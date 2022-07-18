@@ -31,6 +31,7 @@
        url("#{$vanillicon-font-path}vanillicon.svg?#vanillicon") format("svg");
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 .icon:before {

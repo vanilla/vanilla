@@ -12,7 +12,8 @@ use Vanilla\Contracts\Web\AssetInterface;
 /**
  * Class for holder data of a preload.
  */
-class AssetPreloader {
+class AssetPreloader
+{
     // `as` parameter values
     const AS_SCRIPT = "script";
     const AS_STYLE = "style";
@@ -40,7 +41,8 @@ class AssetPreloader {
      * @param string $rel
      * @param string $as
      */
-    public function __construct(AssetInterface $asset, string $rel, string $as) {
+    public function __construct(AssetInterface $asset, string $rel, string $as)
+    {
         $this->asset = $asset;
         $this->as = $as;
         $this->rel = $rel;
@@ -49,21 +51,24 @@ class AssetPreloader {
     /**
      * @return AssetInterface
      */
-    public function getAsset(): AssetInterface {
+    public function getAsset(): AssetInterface
+    {
         return $this->asset;
     }
 
     /**
      * @return string
      */
-    public function getAs(): string {
+    public function getAs(): string
+    {
         return $this->as;
     }
 
     /**
      * @return string
      */
-    public function getRel(): string {
+    public function getRel(): string
+    {
         return $this->rel;
     }
 }

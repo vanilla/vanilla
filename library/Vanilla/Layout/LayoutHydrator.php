@@ -40,7 +40,6 @@ use Vanilla\Widgets\React\BannerContentWidget;
 use Vanilla\Widgets\React\HtmlReactWidget;
 use Vanilla\Widgets\React\LeaderboardWidget;
 use Vanilla\Widgets\React\QuickLinksWidget;
-use Vanilla\Widgets\React\WidgetContainerReactWidget;
 use Vanilla\Widgets\Schema\ReactSingleChildSchema;
 
 /**
@@ -49,10 +48,10 @@ use Vanilla\Widgets\Schema\ReactSingleChildSchema;
  * It collects data resolvers and layout view definitions so that it can take a layout specification
  * and resolve the data inside them into a form that can be rendered by the frontend.
  */
-final class LayoutHydrator {
-
+final class LayoutHydrator
+{
     /** @var string */
-    public const PARAM_PAGE_HEAD = '_pageHead';
+    public const PARAM_PAGE_HEAD = "_pageHead";
 
     /** @var Container */
     private $container;
@@ -92,8 +91,7 @@ final class LayoutHydrator {
         $this->addResolver($container->get(TranslateResolver::class));
 
         // Register core react widget resolvers.
-        $this
-            ->addReactResolver(HtmlReactWidget::class)
+        $this->addReactResolver(HtmlReactWidget::class)
             ->addReactResolver(SectionThreeColumns::class)
             ->addReactResolver(SectionTwoColumns::class)
             ->addReactResolver(SectionOneColumn::class)
@@ -101,8 +99,7 @@ final class LayoutHydrator {
             ->addReactResolver(QuickLinksWidget::class)
             ->addReactResolver(LeaderboardWidget::class)
             ->addReactResolver(BannerFullWidget::class)
-            ->addReactResolver(BannerContentWidget::class)
-        ;
+            ->addReactResolver(BannerContentWidget::class);
 
         $this->addLayoutView($container->get(HomeLayoutView::class));
         $this->addMiddleware($container->get(LayoutPermissionFilterMiddleware::class));
@@ -116,7 +113,8 @@ final class LayoutHydrator {
      *
      * @return LayoutHydrator
      */
-    public function addLayoutView(AbstractCustomLayoutView $layoutView): LayoutHydrator {
+    public function addLayoutView(AbstractCustomLayoutView $layoutView): LayoutHydrator
+    {
         $this->layoutViews[$layoutView->getType()] = $layoutView;
         return $this;
     }
@@ -126,10 +124,10 @@ final class LayoutHydrator {
      *
      * @return string[]
      */
-    public function getLayoutViewTypes(): array {
+    public function getLayoutViewTypes(): array
+    {
         return array_keys($this->layoutViews);
     }
-
 
     /**
      * Add a data middleware to the service.
@@ -138,11 +136,11 @@ final class LayoutHydrator {
      *
      * @return $this
      */
-    public function addMiddleware(AbstractMiddleware $middleware): LayoutHydrator {
+    public function addMiddleware(AbstractMiddleware $middleware): LayoutHydrator
+    {
         $this->dataHydrator->addMiddleware($middleware);
         return $this;
     }
-
 
     /**
      * Add a data resolver to the service.
@@ -151,7 +149,8 @@ final class LayoutHydrator {
      *
      * @return $this
      */
-    public function addResolver(AbstractDataResolver $dataResolver): LayoutHydrator {
+    public function addResolver(AbstractDataResolver $dataResolver): LayoutHydrator
+    {
         $this->dataHydrator->addResolver($dataResolver);
         return $this;
     }
@@ -161,7 +160,8 @@ final class LayoutHydrator {
      *
      * @param class-string<AbstractReactModule> $reactModuleClass
      */
-    public function addReactResolver(string $reactModuleClass): LayoutHydrator {
+    public function addReactResolver(string $reactModuleClass): LayoutHydrator
+    {
         $this->dataHydrator->addResolver(new ReactResolver($reactModuleClass, $this->container));
         return $this;
     }
@@ -174,7 +174,10 @@ final class LayoutHydrator {
      *
      * @return Schema
      */
-    public function getViewParamSchema(?AbstractCustomLayoutView $layoutView, bool $includeResolvedSchema = false): Schema {
+    public function getViewParamSchema(
+        ?AbstractCustomLayoutView $layoutView,
+        bool $includeResolvedSchema = false
+    ): Schema {
         $schema = $this->commonLayout->getParamInputSchema();
 
         if ($includeResolvedSchema) {
@@ -193,14 +196,16 @@ final class LayoutHydrator {
     /**
      * @return AbstractMiddleware[]
      */
-    public function getMiddlewares(): array {
+    public function getMiddlewares(): array
+    {
         return $this->dataHydrator->getMiddlewares();
     }
 
     /**
      * @return AbstractDataResolver[]
      */
-    public function getResolvers(): array {
+    public function getResolvers(): array
+    {
         return $this->dataHydrator->getResolvers();
     }
 
@@ -212,17 +217,24 @@ final class LayoutHydrator {
      *
      * @return ParamResolver
      */
-    private function applyParamsNamesToResolver(?AbstractCustomLayoutView $layoutView, ParamResolver $paramResolver): ParamResolver {
+    private function applyParamsNamesToResolver(
+        ?AbstractCustomLayoutView $layoutView,
+        ParamResolver $paramResolver
+    ): ParamResolver {
         $paramSchema = $this->getViewParamSchema($layoutView, true);
         $enumValues = [];
         $enumDescriptions = [];
 
-        $extractRecursive = function (array $properties, string $rootKey = '') use (&$enumValues, &$extractRecursive, &$enumDescriptions) {
+        $extractRecursive = function (array $properties, string $rootKey = "") use (
+            &$enumValues,
+            &$extractRecursive,
+            &$enumDescriptions
+        ) {
             foreach ($properties as $propertyKey => $propertyValue) {
                 $enumValues[] = $rootKey . $propertyKey;
-                $enumDescriptions[] = $propertyValue['description'] ?? '';
-                if (isset($propertyValue['properties'])) {
-                    $extractRecursive($propertyValue['properties'], $rootKey . $propertyKey . '/');
+                $enumDescriptions[] = $propertyValue["description"] ?? "";
+                if (isset($propertyValue["properties"])) {
+                    $extractRecursive($propertyValue["properties"], $rootKey . $propertyKey . "/");
                 }
             }
         };
@@ -230,8 +242,8 @@ final class LayoutHydrator {
         $extractRecursive($paramSchema->getField("properties", []));
 
         $paramSchema = $paramResolver->getSchema();
-        $paramSchema->setField('properties.ref.enum', $enumValues);
-        $paramSchema->setField('properties.ref.enumDescriptions', $enumDescriptions);
+        $paramSchema->setField("properties.ref.enum", $enumValues);
+        $paramSchema->setField("properties.ref.enumDescriptions", $enumDescriptions);
 
         return $paramResolver;
     }
@@ -246,22 +258,27 @@ final class LayoutHydrator {
      *
      * @return array returns hydrated content.
      */
-    public function hydrateLayout(string $layoutViewType, array $params, array $layout, ?bool $includeMeta = true): array {
+    public function hydrateLayout(
+        string $layoutViewType,
+        array $params,
+        array $layout,
+        ?bool $includeMeta = true
+    ): array {
         $cleanPageHead = clone $this->pageHead;
 
         // Validate the params.
         $params = $this->resolveParams($layoutViewType, $params, $cleanPageHead);
 
-        $hydrator = $this->getHydrator($layoutViewType, $cleanPageHead);
+        $hydrator = $this->getHydrator($layoutViewType, $cleanPageHead, false, $params);
         $result = $hydrator->resolve($layout, $params);
         if ($includeMeta) {
             // Apply pageHead meta
-            $result['seo'] = [
-                'title' => $cleanPageHead->getSeoTitle(),
-                'description' => $cleanPageHead->getSeoDescription(),
-                'meta' => $cleanPageHead->getMetaTags(),
-                'links' => $cleanPageHead->getLinkTags(),
-                'json-ld' => $cleanPageHead->getJsonLDScriptContent(),
+            $result["seo"] = [
+                "title" => $cleanPageHead->getSeoTitle(),
+                "description" => $cleanPageHead->getSeoDescription(),
+                "meta" => $cleanPageHead->getMetaTags(),
+                "links" => $cleanPageHead->getLinkTags(),
+                "json-ld" => $cleanPageHead->getJsonLDScriptContent(),
             ];
         }
         return $result;
@@ -276,9 +293,10 @@ final class LayoutHydrator {
      *
      * @return array returns hydrated content.
      */
-    public function getAssetLayout(string $layoutViewType, array $params, array $layout): array {
+    public function getAssetLayout(string $layoutViewType, array $params, array $layout): array
+    {
         $result = [];
-       // Validate the params.
+        // Validate the params.
         $hydrator = $this->getHydrator($layoutViewType, null, true);
         $hydrator->resolve($layout, $params);
         $widgetNames = [];
@@ -292,26 +310,25 @@ final class LayoutHydrator {
         /** @var WebpackAssetProvider $webpackAssetProvider */
         $webpackAssetProvider = Gdn::getContainer()->get(WebpackAssetProvider::class);
         $webpackAssetProvider->setHotReloadEnabled(false);
-        $jsList = $webpackAssetProvider->getScripts('layouts', true);
-        $cssList = $webpackAssetProvider->getStylesheets('layouts', true);
+        $jsList = $webpackAssetProvider->getScripts("layouts", true);
+        $cssList = $webpackAssetProvider->getStylesheets("layouts", true);
         $webpackAssetProvider->setHotReloadEnabled(true);
-        $result['js'] = [];
-        $result['css'] = [];
+        $result["js"] = [];
+        $result["css"] = [];
 
         foreach ($widgetNames as $widget) {
             foreach ($jsList as $jsAsset) {
                 if (str_contains($jsAsset->getWebPath(), $widget)) {
-                    $result['js'][] = $jsAsset->getWebPath();
+                    $result["js"][] = $jsAsset->getWebPath();
                 }
             }
             foreach ($cssList as $cssAsset) {
                 if (str_contains($cssAsset->getWebPath(), $widget)) {
-                    $result['css'][] = $cssAsset->getWebPath();
+                    $result["css"][] = $cssAsset->getWebPath();
                 }
             }
         }
         // Apply pageHead meta
-
 
         return $result;
     }
@@ -327,7 +344,11 @@ final class LayoutHydrator {
      *
      * @throws ValidationException If the params are invalid.
      */
-    public function resolveParams(?string $layoutViewType, array $inputParams, ?PageHeadInterface $pageHead = null): array {
+    public function resolveParams(
+        ?string $layoutViewType,
+        array $inputParams,
+        ?PageHeadInterface $pageHead = null
+    ): array {
         $layoutView = $this->getLayoutViewType($layoutViewType);
         $inputSchema = $this->getViewParamSchema($layoutView);
         $inputParams = $inputSchema->validate($inputParams);
@@ -349,10 +370,16 @@ final class LayoutHydrator {
      * @param string|null $layoutViewType
      * @param ?PageHeadInterface $pageHead
      * @param bool $onlyGetAsset
+     * @param array $resolvedParams The resolved hydration parameters.
      *
      * @return DataHydrator
      */
-    public function getHydrator(?string $layoutViewType, ?PageHeadInterface $pageHead = null, ?bool $onlyGetAsset = null): DataHydrator {
+    public function getHydrator(
+        ?string $layoutViewType,
+        ?PageHeadInterface $pageHead = null,
+        ?bool $onlyGetAsset = null,
+        array $resolvedParams = []
+    ): DataHydrator {
         $dataHydrator = $this->dataHydrator;
         $layoutView = $this->getLayoutViewType($layoutViewType);
         if ($layoutView) {
@@ -367,8 +394,12 @@ final class LayoutHydrator {
         foreach ($dataHydrator->getResolvers() as $resolver) {
             if ($resolver instanceof PageHeadAwareInterface && $pageHead !== null) {
                 $resolver->setPageHead($pageHead);
-            } else if ($resolver instanceof LayoutAssetAwareInterface && $onlyGetAsset !== null) {
+            }
+            if ($resolver instanceof LayoutAssetAwareInterface && $onlyGetAsset !== null) {
                 $resolver->setPartialHydrate($onlyGetAsset);
+            }
+            if ($resolver instanceof HydrateAwareInterface) {
+                $resolver->setHydrateParams($resolvedParams);
             }
         }
 
@@ -383,25 +414,26 @@ final class LayoutHydrator {
      *
      * @return Schema
      */
-    public function getSchema(?string $layoutViewType): Schema {
+    public function getSchema(?string $layoutViewType): Schema
+    {
         $dataHydrator = $this->getHydrator($layoutViewType);
 
         $schemaGenerator = $dataHydrator->getSchemaGenerator();
         $schema = Schema::parse([
-            'layoutID:s?',
-            'name:s?',
-            'layoutViewType:s' => [
-                'enum' => $this->getLayoutViewTypes(),
+            "layoutID:s?",
+            "name:s?",
+            "layoutViewType:s" => [
+                "enum" => $this->getLayoutViewTypes(),
             ],
-            'layout' => [
-                'type' => 'array',
-                'items' => new HydrateableSchema(
+            "layout" => [
+                "type" => "array",
+                "items" => new HydrateableSchema(
                     // Allow only sections in the top level.
                     (new ReactSingleChildSchema(null, ReactResolver::HYDRATE_GROUP_SECTION))->getSchemaArray(),
                     null
                 ),
             ],
-            'dateInserted:dt?',
+            "dateInserted:dt?",
         ]);
         $schema = $schemaGenerator->decorateSchema($schema);
 
@@ -415,10 +447,11 @@ final class LayoutHydrator {
      *
      * @return AbstractCustomLayoutView|null
      */
-    public function getLayoutViewType(?string $layoutViewType): ?AbstractCustomLayoutView {
+    public function getLayoutViewType(?string $layoutViewType): ?AbstractCustomLayoutView
+    {
         $layoutView = $this->layoutViews[$layoutViewType] ?? null;
         if ($layoutViewType !== null && $layoutView === null) {
-            throw new NotFoundException('LayoutViewType', ['layoutViewType' => $layoutViewType]);
+            throw new NotFoundException("LayoutViewType", ["layoutViewType" => $layoutViewType]);
         }
         return $layoutView;
     }

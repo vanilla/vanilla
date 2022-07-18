@@ -81,7 +81,7 @@
             bottom: $component-vertical_padding;
             left: calc(#{$component-horizontal_padding} / 2);
             right: calc(#{$component-horizontal_padding} / 2);
-        };
+        }
     }
 
     td:first-child .Wrap {
@@ -97,7 +97,7 @@
     .Title.Title {
         font-size: $component-title_fontSize;
         font-weight: $component-title_fontWeight;
-        line-height: #{$theme-photo_size / 2};
+        line-height: #{$theme-photo_size * 0.5};
         display: block;
 
         @if $staticVariables {
@@ -250,7 +250,7 @@
     .UserLink.BlockTitle,
     .BigCount .Meta,
     .Block.Wrap .Meta {
-         margin-left: calc(#{$theme-photo_size} + #{$utility-baseUnit} + (#{$component-horizontal_padding} / 2));
+        margin-left: calc(#{$theme-photo_size} + #{$utility-baseUnit} + (#{$component-horizontal_padding} / 2));
     }
 
     @if ($staticVariables) {
@@ -370,7 +370,6 @@
         }
 
         tbody {
-
             .Options {
                 top: auto;
             }
@@ -455,7 +454,6 @@
         }
 
         @include maxWidth($theme-breakpoint_base) {
-
             td.CountComments,
             td.LatestPost {
                 display: none;
@@ -522,13 +520,11 @@
             .Title {
                 width: calc(100% - 52px);
             }
-
         }
 
         //ideation styles
         .ItemIdea {
             td.DiscussionName {
-
                 .Wrap {
                     display: flex;
                     flex-wrap: wrap;
@@ -606,7 +602,6 @@ body.UserLoggedOut .DiscussionsTable tbody td.DiscussionName .Wrap {
 body.Section-DiscussionList.mine,
 body.Categories.Section-DiscussionList,
 body.Section-Group {
-
     .DataTable.DiscussionsTable {
         width: 100%;
     }
@@ -650,7 +645,6 @@ body.Section-Group {
     }
 
     .Invitation {
-
         @if ($staticVariables) {
             .MItem {
                 color: $component-meta_color;
@@ -663,7 +657,6 @@ body.Section-Group {
         }
 
         .UserName {
-
             @include maxWidth {
                 border-top-right-radius: 0;
                 border-bottom-right-radius: 0;
@@ -675,7 +668,6 @@ body.Section-Group {
         }
 
         .BlockColumn-Buttons {
-
             @include maxWidth {
                 min-width: 105px;
             }
@@ -683,9 +675,7 @@ body.Section-Group {
     }
 
     .Event {
-
         .EventTitle .Wrap {
-
             @include maxWidth {
                 display: flex;
                 flex-wrap: wrap;
@@ -744,7 +734,6 @@ body.Section-Group {
     }
 
     .Group-Name {
-
         .Title-Wrapper,
         .Wrap {
             padding-left: 0;
@@ -769,7 +758,6 @@ body.Section-Group {
         }
 
         @include maxWidth {
-
             .Wrap {
                 display: flex;
                 flex-wrap: wrap;
@@ -785,7 +773,6 @@ body.Section-Group {
         }
     }
 
-
     .EventLocation {
         .Text {
             display: block;
@@ -795,7 +782,6 @@ body.Section-Group {
 
     //Applicants & Invitations table
     @include maxWidth {
-
         tr.Invitation {
             td.UserName {
                 border-right: none;
@@ -823,7 +809,6 @@ body.Section-Group {
     }
 
     @include maxWidth {
-
         td.CountMembers,
         td.EventDate {
             display: none;
@@ -836,7 +821,6 @@ body.Section-Group {
 }
 
 .MemberList .DataTable {
-
     td.UserName {
         width: 70%;
 
@@ -855,7 +839,6 @@ body.Section-Group {
     }
 
     td.BlockColumn-Buttons {
-
         @include maxWidth {
             width: 160px;
 
@@ -872,7 +855,6 @@ body.Section-Group {
     }
 
     td.JoinDate {
-
         @include maxWidth {
             display: none;
         }
@@ -894,14 +876,12 @@ body.Section-Group {
 
 //.Section-Groups DiscussionsList
 .Group-Box .DiscussionsTable {
-
     td.DiscussionName.DiscussionName .Wrap {
         display: block;
         padding-left: 0;
     }
 
     .DiscussionName {
-
         .Title.Title {
             padding-right: 0;
 
@@ -912,13 +892,12 @@ body.Section-Group {
     }
 }
 
-
 // Reactions Log
 .DataTable-ReactionsLog {
     border-radius: 4px;
     overflow: hidden;
     width: 100%;
-    margin: 0!important;
+    margin: 0 !important;
     border-collapse: collapse;
 
     tbody {
@@ -946,7 +925,7 @@ body.Section-Group {
             border: 0 !important;
             border-radius: 0 !important;
             vertical-align: middle;
-            padding: 4px 0!important;
+            padding: 4px 0 !important;
         }
     }
 

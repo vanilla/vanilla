@@ -10,11 +10,13 @@ namespace VanillaTests\ThemeInAddons;
 /**
  * Some theme hooks.
  */
-class ThemeInAddonsThemeHooks extends \Gdn_Plugin {
+class ThemeInAddonsThemeHooks extends \Gdn_Plugin
+{
     /**
      * This will run when you "Enable" the theme
      */
-    public function setup() {
+    public function setup()
+    {
         return true;
     }
 }

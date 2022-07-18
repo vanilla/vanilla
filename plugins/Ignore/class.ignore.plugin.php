@@ -27,46 +27,51 @@
  *
  * @psalm-suppress UndefinedDocblockClass
  */
-class IgnorePlugin extends Gdn_Plugin {
-
-    const IGNORE_SELF = 'self';
-    const IGNORE_GOD = 'god';
-    const IGNORE_LIMIT = 'limit';
-    const IGNORE_RESTRICTED = 'restricted';
-    const IGNORE_FORUM_ADMIN = 'forumadmin';
-    const IGNORE_FORUM_MOD = 'forummods';
+class IgnorePlugin extends Gdn_Plugin
+{
+    const IGNORE_SELF = "self";
+    const IGNORE_GOD = "god";
+    const IGNORE_LIMIT = "limit";
+    const IGNORE_RESTRICTED = "restricted";
+    const IGNORE_FORUM_ADMIN = "forumadmin";
+    const IGNORE_FORUM_MOD = "forummods";
 
     public $allowModeratorIgnore;
 
     /**
      * IgnorePlugin constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->allowModeratorIgnore = c('Plugins.Ignore.AllowModeratorIgnore', true);
-        $this->fireEvent('Init');
+        $this->allowModeratorIgnore = c("Plugins.Ignore.AllowModeratorIgnore", true);
+        $this->fireEvent("Init");
     }
-
 
     /**
      * Add mapper methods
      *
      * @param object $sender
      */
-    public function simpleApiPlugin_mapper_handler($sender) {
+    public function simpleApiPlugin_mapper_handler($sender)
+    {
         switch ($sender->Mapper->Version) {
-            case '1.0':
-                $sender->Mapper->addMap([
-                    'ignore/list' => 'profile/ignore',
-                    'ignore/add' => 'profile/ignore/add',
-                    'ignore/remove' => 'profile/ignore/remove',
-                    'ignore/restrict' => 'profile/ignore/restrict'
-                ], null, [
-                    'ignore/list' => ['IgnoreList', 'IgnoreLimit', 'IgnoreRestricted'],
-                    'ignore/add' => ['Success'],
-                    'ignore/remove' => ['Success'],
-                    'ignore/restrict' => ['Success']
-                ]);
+            case "1.0":
+                $sender->Mapper->addMap(
+                    [
+                        "ignore/list" => "profile/ignore",
+                        "ignore/add" => "profile/ignore/add",
+                        "ignore/remove" => "profile/ignore/remove",
+                        "ignore/restrict" => "profile/ignore/restrict",
+                    ],
+                    null,
+                    [
+                        "ignore/list" => ["IgnoreList", "IgnoreLimit", "IgnoreRestricted"],
+                        "ignore/add" => ["Success"],
+                        "ignore/remove" => ["Success"],
+                        "ignore/restrict" => ["Success"],
+                    ]
+                );
                 break;
         }
     }
@@ -74,29 +79,26 @@ class IgnorePlugin extends Gdn_Plugin {
     /**
      * @param ProfileController $sender
      */
-    public function profileController_afterAddSideMenu_handler($sender) {
-        if (!Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
+    public function profileController_afterAddSideMenu_handler($sender)
+    {
+        if (!Gdn::session()->checkPermission("Garden.SignIn.Allow")) {
             return;
         }
 
-        $sideMenu = $sender->EventArguments['SideMenu'];
+        $sideMenu = $sender->EventArguments["SideMenu"];
         $viewingUserID = Gdn::session()->UserID;
 
         if ($sender->User->UserID == $viewingUserID) {
-            $sideMenu->addLink(
-                'Options',
-                sprite('SpIgnoreList') . ' ' . t('Ignore List'),
-                '/profile/ignore',
-                false,
-                ['class' => 'Popup']
-            );
+            $sideMenu->addLink("Options", sprite("SpIgnoreList") . " " . t("Ignore List"), "/profile/ignore", false, [
+                "class" => "Popup",
+            ]);
         } else {
             $sideMenu->addLink(
-                'Options',
-                sprite('SpIgnoreList') . ' ' . t('Ignore List'),
+                "Options",
+                sprite("SpIgnoreList") . " " . t("Ignore List"),
                 "/profile/ignore/{$sender->User->UserID}/" . Gdn_Format::url($sender->User->Name),
-                'Garden.Users.Edit',
-                ['class' => 'Popup']
+                "Garden.Users.Edit",
+                ["class" => "Popup"]
             );
         }
     }
@@ -106,9 +108,10 @@ class IgnorePlugin extends Gdn_Plugin {
      *
      * @param ProfileController $sender
      */
-    public function profileController_ignore_create($sender) {
-        $sender->permission('Garden.SignIn.Allow');
-        $sender->title(t('Ignore List'));
+    public function profileController_ignore_create($sender)
+    {
+        $sender->permission("Garden.SignIn.Allow");
+        $sender->title(t("Ignore List"));
 
         $this->dispatch($sender);
     }
@@ -116,29 +119,29 @@ class IgnorePlugin extends Gdn_Plugin {
     /**
      * @param Gdn_Controller $sender
      */
-    public function controller_index($sender) {
-
+    public function controller_index($sender)
+    {
         $args = $sender->RequestArgs;
         if (sizeof($args) < 2) {
             $args = array_merge($args, [0, 0]);
         } elseif (sizeof($args) > 2) {
             $args = array_slice($args, 0, 2);
         }
-        list($userReference, $username) = $args;
+        [$userReference, $username] = $args;
 
         $sender->getUserInfo($userReference, $username);
-        $sender->_SetBreadcrumbs(t('Ignore List'), '/profile/ignore');
+        $sender->_SetBreadcrumbs(t("Ignore List"), "/profile/ignore");
 
         $userID = $viewingUserID = Gdn::session()->UserID;
         if ($sender->User->UserID != $viewingUserID) {
-            $sender->permission('Garden.Users.Edit');
+            $sender->permission("Garden.Users.Edit");
             $userID = $sender->User->UserID;
         }
 
-        $sender->setData('ForceEditing', ($userID == Gdn::session()->UserID) ? false : $sender->User->Name);
+        $sender->setData("ForceEditing", $userID == Gdn::session()->UserID ? false : $sender->User->Name);
 
         if ($sender->Form->authenticatedPostBack()) {
-            $ignoreUsername = $sender->Form->getFormValue('AddIgnore');
+            $ignoreUsername = $sender->Form->getFormValue("AddIgnore");
             try {
                 $addIgnoreUser = Gdn::userModel()->getByUsername($ignoreUsername);
                 $addRestricted = $this->ignoreRestricted($addIgnoreUser->UserID);
@@ -166,10 +169,11 @@ class IgnorePlugin extends Gdn_Plugin {
                     default:
                         $this->addIgnore($userID, $addIgnoreUser->UserID);
                         $sender->informMessage(
-                            '<span class="InformSprite Contrast"></span>' . sprintf(t("%s is now on ignore."), $addIgnoreUser->Name),
-                            'AutoDismiss HasSprite'
+                            '<span class="InformSprite Contrast"></span>' .
+                                sprintf(t("%s is now on ignore."), $addIgnoreUser->Name),
+                            "AutoDismiss HasSprite"
                         );
-                        $sender->Form->setFormValue('AddIgnore', '');
+                        $sender->Form->setFormValue("AddIgnore", "");
                         break;
                 }
             } catch (Exception $ex) {
@@ -177,10 +181,10 @@ class IgnorePlugin extends Gdn_Plugin {
             }
         }
 
-        $ignoredUsersRaw = $this->getUserMeta($userID, 'Blocked.User.%');
+        $ignoredUsersRaw = $this->getUserMeta($userID, "Blocked.User.%");
         $ignoredUsersIDs = [];
         foreach ($ignoredUsersRaw as $ignoredUsersKey => $ignoredUsersIgnoreDate) {
-            $ignoredUsersKeyArray = explode('.', $ignoredUsersKey);
+            $ignoredUsersKeyArray = explode(".", $ignoredUsersKey);
             $ignoredUsersID = array_pop($ignoredUsersKeyArray);
             $ignoredUsersIDs[$ignoredUsersID] = $ignoredUsersIgnoreDate;
         }
@@ -189,19 +193,19 @@ class IgnorePlugin extends Gdn_Plugin {
 
         // Add ignore date to each user
         foreach ($ignoredUsers as $ignoredUsersID => &$ignoredUser) {
-            $ignoredUser['IgnoreDate'] = $ignoredUsersIDs[$ignoredUsersID];
+            $ignoredUser["IgnoreDate"] = $ignoredUsersIDs[$ignoredUsersID];
         }
 
         $ignoredUsers = array_values($ignoredUsers);
-        $sender->setData('IgnoreList', $ignoredUsers);
+        $sender->setData("IgnoreList", $ignoredUsers);
 
-        $maxIgnores = c('Plugins.Ignore.MaxIgnores', 5);
-        $sender->setData('IgnoreLimit', ($sender->User->Admin) ? 'infinite' : $maxIgnores);
+        $maxIgnores = c("Plugins.Ignore.MaxIgnores", 5);
+        $sender->setData("IgnoreLimit", $sender->User->Admin ? "infinite" : $maxIgnores);
 
         $ignoreIsRestricted = $this->ignoreIsRestricted($userID);
-        $sender->setData('IgnoreRestricted', $ignoreIsRestricted);
+        $sender->setData("IgnoreRestricted", $ignoreIsRestricted);
 
-        $sender->render('ignore', '', 'plugins/Ignore');
+        $sender->render("ignore", "", "plugins/Ignore");
     }
 
     /*
@@ -215,7 +219,8 @@ class IgnorePlugin extends Gdn_Plugin {
      * @param int|null $sessionUserID
      * @return bool|string
      */
-    public function ignoreRestricted($userID, $sessionUserID = null) {
+    public function ignoreRestricted($userID, $sessionUserID = null)
+    {
         if (is_null($sessionUserID)) {
             $sessionUserID = Gdn::session()->UserID;
         }
@@ -232,29 +237,32 @@ class IgnorePlugin extends Gdn_Plugin {
         }
 
         // Forum admins can;t be ignored.
-        if (Gdn::userModel()->checkPermission($ignoreUser, 'Garden.Settings.Manage')) {
+        if (Gdn::userModel()->checkPermission($ignoreUser, "Garden.Settings.Manage")) {
             return self::IGNORE_FORUM_ADMIN;
         }
 
-        if (!$this->allowModeratorIgnore && Gdn::userModel()->checkPermission($ignoreUser, 'Garden.Moderation.Manage')) {
+        if (
+            !$this->allowModeratorIgnore &&
+            Gdn::userModel()->checkPermission($ignoreUser, "Garden.Moderation.Manage")
+        ) {
             return self::IGNORE_FORUM_MOD;
         }
 
         // Admins can ignore anyone
-        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+        if (Gdn::session()->checkPermission("Garden.Settings.Manage")) {
             return false;
         }
 
         // Ignore has been restricted for you
-        $ignoreRestricted = $this->getUserMeta($sessionUserID, 'Plugin.Ignore.Forbidden');
-        $ignoreRestricted = getValue('Plugin.Ignore.Forbidden', $ignoreRestricted, false);
+        $ignoreRestricted = $this->getUserMeta($sessionUserID, "Plugin.Ignore.Forbidden");
+        $ignoreRestricted = getValue("Plugin.Ignore.Forbidden", $ignoreRestricted, false);
         if ($ignoreRestricted) {
             return self::IGNORE_RESTRICTED;
         }
 
-        $ignoredUsers = $this->getUserMeta($sessionUserID, 'Blocked.User.%');
+        $ignoredUsers = $this->getUserMeta($sessionUserID, "Blocked.User.%");
         $numIgnoredUsers = sizeof($ignoredUsers);
-        $maxIgnores = c('Plugins.Ignore.MaxIgnores', 5);
+        $maxIgnores = c("Plugins.Ignore.MaxIgnores", 5);
         if ($numIgnoredUsers >= $maxIgnores) {
             return self::IGNORE_LIMIT;
         }
@@ -268,16 +276,17 @@ class IgnorePlugin extends Gdn_Plugin {
      * @param int $forUserID
      * @param int $ignoreUserID
      */
-    protected function addIgnore($forUserID, $ignoreUserID) {
-        $this->setUserMeta($forUserID, "Blocked.User.{$ignoreUserID}", date('Y-m-d H:i:s'));
+    protected function addIgnore($forUserID, $ignoreUserID)
+    {
+        $this->setUserMeta($forUserID, "Blocked.User.{$ignoreUserID}", date("Y-m-d H:i:s"));
 
         // Since the Conversation application can be turned off, check first if the ConversationModel is present.
-        if (class_exists('ConversationModel')) {
+        if (class_exists("ConversationModel")) {
             // Remove from conversations
             $conversations = $this->ignoreConversations($ignoreUserID, $forUserID);
-            Gdn::sql()->delete('UserConversation', [
-                'UserID' => $forUserID,
-                'ConversationID' => $conversations
+            Gdn::sql()->delete("UserConversation", [
+                "UserID" => $forUserID,
+                "ConversationID" => $conversations,
             ]);
             $conversationModel = new ConversationModel();
             $conversationModel->countUnread($forUserID, true);
@@ -291,7 +300,8 @@ class IgnorePlugin extends Gdn_Plugin {
      * @param int|null $sessionUserID
      * @return array|bool|string
      */
-    public function ignoreConversations($ignoreUserID, $sessionUserID = null) {
+    public function ignoreConversations($ignoreUserID, $sessionUserID = null)
+    {
         // Guests cant ignore
         if (!Gdn::session()->isValid()) {
             return false;
@@ -307,28 +317,30 @@ class IgnorePlugin extends Gdn_Plugin {
         }
 
         // Avoid a call to the database if the Conversation application is turned off.
-        if (!class_exists('ConversationModel')) {
+        if (!class_exists("ConversationModel")) {
             return [];
         }
 
         // Get ignore user's conversation IDs
         $ignoreConversations = Gdn::sql()
-            ->select('ConversationID')
-            ->from('UserConversation')
-            ->where('UserID', $ignoreUserID)
-            ->where('Deleted', 0)
-            ->get()->resultArray();
-        $ignoreConversationIDs = array_column($ignoreConversations, 'ConversationID', 'ConversationID');
+            ->select("ConversationID")
+            ->from("UserConversation")
+            ->where("UserID", $ignoreUserID)
+            ->where("Deleted", 0)
+            ->get()
+            ->resultArray();
+        $ignoreConversationIDs = array_column($ignoreConversations, "ConversationID", "ConversationID");
         unset($ignoreConversations);
 
         // Get session user's conversation IDs
         $sessionConversations = Gdn::sql()
-            ->select('ConversationID')
-            ->from('UserConversation')
-            ->where('UserID', $sessionUserID)
-            ->where('Deleted', 0)
-            ->get()->resultArray();
-        $sessionConversationIDs = array_column($sessionConversations, 'ConversationID', 'ConversationID');
+            ->select("ConversationID")
+            ->from("UserConversation")
+            ->where("UserID", $sessionUserID)
+            ->where("Deleted", 0)
+            ->get()
+            ->resultArray();
+        $sessionConversationIDs = array_column($sessionConversations, "ConversationID", "ConversationID");
         unset($sessionConversations);
 
         $commonConversations = array_intersect($ignoreConversationIDs, $sessionConversationIDs);
@@ -344,7 +356,8 @@ class IgnorePlugin extends Gdn_Plugin {
      * @param int|null $userID ID for the user to verify ignore permissions for. Current user if none specified.
      * @return bool|string IgnorePlugin::IGNORE_RESTRICTED if user cannot ignore, otherwise false.
      */
-    public function ignoreIsRestricted($userID = null) {
+    public function ignoreIsRestricted($userID = null)
+    {
         // Guests cant ignore
         if (!Gdn::session()->isValid()) {
             return self::IGNORE_RESTRICTED;
@@ -358,8 +371,8 @@ class IgnorePlugin extends Gdn_Plugin {
             return self::IGNORE_RESTRICTED;
         }
 
-        $isRestricted = $this->getUserMeta($userID, 'Plugin.Ignore.Forbidden');
-        $isRestricted = val('Plugin.Ignore.Forbidden', $isRestricted, false);
+        $isRestricted = $this->getUserMeta($userID, "Plugin.Ignore.Forbidden");
+        $isRestricted = val("Plugin.Ignore.Forbidden", $isRestricted, false);
         if ($isRestricted) {
             return self::IGNORE_RESTRICTED;
         }
@@ -370,7 +383,8 @@ class IgnorePlugin extends Gdn_Plugin {
     /**
      * @param Gdn_Controller $sender
      */
-    public function controller_add($sender) {
+    public function controller_add($sender)
+    {
         $sender->deliveryMethod(DELIVERY_METHOD_JSON);
         $sender->deliveryType(DELIVERY_TYPE_DATA);
 
@@ -378,9 +392,9 @@ class IgnorePlugin extends Gdn_Plugin {
             throw new Exception(405);
         }
 
-        $userID = Gdn::request()->get('UserID');
+        $userID = Gdn::request()->get("UserID");
         if ($userID != Gdn::session()->UserID) {
-            $sender->permission('Garden.Users.Edit');
+            $sender->permission("Garden.Users.Edit");
         }
 
         $user = Gdn::userModel()->getID($userID);
@@ -388,7 +402,7 @@ class IgnorePlugin extends Gdn_Plugin {
             throw new Exception(sprintf(t("No such user '%s'"), $userID), 404);
         }
 
-        $ignoreUserID = Gdn::request()->get('IgnoreUserID');
+        $ignoreUserID = Gdn::request()->get("IgnoreUserID");
         $ignoreUser = Gdn::userModel()->getID($ignoreUserID);
         if (!$ignoreUser) {
             throw new Exception(sprintf(t("No such user '%s'"), $ignoreUserID), 404);
@@ -411,7 +425,7 @@ class IgnorePlugin extends Gdn_Plugin {
 
             default:
                 $this->addIgnore($userID, $ignoreUserID);
-                $sender->setData('Success', sprintf(t("Added %s to ignore list."), $ignoreUser->Name));
+                $sender->setData("Success", sprintf(t("Added %s to ignore list."), $ignoreUser->Name));
                 break;
         }
 
@@ -421,31 +435,32 @@ class IgnorePlugin extends Gdn_Plugin {
     /**
      * @param Gdn_Controller $sender
      */
-    public function controller_remove($sender) {
+    public function controller_remove($sender)
+    {
         $sender->deliveryMethod(DELIVERY_METHOD_JSON);
         $sender->deliveryType(DELIVERY_TYPE_DATA);
 
         if (!$sender->Form->authenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
+            throw new Exception("Requires POST", 405);
         }
 
-        $userID = Gdn::request()->get('UserID');
+        $userID = Gdn::request()->get("UserID");
         if ($userID != Gdn::session()->UserID) {
-            $sender->permission('Garden.Users.Edit');
+            $sender->permission("Garden.Users.Edit");
         }
         $user = Gdn::userModel()->getID($userID);
         if (!$user) {
             throw new Exception(sprintf(t("No such user '%s'"), $userID), 404);
         }
 
-        $ignoreUserID = Gdn::request()->get('IgnoreUserID');
+        $ignoreUserID = Gdn::request()->get("IgnoreUserID");
         $ignoreUser = Gdn::userModel()->getID($ignoreUserID);
         if (!$ignoreUser) {
             throw new Exception(sprintf(t("No such user '%s'"), $ignoreUserID), 404);
         }
 
         $this->removeIgnore($userID, $ignoreUserID);
-        $sender->setData('Success', sprintf(t("Removed %s from ignore list."), $ignoreUser->Name));
+        $sender->setData("Success", sprintf(t("Removed %s from ignore list."), $ignoreUser->Name));
 
         $sender->render();
     }
@@ -456,7 +471,8 @@ class IgnorePlugin extends Gdn_Plugin {
      * @param int $forUserID
      * @param int $ignoreUserID
      */
-    protected function removeIgnore($forUserID, $ignoreUserID) {
+    protected function removeIgnore($forUserID, $ignoreUserID)
+    {
         $this->setUserMeta($forUserID, "Blocked.User.{$ignoreUserID}", null);
     }
 
@@ -465,17 +481,18 @@ class IgnorePlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $sender
      */
-    public function controller_restrict($sender) {
+    public function controller_restrict($sender)
+    {
         $sender->deliveryMethod(DELIVERY_METHOD_JSON);
         $sender->deliveryType(DELIVERY_TYPE_DATA);
 
         if (!$sender->Form->authenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
+            throw new Exception("Requires POST", 405);
         }
 
-        $userID = Gdn::request()->get('UserID');
+        $userID = Gdn::request()->get("UserID");
         if ($userID != Gdn::session()->UserID) {
-            $sender->permission('Garden.Users.Edit');
+            $sender->permission("Garden.Users.Edit");
         }
 
         $user = Gdn::userModel()->getID($userID);
@@ -483,14 +500,18 @@ class IgnorePlugin extends Gdn_Plugin {
             throw new Exception("No such user '{$userID}'", 404);
         }
 
-        $restricted = strtolower(Gdn::request()->get('Restricted', 'no'));
-        $restricted = in_array($restricted, ['yes', 'true', 'on', true]) ? true : null;
-        $this->setUserMeta($userID, 'Forbidden', $restricted);
+        $restricted = strtolower(Gdn::request()->get("Restricted", "no"));
+        $restricted = in_array($restricted, ["yes", "true", "on", true]) ? true : null;
+        $this->setUserMeta($userID, "Forbidden", $restricted);
 
         $sender->setData(
-            'Success',
+            "Success",
             sprintf(
-                t($restricted ? "%s's ignore privileges have been disabled." : "%s's ignore privileges have been enabled."),
+                t(
+                    $restricted
+                        ? "%s's ignore privileges have been disabled."
+                        : "%s's ignore privileges have been enabled."
+                ),
                 $user->Name
             )
         );
@@ -501,15 +522,17 @@ class IgnorePlugin extends Gdn_Plugin {
     /**
      * @param ProfileController $sender
      */
-    public function profileController_render_before($sender) {
-        $sender->addJsFile('ignore.js', 'plugins/Ignore');
+    public function profileController_render_before($sender)
+    {
+        $sender->addJsFile("ignore.js", "plugins/Ignore");
     }
 
     /**
      * @param \Vanilla\Web\Asset\LegacyAssetModel $sender
      */
-    public function assetModel_styleCss_handler($sender) {
-        $sender->addCssFile('ignore.css', 'plugins/Ignore');
+    public function assetModel_styleCss_handler($sender)
+    {
+        $sender->addCssFile("ignore.css", "plugins/Ignore");
     }
 
     /**
@@ -519,7 +542,8 @@ class IgnorePlugin extends Gdn_Plugin {
      * @param ActivityModel $sender
      * @param array $args
      */
-    public function activityModel_beforeSave_handler($sender, $args) {
+    public function activityModel_beforeSave_handler($sender, $args)
+    {
         $activity = $args["Activity"];
         if ($this->ignored($activity["ActivityUserID"], $activity["NotifyUserID"])) {
             $args["Activity"]["Skip"] = true;
@@ -532,8 +556,9 @@ class IgnorePlugin extends Gdn_Plugin {
      *
      * @param ActivityModel $sender
      */
-    public function activityModel_afterGet_handler($sender) {
-        $dataEventArgument = 'Data';
+    public function activityModel_afterGet_handler($sender)
+    {
+        $dataEventArgument = "Data";
         if (!array_key_exists($dataEventArgument, $sender->EventArguments)) {
             return;
         }
@@ -542,7 +567,7 @@ class IgnorePlugin extends Gdn_Plugin {
         $data = &$sender->EventArguments[$dataEventArgument];
         $result = &$data->result();
         $result = array_filter($result, function ($row) {
-            return !$this->ignored($row['ActivityUserID']);
+            return !$this->ignored($row["ActivityUserID"]);
         });
 
         if (!empty($result)) {
@@ -551,14 +576,14 @@ class IgnorePlugin extends Gdn_Plugin {
         }
     }
 
-
     /**
      * Add "Ignore" option to profile options.
      *
      * @param ProfileController $sender
      * @param array $args
      */
-    public function profileController_beforeProfileOptions_handler($sender, $args) {
+    public function profileController_beforeProfileOptions_handler($sender, $args)
+    {
         if (!$sender->EditMode && Gdn::session()->isValid()) {
             // Only show option if allowed
             $ignoreRestricted = $this->ignoreRestricted($sender->User->UserID);
@@ -568,10 +593,12 @@ class IgnorePlugin extends Gdn_Plugin {
 
             // Add to dropdown
             $userIgnored = $this->ignored($sender->User->UserID);
-            $label = ($userIgnored) ? sprite('SpUnignore') . ' ' . t('Unignore') : sprite('SpIgnore') . ' ' . t('Ignore');
-            $args['ProfileOptions'][] = ['Text' => $label,
-                'Url' => "/user/ignore/toggle/{$sender->User->UserID}/" . Gdn_Format::url($sender->User->Name),
-                'CssClass' => 'Popup'];
+            $label = $userIgnored ? sprite("SpUnignore") . " " . t("Unignore") : sprite("SpIgnore") . " " . t("Ignore");
+            $args["ProfileOptions"][] = [
+                "Text" => $label,
+                "Url" => "/user/ignore/toggle/{$sender->User->UserID}/" . Gdn_Format::url($sender->User->Name),
+                "CssClass" => "Popup",
+            ];
         }
     }
 
@@ -586,13 +613,13 @@ class IgnorePlugin extends Gdn_Plugin {
      * returns true if userID ignored by sessionUserID, false otherwise.
      * If userID set null, returns an array of blocked users if any users are currently ignored by sessioned user
      */
-    public function ignored($userID = null, $sessionUserID = null) {
-
+    public function ignored($userID = null, $sessionUserID = null)
+    {
         if (is_null($sessionUserID)) {
             $sessionUserID = Gdn::session()->UserID;
         }
 
-        $blockedUsers = $this->getUserMeta($sessionUserID, 'Blocked.User.%');
+        $blockedUsers = $this->getUserMeta($sessionUserID, "Blocked.User.%");
 
         if (is_null($userID)) {
             return $blockedUsers;
@@ -606,32 +633,35 @@ class IgnorePlugin extends Gdn_Plugin {
     /**
      * @param DiscussionController $sender
      */
-    public function discussionController_beforeDiscussionRender_handler($sender) {
-        $sender->addJsFile('ignore.js', 'plugins/Ignore');
+    public function discussionController_beforeDiscussionRender_handler($sender)
+    {
+        $sender->addJsFile("ignore.js", "plugins/Ignore");
     }
 
     /**
      * @param DiscussionController $sender
      */
-    public function discussionController_beforeCommentDisplay_handler($sender) {
+    public function discussionController_beforeCommentDisplay_handler($sender)
+    {
         if ($this->ignoreIsRestricted()) {
             return;
         }
-        $userID = getValue('InsertUserID', $sender->EventArguments['Object']);
+        $userID = getValue("InsertUserID", $sender->EventArguments["Object"]);
         if ($this->ignored($userID)) {
-            $classes = explode(" ", $sender->EventArguments['CssClass']);
-            $classes[] = 'Ignored';
+            $classes = explode(" ", $sender->EventArguments["CssClass"]);
+            $classes[] = "Ignored";
             $classes = array_fill_keys($classes, null);
-            $classes = implode(' ', array_keys($classes));
-            $sender->EventArguments['CssClass'] = $classes;
+            $classes = implode(" ", array_keys($classes));
+            $sender->EventArguments["CssClass"] = $classes;
         }
     }
 
     /**
      * @param MessageController $sender
      */
-    public function messagesController_beforeAddConversation_handler($sender) {
-        $recipients = $sender->EventArguments['Recipients'];
+    public function messagesController_beforeAddConversation_handler($sender)
+    {
+        $recipients = $sender->EventArguments["Recipients"];
         if (!is_array($recipients) || !sizeof($recipients)) {
             return;
         }
@@ -640,7 +670,9 @@ class IgnorePlugin extends Gdn_Plugin {
         foreach ($recipients as $recipientID) {
             if ($this->ignored($userID, $recipientID)) {
                 $user = Gdn::userModel()->getID($recipientID, DATASET_TYPE_ARRAY);
-                $sender->Form->addError(sprintf(t("Unable to create conversation, %s is ignoring you."), htmlspecialchars($user['Name'])));
+                $sender->Form->addError(
+                    sprintf(t("Unable to create conversation, %s is ignoring you."), htmlspecialchars($user["Name"]))
+                );
             }
         }
     }
@@ -650,9 +682,9 @@ class IgnorePlugin extends Gdn_Plugin {
      *
      * @param MessageController $sender
      */
-    public function messagesController_beforeAddMessage_handler($sender) {
-
-        $conversationID = $sender->EventArguments['ConversationID'];
+    public function messagesController_beforeAddMessage_handler($sender)
+    {
+        $conversationID = $sender->EventArguments["ConversationID"];
         $conversationModel = new ConversationModel();
         $recipients = $conversationModel->getRecipients($conversationID);
         if (!$recipients->numRows()) {
@@ -660,13 +692,15 @@ class IgnorePlugin extends Gdn_Plugin {
         }
 
         $recipients = $recipients->resultArray();
-        $recipients = array_column($recipients, 'UserID');
+        $recipients = array_column($recipients, "UserID");
 
         $userID = Gdn::session()->UserID;
         foreach ($recipients as $recipientID => $recipient) {
             if ($this->ignored($userID, $recipientID)) {
                 $user = Gdn::userModel()->getID($recipientID, DATASET_TYPE_ARRAY);
-                $sender->Form->addError(sprintf(t('Unable to send message, %s is ignoring you.'), htmlspecialchars($user['Name'])));
+                $sender->Form->addError(
+                    sprintf(t("Unable to send message, %s is ignoring you."), htmlspecialchars($user["Name"]))
+                );
             }
         }
     }
@@ -674,8 +708,9 @@ class IgnorePlugin extends Gdn_Plugin {
     /**
      * @param UserController $sender
      */
-    public function userController_ignore_create($sender) {
-        $sender->permission('Garden.SignIn.Allow');
+    public function userController_ignore_create($sender)
+    {
+        $sender->permission("Garden.SignIn.Allow");
 
         $args = $sender->RequestArgs;
         if (sizeof($args) < 3) {
@@ -684,21 +719,21 @@ class IgnorePlugin extends Gdn_Plugin {
             $args = array_slice($args, 1, 3);
         }
 
-        list($userReference, $username) = $args;
+        [$userReference, $username] = $args;
 
         // Set user
         $user = $this->getUserInfo($userReference, $username);
-        $sender->setData('User', $user);
-        $userID = getValue('UserID', $user);
+        $sender->setData("User", $user);
+        $userID = getValue("UserID", $user);
 
         // Set title and mode
         $ignoreRestricted = $this->ignoreIsRestricted();
         $userIgnored = $this->ignored($userID);
-        $mode = $userIgnored ? 'unset' : 'set';
-        $actionText = t($mode == 'set' ? 'Ignore' : 'Unignore');
+        $mode = $userIgnored ? "unset" : "set";
+        $actionText = t($mode == "set" ? "Ignore" : "Unignore");
         $sender->title($actionText);
-        $sender->setData('Mode', $mode);
-        if ($mode == 'set') {
+        $sender->setData("Mode", $mode);
+        if ($mode == "set") {
             // Check is Ignore is allowed.
             $ignoreRestricted = $this->ignoreRestricted($userID);
         }
@@ -708,76 +743,78 @@ class IgnorePlugin extends Gdn_Plugin {
                 case self::IGNORE_GOD:
                     $sender->informMessage(
                         '<span class="InformSprite Lightbulb"></span>' . t("You can't ignore that person."),
-                        'AutoDismiss HasSprite'
+                        "AutoDismiss HasSprite"
                     );
                     break;
 
                 case self::IGNORE_LIMIT:
                     $sender->informMessage(
-                        '<span class="InformSprite Lightbulb"></span>' . t("You have reached the maximum number of ignores."),
-                        'AutoDismiss HasSprite'
+                        '<span class="InformSprite Lightbulb"></span>' .
+                            t("You have reached the maximum number of ignores."),
+                        "AutoDismiss HasSprite"
                     );
                     break;
 
                 case self::IGNORE_RESTRICTED:
                     $sender->informMessage(
                         '<span class="InformSprite Lightbulb"></span>' . t("Your ignore privileges have been revoked."),
-                        'AutoDismiss HasSprite'
+                        "AutoDismiss HasSprite"
                     );
                     break;
 
                 case self::IGNORE_SELF:
                     $sender->informMessage(
                         '<span class="InformSprite Lightbulb"></span>' . t("You can't put yourself on ignore."),
-                        'AutoDismiss HasSprite'
+                        "AutoDismiss HasSprite"
                     );
                     break;
             }
 
             // Get conversation intersects
             $conversations = $this->ignoreConversations($userID);
-            $sender->setData('Conversations', $conversations);
+            $sender->setData("Conversations", $conversations);
 
             if ($sender->Form->authenticatedPostBack()) {
                 /** @psalm-suppress ParadoxicalCondition */
                 switch ($mode) {
-                    case 'set':
+                    case "set":
                         if (!$ignoreRestricted) {
-                            $sender->jsonTarget('a.IgnoreButton', t('Unignore'), 'Text');
+                            $sender->jsonTarget("a.IgnoreButton", t("Unignore"), "Text");
                             $this->addIgnore(Gdn::session()->UserID, $userID);
                             $sender->informMessage(
-                                '<span class="InformSprite Contrast"></span>' . sprintf(t("%s is now on ignore."), htmlspecialchars($user->Name)),
-                                'AutoDismiss HasSprite'
+                                '<span class="InformSprite Contrast"></span>' .
+                                    sprintf(t("%s is now on ignore."), htmlspecialchars($user->Name)),
+                                "AutoDismiss HasSprite"
                             );
                         }
 
                         break;
 
-                    case 'unset':
+                    case "unset":
                         if (!$ignoreRestricted) {
-                            $sender->jsonTarget('a.IgnoreButton', t('Ignore'), 'Text');
+                            $sender->jsonTarget("a.IgnoreButton", t("Ignore"), "Text");
                             $this->removeIgnore(Gdn::session()->UserID, $userID);
                             $sender->informMessage(
-                                '<span class="InformSprite Brightness"></span>'.
-                                sprintf(t("%s is no longer on ignore."), htmlspecialchars($user->Name)),
-                                'AutoDismiss HasSprite'
+                                '<span class="InformSprite Brightness"></span>' .
+                                    sprintf(t("%s is no longer on ignore."), htmlspecialchars($user->Name)),
+                                "AutoDismiss HasSprite"
                             );
-                            $sender->setRedirectTo('/profile/ignore');
+                            $sender->setRedirectTo("/profile/ignore");
                         }
 
                         break;
                     default:
                         $sender->informMessage(t("Unsupported operation."));
-                        $sender->setJson('Status', 400);
+                        $sender->setJson("Status", 400);
                         break;
                 }
             }
         } catch (Exception $ex) {
             $sender->informMessage(t("Could not find that person! - " . $ex->getMessage()));
-            $sender->setJson('Status', 404);
+            $sender->setJson("Status", 404);
         }
 
-        $sender->render('confirm', '', 'plugins/Ignore');
+        $sender->render("confirm", "", "plugins/Ignore");
     }
 
     /**
@@ -788,16 +825,17 @@ class IgnorePlugin extends Gdn_Plugin {
      * @param string $userID
      * @return array|bool|false|object
      */
-    protected function getUserInfo($userReference = '', $username = '', $userID = '') {
+    protected function getUserInfo($userReference = "", $username = "", $userID = "")
+    {
         // If a UserID was provided as a querystring parameter, use it over anything else:
         if ($userID) {
             $userReference = $userID;
-            $username = 'Unknown'; // Fill this with a value so the $UserReference is assumed to be an integer/userid.
+            $username = "Unknown"; // Fill this with a value so the $UserReference is assumed to be an integer/userid.
         }
 
-        if ($userReference == '') {
+        if ($userReference == "") {
             $user = Gdn::userModel()->getID(Gdn::session()->UserID);
-        } elseif (is_numeric($userReference) && $username != '') {
+        } elseif (is_numeric($userReference) && $username != "") {
             $user = Gdn::userModel()->getID($userReference);
         } else {
             $user = Gdn::userModel()->getByUsername($userReference);
@@ -805,7 +843,7 @@ class IgnorePlugin extends Gdn_Plugin {
 
         if ($user === false) {
             throw notFoundException();
-        } elseif (getValue('UserID', $user) == Gdn::session()->UserID) {
+        } elseif (getValue("UserID", $user) == Gdn::session()->UserID) {
             throw notFoundException();
         } else {
             return $user;
@@ -817,7 +855,8 @@ class IgnorePlugin extends Gdn_Plugin {
      *
      * @param array $recipientIDs Conversation userIDs.
      */
-    public function filterIgnoredUsers(array &$recipientIDs) {
+    public function filterIgnoredUsers(array &$recipientIDs)
+    {
         $userID = Gdn::session()->UserID;
         foreach ($recipientIDs as $key => $value) {
             if ($this->ignored($userID, $value)) {
@@ -832,17 +871,21 @@ class IgnorePlugin extends Gdn_Plugin {
      * @param ConversationModel $sender
      * @param array $args
      */
-    public function conversationModel_beforeSaveValidation_handler(ConversationModel $sender, array $args) {
-        $recipientIDs = $args['FormPostValues']['RecipientUserID'] ?? false;
+    public function conversationModel_beforeSaveValidation_handler(ConversationModel $sender, array $args)
+    {
+        $recipientIDs = $args["FormPostValues"]["RecipientUserID"] ?? false;
         if ($recipientIDs) {
             $recipientsCopy = $recipientIDs;
             $this->filterIgnoredUsers($recipientIDs);
             $result = array_diff($recipientsCopy, $recipientIDs);
             if (!empty($result)) {
-                $result = implode(',', $result);
+                $result = implode(",", $result);
                 $sender->Validation->addValidationResult(
-                    'recipientUsers',
-                    sprintf(t(' You cannot start a conversation with the following users because they ignored you. %s'), $result)
+                    "recipientUsers",
+                    sprintf(
+                        t(" You cannot start a conversation with the following users because they ignored you. %s"),
+                        $result
+                    )
                 );
             }
         }
@@ -851,16 +894,17 @@ class IgnorePlugin extends Gdn_Plugin {
     /**
      * @param UserController $sender
      */
-    public function userController_ignoreList_create($sender) {
+    public function userController_ignoreList_create($sender)
+    {
         $sender->deliveryType(DELIVERY_TYPE_VIEW);
         $sender->deliveryMethod(DELIVERY_METHOD_JSON);
 
-        if (!Gdn::session()->checkPermission('Garden.Users.Edit')) {
-            $sender->setJson('Status', 401);
-            $sender->render('blank', 'utility', 'dashboard');
+        if (!Gdn::session()->checkPermission("Garden.Users.Edit")) {
+            $sender->setJson("Status", 401);
+            $sender->render("blank", "utility", "dashboard");
         }
 
-        $sender->setJson('Status', 200);
+        $sender->setJson("Status", 200);
 
         $args = $sender->RequestArgs;
         if (sizeof($args) < 3) {
@@ -869,42 +913,42 @@ class IgnorePlugin extends Gdn_Plugin {
             $args = array_slice($args, 1, 3);
         }
 
-        list($userReference, $username) = $args;
+        [$userReference, $username] = $args;
 
         $user = $this->getUserInfo($userReference, $username);
-        $userID = getValue('UserID', $user);
+        $userID = getValue("UserID", $user);
 
         if ($user->Admin) {
             $sender->informMessage(sprintf(t("You can't do that to %s!", $user->Name)));
-            $sender->setJson('Status', 401);
-            $sender->render('blank', 'utility', 'dashboard');
+            $sender->setJson("Status", 401);
+            $sender->render("blank", "utility", "dashboard");
         }
 
         $mode = $sender->RequestArgs[0];
 
         try {
             switch ($mode) {
-                case 'allow':
-                    $this->setUserMeta($userID, 'Forbidden', null);
-                    $sender->jsonTarget('#revoke', t('Restored'));
-                    $sender->jsonTarget('', '', 'Refresh');
+                case "allow":
+                    $this->setUserMeta($userID, "Forbidden", null);
+                    $sender->jsonTarget("#revoke", t("Restored"));
+                    $sender->jsonTarget("", "", "Refresh");
                     break;
 
-                case 'revoke':
-                    $this->setUserMeta($userID, 'Forbidden', true);
-                    $sender->jsonTarget('#revoke', t('Revoked'));
-                    $sender->jsonTarget('', '', 'Refresh');
+                case "revoke":
+                    $this->setUserMeta($userID, "Forbidden", true);
+                    $sender->jsonTarget("#revoke", t("Revoked"));
+                    $sender->jsonTarget("", "", "Refresh");
                     break;
 
                 default:
                     $sender->informMessage(t("Unsupported operation."));
-                    $sender->setJson('Status', 400);
+                    $sender->setJson("Status", 400);
                     break;
             }
         } catch (Exception $ex) {
             $sender->informMessage(t("Could not find that person! - " . $ex->getMessage()));
-            $sender->setJson('Status', 404);
+            $sender->setJson("Status", 404);
         }
-        $sender->render('blank', 'utility', 'dashboard');
+        $sender->render("blank", "utility", "dashboard");
     }
 }

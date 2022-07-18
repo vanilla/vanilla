@@ -231,7 +231,7 @@
     th,
     td {
         width: 100px;
-        padding: ($spacer / 2) $table-padding-x;
+        padding: ($spacer * 0.5) $table-padding-x;
 
         // 1px offset to account for previous border sizes.
         padding-left: $table-padding-x - 1px;
@@ -303,7 +303,7 @@
 
 .tj-meta,
 .table-meta {
-    margin-top: ($spacer / 2);
+    margin-top: ($spacer * 0.5);
 
     & + & {
         margin-top: 0;
@@ -405,7 +405,7 @@
         // Permission column headings
         td {
             text-align: center;
-            padding: $spacer / 2;
+            padding: $spacer * 0.5;
             border: 1px solid #eee;
             border-top: 1px solid #ddd;
             text-transform: uppercase;
@@ -431,7 +431,7 @@
 
     tbody {
         td {
-            padding: ($spacer / 2) ($grid-gutter-width / 2);
+            padding: ($spacer * 0.5) ($grid-gutter-width * 0.5);
             text-align: center;
         }
     }
@@ -467,7 +467,7 @@
                     position: relative;
                     display: block;
                     transform: rotate(90deg);
-                    top: - 24px;
+                    top: -24px;
                 }
             }
         }
@@ -619,7 +619,7 @@
         th,
         td {
             width: 60%;
-            padding: ($spacer / 2) 12px;
+            padding: ($spacer * 0.5) 12px;
             text-transform: uppercase;
             font-weight: 600;
             font-size: $font-size-sm;

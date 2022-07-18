@@ -12,8 +12,8 @@ use Vanilla\Contracts\Models\SiteTotalProviderInterface;
 /**
  * Get site totals for users.
  */
-class UserSiteTotalProvider implements SiteTotalProviderInterface {
-
+class UserSiteTotalProvider implements SiteTotalProviderInterface
+{
     /** @var \UserModel */
     private $userModel;
 
@@ -22,7 +22,8 @@ class UserSiteTotalProvider implements SiteTotalProviderInterface {
      *
      * @param \UserModel $userModel
      */
-    public function __construct(\UserModel $userModel) {
+    public function __construct(\UserModel $userModel)
+    {
         $this->userModel = $userModel;
     }
 
@@ -32,22 +33,25 @@ class UserSiteTotalProvider implements SiteTotalProviderInterface {
      *
      * {@inheritdoc}
      */
-    public function calculateSiteTotalCount(): int {
-        $result = $this->userModel->getCount(['Deleted' => 0]);
+    public function calculateSiteTotalCount(): int
+    {
+        $result = $this->userModel->getCount(["Deleted" => 0]);
         return $result;
     }
 
     /**
      * @inheritdoc
      */
-    public function getSiteTotalRecordType(): string {
+    public function getSiteTotalRecordType(): string
+    {
         return "user";
     }
 
     /**
      * @inheritdoc
      */
-    public function getTableName(): string {
-        return 'User';
+    public function getTableName(): string
+    {
+        return "User";
     }
 }

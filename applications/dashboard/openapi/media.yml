@@ -88,6 +88,14 @@ paths:
                   schema:
                       minLength: 1
                       type: string
+                - description: |
+                      Permanently delete the file from the CDN. This action is irreversible.
+                  in: query
+                  name: deleteFile
+                  required: false
+                  schema:
+                      default: false
+                      type: boolean
             responses:
                 "204":
                     description: Success
@@ -275,6 +283,14 @@ paths:
                   required: true
                   schema:
                       type: integer
+                - description: |
+                      Permanently delete the file from the CDN. This action is irreversible.
+                  in: query
+                  name: deleteFile
+                  required: false
+                  schema:
+                      default: false
+                      type: boolean
             responses:
                 "200":
                     content:

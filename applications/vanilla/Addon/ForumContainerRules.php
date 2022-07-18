@@ -9,9 +9,13 @@ namespace Vanilla\Forum\Addon;
 
 use Garden\Container\ContainerConfigurationInterface;
 use Garden\Container\Reference;
+use Garden\Web\PageControllerRoute;
 use Vanilla\AddonContainerRules;
+use Vanilla\Analytics\EventProviderService;
+use Vanilla\Analytics\SearchDiscussionEventProvider;
+use Vanilla\Forum\Controllers\Pages\DiscussionListPageController;
 use Vanilla\Forum\Layout\View\LegacyCategoryListLayoutView;
-use Vanilla\Forum\Layout\View\LegacyDiscussionListLayoutView;
+use Vanilla\Forum\Layout\View\DiscussionListLayoutView;
 use Vanilla\Forum\Layout\View\LegacyDiscussionThreadLayoutView;
 use Vanilla\Forum\Layout\View\LegacyNewDiscussionLayoutView;
 use Vanilla\Forum\Layout\Middleware\CategoryFilterMiddleware;
@@ -25,6 +29,8 @@ use Vanilla\Forum\Widgets\TagWidget;
 use Vanilla\Forum\Widgets\CategoriesWidget;
 use Vanilla\Forum\Widgets\RSSWidget;
 use Vanilla\Forum\Widgets\UserSpotlightWidget;
+use Vanilla\Forum\Widgets\NewPostWidget;
+use Vanilla\Forum\Widgets\TabsWidget;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\View\HomeLayoutView;
@@ -33,35 +39,62 @@ use Vanilla\Models\SiteTotalService;
 /**
  * Class ForumContainerRules
  */
-class ForumContainerRules extends AddonContainerRules {
-
+class ForumContainerRules extends AddonContainerRules
+{
     /**
      * @inheritdoc
      */
-    public function configureContainer(ContainerConfigurationInterface $container): void {
+    public function configureContainer(ContainerConfigurationInterface $container): void
+    {
         $container
             ->rule(LayoutHydrator::class)
             ->addCall("addReactResolver", [DiscussionAnnouncementsWidget::class])
             ->addCall("addReactResolver", [DiscussionDiscussionsWidget::class])
             ->addCall("addReactResolver", [TagWidget::class])
+            ->addCall("addReactResolver", [TabsWidget::class])
             ->addCall("addReactResolver", [CategoriesWidget::class])
             ->addCall("addReactResolver", [RSSWidget::class])
             ->addCall("addReactResolver", [UserSpotlightWidget::class])
-            ->addCall('addMiddleware', [new Reference(CategoryFilterMiddleware::class)]);
+            ->addCall("addReactResolver", [NewPostWidget::class])
+            ->addCall("addMiddleware", [new Reference(CategoryFilterMiddleware::class)])
 
-        $container->rule(SiteTotalService::class)
-            ->addCall('registerProvider', [new Reference(CategorySiteTotalProvider::class)])
-            ->addCall('registerProvider', [new Reference(DiscussionSiteTotalProvider::class)])
-            ->addCall('registerProvider', [new Reference(CommentSiteTotalProvider::class)])
-            ->addCall('registerProvider', [new Reference(PostSiteTotalProvider::class)])
-        ;
+            // Modern layout views.
+            ->addCall("addLayoutView", [new Reference(DiscussionListLayoutView::class)]);
 
-        $container->rule(LayoutService::class)
-            ->addCall('addLayoutView', [new Reference(LegacyCategoryListLayoutView::class)])
-            ->addCall('addLayoutView', [new Reference(LegacyDiscussionListLayoutView::class)])
-            ->addCall('addLayoutView', [new Reference(LegacyDiscussionThreadLayoutView::class)])
-            ->addCall('addLayoutView', [new Reference(LegacyNewDiscussionLayoutView::class)])
-            ->addCall('addLayoutView', [new Reference(HomeLayoutView::class)])
-        ;
+        $container
+            ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
+            ->addCall("registerStaticLayout", [
+                "discussionList",
+                PATH_ROOT . "/applications/vanilla/Layout/Definitions/discussionList.json",
+            ]);
+
+        $container
+            ->rule(SiteTotalService::class)
+            ->addCall("registerProvider", [new Reference(CategorySiteTotalProvider::class)])
+            ->addCall("registerProvider", [new Reference(DiscussionSiteTotalProvider::class)])
+            ->addCall("registerProvider", [new Reference(CommentSiteTotalProvider::class)])
+            ->addCall("registerProvider", [new Reference(PostSiteTotalProvider::class)]);
+
+        // Search Events
+        $container
+            ->rule(EventProviderService::class)
+            ->addCall("registerEventProvider", [new Reference(SearchDiscussionEventProvider::class)]);
+
+        // Legacy Layout views
+        $container
+            ->rule(LayoutService::class)
+            ->addCall("addLayoutView", [new Reference(LegacyCategoryListLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(DiscussionListLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(LegacyDiscussionThreadLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(LegacyNewDiscussionLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(HomeLayoutView::class)]);
+
+        PageControllerRoute::configurePageRoutes(
+            $container,
+            [
+                "/discussions" => DiscussionListPageController::class,
+            ],
+            "customLayout.discussionList"
+        );
     }
 }

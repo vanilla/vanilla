@@ -13,21 +13,23 @@ use Vanilla\Controllers\SearchRootController;
 /**
  * @method dispatchData(mixed $request = null, bool $permanent = true);
  */
-trait LegacySearchTestTrait {
+trait LegacySearchTestTrait
+{
     /**
      * Perform a search.
      *
      * @param array $searchParams
      * @return HttpResponse
      */
-    protected function performSearch(array $searchParams): HttpResponse {
+    protected function performSearch(array $searchParams): HttpResponse
+    {
         \Gdn::themeFeatures()->forceFeatures([
             SearchRootController::ENABLE_FLAG => false,
         ]);
-        $data = $this->bessy()->getJsonData("/search", $searchParams)['SearchResults'] ?? null;
+        $data = $this->bessy()->getJsonData("/search", $searchParams)["SearchResults"] ?? null;
         $response = new HttpResponse(
             $data === null ? 500 : 200,
-            ['content-type' => 'application/json'],
+            ["content-type" => "application/json"],
             json_encode($data, JSON_UNESCAPED_UNICODE)
         );
         return $response;

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { hashString, splitStringLoosely, matchAtMention, labelize } from "./stringUtils";
+import { hashString, splitStringLoosely, matchAtMention, labelize, isNumeric } from "./stringUtils";
 
 describe("hashString()", () => {
     it("the same string always results in the same value", () => {
@@ -131,6 +131,22 @@ describe("labelize()", () => {
     tests.forEach(([str, expected]) => {
         it("str", () => {
             expect(labelize(str)).toBe(expected);
+        });
+    });
+});
+
+describe("isNumeric()", () => {
+    const numeric = [10100, 100.4131, "1000", "0", "1", "-141", "+3141", "-311.131", "0.0000"];
+    const notNumeric = ["a123123", "12313a", "--00000", {}, [], undefined, null];
+
+    numeric.forEach((val) => {
+        it(`is numeric - '${val}'`, () => {
+            expect(isNumeric(val)).toBe(true);
+        });
+    });
+    notNumeric.forEach((val) => {
+        it(`is not numeric - '${val}'`, () => {
+            expect(isNumeric(val)).toBe(false);
         });
     });
 });

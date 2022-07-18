@@ -14,35 +14,35 @@ use VanillaTests\Library\Vanilla\UploadedFileTest;
 /**
  * Tests for the media model.
  */
-class MediaModelTest extends AbstractAPIv2Test {
-
-    protected static $addons = ['vanilla', 'dashboard'];
+class MediaModelTest extends AbstractAPIv2Test
+{
+    protected static $addons = ["vanilla", "dashboard"];
 
     /**
      * @return \MediaModel
      */
-    private function getMediaModel(): \MediaModel {
+    private function getMediaModel(): \MediaModel
+    {
         return self::container()->get(\MediaModel::class);
     }
 
     /**
      * Test saving and finding of uploads.
      */
-    public function testSaveUpload() {
-        $file = UploadedFile::fromRemoteResourceUrl(
-            UploadedFileTest::TEST_REMOTE_FILE_URL
-        );
+    public function testSaveUpload()
+    {
+        $file = UploadedFile::fromRemoteResourceUrl(UploadedFileTest::TEST_REMOTE_FILE_URL);
         $model = $this->getMediaModel();
 
         $insertedMedia = $model->saveUploadedFile($file);
 
-        $mediaByID = $model->findUploadedMediaByID($insertedMedia['mediaID']);
-        $this->assertEquals($insertedMedia, $mediaByID, 'Media records can be found by ID.');
+        $mediaByID = $model->findUploadedMediaByID($insertedMedia["mediaID"]);
+        $this->assertEquals($insertedMedia, $mediaByID, "Media records can be found by ID.");
 
-        $mediaByUrl = $model->findUploadedMediaByUrl($insertedMedia['url']);
-        $this->assertEquals($insertedMedia, $mediaByUrl, 'Media records can be found by URL.');
+        $mediaByUrl = $model->findUploadedMediaByUrl($insertedMedia["url"]);
+        $this->assertEquals($insertedMedia, $mediaByUrl, "Media records can be found by URL.");
 
         $mediaByForeign = $model->findUploadedMediaByForeignUrl($file->getForeignUrl());
-        $this->assertEquals($insertedMedia, $mediaByForeign, 'Media records can be found by foreign URL.');
+        $this->assertEquals($insertedMedia, $mediaByForeign, "Media records can be found by foreign URL.");
     }
 }

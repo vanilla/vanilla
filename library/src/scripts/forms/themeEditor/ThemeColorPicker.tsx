@@ -37,9 +37,8 @@ export function ThemeColorPicker(_props: IProps) {
     const { inputID, labelID } = useThemeBlock();
 
     // The field
-    const { generatedValue, rawValue, defaultValue, setValue, error, setError } = useThemeVariableField<string>(
-        variableKey,
-    );
+    const { generatedValue, rawValue, defaultValue, setValue, error, setError } =
+        useThemeVariableField<string>(variableKey);
 
     const classes = colorPickerClasses();
     const textInput = useRef<HTMLInputElement>(null);

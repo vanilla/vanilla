@@ -14,10 +14,11 @@
  *
  * @return string
  */
-function smarty_function_follow_button() {
-    $followButton = '';
+function smarty_function_follow_button()
+{
+    $followButton = "";
     $controller = Gdn::controller();
-    require_once $controller->fetchViewLocation('helper_functions', 'categories', false, false);
+    require_once $controller->fetchViewLocation("helper_functions", "categories", false, false);
     $categoryID = $controller->Category->CategoryID;
 
     if ($categoryID) {

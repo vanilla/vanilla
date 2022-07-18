@@ -15,14 +15,15 @@
  * @package core
  * @since 2.2
  */
-class MarkdownVanilla extends \Michelf\MarkdownExtra {
-
+class MarkdownVanilla extends \Michelf\MarkdownExtra
+{
     /**
      * Add all Vanilla customizations to markdown parsing
      *
      * @return void
      */
-    public function addAllFlavor() {
+    public function addAllFlavor()
+    {
         $this->addStrikeout();
         $this->addBreaks();
         $this->addSpoilers();
@@ -38,10 +39,11 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      *
      * @return void
      */
-    public function addBreaks() {
+    public function addBreaks()
+    {
         $this->span_gamut = array_replace($this->span_gamut, [
-            'doStrikeout' =>  15,
-            'doSoftBreaks' => 80,
+            "doStrikeout" => 15,
+            "doSoftBreaks" => 80,
         ]);
     }
 
@@ -50,9 +52,10 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      *
      * @return void
      */
-    public function addStrikeout() {
+    public function addStrikeout()
+    {
         $this->span_gamut = array_replace($this->span_gamut, [
-            'doStrikeout' => 15,
+            "doStrikeout" => 15,
         ]);
     }
 
@@ -61,24 +64,24 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      *
      * @return void
      */
-    public function addSpoilers() {
+    public function addSpoilers()
+    {
         $this->block_gamut = array_replace($this->block_gamut, [
-            'doSpoilers' => 55,
+            "doSpoilers" => 55,
         ]);
     }
-
 
     /**
      * Don't require a newline for unordered lists to be recognized.
      *
      * @return void
      */
-    public function addListFix() {
+    public function addListFix()
+    {
         $this->block_gamut = array_replace($this->block_gamut, [
-            'doListFix' => 39
+            "doListFix" => 39,
         ]);
     }
-
 
     /**
      * Add Spoilers implementation (3 methods).
@@ -86,7 +89,8 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @param string $text
      * @return string
      */
-    protected function doSpoilers($text) {
+    protected function doSpoilers($text)
+    {
         $text = preg_replace_callback(
             '/(                 # Wrap whole match in $1
                 (?>
@@ -95,29 +99,29 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
                     \n*         # blanks
                 )+
             )/xm',
-            [$this, '_doSpoilers_callback'],
+            [$this, "_doSpoilers_callback"],
             $text
         );
 
         return $text;
     }
-    protected function _doSpoilers_callback($matches) {
+    protected function _doSpoilers_callback($matches)
+    {
         $bq = $matches[1];
         # trim one level of quoting - trim whitespace-only lines
-        $bq = preg_replace('/^[ ]*>![ ]?|^[ ]+$/m', '', $bq);
-        $bq = $this->runBlockGamut($bq);        # recurse
-
-        $bq = preg_replace('/^/m', "  ", $bq);
+        $bq = preg_replace('/^[ ]*>![ ]?|^[ ]+$/m', "", $bq);
+        $bq = $this->runBlockGamut($bq); # recurse
+        $bq = preg_replace("/^/m", "  ", $bq);
         # These leading spaces cause problem with <pre> content,
         # so we need to fix that:
-        $bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
-            [&$this, '_doSpoilers_callback2'], $bq);
+        $bq = preg_replace_callback("{(\s*<pre>.+?</pre>)}sx", [&$this, "_doSpoilers_callback2"], $bq);
 
-        return "\n". $this->hashBlock(Gdn_Format::spoilerHtml($bq))."\n\n";
+        return "\n" . $this->hashBlock(Gdn_Format::spoilerHtml($bq)) . "\n\n";
     }
-    protected function _doSpoilers_callback2($matches) {
+    protected function _doSpoilers_callback2($matches)
+    {
         $pre = $matches[1];
-        $pre = preg_replace('/^  /m', '', $pre);
+        $pre = preg_replace("/^  /m", "", $pre);
         return $pre;
     }
 
@@ -127,17 +131,22 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @param string $text
      * @return string
      */
-    protected function doStrikeout($text) {
-        $text = preg_replace_callback('/
+    protected function doStrikeout($text)
+    {
+        $text = preg_replace_callback(
+            '/
         ~~ # open
         (.+?) # $1 = strike text
         ~~ # close
         /xm',
-        [$this, '_doStrikeout_callback'], $text);
+            [$this, "_doStrikeout_callback"],
+            $text
+        );
         return $text;
     }
-    protected function _doStrikeout_callback($matches) {
-        return $this->hashPart("<s>".$this->runSpanGamut($matches[1])."</s>");
+    protected function _doStrikeout_callback($matches)
+    {
+        return $this->hashPart("<s>" . $this->runSpanGamut($matches[1]) . "</s>");
     }
 
     /**
@@ -146,12 +155,13 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @param string $text
      * @return string
      */
-    protected function doSoftBreaks($text) {
+    protected function doSoftBreaks($text)
+    {
         # Do soft line breaks for 1 return:
-        return preg_replace_callback('/\n{1}/',
-            [$this, '_doSoftBreaks_callback'], $text);
+        return preg_replace_callback('/\n{1}/', [$this, "_doSoftBreaks_callback"], $text);
     }
-    protected function _doSoftBreaks_callback($matches) {
+    protected function _doSoftBreaks_callback($matches)
+    {
         return $this->hashPart("<br$this->empty_element_suffix\n");
     }
 
@@ -162,7 +172,8 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @param string $text
      * @return string
      */
-    protected function doListFix($text) {
+    protected function doListFix($text)
+    {
         return preg_replace('/(^(?:[^\n*+-]|[*+-][^ ]).*\n)([*+-] )/m', "$1\n$2", $text);
     }
 
@@ -175,7 +186,8 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @param  string $text
      * @return string
      */
-    protected function doBlockQuotes($text) {
+    protected function doBlockQuotes($text)
+    {
         return preg_replace_callback(
             '/(                 # Wrap whole match in $1
                 (?>
@@ -184,7 +196,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
                     \n*         # blanks
                 )+
             )/xm',
-            [$this, '_doBlockQuotes_callback'],
+            [$this, "_doBlockQuotes_callback"],
             $text
         );
     }
@@ -196,20 +208,22 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @param  array $matches
      * @return string
      */
-    protected function _doBlockQuotes_callback($matches) {
+    protected function _doBlockQuotes_callback($matches)
+    {
         $bq = $matches[1];
         // trim one level of quoting - trim whitespace-only lines
-        $bq = preg_replace('/^[ ]*>[ ]?|^[ ]+$/m', '', $bq);
+        $bq = preg_replace('/^[ ]*>[ ]?|^[ ]+$/m', "", $bq);
         $bq = $this->runBlockGamut($bq); // recurse
 
-        $bq = preg_replace('/^/m', "  ", $bq);
+        $bq = preg_replace("/^/m", "  ", $bq);
         // These leading spaces cause problem with <pre> content,
         // so we need to fix that:
-        $bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
-            [$this, '_doBlockQuotes_callback2'], $bq);
+        $bq = preg_replace_callback("{(\s*<pre>.+?</pre>)}sx", [$this, "_doBlockQuotes_callback2"], $bq);
 
         // return "\n" . $this->hashBlock("<blockquote>\n$bq\n</blockquote>") . "\n\n";
-        return "\n" . $this->hashBlock("<blockquote class=\"UserQuote\"><div class=\"QuoteText\">\n$bq\n</div></blockquote>") . "\n\n";
+        return "\n" .
+            $this->hashBlock("<blockquote class=\"UserQuote\"><div class=\"QuoteText\">\n$bq\n</div></blockquote>") .
+            "\n\n";
     }
 
     /**
@@ -220,8 +234,9 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @param  string $code
      * @return string
      */
-    protected function makeCodeSpan($code) {
-        $code = str_replace(["\r", "\n"], ' ', $code);
+    protected function makeCodeSpan($code)
+    {
+        $code = str_replace(["\r", "\n"], " ", $code);
         return parent::makeCodeSpan($code);
     }
 
@@ -234,11 +249,12 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @param  string $text
      * @return string
      */
-    public function transform($text) {
+    public function transform($text)
+    {
         $this->setup();
 
         # Remove UTF-8 BOM and marker character in input, if present.
-        $text = preg_replace('{^\xEF\xBB\xBF|\x1A}', '', $text);
+        $text = preg_replace('{^\xEF\xBB\xBF|\x1A}', "", $text);
 
         # Standardize line endings:
         #   DOS to Unix and Mac to Unix
@@ -263,7 +279,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
         # This makes subsequent regexen easier to write, because we can
         # match consecutive blank lines with /\n+/ instead of something
         # contorted like /[ ]*\n+/ .
-        $text = preg_replace('/^[ ]+$/m', '', $text);
+        $text = preg_replace('/^[ ]+$/m', "", $text);
 
         # Run document gamut methods.
         foreach ($this->document_gamut as $method => $priority) {

@@ -13,8 +13,8 @@ use Vanilla\Scheduler\Job\JobInterface;
 /**
  * Interface DriverInterface
  */
-interface DriverInterface {
-
+interface DriverInterface
+{
     /**
      * Receive a Job
      *

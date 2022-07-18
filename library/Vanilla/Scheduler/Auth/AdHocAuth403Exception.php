@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Auth;
 /**
  * Class AdHocAuth403Exception
  */
-class AdHocAuth403Exception extends AdHocAuthException {
-
+class AdHocAuth403Exception extends AdHocAuthException
+{
     /**
      * AdHocAuth403Exception constructor
      *
@@ -20,9 +20,9 @@ class AdHocAuth403Exception extends AdHocAuthException {
      * @param array $context
      */
     public function __construct(
-        string $message = 'Forbidden Error',
+        string $message = "Forbidden Error",
         int $code = 403,
-        array $context = ['description' => 'AdHocAuth - Missing Token']
+        array $context = ["description" => "AdHocAuth - Missing Token"]
     ) {
         parent::__construct($message, $code, $context);
     }

@@ -14,23 +14,25 @@ use Vanilla\EmbeddedContent\EmbedUtils;
 /**
  * Embed data object for the giphy.
  */
-class GiphyEmbed extends AbstractEmbed {
-
+class GiphyEmbed extends AbstractEmbed
+{
     const TYPE = "giphy";
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         $data = EmbedUtils::remapProperties($data, [
-            'giphyID' => 'attributes.postID',
+            "giphyID" => "attributes.postID",
         ]);
         $data = EmbedUtils::ensureDimensions($data);
         return $data;
@@ -39,11 +41,8 @@ class GiphyEmbed extends AbstractEmbed {
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
-        return Schema::parse([
-            'height:i',
-            'width:i',
-            'giphyID:s',
-        ]);
+    protected function schema(): Schema
+    {
+        return Schema::parse(["height:i", "width:i", "giphyID:s"]);
     }
 }

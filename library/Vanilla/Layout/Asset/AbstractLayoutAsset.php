@@ -13,6 +13,7 @@ use Vanilla\Web\PageHeadAwareInterface;
 use Vanilla\Web\PageHeadAwareTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
 use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
+use Vanilla\Widgets\React\DefaultSectionTrait;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
@@ -20,9 +21,14 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
  *
  * Assets may have restrictions on where they can be placed and in what views.
  */
-abstract class AbstractLayoutAsset implements ReactWidgetInterface, CombinedPropsWidgetInterface, PageHeadAwareInterface, LayoutAssetAwareInterface {
-
+abstract class AbstractLayoutAsset implements
+    ReactWidgetInterface,
+    CombinedPropsWidgetInterface,
+    PageHeadAwareInterface,
+    LayoutAssetAwareInterface
+{
     use CombinedPropsWidgetTrait;
     use LayoutAssetAwareTrait;
     use PageHeadAwareTrait;
+    use DefaultSectionTrait;
 }

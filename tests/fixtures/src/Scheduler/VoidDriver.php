@@ -16,15 +16,16 @@ use Vanilla\Scheduler\Job\JobInterface;
 /**
  * Class VoidDriver
  */
-class VoidDriver implements DriverInterface {
-
+class VoidDriver implements DriverInterface
+{
     /**
      * Receive a job.
      *
      * @param JobInterface $job
      * @return DriverSlipInterface
      */
-    public function receive(JobInterface $job): DriverSlipInterface {
+    public function receive(JobInterface $job): DriverSlipInterface
+    {
         return new LocalDriverSlip($job);
     }
 
@@ -34,7 +35,8 @@ class VoidDriver implements DriverInterface {
      * @param DriverSlipInterface $driverSlip
      * @return JobExecutionStatus
      */
-    public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus {
+    public function execute(DriverSlipInterface $driverSlip): JobExecutionStatus
+    {
         return JobExecutionStatus::complete();
     }
 
@@ -43,7 +45,8 @@ class VoidDriver implements DriverInterface {
      *
      * @return array
      */
-    public function getSupportedInterfaces(): array {
+    public function getSupportedInterfaces(): array
+    {
         return [];
     }
 }

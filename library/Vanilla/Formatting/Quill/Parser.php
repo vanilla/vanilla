@@ -17,12 +17,14 @@ use Vanilla\Formatting\Quill\Blots\AbstractBlot;
  *
  * @see https://github.com/quilljs/delta Information on quill deltas.
  */
-class Parser {
-
+class Parser
+{
     /** @var array Represents the operations of an "empty" body. */
-    const SINGLE_NEWLINE_CONTENTS = [[
-        'insert' => "\n",
-    ]];
+    const SINGLE_NEWLINE_CONTENTS = [
+        [
+            "insert" => "\n",
+        ],
+    ];
 
     const PARSE_MODE_EXTENDED = "extended";
     const PARSE_MODE_NORMAL = "normal";
@@ -53,7 +55,8 @@ class Parser {
      * @see AbstractBlot
      * @return $this
      */
-    public function addBlot(string $blotClass) {
+    public function addBlot(string $blotClass)
+    {
         $this->blotClasses[] = $blotClass;
 
         return $this;
@@ -65,9 +68,9 @@ class Parser {
      * The embeds NEED to be first here, otherwise something like a blockquote with only a mention in it will
      * match only as a blockquote instead of as a mention.
      */
-    public function addCoreBlotsAndFormats() {
-        $this
-            ->addBlot(Blots\Embeds\ExternalBlot::class)
+    public function addCoreBlotsAndFormats()
+    {
+        $this->addBlot(Blots\Embeds\ExternalBlot::class)
             ->addBlot(Blots\Embeds\MentionBlot::class)
             ->addBlot(Blots\Embeds\EmojiBlot::class)
             ->addBlot(Blots\Lines\SpoilerLineTerminatorBlot::class)
@@ -76,13 +79,12 @@ class Parser {
             ->addBlot(Blots\Lines\HeadingTerminatorBlot::class)
             ->addBlot(Blots\Lines\ParagraphLineTerminatorBlot::class)
             ->addBlot(Blots\Lines\CodeLineTerminatorBlot::class)
-            ->addBlot(Blots\TextBlot::class)// This needs to be the last one!!!
+            ->addBlot(Blots\TextBlot::class) // This needs to be the last one!!!
             ->addFormat(Formats\Link::class)
             ->addFormat(Formats\Bold::class)
             ->addFormat(Formats\Italic::class)
             ->addFormat(Formats\Code::class)
-            ->addFormat(Formats\Strike::class)
-        ;
+            ->addFormat(Formats\Strike::class);
     }
 
     /**
@@ -93,7 +95,8 @@ class Parser {
      * @see AbstractFormat
      * @return $this
      */
-    public function addFormat(string $formatClass) {
+    public function addFormat(string $formatClass)
+    {
         $this->formatClasses[] = $formatClass;
 
         return $this;
@@ -110,7 +113,8 @@ class Parser {
      *
      * @return BlotGroupCollection
      */
-    public function parse(array $operations, string $parseMode = self::PARSE_MODE_NORMAL): BlotGroupCollection {
+    public function parse(array $operations, string $parseMode = self::PARSE_MODE_NORMAL): BlotGroupCollection
+    {
         $this->stripTrailingNewlines($operations);
         $operations = $this->splitPlainTextNewlines($operations);
         return new BlotGroupCollection($operations, $this->blotClasses, $parseMode);
@@ -122,9 +126,11 @@ class Parser {
      * @param array $operations
      * @return string[]
      */
-    public function parseMentionUsernames(array $operations): array {
-        if (!in_array(Blots\Embeds\MentionBlot::class, $this->blotClasses)
-            && !in_array(Blots\Embeds\ExternalBlot::class, $this->blotClasses)
+    public function parseMentionUsernames(array $operations): array
+    {
+        if (
+            !in_array(Blots\Embeds\MentionBlot::class, $this->blotClasses) &&
+            !in_array(Blots\Embeds\ExternalBlot::class, $this->blotClasses)
         ) {
             return [];
         }
@@ -147,7 +153,8 @@ class Parser {
      * @return array
      * @throws FormattingException If valid operations could not be produced.
      */
-    public static function jsonToOperations(string $json): array {
+    public static function jsonToOperations(string $json): array
+    {
         // Ensure that empty posts still get some body content.
         // This will ensure that they will render/validate correctly where empty is allowed
         // And that empty bodies by properly caught in length validation.
@@ -179,8 +186,9 @@ class Parser {
      * @param array $arr
      * @return bool
      */
-    private static function areArrayKeysSequentialInts(array &$arr): bool {
-        for (reset($arr), $base = 0; key($arr) === $base++;) {
+    private static function areArrayKeysSequentialInts(array &$arr): bool
+    {
+        for (reset($arr), $base = 0; key($arr) === $base++; ) {
             next($arr);
         }
         return is_null(key($arr));
@@ -195,7 +203,8 @@ class Parser {
      *
      * @return Formats\AbstractFormat[] The formats matching the given operations.
      */
-    public function getFormatsForOperations(array $currentOp, array $previousOp = [], array $nextOp = []) {
+    public function getFormatsForOperations(array $currentOp, array $previousOp = [], array $nextOp = [])
+    {
         $formats = [];
         foreach ($this->formatClasses as $format) {
             if ($format::matches([$currentOp])) {
@@ -214,7 +223,8 @@ class Parser {
      *
      * @return array
      */
-    public function parseIntoTestData(array $ops): array {
+    public function parseIntoTestData(array $ops): array
+    {
         $parseData = $this->parse($ops);
         $groupData = [];
         foreach ($parseData as $blotGroup) {
@@ -231,10 +241,9 @@ class Parser {
      *
      * @return bool
      */
-    private function isOperationBareInsert(array $op): bool {
-        return !array_key_exists("attributes", $op)
-            && array_key_exists("insert", $op)
-            && is_string($op["insert"]);
+    private function isOperationBareInsert(array $op): bool
+    {
+        return !array_key_exists("attributes", $op) && array_key_exists("insert", $op) && is_string($op["insert"]);
     }
 
     /**
@@ -244,7 +253,8 @@ class Parser {
      *
      * @return bool
      */
-    private function isOpALineBlotTerminator(array $operation): bool {
+    private function isOpALineBlotTerminator(array $operation): bool
+    {
         $validLineBlotClasses = array_intersect(static::LINE_BLOTS, $this->blotClasses);
         /** @var AbstractBlot $blotClass */
         foreach ($validLineBlotClasses as $blotClass) {
@@ -263,7 +273,8 @@ class Parser {
      *
      * @return array The new operations
      */
-    private function splitPlainTextNewlines(array $operations): array {
+    private function splitPlainTextNewlines(array $operations): array
+    {
         $newOperations = [];
         foreach ($operations as $opIndex => $op) {
             // Other types of inserts should not get split, they need special handling inside of their blot.
@@ -283,7 +294,8 @@ class Parser {
 
             // If we are going from a non-bare insert to a bare on and we have a newline we need to add an empty break.
             $prevOp = $operations[$opIndex - 1] ?? [];
-            $needsExtraBreak = $this->isOperationBareInsert($op) && $this->isOpALineBlotTerminator($prevOp) && $subInserts[0] !== "\n";
+            $needsExtraBreak =
+                $this->isOperationBareInsert($op) && $this->isOpALineBlotTerminator($prevOp) && $subInserts[0] !== "\n";
             if ($needsExtraBreak) {
                 $newOperations[] = static::BREAK_OPERATION;
             }
@@ -305,7 +317,8 @@ class Parser {
      *
      * @param array[] $operations The quill operations to loop through.
      */
-    private function stripTrailingNewlines(array &$operations) {
+    private function stripTrailingNewlines(array &$operations)
+    {
         $lastIndex = count($operations) - 1;
         $lastOp = &$operations[$lastIndex];
         if ($lastOp && $this->isOperationBareInsert($lastOp)) {

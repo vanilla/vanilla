@@ -10,8 +10,8 @@ namespace Vanilla\Forum\Search;
 /**
  * Interface for excluded categories from category search.
  */
-interface CategorySearchExclusionInterface {
-
+interface CategorySearchExclusionInterface
+{
     /**
      * Get the categoryIDs to exclude from search.
      *

@@ -10,8 +10,8 @@ use Vanilla\Menu\Counter;
 /**
  * Menu counter provider for role model.
  */
-class RoleCounterProvider implements CounterProviderInterface {
-
+class RoleCounterProvider implements CounterProviderInterface
+{
     /** @var \RoleModel */
     private $roleModel;
 
@@ -24,10 +24,8 @@ class RoleCounterProvider implements CounterProviderInterface {
      * @param \RoleModel $roleModel
      * @param \Gdn_Session $session
      */
-    public function __construct(
-        \RoleModel $roleModel,
-        \Gdn_Session $session
-    ) {
+    public function __construct(\RoleModel $roleModel, \Gdn_Session $session)
+    {
         $this->roleModel = $roleModel;
         $this->session = $session;
     }
@@ -35,10 +33,11 @@ class RoleCounterProvider implements CounterProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getMenuCounters(): array {
+    public function getMenuCounters(): array
+    {
         $counters = [];
         $permissions = $this->session->getPermissions();
-        if ($permissions->hasAny(['Garden.Users.Approve'])) {
+        if ($permissions->hasAny(["Garden.Users.Approve"])) {
             $counters[] = new Counter("Applicants", $this->roleModel->getApplicantCount());
         }
         return $counters;

@@ -13,19 +13,15 @@ use Vanilla\Theme\VariableProviders\QuickLinkProviderInterface;
 /**
  * Provide quicklinks.
  */
-class ReactionsQuickLinksProvider implements QuickLinkProviderInterface {
+class ReactionsQuickLinksProvider implements QuickLinkProviderInterface
+{
     /**
      * Provide some quick links.
      *
      * @return QuickLink[]
      */
-    public function provideQuickLinks(): array {
-        return [
-            new QuickLink(
-                t('Best Of'),
-                '/bestof',
-                null
-            )
-        ];
+    public function provideQuickLinks(): array
+    {
+        return [new QuickLink(t("Best Of"), "/bestof", null)];
     }
 }

@@ -11,9 +11,10 @@ import React from "react";
 interface IProps extends React.HTMLAttributes<HTMLImageElement> {
     src: string;
     alt: string;
+    srcSet?: string;
 }
 
 export function ListItemMedia(props: IProps) {
     const classes = listItemMediaClasses();
-    return <ResponsiveImage className={classes.mediaItem} src={props.src} alt={props.alt} />;
+    return <ResponsiveImage className={classes.mediaItem} src={props.src} srcSet={props.srcSet} alt={props.alt} />;
 }

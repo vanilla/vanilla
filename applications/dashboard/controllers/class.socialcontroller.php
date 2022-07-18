@@ -11,36 +11,39 @@
 /**
  * Handles /social endpoint, so it must be an extrovert.
  */
-class SocialController extends DashboardController {
-
+class SocialController extends DashboardController
+{
     /** @var array Models to automatically instantiate. */
-    public $Uses = ['Form', 'Database'];
+    public $Uses = ["Form", "Database"];
 
     /**
      * Runs before every call to this controller.
      */
-    public function initialize() {
+    public function initialize()
+    {
         parent::initialize();
-        Gdn_Theme::section('Settings');
+        Gdn_Theme::section("Settings");
     }
 
     /**
      * Default method.
      */
-    public function index() {
-        redirectTo('social/manage');
+    public function index()
+    {
+        redirectTo("social/manage");
     }
 
     /**
      * Settings page.
      */
-    public function manage() {
-        $this->permission('Garden.Settings.Manage');
+    public function manage()
+    {
+        $this->permission("Garden.Settings.Manage");
         $this->title("Social Connect Addons");
-        $this->setHighlightRoute('/social/manage');
+        $this->setHighlightRoute("/social/manage");
 
         $connections = $this->getConnections();
-        $this->setData('Connections', $connections);
+        $this->setData("Connections", $connections);
 
         $this->render();
     }
@@ -51,8 +54,9 @@ class SocialController extends DashboardController {
      * @return array|mixed
      * @throws Exception
      */
-    protected function getConnections() {
-        $this->fireEvent('GetConnections');
+    protected function getConnections()
+    {
+        $this->fireEvent("GetConnections");
         $connections = [];
 
         $addons = Gdn::addonManager()->lookupAllByType(\Vanilla\Addon::TYPE_ADDON);
@@ -62,15 +66,15 @@ class SocialController extends DashboardController {
             $addonInfo = $addon->getInfo();
 
             // Limit to designated social addons.
-            if (!array_key_exists('socialConnect', $addonInfo)) {
+            if (!array_key_exists("socialConnect", $addonInfo)) {
                 continue;
             }
 
             // See if addon is enabled.
             $isEnabled = Gdn::addonManager()->isEnabled($addonName, \Vanilla\Addon::TYPE_ADDON);
-            setValue('enabled', $addonInfo, $isEnabled);
+            setValue("enabled", $addonInfo, $isEnabled);
 
-            if (!$isEnabled && !empty($addonInfo['hidden'])) {
+            if (!$isEnabled && !empty($addonInfo["hidden"])) {
                 // Don't show hidden addons unless they are enabled.
                 continue;
             }
@@ -78,12 +82,15 @@ class SocialController extends DashboardController {
             // See if we can detect whether connection is configured.
             $isConfigured = null;
             if ($isEnabled) {
-                $pluginInstance = Gdn::pluginManager()->getPluginInstance($addonName, Gdn_PluginManager::ACCESS_PLUGINNAME);
-                if (method_exists($pluginInstance, 'isConfigured')) {
+                $pluginInstance = Gdn::pluginManager()->getPluginInstance(
+                    $addonName,
+                    Gdn_PluginManager::ACCESS_PLUGINNAME
+                );
+                if (method_exists($pluginInstance, "isConfigured")) {
                     $isConfigured = $pluginInstance->isConfigured();
                 }
             }
-            setValue('configured', $addonInfo, $isConfigured);
+            setValue("configured", $addonInfo, $isConfigured);
 
             // Add the connection.
             $connections[$addonName] = $addonInfo;

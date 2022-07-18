@@ -16,15 +16,16 @@
  * @param Smarty $smarty The smarty object rendering the template.
  * @return string Returns the url.
  */
-function smarty_function_forum_root_link($params, &$smarty) {
-    $text = val('text', $params, '');
-    $format = val('format', $params, '<li><a href="%url" class="%class">%text</a></li>');
+function smarty_function_forum_root_link($params, &$smarty)
+{
+    $text = val("text", $params, "");
+    $format = val("format", $params, '<li><a href="%url" class="%class">%text</a></li>');
 
     $options = [];
-    if (isset($params['class'])) {
-        $options['class'] = $params['class'];
+    if (isset($params["class"])) {
+        $options["class"] = $params["class"];
     }
 
-    $result = Gdn_Theme::link('forumroot', $text, $format, $options);
+    $result = Gdn_Theme::link("forumroot", $text, $format, $options);
     return $result;
 }

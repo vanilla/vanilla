@@ -12,14 +12,15 @@ use Vanilla\Utility\HtmlUtils;
 /**
  * Utility module for applying box shims to views.
  */
-final class BoxThemeShim {
-
+final class BoxThemeShim
+{
     /**
      * Determine if the theme shim should be applied.
      *
      * @return bool
      */
-    public static function isActive(): bool {
+    public static function isActive(): bool
+    {
         return \Gdn::themeFeatures()->useDataDrivenTheme();
     }
 
@@ -28,7 +29,8 @@ final class BoxThemeShim {
      *
      * @param string $html
      */
-    public static function inactiveHtml(string $html) {
+    public static function inactiveHtml(string $html)
+    {
         if (!self::isActive()) {
             echo $html;
         }
@@ -39,7 +41,8 @@ final class BoxThemeShim {
      *
      * @param string $html
      */
-    public static function activeHtml(string $html) {
+    public static function activeHtml(string $html)
+    {
         if (self::isActive()) {
             echo $html;
         }
@@ -50,9 +53,10 @@ final class BoxThemeShim {
      *
      * @param string|null $cssClass
      */
-    public static function startBox(?string $cssClass = null) {
+    public static function startBox(?string $cssClass = null)
+    {
         if (self::isActive()) {
-            $cssClasses = htmlspecialchars(HtmlUtils::classNames('pageBox', $cssClass));
+            $cssClasses = htmlspecialchars(HtmlUtils::classNames("pageBox", $cssClass));
             echo "<section class='$cssClasses'>";
         }
     }
@@ -60,7 +64,8 @@ final class BoxThemeShim {
     /**
      * Render the closing tag of a box.
      */
-    public static function endBox() {
+    public static function endBox()
+    {
         if (self::isActive()) {
             echo "</section>";
         }
@@ -71,9 +76,10 @@ final class BoxThemeShim {
      *
      * @param string|null $cssClass
      */
-    public static function startHeading(?string $cssClass = null) {
+    public static function startHeading(?string $cssClass = null)
+    {
         if (self::isActive()) {
-            $cssClasses = htmlspecialchars(HtmlUtils::classNames('pageHeadingBox', $cssClass));
+            $cssClasses = htmlspecialchars(HtmlUtils::classNames("pageHeadingBox", $cssClass));
             echo "<div class=\"$cssClasses\">";
         }
     }
@@ -81,7 +87,8 @@ final class BoxThemeShim {
     /**
      * End headinb.
      */
-    public static function endHeading() {
+    public static function endHeading()
+    {
         if (self::isActive()) {
             echo "</div>";
         }
@@ -92,9 +99,10 @@ final class BoxThemeShim {
      *
      * @param string|null $cssClass
      */
-    public static function startWidget(?string $cssClass = '') {
+    public static function startWidget(?string $cssClass = "")
+    {
         if (self::isActive()) {
-            $cssClasses = htmlspecialchars(HtmlUtils::classNames('widget-dontUseCssOnMe', $cssClass));
+            $cssClasses = htmlspecialchars(HtmlUtils::classNames("widget-dontUseCssOnMe", $cssClass));
             echo "<section class=\"$cssClasses\">";
         }
     }
@@ -102,7 +110,8 @@ final class BoxThemeShim {
     /**
      * End a widget tag.
      */
-    public static function endWidget() {
+    public static function endWidget()
+    {
         if (self::isActive()) {
             echo "</section>";
         }

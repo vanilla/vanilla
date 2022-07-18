@@ -15,8 +15,8 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class GettyImagesEmbedFactoryTest extends MinimalContainerTestCase {
-
+class GettyImagesEmbedFactoryTest extends MinimalContainerTestCase
+{
     /** @var GettyImagesEmbedFactory */
     private $factory;
 
@@ -26,7 +26,8 @@ class GettyImagesEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
         $this->factory = new GettyImagesEmbedFactory($this->httpClient);
@@ -38,14 +39,16 @@ class GettyImagesEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string $urlToTest
      * @dataProvider supportedDomainsProvider
      */
-    public function testSupportedDomains(string $urlToTest) {
+    public function testSupportedDomains(string $urlToTest)
+    {
         $this->assertTrue($this->factory->canHandleUrl($urlToTest));
     }
 
     /**
      * @return array
      */
-    public function supportedDomainsProvider(): array {
+    public function supportedDomainsProvider(): array
+    {
         return [
             [
                 "https://www.gettyimages.ca/detail/photo/sunset-view-of-parc-jean-drapeau-royalty-free-image/840894796",
@@ -58,7 +61,8 @@ class GettyImagesEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Test network request fetching and handling.
      */
-    public function testCreateEmbedForUrl() {
+    public function testCreateEmbedForUrl()
+    {
         $url = "https://www.gettyimages.com/detail/photo/sunset-view-of-parc-jean-drapeau-royalty-free-image/840894796";
         $embedSignature = "hEvB-nIzdwAH4hElxYgbaupP4gPn42N1gNyunZfqD2E=";
         $foreignID = "lxyvCsYwR-pWsnGRRtcTFw";
@@ -75,12 +79,14 @@ class GettyImagesEmbedFactoryTest extends MinimalContainerTestCase {
             "version" => "1.0",
             "height" => 360,
             "width" => 480,
-            "html" => "<a id='lxyvCsYwR-pWsnGRRtcTFw' class='gie-single' href='http://www.gettyimages.com/detail/840894796' target='_blank' style='color:#a7a7a7;text-decoration:none;font-weight:normal !important;border:none;display:inline-block;'>Embed from Getty Images</a><script>window.gie=window.gie||function(c){(gie.q=gie.q||[]).push(c)};gie(function(){gie.widgets.load({id:'lxyvCsYwR-pWsnGRRtcTFw',sig:'hEvB-nIzdwAH4hElxYgbaupP4gPn42N1gNyunZfqD2E=',w:'480px',h:'360px',items:'840894796',caption: false ,tld:'com',is360: false })});</script><script src='//embed-cdn.gettyimages.com/widgets.js' charset='utf-8' async></script>",
+            "html" =>
+                "<a id='lxyvCsYwR-pWsnGRRtcTFw' class='gie-single' href='http://www.gettyimages.com/detail/840894796' target='_blank' style='color:#a7a7a7;text-decoration:none;font-weight:normal !important;border:none;display:inline-block;'>Embed from Getty Images</a><script>window.gie=window.gie||function(c){(gie.q=gie.q||[]).push(c)};gie(function(){gie.widgets.load({id:'lxyvCsYwR-pWsnGRRtcTFw',sig:'hEvB-nIzdwAH4hElxYgbaupP4gPn42N1gNyunZfqD2E=',w:'480px',h:'360px',items:'840894796',caption: false ,tld:'com',is360: false })});</script><script src='//embed-cdn.gettyimages.com/widgets.js' charset='utf-8' async></script>",
             "title" => "sunset view of Parc Jean-Drapeau",
             "caption" => "Sunset aerial view of Jean-Drapeau Island besides Montreal city",
             "photographer" => "Zhou Jiang",
             "collection" => "Moment",
-            "thumbnail_url" => "http://media.gettyimages.com/photos/sunset-view-of-parc-jeandrapeau-picture-id840894796?s=170x170",
+            "thumbnail_url" =>
+                "http://media.gettyimages.com/photos/sunset-view-of-parc-jeandrapeau-picture-id840894796?s=170x170",
             "thumbnail_height" => 127,
             "thumbnail_width" => 170,
             "terms_of_use_url" => "http://www.gettyimages.com/Corporate/Terms.aspx",
@@ -89,11 +95,7 @@ class GettyImagesEmbedFactoryTest extends MinimalContainerTestCase {
 
         $this->httpClient->addMockResponse(
             $oembedUrl,
-            new HttpResponse(
-                200,
-                "Content-Type: application/json",
-                json_encode($data)
-            )
+            new HttpResponse(200, "Content-Type: application/json", json_encode($data))
         );
 
         // Check over the network.

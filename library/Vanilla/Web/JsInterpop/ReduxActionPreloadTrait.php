@@ -10,8 +10,8 @@ namespace Vanilla\Web\JsInterpop;
 /**
  * Trait for adding preloaded redux actions to a controller.
  */
-trait ReduxActionPreloadTrait {
-
+trait ReduxActionPreloadTrait
+{
     /** @var ReduxAction[] */
     private $reduxActions = [];
 
@@ -23,7 +23,8 @@ trait ReduxActionPreloadTrait {
      *
      * @param ReduxActionProviderInterface $provider The provider to register.
      */
-    public function registerReduxActionProvider(ReduxActionProviderInterface $provider) {
+    public function registerReduxActionProvider(ReduxActionProviderInterface $provider)
+    {
         $this->actionProviders[] = $provider;
     }
 
@@ -34,7 +35,8 @@ trait ReduxActionPreloadTrait {
      *
      * @return $this Own instance for chaining.
      */
-    public function addReduxAction(ReduxAction $action): self {
+    public function addReduxAction(ReduxAction $action): self
+    {
         $this->reduxActions[] = $action;
         return $this;
     }
@@ -44,7 +46,8 @@ trait ReduxActionPreloadTrait {
      *
      * @return PhpAsJsVariable
      */
-    protected function getReduxActionsAsJsVariable(): PhpAsJsVariable {
+    protected function getReduxActionsAsJsVariable(): PhpAsJsVariable
+    {
         // Apply all extra providers.
         foreach ($this->actionProviders as $provider) {
             try {
@@ -54,6 +57,6 @@ trait ReduxActionPreloadTrait {
             }
         }
 
-        return new PhpAsJsVariable('__ACTIONS__', $this->reduxActions);
+        return new PhpAsJsVariable("__ACTIONS__", $this->reduxActions);
     }
 }

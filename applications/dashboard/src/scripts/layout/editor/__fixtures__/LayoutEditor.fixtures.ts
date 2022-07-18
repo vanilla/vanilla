@@ -7,7 +7,7 @@
 import { LayoutEditorContents } from "@dashboard/layout/editor/LayoutEditorContents";
 import { ILayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 
-type TestLayoutEditorStructure = Record<string, Record<string, string[] | string>>;
+type TestLayoutEditorStructure = Record<string, Record<string, string[] | string | object>>;
 
 /**
  * Utilities for testing layout editor.
@@ -31,19 +31,38 @@ export class LayoutEditorFixture {
             sections: {
                 "react.section.1-column": {
                     $reactComponent: "SectionOneColumn",
-                    recommendedWidgets: [],
+                    allowedWidgetIDs: [],
                     schema: {},
                     name: "1 column",
                 },
                 "react.section.2-columns": {
                     $reactComponent: "SectionTwoColumns",
-                    recommendedWidgets: [],
+                    allowedWidgetIDs: [],
                     schema: {},
                     name: "2 columns",
                 },
             },
-            middleware: {},
+            middlewares: {},
         };
+    }
+
+    /**
+     * Create mocked section data
+     */
+    public static widgetData(widgetKeys: string[]) {
+        return Object.fromEntries(
+            widgetKeys.map((widget: string, index: number) => {
+                return [
+                    widget,
+                    {
+                        schema: {},
+                        $reactComponent: "",
+                        iconUrl: "test/url/path",
+                        name: widget.replace("react.", "").replace(/\./gi, " "),
+                    },
+                ];
+            }),
+        );
     }
 
     /**

@@ -10,16 +10,17 @@ namespace VanillaTests\Search;
 /**
  * Search test with helpers for legacy search.
  */
-abstract class AbstractLegacySearchTest extends AbstractSearchTest {
-
+abstract class AbstractLegacySearchTest extends AbstractSearchTest
+{
     use LegacySearchTestTrait;
 
     /**
      * Make sure advanced search is enabled.
      */
-    public static function setupBeforeClass(): void {
-        if (!in_array('AdvancedSearch', static::$addons)) {
-            static::$addons[] = 'AdvancedSearch';
+    public static function setupBeforeClass(): void
+    {
+        if (!in_array("AdvancedSearch", static::$addons)) {
+            static::$addons[] = "AdvancedSearch";
         }
         parent::setupBeforeClass();
     }

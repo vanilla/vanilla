@@ -317,8 +317,7 @@ export const ImageAsElement = storyWithConfig(
                     },
                 },
                 rightImage: {
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                    image: "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 padding: {
                     top: 87,
@@ -477,8 +476,7 @@ export const LogoAndRightImage = storyWithConfig(
                     },
                 },
                 rightImage: {
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                    image: "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 logo: {
                     width: 150,
@@ -532,8 +530,7 @@ export const ImageAsElementWide = storyWithConfig(
                     },
                 },
                 rightImage: {
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                    image: "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 padding: {
                     top: 87,
@@ -593,8 +590,7 @@ export const SearchShadowNoSearchButton = storyWithConfig(
                     alignment: BannerAlignment.LEFT,
                 },
                 rightImage: {
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                    image: "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 padding: {
                     top: 87,

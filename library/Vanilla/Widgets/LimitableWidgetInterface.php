@@ -10,7 +10,8 @@ namespace Vanilla\Widgets;
 /**
  * Interfacing something that can have an item limit.
  */
-interface LimitableWidgetInterface {
+interface LimitableWidgetInterface
+{
     /**
      * Apply a limit to the number of items.
      *

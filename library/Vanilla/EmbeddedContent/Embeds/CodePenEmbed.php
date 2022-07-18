@@ -13,35 +13,33 @@ use Vanilla\EmbeddedContent\EmbedUtils;
 /**
  * Embed for codepen.io.
  */
-class CodePenEmbed extends AbstractEmbed {
+class CodePenEmbed extends AbstractEmbed
+{
     const TYPE = "codepen";
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @return Schema
      */
-    protected function schema(): Schema {
-        return Schema::parse([
-            "height:i",
-            "width:i",
-            "name:s?",
-            "codePenID:s",
-            "author:s",
-        ]);
+    protected function schema(): Schema
+    {
+        return Schema::parse(["height:i", "width:i", "name:s?", "codePenID:s", "author:s"]);
     }
 
     /**
      * @inheritdoc
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         $legacyUrl = $data["attributes"]["embedUrl"] ?? null;
-        if ($legacyUrl && $legacyIDs = $this->urlToIDs($legacyUrl)) {
+        if ($legacyUrl && ($legacyIDs = $this->urlToIDs($legacyUrl))) {
             $data = array_merge($data, $legacyIDs);
         }
 
@@ -56,8 +54,15 @@ class CodePenEmbed extends AbstractEmbed {
      * @param string $url
      * @return string|null
      */
-    private function urlToIDs(string $url): ?array {
-        if (!preg_match("`/?(?<author>[\w-]+)/embed/(?:preview/)?(?<codePenID>[\w-]+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches)) {
+    private function urlToIDs(string $url): ?array
+    {
+        if (
+            !preg_match(
+                "`/?(?<author>[\w-]+)/embed/(?:preview/)?(?<codePenID>[\w-]+)`",
+                parse_url($url, PHP_URL_PATH) ?? "",
+                $matches
+            )
+        ) {
             return null;
         }
         return [

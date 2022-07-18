@@ -14,8 +14,8 @@ use VanillaTests\Fixtures\Tuple;
  * Tests for safePrint().
  */
 
-class SafePrintTest extends TestCase {
-
+class SafePrintTest extends TestCase
+{
     /**
      * Test {@link safePrint()} against several scenarios.
      *
@@ -24,7 +24,8 @@ class SafePrintTest extends TestCase {
      * @param string|void $expected The expected result.
      * @dataProvider provideTestSafePrintArrays
      */
-    public function testSafePrint($testMixed, $testReturnData, $expected) {
+    public function testSafePrint($testMixed, $testReturnData, $expected)
+    {
         $actual = safePrint($testMixed, $testReturnData);
         $this->assertSame($expected, $actual);
     }
@@ -34,40 +35,17 @@ class SafePrintTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestSafePrintArrays() {
+    public function provideTestSafePrintArrays()
+    {
         $r = [
-            'emptyString' => [
-                '',
-                true,
-                'safePrint{empty string}',
-            ],
-            'testMixedTrue' => [
-                true,
-                true,
-                'safePrint{true}',
-            ],
-            'testMixedFalse' => [
-                false,
-                true,
-                'safePrint{false}',
-            ],
-            'testMixedNull' => [
-                null,
-                true,
-                'safePrint{null}',
-            ],
-            'testMixedZero' => [
-                0,
-                true,
-                'safePrint{0}',
-            ],
-            'testMixedArray' => [
-                [1, 2],
-                true,
-                "Array\n(\n    [0] => 1\n    [1] => 2\n)\n",
-            ],
-            'testMixedObject' => [
-                new Tuple('a', 'b'),
+            "emptyString" => ["", true, "safePrint{empty string}"],
+            "testMixedTrue" => [true, true, "safePrint{true}"],
+            "testMixedFalse" => [false, true, "safePrint{false}"],
+            "testMixedNull" => [null, true, "safePrint{null}"],
+            "testMixedZero" => [0, true, "safePrint{0}"],
+            "testMixedArray" => [[1, 2], true, "Array\n(\n    [0] => 1\n    [1] => 2\n)\n"],
+            "testMixedObject" => [
+                new Tuple("a", "b"),
                 true,
                 "VanillaTests\Fixtures\Tuple Object\n(\n    [a] => a\n    [b] => b\n)\n",
             ],

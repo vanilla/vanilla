@@ -10,7 +10,8 @@ namespace Vanilla\Formatting;
 /**
  * Apply this interface to `TextFormatInterface` classes to show that they can be parsed into `TextDOMInterface` instances.
  */
-interface ParsableDOMInterface {
+interface ParsableDOMInterface
+{
     /**
      * Parse a string into the DOM for this format.
      *

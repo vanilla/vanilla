@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Job;
 /**
  * Trait for implemented the message of a long runner job.
  */
-trait LongRunnerJobMessageTrait {
-
+trait LongRunnerJobMessageTrait
+{
     /** @var string */
     private $class;
 
@@ -29,7 +29,8 @@ trait LongRunnerJobMessageTrait {
      *
      * @param array $message
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
         $this->class = $message[LongRunnerJob::OPT_CLASS];
         $this->method = $message[LongRunnerJob::OPT_METHOD];
         $this->args = $message[LongRunnerJob::OPT_ARGS];

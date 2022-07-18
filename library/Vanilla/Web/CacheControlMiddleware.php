@@ -14,8 +14,8 @@ use Gdn_Session as SessionInterface;
 /**
  * Dispatcher middleware for handling caching headers.
  */
-class CacheControlMiddleware implements CacheControlConstantsInterface {
-
+class CacheControlMiddleware implements CacheControlConstantsInterface
+{
     use CacheControlTrait;
 
     /** @var SessionInterface An instance of the current user session. */
@@ -26,7 +26,8 @@ class CacheControlMiddleware implements CacheControlConstantsInterface {
      *
      * @param SessionInterface $session
      */
-    public function __construct(SessionInterface $session) {
+    public function __construct(SessionInterface $session)
+    {
         $this->session = $session;
     }
 
@@ -37,20 +38,23 @@ class CacheControlMiddleware implements CacheControlConstantsInterface {
      * @param callable $next The next middleware.
      * @return mixed Returns the response of the inner middleware.
      */
-    public function __invoke(RequestInterface $request, callable $next) {
+    public function __invoke(RequestInterface $request, callable $next)
+    {
         $response = Data::box($next($request));
 
         if (!$response->hasHeader(self::HEADER_CACHE_CONTROL)) {
             $response->setHeader(
                 self::HEADER_CACHE_CONTROL,
-                $this->session->isValid() || $request->getMethod() !== 'GET' ? self::NO_CACHE : self::PUBLIC_CACHE
+                $this->session->isValid() || $request->getMethod() !== "GET" ? self::NO_CACHE : self::PUBLIC_CACHE
             );
         }
 
-        if ($response->getHeader(self::HEADER_CACHE_CONTROL) !== self::NO_CACHE &&
-            !$response->getMeta(self::META_NO_VARY)) {
+        if (
+            $response->getHeader(self::HEADER_CACHE_CONTROL) !== self::NO_CACHE &&
+            !$response->getMeta(self::META_NO_VARY)
+        ) {
             // Unless we have NO_CACHE set make sure to set the vary header.
-            $response->setHeader('Vary', self::VARY_COOKIE);
+            $response->setHeader("Vary", self::VARY_COOKIE);
         }
 
         foreach (static::getHttp10Headers($response->getHeader(self::HEADER_CACHE_CONTROL)) as $key => $value) {

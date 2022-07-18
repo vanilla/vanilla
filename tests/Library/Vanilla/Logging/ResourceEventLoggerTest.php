@@ -17,8 +17,8 @@ use VanillaTests\Library\Vanilla\TestLogger;
 /**
  * Test for the ResourceEventLogger.
  */
-class ResourceEventLoggerTest extends TestCase {
-
+class ResourceEventLoggerTest extends TestCase
+{
     /** @var ResourceEventLogger */
     private $eventLogger;
 
@@ -28,7 +28,8 @@ class ResourceEventLoggerTest extends TestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $parentLogger = new Logger();
         $this->logger = new TestLogger($parentLogger);
 
@@ -38,7 +39,8 @@ class ResourceEventLoggerTest extends TestCase {
     /**
      * Verify adding a generic action event.
      */
-    public function testIncludeAction(): void {
+    public function testIncludeAction(): void
+    {
         $newAction = md5(rand());
         $event = new CommentEvent($newAction, []);
 
@@ -53,7 +55,8 @@ class ResourceEventLoggerTest extends TestCase {
     /**
      * Verify adding a generic action event.
      */
-    public function testIncludeActionReturn(): void {
+    public function testIncludeActionReturn(): void
+    {
         $action = md5(rand());
         $newResult = $this->eventLogger->includeAction("*", $action);
         $this->assertTrue($newResult);
@@ -64,7 +67,8 @@ class ResourceEventLoggerTest extends TestCase {
     /**
      * Verify adding an event-specific action rule.
      */
-    public function testOverrideEventAction(): void {
+    public function testOverrideEventAction(): void
+    {
         $this->eventLogger->includeAction("*", ResourceEvent::ACTION_UPDATE);
         $this->eventLogger->excludeAction(CommentEvent::class, ResourceEvent::ACTION_UPDATE);
 
@@ -76,7 +80,8 @@ class ResourceEventLoggerTest extends TestCase {
     /**
      * Verify basic ability to log resource events.
      */
-    public function testBasicLog(): void {
+    public function testBasicLog(): void
+    {
         $action = ResourceEvent::ACTION_UPDATE;
         $payload = ["comment" => []];
         $event = new CommentEvent($action, $payload);
@@ -87,10 +92,10 @@ class ResourceEventLoggerTest extends TestCase {
             [
                 Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
                 "event" => $event->getType() . "_" . $event->getAction(),
-                "comment" => $payload['comment'],
+                "comment" => $payload["comment"],
                 "resourceAction" => $event->getAction(),
                 "resourceType" => $event->getType(),
-            ]
+            ],
         ];
 
         $this->eventLogger->logResourceEvent($event);
@@ -100,10 +105,11 @@ class ResourceEventLoggerTest extends TestCase {
     /**
      * Verify basic ability to log resource events.
      */
-    public function testBasicLogWithSender(): void {
+    public function testBasicLogWithSender(): void
+    {
         $action = ResourceEvent::ACTION_UPDATE;
         $payload = ["comment" => []];
-        $event = new CommentEvent($action, $payload, ['userID' => 123, 'name' => 'foo']);
+        $event = new CommentEvent($action, $payload, ["userID" => 123, "name" => "foo"]);
 
         $expected = [
             "info",
@@ -111,12 +117,12 @@ class ResourceEventLoggerTest extends TestCase {
             [
                 Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
                 "event" => $event->getType() . "_" . $event->getAction(),
-                "comment" => $payload['comment'],
+                "comment" => $payload["comment"],
                 "resourceAction" => $event->getAction(),
                 "resourceType" => $event->getType(),
                 Logger::FIELD_USERID => 123,
-                Logger::FIELD_USERNAME => 'foo'
-            ]
+                Logger::FIELD_USERNAME => "foo",
+            ],
         ];
 
         $this->eventLogger->logResourceEvent($event);
@@ -126,7 +132,8 @@ class ResourceEventLoggerTest extends TestCase {
     /**
      * Verify removing a generic action event.
      */
-    public function testExcludeAction(): void {
+    public function testExcludeAction(): void
+    {
         $newAction = md5(rand());
         $event = new CommentEvent($newAction, []);
 
@@ -143,7 +150,8 @@ class ResourceEventLoggerTest extends TestCase {
     /**
      * Verify adding a generic action event.
      */
-    public function testExcludeActionReturn(): void {
+    public function testExcludeActionReturn(): void
+    {
         $action = md5(rand());
         $this->eventLogger->includeAction("*", $action);
         $existingResult = $this->eventLogger->excludeAction("*", $action);
@@ -158,7 +166,8 @@ class ResourceEventLoggerTest extends TestCase {
      * @param array $expected
      * @param array $actual
      */
-    private function assertLogEventEqual(array $expected, array $actual) {
+    private function assertLogEventEqual(array $expected, array $actual)
+    {
         $this->assertSame($expected[0], $actual[0], "Log levels not the same.");
         $this->assertSame($expected[1], $actual[1], "Log messages are not the same.");
         $this->assertEquals($expected[2], $actual[2], "Log contexts are not the same.");

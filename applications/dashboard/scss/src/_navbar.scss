@@ -5,152 +5,150 @@
 // No styleguide reference.
 
 .navbar {
-
-  .vanilla-logo {
-    width: 65px;
-  }
-
-  .title {
-    color: $white;
-  }
-
-  .logo + .title {
-    margin-left: $spacer;
-  }
-
-  img {
-    height: 36px;
-  }
-
-  .nav-item {
-    text-align: center;
-    border-right: 1px solid $navbar-border-color;
-
-    + .nav-item {
-      margin: 0;
+    .vanilla-logo {
+        width: 65px;
     }
 
-    &:first-child {
-      border-left: 1px solid $navbar-border-color;
+    .title {
+        color: $white;
     }
-  }
+
+    .logo + .title {
+        margin-left: $spacer;
+    }
+
+    img {
+        height: 36px;
+    }
+
+    .nav-item {
+        text-align: center;
+        border-right: 1px solid $navbar-border-color;
+
+        + .nav-item {
+            margin: 0;
+        }
+
+        &:first-child {
+            border-left: 1px solid $navbar-border-color;
+        }
+    }
 
     .nav {
         height: 100%;
     }
 
-  .nav-link {
-    position: relative;
-    min-width: 180px;
-    color: $white;
-    border-radius: 0;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &.active {
-      &,
-      &:hover {
-        background-color: $navbar-active-link-active-bg;
-
-        > * {
-          color: $white;
-        }
-      }
-    }
-
-    &:hover {
-      background-color: $navbar-active-link-active-bg;
-    }
-  }
-
-  @include media-breakpoint-down(lg) {
-    .navbar-brand,
-    .navbar-memenu {
-      min-width: inherit;
-    }
-  }
-
-  @include media-breakpoint-down(md) {
-
-    justify-content: flex-start;
-
-    .nav {
-      display: flex;
-      flex-grow: 1;
-      justify-content: space-between;
-    }
-
-    .nav-item {
-      width: 100%;
-    }
-
     .nav-link {
-      min-width: inherit;
-      width: 100%;
-      font-size: $font-size-sm;
+        position: relative;
+        min-width: 180px;
+        color: $white;
+        border-radius: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &.active {
+            &,
+            &:hover {
+                background-color: $navbar-active-link-active-bg;
+
+                > * {
+                    color: $white;
+                }
+            }
+        }
+
+        &:hover {
+            background-color: $navbar-active-link-active-bg;
+        }
     }
 
-    .nav-link-description {
-      display: none;
+    @include media-breakpoint-down(lg) {
+        .navbar-brand,
+        .navbar-memenu {
+            min-width: inherit;
+        }
     }
 
-    .navbar-memenu,
-    .navbar-brand {
-      display: none;
+    @include media-breakpoint-down(md) {
+        justify-content: flex-start;
+
+        .nav {
+            display: flex;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+
+        .nav-item {
+            width: 100%;
+        }
+
+        .nav-link {
+            min-width: inherit;
+            width: 100%;
+            font-size: $font-size-sm;
+        }
+
+        .nav-link-description {
+            display: none;
+        }
+
+        .navbar-memenu,
+        .navbar-brand {
+            display: none;
+        }
     }
-  }
 }
 
 .drawer-toggle {
-  color: $white;
-  font-size: $font-size-lg;
-  padding-top: $spacer / 2 + $border-width;
-  padding-bottom: $spacer / 2 + $border-width;
-
-  &:hover,
-  &:active,
-  &:focus {
     color: $white;
-    text-decoration: none;
-    outline: 0;
-  }
+    font-size: $font-size-lg;
+    padding-top: $spacer * 0.5 + $border-width;
+    padding-bottom: $spacer * 0.5 + $border-width;
 
-  &:hover,
-  &:active {
-    background-color: $navbar-active-link-active-bg;
-  }
+    &:hover,
+    &:active,
+    &:focus {
+        color: $white;
+        text-decoration: none;
+        outline: 0;
+    }
+
+    &:hover,
+    &:active {
+        background-color: $navbar-active-link-active-bg;
+    }
 }
 
 .navbar-memenu,
 .navbar-brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 240px;
 }
 
 .navbar-profile {
-  cursor: pointer;
+    cursor: pointer;
 
-  .icon-caret-down {
-    border-top-color: $navbar-link-color;
-    @include caret;
-  }
+    .icon-caret-down {
+        border-top-color: $navbar-link-color;
+        @include caret;
+    }
 }
 
 // Doesn't currently exist. Was for the ? icon in the original mockups.
 .nav-icons {
-  margin-right: $spacer;
-  color: $white;
+    margin-right: $spacer;
+    color: $white;
 
-  svg {
-    display: block;
-    height: (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg)) - (2 * $border-width);
-  }
+    svg {
+        display: block;
+        height: (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg)) - (2 * $border-width);
+    }
 
-  .nav-link {
-    min-width: inherit;
-  }
+    .nav-link {
+        min-width: inherit;
+    }
 }

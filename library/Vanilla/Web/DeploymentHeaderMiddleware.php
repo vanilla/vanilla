@@ -13,9 +13,10 @@ use Vanilla\Web\Asset\DeploymentCacheBuster;
 /**
  * Deployment middleware for handling deployment key headers.
  */
-class DeploymentHeaderMiddleware {
-    public const VANILLA_DEPLOYMENT_KEY = 'Vdk';
-    public const APPLICATION_VERSION_KEY = 'X-Vanilla-Version';
+class DeploymentHeaderMiddleware
+{
+    public const VANILLA_DEPLOYMENT_KEY = "Vdk";
+    public const APPLICATION_VERSION_KEY = "X-Vanilla-Version";
 
     /** @var DeploymentCacheBuster */
     public $deploymentCacheBuster;
@@ -25,7 +26,8 @@ class DeploymentHeaderMiddleware {
      *
      * @param DeploymentCacheBuster $deploymentCacheBuster
      */
-    public function __construct(DeploymentCacheBuster $deploymentCacheBuster) {
+    public function __construct(DeploymentCacheBuster $deploymentCacheBuster)
+    {
         $this->deploymentCacheBuster = $deploymentCacheBuster;
     }
 
@@ -36,17 +38,12 @@ class DeploymentHeaderMiddleware {
      * @param callable $next The next middleware.
      * @return mixed Returns the response of the inner middleware.
      */
-    public function __invoke(RequestInterface $request, callable $next) {
+    public function __invoke(RequestInterface $request, callable $next)
+    {
         $response = Data::box($next($request));
 
-        $response->setHeader(
-            self::VANILLA_DEPLOYMENT_KEY,
-            $this->deploymentCacheBuster->value()
-        );
-        $response->setHeader(
-            self::APPLICATION_VERSION_KEY,
-            APPLICATION_VERSION
-        );
+        $response->setHeader(self::VANILLA_DEPLOYMENT_KEY, $this->deploymentCacheBuster->value());
+        $response->setHeader(self::APPLICATION_VERSION_KEY, APPLICATION_VERSION);
         return $response;
     }
 }

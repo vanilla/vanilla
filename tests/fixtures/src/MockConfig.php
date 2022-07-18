@@ -13,11 +13,11 @@ use Vanilla\Utility\ArrayUtils;
 /**
  * Mock configuration object. Implements simple set/get for the ConfigurationInterface.
  */
-class MockConfig implements Contracts\ConfigurationInterface {
-
+class MockConfig implements Contracts\ConfigurationInterface
+{
     const DEFAULT_CONFIG = [
-        'Garden.RewriteUrls' => true,
-        'Garden.AllowSSL' => true,
+        "Garden.RewriteUrls" => true,
+        "Garden.AllowSSL" => true,
     ];
 
     /** @var array A mapping of config key to value */
@@ -28,16 +28,17 @@ class MockConfig implements Contracts\ConfigurationInterface {
      *
      * @param array $data
      */
-    public function __construct(array $data = []) {
+    public function __construct(array $data = [])
+    {
         $this->data = static::DEFAULT_CONFIG;
         $this->data += $this->flattenArray($data);
     }
 
-
     /**
      * @inheritdoc
      */
-    public function get($key, $defaultValue = false) {
+    public function get($key, $defaultValue = false)
+    {
         return $this->data[$key] ?? $defaultValue;
     }
 
@@ -49,7 +50,8 @@ class MockConfig implements Contracts\ConfigurationInterface {
      *
      * @return $this For fluent chaining.
      */
-    public function set(string $key, $value) {
+    public function set(string $key, $value)
+    {
         $this->data[$key] = $value;
 
         return $this;
@@ -58,7 +60,8 @@ class MockConfig implements Contracts\ConfigurationInterface {
     /**
      * @inheritdoc
      */
-    public function saveToConfig($name, $value = '', $options = []) {
+    public function saveToConfig($name, $value = "", $options = [])
+    {
         $values = is_array($name) ? $name : [$name => $value];
         foreach ($values as $name => $value) {
             $this->set($name, $value);
@@ -70,7 +73,8 @@ class MockConfig implements Contracts\ConfigurationInterface {
      *
      * @param array $data
      */
-    public function loadData(array $data) {
+    public function loadData(array $data)
+    {
         $data = $this->flattenArray($data);
         $this->data = array_merge($this->data, $data);
     }
@@ -78,7 +82,8 @@ class MockConfig implements Contracts\ConfigurationInterface {
     /**
      * Clear all config data.
      */
-    public function reset() {
+    public function reset()
+    {
         $this->data = static::DEFAULT_CONFIG;
     }
 
@@ -94,11 +99,12 @@ class MockConfig implements Contracts\ConfigurationInterface {
      * @param string $prefix
      * @return array
      */
-    private function flattenArray(array $array, string $prefix = '') {
+    private function flattenArray(array $array, string $prefix = "")
+    {
         $result = [];
         foreach ($array as $key => $value) {
             if (is_array($value) && $this->isAssosciativeArray($value)) {
-                $result = $result + $this->flattenArray($value, $prefix . $key . '.');
+                $result = $result + $this->flattenArray($value, $prefix . $key . ".");
             } else {
                 $result[$prefix . $key] = $value;
             }
@@ -114,7 +120,8 @@ class MockConfig implements Contracts\ConfigurationInterface {
      *
      * @return bool
      */
-    private function isAssosciativeArray(array $arr): bool {
-        return count(array_filter(array_keys($arr), 'is_string')) > 0;
+    private function isAssosciativeArray(array $arr): bool
+    {
+        return count(array_filter(array_keys($arr), "is_string")) > 0;
     }
 }

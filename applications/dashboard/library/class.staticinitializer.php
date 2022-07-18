@@ -10,8 +10,8 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @since 2.2
  */
-trait StaticInitializer {
-
+trait StaticInitializer
+{
     /**
      * @var bool Whether the InitStatic event was fired.
      */
@@ -23,11 +23,12 @@ trait StaticInitializer {
      * @return bool Whether the event was fired.
      * @throws Exception
      */
-    public static function initStatic() {
+    public static function initStatic()
+    {
         if (!self::$initStaticFired) {
             self::$initStaticFired = true;
             Gdn::pluginManager()->fireAs(get_called_class());
-            Gdn::pluginManager()->fireEvent('InitStatic');
+            Gdn::pluginManager()->fireEvent("InitStatic");
             return true;
         }
         return false;

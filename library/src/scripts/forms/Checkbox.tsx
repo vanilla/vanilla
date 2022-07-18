@@ -27,6 +27,7 @@ interface IProps extends IOptionalComponentID {
     defaultChecked?: boolean;
     tooltipLabel?: boolean;
     excludeFromICheck?: boolean;
+    fullWidth?: boolean;
 }
 
 export default function CheckBox(props: IProps) {
@@ -34,7 +35,7 @@ export default function CheckBox(props: IProps) {
     const labelID = props["aria-labelledby"] ?? ownLabelID;
     const classes = checkRadioClasses();
 
-    const { isHorizontal, labelBold = true } = props;
+    const { isHorizontal, fullWidth, labelBold = true } = props;
 
     const icon = (
         <span className={classes.iconContainer} aria-hidden="true">
@@ -49,7 +50,7 @@ export default function CheckBox(props: IProps) {
     );
 
     return (
-        <label className={classNames(props.className, classes.root, { isHorizontal })}>
+        <label className={classNames(props.className, classes.root, { isHorizontal }, fullWidth && classes.fullWidth)}>
             <input
                 className={classNames(classes.input, props.fakeFocus && "focus-visible", {
                     "exclude-icheck": props.excludeFromICheck,

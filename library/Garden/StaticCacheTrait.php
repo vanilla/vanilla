@@ -13,7 +13,8 @@ use Vanilla\Utility\DebugUtils;
  * For classes that need to cache some static values and configs.
  *
  */
-trait StaticCacheTrait {
+trait StaticCacheTrait
+{
     /**
      * @var array
      */
@@ -32,13 +33,14 @@ trait StaticCacheTrait {
      *
      * @return mixed
      */
-    public static function sc(string $key, $default = false) {
+    public static function sc(string $key, $default = false)
+    {
         if (DebugUtils::isTestMode()) {
             return self::f($key, $default);
         }
 
         if (empty($key)) {
-            throw new \Exception('Static cache key can not be empty!');
+            throw new \Exception("Static cache key can not be empty!");
         } else {
             if (!self::$scInit) {
                 self::$sCache = self::scInit();
@@ -56,7 +58,8 @@ trait StaticCacheTrait {
      *
      * @return array
      */
-    protected static function scInit() {
+    protected static function scInit()
+    {
         return [];
     }
 
@@ -68,7 +71,8 @@ trait StaticCacheTrait {
      *
      * @return array
      */
-    protected static function f(string $key, $default) {
+    protected static function f(string $key, $default)
+    {
         return $default;
     }
 }

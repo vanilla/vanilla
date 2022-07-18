@@ -14,7 +14,8 @@ use Garden\Container\Container;
  *
  * @deprecated Use the `BootstrapTestCase` instead.
  */
-class SharedBootstrapTestCase extends BootstrapTestCase {
+class SharedBootstrapTestCase extends BootstrapTestCase
+{
     /**
      * Whether or not the container is "null".
      *
@@ -22,14 +23,16 @@ class SharedBootstrapTestCase extends BootstrapTestCase {
      *
      * @return bool
      */
-    private static function containerIsNull($container) {
+    private static function containerIsNull($container)
+    {
         return $container === null || is_a($container, NullContainer::class);
     }
 
     /**
      * @inheritdoc
      */
-    protected static function getBootstrapFolderName() {
-        return 'sharedbootstrap';
+    protected static function getBootstrapFolderName()
+    {
+        return "sharedbootstrap";
     }
 }

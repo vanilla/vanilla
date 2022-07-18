@@ -13,8 +13,8 @@ use Vanilla\Formatting\Exception\FormattingException;
 /**
  * An interface for rendering, filtering, and parsing user content.
  */
-interface FormatInterface {
-
+interface FormatInterface
+{
     /**
      * Render a safe, sanitized, HTML version of some content.
      *
@@ -121,10 +121,27 @@ interface FormatInterface {
      *
      * @return string[] A list of usernames.
      */
-    public function parseMentions(string $content): array;
+    public function parseMentions(string $content, bool $skipTaggedContent = true): array;
 
     /**
      * @param bool $extendContent
      */
     public function setAllowExtendedContent(bool $extendContent): void;
+
+    /**
+     * Anonymize the username from body by replacing the username with the replacement value.
+     *
+     * @param string $username
+     * @param string $body
+     * @return string
+     */
+    public function removeUserPII(string $username, string $body): string;
+
+    /**
+     * Parse out every user mention from a post.
+     *
+     * @param string $body
+     * @return array Username mentioned in the post.
+     */
+    public function parseAllMentions(string $body): array;
 }

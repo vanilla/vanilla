@@ -11,11 +11,11 @@ use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Web\TwigRenderTrait;
 
- /**
-  * HTML theme asset.
-  */
-class TwigThemeAsset extends HtmlThemeAsset {
-
+/**
+ * HTML theme asset.
+ */
+class TwigThemeAsset extends HtmlThemeAsset
+{
     use TwigRenderTrait;
 
     /** @var string Twig Template content of this asset. */
@@ -30,7 +30,8 @@ class TwigThemeAsset extends HtmlThemeAsset {
      * @param string $template
      * @param string $url
      */
-    public function __construct(string $template, string $url) {
+    public function __construct(string $template, string $url)
+    {
         $this->template = $template;
         $this->url = $url;
     }
@@ -38,14 +39,16 @@ class TwigThemeAsset extends HtmlThemeAsset {
     /**
      * @return string
      */
-    public function getDefaultType(): string {
+    public function getDefaultType(): string
+    {
         return ThemeAssetFactory::ASSET_TYPE_TWIG;
     }
 
     /**
      * @inheritdoc
      */
-    public function getAllowedTypes(): array {
+    public function getAllowedTypes(): array
+    {
         return [ThemeAssetFactory::ASSET_TYPE_TWIG, ThemeAssetFactory::ASSET_TYPE_HTML];
     }
 
@@ -54,7 +57,8 @@ class TwigThemeAsset extends HtmlThemeAsset {
      *
      * @return array
      */
-    public function asArray(): array {
+    public function asArray(): array
+    {
         $result = [
             "url" => $this->url,
             "type" => $this->type,
@@ -72,7 +76,8 @@ class TwigThemeAsset extends HtmlThemeAsset {
     /**
      * @inheritdoc
      */
-    public function render(string $asType = null): Data {
+    public function render(string $asType = null): Data
+    {
         switch ($asType) {
             case ThemeAssetFactory::ASSET_TYPE_TWIG:
                 return parent::render($asType);
@@ -84,7 +89,8 @@ class TwigThemeAsset extends HtmlThemeAsset {
     /**
      * @inheritdoc
      */
-    public function validate(): void {
+    public function validate(): void
+    {
         $this->renderHtml();
     }
 
@@ -95,7 +101,8 @@ class TwigThemeAsset extends HtmlThemeAsset {
      *
      * @return string
      */
-    public function renderHtml(array $data = []): string {
+    public function renderHtml(array $data = []): string
+    {
         try {
             return $this->renderTwigFromString($this->getTemplate(), $data);
         } catch (\Exception $e) {
@@ -108,7 +115,8 @@ class TwigThemeAsset extends HtmlThemeAsset {
      *
      * @return string
      */
-    public function getTemplate(): string {
+    public function getTemplate(): string
+    {
         return $this->template;
     }
 
@@ -117,7 +125,8 @@ class TwigThemeAsset extends HtmlThemeAsset {
      *
      * @return string
      */
-    public function __toString(): string {
+    public function __toString(): string
+    {
         return $this->getTemplate();
     }
 }

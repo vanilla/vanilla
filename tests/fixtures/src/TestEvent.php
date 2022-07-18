@@ -12,8 +12,8 @@ use Psr\EventDispatcher\StoppableEventInterface;
 /**
  * A test event for PSR event tests.
  */
-class TestEvent implements StoppableEventInterface {
-
+class TestEvent implements StoppableEventInterface
+{
     private $stopPropagation = false;
 
     private $num = 0;
@@ -21,7 +21,8 @@ class TestEvent implements StoppableEventInterface {
     /**
      * Increment the number.
      */
-    public function incNum() {
+    public function incNum()
+    {
         $this->num++;
     }
 
@@ -30,21 +31,24 @@ class TestEvent implements StoppableEventInterface {
      *
      * @return int
      */
-    public function getNum(): int {
+    public function getNum(): int
+    {
         return $this->num;
     }
 
     /**
      * @inheritDoc
      */
-    public function isPropagationStopped(): bool {
+    public function isPropagationStopped(): bool
+    {
         return $this->stopPropagation;
     }
 
     /**
      * Set the stop propagation property.
      */
-    public function stopPropagation() {
+    public function stopPropagation()
+    {
         $this->stopPropagation = true;
     }
 }

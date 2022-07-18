@@ -10,8 +10,8 @@ use Vanilla\Menu\Counter;
 /**
  * Menu counter provider for log model.
  */
-class LogCounterProvider implements CounterProviderInterface {
-
+class LogCounterProvider implements CounterProviderInterface
+{
     /** @var \LogModel */
     private $logModel;
 
@@ -24,10 +24,8 @@ class LogCounterProvider implements CounterProviderInterface {
      * @param \LogModel $logModel
      * @param \Gdn_Session $session
      */
-    public function __construct(
-        \LogModel $logModel,
-        \Gdn_Session $session
-    ) {
+    public function __construct(\LogModel $logModel, \Gdn_Session $session)
+    {
         $this->logModel = $logModel;
         $this->session = $session;
     }
@@ -35,16 +33,17 @@ class LogCounterProvider implements CounterProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getMenuCounters(): array {
+    public function getMenuCounters(): array
+    {
         $counters = [];
         $permissions = $this->session->getPermissions();
-        if ($permissions->hasAny(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'])) {
-            $recordCount = $this->logModel->getOperationCount('spam');
+        if ($permissions->hasAny(["Garden.Moderation.Manage", "Moderation.Spam.Manage"])) {
+            $recordCount = $this->logModel->getOperationCount("spam");
             $counters[] = new Counter("SpamQueue", $recordCount);
         }
 
-        if ($permissions->hasAny(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'])) {
-            $recordCount = $this->logModel->getOperationCount('moderate,pending');
+        if ($permissions->hasAny(["Garden.Moderation.Manage", "Moderation.ModerationQueue.Manage"])) {
+            $recordCount = $this->logModel->getOperationCount("moderate,pending");
             $counters[] = new Counter("ModerationQueue", $recordCount);
         }
         return $counters;

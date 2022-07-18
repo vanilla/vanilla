@@ -15,8 +15,8 @@ use Vanilla\AddonManager;
  *
  * @see MockAddon
  */
-class MockAddonManager extends AddonManager {
-
+class MockAddonManager extends AddonManager
+{
     /** @var array MockAddon[] */
     private $addons = [];
 
@@ -25,7 +25,8 @@ class MockAddonManager extends AddonManager {
      *
      * @param array $addons Addons to initialize with.
      */
-    public function __construct(array $addons = []) {
+    public function __construct(array $addons = [])
+    {
         $this->addons = $addons;
     }
 
@@ -36,7 +37,8 @@ class MockAddonManager extends AddonManager {
      *
      * @return $this For fluent chaining.
      */
-    public function pushAddon(MockAddon $addon) {
+    public function pushAddon(MockAddon $addon)
+    {
         $this->addons[] = $addon;
         return $this;
     }
@@ -44,7 +46,8 @@ class MockAddonManager extends AddonManager {
     /**
      * @return array Get the addons.
      */
-    public function getEnabled(): array {
+    public function getEnabled(): array
+    {
         return $this->addons;
     }
 
@@ -54,7 +57,8 @@ class MockAddonManager extends AddonManager {
      * @param int|string $themeKey Theme key or ID
      * @return Addon|null Get theme addon.
      */
-    public function lookupTheme($themeKey) {
+    public function lookupTheme($themeKey)
+    {
         $addon = null;
         /** @var MockAddon $addon */
         foreach ($this->addons as $iterAddon) {

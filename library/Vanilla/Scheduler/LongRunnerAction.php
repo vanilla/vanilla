@@ -7,14 +7,15 @@
 
 namespace Vanilla\Scheduler;
 
+use Garden\Schema\Schema;
 use Garden\Web\RequestInterface;
 use Vanilla\Web\SystemTokenUtils;
 
 /**
  * Parameters to run a long-runner action.
  */
-final class LongRunnerAction {
-
+class LongRunnerAction implements \JsonSerializable
+{
     /**
      * Special arg that represents the previous total of a progressable action.
      */
@@ -40,11 +41,51 @@ final class LongRunnerAction {
      * @param array $args The arguments to pass to the method.
      * @param array $options See LongRunner::OPT_* options.
      */
-    public function __construct(string $className, string $method, array $args, array $options = []) {
+    public function __construct(string $className, string $method, array $args, array $options = [])
+    {
         $this->className = $className;
         $this->method = $method;
         $this->args = $args;
         $this->options = $options;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            "className" => $this->className,
+            "method" => $this->method,
+            "args" => $this->args,
+            "options" => $this->options,
+        ];
+    }
+
+    /**
+     * Create an action from a json serialized format.
+     *
+     * @param array $json
+     *
+     * @return LongRunnerAction
+     */
+    public static function fromJson(array $json): LongRunnerAction
+    {
+        $schema = Schema::parse(["className:s", "method:s", "args:a", "options:o"]);
+        $data = $schema->validate($json);
+        return new LongRunnerAction($data["className"], $data["method"], $data["args"], $data["options"]);
+    }
+
+    /**
+     * Create multiple actions from a json serialized format.
+     *
+     * @param array[] $jsonArr
+     *
+     * @return LongRunnerAction[]
+     */
+    public static function multipleFromJson(array $jsonArr): array
+    {
+        return array_map([self::class, "fromJson"], $jsonArr);
     }
 
     /**
@@ -77,23 +118,6 @@ final class LongRunnerAction {
     }
 
     /**
-     * Encode a JWT with parameters for the next iteration of the action.
-     *
-     * @param SystemTokenUtils $tokenUtils
-     *
-     * @return string A JWT of the next job payload.
-     */
-    public function asCallbackPayload(SystemTokenUtils $tokenUtils): string {
-        return self::makeCallbackPayload(
-            $tokenUtils,
-            $this->className,
-            $this->method,
-            $this->args,
-            $this->options
-        );
-    }
-
-    /**
      * Deocde a JWT into params for the next iteration of the action.
      *
      * @param string $jwt A JWT of the next action payload.
@@ -102,37 +126,61 @@ final class LongRunnerAction {
      *
      * @return LongRunnerAction
      */
-    public static function fromCallbackPayload(string $jwt, SystemTokenUtils $tokenUtils, RequestInterface $request): LongRunnerAction {
+    public static function fromCallbackPayload(
+        string $jwt,
+        SystemTokenUtils $tokenUtils,
+        RequestInterface $request
+    ): LongRunnerAction {
         $decoded = $tokenUtils->decode($jwt, $request)[SystemTokenUtils::CLAIM_REQUEST_BODY];
         return new LongRunnerAction(
-            $decoded['class'],
-            $decoded['method'],
-            $decoded['args'] ?? [],
-            $decoded['options'] ?? []
+            $decoded["class"],
+            $decoded["method"],
+            $decoded["args"] ?? [],
+            $decoded["options"] ?? []
         );
+    }
+
+    /**
+     * Encode a JWT with parameters for the next iteration of the action.
+     *
+     * @param SystemTokenUtils $tokenUtils
+     *
+     * @return string A JWT of the next job payload.
+     */
+    public function asCallbackPayload(SystemTokenUtils $tokenUtils): string
+    {
+        return self::makeCallbackPayload($tokenUtils, $this->className, $this->method, $this->args, $this->options);
     }
 
     /**
      * @return string
      */
-    public function getClassName(): string {
+    public function getClassName(): string
+    {
         return $this->className;
     }
 
     /**
      * @return string
      */
-    public function getMethod(): string {
+    public function getMethod(): string
+    {
         return $this->method;
     }
 
     /**
      * @return array
      */
-    public function getArgs(): array {
+    public function getArgs(): array
+    {
         return $this->args;
     }
 
+    public function getCallableName(): string
+    {
+        $callableName = "{$this->getClassName()}::{$this->getMethod()}()";
+        return $callableName;
+    }
 
     /**
      * Apply next args to the action.
@@ -141,15 +189,17 @@ final class LongRunnerAction {
      *
      * @return $this
      */
-    public function applyNextArgs(LongRunnerNextArgs $args): LongRunnerAction {
-        $this->args = $args->getNextArgs();
+    public function applyNextArgs(LongRunnerNextArgs $args): LongRunnerAction
+    {
+        $this->args = $args->getArgs();
         return $this;
     }
 
     /**
      * @return array
      */
-    public function getOptions(): array {
+    public function getOptions(): array
+    {
         return $this->options;
     }
 }

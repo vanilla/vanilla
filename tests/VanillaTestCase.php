@@ -22,16 +22,17 @@ use VanillaTests\Fixtures\Request;
  * When adding helpers to this class try and make as many of the helpers public and static as possible to model the
  * base class assertions. This allows the methods to be used in traits and other subclasses more easily.
  */
-class VanillaTestCase extends TestCase {
+class VanillaTestCase extends TestCase
+{
     // Useful role names for many test fixtures.
-    public const ROLE_ADMIN = 'Administrator';
-    public const ROLE_MOD = 'Moderator';
-    public const ROLE_MEMBER = 'Member';
+    public const ROLE_ADMIN = "Administrator";
+    public const ROLE_MOD = "Moderator";
+    public const ROLE_MEMBER = "Member";
 
     /**
      * @var array An array of counters for applying to records.
      */
-    protected static $counters = ['' => 0];
+    protected static $counters = ["" => 0];
 
     /**
      * Call a closure on another object to access its private properties.
@@ -43,7 +44,8 @@ class VanillaTestCase extends TestCase {
      * @param array $args The arguments to pass to the call.
      * @return mixed Returns the result of the call.
      */
-    public static function callOn(object $on, \Closure $callable, ...$args) {
+    public static function callOn(object $on, \Closure $callable, ...$args)
+    {
         $fn = $callable->bindTo($on, $on);
         return $fn(...$args);
     }
@@ -60,7 +62,8 @@ class VanillaTestCase extends TestCase {
      * @return mixed Method return.
      * @throws \ReflectionException Throws an exception if the `$target` isn't a real class.
      */
-    public static function invokeMethod($target, $methodName, array $parameters = []) {
+    public static function invokeMethod($target, $methodName, array $parameters = [])
+    {
         $reflection = new \ReflectionClass($target);
 
         if (is_object($target)) {
@@ -76,7 +79,7 @@ class VanillaTestCase extends TestCase {
             return $method->invokeArgs(null, $parameters);
         } else {
             if (!isset($instance)) {
-                throw new \Exception('Cannot call an instance method on a class.');
+                throw new \Exception("Cannot call an instance method on a class.");
             }
             return $method->invokeArgs($target, $parameters);
         }
@@ -92,7 +95,8 @@ class VanillaTestCase extends TestCase {
      * @param string $counter The name of the counter. You usually leave this blank unless you are super picky.
      * @return array Returns the new record.
      */
-    public static function sprintfCounter(array $record, string $counter = ''): array {
+    public static function sprintfCounter(array $record, string $counter = ""): array
+    {
         $count = self::id($counter);
 
         foreach ($record as &$value) {
@@ -110,7 +114,8 @@ class VanillaTestCase extends TestCase {
      * @param string $counter The name of the counter. You usually leave this blank unless you are super picky.
      * @return int Returns the new value of the counter.
      */
-    public static function id(string $counter = ''): int {
+    public static function id(string $counter = ""): int
+    {
         self::$counters += [$counter => 0];
         $count = ++self::$counters[$counter];
 
@@ -125,7 +130,8 @@ class VanillaTestCase extends TestCase {
      * @param bool $strict Whether or not to use strict comparison.
      * @param string $message A message to display on the test.
      */
-    public static function assertArraySubsetRecursive(array $subset, array $array, $strict = true, $message = ''): void {
+    public static function assertArraySubsetRecursive(array $subset, array $array, $strict = true, $message = ""): void
+    {
         self::filterArraySubset($array, $subset);
         if ($strict) {
             self::assertSame($subset, $array, $message);
@@ -142,7 +148,8 @@ class VanillaTestCase extends TestCase {
      * @param array $parent The subset to filter.
      * @param array $subset The parent array.
      */
-    private static function filterArraySubset(array &$parent, array &$subset): void {
+    private static function filterArraySubset(array &$parent, array &$subset): void
+    {
         $parent = array_intersect_key($parent, $subset);
 
         ksort($parent);
@@ -164,7 +171,8 @@ class VanillaTestCase extends TestCase {
      * @param string $message The error message.
      * @return mixed Returns the matching row.
      */
-    public static function assertDatasetMatchesFilter(array $rows, array $filter, string $message = '') {
+    public static function assertDatasetMatchesFilter(array $rows, array $filter, string $message = "")
+    {
         TestCase::assertNotEmpty($rows, "Can't test a filter on an empty dataset.");
         $fn = ArrayUtils::filterCallback($filter, false);
 
@@ -181,7 +189,8 @@ class VanillaTestCase extends TestCase {
      * @param string $message The error message.
      * @return mixed Returns the matching row.
      */
-    public static function assertDatasetHasRow($rows, array $filter, string $message = '') {
+    public static function assertDatasetHasRow($rows, array $filter, string $message = "")
+    {
         if ($rows instanceof \Gdn_DataSet) {
             $rows = $rows->resultArray();
         }
@@ -190,7 +199,7 @@ class VanillaTestCase extends TestCase {
             return array_pop($rows);
         } else {
             $message = $message ?: "The array did not contain exactly one row matching the filter.";
-            $message .= ' '.count($rows).' found.';
+            $message .= " " . count($rows) . " found.";
 
             TestCase::fail($message);
         }
@@ -202,10 +211,15 @@ class VanillaTestCase extends TestCase {
      * @param string $configKey
      * @param mixed $expectedValue
      */
-    public static function assertConfigValue(string $configKey, $expectedValue) {
+    public static function assertConfigValue(string $configKey, $expectedValue)
+    {
         /** @var ConfigurationInterface $config */
         $config = \Gdn::getContainer()->get(ConfigurationInterface::class);
-        TestCase::assertEquals($expectedValue, $config->get($configKey, null), "Configuration values did not match for key: '$configKey'");
+        TestCase::assertEquals(
+            $expectedValue,
+            $config->get($configKey, null),
+            "Configuration values did not match for key: '$configKey'"
+        );
     }
 
     /**
@@ -214,19 +228,20 @@ class VanillaTestCase extends TestCase {
      * @param array $arr The actual array to assert.
      * @param string $fields The fields the dataset should be sorted by.
      */
-    public static function assertSorted(array $arr, string ...$fields): void {
+    public static function assertSorted(array $arr, string ...$fields): void
+    {
         $sorted = $arr;
         usort($sorted, ArrayUtils::sortCallback(...$fields));
 
         $actual = $expected = [];
         for ($i = 0; $i < count($arr); $i++) {
             foreach ($fields as $field) {
-                $j = trim($field, '-');
+                $j = trim($field, "-");
                 $actual[$i][$j] = $arr[$i][$j];
                 $expected[$i][$j] = $sorted[$i][$j];
             }
         }
-        TestCase::assertSame($expected, $actual, "The two arrays are not sorted the same: ".implode(', ', $fields));
+        TestCase::assertSame($expected, $actual, "The two arrays are not sorted the same: " . implode(", ", $fields));
     }
 
     /**
@@ -236,7 +251,8 @@ class VanillaTestCase extends TestCase {
      * @param string|Request $actual
      * @param string $message
      */
-    public function assertUrlSubset($expected, $actual, $message = ''): void {
+    public function assertUrlSubset($expected, $actual, $message = ""): void
+    {
         $re = Request::box($expected);
         $ra = Request::box($actual);
 
@@ -267,9 +283,10 @@ class VanillaTestCase extends TestCase {
      * @param string[] $suffixes The argument suffixes.
      * @return array Returns a data provider array keyed by the base name of each file without any suffixes.
      */
-    public static function provideFileTests(string $dir, ...$suffixes): array {
+    public static function provideFileTests(string $dir, ...$suffixes): array
+    {
         if (empty($suffixes)) {
-            $suffixes = [''];
+            $suffixes = [""];
         }
         $whitelist = [];
         if (is_array($suffixes[count($suffixes) - 1])) {
@@ -277,7 +294,7 @@ class VanillaTestCase extends TestCase {
         }
 
         $result = [];
-        $defaults = array_fill(0, count($suffixes), '');
+        $defaults = array_fill(0, count($suffixes), "");
         foreach ($suffixes as $i => $suffix) {
             $files = glob("$dir/*$suffix");
             foreach ($files as $file) {
@@ -290,7 +307,7 @@ class VanillaTestCase extends TestCase {
                 $contents = file_get_contents($file);
 
                 switch (pathinfo($file, PATHINFO_EXTENSION)) {
-                    case 'json':
+                    case "json":
                         $contents = json_decode($contents, true);
                         break;
                 }
@@ -317,7 +334,12 @@ class VanillaTestCase extends TestCase {
      * @param bool $strictOrder Should the items be strictly ordered.
      * @param int|null $count The expected count of rows.
      */
-    protected static function assertRowsLike(array $expectedFields, array $actualRows, bool $strictOrder = true, ?int $count = null) {
+    protected static function assertRowsLike(
+        array $expectedFields,
+        array $actualRows,
+        bool $strictOrder = true,
+        ?int $count = null
+    ) {
         if (is_int($count)) {
             self::assertEquals($count, count($actualRows));
         }
@@ -337,7 +359,11 @@ class VanillaTestCase extends TestCase {
                     sort($expectedValues);
                 }
 
-                self::assertEquals($expectedValues, $actualValues, "Found wrong values for expected field: $expectedField");
+                self::assertEquals(
+                    $expectedValues,
+                    $actualValues,
+                    "Found wrong values for expected field: $expectedField"
+                );
             }
         }
     }
@@ -348,16 +374,17 @@ class VanillaTestCase extends TestCase {
      * @param array $expected Map of 'path.to.data' => 'expected value'
      * @param array{string, mixed} $data A mapping of dot notation keys to expected values.
      */
-    public static function assertDataLike(array $expected, array $data): void {
+    public static function assertDataLike(array $expected, array $data): void
+    {
         foreach ($expected as $key => $expectedValue) {
             $actualValue = ArrayUtils::getByPath($key, $data);
             Assert::assertEquals(
                 $expectedValue,
                 $actualValue,
-                "Expect key '$key' to be equal to:\n"
-                . json_encode($expectedValue, JSON_PRETTY_PRINT)
-                . "\n Instead got:\n"
-                . json_encode($actualValue, JSON_PRETTY_PRINT)
+                "Expect key '$key' to be equal to:\n" .
+                    json_encode($expectedValue, JSON_PRETTY_PRINT) .
+                    "\n Instead got:\n" .
+                    json_encode($actualValue, JSON_PRETTY_PRINT)
             );
         }
     }

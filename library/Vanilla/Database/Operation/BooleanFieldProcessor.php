@@ -12,8 +12,8 @@ use Vanilla\Logging\LoggerUtils;
 /**
  * Database operation processor for translating int fields to boolean values.
  */
-class BooleanFieldProcessor implements Processor {
-
+class BooleanFieldProcessor implements Processor
+{
     /** @var array */
     private $fields = [];
 
@@ -22,7 +22,8 @@ class BooleanFieldProcessor implements Processor {
      *
      * @param array $fields
      */
-    public function __construct(array $fields = []) {
+    public function __construct(array $fields = [])
+    {
         $this->setFields($fields);
     }
 
@@ -31,7 +32,8 @@ class BooleanFieldProcessor implements Processor {
      *
      * @return array
      */
-    public function getFields(): array {
+    public function getFields(): array
+    {
         return $this->fields;
     }
 
@@ -42,7 +44,8 @@ class BooleanFieldProcessor implements Processor {
      * @param callable $stack
      * @return mixed
      */
-    public function handle(Operation $operation, callable $stack) {
+    public function handle(Operation $operation, callable $stack)
+    {
         if (in_array($operation->getType(), [Operation::TYPE_INSERT, Operation::TYPE_UPDATE])) {
             $this->translateInput($operation);
             return $stack($operation);
@@ -59,7 +62,8 @@ class BooleanFieldProcessor implements Processor {
      *
      * @param Operation $operation
      */
-    private function translateInput(Operation $operation) {
+    private function translateInput(Operation $operation)
+    {
         $set = $operation->getSet();
         foreach ($this->getFields() as $field) {
             if (array_key_exists($field, $set)) {
@@ -75,7 +79,8 @@ class BooleanFieldProcessor implements Processor {
      * @param array $fields
      * @return self
      */
-    public function setFields(array $fields): self {
+    public function setFields(array $fields): self
+    {
         $this->fields = $fields;
         return $this;
     }
@@ -86,7 +91,8 @@ class BooleanFieldProcessor implements Processor {
      * @param array $results
      * @return array
      */
-    private function translateOutput(array $results): array {
+    private function translateOutput(array $results): array
+    {
         $fields = $this->getFields();
         foreach ($results as &$row) {
             foreach ($fields as $field) {

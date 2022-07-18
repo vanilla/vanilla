@@ -94,12 +94,11 @@
     }
 
     .badge {
-
     }
 }
 
 .plank-title {
-    padding: 0 $spacer / 2;
+    padding: 0 $spacer * 0.5;
 }
 
 .plank-options {
@@ -120,7 +119,7 @@
     color: $grey;
 
     &:hover {
-        fill: transparentize($body-color, .4);
+        fill: transparentize($body-color, 0.4);
     }
 }
 
@@ -186,4 +185,3 @@
         padding-right: 3px;
     }
 }
-

@@ -8,7 +8,8 @@ namespace Vanilla\Metadata\Parser;
 
 use DOMDocument;
 
-interface Parser {
+interface Parser
+{
     /**
      * Parse a document for metadata.
      *

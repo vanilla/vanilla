@@ -12,15 +12,16 @@ use PHPUnit\Framework\TestCase;
 /**
  * Basic testing utilities for models.
  */
-trait ModelTestTrait {
-
+trait ModelTestTrait
+{
     /**
      * Assert some arrays of IDs are the same.
      *
      * @param array $expectedIDs
      * @param array $actualIDs
      */
-    protected function assertIDsEqual(array $expectedIDs, array $actualIDs) {
+    protected function assertIDsEqual(array $expectedIDs, array $actualIDs)
+    {
         TestCase::assertSame($this->normalizeIDs($expectedIDs), $this->normalizeIDs($actualIDs));
     }
 
@@ -30,7 +31,8 @@ trait ModelTestTrait {
      * @param array $ids
      * @return array
      */
-    protected function normalizeIDs(array $ids): array {
+    protected function normalizeIDs(array $ids): array
+    {
         $fixedIDs = array_map(function ($id) {
             return (int) $id;
         }, $ids);

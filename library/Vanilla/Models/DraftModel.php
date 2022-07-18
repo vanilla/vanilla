@@ -15,8 +15,8 @@ use Vanilla\Models\PipelineModel;
 /**
  * Handle all-purpose drafts.
  */
-class DraftModel extends PipelineModel {
-
+class DraftModel extends PipelineModel
+{
     /** @var Gdn_Session */
     private $session;
 
@@ -25,18 +25,17 @@ class DraftModel extends PipelineModel {
      *
      * @param Gdn_Session $session
      */
-    public function __construct(Gdn_Session $session) {
+    public function __construct(Gdn_Session $session)
+    {
         parent::__construct("contentDraft");
         $this->session = $session;
 
         $dateProcessor = new CurrentDateFieldProcessor();
-        $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
-            ->setUpdateFields(["dateUpdated"]);
+        $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])->setUpdateFields(["dateUpdated"]);
         $this->addPipelineProcessor($dateProcessor);
 
         $userProcessor = new CurrentUserFieldProcessor($this->session);
-        $userProcessor->setInsertFields(["insertUserID", "updateUserID"])
-            ->setUpdateFields(["updateUserID"]);
+        $userProcessor->setInsertFields(["insertUserID", "updateUserID"])->setUpdateFields(["updateUserID"]);
         $this->addPipelineProcessor($userProcessor);
 
         $jsonProcessor = new JsonFieldProcessor();
@@ -50,15 +49,16 @@ class DraftModel extends PipelineModel {
      * @param int $userID
      * @return int
      */
-    public function draftsCount(int $userID): int {
-
+    public function draftsCount(int $userID): int
+    {
         $countRecord = $this->createSql()
             ->from($this->getTable())
-            ->select('*', 'COUNT', 'draftCount')
-            ->where('insertUserID', $userID)
-            ->groupBy('insertUserID')
-            ->get()->nextRow(DATASET_TYPE_ARRAY);
+            ->select("*", "COUNT", "draftCount")
+            ->where("insertUserID", $userID)
+            ->groupBy("insertUserID")
+            ->get()
+            ->nextRow(DATASET_TYPE_ARRAY);
 
-        return $countRecord['draftCount'] ?? 0;
+        return $countRecord["draftCount"] ?? 0;
     }
 }

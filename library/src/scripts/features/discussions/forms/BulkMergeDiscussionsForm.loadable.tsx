@@ -4,6 +4,7 @@
  * @license gpl-2.0-only
  */
 
+import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { LoadStatus } from "@library/@types/api/core";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { useDiscussionActions } from "@library/features/discussions/DiscussionActions";
@@ -34,8 +35,8 @@ import { count } from "console";
 import React, { useEffect, useMemo, useState } from "react";
 
 interface IMergeRequestBody {
-    discussionIDs: RecordID[];
-    destinationDiscussionID: RecordID;
+    discussionIDs: Array<IDiscussion["discussionID"]>;
+    destinationDiscussionID: IDiscussion["discussionID"];
     addRedirects?: boolean;
 }
 
@@ -44,11 +45,8 @@ interface IProps {
 }
 
 export default function DiscussionMergeFormImpl(props: IProps) {
-    const {
-        checkedDiscussionIDs,
-        addPendingDiscussionByIDs,
-        removePendingDiscussionByIDs,
-    } = useDiscussionCheckBoxContext();
+    const { checkedDiscussionIDs, addPendingDiscussionByIDs, removePendingDiscussionByIDs } =
+        useDiscussionCheckBoxContext();
 
     const discussionActions = useDiscussionActions();
 
@@ -144,7 +142,7 @@ export default function DiscussionMergeFormImpl(props: IProps) {
 }
 
 interface IDiscussionSelectorProps {
-    discussionIDs: RecordID[];
+    discussionIDs: Array<IDiscussion["discussionID"]>;
     value: RecordID | null;
     onChange: (value: RecordID) => void;
     maxRadioInputs: number;

@@ -19,7 +19,7 @@ import Loader from "@library/loaders/Loader";
 import { EmptyAuthenticatorResults } from "@oauth2/components/EmptyAuthenticatorResults";
 import { IAuthenticator } from "@oauth2/AuthenticatorTypes";
 import OAuth2AddEdit from "@oauth2/pages/AuthenticatorAddEdit";
-import LazyModal from "@library/modal/LazyModal";
+import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import Button from "@library/forms/Button";
 import { useAuthenticators, useSetAuthenticatorActive } from "@oauth2/AuthenticatorHooks";
@@ -66,7 +66,7 @@ export default function ConnectionsIndexPage() {
                     </>
                 }
             />
-            <LazyModal isVisible={isFormVisible} size={ModalSizes.LARGE} exitHandler={closeFormModal}>
+            <Modal isVisible={isFormVisible} size={ModalSizes.LARGE} exitHandler={closeFormModal}>
                 <OAuth2AddEdit
                     authenticatorID={editingID}
                     onClose={() => {
@@ -74,7 +74,7 @@ export default function ConnectionsIndexPage() {
                         setFormVisible(false);
                     }}
                 />
-            </LazyModal>
+            </Modal>
             {deleteID !== undefined && (
                 <AuthenticatorDeleteModal
                     authenticatorID={deleteID}

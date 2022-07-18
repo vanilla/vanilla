@@ -15,11 +15,11 @@ use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 /**
  * Base test case for generating storybook data.
  */
-abstract class StorybookGenerationTestCase extends AbstractAPIv2Test {
-
+abstract class StorybookGenerationTestCase extends AbstractAPIv2Test
+{
     use HtmlNormalizeTrait;
 
-    const STORYBOOK_BASE_PATH = PATH_ROOT . '/build/.storybookAppPages';
+    const STORYBOOK_BASE_PATH = PATH_ROOT . "/build/.storybookAppPages";
 
     /** @var bool */
     private static $prettierExists = false;
@@ -27,7 +27,8 @@ abstract class StorybookGenerationTestCase extends AbstractAPIv2Test {
     /**
      * @return string
      */
-    protected static function getBootstrapFolderName() {
+    protected static function getBootstrapFolderName()
+    {
         return "";
     }
 
@@ -37,9 +38,10 @@ abstract class StorybookGenerationTestCase extends AbstractAPIv2Test {
      * @param string $url
      * @param string $storyName
      */
-    public function generateStoryHtml(string $url, string $storyName) {
+    public function generateStoryHtml(string $url, string $storyName)
+    {
         $htmlDocument = $this->bessy()->getHtml($url, [
-            'deliveryType' => DELIVERY_TYPE_ALL,
+            "deliveryType" => DELIVERY_TYPE_ALL,
         ]);
 
         // Strip out some elements we don't use.
@@ -57,19 +59,19 @@ abstract class StorybookGenerationTestCase extends AbstractAPIv2Test {
         $cssFiles = $this->extractLegacyCssFiles($htmlDocument);
         $this->assertNotEmpty(
             $cssFiles,
-            "Something went wrong extracting the page's legacy CSS files.\nHTML document:\n"
-            . $htmlDocument->getRawHtml()
+            "Something went wrong extracting the page's legacy CSS files.\nHTML document:\n" .
+                $htmlDocument->getRawHtml()
         );
         $bodyClasses = $bodyNode->getAttribute("class") ?? "";
         $data = [
-            'cssFiles' => $cssFiles,
-            'bodyClasses' => $bodyClasses,
+            "cssFiles" => $cssFiles,
+            "bodyClasses" => $bodyClasses,
         ];
         $dataJson = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
-        $writeBase = self::STORYBOOK_BASE_PATH . '/' . $storyName;
-        $htmlPath = $writeBase . '.html';
-        $dataPath = $writeBase . '.json';
+        $writeBase = self::STORYBOOK_BASE_PATH . "/" . $storyName;
+        $htmlPath = $writeBase . ".html";
+        $dataPath = $writeBase . ".json";
 
         $bodyContent = $htmlDocument->getOuterHtml($bodyNode);
         // $bodyContent = $this->minifyHTML($bodyContent);
@@ -85,7 +87,8 @@ abstract class StorybookGenerationTestCase extends AbstractAPIv2Test {
     /**
      * @return bool
      */
-    private function prettierExists(): bool {
+    private function prettierExists(): bool
+    {
         if (!isset(self::$prettierExists)) {
             self::$prettierExists = file_exists(PATH_ROOT . "/node_modules");
         }
@@ -98,14 +101,15 @@ abstract class StorybookGenerationTestCase extends AbstractAPIv2Test {
      * @param HtmlDocument $htmlDocument
      * @return string[]
      */
-    private function extractLegacyCssFiles(HtmlDocument $htmlDocument): array {
+    private function extractLegacyCssFiles(HtmlDocument $htmlDocument): array
+    {
         $result = [];
         /** @var \DOMElement $headNode */
         $cssLinks = $htmlDocument->queryXPath("//html/head/link[@rel=\"stylesheet\"]");
 
         /** @var \DOMElement $cssLink */
         foreach ($cssLinks as $cssLink) {
-            $href = $cssLink->getAttribute('href') ?? '';
+            $href = $cssLink->getAttribute("href") ?? "";
             $normalizedHref = $this->getNormalizedCssPath($href);
             if ($normalizedHref) {
                 $result[] = $normalizedHref;
@@ -121,7 +125,8 @@ abstract class StorybookGenerationTestCase extends AbstractAPIv2Test {
      * @param string $initialPath
      * @return string|null
      */
-    private function getNormalizedCssPath(string $initialPath): ?string {
+    private function getNormalizedCssPath(string $initialPath): ?string
+    {
         $path = parse_url($initialPath, PHP_URL_PATH);
         if (!$path) {
             return null;

@@ -16,8 +16,8 @@ use VanillaTests\BootstrapTrait;
 /**
  * Tests for the `Model` class.
  */
-class ModelTest extends BootstrapTestCase {
-
+class ModelTest extends BootstrapTestCase
+{
     /**
      * @var Model
      */
@@ -26,24 +26,21 @@ class ModelTest extends BootstrapTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        $this->container()->call(function (
-            \Gdn_DatabaseStructure $st,
-            \Gdn_SQLDriver $sql
-        ) {
-            if (!$st->tableExists('model')) {
-                $st
-                    ->table('model')
-                    ->primaryKey('modelID')
-                    ->column('name', 'varchar(50)')
+        $this->container()->call(function (\Gdn_DatabaseStructure $st, \Gdn_SQLDriver $sql) {
+            if (!$st->tableExists("model")) {
+                $st->table("model")
+                    ->primaryKey("modelID")
+                    ->column("name", "varchar(50)")
                     ->set();
             } else {
-                $sql->truncate('model');
+                $sql->truncate("model");
             }
         });
 
-        $this->model = $this->container()->getArgs(Model::class, ['model']);
+        $this->model = $this->container()->getArgs(Model::class, ["model"]);
     }
 
     /**
@@ -51,12 +48,13 @@ class ModelTest extends BootstrapTestCase {
      *
      * @return int
      */
-    public function testInsertGet(): int {
+    public function testInsertGet(): int
+    {
         $id = $this->insertOne();
         $row = $this->model->selectSingle($this->model->primaryWhere($id));
 
-        $this->assertSame('foo', $row['name']);
-        $this->assertSame($id, $row['modelID']);
+        $this->assertSame("foo", $row["name"]);
+        $this->assertSame($id, $row["modelID"]);
         return $id;
     }
 
@@ -66,23 +64,22 @@ class ModelTest extends BootstrapTestCase {
      * @param string $name
      * @return int
      */
-    private function insertOne(string $name = 'foo'): int {
-        $id = $this->model->insert(['name' => $name]);
+    private function insertOne(string $name = "foo"): int
+    {
+        $id = $this->model->insert(["name" => $name]);
         return $id;
     }
 
     /**
      * You can select all but some columns by prefixng with a "-".
      */
-    public function testAllButSelect(): void {
+    public function testAllButSelect(): void
+    {
         $id = $this->insertOne();
 
-        $row = $this->model->selectSingle(
-            $this->model->primaryWhere($id),
-            [Model::OPT_SELECT => '-modelID']
-        );
-        $this->assertSame('foo', $row['name']);
-        $this->assertArrayNotHasKey('modelID', $row);
+        $row = $this->model->selectSingle($this->model->primaryWhere($id), [Model::OPT_SELECT => "-modelID"]);
+        $this->assertSame("foo", $row["name"]);
+        $this->assertArrayNotHasKey("modelID", $row);
     }
 
     /**
@@ -90,7 +87,8 @@ class ModelTest extends BootstrapTestCase {
      *
      * @depends testInsertGet
      */
-    public function testDelete(): void {
+    public function testDelete(): void
+    {
         $id = $this->insertOne();
         $this->model->delete($this->model->primaryWhere($id));
 
@@ -103,32 +101,34 @@ class ModelTest extends BootstrapTestCase {
      *
      * @depends testInsertGet
      */
-    public function testUpdate(): void {
+    public function testUpdate(): void
+    {
         $id = $this->insertOne();
-        $r = $this->model->update(['name' => 'bar'], $this->model->primaryWhere($id));
-
+        $r = $this->model->update(["name" => "bar"], $this->model->primaryWhere($id));
 
         $row = $this->model->selectSingle($this->model->primaryWhere($id));
-        $this->assertSame('bar', $row['name']);
+        $this->assertSame("bar", $row["name"]);
     }
 
     /**
      * Insert ignore should ignore duplicates.
      */
-    public function testInsertIgnore(): void {
+    public function testInsertIgnore(): void
+    {
         $id = $this->insertOne();
-        $this->model->insert(['modelID' => $id, 'name' => __FUNCTION__], [Model::OPT_IGNORE => true]);
-        $row = $this->model->selectSingle(['modelID' => $id]);
-        $this->assertNotSame(__FUNCTION__, $row['name']);
+        $this->model->insert(["modelID" => $id, "name" => __FUNCTION__], [Model::OPT_IGNORE => true]);
+        $row = $this->model->selectSingle(["modelID" => $id]);
+        $this->assertNotSame(__FUNCTION__, $row["name"]);
     }
 
     /**
      * Replace should replace the entire row.
      */
-    public function testReplace(): void {
+    public function testReplace(): void
+    {
         $id = $this->insertOne();
-        $this->model->insert(['modelID' => $id, 'name' => __FUNCTION__], [Model::OPT_REPLACE => true]);
-        $row = $this->model->selectSingle(['modelID' => $id]);
-        $this->assertSame(__FUNCTION__, $row['name']);
+        $this->model->insert(["modelID" => $id, "name" => __FUNCTION__], [Model::OPT_REPLACE => true]);
+        $row = $this->model->selectSingle(["modelID" => $id]);
+        $this->assertSame(__FUNCTION__, $row["name"]);
     }
 }

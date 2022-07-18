@@ -13,7 +13,7 @@ import { formatUrl } from "@library/utility/appUtils";
 const defaultOptionProvider: ISearchOptionProvider = {
     supportsAutoComplete: false,
     autocomplete: () => Promise.resolve([]),
-    makeSearchUrl: (query) => formatUrl(`/search?search=${query}`),
+    makeSearchUrl: (query) => formatUrl(`/search?search=${query}`, true),
 };
 
 const SearchContext = React.createContext<IWithSearchProps>({

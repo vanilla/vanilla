@@ -6,13 +6,13 @@
 
 namespace Vanilla\Theme\Asset;
 
- use Vanilla\Theme\ThemeAssetFactory;
+use Vanilla\Theme\ThemeAssetFactory;
 
- /**
-  * HTML theme asset.
-  */
-class HtmlThemeAsset extends ThemeAsset {
-
+/**
+ * HTML theme asset.
+ */
+class HtmlThemeAsset extends ThemeAsset
+{
     /** @var string HTML content of this asset. */
     private $html = "";
 
@@ -25,7 +25,8 @@ class HtmlThemeAsset extends ThemeAsset {
      * @param string $html
      * @param string $url
      */
-    public function __construct(string $html, string $url) {
+    public function __construct(string $html, string $url)
+    {
         $this->html = $html;
         $this->url = $url;
     }
@@ -33,14 +34,16 @@ class HtmlThemeAsset extends ThemeAsset {
     /**
      * @return string
      */
-    public function getDefaultType(): string {
+    public function getDefaultType(): string
+    {
         return ThemeAssetFactory::ASSET_TYPE_HTML;
     }
 
     /**
      * @inheritdoc
      */
-    public function getContentType(): string {
+    public function getContentType(): string
+    {
         return "text/html";
     }
 
@@ -51,7 +54,8 @@ class HtmlThemeAsset extends ThemeAsset {
      *
      * @return string
      */
-    public function renderHtml(array $data = []): string {
+    public function renderHtml(array $data = []): string
+    {
         return $this->html;
     }
 
@@ -60,7 +64,8 @@ class HtmlThemeAsset extends ThemeAsset {
      *
      * @return string
      */
-    public function getValue(): string {
+    public function getValue(): string
+    {
         return $this->html;
     }
 
@@ -69,7 +74,8 @@ class HtmlThemeAsset extends ThemeAsset {
      *
      * @return string
      */
-    public function __toString(): string {
+    public function __toString(): string
+    {
         return $this->html;
     }
 }

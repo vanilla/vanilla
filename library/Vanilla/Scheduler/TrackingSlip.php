@@ -21,8 +21,8 @@ use Vanilla\Scheduler\Job\TrackableJobAwareTrait;
 /**
  * Class TrackingSlip
  */
-class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
-
+class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface
+{
     use LoggerAwareTrait;
     use TrackableJobAwareTrait;
 
@@ -78,7 +78,7 @@ class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
         $this->logger = $logger;
         $this->config = $config;
 
-        $this->trackingID = uniqid((gethostname() ?: 'unknown')."::", true);
+        $this->trackingID = uniqid((gethostname() ?: "unknown") . "::", true);
         $this->driverSlip->setTrackingID($this->trackingID);
     }
 
@@ -87,7 +87,8 @@ class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
      *
      * @return string
      */
-    public function getID(): string {
+    public function getID(): string
+    {
         return $this->driverSlip->getID();
     }
 
@@ -96,7 +97,8 @@ class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
      *
      * @return string
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return $this->driverSlip->getType();
     }
 
@@ -105,7 +107,8 @@ class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
      *
      * @return JobExecutionStatus
      */
-    public function getStatus(): JobExecutionStatus {
+    public function getStatus(): JobExecutionStatus
+    {
         return $this->driverSlip->getStatus();
     }
 
@@ -114,7 +117,8 @@ class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
      *
      * @return DriverSlipInterface
      */
-    public function getDriverSlip(): DriverSlipInterface {
+    public function getDriverSlip(): DriverSlipInterface
+    {
         return $this->driverSlip;
     }
 
@@ -123,7 +127,8 @@ class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
      *
      * @return string
      */
-    public function getJobInterface(): string {
+    public function getJobInterface(): string
+    {
         return $this->jobInterface;
     }
 
@@ -132,14 +137,16 @@ class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
      *
      * @return array
      */
-    public function getExtendedStatus(): array {
+    public function getExtendedStatus(): array
+    {
         return $this->driverSlip->getExtendedStatus();
     }
 
     /**
      * @return JobDescriptorInterface
      */
-    public function getDescriptor(): JobDescriptorInterface {
+    public function getDescriptor(): JobDescriptorInterface
+    {
         return $this->jobDescriptor;
     }
 
@@ -148,21 +155,24 @@ class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
      *
      * @return string|null
      */
-    public function getErrorMessage(): ?string {
+    public function getErrorMessage(): ?string
+    {
         return $this->driverSlip->getErrorMessage();
     }
 
     /**
      * Set Init
      */
-    public function start(): void {
+    public function start(): void
+    {
         $this->timerStart = microtime(true);
     }
 
     /**
      * Set End
      */
-    public function stop(): void {
+    public function stop(): void
+    {
         $this->timerStop = microtime(true);
     }
 
@@ -171,8 +181,11 @@ class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
      *
      * @return int|null
      */
-    public function getElapsedMs(): ?int {
-        return ($this->timerStop !== null && $this->timerStart !== null) ? (int)(($this->timerStop - $this->timerStart) * 1000) : 0;
+    public function getElapsedMs(): ?int
+    {
+        return $this->timerStop !== null && $this->timerStart !== null
+            ? (int) (($this->timerStop - $this->timerStart) * 1000)
+            : 0;
     }
 
     /**
@@ -180,35 +193,31 @@ class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
      *
      * @return bool
      */
-    public function log(): bool {
-
-        if (!$this->config->get('Garden.Scheduler.Log', false)) {
+    public function log(): bool
+    {
+        if (!$this->config->get("Garden.Scheduler.Log", false)) {
             return false;
         }
 
         $values = [
-            'trackingId' => $this->getTrackingID(),
-            'type' => $this->getType(),
-            'jobId' => $this->getID(),
-            'status' => $this->getStatus()->getStatus(),
-            'elapsedMs' => $this->getElapsedMs(),
+            "trackingId" => $this->getTrackingID(),
+            "type" => $this->getType(),
+            "jobId" => $this->getID(),
+            "status" => $this->getStatus()->getStatus(),
+            "elapsedMs" => $this->getElapsedMs(),
         ];
 
         if ($this->getErrorMessage()) {
-            $values['errorMessage'] = $this->getErrorMessage();
+            $values["errorMessage"] = $this->getErrorMessage();
         }
 
-        $this->logger->log(
-            LogLevel::INFO,
-            '',
-            [
-                '_id' => 'scheduler::'.$this->getTrackingID(),
-                '_version' => microtime(true) * 1000000,
-                'scheduler' => $values,
-                Logger::FIELD_EVENT => 'scheduler',
-                Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-            ]
-        );
+        $this->logger->log(LogLevel::INFO, "", [
+            "_id" => "scheduler::" . $this->getTrackingID(),
+            "_version" => microtime(true) * 1000000,
+            "scheduler" => $values,
+            Logger::FIELD_EVENT => "scheduler",
+            Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+        ]);
 
         return true;
     }
@@ -218,14 +227,16 @@ class TrackingSlip implements TrackingSlipInterface, LoggerAwareInterface {
      *
      * @return int
      */
-    public function getDuplication(): int {
+    public function getDuplication(): int
+    {
         return $this->duplication;
     }
 
     /**
      * IncrementDuplication
      */
-    public function incrementDuplication(): void {
+    public function incrementDuplication(): void
+    {
         $this->duplication++;
     }
 }

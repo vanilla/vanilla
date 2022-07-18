@@ -12,11 +12,13 @@ use Vanilla\Models\Model;
 /**
  * A basic model for testing the factory or whatever.
  */
-class TestModel extends Model {
+class TestModel extends Model
+{
     /**
      * TestModel constructor.
      */
-    public function __construct() {
-        parent::__construct('testModel');
+    public function __construct()
+    {
+        parent::__construct("testModel");
     }
 }

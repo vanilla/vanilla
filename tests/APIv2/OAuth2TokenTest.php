@@ -15,36 +15,43 @@ use VanillaTests\TestOAuth\TestOAuthPlugin;
 /**
  * Tests for `POST /api/v2/tokens/oauth`.
  */
-final class OAuth2TokenTest extends AbstractAPIv2Test {
-    protected const CLIENT_ID = 'test123';
+final class OAuth2TokenTest extends AbstractAPIv2Test
+{
+    protected const CLIENT_ID = "test123";
 
     /**
      * The addons to run tests with.
      *
      * @return array
      */
-    protected static function getAddons(): array {
-        return ['vanilla', 'test-oauth'];
+    protected static function getAddons(): array
+    {
+        return ["vanilla", "test-oauth"];
     }
 
     /**
      * Setup tests.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->configureProvider([
-            'AssociationKey' => self::CLIENT_ID,
-            'AssociationSecret' => 'shh...',
-            'Active' => 1,
-            'AllowAccessTokens' => true,
+            "AssociationKey" => self::CLIENT_ID,
+            "AssociationSecret" => "shh...",
+            "Active" => 1,
+            "AllowAccessTokens" => true,
         ]);
 
         // Clean out the provider.
         $oauth = $this->container()->get(TestOAuthPlugin::class);
-        \Closure::bind(function () {
-            $this->accessToken = null;
-            $this->provider = false;
-        }, $oauth, TestOAuthPlugin::class)();
+        \Closure::bind(
+            function () {
+                $this->accessToken = null;
+                $this->provider = false;
+            },
+            $oauth,
+            TestOAuthPlugin::class
+        )();
 
         // Clean up the test user.
         /* @var TestOAuthPlugin $plugin */
@@ -57,11 +64,12 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
     /**
      * An unconfigured client should not be allowed.
      */
-    public function testNotConfigured() {
+    public function testNotConfigured()
+    {
         $this->expectException(HttpException::class);
         $this->expectExceptionCode(500);
 
-        $this->configureProvider(['AssociationSecret' => '']);
+        $this->configureProvider(["AssociationSecret" => ""]);
 
         try {
             $r = $this->postAccessToken();
@@ -73,11 +81,12 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
     /**
      * An inactive client should not be allowed.
      */
-    public function testNotActive() {
+    public function testNotActive()
+    {
         $this->expectException(HttpException::class);
         $this->expectExceptionCode(500);
 
-        $this->configureProvider(['Active' => 0]);
+        $this->configureProvider(["Active" => 0]);
 
         $r = $this->postAccessToken();
     }
@@ -85,12 +94,13 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
     /**
      * An inactive client should not be allowed.
      */
-    public function testNotAllowed() {
+    public function testNotAllowed()
+    {
         $this->expectException(HttpException::class);
         $this->expectExceptionCode(500);
-        $this->expectExceptionMessage('The OAuth client is not allowed to issue access tokens.');
+        $this->expectExceptionMessage("The OAuth client is not allowed to issue access tokens.");
 
-        $this->configureProvider(['AllowAccessTokens' => false]);
+        $this->configureProvider(["AllowAccessTokens" => false]);
 
         $r = $this->postAccessToken();
     }
@@ -98,38 +108,42 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
     /**
      * A client ID mismatch should be an error.
      */
-    public function testBadClientID() {
+    public function testBadClientID()
+    {
         $this->expectException(HttpException::class);
         $this->expectExceptionCode(404);
         $this->expectExceptionMessage('An OAuth client with ID "test123" could not be found.');
 
-        $this->configureProvider(['AssociationKey' => 'different']);
+        $this->configureProvider(["AssociationKey" => "different"]);
         $r = $this->postAccessToken();
     }
 
     /**
      * A bad access token should be forbidden.
      */
-    public function testBadToken() {
+    public function testBadToken()
+    {
         $this->expectException(HttpException::class);
         $this->expectExceptionCode(403);
 
-        $r = $this->postAccessToken('foo');
+        $r = $this->postAccessToken("foo");
     }
 
     /**
      * A good access token should work.
      */
-    public function testGoodToken() {
+    public function testGoodToken()
+    {
         $r = $this->postAccessToken();
 
-        $this->assertNotEmpty($r['accessToken']);
+        $this->assertNotEmpty($r["accessToken"]);
     }
 
     /**
      * A profile that doesn't return enough user information should be an error.
      */
-    public function testBadProfileNoUniqueID() {
+    public function testBadProfileNoUniqueID()
+    {
         $this->expectException(HttpException::class);
         $this->expectExceptionCode(400);
 
@@ -143,7 +157,8 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
     /**
      * A profile that doesn't return enough user information should be an error.
      */
-    public function testBadProfileNoUser() {
+    public function testBadProfileNoUser()
+    {
         $this->expectException(HttpException::class);
         $this->expectExceptionCode(400);
 
@@ -156,10 +171,11 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
      * @param string $oauthAccessToken
      * @return array
      */
-    private function postAccessToken(string $oauthAccessToken = TestOAuthPlugin::GOOD_ACCESS_TOKEN): array {
-        $r = $this->api()->post('/tokens/oauth', [
-            'clientID' => self::CLIENT_ID,
-            'oauthAccessToken' => $oauthAccessToken,
+    private function postAccessToken(string $oauthAccessToken = TestOAuthPlugin::GOOD_ACCESS_TOKEN): array
+    {
+        $r = $this->api()->post("/tokens/oauth", [
+            "clientID" => self::CLIENT_ID,
+            "oauthAccessToken" => $oauthAccessToken,
         ]);
 
         return $r->getBody();
@@ -170,7 +186,8 @@ final class OAuth2TokenTest extends AbstractAPIv2Test {
      *
      * @param array $set The values to set.
      */
-    private function configureProvider(array $set): void {
+    private function configureProvider(array $set): void
+    {
         /* @var \Gdn_AuthenticationProviderModel $model */
         $model = static::container()->get(\Gdn_AuthenticationProviderModel::class);
         $provider = \Gdn_AuthenticationProviderModel::getProviderByKey(TestOAuthPlugin::PROVIDER_KEY);

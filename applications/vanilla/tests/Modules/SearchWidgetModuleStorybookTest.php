@@ -19,17 +19,18 @@ use VanillaTests\Storybook\StorybookGenerationTestCase;
 /**
  * Test rendering of the "Search Widget" module.
  */
-class SearchWidgetModuleStorybookTest extends StorybookGenerationTestCase {
-
+class SearchWidgetModuleStorybookTest extends StorybookGenerationTestCase
+{
     use EventSpyTestTrait;
 
-    public static $addons = ['vanilla'];
+    public static $addons = ["vanilla"];
 
     /**
      * Test rendering of the Search Widget module.
      */
-    public function testRender() {
-        $this->generateStoryHtml('/', 'Custom Search Widget');
+    public function testRender()
+    {
+        $this->generateStoryHtml("/", "Custom Search Widget");
     }
 
     /**
@@ -37,13 +38,19 @@ class SearchWidgetModuleStorybookTest extends StorybookGenerationTestCase {
      *
      * @param \Gdn_Controller $sender
      */
-    public function base_render_before(\Gdn_Controller $sender) {
+    public function base_render_before(\Gdn_Controller $sender)
+    {
         /** @var SearchWidgetModule $module */
         $module = self::container()->get(SearchWidgetModule::class);
-        $module->setTitle('Custom Search Forum');
+        $module->setTitle("Custom Search Forum");
 
-        $schema1 = new MockTagSearchFormSchema($this->buildFormSchema('my-tab'), 'my-tab', 'Submit', 'Hello Search');
-        $schema2 = new MockTagSearchFormSchema($this->buildFormSchema('my-tab2'), 'my-tab2', 'Submit 2', 'Hello Search 2');
+        $schema1 = new MockTagSearchFormSchema($this->buildFormSchema("my-tab"), "my-tab", "Submit", "Hello Search");
+        $schema2 = new MockTagSearchFormSchema(
+            $this->buildFormSchema("my-tab2"),
+            "my-tab2",
+            "Submit 2",
+            "Hello Search 2"
+        );
         $module->setTabFormSchemaClasses([$schema1, $schema2]);
         $sender->addModule($module);
     }
@@ -55,47 +62,39 @@ class SearchWidgetModuleStorybookTest extends StorybookGenerationTestCase {
      *
      * @return array
      */
-    private function buildFormSchema(string $tabID): array {
+    private function buildFormSchema(string $tabID): array
+    {
         return [
-            'x-form' => [
-                'url' => '/search',
-                'searchParams' => [
-                    'domain' => 'discussions',
-                    'scope' => 'site',
-                    'tagsOptions[0][tagCode]' => '{jobRole.urlcode}',
-                    'tagsOptions[0][value]' => '{jobRole.tagId}',
-                    'tagsOptions[0][label]' => '{jobRole.name}',
-                    'tagsOptions[1][tagCode]' => '{industry.urlcode}',
-                    'tagsOptions[1][value]' => '{industry.tagId}',
-                    'tagsOptions[1][label]' => '{industry.name}',
+            "x-form" => [
+                "url" => "/search",
+                "searchParams" => [
+                    "domain" => "discussions",
+                    "scope" => "site",
+                    "tagsOptions[0][tagCode]" => "{jobRole.urlcode}",
+                    "tagsOptions[0][value]" => "{jobRole.tagId}",
+                    "tagsOptions[0][label]" => "{jobRole.name}",
+                    "tagsOptions[1][tagCode]" => "{industry.urlcode}",
+                    "tagsOptions[1][value]" => "{industry.tagId}",
+                    "tagsOptions[1][label]" => "{industry.name}",
                 ],
-                'submitButtonText' => 'Submit',
+                "submitButtonText" => "Submit",
             ],
-            'properties' => [
-                'tabID' => [
-                    'type' => 'string',
-                    'const' => $tabID,
+            "properties" => [
+                "tabID" => [
+                    "type" => "string",
+                    "const" => $tabID,
                 ],
-                'jobRole' => [
-                    'type' => 'object',
-                    'x-control' => SchemaForm::dropDown(
-                        new FormOptions('Job Role'),
-                        new StaticFormChoices([])
-                    ),
+                "jobRole" => [
+                    "type" => "object",
+                    "x-control" => SchemaForm::dropDown(new FormOptions("Job Role"), new StaticFormChoices([])),
                 ],
-                'industry' => [
-                    'type' => 'object',
-                    'x-control' => SchemaForm::dropDown(
-                        new FormOptions('Industry'),
-                        new StaticFormChoices([])
-                    ),
+                "industry" => [
+                    "type" => "object",
+                    "x-control" => SchemaForm::dropDown(new FormOptions("Industry"), new StaticFormChoices([])),
                 ],
             ],
-            'anyOf' => [
-                ['required' => ['jobRole']],
-                ['required' => ['industry']],
-            ],
-            'additionalProperties' => false,
+            "anyOf" => [["required" => ["jobRole"]], ["required" => ["industry"]]],
+            "additionalProperties" => false,
         ];
     }
 }

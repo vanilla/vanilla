@@ -20,8 +20,8 @@ use Vanilla\Models\ModelCache;
 /**
  * Model for UserPoints.
  */
-class UserPointsModel extends Model implements UserLeaderProviderInterface {
-
+class UserPointsModel extends Model implements UserLeaderProviderInterface
+{
     const SLOT_TYPE_DAY = "d";
     const SLOT_TYPE_WEEK = "w";
     const SLOT_TYPE_MONTH = "m";
@@ -47,13 +47,11 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
      * @param ConfigurationInterface $config
      * @param \Gdn_Cache $cache
      */
-    public function __construct(
-        ConfigurationInterface $config,
-        \Gdn_Cache $cache
-    ) {
+    public function __construct(ConfigurationInterface $config, \Gdn_Cache $cache)
+    {
         parent::__construct("UserPoints");
         $this->config = $config;
-        $this->modelCache = new ModelCache('UserPoints', $cache);
+        $this->modelCache = new ModelCache("UserPoints", $cache);
     }
 
     /**
@@ -63,7 +61,8 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
      *
      * @return array
      */
-    public function getLeaders(UserLeaderQuery $query): array {
+    public function getLeaders(UserLeaderQuery $query): array
+    {
         $args = [
             $query->slotType,
             $query->timeSlot,
@@ -72,9 +71,16 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
             $query->includedUserIDs,
             $query->excludedUserIDs,
         ];
-        $leaderData = $this->modelCache->getCachedOrHydrate($args, [$this, 'queryLeaders'], [
-            \Gdn_Cache::FEATURE_EXPIRY => $this->config->get(UserLeaderService::CONF_CACHE_TTL, UserLeaderService::DEFAULT_CACHE_TTL),
-        ]);
+        $leaderData = $this->modelCache->getCachedOrHydrate(
+            $args,
+            [$this, "queryLeaders"],
+            [
+                \Gdn_Cache::FEATURE_EXPIRY => $this->config->get(
+                    UserLeaderService::CONF_CACHE_TTL,
+                    UserLeaderService::DEFAULT_CACHE_TTL
+                ),
+            ]
+        );
 
         return $leaderData;
     }
@@ -100,32 +106,24 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
         array $excludedUserIDs = []
     ) {
         $sql = $this->createSql();
-        $sql->select([
-            'up.SlotType',
-            'up.TimeSlot',
-            'up.Source',
-            'up.CategoryID',
-            'up.UserID',
-            'up.Points'
-        ])
-            ->from('UserPoints up')
-            ->join('User u', 'up.UserID = u.UserID and u.Banned != 1')
+        $sql->select(["up.SlotType", "up.TimeSlot", "up.Source", "up.UserID", "up.Points"])
+            ->from("UserPoints up")
+            ->join("User u", "up.UserID = u.UserID and u.Banned != 1")
             ->where([
-                'up.TimeSlot' => $timeSlot,
-                'up.SlotType' => $slotType,
-                'up.Source' => 'Total',
-                'up.CategoryID' => $categoryID,
-                'up.Points > ' => 0,
-
+                "up.TimeSlot" => $timeSlot,
+                "up.SlotType" => $slotType,
+                "up.Source" => "Total",
+                "up.CategoryID" => $categoryID,
+                "up.Points > " => 0,
             ])
-            ->orderBy('up.Points', 'desc')
+            ->orderBy("up.Points", "desc")
             ->limit($limit);
 
         if (!empty($includedUserIDs)) {
-            $sql->whereIn('up.UserID', $includedUserIDs);
+            $sql->whereIn("up.UserID", $includedUserIDs);
         }
         if (!empty($excludedUserIDs)) {
-            $sql->whereNotIn('up.UserID', $excludedUserIDs);
+            $sql->whereNotIn("up.UserID", $excludedUserIDs);
         }
 
         $results = $sql->get()->resultArray();
@@ -137,19 +135,17 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
      *
      * @return Schema
      */
-    public static function slotTypeSchema(): Schema {
+    public static function slotTypeSchema(): Schema
+    {
         return Schema::parse([
             "type" => "string",
             "default" => UserPointsModel::SLOT_TYPE_ALL,
             "description" => "The timeframe in which leaders should calculated",
             "enum" => UserPointsModel::SLOT_TYPES,
             "x-control" => SchemaForm::dropDown(
-                new FormOptions(
-                    "Timeframe",
-                    "Choose what duration to check for leaders in."
-                ),
+                new FormOptions("Timeframe", "Choose what duration to check for leaders in."),
                 self::getSlotTypeChoices()
-            )
+            ),
         ]);
     }
 
@@ -158,16 +154,15 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
      *
      * @return StaticFormChoices
      */
-    public static function getSlotTypeChoices(): StaticFormChoices {
-        return new StaticFormChoices(
-            [
-                UserPointsModel::SLOT_TYPE_DAY => "Daily",
-                UserPointsModel::SLOT_TYPE_WEEK => "Weekly",
-                UserPointsModel::SLOT_TYPE_MONTH => "Monthly",
-                UserPointsModel::SLOT_TYPE_YEAR => "Yearly",
-                UserPointsModel::SLOT_TYPE_ALL => "All Time",
-            ]
-        );
+    public static function getSlotTypeChoices(): StaticFormChoices
+    {
+        return new StaticFormChoices([
+            UserPointsModel::SLOT_TYPE_DAY => "Daily",
+            UserPointsModel::SLOT_TYPE_WEEK => "Weekly",
+            UserPointsModel::SLOT_TYPE_MONTH => "Monthly",
+            UserPointsModel::SLOT_TYPE_YEAR => "Yearly",
+            UserPointsModel::SLOT_TYPE_ALL => "All Time",
+        ]);
     }
 
     /**
@@ -175,25 +170,21 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
      *
      * @return Schema
      */
-    public static function leaderboardTypeSchema(): Schema {
+    public static function leaderboardTypeSchema(): Schema
+    {
         return Schema::parse([
             "type" => "string",
             "default" => UserLeaderService::LEADERBOARD_TYPE_REPUTATION,
             "description" => "The type of points to use for leaderboard.",
             "enum" => UserLeaderService::LEADERBOARD_TYPES,
             "x-control" => SchemaForm::dropDown(
-                new FormOptions(
-                    "Leaderboard Type",
-                    "Choose the type of leaderboard this is."
-                ),
-                new StaticFormChoices(
-                    [
-                        UserLeaderService::LEADERBOARD_TYPE_REPUTATION => "Reputation points",
-                        UserLeaderService::LEADERBOARD_TYPE_POSTS => "Posts and comments count.",
-                        UserLeaderService::LEADERBOARD_TYPE_ACCEPTED_ANSWERS => "Accepted answers count.",
-                    ]
-                )
-            )
+                new FormOptions("Leaderboard Type", "Choose the type of leaderboard this is."),
+                new StaticFormChoices([
+                    UserLeaderService::LEADERBOARD_TYPE_REPUTATION => "Reputation points",
+                    UserLeaderService::LEADERBOARD_TYPE_POSTS => "Posts and comments count.",
+                    UserLeaderService::LEADERBOARD_TYPE_ACCEPTED_ANSWERS => "Accepted answers count.",
+                ])
+            ),
         ]);
     }
 
@@ -202,18 +193,16 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
      *
      * @return Schema
      */
-    public static function limitSchema(): Schema {
+    public static function limitSchema(): Schema
+    {
         return Schema::parse([
             "type" => "integer",
             "default" => 10,
             "description" => "The maximum number of users to display",
             "x-control" => SchemaForm::textBox(
-                new FormOptions(
-                    "Limit",
-                    "Maximum amount of users to display."
-                ),
+                new FormOptions("Limit", "Maximum amount of users to display."),
                 "number"
-            )
+            ),
         ]);
     }
 
@@ -223,7 +212,8 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface {
      * @param UserLeaderQuery $query
      * @return bool
      */
-    public function canHandleQuery(UserLeaderQuery $query): bool {
+    public function canHandleQuery(UserLeaderQuery $query): bool
+    {
         return $query->leaderboardType === UserLeaderService::LEADERBOARD_TYPE_REPUTATION;
     }
 }

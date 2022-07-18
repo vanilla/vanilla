@@ -7,5 +7,6 @@
 /**
  * Class UserTag
  */
-class UserTag extends Gdn_Model {
+class UserTag extends Gdn_Model
+{
 }

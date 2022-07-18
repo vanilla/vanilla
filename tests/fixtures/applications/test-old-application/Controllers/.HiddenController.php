@@ -7,7 +7,6 @@
 
 namespace Test\OldApplication\Controllers;
 
-
-class HiddenController {
-
+class HiddenController
+{
 }

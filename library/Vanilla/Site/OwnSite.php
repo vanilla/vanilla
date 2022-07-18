@@ -19,8 +19,8 @@ use Vanilla\Http\InternalClient;
  * - IDs are pulled from configuration.
  * - HttpClient is an `InternalClient` so requests don't actually go through HTTP.
  */
-class OwnSite extends Site {
-
+class OwnSite extends Site
+{
     const CONF_ACCOUNT_ID = "Vanilla.AccountID";
     const CONF_SITE_ID = "Vanilla.SiteID";
 
@@ -38,13 +38,13 @@ class OwnSite extends Site {
         \Gdn_Request $request,
         InternalClient $internalClient
     ) {
-        $name = $formatService->renderPlainText($config->get('Garden.Title', ""), HtmlFormat::FORMAT_KEY);
-        $internalClient->setBaseUrl('');
+        $name = $formatService->renderPlainText($config->get("Garden.Title", ""), HtmlFormat::FORMAT_KEY);
+        $internalClient->setBaseUrl("");
         $internalClient->setThrowExceptions(true);
 
         parent::__construct(
             $name,
-            $request->getSimpleUrl(''),
+            $request->getSimpleUrl(""),
             $config->get(self::CONF_SITE_ID, -1),
             $config->get(self::CONF_ACCOUNT_ID, -1),
             $internalClient

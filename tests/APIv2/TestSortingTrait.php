@@ -14,7 +14,8 @@ use VanillaTests\VanillaTestCase;
 /**
  * Allows an `AbstractResourceTest` to test API sorting.
  */
-trait TestSortingTrait {
+trait TestSortingTrait
+{
     /**
      * @var array The fields that are allowed for sorting.
      */
@@ -25,7 +26,8 @@ trait TestSortingTrait {
      *
      * @return string
      */
-    protected function sortUrl(): string {
+    protected function sortUrl(): string
+    {
         return $this->indexUrl();
     }
 
@@ -35,14 +37,17 @@ trait TestSortingTrait {
      * @param string $field
      * @dataProvider provideSortFields
      */
-    public function testIndexSort(string $field): void {
+    public function testIndexSort(string $field): void
+    {
         $rows = $this->generateIndexRows();
 
-        $fields = [$field, '-'.$field];
+        $fields = [$field, "-" . $field];
 
         foreach ($fields as $field) {
             /* @var AbstractResourceTest $this */
-            $actual = $this->api()->get($this->sortUrl(), ['sort' => $field, 'pinOrder' => 'mixed'])->getBody();
+            $actual = $this->api()
+                ->get($this->sortUrl(), ["sort" => $field, "pinOrder" => "mixed"])
+                ->getBody();
             VanillaTestCase::assertSorted($actual, $field);
         }
     }
@@ -52,7 +57,8 @@ trait TestSortingTrait {
      *
      * @return string[]
      */
-    public function provideSortFields(): array {
+    public function provideSortFields(): array
+    {
         $r = [];
         foreach ($this->sortFields as $field) {
             $r[$field] = [$field];

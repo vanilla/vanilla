@@ -10,7 +10,8 @@ namespace VanillaTests;
 /**
  * Class PrivateAccessTrait
  */
-trait PrivateAccessTrait {
+trait PrivateAccessTrait
+{
     /**
      * Call a closure on another object to access its private properties.
      *
@@ -21,7 +22,8 @@ trait PrivateAccessTrait {
      * @param array $args The arguments to pass to the call.
      * @return mixed Returns the result of the call.
      */
-    public static function callOn(object $on, \Closure $callable, ...$args) {
+    public static function callOn(object $on, \Closure $callable, ...$args)
+    {
         $fn = $callable->bindTo($on, $on);
         return $fn(...$args);
     }
@@ -35,7 +37,8 @@ trait PrivateAccessTrait {
      * @return mixed Returns the result of the method.
      * @psalm-suppress InvalidScope
      */
-    public static function callMethodOn(object $on, string $method, ...$args) {
+    public static function callMethodOn(object $on, string $method, ...$args)
+    {
         $fn = function (...$args) use ($method) {
             // phpcs:disable Squiz.Scope.StaticThisUsage
             return $this->$method(...$args);

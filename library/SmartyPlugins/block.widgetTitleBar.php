@@ -15,15 +15,16 @@
  * @param bool $repeat
  * @return string The url.
  */
-function smarty_block_widgetTitleBar($params, $content, &$smarty, &$repeat) {
-    if (!$repeat){
-        $title = val('title', $params);
-        $headingLevel = val('heading', $params, "h2");
-        $viewMoreUrl = val('viewMoreUrl', $params);
+function smarty_block_widgetTitleBar($params, $content, &$smarty, &$repeat)
+{
+    if (!$repeat) {
+        $title = val("title", $params);
+        $headingLevel = val("heading", $params, "h2");
+        $viewMoreUrl = val("viewMoreUrl", $params);
         $barContents = $content;
 
         if ($viewMoreUrl) {
-            $viewMoreText = t('View More');
+            $viewMoreText = t("View More");
             $barContents = <<<EOT
             <a href="$viewMoreUrl" class="_widget-viewAll">
                 <span class="_widget-viewAllLabel">$viewMoreText</span>
@@ -43,4 +44,3 @@ EOT;
 EOT;
     }
 }
-

@@ -12,8 +12,8 @@ use Vanilla\Search\SearchResultItem;
 /**
  * UserSearchResultItem.
  */
-class UserSearchResultItem extends SearchResultItem {
-
+class UserSearchResultItem extends SearchResultItem
+{
     /** @var Schema $userSchema*/
     private $userSchema;
 
@@ -23,18 +23,19 @@ class UserSearchResultItem extends SearchResultItem {
      * @param Schema $userSchema
      * @param array $data
      */
-    public function __construct(Schema $userSchema, array $data) {
+    public function __construct(Schema $userSchema, array $data)
+    {
         $this->userSchema = $userSchema;
         parent::__construct($data);
     }
 
-
     /**
      * Extra schema for user type search results
      */
-    protected function extraSchema(): ?Schema {
+    protected function extraSchema(): ?Schema
+    {
         return Schema::parse([
-            'userInfo' => $this->userSchema
+            "userInfo" => $this->userSchema,
         ])->merge($this->userSchema);
     }
 }

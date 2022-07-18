@@ -11,23 +11,25 @@
 /**
  * Handles /module endpoint.
  */
-class ModuleController extends Gdn_Controller {
+class ModuleController extends Gdn_Controller
+{
     /**
      * {@inheritDoc}
      */
-    public function initialize() {
+    public function initialize()
+    {
         $this->Head = new HeadModule($this);
-        $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.form.js');
-        $this->addJsFile('jquery.popup.js');
-        $this->addJsFile('jquery.gardenhandleajaxform.js');
-        $this->addJsFile('jquery.autosize.min.js');
-        $this->addJsFile('global.js');
-        $this->addJsFile('cropimage.js');
-        $this->addJsFile('vendors/clipboard.min.js');
+        $this->addJsFile("jquery.js");
+        $this->addJsFile("jquery.form.js");
+        $this->addJsFile("jquery.popup.js");
+        $this->addJsFile("jquery.gardenhandleajaxform.js");
+        $this->addJsFile("jquery.autosize.min.js");
+        $this->addJsFile("global.js");
+        $this->addJsFile("cropimage.js");
+        $this->addJsFile("vendors/clipboard.min.js");
 
-        $this->addCssFile('style.css');
-        $this->addCssFile('vanillicon.css', 'static');
+        $this->addCssFile("style.css");
+        $this->addCssFile("vanillicon.css", "static");
         parent::initialize();
     }
 
@@ -38,7 +40,8 @@ class ModuleController extends Gdn_Controller {
      * @param string $appFolder
      * @param string $deliveryType
      */
-    public function index($module, $appFolder = '', $deliveryType = '') {
+    public function index($module, $appFolder = "", $deliveryType = "")
+    {
         if (!$deliveryType) {
             $this->deliveryType(DELIVERY_TYPE_VIEW);
         }
@@ -56,31 +59,30 @@ class ModuleController extends Gdn_Controller {
                 if ($appFolder && in_array($appFolder, $appWhitelist)) {
                     $this->ApplicationFolder = $appFolder;
                 } else {
-                    $filename = str_replace('\\', '/', substr($reflectionClass->getFileName(), strlen(PATH_ROOT)));
+                    $filename = str_replace("\\", "/", substr($reflectionClass->getFileName(), strlen(PATH_ROOT)));
                     // Figure our the application folder for the module.
-                    $parts = explode('/', trim($filename, '/'));
-                    if ($parts[0] == 'applications' && in_array($parts[1], $appWhitelist)) {
+                    $parts = explode("/", trim($filename, "/"));
+                    if ($parts[0] == "applications" && in_array($parts[1], $appWhitelist)) {
                         $this->ApplicationFolder = $parts[1];
                     }
                 }
 
-
                 $moduleInstance = new $module($this);
                 $moduleInstance->Visible = true;
 
-                $whiteList = ['Limit', 'Help'];
+                $whiteList = ["Limit", "Help"];
                 foreach ($this->Request->get() as $key => $value) {
                     if (in_array($key, $whiteList)) {
                         // Set a sane max limit for this open-ended way of calling modules.
-                        if ($key == 'Limit' && $value > 200) {
-                            throw new Exception(t('Invalid limit.'), 400);
+                        if ($key == "Limit" && $value > 200) {
+                            throw new Exception(t("Invalid limit."), 400);
                         }
                         $moduleInstance->$key = $value;
                     }
                 }
 
-                $this->setData('_Module', $moduleInstance);
-                $this->render('Index', false, 'dashboard');
+                $this->setData("_Module", $moduleInstance);
+                $this->render("Index", false, "dashboard");
                 return;
             }
         }

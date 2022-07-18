@@ -8,17 +8,16 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$popup_bg:                             $global-color_white !default;
-$popup_fg:                             $global-color_grey !default;
-$popup-link_color:                     $global-color_primary !default;
-$popup-link-hover_color:               $global-color_primaryAlt !default;
-$popup_borderColor:                    rgba($popup_fg, 0.8) !default;
-$popup_border:                         1px solid $popup_borderColor !default;
-$popup_borderRadius:                   $global_borderRadius !default;
-$popup_boxShadow:                      0 1px 3px 0px rgba($global-color_black, 0.4) !default;
-$popup_paddingVertical:                12px;
-$popup_paddingHorizontal:              18px;
-
+$popup_bg: $global-color_white !default;
+$popup_fg: $global-color_grey !default;
+$popup-link_color: $global-color_primary !default;
+$popup-link-hover_color: $global-color_primaryAlt !default;
+$popup_borderColor: rgba($popup_fg, 0.8) !default;
+$popup_border: 1px solid $popup_borderColor !default;
+$popup_borderRadius: $global_borderRadius !default;
+$popup_boxShadow: 0 1px 3px 0px rgba($global-color_black, 0.4) !default;
+$popup_paddingVertical: 12px;
+$popup_paddingHorizontal: 18px;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -59,7 +58,7 @@ div.Popup {
             }
         }
 
-        input[type= "text"],
+        input[type="text"],
         textarea,
         ul.token-input-list,
         input.InputBox,
@@ -74,7 +73,6 @@ div.Popup {
         }
 
         .Buttons .Close {
-
             &:focus,
             &:hover {
                 color: $global-color_white;

@@ -10,6 +10,6 @@ namespace Garden;
 /**
  * Base Class Controller.
  */
-class Controller {
-
+class Controller
+{
 }

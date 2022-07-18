@@ -10,17 +10,18 @@ namespace VanillaTests\Library\Vanilla;
 use VanillaTests\SharedBootstrapTestCase;
 use Vanilla\Addon;
 
-
 /**
  * Tests of the {@link Addon::checkVersion()} method.
  */
-class CheckVersionTest extends SharedBootstrapTestCase {
+class CheckVersionTest extends SharedBootstrapTestCase
+{
     /**
      * Check exact version matching.
      */
-    public function testExact() {
-        $this->assertTrue(Addon::checkVersion('1.0.2', '1.0.2'));
-        $this->assertFalse(Addon::checkVersion('1.0.2', '2.0.3'));
+    public function testExact()
+    {
+        $this->assertTrue(Addon::checkVersion("1.0.2", "1.0.2"));
+        $this->assertFalse(Addon::checkVersion("1.0.2", "2.0.3"));
     }
 
     /**
@@ -31,17 +32,15 @@ class CheckVersionTest extends SharedBootstrapTestCase {
      * @param bool $expected Whether the check should pass or fail.
      * @dataProvider provideComparisonChecks
      */
-    public function testComparisons($version, $requirement, $expected) {
+    public function testComparisons($version, $requirement, $expected)
+    {
         $actual = Addon::checkVersion($version, $requirement);
 
-//        if ($actual !== $expected) {
-//            $again = Addon::checkVersion($version, $requirement);
-//        }
+        //        if ($actual !== $expected) {
+        //            $again = Addon::checkVersion($version, $requirement);
+        //        }
 
-        $this->assertSame(
-            $actual,
-            $expected
-        );
+        $this->assertSame($actual, $expected);
     }
 
     /**
@@ -52,17 +51,15 @@ class CheckVersionTest extends SharedBootstrapTestCase {
      * @param bool $expected Whether the check should pass or fail.
      * @dataProvider provideBooleanLogicChecks
      */
-    public function testBooleanLogic($version, $requirement, $expected) {
+    public function testBooleanLogic($version, $requirement, $expected)
+    {
         $actual = Addon::checkVersion($version, $requirement);
 
-//        if ($actual !== $expected) {
-//            $again = Addon::checkVersion($version, $requirement);
-//        }
+        //        if ($actual !== $expected) {
+        //            $again = Addon::checkVersion($version, $requirement);
+        //        }
 
-        $this->assertSame(
-            $actual,
-            $expected
-        );
+        $this->assertSame($actual, $expected);
     }
 
     /**
@@ -70,15 +67,16 @@ class CheckVersionTest extends SharedBootstrapTestCase {
      *
      * @return array Returns a data provider.
      */
-    public function provideBooleanLogicChecks() {
+    public function provideBooleanLogicChecks()
+    {
         $r = [
-            ['1.5', '1.5'],
-            ['1.5', '>=1.0 <2.0'],
-            ['1.5', '>=1.0,<2.0'],
-            ['1.5', '>=1.0, <2.0'],
-            ['2.1', '>=1.0 <2.0', false],
-            ['1.3', '>=1.0 <1.1 || >=1.2'],
-            ['1.0', '>=1.0 <1.1 || >=1.2']
+            ["1.5", "1.5"],
+            ["1.5", ">=1.0 <2.0"],
+            ["1.5", ">=1.0,<2.0"],
+            ["1.5", ">=1.0, <2.0"],
+            ["2.1", ">=1.0 <2.0", false],
+            ["1.3", ">=1.0 <1.1 || >=1.2"],
+            ["1.0", ">=1.0 <1.1 || >=1.2"],
         ];
 
         return $this->makeProvider($r);
@@ -89,22 +87,23 @@ class CheckVersionTest extends SharedBootstrapTestCase {
      *
      * @return array Returns a data provider array.
      */
-    public function provideComparisonChecks() {
+    public function provideComparisonChecks()
+    {
         $r = [
-            ['2.0', '>1.0.0'],
-            ['1.0', '> 2.0', false],
-            ['2.0', '>=2.0'],
-            ['2.0', '>= 1.0'],
-            ['1.0', ' >=2.0', false],
-            ['1.0', '<2.0'],
-            ['2.0', '<1.0', false],
-            ['1.0', '<=2.0'],
-            ['1.0', '<=1.0'],
-            ['2.0', '<=1.0', false],
-            ['1.0', '!=2.0'],
-            ['1.0', '!=1.0', false],
-            ['1.1', '1.0 - 2.0'],
-            ['3.0', '1.0 - 2.0', false]
+            ["2.0", ">1.0.0"],
+            ["1.0", "> 2.0", false],
+            ["2.0", ">=2.0"],
+            ["2.0", ">= 1.0"],
+            ["1.0", " >=2.0", false],
+            ["1.0", "<2.0"],
+            ["2.0", "<1.0", false],
+            ["1.0", "<=2.0"],
+            ["1.0", "<=1.0"],
+            ["2.0", "<=1.0", false],
+            ["1.0", "!=2.0"],
+            ["1.0", "!=1.0", false],
+            ["1.1", "1.0 - 2.0"],
+            ["3.0", "1.0 - 2.0", false],
         ];
         return $this->makeProvider($r);
     }
@@ -115,7 +114,8 @@ class CheckVersionTest extends SharedBootstrapTestCase {
      * @param array $array The array to reformat.
      * @return array Returns a data provider array.
      */
-    private function makeProvider(array $array) {
+    private function makeProvider(array $array)
+    {
         $r = [];
         foreach ($array as $row) {
             $row += [2 => true];
@@ -131,7 +131,8 @@ class CheckVersionTest extends SharedBootstrapTestCase {
      * @param string $requirement The version requirement.
      * @param string $message An optional failure message.
      */
-    protected function assertCheckVersion($version, $requirement, $message = '') {
+    protected function assertCheckVersion($version, $requirement, $message = "")
+    {
         $this->assertTrue(Addon::checkVersion($version, $requirement), $message);
     }
 
@@ -142,7 +143,8 @@ class CheckVersionTest extends SharedBootstrapTestCase {
      * @param string $requirement The version requirement.
      * @param string $message An optional failure message.
      */
-    protected function assertCheckVersionFail($version, $requirement, $message = '') {
+    protected function assertCheckVersionFail($version, $requirement, $message = "")
+    {
         $this->assertFalse(Addon::checkVersion($version, $requirement), $message);
     }
 }

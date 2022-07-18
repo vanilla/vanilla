@@ -11,8 +11,8 @@ use Garden\Web\RequestInterface;
 use Vanilla\Authenticator\Authenticator;
 use Vanilla\Authenticator\Exception;
 
-class MockAuthenticator extends Authenticator {
-
+class MockAuthenticator extends Authenticator
+{
     /** @var bool */
     protected $active = true;
 
@@ -22,71 +22,79 @@ class MockAuthenticator extends Authenticator {
     /**
      * MockAuthenticator constructor.
      */
-    public function __construct() {
-        parent::__construct('Mock');
+    public function __construct()
+    {
+        parent::__construct("Mock");
     }
 
     /**
      * @inheritDoc
      */
-    public function isActive(): bool {
+    public function isActive(): bool
+    {
         return $this->active;
     }
 
     /**
      * @inheritDoc
      */
-    public function setActive(bool $active) {
+    public function setActive(bool $active)
+    {
         $this->active = $active;
 
         return $this;
     }
 
-
     /**
      * @return array
      */
-    public function getData() {
+    public function getData()
+    {
         return $this->data;
     }
 
     /**
      * @param $data
      */
-    public function setData($data) {
+    public function setData($data)
+    {
         $this->data = $data;
     }
 
     /**
      * @inheritDoc
      */
-    public function getRegisterUrl() {
+    public function getRegisterUrl()
+    {
         return null;
     }
 
     /**
      * @inheritDoc
      */
-    public function getSignInUrl() {
-        return '/MockAuthenticatorSignIn';
+    public function getSignInUrl()
+    {
+        return "/MockAuthenticatorSignIn";
     }
 
     /**
      * @inheritDoc
      */
-    public function getSignOutUrl() {
+    public function getSignOutUrl()
+    {
         return null;
     }
 
     /**
      * @inheritDoc
      */
-    protected static function getAuthenticatorTypeInfoImpl(): array {
+    protected static function getAuthenticatorTypeInfoImpl(): array
+    {
         return [
-            'ui' => [
-                'photoUrl' => 'http://www.example.com/image.jpg',
-                'backgroundColor' => '#ffffff',
-                'foregroundColor' => '#000000',
+            "ui" => [
+                "photoUrl" => "http://www.example.com/image.jpg",
+                "backgroundColor" => "#ffffff",
+                "foregroundColor" => "#000000",
             ],
         ];
     }
@@ -94,25 +102,28 @@ class MockAuthenticator extends Authenticator {
     /**
      * @inheritDoc
      */
-    public static function isUnique(): bool {
+    public static function isUnique(): bool
+    {
         return true;
     }
 
     /**
      * @inheritDoc
      */
-    protected function getAuthenticatorInfoImpl(): array {
+    protected function getAuthenticatorInfoImpl(): array
+    {
         return [
-            'ui' => [
-                'buttonName' => 'Sign in with MockAuthenticator',
-            ]
+            "ui" => [
+                "buttonName" => "Sign in with MockAuthenticator",
+            ],
         ];
     }
 
     /**
      * @inheritDoc
      */
-    public function validateAuthenticationImpl(RequestInterface $request) {
+    public function validateAuthenticationImpl(RequestInterface $request)
+    {
         return $this->data;
     }
 }

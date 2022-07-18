@@ -70,7 +70,7 @@ export default {
 /**
  * Implements the search bar component
  */
-export function SearchFilter(props: IProps) {
+function SearchFilterStory(props: IProps) {
     const { activeItem = "all", filters = dummmyFilters, endFilters = dummmyEndFilters, message } = props;
     const [data, setData] = useState(activeItem);
 
@@ -84,9 +84,9 @@ export function SearchFilter(props: IProps) {
     );
 }
 
-export const NoMembers = storyWithConfig({}, () => <SearchFilter activeItem={"Groups"} endFilters={[]} />);
+export const NoMembers = storyWithConfig({}, () => <SearchFilterStory activeItem={"Groups"} endFilters={[]} />);
 export const NotRendered = storyWithConfig({}, () => (
-    <SearchFilter
+    <SearchFilterStory
         message={
             "This page should stay empty, we don't want to render the component unless there are more than 1 filters."
         }
@@ -94,3 +94,7 @@ export const NotRendered = storyWithConfig({}, () => (
         endFilters={[]}
     />
 ));
+
+export function SearchFilter() {
+    return <SearchFilterStory />;
+}

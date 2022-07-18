@@ -14,8 +14,8 @@ use Vanilla\Formatting\Quill\Blots\TextBlot;
  *
  * @see TextBlot Usage of these blots can be found in the TextBlot class.
  */
-abstract class AbstractFormat {
-
+abstract class AbstractFormat
+{
     /**
      * @var array The primary operation of the Format. Used to determine the primary tags.
      */
@@ -38,7 +38,8 @@ abstract class AbstractFormat {
      * @param array $previousOperation The next operation.
      * @param array $nextOperation The previous operation.
      */
-    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = []) {
+    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = [])
+    {
         $this->previousOperation = $previousOperation;
         $this->currentOperation = $currentOperation;
         $this->nextOperation = $nextOperation;
@@ -75,8 +76,9 @@ abstract class AbstractFormat {
     /**
      * @inheritDoc
      */
-    public static function matches(array $operations): bool {
-        foreach($operations as $op) {
+    public static function matches(array $operations): bool
+    {
+        foreach ($operations as $op) {
             $attributes = val("attributes", $op, []);
             $lookupKeys = static::getAttributeLookupKey();
             if (!is_array($lookupKeys)) {
@@ -96,24 +98,27 @@ abstract class AbstractFormat {
     /**
      * Formats never actually render any content. They should only be providing starting/ending tags.
      */
-    public function render(): string {
+    public function render(): string
+    {
         return "";
     }
 
     /**
      * Get an attributes array for the blot's tag.
      */
-    protected function getAttributes(): array {
+    protected function getAttributes(): array
+    {
         return [];
     }
 
     /**
      * @inheritDoc
      */
-    private function shouldRenderOpeningTag(): bool {
+    private function shouldRenderOpeningTag(): bool
+    {
         $selfMatchesPrevious = static::matches([$this->previousOperation]);
         $matchesBlackListedFormat = false;
-        foreach(static::getBlackListedNestedFormats() as $blackListedFormat) {
+        foreach (static::getBlackListedNestedFormats() as $blackListedFormat) {
             if ($blackListedFormat::matches([$this->previousOperation, $this->currentOperation])) {
                 $matchesBlackListedFormat = true;
                 break;
@@ -126,15 +131,16 @@ abstract class AbstractFormat {
     /**
      * Render the opening tags for the current blot.
      */
-    public function renderOpeningTag(): string {
+    public function renderOpeningTag(): string
+    {
         if (!$this->shouldRenderOpeningTag()) {
             return "";
         }
 
         $tagName = static::getTagName();
-        $attributes =  $this->getAttributes();
+        $attributes = $this->getAttributes();
 
-        $result = "<".$tagName;
+        $result = "<" . $tagName;
         if ($attributes) {
             foreach ($attributes as $attrKey => $attr) {
                 $result .= " $attrKey=\"$attr\"";
@@ -148,10 +154,11 @@ abstract class AbstractFormat {
     /**
      * @inheritDoc
      */
-    private function shouldRenderClosingTag(): bool {
+    private function shouldRenderClosingTag(): bool
+    {
         $selfMatchesNext = static::matches([$this->nextOperation]);
         $matchesBlackListedFormat = false;
-        foreach(static::getBlackListedNestedFormats() as $blackListedFormat) {
+        foreach (static::getBlackListedNestedFormats() as $blackListedFormat) {
             if ($blackListedFormat::matches([$this->nextOperation, $this->currentOperation])) {
                 $matchesBlackListedFormat = true;
                 break;
@@ -163,11 +170,12 @@ abstract class AbstractFormat {
     /**
      * Render the closing tags for the current blot.
      */
-    public function renderClosingTag(): string {
+    public function renderClosingTag(): string
+    {
         if (!$this->shouldRenderClosingTag()) {
             return "";
         }
 
-        return "</".static::getTagName().">";
+        return "</" . static::getTagName() . ">";
     }
 }

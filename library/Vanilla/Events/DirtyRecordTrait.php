@@ -17,8 +17,8 @@ use Vanilla\Models\DirtyRecordModel;
  *
  * @package Vanilla\Events
  */
-trait DirtyRecordTrait {
-
+trait DirtyRecordTrait
+{
     /**
      * Add dirtyRecord join and where clause.
      *
@@ -27,7 +27,8 @@ trait DirtyRecordTrait {
      * @param string $type
      * @param string $prefix
      */
-    public function joinDirtyRecordTable(Gdn_SQLDriver $sql, $primaryKey, string $type, string $prefix = '') {
+    public function joinDirtyRecordTable(Gdn_SQLDriver $sql, $primaryKey, string $type, string $prefix = "")
+    {
         $primaryKey = $this->transformPrimaryKey($primaryKey, $prefix);
         $sql->join("dirtyRecord dr", "$primaryKey = dr.recordID", "right");
         $sql->where(["dr.recordType" => $type]);
@@ -39,7 +40,8 @@ trait DirtyRecordTrait {
      * @param string $recordType
      * @param int $recordID
      */
-    public function addDirtyRecord(string $recordType, int $recordID) {
+    public function addDirtyRecord(string $recordType, int $recordID)
+    {
         /** @var DirtyRecordModel $dirtyRecordModel */
         try {
             $dirtyRecordModel = Gdn::getContainer()->get(DirtyRecordModel::class);
@@ -47,8 +49,8 @@ trait DirtyRecordTrait {
             throw new RuntimeException("Couldn't instantiate DirtyRecordModel::class");
         }
         $set = [
-            'recordType' => $recordType,
-            'recordID' => $recordID,
+            "recordType" => $recordType,
+            "recordID" => $recordID,
         ];
 
         try {
@@ -70,7 +72,8 @@ trait DirtyRecordTrait {
      *
      * @return array
      */
-    public function getDirtyRecordJoinParams(string $table, $primaryKey, $prefix = ''): array {
+    public function getDirtyRecordJoinParams(string $table, $primaryKey, $prefix = ""): array
+    {
         $primaryKey = $this->transformPrimaryKey($primaryKey, $prefix);
 
         return [
@@ -88,7 +91,8 @@ trait DirtyRecordTrait {
      *
      * @return string
      */
-    public function transformPrimaryKey($primaryKey, string $prefix) {
+    public function transformPrimaryKey($primaryKey, string $prefix)
+    {
         $primaryKey = is_array($primaryKey) ? reset($primaryKey) : $primaryKey;
 
         return $prefix ? "$prefix.$primaryKey" : $primaryKey;

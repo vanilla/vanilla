@@ -19,21 +19,22 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Tests of Vanilla's base page class.
  */
-class PageTest extends SiteTestCase {
-
+class PageTest extends SiteTestCase
+{
     use UsersAndRolesApiTestTrait;
     use CommunityApiTestTrait;
 
     /**
      * Test that links get added properly.
      */
-    public function testLinkTags() {
+    public function testLinkTags()
+    {
         /** @var PageFixture $fixture */
         $fixture = self::container()->get(PageFixture::class);
 
-        $fixture->addLinkTag(['rel' => 'isLink']);
-        $fixture->addMetaTag(['type' => 'isMeta']);
-        $fixture->addOpenGraphTag('og:isOg', 'ogContent');
+        $fixture->addLinkTag(["rel" => "isLink"]);
+        $fixture->addMetaTag(["type" => "isMeta"]);
+        $fixture->addOpenGraphTag("og:isOg", "ogContent");
 
         $result = $fixture->render()->getData();
 
@@ -41,7 +42,7 @@ class PageTest extends SiteTestCase {
         @$dom->loadHTML($result);
 
         $xpath = new \DOMXPath($dom);
-        $head = $xpath->query('head')->item(0);
+        $head = $xpath->query("head")->item(0);
 
         // Link tag
         $link = $xpath->query("//link[@rel='isLink']", $head);
@@ -58,7 +59,8 @@ class PageTest extends SiteTestCase {
     /**
      * Test that extra metas can be applied.
      */
-    public function testExtraMeta() {
+    public function testExtraMeta()
+    {
         /** @var PageFixture $fixture */
         $fixture = self::container()->get(PageFixture::class);
         $fixture->addSiteMetaExtra(new MockSiteMetaExtra(["hello" => ["world" => "foo"]]));
@@ -81,7 +83,8 @@ class PageTest extends SiteTestCase {
      *
      * @dataProvider providePermissions
      */
-    public function testPermissionCheck(array $permissions, array $args, string $exception = null) {
+    public function testPermissionCheck(array $permissions, array $args, string $exception = null)
+    {
         /** @var PageFixture $fixture */
         $fixture = self::container()->get(PageFixture::class);
         $this->runWithPermissions(function () use ($fixture, $exception, $args) {
@@ -98,7 +101,8 @@ class PageTest extends SiteTestCase {
     /**
      * @return array[]
      */
-    public function providePermissions(): array {
+    public function providePermissions(): array
+    {
         return [
             "has one" => [
                 [
@@ -141,20 +145,21 @@ class PageTest extends SiteTestCase {
     /**
      * Test permission checking with an id.
      */
-    public function testPermissionCategory() {
+    public function testPermissionCategory()
+    {
         $category = $this->createCategory();
         $categoryPerm = $this->createPermissionedCategory([], [\RoleModel::ADMIN_ID]);
 
         /** @var PageFixture $fixture */
         $fixture = self::container()->get(PageFixture::class);
-        $fixture->permission("Vanilla.Discussions.Add", $category['categoryID']);
+        $fixture->permission("Vanilla.Discussions.Add", $category["categoryID"]);
 
-        $fixture->permission("Vanilla.Discussions.View", $categoryPerm['categoryID']);
+        $fixture->permission("Vanilla.Discussions.View", $categoryPerm["categoryID"]);
 
         $normalUser = $this->createUser();
         $this->runWithUser(function () use ($fixture, $categoryPerm) {
             $this->expectExceptionCode(403);
-            $fixture->permission('Vanilla.Discussions.View', $categoryPerm['categoryID']);
+            $fixture->permission("Vanilla.Discussions.View", $categoryPerm["categoryID"]);
         }, $normalUser);
     }
 }

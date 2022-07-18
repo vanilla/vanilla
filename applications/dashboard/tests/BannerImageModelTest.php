@@ -19,8 +19,8 @@ use VanillaTests\SiteTestTrait;
 /**
  * Tests for the banner image model.
  */
-class BannerImageModelTest extends TestCase {
-
+class BannerImageModelTest extends TestCase
+{
     use SiteTestTrait;
 
     /** @var array */
@@ -49,44 +49,45 @@ class BannerImageModelTest extends TestCase {
     /**
      * Setup some categories.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        \Gdn::config()->saveToConfig('Garden.BannerImage', 'default.png');
+        \Gdn::config()->saveToConfig("Garden.BannerImage", "default.png");
 
         $model = new \CategoryModel();
         $this->cat1 = $model->save([
-            'Name' => 'Cat 1',
-            'UrlCode' => randomString(10),
+            "Name" => "Cat 1",
+            "UrlCode" => randomString(10),
         ]);
         $this->cat1_1 = $model->save([
-            'Name' => 'Cat 1.1',
-            'ParentCategoryID' => $this->cat1,
-            'UrlCode' => randomString(10),
+            "Name" => "Cat 1.1",
+            "ParentCategoryID" => $this->cat1,
+            "UrlCode" => randomString(10),
         ]);
 
         $this->cat2 = $model->save([
-            'Name' => 'Cat 2',
-            'BannerImage' => "2.png",
-            'UrlCode' => randomString(10),
+            "Name" => "Cat 2",
+            "BannerImage" => "2.png",
+            "UrlCode" => randomString(10),
         ]);
 
         $this->cat2_1 = $model->save([
-            'Name' => 'Cat 2.1',
-            'ParentCategoryID' => $this->cat2,
-            'BannerImage' => "2_1.png",
-            'UrlCode' => randomString(10),
+            "Name" => "Cat 2.1",
+            "ParentCategoryID" => $this->cat2,
+            "BannerImage" => "2_1.png",
+            "UrlCode" => randomString(10),
         ]);
 
         $this->cat2_2 = $model->save([
-            'Name' => 'Cat 2.2',
-            'ParentCategoryID' => $this->cat2,
-            'UrlCode' => randomString(10),
+            "Name" => "Cat 2.2",
+            "ParentCategoryID" => $this->cat2,
+            "UrlCode" => randomString(10),
         ]);
 
         $this->cat2_2_1 = $model->save([
-            'Name' => 'Cat 2.2.1',
-            'ParentCategoryID' => $this->cat2_2,
-            'UrlCode' => randomString(10),
+            "Name" => "Cat 2.2.1",
+            "ParentCategoryID" => $this->cat2_2,
+            "UrlCode" => randomString(10),
         ]);
         /** @var MockSiteSectionProvider $siteSectionProvider */
         $this->siteSectionProvider = self::container()->get(MockSiteSectionProvider::class);
@@ -100,7 +101,8 @@ class BannerImageModelTest extends TestCase {
      *
      * @dataProvider provideCategories
      */
-    public function testGetBannerImageSlug($testLookup, string $expectedImage) {
+    public function testGetBannerImageSlug($testLookup, string $expectedImage)
+    {
         // Workaround from data provider.
         $id = $this->{$testLookup};
         $this->assertEquals($expectedImage, BannerImageModel::getBannerImageSlug($id));
@@ -109,60 +111,65 @@ class BannerImageModelTest extends TestCase {
     /**
      * Test that bad values return default.
      */
-    public function testDefaultValues() {
-        $this->assertEquals('default.png', BannerImageModel::getBannerImageSlug(null));
-        $this->assertEquals('default.png', BannerImageModel::getBannerImageSlug(-1));
-        $this->assertEquals('default.png', BannerImageModel::getBannerImageSlug('asdfasdf'));
+    public function testDefaultValues()
+    {
+        $this->assertEquals("default.png", BannerImageModel::getBannerImageSlug(null));
+        $this->assertEquals("default.png", BannerImageModel::getBannerImageSlug(-1));
+        $this->assertEquals("default.png", BannerImageModel::getBannerImageSlug("asdfasdf"));
     }
 
     /**
      * Test getting contextual controller values.
      */
-    public function testGetCurrent() {
-        $uploadPrefix = 'http://vanilla.test/bannerimagemodeltest/uploads/';
+    public function testGetCurrent()
+    {
+        $uploadPrefix = "http://vanilla.test/bannerimagemodeltest/uploads/";
         $router = self::container()->get(\Gdn_Router::class);
-        $defaultSection = new DefaultSiteSection(new MockConfig([
-            BannerImageModel::DEFAULT_CONFIG_KEY => $uploadPrefix.'default.png',
-        ]), $router);
+        $defaultSection = new DefaultSiteSection(
+            new MockConfig([
+                BannerImageModel::DEFAULT_CONFIG_KEY => $uploadPrefix . "default.png",
+            ]),
+            $router
+        );
         $this->siteSectionProvider->setCurrentSiteSection($defaultSection);
         // No controller
         $this->assertEquals(
-            $uploadPrefix.'default.png',
+            $uploadPrefix . "default.png",
             BannerImageModel::getCurrentBannerImageLink(),
-            'It works with no controller'
+            "It works with no controller"
         );
 
         $controller = new \Gdn_Controller();
-        $controller->setData('ContextualCategoryID', $this->cat2_1);
+        $controller->setData("ContextualCategoryID", $this->cat2_1);
         \Gdn::controller($controller);
         $this->assertEquals(
-            $uploadPrefix.'2_1.png',
+            $uploadPrefix . "2_1.png",
             BannerImageModel::getCurrentBannerImageLink(),
-            'It can pull the contextual categoryID'
+            "It can pull the contextual categoryID"
         );
 
-
         $controller = new \Gdn_Controller();
-        $controller->setData('Category.CategoryID', $this->cat2);
+        $controller->setData("Category.CategoryID", $this->cat2);
         \Gdn::controller($controller);
         $this->assertEquals(
-            $uploadPrefix.'2.png',
+            $uploadPrefix . "2.png",
             BannerImageModel::getCurrentBannerImageLink(),
-            'It can pull the main set category ID'
+            "It can pull the main set category ID"
         );
     }
 
     /**
      * @return array
      */
-    public function provideCategories(): array {
+    public function provideCategories(): array
+    {
         return [
-            ['cat1', 'default.png'],
-            ['cat1_1', 'default.png'],
-            ['cat2', '2.png'],
-            ['cat2_1', '2_1.png'],
-            ['cat2_2', '2.png'],
-            ['cat2_2_1', '2.png'],
+            ["cat1", "default.png"],
+            ["cat1_1", "default.png"],
+            ["cat2", "2.png"],
+            ["cat2_1", "2_1.png"],
+            ["cat2_2", "2.png"],
+            ["cat2_2_1", "2.png"],
         ];
     }
 }

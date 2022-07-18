@@ -28,6 +28,7 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { styleUnit } from "@library/styles/styleUnit";
 import { ISearchScopeNoCompact } from "@library/features/search/SearchScopeContext";
 import SmartLink from "@library/routing/links/SmartLink";
+import { Widget } from "@library/layout/Widget";
 
 export interface IBannerProps {
     action?: React.ReactNode;
@@ -52,13 +53,17 @@ export interface IBannerProps {
  * A component representing a single crumb in a breadcrumb component.
  */
 export default function Banner(props: IBannerProps) {
-    const { isCompact, mediaQueries } = useSection();
+    const { isCompact } = useSection();
     const bannerContextRef = useBannerContainerDivRef();
     const { setOverlayTitleBar } = useBannerContext();
     const { action, className, isContentBanner } = props;
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
-    const classes = isContentBanner ? contentBannerClasses() : bannerClasses();
+    if (!props.backgroundImage && props.options) {
+        // Don't use an overlay if we don't have an image.
+        props.options.useOverlay = false;
+    }
+    const classes = isContentBanner ? contentBannerClasses(props.options) : bannerClasses(undefined, props.options);
     const vars = isContentBanner ? contentBannerVariables(props.options) : bannerVariables(props.options);
     const { options } = vars;
     const device = useDevice();
@@ -136,7 +141,8 @@ export default function Banner(props: IBannerProps) {
     );
 
     return (
-        <div
+        <Widget
+            customContainer
             ref={bannerContextRef}
             className={classNames(className, classes.root, {
                 [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled && options.overlayTitleBar,
@@ -160,7 +166,10 @@ export default function Banner(props: IBannerProps) {
                             {!props.backgroundImage &&
                                 !vars.outerBackground.image &&
                                 !vars.outerBackground.unsetBackground && (
-                                    <DefaultBannerBg isContentBanner={isContentBanner} />
+                                    <DefaultBannerBg
+                                        bgColor={vars.outerBackground.color}
+                                        isContentBanner={isContentBanner}
+                                    />
                                 )}
                         </div>
                         {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
@@ -293,7 +302,7 @@ export default function Banner(props: IBannerProps) {
                     })}
                 </>
             )}
-        </div>
+        </Widget>
     );
 }
 

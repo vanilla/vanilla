@@ -13,7 +13,8 @@
  * @param object $smarty
  * @return string
  */
-function smarty_function_event($params, &$smarty) {
-	 $name = val('name', $params);
-	 Gdn::controller()->fireEvent($name);
+function smarty_function_event($params, &$smarty)
+{
+    $name = val("name", $params);
+    Gdn::controller()->fireEvent($name);
 }

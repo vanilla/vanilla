@@ -45,11 +45,13 @@ export function FormTreeControl(props: IProps) {
 
     return (
         <>
-            <FormGroupLabel
-                className={classes.treeDescription}
-                id={descriptionID}
-                description={props.control.description}
-            />
+            {!!props.control.description && (
+                <FormGroupLabel
+                    className={classes.treeDescription}
+                    id={descriptionID}
+                    description={props.control.description}
+                />
+            )}
             <FormTree<IHideableItem>
                 aria-describedby={props.control.description ? descriptionID : undefined}
                 aria-label={props.control.label}

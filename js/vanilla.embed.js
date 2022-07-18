@@ -489,7 +489,17 @@
 
     Vanilla.embed = embed;
 
-// Expose Vanilla to the global object
+    // Expose Vanilla to the global object
     window.Vanilla = Vanilla;
+
+    // If the iFrame has not been revealed in 15 seconds
+    // force it to show, as it may contain some error or captcha
+    setTimeout(() => {
+        var iframeElem = this.embed.iframe;
+        if (iframeElem.style.visibility !== "visible" || parseInt(iframeElem.style.height, 10) <= 0) {
+            iframeElem.style.visibility = "visible";
+            iframeElem.style.height = "75vh";
+        }
+    },10000)
 
 })(window);

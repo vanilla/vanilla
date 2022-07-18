@@ -91,36 +91,36 @@
 // Styleguide 14.3.
 
 .dropdown-toggle {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .dropdown-menu {
-  padding: ($spacer-y / 2) 0;
+    padding: ($spacer-y * 0.5) 0;
 
-  .icon {
-    margin-right: $spacer / 4;
-  }
+    .icon {
+        margin-right: $spacer * 0.25;
+    }
 
-  svg.icon {
-    margin-top: - 2px;
-  }
+    svg.icon {
+        margin-top: -2px;
+    }
 
-  .dropdown-item.disabled {
-    color: lighten($grey, 20%);
-  }
+    .dropdown-item.disabled {
+        color: lighten($grey, 20%);
+    }
 }
 
 .dropup .dropdown-toggle::after {
-  border-top: .375em solid;
-  border-bottom: 0;
+    border-top: 0.375em solid;
+    border-bottom: 0;
 }
 
 // btn-groups transform into dropdowns when they get too wide for their container.
 // This styles that specific dropdown trigger button.
 
 .dropdown-filter .btn {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-width: 120px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 120px;
 }

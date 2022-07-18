@@ -15,8 +15,8 @@ use VanillaTests\Fixtures\BasicPipelineModel;
 /**
  * Class for testing the "current user field" database operation processor.
  */
-class CurrentUserFieldProcessorTest extends TestCase {
-
+class CurrentUserFieldProcessorTest extends TestCase
+{
     const CURRENT_USER_ID = 99;
 
     /**
@@ -26,7 +26,8 @@ class CurrentUserFieldProcessorTest extends TestCase {
      * @param array $expectedSet
      * @dataProvider provideOperations
      */
-    public function testAddInsertFields(string $type, array $expectedSet) {
+    public function testAddInsertFields(string $type, array $expectedSet)
+    {
         $model = new BasicPipelineModel("Example");
         $session = new Gdn_Session();
         $session->UserID = self::CURRENT_USER_ID;
@@ -45,7 +46,8 @@ class CurrentUserFieldProcessorTest extends TestCase {
      *
      * @return array
      */
-    public function provideOperations() {
+    public function provideOperations()
+    {
         return [
             [Operation::TYPE_DELETE, []],
             [Operation::TYPE_INSERT, ["InsertUserID" => self::CURRENT_USER_ID]],
@@ -61,7 +63,8 @@ class CurrentUserFieldProcessorTest extends TestCase {
      * @param array $expectedSet
      * @dataProvider provideUserFields
      */
-    public function testUserFieldsModeDefault(string $type, array $expectedSet) {
+    public function testUserFieldsModeDefault(string $type, array $expectedSet)
+    {
         $model = new BasicPipelineModel("Example");
         $session = new Gdn_Session();
         $session->UserID = self::CURRENT_USER_ID;
@@ -91,7 +94,8 @@ class CurrentUserFieldProcessorTest extends TestCase {
      * @param array $expectedSet
      * @dataProvider provideUserFields
      */
-    public function testUserFieldsModeImport(string $type, array $expectedSet) {
+    public function testUserFieldsModeImport(string $type, array $expectedSet)
+    {
         $model = new BasicPipelineModel("Example");
         $session = new Gdn_Session();
         $session->UserID = self::CURRENT_USER_ID;
@@ -120,10 +124,8 @@ class CurrentUserFieldProcessorTest extends TestCase {
      *
      * @return array
      */
-    public function provideUserFields() {
-        return [
-            [Operation::TYPE_INSERT, ["InsertUserID" => 200]],
-            [Operation::TYPE_UPDATE, ["UpdateUserID" => 200]],
-        ];
+    public function provideUserFields()
+    {
+        return [[Operation::TYPE_INSERT, ["InsertUserID" => 200]], [Operation::TYPE_UPDATE, ["UpdateUserID" => 200]]];
     }
 }

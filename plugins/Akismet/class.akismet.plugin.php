@@ -7,19 +7,20 @@
 /**
  * Class AkismetPlugin
  */
-class AkismetPlugin extends Gdn_Plugin {
-
+class AkismetPlugin extends Gdn_Plugin
+{
     /**
      * Get an Akismet instance.
      *
      * @return Akismet
      */
-    public static function akismet() {
+    public static function akismet()
+    {
         static $akismet;
 
         if (!$akismet) {
-            $key = c('Plugins.Akismet.Key', c('Plugins.Akismet.MasterKey'));
-            $server = c('Plugins.Akismet.Server', 'rest.akismet.com');
+            $key = c("Plugins.Akismet.Key", c("Plugins.Akismet.MasterKey"));
+            $server = c("Plugins.Akismet.Server", "rest.akismet.com");
             if (!$key || !$server) {
                 return null;
             }
@@ -36,8 +37,9 @@ class AkismetPlugin extends Gdn_Plugin {
      * @param string|false $server Remote URL.
      * @return Akismet
      */
-    private static function buildAkismet($key, $server = false) {
-        $akismet = new Akismet(Gdn::request()->url('/', true), $key);
+    private static function buildAkismet($key, $server = false)
+    {
+        $akismet = new Akismet(Gdn::request()->url("/", true), $key);
 
         if ($server) {
             $akismet->setAkismetServer($server);
@@ -55,7 +57,8 @@ class AkismetPlugin extends Gdn_Plugin {
      * @return bool
      * @throws Exception Throws exception.
      */
-    public function checkAkismet($recordType, $data) {
+    public function checkAkismet($recordType, $data)
+    {
         $userID = $this->userID();
         if (!$userID) {
             return false;
@@ -66,12 +69,12 @@ class AkismetPlugin extends Gdn_Plugin {
             return false;
         }
 
-        $akismet->setCommentAuthor($data['Username']);
-        $akismet->setCommentAuthorEmail($data['Email']);
+        $akismet->setCommentAuthor($data["Username"]);
+        $akismet->setCommentAuthorEmail($data["Email"]);
 
-        $body = concatSep("\n\n", val('Name', $data), val('Body', $data), val('Story', $data));
+        $body = concatSep("\n\n", val("Name", $data), val("Body", $data), val("Story", $data));
         $akismet->setCommentContent($body);
-        $akismet->setUserIP($data['IPAddress']);
+        $akismet->setUserIP($data["IPAddress"]);
 
         $result = $akismet->isCommentSpam();
         return $result;
@@ -83,30 +86,34 @@ class AkismetPlugin extends Gdn_Plugin {
      * @param string $key The config key.
      * @return bool If config key is valid.
      */
-    protected function validateKey($key) {
-        $server = c('Plugins.Akismet.Server');
+    protected function validateKey($key)
+    {
+        $server = c("Plugins.Akismet.Server");
         return self::buildAkismet($key, $server)->isKeyValid();
     }
 
     /**
      * Database update.
      */
-    public function structure() {
+    public function structure()
+    {
         // Get a user for operations.
-        $userID = Gdn::sql()->getWhere('User', ['Name' => 'Akismet', 'Admin' => 2])->value('UserID');
+        $userID = Gdn::sql()
+            ->getWhere("User", ["Name" => "Akismet", "Admin" => 2])
+            ->value("UserID");
 
         if (!$userID) {
-            $userID = Gdn::sql()->insert('User', [
-                'Name' => 'Akismet',
-                'Password' => randomString('20'),
-                'HashMethod' => 'Random',
-                'Email' => 'akismet@domain.com',
-                'DateInserted' => Gdn_Format::toDateTime(),
-                'Admin' => '2'
+            $userID = Gdn::sql()->insert("User", [
+                "Name" => "Akismet",
+                "Password" => randomString("20"),
+                "HashMethod" => "Random",
+                "Email" => "akismet@domain.com",
+                "DateInserted" => Gdn_Format::toDateTime(),
+                "Admin" => "2",
             ]);
         }
 
-        saveToConfig('Plugins.Akismet.UserID', $userID);
+        saveToConfig("Plugins.Akismet.UserID", $userID);
     }
 
     /**
@@ -114,8 +121,9 @@ class AkismetPlugin extends Gdn_Plugin {
      *
      * @return mixed
      */
-    public function userID() {
-        return c('Plugins.Akismet.UserID', null);
+    public function userID()
+    {
+        return c("Plugins.Akismet.UserID", null);
     }
 
     /**
@@ -124,45 +132,46 @@ class AkismetPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender The controller firing the event.
      * @param array $args The arguments sent by the event.
      */
-    public function base_checkSpam_handler($sender, $args) {
+    public function base_checkSpam_handler($sender, $args)
+    {
         // Don't check for spam if another plugin has already determined it is.
-        if ($sender->EventArguments['IsSpam']) {
+        if ($sender->EventArguments["IsSpam"]) {
             return;
         }
 
-        $recordType = $args['RecordType'];
-        $data =& $args['Data'];
+        $recordType = $args["RecordType"];
+        $data = &$args["Data"];
 
         $result = false;
         switch ($recordType) {
-            case 'Registration':
-                $data['Name'] = '';
-                $data['Body'] = val('DiscoveryText', $data);
-                if ($data['Body']) {
+            case "Registration":
+                $data["Name"] = "";
+                $data["Body"] = val("DiscoveryText", $data);
+                if ($data["Body"]) {
                     // Only check for spam if there is discovery text.
                     $result = $this->checkAkismet($recordType, $data);
                     if ($result) {
-                        $data['Log_InsertUserID'] = $this->userID();
+                        $data["Log_InsertUserID"] = $this->userID();
                     }
                 }
                 break;
 
-            case 'Comment':
-            case 'Discussion':
-            case 'Activity':
-            case 'ActivityComment':
+            case "Comment":
+            case "Discussion":
+            case "Activity":
+            case "ActivityComment":
                 $result = $this->checkAkismet($recordType, $data);
-//                $result = true;
+                //                $result = true;
                 if ($result) {
-                    $data['Log_InsertUserID'] = $this->userID();
+                    $data["Log_InsertUserID"] = $this->userID();
                 }
                 break;
 
             default:
                 $result = false;
         }
-        $sender->EventArguments['IsSpam'] = $result;
-        $sender->EventArguments['Source'] = 'akismet';
+        $sender->EventArguments["IsSpam"] = $result;
+        $sender->EventArguments["Source"] = "akismet";
     }
 
     /**
@@ -170,44 +179,45 @@ class AkismetPlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender SettingsController firing the event.
      */
-    public function settingsController_akismet_create($sender) {
+    public function settingsController_akismet_create($sender)
+    {
         // Allow for master hosted key
         $keyDesc = 'Enter the key you obtained from <a href="http://akismet.com">akismet.com</a>';
-        if (c('Plugins.Akismet.MasterKey')) {
-            $keyDesc = 'No key is required! You may optionally use your own.';
+        if (c("Plugins.Akismet.MasterKey")) {
+            $keyDesc = "No key is required! You may optionally use your own.";
         }
 
-        $sender->permission('Garden.Settings.Manage');
-        $sender->setData('Title', t('Akismet Settings'));
+        $sender->permission("Garden.Settings.Manage");
+        $sender->setData("Title", t("Akismet Settings"));
 
         $cf = new ConfigurationModule($sender);
 
         // Do key validation so we don't break our entire site.
         // Always allow a blank key, because the plugin turns off in that scenario.
         if (Gdn::request()->isAuthenticatedPostBack()) {
-            $key = $cf->form()->getFormValue('Plugins.Akismet.Key');
-            if ($key !== '' && !$this->validateKey($key)) {
-                $cf->form()->addError('Key is invalid.');
+            $key = $cf->form()->getFormValue("Plugins.Akismet.Key");
+            if ($key !== "" && !$this->validateKey($key)) {
+                $cf->form()->addError("Key is invalid.");
             }
         }
 
         // Settings to be shown.
         $options = [
-            'Plugins.Akismet.Key' => ['Description' => $keyDesc]
+            "Plugins.Akismet.Key" => ["Description" => $keyDesc],
         ];
 
         // Deprecated TypePad option should go away if it's not already set.
-        if (c('Plugins.Akismet.Server')) {
-            $options['Plugins.Akismet.Server'] = [
-                'Description' => 'You can use either Akismet or TypePad antispam.',
-                'Control' => 'DropDown',
-                'Items' => ['' => 'Akismet', 'api.antispam.typepad.com' => 'TypePad']
+        if (c("Plugins.Akismet.Server")) {
+            $options["Plugins.Akismet.Server"] = [
+                "Description" => "You can use either Akismet or TypePad antispam.",
+                "Control" => "DropDown",
+                "Items" => ["" => "Akismet", "api.antispam.typepad.com" => "TypePad"],
             ];
         }
 
         $cf->initialize($options);
 
-        $sender->addSideMenu('settings/plugins');
+        $sender->addSideMenu("settings/plugins");
         $cf->renderAll();
     }
 }

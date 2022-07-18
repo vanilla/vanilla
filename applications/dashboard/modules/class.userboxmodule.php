@@ -11,14 +11,16 @@
 /**
  * Handle the user box.
  */
-class UserBoxModule extends Gdn_Module {
-
-    public function __construct() {
+class UserBoxModule extends Gdn_Module
+{
+    public function __construct()
+    {
         parent::__construct();
-        $this->_ApplicationFolder = 'dashboard';
+        $this->_ApplicationFolder = "dashboard";
     }
 
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 }

@@ -7,20 +7,21 @@
 
 namespace VanillaTests\Fixtures;
 
-class CommentsController {
-    public function index(string $param = '') {
-
+class CommentsController
+{
+    public function index(string $param = "")
+    {
     }
 
-    public function get(int $id) {
-
+    public function get(int $id)
+    {
     }
 
-    public function index_archives() {
-
+    public function index_archives()
+    {
     }
 
-    public function get_archives(int $id) {
-
+    public function get_archives(int $id)
+    {
     }
 }

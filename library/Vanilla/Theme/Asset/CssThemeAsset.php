@@ -11,8 +11,8 @@ use Vanilla\Theme\ThemeAssetFactory;
 /**
  * Style theme asset.
  */
-class CssThemeAsset extends ThemeAsset {
-
+class CssThemeAsset extends ThemeAsset
+{
     /** @var bool */
     protected $canMerge = true;
 
@@ -25,7 +25,8 @@ class CssThemeAsset extends ThemeAsset {
      * @param string $data
      * @param string $url
      */
-    public function __construct(string $data, string $url) {
+    public function __construct(string $data, string $url)
+    {
         $this->data = $data;
         $this->url = $url;
     }
@@ -33,49 +34,56 @@ class CssThemeAsset extends ThemeAsset {
     /**
      * @inheritdoc
      */
-    public function getDefaultType(): string {
+    public function getDefaultType(): string
+    {
         return ThemeAssetFactory::ASSET_TYPE_CSS;
     }
 
     /**
      * @inheritdoc
      */
-    public function getContentType(): string {
+    public function getContentType(): string
+    {
         return "text/css";
     }
 
     /**
      * @return string
      */
-    public function getUrl(): string {
+    public function getUrl(): string
+    {
         return $this->url;
     }
 
     /**
      * @inheritdoc
      */
-    public function getValue() {
+    public function getValue()
+    {
         return $this->data;
     }
 
     /**
      * @inheritdoc
      */
-    public function __toString(): string {
+    public function __toString(): string
+    {
         return $this->data;
     }
 
     /**
      * @return string
      */
-    public function getData(): string {
+    public function getData(): string
+    {
         return $this->data;
     }
 
     /**
      * @param string $data
      */
-    public function setData(string $data): void {
+    public function setData(string $data): void
+    {
         $this->data = $data;
     }
 }

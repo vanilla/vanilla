@@ -13,7 +13,8 @@ use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 /**
  * Test the categoriescontroller's discussions() method.
  */
-class CategoriesControllerDiscussionsTest extends AbstractAPIv2Test {
+class CategoriesControllerDiscussionsTest extends AbstractAPIv2Test
+{
     use CommunityApiTestTrait;
 
     /** @var \Gdn_Configuration */
@@ -22,27 +23,31 @@ class CategoriesControllerDiscussionsTest extends AbstractAPIv2Test {
     /**
      * @inheritDoc
      */
-    public function setUp() : void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->configuration = static::container()->get('Config');
-        $this->configuration->set('Vanilla.Categories.Layout', 'mixed');
-        $this->configuration->set('Vanilla.Categories.Use', true);
+        $this->configuration = static::container()->get("Config");
+        $this->configuration->set("Vanilla.Categories.Layout", "mixed");
+        $this->configuration->set("Vanilla.Categories.Use", true);
     }
 
     /**
      * Test that only announcement are delivered.
      */
-    public function testOnlyAnnouncementsDisplay() : void {
+    public function testOnlyAnnouncementsDisplay(): void
+    {
         $category = $this->createCategory();
-        $this->createDiscussion(['pinned' => true, 'categoryID' => $category['categoryID']]);
-        $this->createDiscussion(['pinned' => true, 'categoryID' => $category['categoryID']]);
-        $this->createDiscussion(['pinned' => true, 'categoryID' => $category['categoryID']]);
-        $this->createDiscussion(['pinned' => true, 'categoryID' => $category['categoryID']]);
-        $this->createDiscussion(['pinned' => true, 'categoryID' => $category['categoryID']]);
-        $disc6 = $this->createDiscussion(['pinned' => false, 'categoryID' => $category['categoryID']]);
+        $this->createDiscussion(["pinned" => true, "categoryID" => $category["categoryID"]]);
+        $this->createDiscussion(["pinned" => true, "categoryID" => $category["categoryID"]]);
+        $this->createDiscussion(["pinned" => true, "categoryID" => $category["categoryID"]]);
+        $this->createDiscussion(["pinned" => true, "categoryID" => $category["categoryID"]]);
+        $this->createDiscussion(["pinned" => true, "categoryID" => $category["categoryID"]]);
+        $disc6 = $this->createDiscussion(["pinned" => false, "categoryID" => $category["categoryID"]]);
 
-        $discussions = $this->bessy()->get("/categories")->data("Discussions");
+        $discussions = $this->bessy()
+            ->get("/categories")
+            ->data("Discussions");
 
         $discussionIDs = [];
         foreach ($discussions as $discussion) {
@@ -57,14 +62,17 @@ class CategoriesControllerDiscussionsTest extends AbstractAPIv2Test {
     /**
      * Test that announced discussions are delivered and appear before all other discussions.
      */
-    public function testAnnouncementsPinnedComeFirst() : void {
+    public function testAnnouncementsPinnedComeFirst(): void
+    {
         $category = $this->createCategory();
-        $disc1 = $this->createDiscussion(['pinned' => true, 'categoryID' => $category['categoryID']]);
-        $disc2 = $this->createDiscussion(['pinned' => true, 'categoryID' => $category['categoryID']]);
-        $disc3 = $this->createDiscussion(['pinned' => false, 'categoryID' => $category['categoryID']]);
-        $disc4 = $this->createDiscussion(['pinned' => false, 'categoryID' => $category['categoryID']]);
+        $disc1 = $this->createDiscussion(["pinned" => true, "categoryID" => $category["categoryID"]]);
+        $disc2 = $this->createDiscussion(["pinned" => true, "categoryID" => $category["categoryID"]]);
+        $disc3 = $this->createDiscussion(["pinned" => false, "categoryID" => $category["categoryID"]]);
+        $disc4 = $this->createDiscussion(["pinned" => false, "categoryID" => $category["categoryID"]]);
 
-        $discussions = $this->bessy()->get("/categories")->data("Discussions");
+        $discussions = $this->bessy()
+            ->get("/categories")
+            ->data("Discussions");
         $this->assertSame($discussions[0]->DiscussionID, $disc2["discussionID"]);
         $this->assertSame($discussions[1]->DiscussionID, $disc1["discussionID"]);
         $this->assertSame($discussions[2]->DiscussionID, $disc4["discussionID"]);

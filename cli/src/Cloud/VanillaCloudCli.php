@@ -13,14 +13,15 @@ use Vanilla\Cli\Cloud\Commands;
 /**
  * VanillaCli with cloud commands registered.
  */
-class VanillaCloudCli extends VanillaCli {
-
+class VanillaCloudCli extends VanillaCli
+{
     /**
      * Register vanilla-cloud only commands.
      */
-    protected function configureCli(): void {
+    protected function configureCli(): void
+    {
         parent::configureCli();
-        $this->addMethod(Commands\SyncOssCommand::class, 'syncOss', [self::OPT_SETTERS => true]);
-        $this->addMethod(Commands\CloneCommand::class, 'clone', [self::OPT_SETTERS => true]);
+        $this->addMethod(Commands\SyncOssCommand::class, "syncOss", [self::OPT_SETTERS => true]);
+        $this->addMethod(Commands\CloneCommand::class, "clone", [self::OPT_SETTERS => true]);
     }
 }

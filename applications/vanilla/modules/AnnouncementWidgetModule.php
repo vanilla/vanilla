@@ -17,19 +17,21 @@ use Vanilla\Utility\SchemaUtils;
  * @deprecated Use DiscussionAnnouncementsWidget instead.
  * @package Vanilla\Forum\Modules
  */
-class AnnouncementWidgetModule extends BaseDiscussionWidgetModule {
-
+class AnnouncementWidgetModule extends BaseDiscussionWidgetModule
+{
     /**
      * @inheritDoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "List - Announcements";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getApiSchema(): Schema {
+    public static function getApiSchema(): Schema
+    {
         $apiSchema = parent::getApiSchema();
         $apiSchema->merge(
             SchemaUtils::composeSchemas(
@@ -46,9 +48,10 @@ class AnnouncementWidgetModule extends BaseDiscussionWidgetModule {
     /**
      * @inheritDoc
      */
-    protected function getRealApiParams(): array {
+    protected function getRealApiParams(): array
+    {
         $apiParams = parent::getRealApiParams();
-        $apiParams['pinned'] = true;
+        $apiParams["pinned"] = true;
 
         return $apiParams;
     }

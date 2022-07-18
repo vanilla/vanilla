@@ -13,13 +13,14 @@ use PHPUnit\Framework\TestCase;
  * Tests for foreignIDHash().
  */
 
-class ForeignIDHashTest extends TestCase {
-
+class ForeignIDHashTest extends TestCase
+{
     /**
      * Tests {@link foreignIDHash()} with string under 32 characters.
      */
-    public function testForeignIDHashUnder32Chars() {
-        $data = '123456789';
+    public function testForeignIDHashUnder32Chars()
+    {
+        $data = "123456789";
         $actual = foreignIDHash($data);
         $this->assertSame($data, $actual);
     }
@@ -27,8 +28,9 @@ class ForeignIDHashTest extends TestCase {
     /**
      * Test with string over 32 characters
      */
-    public function testForeignIDHashOver32Chars() {
-        $data = 'This string is absolutely positively longer than 32 characters';
+    public function testForeignIDHashOver32Chars()
+    {
+        $data = "This string is absolutely positively longer than 32 characters";
         $expected = md5($data);
         $actual = foreignIDHash($data);
         $this->assertSame($expected, $actual);

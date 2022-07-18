@@ -13,27 +13,28 @@ use Vanilla\Contracts\ConfigurationInterface;
 /**
  * Class for rendering twig views.
  */
-class TwigRenderer extends \Twig\Environment {
-
+class TwigRenderer extends \Twig\Environment
+{
     /**
      * DI.
      *
      * @param TwigEnhancer $enhancer
      * @param ConfigurationInterface $configuration
      */
-    public function __construct(TwigEnhancer $enhancer, ConfigurationInterface $configuration) {
+    public function __construct(TwigEnhancer $enhancer, ConfigurationInterface $configuration)
+    {
         $loader = new \Twig\Loader\FilesystemLoader(PATH_ROOT);
 
-        $isDebug = $configuration->get('Debug') === true;
+        $isDebug = $configuration->get("Debug") === true;
         $envArgs = [
-            'cache' => $enhancer->getCompileCacheDirectory() ?? false, // Null not allowed. Only false or string.
-            'debug' => $isDebug,
-            'auto_reload' => $isDebug,
+            "cache" => $enhancer->getCompileCacheDirectory() ?? false, // Null not allowed. Only false or string.
+            "debug" => $isDebug,
+            "auto_reload" => $isDebug,
             // Automatically controlled by the debug value.
             // This causes twig to check the FS timestamp before going to cache.
             // It will rebuild that file's cache if an update had occured.
             // 'auto_reload' => $isDebug
-            'strict_variables' => $isDebug, // Surface template errors in debug mode.
+            "strict_variables" => $isDebug, // Surface template errors in debug mode.
         ];
         parent::__construct($loader, $envArgs);
 

@@ -19,8 +19,8 @@ use Vanilla\Web\Asset\SiteAsset;
 /**
  * Embed factory with utilities for matching our own site.
  */
-abstract class AbstractOwnSiteEmbedFactory extends AbstractEmbedFactory {
-
+abstract class AbstractOwnSiteEmbedFactory extends AbstractEmbedFactory
+{
     /** @var RequestInterface */
     private $request;
 
@@ -33,10 +33,8 @@ abstract class AbstractOwnSiteEmbedFactory extends AbstractEmbedFactory {
      * @param RequestInterface $request
      * @param SiteSectionModel $sectionModel
      */
-    public function __construct(
-        RequestInterface $request,
-        SiteSectionModel $sectionModel
-    ) {
+    public function __construct(RequestInterface $request, SiteSectionModel $sectionModel)
+    {
         $this->request = $request;
         $this->sectionModel = $sectionModel;
     }
@@ -44,30 +42,28 @@ abstract class AbstractOwnSiteEmbedFactory extends AbstractEmbedFactory {
     /**
      * @return array
      */
-    protected function getSupportedDomains(): array {
-        return [
-            $this->request->getHost(),
-        ];
+    protected function getSupportedDomains(): array
+    {
+        return [$this->request->getHost()];
     }
 
     /**
      * Get a regex representing the root of the site w/ all allowable site sections and siteRoot.
      */
-    protected function getRegexRoot(): string {
+    protected function getRegexRoot(): string
+    {
         $allowedSlugs = [];
         foreach ($this->sectionModel->getAll() as $siteSection) {
-            if ($siteSection->getBasePath() !== '') {
+            if ($siteSection->getBasePath() !== "") {
                 $allowedSlugs[] = $siteSection->getBasePath();
             }
         }
 
         $encodedSlugs = array_map(function ($slug) {
-            return preg_quote($slug, '/');
+            return preg_quote($slug, "/");
         }, $allowedSlugs);
-        $siteSectionRegex = count($encodedSlugs) > 0 ?
-            '(' . implode('|', $encodedSlugs) . ')?'
-            : '';
-        $root = preg_quote($this->request->getAssetRoot(), '/') . $siteSectionRegex;
+        $siteSectionRegex = count($encodedSlugs) > 0 ? "(" . implode("|", $encodedSlugs) . ")?" : "";
+        $root = preg_quote($this->request->getAssetRoot(), "/") . $siteSectionRegex;
 
         return $root;
     }

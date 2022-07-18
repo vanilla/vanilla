@@ -12,8 +12,8 @@ namespace Vanilla\Community\Events;
  *
  * @package Vanilla\Community\Events
  */
-interface RunnerInterface {
-
+interface RunnerInterface
+{
     /**
      * Run dirty record job.
      */

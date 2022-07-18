@@ -13,33 +13,37 @@ use Vanilla\Scheduler\Job\JobPriority;
 /**
  * Class JobPriorityTest
  */
-final class JobPriorityTest extends TestCase {
-
+final class JobPriorityTest extends TestCase
+{
     /**
      * Verify positive assertion of high priority.
      */
-    public function testPriorityHigh() {
+    public function testPriorityHigh()
+    {
         $this->assertTrue(JobPriority::high()->is(JobPriority::high()));
     }
 
     /**
      * Verify positive assertion of normal priority.
      */
-    public function testPriorityNormal() {
+    public function testPriorityNormal()
+    {
         $this->assertTrue(JobPriority::normal()->is(JobPriority::normal()));
     }
 
     /**
      * Verify positive assertion of low priority.
      */
-    public function testPriorityLow() {
+    public function testPriorityLow()
+    {
         $this->assertTrue(JobPriority::low()->is(JobPriority::low()));
     }
 
     /**
      * Verifying positive assertion of custom priority.
      */
-    public function testValidLoosePriorityComparison() {
+    public function testValidLoosePriorityComparison()
+    {
         $priority = JobPriority::high()->getValue();
         $this->assertTrue(JobPriority::loosePriority($priority)->is(JobPriority::high()));
     }
@@ -47,7 +51,8 @@ final class JobPriorityTest extends TestCase {
     /**
      * Verifying negative assertion of custom priority.
      */
-    public function testInvalidLoosePriorityComparison() {
+    public function testInvalidLoosePriorityComparison()
+    {
         $priority = JobPriority::high()->getValue();
         $this->assertFalse(JobPriority::loosePriority($priority)->is(JobPriority::normal()));
     }

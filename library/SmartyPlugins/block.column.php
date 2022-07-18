@@ -15,9 +15,10 @@
  * @param bool $repeat
  * @return string The url.
  */
-function smarty_block_column($params, $content, &$smarty, &$repeat) {
-    if (!$repeat){
-        $class = '_column '.trim(val('class', $params, ''));
+function smarty_block_column($params, $content, &$smarty, &$repeat)
+{
+    if (!$repeat) {
+        $class = "_column " . trim(val("class", $params, ""));
         return <<<EOT
         <div class="$class">
             $content

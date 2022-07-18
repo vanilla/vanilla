@@ -12,7 +12,8 @@ use Garden\StaticCacheConfigTrait;
 /**
  * Class Deprecation.
  */
-class Deprecation {
+class Deprecation
+{
     use StaticCacheConfigTrait;
 
     protected static $calls = [];
@@ -39,15 +40,22 @@ class Deprecation {
      *
      * @return void
      */
-    public static function log() {
+    public static function log()
+    {
         // Set Garden.Log.Deprecation to false to disable log output
-        if (self::c('Garden.Log.Deprecation', true)) {
+        if (self::c("Garden.Log.Deprecation", true)) {
             $info = debug_backtrace()[1];
-            if (!key_exists($info['function'], self::$calls)) {
+            if (!key_exists($info["function"], self::$calls)) {
                 $fileName = self::extractFileNameFromFrame($info);
-                $message = 'Deprecated function '.$info['function'].' called from '.$fileName.' at line : '.$info['line'];
+                $message =
+                    "Deprecated function " .
+                    $info["function"] .
+                    " called from " .
+                    $fileName .
+                    " at line : " .
+                    $info["line"];
                 self::logErrorMessage($message);
-                self::$calls[$info['function']] = true;
+                self::$calls[$info["function"]] = true;
             }
         }
     }
@@ -61,23 +69,23 @@ class Deprecation {
      *
      * @return void
      */
-    public static function unsupportedParam(string $paramName, $value, string $reason = "") {
+    public static function unsupportedParam(string $paramName, $value, string $reason = "")
+    {
         // Set Garden.Log.Deprecation to false to disable log output
-        if (!self::c('Garden.Log.Deprecation', true)) {
+        if (!self::c("Garden.Log.Deprecation", true)) {
             return;
         }
 
         $stack = debug_backtrace();
         $firstFrame = $stack[1];
         $methodName = self::extractMethodNameFromFrame($firstFrame);
-        $lookupKey = $methodName . '-' . $paramName . '-' . $value;
+        $lookupKey = $methodName . "-" . $paramName . "-" . $value;
         if (array_key_exists($lookupKey, self::$calls)) {
             // We've already logged this call in this request.
             return;
         } else {
             self::$calls[$lookupKey] = true;
         }
-
 
         $message = "Method received unsupported parameter type.\n" . $paramName . ": " . json_encode($value);
         if ($reason) {
@@ -94,10 +102,11 @@ class Deprecation {
      *
      * @throws \Exception If called while debug mode is enabled.
      */
-    private static function logErrorMessage(string $message) {
+    private static function logErrorMessage(string $message)
+    {
         trigger_error($message, E_USER_DEPRECATED);
 
-        if (self::c('Debug', false)) {
+        if (self::c("Debug", false)) {
             throw new \Exception($message);
         }
     }
@@ -108,9 +117,10 @@ class Deprecation {
      * @param array $backtrace
      * @return string
      */
-    private static function formatBackTrace(array $backtrace): string {
+    private static function formatBackTrace(array $backtrace): string
+    {
         $errorMessage = "";
-        $stackDepth = self::c('Garden.Log.StackDepth', 3);
+        $stackDepth = self::c("Garden.Log.StackDepth", 3);
 
         for ($i = 0; $i < $stackDepth; $i++) {
             $frame = next($backtrace);
@@ -122,7 +132,7 @@ class Deprecation {
             $fileName = self::extractFileNameFromFrame($frame);
 
             $errorMessage .= "\nMETHOD ==> " . $methodName;
-            $errorMessage .= "\n  FILE ==> " . $fileName . ':' . $frame['line'];
+            $errorMessage .= "\n  FILE ==> " . $fileName . ":" . $frame["line"];
             $errorMessage .= "\n";
         }
 
@@ -135,10 +145,11 @@ class Deprecation {
      * @param array $frame
      * @return string
      */
-    private static function extractMethodNameFromFrame(array $frame): string {
-        $methodName = $frame['function'] . '()';
-        if ($frame['class']) {
-            $methodName = $frame['class'] . $frame['type'] . $methodName;
+    private static function extractMethodNameFromFrame(array $frame): string
+    {
+        $methodName = $frame["function"] . "()";
+        if ($frame["class"]) {
+            $methodName = $frame["class"] . $frame["type"] . $methodName;
         }
 
         return $methodName;
@@ -150,7 +161,8 @@ class Deprecation {
      * @param array $frame
      * @return string
      */
-    private static function extractFileNameFromFrame(array $frame): string {
-        return str_replace(PATH_ROOT, '', $frame['file']);
+    private static function extractFileNameFromFrame(array $frame): string
+    {
+        return str_replace(PATH_ROOT, "", $frame["file"]);
     }
 }

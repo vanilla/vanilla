@@ -15,12 +15,13 @@ use \Gdn_Cache;
  * A real nullcache object. Gdn_DirtyCache needs to be kept as is for some weird reason.
  * This class is what Gdn_DirtyCache should be.
  */
-class NullCache extends Gdn_Cache {
-
+class NullCache extends Gdn_Cache
+{
     /**
      * NullCache constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->cacheType = Gdn_Cache::CACHE_TYPE_NULL;
     }
@@ -29,7 +30,8 @@ class NullCache extends Gdn_Cache {
      * @param $options
      * @return bool
      */
-    public function addContainer($options) {
+    public function addContainer($options)
+    {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
@@ -39,7 +41,8 @@ class NullCache extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function add($key, $value, $options = []) {
+    public function add($key, $value, $options = [])
+    {
         return $this->store($key, $value, $options);
     }
 
@@ -49,7 +52,8 @@ class NullCache extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function store($key, $value, $options = []) {
+    public function store($key, $value, $options = [])
+    {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
@@ -57,7 +61,8 @@ class NullCache extends Gdn_Cache {
      * @param $key
      * @return bool
      */
-    public function exists($key) {
+    public function exists($key)
+    {
         return Gdn_Cache::CACHEOP_FAILURE;
     }
 
@@ -66,10 +71,11 @@ class NullCache extends Gdn_Cache {
      * @param array $options
      * @return mixed
      */
-    public function get($key, $options = []) {
-        if (array_key_exists(Gdn_Cache::FEATURE_DEFAULT, $options)) {
+    public function get($key, $options = [])
+    {
+        if (array_key_exists(Gdn_Cache::FEATURE_DEFAULT, $options ?? [])) {
             return $options[Gdn_Cache::FEATURE_DEFAULT];
-        } else if (is_array($key)) {
+        } elseif (is_array($key)) {
             return [];
         } else {
             return Gdn_Cache::CACHEOP_FAILURE;
@@ -81,7 +87,8 @@ class NullCache extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function remove($key, $options = []) {
+    public function remove($key, $options = [])
+    {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
@@ -91,7 +98,8 @@ class NullCache extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function replace($key, $value, $options = []) {
+    public function replace($key, $value, $options = [])
+    {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
@@ -101,7 +109,8 @@ class NullCache extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function increment($key, $amount = 1, $options = []) {
+    public function increment($key, $amount = 1, $options = [])
+    {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
@@ -111,14 +120,16 @@ class NullCache extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function decrement($key, $amount = 1, $options = []) {
+    public function decrement($key, $amount = 1, $options = [])
+    {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
     /**
      * @return bool
      */
-    public function flush() {
+    public function flush()
+    {
         return true;
     }
 }

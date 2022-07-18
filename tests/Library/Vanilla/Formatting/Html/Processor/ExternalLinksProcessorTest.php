@@ -19,8 +19,8 @@ use VanillaTests\VanillaTestCase;
 /**
  * Tests for verifying the basic behavior of the external-links processor.
  */
-class ExternalLinksProcessorTest extends VanillaTestCase {
-
+class ExternalLinksProcessorTest extends VanillaTestCase
+{
     use BootstrapTrait, HtmlNormalizeTrait, SetupTraitsTrait;
 
     /** @var FormatService */
@@ -35,11 +35,16 @@ class ExternalLinksProcessorTest extends VanillaTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->setUpTestTraits();
 
-        $this->container()->call(function (ExternalLinksProcessor $processor, FormatService $formatService, Gdn_Request $request) {
+        $this->container()->call(function (
+            ExternalLinksProcessor $processor,
+            FormatService $formatService,
+            Gdn_Request $request
+        ) {
             $this->processor = $processor;
             $this->formatService = $formatService;
             $this->request = $request;
@@ -49,7 +54,8 @@ class ExternalLinksProcessorTest extends VanillaTestCase {
     /**
      * Test external links processing for external links.
      */
-    public function testExternalLinksProcessingExternal(): void {
+    public function testExternalLinksProcessingExternal(): void
+    {
         $url = "https://example.com";
         $content = json_encode([
             [
@@ -62,10 +68,18 @@ class ExternalLinksProcessorTest extends VanillaTestCase {
         $document = new HtmlDocument($this->formatService->renderHTML($content, RichFormat::FORMAT_KEY));
         $actual = $this->processor->processDocument($document)->getInnerHtml();
 
-        $expectedHref = "http://" . \Gdn::request()->getHost() . htmlspecialchars($this->request->url("/home/leaving?" . http_build_query([
-            "allowTrusted" => 1,
-            "target" => $url,
-        ])));
+        $expectedHref =
+            "http://" .
+            \Gdn::request()->getHost() .
+            htmlspecialchars(
+                $this->request->url(
+                    "/home/leaving?" .
+                        http_build_query([
+                            "allowTrusted" => 1,
+                            "target" => $url,
+                        ])
+                )
+            );
         $expected = <<<HTML
 <p>
     <a href="$expectedHref" rel="nofollow noreferrer ugc">$url</a>
@@ -78,7 +92,8 @@ HTML;
     /**
      * Test external links processing for internal links.
      */
-    public function testExternalLinksProcessingInternal(): void {
+    public function testExternalLinksProcessingInternal(): void
+    {
         $content = json_encode([
             [
                 "attributes" => ["link" => "http://vanilla.test/discussions"],
@@ -101,7 +116,8 @@ HTML;
     /**
      * Verify ability to disable rewriting external link URLs through the leaving page.
      */
-    public function testDisableWarnLeaving(): void {
+    public function testDisableWarnLeaving(): void
+    {
         $this->processor->setWarnLeaving(false);
         $expected = "https://example.com";
         $html = /** @lang HTML */ <<<HTML
@@ -111,7 +127,8 @@ HTML;
 HTML;
         $document = new HtmlDocument($html);
         $this->processor->processDocument($document);
-        $actual = $document->getDom()
+        $actual = $document
+            ->getDom()
             ->getElementById("a1")
             ->getAttribute("href");
         $this->assertSame($expected, $actual);

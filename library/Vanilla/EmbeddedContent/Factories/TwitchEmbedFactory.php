@@ -14,8 +14,8 @@ use Vanilla\EmbeddedContent\Embeds\TwitchEmbed;
 /**
  * Factory for TwitchEmbed.
  */
-class TwitchEmbedFactory extends AbstractEmbedFactory {
-
+class TwitchEmbedFactory extends AbstractEmbedFactory
+{
     const CLIPS_DOMAIN = "clips.twitch.tv";
     const PRIMARY_DOMAINS = ["twitch.tv"];
 
@@ -29,21 +29,24 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
      *
      * @param HttpClient $httpClient
      */
-    public function __construct(HttpClient $httpClient) {
+    public function __construct(HttpClient $httpClient)
+    {
         $this->httpClient = $httpClient;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return self::PRIMARY_DOMAINS + [self::CLIPS_DOMAIN];
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         if ($domain === self::CLIPS_DOMAIN) {
             return "`^/(?!embed)[^/]+`";
         } else {
@@ -56,13 +59,11 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
      *
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         $twitchID = $this->idFromUrl($url);
 
-        $response = $this->httpClient->get(
-            self::OEMBED_URL_BASE,
-            ["url" => $url]
-        );
+        $response = $this->httpClient->get(self::OEMBED_URL_BASE, ["url" => $url]);
 
         // Example Response JSON
         // phpcs:disable Generic.Files.LineLength
@@ -98,7 +99,7 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
             "width" => $response["width"] ?? null,
             "photoUrl" => $response["thumbnail_url"] ?? null,
             "twitchID" => $twitchID,
-            "time" => $parameters["time"] ?? $parameters["t"] ?? null,
+            "time" => $parameters["time"] ?? ($parameters["t"] ?? null),
         ];
 
         return new TwitchEmbed($data);
@@ -110,7 +111,8 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
      * @param string $url
      * @return string|null
      */
-    public function idFromUrl(string $url): ?string {
+    public function idFromUrl(string $url): ?string
+    {
         $host = parse_url($url, PHP_URL_HOST);
         $path = parse_url($url, PHP_URL_PATH);
 
@@ -119,14 +121,14 @@ class TwitchEmbedFactory extends AbstractEmbedFactory {
         }
 
         if ($host === "clips.twitch.tv" && preg_match("`^/(?<clipID>[^/]+)`", $path, $clipsMatch)) {
-            return "clip:{$clipsMatch['clipID']}";
+            return "clip:{$clipsMatch["clipID"]}";
         } elseif (preg_match("`^/(?<channel>[^/]+)/clip/(?<clipID>[^/]+)`", $path, $clipsMatch)) {
-            return "clip:{$clipsMatch['clipID']}";
+            return "clip:{$clipsMatch["clipID"]}";
         } elseif (preg_match("`^/(?<type>videos|collections)/(?<id>[^/]+)`", $path, $videosMatch)) {
             $type = $videosMatch["type"] === "videos" ? "video" : "collection";
-            return "{$type}:{$videosMatch['id']}";
+            return "{$type}:{$videosMatch["id"]}";
         } elseif (preg_match("`^/(?<channel>[^/]+)`", $path, $channelMatch)) {
-            return "channel:{$channelMatch['channel']}";
+            return "channel:{$channelMatch["channel"]}";
         }
 
         return null;

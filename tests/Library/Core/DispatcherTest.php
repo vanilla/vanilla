@@ -15,8 +15,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Tests for GdnDispatcher.
  */
-class DispatcherTest extends SiteTestCase {
-
+class DispatcherTest extends SiteTestCase
+{
     use UsersAndRolesApiTestTrait;
 
     /**
@@ -26,7 +26,8 @@ class DispatcherTest extends SiteTestCase {
      * @param string $expected The expected name.
      * @dataProvider provideFilterNameTests
      */
-    public function testFilterName(string $name, string $expected) {
+    public function testFilterName(string $name, string $expected)
+    {
         $dis = new UnitTestGdnDispatcher();
         $filtered = $dis->filterName($name);
         $this->assertEquals($expected, $filtered);
@@ -39,7 +40,8 @@ class DispatcherTest extends SiteTestCase {
      * @param string $expected The expected dash case.
      * @dataProvider provideDashCaseTests
      */
-    public function testDashCase(string $name, string $expected) {
+    public function testDashCase(string $name, string $expected)
+    {
         $dis = new UnitTestGdnDispatcher();
         $dashed = $dis->dashCase($name);
         $this->assertEquals($expected, $dashed);
@@ -54,7 +56,8 @@ class DispatcherTest extends SiteTestCase {
      * @param string $expected The expected canonical URL.
      * @dataProvider provideMakeCanonicalUrlTests
      */
-    public function testMakeCanonicalUrl($controller, string $method, array $args, string $expected) {
+    public function testMakeCanonicalUrl($controller, string $method, array $args, string $expected)
+    {
         $reflectedMethod = new \ReflectionMethod($controller, $method);
         $reflectedArgs = reflectArgs($reflectedMethod, $args);
 
@@ -68,20 +71,21 @@ class DispatcherTest extends SiteTestCase {
      *
      * @return array Returns a data provider array.
      */
-    public function provideMakeCanonicalUrlTests(): array {
+    public function provideMakeCanonicalUrlTests(): array
+    {
         $foo = new FooBarController();
 
         $r = [
-            [$foo, 'index', ['page' => 'p1'], '/foo-bar'],
-            [$foo, 'index', ['page' => 'p2'], '/foo-bar/p2'],
-            [$foo, 'index', ['p2', 'baz', 'bam'], '/foo-bar/p2'],
+            [$foo, "index", ["page" => "p1"], "/foo-bar"],
+            [$foo, "index", ["page" => "p2"], "/foo-bar/p2"],
+            [$foo, "index", ["p2", "baz", "bam"], "/foo-bar/p2"],
 
-            [$foo, 'search', ['foo', 'p1'], '/foo-bar/search?search=foo'],
-            [$foo, 'search', ['search' => 'foo', 'page' => 'p2'], '/foo-bar/search?page=p2&search=foo'],
+            [$foo, "search", ["foo", "p1"], "/foo-bar/search?search=foo"],
+            [$foo, "search", ["search" => "foo", "page" => "p2"], "/foo-bar/search?page=p2&search=foo"],
 
-            [$foo, 'doit', ['9'], '/foo-bar/do-it'],
+            [$foo, "doit", ["9"], "/foo-bar/do-it"],
 
-            [$foo, 'foobarcontroller_foobar_create', ['sender' => $foo], '/foo-bar/foo-bar'],
+            [$foo, "foobarcontroller_foobar_create", ["sender" => $foo], "/foo-bar/foo-bar"],
         ];
 
         $result = [];
@@ -104,13 +108,14 @@ class DispatcherTest extends SiteTestCase {
      *
      * @return array Returns a data provider array.
      */
-    public function provideDashCaseTests(): array {
+    public function provideDashCaseTests(): array
+    {
         $r = [
-            ['DashCase', 'dash-case'],
-            ['dashCase', 'dash-case'],
-            ['OneTwoThree', 'one-two-three'],
-            ['FooAPI', 'foo-api'],
-            ['FooBar2', 'foo-bar2'],
+            ["DashCase", "dash-case"],
+            ["dashCase", "dash-case"],
+            ["OneTwoThree", "one-two-three"],
+            ["FooAPI", "foo-api"],
+            ["FooBar2", "foo-bar2"],
         ];
 
         return array_column($r, null, 0);
@@ -121,12 +126,9 @@ class DispatcherTest extends SiteTestCase {
      *
      * @return array Returns a data provider array.
      */
-    public function provideFilterNameTests(): array {
-        $r = [
-            ['discussions', 'Discussions'],
-            ['addon-cache', 'AddonCache'],
-            ['addoncache', 'Addoncache'],
-        ];
+    public function provideFilterNameTests(): array
+    {
+        $r = [["discussions", "Discussions"], ["addon-cache", "AddonCache"], ["addoncache", "Addoncache"]];
 
         return array_column($r, null, 0);
     }
@@ -139,11 +141,15 @@ class DispatcherTest extends SiteTestCase {
      *
      * @dataProvider provideCantBlockUrls
      */
-    public function testCantBlockRequests(string $method, string $url) {
-        \Gdn::config()->saveToConfig('Garden.PrivateCommunity', true);
+    public function testCantBlockRequests(string $method, string $url)
+    {
+        \Gdn::config()->saveToConfig("Garden.PrivateCommunity", true);
         $this->runWithUser(function () use ($method, $url) {
             $dispatcher = \Gdn::dispatcher();
-            $request = \Gdn_Request::create()->fromEnvironment()->setMethod($method)->setUrl($url);
+            $request = \Gdn_Request::create()
+                ->fromEnvironment()
+                ->setMethod($method)
+                ->setUrl($url);
             $canBlock = $dispatcher->getCanBlock($request);
             $this->assertEquals(\Gdn_Dispatcher::BLOCK_NEVER, $canBlock);
         }, \UserModel::GUEST_USER_ID);
@@ -152,15 +158,16 @@ class DispatcherTest extends SiteTestCase {
     /**
      * @return array
      */
-    public function provideCantBlockUrls() {
+    public function provideCantBlockUrls()
+    {
         return [
-            ['GET', '/dist'],
-            ['GET', '/dist/forum/anything/at/all.min.js'],
-            ['GET', '/dist/forum/anything/at/all.min.js?Asdfasdf'],
-            ['GET', '/asset/someasset.font'],
-            ['POST', '/authenticate/to/somewhere'],
-            ['GET', '/utility/update'],
-            ['POST', '/utility/update'],
+            ["GET", "/dist"],
+            ["GET", "/dist/forum/anything/at/all.min.js"],
+            ["GET", "/dist/forum/anything/at/all.min.js?Asdfasdf"],
+            ["GET", "/asset/someasset.font"],
+            ["POST", "/authenticate/to/somewhere"],
+            ["GET", "/utility/update"],
+            ["POST", "/utility/update"],
         ];
     }
 }

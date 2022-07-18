@@ -12,7 +12,8 @@
  * A wrapper for the UserException class so that methods can throw a specific
  * application as a means of validation or user error, rather than a critical exception.
  */
-class Gdn_SanitizedUserException extends Gdn_UserException {
+class Gdn_SanitizedUserException extends Gdn_UserException
+{
     /**
      * Constructs the Gdn_ApplicationException.
      *
@@ -20,7 +21,8 @@ class Gdn_SanitizedUserException extends Gdn_UserException {
      * @param int $code The error code.
      * @param Exception $previous The previous exception used for exception chaining.
      */
-    public function __construct($message, $code = 400, $previous = null) {
-        parent::__construct($message, (int)$code, $previous);
+    public function __construct($message, $code = 400, $previous = null)
+    {
+        parent::__construct($message, (int) $code, $previous);
     }
 }

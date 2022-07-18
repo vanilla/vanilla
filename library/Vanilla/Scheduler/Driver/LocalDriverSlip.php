@@ -14,8 +14,8 @@ use Vanilla\Scheduler\Job\TrackableJobAwareTrait;
 /**
  * LocalDriverSlip
  */
-class LocalDriverSlip implements DriverSlipInterface {
-
+class LocalDriverSlip implements DriverSlipInterface
+{
     use TrackableJobAwareTrait;
 
     /** @var string */
@@ -38,8 +38,9 @@ class LocalDriverSlip implements DriverSlipInterface {
      *
      * @param LocalJobInterface $job
      */
-    public function __construct(LocalJobInterface $job) {
-        $this->id = uniqid('localDriverId::', true);
+    public function __construct(LocalJobInterface $job)
+    {
+        $this->id = uniqid("localDriverId::", true);
         $this->status = JobExecutionStatus::received();
         $this->job = $job;
     }
@@ -47,7 +48,8 @@ class LocalDriverSlip implements DriverSlipInterface {
     /**
      * Get the underlying job.
      */
-    public function getJob(): LocalJobInterface {
+    public function getJob(): LocalJobInterface
+    {
         return $this->job;
     }
 
@@ -56,7 +58,8 @@ class LocalDriverSlip implements DriverSlipInterface {
      *
      * @return string
      */
-    public function getID(): string {
+    public function getID(): string
+    {
         return $this->id;
     }
 
@@ -66,7 +69,8 @@ class LocalDriverSlip implements DriverSlipInterface {
      * @param bool $forceUpdate
      * @return JobExecutionStatus
      */
-    public function getStatus(bool $forceUpdate = false): JobExecutionStatus {
+    public function getStatus(bool $forceUpdate = false): JobExecutionStatus
+    {
         return $this->status;
     }
 
@@ -75,7 +79,8 @@ class LocalDriverSlip implements DriverSlipInterface {
      *
      * @return JobExecutionStatus
      */
-    public function execute(): JobExecutionStatus {
+    public function execute(): JobExecutionStatus
+    {
         $this->status = JobExecutionStatus::progress();
         $this->status = $this->job->run();
 
@@ -87,10 +92,11 @@ class LocalDriverSlip implements DriverSlipInterface {
      *
      * @return array
      */
-    public function getExtendedStatus(): array {
+    public function getExtendedStatus(): array
+    {
         $extendedStatus = [];
-        $extendedStatus['status'] = $this->status;
-        $extendedStatus['error'] = $this->errorMessage;
+        $extendedStatus["status"] = $this->status;
+        $extendedStatus["error"] = $this->errorMessage;
 
         return $extendedStatus;
     }
@@ -101,7 +107,8 @@ class LocalDriverSlip implements DriverSlipInterface {
      * @param string $errorMessage
      * @return $this|DriverSlipInterface
      */
-    public function setStackExecutionFailed(string $errorMessage): DriverSlipInterface {
+    public function setStackExecutionFailed(string $errorMessage): DriverSlipInterface
+    {
         $this->status = JobExecutionStatus::stackExecutionError();
         $this->errorMessage = $errorMessage;
 
@@ -114,7 +121,8 @@ class LocalDriverSlip implements DriverSlipInterface {
      * @param JobExecutionStatus $status
      * @return $this|DriverSlipInterface
      */
-    public function setStatus(JobExecutionStatus $status): DriverSlipInterface {
+    public function setStatus(JobExecutionStatus $status): DriverSlipInterface
+    {
         $this->status = $status;
 
         return $this;
@@ -125,7 +133,8 @@ class LocalDriverSlip implements DriverSlipInterface {
      *
      * @return string|null
      */
-    public function getErrorMessage(): ?string {
+    public function getErrorMessage(): ?string
+    {
         return $this->errorMessage;
     }
 
@@ -134,7 +143,8 @@ class LocalDriverSlip implements DriverSlipInterface {
      *
      * @return string
      */
-    public function getType(): string {
-        return preg_replace('/\\\\/', '_', get_class($this->job));
+    public function getType(): string
+    {
+        return preg_replace("/\\\\/", "_", get_class($this->job));
     }
 }

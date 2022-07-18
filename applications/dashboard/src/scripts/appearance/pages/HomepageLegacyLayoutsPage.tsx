@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { ComponentType } from "react";
+import React, { ComponentType, useMemo } from "react";
 import { AppearanceNav } from "@dashboard/appearance/nav/AppearanceNav";
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
@@ -21,6 +21,7 @@ import { notEmpty } from "@vanilla/utils";
 import Categories from "@dashboard/appearance/previews/Categories";
 import ModernLayout from "@dashboard/appearance/previews/ModernLayout";
 import AdminTitleBar from "@dashboard/components/AdminTitleBar";
+import { useLegacyLayoutView } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 
 export interface IHomepageRouteOption {
     label: string;
@@ -46,14 +47,12 @@ export function addHomepageRouteOption(option: IHomepageRouteOption) {
 }
 
 function HomepageLegacyLayoutsPageImpl() {
-    const configs = useConfigsByKeys(["routes.defaultController"]);
+    const configs = useConfigsByKeys(["routes.defaultController", "customLayout.home"]);
 
-    const { patchConfig } = useConfigPatcher();
+    const legacyPatcher = useLegacyLayoutView("home", "routes.defaultController");
 
     function applyHomeRoute(route: string) {
-        patchConfig({
-            "routes.defaultController": [route, "internal"],
-        });
+        legacyPatcher.putLegacyView(route);
     }
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(configs.status)) {
@@ -69,7 +68,10 @@ function HomepageLegacyLayoutsPageImpl() {
             options={homepageRouteOptions.map((option) => ({
                 label: t(option.label),
                 thumbnailComponent: option.thumbnailComponent,
-                active: configs.data["routes.defaultController"][0] == option.value,
+                active:
+                    (configs.data["routes.defaultController"][0] == option.value ||
+                        configs.data["routes.defaultController"] == option.value) &&
+                    !configs.data["customLayout.home"],
                 onApply: () => applyHomeRoute(option.value),
             }))}
         />

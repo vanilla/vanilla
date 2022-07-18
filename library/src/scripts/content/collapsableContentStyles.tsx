@@ -9,17 +9,18 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { linearGradient, percent, px, translateY } from "csx";
+import { ColorHelper, linearGradient, percent, px, translateY } from "csx";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
 
-export const collapsableContentClasses = useThemeCache(() => {
+export const collapsableContentClasses = useThemeCache((options?: { bgColor?: ColorHelper }) => {
     const globalVars = globalVariables();
     const style = styleFactory("collapsableContent");
 
     const paddingAdjustment = style("paddingAdjustment", {});
+    const bgColor = options?.bgColor ?? globalVars.mainColors.bg;
 
     const root = style({
-        background: ColorsUtils.colorOut(globalVars.mainColors.bg),
+        background: ColorsUtils.colorOut(bgColor),
         position: "relative",
     });
 
@@ -58,11 +59,7 @@ export const collapsableContentClasses = useThemeCache(() => {
         ...absolutePosition.topLeft(),
         width: percent(100),
         height: 75,
-        background: linearGradient(
-            "to bottom",
-            ColorsUtils.colorOut(globalVars.mainColors.bg.fade(0))!,
-            ColorsUtils.colorOut(globalVars.mainColors.bg)!,
-        ),
+        background: linearGradient("to bottom", ColorsUtils.colorOut(bgColor.fade(0))!, ColorsUtils.colorOut(bgColor)!),
         transform: `translateY(-100%)`,
     });
 

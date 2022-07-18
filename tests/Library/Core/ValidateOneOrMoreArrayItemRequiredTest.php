@@ -13,12 +13,13 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateOneOrMoreArrayItemRequired().
  */
 
-class ValidateOneOrMoreArrayItemRequiredTest extends TestCase {
-
+class ValidateOneOrMoreArrayItemRequiredTest extends TestCase
+{
     /**
      * Test on an empty array.
      */
-    public function testValidateOneOrMoreArrayItemRequiredEmpty() {
+    public function testValidateOneOrMoreArrayItemRequiredEmpty()
+    {
         $actual = validateOneOrMoreArrayItemRequired([]);
         $expected = false;
         $this->assertSame($expected, $actual);
@@ -27,8 +28,9 @@ class ValidateOneOrMoreArrayItemRequiredTest extends TestCase {
     /**
      * Test with string.
      */
-    public function testValidateOneOrMoreArrayItemRequiredString() {
-        $actual = validateOneOrMoreArrayItemRequired('foo');
+    public function testValidateOneOrMoreArrayItemRequiredString()
+    {
+        $actual = validateOneOrMoreArrayItemRequired("foo");
         $expected = false;
         $this->assertSame($expected, $actual);
     }
@@ -36,7 +38,8 @@ class ValidateOneOrMoreArrayItemRequiredTest extends TestCase {
     /**
      * Test with non-empty array.
      */
-    public function testValidateOneOrMoreArrayItemRequiredNonEmptyArray() {
+    public function testValidateOneOrMoreArrayItemRequiredNonEmptyArray()
+    {
         $actual = validateOneOrMoreArrayItemRequired([false]);
         $expected = true;
         $this->assertSame($expected, $actual);

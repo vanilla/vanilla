@@ -5,6 +5,22 @@ x-resourceEvents:
         x-addon: "qna"
         name: "Answer"
         type: "answer"
+paths:
+    "/question-status/migrate":
+        x-hidden: true
+        patch:
+            responses:
+                "200":
+                    description: Success
+                "202":
+                    $ref: "../../../applications/dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
+                "403":
+                    $ref: "../../../applications/dashboard/openapi/responses.yml#/components/responses/PermissionError"
+                "408":
+                    $ref: "../../../applications/dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
+            tags:
+                - Migrate Statuses
+            summary: Migrate Qna plugin statuses to unified post statuses (Internal use only) .
 components:
     parameters:
         # This is a partial schema to add Q&A options to the main schema.

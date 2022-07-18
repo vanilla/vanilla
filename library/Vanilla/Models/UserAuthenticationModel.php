@@ -9,12 +9,13 @@ namespace Vanilla\Models;
 /**
  * Model for managing UserAuthentication records.
  */
-class UserAuthenticationModel extends Model {
-
+class UserAuthenticationModel extends Model
+{
     /**
      * Initial model setup.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct("UserAuthentication");
     }
 }

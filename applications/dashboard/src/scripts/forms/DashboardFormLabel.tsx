@@ -10,6 +10,7 @@ interface IProps {
     label: React.ReactNode;
     description?: React.ReactNode;
     afterDescription?: React.ReactNode;
+    inputType?: string;
     labelType?: DashboardLabelType;
 }
 
@@ -23,6 +24,11 @@ export const DashboardFormLabel: React.FC<IProps> = (props: IProps) => {
 
     const labelType = props.labelType !== undefined ? props.labelType : DashboardLabelType.STANDARD;
     const rootClass = labelType === DashboardLabelType.WIDE ? "label-wrap-wide" : "label-wrap";
+
+    if (props.inputType === "checkBox") {
+        // Just a spacer.
+        return <div className={rootClass} id={labelID} />;
+    }
 
     return (
         <div className={rootClass} id={labelID}>

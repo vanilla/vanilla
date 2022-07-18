@@ -12,12 +12,13 @@ use Vanilla\Setup\ComposerHelper;
 /**
  * Clear Caches command.
  */
-class VanillaCacheCommand {
-
+class VanillaCacheCommand
+{
     /**
      * Clear vanilla caches.
      */
-    public function clearCaches() {
+    public function clearCaches()
+    {
         ComposerHelper::clearPhpCache();
         ComposerHelper::clearTwigCache();
     }

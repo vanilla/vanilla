@@ -18,8 +18,8 @@ use Garden\Http\HttpClient;
  * In contrast, properties, such as metadata, may differ between the representation contained on the source
  * and that which is contained at the destination, e.g. its unique identifier, foreign identifier, etc.
  */
-interface SiteSyncResourceTypeSynchronizerInterface {
-
+interface SiteSyncResourceTypeSynchronizerInterface
+{
     /**
      * Get producer of resource type specific data from source to be consumed at destination
      * as part of content synchronization between two sites.

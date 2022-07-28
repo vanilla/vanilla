@@ -14,12 +14,13 @@ use Vanilla\Formatting\Html\HtmlDocument;
 /**
  * Processor of HMTL attachments.
  */
-class AttachmentHtmlProcessor extends HtmlProcessor {
-
+class AttachmentHtmlProcessor extends HtmlProcessor
+{
     /**
      * @inheritdoc
      */
-    public function processDocument(HtmlDocument $document): HtmlDocument {
+    public function processDocument(HtmlDocument $document): HtmlDocument
+    {
         return $document;
     }
 
@@ -30,15 +31,16 @@ class AttachmentHtmlProcessor extends HtmlProcessor {
      *
      * @return Attachment[]
      */
-    public function getAttachments(HtmlDocument $document): array {
-        $domLinks = $document->queryXPath('.//a[@download]');
+    public function getAttachments(HtmlDocument $document): array
+    {
+        $domLinks = $document->queryXPath(".//a[@download]");
 
         /** @var Attachment[] $attachemnts */
         $attachemnts = [];
 
         /** @var \DOMElement $domLink */
         foreach ($domLinks as $domLink) {
-            $href = $domLink->getAttribute('href');
+            $href = $domLink->getAttribute("href");
             $name = $domLink->textContent;
 
             if (!$href || !$name) {
@@ -46,12 +48,12 @@ class AttachmentHtmlProcessor extends HtmlProcessor {
             }
 
             $attachment = Attachment::fromArray([
-                'name' => $name,
-                'url' => $href,
-                'size' => 0,
-                'type' => "unknown",
-                'mediaID' => -1,
-                'dateInserted' => null,
+                "name" => $name,
+                "url" => $href,
+                "size" => 0,
+                "type" => "unknown",
+                "mediaID" => -1,
+                "dateInserted" => null,
             ]);
             $attachemnts[] = $attachment;
         }

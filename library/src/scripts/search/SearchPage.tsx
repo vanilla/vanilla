@@ -30,7 +30,7 @@ import debounce from "lodash/debounce";
 import qs from "qs";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useLocation, useHistory } from "react-router";
-import TwoColumnSection from "@library/layout/TwoColumnSection";
+import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import { SectionProvider, useSection } from "@library/layout/LayoutContext";
 import PanelWidget from "@library/layout/components/PanelWidget";
 import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
@@ -52,21 +52,15 @@ import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
 import { DEFAULT_SEARCH_SOURCE } from "@library/search/SearchService";
 import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
+import { AnalyticsData } from "@library/analytics/AnalyticsData";
 
 interface IProps {
     placeholder?: string;
 }
 
 function SearchPage(props: IProps) {
-    const {
-        form,
-        updateForm,
-        search,
-        results,
-        getDomains,
-        getCurrentDomain,
-        getDefaultFormValues,
-    } = useSearchForm<{}>();
+    const { form, updateForm, search, results, getDomains, getCurrentDomain, getDefaultFormValues } =
+        useSearchForm<{}>();
 
     const { isCompact } = useSection();
     const classes = pageTitleClasses();
@@ -217,6 +211,7 @@ function SearchPage(props: IProps) {
                 <TitleBar title={t("Search")} />
                 <Banner isContentBanner />
                 <Container>
+                    <AnalyticsData uniqueKey={"search_page"} />
                     <QueryString
                         value={{
                             ...form,
@@ -227,7 +222,7 @@ function SearchPage(props: IProps) {
                         }}
                         defaults={getDefaultFormValues()}
                     />
-                    <TwoColumnSection
+                    <SectionTwoColumns
                         className="hasLargePadding"
                         mainTop={
                             <>

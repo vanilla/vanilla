@@ -10,7 +10,8 @@ namespace Vanilla\Contracts\Site;
 /**
  * Provider for applications.
  */
-interface ApplicationProviderInterface {
+interface ApplicationProviderInterface
+{
     /**
      * Returns all applications of the site.
      *

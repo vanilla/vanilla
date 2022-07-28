@@ -18,7 +18,8 @@ namespace Garden;
  * 1. Arrays are valid callbacks and these lazy event handlers will live side-by-side with callbacks.
  * 2. [Objects can use less memory than arrays](https://gist.github.com/nikic/5015323).
  */
-class LazyEventHandler {
+class LazyEventHandler
+{
     /**
      * @var string The name of the class.
      */
@@ -34,7 +35,8 @@ class LazyEventHandler {
      * @param string $class The name of the class.
      * @param string $method The name of the method.
      */
-    public function __construct($class, $method) {
+    public function __construct($class, $method)
+    {
         $this->class = $class;
         $this->method = $method;
     }

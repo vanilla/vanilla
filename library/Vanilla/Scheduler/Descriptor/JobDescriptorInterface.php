@@ -13,8 +13,8 @@ use Vanilla\Scheduler\Job\JobPriority;
 /**
  * Interface JobDescriptorInterface
  */
-interface JobDescriptorInterface {
-
+interface JobDescriptorInterface
+{
     /**
      * @return JobExecutionType
      */

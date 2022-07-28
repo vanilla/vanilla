@@ -16,8 +16,8 @@ use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 /**
  * Base test case for a format. Provides test cases for all core methods on the interface.
  */
-abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
-
+abstract class AbstractFormatTestCase extends MinimalContainerTestCase
+{
     use AssertsFixtureRenderingTrait;
 
     /**
@@ -36,8 +36,9 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function htmlProvider(): array {
-        return $this->makeDataProvider('getHtml', 'HTML');
+    public function htmlProvider(): array
+    {
+        return $this->makeDataProvider("getHtml", "HTML");
     }
 
     /**
@@ -49,13 +50,10 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @dataProvider htmlProvider
      */
-    public function testRenderHtml(string $input, string $expectedOutput, string $errorMessage) {
+    public function testRenderHtml(string $input, string $expectedOutput, string $errorMessage)
+    {
         $format = $this->prepareFormatter();
-        $this->assertHtmlStringEqualsHtmlString(
-            $expectedOutput,
-            $format->renderHTML($input),
-            $errorMessage
-        );
+        $this->assertHtmlStringEqualsHtmlString($expectedOutput, $format->renderHTML($input), $errorMessage);
     }
 
     /**
@@ -63,8 +61,9 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function excerptProvider(): array {
-        return $this->makeDataProvider('getExcerpt', 'Excerpt');
+    public function excerptProvider(): array
+    {
+        return $this->makeDataProvider("getExcerpt", "Excerpt");
     }
 
     /**
@@ -76,13 +75,10 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @dataProvider excerptProvider
      */
-    public function testRenderExcerpt(string $input, string $expectedOutput, string $errorMessage) {
+    public function testRenderExcerpt(string $input, string $expectedOutput, string $errorMessage)
+    {
         $format = $this->prepareFormatter();
-        $this->assertEquals(
-            trim($expectedOutput),
-            $format->renderExcerpt($input),
-            $errorMessage
-        );
+        $this->assertEquals(trim($expectedOutput), $format->renderExcerpt($input), $errorMessage);
     }
 
     /**
@@ -90,8 +86,9 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function plainTextProvider(): array {
-        return $this->makeDataProvider('getText', 'Plain Text');
+    public function plainTextProvider(): array
+    {
+        return $this->makeDataProvider("getText", "Plain Text");
     }
 
     /**
@@ -103,7 +100,8 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @dataProvider plainTextProvider
      */
-    public function testRenderPlainText(string $input, string $expectedOutput, string $errorMessage) {
+    public function testRenderPlainText(string $input, string $expectedOutput, string $errorMessage)
+    {
         $format = $this->prepareFormatter();
         $this->assertEquals(
             trim($expectedOutput), // We can have extra trailing whitespace from our IDE.
@@ -117,8 +115,9 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function quoteProvider(): array {
-        return $this->makeDataProvider('getQuote', 'Quote');
+    public function quoteProvider(): array
+    {
+        return $this->makeDataProvider("getQuote", "Quote");
     }
 
     /**
@@ -130,13 +129,10 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @dataProvider quoteProvider
      */
-    public function testRenderQuote(string $input, string $expectedOutput, string $errorMessage) {
+    public function testRenderQuote(string $input, string $expectedOutput, string $errorMessage)
+    {
         $format = $this->prepareFormatter();
-        $this->assertHtmlStringEqualsHtmlString(
-            $expectedOutput,
-            $format->renderQuote($input),
-            $errorMessage
-        );
+        $this->assertHtmlStringEqualsHtmlString($expectedOutput, $format->renderQuote($input), $errorMessage);
     }
 
     /**
@@ -144,8 +140,9 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function headingsProvider(): array {
-        return $this->makeDataProvider('getHeadings', 'Headings');
+    public function headingsProvider(): array
+    {
+        return $this->makeDataProvider("getHeadings", "Headings");
     }
 
     /**
@@ -156,13 +153,11 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @dataProvider headingsProvider
      */
-    public function testParseHeadings(string $input, array $expectedOutput) {
+    public function testParseHeadings(string $input, array $expectedOutput)
+    {
         $format = $this->prepareFormatter();
         $headings = $format->parseHeadings($input);
-        $this->assertEquals(
-            json_encode($expectedOutput, JSON_PRETTY_PRINT),
-            json_encode($headings, JSON_PRETTY_PRINT)
-        );
+        $this->assertEquals(json_encode($expectedOutput, JSON_PRETTY_PRINT), json_encode($headings, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -170,8 +165,9 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function imageProvider(): array {
-        return $this->makeDataProvider('getImages', 'Images');
+    public function imageProvider(): array
+    {
+        return $this->makeDataProvider("getImages", "Images");
     }
 
     /**
@@ -182,7 +178,8 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @dataProvider imageProvider
      */
-    public function testParseImages(string $input, array $expectedOutput) {
+    public function testParseImages(string $input, array $expectedOutput)
+    {
         $format = $this->prepareFormatter();
         $images = $format->parseImages($input);
         $this->assertEquals($expectedOutput, $images);
@@ -193,8 +190,9 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function imageUrlProvider(): array {
-        return $this->makeDataProvider('getImageUrls', 'Images');
+    public function imageUrlProvider(): array
+    {
+        return $this->makeDataProvider("getImageUrls", "Images");
     }
 
     /**
@@ -205,13 +203,11 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @dataProvider imageUrlProvider
      */
-    public function testParseImageUrls(string $input, array $expectedOutput) {
+    public function testParseImageUrls(string $input, array $expectedOutput)
+    {
         $format = $this->prepareFormatter();
         $images = $format->parseImageUrls($input);
-        $this->assertEquals(
-            json_encode($expectedOutput, JSON_PRETTY_PRINT),
-            json_encode($images, JSON_PRETTY_PRINT)
-        );
+        $this->assertEquals(json_encode($expectedOutput, JSON_PRETTY_PRINT), json_encode($images, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -219,8 +215,9 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function attachmentProvider(): array {
-        return $this->makeDataProvider('getAttachments', 'attachments');
+    public function attachmentProvider(): array
+    {
+        return $this->makeDataProvider("getAttachments", "attachments");
     }
 
     /**
@@ -231,13 +228,11 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @dataProvider attachmentProvider
      */
-    public function testParseAttachments(string $input, array $expectedOutput) {
+    public function testParseAttachments(string $input, array $expectedOutput)
+    {
         $format = $this->prepareFormatter();
         $headings = $format->parseAttachments($input);
-        $this->assertEquals(
-            json_encode($expectedOutput, JSON_PRETTY_PRINT),
-            json_encode($headings, JSON_PRETTY_PRINT)
-        );
+        $this->assertEquals(json_encode($expectedOutput, JSON_PRETTY_PRINT), json_encode($headings, JSON_PRETTY_PRINT));
     }
 
     /**
@@ -245,8 +240,9 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function mentionsProvider(): array {
-        return $this->makeDataProvider('getMentions', 'Mentions');
+    public function mentionsProvider(): array
+    {
+        return $this->makeDataProvider("getMentions", "Mentions");
     }
 
     /**
@@ -257,29 +253,30 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @dataProvider mentionsProvider
      */
-    public function testParseMentions(string $input, array $expectedOutput) {
+    public function testParseMentions(string $input, array $expectedOutput)
+    {
         $format = $this->prepareFormatter();
-        $this->assertSame(
-            $expectedOutput,
-            $format->parseMentions($input)
-        );
+        $this->assertSame($expectedOutput, $format->parseMentions($input));
     }
 
     /**
      * Test parseImageUrls when the format is null.
      */
-    public function testParseImageUrlsNullFormat() {
-        $formatService =  self::container()->get(FormatService::class);
-        $result = $formatService->parseImageUrls('test content', null);
-        $this->assertEquals([], $result, 'NotFoundFormat::parseImageUrl returns an empty array');
+    public function testParseImageUrlsNullFormat()
+    {
+        $formatService = self::container()->get(FormatService::class);
+        $result = $formatService->parseImageUrls("test content", null);
+        $this->assertEquals([], $result, "NotFoundFormat::parseImageUrl returns an empty array");
     }
 
     /**
      * Test parseImageUrls excludes emojis.
      */
-    public function testParseImageUrlsExcludeEmojis() {
+    public function testParseImageUrlsExcludeEmojis()
+    {
         $formatService = $this->prepareFormatter();
-        $content = '<img class="emoji" src="http://dev.vanilla.localhost/resources/emoji/smile.png" title=":)" alt=":)" height="20">';
+        $content =
+            '<img class="emoji" src="http://dev.vanilla.localhost/resources/emoji/smile.png" title=":)" alt=":)" height="20">';
         $result = $formatService->parseImageUrls($content);
         $this->assertEquals([], $result);
     }
@@ -292,7 +289,8 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
      *
      * @return array
      */
-    private function makeDataProvider(string $methodToCall, string $renderType): array {
+    private function makeDataProvider(string $methodToCall, string $renderType): array
+    {
         $paramSets = [];
         $fixtures = $this->prepareFixtures();
         foreach ($fixtures as $fixture) {
@@ -301,7 +299,7 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase {
                 $paramSets[$fixture->getName()] = [
                     $fixture->getInput(),
                     $expected,
-                    "Failed asserting expected fixture output for $renderType fixture '{$fixture->getName()}'"
+                    "Failed asserting expected fixture output for $renderType fixture '{$fixture->getName()}'",
                 ];
             }
         }

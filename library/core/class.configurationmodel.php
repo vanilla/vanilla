@@ -17,8 +17,8 @@
  * and overridden for more complicated procedures related to different
  * configuration arrays.
  */
-class Gdn_ConfigurationModel {
-
+class Gdn_ConfigurationModel
+{
     /**
      * @var string The name of the configuration array that this model is intended to
      * represent. The default value assigned to $this->Name will be the name
@@ -45,8 +45,9 @@ class Gdn_ConfigurationModel {
      * @param string $ConfigurationArrayName The name of the configuration array that is being manipulated.
      * @param object $validation
      */
-    public function __construct($validation) {
-        $this->Name = 'Configuration';
+    public function __construct($validation)
+    {
+        $this->Name = "Configuration";
         $this->Data = [];
         $this->Validation = $validation;
     }
@@ -57,7 +58,8 @@ class Gdn_ConfigurationModel {
      *
      * @param mixed $fieldName The name of the field (or array of field names) to ensure.
      */
-    public function setField($fieldName) {
+    public function setField($fieldName)
+    {
         $config = Gdn::factory(Gdn::AliasConfig);
         if (is_array($fieldName) === false) {
             $fieldName = [$fieldName];
@@ -66,7 +68,7 @@ class Gdn_ConfigurationModel {
         foreach ($fieldName as $index => $value) {
             if (is_numeric($index)) {
                 $nameKey = $value;
-                $default = '';
+                $default = "";
             } else {
                 $nameKey = $index;
                 $default = $value;
@@ -89,7 +91,8 @@ class Gdn_ConfigurationModel {
      * @param mixed $fieldName The name of the field (or array of field names) to save.
      * @param mixed $fieldValue The value of FieldName to be saved.
      */
-    public function forceSetting($fieldName, $fieldValue) {
+    public function forceSetting($fieldName, $fieldValue)
+    {
         $this->_ForceSettings[$fieldName] = $fieldValue;
     }
 
@@ -102,12 +105,13 @@ class Gdn_ConfigurationModel {
      *
      * @param array $array The array to be normalized.
      */
-    private function normalizeArray($array) {
+    private function normalizeArray($array)
+    {
         $return = [];
         foreach ($array as $key => $value) {
             if (is_array($value) === true && array_key_exists(0, $value) === false) {
                 foreach ($value as $k => $v) {
-                    $return[$key.'.'.$k] = $v;
+                    $return[$key . "." . $k] = $v;
                 }
             } else {
                 $return[$key] = $value;
@@ -123,7 +127,8 @@ class Gdn_ConfigurationModel {
      * @param array $formPostValues An associative array of $Field => $Value pairs that represent data posted
      * from the form in the $_POST or $_GET collection.
      */
-    public function save($formPostValues, $live = false) {
+    public function save($formPostValues, $live = false)
+    {
         $config = \Gdn::config();
         // Fudge your way through the schema application. This will allow me to
         // force the validation object to expect the fieldnames contained in
@@ -131,10 +136,10 @@ class Gdn_ConfigurationModel {
         $schema = [];
         foreach ($this->Data as $property => $value) {
             $schema[$property] = [
-                'AutoIncrement' => false,
-                'AllowNull' => true,
-                'Type' => is_array($value) ? 'array' : 'text',
-                'Length' => ''
+                "AutoIncrement" => false,
+                "AllowNull" => true,
+                "Type" => is_array($value) ? "array" : "text",
+                "Length" => "",
             ];
         }
 
@@ -167,7 +172,8 @@ class Gdn_ConfigurationModel {
      * @param string $formPostValues
      * @return bool
      */
-    public function validate($formPostValues) {
+    public function validate($formPostValues)
+    {
         $this->Validation->setSchema($this->Data);
         // Validate the form posted values
         return $this->Validation->validate($formPostValues);
@@ -176,7 +182,8 @@ class Gdn_ConfigurationModel {
     /**
      * Returns the $this->Validation->validationResults() array.
      */
-    public function validationResults() {
+    public function validationResults()
+    {
         return $this->Validation->results();
     }
 }

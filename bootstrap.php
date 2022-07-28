@@ -32,6 +32,8 @@ use Vanilla\Models\SiteMeta;
 use Vanilla\Models\TrustedDomainModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\PlainTextLengthValidator;
+use Vanilla\Scheduler\DeferredScheduler;
+use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Search\AbstractSearchDriver;
 use Vanilla\Search\GlobalSearchType;
 use Vanilla\Search\SearchService;
@@ -53,7 +55,9 @@ use Vanilla\Widgets\TabWidgetModule;
 use Vanilla\Widgets\TabWidgetTabService;
 use Vanilla\Widgets\WidgetService;
 
-if (!defined('APPLICATION')) exit();
+if (!defined("APPLICATION")) {
+    exit();
+}
 /**
  * Bootstrap.
  *
@@ -64,7 +68,7 @@ if (!defined('APPLICATION')) exit();
  */
 
 // Guard against broken cache files.
-if (!class_exists('Gdn')) {
+if (!class_exists("Gdn")) {
     // Throwing an exception here would result in a white screen for the user.
     // This error usually indicates the .ini files in /cache are out of date and should be deleted.
     exit("Class Gdn not found.");
@@ -79,9 +83,9 @@ Gdn::setContainer($dic);
 $dic->setInstance(Container::class, $dic)
 
     // Configuration
-    ->rule('Gdn_Configuration')
+    ->rule("Gdn_Configuration")
     ->setShared(true)
-    ->addAlias('Config')
+    ->addAlias("Config")
     ->addAlias(Contracts\ConfigurationInterface::class)
 
     ->rule(Contracts\Site\AbstractSiteProvider::class)
@@ -93,55 +97,59 @@ $dic->setInstance(Container::class, $dic)
 
     // Site sections
     ->rule(\Vanilla\Site\SiteSectionModel::class)
-    ->addCall('addProvider', [new Reference(SingleSiteSectionProvider::class)])
+    ->addCall("addProvider", [new Reference(SingleSiteSectionProvider::class)])
     ->setShared(true)
 
     // Translation model
     ->rule(\Vanilla\Site\TranslationModel::class)
-    ->addCall('addProvider', [new Reference(\Vanilla\Site\TranslationProvider::class)])
+    ->addCall("addProvider", [new Reference(\Vanilla\Site\TranslationProvider::class)])
     ->setShared(true)
 
     // Site applications
     ->rule(\Vanilla\Contracts\Site\ApplicationProviderInterface::class)
     ->setClass(\Vanilla\Site\ApplicationProvider::class)
-    ->addCall('add', [new Reference(
-        \Vanilla\Site\Application::class,
-        ['garden', ['api', 'entry', 'sso', 'utility', 'robots.txt', 'robots']]
-    )])
+    ->addCall("add", [
+        new Reference(\Vanilla\Site\Application::class, [
+            "garden",
+            ["api", "entry", "sso", "utility", "robots.txt", "robots"],
+        ]),
+    ])
     ->setShared(true)
 
     // ApplicationManager
-    ->rule('Gdn_ApplicationManager')
+    ->rule("Gdn_ApplicationManager")
     ->setShared(true)
-    ->addAlias('ApplicationManager')
+    ->addAlias("ApplicationManager")
 
     ->rule(Garden\Web\Cookie::class)
     ->setShared(true)
-    ->addCall('setPrefix', [ContainerUtils::config('Garden.Cookie.Name', 'Vanilla')])
-    ->addCall('setSecure', [new \Garden\Container\Callback(function (\Psr\Container\ContainerInterface $container) {
-        $config = $container->get(Gdn_Configuration::class);
-        $request = $container->get(\Garden\Web\RequestInterface::class);
-        $secure = $config->get('Garden.ForceSSL') && $request->getScheme() === 'https';
-        return $secure;
-    })])
-    ->addAlias('Cookie')
+    ->addCall("setPrefix", [ContainerUtils::config("Garden.Cookie.Name", "Vanilla")])
+    ->addCall("setSecure", [
+        new \Garden\Container\Callback(function (\Psr\Container\ContainerInterface $container) {
+            $config = $container->get(Gdn_Configuration::class);
+            $request = $container->get(\Garden\Web\RequestInterface::class);
+            $secure = $config->get("Garden.ForceSSL") && $request->getScheme() === "https";
+            return $secure;
+        }),
+    ])
+    ->addAlias("Cookie")
 
     // PluginManager
-    ->rule('Gdn_PluginManager')
+    ->rule("Gdn_PluginManager")
     ->setShared(true)
-    ->addAlias('PluginManager')
+    ->addAlias("PluginManager")
 
     ->rule(SsoUtils::class)
     ->setShared(true)
 
     // ThemeManager
-    ->rule('Gdn_ThemeManager')
+    ->rule("Gdn_ThemeManager")
     ->setShared(true)
-    ->addAlias('ThemeManager')
+    ->addAlias("ThemeManager")
 
     // File base theme api provider
     ->rule(\Vanilla\Theme\ThemeService::class)
-        ->addCall("addVariableProvider", [new Reference(QuickLinksVariableProvider::class)])
+    ->addCall("addVariableProvider", [new Reference(QuickLinksVariableProvider::class)])
 
     ->rule(HttpCacheMiddleware::class)
     ->setShared(true)
@@ -155,125 +163,124 @@ $dic->setInstance(Container::class, $dic)
     ->setShared(true)
 
     ->rule(\Vanilla\Logging\ResourceEventLogger::class)
-    ->addCall("includeAction", [
-        \Vanilla\Dashboard\Events\UserEvent::class,
-        '*',
-    ])
+    ->addCall("includeAction", [\Vanilla\Dashboard\Events\UserEvent::class, "*"])
     ->setShared(true)
 
     // Locale
-    ->rule('Gdn_Locale')
+    ->rule("Gdn_Locale")
     ->setShared(true)
-    ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Garden.Locale'])])
-    ->addAlias('Locale')
+    ->setConstructorArgs([new Reference(["Gdn_Configuration", "Garden.Locale"])])
+    ->addAlias("Locale")
 
     ->rule(Contracts\LocaleInterface::class)
     ->setAliasOf(Gdn_Locale::class)
     ->setShared(true)
 
     // Request
-    ->rule('Gdn_Request')
+    ->rule("Gdn_Request")
     ->setShared(true)
-    ->addCall('fromEnvironment')
-    ->addAlias('Request')
+    ->addCall("fromEnvironment")
+    ->addAlias("Request")
     ->addAlias(\Garden\Web\RequestInterface::class)
 
     ->rule(UASnifferInterface::class)
     ->setClass(UASniffer::class)
 
     // Database.
-    ->rule('Gdn_Database')
+    ->rule("Gdn_Database")
     ->setShared(true)
-    ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Database'])])
-    ->addAlias('Database')
+    ->setConstructorArgs([new Reference(["Gdn_Configuration", "Database"])])
+    ->addAlias("Database")
 
-    ->rule('Gdn_DatabaseStructure')
-    ->setClass('Gdn_MySQLStructure')
+    ->rule("Gdn_DatabaseStructure")
+    ->setClass("Gdn_MySQLStructure")
     ->addCall("setFullTextIndexingEnabled", [new Reference(["Gdn_Configuration", "Database.FullTextIndexing"])])
     ->setShared(true)
     ->addAlias(Gdn::AliasDatabaseStructure)
-    ->addAlias('MySQLStructure')
+    ->addAlias("MySQLStructure")
 
-    ->rule('Gdn_SQLDriver')
-    ->setClass('Gdn_MySQLDriver')
+    ->rule("Gdn_SQLDriver")
+    ->setClass("Gdn_MySQLDriver")
     ->setShared(true)
-    ->addAlias('Gdn_MySQLDriver')
-    ->addAlias('MySQLDriver')
+    ->addAlias("Gdn_MySQLDriver")
+    ->addAlias("MySQLDriver")
     ->addAlias(Gdn::AliasSqlDriver)
 
-    ->rule('Identity')
-    ->setClass('Gdn_CookieIdentity')
+    ->rule("Identity")
+    ->setClass("Gdn_CookieIdentity")
     ->setShared(true)
 
-    ->rule('Gdn_Session')
+    ->rule("Gdn_Session")
     ->setShared(true)
-    ->addAlias('Session')
+    ->addAlias("Session")
 
     ->rule(Gdn::AliasAuthenticator)
-    ->setClass('Gdn_Auth')
+    ->setClass("Gdn_Auth")
     ->setShared(true)
 
-    ->rule('Gdn_Router')
+    ->rule("Gdn_Router")
     ->addAlias(Gdn::AliasRouter)
     ->setShared(true)
 
     ->rule(\Vanilla\Web\Asset\DeploymentCacheBuster::class)
     ->setShared(true)
     ->setConstructorArgs([
-        'deploymentTime' => ContainerUtils::config('Garden.Deployed')
+        "deploymentTime" => ContainerUtils::config("Garden.Deployed"),
     ])
 
     ->rule(\Vanilla\Web\Asset\AssetPreloadModel::class)
     ->setShared(true)
 
     ->rule(\Vanilla\Web\Asset\WebpackAssetProvider::class)
-    ->addCall('setHotReloadEnabled', [
-        ContainerUtils::config('HotReload.Enabled'),
-    ])
-    ->addCall('setLocaleKey', [ContainerUtils::currentLocale()])
-    ->addCall('setCacheBusterKey', [ContainerUtils::cacheBuster()])
+    ->addCall("setHotReloadEnabled", [ContainerUtils::config("HotReload.Enabled")])
+    ->addCall("setLocaleKey", [ContainerUtils::currentLocale()])
+    ->addCall("setCacheBusterKey", [ContainerUtils::cacheBuster()])
     // Explicitly cannot be set as shared.
     // If instantiated too early, then the request/site sections will not be processed yet.
     ->setShared(false)
 
     ->rule(\Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel::class)
     ->setShared(true)
-    ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider::class)])
-    ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\EmbedWhitelistContentSecurityPolicyProvider::class)])
-    ->addCall('addProvider', [new Reference(\Vanilla\Web\ContentSecurityPolicy\VanillaWhitelistContentSecurityPolicyProvider::class)])
-    ->addCall('addProvider', [new Reference(\Vanilla\Web\Asset\WebpackContentSecurityPolicyProvider::class)])
+    ->addCall("addProvider", [
+        new Reference(\Vanilla\Web\ContentSecurityPolicy\DefaultContentSecurityPolicyProvider::class),
+    ])
+    ->addCall("addProvider", [
+        new Reference(\Vanilla\Web\ContentSecurityPolicy\EmbedWhitelistContentSecurityPolicyProvider::class),
+    ])
+    ->addCall("addProvider", [
+        new Reference(\Vanilla\Web\ContentSecurityPolicy\VanillaWhitelistContentSecurityPolicyProvider::class),
+    ])
+    ->addCall("addProvider", [new Reference(\Vanilla\Web\Asset\WebpackContentSecurityPolicyProvider::class)])
 
     ->rule(\Vanilla\Web\Asset\LegacyAssetModel::class)
     ->setConstructorArgs([ContainerUtils::cacheBuster()])
 
-    ->rule('@view-application/json')
+    ->rule("@view-application/json")
     ->setClass(\Vanilla\Web\JsonView::class)
     ->setShared(true)
 
     ->rule("@baseUrl")
     ->setFactory(function (Gdn_Request $request) {
-        return $request->getSimpleUrl('');
+        return $request->getSimpleUrl("");
     })
 
     ->rule(\Vanilla\Web\SystemTokenUtils::class)
-    ->setConstructorArgs([
-        ContainerUtils::config("Context.Secret", "")
-    ])
+    ->setConstructorArgs([ContainerUtils::config("Context.Secret", "")])
     ->setShared(true)
 
     ->rule(\Vanilla\Web\RoleTokenFactory::class)
     ->setShared(true)
 
     ->rule(\Vanilla\OpenAPIBuilder::class)
-    ->addCall('addFilter', ['filter' => new Reference('@apiexpand-filter')])
+    ->addCall("addFilter", ["filter" => new Reference("@apiexpand-filter")])
 
-    ->rule('@apiexpand-filter')
-    ->setFactory([\Vanilla\Web\APIExpandMiddleware::class, 'filterOpenAPIFactory'])
+    ->rule("@apiexpand-filter")
+    ->setFactory([\Vanilla\Web\APIExpandMiddleware::class, "filterOpenAPIFactory"])
 
     ->rule(\Garden\ClassLocator::class)
     ->setClass(\Vanilla\VanillaClassLocator::class)
 
-    ->rule('Gdn_Model')
+    ->rule("Gdn_Model")
     ->setShared(true)
 
     ->rule(Model::class)
@@ -289,56 +296,56 @@ $dic->setInstance(Container::class, $dic)
     ->setShared(true)
 
     ->rule(LayoutViewModel::class)
-    ->addCall('addProvider', [new Reference(GlobalRecordProvider::class)])
+    ->addCall("addProvider", [new Reference(GlobalRecordProvider::class)])
     ->setShared(true)
 
     ->rule(LayoutViewModel::class)
-    ->addCall('addProvider', [new Reference(CategoryRecordProvider::class)])
+    ->addCall("addProvider", [new Reference(CategoryRecordProvider::class)])
     ->setShared(true)
 
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)
-    ->addCall('registerAuthenticatorClass', [\Vanilla\Authenticator\PasswordAuthenticator::class])
+    ->addCall("registerAuthenticatorClass", [\Vanilla\Authenticator\PasswordAuthenticator::class])
 
     ->rule(SearchService::class)
     ->setShared(true)
-    ->addCall('registerActiveDriver', [new Reference(\Vanilla\Search\MysqlSearchDriver::class)])
+    ->addCall("registerActiveDriver", [new Reference(\Vanilla\Search\MysqlSearchDriver::class)])
     ->rule(AbstractSearchDriver::class)
     ->setShared(true)
     ->rule(SearchTypeCollectorInterface::class)
-    ->addCall('registerSearchType', [new Reference(GlobalSearchType::class)])
+    ->addCall("registerSearchType", [new Reference(GlobalSearchType::class)])
     ->setInherit(true)
 
     ->rule(WidgetService::class)
-    ->addCall('registerWidget', [TabWidgetModule::class])
+    ->addCall("registerWidget", [TabWidgetModule::class])
     ->setShared(true)
 
     ->rule(TabWidgetTabService::class)
     ->setShared(true)
 
-    ->rule('Gdn_IPlugin')
+    ->rule("Gdn_IPlugin")
     ->setShared(true)
 
     ->rule(Gdn_Plugin::class)
     ->setShared(true)
-    ->addCall('setAddonFromManager')
+    ->addCall("setAddonFromManager")
 
-    ->rule('Gdn_Slice')
+    ->rule("Gdn_Slice")
     ->setShared(true)
-    ->addAlias('Slice')
+    ->addAlias("Slice")
 
-    ->rule('Gdn_Statistics')
-    ->addAlias('Statistics')
-    ->setShared(true)
-
-    ->rule('Gdn_Regarding')
+    ->rule("Gdn_Statistics")
+    ->addAlias("Statistics")
     ->setShared(true)
 
-    ->rule('BBCodeFormatter')
-    ->setClass('BBCode')
+    ->rule("Gdn_Regarding")
     ->setShared(true)
 
-    ->rule('HtmlFormatter')
+    ->rule("BBCodeFormatter")
+    ->setClass("BBCode")
+    ->setShared(true)
+
+    ->rule("HtmlFormatter")
     ->setClass(VanillaHtmlFormatter::class)
     ->setShared(true)
 
@@ -346,23 +353,23 @@ $dic->setInstance(Container::class, $dic)
     ->setShared(true)
 
     ->rule(\Vanilla\Formatting\Quill\Parser::class)
-    ->addCall('addCoreBlotsAndFormats')
+    ->addCall("addCoreBlotsAndFormats")
     ->setShared(true)
 
-    ->rule('Smarty')
+    ->rule("Smarty")
     ->setShared(true)
 
     ->rule(\Vanilla\Web\Pagination\WebLinking::class)
     ->setShared(true)
 
-    ->rule('ViewHandler.tpl')
-    ->setClass('Gdn_Smarty')
+    ->rule("ViewHandler.tpl")
+    ->setClass("Gdn_Smarty")
     ->setShared(true)
 
-    ->rule('ViewHandler.php')
+    ->rule("ViewHandler.php")
     ->setShared(true)
 
-    ->rule('ViewHandler.twig')
+    ->rule("ViewHandler.twig")
     ->setClass(\Vanilla\Web\LegacyTwigViewHandler::class)
     ->setShared(true)
 
@@ -370,45 +377,42 @@ $dic->setInstance(Container::class, $dic)
     ->setShared(true)
 
     ->rule(TwigEnhancer::class)
-    ->addCall('setCompileCacheDirectory', [PATH_CACHE . '/twig'])
+    ->addCall("setCompileCacheDirectory", [PATH_CACHE . "/twig"])
     ->setShared(true)
 
-    ->rule('Gdn_Form')
-    ->addAlias('Form')
-
-    ->rule(\Emoji::class)
-    ->setShared(true)
+    ->rule("Gdn_Form")
+    ->addAlias("Form")
 
     ->rule(\Vanilla\EmbeddedContent\EmbedService::class)
-    ->addCall('addCoreEmbeds')
+    ->addCall("addCoreEmbeds")
     ->setShared(true)
 
     ->rule(\Vanilla\EmbeddedContent\Factories\ScrapeEmbedFactory::class)
-    ->setConstructorArgs(['httpClient' => new Reference('@scrape-http-client')])
-    ->rule('@scrape-http-client')
+    ->setConstructorArgs(["httpClient" => new Reference("@scrape-http-client")])
+    ->rule("@scrape-http-client")
     ->setClass(\Garden\Http\HttpClient::class)
     ->setConstructorArgs(["handler" => new Reference(Vanilla\Web\SafeCurlHttpHandler::class)])
-    ->addCall('addMiddleware', [new Reference(\Vanilla\Web\Middleware\CookiePassMiddleware::class)])
+    ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\CookiePassMiddleware::class)])
 
     ->rule(Vanilla\PageScraper::class)
-    ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
-    ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
+    ->addCall("registerMetadataParser", [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
+    ->addCall("registerMetadataParser", [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
     ->setShared(true)
 
     ->rule(UserLeaderService::class)
-    ->addCall('addProvider', [new Reference(UserPointsModel::class)])
+    ->addCall("addProvider", [new Reference(UserPointsModel::class)])
     ->setShared(true)
 
     ->rule(\Vanilla\PageScraper::class)
-    ->setConstructorArgs(['httpClient' => new Reference('@scrape-http-client')])
-    ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
-    ->addCall('registerMetadataParser', [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
+    ->setConstructorArgs(["httpClient" => new Reference("@scrape-http-client")])
+    ->addCall("registerMetadataParser", [new Reference(Vanilla\Metadata\Parser\OpenGraphParser::class)])
+    ->addCall("registerMetadataParser", [new Reference(Vanilla\Metadata\Parser\JsonLDParser::class)])
 
     ->rule(Garden\Http\HttpClient::class)
     ->setConstructorArgs(["handler" => new Reference(Vanilla\Web\SafeCurlHttpHandler::class)])
 
     ->rule(Vanilla\Formatting\FormatService::class)
-    ->addCall('registerBuiltInFormats')
+    ->addCall("registerBuiltInFormats")
     ->setInherit(true)
     ->setShared(true)
 
@@ -431,21 +435,20 @@ $dic->setInstance(Container::class, $dic)
     ->setShared(true)
 
     ->rule(Vanilla\Scheduler\SchedulerInterface::class)
-    ->setClass(Vanilla\Scheduler\DummyScheduler::class)
-    ->addCall('addDriver', [Vanilla\Scheduler\Driver\LocalDriver::class])
-    ->addCall('setDispatchEventName', ['SchedulerDispatch'])
-    ->addCall('setDispatchedEventName', ['SchedulerDispatched'])
+    ->setClass(Vanilla\Scheduler\DeferredScheduler::class)
+    ->addAlias(DeferredScheduler::class)
+    ->addCall("addDriver", [Vanilla\Scheduler\Driver\LocalDriver::class])
     ->setShared(true)
 
     // Controller data preloading
     ->rule(Page::class)
     ->setInherit(true)
-    ->addCall('registerReduxActionProvider', ['provider' => new Reference(LocalePreloadProvider::class)])
-    ->addCall('registerReduxActionProvider', ['provider' => new Reference(CurrentUserPreloadProvider::class)])
+    ->addCall("registerReduxActionProvider", ["provider" => new Reference(LocalePreloadProvider::class)])
+    ->addCall("registerReduxActionProvider", ["provider" => new Reference(CurrentUserPreloadProvider::class)])
     ->rule(Gdn_Controller::class)
     ->setInherit(true)
-    ->addCall('registerReduxActionProvider', ['provider' => new Reference(LocalePreloadProvider::class)])
-    ->addCall('registerReduxActionProvider', ['provider' => new Reference(CurrentUserPreloadProvider::class)])
+    ->addCall("registerReduxActionProvider", ["provider" => new Reference(LocalePreloadProvider::class)])
+    ->addCall("registerReduxActionProvider", ["provider" => new Reference(CurrentUserPreloadProvider::class)])
 
     // Optimizations
     ->rule(ModelFactory::class)
@@ -476,8 +479,8 @@ $dic->setInstance(Container::class, $dic)
     ->setShared(true)
     ->rule(FormatConfig::class)
     ->setShared(true)
-;
-
+    ->rule(DiscussionStatusModel::class)
+    ->setShared(true);
 
 // Run through the bootstrap with dependencies.
 $dic->call(function (
@@ -487,10 +490,10 @@ $dic->call(function (
     Gdn_Request $request // remove later
 ) {
     // Load default baseline Garden configurations.
-    $config->load(PATH_CONF.'/config-defaults.php');
+    $config->load(PATH_CONF . "/config-defaults.php");
 
     // Load installation-specific configuration so that we know what apps are enabled.
-    $config->load($config->defaultPath(), 'Configuration', true);
+    $config->load($config->defaultPath(), "Configuration", true);
 
     /**
      * Bootstrap Early
@@ -499,15 +502,15 @@ $dic->call(function (
      * default config and the general and error functions. More control is possible
      * here, but some things have already been loaded and are immutable.
      */
-    if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
-        require_once PATH_CONF.'/bootstrap.early.php';
+    if (file_exists(PATH_CONF . "/bootstrap.early.php")) {
+        require_once PATH_CONF . "/bootstrap.early.php";
     }
 
     $config->caching(true);
-    debug($config->get('Debug', false));
+    debug($config->get("Debug", false));
 
-    set_error_handler([ErrorLogger::class, 'handleError'], E_ALL);
-    set_exception_handler('gdnExceptionHandler');
+    set_error_handler([ErrorLogger::class, "handleError"], E_ALL);
+    set_exception_handler("gdnExceptionHandler");
 
     /**
      * Installer Redirect
@@ -515,8 +518,8 @@ $dic->call(function (
      * If Garden is not yet installed, force the request to /dashboard/setup and
      * begin installation.
      */
-    if ($config->get('Garden.Installed', false) === false && strpos($request->path(), 'setup') === false) {
-        safeHeader('Location: '.$request->url('dashboard/setup', true));
+    if ($config->get("Garden.Installed", false) === false && strpos($request->path(), "setup") === false) {
+        safeHeader("Location: " . $request->url("dashboard/setup", true));
         exit();
     }
 
@@ -528,13 +531,13 @@ $dic->call(function (
      */
 
     // Start the addons, plugins, and applications.
-    $addonManager->startAddonsByKey($config->get('EnabledPlugins'), Addon::TYPE_ADDON);
-    $addonManager->startAddonsByKey($config->get('EnabledApplications'), Addon::TYPE_ADDON);
-    $addonManager->startAddonsByKey(array_keys($config->get('EnabledLocales', [])), Addon::TYPE_LOCALE);
+    $addonManager->startAddonsByKey($config->get("EnabledPlugins"), Addon::TYPE_ADDON);
+    $addonManager->startAddonsByKey($config->get("EnabledApplications"), Addon::TYPE_ADDON);
+    $addonManager->startAddonsByKey(array_keys($config->get("EnabledLocales", [])), Addon::TYPE_LOCALE);
 
     $currentTheme = $config->get(
         // Despite our default theme being responsive, older sites could be configured with a different mobile/desktop theme.
-        isMobile() ? 'Garden.MobileTheme' : 'Garden.Theme',
+        isMobile() ? "Garden.MobileTheme" : "Garden.Theme",
         ThemeService::FALLBACK_THEME_KEY
     );
     $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
@@ -547,8 +550,8 @@ $dic->call(function (
      * All configurations are loaded, as well as the Application, Plugin and Theme
      * managers.
      */
-    if (file_exists(PATH_CONF.'/bootstrap.late.php')) {
-        require_once PATH_CONF.'/bootstrap.late.php';
+    if (file_exists(PATH_CONF . "/bootstrap.late.php")) {
+        require_once PATH_CONF . "/bootstrap.late.php";
     }
 
     /**
@@ -573,12 +576,12 @@ $dic->call(function (
     /// Both of these should be considered "soft" deprecated.
     /// New addons should use AddonContainerRules to configure the application.
     ///
-    if ($eventManager->hasHandler('gdn_pluginManager_afterStart')) {
-        $eventManager->fire('gdn_pluginManager_afterStart', $dic->get(Gdn_PluginManager::class));
+    if ($eventManager->hasHandler("gdn_pluginManager_afterStart")) {
+        $eventManager->fire("gdn_pluginManager_afterStart", $dic->get(Gdn_PluginManager::class));
     }
 
     // Now that all of the events have been bound, fire an event that allows plugins to modify the container.
-    $eventManager->fire('container_init', $dic);
+    $eventManager->fire("container_init", $dic);
 });
 
 // Send out cookie headers.
@@ -596,15 +599,15 @@ register_shutdown_function(function () use ($dic) {
  */
 
 // Load the Garden locale system.
-$dic->get('Gdn_Locale');
+$dic->get("Gdn_Locale");
 
-require_once PATH_LIBRARY_CORE.'/functions.validation.php';
+require_once PATH_LIBRARY_CORE . "/functions.validation.php";
 
 // Configure JWT library to allow for five seconds of leeway.
 JWT::$leeway = 5;
 
 // Start Authenticators
-$dic->get('Authenticator')->startAuthenticator();
+$dic->get("Authenticator")->startAuthenticator();
 
 /**
  * Bootstrap After
@@ -613,15 +616,15 @@ $dic->get('Authenticator')->startAuthenticator();
  * chance to customize Garden's runtime environment before the actual request
  * is handled.
  */
-if (file_exists(PATH_ROOT.'/conf/bootstrap.after.php')) {
-    require_once PATH_ROOT.'/conf/bootstrap.after.php';
+if (file_exists(PATH_ROOT . "/conf/bootstrap.after.php")) {
+    require_once PATH_ROOT . "/conf/bootstrap.after.php";
 }
 
 // Include "Render" functions now - this way pluggables and custom confs can override them.
-require_once PATH_LIBRARY_CORE.'/functions.render.php';
+require_once PATH_LIBRARY_CORE . "/functions.render.php";
 
-if (!defined('CLIENT_NAME')) {
-    define('CLIENT_NAME', 'vanilla');
+if (!defined("CLIENT_NAME")) {
+    define("CLIENT_NAME", "vanilla");
 }
 
 register_shutdown_function(function () use ($dic) {
@@ -629,23 +632,30 @@ register_shutdown_function(function () use ($dic) {
         Gdn_Configuration $config,
         \Garden\EventManager $eventManager,
         \Psr\Log\LoggerInterface $log,
-        \Vanilla\Utility\Timers $timers
+        \Vanilla\Utility\Timers $timers,
+        SchedulerInterface $scheduler
     ) {
-        // Trigger SchedulerDispatch event
-        $eventManager->fire('SchedulerDispatch');
-
         // Logs timers
-        if ($config->get('trace.timers')) {
+        if ($config->get("trace.timers")) {
             $timers->stopAll();
-            $log->log(
-                \Psr\Log\LogLevel::INFO,
-                'elapsed: {request_elapsed_ms}ms, '.$timers->getLogFormatString(),
-                $timers->jsonSerialize() + [
-                    'request_elapsed_ms' => $_SERVER['REQUEST_TIME_FLOAT'] ? (int)((microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']) * 1000) : null,
-                    \Vanilla\Logger::FIELD_EVENT => 'app_timers',
-                    \Vanilla\Logger::FIELD_CHANNEL => \Vanilla\Logger::CHANNEL_SYSTEM,
-                ]
-            );
+            $timers->logAll($log, "app_timers");
+            $timers->reset();
+        }
+
+        // Flush our buffers and close the request.
+        $scheduler->finalizeRequest();
+
+        // Now this will continue running.
+        $timers->start("schedulerDispatch");
+        try {
+            $scheduler->dispatchJobs();
+        } finally {
+            $timers->stop("schedulerDispatch");
+            if ($config->get("trace.timers")) {
+                $timers->stopAll();
+                $timers->logAll($log, "scheduler_timers");
+                $timers->reset();
+            }
         }
     });
 });

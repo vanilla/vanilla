@@ -6,7 +6,7 @@
 import { Mixins } from "@library/styles/Mixins";
 import { singleLineEllipsis, styleUnit } from "@library/styles/styleHelpers";
 import { shadowHelper } from "@library/styles/shadowHelpers";
-import { percent, px } from "csx";
+import { color, percent, px } from "csx";
 import { css } from "@emotion/css";
 import { BorderType } from "@library/styles/styleHelpers";
 import { leaderboardVariables } from "@library/leaderboardWidget/LeaderboardWidget.variables";
@@ -48,8 +48,9 @@ export const leaderboardWidgetClasses = () => {
     const linkStyles = css({
         display: "flex",
         alignItems: "center",
+        ...Mixins.clickable.itemState(),
         ...Mixins.font({
-            color: vars.username.font.color,
+            color: vars.username.font.color ?? color(Mixins.clickable.itemState().color),
         }),
     });
 

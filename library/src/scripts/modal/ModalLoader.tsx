@@ -9,7 +9,7 @@ import { t } from "@library/utility/appUtils";
 import ModalSizes from "@library/modal/ModalSizes";
 import Loader from "@library/loaders/Loader";
 import { useHistory, useLocation } from "react-router";
-import LazyModal from "@library/modal/LazyModal";
+import Modal from "@library/modal/Modal";
 
 interface IProps {}
 
@@ -27,7 +27,7 @@ function ModalLoader(props: IProps) {
         history.push(location.state.lastLocation || "/kb");
     };
     return (
-        <LazyModal
+        <Modal
             isVisible={true}
             label={t("Loading Modal")}
             size={ModalSizes.FULL_SCREEN}
@@ -35,7 +35,7 @@ function ModalLoader(props: IProps) {
             elementToFocusOnExit={document.activeElement as HTMLElement}
         >
             <Loader />
-        </LazyModal>
+        </Modal>
     );
 }
 

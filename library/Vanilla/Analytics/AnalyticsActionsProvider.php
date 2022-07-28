@@ -15,8 +15,8 @@ use Vanilla\Web\JsInterpop\ReduxActionProviderInterface;
 /**
  * Action provider for analytics defaults.
  */
-class AnalyticsActionsProvider implements ReduxActionProviderInterface {
-
+class AnalyticsActionsProvider implements ReduxActionProviderInterface
+{
     /** @var Analytics\ClientInterface */
     private $analyticsClient;
 
@@ -25,25 +25,19 @@ class AnalyticsActionsProvider implements ReduxActionProviderInterface {
      *
      * @param Analytics\ClientInterface $analyticsClient
      */
-    public function __construct(Analytics\ClientInterface $analyticsClient = null) {
+    public function __construct(Analytics\ClientInterface $analyticsClient = null)
+    {
         $this->analyticsClient = $analyticsClient;
     }
 
     /**
      * Create redux actions for analytics config and analytics eventDefaults.
      */
-    public function createActions(): array {
+    public function createActions(): array
+    {
         $actions = [
-            new ReduxAction(
-                ActionConstants::GET_CONFIG,
-                new Data($this->analyticsClient->config()),
-                []
-            ),
-            new ReduxAction(
-                ActionConstants::GET_EVENT_DEFAULTS,
-                new Data($this->analyticsClient->eventDefaults()),
-                []
-            )
+            new ReduxAction(ActionConstants::GET_CONFIG, new Data($this->analyticsClient->config()), []),
+            new ReduxAction(ActionConstants::GET_EVENT_DEFAULTS, new Data($this->analyticsClient->eventDefaults()), []),
         ];
         return $actions;
     }

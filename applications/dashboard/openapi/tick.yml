@@ -4,6 +4,15 @@ paths:
     /tick:
         post:
             summary: Register a page view for statistical and analytical purpose.
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            oneOf:
+                                - $ref: "#/components/schemas/PageView"
+                                - $ref: "#/components/schemas/TrackableSearch"
+
+                required: true
             responses:
                 "201":
                     description: Success
@@ -11,3 +20,118 @@ paths:
                 - Statistics
 components:
     schemas:
+        PageView:
+            properties:
+                url:
+                    description: URL of page view to track for analytics
+                    minLength: 1
+                    type: string
+                referrer:
+                    description: URL of referrer
+                    type: string
+                type:
+                    description: The type of page view event (i.e. page_view, discussion_view)
+                    type: string
+                discussionID:
+                    description: The ID of a discussion to include in analytics
+                    type: integer
+            required:
+                - url
+            type: object
+        TrackableSearch:
+            properties:
+                type:
+                    description: The type of search event.
+                    minLength: 1
+                    type: string
+                    enum:
+                        - search
+                domain:
+                    description: The domain being searched.
+                    minLength: 1
+                    type: string
+                searchResults:
+                    description: The number of results returned by the search.
+                    type: integer
+                searchQuery:
+                    type: object
+                    properties:
+                        terms:
+                            description: The individual terms of the query.
+                            type: array
+                            items:
+                                type: string
+                        negativeTerms:
+                            description: The negative terms used in the query, if any.
+                            type: array
+                            items:
+                                type: string
+                        originalQuery:
+                            description: The query string.
+                            type: string
+                searchTypes:
+                    type: array
+                    items:
+                        type: string
+                page:
+                    description: The page of results returned.
+                    type: integer
+                title:
+                    description: Filter by title
+                    type: string
+                siteSection:
+                    $ref: "#/components/schemas/SiteSections"
+                source:
+                    description: The source being searched.
+                    type: object
+                    properties:
+                        key:
+                            type: string
+                        label:
+                            type: string
+                author:
+                    description: Author filters applied on the search.
+                    type: object
+                    properties:
+                        authorID:
+                            type: array
+                            items:
+                                type: integer
+                        authorName:
+                            type: array
+                            items:
+                                type: string
+                recordType:
+                    description: The type of records searched.
+                    type: array
+                    items:
+                        type: string
+                tag:
+                    description: Tag filters applied on the search.
+                    type: object
+                    properties:
+                        tagID:
+                            type: array
+                            items:
+                                type: integer
+                        tagName:
+                            type: array
+                            items:
+                                type: string
+                category:
+                    description: Category filters applied on the search.
+                    type: object
+                    properties:
+                        categoryID:
+                            type: array
+                            items:
+                                type: integer
+                        categoryName:
+                            type: array
+                            items:
+                                type: string
+            required:
+                - type
+                - domain
+                - searchResults
+                - searchQuery

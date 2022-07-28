@@ -12,8 +12,8 @@ use Garden\Http\HttpClient;
 /**
  * Defines interface for a source that produces data to be synchronized to a destination
  */
-interface SiteSyncProducerInterface {
-
+interface SiteSyncProducerInterface
+{
     /**
      * Perform any necessary setup on sync source prior to producing data to be synced from source to destination
      */

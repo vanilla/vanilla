@@ -13,17 +13,18 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests for DefaultSiteSection.
  */
-class DefaultSiteSectionTest extends MinimalContainerTestCase {
-
+class DefaultSiteSectionTest extends MinimalContainerTestCase
+{
     /**
      * Test that values are correctly pulled from the config.
      */
-    public function testPullsConfigValues() {
+    public function testPullsConfigValues()
+    {
         $expectedName = "test Expected title!!";
         $expectedLocale = "pt-br";
         $this->setConfigs([
-            'Garden.Title' => $expectedName,
-            'Garden.Locale' => $expectedLocale,
+            "Garden.Title" => $expectedName,
+            "Garden.Locale" => $expectedLocale,
         ]);
 
         /** @var DefaultSiteSection $section */

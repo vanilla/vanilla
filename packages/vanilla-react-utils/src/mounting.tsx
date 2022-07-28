@@ -73,7 +73,7 @@ function PortalManager() {
     );
 }
 
-function renderPortals(callback?: () => void) {
+export function renderPortals(callback?: () => void) {
     hasRendered = true;
     // Ensure we have our modal container.
     let container = document.getElementById(PORTAL_MANAGER_ID);

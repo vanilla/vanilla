@@ -13,10 +13,10 @@ use Garden\Web\Data;
 /**
  * Class WebLinking
  */
-class WebLinking {
-
+class WebLinking
+{
     const WEB_LINK_REGEX = '/<(?<link>[0-9a-zA-Z$-_.+!*\'(),:?=&%#]+)>;\s+rel="(?<rel>next|prev)"/i';
-    const HEADER_NAME = 'Link';
+    const HEADER_NAME = "Link";
 
     /** @var array */
     private $links = [];
@@ -33,14 +33,15 @@ class WebLinking {
      *
      * @return WebLinking
      */
-    public function addLink($rel, $uri, $attributes = []) {
+    public function addLink($rel, $uri, $attributes = [])
+    {
         if (empty($this->links[$rel])) {
             $this->links[$rel] = [];
         }
 
         $this->links[$rel][] = [
-            'uri' => $uri,
-            'attributes' => $attributes,
+            "uri" => $uri,
+            "attributes" => $attributes,
         ];
 
         return $this;
@@ -52,14 +53,15 @@ class WebLinking {
      * @param string $rel Link relation. Either an IANA registered type, or an absolute URL.
      * @param string $uri Target URI for the link.
      */
-    public function removeLink($rel, $uri = null) {
+    public function removeLink($rel, $uri = null)
+    {
         if (!isset($this->links[$rel])) {
             return;
         }
 
         if ($uri !== null) {
             $this->links[$rel] = array_filter($this->links[$rel], function ($element) use ($uri) {
-                return $element['uri'] !== $uri;
+                return $element["uri"] !== $uri;
             });
         } else {
             $this->links[$rel] = [];
@@ -75,24 +77,26 @@ class WebLinking {
      *
      * @return string|null
      */
-    public function getLinkHeader() {
+    public function getLinkHeader()
+    {
         $headerValue = $this->getLinkHeaderValue();
-        return $headerValue ? self::HEADER_NAME.': '.$headerValue : null;
+        return $headerValue ? self::HEADER_NAME . ": " . $headerValue : null;
     }
 
     /**
      * Get the link header value.
      */
-    public function getLinkHeaderValue(): string {
+    public function getLinkHeaderValue(): string
+    {
         $results = [];
 
         foreach ($this->links as $rel => $links) {
             foreach ($links as $data) {
-                $parameters = '';
-                foreach ($data['attributes'] as $param => $value) {
+                $parameters = "";
+                foreach ($data["attributes"] as $param => $value) {
                     $parameters .= "; $param=\"$value\"";
                 }
-                $results[] = "<{$data['uri']}>; rel=\"$rel\"$parameters";
+                $results[] = "<{$data["uri"]}>; rel=\"$rel\"$parameters";
             }
         }
 
@@ -103,7 +107,8 @@ class WebLinking {
      * Clear added links.
      * @return WebLinking
      */
-    public function clear() {
+    public function clear()
+    {
         $this->links = [];
         return $this;
     }
@@ -113,12 +118,13 @@ class WebLinking {
      *
      * @param Data $data
      */
-    public function setHeader(Data $data) {
+    public function setHeader(Data $data)
+    {
         $link = $data->getHeader(self::HEADER_NAME);
         if (empty($link)) {
             $link = $this->getLinkHeaderValue();
         } else {
-            $link .= ', '.$this->getLinkHeaderValue();
+            $link .= ", " . $this->getLinkHeaderValue();
         }
         $data->setHeader(self::HEADER_NAME, $link);
     }
@@ -135,27 +141,28 @@ class WebLinking {
      *     'next' => 'https://something.com/page/3
      * ]
      */
-    public static function parseLinkHeaders(string $header): array {
-        $segments = explode(',', $header);
+    public static function parseLinkHeaders(string $header): array
+    {
+        $segments = explode(",", $header);
         $result = [
-            'prev' => null,
-            'next' => null,
+            "prev" => null,
+            "next" => null,
         ];
         foreach ($segments as $segment) {
             $segment = trim($segment);
             preg_match(self::WEB_LINK_REGEX, $segment, $matches);
-            $link = $matches['link'] ?? null;
-            $rel = $matches['rel'] ?? null;
+            $link = $matches["link"] ?? null;
+            $rel = $matches["rel"] ?? null;
 
             if (!$link) {
                 // Badly formed.
                 continue;
             }
 
-            if ($rel === 'next') {
-                $result['next'] = $link;
-            } elseif ($rel === 'prev') {
-                $result['prev'] = $link;
+            if ($rel === "next") {
+                $result["next"] = $link;
+            } elseif ($rel === "prev") {
+                $result["prev"] = $link;
             }
         }
 

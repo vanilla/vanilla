@@ -6,14 +6,15 @@
 import React from "react";
 import { useUniqueID } from "@library/utility/idUtils";
 import { DashboardFormLabel, DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
-import classNames from "classnames";
 import { FormGroupContext } from "./DashboardFormGroupContext";
+import { cx } from "@emotion/css";
 
 interface IProps {
     label: React.ReactNode;
     description?: React.ReactNode;
     afterDescription?: React.ReactNode;
     labelType?: DashboardLabelType;
+    inputType?: string;
     tag?: keyof JSX.IntrinsicElements;
     children: React.ReactNode;
     isIndependant?: boolean; // Setting this resets the side margins.
@@ -25,7 +26,13 @@ export function DashboardFormGroup(props: IProps) {
     const labelID = inputID + "-label";
 
     return (
-        <Tag className={classNames("form-group", props.isIndependant && "row")}>
+        <Tag
+            className={cx(
+                "form-group",
+                { ["row"]: !!props.isIndependant },
+                { [`formGroup-${props.inputType}`]: !!props.inputType },
+            )}
+        >
             <FormGroupContext.Provider
                 value={{ inputID, labelID, labelType: props.labelType || DashboardLabelType.STANDARD }}
             >

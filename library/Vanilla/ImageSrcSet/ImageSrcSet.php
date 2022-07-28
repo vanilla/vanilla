@@ -10,7 +10,8 @@ namespace Vanilla\ImageSrcSet;
 /**
  * A serializable image srcset.
  */
-class ImageSrcSet implements \JsonSerializable {
+class ImageSrcSet implements \JsonSerializable
+{
     /** @var array */
     private $data;
 
@@ -21,14 +22,16 @@ class ImageSrcSet implements \JsonSerializable {
      * @param string $url
      * @return void
      */
-    public function addUrl(int $size, string $url): void {
+    public function addUrl(int $size, string $url): void
+    {
         $this->data[$size] = $url;
     }
 
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return $this->data;
     }
 }

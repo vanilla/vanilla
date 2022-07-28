@@ -22,6 +22,7 @@ export interface IResult {
     excerpt?: string;
     highlight?: string;
     image?: string;
+    imageSet?: string;
     attachments?: IAttachmentIcon[];
     location: ICrumb[] | string[];
     icon?: React.ReactNode;
@@ -30,15 +31,15 @@ export interface IResult {
 }
 
 export default function Result(props: IResult) {
-    const { name, className, meta, url, excerpt, image, attachments, icon, highlight } = props;
+    const { name, className, meta, url, excerpt, image, imageSet, attachments, icon, highlight } = props;
     const hasAttachments = !!(attachments && attachments.length > 0);
-    const showImage = !!image && !hasAttachments;
+    const showImage = (!!image || !!imageSet) && !hasAttachments;
     const hasMedia = hasAttachments || showImage;
     const classes = searchResultClasses();
 
     const media = hasMedia ? (
         showImage ? (
-            <ListItemMedia src={image!} alt={t("Thumbnail for: " + name)} />
+            <ListItemMedia src={image!} srcSet={imageSet} alt={t("Thumbnail for: " + name)} />
         ) : hasAttachments ? (
             <AttachmentIcons attachments={attachments!} />
         ) : null

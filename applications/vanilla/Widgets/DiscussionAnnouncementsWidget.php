@@ -10,50 +10,59 @@ namespace Vanilla\Forum\Widgets;
 use Garden\Schema\Schema;
 use Vanilla\Forum\Modules\AnnouncementWidgetModule;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Widgets\React\DefaultSectionTrait;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
  * Class DiscussionAnnouncementsWidget
  */
-class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule implements ReactWidgetInterface {
+class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule implements ReactWidgetInterface
+{
+    use DiscussionsWidgetSchemaTrait;
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetID(): string {
+    public static function getWidgetID(): string
+    {
         return "discussion.announcements";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Announcements";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getComponentName(): string {
-        // Temporarily this until we make a version supported grids and carousels.
-        return "DiscussionListModule";
+    public static function getComponentName(): string
+    {
+        return "DiscussionsWidget";
     }
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
+    public static function getWidgetIconPath(): string
+    {
         return "/applications/dashboard/design/images/widgetIcons/announcements.svg";
     }
 
     /**
      * @inheridoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         $schema = SchemaUtils::composeSchemas(
             parent::getWidgetSchema(),
-            self::containerOptionsSchema('containerOptions')
+            self::optionsSchema(),
+            self::containerOptionsSchema("containerOptions")
         );
+
         return $schema;
     }
 }

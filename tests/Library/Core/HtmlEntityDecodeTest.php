@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for htmlEntityDecode().
  */
 
-class HtmlEntityDecodeTest extends TestCase {
-
+class HtmlEntityDecodeTest extends TestCase
+{
     /**
      * Test {@link htmlEntityDecode() against several scenarios.
      *
@@ -24,7 +24,8 @@ class HtmlEntityDecodeTest extends TestCase {
      * @param string $expected The expected result.
      * @dataProvider provideTestHtmlEntityDecodeArrays
      */
-    public function testHtmlEntityDecode($testString, $testQuote_style, $testCharset, $expected) {
+    public function testHtmlEntityDecode($testString, $testQuote_style, $testCharset, $expected)
+    {
         $actual = htmlEntityDecode($testString, $testQuote_style, $testCharset);
         $this->assertSame($expected, $actual);
     }
@@ -34,32 +35,28 @@ class HtmlEntityDecodeTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestHtmlEntityDecodeArrays() {
+    public function provideTestHtmlEntityDecodeArrays()
+    {
         $r = [
-            'testWithDefaultSettings' => [
+            "testWithDefaultSettings" => [
                 "I'll &quot;walk&quot; the &lt;b&gt;dog&lt;/b&gt; now",
                 ENT_QUOTES,
-                'utf-8',
+                "utf-8",
                 "I'll \"walk\" the <b>dog</b> now",
             ],
-            'testWithDefaultSettings2' => [
+            "testWithDefaultSettings2" => [
                 "A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;",
                 ENT_QUOTES,
-                'utf-8',
+                "utf-8",
                 "A 'quote' is <b>bold</b>",
             ],
-            'testWithEntNoQuotes' => [
+            "testWithEntNoQuotes" => [
                 "A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;",
                 ENT_NOQUOTES,
-                'utf-8',
+                "utf-8",
                 "A 'quote' is <b>bold</b>",
             ],
-            'testWithHexCode' => [
-                '&#x20AC;',
-                ENT_QUOTES,
-                'utf-8',
-                '€',
-            ],
+            "testWithHexCode" => ["&#x20AC;", ENT_QUOTES, "utf-8", "€"],
         ];
 
         return $r;

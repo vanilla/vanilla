@@ -19,7 +19,8 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
 /**
  * Widget to spotlight a user.
  */
-class UserSpotlightModule extends AbstractReactModule implements InjectableInterface {
+class UserSpotlightModule extends AbstractReactModule implements InjectableInterface
+{
     use UserSpotlightWidgetTrait;
 
     /** @var string|null */
@@ -29,15 +30,15 @@ class UserSpotlightModule extends AbstractReactModule implements InjectableInter
     private $description = null;
 
     /** @var int */
-    private $userID;
-
+    private $userID = -1;
 
     /**
      * Get props for component
      *
      * @return array
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         $data = $this->getUserFragment($this->getUserID());
 
         if (is_null($data) || count($data) === 0) {
@@ -45,13 +46,13 @@ class UserSpotlightModule extends AbstractReactModule implements InjectableInter
         }
 
         $props = [];
-        $props['title'] = $this->getTitle();
-        $props['description'] = $this->getDescription();
-        $props['userInfo'] = $data;
+        $props["title"] = $this->getTitle();
+        $props["description"] = $this->getDescription();
+        $props["userInfo"] = $data;
         $props = $this->getSchema()->validate($props);
 
         // kludge containerOptions for the module
-        $props['containerOptions'] = ['borderType' => 'shadow'];
+        $props["containerOptions"] = ["borderType" => "shadow"];
 
         return $props;
     }
@@ -59,8 +60,9 @@ class UserSpotlightModule extends AbstractReactModule implements InjectableInter
     /**
      * @inheritdoc
      */
-    public static function getComponentName(): string {
-        return 'UserSpotlightWidget';
+    public static function getComponentName(): string
+    {
+        return "UserSpotlightWidget";
     }
 
     /**
@@ -68,12 +70,9 @@ class UserSpotlightModule extends AbstractReactModule implements InjectableInter
      *
      * @return Schema
      */
-    public static function getSchema(): Schema {
-        return Schema::parse([
-            'title:s?',
-            'description:s?',
-            'userInfo?' => new UserFragmentSchema(),
-        ]);
+    public static function getSchema(): Schema
+    {
+        return Schema::parse(["title:s?", "description:s?", "userInfo?" => new UserFragmentSchema()]);
     }
 
     /**
@@ -81,14 +80,16 @@ class UserSpotlightModule extends AbstractReactModule implements InjectableInter
      *
      * @return string|null
      */
-    public function getTitle(): ?string {
+    public function getTitle(): ?string
+    {
         return $this->title;
     }
 
     /**
      * @param string $title
      */
-    public function setTitle($title): void {
+    public function setTitle($title): void
+    {
         $this->title = $title;
     }
 
@@ -97,54 +98,60 @@ class UserSpotlightModule extends AbstractReactModule implements InjectableInter
      *
      * @return string|null
      */
-    public function getDescription(): ?string {
+    public function getDescription(): ?string
+    {
         return $this->description;
     }
 
     /**
      * @param string $description
      */
-    public function setDescription($description): void {
+    public function setDescription($description): void
+    {
         $this->description = $description;
     }
 
     /**
      * @inheritdoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "User Spotlight";
     }
 
     /**
      * @return int
      */
-    public function getUserID(): int {
+    public function getUserID(): int
+    {
         return $this->userID;
     }
 
     /**
      * @param int $userID
      */
-    public function setUserID(int $userID): void {
+    public function setUserID(int $userID): void
+    {
         $this->userID = $userID;
     }
 
     /**
      * @return Schema
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         return SchemaUtils::composeSchemas(
             self::getApiSchema(),
             Schema::parse([
-                'title:s?' => [
-                    'x-control' => SchemaForm::textBox(new FormOptions('Title', 'Set a custom title.'))
+                "title:s?" => [
+                    "x-control" => SchemaForm::textBox(new FormOptions("Title", "Set a custom title.")),
                 ],
-                'description:s?' => [
-                    'x-control' => SchemaForm::textBox(
-                        new FormOptions('Description', 'Set a custom description.'),
-                        'textarea'
-                    )
-                ]
+                "description:s?" => [
+                    "x-control" => SchemaForm::textBox(
+                        new FormOptions("Description", "Set a custom description."),
+                        "textarea"
+                    ),
+                ],
             ])
         );
     }

@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for sliceString().
  */
 
-class SliceStringTest extends TestCase {
-
+class SliceStringTest extends TestCase
+{
     /**
      * Test {@link sliceString against several scenarios.
      *
@@ -24,7 +24,8 @@ class SliceStringTest extends TestCase {
      * @param string $expected The expected result.
      * @dataProvider provideTestSliceStringArrays
      */
-    public function testSliceString($testString, $testLength, $testSuffix, $expected) {
+    public function testSliceString($testString, $testLength, $testSuffix, $expected)
+    {
         $actual = sliceString($testString, $testLength, $testSuffix);
         $this->assertSame($expected, $actual);
     }
@@ -34,25 +35,21 @@ class SliceStringTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestSliceStringArrays() {
+    public function provideTestSliceStringArrays()
+    {
         $r = [
-            'emptyString' => [
-                '',
-                2,
-                '…',
-                '',
-            ],
-            'typicalString' => [
-                'This is my string. There are other strings like it, but this one is mine.',
+            "emptyString" => ["", 2, "…", ""],
+            "typicalString" => [
+                "This is my string. There are other strings like it, but this one is mine.",
                 20,
-                '…',
-                'This is my string. …',
+                "…",
+                "This is my string. …",
             ],
-            'notLengthCondition' => [
-                'This is my string. There are other strings like it, but this one is mine.',
+            "notLengthCondition" => [
+                "This is my string. There are other strings like it, but this one is mine.",
                 0,
-                '…',
-                'This is my string. There are other strings like it, but this one is mine.',
+                "…",
+                "This is my string. There are other strings like it, but this one is mine.",
             ],
         ];
 

@@ -18,17 +18,17 @@ use Vanilla\AddonStructure;
 /**
  * Handles updating.
  */
-class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
-
+class UpdateModel extends Gdn_Model implements LoggerAwareInterface
+{
     use LoggerAwareTrait;
 
-    const STATUS_RUNNING = 'running';
-    const STATUS_SUCCESS = 'success';
-    const STATUS_ERROR = 'error';
+    const STATUS_RUNNING = "running";
+    const STATUS_SUCCESS = "success";
+    const STATUS_ERROR = "error";
 
     // TODO Remove when removing other deprecated functions!
     /** @var string URL to the addons site. */
-    public $AddonSiteUrl = 'http://vanilla.local';
+    public $AddonSiteUrl = "http://vanilla.local";
 
     /**
      * @var bool
@@ -45,8 +45,9 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @throws Gdn_UserException
      * @deprecated since 2.3
      */
-    public static function findFiles($path, $fileNames) {
-        deprecated(__CLASS__.'->'.__METHOD__.'()');
+    public static function findFiles($path, $fileNames)
+    {
+        deprecated(__CLASS__ . "->" . __METHOD__ . "()");
         // Get the list of potential files to analyze.
         if (is_dir($path)) {
             $entries = self::getInfoFiles($path, $fileNames);
@@ -63,33 +64,33 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @param $path The path to the addon directory
      * @return array The addon info array
      */
-    private static function addonJsonConverter($path) {
-
+    private static function addonJsonConverter($path)
+    {
         $addon = new Vanilla\Addon($path);
         $addonInfo = Gdn_PluginManager::calcOldInfoArray($addon);
-        $slug = trim(substr($path, strrpos($path, '/') + 1));
+        $slug = trim(substr($path, strrpos($path, "/") + 1));
 
-        $validTypes = ['application', 'plugin', 'theme', 'locale'];
+        $validTypes = ["application", "plugin", "theme", "locale"];
 
         // If the type is theme or locale then use that.
-        $type = val('Type', $addonInfo, 'addon');
+        $type = val("Type", $addonInfo, "addon");
 
         // If oldType is present then use that.
         if (!in_array($type, $validTypes)) {
-            $type = val('OldType', $addonInfo, false);
+            $type = val("OldType", $addonInfo, false);
         }
 
         // If priority is lower than Addon::PRIORITY_PLUGIN then its an application.
-        if (!in_array($type, $validTypes) && (val('Priority', $type, Addon::PRIORITY_HIGH) < Addon::PRIORITY_PLUGIN)) {
-            $type = 'application';
+        if (!in_array($type, $validTypes) && val("Priority", $type, Addon::PRIORITY_HIGH) < Addon::PRIORITY_PLUGIN) {
+            $type = "application";
         }
 
         // Otherwise, we got a plugin
         if (!in_array($type, $validTypes)) {
-            $type = 'plugin';
+            $type = "plugin";
         }
 
-        $addonInfo['Variable'] = ucfirst($type).'Info';
+        $addonInfo["Variable"] = ucfirst($type) . "Info";
         $info = [$slug => $addonInfo];
 
         return $info;
@@ -103,8 +104,9 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @return array An array of addon information.
      * @deprecated since 2.3
      */
-    public static function analyzeAddon($path, $throwError = true) {
-        deprecated(__CLASS__.'->'.__METHOD__.'()');
+    public static function analyzeAddon($path, $throwError = true)
+    {
+        deprecated(__CLASS__ . "->" . __METHOD__ . "()");
         if (!file_exists($path)) {
             if ($throwError) {
                 throw new Exception("$path not found.", 404);
@@ -116,32 +118,30 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
         $result = [];
 
         $infoPaths = [
-            '/addon.json', // addon
-            '/settings/about.php', // application
-            '/default.php', // plugin
-            '/class.*.plugin.php', // plugin
-            '/about.php', // theme
-            '/definitions.php', // locale
-            '/environment.php', // vanilla core
-            'vanilla2export.php' // porter
+            "/addon.json", // addon
+            "/settings/about.php", // application
+            "/default.php", // plugin
+            "/class.*.plugin.php", // plugin
+            "/about.php", // theme
+            "/definitions.php", // locale
+            "/environment.php", // vanilla core
+            "vanilla2export.php", // porter
         ];
 
         // Look for an addon.json file.
         if (file_exists("$path/addon.json")) {
-
             $info = self::addonJsonConverter($path);
 
             $entry = [
-                'Path' => $path,
-                'Name' => val('Name', $info[key($info)]),
-                'Base' => val('Key', $info[key($info)])
+                "Path" => $path,
+                "Name" => val("Name", $info[key($info)]),
+                "Base" => val("Key", $info[key($info)]),
             ];
 
             $result = self::checkAddon($info, $entry);
             if (empty($result)) {
                 $addon = self::buildAddon($info);
             }
-
         } else {
             // Get the list of potential files to analyze.
             if (is_dir($path)) {
@@ -153,9 +153,9 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
             }
 
             foreach ($entries as $entry) {
-                if ($entry['Name'] == '/environment.php') {
+                if ($entry["Name"] == "/environment.php") {
                     // This could be the core vanilla package.
-                    $version = self::parseCoreVersion($entry['Path']);
+                    $version = self::parseCoreVersion($entry["Path"]);
 
                     if (!$version) {
                         continue;
@@ -163,41 +163,45 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
 
                     // The application was confirmed.
                     $addon = [
-                        'AddonKey' => 'vanilla',
-                        'AddonTypeID' => ADDON_TYPE_CORE,
-                        'Name' => 'Vanilla',
-                        'Description' => 'Vanilla is a powerfully simple discussion forum you can easily customize to make as unique as your community.',
-                        'Version' => $version,
-                        'License' => 'GPLv2',
-                        'Path' => $entry['Path']];
+                        "AddonKey" => "vanilla",
+                        "AddonTypeID" => ADDON_TYPE_CORE,
+                        "Name" => "Vanilla",
+                        "Description" =>
+                            "Vanilla is a powerfully simple discussion forum you can easily customize to make as unique as your community.",
+                        "Version" => $version,
+                        "License" => "GPLv2",
+                        "Path" => $entry["Path"],
+                    ];
                     break;
-                } elseif ($entry['Name'] == 'vanilla2export.php') {
+                } elseif ($entry["Name"] == "vanilla2export.php") {
                     // This could be the vanilla porter.
-                    $version = self::parseCoreVersion($entry['Path']);
+                    $version = self::parseCoreVersion($entry["Path"]);
 
                     if (!$version) {
                         continue;
                     }
 
                     $addon = [
-                        'AddonKey' => 'porter',
-                        'AddonTypeID' => ADDON_TYPE_CORE,
-                        'Name' => 'Vanilla Porter',
-                        'Description' => 'Migrate your legacy forum to Vanilla for the first time. Drop this script in your existing site and navigate to it in your web browser to export your legacy forum data.',
-                        'Version' => $version,
-                        'License' => 'GPLv2',
-                        'Path' => $entry['Path']];
+                        "AddonKey" => "porter",
+                        "AddonTypeID" => ADDON_TYPE_CORE,
+                        "Name" => "Vanilla Porter",
+                        "Description" =>
+                            "Migrate your legacy forum to Vanilla for the first time. Drop this script in your existing site and navigate to it in your web browser to export your legacy forum data.",
+                        "Version" => $version,
+                        "License" => "GPLv2",
+                        "Path" => $entry["Path"],
+                    ];
                     break;
                 } else {
                     // Support for newer addon.json info.
-                    if ($entry['Name'] === '/addon.json') {
+                    if ($entry["Name"] === "/addon.json") {
                         // Build a relative path to addon.json.
-                        $addonDir = dirname($entry['Path']);
+                        $addonDir = dirname($entry["Path"]);
                         $addonDir = stringBeginsWith($addonDir, PATH_ROOT, false, true);
                         $info = self::addonJsonConverter($addonDir);
                     } else {
                         // This could be an addon.
-                        $info = self::parseInfoArray($entry['Path']);
+                        $info = self::parseInfoArray($entry["Path"]);
                     }
 
                     $result = self::checkAddon($info, $entry);
@@ -217,32 +221,29 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
 
         // Add the addon requirements.
         if (!empty($addon)) {
-            $requirements = arrayTranslate(
-                $addon,
-                [
-                    'RequiredApplications' => 'Applications',
-                    'RequiredPlugins' => 'Plugins',
-                    'RequiredThemes' => 'Themes',
-                    'Require' => 'Addons'
-                ]
-            );
+            $requirements = arrayTranslate($addon, [
+                "RequiredApplications" => "Applications",
+                "RequiredPlugins" => "Plugins",
+                "RequiredThemes" => "Themes",
+                "Require" => "Addons",
+            ]);
             foreach ($requirements as $type => $items) {
                 if (!is_array($items)) {
                     unset($requirements[$type]);
                 }
             }
-            $addon['Requirements'] = dbencode($requirements);
+            $addon["Requirements"] = dbencode($requirements);
 
-            $addon['Checked'] = true;
-            $addon['Path'] = $path;
-            $uploadsPath = PATH_UPLOADS.'/';
-            if (stringBeginsWith($addon['Path'], $uploadsPath)) {
-                $addon['File'] = substr($addon['Path'], strlen($uploadsPath));
+            $addon["Checked"] = true;
+            $addon["Path"] = $path;
+            $uploadsPath = PATH_UPLOADS . "/";
+            if (stringBeginsWith($addon["Path"], $uploadsPath)) {
+                $addon["File"] = substr($addon["Path"], strlen($uploadsPath));
             }
 
             if (is_file($path)) {
-                $addon['MD5'] = md5_file($path);
-                $addon['FileSize'] = filesize($path);
+                $addon["MD5"] = md5_file($path);
+                $addon["FileSize"] = filesize($path);
             }
         } elseif ($throwError) {
             $msg = implode("\n", $result);
@@ -261,39 +262,39 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      *     where addon-info is the addon's info array.
      * @return array The addon with the extra info included, or an empty array if $info is bad.
      */
-    private static function buildAddon($info) {
+    private static function buildAddon($info)
+    {
         if (!is_array($info) && count($info)) {
             return [];
         }
 
         $key = key($info);
-        $variable = $info['Variable'];
+        $variable = $info["Variable"];
         $info = $info[$key];
 
         // If there wasn't a "Variable" in the original $info, try the updated $info.
-        if (empty($variable) && array_key_exists('Variable', $info)) {
-            $variable = $info['Variable'];
+        if (empty($variable) && array_key_exists("Variable", $info)) {
+            $variable = $info["Variable"];
         }
 
-        $addon = array_merge(['AddonKey' => $key, 'AddonTypeID' => ''], $info);
+        $addon = array_merge(["AddonKey" => $key, "AddonTypeID" => ""], $info);
         switch ($variable) {
-            case 'ApplicationInfo':
-                $addon['AddonTypeID'] = ADDON_TYPE_APPLICATION;
+            case "ApplicationInfo":
+                $addon["AddonTypeID"] = ADDON_TYPE_APPLICATION;
                 break;
-            case 'LocaleInfo':
-                $addon['AddonTypeID'] = ADDON_TYPE_LOCALE;
+            case "LocaleInfo":
+                $addon["AddonTypeID"] = ADDON_TYPE_LOCALE;
                 break;
-            case 'PluginInfo':
-                $addon['AddonTypeID'] = ADDON_TYPE_PLUGIN;
+            case "PluginInfo":
+                $addon["AddonTypeID"] = ADDON_TYPE_PLUGIN;
                 break;
-            case 'ThemeInfo':
-                $addon['AddonTypeID'] = ADDON_TYPE_THEME;
+            case "ThemeInfo":
+                $addon["AddonTypeID"] = ADDON_TYPE_THEME;
                 break;
         }
 
         return $addon;
     }
-
 
     /**
      * Checks an addon. Returns a collection of errors in an array. If no errors exist, returns an empty array.
@@ -304,21 +305,22 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      *     for the addon name and the addon folder, respectively.
      * @return array The errors with the addon, or an empty array.
      */
-    private static function checkAddon($info, $entry) {
+    private static function checkAddon($info, $entry)
+    {
         $result = [];
 
         if (!is_array($info) && count($info)) {
-            return ['Could not parse addon info array.'];
+            return ["Could not parse addon info array."];
         }
 
         $key = key($info);
-        $variable = $info['Variable'];
+        $variable = $info["Variable"];
         $info = $info[$key];
 
         // Validate the addon.
-        $name = $entry['Name'];
-        if (!val('Name', $info)) {
-            $info['Name'] = $key;
+        $name = $entry["Name"];
+        if (!val("Name", $info)) {
+            $info["Name"] = $key;
         }
 
         // Validate basic fields.
@@ -328,7 +330,7 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
         }
 
         // Validate folder name matches key.
-        if (isset($entry['Base']) && strcasecmp($entry['Base'], $key) != 0 && $variable != 'ThemeInfo') {
+        if (isset($entry["Base"]) && strcasecmp($entry["Base"], $key) != 0 && $variable != "ThemeInfo") {
             $result[] = "$name: The addon's key is not the same as its folder name.";
         }
 
@@ -343,17 +345,18 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @return array
      * @deprecated since 2.3
      */
-    private static function getInfoFiles($path, $infoPaths) {
-        deprecated(__CLASS__.'->'.__METHOD__.'()');
-        $path = str_replace('\\', '/', rtrim($path));
+    private static function getInfoFiles($path, $infoPaths)
+    {
+        deprecated(__CLASS__ . "->" . __METHOD__ . "()");
+        $path = str_replace("\\", "/", rtrim($path));
 
         $result = [];
         // Check to see if the paths exist.
         foreach ($infoPaths as $infoPath) {
-            $glob = glob($path.$infoPath);
+            $glob = glob($path . $infoPath);
             if (is_array($glob)) {
                 foreach ($glob as $globPath) {
-                    $result[] = ['Name' => substr($globPath, strlen($path)), 'Path' => $globPath];
+                    $result[] = ["Name" => substr($globPath, strlen($path)), "Path" => $globPath];
                 }
             }
         }
@@ -372,13 +375,14 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @throws Exception
      * @deprecated since 2.3
      */
-    private static function getInfoZip($path, $infoPaths, $tmpPath = false, $throwError = true) {
-        deprecated(__CLASS__.'->'.__METHOD__.'()');
+    private static function getInfoZip($path, $infoPaths, $tmpPath = false, $throwError = true)
+    {
+        deprecated(__CLASS__ . "->" . __METHOD__ . "()");
         // Extract the zip file so we can make sure it has appropriate information.
         $zip = null;
         $zipOpened = false;
 
-        if (class_exists('ZipArchive', false)) {
+        if (class_exists("ZipArchive", false)) {
             $zip = new ZipArchive();
             $zipOpened = $zip->open($path);
             if ($zipOpened !== true) {
@@ -393,18 +397,26 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
 
         if ($zipOpened !== true) {
             if ($throwError) {
-                $errors = [ZipArchive::ER_EXISTS => 'ER_EXISTS', ZipArchive::ER_INCONS => 'ER_INCONS', ZipArchive::ER_INVAL => 'ER_INVAL',
-                    ZipArchive::ER_MEMORY => 'ER_MEMORY', ZipArchive::ER_NOENT => 'ER_NOENT', ZipArchive::ER_NOZIP => 'ER_NOZIP',
-                    ZipArchive::ER_OPEN => 'ER_OPEN', ZipArchive::ER_READ => 'ER_READ', ZipArchive::ER_SEEK => 'ER_SEEK'];
-                $error = val($zipOpened, $errors, 'Unknown Error');
+                $errors = [
+                    ZipArchive::ER_EXISTS => "ER_EXISTS",
+                    ZipArchive::ER_INCONS => "ER_INCONS",
+                    ZipArchive::ER_INVAL => "ER_INVAL",
+                    ZipArchive::ER_MEMORY => "ER_MEMORY",
+                    ZipArchive::ER_NOENT => "ER_NOENT",
+                    ZipArchive::ER_NOZIP => "ER_NOZIP",
+                    ZipArchive::ER_OPEN => "ER_OPEN",
+                    ZipArchive::ER_READ => "ER_READ",
+                    ZipArchive::ER_SEEK => "ER_SEEK",
+                ];
+                $error = val($zipOpened, $errors, "Unknown Error");
 
-                throw new Exception(t('Could not open addon file. Addons must be zip files.')." ($error)", 400);
+                throw new Exception(t("Could not open addon file. Addons must be zip files.") . " ($error)", 400);
             }
             return [];
         }
 
         if ($tmpPath === false) {
-            $tmpPath = dirname($path).'/'.basename($path, '.zip').'/';
+            $tmpPath = dirname($path) . "/" . basename($path, ".zip") . "/";
         }
 
         if (file_exists($tmpPath)) {
@@ -415,26 +427,30 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $entry = $zip->statIndex($i);
 
-            if (preg_match('#(\.\.[\\/])#', $entry['name'])) {
-                throw new Gdn_UserException("Invalid path in zip file: ".$entry['name']);
+            if (preg_match("#(\.\.[\\/])#", $entry["name"])) {
+                throw new Gdn_UserException("Invalid path in zip file: " . $entry["name"]);
             }
 
-            $name = '/'.ltrim($entry['name'], '/');
+            $name = "/" . ltrim($entry["name"], "/");
 
             foreach ($infoPaths as $infoPath) {
-                $preg = '`('.str_replace(['.', '*'], ['\.', '.*'], $infoPath).')$`';
+                $preg = "`(" . str_replace([".", "*"], ["\.", ".*"], $infoPath) . ')$`';
                 if (preg_match($preg, $name, $matches)) {
-                    $base = trim(substr($name, 0, -strlen($matches[1])), '/');
+                    $base = trim(substr($name, 0, -strlen($matches[1])), "/");
 
-                    if (strpos($base, '/') !== false) {
+                    if (strpos($base, "/") !== false) {
                         continue; // file nested too deep.
                     }
                     if (!file_exists($tmpPath)) {
                         mkdir($tmpPath, 0777, true);
                     }
 
-                    $zip->extractTo($tmpPath, $entry['name']);
-                    $result[] = ['Name' => $matches[1], 'Path' => $tmpPath.rtrim($entry['name'], '/'), 'Base' => $base];
+                    $zip->extractTo($tmpPath, $entry["name"]);
+                    $result[] = [
+                        "Name" => $matches[1],
+                        "Path" => $tmpPath . rtrim($entry["name"], "/"),
+                        "Base" => $base,
+                    ];
                 }
             }
         }
@@ -449,26 +465,27 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @return string A string containing the version or empty if the file could not be parsed.
      * @deprecated since 2.3
      */
-    public static function parseCoreVersion($path) {
-        deprecated(__CLASS__.'->'.__METHOD__.'()');
-        $fp = fopen($path, 'rb');
+    public static function parseCoreVersion($path)
+    {
+        deprecated(__CLASS__ . "->" . __METHOD__ . "()");
+        $fp = fopen($path, "rb");
         $application = false;
-        $version = '';
+        $version = "";
 
         while (($line = fgets($fp)) !== false) {
             if (preg_match("`define\\('(.*?)', '(.*?)'\\);`", $line, $matches)) {
                 $name = $matches[1];
                 $value = $matches[2];
                 switch ($name) {
-                    case 'APPLICATION':
+                    case "APPLICATION":
                         $application = $value;
                         break;
-                    case 'APPLICATION_VERSION':
+                    case "APPLICATION_VERSION":
                         $version = $value;
                 }
             }
 
-            if ($application !== false && $version !== '') {
+            if ($application !== false && $version !== "") {
                 break;
             }
         }
@@ -484,17 +501,18 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @return array|false The info array or false if the file could not be parsed.
      * @deprecated since 2.3
      */
-    public static function parseInfoArray($path, $variable = false) {
-        deprecated(__CLASS__.'->'.__METHOD__.'()');
-        $fp = fopen($path, 'rb');
+    public static function parseInfoArray($path, $variable = false)
+    {
+        deprecated(__CLASS__ . "->" . __METHOD__ . "()");
+        $fp = fopen($path, "rb");
         $lines = [];
         $inArray = false;
-        $globalKey = '';
+        $globalKey = "";
 
         // Get all of the lines in the info array.
         while (($line = fgets($fp)) !== false) {
             // Remove comments from the line.
-            $line = preg_replace('`\s//.*$`', '', $line);
+            $line = preg_replace('`\s//.*$`', "", $line);
             if (!$line) {
                 continue;
             }
@@ -505,7 +523,7 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
                     $globalKey = $matches[1];
                     $inArray = true;
                 }
-            } elseif ($inArray && stringEndsWith(trim($line), ';')) {
+            } elseif ($inArray && stringEndsWith(trim($line), ";")) {
                 break;
             } elseif ($inArray) {
                 $lines[] = trim($line);
@@ -521,13 +539,13 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
         $result = [];
         foreach ($lines as $line) {
             // Get the name from the line.
-            if (!preg_match('`[\'"](.+?)[\'"]\s*=>`', $line, $matches) || !substr($line, -1) == ',') {
+            if (!preg_match('`[\'"](.+?)[\'"]\s*=>`', $line, $matches) || !substr($line, -1) == ",") {
                 continue;
             }
             $key = $matches[1];
 
             // Strip the key from the line.
-            $line = trim(trim(substr(strstr($line, '=>'), 2)), ',');
+            $line = trim(trim(substr(strstr($line, "=>"), 2)), ",");
 
             if (strlen($line) == 0) {
                 continue;
@@ -536,19 +554,19 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
             $value = null;
             if (is_numeric($line)) {
                 $value = $line;
-            } elseif (strcasecmp($line, 'TRUE') == 0 || strcasecmp($line, 'FALSE') == 0)
+            } elseif (strcasecmp($line, "TRUE") == 0 || strcasecmp($line, "FALSE") == 0) {
                 $value = $line;
-            elseif (in_array($line[0], ['"', "'"]) && substr($line, -1) == $line[0]) {
+            } elseif (in_array($line[0], ['"', "'"]) && substr($line, -1) == $line[0]) {
                 $quote = $line[0];
                 $value = trim($line, $quote);
-                $value = str_replace('\\'.$quote, $quote, $value);
-            } elseif (stringBeginsWith($line, 'array(') && substr($line, -1) == ')') {
+                $value = str_replace("\\" . $quote, $quote, $value);
+            } elseif (stringBeginsWith($line, "array(") && substr($line, -1) == ")") {
                 // Parse the line's array.
                 $line = substr($line, 6, strlen($line) - 7);
-                $items = explode(',', $line);
+                $items = explode(",", $line);
                 $array = [];
                 foreach ($items as $item) {
-                    $subItems = explode('=>', $item);
+                    $subItems = explode("=>", $item);
                     if (count($subItems) == 1) {
                         $array[] = trim(trim($subItems[0]), '"\'');
                     } elseif (count($subItems) == 2) {
@@ -564,7 +582,7 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
                 $result[$key] = $value;
             }
         }
-        $result = [$globalKey => $result, 'Variable' => $variable];
+        $result = [$globalKey => $result, "Variable" => $variable];
         return $result;
     }
 
@@ -576,24 +594,25 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @return bool
      * @deprecated since 2.3
      */
-    public function compareAddons($myAddons, $latestAddons) {
-        deprecated(__CLASS__.'->'.__METHOD__.'()');
+    public function compareAddons($myAddons, $latestAddons)
+    {
+        deprecated(__CLASS__ . "->" . __METHOD__ . "()");
         $updateAddons = false;
 
         // Join the site addons with my addons.
         foreach ($latestAddons as $addon) {
-            $key = val('AddonKey', $addon);
-            $type = val('Type', $addon);
-            $slug = strtolower($key).'-'.strtolower($type);
-            $version = val('Version', $addon);
-            $fileUrl = val('Url', $addon);
+            $key = val("AddonKey", $addon);
+            $type = val("Type", $addon);
+            $slug = strtolower($key) . "-" . strtolower($type);
+            $version = val("Version", $addon);
+            $fileUrl = val("Url", $addon);
 
             if (isset($myAddons[$slug])) {
                 $myAddon = $myAddons[$slug];
 
-                if (version_compare($version, val('Version', $myAddon, '999'), '>')) {
-                    $myAddon['NewVersion'] = $version;
-                    $myAddon['NewDownloadUrl'] = $fileUrl;
+                if (version_compare($version, val("Version", $myAddon, "999"), ">")) {
+                    $myAddon["NewVersion"] = $version;
+                    $myAddon["NewDownloadUrl"] = $fileUrl;
                     $updateAddons[$slug] = $myAddon;
                 }
             } else {
@@ -611,20 +630,21 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @return array $results
      * @deprecated since 2.3
      */
-    protected static function checkRequiredFields($info) {
-        deprecated(__CLASS__.'->'.__METHOD__.'()');
+    protected static function checkRequiredFields($info)
+    {
+        deprecated(__CLASS__ . "->" . __METHOD__ . "()");
         $results = [];
 
-        if (!val('Description', $info)) {
-            $results[] = sprintf(t('ValidateRequired'), t('Description'));
+        if (!val("Description", $info)) {
+            $results[] = sprintf(t("ValidateRequired"), t("Description"));
         }
 
-        if (!val('Version', $info)) {
-            $results[] = sprintf(t('ValidateRequired'), t('Version'));
+        if (!val("Version", $info)) {
+            $results[] = sprintf(t("ValidateRequired"), t("Version"));
         }
 
-        if (!val('License', $info)) {
-            $results[] = sprintf(t('ValidateRequired'), t('License'));
+        if (!val("License", $info)) {
+            $results[] = sprintf(t("ValidateRequired"), t("License"));
         }
 
         return $results;
@@ -637,8 +657,9 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @return array Deprecated.
      * @deprecated since 2.3
      */
-    public function getAddons($enabled = false) {
-        deprecated(__CLASS__.'->'.__METHOD__.'()');
+    public function getAddons($enabled = false)
+    {
+        deprecated(__CLASS__ . "->" . __METHOD__ . "()");
         return [];
     }
 
@@ -649,8 +670,9 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @return array|bool Deprecated.
      * @deprecated
      */
-    public function getAddonUpdates($enabled = false) {
-        deprecated(__CLASS__.'->'.__METHOD__.'()');
+    public function getAddonUpdates($enabled = false)
+    {
+        deprecated(__CLASS__ . "->" . __METHOD__ . "()");
     }
 
     /**
@@ -662,7 +684,8 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @return array Returns an array of captured SQL.
      * @throws Throwable Throws an exception if in debug mode and something goes wrong.
      */
-    public function runStructure($captureOnly = false) {
+    public function runStructure($captureOnly = false)
+    {
         $this->saveStatus(self::STATUS_RUNNING);
         $session = \Gdn::session();
 
@@ -677,9 +700,9 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
         } finally {
             if ($originalUserID && $originalUserID !== $session->UserID) {
                 $session->start($originalUserID, false, false);
-            } elseif (!$originalUserID && null !== c('Garden.Installed', false)) {
-            // Vanilla has an alternate install method where this config value is set to null.
-            // When this using this alternate install method we don't have authenticators configured and can't end the session.
+            } elseif (!$originalUserID && null !== c("Garden.Installed", false)) {
+                // Vanilla has an alternate install method where this config value is set to null.
+                // When this using this alternate install method we don't have authenticators configured and can't end the session.
                 $session->end();
             }
         }
@@ -692,7 +715,8 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @return array Returns an array of update SQL.
      * @throws Exception|Throwable Throws an exception if in debug mode.
      */
-    private function runStructureInternal(bool $captureOnly): array {
+    private function runStructureInternal(bool $captureOnly): array
+    {
         $addons = array_reverse(Gdn::addonManager()->getEnabled());
 
         // These variables are required for included structure files.
@@ -711,8 +735,8 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
                     $addonsWithErrors[] = $addon->getKey();
                 }
             }
-            $this->fireEvent('AfterStructure');
-            if ($captureOnly && property_exists($Structure->Database, 'CapturedSql')) {
+            $this->fireEvent("AfterStructure");
+            if ($captureOnly && property_exists($Structure->Database, "CapturedSql")) {
                 $capturedSql = $Structure->Database->CapturedSql;
             }
         } finally {
@@ -723,8 +747,8 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
         }
 
         if (!empty($addonsWithErrors)) {
-            throw new ServerException('Structure failed.', 500, [
-                'failedAddons' => $addonsWithErrors,
+            throw new ServerException("Structure failed.", 500, [
+                "failedAddons" => $addonsWithErrors,
             ]);
         }
 
@@ -738,11 +762,12 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      *
      * @return bool False if the structure failed.
      */
-    public function runStructureForAddon(Addon $addon): bool {
+    public function runStructureForAddon(Addon $addon): bool
+    {
         $logContext = [
-            'addonKey' => $addon->getKey(),
+            "addonKey" => $addon->getKey(),
             \Vanilla\Logger::FIELD_CHANNEL => \Vanilla\Logger::CHANNEL_SYSTEM,
-            \Vanilla\Logger::FIELD_EVENT => 'addon_structure_'.$addon->getKey(),
+            \Vanilla\Logger::FIELD_EVENT => "addon_structure_" . $addon->getKey(),
         ];
 
         $hasError = false;
@@ -751,9 +776,12 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
             if (debug()) {
                 throw $ex;
             } else {
-                $this->logger->error("Structure failed for addon {addonKey}", [
-                    \Vanilla\Logger::FIELD_EVENT => $logContext[\Vanilla\Logger::FIELD_EVENT] . '_failed',
-                ] + $logContext);
+                $this->logger->error(
+                    "Structure failed for addon {addonKey}",
+                    [
+                        \Vanilla\Logger::FIELD_EVENT => $logContext[\Vanilla\Logger::FIELD_EVENT] . "_failed",
+                    ] + $logContext
+                );
             }
         };
 
@@ -762,13 +790,13 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
             foreach ($specialClasses->getStructureClasses() as $structureClass) {
                 $this->logger->debug(
                     "Executing structure for {addonKey}.",
-                    [ 'structureType' => 'class', 'structureClass' => $structureClass ] + $logContext
+                    ["structureType" => "class", "structureClass" => $structureClass] + $logContext
                 );
                 try {
                     /** @var AddonStructure $structureInstance */
                     $structureInstance = \Gdn::getContainer()->get($structureClass);
                     // If this is the first setup using the alt-install, this is the initial setup of the addon.
-                    $isFirstEnable = !Gdn::config('Garden.Installed');
+                    $isFirstEnable = !Gdn::config("Garden.Installed");
                     $structureInstance->structure($isFirstEnable);
                 } catch (Throwable $e) {
                     $handleThrowable($e);
@@ -777,11 +805,11 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
         }
 
         // Look for a structure file.
-        if ($structure = $addon->getSpecial('structure')) {
+        if ($structure = $addon->getSpecial("structure")) {
             $structurePath = $addon->path($structure);
             $this->logger->debug(
                 "Executing structure for {addonKey}.",
-                [ 'structureType' => 'file', 'structurePath' => $structurePath ] + $logContext
+                ["structureType" => "file", "structurePath" => $structurePath] + $logContext
             );
 
             try {
@@ -795,7 +823,7 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
 
                 // Use the system user if specified.
                 $systemUserID = Gdn::userModel()->getSystemUserID();
-                if ($addon->getGlobalKey() === 'dashboard' && $systemUserID) {
+                if ($addon->getGlobalKey() === "dashboard" && $systemUserID) {
                     Gdn::session()->start($systemUserID, false, false);
                 }
             } catch (\Throwable $e) {
@@ -805,19 +833,16 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
 
         // Look for a structure method on the plugin.
         if ($pluginClass = $addon->getPluginClass()) {
-            $plugin = Gdn::pluginManager()->getPluginInstance(
-                $pluginClass,
-                Gdn_PluginManager::ACCESS_CLASSNAME
-            );
+            $plugin = Gdn::pluginManager()->getPluginInstance($pluginClass, Gdn_PluginManager::ACCESS_CLASSNAME);
 
-            if (is_object($plugin) && method_exists($plugin, 'structure')) {
+            if (is_object($plugin) && method_exists($plugin, "structure")) {
                 $this->logger->debug(
                     "Executing structure for {addonKey}.",
-                    ['structureType' => 'method', 'structureClass' => $pluginClass] + $logContext
+                    ["structureType" => "method", "structureClass" => $pluginClass] + $logContext
                 );
 
                 try {
-                    call_user_func([$plugin, 'structure']);
+                    call_user_func([$plugin, "structure"]);
                 } catch (BadMethodCallException $ex) {
                     // The structure method could not be called, probably because it wasn't public.
                 } catch (\Throwable $ex) {
@@ -827,13 +852,13 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
         }
 
         // Register permissions.
-        $permissions = $addon->getInfoValue('registerPermissions');
+        $permissions = $addon->getInfoValue("registerPermissions");
         if (!empty($permissions)) {
             $this->logger->info(
                 "Defining permissions for {addonKey}.",
                 [
-                    'permissions' => $permissions,
-                    \Vanilla\Logger::FIELD_EVENT => 'addon_permissions',
+                    "permissions" => $permissions,
+                    \Vanilla\Logger::FIELD_EVENT => "addon_permissions",
                 ] + $logContext
             );
             Gdn::permissionModel()->define($permissions);
@@ -847,14 +872,16 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      *
      * @param bool $system The new value.
      */
-    public function setRunAsSystem(bool $system): void {
+    public function setRunAsSystem(bool $system): void
+    {
         $this->runAsSystem = $system;
     }
 
     /**
      * @return bool
      */
-    public function getRunAsSystem(): bool {
+    public function getRunAsSystem(): bool
+    {
         return $this->runAsSystem;
     }
 
@@ -864,15 +891,20 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface {
      * @param string $status One of the `STATUS_*` constants.
      * @param string|null $message A message to go along with the status
      */
-    private function saveStatus(string $status, string $message = null) {
-        $now = new \DateTimeImmutable('now', new \DateTimeZone("UTC"));
+    private function saveStatus(string $status, string $message = null)
+    {
+        $now = new \DateTimeImmutable("now", new \DateTimeZone("UTC"));
 
         try {
-            Gdn::config()->saveToConfig([
-                'Garden.Update.LastUpdate' => $now->format(DateTime::RFC3339),
-                'Garden.Update.Status' => $status,
-                'Garden.Update.Message' => $message,
-            ], '', ['RemoveEmpty' => true]);
+            Gdn::config()->saveToConfig(
+                [
+                    "Garden.Update.LastUpdate" => $now->format(DateTime::RFC3339),
+                    "Garden.Update.Status" => $status,
+                    "Garden.Update.Message" => $message,
+                ],
+                "",
+                ["RemoveEmpty" => true]
+            );
         } catch (\Throwable $ex) {
             // Don't do anything at this point.
         }

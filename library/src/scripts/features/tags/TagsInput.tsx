@@ -4,13 +4,12 @@
  */
 
 import React, { useState } from "react";
-import { ITokenProps } from "@library/forms/select/Tokens";
 import { useTagSearch } from "@library/features/tags/TagsHooks";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { LoadStatus } from "@library/@types/api/core";
-import { LazyTokens } from "@library/forms/select/LazyTokens";
+import { Tokens } from "@library/forms/select/Tokens";
 
-interface IProps extends Omit<ITokenProps, "options" | "isLoading" | "value" | "onChange"> {
+interface IProps extends Omit<React.ComponentProps<typeof Tokens>, "options" | "isLoading" | "value" | "onChange"> {
     value?: IComboBoxOption[];
     onChange: (tokens: IComboBoxOption[]) => void;
     menuPlacement?: string;
@@ -22,7 +21,7 @@ export function TagsInput(props: IProps) {
     const { status = LoadStatus.LOADING, data = [] } = useTagSearch(text) || {};
 
     return (
-        <LazyTokens
+        <Tokens
             {...props}
             value={!props.value ? [] : props.value}
             onInputChange={setText}

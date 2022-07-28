@@ -13,16 +13,17 @@ use Vanilla\Theme\ThemeAssetFactory;
 /**
  * JSON theme asset.
  */
-class NeonThemeAsset extends JsonThemeAsset {
-
+class NeonThemeAsset extends JsonThemeAsset
+{
     /** @var string */
     protected $neonString;
 
     /**
      * Make sure the error isn't included when serializing.
      */
-    public function __sleep() {
-        return ['jsonString', 'data', 'neonString'];
+    public function __sleep()
+    {
+        return ["jsonString", "data", "neonString"];
     }
 
     /**
@@ -31,7 +32,8 @@ class NeonThemeAsset extends JsonThemeAsset {
      * @param string $data
      * @param string $url
      */
-    public function __construct($data, string $url) {
+    public function __construct($data, string $url)
+    {
         $this->url = $url;
         $this->neonString = $data;
         try {
@@ -53,14 +55,16 @@ class NeonThemeAsset extends JsonThemeAsset {
     /**
      * @inheritdoc
      */
-    public function getContentType(): string {
+    public function getContentType(): string
+    {
         return "text/neon";
     }
 
     /**
      * @inheritdoc
      */
-    public function getAllowedTypes(): array {
+    public function getAllowedTypes(): array
+    {
         return [ThemeAssetFactory::ASSET_TYPE_JSON, ThemeAssetFactory::ASSET_TYPE_NEON];
     }
 
@@ -71,16 +75,17 @@ class NeonThemeAsset extends JsonThemeAsset {
      *
      * @return Data
      */
-    public function render(string $asType = null): Data {
+    public function render(string $asType = null): Data
+    {
         switch ($asType) {
             case ThemeAssetFactory::ASSET_TYPE_NEON:
                 $data = new Data($this->neonString);
-                $data->setHeader('Content-Type', $this->getContentType());
+                $data->setHeader("Content-Type", $this->getContentType());
                 return $data;
             case ThemeAssetFactory::ASSET_TYPE_JSON:
             default:
                 $data = new Data($this->jsonString);
-                $data->setHeader('Content-Type', parent::getContentType());
+                $data->setHeader("Content-Type", parent::getContentType());
                 return $data;
         }
     }

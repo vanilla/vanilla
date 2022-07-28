@@ -15,8 +15,8 @@ use Vanilla\Formatting\Quill\Parser;
 /**
  * Blot for rendering embeds with the embed manager.
  */
-class ExternalBlot extends AbstractBlot {
-
+class ExternalBlot extends AbstractBlot
+{
     const DATA_KEY = "insert.embed-external.data";
 
     /** @var EmbedService */
@@ -25,8 +25,9 @@ class ExternalBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public static function matches(array $operation): bool {
-        return (boolean) valr("insert.embed-external", $operation);
+    public static function matches(array $operation): bool
+    {
+        return (bool) valr("insert.embed-external", $operation);
     }
 
     /**
@@ -41,8 +42,8 @@ class ExternalBlot extends AbstractBlot {
         string $parseMode = Parser::PARSE_MODE_NORMAL
     ) {
         parent::__construct($currentOperation, $previousOperation, $nextOperation, $parseMode);
-        $this->content = $this->currentOperation["insert"]["embed-external"]['data']['url'] ?? '';
-        if ($this->content !== '') {
+        $this->content = $this->currentOperation["insert"]["embed-external"]["data"]["url"] ?? "";
+        if ($this->content !== "") {
             $this->content .= "\n";
         }
         $this->embedService = Gdn::getContainer()->get(EmbedService::class);
@@ -55,7 +56,8 @@ class ExternalBlot extends AbstractBlot {
      *
      * @return array
      */
-    public static function getEmbedDataFromOperation($operation): array {
+    public static function getEmbedDataFromOperation($operation): array
+    {
         return valr(self::DATA_KEY, $operation, []);
     }
 
@@ -64,7 +66,8 @@ class ExternalBlot extends AbstractBlot {
      *
      * @return array
      */
-    public function getEmbedData(): array {
+    public function getEmbedData(): array
+    {
         return self::getEmbedDataFromOperation($this->currentOperation);
     }
 
@@ -73,7 +76,8 @@ class ExternalBlot extends AbstractBlot {
      *
      * @return AbstractEmbed
      */
-    public function getEmbed(): AbstractEmbed {
+    public function getEmbed(): AbstractEmbed
+    {
         $data = $this->getEmbedData();
         return $this->embedService->createEmbedFromData($data, $this->parseMode === Parser::PARSE_MODE_EXTENDED);
     }
@@ -82,7 +86,8 @@ class ExternalBlot extends AbstractBlot {
      * Render out the content of the blot using the EmbedService.
      * @inheritDoc
      */
-    public function render(): string {
+    public function render(): string
+    {
         if ($this->parseMode === Parser::PARSE_MODE_QUOTE) {
             return $this->renderQuote();
         }
@@ -96,11 +101,12 @@ class ExternalBlot extends AbstractBlot {
      *
      * @return string
      */
-    public function renderQuote(): string {
+    public function renderQuote(): string
+    {
         $value = $this->currentOperation["insert"]["embed-external"] ?? [];
-        $data = $value['data'] ?? $value;
+        $data = $value["data"] ?? $value;
 
-        $url = $data['url'] ?? "";
+        $url = $data["url"] ?? "";
         if ($url) {
             $sanitizedUrl = htmlspecialchars(\Gdn_Format::sanitizeUrl($url));
             return "<p><a href=\"$sanitizedUrl\">$sanitizedUrl</a></p>";
@@ -112,21 +118,24 @@ class ExternalBlot extends AbstractBlot {
      * Block embeds are always their own group.
      * @inheritDoc
      */
-    public function isOwnGroup(): bool {
+    public function isOwnGroup(): bool
+    {
         return true;
     }
 
     /**
      * @inheritDoc
      */
-    public function getGroupOpeningTag(): string {
+    public function getGroupOpeningTag(): string
+    {
         return "";
     }
 
     /**
      * @inheritDoc
      */
-    public function getGroupClosingTag(): string {
+    public function getGroupClosingTag(): string
+    {
         return "";
     }
 }

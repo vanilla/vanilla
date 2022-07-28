@@ -5,7 +5,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const glob = require("glob");
+const glob = require("globby");
 
 const VANILLA_ROOT = __dirname;
 
@@ -18,10 +18,10 @@ let packageDirectoryMaps = {};
 
 function scanAddons(addonDir) {
     const keys = glob
-        .sync(path.join(VANILLA_ROOT, addonDir + "/*"))
-        .map(dir => dir.replace(path.join(VANILLA_ROOT, addonDir + "/"), ""));
+        .sync(path.join(VANILLA_ROOT, addonDir + "/*"), { onlyDirectories: true })
+        .map((dir) => dir.replace(path.join(VANILLA_ROOT, addonDir + "/"), ""));
 
-    keys.forEach(key => {
+    keys.forEach((key) => {
         let root = path.join(VANILLA_ROOT, addonDir, key);
         if (fs.existsSync(path.join(root, "src/scripts/entries")) && key !== "vanilla") {
             addonRootDirs.push(root);
@@ -34,17 +34,20 @@ function scanAddons(addonDir) {
 
 function scanPackages(packagesDir) {
     const keys = glob
-    // Get the directory contents
-    .sync(path.join(VANILLA_ROOT, packagesDir + "/*"))
-    // Filter out any files
-    .filter((path) => fs.lstatSync(path).isDirectory())
-    // Rectify the paths
-    .map(dir => dir.replace(path.join(VANILLA_ROOT, packagesDir + "/"), ""));
+        // Get the directory contents
+        .sync(path.join(VANILLA_ROOT, packagesDir + "/*"), { onlyDirectories: true })
+        // Rectify the paths
+        .map((dir) => dir.replace(path.join(VANILLA_ROOT, packagesDir + "/"), ""));
 
     keys.forEach((key) => {
         // Split into groups of prefix and package name
         const nameArray = key.split(new RegExp("(vanilla).(.*)")).filter((group) => group.length);
-        packageDirectoryMaps[`^@${nameArray[0]}/${nameArray[1]}/(.*)$`] = path.join(VANILLA_ROOT, packagesDir,key, "$1");
+        packageDirectoryMaps[`^@${nameArray[0]}/${nameArray[1]}/(.*)$`] = path.join(
+            VANILLA_ROOT,
+            packagesDir,
+            key,
+            "$1",
+        );
     });
 }
 
@@ -72,28 +75,35 @@ module.exports = {
     collectCoverage: true,
 
     // An array of glob patterns indicating a set of files for which coverage information should be collected
-    collectCoverageFrom: ['<rootDir>/**/*.tsx', '<rootDir>/**/*.ts', '!<rootDir>/**/*.d.ts'],
+    collectCoverageFrom: [
+        "<rootDir>/**/*.tsx",
+        "<rootDir>/**/*.ts",
+        "!<rootDir>/**/*.d.ts",
+        "!<rootDir>/**/*.spec.ts",
+        "!<rootDir>/**/*.spec.tsx",
+    ],
 
     // The directory where Jest should output its coverage files
     coverageDirectory: "coverage/jest",
 
     // An array of regexp pattern strings used to skip coverage collection
     coveragePathIgnorePatterns: [
-      ".github",
-      ".vscode",
-      ".yarn",
-      "/build",
-      "/node_modules/",
-      "/cache/",
-      "/vendor/"
+        "/.github/",
+        "/.vscode/",
+        "/.yarn/",
+        "/build/",
+        "/node_modules/",
+        "/cache/",
+        "/vendor/",
+        "/__fixtures__/",
     ],
 
     // A list of reporter names that Jest uses when writing coverage reports
     coverageReporters: [
-    //   "json",
-    //   "text",
-      "lcov",
-    //   "clover"
+        //   "json",
+        //   "text",
+        "lcov",
+        //   "clover"
     ],
 
     // An object that configures minimum threshold enforcement for coverage results
@@ -124,15 +134,7 @@ module.exports = {
     // moduleDirectories: ["node_modules", ...addonModuleDirs],
 
     // An array of file extensions your modules use
-    moduleFileExtensions: [
-        "js",
-        "cjs",
-        "json",
-        "jsx",
-        "ts",
-        "tsx",
-        "node"
-    ],
+    moduleFileExtensions: ["js", "cjs", "json", "jsx", "ts", "tsx", "node"],
 
     // A map from regular expressions to module names that allow to stub out resources with a single module
     moduleNameMapper: {
@@ -186,9 +188,7 @@ module.exports = {
     // setupFiles: [],
 
     // A list of paths to modules that run some code to configure or set up the testing framework before each test
-    setupFilesAfterEnv: [
-        "<rootDir>/jest.setup.js"
-    ],
+    setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
 
     // A list of paths to snapshot serializer modules Jest should use for snapshot testing
     // snapshotSerializers: [],
@@ -230,9 +230,7 @@ module.exports = {
     // transform: null,
 
     // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-    transformIgnorePatterns: [
-      "/node_modules/"
-    ],
+    transformIgnorePatterns: ["/node_modules/"],
 
     // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
     // unmockedModulePathPatterns: undefined,

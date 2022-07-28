@@ -8,7 +8,6 @@ import { css, CSSObject } from "@emotion/css";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
-import { shadowHelper } from "@library/styles/shadowHelpers";
 import { userSelect } from "@library/styles/styleHelpersFeedback";
 import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
 import { useThemeCache } from "@library/styles/themeCache";
@@ -26,8 +25,8 @@ export const formTreeClasses = useThemeCache(() => {
 
     const tree = css({
         position: "relative",
-        ...Mixins.padding({
-            vertical: 16,
+        ...Mixins.margin({
+            bottom: 16,
         }),
     });
     const coloredRowBorder: CSSObject = {
@@ -53,6 +52,10 @@ export const formTreeClasses = useThemeCache(() => {
         // Rows extend out slightly from the edges of the container in the mockups
         ...extendItemContainer(4),
         ...Mixins.padding({ horizontal: 4 }),
+
+        ...Mixins.padding({
+            vertical: 2,
+        }),
 
         "&:focus": {
             ...coloredRowBorder,
@@ -91,13 +94,13 @@ export const formTreeClasses = useThemeCache(() => {
         flex: 1,
         display: "flex",
         alignItems: "center",
+        paddingRight: 40,
     };
 
     const columnMixin: CSSObject = {
         width: "100%",
         height: "auto",
         maxWidth: 256,
-        marginRight: 8,
     };
 
     const columnHeader = css({
@@ -167,6 +170,7 @@ export const formTreeClasses = useThemeCache(() => {
 
     const autoComplete = css({
         ...columnMixin,
+        borderColor: "transparent",
     });
 
     const actionWrapper = css({

@@ -17,16 +17,16 @@ use Vanilla\Web\RoleTokenFactory;
 /**
  * API Controller for the `/tokens` resource.
  */
-class TokensApiController extends AbstractApiController {
-
+class TokensApiController extends AbstractApiController
+{
     /** Default expiry for issued tokens. */
-    const DEFAULT_EXPIRY = '10 years';
+    const DEFAULT_EXPIRY = "10 years";
 
     /** The maximum number of tokens in a response. */
     const RESPONSE_LIMIT = 200;
 
     /** Default token type. */
-    const TOKEN_TYPE = 'personal';
+    const TOKEN_TYPE = "personal";
 
     /** @var AccessTokenModel */
     private $accessTokenModel;
@@ -66,13 +66,14 @@ class TokensApiController extends AbstractApiController {
      * @param int $id
      * @throws ClientException Throws an exception if current user isn't authorized to delete the token.
      */
-    public function delete($id) {
-        $this->idParamSchema()->setDescription('Revoke an access token.');
-        $out = $this->schema([], 'out');
+    public function delete($id)
+    {
+        $this->idParamSchema()->setDescription("Revoke an access token.");
+        $out = $this->schema([], "out");
 
         $row = $this->token($id);
-        if ($row['UserID'] != $this->getSession()->UserID) {
-            $this->permission('Garden.Settings.Manage');
+        if ($row["UserID"] != $this->getSession()->UserID) {
+            $this->permission("Garden.Settings.Manage");
         }
 
         $this->accessTokenModel->revoke($id);
@@ -86,7 +87,8 @@ class TokensApiController extends AbstractApiController {
      * @throws ClientException Throws an exception if the token has been revoked or has expired.
      * @return bool
      */
-    public function isActiveToken($token, $throw = false) {
+    public function isActiveToken($token, $throw = false)
+    {
         if (is_array($token)) {
             $row = $token;
         } elseif (filter_var($token, FILTER_VALIDATE_INT)) {
@@ -101,13 +103,13 @@ class TokensApiController extends AbstractApiController {
             return false;
         }
 
-        if (array_key_exists('Attributes', $row)) {
-            $attributes = $row['Attributes'];
+        if (array_key_exists("Attributes", $row)) {
+            $attributes = $row["Attributes"];
             if (is_array($attributes)) {
                 // Skip if this token has been revoked.
-                if (array_key_exists('revoked', $row['Attributes']) && $row['Attributes']['revoked']) {
+                if (array_key_exists("revoked", $row["Attributes"]) && $row["Attributes"]["revoked"]) {
                     if ($throw) {
-                        throw new ClientException('Token revoked.', 410);
+                        throw new ClientException("Token revoked.", 410);
                     }
                     return false;
                 }
@@ -117,10 +119,10 @@ class TokensApiController extends AbstractApiController {
         }
 
         // Skip if this token is expired.
-        $expiry = strtotime($row['DateExpires']);
+        $expiry = strtotime($row["DateExpires"]);
         if (time() > $expiry) {
             if ($throw) {
-                throw new ClientException('Token expired.', 410);
+                throw new ClientException("Token expired.", 410);
             }
             return false;
         }
@@ -133,13 +135,17 @@ class TokensApiController extends AbstractApiController {
      *
      * @return Schema
      */
-    public function fullSchema() {
+    public function fullSchema()
+    {
         if (!isset($this->fullSchema)) {
-            $this->fullSchema = $this->schema([
-                'accessTokenID:i' => 'The unique numeric ID.',
-                'name:s|n' => 'A user-specified label.',
-                'dateInserted:dt' => 'When the token was generated.'
-            ], 'Token');
+            $this->fullSchema = $this->schema(
+                [
+                    "accessTokenID:i" => "The unique numeric ID.",
+                    "name:s|n" => "A user-specified label.",
+                    "dateInserted:dt" => "When the token was generated.",
+                ],
+                "Token"
+            );
         }
         return $this->fullSchema;
     }
@@ -152,24 +158,25 @@ class TokensApiController extends AbstractApiController {
      * @throws NotFoundException Throws an exception if this is not an active token.
      * @return array
      */
-    public function get($id, array $query) {
-        $this->permission('Garden.Tokens.Add');
+    public function get($id, array $query)
+    {
+        $this->permission("Garden.Tokens.Add");
 
         $this->idParamSchema();
-        $in = $this->schema([
-            'id',
-            'transientKey:s' => 'A valid CSRF token for the current user.'
-        ], 'in')->setDescription('Reveal a usable access token.');
-        $out = $this->schema($this->sensitiveSchema(), 'out');
+        $in = $this->schema(
+            ["id", "transientKey:s" => "A valid CSRF token for the current user."],
+            "in"
+        )->setDescription("Reveal a usable access token.");
+        $out = $this->schema($this->sensitiveSchema(), "out");
 
-        $query['id'] = $id;
+        $query["id"] = $id;
         $query = $in->validate($query);
-        $this->validateTransientKey($query['transientKey']);
+        $this->validateTransientKey($query["transientKey"]);
 
         $row = $this->token($id);
-        if ($row['UserID'] != $this->getSession()->UserID) {
-            if ($this->getSession()->checkPermission('Garden.Settings.Manage') === false) {
-                throw new NotFoundException('Access Token');
+        if ($row["UserID"] != $this->getSession()->UserID) {
+            if ($this->getSession()->checkPermission("Garden.Settings.Manage") === false) {
+                throw new NotFoundException("Access Token");
             }
         }
         $this->isActiveToken($row, true);
@@ -184,8 +191,9 @@ class TokensApiController extends AbstractApiController {
      *
      * @return Schema
      */
-    public function idParamSchema() {
-        return $this->schema(['id:i' => 'The numeric ID of a token.'], 'in');
+    public function idParamSchema()
+    {
+        return $this->schema(["id:i" => "The numeric ID of a token."], "in");
     }
 
     /**
@@ -193,23 +201,30 @@ class TokensApiController extends AbstractApiController {
      *
      * @return array
      */
-    public function index() {
-        $this->permission('Garden.Tokens.Add');
+    public function index()
+    {
+        $this->permission("Garden.Tokens.Add");
 
-        $in = $this->schema([], 'in')->setDescription('Get a list of access token IDs for the current user.');
+        $in = $this->schema([], "in")->setDescription("Get a list of access token IDs for the current user.");
         // Full access token details are not available in the index. Use GET on a single ID for sensitive information.
-        $out = $this->schema([
-            ':a' => $this->schema([
-                'accessTokenID',
-                'name',
-                'dateInserted'
-            ])->add($this->fullSchema())
-        ], 'out');
+        $out = $this->schema(
+            [
+                ":a" => $this->schema(["accessTokenID", "name", "dateInserted"])->add($this->fullSchema()),
+            ],
+            "out"
+        );
 
-        $rows = $this->accessTokenModel->getWhere([
-            'UserID' => $this->getSession()->UserID,
-            'Type' => self::TOKEN_TYPE
-        ], 'DateInserted', 'desc', self::RESPONSE_LIMIT)->resultArray();
+        $rows = $this->accessTokenModel
+            ->getWhere(
+                [
+                    "UserID" => $this->getSession()->UserID,
+                    "Type" => self::TOKEN_TYPE,
+                ],
+                "DateInserted",
+                "desc",
+                self::RESPONSE_LIMIT
+            )
+            ->resultArray();
         $activeTokens = [];
         foreach ($rows as $token) {
             if ($this->isActiveToken($token) === false) {
@@ -218,7 +233,7 @@ class TokensApiController extends AbstractApiController {
             $activeTokens[] = $token;
         }
         unset($token);
-        $activeTokens = array_map([$this, 'normalizeOutput'], $activeTokens);
+        $activeTokens = array_map([$this, "normalizeOutput"], $activeTokens);
 
         $result = $out->validate($activeTokens);
         return $result;
@@ -230,17 +245,21 @@ class TokensApiController extends AbstractApiController {
      * @param array $body
      * @return mixed
      */
-    public function post(array $body) {
-        $this->permission('Garden.Tokens.Add');
+    public function post(array $body)
+    {
+        $this->permission("Garden.Tokens.Add");
 
-        $in = $this->schema([
-            'name:s' => 'A name indicating what the access token will be used for.',
-            'transientKey:s' => 'A valid CSRF token for the current user.'
-        ], 'in')->setDescription('Issue a new access token for the current user.');
-        $out = $this->schema($this->sensitiveSchema(), 'out');
+        $in = $this->schema(
+            [
+                "name:s" => "A name indicating what the access token will be used for.",
+                "transientKey:s" => "A valid CSRF token for the current user.",
+            ],
+            "in"
+        )->setDescription("Issue a new access token for the current user.");
+        $out = $this->schema($this->sensitiveSchema(), "out");
 
         $body = $in->validate($body);
-        $this->validateTransientKey($body['transientKey']);
+        $this->validateTransientKey($body["transientKey"]);
 
         // Issue the new token.
         $accessToken = $this->accessTokenModel->issue(
@@ -251,8 +270,8 @@ class TokensApiController extends AbstractApiController {
         $this->validateModel($this->accessTokenModel);
         $token = $this->accessTokenModel->trim($accessToken);
         $row = $this->accessTokenModel->getToken($token);
-        $accessTokenID = $row['AccessTokenID'];
-        $row = $this->accessTokenModel->setAttribute($accessTokenID, 'name', $body['name']);
+        $accessTokenID = $row["AccessTokenID"];
+        $row = $this->accessTokenModel->setAttribute($accessTokenID, "name", $body["name"]);
 
         // Serve up the result.
         $row = $this->normalizeOutput($row);
@@ -268,23 +287,28 @@ class TokensApiController extends AbstractApiController {
      * @throws ForbiddenException Request initiated from guest user.
      * @throws \Garden\Schema\ValidationException Validation Failed.
      */
-    public function post_roles(RequestInterface $request) : array {
+    public function post_roles(RequestInterface $request): array
+    {
         if (!$this->getSession()->isValid()) {
             throw new ForbiddenException("Must be logged in to create a role token");
         }
 
-        $in = $this->schema([], 'in')->setDescription("Issue a role token for the current user");
-        $out = $this->schema([
-            'roleToken:s' => "A signed JWT issued for the current user containing the set of roles assigned ".
-                "to this user in its claims",
-            'expires:dt' => 'DateTime when issued JWT expires'
-        ], 'out');
+        $in = $this->schema([], "in")->setDescription("Issue a role token for the current user");
+        $out = $this->schema(
+            [
+                "roleToken:s" =>
+                    "A signed JWT issued for the current user containing the set of roles assigned " .
+                    "to this user in its claims",
+                "expires:dt" => "DateTime when issued JWT expires",
+            ],
+            "out"
+        );
 
         $roleIDs = $this->userModel->getRoleIDs($this->getSession()->UserID);
         $roleToken = $this->roleTokenFactory->forEncoding($roleIDs, $request);
         $response = [
-            'roleToken' => $roleToken->encode(),
-            'expires' => $roleToken->getExpires()
+            "roleToken" => $roleToken->encode(),
+            "expires" => $roleToken->getExpires(),
         ];
 
         return $out->validate($response);
@@ -296,17 +320,18 @@ class TokensApiController extends AbstractApiController {
      * @param array $dbRecord Database record.
      * @return array Return a Schema record.
      */
-    public function normalizeOutput(array $dbRecord) {
+    public function normalizeOutput(array $dbRecord)
+    {
         $name = null;
-        if (array_key_exists('Attributes', $dbRecord) && is_array($dbRecord['Attributes'])) {
-            if (array_key_exists('name', $dbRecord['Attributes']) && is_string($dbRecord['Attributes']['name'])) {
-                $name = $dbRecord['Attributes']['name'];
+        if (array_key_exists("Attributes", $dbRecord) && is_array($dbRecord["Attributes"])) {
+            if (array_key_exists("name", $dbRecord["Attributes"]) && is_string($dbRecord["Attributes"]["name"])) {
+                $name = $dbRecord["Attributes"]["name"];
             }
         }
-        $dbRecord['Name'] = $name ?: t('Personal Access Token');
+        $dbRecord["Name"] = $name ?: t("Personal Access Token");
 
-        if (array_key_exists('Token', $dbRecord) && is_string($dbRecord['Token'])) {
-            $dbRecord['AccessToken'] = $this->accessTokenModel->signTokenRow($dbRecord);
+        if (array_key_exists("Token", $dbRecord) && is_string($dbRecord["Token"])) {
+            $dbRecord["AccessToken"] = $this->accessTokenModel->signTokenRow($dbRecord);
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($dbRecord);
@@ -316,13 +341,14 @@ class TokensApiController extends AbstractApiController {
     /**
      * Get a schema for outputting sensitive token information.
      */
-    public function sensitiveSchema() {
+    public function sensitiveSchema()
+    {
         if (!isset($this->sensitiveSchema)) {
             $this->sensitiveSchema = $this->schema([
-                'accessTokenID',
-                'name',
-                'accessToken:s' => 'A signed version of the token.',
-                'dateInserted'
+                "accessTokenID",
+                "name",
+                "accessToken:s" => "A signed version of the token.",
+                "dateInserted",
             ])->add($this->fullSchema());
         }
         return $this->sensitiveSchema;
@@ -335,10 +361,11 @@ class TokensApiController extends AbstractApiController {
      * @throws NotFoundException Throws an exception when the token cannot be located by its ID.
      * @return array
      */
-    protected function token($accessTokenID) {
+    protected function token($accessTokenID)
+    {
         $row = $this->accessTokenModel->getID($accessTokenID);
         if (!$row) {
-            throw new NotFoundException('Access Token');
+            throw new NotFoundException("Access Token");
         }
         return $row;
     }
@@ -349,13 +376,14 @@ class TokensApiController extends AbstractApiController {
      * @param string $transientKey
      * @throws ClientException Throws an exception when the transient key is invalid.
      */
-    public function validateTransientKey($transientKey) {
+    public function validateTransientKey($transientKey)
+    {
         if ($this->getSession()->transientKey() === false) {
             $this->getSession()->loadTransientKey();
         }
 
         if ($this->getSession()->transientKey() != $transientKey) {
-            throw new ClientException('Invalid transient key.', 401);
+            throw new ClientException("Invalid transient key.", 401);
         }
     }
 
@@ -364,7 +392,8 @@ class TokensApiController extends AbstractApiController {
      *
      * @return AccessTokenModel
      */
-    public function getAccessTokenModel(): AccessTokenModel {
+    public function getAccessTokenModel(): AccessTokenModel
+    {
         return $this->accessTokenModel;
     }
 }

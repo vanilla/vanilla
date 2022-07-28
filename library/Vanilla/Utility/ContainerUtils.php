@@ -19,7 +19,8 @@ use Vanilla\Web\Asset\DeploymentCacheBuster;
 /**
  * Utility functions for container configuration.
  */
-class ContainerUtils {
+class ContainerUtils
+{
     /**
      * Lazily load a config value for some container initialization
      *
@@ -27,7 +28,8 @@ class ContainerUtils {
      * @param mixed $defaultValue
      * @return ReferenceInterface A reference for use in the container initialization.
      */
-    public static function config(string $key, $defaultValue = false): ReferenceInterface {
+    public static function config(string $key, $defaultValue = false): ReferenceInterface
+    {
         return new Callback(function (ContainerInterface $dic) use ($key, $defaultValue) {
             /** @var ConfigurationInterface $config */
             $config = $dic->get(ConfigurationInterface::class);
@@ -40,7 +42,8 @@ class ContainerUtils {
      *
      * @return ReferenceInterface A reference for use in the container initialization.
      */
-    public static function currentLocale(): ReferenceInterface {
+    public static function currentLocale(): ReferenceInterface
+    {
         return new Callback(function (ContainerInterface $dic) {
             $locale = $dic->get(\Gdn_Locale::class);
             return $locale->current();
@@ -52,7 +55,8 @@ class ContainerUtils {
      *
      * @return ReferenceInterface A reference for use in the container initialization.
      */
-    public static function currentTheme(): ReferenceInterface {
+    public static function currentTheme(): ReferenceInterface
+    {
         return new Callback(function (ContainerInterface $dic) {
             /** @type ThemeService $themeService */
             $themeService = $dic->get(ThemeService::class);
@@ -65,13 +69,12 @@ class ContainerUtils {
      *
      * @return ReferenceInterface
      */
-    public static function cacheBuster(): ReferenceInterface {
-        return new Callback(
-            function (ContainerInterface $dic) {
-                $cacheBuster = $dic->get(DeploymentCacheBuster::class);
-                return $cacheBuster->value();
-            }
-        );
+    public static function cacheBuster(): ReferenceInterface
+    {
+        return new Callback(function (ContainerInterface $dic) {
+            $cacheBuster = $dic->get(DeploymentCacheBuster::class);
+            return $cacheBuster->value();
+        });
     }
 
     /**
@@ -87,13 +90,13 @@ class ContainerUtils {
      * @param string $old Container rule to target for replacement. Shared instances will be overwritten.
      * @param string $new Container rule used to determine what will be replace the target in the container.
      */
-    public static function replace(Container $container, string $old, string $new): void {
+    public static function replace(Container $container, string $old, string $new): void
+    {
         if ($container->hasInstance($old)) {
             $container->setInstance($old, null);
         }
 
-        $container->rule($new)
-            ->addAlias($old);
+        $container->rule($new)->addAlias($old);
     }
 
     /**
@@ -107,7 +110,12 @@ class ContainerUtils {
      * @param string $method The name of the method to call.
      * @param array $args The method's arguments.
      */
-    public static function addCall(ContainerConfigurationInterface $container, string $rule, string $method, array $args) {
+    public static function addCall(
+        ContainerConfigurationInterface $container,
+        string $rule,
+        string $method,
+        array $args
+    ) {
         $container->rule($rule)->addCall($method, $args);
         if ($container instanceof Container) {
             if ($container->hasInstance($rule)) {

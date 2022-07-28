@@ -10,8 +10,8 @@ namespace Vanilla\EmbeddedContent;
 /**
  * Interface for filtering embeds.
  */
-interface EmbedFilterInterface {
-
+interface EmbedFilterInterface
+{
     /**
      * Whether or not the filter can handle a particular embed type.
      *

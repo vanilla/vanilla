@@ -13,19 +13,21 @@ use MessageModel;
 /**
  * Test the structure changes to the Message table.
  */
-class ModerationMessageDataMigrationTest extends \VanillaTests\SiteTestCase {
-
+class ModerationMessageDataMigrationTest extends \VanillaTests\SiteTestCase
+{
     /**
      * Test that the relevant data is migrated correctly.
      */
-    public function testDataMigration() {
+    public function testDataMigration()
+    {
         $structure = Gdn::structure();
         //Set up the table the old way.
-        $structure->table("Message")
+        $structure
+            ->table("Message")
             ->column("Application", "varchar(255)", true)
             ->column("Controller", "varchar(255)", true)
             ->column("Method", "varchar(255)", true)
-            ->column("CategoryID", 'int', true)
+            ->column("CategoryID", "int", true)
             ->column("CssClass", "varchar(20)", true)
             ->set();
         $structure->table("Message")->dropColumn("LayoutViewType");
@@ -40,7 +42,7 @@ class ModerationMessageDataMigrationTest extends \VanillaTests\SiteTestCase {
         foreach ($legacyLayoutViews as $view) {
             $oldViewType = $view->getLegacyType();
             $oldViewArray = explode("/", $oldViewType);
-            list($application, $controller, $method) = $oldViewArray;
+            [$application, $controller, $method] = $oldViewArray;
             Gdn::sql()->insert("Message", [
                 "AllowDismiss" => 0,
                 "Content" => $oldViewType,
@@ -55,7 +57,7 @@ class ModerationMessageDataMigrationTest extends \VanillaTests\SiteTestCase {
         }
 
         // Run structure.
-        include PATH_APPLICATIONS.'/dashboard/settings/structure.php';
+        include PATH_APPLICATIONS . "/dashboard/settings/structure.php";
 
         // Verify that the data transferred correctly.
         $messages = $messageModel->getMessages();

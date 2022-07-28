@@ -13,8 +13,8 @@ use Vanilla\InjectableInterface;
 /**
  * Base search driver class.
  */
-abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, InjectableInterface {
-
+abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, InjectableInterface
+{
     /** @var AbstractSearchType[] */
     protected $searchTypesByType = [];
 
@@ -27,7 +27,8 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
     /**
      * @param AbstractSiteProvider $siteProvider
      */
-    public function setDependencies(AbstractSiteProvider $siteProvider) {
+    public function setDependencies(AbstractSiteProvider $siteProvider)
+    {
         $this->siteProvider = $siteProvider;
     }
 
@@ -53,7 +54,8 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
      *
      * @return bool
      */
-    public function supportsForeignRecords(): bool {
+    public function supportsForeignRecords(): bool
+    {
         return false;
     }
 
@@ -62,8 +64,9 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
      *
      * @return string
      */
-    public function driver(): string {
-        return '';
+    public function driver(): string
+    {
+        return "";
     }
 
     /**
@@ -71,7 +74,8 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
      *
      * @return Schema
      */
-    public function buildQuerySchema(): Schema {
+    public function buildQuerySchema(): Schema
+    {
         return SearchQuery::buildSchema($this->getSearchTypes());
     }
 
@@ -84,15 +88,19 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
      * @return SearchResultItem[]
      * @internal Exposed for testing only.
      */
-    public function convertRecordsToResultItems(array $records, SearchQuery $query): array {
+    public function convertRecordsToResultItems(array $records, SearchQuery $query): array
+    {
         $recordsByType = [];
 
         foreach ($records as $record) {
-            $type = $record['type'] ?? null;
-            $id = $record['recordID'] ?? null;
+            $type = $record["type"] ?? null;
+            $id = $record["recordID"] ?? null;
 
             if (!is_string($type) || !is_numeric($id)) {
-                trigger_error('Search record missing a valid recordType or recordID. ' . json_encode($records), E_USER_NOTICE);
+                trigger_error(
+                    "Search record missing a valid recordType or recordID. " . json_encode($records),
+                    E_USER_NOTICE
+                );
                 continue;
             }
 
@@ -114,11 +122,11 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
         /** @var SearchResultItem[] $orderedResultItems */
         $orderedResultItems = [];
         foreach ($records as $record) {
-            $siteID = $this->supportsForeignRecords() ? $record['siteID'] ?? '' : '';
-            $type = $record['type'] ?? '';
-            $recordID = $record['recordID'] ?? '';
-            $highlight = $record['highlight']['bodyPlainText'] ?? '';
-            $key = $siteID.$type.$recordID;
+            $siteID = $this->supportsForeignRecords() ? $record["siteID"] ?? "" : "";
+            $type = $record["type"] ?? "";
+            $recordID = $record["recordID"] ?? "";
+            $highlight = $record["highlight"]["bodyPlainText"] ?? "";
+            $key = $siteID . $type . $recordID;
             $resultItemForKey = $resultsItemsByTypeAndID[$key] ?? null;
             if ($resultItemForKey !== null) {
                 $siteID = $resultItemForKey->getSiteID();
@@ -127,7 +135,7 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
                     $resultItemForKey->setSiteDomain($site->getWebUrl());
                 }
                 if ($highlight) {
-                    $resultItemForKey['highlight'] = $highlight;
+                    $resultItemForKey["highlight"] = $highlight;
                 }
                 $resultItemForKey->setSearchScore($record[SearchResultItem::FIELD_SCORE] ?? null);
                 $resultItemForKey->setSubqueryMatchCount($record[SearchResultItem::FIELD_SUBQUERY_COUNT] ?? null);
@@ -147,11 +155,12 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
      *
      * @return SearchResultItem[]
      */
-    protected function getKeyedResultItemsOfType(string $type, array $recordSet, SearchQuery $query): array {
+    protected function getKeyedResultItemsOfType(string $type, array $recordSet, SearchQuery $query): array
+    {
         $resultsItemsByTypeAndID = [];
         $searchType = $this->getSearchTypeByType($type);
         if ($searchType === null) {
-            trigger_error('Could not find registered search type for type: ' . $searchType, E_USER_NOTICE);
+            trigger_error("Could not find registered search type for type: " . $searchType, E_USER_NOTICE);
             return [];
         }
 
@@ -162,10 +171,10 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
         $siteProvider = \Gdn::getContainer()->get(AbstractSiteProvider::class);
         $ownSiteID = $siteProvider->getOwnSite()->getSiteID();
         foreach ($recordSet as $record) {
-            if (isset($record['siteID']) && $record['siteID'] !== $ownSiteID && $this->supportsForeignRecords()) {
+            if (isset($record["siteID"]) && $record["siteID"] !== $ownSiteID && $this->supportsForeignRecords()) {
                 $foreignRecords[] = $record;
             } else {
-                $ownSiteIDs[] = $record['recordID'];
+                $ownSiteIDs[] = $record["recordID"];
             }
         }
 
@@ -174,8 +183,8 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
             $ownSiteResultItems = $searchType->getResultItems($ownSiteIDs, $query);
             foreach ($ownSiteResultItems as $resultItem) {
                 $id = $resultItem->getAltRecordID() ?? $resultItem->getRecordID();
-                $siteID = $this->supportsForeignRecords() ? $resultItem->getSiteID() : '';
-                $resultsItemsByTypeAndID[$siteID.$resultItem->getType().$id] = $resultItem;
+                $siteID = $this->supportsForeignRecords() ? $resultItem->getSiteID() : "";
+                $resultsItemsByTypeAndID[$siteID . $resultItem->getType() . $id] = $resultItem;
             }
         }
 
@@ -186,7 +195,7 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
                 $item->setIsForeign(true);
                 $id = $item->getRecordID();
                 $siteID = $item->getSiteID();
-                $resultsItemsByTypeAndID[$siteID.$item->getType().$id] = $item;
+                $resultsItemsByTypeAndID[$siteID . $item->getType() . $id] = $item;
             }
         }
         return $resultsItemsByTypeAndID;
@@ -199,21 +208,24 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
      *
      * @return AbstractSearchType|null
      */
-    public function getSearchTypeByType(string $forType): ?AbstractSearchType {
+    public function getSearchTypeByType(string $forType): ?AbstractSearchType
+    {
         return $this->searchTypesByType[$forType] ?? null;
     }
 
     /**
      * @return AbstractSearchType[]
      */
-    public function getSearchTypes(): array {
+    public function getSearchTypes(): array
+    {
         return array_values($this->searchTypesByType);
     }
 
     /**
      * @param SearchService $searchService
      */
-    public function setSearchService(SearchService $searchService) {
+    public function setSearchService(SearchService $searchService)
+    {
         foreach ($this->getSearchTypes() as $searchType) {
             $searchType->setSearchService($searchService);
         }
@@ -222,21 +234,24 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
     /**
      * @return bool
      */
-    public function supportExtensions(): bool {
+    public function supportExtensions(): bool
+    {
         return false;
     }
 
     /**
      * @inheritdoc
      */
-    public function getSearchTypeByDType(int $dType): ?AbstractSearchType {
+    public function getSearchTypeByDType(int $dType): ?AbstractSearchType
+    {
         return $this->searchTypesByDtype[$dType] ?? null;
     }
 
     /**
      * @inheritdoc
      */
-    public function getAllWithDType(): array {
+    public function getAllWithDType(): array
+    {
         return array_values($this->searchTypesByDtype);
     }
 
@@ -245,7 +260,8 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
      *
      * @param AbstractSearchType $searchType
      */
-    public function registerSearchType(AbstractSearchType $searchType) {
+    public function registerSearchType(AbstractSearchType $searchType)
+    {
         foreach ($this->searchTypesByType as $existingSearchType) {
             if (get_class($searchType) === get_class($existingSearchType)) {
                 // Bailout if we've already registered the type.

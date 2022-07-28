@@ -12,20 +12,24 @@ use VanillaTests\SiteTestCase;
 /**
  * Test posting a tick.
  */
-class TickTest extends SiteTestCase {
-
+class TickTest extends SiteTestCase
+{
     /**
      * Test that no error is thrown when Gdn::controller() is null and we post a tick.
      */
-    public function testTick() {
+    public function testTick()
+    {
         $this->enableCaching();
         // We need certain config values in order to hit the place where Gdn::controller() is called.
-        $this->runWithConfig([
-            'Garden.Analytics.Views.Denormalize' => true,
-            'Garden.Analytics.Views.DenormalizeWriteback' => 1
-        ], function () {
-            $this->expectNotToPerformAssertions();
-            $this->api()->post('tick');
-        });
+        $this->runWithConfig(
+            [
+                "Garden.Analytics.Views.Denormalize" => true,
+                "Garden.Analytics.Views.DenormalizeWriteback" => 1,
+            ],
+            function () {
+                $this->expectNotToPerformAssertions();
+                $this->api()->post("tick");
+            }
+        );
     }
 }

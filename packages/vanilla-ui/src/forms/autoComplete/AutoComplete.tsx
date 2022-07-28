@@ -20,10 +20,14 @@ import { CloseIcon } from "../shared/CloseIcon";
 import { AutoCompleteOption, IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
 import { AutoCompleteContext, IAutoCompleteContext, IAutoCompleteInputState } from "./AutoCompleteContext";
 import { useComboboxContext } from "@reach/combobox";
+import groupBy from "lodash/groupBy";
+import sortBy from "lodash/sortBy";
+import { useStackingContext } from "@vanilla/react-utils";
 
 function AutoCompleteArrow() {
     const { size } = useContext(AutoCompleteContext);
-    const classes = useMemo(() => autoCompleteClasses({ size }), [size]);
+    const { zIndex } = useStackingContext();
+    const classes = useMemo(() => autoCompleteClasses({ size, zIndex }), [size, zIndex]);
     return (
         <div className={classes.autoCompleteArrow}>
             <DropDownArrow />
@@ -34,7 +38,8 @@ function AutoCompleteArrow() {
 function AutoCompleteClear(props: { onClear(): void }) {
     const { onClear } = props;
     const { size } = useContext(AutoCompleteContext);
-    const classes = useMemo(() => autoCompleteClasses({ size }), [size]);
+    const { zIndex } = useStackingContext();
+    const classes = useMemo(() => autoCompleteClasses({ size, zIndex }), [size, zIndex]);
     return (
         <div
             className={classes.autoCompleteClear}
@@ -58,7 +63,8 @@ function AutoCompleteClear(props: { onClear(): void }) {
 function AutoCompleteToken(props: { label: string; onUnSelect(): void }) {
     const { onUnSelect, label } = props;
     const { size } = useContext(AutoCompleteContext);
-    const classes = useMemo(() => autoCompleteClasses({ size }), [size]);
+    const { zIndex } = useStackingContext();
+    const classes = useMemo(() => autoCompleteClasses({ size, zIndex }), [size, zIndex]);
     return (
         <div className={cx("autocomplete-token", classes.inputTokenTag)} tabIndex={0}>
             <label>{label}</label>
@@ -155,11 +161,11 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         optionProvider,
         ...otherProps
     } = props;
-    const classes = useMemo(() => autoCompleteClasses({ size, isDisabled: disabled, isClearable: !!clear }), [
-        size,
-        disabled,
-        clear,
-    ]);
+    const { zIndex } = useStackingContext();
+    const classes = useMemo(
+        () => autoCompleteClasses({ size, isDisabled: disabled, isClearable: !!clear, zIndex }),
+        [size, disabled, clear, zIndex],
+    );
     const classesInput = useMemo(() => inputClasses({ size }), [size]);
     const [controlledOptions, setControlledOptions] = useState<IAutoCompleteOptionProps[]>();
     const [arbitraryValues, setArbitraryValues] = useState<string[]>([]);
@@ -178,7 +184,12 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
     );
 
     const values = value;
-    const isMultiple = props.multiple || Array.isArray(value);
+
+    // this prevents switching from multiple to non-multiple when the value is cleared
+    const isMultiple = useMemo(() => {
+        return props.multiple || Array.isArray(value);
+    }, []);
+
     // We need to control the value to be able to clear it.
     const displayValue = isMultiple
         ? ""
@@ -215,7 +226,10 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
      */
     useEffect(() => {
         if (displayValue) {
-            setState({ status: "selected", value: displayValue });
+            //when suggesting, we should not change the selection
+            if (state.status !== "suggesting") {
+                setState({ status: "selected", value: displayValue });
+            }
         } else if (Array.isArray(values)) {
             setState({ status: "selected", value: "" });
             setValuesState(values);
@@ -247,7 +261,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         if (allowArbitraryInput) {
             setArbitraryValues([]);
         }
-        onChange && onChange(undefined);
+        onChange && onChange(isMultiple ? [] : undefined);
     }, [onChange, isMultiple, allowArbitraryInput]);
 
     /**
@@ -298,16 +312,24 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
             if (isMultiple) {
                 const indexDefaultValueFound = finalValue.indexOf(value);
                 if (!Array.isArray(valuesState) && indexDefaultValueFound > -1) {
-                    finalValue.splice(indexDefaultValueFound, 1);
+                    finalValue = finalValue.filter((_val, index) => index !== indexDefaultValueFound);
                 } else {
                     if (Array.isArray(valuesState) && indexFound > -1) {
-                        finalValue.splice(indexFound, 1);
+                        finalValue = finalValue.filter((_val, index) => index !== indexFound);
                     } else {
-                        finalValue.push(value);
+                        finalValue = [...finalValue, value];
                     }
                 }
             }
-            onChange && onChange(finalValue);
+
+            if (finalValue === "true") {
+                finalValue = true;
+            }
+            if (finalValue === "false") {
+                finalValue = false;
+            }
+
+            onChange?.(finalValue);
             afterSelectHandler();
         },
         [onChange, optionByLabel, isMultiple, valuesState],
@@ -367,13 +389,13 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
      */
     const placeholderValue = useMemo<string | undefined>(() => {
         if (placeholder) {
-            if (selectedTokens.length > 0 || arbitraryValues.length > 0 || state.value) {
+            if (selectedTokens.length > 0 || arbitraryValues.length > 0 || (!isMultiple && state.value)) {
                 return undefined;
             }
             return placeholder;
         }
         return undefined;
-    }, [placeholder, selectedTokens, arbitraryValues, state]);
+    }, [placeholder, selectedTokens, arbitraryValues, isMultiple, state]);
 
     const handleKeyDown = (event) => {
         /**
@@ -415,6 +437,10 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         // when trying to select an item
         event.stopPropagation();
     };
+
+    const groupedFilteredOptions = groupBy(filteredOptions, (option) => option.group);
+
+    const showClearButton = !!clear && !!(isMultiple ? value && value.length > 0 : value);
 
     return (
         <AutoCompleteContext.Provider value={context}>
@@ -470,7 +496,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                     {!disabled && (
                         <div className={classes.inputActions}>
                             <AutoCompleteArrow />
-                            {clear && value && <AutoCompleteClear onClear={onClear!} />}
+                            {showClearButton && <AutoCompleteClear onClear={onClear!} />}
                         </div>
                     )}
                 </div>
@@ -485,9 +511,20 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                     position={(_, popoverRect) => positionMatchWidth(containerRect, popoverRect)}
                 >
                     <Reach.ComboboxList>
-                        {filteredOptions.map((props, index) => (
-                            <AutoCompleteOption key={index} {...props} />
-                        ))}
+                        {/* the options without a group come first */}
+                        {sortBy(Object.entries(groupedFilteredOptions), ([groupName]) => groupName !== "undefined").map(
+                            ([groupName, groupMembers], index) => (
+                                <React.Fragment key={index}>
+                                    <li role="separator" className={classes.separator} />
+                                    {groupName !== "undefined" && (
+                                        <h5 className={classes.groupHeading}> {groupName}</h5>
+                                    )}
+                                    {groupMembers.map((props, index) => (
+                                        <AutoCompleteOption key={index} {...props} />
+                                    ))}
+                                </React.Fragment>
+                            ),
+                        )}
                     </Reach.ComboboxList>
                 </Reach.ComboboxPopover>
                 <ComboboxState status={setComboboxState} />

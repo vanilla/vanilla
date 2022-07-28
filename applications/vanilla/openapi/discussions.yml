@@ -35,6 +35,11 @@ paths:
                   name: siteSectionID
                   schema:
                       type: string
+                - description: Filter discussion by a range of tag IDs.
+                  in: query
+                  name: tagID
+                  schema:
+                      $ref: "#/components/schemas/RangeExpression"
                 - description: Filter by discussion type.
                   in: query
                   name: type
@@ -127,6 +132,34 @@ paths:
                       type: boolean
                   x-filter:
                       field: d.Resolved
+                - description: Bookmarked by the UserID.
+                  in: query
+                  name: bookmarkUserID
+                  schema:
+                      type: integer
+                  allowEmptyValue: false
+                - description: Commented (participated) on by the UserID.
+                  in: query
+                  name: participatedUserID
+                  schema:
+                      type: integer
+                  allowEmptyValue: false
+                - description: List of statusIDs to filter discussion by.
+                  in: query
+                  name: statusID
+                  schema:
+                      type: array
+                      items:
+                          type: integer
+                  example: [1, 2, 3]
+                - description: List of internalStatusIDs to filter discussion by.
+                  in: query
+                  name: internalStatusID
+                  schema:
+                      type: array
+                      items:
+                          type: integer
+                  example: [1, 2, 3]
             responses:
                 "200":
                     content:
@@ -595,6 +628,79 @@ paths:
                             type: object
                 required: true
             summary: Update idea metadata on a discussion.
+    "/discussions/{id}/status":
+        put:
+            parameters:
+                - in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Discussion"
+                    description: Success
+            tags:
+                - Discussions
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                statusID:
+                                    description: statusID to change to.
+                                    type: integer
+                                statusNotes:
+                                    description: Reason for status change.
+                                    type: string
+                            required:
+                                - statusId
+                            type: object
+                required: true
+            summary: Change a discussion status.
+    "/discussions/{id}/status-log":
+        get:
+            parameters:
+                - description: |
+                      The discussion ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: |
+                      Desired number of items per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: 50
+                      maximum: 100
+                      minimum: 1
+                - description: |
+                      Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+                  in: query
+                  name: page
+                  schema:
+                      type: integer
+                      default: 1
+                      maximum: 100
+                      minimum: 1
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/StatusLog"
+                                type: array
+                    description: Success
+            tags:
+                - Discussions
+            summary: List of status changes for a discussion.
     "/discussions/{id}/quote":
         get:
             parameters:
@@ -966,6 +1072,8 @@ components:
                         - reactions
                         - tagsIDs
                         - tags
+                        - status
+                        - status.log
             style: form
     schemas:
         CategoryFragment:
@@ -1156,6 +1264,11 @@ components:
                     x-addon: resolved2
                     description: Whether or not the discussion should has been resolved.
                     type: boolean
+                statusID:
+                    type: integer
+                    description: The statusID current applied to the discussion.
+                status:
+                    $ref: "#/components/schemas/StatusFragment"
             required:
                 - discussionID
                 - type
@@ -1356,3 +1469,80 @@ components:
                 - dateInserted
                 - insertUserID
             type: object
+        StatusLog:
+            type: object
+            properties:
+                statusID:
+                    description: Record status ID of the discussion status.
+                    type: integer
+                insertUserID:
+                    description: The id of the user who inserted it.
+                    type: integer
+                dateInserted:
+                    description: Datetime of when the log was created.
+                    format: date-time
+                    type: string
+                recordType:
+                    description: Type of the discussion status.
+                    type: string
+                    enum:
+                        - discussion
+                recordID:
+                    description: Discussion Id of the current discussion
+                    type: string
+                reason:
+                    description: Reason for status change
+                    type: string
+                    nullable: true
+            required:
+                - statusID
+                - insertUserID
+                - dateInserted
+                - recordType
+                - recordID
+        StatusFragment:
+            type: object
+            description: Describes a status currently applied to a discussion. Expandable with `status` and `status.log` expands.
+            properties:
+                statusID:
+                    description: Record status ID of the discussion status.
+                    type: integer
+                name:
+                    description: The name of the status.
+                    type: string
+                recordType:
+                    description: Type of the discussion status.
+                    type: string
+                    enum:
+                        - discussion
+                recordSubType:
+                    description: Some statuses may only apply to a specific subtype of record.
+                    type: string
+                state:
+                    description: States are used to group statuses together.
+                    type: string
+                    enum:
+                        - open
+                        - closed
+                log:
+                    type: object
+                    description: Information about when the status was applied.
+                    required:
+                        - dateUpdated
+                        - updateUser
+                    properties:
+                        reasonUpdated:
+                            description: Reason for status change
+                            type: string
+                            nullable: true
+                        updateUser:
+                            $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/UserFragment"
+                        dateUpdated:
+                            description: When the discussion was last updated.
+                            format: date-time
+                            type: string
+            required:
+                - statusID
+                - name
+                - recordType
+                - state

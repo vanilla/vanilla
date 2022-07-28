@@ -16,9 +16,9 @@ use Vanilla\Formatting\DateTimeFormatter;
 /**
  * Model for updating visit information.
  */
-class UserVisitUpdater {
-
-    const CACHE_KEY_LAST_UPDATE_TIMESTAMP = 'userVisitLastBulkUpdateTimestamp';
+class UserVisitUpdater
+{
+    const CACHE_KEY_LAST_UPDATE_TIMESTAMP = "userVisitLastBulkUpdateTimestamp";
     const BULK_DISPATCH_DELAY = 300; // 5 minutes
     const BULK_DISPATCH_OVERLAP = 60; // 1 minute.
 
@@ -69,14 +69,15 @@ class UserVisitUpdater {
      * @throws \Exception If the user ID is not valid.
      * @return bool True on success, false if the user is banned or deleted.
      */
-    public function updateVisit(int $userID, $clientHour = null) {
+    public function updateVisit(int $userID, $clientHour = null)
+    {
         if (!$userID) {
-            throw new \Exception('A valid User ID is required.');
+            throw new \Exception("A valid User ID is required.");
         }
 
         $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
 
-        if ($user['Banned'] || $user['Deleted']) {
+        if ($user["Banned"] || $user["Deleted"]) {
             // Do not update visit information if the user is banned or deleted.
             return false;
         }
@@ -84,27 +85,30 @@ class UserVisitUpdater {
         $fields = [];
 
         // Update DateLastActive if this is the first time the user is active, or if the user was last active for more than 5 mins.
-        if ($user['DateLastActive'] === null ||
-            ($user['DateLastActive'] !== null && DateTimeFormatter::dateTimeToTimeStamp($user['DateLastActive']) < strtotime('5 minutes ago'))) {
-            $fields['DateLastActive'] = DateTimeFormatter::timeStampToDateTime(CurrentTimeStamp::get());
+        if (
+            $user["DateLastActive"] === null ||
+            ($user["DateLastActive"] !== null &&
+                DateTimeFormatter::dateTimeToTimeStamp($user["DateLastActive"]) < strtotime("5 minutes ago"))
+        ) {
+            $fields["DateLastActive"] = DateTimeFormatter::timeStampToDateTime(CurrentTimeStamp::get());
         }
 
         // Update session level information if necessary.
         if ($userID == $this->session->UserID) {
             $ip = \Gdn::request()->getIP();
-            $fields['LastIPAddress'] = ipEncode($ip);
+            $fields["LastIPAddress"] = ipEncode($ip);
             $this->userModel->saveIP($userID, $ip);
 
             if ($this->session->newVisit()) {
-                $fields['CountVisits'] = val('CountVisits', $user, 0) + 1;
-                $this->userModel->fireEvent('Visit');
+                $fields["CountVisits"] = val("CountVisits", $user, 0) + 1;
+                $this->userModel->fireEvent("Visit");
             }
         }
 
         // Set the hour offset based on the client's clock.
         if (is_numeric($clientHour) && $clientHour >= 0 && $clientHour < 24) {
-            $hourOffset = $clientHour - date('G', time());
-            $fields['HourOffset'] = $hourOffset;
+            $hourOffset = $clientHour - date("G", time());
+            $fields["HourOffset"] = $hourOffset;
         }
 
         // See if the fields have changed.
@@ -116,13 +120,13 @@ class UserVisitUpdater {
         }
 
         if (!empty($set)) {
-            $this->userModel->EventArguments['Fields'] = &$set;
-            $this->userModel->fireEvent('UpdateVisit');
+            $this->userModel->EventArguments["Fields"] = &$set;
+            $this->userModel->fireEvent("UpdateVisit");
             $this->userModel->setField($userID, $set);
             $this->tryDispatchBulkVisitUpdate();
         }
 
-        if ($user['LastIPAddress'] ?? null !== $fields['LastIPAddress'] ?? null) {
+        if ($user["LastIPAddress"] ?? (null !== $fields["LastIPAddress"] ?? null)) {
             // Refetch user with latest updated data.
             $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
             if (!$this->banModel::checkUser($user, null, true, $bans)) {
@@ -139,11 +143,9 @@ class UserVisitUpdater {
     /**
      * Try to dispatch a bulk visit update event for all users updated within a recent timespan.
      */
-    public function tryDispatchBulkVisitUpdate() {
-        $lastUpdateTimestamp = $this->cache->get(
-            self::CACHE_KEY_LAST_UPDATE_TIMESTAMP,
-            null
-        );
+    public function tryDispatchBulkVisitUpdate()
+    {
+        $lastUpdateTimestamp = $this->cache->get(self::CACHE_KEY_LAST_UPDATE_TIMESTAMP, null);
 
         $updateFrom = null;
         if ($lastUpdateTimestamp === null) {
@@ -168,15 +170,17 @@ class UserVisitUpdater {
             }
 
             $currentTime = CurrentTimeStamp::get();
-            $this->eventManager->dispatch(new BulkUpdateEvent(
-                'user',
-                [
-                    'userID' => $userIDs,
-                ],
-                [
-                    'dateLastActive' => (new \DateTime("@$currentTime"))->format(\DateTime::RFC3339),
-                ]
-            ));
+            $this->eventManager->dispatch(
+                new BulkUpdateEvent(
+                    "user",
+                    [
+                        "userID" => $userIDs,
+                    ],
+                    [
+                        "dateLastActive" => (new \DateTime("@$currentTime"))->format(\DateTime::RFC3339),
+                    ]
+                )
+            );
         }
     }
 }

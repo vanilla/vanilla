@@ -13,35 +13,39 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
 /**
  * Module for the react based quicklinks.
  */
-class QuickLinksModule extends AbstractReactModule {
-
+class QuickLinksModule extends AbstractReactModule
+{
     /**
      * @inheritdoc
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         return [
-            'title' => t('Quick Links'),
+            "title" => t("Quick Links"),
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public static function getComponentName(): string {
-        return 'QuickLinks';
+    public static function getComponentName(): string
+    {
+        return "QuickLinks";
     }
 
     /**
      * @inheritdoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         return Schema::parse([]);
     }
 
     /**
      * @inheritdoc
      */
-    public static function getWidgetName(): string {
-        return 'Quick Links';
+    public static function getWidgetName(): string
+    {
+        return "Quick Links";
     }
 }

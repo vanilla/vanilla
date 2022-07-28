@@ -33,9 +33,15 @@ use VanillaTests\VanillaTestCase;
 /**
  * Some basic tests for the `DiscussionModel`.
  */
-class DiscussionModelTest extends SiteTestCase {
-    use ExpectExceptionTrait, TestDiscussionModelTrait, EventSpyTestTrait,
-        TestCategoryModelTrait, CommunityApiTestTrait, UsersAndRolesApiTestTrait, TestCommentModelTrait,
+class DiscussionModelTest extends SiteTestCase
+{
+    use ExpectExceptionTrait,
+        TestDiscussionModelTrait,
+        EventSpyTestTrait,
+        TestCategoryModelTrait,
+        CommunityApiTestTrait,
+        UsersAndRolesApiTestTrait,
+        TestCommentModelTrait,
         SchedulerTestTrait;
 
     /** @var DiscussionEvent */
@@ -77,7 +83,8 @@ class DiscussionModelTest extends SiteTestCase {
      * @param DiscussionEvent $e
      * @return DiscussionEvent
      */
-    public function handleDiscussionEvent(DiscussionEvent $e): DiscussionEvent {
+    public function handleDiscussionEvent(DiscussionEvent $e): DiscussionEvent
+    {
         $this->lastEvent = $e;
         return $e;
     }
@@ -85,7 +92,8 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * Get a new model for each test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->now = new \DateTimeImmutable();
@@ -99,14 +107,14 @@ class DiscussionModelTest extends SiteTestCase {
         $eventManager->unbindClass(self::class);
         $eventManager->addListenerMethod(self::class, "handleDiscussionEvent");
 
-        $this->publicCategory = $this->insertCategories(1, ['UrlCode' => 'public-%s'])[0];
-        $this->insertDiscussions(2, ['CategoryID' => $this->publicCategory['CategoryID']]);
+        $this->publicCategory = $this->insertCategories(1, ["UrlCode" => "public-%s"])[0];
+        $this->insertDiscussions(2, ["CategoryID" => $this->publicCategory["CategoryID"]]);
 
-        $this->privateCategory = $this->insertPrivateCategory([
-            $this->roleID(Bootstrap::ROLE_ADMIN),
-            $this->roleID(Bootstrap::ROLE_MOD),
-        ], ['UrlCode' => 'private-%s']);
-        $this->insertDiscussions(3, ['CategoryID' => $this->privateCategory['CategoryID']]);
+        $this->privateCategory = $this->insertPrivateCategory(
+            [$this->roleID(Bootstrap::ROLE_ADMIN), $this->roleID(Bootstrap::ROLE_MOD)],
+            ["UrlCode" => "private-%s"]
+        );
+        $this->insertDiscussions(3, ["CategoryID" => $this->privateCategory["CategoryID"]]);
         DiscussionModel::cleanForTests();
         $this->activityModel = Gdn::getContainer()->get(ActivityModel::class);
     }
@@ -114,10 +122,11 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * Test DiscussionModel::save() merging validations.
      */
-    public function testDiscussionSaveValidationMerge(): void {
+    public function testDiscussionSaveValidationMerge(): void
+    {
         /** @var EventManager */
         $eventManager = $this->container()->get(EventManager::class);
-        $eventManager->bind('discussionmodel_beforesavediscussion', [$this, 'handleDiscussionSaveValidationMerge']);
+        $eventManager->bind("discussionmodel_beforesavediscussion", [$this, "handleDiscussionSaveValidationMerge"]);
 
         $discussionID = $this->discussionModel->save([
             "Name" => __FUNCTION__,
@@ -126,7 +135,7 @@ class DiscussionModelTest extends SiteTestCase {
         ]);
         $validationResults = $this->discussionModel->Validation->results();
         $this->assertEmpty($discussionID);
-        $this->assertEquals($validationResults['Body'], ['test validate discussion']);
+        $this->assertEquals($validationResults["Body"], ["test validate discussion"]);
     }
 
     /**
@@ -135,41 +144,46 @@ class DiscussionModelTest extends SiteTestCase {
      * @param DiscussionModel $sender
      * @param array $args
      */
-    public function handleDiscussionSaveValidationMerge(DiscussionModel $sender, array $args): void {
-        $sender->Validation->addValidationResult('Body', 'test validate discussion');
+    public function handleDiscussionSaveValidationMerge(DiscussionModel $sender, array $args): void
+    {
+        $sender->Validation->addValidationResult("Body", "test validate discussion");
     }
 
     /**
      * An empty archive date should be null.
      */
-    public function testArchiveDateEmpty() {
-        $this->discussionModel->setArchiveDate('');
+    public function testArchiveDateEmpty()
+    {
+        $this->discussionModel->setArchiveDate("");
         $this->assertNull($this->discussionModel->getArchiveDate());
     }
 
     /**
      * A date expression is valid.
      */
-    public function testDayInPast() {
-        $this->discussionModel->setArchiveDate('-3 days');
+    public function testDayInPast()
+    {
+        $this->discussionModel->setArchiveDate("-3 days");
         $this->assertLessThan($this->now, $this->discussionModel->getArchiveDate());
     }
 
     /**
      * A future date expression gets flipped to the past.
      */
-    public function testDayFlippedToPast() {
-        $this->discussionModel->setArchiveDate('3 days');
+    public function testDayFlippedToPast()
+    {
+        $this->discussionModel->setArchiveDate("3 days");
         $this->assertLessThan($this->now, $this->discussionModel->getArchiveDate());
     }
 
     /**
      * An invalid archive date should throw an exception.
      */
-    public function testInvalidArchiveDate() {
+    public function testInvalidArchiveDate()
+    {
         $this->expectException(\Exception::class);
 
-        $this->discussionModel->setArchiveDate('dnsfids');
+        $this->discussionModel->setArchiveDate("dnsfids");
     }
 
     /**
@@ -180,7 +194,8 @@ class DiscussionModelTest extends SiteTestCase {
      * @param bool $expected
      * @dataProvider provideIsArchivedTests
      */
-    public function testIsArchived(string $archiveDate, ?string $dateLastComment, bool $expected) {
+    public function testIsArchived(string $archiveDate, ?string $dateLastComment, bool $expected)
+    {
         $this->discussionModel->setArchiveDate($archiveDate);
         $actual = $this->discussionModel->isArchived($dateLastComment);
         $this->assertSame($expected, $actual);
@@ -189,14 +204,15 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * An invalid date should return a warning.
      */
-    public function testIsArchivedInvalidDate() {
-        $this->discussionModel->setArchiveDate('2019-10-26');
+    public function testIsArchivedInvalidDate()
+    {
+        $this->discussionModel->setArchiveDate("2019-10-26");
 
-        $actual = @$this->discussionModel->isArchived('fldjsjs');
+        $actual = @$this->discussionModel->isArchived("fldjsjs");
         $this->assertFalse($actual);
 
         $this->expectWarning();
-        $this->discussionModel->isArchived('fldjsjs');
+        $this->discussionModel->isArchived("fldjsjs");
     }
 
     /**
@@ -204,32 +220,33 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @return array
      */
-    public function provideIsArchivedTests(): array {
+    public function provideIsArchivedTests(): array
+    {
         $r = [
-            ['2000-01-01', '2019-10-26', false],
-            ['2000-01-01', '1999-12-31', true],
-            ['2001-01-01', '2001-01-01', false],
-            ['', '1999-01-01', false],
-            ['2001-01-01', null, false],
+            ["2000-01-01", "2019-10-26", false],
+            ["2000-01-01", "1999-12-31", true],
+            ["2001-01-01", "2001-01-01", false],
+            ["", "1999-01-01", false],
+            ["2001-01-01", null, false],
         ];
 
         return $r;
     }
 
-
     /**
      * Test canClose() where Admin is false and user has CloseOwn permission.
      */
-    public function testCanCloseAdminFalseCloseOwnTrue() {
+    public function testCanCloseAdminFalseCloseOwnTrue()
+    {
         $this->session->UserID = 123;
-        $this->session->getPermissions()->set('Vanilla.Discussions.CloseOwn', $this->session->UserID);
+        $this->session->getPermissions()->set("Vanilla.Discussions.CloseOwn", $this->session->UserID);
         $this->session->getPermissions()->setAdmin(false);
         $discussion = [
-            'DiscussionID' => 0,
-            'CategoryID' => 1,
-            'Name' => 'test',
-            'Body' => 'discuss',
-            'InsertUserID' => 123
+            "DiscussionID" => 0,
+            "CategoryID" => 1,
+            "Name" => "test",
+            "Body" => "discuss",
+            "InsertUserID" => 123,
         ];
         $actual = DiscussionModel::canClose($discussion);
         $expected = true;
@@ -239,16 +256,17 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * Test canClose() where Admin is false and user has CloseOwn permission but user did not start the discussion.
      */
-    public function testCanCloseCloseOwnTrueNotOwn() {
+    public function testCanCloseCloseOwnTrueNotOwn()
+    {
         $this->runWithUser(function () {
-            $this->session->getPermissions()->set('Vanilla.Discussions.CloseOwn', true);
+            $this->session->getPermissions()->set("Vanilla.Discussions.CloseOwn", true);
             $this->session->getPermissions()->setAdmin(false);
             $discussion = [
-                'DiscussionID' => 0,
-                'CategoryID' => 1,
-                'Name' => 'test',
-                'Body' => 'discuss',
-                'InsertUserID' => 321
+                "DiscussionID" => 0,
+                "CategoryID" => 1,
+                "Name" => "test",
+                "Body" => "discuss",
+                "InsertUserID" => 321,
             ];
             $actual = DiscussionModel::canClose($discussion);
             $expected = false;
@@ -259,18 +277,19 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * Test canClose() with discussion already closed and user didn't start the discussion.
      */
-    public function testCanCloseCloseIsClosed() {
+    public function testCanCloseCloseIsClosed()
+    {
         $this->runWithUser(function () {
-            $this->session->getPermissions()->set('Vanilla.Discussions.CloseOwn', true);
+            $this->session->getPermissions()->set("Vanilla.Discussions.CloseOwn", true);
             $this->session->getPermissions()->setAdmin(false);
             $discussion = [
-                'DiscussionID' => 0,
-                'CategoryID' => 1,
-                'Name' => 'test',
-                'Body' => 'discuss',
-                'InsertUserID' => 321,
-                'Closed' => true,
-                'Attributes' => ['ClosedByUserID' => 321]
+                "DiscussionID" => 0,
+                "CategoryID" => 1,
+                "Name" => "test",
+                "Body" => "discuss",
+                "InsertUserID" => 321,
+                "Closed" => true,
+                "Attributes" => ["ClosedByUserID" => 321],
             ];
             $actual = DiscussionModel::canClose($discussion);
             $expected = false;
@@ -281,9 +300,16 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * Test canClose() where Admin is true.
      */
-    public function testCanCloseAdminTrue() {
+    public function testCanCloseAdminTrue()
+    {
         $this->session->UserID = 123;
-        $discussion = ['DiscussionID' => 0, 'CategoryID' => 1, 'Name' => 'test', 'Body' => 'discuss', 'InsertUserID' => 123];
+        $discussion = [
+            "DiscussionID" => 0,
+            "CategoryID" => 1,
+            "Name" => "test",
+            "Body" => "discuss",
+            "InsertUserID" => 123,
+        ];
         $actual = DiscussionModel::canClose($discussion);
         $expected = true;
         $this->assertSame($expected, $actual);
@@ -292,13 +318,14 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * Test canClose() with discussion object.
      */
-    public function testCanCloseDiscussionObject() {
+    public function testCanCloseDiscussionObject()
+    {
         $this->session->UserID = 123;
         $discussion = new \stdClass();
         $discussion->DiscussionID = 0;
         $discussion->CategoryID = 1;
-        $discussion->Name = 'test';
-        $discussion->Body = 'discuss';
+        $discussion->Name = "test";
+        $discussion->Body = "discuss";
         $discussion->InsertUserID = 123;
         $actual = DiscussionModel::canClose($discussion);
         $expected = true;
@@ -312,9 +339,10 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * $dateOne > $dateTwo
      */
-    public function testMaxDateDateOneGreater() {
-        $dateOne = '2020-01-09 16:22:42';
-        $dateTwo = '2019-12-02 21:55:40';
+    public function testMaxDateDateOneGreater()
+    {
+        $dateOne = "2020-01-09 16:22:42";
+        $dateTwo = "2019-12-02 21:55:40";
         $expected = $dateOne;
         $actual = DiscussionModel::maxDate($dateOne, $dateTwo);
         $this->assertSame($expected, $actual);
@@ -323,9 +351,10 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * $dateTwo > $dateOne
      */
-    public function testMaxDateDateTwoGreater() {
-        $dateOne = '2019-12-02 21:55:40';
-        $dateTwo = '2020-01-09 16:22:42';
+    public function testMaxDateDateTwoGreater()
+    {
+        $dateOne = "2019-12-02 21:55:40";
+        $dateTwo = "2020-01-09 16:22:42";
         $expected = $dateTwo;
         $actual = DiscussionModel::maxDate($dateOne, $dateTwo);
         $this->assertSame($expected, $actual);
@@ -334,9 +363,10 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * $dateOne is null
      */
-    public function testMaxDateDateOneNull() {
+    public function testMaxDateDateOneNull()
+    {
         $dateOne = null;
-        $dateTwo = '2020-01-09 16:22:42';
+        $dateTwo = "2020-01-09 16:22:42";
         $expected = $dateTwo;
         $actual = DiscussionModel::maxDate($dateOne, $dateTwo);
         $this->assertSame($expected, $actual);
@@ -345,8 +375,9 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * $dateTwo is null
      */
-    public function testMaxDateDateTwoNull() {
-        $dateOne = '2020-01-09 16:22:42';
+    public function testMaxDateDateTwoNull()
+    {
+        $dateOne = "2020-01-09 16:22:42";
         $dateTwo = null;
         $expected = $dateOne;
         $actual = DiscussionModel::maxDate($dateOne, $dateTwo);
@@ -356,7 +387,8 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * Both dates are null
      */
-    public function testMaxDateWithTwoNullValues() {
+    public function testMaxDateWithTwoNullValues()
+    {
         $dateOne = null;
         $dateTwo = null;
         $expected = null;
@@ -384,8 +416,14 @@ class DiscussionModelTest extends SiteTestCase {
         ?string $testMaxDateInserted,
         $expected
     ) {
-        $discussion = (object)$testDiscussionArray;
-        $actual = $this->discussionModel->calculateWatch($discussion, $testLimit, $testOffset, $testTotalComments, $testMaxDateInserted);
+        $discussion = (object) $testDiscussionArray;
+        $actual = $this->discussionModel->calculateWatch(
+            $discussion,
+            $testLimit,
+            $testOffset,
+            $testTotalComments,
+            $testMaxDateInserted
+        );
         $this->assertSame($expected, $actual);
     }
 
@@ -394,125 +432,126 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestCalculateWatchArrays() {
+    public function provideTestCalculateWatchArrays()
+    {
         $r = [
-            'Unread Discussion With No Comments' => [
+            "Unread Discussion With No Comments" => [
                 [
-                    'DateLastViewed' => null,
-                    'CountCommentWatch' => null,
-                    'DateInserted' => '2020-01-17 19:20:02',
-                    'DateLastComment' => '2020-01-17 19:20:02',
-                    'Bookmarked' => 0,
+                    "DateLastViewed" => null,
+                    "CountCommentWatch" => null,
+                    "DateInserted" => "2020-01-17 19:20:02",
+                    "DateLastComment" => "2020-01-17 19:20:02",
+                    "Bookmarked" => 0,
                 ],
                 30,
                 0,
                 0,
                 null,
-                [0, '2020-01-17 19:20:02', 'insert'],
+                [0, "2020-01-17 19:20:02", "insert"],
             ],
-            'Unread Discussion with One Comment' => [
+            "Unread Discussion with One Comment" => [
                 [
-                    'DateLastViewed' => null,
-                    'CountCommentWatch' => null,
-                    'DateInserted' => '2020-01-17 19:20:02',
-                    'DateLastComment' => '2020-01-18 19:20:02',
-                    'Bookmarked' => 0,
+                    "DateLastViewed" => null,
+                    "CountCommentWatch" => null,
+                    "DateInserted" => "2020-01-17 19:20:02",
+                    "DateLastComment" => "2020-01-18 19:20:02",
+                    "Bookmarked" => 0,
                 ],
                 30,
                 0,
                 1,
-                '2020-01-18 19:20:02',
-                [1, '2020-01-18 19:20:02', 'insert'],
+                "2020-01-18 19:20:02",
+                [1, "2020-01-18 19:20:02", "insert"],
             ],
-            'Unread Discussion with One More Total Comments than the Limit' => [
+            "Unread Discussion with One More Total Comments than the Limit" => [
                 [
-                    'DateLastViewed' => null,
-                    'CountCommentWatch' => null,
-                    'DateInserted' => '2020-01-17 19:20:02',
-                    'DateLastComment' => '2020-01-19 19:20:02',
-                    'Bookmarked' => 0,
+                    "DateLastViewed" => null,
+                    "CountCommentWatch" => null,
+                    "DateInserted" => "2020-01-17 19:20:02",
+                    "DateLastComment" => "2020-01-19 19:20:02",
+                    "Bookmarked" => 0,
                 ],
                 30,
                 0,
                 31,
-                '2020-01-18 19:20:02',
-                [30, '2020-01-18 19:20:02', 'insert'],
+                "2020-01-18 19:20:02",
+                [30, "2020-01-18 19:20:02", "insert"],
             ],
-            'Read Discussion with No Comments' => [
+            "Read Discussion with No Comments" => [
                 [
-                    'DateLastViewed' => '2020-01-17 19:20:02',
-                    'CountCommentWatch' => 0,
-                    'DateInserted' => '2020-01-17 19:20:02',
-                    'DateLastComment' => '2020-01-17 19:20:02',
-                    'Bookmarked' => 0,
-                    'WatchUserID' => 1,
+                    "DateLastViewed" => "2020-01-17 19:20:02",
+                    "CountCommentWatch" => 0,
+                    "DateInserted" => "2020-01-17 19:20:02",
+                    "DateLastComment" => "2020-01-17 19:20:02",
+                    "Bookmarked" => 0,
+                    "WatchUserID" => 1,
                 ],
                 30,
                 0,
                 0,
-                '2020-01-17 19:20:02',
-                [0, '2020-01-17 19:20:02', null],
+                "2020-01-17 19:20:02",
+                [0, "2020-01-17 19:20:02", null],
             ],
-            'Read Discussion with New Comments' => [
+            "Read Discussion with New Comments" => [
                 [
-                    'DateLastViewed' => '2020-01-18 19:20:02',
-                    'CountCommentWatch' => 5,
-                    'DateInserted' => '2020-01-17 19:20:02',
-                    'DateLastComment' => '2020-01-19 19:20:02',
-                    'Bookmarked' => 0,
-                    'WatchUserID' => 1,
+                    "DateLastViewed" => "2020-01-18 19:20:02",
+                    "CountCommentWatch" => 5,
+                    "DateInserted" => "2020-01-17 19:20:02",
+                    "DateLastComment" => "2020-01-19 19:20:02",
+                    "Bookmarked" => 0,
+                    "WatchUserID" => 1,
                 ],
                 30,
                 5,
                 20,
-                '2020-01-19 19:20:02',
-                [20, '2020-01-19 19:20:02', 'update'],
+                "2020-01-19 19:20:02",
+                [20, "2020-01-19 19:20:02", "update"],
             ],
-            'User Has Read Page One, but not Page Two' => [
+            "User Has Read Page One, but not Page Two" => [
                 [
-                    'DateLastViewed' => '2020-01-18 19:20:02',
-                    'CountCommentWatch' => 30,
-                    'DateInserted' => '2020-01-17 19:20:02',
-                    'DateLastComment' => '2020-01-19 19:20:02',
-                    'Bookmarked' => 0,
-                    'WatchUserID' => 1,
+                    "DateLastViewed" => "2020-01-18 19:20:02",
+                    "CountCommentWatch" => 30,
+                    "DateInserted" => "2020-01-17 19:20:02",
+                    "DateLastComment" => "2020-01-19 19:20:02",
+                    "Bookmarked" => 0,
+                    "WatchUserID" => 1,
                 ],
                 30,
                 30,
                 31,
-                '2020-01-19 19:20:02',
-                [31, '2020-01-19 19:20:02', 'update'],
+                "2020-01-19 19:20:02",
+                [31, "2020-01-19 19:20:02", "update"],
             ],
-            'Comments Read is Greater than Total Comments' => [
+            "Comments Read is Greater than Total Comments" => [
                 [
-                    'DateLastViewed' => '2020-01-18 19:20:02',
-                    'CountCommentWatch' => 6,
-                    'DateInserted' => '2020-01-17 19:20:02',
-                    'DateLastComment' => '2020-01-18 19:20:02',
-                    'Bookmarked' => 0,
-                    'WatchUserID' => 1,
+                    "DateLastViewed" => "2020-01-18 19:20:02",
+                    "CountCommentWatch" => 6,
+                    "DateInserted" => "2020-01-17 19:20:02",
+                    "DateLastComment" => "2020-01-18 19:20:02",
+                    "Bookmarked" => 0,
+                    "WatchUserID" => 1,
                 ],
                 30,
                 5,
                 5,
-                'DateLastComment' => '2020-01-18 19:20:02',
-                [5, '2020-01-18 19:20:02', 'update'],
+                "DateLastComment" => "2020-01-18 19:20:02",
+                [5, "2020-01-18 19:20:02", "update"],
             ],
-            'Discussion Bookmarked Before Viewed' => [
+            "Discussion Bookmarked Before Viewed" => [
                 [
-                    'DateLastViewed' => null,
-                    'CountCommentWatch' => null,
-                    'DateInserted' => '2020-01-17 19:20:02',
-                    'DateLastComment' => '2020-01-18 19:20:02',
-                    'Bookmarked' => 1,
-                    'WatchUserID' => 1,
+                    "DateLastViewed" => null,
+                    "CountCommentWatch" => null,
+                    "DateInserted" => "2020-01-17 19:20:02",
+                    "DateLastComment" => "2020-01-18 19:20:02",
+                    "Bookmarked" => 1,
+                    "WatchUserID" => 1,
                 ],
                 30,
                 0,
                 0,
-                'DateLastComment' => '2020-01-18 19:20:02',
-                [0, '2020-01-18 19:20:02', 'update'],
-            ]
+                "DateLastComment" => "2020-01-18 19:20:02",
+                [0, "2020-01-18 19:20:02", "update"],
+            ],
         ];
 
         return $r;
@@ -549,99 +588,52 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestCalculateCommentReadData() {
+    public function provideTestCalculateCommentReadData()
+    {
         $r = [
-            'discussionLastCommentDateIsNull' => [
+            "discussionLastCommentDateIsNull" => [10, null, null, "2020-01-09 16:22:42", [true, 0]],
+            "userReadCommentIsNullWithReadDate" => [10, "2019-12-02 21:55:40", null, "2020-01-09 16:22:42", [true, 0]],
+            "userReadCommentIsNullWithUnreadDate" => [
                 10,
+                "2020-01-09 16:22:42",
                 null,
-                null,
-                '2020-01-09 16:22:42',
-                [true, 0],
-            ],
-            'userReadCommentIsNullWithReadDate' => [
-                10,
-                '2019-12-02 21:55:40',
-                null,
-                '2020-01-09 16:22:42',
-                [true, 0],
-            ],
-            'userReadCommentIsNullWithUnreadDate' => [
-                10,
-                '2020-01-09 16:22:42',
-                null,
-                '2019-12-02 21:55:40',
+                "2019-12-02 21:55:40",
                 [false, 1],
             ],
-            'userReadCommentsIsNullWithoutReadDate' => [
+            "userReadCommentsIsNullWithoutReadDate" => [10, "2019-12-02 21:55:40", null, null, [false, true]],
+            "CommentsAndUserReadEqualDatesConcur" => [10, "2019-12-02 21:55:40", 10, "2020-01-09 16:22:42", [true, 0]],
+            "CommentsAndUserReadEqualDatesDisagree" => [
                 10,
-                '2019-12-02 21:55:40',
-                null,
-                null,
-                [false, true],
-            ],
-            'CommentsAndUserReadEqualDatesConcur' => [
+                "2020-01-09 16:22:42",
                 10,
-                '2019-12-02 21:55:40',
-                10,
-                '2020-01-09 16:22:42',
-                [true, 0],
-            ],
-            'CommentsAndUserReadEqualDatesDisagree' => [
-                10,
-                '2020-01-09 16:22:42',
-                10,
-                '2019-12-02 21:55:40',
+                "2019-12-02 21:55:40",
                 [false, 1],
             ],
-            'MoreCommentsThanReadDatesAgree' => [
+            "MoreCommentsThanReadDatesAgree" => [15, "2020-01-09 16:22:42", 10, "2019-12-02 21:55:40", [false, 5]],
+            "MoreCommentsThanReadDatesDisagreeOnePage" => [
                 15,
-                '2020-01-09 16:22:42',
+                "2019-12-02 21:55:40",
                 10,
-                '2019-12-02 21:55:40',
-                [false, 5],
-            ],
-            'MoreCommentsThanReadDatesDisagreeOnePage' => [
-                15,
-                '2019-12-02 21:55:40',
-                10,
-                '2020-01-09 16:22:42',
+                "2020-01-09 16:22:42",
                 [true, 0],
             ],
-            'MoreReadThanCommentsLastCommentLater' => [
+            "MoreReadThanCommentsLastCommentLater" => [5, "2020-01-09 16:22:42", 10, "2019-12-02 21:55:40", [false, 1]],
+            "MoreReadThanCommentsLastCommentEarlier" => [
                 5,
-                '2020-01-09 16:22:42',
+                "2019-12-02 21:55:40",
                 10,
-                '2019-12-02 21:55:40',
-                [false, 1],
-            ],
-            'MoreReadThanCommentsLastCommentEarlier' => [
-                5,
-                '2019-12-02 21:55:40',
-                10,
-                '2020-01-09 16:22:42',
+                "2020-01-09 16:22:42",
                 [true, 0],
             ],
-            'ReadCommentsNoDiscussionCommentsDiscussionNotRead' => [
+            "ReadCommentsNoDiscussionCommentsDiscussionNotRead" => [
                 0,
-                '2020-01-09 16:22:42',
+                "2020-01-09 16:22:42",
                 50,
-                '2019-12-02 21:55:40',
+                "2019-12-02 21:55:40",
                 [false, true],
             ],
-            'NullUserReadDateNoReadComments' => [
-                5,
-                '2020-01-09 16:22:42',
-                0,
-                null,
-                [false, 5],
-            ],
-            'NullUserCountWithReadComments' => [
-                5,
-                '2020-01-09 16:22:42',
-                10,
-                null,
-                [false, 1],
-            ],
+            "NullUserReadDateNoReadComments" => [5, "2020-01-09 16:22:42", 0, null, [false, 5]],
+            "NullUserCountWithReadComments" => [5, "2020-01-09 16:22:42", 10, null, [false, 1]],
         ];
 
         return $r;
@@ -652,7 +644,8 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testDeleteEventDispatched(): void {
+    public function testDeleteEventDispatched(): void
+    {
         $discussionID = $this->discussionModel->save([
             "Name" => __FUNCTION__,
             "Body" => "Hello world.",
@@ -669,7 +662,8 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testSaveInsertEventDispatched(): void {
+    public function testSaveInsertEventDispatched(): void
+    {
         $this->discussionModel->save([
             "Name" => __FUNCTION__,
             "Body" => "Hello world.",
@@ -685,7 +679,8 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testSaveUpdateEventDispatched(): void {
+    public function testSaveUpdateEventDispatched(): void
+    {
         $discussionID = $this->discussionModel->save([
             "Name" => __FUNCTION__,
             "Body" => "Hello world.",
@@ -703,7 +698,8 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * Test that chaning a discussions category triggers a bulk update for all of it's comments.
      */
-    public function testChangeTriggersBulkUpdate() {
+    public function testChangeTriggersBulkUpdate()
+    {
         $this->session->getPermissions()->setAdmin(true);
         $discussionID = $this->discussionModel->save([
             "Name" => __FUNCTION__,
@@ -716,33 +712,35 @@ class DiscussionModelTest extends SiteTestCase {
             "Name" => __FUNCTION__,
             "Body" => "Hello world.",
             "Format" => "markdown",
-            'DiscussionID' => $discussionID,
+            "DiscussionID" => $discussionID,
         ]);
         $this->clearDispatchedEvents();
 
         // No change.
         $this->discussionModel->save([
-            'DiscussionID' => $discussionID,
+            "DiscussionID" => $discussionID,
             "Body" => "Hello world.",
-            'CategoryID' => 1,
+            "CategoryID" => 1,
         ]);
         $this->assertNoEventsDispatched(BulkUpdateEvent::class);
 
         // Changed
         $this->discussionModel->save([
-            'DiscussionID' => $discussionID,
+            "DiscussionID" => $discussionID,
             "Body" => "Hello world.",
-            'CategoryID' => -1,
+            "CategoryID" => -1,
         ]);
-        $this->assertBulkEventDispatched(new BulkUpdateEvent(
-            'comment',
-            [
-                'discussionID' => (int) $discussionID,
-            ],
-            [
-                'categoryID' => -1,
-            ]
-        ));
+        $this->assertBulkEventDispatched(
+            new BulkUpdateEvent(
+                "comment",
+                [
+                    "discussionID" => (int) $discussionID,
+                ],
+                [
+                    "categoryID" => -1,
+                ]
+            )
+        );
     }
 
     /**
@@ -751,8 +749,9 @@ class DiscussionModelTest extends SiteTestCase {
      * @return void
      * @throws \Exception Throws an exception if given an invalid timestamp.
      */
-    public function testSetWatch(): void {
-        $this->session->start(self::$siteInfo['adminUserID'], false, false);
+    public function testSetWatch(): void
+    {
+        $this->session->start(self::$siteInfo["adminUserID"], false, false);
 
         $countComments = 5;
         $discussion = [
@@ -769,10 +768,7 @@ class DiscussionModelTest extends SiteTestCase {
         $this->assertNotEmpty($discussionID, $this->discussionModel->Validation->resultsText());
         $discussion = $this->discussionModel->getID($discussionID);
         $this->assertIsObject($discussion);
-        $this->assertNull(
-            $discussion->CountCommentWatch,
-            "Initial comment watch status not null."
-        );
+        $this->assertNull($discussion->CountCommentWatch, "Initial comment watch status not null.");
 
         // Create a comment watch status.
         $this->discussionModel->setWatch($discussion, 10, 0, $discussion->CountComments);
@@ -817,10 +813,10 @@ class DiscussionModelTest extends SiteTestCase {
                 "UrlCode" => "foo",
                 "PermissionCategoryID" => 1,
                 "DateMarkedRead" => $categoryMarkedRead,
-            ]
+            ],
         ];
 
-        $discussion = (object)[
+        $discussion = (object) [
             "DiscussionID" => 0,
             "CategoryID" => 100,
             "Name" => "test",
@@ -850,7 +846,8 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @return array
      */
-    public function provideMarkedRead(): array {
+    public function provideMarkedRead(): array
+    {
         $result = [
             "Discussion unread, category unread" => [
                 "2020-01-01 00:00:00", // Discussion.DateInserted
@@ -901,27 +898,34 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * Announcements should properly sort.
      */
-    public function testAnnouncementSorting() {
-        $row = ['Name' => 'ax1', 'Announce' => 1];
+    public function testAnnouncementSorting()
+    {
+        $row = ["Name" => "ax1", "Announce" => 1];
         $this->insertDiscussions(10, $row);
 
-        $rows = $this->discussionModel->getAnnouncements($row, 0, false, '-DiscussionID')->resultArray();
-        self::assertSorted($rows, '-DiscussionID');
+        $rows = $this->discussionModel->getAnnouncements($row, 0, false, "-DiscussionID")->resultArray();
+        self::assertSorted($rows, "-DiscussionID");
     }
 
     /**
      * Test DiscussionTypes()
      */
-    public function testDiscussionTypes() {
+    public function testDiscussionTypes()
+    {
         $discussionTypes = $this->discussionModel::discussionTypes();
-        $this->assertSame(['Discussion' => [
-            'apiType' => 'discussion',
-            'Singular' => 'Discussion',
-            'Plural' => 'Discussions',
-            'AddUrl' => '/post/discussion',
-            'AddText' => 'New Discussion',
-            'AddIcon' => 'new-discussion'
-        ]], $discussionTypes);
+        $this->assertSame(
+            [
+                "Discussion" => [
+                    "apiType" => "discussion",
+                    "Singular" => "Discussion",
+                    "Plural" => "Discussions",
+                    "AddUrl" => "/post/discussion",
+                    "AddText" => "New Discussion",
+                    "AddIcon" => "new-discussion",
+                ],
+            ],
+            $discussionTypes
+        );
     }
 
     /**
@@ -929,12 +933,13 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @return int
      */
-    public function testDiscussionCountAsFullAdmin(): int {
+    public function testDiscussionCountAsFullAdmin(): int
+    {
         $userID = $this->createUserFixture(Bootstrap::ROLE_ADMIN);
         $this->session->start($userID);
-        $adminCountAllowed = $this->discussionModel->getCount(
-            ['d.CategoryID' => [$this->publicCategory['CategoryID'], $this->privateCategory['CategoryID']]]
-        );
+        $adminCountAllowed = $this->discussionModel->getCount([
+            "d.CategoryID" => [$this->publicCategory["CategoryID"], $this->privateCategory["CategoryID"]],
+        ]);
         $this->assertSame(5, $adminCountAllowed);
 
         return $adminCountAllowed;
@@ -946,13 +951,14 @@ class DiscussionModelTest extends SiteTestCase {
      * @param int $adminCountAllowed
      * @depends testDiscussionCountAsFullAdmin
      */
-    public function testDiscussionCountWithOneUnviewableCategory($adminCountAllowed): void {
+    public function testDiscussionCountWithOneUnviewableCategory($adminCountAllowed): void
+    {
         $userID = $this->createUserFixture(Bootstrap::ROLE_MEMBER);
         $this->session->start($userID);
 
-        $memberCountAllowed = $this->discussionModel->getCount(
-            ['d.CategoryID' => [$this->publicCategory['CategoryID'], $this->privateCategory['CategoryID']]]
-        );
+        $memberCountAllowed = $this->discussionModel->getCount([
+            "d.CategoryID" => [$this->publicCategory["CategoryID"], $this->privateCategory["CategoryID"]],
+        ]);
         $this->assertSame(2, $memberCountAllowed);
         $this->assertLessThan($adminCountAllowed, $memberCountAllowed);
     }
@@ -962,7 +968,8 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @return int
      */
-    public function testDiscussionCountRecentDiscussionsAdmin(): int {
+    public function testDiscussionCountRecentDiscussionsAdmin(): int
+    {
         $userID = $this->createUserFixture(Bootstrap::ROLE_ADMIN);
         $this->session->start($userID);
         $allCategories = DiscussionModel::categoryPermissions();
@@ -978,7 +985,8 @@ class DiscussionModelTest extends SiteTestCase {
      * @param int $adminCountAllowed
      * @depends testDiscussionCountRecentDiscussionsAdmin
      */
-    public function testDiscussionCountRecentDiscussionsMember($adminCountAllowed): void {
+    public function testDiscussionCountRecentDiscussionsMember($adminCountAllowed): void
+    {
         $userID = $this->createUserFixture(Bootstrap::ROLE_MEMBER);
         $this->session->start($userID);
         $allCategories = DiscussionModel::categoryPermissions();
@@ -987,20 +995,20 @@ class DiscussionModelTest extends SiteTestCase {
         $this->assertLessThan($adminCountAllowed, $memberCountAllowed);
     }
 
-
     /**
      * Smoke test DiscussionModel::getByUser()
      */
-    public function testgetByUser(): void {
+    public function testgetByUser(): void
+    {
         $memberUserID = $this->createUserFixture(VanillaTestCase::ROLE_MEMBER);
-        $countDiscussionsMember = $this->discussionModel->getCount(['d.InsertUserID' => $memberUserID]);
+        $countDiscussionsMember = $this->discussionModel->getCount(["d.InsertUserID" => $memberUserID]);
         $adminUserID = $this->createUserFixture(VanillaTestCase::ROLE_ADMIN);
         $this->session->start($adminUserID);
         $this->discussionModel->save([
             "Name" => __FUNCTION__,
             "Body" => "Hello world Admin.",
             "Format" => "markdown",
-            "CategoryID" => $this->privateCategory['CategoryID']
+            "CategoryID" => $this->privateCategory["CategoryID"],
         ]);
 
         $this->session->start($memberUserID);
@@ -1008,10 +1016,17 @@ class DiscussionModelTest extends SiteTestCase {
             "Name" => __FUNCTION__,
             "Body" => "Hello world Member",
             "Format" => "markdown",
-            "CategoryID" => $this->publicCategory['CategoryID']
+            "CategoryID" => $this->publicCategory["CategoryID"],
         ]);
 
-        $discussionsMember = $this->discussionModel->getByUser($memberUserID, 10, 0, false, $memberUserID, 'PermsDiscussionsView');
+        $discussionsMember = $this->discussionModel->getByUser(
+            $memberUserID,
+            10,
+            0,
+            false,
+            $memberUserID,
+            "PermsDiscussionsView"
+        );
         $discussionsMemberRows = $discussionsMember->numRows();
         $this->assertEquals($discussionsMemberRows, $discussionsMemberRows + $countDiscussionsMember);
     }
@@ -1019,48 +1034,51 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * Test a dirty-record is added when calling setField.
      */
-    public function testDirtyRecordAdded() {
+    public function testDirtyRecordAdded()
+    {
         $discussion = $this->insertDiscussions(1);
-        $id = $discussion[0]['DiscussionID'];
-        $this->discussionModel->setField($id, 'Announce', 1);
-        $this->assertDirtyRecordInserted('discussion', $id);
+        $id = $discussion[0]["DiscussionID"];
+        $this->discussionModel->setField($id, "Announce", 1);
+        $this->assertDirtyRecordInserted("discussion", $id);
     }
 
     /**
      * Test participation count.
      */
-    public function testParticipatedCount() {
-        $this->resetTable('Comment');
+    public function testParticipatedCount()
+    {
+        $this->resetTable("Comment");
         $user2 = $this->createUser();
         $this->createCategory();
         $disc1 = $this->createDiscussion();
         $disc2 = $this->createDiscussion();
         $this->runWithUser(function () use ($disc1, $disc2) {
-            $this->createComment(['discussionID' => $disc1['discussionID']]);
-            $this->createComment(['discussionID' => $disc2['discussionID']]);
+            $this->createComment(["discussionID" => $disc1["discussionID"]]);
+            $this->createComment(["discussionID" => $disc2["discussionID"]]);
             $this->assertEquals(2, $this->discussionModel->getCountParticipated());
         }, $user2);
 
         $this->assertEquals(0, $this->discussionModel->getCountParticipated());
-        $this->assertEquals(2, $this->discussionModel->getCountParticipated($user2['userID']));
+        $this->assertEquals(2, $this->discussionModel->getCountParticipated($user2["userID"]));
     }
 
     /**
      * Smoke test `DiscussionModel::resolveDiscussionArg()`.
      */
-    public function testResolveDiscussionArg(): void {
+    public function testResolveDiscussionArg(): void
+    {
         $expected = $this->insertDiscussions(1)[0];
 
         [$id, $actual] = $this->discussionModel->resolveDiscussionArg($expected);
         $this->assertSame($expected, $actual);
-        $this->assertSame($expected['DiscussionID'], $id);
+        $this->assertSame($expected["DiscussionID"], $id);
 
         // These fields aren't necessary for comparison and are inconsistent between `DiscussionModel::getWhere()` and `DiscussionModel::getID()`.
-        unset($expected['FirstEmail'], $expected['FirstName'], $expected['FirstPhoto'], $expected['WatchUserID']);
+        unset($expected["FirstEmail"], $expected["FirstName"], $expected["FirstPhoto"], $expected["WatchUserID"]);
 
-        [$id2, $actual2] = $this->discussionModel->resolveDiscussionArg($expected['DiscussionID']);
+        [$id2, $actual2] = $this->discussionModel->resolveDiscussionArg($expected["DiscussionID"]);
         $this->assertArraySubsetRecursive($expected, $actual2);
-        $this->assertSame($expected['DiscussionID'], $id2);
+        $this->assertSame($expected["DiscussionID"], $id2);
     }
 
     /**
@@ -1068,28 +1086,29 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @see https://github.com/vanilla/support/issues/4044
      */
-    public function testDiscussionEncoding() {
+    public function testDiscussionEncoding()
+    {
         $in = 'Hello name with "quotes" & ampersand';
-        $this->createDiscussion(['name' => $in]);
-        $fetchedBack = $this->api()->get("/discussions/{$this->lastInsertedDiscussionID}")->getBody();
-        $this->assertEquals($in, $fetchedBack['name']);
+        $this->createDiscussion(["name" => $in]);
+        $fetchedBack = $this->api()
+            ->get("/discussions/{$this->lastInsertedDiscussionID}")
+            ->getBody();
+        $this->assertEquals($in, $fetchedBack["name"]);
     }
 
     /**
      * Test DiscussionModel::FilterCategoryPermissions().
      */
-    public function testFilterCategoryPermissions(): void {
+    public function testFilterCategoryPermissions(): void
+    {
         $discussion1 = $this->createDiscussion();
         $discussion2 = $this->createDiscussion();
-        $discussionIDs =  [
-            $discussion1['discussionID'],
-            $discussion2['discussionID']
-        ];
-        $result = $this->discussionModel->filterCategoryPermissions($discussionIDs, 'Vanilla.Discussions.Delete');
+        $discussionIDs = [$discussion1["discussionID"], $discussion2["discussionID"]];
+        $result = $this->discussionModel->filterCategoryPermissions($discussionIDs, "Vanilla.Discussions.Delete");
         $this->assertEquals($discussionIDs, $result);
-        $userGuest = $this->createUser(['RoleID'=> \RoleModel::GUEST_ID]);
+        $userGuest = $this->createUser(["RoleID" => \RoleModel::GUEST_ID]);
         $result = $this->runWithUser(function () use ($discussionIDs) {
-            return $this->discussionModel->filterCategoryPermissions($discussionIDs, 'Vanilla.Discussions.Delete');
+            return $this->discussionModel->filterCategoryPermissions($discussionIDs, "Vanilla.Discussions.Delete");
         }, $userGuest);
         $this->assertEmpty($result);
     }
@@ -1097,16 +1116,17 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * Test DiscussionModel::CheckPermission().
      */
-    public function testCheckPermission(): void {
+    public function testCheckPermission(): void
+    {
         $category = $this->createCategory();
-        $discussion =  $this->createDiscussion(['categoryID' => $category['categoryID']]);
+        $discussion = $this->createDiscussion(["categoryID" => $category["categoryID"]]);
         $discussion = ArrayUtils::pascalCase($discussion);
-        $result = $this->discussionModel->checkPermission($discussion, 'Vanilla.Discussions.View');
+        $result = $this->discussionModel->checkPermission($discussion, "Vanilla.Discussions.View");
         $this->assertTrue($result);
-        $result = $this->discussionModel->checkPermission($discussion, 'View');
+        $result = $this->discussionModel->checkPermission($discussion, "View");
         $this->assertTrue($result);
-        unset($discussion['CategoryID']);
-        $result = $this->discussionModel->checkPermission($discussion, 'Vanilla.Discussions.View');
+        unset($discussion["CategoryID"]);
+        $result = $this->discussionModel->checkPermission($discussion, "Vanilla.Discussions.View");
         $this->assertFalse($result);
     }
 
@@ -1115,46 +1135,48 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @depends testPrepareMoveDiscussionsData
      */
-    public function testSuccessDiscussionsMove(): void {
+    public function testSuccessDiscussionsMove(): void
+    {
         // Move valid discussions.
         ModelUtils::consumeGenerator(
             $this->discussionModel->moveDiscussionsIterator(
-                self::$data['validDiscussionIDs'],
-                ArrayUtils::pascalCase(self::$data['validCategory2'])['CategoryID'],
+                self::$data["validDiscussionIDs"],
+                ArrayUtils::pascalCase(self::$data["validCategory2"])["CategoryID"],
                 true
             )
         );
-        $discussions = $this->discussionModel->getIn(self::$data['validDiscussionIDs'])->resultArray();
+        $discussions = $this->discussionModel->getIn(self::$data["validDiscussionIDs"])->resultArray();
         foreach ($discussions as $discussion) {
-            $this->assertEquals(self::$data['validCategory2']['categoryID'], $discussion['CategoryID']);
+            $this->assertEquals(self::$data["validCategory2"]["categoryID"], $discussion["CategoryID"]);
         }
     }
 
     /**
      * Prepare move discussions test data.
      */
-    public function testPrepareMoveDiscussionsData(): void {
+    public function testPrepareMoveDiscussionsData(): void
+    {
         $rd1 = rand(5000, 6000);
         $rd2 = rand(3000, 4000);
         $rd3 = rand(1000, 2000);
         $categoryInvalid = [
-            'categoryID' => 123456,
-            'name' => 'invalid category',
-            'urlCode' => 'invalid category'.$rd1.$rd2,
-            'parentCategoryID' => $rd1
+            "categoryID" => 123456,
+            "name" => "invalid category",
+            "urlCode" => "invalid category" . $rd1 . $rd2,
+            "parentCategoryID" => $rd1,
         ];
-        $category_1Name = 'category_1'.$rd1;
-        $category_2Name = 'category_2'.$rd2;
-        $category_3Name = 'category_3'.$rd3;
+        $category_1Name = "category_1" . $rd1;
+        $category_2Name = "category_2" . $rd2;
+        $category_3Name = "category_3" . $rd3;
         $categoryData_1 = [
-            'name' => $category_1Name
+            "name" => $category_1Name,
         ];
 
         $categoryData_2 = [
-            'name' => $category_2Name
+            "name" => $category_2Name,
         ];
         $categoryData_3 = [
-            'name' => $category_3Name
+            "name" => $category_3Name,
         ];
 
         $category_1 = $this->createCategory($categoryData_1);
@@ -1162,42 +1184,47 @@ class DiscussionModelTest extends SiteTestCase {
         $category_3 = $this->createCategory($categoryData_3);
         $category_permission = $this->createPermissionedCategory([], [RoleModel::ADMIN_ID]);
         $discussionData_1 = [
-            'name' => 'Test Discussion_1',
-            'categoryID' => $category_1['categoryID']
+            "name" => "Test Discussion_1",
+            "categoryID" => $category_1["categoryID"],
         ];
         $discussionData_2 = [
-            'name' => 'Test Discussion_2',
-            'categoryID' => $category_1['categoryID']
+            "name" => "Test Discussion_2",
+            "categoryID" => $category_1["categoryID"],
         ];
         $discussionData_3 = [
-            'name' => 'Test Discussion_3',
-            'categoryID' => $category_1['categoryID']
+            "name" => "Test Discussion_3",
+            "categoryID" => $category_1["categoryID"],
         ];
         $discussionData_4 = [
-            'name' => 'Test Discussion_4',
-            'categoryID' => $category_1['categoryID']
+            "name" => "Test Discussion_4",
+            "categoryID" => $category_1["categoryID"],
         ];
         $discussionData_Permission = [
-            'name' => 'Test Discussion_Permission',
-            'categoryID' => $category_permission['categoryID']
+            "name" => "Test Discussion_Permission",
+            "categoryID" => $category_permission["categoryID"],
         ];
         $discussion_1 = $this->createDiscussion($discussionData_1);
         $discussion_2 = $this->createDiscussion($discussionData_2);
         $discussion_3 = $this->createDiscussion($discussionData_3);
         $discussion_4 = $this->createDiscussion($discussionData_Permission);
         $discussion_Permission = $this->createDiscussion($discussionData_4);
-        $discussionIDs = [$discussion_1['discussionID'], $discussion_2['discussionID'], $discussion_3['discussionID'], $discussion_4['discussionID']];
-        self::$data['invalidDiscussionIDs'] = [$rd1, $rd2];
-        self::$data['invalidCategory'] = $categoryInvalid;
-        self::$data['validCategory1'] = $category_1;
-        self::$data['validCategory2'] = $category_2;
-        self::$data['validCategory3'] = $category_3;
-        self::$data['category_permission'] = $category_permission;
-        self::$data['discussion_1'] = $discussionData_1;
-        self::$data['discussion_2'] = $discussionData_2;
-        self::$data['discussion_Permission'] = $discussion_Permission;
-        self::$data['validDiscussionIDs'] = $discussionIDs;
-        self::$data['mixedIDs'] = array_merge(self::$data['validDiscussionIDs'], [1234]);
+        $discussionIDs = [
+            $discussion_1["discussionID"],
+            $discussion_2["discussionID"],
+            $discussion_3["discussionID"],
+            $discussion_4["discussionID"],
+        ];
+        self::$data["invalidDiscussionIDs"] = [$rd1, $rd2];
+        self::$data["invalidCategory"] = $categoryInvalid;
+        self::$data["validCategory1"] = $category_1;
+        self::$data["validCategory2"] = $category_2;
+        self::$data["validCategory3"] = $category_3;
+        self::$data["category_permission"] = $category_permission;
+        self::$data["discussion_1"] = $discussionData_1;
+        self::$data["discussion_2"] = $discussionData_2;
+        self::$data["discussion_Permission"] = $discussion_Permission;
+        self::$data["validDiscussionIDs"] = $discussionIDs;
+        self::$data["mixedIDs"] = array_merge(self::$data["validDiscussionIDs"], [1234]);
 
         $this->assertTrue(!empty(self::$data));
     }
@@ -1222,18 +1249,16 @@ class DiscussionModelTest extends SiteTestCase {
         if ($maxIterations !== null) {
             $this->getLongRunner()->setMaxIterations($maxIterations);
         }
-        $user = $category === 'category_permission' ? $this->createUser() : self::$siteInfo['adminUserID'];
+        $user = $category === "category_permission" ? $this->createUser() : self::$siteInfo["adminUserID"];
         /** @var LongRunnerResult $result */
         $result = $this->runWithUser(function () use ($discussionIDs, $category) {
-            return $this->getLongRunner()->runImmediately(new LongRunnerAction(
-                DiscussionModel::class,
-                'moveDiscussionsIterator',
-                [
+            return $this->getLongRunner()->runImmediately(
+                new LongRunnerAction(DiscussionModel::class, "moveDiscussionsIterator", [
                     self::$data[$discussionIDs],
-                    self::$data[$category]['categoryID'],
-                    true
-                ]
-            ));
+                    self::$data[$category]["categoryID"],
+                    true,
+                ])
+            );
         }, $user);
 
         $this->assertEquals($expectedCode, $result->asData()->getStatus());
@@ -1244,13 +1269,14 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @return array
      */
-    public function provideDiscussionsMoveData(): array {
+    public function provideDiscussionsMoveData(): array
+    {
         return [
-            'invalid-discussion' => ['invalidDiscussionIDs', 'validCategory1', 404, null],
-            'invalid-category' => ['validDiscussionIDs', 'invalidCategory', 404, null],
-            'valid-invalidIDs' => ['mixedIDs', 'validCategory2', 404, null],
-            'timeout' => ['validDiscussionIDs', 'validCategory3', 408, 2],
-            'permission-invalid' => ['validDiscussionIDs', 'category_permission', 400, null]
+            "invalid-discussion" => ["invalidDiscussionIDs", "validCategory1", 404, null],
+            "invalid-category" => ["validDiscussionIDs", "invalidCategory", 404, null],
+            "valid-invalidIDs" => ["mixedIDs", "validCategory2", 404, null],
+            "timeout" => ["validDiscussionIDs", "validCategory3", 408, 2],
+            "permission-invalid" => ["validDiscussionIDs", "category_permission", 400, null],
         ];
     }
 
@@ -1263,59 +1289,62 @@ class DiscussionModelTest extends SiteTestCase {
      *
      * @dataProvider provideLengthValidation
      */
-    public function testLengthValidation(array $config, array $record, string $expectError = null) {
+    public function testLengthValidation(array $config, array $record, string $expectError = null)
+    {
         $this->runWithConfig($config, function () use ($record, $expectError) {
             if ($expectError) {
                 $this->expectExceptionMessage($expectError);
             }
 
             $discussion = $this->createDiscussion($record);
-            $this->assertIsInt($discussion['discussionID']);
+            $this->assertIsInt($discussion["discussionID"]);
         });
     }
 
     /**
      * Providate cases for validating length of discussions.
      */
-    public function provideLengthValidation() {
+    public function provideLengthValidation()
+    {
         return [
-            'too short plaintext' => [
+            "too short plaintext" => [
                 [
-                    'Vanilla.Comment.MinLength' => 5,
+                    "Vanilla.Comment.MinLength" => 5,
                 ],
                 [
-                    'body' => '**four**',
-                    'format' => MarkdownFormat::FORMAT_KEY,
+                    "body" => "**four**",
+                    "format" => MarkdownFormat::FORMAT_KEY,
                 ],
-                'Body is 1 character too short'
+                "Body is 1 character too short",
             ],
-            'bytes over plaintext limit, but plaintext limit under' => [
+            "bytes over plaintext limit, but plaintext limit under" => [
                 [
-                    'Vanilla.Comment.MinLength' => 5,
+                    "Vanilla.Comment.MinLength" => 5,
                 ],
                 [
-                    'body' => '**four**',
-                    'format' => MarkdownFormat::FORMAT_KEY,
+                    "body" => "**four**",
+                    "format" => MarkdownFormat::FORMAT_KEY,
                 ],
-                'Body is 1 character too short'
+                "Body is 1 character too short",
             ],
-            'too long plaintext' => [
+            "too long plaintext" => [
                 [
-                    'Vanilla.Comment.MaxLength' => 5,
+                    "Vanilla.Comment.MaxLength" => 5,
                 ],
                 [
-                    'body' => '**morethanfive**',
-                    'format' => MarkdownFormat::FORMAT_KEY,
+                    "body" => "**morethanfive**",
+                    "format" => MarkdownFormat::FORMAT_KEY,
                 ],
-                'Body is 7 characters too long.'
-            ]
+                "Body is 7 characters too long.",
+            ],
         ];
     }
 
     /**
      * Test a recordAdvancedNotications with CONF_CATEGORY_FOLLOWING disabled.
      */
-    public function testRecordAdvancedNotications() {
+    public function testRecordAdvancedNotications()
+    {
         $this->runWithConfig([CategoryModel::CONF_CATEGORY_FOLLOWING => false], function () {
             $roles = $this->getRoles();
 
@@ -1337,16 +1366,18 @@ class DiscussionModelTest extends SiteTestCase {
             $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
 
             $userMeta = [
-                sprintf('Preferences.Email.NewDiscussion.%d', $categoryAdmin['categoryID']) => $categoryAdmin['categoryID'],
+                sprintf("Preferences.Email.NewDiscussion.%d", $categoryAdmin["categoryID"]) => $categoryAdmin[
+                    "categoryID"
+                ],
             ];
-            $this->userModel::setMeta($memberUser['userID'], $userMeta);
+            $this->userModel::setMeta($memberUser["userID"], $userMeta);
 
             $discussionMember = [
-                'CategoryID' => $categoryAdmin['categoryID'],
-                'Name' => __FUNCTION__ .'test discussion',
-                'Body' => 'foo foo foo',
-                'Format' => 'Text',
-                'InsertUserID' => $discussionUser['userID']
+                "CategoryID" => $categoryAdmin["categoryID"],
+                "Name" => __FUNCTION__ . "test discussion",
+                "Body" => "foo foo foo",
+                "Format" => "Text",
+                "InsertUserID" => $discussionUser["userID"],
             ];
 
             $this->createDiscussion($discussionMember);
@@ -1360,7 +1391,8 @@ class DiscussionModelTest extends SiteTestCase {
     /**
      * Test a recordAdvancedNotications with CONF_CATEGORY_FOLLOWING enabled.
      */
-    public function testRecordAdvancedNoticationsSuccess() {
+    public function testRecordAdvancedNoticationsSuccess()
+    {
         $this->runWithConfig([CategoryModel::CONF_CATEGORY_FOLLOWING => true], function () {
             $roles = $this->getRoles();
 
@@ -1382,16 +1414,18 @@ class DiscussionModelTest extends SiteTestCase {
             $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
 
             $userMeta = [
-                sprintf('Preferences.Email.NewDiscussion.%d', $categoryAdmin['categoryID']) => $categoryAdmin['categoryID'],
+                sprintf("Preferences.Email.NewDiscussion.%d", $categoryAdmin["categoryID"]) => $categoryAdmin[
+                    "categoryID"
+                ],
             ];
-            $this->userModel::setMeta($memberUser['userID'], $userMeta);
+            $this->userModel::setMeta($memberUser["userID"], $userMeta);
 
             $discussionMember = [
-                'CategoryID' => $categoryAdmin['categoryID'],
-                'Name' => __FUNCTION__ .'test discussion',
-                'Body' => 'foo foo foo',
-                'Format' => 'Text',
-                'InsertUserID' => $discussionUser['userID']
+                "CategoryID" => $categoryAdmin["categoryID"],
+                "Name" => __FUNCTION__ . "test discussion",
+                "Body" => "foo foo foo",
+                "Format" => "Text",
+                "InsertUserID" => $discussionUser["userID"],
             ];
 
             $this->createDiscussion($discussionMember);

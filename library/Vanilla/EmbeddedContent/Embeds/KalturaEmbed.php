@@ -12,26 +12,23 @@ use Vanilla\EmbeddedContent\AbstractEmbed;
 /**
  * Embed data object for Kaltura.
  */
-class KalturaEmbed extends AbstractEmbed {
-
+class KalturaEmbed extends AbstractEmbed
+{
     const TYPE = "kaltura";
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
-        return Schema::parse([
-            "height:i",
-            "width:i",
-            "photoUrl:s?",
-            "frameSrc:s",
-        ]);
+    protected function schema(): Schema
+    {
+        return Schema::parse(["height:i", "width:i", "photoUrl:s?", "frameSrc:s"]);
     }
 }

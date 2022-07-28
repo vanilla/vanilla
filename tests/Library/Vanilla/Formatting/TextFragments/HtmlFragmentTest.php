@@ -18,7 +18,8 @@ use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 /**
  * Text fragment tests for the WYSIWYG format.
  */
-class HtmlFragmentTest extends BootstrapTestCase {
+class HtmlFragmentTest extends BootstrapTestCase
+{
     use HtmlNormalizeTrait;
 
     /**
@@ -29,9 +30,12 @@ class HtmlFragmentTest extends BootstrapTestCase {
     /**
      * {@inheritDoc}
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        $this->container()->rule(EmbedService::class)->addCall("addCoreEmbeds");
+        $this->container()
+            ->rule(EmbedService::class)
+            ->addCall("addCoreEmbeds");
         $this->container()->call(function (FormatService $formatService) {
             $this->formatter = $formatService->getFormatter(WysiwygFormat::FORMAT_KEY);
         });
@@ -44,7 +48,8 @@ class HtmlFragmentTest extends BootstrapTestCase {
      * @param string $expected
      * @dataProvider provideBasicTests
      */
-    public function testBasic(string $input, string $expected): void {
+    public function testBasic(string $input, string $expected): void
+    {
         /** @var HtmlDocument $dom */
         $dom = $this->formatter->parseDOM($input);
         $this->assertBasicDom($dom, $input, $expected);
@@ -57,7 +62,8 @@ class HtmlFragmentTest extends BootstrapTestCase {
      * @param string $expected
      * @dataProvider provideBasicRawTests
      */
-    public function testBasicRaw(string $input, string $expected): void {
+    public function testBasicRaw(string $input, string $expected): void
+    {
         $dom = new HtmlDocument($input);
         $this->assertBasicDom($dom, $input, $expected);
     }
@@ -67,8 +73,9 @@ class HtmlFragmentTest extends BootstrapTestCase {
      *
      * @return array
      */
-    public function provideBasicTests(): array {
-        $r = static::provideFileTests(PATH_FIXTURES.'/fragments/html', '-input.html', '-expected.html');
+    public function provideBasicTests(): array
+    {
+        $r = static::provideFileTests(PATH_FIXTURES . "/fragments/html", "-input.html", "-expected.html");
         return $r;
     }
 
@@ -77,8 +84,9 @@ class HtmlFragmentTest extends BootstrapTestCase {
      *
      * @return array
      */
-    public function provideBasicRawTests(): array {
-        $r = static::provideFileTests(PATH_FIXTURES.'/fragments/html-raw', '-input.html', '-expected.html');
+    public function provideBasicRawTests(): array
+    {
+        $r = static::provideFileTests(PATH_FIXTURES . "/fragments/html-raw", "-input.html", "-expected.html");
         return $r;
     }
 
@@ -89,9 +97,10 @@ class HtmlFragmentTest extends BootstrapTestCase {
      * @param string $input
      * @param string $expected
      */
-    private function assertBasicDom(HtmlDocument $dom, string $input, string $expected): void {
+    private function assertBasicDom(HtmlDocument $dom, string $input, string $expected): void
+    {
         $string = $dom->stringify();
-        $this->assertHtmlStringEqualsHtmlString($input, $string->text, 'Sanity test for Html string failed.');
+        $this->assertHtmlStringEqualsHtmlString($input, $string->text, "Sanity test for Html string failed.");
 
         $fragments = $dom->getFragments();
 

@@ -13,11 +13,12 @@ namespace Vanilla\Formatting\Quill\Blots\Lines;
  * Newlines are handled slightly differently here than for regular text because of the `whitespace: pre` that is applied
  * to code blocks. We do not want the newlines to be transformed into breaks.
  */
-class CodeLineTerminatorBlot extends AbstractLineTerminatorBlot {
-
+class CodeLineTerminatorBlot extends AbstractLineTerminatorBlot
+{
     protected $lineBreakText = "\n";
 
-    public function render(): string {
+    public function render(): string
+    {
         $extraNewLines = substr_count($this->currentOperation["insert"], "\n");
         return str_repeat("\n", $extraNewLines);
     }
@@ -25,30 +26,35 @@ class CodeLineTerminatorBlot extends AbstractLineTerminatorBlot {
     /**
      * @inheritdoc
      */
-    public static function matches(array $operation): bool {
-        return static::opAttrsContainKeyWithValue($operation, "codeBlock")
-            || static::opAttrsContainKeyWithValue($operation, "code-block");
+    public static function matches(array $operation): bool
+    {
+        return static::opAttrsContainKeyWithValue($operation, "codeBlock") ||
+            static::opAttrsContainKeyWithValue($operation, "code-block");
     }
 
-    public function renderLineStart(): string {
+    public function renderLineStart(): string
+    {
         return "";
     }
 
-    public function renderLineEnd(): string {
+    public function renderLineEnd(): string
+    {
         return "";
     }
 
     /**
      * @inheritDoc
      */
-    public function getGroupOpeningTag(): string {
+    public function getGroupOpeningTag(): string
+    {
         return '<pre class="code codeBlock" spellcheck="false" tabindex="0">';
     }
 
     /**
      * @inheritDoc
      */
-    public function getGroupClosingTag(): string {
+    public function getGroupClosingTag(): string
+    {
         return "</pre>";
     }
 }

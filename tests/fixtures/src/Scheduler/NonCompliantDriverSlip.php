@@ -15,8 +15,8 @@ use Vanilla\Scheduler\Job\TrackableJobAwareTrait;
 /**
  * Class NonCompliantDriverSlip.
  */
-class NonCompliantDriverSlip implements DriverSlipInterface {
-
+class NonCompliantDriverSlip implements DriverSlipInterface
+{
     use TrackableJobAwareTrait;
 
     /**
@@ -24,7 +24,8 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      *
      * @return JobExecutionStatus
      */
-    public function execute(): JobExecutionStatus {
+    public function execute(): JobExecutionStatus
+    {
         return JobExecutionStatus::failed();
     }
 
@@ -33,7 +34,8 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      *
      * @return string
      */
-    public function getID(): string {
+    public function getID(): string
+    {
         return "null";
     }
 
@@ -43,7 +45,8 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      * @param bool $forceUpdate
      * @return JobExecutionStatus
      */
-    public function getStatus(bool $forceUpdate = false): JobExecutionStatus {
+    public function getStatus(bool $forceUpdate = false): JobExecutionStatus
+    {
         return JobExecutionStatus::failed();
     }
 
@@ -52,8 +55,9 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      *
      * @return array
      */
-    public function getExtendedStatus(): array {
-        return ['status' => $this->getStatus()];
+    public function getExtendedStatus(): array
+    {
+        return ["status" => $this->getStatus()];
     }
 
     /**
@@ -62,7 +66,8 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      * @param string $msg
      * @return DriverSlipInterface
      */
-    public function setStackExecutionFailed(string $msg): DriverSlipInterface {
+    public function setStackExecutionFailed(string $msg): DriverSlipInterface
+    {
         return $this;
     }
 
@@ -72,14 +77,16 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      * @param JobExecutionStatus $status
      * @return DriverSlipInterface
      */
-    public function setStatus(JobExecutionStatus $status): DriverSlipInterface {
+    public function setStatus(JobExecutionStatus $status): DriverSlipInterface
+    {
         return $this;
     }
 
     /**
      * @return string|null
      */
-    public function getErrorMessage(): ?string {
+    public function getErrorMessage(): ?string
+    {
         return null;
     }
 
@@ -88,7 +95,8 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      *
      * @return string|null
      */
-    public function getTrackingID(): ?string {
+    public function getTrackingID(): ?string
+    {
         return "unknown";
     }
 
@@ -97,7 +105,8 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      *
      * @param string $trackingId
      */
-    public function setTrackingID(string $trackingId): void {
+    public function setTrackingID(string $trackingId): void
+    {
         // void
     }
 
@@ -106,7 +115,8 @@ class NonCompliantDriverSlip implements DriverSlipInterface {
      *
      * @return string
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return "unknown";
     }
 }

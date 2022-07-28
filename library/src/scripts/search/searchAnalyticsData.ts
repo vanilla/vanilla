@@ -113,7 +113,7 @@ export const getSearchAnalyticsData = (
         type: "search",
         domain: form.domain,
         searchResults: results.pagination.total ?? -1,
-        searchQuery: splitSearchTerms(form.query),
+        searchQuery: splitSearchTerms(`${form.query}`),
         page: results.pagination?.currentPage ?? -1,
         title: form.name ?? "",
         author: {

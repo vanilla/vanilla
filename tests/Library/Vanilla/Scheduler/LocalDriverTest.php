@@ -18,8 +18,8 @@ use VanillaTests\Fixtures\Scheduler\NonDroveJob;
 /**
  * Class LocalDriverTest.
  */
-final class LocalDriverTest extends SchedulerTestCase {
-
+final class LocalDriverTest extends SchedulerTestCase
+{
     /**
      * Test receiving a valid job.
      *
@@ -27,7 +27,8 @@ final class LocalDriverTest extends SchedulerTestCase {
      * @throws NotFoundException On error.
      * @throws Exception On error.
      */
-    public function testValidReceive() {
+    public function testValidReceive()
+    {
         $container = $this->getEmptyContainer();
 
         /* @var $echoJob EchoJob */
@@ -46,7 +47,8 @@ final class LocalDriverTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testInvalidReceive() {
+    public function testInvalidReceive()
+    {
         $this->expectException(Exception::class);
         $msg = 'The job class \'VanillaTests\Fixtures\Scheduler\NonDroveJob\' doesn\'t implement LocalJobInterface.';
         $this->expectExceptionMessage($msg);
@@ -67,7 +69,8 @@ final class LocalDriverTest extends SchedulerTestCase {
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testExecute() {
+    public function testExecute()
+    {
         $this->expectException(Exception::class);
         $msg = 'The class `VanillaTests\Fixtures\Scheduler\NonCompliantDriverSlip` doesn\'t implement LocalDriverSlip.';
         $this->expectExceptionMessage($msg);

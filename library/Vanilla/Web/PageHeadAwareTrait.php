@@ -10,8 +10,8 @@ namespace Vanilla\Web;
 /**
  * Trait for Page Head population.
  */
-trait PageHeadAwareTrait {
-
+trait PageHeadAwareTrait
+{
     /** @var PageHeadInterface */
     protected $pageHead;
 
@@ -20,7 +20,8 @@ trait PageHeadAwareTrait {
      *
      * @param PageHeadInterface $pageHead
      */
-    public function setPageHead(PageHeadInterface $pageHead) {
+    public function setPageHead(PageHeadInterface $pageHead)
+    {
         $this->pageHead = $pageHead;
     }
 }

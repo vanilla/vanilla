@@ -12,8 +12,8 @@ use Garden\EventManager;
 /**
  * Implementation of Vanilla's "magic" HTML processing.
  */
-class HtmlEnhancer {
-
+class HtmlEnhancer
+{
     /** @var EventManager */
     private $eventManager;
 
@@ -26,11 +26,11 @@ class HtmlEnhancer {
      * @param EventManager $eventManager
      * @param \Emoji $emojiParser
      */
-    public function __construct(EventManager $eventManager, \Emoji $emojiParser) {
+    public function __construct(EventManager $eventManager, \Emoji $emojiParser)
+    {
         $this->eventManager = $eventManager;
         $this->emojiParser = $emojiParser;
     }
-
 
     /**
      * Enhance an HTML Vanilla's "magic" HTML processing.
@@ -47,9 +47,10 @@ class HtmlEnhancer {
      *
      * @internal This method is only public so it can be used for backwards compat in Gdn_Format.
      */
-    public function enhance(string $sanitizedHtml, bool $doMentions = true, bool $doEmbeds = true) {
+    public function enhance(string $sanitizedHtml, bool $doMentions = true, bool $doEmbeds = true)
+    {
         // Do event first so it doesn't have to deal with the other formatters.
-        $eventsHandledHtml = $this->eventManager->fireFilter('format_filterHtml', $sanitizedHtml);
+        $eventsHandledHtml = $this->eventManager->fireFilter("format_filterHtml", $sanitizedHtml);
 
         // Embed & auto-links.
         $sanitizedHtml = \Gdn_Format::links($eventsHandledHtml, true, $doEmbeds);

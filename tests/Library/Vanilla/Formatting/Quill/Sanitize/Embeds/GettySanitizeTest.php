@@ -8,12 +8,13 @@ namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\Embeds;
 
 use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
 
-class GettySanitizeTest extends SanitizeTest {
-
+class GettySanitizeTest extends SanitizeTest
+{
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
+    protected function insertContentOperations(string $content): array
+    {
         $operations = [
             [
                 "insert" => [
@@ -26,13 +27,13 @@ class GettySanitizeTest extends SanitizeTest {
                         "height" => $content,
                         "width" => $content,
                         "attributes" => [
-                            'id' => $content,
-                            'sig' => $content,
-                            'items' => $content,
-                            'isCaptioned' => $content,
-                            'is360' => $content,
-                            'tld' => $content,
-                            'postID' => $content,
+                            "id" => $content,
+                            "sig" => $content,
+                            "items" => $content,
+                            "isCaptioned" => $content,
+                            "is360" => $content,
+                            "tld" => $content,
+                            "postID" => $content,
                         ],
                     ],
                 ],

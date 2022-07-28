@@ -15,7 +15,7 @@ import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import FrameHeader from "@library/layout/frame/FrameHeader";
-import LazyModal from "@library/modal/LazyModal";
+import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n";
@@ -61,7 +61,7 @@ export const MachineTranslationConfigurationModal = (props: IProps) => {
     }, [props.modalSize, service]);
 
     return (
-        <LazyModal
+        <Modal
             isVisible={isVisible}
             size={modalSize}
             exitHandler={() => {
@@ -118,6 +118,6 @@ export const MachineTranslationConfigurationModal = (props: IProps) => {
                     </FrameFooter>
                 }
             />
-        </LazyModal>
+        </Modal>
     );
 };

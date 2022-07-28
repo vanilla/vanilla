@@ -15,8 +15,8 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests to validate twig template.
  */
-class TwigValidatorTest extends MinimalContainerTestCase {
-
+class TwigValidatorTest extends MinimalContainerTestCase
+{
     use TwigRenderTrait;
 
     private static $twigCache;
@@ -24,7 +24,8 @@ class TwigValidatorTest extends MinimalContainerTestCase {
     /**
      * @return bool
      */
-    protected static function useCommonBootstrap(): bool {
+    protected static function useCommonBootstrap(): bool
+    {
         return false;
     }
 
@@ -33,7 +34,8 @@ class TwigValidatorTest extends MinimalContainerTestCase {
      *
      * @return Environment
      */
-    public function getTwig(): \Twig\Environment {
+    public function getTwig(): \Twig\Environment
+    {
         if (!self::$twigCache) {
             self::$twigCache = $this->prepareTwig();
         }
@@ -47,7 +49,8 @@ class TwigValidatorTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideTemplatePaths
      */
-    public function testValidateTemplates(string $templatePath) {
+    public function testValidateTemplates(string $templatePath)
+    {
         $contents = file_get_contents($templatePath);
         try {
             $twig = $this->getTwig();
@@ -62,7 +65,8 @@ class TwigValidatorTest extends MinimalContainerTestCase {
     /**
      * @return array
      */
-    public function provideTemplatePaths(): array {
+    public function provideTemplatePaths(): array
+    {
         $paramSets = [];
 
         $paths = glob(PATH_ROOT . "/{,*/,*/*/,*/*/*/}*.twig", \GLOB_BRACE);

@@ -11,32 +11,35 @@ use Garden\Schema\Schema;
 /**
  * Class UserAuthenticationProviderFragmentSchema
  */
-class UserAuthenticationProviderFragmentSchema extends Schema {
-
+class UserAuthenticationProviderFragmentSchema extends Schema
+{
     /**
      * UserAuthenticationProviderSchema constructor.
      */
-    public function __construct() {
-        parent::__construct($this->parseInternal([
-            "authenticatorID:i",
-            "name:s|n",
-            "type:s",
-            "clientID:s",
-            "default:b",
-            "active:b",
-            "visible:b",
-            "urls" => [
-                "type" => "object",
-                "properties" => [
-                    "signInUrl:s|n",
-                    "signOutUrl:s|n",
-                    "authenticateUrl:s|n",
-                    "registerUrl:s|n",
-                    "passwordUrl:s|n",
-                    "profileUrl:s|n",
+    public function __construct()
+    {
+        parent::__construct(
+            $this->parseInternal([
+                "authenticatorID:i",
+                "name:s|n",
+                "type:s",
+                "clientID:s",
+                "default:b",
+                "active:b",
+                "visible:b",
+                "urls" => [
+                    "type" => "object",
+                    "properties" => [
+                        "signInUrl:s|n",
+                        "signOutUrl:s|n",
+                        "authenticateUrl:s|n",
+                        "registerUrl:s|n",
+                        "passwordUrl:s|n",
+                        "profileUrl:s|n",
+                    ],
+                    "allowNull" => true,
                 ],
-                "allowNull" => true,
-            ],
-        ]));
+            ])
+        );
     }
 }

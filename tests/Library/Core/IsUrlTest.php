@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for isUrl().
  */
 
-class IsUrlTest extends TestCase {
-
+class IsUrlTest extends TestCase
+{
     /**
      * Test {@link isUrl()} against several scenarios.
      *
@@ -22,7 +22,8 @@ class IsUrlTest extends TestCase {
      * @param bool $expected The expected result.
      * @dataProvider provideIsUrlArrays
      */
-    public function testIsUrl($testStr, bool $expected) {
+    public function testIsUrl($testStr, bool $expected)
+    {
         $actual = isUrl($testStr);
         $this->assertSame($expected, $actual);
     }
@@ -32,36 +33,16 @@ class IsUrlTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideIsUrlArrays() {
+    public function provideIsUrlArrays()
+    {
         $r = [
-            'validUrl' => [
-                'https://github.com/tburry/pquery/blob/master/pQuery.php',
-                true,
-            ],
-            'extraCharInHttps' => [
-                'htttps://github.com/tburry/pquery/blob/master/pQuery.php',
-                false,
-            ],
-            'missingCharInHttps' => [
-                'htps://github.com/tburry/pquery/blob/master/pQuery.php',
-                false,
-            ],
-            'missingSlash' => [
-                'https:/github.com/tburry/pquery/blob/master/pQuery.php',
-                false,
-            ],
-            'missingColon' => [
-                'https//github.com/tburry/pquery/blob/master/pQuery.php',
-                false,
-            ],
-            'notAString' => [
-                null,
-                false,
-            ],
-            'startsWithSlashes' => [
-                '//github.com/tburry/pquery/blob/master/pQuery.php',
-                true,
-            ]
+            "validUrl" => ["https://github.com/tburry/pquery/blob/master/pQuery.php", true],
+            "extraCharInHttps" => ["htttps://github.com/tburry/pquery/blob/master/pQuery.php", false],
+            "missingCharInHttps" => ["htps://github.com/tburry/pquery/blob/master/pQuery.php", false],
+            "missingSlash" => ["https:/github.com/tburry/pquery/blob/master/pQuery.php", false],
+            "missingColon" => ["https//github.com/tburry/pquery/blob/master/pQuery.php", false],
+            "notAString" => [null, false],
+            "startsWithSlashes" => ["//github.com/tburry/pquery/blob/master/pQuery.php", true],
         ];
 
         return $r;

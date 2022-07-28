@@ -18,21 +18,23 @@ use VanillaTests\VanillaTestCase;
 /**
  * Verify basic behavior of the TextFragmentCollection class.
  */
-class TextFragmentCollectionTest extends VanillaTestCase {
-
+class TextFragmentCollectionTest extends VanillaTestCase
+{
     use BootstrapTrait, SetupTraitsTrait;
 
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->setUpTestTraits();
     }
 
     /**
      * Verify adherence to the TextFragmentCollectionInterface contract.
      */
-    public function testGetFragments(): void {
+    public function testGetFragments(): void
+    {
         $fragments = [
             "foo" => new BlotPointerTextFragment(new TextBlot([], [], []), "foo"),
             "bar" => new BlotPointerTextFragment(new TextBlot([], [], []), "bar"),
@@ -45,7 +47,8 @@ class TextFragmentCollectionTest extends VanillaTestCase {
     /**
      * Verify ability to use array access to determine a fragment's existence.
      */
-    public function testOffsetExists(): void {
+    public function testOffsetExists(): void
+    {
         $blot = new TextBlot(["foo" => "bar"], [], []);
         $fragment = new BlotPointerTextFragment($blot, "foo");
         $collection = new TextFragmentCollection(["baz" => $fragment]);
@@ -56,7 +59,8 @@ class TextFragmentCollectionTest extends VanillaTestCase {
     /**
      * Verify ability to use array access to obtain a fragment from the collection.
      */
-    public function testOffsetGet(): void {
+    public function testOffsetGet(): void
+    {
         $blot = new TextBlot(["foo" => "bar"], [], []);
         $expected = new BlotPointerTextFragment($blot, "foo");
         $collection = new TextFragmentCollection(["baz" => $expected]);
@@ -67,7 +71,8 @@ class TextFragmentCollectionTest extends VanillaTestCase {
     /**
      * Verify ability to use array access to add a fragment to the collection.
      */
-    public function testOffsetSet(): void {
+    public function testOffsetSet(): void
+    {
         $blot = new TextBlot(["foo" => "bar"], [], []);
         $expected = new BlotPointerTextFragment($blot, "foo");
         $collection = new TextFragmentCollection();
@@ -78,7 +83,8 @@ class TextFragmentCollectionTest extends VanillaTestCase {
     /**
      * Verify attempting to set an invalid fragment value in the collection will throw the proper exception.
      */
-    public function testOffsetSetInvalidValue(): void {
+    public function testOffsetSetInvalidValue(): void
+    {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Value must be an instance of " . TextFragmentInterface::class);
         $collection = new TextFragmentCollection();
@@ -88,7 +94,8 @@ class TextFragmentCollectionTest extends VanillaTestCase {
     /**
      * Verify ability to use array access for removing an item from the collection.
      */
-    public function testOffsetUnset(): void {
+    public function testOffsetUnset(): void
+    {
         $blot = new TextBlot(["foo" => "bar"], [], []);
         $pointer = new BlotPointerTextFragment($blot, "foo");
         $collection = new TextFragmentCollection(["baz" => $pointer]);

@@ -720,9 +720,47 @@ paths:
                     content:
                         application/json:
                             schema:
-                                items:
-                                    $ref: "#/components/schemas/User"
                                 type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        slotType:
+                                            description: Slot type ("d" = day, "w" = week, "m" = month, "y" = year, "a" = all).
+                                            type: string
+                                            enum:
+                                                - d
+                                                - w
+                                                - m
+                                                - y
+                                                - a
+                                        timeSlot:
+                                            description: The starting date/time for the requested Slot type.
+                                            type: string
+                                            format: date-time
+                                        source:
+                                            description: The score's source (Total, Badges, etc.) for the requested Slot type.
+                                            type: string
+                                        categoryID:
+                                            description: The category on which the leaderboard is based on.
+                                            type: integer
+                                        userID:
+                                            description: ID of the user.
+                                            type: integer
+                                        points:
+                                            description: The total number of points the user has accumulated.
+                                            type: integer
+                                        name:
+                                            description: Name of the user.
+                                            minLength: 1
+                                            type: string
+                                        photo:
+                                            description: URL to the user photo.
+                                            minLength: 0
+                                            nullable: true
+                                            type: string
+                                    required:
+                                        - categoryID
+                                        - userID
                     description: Success
     "/users/{id}/badges":
         x-addon: badges

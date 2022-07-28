@@ -18,21 +18,27 @@ use Vanilla\Utility\StringUtils;
  * 2. If you want setUp/tearDown in your test traits then name their methods: `setup$traitName`. You can omit the "Trait" suffix.
  * 2. Call `setupTestTraits()` and `teatDownTestTraits()` in your `setUp()/tearDown()` methods.
  */
-trait SetupTraitsTrait {
+trait SetupTraitsTrait
+{
     /**
      * Call the test trait methods with a given prefix.
      *
      * @param string|object $obj
      * @param string $prefix
      */
-    private static function callTestTraits($obj, string $prefix): void {
+    private static function callTestTraits($obj, string $prefix): void
+    {
         $calls = [];
-        for ($class = new \ReflectionClass(static::class); $class->getParentClass(); $class = $class->getParentClass()) {
+        for (
+            $class = new \ReflectionClass(static::class);
+            $class->getParentClass();
+            $class = $class->getParentClass()
+        ) {
             $uses = $class->getTraits();
             foreach ($uses as $trait) {
                 /** @var \ReflectionClass $trait */
-                $method = $prefix.$trait->getShortName();
-                foreach ([$method, StringUtils::substringRightTrim($method, 'Trait', true)] as $methodName) {
+                $method = $prefix . $trait->getShortName();
+                foreach ([$method, StringUtils::substringRightTrim($method, "Trait", true)] as $methodName) {
                     if (method_exists($obj, $methodName)) {
                         array_unshift($calls, $methodName);
                     }
@@ -47,28 +53,32 @@ trait SetupTraitsTrait {
     /**
      * Call all set up trait methods.
      */
-    public static function setUpBeforeClassTestTraits(): void {
-        self::callTestTraits(static::class, 'setUpBeforeClass');
+    public static function setUpBeforeClassTestTraits(): void
+    {
+        self::callTestTraits(static::class, "setUpBeforeClass");
     }
 
     /**
      * Call all set up trait methods.
      */
-    public function setUpTestTraits(): void {
-        self::callTestTraits($this, 'setUp');
+    public function setUpTestTraits(): void
+    {
+        self::callTestTraits($this, "setUp");
     }
 
     /**
      * Call all tear down trait methods.
      */
-    public function tearDownTestTraits(): void {
-        self::callTestTraits($this, 'tearDown');
+    public function tearDownTestTraits(): void
+    {
+        self::callTestTraits($this, "tearDown");
     }
 
     /**
      * Call all tear down trait methods.
      */
-    public static function tearDownAfterClassTestTraits(): void {
-        self::callTestTraits(static::class, 'tearDownAfterClass');
+    public static function tearDownAfterClassTestTraits(): void
+    {
+        self::callTestTraits(static::class, "tearDownAfterClass");
     }
 }

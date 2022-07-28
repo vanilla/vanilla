@@ -20,8 +20,8 @@ use VanillaTests\Fixtures\MockSiteSectionProvider;
 /**
  * Tests for the discussion/quote embed.
  */
-class DiscussionEmbedFactoryTest extends AbstractAPIv2Test {
-
+class DiscussionEmbedFactoryTest extends AbstractAPIv2Test
+{
     /**
      * Test that all domain types are supported.
      *
@@ -31,7 +31,12 @@ class DiscussionEmbedFactoryTest extends AbstractAPIv2Test {
      * @param SiteSectionInterface[] $siteSections
      * @dataProvider supportedDomainsProvider
      */
-    public function testSupportedDomains(string $urlToTest, bool $isSupported, string $customRoot = '', array $siteSections = []) {
+    public function testSupportedDomains(
+        string $urlToTest,
+        bool $isSupported,
+        string $customRoot = "",
+        array $siteSections = []
+    ) {
         $discussionApi = $this->createMock(\DiscussionsApiController::class);
 
         /** @var RequestInterface $request */
@@ -51,59 +56,33 @@ class DiscussionEmbedFactoryTest extends AbstractAPIv2Test {
     /**
      * @return array
      */
-    public function supportedDomainsProvider(): array {
-        $bootstrapBase = 'http://vanilla.test';
+    public function supportedDomainsProvider(): array
+    {
+        $bootstrapBase = "http://vanilla.test";
         return [
             // Allowed
-            'Correct' => [
-                $bootstrapBase . '/discussion/41342',
-                true
-            ],
+            "Correct" => [$bootstrapBase . "/discussion/41342", true],
             // Not allowed
-            'Correct webroot' => [
-                $bootstrapBase . '/actual-root/discussion/41342',
+            "Correct webroot" => [$bootstrapBase . "/actual-root/discussion/41342", true, "/actual-root"],
+            "Correct section" => [
+                $bootstrapBase . "/actual-root/actual-section/discussion/41342",
                 true,
-                '/actual-root'
+                "/actual-root",
+                [new MockSiteSection("test", "en", "/actual-section", "test1", "test1")],
             ],
-            'Correct section' => [
-                $bootstrapBase . '/actual-root/actual-section/discussion/41342',
-                true,
-                '/actual-root',
-                [new MockSiteSection('test', 'en', '/actual-section', 'test1', 'test1')]
-            ],
-            'Correct section w/ regex character in it' => [
+            "Correct section w/ regex character in it" => [
                 $bootstrapBase . '/actual-root/regex!^$-()-section/discussion/41342',
                 true,
-                '/actual-root',
-                [new MockSiteSection('test', 'en', '/regex!^$-()-section', 'test1', 'test1')]
+                "/actual-root",
+                [new MockSiteSection("test", "en", '/regex!^$-()-section', "test1", "test1")],
             ],
             // Not allowed
-            'Wrong webroot' => [
-                $bootstrapBase . '/wrong-root/discussion/41342',
-                false,
-                '/actual-root'
-            ],
-            'Wrong section' => [
-                $bootstrapBase . '/actual-root/actual-section/discussion/41342',
-                false,
-                '/actual-root',
-            ],
-            'wrong host' => [
-                'https://otherdomain.com/discussion/41342',
-                false
-            ],
-            'wrong url (typo)' => [
-                $bootstrapBase . '/discussions/41342',
-                false
-            ],
-            'Wrong url (is a comment)' => [
-                $bootstrapBase . '/discussion/comment/41342',
-                false
-            ],
-            'bad ID' => [
-                $bootstrapBase . '/discussion/asdfads',
-                false
-            ],
+            "Wrong webroot" => [$bootstrapBase . "/wrong-root/discussion/41342", false, "/actual-root"],
+            "Wrong section" => [$bootstrapBase . "/actual-root/actual-section/discussion/41342", false, "/actual-root"],
+            "wrong host" => ["https://otherdomain.com/discussion/41342", false],
+            "wrong url (typo)" => [$bootstrapBase . "/discussions/41342", false],
+            "Wrong url (is a comment)" => [$bootstrapBase . "/discussion/comment/41342", false],
+            "bad ID" => [$bootstrapBase . "/discussion/asdfads", false],
         ];
     }
 }

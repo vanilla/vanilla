@@ -17,21 +17,22 @@ use VanillaTests\Fixtures\Container;
 /**
  * Tests for the {@link EventManager} class.
  */
-class EventManagerTest extends SharedBootstrapTestCase {
-
+class EventManagerTest extends SharedBootstrapTestCase
+{
     /**
      * Creates an {@link AddonManager} against Vanilla.
      *
      * @return AddonManager Returns the manager.
      */
-    private static function createVanillaManager() {
+    private static function createVanillaManager()
+    {
         $manager = new AddonManager(
             [
-                Addon::TYPE_ADDON => ['/applications', '/plugins'],
-                Addon::TYPE_THEME => '/themes',
-                Addon::TYPE_LOCALE => '/locales'
+                Addon::TYPE_ADDON => ["/applications", "/plugins"],
+                Addon::TYPE_THEME => "/themes",
+                Addon::TYPE_LOCALE => "/locales",
             ],
-            PATH_ROOT.'/tests/cache/em/vanilla-manager'
+            PATH_ROOT . "/tests/cache/em/vanilla-manager"
         );
 
         return $manager;
@@ -40,7 +41,8 @@ class EventManagerTest extends SharedBootstrapTestCase {
     /**
      * Test some of the basic property accessors.
      */
-    public function testGetSet() {
+    public function testGetSet()
+    {
         $container1 = new Container();
         $em = new EventManager($container1);
 
@@ -56,12 +58,13 @@ class EventManagerTest extends SharedBootstrapTestCase {
     /**
      * Test to see if any events will have overlap when we refactor _overwrite and _handler events to use the same base names.
      */
-    public function testEventHandlerOverlap() {
+    public function testEventHandlerOverlap()
+    {
         $pm = new \Gdn_PluginManager();
         $plugins = $this->providePluginClasses();
 
         foreach ($plugins as $row) {
-            list($class, $path) = $row;
+            [$class, $path] = $row;
 
             // Register the plugin. This will give a warning when there's overlap.
             require_once $path; // needed because no autoloader registered
@@ -85,7 +88,8 @@ class EventManagerTest extends SharedBootstrapTestCase {
      * @param mixed $val The value to push.
      * @return \Closure Returns a closure.
      */
-    private function makePushHandler(array &$arr, $val) {
+    private function makePushHandler(array &$arr, $val)
+    {
         return function () use (&$arr, $val) {
             $arr[] = $val;
         };
@@ -99,7 +103,8 @@ class EventManagerTest extends SharedBootstrapTestCase {
      * @param array &$arr The array to push to.
      * @return \Closure Returns a closure.
      */
-    private function makeMetaHandler(array &$arr) {
+    private function makeMetaHandler(array &$arr)
+    {
         return function ($event, $args, $result) use (&$arr) {
             $arr[] = [$event, $args, $result];
         };
@@ -108,63 +113,67 @@ class EventManagerTest extends SharedBootstrapTestCase {
     /**
      * Test a basic event fire.
      */
-    public function testFireEvent() {
+    public function testFireEvent()
+    {
         $em = new EventManager();
 
         $fired = false;
-        $em->bind('test', function () use (&$fired) {
+        $em->bind("test", function () use (&$fired) {
             $fired = true;
         });
         $this->assertFalse($fired);
 
-        $em->fire('test');
+        $em->fire("test");
         $this->assertTrue($fired);
     }
 
     /**
      * Test that events fire in the order registered by default.
      */
-    public function testFireOrderRegistered() {
+    public function testFireOrderRegistered()
+    {
         $em = new EventManager();
 
         $arr = [];
-        $em->bind('test', $this->makePushHandler($arr, 1));
-        $em->bind('test', $this->makePushHandler($arr, 2));
-        $em->bind('test', $this->makePushHandler($arr, 3));
+        $em->bind("test", $this->makePushHandler($arr, 1));
+        $em->bind("test", $this->makePushHandler($arr, 2));
+        $em->bind("test", $this->makePushHandler($arr, 3));
         $this->assertSame([], $arr);
 
-        $em->fire('test');
+        $em->fire("test");
         $this->assertSame([1, 2, 3], $arr);
     }
 
     /**
      * Test event firing from highest to lowest priority.
      */
-    public function testFirePriorityOrder() {
+    public function testFirePriorityOrder()
+    {
         $em = new EventManager();
 
         $arr = [];
-        $em->bind('test', $this->makePushHandler($arr, 1), EventManager::PRIORITY_LOW);
-        $em->bind('test', $this->makePushHandler($arr, 2), EventManager::PRIORITY_HIGH);
-        $em->bind('test', $this->makePushHandler($arr, 3), EventManager::PRIORITY_NORMAL);
+        $em->bind("test", $this->makePushHandler($arr, 1), EventManager::PRIORITY_LOW);
+        $em->bind("test", $this->makePushHandler($arr, 2), EventManager::PRIORITY_HIGH);
+        $em->bind("test", $this->makePushHandler($arr, 3), EventManager::PRIORITY_NORMAL);
         $this->assertSame([], $arr);
 
-        $em->fire('test');
+        $em->fire("test");
         $this->assertSame([2, 3, 1], $arr);
     }
 
     /**
      * Test a basic call to {@link EventManager::fireFilter()}.
      */
-    public function testFireFilter() {
+    public function testFireFilter()
+    {
         $em = new EventManager();
 
         $val = 0;
-        $em->bind('add', function ($val) {
+        $em->bind("add", function ($val) {
             return $val + 1;
         });
 
-        $val2 = $em->fireFilter('add', $val);
+        $val2 = $em->fireFilter("add", $val);
         $this->assertSame(0, $val);
         $this->assertSame(1, $val2);
     }
@@ -172,19 +181,21 @@ class EventManagerTest extends SharedBootstrapTestCase {
     /**
      * Filters with no handlers should return their input value.
      */
-    public function testFireEmptyFilter() {
+    public function testFireEmptyFilter()
+    {
         $em = new EventManager();
 
-        $vals = [123, 'foo'];
+        $vals = [123, "foo"];
         foreach ($vals as $val) {
-            $this->assertSame($val, $em->fireFilter('baz', $val));
+            $this->assertSame($val, $em->fireFilter("baz", $val));
         }
     }
 
     /**
      * Test that firing an event with multiple filters will chain.
      */
-    public function testFireFilterChaining() {
+    public function testFireFilterChaining()
+    {
         $em = new EventManager();
 
         $add = function ($val) {
@@ -192,10 +203,10 @@ class EventManagerTest extends SharedBootstrapTestCase {
         };
 
         $val = 0;
-        $em->bind('add', $add);
-        $em->bind('add', $add);
+        $em->bind("add", $add);
+        $em->bind("add", $add);
 
-        $val2 = $em->fireFilter('add', $val);
+        $val2 = $em->fireFilter("add", $val);
         $this->assertSame(0, $val);
         $this->assertSame(2, $val2);
     }
@@ -203,107 +214,109 @@ class EventManagerTest extends SharedBootstrapTestCase {
     /**
      * Test some basic use cases of {@link EventManager::bindClass()}.
      */
-    public function testBindClassBasics() {
+    public function testBindClassBasics()
+    {
         $em = new EventManager(new Container());
 
-        $em->bindClass('VanillaTests\Fixtures\BasicEventHandlers');
+        $em->bindClass("VanillaTests\Fixtures\BasicEventHandlers");
 
-        $val = $em->fireFilter('filter', '');
-        $this->assertSame('filter', $val);
+        $val = $em->fireFilter("filter", "");
+        $this->assertSame("filter", $val);
 
-        $val2 = $em->fireFilter('somecontroller_somemethod_method', '');
-        $this->assertSame('someController_someCreate', $val2);
+        $val2 = $em->fireFilter("somecontroller_somemethod_method", "");
+        $this->assertSame("someController_someCreate", $val2);
 
-        $val3 = $em->fireFilter('somecontroller_someendpoint_method', '');
-        $this->assertSame('someController_someMethod', $val3);
+        $val3 = $em->fireFilter("somecontroller_someendpoint_method", "");
+        $this->assertSame("someController_someMethod", $val3);
 
-        $val4 = $em->fire('setFoo');
+        $val4 = $em->fire("setFoo");
         $this->assertSame([], $val4);
 
-        $val5 = $em->fire('event_before');
-        $this->assertSame('event_before', $val5[0]);
+        $val5 = $em->fire("event_before");
+        $this->assertSame("event_before", $val5[0]);
 
-        $val6 = $em->fire('event_after');
-        $this->assertSame('event_after', $val6[0]);
+        $val6 = $em->fire("event_after");
+        $this->assertSame("event_after", $val6[0]);
     }
 
     /**
      * Calling {@link EventManager::bindClass()} with an instance should create handlers for that instance.
      */
-    public function testBindClassInstance() {
+    public function testBindClassInstance()
+    {
         $em = new EventManager();
 
-        $val = 'test';
+        $val = "test";
         $handlers = new BasicEventHandlers();
         $this->assertNotSame($val, $handlers->getFoo());
         $handlers->setFoo($val);
         $this->assertSame($val, $handlers->getFoo());
 
         $em->bindClass($handlers);
-        $r = $em->fire('foo');
+        $r = $em->fire("foo");
         $this->assertSame($val, $r[0]);
     }
 
     /**
      * Test {@link EventManager::fireArray()} with an element as a reference that gets modified.
      */
-    public function testFireArrayWithReference() {
+    public function testFireArrayWithReference()
+    {
         $em = new EventManager();
 
-        $em->bind('test', function (&$val) {
-            $val = 'foo';
+        $em->bind("test", function (&$val) {
+            $val = "foo";
         });
 
-        $val = '';
-        $em->fireArray('test', [&$val]);
-        $this->assertSame('foo', $val);
+        $val = "";
+        $em->fireArray("test", [&$val]);
+        $this->assertSame("foo", $val);
     }
 
     /**
      * Test {@link EventManager::bindLazy()}.
      */
-    public function testBindLazy() {
+    public function testBindLazy()
+    {
         $em = new EventManager(new Container());
 
-        $em->bindLazy('getFoo', 'VanillaTests\Fixtures\BasicEventHandlers', 'getFoo');
+        $em->bindLazy("getFoo", "VanillaTests\Fixtures\BasicEventHandlers", "getFoo");
 
-        $r = $em->fire('getfoo');
-        $this->assertSame('foo', $r[0]);
+        $r = $em->fire("getfoo");
+        $this->assertSame("foo", $r[0]);
     }
 
     /**
      * Test some meta event handlers.
      */
-    public function testMetaHandler() {
+    public function testMetaHandler()
+    {
         $em = new EventManager();
 
         $events = [];
         $em->bind(EventManager::EVENT_META, $this->makeMetaHandler($events));
-        $em->bind('foo', function ($v = null) {
+        $em->bind("foo", function ($v = null) {
             return "foo $v";
         });
 
-        $em->fireFilter('foo', 'bar');
-        $em->fire('none', 'baz');
-        $em->fireArray('foo', ['baz']);
+        $em->fireFilter("foo", "bar");
+        $em->fire("none", "baz");
+        $em->fireArray("foo", ["baz"]);
 
-        $expected = [
-            ['foo', ['bar'], 'foo bar'],
-            ['none', ['baz'], []],
-            ['foo', ['baz'], ['foo baz']],
-        ];
+        $expected = [["foo", ["bar"], "foo bar"], ["none", ["baz"], []], ["foo", ["baz"], ["foo baz"]]];
         $this->assertEquals($expected, $events);
     }
 
     /**
      * Make sure that meta event inception doesn't cause anything crazy.
      */
-    public function testFireMetaEvent() {
+    public function testFireMetaEvent()
+    {
         $em = new EventManager();
 
         $events = [];
         $em->bind(EventManager::EVENT_META, $this->makeMetaHandler($events));
-        $r = $em->fire(EventManager::EVENT_META, 'foo', ['args'], 'result');
+        $r = $em->fire(EventManager::EVENT_META, "foo", ["args"], "result");
 
         // Since this shouldn't be done we are not specifying a defined behaviour right now.
         // Let's just make sure that only the two events are fired though.
@@ -313,74 +326,77 @@ class EventManagerTest extends SharedBootstrapTestCase {
     /**
      * Test firing events with no handlers return an empty array of results.
      */
-    public function testEmptyHandlerResults() {
+    public function testEmptyHandlerResults()
+    {
         $em = new EventManager();
 
-        $this->assertSame([], $em->fire('noop'));
-        $this->assertSame([], $em->fireArray('noop', []));
+        $this->assertSame([], $em->fire("noop"));
+        $this->assertSame([], $em->fireArray("noop", []));
     }
 
     /**
      * Test {@link EventManager::hasHandler()}
      */
-    public function testHasHandler() {
+    public function testHasHandler()
+    {
         $em = new EventManager();
 
-        $em->bind('foo', function () {
+        $em->bind("foo", function () {
             return 1;
         });
 
-        $this->assertTrue($em->hasHandler('foo'));
-        $this->assertFalse($em->hasHandler('bar'));
+        $this->assertTrue($em->hasHandler("foo"));
+        $this->assertFalse($em->hasHandler("bar"));
     }
 
     /**
      * Make sure an event with higher than max priority just goes down to max priority.
      */
-    public function testMaxPriority() {
+    public function testMaxPriority()
+    {
         $this->expectNotice();
         $em = new EventManager();
 
         $arr = [];
-        $em->bind('foo', $this->makePushHandler($arr, 1), EventManager::PRIORITY_MAX);
-        $em->bind('foo', $this->makePushHandler($arr, 2), EventManager::PRIORITY_MAX + 1);
+        $em->bind("foo", $this->makePushHandler($arr, 1), EventManager::PRIORITY_MAX);
+        $em->bind("foo", $this->makePushHandler($arr, 2), EventManager::PRIORITY_MAX + 1);
 
-        $r = $em->fire('foo');
+        $r = $em->fire("foo");
         $this->assertSame([1, 2], $arr);
 
         $arr2 = [];
-        $em->bind('foo', $this->makePushHandler($arr2, 1), EventManager::PRIORITY_MAX - 1);
-        $em->bind('foo', $this->makePushHandler($arr2, 2), EventManager::PRIORITY_MAX + 1);
+        $em->bind("foo", $this->makePushHandler($arr2, 1), EventManager::PRIORITY_MAX - 1);
+        $em->bind("foo", $this->makePushHandler($arr2, 2), EventManager::PRIORITY_MAX + 1);
         $this->assertSame([2, 1], $arr2);
     }
 
     /**
      * Test the old EventArguments kludge.
      */
-//    public function testEventArgumentsKludge() {
-//        $em = new eventManager();
-//
-//        $events = [];
-//        $em->bind(EventManager::EVENT_META, $this->makeMetaHandler($events));
-//
-//        $sender = new \stdClass();
-//        $sender->EventArguments = ['foo' => 1];
-//
-//        // fire() has the kludge.
-//        $em->fire('foo', $sender);
-//        // fireArray() doesn't have the kludge.
-//        $em->fireArray('foo', [$sender]);
-//        // fireFilter() doesn't have the kludge.
-//        $r = $em->fireFilter('foo', $sender);
-//
-//        $expected = [
-//            ['foo', [$sender, $sender->EventArguments], []],
-//            ['foo', [$sender], []],
-//            ['foo', [$sender], $sender]
-//        ];
-//
-//        $this->assertSame($expected, $events);
-//    }
+    //    public function testEventArgumentsKludge() {
+    //        $em = new eventManager();
+    //
+    //        $events = [];
+    //        $em->bind(EventManager::EVENT_META, $this->makeMetaHandler($events));
+    //
+    //        $sender = new \stdClass();
+    //        $sender->EventArguments = ['foo' => 1];
+    //
+    //        // fire() has the kludge.
+    //        $em->fire('foo', $sender);
+    //        // fireArray() doesn't have the kludge.
+    //        $em->fireArray('foo', [$sender]);
+    //        // fireFilter() doesn't have the kludge.
+    //        $r = $em->fireFilter('foo', $sender);
+    //
+    //        $expected = [
+    //            ['foo', [$sender, $sender->EventArguments], []],
+    //            ['foo', [$sender], []],
+    //            ['foo', [$sender], $sender]
+    //        ];
+    //
+    //        $this->assertSame($expected, $events);
+    //    }
 
     /**
      * Get a list of plugin classes suitable for tests.
@@ -392,7 +408,8 @@ class EventManagerTest extends SharedBootstrapTestCase {
      * @return array Returns a data provider array.
      * @throws \Exception Throws an exception when the plugin class path doesn't exist.
      */
-    public function providePluginClasses($includeRedefines = false) {
+    public function providePluginClasses($includeRedefines = false)
+    {
         $am = self::createVanillaManager();
 
         $result = [];
@@ -411,14 +428,11 @@ class EventManagerTest extends SharedBootstrapTestCase {
 
                     // Kludge: Check for the userPhoto() function.
                     $fileContents = file_get_contents($path);
-                    if (preg_match('`function userPhoto`i', $fileContents) && !$includeRedefines) {
+                    if (preg_match("`function userPhoto`i", $fileContents) && !$includeRedefines) {
                         continue;
                     }
 
-                    $result[$pluginClass] = [
-                        $pluginClass,
-                        $path
-                    ];
+                    $result[$pluginClass] = [$pluginClass, $path];
                 }
             }
         }
@@ -433,7 +447,8 @@ class EventManagerTest extends SharedBootstrapTestCase {
      * @param string $expected The expected result.
      * @dataProvider provideClassBasenameTests
      */
-    public function testClassBasename($class, $expected) {
+    public function testClassBasename($class, $expected)
+    {
         $basename = EventManager::classBasename($class);
 
         $this->assertEquals($expected, $basename);
@@ -444,11 +459,12 @@ class EventManagerTest extends SharedBootstrapTestCase {
      *
      * @return array Returns a data provider array.
      */
-    public function provideClassBasenameTests() {
+    public function provideClassBasenameTests()
+    {
         $r = [
-            'object' => [$this, 'EventManagerTest'],
-            'no namespace' => ['Foo', 'Foo'],
-            'namespace' => ['Foo\Bar', 'Bar']
+            "object" => [$this, "EventManagerTest"],
+            "no namespace" => ["Foo", "Foo"],
+            "namespace" => ["Foo\Bar", "Bar"],
         ];
 
         return $r;
@@ -457,7 +473,8 @@ class EventManagerTest extends SharedBootstrapTestCase {
     /**
      * Test {@link EventManager::unbind()}.
      */
-    public function testUnbind() {
+    public function testUnbind()
+    {
         $em = new EventManager();
 
         $fired = false;
@@ -465,78 +482,83 @@ class EventManagerTest extends SharedBootstrapTestCase {
             $fired = true;
         };
 
-        $em->bind('e', $fn);
-        $this->assertTrue($em->hasHandler('e'));
+        $em->bind("e", $fn);
+        $this->assertTrue($em->hasHandler("e"));
 
-        $em->unbind('e', $fn);
-        $this->assertFalse($em->hasHandler('e'));
+        $em->unbind("e", $fn);
+        $this->assertFalse($em->hasHandler("e"));
 
-        $r = $em->fire('e');
+        $r = $em->fire("e");
         $this->assertEmpty($r);
     }
 
     /**
      * Test unbinding a class from the event manager by instance.
      */
-    public function testUnbindClassInstance() {
+    public function testUnbindClassInstance()
+    {
         $em = new EventManager();
 
         $handlers = new BasicEventHandlers();
         $em->bindClass($handlers);
 
-        $this->assertTrue($em->hasHandler('foo'));
+        $this->assertTrue($em->hasHandler("foo"));
 
         $em->unbindClass($handlers);
-        $this->assertFalse($em->hasHandler('foo'));
+        $this->assertFalse($em->hasHandler("foo"));
     }
 
     /**
      * Test unbinding a class from the event manager by instance.
      */
-    public function testUnbindClassInstanceName() {
+    public function testUnbindClassInstanceName()
+    {
         $em = new EventManager();
 
         $handlers = new BasicEventHandlers();
         $em->bindClass($handlers);
 
-        $this->assertTrue($em->hasHandler('foo'));
+        $this->assertTrue($em->hasHandler("foo"));
 
         $em->unbindClass(BasicEventHandlers::class);
-        $this->assertFalse($em->hasHandler('foo'));
+        $this->assertFalse($em->hasHandler("foo"));
     }
 
     /**
      * Test unbinding a class from the event manager by class name.
      */
-    public function testUnbindClassName() {
+    public function testUnbindClassName()
+    {
         $em = new EventManager(new Container());
 
         $em->bindClass(BasicEventHandlers::class);
 
-        $this->assertTrue($em->hasHandler('foo'));
+        $this->assertTrue($em->hasHandler("foo"));
 
         $em->unbindClass(BasicEventHandlers::class);
-        $this->assertFalse($em->hasHandler('foo'));
+        $this->assertFalse($em->hasHandler("foo"));
     }
 
     /**
      * Test unbinding a class from the event manager by class name after the handlers have been fetched..
      */
-    public function testUnbindClassExpanded() {
+    public function testUnbindClassExpanded()
+    {
         $em = new EventManager(new Container());
 
         $em->bindClass(BasicEventHandlers::class);
 
-        $this->assertNotEmpty($em->getHandlers('foo'));
+        $this->assertNotEmpty($em->getHandlers("foo"));
 
         $em->unbindClass(BasicEventHandlers::class);
-        $this->assertFalse($em->hasHandler('foo'));
+        $this->assertFalse($em->hasHandler("foo"));
     }
 
     /**
      * If multiple instances are bound then I should not unbind both.
      */
-    public function testUnbindClassInstanceMultiple() {
+    public function testUnbindClassInstanceMultiple()
+    {
         $em = new EventManager();
 
         $handlers = new BasicEventHandlers();
@@ -544,19 +566,20 @@ class EventManagerTest extends SharedBootstrapTestCase {
         $handlers2 = new BasicEventHandlers();
         $em->bindClass($handlers2);
 
-        $this->assertTrue($em->hasHandler('foo'));
+        $this->assertTrue($em->hasHandler("foo"));
 
         $em->unbindClass($handlers);
-        $this->assertTrue($em->hasHandler('foo'));
+        $this->assertTrue($em->hasHandler("foo"));
 
         $em->unbindClass($handlers2);
-        $this->assertFalse($em->hasHandler('foo'));
+        $this->assertFalse($em->hasHandler("foo"));
     }
 
     /**
      * If multiple instances are bound then I should not unbind both.
      */
-    public function testUnbindClassInstanceMultipleByName() {
+    public function testUnbindClassInstanceMultipleByName()
+    {
         $em = new EventManager();
 
         $handlers = new BasicEventHandlers();
@@ -564,9 +587,9 @@ class EventManagerTest extends SharedBootstrapTestCase {
         $handlers2 = new BasicEventHandlers();
         $em->bindClass($handlers2);
 
-        $this->assertTrue($em->hasHandler('foo'));
+        $this->assertTrue($em->hasHandler("foo"));
 
         $em->unbindClass(BasicEventHandlers::class);
-        $this->assertFalse($em->hasHandler('foo'));
+        $this->assertFalse($em->hasHandler("foo"));
     }
 }

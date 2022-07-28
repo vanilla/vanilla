@@ -18,18 +18,20 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  * Class ReactionsEditTest
  * @package VanillaTests\APIv2
  */
-class ReactionsEditTest extends SiteTestCase {
+class ReactionsEditTest extends SiteTestCase
+{
     use UsersAndRolesApiTestTrait;
 
     /** @var ReactionsController  */
     protected $reactionsController;
 
-    public static $addons = ['vanilla', 'reactions'];
+    public static $addons = ["vanilla", "reactions"];
 
     /**
      * @inheritdoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->reactionsController = Gdn::getContainer()->get(ReactionsController::class);
         $this->enableCaching();
@@ -41,29 +43,30 @@ class ReactionsEditTest extends SiteTestCase {
      *
      * @throws \Garden\Web\Exception\ResponseException Throws Response Exception.
      */
-    public function testAddCustomImage() {
+    public function testAddCustomImage()
+    {
         $session = $this->getSession();
-        $session->start(self::$siteInfo['adminUserID']);
-        $reactionData = $this->bessy()->get('reactions/edit/Spam')->Data['Reaction'];
+        $session->start(self::$siteInfo["adminUserID"]);
+        $reactionData = $this->bessy()->get("reactions/edit/Spam")->Data["Reaction"];
 
         // Upload a file and add it to the reaction.
         TestUploader::resetUploads();
-        $upload = TestUploader::uploadFile('Photo', PATH_ROOT.'/tests/fixtures/insightful.svg');
-        $reactionData['Photo'] = $upload;
+        $upload = TestUploader::uploadFile("Photo", PATH_ROOT . "/tests/fixtures/insightful.svg");
+        $reactionData["Photo"] = $upload;
 
-        $this->bessy()->post('reactions/edit/Spam', $reactionData)->Data;
+        $this->bessy()->post("reactions/edit/Spam", $reactionData)->Data;
 
         // Bust the cache.
         ReactionModel::$ReactionTypes = null;
 
         // We should get a Photo field back with the path to the svg file
-        $updatedReaction = $this->bessy()->get('/reactions/edit/Spam')->Data;
-        $this->assertArrayHasKey('Photo', $updatedReaction['Reaction']);
-        $this->assertStringContainsString('svg', $updatedReaction['Reaction']['Photo']);
+        $updatedReaction = $this->bessy()->get("/reactions/edit/Spam")->Data;
+        $this->assertArrayHasKey("Photo", $updatedReaction["Reaction"]);
+        $this->assertStringContainsString("svg", $updatedReaction["Reaction"]["Photo"]);
 
         // Now let's remove the photo.
         // Right now this only verifies the method was run, since redirectTo() throws an error in test mode.
         $this->expectExceptionCode(302);
-        $this->reactionsController->removePhoto('Spam');
+        $this->reactionsController->removePhoto("Spam");
     }
 }

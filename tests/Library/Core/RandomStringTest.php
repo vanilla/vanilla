@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Test randomString().
  */
 
-class RandomStringTest extends TestCase {
-
+class RandomStringTest extends TestCase
+{
     /**
      * Tests {@link randomString()} against several scenarios.
      *
@@ -22,12 +22,13 @@ class RandomStringTest extends TestCase {
      * @param string $testCharacters The allowed characters in the string.
      * @dataProvider provideTestRandomStringArrays
      */
-    public function testRandomString($testLength, $testCharacters) {
+    public function testRandomString($testLength, $testCharacters)
+    {
         $characterClasses = [
-            'A' => str_split('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 1),
-            'a' => str_split('abcdefghijklmnopqrstuvwxyz', 1),
-            '0' => str_split('0123456789', 1),
-            '!' => str_split('~!@#$^&*_+-', 1),
+            "A" => str_split("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 1),
+            "a" => str_split("abcdefghijklmnopqrstuvwxyz", 1),
+            "0" => str_split("0123456789", 1),
+            "!" => str_split('~!@#$^&*_+-', 1),
         ];
 
         $testCharacterOptionsArray = str_split($testCharacters, 1);
@@ -51,32 +52,15 @@ class RandomStringTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestRandomStringArrays() {
+    public function provideTestRandomStringArrays()
+    {
         $r = [
-            'capsOnly' => [
-                25,
-                'A',
-            ],
-            'allLetters' => [
-                25,
-                'Aa',
-            ],
-            'lettersAndNumbers' => [
-                25,
-                'Aa0',
-            ],
-            'allChars' => [
-                25,
-                'Aa0!',
-            ],
-            'weakString' => [
-                1,
-                'a',
-            ],
-            'characterOptionsTooLong' => [
-                25,
-                'Aa0!8',
-            ],
+            "capsOnly" => [25, "A"],
+            "allLetters" => [25, "Aa"],
+            "lettersAndNumbers" => [25, "Aa0"],
+            "allChars" => [25, "Aa0!"],
+            "weakString" => [1, "a"],
+            "characterOptionsTooLong" => [25, "Aa0!8"],
         ];
 
         return $r;

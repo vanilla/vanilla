@@ -14,14 +14,16 @@ use Vanilla\Metadata\Parser\RSSFeedParser;
  *
  * @package VanillaTests\Library\Vanilla\Metadata
  */
-class RSSFeedParserTest extends TestCase {
-
+class RSSFeedParserTest extends TestCase
+{
     /**
      * @return string[]
      */
-    public function dataXML(): array {
+    public function dataXML(): array
+    {
         return [
-            ['<rss xmlns:media="https://vanillaforums.com/rss/" version="2.0">
+            [
+                '<rss xmlns:media="https://vanillaforums.com/rss/" version="2.0">
                 <channel>
                     <link>https://vanillaforums.com/channel</link>
                     <title>Channel</title>
@@ -48,7 +50,8 @@ class RSSFeedParserTest extends TestCase {
                         <enclosure url="https://vanillaforums.com/media/video.mp4" length="123456" type="video/mp4" />
                     </item>
                 </channel>
-            </rss>'],
+            </rss>',
+            ],
         ];
     }
 
@@ -59,24 +62,25 @@ class RSSFeedParserTest extends TestCase {
      *
      * @param string $xmlContent
      */
-    public function testGetResults(string $xmlContent): void {
+    public function testGetResults(string $xmlContent): void
+    {
         $xmlDOM = new \DOMDocument();
         $xmlDOM->loadXML($xmlContent);
         $rssParser = new RSSFeedParser();
         $results = $rssParser->parse($xmlDOM);
-        $this->assertCount(2, $results['item']);
-        $this->assertNotEmpty($results['channel']);
-        $this->assertArrayHasKey('image', $results['channel']);
-        $this->assertEquals('https://vanillaforums.com/channel.png', $results['channel']['image']['url']);
-        $this->assertArrayHasKey('pubDate', $results['item'][0]);
-        $this->assertArrayHasKey('img', $results['item'][0]);
-        $this->assertArrayNotHasKey('img', $results['item'][1]);
-        $this->assertEquals('/images.JPG', $results['item'][0]['img']['src']);
-        $this->assertEquals('Title 3', $results['item'][1]['title']);
-        $this->assertEquals('Cat 1', $results['item'][1]['category']);
+        $this->assertCount(2, $results["item"]);
+        $this->assertNotEmpty($results["channel"]);
+        $this->assertArrayHasKey("image", $results["channel"]);
+        $this->assertEquals("https://vanillaforums.com/channel.png", $results["channel"]["image"]["url"]);
+        $this->assertArrayHasKey("pubDate", $results["item"][0]);
+        $this->assertArrayHasKey("img", $results["item"][0]);
+        $this->assertArrayNotHasKey("img", $results["item"][1]);
+        $this->assertEquals("/images.JPG", $results["item"][0]["img"]["src"]);
+        $this->assertEquals("Title 3", $results["item"][1]["title"]);
+        $this->assertEquals("Cat 1", $results["item"][1]["category"]);
 
         $description = '<img src="/images.JPG" alt="An image" title="Image Title" /><p>Description.</p>';
-        $this->assertEquals($description, $results['item'][0]['description']);
-        $this->assertEquals('https://vanillaforums.com/media/video.mp4', $results['item'][1]['enclosure']['url']);
+        $this->assertEquals($description, $results["item"][0]["description"]);
+        $this->assertEquals("https://vanillaforums.com/media/video.mp4", $results["item"][1]["enclosure"]["url"]);
     }
 }

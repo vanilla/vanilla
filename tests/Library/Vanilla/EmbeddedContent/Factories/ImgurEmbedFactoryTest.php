@@ -15,8 +15,8 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class ImgurEmbedFactoryTest extends MinimalContainerTestCase {
-
+class ImgurEmbedFactoryTest extends MinimalContainerTestCase
+{
     /** @var ImgurEmbedFactory */
     private $factory;
 
@@ -26,7 +26,8 @@ class ImgurEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
         $this->factory = new ImgurEmbedFactory($this->httpClient);
@@ -38,27 +39,28 @@ class ImgurEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string $urlToTest
      * @dataProvider supportedDomainsProvider
      */
-    public function testSupportedDomains(string $urlToTest) {
+    public function testSupportedDomains(string $urlToTest)
+    {
         $this->assertTrue($this->factory->canHandleUrl($urlToTest));
     }
 
     /**
      * @return array
      */
-    public function supportedDomainsProvider(): array {
-        return [
-            [ "https://imgur.com/a/Pt2cHff" ],
-        ];
+    public function supportedDomainsProvider(): array
+    {
+        return [["https://imgur.com/a/Pt2cHff"]];
     }
 
     /**
      * Test network request fetching and handling.
      */
-    public function testCreateEmbedForUrl() {
+    public function testCreateEmbedForUrl()
+    {
         $url = "https://imgur.com/a/Pt2cHff";
         $imgurID = "a/Pt2cHff";
 
-        $oembedParams = http_build_query([ "url" => $url ]);
+        $oembedParams = http_build_query(["url" => $url]);
         $oembedUrl = ImgurEmbedFactory::OEMBED_URL_BASE . "?" . $oembedParams;
 
         // phpcs:disable Generic.Files.LineLength
@@ -69,7 +71,8 @@ class ImgurEmbedFactoryTest extends MinimalContainerTestCase {
             "provider_url" => "https://imgur.com",
             "width" => 540,
             "height" => 500,
-            "html" => "<blockquote class=\"imgur-embed-pub\" lang=\"en\" data-id=\"a/Pt2cHff\"><a href=\"https://imgur.com/a/Pt2cHff\">Very scary birb </a></blockquote><script async src=\"//s.imgur.com/min/embed.js\" charset=\"utf-8\"></script>",
+            "html" =>
+                "<blockquote class=\"imgur-embed-pub\" lang=\"en\" data-id=\"a/Pt2cHff\"><a href=\"https://imgur.com/a/Pt2cHff\">Very scary birb </a></blockquote><script async src=\"//s.imgur.com/min/embed.js\" charset=\"utf-8\"></script>",
             "author_name" => "monalistic",
             "author_url" => "https://imgur.com/user/monalistic",
         ];
@@ -77,11 +80,7 @@ class ImgurEmbedFactoryTest extends MinimalContainerTestCase {
 
         $this->httpClient->addMockResponse(
             $oembedUrl,
-            new HttpResponse(
-                200,
-                "Content-Type: application/json",
-                json_encode($data)
-            )
+            new HttpResponse(200, "Content-Type: application/json", json_encode($data))
         );
 
         // Check over the network.

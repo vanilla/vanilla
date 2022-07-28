@@ -12,8 +12,8 @@
 /**
  * A simple timer class that can be used to time longer running processes.
  */
-class Gdn_Timer {
-
+class Gdn_Timer
+{
     /** @var int Seconds. */
     public $StartTime;
 
@@ -28,7 +28,8 @@ class Gdn_Timer {
      *
      * @return mixed
      */
-    public function elapsedTime() {
+    public function elapsedTime()
+    {
         if (is_null($this->FinishTime)) {
             $result = microtime(true) - $this->StartTime;
         } else {
@@ -42,7 +43,8 @@ class Gdn_Timer {
      *
      * @param string $message
      */
-    public function finish($message = '') {
+    public function finish($message = "")
+    {
         $this->FinishTime = microtime(true);
         if ($message) {
             $this->write($message, $this->FinishTime, $this->StartTime);
@@ -55,10 +57,11 @@ class Gdn_Timer {
      * @param $span
      * @return string
      */
-    public static function formatElapsed($span) {
+    public static function formatElapsed($span)
+    {
         $m = floor($span / 60);
         $s = $span - $m * 60;
-        return sprintf('%d:%05.2f', $m, $s);
+        return sprintf("%d:%05.2f", $m, $s);
     }
 
     /**
@@ -66,7 +69,8 @@ class Gdn_Timer {
      *
      * @param string $message
      */
-    public function start($message = '') {
+    public function start($message = "")
+    {
         $this->StartTime = microtime(true);
         $this->SplitTime = $this->StartTime;
         $this->FinishTime = null;
@@ -81,7 +85,8 @@ class Gdn_Timer {
      *
      * @param string $message
      */
-    public function split($message = '') {
+    public function split($message = "")
+    {
         $prevSplit = $this->SplitTime;
         $this->SplitTime = microtime(true);
         if ($message) {
@@ -96,20 +101,21 @@ class Gdn_Timer {
      * @param null $time
      * @param null $prevTime
      */
-    public function write($message, $time = null, $prevTime = null) {
+    public function write($message, $time = null, $prevTime = null)
+    {
         if ($message) {
             echo $message;
         }
         if (!is_null($time)) {
             if ($message) {
-                echo ': ';
+                echo ": ";
             }
-            echo date('Y-m-d H:i:s', $time);
+            echo date("Y-m-d H:i:s", $time);
             if (!is_null($prevTime)) {
                 $span = $time - $prevTime;
                 $m = floor($span / 60);
                 $s = $span - $m * 60;
-                echo sprintf(' (%d:%05.2f)', $m, $s);
+                echo sprintf(" (%d:%05.2f)", $m, $s);
             }
         }
         echo "\n";

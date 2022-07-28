@@ -12,26 +12,29 @@ use Vanilla\Layout\View\LegacyLayoutViewInterface;
 /**
  * Legacy view type for user profile.
  */
-class LegacyProfileLayoutView implements LegacyLayoutViewInterface {
-
+class LegacyProfileLayoutView implements LegacyLayoutViewInterface
+{
     /**
      * @inheritDoc
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return "Profile Page";
     }
 
     /**
      * @inheritDoc
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return "profile";
     }
 
     /**
      * @inheritDoc
      */
-    public function getLegacyType(): string {
+    public function getLegacyType(): string
+    {
         return "Dashboard/Profile/Index";
     }
 }

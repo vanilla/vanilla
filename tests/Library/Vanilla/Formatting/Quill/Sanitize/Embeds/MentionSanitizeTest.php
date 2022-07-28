@@ -11,17 +11,22 @@ use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
 /**
  * Tests to ensure that @mentions are properly sanitized.
  */
-class MentionSanitizeTest extends SanitizeTest {
-
+class MentionSanitizeTest extends SanitizeTest
+{
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
+    protected function insertContentOperations(string $content): array
+    {
         $operations = [
-            ["insert" => ["mention" => [
-                "name" => $content,
-                "userID" => $content,
-            ]]],
+            [
+                "insert" => [
+                    "mention" => [
+                        "name" => $content,
+                        "userID" => $content,
+                    ],
+                ],
+            ],
             ["insert" => $content],
         ];
 

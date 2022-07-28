@@ -16,6 +16,7 @@ import { IApiError, IFieldError } from "@library/@types/api/core";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { ApiContext } from "@vanilla/ui";
 import { LongRunnerClient } from "@library/LongRunnerClient";
+import { formatUrl } from "./utility/appUtils";
 
 function fieldErrorTransformer(responseData, headers: any) {
     if (responseData && responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
@@ -26,7 +27,7 @@ function fieldErrorTransformer(responseData, headers: any) {
 }
 
 const apiv2 = axios.create({
-    baseURL: siteUrl("/api/v2/"),
+    baseURL: formatUrl("/api/v2/", true),
     headers: {
         "X-Requested-With": "vanilla",
     },

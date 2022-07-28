@@ -1,4 +1,6 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined("APPLICATION")) {
+    exit();
+}
 
 /**
  * A module for rendering a media item in the Vanilla Dashboard.
@@ -14,19 +16,19 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @since 2.3
  */
-class MediaItemModule extends Gdn_Module {
-
+class MediaItemModule extends Gdn_Module
+{
     /** @var string The media item title. */
-    private $title = '';
+    private $title = "";
 
     /** @var string The url for the media item title if it's an anchor. */
-    private $titleUrl = '';
+    private $titleUrl = "";
 
     /** @var string The url for documentation on the plugin. */
-    private $documentationUrl = '';
+    private $documentationUrl = "";
 
     /** @var string The description for the media item. */
-    private $description = '';
+    private $description = "";
 
     /** @var array An array of HTML-formatted meta items for the media item. */
     private $meta = [];
@@ -56,7 +58,7 @@ class MediaItemModule extends Gdn_Module {
     private $dropdown = null;
 
     /** @var string The top-level HTML element for the Media Item. */
-    private $tag = 'div';
+    private $tag = "div";
 
     /** @var array The top-level attributes for the Media Item. */
     private $attributes = [];
@@ -69,19 +71,19 @@ class MediaItemModule extends Gdn_Module {
     private $cssClasses = [];
 
     /** @var string The url to the image source. */
-    private $imageSource = '';
+    private $imageSource = "";
 
     /** @var string The link url for the image if it's an anchor. */
-    private $imageUrl = '';
+    private $imageUrl = "";
 
     /** @var string The CSS class for the image. */
-    private $imageCssClass = '';
+    private $imageCssClass = "";
 
     /** @var string The image alt. */
-    private $imageAlt = '';
+    private $imageAlt = "";
 
     /** @var string The view to render. Supported views are media-addon, media-callout, or media-sm. */
-    public $view = 'media-addon';
+    public $view = "media-addon";
 
     /**
      * MediaItemModule constructor.
@@ -92,7 +94,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $tag The root-level tag of the media item, usually a div or li.
      * @param array $attributes The root-level attributes for the Media Item.
      */
-    public function __construct($title = '', $titleUrl = '', $description = '', $tag = 'div', $attributes = []) {
+    public function __construct($title = "", $titleUrl = "", $description = "", $tag = "div", $attributes = [])
+    {
         parent::__construct();
 
         $this->description = $description;
@@ -108,10 +111,11 @@ class MediaItemModule extends Gdn_Module {
      * @param string $view
      * @return MediaItemModule $this
      */
-    public function setView($view) {
-        $class = val('class', $this->attributes, '');
-        $class .= ' media '.$view;
-        $this->attributes['class'] = $class;
+    public function setView($view)
+    {
+        $class = val("class", $this->attributes, "");
+        $class .= " media " . $view;
+        $this->attributes["class"] = $class;
 
         return parent::setView($view);
     }
@@ -119,14 +123,16 @@ class MediaItemModule extends Gdn_Module {
     /**
      * @return string
      */
-    public function getImageSource() {
+    public function getImageSource()
+    {
         return $this->imageSource;
     }
 
     /**
      * @return string
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->description;
     }
 
@@ -134,7 +140,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $description
      * @return MediaItemModule $this
      */
-    public function setDescription($description) {
+    public function setDescription($description)
+    {
         $this->description = $description;
         return $this;
     }
@@ -142,7 +149,8 @@ class MediaItemModule extends Gdn_Module {
     /**
      * @return string
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
@@ -150,7 +158,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $title
      * @return MediaItemModule $this
      */
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->title = $title;
         return $this;
     }
@@ -158,7 +167,8 @@ class MediaItemModule extends Gdn_Module {
     /**
      * @return string
      */
-    public function getTitleUrl() {
+    public function getTitleUrl()
+    {
         return $this->titleUrl;
     }
 
@@ -166,7 +176,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $titleUrl Url for title, the view handles url()-ing.
      * @return MediaItemModule $this
      */
-    public function setTitleUrl($titleUrl) {
+    public function setTitleUrl($titleUrl)
+    {
         $this->titleUrl = $titleUrl;
         return $this;
     }
@@ -174,10 +185,18 @@ class MediaItemModule extends Gdn_Module {
     /**
      * @return string
      */
-    public function getDocumentationLink() {
+    public function getDocumentationLink()
+    {
         $docLink = "";
         if (!empty($this->documentationUrl)) {
-            $docLink = anchor("<svg alt=\"" . t('page') . "\" class=\"icon icon-12 icon-page\" viewBox=\"0 0 5 6\"><use xlink:href=\"#page\"></use></svg>", $this->documentationUrl, 'documentationLink', ['target' => '_blank', 'title' => $this->title . ' ' . t('Documentation')]);
+            $docLink = anchor(
+                "<svg alt=\"" .
+                    t("page") .
+                    "\" class=\"icon icon-12 icon-page\" viewBox=\"0 0 5 6\"><use xlink:href=\"#page\"></use></svg>",
+                $this->documentationUrl,
+                "documentationLink",
+                ["target" => "_blank", "title" => $this->title . " " . t("Documentation")]
+            );
         }
         return $docLink;
     }
@@ -186,7 +205,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $documentationUrl Url for documentation
      * @return MediaItemModule $this
      */
-    public function setDocumentationUrl($documentationUrl) {
+    public function setDocumentationUrl($documentationUrl)
+    {
         $this->documentationUrl = $documentationUrl;
         return $this;
     }
@@ -194,7 +214,8 @@ class MediaItemModule extends Gdn_Module {
     /**
      * @return array
      */
-    public function getAttributes() {
+    public function getAttributes()
+    {
         return $this->attributes;
     }
 
@@ -202,7 +223,8 @@ class MediaItemModule extends Gdn_Module {
      * @param array $attributes
      * @return MediaItemModule $this
      */
-    public function setAttributes($attributes) {
+    public function setAttributes($attributes)
+    {
         $this->attributes = $attributes;
         return $this;
     }
@@ -214,7 +236,8 @@ class MediaItemModule extends Gdn_Module {
      * @param array $meta
      * @return MediaItemModule $this
      */
-    public function setMeta($meta) {
+    public function setMeta($meta)
+    {
         $this->meta = $meta;
         return $this;
     }
@@ -222,7 +245,8 @@ class MediaItemModule extends Gdn_Module {
     /**
      * @return array
      */
-    public function getMeta() {
+    public function getMeta()
+    {
         return $this->meta;
     }
 
@@ -235,7 +259,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $meta An HTML-formatted string.
      * @return $this
      */
-    public function addMeta($meta) {
+    public function addMeta($meta)
+    {
         $this->meta[] = $meta;
         return $this;
     }
@@ -249,7 +274,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $meta An HTML-formatted string.
      * @return $this
      */
-    public function addMetaIf($isAllowed, $meta) {
+    public function addMetaIf($isAllowed, $meta)
+    {
         if (!$this->allowed($isAllowed)) {
             return $this;
         }
@@ -262,7 +288,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $meta An HTML-formatted string.
      * @return $this
      */
-    public function addTitleMeta(string $meta) {
+    public function addTitleMeta(string $meta)
+    {
         $this->titleMeta[] = $meta;
         return $this;
     }
@@ -276,7 +303,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $meta An HTML-formatted string.
      * @return MediaItemModule $this
      */
-    public function addTitleMetaIf($isAllowed, string $meta) {
+    public function addTitleMetaIf($isAllowed, string $meta)
+    {
         if (!$this->allowed($isAllowed)) {
             return $this;
         }
@@ -288,14 +316,16 @@ class MediaItemModule extends Gdn_Module {
      *
      * @return array Returns the title meta array.
      */
-    public function getTitleMeta(): array {
+    public function getTitleMeta(): array
+    {
         return $this->titleMeta;
     }
 
     /**
      * @return array
      */
-    public function getOptions() {
+    public function getOptions()
+    {
         return $this->options;
     }
 
@@ -306,7 +336,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $value An HTML-formatted string.
      * @return MediaItemModule $this
      */
-    public function addOption($key, $value) {
+    public function addOption($key, $value)
+    {
         $this->options[$key] = $value;
         return $this;
     }
@@ -321,7 +352,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $value An HTML-formatted string.
      * @return MediaItemModule $this
      */
-    public function addOptionIf($isAllowed, $key, $value) {
+    public function addOptionIf($isAllowed, $key, $value)
+    {
         if (!$this->allowed($isAllowed)) {
             return $this;
         }
@@ -331,14 +363,16 @@ class MediaItemModule extends Gdn_Module {
     /**
      * @return array
      */
-    public function getButtons() {
+    public function getButtons()
+    {
         return $this->buttons;
     }
 
     /**
      * @return DropdownModule
      */
-    public function getDropdown() {
+    public function getDropdown()
+    {
         return $this->dropdown;
     }
 
@@ -346,8 +380,9 @@ class MediaItemModule extends Gdn_Module {
      * @param DropdownModule $dropdown
      * @return MediaItemModule $this
      */
-    public function setDropdown($dropdown) {
-        if (is_a($dropdown, 'DropdownModule')) {
+    public function setDropdown($dropdown)
+    {
+        if (is_a($dropdown, "DropdownModule")) {
             $this->dropdown = $dropdown;
         }
         return $this;
@@ -356,7 +391,8 @@ class MediaItemModule extends Gdn_Module {
     /**
      * @return string The top-level HTML element for the Media Item.
      */
-    public function getTag() {
+    public function getTag()
+    {
         return $this->tag;
     }
 
@@ -364,7 +400,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $tag The top-level HTML element for the Media Item.
      * @return MediaItemModule $this
      */
-    public function setTag($tag) {
+    public function setTag($tag)
+    {
         $this->tag = $tag;
         return $this;
     }
@@ -372,7 +409,8 @@ class MediaItemModule extends Gdn_Module {
     /**
      * @return array
      */
-    public function getToggle() {
+    public function getToggle()
+    {
         return $this->toggle;
     }
 
@@ -383,7 +421,8 @@ class MediaItemModule extends Gdn_Module {
      * @param $class
      * @return MediaItemModule $this
      */
-    public function addCssClass($key, $class) {
+    public function addCssClass($key, $class)
+    {
         $this->cssClasses[$key] = $class;
         return $this;
     }
@@ -391,30 +430,30 @@ class MediaItemModule extends Gdn_Module {
     /**
      * @return array The css classes.
      */
-    public function getCssClasses() {
+    public function getCssClasses()
+    {
         return $this->cssClasses;
     }
-
-
 
     /**
      * Renders the html for an image with the image* properties.
      *
      * @return string The html for an image.
      */
-    public function getImageHtml() {
+    public function getImageHtml()
+    {
         if (empty($this->imageSource)) {
-            return '';
+            return "";
         }
 
         $attr = [];
 
         if (!empty($this->imageAlt)) {
-            $attr['alt'] = $this->imageAlt;
+            $attr["alt"] = $this->imageAlt;
         }
 
         if (!empty($this->imageCssClass)) {
-            $attr['class'] = $this->imageCssClass;
+            $attr["class"] = $this->imageCssClass;
         }
 
         $imgHtml = img($this->imageSource, $attr);
@@ -435,7 +474,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $alt The image alt.
      * @return MediaItemModule $this
      */
-    public function setImage($source = '', $url = '', $cssClass = '', $alt = '') {
+    public function setImage($source = "", $url = "", $cssClass = "", $alt = "")
+    {
         $this->imageSource = $source;
         $this->imageUrl = $url;
         $this->imageCssClass = $cssClass;
@@ -455,7 +495,8 @@ class MediaItemModule extends Gdn_Module {
      * @param string $alt The image alt.
      * @return MediaItemModule $this
      */
-    public function setImageIf($isAllowed, $source = '', $url = '', $cssClass = '', $alt = '') {
+    public function setImageIf($isAllowed, $source = "", $url = "", $cssClass = "", $alt = "")
+    {
         if (!$this->allowed($isAllowed)) {
             return $this;
         }
@@ -470,23 +511,24 @@ class MediaItemModule extends Gdn_Module {
      * @param $attributes The button attributes.
      * @return MediaItemModule $this
      */
-    public function addButton($text, $url, $attributes = ['class' => 'btn btn-secondary']) {
+    public function addButton($text, $url, $attributes = ["class" => "btn btn-secondary"])
+    {
         if (is_string($attributes)) {
-            $attr = ['class' => $attributes];
+            $attr = ["class" => $attributes];
         } elseif (is_array($attributes)) {
             $attr = $attributes;
         } else {
             $attr = [];
         }
 
-        if (!isset($attr['class'])) {
-            $attr['class'] = 'btn btn-secondary';
+        if (!isset($attr["class"])) {
+            $attr["class"] = "btn btn-secondary";
         }
 
         $button = [
-            'text' => $text,
-            'url' => $url,
-            'attributes' => $attr
+            "text" => $text,
+            "url" => $url,
+            "attributes" => $attr,
         ];
         $this->buttons[] = $button;
 
@@ -503,7 +545,8 @@ class MediaItemModule extends Gdn_Module {
      * @param $attributes The button attributes.
      * @return MediaItemModule $this
      */
-    public function addButtonIf($isAllowed, $text, $url, $attributes) {
+    public function addButtonIf($isAllowed, $text, $url, $attributes)
+    {
         if (!$this->allowed($isAllowed)) {
             return $this;
         }
@@ -520,15 +563,16 @@ class MediaItemModule extends Gdn_Module {
      * @param string $cssClass The toggle css class.
      * @param string $anchorCssClass The css class for the anchor. Should probably have 'Hijack' in there.
      */
-    public function setToggle($key, $enabled, $url, $label, $cssClass = '', $anchorCssClass = 'Hijack') {
-        $state = $enabled ? 'on' : 'off';
+    public function setToggle($key, $enabled, $url, $label, $cssClass = "", $anchorCssClass = "Hijack")
+    {
+        $state = $enabled ? "on" : "off";
         $this->toggle = [
-            'key' => $key,
-            'state' => $state,
-            'url' => $url,
-            'label' => $label,
-            'cssClass' => $cssClass,
-            'anchorCssClass' => $anchorCssClass
+            "key" => $key,
+            "state" => $state,
+            "url" => $url,
+            "label" => $label,
+            "cssClass" => $cssClass,
+            "anchorCssClass" => $anchorCssClass,
         ];
     }
 
@@ -537,13 +581,22 @@ class MediaItemModule extends Gdn_Module {
      *
      * @return string An HTML-formatted string for a toggle.
      */
-    public function getToggleHtml() {
-        $slider = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>',
-            val('url', $this->toggle), val('anchorCssClass', $this->toggle),
-            ['aria-label' => val('label', $this->toggle)]),
-            'span', ['class' => 'toggle-wrap toggle-wrap-'.val('state', $this->toggle)]);
-        $toggle = wrap($slider, 'div',
-            ['class' => val('cssClass', $this->toggle), 'id' => strtolower(val('key', $this->toggle)).'-toggle']);
+    public function getToggleHtml()
+    {
+        $slider = wrap(
+            anchor(
+                '<div class="toggle-well"></div><div class="toggle-slider"></div>',
+                val("url", $this->toggle),
+                val("anchorCssClass", $this->toggle),
+                ["aria-label" => val("label", $this->toggle)]
+            ),
+            "span",
+            ["class" => "toggle-wrap toggle-wrap-" . val("state", $this->toggle)]
+        );
+        $toggle = wrap($slider, "div", [
+            "class" => val("cssClass", $this->toggle),
+            "id" => strtolower(val("key", $this->toggle)) . "-toggle",
+        ]);
         return $toggle;
     }
 
@@ -552,7 +605,8 @@ class MediaItemModule extends Gdn_Module {
      *
      * @return bool Whether to render the module.
      */
-    public function prepare(){
+    public function prepare()
+    {
         if ($this->dropdown !== null) {
             if (!$this->dropdown->prepare()) {
                 $this->dropdown = null;

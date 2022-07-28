@@ -3,183 +3,167 @@
 // Used in conjunction with global variables to enable certain theme features.
 
 @mixin box-shadow($shadow...) {
-  @if $enable-shadows {
-    box-shadow: $shadow;
-  }
+    @if $enable-shadows {
+        box-shadow: $shadow;
+    }
 }
 
 @mixin transition($transition...) {
-  @if $enable-transitions {
-    transition: $transition;
-  }
+    @if $enable-transitions {
+        transition: $transition;
+    }
 }
 
 @mixin has-top-border() {
-  margin-top: - 1px;
+    margin-top: -1px;
 }
 
 @mixin fixed-table {
-  width: 100%;
-  max-width: 100%;
-  table-layout: fixed;
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
 }
 
 @mixin caret {
-  display: inline-block;
-  width: 0;
-  height: 0;
-  margin-right: 4px;
-  margin-left: 4px;
-  vertical-align: middle;
-  content: '';
-  border-top: $caret-width solid;
-  border-right: $caret-width solid transparent;
-  border-left: $caret-width solid transparent;
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-right: 4px;
+    margin-left: 4px;
+    vertical-align: middle;
+    content: "";
+    border-top: $caret-width solid;
+    border-right: $caret-width solid transparent;
+    border-left: $caret-width solid transparent;
 }
 
 @mixin reverse-link {
-  color: $grey-dark;
+    color: $grey-dark;
 
-  &:hover {
-    color: $brand-primary;
-  }
+    &:hover {
+        color: $brand-primary;
+    }
 }
 
 @mixin button-variant(
-  $color,
-  $background,
-  $border,
-  $active-color,
-  $active-background,
-  $active-border,
-  $hover-color: $active-color,
-  $hover-background: $active-background,
-  $hover-border: $active-border) {
+    $color,
+    $background,
+    $border,
+    $active-color,
+    $active-background,
+    $active-border,
+    $hover-color: $active-color,
+    $hover-background: $active-background,
+    $hover-border: $active-border
+) {
+    color: $color;
+    background-color: $background;
+    border-color: $border;
+    @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(0, 0, 0, 0.075));
 
-  color: $color;
-  background-color: $background;
-  border-color: $border;
-  @include box-shadow(inset 0 1px 0 rgba(255,255,255,.15), 0 1px 1px rgba(0,0,0,.075));
-
-  @include hover {
-    color: $hover-color;
-    background-color: $hover-background;
-    border-color: $hover-border;
-  }
-
-  &:focus,
-  &.focus {
-    color: $active-color;
-    background-color: $active-background;
-    border-color: $active-border;
-    outline: 0;
-  }
-
-  &:active,
-  &.active,
-  .open > &.dropdown-toggle {
-    color: $active-color;
-    background-color: $active-background;
-    border-color: $active-border;
-    // Remove the gradient for the pressed/active state
-    background-image: none;
-    @include box-shadow(inset 0 3px 5px rgba(0,0,0,.125));
-  }
-
-  &.disabled,
-  &:disabled {
-    color: $btn-link-disabled-color;
-    border-color: $btn-link-disabled-color;
+    @include hover {
+        color: $hover-color;
+        background-color: $hover-background;
+        border-color: $hover-border;
+    }
 
     &:focus,
     &.focus {
-      background-color: $background;
+        color: $active-color;
+        background-color: $active-background;
+        border-color: $active-border;
+        outline: 0;
     }
 
-    @include hover {
-      background-color: $background;
+    &:active,
+    &.active,
+    .open > &.dropdown-toggle {
+        color: $active-color;
+        background-color: $active-background;
+        border-color: $active-border;
+        // Remove the gradient for the pressed/active state
+        background-image: none;
+        @include box-shadow(inset 0 3px 5px rgba(0, 0, 0, 0.125));
     }
-  }
+
+    &.disabled,
+    &:disabled {
+        color: $btn-link-disabled-color;
+        border-color: $btn-link-disabled-color;
+
+        &:focus,
+        &.focus {
+            background-color: $background;
+        }
+
+        @include hover {
+            background-color: $background;
+        }
+    }
 }
 
 @mixin font-face(
-  $font-family,
-  $file-path,
-  $weight: normal,
-  $style: normal,
-  $asset-pipeline: $asset-pipeline,
-  $file-formats: eot woff2 woff ttf svg) {
+    $font-family,
+    $file-path,
+    $weight: normal,
+    $style: normal,
+    $asset-pipeline: $asset-pipeline,
+    $file-formats: eot woff2 woff ttf svg
+) {
+    $font-url-prefix: font-url-prefixer($asset-pipeline);
 
-  $font-url-prefix: font-url-prefixer($asset-pipeline);
+    @font-face {
+        font-family: $font-family;
+        font-style: $style;
+        font-weight: $weight;
 
-  @font-face {
-    font-family: $font-family;
-    font-style: $style;
-    font-weight: $weight;
-
-    src: font-source-declaration(
-        $font-family,
-        $file-path,
-        $asset-pipeline,
-        $file-formats,
-        $font-url-prefix
-    );
-  }
+        src: font-source-declaration($font-family, $file-path, $asset-pipeline, $file-formats, $font-url-prefix);
+    }
 }
 
 @mixin image-wrap-border($radius) {
-  &::after {
-    position: absolute;
-    display: block;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: ($border-width * 1) solid rgba(0,0,0,.125);
+    &::after {
+        position: absolute;
+        display: block;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: ($border-width * 1) solid rgba(0, 0, 0, 0.125);
+        border-radius: $radius;
+        content: "";
+    }
+}
+
+@mixin image-wrap($width: 84px, $height: 84px, $radius: 4px, $has-border: true, $background-color: $grey-light) {
+    position: relative;
+    min-width: $width;
+    height: $height;
     border-radius: $radius;
-    content: '';
-  }
+    overflow: hidden;
+    background-color: $background-color;
+
+    @if ($has-border) {
+        @include image-wrap-border($radius);
+    }
+
+    img {
+        width: $width;
+    }
 }
 
-@mixin image-wrap(
-  $width: 84px,
-  $height: 84px,
-  $radius: 4px,
-  $has-border: true,
-  $background-color: $grey-light) {
-
-  position: relative;
-  min-width: $width;
-  height: $height;
-  border-radius: $radius;
-  overflow: hidden;
-  background-color: $background-color;
-
-  @if ($has-border) {
-    @include image-wrap-border($radius);
-  }
-
-  img {
-    width: $width;
-  }
-}
-
-@mixin full-border(
-  $display: block,
-  $has-border-bottom: true,
-  $has-border-top: false) {
-
-  display: $display;
-  margin-left: -$padding-row;
-  margin-right: -$padding-row;
-  padding-left: $padding-row;
-  padding-right: $padding-row;
-  @if ($has-border-bottom) {
-    border-bottom: $border-width solid #e7e8e9;
-  }
-  @if ($has-border-top) {
-    border-top: $border-width solid #e7e8e9;
-  }
+@mixin full-border($display: block, $has-border-bottom: true, $has-border-top: false) {
+    display: $display;
+    margin-left: -$padding-row;
+    margin-right: -$padding-row;
+    padding-left: $padding-row;
+    padding-right: $padding-row;
+    @if ($has-border-bottom) {
+        border-bottom: $border-width solid #e7e8e9;
+    }
+    @if ($has-border-top) {
+        border-top: $border-width solid #e7e8e9;
+    }
 }
 
 // Grid
@@ -192,103 +176,100 @@
 
 // Starts 4 wide
 @mixin grid-item() {
-  @extend .col-xs-12;
-  @extend .col-sm-8;
-  @extend .col-lg-8;
-  @extend .col-xl-6;
+    @extend .col-xs-12;
+    @extend .col-sm-8;
+    @extend .col-lg-8;
+    @extend .col-xl-6;
 }
 
 // Starts 3 wide
 @mixin grid-item-large() {
-  @extend .col-xs-12;
-  @extend .col-sm-8;
-  @extend .col-lg-12;
-  @extend .col-xl-8;
+    @extend .col-xs-12;
+    @extend .col-sm-8;
+    @extend .col-lg-12;
+    @extend .col-xl-8;
 }
 
 @mixin list-reset() {
+    &,
+    ul,
+    ol {
+        padding-left: 0;
+    }
 
-  &,
-  ul,
-  ol {
-    padding-left: 0;
-  }
-
-  li {
-    list-style: none;
-  }
+    li {
+        list-style: none;
+    }
 }
 
-
 @mixin toggle($toggle-height, $toggle-padding) {
+    $toggle-slider-width: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width * 2);
+    $toggle-slider-padding: $toggle-padding + $toggle-border-width;
+    $toggle-width: $toggle-height * 2;
 
-  $toggle-slider-width: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width * 2);
-  $toggle-slider-padding: $toggle-padding + $toggle-border-width;
-  $toggle-width: $toggle-height * 2;
-
-  display: block;
-  position: relative;
-  width: $toggle-width;
-  height: $toggle-height;
-
-  .toggle-well {
     display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: $toggle-height * 2;
+    position: relative;
+    width: $toggle-width;
     height: $toggle-height;
-    background-color: $white;
-    border-radius: $toggle-height / 2;
-    border: $toggle-border-width solid $grey;
-    transition: background .4s;
-    cursor: pointer;
-  }
 
-  .toggle-slider {
-    display: block;
-    position: absolute;
-    top: $toggle-slider-padding;
-    left: $toggle-slider-padding;
-    width: $toggle-slider-width;
-    height: $toggle-slider-width;
-    border-radius: ($toggle-height - ($toggle-padding)) / 2;
-    border: $toggle-border-width solid $grey;
-    background-color: $white;
-    outline: 0;
-    transition: left .4s;
-    cursor: pointer;
-  }
-
-  .toggle-well-on {
-    background-color: $brand-primary;
-    border: 0;
-  }
-
-  .toggle-slider-on {
-    left: $toggle-width - $toggle-slider-width - $toggle-slider-padding;
-    border: 0;
-  }
-
-  .toggle-slider-active {
-    left: ($toggle-width / 2) - ($toggle-slider-width / 2);
-    transition: left .4s;
-  }
-
-  &.toggle-wrap-on {
     .toggle-well {
-      @extend .toggle-well-on;
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: $toggle-height * 2;
+        height: $toggle-height;
+        background-color: $white;
+        border-radius: $toggle-height * 0.5;
+        border: $toggle-border-width solid $grey;
+        transition: background 0.4s;
+        cursor: pointer;
     }
 
     .toggle-slider {
-      @extend .toggle-slider-on;
+        display: block;
+        position: absolute;
+        top: $toggle-slider-padding;
+        left: $toggle-slider-padding;
+        width: $toggle-slider-width;
+        height: $toggle-slider-width;
+        border-radius: ($toggle-height - ($toggle-padding)) * 0.5;
+        border: $toggle-border-width solid $grey;
+        background-color: $white;
+        outline: 0;
+        transition: left 0.4s;
+        cursor: pointer;
     }
-  }
 
-  .InProgress,
-  .toggle-wrap-active {
-    .toggle-slider {
-      @extend .toggle-slider-active;
+    .toggle-well-on {
+        background-color: $brand-primary;
+        border: 0;
     }
-  }
+
+    .toggle-slider-on {
+        left: $toggle-width - $toggle-slider-width - $toggle-slider-padding;
+        border: 0;
+    }
+
+    .toggle-slider-active {
+        left: ($toggle-width * 0.5) - ($toggle-slider-width * 0.5);
+        transition: left 0.4s;
+    }
+
+    &.toggle-wrap-on {
+        .toggle-well {
+            @extend .toggle-well-on;
+        }
+
+        .toggle-slider {
+            @extend .toggle-slider-on;
+        }
+    }
+
+    .InProgress,
+    .toggle-wrap-active {
+        .toggle-slider {
+            @extend .toggle-slider-active;
+        }
+    }
 }

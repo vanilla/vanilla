@@ -75,11 +75,11 @@ export default class SyntaxModule extends Module {
             }
             this.quill.update(Quill.sources.USER);
             const selection = this.quill.getSelection();
-            const codeBlocks = (this.quill.scroll.descendants(
+            const codeBlocks = this.quill.scroll.descendants(
                 (blot) => blot instanceof CodeBlockBlot,
                 0,
                 this.quill.scroll.length() - 1,
-            ) as any) as CodeBlockBlot[];
+            ) as any as CodeBlockBlot[];
 
             if (codeBlocks.length === 0) {
                 return; // Nothing to do here.

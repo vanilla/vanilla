@@ -15,7 +15,8 @@ use Vanilla\Contracts\Site\TranslationResourceInterface;
  * Class TranslationProvider .
  * @package Vanilla\Site
  */
-class TranslationProvider implements TranslationProviderInterface {
+class TranslationProvider implements TranslationProviderInterface
+{
     /** @var LocaleInterface $locale */
     private $locale;
 
@@ -26,28 +27,32 @@ class TranslationProvider implements TranslationProviderInterface {
      * TranslationProvider constructor.
      * @param LocaleInterface $locale
      */
-    public function __construct(LocaleInterface $locale) {
+    public function __construct(LocaleInterface $locale)
+    {
         $this->locale = $locale;
     }
 
     /**
      * @inheritdoc
      */
-    public function initializeResource(TranslationResourceInterface $resource) {
+    public function initializeResource(TranslationResourceInterface $resource)
+    {
         $this->validResources[] = $resource;
     }
 
     /**
      * @inheritdoc
      */
-    public function supportsContentTranslation(): bool {
+    public function supportsContentTranslation(): bool
+    {
         return false;
     }
 
     /**
      * @inheritdoc
      */
-    public function translate(string $propertyKey, string $sourceValue): string {
+    public function translate(string $propertyKey, string $sourceValue): string
+    {
         return $this->locale->translate($propertyKey, $sourceValue);
     }
 

@@ -3,86 +3,85 @@
 // summary table component.
 
 .Feed {
-  padding-top: $spacer / 2;
+    padding-top: $spacer * 0.5;
 }
 
 .FeedItem {
-  position: relative;
-  padding: 12px 0;
-  border-bottom: $table-border-width solid $table-border-color;
+    position: relative;
+    padding: 12px 0;
+    border-bottom: $table-border-width solid $table-border-color;
 
-  &:hover {
-    background-color: #f9fdfe;
-  }
-
-  &:first-child {
-    border-top: $table-border-width solid #ddd;
-  }
-
-  h2 {
-    padding: 0;
-    margin-top: - 3px;
-    margin-left: 0;
-    margin-right: 0;
-    border-top: 0;
-    border-bottom: 0;
-    font-weight: 400;
-    font-size: 13px;
-    text-overflow: ellipsis;
-    margin-bottom: 2px;
-    line-height: $line-height-lg;
-
-    a {
-      @include reverse-link();
-    }
-  }
-
-  .FeedDescription {
-    @extend .info;
-    margin-bottom: - 2px;
-    font-weight: 300;
-
-    strong {
-      font-weight: 400;
+    &:hover {
+        background-color: #f9fdfe;
     }
 
-    p {
-      margin-bottom: 0;
-      display: inline-block;
+    &:first-child {
+        border-top: $table-border-width solid #ddd;
     }
 
-    img {
-      display: none;
+    h2 {
+        padding: 0;
+        margin-top: -3px;
+        margin-left: 0;
+        margin-right: 0;
+        border-top: 0;
+        border-bottom: 0;
+        font-weight: 400;
+        font-size: 13px;
+        text-overflow: ellipsis;
+        margin-bottom: 2px;
+        line-height: $line-height-lg;
+
+        a {
+            @include reverse-link();
+        }
     }
 
-    .details p {
-      margin-bottom: 0;
-      display: initial;
-      line-height: 1.4;
+    .FeedDescription {
+        @extend .info;
+        margin-bottom: -2px;
+        font-weight: 300;
+
+        strong {
+            font-weight: 400;
+        }
+
+        p {
+            margin-bottom: 0;
+            display: inline-block;
+        }
+
+        img {
+            display: none;
+        }
+
+        .details p {
+            margin-bottom: 0;
+            display: initial;
+            line-height: 1.4;
+        }
+
+        .read-less {
+            display: block;
+            margin-top: 3px;
+        }
     }
 
-    .read-less {
-      display: block;
-      margin-top: 3px;
+    .FeedDescription,
+    h2 {
+        margin-right: 102px;
+        margin-left: 12px;
     }
-  }
 
+    .Date {
+        @extend .info;
 
-  .FeedDescription,
-  h2 {
-    margin-right: 102px;
-    margin-left: 12px;
-  }
-
-  .Date {
-    @extend .info;
-
-    position: absolute;
-    right: 12px;
-    width: 102px;
-    line-height: 1;
-    top: $spacer * .75 + (30px / 2) - ($font-size-tables / 2);
-    text-align: right;
-    font-weight: 300;
-  }
+        position: absolute;
+        right: 12px;
+        width: 102px;
+        line-height: 1;
+        top: $spacer * 0.75 + (30px * 0.5) - ($font-size-tables * 0.5);
+        text-align: right;
+        font-weight: 300;
+    }
 }

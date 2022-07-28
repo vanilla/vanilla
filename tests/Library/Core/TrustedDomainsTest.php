@@ -15,8 +15,8 @@ use VanillaTests\SiteTestTrait;
 /**
  * Tests for trusted domains.
  */
-class TrustedDomainsTest extends TestCase {
-
+class TrustedDomainsTest extends TestCase
+{
     use SiteTestTrait;
     use EventSpyTestTrait;
 
@@ -26,9 +26,10 @@ class TrustedDomainsTest extends TestCase {
     /**
      * Setup.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->authProviderModel = self::container()->get(\Gdn_AuthenticationProviderModel::class);
-        $this->resetTable('UserAuthenticationProvider');
+        $this->resetTable("UserAuthenticationProvider");
         // Clear out the cache.
         $this->authProviderModel->onUpdate();
     }
@@ -36,48 +37,61 @@ class TrustedDomainsTest extends TestCase {
     /**
      * @return TrustedDomainModel
      */
-    private function trustedDomainModel(): TrustedDomainModel {
+    private function trustedDomainModel(): TrustedDomainModel
+    {
         return self::container()->get(TrustedDomainModel::class);
     }
 
     /**
      * Test trusted domains.
      */
-    public function testConfigTrustedDomains() {
-        $this->runWithConfig([
-            'Garden.TrustedDomains' => "example.com\n\n\n\nother.com",
-            'Garden.Installed' => false,
-        ], function () {
-            $this->assertEquals(['vanilla.test', "example.com", "other.com"], $this->trustedDomainModel()->getAll());
-        });
+    public function testConfigTrustedDomains()
+    {
+        $this->runWithConfig(
+            [
+                "Garden.TrustedDomains" => "example.com\n\n\n\nother.com",
+                "Garden.Installed" => false,
+            ],
+            function () {
+                $this->assertEquals(
+                    ["vanilla.test", "example.com", "other.com"],
+                    $this->trustedDomainModel()->getAll()
+                );
+            }
+        );
 
-        $this->runWithConfig([
-            'Garden.TrustedDomains' => ["example.com"]
-        ], function () {
-            $this->assertEquals(['vanilla.test', "example.com"], $this->trustedDomainModel()->getAll());
-        });
+        $this->runWithConfig(
+            [
+                "Garden.TrustedDomains" => ["example.com"],
+            ],
+            function () {
+                $this->assertEquals(["vanilla.test", "example.com"], $this->trustedDomainModel()->getAll());
+            }
+        );
     }
 
     /**
      * Test trusted domains from auth providers.
      */
-    public function testAuthProviderDomains() {
+    public function testAuthProviderDomains()
+    {
         $this->authProviderModel->save([
-            'AuthenticationKey' => 'mycustom',
-            'AuthenticationSchemeAlias' => 'mycustom',
-            'AssosciationSecret' => 'asdf',
-            'RegisterUrl' => 'http://registerdomain.com/auth',
+            "AuthenticationKey" => "mycustom",
+            "AuthenticationSchemeAlias" => "mycustom",
+            "AssosciationSecret" => "asdf",
+            "RegisterUrl" => "http://registerdomain.com/auth",
         ]);
 
-        $this->assertEquals(['vanilla.test', "registerdomain.com"], $this->trustedDomainModel()->getAll());
+        $this->assertEquals(["vanilla.test", "registerdomain.com"], $this->trustedDomainModel()->getAll());
     }
 
     /**
      * Test event firing.
      */
-    public function testEventDomains() {
+    public function testEventDomains()
+    {
         $this->getEventManager()->bindClass($this);
-        $this->assertEquals(['vanilla.test', "eventdomain.com"], $this->trustedDomainModel()->getAll());
+        $this->assertEquals(["vanilla.test", "eventdomain.com"], $this->trustedDomainModel()->getAll());
     }
 
     /**
@@ -86,7 +100,8 @@ class TrustedDomainsTest extends TestCase {
      * @param null $sender
      * @param array $args
      */
-    public function entryController_beforeTargetReturn_handler($sender, array $args) {
-        $args['TrustedDomains'][] = 'eventdomain.com';
+    public function entryController_beforeTargetReturn_handler($sender, array $args)
+    {
+        $args["TrustedDomains"][] = "eventdomain.com";
     }
 }

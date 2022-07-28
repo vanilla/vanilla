@@ -13,15 +13,17 @@ use VanillaTests\VanillaTestCase;
 /**
  * Tests for the Reactions openApi.
  */
-class ReactionsOpenApiTest extends VanillaTestCase {
+class ReactionsOpenApiTest extends VanillaTestCase
+{
     use OpenAPIBuilderTrait;
 
-    public static $addons = ['vanilla', 'reactions'];
+    public static $addons = ["vanilla", "reactions"];
 
     /**
      * Test that the reactionType parameter is added to the /discussions get endpoint.
      */
-    public function testReactionsAdditionsToOpenAPI() {
+    public function testReactionsAdditionsToOpenAPI()
+    {
         $builder = $this->createOpenApiBuilder();
         $data = $builder->generateFullOpenAPI();
         $discussionsGetParams = array_column($data["paths"]["/discussions"]["get"]["parameters"], "name");

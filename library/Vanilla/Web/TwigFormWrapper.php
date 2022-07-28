@@ -15,50 +15,50 @@ use \Gdn_Form;
  * - Certain methods output will be marked as "pre-escaped" for twig.
  * - Other methods will be raw strings, and twig will escape them itself.
  */
-class TwigFormWrapper {
-
+class TwigFormWrapper
+{
     // List of form methods that are alreayd sanitized and are exptected to contain HMTL.
     const PRE_ESCAPED_OUTPUT_METHODS = [
         // structure
-        'open',
-        'close',
-        'errors',
-        'label',
-        'labelWrap',
-        'inputWrap',
-        'inlineError',
+        "open",
+        "close",
+        "errors",
+        "label",
+        "labelWrap",
+        "inputWrap",
+        "inlineError",
 
         // Groups
-        'simple',
+        "simple",
 
         // Inputs
-        'dropDown',
-        'categoryDropdown',
-        'toggle',
-        'input',
-        'hidden',
-        'textBox',
-        'textBoxWrap',
-        'bodyBox',
-        'button',
-        'linkButton',
-        'color',
-        'calendar',
-        'captcha',
-        'checkBox',
-        'checkBoxList',
-        'checkBoxGrid',
-        'checkBoxGridGroups',
-        'checkBoxGridGroup',
-        'radio',
-        'radioList',
-        'imageUploadPreview',
-        'imageUploadReact',
-        'date',
-        'currentImage',
-        'imageUpload',
-        'fileUpload',
-        'react',
+        "dropDown",
+        "categoryDropdown",
+        "toggle",
+        "input",
+        "hidden",
+        "textBox",
+        "textBoxWrap",
+        "bodyBox",
+        "button",
+        "linkButton",
+        "color",
+        "calendar",
+        "captcha",
+        "checkBox",
+        "checkBoxList",
+        "checkBoxGrid",
+        "checkBoxGridGroups",
+        "checkBoxGridGroup",
+        "radio",
+        "radioList",
+        "imageUploadPreview",
+        "imageUploadReact",
+        "date",
+        "currentImage",
+        "imageUpload",
+        "fileUpload",
+        "react",
     ];
 
     /**
@@ -71,7 +71,8 @@ class TwigFormWrapper {
      *
      * @param Gdn_Form $form The form object to wrap/proxy to.
      */
-    public function __construct(Gdn_Form $form) {
+    public function __construct(Gdn_Form $form)
+    {
         $this->form = $form;
     }
 
@@ -83,11 +84,12 @@ class TwigFormWrapper {
      *
      * @return mixed
      */
-    public function __call(string $method, array $args) {
+    public function __call(string $method, array $args)
+    {
         $result = call_user_func_array([$this->form, $method], $args);
 
         if (inArrayI(strtolower($method), self::PRE_ESCAPED_OUTPUT_METHODS)) {
-            $result = new \Twig\Markup($result, 'utf-8');
+            $result = new \Twig\Markup($result, "utf-8");
         }
 
         return $result;

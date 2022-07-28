@@ -5,7 +5,11 @@
  */
 
 import { ISearchForm, ISearchResult, ISearchResults } from "@library/search/searchTypes";
-import { RecordID } from "@vanilla/utils";
+
+interface IParams {
+    pagination?: ISearchResults["pagination"];
+    result?: Partial<ISearchResult>;
+}
 
 /**
  * Utilities for testing search
@@ -28,10 +32,10 @@ export class SearchFixture {
     /**
      * Create a single search result
      */
-    public static createMockSearchResult(id: number = 1): ISearchResult {
+    public static createMockSearchResult(id: number = 1, params?: Partial<ISearchResult>): ISearchResult {
         return {
-            name: "test",
-            url: "/",
+            name: `test result ${id}`,
+            url: `test-url-${id}`,
             body: "test",
             excerpt: "test",
             recordID: id,
@@ -48,23 +52,20 @@ export class SearchFixture {
                 dateLastActive: "2016-07-25 17:51:15",
             },
             updateUserID: 0,
+            ...params,
         };
     }
 
     /**
      * Create a mock search response
      */
-    public static createMockSearchResults(
-        numberOfResults: number = 14,
-        params: Partial<ISearchResults> = {},
-    ): ISearchResults {
+
+    public static createMockSearchResults(numberOfResults: number = 14, params: IParams = {}): ISearchResults {
         return {
-            results: {
-                ...Array(numberOfResults)
-                    .fill(null)
-                    .map((_, id) => this.createMockSearchResult(id)),
-                ...params?.results,
-            },
+            results: Array(numberOfResults)
+                .fill(null)
+                .map((_, id) => this.createMockSearchResult(id, params.result)),
+
             pagination: {
                 next: 2,
                 prev: 0,

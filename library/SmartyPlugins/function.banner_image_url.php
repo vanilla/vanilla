@@ -16,6 +16,7 @@ use Vanilla\Dashboard\Models\BannerImageModel;
  *
  * @return string
  */
-function smarty_function_banner_image_url($params, &$smarty) {
+function smarty_function_banner_image_url($params, &$smarty)
+{
     return BannerImageModel::getCurrentBannerImageLink();
 }

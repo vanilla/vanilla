@@ -13,19 +13,16 @@ use Vanilla\Logger;
 /**
  * Add simple implementation of LoggableEvent for classes extending ResourceEvent.
  */
-trait LoggableEventTrait {
-
+trait LoggableEventTrait
+{
     /**
      * Get the event details for logging.
      *
      * @return LogEntry
      */
-    public function getLogEntry(): LogEntry {
-        $entry = new LogEntry(
-            $this->getLogLevel(),
-            $this->getLogMessage(),
-            $this->getLogContext()
-        );
+    public function getLogEntry(): LogEntry
+    {
+        $entry = new LogEntry($this->getLogLevel(), $this->getLogMessage(), $this->getLogContext());
         return $entry;
     }
 
@@ -34,12 +31,13 @@ trait LoggableEventTrait {
      *
      * @return array
      */
-    private function getLogContext(): array {
+    private function getLogContext(): array
+    {
         $payload = $this->getLogPayload();
         $payload = LoggerUtils::stringifyDates($payload);
 
         $result = [
-            Logger::FIELD_EVENT =>  $this->getType() . "_" . $this->getAction(),
+            Logger::FIELD_EVENT => $this->getType() . "_" . $this->getAction(),
             "payload" => $payload,
             "resourceAction" => $this->getAction(),
             "resourceType" => $this->getType(),
@@ -55,7 +53,8 @@ trait LoggableEventTrait {
      *
      * @return string
      */
-    private function getLogLevel(): string {
+    private function getLogLevel(): string
+    {
         return LogLevel::INFO;
     }
 
@@ -64,7 +63,8 @@ trait LoggableEventTrait {
      *
      * @return string
      */
-    private function getLogMessage(): string {
+    private function getLogMessage(): string
+    {
         $verbs = [
             ResourceEvent::ACTION_DELETE => "deleted",
             ResourceEvent::ACTION_INSERT => "inserted",
@@ -85,7 +85,8 @@ trait LoggableEventTrait {
      *
      * @return array
      */
-    private function getLogPayload(): array {
+    private function getLogPayload(): array
+    {
         return $this->getPayload();
     }
 }

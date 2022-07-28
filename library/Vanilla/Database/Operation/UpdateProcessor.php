@@ -12,8 +12,8 @@ use Vanilla\Database\Operation;
 /**
  * A processor to run a callback whenever an update operation is performed.
  */
-class UpdateProcessor implements Processor {
-
+class UpdateProcessor implements Processor
+{
     /** @var callable(Operation, callable): void */
     private $onUpdate;
 
@@ -23,14 +23,16 @@ class UpdateProcessor implements Processor {
      * @param callable(Operation, callable): void $onUpdate A callable to handle the operation.
      * The operation and another callable taking the operation and returning the result is given.
      */
-    public function __construct(callable $onUpdate) {
+    public function __construct(callable $onUpdate)
+    {
         $this->onUpdate = $onUpdate;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(Operation $operation, callable $stack) {
+    public function handle(Operation $operation, callable $stack)
+    {
         switch ($operation->getType()) {
             case Operation::TYPE_UPDATE:
                 return call_user_func($this->onUpdate, $operation, $stack);

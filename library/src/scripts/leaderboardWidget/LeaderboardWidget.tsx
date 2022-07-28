@@ -6,7 +6,10 @@
 
 import React, { useMemo } from "react";
 
-import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
+import {
+    IHomeWidgetContainerOptions,
+    WidgetContainerDisplayType,
+} from "@library/homeWidget/HomeWidgetContainer.styles";
 import { IHomeWidgetItemOptions } from "@library/homeWidget/HomeWidgetItem.styles";
 import { DeepPartial } from "redux";
 import { IUserFragment } from "@library/@types/api/users";
@@ -15,12 +18,13 @@ import { visibility } from "@library/styles/styleHelpersVisibility";
 import { cx } from "@emotion/css";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import { leaderboardWidgetClasses } from "@library/leaderboardWidget/LeaderboardWidget.styles";
-import { IWidgetCommonProps } from "@library/homeWidget/HomeWidget";
+import { HomeWidget, IWidgetCommonProps } from "@library/homeWidget/HomeWidget";
 import { HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { labelize, RecordID } from "@vanilla/utils";
 import { t } from "@vanilla/i18n";
+import { Widget } from "@library/layout/Widget";
 
-interface ILeader {
+export interface ILeader {
     user: IUserFragment;
     [key: string]: RecordID | IUserFragment;
 }
@@ -41,31 +45,42 @@ interface IProps extends IWidgetCommonProps {
 export function LeaderboardWidget(props: IProps) {
     const { title, subtitle, description, containerOptions, itemOptions, leaders } = props;
 
-    const isGrid = !!containerOptions?.isGrid;
     const countKeys = useMemo(
         () => (leaders && leaders[0] ? Object.keys(leaders[0]).filter((key) => key !== "user") : []),
         [leaders],
     );
 
+    enum displayTypesUsingDefaultView {
+        "list" = WidgetContainerDisplayType.LIST,
+        "link" = WidgetContainerDisplayType.LINK,
+    }
+    const isDefaultView = containerOptions
+        ? containerOptions.displayType === undefined || containerOptions.displayType in displayTypesUsingDefaultView
+        : true;
+
     return (
-        <HomeWidgetContainer {...{ title, subtitle, description }} options={containerOptions}>
-            {leaders &&
-                (isGrid ? (
+        <Widget>
+            <HomeWidgetContainer {...{ title, subtitle, description }} options={containerOptions}>
+                {leaders && !isDefaultView ? (
                     leaders.map((leader) => (
                         <HomeWidgetItem
                             key={leader.user.userID}
                             to={leader.user.url ?? ""}
                             name={leader.user.name}
                             description={leader.user.title}
-                            counts={countKeys.map((key) => ({ count: Number(leader[key]), labelCode: labelize(key) }))}
+                            counts={countKeys.map((key) => ({
+                                count: Number(leader[key]),
+                                labelCode: labelize(key),
+                            }))}
                             iconUrl={leader.user.photoUrl}
                             options={itemOptions}
                         />
                     ))
                 ) : (
                     <LeaderboardTable countKeys={countKeys} rows={leaders} />
-                ))}
-        </HomeWidgetContainer>
+                )}
+            </HomeWidgetContainer>
+        </Widget>
     );
 }
 

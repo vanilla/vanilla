@@ -7,15 +7,18 @@
 
 namespace Vanilla\Site;
 
+use Garden\Schema\Schema;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Vanilla\Forms\FieldMatchConditional;
+
 /**
  * Class for dealing with sections of a site.
  *
  * @see SectionInterface
  */
-class SingleSiteSectionProvider implements SiteSectionProviderInterface {
-
+class SingleSiteSectionProvider implements SiteSectionProviderInterface
+{
     /** @var DefaultSiteSection */
     private $defaultSite;
 
@@ -24,21 +27,32 @@ class SingleSiteSectionProvider implements SiteSectionProviderInterface {
      *
      * @param DefaultSiteSection $defaultSite
      */
-    public function __construct(DefaultSiteSection $defaultSite) {
+    public function __construct(DefaultSiteSection $defaultSite)
+    {
         $this->defaultSite = $defaultSite;
     }
 
     /**
      * @inheritDoc
      */
-    public function getAll(): array {
+    public function getAll(): array
+    {
         return [$this->defaultSite];
     }
 
     /**
      * @inheritDoc
      */
-    public function getCurrentSiteSection(): ?SiteSectionInterface {
+    public function getCurrentSiteSection(): ?SiteSectionInterface
+    {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionIDSchema(?FieldMatchConditional $conditional): ?Schema
+    {
         return null;
     }
 }

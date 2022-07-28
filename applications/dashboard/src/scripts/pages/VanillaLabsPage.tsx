@@ -16,6 +16,8 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
 import React from "react";
 import { MemoryRouter } from "react-router";
+import { CustomLayoutLabItem } from "@dashboard/labs/CustomLayoutLabItem";
+import Translate from "@library/content/Translate";
 
 export function VanillaLabsPage() {
     return (
@@ -27,6 +29,7 @@ export function VanillaLabsPage() {
                     {VanillaLabsPage.extraLabComponents.map((ComponentName, index) => {
                         return <ComponentName key={index} />;
                     })}
+                    <CustomLayoutLabItem />
                     <UserCardsLabItem />
                     <NewSearchPageLabItem />
                     <NewQuickLinksLabItem />
@@ -37,11 +40,11 @@ export function VanillaLabsPage() {
                 <h3>{t("Welcome to Labs!")}</h3>
                 <p>{t("This is where you can enable and test out new Vanilla features, pages & components.")}</p>
                 <h3>{t("Need more help?")}</h3>
-                <p>
-                    <SmartLink to="https://success.vanillaforums.com/kb/articles/384-integrate-foundation-pages-components-into-your-themee">
-                        {t("Integrate Foundation Pages & Components Into Your Theme")}
-                    </SmartLink>
-                </p>
+                <Translate
+                    source="Check out our <0>documentation</0>, or ask our <1>community of experts</1>."
+                    c0={(content) => <SmartLink to="https://success.vanillaforums.com/kb">{content}</SmartLink>}
+                    c1={(content) => <SmartLink to="https://success.vanillaforums.com/">{content}</SmartLink>}
+                />
             </DashboardHelpAsset>
         </MemoryRouter>
     );

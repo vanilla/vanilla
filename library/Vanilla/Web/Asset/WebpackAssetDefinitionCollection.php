@@ -17,8 +17,8 @@ use Webmozart\PathUtil\Path;
 /**
  * Collection of asset definitions.
  */
-final class WebpackAssetDefinitionCollection {
-
+final class WebpackAssetDefinitionCollection
+{
     const MANIFEST_JSON = "manifest.json";
     const MANIFEST_PHP = "manifest.php";
     const MANIFESTASYNC_PHP = "manifestAsync.php";
@@ -32,10 +32,10 @@ final class WebpackAssetDefinitionCollection {
     /** @var WebpackAssetDefinition[][] */
     private $cssAssetsByAddonKey;
 
-    /** @var WebpackAssetDefinitionCollection[] */
+    /** @var WebpackAssetDefinition[] */
     private $jsAssetsGlobal;
 
-    /** @var WebpackAssetDefinitionCollection[] */
+    /** @var WebpackAssetDefinition[] */
     private $cssAssetsGlobal;
 
     /** @var WebpackAssetDefinition */
@@ -44,12 +44,16 @@ final class WebpackAssetDefinitionCollection {
     /** @var WebpackAssetDefinition */
     private $bootstrapJsAsset;
 
+    /** @var array */
+    private $allAssetUrls = [];
+
     /**
      * Constructor.
      *
      * @param string $section
      */
-    public function __construct(string $section) {
+    public function __construct(string $section)
+    {
         $this->section = $section;
     }
 
@@ -59,8 +63,9 @@ final class WebpackAssetDefinitionCollection {
      * @param array $array The array to load.
      * @return WebpackAssetDefinitionCollection Returns a new definition with the properties from {@link $array}.
      */
-    public static function __set_state(array $array): WebpackAssetDefinitionCollection {
-        $section = $array['section'];
+    public static function __set_state(array $array): WebpackAssetDefinitionCollection
+    {
+        $section = $array["section"];
         $collection = new WebpackAssetDefinitionCollection($section);
         foreach ($array as $key => $val) {
             $collection->{$key} = $val;
@@ -77,7 +82,8 @@ final class WebpackAssetDefinitionCollection {
      *
      * @return WebpackAsset[]
      */
-    public function createAssets(RequestInterface $request, array $forAddonKeys, string $type): array {
+    public function createAssets(RequestInterface $request, array $forAddonKeys, string $type): array
+    {
         $definitions = [];
         if ($type === "css") {
             $definitions = array_merge(
@@ -111,12 +117,10 @@ final class WebpackAssetDefinitionCollection {
      *
      * @return WebpackAssetDefinition[]
      */
-    private function getDefinitionsForEnabledAddons(array $enabledKeys, array $addonAssets): array {
+    private function getDefinitionsForEnabledAddons(array $enabledKeys, array $addonAssets): array
+    {
         // Webpack assets are always lowercased.
-        $enabledKeys = array_map('strtolower', $enabledKeys);
-
-        // Treat library as an addon.
-        $enabledKeys[] = 'library';
+        $enabledKeys = array_map("strtolower", $enabledKeys);
 
         $definitions = [];
         foreach ($enabledKeys as $enabledKey) {
@@ -133,7 +137,12 @@ final class WebpackAssetDefinitionCollection {
      *
      * @param WebpackAssetDefinition $assetDefinition
      */
-    private function addAsset(WebpackAssetDefinition $assetDefinition) {
+    private function addAsset(WebpackAssetDefinition $assetDefinition)
+    {
+        if ($this->hasAsset($assetDefinition)) {
+            return;
+        }
+        $this->allAssetUrls[$assetDefinition->getAssetPath()] = true;
         $addonKey = $assetDefinition->getAddonKey();
         $assetType = $assetDefinition->getAssetType();
 
@@ -153,9 +162,14 @@ final class WebpackAssetDefinitionCollection {
                 }
                 break;
             default:
-                // Not currently supported, but wepback does generate outputs like this
-                // Such as SVGs and images.
+            // Not currently supported, but wepback does generate outputs like this
+            // Such as SVGs and images.
         }
+    }
+
+    public function hasAsset(WebpackAssetDefinition $assetDefinition): bool
+    {
+        return isset($this->allAssetUrls[$assetDefinition->getAssetPath()]);
     }
 
     /**
@@ -166,7 +180,8 @@ final class WebpackAssetDefinitionCollection {
      *
      * @return bool
      */
-    public static function sectionExists(string $section, string $distPath = PATH_DIST): bool {
+    public static function sectionExists(string $section, string $distPath = PATH_DIST): bool
+    {
         $sectionDir = Path::join([$distPath, $section]);
         return file_exists($sectionDir);
     }
@@ -180,7 +195,11 @@ final class WebpackAssetDefinitionCollection {
      *
      * @return WebpackAssetDefinitionCollection
      */
-    public static function loadFromDist(string $section, string $distPath = PATH_DIST, bool $includeAsync = false): WebpackAssetDefinitionCollection {
+    public static function loadFromDist(
+        string $section,
+        string $distPath = PATH_DIST,
+        bool $includeAsync = false
+    ): WebpackAssetDefinitionCollection {
         $sectionDir = Path::join([$distPath, $section]);
         $manifestPath = Path::join([$sectionDir, self::MANIFEST_JSON]);
         $cachePath = Path::join([$sectionDir, $includeAsync ? self::MANIFESTASYNC_PHP : self::MANIFEST_PHP]);
@@ -188,7 +207,10 @@ final class WebpackAssetDefinitionCollection {
         $definition = FileUtils::getCached($cachePath, function () use ($manifestPath, $section, $includeAsync) {
             $collection = new WebpackAssetDefinitionCollection($section);
             if (!file_exists($manifestPath)) {
-                trigger_error("Failed to load webpack manifest for section '$section'. Could not locate them on disk.", E_USER_NOTICE);
+                trigger_error(
+                    "Failed to load webpack manifest for section '$section'. Could not locate them on disk.",
+                    E_USER_NOTICE
+                );
                 return $collection;
             }
 
@@ -197,7 +219,10 @@ final class WebpackAssetDefinitionCollection {
                 $manifest = FileUtils::getArray($manifestPath);
                 self::applyManifestToCollection($collection, $manifest, $includeAsync);
             } catch (Exception $e) {
-                trigger_error("Could not decode webpack manifest for section '$section'." . $e->getMessage(), E_USER_NOTICE);
+                trigger_error(
+                    "Could not decode webpack manifest for section '$section'." . $e->getMessage(),
+                    E_USER_NOTICE
+                );
             } finally {
                 return $collection;
             }
@@ -206,7 +231,6 @@ final class WebpackAssetDefinitionCollection {
         return $definition;
     }
 
-
     /**
      * Apply a manifest to an collection.
      *
@@ -214,37 +238,60 @@ final class WebpackAssetDefinitionCollection {
      * @param array $manifest
      * @param bool $includeAsync
      */
-    private static function applyManifestToCollection(WebpackAssetDefinitionCollection $collection, array $manifest, bool $includeAsync = false) {
-        foreach ($manifest as $entryPath => $assetPath) {
-            $isAddon = str_starts_with($entryPath, 'addons/');
-            $extension = pathinfo($entryPath, PATHINFO_EXTENSION);
-            $name = pathinfo($entryPath, PATHINFO_FILENAME);
-            $addonKey = null;
+    private static function applyManifestToCollection(
+        WebpackAssetDefinitionCollection $collection,
+        array $manifest,
+        bool $includeAsync = false
+    ) {
+        foreach ($manifest as $chunkName => $assetInfo) {
+            self::addChunkAssetByChunkName($collection, $manifest, $chunkName, $includeAsync);
+        }
+    }
 
-            if (str_contains($assetPath, '/async/') && !$includeAsync) {
-                // Async plugins are loaded by webpack, not by the frontend.
-                continue;
-            }
+    private static function addChunkAssetByChunkName(
+        WebpackAssetDefinitionCollection $collection,
+        array &$manifest,
+        string $chunkName,
+        bool $includeAsync = false
+    ) {
+        $assetInfo = $manifest[$chunkName] ?? null;
+        if ($assetInfo === null) {
+            return;
+        }
+        $assetPath = $assetInfo["filePath"];
+        $isAddon = str_starts_with($chunkName, "addons/");
+        $extension = pathinfo($chunkName, PATHINFO_EXTENSION);
+        $name = pathinfo($chunkName, PATHINFO_FILENAME);
+        $addonKey = null;
 
-            if ($isAddon) {
-                // Trim the "common" from the name.
-                $addonKey = trim(str_replace("-common", "", $name));
-                // Many assets have hash of what chunk they are split from here.
-                $addonKey = preg_replace("/-[a-f0-9]{8}$/", "", $addonKey);
-            }
-
-            $asset = new WebpackAssetDefinition($assetPath, $extension, $collection->section, $addonKey);
-            switch ($name) {
-                case "runtime":
-                    $collection->runtimeJsAsset = $asset;
-                    break;
-                case "bootstrap":
-                    $collection->bootstrapJsAsset = $asset;
-                    break;
-                default:
-                    $collection->addAsset($asset);
-                    break;
+        if ($isAddon) {
+            // Trim the "common" from the name.
+            $addonKey = str_replace([".js", "min.js", ".css", ".min.css"], "", $name);
+            $addonKey = trim(str_replace("-common", "", $addonKey));
+            // Many assets have hash of what chunk they are split from here.
+            $addonKey = preg_replace("/-[a-f0-9]{8}$/", "", $addonKey);
+        } else {
+            if (str_contains($assetPath, "/async/") && !$includeAsync) {
+                // Non-addon async chunks are loaded by webpack, not by the frontend.
+                return;
             }
         }
+
+        $asset = new WebpackAssetDefinition($assetPath, $extension, $collection->section, $addonKey);
+        switch ($name) {
+            case "runtime":
+                $collection->runtimeJsAsset = $asset;
+                break;
+            case "bootstrap":
+                $collection->bootstrapJsAsset = $asset;
+                break;
+            default:
+                $collection->addAsset($asset);
+                break;
+        }
+
+        // Currently we don't actually load the dependenents because they result loading more javascript than we need.
+        // In order to trust them we'll need to have a better mechanism for determining them at build time.
+        // When that happens we may want to recurse into 'dependsOnAsyncChunks'.
     }
 }

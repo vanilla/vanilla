@@ -11,10 +11,10 @@
 /**
  * Handles /routes endpoint.
  */
-class RoutesController extends DashboardController {
-
+class RoutesController extends DashboardController
+{
     /** @var array Models to automatically instantiate. */
-    public $Uses = ['Form'];
+    public $Uses = ["Form"];
 
     /**
      * Set menu path. Automatically run on every use.
@@ -22,11 +22,12 @@ class RoutesController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function initialize() {
+    public function initialize()
+    {
         parent::initialize();
-        Gdn_Theme::section('Settings');
+        Gdn_Theme::section("Settings");
         if ($this->Menu) {
-            $this->Menu->highlightRoute('/dashboard/settings');
+            $this->Menu->highlightRoute("/dashboard/settings");
         }
     }
 
@@ -36,10 +37,11 @@ class RoutesController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function add() {
-        $this->permission('Garden.Settings.Manage');
+    public function add()
+    {
+        $this->permission("Garden.Settings.Manage");
         // Use the edit form with no roleid specified.
-        $this->View = 'Edit';
+        $this->View = "Edit";
         $this->edit();
     }
 
@@ -48,14 +50,15 @@ class RoutesController extends DashboardController {
      *
      * @param string|false $routeIndex Name of route.
      */
-    public function edit($routeIndex = false) {
-        $this->permission('Garden.Settings.Manage');
-        $this->setHighlightRoute('dashboard/routes');
+    public function edit($routeIndex = false)
+    {
+        $this->permission("Garden.Settings.Manage");
+        $this->setHighlightRoute("dashboard/routes");
         $this->Route = Gdn::router()->getRoute($routeIndex);
 
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
-        $configurationModel->setField(['Route', 'Target', 'Type']);
+        $configurationModel->setField(["Route", "Target", "Type"]);
 
         // Set the model on the form.
         $this->Form->setModel($configurationModel);
@@ -65,40 +68,36 @@ class RoutesController extends DashboardController {
             // Apply the route info to the form.
             if ($this->Route !== false) {
                 $this->Form->setData([
-                    'Route' => $this->Route['Route'],
-                    'Target' => $this->Route['Destination'],
-                    'Type' => $this->Route['Type']
+                    "Route" => $this->Route["Route"],
+                    "Target" => $this->Route["Destination"],
+                    "Type" => $this->Route["Type"],
                 ]);
             }
         } else {
             // Define some validation rules for the fields being saved
-            $configurationModel->Validation->applyRule('Route', 'Required');
-            $configurationModel->Validation->applyRule('Target', 'Required');
-            $configurationModel->Validation->applyRule('Type', 'Required');
+            $configurationModel->Validation->applyRule("Route", "Required");
+            $configurationModel->Validation->applyRule("Target", "Required");
+            $configurationModel->Validation->applyRule("Type", "Required");
 
             // Validate & Save
             $formPostValues = $this->Form->formValues();
 
             // Dunno.
-            if ($this->Route['Reserved']) {
-                $formPostValues['Route'] = $this->Route['Route'];
+            if ($this->Route["Reserved"]) {
+                $formPostValues["Route"] = $this->Route["Route"];
             }
 
             if ($configurationModel->validate($formPostValues)) {
-                $newRouteName = val('Route', $formPostValues);
+                $newRouteName = val("Route", $formPostValues);
 
-                if ($this->Route !== false && $newRouteName != $this->Route['Route']) {
-                    Gdn::router()->deleteRoute($this->Route['Route']);
+                if ($this->Route !== false && $newRouteName != $this->Route["Route"]) {
+                    Gdn::router()->deleteRoute($this->Route["Route"]);
                 }
 
-                Gdn::router()->setRoute(
-                    $newRouteName,
-                    val('Target', $formPostValues),
-                    val('Type', $formPostValues)
-                );
+                Gdn::router()->setRoute($newRouteName, val("Target", $formPostValues), val("Type", $formPostValues));
 
                 $this->informMessage(t("The route was saved successfully."));
-                $this->setRedirectTo('dashboard/routes');
+                $this->setRedirectTo("dashboard/routes");
             } else {
                 $this->Form->setValidationResults($configurationModel->validationResults());
             }
@@ -113,8 +112,9 @@ class RoutesController extends DashboardController {
      * @param mixed $routeIndex Name of route.
      * @param string|false $transientKey Security token.
      */
-    public function delete($routeIndex = false, $transientKey = false) {
-        $this->permission('Garden.Settings.Manage');
+    public function delete($routeIndex = false, $transientKey = false)
+    {
+        $this->permission("Garden.Settings.Manage");
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $session = Gdn::session();
 
@@ -124,10 +124,10 @@ class RoutesController extends DashboardController {
         }
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            redirectTo('dashboard/routes');
+            redirectTo("dashboard/routes");
         }
 
-        $this->jsonTarget('', '', 'Refresh');
+        $this->jsonTarget("", "", "Refresh");
 
         $this->render();
     }
@@ -138,10 +138,11 @@ class RoutesController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function index() {
-        $this->permission('Garden.Settings.Manage');
-        $this->setHighlightRoute('dashboard/routes');
-        $this->title(t('Routes'));
+    public function index()
+    {
+        $this->permission("Garden.Settings.Manage");
+        $this->setHighlightRoute("dashboard/routes");
+        $this->title(t("Routes"));
 
         $this->MyRoutes = Gdn::router()->Routes;
         $this->render();

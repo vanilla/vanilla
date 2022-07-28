@@ -14,8 +14,8 @@ use VanillaTests\Fixtures\Tuple;
  * Tests for getValueR().
  */
 
-class GetValueRTest extends TestCase {
-
+class GetValueRTest extends TestCase
+{
     /**
      * Test {@link getValueR()} against several scenarios.
      *
@@ -25,7 +25,8 @@ class GetValueRTest extends TestCase {
      * @param mixed $expected The expected result.
      * @dataProvider provideGetValueRArrays
      */
-    public function testGetValueR($testKey, $testCollection, $testDefault, $expected) {
+    public function testGetValueR($testKey, $testCollection, $testDefault, $expected)
+    {
         $actual = getValueR($testKey, $testCollection, $testDefault);
         $this->assertSame($expected, $actual);
     }
@@ -35,38 +36,14 @@ class GetValueRTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideGetValueRArrays() {
+    public function provideGetValueRArrays()
+    {
         $r = [
-            'flatArray' => [
-                1,
-                ['zero', 'one'],
-                false,
-                'one',
-            ],
-            'nestedArray' => [
-                'outer.inner',
-                ['outer' => ['inner' => 'expectedResult']],
-                false,
-                'expectedResult',
-            ],
-            'flatObject' => [
-                'a',
-                new Tuple('a', 'b'),
-                false,
-                'a'
-            ],
-            'nestedObjectProperty' => [
-                'a.a',
-                new Tuple(new Tuple('a', 'b'), 'b'),
-                false,
-                'a',
-            ],
-            'propertyNotPresent' => [
-                'c',
-                new Tuple('a', 'b'),
-                false,
-                false,
-            ],
+            "flatArray" => [1, ["zero", "one"], false, "one"],
+            "nestedArray" => ["outer.inner", ["outer" => ["inner" => "expectedResult"]], false, "expectedResult"],
+            "flatObject" => ["a", new Tuple("a", "b"), false, "a"],
+            "nestedObjectProperty" => ["a.a", new Tuple(new Tuple("a", "b"), "b"), false, "a"],
+            "propertyNotPresent" => ["c", new Tuple("a", "b"), false, false],
         ];
 
         return $r;

@@ -11,8 +11,8 @@ namespace Vanilla\Web\Asset;
  * A cache buster that works based on the last deployment time.
  * If that deployment time is not available it will fall back to the application version.
  */
-class DeploymentCacheBuster {
-
+class DeploymentCacheBuster
+{
     /** @var int|null */
     private $deploymentTime;
     /**
@@ -20,7 +20,8 @@ class DeploymentCacheBuster {
      *
      * @param int|null $deploymentTime
      */
-    public function __construct($deploymentTime) {
+    public function __construct($deploymentTime)
+    {
         $this->deploymentTime = $deploymentTime;
     }
 
@@ -32,7 +33,8 @@ class DeploymentCacheBuster {
      *
      * @return string
      */
-    public function value(): string {
+    public function value(): string
+    {
         if ($this->deploymentTime) {
             $result = dechex($this->deploymentTime);
         } else {

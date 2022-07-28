@@ -13,8 +13,8 @@ use Vanilla\Contracts\Models\FragmentFetcherInterface;
 /**
  * Handles role data.
  */
-class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
-
+class RoleModel extends Gdn_Model implements FragmentFetcherInterface
+{
     const GUEST_ID = 2;
     const UNCONFIRMED_ID = 3;
     const APPLICANT_ID = 4;
@@ -23,48 +23,50 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
     const MOD_ID = 32;
 
     /** Slug for Guest role type. */
-    const TYPE_GUEST = 'guest';
+    const TYPE_GUEST = "guest";
 
     /** Slug for Unconfirmed role type. */
-    const TYPE_UNCONFIRMED = 'unconfirmed';
+    const TYPE_UNCONFIRMED = "unconfirmed";
 
     /** Slug for Applicant role type. */
-    const TYPE_APPLICANT = 'applicant';
+    const TYPE_APPLICANT = "applicant";
 
     /** Slug for Member role type. */
-    const TYPE_MEMBER = 'member';
+    const TYPE_MEMBER = "member";
 
     /** Slug for Moderator role type. */
-    const TYPE_MODERATOR = 'moderator';
+    const TYPE_MODERATOR = "moderator";
 
     /** Slug for Administrator role type. */
-    const TYPE_ADMINISTRATOR = 'administrator';
+    const TYPE_ADMINISTRATOR = "administrator";
 
     /** @var array All roles. */
     public static $Roles = null;
 
     /** @var array A list of permissions that define an increasing ranking of permissions. */
     public $RankPermissions = [
-        'Garden.Moderation.Manage',
-        'Garden.Community.Manage',
-        'Garden.Users.Add',
-        'Garden.Settings.Manage',
-        'Conversations.Moderation.Manage'
+        "Garden.Moderation.Manage",
+        "Garden.Community.Manage",
+        "Garden.Users.Add",
+        "Garden.Settings.Manage",
+        "Conversations.Moderation.Manage",
     ];
 
     /**
      * Class constructor. Defines the related database table name.
      */
-    public function __construct() {
-        parent::__construct('Role');
-        $this->fireEvent('Init');
+    public function __construct()
+    {
+        parent::__construct("Role");
+        $this->fireEvent("Init");
     }
 
     /**
      * Clear the roles cache.
      */
-    public function clearCache() {
-        $key = 'Roles';
+    public function clearCache()
+    {
+        $key = "Roles";
         Gdn::cache()->remove($key);
     }
 
@@ -74,32 +76,37 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param array $values
      * @return int|false
      */
-    public function define($values) {
-        if (array_key_exists('RoleID', $values)) {
-            $roleID = (int)$values['RoleID'];
-            unset($values['RoleID']);
+    public function define($values)
+    {
+        if (array_key_exists("RoleID", $values)) {
+            $roleID = (int) $values["RoleID"];
+            unset($values["RoleID"]);
 
-            $this->SQL->replace('Role', $values, ['RoleID' => $roleID], true);
+            $this->SQL->replace("Role", $values, ["RoleID" => $roleID], true);
         } else {
             // Check to see if there is a role with the same name.
-            $roleID = $this->SQL->getWhere('Role', ['Name' => $values['Name']])->value('RoleID', null);
+            $roleID = $this->SQL->getWhere("Role", ["Name" => $values["Name"]])->value("RoleID", null);
 
             if (is_null($roleID)) {
                 // Figure out the next role ID.
-                $maxRoleID = $this->SQL->select('r.RoleID', 'MAX')->from('Role r')->get()->value('RoleID', 0);
+                $maxRoleID = $this->SQL
+                    ->select("r.RoleID", "MAX")
+                    ->from("Role r")
+                    ->get()
+                    ->value("RoleID", 0);
                 $roleID = $maxRoleID + 1;
-                $values['RoleID'] = $roleID;
+                $values["RoleID"] = $roleID;
 
                 // Insert the role.
-                $roleID = $this->SQL->insert('Role', $values);
+                $roleID = $this->SQL->insert("Role", $values);
             } else {
-                $roleID = (int)$roleID;
+                $roleID = (int) $roleID;
                 // Update the role.
-                $this->SQL->update('Role', $values, ['RoleID' => $roleID])->put();
+                $this->SQL->update("Role", $values, ["RoleID" => $roleID])->put();
             }
         }
         $this->clearCache();
-        return $roleID ? (int)$roleID : false;
+        return $roleID ? (int) $roleID : false;
     }
 
     /**
@@ -108,13 +115,14 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param mixed $role Role name (string) or $role data (array or object).
      * @return bool Whether role is NOT personal info (FALSE = remove it, it's personal).
      */
-    public static function filterPersonalInfo($role) {
+    public static function filterPersonalInfo($role)
+    {
         if (is_string($role)) {
             $roles = self::getByName($role);
             $role = array_shift($roles);
         }
 
-        return (val('PersonalInfo', $role)) ? false : true;
+        return val("PersonalInfo", $role) ? false : true;
     }
 
     /**
@@ -122,11 +130,12 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      *
      * @inheritdoc
      */
-    public function get($orderFields = '', $orderDirection = 'asc', $limit = false, $pageNumber = false) {
+    public function get($orderFields = "", $orderDirection = "asc", $limit = false, $pageNumber = false)
+    {
         return $this->SQL
             ->select()
-            ->from('Role')
-            ->orderBy($orderFields ?: 'Sort', $orderDirection)
+            ->from("Role")
+            ->orderBy($orderFields ?: "Sort", $orderDirection)
             ->get();
     }
 
@@ -136,13 +145,14 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param int $roleID The ID of the role to get the permissions for.
      * @return array Returns an array of permissions.
      */
-    public function getCategoryPermissions($roleID) {
-        $permissions = Gdn::permissionModel()->getJunctionPermissions(['RoleID' => $roleID], 'Category');
+    public function getCategoryPermissions($roleID)
+    {
+        $permissions = Gdn::permissionModel()->getJunctionPermissions(["RoleID" => $roleID], "Category");
         $result = [];
 
         foreach ($permissions as $perm) {
-            $row = ['CategoryID' => $perm['JunctionID']];
-            unset($perm['Name'], $perm['JunctionID'], $perm['JunctionTable'], $perm['JunctionColumn']);
+            $row = ["CategoryID" => $perm["JunctionID"]];
+            unset($perm["Name"], $perm["JunctionID"], $perm["JunctionTable"], $perm["JunctionColumn"]);
             $row += $perm;
             $result[] = $row;
         }
@@ -155,15 +165,16 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      *
      * @return Gdn_DataSet Returns all of the roles with the ranking permissions.
      */
-    public function getWithRankPermissions() {
+    public function getWithRankPermissions()
+    {
         $this->SQL
-            ->select('r.*')
-            ->from('Role r')
-            ->leftJoin('Permission p', 'p.RoleID = r.RoleID and p.JunctionID is null')
-            ->orderBy('Sort', 'asc');
+            ->select("r.*")
+            ->from("Role r")
+            ->leftJoin("Permission p", "p.RoleID = r.RoleID and p.JunctionID is null")
+            ->orderBy("Sort", "asc");
 
         foreach ($this->RankPermissions as $permission) {
-            $this->SQL->select("`$permission`", '', $permission);
+            $this->SQL->select("`$permission`", "", $permission);
         }
 
         $result = $this->SQL->get();
@@ -175,9 +186,10 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      *
      * @return array
      */
-    public function getArray() {
+    public function getArray()
+    {
         $roleData = $this->get()->resultArray();
-        $result = array_column($roleData, 'Name', 'RoleID');
+        $result = array_column($roleData, "Name", "RoleID");
 
         return $result;
     }
@@ -187,33 +199,34 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      *
      * @return array Returns an array in the format `[RoleID => 'Role Name']`.
      */
-    public function getAssignable() {
+    public function getAssignable()
+    {
         // Administrators can assign all roles.
-        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+        if (Gdn::session()->checkPermission("Garden.Settings.Manage")) {
             return $this->getArray();
         }
         // Users that can't edit other users can't assign any roles.
-        if (!Gdn::session()->checkPermission('Garden.Users.Edit')) {
+        if (!Gdn::session()->checkPermission("Garden.Users.Edit")) {
             return [];
         }
 
         $sql = Gdn::sql();
 
-        $sql->select('r.RoleID, r.Name')
-            ->from('Role r')
-            ->leftJoin('Permission p', 'p.RoleID = r.RoleID and p.JunctionID is null'); // join to global permissions
+        $sql->select("r.RoleID, r.Name")
+            ->from("Role r")
+            ->leftJoin("Permission p", "p.RoleID = r.RoleID and p.JunctionID is null"); // join to global permissions
 
         // Community managers can assign permissions they have,
         // but other users can't assign any ranking permissions.
-        $cM = Gdn::session()->checkPermission('Garden.Community.Manage');
+        $cM = Gdn::session()->checkPermission("Garden.Community.Manage");
         foreach ($this->RankPermissions as $permission) {
             if (!$cM || !Gdn::session()->checkPermission($permission)) {
-                $sql->where("coalesce(`$permission`, 0)", '0', false, false);
+                $sql->where("coalesce(`$permission`, 0)", "0", false, false);
             }
         }
 
         $roles = $sql->get()->resultArray();
-        $roles = array_column($roles, 'Name', 'RoleID');
+        $roles = array_column($roles, "Name", "RoleID");
 
         return $roles;
     }
@@ -226,7 +239,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @return bool
      * @todo Implement this method properly with tests.
      */
-    public function canUserAssign(int $userID, int $roleID): bool {
+    public function canUserAssign(int $userID, int $roleID): bool
+    {
         if ($userID == Gdn::session()->UserID) {
             $assignable = $this->getAssignable();
             return isset($assignable[$roleID]);
@@ -241,11 +255,15 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param string $type One of the {@link RoleModel::TYPE_*} constants.
      * @return array Returns an array of role IDs.
      */
-    public static function getDefaultRoles($type) {
+    public static function getDefaultRoles($type)
+    {
         // Get the roles that match the type.
         try {
-            $roleData = Gdn::sql()->select('RoleID')->getWhere('Role', ['Type' => $type])->resultArray();
-            $roleIDs = array_column($roleData, 'RoleID');
+            $roleData = Gdn::sql()
+                ->select("RoleID")
+                ->getWhere("Role", ["Type" => $type])
+                ->resultArray();
+            $roleIDs = array_column($roleData, "RoleID");
         } catch (Exception $ex) {
             // This exception happens when the type column hasn't been added to GDN_Role yet.
             $roleIDs = [];
@@ -254,17 +272,19 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
         // This method has to be backwards compatible with the old config roles.
         switch ($type) {
             case self::TYPE_APPLICANT:
-                $backRoleIDs = (array)c('Garden.Registration.ApplicantRoleID', null);
+                $backRoleIDs = (array) c("Garden.Registration.ApplicantRoleID", null);
                 break;
             case self::TYPE_GUEST:
-                $guestRoleData = Gdn::sql()->getWhere('UserRole', ['UserID' => 0])->resultArray();
-                $backRoleIDs = array_column($guestRoleData, 'RoleID');
+                $guestRoleData = Gdn::sql()
+                    ->getWhere("UserRole", ["UserID" => 0])
+                    ->resultArray();
+                $backRoleIDs = array_column($guestRoleData, "RoleID");
                 break;
             case self::TYPE_MEMBER:
-                $backRoleIDs = (array)c('Garden.Registration.DefaultRoles', null);
+                $backRoleIDs = (array) c("Garden.Registration.DefaultRoles", null);
                 break;
             case self::TYPE_UNCONFIRMED:
-                $backRoleIDs = (array)c('Garden.Registration.ConfirmEmailRole', null);
+                $backRoleIDs = (array) c("Garden.Registration.ConfirmEmailRole", null);
                 break;
             default:
                 $backRoleIDs = [];
@@ -280,42 +300,41 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      *
      * @return array Returns an array of arrays indexed by role type.
      */
-    public static function getAllDefaultRoles() {
-        $result = array_fill_keys(
-            array_keys(self::getDefaultTypes(false)),
-            []
-        );
+    public static function getAllDefaultRoles()
+    {
+        $result = array_fill_keys(array_keys(self::getDefaultTypes(false)), []);
 
         // Add the roles per type from the role table.
-        $roleData = Gdn::sql()->getWhere('Role', ['Type is not null' => ''])->resultArray();
+        $roleData = Gdn::sql()
+            ->getWhere("Role", ["Type is not null" => ""])
+            ->resultArray();
         foreach ($roleData as $row) {
-            $result[$row['Type']][] = $row['RoleID'];
+            $result[$row["Type"]][] = $row["RoleID"];
         }
 
         // Add the backwards compatible roles.
         $result[self::TYPE_APPLICANT] = array_merge(
             $result[self::TYPE_APPLICANT],
-            (array)c('Garden.Registration.ApplicantRoleID', null)
+            (array) c("Garden.Registration.ApplicantRoleID", null)
         );
 
-        $guestRoleIDs = Gdn::sql()->getWhere('UserRole', ['UserID' => 0])->resultArray();
-        $guestRoleIDs = array_column($guestRoleIDs, 'RoleID');
-        $result[self::TYPE_GUEST] = array_merge(
-            $result[self::TYPE_GUEST],
-            $guestRoleIDs
-        );
+        $guestRoleIDs = Gdn::sql()
+            ->getWhere("UserRole", ["UserID" => 0])
+            ->resultArray();
+        $guestRoleIDs = array_column($guestRoleIDs, "RoleID");
+        $result[self::TYPE_GUEST] = array_merge($result[self::TYPE_GUEST], $guestRoleIDs);
 
         $result[self::TYPE_MEMBER] = array_merge(
             $result[self::TYPE_MEMBER],
-            (array)c('Garden.Registration.DefaultRoles', [])
+            (array) c("Garden.Registration.DefaultRoles", [])
         );
 
         $result[self::TYPE_UNCONFIRMED] = array_merge(
             $result[self::TYPE_UNCONFIRMED],
-            (array)c('Garden.Registration.ConfirmEmailRole', null)
+            (array) c("Garden.Registration.ConfirmEmailRole", null)
         );
 
-        $result = array_map('array_unique', $result);
+        $result = array_map("array_unique", $result);
 
         return $result;
     }
@@ -326,17 +345,18 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param bool $translate Whether or not to translate the type names.
      * @return array Returns an array in the form `[type => name]`.
      */
-    public static function getDefaultTypes($translate = true) {
+    public static function getDefaultTypes($translate = true)
+    {
         $result = [
             self::TYPE_MEMBER => self::TYPE_MEMBER,
             self::TYPE_GUEST => self::TYPE_GUEST,
             self::TYPE_UNCONFIRMED => self::TYPE_UNCONFIRMED,
             self::TYPE_APPLICANT => self::TYPE_APPLICANT,
             self::TYPE_MODERATOR => self::TYPE_MODERATOR,
-            self::TYPE_ADMINISTRATOR => self::TYPE_ADMINISTRATOR
+            self::TYPE_ADMINISTRATOR => self::TYPE_ADMINISTRATOR,
         ];
         if ($translate) {
-            $result = array_map('t', $result);
+            $result = array_map("t", $result);
         }
         return $result;
     }
@@ -359,8 +379,9 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      *
      * @param int $roleID The RoleID to filter to.
      */
-    public function getByRoleID($roleID) {
-        return $this->getWhere(['RoleID' => $roleID])->firstRow();
+    public function getByRoleID($roleID)
+    {
+        return $this->getWhere(["RoleID" => $roleID])->firstRow();
     }
 
     /**
@@ -370,7 +391,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @return Gdn_DataSet Returns the roles as a dataset (with array values).
      * @see UserModel::getRoles()
      */
-    public function getByUserID($userID) {
+    public function getByUserID($userID)
+    {
         $result = Gdn::userModel()->getRoles($userID);
         return $result;
     }
@@ -381,10 +403,12 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param string $type Type slug to match role records against.
      * @return Gdn_DataSet
      */
-    public function getByType($type) {
-        return $this->SQL->select()
-            ->from('Role')
-            ->where('Type', $type)
+    public function getByType($type)
+    {
+        return $this->SQL
+            ->select()
+            ->from("Role")
+            ->where("Type", $type)
             ->get();
     }
 
@@ -393,8 +417,9 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      *
      * @param int $roleID The RoleID to filter out.
      */
-    public function getByNotRoleID($roleID) {
-        return $this->getWhere(['RoleID <>' => $roleID]);
+    public function getByNotRoleID($roleID)
+    {
+        return $this->getWhere(["RoleID <>" => $roleID]);
     }
 
     /**
@@ -403,13 +428,14 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param int|array $roleID One or more role IDs to get the permissions for.
      * @return array Returns an array of permissions.
      */
-    public function getPermissions($roleID) {
+    public function getPermissions($roleID)
+    {
         $permissionModel = Gdn::permissionModel();
-        $roleIDs = (array)$roleID;
+        $roleIDs = (array) $roleID;
 
         foreach ($roleIDs as $iD) {
             $role = self::roles($iD);
-            $limitToSuffix = val('CanSession', $role, true) ? '' : 'View';
+            $limitToSuffix = val("CanSession", $role, true) ? "" : "View";
         }
 
         $result = $permissionModel->getPermissions($roleIDs, $limitToSuffix);
@@ -424,20 +450,22 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param int $roleID The RoleID to filter to.
      * @param bool $usersOnlyWithThisRole Indicating if the count should be any users with this RoleID, or users who are ONLY assigned to this RoleID.
      */
-    public function getUserCount($roleID, $usersOnlyWithThisRole = false) {
+    public function getUserCount($roleID, $usersOnlyWithThisRole = false)
+    {
         if ($usersOnlyWithThisRole) {
-            $data = $this->SQL->select('ur.UserID', 'count', 'UserCount')
-                ->from('UserRole ur')
-                ->join('UserRole urs', 'ur.UserID = urs.UserID')
-                ->groupBy('urs.UserID')
-                ->having('count(urs.RoleID) =', '1', false, false)
-                ->where('ur.RoleID', $roleID)
+            $data = $this->SQL
+                ->select("ur.UserID", "count", "UserCount")
+                ->from("UserRole ur")
+                ->join("UserRole urs", "ur.UserID = urs.UserID")
+                ->groupBy("urs.UserID")
+                ->having("count(urs.RoleID) =", "1", false, false)
+                ->where("ur.RoleID", $roleID)
                 ->get()
                 ->firstRow();
 
             return $data ? $data->UserCount : 0;
         } else {
-            return $this->SQL->getCount('UserRole', ['RoleID' => $roleID]);
+            return $this->SQL->getCount("UserRole", ["RoleID" => $roleID]);
         }
     }
 
@@ -447,12 +475,13 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param bool $force Whether or not to force a cache refresh.
      * @return int Returns the number of applicants or 0 if the registration method isn't set to approval.
      */
-    public function getApplicantCount($force = false) {
-        if (c('Garden.Registration.Method') != 'Approval') {
+    public function getApplicantCount($force = false)
+    {
+        if (c("Garden.Registration.Method") != "Approval") {
             return 0;
         }
 
-        $cacheKey = 'Moderation.ApplicantCount';
+        $cacheKey = "Moderation.ApplicantCount";
 
         if ($force) {
             Gdn::cache()->remove($cacheKey);
@@ -463,15 +492,16 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
         $count = Gdn::cache()->get($cacheKey);
         if ($count === Gdn_Cache::CACHEOP_FAILURE) {
             $count = Gdn::sql()
-                ->select('u.UserID', 'count', 'UserCount')
-                ->from('User u')
-                ->join('UserRole ur', 'u.UserID = ur.UserID')
-                ->where('ur.RoleID', $applicantRoleIDs)
-                ->where('u.Deleted', '0')
-                ->get()->value('UserCount', 0);
+                ->select("u.UserID", "count", "UserCount")
+                ->from("User u")
+                ->join("UserRole ur", "u.UserID = ur.UserID")
+                ->where("ur.RoleID", $applicantRoleIDs)
+                ->where("u.Deleted", "0")
+                ->get()
+                ->value("UserCount", 0);
 
             Gdn::cache()->store($cacheKey, $count, [
-                Gdn_Cache::FEATURE_EXPIRY => 300 // 5 minutes
+                Gdn_Cache::FEATURE_EXPIRY => 300, // 5 minutes
             ]);
         }
         return $count;
@@ -482,20 +512,22 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      *
      * @param string[]|string $permission A permission (or array of permissions) to match.
      */
-    public function getByPermission($permission) {
+    public function getByPermission($permission)
+    {
         if (!is_array($permission)) {
             $permission = [$permission];
         }
 
-        $this->SQL->select('r.*')
-            ->from('Role r')
-            ->join('Permission per', "per.RoleID = r.RoleID")
-            ->where('per.JunctionTable is null');
+        $this->SQL
+            ->select("r.*")
+            ->from("Role r")
+            ->join("Permission per", "per.RoleID = r.RoleID")
+            ->where("per.JunctionTable is null");
 
         $this->SQL->beginWhereGroup();
         $permissionCount = count($permission);
         for ($i = 0; $i < $permissionCount; ++$i) {
-            $this->SQL->where('per.'.$permission[$i], 1);
+            $this->SQL->where("per." . $permission[$i], 1);
         }
         $this->SQL->endWhereGroup();
         return $this->SQL->get();
@@ -507,10 +539,11 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param string[]|string $names
      * @param string[] $missing
      */
-    public static function getByName($names, &$missing = null) {
+    public static function getByName($names, &$missing = null)
+    {
         if (is_string($names)) {
-            $names = explode(',', $names);
-            $names = array_map('trim', $names);
+            $names = explode(",", $names);
+            $names = array_map("trim", $names);
         }
 
         // Make a lookup array of the names.
@@ -522,7 +555,7 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
         $result = [];
         foreach ($roles as $roleID => $role) {
             // Role name might have a trailing space by mistake.
-            $name = trim(strtolower($role['Name']));
+            $name = trim(strtolower($role["Name"]));
 
             if (isset($names[$name])) {
                 $result[$roleID] = $role;
@@ -542,13 +575,16 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param bool $force If the ID does not correspond to a known role, return an empty fragment (row ID, blank name).
      * @return array
      */
-    public static function roles($roleID = null, $force = false) {
+    public static function roles($roleID = null, $force = false)
+    {
         if (self::$Roles == null) {
-            $key = 'Roles';
+            $key = "Roles";
             $roles = Gdn::cache()->get($key);
             if ($roles === Gdn_Cache::CACHEOP_FAILURE) {
-                $roles = Gdn::sql()->get('Role', 'Sort')->resultArray();
-                $roles = Gdn_DataSet::index($roles, ['RoleID']);
+                $roles = Gdn::sql()
+                    ->get("Role", "Sort")
+                    ->resultArray();
+                $roles = Gdn_DataSet::index($roles, ["RoleID"]);
                 Gdn::cache()->store($key, $roles, [Gdn_Cache::FEATURE_EXPIRY => 24 * 3600]);
             }
         } else {
@@ -560,7 +596,7 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
         } elseif (array_key_exists($roleID, $roles)) {
             return $roles[$roleID];
         } elseif ($force) {
-            return ['RoleID' => $roleID, 'Name' => ''];
+            return ["RoleID" => $roleID, "Name" => ""];
         } else {
             return null;
         }
@@ -573,21 +609,26 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param array|false $settings Additional settings for the save.
      * @return bool|mixed Returns the role ID or false on error.
      */
-    public function save($formPostValues, $settings = false) {
+    public function save($formPostValues, $settings = false)
+    {
         // Define the primary key in this model's table.
         $this->defineSchema();
 
-        $roleID = val('RoleID', $formPostValues);
+        $roleID = val("RoleID", $formPostValues);
         $insert = $roleID > 0 ? false : true;
-        $doPermissions = val('DoPermissions', $settings, true);
+        $doPermissions = val("DoPermissions", $settings, true);
 
         if ($insert) {
             // Figure out the next role ID.
-            $maxRoleID = $this->SQL->select('r.RoleID', 'MAX')->from('Role r')->get()->value('RoleID', 0);
+            $maxRoleID = $this->SQL
+                ->select("r.RoleID", "MAX")
+                ->from("Role r")
+                ->get()
+                ->value("RoleID", 0);
             $roleID = $maxRoleID + 1;
 
             $this->addInsertFields($formPostValues);
-            $formPostValues['RoleID'] = strval($roleID); // string for validation
+            $formPostValues["RoleID"] = strval($roleID); // string for validation
         } else {
             $this->addUpdateFields($formPostValues);
         }
@@ -597,12 +638,12 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
             $fields = $this->Validation->schemaValidationFields();
             $fields = $this->coerceData($fields);
             // If the role name has trailing spaces, it can cause problems.
-            if (isset($fields['Name'])) {
-                $fields['Name'] = trim($fields['Name']);
+            if (isset($fields["Name"])) {
+                $fields["Name"] = trim($fields["Name"]);
             }
 
             if ($insert === false) {
-                $this->update($fields, ['RoleID' => $roleID]);
+                $this->update($fields, ["RoleID" => $roleID]);
             } else {
                 $this->insert($fields);
             }
@@ -612,37 +653,37 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
             if ($doPermissions) {
                 $permissionModel = Gdn::permissionModel();
 
-                if (array_key_exists('Permissions', $formPostValues)) {
-                    $globalPermissions = $formPostValues['Permissions'];
-                    $categoryPermissions = val('Category', $globalPermissions, []);
+                if (array_key_exists("Permissions", $formPostValues)) {
+                    $globalPermissions = $formPostValues["Permissions"];
+                    $categoryPermissions = val("Category", $globalPermissions, []);
 
                     // Massage the global permissions.
-                    unset($globalPermissions['Category']);
-                    $globalPermissions['RoleID'] = $roleID;
-                    $globalPermissions['JunctionTable'] = null;
-                    $globalPermissions['JunctionColumn'] = null;
-                    $globalPermissions['JunctionID'] = null;
+                    unset($globalPermissions["Category"]);
+                    $globalPermissions["RoleID"] = $roleID;
+                    $globalPermissions["JunctionTable"] = null;
+                    $globalPermissions["JunctionColumn"] = null;
+                    $globalPermissions["JunctionID"] = null;
                     $permissions = [$globalPermissions];
 
                     // Massage the category permissions.
                     foreach ($categoryPermissions as $perm) {
                         $row = $perm;
-                        $row['RoleID'] = $roleID;
-                        $row['JunctionTable'] = 'Category';
-                        $row['JunctionColumn'] = 'PermissionCategoryID';
-                        $row['JunctionID'] = $row['CategoryID'];
-                        unset($row['CategoryID']);
+                        $row["RoleID"] = $roleID;
+                        $row["JunctionTable"] = "Category";
+                        $row["JunctionColumn"] = "PermissionCategoryID";
+                        $row["JunctionID"] = $row["CategoryID"];
+                        unset($row["CategoryID"]);
                         $permissions[] = $row;
                     }
                 } else {
-                    $permissions = val('Permission', $formPostValues);
-                    $permissions = $permissionModel->pivotPermissions($permissions, ['RoleID' => $roleID]);
+                    $permissions = val("Permission", $formPostValues);
+                    $permissions = $permissionModel->pivotPermissions($permissions, ["RoleID" => $roleID]);
                 }
 
-                $permissionsWhere = ['RoleID' => $roleID];
-                if (val('IgnoreCategoryPermissions', $formPostValues)) {
+                $permissionsWhere = ["RoleID" => $roleID];
+                if (val("IgnoreCategoryPermissions", $formPostValues)) {
                     // Include the default category permissions when ignoring the rest.
-                    $permissionsWhere['JunctionID'] = [null, -1];
+                    $permissionsWhere["JunctionID"] = [null, -1];
                 }
                 $permissionModel->saveAll($permissions, $permissionsWhere);
             }
@@ -652,10 +693,11 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
                 Gdn::userModel()->clearPermissions();
             } else {
                 // Remove the cached permissions for all users with this role.
-                $this->SQL->update('User')
-                    ->join('UserRole', 'User.UserID = UserRole.UserID')
-                    ->set('Permissions', '')
-                    ->where(['UserRole.RoleID' => $roleID])
+                $this->SQL
+                    ->update("User")
+                    ->join("UserRole", "User.UserID = UserRole.UserID")
+                    ->set("Permissions", "")
+                    ->where(["UserRole.RoleID" => $roleID])
                     ->put();
             }
         } else {
@@ -667,7 +709,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
     /**
      * {@inheritDoc}
      */
-    public function insert($fields) {
+    public function insert($fields)
+    {
         $result = parent::insert($fields);
         $this->clearCache();
         return $result;
@@ -676,7 +719,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
     /**
      * {@inheritDoc}
      */
-    public function update($fields, $where = false, $limit = false) {
+    public function update($fields, $where = false, $limit = false)
+    {
         $result = parent::update($fields, $where, $limit);
         $this->clearCache();
         return $result;
@@ -689,13 +733,14 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param string $userIDColumn
      * @param string $rolesColumn
      */
-    public static function setUserRoles(&$users, $userIDColumn = 'UserID', $rolesColumn = 'Roles') {
+    public static function setUserRoles(&$users, $userIDColumn = "UserID", $rolesColumn = "Roles")
+    {
         $userIDs = array_unique(array_column($users, $userIDColumn));
 
         // Try and get all of the mappings from the cache.
         $keys = [];
         foreach ($userIDs as $userID) {
-            $keys[$userID] = formatString(UserModel::USERROLES_KEY, ['UserID' => $userID]);
+            $keys[$userID] = formatString(UserModel::USERROLES_KEY, ["UserID" => $userID]);
         }
         $userRoles = Gdn::cache()->get($keys);
         if (!is_array($userRoles)) {
@@ -711,16 +756,17 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
         }
         if (count($missingIDs) > 0) {
             $dbUserRoles = Gdn::sql()
-                ->select('ur.*')
-                ->from('UserRole ur')
-                ->whereIn('ur.UserID', array_keys($missingIDs))
-                ->get()->resultArray();
+                ->select("ur.*")
+                ->from("UserRole ur")
+                ->whereIn("ur.UserID", array_keys($missingIDs))
+                ->get()
+                ->resultArray();
 
-            $dbUserRoles = Gdn_DataSet::index($dbUserRoles, 'UserID', ['Unique' => false]);
+            $dbUserRoles = Gdn_DataSet::index($dbUserRoles, "UserID", ["Unique" => false]);
 
             // Store the user role mappings.
             foreach ($dbUserRoles as $userID => $rows) {
-                $roleIDs = array_column($rows, 'RoleID');
+                $roleIDs = array_column($rows, "RoleID");
                 $key = $keys[$userID];
                 Gdn::cache()->store($key, $roleIDs);
                 $userRoles[$key] = $roleIDs;
@@ -730,8 +776,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
         $allRoles = self::roles(); // roles indexed by role id.
 
         // Skip personal info roles
-        if (!checkPermission('Garden.PersonalInfo.View')) {
-            $allRoles = array_filter($allRoles, 'self::FilterPersonalInfo');
+        if (!checkPermission("Garden.PersonalInfo.View")) {
+            $allRoles = array_filter($allRoles, "self::FilterPersonalInfo");
         }
 
         // Join the users.
@@ -745,7 +791,7 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
                 if (!array_key_exists($roleID, $allRoles)) {
                     continue;
                 }
-                $roles[$roleID] = $allRoles[$roleID]['Name'];
+                $roles[$roleID] = $allRoles[$roleID]["Name"];
             }
             setValue($rolesColumn, $user, $roles);
         }
@@ -754,9 +800,10 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete($where = [], $options = []) {
+    public function delete($where = [], $options = [])
+    {
         if (is_numeric($where) || is_object($where)) {
-            deprecated('RoleModel->delete()', 'RoleModel->deleteandReplace()');
+            deprecated("RoleModel->delete()", "RoleModel->deleteandReplace()");
 
             $result = $this->deleteAndReplace($where, $options);
             return $result;
@@ -774,8 +821,9 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * - **newRoleID**: The new role to point users to.
      * @return bool Returns **true** on success or **false** otherwise.
      */
-    public function deleteID($id, $options = []) {
-        $result = $this->deleteAndReplace($id, val('newRoleID', $options));
+    public function deleteID($id, $options = [])
+    {
+        $result = $this->deleteAndReplace($id, val("newRoleID", $options));
         return $result;
     }
 
@@ -786,7 +834,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param int $newRoleID Assign users of the deleted role to this new role.
      * @return bool Returns **true** on success or **false** on failure.
      */
-    public function deleteAndReplace($roleID, $newRoleID) {
+    public function deleteAndReplace($roleID, $newRoleID)
+    {
         $roleID = (int) $roleID;
 
         // Grab the affected users
@@ -796,13 +845,13 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
         // Update users that will be orphaned
         if (is_numeric($newRoleID) && $newRoleID > 0) {
             $this->SQL
-                ->options('Ignore', true)
-                ->update('UserRole')
-                ->join('UserRole urs', 'UserRole.UserID = urs.UserID')
-                ->groupBy('urs.UserID')
-                ->having('count(urs.RoleID) =', '1', false, false)
-                ->set('UserRole.RoleID', $newRoleID)
-                ->where(['UserRole.RoleID' => $roleID])
+                ->options("Ignore", true)
+                ->update("UserRole")
+                ->join("UserRole urs", "UserRole.UserID = urs.UserID")
+                ->groupBy("urs.UserID")
+                ->having("count(urs.RoleID) =", "1", false, false)
+                ->set("UserRole.RoleID", $newRoleID)
+                ->where(["UserRole.RoleID" => $roleID])
                 ->put();
         }
 
@@ -812,13 +861,12 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
 
         // Clear the user cache for the affected users.
         foreach ($affectedUsers as $user) {
-            $userModel->clearCache($user['UserID']);
+            $userModel->clearCache($user["UserID"]);
         }
 
-
         // Remove the role
-        $this->SQL->delete('UserRole', ['RoleID' => $roleID]);
-        $result = $this->SQL->delete('Role', ['RoleID' => $roleID]);
+        $this->SQL->delete("UserRole", ["RoleID" => $roleID]);
+        $result = $this->SQL->delete("Role", ["RoleID" => $roleID]);
         $this->clearCache();
         return $result;
     }
@@ -831,7 +879,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
      * @param string $field optionally the field name from the role table to return.
      * @return array|null|void
      */
-    public function getPublicUserRoles($userID, $field = "Name") {
+    public function getPublicUserRoles($userID, $field = "Name")
+    {
         if (!$userID) {
             return;
         }
@@ -840,8 +889,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
 
         // Hide personal info roles
         $unformattedRoles = [];
-        if (!checkPermission('Garden.PersonalInfo.View')) {
-            $unformattedRoles = array_filter($unfilteredRoles, 'self::FilterPersonalInfo');
+        if (!checkPermission("Garden.PersonalInfo.View")) {
+            $unformattedRoles = array_filter($unfilteredRoles, "self::FilterPersonalInfo");
         } else {
             $unformattedRoles = $unfilteredRoles;
         }
@@ -861,7 +910,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
     /**
      * Enforce integrity between users and roles.
      */
-    public static function cleanUserRoles() {
+    public static function cleanUserRoles()
+    {
         $px = Gdn::database()->DatabasePrefix;
         Gdn::sql()->query("
             delete ur
@@ -876,19 +926,27 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
     /**
      * @inheritdoc
      */
-    public function validate($formPostValues, $insert = false) {
+    public function validate($formPostValues, $insert = false)
+    {
         $result = true;
-        $roleID = val('RoleID', $formPostValues);
+        $roleID = val("RoleID", $formPostValues);
 
         if ($roleID && !$insert) {
             $role = $this->getID($roleID, DATASET_TYPE_ARRAY);
             if ($role) {
-                $roleType = val('Type', $role);
-                $newType = val('Type', $formPostValues);
-                if (c('Garden.Registration.ConfirmEmail') && $roleType === self::TYPE_UNCONFIRMED && $newType !== self::TYPE_UNCONFIRMED) {
+                $roleType = val("Type", $role);
+                $newType = val("Type", $formPostValues);
+                if (
+                    c("Garden.Registration.ConfirmEmail") &&
+                    $roleType === self::TYPE_UNCONFIRMED &&
+                    $newType !== self::TYPE_UNCONFIRMED
+                ) {
                     $totalUnconfirmedRoles = $this->getByType(self::TYPE_UNCONFIRMED)->count();
                     if ($totalUnconfirmedRoles === 1) {
-                        $this->Validation->addValidationResult('Type', 'One unconfirmed role is required for email confirmation.');
+                        $this->Validation->addValidationResult(
+                            "Type",
+                            "One unconfirmed role is required for email confirmation."
+                        );
                     }
                 }
             }
@@ -901,11 +959,12 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface {
     /**
      * @inheritDoc
      */
-    public function fetchFragments(array $ids, array $options = []): array {
+    public function fetchFragments(array $ids, array $options = []): array
+    {
         $allRoles = self::roles();
         $result = array_intersect_key($allRoles, array_fill_keys($ids, true));
         foreach ($result as &$row) {
-            $row = ['roleID' => (int)$row['RoleID'], 'name' => $row['Name']];
+            $row = ["roleID" => (int) $row["RoleID"], "name" => $row["Name"]];
         }
         return $result;
     }

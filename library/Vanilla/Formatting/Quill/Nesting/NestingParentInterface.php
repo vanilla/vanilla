@@ -12,8 +12,8 @@ use Vanilla\Formatting\Quill\BlotGroup;
 /**
  * Interface representing a an item that can contain nestable items.
  */
-interface NestingParentInterface {
-
+interface NestingParentInterface
+{
     /**
      * The group to nest.
      *

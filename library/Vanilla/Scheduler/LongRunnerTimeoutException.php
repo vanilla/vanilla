@@ -11,5 +11,6 @@ namespace Vanilla\Scheduler;
  * Throw this into a long-running generator to tell it that it has run out of memory
  * and should return a LongRunnerNextArg.
  */
-class LongRunnerTimeoutException extends \Exception {
+class LongRunnerTimeoutException extends \Exception
+{
 }

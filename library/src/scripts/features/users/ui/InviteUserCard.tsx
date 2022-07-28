@@ -9,7 +9,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import Frame from "@library/layout/frame/Frame";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import FrameBody from "@library/layout/frame/FrameBody";
-import LazyModal from "@library/modal/LazyModal";
+import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@vanilla/i18n";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
@@ -50,7 +50,7 @@ export default function InviteUserCard(props: IProps) {
     const classes = userCardClasses();
 
     return (
-        <LazyModal
+        <Modal
             isVisible={visible}
             size={ModalSizes.MEDIUM}
             exitHandler={() => {
@@ -145,6 +145,6 @@ export default function InviteUserCard(props: IProps) {
                     </FrameBody>
                 }
             />
-        </LazyModal>
+        </Modal>
     );
 }

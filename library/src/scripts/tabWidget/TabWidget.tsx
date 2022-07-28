@@ -1,6 +1,6 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -8,7 +8,6 @@ import React from "react";
 import { ITabData, ITabsProps, Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import Container from "@library/layout/components/Container";
-import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
 
 interface ITabWidgetProps extends Omit<ITabsProps, "data"> {
@@ -32,10 +31,9 @@ export default function TabWidget(props: ITabWidgetProps) {
         ),
     }));
 
-    const widgetClasses = useWidgetSectionClasses();
-
     return (
-        <div className={widgetClasses.widgetClass}>
+        // Items mounted in a portal break if they don't always return a top level HTML element.
+        <div>
             <Container fullGutter>
                 <Tabs
                     includeVerticalPadding={false}

@@ -13,12 +13,14 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Validation logic test.
  */
-class FileEmbedTest extends MinimalContainerTestCase {
+class FileEmbedTest extends MinimalContainerTestCase
+{
     /**
      * Ensure we can create file embed embed from the old data format that might still
      * live in the DB.
      */
-    public function testLegacyDataFormat() {
+    public function testLegacyDataFormat()
+    {
         $oldDataJSON = <<<JSON
  {
     "url": "https://dev.vanilla.localhost/uploads/150/LKE0S2FWLFUP.zip",

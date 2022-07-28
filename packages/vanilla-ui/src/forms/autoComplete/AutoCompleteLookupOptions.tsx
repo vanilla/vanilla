@@ -19,6 +19,7 @@ export interface ILookupApi {
     singleUrl: string;
     valueKey?: string;
     labelKey?: string;
+    extraLabelKey?: string;
     resultsKey?: string;
     excludeLookups?: string[];
     processOptions?: (options: IAutoCompleteOption[]) => IAutoCompleteOptionProps[];
@@ -39,6 +40,10 @@ const apiCaches = new Map<string, any>();
  * It will read the input values from the Autocomplete Context and write the appropriate
  * options to the context to be made available for selection.
  *
+ * - No value, when opened will perform an empty lookup
+ * - When text is updated, lookup again with that text
+ * - When initially loading with a value, perform the single item lookup, not the list.
+ *
  * This component does not return any DOM elements.
  */
 export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
@@ -46,18 +51,10 @@ export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
     const contextApi = useApiContext();
     const api = props.api ?? contextApi;
     const { inputState, value, setOptions, setInputState, multiple } = useContext(AutoCompleteContext);
-    const [ownQuery, setQuery] = useState<string | number>(value ?? "");
+    const [ownQuery, setQuery] = useState<string | number | Array<string | number>>("");
     const [initialValue] = useState(value);
-    const [options, currentOption] = useApiLookup(lookup, api, value, ownQuery, initialValue);
-    const isLoading = (!!initialValue && !currentOption) || options === null;
-
-    const displayValue = multiple ? "" : currentOption?.label ?? currentOption?.value ?? "";
-
-    useEffect(() => {
-        if (inputState.status !== "suggesting") {
-            setInputState({ status: "selected", value: displayValue });
-        }
-    }, [displayValue, inputState.status]);
+    const [options, currentOptionOrOptions] = useApiLookup(lookup, api, value ?? "", ownQuery, initialValue);
+    const isLoading = (!!initialValue && !currentOptionOrOptions) || options === null;
 
     useEffect(() => {
         if (inputState.status === "suggesting") {
@@ -84,17 +81,20 @@ export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
 function useApiLookup(
     lookup: ILookupApi,
     api: AxiosInstance,
-    currentValue: string,
-    currentInputValue: string | number,
+    currentValue: string | number | Array<string | number>,
+    currentInputValue: string | number | Array<string | number>,
     initialValue: any,
-): [IAutoCompleteOption[] | null, IAutoCompleteOption | null] {
+): [IAutoCompleteOption[] | null, IAutoCompleteOption[] | null] {
     const [options, setOptions] = useState<IAutoCompleteOption[] | null>(null);
-    const [initialOption, setInitialOption] = useState<IAutoCompleteOption | null>(null);
+    const [initialOptionsOrOption, setInitialOptionsOrOption] = useState<
+        IAutoCompleteOption | IAutoCompleteOption[] | null
+    >(null);
     const {
         searchUrl,
         singleUrl,
         resultsKey = ".",
         labelKey = "name",
+        extraLabelKey = "name",
         valueKey = "name",
         processOptions,
         excludeLookups,
@@ -109,35 +109,64 @@ function useApiLookup(
     const transformApiToOption = useCallback(
         (result: any): IAutoCompleteOption => {
             const label = String(get(result, labelKey, t("(Untitled)")));
+            const extraLabel = get(result, extraLabelKey) ? String(get(result, extraLabelKey)) : undefined;
             const value = valueKey === "." ? result : get(result, valueKey, "");
             return {
                 label,
+                extraLabel,
                 value,
                 data: result,
             };
         },
-        [labelKey, valueKey],
+        [labelKey, extraLabelKey, valueKey],
     );
 
     // Loading of initial option.
     useEffect(() => {
         if (initialValue && !(excludeLookups ?? []).includes(initialValue)) {
-            const actualApiUrl = singleUrl.replace("/api/v2", "").replace("%s", initialValue);
-            api.get(actualApiUrl).then((response) => {
-                if (response.data) {
-                    let options = [transformApiToOption(response.data)];
+            if ([initialValue].flat().length <= 1) {
+                const actualApiUrl = singleUrl.replace("/api/v2", "").replace("%s", initialValue);
+                api.get(actualApiUrl).then((response) => {
+                    if (response.data) {
+                        let options = [transformApiToOption(response.data)];
+                        if (processOptions) {
+                            options = processOptions(options);
+                        }
+                        apiCaches.set(actualApiUrl, options);
+                        setInitialOptionsOrOption(options[0]);
+                    }
+                });
+            } else {
+                // query api for all options
+                const actualSearchUrl = searchUrl.replace("/api/v2", "").replace("%s", ""); //just get the options
+
+                const cached = apiCaches.get(actualSearchUrl);
+                if (cached) {
+                    setOptions(cached);
+                    return;
+                }
+
+                // Fetch from API
+                api.get(actualSearchUrl).then((response) => {
+                    const { data } = response;
+                    const results = resultsKey === "." ? data : get(data, resultsKey, "[]");
+                    let options: IAutoCompleteOption[] = results.map(transformApiToOption);
                     if (processOptions) {
                         options = processOptions(options);
                     }
-                    apiCaches.set(actualApiUrl, options);
-                    setInitialOption(options[0]);
-                }
-            });
+                    apiCaches.set(actualSearchUrl, options);
+                    // select the current ones from the response
+                    setInitialOptionsOrOption(options.filter(({ value }) => initialValue.includes(value)));
+
+                    // fixme: this may be redundant
+                    setOptions(options);
+                });
+            }
         }
     }, []);
 
     const updateOptions = useCallback(
-        debounce((inputValue: string | number) => {
+        debounce((inputValue: string | number | Array<string | number>) => {
             const actualSearchUrl = searchUrl.replace("/api/v2", "").replace("%s", inputValue.toString());
 
             const cached = apiCaches.get(actualSearchUrl);
@@ -166,10 +195,13 @@ function useApiLookup(
         updateOptions(currentInputValue);
     }, [updateOptions, currentInputValue]);
 
-    const currentOption =
-        [initialOption, ...(options ? options : [])].filter(notEmpty).find((option) => {
-            return option.value == currentValue;
-        }) ?? null;
+    const currentOptionOrOptions = useMemo(() => {
+        return (
+            [...[initialOptionsOrOption].flat(), ...(options ? options : [])].filter(notEmpty).filter(({ value }) => {
+                return Array.isArray(currentValue) ? currentValue.includes(value) : value == currentValue;
+            }) ?? null
+        );
+    }, [currentValue, initialOptionsOrOption, options]);
 
-    return [options, currentOption];
+    return [options, currentOptionOrOptions];
 }

@@ -15,8 +15,8 @@ use Vanilla\EmbeddedContent\EmbedUtils;
 /**
  * Factory for GettyImagesEmbed.
  */
-class GettyImagesEmbedFactory extends AbstractEmbedFactory {
-
+class GettyImagesEmbedFactory extends AbstractEmbedFactory
+{
     const DOMAINS = ["gettyimages.ca", "gty.im", "gettyimages.com"];
 
     const OEMBED_URL_BASE = "https://embed.gettyimages.com/oembed";
@@ -29,21 +29,24 @@ class GettyImagesEmbedFactory extends AbstractEmbedFactory {
      *
      * @param HttpClient $httpClient
      */
-    public function __construct(HttpClient $httpClient) {
+    public function __construct(HttpClient $httpClient)
+    {
         $this->httpClient = $httpClient;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return self::DOMAINS;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         return "`^/?detail/photo/[\w-]+/\d+`";
     }
 
@@ -52,13 +55,11 @@ class GettyImagesEmbedFactory extends AbstractEmbedFactory {
      *
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         $photoID = $this->idFromUrl($url);
 
-        $response = $this->httpClient->get(
-            self::OEMBED_URL_BASE,
-            ["url" => "https://gty.im/{$photoID}"]
-        );
+        $response = $this->httpClient->get(self::OEMBED_URL_BASE, ["url" => "https://gty.im/{$photoID}"]);
 
         // Example Response JSON
         // phpcs:disable Generic.Files.LineLength
@@ -101,7 +102,8 @@ class GettyImagesEmbedFactory extends AbstractEmbedFactory {
      * @param string $html
      * @return array
      */
-    private function configFromHtml(string $html): array {
+    private function configFromHtml(string $html): array
+    {
         if (!preg_match("`gie\.widgets\.load\((?<config>{[^\}]+})\)`", $html, $matches)) {
             return [];
         }
@@ -125,7 +127,10 @@ class GettyImagesEmbedFactory extends AbstractEmbedFactory {
      * @param string $url
      * @return string|null
      */
-    private function idFromUrl(string $url): ?string {
-        return preg_match("`^/?detail/photo/[\w-]+/(?<photoID>\d+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches) ? $matches["photoID"] : null;
+    private function idFromUrl(string $url): ?string
+    {
+        return preg_match("`^/?detail/photo/[\w-]+/(?<photoID>\d+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches)
+            ? $matches["photoID"]
+            : null;
     }
 }

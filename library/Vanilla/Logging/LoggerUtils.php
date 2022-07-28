@@ -13,15 +13,16 @@ use Vanilla\Logger;
 /**
  * General utilities for assisting with logging.
  */
-class LoggerUtils {
-
+class LoggerUtils
+{
     /**
      * Recursively convert DateTimeInterface objects into ISO-8601 strings.
      *
      * @param array $row
      * @return array
      */
-    public static function stringifyDates(array $row): array {
+    public static function stringifyDates(array $row): array
+    {
         array_walk_recursive($row, function (&$value) {
             if ($value instanceof \DateTimeInterface) {
                 $value = $value->format(\DateTimeInterface::ATOM);
@@ -36,7 +37,8 @@ class LoggerUtils {
      * @param ResourceEvent $event
      * @return array
      */
-    public static function resourceEventLogContext(ResourceEvent $event): array {
+    public static function resourceEventLogContext(ResourceEvent $event): array
+    {
         $payload = $event->getPayload();
 
         $result = [
@@ -50,8 +52,8 @@ class LoggerUtils {
         }
 
         if ($event->getSender() !== null) {
-            $result[Logger::FIELD_USERID] = $event->getSender()['userID'];
-            $result[Logger::FIELD_USERNAME] = $event->getSender()['name'];
+            $result[Logger::FIELD_USERID] = $event->getSender()["userID"];
+            $result[Logger::FIELD_USERNAME] = $event->getSender()["name"];
         }
         return $result;
     }
@@ -62,7 +64,8 @@ class LoggerUtils {
      * @param ResourceEvent $event
      * @return string
      */
-    public static function resourceEventLogMessage(ResourceEvent $event): string {
+    public static function resourceEventLogMessage(ResourceEvent $event): string
+    {
         $verbs = [
             ResourceEvent::ACTION_DELETE => "deleted",
             ResourceEvent::ACTION_INSERT => "added",

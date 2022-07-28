@@ -14,8 +14,8 @@ use VanillaTests\Fixtures\Tuple;
  * Tests for setValue().
  */
 
-class SetValueTest extends TestCase {
-
+class SetValueTest extends TestCase
+{
     /**
      * Tests {@link setValue()} against several scenarios.
      *
@@ -25,7 +25,8 @@ class SetValueTest extends TestCase {
      * @param mixed $expected The expected result.
      * @dataProvider provideTestSetValueArrays
      */
-    public function testSetValue($testNeedle, $testHaystack, $testValue, $expected) {
+    public function testSetValue($testNeedle, $testHaystack, $testValue, $expected)
+    {
         setValue($testNeedle, $testHaystack, $testValue);
         $actual = $testHaystack[$testNeedle];
         $this->assertSame($expected, $actual);
@@ -34,10 +35,11 @@ class SetValueTest extends TestCase {
     /**
      * Test {@link setValue()} on an object.
      */
-    public function testSetValueOnObject() {
-        $expected = new Tuple('x', 'b');
-        $haystack = new Tuple('a', 'b');
-        setValue('a', $haystack, 'x');
+    public function testSetValueOnObject()
+    {
+        $expected = new Tuple("x", "b");
+        $haystack = new Tuple("a", "b");
+        setValue("a", $haystack, "x");
         $this->assertEquals($expected, $haystack);
     }
 
@@ -46,20 +48,11 @@ class SetValueTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestSetValueArrays() {
+    public function provideTestSetValueArrays()
+    {
         $r = [
-          'arraySet' => [
-              'one',
-              ['one' => 'two', 'two' => 'two'],
-              'one',
-              'one',
-          ],
-          'arrayNoNeedle' => [
-              'a',
-              ['b' => 'b', 'c' => 'c'],
-              'a',
-              'a',
-          ],
+            "arraySet" => ["one", ["one" => "two", "two" => "two"], "one", "one"],
+            "arrayNoNeedle" => ["a", ["b" => "b", "c" => "c"], "a", "a"],
         ];
 
         return $r;

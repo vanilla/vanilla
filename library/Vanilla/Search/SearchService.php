@@ -14,8 +14,8 @@ use Vanilla\EmbeddedContent\FallbackEmbedFactory;
 /**
  * Entry point for making search queries among multiple providers.
  */
-class SearchService {
-
+class SearchService
+{
     /** @var array [driver => SearchDriverInterface, priority => int] */
     private $drivers;
 
@@ -28,13 +28,14 @@ class SearchService {
      * @param AbstractSearchDriver $driver The driver.
      * @param int $priority The highest priority number becomes the active driver.
      */
-    public function registerActiveDriver(AbstractSearchDriver $driver, int $priority = 0) {
+    public function registerActiveDriver(AbstractSearchDriver $driver, int $priority = 0)
+    {
         $this->drivers[] = [
-            'priority' => $priority,
-            'driver' => $driver,
+            "priority" => $priority,
+            "driver" => $driver,
         ];
         uasort($this->drivers, function (array $driverA, array $driverB) {
-            return $driverB['priority'] <=> $driverA['priority'];
+            return $driverB["priority"] <=> $driverA["priority"];
         });
     }
 
@@ -44,19 +45,20 @@ class SearchService {
      * @param ?string $driverName Driver name.
      * @return AbstractSearchDriver
      */
-    public function getActiveDriver(?string $driverName = null): AbstractSearchDriver {
+    public function getActiveDriver(?string $driverName = null): AbstractSearchDriver
+    {
         if (empty($this->drivers)) {
-            throw new ServerException('No search service is registered');
+            throw new ServerException("No search service is registered");
         }
-        $forceDriver = \Gdn::config('Vanilla.Search.Driver', null);
+        $forceDriver = \Gdn::config("Vanilla.Search.Driver", null);
 
         if ($driverName || $forceDriver) {
             $driver = $this->getDriverByName($driverName ?? $forceDriver);
         } else {
-            $driver = end($this->drivers)['driver'];
+            $driver = end($this->drivers)["driver"];
         }
         if (!$driver) {
-            throw new ServerException('Could not find active driver');
+            throw new ServerException("Could not find active driver");
         }
         $driver->setSearchService($this);
         return $driver;
@@ -70,7 +72,8 @@ class SearchService {
      *
      * @return SearchResults
      */
-    public function search(array $queryData, SearchOptions $options): SearchResults {
+    public function search(array $queryData, SearchOptions $options): SearchResults
+    {
         $activeDriver = $this->getActiveDriver();
         return $activeDriver->search($queryData, $options);
     }
@@ -80,10 +83,9 @@ class SearchService {
      *
      * @return Schema
      */
-    public function buildQuerySchema(): Schema {
-        return $this
-            ->getActiveDriver()
-            ->buildQuerySchema();
+    public function buildQuerySchema(): Schema
+    {
+        return $this->getActiveDriver()->buildQuerySchema();
     }
 
     /**
@@ -91,7 +93,8 @@ class SearchService {
      *
      * @param SearchTypeQueryExtenderInterface $extender
      */
-    public function registerQueryExtender(SearchTypeQueryExtenderInterface $extender) {
+    public function registerQueryExtender(SearchTypeQueryExtenderInterface $extender)
+    {
         $this->extenders[] = $extender;
     }
 
@@ -100,7 +103,8 @@ class SearchService {
      *
      * @return array
      */
-    public function getExtenders(): array {
+    public function getExtenders(): array
+    {
         return $this->extenders;
     }
 
@@ -110,11 +114,12 @@ class SearchService {
      * @param string $name
      * @return AbstractSearchDriver
      */
-    public function getDriverByName(string $name): AbstractSearchDriver {
+    public function getDriverByName(string $name): AbstractSearchDriver
+    {
         /** @var  AbstractSearchDriver $driver */
         foreach ($this->drivers as $currentDriver) {
-            if (strtolower($currentDriver['driver']->getName()) === strtolower($name)) {
-                $driver = $currentDriver['driver'];
+            if (strtolower($currentDriver["driver"]->getName()) === strtolower($name)) {
+                $driver = $currentDriver["driver"];
                 break;
             }
         }
@@ -126,11 +131,12 @@ class SearchService {
      *
      * @return array
      */
-    public function getDriverNames(): array {
+    public function getDriverNames(): array
+    {
         $driverNames = [];
         /** @var  AbstractSearchDriver $driver */
         foreach ($this->drivers as $driver) {
-            $driverNames[] = strtolower($driver['driver']->getName());
+            $driverNames[] = strtolower($driver["driver"]->getName());
         }
         return $driverNames;
     }

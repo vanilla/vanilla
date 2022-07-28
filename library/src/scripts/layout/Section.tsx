@@ -43,6 +43,8 @@ export interface ISectionProps extends React.HTMLAttributes<HTMLElement> {
     childrenBefore?: React.ReactNode;
     childrenAfter?: React.ReactNode;
     contentRef?: React.RefObject<HTMLDivElement>;
+    displayLeftColumn?: boolean;
+    displayRightColumn?: boolean;
 }
 
 /**
@@ -95,6 +97,8 @@ export default function Section(props: ISectionProps) {
         children,
         childrenBefore,
         childrenAfter,
+        displayRightColumn = true,
+        displayLeftColumn = true,
         ...elementProps
     } = props;
 
@@ -146,9 +150,10 @@ export default function Section(props: ISectionProps) {
 
     // Calculate some rendering variables.
 
-    const shouldRenderLeftPanel: boolean = !isCompact && (!!childComponents.leftTop || !!childComponents.leftBottom);
+    const shouldRenderLeftPanel: boolean =
+        !isCompact && (!!childComponents.leftTop || !!childComponents.leftBottom) && displayLeftColumn;
     const shouldRenderRightPanel: boolean =
-        isFullWidth && (!!childComponents.rightTop || !!childComponents.rightBottom);
+        isFullWidth && (!!childComponents.rightTop || !!childComponents.rightBottom) && displayRightColumn;
     const shouldRenderBreadcrumbs: boolean = !!childComponents.breadcrumbs;
 
     const widgetClasses = useWidgetSectionClasses();

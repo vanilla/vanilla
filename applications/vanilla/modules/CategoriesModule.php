@@ -19,8 +19,8 @@ use Vanilla\Widgets\AbstractHomeWidgetModule;
 /**
  * Module displaying Categories.
  */
-class CategoriesModule extends AbstractHomeWidgetModule {
-
+class CategoriesModule extends AbstractHomeWidgetModule
+{
     const CATEGORIES_MODULE = "Categories";
 
     /** @var \CategoriesApiController */
@@ -45,51 +45,56 @@ class CategoriesModule extends AbstractHomeWidgetModule {
      * @param \CategoriesApiController $categoriesApi
      * @param SiteSectionModel $siteSectionModel
      */
-    public function __construct(
-        \CategoriesApiController $categoriesApi,
-        SiteSectionModel $siteSectionModel
-    ) {
+    public function __construct(\CategoriesApiController $categoriesApi, SiteSectionModel $siteSectionModel)
+    {
         parent::__construct();
         $this->categoriesApi = $categoriesApi;
         $this->currentSiteSection = $siteSectionModel->getCurrentSiteSection();
         $this->moduleName = self::CATEGORIES_MODULE;
-        $this->title = t('Featured Categories');
+        $this->title = t("Featured Categories");
     }
 
     /**
      * @return string
      */
-    public function assetTarget() {
-        return 'Content';
+    public function assetTarget()
+    {
+        return "Content";
     }
 
     /**
      * @return bool
      */
-    public function isCountComments(): bool {
+    public function isCountComments(): bool
+    {
         return $this->countComments;
     }
 
     /**
      * @param bool $countComments
      */
-    public function setCountComments(bool $countComments): void {
+    public function setCountComments(bool $countComments): void
+    {
         $this->countComments = $countComments;
     }
 
     /**
      * @return array|null
      */
-    protected function getData(): ?array {
-        $contextualCategoryID = $this->currentSiteSection->getAttributes()['categoryID'] ?? -1;
-        $apiParams = array_merge([
-            'limit' => 10,
-            'featured' => true,
-            'parentCategoryID' => $contextualCategoryID,
-        ], $this->apiParams);
+    protected function getData(): ?array
+    {
+        $contextualCategoryID = $this->currentSiteSection->getAttributes()["categoryID"] ?? -1;
+        $apiParams = array_merge(
+            [
+                "limit" => 10,
+                "featured" => true,
+                "parentCategoryID" => $contextualCategoryID,
+            ],
+            $this->apiParams
+        );
         $data = $this->categoriesApi->index($apiParams)->getData();
         $itemOptions = [
-            'countComments' => $this->isCountComments(),
+            "countComments" => $this->isCountComments(),
         ];
         return array_map(function ($item) use ($itemOptions) {
             return FoundationCategoriesShim::mapApiCategoryToItem($item, $itemOptions);
@@ -99,7 +104,8 @@ class CategoriesModule extends AbstractHomeWidgetModule {
     /**
      * @inheritDoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Featured Categories";
     }
 }

@@ -13,9 +13,5 @@ $container = \Gdn::getContainer();
 $container
     ->rule(ContentFilter::class)
     ->setClass(ContentFilter::class)
-    ->addCall('setReplacement', [
-        ContainerUtils::config('Plugins.CivilTongue.Replacement')
-    ])
-    ->addCall('setWords', [
-        ContainerUtils::config('Plugins.CivilTongue.Words')
-    ]);
+    ->addCall("setReplacement", [ContainerUtils::config("Plugins.CivilTongue.Replacement")])
+    ->addCall("setWords", [ContainerUtils::config("Plugins.CivilTongue.Words")]);

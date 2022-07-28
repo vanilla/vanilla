@@ -22,8 +22,8 @@ use Vanilla\Web\SystemTokenUtils;
 /**
  * This class provides utility methods for executing longer running tasks that use iterators to break up their work.
  */
-class LongRunner {
-
+class LongRunner implements SystemCallableInterface
+{
     /** @var string A long-running generator can return this to indicate it is complete. */
     public const FINISHED = "finished";
 
@@ -71,14 +71,16 @@ class LongRunner {
      * @param SystemTokenUtils $tokenUtils
      * @param \Gdn_Session $session
      */
-    public function __construct(
-        ContainerInterface $container,
-        SystemTokenUtils $tokenUtils,
-        \Gdn_Session $session
-    ) {
+    public function __construct(ContainerInterface $container, SystemTokenUtils $tokenUtils, \Gdn_Session $session)
+    {
         $this->container = $container;
         $this->tokenUtils = $tokenUtils;
         $this->session = $session;
+    }
+
+    public static function getSystemCallableMethods(): array
+    {
+        return ["composeMultipleActions"];
     }
 
     /**
@@ -88,7 +90,8 @@ class LongRunner {
      *
      * @return Data API response data.
      */
-    public function runApi(LongRunnerAction $action): Data {
+    public function runApi(LongRunnerAction $action): Data
+    {
         if ($this->mode === self::MODE_SYNC) {
             $result = $this->runImmediately($action);
             return $result->asData();
@@ -105,7 +108,8 @@ class LongRunner {
      *
      * @return TrackingSlipInterface A tracking slip for the queued job.
      */
-    public function runDeferred(LongRunnerAction $action): TrackingSlipInterface {
+    public function runDeferred(LongRunnerAction $action): TrackingSlipInterface
+    {
         $this->validateLongRunnable($action);
         $job = new NormalJobDescriptor(LongRunnerJob::class);
         $job->setMessage([
@@ -132,7 +136,8 @@ class LongRunner {
      *
      * @return LongRunnerResult
      */
-    public function runImmediately(LongRunnerAction $action): LongRunnerResult {
+    public function runImmediately(LongRunnerAction $action): LongRunnerResult
+    {
         $generator = $this->runIterator($action);
         return ModelUtils::consumeGenerator($generator);
     }
@@ -146,7 +151,8 @@ class LongRunner {
      * @throws ServerException Thrown if the method is not allowed to be run or the long-runner doesn't behave properly.
      * @throws ForbiddenException Thrown if there is no session user.
      */
-    public function runIterator(LongRunnerAction $action): \Generator {
+    public function runIterator(LongRunnerAction $action): \Generator
+    {
         $className = $action->getClassName();
         $method = $action->getMethod();
         $args = $action->getArgs();
@@ -154,16 +160,8 @@ class LongRunner {
         // Validation.
         $this->validateLongRunnable($action);
 
-        // Instantiate and create the generator.
-        $obj = $this->container->get($className);
-        $fn = [$obj, $method];
-        $generator = $fn(...$args);
-        $callableName = "$className::$method()";
-
-        // Make sure we actually got a generator.
-        if (!$generator instanceof \Generator) {
-            throw new ServerException("Long running method $callableName must return a \Generator.");
-        }
+        $generator = $this->generatorFromAction($action);
+        $callableName = $action->getCallableName();
 
         // Start preparing our result.
         $result = new LongRunnerResult();
@@ -175,8 +173,10 @@ class LongRunner {
         }
 
         // Iterate through with timeout and memory checks.
-        $timeoutGenerator = ModelUtils::iterateWithTimeout($generator, $this->timeout);
+        $timeoutGenerator =
+            $this->timeout >= 0 ? ModelUtils::iterateWithTimeout($generator, $this->timeout) : $generator;
         $iterations = 0;
+        $stopReason = "timeout";
         foreach ($timeoutGenerator as $value) {
             if ($value instanceof LongRunnerQuantityTotal && $result->getCountTotalIDs() === null) {
                 // If we haven't already set a total allow it to be set here.
@@ -186,12 +186,18 @@ class LongRunner {
 
             if ($value instanceof LongRunnerItemResultInterface) {
                 $result->addResult($value);
-                yield $result;
+                try {
+                    yield $result;
+                } catch (LongRunnerTimeoutException $ex) {
+                    // we ran out of time. Stop iterator and throw into the generator.
+                    break;
+                }
             }
             $iterations++;
 
             if ($this->maxIterations !== null && $iterations >= $this->maxIterations) {
                 // Stop execution early.
+                $stopReason = "reached max iteratons: {$this->maxIterations}";
                 break;
             }
         }
@@ -206,7 +212,7 @@ class LongRunner {
             // Either we are low on memory or we are running out of time.
             // Get the next args and we need to continue.
             try {
-                $generator->throw(new LongRunnerTimeoutException());
+                $generator->throw(new LongRunnerTimeoutException($stopReason));
             } catch (LongRunnerTimeoutException $e) {
                 // The generator doesn't have any specific handling for timeouts.
                 // We can call it with the same arguments.
@@ -214,28 +220,126 @@ class LongRunner {
                 return $result;
             }
 
-            if ($generator->valid()) {
-                throw new ServerException("Long running method $callableName was told return it's next arguments, but did not return.");
-            }
-
-            $nextArgs = $generator->getReturn();
-            if ($nextArgs === self::FINISHED) {
+            $nextArgs = $this->extractNextArgs($action, $generator);
+            if ($nextArgs === null) {
                 // We actually called the runner on it's last iteration. It's actually done.
                 return $result;
             }
 
-            if (!$nextArgs instanceof LongRunnerNextArgs) {
-                throw new ServerException("Long running method $callableName did not return a LongRunnerNextArgs when requested.");
-            }
-
-            $result->setCallbackPayload(
-                $newAction
-                    ->applyNextArgs($nextArgs)
-                    ->asCallbackPayload($this->tokenUtils)
-            );
+            $result->setCallbackPayload($newAction->applyNextArgs($nextArgs)->asCallbackPayload($this->tokenUtils));
         }
 
         return $result;
+    }
+
+    /**
+     * Given a running generator, signal to it to return its next arguments and return them.
+     *
+     * @param LongRunnerAction $action
+     * @param \Generator $generator
+     *
+     * @return LongRunnerNextArgs|null The next args or null if the generator is finished.
+     */
+    public function extractNextArgs(LongRunnerAction $action, \Generator $generator): ?LongRunnerNextArgs
+    {
+        $callableName = $action->getCallableName();
+        if ($generator->valid()) {
+            throw new ServerException(
+                "Long running method $callableName was told return it's next arguments, but did not return."
+            );
+        }
+
+        $nextArgs = $generator->getReturn();
+        if ($nextArgs === self::FINISHED) {
+            // We actually called the runner on it's last iteration. It's actually done.
+            return null;
+        }
+
+        if (!$nextArgs instanceof LongRunnerNextArgs) {
+            throw new ServerException(
+                "Long running method $callableName did not return a LongRunnerNextArgs when requested."
+            );
+        }
+        return $nextArgs;
+    }
+
+    /**
+     * Create a generator from an action.
+     *
+     * @param LongRunnerAction $action
+     *
+     * @return \Generator
+     */
+    private function generatorFromAction(LongRunnerAction $action)
+    {
+        // Instantiate and create the generator.
+        $obj = $this->container->get($action->getClassName());
+        $fn = [$obj, $action->getMethod()];
+        $generator = $fn(...$action->getArgs());
+
+        // Make sure we actually got a generator.
+        if (!$generator instanceof \Generator) {
+            throw new ServerException("Long running method {$action->getCallableName()} must return a \Generator.");
+        }
+        return $generator;
+    }
+
+    /**
+     * Compose multiple actions together.
+     *
+     * @param LongRunnerAction[] $actions
+     * @param int|null $resumeIndex
+     * @param array|null $resumeArgs Arguments to resume the resumed action with.
+     *
+     * @return \Generator
+     */
+    public function composeMultipleActions(
+        array $actions,
+        ?int $resumeIndex = null,
+        ?array $resumeArgs = null
+    ): \Generator {
+        $resumeIndex = $resumeIndex ?? 0;
+        for ($i = $resumeIndex; $i < count($actions); $i++) {
+            $action = $actions[$i] ?? null;
+            if ($action === null) {
+                throw new ServerException("Invalid index $i for composing multiple actions");
+            }
+
+            if (is_array($action)) {
+                $action = LongRunnerAction::fromJson($action);
+            }
+            if ($i === $resumeIndex && $resumeArgs !== null && $action instanceof LongRunnerAction) {
+                $action = $action->applyNextArgs(new LongRunnerNextArgs($resumeArgs));
+            }
+
+            $generator = $this->generatorFromAction($action);
+            foreach ($generator as $iterationResult) {
+                try {
+                    if ($iterationResult instanceof LongRunnerQuantityTotal) {
+                        // Multiple quantities mucks thing up.
+                        yield;
+                    }
+                    yield $iterationResult;
+                } catch (LongRunnerTimeoutException $timeoutException) {
+                    if ($generator->valid()) {
+                        $generator->throw($timeoutException);
+                    }
+                    $nextResumeArgs = $this->extractNextArgs($action, $generator);
+                    if ($nextResumeArgs === null) {
+                        // It finished
+                        if ($i === count($actions) - 1) {
+                            // We totally finished.
+                            return self::FINISHED;
+                        } else {
+                            return new LongRunnerNextArgs([$actions, $i + 1]);
+                        }
+                    } else {
+                        return new LongRunnerNextArgs([$actions, $i, $nextResumeArgs]);
+                    }
+                }
+            }
+        }
+        return self::FINISHED;
     }
 
     /**
@@ -246,20 +350,23 @@ class LongRunner {
      * @throws ServerException Thrown if the method is not allowed to be run.
      * @throws ForbiddenException Thrown if there is no session user.
      */
-    private function validateLongRunnable(LongRunnerAction $action) {
+    private function validateLongRunnable(LongRunnerAction $action)
+    {
         if (!$this->session->isValid()) {
-            throw new ForbiddenException('You must be signed in to trigger a long-running action.');
+            throw new ForbiddenException("You must be signed in to trigger a long-running action.");
         }
 
         // Maybe this class only exists as a container rule?
         /** @var SystemCallableInterface $class */
         $class = $this->container->get($action->getClassName());
         if (!$class instanceof SystemCallableInterface) {
-            throw new ServerException("Class does not implement " . SystemCallableInterface::class . ": {$action->getClassName()}");
+            throw new ServerException(
+                "Class does not implement " . SystemCallableInterface::class . ": {$action->getClassName()}"
+            );
         }
 
         $allowedMethods = $class::getSystemCallableMethods();
-        $lowercased = array_map('strtolower', $allowedMethods);
+        $lowercased = array_map("strtolower", $allowedMethods);
         if (!in_array(strtolower($action->getMethod()), $lowercased, true)) {
             throw new ServerException("Method `{$action->getMethod()}` was not marked as system callable.");
         }
@@ -282,7 +389,8 @@ class LongRunner {
      *
      * @return $this
      */
-    public function setMode(string $mode): LongRunner {
+    public function setMode(string $mode): LongRunner
+    {
         $this->mode = $mode;
         return $this;
     }
@@ -290,7 +398,8 @@ class LongRunner {
     /**
      * @return string
      */
-    public function getMode(): string {
+    public function getMode(): string
+    {
         return $this->mode;
     }
 
@@ -301,7 +410,8 @@ class LongRunner {
      *
      * @return $this
      */
-    public function setTimeout(int $timeout): LongRunner {
+    public function setTimeout(int $timeout): LongRunner
+    {
         $this->timeout = $timeout;
         return $this;
     }
@@ -309,11 +419,12 @@ class LongRunner {
     /**
      * Set the maximum amount of iterations to do in a job.
      *
-     * @param int $maxIterations
+     * @param int|null $maxIterations
      *
      * @return $this
      */
-    public function setMaxIterations(int $maxIterations): LongRunner {
+    public function setMaxIterations(?int $maxIterations): LongRunner
+    {
         $this->maxIterations = $maxIterations;
         return $this;
     }
@@ -323,7 +434,8 @@ class LongRunner {
      *
      * @return $this
      */
-    public function reset(): LongRunner {
+    public function reset(): LongRunner
+    {
         $this->mode = self::MODE_SYNC;
         $this->timeout = self::TIMEOUT_MAX;
         $this->maxIterations = null;

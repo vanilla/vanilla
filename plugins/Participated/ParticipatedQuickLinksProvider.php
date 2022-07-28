@@ -13,8 +13,8 @@ use Vanilla\Theme\VariableProviders\QuickLinkProviderInterface;
 /**
  * Provide quicklinks.
  */
-class ParticipatedQuickLinksProvider implements QuickLinkProviderInterface {
-
+class ParticipatedQuickLinksProvider implements QuickLinkProviderInterface
+{
     /** @var \Gdn_Session */
     private $session;
 
@@ -27,7 +27,8 @@ class ParticipatedQuickLinksProvider implements QuickLinkProviderInterface {
      * @param \Gdn_Session $session
      * @param \DiscussionModel $discussionModel
      */
-    public function __construct(\Gdn_Session $session, \DiscussionModel $discussionModel) {
+    public function __construct(\Gdn_Session $session, \DiscussionModel $discussionModel)
+    {
         $this->session = $session;
         $this->discussionModel = $discussionModel;
     }
@@ -35,15 +36,16 @@ class ParticipatedQuickLinksProvider implements QuickLinkProviderInterface {
     /**
      * @inheritdoc
      */
-    public function provideQuickLinks(): array {
+    public function provideQuickLinks(): array
+    {
         return [
             new QuickLink(
-                'Participated',
-                '/discussions/participated',
+                "Participated",
+                "/discussions/participated",
                 null,
                 $this->session->isValid() ? $this->discussionModel->getCountParticipated() : null,
                 "session.valid"
-            )
+            ),
         ];
     }
 }

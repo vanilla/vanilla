@@ -10,13 +10,12 @@ namespace Vanilla\QnA\Models\Totals;
 use CategoryModel;
 use Vanilla\Contracts\Models\SiteSectionTotalProviderInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
-use Vanilla\Dashboard\Models\RecordStatusModel;
 
 /**
  * Provide site totals for questions.
  */
-class QuestionSiteTotalProvider implements SiteSectionTotalProviderInterface {
-
+class QuestionSiteTotalProvider implements SiteSectionTotalProviderInterface
+{
     /** @var \Gdn_Database  */
     private $database;
 
@@ -29,7 +28,8 @@ class QuestionSiteTotalProvider implements SiteSectionTotalProviderInterface {
      * @param \Gdn_Database $database
      * @param CategoryModel $categoryModel
      */
-    public function __construct(\Gdn_Database $database, CategoryModel $categoryModel) {
+    public function __construct(\Gdn_Database $database, CategoryModel $categoryModel)
+    {
         $this->database = $database;
         $this->categoryModel = $categoryModel;
     }
@@ -37,17 +37,21 @@ class QuestionSiteTotalProvider implements SiteSectionTotalProviderInterface {
     /**
      * {@inheritDoc}
      */
-    public function calculateSiteTotalCount(?SiteSectionInterface $siteSection = null): int {
-        $sql = $this->database->createSql()
+    public function calculateSiteTotalCount(?SiteSectionInterface $siteSection = null): int
+    {
+        $sql = $this->database
+            ->createSql()
             ->from($this->getTableName())
             ->where("Type", "Question");
 
         if ($siteSection !== null) {
             $rootCategoryID = $siteSection->getCategoryID();
-            $categories = array_merge([$rootCategoryID], $this->categoryModel->getCategoryDescendantIDs($rootCategoryID));
+            $categories = array_merge(
+                [$rootCategoryID],
+                $this->categoryModel->getCategoryDescendantIDs($rootCategoryID)
+            );
             $sql->where("CategoryID", $categories);
         }
-
 
         return $sql->getCount();
     }
@@ -55,14 +59,16 @@ class QuestionSiteTotalProvider implements SiteSectionTotalProviderInterface {
     /**
      * {@inheritDoc}
      */
-    public function getTableName(): string {
+    public function getTableName(): string
+    {
         return "Discussion";
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getSiteTotalRecordType(): string {
+    public function getSiteTotalRecordType(): string
+    {
         return "question";
     }
 }

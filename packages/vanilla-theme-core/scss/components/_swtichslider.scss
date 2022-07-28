@@ -12,7 +12,6 @@
 }
 
 .DataList-Connections {
-
     .Button.ActivateSlider-Button {
         display: inline-block;
         cursor: pointer;
@@ -51,7 +50,7 @@
         }
     }
 
-    .ActivateSlider-Active .Button{
+    .ActivateSlider-Active .Button {
         background: $global-color_primary;
         color: $global-color_white;
         border-color: darken($global-color_primary, 5%);

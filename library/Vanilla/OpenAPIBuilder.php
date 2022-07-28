@@ -3,7 +3,7 @@
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2018 Vanilla Forums Inc.
  * @license GPLv2.0-only
-*/
+ */
 
 namespace Vanilla;
 
@@ -17,7 +17,8 @@ use Vanilla\Utility\ArrayUtils;
  * Add-ons place their OpenAPI specs inside an `openapi` folder in their add-on root. All files with a `.yml` or `.json`
  * are combined.
  */
-class OpenAPIBuilder {
+class OpenAPIBuilder
+{
     /**
      * @var AddonManager
      */
@@ -43,9 +44,10 @@ class OpenAPIBuilder {
      * @param RequestInterface $request The request to use for the URL base path.
      * @param string $cachePath The path to cache the built OpenAPI spec.
      */
-    public function __construct(AddonManager $addonManager, RequestInterface $request, string $cachePath = '') {
+    public function __construct(AddonManager $addonManager, RequestInterface $request, string $cachePath = "")
+    {
         $this->addonManager = $addonManager;
-        $this->cachePath = $cachePath ?: PATH_CACHE.'/openapi.php';
+        $this->cachePath = $cachePath ?: PATH_CACHE . "/openapi.php";
         $this->request = $request;
     }
 
@@ -59,24 +61,25 @@ class OpenAPIBuilder {
      * @param array $schema2
      * @return array
      */
-    public static function mergeSchemas(array $schema1, array $schema2): array {
+    public static function mergeSchemas(array $schema1, array $schema2): array
+    {
         // This callback is on the conservative side. It has a whitelist of known numeric keys and their behavior.
         // Everything else uses plain old `array_merge()`.
         $merge = function (array $arr1, array $arr2, string $key) {
             switch ($key) {
-                case 'required':
+                case "required":
                     // Don't sort required because it's often in a logical order already.
                     $r = array_values(array_unique(array_merge($arr1, $arr2)));
                     break;
-                case 'enum':
-                case 'tags':
+                case "enum":
+                case "tags":
                     $r = array_unique(array_merge($arr1, $arr2));
                     sort($r);
                     break;
-                case 'parameters':
+                case "parameters":
                     // Parameters work a lot like associative arrays, but have to be made that way.
-                    $arr1 = array_column($arr1, null, 'name');
-                    $arr2 = array_column($arr2, null, 'name');
+                    $arr1 = array_column($arr1, null, "name");
+                    $arr2 = array_column($arr2, null, "name");
                     $r = array_values(self::mergeSchemas($arr1, $arr2));
                     break;
                 default:
@@ -96,15 +99,20 @@ class OpenAPIBuilder {
      * @param bool $hidden Pass **true** to show hidden endpoints.
      * @return array Returns an OpenAPI array.
      */
-    public function getEnabledOpenAPI(bool $disabled = false, bool $hidden = false): array {
+    public function getEnabledOpenAPI(bool $disabled = false, bool $hidden = false): array
+    {
         $result = $this->getFullOpenAPI();
 
         $fn = function (array &$parent) use ($disabled, $hidden, &$fn) {
             foreach ($parent as $key => &$data) {
                 if (is_array($data)) {
-                    if (!$hidden && isset($data['x-hidden']) && $data['x-hidden']) {
+                    if (!$hidden && isset($data["x-hidden"]) && $data["x-hidden"]) {
                         unset($parent[$key]);
-                    } elseif (!$disabled && !empty($data['x-addon']) && !$this->addonManager->isEnabled($data['x-addon'], Addon::TYPE_ADDON)) {
+                    } elseif (
+                        !$disabled &&
+                        !empty($data["x-addon"]) &&
+                        !$this->addonManager->isEnabled($data["x-addon"], Addon::TYPE_ADDON)
+                    ) {
                         unset($parent[$key]);
                     } else {
                         $fn($data);
@@ -126,7 +134,8 @@ class OpenAPIBuilder {
      *
      * @return array Returns an OpenAPI array.
      */
-    public function getFullOpenAPI(): array {
+    public function getFullOpenAPI(): array
+    {
         if (!file_exists($this->cachePath)) {
             FileUtils::putExport($this->cachePath, $this->generateFullOpenAPI());
         }
@@ -143,19 +152,19 @@ class OpenAPIBuilder {
         return $result;
     }
 
-
     /**
      * Apply the request specific server root to the OpenAPI definition.
      *
      * @param array $openApi A built OpenAPI definition.
      * @return array The modified OpenAPI definition
      */
-    private function applyRequestBasedApiBasePath(array $openApi): array {
+    private function applyRequestBasedApiBasePath(array $openApi): array
+    {
         // Fix the server URL.
-        $openApi['servers'] = [
+        $openApi["servers"] = [
             [
-                'url' => $this->request->urlDomain(true) . $this->request->getAssetRoot() . '/api/v2',
-            ]
+                "url" => $this->request->urlDomain(true) . $this->request->getAssetRoot() . "/api/v2",
+            ],
         ];
 
         return $openApi;
@@ -166,14 +175,15 @@ class OpenAPIBuilder {
      *
      * @return array Returns an array representation of the OpenAPI spec.
      */
-    public function generateFullOpenAPI(): array {
+    public function generateFullOpenAPI(): array
+    {
         $addons = $this->addonManager->lookupAllByType(Addon::TYPE_ADDON);
 
         $result = [
-            'openapi' => '3.0.2',
-            'info' => [],
-            'paths' => [],
-            'components' => [],
+            "openapi" => "3.0.2",
+            "info" => [],
+            "paths" => [],
+            "components" => [],
         ];
         $results = [];
 
@@ -181,20 +191,20 @@ class OpenAPIBuilder {
             /* @var Addon $addon */
 
             if (defined("GLOB_BRACE")) {
-                $glob = $addon->path('/openapi/*.{json,yml,yaml}', Addon::PATH_FULL);
+                $glob = $addon->path("/openapi/*.{json,yml,yaml}", Addon::PATH_FULL);
                 $paths = glob($glob, GLOB_BRACE);
             } else {
                 // GLOB_BRACE not available on this platform? Got to do it the longform way.
                 $paths = array_merge(
-                    glob($addon->path('/openapi/*.json', Addon::PATH_FULL)),
-                    glob($addon->path('/openapi/*.yml', Addon::PATH_FULL)),
-                    glob($addon->path('/openapi/*.yaml', Addon::PATH_FULL))
+                    glob($addon->path("/openapi/*.json", Addon::PATH_FULL)),
+                    glob($addon->path("/openapi/*.yml", Addon::PATH_FULL)),
+                    glob($addon->path("/openapi/*.yaml", Addon::PATH_FULL))
                 );
             }
 
             foreach ($paths as $path) {
                 $data = FileUtils::getArray($path);
-                if (fnmatch('*.schema.*', $path)) {
+                if (fnmatch("*.schema.*", $path)) {
                     $data = $this->jsonSchemaToOpenAPI($data);
                 }
 
@@ -206,10 +216,10 @@ class OpenAPIBuilder {
         }
 
         // Sort the paths and components.
-        ksort($result['paths']);
+        ksort($result["paths"]);
 
-        foreach ($result['components'] as $key => $_) {
-            ksort($result['components'][$key]);
+        foreach ($result["components"] as $key => $_) {
+            ksort($result["components"][$key]);
         }
 
         $result = $this->applyRequestBasedApiBasePath($result);
@@ -225,26 +235,27 @@ class OpenAPIBuilder {
      * @param array $data The data to annotate.
      * @param Addon $addon The addon that owns the data.
      */
-    private function annotateData(array &$data, Addon $addon) {
+    private function annotateData(array &$data, Addon $addon)
+    {
         $addonKey = $addon->getGlobalKey();
 
-        if (!empty($data['paths'])) {
-            foreach ($data['paths'] as $path => &$methods) {
+        if (!empty($data["paths"])) {
+            foreach ($data["paths"] as $path => &$methods) {
                 foreach ($methods as $method => &$operation) {
-                    if ($method === 'parameters') {
+                    if ($method === "parameters") {
                         $this->annotateDataset($operation, $addonKey);
-                    } elseif (is_array($operation) && !isset($operation['x-addon'])) {
-                        $operation['x-addon'] = $addonKey;
+                    } elseif (is_array($operation) && !isset($operation["x-addon"])) {
+                        $operation["x-addon"] = $addonKey;
                     }
                 }
             }
         }
 
-        if (!empty($data['components'])) {
-            foreach ($data['components'] as $type => &$components) {
+        if (!empty($data["components"])) {
+            foreach ($data["components"] as $type => &$components) {
                 foreach ($components as $key => &$component) {
-                    if (!isset($component['x-addon'])) {
-                        $component['x-addon'] = $addonKey;
+                    if (!isset($component["x-addon"])) {
+                        $component["x-addon"] = $addonKey;
                     }
                 }
             }
@@ -257,10 +268,11 @@ class OpenAPIBuilder {
      * @param array $data
      * @param string $addonKey
      */
-    private function annotateDataset(array &$data, string $addonKey): void {
+    private function annotateDataset(array &$data, string $addonKey): void
+    {
         foreach ($data as $key => &$row) {
-            if (is_array($row) && !isset($row['x-addon'])) {
-                $row['x-addon'] = $addonKey;
+            if (is_array($row) && !isset($row["x-addon"])) {
+                $row["x-addon"] = $addonKey;
             }
         }
     }
@@ -272,31 +284,32 @@ class OpenAPIBuilder {
      *
      * @param array $data The data to clean.
      */
-    private function cleanData(array &$data) {
+    private function cleanData(array &$data)
+    {
         // Remove empty paths and components.
-        if (empty($data['paths'])) {
-            unset($data['paths']);
+        if (empty($data["paths"])) {
+            unset($data["paths"]);
         }
 
-        if (!empty($data['components'])) {
-            foreach ($data['components'] as $type => $components) {
+        if (!empty($data["components"])) {
+            foreach ($data["components"] as $type => $components) {
                 if (empty($components)) {
-                    unset($data['components'][$type]);
+                    unset($data["components"][$type]);
                 }
             }
         }
-        if (empty($data['components'])) {
-            unset($data['components']);
+        if (empty($data["components"])) {
+            unset($data["components"]);
         }
 
         array_walk_recursive($data, function (&$value, $key) {
             // Remove the files in references to make them local references instead.
-            if ($key === '$ref' && ($pos = strpos($value, '#')) !== false) {
+            if ($key === '$ref' && ($pos = strpos($value, "#")) !== false) {
                 $value = substr($value, $pos);
             }
         });
 
-        $data['info'] = $data['info'] ?? [];
+        $data["info"] = $data["info"] ?? [];
     }
 
     /**
@@ -306,7 +319,8 @@ class OpenAPIBuilder {
      *
      * @param callable $filter
      */
-    public function addFilter(callable $filter): void {
+    public function addFilter(callable $filter): void
+    {
         $this->filters[] = $filter;
     }
 
@@ -315,7 +329,8 @@ class OpenAPIBuilder {
      *
      * @param callable $filter
      */
-    public function removeFilter(callable $filter): void {
+    public function removeFilter(callable $filter): void
+    {
         foreach ($this->filters as $i => $row) {
             if ($row === $filter) {
                 unset($this->filters[$i]);
@@ -329,19 +344,20 @@ class OpenAPIBuilder {
      * @param array $data
      * @return array
      */
-    private function jsonSchemaToOpenAPI(array $data): array {
+    private function jsonSchemaToOpenAPI(array $data): array
+    {
         $key = $data['$id'];
-        $definitions = $data['definitions'] ?? [];
-        unset($data['$schema'], $data['$id'], $data['definitions']);
+        $definitions = $data["definitions"] ?? [];
+        unset($data['$schema'], $data['$id'], $data["definitions"]);
         $result = [
-            'components' => [
-                'schemas' => [$key => $data] + $definitions,
-            ]
+            "components" => [
+                "schemas" => [$key => $data] + $definitions,
+            ],
         ];
 
         array_walk_recursive($result, function (&$value, $key) {
             if ($key === '$ref') {
-                $value = str_replace('#/definitions/', '#/components/schemas/', $value);
+                $value = str_replace("#/definitions/", "#/components/schemas/", $value);
             }
         });
 

@@ -16,16 +16,18 @@ use VanillaTests\SiteTestTrait;
 /**
  * Test the {@link AccessTokenModel}.
  */
-class AccessTokenModelTest extends SharedBootstrapTestCase {
+class AccessTokenModelTest extends SharedBootstrapTestCase
+{
     use SiteTestTrait;
 
     /**
      * An access token should verify after being issued.
      */
-    public function testIssueAndVerify() {
-        $model = new AccessTokenModel('sss');
+    public function testIssueAndVerify()
+    {
+        $model = new AccessTokenModel("sss");
         $token = $model->issue(1);
-        $this->assertEquals(1, $model->verify($token)['UserID']);
+        $this->assertEquals(1, $model->verify($token)["UserID"]);
 
         return $token;
     }
@@ -36,31 +38,33 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
      * @param string $token A valid access token to revoke.
      * @depends testIssueAndVerify
      */
-    public function testRevoke($token) {
-        $model = new AccessTokenModel('sss');
+    public function testRevoke($token)
+    {
+        $model = new AccessTokenModel("sss");
         $row = $model->verify($token);
         $this->assertTrue($model->revoke($token));
 
-        $tokenRow = $model->getID($row['AccessTokenID']);
-        $this->assertTrue($tokenRow['Attributes']['revoked'], "The access token should have been marked revoked.");
+        $tokenRow = $model->getID($row["AccessTokenID"]);
+        $this->assertTrue($tokenRow["Attributes"]["revoked"], "The access token should have been marked revoked.");
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Your access token was revoked.');
+        $this->expectExceptionMessage("Your access token was revoked.");
         $model->verify($token, true);
     }
 
     /**
      * A deleted token shouldn't verify.
      */
-    public function testVerifyDeletedToken() {
+    public function testVerifyDeletedToken()
+    {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Access token not found.');
+        $this->expectExceptionMessage("Access token not found.");
 
-        $model = new AccessTokenModel('sss');
+        $model = new AccessTokenModel("sss");
         $token = $model->issue(1);
         $model->verify($token, true);
         $row = $model->getToken($model->trim($token));
-        $id = $row['AccessTokenID'];
+        $id = $row["AccessTokenID"];
         $model->deleteID($id);
         $model->verify($token, true);
     }
@@ -68,8 +72,9 @@ class AccessTokenModelTest extends SharedBootstrapTestCase {
     /**
      * Test that our config saved tokens work correctly.
      */
-    public function testEnsureSingleSystemToken() {
-        $model = new AccessTokenModel('sss');
+    public function testEnsureSingleSystemToken()
+    {
+        $model = new AccessTokenModel("sss");
 
         $model->ensureSingleSystemToken();
         $initialConfToken = \Gdn::config()->get(AccessTokenModel::CONFIG_SYSTEM_TOKEN);

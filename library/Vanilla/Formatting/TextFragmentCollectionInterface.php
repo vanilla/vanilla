@@ -10,7 +10,8 @@ namespace Vanilla\Formatting;
 /**
  * Represents a collection of text fragments.
  */
-interface TextFragmentCollectionInterface {
+interface TextFragmentCollectionInterface
+{
     /**
      * Get the fragments from this instance.
      *

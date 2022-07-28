@@ -15,7 +15,8 @@
  * @param Smarty $smarty The smarty object rendering the template.
  * @return string The text.
  */
-function smarty_function_text($params, &$smarty) {
-    $result = Gdn_Theme::text(val('code', $params, ''), val('default', $params, ''));
+function smarty_function_text($params, &$smarty)
+{
+    $result = Gdn_Theme::text(val("code", $params, ""), val("default", $params, ""));
     return $result;
 }

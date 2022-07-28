@@ -15,8 +15,8 @@ use Vanilla\Web\TwigRenderTrait;
 /**
  * Class KeystoneThemeHooks
  */
-class KeystoneThemeHooks extends \Gdn_Plugin {
-
+class KeystoneThemeHooks extends \Gdn_Plugin
+{
     use TwigRenderTrait;
 
     /**
@@ -24,8 +24,9 @@ class KeystoneThemeHooks extends \Gdn_Plugin {
      *
      * @return void
      */
-    public function setup() {
-        saveToConfig([ 'Garden.MobileTheme' => 'keystone' ]);
+    public function setup()
+    {
+        saveToConfig(["Garden.MobileTheme" => "keystone"]);
     }
 
     /**
@@ -35,25 +36,26 @@ class KeystoneThemeHooks extends \Gdn_Plugin {
      *
      * @return void
      */
-    public function base_render_before($sender) {
-        if (inSection('Dashboard')) {
+    public function base_render_before($sender)
+    {
+        if (inSection("Dashboard")) {
             return;
         }
 
-        $hasAdvancedSearch = class_exists('AdvancedSearchPlugin');
+        $hasAdvancedSearch = class_exists("AdvancedSearchPlugin");
 
         //set "hasAdvancedSearch" to smarty
-        $sender->setData('hasAdvancedSearch', $hasAdvancedSearch);
+        $sender->setData("hasAdvancedSearch", $hasAdvancedSearch);
 
         // For backwards compatibility in CustomizeTheme
         $imageUrl = BannerImageModel::getCurrentBannerImageLink();
-        $sender->setData('heroImageUrl', $imageUrl);
+        $sender->setData("heroImageUrl", $imageUrl);
 
         //set ThemeOptions to smarty
         $themeOptions = c("Garden.ThemeOptions");
 
         foreach ($themeOptions as $key => &$value) {
-            $sender->setData("ThemeOptions.".$key, $value);
+            $sender->setData("ThemeOptions." . $key, $value);
         }
     }
 
@@ -62,7 +64,8 @@ class KeystoneThemeHooks extends \Gdn_Plugin {
      *
      * @param \DiscussionsController $sender
      */
-    public function discussionsController_render_before($sender) {
+    public function discussionsController_render_before($sender)
+    {
         $this->setSanitizedDescription($sender);
     }
 
@@ -71,7 +74,8 @@ class KeystoneThemeHooks extends \Gdn_Plugin {
      *
      * @param \CategoriesController $sender
      */
-    public function categoriesController_render_before($sender) {
+    public function categoriesController_render_before($sender)
+    {
         $this->setSanitizedDescription($sender);
     }
 
@@ -80,13 +84,14 @@ class KeystoneThemeHooks extends \Gdn_Plugin {
      *
      * @param \Gdn_Controller $sender
      */
-    private function setSanitizedDescription($sender) {
-        if ($sender->Data['_Description']) {
+    private function setSanitizedDescription($sender)
+    {
+        if ($sender->Data["_Description"]) {
             /** @var $htmlSanitizer */
             $htmlSanitizer = \Gdn::getContainer()->get(\Vanilla\Formatting\Html\HtmlSanitizer::class);
-            $description = $htmlSanitizer->filter($sender->Data['_Description']);
+            $description = $htmlSanitizer->filter($sender->Data["_Description"]);
         }
-        $sender->setData('sanitizedDescription', $description);
+        $sender->setData("sanitizedDescription", $description);
     }
 
     /**
@@ -96,9 +101,10 @@ class KeystoneThemeHooks extends \Gdn_Plugin {
      *
      * @return void
      */
-    public function settingsController_afterCustomStyles_handler($sender) {
+    public function settingsController_afterCustomStyles_handler($sender)
+    {
         $form = $sender->Form;
-        echo $this->renderTwig("@keystone/customStyles.twig", ['form' => new TwigFormWrapper($form)]);
+        echo $this->renderTwig("@keystone/customStyles.twig", ["form" => new TwigFormWrapper($form)]);
     }
 
     /**
@@ -106,35 +112,37 @@ class KeystoneThemeHooks extends \Gdn_Plugin {
      *
      * @param \SettingsController $sender
      */
-    public function settingsController_themeOptions_create($sender) {
-        $sender->permission('Garden.Settings.Manage');
+    public function settingsController_themeOptions_create($sender)
+    {
+        $sender->permission("Garden.Settings.Manage");
         $form = $sender->Form;
 
-        $sender->addJsFile('addons.js');
-        $sender->setHighlightRoute('dashboard/settings/themeoptions');
+        $sender->addJsFile("addons.js");
+        $sender->setHighlightRoute("dashboard/settings/themeoptions");
 
         $themeManager = \Gdn::themeManager();
-        $sender->setData('ThemeInfo', $themeManager->enabledThemeInfo());
-        $sender->setData('hasAdvancedSearch', class_exists('AdvancedSearchPlugin'));
+        $sender->setData("ThemeInfo", $themeManager->enabledThemeInfo());
+        $sender->setData("hasAdvancedSearch", class_exists("AdvancedSearchPlugin"));
 
         //get toggle values from config
         $checkboxes = c("Garden.ThemeOptions.Options");
 
         foreach ($checkboxes as $key => $value) {
-            $form->setValue("ThemeOptions.Options.".$key, $value);
+            $form->setValue("ThemeOptions.Options." . $key, $value);
         }
 
         if ($form->authenticatedPostBack()) {
             // Save the styles to the config.
-            $styleKey = $form->getFormValue('StyleKey');
+            $styleKey = $form->getFormValue("StyleKey");
 
             $configSaveData = [
-                'Garden.ThemeOptions.Styles.Key' => $styleKey,
-                'Garden.ThemeOptions.Styles.Value' => $sender->data("ThemeInfo.Options.Styles.$styleKey.Basename")];
+                "Garden.ThemeOptions.Styles.Key" => $styleKey,
+                "Garden.ThemeOptions.Styles.Value" => $sender->data("ThemeInfo.Options.Styles.$styleKey.Basename"),
+            ];
 
             // Save the text to the locale.
-            foreach ($sender->data('ThemeInfo.Options.Text', []) as $key => $default) {
-                $value = $form->getFormValue($form->escapeFieldName('Text_'.$key));
+            foreach ($sender->data("ThemeInfo.Options.Text", []) as $key => $default) {
+                $value = $form->getFormValue($form->escapeFieldName("Text_" . $key));
                 $configSaveData["ThemeOption.{$key}"] = $value;
             }
 
@@ -147,24 +155,24 @@ class KeystoneThemeHooks extends \Gdn_Plugin {
             $sender->informMessage(t("Your changes have been saved."));
         }
 
-        $sender->setData('ThemeOptions', c('Garden.ThemeOptions'));
-        $styleKey = $sender->data('ThemeOptions.Styles.Key');
+        $sender->setData("ThemeOptions", c("Garden.ThemeOptions"));
+        $styleKey = $sender->data("ThemeOptions.Styles.Key");
 
         if (!$form->isPostBack()) {
-            foreach ($sender->data('ThemeInfo.Options.Text', []) as $key => $options) {
-                $default = val('Default', $options, '');
-                $value = c("ThemeOption.{$key}", '#DEFAULT#');
-                if ($value === '#DEFAULT#') {
+            foreach ($sender->data("ThemeInfo.Options.Text", []) as $key => $options) {
+                $default = val("Default", $options, "");
+                $value = c("ThemeOption.{$key}", "#DEFAULT#");
+                if ($value === "#DEFAULT#") {
                     $value = $default;
                 }
 
-                $form->setValue($form->escapeFieldName('Text_'.$key), $value);
+                $form->setValue($form->escapeFieldName("Text_" . $key), $value);
             }
         }
 
-        $sender->setData('ThemeFolder', $themeManager->getEnabledDesktopThemeKey());
-        $sender->title(t('Theme Options'));
-        $form->addHidden('StyleKey', $styleKey);
+        $sender->setData("ThemeFolder", $themeManager->getEnabledDesktopThemeKey());
+        $sender->title(t("Theme Options"));
+        $form->addHidden("StyleKey", $styleKey);
 
         $sender->render();
     }

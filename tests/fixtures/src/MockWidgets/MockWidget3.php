@@ -15,12 +15,13 @@ use Vanilla\Widgets\AbstractWidgetModule;
 /**
  * Class MockWidget3
  */
-class MockWidget3 extends MockWidget1 {
-
+class MockWidget3 extends MockWidget1
+{
     /**
      * @inheritdoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Mock Widget 3";
     }
 }

@@ -14,8 +14,8 @@ use Vanilla\Web\ContentSecurityPolicy\Policy;
 /**
  * Dispatcher middleware for handling content-security headers.
  */
-class ContentSecurityPolicyMiddleware {
-
+class ContentSecurityPolicyMiddleware
+{
     const SCRIPT_BYPASS = "CSP_SCRIPT_BYPASS";
 
     /**
@@ -27,7 +27,8 @@ class ContentSecurityPolicyMiddleware {
      * ContentSecurityPolicyMiddleware constructor.
      * @param ContentSecurityPolicyModel $contentSecurityPolicyModel
      */
-    public function __construct(ContentSecurityPolicyModel $contentSecurityPolicyModel) {
+    public function __construct(ContentSecurityPolicyModel $contentSecurityPolicyModel)
+    {
         $this->contentSecurityPolicyModel = $contentSecurityPolicyModel;
     }
 
@@ -38,10 +39,11 @@ class ContentSecurityPolicyMiddleware {
      * @param callable $next The next middleware.
      * @return mixed Returns the response of the inner middleware.
      */
-    public function __invoke(RequestInterface $request, callable $next) {
+    public function __invoke(RequestInterface $request, callable $next)
+    {
         $response = Data::box($next($request));
 
-        $filter = 'all';
+        $filter = "all";
         if ($response->getMeta(self::SCRIPT_BYPASS)) {
             $filter = Policy::FRAME_ANCESTORS;
         }
@@ -53,10 +55,7 @@ class ContentSecurityPolicyMiddleware {
 
         $xFrameString = $this->contentSecurityPolicyModel->getXFrameString();
         if ($xFrameString !== null) {
-            $response->setHeader(
-                ContentSecurityPolicyModel::X_FRAME_OPTIONS,
-                $xFrameString
-            );
+            $response->setHeader(ContentSecurityPolicyModel::X_FRAME_OPTIONS, $xFrameString);
         }
 
         return $response;

@@ -14,8 +14,8 @@ use Vanilla\Cli\Utils\SimpleScriptLogger;
 /**
  * Script for syncing vanilla/vanilla-cloud to vanilla/vanilla.
  */
-class SyncOssCommand {
-
+class SyncOssCommand
+{
     const VERSION = "1.0.0";
     const OSS_ORIGIN = "vanilla-oss";
 
@@ -37,7 +37,8 @@ class SyncOssCommand {
     /**
      * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->logger = new SimpleScriptLogger();
 
         // Kludge to make sure this is loaded before we start changing repos and the cloud directory vanishes.
@@ -65,14 +66,14 @@ class SyncOssCommand {
         "README.md",
 
         // .gitignored but just in case.
-        '.DS_STORE',
-        '.idea',
-        '.phpunit.result.cache',
-        'cgi-bin',
-        'dist',
-        'git-diff.txt',
-        'phpcs-diff.json',
-        'phpunit.xml',
+        ".DS_STORE",
+        ".idea",
+        ".phpunit.result.cache",
+        "cgi-bin",
+        "dist",
+        "git-diff.txt",
+        "phpcs-diff.json",
+        "phpunit.xml",
     ];
 
     /**
@@ -80,7 +81,8 @@ class SyncOssCommand {
      *
      * @return string
      */
-    private function currentBranch(): string {
+    private function currentBranch(): string
+    {
         $resultCode = null;
         $output = ShellUtils::command(
             "git rev-parse --abbrev-ref HEAD",
@@ -96,7 +98,8 @@ class SyncOssCommand {
      *
      * @return string
      */
-    public function getOssBase(): string {
+    public function getOssBase(): string
+    {
         return $this->ossBase;
     }
 
@@ -105,7 +108,8 @@ class SyncOssCommand {
      *
      * @param string $ossBase
      */
-    public function setOssBase(string $ossBase): void {
+    public function setOssBase(string $ossBase): void
+    {
         $this->ossBase = $ossBase;
     }
 
@@ -114,7 +118,8 @@ class SyncOssCommand {
      *
      * @return string
      */
-    public function getCloudBase(): string {
+    public function getCloudBase(): string
+    {
         return $this->cloudBase;
     }
 
@@ -123,7 +128,8 @@ class SyncOssCommand {
      *
      * @param string $cloudBase
      */
-    public function setCloudBase(string $cloudBase): void {
+    public function setCloudBase(string $cloudBase): void
+    {
         $this->cloudBase = $cloudBase;
     }
 
@@ -133,7 +139,8 @@ class SyncOssCommand {
      * @param string $branch
      * @return bool
      */
-    private function branchHasRemote(string $branch): bool {
+    private function branchHasRemote(string $branch): bool
+    {
         $output = ShellUtils::command(
             "git branch --list --format=\"%%(upstream)\" %s",
             [$branch],
@@ -151,16 +158,17 @@ class SyncOssCommand {
     /**
      * Sync common commits from the vanilla-cloud repo to the vanilla repository.
      */
-    public function syncOss() {
+    public function syncOss()
+    {
         $this->cloudHasRemote = $this->branchHasRemote($this->getCloudBase());
         $currentBranch = $this->currentBranch();
 
         try {
             $this->logger->title("Vanilla OSS SyncTool");
-            $this->logger->info("Version: ".self::VERSION);
+            $this->logger->info("Version: " . self::VERSION);
 
             // Switch to root directory.
-            ShellUtils::shellOrThrow("cd ".$this->getRootDir());
+            ShellUtils::shellOrThrow("cd " . $this->getRootDir());
             $this->gitIntegrityCheck();
             $this->ensureOriginCreated();
             $this->createBranch();
@@ -174,7 +182,8 @@ class SyncOssCommand {
      *
      * @param string $branch
      */
-    private function cleanup(string $branch = "master"): void {
+    private function cleanup(string $branch = "master"): void
+    {
         ShellUtils::command("git checkout %s", [$branch], null, $this->logger);
     }
 
@@ -183,14 +192,16 @@ class SyncOssCommand {
      *
      * @return string
      */
-    private function getRootDir(): string {
+    private function getRootDir(): string
+    {
         return realpath(__DIR__ . "/../../../..");
     }
 
     /**
      * Validate that there the git status is clean. Exits otherwise.
      */
-    private function gitIntegrityCheck(): void {
+    private function gitIntegrityCheck(): void
+    {
         $this->logger->title("Validating integrity of the git repo");
 
         $gitStatus = implode(PHP_EOL, ShellUtils::command("git status", [], null, $this->logger));
@@ -199,10 +210,9 @@ class SyncOssCommand {
         if ($isDirty) {
             $this->logger->success("Working tree is clean.");
         } else {
-            $this->logger->error(
-                "Git working tree is dirty. Unable to proceed.",
-                [SimpleScriptLogger::CONTEXT_LINE_COUNT => 2]
-            );
+            $this->logger->error("Git working tree is dirty. Unable to proceed.", [
+                SimpleScriptLogger::CONTEXT_LINE_COUNT => 2,
+            ]);
             $this->logger->info($gitStatus);
             die(1);
         }
@@ -211,7 +221,8 @@ class SyncOssCommand {
     /**
      * Ensure that our remote origin for vanilla/vanilla is created.
      */
-    private function ensureOriginCreated(): void {
+    private function ensureOriginCreated(): void
+    {
         $OSS_ORIGIN = self::OSS_ORIGIN;
         $this->logger->title("Validating Git Origins");
 
@@ -221,18 +232,23 @@ class SyncOssCommand {
         if ($hasOrigin) {
             $this->logger->info("Found existing remote origin $OSS_ORIGIN");
         } else {
-            $this->logger->info(
-                "Could not find existing remote origin $OSS_ORIGIN. Creating it now.",
-                [SimpleScriptLogger::CONTEXT_LINE_COUNT => 2]
+            $this->logger->info("Could not find existing remote origin $OSS_ORIGIN. Creating it now.", [
+                SimpleScriptLogger::CONTEXT_LINE_COUNT => 2,
+            ]);
+            ShellUtils::command(
+                "git remote add %s git@github.com:vanilla/vanilla.git",
+                [$OSS_ORIGIN],
+                null,
+                $this->logger
             );
-            ShellUtils::command("git remote add %s git@github.com:vanilla/vanilla.git", [$OSS_ORIGIN], null, $this->logger);
         }
     }
 
     /**
      * Create a new branch with the synced changes.
      */
-    private function createBranch() {
+    private function createBranch()
+    {
         $OSS_ORIGIN = self::OSS_ORIGIN;
         $currentTime = new \DateTime();
         $dateStamp = $currentTime->format("Y-m-d");
@@ -243,10 +259,7 @@ class SyncOssCommand {
         ShellUtils::command("git fetch --all", [], null, $this->logger);
 
         $this->logger->title("Creating New Sync Branch");
-        $this->logger->info(
-            "Branch name will be: $branchName",
-            [SimpleScriptLogger::CONTEXT_LINE_COUNT => 2]
-        );
+        $this->logger->info("Branch name will be: $branchName", [SimpleScriptLogger::CONTEXT_LINE_COUNT => 2]);
 
         // Gather all the directories to sync.
         $pathSpec = $this->gatherPathSpecToSync();
@@ -265,12 +278,7 @@ class SyncOssCommand {
             $this->logger
         );
 
-        ShellUtils::command(
-            "git add . && git commit -m %s",
-            ["Syncing files from upstream."],
-            null,
-            $this->logger
-        );
+        ShellUtils::command("git add . && git commit -m %s", ["Syncing files from upstream."], null, $this->logger);
 
         $this->logger->info("git push $OSS_ORIGIN $branchName");
     }
@@ -281,7 +289,8 @@ class SyncOssCommand {
      * @param string $revision1
      * @param string $revision2
      */
-    private function syncDeletedFiles(string $revision1, string $revision2) {
+    private function syncDeletedFiles(string $revision1, string $revision2)
+    {
         $brokenLines = ShellUtils::command(
             "git diff --name-status --diff-filter=DR %s..%s",
             [$revision1, $revision2],
@@ -295,13 +304,13 @@ class SyncOssCommand {
                 continue;
             }
 
-            preg_match('/([^\s]+)\s+(?<deletedPath>[^\s]+)(\s+)?([^\s]*)?/', $brokenLine, $matches);
-            $deletedPath = $matches['deletedPath'] ?? null;
+            preg_match("/([^\s]+)\s+(?<deletedPath>[^\s]+)(\s+)?([^\s]*)?/", $brokenLine, $matches);
+            $deletedPath = $matches["deletedPath"] ?? null;
             if (!trim($deletedPath)) {
                 continue;
             }
 
-            $fullDeletedPath = PATH_ROOT . '/' . $deletedPath;
+            $fullDeletedPath = PATH_ROOT . "/" . $deletedPath;
             $deletedFiles[] = $fullDeletedPath;
         }
 
@@ -325,7 +334,8 @@ class SyncOssCommand {
      *
      * @return string
      */
-    private function gatherPathSpecToSync(): array {
+    private function gatherPathSpecToSync(): array
+    {
         $this->logger->title("Gathering paths to sync");
 
         if ($this->cloudHasRemote) {

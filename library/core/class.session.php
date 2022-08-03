@@ -874,10 +874,12 @@ class Gdn_Session implements LoggerAwareInterface
     {
         $cookieName = c("Garden.Cookie.Name", "Vanilla");
         $name = $cookieName . "-sid";
+        $sessionID = "";
         if (\Vanilla\FeatureFlagHelper::featureEnabled(Gdn_Session::FEATURE_SESSION_ID_COOKIE)) {
             $sessionID = Gdn::session()->SessionID;
-        } else {
-            // Grab the entire session record.
+        }
+        if ($sessionID == "") {
+            // Get session ID from cookie
             $sessionID = val($name, $_COOKIE, "");
         }
         // If there is no session, and no value for saving, return.
@@ -885,6 +887,7 @@ class Gdn_Session implements LoggerAwareInterface
             return false;
         }
 
+        // Grab the entire session record.
         $session = $sessionModel->getID($sessionID, DATASET_TYPE_ARRAY);
 
         if (!$session) {

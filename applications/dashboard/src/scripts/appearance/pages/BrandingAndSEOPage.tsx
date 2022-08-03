@@ -51,11 +51,13 @@ const BRANDING_SETTINGS: JsonSchema = {
         "garden.title": {
             type: "string",
             maxLength: 20,
+            minLentgh: 1,
             "x-control": {
                 label: "Banner Title",
                 description:
                     "This title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a logo is uploaded, it will replace this title on user-facing forum pages. Also, keep in mind some themes may hide this title.",
                 inputType: "textBox",
+                default: "Vanilla",
             },
         },
         "garden.orgName": {

@@ -35,6 +35,7 @@ class UserPointsTest extends SiteTestCase
         parent::setUp();
         $this->userPointsModel = $this->container()->get(UserPointsModel::class);
         $this->categoryModel = $this->container()->get(\CategoryModel::class);
+        \Gdn::config()->saveToConfig("Plugins.Reactions.TrackPointsSeparately", true);
         $this->resetTable("UserPoints");
         \Gdn::cache()->flush();
     }
@@ -107,7 +108,7 @@ class UserPointsTest extends SiteTestCase
                 ],
             ],
         ]);
-        $moderator = $this->createRole([
+        $moderatorRole = $this->createRole([
             "name" => "SuperAdmin",
             "permissions" => [
                 [
@@ -119,7 +120,7 @@ class UserPointsTest extends SiteTestCase
             ],
         ]);
         $admin = $this->createUser(["name" => "Admin", "roleID" => [$adminRole["roleID"]]]);
-        $moderator = $this->createUser(["name" => "Moderator", "roleID" => [$moderator["roleID"]]]);
+        $moderator = $this->createUser(["name" => "Moderator", "roleID" => [$moderatorRole["roleID"]]]);
 
         $this->givePoints($admin, 100000);
         $this->givePoints($moderator, 100000);
@@ -142,6 +143,17 @@ class UserPointsTest extends SiteTestCase
             ])
             ->getBody();
         $this->assertCount(0, $leaders);
+
+        // Drop the configs and add an included admin role type.
+        \Gdn::config()->removeFromConfig(UserLeaderService::CONF_EXCLUDE_PERMISSIONS);
+        $leaders = $this->api()
+            ->get("users/leaders", [
+                "slotType" => UserPointsModel::SLOT_TYPE_WEEK,
+                "leaderboardType" => UserLeaderService::LEADERBOARD_TYPE_REPUTATION,
+                "includedRoleIDs" => [$adminRole["roleID"], $moderatorRole["roleID"]],
+            ])
+            ->getBody();
+        $this->assertCount(2, $leaders);
     }
 
     /**
@@ -248,5 +260,72 @@ class UserPointsTest extends SiteTestCase
             ])
             ->getBody();
         $this->assertCount(0, $leaders);
+    }
+
+    /**
+     * Test the `/users/leaders` API endpoint with included/excluded role IDs.
+     */
+    public function testLeadersIncludeExcludeRoles()
+    {
+        // Create 2 new roles for our testing purpose.
+        $roleAID = $this->createRole()["roleID"];
+        $roleBID = $this->createRole()["roleID"];
+
+        // Create 3 users: UserA with role 1, UserB with role 1 & 2, UserC with role 2
+        $userA = $this->createUser(["roleID" => [$roleAID]]);
+        $userB = $this->createUser(["roleID" => [$roleAID, $roleBID]]);
+        $userC = $this->createUser(["roleID" => [$roleBID]]);
+
+        // Give points to users: 50 to UserA, 100 to UserB & 150 to UserC.
+        $this->givePoints($userA, 50);
+        $this->givePoints($userB, 100);
+        $this->givePoints($userC, 150);
+
+        // Default API call parameters.
+        $defaultApiParams = [
+            "leaderboardType" => "reputation",
+            "slotType" => "a",
+        ];
+
+        // Get leaderboard without filters
+        $noFilterResults = $this->api()
+            ->get("/users/leaders", $defaultApiParams)
+            ->getBody();
+        // Assert that all 3 results are returned & results are returned as follow: userC, userB, userA.
+        $this->assertCount(3, $noFilterResults);
+        $this->assertArraySubsetRecursive(
+            [["userID" => $userC["userID"]], ["userID" => $userB["userID"]], ["userID" => $userA["userID"]]],
+            $noFilterResults
+        );
+
+        // Get leaderboard with only the users with roleA.
+        $roleAResults = $this->api()
+            ->get("/users/leaders", $defaultApiParams + ["includedRoleIDs" => [$roleAID]])
+            ->getBody();
+        // Assert that only 2 results are returned & results are returned as follow: userB, userA.
+        $this->assertCount(2, $roleAResults);
+        $this->assertArraySubsetRecursive(
+            [["userID" => $userB["userID"]], ["userID" => $userA["userID"]]],
+            $roleAResults
+        );
+
+        // Get leaderboard with only the users with roleA or roleB, excluding users with roleB.
+        $roleANoroleBResults = $this->api()
+            ->get(
+                "/users/leaders",
+                $defaultApiParams + ["includedRoleIDs" => [$roleAID, $roleBID], "excludedRoleIDs" => $roleBID]
+            )
+            ->getBody();
+        // Assert that only userA is returned.
+        $this->assertCount(1, $roleANoroleBResults);
+        $this->assertArraySubsetRecursive([["userID" => $userA["userID"]]], $roleANoroleBResults);
+
+        // Get leaderboard excluding users with roleB.
+        $noroleBResults = $this->api()
+            ->get("/users/leaders", $defaultApiParams + ["excludedRoleIDs" => $roleBID])
+            ->getBody();
+        // Assert that only userA is returned.
+        $this->assertCount(1, $noroleBResults);
+        $this->assertArraySubsetRecursive([["userID" => $userA["userID"]]], $noroleBResults);
     }
 }

@@ -70,7 +70,9 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
         $query = new UserLeaderQuery(
             $this->props["apiParams"]["slotType"],
             $this->props["apiParams"]["categoryID"] ?? null,
-            $this->props["apiParams"]["limit"]
+            $this->props["apiParams"]["limit"],
+            $this->props["apiParams"]["includedRoleIDs"] ?? null,
+            $this->props["apiParams"]["excludedRoleIDs"] ?? null
         );
         $users = $this->userLeaderService->getLeaders($query);
         if (count($users) === 0) {

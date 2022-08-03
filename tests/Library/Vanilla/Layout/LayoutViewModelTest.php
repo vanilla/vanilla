@@ -141,4 +141,34 @@ class LayoutViewModelTest extends SiteTestCase
         $this->assertSame(1, count($result));
         $this->assertSame(2, count($result[0]["record"]));
     }
+
+    /**
+     * Test correcting the default layoutView row.
+     */
+    public function testCorrectDefaultView(): void
+    {
+        $this->resetTable("layoutView");
+
+        $database = Gdn::database();
+
+        // Insert the old (bad) default row.
+        $database->sql()->insert("layoutView", [
+            "layoutViewID" => 1,
+            "layoutID" => 1,
+            "recordID" => 0,
+            "recordType" => "global",
+            "layoutViewType" => "global",
+            "insertUserID" => 2,
+            "dateInserted" => date("Y-m-d H:i:s"),
+            "updateUserID" => 2,
+            "dateUpdated" => date("Y-m-d H:i:s"),
+        ]);
+
+        // Run structure
+        LayoutViewModel::structure($database);
+
+        // The default row's layoutID should now be "home"
+        $viewRow = $this->layoutViewModel->selectSingle(["layoutViewID" => 1]);
+        $this->assertSame("home", $viewRow["layoutID"]);
+    }
 }

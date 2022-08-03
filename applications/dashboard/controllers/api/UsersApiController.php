@@ -1020,25 +1020,21 @@ class UsersApiController extends AbstractApiController
             "excludedRoleIDs?" => \Vanilla\Schema\RangeExpression::createSchema([":int"]),
         ])->validate($query);
 
-        $includedUserIDs = [];
-        if (isset($query["includedRoleIDs"])) {
-            $includedRoleIDS = $query["includedRoleIDs"]->getValue("=");
-            $includedUsers = $this->userModel->getByRole($includedRoleIDS)->resultArray();
-            $includedUserIDs = array_column($includedUsers, "UserID");
-        }
-        $excludedUserIDs = [];
-        if (isset($query["excludedRoleIDs"])) {
-            $excludedRoleIDS = $query["excludedRoleIDs"]->getValue("=");
-            $excludedUsers = $this->userModel->getByRole($excludedRoleIDS)->resultArray();
-            $excludedUserIDs = array_column($excludedUsers, "UserID");
+        $categoryID = $query["categoryID"] ?? null;
+        $userLeaderService = Gdn::getContainer()->get(UserLeaderService::class);
+        // If we want a leaderboard for a specific category but the separate tracking of points isn't enabled, throw an error.
+        if (!is_null($categoryID) && !$userLeaderService->isTrackPointsSeparately()) {
+            throw new ClientException(
+                "To filter by category, you need to enable the 'Track Points Separately' feature."
+            );
         }
 
         $query = new UserLeaderQuery(
             $query["slotType"] ?? UserPointsModel::SLOT_TYPE_ALL,
             $query["categoryID"] ?? null,
             $query["limit"] ?? null,
-            $includedUserIDs,
-            $excludedUserIDs,
+            isset($query["includedRoleIDs"]) ? (array) $query["includedRoleIDs"]->getValue("=") : null,
+            isset($query["excludedRoleIDs"]) ? (array) $query["excludedRoleIDs"]->getValue("=") : null,
             $query["leaderboardType"] ?? UserLeaderService::LEADERBOARD_TYPE_REPUTATION
         );
         $userLeaderService = Gdn::getContainer()->get(UserLeaderService::class);

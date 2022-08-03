@@ -201,7 +201,7 @@ class WebpackAssetProvider
             $this->enabledAddonKeys = ["library"];
             foreach ($this->addonManager->getEnabled() as $addon) {
                 $addon = $this->checkReplacePreview($addon);
-                $this->enabledAddonKeys[] = $addon->getKey();
+                $this->enabledAddonKeys[] = strtolower($addon->getKey());
             }
         }
         return $this->enabledAddonKeys;

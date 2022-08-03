@@ -367,7 +367,7 @@ class LayoutViewModel extends FullRecordCacheModel
             ->set($explicit, $drop);
         $default = [
             "layoutViewID" => 1,
-            "layoutID" => 1,
+            "layoutID" => "home",
             "recordID" => 0,
             "recordType" => "global",
             "layoutViewType" => "global",
@@ -383,6 +383,14 @@ class LayoutViewModel extends FullRecordCacheModel
 
         if ($insertDefault) {
             $sql->insert(self::TABLE_NAME, $default);
+        }
+
+        $fixDefault =
+            $database->structure()->tableExists(self::TABLE_NAME) &&
+            $sql->getWhere(self::TABLE_NAME, ["layoutViewID" => 1, "layoutID" => 1, "recordID" => 0])->numRows() == 1;
+
+        if ($fixDefault) {
+            $sql->update(self::TABLE_NAME, ["layoutID" => "home"], ["layoutViewID" => 1])->put();
         }
     }
     /**

@@ -93,8 +93,16 @@ class UserLeaderService
         $query->pointsCategoryID = $pointsCategory["CategoryID"] ?? 0;
 
         // We add moderators' user IDs to the excluded user IDs.
-        $moderatorIDs = $this->getModeratorIDs();
-        $query->excludedUserIDs = array_merge($query->excludedUserIDs, $moderatorIDs);
+        if (empty($query->excludedRoleIDs)) {
+            $moderatorRoleIDs = $this->getModeratorRoleIDs();
+            if (!empty($query->includedRoleIDs)) {
+                $moderatorRoleIDs = array_filter($moderatorRoleIDs, function ($id) use ($query) {
+                    // Don't automatically add moderator's role ids if they weren't explicitly included.
+                    return !in_array($id, $query->includedRoleIDs);
+                });
+            }
+            $query->excludedRoleIDs = $moderatorRoleIDs;
+        }
 
         foreach ($this->providers as $provider) {
             if ($provider->canHandleQuery($query)) {
@@ -183,7 +191,7 @@ class UserLeaderService
      *
      * @return array
      */
-    private function getModeratorIDs(): array
+    private function getModeratorRoleIDs(): array
     {
         $excludePermission = $this->config->get(self::CONF_EXCLUDE_PERMISSIONS);
         if (!$excludePermission) {
@@ -210,11 +218,14 @@ class UserLeaderService
             }
         }
 
-        if (!empty($moderatorRoleIDs)) {
-            $moderators = $this->userModel->getByRole($moderatorRoleIDs)->resultArray();
-            $moderatorIDs = array_column($moderators, "UserID");
-        }
+        return $moderatorRoleIDs;
+    }
 
-        return $moderatorIDs;
+    /**
+     * @return bool
+     */
+    public function isTrackPointsSeparately(): bool
+    {
+        return \Gdn::config("Plugins.Reactions.TrackPointsSeparately", false);
     }
 }

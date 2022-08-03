@@ -270,13 +270,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         \Gdn::config()->touch("QnA.Points.Enabled", false);
         \Gdn::config()->touch("QnA.Points.Answer", 1);
         \Gdn::config()->touch("QnA.Points.AcceptedAnswer", 1);
-
-        // Create this plugin's default statuses to insert into the recordStatus table.
-        foreach (self::DEFAULT_STATUSES as $default) {
-            $this->recordStatusModel->processDefaultStatuses($this->database, $default, true);
-        }
-
-        $this->recordStatusModel->structureActiveStates();
     }
 
     /**
@@ -309,6 +302,11 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     public function structure()
     {
         include __DIR__ . "/structure.php";
+        // Create this plugin's default statuses to insert into the recordStatus table.
+        foreach (self::DEFAULT_STATUSES as $default) {
+            $this->recordStatusModel->processDefaultStatuses($this->database, $default, true);
+        }
+        $this->recordStatusModel->structureActiveStates();
         \Gdn::config()->touch([
             "Preferences.Email.AnswerAccepted" => 1,
             "Preferences.Popup.AnswerAccepted" => 1,

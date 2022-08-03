@@ -190,9 +190,10 @@ components:
                     description: |
                         The banner title appears on your site's banner and in your browser's title bar.
                     type: string
-                    default: ""
+                    default: "Vanilla"
                     example: Support Community
-                    maxLength: 50
+                    minLength: 1
+                    maxLength: 20
                     x-key: Garden.Title
                     x-read: public
                     x-write: community.manage

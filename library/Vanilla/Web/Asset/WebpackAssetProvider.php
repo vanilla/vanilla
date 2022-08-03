@@ -191,6 +191,18 @@ class WebpackAssetProvider
     }
 
     /**
+     * Get the embed asset.
+     *
+     * @return WebpackAsset
+     */
+    public function getEmbedAsset(): WebpackAsset
+    {
+        $collection = $this->getCollectionForSection("embed");
+        $assets = $collection->createAssets($this->request, [], "js");
+        return $assets[0];
+    }
+
+    /**
      * Get the enabled addon keys.
      *
      * @return string[]

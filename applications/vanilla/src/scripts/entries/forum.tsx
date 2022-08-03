@@ -27,6 +27,7 @@ import { CategoriesWidget } from "@library/categoriesWidget/CategoriesWidget";
 import { RSSWidget } from "@library/rssWidget/RSSWidget";
 import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
 import { DiscussionsWidget } from "@library/features/discussions/DiscussionsWidget";
+import { onReady } from "@library/utility/appUtils";
 
 registerReducer("forum", forumReducer);
 registerCommunitySearchDomain();
@@ -50,4 +51,6 @@ addComponent("UserSpotlightWidget", UserSpotlightWidget, { overwrite: true });
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();
-triggerLegacyHashScrolling();
+onReady(() => {
+    triggerLegacyHashScrolling();
+});

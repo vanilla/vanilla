@@ -261,7 +261,7 @@ abstract class Gdn_SQLDriver
 
         // Try and split an operator out of $Field.
         $fieldOpRegex =
-            "/(?:\s*(=|<>|>|<|>=|<=)\s*$)|\s+(like|not\s+like)\s*$|\s+(?:(is)\s+(null)|(is\s+not)\s+(null))\s*$/i";
+            "/(?:\s*(=|<>|>|<|>=|<=)\s*$)|\s+(in|not\s+in)\s*$|\s+(like|not\s+like)\s*$|\s+(?:(is)\s+(null)|(is\s+not)\s+(null))\s*$/i";
         $split = preg_split($fieldOpRegex, $field, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
         if (count($split) > 1) {
             $field = $split[0];
@@ -2555,7 +2555,7 @@ abstract class Gdn_SQLDriver
      * in (1,2,3)" query. Concatenated with AND.
      *
      * @param string $field The field to search in for $values.
-     * @param array $values An array of values to look for in $field.
+     * @param array|string $values An array of values to look for in $field.
      * @param bool $escape Whether or not to escape individual values.
      * @return $this
      * @deprecated

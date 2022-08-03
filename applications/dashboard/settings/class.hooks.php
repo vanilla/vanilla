@@ -15,6 +15,7 @@ use Garden\Web\Exception\ClientException;
 use Vanilla\Dashboard\Modules\CommunityLeadersModule;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Contracts;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Utility\ContainerUtils;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -270,7 +271,9 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             // $Sender->addDefinition('MasterView', $Sender->MasterView);
             $sender->addDefinition("InDashboard", $sender->MasterView == "admin" ? "1" : "0");
 
-            if ($embed === 2) {
+            if (FeatureFlagHelper::featureEnabled("newEmbedSystem")) {
+                // New embed system assets go through webpack.
+            } elseif ($embed === 2) {
                 $sender->addJsFile("vanilla.embed.local.js");
             } else {
                 $sender->addJsFile("embed_local.js");

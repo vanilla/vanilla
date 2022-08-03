@@ -22,7 +22,7 @@ class NotFoundException extends ClientException
     public function __construct($message = "Page", array $context = [], ?\Throwable $previous = null)
     {
         if (!empty($message) && strpos($message, " ") === false) {
-            $message = sprintf("%s not found.", $message);
+            $message = sprintf(t("%s not found."), $message);
         }
 
         parent::__construct($message, 404, $context, $previous);

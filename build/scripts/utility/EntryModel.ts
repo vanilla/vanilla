@@ -122,7 +122,7 @@ export default class EntryModel {
                         /* webpackChunkName: "addons/${addonName}-common" */
                         /* webpackPreload: true */
                         "${commonEntry.entryPath}"
-                    )`,
+                    ).catch(e => console.error("Error loading javascript for addon '${addonName}'", e))`,
                 );
             }
 
@@ -135,7 +135,7 @@ export default class EntryModel {
                         /* webpackChunkName: "addons/${addonName}" */
                         /* webpackPreload: true */
                         "${entry.entryPath}"
-                    )`,
+                    ).catch(e => console.error("Error loading javascript for addon '${addonName}'", e))`,
                 );
             }
 
@@ -165,12 +165,6 @@ Promise.all(addonPromises).then((resolved) => {
     console.log("addon dependencies loaded", resolved.length);
     bootstrapVanilla();
 });
-
-
-// Handle webpack hot reloads.
-if (import.meta.webpackHot?.accept) {
-    import.meta.webpackHot?.accept();
-}
         `;
 
         // Create the dynamic entry directory if it doesn't exist.

@@ -606,7 +606,7 @@ export class Mixins {
                           [cssProperty]: mergedColors.visited?.toString(),
                           ...textDecoration,
                       }
-                    : { undefined },
+                    : (undefined as any),
             };
 
             const final = {

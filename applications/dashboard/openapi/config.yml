@@ -190,9 +190,10 @@ components:
                     description: |
                         The banner title appears on your site's banner and in your browser's title bar.
                     type: string
-                    default: ""
+                    default: "Vanilla"
                     example: Support Community
-                    maxLength: 50
+                    minLength: 1
+                    maxLength: 20
                     x-key: Garden.Title
                     x-read: public
                     x-write: community.manage
@@ -308,6 +309,42 @@ components:
                     x-key: Feature.NewPostMenu.Enabled
                     x-read: public
                     x-write: site.manage
+                "labs.newEmbedSystem":
+                    description: |
+                        Enable the new embed system beta.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.newEmbedSystem.Enabled
+                    x-read: public
+                    x-write: site.manage
+                "embed.enabled":
+                    description: |
+                        Allow the site to be embedded at the embed.remoteUrl.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Garden.Embed.Allow
+                    x-write: site.manage
+                    x-read: site.manage
+                "embed.remoteUrl":
+                    description: |
+                        Configure the remote embed URL for the site.
+                    type: string
+                    default: ""
+                    example: "https://my-site.com/forum"
+                    x-key: Garden.Embed.RemoteUrl
+                    x-write: site.manage
+                    x-read: site.manage
+                "embed.forceEmbed":
+                    description: |
+                        Redirect users from the non-embedded site to the embedded site.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Garden.Embed.ForceModernEmbed
+                    x-write: site.manage
+                    x-read: site.manage
                 "discussions.layout":
                     description: |
                         Choose the preferred layout for lists of discussions.

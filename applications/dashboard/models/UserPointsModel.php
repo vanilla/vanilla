@@ -63,17 +63,8 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface
      */
     public function getLeaders(UserLeaderQuery $query): array
     {
-        $args = [
-            $query->slotType,
-            $query->timeSlot,
-            $query->pointsCategoryID,
-            $query->limit,
-            $query->includedUserIDs,
-            $query->excludedUserIDs,
-        ];
-
         $leaderData = $this->modelCache->getCachedOrHydrate(
-            $args,
+            [$query],
             [$this, "queryLeaders"],
             [
                 \Gdn_Cache::FEATURE_EXPIRY => $this->config->get(
@@ -89,46 +80,61 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface
     /**
      * Query the top userIDs in the leaderboard.
      *
-     * @param string $slotType
-     * @param string $timeSlot
-     * @param int $categoryID
-     * @param int $limit
-     * @param int[] $includedUserIDs
-     * @param int[] $excludedUserIDs
+     * @param UserLeaderQuery $query
      *
      * @return int[]
      */
-    public function queryLeaders(
-        string $slotType,
-        string $timeSlot,
-        int $categoryID,
-        int $limit,
-        array $includedUserIDs = [],
-        array $excludedUserIDs = []
-    ) {
-        $sql = $this->createSql();
-        $sql->select(["up.SlotType", "up.TimeSlot", "up.Source", "up.UserID", "up.Points"])
+    public function queryLeaders(UserLeaderQuery $query)
+    {
+        $roleSubQuery = $this->getAllowedRolesSubquery($query);
+
+        $leaderQuery = $this->createSql()
+            ->select(["up.SlotType", "up.TimeSlot", "up.Source", "up.UserID", "up.Points"])
             ->from("UserPoints up")
             ->join("User u", "up.UserID = u.UserID and u.Banned != 1")
             ->where([
-                "up.TimeSlot" => $timeSlot,
-                "up.SlotType" => $slotType,
+                "up.TimeSlot" => $query->timeSlot,
+                "up.SlotType" => $query->slotType,
                 "up.Source" => "Total",
-                "up.CategoryID" => $categoryID,
+                "up.CategoryID" => $query->pointsCategoryID,
                 "up.Points > " => 0,
-            ])
-            ->orderBy("up.Points", "desc")
-            ->limit($limit);
-
-        if (!empty($includedUserIDs)) {
-            $sql->whereIn("up.UserID", $includedUserIDs);
-        }
-        if (!empty($excludedUserIDs)) {
-            $sql->whereNotIn("up.UserID", $excludedUserIDs);
+            ]);
+        if ($roleSubQuery !== null) {
+            $leaderQuery = $leaderQuery->where("`up`.`UserID` in", "({$roleSubQuery->getSelect(true)})", false, false);
         }
 
-        $results = $sql->get()->resultArray();
+        $leaderQuery = $leaderQuery->orderBy("up.Points", "desc")->limit($query->limit);
+
+        $results = $leaderQuery->get()->resultArray();
         return $results;
+    }
+
+    /**
+     * Get the allowed roleIDs for our query.
+     *
+     * @return \Gdn_SQLDriver|null Returns null if we have no filter.
+     */
+    private function getAllowedRolesSubquery(UserLeaderQuery $leaderQuery): ?\Gdn_SQLDriver
+    {
+        if (empty($leaderQuery->includedRoleIDs) && empty($leaderQuery->excludedRoleIDs)) {
+            return null;
+        }
+
+        $subQuery = $this->createSql()
+            ->select("UserID")
+            ->from("UserRole");
+        if (!empty($leaderQuery->excludedRoleIDs)) {
+            $notSubQuery = $this->createSql()
+                ->select("UserID")
+                ->from("UserRole")
+                ->where("RoleID", $leaderQuery->excludedRoleIDs);
+            $subQuery = $subQuery->where("`UserID` not in", "({$notSubQuery->getSelect(true)})", false, false);
+        }
+
+        if (!empty($leaderQuery->includedRoleIDs)) {
+            $subQuery->where("RoleID", $leaderQuery->includedRoleIDs);
+        }
+        return $subQuery;
     }
 
     /**

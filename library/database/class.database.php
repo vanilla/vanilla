@@ -540,14 +540,15 @@ class Gdn_Database implements InjectableInterface
                     // Rethrow.
                     throw $uex;
                 } catch (PDOException $pex) {
-                    [$state, $code, $message] = $pex->errorInfo;
+                    $code = $pex->errorInfo[1] ?? $pex->getCode();
+                    $message = $pex->errorInfo[2] ?? $pex->getMessage();
 
                     // Detect mysql "server has gone away" and try to reconnect.
                     if ($code == 2006 && $try < $tries) {
                         $this->closeConnection();
                         continue;
                     } else {
-                        throw new Gdn_UserException($message, $code);
+                        throw new Gdn_UserException($message, $code, $pex);
                     }
                 } catch (Exception $ex) {
                     $errorInfo = $pDO->errorInfo();

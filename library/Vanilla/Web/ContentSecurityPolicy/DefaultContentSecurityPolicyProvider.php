@@ -63,12 +63,12 @@ class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProvi
             $trusteddDomains = is_string($whitelist) ? array_filter(explode("\n", $whitelist)) : [];
             if (count($trusteddDomains) > 0) {
                 $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, implode(" ", $trusteddDomains));
-            } else {
-                $remoteUrl = $this->config->get("Garden.Embed.RemoteUrl", false);
-                $remoteDomain = is_string($remoteUrl) ? parse_url($remoteUrl, PHP_URL_HOST) : false;
-                if (is_string($remoteDomain)) {
-                    $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, $remoteDomain);
-                }
+            }
+
+            $remoteUrl = $this->config->get("Garden.Embed.RemoteUrl", false);
+            $remoteDomain = is_string($remoteUrl) ? parse_url($remoteUrl, PHP_URL_HOST) : false;
+            if (is_string($remoteDomain)) {
+                $scriptSrcPolicies[] = new Policy(Policy::FRAME_ANCESTORS, $remoteDomain);
             }
         }
         return $scriptSrcPolicies;

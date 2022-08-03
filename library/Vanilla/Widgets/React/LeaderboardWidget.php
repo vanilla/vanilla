@@ -71,20 +71,12 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
      */
     public function getProps(): ?array
     {
-        // Converting includedRolesIDs to includedUserIDs.
-        $includedUsers = $this->userModel->getByRole($this->props["apiParams"]["includedRoleIDs"])->resultArray();
-        $includedUserIDs = array_column($includedUsers, "UserID");
-
-        // Converting excludedRolesIDs to excludedUserIDs.
-        $excludedUsers = $this->userModel->getByRole($this->props["apiParams"]["excludedRoleIDs"])->resultArray();
-        $excludedUserIDs = array_column($excludedUsers, "UserID");
-
         $query = new UserLeaderQuery(
             $this->props["apiParams"]["slotType"],
             $this->props["apiParams"]["categoryID"] ?? null,
             $this->props["apiParams"]["limit"],
-            $includedUserIDs,
-            $excludedUserIDs
+            $this->props["apiParams"]["includedRoleIDs"] ?? null,
+            $this->props["apiParams"]["excludedRoleIDs"] ?? null
         );
         $users = $this->userLeaderService->getLeaders($query);
         if (count($users) === 0) {

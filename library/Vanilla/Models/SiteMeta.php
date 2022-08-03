@@ -14,6 +14,7 @@ use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Search\SearchService;
 use Vanilla\Site\OwnSite;
@@ -340,6 +341,7 @@ class SiteMeta implements \JsonSerializable
         }, array_merge($this->extraMetas, $localizedExtraMetas));
 
         $embedAllowValue = $this->config->get("Garden.Embed.Allow", false);
+        $hasNewEmbed = FeatureFlagHelper::featureEnabled("newEmbedSystem");
         return array_replace_recursive(
             [
                 "context" => [
@@ -356,7 +358,10 @@ class SiteMeta implements \JsonSerializable
                 ],
                 "embed" => [
                     "enabled" => (bool) $embedAllowValue,
-                    "isAdvancedEmbed" => $embedAllowValue == 2,
+                    "isAdvancedEmbed" => !$hasNewEmbed && $embedAllowValue === 2,
+                    "isModernEmbed" => $hasNewEmbed,
+                    "forceModernEmbed" => (bool) $this->config->get("Garden.Embed.ForceModernEmbed", false),
+                    "remoteUrl" => $this->config->get("Garden.Embed.RemoteUrl", null),
                 ],
                 "ui" => [
                     "siteName" => $this->siteTitle,

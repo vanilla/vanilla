@@ -11,6 +11,7 @@ import webpack, { Configuration, Stats } from "webpack";
 import WebpackDevServer, { Configuration as DevServerConfiguration, ServerConfiguration } from "webpack-dev-server";
 import { BuildMode, getOptions, IBuildOptions } from "./buildOptions";
 import { makeDevConfig } from "./configs/makeDevConfig";
+import { makeEmbedConfig } from "./configs/makeEmbedConfig";
 import { makePolyfillConfig } from "./configs/makePolyfillConfig";
 import { makeProdConfig } from "./configs/makeProdConfig";
 import { DIST_ROOT_DIRECTORY, VANILLA_ROOT } from "./env";
@@ -81,6 +82,8 @@ export default class Builder {
             makePolyfillConfig(this.entryModel),
         ]);
 
+        configs.push(makeEmbedConfig(true));
+
         // Running the builds individually is actually faster since webpack 5
         // We can parellize many function per build and saturate the CPU.
         // This also lets you see individual sections errors faster.
@@ -100,8 +103,10 @@ export default class Builder {
         return new Promise<void>((resolve) => {
             const compiler = webpack(config as Configuration);
             compiler.run((err: Error, stats: Stats) => {
-                if (err || stats.hasErrors()) {
+                if (stats?.hasErrors()) {
                     print(stats.toString(this.statOptions));
+                }
+                if (err) {
                     fail(`\nThe build encountered an error: ${err}`);
                 }
 
@@ -170,6 +175,7 @@ ${chalk.yellowBright("$Configuration['HotReload']['Enabled'] = true;")}`);
                 return sectionConfig;
             }),
         );
+        config.push(makeEmbedConfig(false));
         const compiler = webpack(config);
 
         const server = new WebpackDevServer(devServerOptions, compiler as any);

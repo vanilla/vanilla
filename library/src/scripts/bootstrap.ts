@@ -27,6 +27,7 @@ import "@library/VanillaGlobals";
 import "@library/gdn";
 import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
 import { loadThemeShadowDom } from "@library/theming/loadThemeShadowDom";
+import { initModernEmbed } from "@library/embed/modernEmbed.local";
 
 export function bootstrapVanilla() {
     performance.mark("Bootstrap - Start");
@@ -58,6 +59,8 @@ export function bootstrapVanilla() {
             return;
         }
     });
+
+    initModernEmbed();
 
     /**
      * Newer (react) pages do not load JQuery which is used to reveal content

@@ -8,6 +8,9 @@
  * @since 2.0.18
  */
 
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Web\TwigStaticRenderer;
+
 /**
  * Handles /embed endpoint.
  */
@@ -31,6 +34,9 @@ class EmbedController extends DashboardController
     {
         parent::initialize();
         Gdn_Theme::section("Settings");
+        if (FeatureFlagHelper::featureEnabled("newEmbedSystem") && \Gdn::request()->getPath() !== "/embed/forum") {
+            redirectTo("embed/forum");
+        }
     }
 
     /**
@@ -54,6 +60,14 @@ class EmbedController extends DashboardController
     {
         $this->permission("Garden.Settings.Manage");
 
+        $this->setHighlightRoute("embed/forum");
+        $this->title("Embed Community");
+        if (FeatureFlagHelper::featureEnabled("newEmbedSystem")) {
+            $this->setData("component", "ModernEmbedSettings");
+            $this->renderReact();
+            return;
+        }
+
         try {
             if ($this->toggle($toggle, $transientKey)) {
                 redirectTo("embed/forum");
@@ -62,8 +76,6 @@ class EmbedController extends DashboardController
             $this->Form->addError($ex);
         }
 
-        $this->setHighlightRoute("embed/forum");
-        $this->title("Embed Forum");
         $this->render();
     }
 

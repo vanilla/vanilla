@@ -8,7 +8,6 @@ const ReactRefreshPlugin = require("@pmmmwh/react-refresh-webpack-plugin");
 import webpack, { Configuration } from "webpack";
 import { makeBaseConfig } from "./makeBaseConfig";
 import EntryModel from "../utility/EntryModel";
-import { getOptions } from "../buildOptions";
 
 /**
  * Create the development config. Eg. Hot build.

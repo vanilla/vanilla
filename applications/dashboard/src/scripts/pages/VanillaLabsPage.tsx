@@ -18,6 +18,7 @@ import React from "react";
 import { MemoryRouter } from "react-router";
 import { CustomLayoutLabItem } from "@dashboard/labs/CustomLayoutLabItem";
 import Translate from "@library/content/Translate";
+import { NewEmbedSystemLabItem } from "@dashboard/labs/NewEmbedSystemLabItem";
 
 export function VanillaLabsPage() {
     return (
@@ -34,6 +35,7 @@ export function VanillaLabsPage() {
                     <NewSearchPageLabItem />
                     <NewQuickLinksLabItem />
                     <NewPostMenuLabItem />
+                    <NewEmbedSystemLabItem />
                 </AddonList>
             </div>
             <DashboardHelpAsset>

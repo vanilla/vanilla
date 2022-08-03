@@ -144,15 +144,6 @@ export const globalCSS = useThemeCache(() => {
             },
         },
     });
-
-    injectGlobal({
-        [`input:-webkit-search-decoration,
-        input:-webkit-search-cancel-button,
-        input:-webkit-search-results-button,
-        input:-webkit-search-results-decoration`]: {
-            display: "none",
-        },
-    });
 });
 
 export const fullBackgroundClasses = useThemeCache((isRootPage = false) => {

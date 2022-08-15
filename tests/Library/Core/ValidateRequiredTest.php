@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateRequired().
  */
 
-class ValidateRequiredTest extends TestCase {
-
+class ValidateRequiredTest extends TestCase
+{
     /**
      * Test {@link validateRequired()} against several scenarios.
      *
@@ -23,7 +23,8 @@ class ValidateRequiredTest extends TestCase {
      * @param bool $expected The expected result.
      * @dataProvider provideTestValidateRequiredArrays
      */
-    public function testValidateRequired($testValue, $testField, $expected) {
+    public function testValidateRequired($testValue, $testField, $expected)
+    {
         $actual = validateRequired($testValue, $testField);
         $this->assertSame($expected, $actual);
     }
@@ -33,66 +34,35 @@ class ValidateRequiredTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestValidateRequiredArrays() {
+    public function provideTestValidateRequiredArrays()
+    {
         $r = [
-            'valueEmptyString' => [
-                '',
-                null,
-                false,
-            ],
-            'emptyStringDefaultAlsoEmptyString' => [
-                '',
-                ['Default' => ''],
+            "valueEmptyString" => ["", null, false],
+            "emptyStringDefaultAlsoEmptyString" => ["", ["Default" => ""], true],
+            "valueIsArray" => [["foo", "bar"], null, true],
+            "valueIsInt" => [5, null, true],
+            "valueIsString" => ["fooBar", null, true],
+            "valueIsBool" => [true, null, false],
+            "valueIsEmptyStringFieldIsArrayObjectWithEnumTrue" => [
+                "",
+                new \ArrayObject(["Enum" => ["", "declined", "given", "pending"]], \ArrayObject::ARRAY_AS_PROPS),
                 true,
             ],
-            'valueIsArray' => [
-                ['foo', 'bar'],
-                null,
+            "valueIsEmptyStringFieldIsArrayWithEnumTrue" => [
+                "",
+                ["Enum" => ["", "declined", "given", "pending"]],
                 true,
             ],
-            'valueIsInt' => [
-                5,
-                null,
-                true,
-            ],
-            'valueIsString' => [
-                'fooBar',
-                null,
-                true,
-            ],
-            'valueIsBool' => [
-                true,
-                null,
-                false,
-            ],
-            'valueIsEmptyStringFieldIsArrayObjectWithEnumTrue' => [
-                '',
-                new \ArrayObject(['Enum' => [
-                    '',
-                    'declined',
-                    'given',
-                    'pending',
-                    ]], \ArrayObject::ARRAY_AS_PROPS),
-                true,
-            ],
-            'valueIsEmptyStringFieldIsArrayWithEnumTrue' => [
-                '',
-                ['Enum' => [
-                    '',
-                    'declined',
-                    'given',
-                    'pending',
-                ]],
-                true,
-            ],
-            'valueIsEmptyStringFieldIsArrayObjectWithEnumFalse' => [
-                '',
-                new \ArrayObject(array('Enum' => array (
-                    0 => 'foo',
-                    1 => 'declined',
-                    2 => 'given',
-                    3 => 'pending',
-                ))),
+            "valueIsEmptyStringFieldIsArrayObjectWithEnumFalse" => [
+                "",
+                new \ArrayObject([
+                    "Enum" => [
+                        0 => "foo",
+                        1 => "declined",
+                        2 => "given",
+                        3 => "pending",
+                    ],
+                ]),
                 false,
             ],
         ];

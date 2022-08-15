@@ -7,6 +7,7 @@
 
 namespace Vanilla\Site;
 
+use Garden\Schema\Schema;
 use Gdn_Router;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Site\SiteSectionChildIDProviderInterface;
@@ -14,14 +15,15 @@ use Vanilla\Contracts\Site\SiteSectionCounterInterface;
 use Vanilla\Contracts\Site\SiteSectionCountStasherInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Vanilla\Forms\FieldMatchConditional;
 use VanillaTests\Fixtures\MockSiteSectionProvider;
 
 /**
  * Class SiteSectionModel
  * @package Vanilla\Site
  */
-class SiteSectionModel implements SiteSectionChildIDProviderInterface {
-
+class SiteSectionModel implements SiteSectionChildIDProviderInterface
+{
     /** @var SiteSectionProviderInterface[] $providers */
     private $providers = [];
 
@@ -55,7 +57,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      * @param ConfigurationInterface $config
      * @param Gdn_Router $router
      */
-    public function __construct(ConfigurationInterface $config, Gdn_Router $router) {
+    public function __construct(ConfigurationInterface $config, Gdn_Router $router)
+    {
         $this->defaultSiteSection = new DefaultSiteSection($config, $router);
     }
 
@@ -64,14 +67,18 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      *
      * @param SiteSectionProviderInterface $provider
      */
-    public function addProvider(SiteSectionProviderInterface $provider) {
+    public function addProvider(SiteSectionProviderInterface $provider)
+    {
         foreach ($this->providers as $existingProvider) {
-            if (get_class($provider) === get_class($existingProvider) && !($provider instanceof MockSiteSectionProvider)) {
+            if (
+                get_class($provider) === get_class($existingProvider) &&
+                !($provider instanceof MockSiteSectionProvider)
+            ) {
                 return;
             }
         }
         $this->providers[] = $provider;
-        if (!empty($current = $provider->getCurrentSiteSection())) {
+        if (!empty(($current = $provider->getCurrentSiteSection()))) {
             $this->currentSiteSection = $current;
         }
     }
@@ -81,7 +88,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      *
      * @param SiteSectionCounterInterface $counter
      */
-    public function addCounter(SiteSectionCounterInterface $counter) {
+    public function addCounter(SiteSectionCounterInterface $counter)
+    {
         foreach ($this->siteSectionCounters as $existingCounter) {
             if (get_class($counter) === get_class($existingCounter)) {
                 return;
@@ -96,7 +104,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      *
      * @param SiteSectionChildIDProviderInterface $idProvider
      */
-    public function addChildIDProvider(SiteSectionChildIDProviderInterface $idProvider) {
+    public function addChildIDProvider(SiteSectionChildIDProviderInterface $idProvider)
+    {
         foreach ($this->siteSectionChildIDProviders as $existingCounter) {
             if (get_class($idProvider) === get_class($existingCounter)) {
                 return;
@@ -113,7 +122,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      * @param array $route Array should contain Destination and Type.
      *          eg: ['Destination' => 'discussions', 'Type' => 'Internal', 'ImageUrl' => 'layout.png']
      */
-    public function addDefaultRoute(string $name, array $route) {
+    public function addDefaultRoute(string $name, array $route)
+    {
         $this->defaultRoutes[$name] = $route;
     }
 
@@ -122,7 +132,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      *
      * @return array
      */
-    public function getDefaultRoutes(): array {
+    public function getDefaultRoutes(): array
+    {
         return $this->defaultRoutes;
     }
 
@@ -131,13 +142,14 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      *
      * @return array
      */
-    public function getLayoutOptions(): array {
+    public function getLayoutOptions(): array
+    {
         $layouts = [
-            'discussions' => 'Discussions',
-            'categories' => 'Categories'
+            "discussions" => "Discussions",
+            "categories" => "Categories",
         ];
         foreach ($this->defaultRoutes as $name => $route) {
-            $layouts[$route['Destination']] = $name;
+            $layouts[$route["Destination"]] = $name;
         }
         return $layouts;
     }
@@ -147,7 +159,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      * @param string $sectionGroupKey The name of the section group to check.
      * @return SiteSectionInterface[]
      */
-    public function getForSectionGroup(string $sectionGroupKey): array {
+    public function getForSectionGroup(string $sectionGroupKey): array
+    {
         $siteSections = [];
         foreach ($this->getAll() as $siteSection) {
             if ($siteSection->getSectionGroup() === $sectionGroupKey) {
@@ -163,7 +176,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      * @param string $siteSectionID
      * @return SiteSectionInterface|null
      */
-    public function getByID(string $siteSectionID): ?SiteSectionInterface {
+    public function getByID(string $siteSectionID): ?SiteSectionInterface
+    {
         foreach ($this->getAll() as $siteSection) {
             if ($siteSection->getSectionID() === $siteSectionID) {
                 return $siteSection;
@@ -177,7 +191,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      *
      * @return SiteSectionInterface[]
      */
-    public function getAll(): array {
+    public function getAll(): array
+    {
         if (empty($this->siteSections)) {
             $this->siteSections = [];
             foreach ($this->providers as $provider) {
@@ -202,7 +217,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      * @param string $basePath
      * @return SiteSectionInterface|null
      */
-    public function getByBasePath(string $basePath): ?SiteSectionInterface {
+    public function getByBasePath(string $basePath): ?SiteSectionInterface
+    {
         /** @var SiteSectionInterface $siteSection */
         foreach ($this->getAll() as $siteSection) {
             if ($siteSection->getBasePath() === $basePath) {
@@ -218,7 +234,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      * @param string $localeKey The locale key to lookup by.
      * @return SiteSectionInterface[]
      */
-    public function getForLocale(string $localeKey): array {
+    public function getForLocale(string $localeKey): array
+    {
         $siteSections = [];
         /** @var SiteSectionInterface $siteSection */
         foreach ($this->getAll() as $siteSection) {
@@ -234,10 +251,11 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      *
      * @return SiteSectionInterface
      */
-    public function getCurrentSiteSection(): SiteSectionInterface {
+    public function getCurrentSiteSection(): SiteSectionInterface
+    {
         if (is_null($this->currentSiteSection)) {
             foreach ($this->providers as $provider) {
-                if (!empty($current = $provider->getCurrentSiteSection())) {
+                if (!empty(($current = $provider->getCurrentSiteSection()))) {
                     $this->currentSiteSection = $current;
                 }
             }
@@ -248,7 +266,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
     /**
      * Reset the current site section.
      */
-    public function resetCurrentSiteSection() {
+    public function resetCurrentSiteSection()
+    {
         $this->currentSiteSection = null;
     }
 
@@ -258,7 +277,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      * @param string $app
      * @param array $settings
      */
-    public function registerApplication(string $app, array $settings) {
+    public function registerApplication(string $app, array $settings)
+    {
         $this->apps[$app] = $settings;
     }
 
@@ -266,7 +286,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      * Get all available applications
      *
      */
-    public function applications(): array {
+    public function applications(): array
+    {
         return $this->apps;
     }
 
@@ -278,8 +299,9 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      *
      * @return SiteSectionInterface
      */
-    public function getSiteSectionForAttribute(string $attributeName, $attributeValue): SiteSectionInterface {
-        $key = 'siteSection' . '_' .$attributeName . '_' .$attributeValue;
+    public function getSiteSectionForAttribute(string $attributeName, $attributeValue): SiteSectionInterface
+    {
+        $key = "siteSection" . "_" . $attributeName . "_" . $attributeValue;
         $result = $this->siteSectionsForAttributes[$key] ?? null;
 
         if (!$result) {
@@ -313,7 +335,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
     /**
      * @return SiteSectionInterface
      */
-    public function getDefaultSiteSection(): SiteSectionInterface {
+    public function getDefaultSiteSection(): SiteSectionInterface
+    {
         return $this->defaultSiteSection;
     }
 
@@ -324,7 +347,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
      *
      * @return array The counts.
      */
-    public function recalculateCounts(SiteSectionInterface $siteSection): array {
+    public function recalculateCounts(SiteSectionInterface $siteSection): array
+    {
         $stashers = $this->getCountStashers();
         if (empty($stashers)) {
             // Don't calculate counts if nothing is saving them.
@@ -345,7 +369,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
     /**
      * @return SiteSectionCountStasherInterface[]
      */
-    private function getCountStashers(): array {
+    private function getCountStashers(): array
+    {
         $stashers = [];
         foreach ($this->providers as $siteSectionProvider) {
             if ($siteSectionProvider instanceof SiteSectionCountStasherInterface) {
@@ -359,7 +384,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
     /**
      * Clear the local cache of site sections.
      */
-    public function clearLocalCache() {
+    public function clearLocalCache()
+    {
         $this->siteSections = [];
         $this->siteSectionsForAttributes = [];
     }
@@ -367,7 +393,8 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getChildIDs(SiteSectionInterface $siteSection): array {
+    public function getChildIDs(SiteSectionInterface $siteSection): array
+    {
         $result = [];
         foreach ($this->siteSectionChildIDProviders as $siteSectionProvider) {
             $childIDs = $siteSectionProvider->getChildIDs($siteSection);
@@ -377,5 +404,21 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface {
         }
 
         return $result;
+    }
+
+    /**
+     * Get a schema for a site section picker.
+     *
+     * @param FieldMatchConditional|null $conditional
+     *
+     * @return Schema|null
+     */
+    public function getSiteSectionFormOption(?FieldMatchConditional $conditional): ?Schema
+    {
+        $options = null;
+        foreach ($this->providers as $provider) {
+            $options = $options ?? $provider->getSiteSectionIDSchema($conditional);
+        }
+        return $options;
     }
 }

@@ -10,23 +10,25 @@ namespace VanillaTests\APIv2;
 /**
  * Test the /api/v2/messages endpoints.
  */
-class MessagesAllowModerationTest extends MessagesTest {
-
+class MessagesAllowModerationTest extends MessagesTest
+{
     /**
      * {@inheritdoc}
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         parent::setupBeforeClass();
 
         // Allow moderator/admins to moderate the conversations.
-        $config = static::container()->get('Config');
-        $config->set('Conversations.Moderation.Allow', true, true, false);
+        $config = static::container()->get("Config");
+        $config->set("Conversations.Moderation.Allow", true, true, false);
     }
 
     /**
      * Set up tests.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->moderationAllowed = true;
     }
@@ -34,14 +36,16 @@ class MessagesAllowModerationTest extends MessagesTest {
     /**
      * Test GET /resource/<id>.
      */
-    public function testGet() {
+    public function testGet()
+    {
         parent::testGet();
     }
 
     /**
      * Test GET /messages.
      */
-    public function testIndex() {
+    public function testIndex()
+    {
         parent::testIndex();
     }
 }

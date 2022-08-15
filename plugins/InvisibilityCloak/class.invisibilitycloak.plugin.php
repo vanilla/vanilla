@@ -6,8 +6,8 @@
 /**
  * Class InvisibilityCloakPlugin
  */
-class InvisibilityCloakPlugin extends Gdn_Plugin {
-
+class InvisibilityCloakPlugin extends Gdn_Plugin
+{
     /** @var Gdn_Configuration */
     private $configuration;
 
@@ -16,14 +16,16 @@ class InvisibilityCloakPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Configuration $configuration
      */
-    public function __construct(Gdn_Configuration $configuration) {
+    public function __construct(Gdn_Configuration $configuration)
+    {
         $this->configuration = $configuration;
     }
 
     /**
      * Hook into the startup event.
      */
-    public function gdn_dispatcher_appStartup_handler() {
+    public function gdn_dispatcher_appStartup_handler()
+    {
         $this->configuration->set("Robots.Invisible", true, true, false);
     }
 
@@ -32,9 +34,10 @@ class InvisibilityCloakPlugin extends Gdn_Plugin {
      *
      * @param object $sender
      */
-    public function base_render_before($sender) {
+    public function base_render_before($sender)
+    {
         if ($sender->Head) {
-            $sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex,noarchive']);
+            $sender->Head->addTag("meta", ["name" => "robots", "content" => "noindex,noarchive"]);
         }
     }
 }

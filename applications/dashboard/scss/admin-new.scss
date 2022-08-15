@@ -161,7 +161,7 @@ $global-button_radius: $global_borderRadius;
     top: 0;
     right: 0;
     left: 0;
-    padding: $control-padding-y $spacer * 3 / 4;
+    padding: $control-padding-y $spacer * 3 * 0.25;
     color: $input-color;
     border: $input-btn-border-width solid $input-border-color;
     border-radius: $border-radius;
@@ -200,6 +200,7 @@ ul {
     margin-bottom: 0;
 }
 
-a:focus, a:hover {
+a:focus,
+a:hover {
     text-decoration: none;
 }

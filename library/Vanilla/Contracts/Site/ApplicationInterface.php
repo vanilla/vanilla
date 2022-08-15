@@ -10,7 +10,8 @@ namespace Vanilla\Contracts\Site;
 /**
  * Interface representing application.
  */
-interface ApplicationInterface {
+interface ApplicationInterface
+{
     /**
      * Get the application name.
      *

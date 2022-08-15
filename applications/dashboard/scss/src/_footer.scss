@@ -1,66 +1,74 @@
 .footer {
-  @extend .row;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: center;
-  padding-left: $padding-row;
-  padding-right: $padding-row;
-  border-top: 1px solid $border-color;
-  color: $black;
-  background-color: $body-bg;
+    @extend .row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: $padding-row;
+    padding-right: $padding-row;
+    border-top: 1px solid $border-color;
+    color: $black;
+    background-color: $body-bg;
 
-  .vanilla-logo {
-    width: 64px;
-    height: 32px;
-  }
+    .vanilla-logo {
+        width: 64px;
+        height: 32px;
+    }
+}
+
+.vanilla-by-hl-logo-wrap {
+    opacity: 0.3;
+    .powered-by-hl-vanilla {
+        color: $black;
+        width: 215px;
+        height: 32px;
+    }
 }
 
 .vanilla-logo {
+    &,
+    &:hover {
+        @include text-hide();
+    }
 
-  &,
-  &:hover {
-    @include text-hide();
-  }
-
-  display: inline-block;
-  background: 0;
-  background-image: url('images/vanilla-black.svg');
-  background-repeat: no-repeat;
-  background-size: contain;
+    display: inline-block;
+    background: 0;
+    background-image: url("images/vanilla-black.svg");
+    background-repeat: no-repeat;
+    background-size: contain;
 }
 
 .vanilla-logo-white {
-  background-image: url('images/vanilla-white.svg');
+    background-image: url("images/vanilla-white.svg");
 }
 
 .footer-logo-powered-text {
-  background-color: $body-bg;
-  font-size: 6.8px;
-  line-height: $line-height-lg;
-  text-transform: uppercase;
-  text-align: center;
-  opacity: 1;
+    background-color: $body-bg;
+    font-size: 6.8px;
+    line-height: $line-height-lg;
+    text-transform: uppercase;
+    text-align: center;
+    opacity: 1;
 }
 
 .footer-logo-powered {
-  position: relative;
-  top: -8px;
-  display: block;
+    position: relative;
+    top: -8px;
+    display: block;
 }
 
 .footer-logo {
-  padding-top: 8px;
-  opacity: .3;
+    padding-top: 8px;
+    opacity: 0.3;
 }
 
 .footer-nav {
-  opacity: .3;
+    opacity: 0.3;
 }
 
 .footer-nav-item {
-  font-size: $font-size-xs;
-  line-height: $line-height-lg;
-  display: inline-block;
-  padding-left: $spacer;
-  border-left: 1px solid $border-color;
+    font-size: $font-size-xs;
+    line-height: $line-height-lg;
+    display: inline-block;
+    padding-left: $spacer;
+    border-left: 1px solid $border-color;
 }

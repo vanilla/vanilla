@@ -54,43 +54,42 @@
 // Styleguide 8.1.
 
 .toolbar {
-  @include full-border(flex);
-  align-items: flex-start;
-  justify-content: space-between;
-  padding-top: $spacer / 2;
-  padding-bottom: $spacer / 2;
-  padding-right: 0;
+    @include full-border(flex);
+    align-items: flex-start;
+    justify-content: space-between;
+    padding-top: $spacer * 0.5;
+    padding-bottom: $spacer * 0.5;
+    padding-right: 0;
 
-  > * {
-    padding-right: $spacer;
-    flex-shrink: 2;
-  }
+    > * {
+        padding-right: $spacer;
+        flex-shrink: 2;
+    }
 
-  .toolbar-buttons {
-    display: flex;
-    flex-wrap: nowrap;
-  }
+    .toolbar-buttons {
+        display: flex;
+        flex-wrap: nowrap;
+    }
 
-  .toolbar-btn-group {
+    .toolbar-btn-group {
+    }
 
-  }
+    &:empty {
+        padding-top: 0;
+        border-bottom: 0;
+    }
 
-  &:empty {
-    padding-top: 0;
-    border-bottom: 0;
-  }
-
-  .toolbar-main {
-    flex-basis: 1024px / 2 - $spacer;
-    flex-shrink: 1;
-  }
+    .toolbar-main {
+        flex-basis: 1024px * 0.5 - $spacer;
+        flex-shrink: 1;
+    }
 }
 
 .js-toolbar-sticky.is-stuck {
-  position: fixed;
-  top: $navbar-height;
-  background: $white;
-  z-index: 1000;
+    position: fixed;
+    top: $navbar-height;
+    background: $white;
+    z-index: 1000;
 }
 
 // Pager
@@ -121,32 +120,31 @@
 // Styleguide 8.2.
 
 .pager-count {
-  line-height: 1;
-  font-weight: 600;
-  padding-right: $spacer / 2;
-  white-space: nowrap;
+    line-height: 1;
+    font-weight: 600;
+    padding-right: $spacer * 0.5;
+    white-space: nowrap;
 }
 
 .pager-wrap {
-  margin-left: auto;
+    margin-left: auto;
 }
 
 .pager {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: flex-end;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
 
-  // Fixes for pager react component.
-  &.pager-react {
-    .pager-previous {
-      padding-left: 13px;
-      padding-right: 7px;
+    // Fixes for pager react component.
+    &.pager-react {
+        .pager-previous {
+            padding-left: 13px;
+            padding-right: 7px;
+        }
+        .pager-next {
+            padding-left: 7px;
+            padding-right: 13px;
+        }
     }
-    .pager-next {
-      padding-left: 7px;
-      padding-right: 13px;
-    }
-  }
 }
-

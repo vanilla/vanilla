@@ -3,12 +3,12 @@ div.Popup {
     .Buttons .btn-primary.Close,
     #Form_Cancel {
         @include Button(
-                        $global-color_white,
-                        $global-color_primary,
-                        $global-color_primary,
-                        $global-color_primary,
-                        $global-color_white,
-                        $global-color_primary
+            $global-color_white,
+            $global-color_primary,
+            $global-color_primary,
+            $global-color_primary,
+            $global-color_white,
+            $global-color_primary
         );
     }
 
@@ -21,12 +21,12 @@ div.Popup {
     .groupToolbar .Button.Primary,
     .BoxButtons .Button.Primary {
         @include Button(
-                        $global-color_primary,
-                        $global-color_white,
-                        $global-color_primary,
-                        $global-color_primaryAlt,
-                        $global-color_white,
-                        $global-color_primaryAlt
+            $global-color_primary,
+            $global-color_white,
+            $global-color_primary,
+            $global-color_primaryAlt,
+            $global-color_white,
+            $global-color_primaryAlt
         );
     }
 }

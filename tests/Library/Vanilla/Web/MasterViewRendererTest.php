@@ -19,14 +19,15 @@ use VanillaTests\SiteTestCase;
 /**
  * Tests for the master view renderer.
  */
-class MasterViewRendererTest extends SiteTestCase {
-
+class MasterViewRendererTest extends SiteTestCase
+{
     use EventSpyTestTrait;
 
     /**
      * Test that our render event is fired.
      */
-    public function testRenderEvent() {
+    public function testRenderEvent()
+    {
         /** @var MasterViewRenderer $renderer */
         $renderer = self::container()->get(MasterViewRenderer::class);
         /** @var Page $page */
@@ -44,7 +45,8 @@ class MasterViewRendererTest extends SiteTestCase {
      *
      * @param PageRenderBeforeEvent $event
      */
-    public function pageRenderBefore_handler(PageRenderBeforeEvent $event) {
-        $event->getPageHead()->addMetaTag(['type' => 'custom']);
+    public function pageRenderBefore_handler(PageRenderBeforeEvent $event)
+    {
+        $event->getPageHead()->addMetaTag(["type" => "custom"]);
     }
 }

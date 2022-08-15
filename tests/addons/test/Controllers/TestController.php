@@ -8,28 +8,32 @@
 /**
  * Some test methods.
  */
-class TestController extends \Gdn_Controller {
+class TestController extends \Gdn_Controller
+{
     /**
      * A dummy endpoint that needs sign in permission.
      */
-    public function noGuest(): void {
-        $this->permission('Garden.SignIn.Allow');
+    public function noGuest(): void
+    {
+        $this->permission("Garden.SignIn.Allow");
 
-        $this->render('blank', 'utility', 'dashboard');
+        $this->render("blank", "utility", "dashboard");
     }
 
     /**
      * This endpoint needs settings.manage.
      */
-    public function admin(): void {
-        $this->permission('Garden.Settings.Manage');
-        $this->render('blank', 'utility', 'dashboard');
+    public function admin(): void
+    {
+        $this->permission("Garden.Settings.Manage");
+        $this->render("blank", "utility", "dashboard");
     }
 
     /**
      * Throw an exception.
      */
-    public function permissionException(): void {
-        throw permissionException('Garden.Settings.Manage');
+    public function permissionException(): void
+    {
+        throw permissionException("Garden.Settings.Manage");
     }
 }

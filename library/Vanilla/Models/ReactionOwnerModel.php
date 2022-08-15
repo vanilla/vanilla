@@ -15,8 +15,8 @@ use Vanilla\Database\Operation\CurrentDateFieldProcessor;
  * Handle reactions types (owner (app, addon) + record type (model, table) + reaction type).
  * ex: knowledgebase + article + helpful
  */
-class ReactionOwnerModel extends PipelineModel {
-
+class ReactionOwnerModel extends PipelineModel
+{
     /** @var Gdn_Session */
     private $session;
 
@@ -25,7 +25,8 @@ class ReactionOwnerModel extends PipelineModel {
      *
      * @param Gdn_Session $session
      */
-    public function __construct(Gdn_Session $session) {
+    public function __construct(Gdn_Session $session)
+    {
         parent::__construct("reactionOwner");
         $this->session = $session;
 
@@ -44,18 +45,15 @@ class ReactionOwnerModel extends PipelineModel {
      * @param array $filters Structure of 3 elements: ownerType, reactionType, recordType
      * @return int Result reactionOwnerID
      */
-    public function getReactionOwnerID(array $filters): int {
-        $schema = Schema::parse([
-            'ownerType:s',
-            'reactionType:s',
-            'recordType:s'
-        ]);
+    public function getReactionOwnerID(array $filters): int
+    {
+        $schema = Schema::parse(["ownerType:s", "reactionType:s", "recordType:s"]);
         $filters = $schema->validate($filters);
         $res = $this->get($filters);
         if (empty($res)) {
             $id = $this->insert($filters);
         } else {
-            $id = $res[0]['reactionOwnerID'];
+            $id = $res[0]["reactionOwnerID"];
         }
         return $id;
     }

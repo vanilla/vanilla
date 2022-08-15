@@ -11,24 +11,29 @@
 /**
  * Renders a user's photo (if they've uploaded one).
  */
-class UserPhotoModule extends Gdn_Module {
-
+class UserPhotoModule extends Gdn_Module
+{
     /**
      * @var bool Can the current user edit this user's photo?
      */
     public $CanEditPhotos;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->_ApplicationFolder = 'dashboard';
-        $this->CanEditPhotos = Gdn::session()->checkRankedPermission(c('Garden.Profile.EditPhotos', true)) || Gdn::session()->checkPermission('Garden.Users.Edit');
+        $this->_ApplicationFolder = "dashboard";
+        $this->CanEditPhotos =
+            Gdn::session()->checkRankedPermission(c("Garden.Profile.EditPhotos", true)) ||
+            Gdn::session()->checkPermission("Garden.Users.Edit");
     }
 
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
-    public function toString() {
+    public function toString()
+    {
         return parent::toString();
     }
 }

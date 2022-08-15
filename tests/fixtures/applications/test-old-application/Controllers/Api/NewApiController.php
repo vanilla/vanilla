@@ -7,7 +7,6 @@
 
 namespace Test\OldApplication\Controllers\Api;
 
-
-class NewApiController {
-
+class NewApiController
+{
 }

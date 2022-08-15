@@ -14,13 +14,15 @@ use Vanilla\Models\PipelineModel;
 /**
  * Class for basic PipelineModel testing.
  */
-class BasicPipelineModel extends PipelineModel {
+class BasicPipelineModel extends PipelineModel
+{
     /**
      * BasicPipelineModel constructor.
      *
      * @param string $table
      */
-    public function __construct(string $table) {
+    public function __construct(string $table)
+    {
         parent::__construct($table);
 
         $this->readSchema = $this->writeSchema = Schema::parse([
@@ -37,7 +39,8 @@ class BasicPipelineModel extends PipelineModel {
      *
      * @param Operation $operation
      */
-    public function doOperation(Operation $operation) {
+    public function doOperation(Operation $operation)
+    {
         $result = $this->pipeline->processOperation($operation);
         return $result;
     }
@@ -47,7 +50,8 @@ class BasicPipelineModel extends PipelineModel {
      *
      * @param Operation $op
      */
-    protected function handleInnerOperation(Operation $op) {
+    protected function handleInnerOperation(Operation $op)
+    {
         return;
     }
 
@@ -56,7 +60,8 @@ class BasicPipelineModel extends PipelineModel {
      *
      * @param Pipeline $pipeline
      */
-    public function setPipeline(Pipeline $pipeline): void {
+    public function setPipeline(Pipeline $pipeline): void
+    {
         $this->pipeline = $pipeline;
     }
 }

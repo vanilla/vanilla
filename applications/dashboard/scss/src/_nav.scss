@@ -36,72 +36,72 @@
 // Styleguide 9.1.
 
 .nav-adventure {
-  @include has-top-border;
+    @include has-top-border;
 
-  .nav-item {
-    display: block;
-    margin-left: -$padding-row;
-    margin-right: -$padding-row;
-    border-bottom: $border-width solid $border-color;
+    .nav-item {
+        display: block;
+        margin-left: -$padding-row;
+        margin-right: -$padding-row;
+        border-bottom: $border-width solid $border-color;
 
-    &:first-child {
-      border-top: $border-width solid $border-color;
-    }
-  }
-
-  .nav-item-title {
-    line-height: 1;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-
-  .nav-item-description {
-    margin-bottom: - 5px;
-  }
-
-  .nav-link {
-    position: relative;
-    display: flex;
-    justify-items: flex-start;
-    align-items: center;
-    padding: 3px $padding-row;
-    line-height: 20px;
-    color: $grey-dark;
-    transition: background-color .1s;
-
-    > * {
-      z-index: 1;
+        &:first-child {
+            border-top: $border-width solid $border-color;
+        }
     }
 
-    svg {
-      display: block;
-      height: 24px;
+    .nav-item-title {
+        line-height: 1;
+        font-weight: 600;
+        margin-bottom: 6px;
     }
 
-    &:hover {
-      &::before {
-        width: 100%;
-      }
-
-      background-color: #f9fdfe;
+    .nav-item-description {
+        margin-bottom: -5px;
     }
-  }
 
-  .nav-item-icon {
-    flex-shrink: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 36px;
-    height: 36px;
-    border: $border-width solid $border-color;
-    border-radius: $border-radius;
-    margin-right: $spacer;
-  }
+    .nav-link {
+        position: relative;
+        display: flex;
+        justify-items: flex-start;
+        align-items: center;
+        padding: 3px $padding-row;
+        line-height: 20px;
+        color: $grey-dark;
+        transition: background-color 0.1s;
 
-  .nav-item-arrow {
-    margin-left: auto;
-  }
+        > * {
+            z-index: 1;
+        }
+
+        svg {
+            display: block;
+            height: 24px;
+        }
+
+        &:hover {
+            &::before {
+                width: 100%;
+            }
+
+            background-color: #f9fdfe;
+        }
+    }
+
+    .nav-item-icon {
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 36px;
+        height: 36px;
+        border: $border-width solid $border-color;
+        border-radius: $border-radius;
+        margin-right: $spacer;
+    }
+
+    .nav-item-arrow {
+        margin-left: auto;
+    }
 }
 
 // Stats Nav
@@ -124,36 +124,36 @@
 // Styleguide 9.2.
 
 .nav-stats {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .nav-stats-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1;
-  padding: ($spacer / 2) $spacer 0;
-  color: rgba(25,25,25,.20);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    padding: ($spacer * 0.5) $spacer 0;
+    color: rgba(25, 25, 25, 0.2);
 }
 
 .nav-stats-link {
-  > * {
-    cursor: pointer;
-  }
+    > * {
+        cursor: pointer;
+    }
 }
 
 .nav-stats-title {
-  font-weight: 400;
-  padding: $spacer / 2 0 $spacer / 4;
-  text-transform: uppercase;
-  font-size: $font-size-sm;
+    font-weight: 400;
+    padding: $spacer * 0.5 0 $spacer * 0.25;
+    text-transform: uppercase;
+    font-size: $font-size-sm;
 }
 
 .nav-stats-value {
-  font-weight: 300;
-  font-size: 40px;
+    font-weight: 300;
+    font-size: 40px;
 }
 
 // Panel navigation
@@ -163,125 +163,124 @@
 // No styleguide reference.
 
 .nav-heading {
-  margin-top: $spacer / 2;
-  margin-bottom: $spacer / 2;
+    margin-top: $spacer * 0.5;
+    margin-bottom: $spacer * 0.5;
 
-  a {
-    display: block;
-    padding-top: 16px;
-    padding-bottom: 16px;
-    padding-left: 12px;
-    border-bottom: 1px dotted rgba(0,0,0,.0875);
-    font-size: $font-size-sm;
-    font-weight: 600;
-    text-transform: uppercase;
-    text-decoration: none;
+    a {
+        display: block;
+        padding-top: 16px;
+        padding-bottom: 16px;
+        padding-left: 12px;
+        border-bottom: 1px dotted rgba(0, 0, 0, 0.0875);
+        font-size: $font-size-sm;
+        font-weight: 600;
+        text-transform: uppercase;
+        text-decoration: none;
 
-    &::before {
-      @include caret;
-      position: relative;
-      top: -1px;
-      -webkit-transform: rotate(0deg);
-      tranform: rotate(0deg);
-      margin-left: -16px;
-      margin-right: 8px;
-      transition: all .1s ease-out;
+        &::before {
+            @include caret;
+            position: relative;
+            top: -1px;
+            -webkit-transform: rotate(0deg);
+            tranform: rotate(0deg);
+            margin-left: -16px;
+            margin-right: 8px;
+            transition: all 0.1s ease-out;
+        }
+
+        &.collapsed::before {
+            -webkit-transform: rotate(-90deg);
+            tranform: rotate(-90deg);
+        }
     }
-
-    &.collapsed::before {
-      -webkit-transform: rotate(-90deg);
-      tranform: rotate(-90deg);
-    }
-  }
 }
 
 .nav-inline {
-  font-size: 0;
+    font-size: 0;
 
-  .nav-item {
-    display: inline-block;
-  }
+    .nav-item {
+        display: inline-block;
+    }
 
-  .nav-item + .nav-item,
-  .nav-link + .nav-link {
-    margin-left: 16px;
-  }
+    .nav-item + .nav-item,
+    .nav-link + .nav-link {
+        margin-left: 16px;
+    }
 }
 
 .panel-nav {
-  a {
-    color: $grey;
-  }
-
-  .title {
-    display: block;
-    margin-bottom: $spacer;
-  }
-
-  .badge {
-    font-size: $font-size-xs;
-  }
-
-  .globals-sign-out {
-    display: none;
-
-    @include media-breakpoint-down(md) {
-      display: block;
-      margin-top: $spacer * 2;
+    a {
+        color: $grey;
     }
-  }
 
-  .nav-pill {
-    color: $body-bg;
-    background: transparentize($grey, .4);
+    .title {
+        display: block;
+        margin-bottom: $spacer;
+    }
 
-    //color: #1892d8;
-    //background: rgba(255, 255, 255, .75);
-    display: inline-block;
-    ///* text-transform: uppercase; */
-    font-size: 8px;
-    line-height: 1;
-    padding: 2px 4px;
-    border-radius: 3px;
-    vertical-align: middle;
-  }
+    .badge {
+        font-size: $font-size-xs;
+    }
 
-  .nav-link {
+    .globals-sign-out {
+        display: none;
 
-    &.active {
-      border-radius: $nav-pills-panel-border-radius;
-
-      &,
-      &:hover {
-        color: $grey-dark;
-        background-color: $nav-pills-link-hover-bg;
-
-        .nav-pill {
-          color: $nav-pills-link-hover-bg;
-          background-color: transparentize($white, .3);
+        @include media-breakpoint-down(md) {
+            display: block;
+            margin-top: $spacer * 2;
         }
-      }
     }
 
-    &:hover,
-    &.hover {
-      color: $brand-new-primary-active;
-    }
-  }
+    .nav-pill {
+        color: $body-bg;
+        background: transparentize($grey, 0.4);
 
-  .nav-stacked {
-    .nav-item + .nav-item {
-      margin-top: 0;
+        //color: #1892d8;
+        //background: rgba(255, 255, 255, .75);
+        display: inline-block;
+        ///* text-transform: uppercase; */
+        font-size: 8px;
+        line-height: 1;
+        padding: 2px 4px;
+        border-radius: 3px;
+        vertical-align: middle;
     }
-  }
+
+    .nav-link {
+        &.active {
+            border-radius: $nav-pills-panel-border-radius;
+
+            &,
+            &:hover {
+                color: $grey-dark;
+                background-color: $nav-pills-link-hover-bg;
+
+                .nav-pill {
+                    color: $nav-pills-link-hover-bg;
+                    background-color: transparentize($white, 0.3);
+                }
+            }
+        }
+
+        &:hover,
+        &.hover {
+            color: $brand-new-primary-active;
+        }
+    }
+
+    .nav-stacked {
+        .nav-item + .nav-item {
+            margin-top: 0;
+        }
+    }
 }
 
 .nav-link {
-  &,
-  &.active,
-  &:active,
-  &.hover,
-  &:hover {
-    cursor: pointer;
-  }
+    &,
+    &.active,
+    &:active,
+    &.hover,
+    &:hover {
+        cursor: pointer;
+    }
 }

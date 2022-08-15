@@ -13,6 +13,7 @@
  * @param Smarty $smarty The smarty object rendering the template.
  * @return string The url.
  */
-function smarty_function_vanillaurl($params, &$smarty) {
-    return c('Garden.VanillaUrl');
+function smarty_function_vanillaurl($params, &$smarty)
+{
+    return c("Garden.VanillaUrl");
 }

@@ -13,12 +13,18 @@ use Vanilla\Scheduler\Job\JobPriority;
 /**
  * Interface JobDescriptorInterface
  */
-interface JobDescriptorInterface {
-
+interface JobDescriptorInterface
+{
     /**
      * @return JobExecutionType
      */
     public function getExecutionType(): JobExecutionType;
+
+    /**
+     * @param JobExecutionType $jobExecutionType
+     * @return bool
+     */
+    public function canExecuteForType(JobExecutionType $jobExecutionType): bool;
 
     /**
      * @return string

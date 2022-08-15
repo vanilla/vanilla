@@ -11,6 +11,6 @@ namespace Test\OldApplication\arbitraryLowercase;
  * This class is in a arbitrary subdirectory of the addon.
  * The path is lowercased though so it will not be loaded.
  */
-class CustomDirNamespaceClass {
-
+class CustomDirNamespaceClass
+{
 }

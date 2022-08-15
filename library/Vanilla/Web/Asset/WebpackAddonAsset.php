@@ -13,7 +13,8 @@ use Vanilla\Addon;
 /**
  * An webpack asset that it specific to an addon.
  */
-class WebpackAddonAsset extends WebpackAsset {
+class WebpackAddonAsset extends WebpackAsset
+{
     /**
      * Constructor.
      *
@@ -37,14 +38,8 @@ class WebpackAddonAsset extends WebpackAsset {
         if ($isCommonChunk) {
             $assetName .= "-common";
         }
-        parent::__construct(
-            $request,
-            $extension,
-            $section,
-            $assetName,
-            $cacheBustingKey
-        );
-        $this->fileSubpath = $section . DS . 'addons';
-        $this->webSubpath = $section . '/' . 'addons';
+        parent::__construct($request, $extension, $section, $assetName, $cacheBustingKey);
+        $this->fileSubpath = $section . DS . "addons";
+        $this->webSubpath = $section . "/" . "addons";
     }
 }

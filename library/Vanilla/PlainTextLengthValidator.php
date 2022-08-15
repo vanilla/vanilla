@@ -14,8 +14,8 @@ use Vanilla\Contracts\LocaleInterface;
 /*
  * Validates the Body field length by stripping any formatting code.
  */
-class PlainTextLengthValidator {
-
+class PlainTextLengthValidator
+{
     /** @var LocaleInterface */
     private $locale;
 
@@ -28,7 +28,8 @@ class PlainTextLengthValidator {
      * @param FormatService $formatService Service to apply a formatter.
      * @param LocaleInterface $locale For translating error messages.
      */
-    public function __construct(FormatService $formatService, LocaleInterface $locale) {
+    public function __construct(FormatService $formatService, LocaleInterface $locale)
+    {
         $this->locale = $locale;
         $this->formatService = $formatService;
     }
@@ -41,11 +42,12 @@ class PlainTextLengthValidator {
      * @param array $post POST array.
      * @return mixed Either an Invalid Object or the value.
      */
-    private function validate($value, $field, $post) {
-        $format = $post['Format'] ?? '';
+    private function validate($value, $field, $post)
+    {
+        $format = $post["Format"] ?? "";
         if (!$format) {
-            $noFormatError = $this->locale->translate('%s Not Found');
-            return new Invalid(sprintf($noFormatError, 'Format'));
+            $noFormatError = $this->locale->translate("%s Not Found");
+            return new Invalid(sprintf($noFormatError, "Format"));
         }
 
         $maxPlainTextLength = $field->maxPlainTextLength ?? null;
@@ -57,8 +59,8 @@ class PlainTextLengthValidator {
         if ($plainTextLength <= $maxPlainTextLength) {
             return $value;
         } else {
-            $validationMessage = $this->locale->translate('ValidateLength' ?? '');
-            $fieldName = $this->locale->translate($field->Name ?? '');
+            $validationMessage = $this->locale->translate("ValidateLength" ?? "");
+            $fieldName = $this->locale->translate($field->Name ?? "");
             $diff = $plainTextLength - $maxPlainTextLength;
             return new Invalid(sprintf($validationMessage, $fieldName, abs($diff)));
         }
@@ -72,7 +74,8 @@ class PlainTextLengthValidator {
      * @param array $row POST array.
      * @return mixed Either an Invalid Object or the value.
      */
-    public function __invoke($value, $field, $row = []) {
+    public function __invoke($value, $field, $row = [])
+    {
         return $this->validate($value, $field, $row);
     }
 }

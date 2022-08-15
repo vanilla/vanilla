@@ -5,22 +5,22 @@
  */
 
 // Break Points
-$richEditor-mobile_spacing                        : 18px !default;
-$richEditor-mobileBreakPoint                      : 700px !default;
+$richEditor-mobile_spacing: 18px !default;
+$richEditor-mobileBreakPoint: 700px !default;
 
 @mixin defaultTransition($properties...) {
     transition-property: $properties;
-    transition-duration: .15s;
+    transition-duration: 0.15s;
     transition-timing-function: ease-out;
 }
 
-@mixin customCubicBezier($startA, $endA, $startB, $endB){
+@mixin customCubicBezier($startA, $endA, $startB, $endB) {
     transition-timing-function: cubic-bezier($startA, $endA, $startB, $endB);
 }
 
 @mixin generateStylesFromMap($map) {
     @each $property, $value in $map {
-        #{$property} : $value;
+        #{$property}: $value;
     }
 }
 
@@ -55,7 +55,6 @@ $richEditor-mobileBreakPoint                      : 700px !default;
     }
 }
 
-
 @mixin objectFitWithFallback() {
     position: absolute;
     top: 0;
@@ -71,7 +70,6 @@ $richEditor-mobileBreakPoint                      : 700px !default;
         height: 100%;
     }
 }
-
 
 .accessibility-jumpTo {
     @include resetButton;

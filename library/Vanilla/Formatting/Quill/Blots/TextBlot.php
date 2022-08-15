@@ -13,8 +13,8 @@ use Vanilla\Formatting\Quill\Parser;
 /**
  * A class for handling formattable text.
  */
-class TextBlot extends AbstractBlot {
-
+class TextBlot extends AbstractBlot
+{
     use FormattableTextTrait;
 
     /**
@@ -22,7 +22,8 @@ class TextBlot extends AbstractBlot {
      *
      * @inheritDoc
      */
-    public static function matches(array $operation): bool {
+    public static function matches(array $operation): bool
+    {
         $insert = $operation["insert"] ?? null;
         return is_string($insert);
     }
@@ -48,23 +49,26 @@ class TextBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function render(): string {
+    public function render(): string
+    {
         $sanitizedContent = $this->content === "\n" ? "<br>" : htmlentities($this->content, ENT_QUOTES);
 
-        return $this->renderOpeningFormatTags().$sanitizedContent.$this->renderClosingFormatTags();
+        return $this->renderOpeningFormatTags() . $sanitizedContent . $this->renderClosingFormatTags();
     }
 
     /**
      * When a text blot is just a newline, it renders alone - <p><br></p>.
      */
-    public function isOwnGroup(): bool {
+    public function isOwnGroup(): bool
+    {
         return $this->isPlainTextNewLine();
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldClearCurrentGroup(BlotGroup $group): bool {
+    public function shouldClearCurrentGroup(BlotGroup $group): bool
+    {
         return $this->isOwnGroup() || $this->isPlainTextNewLine();
     }
 
@@ -77,11 +81,8 @@ class TextBlot extends AbstractBlot {
      *
      * @return bool
      */
-    protected static function opAttrsContainKeyWithValue(
-        array $operation,
-        string $attrLookupKey,
-        $expectedValue = true
-    ) {
+    protected static function opAttrsContainKeyWithValue(array $operation, string $attrLookupKey, $expectedValue = true)
+    {
         $value = valr("attributes.$attrLookupKey", $operation);
 
         if ((is_array($expectedValue) && in_array($value, $expectedValue)) || $value === $expectedValue) {
@@ -96,7 +97,8 @@ class TextBlot extends AbstractBlot {
      *
      * @return bool
      */
-    private function isPlainTextNewLine(): bool {
+    private function isPlainTextNewLine(): bool
+    {
         return get_class($this) === TextBlot::class && $this->content === "\n";
     }
 }

@@ -18,7 +18,7 @@ interface IRadioGroupContext {
     errors?: IFieldError[];
 }
 
-const RadioGroupContext = React.createContext<IRadioGroupContext | null>(null);
+const RadioGroupContext = React.createContext<IRadioGroupContext>({});
 
 export function useDashboardRadioGroup() {
     const context = useContext(RadioGroupContext);

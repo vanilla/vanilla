@@ -64,7 +64,7 @@ export const TitleBarNavItem = React.forwardRef(function TitleBarNavItem(
             {to && (
                 <SmartLink
                     {...passthru}
-                    ref={(ref as unknown) as React.Ref<HTMLAnchorElement>}
+                    ref={ref as unknown as React.Ref<HTMLAnchorElement>}
                     to={to}
                     className={classNames(
                         linkClassName,
@@ -80,7 +80,7 @@ export const TitleBarNavItem = React.forwardRef(function TitleBarNavItem(
             )}
             {!to && (
                 <Button
-                    buttonRef={(ref as unknown) as React.Ref<HTMLButtonElement>}
+                    buttonRef={ref as unknown as React.Ref<HTMLButtonElement>}
                     onFocus={passthru.onFocus}
                     onMouseEnter={passthru.onMouseEnter}
                     onKeyDown={passthru.onKeyDown}

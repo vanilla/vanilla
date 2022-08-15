@@ -13,8 +13,8 @@ use Vanilla\Models\SiteMetaExtra;
 /**
  * Class for proxying one page head interface to another.
  */
-trait PageHeadProxyTrait { // implements PageHeadInterface
-
+trait PageHeadProxyTrait // implements PageHeadInterface
+{
     /** @var PageHeadInterface */
     private $proxy;
 
@@ -23,14 +23,16 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
      *
      * @param PageHeadInterface $proxy
      */
-    public function setPageHeadProxy(PageHeadInterface $proxy) {
+    public function setPageHeadProxy(PageHeadInterface $proxy)
+    {
         $this->proxy = $proxy;
     }
 
     /**
      * @inheritdoc
      */
-    public function setAssetSection(string $section) {
+    public function setAssetSection(string $section)
+    {
         $this->proxy->setAssetSection($section);
         return $this;
     }
@@ -38,7 +40,8 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function addJsonLDItem(AbstractJsonLDItem $item) {
+    public function addJsonLDItem(AbstractJsonLDItem $item)
+    {
         $this->proxy->addJsonLDItem($item);
         return $this;
     }
@@ -46,15 +49,17 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function addJsonLDItems(array $item) {
-        $this->proxy->addJsonLDItems($item);
+    public function setJsonLdItems(array $setJsonLDItems)
+    {
+        $this->proxy->setJsonLdItems($setJsonLDItems);
         return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function setSeoTitle(string $title, bool $withSiteTitle = true) {
+    public function setSeoTitle(string $title, bool $withSiteTitle = true)
+    {
         $this->proxy->setSeoTitle($title, $withSiteTitle);
         return $this;
     }
@@ -62,7 +67,8 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function setSeoDescription(string $description) {
+    public function setSeoDescription(string $description)
+    {
         $this->proxy->setSeoDescription($description);
         return $this;
     }
@@ -70,7 +76,8 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function setCanonicalUrl(string $path) {
+    public function setCanonicalUrl(string $path)
+    {
         $this->proxy->setCanonicalUrl($path);
         return $this;
     }
@@ -78,7 +85,8 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function setSeoBreadcrumbs(array $crumbs) {
+    public function setSeoBreadcrumbs(array $crumbs)
+    {
         $this->proxy->setSeoBreadcrumbs($crumbs);
         return $this;
     }
@@ -86,7 +94,8 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function addInlineScript(string $script) {
+    public function addInlineScript(string $script)
+    {
         $this->proxy->addInlineScript($script);
         return $this;
     }
@@ -94,7 +103,8 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function addScript(AssetInterface $script) {
+    public function addScript(AssetInterface $script)
+    {
         $this->proxy->addScript($script);
         return $this;
     }
@@ -102,7 +112,8 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function addLinkTag(array $attributes) {
+    public function addLinkTag(array $attributes)
+    {
         $this->proxy->addLinkTag($attributes);
         return $this;
     }
@@ -110,7 +121,8 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function addMetaTag(array $attributes) {
+    public function addMetaTag(array $attributes)
+    {
         $this->proxy->addMetaTag($attributes);
         return $this;
     }
@@ -118,7 +130,8 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function addOpenGraphTag(string $property, string $content) {
+    public function addOpenGraphTag(string $property, string $content)
+    {
         $this->proxy->addOpenGraphTag($property, $content);
         return $this;
     }
@@ -126,7 +139,8 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function addSiteMetaExtra(SiteMetaExtra $extra) {
+    public function addSiteMetaExtra(SiteMetaExtra $extra)
+    {
         $this->proxy->addSiteMetaExtra($extra);
         return $this;
     }
@@ -134,28 +148,32 @@ trait PageHeadProxyTrait { // implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function getSeoTitle(): ?string {
+    public function getSeoTitle(): ?string
+    {
         return $this->proxy->getSeoTitle();
     }
 
     /**
      * @inheritdoc
      */
-    public function getSeoDescription(): ?string {
+    public function getSeoDescription(): ?string
+    {
         return $this->proxy->getSeoDescription();
     }
 
     /**
      * @inheritdoc
      */
-    public function getSeoBreadcrumbs(): ?array {
+    public function getSeoBreadcrumbs(): ?array
+    {
         return $this->proxy->getSeoBreadcrumbs();
     }
 
     /**
      * @inheritdoc
      */
-    public function getCanonicalUrl(): ?string {
+    public function getCanonicalUrl(): ?string
+    {
         return $this->proxy->getCanonicalUrl();
     }
 }

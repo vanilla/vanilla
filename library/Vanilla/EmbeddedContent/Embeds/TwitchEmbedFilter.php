@@ -14,8 +14,8 @@ use Vanilla\EmbeddedContent\EmbedFilterInterface;
 /**
  * Class for filtering data inside of twitch embeds.
  */
-class TwitchEmbedFilter implements EmbedFilterInterface {
-
+class TwitchEmbedFilter implements EmbedFilterInterface
+{
     /** @var string */
     private $host;
 
@@ -24,15 +24,16 @@ class TwitchEmbedFilter implements EmbedFilterInterface {
      *
      * @param RequestInterface $request
      */
-    public function __construct(RequestInterface $request) {
+    public function __construct(RequestInterface $request)
+    {
         $this->host = $request->getHost();
     }
-
 
     /**
      * @inheritdoc
      */
-    public function canHandleEmbedType(string $embedType): bool {
+    public function canHandleEmbedType(string $embedType): bool
+    {
         return $embedType === TwitchEmbed::TYPE;
     }
 
@@ -41,9 +42,10 @@ class TwitchEmbedFilter implements EmbedFilterInterface {
      *
      * @inheritdoc
      */
-    public function filterEmbed(AbstractEmbed $embed): AbstractEmbed {
+    public function filterEmbed(AbstractEmbed $embed): AbstractEmbed
+    {
         if (!($embed instanceof TwitchEmbed)) {
-            throw new EmbeddedContentException('Expected a twitch embed. Instead got a ' . get_class($embed));
+            throw new EmbeddedContentException("Expected a twitch embed. Instead got a " . get_class($embed));
         }
 
         $embed->setHost($this->host);

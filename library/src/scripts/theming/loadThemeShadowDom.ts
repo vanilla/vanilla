@@ -7,6 +7,7 @@
 import { prepareShadowRoot } from "@vanilla/dom-utils";
 
 export function loadThemeShadowDom() {
+    performance.mark("Theme ShadowDOM - Start");
     const themeHeader = document.getElementById("themeHeader");
     const themeFooter = document.getElementById("themeFooter");
     if (themeHeader && !themeHeader.shadowRoot) {
@@ -16,4 +17,5 @@ export function loadThemeShadowDom() {
     if (themeFooter && !themeFooter.shadowRoot) {
         prepareShadowRoot(themeFooter, true);
     }
+    performance.mark("Theme ShadowDOM - End");
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -19,7 +19,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Test {@link CommentModel}.
  */
-class CommentModelTest extends SiteTestCase {
+class CommentModelTest extends SiteTestCase
+{
     use TestCategoryModelTrait,
         TestDiscussionModelTrait,
         TestCommentModelTrait,
@@ -36,17 +37,19 @@ class CommentModelTest extends SiteTestCase {
     /**
      * {@inheritdoc}
      */
-    public static function setupBeforeClass(): void {
+    public static function setupBeforeClass(): void
+    {
         parent::setUpBeforeClass();
 
         // Test as an admin
-        \Gdn::session()->start(self::$siteInfo['adminUserID'], false, false);
+        \Gdn::session()->start(self::$siteInfo["adminUserID"], false, false);
     }
 
     /**
      * Setup
      */
-    public function setup(): void {
+    public function setup(): void
+    {
         parent::setUp();
 
         // Make event testing a little easier.
@@ -65,7 +68,8 @@ class CommentModelTest extends SiteTestCase {
      * @param CommentEvent $e
      * @return CommentEvent
      */
-    public function handleCommentEvent(CommentEvent $e): CommentEvent {
+    public function handleCommentEvent(CommentEvent $e): CommentEvent
+    {
         $this->lastEvent = $e;
         return $e;
     }
@@ -73,30 +77,31 @@ class CommentModelTest extends SiteTestCase {
     /**
      * Test the lookup method.
      */
-    public function testLookup() {
+    public function testLookup()
+    {
         $discussion = [
-            'CategoryID' => 1,
-            'Name' => 'Comment Lookup Test',
-            'Body' => 'foo foo foo',
-            'Format' => 'Text',
-            'InsertUserID' => 1
+            "CategoryID" => 1,
+            "Name" => "Comment Lookup Test",
+            "Body" => "foo foo foo",
+            "Format" => "Text",
+            "InsertUserID" => 1,
         ];
         $discussionID = $this->discussionModel->save($discussion);
 
         $comment = [
-            'DiscussionID' => $discussionID,
-            'Body' => 'Hello world.',
-            'Format' => 'Text'
+            "DiscussionID" => $discussionID,
+            "Body" => "Hello world.",
+            "Format" => "Text",
         ];
         $commentID = $this->commentModel->save($comment);
         $this->assertNotFalse($commentID);
 
-        $result = $this->commentModel->lookup(['CommentID' => $commentID] + $comment);
-        $this->assertInstanceOf('Gdn_DataSet', $result);
+        $result = $this->commentModel->lookup(["CommentID" => $commentID] + $comment);
+        $this->assertInstanceOf("Gdn_DataSet", $result);
         $this->assertEquals(1, $result->count());
 
         $row = $result->firstRow(DATASET_TYPE_ARRAY);
-        $this->assertEquals($commentID, $row['CommentID']);
+        $this->assertEquals($commentID, $row["CommentID"]);
     }
 
     /**
@@ -104,13 +109,14 @@ class CommentModelTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testDeleteEventDispatched(): void {
+    public function testDeleteEventDispatched(): void
+    {
         $discussion = [
-            'CategoryID' => 1,
-            'Name' => 'test delete event',
-            'Body' => 'foo foo foo',
-            'Format' => 'Text',
-            'InsertUserID' => 1
+            "CategoryID" => 1,
+            "Name" => "test delete event",
+            "Body" => "foo foo foo",
+            "Format" => "Text",
+            "InsertUserID" => 1,
         ];
         $discussionID = $this->discussionModel->save($discussion);
         $commentID = $this->commentModel->save([
@@ -130,13 +136,14 @@ class CommentModelTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testSaveInsertEventDispatched(): void {
+    public function testSaveInsertEventDispatched(): void
+    {
         $discussion = [
-            'CategoryID' => 1,
-            'Name' => 'test insert',
-            'Body' => 'foo foo foo',
-            'Format' => 'Text',
-            'InsertUserID' => 1
+            "CategoryID" => 1,
+            "Name" => "test insert",
+            "Body" => "foo foo foo",
+            "Format" => "Text",
+            "InsertUserID" => 1,
         ];
         $discussionID = $this->discussionModel->save($discussion);
         $this->commentModel->save([
@@ -153,13 +160,14 @@ class CommentModelTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testSaveUpdateEventDispatched(): void {
+    public function testSaveUpdateEventDispatched(): void
+    {
         $discussion = [
-            'CategoryID' => 1,
-            'Name' => 'test update',
-            'Body' => 'foo foo foo',
-            'Format' => 'Text',
-            'InsertUserID' => 1
+            "CategoryID" => 1,
+            "Name" => "test update",
+            "Body" => "foo foo foo",
+            "Format" => "Text",
+            "InsertUserID" => 1,
         ];
         $discussionID = $this->discussionModel->save($discussion);
         $commentID = $this->commentModel->save([
@@ -182,7 +190,8 @@ class CommentModelTest extends SiteTestCase {
      *
      * @param int $version
      */
-    public function testGetByUser(int $version = 1): void {
+    public function testGetByUser(int $version = 1): void
+    {
         $userID = \Gdn::session()->UserID;
 
         $comments = $this->insertComments(10);
@@ -200,14 +209,16 @@ class CommentModelTest extends SiteTestCase {
     /**
      * Smoke test `CommentModel::getByUser2()`.
      */
-    public function testGetByUser2(): void {
+    public function testGetByUser2(): void
+    {
         $this->testGetByUser(2);
     }
 
     /**
      * Test `CommentModel::getByUser2()` with permission.
      */
-    public function testGetByUser2Permission(): void {
+    public function testGetByUser2Permission(): void
+    {
         $adminUserID = \Gdn::session()->UserID;
         $roles = $this->getRoles();
         $memberRole = $roles["Member"];
@@ -216,17 +227,17 @@ class CommentModelTest extends SiteTestCase {
         $memberUserID = $this->userModel->save([
             "Name" => "testgetbyuser2",
             "Email" => __FUNCTION__ . "@example.com",
-            "Password" => "vanilla",
+            "Password" => randomString(\Gdn::config("Garden.Password.MinLength")),
             "RoleID" => $memberRole,
         ]);
 
         $categoryAdmin = $this->createPermissionedCategory([], [$roles["Administrator"]]);
         $discussionAdmin = [
-            'CategoryID' => $categoryAdmin['categoryID'],
-            'Name' => __FUNCTION__ .'test discussion',
-            'Body' => 'foo foo foo',
-            'Format' => 'Text',
-            'InsertUserID' => $adminUserID
+            "CategoryID" => $categoryAdmin["categoryID"],
+            "Name" => __FUNCTION__ . "test discussion",
+            "Body" => "foo foo foo",
+            "Format" => "Text",
+            "InsertUserID" => $adminUserID,
         ];
 
         $discussionIDAdmin = $this->discussionModel->insert($discussionAdmin);
@@ -239,7 +250,7 @@ class CommentModelTest extends SiteTestCase {
         // Switch to member user.
         \Gdn::session()->start($memberUserID, false, false);
         $this->insertComments(10);
-        $actual = $this->commentModel->getByUser2($memberUserID, 10, 0, false, null, 'desc', 'PermsDiscussionsView');
+        $actual = $this->commentModel->getByUser2($memberUserID, 10, 0, false, null, "desc", "PermsDiscussionsView");
         $countRows = $actual->numRows();
         foreach ($actual as $row) {
             $this->assertEquals($memberUserID, $row->InsertUserID);
@@ -251,18 +262,20 @@ class CommentModelTest extends SiteTestCase {
     /**
      * Test a dirty-record is added when calling setField.
      */
-    public function testDirtyRecordAdded() {
+    public function testDirtyRecordAdded()
+    {
         $discussion = $this->createDiscussion();
         $comment = $this->createComment();
-        $id = $comment['commentID'];
-        $this->commentModel->setField($id, 'Score', 5);
-        $this->assertDirtyRecordInserted('comment', $id);
+        $id = $comment["commentID"];
+        $this->commentModel->setField($id, "Score", 5);
+        $this->assertDirtyRecordInserted("comment", $id);
     }
 
     /**
-     * Test a recordAdvancedNotications with Following disabled.
+     * Test a category following notification with Following disabled.
      */
-    public function testRecordAdvancedNoticationsFollowingDisabled() {
+    public function testAdvancedNoticationsFollowingDisabled()
+    {
         $this->runWithConfig([CategoryModel::CONF_CATEGORY_FOLLOWING => false], function () {
             $roles = $this->getRoles();
 
@@ -270,30 +283,32 @@ class CommentModelTest extends SiteTestCase {
             $memberUser = $this->createUser([
                 "Name" => "testNotications",
                 "Email" => __FUNCTION__ . "@example.com",
-                "Password" => "vanilla",
+                "Password" => randomString(\Gdn::config("Garden.Password.MinLength")),
                 "RoleID" => $this->memberID,
             ]);
 
             $commentUser = $this->createUser([
                 "Name" => "testComment",
                 "Email" => __FUNCTION__ . "@example.com",
-                "Password" => "vanilla",
+                "Password" => randomString(\Gdn::config("Garden.Password.MinLength")),
                 "RoleID" => $this->memberID,
             ]);
 
             $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
 
             $userMeta = [
-                sprintf('Preferences.Email.NewComment.%d', $categoryAdmin['categoryID']) => $categoryAdmin['categoryID'],
+                sprintf("Preferences.Email.NewComment.%d", $categoryAdmin["categoryID"]) => $categoryAdmin[
+                    "categoryID"
+                ],
             ];
-            $this->userModel::setMeta($memberUser['userID'], $userMeta);
+            $this->userModel::setMeta($memberUser["userID"], $userMeta);
 
             $discussionMember = [
-                'CategoryID' => $categoryAdmin['categoryID'],
-                'Name' => __FUNCTION__ . 'test discussion',
-                'Body' => 'foo foo foo',
-                'Format' => 'Text',
-                'InsertUserID' => $commentUser['userID']
+                "CategoryID" => $categoryAdmin["categoryID"],
+                "Name" => __FUNCTION__ . "test discussion",
+                "Body" => "foo foo foo",
+                "Format" => "Text",
+                "InsertUserID" => $commentUser["userID"],
             ];
 
             $discussionIDMember = $this->createDiscussion($discussionMember);
@@ -303,16 +318,19 @@ class CommentModelTest extends SiteTestCase {
                 "Format" => "markdown",
             ]);
 
-            $this->activityModel->clearNotificationQueue();
-            $this->commentModel->recordAdvancedNotications($this->activityModel, null, $discussionMember);
-            $this->assertSame(0, count(ActivityModel::$Queue));
+            $this->api()->setUserID($memberUser["userID"]);
+            $notifications = $this->api()
+                ->get("/notifications")
+                ->getBody();
+            $this->assertCount(0, $notifications);
         });
     }
 
     /**
-     * Test a recordAdvancedNotications with Following enabled.
+     * Test a category following notification with Following enabled.
      */
-    public function testRecordAdvancedNoticationsFollowingEnabled() {
+    public function testAdvancedNoticationsFollowingEnabled()
+    {
         $this->runWithConfig([CategoryModel::CONF_CATEGORY_FOLLOWING => true], function () {
             $roles = $this->getRoles();
 
@@ -320,30 +338,32 @@ class CommentModelTest extends SiteTestCase {
             $memberUser = $this->createUser([
                 "Name" => "testNotications",
                 "Email" => __FUNCTION__ . "@example.com",
-                "Password" => "vanilla",
+                "Password" => randomString(\Gdn::config("Garden.Password.MinLength")),
                 "RoleID" => $this->memberID,
             ]);
 
             $commentUser = $this->createUser([
                 "Name" => "testComment",
                 "Email" => __FUNCTION__ . "@example.com",
-                "Password" => "vanilla",
+                "Password" => randomString(\Gdn::config("Garden.Password.MinLength")),
                 "RoleID" => $this->memberID,
             ]);
 
             $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
 
             $userMeta = [
-                sprintf('Preferences.Email.NewComment.%d', $categoryAdmin['categoryID']) => $categoryAdmin['categoryID'],
+                sprintf("Preferences.Email.NewComment.%d", $categoryAdmin["categoryID"]) => $categoryAdmin[
+                    "categoryID"
+                ],
             ];
-            $this->userModel::setMeta($memberUser['userID'], $userMeta);
+            $this->userModel::setMeta($memberUser["userID"], $userMeta);
 
             $discussionMember = [
-                'CategoryID' => $categoryAdmin['categoryID'],
-                'Name' => __FUNCTION__ . 'test discussion',
-                'Body' => 'foo foo foo',
-                'Format' => 'Text',
-                'InsertUserID' => $commentUser['userID']
+                "CategoryID" => $categoryAdmin["categoryID"],
+                "Name" => __FUNCTION__ . "test discussion",
+                "Body" => "foo foo foo",
+                "Format" => "Text",
+                "InsertUserID" => $commentUser["userID"],
             ];
 
             $discussionIDMember = $this->createDiscussion($discussionMember);
@@ -353,9 +373,11 @@ class CommentModelTest extends SiteTestCase {
                 "Format" => "markdown",
             ]);
 
-            $this->activityModel->clearNotificationQueue();
-            $this->commentModel->recordAdvancedNotications($this->activityModel, null, $discussionMember);
-            $this->assertSame(1, count(ActivityModel::$Queue));
+            $this->api()->setUserID($memberUser["userID"]);
+            $notifications = $this->api()
+                ->get("/notifications")
+                ->getBody();
+            $this->assertCount(1, $notifications);
         });
     }
 }

@@ -16,6 +16,7 @@ brew install yarn
 ```
 
 ### For Debian/Ubuntu Linux
+
 ```bash
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
@@ -41,12 +42,4 @@ yarn install
 $ yarn build
 ```
 
-Compiles all theme assets using Grunt. SCSS stylesheets will be compiled to [`design/admin.css`](design/admin.css) and Javascript in the `js/src` directory will be concatenated and output to [`js/dashboard.js`](js/dashboard.js).
-
-**Watch** (run continuously)
-
-```sh
-$ yarn watch
-```
-
-Watches the assets for changes and runs the appropriate re-runs the individual parts of the build. Also starts a LiveReload server that will automatically reload your browser after every compilation. To make use of this, install the [LiveReload browser extension](http://livereload.com/extensions/).
+Compiles all theme assets using Webpack. SCSS stylesheets will be compiled to `design/*.css` and Javascript in the `js/src` directory will be concatenated and output to [`js/dashboard.js`](js/dashboard.js).

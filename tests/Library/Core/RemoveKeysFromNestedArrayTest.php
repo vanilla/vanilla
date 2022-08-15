@@ -14,8 +14,8 @@ use VanillaTests\Fixtures\Tuple;
  * Tests for removeKeysFromNestedArray().
  */
 
-class RemoveKeysFromNestedArrayTest extends TestCase {
-
+class RemoveKeysFromNestedArrayTest extends TestCase
+{
     /**
      * Test {@link removeKeysFromNestedArray()} against several scenarios.
      *
@@ -24,7 +24,8 @@ class RemoveKeysFromNestedArrayTest extends TestCase {
      * @param array $expected The expected result.
      * @dataProvider provideTestRemoveKeysFromNestedArrayArrays
      */
-    public function testRemoveKeysFromNestedArray($testArray, $testMatches, $expected) {
+    public function testRemoveKeysFromNestedArray($testArray, $testMatches, $expected)
+    {
         $actual = removeKeysFromNestedArray($testArray, $testMatches);
         $this->assertEqualsCanonicalizing($expected, $actual);
     }
@@ -32,10 +33,11 @@ class RemoveKeysFromNestedArrayTest extends TestCase {
     /**
      * Test {@link removeKeysFromNestedArray()} on an object.
      */
-    public function testRemoveKeysFromNestedArrayFromObject() {
-        $expected = [2, new Tuple('a', 'b'), 5];
+    public function testRemoveKeysFromNestedArrayFromObject()
+    {
+        $expected = [2, new Tuple("a", "b"), 5];
         unset($expected[1]->b);
-        $actual = removeKeysFromNestedArray([2, new Tuple('a', 'b'), 5], ['b']);
+        $actual = removeKeysFromNestedArray([2, new Tuple("a", "b"), 5], ["b"]);
         $this->assertEquals($expected, $actual);
     }
 
@@ -44,18 +46,11 @@ class RemoveKeysFromNestedArrayTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestRemoveKeysFromNestedArrayArrays() {
+    public function provideTestRemoveKeysFromNestedArrayArrays()
+    {
         $r = [
-            'removeStrKeys' => [
-                [2, ['key1' => 0, "key2" => 1, "key3" => 2], 1],
-                ['key1', 'key2', 'key3'],
-                [2, [], 1],
-            ],
-            'removeNumKeys' => [
-                [2, [5 => 1, 6 => 2, 7 => 3], 4],
-                [6, 7],
-                [2, [1], 4],
-            ],
+            "removeStrKeys" => [[2, ["key1" => 0, "key2" => 1, "key3" => 2], 1], ["key1", "key2", "key3"], [2, [], 1]],
+            "removeNumKeys" => [[2, [5 => 1, 6 => 2, 7 => 3], 4], [6, 7], [2, [1], 4]],
         ];
 
         return $r;

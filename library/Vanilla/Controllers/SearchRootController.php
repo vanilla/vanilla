@@ -12,18 +12,17 @@ use Vanilla\Web\PageDispatchController;
 /**
  * Page controller for the new search page.
  */
-class SearchRootController extends PageDispatchController {
-
-    const ENABLE_FLAG = 'useNewSearchPage';
+class SearchRootController extends PageDispatchController
+{
+    const ENABLE_FLAG = "useNewSearchPage";
 
     /**
      * Serve the root search page.
      */
-    public function index() {
-        return $this
-            ->useSimplePage(t('Search'))
+    public function index()
+    {
+        return $this->useSimplePage(t("Search"))
             ->blockRobots("noindex nofollow")
-            ->render()
-        ;
+            ->render();
     }
 }

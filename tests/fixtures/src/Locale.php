@@ -7,8 +7,8 @@
 
 namespace VanillaTests\Fixtures;
 
-
-class Locale {
+class Locale
+{
     /**
      * Translates a code into the selected locale's definition.
      *
@@ -17,7 +17,8 @@ class Locale {
      * @param string $default The default value to be displayed if the translation code is not found.
      * @return string
      */
-    public function translate($code, $default = null) {
+    public function translate($code, $default = null)
+    {
         return $default === null ? $code : $default;
     }
 }

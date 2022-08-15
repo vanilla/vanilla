@@ -13,8 +13,8 @@ use Vanilla\UploadedFile;
 /**
  * Interface for saving uploaded files.
  */
-interface FileUploadHandler {
-
+interface FileUploadHandler
+{
     /**
      * Save an uploaded file into the database and into the
      *

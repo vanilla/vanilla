@@ -13,8 +13,8 @@ use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 /**
  * Handle all-purpose reactions.
  */
-class ReactionModel extends PipelineModel {
-
+class ReactionModel extends PipelineModel
+{
     /** @var Gdn_Session */
     private $session;
 
@@ -23,7 +23,8 @@ class ReactionModel extends PipelineModel {
      *
      * @param Gdn_Session $session
      */
-    public function __construct(Gdn_Session $session) {
+    public function __construct(Gdn_Session $session)
+    {
         parent::__construct("reaction");
         $this->session = $session;
 

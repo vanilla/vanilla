@@ -15,27 +15,28 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Simple tests for category permissions.
  */
-class CategoryPermissionTest extends SiteTestCase {
-
+class CategoryPermissionTest extends SiteTestCase
+{
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
 
-    private const PERM_VIEW = 'Vanilla.Discussions.View';
+    private const PERM_VIEW = "Vanilla.Discussions.View";
 
     /**
      * Test that our permission checks work as expected.
      */
-    public function testNestedPermissions() {
+    public function testNestedPermissions()
+    {
         $role = $this->createRole();
         $userWithNoAccess = $this->createUser();
         $userWithAccess = $this->createUser([
-            'roleID' => [$this->lastRoleID, \RoleModel::MEMBER_ID],
+            "roleID" => [$this->lastRoleID, \RoleModel::MEMBER_ID],
         ]);
-        $permCategory = $this->createPermissionedCategory(['name' => 'Only new role access'], [$role['roleID']]);
+        $permCategory = $this->createPermissionedCategory(["name" => "Only new role access"], [$role["roleID"]]);
         // Permission categoryID points to the perm category.
-        $permSubCategory = $this->createCategory(['name' => 'Perm subcategory']);
+        $permSubCategory = $this->createCategory(["name" => "Perm subcategory"]);
         $plainCategory = $this->createCategory([
-            'parentCategoryID' => -1,
+            "parentCategoryID" => -1,
         ]);
 
         $this->runWithUser(function () use ($permCategory, $plainCategory, $permSubCategory) {
@@ -58,8 +59,9 @@ class CategoryPermissionTest extends SiteTestCase {
      * @param string $permission
      * @param bool $expected
      */
-    private function assertCategoryPermission(array $category, string $permission, bool $expected) {
-        $actual = \CategoryModel::checkPermission($category['categoryID'], $permission);
+    private function assertCategoryPermission(array $category, string $permission, bool $expected)
+    {
+        $actual = \CategoryModel::checkPermission($category["categoryID"], $permission);
         $this->assertEquals($expected, $actual);
     }
 
@@ -68,27 +70,28 @@ class CategoryPermissionTest extends SiteTestCase {
      *
      * @see https://github.com/vanilla/support/issues/4070
      */
-    public function testOrphanedPermissionRow() {
+    public function testOrphanedPermissionRow()
+    {
         $role = $this->createRole();
         $member = $this->createUser([
-            'roleID' => [\RoleModel::MEMBER_ID],
+            "roleID" => [\RoleModel::MEMBER_ID],
         ]);
-        $category = $this->createPermissionedCategory(['name' => 'Oprhaned Role Access'], [$role['roleID']]);
+        $category = $this->createPermissionedCategory(["name" => "Oprhaned Role Access"], [$role["roleID"]]);
 
         // No-one should have access to this now.
         $this->runWithUser(function () use ($category) {
-            $this->assertCategoryPermission($category, 'Vanilla.Discussions.View', false);
+            $this->assertCategoryPermission($category, "Vanilla.Discussions.View", false);
         }, $member);
 
         // Remove custom permissions (but don't clear permission table).
         $categoryModel = \CategoryModel::instance();
-        $categoryModel->setField($category['categoryID'], 'PermissionCategoryID', -1);
+        $categoryModel->setField($category["categoryID"], "PermissionCategoryID", -1);
         \Gdn::userModel()->clearPermissions();
         \CategoryModel::clearCache();
 
         // User should have permissions now.
         $this->runWithUser(function () use ($category) {
-            $this->assertCategoryPermission($category, 'Vanilla.Discussions.View', true);
+            $this->assertCategoryPermission($category, "Vanilla.Discussions.View", true);
         }, $member);
     }
 }

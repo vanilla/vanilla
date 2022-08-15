@@ -12,8 +12,8 @@ use Garden\Web\Exception\NotFoundException;
 /**
  * Test the /api/v2/authenticators/oauth2 and /api/v2/authenticators/:id/oauth2 endpoints.
  */
-class OAuth2Test extends AbstractAPIv2Test {
-
+class OAuth2Test extends AbstractAPIv2Test
+{
     protected static $addons = ["oauth2"];
 
     /** @var string[] */
@@ -25,7 +25,8 @@ class OAuth2Test extends AbstractAPIv2Test {
      * @param array $row
      * @return array
      */
-    private function modifyRow(array $row): array {
+    private function modifyRow(array $row): array
+    {
         $row["clientID"] = md5($row["clientID"]);
         $row["secret"] = md5($row["secret"]);
         $row["urls"]["authorizeUrl"] = "https://example.com/authorize/?clientID=" . $row["clientID"];
@@ -35,7 +36,8 @@ class OAuth2Test extends AbstractAPIv2Test {
     /**
      * Test getting a single authenticator.
      */
-    public function testGet(): void {
+    public function testGet(): void
+    {
         $row = $this->testPost();
         $rowID = $row["authenticatorID"];
 
@@ -47,25 +49,29 @@ class OAuth2Test extends AbstractAPIv2Test {
     /**
      * The database allows empty strings. The API should not die because of that.
      */
-    public function testGetBadDB(): void {
+    public function testGetBadDB(): void
+    {
         $row = $this->testPost();
         $rowID = $row["authenticatorID"];
 
-        \Gdn::sql()->put('UserAuthenticationProvider', [
-            'Name' => '',
-            'AuthenticateUrl' => '',
-            'RegisterUrl' => '',
-            'SignInUrl' => '',
-            'SignOutUrl' => '',
+        \Gdn::sql()->put("UserAuthenticationProvider", [
+            "Name" => "",
+            "AuthenticateUrl" => "",
+            "RegisterUrl" => "",
+            "SignInUrl" => "",
+            "SignOutUrl" => "",
         ]);
 
-        $response = $this->api()->get("authenticators/{$rowID}/oauth2")->getBody();
+        $response = $this->api()
+            ->get("authenticators/{$rowID}/oauth2")
+            ->getBody();
     }
 
     /**
      * Test getting an invalid authenticator.
      */
-    public function testGetInvalid(): void {
+    public function testGetInvalid(): void
+    {
         $this->expectExceptionMessage(NotFoundException::class);
         $this->expectExceptionMessage("Authenticator not found.");
         $badID = PHP_INT_MAX;
@@ -75,17 +81,17 @@ class OAuth2Test extends AbstractAPIv2Test {
     /**
      * Verify updating a whole record at once.
      */
-    public function testPatch(): void {
+    public function testPatch(): void
+    {
         $dbRow = $this->testPost();
         $rowID = $dbRow["authenticatorID"];
 
-        $row = $this->api()->get("authenticators/{$rowID}/oauth2")->getBody();
+        $row = $this->api()
+            ->get("authenticators/{$rowID}/oauth2")
+            ->getBody();
         $fields = $this->modifyRow($row);
         $expected = array_intersect_key($fields, array_flip($this->patchFields));
-        $response = $this->api()->patch(
-            "authenticators/{$rowID}/oauth2",
-            $fields
-        );
+        $response = $this->api()->patch("authenticators/{$rowID}/oauth2", $fields);
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertArraySubsetRecursive($expected, $response->getBody());
@@ -94,7 +100,8 @@ class OAuth2Test extends AbstractAPIv2Test {
     /**
      * Test patching an invalid authenticator.
      */
-    public function testPatchInvalid(): void {
+    public function testPatchInvalid(): void
+    {
         $this->expectExceptionMessage(NotFoundException::class);
         $this->expectExceptionMessage("Authenticator not found.");
         $badID = PHP_INT_MAX;
@@ -107,7 +114,8 @@ class OAuth2Test extends AbstractAPIv2Test {
      * @param array $body
      * @return array
      */
-    public function testPost(array $body = []): array {
+    public function testPost(array $body = []): array
+    {
         static $id = 0;
 
         $id++;
@@ -132,27 +140,32 @@ class OAuth2Test extends AbstractAPIv2Test {
     /**
      * Verify inability to create connection with empty url strings.
      */
-    public function testPostInvalid(): void {
+    public function testPostInvalid(): void
+    {
         $body = [
-            "name" => __FUNCTION__ ,
-            "clientID" => "clientID-".__FUNCTION__,
+            "name" => __FUNCTION__,
+            "clientID" => "clientID-" . __FUNCTION__,
             "secret" => "secret123",
             "urls" => [
                 "authorizeUrl" => "https://example.com/authorize",
                 "profileUrl" => "https://example.com/profile",
                 "tokenUrl" => "https://example.com/token",
                 "signoutUrl" => "",
-                "registerUrl" => ""
+                "registerUrl" => "",
             ],
         ];
         // Makes sure the invalid row doesn't get posted.
-        $rowBefore = $this->api()->get("authenticators")->getBody();
+        $rowBefore = $this->api()
+            ->get("authenticators")
+            ->getBody();
         try {
             $this->api()->post("authenticators/oauth2", $body);
-            $this->fail('There is supposed to be an exception.');
+            $this->fail("There is supposed to be an exception.");
         } catch (ClientException $e) {
             $this->assertEquals(422, $e->getCode());
-            $rowAfter = $this->api()->get("authenticators")->getBody();
+            $rowAfter = $this->api()
+                ->get("authenticators")
+                ->getBody();
             $this->assertRowsEqual($rowBefore, $rowAfter);
         }
     }
@@ -160,7 +173,8 @@ class OAuth2Test extends AbstractAPIv2Test {
     /**
      * Verify inability to create two connections with the same client ID.
      */
-    public function testPostDuplicate(): void {
+    public function testPostDuplicate(): void
+    {
         $body = ["clientID" => __FUNCTION__];
         $this->testPost($body);
 

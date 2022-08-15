@@ -11,6 +11,7 @@ import { LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditor
 import { LayoutEditorWidgetToolbar } from "@dashboard/layout/editor/LayoutEditorWidgetToolbar";
 import { IHydratedEditableWidgetProps } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { WidgetContextProvider } from "@library/layout/Widget";
+import { pointerEventsClass } from "@library/styles/styleHelpersFeedback";
 import { useFocusOnActivate } from "@vanilla/react-utils";
 import React, { useLayoutEffect, useRef } from "react";
 
@@ -54,6 +55,7 @@ export function LayoutEditorWidgetWrapper(props: IProps) {
                     </>
                 )
             }
+            childrenWrapperClassName={pointerEventsClass()}
         >
             {children}
         </WidgetContextProvider>

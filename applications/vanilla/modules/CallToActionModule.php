@@ -20,8 +20,8 @@ use Vanilla\Widgets\AbstractHomeWidgetModule;
  *
  * @package Vanilla\Community
  */
-class CallToActionModule extends AbstractReactModule {
-
+class CallToActionModule extends AbstractReactModule
+{
     /** @var string */
     private $textCTA;
     /** @var string */
@@ -73,192 +73,219 @@ class CallToActionModule extends AbstractReactModule {
     /**
      * @return string
      */
-    public function getTextCTA(): string {
+    public function getTextCTA(): string
+    {
         return $this->textCTA;
     }
 
     /**
      * @param string $textCTA
      */
-    public function setTextCTA(string $textCTA): void {
+    public function setTextCTA(string $textCTA): void
+    {
         $this->textCTA = $textCTA;
     }
 
     /**
      * @return string
      */
-    public function getUrl(): string {
+    public function getUrl(): string
+    {
         return $this->url;
     }
 
     /**
      * @param string $url
      */
-    public function setUrl(string $url): void {
+    public function setUrl(string $url): void
+    {
         $this->url = $url;
     }
 
     /**
      * @return string|null
      */
-    public function getImageUrl(): ?string {
+    public function getImageUrl(): ?string
+    {
         return $this->imageUrl;
     }
 
     /**
      * @param string|null $imageUrl
      */
-    public function setImageUrl(?string $imageUrl): void {
+    public function setImageUrl(?string $imageUrl): void
+    {
         $this->imageUrl = $imageUrl;
     }
 
     /**
      * @return string
      */
-    public function getTitle(): string {
+    public function getTitle(): string
+    {
         return $this->title;
     }
 
     /**
      * @param string $title
      */
-    public function setTitle(string $title): void {
+    public function setTitle(string $title): void
+    {
         $this->title = $title;
     }
 
     /**
      * @return string|null
      */
-    public function getDescription(): ?string {
+    public function getDescription(): ?string
+    {
         return $this->description;
     }
 
     /**
      * @param string|null $description
      */
-    public function setDescription(?string $description): void {
+    public function setDescription(?string $description): void
+    {
         $this->description = $description;
     }
 
     /**
      * @return string|null
      */
-    public function getImagePlacement(): ?string {
+    public function getImagePlacement(): ?string
+    {
         return $this->imagePlacement;
     }
 
     /**
      * @param string|null $imagePlacement
      */
-    public function setImagePlacement(?string $imagePlacement): void {
+    public function setImagePlacement(?string $imagePlacement): void
+    {
         $this->imagePlacement = $imagePlacement;
     }
 
     /**
      * @return string|null
      */
-    public function getBorderType(): ?string {
+    public function getBorderType(): ?string
+    {
         return $this->borderType;
     }
 
     /**
      * @param string|null $borderType
      */
-    public function setBorderType(?string $borderType): void {
+    public function setBorderType(?string $borderType): void
+    {
         $this->borderType = $borderType;
     }
 
     /**
      * @return array|null
      */
-    public function getOtherCTAs(): ?array {
+    public function getOtherCTAs(): ?array
+    {
         return $this->otherCTAs;
     }
 
     /**
      * @param array|null $otherCTAs
      */
-    public function setOtherCTAs(?array $otherCTAs = null): void {
+    public function setOtherCTAs(?array $otherCTAs = null): void
+    {
         $this->otherCTAs = $otherCTAs;
     }
 
     /**
      * @return string
      */
-    public function getLinkButtonType(): ?string {
+    public function getLinkButtonType(): ?string
+    {
         return $this->linkButtonType;
     }
 
     /**
      * @param string $linkButtonType
      */
-    public function setLinkButtonType(string $linkButtonType): void {
+    public function setLinkButtonType(string $linkButtonType): void
+    {
         $this->linkButtonType = $linkButtonType;
     }
 
     /**
      * @param string $alignment
      */
-    public function setAlignment(string $alignment): void {
+    public function setAlignment(string $alignment): void
+    {
         $this->alignment = $alignment;
     }
 
     /**
      * @return string
      */
-    public function getAlignment(): ?string {
+    public function getAlignment(): ?string
+    {
         return $this->alignment;
     }
 
     /**
      * @param bool $compactButtons
      */
-    public function setCompactButtons(bool $compactButtons): void {
+    public function setCompactButtons(bool $compactButtons): void
+    {
         $this->compactButtons = $compactButtons;
     }
 
     /**
      * @return bool
      */
-    public function getCompactButtons(): ?bool {
+    public function getCompactButtons(): ?bool
+    {
         return $this->compactButtons;
     }
 
     /**
      * @param bool $desktopOnly
      */
-    public function setDesktopOnly(bool $desktopOnly): void {
+    public function setDesktopOnly(bool $desktopOnly): void
+    {
         $this->desktopOnly = $desktopOnly;
     }
 
     /**
      * @return bool
      */
-    public function getDesktopOnly(): bool {
+    public function getDesktopOnly(): bool
+    {
         return $this->desktopOnly;
     }
 
     /**
      * @return string
      */
-    public function assetTarget() {
-        return 'Content';
+    public function assetTarget()
+    {
+        return "Content";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getComponentName(): string {
-        return 'CallToAction';
+    public static function getComponentName(): string
+    {
+        return "CallToAction";
     }
 
     /**
      * @return Schema
      */
-    public static function widgetUrlSchema(): Schema {
+    public static function widgetUrlSchema(): Schema
+    {
         return Schema::parse([
-            'url:s' => [
-                'x-control' => SchemaForm::textBox(new FormOptions('Url', 'Set an url.')),
+            "url:s" => [
+                "x-control" => SchemaForm::textBox(new FormOptions("Url", "Set an url.")),
             ],
         ]);
     }
@@ -266,10 +293,11 @@ class CallToActionModule extends AbstractReactModule {
     /**
      * @return Schema
      */
-    public static function widgetTextCTASchema(): Schema {
+    public static function widgetTextCTASchema(): Schema
+    {
         return Schema::parse([
-            'textCTA:s?' => [
-                'x-control' => SchemaForm::textBox(new FormOptions('Text CTA', 'Set text CTA.')),
+            "textCTA:s?" => [
+                "x-control" => SchemaForm::textBox(new FormOptions("Text CTA", "Set text CTA.")),
             ],
         ]);
     }
@@ -277,26 +305,27 @@ class CallToActionModule extends AbstractReactModule {
     /**
      * @return Schema
      */
-    public static function widgetImageUrlSchema(): Schema {
+    public static function widgetImageUrlSchema(): Schema
+    {
         return Schema::parse([
-            'imageUrl:s?' => [
-                'x-control' => SchemaForm::textBox(new FormOptions('Image Url', 'Set an image url.')),
+            "imageUrl:s?" => [
+                "x-control" => SchemaForm::textBox(new FormOptions("Image Url", "Set an image url.")),
             ],
-            'imagePlacement:s?' => [
-                'default' => 'top',
-                'x-control' => SchemaForm::dropDown(
-                    new FormOptions('Image placement', 'Choose an image position.'),
-                    new StaticFormChoices(['top' => 'Top', 'left' => 'Left'])
+            "imagePlacement:s?" => [
+                "default" => "top",
+                "x-control" => SchemaForm::dropDown(
+                    new FormOptions("Image placement", "Choose an image position."),
+                    new StaticFormChoices(["top" => "Top", "left" => "Left"])
                 ),
             ],
         ]);
     }
 
-
     /**
      * @inheritDoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         return SchemaUtils::composeSchemas(
             self::widgetUrlSchema(),
             self::widgetTextCTASchema(),
@@ -306,60 +335,55 @@ class CallToActionModule extends AbstractReactModule {
         );
     }
 
-
     /**
      * @inheritDoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Call To Action";
     }
-
 
     /**
      * Create a schema of the props for the component.
      *
      * @return Schema
      */
-    public static function getSchema(): Schema {
+    public static function getSchema(): Schema
+    {
         return Schema::parse([
-            'to:s',
-            'textCTA:s',
-            'title:s',
-            'imageUrl:s?',
-            'description:s?',
-            'otherCTAs:a?' => Schema::parse([
-                'to:s',
-                'textCTA:s',
-                'linkButtonType:s?',
-            ]),
-            'options:?' => Schema::parse([
-                'box:?' => [
-                    'borderType:s?',
+            "to:s",
+            "textCTA:s",
+            "title:s",
+            "imageUrl:s?",
+            "description:s?",
+            "otherCTAs:a?" => Schema::parse(["to:s", "textCTA:s", "linkButtonType:s?"]),
+            "options:?" => Schema::parse([
+                "box:?" => ["borderType:s?"],
+                "imagePlacement:s?" => [
+                    "enum" => ["top", "left"],
                 ],
-                'imagePlacement:s?' => [
-                    'enum' => ['top', 'left'],
-                ],
-                'linkButtonType:s?',
-                'alignment:s?',
-                'compactButtons:b?',
+                "linkButtonType:s?",
+                "alignment:s?",
+                "compactButtons:b?",
             ]),
-            'desktopOnly:b?',
+            "desktopOnly:b?",
         ]);
     }
 
     /**
      * @inheritDoc
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         $props = [
-            'to' => $this->getUrl(),
-            'textCTA' => $this->getTextCTA(),
-            'title' => $this->getTitle(),
-            'imageUrl' => $this->getImageUrl() ?? '',
-            'description' => $this->getDescription() ?? '',
-            'options' => $this->getOptions(),
-            'otherCTAs' => $this->getOtherCTAs(),
-            'desktopOnly' => $this->getdesktopOnly(),
+            "to" => $this->getUrl(),
+            "textCTA" => $this->getTextCTA(),
+            "title" => $this->getTitle(),
+            "imageUrl" => $this->getImageUrl() ?? "",
+            "description" => $this->getDescription() ?? "",
+            "options" => $this->getOptions(),
+            "otherCTAs" => $this->getOtherCTAs(),
+            "desktopOnly" => $this->getdesktopOnly(),
         ];
         $props = $this->getSchema()->validate($props);
 
@@ -371,23 +395,24 @@ class CallToActionModule extends AbstractReactModule {
      *
      * @return array
      */
-    protected function getOptions(): array {
+    protected function getOptions(): array
+    {
         $options = [
-            'imagePlacement' => $this->getImagePlacement(),
+            "imagePlacement" => $this->getImagePlacement(),
         ];
         if ($this->getBorderType()) {
-            $options['box'] = [
-                'borderType' => $this->getBorderType(),
+            $options["box"] = [
+                "borderType" => $this->getBorderType(),
             ];
         }
         if ($this->getLinkButtonType()) {
-            $options['linkButtonType'] = $this->getLinkButtonType();
+            $options["linkButtonType"] = $this->getLinkButtonType();
         }
         if ($this->getAlignment()) {
-            $options['alignment'] = $this->getAlignment();
+            $options["alignment"] = $this->getAlignment();
         }
         if ($this->getCompactButtons()) {
-            $options['compactButtons'] = $this->getCompactButtons();
+            $options["compactButtons"] = $this->getCompactButtons();
         }
 
         return $options;

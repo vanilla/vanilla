@@ -8,8 +8,8 @@ use Garden\StaticCacheConfigTrait;
 /**
  * A helper class for gatekeeping code behind feature flags.
  */
-class FeatureFlagHelper {
-
+class FeatureFlagHelper
+{
     use StaticCacheConfigTrait;
 
     /**
@@ -18,7 +18,8 @@ class FeatureFlagHelper {
      * @param string $feature The config-friendly name of the feature.
      * @return bool
      */
-    public static function featureEnabled(string $feature): bool {
+    public static function featureEnabled(string $feature): bool
+    {
         // We're going to enforce the root "Feature" namespace.
         $configValue = self::c(self::featureConfigKey($feature));
         // Force a true boolean.
@@ -32,7 +33,8 @@ class FeatureFlagHelper {
      * @param string $feature
      * @return string
      */
-    public static function featureConfigKey(string $feature): string {
+    public static function featureConfigKey(string $feature): string
+    {
         return "Feature.{$feature}.Enabled";
     }
 
@@ -44,7 +46,8 @@ class FeatureFlagHelper {
      * @param int $code Numeric code for the exception. Should be a relevant HTTP response code.
      * @throws FeatureNotEnabledException If the feature is not enabled.
      */
-    public static function ensureFeature(string $feature, string $message = "", int $code = 403) {
+    public static function ensureFeature(string $feature, string $message = "", int $code = 403)
+    {
         if (self::featureEnabled($feature) === false) {
             if ($message === "") {
                 $message = t("This feature is not enabled.");
@@ -62,11 +65,15 @@ class FeatureFlagHelper {
      * @param array $exceptionArguments Any parameters to be passed to the exception class's constructor.
      * @deprecated 2.7 Use FeatureFlagHelper::ensureFeature instead.
      */
-    public static function throwIfNotEnabled(string $feature, string $exceptionClass = \Exception::class, array $exceptionArguments = []) {
+    public static function throwIfNotEnabled(
+        string $feature,
+        string $exceptionClass = \Exception::class,
+        array $exceptionArguments = []
+    ) {
         Utility\Deprecation::log();
         if (self::featureEnabled($feature) === false) {
             if ($exceptionClass === \Exception::class && empty($exceptionArguments)) {
-                $exceptionArguments = [t('This feature is not enabled.')];
+                $exceptionArguments = [t("This feature is not enabled.")];
             }
             throw new $exceptionClass(...$exceptionArguments);
         }
@@ -75,7 +82,8 @@ class FeatureFlagHelper {
     /**
      * Clear the cache on the feature flag helper.
      */
-    public static function clearCache() {
+    public static function clearCache()
+    {
         self::$sCache = [];
     }
 }

@@ -15,7 +15,8 @@ use VanillaTests\Fixtures\Request;
 /**
  * Tests for the `MiddlewareAwareTrait`.
  */
-class MiddlewareAwareTraitTest extends TestCase {
+class MiddlewareAwareTraitTest extends TestCase
+{
     /**
      * @var MiddlewareAware
      */
@@ -24,7 +25,8 @@ class MiddlewareAwareTraitTest extends TestCase {
     /**
      * Create a fixture for tests.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->obj = new MiddlewareAware();
     }
 
@@ -35,26 +37,29 @@ class MiddlewareAwareTraitTest extends TestCase {
      * @param callable $next
      * @return mixed
      */
-    public function middleware(RequestInterface $request, callable $next) {
+    public function middleware(RequestInterface $request, callable $next)
+    {
         return $next($request);
     }
 
     /**
      * You can't add a middleware if the inner middleware isn't initialized.
      */
-    public function testAddMiddlewareTooSoon(): void {
+    public function testAddMiddlewareTooSoon(): void
+    {
         $this->expectException(\RuntimeException::class);
-        $this->obj->addMiddleware([$this, 'middleware']);
+        $this->obj->addMiddleware([$this, "middleware"]);
     }
 
     /**
      * Middleware must return a data object.
      */
-    public function testBadReturn(): void {
+    public function testBadReturn(): void
+    {
         $this->obj->setHandler(function () {
-            return 'foo';
+            return "foo";
         });
-        $this->obj->addMiddleware([$this, 'middleware']);
+        $this->obj->addMiddleware([$this, "middleware"]);
         $this->expectException(\BadFunctionCallException::class);
         $this->obj->callMiddleware(new Request());
     }
@@ -62,7 +67,8 @@ class MiddlewareAwareTraitTest extends TestCase {
     /**
      * You can't call the middleware if there is none.
      */
-    public function testNoMiddlewareCall(): void {
+    public function testNoMiddlewareCall(): void
+    {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage("Cannot call middleware before the inner middleware is initialized.");
         $this->obj->callMiddleware(new Request());

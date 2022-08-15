@@ -10,7 +10,8 @@ namespace VanillaTests;
 /**
  * A data class for capturing sent emails in tests.
  */
-class CapturedEmail {
+class CapturedEmail
+{
     /**
      * @var string|null
      */
@@ -44,7 +45,8 @@ class CapturedEmail {
     /**
      * CapturedEmail constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /**
@@ -53,9 +55,10 @@ class CapturedEmail {
      * @param CapturedEmailAddress[] $arr
      * @param string[][] $emails
      */
-    private function addEmailAddresses(&$arr, $emails): void {
+    private function addEmailAddresses(&$arr, $emails): void
+    {
         foreach ($emails as [$email, $name]) {
-            $arr[] = new CapturedEmailAddress((string)$email, (string)$name);
+            $arr[] = new CapturedEmailAddress((string) $email, (string) $name);
         }
     }
 
@@ -66,7 +69,8 @@ class CapturedEmail {
      * @param string|null $name
      * @return CapturedEmailAddress|null
      */
-    public function findRecipient(?string $email, ?string $name = null): ?CapturedEmailAddress {
+    public function findRecipient(?string $email, ?string $name = null): ?CapturedEmailAddress
+    {
         $to = $this->findRecipientOn($this->to, $email, $name);
         if ($to) {
             return $to;
@@ -89,7 +93,8 @@ class CapturedEmail {
      * @param string|null $name The name to search for  or null for all names.
      * @return CapturedEmailAddress|null
      */
-    public function findRecipientOn(array $arr, ?string $email, ?string $name): ?CapturedEmailAddress {
+    public function findRecipientOn(array $arr, ?string $email, ?string $name): ?CapturedEmailAddress
+    {
         /** @var CapturedEmailAddress $to */
         foreach ($arr as $to) {
             if ($email !== null && $to->email !== $email) {
@@ -109,7 +114,8 @@ class CapturedEmail {
      * @param \Gdn_Email $email
      * @return CapturedEmail $email
      */
-    public static function fromEmail(\Gdn_Email $email): self {
+    public static function fromEmail(\Gdn_Email $email): self
+    {
         $r = new self();
         $r->subject = $email->PhpMailer->Subject;
         $r->body = $email->PhpMailer->Body;

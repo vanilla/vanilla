@@ -320,8 +320,7 @@ window.vanilla.embed = function(host) {
             vanillaIframe.addEventListener('load', loaded, true);
         } else if (vanillaIframe.attachEvent) {
             vanillaIframe.attachEvent('onload', loaded);
-        } else
-            setTimeout(2000, loaded);
+        }
 
         container.appendChild(img);
 
@@ -332,15 +331,12 @@ window.vanilla.embed = function(host) {
                 dataType: 'script',
                 cache: true,
                 success: function() {
-//               setTimeout(function() {
-
                     if (jQuery.fn.appear)
                         jQuery('#vanilla-comments').appear(function() {
                             container.appendChild(vanillaIframe);
                         });
                     else
                         container.appendChild(vanillaIframe); // fallback
-//               }, 10000);
                 }
             });
         } else {
@@ -354,6 +350,15 @@ window.vanilla.embed = function(host) {
     vanilla_embed_css.type = 'text/css';
     vanilla_embed_css.href = host_base_url + (host_base_url.substring(host_base_url.length - 1) == '/' ? '' : '/') + 'applications/dashboard/design/embed.css';
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanilla_embed_css);
+
+    // If the iFrame has not been revealed in 15 seconds
+    // force it to show, as it may contain some error or captcha
+    setTimeout(() => {
+        if (vanillaIframe.style.visibility !== "visible" || parseInt(vanillaIframe.style.height, 10) <= 0) {
+            vanillaIframe.style.visibility = "visible";
+            vanillaIframe.style.height = "75vh";
+        }
+    },10000)
 
     return this;
 };

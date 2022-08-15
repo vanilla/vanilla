@@ -14,12 +14,13 @@ use VanillaTests\SiteTestCase;
  *
  * These are relatively minimal as internal request is already heavily used throughout our test suite.
  */
-class InternalClientTest extends SiteTestCase {
-
+class InternalClientTest extends SiteTestCase
+{
     /**
      * Test that our internal request does not pollute our headers.
      */
-    public function testInternalClientNoRequestPollution() {
+    public function testInternalClientNoRequestPollution()
+    {
         $headers = headers_list();
         $this->api->get("/users/\$me");
         $this->assertSame(headers_list(), $headers);

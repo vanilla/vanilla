@@ -25,8 +25,8 @@ use Vanilla\Formatting\Quill\Nesting\NestingParentRendererInterface;
  * - Multiple Text formats in a single paragraph (as well as inline embeds).
  * - Multiple line blots if it is a line type grouping
  */
-class BlotGroup implements NestableItemInterface, NestingParentInterface {
-
+class BlotGroup implements NestableItemInterface, NestingParentInterface
+{
     /** @var AbstractBlot|BlotGroup[] */
     private $blotsAndGroups = [];
 
@@ -35,17 +35,15 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * Blots that can determine the surrounding tag over the other blot types.
      */
-    private $overridingBlots = [
-        CodeLineTerminatorBlot::class,
-        AbstractLineTerminatorBlot::class,
-    ];
+    private $overridingBlots = [CodeLineTerminatorBlot::class, AbstractLineTerminatorBlot::class];
 
     /**
      * Determine if this group is made up only of a break.
      *
      * @return bool
      */
-    public function isBreakOnlyGroup(): bool {
+    public function isBreakOnlyGroup(): bool
+    {
         if (count($this->blotsAndGroups) !== 1) {
             return false;
         }
@@ -64,7 +62,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return bool
      */
-    public function endsWithBlotOfType(string $blotClass, bool $needsExactMatch = false): bool {
+    public function endsWithBlotOfType(string $blotClass, bool $needsExactMatch = false): bool
+    {
         if (count($this->blotsAndGroups) === 0) {
             return false;
         }
@@ -83,14 +82,16 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return bool
      */
-    public function isEmpty(): bool {
+    public function isEmpty(): bool
+    {
         return count($this->blotsAndGroups) === 0;
     }
 
     /**
      * @inheritdoc
      */
-    public function canNest(BlotGroup $otherGroup): bool {
+    public function canNest(BlotGroup $otherGroup): bool
+    {
         $lastIndex = count($this->blotsAndGroups) - 1;
         $lastItem = $this->blotsAndGroups[$lastIndex] ?? null;
         return $lastItem instanceof NestingParentInterface && $lastItem->canNest($otherGroup);
@@ -99,7 +100,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
     /**
      * @inheritdoc
      */
-    public function getNestingDepth(): int {
+    public function getNestingDepth(): int
+    {
         $ownMainBlot = $this->getMainBlot();
         return $ownMainBlot->getNestingDepth();
     }
@@ -107,7 +109,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
     /**
      * @inheritdoc
      */
-    public function nestGroup(BlotGroup $blotGroup): void {
+    public function nestGroup(BlotGroup $blotGroup): void
+    {
         // First try to nest into our own blotgroup, if possible.
         $lastIndex = count($this->blotsAndGroups) - 1;
         $lastItem = $this->blotsAndGroups[$lastIndex] ?? null;
@@ -123,19 +126,19 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return bool
      */
-    public function canMerge(BlotGroup $otherGroup): bool {
+    public function canMerge(BlotGroup $otherGroup): bool
+    {
         $otherGroupMainBlot = $otherGroup->getMainBlot();
-        return (
-            $otherGroupMainBlot instanceof NestingParentInterface
-            && $this->getMainBlot() instanceof NestingParentInterface
-            && !$otherGroupMainBlot->shouldClearCurrentGroup($this)
-        );
+        return $otherGroupMainBlot instanceof NestingParentInterface &&
+            $this->getMainBlot() instanceof NestingParentInterface &&
+            !$otherGroupMainBlot->shouldClearCurrentGroup($this);
     }
 
     /**
      * @return BlotGroup[]|AbstractBlot
      */
-    public function getBlotsAndGroups() {
+    public function getBlotsAndGroups()
+    {
         return $this->blotsAndGroups;
     }
 
@@ -144,22 +147,21 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return string
      */
-    public function render(): string {
+    public function render(): string
+    {
         // We need a special exception for empty paragraph only blots.
         // This because the ParagraphLineTerminatorBlot does not render a break if there is other group content
         // But does render a break if it is alone. This is mostly to make styling easier.
         // We do not want to need make the paragraph terminator aware of its group.
         if (count($this->blotsAndGroups) === 1) {
             $blot = $this->blotsAndGroups[0];
-            if ($blot instanceof ParagraphLineTerminatorBlot &&
-                $blot->getContent() === "\n"
-            ) {
+            if ($blot instanceof ParagraphLineTerminatorBlot && $blot->getContent() === "\n") {
                 return "<p><br></p>";
             }
         }
 
         // Don't render empty groups.
-        $result = '';
+        $result = "";
         $result .= $this->renderOpeningTag();
         $result .= $this->renderContent();
         $result .= $this->renderClosingTag();
@@ -171,8 +173,9 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return string
      */
-    public function renderContent(): string {
-        $result = '';
+    public function renderContent(): string
+    {
+        $result = "";
         $surroundTagBlot = $this->getMainBlot();
 
         if ($surroundTagBlot instanceof AbstractLineTerminatorBlot) {
@@ -190,7 +193,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
     /**
      * @return string
      */
-    public function renderOpeningTag(): string {
+    public function renderOpeningTag(): string
+    {
         $surroundTagBlot = $this->getMainBlot();
         return $surroundTagBlot->getGroupOpeningTag();
     }
@@ -198,7 +202,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
     /**
      * @return string
      */
-    public function renderClosingTag(): string {
+    public function renderClosingTag(): string
+    {
         $surroundTagBlot = $this->getMainBlot();
         return $surroundTagBlot->getGroupClosingTag();
     }
@@ -212,7 +217,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return string
      */
-    public function renderLineGroup(): string {
+    public function renderLineGroup(): string
+    {
         $result = "";
 
         // Look ahead and get all of the line terminators.
@@ -258,7 +264,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      * @param int $from The index to start from.
      * @return string
      */
-    public function renderPartialLineGroupContent(int $from = 0): string {
+    public function renderPartialLineGroupContent(int $from = 0): string
+    {
         $result = "";
 
         for ($i = $from; $i < count($this->blotsAndGroups); $i++) {
@@ -279,7 +286,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return array
      */
-    private function getLineTerminators(): array {
+    private function getLineTerminators(): array
+    {
         $terminators = [];
         foreach ($this->blotsAndGroups as $blot) {
             if ($blot instanceof AbstractLineTerminatorBlot) {
@@ -297,7 +305,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return string[]
      */
-    public function getMentionUsernames() {
+    public function getMentionUsernames()
+    {
         if ($this->getMainBlot() instanceof Blots\Lines\BlockquoteLineTerminatorBlot) {
             return [];
         }
@@ -325,7 +334,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @param AbstractBlot[] $blots
      */
-    public function pushBlots(array $blots) {
+    public function pushBlots(array $blots)
+    {
         foreach ($blots as $blot) {
             $this->blotsAndGroups[] = $blot;
         }
@@ -338,7 +348,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return int
      */
-    public function getIndexForBlotOfType(string $blotClass): int {
+    public function getIndexForBlotOfType(string $blotClass): int
+    {
         $index = -1;
 
         foreach ($this->blotsAndGroups as $blotIndex => $blot) {
@@ -356,7 +367,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return AbstractBlot|null
      */
-    public function getMainBlot(): ?AbstractBlot {
+    public function getMainBlot(): ?AbstractBlot
+    {
         if (count($this->blotsAndGroups) === 0) {
             return null;
         }
@@ -371,7 +383,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return null|AbstractBlot
      */
-    public function getOverrideBlot(): ?AbstractBlot {
+    public function getOverrideBlot(): ?AbstractBlot
+    {
         foreach ($this->overridingBlots as $overridingBlot) {
             $index = $this->getIndexForBlotOfType($overridingBlot);
             if ($index >= 0) {
@@ -387,7 +400,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return string[]
      */
-    public function getTestData(): array {
+    public function getTestData(): array
+    {
         $blots = [];
         foreach ($this->blotsAndGroups as $blot) {
             if ($blot instanceof AbstractBlot) {
@@ -406,7 +420,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return string
      */
-    public function getUnsafeText(): string {
+    public function getUnsafeText(): string
+    {
         $text = "";
         $mainBlot = $this->getMainBlot();
         if ($mainBlot instanceof SpoilerLineTerminatorBlot) {
@@ -438,7 +453,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      * @param int|null $from The index to search from.
      * @return AbstractLineTerminatorBlot|null
      */
-    public function getTerminatorBlot(int $from = null): ?AbstractLineTerminatorBlot {
+    public function getTerminatorBlot(int $from = null): ?AbstractLineTerminatorBlot
+    {
         if ($this->isEmpty()) {
             return null;
         }
@@ -457,7 +473,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      *
      * @return array
      */
-    public function getOperations(): array {
+    public function getOperations(): array
+    {
         $result = [];
 
         foreach ($this->blotsAndGroups as $blot) {
@@ -486,7 +503,8 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface {
      * @param int $from
      * @param int|null $to
      */
-    public function replace(array $new, int $from = 0, int $to = null): void {
+    public function replace(array $new, int $from = 0, int $to = null): void
+    {
         if ($to === null) {
             $to = count($this->getBlotsAndGroups());
         }

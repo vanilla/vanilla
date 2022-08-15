@@ -14,7 +14,7 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 import SelectOne from "@library/forms/select/SelectOne";
 import { useReduxActions } from "@library/redux/ReduxActions";
 import { CategoryDisplayAs, ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import { LazyTokens } from "@library/forms/select/LazyTokens";
+import { Tokens } from "@library/forms/select/Tokens";
 
 interface IProps {
     multiple?: boolean;
@@ -75,7 +75,7 @@ export function CommunityCategoryInput(props: IProps) {
 
     if (multiple) {
         return (
-            <LazyTokens
+            <Tokens
                 onFocus={setFocused}
                 {...props}
                 placeholder={t("Search...")}

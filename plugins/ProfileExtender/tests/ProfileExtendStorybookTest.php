@@ -14,33 +14,30 @@ use VanillaTests\Storybook\StorybookGenerationTestCase;
  *
  * @package VanillaTests\Addons\ProfileExtender
  */
-class ProfileExtendStorybookTest extends StorybookGenerationTestCase {
-
+class ProfileExtendStorybookTest extends StorybookGenerationTestCase
+{
     use ProfileExtenderTestTrait;
 
     /**
      * {@inheritdoc}
      */
-    public static function getAddons(): array {
-        return ['vanilla', 'profileextender'];
+    public static function getAddons(): array
+    {
+        return ["vanilla", "profileextender"];
     }
 
     /**
      * Test field is on edit profile page.
      */
-    public function testEditProfile() {
-        $this
-            ->getProfileExtenderPlugin()
-            ->updateUserFields(
-                \Gdn::session()->User->UserID,
-                [
-                    'text' => 'This is a text field',
-                    'dropdown' => 'Option2',
-                    'check' => true,
-                ]
-            );
+    public function testEditProfile()
+    {
+        $this->getProfileExtenderPlugin()->updateUserFields(\Gdn::session()->User->UserID, [
+            "text" => "This is a text field",
+            "dropdown" => "Option2",
+            "check" => true,
+        ]);
 
         $encodedName = rawurlencode(\Gdn::session()->User->Name);
-        $this->generateStoryHtml("/profile/edit/$encodedName", 'Edit Profile (Extended)');
+        $this->generateStoryHtml("/profile/edit/$encodedName", "Edit Profile (Extended)");
     }
 }

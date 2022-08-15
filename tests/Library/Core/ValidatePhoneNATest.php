@@ -13,13 +13,14 @@ use PHPUnit\Framework\TestCase;
  * Tests for validatePhoneNA().
  */
 
-class ValidatePhoneNATest extends TestCase {
-
+class ValidatePhoneNATest extends TestCase
+{
     /**
      * Test with empty string.
      */
-    public function testValidatePhoneNAWithEmptyString() {
-        $actual = validatePhoneNA('');
+    public function testValidatePhoneNAWithEmptyString()
+    {
+        $actual = validatePhoneNA("");
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -27,7 +28,8 @@ class ValidatePhoneNATest extends TestCase {
     /**
      * Test with integers.
      */
-    public function testValidatePhoneNAWithIntegers() {
+    public function testValidatePhoneNAWithIntegers()
+    {
         $actual = validatePhoneNA(12345678901);
         $expected = true;
         $this->assertSame($expected, $actual);
@@ -36,8 +38,9 @@ class ValidatePhoneNATest extends TestCase {
     /**
      * Test with string.
      */
-    public function testValidatePhoneNAWithString() {
-        $actual = validatePhoneNA('12345678901');
+    public function testValidatePhoneNAWithString()
+    {
+        $actual = validatePhoneNA("12345678901");
         $expected = true;
         $this->assertSame($expected, $actual);
     }

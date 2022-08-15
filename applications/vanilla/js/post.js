@@ -151,6 +151,8 @@ jQuery(document).ready(function($) {
                         $(frm).triggerHandler('complete');
                         // Redirect to the new discussion
                         document.location = json.RedirectTo;
+                        // Stop further code execution as the redirect occurs
+                        return false;
                     } else {
                         var contentContainer = $("#Content");
 

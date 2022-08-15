@@ -20,8 +20,8 @@ use Vanilla\Scheduler\SchedulerInterface;
 /**
  * A model for managing products.
  */
-class RemoteResourceModel extends FullRecordCacheModel {
-
+class RemoteResourceModel extends FullRecordCacheModel
+{
     /** Cache time to live. */
     const CACHE_TTL = 3600;
 
@@ -37,14 +37,11 @@ class RemoteResourceModel extends FullRecordCacheModel {
      * @param \Gdn_Cache $cache
      * @param SchedulerInterface $scheduler
      */
-    public function __construct(
-        \Gdn_Cache $cache,
-        SchedulerInterface $scheduler
-    ) {
+    public function __construct(\Gdn_Cache $cache, SchedulerInterface $scheduler)
+    {
         parent::__construct("remoteResource", $cache);
         $dateProcessor = new Operation\CurrentDateFieldProcessor();
-        $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
-            ->setUpdateFields(["dateUpdated"]);
+        $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])->setUpdateFields(["dateUpdated"]);
         $this->addPipelineProcessor($dateProcessor);
         $this->scheduler = $scheduler;
     }
@@ -62,11 +59,9 @@ class RemoteResourceModel extends FullRecordCacheModel {
      * @param string $url
      * @return string|null
      */
-    public function getByUrl(string $url): ?string {
-        $resource = $this->select(
-            ["url" => $url],
-            ["cacheOptions" => [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]]
-        );
+    public function getByUrl(string $url): ?string
+    {
+        $resource = $this->select(["url" => $url], ["cacheOptions" => [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]]);
 
         $resource = is_array($resource) ? reset($resource) : $resource;
         $isValid = $resource ? !$this->checkIfContentIsStale($resource) : false;
@@ -75,7 +70,7 @@ class RemoteResourceModel extends FullRecordCacheModel {
             $this->triggerLocalRemoteResourceJob($url);
         }
 
-        $resourceContent = $resource['content'] ?? null;
+        $resourceContent = $resource["content"] ?? null;
         return $resourceContent;
     }
 
@@ -85,8 +80,12 @@ class RemoteResourceModel extends FullRecordCacheModel {
      * @param array $set
      * @param array $options
      */
-    public function insert($set, $options = []) {
-        parent::insert($set, [Model::OPT_REPLACE => true, ["cacheOptions" => [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]]]);
+    public function insert($set, $options = [])
+    {
+        parent::insert($set, [
+            Model::OPT_REPLACE => true,
+            ["cacheOptions" => [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]],
+        ]);
     }
 
     /**
@@ -98,8 +97,9 @@ class RemoteResourceModel extends FullRecordCacheModel {
      * @return bool
      * @throws \Exception Only use insert method to update records.
      */
-    public function update(array $set, array $where, array $options = []): bool {
-        throw new \Exception('use insert method to update records');
+    public function update(array $set, array $where, array $options = []): bool
+    {
+        throw new \Exception("use insert method to update records");
     }
 
     /**
@@ -108,7 +108,8 @@ class RemoteResourceModel extends FullRecordCacheModel {
      * @param string $url
      * @return string
      */
-    public function triggerLocalRemoteResourceJob(string $url): string {
+    public function triggerLocalRemoteResourceJob(string $url): string
+    {
         $jobDescriptor = new NormalJobDescriptor(LocalRemoteResourceJob::class);
         $jobDescriptor->setMessage(["url" => $url]);
         $response = $this->scheduler->addJobDescriptor($jobDescriptor);
@@ -121,8 +122,9 @@ class RemoteResourceModel extends FullRecordCacheModel {
      * @param array $resourceContent
      * @return bool
      */
-    private function checkIfContentIsStale(array $resourceContent): bool {
-        $resourceContentDateUpdated = $resourceContent['dateUpdated'] ?? null;
+    private function checkIfContentIsStale(array $resourceContent): bool
+    {
+        $resourceContentDateUpdated = $resourceContent["dateUpdated"] ?? null;
         $difference = null;
         if ($resourceContentDateUpdated) {
             $difference = CurrentTimeStamp::getCurrentTimeDifference($resourceContentDateUpdated);

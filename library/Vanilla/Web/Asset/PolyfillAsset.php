@@ -11,18 +11,21 @@ namespace Vanilla\Web\Asset;
  * A class representing the polyfill file loaded by
  * @see WebpackAssetProvider::getInlinePolyfillContents();
  */
-class PolyfillAsset extends SiteAsset {
+class PolyfillAsset extends SiteAsset
+{
     /**
      * @inheritdoc
      */
-    public function getWebPath(): string {
-        return $this->makeAssetPath(PATH_DIST_NAME, 'polyfills.min.js');
+    public function getWebPath(): string
+    {
+        return $this->makeAssetPath(PATH_DIST_NAME, "polyfills.min.js");
     }
 
     /**
      * @inheritdoc
      */
-    public function isStatic(): bool {
+    public function isStatic(): bool
+    {
         return true;
     }
 }

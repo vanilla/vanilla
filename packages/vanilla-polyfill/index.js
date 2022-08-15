@@ -29,8 +29,7 @@ polyfillStringNormalize();
  */
 export function polyfillClosest() {
     if (!Element.prototype.matches) {
-        Element.prototype.matches =
-            (Element).prototype.msMatchesSelector || (Element).prototype.webkitMatchesSelector;
+        Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
     }
 
     if (!Element.prototype.closest) {
@@ -60,8 +59,8 @@ export function polyfillClosest() {
  * https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove#Polyfill
  */
 function polyfillRemove() {
-    (arr => {
-        arr.forEach(item => {
+    ((arr) => {
+        arr.forEach((item) => {
             if (item.hasOwnProperty("remove")) {
                 return;
             }
@@ -112,9 +111,8 @@ function polyfillStringNormalize() {
 
     String.prototype.normalize = function () {
         return this;
-    }
+    };
 }
-
 
 /**
  * Polyfill "append" for ie11.
@@ -123,10 +121,10 @@ function polyfillStringNormalize() {
 // Source: https://github.com/jserz/js_piece/blob/master/DOM/ParentNode/append()/append().md
 (function (arr) {
     arr.forEach(function (item) {
-        if (item.hasOwnProperty('append')) {
+        if (item.hasOwnProperty("append")) {
             return;
         }
-        Object.defineProperty(item, 'append', {
+        Object.defineProperty(item, "append", {
             configurable: true,
             enumerable: true,
             writable: true,
@@ -140,7 +138,7 @@ function polyfillStringNormalize() {
                 });
 
                 this.appendChild(docFrag);
-            }
+            },
         });
     });
 })([Element.prototype, Document.prototype, DocumentFragment.prototype]);
@@ -152,10 +150,10 @@ function polyfillStringNormalize() {
 
 (function (arr) {
     arr.forEach(function (item) {
-        if (item.hasOwnProperty('prepend')) {
+        if (item.hasOwnProperty("prepend")) {
             return;
         }
-        Object.defineProperty(item, 'prepend', {
+        Object.defineProperty(item, "prepend", {
             configurable: true,
             enumerable: true,
             writable: true,
@@ -169,7 +167,7 @@ function polyfillStringNormalize() {
                 });
 
                 this.insertBefore(docFrag, this.firstChild);
-            }
+            },
         });
     });
 })([Element.prototype, Document.prototype, DocumentFragment.prototype]);
@@ -179,16 +177,13 @@ function polyfillStringNormalize() {
  */
 
 if (!window.requestAnimationFrame) {
-    window.requestAnimationFrame = (function() {
+    window.requestAnimationFrame = (function () {
         return (
             window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame ||
             window.oRequestAnimationFrame ||
             window.msRequestAnimationFrame ||
-            function(
-                /* function FrameRequestCallback */ callback,
-                /* DOMElement Element */ element
-            ) {
+            function (/* function FrameRequestCallback */ callback, /* DOMElement Element */ element) {
                 window.setTimeout(callback, 1000 / 60);
             }
         );

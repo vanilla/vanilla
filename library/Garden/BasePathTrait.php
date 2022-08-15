@@ -9,8 +9,8 @@ namespace Garden;
 /**
  * Basic trait for managing base path testing.
  */
-trait BasePathTrait {
-
+trait BasePathTrait
+{
     /** @var string */
     protected $basePath;
 
@@ -19,7 +19,8 @@ trait BasePathTrait {
      *
      * @return string|null
      */
-    public function getBasePath(): ?string {
+    public function getBasePath(): ?string
+    {
         return $this->basePath;
     }
 
@@ -29,7 +30,8 @@ trait BasePathTrait {
      * @param string $path
      * @return bool
      */
-    protected function inBasePath(string $path): bool {
+    protected function inBasePath(string $path): bool
+    {
         $result = strcasecmp(substr($path, 0, strlen($this->basePath)), $this->basePath) === 0;
         return $result;
     }
@@ -39,7 +41,8 @@ trait BasePathTrait {
      *
      * @param string $basePath
      */
-    public function setBasePath(string $basePath): void {
+    public function setBasePath(string $basePath): void
+    {
         $this->basePath = $basePath;
     }
 }

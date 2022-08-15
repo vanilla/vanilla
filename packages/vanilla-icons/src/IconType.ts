@@ -3,24 +3,28 @@
  * @license gpl-2.0-only
  */
 
-type DashboardIconType = "dashboard-edit" | "vanilla-logo";
+type AnalyticsIconType = "analytics-add" | "analytics-remove";
+
+type DashboardIconType = "dashboard-edit";
 
 type DataIconType =
+    | "data-add"
+    | "data-down"
     | "data-folder-tabs"
+    | "data-left"
     | "data-pencil"
     | "data-refresh"
-    | "data-trash"
-    | "data-add"
-    | "data-up"
-    | "data-down"
+    | "data-replace"
     | "data-right"
-    | "data-left"
     | "data-swap"
-    | "data-replace";
+    | "data-trash"
+    | "data-up";
 
 type DiscussionIconType = "discussion-bookmark-solid" | "discussion-bookmark";
 
 type EditorIconType = "editor-eye-slash" | "editor-eye";
+
+type ExternalIconType = "external-link";
 
 type MeIconType = "me-messages-solid" | "me-messages" | "me-notifications-solid" | "me-notifications" | "me-sign-in";
 
@@ -34,16 +38,19 @@ type MetaIconType =
     | "meta-unresolved"
     | "meta-view";
 
-type NavigationIconType = "navigation-ellipsis" | "navigation-languages";
+type NavigationIconType =
+    | "navigation-collapseAll"
+    | "navigation-ellipsis"
+    | "navigation-expandAll"
+    | "navigation-languages";
+
+type NewIconType = "new-discussion" | "new-event" | "new-idea" | "new-poll" | "new-question";
 
 type SearchIconType = "search-events" | "search-search";
 
-type AnalyticsIconType = "analytics-add" | "analytics-remove";
-type StatusIconTypes = "status-warning";
+type StatusIconType = "status-warning";
 
-type NewPostIconType = "new-question" | "new-poll" | "new-idea" | "new-discussion" | "new-event";
-
-type ExternalIconType = "external-link";
+type VanillaIconType = "vanilla-logo";
 
 export type IconType =
     | AnalyticsIconType
@@ -55,6 +62,7 @@ export type IconType =
     | MeIconType
     | MetaIconType
     | NavigationIconType
-    | NewPostIconType
+    | NewIconType
     | SearchIconType
-    | StatusIconTypes;
+    | StatusIconType
+    | VanillaIconType;

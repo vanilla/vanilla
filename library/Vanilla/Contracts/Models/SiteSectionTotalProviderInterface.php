@@ -12,7 +12,8 @@ use Vanilla\Contracts\Site\SiteSectionInterface;
 /**
  * Interface for record types with custom logic for crawlable counts for a specified site section.
  */
-interface SiteSectionTotalProviderInterface extends SiteTotalProviderInterface {
+interface SiteSectionTotalProviderInterface extends SiteTotalProviderInterface
+{
     /**
      * Calculate the actual count of crawlable records for the model.
      *

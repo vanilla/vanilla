@@ -7,11 +7,11 @@
 
 namespace Vanilla;
 
-
 /**
  * Represents an invalid validation result.
  */
-class Invalid {
+class Invalid
+{
     /**
      * @var string
      */
@@ -22,7 +22,8 @@ class Invalid {
      *
      * @param string $messageCode The message translation code.
      */
-    public function __construct(string $messageCode) {
+    public function __construct(string $messageCode)
+    {
         $this->messageCode = $messageCode;
     }
 
@@ -31,7 +32,8 @@ class Invalid {
      *
      * @return string Returns the message code.
      */
-    public function getMessageCode(): string {
+    public function getMessageCode(): string
+    {
         return $this->messageCode;
     }
 
@@ -42,10 +44,11 @@ class Invalid {
      *
      * @return Invalid Returns an invalid value.
      */
-    public static function emptyMessage() {
+    public static function emptyMessage()
+    {
         static $value;
         if ($value === null) {
-            $value = new Invalid('');
+            $value = new Invalid("");
         }
 
         return $value;

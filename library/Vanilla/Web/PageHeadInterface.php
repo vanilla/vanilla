@@ -14,8 +14,8 @@ use Vanilla\Navigation\Breadcrumb;
 /**
  * Interface for all public page head methods.
  */
-interface PageHeadInterface {
-
+interface PageHeadInterface
+{
     /**
      * Set the section of the site we are serving assets for.
      *
@@ -33,6 +33,14 @@ interface PageHeadInterface {
      * @return $this For chaining.
      */
     public function addJsonLDItem(AbstractJsonLDItem $item);
+
+    /**
+     * Set Json-LD array object.
+     *
+     * @param array $setJsonLDItems
+     * @return mixed
+     */
+    public function setJsonLdItems(array $setJsonLDItems);
 
     /**
      * Set the page title (in the browser tab).

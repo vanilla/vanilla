@@ -6,7 +6,7 @@
 import { useHashScrolling } from "@library/content/hashScrolling";
 import React from "react";
 import { mountPortal } from "@vanilla/react-utils";
-import { MODAL_CONTAINER_ID } from "@library/modal/Modal";
+import { MODAL_CONTAINER_ID } from "@library/modal/mountModal";
 
 export function triggerLegacyHashScrolling() {
     mountPortal(<LegacyHashScroller />, MODAL_CONTAINER_ID);

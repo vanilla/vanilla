@@ -17,7 +17,8 @@
  *
  * @return string Some HTML.
  */
-function smarty_function_community_chooser(array $params): string {
+function smarty_function_community_chooser(array $params): string
+{
     $props = json_encode($params);
     return "<span data-react='subcommunity-chooser' data-props='$props'></span>";
 }

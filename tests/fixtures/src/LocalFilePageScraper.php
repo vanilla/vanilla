@@ -11,16 +11,17 @@ use Garden\Http\HttpResponse;
 /**
  * A PageScraper class, limited to local files.
  */
-class LocalFilePageScraper extends \Vanilla\PageScraper {
-
+class LocalFilePageScraper extends \Vanilla\PageScraper
+{
     /** @var string */
     private $htmlDir;
     /** @var array Valid URL schemes.  Overwrites parent class property, for unit tests. */
-    protected $validSchemes = [false, 'http', 'https'];
+    protected $validSchemes = [false, "http", "https"];
     /**
      * Get the configured HTML directory.
      */
-    public function getHtmlDir(): ?string {
+    public function getHtmlDir(): ?string
+    {
         return $this->htmlDir;
     }
 
@@ -30,7 +31,8 @@ class LocalFilePageScraper extends \Vanilla\PageScraper {
      * @param string $relativePath Path to the file, relative to the configured HTML directory.
      * @return HttpResponse
      */
-    protected function getUrl(string $relativePath): HttpResponse {
+    protected function getUrl(string $relativePath): HttpResponse
+    {
         if ($this->htmlDir === null) {
             throw new \RuntimeException("HTML directory has not been configured.");
         }
@@ -59,7 +61,8 @@ class LocalFilePageScraper extends \Vanilla\PageScraper {
      * @param string $dir
      * @return self
      */
-    public function setHtmlDir(string $dir): self {
+    public function setHtmlDir(string $dir): self
+    {
         $dir = rtrim($dir, "\\/");
         if (file_exists($dir) === false) {
             throw new \InvalidArgumentException("Directory does not exist.");

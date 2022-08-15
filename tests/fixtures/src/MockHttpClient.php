@@ -14,8 +14,8 @@ use Garden\Http\HttpResponse;
 /**
  * Mock HTTP client for testing. Does send actual HTTP requests.
  */
-class MockHttpClient extends HttpClient {
-
+class MockHttpClient extends HttpClient
+{
     use MockResponseTrait;
 
     /** @var HttpResponse */
@@ -26,7 +26,8 @@ class MockHttpClient extends HttpClient {
      * We're going to use our own middleware instead.
      * @inheritdoc
      */
-    public function __construct(string $baseUrl = '') {
+    public function __construct(string $baseUrl = "")
+    {
         parent::__construct($baseUrl);
 
         // One big difference is the mock middleware starts with a response instead of a request.
@@ -41,7 +42,8 @@ class MockHttpClient extends HttpClient {
      * @overrid
      * @inheritdoc
      */
-    public function request(string $method, string $uri, $body, array $headers = [], array $options = []) {
+    public function request(string $method, string $uri, $body, array $headers = [], array $options = [])
+    {
         $key = $this->makeMockResponseKey($uri, $method, $body);
 
         // Lookup an existing mock response or send back a 404.
@@ -59,7 +61,7 @@ class MockHttpClient extends HttpClient {
         $request = $this->createRequest($method, $uri, $body, $headers, $options);
         $response = call_user_func($this->middleware, $request);
 
-        if (!$response->isResponseClass('2xx')) {
+        if (!$response->isResponseClass("2xx")) {
             $this->handleErrorResponse($response, $options);
         }
 

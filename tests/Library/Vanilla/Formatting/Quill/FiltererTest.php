@@ -19,18 +19,19 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * General testing of Filterer.
  */
-class FiltererTest extends MinimalContainerTestCase {
-
+class FiltererTest extends MinimalContainerTestCase
+{
     /**
      * Do some container registration.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        self::container()->rule(EmbedService::class)
-            ->addCall('registerEmbed', [QuoteEmbed::class, QuoteEmbed::TYPE])
-            ->addCall('registerFilter', [new Reference(QuoteEmbedFilter::class)]);
+        self::container()
+            ->rule(EmbedService::class)
+            ->addCall("registerEmbed", [QuoteEmbed::class, QuoteEmbed::TYPE])
+            ->addCall("registerFilter", [new Reference(QuoteEmbedFilter::class)]);
     }
-
 
     /**
      * Assert that the filterer is validating json properly.
@@ -41,12 +42,13 @@ class FiltererTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideIO
      */
-    public function testFilterer(string $input, string $output, bool $disableUrlEmbeds = false): void {
+    public function testFilterer(string $input, string $output, bool $disableUrlEmbeds = false): void
+    {
         /** @var Filterer $filterer */
         $filterer = self::container()->get(Filterer::class);
         /** @var \Gdn_Configuration $config */
-        $config = static::container()->get('Config');
-        $config->set('Garden.Format.DisableUrlEmbeds', $disableUrlEmbeds, true, false);
+        $config = static::container()->get("Config");
+        $config->set("Garden.Format.DisableUrlEmbeds", $disableUrlEmbeds, true, false);
 
         $filteredOutput = $filterer->filter($input);
 
@@ -61,7 +63,8 @@ class FiltererTest extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function provideIO() {
+    public function provideIO()
+    {
         $loadingEmbed = <<<JSON
    {
       "insert":{
@@ -158,13 +161,8 @@ JSON;
 ]
 JSON;
 
-
         return [
-            [
-                "[$loadingEmbed, {\"insert\":\"\\n\"}]",
-                "[{\"insert\":\"\\n\"}]",
-                false
-            ],
+            ["[$loadingEmbed, {\"insert\":\"\\n\"}]", "[{\"insert\":\"\\n\"}]", false],
             [
                 "[{\"insert\":\"This is some Text\"}, $loadingEmbed, {\"insert\":\"loading embed should be gone\"}]",
                 "[{\"insert\":\"This is some Text\"},{\"insert\":\"loading embed should be gone\"}]",
@@ -173,7 +171,7 @@ JSON;
             [
                 "[{\"insert\":\"Just a normal post\"}, {\"insert\":\"nothing special here\"}]",
                 "[{\"insert\":\"Just a normal post\"},{\"insert\":\"nothing special here\"}]",
-                false
+                false,
             ],
             [
                 // This shouldn't be altered at all.
@@ -181,15 +179,11 @@ JSON;
                 $codeBlock,
                 false,
             ],
-            [
-                $videoEmbed,
-                $videoOutput,
-                true
-            ],
+            [$videoEmbed, $videoOutput, true],
             [
                 "[[],{\"insert\":\"Just a normal post\"}, {\"insert\":\"nothing special here\"}]",
-                "[{\"insert\":\"Just a normal post\"},{\"insert\":\"nothing special here\"}]"
-            ]
+                "[{\"insert\":\"Just a normal post\"},{\"insert\":\"nothing special here\"}]",
+            ],
         ];
     }
 }

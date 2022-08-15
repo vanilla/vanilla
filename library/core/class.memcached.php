@@ -14,17 +14,17 @@
  *
  * A cache layer that stores its items in memcached and uses libmemcached to interact with the daemons.
  */
-class Gdn_Memcached extends Gdn_Cache {
-
+class Gdn_Memcached extends Gdn_Cache
+{
     /** Memcached option. */
     const OPT_MOD_SPLIT = 65000;
 
     /** Memcached option. */
-    const OPT_PASSTHRU_CONTAINER = 'passthru';
+    const OPT_PASSTHRU_CONTAINER = "passthru";
 
     /** O_CREATE. */
     const O_CREATE = 1;
-    const TIMER_READ = ['cache', 'cacheRead'];
+    const TIMER_READ = ["cache", "cacheRead"];
 
     /** @var Memcached  */
     private $memcache;
@@ -45,7 +45,8 @@ class Gdn_Memcached extends Gdn_Cache {
     /**
      * Setup our Memcached configuration.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->cacheType = Gdn_Cache::CACHE_TYPE_MEMORY;
         $this->timers = Gdn::getContainer()->get(\Vanilla\Utility\Timers::class);
@@ -67,7 +68,7 @@ class Gdn_Memcached extends Gdn_Cache {
             $poolKey = sprintf($poolKeyFormat, $poolIndex);
             $this->memcache = new Memcached($poolKey);
         } else {
-            $this->memcache = new Memcached;
+            $this->memcache = new Memcached();
         }
 
         $this->registerFeature(Gdn_Cache::FEATURE_COMPRESS, Memcached::OPT_COMPRESSION);
@@ -77,7 +78,7 @@ class Gdn_Memcached extends Gdn_Cache {
         $this->registerFeature(Gdn_Cache::FEATURE_FORCEPREFIX);
         $this->registerFeature(Gdn_Cache::FEATURE_SHARD);
 
-        if (c('Garden.Cache.Local', true)) {
+        if (c("Garden.Cache.Local", true)) {
             $this->registerFeature(Gdn_Cache::FEATURE_LOCAL);
         }
 
@@ -88,7 +89,7 @@ class Gdn_Memcached extends Gdn_Cache {
             Gdn_Cache::FEATURE_NOPREFIX => false,
             Gdn_Cache::FEATURE_FORCEPREFIX => null,
             Gdn_Cache::FEATURE_SHARD => false,
-            Gdn_Cache::FEATURE_LOCAL => true
+            Gdn_Cache::FEATURE_LOCAL => true,
         ];
 
         $defaultOptions = [
@@ -98,7 +99,7 @@ class Gdn_Memcached extends Gdn_Cache {
             Memcached::OPT_NO_BLOCK => true,
             Memcached::OPT_TCP_NODELAY => true,
             Memcached::OPT_CONNECT_TIMEOUT => 2000,
-            Memcached::OPT_SERVER_FAILURE_LIMIT => 2
+            Memcached::OPT_SERVER_FAILURE_LIMIT => 2,
         ];
 
         $options = $this->option(null, []);
@@ -114,7 +115,8 @@ class Gdn_Memcached extends Gdn_Cache {
      *
      * @return object
      */
-    public function getMemcached() {
+    public function getMemcached()
+    {
         return $this->memcache;
     }
 
@@ -125,15 +127,16 @@ class Gdn_Memcached extends Gdn_Cache {
      * automatically, and needs to configure itself from the values in the global
      * config file.
      */
-    public function autorun() {
-        $servers = Gdn_Cache::activeStore('memcached');
+    public function autorun()
+    {
+        $servers = Gdn_Cache::activeStore("memcached");
         if (!is_array($servers)) {
-            $servers = explode(',', $servers);
+            $servers = explode(",", $servers);
         }
 
         // No servers, cache temporarily offline
         if (!sizeof($servers)) {
-            saveToConfig('Cache.Enabled', false, false);
+            saveToConfig("Cache.Enabled", false, false);
             return false;
         }
 
@@ -148,10 +151,10 @@ class Gdn_Memcached extends Gdn_Cache {
             Gdn_Cache::CONTAINER_WEIGHT,
             Gdn_Cache::CONTAINER_TIMEOUT,
             Gdn_Cache::CONTAINER_ONLINE,
-            Gdn_Cache::CONTAINER_CALLBACK
+            Gdn_Cache::CONTAINER_CALLBACK,
         ];
         foreach ($servers as $cacheServer) {
-            $cacheServer = explode(' ', $cacheServer);
+            $cacheServer = explode(" ", $cacheServer);
             $cacheServer = array_pad($cacheServer, count($keys), null);
             $cacheServer = array_combine($keys, $cacheServer);
 
@@ -174,11 +177,9 @@ class Gdn_Memcached extends Gdn_Cache {
      * const CONTAINER_ONLINE = 5;
      * const CONTAINER_CALLBACK = 6;
      */
-    public function addContainer($options) {
-
-        $required = [
-            Gdn_Cache::CONTAINER_LOCATION
-        ];
+    public function addContainer($options)
+    {
+        $required = [Gdn_Cache::CONTAINER_LOCATION];
 
         $keyedRequirements = array_fill_keys($required, 1);
         if (sizeof(array_intersect_key($options, $keyedRequirements)) != sizeof($required)) {
@@ -190,12 +191,12 @@ class Gdn_Memcached extends Gdn_Cache {
 
         // Merge the options array with our local defaults
         $defaults = [
-            Gdn_Cache::CONTAINER_WEIGHT => 1
+            Gdn_Cache::CONTAINER_WEIGHT => 1,
         ];
 
         $finalContainer = array_merge($defaults, $options);
         $this->containers[$cacheLocation] = $finalContainer;
-        $pathInfo = explode(':', $cacheLocation);
+        $pathInfo = explode(":", $cacheLocation);
 
         $serverHostname = val(0, $pathInfo);
         $serverPort = val(1, $pathInfo, 11211);
@@ -221,7 +222,8 @@ class Gdn_Memcached extends Gdn_Cache {
     /**
      * Get server list with mapping keys.
      */
-    public function shardMap() {
+    public function shardMap()
+    {
         static $servers = null;
         if (is_null($servers)) {
             $serverList = $this->servers();
@@ -236,25 +238,23 @@ class Gdn_Memcached extends Gdn_Cache {
                 $i = $numShards * 10;
                 do {
                     $i--; // limited iterations
-                    $shardKey = betterRandomString(6, 'a0');
+                    $shardKey = betterRandomString(6, "a0");
                     $shardServer = $this->memcache->getServerByKey($shardKey);
-                    $shardServerName = $shardServer['host'];
+                    $shardServerName = $shardServer["host"];
                     if ($shardServerName) {
                         $servers[$shardServerName] = $shardKey;
                     }
                 } while ($i > 0 && count($servers) < $numShards);
-
             }
 
             if (!count($servers)) {
                 // Use random server keys and hope for the best
 
                 foreach ($serverList as $server) {
-                    $serverName = $server['host'];
-                    $servers[$serverName] = betterRandomString(6, 'a0');
+                    $serverName = $server["host"];
+                    $servers[$serverName] = betterRandomString(6, "a0");
                 }
             }
-
         }
         return $servers;
     }
@@ -269,11 +269,12 @@ class Gdn_Memcached extends Gdn_Cache {
      * @static boolean $canAutoShard
      * @return boolean
      */
-    public function canAutoShard() {
+    public function canAutoShard()
+    {
         static $canAutoShard = null;
         if (is_null($canAutoShard)) {
-            $mcversion = phpversion('memcached');
-            $canAutoShard = version_compare($mcversion, '2.2', '>=');
+            $mcversion = phpversion("memcached");
+            $canAutoShard = version_compare($mcversion, "2.2", ">=");
         }
         return $canAutoShard;
     }
@@ -301,8 +302,8 @@ class Gdn_Memcached extends Gdn_Cache {
      * @param int|boolean $shards number of shards, or simply bool true
      * @return MemcachedShard
      */
-    public function shard($key, $value, $keySize, $shards = true) {
-
+    public function shard($key, $value, $keySize, $shards = true)
+    {
         $shardMap = $this->shardMap();
         $mapSize = count($shardMap);
 
@@ -321,7 +322,6 @@ class Gdn_Memcached extends Gdn_Cache {
             if (Gdn_Cache::CACHE_SHARD_MAX_SHARDS > 0 && count($shardMap) > Gdn_Cache::CACHE_SHARD_MAX_SHARDS) {
                 $shards = Gdn_Cache::CACHE_SHARD_MAX_SHARDS;
             }
-
         }
 
         // Don't shard to more servers than we know about
@@ -358,12 +358,12 @@ class Gdn_Memcached extends Gdn_Cache {
         $chunks = str_split($data, $chunk);
         $j = 0;
         for ($i = 0; $i < $shards; $i++) {
-            $shardKey = sprintf('%s-shard%d', $key, $i);
+            $shardKey = sprintf("%s-shard%d", $key, $i);
             $serverKey = $shardMap[$j];
             $manifest->shards[] = [
-                'server' => $serverKey,
-                'key' => $shardKey,
-                'data' => $chunks[$i]
+                "server" => $serverKey,
+                "key" => $shardKey,
+                "data" => $chunks[$i],
             ];
             if (!array_key_exists($serverKey, $manifest->keys)) {
                 $manifest->keys[$serverKey] = [];
@@ -386,7 +386,8 @@ class Gdn_Memcached extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function add($key, $value, $options = []) {
+    public function add($key, $value, $options = [])
+    {
         if (!$this->online()) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
@@ -394,14 +395,17 @@ class Gdn_Memcached extends Gdn_Cache {
         $finalOptions = array_merge($this->storeDefaults, $options);
 
         $expiry = val(Gdn_Cache::FEATURE_EXPIRY, $finalOptions, 0);
-        $useLocal = (bool)$finalOptions[Gdn_Cache::FEATURE_LOCAL];
+        $useLocal = (bool) $finalOptions[Gdn_Cache::FEATURE_LOCAL];
 
         $realKey = $this->makeKey($key, $finalOptions);
 
         // Sharding, write real keys.
         try {
-            $this->timers->start(['cache', 'cacheWrite']);
-            if (array_key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
+            $this->timers->start(["cache", "cacheWrite"]);
+            if (
+                array_key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) &&
+                ($shards = $finalOptions[Gdn_Cache::FEATURE_SHARD])
+            ) {
                 $manifest = $this->shard($realKey, $value, $shards);
                 $shards = $manifest->shards;
                 unset($manifest->shards);
@@ -417,7 +421,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
                 // Write real keys
                 foreach ($shards as $shard) {
-                    $this->memcache->setByKey($shard['server'], $shard['key'], $shard['data'], $expiry);
+                    $this->memcache->setByKey($shard["server"], $shard["key"], $shard["data"], $expiry);
                 }
                 unset($shards);
 
@@ -429,7 +433,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
             $stored = $this->memcache->add($realKey, $value, $expiry);
         } finally {
-            $this->timers->stop(['cache', 'cacheWrite']);
+            $this->timers->stop(["cache", "cacheWrite"]);
         }
 
         // Check if things went ok
@@ -454,15 +458,16 @@ class Gdn_Memcached extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function store($key, $value, $options = []) {
+    public function store($key, $value, $options = [])
+    {
         if (!$this->online()) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
 
         $finalOptions = array_merge($this->storeDefaults, $options);
 
-        $expiry = (int)val(Gdn_Cache::FEATURE_EXPIRY, $finalOptions, 0);
-        $useLocal = (bool)$finalOptions[Gdn_Cache::FEATURE_LOCAL];
+        $expiry = (int) val(Gdn_Cache::FEATURE_EXPIRY, $finalOptions, 0);
+        $useLocal = (bool) $finalOptions[Gdn_Cache::FEATURE_LOCAL];
 
         $realKey = $this->makeKey($key, $finalOptions ?? []);
 
@@ -473,10 +478,13 @@ class Gdn_Memcached extends Gdn_Cache {
         }
 
         try {
-            $this->timers->start(['cache', 'cacheWrite']);
+            $this->timers->start(["cache", "cacheWrite"]);
 
             // Sharding, write real keys and manifest
-            if (array_key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) && $shards = $finalOptions[Gdn_Cache::FEATURE_SHARD]) {
+            if (
+                array_key_exists(Gdn_Cache::FEATURE_SHARD, $finalOptions) &&
+                ($shards = $finalOptions[Gdn_Cache::FEATURE_SHARD])
+            ) {
                 $manifest = $this->shard($realKey, $value, $keySize, $shards);
                 $shards = $manifest->shards;
                 unset($manifest->shards);
@@ -492,7 +500,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
                 // Write real keys
                 foreach ($shards as $shard) {
-                    $this->memcache->setByKey($shard['server'], $shard['key'], $shard['data'], $expiry);
+                    $this->memcache->setByKey($shard["server"], $shard["key"], $shard["data"], $expiry);
                 }
                 unset($shards);
 
@@ -505,7 +513,7 @@ class Gdn_Memcached extends Gdn_Cache {
             // Unsharded, write key
             $stored = $this->memcache->set($realKey, $value, $expiry);
         } finally {
-            $this->timers->stop(['cache', 'cacheWrite']);
+            $this->timers->stop(["cache", "cacheWrite"]);
         }
 
         if ($stored === false) {
@@ -534,7 +542,8 @@ class Gdn_Memcached extends Gdn_Cache {
      * @param array $options
      * @return array|bool|mixed
      */
-    public function get($key, $options = []) {
+    public function get($key, $options = [])
+    {
         if (!$this->online()) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
@@ -549,7 +558,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
         $finalOptions = array_merge($this->storeDefaults, $options);
 
-        $useLocal = (bool)$finalOptions[Gdn_Cache::FEATURE_LOCAL];
+        $useLocal = (bool) $finalOptions[Gdn_Cache::FEATURE_LOCAL];
 
         $localData = [];
         $realKeys = [];
@@ -640,7 +649,6 @@ class Gdn_Memcached extends Gdn_Cache {
                     if ($localValue !== false) {
                         $storeData[$localKey] = $localValue;
                     }
-
                 }
                 $data = $storeData;
                 unset($storeData);
@@ -664,28 +672,28 @@ class Gdn_Memcached extends Gdn_Cache {
             $keyTime = sizeof($realKeys) ? $elapsedTime / sizeof($realKeys) : $elapsedTime;
             foreach ($realKeys as $realKey) {
                 touchValue($realKey, Gdn_Cache::$trackGet, [
-                    'hits' => 0,
-                    'time' => 0,
-                    'keysize' => null,
-                    'transfer' => 0,
-                    'wasted' => 0
+                    "hits" => 0,
+                    "time" => 0,
+                    "keysize" => null,
+                    "transfer" => 0,
+                    "wasted" => 0,
                 ]);
 
                 $keyData = val($realKey, $data, false);
-                Gdn_Cache::$trackGet[$realKey]['hits']++;
-                Gdn_Cache::$trackGet[$realKey]['time'] += $keyTime;
+                Gdn_Cache::$trackGet[$realKey]["hits"]++;
+                Gdn_Cache::$trackGet[$realKey]["time"] += $keyTime;
 
                 if ($keyData !== false) {
                     $keyData = serialize($keyData);
 
                     $keySize = strlen($keyData);
-                    if (is_null(Gdn_Cache::$trackGet[$realKey]['keysize'])) {
-                        Gdn_Cache::$trackGet[$realKey]['keysize'] = $keySize;
+                    if (is_null(Gdn_Cache::$trackGet[$realKey]["keysize"])) {
+                        Gdn_Cache::$trackGet[$realKey]["keysize"] = $keySize;
                     } else {
-                        Gdn_Cache::$trackGet[$realKey]['wasted'] += $keySize;
+                        Gdn_Cache::$trackGet[$realKey]["wasted"] += $keySize;
                     }
 
-                    Gdn_Cache::$trackGet[$realKey]['transfer'] += Gdn_Cache::$trackGet[$realKey]['keysize'];
+                    Gdn_Cache::$trackGet[$realKey]["transfer"] += Gdn_Cache::$trackGet[$realKey]["keysize"];
                 }
             }
         }
@@ -714,7 +722,8 @@ class Gdn_Memcached extends Gdn_Cache {
     /**
      * {@inheritdoc}
      */
-    public function exists($key, $options = []) {
+    public function exists($key, $options = [])
+    {
         if (!$this->online()) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
@@ -731,7 +740,8 @@ class Gdn_Memcached extends Gdn_Cache {
     /**
      * {@inheritdoc}
      */
-    public function remove($key, $options = []) {
+    public function remove($key, $options = [])
+    {
         if (!$this->online()) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
@@ -740,9 +750,9 @@ class Gdn_Memcached extends Gdn_Cache {
 
         $realKey = $this->makeKey($key, $finalOptions);
 
-        $this->timers->start(['cache', 'cacheWrite']);
+        $this->timers->start(["cache", "cacheWrite"]);
         $deleted = $this->memcache->delete($realKey);
-        $this->timers->stop(['cache', 'cacheWrite']);
+        $this->timers->stop(["cache", "cacheWrite"]);
 
         // Check if things went ok
         $ok = $this->lastAction($realKey);
@@ -751,13 +761,14 @@ class Gdn_Memcached extends Gdn_Cache {
         }
 
         unset(Gdn_Cache::$localCache[$realKey]);
-        return ($deleted) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
+        return $deleted ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function replace($key, $value, $options = []) {
+    public function replace($key, $value, $options = [])
+    {
         if (!$this->online()) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
@@ -768,7 +779,8 @@ class Gdn_Memcached extends Gdn_Cache {
     /**
      * {@inheritdoc}
      */
-    public function increment($key, $amount = 1, $options = []) {
+    public function increment($key, $amount = 1, $options = [])
+    {
         if (!$this->online()) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
@@ -783,7 +795,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
         $tryBinary = $this->option(Memcached::OPT_BINARY_PROTOCOL, false) && $requireBinary;
         $realKey = $this->makeKey($key, $finalOptions);
-        $this->timers->start(['cache', 'cacheWrite']);
+        $this->timers->start(["cache", "cacheWrite"]);
         switch ($tryBinary) {
             case false:
                 $incremented = $this->memcache->increment($realKey, $amount);
@@ -798,7 +810,7 @@ class Gdn_Memcached extends Gdn_Cache {
                 $incremented = $this->memcache->increment($realKey, $amount, $initial, $expiry);
                 break;
         }
-        $this->timers->stop(['cache', 'cacheWrite']);
+        $this->timers->stop(["cache", "cacheWrite"]);
 
         // Check if things went ok
         $ok = $this->lastAction($realKey);
@@ -816,7 +828,8 @@ class Gdn_Memcached extends Gdn_Cache {
     /**
      * {@inheritdoc}
      */
-    public function decrement($key, $amount = 1, $options = []) {
+    public function decrement($key, $amount = 1, $options = [])
+    {
         if (!$this->online()) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
@@ -831,7 +844,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
         $tryBinary = $this->option(Memcached::OPT_BINARY_PROTOCOL, false) & $requireBinary;
         $realKey = $this->makeKey($key, $finalOptions);
-        $this->timers->start(['cache', 'cacheWrite']);
+        $this->timers->start(["cache", "cacheWrite"]);
         switch ($tryBinary) {
             case false:
                 $decremented = $this->memcache->decrement($realKey, $amount);
@@ -846,7 +859,7 @@ class Gdn_Memcached extends Gdn_Cache {
                 $decremented = $this->memcache->decrement($realKey, $amount, $initial, $expiry);
                 break;
         }
-        $this->timers->stop(['cache', 'cacheWrite']);
+        $this->timers->stop(["cache", "cacheWrite"]);
 
         // Check if things went ok
         $ok = $this->lastAction($realKey);
@@ -864,7 +877,8 @@ class Gdn_Memcached extends Gdn_Cache {
     /**
      * {@inheritdoc}
      */
-    public function flush() {
+    public function flush()
+    {
         parent::flush();
         return $this->memcache->flush();
     }
@@ -872,14 +886,15 @@ class Gdn_Memcached extends Gdn_Cache {
     /**
      * {@inheritdoc}
      */
-    public function lastAction($key = null) {
+    public function lastAction($key = null)
+    {
         $lastCode = $this->memcache->getResultCode();
 
         if ($lastCode == 47 || $lastCode == 35) {
             if ($key) {
                 $server = $this->memcache->getServerByKey($key);
-                $host = $server['host'];
-                $port = $server['port'];
+                $host = $server["host"];
+                $port = $server["port"];
                 $this->fail("{$host}:{$port}");
             }
             return false;
@@ -890,28 +905,32 @@ class Gdn_Memcached extends Gdn_Cache {
     /**
      * {@inheritdoc}
      */
-    public function online() {
-        return (bool)sizeof($this->containers);
+    public function online()
+    {
+        return (bool) sizeof($this->containers);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function servers() {
+    public function servers()
+    {
         return $this->memcache->getServerList();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function resultCode() {
+    public function resultCode()
+    {
         return $this->memcache->getResultCode();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function resultMessage() {
+    public function resultMessage()
+    {
         return $this->memcache->getResultMessage();
     }
 
@@ -922,7 +941,8 @@ class Gdn_Memcached extends Gdn_Cache {
      * @param mixed $value
      * @return $this
      */
-    public function setStoreDefault(string $key, $value) {
+    public function setStoreDefault(string $key, $value)
+    {
         $this->storeDefaults[$key] = $value;
         return $this;
     }
@@ -934,7 +954,8 @@ class Gdn_Memcached extends Gdn_Cache {
      * @param mixed $default
      * @return mixed
      */
-    private function unShard(MemcachedShard $localValue, $default = null) {
+    private function unShard(MemcachedShard $localValue, $default = null)
+    {
         $manifest = $localValue;
 
         // MultiGet sub-keys
@@ -948,7 +969,7 @@ class Gdn_Memcached extends Gdn_Cache {
         ksort($shardKeys, SORT_NATURAL);
 
         // Check subkeys for validity
-        $shardData = implode('', array_values($shardKeys));
+        $shardData = implode("", array_values($shardKeys));
         unset($shardKeys);
         $dataHash = md5($shardData);
         if ($dataHash != $manifest->hash) {
@@ -963,8 +984,8 @@ class Gdn_Memcached extends Gdn_Cache {
 /**
  * Class MemcachedShard
  */
-class MemcachedShard {
-
+class MemcachedShard
+{
     /** @var   */
     public $hash;
 

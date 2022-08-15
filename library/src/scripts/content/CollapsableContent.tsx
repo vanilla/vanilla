@@ -14,6 +14,7 @@ import classNames from "classnames";
 import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { animated, useSpring } from "react-spring";
 import ReactDOM from "react-dom";
+import { ColorHelper } from "csx";
 
 interface IProps {
     /** The maximum collapsed height of the collapser. */
@@ -41,6 +42,8 @@ interface IProps {
 
     /** An array of DOM nodes to apply as children instead of react contents. See autoWrapCollapsableContent. */
     domNodesToAttach?: Node[];
+
+    bgColor?: ColorHelper;
 }
 
 /**
@@ -100,7 +103,7 @@ export function CollapsableContent(props: IProps) {
         opacity: isExpanded ? 0 : 1,
     });
 
-    const classes = collapsableContentClasses();
+    const classes = collapsableContentClasses({ bgColor: props.bgColor });
 
     const hasOverflow = measurements.height > heightLimit;
 

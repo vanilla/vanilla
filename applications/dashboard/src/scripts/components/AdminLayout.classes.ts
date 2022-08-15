@@ -1,3 +1,9 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2022 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { calc } from "csx";
@@ -6,6 +12,7 @@ import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
 import { singleBorder } from "@library/styles/styleHelpersBorders";
+import { sticky } from "@library/styles/styleHelpersPositioning";
 
 export const adminLayoutClasses = useThemeCache(() => {
     const panelLayoutVars = oneColumnVariables();
@@ -26,13 +33,22 @@ export const adminLayoutClasses = useThemeCache(() => {
         display: "flex",
         flexDirection: "column",
         borderRight: singleBorder(),
-        "& > .siteNav": {
-            marginLeft: 0,
-        },
+        // Make sure the border stretches to the full height.
+        height: "100%",
     });
 
     const twoColLeftPanel = css({
-        width: 240,
+        // Add some extra padding on here so absolute position collapsers
+        // don't get cutoff by the the overflow: auto.
+        width: 240 + 24,
+        marginLeft: -24,
+        paddingLeft: 24,
+        ...sticky(),
+        top: titleBarVariables().fullHeight + 1,
+        // Critical for the sticky to work.
+        alignSelf: "flex-start",
+        maxHeight: `calc(100vh - ${titleBarVariables().fullHeight}px)`,
+        overflow: "auto",
     });
 
     const noLeftPanel = css(

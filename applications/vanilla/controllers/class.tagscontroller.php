@@ -9,8 +9,8 @@
 /**
  * Class TagsController
  */
-class TagsController extends VanillaController {
-
+class TagsController extends VanillaController
+{
     /** @var TagModel */
     private $tagModel;
 
@@ -19,7 +19,8 @@ class TagsController extends VanillaController {
      *
      * @param TagModel $tagModel
      */
-    public function __construct(TagModel $tagModel) {
+    public function __construct(TagModel $tagModel)
+    {
         parent::__construct();
         $this->tagModel = $tagModel;
     }
@@ -32,10 +33,11 @@ class TagsController extends VanillaController {
      * @param string $type
      * @throws Exception
      */
-    public function search($q = '', $id = false, $parent = false, $type = 'tag') {
-        $categoryID = getIncomingValue('CategoryID');
+    public function search($q = "", $id = false, $parent = false, $type = "tag")
+    {
+        $categoryID = getIncomingValue("CategoryID");
         $options["categoryID"] = $categoryID;
-        $options['limit'] = $this->tagModel::LIMIT_DEFAULT;
+        $options["limit"] = $this->tagModel::LIMIT_DEFAULT;
         $data = $this->tagModel->search($q, $id, $parent, $type, $options);
         header("Content-type: application/json");
         echo json_encode($data);

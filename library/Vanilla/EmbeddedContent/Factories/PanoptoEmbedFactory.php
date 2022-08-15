@@ -13,43 +13,41 @@ use Vanilla\EmbeddedContent\Embeds\PanoptoEmbed;
 /**
  * PanoptoEmbedFactory class.
  */
-class PanoptoEmbedFactory extends AbstractEmbedFactory {
-
+class PanoptoEmbedFactory extends AbstractEmbedFactory
+{
     /** @var array DOMAINS */
-    private const DOMAINS = [
-        'hosted.panopto.com',
-        'ca.panopto.com',
-        'cloud.panopto.eu',
-        'ap.panopto.com',
-    ];
+    private const DOMAINS = ["hosted.panopto.com", "ca.panopto.com", "cloud.panopto.eu", "ap.panopto.com"];
 
     /**
      * Use the page scraper to scrape page data.
      *
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         $path = parse_url($url, PHP_URL_HOST);
 
         return new PanoptoEmbed([
-            'embedType' => PanoptoEmbed::TYPE,
-            'domain' => $path,
-            'url' => $url,
-            'sessionId' => $this->sessionIDFromUrl($url),
+            "embedType" => PanoptoEmbed::TYPE,
+            "domain" => $path,
+            "url" => $url,
+            "sessionId" => $this->sessionIDFromUrl($url),
         ]);
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return self::DOMAINS;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         return "`^/?Panopto/Pages/(Viewer|Embed)\.aspx`";
     }
 
@@ -59,12 +57,10 @@ class PanoptoEmbedFactory extends AbstractEmbedFactory {
      * @param string $url
      * @return string|null
      */
-    private function sessionIDFromUrl(string $url): ?string {
+    private function sessionIDFromUrl(string $url): ?string
+    {
         $parameters = [];
-        parse_str(
-            parse_url($url, PHP_URL_QUERY) ?? "",
-            $parameters
-        );
-        return $parameters['id'] ?? null;
+        parse_str(parse_url($url, PHP_URL_QUERY) ?? "", $parameters);
+        return $parameters["id"] ?? null;
     }
 }

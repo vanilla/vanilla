@@ -29,6 +29,9 @@ $Configuration['Database']['ConnectionOptions'] = [
     1000 => true, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY (missing in some PHP installations)
 ];
 
+//Configuration for Dba Counts
+$Configuration['Dba']['Limit'] = 1000;
+
 // Use a dirty cache by default. Try Vanilla with memcached!
 $Configuration['Cache']['Enabled'] = true;
 $Configuration['Cache']['Method'] = 'dirtycache';
@@ -80,7 +83,7 @@ $Configuration['Garden']['Registration']['ConfirmEmail'] = false;
 $Configuration['Garden']['Registration']['MinPasswordLength'] = 6;
 $Configuration['Garden']['Registration']['NameUnique'] = true;
 $Configuration['Garden']['TermsOfService'] = '/home/termsofservice'; // The url to the terms of service.
-$Configuration['Garden']['Password']['MinLength'] = 6;
+$Configuration['Garden']['Password']['MinLength'] = 12;
 $Configuration['Garden']['Roles']['Manage'] = true; // @deprecated
 
 // Garden security features

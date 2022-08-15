@@ -10,24 +10,34 @@ namespace Vanilla\Scheduler;
 /**
  * Class used to wrap the arguments for the next run in a long runner.
  */
-final class LongRunnerNextArgs {
-
+final class LongRunnerNextArgs implements \JsonSerializable
+{
     /** @var array */
-    private $nextArgs;
+    private $args;
 
     /**
      * Constructor.
      *
-     * @param array $nextArgs The arguments to pass for the next invocation of the method.
+     * @param array $args The arguments to pass for the next invocation of the method.
      */
-    public function __construct(array $nextArgs) {
-        $this->nextArgs = $nextArgs;
+    public function __construct(array $args)
+    {
+        $this->args = $args;
     }
 
     /**
      * @return array
      */
-    public function getNextArgs(): array {
-        return $this->nextArgs;
+    public function getArgs(): array
+    {
+        return $this->args;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return $this->getArgs();
     }
 }

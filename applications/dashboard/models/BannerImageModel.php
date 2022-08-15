@@ -13,26 +13,32 @@ use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\TwigStaticRenderer;
+use Vanilla\ImageSrcSet\ImageSrcSetService;
 
 /**
  * Banner Image Model.
  *
  * Previously this class was provided by the "Hero Image" plugin, but is now built in.
  */
-class BannerImageModel {
-
+class BannerImageModel
+{
     const DEFAULT_CONFIG_KEY = "Garden.BannerImage";
 
     /** @var FormatService */
     private $formatService;
+
+    /** @var ImageSrcSetService */
+    private $imageSrcSetService;
 
     /**
      * BannerImageModel constructor.
      *
      * @param FormatService $formatService
      */
-    public function __construct(FormatService $formatService) {
+    public function __construct(FormatService $formatService)
+    {
         $this->formatService = $formatService;
+        $this->imageSrcSetService = Gdn::getContainer()->get(ImageSrcSetService::class);
     }
 
     /**
@@ -42,46 +48,51 @@ class BannerImageModel {
      *
      * @return \Twig\Markup
      */
-    public function renderBanner(array $props = []): \Twig\Markup {
+    public function renderBanner(array $props = []): \Twig\Markup
+    {
         $controller = \Gdn::controller();
+        $iconImage = self::getCurrentBannerIconLink();
+        $backgroundImage = self::getCurrentBannerImageLink();
         $defaultProps = [
-            'description' => $controller->contextualDescription(),
-            'backgroundImage' => self::getCurrentBannerImageLink(),
-            'iconImage' => self::getCurrentBannerIconLink(),
+            "description" => $controller->contextualDescription(),
+            "backgroundImage" => $backgroundImage,
+            "iconImage" => $iconImage,
+            "iconUrlSrcSet" => $this->imageSrcSetService->getResizedSrcSet($iconImage),
+            "backgroundUrlSrcSet" => $this->imageSrcSetService->getResizedSrcSet($backgroundImage),
         ];
         $title = $controller->contextualTitle();
 
         if ($title) {
-              $defaultProps['title'] = $this->formatService->renderPlainText($title, HtmlFormat::FORMAT_KEY);
+            $defaultProps["title"] = $this->formatService->renderPlainText($title, HtmlFormat::FORMAT_KEY);
         }
 
         //sanitize description before passing on to the component
         /** @var $htmlSanitizer */
         $htmlSanitizer = \Gdn::getContainer()->get(\Vanilla\Formatting\Html\HtmlSanitizer::class);
-        $defaultProps['description'] = $htmlSanitizer->filter($defaultProps['description']);
+        $defaultProps["description"] = $htmlSanitizer->filter($defaultProps["description"]);
 
         $props = array_merge($defaultProps, $props);
         $html = "";
         $isRendered = false;
         $contents = "<div style=\"min-height:'500px'\"></div>";
-        if (inSection(c("Theme.Banner.VisibleSections")) || $controller->data('isHomepage')) {
+        if (inSection(c("Theme.Banner.VisibleSections")) || $controller->data("isHomepage")) {
             $isRendered = true;
-            $html = TwigStaticRenderer::renderReactModule('community-banner', $props, '', $contents);
-        } elseif (inSection(c('Theme.ContentBanner.VisibleSections'))) {
+            $html = TwigStaticRenderer::renderReactModule("community-banner", $props, "", $contents);
+        } elseif (inSection(c("Theme.ContentBanner.VisibleSections"))) {
             $isRendered = true;
-            $html = TwigStaticRenderer::renderReactModule('community-content-banner', $props, '', $contents);
+            $html = TwigStaticRenderer::renderReactModule("community-content-banner", $props, "", $contents);
         }
 
         if ($isRendered) {
             /** @var \Garden\EventManager $eventManager */
             $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
-            $afterBanner = $eventManager->fire('AfterBanner', $this);
+            $afterBanner = $eventManager->fire("AfterBanner", $this);
             if (!empty($afterBanner)) {
                 $html .= implode("", $afterBanner);
             }
         }
 
-        return new \Twig\Markup($html, 'utf-8');
+        return new \Twig\Markup($html, "utf-8");
     }
 
     /**
@@ -94,8 +105,9 @@ class BannerImageModel {
      *
      * @return string The category's slug on success, the default otherwise.
      */
-    public static function getBannerImageSlug($categoryID) {
-        return self::getCategoryField($categoryID, 'BannerImage', c(self::DEFAULT_CONFIG_KEY));
+    public static function getBannerImageSlug($categoryID)
+    {
+        return self::getCategoryField($categoryID, "BannerImage", c(self::DEFAULT_CONFIG_KEY));
     }
 
     /**
@@ -107,7 +119,8 @@ class BannerImageModel {
      *
      * @return mixed
      */
-    private static function getCategoryField($categoryID, string $field, $default = null) {
+    private static function getCategoryField($categoryID, string $field, $default = null)
+    {
         if (!class_exists(\CategoryModel::class)) {
             return $default;
         }
@@ -121,7 +134,8 @@ class BannerImageModel {
      *
      * @return string The URL to the category image. Will be empty if no slug could be found.
      */
-    public static function getCurrentBannerImageLink(): string {
+    public static function getCurrentBannerImageLink(): string
+    {
         $controller = \Gdn::controller();
         /** @var SiteSectionModel $siteSectionModel */
         $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
@@ -130,10 +144,10 @@ class BannerImageModel {
         $siteSectionCategory = $currentSection->getCategoryID();
         // Use category ID from site section when there is no Category ID or ContextualCategoryID in the controller.
         $categoryID = $controller
-            ? $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID', $siteSectionCategory))
+            ? $controller->data("Category.CategoryID", $controller->data("ContextualCategoryID", $siteSectionCategory))
             : $siteSectionCategory;
         $defaultBanner = $siteSectionBanner ?: Gdn::config(BannerImageModel::DEFAULT_CONFIG_KEY);
-        $field = $categoryID ? self::getCategoryField($categoryID, 'BannerImage', $defaultBanner) : $defaultBanner;
+        $field = $categoryID ? self::getCategoryField($categoryID, "BannerImage", $defaultBanner) : $defaultBanner;
         return $field ? \Gdn_Upload::url($field) : $field;
     }
 
@@ -142,15 +156,15 @@ class BannerImageModel {
      *
      * @return string The URL to the category image. Will be empty if no slug could be found.
      */
-    public static function getCurrentBannerIconLink(): ?string {
+    public static function getCurrentBannerIconLink(): ?string
+    {
         $controller = \Gdn::controller();
         $categoryID = $controller
-            ? $controller->data('Category.CategoryID', $controller->data('ContextualCategoryID'))
+            ? $controller->data("Category.CategoryID", $controller->data("ContextualCategoryID"))
             : null;
-        $field = self::getCategoryField($categoryID, 'Photo', null);
+        $field = self::getCategoryField($categoryID, "Photo", null);
         return $field ? \Gdn_Upload::url($field) : $field;
     }
-
 
     /**
      * Old name banner image method.
@@ -158,8 +172,9 @@ class BannerImageModel {
      * @inheritdoc
      * @deprecated 4.0 getBannerImageSlug
      */
-    public static function getHeroImageSlug($categoryID) {
-        deprecated(__FUNCTION__, 'getBannerImageSlug');
+    public static function getHeroImageSlug($categoryID)
+    {
+        deprecated(__FUNCTION__, "getBannerImageSlug");
         return self::getBannerImageSlug($categoryID);
     }
 
@@ -169,8 +184,9 @@ class BannerImageModel {
      * @return string The URL to the category image. Will be empty if no slug could be found.
      * @deprecated 4.0 getCurrentBannerImageLink
      */
-    public static function getCurrentHeroImageLink() {
-        deprecated(__FUNCTION__, 'getCurrentBannerImageLink');
+    public static function getCurrentHeroImageLink()
+    {
+        deprecated(__FUNCTION__, "getCurrentBannerImageLink");
         return self::getCurrentBannerImageLink();
     }
 }

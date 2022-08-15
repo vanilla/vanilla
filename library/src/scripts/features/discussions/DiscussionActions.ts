@@ -19,13 +19,13 @@ import { IDiscussionsStoreState } from "@library/features/discussions/discussion
 const createAction = actionCreatorFactory("@@discussions");
 
 export interface IGetDiscussionByID {
-    discussionID: number;
+    discussionID: IDiscussion["discussionID"];
 }
 export interface IGetCategoryByID {
     categoryID: RecordID;
 }
 export interface IGetDiscussionsByIDs {
-    discussionIDs: RecordID[];
+    discussionIDs: Array<IDiscussion["discussionID"]>;
     limit?: number;
     expand?: string | string[];
 }
@@ -92,7 +92,7 @@ export interface IBulkDeleteDiscussion {
 }
 
 export interface IBulkMoveDiscussions {
-    discussionIDs: RecordID[];
+    discussionIDs: Array<IDiscussion["discussionID"]>;
     categoryID: RecordID;
     addRedirects: boolean;
     category?: ICategoryFragment;
@@ -102,8 +102,8 @@ export interface IBulkActionSyncResult {
     progress: {
         countTotalIDs: number;
         exceptionsByID: Record<string | number, any>;
-        failedIDs: number[];
-        successIDs: number[];
+        failedIDs: RecordID[];
+        successIDs: RecordID[];
     };
 }
 

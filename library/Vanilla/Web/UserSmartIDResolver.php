@@ -15,7 +15,8 @@ use Vanilla\Exception\PermissionException;
  *
  * User smart IDs can lookup fields in the user table, also UserAuthentication table for SSO.
  */
-class UserSmartIDResolver {
+class UserSmartIDResolver
+{
     private $emailEnabled = true;
     private $viewEmail = false;
 
@@ -29,7 +30,8 @@ class UserSmartIDResolver {
      *
      * @param \Gdn_Session $session
      */
-    public function __construct(\Gdn_Session $session) {
+    public function __construct(\Gdn_Session $session)
+    {
         $this->session = $session;
     }
 
@@ -42,24 +44,28 @@ class UserSmartIDResolver {
      * @param string $value The value to lookup.
      * @return mixed Returns the smart using **SmartIDMiddleware::fetchValue()**.
      */
-    public function __invoke(SmartIDMiddleware $sender, string $pk, string $column, string $value) {
-        if ($column === 'email') {
+    public function __invoke(SmartIDMiddleware $sender, string $pk, string $column, string $value)
+    {
+        if ($column === "email") {
             if (!$this->canViewEmail()) {
-                throw new PermissionException('personalInfo.view');
+                throw new PermissionException("personalInfo.view");
             }
             if (!$this->isEmailEnabled()) {
-                throw new ForbiddenException('Email addresses are disabled.');
+                throw new ForbiddenException("Email addresses are disabled.");
             }
         }
 
-        if ($column === 'me' && empty($value)) {
+        if ($column === "me" && empty($value)) {
             return $this->session->UserID; // Could be 0 for a guest.
-        } elseif (in_array($column, ['name', 'email'])) {
+        } elseif (in_array($column, ["name", "email"])) {
             // These are basic field lookups on the user table.
-            return $sender->fetchValue('User', $pk, [$column => $value]);
+            return $sender->fetchValue("User", $pk, [$column => $value]);
         } else {
             // Try looking up a secondary user ID.
-            return $sender->fetchValue('UserAuthentication', $pk, ['providerKey' => $column, 'foreignUserKey' => $value]);
+            return $sender->fetchValue("UserAuthentication", $pk, [
+                "providerKey" => $column,
+                "foreignUserKey" => $value,
+            ]);
         }
     }
 
@@ -68,7 +74,8 @@ class UserSmartIDResolver {
      *
      * @return bool Returns the emailEnabled.
      */
-    public function isEmailEnabled(): bool {
+    public function isEmailEnabled(): bool
+    {
         return $this->emailEnabled;
     }
 
@@ -78,7 +85,8 @@ class UserSmartIDResolver {
      * @param bool $emailEnabled The new value.
      * @return $this
      */
-    public function setEmailEnabled(bool $emailEnabled) {
+    public function setEmailEnabled(bool $emailEnabled)
+    {
         $this->emailEnabled = $emailEnabled;
         return $this;
     }
@@ -88,7 +96,8 @@ class UserSmartIDResolver {
      *
      * @return bool Returns the canViewEmail.
      */
-    public function canViewEmail(): bool {
+    public function canViewEmail(): bool
+    {
         return $this->viewEmail;
     }
 
@@ -98,7 +107,8 @@ class UserSmartIDResolver {
      * @param bool $viewEmail The new value.
      * @return $this
      */
-    public function setViewEmail(bool $viewEmail) {
+    public function setViewEmail(bool $viewEmail)
+    {
         $this->viewEmail = $viewEmail;
         return $this;
     }

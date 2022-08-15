@@ -12,8 +12,8 @@ use Vanilla\Database\Operation\Processor;
 /**
  * Test implementation of ResourceEvent.
  */
-class ProcessorFixture implements Processor {
-
+class ProcessorFixture implements Processor
+{
     /** @var callable */
     private $callable;
 
@@ -22,14 +22,16 @@ class ProcessorFixture implements Processor {
      *
      * @param callable $callable
      */
-    public function __construct(callable $callable) {
+    public function __construct(callable $callable)
+    {
         $this->callable = $callable;
     }
 
     /**
      * @inheritdoc
      */
-    public function handle(Operation $operation, callable $stack) {
+    public function handle(Operation $operation, callable $stack)
+    {
         $r = call_user_func($this->callable, $operation);
         return $stack($operation);
     }

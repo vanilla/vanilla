@@ -60,7 +60,7 @@ export function PageHeading(props: IPageHeading) {
             <div className={classes.main}>
                 {includeBackLink && backLink}
                 <ConditionalWrap condition={!!actions} className={classes.titleWrap}>
-                    <Heading depth={props.depth} title={title} className={headingClassName}>
+                    <Heading isLarge={props.depth === 1} depth={props.depth} title={title} className={headingClassName}>
                         {children}
                     </Heading>
                 </ConditionalWrap>

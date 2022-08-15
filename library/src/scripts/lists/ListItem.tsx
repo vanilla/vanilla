@@ -21,6 +21,9 @@ import {
 import TruncatedText from "@library/content/TruncatedText";
 import Heading from "@library/layout/Heading";
 import Paragraph from "@library/layout/Paragraph";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
+import { pointerEventsClass } from "@library/styles/styleHelpersFeedback";
 
 export interface IListItemProps {
     className?: string;
@@ -41,10 +44,12 @@ export interface IListItemProps {
     headingDepth?: number;
     options?: Partial<IListItemComponentOptions>;
     checkbox?: React.ReactNode;
+    asTile?: boolean;
+    disableButtonsInItems?: boolean;
 }
 
 export function ListItem(props: IListItemProps) {
-    const classes = listItemClasses();
+    const classes = listItemClasses(props.asTile);
     const selfRef = useRef<HTMLDivElement>(null);
     const measure = useMeasure(selfRef);
     const { layout } = useContext(ListItemContext);
@@ -75,7 +80,7 @@ export function ListItem(props: IListItemProps) {
     const descriptionView = props.description ? (
         <Paragraph className={cx(classes.description, descriptionClassName)}>
             {truncateDescription ? (
-                <TruncatedText maxCharCount={descriptionMaxCharCount} lines={2}>
+                <TruncatedText maxCharCount={descriptionMaxCharCount} lines={props.asTile ? 3 : 2}>
                     {props.description}
                 </TruncatedText>
             ) : (
@@ -90,31 +95,50 @@ export function ListItem(props: IListItemProps) {
     const checkboxWrapped = props.checkbox && (
         <div className={cx(classes.checkboxContainer, checkboxLabelAdjustment)}>{props.checkbox}</div>
     );
+
+    let actionsContent = props.actions ? (
+        <div
+            className={cx(classes.actionsContainer, {
+                [pointerEventsClass()]: props.disableButtonsInItems,
+            })}
+        >
+            {props.actions}
+        </div>
+    ) : undefined;
+
     return (
         <PageBox as={props.as ?? "li"} ref={selfRef} className={cx(props.className)}>
             <div className={classes.item}>
-                {iconPosition === ListItemIconPosition.DEFAULT && props.icon ? (
-                    <div className={cx(classes.iconContainer, props.iconWrapperClass)}>
-                        {checkboxWrapped}
-                        {props.icon}
-                    </div>
-                ) : (
-                    checkboxWrapped
-                )}
+                <ConditionalWrap condition={!!props.asTile} className={classes.iconAndActionsContainer}>
+                    {iconPosition === ListItemIconPosition.DEFAULT && props.icon ? (
+                        <div className={cx(classes.iconContainer, props.iconWrapperClass)}>
+                            {checkboxWrapped}
+                            {props.icon}
+                        </div>
+                    ) : (
+                        checkboxWrapped
+                    )}
+                    {props.asTile && actionsContent}
+                </ConditionalWrap>
 
                 <div className={classes.contentContainer}>
                     <div className={classes.titleContainer}>
                         <Heading custom className={classes.title} depth={headingDepth}>
                             {props.url ? (
                                 <SmartLink to={props.url} className={cx(classes.titleLink, props.nameClassName)}>
-                                    {props.name}
+                                    <ConditionalWrap
+                                        condition={!!props.asTile}
+                                        component={TruncatedText}
+                                        componentProps={{ lines: 2 }}
+                                    >
+                                        {props.name}
+                                    </ConditionalWrap>
                                 </SmartLink>
                             ) : (
                                 <span className={cx(props.nameClassName)}>{props.name}</span>
                             )}
                         </Heading>
-
-                        {props.actions && <div className={classes.actionsContainer}>{props.actions}</div>}
+                        {!props.asTile && actionsContent}
                     </div>
                     <div className={classes.mediaWrapContainer}>
                         {!isMobileMedia && media}

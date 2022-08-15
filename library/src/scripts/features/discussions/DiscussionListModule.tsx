@@ -5,16 +5,15 @@
  */
 
 import { DiscussionList } from "@library/features/discussions/DiscussionList";
-import { DiscussionListView } from "@library/features/discussions/DiscussionList.views";
+import { IWidgetCommonProps } from "@library/homeWidget/HomeWidget";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
-import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
+import React from "react";
 
-interface IProps extends React.ComponentProps<typeof DiscussionList> {
-    title?: string;
-    description?: string;
-    subtitle?: string;
+interface IProps extends React.ComponentProps<typeof DiscussionList>, IWidgetCommonProps {
     viewAllUrl?: string;
+    containerOptions?: IHomeWidgetContainerOptions;
+    disableButtonsInItems?: boolean; // when rendering in widget preview/overview we don't want them to be interactive
 }
 
 export function DiscussionListModule(props: IProps) {
@@ -24,11 +23,13 @@ export function DiscussionListModule(props: IProps) {
         <HomeWidgetContainer
             title={title}
             subtitle={subtitle}
+            description={description}
             options={{
+                ...props.containerOptions,
                 isGrid: false,
-                description,
                 viewAll: {
-                    to: viewAllUrl,
+                    ...props.containerOptions?.viewAll,
+                    to: viewAllUrl ?? props.containerOptions?.viewAll?.to,
                 },
             }}
         >
@@ -36,3 +37,5 @@ export function DiscussionListModule(props: IProps) {
         </HomeWidgetContainer>
     );
 }
+
+export default DiscussionListModule;

@@ -9,6 +9,7 @@ import { t } from "@library/utility/appUtils";
 import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import classNames from "classnames";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
+import { cx } from "@library/styles/styleShim";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -244,7 +245,7 @@ export function CodeBlockIcon(props: { className?: string; "aria-hidden"?: areaH
     const classesRichEditor = richEditorClasses(false);
     return (
         <svg
-            className={classNames("richEditorButton-icon", classesRichEditor.icon, props.className)}
+            className={cx("richEditorButton-icon", classesRichEditor.icon, props.className)}
             aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
             viewBox="0 0 24 24"
         >

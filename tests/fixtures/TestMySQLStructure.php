@@ -10,13 +10,15 @@ namespace VanillaTests\Fixtures;
 /**
  * A test version of `Gdn_MySQLStructure` for inspecting some protected methods.
  */
-class TestMySQLStructure extends \Gdn_MySQLStructure {
+class TestMySQLStructure extends \Gdn_MySQLStructure
+{
     /**
      * Exposes the `Gdn_MySQLStructure::getCreateTable()` method.
      *
      * @return string
      */
-    public function dumpCreateTable(): string {
+    public function dumpCreateTable(): string
+    {
         return $this->getCreateTable();
     }
 }

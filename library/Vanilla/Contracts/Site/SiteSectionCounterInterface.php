@@ -12,8 +12,8 @@ use Vanilla\Site\SiteSectionModel;
 /**
  * A counter that contributes to the aggregated counts for a site section.
  */
-interface SiteSectionCounterInterface {
-
+interface SiteSectionCounterInterface
+{
     /**
      * Trigger a recalculation of counts for a site section.
      *
@@ -22,5 +22,8 @@ interface SiteSectionCounterInterface {
      *
      * @return array Return an array of keyed counts [$key => [ 'labelCount' => '', 'count' => 424 ]].
      */
-    public function calculateCountsForSiteSection(SiteSectionModel $siteSectionModel, SiteSectionInterface $siteSection): array;
+    public function calculateCountsForSiteSection(
+        SiteSectionModel $siteSectionModel,
+        SiteSectionInterface $siteSection
+    ): array;
 }

@@ -8,7 +8,10 @@ import { cx } from "@emotion/css";
 import Translate from "@library/content/Translate";
 import DiscussionBookmarkToggle from "@library/features/discussions/DiscussionBookmarkToggle";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
-import { discussionListVariables } from "@library/features/discussions/DiscussionList.variables";
+import {
+    discussionListVariables,
+    IDiscussionItemOptions,
+} from "@library/features/discussions/DiscussionList.variables";
 import { useCurrentUserSignedIn } from "@library/features/users/userHooks";
 import { UserPhoto } from "@library/headers/mebox/pieces/UserPhoto";
 import { ListItem } from "@library/lists/ListItem";
@@ -16,34 +19,40 @@ import { MetaIcon, MetaItem, MetaLink, MetaTag } from "@library/metas/Metas";
 import Notice from "@library/metas/Notice";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { t } from "@vanilla/i18n";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import DiscussionOptionsMenu from "@library/features/discussions/DiscussionOptionsMenu";
 import DiscussionVoteCounter from "@library/features/discussions/DiscussionVoteCounter";
 import qs from "qs";
-import Permission, { hasPermission, PermissionMode } from "@library/features/users/Permission";
+import { hasPermission, PermissionMode } from "@library/features/users/Permission";
 import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
 import DateTime from "@library/content/DateTime";
 import { metasClasses } from "@library/metas/Metas.styles";
 import { getMeta } from "@library/utility/appUtils";
 import CheckBox from "@library/forms/Checkbox";
 import { useDiscussionCheckBoxContext } from "@library/features/discussions/DiscussionCheckboxContext";
-import { useToast } from "@library/features/toaster/ToastContext";
 import { ToolTip } from "@library/toolTip/ToolTip";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-
+import { pointerEventsClass } from "@library/styles/styleHelpersFeedback";
 interface IProps {
     discussion: IDiscussion;
     noCheckboxes?: boolean;
+    className?: string;
+    asTile?: boolean;
+    discussionOptions?: IDiscussionItemOptions;
+    disableButtonsInItems?: boolean;
+}
+interface IDiscussionItemMetaProps extends IDiscussion {
+    inTile?: boolean;
+    discussionOptions?: IDiscussionItemOptions;
 }
 
 export default function DiscussionListItem(props: IProps) {
     const { discussion } = props;
 
-    const classes = discussionListClasses();
-    const variables = discussionListVariables();
+    const classes = discussionListClasses(props.discussionOptions, props.asTile);
+    const variables = discussionListVariables(props.discussionOptions);
     const currentUserSignedIn = useCurrentUserSignedIn();
     const checkBoxContext = useDiscussionCheckBoxContext();
-    const toastContext = useToast();
     const hasUnread = discussion.unread || (discussion.countUnread !== undefined && discussion.countUnread > 0);
 
     let iconView = <UserPhoto userInfo={discussion.insertUser} size={variables.profilePhoto.size} />;
@@ -52,7 +61,9 @@ export default function DiscussionListItem(props: IProps) {
         iconView = <ProfileLink userFragment={discussion.insertUser}>{iconView}</ProfileLink>;
     }
 
-    let icon = <div>{iconView}</div>;
+    const iconClass = cx({ [pointerEventsClass()]: props.disableButtonsInItems });
+
+    let icon = <div className={iconClass}>{iconView}</div>;
 
     let iconWrapperClass;
 
@@ -68,7 +79,7 @@ export default function DiscussionListItem(props: IProps) {
         iconWrapperClass = classes.iconAndVoteCounterWrapper(availableReactionsCount as 1 | 2 | undefined);
 
         icon = (
-            <div>
+            <div className={iconClass}>
                 {icon}
                 <div className={classes.voteCounterContainer}>
                     <DiscussionVoteCounter discussion={discussion} />
@@ -127,14 +138,23 @@ export default function DiscussionListItem(props: IProps) {
         <ListItem
             url={discussionUrl}
             name={discussion.name}
-            className={isRowChecked || isPendingAction ? classes.checkedboxRowStyle : undefined}
+            className={cx(isRowChecked || isPendingAction ? classes.checkedboxRowStyle : undefined, props.className)}
             nameClassName={cx(classes.title, { isRead: !hasUnread && currentUserSignedIn })}
-            description={discussion.excerpt}
-            metas={<DiscussionListItemMeta {...discussion} />}
+            description={props.discussionOptions?.excerpt?.display === false ? "" : discussion.excerpt}
+            metas={
+                <DiscussionListItemMeta
+                    {...discussion}
+                    inTile={props.asTile}
+                    discussionOptions={props.discussionOptions}
+                />
+            }
             actions={actions}
             icon={icon}
             iconWrapperClass={iconWrapperClass}
             options={variables.item.options}
+            as={props.asTile ? "div" : undefined}
+            asTile={props.asTile}
+            disableButtonsInItems={props.disableButtonsInItems}
             // TODO: Disable this until the feature is finished.
             checkbox={
                 canUseCheckboxes ? (
@@ -182,15 +202,15 @@ function qnaStatus(status) {
     }
 }
 
-function DiscussionListItemMeta(props: IDiscussion) {
+function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
     const {
         item: {
             metas: { display, asIcons: renderAsIcons },
         },
-    } = discussionListVariables();
+    } = discussionListVariables(props.discussionOptions);
 
-    const classes = discussionListClasses();
-    const variables = discussionListVariables();
+    const classes = discussionListClasses(props.discussionOptions, props.inTile);
+    const variables = discussionListVariables(props.discussionOptions);
 
     const {
         pinned,
@@ -207,12 +227,14 @@ function DiscussionListItemMeta(props: IDiscussion) {
         tags,
         score,
         resolved,
+        inTile,
     } = props;
 
     const currentUserSignedIn = useCurrentUserSignedIn();
 
     const displayUnreadCount =
-        currentUserSignedIn && (unread || (countUnread !== undefined && countUnread > 0 && display.unreadCount));
+        currentUserSignedIn &&
+        ((unread && !inTile) || (countUnread !== undefined && countUnread > 0 && display.unreadCount));
 
     const displayCategory = !!category && display.category;
 
@@ -240,7 +262,7 @@ function DiscussionListItemMeta(props: IDiscussion) {
     const canResolve = hasPermission("staff.allow", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
     const displayResolved = resolved !== undefined && canResolve && display.resolved;
 
-    return (
+    const tagsAndResolvedMetas = (
         <>
             {displayResolved && (
                 <MetaIcon
@@ -278,25 +300,27 @@ function DiscussionListItemMeta(props: IDiscussion) {
                         </MetaTag>
                     );
                 })}
+        </>
+    );
 
+    return (
+        <>
+            {!inTile && tagsAndResolvedMetas}
             {displayViewCount && !renderViewCountAsIcon && (
                 <MetaItem>
                     <Translate source="<0/> views" c0={countViews} />
                 </MetaItem>
             )}
-
             {displayCommentCount && !renderCommentCountAsIcon && (
                 <MetaItem>
                     <Translate source="<0/> comments" c0={countComments} />
                 </MetaItem>
             )}
-
             {displayScore && !renderScoreAsIcon && (
                 <MetaItem>
                     <Translate source="<0/> reactions" c0={score ?? 0} />
                 </MetaItem>
             )}
-
             {displayStartedByUser && (
                 <MetaItem>
                     <Translate
@@ -305,24 +329,20 @@ function DiscussionListItemMeta(props: IDiscussion) {
                     />
                 </MetaItem>
             )}
-
             {displayLastUser && (
-                <MetaItem>
+                <MetaItem className={cx({ [classes.fullWidth]: inTile })}>
                     <Translate
                         source="Most recent by <0/>"
                         c0={<ProfileLink userFragment={lastUser!} className={metasClasses().metaLink} />}
                     />
                 </MetaItem>
             )}
-
             {displayLastCommentDate && !renderLastCommentDateAsIcon && dateLastComment && (
                 <MetaItem>
                     <DateTime timestamp={dateLastComment} />
                 </MetaItem>
             )}
-
             {displayCategory && <MetaLink to={category!.url}> {category!.name} </MetaLink>}
-
             {displayUnreadCount && (
                 <MetaItem>
                     <Notice>
@@ -330,25 +350,21 @@ function DiscussionListItemMeta(props: IDiscussion) {
                     </Notice>
                 </MetaItem>
             )}
-
             {renderViewCountAsIcon && (
                 <MetaIcon icon="meta-view" aria-label={t("Views")}>
                     {countViews}
                 </MetaIcon>
             )}
-
             {renderLastCommentDateAsIcon && dateLastComment && (
                 <MetaIcon icon="meta-time" aria-label={t("Last comment")}>
                     <DateTime timestamp={dateLastComment} />
                 </MetaIcon>
             )}
-
             {renderScoreAsIcon && (
                 <MetaIcon icon="meta-like" aria-label={t("Score")}>
                     {score ?? 0}
                 </MetaIcon>
             )}
-
             {renderCommentCountAsIcon && (
                 <MetaIcon icon="meta-comment" aria-label={t("Comments")}>
                     {countComments}

@@ -18,6 +18,7 @@ namespace Vanilla;
  * controllers and models this is a worthwhile interface. This also allows base classes to add additional dependencies
  * after the fact without breaking child constructors. It is recommended that classes that use this interface
  */
-interface InjectableInterface {
+interface InjectableInterface
+{
     // public function setDependencies(...)
 }

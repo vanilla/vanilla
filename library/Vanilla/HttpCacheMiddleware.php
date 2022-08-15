@@ -16,8 +16,9 @@ use Psr\SimpleCache\InvalidArgumentException;
  * Class HttpCacheMiddleware
  * @package Vanilla
  */
-class HttpCacheMiddleware {
-    const NO_CACHE = '-1';
+class HttpCacheMiddleware
+{
+    const NO_CACHE = "-1";
 
     /**
      * @var CacheInterface
@@ -28,7 +29,8 @@ class HttpCacheMiddleware {
      * HttpCacheMiddleware constructor.
      * @param CacheInterface $cache
      */
-    public function __construct(CacheInterface $cache) {
+    public function __construct(CacheInterface $cache)
+    {
         $this->cache = $cache;
     }
 
@@ -38,7 +40,8 @@ class HttpCacheMiddleware {
      * @param HttpRequest $request
      * @return string
      */
-    private function makeCacheKey(HttpRequest $request): string {
+    private function makeCacheKey(HttpRequest $request): string
+    {
         $cacheKey = $request->getUrl();
         $cacheKey = sha1($cacheKey);
 
@@ -52,8 +55,9 @@ class HttpCacheMiddleware {
      * @param callable $next
      * @return HttpResponse
      */
-    public function __invoke(HttpRequest $request, callable $next): HttpResponse {
-        $ttl = (int)$request->getHeader('X-Cache');
+    public function __invoke(HttpRequest $request, callable $next): HttpResponse
+    {
+        $ttl = (int) $request->getHeader("X-Cache");
 
         // Only cache GET requests.
         if ($request->getMethod() !== HttpRequest::METHOD_GET || $ttl < 0) {
@@ -68,7 +72,7 @@ class HttpCacheMiddleware {
                 $response = $next($request);
 
                 if ($ttl === 1 || $ttl === 0) {
-                    $ttl = strtotime('12 hours', 0);
+                    $ttl = strtotime("12 hours", 0);
                 }
 
                 if ($response->isSuccessful()) {

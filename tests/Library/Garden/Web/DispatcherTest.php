@@ -22,7 +22,8 @@ use VanillaTests\Fixtures\ExactRoute;
 /**
  * Test methods on the Dispatcher class.
  */
-class DispatcherTest extends BootstrapTestCase {
+class DispatcherTest extends BootstrapTestCase
+{
     private static $locale;
 
     /**
@@ -37,17 +38,14 @@ class DispatcherTest extends BootstrapTestCase {
     /**
      * Test Dispatcher::callMiddlewares().
      */
-    public function testCallMiddlewares() {
+    public function testCallMiddlewares()
+    {
         $r = Dispatcher::callMiddlewares(
             new Request(),
-            [
-                $this->makeMiddleware('a'),
-                $this->makeMiddleware('b'),
-                $this->makeMiddleware('c'),
-            ],
+            [$this->makeMiddleware("a"), $this->makeMiddleware("b"), $this->makeMiddleware("c")],
             function (RequestInterface $request): Data {
                 $response = new Data();
-                $response->setHeader("test", $request->getHeader("test").'o');
+                $response->setHeader("test", $request->getHeader("test") . "o");
                 return $response;
             }
         );
@@ -58,33 +56,36 @@ class DispatcherTest extends BootstrapTestCase {
     /**
      * A route middleware should apply to a matched route.
      */
-    public function testRouteMiddleware() {
+    public function testRouteMiddleware()
+    {
         $dis = $this->makeDispatcher();
 
-        $data = $dis->dispatch(new Request('/foo'));
+        $data = $dis->dispatch(new Request("/foo"));
 
-        $this->assertEquals('a(foo)a', $data->getHeader('test'));
+        $this->assertEquals("a(foo)a", $data->getHeader("test"));
     }
 
     /**
      * A route middleware should not apply to a different matched route.
      */
-    public function testRouteMiddlewareNoMatch() {
+    public function testRouteMiddlewareNoMatch()
+    {
         $dis = $this->makeDispatcher();
 
-        $data = $dis->dispatch(new Request('/bar'));
-        $this->assertEquals('(bar)', $data->getHeader('test'));
+        $data = $dis->dispatch(new Request("/bar"));
+        $this->assertEquals("(bar)", $data->getHeader("test"));
     }
 
     /**
      * Test basic middleware dispatching.
      */
-    public function testDispatcherMiddleware() {
+    public function testDispatcherMiddleware()
+    {
         $dis = $this->makeDispatcher();
-        $dis->addMiddleware($this->makeMiddleware('d'));
+        $dis->addMiddleware($this->makeMiddleware("d"));
 
-        $data = $dis->dispatch(new Request('/bar'));
-        $this->assertEquals('d(bar)d', $data->getHeader('test'));
+        $data = $dis->dispatch(new Request("/bar"));
+        $this->assertEquals("d(bar)d", $data->getHeader("test"));
     }
 
     /**
@@ -93,13 +94,14 @@ class DispatcherTest extends BootstrapTestCase {
      * @param string $v The value to add.
      * @return callable Returns a new middleware.
      */
-    protected function makeMiddleware(string $v): callable {
+    protected function makeMiddleware(string $v): callable
+    {
         return function (RequestInterface $request, callable $next) use ($v): Data {
-            $request->setHeader("test", $request->getHeader("test").$v);
+            $request->setHeader("test", $request->getHeader("test") . $v);
 
             /* @var \Garden\Web\Data $response */
             $response = $next($request);
-            $response->setHeader("test", $response->getHeader("test").$v);
+            $response->setHeader("test", $response->getHeader("test") . $v);
 
             return $response;
         };
@@ -110,56 +112,60 @@ class DispatcherTest extends BootstrapTestCase {
      *
      * @return Dispatcher Returns a configured dispatcher.
      */
-    protected function makeDispatcher(): Dispatcher {
+    protected function makeDispatcher(): Dispatcher
+    {
         $dis = new Dispatcher();
 
-        $route = new ExactRoute('/foo', function (RequestInterface $request) {
+        $route = new ExactRoute("/foo", function (RequestInterface $request) {
             $response = new Data();
-            $response->setHeader('test', $request->getHeader("test").'(foo)');
+            $response->setHeader("test", $request->getHeader("test") . "(foo)");
 
             return $response;
         });
 
-        $route->addMiddleware($this->makeMiddleware('a'));
+        $route->addMiddleware($this->makeMiddleware("a"));
 
-        $dis->addRoute($route)
-            ->addRoute(new ExactRoute('/bar', function (RequestInterface $request) {
+        $dis->addRoute($route)->addRoute(
+            new ExactRoute("/bar", function (RequestInterface $request) {
                 $response = new Data();
-                $response->setHeader('test', $request->getHeader("test").'(bar)');
+                $response->setHeader("test", $request->getHeader("test") . "(bar)");
 
                 return $response;
-            }));
+            })
+        );
         return $dis;
     }
 
     /**
      * Test some basic route accessors.
      */
-    public function testRouteAccessors() {
+    public function testRouteAccessors()
+    {
         $dis = new Dispatcher();
 
         $r = new ResourceRoute();
 
-        $dis->addRoute($r, 'foo');
-        $this->assertSame($r, $dis->getRoute('foo'));
+        $dis->addRoute($r, "foo");
+        $this->assertSame($r, $dis->getRoute("foo"));
 
-        $dis->removeRoute('foo');
-        $this->assertNull($dis->getRoute('foo'));
+        $dis->removeRoute("foo");
+        $this->assertNull($dis->getRoute("foo"));
     }
 
     /**
      * Test the conversion of an exception to a response.
      */
-    public function testDispatchException() {
+    public function testDispatchException()
+    {
         $dis = new Dispatcher();
-        $dis->addMiddleware(function (RequestInterface $r, callable  $next) {
-            throw new ClientException('foo');
+        $dis->addMiddleware(function (RequestInterface $r, callable $next) {
+            throw new ClientException("foo");
         });
 
         $r = $dis->dispatch(new Request());
 
         $this->assertSame(400, $r->getStatus());
-        $this->assertSame('foo', $r['message']);
+        $this->assertSame("foo", $r["message"]);
     }
 
     /**
@@ -170,7 +176,8 @@ class DispatcherTest extends BootstrapTestCase {
      * @param array $expected
      * @dataProvider provideHappyReflectArgsTests
      */
-    public function testReflectArgsHappy(\ReflectionMethod $func, array $args, array $expected): void {
+    public function testReflectArgsHappy(\ReflectionMethod $func, array $args, array $expected): void
+    {
         $container = new ArrayContainer();
         $container[get_class(self::$locale)] = self::$locale;
         $container[Tuple::class] = self::$sender2;
@@ -184,29 +191,42 @@ class DispatcherTest extends BootstrapTestCase {
      *
      * @return array
      */
-    public function provideHappyReflectArgsTests(): array {
-        $f1 = new \ReflectionMethod($this, 'dummy1');
-        $f2 = new \ReflectionMethod($this, 'dummy2');
-        $f3 = new \ReflectionMethod($this, 'sender1');
-        $f4 = new \ReflectionMethod($this, 'sender2');
+    public function provideHappyReflectArgsTests(): array
+    {
+        $f1 = new \ReflectionMethod($this, "dummy1");
+        $f2 = new \ReflectionMethod($this, "dummy2");
+        $f3 = new \ReflectionMethod($this, "sender1");
+        $f4 = new \ReflectionMethod($this, "sender2");
 
-        $basic = ['foo' => 123, 'bar' => 'foo'];
+        $basic = ["foo" => 123, "bar" => "foo"];
         self::$locale = new Locale();
         self::$sender = new Tuple(1, 1);
         self::$sender2 = new Tuple(2, 2);
 
         $r = [
-            'named' => [$f1, ['bar' => 'foo', 'FOO' => 123], $basic],
-            'index' => [$f1, [123, 'foo'], $basic],
-            'named overrides index' => [$f1, [345, 'foo', 'foo' => 123], $basic],
-            'default' => [$f1, [123], ['foo' => 123, 'bar' => 'baz']],
-            'container' => [$f2, [], ['obj' => self::$locale, 'foo' => 123]],
-            'container overrides args' => [$f2, ['obj' => 123], ['obj' => self::$locale, 'foo' => 123]],
-            'sender order' => [$f3, [self::$sender, 'a'], ['sender' => self::$sender, 'foo' => 'a', 'bar' => 123]],
-            'sender order hint' => [$f4, [self::$sender, 'a'], ['sender' => self::$sender, 'foo' => 'a', 'bar' => 123]],
-            'sender key' => [$f3, ['sender' => self::$sender, 'foo' => 'a'], ['sender' => self::$sender, 'foo' => 'a', 'bar' => 123]],
-            'sender key hint' => [$f4, ['sender' => self::$sender, 'foo' => 'a'], ['sender' => self::$sender, 'foo' => 'a', 'bar' => 123]],
-            'bad sender' => [$f4, ['sender' => 123, 'foo' => 'a'], ['sender' => self::$sender2, 'foo' => 'a', 'bar' => 123]],
+            "named" => [$f1, ["bar" => "foo", "FOO" => 123], $basic],
+            "index" => [$f1, [123, "foo"], $basic],
+            "named overrides index" => [$f1, [345, "foo", "foo" => 123], $basic],
+            "default" => [$f1, [123], ["foo" => 123, "bar" => "baz"]],
+            "container" => [$f2, [], ["obj" => self::$locale, "foo" => 123]],
+            "container overrides args" => [$f2, ["obj" => 123], ["obj" => self::$locale, "foo" => 123]],
+            "sender order" => [$f3, [self::$sender, "a"], ["sender" => self::$sender, "foo" => "a", "bar" => 123]],
+            "sender order hint" => [$f4, [self::$sender, "a"], ["sender" => self::$sender, "foo" => "a", "bar" => 123]],
+            "sender key" => [
+                $f3,
+                ["sender" => self::$sender, "foo" => "a"],
+                ["sender" => self::$sender, "foo" => "a", "bar" => 123],
+            ],
+            "sender key hint" => [
+                $f4,
+                ["sender" => self::$sender, "foo" => "a"],
+                ["sender" => self::$sender, "foo" => "a", "bar" => 123],
+            ],
+            "bad sender" => [
+                $f4,
+                ["sender" => 123, "foo" => "a"],
+                ["sender" => self::$sender2, "foo" => "a", "bar" => 123],
+            ],
         ];
 
         return $r;
@@ -220,7 +240,8 @@ class DispatcherTest extends BootstrapTestCase {
      * @param string $message
      * @dataProvider provideReflectArgsException
      */
-    public function testReflectArgsExceptions(\ReflectionMethod $func, array $args, string $message): void {
+    public function testReflectArgsExceptions(\ReflectionMethod $func, array $args, string $message): void
+    {
         $container = new ArrayContainer();
 
         $args = Dispatcher::reflectArgs($func, $args, $container, false);
@@ -235,13 +256,22 @@ class DispatcherTest extends BootstrapTestCase {
      *
      * @return array
      */
-    public function provideReflectArgsException(): array {
-        $f1 = new \ReflectionMethod($this, 'dummy1');
-        $f2 = new \ReflectionMethod($this, 'dummy2');
+    public function provideReflectArgsException(): array
+    {
+        $f1 = new \ReflectionMethod($this, "dummy1");
+        $f2 = new \ReflectionMethod($this, "dummy2");
 
         $r = [
-            'missing' => [$f1, [], 'VanillaTests\Library\Garden\Web\DispatcherTest::dummy1() expects the following parameters: $foo.'],
-            'missing obj' => [$f2, [], 'VanillaTests\Library\Garden\Web\DispatcherTest::dummy2() expects the following parameters: $obj.'],
+            "missing" => [
+                $f1,
+                [],
+                'VanillaTests\Library\Garden\Web\DispatcherTest::dummy1() expects the following parameters: $foo.',
+            ],
+            "missing obj" => [
+                $f2,
+                [],
+                'VanillaTests\Library\Garden\Web\DispatcherTest::dummy2() expects the following parameters: $obj.',
+            ],
         ];
 
         return $r;
@@ -253,7 +283,8 @@ class DispatcherTest extends BootstrapTestCase {
      * @param int $foo
      * @param string $bar
      */
-    protected function dummy1(int $foo, string $bar = 'baz'): void {
+    protected function dummy1(int $foo, string $bar = "baz"): void
+    {
         // Do nothing.
     }
 
@@ -263,7 +294,8 @@ class DispatcherTest extends BootstrapTestCase {
      * @param Locale $obj
      * @param int $foo
      */
-    protected function dummy2(Locale $obj, int $foo = 123): void {
+    protected function dummy2(Locale $obj, int $foo = 123): void
+    {
         // Do nothing.
     }
 
@@ -274,7 +306,8 @@ class DispatcherTest extends BootstrapTestCase {
      * @param mixed $foo
      * @param int $bar
      */
-    protected function sender1($sender, $foo, $bar = 123): void {
+    protected function sender1($sender, $foo, $bar = 123): void
+    {
         // Do nothing.
     }
 
@@ -285,7 +318,8 @@ class DispatcherTest extends BootstrapTestCase {
      * @param mixed $foo
      * @param int $bar
      */
-    protected function sender2(Tuple $sender, $foo, $bar = 123): void {
+    protected function sender2(Tuple $sender, $foo, $bar = 123): void
+    {
         // Do nothing.
     }
 }

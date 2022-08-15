@@ -14,11 +14,12 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { Icon } from "@vanilla/icons";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { FrameHeaderMinimal } from "@library/layout/frame/FrameHeaderMinimal";
-import { Hoverable, useMeasure } from "@vanilla/react-utils";
-
+import { useMeasure } from "@vanilla/react-utils";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { cx } from "@emotion/css";
 import ModalSizes from "@library/modal/ModalSizes";
+import Popover, { positionMatchWidth } from "@reach/popover";
+import { positionPreferTopMiddle } from "@library/features/userCard/UserCard";
 
 export enum DropDownOpenDirection {
     ABOVE_LEFT = "aboveLeft",
@@ -71,6 +72,7 @@ export interface IDropDownProps extends IOpenDirectionProps {
     accessibleLabel?: string;
     onHover?: () => void;
     modalSize?: ModalSizes;
+    asReachPopover?: boolean;
 }
 
 export enum FlyoutType {
@@ -129,6 +131,15 @@ export default function DropDown(props: IDropDownProps) {
     });
 
     const positionHidden = openDirection === DropDownOpenDirection.HIDDEN;
+    const positionLeft = [DropDownOpenDirection.ABOVE_LEFT, DropDownOpenDirection.BELOW_LEFT].includes(openDirection);
+    const positionCenter = [DropDownOpenDirection.ABOVE_CENTER, DropDownOpenDirection.BELOW_CENTER].includes(
+        openDirection,
+    );
+    const positionAbove = [
+        DropDownOpenDirection.ABOVE_RIGHT,
+        DropDownOpenDirection.ABOVE_LEFT,
+        DropDownOpenDirection.ABOVE_CENTER,
+    ].includes(openDirection);
 
     const handleID = props.handleID ?? ID + "-handle";
     const contentID = props.contentID ?? ID + "-contents";
@@ -166,53 +177,71 @@ export default function DropDown(props: IDropDownProps) {
                             condition={(!isVisible || positionHidden) && !openAsModal && !!preferredDirection}
                             className={classes.positioning}
                         >
-                            <DropDownContents
-                                {...params}
-                                contentRef={ownContentRef}
-                                id={contentID}
-                                className={cx(props.contentsClassName)}
-                                renderCenter={[
-                                    DropDownOpenDirection.ABOVE_CENTER,
-                                    DropDownOpenDirection.BELOW_CENTER,
-                                ].includes(openDirection)}
-                                renderLeft={[
-                                    DropDownOpenDirection.ABOVE_LEFT,
-                                    DropDownOpenDirection.BELOW_LEFT,
-                                ].includes(openDirection)}
-                                renderAbove={[
-                                    DropDownOpenDirection.ABOVE_RIGHT,
-                                    DropDownOpenDirection.ABOVE_LEFT,
-                                    DropDownOpenDirection.ABOVE_CENTER,
-                                ].includes(openDirection)}
-                                openAsModal={openAsModal}
-                                selfPadded={
-                                    props.selfPadded !== undefined
-                                        ? props.selfPadded
-                                        : props.flyoutType === FlyoutType.FRAME
-                                }
-                                size={
-                                    props.flyoutType === FlyoutType.FRAME && !props.isSmall
-                                        ? DropDownContentSize.MEDIUM
-                                        : DropDownContentSize.SMALL
-                                }
-                                horizontalOffset={props.horizontalOffset}
+                            <ConditionalWrap
+                                condition={!!props.asReachPopover && !openAsModal}
+                                component={Popover}
+                                componentProps={{
+                                    targetRef: ownButtonRef,
+                                    position: (
+                                        targetRect?: DOMRect | null,
+                                        popoverRect?: DOMRect | null,
+                                    ): React.CSSProperties => {
+                                        //adjust position horizontally if centered
+                                        const position = positionCenter
+                                            ? positionPreferTopMiddle(targetRect, popoverRect)
+                                            : positionMatchWidth(targetRect, popoverRect);
+
+                                        //take into account button height
+                                        const adjustedTop =
+                                            positionAbove && targetRect && targetRect.height
+                                                ? (parseFloat(position.top as string) ?? 0) - targetRect.height
+                                                : position.top;
+
+                                        return {
+                                            ...position,
+                                            top: adjustedTop,
+                                        };
+                                    },
+                                }}
                             >
-                                {!openAsModal && title && (
-                                    <FrameHeader title={title} closeFrame={params.closeMenuHandler} />
-                                )}
-                                {openAsModal && mobileTitle && (
-                                    <FrameHeaderMinimal onClose={params.closeMenuHandler}>
-                                        {mobileTitle ?? title}
-                                    </FrameHeaderMinimal>
-                                )}
-                                {openAsModal && props.flyoutType === FlyoutType.FRAME ? (
-                                    props.children
-                                ) : (
-                                    <ContentTag className={cx("dropDownItems", classes.items)}>
-                                        {props.children}
-                                    </ContentTag>
-                                )}
-                            </DropDownContents>
+                                <DropDownContents
+                                    {...params}
+                                    contentRef={ownContentRef}
+                                    id={contentID}
+                                    className={cx(props.contentsClassName)}
+                                    renderCenter={positionCenter}
+                                    renderLeft={positionLeft}
+                                    renderAbove={positionAbove}
+                                    openAsModal={openAsModal}
+                                    selfPadded={
+                                        props.selfPadded !== undefined
+                                            ? props.selfPadded
+                                            : props.flyoutType === FlyoutType.FRAME
+                                    }
+                                    size={
+                                        props.flyoutType === FlyoutType.FRAME && !props.isSmall
+                                            ? DropDownContentSize.MEDIUM
+                                            : DropDownContentSize.SMALL
+                                    }
+                                    horizontalOffset={props.horizontalOffset}
+                                >
+                                    {!openAsModal && title && (
+                                        <FrameHeader title={title} closeFrame={params.closeMenuHandler} />
+                                    )}
+                                    {openAsModal && mobileTitle && (
+                                        <FrameHeaderMinimal onClose={params.closeMenuHandler}>
+                                            {mobileTitle ?? title}
+                                        </FrameHeaderMinimal>
+                                    )}
+                                    {openAsModal && props.flyoutType === FlyoutType.FRAME ? (
+                                        props.children
+                                    ) : (
+                                        <ContentTag className={cx("dropDownItems", classes.items)}>
+                                            {props.children}
+                                        </ContentTag>
+                                    )}
+                                </DropDownContents>
+                            </ConditionalWrap>
                         </ConditionalWrap>
                     </DropdownContext.Provider>
                 );

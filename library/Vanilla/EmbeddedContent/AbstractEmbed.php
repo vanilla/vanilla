@@ -20,8 +20,8 @@ use Vanilla\Web\TwigRenderTrait;
  * - Storing/validating embed data.
  * - Rendering that data as HTML.
  */
-abstract class AbstractEmbed implements \JsonSerializable {
-
+abstract class AbstractEmbed implements \JsonSerializable
+{
     use TwigRenderTrait;
     use JsonFilterTrait;
 
@@ -36,7 +36,8 @@ abstract class AbstractEmbed implements \JsonSerializable {
      *
      * @return bool
      */
-    public static function isExtendedContent(): bool {
+    public static function isExtendedContent(): bool
+    {
         return false;
     }
 
@@ -47,7 +48,8 @@ abstract class AbstractEmbed implements \JsonSerializable {
      *
      * @throws ValidationException If the data doesn't match the specification.
      */
-    public function __construct(array $data) {
+    public function __construct(array $data)
+    {
         $this->updateData($data);
     }
 
@@ -59,7 +61,8 @@ abstract class AbstractEmbed implements \JsonSerializable {
      *
      * @throws ValidationException If the data doesn't match the specification.
      */
-    public function updateData(array $fieldsToUpdate, bool $revalidate = true) {
+    public function updateData(array $fieldsToUpdate, bool $revalidate = true)
+    {
         $data = array_merge($this->data, $fieldsToUpdate);
 
         // Validate the data before assigning local variables.
@@ -74,7 +77,8 @@ abstract class AbstractEmbed implements \JsonSerializable {
     /**
      * @return array
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return $this->getData();
     }
 
@@ -83,7 +87,8 @@ abstract class AbstractEmbed implements \JsonSerializable {
      *
      * @return array;
      */
-    public function getData(): array {
+    public function getData(): array
+    {
         return $this->jsonFilter($this->data);
     }
 
@@ -92,8 +97,9 @@ abstract class AbstractEmbed implements \JsonSerializable {
      *
      * @return string
      */
-    public function getUrl(): string {
-        return $this->data['url'];
+    public function getUrl(): string
+    {
+        return $this->data["url"];
     }
 
     /**
@@ -101,8 +107,9 @@ abstract class AbstractEmbed implements \JsonSerializable {
      *
      * @return string
      */
-    public function getAlt(): string {
-        return $this->data['name'];
+    public function getAlt(): string
+    {
+        return $this->data["name"];
     }
 
     /**
@@ -113,11 +120,12 @@ abstract class AbstractEmbed implements \JsonSerializable {
      *
      * @return string
      */
-    public function renderHtml(): string {
-        $viewPath = dirname(__FILE__) . '/AbstractEmbed.twig';
+    public function renderHtml(): string
+    {
+        $viewPath = dirname(__FILE__) . "/AbstractEmbed.twig";
         return $this->renderTwig($viewPath, [
-            'url' => $this->getUrl(),
-            'data' => json_encode($this, JSON_UNESCAPED_UNICODE)
+            "url" => $this->getUrl(),
+            "data" => json_encode($this, JSON_UNESCAPED_UNICODE),
         ]);
     }
 
@@ -128,9 +136,10 @@ abstract class AbstractEmbed implements \JsonSerializable {
      * @param array $data
      * @return array
      */
-    protected function normalizeCommonData(array $data): array {
+    protected function normalizeCommonData(array $data): array
+    {
         $data = EmbedUtils::remapProperties($data, [
-            'embedType' => 'type',
+            "embedType" => "type",
         ]);
         return $data;
     }
@@ -142,7 +151,8 @@ abstract class AbstractEmbed implements \JsonSerializable {
      * @param array $data The raw data.
      * @return array The normalized data.
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         return $data;
     }
 
@@ -173,16 +183,17 @@ abstract class AbstractEmbed implements \JsonSerializable {
     /**
      * @return Schema
      */
-    private function fullSchema(): Schema {
+    private function fullSchema(): Schema
+    {
         $baseSchema = Schema::parse([
-            'url' => [
-                'type' => 'string',
-                'format' => 'uri',
+            "url" => [
+                "type" => "string",
+                "format" => "uri",
             ],
-            'embedType:s' => [
-                'enum' => $this->getAllowedTypes(),
+            "embedType:s" => [
+                "enum" => $this->getAllowedTypes(),
             ],
-            'name:s?'
+            "name:s?",
         ]);
 
         return $this->schema()->merge($baseSchema);
@@ -191,14 +202,16 @@ abstract class AbstractEmbed implements \JsonSerializable {
     /**
      * @return bool
      */
-    public function isCacheable(): bool {
+    public function isCacheable(): bool
+    {
         return $this->cacheable;
     }
 
     /**
      * @param bool $cacheable
      */
-    public function setCacheable(bool $cacheable): void {
+    public function setCacheable(bool $cacheable): void
+    {
         $this->cacheable = $cacheable;
     }
 }

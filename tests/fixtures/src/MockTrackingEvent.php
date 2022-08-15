@@ -13,15 +13,17 @@ use Garden\Events\TrackingEventInterface;
 /**
  * Mock event implementing the TrackingEventInterface.
  */
-class MockTrackingEvent extends ResourceEvent implements TrackingEventInterface {
-    const COLLECTION_NAME = 'mockCollection';
+class MockTrackingEvent extends ResourceEvent implements TrackingEventInterface
+{
+    const COLLECTION_NAME = "mockCollection";
 
     /**
      * Return the collection name associated with the event.
      *
      * @return string
      */
-    public function getTrackableCollection(): string {
+    public function getTrackableCollection(): string
+    {
         return self::COLLECTION_NAME;
     }
 
@@ -30,8 +32,9 @@ class MockTrackingEvent extends ResourceEvent implements TrackingEventInterface 
      *
      * @return array
      */
-    public function getTrackablePayload(): array {
-        return ['tracking' => true];
+    public function getTrackablePayload(): array
+    {
+        return ["tracking" => true];
     }
 
     /**
@@ -39,7 +42,8 @@ class MockTrackingEvent extends ResourceEvent implements TrackingEventInterface 
      *
      * @return string
      */
-    public function getTrackableAction(): string {
-        return 'track';
+    public function getTrackableAction(): string
+    {
+        return "track";
     }
 }

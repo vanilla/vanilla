@@ -13,25 +13,28 @@
  *
  * @see trace()
  */
-class TraceModule extends Gdn_Module {
-
-    public function __construct() {
+class TraceModule extends Gdn_Module
+{
+    public function __construct()
+    {
         parent::__construct();
-        $this->_ApplicationFolder = 'dashboard';
+        $this->_ApplicationFolder = "dashboard";
     }
 
-    public function assetTarget() {
-        return 'Content';
+    public function assetTarget()
+    {
+        return "Content";
     }
 
-    public function toString() {
+    public function toString()
+    {
         try {
             $traces = trace();
             if (!$traces) {
-                return '';
+                return "";
             }
 
-            $this->setData('Traces', $traces);
+            $this->setData("Traces", $traces);
 
             return $this->fetchView();
         } catch (Exception $ex) {

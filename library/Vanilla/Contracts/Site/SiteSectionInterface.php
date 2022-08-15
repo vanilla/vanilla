@@ -12,9 +12,10 @@ namespace Vanilla\Contracts\Site;
  *
  * Through this mechanism content across the site may be separated and filtered.
  */
-interface SiteSectionInterface extends \JsonSerializable {
-    const APP_FORUM = 'forum';
-    const APP_KB = 'knowledgeBase';
+interface SiteSectionInterface extends \JsonSerializable
+{
+    const APP_FORUM = "forum";
+    const APP_KB = "knowledgeBase";
     /**
      * Get the base path for the section of the site.
      *
@@ -41,6 +42,13 @@ interface SiteSectionInterface extends \JsonSerializable {
      * @return string
      */
     public function getSectionName(): string;
+
+    /**
+     * Get the description for the section.
+     *
+     * @return string|null
+     */
+    public function getSectionDescription(): ?string;
 
     /**
      * Get the uniqueID representing the section.
@@ -114,4 +122,14 @@ interface SiteSectionInterface extends \JsonSerializable {
      * @return string
      */
     public function getBannerImageLink(): string;
+
+    /**
+     * Adapt parameters prior to calling layoutViewModel::getLayoutIdLookup().
+     *
+     * @param string $layoutViewType layoutViewType.
+     * @param string $recordType recordType.
+     * @param string $recordID recordID.
+     * @return array
+     */
+    public function getLayoutIdLookupParams(string $layoutViewType, string $recordType, string $recordID): array;
 }

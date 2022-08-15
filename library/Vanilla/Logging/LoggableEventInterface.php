@@ -9,8 +9,8 @@ namespace Vanilla\Logging;
 /**
  * Methods for allowing easy logging of an event.
  */
-interface LoggableEventInterface {
-
+interface LoggableEventInterface
+{
     /**
      * Get the event details for logging.
      *

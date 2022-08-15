@@ -17,9 +17,10 @@ import { useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
 import qs from "qs";
 import { makeSearchUrl } from "@library/search/SearchPageRoute";
 import { ListItem } from "@library/lists/ListItem";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
 
 interface IProps {
-    discussionID: number;
+    discussionID: IDiscussion["discussionID"];
     icon?: React.ReactNode;
 }
 

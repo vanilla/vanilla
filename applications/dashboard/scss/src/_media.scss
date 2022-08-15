@@ -53,92 +53,94 @@
 //
 // Styleguide 6.1.
 
+@use "sass:math";
+
 .media {
-  display: flex;
+    display: flex;
 
-  .info {
-    font-size: $font-size-tables;
-  }
+    .info {
+        font-size: $font-size-tables;
+    }
 
-  .flag {
-    margin-top: -1px;
-    margin-bottom: $spacer / 2;
-  }
+    .flag {
+        margin-top: -1px;
+        margin-bottom: $spacer * 0.5;
+    }
 
-  .media-title {
-    margin-bottom: $spacer * (2 / 3);
-  }
+    .media-title {
+        margin-bottom: $spacer * math.div(2, 3);
+    }
 
-  .media-description {
-  }
+    .media-description {
+    }
 
-  .media-image {
-    height: 160px;
-    border: $border-width solid $border-color;
-  }
+    .media-image {
+        height: 160px;
+        border: $border-width solid $border-color;
+    }
 }
 
 .media-list {
-  padding-left: 0;
-  list-style: none;
+    padding-left: 0;
+    list-style: none;
 }
 
 .media-addon {
-  .media-image-wrap {
-    display: flex;
-    align-items: center;
-    @include image-wrap();
+    .media-image-wrap {
+        display: flex;
+        align-items: center;
+        @include image-wrap();
 
-    @include media-breakpoint-down(md) {
-      @include image-wrap($spacer * 3.5, $spacer * 3.5);
+        @include media-breakpoint-down(md) {
+            @include image-wrap($spacer * 3.5, $spacer * 3.5);
+        }
     }
-  }
 
-  .media-body {
-    max-width: 540px;
-  }
+    .media-body {
+        max-width: 540px;
+    }
 
-  .media-right {
-    margin-left: auto;
-  }
+    .media-right {
+        margin-left: auto;
+    }
 }
 
 .media-addon,
 .media-callout {
-  @extend .row;
-  border-bottom: 1px solid $border-color;
-  padding: $spacer $padding-row;
+    @extend .row;
+    border-bottom: 1px solid $border-color;
+    padding: $spacer $padding-row;
 
-  .media-title {
-    display: flex;
-    font-weight: 600;
-    margin-bottom: $spacer / 4;
-    margin-top: 0;
-  }
+    .media-title {
+        display: flex;
+        font-weight: 600;
+        margin-bottom: $spacer * 0.25;
+        margin-top: 0;
+    }
 }
 
 .media-options {
-  display: flex;
-  flex-wrap: wrap;
-  align-self: center;
-
-  > *:not(:first-child) {
-    margin-left: $spacer * 2;
-  }
-
-  @include media-breakpoint-down(md) {
-    flex-direction: column-reverse;
-    align-items: center;
-    align-self: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    align-self: center;
 
     > *:not(:first-child) {
-      margin-left: 0;
+        margin-left: $spacer * 2;
     }
 
-    > *:not(:last-child) {
-      margin-top: $spacer / 2;
+    @include media-breakpoint-down(md) {
+        flex-direction: column-reverse;
+        align-items: center;
+        align-self: flex-start;
+
+        > *:not(:first-child) {
+            margin-left: 0;
+        }
+
+        > *:not(:last-child) {
+            margin-top: $spacer * 0.5;
+        }
     }
-  }
 }
 
 //
@@ -146,17 +148,17 @@
 //
 
 .documentationLink {
-  display: inline-block;
-  position: relative;
-  vertical-align: 1px;
-  margin-left: 1px;
-  &.compatIcons {
-      display: block;
-      margin-left: 8px;
-      width: 10px;
-      height: 16.02px;
-      top: 3px;
-  }
+    display: inline-block;
+    position: relative;
+    vertical-align: 1px;
+    margin-left: 1px;
+    &.compatIcons {
+        display: block;
+        margin-left: 8px;
+        width: 10px;
+        height: 16.02px;
+        top: 3px;
+    }
 }
 
 //
@@ -164,11 +166,11 @@
 //
 
 .media-right {
-  padding-left: $spacer;
+    padding-left: $spacer;
 }
 
 .media-left {
-  padding-right: $spacer;
+    padding-right: $spacer;
 }
 
 //
@@ -177,12 +179,12 @@
 
 // Wrapper for title if our title has some info related to it.
 .media-heading {
-  margin-top: 0;
-  margin-bottom: $spacer / 2;
+    margin-top: 0;
+    margin-bottom: $spacer * 0.5;
 }
 
 .media-description {
-  line-height: $line-height-lg;
+    line-height: $line-height-lg;
 }
 
 // Media Callout
@@ -219,40 +221,39 @@
 // Styleguide 6.2.
 
 .media-callout {
+    // Counteracts the padding placed on the grid-item in the media-left
+    padding-left: 0;
 
-  // Counteracts the padding placed on the grid-item in the media-left
-  padding-left: 0;
-
-  .media-title {
-    display: flex;
-    font-weight: 400;
-    margin-bottom: $spacer / 2;
-  }
-
-  .media-left {
-    @include grid-item();
-
-    img {
-      display: block;
-      width: 100%;
+    .media-title {
+        display: flex;
+        font-weight: 400;
+        margin-bottom: $spacer * 0.5;
     }
-  }
 
-  &.media-callout-grey-bg {
-    background-color: $grey-lighter;
-  }
+    .media-left {
+        @include grid-item();
 
-  .media-image-wrap {
-    position: relative;
-    @include image-wrap-border(0);
-  }
+        img {
+            display: block;
+            width: 100%;
+        }
+    }
 
-  // For the theme info popups, make the image half the width of the container, and make sure it doesn't get too tall.
-  .modal & .media-left {
-    @extend .col-xs-12;
-    max-height: 180px;
-    overflow: hidden;
-  }
+    &.media-callout-grey-bg {
+        background-color: $grey-lighter;
+    }
+
+    .media-image-wrap {
+        position: relative;
+        @include image-wrap-border(0);
+    }
+
+    // For the theme info popups, make the image half the width of the container, and make sure it doesn't get too tall.
+    .modal & .media-left {
+        @extend .col-xs-12;
+        max-height: 180px;
+        overflow: hidden;
+    }
 }
 
 // Small Media Item
@@ -279,45 +280,45 @@
 // Styleguide 6.3.
 
 .media-sm {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
 
-  .media-left {
-    padding-right: $spacer / 2;
-    height: 30px;
-  }
-
-  .media-image-wrap {
-    display: inline-block;
-    @include image-wrap(30px, 30px, 1px);
-  }
-
-  .media-image-wrap-no-border {
-    display: inline-block;
-    @include image-wrap(30px, 30px, 1px, false, transparent);
-    margin-right: $spacer / 2;
-  }
-
-  .media-title {
-    margin-bottom: 30px - $font-size-tables - $font-size-sm;
-    font-size: $font-size-tables;
-    line-height: 1;
-
-    a {
-      color: $gray-dark;
-      transition: color 200ms;
-
-      &:hover {
-        text-decoration: none;
-        color: $brand-primary;
-      }
+    .media-left {
+        padding-right: $spacer * 0.5;
+        height: 30px;
     }
-  }
 
-  .info {
-    font-size: $font-size-sm;
-    line-height: 1;
-    color: $grey;
-  }
+    .media-image-wrap {
+        display: inline-block;
+        @include image-wrap(30px, 30px, 1px);
+    }
+
+    .media-image-wrap-no-border {
+        display: inline-block;
+        @include image-wrap(30px, 30px, 1px, false, transparent);
+        margin-right: $spacer * 0.5;
+    }
+
+    .media-title {
+        margin-bottom: 30px - $font-size-tables - $font-size-sm;
+        font-size: $font-size-tables;
+        line-height: 1;
+
+        a {
+            color: $gray-dark;
+            transition: color 200ms;
+
+            &:hover {
+                text-decoration: none;
+                color: $brand-primary;
+            }
+        }
+    }
+
+    .info {
+        font-size: $font-size-sm;
+        line-height: 1;
+        color: $grey;
+    }
 }

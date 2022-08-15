@@ -159,6 +159,15 @@ export const dashboardClasses = useThemeCache(() => {
         },
     });
 
+    const label = css({
+        display: "inline-flex",
+        alignItems: "center",
+    });
+
+    const labelIcon = css({
+        marginLeft: 8,
+    });
+
     return {
         formList,
         helpAsset,
@@ -174,5 +183,7 @@ export const dashboardClasses = useThemeCache(() => {
         disabled,
         colorInput,
         swatch,
+        label,
+        labelIcon,
     };
 });

@@ -5,45 +5,45 @@
  */
 
 @mixin flexMiddle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  align-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
 }
 
 @mixin flexHorizontalJustify($flexWrap: nowrap) {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  justify-content: space-between;
-  flex-wrap: $flexWrap;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: $flexWrap;
 }
 
 @mixin flexCenterContent($flexWrap: nowrap) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: $flexWrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: $flexWrap;
 }
 
 @mixin flexLeftTop {
-  display: flex;
-  align-items: flex-start;
-  flex-direction: row;
-  justify-content: flex-start;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: row;
+    justify-content: flex-start;
 }
 
 @mixin flexLeftMiddle {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  justify-content: flex-start;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
 }
 
 @mixin flexRightMiddle($flexWrap: nowrap) {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  justify-content: flex-end;
-  flex-wrap: $flexWrap;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-wrap: $flexWrap;
 }

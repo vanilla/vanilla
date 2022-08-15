@@ -10,7 +10,8 @@ namespace Vanilla\Formatting\Quill\Nesting;
 /**
  * Interface for representing items that can be nested.
  */
-interface NestableItemInterface {
+interface NestableItemInterface
+{
     /**
      * Get the current nesting depth of the item.
      *

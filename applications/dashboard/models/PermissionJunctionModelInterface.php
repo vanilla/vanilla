@@ -9,7 +9,8 @@ namespace Vanilla\Dashboard\Models;
 /**
  * Interface PermissionJunctionModelInterface
  */
-interface PermissionJunctionModelInterface {
+interface PermissionJunctionModelInterface
+{
     /**
      * Notify model about permissions getting updated. Useful for clearing caches.
      */

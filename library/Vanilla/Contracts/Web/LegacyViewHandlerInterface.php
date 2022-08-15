@@ -10,7 +10,8 @@ namespace Vanilla\Contracts\Web;
 /**
  * An interface for a view handler for Gdn_Controller.
  */
-interface LegacyViewHandlerInterface {
+interface LegacyViewHandlerInterface
+{
     /**
      * Render the given view.
      *

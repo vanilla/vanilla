@@ -13,9 +13,12 @@
  * @param object $smarty
  * @return string
  */
-function smarty_function_discussions_link($params, &$smarty) {
-    $wrap = val('wrap', $params, 'li');
-    return Gdn_Theme::link('discussions',
-        val('text', $params, t('Discussions')),
-        val('format', $params, wrap('<a href="%url" class="%class">%text</a>', $wrap)));
+function smarty_function_discussions_link($params, &$smarty)
+{
+    $wrap = val("wrap", $params, "li");
+    return Gdn_Theme::link(
+        "discussions",
+        val("text", $params, t("Discussions")),
+        val("format", $params, wrap('<a href="%url" class="%class">%text</a>', $wrap))
+    );
 }

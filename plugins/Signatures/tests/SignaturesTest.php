@@ -17,16 +17,17 @@ use VanillaTests\SiteTestCase;
 /**
  * Tests for signatures.
  */
-class SignaturesTest extends SiteTestCase {
-
+class SignaturesTest extends SiteTestCase
+{
     use CommunityApiTestTrait;
 
-    public static $addons = ['Signatures'];
+    public static $addons = ["Signatures"];
 
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         \Gdn::config()->saveToConfig("Signatures.Images.MaxNumber", 1, false);
@@ -35,16 +36,17 @@ class SignaturesTest extends SiteTestCase {
     /**
      * Test that signature can be set and are rendered on comments and discussions.
      */
-    public function testRenderSignature() {
-        $this->setCurrentUserSignature('Hello Signature');
+    public function testRenderSignature()
+    {
+        $this->setCurrentUserSignature("Hello Signature");
         $discussion = $this->createDiscussion();
-        $discussionUrl = $discussion['url'];
+        $discussionUrl = $discussion["url"];
         $this->createComment();
 
         $html = $this->bessy()->getHtml($discussionUrl, [], [TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL]);
         $html->assertCssSelectorTextContains(".Discussion .UserSignature", "Hello Signature");
         $html->assertCssSelectorTextContains(".Comment .UserSignature", "Hello Signature");
-        return $discussion['url'];
+        return $discussion["url"];
     }
 
     /**
@@ -54,7 +56,8 @@ class SignaturesTest extends SiteTestCase {
      *
      * @depends testRenderSignature
      */
-    public function testEmptySignatureNoRender(string $discussionUrl) {
+    public function testEmptySignatureNoRender(string $discussionUrl)
+    {
         $this->setCurrentUserSignature("\n");
 
         $html = $this->bessy()->getHtml($discussionUrl, [], [TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL]);
@@ -65,17 +68,18 @@ class SignaturesTest extends SiteTestCase {
     /**
      * Test that signature can be set and are rendered on comments and discussions without text, but with an Image.
      */
-    public function testRenderSignatureImageOnly() {
+    public function testRenderSignatureImageOnly()
+    {
         $this->setCurrentUserSignature('<img src="https://example.com/image.png" />', HtmlFormat::FORMAT_KEY);
         $discussion = $this->createDiscussion();
-        $discussionUrl = $discussion['url'];
+        $discussionUrl = $discussion["url"];
         $this->createComment();
 
         $html = $this->bessy()->getHtml($discussionUrl, [], [TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL]);
         $html->assertCssSelectorExists(".Discussion .UserSignature img");
         $html->assertCssSelectorExists(".Comment .UserSignature img");
 
-        return $discussion['url'];
+        return $discussion["url"];
     }
 
     /**
@@ -88,8 +92,8 @@ class SignaturesTest extends SiteTestCase {
      *
      * @dataProvider provideTestData
      */
-    public function testSaveSignature(string $signature, string $format, bool $expectedSuccess, string $expectValue) {
-
+    public function testSaveSignature(string $signature, string $format, bool $expectedSuccess, string $expectValue)
+    {
         if (!$expectedSuccess) {
             $this->expectException(\Exception::class);
             $this->expectExceptionMessage($expectValue);
@@ -103,11 +107,17 @@ class SignaturesTest extends SiteTestCase {
      *
      * @return array
      */
-    public function provideTestData(): array {
+    public function provideTestData(): array
+    {
         $r = [
-            'Invalid Rich Format' => ['Hello Signature', RichFormat::FORMAT_KEY, false, "Signature invalid."],
-            'Valid Text Format' => ['Hello Signature', TextFormat::FORMAT_KEY, true, "Your changes have been saved."],
-            'Valid Rich Format' => ['[{"insert":"test 123\n"}]', RichFormat::FORMAT_KEY, true, "Your changes have been saved."],
+            "Invalid Rich Format" => ["Hello Signature", RichFormat::FORMAT_KEY, false, "Signature invalid."],
+            "Valid Text Format" => ["Hello Signature", TextFormat::FORMAT_KEY, true, "Your changes have been saved."],
+            "Valid Rich Format" => [
+                '[{"insert":"test 123\n"}]',
+                RichFormat::FORMAT_KEY,
+                true,
+                "Your changes have been saved.",
+            ],
         ];
         return $r;
     }
@@ -118,10 +128,11 @@ class SignaturesTest extends SiteTestCase {
      * @param string $signature
      * @param string $format
      */
-    private function setCurrentUserSignature(string $signature, string $format = TextFormat::FORMAT_KEY) {
-        return $this->bessy()->postJsonData('/profile/signature', [
-            'Body' => $signature,
-            'Format' => $format,
+    private function setCurrentUserSignature(string $signature, string $format = TextFormat::FORMAT_KEY)
+    {
+        return $this->bessy()->postJsonData("/profile/signature", [
+            "Body" => $signature,
+            "Format" => $format,
         ]);
     }
 }

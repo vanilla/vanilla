@@ -15,8 +15,8 @@ use Vanilla\Scheduler\Job\LocalApiJob;
 /**
  * Job to send question followup notifications.
  */
-class QnaFollowupJob extends LocalApiJob implements LoggerAwareInterface {
-
+class QnaFollowupJob extends LocalApiJob implements LoggerAwareInterface
+{
     use LoggerAwareTrait;
 
     /**
@@ -24,14 +24,16 @@ class QnaFollowupJob extends LocalApiJob implements LoggerAwareInterface {
      *
      * @param array $message
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
         return;
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public function run(): JobExecutionStatus {
+    public function run(): JobExecutionStatus
+    {
         try {
             $this->logger->info("QnA notifications start");
             $response = $this->vanillaClient->post("/discussions/question-notifications");
@@ -39,9 +41,9 @@ class QnaFollowupJob extends LocalApiJob implements LoggerAwareInterface {
             return JobExecutionStatus::complete();
         } catch (\Exception $e) {
             $this->logger->info("QnA notifications failed", [
-                'message' => $e->getMessage(),
-                'code' => $e->getCode(),
-                'trace' => $e->getTraceAsString(),
+                "message" => $e->getMessage(),
+                "code" => $e->getCode(),
+                "trace" => $e->getTraceAsString(),
             ]);
             return JobExecutionStatus::failed();
         }

@@ -10,8 +10,8 @@ namespace Vanilla\Contracts\Formatting;
 /**
  * Interface to provide headings.
  */
-interface HeadingProviderInterface {
-
+interface HeadingProviderInterface
+{
     /**
      * Fetch a list of headings from something.
      *

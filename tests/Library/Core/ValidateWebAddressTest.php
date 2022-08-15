@@ -13,13 +13,14 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateWebAddress().
  */
 
-class ValidateWebAddressTest extends TestCase {
-
+class ValidateWebAddressTest extends TestCase
+{
     /**
      * Test with empty string.
      */
-    public function testWithEmptyString() {
-        $actual = validateWebAddress('');
+    public function testWithEmptyString()
+    {
+        $actual = validateWebAddress("");
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -27,8 +28,9 @@ class ValidateWebAddressTest extends TestCase {
     /**
      * Test with web address.
      */
-    public function testWithWebAddress() {
-        $actual = validateWebAddress('http://www.example.com');
+    public function testWithWebAddress()
+    {
+        $actual = validateWebAddress("http://www.example.com");
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -36,8 +38,9 @@ class ValidateWebAddressTest extends TestCase {
     /**
      * Test without web address.
      */
-    public function testWithoutWebAddress() {
-        $actual = validateWebAddress('this is not a web address at all');
+    public function testWithoutWebAddress()
+    {
+        $actual = validateWebAddress("this is not a web address at all");
         $expected = false;
         $this->assertSame($expected, $actual);
     }

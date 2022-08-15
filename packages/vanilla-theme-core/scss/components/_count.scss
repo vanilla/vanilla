@@ -8,17 +8,17 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$count_fontWeight:                  inherit !default;
-$count_fontSize:                    $global-small_fontSize !default;
-$count_borderRadius:                3px !default;
-$count_height:                      $formButton_height !default;
-$count_bg:                          transparent !default;
-$count_border:                      0 !default;
-$count_color:                       inherit !default;
+$count_fontWeight: inherit !default;
+$count_fontSize: $global-small_fontSize !default;
+$count_borderRadius: 3px !default;
+$count_height: $formButton_height !default;
+$count_bg: transparent !default;
+$count_border: 0 !default;
+$count_color: inherit !default;
 
-$count-hover_bg:                    transparent !default;
-$count-hover_borderColor:           transparent !default;
-$count-hover_color:                 inherit !default;
+$count-hover_bg: transparent !default;
+$count-hover_borderColor: transparent !default;
+$count-hover_color: inherit !default;
 
 @mixin Count {
     background-color: $count_bg;

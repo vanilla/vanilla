@@ -18,6 +18,7 @@
   src: url("../../../resources/fonts/vanillicon/vanillicon.eot?#iefix") format("embedded-opentype"), url("../../../resources/fonts/vanillicon/vanillicon.woff") format("woff"), url("../../../resources/fonts/vanillicon/vanillicon.ttf") format("truetype"), url("../../../resources/fonts/vanillicon/vanillicon.svg?#vanillicon") format("svg");
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 .icon-vanillicon-adjust:before {
   content: "\f100";
@@ -4486,12 +4487,6 @@ html {
 @-moz-viewport {
   width: device-width;
 }
-@-ms-viewport {
-  width: device-width;
-}
-@-o-viewport {
-  width: device-width;
-}
 @-webkit-viewport {
   width: device-width;
 }
@@ -4545,7 +4540,7 @@ dl {
 }
 
 ol ol,
-ul,
+ul ul,
 ol ul,
 ul ol {
   margin-bottom: 0;
@@ -4570,7 +4565,7 @@ a {
 }
 a:focus, a:hover {
   color: #015f8f;
-  text-decoration: none;
+  text-decoration: underline;
 }
 a:focus {
   outline: thin dotted;
@@ -4837,15 +4832,16 @@ output {
   line-height: 36px;
   height: 36px;
   font-weight: normal;
-  user-select: none;
+  -webkit-user-select: none;
+          user-select: none;
   overflow: hidden;
   cursor: pointer;
   background-color: transparent;
-  color: #555A62;
+  color: #555a62;
   border-width: 1px;
   border-radius: 6px;
   border-style: solid;
-  border-color: #BCBEC1;
+  border-color: #bcbec1;
   order: -1;
 }
 
@@ -5862,4 +5858,13 @@ label[id^=iCheck] {
   background-color: #f4f6fb;
 }
 
-/*# sourceMappingURL=admin-new.css.map */
+ul {
+  margin-bottom: 0;
+}
+
+a:focus,
+a:hover {
+  text-decoration: none;
+}
+
+/*# sourceMappingURL=admin-new.css.map*/

@@ -13,13 +13,14 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateZipCode().
  */
 
-class ValidateZipCodeTest extends TestCase {
-
+class ValidateZipCodeTest extends TestCase
+{
     /**
      * Test with empty string.
      */
-    public function testValidateZipCodeWithEmptyString() {
-        $actual = validateZipCode('');
+    public function testValidateZipCodeWithEmptyString()
+    {
+        $actual = validateZipCode("");
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -27,7 +28,8 @@ class ValidateZipCodeTest extends TestCase {
     /**
      * Test with 5-digit ints.
      */
-    public function testValidateZipCodeWithFiveDigitIntegers() {
+    public function testValidateZipCodeWithFiveDigitIntegers()
+    {
         $actual = validateZipCode(22207);
         $expected = true;
         $this->assertSame($expected, $actual);
@@ -36,8 +38,9 @@ class ValidateZipCodeTest extends TestCase {
     /**
      * Test with 9-digit string.
      */
-    public function testValidateZipCodeWithNineDigitString() {
-        $actual = validateZipCode('22207-1234');
+    public function testValidateZipCodeWithNineDigitString()
+    {
+        $actual = validateZipCode("22207-1234");
         $expected = true;
         $this->assertSame($expected, $actual);
     }

@@ -12,9 +12,10 @@ import React, { useLayoutEffect, useRef, useState } from "react";
 import intersection from "lodash/intersection";
 import { css } from "@emotion/css";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
 
 interface IProps {
-    discussionIDs?: number[];
+    discussionIDs?: Array<IDiscussion["discussionID"]>;
     className?: string;
 }
 

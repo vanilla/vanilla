@@ -10,11 +10,13 @@ namespace Vanilla\Dashboard\Models;
 /**
  * For internal use.
  */
-class ShortCircuitException extends \Exception {
+class ShortCircuitException extends \Exception
+{
     /**
      * ShortCircuitException constructor.
      */
-    public function __construct() {
-        parent::__construct('Short Circuit', 500);
+    public function __construct()
+    {
+        parent::__construct("Short Circuit", 500);
     }
 }

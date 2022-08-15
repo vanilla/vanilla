@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import Message from "@library/messages/Message";
@@ -16,11 +15,13 @@ import { negative, negativeUnit } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { ErrorIcon } from "@library/icons/common";
 
-const story = storiesOf("Alerts", module);
+export default {
+    title: "Alerts",
+};
 
 const message = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus.`;
 
-story.add("Message (Fixed Position)", () => {
+function MessageStory() {
     const classesMessages = messagesClasses();
     const [fixedMessageFlag, setFixedMessageFlag] = useState(true);
 
@@ -95,4 +96,8 @@ story.add("Message (Fixed Position)", () => {
             </StoryContent>
         </>
     );
-});
+}
+
+export function MessageFixedPosition() {
+    <MessageStory />;
+}

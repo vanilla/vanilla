@@ -16,8 +16,8 @@ use Vanilla\Scheduler\Job\JobPriority;
  *
  * I look like a Job, but not extending any Driver interface
  */
-class NonDroveJob implements JobInterface {
-
+class NonDroveJob implements JobInterface
+{
     /** @var LoggerInterface */
     protected $logger;
 
@@ -29,7 +29,8 @@ class NonDroveJob implements JobInterface {
      *
      * @param LoggerInterface $logger
      */
-    public function __construct(LoggerInterface $logger) {
+    public function __construct(LoggerInterface $logger)
+    {
         $this->logger = $logger;
     }
 
@@ -38,15 +39,17 @@ class NonDroveJob implements JobInterface {
      *
      * @param array $message
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
         $this->message = $message;
     }
 
     /**
      * Run the job.
      */
-    public function run() {
-        $this->logger->info(get_class($this)." :: ".var_export($this->message, true));
+    public function run()
+    {
+        $this->logger->info(get_class($this) . " :: " . var_export($this->message, true));
     }
 
     /**
@@ -54,7 +57,8 @@ class NonDroveJob implements JobInterface {
      *
      * @param JobPriority $priority
      */
-    public function setPriority(JobPriority $priority) {
+    public function setPriority(JobPriority $priority)
+    {
         // void method.
     }
 
@@ -63,7 +67,8 @@ class NonDroveJob implements JobInterface {
      *
      * @param integer $seconds
      */
-    public function setDelay(int $seconds) {
+    public function setDelay(int $seconds)
+    {
         // void method.
     }
 }

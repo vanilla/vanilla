@@ -7,21 +7,21 @@
 
 namespace VanillaTests\Fixtures;
 
-
-class FooBarController {
-    public function index($page = '') {
-
+class FooBarController
+{
+    public function index($page = "")
+    {
     }
 
-    public function search($search = '', $page = 'p1') {
-
+    public function search($search = "", $page = "p1")
+    {
     }
 
-    public function doIt($limit = 9) {
-
+    public function doIt($limit = 9)
+    {
     }
 
-    public function fooBarController_fooBar_create($sender, $a = '') {
-
+    public function fooBarController_fooBar_create($sender, $a = "")
+    {
     }
 }

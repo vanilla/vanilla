@@ -9,7 +9,7 @@ import { STORY_SITE_NAV_ACTIVE_RECORD, STORY_SITE_NAV_ITEMS } from "@library/nav
 import { StoryContent } from "@library/storybook/StoryContent";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { SettingsIcon } from "@library/icons/titleBar";
-import LazyModal from "@library/modal/LazyModal";
+import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
 import SiteNavProvider, { SiteNavContext } from "@library/navigation/SiteNavContext";
@@ -29,7 +29,7 @@ export default {
 function Story() {
     return (
         <SiteNavProvider categoryRecordType="knowledgeCategory">
-            <LazyModal scrollable isVisible={true} size={ModalSizes.MODAL_AS_SIDE_PANEL_LEFT}>
+            <Modal scrollable isVisible={true} size={ModalSizes.MODAL_AS_SIDE_PANEL_LEFT}>
                 <DropDownPanelNav
                     activeRecord={STORY_SITE_NAV_ACTIVE_RECORD}
                     isNestable={true}
@@ -56,7 +56,7 @@ function Story() {
                         </>
                     }
                 />
-            </LazyModal>
+            </Modal>
         </SiteNavProvider>
     );
 }

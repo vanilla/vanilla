@@ -8,15 +8,15 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$breadcrumbs_fg:                                 $global-color_fg !default;
-$breadcrumbs-link_fg:                            $global-color_primary !default;
-$breadcrumbs-link-hover_fg:                      $global-color_primary !default;
-$breadcrumbs-last_fg:                            $breadcrumbs-link_fg !default;
-$breadcrumbs_textTransform:                      uppercase !default;
-$breadcrumbs-hover_textDecoration:               underline !default;
-$breadcrumbs_fontSize:                           $global-small_fontSize !default;
-$breadcrumbs_fontWeight:                         $global-normal_fontWeight !default;
-$breadcrumbs_lineHeight:                         $global-condensed_lineHeight !default;
+$breadcrumbs_fg: $global-color_fg !default;
+$breadcrumbs-link_fg: $global-color_primary !default;
+$breadcrumbs-link-hover_fg: $global-color_primary !default;
+$breadcrumbs-last_fg: $breadcrumbs-link_fg !default;
+$breadcrumbs_textTransform: uppercase !default;
+$breadcrumbs-hover_textDecoration: underline !default;
+$breadcrumbs_fontSize: $global-small_fontSize !default;
+$breadcrumbs_fontWeight: $global-normal_fontWeight !default;
+$breadcrumbs_lineHeight: $global-condensed_lineHeight !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -54,7 +54,7 @@ $breadcrumbs_lineHeight:                         $global-condensed_lineHeight !d
 
     @if ($staticVariables) {
         .Crumb {
-            opacity: .5;
+            opacity: 0.5;
         }
     }
 

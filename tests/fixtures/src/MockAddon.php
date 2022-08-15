@@ -12,8 +12,8 @@ use Vanilla\Addon;
 /**
  * Mock addon class. Assumes key and subdirectory are the same.
  */
-class MockAddon extends Addon {
-
+class MockAddon extends Addon
+{
     /** @var string */
     private $key;
 
@@ -26,7 +26,8 @@ class MockAddon extends Addon {
      * @param string $key
      * @param array $info
      */
-    public function __construct(string $key, array $info = []) {
+    public function __construct(string $key, array $info = [])
+    {
         $this->key = $key;
         $this->info = $info;
     }
@@ -34,35 +35,40 @@ class MockAddon extends Addon {
     /**
      * @return string
      */
-    public function getSubdir(): string {
+    public function getSubdir(): string
+    {
         return $this->key;
     }
 
     /**
      * @return string
      */
-    public function getKey(): string {
+    public function getKey(): string
+    {
         return $this->key;
     }
 
     /**
      * @inheritdoc
      */
-    public function getInfo(): array {
+    public function getInfo(): array
+    {
         return $this->info;
     }
 
     /**
      * @inheritdoc
      */
-    public function getInfoValue(string $key, $default = null) {
+    public function getInfoValue(string $key, $default = null)
+    {
         return isset($this->info[$key]) ? $this->info[$key] : $default;
     }
 
     /**
      * @inheritdoc
      */
-    public function path($subpath = '', $relative = '') {
-        return '/mock-addon/'.$this->getKey().'/'.$subpath;
+    public function path($subpath = "", $relative = "")
+    {
+        return "/mock-addon/" . $this->getKey() . "/" . $subpath;
     }
 }

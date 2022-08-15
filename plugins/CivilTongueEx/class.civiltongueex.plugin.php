@@ -8,13 +8,13 @@
 
 // 1.0 - Fix empty pattern when list ends in semi-colon, use non-custom permission (2012-03-12 Lincoln)
 
-use \CivilTongueEx\Library\ContentFilter;
+use CivilTongueEx\Library\ContentFilter;
 
 /**
  * Class CivilTonguePlugin
  */
-class CivilTonguePlugin extends Gdn_Plugin {
-
+class CivilTonguePlugin extends Gdn_Plugin
+{
     /** @var mixed  */
     public $Replacement;
 
@@ -26,9 +26,10 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @param ContentFilter $contentFilter
      */
-    public function __construct(ContentFilter $contentFilter) {
+    public function __construct(ContentFilter $contentFilter)
+    {
         parent::__construct();
-        $this->setReplacement(c('Plugins.CivilTongue.Replacement', ''));
+        $this->setReplacement(c("Plugins.CivilTongue.Replacement", ""));
         $this->contentFilter = $contentFilter;
     }
 
@@ -38,11 +39,13 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function base_filterContent_handler($sender, $args) {
-        if (!isset($args['String']))
+    public function base_filterContent_handler($sender, $args)
+    {
+        if (!isset($args["String"])) {
             return;
+        }
 
-        $args['String'] = $this->replace($args['String']);
+        $args["String"] = $this->replace($args["String"]);
     }
 
     /**
@@ -51,28 +54,28 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param $sender
      * @param array $args
      */
-    public function pluginController_tongue_create($sender, $args = []) {
-        $sender->permission('Garden.Settings.Manage');
+    public function pluginController_tongue_create($sender, $args = [])
+    {
+        $sender->permission("Garden.Settings.Manage");
         $sender->Form = new Gdn_Form();
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
-        $configurationModel->setField(['Plugins.CivilTongue.Words', 'Plugins.CivilTongue.Replacement']);
+        $configurationModel->setField(["Plugins.CivilTongue.Words", "Plugins.CivilTongue.Replacement"]);
         $sender->Form->setModel($configurationModel);
 
-        if ($sender->Form->authenticatedPostBack() === FALSE) {
-
+        if ($sender->Form->authenticatedPostBack() === false) {
             $sender->Form->setData($configurationModel->Data);
         } else {
             $data = $sender->Form->formValues();
 
-            if ($sender->Form->save() !== FALSE)
+            if ($sender->Form->save() !== false) {
                 $sender->StatusMessage = t("Your settings have been saved.");
+            }
         }
 
-        $sender->addSideMenu('plugin/tongue');
-        $sender->setData('Title', t('Civil Tongue'));
-        $sender->render($this->getView('index.php'));
-
+        $sender->addSideMenu("plugin/tongue");
+        $sender->setData("Title", t("Civil Tongue"));
+        $sender->render($this->getView("index.php"));
     }
 
     /**
@@ -81,7 +84,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function profileController_render_before($sender, $args) {
+    public function profileController_render_before($sender, $args)
+    {
         $this->activityController_render_before($sender, $args);
         $this->discussionsController_render_before($sender, $args);
     }
@@ -92,73 +96,75 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function activityController_render_before($sender, $args) {
-        $user = val('User', $sender);
-        if ($user)
-            setValue('About', $user, $this->replace(val('About', $user)));
+    public function activityController_render_before($sender, $args)
+    {
+        $user = val("User", $sender);
+        if ($user) {
+            setValue("About", $user, $this->replace(val("About", $user)));
+        }
 
-        if (isset($sender->Data['Activities'])) {
-            $activities =& $sender->Data['Activities'];
+        if (isset($sender->Data["Activities"])) {
+            $activities = &$sender->Data["Activities"];
             foreach ($activities as &$row) {
-                setValue('Story', $row, $this->replace(val('Story', $row)));
+                setValue("Story", $row, $this->replace(val("Story", $row)));
 
-                if (isset($row['Comments'])) {
-                    foreach ($row['Comments'] as &$comment) {
-                        $comment['Body'] = $this->replace($comment['Body']);
+                if (isset($row["Comments"])) {
+                    foreach ($row["Comments"] as &$comment) {
+                        $comment["Body"] = $this->replace($comment["Body"]);
                     }
                 }
 
-                if (val('Headline', $row)) {
-                    $row['Headline'] = $this->replace($row['Headline']);
+                if (val("Headline", $row)) {
+                    $row["Headline"] = $this->replace($row["Headline"]);
                 }
             }
         }
 
         // Reactions store their data in the Data key.
-        if (isset($sender->Data['Data']) && is_array($sender->Data['Data'])) {
-            $data =& $sender->Data['Data'];
+        if (isset($sender->Data["Data"]) && is_array($sender->Data["Data"])) {
+            $data = &$sender->Data["Data"];
             foreach ($data as &$row) {
-                if (!is_array($row) || !isset($row['Body'])) {
+                if (!is_array($row) || !isset($row["Body"])) {
                     continue;
                 }
-                setValue('Body', $row, $this->replace(val('Body', $row)));
+                setValue("Body", $row, $this->replace(val("Body", $row)));
             }
         }
 
-        $commentData = val('CommentData', $sender);
+        $commentData = val("CommentData", $sender);
         if ($commentData) {
-            $result =& $commentData->result();
+            $result = &$commentData->result();
             foreach ($result as &$row) {
-                $value = $this->replace(val('Story', $row));
-                setValue('Story', $row, $value);
+                $value = $this->replace(val("Story", $row));
+                setValue("Story", $row, $value);
 
-                $value = $this->replace(val('DiscussionName', $row));
-                setValue('DiscussionName', $row, $value);
+                $value = $this->replace(val("DiscussionName", $row));
+                setValue("DiscussionName", $row, $value);
 
-                $value = $this->replace(val('Body', $row));
-                setValue('Body', $row, $value);
+                $value = $this->replace(val("Body", $row));
+                setValue("Body", $row, $value);
             }
         }
 
-        $comments = val('Comments', $sender->Data);
+        $comments = val("Comments", $sender->Data);
         if ($comments) {
             if (is_array($comments)) {
                 $result = $comments;
             } elseif ($comments instanceof Gdn_DataSet) {
-                $result =& $comments->result();
+                $result = &$comments->result();
             } else {
                 $result = null;
             }
             if ($result) {
                 foreach ($result as &$row) {
-                    $value = $this->replace(val('Story', $row));
-                    setValue('Story', $row, $value);
+                    $value = $this->replace(val("Story", $row));
+                    setValue("Story", $row, $value);
 
-                    $value = $this->replace(val('DiscussionName', $row));
-                    setValue('DiscussionName', $row, $value);
+                    $value = $this->replace(val("DiscussionName", $row));
+                    setValue("DiscussionName", $row, $value);
 
-                    $value = $this->replace(val('Body', $row));
-                    setValue('Body', $row, $value);
+                    $value = $this->replace(val("Body", $row));
+                    setValue("Body", $row, $value);
                 }
             }
         }
@@ -169,15 +175,16 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @param CategoriesController $sender
      */
-    public function categoriesController_render_before($sender) {
-        $categoryTree = $sender->data('CategoryTree');
+    public function categoriesController_render_before($sender)
+    {
+        $categoryTree = $sender->data("CategoryTree");
         if ($categoryTree) {
             $this->sanitizeCategories($categoryTree);
-            $sender->setData('CategoryTree', $categoryTree);
+            $sender->setData("CategoryTree", $categoryTree);
         }
 
         // When category layout is table.
-        $discussions = val('Discussions', $sender->Data, false);
+        $discussions = val("Discussions", $sender->Data, false);
         if ($discussions) {
             foreach ($discussions as &$discussion) {
                 $discussion->Name = $this->replace($discussion->Name);
@@ -191,13 +198,14 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @param array $categories
      */
-    protected function sanitizeCategories(array &$categories) {
+    protected function sanitizeCategories(array &$categories)
+    {
         foreach ($categories as &$row) {
-            if (isset($row['LastTitle'])) {
-                $row['LastTitle'] = $this->replace($row['LastTitle']);
+            if (isset($row["LastTitle"])) {
+                $row["LastTitle"] = $this->replace($row["LastTitle"]);
             }
-            if (!empty($row['Children'])) {
-                $this->sanitizeCategories($row['Children']);
+            if (!empty($row["Children"])) {
+                $this->sanitizeCategories($row["Children"]);
             }
         }
     }
@@ -207,15 +215,15 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function categoriesController_discussions_render($sender, $args) {
-
+    public function categoriesController_discussions_render($sender, $args)
+    {
         foreach ($sender->CategoryDiscussionData as $discussions) {
             if (!$discussions instanceof Gdn_DataSet) {
                 continue;
             }
             $r = $discussions->result();
             foreach ($r as &$row) {
-                setValue('Name', $row, $this->replace(val('Name', $row)));
+                setValue("Name", $row, $this->replace(val("Name", $row)));
             }
         }
     }
@@ -225,8 +233,9 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @param DiscussionsController $sender
      */
-    public function discussionsController_render_before($sender) {
-        $discussions = $sender->data('Discussions', []);
+    public function discussionsController_render_before($sender)
+    {
+        $discussions = $sender->data("Discussions", []);
         if (is_array($discussions) || $discussions instanceof \Traversable) {
             foreach ($discussions as &$discussion) {
                 $discussion->Name = $this->replace($discussion->Name);
@@ -241,9 +250,10 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param DiscussionController $sender Sending Controller.
      * @param array $args Sending arguments.
      */
-    public function discussionController_render_before($sender, $args) {
+    public function discussionController_render_before($sender, $args)
+    {
         // Process OP
-        $discussion = val('Discussion', $sender);
+        $discussion = val("Discussion", $sender);
         if ($discussion) {
             $discussion->Name = $this->replace($discussion->Name);
             if (isset($discussion->Body)) {
@@ -251,7 +261,7 @@ class CivilTonguePlugin extends Gdn_Plugin {
             }
         }
         // Get comments (2.1+)
-        $comments = $sender->data('Comments');
+        $comments = $sender->data("Comments");
 
         // Backwards compatibility to 2.0.18
         if (isset($sender->CommentData)) {
@@ -264,8 +274,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
                 $comment->Body = $this->replace($comment->Body);
             }
         }
-        if (val('Title', $sender->Data)) {
-            $sender->Data['Title'] = $this->replace($sender->Data['Title']);
+        if (val("Title", $sender->Data)) {
+            $sender->Data["Title"] = $this->replace($sender->Data["Title"]);
         }
     }
 
@@ -274,12 +284,13 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @param SearchController $sender
      */
-    public function searchController_render_before($sender) {
-        if (isset($sender->Data['SearchResults'])) {
-            $results =& $sender->Data['SearchResults'];
+    public function searchController_render_before($sender)
+    {
+        if (isset($sender->Data["SearchResults"])) {
+            $results = &$sender->Data["SearchResults"];
             foreach ($results as &$row) {
-                $row['Title'] = $this->replace($row['Title']);
-                $row['Summary'] = $this->replace($row['Summary']);
+                $row["Title"] = $this->replace($row["Title"]);
+                $row["Summary"] = $this->replace($row["Summary"]);
             }
         }
     }
@@ -289,11 +300,12 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @param RootController $sender
      */
-    public function rootController_bestOf_render($sender) {
-        if (isset($sender->Data['Data'])) {
-            foreach ($sender->Data['Data'] as &$row) {
-                $row['Name'] = $this->replace($row['Name']);
-                $row['Body'] = $this->replace($row['Body']);
+    public function rootController_bestOf_render($sender)
+    {
+        if (isset($sender->Data["Data"])) {
+            foreach ($sender->Data["Data"] as &$row) {
+                $row["Name"] = $this->replace($row["Name"]);
+                $row["Body"] = $this->replace($row["Body"]);
             }
         }
     }
@@ -304,7 +316,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param string $text
      * @return ?string
      */
-    public function replace($text = ''): ?string {
+    public function replace($text = ""): ?string
+    {
         return $this->contentFilter->replace($text);
     }
 
@@ -313,16 +326,18 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @return array
      */
-    public function getpatterns(): array {
+    public function getpatterns(): array
+    {
         return $this->contentFilter->getPatterns();
     }
 
     /**
      *
      */
-    public function setup() {
+    public function setup()
+    {
         // Set default configuration
-        saveToConfig('Plugins.CivilTongue.Replacement', '****');
+        saveToConfig("Plugins.CivilTongue.Replacement", "****");
     }
 
     /**
@@ -330,7 +345,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @param Gdn_Email $sender
      */
-    public function gdn_email_beforeSendMail_handler($sender) {
+    public function gdn_email_beforeSendMail_handler($sender)
+    {
         $sender->PhpMailer->Subject = $this->replace($sender->PhpMailer->Subject);
         $sender->PhpMailer->Body = $this->replace($sender->PhpMailer->Body);
         $sender->PhpMailer->AltBody = $this->replace($sender->PhpMailer->AltBody);
@@ -342,12 +358,13 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function notificationsController_informNotifications_handler($sender, $args) {
-        $activities = val('Activities', $args);
+    public function notificationsController_informNotifications_handler($sender, $args)
+    {
+        $activities = val("Activities", $args);
         foreach ($activities as $key => $activity) {
-            if (val('Headline', $activity)) {
-                $activity['Headline'] = $this->replace($activity['Headline']);
-                $args['Activities'][$key]['Headline'] = $this->replace($args['Activities'][$key]['Headline']);
+            if (val("Headline", $activity)) {
+                $activity["Headline"] = $this->replace($activity["Headline"]);
+                $args["Activities"][$key]["Headline"] = $this->replace($args["Activities"][$key]["Headline"]);
             }
         }
     }
@@ -358,10 +375,11 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param ActivityModel $sender
      * @param array $args
      */
-    public function activityModel_beforeSave_handler($sender, $args) {
-        $activity = val('Activity', $args);
-        setValue('Story', $activity, $this->replace(val('Story', $activity)));
-        $sender->EventArguments['Activity'] = $activity;
+    public function activityModel_beforeSave_handler($sender, $args)
+    {
+        $activity = val("Activity", $args);
+        setValue("Story", $activity, $this->replace(val("Story", $activity)));
+        $sender->EventArguments["Activity"] = $activity;
     }
 
     /**
@@ -370,8 +388,9 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function messagesController_beforeMessages_handler($sender, $args) {
-        foreach ($args['MessageData'] as &$message) {
+    public function messagesController_beforeMessages_handler($sender, $args)
+    {
+        foreach ($args["MessageData"] as &$message) {
             $body = val("Body", $message);
             if ($body) {
                 $message->Body = $this->replace($body);
@@ -385,12 +404,13 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function messagesController_beforeMessagesAll_handler($sender, $args) {
-        $conversations = val('Conversations', $args);
+    public function messagesController_beforeMessagesAll_handler($sender, $args)
+    {
+        $conversations = val("Conversations", $args);
         foreach ($conversations as $key => &$conversation) {
-            if (val('LastBody', $conversation)) {
-                $conversation['LastBody'] = $this->replace($conversation['LastBody']);
-                $args['Conversations'][$key]['LastBody'] = $this->replace($args['Conversations'][$key]['LastBody']);
+            if (val("LastBody", $conversation)) {
+                $conversation["LastBody"] = $this->replace($conversation["LastBody"]);
+                $args["Conversations"][$key]["LastBody"] = $this->replace($args["Conversations"][$key]["LastBody"]);
             }
         }
     }
@@ -401,12 +421,13 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function messagesController_beforeMessagesPopin_handler($sender, $args) {
-        $conversations = val('Conversations', $args);
+    public function messagesController_beforeMessagesPopin_handler($sender, $args)
+    {
+        $conversations = val("Conversations", $args);
         foreach ($conversations as $key => &$conversation) {
-            if (val('LastBody', $conversation)) {
-                $conversation['LastBody'] = $this->replace($conversation['LastBody']);
-                $args['Conversations'][$key]['LastBody'] = $this->replace($args['Conversations'][$key]['LastBody']);
+            if (val("LastBody", $conversation)) {
+                $conversation["LastBody"] = $this->replace($conversation["LastBody"]);
+                $args["Conversations"][$key]["LastBody"] = $this->replace($args["Conversations"][$key]["LastBody"]);
             }
         }
     }
@@ -417,12 +438,13 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param ConversationModel $sender The sending object.
      * @param array $args
      */
-    public function conversationModel_afterAdd_handler($sender, $args) {
-        if (val('Body', $args)) {
-            $args['Body'] = $this->replace($args['Body']);
+    public function conversationModel_afterAdd_handler($sender, $args)
+    {
+        if (val("Body", $args)) {
+            $args["Body"] = $this->replace($args["Body"]);
         }
-        if (val('Subject', $args)) {
-            $args['Subject'] = $this->replace($args['Subject']);
+        if (val("Subject", $args)) {
+            $args["Subject"] = $this->replace($args["Subject"]);
         }
     }
 
@@ -432,12 +454,13 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param ConversationMessageModel $sender The sending object.
      * @param array $args
      */
-    public function conversationMessageModel_afterAdd_handler($sender, $args) {
-        if (val('Body', $args)) {
-            $args['Body'] = $this->replace($args['Body']);
+    public function conversationMessageModel_afterAdd_handler($sender, $args)
+    {
+        if (val("Body", $args)) {
+            $args["Body"] = $this->replace($args["Body"]);
         }
-        if (val('Subject', $args)) {
-            $args['Subject'] = $this->replace($args['Subject']);
+        if (val("Subject", $args)) {
+            $args["Subject"] = $this->replace($args["Subject"]);
         }
     }
 
@@ -448,15 +471,16 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param array $args Sending arguments.
      * @psalm-suppress UndefinedDocblockClass
      */
-    public function pollModule_afterLoadPoll_handler($sender, $args) {
-        if ($options = val('PollOptions', $args)) {
+    public function pollModule_afterLoadPoll_handler($sender, $args)
+    {
+        if ($options = val("PollOptions", $args)) {
             foreach ($options as &$option) {
-                $option['Body'] = $this->replace($option['Body']);
+                $option["Body"] = $this->replace($option["Body"]);
             }
-            $args['PollOptions'] =  $options;
+            $args["PollOptions"] = $options;
         }
-        if ($name = val('Name', val('Poll', $args))) {
-            $args['Poll']->Name = $this->replace($name);
+        if ($name = val("Name", val("Poll", $args))) {
+            $args["Poll"]->Name = $this->replace($name);
         }
     }
 
@@ -468,15 +492,16 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param SettingsController $sender Sending controller instance
      * @param array $args Event's arguments
      */
-    public function groupsController_beforeGroupLists_handler($sender, $args) {
-        $sections = ['MyGroups', 'NewGroups', 'Groups'];
+    public function groupsController_beforeGroupLists_handler($sender, $args)
+    {
+        $sections = ["MyGroups", "NewGroups", "Groups"];
 
         foreach ($sections as $section) {
             $groups = $sender->data($section);
             if ($groups) {
                 foreach ($groups as &$group) {
-                    $group['Name'] = $this->replace($group['Name']);
-                    $group['Description'] = $this->replace($group['Description']);
+                    $group["Name"] = $this->replace($group["Name"]);
+                    $group["Description"] = $this->replace($group["Description"]);
                 }
                 $sender->setData($section, $groups);
             }
@@ -491,14 +516,15 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param SettingsController $sender Sending controller instance
      * @param array $args Event's arguments
      */
-    public function groupsController_beforeBrowseGroupList_handler($sender, $args) {
-        $groups = $sender->data('Groups');
+    public function groupsController_beforeBrowseGroupList_handler($sender, $args)
+    {
+        $groups = $sender->data("Groups");
         if ($groups) {
             foreach ($groups as &$group) {
-                $group['Name'] = $this->replace($group['Name']);
-                $group['Description'] = $this->replace($group['Description']);
+                $group["Name"] = $this->replace($group["Name"]);
+                $group["Description"] = $this->replace($group["Description"]);
             }
-            $sender->setData('Groups', $groups);
+            $sender->setData("Groups", $groups);
         }
     }
 
@@ -510,9 +536,10 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param SettingsController $sender Sending controller instance
      * @param array $args Event's arguments
      */
-    public function base_groupLoaded_handler($sender, $args) {
-        $args['Group']['Name'] = $this->replace($args['Group']['Name']);
-        $args['Group']['Description'] = $this->replace($args['Group']['Description']);
+    public function base_groupLoaded_handler($sender, $args)
+    {
+        $args["Group"]["Name"] = $this->replace($args["Group"]["Name"]);
+        $args["Group"]["Description"] = $this->replace($args["Group"]["Description"]);
     }
 
     /**
@@ -523,12 +550,13 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param SettingsController $sender Sending controller instance
      * @param array $args Event's arguments
      */
-    public function groupController_groupEventsLoaded_handler($sender, $args) {
-        $events = &$args['Events'];
+    public function groupController_groupEventsLoaded_handler($sender, $args)
+    {
+        $events = &$args["Events"];
         foreach ($events as &$event) {
-            $event['Name'] = $this->replace($event['Name']);
-            $event['Body'] = $this->replace($event['Body']);
-            $event['Location'] = $this->replace($event['Location']);
+            $event["Name"] = $this->replace($event["Name"]);
+            $event["Body"] = $this->replace($event["Body"]);
+            $event["Location"] = $this->replace($event["Location"]);
         }
     }
 
@@ -540,15 +568,16 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param SettingsController $sender Sending controller instance
      * @param array $args Event's arguments
      */
-    public function eventsController_eventsLoaded_handler($sender, $args) {
-        $sections = ['UpcomingEvents', 'RecentEvents'];
+    public function eventsController_eventsLoaded_handler($sender, $args)
+    {
+        $sections = ["UpcomingEvents", "RecentEvents"];
 
         foreach ($sections as $section) {
             $events = &$args[$section];
             foreach ($events as &$event) {
-                $event['Name'] = $this->replace($event['Name']);
-                $event['Body'] = $this->replace($event['Body']);
-                $event['Location'] = $this->replace($event['Location']);
+                $event["Name"] = $this->replace($event["Name"]);
+                $event["Body"] = $this->replace($event["Body"]);
+                $event["Location"] = $this->replace($event["Location"]);
             }
             unset($events, $event);
         }
@@ -562,14 +591,15 @@ class CivilTonguePlugin extends Gdn_Plugin {
      * @param SettingsController $sender Sending controller instance
      * @param array $args Event's arguments
      */
-    public function eventController_eventLoaded_handler($sender, $args) {
-        $args['Event']['Name'] = $this->replace($args['Event']['Name']);
-        $args['Event']['Body'] = $this->replace($args['Event']['Body']);
-        $args['Event']['Location'] = $this->replace($args['Event']['Location']);
+    public function eventController_eventLoaded_handler($sender, $args)
+    {
+        $args["Event"]["Name"] = $this->replace($args["Event"]["Name"]);
+        $args["Event"]["Body"] = $this->replace($args["Event"]["Body"]);
+        $args["Event"]["Location"] = $this->replace($args["Event"]["Location"]);
 
-        if (isset($args['Group'])) {
-            $args['Group']['Name'] = $this->replace($args['Group']['Name']);
-            $args['Group']['Description'] = $this->replace($args['Group']['Description']);
+        if (isset($args["Group"])) {
+            $args["Group"]["Name"] = $this->replace($args["Group"]["Name"]);
+            $args["Group"]["Description"] = $this->replace($args["Group"]["Description"]);
         }
     }
 
@@ -578,12 +608,13 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @param HeadModule $sender The head module.
      */
-    public function headModule_beforeToString_handler($sender) {
+    public function headModule_beforeToString_handler($sender)
+    {
         $tags = $sender->getTags();
         $newTags = [];
         foreach ($tags as $tag) {
-            if ($tag['_tag'] === 'meta') {
-                setValue('content', $tag, $this->replace($tag['content']));
+            if ($tag["_tag"] === "meta") {
+                setValue("content", $tag, $this->replace($tag["content"]));
             }
             $newTags[] = $tag;
         }
@@ -595,7 +626,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @return string
      */
-    public function getReplacement(): string {
+    public function getReplacement(): string
+    {
         return $this->Replacement;
     }
 
@@ -604,7 +636,8 @@ class CivilTonguePlugin extends Gdn_Plugin {
      *
      * @param mixed $replacement
      */
-    public function setReplacement($replacement): void {
+    public function setReplacement($replacement): void
+    {
         $this->Replacement = $replacement;
     }
 }

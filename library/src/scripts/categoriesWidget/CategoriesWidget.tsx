@@ -60,3 +60,5 @@ export function CategoriesWidget(props: IProps) {
         );
     }
 }
+
+export default CategoriesWidget;

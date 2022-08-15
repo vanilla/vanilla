@@ -17,14 +17,15 @@ use Vanilla\Logging\LoggerUtils;
 /**
  * Represent a comment resource event.
  */
-class CommentEvent extends ResourceEvent implements LoggableEventInterface, TrackingEventInterface {
-
+class CommentEvent extends ResourceEvent implements LoggableEventInterface, TrackingEventInterface
+{
     /**
      * @inheritDoc
      */
-    public function getLogEntry(): LogEntry {
+    public function getLogEntry(): LogEntry
+    {
         $context = LoggerUtils::resourceEventLogContext($this);
-        $context['comment'] = array_intersect_key($this->payload["comment"] ?? [], [
+        $context["comment"] = array_intersect_key($this->payload["comment"] ?? [], [
             "commentID" => true,
             "discussionID" => true,
             "categoryID" => true,
@@ -37,11 +38,7 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
             "name" => true,
         ]);
 
-        $log = new LogEntry(
-            LogLevel::INFO,
-            LoggerUtils::resourceEventLogMessage($this),
-            $context
-        );
+        $log = new LogEntry(LogLevel::INFO, LoggerUtils::resourceEventLogMessage($this), $context);
 
         return $log;
     }
@@ -51,7 +48,8 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
      *
      * @return string|null
      */
-    public function getTrackableCollection(): ?string {
+    public function getTrackableCollection(): ?string
+    {
         switch ($this->getAction()) {
             case ResourceEvent::ACTION_INSERT:
                 return "post";
@@ -70,11 +68,16 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
      *
      * @return array
      */
-    public function getTrackablePayload(TrackableCommunityModel $trackableCommunity): array {
+    public function getTrackablePayload(TrackableCommunityModel $trackableCommunity): array
+    {
         $trackingData = $trackableCommunity->getTrackableComment(
             $this->getPayload()["comment"],
             $this->getTrackableAction()
         );
+        // Don't track the comment body.
+        $trackingData["comment"] = [
+            "body" => null,
+        ];
         return $trackingData;
     }
 
@@ -83,14 +86,15 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
      *
      * @return string
      */
-    public function getTrackableAction(): string {
+    public function getTrackableAction(): string
+    {
         switch ($this->getAction()) {
             case ResourceEvent::ACTION_INSERT:
-                return 'comment_add';
+                return "comment_add";
             case ResourceEvent::ACTION_UPDATE:
-                return 'comment_edit';
+                return "comment_edit";
             case ResourceEvent::ACTION_DELETE:
-                return 'comment_delete';
+                return "comment_delete";
             default:
                 return $this->getAction();
         }
@@ -99,14 +103,16 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
     /**
      * @return int
      */
-    public function getDiscussionID(): int {
-        return $this->payload['comment']['discussionID'];
+    public function getDiscussionID(): int
+    {
+        return $this->payload["comment"]["discussionID"];
     }
 
     /**
      * @return int
      */
-    public function getInsertUserID(): int {
-        return $this->payload['comment']['insertUserID'];
+    public function getInsertUserID(): int
+    {
+        return $this->payload["comment"]["insertUserID"];
     }
 }

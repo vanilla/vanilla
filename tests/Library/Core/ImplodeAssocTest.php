@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for implodeAssoc().
  */
 
-class ImplodeAssocTest extends TestCase {
-
+class ImplodeAssocTest extends TestCase
+{
     /**
      * Test {@link implodeAssoc()} against several scenarios.
      *
@@ -24,7 +24,8 @@ class ImplodeAssocTest extends TestCase {
      * @param string $expected The expected result.
      * @dataProvider provideImplodeAssocTestArrays
      */
-    public function testImplodeAssoc($testKeyGlue, $testElementGlue, $testArray, $expected) {
+    public function testImplodeAssoc($testKeyGlue, $testElementGlue, $testArray, $expected)
+    {
         $actual = implodeAssoc($testKeyGlue, $testElementGlue, $testArray);
         $this->assertSame($expected, $actual);
     }
@@ -34,32 +35,13 @@ class ImplodeAssocTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideImplodeAssocTestArrays() {
+    public function provideImplodeAssocTestArrays()
+    {
         $r = [
-            'emptyArray' => [
-                '>',
-                '+',
-                [],
-                '',
-            ],
-            'oneToOneArray' => [
-                '>',
-                '+',
-                ['one' => 'thingOne', 'two' => 'thingTwo'],
-                'one>thingOne+two>thingTwo',
-            ],
-            'nonAssocArray' => [
-                '>',
-                '+',
-                ['one', 'two', 'three'],
-                '0>one+1>two+2>three',
-            ],
-            'numValsArray' => [
-                '>',
-                '+',
-                [0, 1, 2],
-                '0>0+1>1+2>2',
-            ],
+            "emptyArray" => [">", "+", [], ""],
+            "oneToOneArray" => [">", "+", ["one" => "thingOne", "two" => "thingTwo"], "one>thingOne+two>thingTwo"],
+            "nonAssocArray" => [">", "+", ["one", "two", "three"], "0>one+1>two+2>three"],
+            "numValsArray" => [">", "+", [0, 1, 2], "0>0+1>1+2>2"],
         ];
 
         return $r;

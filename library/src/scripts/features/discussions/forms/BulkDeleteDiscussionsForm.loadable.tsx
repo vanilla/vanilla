@@ -41,9 +41,8 @@ export default function BulkDeleteDiscussionsForm(props: IBulkActionForm) {
 
     // Caching IDs because checkedDiscussionIDs will change during deletion process
     const [cachedActionIDs, setCachedIDs] = useState<RecordID[]>([]);
-    const { isDeletePending, deletionFailedIDs, deletionSuccessIDs, deleteSelectedIDs } = useBulkDelete(
-        cachedActionIDs,
-    );
+    const { isDeletePending, deletionFailedIDs, deletionSuccessIDs, deleteSelectedIDs } =
+        useBulkDelete(cachedActionIDs);
     const failedDiscussions = useDiscussionByIDs(deletionFailedIDs ?? []);
 
     const errorMessage = useMemo(() => {
@@ -54,9 +53,10 @@ export default function BulkDeleteDiscussionsForm(props: IBulkActionForm) {
             : null;
     }, [failedDiscussions]);
 
-    const isSuccess = useMemo(() => (deletionSuccessIDs && deletionSuccessIDs.length > 0) ?? false, [
-        deletionSuccessIDs,
-    ]);
+    const isSuccess = useMemo(
+        () => (deletionSuccessIDs && deletionSuccessIDs.length > 0) ?? false,
+        [deletionSuccessIDs],
+    );
 
     useEffect(() => {
         setCachedIDs(checkedDiscussionIDs);

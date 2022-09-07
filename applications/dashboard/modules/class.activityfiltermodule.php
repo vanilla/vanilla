@@ -11,15 +11,16 @@
 /**
  * Renders the activity filter menu.
  */
-class ActivityFilterModule extends Gdn_Module {
-
+class ActivityFilterModule extends Gdn_Module
+{
     /**
      *
      *
      * @return string
      */
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
     /**
@@ -27,7 +28,8 @@ class ActivityFilterModule extends Gdn_Module {
      *
      * @return string
      */
-    public function toString() {
+    public function toString()
+    {
         return parent::toString();
     }
 }

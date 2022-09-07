@@ -12,20 +12,22 @@ use PHPUnit\Framework\TestCase;
 /**
  * Dirty cache for tests.
  */
-class TestCache extends \Gdn_Dirtycache {
-
+class TestCache extends \Gdn_Dirtycache
+{
     /**
      * Assert that our cache is empty.
      */
-    public function assertEmpty(): void {
-        TestCase::assertEmpty($this->cache, 'Expected cache to be empty.');
+    public function assertEmpty(): void
+    {
+        TestCase::assertEmpty($this->cache, "Expected cache to be empty.");
     }
 
     /**
      * Assert that our cache is not empty.
      */
-    public function assertNotEmpty(): void {
-        TestCase::assertNotEmpty($this->cache, 'Expected cache not to be empty.');
+    public function assertNotEmpty(): void
+    {
+        TestCase::assertNotEmpty($this->cache, "Expected cache not to be empty.");
     }
 
     /**
@@ -34,7 +36,8 @@ class TestCache extends \Gdn_Dirtycache {
      * @param string $keyPattern
      * @param int $expected
      */
-    public function assertGetCount(string $keyPattern, int $expected) {
+    public function assertGetCount(string $keyPattern, int $expected)
+    {
         TestCase::assertEquals($expected, $this->getCount($keyPattern, $this->countGets));
     }
 
@@ -44,7 +47,8 @@ class TestCache extends \Gdn_Dirtycache {
      * @param string $keyPattern
      * @param int $expected
      */
-    public function assertSetCount(string $keyPattern, int $expected) {
+    public function assertSetCount(string $keyPattern, int $expected)
+    {
         TestCase::assertEquals($expected, $this->getCount($keyPattern, $this->countSets));
     }
 
@@ -55,7 +59,8 @@ class TestCache extends \Gdn_Dirtycache {
      *
      * @return int
      */
-    public function getGetCount(string $keyPattern): int {
+    public function getGetCount(string $keyPattern): int
+    {
         return $this->getCount($keyPattern, $this->countGets);
     }
 
@@ -66,7 +71,8 @@ class TestCache extends \Gdn_Dirtycache {
      *
      * @return int
      */
-    public function getSetCount(string $keyPattern): int {
+    public function getSetCount(string $keyPattern): int
+    {
         return $this->getCount($keyPattern, $this->countSets);
     }
 
@@ -78,7 +84,8 @@ class TestCache extends \Gdn_Dirtycache {
      *
      * @return int
      */
-    private function getCount(string $keyPattern, array $from): int {
+    private function getCount(string $keyPattern, array $from): int
+    {
         $actual = 0;
         foreach ($from as $actualKey => $item) {
             if (!fnmatch($keyPattern, $actualKey)) {

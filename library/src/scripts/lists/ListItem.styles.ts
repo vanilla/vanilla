@@ -5,9 +5,9 @@
  */
 
 import { css } from "@emotion/css";
+import { homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { listItemVariables } from "@library/lists/ListItem.variables";
 import { metasVariables } from "@library/metas/Metas.variables";
-import { tabBrowseClasses } from "@library/sectioning/tabStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
@@ -15,9 +15,10 @@ import { extendItemContainer } from "@library/styles/styleHelpers";
 import { getPixelNumber } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 
-export const listItemClasses = useThemeCache(() => {
+export const listItemClasses = useThemeCache((asTile?: boolean) => {
     const globalVars = globalVariables();
     const vars = listItemVariables();
+    const homeWidgetItemVars = homeWidgetItemVariables();
 
     const listInTab = css({
         ".tabContent &": {
@@ -28,10 +29,21 @@ export const listItemClasses = useThemeCache(() => {
     const item = css({
         display: "flex",
         alignItems: "flex-start",
+        ...(asTile && {
+            flexDirection: "column",
+            minHeight: 240,
+            ...Mixins.box(homeWidgetItemVars.options.box, { onlyPaddings: true }),
+        }),
     });
+
     const contentContainer = css({
         width: "100%",
         color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        ...(asTile && {
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+        }),
     });
 
     const mediaWrapSpacing = Mixins.margin({
@@ -42,13 +54,22 @@ export const listItemClasses = useThemeCache(() => {
         flexWrap: "wrap",
         flexDirection: "row-reverse",
         ...extendItemContainer(8),
+        ...(asTile && {
+            flexGrow: 1,
+        }),
     });
+
     const metaDescriptionContainer = css({
         ...mediaWrapSpacing,
         flexGrow: 1,
         flexBasis: "300px",
         marginTop: 4,
+        ...(asTile && {
+            display: "flex",
+            flexDirection: "column",
+        }),
     });
+
     const mobileMediaContainer = css({
         marginTop: 8,
         marginBottom: 8,
@@ -63,6 +84,14 @@ export const listItemClasses = useThemeCache(() => {
         alignSelf: "flex-end",
     });
 
+    const iconAndActionsContainer = css({
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "100%",
+        paddingBottom: 8,
+    });
+
     const iconContainer = css({
         display: "flex",
         justifyContent: "center",
@@ -73,13 +102,18 @@ export const listItemClasses = useThemeCache(() => {
     const checkboxContainer = css({
         marginRight: "8px",
     });
+
     const checkboxLabelAdjustment = css({
         "& > label": {
             paddingTop: "2px",
         },
     });
 
-    const metasContainer = css({});
+    const metasContainer = css({
+        ...(asTile && {
+            marginTop: "auto",
+        }),
+    });
 
     // Some delicate math required to vertically align the user icon and the first row of metas.
     const metasVars = metasVariables();
@@ -114,7 +148,9 @@ export const listItemClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "flex-start",
     });
+
     const titleLink = css(mixinListItemTitleLink());
+
     const description = css({
         ...Mixins.font(vars.description.font),
         [`.${metasContainer} + &`]: {
@@ -122,8 +158,16 @@ export const listItemClasses = useThemeCache(() => {
         },
         [`& + .${metasContainer}`]: {
             marginTop: 8,
+            ...(asTile && {
+                marginTop: "auto",
+            }),
         },
+        ...(asTile && {
+            marginBottom: 8,
+            lineHeight: "21px",
+        }),
     });
+
     const actionsContainer = css({
         display: "flex",
         alignItems: "center",
@@ -138,6 +182,7 @@ export const listItemClasses = useThemeCache(() => {
         item,
         contentContainer,
         iconContainer,
+        iconAndActionsContainer,
         checkboxContainer,
         checkboxLabelAdjustment,
         inlineIconAndMetasContainer,

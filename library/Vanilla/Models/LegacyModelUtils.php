@@ -12,8 +12,8 @@ use Gdn_Model;
 /**
  * Utility functions that operate on models.
  */
-final class LegacyModelUtils {
-
+final class LegacyModelUtils
+{
     public const COUNT_LIMIT_DEFAULT = 100;
 
     /**
@@ -24,18 +24,21 @@ final class LegacyModelUtils {
      * @param string $parameter
      * @return array
      */
-    public static function getCrawlInfoFromPrimaryKey(\Gdn_Model $model, string $url, string $parameter): array {
+    public static function getCrawlInfoFromPrimaryKey(\Gdn_Model $model, string $url, string $parameter): array
+    {
         $count = $model->getTotalRowCount();
         $range = $model->SQL
-            ->select($model->PrimaryKey, 'min', 'min')
-            ->select($model->PrimaryKey, 'max', 'max')
-            ->get($model->Name)->firstRow(DATASET_TYPE_ARRAY) ?: ['min' => null, 'max' => null];
+            ->select($model->PrimaryKey, "min", "min")
+            ->select($model->PrimaryKey, "max", "max")
+            ->get($model->Name)
+            ->firstRow(DATASET_TYPE_ARRAY) ?: ["min" => null, "max" => null];
 
-        $r = [
-                'url' => $url,
-                'uniqueIDField' => $parameter,
-                'parameter' => $parameter,
-                'count' => $count,
+        $r =
+            [
+                "url" => $url,
+                "uniqueIDField" => $parameter,
+                "parameter" => $parameter,
+                "count" => $count,
             ] + $range;
         return $r;
     }
@@ -46,13 +49,14 @@ final class LegacyModelUtils {
      * @param string $field
      * @return array Returns an array in the form `[$field, $direction]`.
      */
-    public static function orderFieldDirection(string $field): array {
+    public static function orderFieldDirection(string $field): array
+    {
         if (empty($field)) {
-            return ['', ''];
-        } elseif ($field[0] === '-') {
-            return [substr($field, 1), 'desc'];
+            return ["", ""];
+        } elseif ($field[0] === "-") {
+            return [substr($field, 1), "desc"];
         } else {
-            return [$field, 'asc'];
+            return [$field, "asc"];
         }
     }
 
@@ -68,9 +72,10 @@ final class LegacyModelUtils {
      * @param int $limit The number of records per page.
      * @return iterable
      */
-    public static function reduceTable(Gdn_Model $model, array $where, int $limit = 50): iterable {
+    public static function reduceTable(Gdn_Model $model, array $where, int $limit = 50): iterable
+    {
         do {
-            $rows = $model->getWhere($where, $model->PrimaryKey, 'asc', $limit)->resultArray();
+            $rows = $model->getWhere($where, $model->PrimaryKey, "asc", $limit)->resultArray();
             yield from $rows;
         } while (count($rows) >= $limit);
     }
@@ -82,7 +87,8 @@ final class LegacyModelUtils {
      * @param array $mappings The path mappings to change the keys to the correct column names.
      * @return array
      */
-    public static function normalizeApiInput(array $row, array $mappings = []): array {
+    public static function normalizeApiInput(array $row, array $mappings = []): array
+    {
         $result = [];
 
         foreach ($row as $key => $value) {
@@ -102,7 +108,8 @@ final class LegacyModelUtils {
      * @param array $mappings
      * @return array
      */
-    public static function normalizeApiOutput(array $row, array $mappings = []): array {
+    public static function normalizeApiOutput(array $row, array $mappings = []): array
+    {
         $result = [];
         $flippedMap = array_flip($mappings);
 
@@ -129,9 +136,11 @@ final class LegacyModelUtils {
      * @param int $limit
      * @return int
      */
-    public static function getLimitedCount(Gdn_Model $model, array $where, int $limit = self::COUNT_LIMIT_DEFAULT): int {
+    public static function getLimitedCount(Gdn_Model $model, array $where, int $limit = self::COUNT_LIMIT_DEFAULT): int
+    {
         $sql = clone $model->SQL;
-        $subquery = $sql->reset()
+        $subquery = $sql
+            ->reset()
             ->select($model->PrimaryKey)
             ->from($model->Name)
             ->where($where)
@@ -142,10 +151,7 @@ final class LegacyModelUtils {
 select count(*) as rowCount
 from ($subquery) as subquery
 SQL;
-        $result = $sql->Database->query(
-            $query,
-            $sql->namedParameters()
-        )->value("rowCount");
+        $result = $sql->Database->query($query, $sql->namedParameters())->value("rowCount");
         return $result;
     }
 }

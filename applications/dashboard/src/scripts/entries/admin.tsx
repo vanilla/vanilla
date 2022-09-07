@@ -31,6 +31,7 @@ import { escapeHTML } from "@vanilla/dom-utils";
 import { getDashboardRoutes } from "@dashboard/dashboardRoutes";
 import { dashboardSectionSlice } from "@dashboard/DashboardSectionSlice";
 import AdminHeader from "@dashboard/components/AdminHeader";
+import ModernEmbedSettings from "@library/embed/ModernEmbedSettings";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
@@ -38,6 +39,7 @@ window.escapeHTML = escapeHTML;
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 addComponent("VanillaLabsPage", VanillaLabsPage);
 addComponent("LanguageSettingsPage", LanguageSettingsPage);
+addComponent("ModernEmbedSettings", ModernEmbedSettings);
 
 disableComponentTheming();
 onContent(() => initAllUserContent());

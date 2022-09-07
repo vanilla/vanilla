@@ -63,7 +63,7 @@ class MemcachedTest extends SimpleCacheTest {
         $actual = $cache->get(__FUNCTION__);
         $this->assertSame($data, $actual);
 
-        $actual2 = $cache->get([__FUNCTION__]);
+        $actual2 = $cache->get([__FUNCTION__], null);
         $this->assertSame($data, $actual2[__FUNCTION__]);
     }
 

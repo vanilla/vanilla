@@ -4,24 +4,23 @@
 //
 // @author    Becky Van Bussel <beckyvanbussel@gmail.com>
 //
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,600i,700,700i');
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,600i,700,700i");
 
+@import "src/admin_variables";
+@import "src/svgs";
+@import "maps/bootstrapVariables";
+@import "maps/bootstrapMixins";
+@import "maps/bootstrapAnimation";
+@import "src/mixins";
 
-@import 'src/admin_variables';
-@import 'src/svgs';
-@import 'maps/bootstrapVariables';
-@import 'maps/bootstrapMixins';
-@import 'maps/bootstrapAnimation';
-@import 'src/mixins';
+@import "maps/vanillicon";
+@import "src/icons";
+@import "maps/vendorSubset";
+@import "maps/dashboard";
+@import "maps/extensions";
 
-@import 'maps/vanillicon';
-@import 'src/icons';
-@import 'maps/vendorSubset';
-@import 'maps/dashboard';
-@import 'maps/extensions';
-
-@import 'legacy/jcrop';
-@import 'src/helpers';
+@import "legacy/jcrop";
+@import "src/helpers";
 @import "new-components/imageUpload";
 
 @import "style-compat";

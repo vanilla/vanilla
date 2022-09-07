@@ -41,6 +41,7 @@ export interface ITabsProps {
     includeVerticalPadding?: boolean;
     tabListClasses?: string;
     tabPanelClasses?: string;
+    tabsRootClass?: string;
 }
 
 function PassThruKludge(props: any) {
@@ -56,6 +57,7 @@ export function Tabs(props: ITabsProps) {
         includeVerticalPadding = true,
         tabListClasses,
         tabPanelClasses,
+        tabsRootClass,
     } = props;
     const [activeTab, setActiveTab] = useState(defaultTabIndex ?? 0);
 
@@ -78,7 +80,7 @@ export function Tabs(props: ITabsProps) {
     return (
         <ReachTabs
             index={activeTab}
-            className={classes?.root(props.extendContainer)}
+            className={cx(classes?.root(props.extendContainer), tabsRootClass)}
             onChange={(index) => {
                 setActiveTab(index);
                 props.onChange?.(props.data[index]);

@@ -22,13 +22,15 @@ use Garden\Container\Container;
  * 4. You can include other test traits and they should set up and tear down automatically.
  *
  */
-class SiteTestCase extends VanillaTestCase {
+class SiteTestCase extends VanillaTestCase
+{
     use SiteTestTrait, SetupTraitsTrait;
 
     /**
      * @inheritDoc
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         parent::setUpBeforeClass();
         static::setUpBeforeClassTestTraits();
     }
@@ -36,7 +38,8 @@ class SiteTestCase extends VanillaTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->setUpTestTraits();
     }
@@ -44,7 +47,8 @@ class SiteTestCase extends VanillaTestCase {
     /**
      * @inheritDoc
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
         $this->tearDownTestTraits();
     }
@@ -52,7 +56,8 @@ class SiteTestCase extends VanillaTestCase {
     /**
      * @inheritDoc
      */
-    public static function tearDownAfterClass(): void {
+    public static function tearDownAfterClass(): void
+    {
         parent::tearDownAfterClass();
         static::tearDownAfterClassTestTraits();
     }

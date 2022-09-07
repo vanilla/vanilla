@@ -146,9 +146,6 @@
         outerBackground: {
             # image: "https:#site.com/path/to/some/image.jpg",
             # color: "#1DB1FD",
-            # position: "50% 50%",
-            # repeat: "no-repeat",
-            # size: "cover",
         },
         backgrounds: {
             ## Apply an overlay on the banner background.

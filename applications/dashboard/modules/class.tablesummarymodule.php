@@ -9,10 +9,10 @@
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPL
  * @since 2.3
  */
-class TableSummaryModule extends Gdn_Module {
-
-    const CSS_PREFIX = 'table-summary';
-    const MAIN_CSS_CLASS = 'table-summary-cell-main';
+class TableSummaryModule extends Gdn_Module
+{
+    const CSS_PREFIX = "table-summary";
+    const MAIN_CSS_CLASS = "table-summary-cell-main";
 
     /**
      * @var array An array of column-type arrays.
@@ -29,7 +29,8 @@ class TableSummaryModule extends Gdn_Module {
     /** @var string The table title. */
     private $title;
 
-    public function __construct($title = '') {
+    public function __construct($title = "")
+    {
         parent::__construct();
         $this->title = $title;
     }
@@ -38,7 +39,8 @@ class TableSummaryModule extends Gdn_Module {
      * @return array An array of row-type arrays. Each row array has a cells and attributes key.
      * The cells key holds an array of 'column-key' => 'cell-content' data.
      */
-    public function getRows() {
+    public function getRows()
+    {
         return $this->rows;
     }
 
@@ -46,14 +48,16 @@ class TableSummaryModule extends Gdn_Module {
      * @return array An array of column-type arrays.
      * A column array has the following keys: key, name, attributes, columnClass.
      */
-    public function getColumns() {
+    public function getColumns()
+    {
         return $this->columns;
     }
 
     /**
      * @return string The table title.
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
@@ -61,7 +65,8 @@ class TableSummaryModule extends Gdn_Module {
      * @param string $title
      * @return $this
      */
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->title = $title;
         return $this;
     }
@@ -75,20 +80,21 @@ class TableSummaryModule extends Gdn_Module {
      * @param string $columnClass The css class to propagate to every cell in this column.
      * @return TableSummaryModule $this
      */
-    public function addColumn($key, $name = '', $attributes = [], $columnClass = '') {
-        $class = val('class', $attributes) ?
-            $attributes['class'].' '.self::CSS_PREFIX.'-heading-'.slugify($key) :
-            self::CSS_PREFIX.'-heading-'.slugify($key);
+    public function addColumn($key, $name = "", $attributes = [], $columnClass = "")
+    {
+        $class = val("class", $attributes)
+            ? $attributes["class"] . " " . self::CSS_PREFIX . "-heading-" . slugify($key)
+            : self::CSS_PREFIX . "-heading-" . slugify($key);
 
         if ($columnClass) {
-            $class .= ' '.$columnClass;
+            $class .= " " . $columnClass;
         }
-        $attributes['class'] = $class;
+        $attributes["class"] = $class;
         $this->columns[$key] = [
-            'key' => $key,
-            'name' => $name,
-            'attributes' => $attributes,
-            'column-class' => $columnClass
+            "key" => $key,
+            "name" => $name,
+            "attributes" => $attributes,
+            "column-class" => $columnClass,
         ];
 
         return $this;
@@ -105,7 +111,8 @@ class TableSummaryModule extends Gdn_Module {
      * @param string $columnClass The css class to propagate to every cell in this column.
      * @return TableSummaryModule $this
      */
-    public function addColumnIf($isAllowed, $key, $name = '', $attributes = [], $columnClass = '') {
+    public function addColumnIf($isAllowed, $key, $name = "", $attributes = [], $columnClass = "")
+    {
         if (!$this->allowed($isAllowed)) {
             return $this;
         }
@@ -122,7 +129,8 @@ class TableSummaryModule extends Gdn_Module {
      * @param array $attributes The attributes on the tr element.
      * @return TableSummaryModule $this
      */
-    public function addRow($row = [], $key = '', $attributes = []) {
+    public function addRow($row = [], $key = "", $attributes = [])
+    {
         if (!$key) {
             $key = randomString(8);
         } else {
@@ -134,10 +142,10 @@ class TableSummaryModule extends Gdn_Module {
         $cellData = [];
 
         foreach ($cells as $cellKey => $cell) {
-            $cellData[$cellKey]['data'] = $cell;
+            $cellData[$cellKey]["data"] = $cell;
         }
-        $this->rows[$key]['cells'] = $cellData;
-        $this->rows[$key]['attributes'] = $attributes;
+        $this->rows[$key]["cells"] = $cellData;
+        $this->rows[$key]["attributes"] = $attributes;
 
         return $this;
     }
@@ -147,15 +155,16 @@ class TableSummaryModule extends Gdn_Module {
      *
      * @return bool Whether to render the module.
      */
-    public function prepare() {
+    public function prepare()
+    {
         // Add css classes to cells
         foreach ($this->rows as $rowKey => $row) {
-            foreach ($row['cells'] as $key => $value) {
-                $cellClass = self::CSS_PREFIX.'-cell-'.$key;
-                if (isset($this->columns[$key]['column-class'])) {
-                    $cellClass .= ' '.$this->columns[$key]['column-class'];
+            foreach ($row["cells"] as $key => $value) {
+                $cellClass = self::CSS_PREFIX . "-cell-" . $key;
+                if (isset($this->columns[$key]["column-class"])) {
+                    $cellClass .= " " . $this->columns[$key]["column-class"];
                 }
-                $this->rows[$rowKey]['cells'][$key]['attributes']['class'] = $cellClass;
+                $this->rows[$rowKey]["cells"][$key]["attributes"]["class"] = $cellClass;
             }
         }
         return true;

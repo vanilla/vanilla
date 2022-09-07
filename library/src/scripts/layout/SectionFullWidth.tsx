@@ -23,3 +23,5 @@ export function SectionFullWidth(props: IProps) {
         </div>
     );
 }
+
+export default SectionFullWidth;

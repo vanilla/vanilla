@@ -10,7 +10,8 @@ namespace Vanilla\Contracts;
 /**
  * Interface for localization.
  */
-interface LocaleInterface {
+interface LocaleInterface
+{
     /**
      * Translates a code into the selected locale's definition.
      *

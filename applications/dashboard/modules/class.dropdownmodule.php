@@ -70,8 +70,8 @@
  */
 use Vanilla\Utility\HtmlUtils;
 
-class DropdownModule extends Gdn_Module {
-
+class DropdownModule extends Gdn_Module
+{
     use NestedCollection;
     use \Garden\StaticCacheViewLocationTrait;
 
@@ -88,16 +88,16 @@ class DropdownModule extends Gdn_Module {
      * - **icon**: string - Icon for the trigger.
      */
     private $trigger = [
-        'type' => 'button',
-        'text' => '',
-        'cssClass' => '',
-        'icon' => 'caret-down',
+        "type" => "button",
+        "text" => "",
+        "cssClass" => "",
+        "icon" => "caret-down",
     ];
 
     /**
      * @var array Allowed trigger types.
      */
-    private $triggerTypes = ['button', 'anchor'];
+    private $triggerTypes = ["button", "anchor"];
 
     /**
      * @var string A potential CSS class of the dropdown menu wrapper container.
@@ -107,12 +107,12 @@ class DropdownModule extends Gdn_Module {
     /**
      * @var string A potential CSS class of the list <ul> block.
      */
-    private $listCssClass = '';
+    private $listCssClass = "";
 
     /**
      * @var string The dropdown menu wrapper container element tag.
      */
-    private $tag = 'div';
+    private $tag = "div";
 
     /**
      * Constructor.
@@ -123,97 +123,114 @@ class DropdownModule extends Gdn_Module {
      * @param string $listCssClass A potential CSS class of the list <ul> block.
      * @param bool $useCssPrefix Whether to use CSS prefixes on the dropmenu items.
      */
-    public function __construct($triggerIdPrefix = 'dropdown', $triggerText = '', $cssClass = '', $listCssClass = '', $useCssPrefix = true) {
+    public function __construct(
+        $triggerIdPrefix = "dropdown",
+        $triggerText = "",
+        $cssClass = "",
+        $listCssClass = "",
+        $useCssPrefix = true
+    ) {
         parent::__construct();
         $this->flatten = true;
         $this->useCssPrefix = $useCssPrefix;
 
         $this->triggerId = HtmlUtils::uniqueElementID($triggerIdPrefix);
-        $this->trigger['text'] = $triggerText;
+        $this->trigger["text"] = $triggerText;
         $this->cssClass = $cssClass;
         $this->listCssClass = trim($listCssClass);
 
         if ($useCssPrefix) {
-            $this->headerCssClassPrefix = 'dropdown-header';
-            $this->linkCssClassPrefix = 'dropdown-menu-link';
-            $this->dividerCssClassPrefix = 'divider';
+            $this->headerCssClassPrefix = "dropdown-header";
+            $this->linkCssClassPrefix = "dropdown-menu-link";
+            $this->dividerCssClassPrefix = "divider";
         }
     }
 
     /**
      * @return array
      */
-    public function getTrigger() {
-       return $this->trigger;
+    public function getTrigger()
+    {
+        return $this->trigger;
     }
 
     /**
      * @return string
      */
-    public function getTriggerId() {
+    public function getTriggerId()
+    {
         return $this->triggerId;
     }
 
     /**
      * @param string $triggerId
      */
-    public function setTriggerId($triggerId) {
+    public function setTriggerId($triggerId)
+    {
         $this->triggerId = $triggerId;
     }
 
     /**
      * @return array
      */
-    public function getTriggerTypes() {
+    public function getTriggerTypes()
+    {
         return $this->triggerTypes;
     }
 
     /**
      * @param array $triggerTypes
      */
-    public function setTriggerTypes($triggerTypes) {
+    public function setTriggerTypes($triggerTypes)
+    {
         $this->triggerTypes = $triggerTypes;
     }
 
     /**
      * @return string
      */
-    public function getCssClass() {
+    public function getCssClass()
+    {
         return $this->cssClass;
     }
 
     /**
      * @param string $cssClass
      */
-    public function setCssClass($cssClass) {
+    public function setCssClass($cssClass)
+    {
         $this->cssClass = $cssClass;
     }
 
     /**
      * @return string
      */
-    public function getListCssClass() {
+    public function getListCssClass()
+    {
         return $this->listCssClass;
     }
 
     /**
      * @param string $listCssClass
      */
-    public function setListCssClass($listCssClass) {
+    public function setListCssClass($listCssClass)
+    {
         $this->listCssClass = $listCssClass;
     }
 
     /**
      * @return string
      */
-    public function getTag() {
+    public function getTag()
+    {
         return $this->tag;
     }
 
     /**
      * @param string $tag
      */
-    public function setTag($tag) {
+    public function setTag($tag)
+    {
         $this->tag = $tag;
     }
 
@@ -228,13 +245,20 @@ class DropdownModule extends Gdn_Module {
      * @param array $attributes The attributes to add to the trigger.
      * @return object $this The calling DropdownModule object.
      */
-    public function setTrigger($text = '', $type = 'button', $cssClass = 'btn-default', $icon = 'caret-down', $url = '', $attributes = []) {
-        $this->trigger['text'] = $text;
-        $this->trigger['type'] = in_array($type, $this->triggerTypes) ? $type : 'button';
-        $this->trigger['icon'] = $icon;
-        $this->trigger['cssClass'] = trim($cssClass);
-        $this->trigger['attributes'] = $attributes;
-        $this->trigger['url'] = $url;
+    public function setTrigger(
+        $text = "",
+        $type = "button",
+        $cssClass = "btn-default",
+        $icon = "caret-down",
+        $url = "",
+        $attributes = []
+    ) {
+        $this->trigger["text"] = $text;
+        $this->trigger["type"] = in_array($type, $this->triggerTypes) ? $type : "button";
+        $this->trigger["icon"] = $icon;
+        $this->trigger["cssClass"] = trim($cssClass);
+        $this->trigger["attributes"] = $attributes;
+        $this->trigger["url"] = $url;
         return $this;
     }
 }

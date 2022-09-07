@@ -19,56 +19,56 @@
 // Styleguide 13.1.
 
 .toaster {
-  position: relative;
-  display: block;
-  width: 448px;
-  padding: $spacer $spacer * 3 $spacer $spacer;
-  margin-top: $spacer / 8;
-  font-weight: 400;
-  font-size: $font-size-md;
-  line-height: 18px;
-  color: $white;
-  background: #333;
-  border: $border-width solid $black;
-  opacity: .9;
-  box-shadow: inset 0 0 1px 0 rgba(255,255,255,.72);
-  border-radius: $border-radius;
-
-  @include media-breakpoint-down(sm) {
-    width: 100%;
-  }
-
-  a {
+    position: relative;
+    display: block;
+    width: 448px;
+    padding: $spacer $spacer * 3 $spacer $spacer;
+    margin-top: $spacer * 0.125;
+    font-weight: 400;
+    font-size: $font-size-md;
+    line-height: 18px;
     color: $white;
-    text-decoration: underline;
-  }
+    background: #333;
+    border: $border-width solid $black;
+    opacity: 0.9;
+    box-shadow: inset 0 0 1px 0 rgba(255, 255, 255, 0.72);
+    border-radius: $border-radius;
 
-  &:hover {
-    background-color: rgba(0,0,0,.8);
-  }
+    @include media-breakpoint-down(sm) {
+        width: 100%;
+    }
+
+    a {
+        color: $white;
+        text-decoration: underline;
+    }
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
 }
 
 .toaster-close {
-  position: absolute;
-  top: $spacer - 2px;
-  right: $spacer;
-  cursor: pointer;
+    position: absolute;
+    top: $spacer - 2px;
+    right: $spacer;
+    cursor: pointer;
 
-  &::before {
-    display: inline-block;
-    content: $close-white;
-  }
+    &::before {
+        display: inline-block;
+        content: $close-white;
+    }
 }
 
 .toasters {
-  position: fixed;
-  bottom: 24px;
-  left: 24px;
-  z-index: 1050;
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 1050;
 
-  @include media-breakpoint-down(sm) {
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
-  }
+    @include media-breakpoint-down(sm) {
+        left: 12px;
+        right: 12px;
+        bottom: 12px;
+    }
 }

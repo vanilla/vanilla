@@ -10,11 +10,13 @@ namespace VanillaTests\PluginInAddons;
 /**
  * Some theme hooks.
  */
-class PluginInAddonsPlugin extends \Gdn_Plugin {
+class PluginInAddonsPlugin extends \Gdn_Plugin
+{
     /**
      * Run migrations.
      */
-    public function structure() {
+    public function structure()
+    {
         return true;
     }
 }

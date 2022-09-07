@@ -9,8 +9,8 @@ namespace Vanilla\Contracts\Models;
 /**
  * Interface for standard fetching of one or more resource record fragments.
  */
-interface FragmentFetcherInterface {
-
+interface FragmentFetcherInterface
+{
     /**
      * Get resource fragments for one or more IDs.
      *

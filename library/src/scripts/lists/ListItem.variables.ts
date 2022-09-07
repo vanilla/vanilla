@@ -23,6 +23,11 @@ export enum ListItemIconPosition {
     META = "meta",
 
     /**
+     * Icon appears on the top of the content
+     */
+    TOP = "top",
+
+    /**
      * Icon is hidden
      */
     HIDDEN = "hidden",

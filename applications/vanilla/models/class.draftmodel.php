@@ -12,16 +12,17 @@ use Garden\EventManager;
 /**
  * Manages unpublished drafts of comments and discussions.
  */
-class DraftModel extends Gdn_Model {
-
+class DraftModel extends Gdn_Model
+{
     /**
      * Class constructor. Defines the related database table name.
      *
      * @since 2.0.0
      * @access public
      */
-    public function __construct() {
-        parent::__construct('Draft');
+    public function __construct()
+    {
+        parent::__construct("Draft");
     }
 
     /**
@@ -30,18 +31,18 @@ class DraftModel extends Gdn_Model {
      * @since 2.0.0
      * @access public
      */
-    public function draftQuery() {
-        $this->SQL
-            ->select('d.*')
-            ->from('Draft d');
+    public function draftQuery()
+    {
+        $this->SQL->select("d.*")->from("Draft d");
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get($orderFields = '', $orderDirection = 'asc', $limit = false, $pageNumber = false) {
+    public function get($orderFields = "", $orderDirection = "asc", $limit = false, $pageNumber = false)
+    {
         if (is_numeric($orderFields)) {
-            deprecated('DraftModel->get()', 'DraftModel->getByUser()');
+            deprecated("DraftModel->get()", "DraftModel->getByUser()");
             return $this->getByUser($orderFields, $orderDirection, $limit, $pageNumber);
         }
     }
@@ -55,7 +56,8 @@ class DraftModel extends Gdn_Model {
      * @param int $discussionID Limits drafts returned to a single discussion.
      * @return object Gdn_DataSet SQL results.
      */
-    public function getByUser($userID, $offset = 0, $limit = false, $discussionID = 0) {
+    public function getByUser($userID, $offset = 0, $limit = false, $discussionID = 0)
+    {
         if (!is_numeric($offset) || $offset < 0) {
             $offset = 0;
         }
@@ -66,15 +68,15 @@ class DraftModel extends Gdn_Model {
 
         $this->draftQuery();
         $this->SQL
-            ->select('d.Name, di.Name', 'coalesce', 'Name')
-            ->select('di.DateInserted', '', 'DiscussionExists')
-            ->join('Discussion di', 'd.discussionID = di.DiscussionID', 'left')
-            ->where('d.InsertUserID', $userID)
-            ->orderBy('d.DateInserted', 'desc')
+            ->select("d.Name, di.Name", "coalesce", "Name")
+            ->select("di.DateInserted", "", "DiscussionExists")
+            ->join("Discussion di", "d.discussionID = di.DiscussionID", "left")
+            ->where("d.InsertUserID", $userID)
+            ->orderBy("d.DateInserted", "desc")
             ->limit($limit, $offset);
 
         if (is_numeric($discussionID) && $discussionID > 0) {
-            $this->SQL->where('d.DiscussionID', $discussionID);
+            $this->SQL->where("d.DiscussionID", $discussionID);
         }
 
         return $this->SQL->get();
@@ -88,12 +90,13 @@ class DraftModel extends Gdn_Model {
      * @param array $options Not used.
      * @return array|object SQL results.
      */
-    public function getID($id, $datasetType = false, $options = []) {
+    public function getID($id, $datasetType = false, $options = [])
+    {
         $datasetType = $datasetType ?: DATASET_TYPE_OBJECT;
 
         $this->draftQuery();
         return $this->SQL
-            ->where('d.DraftID', $id)
+            ->where("d.DraftID", $id)
             ->get()
             ->firstRow($datasetType);
     }
@@ -101,9 +104,10 @@ class DraftModel extends Gdn_Model {
     /**
      * {@inheritdoc}
      */
-    public function getCount($wheres = '') {
+    public function getCount($wheres = "")
+    {
         if (is_numeric($wheres)) {
-            deprecated('DraftModel->getCount(int)', 'DraftModel->getCountByUser()');
+            deprecated("DraftModel->getCount(int)", "DraftModel->getCountByUser()");
             return $this->getCountByUser($wheres);
         }
 
@@ -116,14 +120,14 @@ class DraftModel extends Gdn_Model {
      * @param int $userID Unique ID of user to count drafts for.
      * @return int Total drafts.
      */
-    public function getCountByUser($userID) {
+    public function getCountByUser($userID)
+    {
         return $this->SQL
-            ->select('DraftID', 'count', 'CountDrafts')
-            ->from('Draft')
-            ->where('InsertUserID', $userID)
+            ->select("DraftID", "count", "CountDrafts")
+            ->from("Draft")
+            ->where("InsertUserID", $userID)
             ->get()
-            ->firstRow()
-            ->CountDrafts;
+            ->firstRow()->CountDrafts;
     }
 
     /**
@@ -133,40 +137,44 @@ class DraftModel extends Gdn_Model {
      * @param array $settings Not used.
      * @return int Unique ID of draft.
      */
-    public function save($formPostValues, $settings = []) {
+    public function save($formPostValues, $settings = [])
+    {
         $session = Gdn::session();
 
         // Define the primary key in this model's table.
         $this->defineSchema();
 
-        if (array_key_exists('Body', $formPostValues)) {
+        if (array_key_exists("Body", $formPostValues)) {
             // Add & apply any extra validation rules:
-            $this->Validation->applyRule('Body', 'Required');
-            $maxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+            $this->Validation->applyRule("Body", "Required");
+            $maxCommentLength = Gdn::config("Vanilla.Comment.MaxLength");
             if (is_numeric($maxCommentLength) && $maxCommentLength > 0) {
-                $this->Validation->setSchemaProperty('Body', 'Length', $maxCommentLength);
-                $this->Validation->applyRule('Body', 'Length');
+                $this->Validation->setSchemaProperty("Body", "Length", $maxCommentLength);
+                $this->Validation->applyRule("Body", "Length");
             }
         } else {
-            $this->Validation->unapplyRule('Body', 'Required');
-            $this->Validation->unapplyRule('Body', 'Length');
+            $this->Validation->unapplyRule("Body", "Required");
+            $this->Validation->unapplyRule("Body", "Length");
         }
 
         // Get the DraftID from the form so we know if we are inserting or updating.
-        $draftID = (int) val('DraftID', $formPostValues, 0);
+        $draftID = (int) val("DraftID", $formPostValues, 0);
         $insert = $draftID === 0 ? true : false;
 
         if (!$draftID) {
-            unset($formPostValues['DraftID']);
+            unset($formPostValues["DraftID"]);
         }
 
         // Remove the discussionid from the form value collection if it's empty
-        if (array_key_exists('DiscussionID', $formPostValues) && $formPostValues['DiscussionID'] === '') {
-            unset($formPostValues['DiscussionID']);
+        if (array_key_exists("DiscussionID", $formPostValues) && $formPostValues["DiscussionID"] === "") {
+            unset($formPostValues["DiscussionID"]);
         }
 
-        if (array_key_exists('CategoryID', $formPostValues) && filter_var($formPostValues['CategoryID'], FILTER_VALIDATE_INT) === false) {
-            unset($formPostValues['CategoryID']);
+        if (
+            array_key_exists("CategoryID", $formPostValues) &&
+            filter_var($formPostValues["CategoryID"], FILTER_VALIDATE_INT) === false
+        ) {
+            unset($formPostValues["CategoryID"]);
         }
 
         // Add the update fields because this table's default sort is by DateUpdated (see $this->get()).
@@ -174,35 +182,35 @@ class DraftModel extends Gdn_Model {
         $this->addUpdateFields($formPostValues);
 
         // Remove checkboxes from the fields if they were unchecked
-        if (val('Announce', $formPostValues, '') === false) {
-            unset($formPostValues['Announce']);
+        if (val("Announce", $formPostValues, "") === false) {
+            unset($formPostValues["Announce"]);
         }
 
-        if (val('Closed', $formPostValues, '') === false) {
-            unset($formPostValues['Closed']);
+        if (val("Closed", $formPostValues, "") === false) {
+            unset($formPostValues["Closed"]);
         }
 
-        if (val('Sink', $formPostValues, '') === false) {
-            unset($formPostValues['Sink']);
+        if (val("Sink", $formPostValues, "") === false) {
+            unset($formPostValues["Sink"]);
         }
-        $args = ['FormPostValues' => $formPostValues];
+        $args = ["FormPostValues" => $formPostValues];
         /** @var \Garden\EventManager $eventManager */
         $eventManager = Gdn::getContainer()->get(EventManager::class);
-        $eventManager->fireFilter('draftModel_beforeSaveDiscussion', $this, $args);
+        $eventManager->fireFilter("draftModel_beforeSaveDiscussion", $this, $args);
 
         // Validate the form posted values
         if ($this->validate($formPostValues, $insert)) {
             $fields = $this->Validation->schemaValidationFields(); // All fields on the form that relate to the schema
-            $draftID = intval(val('DraftID', $fields, 0));
+            $draftID = intval(val("DraftID", $fields, 0));
 
             // If the post is new and it validates, make sure the user isn't spamming
             if ($draftID > 0) {
                 // Update the draft.
-                unset($fields['DraftID']); // remove the primary key from the fields for saving
+                unset($fields["DraftID"]); // remove the primary key from the fields for saving
                 $this->SQL->put($this->Name, $fields, [$this->PrimaryKey => $draftID]);
             } else {
                 // Insert the draft
-                unset($fields['DraftID']);
+                unset($fields["DraftID"]);
                 $draftID = $this->SQL->insert($this->Name, $fields);
                 $this->updateUser($session->UserID);
             }
@@ -216,9 +224,10 @@ class DraftModel extends Gdn_Model {
      *
      * {@inheritdoc}
      */
-    public function delete($where = [], $options = []) {
+    public function delete($where = [], $options = [])
+    {
         if (is_numeric($where)) {
-            deprecated('DraftModel->delete(int)', 'DraftModel->deleteID(int)');
+            deprecated("DraftModel->delete(int)", "DraftModel->deleteID(int)");
 
             $result = $this->deleteID($where, $options);
             return $result;
@@ -236,16 +245,17 @@ class DraftModel extends Gdn_Model {
      * @param array $options Not used.
      * @return bool Always returns TRUE.
      */
-    public function deleteID($id, $options = []) {
+    public function deleteID($id, $options = [])
+    {
         // Get some information about this draft
         $draftUser = $this->SQL
-            ->select('InsertUserID')
-            ->from('Draft')
-            ->where('DraftID', $id)
+            ->select("InsertUserID")
+            ->from("Draft")
+            ->where("DraftID", $id)
             ->get()
             ->firstRow();
 
-        $this->SQL->delete('Draft', ['DraftID' => $id]);
+        $this->SQL->delete("Draft", ["DraftID" => $id]);
         if (is_object($draftUser)) {
             $this->updateUser($draftUser->InsertUserID);
         }
@@ -261,11 +271,12 @@ class DraftModel extends Gdn_Model {
      *
      * @param int $userID Unique ID of the user to be updated.
      */
-    public function updateUser($userID) {
+    public function updateUser($userID)
+    {
         // Retrieve a draft count
         $countDrafts = $this->getCountByUser($userID);
 
         // Update CountDrafts column of user table fot this user
-        Gdn::userModel()->setField($userID, 'CountDrafts', $countDrafts);
+        Gdn::userModel()->setField($userID, "CountDrafts", $countDrafts);
     }
 }

@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Fixtures;
 
-
 use Psr\Container\ContainerInterface;
 use Psr\Container\Exception\ContainerException;
 use Psr\Container\Exception\NotFoundException;
@@ -15,16 +14,18 @@ use Psr\Container\Exception\NotFoundException;
 /**
  * A basic container for unit testing.
  */
-class Container extends \ArrayObject implements ContainerInterface {
+class Container extends \ArrayObject implements ContainerInterface
+{
     /**
      * Finds an entry of the container by its identifier and returns it.
      *
      * @param string $id Identifier of the entry to look for.
      * @return mixed Entry.
      */
-    public function get($id) {
+    public function get($id)
+    {
         if (!isset($this[$id])) {
-            $this[$id] = new $id;
+            $this[$id] = new $id();
         }
 
         return $this[$id];
@@ -37,7 +38,8 @@ class Container extends \ArrayObject implements ContainerInterface {
      *
      * @return boolean
      */
-    public function has($id) {
+    public function has($id)
+    {
         return class_exists($id);
     }
 }

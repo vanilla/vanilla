@@ -22,8 +22,8 @@ use VanillaTests\Fixtures\SpyingEventManager;
 /**
  * Trait for asserting that events are dispatched properly.
  */
-trait EventSpyTestTrait {
-
+trait EventSpyTestTrait
+{
     /** @var array Called event handler information. */
     private $calledHandlers = [];
 
@@ -33,7 +33,8 @@ trait EventSpyTestTrait {
     /**
      * Cleanup the trait (e.g. reset the state of collection properties).
      */
-    private function cleanupEventSpyTestTrait(): void {
+    private function cleanupEventSpyTestTrait(): void
+    {
         $this->clearDispatchedEvents();
         $this->clearFiredEvents();
         $this->clearCalledHandlers();
@@ -42,7 +43,8 @@ trait EventSpyTestTrait {
     /**
      * Setup.
      */
-    public function setUpEventSpyTestTrait() {
+    public function setUpEventSpyTestTrait()
+    {
         if (!$this->isBound) {
             $this->getEventManager()->bindClass($this, EventManager::PRIORITY_LOW);
             $this->isBound = true;
@@ -53,14 +55,16 @@ trait EventSpyTestTrait {
     /**
      * Teardown.
      */
-    public function tearDownEventSpyTestTrait() {
+    public function tearDownEventSpyTestTrait()
+    {
         $this->cleanupEventSpyTestTrait();
     }
 
     /**
      * Clear the called event handlers.
      */
-    public function clearCalledHandlers() {
+    public function clearCalledHandlers()
+    {
         $this->calledHandlers = [];
     }
 
@@ -70,10 +74,11 @@ trait EventSpyTestTrait {
      * @param string $name
      * @param array $arguments
      */
-    public function handlerCalled(string $name, array $arguments) {
+    public function handlerCalled(string $name, array $arguments)
+    {
         $this->calledHandlers[] = [
-            'name' => $name,
-            'args' => $arguments,
+            "name" => $name,
+            "args" => $arguments,
         ];
     }
 
@@ -85,11 +90,12 @@ trait EventSpyTestTrait {
      *
      * @return array The called handler.
      */
-    public function assertHandlerCalled(string $name, array $contstraints = null): array {
+    public function assertHandlerCalled(string $name, array $contstraints = null): array
+    {
         $foundHandler = null;
         foreach ($this->calledHandlers as $handler) {
-            $calledName = $handler['name'];
-            $calledArgs = $handler['args'];
+            $calledName = $handler["name"];
+            $calledArgs = $handler["args"];
 
             if ($calledName !== $name) {
                 continue;
@@ -101,7 +107,7 @@ trait EventSpyTestTrait {
                         continue 2;
                     }
                     if ($argument instanceof Constraint) {
-                        if (!$argument->evaluate($calledArgs[$key], '', true)) {
+                        if (!$argument->evaluate($calledArgs[$key], "", true)) {
                             continue 2;
                         }
                     } elseif ($argument != $calledArgs[$key]) {
@@ -115,30 +121,34 @@ trait EventSpyTestTrait {
 
         $this->assertTrue(
             !!$foundHandler,
-            "Could not find a matching call for $name in called handlers:\n" . json_encode($this->calledHandlers, JSON_PRETTY_PRINT)
+            "Could not find a matching call for $name in called handlers:\n" .
+                json_encode($this->calledHandlers, JSON_PRETTY_PRINT)
         );
 
-        return $foundHandler['args'];
+        return $foundHandler["args"];
     }
 
     /**
      * Clear the dispatched events.
      */
-    protected function clearDispatchedEvents() {
+    protected function clearDispatchedEvents()
+    {
         $this->getEventManager()->clearDispatchedEvents();
     }
 
     /**
      * Clear the fired events.
      */
-    protected function clearFiredEvents() {
+    protected function clearFiredEvents()
+    {
         $this->getEventManager()->clearFiredEvents();
     }
 
     /**
      * @return SpyingEventManager
      */
-    protected function getEventManager(): SpyingEventManager {
+    protected function getEventManager(): SpyingEventManager
+    {
         return \Gdn::getContainer()->get(EventManager::class);
     }
 
@@ -149,19 +159,22 @@ trait EventSpyTestTrait {
      * @param array|string[] $matchPayloadFields
      * @param bool $strictCount If set to true we are asserting these are the only events dispatched.
      */
-    public function assertEventsDispatched(array $events, array $matchPayloadFields = ["*"], bool $strictCount = false) {
+    public function assertEventsDispatched(array $events, array $matchPayloadFields = ["*"], bool $strictCount = false)
+    {
         if ($strictCount) {
             $expectedCount = count($events);
             $dispatchedEvents = $this->getEventManager()->getDispatchedEvents();
-            $dispatchedEvents = array_values(array_filter($dispatchedEvents, function ($event) {
-                return $event instanceof ResourceEvent;
-            }));
+            $dispatchedEvents = array_values(
+                array_filter($dispatchedEvents, function ($event) {
+                    return $event instanceof ResourceEvent;
+                })
+            );
             $actualCount = count($dispatchedEvents);
             TestCase::assertEquals(
                 $expectedCount,
                 $actualCount,
-                "Expected {$expectedCount} events to be dispatched, but $actualCount events were dispatched. Dispatched Events:\n".
-                json_encode($dispatchedEvents, JSON_PRETTY_PRINT)
+                "Expected {$expectedCount} events to be dispatched, but $actualCount events were dispatched. Dispatched Events:\n" .
+                    json_encode($dispatchedEvents, JSON_PRETTY_PRINT)
             );
         }
         foreach ($events as $event) {
@@ -169,14 +182,14 @@ trait EventSpyTestTrait {
         }
     }
 
-
     /**
      * Looks for a fired event & returns either true if it's found or false if it's not.
      *
      * @param string $event
      * @return bool
      */
-    private function lookForEventFired(string $event): bool {
+    private function lookForEventFired(string $event): bool
+    {
         $event = strtolower($event);
         $firedEvents = array_column($this->getEventManager()->getFiredEvents(), 0);
         $firedEvents = array_map("strtolower", $firedEvents);
@@ -189,14 +202,12 @@ trait EventSpyTestTrait {
      * @param string $event Event name to match
      * @return array Set of fired events that match provided event name
      */
-    public function getMatchingEventsFired(string $event) : array {
+    public function getMatchingEventsFired(string $event): array
+    {
         $firedEvents = $this->getEventManager()->getFiredEvents();
-        $matchingEventsFired = array_filter(
-            $firedEvents,
-            function (array $fired) use ($event) {
-                return strcasecmp($fired[0], $event) === 0;
-            }
-        );
+        $matchingEventsFired = array_filter($firedEvents, function (array $fired) use ($event) {
+            return strcasecmp($fired[0], $event) === 0;
+        });
         return empty($matchingEventsFired) ? [] : array_column($matchingEventsFired, 1);
     }
 
@@ -205,7 +216,8 @@ trait EventSpyTestTrait {
      *
      * @param string $event
      */
-    public function assertEventFired(string $event): void {
+    public function assertEventFired(string $event): void
+    {
         TestCase::assertTrue($this->lookForEventFired($event));
     }
 
@@ -214,7 +226,8 @@ trait EventSpyTestTrait {
      *
      * @param string $event
      */
-    public function assertEventNotFired(string $event): void {
+    public function assertEventNotFired(string $event): void
+    {
         TestCase::assertFalse($this->lookForEventFired($event));
     }
 
@@ -223,18 +236,21 @@ trait EventSpyTestTrait {
      *
      * @param string $eventClass The type of event to check.
      */
-    public function assertNoEventsDispatched(string $eventClass = null) {
+    public function assertNoEventsDispatched(string $eventClass = null)
+    {
         $events = $this->getEventManager()->getDispatchedEvents();
-        $events = array_values(array_filter($events, function ($event) {
-            return $event instanceof ResourceEvent;
-        }));
+        $events = array_values(
+            array_filter($events, function ($event) {
+                return $event instanceof ResourceEvent;
+            })
+        );
         if ($eventClass !== null) {
             $events = array_filter($events, function ($event) use ($eventClass) {
                 return is_a($event, $eventClass);
             });
         }
 
-        TestCase::assertEquals(0, count($events), 'No events were supposed to be dispatched.');
+        TestCase::assertEquals(0, count($events), "No events were supposed to be dispatched.");
     }
 
     /**
@@ -242,7 +258,8 @@ trait EventSpyTestTrait {
      *
      * @param array $eventProperties
      */
-    public function assertEventNotDispatched(array $eventProperties = []) {
+    public function assertEventNotDispatched(array $eventProperties = [])
+    {
         /** @var ResourceEvent[] $events */
         $events = $this->getEventManager()->getDispatchedEvents();
 
@@ -253,35 +270,35 @@ trait EventSpyTestTrait {
                     continue;
                 }
 
-                $type = $eventProperties["type"] ?? '';
-                $action = $eventProperties["action"] ?? '';
-                if ($event->getType() === $type &&
-                    $event->getAction() === $action
-                ) {
+                $type = $eventProperties["type"] ?? "";
+                $action = $eventProperties["action"] ?? "";
+                if ($event->getType() === $type && $event->getAction() === $action) {
                     $eventDispatched = true;
                 }
             }
         }
-        TestCase::assertEquals(false, $eventDispatched, 'No events were supposed to be dispatched.');
+        TestCase::assertEquals(false, $eventDispatched, "No events were supposed to be dispatched.");
     }
 
     /**
      * @param BulkUpdateEvent $updateEvent
      */
-    public function assertBulkEventDispatched(BulkUpdateEvent $updateEvent) {
+    public function assertBulkEventDispatched(BulkUpdateEvent $updateEvent)
+    {
         $hasEvent = false;
         $dispatchedEvents = $this->getEventManager()->getDispatchedEvents();
         /** @var BulkUpdateEvent $dispatchedEvent */
         foreach ($dispatchedEvents as $dispatchedEvent) {
             $constraint = new IsEqual($updateEvent);
-            if ($constraint->evaluate($dispatchedEvent, '', true)) {
+            if ($constraint->evaluate($dispatchedEvent, "", true)) {
                 $hasEvent = true;
             }
         }
 
         $this->assertTrue(
             $hasEvent,
-            "Could not find a matching event for $updateEvent in dispatched events:\n" . json_encode($dispatchedEvents, JSON_PRETTY_PRINT)
+            "Could not find a matching event for $updateEvent in dispatched events:\n" .
+                json_encode($dispatchedEvents, JSON_PRETTY_PRINT)
         );
     }
 
@@ -292,7 +309,8 @@ trait EventSpyTestTrait {
      * @param array|string[] $matchPayloadFields
      * @return ResourceEvent|null ResourceEvent that matches provided payload fields, if any, else null
      */
-    public function assertEventDispatched(ResourceEvent $event, array $matchPayloadFields = ["*"]): ?ResourceEvent {
+    public function assertEventDispatched(ResourceEvent $event, array $matchPayloadFields = ["*"]): ?ResourceEvent
+    {
         $matchAll = in_array("*", $matchPayloadFields);
         $dispatchedEvents = $this->getEventManager()->getDispatchedEvents();
 
@@ -312,7 +330,8 @@ trait EventSpyTestTrait {
             }
 
             foreach ($matchPayloadFields as $matchPayloadField) {
-                $dispatchedField = $dispatchedEvent->getPayload()[$dispatchedEvent->getType()][$matchPayloadField] ?? null;
+                $dispatchedField =
+                    $dispatchedEvent->getPayload()[$dispatchedEvent->getType()][$matchPayloadField] ?? null;
                 $expectedField = $event->getPayload()[$event->getType()][$matchPayloadField] ?? null;
                 if ($dispatchedField !== $expectedField) {
                     continue 2;
@@ -335,14 +354,17 @@ trait EventSpyTestTrait {
      * @param TrackingEventInterface $event
      * @param array $matchTrackablePayloadFields
      */
-    public function assertTrackablePayload(TrackingEventInterface $event, $matchTrackablePayloadFields = []) {
+    public function assertTrackablePayload(TrackingEventInterface $event, $matchTrackablePayloadFields = [])
+    {
         $hasEvent = false;
         $dispatchedEvents = $this->getEventManager()->getDispatchedEvents();
         /** @var TrackingEventInterface $dispatchedEvent */
         foreach ($dispatchedEvents as $dispatchedEvent) {
-            if (!($event instanceof TrackingEventInterface)
-                || !($dispatchedEvent instanceof TrackingEventInterface)
-                || !method_exists($event, 'getTrackablePayload')) {
+            if (
+                !($event instanceof TrackingEventInterface) ||
+                !($dispatchedEvent instanceof TrackingEventInterface) ||
+                !method_exists($event, "getTrackablePayload")
+            ) {
                 continue;
             }
 
@@ -351,7 +373,8 @@ trait EventSpyTestTrait {
             }
 
             foreach ($matchTrackablePayloadFields as $matchPayloadField) {
-                $dispatchedField = $dispatchedEvent->getTrackablePayload()[$dispatchedEvent->getType()][$matchPayloadField] ?? null;
+                $dispatchedField =
+                    $dispatchedEvent->getTrackablePayload()[$dispatchedEvent->getType()][$matchPayloadField] ?? null;
                 $expectedField = $event->getTrackablePayload()[$event->getType()][$matchPayloadField] ?? null;
                 if ($dispatchedField !== $expectedField) {
                     continue 2;
@@ -363,7 +386,8 @@ trait EventSpyTestTrait {
 
         $this->assertTrue(
             $hasEvent,
-            "Could not find a matching event for $event in dispatched events:\n" . json_encode($dispatchedEvents, JSON_PRETTY_PRINT)
+            "Could not find a matching event for $event in dispatched events:\n" .
+                json_encode($dispatchedEvents, JSON_PRETTY_PRINT)
         );
     }
 
@@ -377,20 +401,13 @@ trait EventSpyTestTrait {
      * that matches the value returned by the event's `getType()` method.
      * @return ResourceEvent
      */
-    private function expectedResourceEvent(string $type, string $action, array $payload): ResourceEvent {
+    private function expectedResourceEvent(string $type, string $action, array $payload): ResourceEvent
+    {
         if (is_a($type, ResourceEvent::class, true)) {
             $recordType = $type::typeFromClass();
-            return new $type(
-                $action,
-                [$recordType => $payload],
-                $this->getCurrentUser()
-            );
+            return new $type($action, [$recordType => $payload], $this->getCurrentUser());
         } else {
-            $event = new GenericResourceEvent(
-                $action,
-                [$type => $payload],
-                $this->getCurrentUser()
-            );
+            $event = new GenericResourceEvent($action, [$type => $payload], $this->getCurrentUser());
             $event->setType($type);
             return $event;
         }
@@ -399,8 +416,11 @@ trait EventSpyTestTrait {
     /**
      * Get the current user.
      */
-    private function getCurrentUser() {
-        return \Gdn::userModel()->currentFragment()->jsonSerialize();
+    private function getCurrentUser()
+    {
+        return \Gdn::userModel()
+            ->currentFragment()
+            ->jsonSerialize();
     }
 
     /**
@@ -409,12 +429,13 @@ trait EventSpyTestTrait {
      * @param string $recordType
      * @param int $recordID
      */
-    public function assertDirtyRecordInserted(string $recordType, int $recordID) {
+    public function assertDirtyRecordInserted(string $recordType, int $recordID)
+    {
         /** @var DirtyRecordModel $dirtyRecordModel */
         $dirtyRecordModel = \Gdn::getContainer()->get(DirtyRecordModel::class);
         $record = $dirtyRecordModel->select(["recordType" => $recordType, "recordID" => $recordID]);
         $this->assertEquals($recordID, $record[0]["recordID"]);
-        $this->resetTable('dirtyRecord');
+        $this->resetTable("dirtyRecord");
     }
 
     /**
@@ -425,7 +446,8 @@ trait EventSpyTestTrait {
      *
      * @return mixed
      */
-    public function runWithBoundEvents(callable $callable, array $eventHandlers) {
+    public function runWithBoundEvents(callable $callable, array $eventHandlers)
+    {
         $eventManager = $this->getEventManager();
         foreach ($eventHandlers as $eventName => $eventHandler) {
             $eventManager->bind($eventName, $eventHandler);

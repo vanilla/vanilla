@@ -12,7 +12,8 @@ namespace VanillaTests;
  *
  * @deprecated Use `VanillaTestCase::invokeMethod()` and `VanillaTestCase::callOn()` instead.
  */
-trait InvokeMethodTrait {
+trait InvokeMethodTrait
+{
     /**
      * Call protected/private method of a class.
      *
@@ -24,7 +25,8 @@ trait InvokeMethodTrait {
      *
      * @return mixed Method return.
      */
-    public static function invokeMethod($target, $methodName, array $parameters = []) {
+    public static function invokeMethod($target, $methodName, array $parameters = [])
+    {
         return VanillaTestCase::invokeMethod($target, $methodName, $parameters);
     }
 
@@ -36,7 +38,8 @@ trait InvokeMethodTrait {
      * @param mixed $args
      * @return mixed
      */
-    protected static function callOn(object $on, \Closure $callable, ...$args) {
+    protected static function callOn(object $on, \Closure $callable, ...$args)
+    {
         return VanillaTestCase::callOn($on, $callable, ...$args);
     }
 }

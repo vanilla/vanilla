@@ -13,8 +13,8 @@ use Vanilla\Formatting\Quill\Blots\FormattableTextTrait;
 /**
  * Base class for creating inline content a value that goes beyond a simple string.
  */
-abstract class AbstractInlineEmbedBlot extends AbstractBlot {
-
+abstract class AbstractInlineEmbedBlot extends AbstractBlot
+{
     use FormattableTextTrait;
 
     const ZERO_WIDTH_WHITESPACE = "&#65279;";
@@ -36,7 +36,8 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public static function matches(array $operation): bool {
+    public static function matches(array $operation): bool
+    {
         return valr(static::getInsertKey(), $operation);
     }
 
@@ -48,7 +49,8 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = []) {
+    public function __construct(array $currentOperation, array $previousOperation = [], array $nextOperation = [])
+    {
         parent::__construct($currentOperation, $previousOperation, $nextOperation);
         $this->parseFormats($this->currentOperation, $this->previousOperation, $this->nextOperation);
         $potentialContent = valr(static::getInsertKey(), $this->currentOperation);
@@ -58,7 +60,8 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
     /**
      * @inheritDoc
      */
-    public function render(): string {
+    public function render(): string
+    {
         $result = "<" . static::getContainerHTMLTag();
 
         $attributes = $this->getContainerHMTLAttributes();
@@ -70,6 +73,6 @@ abstract class AbstractInlineEmbedBlot extends AbstractBlot {
         $result .= $this->content;
         $result .= "</" . static::getContainerHTMLTag() . ">";
 
-        return $this->renderOpeningFormatTags().$result.$this->renderClosingFormatTags();
+        return $this->renderOpeningFormatTags() . $result . $this->renderClosingFormatTags();
     }
 }

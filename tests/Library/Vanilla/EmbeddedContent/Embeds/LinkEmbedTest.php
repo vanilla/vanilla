@@ -13,12 +13,14 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Test for the individual linkembed.
  */
-class LinkEmbedTest extends MinimalContainerTestCase {
+class LinkEmbedTest extends MinimalContainerTestCase
+{
     /**
      * Ensure we can create giphy embed from the old data format that might still
      * live in the DB.
      */
-    public function testLegacyDataFormat() {
+    public function testLegacyDataFormat()
+    {
         $oldDataJSON = <<<JSON
 {
     "url": "https://vanillaforums.com/en/",

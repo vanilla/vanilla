@@ -12,8 +12,8 @@ use Garden\EventManager;
 /**
  * An event manager that tracks all dispatched events so can make assertions on them.
  */
-class SpyingEventManager extends EventManager {
-
+class SpyingEventManager extends EventManager
+{
     /** @var array */
     private $firedEvents = [];
 
@@ -25,7 +25,8 @@ class SpyingEventManager extends EventManager {
      *
      * @inheritdoc
      */
-    public function dispatch(object $event) {
+    public function dispatch(object $event)
+    {
         $this->dispatchedEvents[] = $event;
         return parent::dispatch($event);
     }
@@ -37,7 +38,8 @@ class SpyingEventManager extends EventManager {
      * @param mixed $args Any arguments to pass along to the event handlers.
      * @return array Returns the result of the event handlers where each handler's result is an item in the array.
      */
-    public function fire($event, ...$args) {
+    public function fire($event, ...$args)
+    {
         $this->firedEvents[] = [$event, $args];
         return parent::fire($event, ...$args);
     }
@@ -45,14 +47,16 @@ class SpyingEventManager extends EventManager {
     /**
      * Clear the dispatched events.
      */
-    public function clearDispatchedEvents() {
+    public function clearDispatchedEvents()
+    {
         $this->dispatchedEvents = [];
     }
 
     /**
      * Clear fired events.
      */
-    public function clearFiredEvents(): void {
+    public function clearFiredEvents(): void
+    {
         $this->firedEvents = [];
     }
 
@@ -61,14 +65,16 @@ class SpyingEventManager extends EventManager {
      *
      * @return array
      */
-    public function getFiredEvents(): array {
+    public function getFiredEvents(): array
+    {
         return $this->firedEvents;
     }
 
     /**
      * @return object[]
      */
-    public function getDispatchedEvents(): array {
+    public function getDispatchedEvents(): array
+    {
         return $this->dispatchedEvents;
     }
 }

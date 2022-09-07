@@ -13,7 +13,8 @@ use VanillaTests\SiteTestTrait;
 /**
  * Tests for the `SsoUtils` class.
  */
-class SsoUtilsTest extends TestCase {
+class SsoUtilsTest extends TestCase
+{
     use SiteTestTrait;
 
     /**
@@ -24,12 +25,11 @@ class SsoUtilsTest extends TestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->setupSiteTestTrait();
-        $this->container()->call(function (
-            \SsoUtils $ssoUtils
-        ) {
+        $this->container()->call(function (\SsoUtils $ssoUtils) {
             $this->ssoUtils = $ssoUtils;
         });
     }
@@ -37,35 +37,39 @@ class SsoUtilsTest extends TestCase {
     /**
      * Test creating and then verifying a state token.
      */
-    public function testStateToken(): void {
+    public function testStateToken(): void
+    {
         $token = $this->ssoUtils->getStateToken(true);
-        $this->ssoUtils->verifyStateToken('test', $token);
+        $this->ssoUtils->verifyStateToken("test", $token);
         $this->assertTrue(true);
     }
 
     /**
      * An empty state token should not verify.
      */
-    public function testEmptyStateToken(): void {
+    public function testEmptyStateToken(): void
+    {
         $this->expectExceptionCode(403);
-        $this->ssoUtils->verifyStateToken('test', '');
+        $this->ssoUtils->verifyStateToken("test", "");
     }
 
     /**
      * An invalid state token should not verify.
      */
-    public function testInvalidStateToken(): void {
+    public function testInvalidStateToken(): void
+    {
         $this->expectExceptionCode(400);
-        $this->ssoUtils->verifyStateToken('test', 'foo');
+        $this->ssoUtils->verifyStateToken("test", "foo");
     }
 
     /**
      * Test a valid token that hasn't been saved.
      */
-    public function testDifferentToken(): void {
+    public function testDifferentToken(): void
+    {
         $token1 = $this->ssoUtils->getStateToken(true);
         $token2 = $this->ssoUtils->getStateToken(true);
         $this->expectExceptionCode(400);
-        $this->ssoUtils->verifyStateToken('test', $token1);
+        $this->ssoUtils->verifyStateToken("test", $token1);
     }
 }

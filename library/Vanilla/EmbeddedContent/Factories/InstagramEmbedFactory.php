@@ -23,22 +23,24 @@ use Vanilla\EmbeddedContent\Embeds\InstagramEmbed;
  *
  * As a result we just parse the URL and let their JS library handle the rest now.
  */
-class InstagramEmbedFactory extends AbstractEmbedFactory {
-
+class InstagramEmbedFactory extends AbstractEmbedFactory
+{
     const NAME = "Instagram Post";
     const DOMAINS = ["instagram.com", "instagr.am"];
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return self::DOMAINS;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         return "`/?p/.*`";
     }
 
@@ -47,7 +49,8 @@ class InstagramEmbedFactory extends AbstractEmbedFactory {
      *
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         $data = [
             "embedType" => InstagramEmbed::TYPE,
             "url" => $url,
@@ -66,7 +69,10 @@ class InstagramEmbedFactory extends AbstractEmbedFactory {
      *
      * @return string|null
      */
-    private function idFromUrl(string $url): ?string {
-        return preg_match("`/?p/(?<postID>[\w-]+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches) ? $matches["postID"] : null;
+    private function idFromUrl(string $url): ?string
+    {
+        return preg_match("`/?p/(?<postID>[\w-]+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches)
+            ? $matches["postID"]
+            : null;
     }
 }

@@ -22,8 +22,9 @@ use Psr\Container\ContainerInterface;
  * - Class and method lookup can be customized.
  * - Supports different controller methods for different HTTP methods.
  */
-class ResourceRoute extends Route {
-    private static $specialMethods = ['index', 'get', 'post', 'patch', 'put', 'options', 'delete'];
+class ResourceRoute extends Route
+{
+    private static $specialMethods = ["index", "get", "post", "patch", "put", "options", "delete"];
 
     /**
      * @var string
@@ -59,8 +60,8 @@ class ResourceRoute extends Route {
      * @param ClassLocator|null $classLocator A class locator used to lookup classes and methods on the controllers.
      */
     public function __construct(
-        $basePath = '/',
-        $controllerPattern = '%sController',
+        $basePath = "/",
+        $controllerPattern = "%sController",
         ContainerInterface $container = null,
         ClassLocator $classLocator = null
     ) {
@@ -70,16 +71,17 @@ class ResourceRoute extends Route {
         $this->container = $container;
         $this->classLocator = $classLocator ?: new ClassLocator();
 
-
-        $this
-            ->setConstraint('id', ['position' => 0, 'notype' => ['regex' => '`^\d+$`']])
-            ->setConstraint('page', '`^p\d+$`');
+        $this->setConstraint("id", ["position" => 0, "notype" => ["regex" => '`^\d+$`']])->setConstraint(
+            "page",
+            '`^p\d+$`'
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function match(RequestInterface $request) {
+    public function match(RequestInterface $request)
+    {
         if (!$this->isEnabled()) {
             return null;
         }
@@ -88,13 +90,13 @@ class ResourceRoute extends Route {
         // First check and strip the base path.
         if (stripos($path, $this->basePath) === 0) {
             $pathPart = substr($path, strlen($this->basePath));
-        } elseif ($this->basePath === $path.'/' && !empty($this->rootController)) {
-            $pathPart = '';
+        } elseif ($this->basePath === $path . "/" && !empty($this->rootController)) {
+            $pathPart = "";
         } else {
             return null;
         }
 
-        $pathArgs = explode('/', $pathPart);
+        $pathArgs = explode("/", $pathPart);
 
         // First look for the controller.
         $resource = array_shift($pathArgs);
@@ -103,7 +105,7 @@ class ResourceRoute extends Route {
             $controllerClass = $this->rootController;
         } else {
             $controllerSlug = $this->filterName($resource);
-            foreach ((array)$this->controllerPattern as $controllerPattern) {
+            foreach ((array) $this->controllerPattern as $controllerPattern) {
                 $controllerClass = $this->classLocator->findClass(sprintf($controllerPattern, $controllerSlug));
                 if ($controllerClass) {
                     break;
@@ -125,7 +127,7 @@ class ResourceRoute extends Route {
         $result = $this->findAction($controller, $request, $pathArgs);
 
         if ($result !== null) {
-            $result->setMeta('resource', $resource);
+            $result->setMeta("resource", $resource);
         }
 
         return $result;
@@ -138,12 +140,13 @@ class ResourceRoute extends Route {
      * @param bool $ext Whether or not to look for a file extension.
      * @return string Returns the filtered name.
      */
-    private function filterName($name, bool $ext = false) {
-        $result = implode('', array_map('ucfirst', explode('-', $name)));
+    private function filterName($name, bool $ext = false)
+    {
+        $result = implode("", array_map("ucfirst", explode("-", $name)));
 
         // Get the extension too.
-        if ($ext && $pos = strrpos($result, '.')) {
-            $result[$pos] = '_';
+        if ($ext && ($pos = strrpos($result, "."))) {
+            $result[$pos] = "_";
         }
         return $result;
     }
@@ -154,11 +157,12 @@ class ResourceRoute extends Route {
      * @param string $class The name of the class to instantiate.
      * @return object Returns an instance of the class.
      */
-    private function createInstance($class) {
+    private function createInstance($class)
+    {
         if ($this->container !== null) {
             return $this->container->get($class);
         } else {
-            return new $class;
+            return new $class();
         }
     }
 
@@ -170,9 +174,10 @@ class ResourceRoute extends Route {
      * @param array $pathArgs The current path arguments from the request.
      * @return Action|null Returns method call information or **null** if there is no method.
      */
-    private function findAction($controller, RequestInterface $request, array $pathArgs) {
+    private function findAction($controller, RequestInterface $request, array $pathArgs)
+    {
         $methodNames = $this->getControllerMethodNames($request->getMethod(), $pathArgs);
-        foreach ($methodNames as list($methodName, $omit)) {
+        foreach ($methodNames as [$methodName, $omit]) {
             if ($callback = $this->findMethod($controller, $methodName)) {
                 $args = $pathArgs;
                 if ($omit !== null) {
@@ -188,8 +193,8 @@ class ResourceRoute extends Route {
 
                 if ($callbackArgs !== null) {
                     $result = new Action($callback, $callbackArgs);
-                    $result->setMeta('method', $request->getMethod());
-                    $result->setMeta('action', $result->getCallback()[1]);
+                    $result->setMeta("method", $request->getMethod());
+                    $result->setMeta("action", $result->getCallback()[1]);
                     return $result;
                 }
             }
@@ -208,13 +213,14 @@ class ResourceRoute extends Route {
      * @param bool $notice Whether to trigger a notice when the check doesn't work.
      * @return bool Returns **true** if the name is correct or **false** otherwise.
      */
-    private function checkMethodCase($method, $compare, $obj, $notice = false) {
-        $methodSx = trim(strrchr($method, '_'), '_');
-        $trySx = trim(strrchr($compare, '_'), '_');
+    private function checkMethodCase($method, $compare, $obj, $notice = false)
+    {
+        $methodSx = trim(strrchr($method, "_"), "_");
+        $trySx = trim(strrchr($compare, "_"), "_");
 
         if ($methodSx !== $trySx) {
             if ($notice) {
-                $expected = get_class($obj).'::'.substr($method, 0, -strlen($methodSx)).$trySx.'()';
+                $expected = get_class($obj) . "::" . substr($method, 0, -strlen($methodSx)) . $trySx . "()";
                 trigger_error("Method name has incorrect case. Expecting $expected.");
             }
             return false;
@@ -229,11 +235,12 @@ class ResourceRoute extends Route {
      * @param string $methodName The name of the method.
      * @return callable|null Returns the method callback or null if it doesn't.
      */
-    private function findMethod($controller, $methodName) {
+    private function findMethod($controller, $methodName)
+    {
         $regex = '`^(get|index|post|patch|put|options|delete)(_|$)`i';
 
         // Getters and setters aren't found.
-        if (!(preg_match($regex, $methodName) || strcasecmp($methodName, 'index') === 0)) {
+        if (!(preg_match($regex, $methodName) || strcasecmp($methodName, "index") === 0)) {
             return null;
         }
 
@@ -258,8 +265,13 @@ class ResourceRoute extends Route {
      * @return array|mixed|null
      * @internal param int|null $namePos The position of the name in the path.
      */
-    private function matchArgs(\ReflectionFunctionAbstract $method, RequestInterface $request, array $pathArgs, $sender = null) {
-        list($defaults, $params, $mapped, $pathParam) = $this->splitMappedParameters($method);
+    private function matchArgs(
+        \ReflectionFunctionAbstract $method,
+        RequestInterface $request,
+        array $pathArgs,
+        $sender = null
+    ) {
+        [$defaults, $params, $mapped, $pathParam] = $this->splitMappedParameters($method);
 
         $args = []; // reflected $pathArgs without mappings.
         $i = 0;
@@ -303,7 +315,7 @@ class ResourceRoute extends Route {
 
                     $defaults[$name] = $args[$name] = $extraPathArgs;
                     $pathCapture = true;
-                } elseif ($this->testConstraint($param, $value, ['position' => $pos])) {
+                } elseif ($this->testConstraint($param, $value, ["position" => $pos])) {
                     $defaults[$name] = $args[$name] = $value;
                     $pathCapture = false;
                 } elseif ($pathCapture === true && $param->isDefaultValueAvailable()) {
@@ -325,7 +337,8 @@ class ResourceRoute extends Route {
 
         // Fix the path.
         if ($pathParam !== null && !$pathParam->isArray()) {
-            $args[$pathParam->getName()] = $defaults[$pathParam->getName()] = '/'.implode('/', $defaults[$pathParam->getName()]);
+            $args[$pathParam->getName()] = $defaults[$pathParam->getName()] =
+                "/" . implode("/", $defaults[$pathParam->getName()]);
         }
 
         // Fill in all of the mappings now that everything has been reflected.
@@ -353,7 +366,8 @@ class ResourceRoute extends Route {
      * @param \ReflectionFunctionAbstract $method The method to split.
      * @return array Returns an array in the form `[$defaults[], $mapped[], $params[], $path]`.
      */
-    private function splitMappedParameters(\ReflectionFunctionAbstract $method) {
+    private function splitMappedParameters(\ReflectionFunctionAbstract $method)
+    {
         $defaults = [];
         $mapped = [];
         $params = [];
@@ -386,7 +400,8 @@ class ResourceRoute extends Route {
      * @param callable $callback The callback to reflect.
      * @return \ReflectionFunctionAbstract Returns the appropriate reflection object for the type of callback passed.
      */
-    private function reflectCallback(callable $callback) {
+    private function reflectCallback(callable $callback)
+    {
         if (is_array($callback)) {
             return new \ReflectionMethod(...$callback);
         } else {
@@ -401,7 +416,8 @@ class ResourceRoute extends Route {
      * @param array $pathArgs The current path of the request, minus the controller part.
      * @return array Returns an array of method names and an optional omission index.
      */
-    private function getControllerMethodNames($method, $pathArgs) {
+    private function getControllerMethodNames($method, $pathArgs)
+    {
         $method = strtolower($method);
         $result = [];
 
@@ -409,7 +425,7 @@ class ResourceRoute extends Route {
             $name = lcfirst($this->filterName($pathArgs[0], count($pathArgs) === 1));
             $result[] = ["{$method}_{$name}", 0];
 
-            if ($method === 'get') {
+            if ($method === "get") {
                 $result[] = ["index_{$name}", 0];
             }
         }
@@ -417,25 +433,25 @@ class ResourceRoute extends Route {
             $name = lcfirst($this->filterName($pathArgs[1], count($pathArgs) === 2));
             $result[] = ["{$method}_{$name}", 1];
 
-            if ($method === 'get') {
+            if ($method === "get") {
                 $result[] = ["index_{$name}", 1];
             }
         }
 
         $result[] = [$method, null];
 
-        if ($method === 'get') {
-            $result[] = ['index', null];
+        if ($method === "get") {
+            $result[] = ["index", null];
         } elseif ($method === "patch" && empty($pathArgs)) {
             /**
              * Kludge to allow patch requests to a resource's index. Necessary because current dispatching cannot
              * differentiate between an index or resource-specific reqeust by the method name, only its parameters.
              */
-            $result[] = ['patch_index', null];
-        } elseif ($method === 'post' && !empty($pathArgs)) {
+            $result[] = ["patch_index", null];
+        } elseif ($method === "post" && !empty($pathArgs)) {
             // This is a bit of a kludge to allow POST to be used against the usual PATCH method to allow for
             // multipart/form-data on PATCH (edit) endpoints.
-            $result[] = ['patch', null];
+            $result[] = ["patch", null];
         }
 
         return $result;
@@ -446,7 +462,8 @@ class ResourceRoute extends Route {
      *
      * @return ClassLocator Returns the classLocator.
      */
-    public function getClassLocator() {
+    public function getClassLocator()
+    {
         return $this->classLocator;
     }
 
@@ -456,7 +473,8 @@ class ResourceRoute extends Route {
      * @param ClassLocator $classLocator The new class locator.
      * @return $this
      */
-    public function setClassLocator(ClassLocator $classLocator) {
+    public function setClassLocator(ClassLocator $classLocator)
+    {
         $this->classLocator = $classLocator;
         return $this;
     }
@@ -466,7 +484,8 @@ class ResourceRoute extends Route {
      *
      * @return string Returns the basePath.
      */
-    public function getBasePath() {
+    public function getBasePath()
+    {
         return $this->basePath;
     }
 
@@ -476,8 +495,9 @@ class ResourceRoute extends Route {
      * @param string $basePath The new base path.
      * @return $this
      */
-    public function setBasePath($basePath) {
-        $this->basePath = '/'.ltrim($basePath, '/');
+    public function setBasePath($basePath)
+    {
+        $this->basePath = "/" . ltrim($basePath, "/");
         return $this;
     }
 
@@ -486,7 +506,8 @@ class ResourceRoute extends Route {
      *
      * @return string Returns the controllerPattern.
      */
-    public function getControllerPattern() {
+    public function getControllerPattern()
+    {
         return $this->controllerPattern;
     }
 
@@ -498,7 +519,8 @@ class ResourceRoute extends Route {
      * @param string $controllerPattern The new controller pattern.
      * @return $this
      */
-    public function setControllerPattern($controllerPattern) {
+    public function setControllerPattern($controllerPattern)
+    {
         $this->controllerPattern = $controllerPattern;
         return $this;
     }
@@ -510,7 +532,8 @@ class ResourceRoute extends Route {
      *
      * @return string
      */
-    public function getRootController(): string {
+    public function getRootController(): string
+    {
         return $this->rootController;
     }
 
@@ -519,7 +542,8 @@ class ResourceRoute extends Route {
      *
      * @param string $class
      */
-    public function setRootController(string $class) {
+    public function setRootController(string $class)
+    {
         $this->rootController = $class;
         return $this;
     }

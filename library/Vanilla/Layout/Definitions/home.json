@@ -3,60 +3,80 @@
     "dateInserted": "2022-01-01T00:00:00Z",
     "layoutViewType": "home",
     "layoutID": "home",
-    "name": "Playground Home Default",
+    "name": "Default Homepage Layout",
     "layout": [
         {
+            "$hydrate": "react.section.full-width",
+            "children": [
+                {
+                    "$hydrate": "react.app-banner",
+                    "showTitle": true,
+                    "showDescription": true,
+                    "showSearch": true
+                }
+            ]
+        },
+        {
             "$hydrate": "react.section.1-column",
-            "contents": [
+            "children": [
                 {
                     "$hydrate": "react.categories",
-                    "title": "Categories",
-                    "apiParams": {}
+                    "apiParams": {
+                        "limit": 9,
+                        "featured": true
+                    },
+                    "itemOptions": {
+                        "display": {
+                            "name": true,
+                            "description": true,
+                            "counts": true
+                        }
+                    },
+                    "title": "Featured Categories",
+                    "containerOptions": {
+                        "displayType": "carousel"
+                    }
                 }
             ]
         },
         {
             "$hydrate": "react.section.2-columns",
-            "mainTop": [
-                {
-                    "$hydrate": "react.html",
-                    "html": "<h1 style='margin-top: 0'>Hello Layout Editor</h1>"
-                }
-            ],
             "mainBottom": [
                 {
                     "$hydrate": "react.discussion.discussions",
-                    "title": "Recent discussion",
                     "apiParams": {
-                        "sort": "-dateLastComment"
-                    }
+                        "includeChildCategories": true,
+                        "sort": "-dateLastComment",
+                        "slotType": "a",
+                        "limit": 10
+                    },
+                    "containerOptions": {
+                        "viewAll": {
+                            "to": "/discussions"
+                        }
+                    },
+                    "title": "Recent Discussions"
                 }
             ],
-            "rightBottom": [
+            "secondaryBottom": [
                 {
-                    "$hydrate": "react.leaderboard",
-                    "title": "Community Leaders",
-                    "apiParams": {
-                        "slotType": "a"
-                    }
+                    "$hydrate": "react.newpost",
+                    "asOwnButtons": [],
+                    "excludedButtons": []
                 },
                 {
                     "$hydrate": "react.quick-links",
-                    "title": "Quick Links",
-                    "links": [
-                        {
-                            "name": "Link 1",
-                            "url": "/link1"
-                        },
-                        {
-                            "name": "Link 2",
-                            "url": "/link2"
-                        },
-                        {
-                            "name": "Link 3",
-                            "url": "/link3"
-                        }
-                    ]
+                    "title": "Quick Links"
+                },
+                {
+                    "$hydrate": "react.userspotlight",
+                    "userTextAlignment": "left",
+                    "apiParams": {
+                        "userID": -1
+                    },
+                    "title": "Customer Spotlight",
+                    "subtitle": "",
+                    "description": "“Use this space to add a Customer Spotlight by telling the customer's story using their unique language, share what problems they experienced, and how they conquered it by using your product(s).”"
                 }
             ]
         }

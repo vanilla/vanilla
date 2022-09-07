@@ -11,7 +11,7 @@ import React, { useContext } from "react";
  */
 export function createProvider<
     ContextValueType extends object,
-    ProviderPropTypes extends { children: React.ReactNode }
+    ProviderPropTypes extends { children: React.ReactNode },
 >(
     defaultValue: ContextValueType,
     valueCalculator: (props: ProviderPropTypes) => ContextValueType,

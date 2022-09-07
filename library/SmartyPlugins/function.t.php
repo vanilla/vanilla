@@ -15,8 +15,9 @@
  * @param Smarty $smarty The smarty object rendering the template.
  * @return string The text.
  */
-function smarty_function_t($params, &$smarty) {
-    $code = val('c', $params, '');
-    $result = t($code, val('d', $params, $code));
+function smarty_function_t($params, &$smarty)
+{
+    $code = val("c", $params, "");
+    $result = t($code, val("d", $params, $code));
     return $result;
 }

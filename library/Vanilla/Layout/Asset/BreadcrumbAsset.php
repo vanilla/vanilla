@@ -17,8 +17,8 @@ use Vanilla\Web\BreadcrumbJsonLD;
 /**
  * Asset representing breadcrumbs for the page.
  */
-class BreadcrumbAsset extends AbstractLayoutAsset {
-
+class BreadcrumbAsset extends AbstractLayoutAsset
+{
     /** @var BreadcrumbModel */
     private $breadcrumbModel;
 
@@ -27,7 +27,8 @@ class BreadcrumbAsset extends AbstractLayoutAsset {
      *
      * @param BreadcrumbModel $breadcrumbModel
      */
-    public function __construct(BreadcrumbModel $breadcrumbModel) {
+    public function __construct(BreadcrumbModel $breadcrumbModel)
+    {
         $this->breadcrumbModel = $breadcrumbModel;
     }
 
@@ -38,28 +39,32 @@ class BreadcrumbAsset extends AbstractLayoutAsset {
     /**
      * @inheritdoc
      */
-    public static function getComponentName(): string {
+    public static function getComponentName(): string
+    {
         return "Breadcrumbs";
     }
 
     /**
      * @inheritdoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Breadcrumbs";
     }
 
     /**
      * @inheritdoc
      */
-    public static function getWidgetID(): string {
+    public static function getWidgetID(): string
+    {
         return "asset.breadcrumbs";
     }
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
+    public static function getWidgetIconPath(): string
+    {
         return "/applications/dashboard/design/images/widgetIcons/breadcrumbs.svg";
     }
 
@@ -72,9 +77,10 @@ class BreadcrumbAsset extends AbstractLayoutAsset {
     /**
      * @inheritdoc
      */
-    public function getProps(): ?array {
-        $recordType = $this->props['recordType'] ?? null;
-        $recordID = $this->props['recordID'] ?? null;
+    public function getProps(): ?array
+    {
+        $recordType = $this->props["recordType"] ?? null;
+        $recordID = $this->props["recordID"] ?? null;
         if ($recordType === null || $recordID === null) {
             return null;
         }
@@ -82,7 +88,7 @@ class BreadcrumbAsset extends AbstractLayoutAsset {
         $record = new GenericRecord($recordType, $recordID);
         $crumbs = $this->breadcrumbModel->getForRecord($record);
 
-        $includeHomeCrumb = $this->props['includeHomeCrumb'];
+        $includeHomeCrumb = $this->props["includeHomeCrumb"];
         if (!$includeHomeCrumb) {
             array_shift($crumbs);
         }
@@ -90,20 +96,21 @@ class BreadcrumbAsset extends AbstractLayoutAsset {
             $this->pageHead->setSeoBreadcrumbs($crumbs);
         }
         return [
-            'crumbs' => $crumbs
+            "crumbs" => $crumbs,
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         return Schema::parse([
-            'recordType:s?' => 'The record type of the record to build breadcrumbs for.',
-            'recordID:i?' => 'The record type of the record to build breadcrumbs for.',
-            'includeHomeCrumb:b?' => [
-                'description' => 'Set this false to `true` to include a home breadcrumb.',
-                'default' => true,
+            "recordType:s?" => "The record type of the record to build breadcrumbs for.",
+            "recordID:i?" => "The record type of the record to build breadcrumbs for.",
+            "includeHomeCrumb:b?" => [
+                "description" => "Set this false to `true` to include a home breadcrumb.",
+                "default" => true,
             ],
         ]);
     }

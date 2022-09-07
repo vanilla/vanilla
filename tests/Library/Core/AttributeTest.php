@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for attribute().
  */
 
-class AttributeTest extends TestCase {
-
+class AttributeTest extends TestCase
+{
     /**
      * Tests {@link attribute()} against several scenarios.
      *
@@ -23,7 +23,8 @@ class AttributeTest extends TestCase {
      * @param string $expected The expected result.
      * @dataProvider provideTestAttributeArrays
      */
-    public function testAttribute($testName, $testValueOrExclude, $expected) {
+    public function testAttribute($testName, $testValueOrExclude, $expected)
+    {
         $actual = attribute($testName, $testValueOrExclude);
         $this->assertSame($expected, $actual);
     }
@@ -33,23 +34,16 @@ class AttributeTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestAttributeArrays() {
+    public function provideTestAttributeArrays()
+    {
         $r = [
-            'testNameIsString' => [
-              "width",
-              '500',
-              ' width="500"',
-            ],
-            'emptyValue' => [
-                "width",
-                false,
-                '',
-            ],
-            'valueIsArray' => [
-                ['data-something' => ['x' => '1', 'y' => '2']],
+            "testNameIsString" => ["width", "500", ' width="500"'],
+            "emptyValue" => ["width", false, ""],
+            "valueIsArray" => [
+                ["data-something" => ["x" => "1", "y" => "2"]],
                 [],
-                ' data-something="{&quot;x&quot;:&quot;1&quot;,&quot;y&quot;:&quot;2&quot;}"'
-            ]
+                ' data-something="{&quot;x&quot;:&quot;1&quot;,&quot;y&quot;:&quot;2&quot;}"',
+            ],
         ];
 
         return $r;

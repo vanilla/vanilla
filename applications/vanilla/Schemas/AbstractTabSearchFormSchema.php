@@ -13,8 +13,8 @@ namespace Vanilla\Community\Schemas;
  *
  * @package Vanilla\Community\Schemas
  */
-abstract class AbstractTabSearchFormSchema {
-
+abstract class AbstractTabSearchFormSchema
+{
     /**
      * Get the schema.
      *
@@ -41,7 +41,8 @@ abstract class AbstractTabSearchFormSchema {
      *
      * @return bool
      */
-    public function isDefault(): bool {
+    public function isDefault(): bool
+    {
         return true;
     }
 

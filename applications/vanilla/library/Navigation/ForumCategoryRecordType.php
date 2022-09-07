@@ -11,8 +11,8 @@ use Vanilla\Contracts\RecordInterface;
 /**
  * An instance of a knowledge category.
  */
-class ForumCategoryRecordType implements RecordInterface {
-
+class ForumCategoryRecordType implements RecordInterface
+{
     const TYPE = "category";
 
     /** @var int */
@@ -23,21 +23,24 @@ class ForumCategoryRecordType implements RecordInterface {
      *
      * @param int $categoryID
      */
-    public function __construct(int $categoryID) {
+    public function __construct(int $categoryID)
+    {
         $this->categoryID = $categoryID;
     }
 
     /**
      * @inheritDoc
      */
-    public function getRecordID(): int {
+    public function getRecordID(): int
+    {
         return $this->categoryID;
     }
 
     /**
      * @inheritDoc
      */
-    public function getRecordType(): string {
+    public function getRecordType(): string
+    {
         return self::TYPE;
     }
 }

@@ -9,7 +9,8 @@ namespace Vanilla\Menu;
 /**
  * Counter provider interface
  */
-interface CounterProviderInterface {
+interface CounterProviderInterface
+{
     /**
      * Get menu counters.
      *

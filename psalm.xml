@@ -18,7 +18,6 @@
         <directory name="plugins/CivilTongueEx" />
         <directory name="plugins/Facebook" />
         <directory name="plugins/Flagging" />
-        <directory name="plugins/GettingStarted" />
         <directory name="plugins/GooglePlus" />
         <directory name="plugins/GooglePrettify" />
         <directory name="plugins/Gravatar" />

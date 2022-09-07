@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Job;
 /**
  * JobExecutionType
  */
-class JobExecutionType {
-
+class JobExecutionType
+{
     /**
      * @var string
      */
@@ -22,14 +22,16 @@ class JobExecutionType {
      *
      * @param string $type
      */
-    protected function __construct(string $type) {
+    protected function __construct(string $type)
+    {
         $this->myType = $type;
     }
 
     /**
      * @return string
      */
-    public function getValue(): string {
+    public function getValue(): string
+    {
         return $this->myType;
     }
 
@@ -39,22 +41,25 @@ class JobExecutionType {
      * @param JobExecutionType $jet
      * @return bool
      */
-    public function is(JobExecutionType $jet): bool {
+    public function is(JobExecutionType $jet): bool
+    {
         return $this->myType == $jet->getValue();
     }
 
     /**
      * @return JobExecutionType
      */
-    public static function normal() {
-        return new JobExecutionType('normal');
+    public static function normal()
+    {
+        return new JobExecutionType("normal");
     }
 
     /**
      * @return JobExecutionType
      */
-    public static function cron() {
-        return new JobExecutionType('cron');
+    public static function cron()
+    {
+        return new JobExecutionType("cron");
     }
 
     /**
@@ -63,7 +68,8 @@ class JobExecutionType {
      * @param string $type
      * @return JobExecutionType
      */
-    public static function looseType(string $type) {
+    public static function looseType(string $type)
+    {
         return new JobExecutionType($type);
     }
 }

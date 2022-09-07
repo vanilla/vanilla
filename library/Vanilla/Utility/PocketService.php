@@ -14,8 +14,8 @@ use Garden\Schema\Schema;
  *
  * @package Vanilla\Utility
  */
-class PocketService {
-
+class PocketService
+{
     /** @var Schema $schema */
     private $schema;
 
@@ -27,7 +27,8 @@ class PocketService {
      *
      * @param Schema $schema
      */
-    public function extendSchema(Schema $schema) {
+    public function extendSchema(Schema $schema)
+    {
         if ($this->schema === null) {
             $this->schema = $schema;
         } else {
@@ -40,7 +41,8 @@ class PocketService {
      *
      * @param string $page
      */
-    public function addPage(string $page) {
+    public function addPage(string $page)
+    {
         $this->pages[] = $page;
     }
 
@@ -49,7 +51,8 @@ class PocketService {
      *
      * @return array
      */
-    public function getPages(): array {
+    public function getPages(): array
+    {
         return $this->pages;
     }
 
@@ -58,7 +61,8 @@ class PocketService {
      *
      * @return Schema|null
      */
-    public function getSchema(): ?Schema {
+    public function getSchema(): ?Schema
+    {
         return $this->schema;
     }
 }

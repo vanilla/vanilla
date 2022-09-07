@@ -13,6 +13,7 @@ import {
 } from "@library/features/discussions/discussionHooks";
 import VoteCounter, { IProps as VoteCounterProps } from "@library/voteCounter/VoteCounter";
 import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
+import { useToast } from "@library/features/toaster/ToastContext";
 
 interface IProps {
     discussion: IDiscussion;
@@ -25,6 +26,7 @@ const DiscussionVoteCounter: FunctionComponent<IProps> = ({
 }) => {
     const reactToDiscussion = useReactToDiscussion(discussionID);
     const removeDiscussionReaction = useRemoveDiscussionReaction(discussionID);
+    const toast = useToast();
 
     const currentReaction = useCurrentDiscussionReaction(discussionID);
 
@@ -38,9 +40,13 @@ const DiscussionVoteCounter: FunctionComponent<IProps> = ({
         handleToggleUpvoted = async function () {
             const callback = hasUpvoted ? removeDiscussionReaction : async () => reactToDiscussion(upvoteReaction);
             try {
-                callback();
+                hasUpvoted ? callback() : await callback();
             } catch (error) {
-                // absorb error
+                toast.addToast({
+                    autoDismiss: false,
+                    dismissible: true,
+                    body: <>{error.description}</>,
+                });
             }
         };
     }
@@ -51,9 +57,13 @@ const DiscussionVoteCounter: FunctionComponent<IProps> = ({
         handleToggleDownvoted = async function () {
             const callback = hasDownvoted ? removeDiscussionReaction : async () => reactToDiscussion(downvoteReaction);
             try {
-                callback();
+                hasDownvoted ? callback() : await callback();
             } catch (error) {
-                //absorb error
+                toast.addToast({
+                    autoDismiss: false,
+                    dismissible: true,
+                    body: <>{error.description}</>,
+                });
             }
         };
     }

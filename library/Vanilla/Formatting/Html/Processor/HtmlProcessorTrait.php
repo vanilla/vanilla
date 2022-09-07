@@ -13,8 +13,8 @@ use Vanilla\Formatting\Html\HtmlDocument;
 /**
  * Trait containing values for a
  */
-trait HtmlProcessorTrait {
-
+trait HtmlProcessorTrait
+{
     /**
      * Get Attribute from dom node
      *
@@ -23,7 +23,8 @@ trait HtmlProcessorTrait {
      *
      * @return array
      */
-    public function getAttrData(string $attr, \DOMElement $domNode) {
+    public function getAttrData(string $attr, \DOMElement $domNode)
+    {
         // Empty array to hold all classes to return
         //Loop through each tag in the dom and add it's attribute data to the array
         $attrData = [];
@@ -42,7 +43,8 @@ trait HtmlProcessorTrait {
      * @param \DOMElement $element
      * @return string
      */
-    public function getOuterHtml(\DOMElement $element): string {
+    public function getOuterHtml(\DOMElement $element): string
+    {
         return $this->getDom()->saveHTML($element);
     }
 
@@ -52,8 +54,9 @@ trait HtmlProcessorTrait {
      * @param \DOMElement $domElement the dom element
      * @return array array
      */
-    public function getClasses($domElement) {
-        return self::getAttrData('class', $domElement);
+    public function getClasses($domElement)
+    {
+        return self::getAttrData("class", $domElement);
     }
 
     /**
@@ -63,7 +66,8 @@ trait HtmlProcessorTrait {
      * @param string $target
      * @return bool
      */
-    public function hasClass($classes, $target) {
+    public function hasClass($classes, $target)
+    {
         foreach ($classes as $c) {
             if ($c === $target) {
                 return true;
@@ -79,7 +83,8 @@ trait HtmlProcessorTrait {
      * @param string $key
      * @param string $value
      */
-    public function setAttribute(\DOMElement $domNode, $key, $value) {
+    public function setAttribute(\DOMElement $domNode, $key, $value)
+    {
         $domNode->setAttribute($key, $value);
     }
 
@@ -89,7 +94,8 @@ trait HtmlProcessorTrait {
      * @param \DOMElement $domNode
      * @param string $class
      */
-    public function appendClass(\DOMElement &$domNode, $class) {
+    public function appendClass(\DOMElement &$domNode, $class)
+    {
         if (empty($domNode->getAttribute("class"))) {
             $domNode->setAttribute("class", $class);
         } else {
@@ -105,7 +111,8 @@ trait HtmlProcessorTrait {
      *
      * @return \DOMNodeList
      */
-    public function queryXPath(string $xpathQuery): \DOMNodeList {
+    public function queryXPath(string $xpathQuery): \DOMNodeList
+    {
         $xpath = new \DOMXPath($this->getDom());
         return $xpath->query($xpathQuery) ?: new \DOMNodeList();
     }
@@ -118,7 +125,8 @@ trait HtmlProcessorTrait {
      *
      * @return \DOMNodeList
      */
-    public function queryCssSelector(string $cssQuery): \DOMNodeList {
+    public function queryCssSelector(string $cssQuery): \DOMNodeList
+    {
         $converter = new CssSelectorConverter();
         $xpath = $converter->toXPath($cssQuery);
         return $this->queryXPath($xpath);

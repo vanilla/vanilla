@@ -14,10 +14,10 @@
  * @since 2.0.18
  * @package Dashboard
  */
-class BanModel extends Gdn_Model {
-
-    const ACTION_BAN = 'ban';
-    const ACTION_UNBAN = 'unban';
+class BanModel extends Gdn_Model
+{
+    const ACTION_BAN = "ban";
+    const ACTION_UNBAN = "unban";
 
     const CACHE_KEY = "allBans";
     const CACHE_TTL = 60 * 30; // 30 minutes.
@@ -43,9 +43,10 @@ class BanModel extends Gdn_Model {
     /**
      * Defines the related database table name.
      */
-    public function __construct() {
-        parent::__construct('Ban');
-        $this->fireEvent('Init');
+    public function __construct()
+    {
+        parent::__construct("Ban");
+        $this->fireEvent("Init");
     }
 
     /**
@@ -53,7 +54,8 @@ class BanModel extends Gdn_Model {
      *
      * @return BanModel Returns the singleton instance of this class.
      */
-    public static function instance() {
+    public static function instance()
+    {
         if (!isset(self::$instance)) {
             self::$instance = new BanModel();
         }
@@ -66,13 +68,16 @@ class BanModel extends Gdn_Model {
      * @since 2.0.18
      * @access public
      */
-    public static function &allBans() {
+    public static function &allBans()
+    {
         if (!self::$_AllBans) {
             $cache = \Gdn::cache();
             $bans = $cache->get(self::CACHE_KEY);
             if ($bans === \Gdn_Cache::CACHEOP_FAILURE) {
-                $bans = Gdn::sql()->get('Ban')->resultArray();
-                $bans = array_column($bans, null, 'BanID');
+                $bans = Gdn::sql()
+                    ->get("Ban")
+                    ->resultArray();
+                $bans = array_column($bans, null, "BanID");
                 $cache->store(self::CACHE_KEY, $bans, [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_KEY]);
             }
             self::$_AllBans = $bans;
@@ -83,17 +88,18 @@ class BanModel extends Gdn_Model {
     /**
      * Clean the ban cache.
      */
-    public static function clearCache() {
+    public static function clearCache()
+    {
         \Gdn::cache()->remove(self::CACHE_KEY);
     }
 
     /**
      * Clear the cache on updates.
      */
-    protected function onUpdate() {
+    protected function onUpdate()
+    {
         self::clearCache();
     }
-
 
     /**
      * Convert bans to new type.
@@ -104,7 +110,8 @@ class BanModel extends Gdn_Model {
      * @param array $newBan Data about the new ban.
      * @param array $oldBan Data about the old ban.
      */
-    public function applyBan($newBan = null, $oldBan = null) {
+    public function applyBan($newBan = null, $oldBan = null)
+    {
         if (!$newBan && !$oldBan) {
             return;
         }
@@ -117,29 +124,27 @@ class BanModel extends Gdn_Model {
 
         if ($newBan) {
             // Get a list of users affected by the new ban.
-            if (isset($newBan['BanID'])) {
-                $allBans[$newBan['BanID']] = $newBan;
+            if (isset($newBan["BanID"])) {
+                $allBans[$newBan["BanID"]] = $newBan;
             }
 
             // Protect against a lack of inet6_ntoa, which wasn't introduced until MySQL 5.6.3.
             try {
                 $newUsers = $this->SQL
-                    ->select('u.UserID, u.Banned')
-                    ->from('User u')
+                    ->select("u.UserID, u.Banned")
+                    ->from("User u")
                     ->where($this->banWhere($newBan), null, false)
-                    ->where('Admin', 0)// No banning superadmins, pls.
-                    ->get()->resultArray();
+                    ->where("Admin", 0) // No banning superadmins, pls.
+                    ->get()
+                    ->resultArray();
             } catch (Exception $e) {
-                Logger::log(
-                    Logger::ERROR,
-                    $e->getMessage()
-                );
+                Logger::log(Logger::ERROR, $e->getMessage());
                 $newUsers = [];
             }
 
-            $newUserIDs = array_column($newUsers, 'UserID');
-        } elseif (isset($oldBan['BanID'])) {
-            unset($allBans[$oldBan['BanID']]);
+            $newUserIDs = array_column($newUsers, "UserID");
+        } elseif (isset($oldBan["BanID"])) {
+            unset($allBans[$oldBan["BanID"]]);
         }
 
         if ($oldBan) {
@@ -147,22 +152,20 @@ class BanModel extends Gdn_Model {
             // Protect against a lack of inet6_ntoa, which wasn't introduced until MySQL 5.6.3.
             try {
                 $oldUsers = $this->SQL
-                    ->select('u.UserID, u.LastIPAddress, u.Name, u.Email, u.Banned')
-                    ->from('User u')
+                    ->select("u.UserID, u.LastIPAddress, u.Name, u.Email, u.Banned")
+                    ->from("User u")
                     ->where($this->banWhere($oldBan))
-                    ->get()->resultArray();
+                    ->get()
+                    ->resultArray();
             } catch (Exception $e) {
-                Logger::log(
-                    Logger::ERROR,
-                    $e->getMessage()
-                );
+                Logger::log(Logger::ERROR, $e->getMessage());
                 $oldUsers = [];
             }
         }
 
         // Check users that need to be unbanned.
         foreach ($oldUsers as $user) {
-            if (in_array($user['UserID'], $newUserIDs)) {
+            if (in_array($user["UserID"], $newUserIDs)) {
                 continue;
             }
             // TODO check the user against the other bans.
@@ -171,7 +174,7 @@ class BanModel extends Gdn_Model {
 
         // Check users that need to be banned.
         foreach ($newUsers as $user) {
-            if (self::isBanned($user['Banned'], BanModel::BAN_AUTOMATIC)) {
+            if (self::isBanned($user["Banned"], BanModel::BAN_AUTOMATIC)) {
                 continue;
             }
             $this->saveUser($user, true, $newBan);
@@ -188,22 +191,23 @@ class BanModel extends Gdn_Model {
      *    Valid values for BanType are email, ipaddress or name.
      * @return array
      */
-    public function banWhere($ban) {
-        $result = ['u.Admin' => 0, 'u.Deleted' => 0];
-        $ban['BanValue'] = str_replace('*', '%', $ban['BanValue']);
+    public function banWhere($ban)
+    {
+        $result = ["u.Admin" => 0, "u.Deleted" => 0];
+        $ban["BanValue"] = str_replace("*", "%", $ban["BanValue"]);
 
-        switch (strtolower($ban['BanType'])) {
-            case 'email':
-                $result['u.Email like'] = $ban['BanValue'];
+        switch (strtolower($ban["BanType"])) {
+            case "email":
+                $result["u.Email like"] = $ban["BanValue"];
                 break;
-            case 'ipaddress':
-                $result['inet6_ntoa(u.LastIPAddress) like'] = $ban['BanValue'];
+            case "ipaddress":
+                $result["inet6_ntoa(u.LastIPAddress) like"] = $ban["BanValue"];
                 break;
-            case 'name':
-                $result['u.Name like'] = $ban['BanValue'];
+            case "name":
+                $result["u.Name like"] = $ban["BanValue"];
                 break;
             default:
-                $result = $this->getEventManager()->fireFilter('banModel_banWhere', $result, $ban);
+                $result = $this->getEventManager()->fireFilter("banModel_banWhere", $result, $ban);
                 break;
         }
         return $result;
@@ -215,11 +219,12 @@ class BanModel extends Gdn_Model {
      * @since 2.0.18
      * @access public
      */
-    public function _BeforeGet() {
+    public function _BeforeGet()
+    {
         $this->SQL
-            ->select('Ban.*')
-            ->select('iu.Name', '', 'InsertName')
-            ->join('User iu', 'Ban.InsertUserID = iu.UserID', 'left');
+            ->select("Ban.*")
+            ->select("iu.Name", "", "InsertName")
+            ->join("User iu", "Ban.InsertUserID = iu.UserID", "left");
 
         parent::_BeforeGet();
     }
@@ -235,7 +240,8 @@ class BanModel extends Gdn_Model {
      * @param bool $UpdateBlocks
      * @return bool Whether user is banned.
      */
-    public static function checkUser($User, $Validation = null, $UpdateBlocks = false, &$BansFound = null) {
+    public static function checkUser($User, $Validation = null, $UpdateBlocks = false, &$BansFound = null)
+    {
         $Bans = self::allBans();
 
         $Banned = [];
@@ -246,25 +252,25 @@ class BanModel extends Gdn_Model {
 
         foreach ($Bans as $Ban) {
             // Convert ban to regex.
-            $Parts = explode('*', str_replace('%', '*', $Ban['BanValue']));
-            $Parts = array_map('preg_quote', $Parts);
-            $Regex = '`^'.implode('.*', $Parts).'$`i';
+            $Parts = explode("*", str_replace("%", "*", $Ban["BanValue"]));
+            $Parts = array_map("preg_quote", $Parts);
+            $Regex = "`^" . implode(".*", $Parts) . '$`i';
 
-            if ($Ban['BanType'] === 'IPAddress') {
-                $value = ipDecode(val('LastIPAddress', $User));
+            if ($Ban["BanType"] === "IPAddress") {
+                $value = ipDecode(val("LastIPAddress", $User));
             } else {
-                $value = val($Ban['BanType'], $User);
+                $value = val($Ban["BanType"], $User);
             }
 
             if (preg_match($Regex, $value)) {
-                $Banned[$Ban['BanType']] = true;
+                $Banned[$Ban["BanType"]] = true;
                 $BansFound[] = $Ban;
 
                 if ($UpdateBlocks) {
                     Gdn::sql()
-                        ->update('Ban')
-                        ->set('CountBlockedRegistrations', 'CountBlockedRegistrations + 1', false, false)
-                        ->where('BanID', $Ban['BanID'])
+                        ->update("Ban")
+                        ->set("CountBlockedRegistrations", "CountBlockedRegistrations + 1", false, false)
+                        ->where("BanID", $Ban["BanID"])
                         ->put();
                     self::clearCache();
                 }
@@ -274,7 +280,7 @@ class BanModel extends Gdn_Model {
         // Add the validation results.
         if ($Validation) {
             foreach ($Banned as $BanType => $Value) {
-                $Validation->addValidationResult(Gdn_Form::labelCode($BanType), 'ValidateBanned');
+                $Validation->addValidationResult(Gdn_Form::labelCode($BanType), "ValidateBanned");
             }
         }
         return count($Banned) == 0;
@@ -287,9 +293,10 @@ class BanModel extends Gdn_Model {
      * @param array|true $options An array of options to control the delete.
      * @return bool Returns **true** on success or **false** on failure.
      */
-    public function delete($where = [], $options = []) {
-        if (isset($where['BanID'])) {
-            $oldBan = $this->getID($where['BanID'], DATASET_TYPE_ARRAY);
+    public function delete($where = [], $options = [])
+    {
+        if (isset($where["BanID"])) {
+            $oldBan = $this->getID($where["BanID"], DATASET_TYPE_ARRAY);
         }
 
         $result = parent::delete($where, $options);
@@ -301,23 +308,24 @@ class BanModel extends Gdn_Model {
         return $result;
     }
 
-//   public function getBanUsers($Ban) {
-//      $this->_SetBanWhere($Ban);
-//
-//      $Result = $this->SQL
-//         ->select('u.UserID, u.Banned')
-//         ->from('User u')
-//         ->get()->resultArray();
-//
-//      return $Result;
-//   }
+    //   public function getBanUsers($Ban) {
+    //      $this->_SetBanWhere($Ban);
+    //
+    //      $Result = $this->SQL
+    //         ->select('u.UserID, u.Banned')
+    //         ->from('User u')
+    //         ->get()->resultArray();
+    //
+    //      return $Result;
+    //   }
 
     /**
      * Explode a banned bit mask into an array of ban constants.
      * @param int $banned The banned bit mask to explode.
      * @return array Returns an array of the set bits.
      */
-    public static function explodeBans($banned) {
+    public static function explodeBans($banned)
+    {
         $result = [];
 
         for ($i = 1; $i <= 8; $i++) {
@@ -330,7 +338,6 @@ class BanModel extends Gdn_Model {
         return $result;
     }
 
-
     /**
      * Check whether or not a banned value is banned for a given reason.
      *
@@ -339,9 +346,10 @@ class BanModel extends Gdn_Model {
      * This should be one of the `BanModel::BAN_*` constants.
      * @return bool Returns true if the value is banned or false otherwise.
      */
-    public static function isBanned($banned, $reason = 0) {
+    public static function isBanned($banned, $reason = 0)
+    {
         if (!$reason) {
-            return (bool)$banned;
+            return (bool) $banned;
         } else {
             return ($banned & $reason) > 0;
         }
@@ -355,7 +363,8 @@ class BanModel extends Gdn_Model {
      * @param int $reason The reason for the banning. This should be one of the `BanModel::BAN_*` constants.
      * @return int Returns the new banned value.
      */
-    public static function setBanned($banned, $value, $reason) {
+    public static function setBanned($banned, $value, $reason)
+    {
         if ($value) {
             $banned = $banned | $reason;
         } else {
@@ -370,8 +379,9 @@ class BanModel extends Gdn_Model {
      * @param array $formPostValues
      * @param array|false $settings
      */
-    public function save($formPostValues, $settings = false) {
-        $currentBanID = val('BanID', $formPostValues);
+    public function save($formPostValues, $settings = false)
+    {
+        $currentBanID = val("BanID", $formPostValues);
 
         // Get the current ban before saving.
         if ($currentBanID) {
@@ -382,11 +392,11 @@ class BanModel extends Gdn_Model {
 
         $this->setCounts($formPostValues);
         $banID = parent::save($formPostValues, $settings);
-        $formPostValues['BanID'] = $banID;
+        $formPostValues["BanID"] = $banID;
 
-        $this->EventArguments['CurrentBan'] = $currentBan;
-        $this->EventArguments['FormPostValues'] = $formPostValues;
-        $this->fireEvent('AfterSave');
+        $this->EventArguments["CurrentBan"] = $currentBan;
+        $this->EventArguments["FormPostValues"] = $formPostValues;
+        $this->fireEvent("AfterSave");
 
         $this->applyBan($formPostValues, $currentBan);
     }
@@ -401,29 +411,36 @@ class BanModel extends Gdn_Model {
      * @param bool $bannedValue Whether user is banned.
      * @param array|false $ban An array representing the specific auto-ban.
      */
-    public function saveUser($user, $bannedValue, $ban = false) {
-        $bannedValue = (bool)$bannedValue;
-        $banned = $user['Banned'];
+    public function saveUser($user, $bannedValue, $ban = false)
+    {
+        $bannedValue = (bool) $bannedValue;
+        $banned = $user["Banned"];
 
         if (static::isBanned($banned, self::BAN_AUTOMATIC) === $bannedValue) {
             return;
         }
 
         $newBanned = static::setBanned($banned, $bannedValue, self::BAN_AUTOMATIC);
-        Gdn::userModel()->save(["UserID" => $user['UserID'], 'Banned' => $newBanned]);
+        Gdn::userModel()->save(["UserID" => $user["UserID"], "Banned" => $newBanned]);
         $banningUserID = Gdn::session()->UserID;
         // This is true when a session is started and the session user has a new ip address and it matches a banning rule ip address
-        if ($user['UserID'] == $banningUserID) {
-            $banningUserID = val('InsertUserID', $ban, Gdn::userModel()->getSystemUserID());
+        if ($user["UserID"] == $banningUserID) {
+            $banningUserID = val("InsertUserID", $ban, Gdn::userModel()->getSystemUserID());
         }
 
         // Create and dispatch a UserDisciplineEvent
         $action = $bannedValue ? self::ACTION_BAN : self::ACTION_UNBAN;
-        $disciplineType = $bannedValue ?
-            \Vanilla\Dashboard\Events\UserDisciplineEvent::DISCIPLINE_TYPE_NEGATIVE :
-            \Vanilla\Dashboard\Events\UserDisciplineEvent::DISCIPLINE_TYPE_POSITIVE;
-        $source  = $ban ? "ban_rules" : null;
-        $banEvent = Gdn::userModel()->createUserDisciplineEvent($user["UserID"], $action, $disciplineType, $source, $banningUserID);
+        $disciplineType = $bannedValue
+            ? \Vanilla\Dashboard\Events\UserDisciplineEvent::DISCIPLINE_TYPE_NEGATIVE
+            : \Vanilla\Dashboard\Events\UserDisciplineEvent::DISCIPLINE_TYPE_POSITIVE;
+        $source = $ban ? "ban_rules" : null;
+        $banEvent = Gdn::userModel()->createUserDisciplineEvent(
+            $user["UserID"],
+            $action,
+            $disciplineType,
+            $source,
+            $banningUserID
+        );
         if ($ban) {
             $banEvent->setReason("{$ban["BanType"]} matches {$ban["BanValue"]}");
         }
@@ -431,31 +448,31 @@ class BanModel extends Gdn_Model {
         $eventManager->dispatch($banEvent);
 
         // Log the ban.
-        $bannedString = $bannedValue ? 'banned' : 'unbanned';
+        $bannedString = $bannedValue ? "banned" : "unbanned";
         if (is_array($ban)) {
             Logger::event(
-                \Vanilla\Events\EventAction::eventName('user', \Vanilla\Events\EventAction::BAN),
+                \Vanilla\Events\EventAction::eventName("user", \Vanilla\Events\EventAction::BAN),
                 \Psr\Log\LogLevel::INFO,
-                "{".Logger::FIELD_TARGET_USERNAME."} was auto-$bannedString by {banType}.",
+                "{" . Logger::FIELD_TARGET_USERNAME . "} was auto-$bannedString by {banType}.",
                 [
                     Logger::FIELD_CHANNEL => Logger::CHANNEL_MODERATION,
-                    Logger::FIELD_TARGET_USERID => $user['UserID'],
+                    Logger::FIELD_TARGET_USERID => $user["UserID"],
                     Logger::FIELD_USERID => $banningUserID,
-                    'banned' => $bannedValue,
-                    'banType' => strtolower($ban['BanType']),
-                    'banValue' => $ban['BanValue'],
+                    "banned" => $bannedValue,
+                    "banType" => strtolower($ban["BanType"]),
+                    "banValue" => $ban["BanValue"],
                 ]
             );
         } else {
             Logger::event(
-                \Vanilla\Events\EventAction::eventName('user', \Vanilla\Events\EventAction::BAN),
+                \Vanilla\Events\EventAction::eventName("user", \Vanilla\Events\EventAction::BAN),
                 \Psr\Log\LogLevel::INFO,
-                "{".Logger::FIELD_TARGET_USERNAME."} was auto-$bannedString.",
+                "{" . Logger::FIELD_TARGET_USERNAME . "} was auto-$bannedString.",
                 [
                     Logger::FIELD_CHANNEL => Logger::CHANNEL_MODERATION,
-                    Logger::FIELD_TARGET_USERID => $user['UserID'],
+                    Logger::FIELD_TARGET_USERID => $user["UserID"],
                     Logger::FIELD_USERID => $banningUserID,
-                    'banned' => $bannedValue,
+                    "banned" => $bannedValue,
                 ]
             );
         }
@@ -463,22 +480,23 @@ class BanModel extends Gdn_Model {
         // Add the activity.
         $activityModel = new ActivityModel();
         $activity = [
-            'ActivityType' => 'Ban',
-            'ActivityUserID' => $user['UserID'],
-            'RegardingUserID' => $banningUserID,
-            'NotifyUserID' => ActivityModel::NOTIFY_MODS
+            "ActivityType" => "Ban",
+            "ActivityUserID" => $user["UserID"],
+            "RegardingUserID" => $banningUserID,
+            "NotifyUserID" => ActivityModel::NOTIFY_MODS,
         ];
         if ($ban) {
-            $activity['HeadlineFormat'] = '{ActivityUserID,user} was '.$bannedString.' (based on {Data.BanType}: {Data.BanValue}).';
-            $activity['Data'] = arrayTranslate($ban, ['BanType', 'BanValue']);
-            $activity['Story'] = $ban['Notes'];
-            $activity['RecordType'] = 'Ban';
+            $activity["HeadlineFormat"] =
+                "{ActivityUserID,user} was " . $bannedString . " (based on {Data.BanType}: {Data.BanValue}).";
+            $activity["Data"] = arrayTranslate($ban, ["BanType", "BanValue"]);
+            $activity["Story"] = $ban["Notes"];
+            $activity["RecordType"] = "Ban";
 
-            if (isset($ban['BanID'])) {
-                $activity['BanID'] = $ban['BanID'];
+            if (isset($ban["BanID"])) {
+                $activity["BanID"] = $ban["BanID"];
             }
         } else {
-            $activity['HeadlineFormat'] = '{ActivityUserID,user} was '.$bannedString.'.';
+            $activity["HeadlineFormat"] = "{ActivityUserID,user} was " . $bannedString . ".";
         }
         $activityModel->save($activity);
     }
@@ -490,22 +508,21 @@ class BanModel extends Gdn_Model {
      * @access public
      * @param array $data
      */
-    public function setCounts(&$data) {
+    public function setCounts(&$data)
+    {
         // Protect against a lack of inet6_ntoa, which wasn't introduced until MySQL 5.6.3.
         try {
             $countUsers = $this->SQL
-                ->select('UserID', 'count', 'CountUsers')
-                ->from('User u')
+                ->select("UserID", "count", "CountUsers")
+                ->from("User u")
                 ->where($this->banWhere($data), null, false)
-                ->get()->value('CountUsers', 0);
+                ->get()
+                ->value("CountUsers", 0);
         } catch (Exception $e) {
-            Logger::log(
-                Logger::ERROR,
-                $e->getMessage()
-            );
+            Logger::log(Logger::ERROR, $e->getMessage());
             $countUsers = 0;
         }
 
-        $data['CountUsers'] = $countUsers;
+        $data["CountUsers"] = $countUsers;
     }
 }

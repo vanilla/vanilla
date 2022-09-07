@@ -3,11 +3,12 @@
  * @license GPL-2.0-only
  */
 
+import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { IUserFragment } from "@library/@types/api/users";
 
 export interface IComment {
     commentID: number;
-    discussionID: number;
+    discussionID: IDiscussion["discussionID"];
     body: string;
     dateInserted: string;
     dateUpdated: string | null;
@@ -20,7 +21,7 @@ export interface IComment {
 
 export interface ICommentEdit {
     commentID: number;
-    discussionID: number;
+    discussionID: IDiscussion["discussionID"];
     body: string;
     format: string;
 }

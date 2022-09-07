@@ -16,16 +16,17 @@ export interface ILayoutsStoreState extends ICoreStoreState {
 }
 
 export interface ILayoutsState {
-    layoutsByID: { [key in ILayoutDetails["layoutID"]]?: Loadable<ILayoutDetails> };
+    layoutsByID: Record<RecordID, Loadable<ILayoutDetails>>;
     layoutsListStatus: {
         status: LoadStatus;
         error?: any;
     };
     layoutDraft: ILayoutDraft | null;
-    layoutDraftPersistLoadable: ILoadable<ILayoutEdit>;
+
     layoutJsonsByLayoutID: Record<RecordID, Loadable<ILayoutEdit>>;
     catalogByViewType: Partial<Record<LayoutViewType, ILayoutCatalog>>;
-    catalogStatusByViewType: Partial<Record<LayoutViewType, Loadable<{}>>>;
+    catalogStatusByViewType: Partial<Record<string, Loadable<{}>>>;
+    legacyStatusesByViewType: Partial<Record<LayoutViewType, ILoadable<{}>>>;
 }
 
 export const INITIAL_LAYOUTS_STATE: ILayoutsState = {
@@ -34,16 +35,15 @@ export const INITIAL_LAYOUTS_STATE: ILayoutsState = {
         status: LoadStatus.PENDING,
     },
     layoutDraft: null,
-    layoutDraftPersistLoadable: {
-        status: LoadStatus.PENDING,
-    },
     layoutJsonsByLayoutID: {},
     catalogByViewType: {},
     catalogStatusByViewType: {},
+    legacyStatusesByViewType: {},
 };
 
-export type LayoutViewType = "home" | "discussions" | "categories";
-export const LAYOUT_VIEW_TYPES = ["home", "discussions", "categories"] as LayoutViewType[];
+export const LAYOUT_VIEW_TYPES = ["home", "discussionList", "categoryList"] as const;
+export type LayoutViewType = typeof LAYOUT_VIEW_TYPES[number];
+
 export interface ILayoutDetails {
     layoutID: RecordID;
     name: string;
@@ -82,11 +82,7 @@ export interface ILayoutView {
         url: string;
     };
 }
-export interface ILayoutViewQuery {
-    layoutID: RecordID;
-    recordID: number;
-    recordType: string;
-}
+export type LayoutViewFragment = Pick<ILayoutView, "recordID" | "recordType">;
 
 /**
  * Interface representing a raw layout widget (like what comes back from the /api/v2/layouts/:id/edit)
@@ -143,7 +139,7 @@ export type IWidgetCatalog = Record<
     {
         schema: JsonSchema;
         $reactComponent: string;
-        recommendedWidgets?: Array<{ widgetID: string; widgetName: string }>;
+        allowedWidgetIDs?: string[];
         iconUrl?: string;
         name: string;
     }
@@ -166,5 +162,5 @@ export interface ILayoutCatalog {
     /** A mapping of widgetType to widget schema for all available sections. */
     sections: IWidgetCatalog;
     /** A mapping of middlewareType to middleware schema for all available middleware. */
-    middleware: ISchemaCatalog;
+    middlewares: ISchemaCatalog;
 }

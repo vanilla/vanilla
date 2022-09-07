@@ -111,6 +111,8 @@ components:
                     example: true
                 visible:
                     type: boolean
+                isOidc:
+                    type: boolean
                 urls:
                     type: object
                     properties:
@@ -156,6 +158,7 @@ components:
 # RegisterUrl                 varchar(255) - urls.registerUrl
 # SignInUrl                   varchar(255) - urls.signInUrl
 # SignOutUrl                  varchar(255) - urls.signOutUrl
+# OIDCConnection              varchar(255) - urls.useOIDCConnection
 # PasswordUrl                 varchar(255) - urls.passwordUrl
 # ProfileUrl                  varchar(255) - urls.profileUrl
 # Attributes                  text

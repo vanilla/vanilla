@@ -9,7 +9,8 @@ namespace Vanilla\EmbeddedContent;
 use Garden\Web\Exception\ServerException;
 
 /**
-* Exception to be thrown if an error is encountered handling embedded content.
-*/
-class EmbeddedContentException extends ServerException {
+ * Exception to be thrown if an error is encountered handling embedded content.
+ */
+class EmbeddedContentException extends ServerException
+{
 }

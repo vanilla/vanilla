@@ -10,7 +10,8 @@ namespace Vanilla\Layout\Providers;
 /**
  * Some class that can map record IDs to record name/url.
  */
-interface LayoutViewRecordProviderInterface {
+interface LayoutViewRecordProviderInterface
+{
     /**
      * Get a Name/URL array for a particular record.
      *
@@ -35,4 +36,13 @@ interface LayoutViewRecordProviderInterface {
      * @return bool
      */
     public function validateRecords(array $recordIDs): bool;
+
+    /**
+     * Get Parent recordType/ID for layout lookup.
+     *
+     * @param string $recordType
+     * @param string $recordID
+     * @return array
+     */
+    public function getParentRecordTypeAndID(string $recordType, string $recordID): array;
 }

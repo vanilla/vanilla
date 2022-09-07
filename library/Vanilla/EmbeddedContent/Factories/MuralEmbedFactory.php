@@ -14,20 +14,18 @@ use Vanilla\EmbeddedContent\Embeds\MuralEmbed;
 /**
  * MuralEmbedFactory class.
  */
-class MuralEmbedFactory extends AbstractEmbedFactory {
-
+class MuralEmbedFactory extends AbstractEmbedFactory
+{
     /** @var array DOMAINS */
-    const DOMAINS = [
-        'app.mural.co',
-        'app.mural.com'
-    ];
+    const DOMAINS = ["app.mural.co", "app.mural.com"];
 
     /**
      * Use the page scraper to scrape page data.
      *
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         $pattern = $this->getSupportedPathRegex($url);
 
         // Provided url needs to validate against regex pattern.
@@ -35,8 +33,8 @@ class MuralEmbedFactory extends AbstractEmbedFactory {
             $urlDomain = parse_url($url, PHP_URL_HOST);
             if (in_array($urlDomain, $this->getSupportedDomains())) {
                 return new MuralEmbed([
-                    'embedType' => MuralEmbed::TYPE,
-                    'url' => $url,
+                    "embedType" => MuralEmbed::TYPE,
+                    "url" => $url,
                 ]);
             }
         }
@@ -48,14 +46,16 @@ class MuralEmbedFactory extends AbstractEmbedFactory {
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return self::DOMAINS;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         return "`/embed/.+$`";
     }
 }

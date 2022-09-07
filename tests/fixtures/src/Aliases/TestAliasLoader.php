@@ -12,14 +12,15 @@ use Vanilla\AliasProviderTrait;
 /**
  * A test fixture for testing the AliasProviderTrait.
  */
-class TestAliasLoader {
-
+class TestAliasLoader
+{
     use AliasProviderTrait;
 
     /**
      * @inheritdoc
      */
-    protected static function provideAliases(): array {
+    protected static function provideAliases(): array
+    {
         return [
             NewClass::class => ["VanillaTests\OldClass"],
             ExtendsNewClass::class => ["VanillaTests\ExtendsOldClass"],

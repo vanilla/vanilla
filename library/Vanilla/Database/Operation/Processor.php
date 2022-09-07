@@ -11,8 +11,8 @@ use Vanilla\Database\Operation;
 /**
  * Processor of operations in a database pipeline.
  */
-interface Processor {
-
+interface Processor
+{
     /**
      * Perform actions based on a database operation.
      *

@@ -12,21 +12,22 @@ use Garden\Schema\ValidationException;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\InjectableInterface;
 use Vanilla\Utility\ArrayUtils;
+use Webmozart\Assert\Assert;
 
 /**
  * Basic model class.
  */
-class Model implements InjectableInterface {
-
+class Model implements InjectableInterface
+{
     public const OPT_LIMIT = "limit";
     public const OPT_OFFSET = "offset";
     public const OPT_SELECT = "select";
-    public const OPT_ORDER = 'order';
-    public const OPT_MODE = 'mode';
-    public const OPT_REPLACE = 'replace';
-    public const OPT_IGNORE = 'ignore';
-    public const OPT_META = 'meta';
-    public const OPT_JOINS = 'joins';
+    public const OPT_ORDER = "order";
+    public const OPT_MODE = "mode";
+    public const OPT_REPLACE = "replace";
+    public const OPT_IGNORE = "ignore";
+    public const OPT_META = "meta";
+    public const OPT_JOINS = "joins";
 
     /** @var \Gdn_Database */
     protected $database;
@@ -55,9 +56,10 @@ class Model implements InjectableInterface {
      *
      * @param string $table Database table associated with this resource.
      */
-    public function __construct(string $table) {
+    public function __construct(string $table)
+    {
         $this->table = $table;
-        $this->setPrimaryKey($table.'ID');
+        $this->setPrimaryKey($table . "ID");
     }
 
     /**
@@ -65,7 +67,8 @@ class Model implements InjectableInterface {
      *
      * @return string
      */
-    public function getTableName(): string {
+    public function getTableName(): string
+    {
         return $this->table;
     }
 
@@ -75,7 +78,8 @@ class Model implements InjectableInterface {
      * @param Schema $schema Schema representing the resource's database table.
      * @return Schema Currently configured read schema.
      */
-    protected function configureReadSchema(Schema $schema): Schema {
+    protected function configureReadSchema(Schema $schema): Schema
+    {
         // Child classes can make adjustments as necessary.
         return $schema;
     }
@@ -85,7 +89,8 @@ class Model implements InjectableInterface {
      *
      * @return Schema
      */
-    public function getReadSchema(): Schema {
+    public function getReadSchema(): Schema
+    {
         if ($this->readSchema === null) {
             $schema = clone $this->getDatabaseSchema();
             $this->configureReadSchema($schema);
@@ -99,7 +104,8 @@ class Model implements InjectableInterface {
      *
      * @return Schema
      */
-    public function getWriteSchema(): Schema {
+    public function getWriteSchema(): Schema
+    {
         if ($this->writeSchema === null) {
             $schema = clone $this->getDatabaseSchema();
             $this->configureWriteSchema($schema);
@@ -114,7 +120,8 @@ class Model implements InjectableInterface {
      * @param Schema $schema Schema representing the resource's database table.
      * @return Schema Currently configured write schema.
      */
-    protected function configureWriteSchema(Schema $schema): Schema {
+    protected function configureWriteSchema(Schema $schema): Schema
+    {
         // Child classes can make adjustments as necessary.
         return $schema;
     }
@@ -128,7 +135,8 @@ class Model implements InjectableInterface {
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function delete(array $where, array $options = []): bool {
+    public function delete(array $where, array $options = []): bool
+    {
         $limit = $options[self::OPT_LIMIT] ?? false;
 
         $this->createSql()->delete($this->table, $where, $limit);
@@ -142,7 +150,8 @@ class Model implements InjectableInterface {
      * @deprecated Use `getReadSchema()` and `getWriteSchema()` instead.
      * @codeCoverageIgnore
      */
-    protected function ensureSchemas() {
+    protected function ensureSchemas()
+    {
         $this->getReadSchema();
         $this->getWriteSchema();
     }
@@ -161,7 +170,8 @@ class Model implements InjectableInterface {
      * @todo Document support for the "order" option.
      * @todo Add support for a "page" option to set the limit.
      */
-    public function select(array $where = [], array $options = []): array {
+    public function select(array $where = [], array $options = []): array
+    {
         $orderFields = $options[self::OPT_ORDER] ?? ($options["orderFields"] ?? []);
         $orderDirection = $options["orderDirection"] ?? "asc";
         $limit = $options[self::OPT_LIMIT] ?? false;
@@ -172,7 +182,7 @@ class Model implements InjectableInterface {
 
         if (!empty($selects)) {
             if (is_string($selects)) {
-                $selects = ArrayUtils::explodeTrim(',', $selects);
+                $selects = ArrayUtils::explodeTrim(",", $selects);
             }
             $selects = $this->translateSelects($selects);
 
@@ -184,7 +194,8 @@ class Model implements InjectableInterface {
             $this->applyJoins($joins, $sqlDriver);
         }
 
-        $result = $sqlDriver->getWhere($this->table, $where, $orderFields, $orderDirection, $limit, $offset)
+        $result = $sqlDriver
+            ->getWhere($this->table, $where, $orderFields, $orderDirection, $limit, $offset)
             ->resultArray();
 
         if (empty($selects)) {
@@ -193,7 +204,7 @@ class Model implements InjectableInterface {
             $selectExpressions = $sqlDriver->parseSelectExpression($selects);
             $selectFinalFieldNames = [];
             foreach ($selectExpressions as $selectExpression) {
-                $selectFinalFieldNames[] = $selectExpression['Alias'] ?: $selectExpression['Field'];
+                $selectFinalFieldNames[] = $selectExpression["Alias"] ?: $selectExpression["Field"];
             }
 
             $schema = Schema::parse($selectFinalFieldNames)->add($this->getReadSchema());
@@ -213,7 +224,8 @@ class Model implements InjectableInterface {
      * @return array
      * @deprecated Use Model::select
      */
-    public function get(array $where = [], array $options = []): array {
+    public function get(array $where = [], array $options = []): array
+    {
         return $this->select($where, $options);
     }
 
@@ -222,7 +234,8 @@ class Model implements InjectableInterface {
      *
      * @return string
      */
-    public function getTable(): string {
+    public function getTable(): string
+    {
         return $this->table;
     }
 
@@ -231,7 +244,8 @@ class Model implements InjectableInterface {
      *
      * @return array
      */
-    public function getPrimaryKey(): array {
+    public function getPrimaryKey(): array
+    {
         return $this->primaryKey;
     }
 
@@ -240,7 +254,8 @@ class Model implements InjectableInterface {
      *
      * @param string $columns
      */
-    protected function setPrimaryKey(string ...$columns): void {
+    protected function setPrimaryKey(string ...$columns): void
+    {
         $this->primaryKey = $columns;
     }
 
@@ -251,7 +266,8 @@ class Model implements InjectableInterface {
      * @param mixed $ids
      * @return array
      */
-    public function primaryWhere($id, ...$ids): array {
+    public function primaryWhere($id, ...$ids): array
+    {
         $values = array_merge([$id], $ids);
         $where = [];
         foreach ($this->getPrimaryKey() as $i => $column) {
@@ -266,7 +282,8 @@ class Model implements InjectableInterface {
      * @param array $row The row to pluck.
      * @return array Returns an array suitable to pass as a where parameter.
      */
-    public function pluckPrimaryWhere(array $row): array {
+    public function pluckPrimaryWhere(array $row): array
+    {
         $where = [];
         foreach ($this->getPrimaryKey() as $column) {
             $where[$column] = $row[$column];
@@ -287,7 +304,8 @@ class Model implements InjectableInterface {
      * @throws ValidationException If a row fails to validate against the schema.
      * @throws NoResultsException If no rows could be found.
      */
-    public function selectSingle(array $where = [], array $options = []): array {
+    public function selectSingle(array $where = [], array $options = []): array
+    {
         $options[self::OPT_LIMIT] = 1;
         $rows = $this->select($where, $options);
         if (empty($rows)) {
@@ -305,7 +323,8 @@ class Model implements InjectableInterface {
      * @return int|true ID of the inserted row.
      * @throws Exception If an error is encountered while performing the query.
      */
-    public function insert(array $set, array $options = []) {
+    public function insert(array $set, array $options = [])
+    {
         $options += [
             self::OPT_REPLACE => false,
             self::OPT_IGNORE => false,
@@ -315,9 +334,9 @@ class Model implements InjectableInterface {
 
         $sql = $this->createSql();
         if ($options[self::OPT_REPLACE]) {
-            $sql->options('Replace', true);
+            $sql->options("Replace", true);
         } elseif ($options[self::OPT_IGNORE]) {
-            $sql->options('Ignore', true);
+            $sql->options("Ignore", true);
         }
         $result = $sql->insert($this->table, $set);
         if ($result === false) {
@@ -327,7 +346,7 @@ class Model implements InjectableInterface {
         }
         // This is a bit of a kludge, but we want a true integer because we are otherwise string with schemas.
         if (is_numeric($result)) {
-            $result = (int)$result;
+            $result = (int) $result;
         }
         return $result;
     }
@@ -335,7 +354,8 @@ class Model implements InjectableInterface {
     /**
      * @param \Gdn_Database $database
      */
-    public function setDependencies(\Gdn_Database $database) {
+    public function setDependencies(\Gdn_Database $database)
+    {
         $this->database = $database;
     }
 
@@ -344,7 +364,8 @@ class Model implements InjectableInterface {
      *
      * @return \Gdn_SQLDriver
      */
-    protected function createSql(): \Gdn_SQLDriver {
+    protected function createSql(): \Gdn_SQLDriver
+    {
         return $this->database->createSql();
     }
 
@@ -355,7 +376,8 @@ class Model implements InjectableInterface {
      * @deprecated
      * @codeCoverageIgnore
      */
-    protected function sql(): \Gdn_SQLDriver {
+    protected function sql(): \Gdn_SQLDriver
+    {
         return $this->createSql();
     }
 
@@ -368,7 +390,8 @@ class Model implements InjectableInterface {
      * @throws Exception If an error is encountered while performing the query.
      * @return bool True.
      */
-    public function update(array $set, array $where, array $options = []): bool {
+    public function update(array $set, array $where, array $options = []): bool
+    {
         $set = $this->getWriteSchema()->validate($set, true);
         $this->createSql()->put($this->table, $set, $where);
         // If fully executed without an exception bubbling up, consider this a success.
@@ -381,16 +404,17 @@ class Model implements InjectableInterface {
      * @param array $selects
      * @return array
      */
-    private function translateSelects(array $selects): array {
+    private function translateSelects(array $selects): array
+    {
         $negatives = [];
         foreach ($selects as $select) {
-            if ($select[0] === '-') {
+            if ($select[0] === "-") {
                 $negatives[] = substr($select, 1);
             }
         }
 
         if (!empty($negatives)) {
-            $columns = array_keys($this->getReadSchema()->getField('properties'));
+            $columns = array_keys($this->getReadSchema()->getField("properties"));
             $selects = array_values(array_diff($columns, $negatives));
         }
         return $selects;
@@ -401,7 +425,8 @@ class Model implements InjectableInterface {
      *
      * @return Schema
      */
-    private function getDatabaseSchema(): Schema {
+    private function getDatabaseSchema(): Schema
+    {
         if ($this->databaseSchema === null) {
             $this->databaseSchema = $this->database->simpleSchema($this->getTable());
         }
@@ -414,13 +439,35 @@ class Model implements InjectableInterface {
      * @param array $joins
      * @param \Gdn_SQLDriver $sqlDriver
      */
-    protected function applyJoins(array $joins, \Gdn_SQLDriver $sqlDriver): void {
+    protected function applyJoins(array $joins, \Gdn_SQLDriver $sqlDriver): void
+    {
         foreach ($joins as $join) {
-            $tableName = $join['tableName'] ?? '';
-            $on = $join['on'] ?? '';
-            $joinType = $join['joinType'] ?? '';
+            $tableName = $join["tableName"] ?? "";
+            $on = $join["on"] ?? "";
+            $joinType = $join["joinType"] ?? "";
 
             $sqlDriver->join($tableName, $on, $joinType);
         }
+    }
+
+    /**
+     * Filter a list of recordIDs to only ones that currently exist.
+     *
+     * @param int[] $recordIDs The incoming recordIDs.
+     *
+     * @return array The filtered recordIDs.
+     */
+    public function filterExistingRecordIDs(array $recordIDs): array
+    {
+        $primaryKey = $this->getPrimaryKey();
+        Assert::count($primaryKey, 1, "filterExistingRecordIDs() only works on simple primary keys.");
+        $primaryKey = $primaryKey[0];
+        $existing = $this->createSql()
+            ->select($primaryKey)
+            ->from($this->table)
+            ->where($primaryKey, $recordIDs)
+            ->get()
+            ->column($primaryKey);
+        return $existing;
     }
 }

@@ -26,8 +26,8 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests for the extended content.
  */
-class ExtendedContentFormatServiceTest extends TestCase {
-
+class ExtendedContentFormatServiceTest extends TestCase
+{
     use HtmlNormalizeTrait;
     use ExpectExceptionTrait;
     use BootstrapTrait;
@@ -35,23 +35,27 @@ class ExtendedContentFormatServiceTest extends TestCase {
     /**
      * Setup.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        self::container()->rule(EmbedService::class)
-            ->addCall('registerEmbed', [IFrameEmbed::class, IFrameEmbed::TYPE]);
+        self::container()
+            ->rule(EmbedService::class)
+            ->addCall("registerEmbed", [IFrameEmbed::class, IFrameEmbed::TYPE]);
     }
 
     /**
      * @return FormatService
      */
-    private function getFormatter(): FormatService {
+    private function getFormatter(): FormatService
+    {
         return self::container()->get(FormatService::class);
     }
 
     /**
      * @return ExtendedContentFormatService
      */
-    private function getExtendedFormatter(): ExtendedContentFormatService {
+    private function getExtendedFormatter(): ExtendedContentFormatService
+    {
         return self::container()->get(ExtendedContentFormatService::class);
     }
 
@@ -62,11 +66,13 @@ class ExtendedContentFormatServiceTest extends TestCase {
      *
      * @dataProvider provideFrameHtmlFormats
      */
-    public function testHtmlFormats(string $format) {
-        $in = '<iframe src="http://example.com" class="importedEmbed-iframe"></iframe>'
-            . '<video width="320" height="240" controls="" autoplay="">'
-            . '<source src="https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4" type="video/mp4"></source>'
-            . '</video>';
+    public function testHtmlFormats(string $format)
+    {
+        $in =
+            '<iframe src="http://example.com" class="importedEmbed-iframe"></iframe>' .
+            '<video width="320" height="240" controls="" autoplay="">' .
+            '<source src="https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4" type="video/mp4"></source>' .
+            "</video>";
 
         // Stripped out in the normal formatter. Iframes aren't allowed.
         $actualNormal = trim($this->getFormatter()->renderHTML($in, $format));
@@ -82,30 +88,30 @@ class ExtendedContentFormatServiceTest extends TestCase {
     /**
      * @return array
      */
-    public function provideFrameHtmlFormats() {
-        return [
-            [HtmlFormat::FORMAT_KEY],
-            [WysiwygFormat::FORMAT_KEY],
-            [MarkdownFormat::FORMAT_KEY],
-        ];
+    public function provideFrameHtmlFormats()
+    {
+        return [[HtmlFormat::FORMAT_KEY], [WysiwygFormat::FORMAT_KEY], [MarkdownFormat::FORMAT_KEY]];
     }
 
     /**
      * Test embeds in the rich editor with iframes.
      */
-    public function testRichFrameEmbeds() {
-        $ops = [[
-            "insert" => [
-                "embed-external" => [
-                    'data' => [
-                        "url" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
-                        "embedType" => "iframe",
-                        "height" => 630,
-                        "width" => 1200,
+    public function testRichFrameEmbeds()
+    {
+        $ops = [
+            [
+                "insert" => [
+                    "embed-external" => [
+                        "data" => [
+                            "url" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
+                            "embedType" => "iframe",
+                            "height" => 630,
+                            "width" => 1200,
+                        ],
                     ],
                 ],
             ],
-        ]];
+        ];
         $in = json_encode($ops);
 
         $normal = $this->getFormatter()->renderHTML($in, RichFormat::FORMAT_KEY);

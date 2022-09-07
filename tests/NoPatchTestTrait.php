@@ -12,18 +12,21 @@ use PHPUnit\Framework\TestCase;
 /**
  * @package VanillaTestsUse this trait on `AbstractResourceTest` classes that don't have a `PATCH` endpoint.
  */
-trait NoPatchTestTrait {
+trait NoPatchTestTrait
+{
     /**
      * {@inheritDoc}
      */
-    public function testPatchFull() {
+    public function testPatchFull()
+    {
         TestCase::markTestSkipped("The resource doesn't have a PATCH endpoint.");
     }
 
     /**
      * {@inheritDoc}
      */
-    public function providePatchFields() {
+    public function providePatchFields()
+    {
         return [];
     }
 }

@@ -11,20 +11,22 @@ import ProfileLink from "@library/navigation/ProfileLink";
 import { IUserFragment } from "@library/@types/api/users";
 import { UserPhoto } from "@library/headers/mebox/pieces/UserPhoto";
 import { useMeasure } from "@vanilla/react-utils/src";
-import { forumLayoutVariables } from "@dashboard/compatibilityStyles/forumLayoutStyles";
+import { pageHeadingBoxClasses } from "@library/layout/PageHeadingBox.styles";
+import { twoColumnVariables } from "@library/layout/types/layout.twoColumns";
 
 export interface IUserSpotlightProps {
     title?: string;
+    subtitle?: string;
     description?: string;
     options: DeepPartial<IUserSpotlightOptions>;
     userInfo: IUserFragment;
 }
 
 export function UserSpotlight(props: IUserSpotlightProps) {
-    const { title, description, options, userInfo } = props;
+    const { title, subtitle, description, options, userInfo } = props;
     const rootRef = useRef<HTMLDivElement | null>(null);
     const rootMeasure = useMeasure(rootRef);
-    const shouldWrap = rootMeasure.width > 0 && rootMeasure.width < forumLayoutVariables().panel.paddedWidth;
+    const shouldWrap = rootMeasure.width > 0 && rootMeasure.width < twoColumnVariables().panel.paddedWidth;
     const vars = userSpotlightVariables(options);
     const classes = userSpotlightClasses(shouldWrap, options);
 
@@ -36,8 +38,9 @@ export function UserSpotlight(props: IUserSpotlightProps) {
                 </ProfileLink>
             </div>
             <div className={classes.textContainer}>
-                <div className={classes.title}>{title}</div>
-                <div className={classes.description}>{description}</div>
+                {subtitle && <div className={pageHeadingBoxClasses().subtitle}>{subtitle}</div>}
+                {title && <div className={classes.title}>{title}</div>}
+                {description && <div className={classes.description}>{description}</div>}
                 <div className={classes.userText}>
                     <ProfileLink userFragment={userInfo} className={classes.userName}>
                         {userInfo.name}

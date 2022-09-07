@@ -43,9 +43,17 @@ export const colorPickerClasses = () => {
         transform: translateX(negativeUnit(10)),
     });
 
+    const clearButton = css({
+        position: "absolute",
+        right: 54,
+        height: 30,
+        color: "#777a80",
+    });
+
     return {
         root,
         swatch,
         realInput,
+        clearButton,
     };
 };

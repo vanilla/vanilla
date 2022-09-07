@@ -15,11 +15,11 @@ use VanillaTests\SiteTestCase;
 /**
  * Tests for the multilingual plugin.
  */
-class MultilingualPluginTest extends SiteTestCase {
-
+class MultilingualPluginTest extends SiteTestCase
+{
     use EventSpyTestTrait;
 
-    public static $addons = ['Multilingual'];
+    public static $addons = ["Multilingual"];
 
     /**
      * Test the following:
@@ -28,7 +28,8 @@ class MultilingualPluginTest extends SiteTestCase {
      * - Locale sticks into the session.
      * - Event handler locale definitions still apply.
      */
-    public function testStickyLocales() {
+    public function testStickyLocales()
+    {
         // Add a fr language locale.
         $testLocaleAddon = new Addon("/tests/fixtures/locales/test-fr");
         \Gdn::addonManager()->add($testLocaleAddon);
@@ -36,13 +37,17 @@ class MultilingualPluginTest extends SiteTestCase {
         $addonModel->enable($testLocaleAddon);
 
         // Locale key gets set through the query param and applied.
-        $response = $this->bessy()->getJsonData('/testtranslated/foo?locale=fr')->getData();
-        $this->assertEquals("bar-fr", $response['foo']);
+        $response = $this->bessy()
+            ->getJsonData("/testtranslated/foo?locale=fr")
+            ->getData();
+        $this->assertEquals("bar-fr", $response["foo"]);
         $this->assertEquals("fr", $response["currentLocaleKey"]);
 
         // Locale is stashed in session and the afterSet_handler still worked.
-        $response = $this->bessy()->getJsonData('/testtranslated/overridden')->getData();
-        $this->assertEquals("inEventHandler", $response['overridden']);
+        $response = $this->bessy()
+            ->getJsonData("/testtranslated/overridden")
+            ->getData();
+        $this->assertEquals("inEventHandler", $response["overridden"]);
         $this->assertEquals("fr", $response["currentLocaleKey"]);
     }
 
@@ -51,12 +56,13 @@ class MultilingualPluginTest extends SiteTestCase {
      *
      * @param \Gdn_Locale $locale
      */
-    public function gdn_locale_afterSet_handler(\Gdn_Locale $locale) {
+    public function gdn_locale_afterSet_handler(\Gdn_Locale $locale)
+    {
         $translations = [
-            'overridden' => 'inEventHandler',
+            "overridden" => "inEventHandler",
         ];
 
-        $locale->LocaleContainer->loadArray($translations, 'ClientLocale', 'Definition', true);
+        $locale->LocaleContainer->loadArray($translations, "ClientLocale", "Definition", true);
     }
 
     /**
@@ -68,9 +74,10 @@ class MultilingualPluginTest extends SiteTestCase {
      * @param \RootController $controller
      * @param string $source
      */
-    public function rootController_testTranslated_create(\RootController $controller, string $source) {
+    public function rootController_testTranslated_create(\RootController $controller, string $source)
+    {
         $controller->setData($source, t($source));
-        $controller->setData('currentLocaleKey', \Gdn::locale()->current());
+        $controller->setData("currentLocaleKey", \Gdn::locale()->current());
         $controller->renderData();
     }
 }

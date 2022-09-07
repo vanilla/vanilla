@@ -11,14 +11,15 @@ use VanillaTests\SharedBootstrapTestCase;
 use Gdn_Controller;
 use stdClass;
 
-class ControllerTest extends SharedBootstrapTestCase {
-
+class ControllerTest extends SharedBootstrapTestCase
+{
     /**
      * Testing that the same key will be used to set data and to get it back.
      *
      * @dataProvider getTestDataForSetData
      */
-    public function testSetDataAndDataUseTheSameKeys($key, $value) {
+    public function testSetDataAndDataUseTheSameKeys($key, $value)
+    {
         $controller = new Gdn_Controller();
         $controller->setData($key, $value);
 
@@ -33,7 +34,8 @@ class ControllerTest extends SharedBootstrapTestCase {
      *
      * @dataProvider getTestDataForSetData
      */
-    public function testCanAddValuesToDataArrayUsingSetData($key, $value, $expectedDataArray) {
+    public function testCanAddValuesToDataArrayUsingSetData($key, $value, $expectedDataArray)
+    {
         $controller = new Gdn_Controller();
         $controller->setData($key, $value);
 
@@ -46,7 +48,8 @@ class ControllerTest extends SharedBootstrapTestCase {
      *
      * @dataProvider getTestDataForSetData
      */
-    public function testCanAddPropertiesUsingSetData($key, $value, $expectedDataArray) {
+    public function testCanAddPropertiesUsingSetData($key, $value, $expectedDataArray)
+    {
         $controller = new Gdn_Controller();
         $controller->setData($key, $value, true);
 
@@ -63,13 +66,14 @@ class ControllerTest extends SharedBootstrapTestCase {
     /**
      * Testing that using method setData won't affect previously set keys
      */
-    public function testSetDataDoesntTouchTheOtherKeys() {
+    public function testSetDataDoesntTouchTheOtherKeys()
+    {
         $controller = new Gdn_Controller();
-        $controller->setData('precious', 'value');
-        $this->assertEquals('value', $controller->data('precious'));
+        $controller->setData("precious", "value");
+        $this->assertEquals("value", $controller->data("precious"));
 
-        $controller->setData('newKey', 'newValue');
-        $this->assertEquals(['precious' => 'value', 'newKey' => 'newValue'], $controller->Data);
+        $controller->setData("newKey", "newValue");
+        $this->assertEquals(["precious" => "value", "newKey" => "newValue"], $controller->Data);
     }
 
     /**
@@ -77,21 +81,21 @@ class ControllerTest extends SharedBootstrapTestCase {
      *
      * @return array
      */
-    public function getTestDataForSetData() {
+    public function getTestDataForSetData()
+    {
         return [
             // $key,             $value,                            $expectedDataArray
-            ['app',             'Vanilla',                          ['app' => 'Vanilla']],
-            ['app name',        'Vanilla',                          ['app name' => 'Vanilla']],
-            ['&^^^&*',          new stdClass(),                     ['&^^^&*' => new stdClass()]],
-            ['test an array',   ['my' => 'value'],                  ['test an array' => ['my' => 'value']]],
-            [['appName' => 'Vanilla', 'appVersion' => '2'], null,   ['appName' => 'Vanilla', 'appVersion' => '2']],
+            ["app", "Vanilla", ["app" => "Vanilla"]],
+            ["app name", "Vanilla", ["app name" => "Vanilla"]],
+            ["&^^^&*", new stdClass(), ["&^^^&*" => new stdClass()]],
+            ["test an array", ["my" => "value"], ["test an array" => ["my" => "value"]]],
+            [["appName" => "Vanilla", "appVersion" => "2"], null, ["appName" => "Vanilla", "appVersion" => "2"]],
 
             // test $key with dot-notation
-            ['app.name', 'Vanilla', ['app' => ['name' => 'Vanilla']]],
+            ["app.name", "Vanilla", ["app" => ["name" => "Vanilla"]]],
 
             // dot-notation inside an array of $keys
-            [['app.name' => 'Vanilla', 'app.version' => '2'], null, ['app' => ['name' => 'Vanilla', 'version' => '2']]],
+            [["app.name" => "Vanilla", "app.version" => "2"], null, ["app" => ["name" => "Vanilla", "version" => "2"]]],
         ];
     }
-
 }

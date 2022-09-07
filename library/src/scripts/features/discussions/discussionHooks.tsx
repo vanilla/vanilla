@@ -184,13 +184,13 @@ export function useUserCanEditDiscussion(discussion: IDiscussion) {
     );
 }
 
-function usePatchStatus(discussionID: number, patchID: string): LoadStatus {
+function usePatchStatus(discussionID: IDiscussion["discussionID"], patchID: string): LoadStatus {
     return useSelector((state: IDiscussionsStoreState) => {
         return state.discussions.patchStatusByPatchID[`${discussionID}-${patchID}`]?.status ?? LoadStatus.PENDING;
     });
 }
 
-export function useDiscussionPatch(discussionID: number, patchID: string | null = null) {
+export function useDiscussionPatch(discussionID: IDiscussion["discussionID"], patchID: string | null = null) {
     const ownID = useUniqueID("discussionPatch");
     const actualPatchID = patchID ?? ownID;
     const isLoading = usePatchStatus(discussionID, actualPatchID) === LoadStatus.LOADING;
@@ -214,13 +214,13 @@ export function useDiscussionPatch(discussionID: number, patchID: string | null 
     };
 }
 
-function useDiscussionPutTypeStatus(discussionID: number): LoadStatus {
+function useDiscussionPutTypeStatus(discussionID: IDiscussion["discussionID"]): LoadStatus {
     return useSelector((state: IDiscussionsStoreState) => {
         return state.discussions.changeTypeByID[discussionID]?.status ?? LoadStatus.PENDING;
     });
 }
 
-export function useDiscussionPutType(discussionID: number) {
+export function useDiscussionPutType(discussionID: IDiscussion["discussionID"]) {
     const isLoading = useDiscussionPutTypeStatus(discussionID) === LoadStatus.LOADING;
     const actions = useDiscussionActions();
 
@@ -240,7 +240,7 @@ export function useDiscussionPutType(discussionID: number) {
     };
 }
 
-export function usePutDiscussionTags(discussionID: number) {
+export function usePutDiscussionTags(discussionID: IDiscussion["discussionID"]) {
     const actions = useDiscussionActions();
 
     async function putDiscussionTags(tagIDs: number[]) {
@@ -260,7 +260,9 @@ export function usePutDiscussionTags(discussionID: number) {
 /**
  * This hooks will return a selection of the already loaded discussions
  */
-export function useDiscussionByIDs(discussionIDs: RecordID[]): Record<RecordID, IDiscussion> | null {
+export function useDiscussionByIDs(
+    discussionIDs: Array<IDiscussion["discussionID"]>,
+): Record<RecordID, IDiscussion> | null {
     const { getDiscussionByIDs } = useDiscussionActions();
 
     // This state will handle the specific discussions requested
@@ -322,7 +324,7 @@ export function useDiscussionByIDs(discussionIDs: RecordID[]): Record<RecordID, 
 /**
  * This hook is used to display the correct status for the bulk delete form
  */
-export function useBulkDelete(discussionIDs: RecordID | RecordID[]) {
+export function useBulkDelete(discussionIDs: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>) {
     const { bulkDeleteDiscussion } = useDiscussionActions();
     const {
         addCheckedDiscussionsByIDs,
@@ -342,14 +344,9 @@ export function useBulkDelete(discussionIDs: RecordID | RecordID[]) {
         return false;
     }, [statusByID]);
 
-    const filterStatusByID = (
-        statusByID: Record<RecordID, LoadStatus> | null,
-        statusCondition: LoadStatus,
-    ): number[] | null => {
+    const filterStatusByID = (statusByID: Record<RecordID, LoadStatus> | null, statusCondition: LoadStatus) => {
         if (statusByID) {
-            const result = Object.keys(statusByID)
-                .filter((ID) => statusByID[ID] === statusCondition)
-                .map((value) => parseInt(value));
+            const result = Object.keys(statusByID).filter((ID) => statusByID[ID] === statusCondition);
             return result.length > 0 ? result : null;
         }
         return null;
@@ -386,7 +383,7 @@ export function useBulkDelete(discussionIDs: RecordID | RecordID[]) {
     // Execute the delete request and manage the discussion selection
     const deleteSelectedIDs = () => {
         // Fire off the request to delete
-        bulkDeleteDiscussion({ discussionIDs: discussionIDs as number[] });
+        bulkDeleteDiscussion({ discussionIDs: [discussionIDs].flat() });
         // Add these IDs to the pending list
         addPendingDiscussionByIDs(discussionIDs);
         // Remove them from the selection
@@ -401,7 +398,7 @@ export function useBulkDelete(discussionIDs: RecordID | RecordID[]) {
  * This hook is used to power the bulk move form
  */
 export function useBulkDiscussionMove(
-    discussionIDs: RecordID | RecordID[],
+    discussionIDs: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>,
     categoryID: RecordID | undefined,
     addRedirects: boolean,
 ) {

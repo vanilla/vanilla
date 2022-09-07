@@ -15,27 +15,31 @@ use Vanilla\ApiUtils;
 /**
  * Adds a basic test for crawling.
  */
-trait TestCrawlTrait {
+trait TestCrawlTrait
+{
     /**
      * Test a basic crawl.
      */
-    public function testResourceCrawl(): void {
+    public function testResourceCrawl(): void
+    {
         if (empty($this->resourceName)) {
-            $this->markTestSkipped('No resource to crawl.');
+            $this->markTestSkipped("No resource to crawl.");
         }
         $rows = $this->generateIndexRows();
 
-        $resources = $this->api()->get('/resources', ['crawlable' => true])->getBody();
+        $resources = $this->api()
+            ->get("/resources", ["crawlable" => true])
+            ->getBody();
         foreach ($resources as $row) {
-            if ($row['recordType'] !== $this->resourceName) {
+            if ($row["recordType"] !== $this->resourceName) {
                 continue;
             }
 
-            ['url' => $url] = $row;
+            ["url" => $url] = $row;
             $this->assertResourceCrawl($url);
             return;
         }
-        $this->fail('Did not find resource: '.$this->resourceName);
+        $this->fail("Did not find resource: " . $this->resourceName);
     }
 
     /**
@@ -43,9 +47,12 @@ trait TestCrawlTrait {
      *
      * @param string $url
      */
-    protected function assertResourceCrawl(string $url): void {
-        $r = $this->api()->get($url, ['expand' => 'crawl'])->getBody();
-        ['url' => $crawlUrl, 'parameter' => $param, 'min' => $min, 'max' => $max] = $r['crawl'];
+    protected function assertResourceCrawl(string $url): void
+    {
+        $r = $this->api()
+            ->get($url, ["expand" => "crawl"])
+            ->getBody();
+        ["url" => $crawlUrl, "parameter" => $param, "min" => $min, "max" => $max] = $r["crawl"];
 
         $min = $min ?? 0;
         $max = $max ?? 100;
@@ -53,8 +60,8 @@ trait TestCrawlTrait {
         /** @var HttpResponse $crawl */
         $crawl = $this->api()->get($crawlUrl, [$param => "$min..$max"]);
 
-        TestCase::assertTrue($crawl->hasHeader('link'), 'The crawl response is missing the paging header.');
-        $paging = ApiUtils::parsePageHeader($crawl->getHeader('link'));
+        TestCase::assertTrue($crawl->hasHeader("link"), "The crawl response is missing the paging header.");
+        $paging = ApiUtils::parsePageHeader($crawl->getHeader("link"));
         TestCase::assertNotNull($paging, "The crawl link header did not have correct paging information.");
 
         TestCase::assertSame(200, $crawl->getStatusCode());

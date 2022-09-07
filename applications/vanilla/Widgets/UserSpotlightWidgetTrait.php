@@ -19,8 +19,8 @@ use Vanilla\Logging\ErrorLogger;
 /**
  * Sharable properties and methods between the UserSpotlightWidget and the module.
  */
-trait UserSpotlightWidgetTrait {
-
+trait UserSpotlightWidgetTrait
+{
     /** @var UserModel */
     private $userModel;
 
@@ -29,7 +29,8 @@ trait UserSpotlightWidgetTrait {
      *
      * @param UserModel $userModel
      */
-    public function setDependencies(UserModel $userModel) {
+    public function setDependencies(UserModel $userModel)
+    {
         $this->userModel = $userModel;
     }
 
@@ -40,12 +41,13 @@ trait UserSpotlightWidgetTrait {
      *
      * @return UserFragment|null
      */
-    protected function getUserFragment(int $userID): ?UserFragment {
+    protected function getUserFragment(int $userID): ?UserFragment
+    {
         try {
-            $user = $this->userModel->getFragmentByID($userID);
+            $user = $this->userModel->getFragmentByID($userID, true);
             return $user;
         } catch (NoResultsException $e) {
-            ErrorLogger::warning($e, ['userspotlight']);
+            ErrorLogger::warning($e, ["userspotlight"]);
             return null;
         }
     }
@@ -55,24 +57,16 @@ trait UserSpotlightWidgetTrait {
      *
      * @return Schema
      */
-    public static function getApiSchema(): Schema {
+    public static function getApiSchema(): Schema
+    {
         return Schema::parse([
-            'userID?' => [
-                'type' => 'integer',
-                'x-control' => SchemaForm::dropDown(
-                    new FormOptions(
-                        'User',
-                        'Choose a user.',
-                        'Search...'
-                    ),
-                    new ApiFormChoices(
-                        '/api/v2/users/by-names?name=%s*',
-                        '/api/v2/users/%s',
-                        'userID',
-                        'name'
-                    )
-                )
-            ]
+            "userID" => [
+                "type" => "integer",
+                "x-control" => SchemaForm::dropDown(
+                    new FormOptions("User", "Choose a user.", "Search..."),
+                    new ApiFormChoices("/api/v2/users/by-names?name=%s*", "/api/v2/users/%s", "userID", "name")
+                ),
+            ],
         ]);
     }
 }

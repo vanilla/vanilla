@@ -7,9 +7,10 @@
 import { DashboardFormSubheading } from "@dashboard/forms/DashboardFormSubheading";
 import FormTree from "@library/tree/FormTree";
 import { formTreeClasses } from "@library/tree/FormTree.classes";
-import { ItemID } from "@library/tree/types";
+import { ItemID, ITreeItem } from "@library/tree/types";
 import { itemsToTree, PartialTreeItem, treeToItems } from "@library/tree/utils";
 import { useUniqueID } from "@library/utility/idUtils";
+import { IconType } from "@vanilla/icons";
 import { ICommonControl, IControlProps, JsonSchema } from "@vanilla/json-schema-forms";
 import { FormGroupLabel } from "@vanilla/ui";
 import React, { useEffect, useMemo, useState } from "react";
@@ -18,8 +19,9 @@ interface IFormTreeControl extends ICommonControl {
     itemSchema: JsonSchema;
 }
 
-interface IProps extends Omit<IControlProps, "control"> {
+interface IProps<ItemDataType = any> extends Omit<IControlProps, "control"> {
     control: IFormTreeControl;
+    getRowIcon?(treeItem: ITreeItem<ItemDataType>): IconType;
 }
 
 interface IHideableItem {
@@ -45,11 +47,13 @@ export function FormTreeControl(props: IProps) {
 
     return (
         <>
-            <FormGroupLabel
-                className={classes.treeDescription}
-                id={descriptionID}
-                description={props.control.description}
-            />
+            {!!props.control.description && (
+                <FormGroupLabel
+                    className={classes.treeDescription}
+                    id={descriptionID}
+                    description={props.control.description}
+                />
+            )}
             <FormTree<IHideableItem>
                 aria-describedby={props.control.description ? descriptionID : undefined}
                 aria-label={props.control.label}
@@ -68,6 +72,7 @@ export function FormTreeControl(props: IProps) {
                         isHidden,
                     };
                 }}
+                getRowIcon={props.getRowIcon}
             />
         </>
     );

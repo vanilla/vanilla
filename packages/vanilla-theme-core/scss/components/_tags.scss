@@ -8,15 +8,15 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$tag_borderRadius:                3px !default;
-$tag_height:                      $formButton_height !default;
-$tag_fontSize:                    $global-small_fontSize !default;
-$tag_bg:                          $button-basic_bg !default;
-$tag_fg:                          $button-basic_fg !default;
-$tag_borderColor:                 $button-basic_border !default;
-$tag-hover_bg:                    $button-basic-hover_bg !default;
-$tag-hover_fg:                    $global-color_primary !default;
-$tag-hover_borderColor:           $global-color_primary !default;
+$tag_borderRadius: 3px !default;
+$tag_height: $formButton_height !default;
+$tag_fontSize: $global-small_fontSize !default;
+$tag_bg: $button-basic_bg !default;
+$tag_fg: $button-basic_fg !default;
+$tag_borderColor: $button-basic_border !default;
+$tag-hover_bg: $button-basic-hover_bg !default;
+$tag-hover_fg: $global-color_primary !default;
+$tag-hover_borderColor: $global-color_primary !default;
 
 @mixin Tag($color_fg: $tag_fg, $color_bg: $tag_bg, $borderColor: $tag_borderColor) {
     background-color: $color_bg;
@@ -69,7 +69,6 @@ $tag-hover_borderColor:           $global-color_primary !default;
     .DataList,
     .MessageList,
     .DataTableWrap {
-
         .Tag,
         .Tag-Poll,
         .RoleTracker,
@@ -79,7 +78,6 @@ $tag-hover_borderColor:           $global-color_primary !default;
 
         .RoleTracker,
         .IdeationTag {
-
             .Tag {
                 background-color: transparent;
                 padding: 0;
@@ -109,7 +107,6 @@ $tag-hover_borderColor:           $global-color_primary !default;
             .IdeationTag,
             .tag-tracker,
             .MItem.RoleTracker {
-
                 &:focus,
                 &:hover,
                 &:active {
@@ -119,7 +116,6 @@ $tag-hover_borderColor:           $global-color_primary !default;
                 }
             }
         }
-
     }
 
     .Form-Tags .AvailableTag {
@@ -133,5 +129,4 @@ $tag-hover_borderColor:           $global-color_primary !default;
             text-decoration: none;
         }
     }
-
 }

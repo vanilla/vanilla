@@ -10,12 +10,12 @@ namespace Vanilla\Scheduler;
 /**
  * Interface to represent a long runner item result.
  */
-interface LongRunnerItemResultInterface {
-
+interface LongRunnerItemResultInterface
+{
     /**
      * Get the record ID of this long runner result.
      *
-     * @return int
+     * @return int|string
      */
-    public function getRecordID(): int;
+    public function getRecordID();
 }

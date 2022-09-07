@@ -4,7 +4,6 @@
  */
 
 import { LoadStatus } from "@library/@types/api/core";
-import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { IResult } from "@library/result/Result";
 import ResultList from "@library/result/ResultList";
 import { ResultMeta } from "@library/result/ResultMeta";
@@ -14,12 +13,11 @@ import { ISearchResult } from "@library/search/searchTypes";
 import { DEFAULT_SEARCH_SOURCE, SearchService } from "@library/search/SearchService";
 import { useSearchForm } from "@library/search/SearchContext";
 import { useLastValue } from "@vanilla/react-utils";
-import { hashString } from "@vanilla/utils";
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect } from "react";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { ALL_CONTENT_DOMAIN_NAME, DEFAULT_RESULT_COMPONENT } from "@library/search/searchConstants";
 import { makeSearchUrl } from "@library/search/SearchPageRoute";
-import { formatUrl, t } from "@library/utility/appUtils";
+import { createSourceSetValue, formatUrl, t } from "@library/utility/appUtils";
 import qs from "qs";
 import { sprintf } from "sprintf-js";
 import { MetaLink } from "@library/metas/Metas";
@@ -41,14 +39,6 @@ export function SearchPageResults(props: IProps) {
             window.scrollTo({ top: 0 });
         }
     }, [status, lastStatus]);
-
-    //this way, search page_view event won't be triggered multiple times with component rerendering, but only once when we visit the page
-    const isInitial = useRef(true);
-    useEffect(() => {
-        if (isInitial.current && status === LoadStatus.SUCCESS) {
-            isInitial.current = false;
-        }
-    });
 
     let content = <></>;
     switch (results.status) {
@@ -81,9 +71,6 @@ export function SearchPageResults(props: IProps) {
             }
             content = (
                 <>
-                    {isInitial.current && (
-                        <AnalyticsData uniqueKey={hashString(form.query + JSON.stringify(results.data!.pagination))} />
-                    )}
                     <ResultList
                         resultComponent={isCommunity ? currentDomain.ResultComponent : DEFAULT_RESULT_COMPONENT}
                         results={results.data!.results.map(mapResult)}
@@ -104,9 +91,13 @@ export function SearchPageResults(props: IProps) {
  *
  * @param searchResult The API search result to map.
  */
-function mapResult(searchResult: ISearchResult): IResult | undefined {
+export function mapResult(searchResult: ISearchResult): IResult | undefined {
     const crumbs = searchResult.breadcrumbs || [];
     const icon = SearchService.getSubType(searchResult.type)?.icon;
+
+    const sourceSet = {
+        imageSet: createSourceSetValue(searchResult?.image?.urlSrcSet ?? {}),
+    };
 
     return {
         name: searchResult.name,
@@ -118,6 +109,7 @@ function mapResult(searchResult: ISearchResult): IResult | undefined {
         location: crumbs,
         userInfo: searchResult.userInfo,
         highlight: searchResult.highlight,
+        ...(sourceSet.imageSet.length > 0 ? sourceSet : {}),
     };
 }
 

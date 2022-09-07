@@ -4,13 +4,15 @@
  * @license GPL-2.0-only
  */
 
+@use "sass:math";
+
 @function parseInt($n) {
-    @return $n / ($n * 0 + 1);
+    @return math.div($n, $n * 0 + 1);
 }
 
 @function stripUnit($number) {
     @if type-of($number) == "number" and not unitless($number) {
-        @return $number / ($number * 0 + 1);
+        @return math.div($number, $number * 0 + 1);
     }
 
     @return $number;
@@ -25,7 +27,8 @@
     $index: str-index($string, $search);
 
     @if $index {
-        @return str-slice($string, 1, $index - 1) + $replace + replace(str-slice($string, $index + str-length($search)), $search, $replace);
+        @return str-slice($string, 1, $index - 1) + $replace +
+            replace(str-slice($string, $index + str-length($search)), $search, $replace);
     }
 
     @return $string;
@@ -35,11 +38,11 @@
     @return replace($string, "#");
 }
 
-@function maxMinValue($input, $min, $max){
+@function maxMinValue($input, $min, $max) {
     @if $input > $max {
         @return $max;
     } @else if $input < $min {
-        @return    $min;
+        @return $min;
     } @else {
         @return $input;
     }
@@ -50,7 +53,7 @@
     $x1: $x0;
 
     @for $i from 1 through 10 {
-        $x1: $x0 - ($x0 * $x0 - abs($r)) / (2 * $x0);
+        $x1: $x0 - math.div($x0 * $x0 - abs($r), 2 * $x0);
         $x0: $x1;
     }
 
@@ -69,27 +72,25 @@
     @return $value;
 }
 
-
 @function pythagoreanTheorem-hypotenuse($a, $b) {
-    @return sqrt( pow($a) + pow($b) );
+    @return sqrt(pow($a) + pow($b));
 }
 
 @function pythagoreanTheorem-getSquareSides($hypotenuse) {
-    @return sqrt( pow(stripUnit($hypotenuse)) / 2 );
+    @return sqrt(pow(stripUnit($hypotenuse)) * 0.5);
 }
 
-
 @function pythagoreanTheorem-getMissingSide($hypotenuse, $side) {
-    @return sqrt( sqrt($hypotenuse) - sqrt($side) );
+    @return sqrt(sqrt($hypotenuse) - sqrt($side));
 }
 
 @function getEm($numerator, $denominator) {
-    @return (stripUnit($numerator)/stripUnit($denominator)) * 1em;
+    @return math.div(stripUnit($numerator), stripUnit($denominator)) * 1em;
 }
 
 @mixin generateStylesFromMap($map) {
     @each $property, $value in $map {
-        #{$property} : $value;
+        #{$property}: $value;
     }
 }
 

@@ -4,34 +4,46 @@
  * @license GPL-2.0-only
  */
 
+use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Gdn_Statistics as Statistics;
-use Garden\Schema\Schema;
+use Vanilla\Analytics\EventProviderService;
+use Vanilla\Community\Events\PageViewEvent;
 
 /**
  * API Controller for site analytics.
  */
-class TickApiController extends AbstractApiController {
-
+class TickApiController extends AbstractApiController
+{
     /** @var Statistics */
     private $statistics;
 
+    /** @var EventProviderService */
+    private $eventProviderService;
+
     /**
      * TickApiController constructor.
+     *
      * @param Statistics $statistics
+     * @param EventProviderService $eventProviderService
      */
-    public function __construct(Statistics $statistics) {
+    public function __construct(Statistics $statistics, EventProviderService $eventProviderService)
+    {
         $this->statistics = $statistics;
+        $this->eventProviderService = $eventProviderService;
     }
 
     /**
      * Collect an analytics tick.
      *
      * @return Data
+     * @throws ValidationException
      */
-    public function post(): Data {
+    public function post(array $body): Data
+    {
         $this->statistics->tick();
         $this->statistics->fireEvent("AnalyticsTick");
-        return new Data('');
+        $this->eventProviderService->handleRequest($body);
+        return new Data("");
     }
 }

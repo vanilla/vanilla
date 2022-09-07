@@ -44,6 +44,9 @@ export interface IBannerOptions {
     overlayTitleBar: boolean;
     url: string;
     deduplicateTitles: boolean;
+    bgColor: ColorHelper;
+    fgColor: ColorHelper;
+    useOverlay?: boolean;
 }
 
 /**
@@ -59,60 +62,14 @@ export const bannerVariables = useThemeCache(
             forcedVars,
             new LocalVariableMapping({
                 [`padding`]: "spacing.padding",
+                "options.bgColor": ["colors.bg", "colors.primary"],
+                "options.fgColor": ["colors.fg", "colors.primaryContrast"],
             }),
             !!altName,
         );
         const globalVars = globalVariables(forcedVars);
         const compactSearchVars = compactSearchVariables(forcedVars);
         const searchBarVars = searchBarVariables(forcedVars);
-
-        // Main colors
-        const colorsInit = makeThemeVars("colors", {
-            primary: globalVars.mainColors.primary,
-            primaryContrast: globalVars.mainColors.primaryContrast,
-            bg: globalVars.mainColors.primary,
-        });
-
-        const colors = makeThemeVars("colors", {
-            ...colorsInit,
-            fg: colorsInit.primaryContrast,
-        });
-
-        const presetsInit = makeThemeVars("presets", {
-            input: {
-                /**
-                 * @var banner.presets.input.preset
-                 * @title Input Preset
-                 * @description Choose the type of input to use in the banner.
-                 * @type string
-                 * @enum no border | border | unified border
-                 */
-                preset: SearchBarPresets.NO_BORDER,
-            },
-        });
-
-        const presets = makeThemeVars("presets", {
-            ...presetsInit,
-            button: {
-                /**
-                 * @var banner.presets.button.preset
-                 * @title Button Preset
-                 * @description Choose the type of button to apply to the banner.
-                 * @type string
-                 * @enum transparent | solid | hide
-                 */
-                preset:
-                    presetsInit.input.preset === SearchBarPresets.UNIFIED_BORDER || // Unified border currently only supports solid buttons.
-                    ColorsUtils.isDarkColor(colors.primaryContrast)
-                        ? ButtonPreset.SOLID
-                        : ButtonPreset.TRANSPARENT,
-            },
-        });
-
-        const isSolidButton = presets.button.preset === ButtonPreset.SOLID;
-        const isBordered = presets.input.preset === SearchBarPresets.BORDER;
-        const isTransparentButton = presets.button.preset === ButtonPreset.TRANSPARENT;
-        const isSolidBordered = isBordered && isSolidButton;
 
         /**
          * @varGroup banner.options
@@ -202,9 +159,68 @@ export const bannerVariables = useThemeCache(
 
                 // Not publicly documented yet. Currently just an escape hatch in case we have issues on deployment.
                 deduplicateTitles: true,
+                bgColor: globalVars.mainColors.primary,
+                fgColor: globalVars.mainColors.primaryContrast,
+                useOverlay: true,
             } as IBannerOptions,
             optionOverrides,
         );
+
+        // Main colors
+        const colorsInit = makeThemeVars(
+            "colors",
+            {
+                primary: options.bgColor,
+                primaryContrast: options.fgColor,
+                bg: options.bgColor,
+            },
+            optionOverrides?.fgColor && { primaryContrast: optionOverrides?.fgColor }, //this is to override variables if there are
+        );
+
+        const colors = makeThemeVars(
+            "colors",
+            {
+                ...colorsInit,
+                fg: colorsInit.primaryContrast,
+            },
+            optionOverrides?.fgColor && { primaryContrast: optionOverrides?.fgColor }, //this is to override variables if there are
+        );
+
+        const presetsInit = makeThemeVars("presets", {
+            input: {
+                /**
+                 * @var banner.presets.input.preset
+                 * @title Input Preset
+                 * @description Choose the type of input to use in the banner.
+                 * @type string
+                 * @enum no border | border | unified border
+                 */
+                preset: SearchBarPresets.NO_BORDER,
+            },
+        });
+
+        const presets = makeThemeVars("presets", {
+            ...presetsInit,
+            button: {
+                /**
+                 * @var banner.presets.button.preset
+                 * @title Button Preset
+                 * @description Choose the type of button to apply to the banner.
+                 * @type string
+                 * @enum transparent | solid | hide
+                 */
+                preset:
+                    presetsInit.input.preset === SearchBarPresets.UNIFIED_BORDER || // Unified border currently only supports solid buttons.
+                    ColorsUtils.isDarkColor(colors.primaryContrast)
+                        ? ButtonPreset.SOLID
+                        : ButtonPreset.TRANSPARENT,
+            },
+        });
+
+        const isSolidButton = presets.button.preset === ButtonPreset.SOLID;
+        const isBordered = presets.input.preset === SearchBarPresets.BORDER;
+        const isTransparentButton = presets.button.preset === ButtonPreset.TRANSPARENT;
+        const isSolidBordered = isBordered && isSolidButton;
 
         /**
          * @varGroup banner.padding
@@ -276,7 +292,14 @@ export const bannerVariables = useThemeCache(
              * @type string
              * @format hex-color
              */
-            ...compactSearchVars.backgrounds,
+            ...(options.useOverlay != null
+                ? {
+                      useOverlay: options.useOverlay,
+                      overlayColor: ColorsUtils.isLightColor(colors.fg)
+                          ? globalVars.elementaryColors.black.fade(0.25)
+                          : globalVars.elementaryColors.white.fade(0.25),
+                  }
+                : compactSearchVars.backgrounds),
         });
 
         const contentContainer = makeThemeVars("contentContainer", {
@@ -743,7 +766,7 @@ export const bannerVariables = useThemeCache(
              * @type string
              * @format hex-color
              */
-            bg: globalVars.mainColors.primary as ColorHelper | undefined | string,
+            bg: colors.primary as ColorHelper | undefined | string,
 
             /**
              * @var banner.searchStrip.minHeight

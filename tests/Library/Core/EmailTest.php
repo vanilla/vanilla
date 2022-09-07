@@ -14,7 +14,8 @@ use VanillaTests\BootstrapTestCase;
 /**
  * Tests for the Gdn_Email class
  */
-class EmailTest extends BootstrapTestCase {
+class EmailTest extends BootstrapTestCase
+{
     /** @var ConfigurationInterface */
     private $config;
 
@@ -29,7 +30,8 @@ class EmailTest extends BootstrapTestCase {
      *
      * @param string $supportAddress
      */
-    private function setSupportAddress(string $supportAddress): void {
+    private function setSupportAddress(string $supportAddress): void
+    {
         $this->supportAddress = $supportAddress;
         $this->config->saveToConfig("Garden.Email.SupportAddress", $supportAddress, false);
     }
@@ -39,7 +41,8 @@ class EmailTest extends BootstrapTestCase {
      *
      * @param string $supportName
      */
-    private function setSupportName(string $supportName): void {
+    private function setSupportName(string $supportName): void
+    {
         $this->supportName = $supportName;
         $this->config->saveToConfig("Garden.Email.SupportName", $supportName, false);
     }
@@ -47,7 +50,8 @@ class EmailTest extends BootstrapTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->container()->call(function (ConfigurationInterface $config) {
@@ -62,7 +66,8 @@ class EmailTest extends BootstrapTestCase {
     /**
      * Verify no configured support address falls back to a standard no-reply address.
      */
-    public function testGetDefaultFromAddressNoReply(): void {
+    public function testGetDefaultFromAddressNoReply(): void
+    {
         $this->setSupportAddress("");
         $obj = new Gdn_Email();
         $result = $obj->getDefaultFromAddress();
@@ -72,7 +77,8 @@ class EmailTest extends BootstrapTestCase {
     /**
      * Verify the support address is used, when no envelope address is configured.
      */
-    public function testGetDefaultSenderAddressSupport(): void {
+    public function testGetDefaultSenderAddressSupport(): void
+    {
         $obj = new Gdn_Email();
         $result = $obj->getDefaultSenderAddress();
         $this->assertSame($this->supportAddress, $result);
@@ -81,7 +87,8 @@ class EmailTest extends BootstrapTestCase {
     /**
      * Verify the envelope address is used, when configured.
      */
-    public function testGetDefaultSenderAddressEnvelope(): void {
+    public function testGetDefaultSenderAddressEnvelope(): void
+    {
         $expected = "envelope@example.com";
         $this->config->saveToConfig("Garden.Email.EnvelopeAddress", $expected, false);
         $obj = new Gdn_Email();
@@ -92,7 +99,8 @@ class EmailTest extends BootstrapTestCase {
     /**
      * Verify getting a standard no-reply email address for the current domain.
      */
-    public function testGetNoReplyAddress(): void {
+    public function testGetNoReplyAddress(): void
+    {
         /** @var RequestInterface $request */
         $request = $this->container()->get(RequestInterface::class);
         $request->setHost("example.com");
@@ -111,7 +119,8 @@ class EmailTest extends BootstrapTestCase {
      * @param string|null $expectedName
      * @dataProvider provideFromParameters
      */
-    public function testFrom(string $email, string $name, ?string $expectedEmail, ?string $expectedName): void {
+    public function testFrom(string $email, string $name, ?string $expectedEmail, ?string $expectedName): void
+    {
         // Provider data is retrieved before the test is setup, so we can't use dynamic properties in them. Do it here.
         $expectedName = $expectedName ?? $this->supportName;
         $expectedEmail = $expectedEmail ?? $this->supportAddress;
@@ -130,7 +139,8 @@ class EmailTest extends BootstrapTestCase {
     /**
      * Verify ability to override the sender on the underlying PHPMailer reference by way of the from method.
      */
-    public function testFromOverrideSender(): void {
+    public function testFromOverrideSender(): void
+    {
         $obj = new Gdn_Email();
         $mailer = $obj->PhpMailer;
         $mailer->Sender = "sender@example.com";
@@ -143,7 +153,8 @@ class EmailTest extends BootstrapTestCase {
     /**
      * Verify the underlying PHPMailer sender will default to the standard default, not the specified from address.
      */
-    public function testFromDefaultSender(): void {
+    public function testFromDefaultSender(): void
+    {
         $obj = new Gdn_Email();
         $mailer = $obj->PhpMailer;
         $mailer->Sender = "";
@@ -156,7 +167,8 @@ class EmailTest extends BootstrapTestCase {
      *
      * @return array
      */
-    public function provideFromParameters(): array {
+    public function provideFromParameters(): array
+    {
         return [
             "Specifying email and name" => ["foo@example.com", "foo", "foo@example.com", "foo"],
             "Specifying email" => ["foo@example.com", "", "foo@example.com", null],

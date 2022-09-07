@@ -12,8 +12,8 @@ use Garden\Web\Exception\NotFoundException;
 /**
  * A route that handles all **OPTIONS** requests to aid [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS) support.
  */
-class PreflightRoute extends Route {
-
+class PreflightRoute extends Route
+{
     /**
      * @var string
      */
@@ -24,7 +24,8 @@ class PreflightRoute extends Route {
      */
     private $throwNotFound;
 
-    public function __construct($basePath = '/', $throwNotFound = false) {
+    public function __construct($basePath = "/", $throwNotFound = false)
+    {
         $this->setBasePath($basePath);
         $this->setThrowNotFound($throwNotFound);
     }
@@ -35,7 +36,8 @@ class PreflightRoute extends Route {
      * @param RequestInterface $request The request to match against.
      * @return mixed Returns match information or **null** if the route doesn't match.
      */
-    public function match(RequestInterface $request) {
+    public function match(RequestInterface $request)
+    {
         $path = $request->getPath();
 
         // First check and strip the base path.
@@ -45,8 +47,8 @@ class PreflightRoute extends Route {
             return null;
         }
 
-        if (strcasecmp($request->getMethod(), 'OPTIONS') === 0) {
-            return [$this, 'dispatch'];
+        if (strcasecmp($request->getMethod(), "OPTIONS") === 0) {
+            return [$this, "dispatch"];
         }
 
         if ($this->getThrowNotFound()) {
@@ -61,7 +63,8 @@ class PreflightRoute extends Route {
      *
      * @return null Returns **null** for a "no content" response.
      */
-    public function dispatch() {
+    public function dispatch()
+    {
         return null;
     }
 
@@ -70,7 +73,8 @@ class PreflightRoute extends Route {
      *
      * @return string Returns the basePath.
      */
-    public function getBasePath() {
+    public function getBasePath()
+    {
         return $this->basePath;
     }
 
@@ -80,8 +84,9 @@ class PreflightRoute extends Route {
      * @param string $basePath The new base path.
      * @return $this
      */
-    public function setBasePath($basePath) {
-        $this->basePath = '/'.ltrim($basePath, '/');
+    public function setBasePath($basePath)
+    {
+        $this->basePath = "/" . ltrim($basePath, "/");
         return $this;
     }
 
@@ -90,7 +95,8 @@ class PreflightRoute extends Route {
      *
      * @return mixed Returns the throwNotFound.
      */
-    public function getThrowNotFound() {
+    public function getThrowNotFound()
+    {
         return $this->throwNotFound;
     }
 
@@ -100,7 +106,8 @@ class PreflightRoute extends Route {
      * @param mixed $throwNotFound
      * @return $this
      */
-    public function setThrowNotFound($throwNotFound) {
+    public function setThrowNotFound($throwNotFound)
+    {
         $this->throwNotFound = $throwNotFound;
         return $this;
     }

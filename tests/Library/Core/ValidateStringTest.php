@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateString().
  */
 
-class ValidateStringTest extends TestCase {
-
+class ValidateStringTest extends TestCase
+{
     /**
      * Test {@link validateString()} against various scenarios.
      *
@@ -22,7 +22,8 @@ class ValidateStringTest extends TestCase {
      * @param bool $expected The expected result.
      * @dataProvider provideTestValidateStringArrays
      */
-    public function testValidateString($testValue, $expected) {
+    public function testValidateString($testValue, $expected)
+    {
         $actual = validateString($testValue, []);
         $this->assertSame($expected, $actual);
     }
@@ -32,24 +33,13 @@ class ValidateStringTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestValidateStringArrays() {
+    public function provideTestValidateStringArrays()
+    {
         $r = [
-            'basicString' => [
-                'string',
-                true,
-            ],
-            'emptyString' => [
-                '',
-                true,
-            ],
-            'nullCase' => [
-                null,
-                true,
-            ],
-            'array' => [
-                ['not a' => 'scalar'],
-                false,
-            ],
+            "basicString" => ["string", true],
+            "emptyString" => ["", true],
+            "nullCase" => [null, true],
+            "array" => [["not a" => "scalar"], false],
         ];
 
         return $r;

@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Job;
 /**
  * Job status for progress.
  */
-class JobExecutionProgress extends JobExecutionStatus {
-
+class JobExecutionProgress extends JobExecutionStatus
+{
     /** @var int|null */
     private $quantityTotal = null;
 
@@ -31,45 +31,51 @@ class JobExecutionProgress extends JobExecutionStatus {
      * @param int $quantityComplete
      * @param int $quantityFailed
      */
-    public function __construct(?int $quantityTotal, int $quantityComplete = 0, int $quantityFailed = 0) {
+    public function __construct(?int $quantityTotal, int $quantityComplete = 0, int $quantityFailed = 0)
+    {
         $this->quantityTotal = $quantityTotal;
         $this->quantityComplete = $quantityComplete;
         $this->quantityFailed = $quantityFailed;
-        parent::__construct('progress');
+        parent::__construct("progress");
     }
 
     /**
      * @return string|null
      */
-    public function getErrorMessage(): ?string {
+    public function getErrorMessage(): ?string
+    {
         return $this->errorMessage;
     }
 
     /**
      * @param string|null $errorMessage
      */
-    public function setErrorMessage(?string $errorMessage): void {
+    public function setErrorMessage(?string $errorMessage): void
+    {
         $this->errorMessage = $errorMessage;
     }
 
     /**
      * @return int|null
      */
-    public function getQuantityTotal(): ?int {
+    public function getQuantityTotal(): ?int
+    {
         return $this->quantityTotal;
     }
 
     /**
      * @return int
      */
-    public function getQuantityComplete(): int {
+    public function getQuantityComplete(): int
+    {
         return $this->quantityComplete;
     }
 
     /**
      * @return int
      */
-    public function getQuantityFailed(): int {
+    public function getQuantityFailed(): int
+    {
         return $this->quantityFailed;
     }
 }

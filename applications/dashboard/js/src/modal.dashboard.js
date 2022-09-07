@@ -5,7 +5,7 @@
  * Confirm modals that don't ajax-in the content.
  *
  */
-var DashboardModal = (function() {
+window.DashboardModal = (function() {
 
     /**
      * The settings we can configure when starting the DashboardModal.

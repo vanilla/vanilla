@@ -13,13 +13,13 @@ namespace Vanilla;
  *
  * When using this object as an array its properties are referenced.
  */
-trait ArrayAccessTrait {
-
+trait ArrayAccessTrait
+{
     /**
      * Returns the source from which ArrayAccess will be based on.
      * @return array|object
      */
-    abstract protected function & getArrayAccessSource();
+    abstract protected function &getArrayAccessSource();
 
     /**
      * Whether an offset exists.
@@ -30,7 +30,8 @@ trait ArrayAccessTrait {
      * The return value will be casted to boolean if non-boolean was returned.
      * @link http://php.net/manual/en/arrayaccess.offsetexists.php
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         $source = $this->getArrayAccessSource();
         return is_array($source) ? isset($source[$offset]) : isset($source->$offset);
     }
@@ -42,7 +43,8 @@ trait ArrayAccessTrait {
      * @return mixed Can return all value types.
      * @link http://php.net/manual/en/arrayaccess.offsetget.php
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         $source = $this->getArrayAccessSource();
         return is_array($source) ? $source[$offset] : $source->$offset;
     }
@@ -54,7 +56,8 @@ trait ArrayAccessTrait {
      * @param mixed $value The value to set.
      * @link http://php.net/manual/en/arrayaccess.offsetset.php
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         $source = &$this->getArrayAccessSource();
         if (is_array($source)) {
             $source[$offset] = $value;
@@ -69,7 +72,8 @@ trait ArrayAccessTrait {
      * @param mixed $offset The offset to unset.
      * @link http://php.net/manual/en/arrayaccess.offsetunset.php
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         $source = $this->getArrayAccessSource();
         if (is_array($source)) {
             unset($source[$offset]);

@@ -11,8 +11,8 @@ use Garden\Events\ResourceEvent;
 /**
  * Test implementation of ResourceEvent.
  */
-class TestResourceEvent extends ResourceEvent {
-
+class TestResourceEvent extends ResourceEvent
+{
     /** @var bool */
     public $wasHandled = false;
 }

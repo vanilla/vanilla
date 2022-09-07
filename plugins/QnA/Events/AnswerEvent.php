@@ -12,6 +12,6 @@ use Garden\Events\ResourceEvent;
 /**
  * Represent a Answer resource event.
  */
-class AnswerEvent extends ResourceEvent {
-
+class AnswerEvent extends ResourceEvent
+{
 }

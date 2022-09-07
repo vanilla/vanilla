@@ -17,6 +17,7 @@ use Vanilla\Formatting\Formats\HtmlFormat;
  * @since 2.0
  * @return string
  */
-function smarty_function_homepage_title() {
-    return Gdn::formatService()->renderPlainText(c('Garden.HomepageTitle'), HtmlFormat::FORMAT_KEY);
+function smarty_function_homepage_title()
+{
+    return Gdn::formatService()->renderPlainText(c("Garden.HomepageTitle"), HtmlFormat::FORMAT_KEY);
 }

@@ -10,8 +10,8 @@ namespace Vanilla\Layout;
 /**
  * Helper class to get Widget list.
  */
-interface LayoutAssetAwareInterface {
-
+interface LayoutAssetAwareInterface
+{
     /**
      * Set partialAsset for data population.
      *

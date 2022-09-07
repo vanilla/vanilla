@@ -22,34 +22,39 @@ use VanillaTests\Fixtures\Scheduler\InstantScheduler;
 /**
  * Trait for testing jobs with the scheduler.
  */
-trait SchedulerTestTrait {
-
+trait SchedulerTestTrait
+{
     /**
      * Make sure we have a clean scheduler for every test.
      */
-    public function setupSchedulerTestTrait() {
+    public function setupSchedulerTestTrait()
+    {
         $this->getScheduler()->reset();
         $this->getLongRunner()->reset();
+        $this->getLongRunner()->setTimeout(-1);
     }
 
     /**
      * @return InstantScheduler
      */
-    protected function getScheduler(): InstantScheduler {
+    protected function getScheduler(): InstantScheduler
+    {
         return \Gdn::getContainer()->get(SchedulerInterface::class);
     }
 
     /**
      * @return LongRunner
      */
-    protected function getLongRunner(): LongRunner {
+    protected function getLongRunner(): LongRunner
+    {
         return \Gdn::getContainer()->get(LongRunner::class);
     }
 
     /**
      * @return JobStatusModel
      */
-    protected function getJobStatusModel(): JobStatusModel {
+    protected function getJobStatusModel(): JobStatusModel
+    {
         return \Gdn::getContainer()->get(JobStatusModel::class);
     }
 
@@ -61,9 +66,10 @@ trait SchedulerTestTrait {
      *
      * @return array The results.
      */
-    protected function assertTrackedJobCount(int $expectedCount, array $where): array {
+    protected function assertTrackedJobCount(int $expectedCount, array $where): array
+    {
         $where += [
-            'trackingUserID' => \Gdn::session()->UserID,
+            "trackingUserID" => \Gdn::session()->UserID,
         ];
         $results = $this->getJobStatusModel()->select($where);
         TestCase::assertCount($expectedCount, $results);
@@ -73,17 +79,22 @@ trait SchedulerTestTrait {
     /**
      * Make subsequent call requests based on a longRunner callbackPayload.
      *
-     * @param string|HttpResponse|array|LongRunnerResult $callbackPayload The payload from the long runner result.
+     * @param string|HttpResponse|array|LongRunnerResult|Data $callbackPayload The payload from the long runner result.
      *
      * @return HttpResponse
      */
-    protected function resumeLongRunner($callbackPayload): HttpResponse {
+    protected function resumeLongRunner($callbackPayload): HttpResponse
+    {
         if ($callbackPayload instanceof HttpResponse) {
             $callbackPayload = $callbackPayload->getBody();
         }
 
+        if ($callbackPayload instanceof Data) {
+            $callbackPayload = $callbackPayload->getData();
+        }
+
         if (is_array($callbackPayload)) {
-            $callbackPayload = $callbackPayload['callbackPayload'];
+            $callbackPayload = $callbackPayload["callbackPayload"];
         }
 
         if ($callbackPayload instanceof LongRunnerResult) {
@@ -91,14 +102,17 @@ trait SchedulerTestTrait {
         }
 
         if (!is_string($callbackPayload)) {
-            TestCase::fail('Cannot resume a longRunner without callback payload. Received: ' . json_encode($callbackPayload, JSON_PRETTY_PRINT));
+            TestCase::fail(
+                "Cannot resume a longRunner without callback payload. Received: " .
+                    json_encode($callbackPayload, JSON_PRETTY_PRINT)
+            );
         }
 
         $response = $this->api()->post(
             "/calls/run",
             $callbackPayload,
-            [ 'Content-Type' => SystemTokenMiddleware::AUTH_CONTENT_TYPE ],
-            [ 'throw' => false ]
+            ["Content-Type" => SystemTokenMiddleware::AUTH_CONTENT_TYPE],
+            ["throw" => false]
         );
         return $response;
     }

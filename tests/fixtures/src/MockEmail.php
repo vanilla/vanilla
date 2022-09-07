@@ -11,15 +11,16 @@ namespace VanillaTests\Fixtures;
 /**
  * Mock email object.
  */
-class MockEmail extends \Gdn_Email {
-
+class MockEmail extends \Gdn_Email
+{
     /**
      * Always returns true because we don't want tests sending emails.
      *
      * @param string $eventName
      * @return bool
      */
-    public function send($eventName = '') {
+    public function send($eventName = "")
+    {
         return true;
     }
 }

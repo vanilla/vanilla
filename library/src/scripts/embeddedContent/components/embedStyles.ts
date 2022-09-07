@@ -14,6 +14,7 @@ import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, px } from "csx";
 import { CSSObject } from "@emotion/css";
+import { userContentVariables } from "@library/content/UserContent.variables";
 
 export const embedContainerVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -27,7 +28,7 @@ export const embedContainerVariables = useThemeCache(() => {
     const border = makeThemeVars("border", {
         style: "none",
         width: 0,
-        radius: px(4),
+        radius: userContentVariables().embeds.borderRadius ?? 4,
     });
 
     const title = makeThemeVars("title", {
@@ -85,7 +86,7 @@ export const embedContainerClasses = useThemeCache(() => {
                 color: ColorsUtils.colorOut(vars.colors.fg),
                 textDecoration: "none",
             }),
-            background: ColorsUtils.colorOut(vars.colors.bg),
+            background: ColorsUtils.colorOut(userContentVariables().embeds.bg ?? vars.colors.bg),
             display: "block",
             position: "relative",
             margin: "auto",
@@ -136,7 +137,7 @@ export const embedContainerClasses = useThemeCache(() => {
                 width: percent(100),
                 padding: 0,
                 lineHeight: globalVars.lineHeights.condensed,
-                color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+                color: ColorsUtils.colorOut(userContentVariables().embeds.fg ?? globalVars.mainColors.fg),
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",

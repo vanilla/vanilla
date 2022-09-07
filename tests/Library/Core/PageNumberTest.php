@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for pageNumber().
  */
 
-class PageNumberTest extends TestCase {
-
+class PageNumberTest extends TestCase
+{
     /**
      * Tests {@link pageNumber()} against several scenarios.
      *
@@ -27,7 +27,8 @@ class PageNumberTest extends TestCase {
      * @param float|string $expected The expected result.
      * @dataProvider provideTestPageNumberArrays
      */
-    public function testPageNumber($testOffset, $testLimit, $testUrlParam, $testFirst, $expected) {
+    public function testPageNumber($testOffset, $testLimit, $testUrlParam, $testFirst, $expected)
+    {
         $actual = pageNumber($testOffset, $testLimit, $testUrlParam, $testFirst);
         $this->assertSame($expected, $actual);
     }
@@ -37,43 +38,14 @@ class PageNumberTest extends TestCase {
      *
      * @return array An array of test data.
      */
-    public function provideTestPageNumberArrays() {
+    public function provideTestPageNumberArrays()
+    {
         $r = [
-            'offsetZero' => [
-              0,
-              50,
-              false,
-              true,
-              1.0
-            ],
-            'offsetTwentyFive' => [
-                25,
-                3,
-                false,
-                true,
-                9.0,
-            ],
-            'firstIfCase' => [
-                0,
-                50,
-                true,
-                false,
-                '',
-            ],
-            'secondIfCase' => [
-                25,
-                3,
-                true,
-                true,
-                'p9',
-            ],
-            'thirdIfCase' => [
-                25,
-                3,
-                'Page Number ',
-                true,
-                'Page Number 9',
-            ],
+            "offsetZero" => [0, 50, false, true, 1.0],
+            "offsetTwentyFive" => [25, 3, false, true, 9.0],
+            "firstIfCase" => [0, 50, true, false, ""],
+            "secondIfCase" => [25, 3, true, true, "p9"],
+            "thirdIfCase" => [25, 3, "Page Number ", true, "Page Number 9"],
         ];
 
         return $r;

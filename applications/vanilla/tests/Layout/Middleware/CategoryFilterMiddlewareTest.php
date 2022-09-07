@@ -16,7 +16,8 @@ use VanillaTests\SiteTestTrait;
 /**
  * Tests for our middleware filters.
  */
-class CategoryFilterMiddlewareTest extends BootstrapTestCase {
+class CategoryFilterMiddlewareTest extends BootstrapTestCase
+{
     use LayoutTestTrait;
     use SiteTestTrait;
     /**
@@ -28,8 +29,9 @@ class CategoryFilterMiddlewareTest extends BootstrapTestCase {
      *
      * @dataProvider provideMiddlewareFiltersTo
      */
-    public function testLayoutHydratesTo(array $input, array $expected, array $params = []) {
-        $hydrator = self::getLayoutService()->getHydrator('home');
+    public function testLayoutHydratesTo(array $input, array $expected, array $params = [])
+    {
+        $hydrator = self::getLayoutService()->getHydrator("home");
         $hydrator->addMiddleware(new CategoryFilterMiddleware(new \CategoryModel()));
         $actual = $hydrator->resolve($input, $params);
         // Make sure we see it as the API output would.
@@ -37,84 +39,89 @@ class CategoryFilterMiddlewareTest extends BootstrapTestCase {
         $this->assertSame($expected, $actual);
     }
 
-
     /**
      * @return iterable
      */
-    public function provideMiddlewareFiltersTo(): iterable {
+    public function provideMiddlewareFiltersTo(): iterable
+    {
         $categoryMiddlewareDefinitionFail = [
             '$middleware' => [
                 "category-filter" => [
-                    "categoryID" => -1
-                ]
-            ]
+                    "categoryID" => -1,
+                ],
+            ],
         ];
 
         yield "Fail to resolve node when category filter fails " => [
             [
                 "layoutViewType" => "home",
-                "layout" => [[
-                    "data" => [
-                        '$hydrate' => "sprintf",
-                        "format" => "is %s args",
-                        "args" => ["resolved"]
+                "layout" => [
+                    [
+                        "data" => [
+                            '$hydrate' => "sprintf",
+                            "format" => "is %s args",
+                            "args" => ["resolved"],
+                        ],
+                        $categoryMiddlewareDefinitionFail,
                     ],
-                    $categoryMiddlewareDefinitionFail
-                ]]
+                ],
             ],
             [
                 "layoutViewType" => "home",
                 "layout" => [
                     [
                         "data" => "is resolved args",
-                        0 => null // this indicates we have a null node returned
-                    ]
-                ]
+                        0 => null, // this indicates we have a null node returned
+                    ],
+                ],
             ],
             [
-                'categoryID' => 2
-            ]
+                "categoryID" => 2,
+            ],
         ];
 
         $categoryMiddlewareDefinitionPass = [
             '$middleware' => [
                 "category-filter" => [
-                    "categoryID" => 2
-                ]
-            ]
+                    "categoryID" => 2,
+                ],
+            ],
         ];
 
         yield "Success resolving node when category filter passes " => [
             [
                 "layoutViewType" => "home",
-                "layout" => [[
-                    "data" => [
-                        '$hydrate' => "sprintf",
-                        "format" => "is %s args",
-                        "args" => ["resolved"]
+                "layout" => [
+                    [
+                        "data" => [
+                            '$hydrate' => "sprintf",
+                            "format" => "is %s args",
+                            "args" => ["resolved"],
+                        ],
+                        $categoryMiddlewareDefinitionPass,
                     ],
-                    $categoryMiddlewareDefinitionPass
-                ]]
+                ],
             ],
             [
                 "layoutViewType" => "home",
                 "layout" => [
                     [
                         "data" => "is resolved args",
-                        0 => [] //not null is successful node response
-                    ]
-                ]
+                        0 => [], //not null is successful node response
+                    ],
+                ],
             ],
             [
-                'categoryID' => 2
-            ]
+                "categoryID" => 2,
+            ],
         ];
     }
 
     /**
      * @return LayoutHydrator
      */
-    private function getLayoutService(): LayoutHydrator {
+    private function getLayoutService(): LayoutHydrator
+    {
         return self::container()->get(LayoutHydrator::class);
     }
 }

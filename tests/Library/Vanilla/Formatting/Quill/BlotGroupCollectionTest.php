@@ -14,8 +14,8 @@ use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
 /**
  * Verify basic functionality of BlotGroupCollection.
  */
-class BlotGroupCollectionTest extends BootstrapTestCase {
-
+class BlotGroupCollectionTest extends BootstrapTestCase
+{
     /** @var RichFormat */
     private $formatter;
 
@@ -25,7 +25,8 @@ class BlotGroupCollectionTest extends BootstrapTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->container()->call(function (RichFormat $formatter, Parser $parser) {
             $this->formatter = $formatter;
             $this->parser = $parser;
@@ -38,7 +39,8 @@ class BlotGroupCollectionTest extends BootstrapTestCase {
      * @param string $content
      * @dataProvider provideStringifyContent
      */
-    public function testStringify(string $content): void {
+    public function testStringify(string $content): void
+    {
         $operations = Parser::jsonToOperations($content);
         $collection = $this->parser->parse($operations, Parser::PARSE_MODE_NORMAL);
         $result = $collection->stringify();
@@ -53,7 +55,8 @@ class BlotGroupCollectionTest extends BootstrapTestCase {
      *
      * @return array<string, string[]>
      */
-    public function provideStringifyContent(): array {
+    public function provideStringifyContent(): array
+    {
         $factory = new FormatFixtureFactory("rich");
         $fixtures = $factory->getAllFixtures();
 

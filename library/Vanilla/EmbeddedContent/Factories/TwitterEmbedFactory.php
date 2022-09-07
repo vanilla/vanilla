@@ -14,8 +14,8 @@ use Vanilla\EmbeddedContent\Embeds\TwitterEmbed;
 /**
  * Factory for TwitterEmbed.
  */
-class TwitterEmbedFactory extends AbstractEmbedFactory {
-
+class TwitterEmbedFactory extends AbstractEmbedFactory
+{
     const DOMAINS = ["twitter.com"];
 
     /** @var HttpClient */
@@ -26,21 +26,24 @@ class TwitterEmbedFactory extends AbstractEmbedFactory {
      *
      * @param HttpClient $httpClient
      */
-    public function __construct(HttpClient $httpClient) {
+    public function __construct(HttpClient $httpClient)
+    {
         $this->httpClient = $httpClient;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return self::DOMAINS;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         return "`^/?(?:[^\/]+)/status(es)?/[\d]+`";
     }
 
@@ -49,7 +52,8 @@ class TwitterEmbedFactory extends AbstractEmbedFactory {
      *
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         $data = [
             "embedType" => TwitterEmbed::TYPE,
             "url" => $url,
@@ -65,11 +69,14 @@ class TwitterEmbedFactory extends AbstractEmbedFactory {
      * @param string $url
      * @return int|null
      */
-    private function statusIDFromUrl(string $url): ?int {
-        if (!preg_match("`^/?(?:[^\/]+)/status(es)?/(?<statusID>[\d]+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches)) {
+    private function statusIDFromUrl(string $url): ?int
+    {
+        if (
+            !preg_match("`^/?(?:[^\/]+)/status(es)?/(?<statusID>[\d]+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches)
+        ) {
             return null;
         }
 
-        return (int)$matches["statusID"];
+        return (int) $matches["statusID"];
     }
 }

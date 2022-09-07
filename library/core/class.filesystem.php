@@ -11,8 +11,8 @@
  * @since 2.0
  */
 
-if (!defined('VANILLA_FILE_PUT_FLAGS')) {
-    define('VANILLA_FILE_PUT_FLAGS', LOCK_EX);
+if (!defined("VANILLA_FILE_PUT_FLAGS")) {
+    define("VANILLA_FILE_PUT_FLAGS", LOCK_EX);
 }
 
 /**
@@ -21,8 +21,8 @@ if (!defined('VANILLA_FILE_PUT_FLAGS')) {
  * Abstract many common filesystem tasks such as deleting and creating folders,
  * reading files, and creating blank files.
  */
-class Gdn_FileSystem {
-
+class Gdn_FileSystem
+{
     /** Op. */
     const O_CREATE = 1;
 
@@ -32,9 +32,7 @@ class Gdn_FileSystem {
     /** Op. */
     const O_READ = 4;
 
-    const TRUSTED_FOLDERS = [
-        PATH_UPLOADS,
-    ];
+    const TRUSTED_FOLDERS = [PATH_UPLOADS];
 
     /**
      * Searches the provided file path(s). Returns the first one it finds in the
@@ -43,7 +41,8 @@ class Gdn_FileSystem {
      * @param mixed $files The path (or array of paths) to files which should be checked for
      * existence.
      */
-    public static function exists($files) {
+    public static function exists($files)
+    {
         if (!is_array($files)) {
             $files = [$files];
         }
@@ -66,14 +65,15 @@ class Gdn_FileSystem {
      *
      * @param string $sourceFolder
      */
-    public static function folders($sourceFolders) {
+    public static function folders($sourceFolders)
+    {
         if (!is_array($sourceFolders)) {
             $sourceFolders = [$sourceFolders];
         }
 
-        $blackList = Gdn::config('Garden.FolderBlacklist');
+        $blackList = Gdn::config("Garden.FolderBlacklist");
         if (!is_array($blackList)) {
-            $blackList = ['.', '..'];
+            $blackList = [".", ".."];
         }
 
         $result = [];
@@ -106,7 +106,8 @@ class Gdn_FileSystem {
      * search can be performed. If no white-list is provided, the search will
      * only be performed in $SourceFolder.
      */
-    public static function find($sourceFolders, $fileName, $whiteList = false) {
+    public static function find($sourceFolders, $fileName, $whiteList = false)
+    {
         $return = self::_find($sourceFolders, $whiteList, $fileName, true);
         if (is_array($return)) {
             return count($return) > 0 ? $return[0] : false;
@@ -127,7 +128,8 @@ class Gdn_FileSystem {
      * search can be performed. If no white-list is provided, the search will
      * only be performed in $SourceFolder.
      */
-    public static function findAll($sourceFolders, $fileName, $whiteList = false) {
+    public static function findAll($sourceFolders, $fileName, $whiteList = false)
+    {
         return self::_find($sourceFolders, $whiteList, $fileName, false);
     }
 
@@ -147,7 +149,8 @@ class Gdn_FileSystem {
      * or should it return an array of every instance in which it is found?
      * Default is to return an array of every instance.
      */
-    private static function _find($sourceFolders, $whiteList, $fileName, $returnFirst = false) {
+    private static function _find($sourceFolders, $whiteList, $fileName, $returnFirst = false)
+    {
         $return = [];
 
         if (!is_array($sourceFolders)) {
@@ -167,7 +170,15 @@ class Gdn_FileSystem {
             } else {
                 if ($directoryHandle = opendir($sourceFolder)) {
                     if ($directoryHandle === false) {
-                        trigger_error(errorMessage('Failed to open folder when performing a filesystem search.', 'Gdn_FileSystem', '_Find', $sourceFolder), E_USER_ERROR);
+                        trigger_error(
+                            errorMessage(
+                                "Failed to open folder when performing a filesystem search.",
+                                "Gdn_FileSystem",
+                                "_Find",
+                                $sourceFolder
+                            ),
+                            E_USER_ERROR
+                        );
                     }
 
                     // Search all subfolders
@@ -214,14 +225,14 @@ class Gdn_FileSystem {
      * @param string $libraryName The name of the library to search for. This is a valid file name.
      * ie. "class.database.php"
      */
-    public static function findByMapping($mappingCacheName, $sourceFolders, $folderWhiteList, $libraryName) {
-
+    public static function findByMapping($mappingCacheName, $sourceFolders, $folderWhiteList, $libraryName)
+    {
         // If the application folder was provided, it will be the only entry in the whitelist, so prepend it.
         if (is_array($folderWhiteList) && count($folderWhiteList) == 1) {
             $libraryName = combinePaths([$folderWhiteList[0], $libraryName]);
         }
 
-        $libraryKey = str_replace('.', '__', $libraryName);
+        $libraryKey = str_replace(".", "__", $libraryName);
         Gdn_LibraryMap::prepareCache($mappingCacheName);
         $libraryPath = Gdn_LibraryMap::getCache($mappingCacheName, $libraryKey);
         if ($libraryPath === null) {
@@ -249,7 +260,8 @@ class Gdn_FileSystem {
      * Returns the contents of the specified file, or FALSE if it does not
      * exist.
      */
-    public static function getContents() {
+    public static function getContents()
+    {
         $file = combinePaths(func_get_args());
         if (file_exists($file) && is_file($file)) {
             return file_get_contents($file);
@@ -264,17 +276,29 @@ class Gdn_FileSystem {
      * @param string $fileName The full path and name of the file to be saved.
      * @param string $fileContents The contents of the file being saved.
      */
-    public static function saveFile($fileName, $fileContents, $flags = VANILLA_FILE_PUT_FLAGS) {
-
+    public static function saveFile($fileName, $fileContents, $flags = VANILLA_FILE_PUT_FLAGS)
+    {
         // Check that the folder exists and is writable
         $dirName = dirname($fileName);
         $fileBaseName = basename($fileName);
         if (!is_dir($dirName)) {
-            throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] does not exist.', $fileBaseName, $dirName));
+            throw new Exception(
+                sprintf(
+                    'Requested save operation [%1$s] could not be completed because target folder [%2$s] does not exist.',
+                    $fileBaseName,
+                    $dirName
+                )
+            );
         }
 
         if (!isWritable($dirName)) {
-            throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.', $fileBaseName, $dirName));
+            throw new Exception(
+                sprintf(
+                    'Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.',
+                    $fileBaseName,
+                    $dirName
+                )
+            );
         }
 
         if (file_put_contents($fileName, $fileContents, $flags) === false) {
@@ -290,9 +314,10 @@ class Gdn_FileSystem {
      *
      * @param string $fileName The full path to the file being touched.
      */
-    public static function touch($fileName) {
+    public static function touch($fileName)
+    {
         if (!file_exists($fileName)) {
-            file_put_contents($fileName, '', LOCK_EX);
+            file_put_contents($fileName, "", LOCK_EX);
         }
     }
 
@@ -304,8 +329,9 @@ class Gdn_FileSystem {
      * @param string $mimeType The mime type of the file.
      * @param string $serveMode Whether to download the file as an attachment, or inline
      */
-    public static function serveFile($file, $name = '', $mimeType = '', $serveMode = 'attachment') {
-        $fileIsLocal = (substr($file, 0, 4) == 'http') ? false : true;
+    public static function serveFile($file, $name = "", $mimeType = "", $serveMode = "attachment")
+    {
+        $fileIsLocal = substr($file, 0, 4) == "http" ? false : true;
         if ($fileIsLocal) {
             $fileAvailable = is_readable($file);
             if (is_readable($file)) {
@@ -322,7 +348,6 @@ class Gdn_FileSystem {
             $fileAvailable = true;
         }
 
-
         if ($fileAvailable) {
             // Close the database connection
             Gdn::database()->closeConnection();
@@ -330,11 +355,11 @@ class Gdn_FileSystem {
             // Determine if Path extension should be appended to Name
             $nameExtension = strtolower(pathinfo($name, PATHINFO_EXTENSION));
             $fileExtension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-            if ($nameExtension == '') {
-                if ($name == '') {
-                    $name = pathinfo($file, PATHINFO_FILENAME).'.'.$fileExtension;
-                } elseif (!stringEndsWith($name, '.'.$fileExtension)) {
-                    $name .= '.'.$fileExtension;
+            if ($nameExtension == "") {
+                if ($name == "") {
+                    $name = pathinfo($file, PATHINFO_FILENAME) . "." . $fileExtension;
+                } elseif (!stringEndsWith($name, "." . $fileExtension)) {
+                    $name .= "." . $fileExtension;
                 }
             } else {
                 $extension = $nameExtension;
@@ -357,40 +382,40 @@ class Gdn_FileSystem {
                 "jpeg" => "image/jpg",
                 "jpg" => "image/jpg",
                 "php" => "text/plain",
-                "ico" => "image/vnd.microsoft.icon"
+                "ico" => "image/vnd.microsoft.icon",
             ];
 
-            if ($mimeType == '') {
+            if ($mimeType == "") {
                 if (array_key_exists($fileExtension, $mimeTypes)) {
                     $mimeType = $mimeTypes[$fileExtension];
                 } else {
-                    $mimeType = 'application/force-download';
-                };
-            };
+                    $mimeType = "application/force-download";
+                }
+            }
 
             @ob_end_clean();
 
             // required for IE, otherwise Content-Disposition may be ignored
-            if (ini_get('zlib.output_compression')) {
-                ini_set('zlib.output_compression', 'Off');
+            if (ini_get("zlib.output_compression")) {
+                ini_set("zlib.output_compression", "Off");
             }
 
-            if ($serveMode == 'inline') {
-                safeHeader('Content-Disposition: inline; filename="'.$name.'"');
+            if ($serveMode == "inline") {
+                safeHeader('Content-Disposition: inline; filename="' . $name . '"');
             } else {
-                safeHeader('Content-Disposition: attachment; filename="'.$name.'"');
+                safeHeader('Content-Disposition: attachment; filename="' . $name . '"');
             }
 
-            safeHeader('Content-Type: '.$mimeType);
+            safeHeader("Content-Type: " . $mimeType);
             safeHeader("Content-Transfer-Encoding: binary");
-            safeHeader('Accept-Ranges: bytes');
+            safeHeader("Accept-Ranges: bytes");
             safeHeader("Cache-control: private");
-            safeHeader('Pragma: private');
+            safeHeader("Pragma: private");
             safeHeader("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
             readfile($file);
             exit();
         } else {
-            die('not readable');
+            die("not readable");
         }
     }
 
@@ -401,7 +426,8 @@ class Gdn_FileSystem {
      * @param string $Dir
      * @return void
      */
-    public static function removeFolder($path) {
+    public static function removeFolder($path)
+    {
         if (!file_exists($path)) {
             return;
         }
@@ -411,16 +437,16 @@ class Gdn_FileSystem {
             return;
         }
 
-        $path = rtrim($path, '/').'/';
+        $path = rtrim($path, "/") . "/";
 
         // Get all of the files in the directory.
         if ($dh = opendir($path)) {
             while (($file = readdir($dh)) !== false) {
-                if (trim($file, '.') == '') {
+                if (trim($file, ".") == "") {
                     continue;
                 }
 
-                $subPath = $path.$file;
+                $subPath = $path . $file;
 
                 if (is_dir($subPath)) {
                     self::removeFolder($subPath);
@@ -433,15 +459,16 @@ class Gdn_FileSystem {
         rmdir($path);
     }
 
-    public static function checkFolderR($path, $flags = 0) {
-        $trimPath = ltrim($path, '/');
-        $pathParts = explode('/', $trimPath);
-        $prepend = (strlen($path) !== strlen($trimPath)) ? DS : '';
+    public static function checkFolderR($path, $flags = 0)
+    {
+        $trimPath = ltrim($path, "/");
+        $pathParts = explode("/", $trimPath);
+        $prepend = strlen($path) !== strlen($trimPath) ? DS : "";
 
         $currentPath = [];
         foreach ($pathParts as $folderPart) {
             array_push($currentPath, $folderPart);
-            $testFolder = $prepend.implode(DS, $currentPath);
+            $testFolder = $prepend . implode(DS, $currentPath);
 
             if ($flags & Gdn_FileSystem::O_CREATE) {
                 if (!is_dir($testFolder)) {
@@ -452,7 +479,6 @@ class Gdn_FileSystem {
             if (!is_dir($testFolder)) {
                 return false;
             }
-
         }
 
         if ($flags & Gdn_FileSystem::O_READ) {

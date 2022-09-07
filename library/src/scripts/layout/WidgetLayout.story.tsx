@@ -10,7 +10,7 @@ import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import { HomeWidgetItemContentType } from "@library/homeWidget/HomeWidgetItem.styles";
 import PanelWidget from "@library/layout/components/PanelWidget";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
-import TwoColumnSection from "@library/layout/TwoColumnSection";
+import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { widgetLayoutClasses } from "@library/layout/WidgetLayout.styles";
 import { List } from "@library/lists/List";
@@ -91,7 +91,7 @@ function DummyWidgetContainer(props: IDummy) {
 function DummyPanelWidget() {
     return (
         <WidgetLayout>
-            <TwoColumnSection
+            <SectionTwoColumns
                 breadcrumbs={<Breadcrumbs>{STORY_CRUMBS}</Breadcrumbs>}
                 mainBottom={
                     <PanelWidget>
@@ -117,7 +117,7 @@ function DummyPanelWidget() {
                         </PanelWidget>
                     </>
                 }
-            ></TwoColumnSection>
+            ></SectionTwoColumns>
         </WidgetLayout>
     );
 }

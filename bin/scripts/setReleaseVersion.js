@@ -19,7 +19,7 @@ const filesToAlter = [
 ];
 
 async function run() {
-    const newVersion = await promptVersion()
+    const newVersion = await promptVersion();
 
     for (const file of filesToAlter) {
         const prettyName = file.replace(ROOT, "");

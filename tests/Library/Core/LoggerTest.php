@@ -15,34 +15,41 @@ use VanillaTests\TestLogger;
 /**
  * Tests for the `Logger` class.
  */
-class LoggerTest extends BootstrapTestCase {
+class LoggerTest extends BootstrapTestCase
+{
     /**
      * Test adding and removing a logger.
      */
-    public function testAddRemoveLogger(): void {
+    public function testAddRemoveLogger(): void
+    {
         $logger = new TestLogger();
         \Logger::addLogger($logger);
-        \Logger::event('foo', LogLevel::INFO, 'bar');
-        $this->assertNotNull($logger->search([
-            \Logger::FIELD_EVENT => 'foo',
-            'message' => 'bar',
-            'level' => LogLevel::INFO,
-        ]));
+        \Logger::event("foo", LogLevel::INFO, "bar");
+        $this->assertNotNull(
+            $logger->search([
+                \Logger::FIELD_EVENT => "foo",
+                "message" => "bar",
+                "level" => LogLevel::INFO,
+            ])
+        );
 
         $logger->clear();
         \Logger::removeLogger($logger);
-        \Logger::event('foo', LogLevel::INFO, 'bar');
-        $this->assertNull($logger->search([
-            \Logger::FIELD_EVENT => 'foo',
-            'message' => 'bar',
-            'level' => LogLevel::INFO,
-        ]));
+        \Logger::event("foo", LogLevel::INFO, "bar");
+        $this->assertNull(
+            $logger->search([
+                \Logger::FIELD_EVENT => "foo",
+                "message" => "bar",
+                "level" => LogLevel::INFO,
+            ])
+        );
     }
 
     /**
      * You shouldn't be able to add a vanilla logger to the logger.
      */
-    public function testAddInvalidLogger(): void {
+    public function testAddInvalidLogger(): void
+    {
         $logger = new \Vanilla\Logger();
         $this->expectException(\InvalidArgumentException::class);
         \Logger::addLogger($logger);
@@ -54,12 +61,13 @@ class LoggerTest extends BootstrapTestCase {
      * @param string $level
      * @dataProvider provideLogLevels
      */
-    public function testBasicLoggingMethods(string $level): void {
+    public function testBasicLoggingMethods(string $level): void
+    {
         $method = [\Logger::class, $level];
         call_user_func($method, $level);
         $this->assertLog([
-            'level' => $level,
-            'message' => $level,
+            "level" => $level,
+            "message" => $level,
         ]);
     }
 
@@ -71,15 +79,17 @@ class LoggerTest extends BootstrapTestCase {
      *
      * @dataProvider provideLogLevels
      */
-    public function testPriorityLabels(string $level, int $priority): void {
+    public function testPriorityLabels(string $level, int $priority): void
+    {
         $this->assertSame($level, \Logger::priorityLabel($priority));
     }
 
     /**
      * An unknown priority should get a standard label.
      */
-    public function testUnknownPriorityLabel(): void {
-        $this->assertSame('unknown', \Logger::priorityLabel('foo'));
+    public function testUnknownPriorityLabel(): void
+    {
+        $this->assertSame("unknown", \Logger::priorityLabel("foo"));
     }
 
     /**
@@ -89,29 +99,33 @@ class LoggerTest extends BootstrapTestCase {
      * @param int $priority
      * @dataProvider provideLogLevels
      */
-    public function testLevelPriority(string $level, int $priority): void {
+    public function testLevelPriority(string $level, int $priority): void
+    {
         $this->assertSame($priority, \Logger::levelPriority($level));
     }
 
     /**
      * An empty level should be interpreted as debug level.
      */
-    public function testEmptyLevelPriority(): void {
-        $this->assertSame(LOG_DEBUG, \Logger::levelPriority(''));
+    public function testEmptyLevelPriority(): void
+    {
+        $this->assertSame(LOG_DEBUG, \Logger::levelPriority(""));
     }
 
     /**
      * An unknown log level should be a notice.
      */
-    public function testUnknownLevelPriority(): void {
+    public function testUnknownLevelPriority(): void
+    {
         $this->expectNotice();
-        \Logger::levelPriority('foo');
+        \Logger::levelPriority("foo");
     }
 
     /**
      * Test get levels.
      */
-    public function testGetLevels(): void {
+    public function testGetLevels(): void
+    {
         $test = $this->provideLogLevels();
         $levels = \Logger::getLevels();
         $this->assertSame(count($test), count($levels));
@@ -122,7 +136,8 @@ class LoggerTest extends BootstrapTestCase {
      *
      * @return array
      */
-    public function provideLogLevels(): array {
+    public function provideLogLevels(): array
+    {
         return [
             LogLevel::DEBUG => [LogLevel::DEBUG, LOG_DEBUG],
             LogLevel::INFO => [LogLevel::INFO, LOG_INFO],

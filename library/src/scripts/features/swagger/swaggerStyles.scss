@@ -1,16 +1,12 @@
-@import "~swagger-ui-react/swagger-ui.css";
+@import "~swagger-ui/dist/swagger-ui.css";
 
 .swagger-ui.swagger-ui {
     text-align: left;
     font-family: inherit !important;
+
     .wrapper {
         padding: 0;
         margin: 0;
-    }
-
-    // Widen the min-width on the first table column.
-    table tbody tr td:first-of-type {
-        min-width: 12em;
     }
 
     // Hide this unwanted tag.
@@ -18,53 +14,23 @@
         display: none;
     }
 
-    .opblock {
-        line-height: 1;
+    // Hide unneeded inputs
+    .parameters-col_description {
+        input,
+        select {
+            display: none;
+        }
     }
 
-    .loading {
-        white-space: nowrap;
+    thead .response-col_status {
+        font-size: 12px;
     }
 
-    .opblock-summary {
-        flex-direction: column;
-        align-items: center;
-        min-height: 42px;
-        padding-left: 105px;
-        position: relative;
-        align-items: flex-start;
+    tbody .response-col_status {
+        padding-top: 24px;
     }
 
-    .authorization__btn {
-        display: none;
-    }
-
-    .opblock-summary-method {
-        position: absolute;
-        left: 5px;
-        top: 5px;
-        bottom: 5px;
-        width: 100px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: inherit;
-    }
-
-    .opblock-summary-description {
-        padding: 0 10px;
-        padding-top: 5px;
-        font-family: inherit;
-    }
-
-    table.model {
-        margin-top: 24px;
-    }
-
-    .try-out {
-        display: none;
-    }
-
+    // Fix the margin on the example tabs
     .model-example .tab {
         margin: 0;
         margin-bottom: 10px;
@@ -74,21 +40,33 @@
         display: none;
     }
 
-    .parameters-col_description {
-        input,
-        select {
-            display: none;
-        }
+    // Wrap the endpoint description to their own line.
+
+    .opblock-summary-path.opblock-summary-path.opblock-summary-path {
+        width: 100%;
+        max-width: initial;
+        line-height: 1.2;
     }
 
-    // Fix wrapping and alignmenet of "required" markers.
-    .opblock-title {
+    .opblock-summary-method {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 100px;
         display: flex;
         align-items: center;
+        justify-content: center;
+        font-family: inherit;
+    }
 
-        &:after {
-            // This is some pseudo-text.
-            white-space: nowrap;
+    .opblock-summary-description {
+        padding: 0 10px;
+        padding-top: 1px;
+        font-family: inherit;
+
+        &:empty {
+            display: none;
         }
     }
 
@@ -99,19 +77,38 @@
         padding-left: 0;
         padding-right: 0;
         font-family: inherit;
+    }
 
-        &:hover {
-            background: none;
+    .opblock-summary-control {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        position: relative;
+        padding-left: 105px;
+        padding-right: 40px;
+        min-height: 40px;
 
-            a {
-                text-decoration: underline !important;
-            }
+        .arrow {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
         }
     }
 
-    .opblock-tag + div {
-        display: flex;
-        flex-direction: column;
+    .parameter__name.required:after {
+        white-space: nowrap;
+    }
+
+    .authorization__btn {
+        display: none;
+    }
+
+    .loading-container {
+        .loading::after {
+            min-width: 48px;
+        }
     }
 }
 

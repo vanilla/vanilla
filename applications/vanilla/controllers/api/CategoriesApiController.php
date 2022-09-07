@@ -25,8 +25,8 @@ use Vanilla\Utility\TreeBuilder;
 /**
  * API Controller for the `/categories` resource.
  */
-class CategoriesApiController extends AbstractApiController {
-
+class CategoriesApiController extends AbstractApiController
+{
     /** @var CategoryModel */
     private $categoryModel;
 
@@ -50,7 +50,7 @@ class CategoriesApiController extends AbstractApiController {
     public const OUTPUT_FORMATS = [self::OUTPUT_FORMAT_TREE, self::OUTPUT_FORMAT_FLAT];
 
     /** @var string */
-    const ERRORINDEXMSG = 'The following fields: {page, limit, outputFormat=flat} is incompatible with {maxDepth, outputFormat=tree}';
+    const ERRORINDEXMSG = "The following fields: {page, limit, outputFormat=flat} is incompatible with {maxDepth, outputFormat=tree}";
 
     /** @var SiteSectionModel */
     private $siteSectionModel;
@@ -82,22 +82,23 @@ class CategoriesApiController extends AbstractApiController {
      * @param array $extra Additional fields to include.
      * @return Schema Returns a schema object.
      */
-    public function categoryPostSchema($type = '', array $extra = []) {
+    public function categoryPostSchema($type = "", array $extra = [])
+    {
         if ($this->categoryPostSchema === null) {
             $fields = [
-                'name',
-                'parentCategoryID?',
-                'urlcode',
-                'displayAs?',
-                'customPermissions?',
-                'description?',
-                'featured?',
-                'iconUrl?',
-                'bannerUrl?'
+                "name",
+                "parentCategoryID?",
+                "urlcode",
+                "displayAs?",
+                "customPermissions?",
+                "description?",
+                "featured?",
+                "iconUrl?",
+                "bannerUrl?",
             ];
             $this->categoryPostSchema = $this->schema(
                 Schema::parse(array_merge($fields, $extra))->add($this->schemaWithParent()),
-                'CategoryPost'
+                "CategoryPost"
             );
         }
         return $this->schema($this->categoryPostSchema, $type);
@@ -109,9 +110,10 @@ class CategoriesApiController extends AbstractApiController {
      * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
-    public function categorySchema($type = '') {
+    public function categorySchema($type = "")
+    {
         if ($this->categorySchema === null) {
-            $this->categorySchema = $this->schema($this->fullSchema(), 'Category');
+            $this->categorySchema = $this->schema($this->fullSchema(), "Category");
         }
         return $this->schema($this->categorySchema, $type);
     }
@@ -123,10 +125,11 @@ class CategoriesApiController extends AbstractApiController {
      * @throws NotFoundException if the category cannot be found.
      * @return array
      */
-    public function category($id) {
+    public function category($id)
+    {
         $category = CategoryModel::categories($id);
         if (empty($category)) {
-            throw new NotFoundException('Category');
+            throw new NotFoundException("Category");
         }
         return $category;
     }
@@ -140,23 +143,27 @@ class CategoriesApiController extends AbstractApiController {
      * @throws ServerException if the category has its CanDelete flag set to false.
      * @throws ServerException if the category has children.
      */
-    public function delete($id, array $query = []): Data {
-        $this->permission('Garden.Settings.Manage');
+    public function delete($id, array $query = []): Data
+    {
+        $this->permission("Garden.Settings.Manage");
 
-        $in = $this->schema([
-            "batch:b?" => ["default" => false],
-            "newCategoryID:i?"
-        ], "in");
-        $out = $this->schema([], 'out');
+        $in = $this->schema(
+            [
+                "batch:b?" => ["default" => false],
+                "newCategoryID:i?",
+            ],
+            "in"
+        );
+        $out = $this->schema([], "out");
 
         $query = $in->validate($query);
         $row = $this->category($id);
-        $children = $this->categoryModel->getChildTree($row['CategoryID']);
-        if (!$row['CanDelete']) {
-            throw new ServerException('The specified category cannot be deleted.', 500);
+        $children = $this->categoryModel->getChildTree($row["CategoryID"]);
+        if (!$row["CanDelete"]) {
+            throw new ServerException("The specified category cannot be deleted.", 500);
         }
         if (count($children) > 0) {
-            throw new ServerException('Cannot delete categories with children.', 500);
+            throw new ServerException("Cannot delete categories with children.", 500);
         }
 
         $options = [];
@@ -170,7 +177,9 @@ class CategoriesApiController extends AbstractApiController {
         }
         $args = [$id, $deleteOptions];
 
-        $response = $this->runner->runApi(new LongRunnerAction(CategoryModel::class, 'deleteIDIterable', $args, $options));
+        $response = $this->runner->runApi(
+            new LongRunnerAction(CategoryModel::class, "deleteIDIterable", $args, $options)
+        );
         if ($response->getStatus() === 200) {
             $response->setStatus(204);
         }
@@ -182,7 +191,8 @@ class CategoriesApiController extends AbstractApiController {
      *
      * @return Schema Returns a schema object.
      */
-    public function fullSchema() {
+    public function fullSchema()
+    {
         return $this->categoryModel->schema();
     }
 
@@ -195,17 +205,21 @@ class CategoriesApiController extends AbstractApiController {
      * @return array
      * @throws NotFoundException If unable to find the category.
      */
-    public function get(int $id, array $query = []) {
-        $query['id'] = $id;
-        if (!$this->categoryModel::checkPermission($id, 'Vanilla.Discussions.View')) {
-            throw new ForbiddenException('Category');
+    public function get(int $id, array $query = [])
+    {
+        $query["id"] = $id;
+        if (!$this->categoryModel::checkPermission($id, "Vanilla.Discussions.View")) {
+            throw new ForbiddenException("Category");
         }
 
-        $in = $this->idParamSchema()->setDescription('Get a category.');
+        $in = $this->idParamSchema()->setDescription("Get a category.");
         $query = $in->validate($query);
-        $expand = $query['expand'];
+        $expand = $query["expand"];
 
-        $out = $this->schema(CrawlableRecordSchema::applyExpandedSchema($this->schemaWithParent(), 'category', $expand), 'out');
+        $out = $this->schema(
+            CrawlableRecordSchema::applyExpandedSchema($this->schemaWithParent(), "category", $expand),
+            "out"
+        );
 
         $row = $this->category($id);
         $row = $this->normalizeOutput($row, $expand);
@@ -221,13 +235,24 @@ class CategoriesApiController extends AbstractApiController {
      * @throws NotFoundException if unable to find the category.
      * @return array
      */
-    public function get_edit($id) {
-        $this->permission('Garden.Settings.Manage');
+    public function get_edit($id)
+    {
+        $this->permission("Garden.Settings.Manage");
 
-        $in = $this->idParamSchema()->setDescription('Get a category for editing.');
-        $out = $this->schema(Schema::parse([
-            'categoryID', 'name', 'parentCategoryID', 'urlcode', 'description', 'displayAs', 'iconUrl', 'bannerUrl'
-        ])->add($this->fullSchema()), 'out');
+        $in = $this->idParamSchema()->setDescription("Get a category for editing.");
+        $out = $this->schema(
+            Schema::parse([
+                "categoryID",
+                "name",
+                "parentCategoryID",
+                "urlcode",
+                "description",
+                "displayAs",
+                "iconUrl",
+                "bannerUrl",
+            ])->add($this->fullSchema()),
+            "out"
+        );
 
         $row = $this->category($id);
         $row = $this->normalizeOutput($row);
@@ -243,7 +268,8 @@ class CategoriesApiController extends AbstractApiController {
      * @param int $userID
      * @return Data
      */
-    public function get_preferences(int $id, int $userID): Data {
+    public function get_preferences(int $id, int $userID): Data
+    {
         if ($this->getSession()->UserID === $userID) {
             $permission = "Garden.SignIn.Allow";
         } else {
@@ -268,39 +294,40 @@ class CategoriesApiController extends AbstractApiController {
      * @param array $query The query string.
      * @return Data
      */
-    public function get_search(array $query) {
+    public function get_search(array $query)
+    {
         $this->permission();
 
         $in = $this->schema([
-            'query:s' => [
-                'description' => 'Category name filter.',
-                'minLength' => 0,
+            "query:s" => [
+                "description" => "Category name filter.",
+                "minLength" => 0,
             ],
-            'page:i?' => [
-                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
-                'default' => 1,
-                'minimum' => 1,
+            "page:i?" => [
+                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                "default" => 1,
+                "minimum" => 1,
             ],
-            'parentCategoryID:i?',
-            'limit:i?' => [
-                'description' => 'Desired number of items per page.',
-                'default' => $this->categoryModel->getDefaultLimit(),
-                'minimum' => 1,
-                'maximum' => ApiUtils::getMaxLimit(100),
+            "parentCategoryID:i?",
+            "limit:i?" => [
+                "description" => "Desired number of items per page.",
+                "default" => $this->categoryModel->getDefaultLimit(),
+                "minimum" => 1,
+                "maximum" => ApiUtils::getMaxLimit(100),
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['parent', 'breadcrumbs'])
-        ])->setDescription('Search categories.');
-        $expand =  $query['expand'] ?? [];
-        $out = $this->schema([':a' => $this->schemaWithParent($expand)], 'out');
+            "expand?" => ApiUtils::getExpandDefinition(["parent", "breadcrumbs"]),
+        ])->setDescription("Search categories.");
+        $expand = $query["expand"] ?? [];
+        $out = $this->schema([":a" => $this->schemaWithParent($expand)], "out");
 
         $query = $in->validate($query);
 
-        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
 
         $results = $this->categoryModel->searchByName(
-            $query['query'],
-            $query['parentCategoryID'] ?? null,
-            $this->isExpandField('parent', $expand),
+            $query["query"],
+            $query["parentCategoryID"] ?? null,
+            $this->isExpandField("parent", $expand),
             $limit,
             $offset
         );
@@ -311,9 +338,9 @@ class CategoriesApiController extends AbstractApiController {
 
         $result = $out->validate($results);
 
-        $paging = ApiUtils::morePagerInfo($result, '/api/v2/categories/search', $query, $in);
+        $paging = ApiUtils::morePagerInfo($result, "/api/v2/categories/search", $query, $in);
 
-        return new Data($result, ['paging' => $paging]);
+        return new Data($result, ["paging" => $paging]);
     }
 
     /**
@@ -322,12 +349,13 @@ class CategoriesApiController extends AbstractApiController {
      * @param string $type The type of schema.
      * @return Schema Returns a schema object.
      */
-    public function idParamSchema($type = 'in') {
+    public function idParamSchema($type = "in")
+    {
         if ($this->idParamSchema === null) {
             $this->idParamSchema = $this->schema(
                 Schema::parse([
-                    'id:i' => 'The category ID.',
-                    'expand?' => ApiUtils::getExpandDefinition([]),
+                    "id:i" => "The category ID.",
+                    "expand?" => ApiUtils::getExpandDefinition([]),
                 ]),
                 $type
             );
@@ -338,42 +366,49 @@ class CategoriesApiController extends AbstractApiController {
     /**
      * @return Schema Returns a schema object.
      */
-    public function getIndexSchema(): Schema {
-        return $this->schema([
-            'categoryID?' => \Vanilla\Schema\RangeExpression::createSchema([':int']),
-            'parentCategoryID:i?',
-            'parentCategoryCode:s?',
-            'followed:b?',
-            'maxDepth:i?' => [
-                'description' => ''
-            ],
-            'archived:b|n' => [
-                'default' => null
-            ],
-            'page:i?' => [
-                'minimum' => 1,
-                'maximum' => $this->categoryModel->getMaxPages(),
-            ],
-            'limit:i?' => [
-                'minimum' => 1,
-                'maximum' => ApiUtils::getMaxLimit(),
-            ],
-            'expand?' => ApiUtils::getExpandDefinition([]),
-            'featured:b?',
-            'dirtyRecords:b?',
-            'outputFormat:s?' => [
-                'enum' => self::OUTPUT_FORMATS,
-            ],
-            'siteSectionID:s?' => [
-                'description' => 'Filter categories by site-section-id (subcommunity).
+    public function getIndexSchema(): Schema
+    {
+        return $this->schema(
+            [
+                "categoryID?" => \Vanilla\Schema\RangeExpression::createSchema([":int"]),
+                "parentCategoryID:i?",
+                "parentCategoryCode:s?",
+                "followed:b?",
+                "maxDepth:i?" => [
+                    "description" => "",
+                ],
+                "archived:b|n" => [
+                    "default" => null,
+                ],
+                "page:i?" => [
+                    "minimum" => 1,
+                    "maximum" => $this->categoryModel->getMaxPages(),
+                ],
+                "limit:i?" => [
+                    "minimum" => 1,
+                    "maximum" => ApiUtils::getMaxLimit(),
+                ],
+                "expand?" => ApiUtils::getExpandDefinition([]),
+                "featured:b?",
+                "dirtyRecords:b?",
+                "outputFormat:s?" => [
+                    "enum" => self::OUTPUT_FORMATS,
+                ],
+                "siteSectionID:s?" => [
+                    "description" => 'Filter categories by site-section-id (subcommunity).
                      The subcommunityID or folder can be used.
                      The query looks like:
                      siteSectionID=$SubcommunityID:{id} ie. 1
                      siteSectionID=$SubcommunityID:{folder} ie. ',
-            ]
-        ], 'in')
-            ->addValidator('', \Vanilla\Utility\SchemaUtils::onlyOneOf(['categoryID', 'parentCategoryID', 'parentCategoryCode']))
-            ->setDescription('List categories.');
+                ],
+            ],
+            "in"
+        )
+            ->addValidator(
+                "",
+                \Vanilla\Utility\SchemaUtils::onlyOneOf(["categoryID", "parentCategoryID", "parentCategoryCode"])
+            )
+            ->setDescription("List categories.");
     }
 
     /**
@@ -383,15 +418,16 @@ class CategoriesApiController extends AbstractApiController {
      * @return array
      * @throws NotFoundException If unable to find the category.
      */
-    public function getIndexParentCategoryID(array $query): array {
-        if (array_key_exists('parentCategoryID', $query)) {
-            $parent = $this->category($query['parentCategoryID']);
-        } elseif (array_key_exists('parentCategoryCode', $query)) {
-            $parent = $this->category($query['parentCategoryCode']);
-        } elseif (!empty($query['siteSectionID'])) {
-            $siteSection = $this->siteSectionModel->getByID($query['siteSectionID']);
-            $categoryID = ($siteSection) ? $siteSection->getCategoryID() : [];
-            $parent = $categoryID ? $this->category($categoryID) : ['CategoryID' => 0];
+    public function getIndexParentCategoryID(array $query): array
+    {
+        if (array_key_exists("parentCategoryID", $query)) {
+            $parent = $this->category($query["parentCategoryID"]);
+        } elseif (array_key_exists("parentCategoryCode", $query)) {
+            $parent = $this->category($query["parentCategoryCode"]);
+        } elseif (!empty($query["siteSectionID"])) {
+            $siteSection = $this->siteSectionModel->getByID($query["siteSectionID"]);
+            $categoryID = $siteSection ? $siteSection->getCategoryID() : [];
+            $parent = $categoryID ? $this->category($categoryID) : ["CategoryID" => 0];
         } else {
             $parent = [];
         }
@@ -405,24 +441,18 @@ class CategoriesApiController extends AbstractApiController {
      * @param array $parentCategory
      * @return string
      */
-    public function getIndexFormat(array $query, array $parentCategory): string {
-        if (array_key_exists('outputFormat', $query)) {
-            return $query['outputFormat'];
+    public function getIndexFormat(array $query, array $parentCategory): string
+    {
+        if (array_key_exists("outputFormat", $query)) {
+            return $query["outputFormat"];
         }
 
         // Check the parent category.
-        if (array_key_exists('DisplayAs', $parentCategory) && $parentCategory['DisplayAs'] == 'Flat') {
-            return 'flat';
+        if (array_key_exists("DisplayAs", $parentCategory) && $parentCategory["DisplayAs"] == "Flat") {
+            return "flat";
         }
 
-        $defaultToFlatKeys = [
-            'categoryID',
-            'dirtyRecords',
-            'page',
-            'limit',
-            'followed',
-            'featured',
-        ];
+        $defaultToFlatKeys = ["categoryID", "dirtyRecords", "page", "limit", "followed", "featured"];
 
         $keys = array_keys($query);
         $flatKeysFound = array_intersect($keys, $defaultToFlatKeys);
@@ -441,79 +471,83 @@ class CategoriesApiController extends AbstractApiController {
      * @param bool $filter Apply permission based filter
      * @return Data
      */
-    public function index(array $query, bool $filter = true): Data {
+    public function index(array $query, bool $filter = true): Data
+    {
         $this->permission();
         $in = $this->getIndexSchema();
         $query = $in->validate($query);
         $this->checkMixedQuery($query);
 
-        $expand = $query['expand'];
-        $out = $this->schema([
-            ':a' => CrawlableRecordSchema::applyExpandedSchema($this->schemaWithChildren(), 'category', $expand)
-        ], 'out');
+        $expand = $query["expand"];
+        $out = $this->schema(
+            [
+                ":a" => CrawlableRecordSchema::applyExpandedSchema($this->schemaWithChildren(), "category", $expand),
+            ],
+            "out"
+        );
 
         $parentCategory = $this->getIndexParentCategoryID($query);
         $format = $this->getIndexFormat($query, $parentCategory);
         $this->categoryModel->setJoinUserCategory(false);
 
-        $page = isset($query['page']) ? $query['page'] : 1;
-        $limit = isset($query['limit']) ? $query['limit'] : 30;
+        $page = isset($query["page"]) ? $query["page"] : 1;
+        $limit = isset($query["limit"]) ? $query["limit"] : 30;
         [$offset, $limit] = offsetLimit("p{$page}", $limit);
         if ($format === self::OUTPUT_FORMAT_TREE) {
-            $limit = '';
+            $limit = "";
             $page = 1;
         }
 
         $where = [];
-        $sort = '';
+        $sort = "";
 
-        if ($query['featured'] ?? false) {
-            $where['Featured'] = $query['featured'] ? 1 : 0;
-            $sort = 'SortFeatured';
+        if ($query["featured"] ?? false) {
+            $where["Featured"] = $query["featured"] ? 1 : 0;
+            $sort = "SortFeatured";
         }
 
-        if ($query['dirtyRecords'] ?? false) {
+        if ($query["dirtyRecords"] ?? false) {
             $where[DirtyRecordModel::DIRTY_RECORD_OPT] = true;
         }
 
-        if ($format === 'tree') {
-            $maxDepth = $query['maxDepth'] ?? 2;
-            $parentCategoryDepth = $parentCategory['Depth'] ?? 0;
+        if ($format === "tree") {
+            $maxDepth = $query["maxDepth"] ?? 2;
+            $parentCategoryDepth = $parentCategory["Depth"] ?? 0;
             $maxDepth = $maxDepth + $parentCategoryDepth;
-            $where['Depth <='] = $maxDepth;
+            $where["Depth <="] = $maxDepth;
         }
 
         /** @var RangeExpression $categoryIDs */
-        $categoryIDs = $query['categoryID'] ?? new RangeExpression('>', 0);
+        $categoryIDs = $query["categoryID"] ?? new RangeExpression(">", 0);
 
         // Apply permission filtering.
         $visibleIDs = $this->categoryModel->getVisibleCategoryIDs();
         if ($visibleIDs === true) {
-            $categoryIDs = $categoryIDs->withFilteredValue('>', 0);
+            $categoryIDs = $categoryIDs->withFilteredValue(">", 0);
         } else {
-            $categoryIDs = $categoryIDs->withFilteredValue('=', $visibleIDs);
+            $categoryIDs = $categoryIDs->withFilteredValue("=", $visibleIDs);
         }
 
         // Apply "followed" filtering.
-        if ($query['followed'] ?? false) {
+        if ($query["followed"] ?? false) {
             $followedRecords = $this->categoryModel->getFollowed($this->getSession()->UserID);
-            $followedIDs = array_column($followedRecords, 'CategoryID');
+            $followedIDs = array_column($followedRecords, "CategoryID");
             $categoryIDs = $categoryIDs->withFilteredValue("=", $followedIDs);
         }
 
         // Parent category filtering.
         if (!empty($parentCategory)) {
-            $descendantIDs = $this->categoryModel->getCategoriesDescendantIDs([$parentCategory['CategoryID']]);
+            $descendantIDs = $this->categoryModel->getCategoriesDescendantIDs([$parentCategory["CategoryID"]]);
             $categoryIDs = $categoryIDs->withFilteredValue("=", $descendantIDs);
         }
 
-        $where['CategoryID'] = $categoryIDs;
+        $where["CategoryID"] = $categoryIDs;
 
         [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset, $sort, $filter);
 
         // Filter tree by the category "archived" fields.
-        if (!isset($query['followed']) && $query['archived'] !== null) {
-            $categories = $this->archiveFilter($categories, $query['archived'] ? 0 : 1);
+        if (!isset($query["followed"]) && $query["archived"] !== null) {
+            $categories = $this->archiveFilter($categories, $query["archived"] ? 0 : 1);
         }
 
         foreach ($categories as &$category) {
@@ -521,21 +555,23 @@ class CategoriesApiController extends AbstractApiController {
         }
         $categories = $out->validate($categories);
 
-        if ($format === 'tree') {
-            $categories = $this->treeNormalizedBuilder()->buildTree($categories);
-        } elseif ($sort === '') {
+        if ($format === "tree") {
+            $categories = $this->treeNormalizedBuilder()
+                ->setRootID($parentCategory["ParentCategoryID"] ?? null)
+                ->buildTree($categories);
+        } elseif ($sort === "") {
             $categories = $this->treeNormalizedBuilder()->sort($categories);
         }
 
         if (isset($totalCountCallBack) && $format === self::OUTPUT_FORMAT_FLAT) {
-            $query['page'] = $page;
-            $query['limit'] = $limit;
-            $paging = ApiUtils::numberedPagerInfo($totalCountCallBack(), '/api/v2/categories', $query, $in);
+            $query["page"] = $page;
+            $query["limit"] = $limit;
+            $paging = ApiUtils::numberedPagerInfo($totalCountCallBack(), "/api/v2/categories", $query, $in);
         } else {
             $paging = [];
         }
 
-        return new Data($categories, ['paging' => $paging]);
+        return new Data($categories, ["paging" => $paging]);
     }
 
     /**
@@ -544,7 +580,8 @@ class CategoriesApiController extends AbstractApiController {
      * @param int $userID
      * @return Data
      */
-    public function index_preferences(int $userID): Data {
+    public function index_preferences(int $userID): Data
+    {
         if ($this->getSession()->UserID === $userID) {
             $permission = "Garden.SignIn.Allow";
         } else {
@@ -571,16 +608,17 @@ class CategoriesApiController extends AbstractApiController {
      * @param int $archived
      * @return array
      */
-    private function archiveFilter(array $categories, $archived) {
+    private function archiveFilter(array $categories, $archived)
+    {
         $result = [];
         foreach ($categories as $index => $category) {
             // Discard, based on archived value.
-            if (array_key_exists('Archived', $category) && $category['Archived'] === $archived) {
+            if (array_key_exists("Archived", $category) && $category["Archived"] === $archived) {
                 continue;
             }
             // Process any children.
-            if (!empty($category['Children'])) {
-                $category['Children'] = $this->archiveFilter($category['Children'], $archived);
+            if (!empty($category["Children"])) {
+                $category["Children"] = $this->archiveFilter($category["Children"], $archived);
             }
             // If the category made it this far, include it.
             $result[] = $category;
@@ -596,32 +634,33 @@ class CategoriesApiController extends AbstractApiController {
      * @throws NotFoundException if unable to find the category.
      * @return array
      */
-    public function patch($id, array $body) {
-        $this->permission('Garden.Settings.Manage');
+    public function patch($id, array $body)
+    {
+        $this->permission("Garden.Settings.Manage");
 
-        $this->idParamSchema('in');
-        $in = $this->categoryPostSchema('in', [
-            'description',
-            'parentCategoryID' => 'Parent category ID. Changing a category\'s parent will rebuild the category tree.'
-        ])->setDescription('Update a category.');
-        $out = $this->schemaWithParent(false, 'out');
+        $this->idParamSchema("in");
+        $in = $this->categoryPostSchema("in", [
+            "description",
+            "parentCategoryID" => 'Parent category ID. Changing a category\'s parent will rebuild the category tree.',
+        ])->setDescription("Update a category.");
+        $out = $this->schemaWithParent(false, "out");
 
         $body = $in->validate($body, true);
         // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->category($id);
 
-        if (array_key_exists('parentCategoryID', $body)) {
-            $this->updateParent($id, $body['parentCategoryID']);
-            unset($body['parentCategoryID']);
+        if (array_key_exists("parentCategoryID", $body)) {
+            $this->updateParent($id, $body["parentCategoryID"]);
+            unset($body["parentCategoryID"]);
         }
 
         if (!empty($body)) {
-            if (array_key_exists('customPermissions', $body)) {
+            if (array_key_exists("customPermissions", $body)) {
                 $this->categoryModel->save([
-                    'CategoryID' => $id,
-                    'CustomPermissions' => $body['customPermissions']
+                    "CategoryID" => $id,
+                    "CustomPermissions" => $body["customPermissions"],
                 ]);
-                unset($body['customPermissions']);
+                unset($body["customPermissions"]);
             }
             $categoryData = $this->normalizeInput($body);
             $this->categoryModel->setField($id, $categoryData);
@@ -646,7 +685,8 @@ class CategoriesApiController extends AbstractApiController {
      *      Garden.Users.Edit or the Moderation.Profiles.Edit permission.
      * 3. if opting for email notifications when the user in question doesn't have the Garden.Email.View permission.
      */
-    public function patch_preferences(int $id, int $userID, array $body): Data {
+    public function patch_preferences(int $id, int $userID, array $body): Data
+    {
         if ($this->getSession()->UserID === $userID) {
             $permission = "Garden.SignIn.Allow";
             $isSelfService = true;
@@ -668,12 +708,18 @@ class CategoriesApiController extends AbstractApiController {
 
         // Make sure the user whose preferences are being changed has the Email.View permission if opting for email
         // notifications. Throw an error if they don't.
-        if (isset($body[CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS]) && $body[CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS]) {
+        if (
+            isset($body[CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS]) &&
+            $body[CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS]
+        ) {
             $hasEmailViewPerm = $isSelfService
-                ? $this->getPermissions()->has('Garden.Email.View')
-                : Gdn::getContainer()->get(UserModel::class)->getPermissions($userID)->has('Garden.Email.View');
+                ? $this->getPermissions()->has("Garden.Email.View")
+                : Gdn::getContainer()
+                    ->get(UserModel::class)
+                    ->getPermissions($userID)
+                    ->has("Garden.Email.View");
             if (!$hasEmailViewPerm) {
-                throw new \Vanilla\Exception\PermissionException('Garden.Email.View');
+                throw new \Vanilla\Exception\PermissionException("Garden.Email.View");
             }
         }
 
@@ -691,11 +737,12 @@ class CategoriesApiController extends AbstractApiController {
      * @throws ServerException if the category could not be created.
      * @return array
      */
-    public function post(array $body) {
-        $this->permission('Garden.Settings.Manage');
+    public function post(array $body)
+    {
+        $this->permission("Garden.Settings.Manage");
 
-        $in = $this->schema($this->categoryPostSchema(), 'in')->setDescription('Add a category.');
-        $out = $this->schema($this->schemaWithParent(), 'out');
+        $in = $this->schema($this->categoryPostSchema(), "in")->setDescription("Add a category.");
+        $out = $this->schema($this->schemaWithParent(), "out");
 
         $body = $in->validate($body);
 
@@ -704,7 +751,7 @@ class CategoriesApiController extends AbstractApiController {
         $this->validateModel($this->categoryModel);
 
         if (!$id) {
-            throw new ServerException('Unable to add category.', 500);
+            throw new ServerException("Unable to add category.", 500);
         }
 
         $row = $this->category($id);
@@ -719,24 +766,25 @@ class CategoriesApiController extends AbstractApiController {
      * @param int $id The target category's ID.
      * @return array
      */
-    public function put_follow($id, array $body) {
-        $this->permission('Garden.SignIn.Allow');
+    public function put_follow($id, array $body)
+    {
+        $this->permission("Garden.SignIn.Allow");
 
-        $schema = ['followed:b' => 'The category-follow status for the current user.'];
-        $in = $this->schema($schema, 'in');
-        $out = $this->schema($schema, 'out');
+        $schema = ["followed:b" => "The category-follow status for the current user."];
+        $in = $this->schema($schema, "in");
+        $out = $this->schema($schema, "out");
 
         $category = $this->category($id);
         $body = $in->validate($body);
         $userID = $this->getSession()->UserID;
 
-        $this->permission('Vanilla.Discussions.View', $category['PermissionCategoryID']);
+        $this->permission("Vanilla.Discussions.View", $category["PermissionCategoryID"]);
 
-        $this->categoryModel->follow($userID, $id, $body['followed']);
+        $this->categoryModel->follow($userID, $id, $body["followed"]);
         ModelUtils::validationResultToValidationException($this->categoryModel);
 
         $result = $out->validate([
-            'followed' => $this->categoryModel->isFollowed($userID, $id)
+            "followed" => $this->categoryModel->isFollowed($userID, $id),
         ]);
         return $result;
     }
@@ -747,23 +795,23 @@ class CategoriesApiController extends AbstractApiController {
      * @param array $request
      * @return array
      */
-    public function normalizeInput(array $request) {
-        if (array_key_exists('bannerUrl', $request)) {
-            $request['BannerImage'] = $request['bannerUrl'];
-            unset($request['bannerUrl']);
+    public function normalizeInput(array $request)
+    {
+        if (array_key_exists("bannerUrl", $request)) {
+            $request["BannerImage"] = $request["bannerUrl"];
+            unset($request["bannerUrl"]);
         }
 
-
-        if (array_key_exists('iconUrl', $request)) {
-            $request['Photo'] = $request['iconUrl'];
-            unset($request['iconUrl']);
+        if (array_key_exists("iconUrl", $request)) {
+            $request["Photo"] = $request["iconUrl"];
+            unset($request["iconUrl"]);
         }
 
         $request = ApiUtils::convertInputKeys($request);
 
-        if (array_key_exists('Urlcode', $request)) {
-            $request['UrlCode'] = $request['Urlcode'];
-            unset($request['Urlcode']);
+        if (array_key_exists("Urlcode", $request)) {
+            $request["UrlCode"] = $request["Urlcode"];
+            unset($request["Urlcode"]);
         }
 
         return $request;
@@ -777,9 +825,12 @@ class CategoriesApiController extends AbstractApiController {
      *
      * @return array Return a Schema record.
      */
-    public function normalizeOutput(array $dbRecord, $expand = []) {
+    public function normalizeOutput(array $dbRecord, $expand = [])
+    {
         $row = $this->categoryModel->normalizeRow($dbRecord, $expand);
-        $row['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($dbRecord['CategoryID']));
+        $row["breadcrumbs"] = $this->breadcrumbModel->getForRecord(
+            new ForumCategoryRecordType($dbRecord["CategoryID"])
+        );
         return $row;
     }
 
@@ -796,32 +847,33 @@ class CategoriesApiController extends AbstractApiController {
      * @throws ClientException if trying to move a category under one of its own children.
      * @return array The updated category row.
      */
-    private function updateParent($categoryID, $parentCategoryID) {
+    private function updateParent($categoryID, $parentCategoryID)
+    {
         if ($categoryID == $parentCategoryID) {
-            throw new ClientException('A category cannot be the parent of itself.');
+            throw new ClientException("A category cannot be the parent of itself.");
         }
 
         if ($parentCategoryID < 1 && $parentCategoryID !== -1) {
-            throw new ClientException('parentCategoryID must be -1 or greater than zero.');
+            throw new ClientException("parentCategoryID must be -1 or greater than zero.");
         }
 
         // Make sure the parent exists.
         try {
             $this->category($parentCategoryID);
         } catch (Exception $e) {
-            throw new ClientException('The new parent category could not be found.');
+            throw new ClientException("The new parent category could not be found.");
         }
 
         // Make sure the category exists.
         $this->category($categoryID);
 
         $childTree = CategoryModel::flattenTree($this->categoryModel->getChildTree($categoryID));
-        $children = array_column($childTree, 'CategoryID');
+        $children = array_column($childTree, "CategoryID");
         if (in_array($parentCategoryID, $children)) {
-            throw new ClientException('Cannot move a category under one of its own children.');
+            throw new ClientException("Cannot move a category under one of its own children.");
         }
 
-        $this->categoryModel->setField($categoryID, 'ParentCategoryID', $parentCategoryID);
+        $this->categoryModel->setField($categoryID, "ParentCategoryID", $parentCategoryID);
 
         $this->categoryModel->rebuildTree();
         $this->categoryModel->recalculateTree();
@@ -836,19 +888,18 @@ class CategoriesApiController extends AbstractApiController {
      *
      * @return Schema
      */
-    public function schemaWithChildren() {
+    public function schemaWithChildren()
+    {
         $schema = clone $this->fullSchema();
         $childSchema = clone $schema;
 
-        $schema->merge(Schema::parse([
-            'depth:i',
-            'children:a?' => $childSchema->merge(Schema::parse([
-                'depth:i',
-                'children:a',
-                'sort:i'
-            ])),
-            'sort:i',
-        ]));
+        $schema->merge(
+            Schema::parse([
+                "depth:i",
+                "children:a?" => $childSchema->merge(Schema::parse(["depth:i", "children:a", "sort:i"])),
+                "sort:i",
+            ])
+        );
         return $schema;
     }
 
@@ -858,11 +909,13 @@ class CategoriesApiController extends AbstractApiController {
      * @param bool $expand
      * @return Schema
      */
-    public function schemaWithParent($expand = false, $type = '') {
-        $attributes = ['parentCategoryID:i|n' => 'Parent category ID.'];
+    public function schemaWithParent($expand = false, $type = "")
+    {
+        $attributes = ["parentCategoryID:i|n" => "Parent category ID."];
         if ($expand) {
-            $attributes['parent:o?'] = Schema::parse(['categoryID', 'name', 'urlcode', 'url'])
-                ->add($this->fullSchema());
+            $attributes["parent:o?"] = Schema::parse(["categoryID", "name", "urlcode", "url"])->add(
+                $this->fullSchema()
+            );
         }
         $schema = $this->fullSchema();
         $result = $schema->merge(Schema::parse($attributes));
@@ -879,21 +932,19 @@ class CategoriesApiController extends AbstractApiController {
      * @param bool $filter Apply permission based filter
      * @return array
      */
-    private function getCategoriesWhere(array $where, $limit, $offset, $order = '', bool $filter = true): array {
+    private function getCategoriesWhere(array $where, $limit, $offset, $order = "", bool $filter = true): array
+    {
         $dirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
         if ($dirtyRecords) {
             $this->categoryModel->applyDirtyWheres();
             unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
-            $categories = $this->categoryModel->getWhere($where, $order, '', $limit, $offset)
-                ->resultArray();
+            $categories = $this->categoryModel->getWhere($where, $order, "", $limit, $offset)->resultArray();
         } else {
-            $categories = $this->categoryModel
-                ->getWhere($where, $order, '', $limit, $offset)
-                ->resultArray();
+            $categories = $this->categoryModel->getWhere($where, $order, "", $limit, $offset)->resultArray();
         }
 
         // Index by ID for category calculation functions.
-        $categories = array_column($categories, null, 'CategoryID');
+        $categories = array_column($categories, null, "CategoryID");
         // Drop off the root category.
         unset($categories[-1]);
 
@@ -919,9 +970,14 @@ class CategoriesApiController extends AbstractApiController {
      *
      * @param array $query
      */
-    private function checkMixedQuery($query): void {
-        $formatIsFlat = isset($query['page']) || isset($query['limit']) || (isset($query['outputFormat']) && $query['outputFormat'] === 'flat');
-        $formatIsTree = isset($query['maxDepth']) || (isset($query['outputFormat']) && $query['outputFormat'] === 'tree');
+    private function checkMixedQuery($query): void
+    {
+        $formatIsFlat =
+            isset($query["page"]) ||
+            isset($query["limit"]) ||
+            (isset($query["outputFormat"]) && $query["outputFormat"] === "flat");
+        $formatIsTree =
+            isset($query["maxDepth"]) || (isset($query["outputFormat"]) && $query["outputFormat"] === "tree");
 
         if ($formatIsFlat && $formatIsTree) {
             trigger_error(self::ERRORINDEXMSG, E_USER_WARNING);
@@ -933,17 +989,15 @@ class CategoriesApiController extends AbstractApiController {
      *
      * @return TreeBuilder
      */
-    private function treeNormalizedBuilder(): TreeBuilder {
-        $builder = TreeBuilder::create('categoryID', 'parentCategoryID')
+    private function treeNormalizedBuilder(): TreeBuilder
+    {
+        $builder = TreeBuilder::create("categoryID", "parentCategoryID")
             ->setAllowUnreachableNodes(true)
             ->setRootID(null)
-            ->setChildrenFieldName('children')
+            ->setChildrenFieldName("children")
             ->setSorter(function (array $catA, array $catB) {
-                return ($catA['sort'] ?? 0) <=> ($catB['sort'] ?? 0);
-            })
-        ;
+                return ($catA["sort"] ?? 0) <=> ($catB["sort"] ?? 0);
+            });
         return $builder;
     }
-
-
 }

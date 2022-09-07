@@ -4,7 +4,7 @@
  */
 
 import { ColorHelper, px } from "csx";
-import isNumeric from "validator/lib/isNumeric";
+import { isNumeric } from "@vanilla/utils";
 export * from "@library/styles/styleHelpersAnimation";
 export * from "@library/styles/styleHelpersBackgroundStyling";
 export * from "@library/styles/styleHelpersTypography";

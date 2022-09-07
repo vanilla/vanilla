@@ -10,8 +10,8 @@ namespace VanillaTests\Library\Vanilla\Formatting;
 /**
  * Base test case for rendering some input/output from a fixture.
  */
-trait AssertsFixtureRenderingTrait {
-
+trait AssertsFixtureRenderingTrait
+{
     use HtmlNormalizeTrait;
 
     /**
@@ -27,10 +27,11 @@ trait AssertsFixtureRenderingTrait {
      * @return string[] A tuple of the input and expected output for html and txt.
      * @throws \Exception When a fixture doesn't have the exactly 1 input & output.
      */
-    public function getFixture(string $fixtureDir): array {
-        $inputs = glob($fixtureDir . '/input.*');
-        $outputHtml = glob($fixtureDir . '/output.html')[0] ?? null;
-        $outputText = glob($fixtureDir . '/output.txt')[0] ?? null;
+    public function getFixture(string $fixtureDir): array
+    {
+        $inputs = glob($fixtureDir . "/input.*");
+        $outputHtml = glob($fixtureDir . "/output.html")[0] ?? null;
+        $outputText = glob($fixtureDir . "/output.txt")[0] ?? null;
 
         if (count($inputs) !== 1) {
             throw new \Exception("There must be exactly 1 input when fetching a fixture.");
@@ -38,8 +39,8 @@ trait AssertsFixtureRenderingTrait {
 
         return [
             file_get_contents($inputs[0]),
-            $outputHtml ? file_get_contents($outputHtml) : 'no output.html fixture provided',
-            $outputText ? file_get_contents($outputText) : 'no output.txt fixture provided',
+            $outputHtml ? file_get_contents($outputHtml) : "no output.html fixture provided",
+            $outputText ? file_get_contents($outputText) : "no output.txt fixture provided",
         ];
     }
 
@@ -50,10 +51,11 @@ trait AssertsFixtureRenderingTrait {
      *
      * @return array
      */
-    protected function createFixtureDataProvider(string $fixtureDir) {
+    protected function createFixtureDataProvider(string $fixtureDir)
+    {
         $paramSets = [];
 
-        $files = glob(PATH_ROOT . '/tests/fixtures/' . "$fixtureDir/*", GLOB_ONLYDIR);
+        $files = glob(PATH_ROOT . "/tests/fixtures/" . "$fixtureDir/*", GLOB_ONLYDIR);
         foreach ($files as $file) {
             $paramSets[] = [$file];
         }

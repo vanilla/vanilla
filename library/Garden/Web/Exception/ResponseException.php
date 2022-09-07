@@ -18,7 +18,8 @@ use Garden\Web\Data;
  * than throw an exception. However, if you are in old code that just can't return a response then throw an exception
  * in order to make your code somewhat testable.
  */
-class ResponseException extends \Exception {
+class ResponseException extends HttpException
+{
     /**
      * @var Data
      */
@@ -29,8 +30,9 @@ class ResponseException extends \Exception {
      *
      * @param Data $response
      */
-    public function __construct(Data $response) {
-        parent::__construct(HttpResponse::reasonPhrase($response->getStatus()) ?? 'Response', $response->getStatus());
+    public function __construct(Data $response)
+    {
+        parent::__construct(HttpResponse::reasonPhrase($response->getStatus()) ?? "Response", $response->getStatus());
         $this->response = $response;
     }
 
@@ -39,7 +41,8 @@ class ResponseException extends \Exception {
      *
      * @return Data
      */
-    public function getResponse(): Data {
+    public function getResponse(): Data
+    {
         return $this->response;
     }
 }

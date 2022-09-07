@@ -144,6 +144,79 @@ describe("LayoutEditorContents", () => {
             );
         });
 
+        it("can modify widgets", () => {
+            const paramsForWidget = {
+                apiParams: {
+                    featured: true,
+                },
+                title: "My Widget",
+                containerOptions: {
+                    borderType: "border",
+                },
+            };
+
+            const modifiedParamsForWidget = {
+                apiParams: {
+                    featured: false,
+                },
+                title: "My Widget Renamed",
+                containerOptions: {
+                    borderType: "shadow",
+                },
+            };
+            let contents = LayoutEditorFixture.contents({});
+            contents = contents.insertSection(0, {
+                $hydrate: "react.section.2-columns",
+                testID: "section1",
+            });
+
+            contents = contents.insertWidget(
+                {
+                    sectionIndex: 0,
+                    sectionRegion: "mainBottom",
+                    sectionRegionIndex: 0,
+                },
+                {
+                    $hydrate: "react.my-widget",
+                    //testID is widget spec in this case
+                    testID: paramsForWidget,
+                },
+            );
+
+            //created widget
+            LayoutEditorFixture.assertContentStructure(
+                {
+                    section1: {
+                        mainBottom: [paramsForWidget],
+                    },
+                },
+                contents,
+            );
+
+            contents = contents.modifyWidget(
+                {
+                    sectionIndex: 0,
+                    sectionRegion: "mainBottom",
+                    sectionRegionIndex: 0,
+                },
+                {
+                    $hydrate: "react.my-widget",
+                    //testID is widget spec in this case
+                    testID: modifiedParamsForWidget,
+                },
+            );
+
+            //modified widget has different params
+            LayoutEditorFixture.assertContentStructure(
+                {
+                    section1: {
+                        mainBottom: [modifiedParamsForWidget],
+                    },
+                },
+                contents,
+            );
+        });
+
         it("can delete widgets and sections", () => {
             let contents = LayoutEditorFixture.contents({});
             contents = contents.insertSection(0, {

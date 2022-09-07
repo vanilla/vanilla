@@ -10,8 +10,8 @@ namespace Garden\Web\Exception;
 /**
  * PartialCompletionException class.
  */
-class PartialCompletionException extends HttpException {
-
+class PartialCompletionException extends HttpException
+{
     /**
      * @var array
      */
@@ -35,7 +35,12 @@ class PartialCompletionException extends HttpException {
      * @param array $successIDs Successful resource IDs.
      * @param array $notTriedIDs Timeout resource IDs.
      */
-    public function __construct(array $exceptions = [], array $failedIDs = [], array $successIDs = [], array $notTriedIDs = []) {
+    public function __construct(
+        array $exceptions = [],
+        array $failedIDs = [],
+        array $successIDs = [],
+        array $notTriedIDs = []
+    ) {
         $this->notTriedIDs = $notTriedIDs;
         $this->failedIDs = $failedIDs;
         $this->successIDs = $successIDs;
@@ -46,11 +51,11 @@ class PartialCompletionException extends HttpException {
             $codes[] = $value->getCode();
         }
         $status = max(...$codes);
-        parent::__construct(
-            'Failed processing some resources.',
-            $status,
-            ['failedIDs' => $failedIDs, 'successIDs' => $successIDs, 'notTriedIDs' => $notTriedIDs]
-        );
+        parent::__construct("Failed processing some resources.", $status, [
+            "failedIDs" => $failedIDs,
+            "successIDs" => $successIDs,
+            "notTriedIDs" => $notTriedIDs,
+        ]);
     }
 
     /**
@@ -58,7 +63,8 @@ class PartialCompletionException extends HttpException {
      *
      * @return array
      */
-    public function getNotTried(): array {
+    public function getNotTried(): array
+    {
         return $this->notTriedIDs;
     }
 
@@ -67,7 +73,8 @@ class PartialCompletionException extends HttpException {
      *
      * @return array
      */
-    public function getSuccessIDs(): array {
+    public function getSuccessIDs(): array
+    {
         return $this->successIDs;
     }
 
@@ -76,7 +83,8 @@ class PartialCompletionException extends HttpException {
      *
      * @return array
      */
-    public function getFailedIDs(): array {
+    public function getFailedIDs(): array
+    {
         return $this->failedIDs;
     }
 }

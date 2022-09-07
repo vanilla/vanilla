@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for domGetImages().
  */
 
-class DomGetImagesTest extends TestCase {
-
+class DomGetImagesTest extends TestCase
+{
     /**
      * Tests {@link domGetImages()} against several scenarios.
      *
@@ -24,7 +24,8 @@ class DomGetImagesTest extends TestCase {
      * @param array $expected The expected result.
      * @dataProvider provideTestDomGetImagesArrays
      */
-    public function testDomGetImages($testDom, $testUrl, $testMaxImages, $expected) {
+    public function testDomGetImages($testDom, $testUrl, $testMaxImages, $expected)
+    {
         $testDom = \pQuery::parseStr($testDom);
         $actual = domGetImages($testDom, $testUrl, $testMaxImages);
         $this->assertSame($expected, $actual);
@@ -35,37 +36,38 @@ class DomGetImagesTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestDomGetImagesArrays() {
+    public function provideTestDomGetImagesArrays()
+    {
         $r = [
-            'testOneImage' => [
+            "testOneImage" => [
                 '<div class="story-teaser__img-wrap">
                     <img src="/image1" height="400" width="400"/>     
                  </div>',
-                'https://www.example.com/',
+                "https://www.example.com/",
                 1,
                 [0 => "https://www.example.com/image1"],
             ],
-            'testDoubleClickCondition' => [
+            "testDoubleClickCondition" => [
                 '<div class="story-teaser__img-wrap">
                     <img src="https://www.doubleclick.com"/>     
                  </div>',
-                'https://www.example.com',
+                "https://www.example.com",
                 1,
                 [],
             ],
-            'testImageTooSmall' => [
+            "testImageTooSmall" => [
                 '<div class="story-teaser__img-wrap">
                     <img src="/image1" height="90" width="90"/>
                  </div>',
-                'https://www.example.com/',
+                "https://www.example.com/",
                 1,
                 [],
             ],
-            'testBannerImage' => [
+            "testBannerImage" => [
                 '<div class="story-teaser__img-wrap">
                     <img src="/image1" height="90" width="400"/>
                 </div>',
-                'https://www.example.com/',
+                "https://www.example.com/",
                 1,
                 [],
             ],

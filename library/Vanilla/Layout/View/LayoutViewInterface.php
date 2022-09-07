@@ -10,7 +10,8 @@ namespace Vanilla\Layout\View;
 /**
  * Defines methods for layout views.
  */
-interface LayoutViewInterface {
+interface LayoutViewInterface
+{
     /**
      * @return string
      */

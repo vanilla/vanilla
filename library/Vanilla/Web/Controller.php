@@ -26,8 +26,8 @@ use Vanilla\Utility\ModelUtils;
 /**
  * The controller base class.
  */
-abstract class Controller implements InjectableInterface, CacheControlConstantsInterface {
-
+abstract class Controller implements InjectableInterface, CacheControlConstantsInterface
+{
     use PermissionCheckTrait;
 
     /**
@@ -74,7 +74,8 @@ abstract class Controller implements InjectableInterface, CacheControlConstantsI
     /**
      * @inheridoc
      */
-    protected function getPermissions(): ?Permissions {
+    protected function getPermissions(): ?Permissions
+    {
         if ($this->session === null) {
             return null;
         }
@@ -93,13 +94,14 @@ abstract class Controller implements InjectableInterface, CacheControlConstantsI
      * - **["TypeID", "in" or "out"]**. When you need to define both a type ID and input or output.
      * @return Schema Returns a schema object.
      */
-    public function schema($schema, $type = 'in') {
+    public function schema($schema, $type = "in")
+    {
         if (is_array($type)) {
             $origType = $type;
             [$id, $type] = $origType;
-        } elseif (!in_array($type, ['in', 'out'], true)) {
+        } elseif (!in_array($type, ["in", "out"], true)) {
             $id = $type;
-            $type = '';
+            $type = "";
         }
 
         if (empty($id) || !is_string($id)) {
@@ -124,7 +126,8 @@ abstract class Controller implements InjectableInterface, CacheControlConstantsI
      *
      * @return SessionInterface Returns the session.
      */
-    public function getSession() {
+    public function getSession()
+    {
         return $this->session;
     }
 
@@ -134,7 +137,8 @@ abstract class Controller implements InjectableInterface, CacheControlConstantsI
      * @param SessionInterface $session The new session.
      * @return $this
      */
-    public function setSession($session) {
+    public function setSession($session)
+    {
         $this->session = $session;
         return $this;
     }
@@ -144,7 +148,8 @@ abstract class Controller implements InjectableInterface, CacheControlConstantsI
      *
      * @return EventManager Returns the event manager.
      */
-    public function getEventManager() {
+    public function getEventManager()
+    {
         return $this->eventManager;
     }
 
@@ -154,7 +159,8 @@ abstract class Controller implements InjectableInterface, CacheControlConstantsI
      * @param EventManager $eventManager The new event manager.
      * @return $this
      */
-    public function setEventManager($eventManager) {
+    public function setEventManager($eventManager)
+    {
         $this->eventManager = $eventManager;
         return $this;
     }
@@ -164,7 +170,8 @@ abstract class Controller implements InjectableInterface, CacheControlConstantsI
      *
      * @return LocaleInterface Returns the locale.
      */
-    public function getLocale() {
+    public function getLocale()
+    {
         return $this->locale;
     }
 
@@ -174,7 +181,8 @@ abstract class Controller implements InjectableInterface, CacheControlConstantsI
      * @param LocaleInterface $locale The locale of the current user.
      * @return $this
      */
-    public function setLocale($locale) {
+    public function setLocale($locale)
+    {
         $this->locale = $locale;
         return $this;
     }
@@ -187,7 +195,8 @@ abstract class Controller implements InjectableInterface, CacheControlConstantsI
      * @throws ValidationException if errors are detected and $throw is true.
      * @return Validation
      */
-    public function validateModel($model, $throw = true) {
+    public function validateModel($model, $throw = true)
+    {
         return ModelUtils::validationResultToValidationException($model, $this->locale, $throw);
     }
 }

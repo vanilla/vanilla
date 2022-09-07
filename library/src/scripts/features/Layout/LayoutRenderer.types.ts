@@ -10,11 +10,10 @@ export enum LayoutDevice {
     ALL = "all",
 }
 export interface ILayoutQuery {
-    recordID?: number;
+    recordID?: number | string;
     recordType?: string;
     layoutViewType: string;
     params: {
-        siteSectionID?: string;
         [key: string]: any;
     };
 }

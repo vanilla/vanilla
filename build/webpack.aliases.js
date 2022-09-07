@@ -13,5 +13,5 @@ module.exports = {
             // SCSS
             "library-scss": resolve(VANILLA_ROOT, "library/src/scss/"),
         },
-    }
-}
+    },
+};

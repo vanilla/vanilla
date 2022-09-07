@@ -13,8 +13,8 @@ use Vanilla\Web\PageHead;
 /**
  * Event for before a page renders.
  */
-final class PageRenderBeforeEvent {
-
+final class PageRenderBeforeEvent
+{
     /** @var PageHead */
     private $pageHead;
 
@@ -27,7 +27,8 @@ final class PageRenderBeforeEvent {
      * @param PageHead $pageHead
      * @param Page $page
      */
-    public function __construct(PageHead $pageHead, Page $page) {
+    public function __construct(PageHead $pageHead, Page $page)
+    {
         $this->pageHead = $pageHead;
         $this->page = $page;
     }
@@ -35,14 +36,16 @@ final class PageRenderBeforeEvent {
     /**
      * @return PageHead
      */
-    public function getPageHead(): PageHead {
+    public function getPageHead(): PageHead
+    {
         return $this->pageHead;
     }
 
     /**
      * @return Page
      */
-    public function getPage(): Page {
+    public function getPage(): Page
+    {
         return $this->page;
     }
 }

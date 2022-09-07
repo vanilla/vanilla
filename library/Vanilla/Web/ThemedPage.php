@@ -12,8 +12,8 @@ use Vanilla\Theme\ThemePreloadProvider;
 /**
  * A Web\Page that makes use of custom theme data from the theming API.
  */
-abstract class ThemedPage extends Page {
-
+abstract class ThemedPage extends Page
+{
     /** @var ThemePreloadProvider */
     protected $themeProvider;
 
@@ -29,8 +29,9 @@ abstract class ThemedPage extends Page {
         \Gdn_Session $session,
         PageHead $pageHead,
         MasterViewRenderer $masterViewRenderer,
-        ThemePreloadProvider $themeProvider = null // Default required to conform to interface
+        ThemePreloadProvider $themeProvider = null
     ) {
+        // Default required to conform to interface
         parent::setDependencies($siteMeta, $request, $session, $pageHead, $masterViewRenderer);
         $this->themeProvider = $themeProvider;
         if ($this->forcedThemeKey !== null) {
@@ -42,7 +43,8 @@ abstract class ThemedPage extends Page {
     /**
      * Initialize data that is shared among all of the controllers.
      */
-    protected function initAssets() {
+    protected function initAssets()
+    {
         // Preload for frontend
         $this->registerReduxActionProvider($this->themeProvider);
 

@@ -46,3 +46,5 @@ export function SectionOneColumn(props: IProps) {
         </div>
     );
 }
+
+export default SectionOneColumn;

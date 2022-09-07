@@ -12,27 +12,24 @@ use Vanilla\EmbeddedContent\AbstractEmbed;
 /**
  * Embed data object for Brightcove.
  */
-class BrightcoveEmbed extends AbstractEmbed {
-
+class BrightcoveEmbed extends AbstractEmbed
+{
     /** @var string TYPE */
-    const TYPE = 'brightcove';
+    const TYPE = "brightcove";
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
-        return Schema::parse([
-            "account:s",
-            "playerID:s",
-            "playerEmbed:s",
-            "videoID:s"
-        ]);
+    protected function schema(): Schema
+    {
+        return Schema::parse(["account:s", "playerID:s", "playerEmbed:s", "videoID:s"]);
     }
 }

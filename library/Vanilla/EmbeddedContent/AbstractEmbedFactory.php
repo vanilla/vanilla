@@ -16,8 +16,8 @@ use Garden\Http\HttpClient;
  * - Gathering additional information through I/O.
  * - Create an AbstractEmbed instance.
  */
-abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
-
+abstract class AbstractEmbedFactory implements EmbedCreatorInterface
+{
     const WILDCARD_DOMAIN = "*";
     const NO_MATCH_DOMAIN = "!";
 
@@ -34,7 +34,8 @@ abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
      * @param string $url
      * @return bool
      */
-    public function canHandleUrl(string $url): bool {
+    public function canHandleUrl(string $url): bool
+    {
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             // Not even a URL.
             return false;
@@ -43,17 +44,18 @@ abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
         $pieces = parse_url($url);
 
         // We only allow limited URL schemes.
-        $scheme = $pieces['scheme'] ?? '';
-        $schemeMatches = in_array($scheme, ['http', 'https']);
+        $scheme = $pieces["scheme"] ?? "";
+        $schemeMatches = in_array($scheme, ["http", "https"]);
 
         // Validate we have domain. We allow all subdomains here.
-        $domain = $pieces['host'] ?? '';
+        $domain = $pieces["host"] ?? "";
         $domainMatches = false;
         foreach ($this->getSupportedDomains() as $supportedDomain) {
-            if ($supportedDomain === self::WILDCARD_DOMAIN
-                || $domain === $supportedDomain
-                || stringEndsWith($domain, ".{$supportedDomain}")
-                || fnmatch($supportedDomain, $domain)
+            if (
+                $supportedDomain === self::WILDCARD_DOMAIN ||
+                $domain === $supportedDomain ||
+                stringEndsWith($domain, ".{$supportedDomain}") ||
+                fnmatch($supportedDomain, $domain)
             ) {
                 $domainMatches = true;
                 break;
@@ -61,7 +63,7 @@ abstract class AbstractEmbedFactory implements EmbedCreatorInterface {
         }
 
         // Check our URL path.
-        $path = $pieces['path'] ?? null;
+        $path = $pieces["path"] ?? null;
         if ($path === null) {
             $pathMatches = $this->canHandleEmptyPaths;
         } else {

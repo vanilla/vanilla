@@ -12,8 +12,8 @@ use Garden\Web\Data;
 /**
  * Item representing some JSON-LD item.
  */
-abstract class AbstractJsonLDItem implements \JsonSerializable {
-
+abstract class AbstractJsonLDItem implements \JsonSerializable
+{
     /**
      * Calculate the value of the JSON-LD item.
      *
@@ -24,7 +24,8 @@ abstract class AbstractJsonLDItem implements \JsonSerializable {
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return $this->calculateValue();
     }
 }

@@ -36,17 +36,15 @@ export function TabbedSchemaForm(props: IPartialProps) {
             [propertyName]: tabID,
         });
 
-    const tabs = schema.oneOf!.map(
-        (tabSchema): IFormTab => {
-            const tabProperty = tabSchema.properties[propertyName];
-            const tabID = tabProperty.const;
-            return {
-                tabID,
-                contents: <PartialSchemaForm {...props} inheritSchema={schema} schema={tabSchema as JsonSchema} />,
-                label: control.choices!.staticOptions![tabID],
-            };
-        },
-    );
+    const tabs = schema.oneOf!.map((tabSchema): IFormTab => {
+        const tabProperty = tabSchema.properties[propertyName];
+        const tabID = tabProperty.const;
+        return {
+            tabID,
+            contents: <PartialSchemaForm {...props} inheritSchema={schema} schema={tabSchema as JsonSchema} />,
+            label: control.choices!.staticOptions![tabID],
+        };
+    });
 
     if (!FormTabs) {
         return null;

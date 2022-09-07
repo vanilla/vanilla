@@ -14,8 +14,8 @@ use Psr\Log\LoggerInterface;
  *
  * I look like a Job, but not implementing the JobInterface
  */
-class NonCompliantJob {
-
+class NonCompliantJob
+{
     /** @var LoggerInterface */
     protected $logger;
 
@@ -27,7 +27,8 @@ class NonCompliantJob {
      *
      * @param LoggerInterface $logger
      */
-    public function __construct(LoggerInterface $logger) {
+    public function __construct(LoggerInterface $logger)
+    {
         $this->logger = $logger;
     }
 
@@ -36,14 +37,16 @@ class NonCompliantJob {
      *
      * @param array $message
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
         $this->message = $message;
     }
 
     /**
      * Run the job.
      */
-    public function run() {
-        $this->logger->info(get_class($this)." :: ".var_export($this->message, true));
+    public function run()
+    {
+        $this->logger->info(get_class($this) . " :: " . var_export($this->message, true));
     }
 }

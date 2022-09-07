@@ -10,8 +10,8 @@ namespace Vanilla\Contracts\Site;
 /**
  * Interface representing information about the current or related sites.
  */
-abstract class AbstractSiteProvider {
-
+abstract class AbstractSiteProvider
+{
     /**
      * Get all availaible sites.
      *
@@ -36,7 +36,8 @@ abstract class AbstractSiteProvider {
     /**
      * Clear any cached sites.
      */
-    public function clearCache(): void {
+    public function clearCache(): void
+    {
     }
 
     /**
@@ -46,7 +47,8 @@ abstract class AbstractSiteProvider {
      *
      * @return Site
      */
-    public function getBySiteID(int $siteID): Site {
+    public function getBySiteID(int $siteID): Site
+    {
         foreach ($this->getAllSites() as $site) {
             if ($site->getSiteID() === $siteID) {
                 return $site;
@@ -63,7 +65,8 @@ abstract class AbstractSiteProvider {
      *
      * @return Site[]
      */
-    public function getByAccountID(int $accountID): array {
+    public function getByAccountID(int $accountID): array
+    {
         $result = [];
         foreach ($this->getAllSites() as $site) {
             if ($site->getAccountID() === $accountID) {
@@ -83,7 +86,8 @@ abstract class AbstractSiteProvider {
      *
      * @return Site[]
      */
-    public function getBySiteIDs(array $siteIDs): array {
+    public function getBySiteIDs(array $siteIDs): array
+    {
         $result = [];
         foreach ($siteIDs as $siteID) {
             $result[] = $this->getBySiteID($siteID);

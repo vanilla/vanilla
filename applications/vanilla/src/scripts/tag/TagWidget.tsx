@@ -42,7 +42,7 @@ export default function TagWidget(props: IProps) {
                             return (
                                 <MetaTag
                                     key={index}
-                                    to={`discussions/tagged/${tag.urlcode}`}
+                                    to={`/discussions/tagged/${tag.urlcode}`}
                                     preset={itemOptions?.tagPreset ?? TagPreset.STANDARD}
                                 >
                                     {tag.name} <span className={classNames(classes.count)}>{tag.countDiscussions}</span>

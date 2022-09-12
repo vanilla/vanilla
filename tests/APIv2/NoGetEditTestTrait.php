@@ -14,14 +14,16 @@ use PHPUnit\Framework\TestCase;
  * Use this trait on `AbstractResourceTest` classes that don't have a `GET /:id/edit` endpoint.
  * It will just use `GET /:id` instead.
  */
-trait NoGetEditTestTrait {
+trait NoGetEditTestTrait
+{
     /**
      * Call `GET /:id/edit`
      *
      * @param mixed $rowOrID The PK value or a row.
      * @return HttpResponse
      */
-    protected function getEdit($rowOrID): HttpResponse {
+    protected function getEdit($rowOrID): HttpResponse
+    {
         if (is_array($rowOrID)) {
             $id = $rowOrID[$this->pk];
         } else {
@@ -35,7 +37,8 @@ trait NoGetEditTestTrait {
     /**
      * {@inheritDoc}
      */
-    public function testGetEditFields() {
+    public function testGetEditFields()
+    {
         TestCase::markTestSkipped("This resource doesn't have GET /:id/edit.");
     }
 }

@@ -10,8 +10,8 @@ namespace Vanilla\Utility;
 /**
  * Utility for constructing a tree from an array.
  */
-final class TreeBuilder {
-
+final class TreeBuilder
+{
     /** @var string */
     private $recordIDFieldName;
 
@@ -19,7 +19,7 @@ final class TreeBuilder {
     private $parentIDFieldName;
 
     /** @var string */
-    private $childrenFieldName = 'children';
+    private $childrenFieldName = "children";
 
     /** @var callable */
     private $sorter = null;
@@ -37,7 +37,8 @@ final class TreeBuilder {
      * @param string $parentIDFieldName The field to use as the parentID in the tree.
      * If this isn't present on a record it will be placed at the top level.
      */
-    public static function create(string $recordIDFieldName, string $parentIDFieldName): self {
+    public static function create(string $recordIDFieldName, string $parentIDFieldName): self
+    {
         return new TreeBuilder($recordIDFieldName, $parentIDFieldName);
     }
 
@@ -47,7 +48,8 @@ final class TreeBuilder {
      * @param string $recordIDFieldName
      * @param string $parentIDFieldName
      */
-    private function __construct(string $recordIDFieldName, string $parentIDFieldName) {
+    private function __construct(string $recordIDFieldName, string $parentIDFieldName)
+    {
         $this->recordIDFieldName = $recordIDFieldName;
         $this->parentIDFieldName = $parentIDFieldName;
     }
@@ -59,7 +61,8 @@ final class TreeBuilder {
      *
      * @return $this
      */
-    public function setChildrenFieldName(string $childrenFieldName): self {
+    public function setChildrenFieldName(string $childrenFieldName): self
+    {
         $this->childrenFieldName = $childrenFieldName;
         return $this;
     }
@@ -71,7 +74,8 @@ final class TreeBuilder {
      *
      * @return $this
      */
-    public function setSorter(?callable $sorter): self {
+    public function setSorter(?callable $sorter): self
+    {
         $this->sorter = $sorter;
         return $this;
     }
@@ -88,7 +92,8 @@ final class TreeBuilder {
      *
      * @return $this
      */
-    public function setRootID($rootID): self {
+    public function setRootID($rootID): self
+    {
         $this->rootID = $rootID;
         return $this;
     }
@@ -103,7 +108,8 @@ final class TreeBuilder {
      *
      * @return $this
      */
-    public function setAllowUnreachableNodes(bool $allowUnreachableNodes): self {
+    public function setAllowUnreachableNodes(bool $allowUnreachableNodes): self
+    {
         $this->allowUnreachableNodes = $allowUnreachableNodes;
         return $this;
     }
@@ -114,7 +120,8 @@ final class TreeBuilder {
      * @param array $source
      * @return array
      */
-    public function buildTree(array $source): array {
+    public function buildTree(array $source): array
+    {
         $sourcesByID = array_column($source, null, $this->recordIDFieldName);
         $rootItemIDs = [];
         $rootItemIDsWrongRoot = [];
@@ -207,7 +214,8 @@ final class TreeBuilder {
      *
      * @return array The flattened structure.
      */
-    public function flattenTree(array $items): array {
+    public function flattenTree(array $items): array
+    {
         $result = [];
 
         $flattenInternal = function ($item) use (&$result, &$flattenInternal) {
@@ -233,7 +241,8 @@ final class TreeBuilder {
      *
      * @return array The sorted items.
      */
-    public function sort(array $source): array {
+    public function sort(array $source): array
+    {
         $tree = $this->buildTree($source);
         $flattened = $this->flattenTree($tree);
         return $flattened;
@@ -246,7 +255,8 @@ final class TreeBuilder {
     /**
      * @param array $records
      */
-    private function sortRecords(array &$records): void {
+    private function sortRecords(array &$records): void
+    {
         if ($this->sorter !== null) {
             // Sort the children
             uasort($records, $this->sorter);

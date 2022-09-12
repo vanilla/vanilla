@@ -13,8 +13,8 @@ use Vanilla\Models\UserAuthenticationProviderFragmentSchema;
 /**
  * Class AuthenticatorsApiController
  */
-class AuthenticatorsApiController extends AbstractApiController  {
-
+class AuthenticatorsApiController extends AbstractApiController
+{
     /** @var Gdn_AuthenticationProviderModel */
     private $authenticatorModel;
 
@@ -23,7 +23,8 @@ class AuthenticatorsApiController extends AbstractApiController  {
      *
      * @param Gdn_AuthenticationProviderModel $authenticatorModel
      */
-    public function __construct(Gdn_AuthenticationProviderModel $authenticatorModel) {
+    public function __construct(Gdn_AuthenticationProviderModel $authenticatorModel)
+    {
         $this->authenticatorModel = $authenticatorModel;
     }
 
@@ -34,7 +35,8 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @throws NotFoundException
      * @return array
      */
-    private function authenticatorByID(int $id, bool $normalize = true): array {
+    private function authenticatorByID(int $id, bool $normalize = true): array
+    {
         $row = $this->authenticatorModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$row) {
             throw new NotFoundException("Authenticator");
@@ -52,7 +54,8 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @param int $id
      * @return Data
      */
-    public function delete(int $id): void {
+    public function delete(int $id): void
+    {
         $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema([], "in");
@@ -68,7 +71,8 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @param int $id
      * @return Data
      */
-    public function get(int $id): Data {
+    public function get(int $id): Data
+    {
         $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema([], "in");
@@ -85,39 +89,41 @@ class AuthenticatorsApiController extends AbstractApiController  {
      *
      * @return Data
      */
-    public function index(array $query = []): Data {
+    public function index(array $query = []): Data
+    {
         $this->permission("Garden.Settings.Manage");
 
-        $in = $this->schema([
-            'page:i?' => [
-                'default' => 1,
-                'minimum' => 1,
+        $in = $this->schema(
+            [
+                "page:i?" => [
+                    "default" => 1,
+                    "minimum" => 1,
+                ],
+                "limit:i?" => [
+                    "default" => 10,
+                    "minimum" => 1,
+                    "maximum" => ApiUtils::getMaxLimit(),
+                ],
+                "type:s?" => [
+                    "x-filter" => ["field" => "AuthenticationSchemeAlias"],
+                ],
             ],
-            'limit:i?' => [
-                'default' => 10,
-                'minimum' => 1,
-                'maximum' => ApiUtils::getMaxLimit(),
-            ],
-            "type:s?" => [
-                "x-filter" => ["field" => "AuthenticationSchemeAlias"],
-            ],
-        ], "in");
+            "in"
+        );
         $out = $this->schema([":a" => new UserAuthenticationProviderFragmentSchema()], "out");
 
         $query = $in->validate($query);
-        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
 
         $where = ApiUtils::queryToFilters($in, $query);
 
-        $rows = $this->authenticatorModel
-            ->getWhere($where, "", "asc", $limit, $offset)
-            ->resultArray();
+        $rows = $this->authenticatorModel->getWhere($where, "", "asc", $limit, $offset)->resultArray();
         $result = array_map([$this->authenticatorModel, "normalizeRow"], $rows);
 
         $data = $out->validate($result);
 
         $paging = ApiUtils::morePagerInfo($data, "/api/v2/authenticators", $query, $in);
-        return new Data($data, ['paging' => $paging]);
+        return new Data($data, ["paging" => $paging]);
     }
 
     /**
@@ -126,7 +132,8 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @param array $input
      * @return array
      */
-    private function normalizeInput(array $input): array {
+    private function normalizeInput(array $input): array
+    {
         $transformer = new Transformer([
             "Active" => "active",
             "AuthenticateUrl" => "/urls/authenticateUrl",
@@ -154,14 +161,13 @@ class AuthenticatorsApiController extends AbstractApiController  {
      * @param array $body
      * @return Data
      */
-    public function patch(int $id, array $body): Data {
+    public function patch(int $id, array $body): Data
+    {
         $this->permission("Garden.Settings.Manage");
 
-        $in = $this->schema([
-            "active",
-            "default",
-            "visible",
-        ], "in")->add(new UserAuthenticationProviderFragmentSchema());
+        $in = $this->schema(["active", "default", "visible"], "in")->add(
+            new UserAuthenticationProviderFragmentSchema()
+        );
         $out = $this->schema(new UserAuthenticationProviderFragmentSchema(), "out");
 
         $this->authenticatorByID($id);

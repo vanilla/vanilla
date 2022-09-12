@@ -11,8 +11,8 @@ use Vanilla\Contracts\Web\LegacyViewHandlerInterface;
 /**
  * Gdn_Controller view handler for twig.
  */
-class LegacyTwigViewHandler implements LegacyViewHandlerInterface {
-
+class LegacyTwigViewHandler implements LegacyViewHandlerInterface
+{
     use TwigRenderTrait;
 
     /**
@@ -21,15 +21,16 @@ class LegacyTwigViewHandler implements LegacyViewHandlerInterface {
      * @param string $path
      * @param \Gdn_Controller|\Gdn_Module|\Gdn_Pluggable $controller
      */
-    public function render($path, $controller) {
+    public function render($path, $controller)
+    {
         // Extra data to merge into the controllers data for every render.
         $form = $controller->Form ?? ($controller->form ?? null);
 
         $extraData = [
-            'form' => is_a($form, \Gdn_Form::class) ? new TwigFormWrapper($form) : null,
-            'category' => $controller->Category ?? null,
-            'discussion' => $controller->Discussion ?? null,
-            'pluggable' => $controller instanceof \Gdn_Pluggable ? $controller : null,
+            "form" => is_a($form, \Gdn_Form::class) ? new TwigFormWrapper($form) : null,
+            "category" => $controller->Category ?? null,
+            "discussion" => $controller->Discussion ?? null,
+            "pluggable" => $controller instanceof \Gdn_Pluggable ? $controller : null,
         ];
 
         $data = array_merge($extraData, (array) $controller->Data);

@@ -15,8 +15,8 @@ use VanillaTests\Layout\LayoutTestTrait;
  *
  * @package VanillaTests\Library\Vanilla\Theme
  */
-class QuickLinksTest extends SiteTestCase {
-
+class QuickLinksTest extends SiteTestCase
+{
     use LayoutTestTrait;
 
     /**
@@ -29,33 +29,25 @@ class QuickLinksTest extends SiteTestCase {
      *
      * @return QuickLink
      */
-    public function addQuickLink(
-        $name = 'MockLink',
-        $url = '/mocklink',
-        $count = null,
-        $sort = null
-    ) {
-        return new QuickLink(
-            $name,
-            $url,
-            $count,
-            $sort
-        );
+    public function addQuickLink($name = "MockLink", $url = "/mocklink", $count = null, $sort = null)
+    {
+        return new QuickLink($name, $url, $count, $sort);
     }
 
     /**
      * Test quickLink methods.
      */
-    public function testQuickLink() {
-        $name = 'test';
-        $url = '/test';
+    public function testQuickLink()
+    {
+        $name = "test";
+        $url = "/test";
         $newQuickLink = $this->addQuickLink($name, $url, 2, 11);
         $this->assertEquals(slugify($name), $newQuickLink->getID());
         $this->assertEquals(2, $newQuickLink->getCount());
         $this->assertEquals(11, $newQuickLink->getSort());
 
-        $name = 'test2';
-        $url = '/test2';
+        $name = "test2";
+        $url = "/test2";
         $newQuickLink = $this->addQuickLink($name, $url, null, null);
 
         $this->assertEquals(slugify($name), $newQuickLink->getID());
@@ -66,7 +58,8 @@ class QuickLinksTest extends SiteTestCase {
     /**
      * Verify setting and getting a QuickLink's count limit.
      */
-    public function testSetCountLimit(): void {
+    public function testSetCountLimit(): void
+    {
         $limit = 100;
         $quickLink = new QuickLink(__FUNCTION__, "/path/to/page");
         $quickLink->setCountLimit($limit);
@@ -79,7 +72,8 @@ class QuickLinksTest extends SiteTestCase {
     /**
      * Verify default value of the countLimit field.
      */
-    public function testNoCountLimit(): void {
+    public function testNoCountLimit(): void
+    {
         $quickLink = new QuickLink(__FUNCTION__, "/path/to/page");
         $serialized = json_decode(json_encode($quickLink), true);
 
@@ -90,30 +84,31 @@ class QuickLinksTest extends SiteTestCase {
     /**
      * Test that we can hydrate Quick Links Widget.
      */
-    public function testHydrateQuickLinksWidget() {
+    public function testHydrateQuickLinksWidget()
+    {
         $spec = [
-            '$hydrate' => 'react.quick-links',
-            'title' => 'Quick Links',
-            'containerOptions' => [
-                'borderType' => 'border',
+            '$hydrate' => "react.quick-links",
+            "title" => "Quick Links",
+            "containerOptions" => [
+                "borderType" => "border",
             ],
-            'links' => [
+            "links" => [
                 [
-                    'name' => "Item1",
-                    'url' => "http://something",
+                    "name" => "Item1",
+                    "url" => "http://something",
                 ],
                 [
-                    'name' => "Item2",
-                    'url' => "http://something2",
+                    "name" => "Item2",
+                    "url" => "http://something2",
                 ],
             ],
         ];
         $expected = [
-            '$reactComponent' => 'QuickLinks',
+            '$reactComponent' => "QuickLinks",
             '$reactProps' => [
-                'containerOptions' => $spec['containerOptions'],
-                'title' => $spec['title'],
-                'links' => $spec['links'],
+                "containerOptions" => $spec["containerOptions"],
+                "title" => $spec["title"],
+                "links" => $spec["links"],
             ],
         ];
         $this->assertHydratesTo($spec, [], $expected);

@@ -11,15 +11,16 @@
 /**
  * Object for doing specific actions to a SMF2 import.
  */
-class Smf2ImportModel extends Gdn_Model {
-
+class Smf2ImportModel extends Gdn_Model
+{
     /** @var ImportModel */
     var $ImportModel = null;
 
     /**
      * Finalize the import.
      */
-    public function afterImport() {
+    public function afterImport()
+    {
         // Make different sizes of avatars
         $this->processAvatars();
     }
@@ -27,12 +28,16 @@ class Smf2ImportModel extends Gdn_Model {
     /**
      * Create different sizes of user photos.
      */
-    public function processAvatars() {
+    public function processAvatars()
+    {
         $uploadImage = new Gdn_UploadImage();
-        $userData = $this->SQL->select('u.Photo')->from('User u')->get();
+        $userData = $this->SQL
+            ->select("u.Photo")
+            ->from("User u")
+            ->get();
         foreach ($userData->result() as $user) {
             try {
-                $image = PATH_ROOT.DS.'uploads'.DS.str_replace('userpics', 'attachments', $user->Photo);
+                $image = PATH_ROOT . DS . "uploads" . DS . str_replace("userpics", "attachments", $user->Photo);
 
                 // Check extension length
                 $imageExtension = strlen(pathinfo($image, PATHINFO_EXTENSION));
@@ -44,17 +49,17 @@ class Smf2ImportModel extends Gdn_Model {
                 }
 
                 // Make sure the avatars folder exists.
-                if (!file_exists(PATH_ROOT.'/uploads/userpics')) {
-                    mkdir(PATH_ROOT.'/uploads/userpics');
+                if (!file_exists(PATH_ROOT . "/uploads/userpics")) {
+                    mkdir(PATH_ROOT . "/uploads/userpics");
                 }
 
                 // Save the uploaded image in profile size
-                if (!file_exists(PATH_ROOT.'/uploads/userpics/p'.$imageBaseName)) {
+                if (!file_exists(PATH_ROOT . "/uploads/userpics/p" . $imageBaseName)) {
                     $uploadImage->saveImageAs(
                         $image,
-                        PATH_ROOT.'/uploads/userpics/p'.$imageBaseName,
-                        Gdn::config('Garden.Profile.MaxHeight'),
-                        Gdn::config('Garden.Profile.MaxWidth')
+                        PATH_ROOT . "/uploads/userpics/p" . $imageBaseName,
+                        Gdn::config("Garden.Profile.MaxHeight"),
+                        Gdn::config("Garden.Profile.MaxWidth")
                     );
                 }
 
@@ -68,11 +73,11 @@ class Smf2ImportModel extends Gdn_Model {
                 );*/
 
                 // Save the uploaded image in thumbnail size
-                $thumbSize = Gdn::config('Garden.Thumbnail.Size');
-                if (!file_exists(PATH_ROOT.'/uploads/userpics/n'.$imageBaseName)) {
+                $thumbSize = Gdn::config("Garden.Thumbnail.Size");
+                if (!file_exists(PATH_ROOT . "/uploads/userpics/n" . $imageBaseName)) {
                     $uploadImage->saveImageAs(
                         $image,
-                        PATH_ROOT.'/uploads/userpics/n'.$imageBaseName,
+                        PATH_ROOT . "/uploads/userpics/n" . $imageBaseName,
                         $thumbSize,
                         $thumbSize,
                         true

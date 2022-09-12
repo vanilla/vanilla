@@ -13,11 +13,12 @@ use Vanilla\Contracts\Site\ApplicationInterface;
  * Class Application
  * @package Vanilla\Site
  */
-class Application implements ApplicationInterface {
+class Application implements ApplicationInterface
+{
     /**
      * @var string
      */
-    private $name = '';
+    private $name = "";
 
     /**
      * @var array List of reserved root slugs managed by app
@@ -30,7 +31,8 @@ class Application implements ApplicationInterface {
      * @param string $name
      * @param array $reservedSlugs
      */
-    public function __construct(string $name, array $reservedSlugs) {
+    public function __construct(string $name, array $reservedSlugs)
+    {
         $this->name = $name;
         $this->reservedSlugs = $reservedSlugs;
     }
@@ -38,14 +40,16 @@ class Application implements ApplicationInterface {
     /**
      * @inheritdoc
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return $this->name;
     }
 
     /**
      * @inheritdoc
      */
-    public function getReservedSlugs(): array {
+    public function getReservedSlugs(): array
+    {
         return $this->reservedSlugs;
     }
 }

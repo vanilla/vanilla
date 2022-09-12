@@ -14,8 +14,8 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests for some date time utilities.
  */
-class DateTimeTest extends MinimalContainerTestCase {
-
+class DateTimeTest extends MinimalContainerTestCase
+{
     /**
      * Test dateCompare.
      *
@@ -25,7 +25,8 @@ class DateTimeTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideDateComparisons
      */
-    public function testDateCompare($date1, $date2, int $expected) {
+    public function testDateCompare($date1, $date2, int $expected)
+    {
         $result = dateCompare($date1, $date2);
         $this->assertEquals($expected, $result);
     }
@@ -33,12 +34,13 @@ class DateTimeTest extends MinimalContainerTestCase {
     /**
      * @return array
      */
-    public function provideDateComparisons(): array {
+    public function provideDateComparisons(): array
+    {
         $now = time();
         return [
-            ['2015-12-24 12:12:12', '2015-12-24 12:12:11', 1],
-            ['2015-12-24 12:12:12', '2015-12-24 12:12:12', 0],
-            ['2015-12-24 12:12:12', '2015-12-24 12:12:13', -1],
+            ["2015-12-24 12:12:12", "2015-12-24 12:12:11", 1],
+            ["2015-12-24 12:12:12", "2015-12-24 12:12:12", 0],
+            ["2015-12-24 12:12:12", "2015-12-24 12:12:13", -1],
             [$now, $now - 1, 1],
             [$now, $now, 0],
             [$now, $now + 1, -1],
@@ -53,7 +55,8 @@ class DateTimeTest extends MinimalContainerTestCase {
      * @param DateTimeZone $tz2 The second timezone to compare.
      * @dataProvider provideDateAndTimeZones
      */
-    public function testDifferentTimezones($dateString, DateTimeZone $tz1, DateTimeZone $tz2) {
+    public function testDifferentTimezones($dateString, DateTimeZone $tz1, DateTimeZone $tz2)
+    {
         $dt1 = new DateTime($dateString, $tz1);
         $dt2 = new DateTime($dateString, $tz2);
 
@@ -65,10 +68,11 @@ class DateTimeTest extends MinimalContainerTestCase {
      *
      * @return array Returns a data provider array.
      */
-    public function provideDateStrings() {
+    public function provideDateStrings()
+    {
         return $r = [
-            0 => ['2016-04-25'],
-            1 => ['2016-12-01']
+            0 => ["2016-04-25"],
+            1 => ["2016-12-01"],
         ];
     }
 
@@ -77,8 +81,9 @@ class DateTimeTest extends MinimalContainerTestCase {
      *
      * @return array Returns a data provider array.
      */
-    public function provideDateAndTimeZones() {
-        $timezones = ['America/Montreal', 'America/Detroit'];
+    public function provideDateAndTimeZones()
+    {
+        $timezones = ["America/Montreal", "America/Detroit"];
         $dates = array_column($this->provideDateStrings(), 0);
 
         $r = [];
@@ -91,11 +96,7 @@ class DateTimeTest extends MinimalContainerTestCase {
                     }
 
                     $tz2 = new DateTimeZone($timezone2);
-                    $r["$date $timezone1 vs $timezone2"] = [
-                        $date,
-                        $tz1,
-                        $tz2
-                    ];
+                    $r["$date $timezone1 vs $timezone2"] = [$date, $tz1, $tz2];
                 }
             }
         }

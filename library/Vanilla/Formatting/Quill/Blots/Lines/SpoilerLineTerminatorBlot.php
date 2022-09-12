@@ -12,19 +12,21 @@ use Vanilla\Formatting\Quill\Parser;
 /**
  * A blot to represent a spoiler line terminator.
  */
-class SpoilerLineTerminatorBlot extends AbstractLineTerminatorBlot {
-
+class SpoilerLineTerminatorBlot extends AbstractLineTerminatorBlot
+{
     /**
      * @inheritDoc
      */
-    public static function matches(array $operation): bool {
+    public static function matches(array $operation): bool
+    {
         return static::opAttrsContainKeyWithValue($operation, "spoiler-line");
     }
 
     /**
      * @inheritDoc
      */
-    public function getGroupOpeningTag(): string {
+    public function getGroupOpeningTag(): string
+    {
         $wrapperClass = "spoiler";
         $contentClass = "spoiler-content";
         $button = $this->getToggleButton();
@@ -35,22 +37,25 @@ class SpoilerLineTerminatorBlot extends AbstractLineTerminatorBlot {
     /**
      * @inheritDoc
      */
-    public function getGroupClosingTag(): string {
+    public function getGroupClosingTag(): string
+    {
         return "</div></div>";
     }
 
     /**
      * @inheritDoc
      */
-    public function renderLineStart(): string {
+    public function renderLineStart(): string
+    {
         return '<p class="spoiler-line">';
     }
 
     /**
      * @inheritDoc
      */
-    public function renderLineEnd(): string {
-        return '</p>';
+    public function renderLineEnd(): string
+    {
+        return "</p>";
     }
 
     /**
@@ -58,8 +63,9 @@ class SpoilerLineTerminatorBlot extends AbstractLineTerminatorBlot {
      *
      * @return string
      */
-    private function getToggleButton(): string {
-        $t = 't';
+    private function getToggleButton(): string
+    {
+        $t = "t";
         $buttonClasses = "iconButton button-spoiler";
         $buttonDisabled = "disabled";
         $chevron = "";
@@ -81,11 +87,11 @@ HTML;
         }
         return <<<HTML
 <div contenteditable="false" class="spoiler-buttonContainer">
-<button title="{$t('Toggle Spoiler')}" class="$buttonClasses" $buttonDisabled>
+<button title="{$t("Toggle Spoiler")}" class="$buttonClasses" $buttonDisabled>
     <span class="spoiler-warning">
         <span class="spoiler-warningMain">
             <svg class="spoiler-icon" viewBox="0 0 24 24">
-                <title>{$t('Spoiler')}</title>
+                <title>{$t("Spoiler")}</title>
                 <path fill="currentColor" d="M11.469 15.47c-2.795-.313-4.73-3.017-4.06-5.8l4.06 5.8zM12 16.611a9.65 
                 9.65 0 0 1-8.333-4.722 9.569 9.569 0 0 1 3.067-3.183L5.778 7.34a11.235 11.235 0 0 0-3.547 3.703 1.667 
                 1.667 0 0 0 0 1.692A11.318 11.318 0 0 0 12 18.278c.46 0 .92-.028 1.377-.082l-1.112-1.589a9.867 9.867 
@@ -95,7 +101,7 @@ HTML;
                 7.2a1.944 1.944 0 1 0 3.339 1.354 4.722 4.722 0 0 1-1.283 5.962l.927 1.324a9.602 9.602 0 0 0 4.522-3.952z"/>
             </svg>
             <span class="spoiler-warningLabel">
-                {$t('Spoiler Warning')}
+                {$t("Spoiler Warning")}
             </span>
         </span>
         $chevron

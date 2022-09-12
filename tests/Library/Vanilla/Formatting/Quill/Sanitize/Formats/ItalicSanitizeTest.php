@@ -8,17 +8,18 @@ namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\Formats;
 
 use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
 
-class ItalicSanitizeTest extends SanitizeTest {
-
+class ItalicSanitizeTest extends SanitizeTest
+{
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
+    protected function insertContentOperations(string $content): array
+    {
         $operations = [
             [
                 "insert" => $content,
-                "attributes" => [ "italic" => true ]
-            ]
+                "attributes" => ["italic" => true],
+            ],
         ];
         return $operations;
     }

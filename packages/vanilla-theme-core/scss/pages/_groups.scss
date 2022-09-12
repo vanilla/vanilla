@@ -13,7 +13,6 @@ $GroupIcon-size: 140px;
 $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 
 .Section-Group {
-
     .Excerpt + .HasNew {
         margin-left: $utility-baseUnitHalf;
     }
@@ -25,9 +24,9 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
         text-align: center;
         font-size: $global-title_fontSize;
 
-         @include maxWidth {
-             text-align: left;
-         }
+        @include maxWidth {
+            text-align: left;
+        }
     }
 
     .PageControls.PageControls .BoxNewDiscussion {
@@ -36,7 +35,6 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 
     .BoCloseButtons,
     .Button-Controls {
-
         @include maxWidth {
             display: block;
             width: 100%;
@@ -44,9 +42,7 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
     }
 
     .Button-Controls {
-
         .ButtonGroup.Multi {
-
             @include maxWidth {
                 padding: 0;
 
@@ -57,7 +53,6 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
         }
 
         @include maxWidth {
-
             .NewEventButton,
             .Button:not(.Handle),
             .ButtonGroup {
@@ -68,17 +63,15 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
         }
     }
 
-     .BoxButtons {
-
-         @include maxWidth {
+    .BoxButtons {
+        @include maxWidth {
             display: block;
             width: 100%;
-         }
-     }
+        }
+    }
 }
 
 .Section-Group.Section-Discussion {
-
     .H {
         text-align: left;
     }
@@ -90,7 +83,6 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 
 .Section-Group.NoPanel,
 .Section-GroupList {
-
     .Frame-content {
         > .Container {
             max-width: $global-main_width;
@@ -103,14 +95,12 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 }
 
 .Section-GroupList {
-
     .groupToolbar {
         display: flex;
         justify-content: flex-end;
     }
 
     .groupToolbar-newGroup {
-
         @include maxWidth {
             width: 100%;
             text-align: center;
@@ -118,7 +108,6 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
     }
 
     .MainContent {
-
         h1 {
             display: none;
         }
@@ -152,7 +141,6 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
     }
 
     .DataList .Item {
-
         .Title,
         .GroupDescription {
             margin: 0;
@@ -176,7 +164,6 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
             flex-wrap: wrap;
             align-items: flex-start;
             justify-content: space-between;
-
 
             .ItemContent {
                 flex: 1;
@@ -274,7 +261,6 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
     }
 
     @if ($staticVariables) {
-
         .Button:nth-child(2) {
             margin-left: $utility-baseUnitHalf;
             background-color: transparent;
@@ -373,14 +359,12 @@ $GroupIcon-overlap: #{50px + $utility-baseUnitTriple};
 
 // if $Group.Icon is not set, don't add the padding
 body.noGroupIcon {
-
     .Group-Header-Info {
         padding-left: 0;
     }
 }
 
 @if ($staticVariables) {
-
     .Group-Meta.Group-Meta {
         margin: 0 -#{$utility-baseUnitHalf};
         font-size: $global-small_fontSize;
@@ -400,7 +384,7 @@ body.noGroupIcon {
             margin: 0 $utility-baseUnitHalf;
         }
 
-        .MItem:nth-child(-n+2) .label {
+        .MItem:nth-child(-n + 2) .label {
             font-weight: $global-bold_fontWeight;
         }
     }
@@ -426,7 +410,6 @@ body.noGroupIcon {
         }
     }
 }
-
 
 // Over selected on core...
 .Group-Header.Group-Header.Group-Header.NoBanner {
@@ -462,7 +445,6 @@ body.noGroupIcon {
         }
     }
 
-
     .GroupOptions {
         top: 0;
         right: 0;
@@ -475,9 +457,7 @@ body.noGroupIcon {
 }
 
 .Section-Members {
-
     .DataList .Item {
-
         @include maxWidth {
             display: flex;
             flex-direction: row-reverse;
@@ -540,7 +520,6 @@ body.noGroupIcon {
 }
 
 .Group-MembersPreview {
-
     .PhotoGrid {
         margin: 0 -#{$utility-baseUnitHalf};
     }
@@ -557,7 +536,6 @@ body.noGroupIcon {
 }
 
 .Section-Event.Section-Event {
-
     .AttendeeList.AttendeeList h3 {
         font-size: $global-subTitle_fontSize;
         font-weight: $global-heading_fontWeight;
@@ -586,7 +564,6 @@ body.noGroupIcon {
     }
 
     .EventTime {
-
         label.When {
             display: none;
         }
@@ -611,14 +588,12 @@ body.noGroupIcon {
     }
 
     .EventTitle {
-
         .ButtonGroup {
             margin-top: 0;
         }
     }
 
     @include maxWidth {
-
         .FieldInfo {
             display: block;
             width: 100%;
@@ -634,17 +609,17 @@ body.noGroupIcon {
         width: 100%;
         margin-right: 0;
         margin-bottom: $utility-baseUnitHalf;
-     }
+    }
 }
 
 .group-members-filter-box {
     position: relative;
     display: flex;
 
-     @include maxWidth {
-         flex-wrap: wrap;
-         justify-content: flex-end;
-     }
+    @include maxWidth {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
 
     @if ($staticVariables) {
         .Button {

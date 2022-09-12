@@ -16,8 +16,8 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the giphy embed and factory.
  */
-class GiphyEmbedFactoryTest extends MinimalContainerTestCase {
-
+class GiphyEmbedFactoryTest extends MinimalContainerTestCase
+{
     /** @var GiphyEmbedFactory */
     private $factory;
 
@@ -27,12 +27,12 @@ class GiphyEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
         $this->factory = new GiphyEmbedFactory($this->httpClient);
     }
-
 
     /**
      * Test that all giphy domain types are supported.
@@ -40,43 +40,46 @@ class GiphyEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string $urlToTest
      * @dataProvider supportedDomainsProvider
      */
-    public function testSupportedDomains(string $urlToTest) {
+    public function testSupportedDomains(string $urlToTest)
+    {
         $this->assertTrue($this->factory->canHandleUrl($urlToTest));
     }
 
     /**
      * @return array
      */
-    public function supportedDomainsProvider(): array {
+    public function supportedDomainsProvider(): array
+    {
         return [
-            ['https://gph.is/291u1MC'],
-            ['https://giphy.com/gifs/howtogiphygifs-how-to-XatG8bioEwwVO'],
-            ['https://media.giphy.com/media/kW8mnYSNkUYKc/giphy.gif']
+            ["https://gph.is/291u1MC"],
+            ["https://giphy.com/gifs/howtogiphygifs-how-to-XatG8bioEwwVO"],
+            ["https://media.giphy.com/media/kW8mnYSNkUYKc/giphy.gif"],
         ];
     }
 
     /**
      * Test network request fetching and handling.
      */
-    public function testCreateEmbedForUrl() {
-        $urlToCheck = 'https://giphy.com/gifs/howtogiphygifs-how-to-XatG8bioEwwVO';
-        $endpoint = GiphyEmbedFactory::OEMBED_URL_BASE . '?url=' . urlencode($urlToCheck);
+    public function testCreateEmbedForUrl()
+    {
+        $urlToCheck = "https://giphy.com/gifs/howtogiphygifs-how-to-XatG8bioEwwVO";
+        $endpoint = GiphyEmbedFactory::OEMBED_URL_BASE . "?url=" . urlencode($urlToCheck);
 
-        $title = 'Hello title';
+        $title = "Hello title";
         $width = 500;
         $height = 400;
-        $finalUrl = 'https://media.giphy.com/media/kW8mnYSNkUYKc/giphy.gif';
+        $finalUrl = "https://media.giphy.com/media/kW8mnYSNkUYKc/giphy.gif";
 
         $this->httpClient->addMockResponse(
             $endpoint,
             new HttpResponse(
                 200,
-                'Content-Type: application/json',
+                "Content-Type: application/json",
                 json_encode([
-                    'width' => $width,
-                    'title' => $title,
-                    'height' => $height,
-                    'url' => $finalUrl,
+                    "width" => $width,
+                    "title" => $title,
+                    "height" => $height,
+                    "url" => $finalUrl,
                 ])
             )
         );
@@ -86,15 +89,15 @@ class GiphyEmbedFactoryTest extends MinimalContainerTestCase {
         $embedData = $giphyEmbed->jsonSerialize();
         $this->assertEquals(
             [
-                'width' => $width,
-                'name' => $title,
-                'height' => $height,
-                'url' => $urlToCheck, // The original URL.
-                'embedType' => GiphyEmbed::TYPE,
-                'giphyID' => 'kW8mnYSNkUYKc',
+                "width" => $width,
+                "name" => $title,
+                "height" => $height,
+                "url" => $urlToCheck, // The original URL.
+                "embedType" => GiphyEmbed::TYPE,
+                "giphyID" => "kW8mnYSNkUYKc",
             ],
             $embedData,
-            'Data cna be fetched over the network to create the embed from a URL.'
+            "Data cna be fetched over the network to create the embed from a URL."
         );
 
         // Just verify that this doesn't throw an exception.

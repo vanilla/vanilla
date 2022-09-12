@@ -11,13 +11,15 @@ use PHPUnit\Framework\TestCase;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\BootstrapTrait;
 
-class AuthenticatorTest extends TestCase {
+class AuthenticatorTest extends TestCase
+{
     use BootstrapTrait;
 
     /**
      * Test that an authenticator with minimal/properly implemented methods will instantiate.
      */
-    public function testInstantiateAuthenticator() {
+    public function testInstantiateAuthenticator()
+    {
         new MockAuthenticator();
         $this->assertTrue(true);
     }

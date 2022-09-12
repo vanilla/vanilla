@@ -13,7 +13,8 @@ use Gdn;
  * For classes that want translation to incorporate.
  *
  */
-trait StaticCacheTranslationTrait {
+trait StaticCacheTranslationTrait
+{
     use StaticCacheTrait {
         sc as t;
         scInit as tInit;
@@ -27,9 +28,10 @@ trait StaticCacheTranslationTrait {
      *
      * @return string
      */
-    protected static function f(string $key, $default) {
-        if ($key === '') {
-            return '';
+    protected static function f(string $key, $default)
+    {
+        if ($key === "") {
+            return "";
         }
         return Gdn::translate($key, $default);
     }

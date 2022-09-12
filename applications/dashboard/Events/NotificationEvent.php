@@ -11,5 +11,6 @@ use Garden\Events\ResourceEvent;
 /**
  * Represent a user notification event.
  */
-class NotificationEvent extends ResourceEvent {
+class NotificationEvent extends ResourceEvent
+{
 }

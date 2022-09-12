@@ -13,9 +13,12 @@
  * @param object $smarty
  * @return string
  */
-function smarty_function_profile_link($params, &$smarty) {
-    $wrap = val('wrap', $params, 'li');
-    return Gdn_Theme::link('profile',
-        val('text', $params, ''),
-        val('format', $params, wrap('<a href="%url" class="%class">%text</a>', $wrap)));
+function smarty_function_profile_link($params, &$smarty)
+{
+    $wrap = val("wrap", $params, "li");
+    return Gdn_Theme::link(
+        "profile",
+        val("text", $params, ""),
+        val("format", $params, wrap('<a href="%url" class="%class">%text</a>', $wrap))
+    );
 }

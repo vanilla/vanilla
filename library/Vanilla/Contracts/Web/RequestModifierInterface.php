@@ -10,8 +10,8 @@ namespace Vanilla\Contracts\Web;
 /**
  * Interface for modifying a request in place.
  */
-interface RequestModifierInterface {
-
+interface RequestModifierInterface
+{
     /**
      * Modify the given request.
      *

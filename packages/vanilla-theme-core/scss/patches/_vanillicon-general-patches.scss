@@ -183,7 +183,7 @@
 
 .ReactFacebook:hover {
     &::before {
-        color: #3A5795;
+        color: #3a5795;
     }
 }
 
@@ -193,7 +193,7 @@
 
 .ReactTwitter:hover {
     &::before {
-        color: #55ACEE;
+        color: #55acee;
     }
 }
 
@@ -201,10 +201,9 @@
     content: $icon-google-plus-alt;
 }
 
-
 .ReactGooglePlus:hover {
     &::before {
-        color: #DD4B39;
+        color: #dd4b39;
     }
 }
 
@@ -314,7 +313,7 @@
     }
 
     .SocialIcon-MicrosoftAccount .Icon::before {
-        content:  $icon-windows-alt;
+        content: $icon-windows-alt;
     }
 
     .SocialIcon-Steam .Icon::before {
@@ -353,7 +352,7 @@ a.Bookmark {
 a.Bookmarked {
     &::before,
     &:hover::before {
-        color: #E5B951 !important;
+        color: #e5b951 !important;
         content: $icon-star;
     }
 }

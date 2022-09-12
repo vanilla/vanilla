@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for slugify().
  */
 
-class SlugifyTest extends TestCase {
-
+class SlugifyTest extends TestCase
+{
     /**
      * Tests {@link slugify()} against several scenarios.
      *
@@ -22,7 +22,8 @@ class SlugifyTest extends TestCase {
      * @param string $expected The expected result.
      * @dataProvider provideTestSlugifyArrays
      */
-    public function testSlugify($testText, $expected) {
+    public function testSlugify($testText, $expected)
+    {
         $actual = slugify($testText);
         $this->assertSame($expected, $actual);
     }
@@ -32,29 +33,21 @@ class SlugifyTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestSlugifyArrays() {
+    public function provideTestSlugifyArrays()
+    {
         $r = [
-            'emptyString' => [
-                '',
-                'n-a',
+            "emptyString" => ["", "n-a"],
+            "upperCaseString" => ["Text", "text"],
+            "stringWithMultipleConsecutiveSpaces" => [
+                "This     text   has     many     spaces",
+                "this-text-has-many-spaces",
             ],
-            'upperCaseString' => [
-                'Text',
-                'text',
-            ],
-            'stringWithMultipleConsecutiveSpaces' => [
-                'This     text   has     many     spaces',
-                'this-text-has-many-spaces',
-            ],
-            'testRemovingDuplicateHyphens' => [
-                'this text......has many periods',
-                'this-text-has-many-periods',
-            ],
-//            This doesn't work in all environments
-//            'stringWithEszett' => [
-//                'this string has an Eßzett',
-//                'this-string-has-an-esszett',
-//            ],
+            "testRemovingDuplicateHyphens" => ["this text......has many periods", "this-text-has-many-periods"],
+            //            This doesn't work in all environments
+            //            'stringWithEszett' => [
+            //                'this string has an Eßzett',
+            //                'this-string-has-an-esszett',
+            //            ],
         ];
 
         return $r;

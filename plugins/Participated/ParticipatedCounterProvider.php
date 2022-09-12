@@ -12,8 +12,8 @@ use Vanilla\Menu\Counter;
 /**
  * Menu counter provider for discussion model.
  */
-class ParticipatedCounterProvider implements CounterProviderInterface {
-
+class ParticipatedCounterProvider implements CounterProviderInterface
+{
     /** @var \DiscussionModel */
     private $discussionModel;
 
@@ -22,14 +22,16 @@ class ParticipatedCounterProvider implements CounterProviderInterface {
      *
      * @param \DiscussionModel $discussionModel
      */
-    public function __construct(\DiscussionModel $discussionModel) {
+    public function __construct(\DiscussionModel $discussionModel)
+    {
         $this->discussionModel = $discussionModel;
     }
 
     /**
      * @inheritdoc
      */
-    public function getMenuCounters(): array {
+    public function getMenuCounters(): array
+    {
         $counters[] = new Counter("Participated", $this->discussionModel->getCountParticipated());
         return $counters;
     }

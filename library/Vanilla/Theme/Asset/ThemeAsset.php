@@ -6,18 +6,18 @@
 
 namespace Vanilla\Theme\Asset;
 
- use Garden\Web\Data;
- use Garden\Web\Exception\ClientException;
+use Garden\Web\Data;
+use Garden\Web\Exception\ClientException;
 
- /**
-  * Basic theme asset.
-  */
-abstract class ThemeAsset implements \JsonSerializable {
-
+/**
+ * Basic theme asset.
+ */
+abstract class ThemeAsset implements \JsonSerializable
+{
     protected $includeValueInJson = true;
 
     /** @var string */
-    protected $url = '';
+    protected $url = "";
 
     /** @var boolean */
     protected $canMerge = false;
@@ -52,7 +52,8 @@ abstract class ThemeAsset implements \JsonSerializable {
      *
      * @throws ClientException If the asset is invalid.
      */
-    public function validate(): void {
+    public function validate(): void
+    {
         return;
     }
 
@@ -63,7 +64,8 @@ abstract class ThemeAsset implements \JsonSerializable {
      *
      * @return string
      */
-    public function getUrl(): string {
+    public function getUrl(): string
+    {
         return $this->url;
     }
 
@@ -77,7 +79,8 @@ abstract class ThemeAsset implements \JsonSerializable {
     /**
      * @param bool $includeValueInJson
      */
-    public function setIncludeValueInJson(bool $includeValueInJson): void {
+    public function setIncludeValueInJson(bool $includeValueInJson): void
+    {
         $this->includeValueInJson = $includeValueInJson;
     }
 
@@ -86,7 +89,8 @@ abstract class ThemeAsset implements \JsonSerializable {
      *
      * @return array
      */
-    public function getAllowedTypes(): array {
+    public function getAllowedTypes(): array
+    {
         return [$this->getDefaultType()];
     }
 
@@ -97,9 +101,10 @@ abstract class ThemeAsset implements \JsonSerializable {
      *
      * @return Data
      */
-    public function render(string $asType = null): Data {
+    public function render(string $asType = null): Data
+    {
         $result = new Data($this->__toString());
-        $result->setHeader('Content-Type', $this->getContentType());
+        $result->setHeader("Content-Type", $this->getContentType());
         return $result;
     }
 
@@ -108,15 +113,16 @@ abstract class ThemeAsset implements \JsonSerializable {
      *
      * @return array
      */
-    public function asArray(): array {
+    public function asArray(): array
+    {
         $result = [
-            'url' => $this->getUrl(),
-            'type' => $this->getDefaultType(),
-            'content-type' => $this->getContentType(),
+            "url" => $this->getUrl(),
+            "type" => $this->getDefaultType(),
+            "content-type" => $this->getContentType(),
         ];
 
         if ($this->includeValueInJson) {
-            $result['data'] = $this->getValue();
+            $result["data"] = $this->getValue();
         }
         return $result;
     }
@@ -124,21 +130,24 @@ abstract class ThemeAsset implements \JsonSerializable {
     /**
      * Specify data which should be serialized to JSON.
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return $this->asArray();
     }
 
     /**
      * @return bool
      */
-    public function canMerge(): bool {
+    public function canMerge(): bool
+    {
         return $this->canMerge;
     }
 
     /**
      * @param bool $canMerge
      */
-    public function setCanMerge(bool $canMerge): void {
+    public function setCanMerge(bool $canMerge): void
+    {
         $this->canMerge = $canMerge;
     }
 }

@@ -6,10 +6,13 @@
 
 namespace VanillaTests\Fixtures;
 
-class SomeController {
-    public function someEndpoint($val = '') {
+class SomeController
+{
+    public function someEndpoint($val = "")
+    {
     }
 
-    public function someMethod($val = '') {
+    public function someMethod($val = "")
+    {
     }
 }

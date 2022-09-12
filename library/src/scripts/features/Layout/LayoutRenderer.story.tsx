@@ -280,7 +280,7 @@ export function Misconfiguration() {
                 </StoryParagraph>
                 <LayoutStory
                     layout={
-                        ([
+                        [
                             {
                                 $reactComponent: "unregistered_component",
                                 $reactProps: "this is not valid",
@@ -300,7 +300,7 @@ export function Misconfiguration() {
                                     ],
                                 },
                             },
-                        ] as unknown) as IHydratedLayoutWidget[]
+                        ] as unknown as IHydratedLayoutWidget[]
                     }
                 />
             </StoryContent>

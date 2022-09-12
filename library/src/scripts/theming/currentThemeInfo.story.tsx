@@ -23,8 +23,7 @@ const preview: IThemePreview = {
     info: {
         Description: {
             type: "string",
-            value:
-                "A responsive Vanilla theme with customization options. A responsive Vanilla theme with customization options.",
+            value: "A responsive Vanilla theme with customization options. A responsive Vanilla theme with customization options.",
         },
         Authors: { type: "string", value: "Author1, Author2, Author3" },
     },

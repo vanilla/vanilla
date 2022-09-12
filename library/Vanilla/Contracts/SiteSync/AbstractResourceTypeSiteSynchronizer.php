@@ -12,8 +12,8 @@ use Garden\Http\HttpClient;
 /**
  * Abstract synchronizer of resources of a specific type between a source site and a destination site
  */
-abstract class AbstractResourceTypeSiteSynchronizer implements SiteSyncResourceTypeSynchronizerInterface {
-
+abstract class AbstractResourceTypeSiteSynchronizer implements SiteSyncResourceTypeSynchronizerInterface
+{
     /** @var SiteSyncProducerInterface $siteSyncProducer */
     protected $siteSyncProducer;
 
@@ -26,7 +26,8 @@ abstract class AbstractResourceTypeSiteSynchronizer implements SiteSyncResourceT
      * @param SiteSyncProducerInterface $producer Produces resources to sync from source to destination
      * @param SiteSyncConsumerInterface $consumer Consumes resources to sync from source to destination
      */
-    public function __construct(SiteSyncProducerInterface $producer, SiteSyncConsumerInterface $consumer) {
+    public function __construct(SiteSyncProducerInterface $producer, SiteSyncConsumerInterface $consumer)
+    {
         $this->siteSyncProducer = $producer;
         $this->siteSyncConsumer = $consumer;
     }
@@ -41,23 +42,26 @@ abstract class AbstractResourceTypeSiteSynchronizer implements SiteSyncResourceT
     /**
      * @inheritdoc
      */
-    public function getSiteSyncProducer(): SiteSyncProducerInterface {
+    public function getSiteSyncProducer(): SiteSyncProducerInterface
+    {
         return $this->siteSyncProducer;
     }
 
     /**
      * @inheritdoc
      */
-    public function getSiteSyncConsumer(): SiteSyncConsumerInterface {
+    public function getSiteSyncConsumer(): SiteSyncConsumerInterface
+    {
         return $this->siteSyncConsumer;
     }
 
     /**
      * @inheritdoc
      */
-    public function isSyncAllEnabled(HttpClient $producerClient, HttpClient $consumerClient): bool {
-        return $this->siteSyncProducer->isProduceAllEnabled($producerClient)
-            && $this->siteSyncConsumer->isConsumeAllEnabled($consumerClient);
+    public function isSyncAllEnabled(HttpClient $producerClient, HttpClient $consumerClient): bool
+    {
+        return $this->siteSyncProducer->isProduceAllEnabled($producerClient) &&
+            $this->siteSyncConsumer->isConsumeAllEnabled($consumerClient);
     }
 
     /**

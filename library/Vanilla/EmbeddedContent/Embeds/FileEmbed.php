@@ -14,29 +14,31 @@ use Vanilla\Models\VanillaMediaSchema;
 /**
  * File Embed data object.
  */
-class FileEmbed extends AbstractEmbed {
-
+class FileEmbed extends AbstractEmbed
+{
     const TYPE = "file";
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         // The legacy file embeds have everything underneath attributes.
-        $attributes = $data['attributes'] ?? null;
+        $attributes = $data["attributes"] ?? null;
         if ($attributes !== null) {
             $data = $attributes + $data;
         }
 
-        if (!isset($data['foreignUrl'])) {
-            $data['foreignUrl'] = null;
+        if (!isset($data["foreignUrl"])) {
+            $data["foreignUrl"] = null;
         }
 
         // The `type` field may contain the mime-type data.
@@ -49,19 +51,21 @@ class FileEmbed extends AbstractEmbed {
      *
      * @return string
      */
-    public function renderHtml(): string {
-        $viewPath = dirname(__FILE__) . '/FileEmbed.twig';
+    public function renderHtml(): string
+    {
+        $viewPath = dirname(__FILE__) . "/FileEmbed.twig";
         return $this->renderTwig($viewPath, [
-            'url' => $this->getUrl(),
-            'name' => $this->data['name'],
-            'data' => $this,
+            "url" => $this->getUrl(),
+            "name" => $this->data["name"],
+            "data" => $this,
         ]);
     }
 
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
+    protected function schema(): Schema
+    {
         return new VanillaMediaSchema(true);
     }
 
@@ -70,7 +74,8 @@ class FileEmbed extends AbstractEmbed {
      *
      * @return Attachment
      */
-    public function asAttachment(): Attachment {
+    public function asAttachment(): Attachment
+    {
         return Attachment::fromArray($this->getData());
     }
 }

@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for stringEndsWith().
  */
 
-class StringEndsWithTest extends TestCase {
-
+class StringEndsWithTest extends TestCase
+{
     /**
      * Tests {@link stringEndsWith()} against several scenarios.
      *
@@ -25,7 +25,8 @@ class StringEndsWithTest extends TestCase {
      * @param bool|string $expected The expeted resul.
      * @dataProvider provideTestStringEndsWithArrays
      */
-    public function testStringEndsWith($testHaystack, $testNeedle, $testCaseInsensitive, $testTrim, $expected) {
+    public function testStringEndsWith($testHaystack, $testNeedle, $testCaseInsensitive, $testTrim, $expected)
+    {
         $actual = stringEndsWith($testHaystack, $testNeedle, $testCaseInsensitive, $testTrim);
         $this->assertSame($expected, $actual);
     }
@@ -35,64 +36,17 @@ class StringEndsWithTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestStringEndsWithArrays() {
+    public function provideTestStringEndsWithArrays()
+    {
         $r = [
-            'twoEmptyStringsTrimTrue' => [
-                '',
-                '',
-                false,
-                true,
-                '',
-            ],
-            'twoEmptyStringsTrimFalse' => [
-                '',
-                '',
-                false,
-                false,
-                true,
-            ],
-            'emptyHaystackTrimTrue' => [
-                '',
-                'needle',
-                false,
-                true,
-                '',
-            ],
-            'emptyHaystackTrimFalse' => [
-                '',
-                'needle',
-                false,
-                false,
-                false,
-            ],
-            'needlePresentTrimTrue' => [
-                'haystackEndsWithANeedle',
-                'Needle',
-                false,
-                true,
-                'haystackEndsWithA',
-            ],
-            'needlePresentTrimFalse' => [
-                'haystackEndsWithANeedle',
-                'Needle',
-                false,
-                false,
-                true,
-            ],
-            'needleComesEarlier' => [
-                'the needle does not end this haystack',
-                'needle',
-                false,
-                false,
-                false,
-            ],
-            'caseInsensitive' => [
-                'haystackEndsWithANeEdLe',
-                'needle',
-                true,
-                false,
-                true,
-            ],
+            "twoEmptyStringsTrimTrue" => ["", "", false, true, ""],
+            "twoEmptyStringsTrimFalse" => ["", "", false, false, true],
+            "emptyHaystackTrimTrue" => ["", "needle", false, true, ""],
+            "emptyHaystackTrimFalse" => ["", "needle", false, false, false],
+            "needlePresentTrimTrue" => ["haystackEndsWithANeedle", "Needle", false, true, "haystackEndsWithA"],
+            "needlePresentTrimFalse" => ["haystackEndsWithANeedle", "Needle", false, false, true],
+            "needleComesEarlier" => ["the needle does not end this haystack", "needle", false, false, false],
+            "caseInsensitive" => ["haystackEndsWithANeEdLe", "needle", true, false, true],
         ];
 
         return $r;

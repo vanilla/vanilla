@@ -14,8 +14,8 @@ use Vanilla\Theme\Asset\JsonThemeAsset;
 /**
  * Tests for the
  */
-class JsonThemeAssetTest extends TestCase {
-
+class JsonThemeAssetTest extends TestCase
+{
     /**
      * Test that certain input values are correctly preserved.
      *
@@ -25,12 +25,13 @@ class JsonThemeAssetTest extends TestCase {
      *
      * @dataProvider provideRenderPreservion
      */
-    public function testRenderPreservation(string $inOut) {
-        $asset = new JsonThemeAsset($inOut, '');
+    public function testRenderPreservation(string $inOut)
+    {
+        $asset = new JsonThemeAsset($inOut, "");
         $result = $asset->render()->getData();
         $this->assertEquals($inOut, $result);
 
-        $asset = new JsonThemeAsset($inOut, '');
+        $asset = new JsonThemeAsset($inOut, "");
         $asset->setIncludeValueInJson(true);
         $encoded = json_encode($asset);
         $result = <<<JSON
@@ -43,29 +44,16 @@ JSON;
     /**
      * @return array
      */
-    public function provideRenderPreservion(): array {
+    public function provideRenderPreservion(): array
+    {
         return [
-            'empty array' => [
-                '[]',
-            ],
-            'empty object' => [
-                '{}'
-            ],
-             'nested empty array' => [
-                '{"key":[]}'
-             ],
-            'nested empty object' => [
-                '{"key":{}}'
-            ],
-            'nested empty array object' => [
-                '[{"key":{}}]'
-            ],
-            'indexed array' => [
-                '{"field":[1,5,"asdf"]}',
-            ],
-            'indexed array 2' => [
-                '{"field":{"field":["asdf"]}}',
-            ],
+            "empty array" => ["[]"],
+            "empty object" => ["{}"],
+            "nested empty array" => ['{"key":[]}'],
+            "nested empty object" => ['{"key":{}}'],
+            "nested empty array object" => ['[{"key":{}}]'],
+            "indexed array" => ['{"field":[1,5,"asdf"]}'],
+            "indexed array 2" => ['{"field":{"field":["asdf"]}}'],
         ];
     }
 
@@ -77,8 +65,9 @@ JSON;
      *
      * @dataProvider provideErrors
      */
-    public function testErrors(string $in, array $error) {
-        $asset = new JsonThemeAsset($in, '');
+    public function testErrors(string $in, array $error)
+    {
+        $asset = new JsonThemeAsset($in, "");
         $asset->setIncludeValueInJson(true);
 
         $caughtError = false;
@@ -87,39 +76,40 @@ JSON;
         } catch (ClientException $e) {
             $caughtError = true;
         }
-        $this->assertTrue($caughtError, 'An exception must be thrown while validating.');
+        $this->assertTrue($caughtError, "An exception must be thrown while validating.");
         $this->assertEquals($error, $asset->getValue());
     }
 
     /**
      * @return array|array[]
      */
-    public function provideErrors(): array {
+    public function provideErrors(): array
+    {
         return [
-            'invalid json' => [
-                '{asdfasdf [asdfasdf]',
+            "invalid json" => [
+                "{asdfasdf [asdfasdf]",
                 [
-                    'error' => 'Error decoding JSON',
-                    'message' => 'Syntax error',
+                    "error" => "Error decoding JSON",
+                    "message" => "Syntax error",
                 ],
             ],
-            'is a string' => [
-                'hello',
+            "is a string" => [
+                "hello",
                 [
-                    'error' => 'Error decoding JSON',
-                    'message' => 'Syntax error',
+                    "error" => "Error decoding JSON",
+                    "message" => "Syntax error",
                 ],
             ],
-            'is number' => [
-                '52',
+            "is number" => [
+                "52",
                 [
-                    'value' => 52,
+                    "value" => 52,
                 ],
             ],
-            'is null' => [
-                'null',
+            "is null" => [
+                "null",
                 [
-                    'value' => null,
+                    "value" => null,
                 ],
             ],
         ];

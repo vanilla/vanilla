@@ -15,6 +15,7 @@ interface IProps {
     name?: string;
     onChange?: (newValue: boolean) => void;
     excludeFromICheck?: boolean;
+    fullWidth?: boolean;
 }
 
 export function DashboardCheckBox(props: IProps) {
@@ -24,9 +25,11 @@ export function DashboardCheckBox(props: IProps) {
     return (
         <CheckBox
             {...props}
+            fullWidth={props.fullWidth}
             excludeFromICheck={excludeFromICheck}
             onChange={(e) => props.onChange && props.onChange(!!e.target.checked)}
             isHorizontal={isInline}
+            className={props.className}
         />
     );
 }

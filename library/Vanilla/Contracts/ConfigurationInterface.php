@@ -10,7 +10,8 @@ namespace Vanilla\Contracts;
 /**
  * Interface for reading configuration values.
  */
-interface ConfigurationInterface {
+interface ConfigurationInterface
+{
     /**
      * Gets a setting from the configuration array. Returns $defaultValue if the value isn't found.
      *
@@ -28,5 +29,5 @@ interface ConfigurationInterface {
      * @param array|false $options Some options on how to save it. Pass false to do an "in-memory" save.
      * @return bool|int
      */
-    public function saveToConfig($name, $value = '', $options = []);
+    public function saveToConfig($name, $value = "", $options = []);
 }

@@ -20,6 +20,8 @@ export interface ICallToActionOptions {
     imagePlacement?: "top" | "left";
     alignment?: "center" | "left";
     compactButtons?: boolean;
+    textColor?: string;
+    useOverlay?: boolean;
 }
 
 /**
@@ -64,7 +66,7 @@ export const callToActionVariables = useThemeCache(
              * @expand spacing
              */
             spacing: Variables.spacing({
-                bottom: 16,
+                bottom: 8,
             }),
         });
 

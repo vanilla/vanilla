@@ -21,8 +21,8 @@
  *  - Call the static method Gdn_FormatterChain::chain() to install it on top of the other formatter.
  *  - Depending on the priority you specified your formatter will be called before or after the existing formatter.
  */
-class Gdn_FormatterChain {
-
+class Gdn_FormatterChain
+{
     const PRIORITY_DEFAULT = 0;
 
     const PRIORITY_FIRST = 1000;
@@ -37,18 +37,20 @@ class Gdn_FormatterChain {
      * @param object $formatter The formatter to install.
      * @param int $priority The priority of the formatter in the chain. High priorities come first.
      */
-    public function add($formatter, $priority = Gdn_FormatterChain::PRIORITY_DEFAULT) {
+    public function add($formatter, $priority = Gdn_FormatterChain::PRIORITY_DEFAULT)
+    {
         // Make sure the priority isn't out of bounds.
         if ($priority < self::PRIORITY_LAST) {
             $priority = self::PRIORITY_LAST;
-        } elseif ($priority > self::PRIORITY_FIRST)
+        } elseif ($priority > self::PRIORITY_FIRST) {
             $priority = self::PRIORITY_FIRST;
+        }
 
         $fArray = [$formatter, $priority];
         $this->_Formatters[] = $fArray;
 
         // Resort the array so it's in priority order.
-        usort($this->_Formatters, ['Gdn_FormatterChain', 'Compare']);
+        usort($this->_Formatters, ["Gdn_FormatterChain", "Compare"]);
     }
 
     /**
@@ -61,20 +63,21 @@ class Gdn_FormatterChain {
      * @param int $priority The priority of the formatter in the chain. High priorities come first.
      * @return Gdn_FormatterChain The chain object that was created.
      */
-    public static function chain($type, $formatter, $priority = Gdn_FormatterChain::PRIORITY_DEFAULT) {
+    public static function chain($type, $formatter, $priority = Gdn_FormatterChain::PRIORITY_DEFAULT)
+    {
         // Grab the existing formatter from the factory.
-        $formatter = Gdn::factory($type.'Formatter');
+        $formatter = Gdn::factory($type . "Formatter");
 
         if ($formatter === null) {
             $chain = new Gdn_FormatterChain();
-            Gdn::factoryInstall($type.'Formatter', 'Gdn_FormatterChain', __FILE__, Gdn::FactorySingleton, $chain);
-        } elseif (is_a($formatter, 'Gdn_FormatterChain')) {
+            Gdn::factoryInstall($type . "Formatter", "Gdn_FormatterChain", __FILE__, Gdn::FactorySingleton, $chain);
+        } elseif (is_a($formatter, "Gdn_FormatterChain")) {
             $chain = $formatter;
         } else {
-            Gdn::factoryUninstall($type.'Formatter');
+            Gdn::factoryUninstall($type . "Formatter");
 
             // Look for a priority on the existing object.
-            if (property_exists($formatter, 'Priority')) {
+            if (property_exists($formatter, "Priority")) {
                 $priority = $formatter->Priority;
             } else {
                 $priority = self::PRIORITY_DEFAULT;
@@ -82,7 +85,7 @@ class Gdn_FormatterChain {
 
             $chain = new Gdn_FormatterChain();
             $chain->add($formatter, $priority);
-            Gdn::factoryInstall($type.'Formatter', 'Gdn_FormatterChain', __FILE__, Gdn::FactorySingleton, $chain);
+            Gdn::factoryInstall($type . "Formatter", "Gdn_FormatterChain", __FILE__, Gdn::FactorySingleton, $chain);
         }
         $chain->add($formatter, $priority);
         return $chain;
@@ -94,12 +97,13 @@ class Gdn_FormatterChain {
      * @param array $b The second formatter array to compare.
      * @return int
      */
-    public static function compare($a, $b) {
+    public static function compare($a, $b)
+    {
         if ($a[1] < $b[1]) {
             return 1;
-        } elseif ($a[1] > $b[1])
+        } elseif ($a[1] > $b[1]) {
             return -1;
-        else {
+        } else {
             return 0;
         }
     }
@@ -109,7 +113,8 @@ class Gdn_FormatterChain {
      * @param string $string The string to format.
      * @return string The formatted string.
      */
-    public function format($string) {
+    public function format($string)
+    {
         $result = $string;
         foreach ($this->_Formatters as $fArray) {
             $result = $fArray[0]->format($result);

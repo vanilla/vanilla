@@ -9,7 +9,7 @@ import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import Container from "@library/layout/components/Container";
 import { PanelWidget } from "@library/layout/components/PanelWidget";
 import { SubtitleType } from "@library/layout/PageHeadingBox.variables";
-import TwoColumnSection from "@library/layout/TwoColumnSection";
+import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import { List } from "@library/lists/List";
 import { ListItem } from "@library/lists/ListItem";
 import { StoryListItems } from "@library/lists/ListItem.story";
@@ -98,7 +98,7 @@ export const WithContainer = storyWithConfig({ useWrappers: false }, () => {
 export const InAPanel = storyWithConfig({ useWrappers: false }, () => {
     return (
         <Container fullGutter>
-            <TwoColumnSection
+            <SectionTwoColumns
                 mainBottom={
                     <>
                         <PanelWidget>

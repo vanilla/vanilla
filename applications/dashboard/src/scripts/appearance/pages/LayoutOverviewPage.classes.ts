@@ -9,6 +9,11 @@ export default useThemeCache(() => {
         marginRight: 8,
     });
 
+    const dropdownItemLabel = css({
+        display: "block",
+        flexGrow: 1,
+    });
+
     const overviewContent = css({
         padding: 0,
         margin: 0,
@@ -29,6 +34,7 @@ export default useThemeCache(() => {
 
     return {
         layoutOptionsDropdown,
+        dropdownItemLabel,
         overviewContent,
         titleLabel,
     };

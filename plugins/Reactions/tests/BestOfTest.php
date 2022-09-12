@@ -14,31 +14,33 @@ use VanillaTests\SiteTestCase;
 /**
  * Tests for the /bestof page.
  */
-class BestOfTest extends SiteTestCase {
-
+class BestOfTest extends SiteTestCase
+{
     public static $addons = ["reactions"];
 
     /**
      * Test defaulting behaviour of the data driven themes on the bestof layout.
      */
-    public function testBestOfDefaultView() {
-        \Gdn::themeFeatures()->forceFeatures(['DataDrivenTheme' => true]);
+    public function testBestOfDefaultView()
+    {
+        \Gdn::themeFeatures()->forceFeatures(["DataDrivenTheme" => true]);
         $this->assertBestOfIsList();
 
         // Still respects config if explicitly set.
-        $this->runWithConfig(['Plugins.Reactions.BestOfStyle' => 'Tiles'], [$this, 'assertBestOfIsTiles']);
+        $this->runWithConfig(["Plugins.Reactions.BestOfStyle" => "Tiles"], [$this, "assertBestOfIsTiles"]);
 
-        \Gdn::themeFeatures()->forceFeatures(['DataDrivenTheme' => false]);
+        \Gdn::themeFeatures()->forceFeatures(["DataDrivenTheme" => false]);
         $this->assertBestOfIsTiles();
 
         // Still respects config if explicitly set.
-        $this->runWithConfig(['Plugins.Reactions.BestOfStyle' => 'List'], [$this, 'assertBestOfIsList']);
+        $this->runWithConfig(["Plugins.Reactions.BestOfStyle" => "List"], [$this, "assertBestOfIsList"]);
     }
 
     /**
      * Assert that bestof is currently rendering as a list.
      */
-    public function assertBestOfIsList() {
+    public function assertBestOfIsList()
+    {
         $html = $this->bessy()->getHtml("/bestof", [
             TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL,
         ]);
@@ -52,7 +54,8 @@ class BestOfTest extends SiteTestCase {
     /**
      * Assert that bestof is currently rendering as tiles.
      */
-    public function assertBestOfIsTiles() {
+    public function assertBestOfIsTiles()
+    {
         $html = $this->bessy()->getHtml("/bestof", [
             TestDispatcher::OPT_DELIVERY_TYPE => DELIVERY_TYPE_ALL,
         ]);

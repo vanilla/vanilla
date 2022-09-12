@@ -16,8 +16,8 @@ use Vanilla\Scheduler\SchedulerInterface;
 /**
  * Class ParentJob.
  */
-class ParentJob implements LocalJobInterface {
-
+class ParentJob implements LocalJobInterface
+{
     /** @var LoggerInterface */
     protected $logger;
 
@@ -33,7 +33,8 @@ class ParentJob implements LocalJobInterface {
      * @param LoggerInterface $logger
      * @param SchedulerInterface $scheduler
      */
-    public function __construct(LoggerInterface $logger, SchedulerInterface $scheduler) {
+    public function __construct(LoggerInterface $logger, SchedulerInterface $scheduler)
+    {
         $this->logger = $logger;
         $this->scheduler = $scheduler;
     }
@@ -43,7 +44,8 @@ class ParentJob implements LocalJobInterface {
      *
      * @param array $message
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
         $this->message = $message;
     }
 
@@ -52,8 +54,9 @@ class ParentJob implements LocalJobInterface {
      *
      * @return JobExecutionStatus
      */
-    public function run(): JobExecutionStatus {
-        $this->logger->info(get_class($this)." :: Creating ChildJob");
+    public function run(): JobExecutionStatus
+    {
+        $this->logger->info(get_class($this) . " :: Creating ChildJob");
         $this->scheduler->addJobDescriptor(new NormalJobDescriptor(EchoJob::class));
 
         return JobExecutionStatus::complete();

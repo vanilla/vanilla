@@ -7,8 +7,8 @@
 
 namespace Vanilla\Utility;
 
-
-class DelimitedScheme extends NameScheme {
+class DelimitedScheme extends NameScheme
+{
     /**
      * @var string
      */
@@ -19,7 +19,8 @@ class DelimitedScheme extends NameScheme {
      */
     private $scheme;
 
-    public function __construct($delimiter, NameScheme $scheme) {
+    public function __construct($delimiter, NameScheme $scheme)
+    {
         $this->delimiter = $delimiter;
         $this->scheme = $scheme;
     }
@@ -30,7 +31,8 @@ class DelimitedScheme extends NameScheme {
      * @param string $name The name to convert to this scheme.
      * @return string Returns the new name as a string.
      */
-    public function convert($name) {
+    public function convert($name)
+    {
         $parts = explode($this->delimiter, $name);
 
         $converted = [];
@@ -48,7 +50,8 @@ class DelimitedScheme extends NameScheme {
      * @param string $name The name to test.
      * @return bool Returns **true** if the name is valid for this spec or **false** otherwise.
      */
-    public function valid($name) {
+    public function valid($name)
+    {
         $parts = explode($this->delimiter, $name);
         foreach ($parts as $part) {
             if (!$this->scheme->valid($part)) {
@@ -63,7 +66,8 @@ class DelimitedScheme extends NameScheme {
      *
      * @return NameScheme Returns the scheme.
      */
-    public function getScheme() {
+    public function getScheme()
+    {
         return $this->scheme;
     }
 
@@ -73,7 +77,8 @@ class DelimitedScheme extends NameScheme {
      * @param NameScheme $scheme
      * @return DelimitedScheme Returns `$this` for fluent calls.
      */
-    public function setScheme($scheme) {
+    public function setScheme($scheme)
+    {
         $this->scheme = $scheme;
         return $this;
     }
@@ -83,7 +88,8 @@ class DelimitedScheme extends NameScheme {
      *
      * @return string Returns the delimiter.
      */
-    public function getDelimiter() {
+    public function getDelimiter()
+    {
         return $this->delimiter;
     }
 
@@ -93,7 +99,8 @@ class DelimitedScheme extends NameScheme {
      * @param string $delimiter
      * @return DelimitedScheme Returns `$this` for fluent calls.
      */
-    public function setDelimiter($delimiter) {
+    public function setDelimiter($delimiter)
+    {
         $this->delimiter = $delimiter;
         return $this;
     }

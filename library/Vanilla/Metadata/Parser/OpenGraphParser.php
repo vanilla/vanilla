@@ -8,36 +8,37 @@ namespace Vanilla\Metadata\Parser;
 
 use DOMDocument;
 
-class OpenGraphParser implements Parser {
-
+class OpenGraphParser implements Parser
+{
     /**
      * @inheritdoc
      */
-    public function parse(DOMDocument $document): array {
+    public function parse(DOMDocument $document): array
+    {
         /** @var \DOMNodeList $metaTags */
-        $metaTags = $document->getElementsByTagName('meta');
+        $metaTags = $document->getElementsByTagName("meta");
         $images = [];
         $result = [];
 
         /** @var \DOMElement $tag */
         foreach ($metaTags as $tag) {
-            if ($tag->hasAttribute('property') === false) {
+            if ($tag->hasAttribute("property") === false) {
                 continue;
-            } elseif (substr($tag->getAttribute('property'), 0, 3) !== 'og:') {
+            } elseif (substr($tag->getAttribute("property"), 0, 3) !== "og:") {
                 continue;
             }
 
-            $property = $tag->getAttribute('property');
-            $content = $tag->getAttribute('content');
+            $property = $tag->getAttribute("property");
+            $content = $tag->getAttribute("content");
 
             switch ($property) {
-                case 'og:title':
-                    $result['Title'] = $content;
+                case "og:title":
+                    $result["Title"] = $content;
                     break;
-                case 'og:description':
-                    $result['Description'] = $content;
+                case "og:description":
+                    $result["Description"] = $content;
                     break;
-                case 'og:image':
+                case "og:image":
                     // Only allow valid URLs.
                     if (filter_var($content, FILTER_VALIDATE_URL) === false) {
                         continue 2;
@@ -48,7 +49,7 @@ class OpenGraphParser implements Parser {
         }
 
         if (count($images)) {
-            $result['Images'] = $images;
+            $result["Images"] = $images;
         }
 
         return $result;

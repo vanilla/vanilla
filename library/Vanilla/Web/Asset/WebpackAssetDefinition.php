@@ -12,8 +12,8 @@ use Garden\Web\RequestInterface;
 /**
  * Store a webpack asset definition.
  */
-final class WebpackAssetDefinition {
-
+final class WebpackAssetDefinition
+{
     /** @var string */
     private $assetPath;
 
@@ -34,7 +34,8 @@ final class WebpackAssetDefinition {
      * @param string $section
      * @param string|null $addonKey
      */
-    public function __construct(string $assetPath, string $assetType, string $section, ?string $addonKey) {
+    public function __construct(string $assetPath, string $assetType, string $section, ?string $addonKey)
+    {
         $this->assetPath = $assetPath;
         $this->assetType = $assetType;
         $this->section = $section;
@@ -47,11 +48,16 @@ final class WebpackAssetDefinition {
      * @param array $array The array to load.
      * @return WebpackAssetDefinition Returns a new definition with the properties from {@link $array}.
      */
-    public static function __set_state(array $array): WebpackAssetDefinition {
-        $array += ['assetPath' => '', 'assetType' => [], 'section' => [], 'addonKey' => null];
-        return new WebpackAssetDefinition($array['assetPath'], $array['assetType'], $array['section'], $array['addonKey']);
+    public static function __set_state(array $array): WebpackAssetDefinition
+    {
+        $array += ["assetPath" => "", "assetType" => [], "section" => [], "addonKey" => null];
+        return new WebpackAssetDefinition(
+            $array["assetPath"],
+            $array["assetType"],
+            $array["section"],
+            $array["addonKey"]
+        );
     }
-
 
     /**
      * Convert the definition into an actual site asset.
@@ -60,35 +66,40 @@ final class WebpackAssetDefinition {
      *
      * @return WebpackAsset
      */
-    public function asAsset(RequestInterface $request): WebpackAsset {
+    public function asAsset(RequestInterface $request): WebpackAsset
+    {
         return new WebpackAsset($request, $this->assetPath);
     }
 
     /**
      * @return string
      */
-    public function getAssetPath(): string {
+    public function getAssetPath(): string
+    {
         return $this->assetPath;
     }
 
     /**
      * @return string
      */
-    public function getAssetType(): string {
+    public function getAssetType(): string
+    {
         return $this->assetType;
     }
 
     /**
      * @return string
      */
-    public function getSection(): string {
+    public function getSection(): string
+    {
         return $this->section;
     }
 
     /**
      * @return string|null
      */
-    public function getAddonKey(): ?string {
+    public function getAddonKey(): ?string
+    {
         return $this->addonKey;
     }
 }

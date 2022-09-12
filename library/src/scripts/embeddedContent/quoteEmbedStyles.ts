@@ -15,6 +15,7 @@ import { embedContainerVariables } from "@library/embeddedContent/components/emb
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { Mixins } from "@library/styles/Mixins";
 import { metasVariables } from "@library/metas/Metas.variables";
+import { userContentVariables } from "@library/content/UserContent.variables";
 
 export const quoteEmbedVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -78,9 +79,9 @@ export const quoteEmbedClasses = useThemeCache(() => {
         width: percent(100),
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("medium", "bold"),
-            color: important(ColorsUtils.colorOut(globalVars.mainColors.fg) as string),
             lineHeight: globalVars.lineHeights.condensed,
         }),
+        color: important(ColorsUtils.colorOut(userContentVariables().embeds.fg ?? globalVars.mainColors.fg) as string),
     });
 
     const isPadded = style("isPadded", {});
@@ -119,6 +120,7 @@ export const quoteEmbedClasses = useThemeCache(() => {
                 }),
             },
         },
+        backgroundColor: ColorsUtils.colorOut(userContentVariables().embeds.bg),
     });
 
     const footer = style("footer", {
@@ -138,6 +140,8 @@ export const quoteEmbedClasses = useThemeCache(() => {
         minHeight: styleUnit(vars.footer.height),
     });
 
+    const separatorBgColor = userContentVariables().embeds.bg ?? embedContainerVariables().colors.bg;
+
     const footerSeparator = style("footerSeparator", {
         // Reset
         border: 0,
@@ -148,7 +152,11 @@ export const quoteEmbedClasses = useThemeCache(() => {
         // Styling
         width: percent(100),
         height: styleUnit(1),
-        backgroundColor: ColorsUtils.colorOut(globalVars.mixBgAndFg(0.2)),
+        backgroundColor: ColorsUtils.colorOut(
+            ColorsUtils.isDarkColor(separatorBgColor)
+                ? globalVars.getFgForBg(separatorBgColor)
+                : globalVars.mixBgAndFg(0.2),
+        ),
     });
 
     const postLink = style("postLink", {
@@ -212,6 +220,10 @@ export const quoteEmbedClasses = useThemeCache(() => {
                 ...Mixins.font({
                     ...globalVars.fontSizeAndWeightVars("medium"),
                 }),
+
+                "& p": {
+                    color: ColorsUtils.colorOut(userContentVariables().embeds.fg),
+                },
             },
         },
     });

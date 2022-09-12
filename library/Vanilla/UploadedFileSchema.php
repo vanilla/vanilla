@@ -20,16 +20,17 @@ use Vanilla\Utility\ArrayUtils;
 /**
  * Validation for uploaded files.
  */
-class UploadedFileSchema extends Schema {
+class UploadedFileSchema extends Schema
+{
     protected const UNKNOWN_CONTENT_TYPE = "application/octet-stream";
 
     protected const TEXT_CONTENT_TYPE = "text/plain";
 
-    const OPTION_ALLOWED_EXTENSIONS = 'allowedExtensions';
-    const OPTION_MAX_SIZE = 'maxSize';
-    const OPTION_VALIDATE_CONTENT_TYPES = 'validateContentTypes';
+    const OPTION_ALLOWED_EXTENSIONS = "allowedExtensions";
+    const OPTION_MAX_SIZE = "maxSize";
+    const OPTION_VALIDATE_CONTENT_TYPES = "validateContentTypes";
     const OPTION_ALLOW_UNKNOWN_TYPES = "allowUnknownTypes";
-    const OPTION_ALLOW_NON_STRICT_TYPES = 'allowNonStrictTypes';
+    const OPTION_ALLOW_NON_STRICT_TYPES = "allowNonStrictTypes";
 
     /** @var int $maxFileSize */
     private $maxSize;
@@ -59,18 +60,15 @@ class UploadedFileSchema extends Schema {
     /**
      * @var string[] Content types that must match their extensions.
      */
-    private $strictContentTypes = [
-        'text/html',
-        'application/x-shockwave-flash',
-        'application/xhtml+xml',
-    ];
+    private $strictContentTypes = ["text/html", "application/x-shockwave-flash", "application/xhtml+xml"];
 
     /**
      * Initialize an instance of a new UploadedFileSchema class.
      *
      * @param array $options
      */
-    public function __construct(array $options = []) {
+    public function __construct(array $options = [])
+    {
         $options += [
             self::OPTION_VALIDATE_CONTENT_TYPES => false,
             self::OPTION_ALLOW_NON_STRICT_TYPES => false,
@@ -79,31 +77,34 @@ class UploadedFileSchema extends Schema {
         if (array_key_exists(self::OPTION_ALLOWED_EXTENSIONS, $options)) {
             $allowedExtensions = $options[self::OPTION_ALLOWED_EXTENSIONS];
         } else {
-            $allowedExtensions = Gdn::getContainer()->get('Config')->get('Garden.Upload.AllowedFileExtensions', []);
+            $allowedExtensions = Gdn::getContainer()
+                ->get("Config")
+                ->get("Garden.Upload.AllowedFileExtensions", []);
         }
 
         if (array_key_exists(self::OPTION_MAX_SIZE, $options)) {
             $maxSize = $options[self::OPTION_MAX_SIZE];
         } else {
-            $maxSize = Gdn_Upload::unformatFileSize(Gdn::getContainer()->get('Config')->get(
-                'Garden.Upload.MaxFileSize',
-                ini_get('upload_max_filesize')
-            ));
+            $maxSize = Gdn_Upload::unformatFileSize(
+                Gdn::getContainer()
+                    ->get("Config")
+                    ->get("Garden.Upload.MaxFileSize", ini_get("upload_max_filesize"))
+            );
         }
 
         $this->setValidateContentTypes($options[self::OPTION_VALIDATE_CONTENT_TYPES]);
         $this->setAllowNonStrictTypes($options[self::OPTION_ALLOW_NON_STRICT_TYPES]);
 
         $this->setMaxSize($maxSize);
-        $this->setAllowedExtensions(array_map('strtolower', $allowedExtensions));
+        $this->setAllowedExtensions(array_map("strtolower", $allowedExtensions));
 
         $this->mimeTypes = new MimeTypes();
         $this->setAllowUnknownTypes($options[self::OPTION_ALLOW_UNKNOWN_TYPES] ?? false);
 
         parent::__construct([
-            'id' => 'UploadedFile',
-            'type' => 'string',
-            'format' => 'binary'
+            "id" => "UploadedFile",
+            "type" => "string",
+            "format" => "binary",
         ]);
     }
 
@@ -112,7 +113,8 @@ class UploadedFileSchema extends Schema {
      *
      * @return array
      */
-    public function getAllowedExtensions() {
+    public function getAllowedExtensions()
+    {
         return $this->allowedExtensions;
     }
 
@@ -121,7 +123,8 @@ class UploadedFileSchema extends Schema {
      *
      * @return boolean
      */
-    public function getAllowUnknownTypes(): bool {
+    public function getAllowUnknownTypes(): bool
+    {
         return $this->allowUnknownTypes;
     }
 
@@ -130,7 +133,8 @@ class UploadedFileSchema extends Schema {
      *
      * @return int
      */
-    public function getMaxSize() {
+    public function getMaxSize()
+    {
         return $this->maxSize;
     }
 
@@ -139,7 +143,8 @@ class UploadedFileSchema extends Schema {
      *
      * @return boolean
      */
-    public function getTriggerContentTypeError(): bool {
+    public function getTriggerContentTypeError(): bool
+    {
         return $this->triggerContentTypeError;
     }
 
@@ -149,7 +154,8 @@ class UploadedFileSchema extends Schema {
      * @param array $allowedExtensions
      * @return array
      */
-    public function setAllowedExtensions(array $allowedExtensions) {
+    public function setAllowedExtensions(array $allowedExtensions)
+    {
         return $this->allowedExtensions = $allowedExtensions;
     }
 
@@ -159,7 +165,8 @@ class UploadedFileSchema extends Schema {
      * @param bool $allowUnknownTypes
      * @return bool
      */
-    public function setAllowUnknownTypes(bool $allowUnknownTypes): bool {
+    public function setAllowUnknownTypes(bool $allowUnknownTypes): bool
+    {
         return $this->allowUnknownTypes = $allowUnknownTypes;
     }
 
@@ -169,8 +176,9 @@ class UploadedFileSchema extends Schema {
      * @param int $maxSize
      * @return int
      */
-    public function setMaxSize($maxSize) {
-        return $this->maxSize = (int)$maxSize;
+    public function setMaxSize($maxSize)
+    {
+        return $this->maxSize = (int) $maxSize;
     }
 
     /**
@@ -179,21 +187,23 @@ class UploadedFileSchema extends Schema {
      * @param boolean $triggerContentTypeError
      * @return boolean
      */
-    public function setTriggerContentTypeError(bool $triggerContentTypeError): bool {
+    public function setTriggerContentTypeError(bool $triggerContentTypeError): bool
+    {
         return $this->triggerContentTypeError = $triggerContentTypeError;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validate($data, $sparse = false) {
-        $field = new ValidationField($this->createValidation(), $this->getSchemaArray(), '', $sparse);
+    public function validate($data, $sparse = false)
+    {
+        $field = new ValidationField($this->createValidation(), $this->getSchemaArray(), "", $sparse);
 
         $clean = $this->validateUploadedFile($data, $field);
 
         if (Invalid::isInvalid($clean) && $field->isValid()) {
             // This really shouldn't happen, but we want to protect against seeing the invalid object.
-            $field->addError('invalid', ['messageCode' => '{field} is invalid.', 'status' => 422]);
+            $field->addError("invalid", ["messageCode" => "{field} is invalid.", "status" => 422]);
         }
 
         if (!$field->getValidation()->isValid()) {
@@ -210,7 +220,8 @@ class UploadedFileSchema extends Schema {
      * @param string $extension The file extension.
      * @param ValidationField $field The error collector.
      */
-    private function validateContentTypeExtension(string $mime, string $extension, ValidationField $field): void {
+    private function validateContentTypeExtension(string $mime, string $extension, ValidationField $field): void
+    {
         $validExtensions = $this->mimeTypes->getAllExtensions($mime);
 
         if (in_array($extension, $validExtensions) || $mime === self::TEXT_CONTENT_TYPE) {
@@ -236,7 +247,8 @@ class UploadedFileSchema extends Schema {
         } elseif (empty($validExtensions)) {
             trigger_error("No known mime type for extension: $extension.", E_USER_NOTICE);
         } else {
-            $errorMessage = "The file has an extension that is not valid for its content type. ({ext} does not match {mime})";
+            $errorMessage =
+                "The file has an extension that is not valid for its content type. ({ext} does not match {mime})";
             $field->addError("invalid", [
                 "messageCode" => $errorMessage,
                 "ext" => $extension,
@@ -257,7 +269,8 @@ class UploadedFileSchema extends Schema {
      * @param ValidationField $field
      * @param string $extension
      */
-    private function validateContentType(UploadedFile $upload, ValidationField $field, string $extension): void {
+    private function validateContentType(UploadedFile $upload, ValidationField $field, string $extension): void
+    {
         $file = $upload->getFile();
 
         $detectedType = strtolower(mime_content_type($file));
@@ -278,9 +291,10 @@ class UploadedFileSchema extends Schema {
      * @param ValidationField $field The validation results to add.
      * @return string|Invalid Returns the valid string or **null** if validation fails.
      */
-    protected function validateUploadedFile($value, ValidationField $field) {
+    protected function validateUploadedFile($value, ValidationField $field)
+    {
         if (!($value instanceof UploadedFile)) {
-            $field->addError('invalid', ['messageCode' => '{field} is not a valid file upload.']);
+            $field->addError("invalid", ["messageCode" => "{field} is not a valid file upload."]);
             return Invalid::value();
         }
         /* @var UploadedFile $value */
@@ -302,11 +316,12 @@ class UploadedFileSchema extends Schema {
      * @param ValidationField $field
      * @return UploadedFile
      */
-    protected function validateExtension(UploadedFile $upload, ValidationField $field) {
+    protected function validateExtension(UploadedFile $upload, ValidationField $field)
+    {
         $result = false;
         $file = $upload->getClientFilename();
 
-        if (is_string($file) && $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION))) {
+        if (is_string($file) && ($ext = strtolower(pathinfo($file, PATHINFO_EXTENSION)))) {
             $ext = strtolower($ext);
             if (in_array($ext, $this->getAllowedExtensions())) {
                 if ($this->getValidateContentTypes()) {
@@ -320,9 +335,12 @@ class UploadedFileSchema extends Schema {
 
         if ($result !== true) {
             if ($ext === null) {
-                $field->addError('invalid', ['messageCode' => '{field} does not contain a file extension.']);
+                $field->addError("invalid", ["messageCode" => "{field} does not contain a file extension."]);
             } else {
-                $field->addError('invalid', ['messageCode' => '{field} contains an invalid file extension: {ext}.', 'ext' => $ext]);
+                $field->addError("invalid", [
+                    "messageCode" => "{field} contains an invalid file extension: {ext}.",
+                    "ext" => $ext,
+                ]);
             }
         }
 
@@ -335,9 +353,10 @@ class UploadedFileSchema extends Schema {
      * @param UploadedFile $upload
      * @return UploadedFile
      */
-    protected function validateSize(UploadedFile $upload, ValidationField $field) {
+    protected function validateSize(UploadedFile $upload, ValidationField $field)
+    {
         if ($upload->getSize() > $this->getMaxSize()) {
-            $field->addError('invalid', ['messageCode' => '{field} exceeds the maximum file size.']);
+            $field->addError("invalid", ["messageCode" => "{field} exceeds the maximum file size."]);
         }
         return $upload;
     }
@@ -347,7 +366,8 @@ class UploadedFileSchema extends Schema {
      *
      * @return bool Returns **true** if mime types are validated or **false** otherwise.
      */
-    public function getValidateContentTypes(): bool {
+    public function getValidateContentTypes(): bool
+    {
         return $this->validateContentTypes;
     }
 
@@ -357,7 +377,8 @@ class UploadedFileSchema extends Schema {
      * @param bool $validateContentTypes The new value.
      * @return $this
      */
-    public function setValidateContentTypes(bool $validateContentTypes): self {
+    public function setValidateContentTypes(bool $validateContentTypes): self
+    {
         $this->validateContentTypes = $validateContentTypes;
         return $this;
     }
@@ -369,7 +390,8 @@ class UploadedFileSchema extends Schema {
      * @param ValidationField $field The field to collect errors.
      * @return bool Returns **true** if the file validated or **false** otherwise.
      */
-    protected function validateExists(UploadedFile $file, ValidationField $field): bool {
+    protected function validateExists(UploadedFile $file, ValidationField $field): bool
+    {
         if (!file_exists($file->getFile())) {
             $field->addError("required", ["messageCode" => "File doesn't exist."]);
             return false;
@@ -384,7 +406,8 @@ class UploadedFileSchema extends Schema {
      *
      * @return string[] Returns an array of mime types..
      */
-    public function getStrictContentTypes(): array {
+    public function getStrictContentTypes(): array
+    {
         return $this->strictContentTypes;
     }
 
@@ -394,7 +417,8 @@ class UploadedFileSchema extends Schema {
      * @param string $strictContentTypes A list of mime types.
      * @return $this
      */
-    public function setStrictContentTypes(array $strictContentTypes): self {
+    public function setStrictContentTypes(array $strictContentTypes): self
+    {
         $this->strictContentTypes = $strictContentTypes;
         return $this;
     }
@@ -405,7 +429,8 @@ class UploadedFileSchema extends Schema {
      * @param string $mime The mime type of the content.
      * @return UploadedFileSchema
      */
-    public function addStrictContentType(string $mime): self {
+    public function addStrictContentType(string $mime): self
+    {
         $this->strictContentTypes[] = $mime;
     }
 
@@ -414,7 +439,8 @@ class UploadedFileSchema extends Schema {
      *
      * @return bool Returns **true** to allow or **false** otherwise.
      */
-    public function getAllowNonStrictTypes(): bool {
+    public function getAllowNonStrictTypes(): bool
+    {
         return $this->allowNonStrictTypes;
     }
 
@@ -428,7 +454,8 @@ class UploadedFileSchema extends Schema {
      * @param bool $allowNonStrictTypes The new value.
      * @return $this
      */
-    public function setAllowNonStrictTypes(bool $allowNonStrictTypes): self {
+    public function setAllowNonStrictTypes(bool $allowNonStrictTypes): self
+    {
         $this->allowNonStrictTypes = $allowNonStrictTypes;
         return $this;
     }
@@ -447,9 +474,10 @@ class UploadedFileSchema extends Schema {
      * @param string $field The name of the field to check
      * @param RequestInterface $request The request object used to look at headers.
      */
-    final public static function validateUploadSanity($body, string $field, RequestInterface $request): void {
+    final public static function validateUploadSanity($body, string $field, RequestInterface $request): void
+    {
         ArrayUtils::assertArray($body, "The request body isn't a valid array.");
-        if (empty($body[$field]) && stripos($request->getHeader('content-type'), 'multipart/form-data') === false) {
+        if (empty($body[$field]) && stripos($request->getHeader("content-type"), "multipart/form-data") === false) {
             $validation = new Validation();
             $validation->addError(
                 $field,

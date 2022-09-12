@@ -16,7 +16,8 @@ use VanillaTests\Fixtures\Authenticator\CssColorAuthenticator;
 /**
  * Class AuthenticatorCssColorValidation.
  */
-class AuthenticatorCssColorValidation extends TestCase {
+class AuthenticatorCssColorValidation extends TestCase
+{
     use BootstrapTrait;
 
     /** @var AuthenticatorModel */
@@ -25,7 +26,8 @@ class AuthenticatorCssColorValidation extends TestCase {
     /**
      * @inheritdoc
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         BootstrapTrait::setUpBeforeClass();
 
         self::$authenticatorModel = self::container()->get(AuthenticatorModel::class);
@@ -35,14 +37,16 @@ class AuthenticatorCssColorValidation extends TestCase {
     /**
      * @inheritdoc
      */
-    public static function tearDownAfterClass(): void {
+    public static function tearDownAfterClass(): void
+    {
         BootstrapTrait::tearDownAfterClass();
     }
 
     /**
      * @inheritdoc
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         CssColorAuthenticator::resetColor();
 
         parent::tearDown();
@@ -63,14 +67,15 @@ class AuthenticatorCssColorValidation extends TestCase {
      * @throws \Garden\Web\Exception\ServerException
      *
      */
-    public function testValidColors($color = null) {
+    public function testValidColors($color = null)
+    {
         CssColorAuthenticator::setCssColor($color);
         /** @var Authenticator $authenticator */
         $authenticator = self::$authenticatorModel->getAuthenticatorByID(CssColorAuthenticator::getType());
 
-        $this->assertInternalType('object', $authenticator);
+        $this->assertInternalType("object", $authenticator);
         $this->assertEquals(get_class($authenticator), CssColorAuthenticator::class);
-        $this->assertEquals($color, $authenticator->getAuthenticatorInfo()['ui']['backgroundColor']);
+        $this->assertEquals($color, $authenticator->getAuthenticatorInfo()["ui"]["backgroundColor"]);
     }
 
     /**
@@ -88,7 +93,8 @@ class AuthenticatorCssColorValidation extends TestCase {
      * @throws \Garden\Web\Exception\ServerException
      *
      */
-    public function testInvalidColors($color = null) {
+    public function testInvalidColors($color = null)
+    {
         CssColorAuthenticator::setCssColor($color);
         self::$authenticatorModel->getAuthenticatorByID(CssColorAuthenticator::getType());
     }
@@ -98,18 +104,19 @@ class AuthenticatorCssColorValidation extends TestCase {
      *
      * @return array
      */
-    public function validCssColorsProvider() {
+    public function validCssColorsProvider()
+    {
         return [
-            'long hex' => ['#F8C1A0'],
-            'short hex' => ['#09D'],
-            'lower case hex' => ['#abcdef'],
-            'rgb(0, 0, 0)' => ['rgb(0, 0, 0)'],
-            'rgb(0,0, 0) Goofy spacing' => ['rgb(0, 0, 0)'],
-            'rgb(255, 255, 255)' => ['rgb(255, 255, 255)'],
-            'rgba(192, 7, 10, 0)' => ['rgba(192, 7, 10, 0)'],
-            'rgba(192, 7, 10, 1)' => ['rgba(192, 7, 10, 1)'],
-            'rgba(192, 7, 10, 0.34)' => ['rgba(192, 7, 10, 0.34)'],
-            'rgba(192, 7, 10, 0.34) Goofy spacing' => ['rgba(192,7, 10,0.34)'],
+            "long hex" => ["#F8C1A0"],
+            "short hex" => ["#09D"],
+            "lower case hex" => ["#abcdef"],
+            "rgb(0, 0, 0)" => ["rgb(0, 0, 0)"],
+            "rgb(0,0, 0) Goofy spacing" => ["rgb(0, 0, 0)"],
+            "rgb(255, 255, 255)" => ["rgb(255, 255, 255)"],
+            "rgba(192, 7, 10, 0)" => ["rgba(192, 7, 10, 0)"],
+            "rgba(192, 7, 10, 1)" => ["rgba(192, 7, 10, 1)"],
+            "rgba(192, 7, 10, 0.34)" => ["rgba(192, 7, 10, 0.34)"],
+            "rgba(192, 7, 10, 0.34) Goofy spacing" => ["rgba(192,7, 10,0.34)"],
         ];
     }
 
@@ -118,12 +125,13 @@ class AuthenticatorCssColorValidation extends TestCase {
      *
      * @return array
      */
-    public function invalidCssColorsProvider() {
+    public function invalidCssColorsProvider()
+    {
         return [
-            'hsl' => ['hsl(120, 100%, 50%)'],
-            'hsla' => ['hsla(120, 100%, 50%, 0.3)'],
-            'named color (blue)' => ['Blue'],
-            'hex with no #' => ['FF1100'],
+            "hsl" => ["hsl(120, 100%, 50%)"],
+            "hsla" => ["hsla(120, 100%, 50%, 0.3)"],
+            "named color (blue)" => ["Blue"],
+            "hex with no #" => ["FF1100"],
         ];
     }
 }

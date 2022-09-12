@@ -16,8 +16,7 @@ const fakeAddons: Array<Omit<IAddon, "onEnabledChange">> = [
         enabled: true,
         description:
             "Usercards allow you to get a quick in-line snapshot of a user’s information. When viewing posts and leaderboards, click on the username to see a card showcasing the users basic profile info without having to navigate away from the page. Enable this feature to add usercards to your custom theme.",
-        notes:
-            "N.B. This new Search Page first needs to be configured to match your custom theme. This can be done using our new theme editor. Find out more.",
+        notes: "N.B. This new Search Page first needs to be configured to match your custom theme. This can be done using our new theme editor. Find out more.",
     },
     {
         imageUrl: ADDON_STORY_IMAGE,
@@ -25,8 +24,7 @@ const fakeAddons: Array<Omit<IAddon, "onEnabledChange">> = [
         enabled: false,
         description:
             "Vanilla’s new search service is finally here. Enable our new search page UI to gain access to the newest search features such as Member Search, search sorting and term highlighting.",
-        notes:
-            "N.B. This new Search Page first needs to be configured to match your custom theme. This can be done using our new theme editor. Find out more.",
+        notes: "N.B. This new Search Page first needs to be configured to match your custom theme. This can be done using our new theme editor. Find out more.",
     },
 ];
 

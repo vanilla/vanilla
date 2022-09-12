@@ -17,18 +17,19 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  *
  * @package VanillaTests\Modules
  */
-class ReactionModuleStoryBookTest extends StorybookGenerationTestCase {
-
+class ReactionModuleStoryBookTest extends StorybookGenerationTestCase
+{
     use EventSpyTestTrait;
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
 
-    public static $addons = ['reactions'];
+    public static $addons = ["reactions"];
 
     /**
      * @inheritdoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->createUserFixtures();
         $this->container()->call(function (\ReactionModel $reactionModel) {
@@ -40,18 +41,13 @@ class ReactionModuleStoryBookTest extends StorybookGenerationTestCase {
     /**
      * Test rendering of the Reactions Module.
      */
-    public function testRender() {
+    public function testRender()
+    {
         $discussion = $this->createDiscussion(["categoryID" => 1]);
-        $this->api->post(
-            "discussions/{$discussion['discussionID']}/reactions",
-            ["reactionType" => "Agree"]
-        );
+        $this->api->post("discussions/{$discussion["discussionID"]}/reactions", ["reactionType" => "Agree"]);
         $discussion2 = $this->createDiscussion(["categoryID" => 1]);
-        $this->api->post(
-            "discussions/{$discussion2['discussionID']}/reactions",
-            ["reactionType" => "Like"]
-        );
-        $this->generateStoryHtml('/', 'Reactions Module');
+        $this->api->post("discussions/{$discussion2["discussionID"]}/reactions", ["reactionType" => "Like"]);
+        $this->generateStoryHtml("/", "Reactions Module");
     }
 
     /**
@@ -59,7 +55,8 @@ class ReactionModuleStoryBookTest extends StorybookGenerationTestCase {
      *
      * @param \Gdn_Controller $sender
      */
-    public function base_render_before(\Gdn_Controller $sender) {
+    public function base_render_before(\Gdn_Controller $sender)
+    {
         /** @var ReactionsModule $module */
         $module = self::container()->get(\ReactionsModule::class);
         $sender->addModule($module);

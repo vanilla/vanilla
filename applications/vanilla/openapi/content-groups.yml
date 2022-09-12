@@ -1,0 +1,284 @@
+openapi: 3.0.3
+info:
+paths:
+    /content-groups:
+        x-hidden: true
+        get:
+            summary: List content groups.
+            parameters:
+                - description: Filter by one or more content Group IDs.
+                  in: query
+                  name: contentGroupID
+                  required: false
+                  schema:
+                      $ref: "#/components/schemas/RangeExpression"
+                - description: Filter by content groups name
+                  in: query
+                  name: name
+                  required: false
+                  schema:
+                      type: string
+                      minLength: 1
+                      maxLength: 255
+                - $ref: "#/components/parameters/Page"
+                - description: Desired number of content groups per page.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      default: 20
+                      minimum: 1
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/FullContentGroupSchema"
+                                type: array
+                    description: Success
+                "401":
+                    $ref: "#/components/responses/PermissionError"
+            tags:
+                - Content Groups
+        post:
+            summary: Create new content group
+            requestBody:
+                content:
+                    "application/json":
+                        schema:
+                            $ref: "#/components/schemas/FullContentGroupSchema"
+            responses:
+                "201":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/FullContentGroupSchema"
+                    description: Success.
+                "401":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "400":
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/BasicError"
+            tags:
+                - Content Groups
+    /content-groups/{id}:
+        x-hidden: true
+        parameters:
+            - description: The content group id
+              in: path
+              name: id
+              required: true
+              schema:
+                  type: integer
+        get:
+            summary: Get a single content group.
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/FullContentGroupSchema"
+                    description: Success
+                "401":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+            tags:
+                - Content Groups
+        patch:
+            summary: Update a content group
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ContentGroup"
+            responses:
+                "200":
+                    description: Success.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ContentGroup"
+                "401":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "400":
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/BasicError"
+            tags:
+                - Content Groups
+        delete:
+            summary: Delete a content group.
+            responses:
+                "204":
+                    description: Success.
+                "401":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+            tags:
+                - Content Groups
+    /content-groups/{id}/content/{locale}:
+        x-hidden: true
+        get:
+            summary: List content group with the each record expanded
+            parameters:
+                - description: The content group id
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+                - description: Filter the records by their locale.
+                  in: path
+                  name: locale
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ContentGroupContentSchema"
+                    description: Success
+                "401":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+            tags:
+                - Content Groups
+components:
+    schemas:
+        ContentGroup:
+            description: A content group resource
+            type: object
+            properties:
+                name:
+                    description: Name for the content group
+                    minLength: 1
+                    maxLength: 255
+                    type: string
+                dateInserted:
+                    description: When the content group was created.
+                    format: date-time
+                    type: string
+                dateUpdated:
+                    description: When the content group was last updated.
+                    format: date-time
+                    nullable: true
+                    type: string
+                insertUserID:
+                    description: The unique ID of the user that created this content group.
+                    type: integer
+                updateUserID:
+                    description: The unique ID of the user who updated this content group.
+                    nullable: true
+                    type: integer
+                records:
+                    description: An array of records that belongs to the content group.
+                    items:
+                        properties:
+                            recordID:
+                                description: The ID of the corresponding record
+                                type: integer
+                            recordType:
+                                description: The type of the record.
+                                enum:
+                                    - article
+                                    - category
+                                    - discussion
+                                    - event
+                                    - groups
+                                    - knowledgeBase
+                                type: string
+                            sort:
+                                description: Manual sort order for the group
+                                nullable: true
+                                type: integer
+                        required:
+                            - recordID
+                            - recordType
+                        type: object
+                    type: array
+                    maxItems: 30
+            required:
+                - name
+                - records
+        FullContentGroupSchema:
+            allOf:
+                - type: object
+                  properties:
+                      contentGroupID:
+                          description: The Id of the content group.
+                          type: integer
+                          readOnly: true
+                  required:
+                      - contentGroupID
+                - $ref: "#/components/schemas/ContentGroup"
+        ContentGroupContentSchema:
+            description: A content group resource with records expanded
+            type: object
+            properties:
+                contentGroupID:
+                    description: The Id of the content group.
+                    type: integer
+                    readOnly: true
+                name:
+                    description: Name for the content group
+                    minLength: 1
+                    maxLength: 255
+                    type: string
+                records:
+                    description: An array of records that belongs to the content group.
+                    items:
+                        properties:
+                            recordID:
+                                description: The ID of the corresponding record
+                                type: integer
+                            recordType:
+                                description: The type of the record.
+                                enum:
+                                    - article
+                                    - category
+                                    - discussion
+                                    - event
+                                    - groups
+                                    - knowledgeBase
+                                type: string
+                            sort:
+                                description: Manual sort order for the group
+                                nullable: true
+                                type: integer
+                            record:
+                                description: The content of the specific record
+                                type: object
+                                anyOf:
+                                    - $ref: "../../../cloud/plugins/knowledge/openapi/articles.yml#/components/schemas/Article"
+                                    - $ref: "../../vanilla/openapi/discussions.yml#/components/schemas/Discussion"
+                                    - $ref: "../../vanilla/openapi/categories.yml#/components/schemas/CategorySchema"
+                                    - $ref: "../../groups/openapi/groups.yml#/components/schemas/Group"
+                                    - $ref: "../../groups/openapi/events.yml#/components/schemas/FullEvent"
+                                    - $ref: "../../../cloud/plugins/knowledge/openapi/knowledge-bases.yml#/components/schemas/FullKnowledgeBaseSchema"
+                        required:
+                            - recordID
+                            - recordType
+                            - sort
+                            - record
+                        type: object
+                    type: array
+                    maxItems: 30
+            required:
+                - contentGroupID
+                - name
+                - records

@@ -13,10 +13,10 @@ use Vanilla\Web\TwigStaticRenderer;
 /**
  * Class for converting legacy category items into new modules.
  */
-class FoundationCategoriesShim {
-
-    private const TYPE_CATEGORIES = 'categories';
-    private const TYPE_HEADING = 'heading';
+class FoundationCategoriesShim
+{
+    private const TYPE_CATEGORIES = "categories";
+    private const TYPE_HEADING = "heading";
 
     /** @var \CategoryModel */
     private $categoryModel;
@@ -30,7 +30,8 @@ class FoundationCategoriesShim {
      * @param \CategoryModel $categoryModel
      * @param Container $container
      */
-    public function __construct(\CategoryModel $categoryModel, Container $container) {
+    public function __construct(\CategoryModel $categoryModel, Container $container)
+    {
         $this->categoryModel = $categoryModel;
         $this->container = $container;
     }
@@ -41,13 +42,14 @@ class FoundationCategoriesShim {
      * @param array $legacyCategories
      * @return string
      */
-    public function renderShimLegacyCategories(array $legacyCategories): string {
+    public function renderShimLegacyCategories(array $legacyCategories): string
+    {
         $groups = [];
         $currentGroup = FoundationCategoriesShim::createGroup();
 
         // Utility method to clear the current grouping.
         $clearGroup = function () use (&$currentGroup, &$groups) {
-            if (!empty($currentGroup['items'])) {
+            if (!empty($currentGroup["items"])) {
                 $groups[] = $currentGroup;
                 $currentGroup = FoundationCategoriesShim::createGroup();
             }
@@ -58,21 +60,26 @@ class FoundationCategoriesShim {
             $categories[] = $this->categoryModel->normalizeRow($legacyCategory);
         }
 
-        $parseChildren = function (array $children, int $level = 2) use (&$currentGroup, &$groups, &$clearGroup, &$parseChildren) {
+        $parseChildren = function (array $children, int $level = 2) use (
+            &$currentGroup,
+            &$groups,
+            &$clearGroup,
+            &$parseChildren
+        ) {
             // Break up the categories with headings as separators.
             // After each heading we have a separate grid.
             foreach ($children as $category) {
-                if ($category['displayAs'] === 'heading') {
+                if ($category["displayAs"] === "heading") {
                     $clearGroup();
                     $groups[] = [
-                        'type' => self::TYPE_HEADING,
-                        'name' => $category['name'],
-                        'level' => $level,
+                        "type" => self::TYPE_HEADING,
+                        "name" => $category["name"],
+                        "level" => $level,
                     ];
-                    $parseChildren($category['children'], $level + 1);
+                    $parseChildren($category["children"], $level + 1);
                     $clearGroup();
                 } else {
-                    $currentGroup['items'][] = self::mapApiCategoryToItem($category);
+                    $currentGroup["items"][] = self::mapApiCategoryToItem($category);
                 }
             }
         };
@@ -82,18 +89,18 @@ class FoundationCategoriesShim {
         // Clear the remaining group if there is one.
         $clearGroup();
 
-        $result = '';
+        $result = "";
         // Render all groups.
         foreach ($groups as $group) {
-            if ($group['type'] === self::TYPE_HEADING) {
+            if ($group["type"] === self::TYPE_HEADING) {
                 $result .= TwigStaticRenderer::renderTwigStatic("@vanilla/categories/categoryBoxHeading.twig", $group);
             }
 
-            if (!empty($group['items'])) {
+            if (!empty($group["items"])) {
                 // Headings can sometimes have children. Since they aren't navigable, display them here.
                 /** @var FoundationCategoriesGridModule $shimModule */
                 $shimModule = $this->container->get(FoundationCategoriesGridModule::class);
-                $shimModule->setWidgetItems($group['items']);
+                $shimModule->setWidgetItems($group["items"]);
                 $result .= $shimModule->toString();
             }
         }
@@ -103,10 +110,11 @@ class FoundationCategoriesShim {
     /**
      * @return array
      */
-    private static function createGroup(): array {
+    private static function createGroup(): array
+    {
         return [
-            'type' => self::TYPE_CATEGORIES,
-            'items' => [],
+            "type" => self::TYPE_CATEGORIES,
+            "items" => [],
         ];
     }
 
@@ -115,7 +123,8 @@ class FoundationCategoriesShim {
      *
      * @param array $legacyCategories
      */
-    public static function printLegacyShim(array $legacyCategories) {
+    public static function printLegacyShim(array $legacyCategories)
+    {
         /** @var FoundationCategoriesShim $shim */
         $shim = \Gdn::getContainer()->get(FoundationCategoriesShim::class);
         echo $shim->renderShimLegacyCategories($legacyCategories);
@@ -126,10 +135,10 @@ class FoundationCategoriesShim {
      *
      * @return bool
      */
-    public static function isEnabled(): bool {
-        return \Gdn::config('Vanilla.Categories.Layout') === 'foundation';
+    public static function isEnabled(): bool
+    {
+        return \Gdn::config("Vanilla.Categories.Layout") === "foundation";
     }
-
 
     /**
      * Utility for for mapping category data into a widget item.
@@ -138,30 +147,31 @@ class FoundationCategoriesShim {
      * @param array|null $options
      * @return array
      */
-    public static function mapApiCategoryToItem(array $category, ?array $options = null): array {
+    public static function mapApiCategoryToItem(array $category, ?array $options = null): array
+    {
         $counts = [
             [
                 // %s discussion
                 // %s discussions
-                'labelCode' => 'discussions',
-                'count' => (int) $category['countAllDiscussions'] ?? 0,
-            ]
+                "labelCode" => "discussions",
+                "count" => (int) $category["countAllDiscussions"] ?? 0,
+            ],
         ];
-        if ($options['countComments'] ?? false) {
+        if ($options["countComments"] ?? false) {
             $counts[] = [
                 // %s Comment
                 // %s Comments
-                'labelCode' => 'Comments',
-                'count' => (int) $category['countAllComments'] ?? 0,
+                "labelCode" => "Comments",
+                "count" => (int) $category["countAllComments"] ?? 0,
             ];
         }
         return [
-            'to' => $category['url'],
-            'iconUrl' => $category['iconUrl'] ?? null,
-            'imageUrl' => $category['bannerUrl'] ?? null,
-            'name' => $category['name'],
-            'description' => $category['description'] ?? '',
-            'counts' => $counts
+            "to" => $category["url"],
+            "iconUrl" => $category["iconUrl"] ?? null,
+            "imageUrl" => $category["bannerUrl"] ?? null,
+            "name" => $category["name"],
+            "description" => $category["description"] ?? "",
+            "counts" => $counts,
         ];
     }
 }

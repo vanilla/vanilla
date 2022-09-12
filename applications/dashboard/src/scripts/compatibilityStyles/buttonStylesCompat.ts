@@ -167,6 +167,7 @@ export const buttonCSS = () => {
     mixinButton(".PrevNextPager .Previous", ButtonTypes.STANDARD);
     mixinButton(".PrevNextPager .Next", ButtonTypes.STANDARD);
     mixinButton("div.Popup .Button.change-picture-new", ButtonTypes.STANDARD);
+    mixinButton("div.Popup .Button.change-picture-remove", ButtonTypes.STANDARD);
     mixinButton("body.Section-BestOf .FilterMenu a", ButtonTypes.STANDARD);
     mixinButton(".group-members-filter-box .Button", ButtonTypes.STANDARD);
     mixinButton("body.Section-Profile .ProfileOptions .Button-EditProfile", ButtonTypes.STANDARD);

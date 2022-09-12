@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for sliceParagraphTest().
  */
 
-class SliceParagraphTest extends TestCase {
-
+class SliceParagraphTest extends TestCase
+{
     /**
      * Test {@link sliceParagraph()} against several scenarios.
      *
@@ -24,7 +24,8 @@ class SliceParagraphTest extends TestCase {
      * @param string $expected The expected result.
      * @dataProvider provideTestSliceParagraphArrays
      */
-    public function testSliceParagraph($testString, $testLimits, $testSuffix, $expected) {
+    public function testSliceParagraph($testString, $testLimits, $testSuffix, $expected)
+    {
         $actual = sliceParagraph($testString, $testLimits, $testSuffix);
         $this->assertSame($expected, $actual);
     }
@@ -34,9 +35,10 @@ class SliceParagraphTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestSliceParagraphArrays() {
+    public function provideTestSliceParagraphArrays()
+    {
         $r = [
-            'sliceOnParagraph' => [
+            "sliceOnParagraph" => [
                 "Herodotus relates that Xerxes wept at the sight 
                 of his army, which stretched further than the eye 
                 could reach, in the thought that of all these, after a 
@@ -48,7 +50,7 @@ class SliceParagraphTest extends TestCase {
                 swarming in all directions, crowding and soiling everything, 
                 like flies in summer.",
                 [500, 30],
-                '-',
+                "-",
                 "Herodotus relates that Xerxes wept at the sight 
                 of his army, which stretched further than the eye 
                 could reach, in the thought that of all these, after a 
@@ -57,7 +59,7 @@ class SliceParagraphTest extends TestCase {
                 weep at thinking that, when ten years have passed, 
                 not one of them will be heard of.\n",
             ],
-            'sliceOnParagraphLimitsInt' => [
+            "sliceOnParagraphLimitsInt" => [
                 "Herodotus relates that Xerxes wept at the sight 
                 of his army, which stretched further than the eye 
                 could reach, in the thought that of all these, after a 
@@ -69,7 +71,7 @@ class SliceParagraphTest extends TestCase {
                 swarming in all directions, crowding and soiling everything, 
                 like flies in summer.",
                 500,
-                '-',
+                "-",
                 "Herodotus relates that Xerxes wept at the sight 
                 of his army, which stretched further than the eye 
                 could reach, in the thought that of all these, after a 
@@ -78,7 +80,7 @@ class SliceParagraphTest extends TestCase {
                 weep at thinking that, when ten years have passed, 
                 not one of them will be heard of.\n",
             ],
-            'maxLengthGreaterThanStringLength' => [
+            "maxLengthGreaterThanStringLength" => [
                 "Herodotus relates that Xerxes wept at the sight 
                 of his army, which stretched further than the eye 
                 could reach, in the thought that of all these, after a 
@@ -90,7 +92,7 @@ class SliceParagraphTest extends TestCase {
                 swarming in all directions, crowding and soiling everything, 
                 like flies in summer.",
                 2000,
-                '-',
+                "-",
                 "Herodotus relates that Xerxes wept at the sight 
                 of his army, which stretched further than the eye 
                 could reach, in the thought that of all these, after a 
@@ -102,7 +104,7 @@ class SliceParagraphTest extends TestCase {
                 swarming in all directions, crowding and soiling everything, 
                 like flies in summer.",
             ],
-            'splitOnSentence' => [
+            "splitOnSentence" => [
                 "Herodotus relates that Xerxes wept at the sight 
                 of his army, which stretched further than the eye 
                 could reach, in the thought that of all these, after a 
@@ -114,13 +116,13 @@ class SliceParagraphTest extends TestCase {
                 swarming in all directions, crowding and soiling everything, 
                 like flies in summer.",
                 40,
-                '-',
+                "-",
                 "Herodotus relates that Xerxes wept at the sight 
                 of his army, which stretched further than the eye 
                 could reach, in the thought that of all these, after a 
                 hundred years, not one would be alive.",
             ],
-            'splitMidSentence' => [
+            "splitMidSentence" => [
                 "Herodotus relates that Xerxes wept at the sight 
                 of his army, which stretched further than the eye 
                 could reach, in the thought that of all these, after a 
@@ -132,7 +134,7 @@ class SliceParagraphTest extends TestCase {
                 swarming in all directions, crowding and soiling everything, 
                 like flies in summer.",
                 [501, 500],
-                ',',
+                ",",
                 "Herodotus relates that Xerxes wept at the sight 
                 of his army, which stretched further than the eye 
                 could reach, in the thought that of all these, after a 
@@ -141,16 +143,16 @@ class SliceParagraphTest extends TestCase {
                 weep at thinking that, when ten years have passed, 
                 not one of them will be heard of.\n\nIt is in literature as in life :",
             ],
-            'noSentence' => [
+            "noSentence" => [
                 "This sentence is not a sentence because it has no punctuation",
                 25,
-                ' ',
+                " ",
                 "This sentence is not a ",
             ],
-            'noSpaceToSplitOn' => [
+            "noSpaceToSplitOn" => [
                 "This sentence is not a sentence because it has no punctuation",
                 2,
-                ' ',
+                " ",
                 "This sentence is not a sentence because it has no punctuation ",
             ],
         ];

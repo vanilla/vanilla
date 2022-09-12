@@ -12,31 +12,33 @@ use Vanilla\DateFilterSchema;
 /**
  * A date range method with specific backwards compatibility for the `DateFilterSchema` class.
  */
-final class LegacyDateRangeExpression extends DateRangeExpression implements \ArrayAccess {
+final class LegacyDateRangeExpression extends DateRangeExpression implements \ArrayAccess
+{
     /**
      * Make a date range inclusive instead of exclusive.
      *
      * @param \DateTimeImmutable[] $values
      * @return array Returns an array in the form `[$from, $to]`.
      */
-    private static function makeInclusiveRange(array $values) {
-        $r = ['from' => DateFilterSchema::farPastDate(), 'to' => DateFilterSchema::farFutureDate()];
+    private static function makeInclusiveRange(array $values)
+    {
+        $r = ["from" => DateFilterSchema::farPastDate(), "to" => DateFilterSchema::farFutureDate()];
         foreach ($values as $op => $date) {
             switch ($op) {
-                case '>=':
-                    $r['from'] = $date;
+                case ">=":
+                    $r["from"] = $date;
                     break;
-                case '>':
-                    $r['from'] = $date->modify('+1 second');
+                case ">":
+                    $r["from"] = $date->modify("+1 second");
                     break;
-                case '<':
-                    $r['to'] = $date->modify('-1 second');
+                case "<":
+                    $r["to"] = $date->modify("-1 second");
                     break;
-                case '<=':
-                    $r['to'] = $date;
+                case "<=":
+                    $r["to"] = $date;
                     break;
-                case '=':
-                    $r['from'] = $r['to'] = $date;
+                case "=":
+                    $r["from"] = $r["to"] = $date;
                     break;
             }
         }
@@ -46,7 +48,8 @@ final class LegacyDateRangeExpression extends DateRangeExpression implements \Ar
     /**
      * {@inheritDoc}
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         $arr = $this->toLegacyArray();
         return isset($arr[$offset]);
     }
@@ -57,8 +60,9 @@ final class LegacyDateRangeExpression extends DateRangeExpression implements \Ar
      * @param array $arr
      * @return LegacyDateRangeExpression
      */
-    public static function createFromLegacyArray(array $arr): LegacyDateRangeExpression {
-        $r = new static('=', 0);
+    public static function createFromLegacyArray(array $arr): LegacyDateRangeExpression
+    {
+        $r = new static("=", 0);
         $r->fromLegacyArray($arr);
 
         return $r;
@@ -69,28 +73,29 @@ final class LegacyDateRangeExpression extends DateRangeExpression implements \Ar
      *
      * @param array $arr
      */
-    public function fromLegacyArray(array $arr): void {
-        if ($arr['operator'] === '=') {
-            $this->values = ['=' => reset($arr['date'])];
+    public function fromLegacyArray(array $arr): void
+    {
+        if ($arr["operator"] === "=") {
+            $this->values = ["=" => reset($arr["date"])];
         } else {
             $brackets = array_flip(self::BRACKETS);
-            if (preg_match('`[(\[][)\]]`', $arr['operator'])) {
-                $ops = str_split($arr['operator']);
+            if (preg_match("`[(\[][)\]]`", $arr["operator"])) {
+                $ops = str_split($arr["operator"]);
             } else {
-                $ops = (array)$arr['operator'];
+                $ops = (array) $arr["operator"];
             }
             $values = [];
             foreach ($ops as $i => $op) {
                 // Legacy arrays have an annoyance where the date range is always an inclusive array, regardless of the operator.
                 // We need to correct for that by adding/subtracting a second.
                 /** @var \DateTimeImmutable $date */
-                $date = $arr['date'][$i];
+                $date = $arr["date"][$i];
                 switch ($op) {
-                    case '(':
-                        $date = $date->modify('-1 second');
+                    case "(":
+                        $date = $date->modify("-1 second");
                         break;
-                    case ')':
-                        $date = $date->modify('+1 second');
+                    case ")":
+                        $date = $date->modify("+1 second");
                         break;
                 }
                 if (isset(self::BRACKETS[$op])) {
@@ -108,30 +113,32 @@ final class LegacyDateRangeExpression extends DateRangeExpression implements \Ar
      *
      * @return array
      */
-    public function toLegacyArray(): array {
+    public function toLegacyArray(): array
+    {
         $arr = [];
 
         if (count($this->values) === 1) {
-            $arr['operator'] = key($this->values);
-            $arr['date'] = [reset($this->values)];
-            $arr['inclusiveRange'] = self::makeInclusiveRange($this->values);
+            $arr["operator"] = key($this->values);
+            $arr["date"] = [reset($this->values)];
+            $arr["inclusiveRange"] = self::makeInclusiveRange($this->values);
 
             return $arr;
         }
-        $arr['operator'] = '';
+        $arr["operator"] = "";
         foreach (self::BRACKETS as $op => $bracket) {
             if (isset($this->values[$op])) {
-                $arr['operator'] .= $bracket;
+                $arr["operator"] .= $bracket;
             }
         }
-        $arr['date'] = $arr['inclusiveRange'] = self::makeInclusiveRange($this->values);
+        $arr["date"] = $arr["inclusiveRange"] = self::makeInclusiveRange($this->values);
         return $arr;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         $arr = $this->toLegacyArray();
         return $arr[$offset];
     }
@@ -140,7 +147,8 @@ final class LegacyDateRangeExpression extends DateRangeExpression implements \Ar
      * {@inheritDoc}
      * @codeCoverageIgnore
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         $arr = $this->toLegacyArray();
         $arr[$offset] = $value;
         $this->fromLegacyArray($arr);
@@ -150,7 +158,8 @@ final class LegacyDateRangeExpression extends DateRangeExpression implements \Ar
      * {@inheritDoc}
      * @codeCoverageIgnore
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         $arr = $this->toLegacyArray();
         unset($arr[$offset]);
         $this->fromLegacyArray($arr);

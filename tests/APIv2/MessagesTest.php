@@ -10,8 +10,8 @@ namespace VanillaTests\APIv2;
 /**
  * Test the /api/v2/messages endpoints.
  */
-class MessagesTest extends AbstractResourceTest {
-
+class MessagesTest extends AbstractResourceTest
+{
     protected static $userID;
 
     protected static $conversationID;
@@ -24,8 +24,9 @@ class MessagesTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public function __construct($name = null, array $data = [], $dataName = '') {
-        $this->baseUrl = '/messages';
+    public function __construct($name = null, array $data = [], $dataName = "")
+    {
+        $this->baseUrl = "/messages";
 
         parent::__construct($name, $data, $dataName);
     }
@@ -33,46 +34,51 @@ class MessagesTest extends AbstractResourceTest {
     /**
      * {@inheritdoc}
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         parent::setupBeforeClass();
 
         /**
          * @var \Gdn_Session $session
          */
         $session = self::container()->get(\Gdn_Session::class);
-        $session->start(self::$siteInfo['adminUserID'], false, false);
+        $session->start(self::$siteInfo["adminUserID"], false, false);
 
         // Disable flood control checks on the models and make sure that those specific instances are injected into the controllers.
-        $conversationModel = self::container()->get(\ConversationModel::class)->setFloodControlEnabled(false);
+        $conversationModel = self::container()
+            ->get(\ConversationModel::class)
+            ->setFloodControlEnabled(false);
         self::container()->setInstance(\ConversationModel::class, $conversationModel);
-        $conversationMessageModel = self::container()->get(\ConversationMessageModel::class)->setFloodControlEnabled(false);
+        $conversationMessageModel = self::container()
+            ->get(\ConversationMessageModel::class)
+            ->setFloodControlEnabled(false);
         self::container()->setInstance(\ConversationMessageModel::class, $conversationMessageModel);
 
         /** @var \UsersApiController $usersAPIController */
-        $usersAPIController = static::container()->get('UsersAPIController');
+        $usersAPIController = static::container()->get("UsersAPIController");
 
         $user = $usersAPIController->post([
-            'name' => "MessagesUser1",
-            'email' => "MessagesUser1@example.com",
-            'password' => "$%#$&ADSFBNYI*&WBV1",
+            "name" => "MessagesUser1",
+            "email" => "MessagesUser1@example.com",
+            "password" => "$%#$&ADSFBNYI*&WBV1",
         ]);
-        self::$userID = $user['userID'];
+        self::$userID = $user["userID"];
 
         /** @var \ConversationsApiController $conversationsApiController */
-        $conversationsApiController = static::container()->get('ConversationsApiController');
+        $conversationsApiController = static::container()->get("ConversationsApiController");
 
         // Create the conversation as the newly created user.
         $session->start(self::$userID, false, false);
 
         $conversation = $conversationsApiController->post([
-            'participantUserIDs' => [self::$userID]
+            "participantUserIDs" => [self::$userID],
         ]);
-        self::$conversationID = $conversation['conversationID'];
+        self::$conversationID = $conversation["conversationID"];
 
         // Disable email sending.
         /** @var \Gdn_Configuration $config */
-        $config = static::container()->get('Config');
-        $config->set('Garden.Email.Disabled', true, true, false);
+        $config = static::container()->get("Config");
+        $config->set("Garden.Email.Disabled", true, true, false);
 
         $session->end();
     }
@@ -80,23 +86,26 @@ class MessagesTest extends AbstractResourceTest {
     /**
      * We don't care about main images for this endpoint.
      */
-    public function testMainImageField() {
+    public function testMainImageField()
+    {
         $this->markTestSkipped();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function record() {
-        return array_merge(parent::record(), ['conversationID' => self::$conversationID]);
+    public function record()
+    {
+        return array_merge(parent::record(), ["conversationID" => self::$conversationID]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function indexUrl() {
+    public function indexUrl()
+    {
         $indexUrl = $this->baseUrl;
-        $indexUrl .= '?'.http_build_query(['conversationID' => self::$conversationID]);
+        $indexUrl .= "?" . http_build_query(["conversationID" => self::$conversationID]);
         return $indexUrl;
     }
 
@@ -104,14 +113,16 @@ class MessagesTest extends AbstractResourceTest {
      * {@inheritdoc}
      * @requires function MessagesApiController::delete
      */
-    public function testDelete() {
-        $this->fail(__METHOD__.' needs to be implemented');
+    public function testDelete()
+    {
+        $this->fail(__METHOD__ . " needs to be implemented");
     }
 
     /**
      * Test GET /resource/<id>.
      */
-    public function testGet() {
+    public function testGet()
+    {
         $this->expectModerationException();
 
         parent::testGet();
@@ -121,30 +132,34 @@ class MessagesTest extends AbstractResourceTest {
      * {@inheritdoc}
      * @requires function MessagesApiController::patch
      */
-    public function testGetEdit($record = null) {
-        $this->fail(__METHOD__.' needs to be implemented');
+    public function testGetEdit($record = null)
+    {
+        $this->fail(__METHOD__ . " needs to be implemented");
     }
 
     /**
      * {@inheritdoc}
      * @requires function MessagesApiController::patch
      */
-    public function testGetEditFields() {
-        $this->fail(__METHOD__.' needs to be implemented');
+    public function testGetEditFields()
+    {
+        $this->fail(__METHOD__ . " needs to be implemented");
     }
 
     /**
      * {@inheritdoc}
      * @requires function MessagesApiController::patch
      */
-    public function testEditFormatCompat(string $editSuffix = "/edit") {
-        $this->fail(__METHOD__.' needs to be implemented');
+    public function testEditFormatCompat(string $editSuffix = "/edit")
+    {
+        $this->fail(__METHOD__ . " needs to be implemented");
     }
 
     /**
      * Test GET /messages.
      */
-    public function testIndex() {
+    public function testIndex()
+    {
         $this->expectModerationException();
 
         parent::testIndex();
@@ -157,7 +172,8 @@ class MessagesTest extends AbstractResourceTest {
      * @param array $extra Additional fields to send along with the POST request.
      * @return array Returns the new record.
      */
-    public function testPost($record = null, array $extra = []) {
+    public function testPost($record = null, array $extra = [])
+    {
         $currentUserID = $this->api()->getUserID();
         $this->api()->setUserID(self::$userID);
 
@@ -172,24 +188,27 @@ class MessagesTest extends AbstractResourceTest {
      * {@inheritdoc}
      * @requires function MessagesApiController::patch
      */
-    public function testPatch() {
-        $this->fail(__METHOD__.' needs to be implemented');
+    public function testPatch()
+    {
+        $this->fail(__METHOD__ . " needs to be implemented");
     }
 
     /**
      * {@inheritdoc}
      * @requires function MessagesApiController::patch
      */
-    public function testPatchSparse($field) {
-        $this->fail(__METHOD__.' needs to be implemented');
+    public function testPatchSparse($field)
+    {
+        $this->fail(__METHOD__ . " needs to be implemented");
     }
 
     /**
      * {@inheritdoc}
      * @requires function MessagesApiController::patch
      */
-    public function testPatchFull() {
-        $this->fail(__METHOD__.' needs to be implemented');
+    public function testPatchFull()
+    {
+        $this->fail(__METHOD__ . " needs to be implemented");
     }
 
     /**
@@ -207,9 +226,9 @@ class MessagesTest extends AbstractResourceTest {
         string $sanitizedOutput
     ): void {
         $postBody = $this->testPost(array_merge($this->record(), $xssVectorFormat));
-        $this->assertStringNotContainsString($xssVector, $postBody['body']);
-        $this->assertStringContainsString($sanitizedOutput, $postBody['body']);
-        $messageID = $postBody['messageID'];
+        $this->assertStringNotContainsString($xssVector, $postBody["body"]);
+        $this->assertStringContainsString($sanitizedOutput, $postBody["body"]);
+        $messageID = $postBody["messageID"];
 
         // Need to switch back to user posting the message when getting the message
         $currentUserID = $this->api()->getUserID();
@@ -219,7 +238,7 @@ class MessagesTest extends AbstractResourceTest {
 
         $this->assertTrue($response->isSuccessful());
         $getBody = $response->getBody();
-        $this->assertStringContainsString($sanitizedOutput, $getBody['body']);
+        $this->assertStringContainsString($sanitizedOutput, $getBody["body"]);
     }
 
     /**
@@ -227,48 +246,50 @@ class MessagesTest extends AbstractResourceTest {
      *
      * @return iterable
      */
-    public function provideXssVectorSanitized(): iterable {
+    public function provideXssVectorSanitized(): iterable
+    {
         $xssVector = '"><<iframe/><iframe src=javascript:alert(document.domain)></iframe>';
-        yield 'iframe with src javascript, markdown format' => [
-            'xssVectorFormat' => [
-                'body' => $xssVector,
-                'format' => 'markdown'
+        yield "iframe with src javascript, markdown format" => [
+            "xssVectorFormat" => [
+                "body" => $xssVector,
+                "format" => "markdown",
             ],
-            'xssVector' => $xssVector,
-            'sanitizedOutput' => "\"&gt;&lt;" //stripped tags
+            "xssVector" => $xssVector,
+            "sanitizedOutput" => "\"&gt;&lt;", //stripped tags
         ];
-        yield 'iframe with src javascript, rich format' => [
-            'xssVectorFormat' => [
-                'body' => json_encode([["insert" => "{$xssVector}"]]),
-                'format' => 'rich'
+        yield "iframe with src javascript, rich format" => [
+            "xssVectorFormat" => [
+                "body" => json_encode([["insert" => "{$xssVector}"]]),
+                "format" => "rich",
             ],
-            'xssVector' => $xssVector,
-            'sanitizedOutput' => htmlspecialchars($xssVector, ENT_NOQUOTES)
+            "xssVector" => $xssVector,
+            "sanitizedOutput" => htmlspecialchars($xssVector, ENT_NOQUOTES),
         ];
-        yield 'iframe with src javascript in code block, rich format' => [
-            'xssVectorFormat' => [
-                'body' => json_encode([
+        yield "iframe with src javascript in code block, rich format" => [
+            "xssVectorFormat" => [
+                "body" => json_encode([
                     [
-                        'attributes' => ['code' => true],
-                        'insert' => "{$xssVector}"
+                        "attributes" => ["code" => true],
+                        "insert" => "{$xssVector}",
                     ],
-                    ['insert' => '\n']
+                    ["insert" => '\n'],
                 ]),
-                'format' => 'rich'
+                "format" => "rich",
             ],
-            'xssVector' => $xssVector,
-            'sanitizedOutput' => htmlspecialchars($xssVector, ENT_NOQUOTES)
+            "xssVector" => $xssVector,
+            "sanitizedOutput" => htmlspecialchars($xssVector, ENT_NOQUOTES),
         ];
     }
 
     /**
      * Expect exceptions if conversation moderation isn't allowed.
      */
-    private function expectModerationException(): void {
+    private function expectModerationException(): void
+    {
         if (!$this->moderationAllowed) {
             $this->expectException(\Exception::class);
             $this->expectExceptionCode(403);
-            $this->expectExceptionMessage('The site is not configured for moderating conversations.');
+            $this->expectExceptionMessage("The site is not configured for moderating conversations.");
         }
     }
 }

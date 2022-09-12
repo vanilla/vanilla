@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -71,11 +71,11 @@ export function HomeWidget(props: IProps) {
             HomeWidgetItemContentType.TITLE_DESCRIPTION_ICON,
             HomeWidgetItemContentType.TITLE_DESCRIPTION_IMAGE,
         ].includes(itemOptions.contentType) &&
-        props.itemData.length < containerOptions.maxColumnCount &&
+        props.itemData.length < containerOptions.maxColumnCount! &&
         !containerOptions.isCarousel &&
         containerOptions.displayType !== WidgetContainerDisplayType.CAROUSEL
     ) {
-        extraSpacerItemCount = containerOptions.maxColumnCount - props.itemData.length;
+        extraSpacerItemCount = containerOptions.maxColumnCount! - props.itemData.length;
     }
 
     return (

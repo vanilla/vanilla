@@ -13,7 +13,8 @@ use Vanilla\ImageSrcSet\ImageResizeProviderInterface;
  * For testing purpose.
  * Provides a single image url based on its initial URL & desired maximum width.
  */
-class MockImageSrcSetProvider implements ImageResizeProviderInterface {
+class MockImageSrcSetProvider implements ImageResizeProviderInterface
+{
     /**
      * Returns a resized image URL.
      *
@@ -21,8 +22,9 @@ class MockImageSrcSetProvider implements ImageResizeProviderInterface {
      * @param int $maxWidth
      * @return string|null
      */
-    public function getResizedImageUrl(?string $initialUrl, int $maxWidth): ?string {
+    public function getResizedImageUrl(?string $initialUrl, int $maxWidth): ?string
+    {
         $filename = pathinfo($initialUrl, PATHINFO_FILENAME);
-        return 'https://loremflickr.com/g/' . $maxWidth .'/600/' . $filename;
+        return "https://loremflickr.com/g/" . $maxWidth . "/600/" . $filename;
     }
 }

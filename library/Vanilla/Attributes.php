@@ -12,7 +12,8 @@ use Garden\JsonFilterTrait;
 /**
  * A container for API attributes.
  */
-class Attributes extends \ArrayObject implements \JsonSerializable {
+class Attributes extends \ArrayObject implements \JsonSerializable
+{
     use JsonFilterTrait;
 
     /**
@@ -20,7 +21,8 @@ class Attributes extends \ArrayObject implements \JsonSerializable {
      *
      * @param array|string|null $input The initial attributes.
      */
-    public function __construct($input = null) {
+    public function __construct($input = null)
+    {
         //A value of empty string should be null.
         $input = $input ?: null;
 
@@ -35,7 +37,6 @@ class Attributes extends \ArrayObject implements \JsonSerializable {
         parent::__construct($input, \ArrayObject::ARRAY_AS_PROPS);
     }
 
-
     /**
      * Specify data which should be serialized to JSON.
      *
@@ -44,10 +45,11 @@ class Attributes extends \ArrayObject implements \JsonSerializable {
      * which is a value of any type other than a resource.
      * @since 5.4.0
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         $r = $this->getArrayCopy();
         if (empty($r)) {
-            return (object)$r;
+            return (object) $r;
         }
         $r = $this->jsonFilter($r);
         return $r;

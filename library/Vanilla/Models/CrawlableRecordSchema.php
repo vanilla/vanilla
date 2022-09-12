@@ -16,8 +16,8 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Constants for the scope of a record. (What types of users can view it).
  */
-final class CrawlableRecordSchema {
-
+final class CrawlableRecordSchema
+{
     /**
      * The record is visible to guests.
      */
@@ -30,11 +30,51 @@ final class CrawlableRecordSchema {
 
     /** @var string[] Locales that allow crawling of. */
     const CRAWLABLE_LOCALES = [
-        "ar", "bg", "ca", "cs", "cy", "da", "de", "el", "en", "en_GB",
-        "es", "es_MX", "fa", "fi", "fr", "fr_CA", "gd", "he", "hi",
-        "hu", "id", "it", "ja", "ko", "ms_MY", "nl", "no", "nso",
-        "pl", "pt", "pt_BR", "ro", "ru", "sk", "sr", "sv", "th", "tl",
-        "tr", "uk", "ur", "vi", "zh", "zh_TW", "zu_ZA",
+        "ar",
+        "bg",
+        "ca",
+        "cs",
+        "cy",
+        "da",
+        "de",
+        "el",
+        "en",
+        "en_GB",
+        "es",
+        "es_MX",
+        "fa",
+        "fi",
+        "fr",
+        "fr_CA",
+        "gd",
+        "he",
+        "hi",
+        "hu",
+        "id",
+        "it",
+        "ja",
+        "ko",
+        "ms_MY",
+        "nl",
+        "no",
+        "nso",
+        "pl",
+        "pt",
+        "pt_BR",
+        "ro",
+        "ru",
+        "sk",
+        "sr",
+        "sv",
+        "th",
+        "tl",
+        "tr",
+        "uk",
+        "ur",
+        "vi",
+        "zh",
+        "zh_TW",
+        "zu_ZA",
     ];
 
     const ALL_LOCALES = "all";
@@ -94,45 +134,43 @@ final class CrawlableRecordSchema {
      *
      * @return Schema
      */
-    public static function schema(string $defaultType): Schema {
+    public static function schema(string $defaultType): Schema
+    {
         /** @var AbstractSiteProvider $siteProvider */
         $siteProvider = \Gdn::getContainer()->get(AbstractSiteProvider::class);
-        $isPrivateCommunity = \Gdn::config('Garden.PrivateCommunity', false);
+        $isPrivateCommunity = \Gdn::config("Garden.PrivateCommunity", false);
 
         return Schema::parse([
-            'scope' => [
-                'type' => 'string',
-                'enum' => [
-                    self::SCOPE_PUBLIC,
-                    self::SCOPE_RESTRICTED,
-                ],
+            "scope" => [
+                "type" => "string",
+                "enum" => [self::SCOPE_PUBLIC, self::SCOPE_RESTRICTED],
             ],
-            'name:s',
-            'excerpt:s' => [
-                'minLength' => 0,
+            "name:s",
+            "excerpt:s" => [
+                "minLength" => 0,
             ],
-            'image:s?',
-            'localizedID:s?',
-            'locale:s?',
-            'type:s' => [
-                'default' => $defaultType,
+            "image:s?",
+            "localizedID:s?",
+            "locale:s?",
+            "type:s" => [
+                "default" => $defaultType,
             ],
-            'recordType:s' => [
-                'default' => $defaultType,
+            "recordType:s" => [
+                "default" => $defaultType,
             ],
-            'siteID:i' => [
-                'default' => $siteProvider->getOwnSite()->getSiteID(),
+            "siteID:i" => [
+                "default" => $siteProvider->getOwnSite()->getSiteID(),
             ],
-            'recordCollapseID:s?',
+            "recordCollapseID:s?",
             "privacy:s?" => ["default" => "public"],
-        ])->addFilter('', function ($data) use ($defaultType, $siteProvider, $isPrivateCommunity) {
-            if (!isset($data['recordCollapseID'])) {
+        ])->addFilter("", function ($data) use ($defaultType, $siteProvider, $isPrivateCommunity) {
+            if (!isset($data["recordCollapseID"])) {
                 $recordID = $data["{$defaultType}ID"] ?? randomString(10);
-                $siteID = $data['siteID'] ?? $siteProvider->getOwnSite()->getSiteID();
-                $data['recordCollapseID'] = "site{$siteID}_{$defaultType}{$recordID}";
+                $siteID = $data["siteID"] ?? $siteProvider->getOwnSite()->getSiteID();
+                $data["recordCollapseID"] = "site{$siteID}_{$defaultType}{$recordID}";
             }
             if ($isPrivateCommunity) {
-                $data['scope'] = self::SCOPE_RESTRICTED;
+                $data["scope"] = self::SCOPE_RESTRICTED;
             }
             return $data;
         });
@@ -144,25 +182,25 @@ final class CrawlableRecordSchema {
      * @param Schema $schema
      * @return Schema
      */
-    public static function localize(Schema $schema): Schema {
+    public static function localize(Schema $schema): Schema
+    {
         $fields = [];
-        foreach ($schema['properties'] as $property => $data) {
-            if (true === ($data['x-localize'] ?? false)) {
+        foreach ($schema["properties"] as $property => $data) {
+            if (true === ($data["x-localize"] ?? false)) {
                 $fields[] = $property;
             }
         }
         if (!empty($fields)) {
-            $schema->merge(self::getLocalesSchema($fields))
-                ->addFilter('', function (array $row) use ($fields): array {
-                    $locale = $row['locale'] ?? [];
-                    foreach ($fields as $field) {
-                        $val = $row[$field] ?? null;
-                        if ($val && $locale) {
-                            $row["{$field}_{$locale}"] = $val;
-                        }
+            $schema->merge(self::getLocalesSchema($fields))->addFilter("", function (array $row) use ($fields): array {
+                $locale = $row["locale"] ?? [];
+                foreach ($fields as $field) {
+                    $val = $row[$field] ?? null;
+                    if ($val && $locale) {
+                        $row["{$field}_{$locale}"] = $val;
                     }
-                    return $row;
-                });
+                }
+                return $row;
+            });
         }
         return $schema;
     }
@@ -172,11 +210,12 @@ final class CrawlableRecordSchema {
      *
      * @return Schema
      */
-    public static function getLocalesSchema(array $fields) {
+    public static function getLocalesSchema(array $fields)
+    {
         $schema = [];
         foreach (self::CRAWLABLE_LOCALES as $locale) {
             foreach ($fields as $field) {
-                $schema[$field.'_'.$locale.':s?'] = ['x-analyzer' => self::LOCALE_ANALYZERS[$locale]];
+                $schema[$field . "_" . $locale . ":s?"] = ["x-analyzer" => self::LOCALE_ANALYZERS[$locale]];
             }
         }
         return Schema::parse($schema);
@@ -189,10 +228,11 @@ final class CrawlableRecordSchema {
      * @param string|null $locale
      * @return array
      */
-    public static function localizedFieldNames(array $fieldNames, ?string $locale): array {
+    public static function localizedFieldNames(array $fieldNames, ?string $locale): array
+    {
         if (!empty($locale) && !empty(self::LOCALE_ANALYZERS[$locale])) {
             foreach ($fieldNames as &$fieldName) {
-                $fieldName .= '_'.$locale;
+                $fieldName .= "_" . $locale;
             }
         }
         return $fieldNames;
@@ -207,13 +247,14 @@ final class CrawlableRecordSchema {
      *
      * @return Schema
      */
-    public static function applyExpandedSchema(Schema $schema, string $defaultType, $expand = []): Schema {
+    public static function applyExpandedSchema(Schema $schema, string $defaultType, $expand = []): Schema
+    {
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
             $mergedSchema = self::schema($defaultType)->merge($schema);
             $localizedSchema = self::localize($mergedSchema);
 
             return Gdn::eventManager()->fireFilter(
-                'crawlableRecordSchema_applyExpandedSchema',
+                "crawlableRecordSchema_applyExpandedSchema",
                 $localizedSchema,
                 $schema,
                 $defaultType,

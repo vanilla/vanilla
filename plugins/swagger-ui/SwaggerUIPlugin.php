@@ -16,22 +16,24 @@ use Vanilla\Web\Asset\LegacyAssetModel;
 /**
  * Handles the swagger UI menu options.
  */
-class SwaggerUIPlugin extends Gdn_Plugin {
+class SwaggerUIPlugin extends Gdn_Plugin
+{
     /**
      * Add the APIv2 menu item.
      *
      * @param \DashboardNavModule $nav The menu to add the module to.
      */
-    public function dashboardNavModule_init_handler(\DashboardNavModule $nav) {
+    public function dashboardNavModule_init_handler(\DashboardNavModule $nav)
+    {
         $nav->addLinkToSectionIf(
-            \gdn::session()->checkPermission('Garden.Settings.Manage'),
-            'settings',
-            t('API'),
-            '/settings/swagger',
-            'api.swagger-ui',
-            'nav-swagger-ui',
-            ['after' => 'security'],
-            ['badge' => 'v2']
+            \gdn::session()->checkPermission("Garden.Settings.Manage"),
+            "settings",
+            t("API"),
+            "/settings/swagger",
+            "api.swagger-ui",
+            "nav-swagger-ui",
+            ["after" => "security"],
+            ["badge" => "v2"]
         );
     }
 
@@ -40,12 +42,13 @@ class SwaggerUIPlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender The page controller.
      */
-    public function settingsController_swagger_create(SettingsController $sender) {
-        $sender->permission('Garden.Settings.Manage');
+    public function settingsController_swagger_create(SettingsController $sender)
+    {
+        $sender->permission("Garden.Settings.Manage");
 
-        $folder = 'plugins/'.$this->getAddon()->getKey();
+        $folder = "plugins/" . $this->getAddon()->getKey();
 
-        $sender->title(t('Vanilla API v2'));
-        $sender->render('swagger', 'settings', $folder);
+        $sender->title(t("Vanilla API v2"));
+        $sender->render("swagger", "settings", $folder);
     }
 }

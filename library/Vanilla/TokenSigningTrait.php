@@ -10,7 +10,8 @@ namespace Vanilla;
 /**
  * Methods to be used for token generation and signing.
  */
-trait TokenSigningTrait {
+trait TokenSigningTrait
+{
     /** @var string The secret used to sign the token. */
     private $secret;
 
@@ -22,7 +23,8 @@ trait TokenSigningTrait {
      *
      * @return mixed Returns the secret.
      */
-    public function getSecret() {
+    public function getSecret()
+    {
         return $this->secret;
     }
 
@@ -31,7 +33,8 @@ trait TokenSigningTrait {
      *
      * @param mixed $secret
      */
-    public function setSecret($secret) {
+    public function setSecret($secret)
+    {
         $this->secret = $secret;
         return $this;
     }
@@ -42,8 +45,9 @@ trait TokenSigningTrait {
      * @param string $str The string to encode.
      * @return string The encoded string.
      */
-    private static function base64urlEncode($str) {
-        return trim(strtr(base64_encode($str), '+/', '-_'), '=');
+    private static function base64urlEncode($str)
+    {
+        return trim(strtr(base64_encode($str), "+/", "-_"), "=");
     }
 
     /**
@@ -52,8 +56,9 @@ trait TokenSigningTrait {
      * @param string $str The encoded string.
      * @return string The decoded string.
      */
-    private static function base64urlDecode($str) {
-        return base64_decode(strtr($str, '-_', '+/'));
+    private static function base64urlDecode($str)
+    {
+        return base64_decode(strtr($str, "-_", "+/"));
     }
 
     /**
@@ -63,7 +68,8 @@ trait TokenSigningTrait {
      *
      * @return string Returns a 32 character token string.
      */
-    public function randomToken() {
+    public function randomToken()
+    {
         $token = self::base64urlEncode(openssl_random_pseudo_bytes(24));
         return $token;
     }
@@ -76,29 +82,30 @@ trait TokenSigningTrait {
      * @return bool Returns **true** if the token's expiry date and signature is valid or **false** otherwise.
      * @throws \Exception Throws an exception if the token is invalid and {@link $throw} is **true**.
      */
-    public function verifyTokenSignature($accessToken, $throw = false) {
-        $parts = explode('.', $accessToken);
+    public function verifyTokenSignature($accessToken, $throw = false)
+    {
+        $parts = explode(".", $accessToken);
 
         if (empty($accessToken)) {
-            return $this->tokenError('Missing '.$this->tokenIdentifier, 401, $throw);
+            return $this->tokenError("Missing " . $this->tokenIdentifier, 401, $throw);
         }
 
         if (count($parts) !== 4) {
-            return $this->tokenError('Your '.$this->tokenIdentifier.' missing parts.', 401, $throw);
+            return $this->tokenError("Your " . $this->tokenIdentifier . " missing parts.", 401, $throw);
         }
 
-        list($version, $token, $expireStr, $sig) = $parts;
+        [$version, $token, $expireStr, $sig] = $parts;
 
         $expires = $this->decodeDate($expireStr);
         if ($expires === null) {
-            return $this->tokenError('Your '.$this->tokenIdentifier.' has an invalid expiry date.', 401, $throw);
+            return $this->tokenError("Your " . $this->tokenIdentifier . " has an invalid expiry date.", 401, $throw);
         } elseif ($expires < time()) {
-            return $this->tokenError('Your '.$this->tokenIdentifier.' has expired.', 401, $throw);
+            return $this->tokenError("Your " . $this->tokenIdentifier . " has expired.", 401, $throw);
         }
 
         $checkToken = $this->signToken($token, $expires);
         if (!hash_equals($checkToken, $accessToken)) {
-            return $this->tokenError('Your '.$this->tokenIdentifier.' has an invalid signature.', 401, $throw);
+            return $this->tokenError("Your " . $this->tokenIdentifier . " has an invalid signature.", 401, $throw);
         }
 
         return true;
@@ -111,18 +118,19 @@ trait TokenSigningTrait {
      * @param mixed $expires The expiry date of the token.
      * @return string
      */
-    public function signToken($token, $expires = '2 months') {
+    public function signToken($token, $expires = "2 months")
+    {
         if (empty($this->getSecret())) {
             // This means something has been misconfigured. Throw a noisy error.
             throw new \Exception("No secret to sign tokens with.", 500);
         }
 
-        $str = 'va.'.$token.'.'.$this->encodeDate($expires);
-        $sig = self::base64urlEncode(hash_hmac('sha256', $str, $this->secret, true));
+        $str = "va." . $token . "." . $this->encodeDate($expires);
+        $sig = self::base64urlEncode(hash_hmac("sha256", $str, $this->secret, true));
 
         // Use a substring of the signature because we don't want the tokens to be too massive.
         // The signature is only the first line of defence. The database is the final verification.
-        $result = $str.'.'.substr($sig, 0, 7);
+        $result = $str . "." . substr($sig, 0, 7);
         return $result;
     }
 
@@ -135,7 +143,8 @@ trait TokenSigningTrait {
      * @return bool Returns **false**.
      * @throws \Exception Throws an exception if {@link $throw} is true.
      */
-    private function tokenError($message, $code = 401, $throw = false) {
+    private function tokenError($message, $code = 401, $throw = false)
+    {
         if ($throw) {
             throw new \Exception($message, $code);
         }
@@ -148,9 +157,10 @@ trait TokenSigningTrait {
      * @param mixed $dt A timestamp or date string.
      * @return false|int
      */
-    private function toTimestamp($dt) {
+    private function toTimestamp($dt)
+    {
         if (is_numeric($dt)) {
-            return (int)$dt;
+            return (int) $dt;
         } elseif ($ts = strtotime($dt)) {
             return $ts;
         }
@@ -163,9 +173,10 @@ trait TokenSigningTrait {
      * @param mixed $dt A timestamp or date string.
      * @return string Returns the encoded date.
      */
-    private function encodeDate($dt) {
+    private function encodeDate($dt)
+    {
         $timestamp = $this->toTimestamp($dt);
-        $result = self::base64urlEncode(pack('I', $timestamp));
+        $result = self::base64urlEncode(pack("I", $timestamp));
         return $result;
     }
 
@@ -175,8 +186,9 @@ trait TokenSigningTrait {
      * @param string $str An encoded date.
      * @return int Returns a timestamp.
      */
-    private function decodeDate($str) {
-        $arr = unpack('I*', self::base64urlDecode($str));
+    public function decodeDate($str)
+    {
+        $arr = unpack("I*", self::base64urlDecode($str));
         if (empty($arr[1]) || !is_int($arr[1])) {
             return null;
         }

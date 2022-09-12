@@ -10,8 +10,8 @@ namespace Vanilla\Web;
 /**
  * Class for rendering twig views with the vanilla environment configured.
  */
-trait TwigRenderTrait {
-
+trait TwigRenderTrait
+{
     /** @var string The path to look for twig views in. */
     protected static $twigDefaultFolder = PATH_ROOT;
 
@@ -23,7 +23,8 @@ trait TwigRenderTrait {
     /**
      * Initialize the twig environment.
      */
-    private function prepareTwig(): \Twig\Environment {
+    private function prepareTwig(): \Twig\Environment
+    {
         return \Gdn::getContainer()->get(TwigRenderer::class);
     }
 
@@ -35,12 +36,13 @@ trait TwigRenderTrait {
      *
      * @return string Rendered HTML.
      */
-    public function renderTwig(string $path, array $data): string {
+    public function renderTwig(string $path, array $data): string
+    {
         if (!$this->twig) {
             $this->twig = $this->prepareTwig();
         }
         // Ensure that we don't duplicate our root path in the path view.
-        $path = str_replace(PATH_ROOT, '', $path);
+        $path = str_replace(PATH_ROOT, "", $path);
         return $this->twig->render($path, $data);
     }
 
@@ -51,7 +53,8 @@ trait TwigRenderTrait {
      * @param array $data
      * @return string
      */
-    public function renderTwigFromString(string $templateString, array $data): string {
+    public function renderTwigFromString(string $templateString, array $data): string
+    {
         if (!$this->twig) {
             $this->twig = $this->prepareTwig();
         }

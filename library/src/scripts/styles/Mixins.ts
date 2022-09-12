@@ -136,10 +136,11 @@ export class Mixins {
             ...Mixins.borderType(borderType, { border, interactiveOutline: config?.interactiveOutline }),
             ...(hasFullOutline || borderType === BorderType.SEPARATOR
                 ? {
-                      "& &:first-of-type:before, & .pageBox:first-of-type:before, & .pageBoxNoCompat:first-of-type:before": {
-                          // Hide separator
-                          display: "none",
-                      },
+                      "& &:first-of-type:before, & .pageBox:first-of-type:before, & .pageBoxNoCompat:first-of-type:before":
+                          {
+                              // Hide separator
+                              display: "none",
+                          },
                       "& &:last-of-type:after, & .pageBox:last-of-type:after, & .pageBoxNoCompat:last-of-type:after": {
                           // Hide separator
                           display: "none",
@@ -605,7 +606,7 @@ export class Mixins {
                           [cssProperty]: mergedColors.visited?.toString(),
                           ...textDecoration,
                       }
-                    : { undefined },
+                    : (undefined as any),
             };
 
             const final = {

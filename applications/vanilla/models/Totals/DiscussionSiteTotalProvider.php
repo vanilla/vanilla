@@ -13,8 +13,8 @@ use Vanilla\Contracts\Site\SiteSectionInterface;
 /**
  * Provide site totals for discussions.
  */
-class DiscussionSiteTotalProvider implements SiteSectionTotalProviderInterface {
-
+class DiscussionSiteTotalProvider implements SiteSectionTotalProviderInterface
+{
     /** @var \Gdn_Database */
     private $database;
 
@@ -23,7 +23,8 @@ class DiscussionSiteTotalProvider implements SiteSectionTotalProviderInterface {
      *
      * @param \Gdn_Database $database
      */
-    public function __construct(\Gdn_Database $database) {
+    public function __construct(\Gdn_Database $database)
+    {
         $this->database = $database;
     }
 
@@ -33,7 +34,8 @@ class DiscussionSiteTotalProvider implements SiteSectionTotalProviderInterface {
      * @param SiteSectionInterface|null $siteSection
      * @return int
      */
-    public function calculateSiteTotalCount(SiteSectionInterface $siteSection = null): int {
+    public function calculateSiteTotalCount(SiteSectionInterface $siteSection = null): int
+    {
         $rootCategoryID = $siteSection === null ? \CategoryModel::ROOT_ID : $siteSection->getCategoryID();
 
         $countDiscussions = $this->database
@@ -52,14 +54,16 @@ class DiscussionSiteTotalProvider implements SiteSectionTotalProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getSiteTotalRecordType(): string {
+    public function getSiteTotalRecordType(): string
+    {
         return "discussion";
     }
 
     /**
      * @inheritdoc
      */
-    public function getTableName(): string {
-        return 'Category';
+    public function getTableName(): string
+    {
+        return "Category";
     }
 }

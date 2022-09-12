@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { mountModal } from "@library/modal/Modal";
+import { mountModal } from "@library/modal/mountModal";
 import { delegateEvent } from "@vanilla/dom-utils";
 import { DeleteCategoryModal } from "@vanilla/addon-vanilla/categories/DeleteCategoryModal";
 import { onReady, onContent } from "@library/utility/appUtils";
@@ -12,8 +12,10 @@ import { suggestedTextStyleHelper } from "@library/features/search/suggestedText
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { CategoryPicker } from "@library/forms/select/CategoryPicker";
 import { addComponent } from "@library/utility/componentRegistry";
+import { CommunityMemberInput } from "@vanilla/addon-vanilla/forms/CommunityMemberInput";
 cssOut(`.suggestedTextInput-option`, suggestedTextStyleHelper({ forDashboard: true }).option);
 addComponent("CategoryPicker", CategoryPicker, { overwrite: true });
+addComponent("CommunityMemberInput", CommunityMemberInput, { overwrite: true });
 onReady(handleImageUploadInputDisplay);
 onContent(handleImageUploadInputDisplay);
 

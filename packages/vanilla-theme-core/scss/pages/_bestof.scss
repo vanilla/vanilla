@@ -9,7 +9,6 @@
 \* -------------------------------------------------------------- */
 
 body.Section-BestOf {
-
     @include noPanel;
 
     .SearchBox {
@@ -43,14 +42,12 @@ body.Section-BestOf {
         }
 
         .BestOfEverything {
-
             .ReactSprite {
                 display: none;
             }
         }
 
         li.Active {
-
             a {
                 background-color: $button-basic-hover_bg;
                 border-color: $button-basic-hover_border;
@@ -132,7 +129,7 @@ body.Section-BestOf {
             background: none;
             font-size: $component-title_fontSize;
             font-weight: $component-title_fontWeight;
-            line-height: #{$theme-photo_size / 2};
+            line-height: #{$theme-photo_size * 0.5};
             color: $component-title_color;
             margin-bottom: $utility-baseUnit;
 
@@ -182,7 +179,6 @@ body.Section-BestOf {
 
     .Tile,
     .Item {
-
         .Item-Header,
         .Item-BodyWrap {
             margin-bottom: $utility-baseUnit;
@@ -253,7 +249,6 @@ body.Section-BestOf {
     }
 
     &.UserLoggedOut {
-
         .Author {
             display: flex;
             align-items: center;
@@ -266,7 +261,6 @@ body.Section-BestOf {
     }
 
     @include maxWidth {
-
         .ImageWrap {
             width: 100%;
         }

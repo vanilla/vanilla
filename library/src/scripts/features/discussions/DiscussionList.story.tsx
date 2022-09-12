@@ -15,6 +15,8 @@ import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
 import { setMeta } from "@library/utility/appUtils";
 
 import keyBy from "lodash/keyBy";
+import { DiscussionsWidget } from "@library/features/discussions/DiscussionsWidget";
+import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
 
 export default {
     title: "Components/DiscussionLists",
@@ -351,6 +353,55 @@ export const IconHidden = storyWithConfig(
             <StoryContent>
                 <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
             </StoryContent>
+        );
+    },
+);
+
+export const AsGridVariant = storyWithConfig(
+    {
+        themeVars: {},
+        storeState: loggedInStoreState,
+    },
+    () => {
+        return (
+            <DiscussionsWidget
+                discussions={fakeDiscussions}
+                apiParams={{ discussionID: fakeDiscussions[0].discussionID }}
+                containerOptions={{ displayType: WidgetContainerDisplayType.GRID }}
+            />
+        );
+    },
+);
+
+export const AsCarouselVariant = storyWithConfig(
+    {
+        themeVars: {},
+        storeState: loggedInStoreState,
+    },
+    () => {
+        return (
+            <DiscussionsWidget
+                discussions={fakeDiscussions}
+                apiParams={{ discussionID: fakeDiscussions[0].discussionID }}
+                containerOptions={{ displayType: WidgetContainerDisplayType.CAROUSEL }}
+            />
+        );
+    },
+);
+
+export const AsSimpleLinks = storyWithConfig(
+    {
+        themeVars: {},
+        storeState: loggedInStoreState,
+    },
+    () => {
+        return (
+            <DiscussionsWidget
+                title="My Discussions"
+                discussions={fakeDiscussions}
+                apiParams={{ discussionID: fakeDiscussions[0].discussionID }}
+                containerOptions={{ displayType: WidgetContainerDisplayType.LINK }}
+            />
         );
     },
 );

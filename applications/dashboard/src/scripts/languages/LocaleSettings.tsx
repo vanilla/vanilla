@@ -29,15 +29,8 @@ export interface ILocaleSettingsProps {
 }
 
 export const LocaleSettings = (props: ILocaleSettingsProps) => {
-    const {
-        localeList,
-        setLocaleEnabled,
-        defaultLocale,
-        localeOptions,
-        setDefaultLocale,
-        canConfigure,
-        onEdit,
-    } = props;
+    const { localeList, setLocaleEnabled, defaultLocale, localeOptions, setDefaultLocale, canConfigure, onEdit } =
+        props;
     const classes = dashboardClasses();
     const languageClasses = languageSettingsStyles();
 

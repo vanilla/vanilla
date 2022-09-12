@@ -30,11 +30,11 @@
     }
 
     @include headings {
-            break-after: avoid;
+        break-after: avoid;
     }
 
     p {
-            break-before: avoid;
+        break-before: avoid;
     }
 
     &.flexColumns-2 {

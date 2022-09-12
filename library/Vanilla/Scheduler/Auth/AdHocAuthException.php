@@ -12,8 +12,8 @@ use Garden\Web\Exception\ClientException;
 /**
  * Class AdHocAuthException
  */
-class AdHocAuthException extends ClientException {
-
+class AdHocAuthException extends ClientException
+{
     /**
      * AdHocAuthException constructor
      *
@@ -21,7 +21,8 @@ class AdHocAuthException extends ClientException {
      * @param int $code
      * @param array $context
      */
-    public function __construct(string $message, int $code, array $context) {
+    public function __construct(string $message, int $code, array $context)
+    {
         parent::__construct($message, $code, $context);
     }
 }

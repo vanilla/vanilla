@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for absoluteSource()
  */
 
-class AbsoluteSourceTest extends TestCase {
-
+class AbsoluteSourceTest extends TestCase
+{
     /**
      * Tests {@link absoluteSource()} against several scenarios.
      *
@@ -23,7 +23,8 @@ class AbsoluteSourceTest extends TestCase {
      * @param string $expected The expected result.
      * @dataProvider provideTestAbsoluteSourceArrays
      */
-    public function testAbsoluteSource($testSrcPath, $testUrl, $expected) {
+    public function testAbsoluteSource($testSrcPath, $testUrl, $expected)
+    {
         $actual = absoluteSource($testSrcPath, $testUrl);
         $this->assertSame($expected, $actual);
     }
@@ -33,9 +34,10 @@ class AbsoluteSourceTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestAbsoluteSourceArrays() {
+    public function provideTestAbsoluteSourceArrays()
+    {
         $r = [
-            'pathAlreadyAbsolute' => [
+            "pathAlreadyAbsolute" => [
                 "https://compote.slate.com/images/51db07dd-254c-4474-840e-118a55abca0c.
                 jpeg?width=780&amp;height=520&amp;rect=1560x1040&amp;offset=0x0",
                 "https://slate.com/news-and-politics/2019/12/katie-hill-revenge-porn-
@@ -43,21 +45,9 @@ class AbsoluteSourceTest extends TestCase {
                 "https://compote.slate.com/images/51db07dd-254c-4474-840e-118a55abca0c.
                 jpeg?width=780&amp;height=520&amp;rect=1560x1040&amp;offset=0x0",
             ],
-            'pathRelative' => [
-                '/images/picture',
-                'https://my-domain.com',
-                'https://my-domain.com/images/picture',
-            ],
-            'noUrl' => [
-                'images/picture',
-                '',
-                '',
-            ],
-            'badSrcPath' => [
-                'http:///example.com',
-                'https://my-domain.com',
-                '',
-            ],
+            "pathRelative" => ["/images/picture", "https://my-domain.com", "https://my-domain.com/images/picture"],
+            "noUrl" => ["images/picture", "", ""],
+            "badSrcPath" => ["http:///example.com", "https://my-domain.com", ""],
         ];
 
         return $r;

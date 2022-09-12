@@ -15,7 +15,8 @@ use VanillaTests\IsolatedTestCase;
 /**
  * Tests for the alias provider trait.
  */
-class AliasProviderTraitTest extends IsolatedTestCase {
+class AliasProviderTraitTest extends IsolatedTestCase
+{
     /**
      * Prepare each instance of the test.
      *
@@ -24,12 +25,12 @@ class AliasProviderTraitTest extends IsolatedTestCase {
      * - Verify that the we are starting with a fresh set of classes. Eg. The classes we're testing have not been
      * autoloaded yet. $runTestInSeparateProcess should handle this.
      */
-    public static function setUpBeforeClass(): void {
-
+    public static function setUpBeforeClass(): void
+    {
         // Our alias autoloader throws deprecated notices. Disable the error reporting for these tests.
         // Since this test runs in a separate process it shouldn't affect the rest of the tests.
         error_reporting(E_ALL ^ E_USER_DEPRECATED);
-        spl_autoload_register([TestAliasLoader::class, 'autoload']);
+        spl_autoload_register([TestAliasLoader::class, "autoload"]);
         self::assertFreshAutoload(NewClass::class);
         self::assertFreshAutoload(ExtendsNewClass::class);
     }
@@ -37,7 +38,8 @@ class AliasProviderTraitTest extends IsolatedTestCase {
     /**
      * Verify that loading the old class loads the new class through the autoloader.
      */
-    public function testSimpleAliasAutoload() {
+    public function testSimpleAliasAutoload()
+    {
         /** @psalm-suppress UndefinedClass */
         new \VanillaTests\OldClass();
         $this->assertCompleteAutoload(NewClass::class);
@@ -46,7 +48,8 @@ class AliasProviderTraitTest extends IsolatedTestCase {
     /**
      * Tests for various permutations of old classname + new classnames with inheritance.
      */
-    public function testNewExtendsNew() {
+    public function testNewExtendsNew()
+    {
         $this->assertClassExtendsClass(ExtendsNewClass::class, NewClass::class);
         $this->assertCompleteAutoload(NewClass::class);
         $this->assertCompleteAutoload(ExtendsNewClass::class);
@@ -55,7 +58,8 @@ class AliasProviderTraitTest extends IsolatedTestCase {
     /**
      * Tests for various permutations of old classname + new classnames with inheritance.
      */
-    public function testOldExtendsNew() {
+    public function testOldExtendsNew()
+    {
         /** @psalm-suppress UndefinedClass */
         $this->assertClassExtendsClass(\VanillaTests\ExtendsOldClass::class, NewClass::class);
         $this->assertCompleteAutoload(NewClass::class);
@@ -65,7 +69,8 @@ class AliasProviderTraitTest extends IsolatedTestCase {
     /**
      * Tests for various permutations of old classname + new classnames with inheritance.
      */
-    public function testNewExtendsOld() {
+    public function testNewExtendsOld()
+    {
         /** @psalm-suppress UndefinedClass */
         $this->assertClassExtendsClass(ExtendsNewClass::class, \VanillaTests\OldClass::class);
         $this->assertCompleteAutoload(NewClass::class);
@@ -75,7 +80,8 @@ class AliasProviderTraitTest extends IsolatedTestCase {
     /**
      * Tests for various permutations of old classname + new classnames with inheritance.
      */
-    public function testOldExtendsOld() {
+    public function testOldExtendsOld()
+    {
         /** @psalm-suppress UndefinedClass */
         $this->assertClassExtendsClass(\VanillaTests\ExtendsOldClass::class, \VanillaTests\OldClass::class);
         $this->assertCompleteAutoload(NewClass::class);
@@ -88,7 +94,8 @@ class AliasProviderTraitTest extends IsolatedTestCase {
      * @param string $childClass
      * @param string $parentClass
      */
-    private static function assertClassExtendsClass(string $childClass, string $parentClass) {
+    private static function assertClassExtendsClass(string $childClass, string $parentClass)
+    {
         $child = new $childClass();
         self::assertTrue(is_subclass_of($child, $parentClass));
     }
@@ -98,7 +105,8 @@ class AliasProviderTraitTest extends IsolatedTestCase {
      *
      * @param string $className
      */
-    private static function assertClassLoaded(string $className) {
+    private static function assertClassLoaded(string $className)
+    {
         self::assertTrue(class_exists($className, false));
     }
 
@@ -109,7 +117,8 @@ class AliasProviderTraitTest extends IsolatedTestCase {
      *
      * @param string $className
      */
-    private static function assertClassNotLoaded(string $className) {
+    private static function assertClassNotLoaded(string $className)
+    {
         self::assertTrue(class_exists($className, false) === false);
     }
 
@@ -120,7 +129,8 @@ class AliasProviderTraitTest extends IsolatedTestCase {
      *
      * @param string $className
      */
-    private static function assertFreshAutoload(string $className) {
+    private static function assertFreshAutoload(string $className)
+    {
         self::assertClassNotLoaded($className);
 
         foreach (TestAliasLoader::getAliases($className) as $alias) {
@@ -133,7 +143,8 @@ class AliasProviderTraitTest extends IsolatedTestCase {
      *
      * @param string $className
      */
-    private static function assertCompleteAutoload(string $className) {
+    private static function assertCompleteAutoload(string $className)
+    {
         self::assertClassLoaded($className);
         foreach (TestAliasLoader::getAliases($className) as $alias) {
             self::assertClassLoaded($alias);

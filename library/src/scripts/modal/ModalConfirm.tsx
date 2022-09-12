@@ -4,24 +4,23 @@
  * @license GPL-2.0-only
  */
 
+import { cx } from "@emotion/css";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
+import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import FrameFooter from "@library/layout/frame/FrameFooter";
+import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import SmartAlign from "@library/layout/SmartAlign";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import LazyModal from "@library/modal/LazyModal";
+import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
-import { t } from "@library/utility/appUtils";
-import { getRequiredID, uniqueIDFromPrefix } from "@library/utility/idUtils";
-import classNames from "classnames";
-import React from "react";
-import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
-import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import LinkAsButton from "@library/routing/LinkAsButton";
-import { cx } from "@emotion/css";
+import { t } from "@library/utility/appUtils";
+import { uniqueIDFromPrefix } from "@library/utility/idUtils";
+import React from "react";
 
 interface IProps {
     title: React.ReactNode; // required for accessibility
@@ -64,7 +63,7 @@ export default class ModalConfirm extends React.Component<IProps> {
         const classesFrameBody = frameBodyClasses();
         const classFrameFooter = frameFooterClasses();
         return (
-            <LazyModal
+            <Modal
                 isVisible={this.props.isVisible}
                 size={size ? size : ModalSizes.SMALL}
                 elementToFocus={this.cancelRef.current as HTMLElement}
@@ -139,7 +138,7 @@ export default class ModalConfirm extends React.Component<IProps> {
                         </FrameFooter>
                     }
                 />
-            </LazyModal>
+            </Modal>
         );
     }
 

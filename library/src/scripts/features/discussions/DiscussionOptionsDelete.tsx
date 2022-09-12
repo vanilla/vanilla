@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import { IDiscussionsStoreState } from "./discussionsReducer";
 import { useDiscussionActions } from "./DiscussionActions";
 import { LoadStatus } from "@library/@types/api/core";
+import { StackingContextProvider } from "@vanilla/react-utils";
 
 const DiscussionOptionsDelete: FunctionComponent<{ discussion: IDiscussion }> = ({ discussion }) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -40,17 +41,19 @@ const DiscussionOptionsDelete: FunctionComponent<{ discussion: IDiscussion }> = 
             <DropDownItemButton name={t("Delete")} onClick={open}>
                 {t("Delete")}
             </DropDownItemButton>
-            <ModalConfirm
-                isVisible={isVisible}
-                size={ModalSizes.MEDIUM}
-                title={t("Delete Discussion")}
-                onCancel={close}
-                onConfirm={handleDeleteConfirm}
-                isConfirmLoading={status === LoadStatus.LOADING}
-                elementToFocusOnExit={document.activeElement as HTMLElement}
-            >
-                {t("Are you sure you want to delete this discussion?")}
-            </ModalConfirm>
+            <StackingContextProvider>
+                <ModalConfirm
+                    isVisible={isVisible}
+                    size={ModalSizes.MEDIUM}
+                    title={t("Delete Discussion")}
+                    onCancel={close}
+                    onConfirm={handleDeleteConfirm}
+                    isConfirmLoading={status === LoadStatus.LOADING}
+                    elementToFocusOnExit={document.activeElement as HTMLElement}
+                >
+                    {t("Are you sure you want to delete this discussion?")}
+                </ModalConfirm>
+            </StackingContextProvider>
         </>
     );
 };

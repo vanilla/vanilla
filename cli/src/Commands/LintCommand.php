@@ -10,15 +10,16 @@ namespace Vanilla\Cli\Commands;
 /**
  * Linting utilities.
  */
-class LintCommand {
-
+class LintCommand
+{
     /** @var string */
     private $comparisonBranch;
 
     /**
      * Lint changed PHP code.
      */
-    public function lint() {
+    public function lint()
+    {
         $root = PATH_ROOT;
         system(PATH_ROOT . "/.circleci/scripts/diff-standards.sh {$this->comparisonBranch} {$root}");
     }
@@ -26,7 +27,8 @@ class LintCommand {
     /**
      * @return string
      */
-    public function getComparisonBranch(): string {
+    public function getComparisonBranch(): string
+    {
         return $this->comparisonBranch ?? "master";
     }
 
@@ -35,7 +37,8 @@ class LintCommand {
      *
      * @param string $comparisonBranch
      */
-    public function setComparisonBranch(string $comparisonBranch): void {
+    public function setComparisonBranch(string $comparisonBranch): void
+    {
         $this->comparisonBranch = $comparisonBranch;
     }
 }

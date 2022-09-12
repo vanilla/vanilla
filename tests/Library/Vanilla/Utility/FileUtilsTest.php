@@ -13,14 +13,16 @@ use VanillaTests\VanillaTestCase;
 /**
  * Tests for the FileUtils class.
  */
-class FileUtilsTest extends VanillaTestCase {
+class FileUtilsTest extends VanillaTestCase
+{
     /**
      * Test the basic put/get loop for saving a variable.
      */
-    public function testPutGetExport(): void {
-        $path = tempnam(PATH_ROOT.'/tests/cache', __FUNCTION__);
+    public function testPutGetExport(): void
+    {
+        $path = tempnam(PATH_ROOT . "/tests/cache", __FUNCTION__);
 
-        $var = ['a' => 'b'];
+        $var = ["a" => "b"];
         $r = FileUtils::putExport($path, $var);
         $this->assertTrue($r);
 

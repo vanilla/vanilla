@@ -16,8 +16,8 @@ use Vanilla\Web\Asset\ExternalAsset;
 /**
  * Embed data object for Twitter.
  */
-class TwitterEmbed extends AbstractEmbed {
-
+class TwitterEmbed extends AbstractEmbed
+{
     const JS_SCRIPT = "https://platform.twitter.com/widgets.js";
     const TYPE = "twitter";
 
@@ -25,7 +25,8 @@ class TwitterEmbed extends AbstractEmbed {
      * Override to set a value in the PreloadAssetModel.
      * @inheritdoc
      */
-    public function __construct(array $data) {
+    public function __construct(array $data)
+    {
         parent::__construct($data);
 
         // The twitter embed causes the page scrolling to jump if we don't load it's scripts in the initial page load.
@@ -34,22 +35,23 @@ class TwitterEmbed extends AbstractEmbed {
         EmbedUtils::getPreloadModel()->addScript(
             new ExternalAsset(self::JS_SCRIPT),
             AssetPreloader::REL_FULL,
-            'twitter-embed-script-asset'
+            "twitter-embed-script-asset"
         );
     }
-
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         $data = EmbedUtils::remapProperties($data, [
             "statusID" => "attributes.statusID",
         ]);
@@ -59,9 +61,8 @@ class TwitterEmbed extends AbstractEmbed {
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
-        return Schema::parse([
-            "statusID:s",
-        ]);
+    protected function schema(): Schema
+    {
+        return Schema::parse(["statusID:s"]);
     }
 }

@@ -13,15 +13,16 @@ use Vanilla\CurrentTimeStamp;
 /**
  * Test extension to cleanup polluted static globals after every test.
  */
-final class StaticCleanupTestExtension implements AfterTestHook {
-
+final class StaticCleanupTestExtension implements AfterTestHook
+{
     /**
      * Cleanup.
      *
      * @param string $test
      * @param float $time
      */
-    public function executeAfterTest(string $test, float $time): void {
+    public function executeAfterTest(string $test, float $time): void
+    {
         CurrentTimeStamp::clearMockTime();
     }
 }

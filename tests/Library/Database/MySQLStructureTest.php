@@ -15,8 +15,8 @@ use VanillaTests\SiteTestTrait;
 /**
  * Tests for the `Gdn_MySQLStructure` class.
  */
-class MySQLStructureTest extends BootstrapTestCase {
-
+class MySQLStructureTest extends BootstrapTestCase
+{
     /**
      * @var TestMySQLStructure
      */
@@ -28,7 +28,8 @@ class MySQLStructureTest extends BootstrapTestCase {
     /**
      * Set up a fixture for use in tests.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->db = $this->container()->get(\Gdn_Database::class);
@@ -47,12 +48,13 @@ class MySQLStructureTest extends BootstrapTestCase {
      * @param string $engine
      * @dataProvider provideEngines
      */
-    public function testDefaultCollation(string $engine): void {
+    public function testDefaultCollation(string $engine): void
+    {
         $this->doCollationTest(
             [
-                'Database.DefaultStorageEngine' => $engine,
+                "Database.DefaultStorageEngine" => $engine,
             ],
-            '',
+            "",
             $engine
         );
     }
@@ -60,12 +62,9 @@ class MySQLStructureTest extends BootstrapTestCase {
     /**
      * The default storage engine should be innodb.
      */
-    public function testDefaultCollationInnodb(): void {
-        $this->doCollationTest(
-            [],
-            '',
-            'innodb'
-        );
+    public function testDefaultCollationInnodb(): void
+    {
+        $this->doCollationTest([], "", "innodb");
     }
 
     /**
@@ -74,13 +73,14 @@ class MySQLStructureTest extends BootstrapTestCase {
      * @param string $engine
      * @dataProvider provideEngines
      */
-    public function testForceCollation(string $engine): void {
+    public function testForceCollation(string $engine): void
+    {
         $this->doCollationTest(
             [
-                'Database.DefaultStorageEngine' => 'foo',
-                'Database.ForceStorageEngine' => $engine,
+                "Database.DefaultStorageEngine" => "foo",
+                "Database.ForceStorageEngine" => $engine,
             ],
-            '',
+            "",
             $engine
         );
     }
@@ -91,11 +91,12 @@ class MySQLStructureTest extends BootstrapTestCase {
      * @param string $engine
      * @dataProvider provideEngines
      */
-    public function testExplicitCollation(string $engine): void {
+    public function testExplicitCollation(string $engine): void
+    {
         $this->doCollationTest(
             [
-                'Database.DefaultStorageEngine' => 'foo',
-                'Database.ForceStorageEngine' => 'foo',
+                "Database.DefaultStorageEngine" => "foo",
+                "Database.ForceStorageEngine" => "foo",
             ],
             $engine,
             $engine
@@ -107,7 +108,8 @@ class MySQLStructureTest extends BootstrapTestCase {
      *
      * @return void
      */
-    public function testAddInplaceIndex(): void {
+    public function testAddInplaceIndex(): void
+    {
         // Make sure we're starting with a blank slate.
         $this->st->table(__FUNCTION__)->drop();
 
@@ -128,9 +130,34 @@ class MySQLStructureTest extends BootstrapTestCase {
     }
 
     /**
+     * Test conditionally dropping a column if it exists.
+     */
+    public function testConditionColumnDrop()
+    {
+        $this->st
+            ->table(__FUNCTION__)
+            ->primaryKey("id")
+            ->column("value", "int", false, "index.test")
+            ->column("value2", "int", false)
+            ->set();
+
+        // we have an index.
+        $this->assertColumnHasIndex(__FUNCTION__, "value");
+
+        // We can drop it.
+        $this->st->dropIndexIfExists(__FUNCTION__, "IX_" . __FUNCTION__ . "_test");
+        $this->assertColumnNotHasIndex(__FUNCTION__, "value");
+
+        // We can call this even on other columns without error.
+        $this->assertColumnNotHasIndex(__FUNCTION__, "value");
+        $this->assertColumnNotHasIndex(__FUNCTION__, "value2");
+    }
+
+    /**
      * Database indexes should be case-insensitive.
      */
-    public function testIndexCaseInsensitive(): void {
+    public function testIndexCaseInsensitive(): void
+    {
         $px = $this->st->Database->DatabasePrefix;
         $tbl = __FUNCTION__;
 
@@ -138,23 +165,23 @@ class MySQLStructureTest extends BootstrapTestCase {
 
         $this->st
             ->table($tbl)
-            ->primaryKey('id')
-            ->column('status', 'int')
+            ->primaryKey("id")
+            ->column("status", "int")
             ->set();
 
         $this->st->Database->query("alter table `$px{$tbl}` add index IX_{$tbl}_Status (`status`)");
-        $this->assertColumnHasIndex($tbl, 'status');
+        $this->assertColumnHasIndex($tbl, "status");
 
         try {
             $this->st->CaptureOnly = true;
-            $this->assertEmpty($this->db->CapturedSql, 'Something went wrong with the test.');
+            $this->assertEmpty($this->db->CapturedSql, "Something went wrong with the test.");
 
             $this->st
                 ->table($tbl)
-                ->column('status', 'int', false, 'index.status')
+                ->column("status", "int", false, "index.status")
                 ->set();
 
-            $this->assertEmpty($this->db->CapturedSql, $this->db->CapturedSql[0] ?? '');
+            $this->assertEmpty($this->db->CapturedSql, $this->db->CapturedSql[0] ?? "");
         } finally {
             $this->st->CaptureOnly = false;
         }
@@ -165,7 +192,8 @@ class MySQLStructureTest extends BootstrapTestCase {
      *
      * @return void
      */
-    public function testIndexRequiringLockUnderThreshold(): void {
+    public function testIndexRequiringLockUnderThreshold(): void
+    {
         // Make sure we're starting with a blank slate.
         $this->st->table(__FUNCTION__)->drop();
 
@@ -191,7 +219,8 @@ class MySQLStructureTest extends BootstrapTestCase {
      *
      * @return void
      */
-    public function testIndexRequiringLockOverThreshold(): void {
+    public function testIndexRequiringLockOverThreshold(): void
+    {
         // Make sure we're starting with a blank slate.
         $this->st->table(__FUNCTION__)->drop();
 
@@ -206,7 +235,7 @@ class MySQLStructureTest extends BootstrapTestCase {
         $sql = $this->st->Database->sql();
         $threshold = 5;
         $this->st->setAlterTableThreshold($threshold);
-        for ($i = 1; $i <= ($threshold + 1); $i++) {
+        for ($i = 1; $i <= $threshold + 1; $i++) {
             $sql->insert(__FUNCTION__, ["value" => "Row {$i}"]);
         }
 
@@ -219,10 +248,7 @@ class MySQLStructureTest extends BootstrapTestCase {
 
         // Verify the issue was detected.
         $issues = $this->st->getIssues();
-        $this->assertEquals(
-            "The table was past its threshold. Run the alter manually.",
-            $issues[0]["message"]
-        );
+        $this->assertEquals("The table was past its threshold. Run the alter manually.", $issues[0]["message"]);
 
         // Verify the index wasn't actually created.
         $columns = $this->tableColumns(__FUNCTION__);
@@ -234,12 +260,25 @@ class MySQLStructureTest extends BootstrapTestCase {
      *
      * @param string $table
      * @param string $column
-     * @return boolean
      */
-    private function assertColumnHasIndex(string $table, string $column) {
+    private function assertColumnHasIndex(string $table, string $column)
+    {
         // Verify the index was set.
         $columns = $this->tableColumns($table);
         $this->assertNotEmpty($columns[$column]["Key"]);
+    }
+
+    /**
+     * Assert that a column has no indexes.
+     *
+     * @param string $table
+     * @param string $column
+     */
+    private function assertColumnNotHasIndex(string $table, string $column)
+    {
+        // Verify the index was set.
+        $columns = $this->tableColumns($table);
+        $this->assertEmpty($columns[$column]["Key"]);
     }
 
     /**
@@ -250,12 +289,13 @@ class MySQLStructureTest extends BootstrapTestCase {
      * @param string $expectedEngine The expected engine in the `create table` statement.
      * @dataProvider provideEngines
      */
-    final private function doCollationTest(array $config, string $explicitEngine, string $expectedEngine): void {
+    final private function doCollationTest(array $config, string $explicitEngine, string $expectedEngine): void
+    {
         $this->runWithConfig($config, function () use ($explicitEngine, $expectedEngine) {
             $this->st
-                ->table('testDefaultCollationISAM')
-                ->primaryKey('id')
-                ->column('name', 'varchar(50)');
+                ->table("testDefaultCollationISAM")
+                ->primaryKey("id")
+                ->column("name", "varchar(50)");
 
             if (!empty($explicitEngine)) {
                 $this->st->engine($explicitEngine, false);
@@ -279,10 +319,11 @@ EOT;
      *
      * @return array
      */
-    public function provideEngines(): array {
+    public function provideEngines(): array
+    {
         return [
-            'innodb' => ['innodb'],
-            'myisam' => ['myisam'],
+            "innodb" => ["innodb"],
+            "myisam" => ["myisam"],
         ];
     }
 
@@ -292,11 +333,10 @@ EOT;
      * @param string $table
      * @return array
      */
-    private function tableColumns(string $table): array {
+    private function tableColumns(string $table): array
+    {
         $sql = $this->st->Database->sql();
-        $columnsRaw = $sql
-            ->query($sql->fetchColumnSql($table))
-            ->resultArray();
+        $columnsRaw = $sql->query($sql->fetchColumnSql($table))->resultArray();
         $columns = array_column($columnsRaw, null, "Field");
         return $columns;
     }
@@ -304,20 +344,19 @@ EOT;
     /**
      * Text types should not alter when being re-defined.
      */
-    public function testNoAlterTextColumns(): void {
+    public function testNoAlterTextColumns(): void
+    {
         $this->st
             ->table(__FUNCTION__)
-            ->column('foo', 'text')
+            ->column("foo", "text")
             ->set();
 
         $this->st->CaptureOnly = true;
-        $this->st
-            ->table(__FUNCTION__)
-            ->column('foo', 'text');
+        $this->st->table(__FUNCTION__)->column("foo", "text");
         $this->st->set();
 
         $sql = $this->st->Database->CapturedSql ?? [];
-        $this->assertEmpty($sql, 'The table should not have altered.');
+        $this->assertEmpty($sql, "The table should not have altered.");
     }
 
     /**
@@ -325,25 +364,24 @@ EOT;
      *
      * We had a bug previously where the initial indexes on update were incorrect, but were correct on update.
      */
-    public function testCreateUniqueIndexes() {
+    public function testCreateUniqueIndexes()
+    {
         $createStructure = function () {
             $this->st
-                ->table('uniqueIndexes')
-                ->column('part1', 'int', false, ['index', 'unique.combined'])
-                ->column('part2', 'int', false, 'unique.combined')
-                ->set()
-            ;
+                ->table("uniqueIndexes")
+                ->column("part1", "int", false, ["index", "unique.combined"])
+                ->column("part2", "int", false, "unique.combined")
+                ->set();
         };
 
         // run twice to make sure indexes are stable.
         $createStructure();
         $createStructure();
 
-        $this->assertIndexes([
-            'UX_uniqueIndexes_combined[part1]',
-            'UX_uniqueIndexes_combined[part2]',
-            'IX_uniqueIndexes_part1[part1]',
-        ], "uniqueIndexes");
+        $this->assertIndexes(
+            ["UX_uniqueIndexes_combined[part1]", "UX_uniqueIndexes_combined[part2]", "IX_uniqueIndexes_part1[part1]"],
+            "uniqueIndexes"
+        );
     }
 
     /**
@@ -354,15 +392,16 @@ EOT;
      * @param string[] $expected
      * @param string $table
      */
-    private function assertIndexes(array $expected, string $table) {
-        $actualIndexRows = $this->db->sql()
+    private function assertIndexes(array $expected, string $table)
+    {
+        $actualIndexRows = $this->db
+            ->sql()
             ->query("SHOW INDEXES FROM GDN_$table")
-            ->resultArray()
-        ;
+            ->resultArray();
 
         $actual = "";
         foreach ($actualIndexRows as $actualIndexRow) {
-            $actual .= $actualIndexRow['Key_name'] . '[' . $actualIndexRow['Column_name'] . ']' . "\n";
+            $actual .= $actualIndexRow["Key_name"] . "[" . $actualIndexRow["Column_name"] . "]" . "\n";
         }
         $actual = trim($actual);
 

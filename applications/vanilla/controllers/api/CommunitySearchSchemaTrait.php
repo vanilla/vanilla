@@ -11,31 +11,33 @@ use Vanilla\Search\SearchService;
 /**
  * Trait for common search schema on the community apis.
  */
-trait CommunitySearchSchemaTrait {
+trait CommunitySearchSchemaTrait
+{
     /**
      * Get a generic search schema.
      *
      * @return Schema
      */
-    private function searchSchema() {
+    private function searchSchema()
+    {
         if (!isset($this->searchSchema)) {
             $this->searchSchema = Schema::parse([
-                'query:s' => 'Search terms.',
-                'page:i?' => [
-                    'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
-                    'default' => 1,
-                    'minimum' => 1,
-                    'maximum' => \DiscussionModel::instance()->getMaxPages(),
+                "query:s" => "Search terms.",
+                "page:i?" => [
+                    "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                    "default" => 1,
+                    "minimum" => 1,
+                    "maximum" => \DiscussionModel::instance()->getMaxPages(),
                 ],
-                'limit:i?' => [
-                    'description' => 'Desired number of items per page.',
-                    'default' => \DiscussionModel::instance()->getDefaultLimit(),
-                    'minimum' => 1,
-                    'maximum' => 100,
+                "limit:i?" => [
+                    "description" => "Desired number of items per page.",
+                    "default" => \DiscussionModel::instance()->getDefaultLimit(),
+                    "minimum" => 1,
+                    "maximum" => 100,
                 ],
-                'expand:b?' => [
-                    'default' => false,
-                    'description' => 'Expand associated records.',
+                "expand:b?" => [
+                    "default" => false,
+                    "description" => "Expand associated records.",
                 ],
             ]);
         }
@@ -46,7 +48,8 @@ trait CommunitySearchSchemaTrait {
     /**
      * @return SearchService
      */
-    private function getSearchService(): SearchService {
+    private function getSearchService(): SearchService
+    {
         return \Gdn::getContainer()->get(SearchService::class);
     }
 }

@@ -3,7 +3,7 @@ import { HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
 import { STORY_ICON, STORY_IMAGE, STORY_IPSUM_MEDIUM, STORY_IPSUM_SHORT } from "@library/storybook/storyData";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
-import TwoColumnSection from "@library/layout/TwoColumnSection";
+import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import PanelWidget from "@library/layout/components/PanelWidget";
 
 export default {
@@ -93,7 +93,7 @@ export const InPanelLayout = storyWithConfig(
     },
     () => {
         return (
-            <TwoColumnSection
+            <SectionTwoColumns
                 mainBottom={
                     <PanelWidget>
                         <StoryCarousel />
@@ -104,7 +104,7 @@ export const InPanelLayout = storyWithConfig(
                         <StoryCarousel />
                     </PanelWidget>
                 }
-            ></TwoColumnSection>
+            ></SectionTwoColumns>
         );
     },
 );

@@ -14,8 +14,8 @@ use Vanilla\Web\Pagination\ApiPaginationIterator;
  * Abstract implementation of a producer that retrieves resources from a source site
  * used when synchronizing resources between a source and destination site
  */
-abstract class AbstractSiteSyncProducer implements SiteSyncProducerInterface {
-
+abstract class AbstractSiteSyncProducer implements SiteSyncProducerInterface
+{
     /** @var string $apiEndpointPath */
     protected $apiEndpointPath;
 
@@ -25,21 +25,24 @@ abstract class AbstractSiteSyncProducer implements SiteSyncProducerInterface {
      * @param string $apiEndpointPath Path portion of URL for API v2 endpoint used to access resources
      * at source site when producing items to be synchronized with the destination site.
      */
-    protected function __construct(string $apiEndpointPath) {
+    protected function __construct(string $apiEndpointPath)
+    {
         $this->apiEndpointPath = $apiEndpointPath;
     }
 
     /**
      * @inheritdoc
      */
-    public function setup(): void {
+    public function setup(): void
+    {
         /** empty */
     }
 
     /**
      * @inheritdoc
      */
-    public function isProduceAllEnabled(HttpClient $sourceClient): bool {
+    public function isProduceAllEnabled(HttpClient $sourceClient): bool
+    {
         return true;
     }
 
@@ -48,14 +51,16 @@ abstract class AbstractSiteSyncProducer implements SiteSyncProducerInterface {
      *
      * @return string
      */
-    public function getApiEndpointPath(): string {
+    public function getApiEndpointPath(): string
+    {
         return $this->apiEndpointPath;
     }
 
     /**
      * @inheritdoc
      */
-    public function produceAllApi(HttpClient $sourceClient): ?array {
+    public function produceAllApi(HttpClient $sourceClient): ?array
+    {
         $resources = [];
         $iterator = new ApiPaginationIterator($sourceClient, $this->apiEndpointPath);
         foreach ($iterator as $records) {

@@ -26,8 +26,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Test the /api/v2/categories endpoints.
  */
-class CategoryPreferencesTest extends SiteTestCase {
-
+class CategoryPreferencesTest extends SiteTestCase
+{
     use CommunityApiTestTrait;
     use EventSpyTestTrait;
     use UsersAndRolesApiTestTrait;
@@ -38,11 +38,11 @@ class CategoryPreferencesTest extends SiteTestCase {
     /**
      * Fix some container setup issues of the breadcrumb model.
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         parent::setupBeforeClass();
         self::$categoryModel = self::container()->get(CategoryModel::class);
     }
-
 
     /**
      * Verify ability to successfully retrieve a user's preferences for a single category.
@@ -80,7 +80,9 @@ class CategoryPreferencesTest extends SiteTestCase {
         $userMetaModel->setUserMeta($userID, "Preferences.Popup.NewComment.{$categoryID}", $commentsApp);
         $userMetaModel->setUserMeta($userID, "Preferences.Email.NewComment.{$categoryID}", $commentsEmail);
 
-        $preferences = $this->api()->get("/categories/{$categoryID}/preferences/{$userID}")->getBody();
+        $preferences = $this->api()
+            ->get("/categories/{$categoryID}/preferences/{$userID}")
+            ->getBody();
         $this->assertSame($expected, $preferences[CategoryModel::PREFERENCE_KEY_NOTIFICATION]);
     }
 
@@ -89,23 +91,66 @@ class CategoryPreferencesTest extends SiteTestCase {
      *
      * @return array[]
      */
-    public function provideLegacyNotificationData(): array {
+    public function provideLegacyNotificationData(): array
+    {
         return [
             "Following, only" => [true, null, null, null, null, CategoryModel::NOTIFICATION_FOLLOW],
             "Email on comments, only" => [null, null, null, null, true, CategoryModel::NOTIFICATION_ALL],
             "Email on comments, following" => [true, null, null, null, true, CategoryModel::NOTIFICATION_ALL],
             "Email on discussions, only" => [null, null, true, null, null, CategoryModel::NOTIFICATION_DISCUSSIONS],
-            "Email on discussions, following" => [true, null, true, null, null, CategoryModel::NOTIFICATION_DISCUSSIONS],
+            "Email on discussions, following" => [
+                true,
+                null,
+                true,
+                null,
+                null,
+                CategoryModel::NOTIFICATION_DISCUSSIONS,
+            ],
             "In-app on comments, only" => [null, null, null, true, null, CategoryModel::NOTIFICATION_ALL],
             "In-app on comments, following" => [true, null, null, true, null, CategoryModel::NOTIFICATION_ALL],
             "In-app on discussions, only" => [null, true, null, null, null, CategoryModel::NOTIFICATION_DISCUSSIONS],
-            "In-app on discussions, following" => [true, true, null, null, null, CategoryModel::NOTIFICATION_DISCUSSIONS],
+            "In-app on discussions, following" => [
+                true,
+                true,
+                null,
+                null,
+                null,
+                CategoryModel::NOTIFICATION_DISCUSSIONS,
+            ],
             "Email on comments and discussions" => [null, null, true, null, true, CategoryModel::NOTIFICATION_ALL],
-            "Email on comments and discussions, following" => [true, null, true, null, true, CategoryModel::NOTIFICATION_ALL],
+            "Email on comments and discussions, following" => [
+                true,
+                null,
+                true,
+                null,
+                true,
+                CategoryModel::NOTIFICATION_ALL,
+            ],
             "In-app on comments and discussions" => [null, true, null, true, null, CategoryModel::NOTIFICATION_ALL],
-            "In-app on comments and discussions, following" => [true, true, null, true, null, CategoryModel::NOTIFICATION_ALL],
-            "Email and in-app on comments and discussions" => [null, true, true, true, true, CategoryModel::NOTIFICATION_ALL],
-            "Email and in-app on comments and discussions, following" => [true, true, true, true, true, CategoryModel::NOTIFICATION_ALL],
+            "In-app on comments and discussions, following" => [
+                true,
+                true,
+                null,
+                true,
+                null,
+                CategoryModel::NOTIFICATION_ALL,
+            ],
+            "Email and in-app on comments and discussions" => [
+                null,
+                true,
+                true,
+                true,
+                true,
+                CategoryModel::NOTIFICATION_ALL,
+            ],
+            "Email and in-app on comments and discussions, following" => [
+                true,
+                true,
+                true,
+                true,
+                true,
+                CategoryModel::NOTIFICATION_ALL,
+            ],
         ];
     }
 
@@ -140,10 +185,7 @@ class CategoryPreferencesTest extends SiteTestCase {
         if (is_bool($useEmailNotifications)) {
             $request[CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS] = $useEmailNotifications;
         }
-        $this->api()->patch(
-            "/categories/{$categoryID}/preferences/{$userID}",
-            $request
-        );
+        $this->api()->patch("/categories/{$categoryID}/preferences/{$userID}", $request);
 
         $actualFollowing = self::$categoryModel->isFollowed($userID, $categoryID);
         $this->assertSame($expectedFollowing, $actualFollowing);
@@ -164,7 +206,7 @@ class CategoryPreferencesTest extends SiteTestCase {
             $actual = $meta[$key];
             $this->assertSame(
                 $expected,
-                $actual === null ? $actual : (bool)$actual,
+                $actual === null ? $actual : (bool) $actual,
                 "{$key} was not set as expected."
             );
         }
@@ -175,32 +217,65 @@ class CategoryPreferencesTest extends SiteTestCase {
      *
      * @return array[]
      */
-    public function providePostNotificationsData(): array {
+    public function providePostNotificationsData(): array
+    {
         return [
-            CategoryModel::NOTIFICATION_ALL => [
-                CategoryModel::NOTIFICATION_ALL, null, true, true, null, true, null
-            ],
+            CategoryModel::NOTIFICATION_ALL => [CategoryModel::NOTIFICATION_ALL, null, true, true, null, true, null],
             CategoryModel::NOTIFICATION_DISCUSSIONS => [
-                CategoryModel::NOTIFICATION_DISCUSSIONS, null, true, true, null, null, null
+                CategoryModel::NOTIFICATION_DISCUSSIONS,
+                null,
+                true,
+                true,
+                null,
+                null,
+                null,
             ],
             CategoryModel::NOTIFICATION_FOLLOW => [
-                CategoryModel::NOTIFICATION_FOLLOW, null, true, null, null, null, null
+                CategoryModel::NOTIFICATION_FOLLOW,
+                null,
+                true,
+                null,
+                null,
+                null,
+                null,
             ],
             CategoryModel::NOTIFICATION_ALL . ", opt into emails" => [
-                CategoryModel::NOTIFICATION_ALL, true, true, true, true, true, true
+                CategoryModel::NOTIFICATION_ALL,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
             ],
             CategoryModel::NOTIFICATION_DISCUSSIONS . ", opt into emails" => [
-                CategoryModel::NOTIFICATION_DISCUSSIONS, true, true, true, true, null, null
+                CategoryModel::NOTIFICATION_DISCUSSIONS,
+                true,
+                true,
+                true,
+                true,
+                null,
+                null,
             ],
             CategoryModel::NOTIFICATION_ALL . ", opt out of emails" => [
-                CategoryModel::NOTIFICATION_ALL, false, true, true, null, true, null
+                CategoryModel::NOTIFICATION_ALL,
+                false,
+                true,
+                true,
+                null,
+                true,
+                null,
             ],
             CategoryModel::NOTIFICATION_DISCUSSIONS . ", opt out of emails" => [
-                CategoryModel::NOTIFICATION_DISCUSSIONS, false, true, true, null, null, null
+                CategoryModel::NOTIFICATION_DISCUSSIONS,
+                false,
+                true,
+                true,
+                null,
+                null,
+                null,
             ],
-            "null" => [
-                null, null, false, null, null, null, null
-            ],
+            "null" => [null, null, false, null, null, null, null],
         ];
     }
 
@@ -209,63 +284,72 @@ class CategoryPreferencesTest extends SiteTestCase {
      *
      * @see https://github.com/vanilla/support/issues/4856
      */
-    public function testLegacyPreferencesDoesntBreak() {
+    public function testLegacyPreferencesDoesntBreak()
+    {
         $this->createCategory();
         $user = $this->createUser();
-        $this->api()->setUserID($user['userID']);
+        $this->api()->setUserID($user["userID"]);
         $url = "/categories/{$this->lastInsertedCategoryID}/preferences/{$this->lastUserID}";
-        $initial = $this->api()->patch($url, [
-            CategoryModel::PREFERENCE_KEY_NOTIFICATION => CategoryModel::NOTIFICATION_ALL,
-            CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => true,
-        ])->getBody();
+        $initial = $this->api()
+            ->patch($url, [
+                CategoryModel::PREFERENCE_KEY_NOTIFICATION => CategoryModel::NOTIFICATION_ALL,
+                CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => true,
+            ])
+            ->getBody();
 
-        $this->bessy()->postJsonData("/profile/preferences/{$user['name']}", [
-            'Popup-dot-WallComment' => 1,
+        $this->bessy()->postJsonData("/profile/preferences/{$user["name"]}", [
+            "Popup-dot-WallComment" => 1,
         ]);
 
-        $after = $this->api()->get($url)->getBody();
+        $after = $this->api()
+            ->get($url)
+            ->getBody();
         $this->assertEquals($initial, $after);
     }
 
     /**
      * Test that notifications get sent for items in categories more than 2 deep.
      */
-    public function testNotificationPreferencesDepth4() {
-        $this->runWithConfig([
-            \CategoryModel::CONF_CATEGORY_FOLLOWING => true,
-        ], function () {
-            // Create categories.
-            $this->createCategory();
-            $this->createCategory();
-            $this->createCategory();
-            $depth4Category = $this->createCategory();
-            $this->assertNotEquals(CategoryModel::ROOT_ID, $depth4Category['parentCategoryID']);
+    public function testNotificationPreferencesDepth4()
+    {
+        $this->runWithConfig(
+            [
+                \CategoryModel::CONF_CATEGORY_FOLLOWING => true,
+            ],
+            function () {
+                // Create categories.
+                $this->createCategory();
+                $this->createCategory();
+                $this->createCategory();
+                $depth4Category = $this->createCategory();
+                $this->assertNotEquals(CategoryModel::ROOT_ID, $depth4Category["parentCategoryID"]);
 
-            // Create Users
-            $postUser = $this->createUser();
-            $followUser = $this->createUser();
+                // Create Users
+                $postUser = $this->createUser();
+                $followUser = $this->createUser();
 
-            // Follow the category.
-            $this->runWithUser(function () use ($depth4Category, $followUser) {
-                $url = "/categories/{$depth4Category['categoryID']}/preferences/{$followUser['userID']}";
-                $this->api()->patch($url, [
-                    CategoryModel::PREFERENCE_KEY_NOTIFICATION => CategoryModel::NOTIFICATION_ALL,
-                    CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => true,
-                ]);
-            }, $followUser);
-            // Create the posts
-            $this->runWithUser(function () use ($depth4Category) {
-                $discussion = $this->createDiscussion(['name' => 'Hello Discussion']);
-                $this->assertEquals($depth4Category['categoryID'], $discussion['categoryID']);
-                $this->createComment();
-            }, $postUser);
-            // Follow user should have 2 app notifications and 2 email notifications.
-            $this->runWithUser(function () use ($followUser) {
-                /** @var \ActivityModel $activityModel */
-                $activityModel = self::container()->get(\ActivityModel::class);
-                $this->assertEquals(2, $activityModel->getUserTotalUnread($followUser['userID']));
-            }, $followUser);
-        });
+                // Follow the category.
+                $this->runWithUser(function () use ($depth4Category, $followUser) {
+                    $url = "/categories/{$depth4Category["categoryID"]}/preferences/{$followUser["userID"]}";
+                    $this->api()->patch($url, [
+                        CategoryModel::PREFERENCE_KEY_NOTIFICATION => CategoryModel::NOTIFICATION_ALL,
+                        CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => true,
+                    ]);
+                }, $followUser);
+                // Create the posts
+                $this->runWithUser(function () use ($depth4Category) {
+                    $discussion = $this->createDiscussion(["name" => "Hello Discussion"]);
+                    $this->assertEquals($depth4Category["categoryID"], $discussion["categoryID"]);
+                    $this->createComment();
+                }, $postUser);
+                // Follow user should have 2 app notifications and 2 email notifications.
+                $this->runWithUser(function () use ($followUser) {
+                    /** @var \ActivityModel $activityModel */
+                    $activityModel = self::container()->get(\ActivityModel::class);
+                    $this->assertEquals(2, $activityModel->getUserTotalUnread($followUser["userID"]));
+                }, $followUser);
+            }
+        );
     }
 
     /**
@@ -273,7 +357,8 @@ class CategoryPreferencesTest extends SiteTestCase {
      *
      * @return array
      */
-    public function provideUseEmailNotificationsData(): array {
+    public function provideUseEmailNotificationsData(): array
+    {
         $data = $this->providePostNotificationsData();
         $result = array_filter($data, function ($data) {
             return is_bool($data[1]);
@@ -310,14 +395,12 @@ class CategoryPreferencesTest extends SiteTestCase {
         $this->api()->setUserID($userID);
 
         // Setup notifications in a separate request, before attempting to modify email notification settings.
-        $this->api()->patch(
-            "/categories/{$categoryID}/preferences/{$userID}",
-            [CategoryModel::PREFERENCE_KEY_NOTIFICATION => $postNotifications]
-        );
-        $this->api()->patch(
-            "/categories/{$categoryID}/preferences/{$userID}",
-            [CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => $useEmailNotifications]
-        );
+        $this->api()->patch("/categories/{$categoryID}/preferences/{$userID}", [
+            CategoryModel::PREFERENCE_KEY_NOTIFICATION => $postNotifications,
+        ]);
+        $this->api()->patch("/categories/{$categoryID}/preferences/{$userID}", [
+            CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => $useEmailNotifications,
+        ]);
 
         /** @var \UserMetaModel $userMetaModel */
         $userMetaModel = $this->container()->get(\UserMetaModel::class);
@@ -335,7 +418,7 @@ class CategoryPreferencesTest extends SiteTestCase {
             $actual = $meta[$key];
             $this->assertSame(
                 $expected,
-                $actual === null ? $actual : (bool)$actual,
+                $actual === null ? $actual : (bool) $actual,
                 "{$key} was not set as expected."
             );
         }
@@ -344,7 +427,8 @@ class CategoryPreferencesTest extends SiteTestCase {
     /**
      * Verify listing out all of a user's category preferences.
      */
-    public function testNotificationPreferencesIndex(): void {
+    public function testNotificationPreferencesIndex(): void
+    {
         $category = $this->createCategory();
         $categoryID = $category["categoryID"];
         $user = $this->createUser();
@@ -354,19 +438,24 @@ class CategoryPreferencesTest extends SiteTestCase {
         $categoryModel = self::$categoryModel;
         $categoryModel->follow($userID, $categoryID, true);
 
-        $response = $this->api()->get("/categories/preferences/{$userID}")->getBody();
+        $response = $this->api()
+            ->get("/categories/preferences/{$userID}")
+            ->getBody();
         $this->assertCount(1, $response);
 
         $actual = array_shift($response);
-        $this->assertSame([
-            "preferences" => [
-                CategoryModel::PREFERENCE_KEY_NOTIFICATION => CategoryModel::NOTIFICATION_FOLLOW,
-                CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => false,
+        $this->assertSame(
+            [
+                "preferences" => [
+                    CategoryModel::PREFERENCE_KEY_NOTIFICATION => CategoryModel::NOTIFICATION_FOLLOW,
+                    CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => false,
+                ],
+                "categoryID" => $categoryID,
+                "name" => $category["name"],
+                "url" => $category["url"],
             ],
-            "categoryID" => $categoryID,
-            "name" => $category["name"],
-            "url" => $category["url"],
-        ], $actual);
+            $actual
+        );
     }
 
     /**
@@ -374,55 +463,62 @@ class CategoryPreferencesTest extends SiteTestCase {
      *
      * @see https://higherlogic.atlassian.net/browse/APPENG-11913
      */
-    public function testNotificationPreferencesHighCategoryIDs(): void {
+    public function testNotificationPreferencesHighCategoryIDs(): void
+    {
         $user = $this->createUser();
 
         // There was a bug with category IDs more than one digit long that doesn't usually get hit in tests.
-        \Gdn::sql()->query("alter table ".\Gdn::sql()->prefixTable("Category")." AUTO_INCREMENT=100", "update");
+        \Gdn::sql()->query("alter table " . \Gdn::sql()->prefixTable("Category") . " AUTO_INCREMENT=100", "update");
 
         $categories = [];
         for ($i = 0; $i < 2; $i++) {
             $cat = $this->createCategory();
-            \Gdn::sql()->insert('UserMeta', [
-                'UserID' => $user['userID'],
-                'Name' => "Preferences.Email.NewDiscussion.{$cat['categoryID']}",
-                'Value' => '1',
+            \Gdn::sql()->insert("UserMeta", [
+                "UserID" => $user["userID"],
+                "Name" => "Preferences.Email.NewDiscussion.{$cat["categoryID"]}",
+                "Value" => "1",
             ]);
-            $categories[$cat['categoryID']] = $cat;
+            $categories[$cat["categoryID"]] = $cat;
         }
 
         $cat = $this->createCategory();
-        \Gdn::sql()->insert('UserCategory', [
-            'UserID' => $user['userID'],
-            'CategoryID' => $cat['categoryID'],
-            'DateMarkedRead' => null,
-            'Followed' => 1,
-            'Unfollow' => 0,
+        \Gdn::sql()->insert("UserCategory", [
+            "UserID" => $user["userID"],
+            "CategoryID" => $cat["categoryID"],
+            "DateMarkedRead" => null,
+            "Followed" => 1,
+            "Unfollow" => 0,
         ]);
-        $categories[$cat['categoryID']] = $cat;
+        $categories[$cat["categoryID"]] = $cat;
 
-        $prefs = $this->api()->get("/categories/preferences/{$user['userID']}")->getBody();
+        $prefs = $this->api()
+            ->get("/categories/preferences/{$user["userID"]}")
+            ->getBody();
         $this->assertCount(count($categories), $prefs);
     }
 
     /**
      * Verify disabling a user's notifications for a particular category.
      */
-    public function testNotificationPreferencesNone(): void {
+    public function testNotificationPreferencesNone(): void
+    {
         $category = $this->createCategory();
         $categoryID = $category["categoryID"];
         $user = $this->createUser();
         $userID = $user["userID"];
         $this->api()->setUserID($userID);
 
-        $preferences = $this->api()->get("/categories/{$categoryID}/preferences/{$userID}")->getBody();
+        $preferences = $this->api()
+            ->get("/categories/{$categoryID}/preferences/{$userID}")
+            ->getBody();
         $this->assertSame(null, $preferences[CategoryModel::PREFERENCE_KEY_NOTIFICATION]);
     }
 
     /**
      * Verify users with inadequate permissions cannot see other user's preferences.
      */
-    public function testNotificationPreferencesNoPermission(): void {
+    public function testNotificationPreferencesNoPermission(): void
+    {
         $category = $this->createCategory();
         $categoryID = $category["categoryID"];
         $user = $this->createUser();
@@ -432,13 +528,16 @@ class CategoryPreferencesTest extends SiteTestCase {
         $this->api()->setUserID($userID);
 
         $this->expectException(ForbiddenException::class);
-        $this->api()->get("/categories/{$categoryID}/preferences/{$targetUserID}")->getBody();
+        $this->api()
+            ->get("/categories/{$categoryID}/preferences/{$targetUserID}")
+            ->getBody();
     }
 
     /**
      * Verify users with inadequate permissions cannot see other user's preferences.
      */
-    public function testNotificationPreferencesNoPermissionIndex(): void {
+    public function testNotificationPreferencesNoPermissionIndex(): void
+    {
         $user = $this->createUser();
         $userID = $user["userID"];
         $targetUser = $this->createUser();
@@ -446,13 +545,16 @@ class CategoryPreferencesTest extends SiteTestCase {
         $this->api()->setUserID($userID);
 
         $this->expectException(ForbiddenException::class);
-        $this->api()->get("/categories/preferences/{$targetUserID}")->getBody();
+        $this->api()
+            ->get("/categories/preferences/{$targetUserID}")
+            ->getBody();
     }
 
     /**
      * Verify users with inadequate permissions cannot set other user's preferences.
      */
-    public function testNotificationPreferencesNoPermissionPatch(): void {
+    public function testNotificationPreferencesNoPermissionPatch(): void
+    {
         $category = $this->createCategory();
         $categoryID = $category["categoryID"];
         $user = $this->createUser();
@@ -470,19 +572,20 @@ class CategoryPreferencesTest extends SiteTestCase {
     /**
      * Verify that an error is thrown when a user opts for email notifications without having the Garden.Email.View permission.
      */
-    public function testNotificationEmailPreferenceWithoutEmailViewPermission(): void {
+    public function testNotificationEmailPreferenceWithoutEmailViewPermission(): void
+    {
         $category = $this->createCategory();
-        $categoryID = $category['categoryID'];
+        $categoryID = $category["categoryID"];
         $user = $this->createUser();
-        $userID = $user['userID'];
+        $userID = $user["userID"];
         $session = $this->getSession();
         $session->start($userID);
-        $session->setPermission(['Garden.Email.View' => false]);
+        $session->setPermission(["Garden.Email.View" => false]);
         $this->expectException(ForbiddenException::class);
         $this->expectExceptionMessage("Permission Problem");
         $this->api()->patch("/categories/{$categoryID}/preferences/{$userID}", [
             CategoryModel::PREFERENCE_KEY_NOTIFICATION => "discussions",
-            CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => true
+            CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => true,
         ]);
     }
 
@@ -490,17 +593,20 @@ class CategoryPreferencesTest extends SiteTestCase {
      * Verify that opting another user into email notifications succeeds when the user
      * in question has the 'Garden.Email.View' permission.
      */
-    public function testNotificationEmailPreferenceWithoutEmailViewPermissionSetByAdmin(): void {
+    public function testNotificationEmailPreferenceWithoutEmailViewPermissionSetByAdmin(): void
+    {
         $category = $this->createCategory();
-        $categoryID = $category['categoryID'];
-        $roleWithEmail = $this->createRole([], ['email.view' => true]);
-        $userSuccess = $this->createUser(['roleID' => [$roleWithEmail['roleID']]]);
+        $categoryID = $category["categoryID"];
+        $roleWithEmail = $this->createRole([], ["email.view" => true]);
+        $userSuccess = $this->createUser(["roleID" => [$roleWithEmail["roleID"]]]);
 
         // Should work when the user has the 'Garden.Email.View' permission.
-        $preferencesWithEmail = $this->api()->patch("/categories/{$categoryID}/preferences/{$userSuccess['userID']}", [
-            CategoryModel::PREFERENCE_KEY_NOTIFICATION => "discussions",
-            CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => true
-        ])->getBody();
+        $preferencesWithEmail = $this->api()
+            ->patch("/categories/{$categoryID}/preferences/{$userSuccess["userID"]}", [
+                CategoryModel::PREFERENCE_KEY_NOTIFICATION => "discussions",
+                CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => true,
+            ])
+            ->getBody();
         $this->assertTrue($preferencesWithEmail[CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS]);
     }
 
@@ -508,18 +614,19 @@ class CategoryPreferencesTest extends SiteTestCase {
      * Verify that opting another user into email notifications fails when the user in question doesn't have
      * the 'Garden.Email.View' permission.
      */
-    public function testNotificationEmailPreferencesWithoutEmailViewPermissionSetByAdmin(): void {
+    public function testNotificationEmailPreferencesWithoutEmailViewPermissionSetByAdmin(): void
+    {
         $category = $this->createCategory();
-        $categoryID = $category['categoryID'];
-        $roleWithoutEmail = $this->createRole([], ['email.view' => false]);
-        $userFailure = $this->createUser(['roleID' => [$roleWithoutEmail['roleID']]]);
+        $categoryID = $category["categoryID"];
+        $roleWithoutEmail = $this->createRole([], ["email.view" => false]);
+        $userFailure = $this->createUser(["roleID" => [$roleWithoutEmail["roleID"]]]);
 
         // Should fail when the user doesn't have the 'Garden.Email.View' permission.
         $this->expectException(ForbiddenException::class);
         $this->expectExceptionMessage("Permission Problem");
-        $this->api()->patch("/categories/{$categoryID}/preferences/{$userFailure['userID']}", [
+        $this->api()->patch("/categories/{$categoryID}/preferences/{$userFailure["userID"]}", [
             CategoryModel::PREFERENCE_KEY_NOTIFICATION => "discussions",
-            CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => true
+            CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => true,
         ]);
     }
 }

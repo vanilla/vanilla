@@ -11,14 +11,15 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for validation functions.
  */
-class ValidationFunctionsTest extends TestCase {
-
+class ValidationFunctionsTest extends TestCase
+{
     /**
      * Assert a value is an instance of the Invalid class.
      *
      * @param mixed $value
      */
-    protected function assertInvalid($value) {
+    protected function assertInvalid($value)
+    {
         $this->assertInstanceOf(\Vanilla\Invalid::class, $value);
     }
 
@@ -29,10 +30,11 @@ class ValidationFunctionsTest extends TestCase {
      * @param bool $isValid Is this expected to be a valid time?
      * @dataProvider provideTimes
      */
-    public function testValidateTime($value, $isValid) {
+    public function testValidateTime($value, $isValid)
+    {
         $result = validateTime($value);
         if ($isValid) {
-            $this->assertIsString('string', $value);
+            $this->assertIsString("string", $value);
         } else {
             $this->assertInvalid($result);
         }
@@ -43,19 +45,20 @@ class ValidationFunctionsTest extends TestCase {
      *
      * @return array
      */
-    public function provideTimes() {
+    public function provideTimes()
+    {
         return [
-            ['12:00:00', true],
-            ['12:00', true],
-            ['12', false],
-            ['24:00:00', true],
-            ['60:00:00', false],
-            ['24:60:00', false],
-            ['24:00:60', false],
-            ['24:00:59', true],
-            ['24:59:00', true],
-            ['00:59:59', true],
-            ['1:00', true],
+            ["12:00:00", true],
+            ["12:00", true],
+            ["12", false],
+            ["24:00:00", true],
+            ["60:00:00", false],
+            ["24:60:00", false],
+            ["24:00:60", false],
+            ["24:00:59", true],
+            ["24:59:00", true],
+            ["00:59:59", true],
+            ["1:00", true],
             [1, false],
             [true, false],
             [false, false],

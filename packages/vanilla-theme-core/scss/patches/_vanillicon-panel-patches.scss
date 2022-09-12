@@ -10,14 +10,12 @@
 
 .Box,
 .BoxFilter {
-
     a {
         display: flex;
-        align-items:  center;
+        align-items: center;
 
         &::before {
-
-            @if($panel_item-showIcons == false) {
+            @if ($panel_item-showIcons == false) {
                 content: none !important;
             } @else {
                 margin-right: $utility-baseUnitHalf;
@@ -36,9 +34,9 @@
     }
 
     &.BadgeGrid {
-       a {
-           display: inline-block;
-       }
+        a {
+            display: inline-block;
+        }
     }
 
     li.MyDiscussions a::before {

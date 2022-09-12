@@ -21,8 +21,8 @@ use Vanilla\Models\CrawlableRecordSchema;
 /**
  * Search record type for a user.
  */
-class CategorySearchType extends AbstractSearchType {
-
+class CategorySearchType extends AbstractSearchType
+{
     /** @var \CategoryModel $categoryModel */
     protected $categoryModel;
 
@@ -54,39 +54,44 @@ class CategorySearchType extends AbstractSearchType {
     /**
      * @param CategorySearchExclusionInterface $searchExclusion
      */
-    public function addSearchExcluder(CategorySearchExclusionInterface $searchExclusion): void {
+    public function addSearchExcluder(CategorySearchExclusionInterface $searchExclusion): void
+    {
         $this->searchExcluders[] = $searchExclusion;
     }
 
     /**
      * @inheritdoc
      */
-    public function getKey(): string {
-        return 'category';
+    public function getKey(): string
+    {
+        return "category";
     }
 
     /**
      * @inheritdoc
      */
-    public function getRecordType(): string {
-        return 'category';
+    public function getRecordType(): string
+    {
+        return "category";
     }
 
     /**
      * @inheritdoc
      */
-    public function getType(): string {
-        return 'category';
+    public function getType(): string
+    {
+        return "category";
     }
 
     /**
      * @inheritdoc
      */
-    public function getResultItems(array $recordIDs, SearchQuery $query): array {
+    public function getResultItems(array $recordIDs, SearchQuery $query): array
+    {
         $results = $this->categoriesApi->index(
             [
-                'categoryID' => implode(',', $recordIDs),
-                'expand' => [ModelUtils::EXPAND_CRAWL],
+                "categoryID" => implode(",", $recordIDs),
+                "expand" => [ModelUtils::EXPAND_CRAWL],
             ],
             false
         );
@@ -94,10 +99,10 @@ class CategorySearchType extends AbstractSearchType {
 
         $resultItems = array_map(function ($result) {
             $mapped = ArrayUtils::remapProperties($result, [
-                'recordID' => 'categoryID',
+                "recordID" => "categoryID",
             ]);
-            $mapped['recordType'] = $this->getRecordType();
-            $mapped['type'] = $this->getType();
+            $mapped["recordType"] = $this->getRecordType();
+            $mapped["type"] = $this->getType();
             $this->mapCounts($mapped);
 
             $categoryResultItem = new SearchResultItem($mapped);
@@ -113,20 +118,21 @@ class CategorySearchType extends AbstractSearchType {
      *
      * @param array $record
      */
-    private function mapCounts(array &$record) {
-        $record['counts'] = [
+    private function mapCounts(array &$record)
+    {
+        $record["counts"] = [
             [
                 // %s sub-category
                 // %s sub-categories
-                'labelCode' => 'sub-categories',
-                'count' => $record['countCategories'],
+                "labelCode" => "sub-categories",
+                "count" => $record["countCategories"],
             ],
             [
                 // %s discussion
                 // %s discussions
-                'labelCode' => 'discussions',
-                'count' => $record['countAllDiscussions'],
-            ]
+                "labelCode" => "discussions",
+                "count" => $record["countAllDiscussions"],
+            ],
         ];
     }
 
@@ -134,7 +140,8 @@ class CategorySearchType extends AbstractSearchType {
      * Overridden to map ocunts.
      * @inheritdoc
      */
-    public function convertForeignSearchItem(array $record): SearchResultItem {
+    public function convertForeignSearchItem(array $record): SearchResultItem
+    {
         $this->mapCounts($record);
         return parent::convertForeignSearchItem($record);
     }
@@ -145,12 +152,13 @@ class CategorySearchType extends AbstractSearchType {
      * @param SearchQuery $query
      * @return array|null
      */
-    protected function getCategoryIDs(SearchQuery $query): ?array {
+    protected function getCategoryIDs(SearchQuery $query): ?array
+    {
         $categoryIDs = $this->categoryModel->getSearchCategoryIDs(
-            $query->getQueryParameter('categoryID'),
-            $query->getQueryParameter('followedCategories'),
-            $query->getQueryParameter('includeChildCategories'),
-            $query->getQueryParameter('includeArchivedCategories')
+            $query->getQueryParameter("categoryID"),
+            $query->getQueryParameter("followedCategories"),
+            $query->getQueryParameter("includeChildCategories"),
+            $query->getQueryParameter("includeArchivedCategories")
         );
         if (empty($categoryIDs)) {
             $categoryIDs[] = 0;
@@ -169,36 +177,37 @@ class CategorySearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function applyToQuery(SearchQuery $query) {
+    public function applyToQuery(SearchQuery $query)
+    {
         if ($query instanceof MysqlSearchQuery) {
             $query->addSql($this->generateSql($query));
         } else {
             $query->addIndex($this->getIndex());
 
-            $locale = $query->getQueryParameter('locale');
+            $locale = $query->getQueryParameter("locale");
             $enableBoost = false;
 
-            if ($queryParam = $query->getQueryParameter('query', false)) {
-                $query->whereText($queryParam, ['name', 'description'], $query::MATCH_FULLTEXT_EXTENDED, $locale);
+            if ($queryParam = $query->getQueryParameter("query", false)) {
+                $query->whereText($queryParam, ["name", "description"], $query::MATCH_FULLTEXT_EXTENDED, $locale);
                 $enableBoost = true;
             }
 
-            if ($name = $query->getQueryParameter('name', false)) {
-                $query->whereText($name, ['name'], $query::MATCH_FULLTEXT_EXTENDED, $locale);
+            if ($name = $query->getQueryParameter("name", false)) {
+                $query->whereText($name, ["name"], $query::MATCH_FULLTEXT_EXTENDED, $locale);
                 $enableBoost = true;
             }
 
-            if ($description = $query->getQueryParameter('description', false)) {
-                $query->whereText($description, ['description']);
+            if ($description = $query->getQueryParameter("description", false)) {
+                $query->whereText($description, ["description"]);
             }
 
             $categoryIDs = $this->getCategoryIDs($query);
             if (!empty($categoryIDs)) {
-                $query->setFilter('CategoryID', $categoryIDs);
+                $query->setFilter("CategoryID", $categoryIDs);
             }
 
             if ($enableBoost) {
-                if ($query instanceof BoostableSearchQueryInterface && $query->getBoostParameter('categoryBoost')) {
+                if ($query instanceof BoostableSearchQueryInterface && $query->getBoostParameter("categoryBoost")) {
                     $query->startBoostQuery();
                     $query->boostType($this, $this->getBoostValue());
                     $query->endBoostQuery();
@@ -210,19 +219,19 @@ class CategorySearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function getSorts(): array {
-        return [
-
-        ];
+    public function getSorts(): array
+    {
+        return [];
     }
 
     /**
      * @inheritdoc
      */
-    public function getQuerySchema(): Schema {
+    public function getQuerySchema(): Schema
+    {
         return Schema::parse([
-            'description:s?' => [
-                'x-search-filter' => true,
+            "description:s?" => [
+                "x-search-filter" => true,
             ],
         ]);
     }
@@ -232,10 +241,11 @@ class CategorySearchType extends AbstractSearchType {
      *
      * @return Schema|null
      */
-    public function getBoostSchema(): ?Schema {
+    public function getBoostSchema(): ?Schema
+    {
         return Schema::parse([
-            'categoryBoost:b' => [
-                'default' => true,
+            "categoryBoost:b" => [
+                "default" => true,
             ],
         ]);
     }
@@ -245,10 +255,10 @@ class CategorySearchType extends AbstractSearchType {
      *
      * @return float|null
      */
-    protected function getBoostValue(): ?float {
-        return $this->config->get('Elastic.Boost.Category', 15);
+    protected function getBoostValue(): ?float
+    {
+        return $this->config->get("Elastic.Boost.Category", 15);
     }
-
 
     /**
      * Generates prepares sql query string
@@ -256,43 +266,48 @@ class CategorySearchType extends AbstractSearchType {
      * @param MysqlSearchQuery $query
      * @return string
      */
-    public function generateSql(MysqlSearchQuery $query): string {
+    public function generateSql(MysqlSearchQuery $query): string
+    {
         // mysql is not implemented
-        return '';
+        return "";
     }
 
     /**
      * @inheritdoc
      */
-    public function validateQuery(SearchQuery $query): void {
-        ;
+    public function validateQuery(SearchQuery $query): void
+    {
     }
 
     /**
      * @return string
      */
-    public function getSingularLabel(): string {
-        return \Gdn::translate('Category');
+    public function getSingularLabel(): string
+    {
+        return \Gdn::translate("Category");
     }
 
     /**
      * @return string
      */
-    public function getPluralLabel(): string {
-        return \Gdn::translate('Categories');
+    public function getPluralLabel(): string
+    {
+        return \Gdn::translate("Categories");
     }
 
     /**
      * @inheritdoc
      */
-    public function getDTypes(): ?array {
+    public function getDTypes(): ?array
+    {
         return null;
     }
 
     /**
      * @inheritdoc
      */
-    public function guidToRecordID(int $guid): ?int {
+    public function guidToRecordID(int $guid): ?int
+    {
         return null;
     }
 }

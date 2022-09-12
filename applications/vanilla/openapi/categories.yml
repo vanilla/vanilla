@@ -537,81 +537,7 @@ paths:
                     content:
                         "application/json":
                             schema:
-                                properties:
-                                    categoryID:
-                                        description: The ID of the category.
-                                        type: integer
-                                    countAllComments:
-                                        description: Total of all comments in a category and its children.
-                                        type: integer
-                                    countAllDiscussions:
-                                        description: Total of all discussions in a category and its children.
-                                        type: integer
-                                    countCategories:
-                                        description: Total number of child categories.
-                                        type: integer
-                                    countComments:
-                                        description: Total comments in the category.
-                                        type: integer
-                                    countDiscussions:
-                                        description: Total discussions in the category.
-                                        type: integer
-                                    customPermissions:
-                                        description: Are custom permissions set for this category?
-                                        type: boolean
-                                    description:
-                                        description: The description of the category.
-                                        minLength: 0
-                                        nullable: true
-                                        type: string
-                                    displayAs:
-                                        type: string
-                                        default: discussions
-                                        description: The display style of the category.
-                                        enum:
-                                            - categories
-                                            - discussions
-                                            - flat
-                                            - heading
-                                        minLength: 1
-                                    followed:
-                                        description: Is the category being followed by the current user?
-                                        type: boolean
-                                    isArchived:
-                                        description: The archived state of this category.
-                                        type: boolean
-                                    name:
-                                        description: The name of the category.
-                                        minLength: 1
-                                        type: string
-                                    parentCategoryID:
-                                        description: Parent category ID.
-                                        nullable: true
-                                        type: integer
-                                    url:
-                                        description: The URL to the category.
-                                        minLength: 1
-                                        type: string
-                                    urlcode:
-                                        description: The URL code of the category.
-                                        minLength: 1
-                                        type: string
-                                required:
-                                    - categoryID
-                                    - name
-                                    - description
-                                    - parentCategoryID
-                                    - customPermissions
-                                    - isArchived
-                                    - urlcode
-                                    - url
-                                    - displayAs
-                                    - countCategories
-                                    - countDiscussions
-                                    - countComments
-                                    - countAllDiscussions
-                                    - countAllComments
-                                type: object
+                                $ref: "#/components/schemas/CategorySchema"
                     description: Success
             tags:
                 - Categories
@@ -931,3 +857,79 @@ components:
                       properties:
                           preferences:
                               $ref: "#/components/schemas/CategoryPreferences"
+        CategorySchema:
+            properties:
+                categoryID:
+                    description: The ID of the category.
+                    type: integer
+                countAllComments:
+                    description: Total of all comments in a category and its children.
+                    type: integer
+                countAllDiscussions:
+                    description: Total of all discussions in a category and its children.
+                    type: integer
+                countCategories:
+                    description: Total number of child categories.
+                    type: integer
+                countComments:
+                    description: Total comments in the category.
+                    type: integer
+                countDiscussions:
+                    description: Total discussions in the category.
+                    type: integer
+                customPermissions:
+                    description: Are custom permissions set for this category?
+                    type: boolean
+                description:
+                    description: The description of the category.
+                    minLength: 0
+                    nullable: true
+                    type: string
+                displayAs:
+                    type: string
+                    default: discussions
+                    description: The display style of the category.
+                    enum:
+                        - categories
+                        - discussions
+                        - flat
+                        - heading
+                    minLength: 1
+                followed:
+                    description: Is the category being followed by the current user?
+                    type: boolean
+                isArchived:
+                    description: The archived state of this category.
+                    type: boolean
+                name:
+                    description: The name of the category.
+                    minLength: 1
+                    type: string
+                parentCategoryID:
+                    description: Parent category ID.
+                    nullable: true
+                    type: integer
+                url:
+                    description: The URL to the category.
+                    minLength: 1
+                    type: string
+                urlcode:
+                    description: The URL code of the category.
+                    minLength: 1
+                    type: string
+            required:
+                - categoryID
+                - name
+                - description
+                - parentCategoryID
+                - customPermissions
+                - isArchived
+                - urlcode
+                - url
+                - displayAs
+                - countCategories
+                - countDiscussions
+                - countComments
+                - countAllDiscussions
+                - countAllComments
+            type: object

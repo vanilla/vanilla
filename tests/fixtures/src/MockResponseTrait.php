@@ -13,7 +13,8 @@ use Garden\Http\HttpResponse;
 /**
  * Trait for mocking HTTP responses.
  */
-trait MockResponseTrait {
+trait MockResponseTrait
+{
     protected $mockedResponses = [];
 
     /**
@@ -25,14 +26,11 @@ trait MockResponseTrait {
      *
      * @return string
      */
-    private function makeMockResponseKey(
-        string $uri,
-        string $method = HttpRequest::METHOD_GET,
-        $body = null
-    ): string {
+    private function makeMockResponseKey(string $uri, string $method = HttpRequest::METHOD_GET, $body = null): string
+    {
         $queryBody = $body && is_array($body) ? serialize($body) : $body;
-        $bodyHash = $queryBody ? '-'.md5($queryBody) : '';
-        return $method.'-'.$uri.$bodyHash;
+        $bodyHash = $queryBody ? "-" . md5($queryBody) : "";
+        return $method . "-" . $uri . $bodyHash;
     }
 
     /**

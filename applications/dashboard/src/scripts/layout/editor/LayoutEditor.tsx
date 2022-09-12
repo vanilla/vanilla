@@ -24,7 +24,7 @@ import {
 } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { FauxWidget } from "@dashboard/layout/overview/LayoutOverview";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
-import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
+import { LayoutLookupContext, LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
 import Container, { ContainerContextReset, ContainerWidthContextProvider } from "@library/layout/components/Container";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { LinkContext, LINK_CONTEXT_DEFAULTS } from "@library/routing/links/LinkContextProvider";
@@ -66,7 +66,7 @@ function LayoutEditorImpl(props: IProps) {
 
     useFocusWatcher(ref, (hasFocus, elementFocused) => {
         const focusIsInLayoutEditorModal = elementFocused?.closest("[data-layout-editor-modal]");
-        if (!hasFocus && !focusIsInLayoutEditorModal) {
+        if (elementFocused && !hasFocus && !focusIsInLayoutEditorModal) {
             editorSelection.stashState();
         } else if (hasFocus && elementFocused === ref.current) {
             editorSelection.restoreState();
@@ -210,13 +210,18 @@ function LayoutEditorImpl(props: IProps) {
                             maxWidth={1264}
                         >
                             <ContainerContextReset>
-                                <LayoutRenderer<IHydratedEditableWidgetProps>
-                                    allowInternalProps
-                                    layout={editorContents.hydrate().layout}
-                                    fallbackWidget={FauxWidget}
-                                    componentFetcher={fetchEditorOverviewComponent}
-                                    componentWrapper={LayoutEditorWidgetWrapper}
-                                />
+                                <LayoutLookupContext.Provider
+                                    value={{
+                                        fallbackWidget: FauxWidget,
+                                        componentFetcher: fetchEditorOverviewComponent,
+                                        componentWrapper: LayoutEditorWidgetWrapper,
+                                    }}
+                                >
+                                    <LayoutRenderer<IHydratedEditableWidgetProps>
+                                        allowInternalProps
+                                        layout={editorContents.hydrate().layout}
+                                    />
+                                </LayoutLookupContext.Provider>
                             </ContainerContextReset>
                         </ContainerWidthContextProvider>
                     </DeviceProvider>

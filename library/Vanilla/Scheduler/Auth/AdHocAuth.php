@@ -13,8 +13,8 @@ use Vanilla\Contracts\ConfigurationInterface;
 /**
  * AdHocAuth
  */
-class AdHocAuth {
-
+class AdHocAuth
+{
     /** @var RequestInterface */
     protected $request;
 
@@ -27,8 +27,9 @@ class AdHocAuth {
      * @param ConfigurationInterface $config
      * @param RequestInterface $request
      */
-    public function __construct(ConfigurationInterface $config, RequestInterface $request) {
-        $this->cronToken = $config->get('Garden.Scheduler.Token', null);
+    public function __construct(ConfigurationInterface $config, RequestInterface $request)
+    {
+        $this->cronToken = $config->get("Garden.Scheduler.Token", null);
         $this->request = $request;
     }
 
@@ -38,17 +39,18 @@ class AdHocAuth {
      * @return bool
      * @throws AdHocAuthException When Validation has failed.
      */
-    public function validateToken() {
+    public function validateToken()
+    {
         if ($this->cronToken === null) {
             throw new AdHocAuth412Exception();
         }
 
-        $authHeader = $this->request->getHeader('Authorization') ?? '';
-        if ($authHeader === '') {
+        $authHeader = $this->request->getHeader("Authorization") ?? "";
+        if ($authHeader === "") {
             throw new AdHocAuth403Exception();
         }
 
-        $parts = explode(' ', $authHeader);
+        $parts = explode(" ", $authHeader);
 
         if (count($parts) === 2 && strtolower($parts[0]) === "bearer") {
             if (hash_equals($parts[1], $this->cronToken)) {

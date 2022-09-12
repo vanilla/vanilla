@@ -32,16 +32,16 @@
 // Styleguide 2.1.1.
 
 .padded {
-  margin-top: $spacer;
-  margin-bottom: $spacer;
+    margin-top: $spacer;
+    margin-bottom: $spacer;
 }
 
 .padded-top {
-  margin-top: $spacer;
+    margin-top: $spacer;
 }
 
 .padded-bottom {
-  margin-bottom: $spacer;
+    margin-bottom: $spacer;
 }
 
 // Horizontal Padding Helpers
@@ -59,11 +59,11 @@
 // Styleguide 2.1.2.
 
 .padded-left {
-  margin-left: $spacer;
+    margin-left: $spacer;
 }
 
 .padded-right {
-  margin-right: $spacer;
+    margin-right: $spacer;
 }
 
 // Flex Helpers
@@ -89,21 +89,21 @@
 // Styleguide 2.2.1.
 
 .flex {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-  > * {
-    margin-right: $spacer / 4;
-  }
+    > * {
+        margin-right: $spacer * 0.25;
+    }
 
-  > *:last-child {
-    margin-right: 0;
-  }
+    > *:last-child {
+        margin-right: 0;
+    }
 }
 
 .flex-wrap {
-  flex-wrap: wrap;
+    flex-wrap: wrap;
 }
 
 // Filling Extra Space
@@ -123,11 +123,11 @@
 // Styleguide 2.2.2.
 
 .shrink {
-  flex-shrink: 1;
+    flex-shrink: 1;
 }
 
 .grow {
-  flex-grow: 1;
+    flex-grow: 1;
 }
 
 // Ensuring Space
@@ -147,11 +147,11 @@
 // Styleguide 2.2.3.
 
 .no-shrink {
-  flex-shrink: 0;
+    flex-shrink: 0;
 }
 
 .no-grow {
-  flex-grow: 0;
+    flex-grow: 0;
 }
 
 // Float Helpers
@@ -168,11 +168,11 @@
 // Styleguide 2.3.
 
 .pull-left {
-  float: left;
+    float: left;
 }
 
 .pull-right {
-  float: right;
+    float: right;
 }
 
 // Hidden Helper
@@ -188,7 +188,7 @@
 
 .Hidden,
 .hidden {
-  display: none;
+    display: none;
 }
 
 // Progress Spinner
@@ -201,7 +201,7 @@
 // Styleguide 2.6.
 
 .progress {
-  background: url('images/progress.gif') center center no-repeat;
+    background: url("images/progress.gif") center center no-repeat;
 }
 
 // Foggy
@@ -250,21 +250,21 @@
 // Styleguide 2.7.
 
 .foggy {
-  position: relative;
-  -webkit-filter: blur(2px);
+    position: relative;
+    -webkit-filter: blur(2px);
 
-  input {
-    user-select: none;
-  }
+    input {
+        user-select: none;
+    }
 
-  &::before {
-    position: absolute;
-    display: block;
-    width: 100%;
-    height: 100%;
-    opacity: .5;
-    background-color: $white;
-    z-index: 1;
-    content: '';
-  }
+    &::before {
+        position: absolute;
+        display: block;
+        width: 100%;
+        height: 100%;
+        opacity: 0.5;
+        background-color: $white;
+        z-index: 1;
+        content: "";
+    }
 }

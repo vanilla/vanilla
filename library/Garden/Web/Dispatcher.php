@@ -7,6 +7,7 @@
 
 namespace Garden\Web;
 
+use Garden\Web\Exception\ResponseException;
 use Gdn;
 use Gdn_Locale;
 use Garden\Schema\ValidationException;
@@ -25,8 +26,8 @@ use Garden\CustomExceptionHandler;
 /**
  * Dispatches requests and receives responses.
  */
-class Dispatcher implements LoggerAwareInterface {
-
+class Dispatcher implements LoggerAwareInterface
+{
     use LoggerAwareTrait;
     use MiddlewareAwareTrait;
 
@@ -54,7 +55,8 @@ class Dispatcher implements LoggerAwareInterface {
      * @param LocaleInterface $locale
      * @param ContainerInterface $container The container is used to fetch view handlers.
      */
-    public function __construct(LocaleInterface $locale = null, ContainerInterface $container = null) {
+    public function __construct(LocaleInterface $locale = null, ContainerInterface $container = null)
+    {
         $this->middleware = function (RequestInterface $request): Data {
             return $this->dispatchInternal($request);
         };
@@ -69,8 +71,9 @@ class Dispatcher implements LoggerAwareInterface {
      * @param string $key An optional key of the route. If set you can modify the route later.
      * @return $this
      */
-    public function addRoute(Route $route, $key = '') {
-        if ($key !== '') {
+    public function addRoute(Route $route, $key = "")
+    {
+        if ($key !== "") {
             $this->routes[$key] = $route;
         } else {
             $this->routes[] = $route;
@@ -88,7 +91,8 @@ class Dispatcher implements LoggerAwareInterface {
      * @param string|int $key The key of the route to remove.
      * @return $this
      */
-    public function removeRoute($key) {
+    public function removeRoute($key)
+    {
         unset($this->routes[$key]);
         return $this;
     }
@@ -99,7 +103,8 @@ class Dispatcher implements LoggerAwareInterface {
      * @param string|int $key The route to get.
      * @return Route|null Returns a {@link Route} or **null** if no route exists with the given key.
      */
-    public function getRoute($key) {
+    public function getRoute($key)
+    {
         return isset($this->routes[$key]) ? $this->routes[$key] : null;
     }
 
@@ -111,7 +116,8 @@ class Dispatcher implements LoggerAwareInterface {
      * @param RequestInterface $request The request to handle.
      * @return Data Returns the response as a data object.
      */
-    public function dispatch(RequestInterface $request) {
+    public function dispatch(RequestInterface $request)
+    {
         try {
             $result = $this->callMiddleware($request);
         } catch (\Exception $ex) {
@@ -129,7 +135,8 @@ class Dispatcher implements LoggerAwareInterface {
      * @param RequestInterface $request The request to handle.
      * @return Data Returns the response as a data object.
      */
-    protected function dispatchInternal(RequestInterface $request) {
+    protected function dispatchInternal(RequestInterface $request)
+    {
         $ex = null;
 
         foreach ($this->routes as $route) {
@@ -141,23 +148,25 @@ class Dispatcher implements LoggerAwareInterface {
                 } elseif ($action !== null) {
                     // KLUDGE: Check for CSRF here because we can only do a global check for new dispatches.
                     // Once we can test properly then a route can be added that checks for CSRF on all requests.
-                    if ($request->getMethod() === 'POST' && $request instanceof \Gdn_Request) {
+                    if ($request->getMethod() === "POST" && $request instanceof \Gdn_Request) {
                         /* @var \Gdn_Request $request */
                         try {
                             $request->isAuthenticatedPostBack(true);
                         } catch (\Exception $ex) {
-                            Gdn::session()->getPermissions()->addBan(
-                                Permissions::BAN_CSRF,
-                                [
-                                    'msg' => $this->locale->translate('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'),
-                                    'code' => 403,
-                                ]
-                            );
+                            Gdn::session()
+                                ->getPermissions()
+                                ->addBan(Permissions::BAN_CSRF, [
+                                    "msg" => $this->locale->translate(
+                                        "Invalid CSRF token.",
+                                        "Invalid CSRF token. Please try again."
+                                    ),
+                                    "code" => 403,
+                                ]);
                         }
                     }
 
                     $fn = function (RequestInterface $request) use ($route, $action): Data {
-                        if (is_object($action) && method_exists($action, 'replaceRequest')) {
+                        if (is_object($action) && method_exists($action, "replaceRequest")) {
                             $action->replaceRequest($request);
                         }
 
@@ -168,7 +177,7 @@ class Dispatcher implements LoggerAwareInterface {
                             $ob = ob_get_clean();
                         }
                         $response = $this->makeResponse($actionResponse, $ob);
-                        if (is_object($action) && method_exists($action, 'getMetaArray')) {
+                        if (is_object($action) && method_exists($action, "getMetaArray")) {
                             $this->mergeMeta($response, $action->getMetaArray());
                         }
                         $this->mergeMeta($response, $route->getMetaArray());
@@ -190,9 +199,13 @@ class Dispatcher implements LoggerAwareInterface {
                         "exception" => $dispatchEx,
                     ]);
                 } else {
-                    ErrorLogger::error($dispatchEx, ['api_error', 'dispatcher-caught'], [
-                        'responseCode' => $dispatchEx->getCode(),
-                    ]);
+                    ErrorLogger::error(
+                        $dispatchEx,
+                        ["api_error", "dispatcher-caught"],
+                        [
+                            "responseCode" => $dispatchEx->getCode(),
+                        ]
+                    );
                 }
                 $response = null;
                 if (is_object($action ?? null) && $action instanceof Action) {
@@ -217,20 +230,20 @@ class Dispatcher implements LoggerAwareInterface {
             } else {
                 $response = $this->makeResponse(new NotFoundException($request->getPath()));
                 // This is temporary. Only use internally.
-                $response->setMeta('noMatch', true);
+                $response->setMeta("noMatch", true);
             }
         } else {
-            if ($response->getMeta('status', null) === null) {
+            if ($response->getMeta("status", null) === null) {
                 switch ($request->getMethod()) {
-                    case 'GET':
-                    case 'PATCH':
-                    case 'PUT':
+                    case "GET":
+                    case "PATCH":
+                    case "PUT":
                         $response->setStatus(200);
                         break;
-                    case 'POST':
+                    case "POST":
                         $response->setStatus(201);
                         break;
-                    case 'DELETE':
+                    case "DELETE":
                         $response->setStatus(204);
                         break;
                 }
@@ -258,7 +271,8 @@ class Dispatcher implements LoggerAwareInterface {
      * @param array|null $meta The meta to merge.
      * @param bool $replace Whether to replace existing items or not.
      */
-    private function mergeMeta(Data $data, array $meta = null, $replace = false) {
+    private function mergeMeta(Data $data, array $meta = null, $replace = false)
+    {
         if (empty($meta)) {
             return;
         }
@@ -278,7 +292,8 @@ class Dispatcher implements LoggerAwareInterface {
      *
      * @param RequestInterface $request The request to handle.
      */
-    public function handle(RequestInterface $request) {
+    public function handle(RequestInterface $request)
+    {
         $response = $this->dispatch($request);
 
         $this->render($request, $response);
@@ -291,8 +306,11 @@ class Dispatcher implements LoggerAwareInterface {
      * @param string $ob The contents of the output buffer, if any.
      * @return Data Returns the data response.
      */
-    private function makeResponse($raw, $ob = '') {
-        if ($raw instanceof Data) {
+    private function makeResponse($raw, $ob = "")
+    {
+        if ($raw instanceof ResponseException) {
+            throw $raw;
+        } elseif ($raw instanceof Data) {
             $result = $raw;
         } elseif (is_array($raw) || is_string($raw)) {
             // This is an array of response data.
@@ -311,23 +329,23 @@ class Dispatcher implements LoggerAwareInterface {
                 $errorCode = 500;
             }
 
-            $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ['message' => $raw->getMessage()];
+            $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ["message" => $raw->getMessage()];
             if (debug() && is_array($data)) {
-                $data['trace'] = $raw->getTrace();
+                $data["trace"] = $raw->getTrace();
             }
             $result = new Data($data, $errorCode);
             // Provide stack trace as meta information.
-            $result->setMeta('exception', $raw);
+            $result->setMeta("exception", $raw);
 
-            $this->mergeMeta($result, ['template' => 'error-page']);
+            $this->mergeMeta($result, ["template" => "error-page"]);
         } elseif ($raw instanceof \JsonSerializable) {
-            $result = new Data((array)$raw->jsonSerialize());
+            $result = new Data((array) $raw->jsonSerialize());
         } elseif (!empty($ob)) {
             $result = new Data($ob);
         } elseif ($raw === null) {
             $result = new Data(null);
         } else {
-            $result = new Data(['message' => 'Could not encode the response.', 'status' => 500], 500);
+            $result = new Data(["message" => "Could not encode the response.", "status" => 500], 500);
         }
 
         return $result;
@@ -339,18 +357,19 @@ class Dispatcher implements LoggerAwareInterface {
      * @param Data $response The current response being dispatched.
      * @param RequestInterface $request The current request.
      */
-    private function addAccessControl(Data $response, RequestInterface $request) {
-        if (!$response->hasHeader('Access-Control-Allow-Origin') && $allowOrigin = $this->allowOrigin($request)) {
-            $response->setHeader('Access-Control-Allow-Origin', $allowOrigin);
+    private function addAccessControl(Data $response, RequestInterface $request)
+    {
+        if (!$response->hasHeader("Access-Control-Allow-Origin") && ($allowOrigin = $this->allowOrigin($request))) {
+            $response->setHeader("Access-Control-Allow-Origin", $allowOrigin);
 
-            if ($request->hasHeader('Access-Control-Request-Method')) {
-                $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+            if ($request->hasHeader("Access-Control-Request-Method")) {
+                $response->setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
             }
-            if ($request->hasHeader('Access-Control-Request-Headers')) {
-                $response->setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+            if ($request->hasHeader("Access-Control-Request-Headers")) {
+                $response->setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
             }
 
-            $response->setHeader('Access-Control-Max-Age', strtotime('1 hour'));
+            $response->setHeader("Access-Control-Max-Age", strtotime("1 hour"));
         }
     }
 
@@ -360,28 +379,32 @@ class Dispatcher implements LoggerAwareInterface {
      * @param RequestInterface $request The request to check.
      * @return string Returns a value valid for a **Access-Control-Allow-Origin** header or an empty string if the origin isn't allowed.
      */
-    private function allowOrigin(RequestInterface $request) {
-        $origin = $request->getHeader('Origin');
+    private function allowOrigin(RequestInterface $request)
+    {
+        $origin = $request->getHeader("Origin");
         if (empty($origin)) {
-            return '';
+            return "";
         }
         $host = parse_url($origin, PHP_URL_HOST);
         if (strcasecmp($host, $request->getHost()) === 0) {
             // Same origin, no need for header.
-            return '';
+            return "";
         }
-        $hostAndScheme = parse_url($origin, PHP_URL_SCHEME).'://'.$host;
+        $hostAndScheme = parse_url($origin, PHP_URL_SCHEME) . "://" . $host;
 
-        if ($this->allowedOrigins === '*') {
-            return '*';
+        if ($this->allowedOrigins === "*") {
+            return "*";
         } elseif (is_callable($this->allowedOrigins) && call_user_func($this->allowedOrigins, $origin)) {
             return $origin;
         } elseif (is_string($this->allowedOrigins) && in_array($this->allowedOrigins, [$host, $hostAndScheme], true)) {
             return $origin;
-        } elseif (is_array($this->allowedOrigins) && (in_array($host, $this->allowedOrigins) || in_array($hostAndScheme, $this->allowedOrigins))) {
+        } elseif (
+            is_array($this->allowedOrigins) &&
+            (in_array($host, $this->allowedOrigins) || in_array($hostAndScheme, $this->allowedOrigins))
+        ) {
             return $origin;
         }
-        return '';
+        return "";
     }
 
     /**
@@ -389,7 +412,8 @@ class Dispatcher implements LoggerAwareInterface {
      *
      * @return array|callable|string Returns the allowedOrigins.
      */
-    public function getAllowedOrigins() {
+    public function getAllowedOrigins()
+    {
         return $this->allowedOrigins;
     }
 
@@ -405,7 +429,8 @@ class Dispatcher implements LoggerAwareInterface {
      * @param array|callable|string $origins The allowed origins.
      * @return $this
      */
-    public function setAllowedOrigins($origins) {
+    public function setAllowedOrigins($origins)
+    {
         $this->allowedOrigins = $origins;
         return $this;
     }
@@ -420,7 +445,8 @@ class Dispatcher implements LoggerAwareInterface {
      * @param callable $core The core request handler (inner middleware).
      * @return Data Returns the response from the core handler passed through the middleware.
      */
-    public static function callMiddlewares(RequestInterface $request, array $middlewares, callable $core): Data {
+    public static function callMiddlewares(RequestInterface $request, array $middlewares, callable $core): Data
+    {
         $makeNext = function (array $middlewares, callable $core, int $index) use (&$makeNext): callable {
             if ($index >= count($middlewares)) {
                 return $core;
@@ -447,12 +473,13 @@ class Dispatcher implements LoggerAwareInterface {
      * @param RequestInterface $request The initial request.
      * @param Data $response The response data.
      */
-    public function render(RequestInterface $request, Data $response) {
-        $contentType = $response->getHeader('Content-Type', $request->getHeader('Accept'));
-        if (preg_match('`([a-z]+/[a-z0-9.-]+)`i', $contentType, $m)) {
+    public function render(RequestInterface $request, Data $response)
+    {
+        $contentType = $response->getHeader("Content-Type", $request->getHeader("Accept"));
+        if (preg_match("`([a-z]+/[a-z0-9.-]+)`i", $contentType, $m)) {
             $contentType = strtolower($m[1]);
         } else {
-            $contentType = 'application/json';
+            $contentType = "application/json";
         }
 
         // Check to see if there is a view handler.
@@ -503,7 +530,7 @@ class Dispatcher implements LoggerAwareInterface {
                     $value = $container->get($param->getClass()->getName());
                 } else {
                     $value = null;
-                    $missing[$lname] = '$'.$param->getName();
+                    $missing[$lname] = '$' . $param->getName();
                 }
             } elseif (isset($largs[$lname])) {
                 $value = $largs[$lname];
@@ -513,19 +540,22 @@ class Dispatcher implements LoggerAwareInterface {
                 $value = $param->getDefaultValue();
             } else {
                 $value = null;
-                $missing[$lname] = '$'.$param->getName();
+                $missing[$lname] = '$' . $param->getName();
             }
             $result[$param->getName()] = $value;
         }
 
         if ($throw && !empty($missing)) {
             if ($function instanceof \ReflectionMethod) {
-                $name = $function->getDeclaringClass()->getName().'::'.$function->getName();
+                $name = $function->getDeclaringClass()->getName() . "::" . $function->getName();
             } else {
                 $name = $function->getName();
             }
 
-            throw new \ReflectionException("$name() expects the following parameters: ".implode(', ', $missing).'.', 400);
+            throw new \ReflectionException(
+                "$name() expects the following parameters: " . implode(", ", $missing) . ".",
+                400
+            );
         }
 
         return $result;

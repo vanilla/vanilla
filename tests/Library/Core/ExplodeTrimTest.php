@@ -13,8 +13,8 @@ use Vanilla\Utility\ArrayUtils;
 /**
  * Tests for explodeTrim().
  */
-class ExplodeTrimTest extends TestCase {
-
+class ExplodeTrimTest extends TestCase
+{
     /**
      * Test {@link explodeTrim()} against several scenarios.
      *
@@ -24,7 +24,8 @@ class ExplodeTrimTest extends TestCase {
      * @param string|array $expected Expected result.
      * @dataProvider provideExplodeTrimArrays
      */
-    public function testExplodeTrim(string $testDelimiter, string $testString, bool $testImplode, $expected) {
+    public function testExplodeTrim(string $testDelimiter, string $testString, bool $testImplode, $expected)
+    {
         $actual = explodeTrim($testDelimiter, $testString, $testImplode);
         if (is_array($actual)) {
             $this->assertEqualsCanonicalizing($expected, $actual);
@@ -42,7 +43,8 @@ class ExplodeTrimTest extends TestCase {
      * @param string|array $expected Expected result.
      * @dataProvider provideExplodeTrimArrays
      */
-    public function testExplodeTrimMethod(string $delimiter, string $string, bool $implode, $expected) {
+    public function testExplodeTrimMethod(string $delimiter, string $string, bool $implode, $expected)
+    {
         $actual = ArrayUtils::explodeTrim($delimiter, $string);
         if ($implode) {
             $actual = implode($delimiter, $actual);
@@ -60,32 +62,33 @@ class ExplodeTrimTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideExplodeTrimArrays() {
+    public function provideExplodeTrimArrays()
+    {
         $r = [
-            'stringWithExtraSpacesExploded' => [
-                ' ',
-                'this is a  string  with some  extra        spaces',
+            "stringWithExtraSpacesExploded" => [
+                " ",
+                "this is a  string  with some  extra        spaces",
                 false,
-                ['this', 'is', 'a', 'string', 'with', 'some', 'extra', 'spaces'],
+                ["this", "is", "a", "string", "with", "some", "extra", "spaces"],
             ],
-            'stringWithExtraSpacesImploded' => [
-                ' ',
-                'this is a  string  with some  extra        spaces',
+            "stringWithExtraSpacesImploded" => [
+                " ",
+                "this is a  string  with some  extra        spaces",
                 true,
-                'this is a string with some extra spaces',
+                "this is a string with some extra spaces",
             ],
-            'stringWithFours' => [
-                '4',
-                'this4is4   a    4 string   4   split 4on44    4444fours',
+            "stringWithFours" => [
+                "4",
+                "this4is4   a    4 string   4   split 4on44    4444fours",
                 false,
-                ['this', 'is', 'a', 'string', 'split', 'on', 'fours'],
+                ["this", "is", "a", "string", "split", "on", "fours"],
             ],
-            'stringWithFoursImploded' => [
-                '4',
-                'this4is4   a    4 string   4   split 4on44    4444fours',
+            "stringWithFoursImploded" => [
+                "4",
+                "this4is4   a    4 string   4   split 4on44    4444fours",
                 true,
-                'this4is4a4string4split4on4fours',
-            ]
+                "this4is4a4string4split4on4fours",
+            ],
         ];
 
         return $r;

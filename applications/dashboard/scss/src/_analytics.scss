@@ -1,168 +1,166 @@
-
 // Vanilla Stats
 .toolbar-stats {
-  flex-wrap: wrap;
-  justify-content: space-between;
-
-  > * {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .toolbar-stats-slot {
-    margin-top: $spacer * 2;
-
-    @include media-breakpoint-down(md) {
-      margin-top: $spacer;
-    }
-  }
-
-  .toolbar-stats-date-picker {
-    display: flex;
     flex-wrap: wrap;
-    margin-top: $spacer;
-
-    @include media-breakpoint-down(md) {
-      margin-top: 0;
-    }
+    justify-content: space-between;
 
     > * {
-      margin-top: $spacer;
-      margin-left: auto;
-      margin-right: auto;
+        margin-left: auto;
+        margin-right: auto;
     }
 
-    .filter-date {
-      padding-left: $spacer / 2;
-      padding-right: $spacer / 2;
-      min-width: 210px + $spacer;
+    .toolbar-stats-slot {
+        margin-top: $spacer * 2;
 
-      &:after {
-        right: 9px + $spacer / 2;
-      }
+        @include media-breakpoint-down(md) {
+            margin-top: $spacer;
+        }
     }
-  }
+
+    .toolbar-stats-date-picker {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: $spacer;
+
+        @include media-breakpoint-down(md) {
+            margin-top: 0;
+        }
+
+        > * {
+            margin-top: $spacer;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .filter-date {
+            padding-left: $spacer * 0.5;
+            padding-right: $spacer * 0.5;
+            min-width: 210px + $spacer;
+
+            &:after {
+                right: 9px + $spacer * 0.5;
+            }
+        }
+    }
 }
-
 
 // Analytics
 .analytics-panel {
-  @include list-reset;
+    @include list-reset;
 }
 
 .analytics-widget {
-  position: relative;
+    position: relative;
 }
 
 //Options
 .analytics-widget-options {
-  position: absolute;
-  right: 0;
-  top: $spacer;
+    position: absolute;
+    right: 0;
+    top: $spacer;
 }
 
 .analytics-widget-header {
-  .title {
-    @extend h2;
-  }
+    .title {
+        @extend h2;
+    }
 }
 
 .analytics-widget-metric {
-  .analytics-widget-options {
-    right: $spacer / 2;
-    top: 0;
-  }
+    .analytics-widget-options {
+        right: $spacer * 0.5;
+        top: 0;
+    }
 }
 
 // Bookmark Icons
 .bookmark {
-  @extend .btn-icon;
-  @extend .btn-icon-sm;
+    @extend .btn-icon;
+    @extend .btn-icon-sm;
 }
 
 .bookmarked {
-  svg {
-    transform: rotate(30deg);
-  }
+    svg {
+        transform: rotate(30deg);
+    }
 }
 
 .analytics-widget-move {
-  margin-left: 10px;
-  cursor: move;
+    margin-left: 10px;
+    cursor: move;
 
-  &::before {
-    color: $grey;
-    @include icon;
-    @include char-content('\f1db');
-  }
+    &::before {
+        color: $grey;
+        @include icon;
+        @include char-content("\f1db");
+    }
 }
 
 .analytics-panel-metrics {
-  @include full-border;
-  @extend .nav-stats;
-  overflow: hidden;
+    @include full-border;
+    @extend .nav-stats;
+    overflow: hidden;
 
-  justify-content: center;
-  flex-wrap: wrap;
+    justify-content: center;
+    flex-wrap: wrap;
 
-  padding: ($spacer / 2) 0 $spacer;
+    padding: ($spacer * 0.5) 0 $spacer;
 
-  .metric-value {
-    text-align: center;
-    @extend .nav-stats-value;
-    color: $grey;
-  }
-
-  .metric-title {
-    text-align: center;
-    @extend .nav-stats-title;
-    color: $grey;
-  }
-
-  .analytics-widget-metric {
-    @extend .nav-stats-item;
-    padding: $spacer ($spacer * 2) !important;
-    margin-top: ($spacer / 2);
-    min-width: 180px;
-
-    &:last-child {
-      border-right: 0;
+    .metric-value {
+        text-align: center;
+        @extend .nav-stats-value;
+        color: $grey;
     }
-  }
 
-  &:empty {
-    display: none;
-  }
+    .metric-title {
+        text-align: center;
+        @extend .nav-stats-title;
+        color: $grey;
+    }
+
+    .analytics-widget-metric {
+        @extend .nav-stats-item;
+        padding: $spacer ($spacer * 2) !important;
+        margin-top: ($spacer * 0.5);
+        min-width: 180px;
+
+        &:last-child {
+            border-right: 0;
+        }
+    }
+
+    &:empty {
+        display: none;
+    }
 }
 
 .keen-spinner > div > div {
-  width: 5px !important;
-  height: 1px !important;
+    width: 5px !important;
+    height: 1px !important;
 }
 
 // Hide the toolbar filter button when the panel is visible
 .toolbar .filter-category {
-  display: none;
+    display: none;
 
-  svg {
-    transform: scale(.75);
-  }
+    svg {
+        transform: scale(0.75);
+    }
 }
 
 @include media-breakpoint-down(md) {
-  .toolbar .filter-category {
-    display: block;
-  }
+    .toolbar .filter-category {
+        display: block;
+    }
 }
 
 .table-summary-cell-position-change svg {
-  margin-top: -4px;
+    margin-top: -4px;
 
-  .rise & {
-    color: $brand-success;
-  }
+    .rise & {
+        color: $brand-success;
+    }
 
-  .fall & {
-    color: $brand-danger;
-  }
+    .fall & {
+        color: $brand-danger;
+    }
 }

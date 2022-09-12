@@ -1,14 +1,12 @@
 # Vanilla Theme Boilerplate
 
-
 ## Description
 
 Custom theme for Vanilla Theme Boilerplate.
 
-
 ## Notes
 
-- This theme needs the `Feature.NewFlyouts.Enabled` config set as `true` for the flyouts to work properly. 
+-   This theme needs the `Feature.NewFlyouts.Enabled` config set as `true` for the flyouts to work properly.
 
 ## Building Styles / Javascript / Images
 
@@ -25,7 +23,5 @@ vanilla build --watch
 ```
 
 to build your styles/js/images.
-
-
 
 Documentation for the CLI can be found [here](https://docs.vanillaforums.com/developer/vanilla-cli/#build-tools).

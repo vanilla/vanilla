@@ -22,8 +22,8 @@ use Vanilla\Utility\SchemaUtils;
 /**
  * Adapter class for using the search service in the legacy advanced search.
  */
-class LegacySearchAdapter {
-
+class LegacySearchAdapter
+{
     /** @var SearchService */
     private $searchService;
 
@@ -44,7 +44,12 @@ class LegacySearchAdapter {
      * @param \Gdn_Session $session
      * @param SiteSectionModel $siteSectionModel
      */
-    public function __construct(SearchService $searchService, \UserModel $userModel, \Gdn_Session $session, SiteSectionModel $siteSectionModel) {
+    public function __construct(
+        SearchService $searchService,
+        \UserModel $userModel,
+        \Gdn_Session $session,
+        SiteSectionModel $siteSectionModel
+    ) {
         $this->searchService = $searchService;
         $this->userModel = $userModel;
         $this->session = $session;
@@ -60,11 +65,12 @@ class LegacySearchAdapter {
      *
      * @return SearchResults
      */
-    public function search(array $advancedSearchQuery, int $offset, int $limit): SearchResults {
+    public function search(array $advancedSearchQuery, int $offset, int $limit): SearchResults
+    {
         $searchOptions = new SearchOptions($offset, $limit);
         $serviceQuery = $this->convertQuery($advancedSearchQuery);
         $results = $this->searchService->search($serviceQuery, $searchOptions);
-        $this->userModel->expandUsers($results, ['insertUser' => 'insertUserID']);
+        $this->userModel->expandUsers($results, ["insertUserID"]);
 
         return $results;
     }
@@ -76,73 +82,69 @@ class LegacySearchAdapter {
      *
      * @return array
      */
-    private function convertQuery(array $advQuery): array {
+    private function convertQuery(array $advQuery): array
+    {
         $caseInsensitiveQuery = [];
         foreach ($advQuery as $field => $value) {
             $caseInsensitiveQuery[strtolower($field)] = $value;
         }
         $advQuery = $caseInsensitiveQuery;
         $query = [
-            'locale' => $this->siteSectionModel->getCurrentSiteSection()->getContentLocale(),
+            "locale" => $this->siteSectionModel->getCurrentSiteSection()->getContentLocale(),
         ];
 
-        if ($search = $this->getValidField($advQuery, 'Search')
-            ?? $this->getValidField($advQuery, 'search')) {
-            $query['query'] = $search;
+        if ($search = $this->getValidField($advQuery, "Search") ?? $this->getValidField($advQuery, "search")) {
+            $query["query"] = $search;
         }
 
-
-        if ($title = $this->getValidField($advQuery, 'title')) {
-            $query['name'] = $title;
+        if ($title = $this->getValidField($advQuery, "title")) {
+            $query["name"] = $title;
         }
 
-        if ($author = $this->getValidField($advQuery, 'author')) {
-            $userNames = explode(',', $author);
-            $userNames = array_map('trim', $userNames);
-            $query['insertUserNames'] = $userNames;
+        if ($author = $this->getValidField($advQuery, "author")) {
+            $userNames = explode(",", $author);
+            $userNames = array_map("trim", $userNames);
+            $query["insertUserNames"] = $userNames;
         }
 
-        if ($tags = $this->getValidField($advQuery, 'tags')) {
-            $tags = explode(',', $tags);
-            $tags = array_map('trim', $tags);
-            $query['tags'] = $tags;
-            $query['tagOperator'] = 'and';
+        if ($tags = $this->getValidField($advQuery, "tags")) {
+            $tags = explode(",", $tags);
+            $tags = array_map("trim", $tags);
+            $query["tags"] = $tags;
+            $query["tagOperator"] = "and";
         }
 
-        $query = array_merge(
-            $query,
-            $this->extractTypesQueries($advQuery),
-            $this->extractDateQueries($advQuery)
-        );
-        $queryCategoryID = $this->getValidField($advQuery, 'categoryid') ?? null;
-        $rawCat = $this->getValidField($advQuery, 'cat') ?? $queryCategoryID ?? 'all';
-        $query['includeArchivedCategories'] = (bool)($this->getValidField($advQuery, 'archived') ?? false);
-        $query['followedCategories'] = (bool)($this->getValidField($advQuery, 'followedcats') ?? false);
+        $query = array_merge($query, $this->extractTypesQueries($advQuery), $this->extractDateQueries($advQuery));
+        $queryCategoryID = $this->getValidField($advQuery, "categoryid") ?? null;
+        $rawCat = $this->getValidField($advQuery, "cat") ?? ($queryCategoryID ?? "all");
+        $query["includeArchivedCategories"] = (bool) ($this->getValidField($advQuery, "archived") ?? false);
+        $query["followedCategories"] = (bool) ($this->getValidField($advQuery, "followedcats") ?? false);
         if (is_numeric($rawCat)) {
             // If we have some categoryID to filter on apply categoryIDs.
             // Otherwise apply the defaults.
             $categoryID = (int) $rawCat;
-            $subcats = (bool)($this->getValidField($advQuery, 'subcats') ?? true);
-            $query['categoryID'] = $categoryID;
-            $query['includeChildCategories'] = $subcats;
-        } elseif ($rawCat !== 'all') {
+            $subcats = (bool) ($this->getValidField($advQuery, "subcats") ?? true);
+            $query["categoryID"] = $categoryID;
+            $query["includeChildCategories"] = $subcats;
+        } elseif ($rawCat !== "all") {
             // Fallback to a default using our current siteSection.
-            $contextualCategoryID = $this->siteSectionModel->getCurrentSiteSection()->getAttributes()['CategoryID'] ?? null;
+            $contextualCategoryID =
+                $this->siteSectionModel->getCurrentSiteSection()->getAttributes()["CategoryID"] ?? null;
             if (is_int($contextualCategoryID) && $contextualCategoryID > 0) {
                 // we have some contextual categoryID to apply.
-                $query['categoryID'] = $contextualCategoryID;
-                $query['includeChildCategories'] = true;
+                $query["categoryID"] = $contextualCategoryID;
+                $query["includeChildCategories"] = true;
             }
         }
 
-        if ($discussionID = $this->getValidField($advQuery, 'discussionid')) {
-            $query['discussionID'] = $discussionID;
-            $query['recordTypes'] = ['discussion', 'comment'];
-            unset($query['types']);
-        } elseif ($this->getValidField($advQuery, 'nocollapse')) {
-            $query['collapse'] = false;
+        if ($discussionID = $this->getValidField($advQuery, "discussionid")) {
+            $query["discussionID"] = $discussionID;
+            $query["recordTypes"] = ["discussion", "comment"];
+            unset($query["types"]);
+        } elseif ($this->getValidField($advQuery, "nocollapse")) {
+            $query["collapse"] = false;
         } else {
-            $query['collapse'] = true;
+            $query["collapse"] = true;
         }
 
         return $query;
@@ -157,7 +159,8 @@ class LegacySearchAdapter {
      *
      * @return mixed
      */
-    private function getValidField(array $advQuery, string $field) {
+    private function getValidField(array $advQuery, string $field)
+    {
         $field = strtolower($field);
         $field = $advQuery[$field] ?? null;
         return !empty($field) ? $field : null;
@@ -169,14 +172,15 @@ class LegacySearchAdapter {
      * @param array $advQuery
      * @return array
      */
-    private function extractDateQueries(array $advQuery): array {
-        $date = $this->getValidField($advQuery, 'date');
-        $within = $this->getValidField($advQuery, 'within');
+    private function extractDateQueries(array $advQuery): array
+    {
+        $date = $this->getValidField($advQuery, "date");
+        $within = $this->getValidField($advQuery, "within");
         if (!$date) {
             return [];
         }
 
-        $timestamp = strtotime($advQuery['date']);
+        $timestamp = strtotime($advQuery["date"]);
         if (!$timestamp) {
             return [];
         }
@@ -184,18 +188,18 @@ class LegacySearchAdapter {
         $timestamp -= $this->session->hourOffset() * TimeUnit::ONE_HOUR;
 
         if ($within !== null) {
-            $timestampStart = strtotime('-' . $within, $timestamp);
-            $timestampEnd =  strtotime('+' . $within, $timestamp);
+            $timestampStart = strtotime("-" . $within, $timestamp);
+            $timestampEnd = strtotime("+" . $within, $timestamp);
         } else {
             $timestampStart = $timestamp;
-            $timestampEnd = strtotime('+1 day', $timestamp);
+            $timestampEnd = strtotime("+1 day", $timestamp);
         }
 
         $start = DateTimeFormatter::timeStampToDateTime($timestampStart);
         $end = DateTimeFormatter::timeStampToDateTime($timestampEnd);
 
         return [
-            'dateInserted' => "[$start,$end]",
+            "dateInserted" => "[$start,$end]",
         ];
     }
 
@@ -205,11 +209,12 @@ class LegacySearchAdapter {
      * @param array $advQuery
      * @return array
      */
-    private function extractTypesQueries(array $advQuery): array {
+    private function extractTypesQueries(array $advQuery): array
+    {
         $types = [];
         $recordTypes = [];
         foreach ($advQuery as $field => $value) {
-            if (str_contains($field, '_') && $value === "1" || $value === 1 || $value === true) {
+            if ((str_contains($field, "_") && $value === "1") || $value === 1 || $value === true) {
                 // Likely a type query.
                 $pieces = explode("_", $field);
                 if (count($pieces) === 2) {
@@ -230,11 +235,11 @@ class LegacySearchAdapter {
 
         $result = [];
         if (!empty($types)) {
-            $result['types'] = $types;
+            $result["types"] = $types;
         }
 
         if (!empty($recordTypes)) {
-            $result['recordTypes'] = $recordTypes;
+            $result["recordTypes"] = $recordTypes;
         }
         return $result;
     }
@@ -244,7 +249,8 @@ class LegacySearchAdapter {
      *
      * @return bool
      */
-    public function supportsAutoComplete(): bool {
+    public function supportsAutoComplete(): bool
+    {
         return !is_a($this->searchService->getActiveDriver(), MysqlSearchDriver::class);
     }
 }

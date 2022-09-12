@@ -9,6 +9,8 @@ import { PublishStatus } from "@library/@types/api/core";
 import { IUserFragment, IUser } from "@library/@types/api/users";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
+import { ImageSourceSet } from "@library/utility/appUtils";
 
 export interface ISearchSource {
     /** Key used to identify the search source */
@@ -71,6 +73,7 @@ export interface ISearchResult {
     image?: {
         url: string;
         alt: string;
+        urlSrcSet?: ImageSourceSet;
     };
     dateUpdated: string | null;
     dateInserted: string;
@@ -81,7 +84,7 @@ export interface ISearchResult {
     userInfo?: IUser;
     counts?: ICountResult[];
     isForeign?: boolean;
-    discussionID?: number;
+    discussionID?: IDiscussion["discussionID"];
     subqueryMatchCount?: number;
     subqueryExtraParams?: Record<string, any>;
     searchScore?: number;

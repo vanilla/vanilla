@@ -25,10 +25,11 @@ use Vanilla\Utility\CapitalCaseScheme;
 /**
  * Class SSOModel
  */
-class SSOModel {
-    const IDENTIFIER_TYPE_EMAIL = 'email';
-    const IDENTIFIER_TYPE_ID = 'userID';
-    const IDENTIFIER_TYPE_NAME = 'name';
+class SSOModel
+{
+    const IDENTIFIER_TYPE_EMAIL = "email";
+    const IDENTIFIER_TYPE_ID = "userID";
+    const IDENTIFIER_TYPE_NAME = "name";
 
     /** @var AuthenticatorModel */
     private $authenticatorModel;
@@ -96,65 +97,53 @@ class SSOModel {
      * @throws \Garden\Container\NotFoundException
      * @throws \Garden\Web\Exception\NotFoundException
      */
-    public function createUser(SSOData $ssoData, $options = []) {
+    public function createUser(SSOData $ssoData, $options = [])
+    {
         // Clear userModel validation results..
         $this->userModel->Validation->reset();
 
         $ssoAuthenticator = $this->getSSOAuthenticator($ssoData);
 
         // Used to know if registration should set email as verified or not.
-        $userSuppliedEmail = ($options['email'] ?? null) !== null;
+        $userSuppliedEmail = ($options["email"] ?? null) !== null;
 
-
-        if ($options['useSSOData'] ?? true) {
-            $email = $ssoData->getUserValue('email');
-            $name = $ssoData->getUserValue('name');
+        if ($options["useSSOData"] ?? true) {
+            $email = $ssoData->getUserValue("email");
+            $name = $ssoData->getUserValue("name");
         } else {
             $email = null;
             $name = null;
         }
 
-        $email = $options['email'] ?? $email;
-        $name = $options['name'] ?? $name;
+        $email = $options["email"] ?? $email;
+        $name = $options["name"] ?? $name;
 
         $validation = new Validation();
 
         if (!$name) {
-            $validation->addError(
-                'name',
-                'Username is required.',
-                ['status' => 400]
-            );
-        } else if (!validateUsername($name)) {
-            $validation->addError(
-                'name',
-                'Username is not valid.',
-                ['status' => 422]
-            );
+            $validation->addError("name", "Username is required.", ["status" => 400]);
+        } elseif (!validateUsername($name)) {
+            $validation->addError("name", "Username is not valid.", ["status" => 422]);
         }
 
-        if (!$this->config->get('Garden.Registration.NoEmail') && !$email) {
-            $validation->addError(
-                'email',
-                'Email is required.',
-                ['status' => 400]
-            );
+        if (!$this->config->get("Garden.Registration.NoEmail") && !$email) {
+            $validation->addError("email", "Email is required.", ["status" => 400]);
         }
 
         if (!$validation->getErrors()) {
             $userInfo = [
-                'Name' => $name,
-                'Email' => $email,
-                'Password' => betterRandomString('32', 'Aa0!'),
-                'HashMethod' => 'Random',
+                "Name" => $name,
+                "Email" => $email,
+                "Password" => betterRandomString("32", "Aa0!"),
+                "HashMethod" => "Random",
             ];
 
             $emailFromTrustedProvider = !$userSuppliedEmail && $ssoAuthenticator->isTrusted();
 
             $userID = $this->userModel->save($userInfo, [
-                'NoConfirmEmail' => $emailFromTrustedProvider,
-                'ValidateEmail' => !$emailFromTrustedProvider,
-                'FixUnique' => true,
+                "NoConfirmEmail" => $emailFromTrustedProvider,
+                "ValidateEmail" => !$emailFromTrustedProvider,
+                "FixUnique" => true,
             ]);
 
             if (!$userID) {
@@ -162,29 +151,23 @@ class SSOModel {
                 $validationResults = $this->userModel->validationResults();
 
                 $mapping = [
-                    'The name you entered is already in use by another member.' => [
-                        'code' => 'The username is taken.',
-                        'status' => '422',
+                    "The name you entered is already in use by another member." => [
+                        "code" => "The username is taken.",
+                        "status" => "422",
                     ],
-                    'The email you entered is in use by another member.' => [
-                        'code' => 'The email is taken.',
-                        'status' => '422',
+                    "The email you entered is in use by another member." => [
+                        "code" => "The email is taken.",
+                        "status" => "422",
                     ],
                 ];
 
                 foreach ($validationResults as $field => $errors) {
                     $field = lcfirst($field);
                     foreach ($errors as $error) {
-                        $validation->addError(
-                            $field,
-                            $mapping[$error]['code'] ?? $error,
-                            [
-                                'status' => $mapping[$error]['status'] ?? 400,
-                            ]
-                        );
+                        $validation->addError($field, $mapping[$error]["code"] ?? $error, [
+                            "status" => $mapping[$error]["status"] ?? 400,
+                        ]);
                     }
-
-
                 }
             } else {
                 return $this->linkUser($ssoData, $userID);
@@ -208,42 +191,39 @@ class SSOModel {
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
      */
-    public function linkUserFromCredentials(SSOData $ssoData, $identifierType, $identifier, $password) {
-        if (!$this->config->get('Garden.Registration.AllowConnect', true)) {
-            throw new ServerException('Liking user is not allowed.');
+    public function linkUserFromCredentials(SSOData $ssoData, $identifierType, $identifier, $password)
+    {
+        if (!$this->config->get("Garden.Registration.AllowConnect", true)) {
+            throw new ServerException("Liking user is not allowed.");
         }
 
         if (!isset($password)) {
-            throw new ClientException('Password is required');
+            throw new ClientException("Password is required");
         }
 
         if ($identifierType === self::IDENTIFIER_TYPE_ID) {
             $user = $this->getUserById($identifier);
-        } else if ($identifierType === self::IDENTIFIER_TYPE_EMAIL) {
+        } elseif ($identifierType === self::IDENTIFIER_TYPE_EMAIL) {
             $user = $this->getUserByEmail($identifier);
-        } else if ($identifierType === self::IDENTIFIER_TYPE_NAME) {
+        } elseif ($identifierType === self::IDENTIFIER_TYPE_NAME) {
             $user = $this->getUserByName($identifier);
         } else {
-            throw new ServerException('Invalid identifier type "'.$identifierType.'".');
+            throw new ServerException('Invalid identifier type "' . $identifierType . '".');
         }
 
         try {
-            $passwordValid = $this->passwordHash->checkPassword($password, $user['Password'], $user['HashMethod']);
+            $passwordValid = $this->passwordHash->checkPassword($password, $user["Password"], $user["HashMethod"]);
         } catch (Exception $exception) {
             $validation = new Validation();
-            $validation->addError(
-                'password',
-                $exception->getMessage(),
-                ['status' => 400]
-            );
+            $validation->addError("password", $exception->getMessage(), ["status" => 400]);
             throw new ValidationException($validation);
         }
 
         if (!$passwordValid) {
-            throw new ClientException('The password validation failed.');
+            throw new ClientException("The password validation failed.");
         }
 
-        return $this->linkUser($ssoData, $user['UserID']);
+        return $this->linkUser($ssoData, $user["UserID"]);
     }
 
     /**
@@ -256,13 +236,14 @@ class SSOModel {
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
      */
-    public function linkUserFromSession(SSOData $ssoData) {
-        if (!$this->config->get('Garden.Registration.AllowConnect', true)) {
-            throw new ServerException('Liking user is not allowed.');
+    public function linkUserFromSession(SSOData $ssoData)
+    {
+        if (!$this->config->get("Garden.Registration.AllowConnect", true)) {
+            throw new ServerException("Liking user is not allowed.");
         }
 
         if (!$this->session->isValid()) {
-            throw new ForbiddenException('Cannot link user from session while not signed in.');
+            throw new ForbiddenException("Cannot link user from session while not signed in.");
         }
 
         return $this->linkUser($ssoData, $this->session->UserID);
@@ -278,17 +259,18 @@ class SSOModel {
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
      */
-    protected function linkUser(SSOData $ssoData, $userID) {
-        if (!$this->config->get('Garden.Registration.AllowConnect', true)) {
-            throw new ServerException('Liking user is not allowed.');
+    protected function linkUser(SSOData $ssoData, $userID)
+    {
+        if (!$this->config->get("Garden.Registration.AllowConnect", true)) {
+            throw new ServerException("Liking user is not allowed.");
         }
 
         $user = $this->getUserById($userID);
 
         $this->userModel->saveAuthentication([
-            'UserID' => $userID,
-            'Provider' => $ssoData->getAuthenticatorID(),
-            'UniqueID' => $ssoData->getUniqueID(),
+            "UserID" => $userID,
+            "Provider" => $ssoData->getAuthenticatorID(),
+            "UniqueID" => $ssoData->getUniqueID(),
         ]);
 
         return $user;
@@ -302,11 +284,12 @@ class SSOModel {
      * @return array
      * @throws \Garden\Web\Exception\NotFoundException
      */
-    protected function getLinkedUser(SSOData $ssoData) {
+    protected function getLinkedUser(SSOData $ssoData)
+    {
         $data = $this->userModel->getAuthentication($ssoData->getUniqueID(), $ssoData->getAuthenticatorID());
 
         if (!$data) {
-            throw new NotFoundException('UserLink');
+            throw new NotFoundException("UserLink");
         }
 
         return $data;
@@ -322,27 +305,28 @@ class SSOModel {
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
      */
-    protected function getUserByEmail($email) {
+    protected function getUserByEmail($email)
+    {
         // Allows registration without an email address.
-        $noEmail = $this->config->get('Garden.Registration.NoEmail', false);
+        $noEmail = $this->config->get("Garden.Registration.NoEmail", false);
 
         // Specifies whether Emails are unique or not.
-        $emailUnique = !$noEmail && $this->config->get('Garden.Registration.EmailUnique', true);
+        $emailUnique = !$noEmail && $this->config->get("Garden.Registration.EmailUnique", true);
 
         if (!$emailUnique) {
-            throw new ClientException('Cannot get user by email due to current configurations.');
+            throw new ClientException("Cannot get user by email due to current configurations.");
         }
 
         if (!$email) {
-            throw new ClientException('Email is required.');
+            throw new ClientException("Email is required.");
         }
 
-        $results = $this->userModel->getWhere(['Email' => $email])->resultArray();
+        $results = $this->userModel->getWhere(["Email" => $email])->resultArray();
 
         if (!$results) {
-            throw new NotFoundException('User');
-        } else if (count($results) > 1) {
-            throw new ServerException('Multiple users found with the same email.');
+            throw new NotFoundException("User");
+        } elseif (count($results) > 1) {
+            throw new ServerException("Multiple users found with the same email.");
         }
 
         return reset($results);
@@ -358,21 +342,22 @@ class SSOModel {
      * @throws \Garden\Web\Exception\NotFoundException
      * @throws \Garden\Web\Exception\ServerException
      */
-    protected function getUserByName($name) {
-        if (!$this->config->get('Garden.Registration.NameUnique', true)) {
-            throw new ClientException('Cannot get user by name due to current configurations.');
+    protected function getUserByName($name)
+    {
+        if (!$this->config->get("Garden.Registration.NameUnique", true)) {
+            throw new ClientException("Cannot get user by name due to current configurations.");
         }
 
-        if (!isset($name) || $name === '') {
-            throw new ClientException('Name is required.');
+        if (!isset($name) || $name === "") {
+            throw new ClientException("Name is required.");
         }
 
-        $results = $this->userModel->getWhere(['Name' => $name])->resultArray();
+        $results = $this->userModel->getWhere(["Name" => $name])->resultArray();
 
         if (!$results) {
-            throw new NotFoundException('User');
-        } else if (count($results) > 1) {
-            throw new ServerException('Multiple users found with the same name.');
+            throw new NotFoundException("User");
+        } elseif (count($results) > 1) {
+            throw new ServerException("Multiple users found with the same name.");
         }
 
         return reset($results);
@@ -386,11 +371,12 @@ class SSOModel {
      * @return array
      * @throws \Garden\Web\Exception\NotFoundException
      */
-    protected function getUserByID($userID) {
+    protected function getUserByID($userID)
+    {
         $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
 
         if (!$user) {
-            throw new NotFoundException('User');
+            throw new NotFoundException("User");
         }
 
         return $user;
@@ -413,7 +399,8 @@ class SSOModel {
      * @throws \Garden\Container\NotFoundException
      * @throws \Garden\Web\Exception\NotFoundException
      */
-    public function sso(SSOData $ssoData, $options = []) {
+    public function sso(SSOData $ssoData, $options = [])
+    {
         // Clear userModel validation results..
         $this->userModel->Validation->reset();
 
@@ -421,46 +408,53 @@ class SSOModel {
         $ssoData->validate();
 
         /** @var SSOAuthenticator $ssoAuthenticator */
-        $ssoAuthenticator = $this->authenticatorModel->getAuthenticator($ssoData->getAuthenticatorType(), $ssoData->getAuthenticatorID());
+        $ssoAuthenticator = $this->authenticatorModel->getAuthenticator(
+            $ssoData->getAuthenticatorType(),
+            $ssoData->getAuthenticatorID()
+        );
         if (!is_a($ssoAuthenticator, SSOAuthenticator::class)) {
-            throw new ServerException('Expected an SSOAuthenticator');
+            throw new ServerException("Expected an SSOAuthenticator");
         }
 
         $user = false;
         try {
             $user = $this->getLinkedUser($ssoData);
-        } catch (Exception $e) {}
+        } catch (Exception $e) {
+        }
 
         if (!$user) {
             // Allows SSO connections to link a VanillaUser to a ForeignUser.
-            $allowConnect = $this->config->get('Garden.Registration.AllowConnect', true);
+            $allowConnect = $this->config->get("Garden.Registration.AllowConnect", true);
 
             // We want to link to the currently logged user.
-            if ($options['linkToSession'] ?? false) {
+            if ($options["linkToSession"] ?? false) {
                 if (!$this->session->isValid()) {
-                    throw new ClientException('Cannot link user to session while not signed in.', 401);
+                    throw new ClientException("Cannot link user to session while not signed in.", 401);
                 }
                 if (!$allowConnect) {
-                    throw new ForbiddenException('This site is not configured to allow user linking.');
+                    throw new ForbiddenException("This site is not configured to allow user linking.");
                 }
             }
 
             // Allows registration without an email address.
-            $noEmail = $this->config->get('Garden.Registration.NoEmail', false);
+            $noEmail = $this->config->get("Garden.Registration.NoEmail", false);
 
             // Specifies whether Emails are unique or not.
-            $emailUnique = !$noEmail && $this->config->get('Garden.Registration.EmailUnique', true);
+            $emailUnique = !$noEmail && $this->config->get("Garden.Registration.EmailUnique", true);
 
             // Will automatically try to link users using the provided Email address if the Provider is "Trusted".
             $autoConnect = $emailUnique && $allowConnect && $ssoAuthenticator->canAutoLinkUser();
 
             // Let's try to find a matching user.
             if ($autoConnect) {
-                $user = $this->getUserByEmail($ssoData->getUserValue('email'));
+                $user = $this->getUserByEmail($ssoData->getUserValue("email"));
 
                 // Make sure that the user isn't already linked to another ID.
                 if ($user) {
-                    $result = $this->userModel->getAuthenticationByUser($user['UserID'], $ssoData->getAuthenticatorID());
+                    $result = $this->userModel->getAuthenticationByUser(
+                        $user["UserID"],
+                        $ssoData->getAuthenticatorID()
+                    );
                     if ($result) {
                         // TODO: We should probably add some sort of warning about this.
                         $user = false;
@@ -472,41 +466,42 @@ class SSOModel {
             if (!$user) {
                 try {
                     $user = $this->createUser($ssoData);
-                } catch(Exception $e) {}
+                } catch (Exception $e) {
+                }
             }
 
             // Yay!
             if ($user !== false) {
                 $this->userModel->saveAuthentication([
-                    'UserID' => $user['UserID'],
-                    'Provider' => $ssoData->getAuthenticatorID(),
-                    'UniqueID' => $ssoData->getUniqueID(),
+                    "UserID" => $user["UserID"],
+                    "Provider" => $ssoData->getAuthenticatorID(),
+                    "UniqueID" => $ssoData->getUniqueID(),
                 ]);
             }
         }
 
         if ($user) {
-            $this->session->start($user['UserID'], $options['setCookie'] ?? true, $options['persistCookie'] ?? false);
-            $this->userModel->fireEvent('AfterSignIn');
+            $this->session->start($user["UserID"], $options["setCookie"] ?? true, $options["persistCookie"] ?? false);
+            $this->userModel->fireEvent("AfterSignIn");
 
             if (!$this->session->isValid()) {
-                throw new ClientException('The session could not be started.', 401);
+                throw new ClientException("The session could not be started.", 401);
             }
 
             // Allow user's synchronization
-            $syncInfo = $this->config->get('Garden.Registration.ConnectSynchronize', true);
+            $syncInfo = $this->config->get("Garden.Registration.ConnectSynchronize", true);
 
             if ($syncInfo) {
                 // Synchronize user's roles.
-                $syncRoles = $this->config->get('Garden.SSO.SyncRoles', false);
+                $syncRoles = $this->config->get("Garden.SSO.SyncRoles", false);
 
                 // Override $syncRoles if the authenticator is trusted.
                 if ($ssoAuthenticator->isTrusted()) {
                     // Synchronize user's roles only on registration.
-                    $syncRolesOnlyRegistration = $this->config->get('Garden.SSO.SyncRolesOnRegistrationOnly', false);
+                    $syncRolesOnlyRegistration = $this->config->get("Garden.SSO.SyncRolesOnRegistrationOnly", false);
 
                     // This coupling (connectOption put in $ssoData) sucks but I feel like that's the best way to accommodate the config!
-                    if ($syncRolesOnlyRegistration && val('connectOption', $ssoData) !== 'createuser') {
+                    if ($syncRolesOnlyRegistration && val("connectOption", $ssoData) !== "createuser") {
                         $syncRoles = false;
                     } else {
                         $syncRoles = true;
@@ -514,13 +509,9 @@ class SSOModel {
                 }
 
                 if (!$this->syncUser($ssoData, $user, $syncInfo, $syncRoles)) {
-                    throw new ServerException(
-                        "User synchronization failed",
-                        500,
-                        [
-                            'validationResults' => $this->userModel->validationResults()
-                        ]
-                    );
+                    throw new ServerException("User synchronization failed", 500, [
+                        "validationResults" => $this->userModel->validationResults(),
+                    ]);
                 }
             }
         } else {
@@ -541,26 +532,27 @@ class SSOModel {
      * @return bool If the synchronisation was a success ot not.
      * @throws \Garden\Web\Exception\ServerException
      */
-    private function syncUser(SSOData $ssoData, $user, $syncInfo, $syncRoles) {
+    private function syncUser(SSOData $ssoData, $user, $syncInfo, $syncRoles)
+    {
         if (!$syncInfo && !$syncRoles) {
             return true;
         }
 
         $userInfo = [
-            'UserID' => $user['UserID']
+            "UserID" => $user["UserID"],
         ];
 
         if ($syncInfo) {
             $userInfo = array_merge($this->capitalCaseScheme->convertArrayKeys($ssoData->getUser()), $userInfo);
 
             // Don't overwrite the user photo if the user uploaded a new one.
-            $photo = val('Photo', $user);
-            if (!val('Photo', $userInfo) || ($photo && !isUrl($photo))) {
-                unset($userInfo['Photo']);
+            $photo = val("Photo", $user);
+            if (!val("Photo", $userInfo) || ($photo && !isUrl($photo))) {
+                unset($userInfo["Photo"]);
             }
         }
 
-        $ssoDataRole = $ssoData->getUserValue('roles');
+        $ssoDataRole = $ssoData->getUserValue("roles");
         $saveRoles = $syncRoles && $ssoDataRole !== null;
         if ($saveRoles) {
             if (!empty($ssoDataRole)) {
@@ -573,20 +565,20 @@ class SSOModel {
                 try {
                     $roleIDs = $this->userModel->newUserRoleIDs();
                 } catch (Exception $e) {
-                    throw new ServerException('Unable to synchronize user info.');
+                    throw new ServerException("Unable to synchronize user info.");
                 }
             }
 
-            $userInfo['RoleID'] = $roleIDs;
+            $userInfo["RoleID"] = $roleIDs;
         }
 
         $userID = $this->userModel->save($userInfo, [
-            'NoConfirmEmail' => true,
-            'FixUnique' => true,
-            'SaveRoles' => $saveRoles,
+            "NoConfirmEmail" => true,
+            "FixUnique" => true,
+            "SaveRoles" => $saveRoles,
         ]);
 
-        $this->eventManager->fireArray('afterUserSync', [$userID, $ssoData->getUser(), $ssoData->getExtra()]);
+        $this->eventManager->fireArray("afterUserSync", [$userID, $ssoData->getUser(), $ssoData->getExtra()]);
 
         return $userID !== false;
     }
@@ -603,14 +595,18 @@ class SSOModel {
      * @throws \Garden\Container\NotFoundException
      * @throws \Garden\Web\Exception\NotFoundException
      */
-    protected function getSSOAuthenticator(SSOData $ssoData) {
-        $ssoAuthenticator = $this->authenticatorModel->getAuthenticator($ssoData->getAuthenticatorType(), $ssoData->getAuthenticatorID());
+    protected function getSSOAuthenticator(SSOData $ssoData)
+    {
+        $ssoAuthenticator = $this->authenticatorModel->getAuthenticator(
+            $ssoData->getAuthenticatorType(),
+            $ssoData->getAuthenticatorID()
+        );
         if (!is_a($ssoAuthenticator, SSOAuthenticator::class)) {
-            throw new ServerException('Expected an SSOAuthenticator');
+            throw new ServerException("Expected an SSOAuthenticator");
         }
 
         if (!$ssoAuthenticator->isActive()) {
-            throw new ClientException('Authenticator is not active.', 422);
+            throw new ClientException("Authenticator is not active.", 422);
         }
 
         return $ssoAuthenticator;

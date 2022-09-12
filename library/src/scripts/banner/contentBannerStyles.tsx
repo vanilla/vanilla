@@ -95,9 +95,9 @@ export const contentBannerVariables = useThemeCache(
     },
 );
 
-export const contentBannerClasses = useThemeCache((options?: { debug?: boolean | string }) => {
-    const vars = contentBannerVariables();
-    const classes = bannerClasses(vars);
+export const contentBannerClasses = useThemeCache((optionOverrides?: Partial<IBannerOptions>) => {
+    const vars = contentBannerVariables(optionOverrides);
+    const classes = bannerClasses(vars, optionOverrides);
     return {
         ...classes,
         textAndSearchContainer: cx(

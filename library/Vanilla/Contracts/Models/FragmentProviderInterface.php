@@ -10,7 +10,8 @@ namespace Vanilla\Contracts\Models;
 /**
  * Interface representing a generic fragment provider.
  */
-interface FragmentProviderInterface {
+interface FragmentProviderInterface
+{
     /**
      * Get a single fragment by it's ID.
      *

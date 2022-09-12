@@ -12,8 +12,8 @@ use Garden\Web\Data;
 /**
  * Implement this to decorate a trackable record.
  */
-interface TrackableDecoratorInterface {
-
+interface TrackableDecoratorInterface
+{
     /**
      * Implement this method to decorate a trackable record.
      *

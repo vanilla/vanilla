@@ -12,10 +12,15 @@ use Garden\EventHandlersInterface;
 /**
  * Data class for holding special classes for intializing an addon.
  */
-final class AddonSpecialClasses {
-
+final class AddonSpecialClasses
+{
     private const SPECIAL_NAMESPACE_PREFIX = "Addon\\";
-    private const DATA_KEYS = ['structureClasses', 'containerRulesClasses', 'addonConfigurationClasses', 'eventHandlersClasses'];
+    private const DATA_KEYS = [
+        "structureClasses",
+        "containerRulesClasses",
+        "addonConfigurationClasses",
+        "eventHandlersClasses",
+    ];
 
     /** @var array<class-string<AddonStructure>> */
     private $structureClasses = [];
@@ -34,7 +39,8 @@ final class AddonSpecialClasses {
      *
      * @param array $data An array of the data properties of the instance.
      */
-    private function __construct(array $data = []) {
+    private function __construct(array $data = [])
+    {
         foreach (self::DATA_KEYS as $key) {
             $this->{$key} = $data[$key] ?? [];
         }
@@ -52,13 +58,14 @@ final class AddonSpecialClasses {
      *
      * @return AddonSpecialClasses
      */
-    public static function fromAddon(Addon $addon): AddonSpecialClasses {
+    public static function fromAddon(Addon $addon): AddonSpecialClasses
+    {
         $classCollections = $addon->getClasses();
         $instance = new AddonSpecialClasses();
         foreach ($classCollections as $classes) {
             foreach ($classes as $class) {
                 // Easy bailout.
-                if (!str_ends_with($class['namespace'] ?? '', self::SPECIAL_NAMESPACE_PREFIX)) {
+                if (!str_ends_with($class["namespace"] ?? "", self::SPECIAL_NAMESPACE_PREFIX)) {
                     // We only care about these specific classes.
                     continue;
                 }
@@ -66,13 +73,13 @@ final class AddonSpecialClasses {
                 // These classes in this special namespace really shouldn't have any side effects.
                 // We need them to be loaded so that we can do checks against them.
                 try {
-                    require_once $addon->path($class['path']);
+                    require_once $addon->path($class["path"]);
                 } catch (\Throwable $throwable) {
                     trigger_error($throwable->getMessage(), E_USER_WARNING);
                 }
 
                 try {
-                    $fullClassName = $class['namespace'].$class['className'];
+                    $fullClassName = $class["namespace"] . $class["className"];
                     if (is_a($fullClassName, AddonContainerRules::class, true)) {
                         $instance->containerRulesClasses[] = $fullClassName;
                     } elseif (is_a($fullClassName, AddonConfigurationDefaults::class, true)) {
@@ -86,7 +93,10 @@ final class AddonSpecialClasses {
                     // Catch any errors that might occur during autoloading.
                     // We don't want our scanning to blow up the site before the cache is built.
                     // If there is an invalid class in some corner just log it and proceed.
-                    trigger_error("Error while scanning class: `{$fullClassName}`.\n" . formatException($e), E_USER_WARNING);
+                    trigger_error(
+                        "Error while scanning class: `{$fullClassName}`.\n" . formatException($e),
+                        E_USER_WARNING
+                    );
                     continue;
                 }
             }
@@ -101,35 +111,40 @@ final class AddonSpecialClasses {
      * @param array $array The array to load.
      * @return AddonSpecialClasses Returns a new definition with the properties from {@link $array}.
      */
-    public static function __set_state(array $array): AddonSpecialClasses {
+    public static function __set_state(array $array): AddonSpecialClasses
+    {
         return new AddonSpecialClasses($array);
     }
 
     /**
      * @return array<class-string<AddonStructure>>
      */
-    public function getStructureClasses(): array {
+    public function getStructureClasses(): array
+    {
         return $this->structureClasses;
     }
 
     /**
      * @return array<class-string<AddonContainerRules>>
      */
-    public function getContainerRulesClasses(): array {
+    public function getContainerRulesClasses(): array
+    {
         return $this->containerRulesClasses;
     }
 
     /**
      * @return array<class-string<AddonConfigurationDefaults>>
      */
-    public function getAddonConfigurationClasses(): array {
+    public function getAddonConfigurationClasses(): array
+    {
         return $this->addonConfigurationClasses;
     }
 
     /**
      * @return array<class-string<EventHandlersInterface>>
      */
-    public function getEventHandlersClasses(): array {
+    public function getEventHandlersClasses(): array
+    {
         return $this->eventHandlersClasses;
     }
 }

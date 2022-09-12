@@ -13,12 +13,14 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Validation logic test.
  */
-class CodePenEmbedTest extends MinimalContainerTestCase {
+class CodePenEmbedTest extends MinimalContainerTestCase
+{
     /**
      * Ensure we can create code pen embed from the old data format that might still
      * live in the DB.
      */
-    public function testLegacyDataFormat() {
+    public function testLegacyDataFormat()
+    {
         $oldDataJSON = <<<JSON
 {
     "url": "https://codepen.io/hiroshi_m/pen/YoKYVv",

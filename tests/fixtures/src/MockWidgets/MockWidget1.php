@@ -17,72 +17,78 @@ use Vanilla\Widgets\AbstractWidgetModule;
 /**
  * Class MockWidget1
  */
-class MockWidget1 extends AbstractWidgetModule {
-
+class MockWidget1 extends AbstractWidgetModule
+{
     /** @var string */
     private $name;
 
     /**
      * @inheritdoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         return Schema::parse([
-            'name' => [
-                'type' => 'string',
-                'x-control' => SchemaForm::textBox(
-                    new FormOptions('Title', 'name text box description')
-                )
+            "name" => [
+                "type" => "string",
+                "x-control" => SchemaForm::textBox(new FormOptions("Title", "name text box description")),
             ],
-            'nested?' => [
-                'type' => 'object',
-                'x-control' => SchemaForm::section(new FormOptions('Nested Params')),
-                'properties' => [
-                    'slotType:s?' => [
-                        'enum' => ['d', 'w', 'm'],
-                        'x-control' => SchemaForm::radio(new FormOptions('Timeframe'), new StaticFormChoices([
-                            'd' => 'Daily',
-                            'w' => 'Weekly',
-                            'm' => 'Monthly',
-                        ]))
-                    ]
-                ]
-            ]
+            "nested?" => [
+                "type" => "object",
+                "x-control" => SchemaForm::section(new FormOptions("Nested Params")),
+                "properties" => [
+                    "slotType:s?" => [
+                        "enum" => ["d", "w", "m"],
+                        "x-control" => SchemaForm::radio(
+                            new FormOptions("Timeframe"),
+                            new StaticFormChoices([
+                                "d" => "Daily",
+                                "w" => "Weekly",
+                                "m" => "Monthly",
+                            ])
+                        ),
+                    ],
+                ],
+            ],
         ]);
     }
 
     /**
      * @return string
      */
-    public function toString(): string {
+    public function toString(): string
+    {
         return "<div class='mockWidget'>{$this->name}</div>";
     }
 
     /**
      * @return array|null
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         return [];
     }
 
     /**
      * @return string
      */
-    public static function getComponentName(): string {
+    public static function getComponentName(): string
+    {
         return "mock-widget";
     }
-
 
     /**
      * @param string $name
      */
-    public function setName(string $name): void {
+    public function setName(string $name): void
+    {
         $this->name = $name;
     }
 
     /**
      * @inheritdoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Mock Widget 1";
     }
 }

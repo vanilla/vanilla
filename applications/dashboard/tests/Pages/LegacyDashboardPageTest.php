@@ -14,14 +14,15 @@ use VanillaTests\APIv2\AbstractAPIv2Test;
 /**
  * Tests coverage for the LegacyDashboardPage.
  */
-class LegacyDashboardPageTest extends AbstractAPIv2Test {
-
+class LegacyDashboardPageTest extends AbstractAPIv2Test
+{
     /**
      * Test initializing the page with no container set.
      *
      * @throws ServerException If controller is not set.
      */
-    public function testPageInitNoController() {
+    public function testPageInitNoController()
+    {
         $page = self::container()->get(LegacyDashboardPage::class);
         $this->expectException(ServerException::class);
         $page->initialize();

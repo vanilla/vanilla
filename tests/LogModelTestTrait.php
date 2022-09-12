@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Trait for testing and asserting items logged with the log model.
  */
-trait LogModelTestTrait {
-
+trait LogModelTestTrait
+{
     /**
      * Assert that some items were logged and return them.
      *
@@ -24,7 +24,8 @@ trait LogModelTestTrait {
      *
      * @return array The found items.
      */
-    protected function assertCountLoggedRecords(int $expectedCount, array $where, string $message = ''): array {
+    protected function assertCountLoggedRecords(int $expectedCount, array $where, string $message = ""): array
+    {
         $logModel = $this->getLogModel();
         $results = $logModel->getWhere($where);
         Assert::assertCount($expectedCount, $results, $message);
@@ -34,7 +35,8 @@ trait LogModelTestTrait {
     /**
      * @return \LogModel
      */
-    protected function getLogModel(): \LogModel {
+    protected function getLogModel(): \LogModel
+    {
         return \Gdn::getContainer()->get(\LogModel::class);
     }
 }

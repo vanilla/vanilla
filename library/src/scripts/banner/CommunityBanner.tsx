@@ -46,6 +46,9 @@ function useTitleDescriptionDeduplication(props: IProps, options: BannerOptions)
         let stillHasTitle = false;
         let stillHasDescription = false;
 
+        //on some pages we don't want to hide the content title (e.g. discussion page with content banner)
+        const omitDeduplication = [".Section-Discussion"].some((selector) => document.querySelector(selector));
+
         // The title does this font-size hack for handling things like category following actions.
         // If there isn't an indicator though, it's better to just remove the element.
         if (hasTitle) {
@@ -54,7 +57,7 @@ function useTitleDescriptionDeduplication(props: IProps, options: BannerOptions)
                 closestBox = titleElement.closest(".pageHeadingBox") ?? closestBox;
                 if (titleElement.textContent?.trim() === props.title?.trim()) {
                     titleElement.classList.add(hiddenCss);
-                } else {
+                } else if (!omitDeduplication) {
                     titleElement.classList.add(fontHiddenCss);
                     stillHasTitle = true;
                 }
@@ -67,14 +70,14 @@ function useTitleDescriptionDeduplication(props: IProps, options: BannerOptions)
                 closestBox = descriptionElement.closest(".pageHeadingBox") ?? closestBox;
                 if (descriptionElement.textContent?.trim() === props.description?.trim()) {
                     descriptionElement.classList.add(hiddenCss);
-                } else {
+                } else if (!omitDeduplication) {
                     descriptionElement.classList.add(fontHiddenCss);
                     stillHasDescription = true;
                 }
             }
         }
 
-        if (!stillHasTitle && !stillHasDescription && closestBox) {
+        if (!stillHasTitle && !stillHasDescription && closestBox && !omitDeduplication) {
             // We can clear the whole box.
             closestBox.classList.add(hiddenCss);
         }

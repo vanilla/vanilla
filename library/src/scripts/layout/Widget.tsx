@@ -5,11 +5,13 @@
  */
 
 import { cx } from "@emotion/css";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { useWidgetSectionClasses } from "@library/layout/WidgetLayout.context";
 import React, { useContext } from "react";
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     withContainer?: boolean;
+    customContainer?: boolean;
     children?: React.ReactNode;
 }
 
@@ -19,6 +21,7 @@ interface IWidgetContext {
     extraContent?: React.ReactNode;
     widgetRef?: React.MutableRefObject<HTMLElement | null | undefined>;
     tabIndex?: React.HTMLAttributes<any>["tabIndex"];
+    childrenWrapperClassName?: string;
 }
 
 const WidgetContext = React.createContext<IWidgetContext>({});
@@ -27,7 +30,7 @@ export const Widget = React.forwardRef(function Widget(
     _props: IProps,
     ref: React.MutableRefObject<HTMLElement | null | undefined>,
 ) {
-    const { withContainer, children, ...props } = _props;
+    const { withContainer, children, customContainer, ...props } = _props;
     const classes = useWidgetSectionClasses();
     const context = useContext(WidgetContext);
     return (
@@ -45,12 +48,17 @@ export const Widget = React.forwardRef(function Widget(
                 }
             }}
             className={cx(
-                withContainer ? classes.widgetWithContainerClass : classes.widgetClass,
+                !customContainer && (withContainer ? classes.widgetWithContainerClass : classes.widgetClass),
                 context.extraClasses,
                 props.className,
             )}
         >
-            {children}
+            <ConditionalWrap
+                condition={!!context.childrenWrapperClassName}
+                componentProps={{ className: context.childrenWrapperClassName }}
+            >
+                {children}
+            </ConditionalWrap>
             {context.extraContent}
         </div>
     );

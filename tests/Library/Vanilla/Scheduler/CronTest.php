@@ -9,34 +9,34 @@ namespace VanillaTests\Library\Vanilla\Scheduler;
 
 use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
-use Garden\EventManager;
 use Gdn_Cache;
+use Vanilla\CurrentTimeStamp;
+use Vanilla\Scheduler\CronModel;
 use Vanilla\Scheduler\Descriptor\CronJobDescriptor;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\Job\JobExecutionStatus;
 use Vanilla\Scheduler\Job\JobExecutionType;
-use Vanilla\Scheduler\SchedulerInterface;
-use Vanilla\Scheduler\TrackingSlip;
 use VanillaTests\Fixtures\OfflineNullCache;
 use VanillaTests\Fixtures\Scheduler\EchoJob;
+use VanillaTests\Fixtures\Scheduler\ParentJob;
 use VanillaTests\Fixtures\Scheduler\ThrowableEchoJob;
 
 /**
  * Class CronTest
  */
-class CronTest extends SchedulerTestCase {
-
+class CronTest extends SchedulerTestCase
+{
     /**
      * Test adding a simple Cron job.
      *
      * @throws ContainerException On error.
      * @throws NotFoundException On error.
      */
-    public function testAddCronEchoJob() {
-        /* @var $dummyScheduler SchedulerInterface */
-        $dummyScheduler = $this->getConfiguredContainer()->get(SchedulerInterface::class);
+    public function testAddCronEchoJob()
+    {
+        $deferredScheduler = $this->getDeferredScheduler();
 
-        $trackingSlip = $dummyScheduler->addJobDescriptor(new CronJobDescriptor(EchoJob::class, '* * * * *'));
+        $trackingSlip = $deferredScheduler->addJobDescriptor(new CronJobDescriptor(EchoJob::class, "* * * * *"));
 
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(JobExecutionStatus::received()));
@@ -44,126 +44,163 @@ class CronTest extends SchedulerTestCase {
 
     /**
      * Test adding a simple Normal job with CronExecutionType
-     *
-     * @throws ContainerException On error.
-     * @throws NotFoundException On error.
      */
-    public function testAddNormalEchoJobWithCronExecutionType() {
-        $container = $this->getConfiguredContainer();
+    public function testAddNormalEchoJobWithCronExecutionType()
+    {
+        $deferredScheduler = $this->getDeferredScheduler();
+        $deferredScheduler->setExecutionType(JobExecutionType::cron());
 
-        /* @var $dummyScheduler SchedulerInterface */
-        $dummyScheduler = $container->get(SchedulerInterface::class);
-        $dummyScheduler->setExecutionType(JobExecutionType::cron());
-
-        $trackingSlip = $dummyScheduler->addJobDescriptor(new NormalJobDescriptor(EchoJob::class));
+        $trackingSlip = $deferredScheduler->addJobDescriptor(new NormalJobDescriptor(EchoJob::class));
 
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(JobExecutionStatus::received()));
 
-        /** @var $eventManager EventManager */
-        $eventManager = $container->get(EventManager::class);
+        $trackingSlips = $deferredScheduler->dispatchJobs();
 
-        $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
-            /** @var $trackingSlips TrackingSlip[] */
-            $this->assertTrue(count($trackingSlips) == 1);
-            $this->assertStringContainsString('localDriverId', $trackingSlips[0]->getID());
-            $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::abandoned()));
-        });
+        $this->assertCount(1, $trackingSlips);
+        $this->assertStringContainsString("localDriverId", $trackingSlips[0]->getID());
+        $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::complete()));
+    }
 
-        $eventManager->fire(self::DISPATCH_EVENT);
+    /**
+     * Test dispatching in *normal* mode with a cron job that creates a normal child job.
+     * Cron jobs aren't allowed in normal mode so only one slip should be returned with its status set to abandoned.
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testAddCronEchoJobWithNormalExecutionType()
+    {
+        $deferredScheduler = $this->getDeferredScheduler();
+
+        $deferredScheduler->addJobDescriptor(new CronJobDescriptor(ParentJob::class, "* * * * *"));
+
+        $trackingSlips = $deferredScheduler->dispatchJobs();
+
+        $this->assertCount(1, $trackingSlips);
+        $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::abandoned()));
     }
 
     /**
      * Test dispatching a single job, resulting in failure.
-     *
-     * @throws ContainerException On error.
-     * @throws NotFoundException On error.
      */
-    public function testSkippedCronJob() {
-        $container = $this->getConfiguredContainer();
+    public function testSkippedCronJob()
+    {
+        $deferredScheduler = $this->getDeferredScheduler();
+        $deferredScheduler->setExecutionType(JobExecutionType::cron());
 
-        /* @var $dummyScheduler SchedulerInterface */
-        $dummyScheduler = $container->get(SchedulerInterface::class);
-        $dummyScheduler->setExecutionType(JobExecutionType::cron());
-
-        $trackingSlip = $dummyScheduler->addJobDescriptor(new CronJobDescriptor(ThrowableEchoJob::class, "#"));
+        $trackingSlip = $deferredScheduler->addJobDescriptor(new CronJobDescriptor(ThrowableEchoJob::class, "#"));
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(JobExecutionStatus::received()));
 
-        /** @var $eventManager EventManager */
-        $eventManager = $container->get(EventManager::class);
-
-        $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
-            /** @var $trackingSlips TrackingSlip[] */
-            $this->assertTrue(count($trackingSlips) == 1);
-            $this->assertStringContainsString('localDriverId', $trackingSlips[0]->getID());
-            $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::abandoned()));
-        });
-
-        $eventManager->fire(self::DISPATCH_EVENT);
+        $trackingSlips = $deferredScheduler->dispatchJobs();
+        $this->assertTrue(count($trackingSlips) == 1);
+        $this->assertStringContainsString("localDriverId", $trackingSlips[0]->getID());
+        $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::abandoned()));
     }
 
     /**
      * Test adding a simple Cron job with CronExecutionType
-     *
-     * @throws ContainerException On error.
-     * @throws NotFoundException On error.
      */
-    public function testAddCronEchoJobWithCronExecutionType() {
-        $container = $this->getConfiguredContainer();
+    public function testAddCronEchoJobWithCronExecutionType()
+    {
+        $deferredScheduler = $this->getDeferredScheduler();
+        $deferredScheduler->setExecutionType(JobExecutionType::cron());
 
-        /* @var $dummyScheduler SchedulerInterface */
-        $dummyScheduler = $container->get(SchedulerInterface::class);
-        $dummyScheduler->setExecutionType(JobExecutionType::cron());
-
-        $trackingSlip = $dummyScheduler->addJobDescriptor(new CronJobDescriptor(EchoJob::class, '* * * * *'));
+        $trackingSlip = $deferredScheduler->addJobDescriptor(new CronJobDescriptor(EchoJob::class, "* * * * *"));
 
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(JobExecutionStatus::received()));
 
-        /** @var $eventManager EventManager */
-        $eventManager = $container->get(EventManager::class);
+        $trackingSlips = $deferredScheduler->dispatchJobs();
+        $this->assertTrue(count($trackingSlips) == 1);
+        $this->assertStringContainsString("localDriverId", $trackingSlips[0]->getID());
+        $complete = JobExecutionStatus::complete();
+        $this->assertTrue($trackingSlips[0]->getStatus()->is($complete));
+        $this->assertTrue($trackingSlips[0]->getExtendedStatus()["status"]->is($complete));
+    }
 
-        $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
-            /** @var $trackingSlips TrackingSlip[] */
-            $this->assertTrue(count($trackingSlips) == 1);
-            $this->assertStringContainsString('localDriverId', $trackingSlips[0]->getID());
-            $complete = JobExecutionStatus::complete();
-            $this->assertTrue($trackingSlips[0]->getStatus()->is($complete));
-            $this->assertTrue($trackingSlips[0]->getExtendedStatus()['status']->is($complete));
-        });
+    /**
+     * Test that multiple crons can't be triggered at the same time.
+     */
+    public function testCronLocking()
+    {
+        $deferredScheduler = $this->getDeferredScheduler();
+        $deferredScheduler->setExecutionType(JobExecutionType::cron());
+        $deferredScheduler->addJobDescriptor(new CronJobDescriptor(EchoJob::class, "* * * * *"));
 
-        $eventManager->fire(self::DISPATCH_EVENT);
+        $lock = $this->container()
+            ->get(CronModel::class)
+            ->createLock();
+        $this->assertTrue($lock->acquire());
+
+        // This will not run and the jobs will be abandoned.
+        $trackingSlips = $deferredScheduler->dispatchJobs();
+        $this->assertCount(1, $trackingSlips);
+        $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::abandoned()));
+    }
+
+    /**
+     * Test that we properly parse cron expressions and execute crons at the correct time.
+     *
+     * @return void
+     */
+    public function testCronScheduling()
+    {
+        $lastRunTime = $this->mockLastRunTime("2022-12-01 00:01:00");
+        $deferredScheduler = $this->getDeferredScheduler();
+        $deferredScheduler->setExecutionType(JobExecutionType::cron());
+        // Job scheduled every 15 minutes.
+        $deferredScheduler->addJobDescriptor(new CronJobDescriptor(EchoJob::class, "*/15 * * * *"));
+        // Only 14 minutes have passed. Job won't run.
+        $lastRunTime = CurrentTimeStamp::mockTime($lastRunTime->modify("+13 minutes"));
+        $trackingSlips = $deferredScheduler->dispatchJobs();
+        $this->assertCount(1, $trackingSlips);
+        // Our tracking slip should be abandoned.
+        $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::abandoned()));
+
+        // Move forwards 15 minutes and try again.
+        CurrentTimeStamp::mockTime($lastRunTime->modify("+15 minutes"));
+        $deferredScheduler->addJobDescriptor(new CronJobDescriptor(EchoJob::class, "*/15 * * * *"));
+        $trackingSlips = $deferredScheduler->dispatchJobs();
+        $this->assertCount(1, $trackingSlips);
+        $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::complete()));
+    }
+
+    /**
+     * Mock out the last run time.
+     *
+     * @param $toMock
+     * @return \DateTimeImmutable
+     */
+    private function mockLastRunTime($toMock): \DateTimeImmutable
+    {
+        $time = CurrentTimeStamp::mockTime($toMock);
+        $cronModel = $this->container()->get(CronModel::class);
+        // We've tracked our last run time.
+        $cronModel->trackRun();
+        CurrentTimeStamp::clearMockTime();
+        return $time;
     }
 
     /**
      * Test adding a simple Cron job with CronExecutionType with offline cache
-     *
-     * @throws ContainerException On error.
-     * @throws NotFoundException On error.
      */
-    public function testAddCronEchoJobWithCronExecutionTypeOfflineCache() {
-        $container = $this->getConfiguredContainer();
+    public function testAddCronEchoJobWithCronExecutionTypeOfflineCache()
+    {
+        $container = $this->container();
 
         $offlineCache = $container->get(OfflineNullCache::class);
         $container->setInstance(Gdn_Cache::class, $offlineCache);
 
-        /** @var $eventManager EventManager */
-        $eventManager = $container->get(EventManager::class);
+        $deferredScheduler = $this->getDeferredScheduler();
+        $deferredScheduler->setExecutionType(JobExecutionType::cron());
 
-        /* @var $dummyScheduler SchedulerInterface */
-        $dummyScheduler = $container->get(SchedulerInterface::class);
-        $dummyScheduler->setExecutionType(JobExecutionType::cron());
+        $deferredScheduler->addJobDescriptor(new CronJobDescriptor(EchoJob::class, "* * * * *"));
 
-        $dummyScheduler->addJobDescriptor(new CronJobDescriptor(EchoJob::class, '* * * * *'));
-
-        $eventManager->bind(self::DISPATCHED_EVENT, function ($trackingSlips) {
-            /** @var $trackingSlips TrackingSlip[] */
-            $this->assertTrue(count($trackingSlips) == 1);
-            $complete = JobExecutionStatus::complete();
-            $this->assertTrue($trackingSlips[0]->getStatus()->is($complete));
-        });
-
-        $eventManager->fire(self::DISPATCH_EVENT);
+        $trackingSlips = $deferredScheduler->dispatchJobs();
+        $this->assertTrue(count($trackingSlips) == 1);
+        $complete = JobExecutionStatus::complete();
+        $this->assertTrue($trackingSlips[0]->getStatus()->is($complete));
     }
 }

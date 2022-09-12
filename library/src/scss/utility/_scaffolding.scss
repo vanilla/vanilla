@@ -28,8 +28,7 @@ textarea,
 button,
 input {
     &.isDisabled,
-    &[disabled]
-    {
+    &[disabled] {
         @include disabledInput();
     }
 }
@@ -38,7 +37,8 @@ input,
 select,
 textarea {
     /* Omitting radio inputs since they are generally inline if not overwritten */
-    &[type="radio"], &[type="checkbox"] {
+    &[type="radio"],
+    &[type="checkbox"] {
         width: inherit;
     }
     width: 100%;
@@ -66,7 +66,6 @@ mark {
     background-color: $mark_bg;
     color: $global-color-fg;
 }
-
 
 a {
     @include allLinkStates {
@@ -137,14 +136,14 @@ abbr[title] {
 }
 
 hr {
-        margin: 0;
-        border: {
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-                style: solid;
-        }
+    margin: 0;
+    border: {
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        style: solid;
+    }
 }
 
 iframe {

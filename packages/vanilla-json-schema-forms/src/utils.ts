@@ -15,7 +15,7 @@ const ajv = new Ajv({
 export function validateConditions(conditions: Condition[], rootInstance: any) {
     const invalid = conditions.flatMap((condition) => {
         try {
-            const val = get(rootInstance, condition.field);
+            const val = get(rootInstance, condition.field, condition.default ?? null);
             if (!ajv.validate(condition, val)) {
                 return [condition];
             }

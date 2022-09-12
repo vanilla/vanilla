@@ -17,8 +17,8 @@ use Vanilla\Site\SiteSectionModel;
 /**
  * Quote embed factory for comments.
  */
-class DiscussionEmbedFactory extends AbstractOwnSiteEmbedFactory {
-
+class DiscussionEmbedFactory extends AbstractOwnSiteEmbedFactory
+{
     /** @var \DiscussionsApiController */
     private $discussionApi;
 
@@ -41,7 +41,8 @@ class DiscussionEmbedFactory extends AbstractOwnSiteEmbedFactory {
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain = ''): string {
+    protected function getSupportedPathRegex(string $domain = ""): string
+    {
         $regexRoot = $this->getRegexRoot();
         return "/^$regexRoot\/discussion\/(?<discussionID>\d+)/i";
     }
@@ -49,19 +50,20 @@ class DiscussionEmbedFactory extends AbstractOwnSiteEmbedFactory {
     /**
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         $path = parse_url($url, PHP_URL_PATH);
         preg_match($this->getSupportedPathRegex(), $path, $matches);
-        $id = $matches['discussionID'] ?? null;
+        $id = $matches["discussionID"] ?? null;
 
         if ($id === null) {
-            throw new NotFoundException('Discussion');
+            throw new NotFoundException("Discussion");
         }
 
         $discussion = $this->discussionApi->get_quote($id);
         $data = $discussion + [
-                'embedType' => QuoteEmbed::TYPE,
-            ];
+            "embedType" => QuoteEmbed::TYPE,
+        ];
         return new QuoteEmbed($data);
     }
 }

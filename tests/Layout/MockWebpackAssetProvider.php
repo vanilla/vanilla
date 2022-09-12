@@ -18,8 +18,8 @@ use Vanilla\Web\Asset\WebpackAssetProvider;
 /**
  * Mock Class to provide assets from the webpack build process.
  */
-class MockWebpackAssetProvider extends WebpackAssetProvider {
-
+class MockWebpackAssetProvider extends WebpackAssetProvider
+{
     /**
      * Get script assets built from webpack using the in-repo build process.
      *
@@ -35,8 +35,9 @@ class MockWebpackAssetProvider extends WebpackAssetProvider {
      * @param bool $includeAsync - use Async param
      * @return WebpackAsset[] The assets files for all webpack scripts.
      */
-    public function getScripts(string $section, bool $includeAsync = false): array {
-        $scripts = $this->createAssets('js');
+    public function getScripts(string $section, bool $includeAsync = false): array
+    {
+        $scripts = $this->createAssets("js");
         return $scripts;
     }
 
@@ -48,8 +49,9 @@ class MockWebpackAssetProvider extends WebpackAssetProvider {
      *
      * @return WebpackAsset[]
      */
-    public function getStylesheets(string $section, bool $includeAsync = false): array {
-        $styles = $this->createAssets('css');
+    public function getStylesheets(string $section, bool $includeAsync = false): array
+    {
+        $styles = $this->createAssets("css");
         return $styles;
     }
 
@@ -60,17 +62,49 @@ class MockWebpackAssetProvider extends WebpackAssetProvider {
      *
      * @return WebpackAsset[]
      */
-    public function createAssets(string $type): array {
+    public function createAssets(string $type): array
+    {
         $assets = [];
         $arrays = [
-            ['assetPath' => "LeaderboardWidget." . $type, 'assetType' => $type, 'section' => "widgets", 'addonKey'=>"widget"],
-            ['assetPath' => "BreadcrumbsWidget." . $type, 'assetType' => $type, 'section' => "widgets", 'addonKey'=>"widget"],
-            ['assetPath' => "DiscussionWidget." . $type, 'assetType' => $type, 'section' => "widgets", 'addonKey'=>"widget"],
-            ['assetPath' => "GroupWidget." . $type, 'assetType' => $type, 'section' => "widgets", 'addonKey'=>"widget"],
-            ['assetPath' => "CommentWidget." . $type, 'assetType' => $type, 'section' => "widgets", 'addonKey'=>"widget"]];
-        $request  = Gdn::getContainer()->get(RequestInterface::class);
+            [
+                "assetPath" => "LeaderboardWidget." . $type,
+                "assetType" => $type,
+                "section" => "widgets",
+                "addonKey" => "widget",
+            ],
+            [
+                "assetPath" => "BreadcrumbsWidget." . $type,
+                "assetType" => $type,
+                "section" => "widgets",
+                "addonKey" => "widget",
+            ],
+            [
+                "assetPath" => "DiscussionWidget." . $type,
+                "assetType" => $type,
+                "section" => "widgets",
+                "addonKey" => "widget",
+            ],
+            [
+                "assetPath" => "GroupWidget." . $type,
+                "assetType" => $type,
+                "section" => "widgets",
+                "addonKey" => "widget",
+            ],
+            [
+                "assetPath" => "CommentWidget." . $type,
+                "assetType" => $type,
+                "section" => "widgets",
+                "addonKey" => "widget",
+            ],
+        ];
+        $request = Gdn::getContainer()->get(RequestInterface::class);
         foreach ($arrays as $array) {
-            $assets[] = (new WebpackAssetDefinition($array['assetPath'], $array['assetType'], $array['section'], $array['addonKey']))->asAsset($request);
+            $assets[] = (new WebpackAssetDefinition(
+                $array["assetPath"],
+                $array["assetType"],
+                $array["section"],
+                $array["addonKey"]
+            ))->asAsset($request);
         }
         return $assets;
     }

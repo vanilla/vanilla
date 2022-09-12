@@ -15,8 +15,8 @@ use Vanilla\Metadata\Parser\RSSFeedParser;
 /**
  * Trait for fetching items for RSS feeds.
  */
-trait RssWidgetTrait {
-
+trait RssWidgetTrait
+{
     /**
      * @var RSSFeedParser
      */
@@ -64,13 +64,17 @@ trait RssWidgetTrait {
      *
      * @return array|null
      */
-    protected function getRssFeedItems(string $feedUrl, ?string $fallbackImageUrl): ?array {
+    protected function getRssFeedItems(string $feedUrl, ?string $fallbackImageUrl): ?array
+    {
         $results = $this->loadParsedXMLData($feedUrl);
         if (!$results) {
             return null;
         }
-        $resultsItems = $results['item'] ?? [];
-        $fallbackImageUrl = $fallbackImageUrl ?? $results['channel']['image']['url'] ?? null;
+        $resultsItems = $results["item"] ?? [];
+        $fallbackImageUrl =
+            $fallbackImageUrl && $fallbackImageUrl !== ""
+                ? $fallbackImageUrl
+                : $results["channel"]["image"]["url"] ?? null;
 
         $feedItems = [];
         foreach ($resultsItems as $item) {
@@ -86,8 +90,9 @@ trait RssWidgetTrait {
      *
      * @return string
      */
-    private function getCacheKey(string $feedUrl): string {
-        return sprintf('rss.module.%s.parse.content', md5($feedUrl));
+    private function getCacheKey(string $feedUrl): string
+    {
+        return sprintf("rss.module.%s.parse.content", md5($feedUrl));
     }
 
     /**
@@ -97,7 +102,8 @@ trait RssWidgetTrait {
      *
      * @return array|null
      */
-    private function getFromCache(string $feedUrl): ?array {
+    private function getFromCache(string $feedUrl): ?array
+    {
         $key = $this->getCacheKey($feedUrl);
         $parsedContent = $this->cache->get($key);
 
@@ -111,7 +117,8 @@ trait RssWidgetTrait {
      *
      * @return array|null
      */
-    private function loadParsedXMLData(string $feedUrl): ?array {
+    private function loadParsedXMLData(string $feedUrl): ?array
+    {
         $results = $this->getFromCache($feedUrl);
         $rssFeedContent = !$results ? $this->remoteResourceModel->getByUrl($feedUrl) : null;
         if (!$results && !$rssFeedContent) {
@@ -137,19 +144,20 @@ trait RssWidgetTrait {
      * @param ?string $fallbackUrl
      * @return array
      */
-    private function mapRSSFeedToItem(array $result, ?string $fallbackUrl) {
-        $image = $result['img'] ?? null;
-        $imageValue = $image['src'] ?? null;
-        $enclosure = $result['enclosure'] ?? null;
-        $isEnclosureImage = $enclosure && substr($enclosure['type'], 0, 6) === 'image/';
-        $enclosureValue = $isEnclosureImage ? $enclosure['url'] : null;
+    private function mapRSSFeedToItem(array $result, ?string $fallbackUrl)
+    {
+        $image = $result["img"] ?? null;
+        $imageValue = $image["src"] ?? null;
+        $enclosure = $result["enclosure"] ?? null;
+        $isEnclosureImage = $enclosure && substr($enclosure["type"], 0, 6) === "image/";
+        $enclosureValue = $isEnclosureImage ? $enclosure["url"] : null;
         $imageUrl = $imageValue ?: $enclosureValue;
 
         return [
-            'to' => $result['link'],
-            'name' => $result['title'],
-            'imageUrl' => $imageUrl ?: $fallbackUrl,
-            'description' => $this->formatService->renderPlainText($result['description'], HtmlFormat::FORMAT_KEY),
+            "to" => $result["link"],
+            "name" => $result["title"],
+            "imageUrl" => $imageUrl ?: $fallbackUrl,
+            "description" => $this->formatService->renderPlainText($result["description"], HtmlFormat::FORMAT_KEY),
         ];
     }
 }

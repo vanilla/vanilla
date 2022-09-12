@@ -11,8 +11,8 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
 /**
  * Class ReactionsModule
  */
-class ReactionsModule extends AbstractReactModule {
-
+class ReactionsModule extends AbstractReactModule
+{
     /** @var object|null User */
     public $user = null;
 
@@ -26,7 +26,8 @@ class ReactionsModule extends AbstractReactModule {
      *
      * @param UsersApiController $usersApi
      */
-    public function __construct(UsersApiController $usersApi) {
+    public function __construct(UsersApiController $usersApi)
+    {
         $this->usersApi = $usersApi;
         parent::__construct();
     }
@@ -34,8 +35,9 @@ class ReactionsModule extends AbstractReactModule {
     /**
      * @inheritDoc
      */
-    public function assetTarget() {
-        return 'Content';
+    public function assetTarget()
+    {
+        return "Content";
     }
 
     /**
@@ -43,17 +45,18 @@ class ReactionsModule extends AbstractReactModule {
      *
      * @return array
      */
-    public function getData(): array {
+    public function getData(): array
+    {
         $data = [];
-        $this->user = !$this->user ? $this->_Sender->User ?? $this->data('User', Gdn::session()->User): $this->user;
+        $this->user = !$this->user ? $this->_Sender->User ?? $this->data("User", Gdn::session()->User) : $this->user;
         $isValid = ($this->user->UserID ?? 0) > 0;
         if ($isValid) {
             $userID = $this->user->UserID;
             $name = $this->user->Name;
-            $userData = $this->usersApi->get($userID, ['expand' => ['reactionsReceived']])->getData();
-            $reactionsReceived = array_values($userData['reactionsReceived'] ?? []);
+            $userData = $this->usersApi->get($userID, ["expand" => ["reactionsReceived"]])->getData();
+            $reactionsReceived = array_values($userData["reactionsReceived"] ?? []);
             foreach ($reactionsReceived as $reactionReceived) {
-                $url = url("profile/reactions/$name?reaction=".strtolower($reactionReceived["urlcode"]), true);
+                $url = url("profile/reactions/$name?reaction=" . strtolower($reactionReceived["urlcode"]), true);
                 $data[] = $reactionReceived + ["url" => $url];
             }
         }
@@ -66,33 +69,39 @@ class ReactionsModule extends AbstractReactModule {
      *
      * @return array|null
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         $reactions = $this->getData();
-        return $this->user ? [
-            'apiParams' => ['userID' => $this->user->UserID],
-            'apiData' => $reactions,
-            'homeWidget' => true,
-        ] : null;
+        return $this->user
+            ? [
+                "apiParams" => ["userID" => $this->user->UserID],
+                "apiData" => $reactions,
+                "homeWidget" => true,
+            ]
+            : null;
     }
 
     /**
      * @inheritDoc
      */
-    public static function getComponentName(): string {
-        return 'ReactionListModule';
+    public static function getComponentName(): string
+    {
+        return "ReactionListModule";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         return Schema::parse([]);
     }
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetName(): string {
-        return 'ReactionList';
+    public static function getWidgetName(): string
+    {
+        return "ReactionList";
     }
 }

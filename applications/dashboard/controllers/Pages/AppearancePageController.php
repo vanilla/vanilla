@@ -18,7 +18,8 @@ use Vanilla\Web\PageDispatchController;
 /**
  * Controller covering the `/appearance/*` pages.
  */
-class AppearancePageController extends PageDispatchController {
+class AppearancePageController extends PageDispatchController
+{
     use ReduxActionPreloadTrait;
 
     /**
@@ -27,9 +28,11 @@ class AppearancePageController extends PageDispatchController {
      * @param string $path Allow any path.
      * @return Data
      */
-    public function index(string $path = ""): Data {
+    public function index(string $path = ""): Data
+    {
         $data = $this->usePage(DashboardPage::class)
-            ->permission(["settings.manage", "community.moderate"])
+            ->permission(["site.manage", "community.moderate"])
+            ->setSeoTitle(t("Appearance"))
             ->setSeoRequired(false)
             ->blockRobots()
             ->render();

@@ -13,8 +13,8 @@ use Vanilla\Theme\VariableProviders\QuickLinkProviderInterface;
 /**
  * Provide quick links related to the current user.
  */
-class ForumQuickLinksProvider implements QuickLinkProviderInterface {
-
+class ForumQuickLinksProvider implements QuickLinkProviderInterface
+{
     /** @var \Gdn_Session */
     private $session;
 
@@ -23,58 +23,42 @@ class ForumQuickLinksProvider implements QuickLinkProviderInterface {
      *
      * @param \Gdn_Session $session
      */
-    public function __construct(\Gdn_Session $session) {
+    public function __construct(\Gdn_Session $session)
+    {
         $this->session = $session;
     }
 
     /**
      * @inheritdoc
      */
-    public function provideQuickLinks(): array {
+    public function provideQuickLinks(): array
+    {
         $result = [];
-        $result[] = new QuickLink(
-            t('All Categories'),
-            '/categories',
-            null,
-            -4,
-            "discussions.view"
-        );
+        $result[] = new QuickLink(t("All Categories"), "/categories", null, -4, "discussions.view");
+
+        $result[] = new QuickLink("Recent Discussions", "/discussions", null, -3, "discussions.view");
+
+        $result[] = new QuickLink(t("Activity"), "/activity", null, -2, "discussions.view");
 
         $result[] = new QuickLink(
-            'Recent Discussions',
-            '/discussions',
-            null,
-            -3,
-            "discussions.view"
-        );
-
-        $result[] = new QuickLink(
-            t('Activity'),
-            '/activity',
-            null,
-            -2,
-            "discussions.view"
-        );
-
-        $result[] = new QuickLink(
-            t('My Bookmarks'),
-            '/discussions/bookmarked',
+            t("My Bookmarks"),
+            "/discussions/bookmarked",
             $this->session->User->CountBookmarks ?? 0,
             -1,
             "session.valid"
         );
 
         $result[] = new QuickLink(
-            t('My Discussions'),
-            '/discussions/mine',
+            t("My Discussions"),
+            "/discussions/mine",
             $this->session->User->CountDiscussions ?? 0,
             -1,
             "session.valid"
         );
 
         $result[] = new QuickLink(
-            t('My Drafts'),
-            '/drafts',
+            t("My Drafts"),
+            "/drafts",
             $this->session->User->CountDrafts ?? 0,
             -1,
             "session.valid"

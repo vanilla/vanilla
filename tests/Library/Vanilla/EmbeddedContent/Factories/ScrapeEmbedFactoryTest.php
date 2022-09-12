@@ -18,8 +18,8 @@ use VanillaTests\Fixtures\MockPageScraper;
 /**
  * Tests for the giphy embed and factory.
  */
-class ScrapeEmbedFactoryTest extends MinimalContainerTestCase {
-
+class ScrapeEmbedFactoryTest extends MinimalContainerTestCase
+{
     /** @var ScrapeEmbedFactory */
     private $factory;
 
@@ -32,13 +32,13 @@ class ScrapeEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->pageScraper = new MockPageScraper();
         $this->httpClient = new MockHttpClient();
         $this->factory = new ScrapeEmbedFactory($this->pageScraper, $this->httpClient);
     }
-
 
     /**
      * Test that all giphy domain types are supported.
@@ -46,41 +46,48 @@ class ScrapeEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string $urlToTest
      * @dataProvider supportedDomains
      */
-    public function testSupportedDomains(string $urlToTest) {
-        $this->assertTrue(
-            $this->factory->canHandleUrl($urlToTest),
-            "LinkEmbedFactory should match every URL."
-        );
+    public function testSupportedDomains(string $urlToTest)
+    {
+        $this->assertTrue($this->factory->canHandleUrl($urlToTest), "LinkEmbedFactory should match every URL.");
     }
 
     /**
      * @return array
      */
-    public function supportedDomains(): array {
+    public function supportedDomains(): array
+    {
         return [
-            ['https://tasdfasdf.com/asdfasd4-23e1//asdf31/1324'],
-            ['http://asd.com'], // Empty paths.
-            ['https://testasd.com/.png']
+            ["https://tasdfasdf.com/asdfasd4-23e1//asdf31/1324"],
+            ["http://asd.com"], // Empty paths.
+            ["https://testasd.com/.png"],
         ];
     }
 
     /**
      * Test network request fetching and handling.
      */
-    public function testCreateEmbedForUrl() {
-        $urlToCheck = 'https://test.com';
+    public function testCreateEmbedForUrl()
+    {
+        $urlToCheck = "https://test.com";
 
         $name = "Hello Title";
         $description = "Hello description";
         $images = ["https://test.com/image.png", "https://other.com/pic.jpg"];
-        $this->pageScraper->addMockResponse($urlToCheck, new HttpResponse(200, [
-            'content-type' => 'application/json'
-        ], json_encode([
-            'Title' => $name,
-            'Description' => $description,
-            'Images' => $images,
-            'Url' => $urlToCheck,
-        ])));
+        $this->pageScraper->addMockResponse(
+            $urlToCheck,
+            new HttpResponse(
+                200,
+                [
+                    "content-type" => "application/json",
+                ],
+                json_encode([
+                    "Title" => $name,
+                    "Description" => $description,
+                    "Images" => $images,
+                    "Url" => $urlToCheck,
+                ])
+            )
+        );
 
         // Check over the network.
         $embed = $this->factory->createEmbedForUrl($urlToCheck);
@@ -88,14 +95,14 @@ class ScrapeEmbedFactoryTest extends MinimalContainerTestCase {
         $embedData = $embed->jsonSerialize();
         $this->assertEquals(
             [
-                'name' => $name,
-                'url' => $urlToCheck, // The original URL.
-                'embedType' => LinkEmbed::TYPE,
-                'body' => $description,
-                'photoUrl' => $images[0],
+                "name" => $name,
+                "url" => $urlToCheck, // The original URL.
+                "embedType" => LinkEmbed::TYPE,
+                "body" => $description,
+                "photoUrl" => $images[0],
             ],
             $embedData,
-            'Data cna be fetched over the network to create the embed from a URL.'
+            "Data cna be fetched over the network to create the embed from a URL."
         );
     }
 }

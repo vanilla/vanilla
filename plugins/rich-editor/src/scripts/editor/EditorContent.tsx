@@ -19,6 +19,8 @@ import Quill, { DeltaOperation, QuillOptionsStatic, Sources } from "quill/core";
 import React, { useCallback, useEffect, useRef, useMemo } from "react";
 import { useLastValue } from "@vanilla/react-utils";
 import { userContentClasses } from "@library/content/UserContent.styles";
+import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
+import { scrollToElement } from "@library/content/hashScrolling";
 
 const DEFAULT_CONTENT = [{ insert: "\n" }];
 
@@ -254,6 +256,7 @@ function useLegacyTextAreaSync(textArea?: HTMLInputElement | HTMLTextAreaElement
  */
 function useQuoteButtonHandler() {
     const { quill } = useEditor();
+    const offset = useScrollOffset();
 
     useEffect(() => {
         /**
@@ -272,10 +275,7 @@ function useQuoteButtonHandler() {
             // A slight min-time to ensure the user's page is finished scrolling before the new content loads in.
             embedInserter.scrapeMedia(url, 500);
 
-            // Just in case the browser doesn't support this API.
-            if (quill.root.scrollIntoView) {
-                quill.root.scrollIntoView({ behavior: "smooth" });
-            }
+            scrollToElement(quill.root, offset.topOffset ?? 0);
         };
         const delegatedHandler = delegateEvent("click", ".js-quoteButton", handleQuoteButtonClick)!;
         return () => {
@@ -351,11 +351,11 @@ function useUpdateHandler() {
         }
 
         HeaderBlot.resetCounters();
-        const headers = (quill.scroll.descendants(
+        const headers = quill.scroll.descendants(
             (blot) => blot instanceof HeaderBlot,
             0,
             quill.scroll.length(),
-        ) as any) as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
+        ) as any as HeaderBlot[]; // Explicit mapping of types because the parchments types suck.
 
         headers.forEach((header) => header.setGeneratedID());
         quill.update(Quill.sources.API);

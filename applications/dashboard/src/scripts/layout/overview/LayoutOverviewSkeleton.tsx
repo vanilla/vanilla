@@ -9,13 +9,13 @@ import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
 import { ContainerContextReset } from "@library/layout/components/Container";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext";
-import ThreeColumnSection from "@library/layout/ThreeColumnSection";
+import SectionThreeColumns from "@library/layout/ThreeColumnSection";
 import React, { useMemo } from "react";
 import random from "lodash/random";
 import { SectionOneColumn } from "@library/layout/SectionOneColumn";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { SectionFullWidth } from "@library/layout/SectionFullWidth";
-import TwoColumnSection from "@library/layout/TwoColumnSection";
+import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import PanelWidget from "@library/layout/components/PanelWidget";
 import { Widget } from "@library/layout/Widget";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
@@ -69,11 +69,11 @@ function RandomSection() {
             );
         case 2:
             return (
-                <TwoColumnSection mainBottom={<RandomWidgets inPanel />} secondaryBottom={<RandomWidgets inPanel />} />
+                <SectionTwoColumns mainBottom={<RandomWidgets inPanel />} secondaryBottom={<RandomWidgets inPanel />} />
             );
         case 3:
             return (
-                <ThreeColumnSection
+                <SectionThreeColumns
                     leftBottom={<RandomWidgets inPanel />}
                     middleBottom={<RandomWidgets heights={[220, 300]} inPanel />}
                     rightBottom={<RandomWidgets inPanel />}

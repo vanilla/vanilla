@@ -21,7 +21,7 @@ import isEmpty from "lodash/isEmpty";
 import { LayoutViewType, LAYOUT_VIEW_TYPES } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { registeredAppearanceNavItems } from "@dashboard/appearance/navigationItems";
 
-const CUSTOM_LAYOUTS_CONFIG_KEY = "labs.customLayouts";
+export const LAYOUT_EDITOR_CONFIG_KEY = "labs.layoutEditor";
 
 function makeTreeChildren(layouts: ILayoutDetails[], recordID: RecordID) {
     return (
@@ -46,23 +46,19 @@ function makeTreeChildren(layouts: ILayoutDetails[], recordID: RecordID) {
 
 function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigationTreeItem {
     // Check if custom layouts are enabled
-    const config = useConfigsByKeys([CUSTOM_LAYOUTS_CONFIG_KEY]);
+    const perPageEditorConfigs = LAYOUT_VIEW_TYPES.map((type) => `layoutEditor.${type}`);
+    const perPageAppliedConfigs = LAYOUT_VIEW_TYPES.map((type) => `customLayout.${type}`);
+    const config = useConfigsByKeys([LAYOUT_EDITOR_CONFIG_KEY, ...perPageEditorConfigs, ...perPageAppliedConfigs]);
     const { layoutsByViewType } = useLayouts();
-    const isCustomLayoutsEnabled = useMemo(() => !!config?.data?.[CUSTOM_LAYOUTS_CONFIG_KEY], [config]);
 
     const layoutViewTypesTranslatedNames: { [key in LayoutViewType]: string } = {
         home: t("Home"),
-        discussions: t("Discussions"),
-        categories: t("Categories"),
+        discussionList: t("Discussions"),
+        categoryList: t("Categories"),
     };
 
-    return {
-        name: t("Layout Editor"),
-        parentID,
-        sort: 0,
-        recordID: ownID,
-        recordType: "panelMenu",
-        children: LAYOUT_VIEW_TYPES.map((layoutViewType) => ({
+    function editorNav(layoutViewType: LayoutViewType): INavigationTreeItem {
+        return {
             name: t(`${layoutViewTypesTranslatedNames[layoutViewType]} Page`),
             parentID: ownID,
             sort: 0,
@@ -77,29 +73,58 @@ function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigatio
                     recordType: "appearanceNavItem",
                     children: [],
                     url: getRelativeUrl(LegacyLayoutsRoute.url(layoutViewType)),
+                    withCheckMark: config?.data?.[`customLayout.${layoutViewType}`] == false,
                 },
-                ...(isCustomLayoutsEnabled && !isEmpty(layoutsByViewType)
+                ...(!isEmpty(layoutsByViewType)
                     ? [
                           ...makeTreeChildren(layoutsByViewType[layoutViewType] ?? [], layoutViewType),
-                          ...(layoutViewType === "home"
-                              ? [
-                                    {
-                                        name: t("Add Custom Layout"),
-                                        parentID: layoutViewType,
-                                        sort: 0,
-                                        recordID: -1,
-                                        recordType: "addLayout",
-                                        isLink: true,
-                                        children: [],
-                                        url: getRelativeUrl(LayoutEditorRoute.url({ layoutViewType })),
-                                    },
-                                ]
-                              : []),
+                          {
+                              name: t("Add Custom Layout"),
+                              parentID: layoutViewType,
+                              sort: 0,
+                              recordID: -1,
+                              recordType: "addLayout",
+                              isLink: true,
+                              children: [],
+                              url: getRelativeUrl(LayoutEditorRoute.url({ layoutViewType })),
+                          },
                       ]
                     : []),
             ],
-        })),
+        };
+    }
+
+    function legacyNav(layoutViewType: LayoutViewType) {
+        return {
+            name: t(`${layoutViewTypesTranslatedNames[layoutViewType]} Page`),
+            parentID: layoutViewType,
+            sort: 0,
+            recordID: uuidv4(),
+            recordType: "appearanceNavItem",
+            children: [],
+            url: getRelativeUrl(LegacyLayoutsRoute.url(layoutViewType)),
+        };
+    }
+
+    const topLevelItem: INavigationTreeItem = {
+        name: t("Layouts"),
+        parentID,
+        sort: 0,
+        recordID: ownID,
+        recordType: "panelMenu",
+        children: [],
     };
+
+    if (config.data) {
+        LAYOUT_VIEW_TYPES.forEach((viewType) => {
+            if (config.data?.[LAYOUT_EDITOR_CONFIG_KEY] && config.data?.[`layoutEditor.${viewType}`]) {
+                topLevelItem.children.push(editorNav(viewType));
+            } else {
+                topLevelItem.children.push(legacyNav(viewType));
+            }
+        });
+    }
+    return topLevelItem;
 }
 
 export function useAppearanceNavItems(parentID: RecordID): INavigationTreeItem[] {

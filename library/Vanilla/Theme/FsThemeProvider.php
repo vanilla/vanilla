@@ -15,8 +15,8 @@ use Garden\Web\RequestInterface;
 /**
  * Handle custom themes.
  */
-class FsThemeProvider implements ThemeProviderInterface {
-
+class FsThemeProvider implements ThemeProviderInterface
+{
     /** @var AddonManager $addonManager */
     private $addonManager;
 
@@ -46,14 +46,16 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @param ThemeService $themeService
      */
-    public function setThemeService(ThemeService $themeService): void {
+    public function setThemeService(ThemeService $themeService): void
+    {
         // Don't actually need it.
     }
 
     /**
      * @inheritdoc
      */
-    public function handlesThemeID($themeID): bool {
+    public function handlesThemeID($themeID): bool
+    {
         $addon = @$this->addonManager->lookupTheme($themeID);
         return $addon !== null;
     }
@@ -61,7 +63,8 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getTheme($themeKey, array $args = []): Theme {
+    public function getTheme($themeKey, array $args = []): Theme
+    {
         $addon = $this->getThemeAddon($themeKey);
         return Theme::fromAddon($addon);
     }
@@ -69,14 +72,16 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getThemeRevisions($themeKey): array {
+    public function getThemeRevisions($themeKey): array
+    {
         return [$this->getTheme($themeKey)];
     }
 
     /**
      * @inheritdoc
      */
-    public function getMasterThemeKey($themeKey): string {
+    public function getMasterThemeKey($themeKey): string
+    {
         $theme = $this->getThemeAddon($themeKey);
         return $theme->getKey();
     }
@@ -88,7 +93,8 @@ class FsThemeProvider implements ThemeProviderInterface {
      *
      * @return Addon
      */
-    public function getThemeAddon($themeKey): Addon {
+    public function getThemeAddon($themeKey): Addon
+    {
         $theme = $this->addonManager->lookupTheme($themeKey);
         if (!$theme) {
             // Try to load our fallback theme.
@@ -104,7 +110,8 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function themeExists($themeKey): bool {
+    public function themeExists($themeKey): bool
+    {
         $theme = $this->addonManager->lookupTheme($themeKey);
         return $theme !== null;
     }
@@ -112,7 +119,8 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritDoc
      */
-    public function getAllThemes(): array {
+    public function getAllThemes(): array
+    {
         /** @var Addon[] $allThemes */
         $allThemes = $this->addonManager->lookupAllByType(Addon::TYPE_THEME);
         $allAvailableThemes = [];
@@ -128,17 +136,19 @@ class FsThemeProvider implements ThemeProviderInterface {
     /**
      * @inheritdoc
      */
-    public function setCurrentTheme($themeKey): Theme {
-        $this->config->set('Garden.Theme', $themeKey);
-        $this->config->set('Garden.MobileTheme', $themeKey);
-        $this->config->set('Garden.CurrentTheme', $themeKey);
+    public function setCurrentTheme($themeKey): Theme
+    {
+        $this->config->set("Garden.Theme", $themeKey);
+        $this->config->set("Garden.MobileTheme", $themeKey);
+        $this->config->set("Garden.CurrentTheme", $themeKey);
         return $this->getTheme($themeKey);
     }
 
     /**
      * @inheritdoc
      */
-    public function setPreviewTheme($themeID, int $revisionID = null): Theme {
+    public function setPreviewTheme($themeID, int $revisionID = null): Theme
+    {
         $theme = $this->getTheme($themeID);
         $this->themeHelper->setSessionPreviewTheme($theme);
         return $theme;

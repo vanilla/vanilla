@@ -646,6 +646,10 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
         objectPosition: "center center",
     });
 
+    const defaultImageSVG = css({
+        ...Mixins.absolute.fullSizeOfParent(),
+    });
+
     const iconContainer = style(
         "iconContainer",
         {
@@ -768,6 +772,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
         imageContainer,
         imageContainerWrapper,
         image,
+        defaultImageSVG,
         description,
         icon,
         iconWrap,

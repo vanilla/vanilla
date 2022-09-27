@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for arraySearchI().
  */
 
-class ArraySearchTestI extends TestCase {
-
+class ArraySearchTestI extends TestCase
+{
     /**
      * Test {@link arraySearchI()} against several scenarios.
      *
@@ -23,7 +23,8 @@ class ArraySearchTestI extends TestCase {
      * @param string|int $expected Expected result.
      * @dataProvider provideSearchTestIArrays
      */
-    public function testArraySearchI($testValue, array $testSearch, $expected) {
+    public function testArraySearchI($testValue, array $testSearch, $expected)
+    {
         $actual = arraySearchI($testValue, $testSearch);
         $this->assertSame($expected, $actual);
     }
@@ -33,28 +34,13 @@ class ArraySearchTestI extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideSearchTestIArrays() {
+    public function provideSearchTestIArrays()
+    {
         $r = [
-            'hasValueSameCase' => [
-                'foo',
-                ['key1' => 'foo', 'key2' => 'bar'],
-                'key1',
-            ],
-            'hasValueDiffCase' => [
-                'FoO',
-                ['key1' => 'fOo', 'key2' => 'bar'],
-                'key1',
-            ],
-            'hasValueKeyInt' => [
-                'foO',
-                [0 => 'FOo', 1 => 'bar'],
-                0,
-            ],
-            'doesNotHaveValue' => [
-                'boo',
-                ['key1' => 'foo', 'key2' => 'bar'],
-                false,
-            ]
+            "hasValueSameCase" => ["foo", ["key1" => "foo", "key2" => "bar"], "key1"],
+            "hasValueDiffCase" => ["FoO", ["key1" => "fOo", "key2" => "bar"], "key1"],
+            "hasValueKeyInt" => ["foO", [0 => "FOo", 1 => "bar"], 0],
+            "doesNotHaveValue" => ["boo", ["key1" => "foo", "key2" => "bar"], false],
         ];
 
         return $r;

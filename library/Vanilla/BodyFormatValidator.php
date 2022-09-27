@@ -15,8 +15,8 @@ use Vanilla\Formatting\Formats;
 /**
  * Validates body fields to make sure it complies with its format.
  */
-class BodyFormatValidator {
-
+class BodyFormatValidator
+{
     /**
      * Validate richly formatted text.
      *
@@ -24,7 +24,8 @@ class BodyFormatValidator {
      * @param string $format The format of the field.
      * @return string|Invalid Returns the re-encoded string on success or `Invalid` on failure.
      */
-    private function validate($value, string $format) {
+    private function validate($value, string $format)
+    {
         try {
             $result = \Gdn::formatService()->filter($value, $format);
         } catch (FormattingException $e) {
@@ -33,10 +34,10 @@ class BodyFormatValidator {
             // For backwards compatibility unknown formatters are allowed in this validator.
             // The old models handle their own format validation where necessary.
             trigger_error(
-                "Could not validate format $format. A formatter was not found."
-                . "This is currently a warning, but may be an exception in the future.\n"
-                . "To fix this, implement `Vanilla\Contracts\Formatting\FormatInterface` for $format "
-                . "and register it with the `Vanilla\Formatting\FormatService`",
+                "Could not validate format $format. A formatter was not found." .
+                    "This is currently a warning, but may be an exception in the future.\n" .
+                    "To fix this, implement `Vanilla\Contracts\Formatting\FormatInterface` for $format " .
+                    "and register it with the `Vanilla\Formatting\FormatService`",
                 E_USER_WARNING
             );
             return $value;
@@ -53,8 +54,9 @@ class BodyFormatValidator {
      * @param array $row The entire row where the field is.
      * @return string|Invalid Returns the valid string on success or `Invalid` on failure.
      */
-    public function __invoke($value, $field, $row = []) {
-        $format = strtolower($row['Format'] ?? Formats\TextFormat::FORMAT_KEY);
+    public function __invoke($value, $field, $row = [])
+    {
+        $format = strtolower($row["Format"] ?? Formats\TextFormat::FORMAT_KEY);
         $valid = $this->validate($value, $format);
 
         return $valid;

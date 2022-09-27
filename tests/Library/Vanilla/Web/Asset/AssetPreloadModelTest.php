@@ -17,21 +17,23 @@ use VanillaTests\SharedBootstrapTestCase;
 /**
  * Tests for the asset preload model.
  */
-class AssetPreloadModelTest extends MinimalContainerTestCase {
-
+class AssetPreloadModelTest extends MinimalContainerTestCase
+{
     use HtmlNormalizeTrait;
 
     /**
      * @return bool
      */
-    protected static function useCommonBootstrap(): bool {
+    protected static function useCommonBootstrap(): bool
+    {
         return false;
     }
 
     /**
      * Test that unique keys work.
      */
-    public function testDuplication() {
+    public function testDuplication()
+    {
         $model = new AssetPreloadModel();
         $first = "https://test.asset.com/1.js";
         $second = "https://test.asset.com/2.js";
@@ -39,13 +41,20 @@ class AssetPreloadModelTest extends MinimalContainerTestCase {
         $model->addScript(new ExternalAsset($first), AssetPreloader::REL_PRELOAD, $key);
         $model->addScript(new ExternalAsset($second), AssetPreloader::REL_PRELOAD, $key);
         $this->assertCount(1, $model->getPreloads());
-        $this->assertEquals($first, $model->getPreloads()[0]->getAsset()->getWebPath());
+        $this->assertEquals(
+            $first,
+            $model
+                ->getPreloads()[0]
+                ->getAsset()
+                ->getWebPath()
+        );
     }
 
     /**
      * Test the HTML rendering.
      */
-    public function testRendering() {
+    public function testRendering()
+    {
         $model = new AssetPreloadModel();
         $model->addScript(new ExternalAsset("test-script"), AssetPreloader::REL_FULL);
         $model->addScript(new ExternalAsset("test-script-preload"), AssetPreloader::REL_PRELOAD);
@@ -66,9 +75,6 @@ class AssetPreloadModelTest extends MinimalContainerTestCase {
 
 HTML;
 
-        $this->assertEquals(
-            $expected,
-            $model->renderHtml()
-        );
+        $this->assertEquals($expected, $model->renderHtml());
     }
 }

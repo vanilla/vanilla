@@ -85,3 +85,40 @@ describe("isUrl", () => {
         });
     }
 });
+
+describe("createSourceSetValue", () => {
+    it("generates a source string", () => {
+        const mock = {
+            100: "test-100",
+            200: "test-200",
+        };
+        const expected = "test-100 100w,test-200 200w";
+        const actual = application.createSourceSetValue(mock);
+        expect(actual).toEqual(expected);
+    });
+    it("omits empty values source string", () => {
+        const mock = {
+            100: "test-100",
+            200: "",
+            300: "test-300",
+        };
+        const expected = "test-100 100w,test-300 300w";
+        const actual = application.createSourceSetValue(mock);
+        expect(actual).toEqual(expected);
+    });
+    it("returns empty source string for an object with empty values", () => {
+        const mock = {
+            100: "",
+            200: "",
+        };
+        const expected = "";
+        const actual = application.createSourceSetValue(mock);
+        expect(actual).toEqual(expected);
+    });
+    it("returns empty source string for an empty object", () => {
+        const mock = {};
+        const expected = "";
+        const actual = application.createSourceSetValue(mock);
+        expect(actual).toEqual(expected);
+    });
+});

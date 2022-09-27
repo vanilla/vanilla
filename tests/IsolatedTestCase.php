@@ -16,7 +16,8 @@ use PHPUnit\Framework\TestCase;
  *
  * If you use this you will need to do anything not including in tests/phpunit.php yourself.
  */
-class IsolatedTestCase extends TestCase {
+class IsolatedTestCase extends TestCase
+{
     /** @var bool Set this to have each test run separately without the same autoload. */
     protected $runTestInSeparateProcess = true;
 

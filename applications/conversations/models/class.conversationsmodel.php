@@ -11,8 +11,8 @@
 /**
  * Introduces common methods that child classes can use.
  */
-abstract class ConversationsModel extends Gdn_Model {
-
+abstract class ConversationsModel extends Gdn_Model
+{
     use \Vanilla\FloodControlTrait;
 
     /**
@@ -26,9 +26,10 @@ abstract class ConversationsModel extends Gdn_Model {
      * @since 2.2
      * @access public
      */
-    public function __construct($name = '') {
+    public function __construct($name = "")
+    {
         parent::__construct($name);
-        $this->floodGate = FloodControlHelper::configure($this, 'Conversations', $this->Name);
+        $this->floodGate = FloodControlHelper::configure($this, "Conversations", $this->Name);
     }
 
     /**
@@ -42,8 +43,9 @@ abstract class ConversationsModel extends Gdn_Model {
      * @since 2.2
      * @return bool Whether spam check is positive (TRUE = spammer).
      */
-    public function checkForSpam($type, $skipSpamCheck = false) {
-        deprecated(__CLASS__.' '.__METHOD__, 'FloodControlTrait::checkUserSpamming()');
+    public function checkForSpam($type, $skipSpamCheck = false)
+    {
+        deprecated(__CLASS__ . " " . __METHOD__, "FloodControlTrait::checkUserSpamming()");
 
         if ($skipSpamCheck) {
             return false;
@@ -52,11 +54,14 @@ abstract class ConversationsModel extends Gdn_Model {
         $session = Gdn::session();
 
         // Validate $type
-        if (!in_array($type, ['Conversation', 'ConversationMessage'])) {
-            trigger_error(errorMessage(sprintf('Spam check type unknown: %s', $type), $this->Name, 'checkForSpam'), E_USER_ERROR);
+        if (!in_array($type, ["Conversation", "ConversationMessage"])) {
+            trigger_error(
+                errorMessage(sprintf("Spam check type unknown: %s", $type), $this->Name, "checkForSpam"),
+                E_USER_ERROR
+            );
         }
 
-        $storageObject = FloodControlHelper::configure($this, 'Conversations', $type);
+        $storageObject = FloodControlHelper::configure($this, "Conversations", $type);
         return $this->checkUserSpamming($session->User->UserID, $storageObject);
     }
 
@@ -71,27 +76,33 @@ abstract class ConversationsModel extends Gdn_Model {
      *
      * @return array Array of users or userIDs depending on $idsOnly's value.
      */
-    public function getConversationMembers($conversationID, $idsOnly = true, $limit = false, $offset = false, $active = null) {
+    public function getConversationMembers(
+        $conversationID,
+        $idsOnly = true,
+        $limit = false,
+        $offset = false,
+        $active = null
+    ) {
         $conversationMembers = [];
 
-        $userConversation = new Gdn_Model('UserConversation');
+        $userConversation = new Gdn_Model("UserConversation");
         if (is_array($conversationID)) {
             $where = $conversationID;
         } else {
-            $where = ['ConversationID' => $conversationID];
+            $where = ["ConversationID" => $conversationID];
         }
         if ($active === true) {
-            $where['Deleted'] = 0;
+            $where["Deleted"] = 0;
         } elseif ($active === false) {
-            $where['Deleted'] = 1;
+            $where["Deleted"] = 1;
         }
-        $userMembers = $userConversation->getWhere($where, 'UserID', 'asc', $limit, $offset)->resultArray();
+        $userMembers = $userConversation->getWhere($where, "UserID", "asc", $limit, $offset)->resultArray();
 
         if (is_array($userMembers) && count($userMembers)) {
             if ($idsOnly) {
-                $conversationMembers = array_column($userMembers, 'UserID');
+                $conversationMembers = array_column($userMembers, "UserID");
             } else {
-                $conversationMembers = Gdn_DataSet::index($userMembers, 'UserID');
+                $conversationMembers = Gdn_DataSet::index($userMembers, "UserID");
             }
         }
 
@@ -106,15 +117,16 @@ abstract class ConversationsModel extends Gdn_Model {
      *
      * @return array Array of users or userIDs depending on $idsOnly's value.
      */
-    public function getConversationMembersCount($conversationID, $active = null) {
-        $userConversation = new Gdn_Model('UserConversation');
+    public function getConversationMembersCount($conversationID, $active = null)
+    {
+        $userConversation = new Gdn_Model("UserConversation");
 
-        $where = ['ConversationID' => $conversationID];
+        $where = ["ConversationID" => $conversationID];
 
         if ($active === true) {
-            $where['Deleted'] = 0;
+            $where["Deleted"] = 0;
         } elseif ($active === false) {
-            $where['Deleted'] = 1;
+            $where["Deleted"] = 1;
         }
 
         return $userConversation->getCount($where);
@@ -128,9 +140,10 @@ abstract class ConversationsModel extends Gdn_Model {
      *
      * @return bool
      */
-    public function validConversationMember($conversationID, $userID) {
+    public function validConversationMember($conversationID, $userID)
+    {
         $conversationMembers = $this->getConversationMembers($conversationID, true, false, false, true);
-        return (in_array($userID, $conversationMembers));
+        return in_array($userID, $conversationMembers);
     }
 
     /**
@@ -141,40 +154,44 @@ abstract class ConversationsModel extends Gdn_Model {
      * @param array $notifyUserIDs
      * @param array $options
      */
-    protected function notifyUsers($conversation, $message, $notifyUserIDs, $options = []) {
-        $conversation = (array)$conversation;
-        $message = (array)$message;
+    protected function notifyUsers($conversation, $message, $notifyUserIDs, $options = [])
+    {
+        $conversation = (array) $conversation;
+        $message = (array) $message;
 
         $activity = [
-            'ActivityType' => 'ConversationMessage',
-            'ActivityUserID' => $message['InsertUserID'],
-            'HeadlineFormat' => t('HeadlineFormat.ConversationMessage', '{ActivityUserID,User} sent you a <a href="{Url,html}">message</a>'),
-            'RecordType' => 'Conversation',
-            'RecordID' => $conversation['ConversationID'],
-            'Story' => $message['Body'],
-            'ActionText' => $options['ActionText'] ?? t('Reply'),
-            'Format' => val('Format', $message, c('Garden.InputFormatter')),
-            'Route' => $options['Url'] ?? "/messages/{$conversation['ConversationID']}#Message_{$message['MessageID']}"
+            "ActivityType" => "ConversationMessage",
+            "ActivityUserID" => $message["InsertUserID"],
+            "HeadlineFormat" => t(
+                "HeadlineFormat.ConversationMessage",
+                '{ActivityUserID,User} sent you a <a href="{Url,html}">message</a>'
+            ),
+            "RecordType" => "Conversation",
+            "RecordID" => $conversation["ConversationID"],
+            "Story" => $message["Body"],
+            "ActionText" => $options["ActionText"] ?? t("Reply"),
+            "Format" => val("Format", $message, c("Garden.InputFormatter")),
+            "Route" => $options["Url"] ?? "/messages/{$conversation["ConversationID"]}#Message_{$message["MessageID"]}",
         ];
 
-        $subject = $conversation['Subject'] ?? '';
+        $subject = $conversation["Subject"] ?? "";
         if ($subject) {
-            if (empty($options['FirstMessage'])) {
-                $subject = sprintf(t('Re: %s'), $subject);
+            if (empty($options["FirstMessage"])) {
+                $subject = sprintf(t("Re: %s"), $subject);
             }
-            $options['EmailSubject'] = $subject;
+            $options["EmailSubject"] = $subject;
         } else {
             $options = [];
         }
 
         $activityModel = new ActivityModel();
         foreach ($notifyUserIDs as $userID) {
-            if ($message['InsertUserID'] == $userID) {
+            if ($message["InsertUserID"] == $userID) {
                 continue; // Don't notify self.
             }
 
-            $activity['NotifyUserID'] = $userID;
-            $activityModel->queue($activity, 'ConversationMessage', $options);
+            $activity["NotifyUserID"] = $userID;
+            $activityModel->queue($activity, "ConversationMessage", $options);
         }
         $activityModel->saveQueue();
     }

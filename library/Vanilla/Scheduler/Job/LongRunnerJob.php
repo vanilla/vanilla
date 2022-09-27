@@ -14,8 +14,8 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Execute a long-runner in a job.
  */
-class LongRunnerJob implements LocalJobInterface, TrackableJobAwareInterface {
-
+class LongRunnerJob implements LocalJobInterface, TrackableJobAwareInterface
+{
     use TrackableJobAwareTrait;
     use LongRunnerJobMessageTrait;
 
@@ -33,14 +33,14 @@ class LongRunnerJob implements LocalJobInterface, TrackableJobAwareInterface {
     /** @var JobStatusModel */
     private $jobStatusModel;
 
-
     /**
      * DI.
      *
      * @param LongRunner $longRunner
      * @param JobStatusModel $jobStatusModel
      */
-    public function __construct(LongRunner $longRunner, JobStatusModel $jobStatusModel) {
+    public function __construct(LongRunner $longRunner, JobStatusModel $jobStatusModel)
+    {
         $this->longRunner = $longRunner;
         $this->jobStatusModel = $jobStatusModel;
     }
@@ -48,9 +48,20 @@ class LongRunnerJob implements LocalJobInterface, TrackableJobAwareInterface {
     /**
      * @inheritdoc
      */
-    public function run(): JobExecutionStatus {
-        $result = ModelUtils::consumeGenerator($this->runIterator());
-        return $result;
+    public function run(): JobExecutionStatus
+    {
+        $initialTimeout = $this->longRunner->getTimeout();
+        $initialMaxIterations = $this->longRunner->getMaxIterations();
+        try {
+            // There are no timeouts in a deferred job.
+            $this->longRunner->setTimeout(-1);
+            $this->longRunner->setMaxIterations(null);
+            $result = ModelUtils::consumeGenerator($this->runIterator());
+            return $result;
+        } finally {
+            $this->longRunner->setTimeout($initialTimeout);
+            $this->longRunner->setMaxIterations($initialMaxIterations);
+        }
     }
 
     /**
@@ -58,8 +69,8 @@ class LongRunnerJob implements LocalJobInterface, TrackableJobAwareInterface {
      *
      * @internal Only exposed for tests.
      */
-    public function runIterator(): \Generator {
-        $this->longRunner->setTimeout(100000);
+    public function runIterator(): \Generator
+    {
         $iterator = $this->longRunner->runIterator(
             new LongRunnerAction($this->class, $this->method, $this->args, $this->options)
         );

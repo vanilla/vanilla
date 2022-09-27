@@ -20,22 +20,24 @@ use Vanilla\Utility\SchemaUtils;
  * @deprecated Use DiscussionQuestionsWidget instead.
  * @package Vanilla\Forum\Modules
  */
-class QnAWidgetModule extends BaseDiscussionWidgetModule {
-
-    const ALL_QUESTIONS = 'all';
+class QnAWidgetModule extends BaseDiscussionWidgetModule
+{
+    const ALL_QUESTIONS = "all";
 
     /**
      * @inheritDoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "List - Questions";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getApiSchema(): Schema {
-        $apiSchema =  parent::getApiSchema();
+    public static function getApiSchema(): Schema
+    {
+        $apiSchema = parent::getApiSchema();
         $apiSchema->merge(
             SchemaUtils::composeSchemas(
                 self::qnaFilterSchema(),
@@ -50,14 +52,17 @@ class QnAWidgetModule extends BaseDiscussionWidgetModule {
     }
 
     /**
-     * @inheritDoc
+     * Get the real parameters that we will pass to the API.
+     * @param array|null $params
+     * @return array
      */
-    protected function getRealApiParams(): array {
+    protected function getRealApiParams(?array $params = null): array
+    {
         $apiParams = parent::getRealApiParams();
-        $apiParams['type'] = QnaModel::TYPE;
-        $status = $apiParams['status'] ?? '';
+        $apiParams["type"] = QnaModel::TYPE;
+        $status = $apiParams["status"] ?? "";
         if ($status === self::ALL_QUESTIONS) {
-            unset($apiParams['status']);
+            unset($apiParams["status"]);
         }
 
         return $apiParams;
@@ -68,31 +73,27 @@ class QnAWidgetModule extends BaseDiscussionWidgetModule {
      *
      * @return Schema
      */
-    protected static function qnaFilterSchema(): Schema {
+    protected static function qnaFilterSchema(): Schema
+    {
         return Schema::parse([
             "status:s?" => [
-                "enum" => array_map(
-                    'strtolower',
-                    [
-                        QnaModel::ACCEPTED,
-                        QnaModel::ANSWERED,
-                        QnaModel::UNANSWERED,
-                        self::ALL_QUESTIONS
-                    ]
+                "enum" => array_map("strtolower", [
+                    QnaModel::ACCEPTED,
+                    QnaModel::ANSWERED,
+                    QnaModel::UNANSWERED,
+                    self::ALL_QUESTIONS,
+                ]),
+                "default" => self::ALL_QUESTIONS,
+                "x-control" => SchemaForm::dropDown(
+                    new FormOptions(t("Status"), t("Filter by question status")),
+                    new StaticFormChoices([
+                        strtolower(QnaModel::ACCEPTED) => t("Accepted answer only"),
+                        strtolower(QnaModel::ANSWERED) => t("Answered questions only"),
+                        strtolower(QnaModel::UNANSWERED) => t("Unanswered questions only"),
+                        strtolower(self::ALL_QUESTIONS) => t("All"),
+                    ])
                 ),
-                'default' => self::ALL_QUESTIONS,
-                'x-control' => SchemaForm::dropDown(
-                    new FormOptions(t('Status'), t('Filter by question status')),
-                    new StaticFormChoices(
-                        [
-                            strtolower(QnaModel::ACCEPTED) => t('Accepted answer only'),
-                            strtolower(QnaModel::ANSWERED) => t('Answered questions only'),
-                            strtolower(QnaModel::UNANSWERED) => t('Unanswered questions only'),
-                            strtolower(self::ALL_QUESTIONS) => t('All'),
-                        ]
-                    )
-                )
-            ]
+            ],
         ]);
     }
 }

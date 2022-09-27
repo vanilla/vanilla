@@ -13,8 +13,8 @@ use Vanilla\FileUtils;
 /**
  * Provider for default layouts for a layout view type defined as a YAML file and registered during bootstrapping.
  */
-class FileBasedLayoutProvider implements LayoutProviderInterface {
-
+class FileBasedLayoutProvider implements LayoutProviderInterface
+{
     //region Properties
 
     /** @var string $cacheBasePath */
@@ -38,7 +38,8 @@ class FileBasedLayoutProvider implements LayoutProviderInterface {
      *
      * @param string $cacheBasePath Base path used to cache parsed static layout definitions
      */
-    public function __construct(string $cacheBasePath, \UserModel $userModel) {
+    public function __construct(string $cacheBasePath, \UserModel $userModel)
+    {
         $this->cacheBasePath = $cacheBasePath;
         $this->userModel = $userModel;
         $this->layoutPaths = [];
@@ -51,20 +52,22 @@ class FileBasedLayoutProvider implements LayoutProviderInterface {
     /**
      * @inheritdoc
      */
-    public function isIDFormatSupported($layoutID): bool {
+    public function isIDFormatSupported($layoutID): bool
+    {
         return is_string($layoutID) && !is_numeric($layoutID);
     }
 
     /**
      * @inheritdoc
      */
-    public function getByID($layoutID): array {
+    public function getByID($layoutID): array
+    {
         if (!isset($this->layoutPaths[$layoutID])) {
-            throw new NotFoundException('Layout');
+            throw new NotFoundException("Layout");
         }
         $cachePath = "{$this->cacheBasePath}/{$layoutID}.php";
         $this->requestedLayoutPath = $this->layoutPaths[$layoutID];
-        $layout = (array)FileUtils::getCached($cachePath, [$this, 'parseRequestedLayoutFile']);
+        $layout = (array) FileUtils::getCached($cachePath, [$this, "parseRequestedLayoutFile"]);
         $this->requestedLayoutPath = null;
         return $layout;
     }
@@ -72,13 +75,11 @@ class FileBasedLayoutProvider implements LayoutProviderInterface {
     /**
      * @inheritDoc
      */
-    public function getAll(): array {
-        return array_map(
-            function ($layoutID) {
-                return $this->getByID($layoutID);
-            },
-            array_keys($this->layoutPaths)
-        );
+    public function getAll(): array
+    {
+        return array_map(function ($layoutID) {
+            return $this->getByID($layoutID);
+        }, array_keys($this->layoutPaths));
     }
 
     /**
@@ -87,7 +88,8 @@ class FileBasedLayoutProvider implements LayoutProviderInterface {
      * @param string $layoutID Layout view type for the static layout
      * @param string $layoutFilePath Path to the file where the static layout is defined.
      */
-    public function registerStaticLayout(string $layoutID, string $layoutFilePath): void {
+    public function registerStaticLayout(string $layoutID, string $layoutFilePath): void
+    {
         if (file_exists($layoutFilePath)) {
             $this->layoutPaths[$layoutID] = $layoutFilePath;
         }
@@ -98,7 +100,8 @@ class FileBasedLayoutProvider implements LayoutProviderInterface {
      *
      * @param string $cacheBasePath
      */
-    public function setCacheBasePath(string $cacheBasePath): void {
+    public function setCacheBasePath(string $cacheBasePath): void
+    {
         $this->cacheBasePath = $cacheBasePath;
     }
 
@@ -107,7 +110,8 @@ class FileBasedLayoutProvider implements LayoutProviderInterface {
      *
      * @return string
      */
-    public function getCacheBasePath(): string {
+    public function getCacheBasePath(): string
+    {
         return $this->cacheBasePath;
     }
 
@@ -117,16 +121,17 @@ class FileBasedLayoutProvider implements LayoutProviderInterface {
      * @return array
      * @throws NotFoundException Requested layout file not found.
      */
-    public function parseRequestedLayoutFile(): array {
+    public function parseRequestedLayoutFile(): array
+    {
         try {
             if (!isset($this->requestedLayoutPath)) {
-                throw new NotFoundException('Layout');
+                throw new NotFoundException("Layout");
             }
             $contents = FileUtils::getArray($this->requestedLayoutPath);
-            $contents['insertUserID'] = $this->userModel->getSystemUserID();
+            $contents["insertUserID"] = $this->userModel->getSystemUserID();
             return $contents;
         } catch (\Exception $e) {
-            throw new NotFoundException('Layout');
+            throw new NotFoundException("Layout");
         }
     }
     //endregion

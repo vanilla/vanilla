@@ -6,7 +6,7 @@
 import React from "react";
 import Member from "@dashboard/components/Member";
 import { MemberTable } from "@dashboard/components/MemberTable";
-import TwoColumnSection from "@library/layout/TwoColumnSection";
+import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import { IUser } from "@library/@types/api/users";
 import { IResult } from "@library/result/Result";
 
@@ -22,7 +22,6 @@ export default {
 const common: IResult = {
     name: "common",
     url: "#",
-    location: [],
 };
 
 const one = {
@@ -68,7 +67,7 @@ const badUserName = {
 };
 
 export const MemberList = () => (
-    <TwoColumnSection
+    <SectionTwoColumns
         mainTop={
             <MemberTable>
                 <Member {...one} />
@@ -86,7 +85,7 @@ export const MemberList = () => (
 );
 
 export const MemberListShort = () => (
-    <TwoColumnSection
+    <SectionTwoColumns
         mainTop={
             <MemberTable>
                 <Member {...one} />

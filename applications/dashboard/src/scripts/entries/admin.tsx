@@ -31,13 +31,18 @@ import { escapeHTML } from "@vanilla/dom-utils";
 import { getDashboardRoutes } from "@dashboard/dashboardRoutes";
 import { dashboardSectionSlice } from "@dashboard/DashboardSectionSlice";
 import AdminHeader from "@dashboard/components/AdminHeader";
+import ModernEmbedSettings from "@library/embed/ModernEmbedSettings";
+import { userProfilesSlice } from "@dashboard/userProfiles/state/UserProfiles.slice";
+import { UserProfileSettings } from "@dashboard/userProfiles/UserProfileSettings";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 addComponent("VanillaLabsPage", VanillaLabsPage);
+
 addComponent("LanguageSettingsPage", LanguageSettingsPage);
+addComponent("ModernEmbedSettings", ModernEmbedSettings);
 
 disableComponentTheming();
 onContent(() => initAllUserContent());
@@ -45,6 +50,9 @@ registerReducer("roles", roleReducer);
 registerReducer("themeSettings", themeSettingsReducer);
 registerReducer("forum", forumReducer);
 registerReducer("roleRequests", RoleRequestReducer);
+
+registerReducer(userProfilesSlice.name, userProfilesSlice.reducer);
+addComponent("UserProfileSettings", UserProfileSettings);
 
 applySharedPortalContext((props) => {
     const [navHeight, setNavHeight] = useState(0);

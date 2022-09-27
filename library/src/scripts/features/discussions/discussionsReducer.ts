@@ -482,6 +482,51 @@ export const discussionsReducer = produce(
 
             return state;
         })
+        .case(DiscussionActions.bulkCloseDiscussionsACs.started, (state, params) => {
+            const { discussionIDs } = params;
+            discussionIDs.forEach((ID) => {
+                state.patchStatusByPatchID[`${ID}-close`] = {
+                    status: LoadStatus.LOADING,
+                };
+            });
+            return state;
+        })
+        .case(DiscussionActions.bulkCloseDiscussionsACs.failed, (state, payload) => {
+            const { discussionIDs } = payload.params;
+            discussionIDs.forEach((ID) => {
+                state.patchStatusByPatchID[`${ID}-close`] = {
+                    status: LoadStatus.ERROR,
+                    error: payload.error,
+                };
+            });
+            return state;
+        })
+        .case(DiscussionActions.bulkCloseDiscussionsACs.done, (state, payload) => {
+            const { failedIDs, exceptionsByID, successIDs } = payload.result.progress;
+
+            if (failedIDs && failedIDs.length > 0) {
+                failedIDs.forEach((ID) => {
+                    state.patchStatusByPatchID[`${ID}-close`] = {
+                        status: LoadStatus.ERROR,
+                        error: exceptionsByID[ID],
+                    };
+                });
+            }
+
+            if (successIDs && successIDs.length > 0) {
+                successIDs.forEach((ID) => {
+                    state.patchStatusByPatchID[`${ID}-close`] = {
+                        status: LoadStatus.SUCCESS,
+                    };
+                    state.discussionsByID[ID] = {
+                        ...state.discussionsByID[ID],
+                        closed: true,
+                    };
+                });
+            }
+
+            return state;
+        })
         .case(DiscussionActions.getCategoryByIDACs.started, (state, params) => {
             const { categoryID } = params;
             state.categoriesStatusesByID[categoryID] = {

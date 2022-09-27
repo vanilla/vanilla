@@ -14,6 +14,7 @@
                 echo $this->Form->textBox('Email', ['autofocus' => 'autofocus']);
                 ?>
             </li>
+            <?php Captcha::render($this); ?>
             <li class="Buttons">
                 <?php
                 echo $this->Form->button('Request a new password', ['class' => 'Button Primary']);

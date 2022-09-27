@@ -56,6 +56,7 @@ story.add("Elements", () => {
                 <Checkbox label="Hover/Focus" fakeFocus />
                 <Checkbox label="Checked" defaultChecked />
                 <Checkbox label="Disabled" disabled />
+                <Checkbox label="Disabled with note" disabled disabledNote="This is disabled for a good reason." />
                 <Checkbox label="Checked & Disabled" defaultChecked disabled />
             </CheckboxGroup>
             <StoryHeading>Hidden Label</StoryHeading>

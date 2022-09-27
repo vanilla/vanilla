@@ -7,33 +7,37 @@
 
 namespace Vanilla\Formatting\Quill\Formats;
 
-class Code extends AbstractFormat {
-
+class Code extends AbstractFormat
+{
     /**
      * @inheritDoc
      */
-    protected static function getAttributeLookupKey(): array {
+    protected static function getAttributeLookupKey(): array
+    {
         return ["codeInline", "code"];
     }
 
     /**
      * @inheritDoc
      */
-    protected function getBlackListedNestedFormats(): array {
+    protected function getBlackListedNestedFormats(): array
+    {
         return [];
     }
 
     /**
      * @inheritDoc
      */
-    protected function getTagName(): string {
+    protected function getTagName(): string
+    {
         return "code";
     }
 
     /**
      * Get an attributes array for the blot's tag.
      */
-    protected function getAttributes(): array {
+    protected function getAttributes(): array
+    {
         return [
             "class" => "code codeInline",
             "spellcheck" => "false",

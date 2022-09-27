@@ -13,19 +13,18 @@ import { useSection } from "@library/layout/LayoutContext";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { memberListClasses } from "@dashboard/components/MemberList.styles";
-import { IResult } from "@library/result/Result";
 import DateTime from "@library/content/DateTime";
 
-interface IProps extends IResult {
+export interface IMemberResultProps {
     // We always have userInfo on these member queries.
-    userInfo: IUser;
+    userInfo?: IUser;
 }
 
-export default function Member(props: IProps) {
+export default function Member(props: IMemberResultProps) {
     const user = props.userInfo;
     const { isCompact } = useSection();
 
-    if (user == null) {
+    if (!user) {
         return <></>;
     }
 

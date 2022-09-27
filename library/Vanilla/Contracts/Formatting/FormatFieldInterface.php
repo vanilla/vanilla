@@ -12,8 +12,8 @@ namespace Vanilla\Contracts\Formatting;
  *
  * @package Vanilla\Contracts\Formatting
  */
-interface FormatFieldInterface {
-
+interface FormatFieldInterface
+{
     /**
      * Enable/disable field formatting.
      *

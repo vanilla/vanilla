@@ -21,8 +21,8 @@ use VanillaTests\VanillaTestCase;
 /**
  * Tests for verifying the basic behavior of the Image Html processor.
  */
-class ImageHtmlProcessorTest extends VanillaTestCase {
-
+class ImageHtmlProcessorTest extends VanillaTestCase
+{
     use BootstrapTrait, HtmlNormalizeTrait, SetupTraitsTrait;
 
     /** @var FormatService */
@@ -37,11 +37,16 @@ class ImageHtmlProcessorTest extends VanillaTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->setUpTestTraits();
 
-        $this->container()->call(function (ImageHtmlProcessor $processor, FormatService $formatService, Gdn_Request $request) {
+        $this->container()->call(function (
+            ImageHtmlProcessor $processor,
+            FormatService $formatService,
+            Gdn_Request $request
+        ) {
             $this->processor = $processor;
             $this->formatService = $formatService;
             $this->request = $request;
@@ -57,24 +62,26 @@ class ImageHtmlProcessorTest extends VanillaTestCase {
     /**
      * Test generating srcsets on content's images.
      */
-    public function testImagesSrcSet() {
+    public function testImagesSrcSet()
+    {
         // Source content.
         $body = "There is an image here! <img src='/image/baconSlice.png' />";
         // The expected output.
         $expectedOutput =
-            'There is an image here! '.
-            '<img ' .
-                'src="/image/baconSlice.png" ' .
-                'alt="image" ' .
-                'class="embedImage-img importedEmbed-img" ' .
-                'srcset="' .
-                    'https://loremflickr.com/g/10/600/baconSlice 10w, ' .
-                    'https://loremflickr.com/g/300/600/baconSlice 300w, ' .
-                    'https://loremflickr.com/g/800/600/baconSlice 800w, ' .
-                    'https://loremflickr.com/g/1200/600/baconSlice 1200w, ' .
-                    '/image/baconSlice.png' .
-                '"' .
-            '>';
+            "There is an image here! " .
+            "<img " .
+            'src="/image/baconSlice.png" ' .
+            'alt="image" ' .
+            'class="embedImage-img importedEmbed-img" ' .
+            'srcset="' .
+            "https://loremflickr.com/g/10/600/baconSlice 10w, " .
+            "https://loremflickr.com/g/300/600/baconSlice 300w, " .
+            "https://loremflickr.com/g/800/600/baconSlice 800w, " .
+            "https://loremflickr.com/g/1200/600/baconSlice 1200w, " .
+            "https://loremflickr.com/g/1600/600/baconSlice 1600w, " .
+            "/image/baconSlice.png" .
+            '"' .
+            ">";
 
         $document = new HtmlDocument(\Gdn::formatService()->renderHTML($body, WysiwygFormat::FORMAT_KEY));
         $actualOutput = $this->processor->processDocument($document)->getInnerHtml();

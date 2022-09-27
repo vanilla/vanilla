@@ -18,8 +18,8 @@ use Vanilla\Contracts\Site\Site;
  *
  * Only knows about it's own site and the IDs don't mean anything.
  */
-class OwnSiteProvider extends AbstractSiteProvider {
-
+class OwnSiteProvider extends AbstractSiteProvider
+{
     /** @var Site */
     protected $ownSite;
 
@@ -32,43 +32,38 @@ class OwnSiteProvider extends AbstractSiteProvider {
      * @param OwnSite $ownSite
      * @param LocaleInterface $locale
      */
-    public function __construct(
-        OwnSite $ownSite,
-        LocaleInterface $locale
-    ) {
+    public function __construct(OwnSite $ownSite, LocaleInterface $locale)
+    {
         $this->ownSite = $ownSite;
 
         $unknownSiteHttp = new HttpClient();
         $unknownSiteHttp->addMiddleware(function () {
-            throw new NotFoundException('Site');
+            throw new NotFoundException("Site");
         });
-        $this->unknownSite = new Site(
-            $locale->translate('Unknown Site'),
-            "/",
-            -1,
-            -1,
-            $unknownSiteHttp
-        );
+        $this->unknownSite = new Site($locale->translate("Unknown Site"), "/", -1, -1, $unknownSiteHttp);
     }
 
     /**
      * @return Site[]
      */
-    public function getAllSites(): array {
+    public function getAllSites(): array
+    {
         return [$this->ownSite];
     }
 
     /**
      * @inheritdoc
      */
-    public function getOwnSite(): Site {
+    public function getOwnSite(): Site
+    {
         return $this->ownSite;
     }
 
     /**
      * @inheritdoc
      */
-    public function getUnknownSite(): Site {
+    public function getUnknownSite(): Site
+    {
         return $this->unknownSite;
     }
 }

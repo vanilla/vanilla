@@ -10,8 +10,8 @@ namespace Vanilla\Theme;
 /**
  * Interface for providing variables on a theme.
  */
-interface VariableDefaultsProviderInterface {
-
+interface VariableDefaultsProviderInterface
+{
     /**
      * Get variables to include with a theme.
      *

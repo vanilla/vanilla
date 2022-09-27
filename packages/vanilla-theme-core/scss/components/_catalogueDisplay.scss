@@ -8,8 +8,8 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$catalogue-photoSize:                         100px !default;
-$catalogue-mobileHeight:                      100px !default;
+$catalogue-photoSize: 100px !default;
+$catalogue-mobileHeight: 100px !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -67,9 +67,7 @@ $catalogue-mobileHeight:                      100px !default;
 }
 
 .DataTable {
-
     .CatalogueRow .Options {
-
         @include maxWidth($theme-breakpoint_mobile) {
             margin-bottom: $utility-baseUnitDouble;
         }

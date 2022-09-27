@@ -6,9 +6,9 @@
 module.exports = (api, options) => {
     api.cache(true);
     let envPlugins = {};
-    const isStoryshot = !!process.env.STORYSHOT;
+    const shouldTransformWebpackContext = !!process.env.STORYSHOT || process.env.NODE_ENV === "test";
 
-    if (isStoryshot) {
+    if (shouldTransformWebpackContext) {
         envPlugins["test"] = {
             plugins: ["require-context-hook"],
         };
@@ -17,7 +17,7 @@ module.exports = (api, options) => {
     return {
         presets: ["@vanilla/babel-preset"],
         env: {
-            ...envPlugins
-        }
+            ...envPlugins,
+        },
     };
 };

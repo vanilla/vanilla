@@ -15,8 +15,8 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class TwitchEmbedFactoryTest extends MinimalContainerTestCase {
-
+class TwitchEmbedFactoryTest extends MinimalContainerTestCase
+{
     /** @var TwitchEmbedFactory */
     private $factory;
 
@@ -26,7 +26,8 @@ class TwitchEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
         $this->factory = new TwitchEmbedFactory($this->httpClient);
@@ -38,28 +39,29 @@ class TwitchEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string $urlToTest
      * @dataProvider supportedDomainsProvider
      */
-    public function testSupportedDomains(string $urlToTest) {
+    public function testSupportedDomains(string $urlToTest)
+    {
         $this->assertTrue($this->factory->canHandleUrl($urlToTest));
     }
 
     /**
      * @return array
      */
-    public function supportedDomainsProvider(): array {
-        return [
-            [ "https://www.twitch.tv/videos/441409883" ]
-        ];
+    public function supportedDomainsProvider(): array
+    {
+        return [["https://www.twitch.tv/videos/441409883"]];
     }
 
     /**
      * Test network request fetching and handling.
      */
-    public function testCreateEmbedForUrl() {
+    public function testCreateEmbedForUrl()
+    {
         $url = "https://www.twitch.tv/videos/441409883";
         $videoID = "441409883";
         $frameSrc = "https://player.twitch.tv/?video=441409883";
 
-        $oembedParams = http_build_query([ "url" => $url ]);
+        $oembedParams = http_build_query(["url" => $url]);
         $oembedUrl = TwitchEmbedFactory::OEMBED_URL_BASE . "?" . $oembedParams;
 
         // phpcs:disable Generic.Files.LineLength
@@ -72,11 +74,13 @@ class TwitchEmbedFactoryTest extends MinimalContainerTestCase {
             "author_url" => "https://www.twitch.tv/jerma985",
             "provider_name" => "Twitch",
             "provider_url" => "https://www.twitch.tv/",
-            "thumbnail_url" => "https://static-cdn.jtvnw.net/s3_vods/aa1bb413e849cf63b446_jerma985_34594404336_1230815694/thumb/thumb0-640x360.jpg",
+            "thumbnail_url" =>
+                "https://static-cdn.jtvnw.net/s3_vods/aa1bb413e849cf63b446_jerma985_34594404336_1230815694/thumb/thumb0-640x360.jpg",
             "video_length" => 19593,
             "created_at" => "2019-06-19T21:22:59Z",
             "game" => "The Movies",
-            "html" => "<iframe src=\"https://player.twitch.tv/?%21branding=&amp;autoplay=false&amp;video=v441409883\" width=\"500\" height=\"281\" frameborder=\"0\" scrolling=\"no\" allowfullscreen></iframe>",
+            "html" =>
+                "<iframe src=\"https://player.twitch.tv/?%21branding=&amp;autoplay=false&amp;video=v441409883\" width=\"500\" height=\"281\" frameborder=\"0\" scrolling=\"no\" allowfullscreen></iframe>",
             "width" => 500,
             "height" => 281,
             "request_url" => "https://www.twitch.tv/videos/441409883",
@@ -85,11 +89,7 @@ class TwitchEmbedFactoryTest extends MinimalContainerTestCase {
 
         $this->httpClient->addMockResponse(
             $oembedUrl,
-            new HttpResponse(
-                200,
-                "Content-Type: application/json",
-                json_encode($data)
-            )
+            new HttpResponse(200, "Content-Type: application/json", json_encode($data))
         );
 
         // Check over the network.
@@ -122,7 +122,8 @@ class TwitchEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string|null $expectedID
      * @dataProvider provideIDTestUrls
      */
-    public function testIDFromUrl(string $url, ?string $expectedID): void {
+    public function testIDFromUrl(string $url, ?string $expectedID): void
+    {
         $embed = $this->factory->createEmbedForUrl($url);
         $data = $embed->jsonSerialize();
         $this->assertSame($data["twitchID"], $expectedID);
@@ -133,28 +134,17 @@ class TwitchEmbedFactoryTest extends MinimalContainerTestCase {
      *
      * @return array
      */
-    public function provideIDTestUrls(): array {
+    public function provideIDTestUrls(): array
+    {
         return [
-            "Clip, short-form" => [
-                "https://clips.twitch.tv/KnottyOddFishShazBotstix",
-                "clip:KnottyOddFishShazBotstix",
-            ],
+            "Clip, short-form" => ["https://clips.twitch.tv/KnottyOddFishShazBotstix", "clip:KnottyOddFishShazBotstix"],
             "Clip, long-form" => [
                 "https://www.twitch.tv/jerma985/clip/KnottyOddFishShazBotstix",
                 "clip:KnottyOddFishShazBotstix",
             ],
-            "Channel" => [
-                "https://www.twitch.tv/jerma985",
-                "channel:jerma985",
-            ],
-            "Video" => [
-                "https://www.twitch.tv/videos/346728148",
-                "video:346728148",
-            ],
-            "Collection" => [
-                "https://www.twitch.tv/collections/myIbIFkZphQSbQ",
-                "collection:myIbIFkZphQSbQ",
-            ],
+            "Channel" => ["https://www.twitch.tv/jerma985", "channel:jerma985"],
+            "Video" => ["https://www.twitch.tv/videos/346728148", "video:346728148"],
+            "Collection" => ["https://www.twitch.tv/collections/myIbIFkZphQSbQ", "collection:myIbIFkZphQSbQ"],
         ];
     }
 }

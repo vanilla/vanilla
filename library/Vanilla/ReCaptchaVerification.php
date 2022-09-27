@@ -12,8 +12,8 @@ use Vanilla\Contracts\ConfigurationInterface;
 /**
  * Class reCaptchaVerification
  */
-class ReCaptchaVerification {
-
+class ReCaptchaVerification
+{
     const RECAPTCHA_V3_URL = "https://www.google.com/recaptcha/api/siteverify";
 
     /** @var HttpClient */
@@ -28,7 +28,8 @@ class ReCaptchaVerification {
      * @param HttpClient $httpClient
      * @param ConfigurationInterface $config
      */
-    public function __construct(HttpClient $httpClient, ConfigurationInterface $config) {
+    public function __construct(HttpClient $httpClient, ConfigurationInterface $config)
+    {
         $this->httpClient = $httpClient;
         $this->config = $config;
     }
@@ -39,13 +40,14 @@ class ReCaptchaVerification {
      * @param string $responseToken
      * @return bool
      */
-    public function siteVerifyV3(string $responseToken = ''): bool {
+    public function siteVerifyV3(string $responseToken = ""): bool
+    {
         $body = [
-            "secret" => $this->config->get("RecaptchaV3.PrivateKey", ''),
+            "secret" => $this->config->get("RecaptchaV3.PrivateKey", ""),
             "response" => $responseToken,
         ];
         $reCaptchaResponse = $this->httpClient->post(self::RECAPTCHA_V3_URL, $body)->getBody();
-        $reCaptchaResponse= $reCaptchaResponse["success"] ?? false;
+        $reCaptchaResponse = $reCaptchaResponse["success"] ?? false;
 
         return $reCaptchaResponse;
     }

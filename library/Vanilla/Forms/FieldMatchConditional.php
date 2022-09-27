@@ -13,8 +13,8 @@ use Garden\Schema\Schema;
  *
  * @package Vanilla\Forms
  */
-class FieldMatchConditional implements FormFieldMatchInterface {
-
+class FieldMatchConditional implements FormFieldMatchInterface
+{
     /**
      * @var string $field
      */
@@ -31,10 +31,8 @@ class FieldMatchConditional implements FormFieldMatchInterface {
      * @param string $field
      * @param Schema $schema
      */
-    public function __construct(
-        string $field,
-        Schema $schema
-    ) {
+    public function __construct(string $field, Schema $schema)
+    {
         $this->field = $field;
         $this->schema = $schema;
     }
@@ -44,9 +42,10 @@ class FieldMatchConditional implements FormFieldMatchInterface {
      *
      * @return array
      */
-    public function getCondition(): array {
+    public function getCondition(): array
+    {
         return [
-            'field' => $this->field,
+            "field" => $this->field,
         ] + $this->schema->getSchemaArray();
     }
 }

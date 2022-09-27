@@ -16,15 +16,15 @@ use VanillaTests\VanillaTestCase;
 /**
  * Test {@link SpamModel}.
  */
-class SpamModelTest extends VanillaTestCase {
-    use EventSpyTestTrait,
-        BootstrapTrait,
-        SetupTraitsTrait;
+class SpamModelTest extends VanillaTestCase
+{
+    use EventSpyTestTrait, BootstrapTrait, SetupTraitsTrait;
 
     /**
      * Setup
      */
-    public function setup(): void {
+    public function setup(): void
+    {
         parent::setUp();
         $this->setUpTestTraits();
     }
@@ -34,13 +34,14 @@ class SpamModelTest extends VanillaTestCase {
      *
      * @return void
      */
-    public function testTrippingCheckSpam() {
+    public function testTrippingCheckSpam()
+    {
         /** @var GDN_Session $sessObj */
         $sessObj = $this->container()->get(GDN_Session::class);
-        $sessObj->getPermissions()->set('Garden.Moderation.Manage', false);
+        $sessObj->getPermissions()->set("Garden.Moderation.Manage", false);
 
-        SpamModel::isSpam('Comment', []);
-        $this->assertEventFired('SpamModel_CheckSpam');
+        SpamModel::isSpam("Comment", []);
+        $this->assertEventFired("SpamModel_CheckSpam");
     }
 
     /**
@@ -48,12 +49,13 @@ class SpamModelTest extends VanillaTestCase {
      *
      * @return void
      */
-    public function testNotTrippingCheckSpam() {
+    public function testNotTrippingCheckSpam()
+    {
         /** @var GDN_Session $sessObj */
         $sessObj = $this->container()->get(GDN_Session::class);
-        $sessObj->getPermissions()->set('Garden.Moderation.Manage', true);
+        $sessObj->getPermissions()->set("Garden.Moderation.Manage", true);
 
-        SpamModel::isSpam('Comment', []);
-        $this->assertEventNotFired('SpamModel_CheckSpam');
+        SpamModel::isSpam("Comment", []);
+        $this->assertEventNotFired("SpamModel_CheckSpam");
     }
 }

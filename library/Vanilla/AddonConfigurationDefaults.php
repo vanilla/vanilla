@@ -10,8 +10,8 @@ namespace Vanilla;
 /**
  * Class for implementing addon specific configuration defaults.
  */
-abstract class AddonConfigurationDefaults {
-
+abstract class AddonConfigurationDefaults
+{
     /**
      * Get an array of configuration defaults.
      *

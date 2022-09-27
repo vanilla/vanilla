@@ -7,7 +7,7 @@ import React from "react";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { DiscussionListView } from "@library/features/discussions/DiscussionList.views";
-import { STORY_IPSUM_MEDIUM, STORY_USER, STORY_ME_ADMIN, STORY_TAGS } from "@library/storybook/storyData";
+import { STORY_IPSUM_MEDIUM, STORY_USER, STORY_ME_ADMIN, STORY_TAGS, STORY_IMAGE } from "@library/storybook/storyData";
 import { ListItemIconPosition } from "@library/lists/ListItem.variables";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { LoadStatus } from "@library/@types/api/core";
@@ -15,6 +15,9 @@ import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
 import { setMeta } from "@library/utility/appUtils";
 
 import keyBy from "lodash/keyBy";
+import { DiscussionsWidget } from "@library/features/discussions/DiscussionsWidget";
+import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
+import { StoryHeading } from "@library/storybook/StoryHeading";
 
 export default {
     title: "Components/DiscussionLists",
@@ -353,4 +356,94 @@ export const IconHidden = storyWithConfig(
             </StoryContent>
         );
     },
+);
+
+export const AsGridVariant = storyWithConfig(
+    {
+        themeVars: {},
+        storeState: loggedInStoreState,
+    },
+    () => {
+        return (
+            <DiscussionsWidget
+                discussions={fakeDiscussions}
+                apiParams={{ discussionID: fakeDiscussions[0].discussionID }}
+                containerOptions={{ displayType: WidgetContainerDisplayType.GRID }}
+            />
+        );
+    },
+);
+
+export const AsCarouselVariant = storyWithConfig(
+    {
+        themeVars: {},
+        storeState: loggedInStoreState,
+    },
+    () => {
+        return (
+            <DiscussionsWidget
+                discussions={fakeDiscussions}
+                apiParams={{ discussionID: fakeDiscussions[0].discussionID }}
+                containerOptions={{ displayType: WidgetContainerDisplayType.CAROUSEL }}
+            />
+        );
+    },
+);
+
+export const AsSimpleLinks = storyWithConfig(
+    {
+        themeVars: {},
+        storeState: loggedInStoreState,
+    },
+    () => {
+        return (
+            <DiscussionsWidget
+                title="My Discussions"
+                discussions={fakeDiscussions}
+                apiParams={{ discussionID: fakeDiscussions[0].discussionID }}
+                containerOptions={{ displayType: WidgetContainerDisplayType.LINK }}
+            />
+        );
+    },
+);
+
+export const FeaturedImage = storyWithConfig(
+    {
+        themeVars: {},
+        storeState: loggedInStoreState,
+    },
+    () => (
+        <>
+            <StoryHeading>List View</StoryHeading>
+            <DiscussionsWidget
+                discussions={fakeDiscussions}
+                apiParams={{
+                    discussionID: fakeDiscussions[0].discussionID,
+                    featuredImage: true,
+                    fallbackImage: STORY_IMAGE,
+                }}
+                containerOptions={{ displayType: WidgetContainerDisplayType.LIST }}
+            />
+            <StoryHeading>Grid View</StoryHeading>
+            <DiscussionsWidget
+                discussions={fakeDiscussions}
+                apiParams={{
+                    discussionID: fakeDiscussions[0].discussionID,
+                    featuredImage: true,
+                    fallbackImage: STORY_IMAGE,
+                }}
+                containerOptions={{ displayType: WidgetContainerDisplayType.GRID }}
+            />
+            <StoryHeading>Carousel View</StoryHeading>
+            <DiscussionsWidget
+                discussions={fakeDiscussions}
+                apiParams={{
+                    discussionID: fakeDiscussions[0].discussionID,
+                    featuredImage: true,
+                    fallbackImage: STORY_IMAGE,
+                }}
+                containerOptions={{ displayType: WidgetContainerDisplayType.CAROUSEL }}
+            />
+        </>
+    ),
 );

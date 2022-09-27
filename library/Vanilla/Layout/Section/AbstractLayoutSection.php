@@ -14,14 +14,25 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
 /**
  * Interface representing a layout section.
  */
-abstract class AbstractLayoutSection implements ReactWidgetInterface, CombinedPropsWidgetInterface {
-
+abstract class AbstractLayoutSection implements ReactWidgetInterface, CombinedPropsWidgetInterface
+{
     use CombinedPropsWidgetTrait;
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
+    public static function getWidgetIconPath(): string
+    {
         return "";
+    }
+
+    /**
+     * We don't care about this here.
+     *
+     * @return array
+     */
+    public static function getAllowedSectionIDs(): array
+    {
+        return [];
     }
 }

@@ -10,7 +10,6 @@ import { css } from "@emotion/css";
 import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
 import { singleBorder } from "@library/styles/styleHelpersBorders";
 import { inputMixinVars } from "@library/forms/inputStyles";
-import { Mixins } from "@library/styles/Mixins";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 
 export const dashboardClasses = useThemeCache(() => {
@@ -159,6 +158,21 @@ export const dashboardClasses = useThemeCache(() => {
         },
     });
 
+    const label = css({
+        display: "inline-flex",
+        alignItems: "center",
+    });
+
+    const labelIcon = css({
+        marginLeft: 4,
+    });
+
+    const noLeftPadding = css({
+        "&&": {
+            paddingLeft: 0,
+        },
+    });
+
     return {
         formList,
         helpAsset,
@@ -174,5 +188,8 @@ export const dashboardClasses = useThemeCache(() => {
         disabled,
         colorInput,
         swatch,
+        label,
+        labelIcon,
+        noLeftPadding,
     };
 });

@@ -12,11 +12,13 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Verify embed class capabilities.
  */
-class YouTubeEmbedTest extends MinimalContainerTestCase {
+class YouTubeEmbedTest extends MinimalContainerTestCase
+{
     /**
      * Ensure we can create an embed from legacy data that might still live in the DB.
      */
-    public function testLegacyDataFormat() {
+    public function testLegacyDataFormat()
+    {
         $legacyJSON = <<<JSON
 {
     "url": "https://www.youtube.com/watch?v=fy0fTFpqT48&t=2s",

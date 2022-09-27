@@ -18,7 +18,7 @@ interface IRadioGroupContext {
     errors?: IFieldError[];
 }
 
-const RadioGroupContext = React.createContext<IRadioGroupContext | null>(null);
+const RadioGroupContext = React.createContext<IRadioGroupContext>({});
 
 export function useDashboardRadioGroup() {
     const context = useContext(RadioGroupContext);
@@ -36,13 +36,13 @@ export function useDashboardRadioGroup() {
 
 interface IProps extends IRadioGroupContext {
     children: React.ReactNode;
-    type?: "group" | "radioogroup";
+    type?: "group" | "radiogroup";
 }
 
 export function DashboardRadioGroup(props: IProps) {
     const { labelID, labelType } = useFormGroup();
     const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
-    const type = props.type || "radioogroup";
+    const type = props.type || "radiogroup";
 
     return (
         <RadioGroupContext.Provider value={props}>

@@ -3,7 +3,7 @@
     "version": "3.0.1",
     "main": "index.js",
     "module": "index.js",
-    "license": "gpl-2.0-only",
+    "license": "MIT",
     "dependencies": {
         "@webcomponents/webcomponentsjs": "^2.3.0",
         "core-js": "^3.19.0"

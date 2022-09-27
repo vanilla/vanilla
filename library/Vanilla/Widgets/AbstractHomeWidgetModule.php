@@ -17,8 +17,8 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
 /**
  * Abstraction layer for the module displaying Categories.
  */
-abstract class AbstractHomeWidgetModule extends AbstractReactModule {
-
+abstract class AbstractHomeWidgetModule extends AbstractReactModule
+{
     use HomeWidgetContainerSchemaTrait;
 
     const CONTENT_TYPE_ICON = "title-description-icon";
@@ -70,8 +70,8 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     public $maxWidth = null;
 
     /**
-    * @var object|null Whether counts or description is rendered.
-    */
+     * @var object|null Whether counts or description is rendered.
+     */
     public $display = null;
 
     /**
@@ -110,39 +110,45 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     /**
      * @return string|null
      */
-    protected function getTitle(): ?string {
+    protected function getTitle(): ?string
+    {
         return $this->title;
     }
 
     /**
      * @return int|null
      */
-    public function getMaxItemCount(): ?int {
+    public function getMaxItemCount(): ?int
+    {
         return $this->maxItemCount;
     }
 
     /**
      * @param int|null $maxItemCount
      */
-    public function setMaxItemCount(?int $maxItemCount = null): void {
+    public function setMaxItemCount(?int $maxItemCount = null): void
+    {
         $this->maxItemCount = $maxItemCount;
     }
-
 
     /**
      * @return array
      */
-    protected function getItemOptions(): array {
-        $options = array_merge_recursive([
-            'contentType' => $this->contentType,
-            'display' => $this->display,
-            'box' => [
-                'borderType' => $this->borderType,
+    protected function getItemOptions(): array
+    {
+        $options = array_merge_recursive(
+            [
+                "contentType" => $this->contentType,
+                "display" => $this->display,
+                "box" => [
+                    "borderType" => $this->borderType,
+                ],
+                "name" => $this->name,
             ],
-            'name' => $this->name,
-        ], $this->itemOptions);
+            $this->itemOptions
+        );
         if (!empty($this->iconProps)) {
-            $options['iconProps'] = $this->iconProps;
+            $options["iconProps"] = $this->iconProps;
         }
         return $options;
     }
@@ -150,17 +156,21 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     /**
      * @return array
      */
-    protected function getContainerOptions(): array {
-        $this->containerOptions = array_merge([
-            'maxColumnCount' => $this->maxColumnCount,
-            'subtitle' => $this->subtitle,
-            'description' => $this->description,
-            'headerAlignment' => $this->headerAlignment,
-            'contentAlignment' => $this->contentAlignment,
-            'maxWidth' => $this->maxWidth,
-            'noGutter' => $this->noGutter,
-            'isCarousel' => $this->isCarousel,
-        ], $this->containerOptions);
+    protected function getContainerOptions(): array
+    {
+        $this->containerOptions = array_merge(
+            [
+                "maxColumnCount" => $this->maxColumnCount,
+                "subtitle" => $this->subtitle,
+                "description" => $this->description,
+                "headerAlignment" => $this->headerAlignment,
+                "contentAlignment" => $this->contentAlignment,
+                "maxWidth" => $this->maxWidth,
+                "noGutter" => $this->noGutter,
+                "isCarousel" => $this->isCarousel,
+            ],
+            $this->containerOptions
+        );
 
         return $this->containerOptions;
     }
@@ -170,7 +180,8 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
      *
      * @return array
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         $data = $this->getData();
         if ($data === null) {
             return null;
@@ -179,11 +190,11 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
             return null;
         }
         $props = [];
-        $props['title'] = $this->getTitle();
-        $props['containerOptions'] = $this->getContainerOptions();
-        $props['itemOptions'] = $this->getItemOptions();
-        $props['itemData'] = $data;
-        $props['maxItemCount'] = $this->getMaxItemCount();
+        $props["title"] = $this->getTitle();
+        $props["containerOptions"] = $this->getContainerOptions();
+        $props["itemOptions"] = $this->getItemOptions();
+        $props["itemData"] = $data;
+        $props["maxItemCount"] = $this->getMaxItemCount();
 
         $props = $this->getSchema()->validate($props);
 
@@ -195,7 +206,8 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
      *
      * @return string
      */
-    public static function getComponentName(): string {
+    public static function getComponentName(): string
+    {
         return "HomeWidget";
     }
 
@@ -204,105 +216,83 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
      *
      * @return Schema
      */
-    public static function getSchema(): Schema {
+    public static function getSchema(): Schema
+    {
         $bgSchema = Schema::parse([
-            'color:s?',
-            'attachment:s?',
-            'position:s?',
-            'repeat:s?',
-            'size:s?',
-            'attachment:s?',
-            'position:s?',
-            'repeat:s?',
-            'size:s?',
-            'image:s?',
-            'fallbackImage:s?',
-            'opacity:i?',
-            'unsetBackground:b?',
+            "color:s?",
+            "attachment:s?",
+            "position:s?",
+            "repeat:s?",
+            "size:s?",
+            "attachment:s?",
+            "position:s?",
+            "repeat:s?",
+            "size:s?",
+            "image:s?",
+            "fallbackImage:s?",
+            "opacity:i?",
+            "unsetBackground:b?",
         ]);
 
         return Schema::parse([
-            'title:s?',
-            'containerOptions' => Schema::parse([
-                'outerBackground:?' => $bgSchema,
-                'innerBackground:?' => $bgSchema,
-                'borderType:s?',
-                'maxWidth:s?',
-                'noGutter:b?',
-                'viewAll?' => Schema::parse([
-                    'position:s?',
-                    'to:s?',
-                    'name:s?',
-                    'displayType:s?',
-                ]),
-                'maxColumnCount:i?',
-                'subtitle?' => Schema::parse([
-                    'type:s?' => [
-                        'enum' => ['standard', 'overline']
+            "title:s?",
+            "containerOptions" => Schema::parse([
+                "outerBackground:?" => $bgSchema,
+                "innerBackground:?" => $bgSchema,
+                "borderType:s?",
+                "maxWidth:s?",
+                "noGutter:b?",
+                "viewAll?" => Schema::parse(["position:s?", "to:s?", "name:s?", "displayType:s?"]),
+                "maxColumnCount:i?",
+                "subtitle?" => Schema::parse([
+                    "type:s?" => [
+                        "enum" => ["standard", "overline"],
                     ],
-                    'content:s?',
-                    'font:o?',
-                    'padding:o?',
+                    "content:s?",
+                    "font:o?",
+                    "padding:o?",
                 ]),
-                'description:s?',
-                'headerAlignment:s?' => [
-                    'enum' => ['center', 'left']
+                "description:s?",
+                "headerAlignment:s?" => [
+                    "enum" => ["center", "left"],
                 ],
-                'contentAlignment:s?' => [
-                    'enum' => ['center', 'flex-start']
+                "contentAlignment:s?" => [
+                    "enum" => ["center", "flex-start"],
                 ],
-                'isCarousel:b?',
+                "isCarousel:b?",
             ]),
-            'itemOptions' => Schema::parse([
-                'imagePlacement:s?' => [
-                    'enum' => ['left', 'top'],
+            "itemOptions" => Schema::parse([
+                "imagePlacement:s?" => [
+                    "enum" => ["left", "top"],
                 ],
-                'imagePlacementMobile:s?' => [
-                    'enum' => ['left', 'top'],
+                "imagePlacementMobile:s?" => [
+                    "enum" => ["left", "top"],
                 ],
-                'box?' => [
-                    'borderType:s?',
-                    'border:o?',
-                    'background:?' => $bgSchema,
-                    'spacing:o?'
-                ],
-                'contentType:s?',
-                'fg:s?',
-                'display:?' => Schema::parse([
-                    'description:b',
-                    'counts:b',
-                ]),
-                'name:?' => Schema::parse([
-                    'hidden:b?',
-                    'font:o?',
-                    'states:o?',
-                ]),
-                'justifyContent:s?',
-                'alignment:s?',
-                'viewMore?' => Schema::parse([
-                    'labelCode:s?',
-                    'buttonType:s?',
-                ]),
-                'iconProps?' => Schema::parse([
-                    'placement:s?' => [
-                        'enum' => ['top', 'left']
+                "box?" => ["borderType:s?", "border:o?", "background:?" => $bgSchema, "spacing:o?"],
+                "contentType:s?",
+                "fg:s?",
+                "display:?" => Schema::parse(["description:b", "counts:b"]),
+                "name:?" => Schema::parse(["hidden:b?", "font:o?", "states:o?"]),
+                "justifyContent:s?",
+                "alignment:s?",
+                "viewMore?" => Schema::parse(["labelCode:s?", "buttonType:s?"]),
+                "iconProps?" => Schema::parse([
+                    "placement:s?" => [
+                        "enum" => ["top", "left"],
                     ],
-                    'background:o?',
-                    'border:o?',
-                    'size:i?',
+                    "background:o?",
+                    "border:o?",
+                    "size:i?",
                 ]),
             ]),
-            'maxItemCount:i?',
-            'itemData:a' => Schema::parse([
-                'to:s',
-                'iconUrl:s?',
-                'imageUrl:s?',
-                'name:s',
-                'description:s?',
-                'counts:a?' => Schema::parse([
-                    'labelCode:s',
-                    'count:i',
-                ])
+            "maxItemCount:i?",
+            "itemData:a" => Schema::parse([
+                "to:s",
+                "iconUrl:s?",
+                "imageUrl:s?",
+                "name:s",
+                "description:s?",
+                "counts:a?" => Schema::parse(["labelCode:s", "count:i"]),
             ]),
         ]);
     }
@@ -310,15 +300,17 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     /**
      * @param bool $isCarousel
      */
-    public function setIsCarousel(bool $isCarousel) {
+    public function setIsCarousel(bool $isCarousel)
+    {
         $this->isCarousel = $isCarousel;
     }
 
     /**
      * @param string $content
      */
-    public function setSubtitleContent(string $content) {
-        $this->subtitle['content'] = $content;
+    public function setSubtitleContent(string $content)
+    {
+        $this->subtitle["content"] = $content;
     }
 
     /**
@@ -326,37 +318,13 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
      *
      * @return Schema
      */
-    public static function widgetColumnSchema(): Schema {
+    public static function widgetColumnSchema(): Schema
+    {
         return Schema::parse([
-            'maxColumnCount:i?' => [
-                'x-control' => SchemaForm::dropDown(
-                    new FormOptions('Max Columns', 'Set the maximum number of columns for the widget.'),
-                    new StaticFormChoices(['1' => 1, '2' => 2, '3' => 3, '4' => 4, '5' => 5])
-                )
-            ],
-        ]);
-    }
-
-    /**
-     * @return Schema
-     */
-    public static function widgetContentTypeSchema() {
-        return Schema::parse([
-            'contentType:s?' => [
-                'enum' => [self::CONTENT_TYPE_TEXT, self::CONTENT_TYPE_ICON, self::CONTENT_TYPE_BACKGROUND, self::CONTENT_TYPE_IMAGE],
-                'x-control' => SchemaForm::dropDown(
-                    new FormOptions(
-                        'Display Type',
-                        'Choose the appearance of your widget.'
-                    ),
-                    new StaticFormChoices(
-                        [
-                            self::CONTENT_TYPE_TEXT => 'Text',
-                            self::CONTENT_TYPE_IMAGE => 'Image',
-                            self::CONTENT_TYPE_ICON => 'Icon',
-                            self::CONTENT_TYPE_BACKGROUND => 'Background'
-                        ]
-                    )
+            "maxColumnCount:i?" => [
+                "x-control" => SchemaForm::dropDown(
+                    new FormOptions("Max Columns", "Set the maximum number of columns for the widget."),
+                    new StaticFormChoices(["1" => 1, "2" => 2, "3" => 3, "4" => 4, "5" => 5])
                 ),
             ],
         ]);
@@ -365,22 +333,44 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     /**
      * @return Schema
      */
-    public static function widgetHeaderAligmentSchema() {
+    public static function widgetContentTypeSchema()
+    {
         return Schema::parse([
-            'headerAlignment:s?' => [
-                'enum' => [self::ALIGNMENT_LEFT, self::ALIGNMENT_CENTER],
-                'default' => self::ALIGNMENT_LEFT,
-                'x-control' => SchemaForm::dropDown(
-                    new FormOptions(
-                        'Header alignment',
-                        'Choose header alignment.'
-                    ),
-                    new StaticFormChoices(
-                        [
-                            self::ALIGNMENT_LEFT => 'Left',
-                            self::ALIGNMENT_CENTER => 'Center',
-                        ]
-                    )
+            "contentType:s?" => [
+                "enum" => [
+                    self::CONTENT_TYPE_TEXT,
+                    self::CONTENT_TYPE_ICON,
+                    self::CONTENT_TYPE_BACKGROUND,
+                    self::CONTENT_TYPE_IMAGE,
+                ],
+                "x-control" => SchemaForm::dropDown(
+                    new FormOptions("Display Type", "Choose the appearance of your widget."),
+                    new StaticFormChoices([
+                        self::CONTENT_TYPE_TEXT => "Text",
+                        self::CONTENT_TYPE_IMAGE => "Image",
+                        self::CONTENT_TYPE_ICON => "Icon",
+                        self::CONTENT_TYPE_BACKGROUND => "Background",
+                    ])
+                ),
+            ],
+        ]);
+    }
+
+    /**
+     * @return Schema
+     */
+    public static function widgetHeaderAligmentSchema()
+    {
+        return Schema::parse([
+            "headerAlignment:s?" => [
+                "enum" => [self::ALIGNMENT_LEFT, self::ALIGNMENT_CENTER],
+                "default" => self::ALIGNMENT_LEFT,
+                "x-control" => SchemaForm::dropDown(
+                    new FormOptions("Header alignment", "Choose header alignment."),
+                    new StaticFormChoices([
+                        self::ALIGNMENT_LEFT => "Left",
+                        self::ALIGNMENT_CENTER => "Center",
+                    ])
                 ),
             ],
         ]);
@@ -392,15 +382,13 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
      * @param int $defaultMaxItemCount
      * @return Schema
      */
-    public static function widgetMaxCountItemSchema(int $defaultMaxItemCount = self::DEFAULT_MAX_ITEMS_COUNT) {
+    public static function widgetMaxCountItemSchema(int $defaultMaxItemCount = self::DEFAULT_MAX_ITEMS_COUNT)
+    {
         return Schema::parse([
-            'maxItemCount:i?' => [
-                'default' => $defaultMaxItemCount,
-                'x-control' => SchemaForm::textBox(
-                    new FormOptions(
-                        'Limit',
-                        'Maximum amount of items to display.'
-                    ),
+            "maxItemCount:i?" => [
+                "default" => $defaultMaxItemCount,
+                "x-control" => SchemaForm::textBox(
+                    new FormOptions("Limit", "Maximum amount of items to display."),
                     "number"
                 ),
             ],
@@ -412,16 +400,12 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
      *
      * @return Schema
      */
-    public static function getCarouselSchema() {
+    public static function getCarouselSchema()
+    {
         return Schema::parse([
-            'isCarousel:b?' => [
-                'default' => false,
-                'x-control' => SchemaForm::toggle(
-                    new FormOptions(
-                        'As Carousel',
-                        'Display the widget as a carousel.'
-                    )
-                ),
+            "isCarousel:b?" => [
+                "default" => false,
+                "x-control" => SchemaForm::toggle(new FormOptions("As Carousel", "Display the widget as a carousel.")),
             ],
         ]);
     }
@@ -429,7 +413,8 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule {
     /**
      * @return Schema
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         return SchemaUtils::composeSchemas(
             self::widgetTitleSchema(),
             self::widgetDescriptionSchema(),

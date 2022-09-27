@@ -18,8 +18,8 @@ use Vanilla\Utility\ArrayUtils;
  * This is pretty bare-bones so you likely want to extend TextBlot or AbstractFormat instead.
  * See https://github.com/quilljs/parchment#blots for an explanation of the JS implementation of quill (parchment) blots.
  */
-abstract class AbstractBlot implements NestableItemInterface {
-
+abstract class AbstractBlot implements NestableItemInterface
+{
     /** @var string */
     protected $parseMode;
 
@@ -75,7 +75,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return string
      */
-    public function renderQuote(): string {
+    public function renderQuote(): string
+    {
         return $this->render();
     }
 
@@ -86,7 +87,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return bool
      */
-    public function hasConsumedNextOp(): bool {
+    public function hasConsumedNextOp(): bool
+    {
         return $this::matches([$this->nextOperation]) && !$this::matches([$this->currentOperation]);
     }
 
@@ -95,7 +97,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return bool
      */
-    public function isOwnGroup(): bool {
+    public function isOwnGroup(): bool
+    {
         return false;
     }
 
@@ -104,7 +107,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return string
      */
-    public function getGroupOpeningTag(): string {
+    public function getGroupOpeningTag(): string
+    {
         return "<p>";
     }
 
@@ -113,7 +117,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return string
      */
-    public function getGroupClosingTag(): string {
+    public function getGroupClosingTag(): string
+    {
         return "</p>";
     }
 
@@ -124,7 +129,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return bool
      */
-    public function shouldClearCurrentGroup(BlotGroup $group): bool {
+    public function shouldClearCurrentGroup(BlotGroup $group): bool
+    {
         return $this->isOwnGroup();
     }
 
@@ -133,14 +139,16 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return string
      */
-    public function getContent(): string {
+    public function getContent(): string
+    {
         return $this->content;
     }
 
     /**
      * @inheritdoc
      */
-    public function getNestingDepth(): int {
+    public function getNestingDepth(): int
+    {
         return 0;
     }
 
@@ -169,7 +177,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      *
      * @return array
      */
-    public function getCurrentOperation(): array {
+    public function getCurrentOperation(): array
+    {
         return $this->currentOperation;
     }
 
@@ -180,7 +189,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      * @param mixed $default
      * @return mixed
      */
-    public function getCurrentOperationField(string $path, $default = null) {
+    public function getCurrentOperationField(string $path, $default = null)
+    {
         return ArrayUtils::getByPath($path, $this->currentOperation, $default);
     }
 
@@ -191,7 +201,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      * @param mixed $value
      * @return $this
      */
-    public function setCurrentOperationField(string $path, $value): self {
+    public function setCurrentOperationField(string $path, $value): self
+    {
         ArrayUtils::setByPath($path, $this->currentOperation, $value);
         return $this;
     }
@@ -202,7 +213,8 @@ abstract class AbstractBlot implements NestableItemInterface {
      * @param array $previous
      * @param array $next
      */
-    public function setPreviousNextOperations(array $previous, array $next): void {
+    public function setPreviousNextOperations(array $previous, array $next): void
+    {
         $this->previousOperation = $previous;
         $this->nextOperation = $next;
     }

@@ -21,176 +21,176 @@
 // No styleguide reference.
 
 .main-container {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 .navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: $navbar-height;
-  z-index: 1010;
-  background-color: $brand-new-primary;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: $navbar-height;
+    z-index: 1010;
+    background-color: $brand-new-primary;
 }
 
 .main-row {
-  display: flex;
-  justify-content: center;
-  margin-top: $navbar-height;
-  height: 100%;
+    display: flex;
+    justify-content: center;
+    padding-top: $navbar-height;
+    height: 100%;
 
-  @include media-breakpoint-down(md) {
-    display: block;
-    width: 100%;
-  }
+    @include media-breakpoint-down(md) {
+        display: block;
+        width: 100%;
+    }
 }
 
 .dashboard-main {
-  position: relative;
-  flex-grow: 1;
-  // The panels are fixed width and the main content fills the rest of the screen.
-  // We want the content to load after the other assets to prevent janky loading, so we
-  // position it after the two panels and order it to be in the center here.
-  order: 2;
-  display: flex;
-  flex-direction: column;
-  // Ensure the footer is flush with the bottom of the window if the page height is less than the window height.
-  min-height: 100vh;
-  margin-top: -$navbar-height;
-  padding-top: $navbar-height;
-  padding-left: $padding-row;
-  padding-right: $padding-row;
-  max-width: 1024px;
-  overflow-y: hidden; // Setting overflow property stops content from widening into the panels.
-
-  .content {
+    position: relative;
     flex-grow: 1;
-    padding-bottom: $footer-height + 60px;
-  }
+    // The panels are fixed width and the main content fills the rest of the screen.
+    // We want the content to load after the other assets to prevent janky loading, so we
+    // position it after the two panels and order it to be in the center here.
+    order: 2;
+    display: flex;
+    flex-direction: column;
+    // Ensure the footer is flush with the bottom of the window if the page height is less than the window height.
+    min-height: 100vh;
+    margin-top: -$navbar-height;
+    padding-top: $navbar-height;
+    padding-left: $padding-row;
+    padding-right: $padding-row;
+    max-width: 1024px;
+    overflow-y: hidden; // Setting overflow property stops content from widening into the panels.
 
-  .footer {
-    flex-shrink: 0;
-    height: $footer-height;
-    margin-top: -$footer-height - 1px;
-  }
+    .content {
+        flex-grow: 1;
+        padding-bottom: $footer-height + 60px;
+    }
+
+    .footer {
+        flex-shrink: 0;
+        height: $footer-height;
+        margin-top: -$footer-height - 1px;
+    }
 }
 
 // Panels
 
 .panel {
-  padding-top: $spacer * 4;
-  padding-bottom: $spacer * 4;
+    padding-top: $spacer * 4;
+    padding-bottom: $spacer * 4;
 }
 
 .panel-content,
 .panel-content-wrapper {
-  width: 204px;
-  height: 100%;
+    width: 204px;
+    height: 100%;
 }
 
 $panelMaxHeight: calc(100vh - #{$navbar-height * 2});
 
 .panel-left {
-  padding-left: $spacer;
-  position: sticky;
-  top: 0;
-  max-height: $panelMaxHeight;
-  padding-bottom: 0;
-
-  .panel-content {
+    padding-left: $spacer;
+    position: sticky;
+    top: 0;
     max-height: $panelMaxHeight;
-    overflow: auto;
-  }
+    padding-bottom: 0;
+
+    .panel-content {
+        max-height: $panelMaxHeight;
+        overflow: auto;
+    }
 }
 
 .panel-right {
-  padding-right: $spacer;
-  order: 3;
-  position: sticky;
-  max-height: $panelMaxHeight;
-
-  top: 0;
-
-  .panel-content {
+    padding-right: $spacer;
+    order: 3;
+    position: sticky;
     max-height: $panelMaxHeight;
-    overflow: auto;
-    padding-left: $spacer;
-  }
+
+    top: 0;
+
+    .panel-content {
+        max-height: $panelMaxHeight;
+        overflow: auto;
+        padding-left: $spacer;
+    }
 }
 
 // For wide panel-less pages, like the Dashboard Home page
 
 .main-row-wide {
-  .dashboard-main {
-    max-width: 1296px;
-  }
+    .dashboard-main {
+        max-width: 1296px;
+    }
 
-  .panel-right {
-    display: none;
-  }
+    .panel-right {
+        display: none;
+    }
 
-  .panel-left {
-    display: none;
-  }
+    .panel-left {
+        display: none;
+    }
 }
 
 // Drawer functionality, and responsive show/hide
 
 .drawer-show .dashboard-main {
-  transform: translate3d($drawer-width, 0, 0);
+    transform: translate3d($drawer-width, 0, 0);
 
-  &::after {
-    position: absolute;
-    display: block;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background-color: rgba(0,0,0,.25);
-    z-index: 3;
-    content: '';
-  }
+    &::after {
+        position: absolute;
+        display: block;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.25);
+        z-index: 3;
+        content: "";
+    }
 }
 
 .drawer-toggle {
-  display: none;
+    display: none;
 }
 
 .drawer-only {
-  display: none;
+    display: none;
 }
 
 .drawer-show {
-  .drawer-only {
-    display: block;
-  }
+    .drawer-only {
+        display: block;
+    }
 }
 
 @include media-breakpoint-down(md) {
-  .panel-right {
-    display: none;
-  }
+    .panel-right {
+        display: none;
+    }
 
-  .panel-left {
-    display: none;
-  }
+    .panel-left {
+        display: none;
+    }
 
-  .drawer-toggle {
-    display: block;
-  }
+    .drawer-toggle {
+        display: block;
+    }
 
-  .drawer-show .panel-left {
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    display: block;
-    width: $drawer-width;
-    height: 100%;
-    padding-top: $spacer * 4 + $navbar-height;
-    overflow: auto;
-  }
+    .drawer-show .panel-left {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        display: block;
+        width: $drawer-width;
+        height: 100%;
+        padding-top: $spacer * 4 + $navbar-height;
+        overflow: auto;
+    }
 }

@@ -10,7 +10,8 @@ namespace Vanilla\Database\SetLiterals;
 /**
  * A base class for specifying literal SQL expressions.
  */
-abstract class SetLiteral {
+abstract class SetLiteral
+{
     /**
      * Generate the literal SQL expression.
      *

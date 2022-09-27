@@ -12,26 +12,29 @@ use Vanilla\Layout\View\LegacyLayoutViewInterface;
 /**
  * Legacy view type for category list.
  */
-class LegacyCategoryListLayoutView implements LegacyLayoutViewInterface {
-
+class LegacyCategoryListLayoutView implements LegacyLayoutViewInterface
+{
     /**
      * @inheritDoc
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return "Categories Page";
     }
 
     /**
      * @inheritDoc
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return "categoryList";
     }
 
     /**
      * @inheritDoc
      */
-    public function getLegacyType(): string {
+    public function getLegacyType(): string
+    {
         return "Vanilla/Categories/Index";
     }
 }

@@ -15,8 +15,8 @@ use Vanilla\Web\PageDispatchController;
 /**
  * Route for a PageDispatchController.
  */
-class PageControllerRoute extends ResourceRoute {
-
+class PageControllerRoute extends ResourceRoute
+{
     /**
      * Initialize a new {@link ResourceRoute}.
      *
@@ -24,14 +24,11 @@ class PageControllerRoute extends ResourceRoute {
      * @param class-string<PageDispatchController> $controllerClass The class for the controller.
      * @param ContainerInterface|null $container An optional container used to create controller instances.
      */
-    public function __construct($basePath, $controllerClass, ContainerInterface $container = null) {
-        parent::__construct(
-            $basePath,
-            '',
-            $container
-        );
+    public function __construct($basePath, $controllerClass, ContainerInterface $container = null)
+    {
+        parent::__construct($basePath, "", $container);
 
-        $this->setMeta("CONTENT_TYPE", 'text/html; charset=utf-8');
+        $this->setMeta("CONTENT_TYPE", "text/html; charset=utf-8");
         $this->setRootController($controllerClass);
     }
 
@@ -56,13 +53,12 @@ class PageControllerRoute extends ResourceRoute {
             $dic->rule($ruleName)
                 ->setClass(self::class)
                 ->setConstructorArgs([$routePrefix, $controllerClass])
-                ->addCall('setPriority', [$priority])
-            ;
+                ->addCall("setPriority", [$priority]);
             if ($featureFlag) {
                 $dic->addCall("setFeatureFlag", [$featureFlag]);
             }
             $dic->rule(Dispatcher::class);
-            $dic->addCall('addRoute', [new Reference($ruleName)]);
+            $dic->addCall("addRoute", [new Reference($ruleName)]);
         }
     }
 }

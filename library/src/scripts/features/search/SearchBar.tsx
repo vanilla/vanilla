@@ -35,7 +35,7 @@ import { sprintf } from "sprintf-js";
 import { DEFAULT_SEARCH_SOURCE } from "@library/search/SearchService";
 
 // Re-exported after being moved.
-export { IComboBoxOption };
+export type { IComboBoxOption };
 
 export default React.forwardRef(function SearchBar(
     props: ISearchBarProps,
@@ -214,7 +214,7 @@ export default React.forwardRef(function SearchBar(
                         ...sources
                             .filter((source) => source.key !== DEFAULT_SEARCH_SOURCE.key)
                             .map((source) => ({
-                                label: source.getLabel(),
+                                label: source.label,
                                 options: results.filter(
                                     ({ source: resultSourceKey }) => source.key === resultSourceKey,
                                 ),
@@ -364,8 +364,11 @@ function SearchBarControl(props: IControlProps) {
     const { optionsItems = [], value, onChange } = scope;
     const hasScope = scope.optionsItems.length > 1;
     const searchButtonIsVisible = !hasScope ? !hideSearchButton : false;
-    const { compact = false, borderRadius = searchBarVars.border.radius, preset = searchBarVars.options.preset } =
-        overwriteSearchBar || {};
+    const {
+        compact = false,
+        borderRadius = searchBarVars.border.radius,
+        preset = searchBarVars.options.preset,
+    } = overwriteSearchBar || {};
 
     // In case we'll need to use ID
     const ID = useMemo(() => uniqueIDFromPrefix("search"), []);

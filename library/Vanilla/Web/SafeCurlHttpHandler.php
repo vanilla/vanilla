@@ -13,8 +13,8 @@ use Garden\Http\HttpResponse;
 /**
  * HTTP handler interface utilizing SafeCurl.
  */
-class SafeCurlHttpHandler extends CurlHandler {
-
+class SafeCurlHttpHandler extends CurlHandler
+{
     /** @var bool Should location headers be followed? */
     private $followLocation = true;
 
@@ -24,7 +24,8 @@ class SafeCurlHttpHandler extends CurlHandler {
      * @param resource $curlHandle The curl handle to execute.
      * @return HttpResponse Returns an {@link RestResponse} object with the information from the request
      */
-    protected function execCurl($curlHandle) {
+    protected function execCurl($curlHandle)
+    {
         $url = curl_getinfo($curlHandle, CURLINFO_EFFECTIVE_URL);
         $safeCurl = new SafeCurl($curlHandle);
         $safeCurl->setFollowLocation($this->followLocation);
@@ -38,13 +39,13 @@ class SafeCurlHttpHandler extends CurlHandler {
             //
             // TL:DR; HttpHandlers should never throw. Only return responses (that could be an error response).
             $responseBody = [
-                'error' => array_filter([
-                    'message' => $e->getMessage(),
-                    'code' => $e->getCode(),
-                    'trace' => debug() ? $e->getTraceAsString() : null,
-                ])
+                "error" => array_filter([
+                    "message" => $e->getMessage(),
+                    "code" => $e->getCode(),
+                    "trace" => debug() ? $e->getTraceAsString() : null,
+                ]),
             ];
-            $response = new HttpResponse(500, ['content-type' => 'application/json'], json_encode($responseBody));
+            $response = new HttpResponse(500, ["content-type" => "application/json"], json_encode($responseBody));
         }
 
         return $response;
@@ -57,7 +58,8 @@ class SafeCurlHttpHandler extends CurlHandler {
      * @param string|HttpResponse $response Either a string or an http response.
      * @return HttpResponse
      */
-    protected function decodeCurlResponse($ch, $response): HttpResponse {
+    protected function decodeCurlResponse($ch, $response): HttpResponse
+    {
         if ($response instanceof HttpResponse) {
             return $response;
         } else {
@@ -70,7 +72,8 @@ class SafeCurlHttpHandler extends CurlHandler {
      *
      * @param bool $followLocation
      */
-    public function setFollowLocation(bool $followLocation) {
+    public function setFollowLocation(bool $followLocation)
+    {
         $this->followLocation = $followLocation;
     }
 
@@ -79,7 +82,8 @@ class SafeCurlHttpHandler extends CurlHandler {
      *
      * @return bool
      */
-    public function getFollowLocation(): bool {
+    public function getFollowLocation(): bool
+    {
         return $this->followLocation;
     }
 }

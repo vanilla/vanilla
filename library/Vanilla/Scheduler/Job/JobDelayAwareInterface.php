@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Job;
 /**
  * Interface JobDelayAwareInterface
  */
-interface JobDelayAwareInterface {
-
+interface JobDelayAwareInterface
+{
     /**
      * Set job execution delay
      *

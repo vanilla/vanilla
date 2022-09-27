@@ -14,8 +14,8 @@ use Vanilla\EmbeddedContent\Embeds\VimeoEmbed;
 /**
  * Factory for VimeoEmbed.
  */
-class VimeoEmbedFactory extends AbstractEmbedFactory {
-
+class VimeoEmbedFactory extends AbstractEmbedFactory
+{
     const DOMAINS = ["vimeo.com"];
 
     const OEMBED_URL_BASE = "https://vimeo.com/api/oembed.json";
@@ -28,21 +28,24 @@ class VimeoEmbedFactory extends AbstractEmbedFactory {
      *
      * @param HttpClient $httpClient
      */
-    public function __construct(HttpClient $httpClient) {
+    public function __construct(HttpClient $httpClient)
+    {
         $this->httpClient = $httpClient;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedDomains(): array {
+    protected function getSupportedDomains(): array
+    {
         return self::DOMAINS;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         return "`^/\d+(/[a-z0-9]+)?$`";
     }
 
@@ -51,11 +54,9 @@ class VimeoEmbedFactory extends AbstractEmbedFactory {
      *
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
-        $response = $this->httpClient->get(
-            self::OEMBED_URL_BASE,
-            ["url" => $url]
-        );
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
+        $response = $this->httpClient->get(self::OEMBED_URL_BASE, ["url" => $url]);
 
         // Example Response JSON
         // phpcs:disable Generic.Files.LineLength

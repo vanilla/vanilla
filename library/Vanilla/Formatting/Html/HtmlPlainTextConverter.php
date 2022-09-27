@@ -12,8 +12,8 @@ use Garden\StaticCacheTranslationTrait;
 /**
  * Class for converting HTML into plain text.
  */
-class HtmlPlainTextConverter {
-
+class HtmlPlainTextConverter
+{
     use StaticCacheTranslationTrait;
 
     /** @var string; */
@@ -27,18 +27,19 @@ class HtmlPlainTextConverter {
      * @param string $html An HTML-formatted string.
      * @return string Plain text.
      */
-    public function convert(string $html): string {
+    public function convert(string $html): string
+    {
         $result = $html;
         $result = $this->replaceHtmlElementsWithStrings(
             $result,
             [
-                'Spoiler' => "",
-                'UserSpoiler' => "",
-                'Quote' => "",
-                'UserQuote' => "",
+                "Spoiler" => "",
+                "UserSpoiler" => "",
+                "Quote" => "",
+                "UserQuote" => "",
             ],
             [
-                'img' => ""
+                "img" => "",
             ]
         );
         $result = $this->replaceListItems($result);
@@ -50,7 +51,8 @@ class HtmlPlainTextConverter {
     /**
      * @param string $addNewLinesAfterDiv
      */
-    public function setAddNewLinesAfterDiv(string $addNewLinesAfterDiv): void {
+    public function setAddNewLinesAfterDiv(string $addNewLinesAfterDiv): void
+    {
         $this->addNewLinesAfterDiv = $addNewLinesAfterDiv;
     }
 
@@ -65,8 +67,12 @@ class HtmlPlainTextConverter {
      *
      * @return string Returns the html with spoilers removed.
      */
-    protected function replaceHtmlElementsWithStrings(string $html, array $classStringMapping, array $tagNameStringMapping) {
-        $contentID = 'contentID';
+    protected function replaceHtmlElementsWithStrings(
+        string $html,
+        array $classStringMapping,
+        array $tagNameStringMapping
+    ) {
+        $contentID = "contentID";
 
         // Use a big content prefix so we can force utf-8 parsing.
         $contentPrefix = <<<HTML
@@ -97,7 +103,7 @@ HTML;
             }
         }
 
-        $content = $dom->getElementById('contentID');
+        $content = $dom->getElementById("contentID");
         $htmlBodyString = @$dom->saveXML($content, LIBXML_NOEMPTYTAG);
         return $htmlBodyString;
     }
@@ -109,7 +115,8 @@ HTML;
      * @param \DOMNode $node
      * @param string $replacement
      */
-    private function replaceNodeWithString(\DOMDocument $dom, \DOMNode $node, string $replacement) {
+    private function replaceNodeWithString(\DOMDocument $dom, \DOMNode $node, string $replacement)
+    {
         /** @var \DOMElement $parent */
         $parent = $node->parentNode;
         $nextSiblimg = $node->nextSibling;
@@ -119,7 +126,7 @@ HTML;
             $textNode = $dom->createTextNode(self::t($replacement));
             $parent->replaceChild($textNode, $node);
         }
-        $breakNode = $dom->createElement('br');
+        $breakNode = $dom->createElement("br");
         $parent->insertBefore($breakNode, $nextSiblimg);
     }
 
@@ -131,41 +138,42 @@ HTML;
      *
      * @return string An HTML-formatted strings with common tags replaced with plainText
      */
-    private function replaceHtmlTags(string $html, bool $collapse = false): string {
+    private function replaceHtmlTags(string $html, bool $collapse = false): string
+    {
         // Remove returns and then replace html return tags with returns.
-        $result = str_replace(["\n", "\r"], '', $html);
-        $result = preg_replace('`<br\s*/?>`', "\n", $result);
+        $result = str_replace(["\n", "\r"], "", $html);
+        $result = preg_replace("`<br\s*/?>`", "\n", $result);
 
         // Fix lists.
         $result = $this->replaceListItems($result);
 
         $newLineBlocks = [
-            'table',
-            'dl',
-            'pre',
-            'blockquote',
-            'address',
-            'p',
-            'h[1-6]',
-            'section',
-            'article',
-            'aside',
-            'hgroup',
-            'header',
-            'footer',
-            'nav',
-            'figure',
-            'figcaption',
-            'details',
-            'menu',
-            'summary',
+            "table",
+            "dl",
+            "pre",
+            "blockquote",
+            "address",
+            "p",
+            "h[1-6]",
+            "section",
+            "article",
+            "aside",
+            "hgroup",
+            "header",
+            "footer",
+            "nav",
+            "figure",
+            "figcaption",
+            "details",
+            "menu",
+            "summary",
         ];
 
         if ($this->addNewLinesAfterDiv) {
             $result = preg_replace("`</(?:div)>`", "\n", $result);
         }
 
-        $endTagRegex = '</(?:' . implode('|', $newLineBlocks) . ')>';
+        $endTagRegex = "</(?:" . implode("|", $newLineBlocks) . ")>";
         if ($collapse) {
             $endTagRegex = "((\s+)?{$endTagRegex})+";
         }
@@ -191,17 +199,18 @@ HTML;
      * @param string $html An HTML-formatted string.
      * @return string Returns the HTML with all list items removed.
      */
-    private function replaceListItems(string $html): string {
+    private function replaceListItems(string $html): string
+    {
         // Strip the wrapping tags.
-        $html = str_replace(['<ul>', '<ol>'], '', $html);
-        $html = str_replace(['</ul>', '</ol>'], '<br>', $html);
+        $html = str_replace(["<ul>", "<ol>"], "", $html);
+        $html = str_replace(["</ul>", "</ol>"], "<br>", $html);
 
         // Replace starting tags.
-        $html = str_replace(['<li>', '&lt;li&gt;'], '* ', $html);
+        $html = str_replace(["<li>", "&lt;li&gt;"], "* ", $html);
 
         $regexes = [
-            '/(<\/?(?:li|ul|ol)([^>]+)?>)/', // UTF-8 encoded
-            '/(&lt;\/?(?:li|ul|ol)([^&]+)?&gt;)/' // HtmlEncoded
+            "/(<\/?(?:li|ul|ol)([^>]+)?>)/", // UTF-8 encoded
+            "/(&lt;\/?(?:li|ul|ol)([^&]+)?&gt;)/", // HtmlEncoded
         ];
 
         // Replace closing tags.

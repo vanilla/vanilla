@@ -12,8 +12,8 @@ namespace CivilTongueEx\Library;
  *
  * @package CivilTongueEx\Library
  */
-class ContentFilter {
-
+class ContentFilter
+{
     /** @var string? */
     private $replacement;
 
@@ -30,7 +30,8 @@ class ContentFilter {
      *
      * @return ?string
      */
-    public function replace($text = ''): ?string {
+    public function replace($text = ""): ?string
+    {
         if (!isset($text)) {
             return $text;
         }
@@ -45,18 +46,19 @@ class ContentFilter {
      *
      * @return array
      */
-    public function getPatterns(): array {
+    public function getPatterns(): array
+    {
         $patterns = $this->getStaticPatterns();
 
         if ($patterns === null) {
             $patterns = [];
             $words = $this->words;
             if ($words !== null) {
-                $explodedWords = explode(';', $words);
+                $explodedWords = explode(";", $words);
 
                 foreach ($explodedWords as $word) {
                     if (trim($word)) {
-                        $patterns[] = '`(?<![\pL\pN\pM])'.preg_quote(trim($word), '`').'(?![\pL\pN\pM])`isu';
+                        $patterns[] = "`(?<![\pL\pN\pM])" . preg_quote(trim($word), "`") . "(?![\pL\pN\pM])`isu";
                     }
                 }
             }
@@ -70,7 +72,8 @@ class ContentFilter {
      *
      * @return string
      */
-    public function getReplacement(): string {
+    public function getReplacement(): string
+    {
         return $this->replacement;
     }
 
@@ -80,7 +83,8 @@ class ContentFilter {
      *
      * @param null|array $patterns $patterns Patterns to set.
      */
-    public function setStaticPatterns(?array $patterns) {
+    public function setStaticPatterns(?array $patterns)
+    {
         self::$patterns = $patterns;
     }
 
@@ -89,7 +93,8 @@ class ContentFilter {
      *
      * @return null|array
      */
-    public function getStaticPatterns() {
+    public function getStaticPatterns()
+    {
         return self::$patterns;
     }
 
@@ -98,7 +103,8 @@ class ContentFilter {
      *
      * @return string
      */
-    public function getWords(): string {
+    public function getWords(): string
+    {
         return $this->words;
     }
 
@@ -107,7 +113,8 @@ class ContentFilter {
      *
      * @param string $replacement
      */
-    public function setReplacement($replacement) {
+    public function setReplacement($replacement)
+    {
         $this->replacement = $replacement;
     }
 
@@ -116,7 +123,8 @@ class ContentFilter {
      *
      * @param string $words
      */
-    public function setWords($words) {
+    public function setWords($words)
+    {
         $this->words = $words;
     }
 }

@@ -19,11 +19,11 @@ use Vanilla\Models\PipelineModel;
 /**
  * Processor for creating and firing resource events from a pipeline model.
  */
-class ResourceEventProcessor implements Processor {
-
+class ResourceEventProcessor implements Processor
+{
     use DirtyRecordTrait;
 
-    const META_NEW_INSERT_ID = 'newInsertID';
+    const META_NEW_INSERT_ID = "newInsertID";
 
     /** @var int If more records than this are triggered at once then we will fail the request. */
     const MAX_UPDATE_LIMIT = 1000;
@@ -47,7 +47,8 @@ class ResourceEventProcessor implements Processor {
      * @param EventManager $eventManager
      * @param \UserModel $userModel
      */
-    public function __construct(EventManager $eventManager, \UserModel $userModel) {
+    public function __construct(EventManager $eventManager, \UserModel $userModel)
+    {
         $this->eventManager = $eventManager;
         $this->userModel = $userModel;
     }
@@ -55,7 +56,8 @@ class ResourceEventProcessor implements Processor {
     /**
      * @param string $resourceEventClass
      */
-    public function setResourceEventClass(string $resourceEventClass): void {
+    public function setResourceEventClass(string $resourceEventClass): void
+    {
         $this->resourceEventClass = $resourceEventClass;
     }
 
@@ -66,7 +68,8 @@ class ResourceEventProcessor implements Processor {
      * @param callable $stack
      * @return mixed|void
      */
-    public function handle(Operation $operation, callable $stack) {
+    public function handle(Operation $operation, callable $stack)
+    {
         $operationType = $operation->getType();
 
         $this->validateUpdateLimit($operation);
@@ -81,9 +84,7 @@ class ResourceEventProcessor implements Processor {
 
         // Inserts and updates have to be gathered after the records are inserted/updated.
         $insertUpdateEvents = $this->getInsertUpdateResourceEvents($operation);
-        if (!$insertUpdateEvents &&
-            ($operationType == Operation::TYPE_UPDATE)
-        ) {
+        if (!$insertUpdateEvents && $operationType == Operation::TYPE_UPDATE) {
             $this->stashDirtyRecords($operation);
         }
 
@@ -97,21 +98,24 @@ class ResourceEventProcessor implements Processor {
     /**
      * @return int
      */
-    public function getUpdateLimit(): int {
+    public function getUpdateLimit(): int
+    {
         return $this->updateLimit;
     }
 
     /**
      * @param int $updateLimit
      */
-    public function setUpdateLimit(int $updateLimit): void {
+    public function setUpdateLimit(int $updateLimit): void
+    {
         $this->updateLimit = $updateLimit;
     }
 
     /**
      * @param Operation $operation
      */
-    private function validateUpdateLimit(Operation $operation) {
+    private function validateUpdateLimit(Operation $operation)
+    {
         if (!in_array($operation->getType(), [Operation::TYPE_UPDATE, Operation::TYPE_DELETE])) {
             // We only care about updates to the tables.
             return;
@@ -124,10 +128,11 @@ class ResourceEventProcessor implements Processor {
         }
 
         $actualLimit = $this->getUpdateLimit();
-        $affectedRowCount = $model->selectSingle($operation->getWhere(), [
-            Model::OPT_SELECT => 'count(*) as count',
-            PipelineModel::OPT_RUN_PIPELINE => false, // If we run the pipeline, it can polluate the pipelines primary action.
-        ])['count'] ?? 0;
+        $affectedRowCount =
+            $model->selectSingle($operation->getWhere(), [
+                Model::OPT_SELECT => "count(*) as count",
+                PipelineModel::OPT_RUN_PIPELINE => false, // If we run the pipeline, it can polluate the pipelines primary action.
+            ])["count"] ?? 0;
 
         if ($affectedRowCount > $actualLimit) {
             throw new ResourceEventLimitException($actualLimit, $affectedRowCount);
@@ -141,7 +146,8 @@ class ResourceEventProcessor implements Processor {
      *
      * @return ResourceEvent[]
      */
-    private function getDeleteResourceEvents(Operation $operation): array {
+    private function getDeleteResourceEvents(Operation $operation): array
+    {
         if ($operation->getType() !== Operation::TYPE_DELETE) {
             return [];
         }
@@ -156,14 +162,16 @@ class ResourceEventProcessor implements Processor {
      *
      * @return ResourceEvent[]
      */
-    private function getInsertUpdateResourceEvents(Operation $operation): array {
+    private function getInsertUpdateResourceEvents(Operation $operation): array
+    {
         $operationType = $operation->getType();
         if (!in_array($operationType, [Operation::TYPE_INSERT, Operation::TYPE_UPDATE])) {
             // This only handles inserts and updates.
             return [];
         }
 
-        $action = $operationType === Operation::TYPE_INSERT ? ResourceEvent::ACTION_INSERT : ResourceEvent::ACTION_UPDATE;
+        $action =
+            $operationType === Operation::TYPE_INSERT ? ResourceEvent::ACTION_INSERT : ResourceEvent::ACTION_UPDATE;
         $properties = $operation->getSet();
         $shouldResource = true;
 
@@ -185,14 +193,15 @@ class ResourceEventProcessor implements Processor {
      * @param array|string $properties
      * @return bool
      */
-    public function shouldResourceEvent($properties): bool {
+    public function shouldResourceEvent($properties): bool
+    {
         $shouldResourceEvent = true;
 
         if (is_array($properties)) {
             $propertyNames = array_keys($properties);
             foreach ($propertyNames as $propertyName) {
-                $fieldIsValid = !str_contains($propertyName, 'Count')
-                    && !in_array($propertyName, $this->getRestrictedProperties());
+                $fieldIsValid =
+                    !str_contains($propertyName, "Count") && !in_array($propertyName, $this->getRestrictedProperties());
                 if (!$fieldIsValid) {
                     $shouldResourceEvent = false;
                     break;
@@ -201,10 +210,8 @@ class ResourceEventProcessor implements Processor {
         }
 
         if (is_string($properties)) {
-            $fieldIsValid = (
-                !in_array($properties, $this->getRestrictedProperties()) &&
-                !str_contains($properties, 'Count')
-            );
+            $fieldIsValid =
+                !in_array($properties, $this->getRestrictedProperties()) && !str_contains($properties, "Count");
             if (!$fieldIsValid) {
                 $shouldResourceEvent = false;
             }
@@ -223,7 +230,8 @@ class ResourceEventProcessor implements Processor {
      *
      * @return ResourceEvent[]
      */
-    private function createResourceEvents(Operation $operation, string $action): array {
+    private function createResourceEvents(Operation $operation, string $action): array
+    {
         $events = [];
         $model = $operation->getCaller();
         if ($model === null) {
@@ -238,7 +246,7 @@ class ResourceEventProcessor implements Processor {
             $where = array_merge($where, $model->primaryWhere($metaID));
         }
         $rows = $model->select($where, $operation->getOptions());
-        $currentUserFragment =  $this->userModel->currentFragment();
+        $currentUserFragment = $this->userModel->currentFragment();
 
         $resourceEventClass = $this->resourceEventClass;
 
@@ -263,7 +271,8 @@ class ResourceEventProcessor implements Processor {
      *
      * @param array $restrictedProperties
      */
-    public function setRestrictedProperties(array $restrictedProperties) {
+    public function setRestrictedProperties(array $restrictedProperties)
+    {
         $this->restrictedProperties = $restrictedProperties;
     }
 
@@ -272,7 +281,8 @@ class ResourceEventProcessor implements Processor {
      *
      * @return array
      */
-    public function getRestrictedProperties(): array {
+    public function getRestrictedProperties(): array
+    {
         return $this->restrictedProperties;
     }
 
@@ -281,7 +291,8 @@ class ResourceEventProcessor implements Processor {
      *
      * @param Operation $operation
      */
-    private function stashDirtyRecords(Operation $operation): void {
+    private function stashDirtyRecords(Operation $operation): void
+    {
         $resourceType = $operation->getMeta("resourceType");
         $resourceIDs = $operation->getMeta("resourceIDs");
 

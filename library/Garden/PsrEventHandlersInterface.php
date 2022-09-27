@@ -10,8 +10,8 @@ namespace Garden;
 /**
  * Use this interface to mark this as a class with autobound PSR event handlers.
  */
-interface PsrEventHandlersInterface extends EventHandlersInterface {
-
+interface PsrEventHandlersInterface extends EventHandlersInterface
+{
     /**
      * Return an array of methods on this class that are event handlers.
      *

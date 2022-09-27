@@ -24,7 +24,7 @@ export default {
     },
 };
 
-export function RadioInputsRenderedAsButtons(props: {
+function RadioInputsRenderedAsButtonsStory(props: {
     title?: string;
     accessibleTitle?: string;
     disabled?: boolean;
@@ -69,8 +69,12 @@ export function RadioInputsRenderedAsButtons(props: {
     );
 }
 
+export function RadioInputsRenderedAsButtons() {
+    return <RadioInputsRenderedAsButtonsStory />;
+}
+
 export const LookingLikeTabs = storyWithConfig({}, () => (
-    <RadioInputsRenderedAsButtons
+    <RadioInputsRenderedAsButtonsStory
         title="Tab Style Buttons"
         buttonClass={""}
         buttonActiveClass={""}
@@ -82,5 +86,5 @@ export const LookingLikeTabs = storyWithConfig({}, () => (
 ));
 
 export const Disabled = storyWithConfig({}, () => (
-    <RadioInputsRenderedAsButtons title="Disabled Buttons" disabled={true} />
+    <RadioInputsRenderedAsButtonsStory title="Disabled Buttons" disabled={true} />
 ));

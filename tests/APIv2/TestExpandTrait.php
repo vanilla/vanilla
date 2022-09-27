@@ -17,21 +17,24 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Trait for asserting that certain common properties are expanded.
  */
-trait TestExpandTrait {
-
+trait TestExpandTrait
+{
     /**
      * Test the expand parameters on the groups API.
      *
      * @group expands
      */
-    public function testExpandIndex() {
+    public function testExpandIndex()
+    {
         $notExpanded = $this->testIndex();
         $this->assertUsersNotExpanded($notExpanded);
         $this->assertCrawlNotExpanded($notExpanded);
 
         // Fetch with expands
         $expands = array_merge([ModelUtils::EXPAND_CRAWL], $this->getExpandableUserFields());
-        $expanded = $this->api()->get($this->indexUrl(), ['expand' => $expands])->getBody();
+        $expanded = $this->api()
+            ->get($this->indexUrl(), ["expand" => $expands])
+            ->getBody();
 
         $this->assertUsersExpanded($expanded);
         $this->assertCrawlExpanded($expanded);
@@ -39,9 +42,9 @@ trait TestExpandTrait {
         // Test private community crawl.
         $this->runWithPrivateCommunity(function () {
             $this->api()->setUserID(InternalClient::DEFAULT_USER_ID);
-            $rows = $this->api()->get($this->indexUrl(), ['expand' => ModelUtils::EXPAND_CRAWL]);
+            $rows = $this->api()->get($this->indexUrl(), ["expand" => ModelUtils::EXPAND_CRAWL]);
             foreach ($rows as $row) {
-                TestCase::assertEquals(CrawlableRecordSchema::SCOPE_RESTRICTED, $row['scope']);
+                TestCase::assertEquals(CrawlableRecordSchema::SCOPE_RESTRICTED, $row["scope"]);
             }
         });
     }
@@ -51,14 +54,19 @@ trait TestExpandTrait {
      *
      * @group expands
      */
-    public function testExpandGet() {
+    public function testExpandGet()
+    {
         $record = $this->testPost();
-        $notExpanded = $this->api()->get($this->baseUrl . '/' . $record[$this->pk])->getBody();
+        $notExpanded = $this->api()
+            ->get($this->baseUrl . "/" . $record[$this->pk])
+            ->getBody();
         $this->assertUsersNotExpanded([$notExpanded]);
         $this->assertCrawlNotExpanded([$notExpanded]);
 
         $expands = array_merge([ModelUtils::EXPAND_CRAWL], $this->getExpandableUserFields());
-        $expanded = $this->api()->get($this->baseUrl . '/' . $record[$this->pk], ['expand' => $expands])->getBody();
+        $expanded = $this->api()
+            ->get($this->baseUrl . "/" . $record[$this->pk], ["expand" => $expands])
+            ->getBody();
         $this->assertUsersExpanded([$expanded]);
         $this->assertCrawlExpanded([$expanded]);
     }
@@ -76,7 +84,8 @@ trait TestExpandTrait {
      * @param array $rows
      * @param string[] $userFields
      */
-    private function assertUsersExpanded(array $rows, array $userFields = null) {
+    private function assertUsersExpanded(array $rows, array $userFields = null)
+    {
         $userFields = $userFields ?? $this->getExpandableUserFields();
 
         $fragmentSchema = new UserFragmentSchema();
@@ -95,12 +104,13 @@ trait TestExpandTrait {
      * @param array $rows
      * @param array $userFields
      */
-    private function assertUsersNotExpanded(array $rows, array $userFields = null) {
+    private function assertUsersNotExpanded(array $rows, array $userFields = null)
+    {
         $userFields = $userFields ?? $this->getExpandableUserFields();
 
         foreach ($rows as $row) {
             foreach ($userFields as $userField) {
-                $this->assertArrayNotHasKey('userField', $row);
+                $this->assertArrayNotHasKey("userField", $row);
             }
         }
     }
@@ -110,12 +120,13 @@ trait TestExpandTrait {
      *
      * @param array $rows
      */
-    private function assertCrawlExpanded(array $rows) {
+    private function assertCrawlExpanded(array $rows)
+    {
         foreach ($rows as $row) {
-            $scope = $row['scope'] ?? null;
+            $scope = $row["scope"] ?? null;
             $this->assertNotNull($scope, "Row did not define any scope.");
 
-            $excerpt = $row['excerpt'] ?? null;
+            $excerpt = $row["excerpt"] ?? null;
             $this->assertNotNull($excerpt, "Row did not define any excerpt.");
 
             $this->assertLocaleExpanded($row);
@@ -127,9 +138,10 @@ trait TestExpandTrait {
      *
      * @param array $rows
      */
-    private function assertCrawlNotExpanded(array $rows) {
+    private function assertCrawlNotExpanded(array $rows)
+    {
         foreach ($rows as $row) {
-            $this->assertArrayNotHasKey('scope', $rows);
+            $this->assertArrayNotHasKey("scope", $rows);
         }
     }
 
@@ -138,16 +150,17 @@ trait TestExpandTrait {
      *
      * @param array $row
      */
-    private function assertLocaleExpanded(array $row): void {
-        $locale = $row['locale'] ?? null;
-        $body = $row['bodyPlainText'] ?? null;
-        $name = $row['name'] ?? null;
+    private function assertLocaleExpanded(array $row): void
+    {
+        $locale = $row["locale"] ?? null;
+        $body = $row["bodyPlainText"] ?? null;
+        $name = $row["name"] ?? null;
 
         if ($locale && $locale !== CrawlableRecordSchema::ALL_LOCALES && $body) {
-            $this->assertArrayHasKey('bodyPlainText_' . $locale, $row);
+            $this->assertArrayHasKey("bodyPlainText_" . $locale, $row);
         }
         if ($locale && $locale !== CrawlableRecordSchema::ALL_LOCALES && $name) {
-            $this->assertArrayHasKey('name_' . $locale, $row);
+            $this->assertArrayHasKey("name_" . $locale, $row);
         }
     }
 }

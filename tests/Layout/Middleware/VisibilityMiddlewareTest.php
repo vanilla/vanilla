@@ -16,61 +16,65 @@ use VanillaTests\SiteTestTrait;
 /**
  * Test for the visibility middleware.
  */
-class VisibilityMiddlewareTest extends BootstrapTestCase {
-
+class VisibilityMiddlewareTest extends BootstrapTestCase
+{
     use LayoutTestTrait;
     use SiteTestTrait;
 
     /**
      * Test that our middleware passes through its values on react nodes.
      */
-    public function testPassesThroughReactNode() {
+    public function testPassesThroughReactNode()
+    {
         $hydrator = self::container()->get(LayoutHydrator::class);
 
         $middlewareDef = [
-            'visibility' => [
-                'device' => 'mobile',
+            "visibility" => [
+                "device" => "mobile",
             ],
         ];
 
         $input = [
             $this->layoutSection([
-                $this->layoutHtml('Should appear'),
-                $this->layoutHtml('Should have middleware passed to frontend.', $middlewareDef + ['hideMe' => 'Should get removed.']),
+                $this->layoutHtml("Should appear"),
+                $this->layoutHtml(
+                    "Should have middleware passed to frontend.",
+                    $middlewareDef + ["hideMe" => "Should get removed."]
+                ),
             ]),
-            'notReact' => [
+            "notReact" => [
                 DataHydrator::KEY_MIDDLEWARE => $middlewareDef,
-                DataHydrator::KEY_HYDRATE => 'sprintf',
-                'format' => 'No middleware %s',
-                'args' => ['here'],
-            ]
+                DataHydrator::KEY_HYDRATE => "sprintf",
+                "format" => "No middleware %s",
+                "args" => ["here"],
+            ],
         ];
 
         $expected = [
             [
-                '$reactComponent' => 'SectionOneColumn',
+                '$reactComponent' => "SectionOneColumn",
                 '$reactProps' => [
-                    'children' => [
+                    "children" => [
                         [
-                            '$reactComponent' => 'HtmlWidget',
+                            '$reactComponent' => "HtmlWidget",
                             '$reactProps' => [
-                                'html' => 'Should appear',
-                                'isAdvertisement' => false
+                                "isAdvertisement" => false,
+                                "html" => "Should appear",
                             ],
                         ],
                         [
                             '$middleware' => $middlewareDef,
-                            '$reactComponent' => 'HtmlWidget',
+                            '$reactComponent' => "HtmlWidget",
                             '$reactProps' => [
-                                'html' => 'Should have middleware passed to frontend.',
-                                'isAdvertisement' => false
+                                "isAdvertisement" => false,
+                                "html" => "Should have middleware passed to frontend.",
                             ],
                         ],
                     ],
-                    'isNarrow' => false,
+                    "isNarrow" => false,
                 ],
             ],
-            'notReact' => 'No middleware here',
+            "notReact" => "No middleware here",
         ];
 
         $output = $hydrator->getHydrator(null)->resolve($input);

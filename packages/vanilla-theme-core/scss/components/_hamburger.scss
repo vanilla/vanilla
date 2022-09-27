@@ -8,15 +8,17 @@
     Variables
 \* -------------------------------------------------------------- */
 
-$hamburger-size:                         22px !default;
-$hamburger_padding:                      0 !default;
-$hamburger_bg:                           transparent !default;
-$hamburger_fg:                           $header_fg !default;
-$hamburger-stroke_height:                2px !default;
-$hamburger_borderRadius:                 $component_borderRadius !default;
-$hamburger-stroke_borderRadius:          $hamburger-stroke_height !default;
-$hamburger_transition:                   $global-default_timing !default;
-$hamburger_jstransform:                  "isToggled" !default;
+@use "sass:math";
+
+$hamburger-size: 22px !default;
+$hamburger_padding: 0 !default;
+$hamburger_bg: transparent !default;
+$hamburger_fg: $header_fg !default;
+$hamburger-stroke_height: 2px !default;
+$hamburger_borderRadius: $component_borderRadius !default;
+$hamburger-stroke_borderRadius: $hamburger-stroke_height !default;
+$hamburger_transition: $global-default_timing !default;
+$hamburger_jstransform: "isToggled" !default;
 
 /* -------------------------------------------------------------- *\
     Styles
@@ -42,7 +44,7 @@ $hamburger_jstransform:                  "isToggled" !default;
 
 @for $i from 1 through 3 {
     .Hamburger-svgchevron path.a#{$i} {
-        animation-delay: -($i - ($i / 2)) + 0.5s;
+        animation-delay: -($i - ($i * 0.5)) + 0.5s;
     }
 }
 
@@ -86,15 +88,15 @@ $hamburger_jstransform:                  "isToggled" !default;
         content: "";
         position: absolute;
         left: 0;
-        transform-origin: ($hamburger-size / 4) center;
+        transform-origin: ($hamburger-size * 0.25) center;
     }
 
     &::before {
-        top: ($hamburger-size / 4);
+        top: ($hamburger-size * 0.25);
     }
 
     &::after {
-        top: -($hamburger-size / 3.5);
+        top: -(math.div($hamburger-size, 3.5));
     }
 
     .#{$hamburger_jstransform} & {

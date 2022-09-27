@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Job;
 /**
  * Trait to implement TrackableJobAwareInterface.
  */
-trait TrackableJobAwareTrait { // Implements TrackableJobAwareInterface
-
+trait TrackableJobAwareTrait // Implements TrackableJobAwareInterface
+{
     /** @var int|null */
     protected $trackingUserID = null;
 
@@ -25,7 +25,8 @@ trait TrackableJobAwareTrait { // Implements TrackableJobAwareInterface
      *
      * @return void
      */
-    public function setTrackingUserID(?int $userID): void {
+    public function setTrackingUserID(?int $userID): void
+    {
         $this->trackingUserID = $userID;
     }
 
@@ -34,7 +35,8 @@ trait TrackableJobAwareTrait { // Implements TrackableJobAwareInterface
      *
      * @return int|null
      */
-    public function getTrackingUserID(): ?int {
+    public function getTrackingUserID(): ?int
+    {
         return $this->trackingUserID;
     }
 
@@ -43,7 +45,8 @@ trait TrackableJobAwareTrait { // Implements TrackableJobAwareInterface
      *
      * @return string|null
      */
-    public function getTrackingID(): ?string {
+    public function getTrackingID(): ?string
+    {
         return $this->trackingID;
     }
 
@@ -52,7 +55,8 @@ trait TrackableJobAwareTrait { // Implements TrackableJobAwareInterface
      *
      * @param string|null $trackingID Null is to mirror the getter.
      */
-    public function setTrackingID(?string $trackingID): void {
+    public function setTrackingID(?string $trackingID): void
+    {
         $this->trackingID = $trackingID;
     }
 }

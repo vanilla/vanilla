@@ -18,6 +18,12 @@ paths:
                       default: 30
                       maximum: 100
                       minimum: 1
+                - name: shouldBatch
+                  in: query
+                  description: |
+                      Whether to batch notifications.
+                  schema:
+                      type: boolean
                 - $ref: "#/components/parameters/Page"
             responses:
                 "200":
@@ -135,6 +141,12 @@ components:
                 notificationID:
                     description: A unique ID to identify the notification.
                     type: integer
+                activityType:
+                    description: The type of activity that generated the notification.
+                    type: string
+                reason:
+                    description: The reason the user is receiving this notification.
+                    type: string
                 photoUrl:
                     description: An avatar or thumbnail associated with the notification.
                     nullable: true

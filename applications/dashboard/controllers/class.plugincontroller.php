@@ -18,5 +18,6 @@
 /**
  * Handles /plugin endpoint.
  */
-class PluginController extends DashboardController {
+class PluginController extends DashboardController
+{
 }

@@ -10,5 +10,6 @@ namespace Vanilla\Contracts\Models;
 /**
  * Interface for modelling user expansion.
  */
-interface UserProviderInterface extends FragmentProviderInterface {
+interface UserProviderInterface extends FragmentProviderInterface
+{
 }

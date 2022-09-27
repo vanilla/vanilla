@@ -11,7 +11,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Vanilla\Logger;
 
-class TestLogger implements LoggerInterface {
+class TestLogger implements LoggerInterface
+{
     use LoggerTrait;
 
     /**
@@ -29,7 +30,8 @@ class TestLogger implements LoggerInterface {
      */
     public $logs = [];
 
-    public function __construct(Logger $parent = null, $level = Logger::DEBUG) {
+    public function __construct(Logger $parent = null, $level = Logger::DEBUG)
+    {
         if (!isset($parent)) {
             $parent = new Logger();
         }
@@ -37,16 +39,21 @@ class TestLogger implements LoggerInterface {
         $this->parent = $parent;
     }
 
-    public static function replaceContext($format, $context = []) {
-        $msg = preg_replace_callback('`({[^\s{}]+})`', function($m) use ($context) {
-            $field = trim($m[1], '{}');
-            $fieldValue = $context[$field] ?? $context['data'][$field] ?? null;
-            if ($fieldValue !== null) {
-                return $fieldValue;
-            } else {
-                return $m[1];
-            }
-        }, $format);
+    public static function replaceContext($format, $context = [])
+    {
+        $msg = preg_replace_callback(
+            "`({[^\s{}]+})`",
+            function ($m) use ($context) {
+                $field = trim($m[1], "{}");
+                $fieldValue = $context[$field] ?? ($context["data"][$field] ?? null);
+                if ($fieldValue !== null) {
+                    return $fieldValue;
+                } else {
+                    return $m[1];
+                }
+            },
+            $format
+        );
         return $msg;
     }
 
@@ -58,7 +65,8 @@ class TestLogger implements LoggerInterface {
      * @param array $context
      * @return null
      */
-    public function log($level, $message, array $context = []) {
+    public function log($level, $message, array $context = [])
+    {
         $msg = $this->replaceContext($message, $context);
         $this->logs[] = "$level $msg";
         $this->last = [$level, $message, $context];
@@ -69,7 +77,8 @@ class TestLogger implements LoggerInterface {
      *
      * @return string
      */
-    public function getLastLevel(): string {
+    public function getLastLevel(): string
+    {
         return $this->last[0];
     }
 
@@ -78,7 +87,8 @@ class TestLogger implements LoggerInterface {
      *
      * @return string
      */
-    public function getLastMessage(): string {
+    public function getLastMessage(): string
+    {
         return $this->last[1];
     }
 
@@ -87,7 +97,8 @@ class TestLogger implements LoggerInterface {
      *
      * @return array
      */
-    public function getLastContext(): array {
+    public function getLastContext(): array
+    {
         return $this->last[2];
     }
 }

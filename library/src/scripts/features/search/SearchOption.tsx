@@ -21,7 +21,7 @@ import { MetaIcon, MetaTag } from "@library/metas/Metas";
 export interface ISearchOptionData {
     crumbs: ICrumb[];
     name: string;
-    dateUpdated: string;
+    dateUpdated?: string;
     labels?: string[];
     url: string;
     type?: string;

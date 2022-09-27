@@ -110,7 +110,7 @@ compatibilityStyles = useThemeCache(() => {
 
     const panelSelectors = `
         .About a,
-        .Panel.Panel-main .PanelInfo a.ItemLink,
+        .Panel.Panel-main .PanelInfo a.ItemLink
         `;
 
     // Panel

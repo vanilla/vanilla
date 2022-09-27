@@ -8,17 +8,18 @@ namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\Formats;
 
 use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
 
-class CodeSanitizeTest extends SanitizeTest {
-
+class CodeSanitizeTest extends SanitizeTest
+{
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
+    protected function insertContentOperations(string $content): array
+    {
         $operations = [
             [
                 "insert" => $content,
-                "attributes" => [ "codeBlock" => true ]
-            ]
+                "attributes" => ["codeBlock" => true],
+            ],
         ];
         return $operations;
     }

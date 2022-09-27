@@ -42,7 +42,7 @@ export const MachineTranslationSettings = (props: IMachineTranslationProps) => {
                     labelType={DashboardLabelType.WIDE}
                     label={t("Enable Machine Translation")}
                     description={t(
-                        "Enable Machine Translation and configure your translation service provides to translate Knowledge Base articles.",
+                        "Enable Machine Translation and configure your translation service providers to translate Knowledge Base articles.",
                     )}
                     afterDescription={
                         !isAnyConfigured &&

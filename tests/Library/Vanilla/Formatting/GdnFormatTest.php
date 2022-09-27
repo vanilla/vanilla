@@ -13,8 +13,8 @@ use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 /**
  * Unit tests for the Gdn_Format class.
  */
-class GdnFormatTest extends MinimalContainerTestCase {
-
+class GdnFormatTest extends MinimalContainerTestCase
+{
     use AssertsFixtureRenderingTrait;
 
     /**
@@ -24,8 +24,9 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideBBCode
      */
-    public function testBBCode(string $fixtureDir) {
-        $this->assertFixturePassesForFormat($fixtureDir, 'bbcode');
+    public function testBBCode(string $fixtureDir)
+    {
+        $this->assertFixturePassesForFormat($fixtureDir, "bbcode");
     }
 
     /**
@@ -35,8 +36,9 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideMarkdown
      */
-    public function testMarkdown(string $fixtureDir) {
-        $this->assertFixturePassesForFormat($fixtureDir, 'markdown');
+    public function testMarkdown(string $fixtureDir)
+    {
+        $this->assertFixturePassesForFormat($fixtureDir, "markdown");
     }
 
     /**
@@ -46,8 +48,9 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideText
      */
-    public function testText(string $fixtureDir) {
-        $this->assertFixturePassesForFormat($fixtureDir, 'text');
+    public function testText(string $fixtureDir)
+    {
+        $this->assertFixturePassesForFormat($fixtureDir, "text");
     }
 
     /**
@@ -57,8 +60,9 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideTextEx
      */
-    public function testTextEx(string $fixtureDir) {
-        $this->assertFixturePassesForFormat($fixtureDir, 'textex');
+    public function testTextEx(string $fixtureDir)
+    {
+        $this->assertFixturePassesForFormat($fixtureDir, "textex");
     }
 
     /**
@@ -68,8 +72,9 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideHtml
      */
-    public function testHtml(string $fixtureDir) {
-        $this->assertFixturePassesForFormat($fixtureDir, 'html');
+    public function testHtml(string $fixtureDir)
+    {
+        $this->assertFixturePassesForFormat($fixtureDir, "html");
     }
 
     /**
@@ -79,7 +84,8 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideWysiwyg
      */
-    public function testWysiwyg(string $fixtureDir) {
+    public function testWysiwyg(string $fixtureDir)
+    {
         [$input, $expectedOutput] = $this->getFixture($fixtureDir);
         $output = \Gdn_Format::wysiwyg($input);
         $this->assertHtmlStringEqualsHtmlString(
@@ -97,7 +103,8 @@ class GdnFormatTest extends MinimalContainerTestCase {
      *
      * @dataProvider groupInputModesProvider
      */
-    public function testGroupInputModes(array $fixtureDirs, callable $formatMethod) {
+    public function testGroupInputModes(array $fixtureDirs, callable $formatMethod)
+    {
         $this->assertAllFixturesAsArray($fixtureDirs, $formatMethod);
         $this->assertAllFixturesAsObject($fixtureDirs, $formatMethod);
     }
@@ -105,57 +112,64 @@ class GdnFormatTest extends MinimalContainerTestCase {
     /**
      * @return array
      */
-    public function groupInputModesProvider(): array {
+    public function groupInputModesProvider(): array
+    {
         return [
-            [$this->provideHtml(), [\Gdn_Format::class, 'html']],
-            [$this->provideWysiwyg(), [\Gdn_Format::class, 'wysiwyg']],
-            [$this->provideText(), [\Gdn_Format::class, 'text']],
-            [$this->provideMarkdown(), [\Gdn_Format::class, 'markdown']],
-            [$this->provideBBCode(), [\Gdn_Format::class, 'bbcode']],
-            [$this->provideTextEx(), [\Gdn_Format::class, 'textex']],
+            [$this->provideHtml(), [\Gdn_Format::class, "html"]],
+            [$this->provideWysiwyg(), [\Gdn_Format::class, "wysiwyg"]],
+            [$this->provideText(), [\Gdn_Format::class, "text"]],
+            [$this->provideMarkdown(), [\Gdn_Format::class, "markdown"]],
+            [$this->provideBBCode(), [\Gdn_Format::class, "bbcode"]],
+            [$this->provideTextEx(), [\Gdn_Format::class, "textex"]],
         ];
     }
 
     /**
      * @return array
      */
-    public function provideHtml(): array {
-        return $this->createFixtureDataProvider('/formats/html');
+    public function provideHtml(): array
+    {
+        return $this->createFixtureDataProvider("/formats/html");
     }
 
     /**
      * @return array
      */
-    public function provideBBCode(): array {
-        return $this->createFixtureDataProvider('/formats/bbcode');
+    public function provideBBCode(): array
+    {
+        return $this->createFixtureDataProvider("/formats/bbcode");
     }
 
     /**
      * @return array
      */
-    public function provideMarkdown(): array {
-        return $this->createFixtureDataProvider('/formats/markdown');
+    public function provideMarkdown(): array
+    {
+        return $this->createFixtureDataProvider("/formats/markdown");
     }
 
     /**
      * @return array
      */
-    public function provideText(): array {
-        return $this->createFixtureDataProvider('/formats/text');
+    public function provideText(): array
+    {
+        return $this->createFixtureDataProvider("/formats/text");
     }
 
     /**
      * @return array
      */
-    public function provideTextEx(): array {
-        return $this->createFixtureDataProvider('/formats/textex');
+    public function provideTextEx(): array
+    {
+        return $this->createFixtureDataProvider("/formats/textex");
     }
 
     /**
      * @return array
      */
-    public function provideWysiwyg(): array {
-        return $this->createFixtureDataProvider('/formats/wysiwyg');
+    public function provideWysiwyg(): array
+    {
+        return $this->createFixtureDataProvider("/formats/wysiwyg");
     }
 
     /**
@@ -164,7 +178,8 @@ class GdnFormatTest extends MinimalContainerTestCase {
      * @param string $fixtureDir
      * @param string $format
      */
-    public function assertFixturePassesForFormat(string $fixtureDir, string $format) {
+    public function assertFixturePassesForFormat(string $fixtureDir, string $format)
+    {
         [$input, $expectedHtml, $expectedText] = $this->getFixture($fixtureDir);
         $outputHtml = \Gdn_Format::to($input, $format);
         $this->assertHtmlStringEqualsHtmlString(
@@ -190,7 +205,8 @@ class GdnFormatTest extends MinimalContainerTestCase {
      * @param array $fixtureDirs
      * @param callable $formatMethod
      */
-    private function assertAllFixturesAsArray(array $fixtureDirs, callable $formatMethod) {
+    private function assertAllFixturesAsArray(array $fixtureDirs, callable $formatMethod)
+    {
         $allInputs = [];
         $expectedOutputs = [];
 
@@ -213,7 +229,8 @@ class GdnFormatTest extends MinimalContainerTestCase {
      * @param array $fixtureDirs
      * @param callable $formatMethod
      */
-    private function assertAllFixturesAsObject(array $fixtureDirs, callable $formatMethod) {
+    private function assertAllFixturesAsObject(array $fixtureDirs, callable $formatMethod)
+    {
         $allInputs = new \stdClass();
         $expectedOutputs = [];
 
@@ -233,18 +250,21 @@ class GdnFormatTest extends MinimalContainerTestCase {
     /**
      * Test various cases that cause us not to format mentions.
      */
-    public function testMentionCharBailout() {
+    public function testMentionCharBailout()
+    {
         $invalidFirstChars = '@{ hello @}asdf  @"{hello}';
 
         // With quotes any character is allowed.
-        $expected = '@{ hello @}asdf  <a href="http://vanilla.test/minimal-container-test/profile/%7Bhello%7D" rel="nofollow">@{hello}</a>';
+        $expected =
+            '@{ hello @}asdf  <a href="http://vanilla.test/minimal-container-test/profile/%7Bhello%7D" rel="nofollow">@{hello}</a>';
         $this->assertEquals($expected, \Gdn_Format::mentions($invalidFirstChars));
     }
 
     /**
      * Test various cases that cause us not to format mentions.
      */
-    public function testTooManyBailout() {
+    public function testTooManyBailout()
+    {
         $tooManyAlphas = "";
         for ($i = 0; $i < 60; $i++) {
             $tooManyAlphas .= "@someone ";

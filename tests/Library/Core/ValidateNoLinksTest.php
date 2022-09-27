@@ -12,13 +12,14 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for validateNoLinks().
  */
-class ValidateNoLinksTest extends TestCase {
-
+class ValidateNoLinksTest extends TestCase
+{
     /**
      * Test string with a link.
      */
-    public function testValidateNoLinksFalse() {
-        $actual = validateNoLinks('this-string-has-https://a-link');
+    public function testValidateNoLinksFalse()
+    {
+        $actual = validateNoLinks("this-string-has-https://a-link");
         $expected = false;
         $this->assertSame($expected, $actual);
     }
@@ -26,8 +27,9 @@ class ValidateNoLinksTest extends TestCase {
     /**
      * Test string without a link.
      */
-    public function testValidateNoLinksTrue() {
-        $actual = validateNoLinks('this-string-has-no-links');
+    public function testValidateNoLinksTrue()
+    {
+        $actual = validateNoLinks("this-string-has-no-links");
         $expected = true;
         $this->assertSame($expected, $actual);
     }

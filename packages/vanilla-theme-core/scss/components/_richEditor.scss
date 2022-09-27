@@ -5,7 +5,6 @@
  */
 
 body.hasRichEditor {
-
     .FormWrapper.FormWrapper-Condensed {
         border-width: 0;
         padding-right: 0 !important;
@@ -33,7 +32,6 @@ body.hasRichEditor {
     }
 
     .Popup {
-
         .NoteForm {
             padding: 0;
         }
@@ -62,7 +60,6 @@ body.hasRichEditor {
     }
 
     .embedDialogue.embedDialogue {
-
         @include maxWidth {
             position: static;
         }
@@ -72,7 +69,6 @@ body.hasRichEditor {
     #GroupForm,
     #MessageForm,
     #ConversationForm {
-
         .FormWrapper {
             padding-left: 0;
             padding-right: 0;
@@ -83,7 +79,6 @@ body.hasRichEditor {
 body.hasRichEditor #MessageForm,
 body.hasRichEditor.Profile {
     .FormWrapper-Condensed.FormWrapper-Condensed {
-
         @include maxWidth($theme-breakpoint_tablet) {
             padding-left: $utility-baseUnitTriple;
         }
@@ -95,7 +90,6 @@ body.hasRichEditor.Profile {
 }
 
 body.hasRichEditor.Section-PostDiscussion #DiscussionForm {
-
     .FormWrapper {
         padding-left: 0;
         padding-right: 0;

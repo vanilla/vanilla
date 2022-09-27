@@ -9,7 +9,7 @@ import AdminLayout from "@dashboard/components/AdminLayout";
 import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { t } from "@vanilla/i18n";
-import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
+import { useConfigsByKeys } from "@library/config/configHooks";
 import { LoadStatus } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { notEmpty } from "@vanilla/utils";
@@ -23,11 +23,13 @@ import { LayoutOption } from "@dashboard/appearance/types";
 import AdminTitleBar from "@dashboard/components/AdminTitleBar";
 import SmartLink from "@library/routing/links/SmartLink";
 import Translate from "@library/content/Translate";
+import { useLegacyLayoutView } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 
 function CategoriesLegacyLayoutsPage() {
-    const configs = useConfigsByKeys(["categories.layout"]);
+    const configs = useConfigsByKeys(["categories.layout", "customLayout.categoryList"]);
+    const isCustomCategoryList = configs.data?.["customLayout.categoryList"];
 
-    const { patchConfig } = useConfigPatcher();
+    const legacyPatcher = useLegacyLayoutView("categoryList", "categories.layout");
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(configs.status)) {
         return <Loader />;
@@ -38,9 +40,7 @@ function CategoriesLegacyLayoutsPage() {
     }
 
     function applyCategoriesLayout(layout: LayoutOption) {
-        patchConfig({
-            "categories.layout": layout,
-        });
+        legacyPatcher.putLegacyView(layout);
     }
 
     const editUrl = "/appearance/style-guides";
@@ -51,25 +51,25 @@ function CategoriesLegacyLayoutsPage() {
                 {
                     label: t("Modern Layout"),
                     thumbnailComponent: ModernLayout,
-                    active: configs.data["categories.layout"] == LayoutOption.MODERN,
+                    active: !isCustomCategoryList && configs.data["categories.layout"] == LayoutOption.MODERN,
                     onApply: () => applyCategoriesLayout(LayoutOption.MODERN),
                 },
                 {
                     label: t("Table Layout"),
                     thumbnailComponent: TableLayout,
-                    active: configs.data["categories.layout"] == LayoutOption.TABLE,
+                    active: !isCustomCategoryList && configs.data["categories.layout"] == LayoutOption.TABLE,
                     onApply: () => applyCategoriesLayout(LayoutOption.TABLE),
                 },
                 {
                     label: t("Mixed Layout"),
                     thumbnailComponent: MixedLayout,
-                    active: configs.data["categories.layout"] == LayoutOption.MIXED,
+                    active: !isCustomCategoryList && configs.data["categories.layout"] == LayoutOption.MIXED,
                     onApply: () => applyCategoriesLayout(LayoutOption.MIXED),
                 },
                 {
                     label: t("Tiled Layout"),
                     thumbnailComponent: TiledLayout,
-                    active: configs.data["categories.layout"] == LayoutOption.FOUNDATION,
+                    active: !isCustomCategoryList && configs.data["categories.layout"] == LayoutOption.FOUNDATION,
                     onApply: () => applyCategoriesLayout(LayoutOption.FOUNDATION),
                     editUrl,
                 },
@@ -94,7 +94,7 @@ export default function Page() {
                                 "Choose the preferred layout for lists of categories. You can edit the Tiled Layout. To learn more, see <0/>."
                             }
                             c0={
-                                <SmartLink to={"https://success.vanillaforums.com/kb/articles/430-layout-settings"}>
+                                <SmartLink to={"https://success.vanillaforums.com/kb/articles/430"}>
                                     {t("the documentation")}
                                 </SmartLink>
                             }

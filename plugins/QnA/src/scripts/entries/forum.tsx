@@ -10,25 +10,12 @@ import { AjaxModal } from "../AjaxModal";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import Loader from "@library/loaders/Loader";
 import ModalSizes from "@library/modal/ModalSizes";
-import { mountModal } from "@library/modal/Modal";
+import { mountModal } from "@library/modal/mountModal";
 import { t } from "@vanilla/i18n";
 import gdn from "@library/gdn";
 import { addComponent } from "@library/utility/componentRegistry";
 import { DiscussionListModule } from "@library/features/discussions/DiscussionListModule";
-
-/**
- * Get discussionID from ItemDiscussion
- *
- * @returns string?
- */
-function getDiscussionID() {
-    let discussionID;
-    const discussion = document.querySelector(".ItemDiscussion") as HTMLElement;
-    if (discussion) {
-        discussionID = discussion.id.match(/\d+$/gi)![0];
-    }
-    return discussionID;
-}
+import { registerQnaSearchTypes } from "../registerQnaSearchTypes";
 
 /**
  * Hijack click because api request needs to be a POST
@@ -63,6 +50,7 @@ export async function hijackFollowUpClick(e) {
 }
 
 onReady(() => {
+    registerQnaSearchTypes();
     document.addEventListener("click", hijackFollowUpClick);
 });
 

@@ -13,8 +13,8 @@
 /**
  * Handles creating and returning a pager.
  */
-class Gdn_PagerFactory {
-
+class Gdn_PagerFactory
+{
     /**
      *
      *
@@ -22,11 +22,12 @@ class Gdn_PagerFactory {
      * @param $sender
      * @return bool
      */
-    public function getPager($pagerType, $sender) {
-        $pagerType = $pagerType.'Module';
+    public function getPager($pagerType, $sender)
+    {
+        $pagerType = $pagerType . "Module";
 
         if (!class_exists($pagerType)) {
-            $pagerType = 'PagerModule';
+            $pagerType = "PagerModule";
         }
 
         if (!class_exists($pagerType)) {

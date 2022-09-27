@@ -16,25 +16,27 @@ use VanillaTests\Library\Vanilla\Logging\TestErrorLoggerCollection;
 /**
  * Test trait for working with loggers.
  */
-trait TestLoggerTrait {
-
+trait TestLoggerTrait
+{
     /** @var string */
     protected static $errorLogFilePath;
 
     /**
      * @return void
      */
-    protected function setUpLoggerTrait() {
+    protected function setUpLoggerTrait()
+    {
         $logger = $this->getTestLogger();
         $logger->clear();
         static::$errorLogFilePath = TestErrorLoggerCollection::createLogFilePath();
-        \Gdn::config()->saveToConfig(ErrorLogger::CONF_LOG_FILE, self::$errorLogFilePath, ['Save' => false]);
+        \Gdn::config()->saveToConfig(ErrorLogger::CONF_LOG_FILE, self::$errorLogFilePath, ["Save" => false]);
     }
 
     /**
      * @return TestLogger
      */
-    protected static function getTestLogger(): TestLogger {
+    protected static function getTestLogger(): TestLogger
+    {
         $logger = static::container()->get(TestLogger::class);
         return $logger;
     }
@@ -42,7 +44,8 @@ trait TestLoggerTrait {
     /**
      * @return LoggerInterface
      */
-    protected static function getLogger(): LoggerInterface {
+    protected static function getLogger(): LoggerInterface
+    {
         $logger = static::container()->get(LoggerInterface::class);
         return $logger;
     }
@@ -50,7 +53,8 @@ trait TestLoggerTrait {
     /**
      * @return TestErrorLoggerCollection
      */
-    protected static function getTestErrorLogCollection(): TestErrorLoggerCollection {
+    protected static function getTestErrorLogCollection(): TestErrorLoggerCollection
+    {
         $collection = new TestErrorLoggerCollection(static::$errorLogFilePath);
         return $collection;
     }
@@ -61,7 +65,8 @@ trait TestLoggerTrait {
      *
      * @param callable $callable
      */
-    protected static function runWithLogDecorator(callable $callable) {
+    protected static function runWithLogDecorator(callable $callable)
+    {
         $origDecorator = self::container()->get(LogDecorator::class);
         try {
             $clonedDecorator = clone $origDecorator;
@@ -80,19 +85,24 @@ trait TestLoggerTrait {
      *
      * @return array Return the first log entry found.
      */
-    public function assertLog($filter = [], TestLogger $testLogger = null): array {
+    public function assertLog($filter = [], TestLogger $testLogger = null): array
+    {
         $logger = $testLogger ?? $this->getTestLogger();
         $item = $logger->search($filter);
         if ($item === null) {
-            $actual = '';
+            $actual = "";
             $logs = $logger->getLog();
             foreach ($logs as $log) {
                 $actual .= '\n';
                 $actual .= json_encode($log, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
 
-            $this->fail("Could not find expected log: ".json_encode($filter, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n" .
-                $actual);
+            $this->fail(
+                "Could not find expected log: " .
+                    json_encode($filter, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) .
+                    "\n" .
+                    $actual
+            );
         }
         $this->assertNotNull($item);
         return $item;
@@ -105,7 +115,8 @@ trait TestLoggerTrait {
      *
      * @return array Return the first log entry found.
      */
-    public function assertErrorLog($filter = []): array {
+    public function assertErrorLog($filter = []): array
+    {
         $collection = self::getTestErrorLogCollection();
         return $this->assertLog($filter, $collection->getTestLogger());
     }
@@ -115,7 +126,8 @@ trait TestLoggerTrait {
      *
      * @param string $message
      */
-    public function assertErrorLogMessage(string $message) {
+    public function assertErrorLogMessage(string $message)
+    {
         $collection = self::getTestErrorLogCollection();
         $this->assertLogMessage($message, $collection->getTestLogger());
     }
@@ -126,10 +138,11 @@ trait TestLoggerTrait {
      * @param array $filter The log filter.
      * @param TestLogger|null $testLogger The logger to search through.
      */
-    public function assertNoLog($filter = [], TestLogger $testLogger = null) {
+    public function assertNoLog($filter = [], TestLogger $testLogger = null)
+    {
         $logger = $testLogger ?? $this->getTestLogger();
         $item = $logger->search($filter);
-        $this->assertNull($item, "Unexpected log found: ".json_encode($filter));
+        $this->assertNull($item, "Unexpected log found: " . json_encode($filter));
     }
 
     /**
@@ -137,7 +150,8 @@ trait TestLoggerTrait {
      *
      * @param array $filter The log filter.
      */
-    public function assertNoErrorLog($filter = []) {
+    public function assertNoErrorLog($filter = [])
+    {
         $collection = self::getTestErrorLogCollection();
         $this->assertNoLog($filter, $collection->getTestLogger());
     }
@@ -148,8 +162,9 @@ trait TestLoggerTrait {
      * @param string $message
      * @param TestLogger|null $testLogger
      */
-    public function assertLogMessage(string $message, TestLogger $testLogger = null) {
+    public function assertLogMessage(string $message, TestLogger $testLogger = null)
+    {
         $logger = $testLogger ?? $this->getTestLogger();
-        $this->assertTrue($logger->hasMessage($message), "The log doesn't have the message: ".$message);
+        $this->assertTrue($logger->hasMessage($message), "The log doesn't have the message: " . $message);
     }
 }

@@ -125,7 +125,7 @@ export const inputCSS = () => {
         },
     });
 
-    cssOut("form .SelectWrapper::after", {
+    cssOut("form .SelectWrapper:after", {
         color: "inherit",
     });
 

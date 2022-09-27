@@ -11,6 +11,7 @@ import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import LazyAnnounceDiscussionForm from "@library/features/discussions/forms/LazyAnnounceDiscussionForm";
+import { StackingContextProvider } from "@vanilla/react-utils";
 
 const DiscussionOptionsAnnounce: FunctionComponent<{ discussion: IDiscussion }> = ({ discussion }) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -20,9 +21,11 @@ const DiscussionOptionsAnnounce: FunctionComponent<{ discussion: IDiscussion }> 
     return (
         <>
             <DropDownItemButton onClick={open}>{t("Announce")}</DropDownItemButton>
-            <Modal isVisible={isVisible} size={ModalSizes.MEDIUM} exitHandler={close}>
-                <LazyAnnounceDiscussionForm discussion={discussion} onSuccess={close} onCancel={close} />
-            </Modal>
+            <StackingContextProvider>
+                <Modal isVisible={isVisible} size={ModalSizes.MEDIUM} exitHandler={close}>
+                    <LazyAnnounceDiscussionForm discussion={discussion} onSuccess={close} onCancel={close} />
+                </Modal>
+            </StackingContextProvider>
         </>
     );
 };

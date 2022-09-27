@@ -10,5 +10,6 @@ namespace Vanilla\Formatting\Quill\Nesting;
 /**
  * Exception to throw when a blot is nested improperly.
  */
-class InvalidNestingException extends \Exception {
+class InvalidNestingException extends \Exception
+{
 }

@@ -6,15 +6,17 @@
 
 namespace VanillaTests\Fixtures;
 
+use Garden\Schema\Schema;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
+use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Site\DefaultSiteSection;
 
 /**
  * Mock site-section-provider.
  */
-class MockSiteSectionProvider implements SiteSectionProviderInterface {
-
+class MockSiteSectionProvider implements SiteSectionProviderInterface
+{
     /**
      * @var SiteSectionInterface[] $siteSections
      */
@@ -28,29 +30,32 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
      *
      * @param DefaultSiteSection $defaultSiteSection
      */
-    public function __construct(DefaultSiteSection $defaultSiteSection) {
+    public function __construct(DefaultSiteSection $defaultSiteSection)
+    {
         $this->siteSections = array_merge([$defaultSiteSection]);
     }
 
     /**
      * @param SiteSectionInterface[] $siteSections
      */
-    public function addSiteSections(array $siteSections) {
+    public function addSiteSections(array $siteSections)
+    {
         $this->siteSections = array_merge($this->siteSections, $siteSections);
     }
-
 
     /**
      * @inheritdoc
      */
-    public function getAll(): array {
+    public function getAll(): array
+    {
         return $this->siteSections;
     }
 
     /**
      * @inheritdoc
      */
-    public function getForSectionGroup(string $sectionGroupKey): array {
+    public function getForSectionGroup(string $sectionGroupKey): array
+    {
         $sections = [];
 
         /** @var SiteSectionInterface $section */
@@ -66,7 +71,8 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getByID(int $id): ?SiteSectionInterface {
+    public function getByID(int $id): ?SiteSectionInterface
+    {
         foreach ($this->siteSections as $section) {
             if ($section->getSectionID() === $id) {
                 return $section;
@@ -79,7 +85,8 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getByBasePath(string $basePath): ?SiteSectionInterface {
+    public function getByBasePath(string $basePath): ?SiteSectionInterface
+    {
         foreach ($this->siteSections as $section) {
             if ($section->getBasePath() === $basePath) {
                 return $section;
@@ -92,7 +99,8 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getForLocale(string $localeKey): array {
+    public function getForLocale(string $localeKey): array
+    {
         $sections = [];
 
         /** @var SiteSectionInterface $section */
@@ -108,14 +116,16 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getCurrentSiteSection(): ?SiteSectionInterface {
+    public function getCurrentSiteSection(): ?SiteSectionInterface
+    {
         return $this->currentSiteSection;
     }
 
     /**
      * @param SiteSectionInterface $currentSiteSection
      */
-    public function setCurrentSiteSection(SiteSectionInterface $currentSiteSection): void {
+    public function setCurrentSiteSection(SiteSectionInterface $currentSiteSection): void
+    {
         $this->currentSiteSection = $currentSiteSection;
     }
 
@@ -126,53 +136,62 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface {
      *
      * @return MockSiteSectionProvider
      */
-    public static function fromLocales(array $locales = ["en", "fr", "es", "ru"]): MockSiteSectionProvider {
+    public static function fromLocales(array $locales = ["en", "fr", "es", "ru"]): MockSiteSectionProvider
+    {
         $siteSections = [];
 
         foreach ($locales as $locale) {
             $siteSections[] = new MockSiteSection(
-                "siteSectionName_".$locale,
+                "siteSectionName_" . $locale,
                 $locale,
-                '/'.$locale,
-                "mockSiteSection-".$locale,
+                "/" . $locale,
+                "mockSiteSection-" . $locale,
                 "mockSiteSectionGroup-1",
                 [
-                    'Destination' => 'discussions',
-                    'Type' => 'Internal'
+                    "Destination" => "discussions",
+                    "Type" => "Internal",
                 ],
-                'keystone'
+                "keystone"
             );
 
             $siteSections[] = new MockSiteSection(
-                "ssg2_siteSectionName_".$locale,
+                "ssg2_siteSectionName_" . $locale,
                 $locale,
-                '/ssg2-'.$locale,
-                "ssg2-mockSiteSection-".$locale,
+                "/ssg2-" . $locale,
+                "ssg2-mockSiteSection-" . $locale,
                 "mockSiteSectionGroup-2",
                 [
-                    'Destination' => 'discussions',
-                    'Type' => 'Internal'
+                    "Destination" => "discussions",
+                    "Type" => "Internal",
                 ],
-                'keystone'
+                "keystone"
             );
         }
 
         $siteSections[] = new MockSiteSection(
             "single_siteSectionName_ru",
             "ru",
-            '/single-ru',
+            "/single-ru",
             "single-mockSiteSection-ru",
             "mockSiteSectionGroup-3",
             [
-                'Destination' => 'discussions',
-                'Type' => 'Internal'
+                "Destination" => "discussions",
+                "Type" => "Internal",
             ],
-            'keystone'
+            "keystone"
         );
 
         /** @var MockSiteSectionProvider $provider */
         $provider = \Gdn::getContainer()->get(MockSiteSectionProvider::class);
         $provider->addSiteSections($siteSections);
         return $provider;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionIDSchema(?FieldMatchConditional $conditional): ?Schema
+    {
+        return null;
     }
 }

@@ -15,11 +15,12 @@
  * @param bool $repeat
  * @return string The url.
  */
-function smarty_block_columns($params, $content, &$smarty, &$repeat) {
-    if (!$repeat){
-        $count = val('count', $params, false);
-        $countClass = $count ? ' _columns-'.intval($count) : '';
-        $class = '_columns '.trim(val('class', $params, '')).$countClass;
+function smarty_block_columns($params, $content, &$smarty, &$repeat)
+{
+    if (!$repeat) {
+        $count = val("count", $params, false);
+        $countClass = $count ? " _columns-" . intval($count) : "";
+        $class = "_columns " . trim(val("class", $params, "")) . $countClass;
         return <<<EOT
         <div class="$class">
             $content

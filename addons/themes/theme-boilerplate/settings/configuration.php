@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-$Configuration['Garden']['MobileTheme'] = 'keystone';
-$Configuration['Badges']['BadgesModule']['Target'] = 'AfterUserInfo';
-$Configuration['Feature']['NewFlyouts']['Enabled'] = true;
-$Configuration['Feature']['DataDrivenTitleBar']['Enabled'] = false;
+$Configuration["Garden"]["MobileTheme"] = "keystone";
+$Configuration["Badges"]["BadgesModule"]["Target"] = "AfterUserInfo";
+$Configuration["Feature"]["NewFlyouts"]["Enabled"] = true;
+$Configuration["Feature"]["DataDrivenTitleBar"]["Enabled"] = false;

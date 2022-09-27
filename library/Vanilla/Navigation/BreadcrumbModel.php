@@ -12,15 +12,16 @@ use Vanilla\Contracts\RecordInterface;
 /**
  * Provider of breadcrumb data.
  */
-class BreadcrumbModel {
-
+class BreadcrumbModel
+{
     /** @var array A mapping of recordType to breadcrumb provider. */
     private $providers = [];
 
     /**
      * @param BreadcrumbProviderInterface $provider
      */
-    public function addProvider(BreadcrumbProviderInterface $provider) {
+    public function addProvider(BreadcrumbProviderInterface $provider)
+    {
         $types = $provider::getValidRecordTypes();
         foreach ($types as $type) {
             $this->providers[$type] = $provider;
@@ -35,7 +36,8 @@ class BreadcrumbModel {
      *
      * @return Breadcrumb[]
      */
-    public function getForRecord(RecordInterface $record, string $locale = null): array {
+    public function getForRecord(RecordInterface $record, string $locale = null): array
+    {
         /** @var BreadcrumbProviderInterface|null $provider */
         $provider = $this->providers[$record->getRecordType()] ?? null;
         if (!$provider) {
@@ -52,12 +54,13 @@ class BreadcrumbModel {
      *
      * @return array Breadcrumb data as array of structure ['Name'=>'', 'Url'=>'//'].
      */
-    public static function crumbsAsArray(array $crumbs): array {
+    public static function crumbsAsArray(array $crumbs): array
+    {
         $crumbList = [];
         foreach ($crumbs as $index => $crumb) {
             $crumbList[] = [
-                'Name' => $crumb->getName(),
-                'Url' => $crumb->getUrl(),
+                "Name" => $crumb->getName(),
+                "Url" => $crumb->getUrl(),
             ];
         }
         return $crumbList;

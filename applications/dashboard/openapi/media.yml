@@ -88,6 +88,13 @@ paths:
                   schema:
                       minLength: 1
                       type: string
+                - description: |
+                      Permanently delete the file from the CDN. This action is irreversible.
+                  in: query
+                  name: deleteFile
+                  required: true
+                  schema:
+                      type: boolean
             responses:
                 "204":
                     description: Success
@@ -275,65 +282,15 @@ paths:
                   required: true
                   schema:
                       type: integer
+                - description: |
+                      Permanently delete the file from the CDN. This action is irreversible.
+                  in: query
+                  name: deleteFile
+                  required: true
+                  schema:
+                      type: boolean
             responses:
-                "200":
-                    content:
-                        application/json:
-                            schema:
-                                properties:
-                                    dateInserted:
-                                        description: When the media item was created.
-                                        format: date-time
-                                        type: string
-                                    foreignID:
-                                        description: The ID of the table.
-                                        nullable: true
-                                        type: integer
-                                    foreignType:
-                                        description: Table the media is linked to.
-                                        minLength: 1
-                                        nullable: true
-                                        type: string
-                                    height:
-                                        description: Image height
-                                        nullable: true
-                                        type: integer
-                                    insertUserID:
-                                        description: The user that created the media item.
-                                        type: integer
-                                    mediaID:
-                                        description: The ID of the record.
-                                        type: integer
-                                    name:
-                                        description: The original filename of the upload.
-                                        minLength: 1
-                                        type: string
-                                    size:
-                                        description: File size in bytes
-                                        type: integer
-                                    type:
-                                        description: MIME type
-                                        minLength: 1
-                                        type: string
-                                    url:
-                                        description: The URL of the file.
-                                        minLength: 1
-                                        type: string
-                                    width:
-                                        description: Image width
-                                        nullable: true
-                                        type: integer
-                                required:
-                                    - mediaID
-                                    - url
-                                    - name
-                                    - type
-                                    - size
-                                    - dateInserted
-                                    - insertUserID
-                                    - foreignType
-                                    - foreignID
-                                type: object
+                "204":
                     description: Success
             tags:
                 - Media
@@ -488,6 +445,73 @@ paths:
                             $ref: "#/components/schemas/MediaItemPatch"
                 required: true
             summary: Update a media item's attachment to another record.
+    "/media/list":
+        delete:
+            parameters:
+                - description: |
+                      Permanently delete the file from the CDN. This action is irreversible.
+                  in: query
+                  name: deleteFile
+                  required: true
+                  schema:
+                      type: boolean
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            description: An array of media IDs.
+                            properties:
+                                mediaIDs:
+                                    type: array
+                                    items:
+                                        type: integer
+                                    example: [2452, 14253, 14124]
+            responses:
+                "202":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
+                "204":
+                    description: Success
+                "403":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
+                "408":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
+            tags:
+                - Media
+            summary: Delete a list of media by their ID's.
+    "/media/list-by-url":
+        delete:
+            parameters:
+                - description: |
+                      Permanently delete the file from the CDN. This action is irreversible.
+                  in: query
+                  name: deleteFile
+                  required: true
+                  schema:
+                      type: boolean
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            description: An array of media URLs.
+                            properties:
+                                urls:
+                                    type: array
+                                    items:
+                                        type: string
+            responses:
+                "202":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
+                "204":
+                    description: Success
+                "403":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
+                "408":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
+            tags:
+                - Media
+            summary: Delete a list of media by their URL's.
 components:
     schemas:
         MediaItemPatch:

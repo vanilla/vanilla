@@ -44,6 +44,7 @@ export interface ISelectOneProps extends IMenuPlacement {
     selectRef?: React.RefObject<Select>;
     onFocus?: () => void;
     maxHeight?: number;
+    name?: string;
 }
 
 export enum MenuPlacement {
@@ -126,6 +127,7 @@ export default function SelectOne(props: ISelectOneProps) {
                     menuPlacement={props.menuPlacement ?? "auto"}
                     ref={props.selectRef}
                     maxMenuHeight={props.maxHeight}
+                    name={props.name}
                 />
                 <Paragraph className={classesInputBlock.labelNote}>{props.noteAfterInput}</Paragraph>
                 <ErrorMessages id={errorID} errors={props.errors} />

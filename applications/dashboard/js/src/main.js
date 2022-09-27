@@ -675,7 +675,7 @@
  * @param {string} cssClass - The css class to apply to the svg.
  * @returns {string} The HTML for the svg icon.
  */
-var dashboardSymbol =  function(name, alt, cssClass) {
+window.dashboardSymbol =  function(name, alt, cssClass) {
     if (alt) {
         alt = 'alt="' + alt + '" ';
     } else {

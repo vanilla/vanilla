@@ -22,7 +22,7 @@ export function deconstructAttributesFromElement(
 ): HTMLAttributes<any> {
     const { classAsClassName = true, hrefAsTo = false } = options || {};
     const attrs = {};
-    Object.values(element.attributes).forEach(attr => {
+    Object.values(element.attributes).forEach((attr) => {
         attrs[attr.name] = attr.value;
     });
 

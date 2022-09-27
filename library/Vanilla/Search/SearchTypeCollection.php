@@ -16,8 +16,8 @@ use Webmozart\Assert\Assert;
 /**
  * Class for working with a collection of search types.
  */
-final class SearchTypeCollection implements \IteratorAggregate {
-
+final class SearchTypeCollection implements \IteratorAggregate
+{
     /** @var AbstractSearchType[] */
     private $allTypes;
 
@@ -26,21 +26,24 @@ final class SearchTypeCollection implements \IteratorAggregate {
      *
      * @param AbstractSearchType[] $allTypes
      */
-    public function __construct(array $allTypes) {
+    public function __construct(array $allTypes)
+    {
         $this->allTypes = $allTypes;
     }
 
     /**
      * @return AbstractSearchType[]
      */
-    public function getAllTypes(): array {
+    public function getAllTypes(): array
+    {
         return $this->allTypes;
     }
 
     /**
      * @return \Iterator
      */
-    public function getIterator() {
+    public function getIterator()
+    {
         return new \ArrayIterator($this->getAllTypes());
     }
 
@@ -49,7 +52,8 @@ final class SearchTypeCollection implements \IteratorAggregate {
      *
      * @param AbstractSearchType $type
      */
-    public function addType(AbstractSearchType $type) {
+    public function addType(AbstractSearchType $type)
+    {
         $foundTypes = $this->getByType($type->getType());
         if (empty($foundTypes)) {
             $this->allTypes[] = $type;
@@ -65,9 +69,10 @@ final class SearchTypeCollection implements \IteratorAggregate {
      *
      * @return SearchTypeCollection
      */
-    public function getFilteredCollection(array $params): SearchTypeCollection {
-        $queryTypes = $params['types'] ?? [];
-        $queryRecordTypes = $params['recordTypes'] ?? [];
+    public function getFilteredCollection(array $params): SearchTypeCollection
+    {
+        $queryTypes = $params["types"] ?? [];
+        $queryRecordTypes = $params["recordTypes"] ?? [];
 
         // Types are more specific than recordTypes, so when specified we should use the types.
         $shouldApplyRecordTypes = empty($queryTypes);
@@ -87,9 +92,9 @@ final class SearchTypeCollection implements \IteratorAggregate {
             foreach ($foundTypes as $foundType) {
                 if (!$foundType->userHasPermission()) {
                     $validation->addError(
-                        'types',
+                        "types",
                         sprintf("You don't have permission to search the %s type", $foundType->getType()),
-                        ['status' => 403]
+                        ["status" => 403]
                     );
                     continue;
                 }
@@ -106,9 +111,9 @@ final class SearchTypeCollection implements \IteratorAggregate {
             foreach ($foundTypes as $foundType) {
                 if (!$foundType->userHasPermission()) {
                     $validation->addError(
-                        'recordTypes',
+                        "recordTypes",
                         sprintf("You don't have permission to search the %s recordType", $foundType->getRecordType()),
-                        ['status' => 403]
+                        ["status" => 403]
                     );
                     continue;
                 }
@@ -127,7 +132,10 @@ final class SearchTypeCollection implements \IteratorAggregate {
         $mergedTypes = array_merge($extraRecordTypes, $filteredTypes);
         foreach ($mergedTypes as $searchType) {
             if ($searchType->isExclusiveType() && count($mergedTypes) > 1) {
-                $validation->addError('types', sprintf("%s type cannot be searched with other types", $searchType->getType()));
+                $validation->addError(
+                    "types",
+                    sprintf("%s type cannot be searched with other types", $searchType->getType())
+                );
             }
         }
 
@@ -143,7 +151,8 @@ final class SearchTypeCollection implements \IteratorAggregate {
      *
      * @return bool
      */
-    public function hasExclusiveType(): bool {
+    public function hasExclusiveType(): bool
+    {
         foreach ($this->allTypes as $searchType) {
             if ($searchType->isExclusiveType()) {
                 return true;
@@ -157,7 +166,8 @@ final class SearchTypeCollection implements \IteratorAggregate {
      *
      * @return AbstractSearchType[]
      */
-    public function getDefaultTypes(): array {
+    public function getDefaultTypes(): array
+    {
         $result = [];
         // Apply all non-exclusive types.
         foreach ($this->allTypes as $searchType) {
@@ -175,7 +185,8 @@ final class SearchTypeCollection implements \IteratorAggregate {
      *
      * @return AbstractSearchType[]
      */
-    public function getByType(string $type): array {
+    public function getByType(string $type): array
+    {
         $result = [];
         foreach ($this->allTypes as $searchType) {
             if ($type === $searchType->getType()) {
@@ -192,7 +203,8 @@ final class SearchTypeCollection implements \IteratorAggregate {
      *
      * @return AbstractSearchType[]
      */
-    public function getByRecordType(string $recordType): array {
+    public function getByRecordType(string $recordType): array
+    {
         $result = [];
         foreach ($this->allTypes as $searchType) {
             if ($recordType === $searchType->getRecordType()) {
@@ -212,11 +224,12 @@ final class SearchTypeCollection implements \IteratorAggregate {
      *      // These both a share searchGroup of "places" but can't share the same query.
      *      "category" => [CategorySearchType],
      *      "group" => [GroupSearchType],
-      * ]
+     * ]
      *
      * @return AbstractSearchType[][]
      */
-    public function getAsOptimizedRecordTypes(): array {
+    public function getAsOptimizedRecordTypes(): array
+    {
         $typesByAllowedGroup = [];
 
         foreach ($this->allTypes as $searchType) {

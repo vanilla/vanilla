@@ -16,9 +16,10 @@ use Vanilla\VanillaClassLocator;
 use VanillaTests\Fixtures\SomeController;
 use VanillaTests\Library\Garden\ClassLocatorTest;
 
-class VanillaClassLocatorTest extends ClassLocatorTest {
-
-    public function testFindMethodWithOverride() {
+class VanillaClassLocatorTest extends ClassLocatorTest
+{
+    public function testFindMethodWithOverride()
+    {
         $container = new Container();
         $container
             ->setInstance(Container::class, $container)
@@ -27,27 +28,31 @@ class VanillaClassLocatorTest extends ClassLocatorTest {
             ->defaultRule()
             ->setShared(true)
             ->rule(EventManager::class)
-            ->addCall('bindClass', [BasicEventHandlers::class]);
+            ->addCall("bindClass", [BasicEventHandlers::class]);
 
         $vanillaClassLocator = $container->get(VanillaClassLocator::class);
-        $handler = $vanillaClassLocator->findMethod($container->get(SomeController::class), 'someEndpoint_method');
+        $handler = $vanillaClassLocator->findMethod($container->get(SomeController::class), "someEndpoint_method");
 
         $this->assertTrue(is_callable($handler));
 
-        list($object, $method) = $handler;
+        [$object, $method] = $handler;
         $this->assertSame($container->get(BasicEventHandlers::class), $object);
-        $this->assertSame(strtolower('someController_someEndpoint_method'), strtolower($method));
+        $this->assertSame(strtolower("someController_someEndpoint_method"), strtolower($method));
     }
 
-    public function testFindClassWithWildcard() {
-        $addonManager = new AddonManager([
-            Addon::TYPE_ADDON => '/tests/fixtures/plugins',
-        ], PATH_ROOT.'/tests/cache/'.EventManager::classBasename(__CLASS__));
-        $addonManager->startAddonsByKey('namespaced-plugin', Addon::TYPE_ADDON);
+    public function testFindClassWithWildcard()
+    {
+        $addonManager = new AddonManager(
+            [
+                Addon::TYPE_ADDON => "/tests/fixtures/plugins",
+            ],
+            PATH_ROOT . "/tests/cache/" . EventManager::classBasename(__CLASS__)
+        );
+        $addonManager->startAddonsByKey("namespaced-plugin", Addon::TYPE_ADDON);
 
         $classLocator = new VanillaClassLocator(new EventManager(), $addonManager);
 
-        $className = $classLocator->findClass('*\\NamespacedPlugin');
+        $className = $classLocator->findClass("*\\NamespacedPlugin");
         $this->assertEquals(NamespacedPlugin::class, $className);
 
         // The class locator should still locate regular classes.

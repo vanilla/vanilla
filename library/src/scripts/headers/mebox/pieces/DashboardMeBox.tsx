@@ -49,10 +49,6 @@ export default function DashboardMeBox(props: DashboardMeBoxProps) {
 
     const supportLinks = (
         <div className={classes.supportSection}>
-            <a href="https://accounts.vanillaforums.com/account" className={classes.supportLink}>
-                {t("My Account")}
-                <Icon icon="external-link" size="compact" />
-            </a>
             <a href="https://support.vanillaforums.com" className={classes.supportLink}>
                 {t("Customer Support")}
                 <Icon icon="external-link" size="compact" />

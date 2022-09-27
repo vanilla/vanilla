@@ -11,16 +11,17 @@
 /**
  * Handles /addoncache endpoint
  */
-class AddonCacheController extends DashboardController {
-
+class AddonCacheController extends DashboardController
+{
     /**
      * AddonCacheController constructor.
      *
      * @throws Gdn_UserException if endpoints are disabled in config.
      */
-    public function __construct() {
-        if (c('Cache.Addons.DisableEndpoints')) {
-            throw new Gdn_UserException('Addon cache endpoints disabled', 403);
+    public function __construct()
+    {
+        if (c("Cache.Addons.DisableEndpoints")) {
+            throw new Gdn_UserException("Addon cache endpoints disabled", 403);
         }
 
         parent::__construct();
@@ -31,11 +32,12 @@ class AddonCacheController extends DashboardController {
      *
      * @throws Exception if using an invalid method.
      */
-    public function clear($target) {
-        $this->permission('Garden.Settings.Manage');
+    public function clear($target)
+    {
+        $this->permission("Garden.Settings.Manage");
 
         if (Gdn::request()->isPostBack() === false) {
-            throw new Exception('Requires POST', 405);
+            throw new Exception("Requires POST", 405);
         }
 
         Gdn::request()->isAuthenticatedPostBack(true);
@@ -43,9 +45,9 @@ class AddonCacheController extends DashboardController {
         $cleared = Gdn::addonManager()->clearCache();
 
         if ($cleared) {
-            $this->informMessage(t('Addon cache cleared.'));
+            $this->informMessage(t("Addon cache cleared."));
         } else {
-            $this->informMessage(t('Unable to clear addon cache.'));
+            $this->informMessage(t("Unable to clear addon cache."));
         }
 
         if (!empty($target)) {
@@ -53,7 +55,7 @@ class AddonCacheController extends DashboardController {
         }
 
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
-        $this->render('blank', 'utility', 'dashboard');
+        $this->render("blank", "utility", "dashboard");
     }
 
     /**
@@ -62,11 +64,12 @@ class AddonCacheController extends DashboardController {
      * @param string $type
      * @throws Exception if no type specified.
      */
-    public function verify($type) {
-        $this->permission('Garden.Settings.Manage');
+    public function verify($type)
+    {
+        $this->permission("Garden.Settings.Manage");
 
         if ($type === null) {
-            throw new Exception('Type required');
+            throw new Exception("Type required");
         }
 
         $cached = Gdn::addonManager()->lookupAllByType($type);
@@ -75,39 +78,32 @@ class AddonCacheController extends DashboardController {
         $new = array_keys(array_diff_key($current, $cached));
         $invalid = array_keys(array_diff_key($cached, $current));
 
-        $updateRequired = (count($new) || count($invalid));
+        $updateRequired = count($new) || count($invalid);
 
         if ($updateRequired) {
-            $clearUrl = '/addoncache/clear?Target={SelfUrl}';
-            $actions = wrap(
-                anchor(t('Click here to fix.'), $clearUrl, 'Hijack js-inform-close'),
-                'div',
-                ['class' => 'Actions']
-            );
+            $clearUrl = "/addoncache/clear?Target={SelfUrl}";
+            $actions = wrap(anchor(t("Click here to fix."), $clearUrl, "Hijack js-inform-close"), "div", [
+                "class" => "Actions",
+            ]);
 
-            $this->informMessage(
-                t('The addon cache is outdated.').$actions,
-                ['CssClass' => 'Dismissable', 'id' => 'CheckSummary']
-            );
+            $this->informMessage(t("The addon cache is outdated.") . $actions, [
+                "CssClass" => "Dismissable",
+                "id" => "CheckSummary",
+            ]);
 
             if (debug()) {
-                Logger::event(
-                    'addoncache_outdated',
-                    Logger::INFO,
-                    'Addon cache outdated',
-                    [
-                        'type' => $type,
-                        'new' => $new,
-                        'invalid' => $invalid,
-                        'current' => array_keys($current),
-                        'cached' => array_keys($cached),
-                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-                    ]
-                );
+                Logger::event("addoncache_outdated", Logger::INFO, "Addon cache outdated", [
+                    "type" => $type,
+                    "new" => $new,
+                    "invalid" => $invalid,
+                    "current" => array_keys($current),
+                    "cached" => array_keys($cached),
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+                ]);
             }
         }
 
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
-        $this->render('blank', 'utility', 'dashboard');
+        $this->render("blank", "utility", "dashboard");
     }
 }

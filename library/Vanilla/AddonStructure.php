@@ -10,8 +10,8 @@ namespace Vanilla;
 /**
  * Class for structuring a site for an addon.
  */
-abstract class AddonStructure {
-
+abstract class AddonStructure
+{
     /**
      * Strucutre the site for the adodn.
      *

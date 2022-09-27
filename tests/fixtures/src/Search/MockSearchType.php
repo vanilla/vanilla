@@ -14,8 +14,8 @@ use Vanilla\Search\SearchQuery;
 /**
  * Mock search type for tests.
  */
-class MockSearchType extends AbstractSearchType {
-
+class MockSearchType extends AbstractSearchType
+{
     /** @var string */
     private $key;
 
@@ -42,7 +42,8 @@ class MockSearchType extends AbstractSearchType {
      *
      * @param string $type
      */
-    public function __construct(string $type = 'mock') {
+    public function __construct(string $type = "mock")
+    {
         $this->key = $type;
         $this->searchGroup = $type;
         $this->type = $type;
@@ -52,98 +53,112 @@ class MockSearchType extends AbstractSearchType {
     /**
      * @return string
      */
-    public function getKey(): string {
+    public function getKey(): string
+    {
         return $this->key;
     }
 
     /**
      * @param string $key
      */
-    public function setKey(string $key): void {
+    public function setKey(string $key): void
+    {
         $this->key = $key;
     }
 
     /**
      * @return string
      */
-    public function getRecordType(): string {
+    public function getRecordType(): string
+    {
         return $this->searchGroup;
     }
 
     /**
      * @param string $searchGroup
      */
-    public function setSearchGroup(string $searchGroup): void {
+    public function setSearchGroup(string $searchGroup): void
+    {
         $this->searchGroup = $searchGroup;
     }
 
     /**
      * @return string
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return $this->type;
     }
 
     /**
      * @param string $type
      */
-    public function setType(string $type): void {
+    public function setType(string $type): void
+    {
         $this->type = $type;
     }
 
     /**
      * @return array
      */
-    public function getSorts(): array {
+    public function getSorts(): array
+    {
         return $this->sorts;
     }
 
     /**
      * @param array $sorts
      */
-    public function setSorts(array $sorts): void {
+    public function setSorts(array $sorts): void
+    {
         $this->sorts = $sorts;
     }
 
     /**
      * @return Schema
      */
-    public function getQuerySchema(): Schema {
+    public function getQuerySchema(): Schema
+    {
         return $this->querySchema;
     }
 
     /**
      * @param Schema $querySchema
      */
-    public function setQuerySchema(Schema $querySchema): void {
+    public function setQuerySchema(Schema $querySchema): void
+    {
         $this->querySchema = $querySchema;
     }
 
     /**
      * @return bool
      */
-    public function userHasPermission(): bool {
+    public function userHasPermission(): bool
+    {
         return $this->userHasPermission;
     }
 
     /**
      * @param bool $userHasPermission
      */
-    public function setUserHasPermission(bool $userHasPermission): void {
+    public function setUserHasPermission(bool $userHasPermission): void
+    {
         $this->userHasPermission = $userHasPermission;
     }
 
     /**
      * @return bool
      */
-    public function isExclusiveType(): bool {
+    public function isExclusiveType(): bool
+    {
         return $this->isExclusiveType;
     }
 
     /**
      * @param bool $isExclusiveType
      */
-    public function setIsExclusiveType(bool $isExclusiveType): void {
+    public function setIsExclusiveType(bool $isExclusiveType): void
+    {
         $this->isExclusiveType = $isExclusiveType;
     }
 
@@ -151,7 +166,8 @@ class MockSearchType extends AbstractSearchType {
      * Stubbed because it's a mock.
      * @inheritdoc
      */
-    public function getResultItems(array $recordIDs, SearchQuery $query): array {
+    public function getResultItems(array $recordIDs, SearchQuery $query): array
+    {
         return [];
     }
 
@@ -159,41 +175,47 @@ class MockSearchType extends AbstractSearchType {
      * Stubbed because it's a mock.
      * @inheritdoc
      */
-    public function applyToQuery(SearchQuery $query) {
+    public function applyToQuery(SearchQuery $query)
+    {
     }
 
     /**
      * Stubbed because it's a mock.
      * @inheritdoc
      */
-    public function validateQuery(SearchQuery $query): void {
+    public function validateQuery(SearchQuery $query): void
+    {
     }
 
     /**
      * @inheritdoc
      */
-    public function getSingularLabel(): string {
-        return 'Mock';
+    public function getSingularLabel(): string
+    {
+        return "Mock";
     }
 
     /**
      * @inheritdoc
      */
-    public function getPluralLabel(): string {
-        return 'Mocks';
+    public function getPluralLabel(): string
+    {
+        return "Mocks";
     }
 
     /**
      * @inheritdoc
      */
-    public function getDTypes(): ?array {
+    public function getDTypes(): ?array
+    {
         return null;
     }
 
     /**
      * @inheritdoc
      */
-    public function guidToRecordID(int $guid): ?int {
+    public function guidToRecordID(int $guid): ?int
+    {
         return null;
     }
 }

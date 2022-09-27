@@ -13,16 +13,17 @@ use VanillaTests\Storybook\StorybookGenerationTestCase;
 /**
  * Test rendering of the Guest Module module.
  */
-class GuestModuleStorybookTest extends StorybookGenerationTestCase {
-
+class GuestModuleStorybookTest extends StorybookGenerationTestCase
+{
     use EventSpyTestTrait;
 
-    public static $addons = ['vanilla'];
+    public static $addons = ["vanilla"];
 
     /**
      * End the session.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         \Gdn::session()->end();
     }
@@ -30,7 +31,8 @@ class GuestModuleStorybookTest extends StorybookGenerationTestCase {
     /**
      * Test rendering of the Guest module.
      */
-    public function testRender() {
-        $this->generateStoryHtml('/', 'Guest Module');
+    public function testRender()
+    {
+        $this->generateStoryHtml("/", "Guest Module");
     }
 }

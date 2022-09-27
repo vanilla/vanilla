@@ -13,7 +13,8 @@ use VanillaTests\BootstrapTrait;
 /**
  * Tests for the `MorePagerModule` class.
  */
-class MorePagerModuleTest extends TestCase {
+class MorePagerModuleTest extends TestCase
+{
     use BootstrapTrait;
 
     /**
@@ -23,7 +24,8 @@ class MorePagerModuleTest extends TestCase {
      * @param string $expected
      * @dataProvider provideFormatUrlTests
      */
-    public function testFormatUrl(string $url, string $expected): void {
+    public function testFormatUrl(string $url, string $expected): void
+    {
         $actual = \MorePagerModule::formatUrl($url, 10, 10, 101);
         $this->assertSame($expected, $actual);
     }
@@ -33,12 +35,13 @@ class MorePagerModuleTest extends TestCase {
      *
      * @return array
      */
-    public function provideFormatUrlTests(): array {
+    public function provideFormatUrlTests(): array
+    {
         $r = [
-            ['%1$s to %2$s', '11 to 20'],
-            ['%1$s to %2$s of %3$s', '11 to 20 of 101'],
-            ['{from} to {to}', '11 to 20'],
-            ['{from} to {to} of {count}', '11 to 20 of 101'],
+            ['%1$s to %2$s', "11 to 20"],
+            ['%1$s to %2$s of %3$s', "11 to 20 of 101"],
+            ["{from} to {to}", "11 to 20"],
+            ["{from} to {to} of {count}", "11 to 20 of 101"],
         ];
 
         return array_column($r, null, 0);

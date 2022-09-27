@@ -21,58 +21,88 @@
 // Styleguide 1.1.
 
 .content {
-  h1, .h1,
-  h2, .h2,
-  h3, .h3,
-  h4, .h4,
-  h5, .h5,
-  h6, .h6 {
-    font-family: $headings-font-family;
-    font-weight: $headings-font-weight;
-    line-height: $headings-line-height;
-    color: $headings-color;
-  }
+    h1,
+    .h1,
+    h2,
+    .h2,
+    h3,
+    .h3,
+    h4,
+    .h4,
+    h5,
+    .h5,
+    h6,
+    .h6 {
+        font-family: $headings-font-family;
+        font-weight: $headings-font-weight;
+        line-height: $headings-line-height;
+        color: $headings-color;
+    }
 
-  h1, .h1 { font-size: $font-size-h1; }
-  h2, .h2 { font-size: $font-size-h2; }
-  h3, .h3 { font-size: $font-size-h3; }
-  h4, .h4 { font-size: $font-size-h4; }
-  h5, .h5 { font-size: $font-size-h5; }
-  h6, .h6 { font-size: $font-size-h6; }
+    h1,
+    .h1 {
+        font-size: $font-size-h1;
+    }
+    h2,
+    .h2 {
+        font-size: $font-size-h2;
+    }
+    h3,
+    .h3 {
+        font-size: $font-size-h3;
+    }
+    h4,
+    .h4 {
+        font-size: $font-size-h4;
+    }
+    h5,
+    .h5 {
+        font-size: $font-size-h5;
+    }
+    h6,
+    .h6 {
+        font-size: $font-size-h6;
+    }
 
-  h1, .h1,
-  h2, .h2,
-  h3, .h3,
-  h4, .h4,
-  h5, .h5,
-  h6, .h6 {
-    margin-top: $spacer;
-    margin-bottom: $headings-margin-bottom;
-  }
+    h1,
+    .h1,
+    h2,
+    .h2,
+    h3,
+    .h3,
+    h4,
+    .h4,
+    h5,
+    .h5,
+    h6,
+    .h6 {
+        margin-top: $spacer;
+        margin-bottom: $headings-margin-bottom;
+    }
 
-  // Paragraph
-  //
-  // Base paragraph style
-  //
-  // Markup:
-  // <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam adipiscing
-  // mauris a ante mollis congue. Nam quis mauris nulla. Aenean accumsan volutpat
-  // purus vitae venenatis. Fusce non lacus quis erat aliquam pharetra.</p>
-  // <p>Nunc quis lobortis nunc. Duis mattis porta gravida. In sit amet eros ac
-  // nisl fermentum sagittis. Cras condimentum felis sed tincidunt varius. Cum
-  // sociis natoque penatibus et magnis dis parturient montes, nascetur
-  // ridiculus mus.</p>
-  //
-  // Styleguide 1.2.
+    // Paragraph
+    //
+    // Base paragraph style
+    //
+    // Markup:
+    // <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam adipiscing
+    // mauris a ante mollis congue. Nam quis mauris nulla. Aenean accumsan volutpat
+    // purus vitae venenatis. Fusce non lacus quis erat aliquam pharetra.</p>
+    // <p>Nunc quis lobortis nunc. Duis mattis porta gravida. In sit amet eros ac
+    // nisl fermentum sagittis. Cras condimentum felis sed tincidunt varius. Cum
+    // sociis natoque penatibus et magnis dis parturient montes, nascetur
+    // ridiculus mus.</p>
+    //
+    // Styleguide 1.2.
 
-  p {
-    margin-bottom: ($spacer / 2);
-  }
+    p {
+        margin-bottom: ($spacer * 0.5);
+    }
 
-  pre {
-    margin-bottom: 0;
-    white-space: pre-wrap;
-  }
+    pre {
+        margin-bottom: 0;
+        white-space: pre-wrap;
+    }
 }
 
 // Full Border
@@ -86,7 +116,7 @@
 // Styleguide 1.3.
 
 .full-border {
-  @include full-border(block)
+    @include full-border(block);
 }
 
 // Heading Block
@@ -96,10 +126,10 @@
 // No styleguide reference.
 
 .content > h1 {
-  @include full-border(block);
-  font-size: $font-size-lg;
-  margin-bottom: 0;
-  padding-bottom: $spacer;
+    @include full-border(block);
+    font-size: $font-size-lg;
+    margin-bottom: 0;
+    padding-bottom: $spacer;
 }
 
 // Header Block
@@ -126,25 +156,25 @@
 // Styleguide 1.4.1.
 
 .header-block {
-  @include full-border(flex);
-  justify-content: space-between;
-  align-items: center;
-  min-height: $header-block-height;
+    @include full-border(flex);
+    justify-content: space-between;
+    align-items: center;
+    min-height: $header-block-height;
 
-  h1 {
-    margin: 0;
-    padding: ($spacer / 2) 0;
-    font-size: $font-size-lg;
-  }
+    h1 {
+        margin: 0;
+        padding: ($spacer * 0.5) 0;
+        font-size: $font-size-lg;
+    }
 }
 
 .title-block {
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 
-  .backLink {
-      margin-left: 0;
-  }
+    .backLink {
+        margin-left: 0;
+    }
 }
 
 // Header Block with Return Button
@@ -169,19 +199,19 @@
 // Styleguide 1.4.2.
 
 .btn-return {
-  position: relative;
-  padding-left: 0;
-  margin-right: $spacer / 2;
-
-  svg {
     position: relative;
-    top: 4px;
-    width: $font-size-lg;
-  }
+    padding-left: 0;
+    margin-right: $spacer * 0.5;
 
-  &:hover {
-    color: $brand-primary;
-  }
+    svg {
+        position: relative;
+        top: 4px;
+        width: $font-size-lg;
+    }
+
+    &:hover {
+        color: $brand-primary;
+    }
 
     .title-block & {
         margin-left: -1em;
@@ -222,35 +252,37 @@
 // Styleguide 1.5.2.
 
 .header-menu {
-  $header-menu-border-width: 3px;
-  $header-menu-font-size: 18px;
-  $header-menu-height: $header-block-height;
-  $header-menu-padding: ($header-menu-height - $header-menu-font-size - ($header-menu-border-width * 2) - $border-width) / 2;
+    $header-menu-border-width: 3px;
+    $header-menu-font-size: 18px;
+    $header-menu-height: $header-block-height;
+    $header-menu-padding: (
+            $header-menu-height - $header-menu-font-size - ($header-menu-border-width * 2) - $border-width
+        ) * 0.5;
 
-  @include full-border(flex);
-  justify-content: center;
-  align-items: center;
+    @include full-border(flex);
+    justify-content: center;
+    align-items: center;
 
-  .header-menu-item {
-    padding: ($header-menu-padding) 0;
-    margin: 0 $spacer * 2;
-    font-size: $header-menu-font-size;
-    line-height: 1;
-    color: $grey;
-    text-decoration: none;
-    border-top: $header-menu-border-width solid transparent;
-    border-bottom: $header-menu-border-width solid transparent;
-    cursor: pointer;
+    .header-menu-item {
+        padding: ($header-menu-padding) 0;
+        margin: 0 $spacer * 2;
+        font-size: $header-menu-font-size;
+        line-height: 1;
+        color: $grey;
+        text-decoration: none;
+        border-top: $header-menu-border-width solid transparent;
+        border-bottom: $header-menu-border-width solid transparent;
+        cursor: pointer;
 
-    &.active {
-      border-bottom-color: $brand-primary;
-      color: $brand-primary;
+        &.active {
+            border-bottom-color: $brand-primary;
+            color: $brand-primary;
+        }
+
+        &:hover {
+            color: $brand-primary;
+        }
     }
-
-    &:hover {
-      color: $brand-primary;
-    }
-  }
 }
 
 // Subheading
@@ -266,15 +298,15 @@
 // Styleguide 1.6.
 
 .subheading.subheading {
-  @include full-border(block, false, true);
-  @include has-top-border;
-  padding-top: $spacer;
-  padding-bottom: $spacer / 2;
-  margin-bottom: 0;
-  font-size: 16px;
-  line-height: $line-height;
-  font-weight: 600;
-  border-top: $border-width solid #e7e8e9;
+    @include full-border(block, false, true);
+    @include has-top-border;
+    padding-top: $spacer;
+    padding-bottom: $spacer * 0.5;
+    margin-bottom: 0;
+    font-size: 16px;
+    line-height: $line-height;
+    font-weight: 600;
+    border-top: $border-width solid #e7e8e9;
 }
 
 // Subheading Block
@@ -295,19 +327,19 @@
 // Styleguide 1.7.
 
 .subheading-block {
-  @include full-border(block, false, true);
-  @include has-top-border;
-  padding-top: $spacer;
-  padding-bottom: $spacer / 2;
-  border-top: $border-width solid $border-color;
+    @include full-border(block, false, true);
+    @include has-top-border;
+    padding-top: $spacer;
+    padding-bottom: $spacer * 0.5;
+    border-top: $border-width solid $border-color;
 
-  .subheading-title {
-    margin-top: 0;
-    margin-bottom: 0;
-    font-size: 16px;
-    line-height: 1.5;
-    font-weight: 600;
-  }
+    .subheading-title {
+        margin-top: 0;
+        margin-bottom: 0;
+        font-size: 16px;
+        line-height: 1.5;
+        font-weight: 600;
+    }
 }
 
 // Flags
@@ -320,18 +352,18 @@
 // Styleguide 1.8.
 
 .flag {
-  $flag-height: 18px;
-  display: inline-block;
-  padding-left: 2px;
-  padding-right: 12px;
-  line-height: 0;
-  font-size: $font-size-xs;
-  color: $white;
-  border-style: solid;
-  border-color: $brand-secondary;
-  border-right-color: transparent;
-  border-width: $flag-height / 2;
-  text-transform: uppercase;
+    $flag-height: 18px;
+    display: inline-block;
+    padding-left: 2px;
+    padding-right: 12px;
+    line-height: 0;
+    font-size: $font-size-xs;
+    color: $white;
+    border-style: solid;
+    border-color: $brand-secondary;
+    border-right-color: transparent;
+    border-width: $flag-height * 0.5;
+    text-transform: uppercase;
 }
 
 // Badges
@@ -367,36 +399,36 @@
 // Styleguide 1.9.1.
 
 .badge {
-  display: inline-block;
-  vertical-align: middle;
-  padding: 0 ($spacer / 4);
-  margin-left: $spacer / 4;
-  font-size: $font-size-xs;
-  background-color: rgba(0,0,0,.1875);
-  color: $white;
-  border-radius: 4px;
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0 ($spacer * 0.25);
+    margin-left: $spacer * 0.25;
+    font-size: $font-size-xs;
+    background-color: rgba(0, 0, 0, 0.1875);
+    color: $white;
+    border-radius: 4px;
 
-  .btn-group & {
-    margin-top: - 2px;
-  }
+    .btn-group & {
+        margin-top: -2px;
+    }
 
-  &.badge-outline {
-    background-color: transparent;
-    color: rgba(0,0,0,.3275);
-    border: $border-width solid rgba(0,0,0,.25);
-  }
+    &.badge-outline {
+        background-color: transparent;
+        color: rgba(0, 0, 0, 0.3275);
+        border: $border-width solid rgba(0, 0, 0, 0.25);
+    }
 }
 
 @each $semantic-color in map-keys($semantic-colors) {
-  $color: map-get($semantic-colors, $semantic-color);
-  .badge-#{$semantic-color} {
-    background-color: $color;
+    $color: map-get($semantic-colors, $semantic-color);
+    .badge-#{$semantic-color} {
+        background-color: $color;
 
-    &.badge-outline {
-      color: $color;
-      border-color: $color;
+        &.badge-outline {
+            color: $color;
+            border-color: $color;
+        }
     }
-  }
 }
 
 // Semantic Text Colors
@@ -417,11 +449,11 @@
 
 // Generates .text-* css rules to change text color for all our semantic colors in variables.
 @each $semantic-color in map-keys($semantic-colors) {
-  $color: map-get($semantic-colors, $semantic-color);
+    $color: map-get($semantic-colors, $semantic-color);
 
-  .text-#{$semantic-color} {
-    color: $color;
-  }
+    .text-#{$semantic-color} {
+        color: $color;
+    }
 }
 
 // Spacer
@@ -434,10 +466,9 @@
 //Styleguide 1.11.
 
 .spacer {
-  display: inline-block;
-  padding: 0 4px;
+    display: inline-block;
+    padding: 0 4px;
 }
-
 
 // Anchors
 //
@@ -449,7 +480,7 @@
 // Styleguide 1.12.
 
 .reverse-link {
-  @include reverse-link();
+    @include reverse-link();
 }
 
 // Font Helpers
@@ -466,30 +497,30 @@
 // Styleguide 1.13.
 
 .italic {
-  font-style: italic;
+    font-style: italic;
 }
 
 strong,
 .strong {
-  font-weight: 600;
+    font-weight: 600;
 }
 
 .Info,
 .Info2,
 .info {
-  display: block;
-  font-size: $font-size-sm;
-  line-height: $line-height-lg;
-  color: $grey;
+    display: block;
+    font-size: $font-size-sm;
+    line-height: $line-height-lg;
+    color: $grey;
 }
 
 .info-inline {
-  display: inline-block;
-  margin-left: $meta-margin;
+    display: inline-block;
+    margin-left: $meta-margin;
 }
 
 .info-item + .info-item {
-  margin-left: $meta-margin;
+    margin-left: $meta-margin;
 }
 
 // List Reset
@@ -506,17 +537,18 @@ strong,
 // Styleguide 1.14.
 
 .list-reset {
-  &,
-  ul,
-  ol {
-    @include list-reset;
-  }
+    &,
+    ul,
+    ol {
+        @include list-reset;
+    }
 }
 
-li, dd {
-  &:last-child {
-    margin-bottom: 0;
-  }
+li,
+dd {
+    &:last-child {
+        margin-bottom: 0;
+    }
 }
 
 // Truncate
@@ -530,7 +562,7 @@ li, dd {
 // Styleguide 1.15.
 
 .truncate {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }

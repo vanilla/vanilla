@@ -12,12 +12,14 @@ use Vanilla\Web\SmartIDMiddleware;
 /**
  * A test version of the **SmartIDMiddleware** that doesn't make database calls.
  */
-class TestSmartIDMiddleware extends SmartIDMiddleware {
+class TestSmartIDMiddleware extends SmartIDMiddleware
+{
     /**
      * TestSmartIDMiddleware constructor.
      */
-    public function __construct() {
-        $this->addFullSuffix('ID');
+    public function __construct()
+    {
+        $this->addFullSuffix("ID");
     }
 
     /**
@@ -28,7 +30,8 @@ class TestSmartIDMiddleware extends SmartIDMiddleware {
      * @param array $where The where clause of the query.
      * @return string Returns a dummy smart ID value.
      */
-    public function fetchValue(string $table, string $pk, array $where) {
-        return "($table.$pk.".implodeAssoc(':', '.', $where).')';
+    public function fetchValue(string $table, string $pk, array $where)
+    {
+        return "($table.$pk." . implodeAssoc(":", ".", $where) . ")";
     }
 }

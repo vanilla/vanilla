@@ -1,0 +1,30 @@
+openapi: 3.0.2
+info:
+    description: API access to your community.
+    title: Vanilla API
+    version: "2.0"
+servers:
+    - url: /api/v2
+paths:
+    /authenticator-types:
+        x-hidden: true
+        get:
+            summary: List every available authenticator types.
+            tags:
+                - Authenticators
+            responses:
+                200:
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        authenticatorType:
+                                            type: string
+                                            description: The unique key for the authenticator.
+                                        name:
+                                            type: string
+                                            description: User readable name for the authenticator.

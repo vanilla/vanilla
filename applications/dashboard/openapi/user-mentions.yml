@@ -1,0 +1,118 @@
+openapi: 3.0.2
+info:
+paths:
+    /user-mentions/users/{userID}:
+        x-hidden: false
+        get:
+            parameters:
+                - description: The discussion ID.
+                  in: path
+                  name: userID
+                  required: true
+                  schema:
+                      type: integer
+                - description: >-
+                      Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
+                      This parameter is incompatible with a tree structure.
+                  in: query
+                  name: page
+                  schema:
+                      type: integer
+                      minimum: 1
+                - description: >-
+                      Desired number of items per page.
+                      This parameter is incompatible with a tree structure.
+                  in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      maximum: 100
+                      minimum: 1
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    properties:
+                                        userID:
+                                            description: The ID of the user.
+                                            type: integer
+                                        recordType:
+                                            description: Type of the record
+                                            enum:
+                                                - discussions
+                                                - comment
+                                        recordID:
+                                            description: The ID of the record.
+                                            type: integer
+                                        mentionedName:
+                                            description: Name of the mentioned user.
+                                            type: string
+                                        parentRecordType:
+                                            description: Type of the record
+                                            enum:
+                                                - category
+                                                - discussions
+                                        ParentRecordID:
+                                            description: The ID of the parent record.
+                                            type: integer
+                                        dateInserted:
+                                            description: The date of the insertion of the mention.
+                                            format: date-time
+                                            type: string
+                                        status:
+                                            description: Status of the mention.
+                                            enum:
+                                                - active
+                                                - removed
+                                                - toDelete
+                                    type: object
+                                type: array
+                    description: Success
+            tags:
+                - User Mentions
+            summary: List the user mentions of a user.
+    /user-mentions/{id}/anonymize:
+        x-hidden: false
+        post:
+            tags:
+                - User Mentions
+            summary: Anonymize a user's mentions.
+            parameters:
+                - name: id
+                  description: The userID of the user to anonymize.
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    properties:
+                                        progress:
+                                            description: The ID of the user.
+                                            items:
+                                                properties:
+                                                    successIDs:
+                                                        description: IDs that were successfuly updated.
+                                                        type: array
+                                                        items:
+                                                            type: integer
+                                                    failedIDs:
+                                                        description: IDs that were unsuccessfuly updated.
+                                                        type: array
+                                                        items:
+                                                            type: integer
+                                                    exceptionsByID:
+                                                        type: object
+                                                    countTotalIDs:
+                                                        type: integer
+                                                    callbackPayload:
+                                                        type: string
+                                    type: object
+                                type: array
+                    description: Success

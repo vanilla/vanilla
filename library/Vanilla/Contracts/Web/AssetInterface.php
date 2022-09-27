@@ -10,7 +10,8 @@ namespace Vanilla\Contracts\Web;
 /**
  * A web asset interface.
  */
-interface AssetInterface {
+interface AssetInterface
+{
     /**
      * It tells if the asset is static or not
      * Static means that the asset is inmutable during the build's lifecycle

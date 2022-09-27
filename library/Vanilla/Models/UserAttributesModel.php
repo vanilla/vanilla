@@ -14,15 +14,17 @@ use Vanilla\Database\Operation\JsonFieldProcessor;
  *
  * This is very much a more modern version of the user meta table, but without the tedious interface and monolithic caching.
  */
-class UserAttributesModel extends PipelineModel {
+class UserAttributesModel extends PipelineModel
+{
     /**
      * UserAttributeModel constructor.
      */
-    public function __construct() {
-        parent::__construct('userAttributes');
-        $this->setPrimaryKey('userID', 'key');
+    public function __construct()
+    {
+        parent::__construct("userAttributes");
+        $this->setPrimaryKey("userID", "key");
 
-        $json = new JsonFieldProcessor(['attributes']);
+        $json = new JsonFieldProcessor(["attributes"]);
         $this->addPipelineProcessor($json);
     }
 
@@ -34,9 +36,10 @@ class UserAttributesModel extends PipelineModel {
      * @param mixed $default The default if the attributes aren't found.
      * @return mixed Returns the attributes or **null**.
      */
-    public function getAttributes(int $userID, string $key, $default = null) {
-        $r = $this->select(['userID' => $userID, 'key' => $key]);
-        return empty($r) ? $default : $r[0]['attributes'];
+    public function getAttributes(int $userID, string $key, $default = null)
+    {
+        $r = $this->select(["userID" => $userID, "key" => $key]);
+        return empty($r) ? $default : $r[0]["attributes"];
     }
 
     /**
@@ -46,8 +49,9 @@ class UserAttributesModel extends PipelineModel {
      * @param string $key The key to set the attributes at.
      * @param mixed $value The new attributes value.
      */
-    public function setAttributes(int $userID, string $key, $value) {
-        $this->insert(['userID' => $userID, 'key' => $key, 'attributes' => $value], [Model::OPT_REPLACE => true]);
+    public function setAttributes(int $userID, string $key, $value)
+    {
+        $this->insert(["userID" => $userID, "key" => $key, "attributes" => $value], [Model::OPT_REPLACE => true]);
     }
 
     /**
@@ -57,7 +61,8 @@ class UserAttributesModel extends PipelineModel {
      * @param string $key The key of the attributes.
      * @param array $patch An array to merge with the current value.
      */
-    public function patchAttributes(int $userID, string $key, array $patch) {
+    public function patchAttributes(int $userID, string $key, array $patch)
+    {
         $current = $this->getAttributes($userID, $key, []);
         if (!is_array($current)) {
             throw new \InvalidArgumentException("You cannot patch non-array attributes.");

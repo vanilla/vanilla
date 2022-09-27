@@ -6,7 +6,7 @@
 
 import React, { FunctionComponent } from "react";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
+import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
 import { getMeta, t } from "@library/utility/appUtils";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 import { useUserCanEditDiscussion } from "@library/features/discussions/discussionHooks";
@@ -123,7 +123,7 @@ const DiscussionOptionsMenu: FunctionComponent<{ discussion: IDiscussion }> = ({
     }
 
     return (
-        <DropDown name={t("Discussion Options")} flyoutType={FlyoutType.LIST}>
+        <DropDown name={t("Discussion Options")} flyoutType={FlyoutType.LIST} asReachPopover>
             {items.map((item, i) => {
                 return <React.Fragment key={i}>{item}</React.Fragment>;
             })}

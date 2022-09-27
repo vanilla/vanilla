@@ -5,18 +5,20 @@
  */
 
 import { visibility } from "@library/styles/styleHelpers";
-import { ToolTip } from "@library/toolTip/ToolTip";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { t } from "@library/utility/appUtils";
 import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
 import classNames from "classnames";
 import React from "react";
 import { checkRadioClasses } from "./checkRadioStyles";
+import { InformationIcon } from "@library/icons/common";
 
 interface IProps extends IOptionalComponentID {
     id?: string;
     className?: string;
     checked?: boolean;
     disabled?: boolean;
+    disabledNote?: string;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     label?: React.ReactNode;
     "aria-labelledby"?: string;
@@ -27,6 +29,7 @@ interface IProps extends IOptionalComponentID {
     defaultChecked?: boolean;
     tooltipLabel?: boolean;
     excludeFromICheck?: boolean;
+    fullWidth?: boolean;
 }
 
 export default function CheckBox(props: IProps) {
@@ -34,7 +37,22 @@ export default function CheckBox(props: IProps) {
     const labelID = props["aria-labelledby"] ?? ownLabelID;
     const classes = checkRadioClasses();
 
-    const { isHorizontal, labelBold = true } = props;
+    const {
+        isHorizontal,
+        fullWidth,
+        labelBold = true,
+        onChange,
+        checked,
+        disabled,
+        disabledNote,
+        className,
+        fakeFocus,
+        excludeFromICheck,
+        defaultChecked,
+        tooltipLabel,
+        label,
+        hideLabel,
+    } = props;
 
     const icon = (
         <span className={classes.iconContainer} aria-hidden="true">
@@ -49,34 +67,37 @@ export default function CheckBox(props: IProps) {
     );
 
     return (
-        <label className={classNames(props.className, classes.root, { isHorizontal })}>
+        <label className={classNames(className, classes.root, { isHorizontal }, fullWidth && classes.fullWidth)}>
             <input
-                className={classNames(classes.input, props.fakeFocus && "focus-visible", {
-                    "exclude-icheck": props.excludeFromICheck,
+                className={classNames(classes.input, fakeFocus && "focus-visible", {
+                    "exclude-icheck": excludeFromICheck,
                 })}
                 aria-labelledby={labelID}
                 type="checkbox"
-                onChange={props.onChange}
-                checked={props.checked}
-                defaultChecked={props.defaultChecked}
-                disabled={props.disabled}
+                onChange={onChange}
+                checked={checked}
+                defaultChecked={defaultChecked}
+                disabled={disabled}
                 tabIndex={0}
             />
-            {props.tooltipLabel && props.label ? <ToolTip label={props.label}>{icon}</ToolTip> : icon}
-            {props.label && (
+            {tooltipLabel && label ? <ToolTip label={label}>{icon}</ToolTip> : icon}
+            {!!label && (
                 <span
                     id={labelID}
-                    className={classNames(
-                        classes.label,
-                        props.tooltipLabel && visibility().visuallyHidden,
-                        props.hideLabel === true && visibility().visuallyHidden,
-                        {
-                            [classes.labelBold]: labelBold,
-                        },
-                    )}
+                    className={classNames(classes.label, {
+                        [classes.labelBold]: labelBold,
+                        [visibility().visuallyHidden]: tooltipLabel || hideLabel,
+                    })}
                 >
-                    {props.label}
+                    {label}
                 </span>
+            )}
+            {disabled && disabledNote && (
+                <ToolTip label={disabledNote}>
+                    <ToolTipIcon>
+                        <InformationIcon informationMessage={disabledNote} />
+                    </ToolTipIcon>
+                </ToolTip>
             )}
         </label>
     );

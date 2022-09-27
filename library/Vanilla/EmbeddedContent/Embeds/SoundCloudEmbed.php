@@ -13,8 +13,8 @@ use Vanilla\EmbeddedContent\EmbedUtils;
 /**
  * Embed data object for SoundCloud.
  */
-class SoundCloudEmbed extends AbstractEmbed {
-
+class SoundCloudEmbed extends AbstractEmbed
+{
     const API_HOST = "api.soundcloud.com";
 
     const TYPE = "soundcloud";
@@ -25,7 +25,8 @@ class SoundCloudEmbed extends AbstractEmbed {
      * @param string $url
      * @return array|null
      */
-    private function apiUrlToID(string $url): array {
+    private function apiUrlToID(string $url): array
+    {
         if (parse_url($url, PHP_URL_HOST) !== self::API_HOST) {
             return [];
         }
@@ -45,14 +46,16 @@ class SoundCloudEmbed extends AbstractEmbed {
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         $embedUrl = $data["attributes"]["embedUrl"] ?? null;
         $postID = $data["attributes"]["postID"] ?? null;
         if (is_string($embedUrl) && is_string($postID)) {
@@ -65,7 +68,8 @@ class SoundCloudEmbed extends AbstractEmbed {
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
+    protected function schema(): Schema
+    {
         return Schema::parse([
             "userID:s?",
             "photoUrl:s?",
@@ -89,7 +93,8 @@ class SoundCloudEmbed extends AbstractEmbed {
      * @param string $postID
      * @return array
      */
-    private function urlToID(string $url, string $postID): array {
+    private function urlToID(string $url, string $postID): array
+    {
         $parameters = [];
         parse_str(parse_url($url, PHP_URL_QUERY) ?? "", $parameters);
 

@@ -15,13 +15,15 @@ use Vanilla\Logging\LoggerUtils;
 /**
  * Represent a category resource event.
  */
-class CategoryEvent extends ResourceEvent implements LoggableEventInterface {
+class CategoryEvent extends ResourceEvent implements LoggableEventInterface
+{
     /**
      * @inheritDoc
      */
-    public function getLogEntry(): LogEntry {
+    public function getLogEntry(): LogEntry
+    {
         $context = LoggerUtils::resourceEventLogContext($this);
-        $context['category'] = array_intersect_key($this->payload["category"] ?? [], [
+        $context["category"] = array_intersect_key($this->payload["category"] ?? [], [
             "categoryID" => true,
             "dateInserted" => true,
             "dateUpdated" => true,
@@ -31,11 +33,7 @@ class CategoryEvent extends ResourceEvent implements LoggableEventInterface {
             "name" => true,
         ]);
 
-        $log = new LogEntry(
-            LogLevel::INFO,
-            LoggerUtils::resourceEventLogMessage($this),
-            $context
-        );
+        $log = new LogEntry(LogLevel::INFO, LoggerUtils::resourceEventLogMessage($this), $context);
 
         return $log;
     }
@@ -45,7 +43,8 @@ class CategoryEvent extends ResourceEvent implements LoggableEventInterface {
      *
      * @return string
      */
-    public function getApiUrl() {
+    public function getApiUrl()
+    {
         [$recordType, $recordID] = $this->getRecordTypeAndID();
         return "/api/v2/categories/$recordID";
     }

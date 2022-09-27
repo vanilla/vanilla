@@ -11,8 +11,8 @@ use Vanilla\Theme\Asset\ThemeAsset;
 /**
  * Interface for providing variables on a theme.
  */
-interface ThemeProviderWriteInterface extends ThemeProviderInterface {
-
+interface ThemeProviderWriteInterface extends ThemeProviderInterface
+{
     /**
      * Create new theme.
      *

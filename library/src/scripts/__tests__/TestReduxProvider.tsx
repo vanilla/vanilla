@@ -10,6 +10,10 @@ import { testStoreState } from "@library/__tests__/testStoreState";
 import { Provider } from "react-redux";
 import getStore from "@library/redux/getStore";
 
+/**
+ * FIXME: Make this more extendable or rename
+ * This is only useful for core tests. It ignores extra reducer keys
+ */
 export function TestReduxProvider(props: { state: DeepPartial<ICoreStoreState>; children?: React.ReactNode }) {
     const initialState = testStoreState(props.state);
 

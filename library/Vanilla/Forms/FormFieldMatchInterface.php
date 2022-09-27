@@ -11,8 +11,8 @@ namespace Vanilla\Forms;
  *
  * @package Vanilla\Forms
  */
-interface FormFieldMatchInterface {
-
+interface FormFieldMatchInterface
+{
     /**
      * Get condition array.
      *

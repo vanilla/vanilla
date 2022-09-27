@@ -81,7 +81,6 @@
 //
 // Styleguide 10.4.2.
 
-
 // Overriding Content
 //
 // As we saw in section 10.2., you can override the css class of a modal by setting the data content attribute.
@@ -192,169 +191,173 @@
 // When the modal fills the screen it has an even 3% on top and bottom
 // Centers the modal
 .modal-dialog {
-  position: relative;
-  margin: 3vh auto;
-  max-width: 1024px;
+    position: relative;
+    margin: 3vh auto;
+    max-width: 1024px;
 
-  &.modal-sm {
-    max-width: 400px;
-  }
-
-  &.modal-md {
-    max-width: 600px;
-  }
-
-  &.modal-center {
-    // Appears more centered, vertically
-    margin: 25vh auto;
-
-    .modal-body {
-      max-height: 50vh;
+    &.modal-sm {
+        max-width: 400px;
     }
-  }
+
+    &.modal-md {
+        max-width: 600px;
+    }
+
+    &.modal-center {
+        // Appears more centered, vertically
+        margin: 25vh auto;
+
+        .modal-body {
+            max-height: 50vh;
+        }
+    }
 }
 
 // Sets the maximum height of the entire modal to 94% of the screen height
 .modal-body {
-  $height: calc(92vh - #{$header-block-height + $footer-height});
+    $height: calc(92vh - #{$header-block-height + $footer-height});
 
-  position: relative;
-  max-height: $height;
-  overflow-y: auto;
-  padding: 0 $modal-inner-padding;
+    position: relative;
+    max-height: $height;
+    overflow-y: auto;
+    padding: 0 $modal-inner-padding;
 
-  .modal-confirm & {
-    padding: $spacer;
-  }
+    .modal-confirm & {
+        padding: $spacer;
+    }
 
-  .modal-full-height & {
-    height: $height;
-  }
+    .modal-full-height & {
+        height: $height;
+    }
 }
 
 .modal-backdrop {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: $zindex-modal-bg;
-  background-color: $modal-backdrop-bg;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: $zindex-modal-bg;
+    background-color: $modal-backdrop-bg;
 
-  // Fade for backdrop
-  &.fade { opacity: 0; }
-  &.in { opacity: $modal-backdrop-opacity; }
+    // Fade for backdrop
+    &.fade {
+        opacity: 0;
+    }
+    &.in {
+        opacity: $modal-backdrop-opacity;
+    }
 }
 
 .modal-content {
-  position: relative;
-  background-color: $modal-content-bg;
-  background-clip: padding-box;
-  border: $border-width solid $modal-content-border-color;
-  border-radius: $border-radius;
-  @include box-shadow(0 3px 9px rgba(0,0,0,.5));
-  outline: 0; // Remove focus outline from opened modal
+    position: relative;
+    background-color: $modal-content-bg;
+    background-clip: padding-box;
+    border: $border-width solid $modal-content-border-color;
+    border-radius: $border-radius;
+    @include box-shadow(0 3px 9px rgba(0, 0, 0, 0.5));
+    outline: 0; // Remove focus outline from opened modal
 }
 
 .modal {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  padding: 0 $spacer / 2;
-  z-index: $zindex-modal;
-  overflow: hidden;
-  outline: 0; // Prevent Chrome on Windows from adding a focus outline.
-  -webkit-overflow-scrolling: touch;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    padding: 0 $spacer * 0.5;
+    z-index: $zindex-modal;
+    overflow: hidden;
+    outline: 0; // Prevent Chrome on Windows from adding a focus outline.
+    -webkit-overflow-scrolling: touch;
 
-  &.fade .modal-dialog {
-    transition: opacity .2s ease-out;
-    transform: none;
-    opacity: 0;
-  }
+    &.fade .modal-dialog {
+        transition: opacity 0.2s ease-out;
+        transform: none;
+        opacity: 0;
+    }
 
-  &.in .modal-dialog {
-    transform: none;
-    -webkit-filter: none;
-    opacity: 1;
-  }
+    &.in .modal-dialog {
+        transform: none;
+        -webkit-filter: none;
+        opacity: 1;
+    }
 }
 
 .modal-open {
-  overflow: hidden;
+    overflow: hidden;
 }
 
 .modal-open .modal {
-  overflow-x: hidden;
-  overflow-y: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .modal-footer,
 .modal-header {
-  z-index: 1005;
-  padding: ((60px - $control-height) / 2) $spacer;
+    z-index: 1005;
+    padding: ((60px - $control-height) * 0.5) $spacer;
 }
 
 .modal-footer {
-  height: $footer-height;
-  text-align: right; // right align buttons
-  border-top: $border-width solid $modal-footer-border-color;
-  margin-top: $border-width;
+    height: $footer-height;
+    text-align: right; // right align buttons
+    border-top: $border-width solid $modal-footer-border-color;
+    margin-top: $border-width;
 
-  &:empty {
-    display: none;
-  }
+    &:empty {
+        display: none;
+    }
 
-  // Fade appearance
-  &::before {
-    position: absolute;
-    left: 0;
-    bottom: 61px;
-    display: block;
-    width: 100%;
-    height: 16px;
-    box-shadow: inset 0 -12px 12px 0 rgba(255,255,255,1);
-    content: '';
-  }
+    // Fade appearance
+    &::before {
+        position: absolute;
+        left: 0;
+        bottom: 61px;
+        display: block;
+        width: 100%;
+        height: 16px;
+        box-shadow: inset 0 -12px 12px 0 rgba(255, 255, 255, 1);
+        content: "";
+    }
 }
 
 .modal-header {
-  height: $header-block-height;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: $border-width solid $modal-header-border-color;
+    height: $header-block-height;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: $border-width solid $modal-header-border-color;
 }
 
 .modal-title {
-  line-height: $line-height-sm;
-  margin: 0;
+    line-height: $line-height-sm;
+    margin: 0;
 }
 
 .modal-close {
-  padding: 0;
+    padding: 0;
 
-  svg {
-    height: 52px - 18px;
-  }
+    svg {
+        height: 52px - 18px;
+    }
 }
 
 button.close {
-  padding: 0;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-  -webkit-appearance: none;
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    -webkit-appearance: none;
 }
 
 .modal-no-header {
-  .modal-close {
-    position: absolute;
-    top: $spacer / 2;
-    right: $spacer / 2;
-  }
+    .modal-close {
+        position: absolute;
+        top: $spacer * 0.5;
+        right: $spacer * 0.5;
+    }
 }
 
 // The modal js wraps the modal body and footer in a form element to place the form buttons in the footer.
@@ -362,34 +365,34 @@ button.close {
 // list-un-reset can be applied to any lists appearing in a modal that are not actually part of the form and should
 // have list styling.
 .modal .list-un-reset {
-  ul,
-  ol {
-    margin-left: 15px;
-  }
-
-  ul li {
-    list-style: disc inside;
-  }
-
-  ol li {
-    list-style: decimal inside;
-  }
-
-  ul ul,
-  ol ul {
-    margin-left: 30px;
-
-    li {
-      list-style: circle inside;
+    ul,
+    ol {
+        margin-left: 15px;
     }
-  }
 
-  ol ol,
-  ul ol {
-    margin-left: 15px;
-
-    li {
-      list-style: lower-latin inside;
+    ul li {
+        list-style: disc inside;
     }
-  }
+
+    ol li {
+        list-style: decimal inside;
+    }
+
+    ul ul,
+    ol ul {
+        margin-left: 30px;
+
+        li {
+            list-style: circle inside;
+        }
+    }
+
+    ol ol,
+    ul ol {
+        margin-left: 15px;
+
+        li {
+            list-style: lower-latin inside;
+        }
+    }
 }

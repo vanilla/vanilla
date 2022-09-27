@@ -16,7 +16,7 @@
         "boilerplate"
     ],
     "author": "Isis Graziatto <isis.g@vanillaforums.com> (https://vanilaforums.com)",
-    "license": "GPL-2.0-only",
+    "license": "MIT",
     "repository": {
         "type": "git",
         "url": "git+ssh://git@github.com/vanilla/vanilla-cloud.git"

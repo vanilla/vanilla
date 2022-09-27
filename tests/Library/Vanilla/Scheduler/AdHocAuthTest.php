@@ -23,8 +23,8 @@ use Vanilla\Scheduler\Auth\AdHocAuthException;
  *
  * @package VanillaTests\Library\Vanilla\Scheduler
  */
-class AdHocAuthTest extends SchedulerTestCase {
-
+class AdHocAuthTest extends SchedulerTestCase
+{
     /**
      * Test Missing Token
      *
@@ -32,13 +32,15 @@ class AdHocAuthTest extends SchedulerTestCase {
      * @throws NotFoundException On error.
      * @throws AdHocAuthException On error.
      */
-    public function testMissingTokenConfiguration() {
+    public function testMissingTokenConfiguration()
+    {
         $this->expectException(AdHocAuth412Exception::class);
-        $container = $this->getConfiguredContainer();
+        $container = $this->container();
 
         $request = $this->createMock(Gdn_Request::class);
         $container->setInstance(RequestInterface::class, $request);
 
+        \Gdn::config()->remove("Garden.Scheduler.Token");
         /** @var AdHocAuth $auth */
         $auth = $container->get(AdHocAuth::class);
         $auth->validateToken();
@@ -51,16 +53,17 @@ class AdHocAuthTest extends SchedulerTestCase {
      * @throws NotFoundException On error.
      * @throws AdHocAuthException On error.
      */
-    public function testMissingTokenHeader() {
+    public function testMissingTokenHeader()
+    {
         $this->expectException(AdHocAuth403Exception::class);
-        $container = $this->getConfiguredContainer();
+        $container = $this->container();
 
         $request = $this->createMock(Gdn_Request::class);
-        $request->method('getHeader')->willReturn('');
+        $request->method("getHeader")->willReturn("");
         $container->setInstance(RequestInterface::class, $request);
 
         $config = $container->get(Gdn_Configuration::class);
-        $config->set('Garden.Scheduler.Token', uniqid(), true, false);
+        $config->set("Garden.Scheduler.Token", uniqid(), true, false);
 
         /** @var AdHocAuth $auth */
         $auth = $container->get(AdHocAuth::class);
@@ -74,16 +77,17 @@ class AdHocAuthTest extends SchedulerTestCase {
      * @throws NotFoundException On error.
      * @throws AdHocAuthException On error.
      */
-    public function testMalformedTokenHeader() {
+    public function testMalformedTokenHeader()
+    {
         $this->expectException(AdHocAuth401Exception::class);
-        $container = $this->getConfiguredContainer();
+        $container = $this->container();
 
         $request = $this->createMock(Gdn_Request::class);
-        $request->method('getHeader')->willReturn('NoBearer abc');
+        $request->method("getHeader")->willReturn("NoBearer abc");
         $container->setInstance(RequestInterface::class, $request);
 
         $config = $container->get(Gdn_Configuration::class);
-        $config->set('Garden.Scheduler.Token', uniqid(), true, false);
+        $config->set("Garden.Scheduler.Token", uniqid(), true, false);
 
         /** @var AdHocAuth $auth */
         $auth = $container->get(AdHocAuth::class);
@@ -97,16 +101,17 @@ class AdHocAuthTest extends SchedulerTestCase {
      * @throws NotFoundException On error.
      * @throws AdHocAuthException On error.
      */
-    public function testWrongToken() {
+    public function testWrongToken()
+    {
         $this->expectException(AdHocAuth401Exception::class);
-        $container = $this->getConfiguredContainer();
+        $container = $this->container();
 
         $request = $this->createMock(Gdn_Request::class);
-        $request->method('getHeader')->willReturn('abc');
+        $request->method("getHeader")->willReturn("abc");
         $container->setInstance(RequestInterface::class, $request);
 
         $config = $container->get(Gdn_Configuration::class);
-        $config->set('Garden.Scheduler.Token', 'def', true, false);
+        $config->set("Garden.Scheduler.Token", "def", true, false);
 
         /** @var AdHocAuth $auth */
         $auth = $container->get(AdHocAuth::class);
@@ -120,18 +125,20 @@ class AdHocAuthTest extends SchedulerTestCase {
      * @throws NotFoundException On error.
      * @throws AdHocAuthException On error.
      */
-    public function testValidToken() {
-        $container = $this->getConfiguredContainer();
+    public function testValidToken()
+    {
+        $container = $this->container();
 
         $request = $this->createMock(Gdn_Request::class);
-        $request->method('getHeader')->willReturn('bearer abc');
+        $request->method("getHeader")->willReturn("bearer abc");
         $container->setInstance(RequestInterface::class, $request);
 
         $config = $container->get(Gdn_Configuration::class);
-        $config->set('Garden.Scheduler.Token', 'abc', true, false);
+        $config->set("Garden.Scheduler.Token", "abc", true, false);
 
         /** @var AdHocAuth $auth */
         $auth = $container->get(AdHocAuth::class);
         $auth->validateToken();
+        $this->assertTrue(true); // No exceptions were thrown.
     }
 }

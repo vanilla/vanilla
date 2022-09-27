@@ -6,7 +6,7 @@
 
 import React, { ReactNode, useEffect, useState } from "react";
 import apiv2 from "@library/apiv2";
-import LazyModal from "@library/modal/LazyModal";
+import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import FrameBody from "@library/layout/frame/FrameBody";
 import Frame from "@library/layout/frame/Frame";
@@ -74,11 +74,11 @@ export function AjaxModal(props: IProps) {
     });
 
     return (
-        <LazyModal isVisible={isVisible} size={props.size} exitHandler={close}>
+        <Modal isVisible={isVisible} size={props.size} exitHandler={close}>
             <Frame
                 header={props.title ? <FrameHeader title={props.title} closeFrame={close} /> : null}
                 body={<FrameBody selfPadded={true}>{loading ? props.loader : message}</FrameBody>}
             />
-        </LazyModal>
+        </Modal>
     );
 }

@@ -20,8 +20,8 @@ use Vanilla\Web\PageHeadInterface;
  * - Param validation and expansion for that type.
  * - The assets provided for that view type.
  */
-abstract class AbstractCustomLayoutView implements LayoutViewInterface {
-
+abstract class AbstractCustomLayoutView implements LayoutViewInterface
+{
     /** @var array<class-string<AbstractLayoutAsset>> */
     private $assetClasses = [];
 
@@ -54,7 +54,8 @@ abstract class AbstractCustomLayoutView implements LayoutViewInterface {
      *
      * @return Schema
      */
-    public function getParamResolvedSchema(): Schema {
+    public function getParamResolvedSchema(): Schema
+    {
         return new Schema();
     }
 
@@ -65,7 +66,8 @@ abstract class AbstractCustomLayoutView implements LayoutViewInterface {
      *
      * @return array
      */
-    public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array {
+    public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
+    {
         return $paramInput;
     }
 
@@ -73,10 +75,9 @@ abstract class AbstractCustomLayoutView implements LayoutViewInterface {
      * Add an asset class.
      *
      * @param class-string<AbstractLayoutAsset> $assetClass
-     * @param bool $isRequired
-     * @param bool $isUnique
      */
-    public function registerAssetClass(string $assetClass, bool $isRequired = true, bool $isUnique = true) {
+    public function registerAssetClass(string $assetClass)
+    {
         $this->assetClasses[] = $assetClass;
     }
 
@@ -87,13 +88,12 @@ abstract class AbstractCustomLayoutView implements LayoutViewInterface {
      * @param Container $container
      * @return DataHydrator
      */
-    public function createHydrator(DataHydrator $baseHydrator, Container $container): DataHydrator {
+    public function createHydrator(DataHydrator $baseHydrator, Container $container): DataHydrator
+    {
         $newHydrator = clone $baseHydrator;
 
         foreach ($this->assetClasses as $assetClass) {
-            $newHydrator->addResolver(
-                new ReactResolver($assetClass, $container)
-            );
+            $newHydrator->addResolver(new ReactResolver($assetClass, $container));
         }
 
         return $newHydrator;
@@ -104,7 +104,8 @@ abstract class AbstractCustomLayoutView implements LayoutViewInterface {
      *
      * @return array<class-string<AbstractLayoutAsset>>
      */
-    public function getAssetClasses(): array {
+    public function getAssetClasses(): array
+    {
         return $this->assetClasses;
     }
 }

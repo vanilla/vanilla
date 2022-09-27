@@ -14,27 +14,28 @@ use Garden\Schema\Schema;
  *
  * @package Vanilla\Metadata\Parser
  */
-abstract class AbstractXmlParser implements Parser {
-
+abstract class AbstractXmlParser implements Parser
+{
     /**
      * Parse a xml content.
      *
      * @param DOMDocument $document
      * @return array
      */
-    public function parse(DOMDocument $document): array {
+    public function parse(DOMDocument $document): array
+    {
         $results = [];
         $schemaArray = $this->getSchema()->getSchemaArray();
-        foreach ($schemaArray['properties'] as $fieldName => $property) {
-            $type = $property['type'] ?? null;
+        foreach ($schemaArray["properties"] as $fieldName => $property) {
+            $type = $property["type"] ?? null;
             $elements = $document->getElementsByTagName($fieldName);
 
             /** @var \DOMElement $element */
             foreach ($elements as $element) {
-                if ($type === 'object') {
+                if ($type === "object") {
                     $results[$fieldName] = $this->getXMLData($property, $element);
                 } elseif ($type == "array") {
-                    $results[$fieldName][] = $this->getXMLData($property['items'], $element);
+                    $results[$fieldName][] = $this->getXMLData($property["items"], $element);
                 } else {
                     $results[$fieldName] = trim($element->nodeValue);
                 }
@@ -52,17 +53,18 @@ abstract class AbstractXmlParser implements Parser {
      * @param \DOMElement $domElement
      * @return array
      */
-    private function getXMLData($schema, \DOMElement $domElement): array {
+    private function getXMLData($schema, \DOMElement $domElement): array
+    {
         $schemaArray = is_array($schema) ? $schema : $schema->getSchemaArray();
-        if (!isset($schemaArray['properties'])) {
+        if (!isset($schemaArray["properties"])) {
             return [];
         }
         $data = [];
-        foreach ($schemaArray['properties'] as $fieldName => $property) {
-            $type = $property['type'] ?? null;
-            if ($type === 'array') {
-                $data[$fieldName][] = $this->getXMLData($property['items'], $domElement);
-            } elseif ($type === 'object') {
+        foreach ($schemaArray["properties"] as $fieldName => $property) {
+            $type = $property["type"] ?? null;
+            if ($type === "array") {
+                $data[$fieldName][] = $this->getXMLData($property["items"], $domElement);
+            } elseif ($type === "object") {
                 $childDOMElement = $domElement->getElementsByTagName($fieldName)->item(0);
                 if ($childDOMElement) {
                     $data[$fieldName] = $this->getXMLData($property, $childDOMElement);
@@ -109,10 +111,11 @@ abstract class AbstractXmlParser implements Parser {
      * @param Schema|array $schema
      * @return array
      */
-    protected function getAttributesFromElement(\DOMElement $DOMElement, $schema): array {
+    protected function getAttributesFromElement(\DOMElement $DOMElement, $schema): array
+    {
         $schemaArray = is_array($schema) ? $schema : $schema->getSchemaArray();
         $attributes = [];
-        foreach ($schemaArray['properties'] as $attributeName => $property) {
+        foreach ($schemaArray["properties"] as $attributeName => $property) {
             $attributes[$attributeName] = $DOMElement->getAttribute($attributeName);
         }
 

@@ -14,8 +14,8 @@ use Garden\Http\HttpHandlerInterface;
  *
  * @package Vanilla\RemoteResource
  */
-class RemoteResourceHttpClient extends HttpClient {
-
+class RemoteResourceHttpClient extends HttpClient
+{
     /** @var int  */
     public const REQUEST_TIMEOUT = 10;
 
@@ -25,7 +25,8 @@ class RemoteResourceHttpClient extends HttpClient {
      * @param string $baseUrl
      * @param HttpHandlerInterface|null $handler
      */
-    public function __construct(string $baseUrl = '', HttpHandlerInterface $handler = null) {
+    public function __construct(string $baseUrl = "", HttpHandlerInterface $handler = null)
+    {
         parent::__construct($baseUrl, $handler);
         $this->setDefaultOption("timeout", self::REQUEST_TIMEOUT);
     }

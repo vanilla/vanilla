@@ -10,7 +10,7 @@
 
 use Vanilla\Utility\ArrayUtils;
 
-if (!function_exists('absoluteSource')) {
+if (!function_exists("absoluteSource")) {
     /**
      * Get the full url of a source path relative to a base url.
      *
@@ -22,59 +22,61 @@ if (!function_exists('absoluteSource')) {
      * @param string $url The full url to the page containing the src reference.
      * @return string Absolute source path.
      */
-    function absoluteSource($srcPath, $url) {
+    function absoluteSource($srcPath, $url)
+    {
         $srcParts = parse_url($srcPath);
         $urlParts = parse_url($url);
 
         if ($srcParts === false || $urlParts === false) {
-            return '';
+            return "";
         }
 
         // If there is a scheme in the src path already, just return it.
-        if (!empty($srcParts['scheme'])) {
-            if (in_array($srcParts['scheme'], ['http', 'https'], true)) {
+        if (!empty($srcParts["scheme"])) {
+            if (in_array($srcParts["scheme"], ["http", "https"], true)) {
                 return $srcPath;
             } else {
-                return '';
+                return "";
             }
-        } elseif (empty($urlParts['scheme']) || !in_array($urlParts['scheme'], ['http', 'https'])) {
-            return '';
+        } elseif (empty($urlParts["scheme"]) || !in_array($urlParts["scheme"], ["http", "https"])) {
+            return "";
         }
 
-        $parts = $srcParts + $urlParts + ['path' => ''];
+        $parts = $srcParts + $urlParts + ["path" => ""];
 
-        if (!empty($srcParts['path']) && $srcParts['path'][0] !== '/') {
+        if (!empty($srcParts["path"]) && $srcParts["path"][0] !== "/") {
             // Work with the path in the url & the provided src path to backtrace if necessary
-            $urlPathParts = explode('/', trim(str_replace('\\', '/', $urlParts['path'] ?? ''), '/'));
-            $srcPathParts = explode('/', str_replace('\\', '/', $srcParts['path']));
+            $urlPathParts = explode("/", trim(str_replace("\\", "/", $urlParts["path"] ?? ""), "/"));
+            $srcPathParts = explode("/", str_replace("\\", "/", $srcParts["path"]));
             foreach ($srcPathParts as $part) {
-                if (!$part || $part == '.') {
+                if (!$part || $part == ".") {
                     continue;
                 }
 
-                if ($part == '..') {
+                if ($part == "..") {
                     array_pop($urlPathParts);
                 } else {
                     $urlPathParts[] = $part;
                 }
             }
 
-            $parts['path'] = '/'.implode('/', $urlPathParts);
+            $parts["path"] = "/" . implode("/", $urlPathParts);
         }
 
-        $result = "{$parts['scheme']}://{$parts['host']}{$parts['path']}";
+        $result = "{$parts["scheme"]}://{$parts["host"]}{$parts["path"]}";
         return $result;
     }
 }
 
-if (!function_exists('anonymizeIP')) {
+if (!function_exists("anonymizeIP")) {
     /**
      * Anonymize an IPv4 or IPv6 address.
      *
      * @param string $ip An IPv4 or IPv6 address.
      * @return bool|string Anonymized IP address on success. False on failure.
      */
-    function anonymizeIP(string $ip) {
+    function anonymizeIP(string $ip)
+    {
         $result = false;
 
         if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
@@ -83,7 +85,7 @@ if (!function_exists('anonymizeIP')) {
             if ($packed !== false) {
                 // Remove the last octet of an IPv4 address or the last 80 bits of an IPv6 address.
                 // IP v4 addresses are 32 bits (4 bytes). IP v6 addresses are 128 bits (16 bytes).
-                $mask = strlen($packed) == 4 ? inet_pton('255.255.255.0') : inet_pton('ffff:ffff:ffff::');
+                $mask = strlen($packed) == 4 ? inet_pton("255.255.255.0") : inet_pton("ffff:ffff:ffff::");
                 $result = inet_ntop($packed & $mask);
             }
         }
@@ -100,14 +102,15 @@ if (!function_exists('array_fill_keys')) {
    }
 }
 */
-if (!function_exists('arrayHasValue')) {
+if (!function_exists("arrayHasValue")) {
     /**
      * Search an array (and all arrays it contains) for a value.
      *
      * @param array $array The array to search.
      * @param mixed $value The value to search for.
      */
-    function arrayHasValue($array, $value) {
+    function arrayHasValue($array, $value)
+    {
         if (in_array($value, $array)) {
             return true;
         } else {
@@ -121,7 +124,7 @@ if (!function_exists('arrayHasValue')) {
     }
 }
 
-if (!function_exists('arrayKeyExistsI')) {
+if (!function_exists("arrayKeyExistsI")) {
     /**
      * A case-insensitive array_key_exists search.
      *
@@ -130,7 +133,8 @@ if (!function_exists('arrayKeyExistsI')) {
      * @return bool Returns true if the array contains the key or false otherwise.
      * @see array_key_exists, arrayHasValue
      */
-    function arrayKeyExistsI($key, $search) {
+    function arrayKeyExistsI($key, $search)
+    {
         if (is_array($search)) {
             foreach ($search as $k => $v) {
                 if (strtolower($key) == strtolower($k)) {
@@ -142,20 +146,21 @@ if (!function_exists('arrayKeyExistsI')) {
     }
 }
 
-if (!function_exists('arrayPathExists')) {
+if (!function_exists("arrayPathExists")) {
     /**
      * Whether a sequence of keys (path) exists or not in an array.
      *
      * This function should only be used if isset($array[$key1][$key2]) cannot be used because the value could be null.
      *
      * @param array $keys The sequence of keys (path) to test against the array.
-     * @param array $array The array to search.
+     * @param array|iterable $array The array to search.
      * @param mixed $value The path value.
      *
      * @return bool Returns true if the path exists in the array or false otherwise.
      */
-    function arrayPathExists(array $keys, array $array, &$value = null) {
-        if (!count($keys) || !count($array)) {
+    function arrayPathExists(array $keys, $array, &$value = null)
+    {
+        if (!count($keys)) {
             return false;
         }
 
@@ -163,12 +168,12 @@ if (!function_exists('arrayPathExists')) {
         do {
             $key = array_shift($keys);
 
-            if (array_key_exists($key, $target)) {
+            if (ArrayUtils::arrayKeyExists($key, $target)) {
                 $target = $target[$key];
             } else {
                 return false;
             }
-        } while (($countKeys = count($keys)) && is_array($target));
+        } while (($countKeys = count($keys)) && ArrayUtils::isArray($target));
 
         $found = $countKeys === 0;
         if ($found) {
@@ -179,7 +184,7 @@ if (!function_exists('arrayPathExists')) {
     }
 }
 
-if (!function_exists('arrayReplaceConfig')) {
+if (!function_exists("arrayReplaceConfig")) {
     /**
      * Replaces elements from an override array into a default array recursively, overwriting numeric arrays entirely.
      *
@@ -189,7 +194,8 @@ if (!function_exists('arrayReplaceConfig')) {
      * @param array $override The array of override values.
      * @return array Returns the replaced arrays.
      */
-    function arrayReplaceConfig(array $default, array $override) {
+    function arrayReplaceConfig(array $default, array $override)
+    {
         if (isset($override[0]) || empty($default)) {
             return $override;
         }
@@ -197,8 +203,13 @@ if (!function_exists('arrayReplaceConfig')) {
         $result = array_replace($default, $override);
 
         foreach ($result as $key => &$value) {
-            if (is_array($value) && isset($default[$key]) && isset($override[$key]) &&
-                is_array($default[$key]) && !isset($value[0]) && !isset($default[$key][0])
+            if (
+                is_array($value) &&
+                isset($default[$key]) &&
+                isset($override[$key]) &&
+                is_array($default[$key]) &&
+                !isset($value[0]) &&
+                !isset($default[$key][0])
             ) {
                 $value = arrayReplaceConfig($default[$key], $override[$key]);
             }
@@ -208,7 +219,7 @@ if (!function_exists('arrayReplaceConfig')) {
     }
 }
 
-if (!function_exists('arraySearchI')) {
+if (!function_exists("arraySearchI")) {
     /**
      * Case-insensitive version of array_search.
      *
@@ -216,12 +227,13 @@ if (!function_exists('arraySearchI')) {
      * @param array $search The array to search in for $value.
      * @return mixed Key of $value in the $search array.
      */
-    function arraySearchI($value, $search) {
-        return array_search(strtolower($value), array_map('strtolower', $search));
+    function arraySearchI($value, $search)
+    {
+        return array_search(strtolower($value), array_map("strtolower", $search));
     }
 }
 
-if (!function_exists('arrayTranslate')) {
+if (!function_exists("arrayTranslate")) {
     /**
      * Take all of the items specified in an array and make a new array with them specified by mappings.
      *
@@ -230,8 +242,9 @@ if (!function_exists('arrayTranslate')) {
      * @param bool $addRemaining Whether or not to add the remaining items to the array.
      * @return array
      */
-    function arrayTranslate($array, $mappings, $addRemaining = false) {
-        $array = (array)$array;
+    function arrayTranslate($array, $mappings, $addRemaining = false)
+    {
+        $array = (array) $array;
         $result = [];
         foreach ($mappings as $index => $value) {
             if (is_numeric($index)) {
@@ -266,7 +279,7 @@ if (!function_exists('arrayTranslate')) {
     }
 }
 
-if (!function_exists('arrayValueI')) {
+if (!function_exists("arrayValueI")) {
     /**
      * Get the value associated with the {@link $needle} in the {@link $haystack}. This is a CASE-INSENSITIVE search.
      *
@@ -275,7 +288,8 @@ if (!function_exists('arrayValueI')) {
      * @param mixed $default The default value to return if the requested value is not found. Default is false.
      * @return mixed Returns the value at {@link $needle} in {@link $haystack} or {@link $default} if it isn't found.
      */
-    function arrayValueI($needle, $haystack, $default = false) {
+    function arrayValueI($needle, $haystack, $default = false)
+    {
         $return = $default;
         $needle = strtolower($needle);
         if (is_array($haystack)) {
@@ -290,7 +304,7 @@ if (!function_exists('arrayValueI')) {
     }
 }
 
-if (!function_exists('calculateNumberOfPages')) {
+if (!function_exists("calculateNumberOfPages")) {
     /**
      * Calculate the total number of pages based on the total items and items per page.
      *
@@ -301,8 +315,9 @@ if (!function_exists('calculateNumberOfPages')) {
      * @param int $itemsPerPage The number of items per page.
      * @return int Returns the number of pages available.
      */
-    function calculateNumberOfPages($itemCount, $itemsPerPage) {
-        $tmpCount = ($itemCount / $itemsPerPage);
+    function calculateNumberOfPages($itemCount, $itemsPerPage)
+    {
+        $tmpCount = $itemCount / $itemsPerPage;
         $roundedCount = intval($tmpCount);
 
         if ($tmpCount > 1) {
@@ -318,7 +333,7 @@ if (!function_exists('calculateNumberOfPages')) {
     }
 }
 
-if (!function_exists('changeBasename')) {
+if (!function_exists("changeBasename")) {
     /**
      * Change the basename part of a filename for a given path.
      *
@@ -326,27 +341,29 @@ if (!function_exists('changeBasename')) {
      * @param string $newBasename The new basename. A %s will be replaced by the old basename.
      * @return string Return {@link $path} with the basename changed.
      */
-    function changeBasename($path, $newBasename) {
-        $newBasename = str_replace('%s', '$2', $newBasename);
-        $result = preg_replace('/^(.*\/)?(.*?)(\.[^.]+)$/', '$1'.$newBasename.'$3', $path);
+    function changeBasename($path, $newBasename)
+    {
+        $newBasename = str_replace("%s", '$2', $newBasename);
+        $result = preg_replace('/^(.*\/)?(.*?)(\.[^.]+)$/', '$1' . $newBasename . '$3', $path);
 
         return $result;
     }
 }
 
-if (!function_exists('check_utf8')) {
+if (!function_exists("check_utf8")) {
     /**
      * Check to see if a string is UTF-8.
      *
      * @param string $str The string to check.
      * @return bool Returns true if the string contains only valid UTF-8 characters or false otherwise.
      */
-    function check_utf8($str) {
+    function check_utf8($str)
+    {
         $len = strlen($str);
         for ($i = 0; $i < $len; $i++) {
             $c = ord($str[$i]);
             if ($c > 128) {
-                if (($c > 247)) {
+                if ($c > 247) {
                     return false;
                 } elseif ($c > 239) {
                     $bytes = 4;
@@ -357,7 +374,7 @@ if (!function_exists('check_utf8')) {
                 } else {
                     return false;
                 }
-                if (($i + $bytes) > $len) {
+                if ($i + $bytes > $len) {
                     return false;
                 }
                 while ($bytes > 1) {
@@ -374,7 +391,7 @@ if (!function_exists('check_utf8')) {
     }
 }
 
-if (!function_exists('combinePaths')) {
+if (!function_exists("combinePaths")) {
     /**
      * Takes an array of path parts and concatenates them using the specified delimiter.
      *
@@ -389,22 +406,23 @@ if (!function_exists('combinePaths')) {
      * @param string $delimiter The delimiter to use when concatenating. Defaults to system-defined directory separator.
      * @return string Returns the concatenated path.
      */
-    function combinePaths($paths, $delimiter = DS) {
+    function combinePaths($paths, $delimiter = DS)
+    {
         if (is_array($paths)) {
             $mungedPath = implode($delimiter, $paths);
             $mungedPath = str_replace(
-                [$delimiter.$delimiter.$delimiter, $delimiter.$delimiter],
+                [$delimiter . $delimiter . $delimiter, $delimiter . $delimiter],
                 [$delimiter, $delimiter],
                 $mungedPath
             );
-            return str_replace(['http:/', 'https:/'], ['http://', 'https://'], $mungedPath);
+            return str_replace(["http:/", "https:/"], ["http://", "https://"], $mungedPath);
         } else {
             return $paths;
         }
     }
 }
 
-if (!function_exists('concatSep')) {
+if (!function_exists("concatSep")) {
     /**
      * Concatenate a string to another string with a separator.
      *
@@ -415,15 +433,16 @@ if (!function_exists('concatSep')) {
      *  - If this parameter is a string then the function will look for more arguments to concatenate.
      * @return string
      */
-    function concatSep($sep, $str1, $str2) {
+    function concatSep($sep, $str1, $str2)
+    {
         if (is_array($str2)) {
-            $strings = array_merge((array)$str1, $str2);
+            $strings = array_merge((array) $str1, $str2);
         } else {
             $strings = func_get_args();
             array_shift($strings);
         }
 
-        $result = '';
+        $result = "";
         foreach ($strings as $string) {
             if (!$string) {
                 continue;
@@ -438,8 +457,7 @@ if (!function_exists('concatSep')) {
     }
 }
 
-if (!function_exists('flattenArray')) {
-
+if (!function_exists("flattenArray")) {
     /**
      * Recursively flatten a nested array into a single-dimension array.
      *
@@ -448,13 +466,13 @@ if (!function_exists('flattenArray')) {
      * @return array Returns the flattened array.
      * @deprecated Use ArrayUtils::flattenArray(); instead.
      */
-    function flattenArray($sep, $array) {
+    function flattenArray($sep, $array)
+    {
         return ArrayUtils::flattenArray($sep, $array);
     }
 }
 
-if (!function_exists('unflattenArray')) {
-
+if (!function_exists("unflattenArray")) {
     /**
      * Convert a flattened array into a multi dimensional array.
      *
@@ -464,7 +482,8 @@ if (!function_exists('unflattenArray')) {
      * @param array $array The array to flatten.
      * @return array|bool Returns the flattened array or false.
      */
-    function unflattenArray($sep, $array) {
+    function unflattenArray($sep, $array)
+    {
         $result = [];
 
         try {
@@ -492,7 +511,7 @@ if (!function_exists('unflattenArray')) {
     }
 }
 
-if (!function_exists('safePrint')) {
+if (!function_exists("safePrint")) {
     /**
      * Return/print human-readable and non casted information about a variable.
      *
@@ -500,8 +519,8 @@ if (!function_exists('safePrint')) {
      * @param bool $returnData Whether or not to return the data instead of echoing it.
      * @return string|void Returns {@link $mixed} or nothing if {@link $returnData} is false.
      */
-    function safePrint($mixed, $returnData = false) {
-
+    function safePrint($mixed, $returnData = false)
+    {
         $functionName = __FUNCTION__;
 
         $replaceCastedValues = function (&$value) use (&$replaceCastedValues, $functionName) {
@@ -520,16 +539,16 @@ if (!function_exists('safePrint')) {
                 return;
             }
 
-            if ($value === '') {
-                $value = $functionName.'{empty string}';
+            if ($value === "") {
+                $value = $functionName . "{empty string}";
             } elseif ($value === true) {
-                $value = $functionName.'{true}';
+                $value = $functionName . "{true}";
             } elseif ($value === false) {
-                $value = $functionName.'{false}';
+                $value = $functionName . "{false}";
             } elseif ($value === null) {
-                $value = $functionName.'{null}';
+                $value = $functionName . "{null}";
             } elseif ($value === 0) {
-                $value = $functionName.'{0}';
+                $value = $functionName . "{0}";
             }
         };
 
@@ -539,16 +558,17 @@ if (!function_exists('safePrint')) {
     }
 }
 
-if (!function_exists('dbdecode')) {
+if (!function_exists("dbdecode")) {
     /**
      * Decode a value retrieved from database storage.
      *
      * @param string $value An encoded string representation of a value to be decoded.
      * @return mixed Null if the $value was empty, a decoded value on success or false on failure.
      */
-    function dbdecode($value) {
+    function dbdecode($value)
+    {
         // Mirror dbencode behaviour.
-        if ($value === null || $value === '') {
+        if ($value === null || $value === "") {
             return null;
         } elseif (is_array($value)) {
             // This handles a common double decoding scenario.
@@ -560,7 +580,7 @@ if (!function_exists('dbdecode')) {
         // Backward compatibility.
         if ($decodedValue === null) {
             // Suppress errors https://github.com/vanilla/vanilla/pull/3734#issuecomment-210664113
-            $decodedValue = @unserialize($value, ['allowed_classes' => false]);
+            $decodedValue = @unserialize($value, ["allowed_classes" => false]);
         }
 
         if (is_array($value) || is_object($value)) {
@@ -572,16 +592,17 @@ if (!function_exists('dbdecode')) {
     }
 }
 
-if (!function_exists('dbencode')) {
+if (!function_exists("dbencode")) {
     /**
      * Encode a value in preparation for database storage.
      *
      * @param mixed $value A value to be encoded.
      * @return mixed An encoded string representation of the provided value, null if the value was empty or false on failure.
      */
-    function dbencode($value) {
+    function dbencode($value)
+    {
         // Treat an empty value as null so that we insert "nothing" in the database instead of an empty string.
-        if ($value === null || $value === '') {
+        if ($value === null || $value === "") {
             return null;
         }
 
@@ -595,17 +616,17 @@ if (!function_exists('dbencode')) {
         try {
             $encodedValue = jsonEncodeChecked($value, JSON_UNESCAPED_SLASHES);
         } catch (Exception $ex) {
-            $msg = 'Failed to encode a value in dbencode()';
-            $context = ['value' => $value];
-            trace(array_merge(['Error' => $msg], $context), TRACE_ERROR);
-            Logger::log(Logger::ERROR, 'Failed to encode a value in dbencode()', $context);
+            $msg = "Failed to encode a value in dbencode()";
+            $context = ["value" => $value];
+            trace(array_merge(["Error" => $msg], $context), TRACE_ERROR);
+            Logger::log(Logger::ERROR, "Failed to encode a value in dbencode()", $context);
         }
 
         return $encodedValue;
     }
 }
 
-if (!function_exists('dateCompare')) {
+if (!function_exists("dateCompare")) {
     /**
      * Compare two dates.
      *
@@ -617,7 +638,8 @@ if (!function_exists('dateCompare')) {
      * {@link $date2}, and 0 if they are equal.
      * @since 2.1
      */
-    function dateCompare($date1, $date2) {
+    function dateCompare($date1, $date2)
+    {
         if (!is_numeric($date1)) {
             $date1 = strtotime($date1);
         }
@@ -635,7 +657,7 @@ if (!function_exists('dateCompare')) {
     }
 }
 
-if (!function_exists('debugMethod')) {
+if (!function_exists("debugMethod")) {
     /**
      * Format a function or method call for debug output.
      *
@@ -643,26 +665,27 @@ if (!function_exists('debugMethod')) {
      * @param array $methodArgs An array of arguments passed to the method.
      * @return string Returns the method formatted for debug output.
      */
-    function debugMethod($methodName, $methodArgs = []) {
-        echo $methodName."(";
+    function debugMethod($methodName, $methodArgs = [])
+    {
+        echo $methodName . "(";
         $sA = [];
         foreach ($methodArgs as $funcArg) {
             if (is_null($funcArg)) {
-                $sA[] = 'null';
+                $sA[] = "null";
             } elseif (!is_array($funcArg) && !is_object($funcArg)) {
                 $sA[] = "'{$funcArg}'";
             } elseif (is_array($funcArg)) {
-                $sA[] = "'Array(".sizeof($funcArg).")'";
+                $sA[] = "'Array(" . sizeof($funcArg) . ")'";
             } else {
-                $sA[] = gettype($funcArg)."/".get_class($funcArg);
+                $sA[] = gettype($funcArg) . "/" . get_class($funcArg);
             }
         }
-        echo implode(', ', $sA);
+        echo implode(", ", $sA);
         echo ")\n";
     }
 }
 
-if (!function_exists('deprecated')) {
+if (!function_exists("deprecated")) {
     /**
      * Mark a function deprecated.
      *
@@ -670,7 +693,8 @@ if (!function_exists('deprecated')) {
      * @param string $newName The name of the new function that should be used instead.
      * @param string $date Deprecated. Ironic, no?
      */
-    function deprecated($oldName, $newName = '', $date = '') {
+    function deprecated($oldName, $newName = "", $date = "")
+    {
         $message = "$oldName is deprecated.";
         if ($newName) {
             $message .= " Use $newName instead.";
@@ -680,7 +704,7 @@ if (!function_exists('deprecated')) {
     }
 }
 
-if (!function_exists('domGetContent')) {
+if (!function_exists("domGetContent")) {
     /**
      * Search a DOM for a selector and return the contents.
      *
@@ -689,14 +713,15 @@ if (!function_exists('domGetContent')) {
      * @param string $default The default content to return if the node isn't found.
      * @return string Returns the content of the found node or {@link $default} otherwise.
      */
-    function domGetContent($dom, $selector, $default = '') {
+    function domGetContent($dom, $selector, $default = "")
+    {
         $element = $dom->query($selector);
-        $content = $element->attr('content');
+        $content = $element->attr("content");
         return $content ? $content : $default;
     }
 }
 
-if (!function_exists('domGetImages')) {
+if (!function_exists("domGetImages")) {
     /**
      * Get the images from a DOM.
      *
@@ -705,13 +730,14 @@ if (!function_exists('domGetImages')) {
      * @param int $maxImages The maximum number of images to return.
      * @return array Returns an array in the form: `[['http://imageUrl.com'], ...]`.
      */
-    function domGetImages($dom, $url, $maxImages = 4) {
+    function domGetImages($dom, $url, $maxImages = 4)
+    {
         $images = [];
-        foreach ($dom->query('img') as $element) {
+        foreach ($dom->query("img") as $element) {
             $images[] = [
-                'Src' => absoluteSource($element->attr('src'), $url),
-                'Width' => $element->attr('width'),
-                'Height' => $element->attr('height'),
+                "Src" => absoluteSource($element->attr("src"), $url),
+                "Width" => $element->attr("width"),
+                "Height" => $element->attr("height"),
             ];
         }
 
@@ -720,21 +746,21 @@ if (!function_exists('domGetImages')) {
         // Only look at first 4 images (speed!)
         $i = 0;
         foreach ($images as $imageInfo) {
-            $image = $imageInfo['Src'];
+            $image = $imageInfo["Src"];
 
-            if (empty($image) || strpos($image, 'doubleclick.') !== false) {
+            if (empty($image) || strpos($image, "doubleclick.") !== false) {
                 continue;
             }
 
             try {
-                if ($imageInfo['Height'] && $imageInfo['Width']) {
-                    $height = $imageInfo['Height'];
-                    $width = $imageInfo['Width'];
+                if ($imageInfo["Height"] && $imageInfo["Width"]) {
+                    $height = $imageInfo["Height"];
+                    $width = $imageInfo["Width"];
                 } else {
                     [$width, $height] = getimagesize($image);
                 }
 
-                $diag = (int)floor(sqrt(($width * $width) + ($height * $height)));
+                $diag = (int) floor(sqrt($width * $width + $height * $height));
 
                 if (!$width || !$height) {
                     continue;
@@ -757,7 +783,6 @@ if (!function_exists('domGetImages')) {
                     $imageSort[$diag][] = $image;
                 }
 
-
                 $i++;
 
                 if ($i > $maxImages) {
@@ -777,7 +802,7 @@ if (!function_exists('domGetImages')) {
     }
 }
 
-if (!function_exists('forceIPv4')) {
+if (!function_exists("forceIPv4")) {
     /**
      * Force a string into ipv4 notation.
      *
@@ -787,32 +812,34 @@ if (!function_exists('forceIPv4')) {
      *
      * @deprecated we are now storing IPV6, IPV4 notation is not required
      */
-    function forceIPv4($iP) {
-        if ($iP === '::1') {
-            return '127.0.0.1';
-        } elseif (strpos($iP, ':') === true) {
-            return '0.0.0.1';
-        } elseif (strpos($iP, '.') === false) {
-            return '0.0.0.2';
+    function forceIPv4($iP)
+    {
+        if ($iP === "::1") {
+            return "127.0.0.1";
+        } elseif (strpos($iP, ":") === true) {
+            return "0.0.0.1";
+        } elseif (strpos($iP, ".") === false) {
+            return "0.0.0.2";
         } else {
             return substr($iP, 0, 15);
         }
     }
 }
 
-if (!function_exists('ForeignIDHash')) {
+if (!function_exists("ForeignIDHash")) {
     /**
      * If a ForeignID is longer than 32 characters, use its hash instead.
      *
      * @param string $foreignID The current foreign ID value.
      * @return string Returns a string that is 32 characters or less.
      */
-    function foreignIDHash($foreignID) {
+    function foreignIDHash($foreignID)
+    {
         return strlen($foreignID) > 32 ? md5($foreignID) : $foreignID;
     }
 }
 
-if (!function_exists('forceBool')) {
+if (!function_exists("forceBool")) {
     /**
      * Force a mixed value to a boolean.
      *
@@ -822,20 +849,21 @@ if (!function_exists('forceBool')) {
      * @param mixed $false The value to return for false.
      * @return mixed Returns {@link $true} if the value is true or {@link $false} otherwiese.
      */
-    function forceBool($value, $defaultValue = false, $true = true, $false = false) {
+    function forceBool($value, $defaultValue = false, $true = true, $false = false)
+    {
         if (is_bool($value)) {
             return $value ? $true : $false;
         } elseif (is_numeric($value)) {
             return $value == 0 ? $false : $true;
         } elseif (is_string($value)) {
-            return strtolower($value) == 'true' ? $true : $false;
+            return strtolower($value) == "true" ? $true : $false;
         } else {
             return $defaultValue;
         }
     }
 }
 
-if (!function_exists('getConnectionString')) {
+if (!function_exists("getConnectionString")) {
     /**
      * Construct a PDO connection string.
      *
@@ -844,29 +872,31 @@ if (!function_exists('getConnectionString')) {
      * @param string $serverType The type of database server.
      * @return string Returns the PDO connection string.
      */
-    function getConnectionString($databaseName, $hostName = 'localhost', $serverType = 'mysql') {
-        $hostName = explode(':', $hostName);
-        $port = count($hostName) == 2 ? $hostName[1] : '';
+    function getConnectionString($databaseName, $hostName = "localhost", $serverType = "mysql")
+    {
+        $hostName = explode(":", $hostName);
+        $port = count($hostName) == 2 ? $hostName[1] : "";
         $hostName = $hostName[0];
-        $string = $serverType.':host='.$hostName;
-        if ($port != '') {
-            $string .= ';port='.$port;
+        $string = $serverType . ":host=" . $hostName;
+        if ($port != "") {
+            $string .= ";port=" . $port;
         }
-        $string .= ';dbname='.$databaseName;
+        $string .= ";dbname=" . $databaseName;
 
         return $string;
     }
 }
 
-if (!function_exists('getAllMentions')) {
+if (!function_exists("getAllMentions")) {
     /**
      * Parses a string for all mentioned usernames and returns an array of these usernames.
      *
      * @param string $str The string to parse.
      * @return array The mentioned usernames.
      */
-    function getAllMentions($str) {
-        $parts = preg_split('`\B@`', $str);
+    function getAllMentions($str)
+    {
+        $parts = preg_split("`\B@`", $str);
         $mentions = [];
         if (count($parts) == 1) {
             return [];
@@ -889,7 +919,7 @@ if (!function_exists('getAllMentions')) {
             }
             if (!$mention && !empty($part)) {
                 // Unquoted mention.
-                $parts2 = preg_split('`([\s.,;?!:])`', $part, 2, PREG_SPLIT_DELIM_CAPTURE);
+                $parts2 = preg_split("`([\s.,;?!:])`", $part, 2, PREG_SPLIT_DELIM_CAPTURE);
                 $mention = $parts2[0];
             }
 
@@ -903,7 +933,7 @@ if (!function_exists('getAllMentions')) {
     }
 }
 
-if (!function_exists('getValueR')) {
+if (!function_exists("getValueR")) {
     /**
      * Return the value from an associative array or an object.
      *
@@ -915,8 +945,9 @@ if (!function_exists('getValueR')) {
      * @param mixed $default The value to return if the key does not exist.
      * @return mixed The value from the array or object.
      */
-    function getValueR($key, $collection, $default = false) {
-        $path = explode('.', $key);
+    function getValueR($key, $collection, $default = false)
+    {
+        $path = explode(".", $key);
 
         $value = $collection;
         for ($i = 0; $i < count($path); ++$i) {
@@ -934,7 +965,7 @@ if (!function_exists('getValueR')) {
     }
 }
 
-if (!function_exists('htmlEntityDecode')) {
+if (!function_exists("htmlEntityDecode")) {
     /**
      * Decode all of the entities out of an HTML string.
      *
@@ -944,13 +975,18 @@ if (!function_exists('htmlEntityDecode')) {
      * @return string Returns {@link $string} with HTML entities decoded.
      * @since 2.1
      */
-    function htmlEntityDecode($string, $quote_style = ENT_QUOTES, $charset = "utf-8") {
+    function htmlEntityDecode($string, $quote_style = ENT_QUOTES, $charset = "utf-8")
+    {
         $string = html_entity_decode($string, $quote_style, $charset);
-        $string = str_ireplace('&apos;', "'", $string);
-        $string = preg_replace_callback('/&#x([0-9a-fA-F]+);/i', "chr_utf8_callback", $string);
-        $string = preg_replace_callback('/&#([0-9]+);/', function ($matches) {
-            return chr_utf8($matches[1]);
-        }, $string);
+        $string = str_ireplace("&apos;", "'", $string);
+        $string = preg_replace_callback("/&#x([0-9a-fA-F]+);/i", "chr_utf8_callback", $string);
+        $string = preg_replace_callback(
+            "/&#([0-9]+);/",
+            function ($matches) {
+                return chr_utf8($matches[1]);
+            },
+            $string
+        );
         return $string;
     }
 
@@ -961,7 +997,8 @@ if (!function_exists('htmlEntityDecode')) {
      * @return string Returns the match passed through {@link chr_utf8()}.
      * @access private
      */
-    function chr_utf8_callback($matches) {
+    function chr_utf8_callback($matches)
+    {
         return chr_utf8(hexdec($matches[1]));
     }
 
@@ -971,28 +1008,28 @@ if (!function_exists('htmlEntityDecode')) {
      * @param mixed $num A UTF-8 character code.
      * @return string Returns a UTF-8 string representation of {@link $num}.
      */
-    function chr_utf8($num) {
+    function chr_utf8($num)
+    {
         if ($num < 128) {
             return chr($num);
         }
         if ($num < 2048) {
-            return chr(($num >> 6) + 192).chr(($num & 63) + 128);
+            return chr(($num >> 6) + 192) . chr(($num & 63) + 128);
         }
         if ($num < 65536) {
-            return chr(($num >> 12) + 224).chr((($num >> 6) & 63) + 128).chr(($num & 63) + 128);
+            return chr(($num >> 12) + 224) . chr((($num >> 6) & 63) + 128) . chr(($num & 63) + 128);
         }
         if ($num < 2097152) {
-            return
-                chr(($num >> 18) + 240).
-                chr((($num >> 12) & 63) + 128).
-                chr((($num >> 6) & 63) + 128).
+            return chr(($num >> 18) + 240) .
+                chr((($num >> 12) & 63) + 128) .
+                chr((($num >> 6) & 63) + 128) .
                 chr(($num & 63) + 128);
         }
-        return '';
+        return "";
     }
 }
 
-if (!function_exists('htmlEsc')) {
+if (!function_exists("htmlEsc")) {
     /**
      * Alias htmlspecialchars() for code brevity.
      *
@@ -1000,12 +1037,13 @@ if (!function_exists('htmlEsc')) {
      * @param int $flags See: htmlspecialchars().
      * @return string|array Escaped string or array.
      */
-    function htmlEsc($string, $flags = ENT_COMPAT) {
-        return htmlspecialchars($string, $flags, 'UTF-8');
+    function htmlEsc($string, $flags = ENT_COMPAT)
+    {
+        return htmlspecialchars($string, $flags, "UTF-8");
     }
 }
 
-if (!function_exists('implodeAssoc')) {
+if (!function_exists("implodeAssoc")) {
     /**
      * A version of implode() that operates on array keys and values.
      *
@@ -1014,21 +1052,22 @@ if (!function_exists('implodeAssoc')) {
      * @param array $array The array to implode.
      * @return string The imploded array.
      */
-    function implodeAssoc($keyGlue, $elementGlue, $array) {
-        $result = '';
+    function implodeAssoc($keyGlue, $elementGlue, $array)
+    {
+        $result = "";
 
         foreach ($array as $key => $value) {
             if (strlen($result) > 0) {
                 $result .= $elementGlue;
             }
 
-            $result .= $key.$keyGlue.$value;
+            $result .= $key . $keyGlue . $value;
         }
         return $result;
     }
 }
 
-if (!function_exists('inArrayI')) {
+if (!function_exists("inArrayI")) {
     /**
      * Case-insensitive version of php's native in_array function.
      *
@@ -1036,7 +1075,8 @@ if (!function_exists('inArrayI')) {
      * @param array $haystack The array to search.
      * @return bool Returns true if the value is found in the array.
      */
-    function inArrayI($needle, $haystack) {
+    function inArrayI($needle, $haystack)
+    {
         $needle = strtolower($needle);
         foreach ($haystack as $item) {
             if (strtolower($item) == $needle) {
@@ -1047,7 +1087,7 @@ if (!function_exists('inArrayI')) {
     }
 }
 
-if (!function_exists('inSubArray')) {
+if (!function_exists("inSubArray")) {
     /**
      * Loop through {@link $haystack} looking for subarrays that contain {@link $needle}.
      *
@@ -1055,7 +1095,8 @@ if (!function_exists('inSubArray')) {
      * @param array $haystack The array to search.
      * @return bool Returns true if the value is found in the array.
      */
-    function inSubArray($needle, $haystack) {
+    function inSubArray($needle, $haystack)
+    {
         foreach ($haystack as $key => $val) {
             if (is_array($val) && in_array($needle, $val)) {
                 return true;
@@ -1065,15 +1106,16 @@ if (!function_exists('inSubArray')) {
     }
 }
 
-if (!function_exists('ipDecode')) {
+if (!function_exists("ipDecode")) {
     /**
      * Decode a packed IP address to its human-readable form.
      *
      * @param string $packedIP A string representing a packed IP address.
      * @return string|null A human-readable representation of the provided IP address.
      */
-    function ipDecode($packedIP) {
-        if (filter_var($packedIP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6)) {
+    function ipDecode($packedIP)
+    {
+        if (filter_var($packedIP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
             // If it's already a valid IP address, don't bother unpacking it.
             $result = $packedIP;
         } elseif ($iP = @inet_ntop($packedIP)) {
@@ -1086,14 +1128,15 @@ if (!function_exists('ipDecode')) {
     }
 }
 
-if (!function_exists('ipEncode')) {
+if (!function_exists("ipEncode")) {
     /**
      * Encode a human-readable IP address as a packed string.
      *
      * @param string $iP A human-readable IP address.
      * @return null|string A packed string representing a packed IP address.
      */
-    function ipEncode($iP) {
+    function ipEncode($iP)
+    {
         $result = null;
 
         if ($packedIP = @inet_pton($iP)) {
@@ -1104,23 +1147,20 @@ if (!function_exists('ipEncode')) {
     }
 }
 
-if (!function_exists('isTimestamp')) {
+if (!function_exists("isTimestamp")) {
     /**
      * Check to make sure a value is a valid timestamp.
      *
      * @param int $stamp The timestamp to check.
      * @return bool Returns true if {@link $stamp} is valid or false otherwise.
      */
-    function isTimestamp($stamp) {
-        return checkdate(
-            @date("m", $stamp),
-            @date("d", $stamp),
-            @date("Y", $stamp)
-        );
+    function isTimestamp($stamp)
+    {
+        return checkdate(@date("m", $stamp), @date("d", $stamp), @date("Y", $stamp));
     }
 }
 
-if (!function_exists('isUrl')) {
+if (!function_exists("isUrl")) {
     /**
      * Determine whether or not a string is a url in the form http://, https://, or //.
      *
@@ -1128,28 +1168,30 @@ if (!function_exists('isUrl')) {
      * @return bool
      * @since 2.1
      */
-    function isUrl($str) {
+    function isUrl($str)
+    {
         if (!$str) {
             return false;
         }
-        if (substr($str, 0, 2) == '//') {
+        if (substr($str, 0, 2) == "//") {
             return true;
         }
-        if (preg_match('`^https?://`i', $str)) {
+        if (preg_match("`^https?://`i", $str)) {
             return true;
         }
         return false;
     }
 }
 
-if (!function_exists('isExternalUrl')) {
+if (!function_exists("isExternalUrl")) {
     /**
      * Determine if provided url is external.
      *
      * @param string $url
      * @return bool
      */
-    function isExternalUrl(string $url): bool {
+    function isExternalUrl(string $url): bool
+    {
         $urlHost = parse_url($url, PHP_URL_HOST);
 
         // If the link doesn't specify a host, the link is internal.
@@ -1157,12 +1199,12 @@ if (!function_exists('isExternalUrl')) {
             return false;
         } else {
             // If the link's url is different from the host, it's external.
-            return ($urlHost !== Gdn::Request()->host());
+            return $urlHost !== Gdn::Request()->host();
         }
     }
 }
 
-if (!function_exists('isWritable')) {
+if (!function_exists("isWritable")) {
     /**
      * Determine whether or not a path is writable.
      *
@@ -1175,16 +1217,17 @@ if (!function_exists('isWritable')) {
      * @param string $path The past to test.
      * @return bool Returns true if {@link $path} is writable or false otherwise.
      */
-    function isWritable($path) {
+    function isWritable($path)
+    {
         if (substr($path, -1) === DS) {
             // Recursively return a temporary file path
-            return isWritable($path.uniqid(mt_rand()).'.tmp');
+            return isWritable($path . uniqid(mt_rand()) . ".tmp");
         } elseif (is_dir($path)) {
-            return isWritable($path.'/'.uniqid(mt_rand()).'.tmp');
+            return isWritable($path . "/" . uniqid(mt_rand()) . ".tmp");
         }
         // Check tmp file for read/write capabilities
         $keepPath = file_exists($path);
-        $file = @fopen($path, 'a');
+        $file = @fopen($path, "a");
         if ($file === false) {
             return false;
         }
@@ -1199,14 +1242,15 @@ if (!function_exists('isWritable')) {
     }
 }
 
-if (!function_exists('jsonFilter')) {
+if (!function_exists("jsonFilter")) {
     /**
      * Prepare data for json_encode.
      *
      * @param mixed $value
      */
-    function jsonFilter(&$value) {
-        $fn = function (&$value, $key = '', $parentKey = '') use (&$fn) {
+    function jsonFilter(&$value)
+    {
+        $fn = function (&$value, $key = "", $parentKey = "") use (&$fn) {
             if (is_array($value)) {
                 array_walk($value, function (&$childValue, $childKey) use ($fn, $key) {
                     $fn($childValue, $childKey, $key);
@@ -1215,7 +1259,7 @@ if (!function_exists('jsonFilter')) {
                 $value = $value->format(\DateTime::RFC3339);
             } elseif (is_string($value)) {
                 // Only attempt to unpack as an IP address if this field or its parent matches the IP field naming scheme.
-                $isIPField = (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parentKey, 'IPAddresses', true));
+                $isIPField = stringEndsWith($key, "IPAddress", true) || stringEndsWith($parentKey, "IPAddresses", true);
                 if ($isIPField && ($ip = ipDecode($value)) !== null) {
                     $value = $ip;
                 }
@@ -1230,18 +1274,19 @@ if (!function_exists('jsonFilter')) {
     }
 }
 
-if (!function_exists('now')) {
+if (!function_exists("now")) {
     /**
      * Get the current time in seconds with a millisecond fraction.
      *
      * @return float Returns the current time.
      */
-    function now() {
+    function now()
+    {
         return microtime(true);
     }
 }
 
-if (!function_exists('offsetLimit')) {
+if (!function_exists("offsetLimit")) {
     /**
      * Convert various forms of querystring limit/offset, page, limit/range to database limit/offset.
      *
@@ -1255,28 +1300,29 @@ if (!function_exists('offsetLimit')) {
      * @return array Returns an array in the form: `[$offset, $limit]`.
      * @throws Exception Throws a 404 exception if the {@link $offsetOrPage} is too high and {@link $throw} is true.
      */
-    function offsetLimit($offsetOrPage = '', $limitOrPageSize = '', $throw = false) {
-        $limitOrPageSize = is_numeric($limitOrPageSize) ? (int)$limitOrPageSize : 50;
+    function offsetLimit($offsetOrPage = "", $limitOrPageSize = "", $throw = false)
+    {
+        $limitOrPageSize = is_numeric($limitOrPageSize) ? (int) $limitOrPageSize : 50;
 
         if (is_numeric($offsetOrPage)) {
-            $offset = (int)$offsetOrPage;
+            $offset = (int) $offsetOrPage;
             $limit = $limitOrPageSize;
-        } elseif (preg_match('/p(\d+)/i', $offsetOrPage, $matches)) {
+        } elseif (preg_match("/p(\d+)/i", $offsetOrPage, $matches)) {
             $page = $matches[1];
             $offset = $limitOrPageSize * ($page - 1);
             $limit = $limitOrPageSize;
-        } elseif (preg_match('/(\d+)-(\d+)/', $offsetOrPage, $matches)) {
+        } elseif (preg_match("/(\d+)-(\d+)/", $offsetOrPage, $matches)) {
             $offset = $matches[1] - 1;
             $limit = $matches[2] - $matches[1] + 1;
-        } elseif (preg_match('/(\d+)lim(\d*)/i', $offsetOrPage, $matches)) {
-            $offset = (int)$matches[1];
-            $limit = (int)$matches[2];
+        } elseif (preg_match("/(\d+)lim(\d*)/i", $offsetOrPage, $matches)) {
+            $offset = (int) $matches[1];
+            $limit = (int) $matches[2];
             if (!is_numeric($limit)) {
                 $limit = $limitOrPageSize;
             }
-        } elseif (preg_match('/(\d+)lin(\d*)/i', $offsetOrPage, $matches)) {
+        } elseif (preg_match("/(\d+)lin(\d*)/i", $offsetOrPage, $matches)) {
             $offset = $matches[1] - 1;
-            $limit = (int)$matches[2];
+            $limit = (int) $matches[2];
             if (!is_numeric($limit)) {
                 $limit = $limitOrPageSize;
             }
@@ -1299,7 +1345,7 @@ if (!function_exists('offsetLimit')) {
     }
 }
 
-if (!function_exists('pageNumber')) {
+if (!function_exists("pageNumber")) {
     /**
      * Get the page number from a database offset and limit.
      *
@@ -1310,100 +1356,105 @@ if (!function_exists('pageNumber')) {
      *  - string: The prefix for the page number.
      * @param bool $first Whether or not to return the page number if it is the first page.
      */
-    function pageNumber($offset, $limit, $urlParam = false, $first = true) {
-        $result = floor($offset / $limit) + 1;
+    function pageNumber($offset, $limit, $urlParam = false, $first = true)
+    {
+        $result = !empty($limit) ? floor($offset / $limit) + 1 : 1;
 
         if ($urlParam !== false && !$first && $result == 1) {
-            $result = '';
+            $result = "";
         } elseif ($urlParam === true) {
-            $result = 'p'.$result;
+            $result = "p" . $result;
         } elseif (is_string($urlParam)) {
-            $result = $urlParam.$result;
+            $result = $urlParam . $result;
         }
 
         return $result;
     }
 }
 
-if (!function_exists('write_ini_string')) {
+if (!function_exists("write_ini_string")) {
     /**
      * Formats an array in INI format.
      *
      * @param array $data The data to format.
      * @return string Returns the {@link $data} array in INI format.
      */
-    function write_ini_string($data) {
+    function write_ini_string($data)
+    {
         $flat = [];
         foreach ($data as $topic => $settings) {
             if (is_array($settings)) {
                 $flat[] = "[{$topic}]";
                 foreach ($settings as $settingsKey => $settingsVal) {
-                    $flat[] = "{$settingsKey} = ".(is_numeric($settingsVal) ? $settingsVal : '"'.$settingsVal.'"');
+                    $flat[] =
+                        "{$settingsKey} = " . (is_numeric($settingsVal) ? $settingsVal : '"' . $settingsVal . '"');
                 }
                 $flat[] = "";
             } else {
-                $flat[] = "{$topic} = ".(is_numeric($settings) ? $settings : '"'.$settings.'"');
+                $flat[] = "{$topic} = " . (is_numeric($settings) ? $settings : '"' . $settings . '"');
             }
         }
         return implode("\n", $flat);
     }
 }
 
-if (!function_exists('buildUrl')) {
+if (!function_exists("buildUrl")) {
     /**
      * Complementary to {@link parseUrl()}, this function puts the pieces back together and returns a valid url.
      *
      * @param array $parts The ParseUrl array to build.
      */
-    function buildUrl($parts) {
+    function buildUrl($parts)
+    {
         // Full format: http://user:pass@hostname:port/path?querystring#fragment
-        $return = $parts['scheme'].'://';
-        if ($parts['user'] != '' || $parts['pass'] != '') {
-            $return .= $parts['user'].':'.$parts['pass'].'@';
+        $return = $parts["scheme"] . "://";
+        if ($parts["user"] != "" || $parts["pass"] != "") {
+            $return .= $parts["user"] . ":" . $parts["pass"] . "@";
         }
 
-        $return .= $parts['host'];
+        $return .= $parts["host"];
         // Custom port?
-        if ($parts['port'] == '443' && $parts['scheme'] == 'https') {
-        } elseif ($parts['port'] == '80' && $parts['scheme'] == 'http') {
-        } elseif ($parts['port'] != '') {
-            $return .= ':'.$parts['port'];
+        if ($parts["port"] == "443" && $parts["scheme"] == "https") {
+        } elseif ($parts["port"] == "80" && $parts["scheme"] == "http") {
+        } elseif ($parts["port"] != "") {
+            $return .= ":" . $parts["port"];
         }
 
-        if ($parts['path'] != '') {
-            if (substr($parts['path'], 0, 1) != '/') {
-                $return .= '/';
+        if ($parts["path"] != "") {
+            if (substr($parts["path"], 0, 1) != "/") {
+                $return .= "/";
             }
-            $return .= $parts['path'];
+            $return .= $parts["path"];
         }
-        if ($parts['query'] != '') {
-            $return .= '?'.$parts['query'];
+        if ($parts["query"] != "") {
+            $return .= "?" . $parts["query"];
         }
 
-        if ($parts['fragment'] != '') {
-            $return .= '#'.$parts['fragment'];
+        if ($parts["fragment"] != "") {
+            $return .= "#" . $parts["fragment"];
         }
 
         return $return;
     }
 }
 
-if (!function_exists('prefixString')) {
+if (!function_exists("prefixString")) {
     /**
      * Takes a string, and prefixes it with $prefix unless it is already prefixed that way.
      *
      * @param string $prefix The prefix to use.
      * @param string $string The string to be prefixed.
      */
-    function prefixString($prefix, $string) {
+    function prefixString($prefix, $string)
+    {
         if (substr($string, 0, strlen($prefix)) != $prefix) {
-            $string = $prefix.$string;
+            $string = $prefix . $string;
         }
         return $string;
     }
 }
 
-if (!function_exists('randomString')) {
+if (!function_exists("randomString")) {
     /**
      * Generate a random string of characters.
      *
@@ -1411,12 +1462,13 @@ if (!function_exists('randomString')) {
      * @param string $characters The allowed characters in the string. See {@link betterRandomString()} for character options.
      * @return string Returns a random string of characters.
      */
-    function randomString($length, $characters = 'A0') {
+    function randomString($length, $characters = "A0")
+    {
         return betterRandomString($length, $characters);
     }
 }
 
-if (!function_exists('betterRandomString')) {
+if (!function_exists("betterRandomString")) {
     /**
      * Generate a random string of characters with additional character options that can be cryptographically strong.
      *
@@ -1435,19 +1487,20 @@ if (!function_exists('betterRandomString')) {
      * You can also pass a string of all allowed characters in the string if you pass a string of more than four characters.
      * @return string Returns the random string for the given arguments.
      */
-    function betterRandomString($length, $characterOptions = 'A0') {
+    function betterRandomString($length, $characterOptions = "A0")
+    {
         $characterClasses = [
-            'A' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-            'a' => 'abcdefghijklmnopqrstuvwxyz',
-            '0' => '0123456789',
-            '!' => '~!@#$^&*_+-'
+            "A" => "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+            "a" => "abcdefghijklmnopqrstuvwxyz",
+            "0" => "0123456789",
+            "!" => '~!@#$^&*_+-',
         ];
 
         if (strlen($characterOptions) > count($characterClasses)) {
             $characters = $characterOptions;
         } else {
             $characterOptionsArray = str_split($characterOptions, 1);
-            $characters = '';
+            $characters = "";
 
             foreach ($characterOptionsArray as $char) {
                 if (array_key_exists($char, $characterClasses)) {
@@ -1460,11 +1513,11 @@ if (!function_exists('betterRandomString')) {
         $randomChars = [];
         $cryptoStrong = false;
 
-        if (function_exists('openssl_random_pseudo_bytes')) {
-            $randomChars = unpack('C*', openssl_random_pseudo_bytes($length, $cryptoStrong));
-        } elseif (function_exists('mcrypt_create_iv')) {
+        if (function_exists("openssl_random_pseudo_bytes")) {
+            $randomChars = unpack("C*", openssl_random_pseudo_bytes($length, $cryptoStrong));
+        } elseif (function_exists("mcrypt_create_iv")) {
             // @codeCoverageIgnoreStart
-            $randomChars = unpack('C*', mcrypt_create_iv($length));
+            $randomChars = unpack("C*", mcrypt_create_iv($length));
             $cryptoStrong = true;
             // @codeCoverageIgnoreEnd
         } elseif (function_exists("random_bytes")) {
@@ -1480,15 +1533,15 @@ if (!function_exists('betterRandomString')) {
             // @codeCoverageIgnoreEnd
         }
 
-        $string = '';
+        $string = "";
         foreach ($randomChars as $c) {
-            $offset = (int)$c % $charLen;
+            $offset = (int) $c % $charLen;
             $string .= substr($characters, $offset, 1);
         }
 
         if (!$cryptoStrong) {
             // @codeCoverageIgnoreStart
-            Logger::log(Logger::WARNING, 'Random number generation is not cryptographically strong.');
+            Logger::log(Logger::WARNING, "Random number generation is not cryptographically strong.");
             // @codeCoverageIgnoreEnd
         }
 
@@ -1496,7 +1549,7 @@ if (!function_exists('betterRandomString')) {
     }
 }
 
-if (!function_exists('reflectArgs')) {
+if (!function_exists("reflectArgs")) {
     /**
      * Reflect the arguments on a callback and returns them as an associative array.
      *
@@ -1505,7 +1558,8 @@ if (!function_exists('reflectArgs')) {
      * @param array $args2 An optional other array of arguments.
      * @return array The arguments in an associative array, in order ready to be passed to call_user_func_array().
      */
-    function reflectArgs($callback, $args1, $args2 = null) {
+    function reflectArgs($callback, $args1, $args2 = null)
+    {
         if (is_string($callback) && !function_exists($callback)) {
             throw new Exception("Function $callback does not exist");
         }
@@ -1528,7 +1582,7 @@ if (!function_exists('reflectArgs')) {
         }
 
         if ($meth instanceof ReflectionMethod) {
-            $methName = $meth->getDeclaringClass()->getName().'::'.$meth->getName();
+            $methName = $meth->getDeclaringClass()->getName() . "::" . $meth->getName();
         } else {
             $methName = $meth->getName();
         }
@@ -1551,7 +1605,7 @@ if (!function_exists('reflectArgs')) {
                 $paramValue = $methParam->getDefaultValue();
             } else {
                 $paramValue = null;
-                $missingArgs[] = '$'.$paramName;
+                $missingArgs[] = '$' . $paramName;
             }
 
             $args[$paramName] = $paramValue;
@@ -1563,14 +1617,17 @@ if (!function_exists('reflectArgs')) {
         }
 
         if (count($missingArgs) > 0) {
-            trigger_error("$methName() expects the following parameters: ".implode(', ', $missingArgs).'.', E_USER_NOTICE);
+            trigger_error(
+                "$methName() expects the following parameters: " . implode(", ", $missingArgs) . ".",
+                E_USER_NOTICE
+            );
         }
 
         return $args;
     }
 }
 
-if (!function_exists('removeKeysFromNestedArray')) {
+if (!function_exists("removeKeysFromNestedArray")) {
     /**
      * Recursively remove a set of keys from an array.
      *
@@ -1578,7 +1635,8 @@ if (!function_exists('removeKeysFromNestedArray')) {
      * @param array[string|int] $matches An array of keys to remove.
      * @return array Returns a copy of {@link $array} with the keys removed.
      */
-    function removeKeysFromNestedArray($array, $matches) {
+    function removeKeysFromNestedArray($array, $matches)
+    {
         if (is_array($array)) {
             foreach ($array as $key => $value) {
                 $isMatch = false;
@@ -1611,7 +1669,7 @@ if (!function_exists('removeKeysFromNestedArray')) {
     }
 }
 
-if (!function_exists('safeGlob')) {
+if (!function_exists("safeGlob")) {
     /**
      * A version of {@link glob()} that always returns an array.
      *
@@ -1619,7 +1677,8 @@ if (!function_exists('safeGlob')) {
      * @param string[] $extensions An array of file extensions to whitelist.
      * @return string[] Returns an array of paths that match the glob.
      */
-    function safeGlob($pattern, $extensions = []) {
+    function safeGlob($pattern, $extensions = [])
+    {
         $result = glob($pattern, GLOB_NOSORT);
         if (!is_array($result)) {
             $result = [];
@@ -1641,7 +1700,7 @@ if (!function_exists('safeGlob')) {
     }
 }
 
-if (!function_exists('safeImage')) {
+if (!function_exists("safeImage")) {
     /**
      * Examines the provided url & checks to see if there is a valid image on the other side. Optionally you can specify minimum dimensions.
      *
@@ -1650,7 +1709,8 @@ if (!function_exists('safeImage')) {
      * @param int $minWidth Minimum width (in pixels) of image. 0 means any width.
      * @return mixed The url of the image if safe, false otherwise.
      */
-    function safeImage($imageUrl, $minHeight = 0, $minWidth = 0) {
+    function safeImage($imageUrl, $minHeight = 0, $minWidth = 0)
+    {
         try {
             [$width, $height, $_, $_] = getimagesize($imageUrl);
             if ($minHeight > 0 && $minHeight > $height) {
@@ -1667,14 +1727,15 @@ if (!function_exists('safeImage')) {
     }
 }
 
-if (!function_exists('safeUnlink')) {
+if (!function_exists("safeUnlink")) {
     /**
      * A version of {@link unlink()} that won't raise a warning.
      *
      * @param string $filename Path to the file.
      * @return bool TRUE on success or FALSE on failure.
      */
-    function safeUnlink($filename) {
+    function safeUnlink($filename)
+    {
         try {
             $r = unlink($filename);
             return $r;
@@ -1684,7 +1745,7 @@ if (!function_exists('safeUnlink')) {
     }
 }
 
-if (!function_exists('sliceParagraph')) {
+if (!function_exists("sliceParagraph")) {
     /**
      * Slices a string at a paragraph.
      *
@@ -1700,7 +1761,8 @@ if (!function_exists('sliceParagraph')) {
      * @param string $suffix The suffix if the string must be sliced mid-sentence.
      * @return string
      */
-    function sliceParagraph($string, $limits = 500, $suffix = '…') {
+    function sliceParagraph($string, $limits = 500, $suffix = "…")
+    {
         if (is_int($limits)) {
             $limits = [$limits, 32];
         }
@@ -1709,23 +1771,23 @@ if (!function_exists('sliceParagraph')) {
             return $string;
         }
 
-//      $String = preg_replace('`\s+\n`', "\n", $String);
+        //      $String = preg_replace('`\s+\n`', "\n", $String);
 
         // See if there is a paragraph.
-        $pos = strrpos(sliceString($string, $maxLength, ''), "\n\n");
+        $pos = strrpos(sliceString($string, $maxLength, ""), "\n\n");
 
         if ($pos === false || $pos < $minLength) {
             // There was no paragraph so try and split on sentences.
-            $sentences = preg_split('`([.!?:]\s+)`', $string, null, PREG_SPLIT_DELIM_CAPTURE);
+            $sentences = preg_split("`([.!?:]\s+)`", $string, null, PREG_SPLIT_DELIM_CAPTURE);
 
-            $result = '';
+            $result = "";
             if (count($sentences) > 1) {
-                $result = $sentences[0].$sentences[1];
+                $result = $sentences[0] . $sentences[1];
 
                 for ($i = 2; $i < count($sentences); $i++) {
                     $sentence = $sentences[$i];
 
-                    if ((strlen($result) + strlen($sentence)) <= $maxLength || preg_match('`[.!?:]\s+`', $sentence)) {
+                    if (strlen($result) + strlen($sentence) <= $maxLength || preg_match("`[.!?:]\s+`", $sentence)) {
                         $result .= $sentence;
                     } else {
                         break;
@@ -1738,9 +1800,9 @@ if (!function_exists('sliceParagraph')) {
             }
 
             // There was no sentence. Slice off the last word and call it a day.
-            $pos = strrpos(sliceString($string, $maxLength, ''), ' ');
+            $pos = strrpos(sliceString($string, $maxLength, ""), " ");
             if ($pos === false) {
-                return $string.$suffix;
+                return $string . $suffix;
             } else {
                 return sliceString($string, $pos + 1, $suffix);
             }
@@ -1750,7 +1812,7 @@ if (!function_exists('sliceParagraph')) {
     }
 }
 
-if (!function_exists('sliceString')) {
+if (!function_exists("sliceString")) {
     /**
      * Slice a string, trying to account for multi-byte character sets if support is provided.
      *
@@ -1759,23 +1821,24 @@ if (!function_exists('sliceString')) {
      * @param string $suffix The suffix to add to the string if it is longer than {@link $length}.
      * @return string Returns a copy of {@link $string} appropriately sliced.
      */
-    function sliceString($string, $length, $suffix = '…') {
+    function sliceString($string, $length, $suffix = "…")
+    {
         if (!$length) {
             return $string;
         }
 
-        if (function_exists('mb_strimwidth')) {
-            return mb_strimwidth($string, 0, $length, $suffix, 'utf-8');
+        if (function_exists("mb_strimwidth")) {
+            return mb_strimwidth($string, 0, $length, $suffix, "utf-8");
         } else {
             // @codeCoverageIgnoreStart
             $trim = substr($string, 0, $length);
-            return $trim.((strlen($trim) != strlen($string)) ? $suffix : '');
+            return $trim . (strlen($trim) != strlen($string) ? $suffix : "");
             // @codeCoverageIgnoreEnd
         }
     }
 }
 
-if (!function_exists('stringBeginsWith')) {
+if (!function_exists("stringBeginsWith")) {
     /**
      * Checks whether or not string A begins with string B.
      *
@@ -1785,7 +1848,8 @@ if (!function_exists('stringBeginsWith')) {
      * @param bool $trim Whether or not to trim $B off of $A if it is found.
      * @return bool|string Returns true/false unless $trim is true.
      */
-    function stringBeginsWith($haystack, $needle, $caseInsensitive = false, $trim = false) {
+    function stringBeginsWith($haystack, $needle, $caseInsensitive = false, $trim = false)
+    {
         if (strlen($haystack) < strlen($needle)) {
             return $trim ? $haystack : false;
         } elseif (strlen($needle) == 0) {
@@ -1803,7 +1867,7 @@ if (!function_exists('stringBeginsWith')) {
     }
 }
 
-if (!function_exists('stringEndsWith')) {
+if (!function_exists("stringEndsWith")) {
     /**
      * Checks whether or not string A ends with string B.
      *
@@ -1813,7 +1877,8 @@ if (!function_exists('stringEndsWith')) {
      * @param bool $trim Whether or not to trim $B off of $A if it is found.
      * @return bool|string Returns true/false unless $trim is true.
      */
-    function stringEndsWith($haystack, $needle, $caseInsensitive = false, $trim = false) {
+    function stringEndsWith($haystack, $needle, $caseInsensitive = false, $trim = false)
+    {
         if (strlen($haystack) < strlen($needle)) {
             return $trim ? $haystack : false;
         } elseif (strlen($needle) == 0) {
@@ -1831,20 +1896,20 @@ if (!function_exists('stringEndsWith')) {
     }
 }
 
-if (!function_exists('stringIsNullOrEmpty')) {
+if (!function_exists("stringIsNullOrEmpty")) {
     /**
      * Checks whether or not a string is null or an empty string (after trimming).
      *
      * @param string $string The string to check.
      * @return bool
      */
-    function stringIsNullOrEmpty($string) {
-        return is_null($string) === true || (is_string($string) && trim($string) == '');
+    function stringIsNullOrEmpty($string)
+    {
+        return is_null($string) === true || (is_string($string) && trim($string) == "");
     }
 }
 
-
-if (!function_exists('setValue')) {
+if (!function_exists("setValue")) {
     /**
      * Set the value on an object/array.
      *
@@ -1852,7 +1917,8 @@ if (!function_exists('setValue')) {
      * @param mixed $haystack The array or object to set.
      * @param mixed $value The value to set.
      */
-    function setValue($needle, &$haystack, $value) {
+    function setValue($needle, &$haystack, $value)
+    {
         if (is_array($haystack)) {
             $haystack[$needle] = $value;
         } elseif (is_object($haystack)) {
@@ -1861,7 +1927,7 @@ if (!function_exists('setValue')) {
     }
 }
 
-if (!function_exists('touchValue')) {
+if (!function_exists("touchValue")) {
     /**
      * Set the value on an object/array if it doesn't already exist.
      *
@@ -1870,7 +1936,8 @@ if (!function_exists('touchValue')) {
      * @param mixed $default The value to set.
      * @return mixed Returns the existing or new value in the collection.
      */
-    function touchValue($key, &$collection, $default) {
+    function touchValue($key, &$collection, $default)
+    {
         if (is_array($collection) && !array_key_exists($key, $collection)) {
             $collection[$key] = $default;
         } elseif (is_object($collection) && !property_exists($collection, $key)) {
@@ -1881,7 +1948,7 @@ if (!function_exists('touchValue')) {
     }
 }
 
-if (!function_exists('touchFolder')) {
+if (!function_exists("touchFolder")) {
     /**
      * Ensure that a folder exists.
      *
@@ -1889,25 +1956,27 @@ if (!function_exists('touchFolder')) {
      * @param int $perms The permissions to put on the folder if creating it.
      * @since 2.1
      */
-    function touchFolder($path, $perms = 0777) {
+    function touchFolder($path, $perms = 0777)
+    {
         if (!file_exists($path)) {
             mkdir($path, $perms, true);
         }
     }
 }
 
-if (!function_exists('unicodeRegexSupport')) {
+if (!function_exists("unicodeRegexSupport")) {
     /**
      * Test for Unicode PCRE support. On non-UTF8 systems this will result in a blank string.
      *
      * @return bool
      */
-    function unicodeRegexSupport() {
-        return (preg_replace('`[\pP]`u', '', 'P') != '');
+    function unicodeRegexSupport()
+    {
+        return preg_replace("`[\pP]`u", "", "P") != "";
     }
 }
 
-if (!function_exists('slugify')) {
+if (!function_exists("slugify")) {
     /**
      * Converts a string to a slug-type string.
      *
@@ -1917,35 +1986,35 @@ if (!function_exists('slugify')) {
      * @param string $text The text to convert.
      * @return string mixed|string The slugified text.
      */
-    function slugify($text) {
+    function slugify($text)
+    {
         // replace non letter or digits by -
-        $text = preg_replace('/[^\pL\d]+/u', '-', $text);
+        $text = preg_replace("/[^\pL\d]+/u", "-", $text);
 
         // transliterate
-        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        $text = iconv("utf-8", "us-ascii//TRANSLIT", $text);
 
         // remove unwanted characters
-        $text = preg_replace('/[^-\w]+/', '', $text);
+        $text = preg_replace("/[^-\w]+/", "", $text);
 
         // trim
-        $text = trim($text, '-');
+        $text = trim($text, "-");
 
         // remove duplicate -
-        $text = preg_replace('/-+/', '-', $text);
+        $text = preg_replace("/-+/", "-", $text);
 
         // lowercase
         $text = strtolower($text);
 
         if (empty($text)) {
-            return 'n-a';
+            return "n-a";
         }
 
         return $text;
     }
 }
 
-if (!function_exists('urlMatch')) {
-
+if (!function_exists("urlMatch")) {
     /**
      * Match a URL against a pattern.
      *
@@ -1953,7 +2022,8 @@ if (!function_exists('urlMatch')) {
      * @param string $url The URL to test.
      * @return bool Returns **true** if {@link $url} matches against {@link $pattern} or **false** otherwise.
      */
-    function urlMatch($pattern, $url) {
+    function urlMatch($pattern, $url)
+    {
         if (empty($pattern)) {
             return false;
         }
@@ -1963,36 +2033,36 @@ if (!function_exists('urlMatch')) {
         if ($urlParts === false || $patternParts === false) {
             return false;
         }
-        $urlParts += ['scheme' => '', 'host' => '', 'path' => ''];
+        $urlParts += ["scheme" => "", "host" => "", "path" => ""];
 
         // Fix a pattern with no path.
-        if (empty($patternParts['host'])) {
-            $pathParts = explode('/', val('path', $patternParts), 2);
-            $patternParts['host'] = $pathParts[0];
-            $patternParts['path'] = '/'.trim(val(1, $pathParts), '/');
+        if (empty($patternParts["host"])) {
+            $pathParts = explode("/", val("path", $patternParts), 2);
+            $patternParts["host"] = $pathParts[0];
+            $patternParts["path"] = "/" . trim(val(1, $pathParts), "/");
         }
 
-        if (!empty($patternParts['scheme']) && $patternParts['scheme'] !== $urlParts['scheme']) {
+        if (!empty($patternParts["scheme"]) && $patternParts["scheme"] !== $urlParts["scheme"]) {
             return false;
         }
 
-        if (!empty($patternParts['host'])) {
-            $p = $patternParts['host'];
-            $host = $urlParts['host'];
+        if (!empty($patternParts["host"])) {
+            $p = $patternParts["host"];
+            $host = $urlParts["host"];
 
             if (!fnmatch($p, $host)) {
-                if (substr($p, 0, 2) !== '*.' || !fnmatch(substr($p, 2), $host)) {
+                if (substr($p, 0, 2) !== "*." || !fnmatch(substr($p, 2), $host)) {
                     return false;
                 }
             }
         }
 
-        if (!empty($patternParts['path']) && $patternParts['path'] !== '/') {
-            $p = $patternParts['path'];
-            $path = '/'.trim(val('path', $urlParts), '/');
+        if (!empty($patternParts["path"]) && $patternParts["path"] !== "/") {
+            $p = $patternParts["path"];
+            $path = "/" . trim(val("path", $urlParts), "/");
 
             if (!fnmatch($p, $path)) {
-                if (substr($p, -2) !== '/*' || !fnmatch(substr($p, 0, -2), $path)) {
+                if (substr($p, -2) !== "/*" || !fnmatch(substr($p, 0, -2), $path)) {
                     return false;
                 }
             }
@@ -2002,14 +2072,15 @@ if (!function_exists('urlMatch')) {
     }
 }
 
-if (!function_exists('walkAllRecursive')) {
+if (!function_exists("walkAllRecursive")) {
     /**
      * Recursively walk through all array elements or object properties.
      *
      * @param array|object $input
      * @param callable $callback
      */
-    function walkAllRecursive(&$input, $callback) {
+    function walkAllRecursive(&$input, $callback)
+    {
         $currentDepth = 0;
         $maxDepth = 128;
 
@@ -2017,7 +2088,7 @@ if (!function_exists('walkAllRecursive')) {
             $currentDepth++;
 
             if ($currentDepth > $maxDepth) {
-                throw new Exception('Maximum recursion depth exceeded.', 500);
+                throw new Exception("Maximum recursion depth exceeded.", 500);
             }
             foreach ($input as $key => &$val) {
                 if (is_array($val) || is_object($val)) {
@@ -2034,17 +2105,22 @@ if (!function_exists('walkAllRecursive')) {
     }
 }
 
-if (!function_exists('ipEncodeRecursive')) {
+if (!function_exists("ipEncodeRecursive")) {
     /**
      * Recursively walk through all array elements or object properties and encode IP fields.
      *
      * @param array|object $input
      * @return array|object
      */
-    function ipEncodeRecursive($input) {
+    function ipEncodeRecursive($input)
+    {
         walkAllRecursive($input, function (&$val, $key = null, $parent = null) {
             if (is_string($val)) {
-                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true) || $key === 'IP') {
+                if (
+                    stringEndsWith($key, "IPAddress", true) ||
+                    stringEndsWith($parent, "IPAddresses", true) ||
+                    $key === "IP"
+                ) {
                     $val = ipEncode($val);
                 }
             }
@@ -2053,17 +2129,22 @@ if (!function_exists('ipEncodeRecursive')) {
     }
 }
 
-if (!function_exists('ipDecodeRecursive')) {
+if (!function_exists("ipDecodeRecursive")) {
     /**
      * Recursively walk through all array elements or object properties and decode IP fields.
      *
      * @param array|object $input
      * @return array|object
      */
-    function ipDecodeRecursive($input) {
+    function ipDecodeRecursive($input)
+    {
         walkAllRecursive($input, function (&$val, $key = null, $parent = null) {
             if (is_string($val)) {
-                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true) || $key === 'IP') {
+                if (
+                    stringEndsWith($key, "IPAddress", true) ||
+                    stringEndsWith($parent, "IPAddresses", true) ||
+                    $key === "IP"
+                ) {
                     $val = ipDecode($val);
                 }
             }

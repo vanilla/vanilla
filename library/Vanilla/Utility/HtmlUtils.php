@@ -12,8 +12,8 @@ namespace Vanilla\Utility;
  *
  * DO NOT ADD PROPERTIES OR NON-STATIC METHODS TO THIS CLASS.
  */
-final class HtmlUtils {
-
+final class HtmlUtils
+{
     /** @var string[] Keep track of dom IDs */
     private static $domIDs = [];
 
@@ -23,22 +23,23 @@ final class HtmlUtils {
      * @param array $attributes The attribute array to format.
      * @return string Returns a string in ` attribute="value" attribute="value"` format.
      */
-    public static function attributes(array $attributes): string {
-        $result = '';
+    public static function attributes(array $attributes): string
+    {
+        $result = "";
 
         foreach ($attributes as $name => $val) {
             if (is_numeric($name) || in_array($val, [false, null], true)) {
                 continue;
             }
 
-            if (is_array($val) && strpos($name, 'data-') === 0) {
+            if (is_array($val) && strpos($name, "data-") === 0) {
                 $val = json_encode($val, JSON_UNESCAPED_UNICODE);
             }
 
             if ($val === true) {
-                $result .= ' '.$name;
+                $result .= " " . $name;
             } else {
-                $result .= ' '.$name.'="'.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'"';
+                $result .= " " . $name . '="' . htmlspecialchars($val, ENT_COMPAT, "UTF-8") . '"';
             }
         }
         return $result;
@@ -51,9 +52,10 @@ final class HtmlUtils {
      *
      * @return array
      */
-    public static function getClasses(\DOMElement $domNode): array {
+    public static function getClasses(\DOMElement $domNode): array
+    {
         $result = [];
-        if ($classes = $domNode->getAttribute('class')) {
+        if ($classes = $domNode->getAttribute("class")) {
             $result = explode(" ", $classes);
         }
         return array_unique($result);
@@ -66,7 +68,8 @@ final class HtmlUtils {
      * @param string $className The class name to look for.
      * @return bool
      */
-    public static function hasClass(\DOMElement $domElement, string $className): bool {
+    public static function hasClass(\DOMElement $domElement, string $className): bool
+    {
         $classes = self::getClasses($domElement);
         return in_array($className, $classes);
     }
@@ -77,11 +80,12 @@ final class HtmlUtils {
      * @param \DOMElement $domNode
      * @param string $className
      */
-    public static function appendClass(\DOMElement $domNode, string $className) {
+    public static function appendClass(\DOMElement $domNode, string $className)
+    {
         $classes = self::getClasses($domNode);
         $classes[] = $className;
         $classes = array_unique($classes);
-        $domNode->setAttribute('class', implode(" ", $classes));
+        $domNode->setAttribute("class", implode(" ", $classes));
     }
 
     /**
@@ -91,11 +95,12 @@ final class HtmlUtils {
      *
      * @return string The CSS classes joined together.
      */
-    public static function classNames(...$args): string {
+    public static function classNames(...$args): string
+    {
         $args = array_filter($args, function ($item) {
-            return is_string($item) && $item !== '';
+            return is_string($item) && $item !== "";
         });
-        return implode(' ', $args);
+        return implode(" ", $args);
     }
 
     /**
@@ -141,32 +146,36 @@ final class HtmlUtils {
      * @param mixed $args Arguments that will replace the tags in the string.
      * @return string Returns the formatted string.
      */
-    public static function formatTags(string $format, ...$args): string {
-        $r = preg_replace_callback('`<(/)?([\d]+)(\s*/?)>`', function ($m) use ($args, $format) {
-            $index = $m[2];
+    public static function formatTags(string $format, ...$args): string
+    {
+        $r = preg_replace_callback(
+            "`<(/)?([\d]+)(\s*/?)>`",
+            function ($m) use ($args, $format) {
+                $index = $m[2];
 
-            if (!isset($args[$index])) {
-                trigger_error("Invalid tag: ".$m[0], E_USER_NOTICE);
-                return '';
-            } else {
-                $arg = (array)$args[$index];
-            }
+                if (!isset($args[$index])) {
+                    trigger_error("Invalid tag: " . $m[0], E_USER_NOTICE);
+                    return "";
+                } else {
+                    $arg = (array) $args[$index];
+                }
 
-            if (!empty($m[1])) {
-                // This is a closing tag.
-                return "</{$arg[0]}>";
-            } elseif (!empty($m[3]) && is_string($args[$index])) {
-                // This is a self-closing tag with a string literal.
-                return $args[$index];
-            } else {
-                // This is an opening tag or a self-closing tag.
-                return '<'.$arg[0].self::attributes($arg).$m[3].'>';
-            }
-        }, $format);
+                if (!empty($m[1])) {
+                    // This is a closing tag.
+                    return "</{$arg[0]}>";
+                } elseif (!empty($m[3]) && is_string($args[$index])) {
+                    // This is a self-closing tag with a string literal.
+                    return $args[$index];
+                } else {
+                    // This is an opening tag or a self-closing tag.
+                    return "<" . $arg[0] . self::attributes($arg) . $m[3] . ">";
+                }
+            },
+            $format
+        );
 
         return $r;
     }
-
 
     /**
      * Provides a unique id
@@ -175,13 +184,13 @@ final class HtmlUtils {
 
      * @return string
      */
-    public static function uniqueElementID($prefix): string {
+    public static function uniqueElementID($prefix): string
+    {
         if (empty(self::$domIDs[$prefix])) {
             self::$domIDs[$prefix] = 0;
         }
         return $prefix . ++self::$domIDs[$prefix];
     }
-
 
     /**
      * Provides an accessible context for clickable items, so they can make sense out of context.
@@ -190,7 +199,8 @@ final class HtmlUtils {
      * @param array $data The placeholder data
      * @return string
      */
-    public static function accessibleLabel($template, $data): string {
+    public static function accessibleLabel($template, $data): string
+    {
         return htmlspecialchars(sprintf(t($template), ...$data));
     }
 }

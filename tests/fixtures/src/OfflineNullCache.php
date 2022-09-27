@@ -12,12 +12,13 @@ namespace VanillaTests\Fixtures;
  *
  * A NullCache that is always offline
  */
-class OfflineNullCache extends NullCache {
-
+class OfflineNullCache extends NullCache
+{
     /**
      * @return bool
      */
-    public function online() {
+    public function online()
+    {
         return false;
     }
 
@@ -27,7 +28,8 @@ class OfflineNullCache extends NullCache {
      * @param bool $forceEnable
      * @return bool
      */
-    public static function activeEnabled($forceEnable = false) {
+    public static function activeEnabled($forceEnable = false)
+    {
         return false;
     }
 }

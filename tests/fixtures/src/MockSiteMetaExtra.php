@@ -12,7 +12,8 @@ use Vanilla\Models\SiteMetaExtra;
 /**
  * Site meta extra implementation for easy use in tests.
  */
-class MockSiteMetaExtra extends SiteMetaExtra {
+class MockSiteMetaExtra extends SiteMetaExtra
+{
     /** @var array */
     private $value;
 
@@ -21,14 +22,16 @@ class MockSiteMetaExtra extends SiteMetaExtra {
      *
      * @param array $value
      */
-    public function __construct(array $value = []) {
+    public function __construct(array $value = [])
+    {
         $this->value = $value;
     }
 
     /**
      * @return array
      */
-    public function getValue(): array {
+    public function getValue(): array
+    {
         return $this->value;
     }
 }

@@ -32,6 +32,7 @@ export const BOOTSTRAP_SOURCE_FILE = resolve(VANILLA_ROOT, "library/src/scripts/
 export const EMOTION_DEV_SPEEDUP_FILE = resolve(VANILLA_ROOT, "library/src/scripts/emotionDevSpeedup.ts");
 export const POLYFILL_SOURCE_FILE = "@vanilla/polyfill";
 export const PUBLIC_PATH_SOURCE_FILE = resolve(VANILLA_ROOT, "build/entries/public-path.ts");
+export const DYNAMIC_ENTRY_DIR_PATH = resolve(VANILLA_ROOT, "build/entries/dynamic");
 
 // Tests
 export const TEST_FILE_ROOTS = process.env.TEST_FILE_ROOTS

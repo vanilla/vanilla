@@ -14,8 +14,8 @@ use Vanilla\Theme\BoxThemeShim;
  *
  * @todo Just make this a core option on the Avatars page.
  */
-class IndexPhotosPlugin extends Gdn_Plugin {
-
+class IndexPhotosPlugin extends Gdn_Plugin
+{
     use \Garden\StaticCacheConfigTrait;
 
     /**
@@ -23,9 +23,10 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      *
      * @param \Vanilla\Web\Asset\LegacyAssetModel $sender
      */
-    public function assetModel_styleCss_handler($sender) {
-        if (self::c('Vanilla.Discussions.Layout') != 'table' && !BoxThemeShim::isActive()) {
-            $sender->addCssFile('indexphotos.css', 'plugins/IndexPhotos');
+    public function assetModel_styleCss_handler($sender)
+    {
+        if (self::c("Vanilla.Discussions.Layout") != "table" && !BoxThemeShim::isActive()) {
+            $sender->addCssFile("indexphotos.css", "plugins/IndexPhotos");
         }
     }
 
@@ -35,10 +36,11 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @param DiscussionController $sender
      * @param array $args
      */
-    public function discussionsController_afterDiscussionLabels_handler($sender, $args) {
-        if (self::c('Vanilla.Discussions.Layout') != 'table') {
-            if (val('FirstUser', $args)) {
-                echo '<span class="MItem DiscussionAuthor">'.userAnchor(val('FirstUser', $args)).'</span>';
+    public function discussionsController_afterDiscussionLabels_handler($sender, $args)
+    {
+        if (self::c("Vanilla.Discussions.Layout") != "table") {
+            if (val("FirstUser", $args)) {
+                echo '<span class="MItem DiscussionAuthor">' . userAnchor(val("FirstUser", $args)) . "</span>";
             }
         }
     }
@@ -49,10 +51,11 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @param CategoriesController $sender
      * @param array $args
      */
-    public function categoriesController_afterDiscussionLabels_handler($sender, $args) {
-        if (self::c('Vanilla.Discussions.Layout') != 'table') {
-            if (val('FirstUser', $args)) {
-                echo '<span class="MItem DiscussionAuthor">'.userAnchor(val('FirstUser', $args)).'</span>';
+    public function categoriesController_afterDiscussionLabels_handler($sender, $args)
+    {
+        if (self::c("Vanilla.Discussions.Layout") != "table") {
+            if (val("FirstUser", $args)) {
+                echo '<span class="MItem DiscussionAuthor">' . userAnchor(val("FirstUser", $args)) . "</span>";
             }
         }
     }
@@ -63,8 +66,9 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @param DiscussionController $sender
      * @param array $args
      */
-    public function discussionsController_beforeDiscussionContent_handler($sender, array $args) {
-        if (self::c('Vanilla.Discussions.Layout') != 'table') {
+    public function discussionsController_beforeDiscussionContent_handler($sender, array $args)
+    {
+        if (self::c("Vanilla.Discussions.Layout") != "table") {
             $this->displayPhoto($sender, $args);
         }
     }
@@ -75,8 +79,9 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @param CategoriesController $sender
      * @param array $args
      */
-    public function categoriesController_beforeDiscussionContent_handler($sender, array $args) {
-        if (self::c('Vanilla.Discussions.Layout') != 'table') {
+    public function categoriesController_beforeDiscussionContent_handler($sender, array $args)
+    {
+        if (self::c("Vanilla.Discussions.Layout") != "table") {
             $this->displayPhoto($sender, $args);
         }
     }
@@ -87,8 +92,9 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @param DiscussionController $sender
      * @param array $args
      */
-    public function discussionsController_beforeDiscussionName_handler($sender, array $args) {
-        if (self::c('Vanilla.Discussions.Layout') != 'table') {
+    public function discussionsController_beforeDiscussionName_handler($sender, array $args)
+    {
+        if (self::c("Vanilla.Discussions.Layout") != "table") {
             $this->addCSSClass($args);
         }
     }
@@ -99,8 +105,9 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @param CategoriesController $sender
      * @param array $args
      */
-    public function categoriesController_beforeDiscussionName_handler($sender, array $args) {
-        if (self::c('Vanilla.Discussions.Layout') != 'table') {
+    public function categoriesController_beforeDiscussionName_handler($sender, array $args)
+    {
+        if (self::c("Vanilla.Discussions.Layout") != "table") {
             $this->addCSSClass($args);
         }
     }
@@ -110,10 +117,11 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      *
      * @param array $args
      */
-    private function addCSSClass(array $args) {
-        $cssClass = $args['CssClass'] ?? '';
-        $cssClass .= ' ItemDiscussion-withPhoto';
-        $args['CssClass'] = $cssClass;
+    private function addCSSClass(array $args)
+    {
+        $cssClass = $args["CssClass"] ?? "";
+        $cssClass .= " ItemDiscussion-withPhoto";
+        $args["CssClass"] = $cssClass;
     }
 
     /**
@@ -122,9 +130,10 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    protected function displayPhoto($sender, array $args) {
+    protected function displayPhoto($sender, array $args)
+    {
         // Build user object & output photo
-        $firstUser = userBuilder($sender->EventArguments['Discussion'], 'First');
-        echo userPhoto($firstUser, ['LinkClass' => 'IndexPhoto']);
+        $firstUser = userBuilder($sender->EventArguments["Discussion"], "First");
+        echo userPhoto($firstUser, ["LinkClass" => "IndexPhoto"]);
     }
 }

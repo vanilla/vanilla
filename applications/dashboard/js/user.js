@@ -31,7 +31,8 @@ $(document).on('contentLoad', function(e) {
 
     // Generate password
     $(context).on('click', 'a.GeneratePassword', function() {
-        var passwd = gdn.generateString(7);
+        let passwdLen = $(this).attr('data-length') !== undefined ? $(this).attr('data-length') : 8;
+        var passwd = gdn.generateString(passwdLen);
         $(':password').val(passwd);
         $('#Form_ShowPassword').val(passwd);
         return false;

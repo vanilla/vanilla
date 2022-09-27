@@ -15,44 +15,48 @@ use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
 use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
+use Vanilla\Widgets\React\DefaultSectionTrait;
 use Vanilla\Widgets\React\ReactWidgetInterface;
-use Vanilla\Widgets\WidgetSchemaTrait;
 
 /**
  * Class RSSWidget
  */
-class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, InjectableInterface {
-
+class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, InjectableInterface
+{
     use CombinedPropsWidgetTrait;
     use HomeWidgetContainerSchemaTrait;
-    use WidgetSchemaTrait;
     use RssWidgetTrait;
+    use DefaultSectionTrait;
 
     /**
      * @inheridoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "RSS Feed";
     }
 
     /**
      * @inheridoc
      */
-    public static function getWidgetID(): string {
+    public static function getWidgetID(): string
+    {
         return "rss";
     }
 
     /**
      * @inheridoc
      */
-    public static function getComponentName(): string {
+    public static function getComponentName(): string
+    {
         return "RSSWidget";
     }
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
+    public static function getWidgetIconPath(): string
+    {
         return "/applications/dashboard/design/images/widgetIcons/rssfeed.svg";
     }
 
@@ -61,55 +65,57 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
      *
      * @return array
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         $itemData = $this->getRssFeedItems(
-            $this->props['apiParams']['feedUrl'],
-            $this->props['apiParams']['fallbackImageUrl'] ?? null
+            $this->props["apiParams"]["feedUrl"],
+            $this->props["apiParams"]["fallbackImageUrl"] ?? null
         );
-        $limit = $this->props['apiParams']['limit'] ?? null;
-        $this->props['itemData'] = count($itemData) > $limit ? array_slice($itemData, 0, $limit) : $itemData;
+        if (empty($itemData)) {
+            //if there is no valid content then we should prevent the widget from rendering and not throwing errors.
+            $this->props = null;
+        } else {
+            $limit = $this->props["apiParams"]["limit"] ?? null;
+            $this->props["itemData"] = count($itemData) > $limit ? array_slice($itemData, 0, $limit) : $itemData;
+        }
+
         return $this->props;
     }
 
     /**
      * @inheridoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         $schema = SchemaUtils::composeSchemas(
-            Schema::parse([
-                'apiParams' => Schema::parse([
-                    'feedUrl:s' => [
-                        'x-control' => SchemaForm::textBox(
-                            new FormOptions(
-                                'URL',
-                                'RSS Feed URL.'
-                            ),
-                            "url"
-                        ),
-                    ],
-                    'fallbackImageUrl:?' => [
-                        'x-control' => SchemaForm::textBox(
-                            new FormOptions(
-                                'URL',
-                                'Render this image instead if feed entry does not have one.'
-                            ),
-                            "url"
-                        ),
-                    ],
-                    'limit:i?' => [
-                        'default' => 10,
-                        'x-control' => SchemaForm::dropDown(
-                            new FormOptions('Limit', 'Maximum amount of items to display.'),
-                            new StaticFormChoices(array_combine(range(1, 10), range(1, 10)))
-                        ),
-                    ],
-                ])
-            ]),
             self::widgetTitleSchema(),
             self::widgetSubtitleSchema("subtitle"),
             self::widgetDescriptionSchema(),
-            self::containerOptionsSchema('containerOptions'),
-            self::itemOptionsSchema()
+            Schema::parse([
+                "apiParams" => Schema::parse([
+                    "feedUrl:s" => [
+                        "x-control" => SchemaForm::textBox(new FormOptions("RSS Feed URL", "RSS Feed URL.")),
+                    ],
+                    "fallbackImageUrl:s?" => [
+                        "x-control" => SchemaForm::upload(
+                            new FormOptions(
+                                "Fallback Image",
+                                "Render this image instead if feed entry does not have one.",
+                                "",
+                                "By default, an SVG image using your brand color displays when there’s nothing else to show. Upload your own image to customize. Recommended size: 1200px by 600px."
+                            )
+                        ),
+                    ],
+                    "limit:i?" => [
+                        "default" => 10,
+                        "x-control" => SchemaForm::dropDown(
+                            new FormOptions("Limit", "Maximum amount of items to display."),
+                            new StaticFormChoices(array_combine(range(1, 10), range(1, 10)))
+                        ),
+                    ],
+                ]),
+            ]),
+            self::containerOptionsSchema("containerOptions")
         );
 
         return $schema;

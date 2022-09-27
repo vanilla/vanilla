@@ -14,9 +14,9 @@ use Vanilla\Authenticator\Exception;
 /**
  * Class CssColorAuthenticator.
  */
-class CssColorAuthenticator extends Authenticator {
-
-    const DEFAULT_CSS_COLOR = '#FFFFFF';
+class CssColorAuthenticator extends Authenticator
+{
+    const DEFAULT_CSS_COLOR = "#FFFFFF";
 
     /** @var bool */
     protected $active = true;
@@ -26,25 +26,27 @@ class CssColorAuthenticator extends Authenticator {
 
     protected static $cssColor = self::DEFAULT_CSS_COLOR;
 
-
     /**
      * MockAuthenticator constructor.
      */
-    public function __construct() {
-        parent::__construct('CssColor');
+    public function __construct()
+    {
+        parent::__construct("CssColor");
     }
 
     /**
      * @inheritDoc
      */
-    public function isActive(): bool {
+    public function isActive(): bool
+    {
         return $this->active;
     }
 
     /**
      * @inheritDoc
      */
-    public function setActive(bool $active) {
+    public function setActive(bool $active)
+    {
         $this->active = $active;
 
         return $this;
@@ -55,26 +57,29 @@ class CssColorAuthenticator extends Authenticator {
      *
      * @param $color
      */
-    public static function setCssColor($color) {
+    public static function setCssColor($color)
+    {
         self::$cssColor = $color;
     }
 
     /**
      * Reset the current cssColor.
      */
-    public static function resetColor() {
+    public static function resetColor()
+    {
         self::$cssColor = self::DEFAULT_CSS_COLOR;
     }
 
     /**
      * @inheritDoc
      */
-    protected static function getAuthenticatorTypeInfoImpl(): array {
+    protected static function getAuthenticatorTypeInfoImpl(): array
+    {
         return [
-            'ui' => [
-                'photoUrl' => 'http://www.example.com/image.jpg',
-                'backgroundColor' => self::$cssColor,
-                'foregroundColor' => '#000000',
+            "ui" => [
+                "photoUrl" => "http://www.example.com/image.jpg",
+                "backgroundColor" => self::$cssColor,
+                "foregroundColor" => "#000000",
             ],
         ];
     }
@@ -82,46 +87,52 @@ class CssColorAuthenticator extends Authenticator {
     /**
      * @inheritDoc
      */
-    public static function isUnique(): bool {
+    public static function isUnique(): bool
+    {
         return true;
     }
 
     /**
      * @inheritDoc
      */
-    protected function getAuthenticatorInfoImpl(): array {
+    protected function getAuthenticatorInfoImpl(): array
+    {
         return [
-            'ui' => [
-                'buttonName' => 'Sign in with MockAuthenticator',
-            ]
+            "ui" => [
+                "buttonName" => "Sign in with MockAuthenticator",
+            ],
         ];
     }
 
     /**
      * @inheritDoc
      */
-    public function getRegisterUrl() {
+    public function getRegisterUrl()
+    {
         return null;
     }
 
     /**
      * @inheritDoc
      */
-    public function getSignInUrl() {
+    public function getSignInUrl()
+    {
         return null;
     }
 
     /**
      * @inheritDoc
      */
-    public function getSignOutUrl() {
+    public function getSignOutUrl()
+    {
         return null;
     }
 
     /**
      * @inheritDoc
      */
-    public function validateAuthenticationImpl(RequestInterface $request) {
-        throw new \Exception('Not implemented');
+    public function validateAuthenticationImpl(RequestInterface $request)
+    {
+        throw new \Exception("Not implemented");
     }
 }

@@ -15,8 +15,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Verify discussion count routines.
  */
-class DiscussionModelCountsTest extends AbstractCountsTest {
-
+class DiscussionModelCountsTest extends AbstractCountsTest
+{
     use UsersAndRolesApiTestTrait;
 
     /**
@@ -26,7 +26,8 @@ class DiscussionModelCountsTest extends AbstractCountsTest {
      * @return int
      * @throws \Exception If a categoryID could not be determined.
      */
-    private function alternateCategoryID(array $row): int {
+    private function alternateCategoryID(array $row): int
+    {
         foreach ($this->categories as $category) {
             if ($category["CategoryID"] !== $row["CategoryID"]) {
                 return $category["CategoryID"];
@@ -38,21 +39,23 @@ class DiscussionModelCountsTest extends AbstractCountsTest {
     /**
      * Assert counts for all known records is accurate.
      */
-    public function testSetupCounts() {
+    public function testSetupCounts()
+    {
         $this->assertAllCounts();
     }
 
     /**
      * Verify counts after multiple discussions across different categories have been deleted.
      */
-    public function testDeleteMultipleDiscussions() {
+    public function testDeleteMultipleDiscussions()
+    {
         $toDelete = [];
         $cats = [];
 
         foreach ($this->discussions as $discussion) {
-            if (!in_array($discussion['CategoryID'], $cats)) {
-                $cats[] = $discussion['CategoryID'];
-                $toDelete[] = $discussion['DiscussionID'];
+            if (!in_array($discussion["CategoryID"], $cats)) {
+                $cats[] = $discussion["CategoryID"];
+                $toDelete[] = $discussion["DiscussionID"];
             }
         }
 
@@ -67,7 +70,8 @@ class DiscussionModelCountsTest extends AbstractCountsTest {
     /**
      * Verify counts after using DiscussionModel::save to move discussions between categories.
      */
-    public function testMoveUsingSave(): void {
+    public function testMoveUsingSave(): void
+    {
         $row = current($this->discussions);
 
         $originalCategoryID = $row["CategoryID"];

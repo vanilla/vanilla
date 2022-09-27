@@ -1,0 +1,48 @@
+{
+    "$schema": "http://dev.vanilla.localhost/api/v2/layouts/schema?layoutViewType=discussionList&cacheBuster=5",
+    "dateInserted": "2022-01-01T00:00:00Z",
+    "layoutViewType": "discussionList",
+    "layoutID": "discussionList",
+    "name": "Playground Discussion List Default",
+    "layout": [
+        {
+            "$hydrate": "react.section.2-columns",
+            "mainTop": [
+                {
+                    "$hydrate": "react.html",
+                    "isAdvertisement": false,
+                    "html": {
+                        "$hydrate": "sprintf",
+                        "format": "<h1 style='margin-top: 0'>Hello Discussion List - %s </h1>",
+                        "args": [
+                            {
+                                "$hydrate": "param",
+                                "ref": "status",
+                                "default": "Recent"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "mainBottom": [
+                {
+                    "$hydrate": "react.discussion.discussions",
+                    "title": "Recent discussion",
+                    "apiParams": {
+                        "sort": "-dateLastComment",
+                        "type": {
+                            "$hydrate": "param",
+                            "ref": "type"
+                        }
+                    }
+                }
+            ],
+            "rightBottom": [
+                {
+                    "$hydrate": "react.quick-links",
+                    "title": "Quick Links"
+                }
+            ]
+        }
+    ]
+}

@@ -8,34 +8,42 @@ import { useThemeCache } from "@library/styles/styleUtils";
 import { Variables } from "@library/styles/Variables";
 import { calc } from "csx";
 
-export const adminTitleBarClasses = useThemeCache(() => {
+export const adminTitleBarClasses = (props?) => {
+    const { zIndex } = props ?? {};
     const panelLayoutVars = oneColumnVariables();
     const mediaQueries = titleBarVariables().mediaQueries();
 
     const root = css({
         background: "#fbfcff",
         borderBottom: "1px solid #dddee0",
+        position: "sticky",
+        top: titleBarVariables().fullHeight + 1,
+        zIndex: zIndex ?? 1,
     });
 
-    const container = css(
-        {
-            display: "flex",
-            flexDirection: "column",
-            ...Mixins.margin(
-                Variables.spacing({
-                    vertical: 12,
-                    left: 28,
-                    right: calc(
-                        `(100vw - ${panelLayoutVars.contentWidth + panelLayoutVars.gutter.full}px)/2 + ${
-                            panelLayoutVars.gutter.full
-                        }px`,
-                    ),
-                }),
-            ),
-        },
+    const container = useThemeCache((useTwoColumnContainer?: boolean) =>
+        css(
+            {
+                display: "flex",
+                flexDirection: "column",
+                ...Mixins.margin(
+                    Variables.spacing({
+                        vertical: 12,
+                        left: 28,
+                        right: useTwoColumnContainer
+                            ? calc(
+                                  `(100vw - ${panelLayoutVars.contentWidth + panelLayoutVars.gutter.full}px)/2 + ${
+                                      panelLayoutVars.gutter.full
+                                  }px`,
+                              )
+                            : 28,
+                    }),
+                ),
+            },
 
-        mediaQueries.customBreakPoint({ marginRight: panelLayoutVars.gutter.full }, panelLayoutVars.contentWidth),
-        mediaQueries.compact({ marginRight: panelLayoutVars.gutter.size, marginLeft: panelLayoutVars.gutter.size }),
+            mediaQueries.customBreakPoint({ marginRight: panelLayoutVars.gutter.full }, panelLayoutVars.contentWidth),
+            mediaQueries.compact({ marginRight: panelLayoutVars.gutter.size, marginLeft: panelLayoutVars.gutter.size }),
+        ),
     );
 
     const titleAndActionsContainer = css({
@@ -94,7 +102,7 @@ export const adminTitleBarClasses = useThemeCache(() => {
         descriptionWrapper,
         description,
     };
-});
+};
 
 export const adminEditTitleBarClasses = useThemeCache(() => {
     const panelLayoutVars = oneColumnVariables();
@@ -106,10 +114,11 @@ export const adminEditTitleBarClasses = useThemeCache(() => {
         zIndex: 3,
         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
         marginBottom: 1,
+        background: "#fff",
     });
 
     const editingContainer = cx(
-        adminTitleBarClasses().container,
+        adminTitleBarClasses().container(true),
         css({
             background: "#fff",
         }),

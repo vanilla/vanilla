@@ -12,8 +12,8 @@ use Garden\Web\Exception\ServerException;
 /**
  * Exception to through if more resource events than allowed are being processed at once.
  */
-class ResourceEventLimitException extends ServerException {
-
+class ResourceEventLimitException extends ServerException
+{
     /**
      * Constructor.
      *
@@ -21,7 +21,8 @@ class ResourceEventLimitException extends ServerException {
      * @param int $triedProcessing The amount of records that were attempted to be processed.
      * @param array $context Exception context.
      */
-    public function __construct(int $limit, int $triedProcessing, array $context = []) {
+    public function __construct(int $limit, int $triedProcessing, array $context = [])
+    {
         $message = "Attempted to process $triedProcessing events. The limit is $limit.";
         parent::__construct($message, 500, $context);
     }

@@ -12,8 +12,8 @@ use Vanilla\Search\SearchResultItem;
 /**
  * DiscussionSearchResultItem.
  */
-class DiscussionSearchResultItem extends SearchResultItem {
-
+class DiscussionSearchResultItem extends SearchResultItem
+{
     /**
      * @var string Class used to construct search result items.
      */
@@ -22,24 +22,22 @@ class DiscussionSearchResultItem extends SearchResultItem {
     /**
      * Extra schema for user type search results
      */
-    protected function extraSchema(): ?Schema {
-        return Schema::parse([
-            'discussionID:i?',
-            'tagIDs:a?',
-            'labelCodes:a?',
-        ]);
+    protected function extraSchema(): ?Schema
+    {
+        return Schema::parse(["discussionID:i?", "tagIDs:a?", "labelCodes:a?"]);
     }
 
     /**
      * @param int|null $count
      */
-    public function setSubqueryMatchCount(?int $count): void {
-        $discussionID = $this->data['discussionID'] ?? null;
+    public function setSubqueryMatchCount(?int $count): void
+    {
+        $discussionID = $this->data["discussionID"] ?? null;
         if ($count !== null && $discussionID !== null) {
             parent::setSubqueryMatchCount($count);
-            $this->data['subqueryExtraParams'] = [
-                'scope' => 'site',
-                'discussionID' => $discussionID,
+            $this->data["subqueryExtraParams"] = [
+                "scope" => "site",
+                "discussionID" => $discussionID,
             ];
         }
     }

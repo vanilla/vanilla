@@ -6,12 +6,12 @@
 
 import { promisify } from "util";
 import * as fs from "fs";
+import fse from "fs-extra";
 import * as path from "path";
 import {
     VANILLA_APPS,
     VANILLA_PLUGINS,
     PUBLIC_PATH_SOURCE_FILE,
-    BOOTSTRAP_SOURCE_FILE,
     LIBRARY_SRC_DIRECTORY,
     PACKAGES_DIRECTORY,
     VANILLA_ROOT,
@@ -19,6 +19,7 @@ import {
     VANILLA_ADDONS,
     VANILLA_THEMES_LEGACY,
     EMOTION_DEV_SPEEDUP_FILE,
+    DYNAMIC_ENTRY_DIR_PATH,
 } from "../env";
 import { BuildMode, IBuildOptions } from "../buildOptions";
 const readDir = promisify(fs.readdir);
@@ -30,7 +31,13 @@ interface IEntry {
 }
 
 interface IWebpackEntries {
-    [outputName: string]: string | string[];
+    [outputName: string]:
+        | string
+        | string[]
+        | {
+              import: string | string[];
+              dependOn: string | string[];
+          };
 }
 
 interface IAddon {
@@ -89,29 +96,90 @@ export default class EntryModel {
     }
 
     /**
+     * Get the production entries.
+     *
+     * We put all of the addons into a "virtual" entry that's constructed here.
+     * This is so the addon chunks can be conditionally applied based off of the runtime.
      *
      * @param section The section to get entries for. These sections are dynamically generated.
-     * @see getSections()
      */
-    public async getProdEntries(section: string): Promise<IWebpackEntries> {
-        const entries: IWebpackEntries = {};
+    public async getProdEntries(section: string) {
+        // A mapping `import()` strings by addon.
+        let importStringsByAddonKey: Record<string, string[]> = {};
 
+        // Loop through the addons
         for (const entryDir of this.entryDirs) {
+            let importStrings: string[] = [];
+            let addonName: string | null = null;
+
+            // The common entry is one shared between sections.
+            // An addon may or may not have one.
             const commonEntry = await this.lookupEntry(entryDir, "common");
             if (commonEntry !== null) {
-                const addonName = path.basename(commonEntry.addonPath).toLowerCase();
-                entries[`addons/${addonName}-common`] = [PUBLIC_PATH_SOURCE_FILE, commonEntry.entryPath];
+                addonName = path.basename(commonEntry.addonPath).toLowerCase();
+                importStrings.push(
+                    `import(
+                        /* webpackChunkName: "addons/${addonName}-common" */
+                        /* webpackPreload: true */
+                        "${commonEntry.entryPath}"
+                    ).catch(e => console.error("Error loading javascript for addon '${addonName}'", e))`,
+                );
             }
 
+            // The main entry for the section.
             const entry = await this.lookupEntry(entryDir, section);
             if (entry !== null) {
-                const addonName = path.basename(entry.addonPath).toLowerCase();
-                entries[`addons/${addonName}`] = [PUBLIC_PATH_SOURCE_FILE, entry.entryPath];
+                addonName = path.basename(entry.addonPath).toLowerCase();
+                importStrings.push(
+                    `import(
+                        /* webpackChunkName: "addons/${addonName}" */
+                        /* webpackPreload: true */
+                        "${entry.entryPath}"
+                    ).catch(e => console.error("Error loading javascript for addon '${addonName}'", e))`,
+                );
+            }
+
+            // If we have entries for the addon, stash them.
+            if (importStrings.length > 0 && addonName) {
+                importStringsByAddonKey[addonName] = importStrings;
             }
         }
 
-        entries.bootstrap = [PUBLIC_PATH_SOURCE_FILE, BOOTSTRAP_SOURCE_FILE];
-        return entries;
+        let synthesizedFile = `
+import { bootstrapVanilla } from "@library/bootstrap";
+import { renderPortals } from "@vanilla/react-utils";
+
+const enabledAddonKeys = window.__VANILLA_ENABLED_ADDON_KEYS__;
+let addonPromises = [];
+
+${Object.entries(importStringsByAddonKey)
+    .map(([addonKey, entries]) => {
+        return `
+if (enabledAddonKeys.includes("${addonKey}")) {
+    ${entries.map((entryImport) => `addonPromises.push(${entryImport});`).join("\n")}
+}`;
+    })
+    .join("\n")}
+
+Promise.all(addonPromises).then((resolved) => {
+    console.log("addon dependencies loaded", resolved.length);
+    bootstrapVanilla();
+});
+        `;
+
+        // Create the dynamic entry directory if it doesn't exist.
+        if (!fse.existsSync(DYNAMIC_ENTRY_DIR_PATH)) {
+            fse.mkdirSync(DYNAMIC_ENTRY_DIR_PATH);
+        }
+
+        // Write out the dynamic bootstrap file.
+        const dynamicBootstrap = path.join(DYNAMIC_ENTRY_DIR_PATH, `${section}.js`);
+        fse.writeFileSync(dynamicBootstrap, synthesizedFile);
+
+        // Add the entry.
+        return {
+            bootstrap: [PUBLIC_PATH_SOURCE_FILE, dynamicBootstrap],
+        };
     }
 
     /**
@@ -122,25 +190,11 @@ export default class EntryModel {
      *
      * @param section - The section to get entries for.
      */
-    public async getDevEntries(section: string): Promise<string[]> {
-        const entries: string[] = [];
-
-        entries.push(EMOTION_DEV_SPEEDUP_FILE);
-
-        for (const entryDir of this.entryDirs) {
-            const commonEntry = await this.lookupEntry(entryDir, "common");
-            if (commonEntry !== null) {
-                entries.push(commonEntry.entryPath);
-            }
-
-            const entry = await this.lookupEntry(entryDir, section);
-            if (entry !== null) {
-                entries.push(entry.entryPath);
-            }
-        }
-
-        entries.push(BOOTSTRAP_SOURCE_FILE);
-        return entries;
+    public async getDevEntries(section: string) {
+        const prodEntries = await this.getProdEntries(section);
+        prodEntries.bootstrap.shift();
+        prodEntries.bootstrap?.unshift(EMOTION_DEV_SPEEDUP_FILE);
+        return prodEntries;
     }
 
     /**

@@ -13,8 +13,8 @@ use Vanilla\Exception\Database\NoResultsException;
 /**
  * Mock user provider that can be configured for some users.
  */
-class MockUserProvider implements UserProviderInterface {
-
+class MockUserProvider implements UserProviderInterface
+{
     private $currentID = 1;
 
     private $usersByID = [];
@@ -22,13 +22,14 @@ class MockUserProvider implements UserProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getFragmentByID(int $id, bool $useUnknownFallback = false): array {
+    public function getFragmentByID(int $id, bool $useUnknownFallback = false): array
+    {
         $user = $this->usersByID[$id] ?? null;
         if (!$user) {
             if ($useUnknownFallback) {
                 return $this->getGeneratedFragment(\UserModel::GENERATED_FRAGMENT_KEY_UNKNOWN);
             } else {
-                throw new NoResultsException('No user found for ID ' . $id);
+                throw new NoResultsException("No user found for ID " . $id);
             }
         }
 
@@ -38,9 +39,10 @@ class MockUserProvider implements UserProviderInterface {
     /**
      * @inheritdoc
      */
-    public function expandUsers(array &$records, array $columnNames): void {
+    public function expandUsers(array &$records, array $columnNames): void
+    {
         foreach ($columnNames as $column) {
-            $noIDName = str_replace('ID', '', $column);
+            $noIDName = str_replace("ID", "", $column);
             foreach ($records as $record) {
                 $record[$noIDName] = $this->getFragmentByID($record[$column], true);
             }
@@ -51,10 +53,10 @@ class MockUserProvider implements UserProviderInterface {
      * All values are supported.
      * @return array
      */
-    public function getAllowedGeneratedRecordKeys(): array {
+    public function getAllowedGeneratedRecordKeys(): array
+    {
         return [];
     }
-
 
     /**
      * Create a mock user, add it, and return it.
@@ -62,16 +64,17 @@ class MockUserProvider implements UserProviderInterface {
      * @param string|null $label
      * @return array
      */
-    public function addMockUser(string $label = null) {
+    public function addMockUser(string $label = null)
+    {
         $record = [
-            'userID' => $this->currentID,
-            'name' => 'user' . $this->currentID,
-            'dateLastActive' => null,
-            'photoUrl' => 'image.png',
+            "userID" => $this->currentID,
+            "name" => "user" . $this->currentID,
+            "dateLastActive" => null,
+            "photoUrl" => "image.png",
         ];
 
         if ($label) {
-            $record['label'] = $label;
+            $record["label"] = $label;
         }
 
         $this->usersByID[$this->currentID] = $record;
@@ -82,12 +85,13 @@ class MockUserProvider implements UserProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getGeneratedFragment(string $key): array {
+    public function getGeneratedFragment(string $key): array
+    {
         return [
-            'userID' => 0,
-            'name' => $key,
-            'email' => $key . '@example.com',
-            'photoUrl' => $key . '.png',
+            "userID" => 0,
+            "name" => $key,
+            "email" => $key . "@example.com",
+            "photoUrl" => $key . ".png",
         ];
     }
 }

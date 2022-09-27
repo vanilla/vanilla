@@ -11,11 +11,12 @@ import { createBrowserHistory, History } from "history";
 import NotFoundPage from "@library/routing/NotFoundPage";
 import { BackRoutingProvider } from "@library/routing/links/BackRoutingProvider";
 import { initPageViewTracking, usePageChangeListener } from "@library/pageViews/pageViewTracking";
-import { BannerContextProvider } from "./banner/BannerContext";
+import { ErrorPageBoundary } from "@library/errorPages/ErrorPageBoundary";
 
 interface IProps {
     disableDynamicRouting?: boolean;
     sectionRoots?: string[];
+    useLayoutRouting?: boolean;
     onRouteChange?: (history: History) => void;
 }
 
@@ -35,16 +36,21 @@ export function Router(props: IProps) {
     usePageChangeListener(pageChangeHandler);
 
     let routes = (
-        <Switch>
-            {Router._routes}
-            <Route key="@not-found" component={NotFoundPage} />
-        </Switch>
+        <ErrorPageBoundary>
+            <Switch>
+                {Router._routes}
+                <Route key="@not-found" component={NotFoundPage} />
+            </Switch>
+        </ErrorPageBoundary>
     );
 
     routes = <BackRoutingProvider>{routes}</BackRoutingProvider>;
     if (!props.disableDynamicRouting) {
         routes = (
-            <LinkContextProvider linkContexts={(props.sectionRoots ?? ["/"])?.map((root) => formatUrl(root, true))}>
+            <LinkContextProvider
+                useLayoutRouting={props.useLayoutRouting}
+                linkContexts={(props.sectionRoots ?? ["/"])?.map((root) => formatUrl(root, true))}
+            >
                 {routes}
             </LinkContextProvider>
         );

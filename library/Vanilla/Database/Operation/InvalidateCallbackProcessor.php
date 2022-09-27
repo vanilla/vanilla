@@ -13,15 +13,16 @@ use Vanilla\Database\Operation\Processor;
 /**
  * Processor for doing some invalidation of cache.
  */
-class InvalidateCallbackProcessor implements Processor {
-
+class InvalidateCallbackProcessor implements Processor
+{
     /** @var callable */
     private $callback;
 
     /**
      * @param callable $callback
      */
-    public function __construct(callable $callback) {
+    public function __construct(callable $callback)
+    {
         $this->callback = $callback;
     }
 
@@ -32,7 +33,8 @@ class InvalidateCallbackProcessor implements Processor {
      * @param callable $stack
      * @return mixed|void
      */
-    public function handle(Operation $operation, callable $stack) {
+    public function handle(Operation $operation, callable $stack)
+    {
         $result = $stack($operation);
 
         if (in_array($operation->getType(), [Operation::TYPE_INSERT, Operation::TYPE_DELETE, Operation::TYPE_UPDATE])) {

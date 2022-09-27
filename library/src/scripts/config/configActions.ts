@@ -1,5 +1,5 @@
 import apiv2 from "@library/apiv2";
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const getConfigsByKeyThunk = createAsyncThunk("@@config/get", async (configKeys: string[]) => {
     const response = await apiv2.get("/config", {
@@ -12,11 +12,25 @@ export const getConfigsByKeyThunk = createAsyncThunk("@@config/get", async (conf
 
 export const patchConfigThunk = createAsyncThunk(
     "@@config/patch",
-    async (params: { values: Record<string, any>; watchID: string }) => {
-        const response = await apiv2.patch("/config", params.values);
-        return response.data;
+    async (params: { values: Record<string, any>; watchID: string }, thunkAPI) => {
+        try {
+            const response = await apiv2.patch("/config", params.values);
+            return response.data;
+        } catch (initialError) {
+            const detailedErrors =
+                initialError.response && initialError.response.data && initialError.response.data.errors;
+            const errorNames =
+                detailedErrors && typeof detailedErrors === "object" ? Object.keys(detailedErrors) : null;
+            const errors = errorNames && errorNames.length && detailedErrors[errorNames[0]];
+            //one at a time
+            const finalError = errors && errors.length ? errors[0] : initialError;
+
+            throw finalError;
+        }
     },
 );
+
+export const updateConfigsLocal = createAction<Record<string, any>>("@@config/update-local");
 
 export const getAllTranslationServicesThunk = createAsyncThunk("@@config/get-translation-services", async () => {
     const response = await apiv2.get(`/translation-services`, {});

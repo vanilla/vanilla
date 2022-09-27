@@ -10,7 +10,8 @@ namespace Vanilla\Contracts;
 /**
  * Interface for a record.
  */
-interface RecordInterface {
+interface RecordInterface
+{
     /**
      * @return string
      */

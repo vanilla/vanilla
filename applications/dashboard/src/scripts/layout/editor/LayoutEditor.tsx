@@ -5,6 +5,7 @@
 
 import { layoutEditorClasses } from "@dashboard/layout/editor/LayoutEditor.classes";
 import { fetchEditorOverviewComponent } from "@dashboard/layout/editor/LayoutEditor.overviews";
+import { LayoutEditorAssetUtils } from "@dashboard/layout/editor/LayoutEditorAssetUtils";
 import { LayoutEditorContents, LayoutEditorPath } from "@dashboard/layout/editor/LayoutEditorContents";
 import {
     LayoutEditorDirection,
@@ -24,7 +25,7 @@ import {
 } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { FauxWidget } from "@dashboard/layout/overview/LayoutOverview";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
-import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
+import { LayoutLookupContext, LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
 import Container, { ContainerContextReset, ContainerWidthContextProvider } from "@library/layout/components/Container";
 import { DeviceProvider } from "@library/layout/DeviceContext";
 import { LinkContext, LINK_CONTEXT_DEFAULTS } from "@library/routing/links/LinkContextProvider";
@@ -64,9 +65,22 @@ function LayoutEditorImpl(props: IProps) {
     const { editorContents, editorSelection } = useLayoutEditor();
     const [initialSectionID, setInitialSectionID] = useState<LayoutSectionID | null>(null);
 
+    useEffect(() => {
+        //TODO:we should make this more dynamic for other view types as well when we have more required assets
+        //right now only for discussion list, we need to pre-hydrate a section with discussionList asset
+        if (
+            !editorContents.validate().isValid &&
+            Object.keys(catalog.assets).length > 0 &&
+            catalog.layoutViewType === "discussionList"
+        ) {
+            editorContents.insertSection(0, LayoutEditorAssetUtils.discussionList());
+            editorSelection.moveSelectionTo(LayoutEditorPath.section(0), LayoutEditorSelectionMode.SECTION);
+        }
+    }, [catalog.assets, catalog.layoutViewType]);
+
     useFocusWatcher(ref, (hasFocus, elementFocused) => {
         const focusIsInLayoutEditorModal = elementFocused?.closest("[data-layout-editor-modal]");
-        if (!hasFocus && !focusIsInLayoutEditorModal) {
+        if (elementFocused && !hasFocus && !focusIsInLayoutEditorModal) {
             editorSelection.stashState();
         } else if (hasFocus && elementFocused === ref.current) {
             editorSelection.restoreState();
@@ -149,7 +163,7 @@ function LayoutEditorImpl(props: IProps) {
 
     const descriptionID = useUniqueID("description");
 
-    if (editorContents.getSectionCount() === 0) {
+    if (editorContents.getSectionCount() === 0 && editorContents.validate().isValid) {
         // We are empty. Use the contents.
         const addInitialSection = (sectionID: LayoutSectionID) => {
             editorContents.insertSection(0, {
@@ -210,13 +224,18 @@ function LayoutEditorImpl(props: IProps) {
                             maxWidth={1264}
                         >
                             <ContainerContextReset>
-                                <LayoutRenderer<IHydratedEditableWidgetProps>
-                                    allowInternalProps
-                                    layout={editorContents.hydrate().layout}
-                                    fallbackWidget={FauxWidget}
-                                    componentFetcher={fetchEditorOverviewComponent}
-                                    componentWrapper={LayoutEditorWidgetWrapper}
-                                />
+                                <LayoutLookupContext.Provider
+                                    value={{
+                                        fallbackWidget: FauxWidget,
+                                        componentFetcher: fetchEditorOverviewComponent,
+                                        componentWrapper: LayoutEditorWidgetWrapper,
+                                    }}
+                                >
+                                    <LayoutRenderer<IHydratedEditableWidgetProps>
+                                        allowInternalProps
+                                        layout={editorContents.hydrate().layout}
+                                    />
+                                </LayoutLookupContext.Provider>
                             </ContainerContextReset>
                         </ContainerWidthContextProvider>
                     </DeviceProvider>

@@ -1,11 +1,10 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import classNames from "classnames";
+import React, { useMemo } from "react";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { getClassForButtonType } from "@library/forms/Button";
 import SmartLink from "@library/routing/links/SmartLink";
@@ -13,6 +12,7 @@ import { IOptionalComponentID } from "@library/utility/idUtils";
 import { LinkProps } from "react-router-dom";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { buttonLabelWrapClass } from "@library/forms/Button.styles";
+import { cx } from "@emotion/css";
 
 interface IProps extends IOptionalComponentID, LinkProps {
     children: React.ReactNode;
@@ -29,42 +29,52 @@ interface IProps extends IOptionalComponentID, LinkProps {
 /**
  * A Link component that looks like a Button component.
  */
-export default class LinkAsButton extends React.Component<IProps> {
-    public static defaultProps: Partial<IProps> = {
-        tabIndex: 0,
-    };
+export function LinkAsButton(props: IProps) {
+    const {
+        buttonType = ButtonTypes.STANDARD,
+        className,
+        title,
+        ariaLabel,
+        to,
+        children,
+        tabIndex = 0,
+        addWrap = false,
+        disabled,
+        ...restProps
+    } = props;
+    const componentClasses = cx(getClassForButtonType(buttonType), className);
 
-    public render() {
-        const {
-            buttonType = ButtonTypes.STANDARD,
-            className,
-            title,
-            ariaLabel,
-            to,
-            children,
+    const fallbackTitle = typeof children === "string" ? children : undefined;
+
+    const linkProps = useMemo(() => {
+        return {
+            className: componentClasses,
+            title: title ?? fallbackTitle,
+            "aria-label": ariaLabel || title || fallbackTitle,
             tabIndex,
-            addWrap = false,
+            role: !disabled ? "button" : "presentation",
             disabled,
-            ...restProps
-        } = this.props;
-        const componentClasses = classNames(getClassForButtonType(buttonType), className);
+        };
+    }, [ariaLabel, componentClasses, disabled, fallbackTitle, tabIndex, title]);
 
-        const fallbackTitle = typeof children === "string" ? children : undefined;
+    // Disabled links are invalid. Therefore the component returns span wrapped text instead
+    if (disabled) {
         return (
-            <SmartLink
-                className={componentClasses}
-                title={title ?? fallbackTitle}
-                aria-label={ariaLabel || title || fallbackTitle}
-                tabIndex={tabIndex}
-                role={"button"}
-                to={disabled ? "" : to}
-                disabled={disabled}
-                {...restProps}
-            >
+            <span {...linkProps} {...restProps}>
                 <ConditionalWrap className={buttonLabelWrapClass().root} condition={addWrap}>
                     {children}
                 </ConditionalWrap>
-            </SmartLink>
+            </span>
         );
     }
+
+    return (
+        <SmartLink {...linkProps} to={to ?? ""} {...restProps}>
+            <ConditionalWrap className={buttonLabelWrapClass().root} condition={addWrap}>
+                {children}
+            </ConditionalWrap>
+        </SmartLink>
+    );
 }
+
+export default LinkAsButton;

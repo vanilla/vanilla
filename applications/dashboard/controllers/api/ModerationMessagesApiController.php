@@ -22,7 +22,8 @@ use Vanilla\Utility\SchemaUtils;
 /**
  * Api controller for moderation messages.
  */
-class ModerationMessagesApiController extends AbstractApiController {
+class ModerationMessagesApiController extends AbstractApiController
+{
     /** @var MessageModel */
     private $messageModel;
 
@@ -35,7 +36,8 @@ class ModerationMessagesApiController extends AbstractApiController {
      * @param MessageModel $messageModel
      * @param CategoryModel $categoryModel
      */
-    public function __construct(MessageModel $messageModel, CategoryModel $categoryModel) {
+    public function __construct(MessageModel $messageModel, CategoryModel $categoryModel)
+    {
         $this->messageModel = $messageModel;
         $this->categoryModel = $categoryModel;
     }
@@ -46,8 +48,9 @@ class ModerationMessagesApiController extends AbstractApiController {
      * @param array $query
      * @return Data
      */
-    public function index(array $query = []): Data {
-        $this->permission('session.valid');
+    public function index(array $query = []): Data
+    {
+        $this->permission("session.valid");
 
         $validatedQuery = $this->messageModel->getIndexSchema()->validate($query);
 
@@ -86,7 +89,8 @@ class ModerationMessagesApiController extends AbstractApiController {
      * @param int $id
      * @return Data
      */
-    public function get(int $id): Data {
+    public function get(int $id): Data
+    {
         $this->permission("session.valid");
         $message = $this->lookupMessage($id);
 
@@ -103,7 +107,8 @@ class ModerationMessagesApiController extends AbstractApiController {
      * @param array $body
      * @return Data
      */
-    public function post(array $body): Data {
+    public function post(array $body): Data
+    {
         $this->permission("community.moderate");
         $inputSchema = $this->messageModel->getPostSchema();
         $validatedPost = $inputSchema->validate($body);
@@ -129,7 +134,8 @@ class ModerationMessagesApiController extends AbstractApiController {
      * @param array $body
      * @return Data
      */
-    public function patch(int $id, array $body): Data {
+    public function patch(int $id, array $body): Data
+    {
         $this->permission("community.moderate");
         $message = $this->messageModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$message) {
@@ -158,7 +164,8 @@ class ModerationMessagesApiController extends AbstractApiController {
      * @param int $id
      * @throws NotFoundException Throws an exception if the message isn't found.
      */
-    public function delete(int $id): void {
+    public function delete(int $id): void
+    {
         $this->permission("community.moderate");
 
         $message = $this->lookupMessage($id);
@@ -173,7 +180,8 @@ class ModerationMessagesApiController extends AbstractApiController {
      * @return Data
      * @throws ForbiddenException Throws an exception if the message isn't found, the  or if it's not dismissible.
      */
-    public function put_dismiss(int $id): Data {
+    public function put_dismiss(int $id): Data
+    {
         $this->permission("session.valid");
         $message = $this->messageModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$message["AllowDismiss"]) {
@@ -186,7 +194,7 @@ class ModerationMessagesApiController extends AbstractApiController {
 
         $dismissedMessages = Gdn::session()->getPreference("DismissedMessages", []);
         $dismissedMessages[] = $id;
-        Gdn::session()->setPreference('DismissedMessages', $dismissedMessages);
+        Gdn::session()->setPreference("DismissedMessages", $dismissedMessages);
         return new Data(["dismissed" => true]);
     }
 
@@ -196,7 +204,8 @@ class ModerationMessagesApiController extends AbstractApiController {
      * @param array $query
      * @return array
      */
-    private function normalizeQuery(array $query = []): array {
+    private function normalizeQuery(array $query = []): array
+    {
         if (empty($query)) {
             return [];
         }
@@ -218,7 +227,8 @@ class ModerationMessagesApiController extends AbstractApiController {
      * @return array
      * @throws NotFoundException Throws an exception if the message isn't found.
      */
-    private function lookupMessage(int $id): array {
+    private function lookupMessage(int $id): array
+    {
         $savedMessage = $this->messageModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$savedMessage) {
             throw new NotFoundException("Message");

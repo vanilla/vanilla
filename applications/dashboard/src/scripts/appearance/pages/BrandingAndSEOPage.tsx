@@ -22,6 +22,7 @@ import isEqual from "lodash/isEqual";
 import React, { useEffect, useMemo, useState } from "react";
 import SmartLink from "@library/routing/links/SmartLink";
 import { BrandingAndSEOPageClasses } from "@dashboard/appearance/pages/BrandingAndSEOPage.classes";
+import { useToast } from "@library/features/toaster/ToastContext";
 
 const BRANDING_SETTINGS: JsonSchema = {
     type: "object",
@@ -43,7 +44,7 @@ const BRANDING_SETTINGS: JsonSchema = {
             "x-control": {
                 label: "Site Description",
                 description:
-                    "The site description usually appears in search engines. You should try having a description that is 100–150 characters long.",
+                    "The site description usually appears in search engines. You should try having a description that is 100-150 characters long.",
                 inputType: "textBox",
                 type: "textarea",
             },
@@ -51,11 +52,13 @@ const BRANDING_SETTINGS: JsonSchema = {
         "garden.title": {
             type: "string",
             maxLength: 20,
+            minLentgh: 1,
             "x-control": {
                 label: "Banner Title",
                 description:
                     "This title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a logo is uploaded, it will replace this title on user-facing forum pages. Also, keep in mind some themes may hide this title.",
                 inputType: "textBox",
+                default: "Vanilla",
             },
         },
         "garden.orgName": {
@@ -168,15 +171,18 @@ const BRANDING_SETTINGS: JsonSchema = {
 };
 
 export default function BrandingAndSEOPage() {
-    const { isLoading: isPatchLoading, patchConfig } = useConfigPatcher();
+    const { isLoading: isPatchLoading, patchConfig, error } = useConfigPatcher();
 
     // A setting values loadable for the schema from the `/config` endpoint
     const settings = useConfigsByKeys(Object.keys(BRANDING_SETTINGS["properties"]));
 
+    const toast = useToast();
+
     // Load state for the setting values
-    const isLoaded = useMemo<boolean>(() => [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status), [
-        settings,
-    ]);
+    const isLoaded = useMemo<boolean>(
+        () => [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status),
+        [settings],
+    );
 
     const [value, setValue] = useState<JsonSchema>(
         Object.fromEntries(
@@ -191,7 +197,7 @@ export default function BrandingAndSEOPage() {
         if (settings.data) {
             return Object.keys(value).reduce(
                 (delta: { [key: string]: string | number | boolean }, currentKey: string) => {
-                    if (!isEqual(value[currentKey], settings.data[currentKey])) {
+                    if (!isEqual(value[currentKey], settings.data?.[currentKey])) {
                         return { ...delta, [currentKey]: value[currentKey] };
                     }
                     return delta;
@@ -214,7 +220,13 @@ export default function BrandingAndSEOPage() {
                 return Object.fromEntries(Object.keys(settings.data ?? {}).map((key) => [key, settings?.data?.[key]]));
             });
         }
-    }, [isLoaded, settings]);
+        if (error && error.message) {
+            toast.addToast({
+                dismissible: true,
+                body: <>{error.message}</>,
+            });
+        }
+    }, [isLoaded, settings, error]);
 
     const settingsSchema = useMemo<JsonSchema>(() => {
         if (isLoaded) {

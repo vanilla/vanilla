@@ -31,7 +31,8 @@ use Vanilla\Logger;
  *   required to include their structure files.
  * - TODO: The {@link AddonModel} doesn't currently respect restrictions on themes and locales. This should be addressed later.
  */
-class AddonModel implements LoggerAwareInterface {
+class AddonModel implements LoggerAwareInterface
+{
     use LoggerAwareTrait;
 
     /**
@@ -91,7 +92,8 @@ class AddonModel implements LoggerAwareInterface {
      * - **themeType**: Specify "mobile" for the mobile theme.
      * @return array Returns an array of all of the addons that were enabled.
      */
-    public function enable(Addon $addon, array $options = []) {
+    public function enable(Addon $addon, array $options = [])
+    {
         $this->validateEnable($addon, $options);
 
         // Enable this addon's requirements.
@@ -114,29 +116,29 @@ class AddonModel implements LoggerAwareInterface {
      * @param array $options Additional options for the enable.
      * @throws ValidationException Throws an exception if the addon cannot be enabled.
      */
-    public function validateEnable(Addon $addon, array $options = []) {
-        $options += ['force' => false];
+    public function validateEnable(Addon $addon, array $options = [])
+    {
+        $options += ["force" => false];
         $validation = new Validation();
 
-        if (!$options['force'] && $this->isEnabledConfig($addon, $options)) {
-            $validation->addError(
-                'enabled',
-                'The {addonName} {addonType} is already enabled.',
-                ['addonName' => $addon->getName(), 'addonType' => $addon->getType()]
-            );
+        if (!$options["force"] && $this->isEnabledConfig($addon, $options)) {
+            $validation->addError("enabled", "The {addonName} {addonType} is already enabled.", [
+                "addonName" => $addon->getName(),
+                "addonType" => $addon->getType(),
+            ]);
             throw new ValidationException($validation);
         }
 
         try {
             $this->addonManager->checkRequirements($addon, true);
         } catch (\Exception $ex) {
-            $validation->addError('requirements', $ex->getMessage(), $ex->getCode());
+            $validation->addError("requirements", $ex->getMessage(), $ex->getCode());
         }
 
         try {
             $this->addonManager->checkConflicts($addon, true);
         } catch (\Exception $ex) {
-            $validation->addError('conflicts', $ex->getMessage(), $ex->getCode());
+            $validation->addError("conflicts", $ex->getMessage(), $ex->getCode());
         }
 
         if (!$validation->isValid()) {
@@ -146,7 +148,7 @@ class AddonModel implements LoggerAwareInterface {
         try {
             $addon->test(true);
         } catch (\Exception $ex) {
-            $validation->addError('test', $ex->getMessage());
+            $validation->addError("test", $ex->getMessage());
             throw new ValidationException($validation);
         }
     }
@@ -158,23 +160,24 @@ class AddonModel implements LoggerAwareInterface {
      * @param array $options Additional options for the check.
      * @return bool Returns **true** if the addon is enabled or **false** otherwise.
      */
-    public function isEnabledConfig(Addon $addon, array $options = []) {
+    public function isEnabledConfig(Addon $addon, array $options = [])
+    {
         $enabled = false;
         switch ($addon->getType()) {
             case Addon::TYPE_ADDON:
-                if ($addon->getInfoValue('oldType') === 'application') {
-                    $enabled = $this->config->get('EnabledApplications.'.$addon->getRawKey());
+                if ($addon->getInfoValue("oldType") === "application") {
+                    $enabled = $this->config->get("EnabledApplications." . $addon->getRawKey());
                 } else {
-                    $enabled = $this->config->get('EnabledPlugins.'.$addon->getRawKey());
+                    $enabled = $this->config->get("EnabledPlugins." . $addon->getRawKey());
                 }
                 break;
             case Addon::TYPE_LOCALE:
-                $enabled = $this->config->get('EnabledLocales.'.$addon->getRawKey());
+                $enabled = $this->config->get("EnabledLocales." . $addon->getRawKey());
                 break;
             case Addon::TYPE_THEME:
-                $options += ['themeType' => ''];
+                $options += ["themeType" => ""];
 
-                $enabled = $this->config->get($this->getThemeConfigKey($options['themeType'])) === $addon->getKey();
+                $enabled = $this->config->get($this->getThemeConfigKey($options["themeType"])) === $addon->getKey();
                 break;
         }
         return !empty($enabled);
@@ -188,14 +191,15 @@ class AddonModel implements LoggerAwareInterface {
      * @param Addon $addon The addon to enable.
      * @param array $options Additional options for the enable.
      */
-    private function enableInternal(Addon $addon, array $options) {
+    private function enableInternal(Addon $addon, array $options)
+    {
         $wasEnabled = $this->isEnabledConfig($addon, $options);
 
         $this->addonManager->startAddon($addon);
 
         // Load bootstrap file.
-        $force = !empty($options['force']);
-        $shouldSkipContainer = !empty($options['skipContainer']);
+        $force = !empty($options["force"]);
+        $shouldSkipContainer = !empty($options["skipContainer"]);
         if (!$wasEnabled || ($force && !$shouldSkipContainer)) {
             $addon->configureContainer($this->container);
 
@@ -209,15 +213,12 @@ class AddonModel implements LoggerAwareInterface {
         $this->enableInConfig($addon, true, $options);
 
         if (!$wasEnabled) {
-            $this->logger->info(
-                'The {addonKey} {addonType} was enabled.',
-                [
-                    'event' => 'addon_enabled',
-                    'addonKey' => $addon->getKey(),
-                    'addonType' => $addon->getType(),
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
-                ]
-            );
+            $this->logger->info("The {addonKey} {addonType} was enabled.", [
+                "event" => "addon_enabled",
+                "addonKey" => $addon->getKey(),
+                "addonType" => $addon->getType(),
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
+            ]);
         }
     }
 
@@ -228,12 +229,13 @@ class AddonModel implements LoggerAwareInterface {
      *
      * @param string $pluginClass The name of the plugin class.
      */
-    public function callBootstrapEvents($pluginClass) {
+    public function callBootstrapEvents($pluginClass)
+    {
         $instance = $this->container->get($pluginClass);
         // Kludge: Force the plugin class as shared. This should be done in the EventManager eventually.
         $this->container->setInstance($pluginClass, $instance);
 
-        $this->events->fireClass($instance, 'container_init', $this->container);
+        $this->events->fireClass($instance, "container_init", $this->container);
     }
 
     /**
@@ -241,9 +243,10 @@ class AddonModel implements LoggerAwareInterface {
      *
      * @param Addon $addon The addon to run.
      */
-    private function runSetup(Addon $addon) {
+    private function runSetup(Addon $addon)
+    {
         // Look for a setup method.
-        $this->callPluginMethod($addon, 'setup');
+        $this->callPluginMethod($addon, "setup");
         $this->runStructure($addon);
     }
 
@@ -254,20 +257,18 @@ class AddonModel implements LoggerAwareInterface {
      * @param string $method The name of the method to call.
      * @return bool Returns **true** if the method was called or **false** otherwise.
      */
-    private function callPluginMethod(Addon $addon, $method) {
+    private function callPluginMethod(Addon $addon, $method)
+    {
         if (($pluginClass = $addon->getPluginClass()) && method_exists($pluginClass, $method)) {
             $plugin = $this->container->get($pluginClass);
 
-            $this->logger->info(
-                "Calling {addonMethod} on {addonClass} for {addonKey}.",
-                [
-                    'event' => 'addon_method',
-                    'addonMethod' => $method,
-                    'addonClass' => $pluginClass,
-                    'addonKey' => $addon->getKey(),
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-                ]
-            );
+            $this->logger->info("Calling {addonMethod} on {addonClass} for {addonKey}.", [
+                "event" => "addon_method",
+                "addonMethod" => $method,
+                "addonClass" => $pluginClass,
+                "addonKey" => $addon->getKey(),
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+            ]);
 
             $this->container->call([$plugin, $method]);
 
@@ -283,41 +284,38 @@ class AddonModel implements LoggerAwareInterface {
      * @param bool $enabled Whether or not the addon is enabled.
      * @param array $options Additional options for the operation.
      */
-    private function enableInConfig(Addon $addon, $enabled, array $options = []) {
-        $options += ['forceConfig' => true];
+    private function enableInConfig(Addon $addon, $enabled, array $options = [])
+    {
+        $options += ["forceConfig" => true];
 
-        if (!$options['forceConfig'] && $this->isEnabledConfig($addon, $options) === $enabled) {
+        if (!$options["forceConfig"] && $this->isEnabledConfig($addon, $options) === $enabled) {
             return;
         }
 
         switch ($addon->getType()) {
             case Addon::TYPE_ADDON:
-                if ($addon->getInfoValue('oldType') === 'application') {
+                if ($addon->getInfoValue("oldType") === "application") {
                     $this->config->saveToConfig(
-                        'EnabledApplications.'.$addon->getRawKey(),
-                        $enabled ? trim(basename($addon->getSubdir()), '/') : null,
-                        ['RemoveEmpty' => true]
+                        "EnabledApplications." . $addon->getRawKey(),
+                        $enabled ? trim(basename($addon->getSubdir()), "/") : null,
+                        ["RemoveEmpty" => true]
                     );
                 } else {
-                    $this->config->saveToConfig('EnabledPlugins.'.$addon->getRawKey(), $enabled);
+                    $this->config->saveToConfig("EnabledPlugins." . $addon->getRawKey(), $enabled);
                 }
                 break;
             case Addon::TYPE_LOCALE:
                 $this->config->saveToConfig(
-                    'EnabledLocales.'.$addon->getRawKey(),
-                    $enabled ? $addon->getInfoValue('locale') : null,
-                    ['RemoveEmpty' => true]
+                    "EnabledLocales." . $addon->getRawKey(),
+                    $enabled ? $addon->getInfoValue("locale") : null,
+                    ["RemoveEmpty" => true]
                 );
                 break;
             case Addon::TYPE_THEME:
-                $options += ['themeType' => ''];
-                $configKey = $this->getThemeConfigKey($options['themeType']);
+                $options += ["themeType" => ""];
+                $configKey = $this->getThemeConfigKey($options["themeType"]);
 
-                $this->config->saveToConfig(
-                    $configKey,
-                    $enabled ? $addon->getKey() : null,
-                    ['RemoveEmpty' => true]
-                );
+                $this->config->saveToConfig($configKey, $enabled ? $addon->getKey() : null, ["RemoveEmpty" => true]);
                 break;
         }
     }
@@ -329,7 +327,8 @@ class AddonModel implements LoggerAwareInterface {
      * @param array $options Additional options on the disable.
      * @throws ValidationException Throws an exception if the addon cannot be disabled.
      */
-    public function disable(Addon $addon, array $options = []) {
+    public function disable(Addon $addon, array $options = [])
+    {
         $wasEnabled = $this->isEnabledConfig($addon, $options);
 
         // 1. Validate the disable.
@@ -337,12 +336,12 @@ class AddonModel implements LoggerAwareInterface {
             $this->addonManager->checkDependents($addon, true);
         } catch (\Exception $ex) {
             $validation = new Validation();
-            $validation->addError('dependents', $ex->getMessage());
+            $validation->addError("dependents", $ex->getMessage());
             throw new ValidationException($validation);
         }
 
         // 2. Perform necessary hook action.
-        $this->callPluginMethod($addon, 'onDisable');
+        $this->callPluginMethod($addon, "onDisable");
 
         // 3. Disable it.
         $this->enableInConfig($addon, false, $options);
@@ -351,19 +350,15 @@ class AddonModel implements LoggerAwareInterface {
 
         // 4. Log the disable.
         if ($wasEnabled) {
-            $this->logger->info(
-                'The {addonKey} {addonType} was disabled.',
-                [
-                    'event' => 'addon_disabled',
-                    'addonKey' => $addon->getKey(),
-                    'addonType' => $addon->getType(),
-                    Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
-                ]
-            );
+            $this->logger->info("The {addonKey} {addonType} was disabled.", [
+                "event" => "addon_disabled",
+                "addonKey" => $addon->getKey(),
+                "addonType" => $addon->getType(),
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_ADMIN,
+            ]);
         }
 
-//        $this->EventArguments['AddonName'] = $pluginName;
-//        $this->fireEvent('AddonDisabled');
+        $this->events->dispatch(new AddonDisabledEvent($addon));
     }
 
     /**
@@ -373,15 +368,17 @@ class AddonModel implements LoggerAwareInterface {
      *
      * @param Addon $addon The addon to run.
      */
-    public function runStructure(Addon $addon) {
+    public function runStructure(Addon $addon)
+    {
         $this->updateModel->runStructureForAddon($addon);
     }
 
     /**
      * Signal completion after a structure update.
      */
-    public function onAfterStructure() {
-        $this->events->fire('updateModel_afterStructure', $this);
+    public function onAfterStructure()
+    {
+        $this->events->fire("updateModel_afterStructure", $this);
     }
 
     /**
@@ -389,11 +386,13 @@ class AddonModel implements LoggerAwareInterface {
      *
      * @return AddonManager Returns the addonManager.
      */
-    public function getAddonManager() {
+    public function getAddonManager()
+    {
         return $this->addonManager;
     }
 
-    public function splitID($addonID) {
+    public function splitID($addonID)
+    {
         return Addon::splitGlobalKey($addonID);
     }
 
@@ -403,34 +402,35 @@ class AddonModel implements LoggerAwareInterface {
      * @param array $where The filter.
      * @return Addon[] Returns an array of addons.
      */
-    public function getWhere(array $where = []) {
+    public function getWhere(array $where = [])
+    {
         $where += [
-            'enabled' => null,
-            'type' => null,
-            'addonID' => null,
-            'hidden' => $this->config->get('Garden.Themes.Visible') === 'all' ? null : false,
-            'deprecated' => null,
-            'themeType' => 'desktop'
+            "enabled" => null,
+            "type" => null,
+            "addonID" => null,
+            "hidden" => $this->config->get("Garden.Themes.Visible") === "all" ? null : false,
+            "deprecated" => null,
+            "themeType" => "desktop",
         ];
 
         $am = $this->getAddonManager();
 
         // Do a bit of optimization depending on the filter.
-        if ($where['addonID']) {
-            [$key, $type] = Addon::splitGlobalKey($where['addonID']);
+        if ($where["addonID"]) {
+            [$key, $type] = Addon::splitGlobalKey($where["addonID"]);
             $addons = [$am->lookupByType($key, $type)];
-        } elseif ($where['enabled'] && $where['type'] === Addon::TYPE_THEME) {
-            $addons = [$am->lookupTheme($this->getThemeKey($where['themeType']))];
-        } elseif (!empty($where['enabled'])) {
+        } elseif ($where["enabled"] && $where["type"] === Addon::TYPE_THEME) {
+            $addons = [$am->lookupTheme($this->getThemeKey($where["themeType"]))];
+        } elseif (!empty($where["enabled"])) {
             $addons = $am->getEnabled();
             // Add the theme again because getEnabled() doesn't currently work with the mobile theme.
-            if ($theme = $am->lookupTheme($this->getThemeKey($where['themeType']))) {
-                $addons[$theme->getType().'/'.$theme->getKey()] = $theme;
+            if ($theme = $am->lookupTheme($this->getThemeKey($where["themeType"]))) {
+                $addons[$theme->getType() . "/" . $theme->getKey()] = $theme;
             }
 
             $addons = array_values($addons);
-        } elseif (!empty($where['type'])) {
-            $addons = array_values($am->lookupAllByType($where['type']));
+        } elseif (!empty($where["type"])) {
+            $addons = array_values($am->lookupAllByType($where["type"]));
         } else {
             $addons = array_merge(
                 array_values($am->lookupAllByType(Addon::TYPE_ADDON)),
@@ -444,22 +444,32 @@ class AddonModel implements LoggerAwareInterface {
                 return false;
             }
 
-            if (isset($where['type']) && $addon->getType() !== $where['type']) {
+            if (isset($where["type"]) && $addon->getType() !== $where["type"]) {
                 return false;
             }
-            if (isset($where['enabled'])) {
-                if ($addon->getType() === Addon::TYPE_THEME && $addon->getKey() !== $this->getThemeKey($where['themeType'])) {
+            if (isset($where["enabled"])) {
+                if (
+                    $addon->getType() === Addon::TYPE_THEME &&
+                    $addon->getKey() !== $this->getThemeKey($where["themeType"])
+                ) {
                     return false;
-                } elseif ($addon->getType() !== Addon::TYPE_THEME && $where['enabled'] !== $am->isEnabled($addon->getKey(), $addon->getType())) {
+                } elseif (
+                    $addon->getType() !== Addon::TYPE_THEME &&
+                    $where["enabled"] !== $am->isEnabled($addon->getKey(), $addon->getType())
+                ) {
                     return false;
                 }
             }
-            if (isset($where['hidden']) && $where['hidden'] !== $addon->getInfoValue('hidden', false)) {
+            if (isset($where["hidden"]) && $where["hidden"] !== $addon->getInfoValue("hidden", false)) {
                 return false;
             }
-            if (isset($where['deprecated']) && $where['deprecated'] !== $addon->getInfoValue('deprecated', false)) {
+            if (isset($where["deprecated"]) && $where["deprecated"] !== $addon->getInfoValue("deprecated", false)) {
                 return false;
-            } elseif (!isset($where['deprecated']) && $addon->getInfoValue('deprecated') && !$am->isEnabled($addon->getKey(), $addon->getType())) {
+            } elseif (
+                !isset($where["deprecated"]) &&
+                $addon->getInfoValue("deprecated") &&
+                !$am->isEnabled($addon->getKey(), $addon->getType())
+            ) {
                 return false;
             }
             return true;
@@ -474,11 +484,12 @@ class AddonModel implements LoggerAwareInterface {
      * @param string $type They type of theme, one of **desktop** or **mobile**.
      * @return string Returns an addon key for a theme.
      */
-    public function getThemeKey($type = '') {
-        if ($type === 'mobile') {
-            $r = $this->config->get('Garden.MobileTheme', AddonManager::DEFAULT_MOBILE_THEME);
+    public function getThemeKey($type = "")
+    {
+        if ($type === "mobile") {
+            $r = $this->config->get("Garden.MobileTheme", AddonManager::DEFAULT_MOBILE_THEME);
         } else {
-            $r = $this->config->get('Garden.Theme', AddonManager::DEFAULT_DESKTOP_THEME);
+            $r = $this->config->get("Garden.Theme", AddonManager::DEFAULT_DESKTOP_THEME);
         }
         return $r;
     }
@@ -489,11 +500,12 @@ class AddonModel implements LoggerAwareInterface {
      * @param string $type The type of theme, either **dekstop** or **mobile**.
      * @return string Returns a config key.
      */
-    private function getThemeConfigKey($type = '') {
-        if (strcasecmp($type, 'desktop') === 0) {
-            $type = '';
+    private function getThemeConfigKey($type = "")
+    {
+        if (strcasecmp($type, "desktop") === 0) {
+            $type = "";
         }
-        $r = 'Garden.'.ucfirst($type).'Theme';
+        $r = "Garden." . ucfirst($type) . "Theme";
         return $r;
     }
 }

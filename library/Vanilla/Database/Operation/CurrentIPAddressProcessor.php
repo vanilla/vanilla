@@ -13,7 +13,8 @@ use Vanilla\Utility\ArrayUtils;
 /**
  * A processor that adds the current IP address to fields in the model.
  */
-class CurrentIPAddressProcessor implements Processor {
+class CurrentIPAddressProcessor implements Processor
+{
     /** @var array */
     private $insertFields = ["InsertIPAddress"];
 
@@ -28,7 +29,8 @@ class CurrentIPAddressProcessor implements Processor {
      *
      * @param \Gdn_Request $request
      */
-    public function __construct(\Gdn_Request $request) {
+    public function __construct(\Gdn_Request $request)
+    {
         $this->request = $request;
     }
 
@@ -37,7 +39,8 @@ class CurrentIPAddressProcessor implements Processor {
      *
      * @return array
      */
-    public function getInsertFields(): array {
+    public function getInsertFields(): array
+    {
         return $this->insertFields;
     }
 
@@ -46,7 +49,8 @@ class CurrentIPAddressProcessor implements Processor {
      *
      * @return array
      */
-    public function getUpdateFields(): array {
+    public function getUpdateFields(): array
+    {
         return $this->updateFields;
     }
 
@@ -57,7 +61,8 @@ class CurrentIPAddressProcessor implements Processor {
      * @param callable $stack
      * @return mixed
      */
-    public function handle(Operation $operation, callable $stack) {
+    public function handle(Operation $operation, callable $stack)
+    {
         switch ($operation->getType()) {
             case Operation::TYPE_INSERT:
                 $fields = $this->getInsertFields();
@@ -82,12 +87,15 @@ class CurrentIPAddressProcessor implements Processor {
         }
 
         foreach ($fields as $field) {
-            $fieldExists = $operation->getCaller()->getWriteSchema()->getField("properties.{$field}");
+            $fieldExists = $operation
+                ->getCaller()
+                ->getWriteSchema()
+                ->getField("properties.{$field}");
             if ($fieldExists) {
                 $set = $operation->getSet();
                 if (empty($set[$field]) || $operation->getMode() === Operation::MODE_DEFAULT) {
                     $set[$field] = ipEncode($this->getCurrentIPAddress());
-                };
+                }
                 $operation->setSet($set);
             }
         }
@@ -100,7 +108,8 @@ class CurrentIPAddressProcessor implements Processor {
      *
      * @return string|null
      */
-    public function getCurrentIPAddress(): ?string {
+    public function getCurrentIPAddress(): ?string
+    {
         return $this->request->getIP();
     }
 
@@ -110,7 +119,8 @@ class CurrentIPAddressProcessor implements Processor {
      * @param array $insertFields
      * @return self
      */
-    public function setInsertFields(array $insertFields): self {
+    public function setInsertFields(array $insertFields): self
+    {
         $this->insertFields = $insertFields;
         return $this;
     }
@@ -120,9 +130,10 @@ class CurrentIPAddressProcessor implements Processor {
      *
      * @return $this
      */
-    public function camelCase(): self {
-        $this->insertFields = array_map('lcfirst', $this->insertFields);
-        $this->updateFields = array_map('lcfirst', $this->updateFields);
+    public function camelCase(): self
+    {
+        $this->insertFields = array_map("lcfirst", $this->insertFields);
+        $this->updateFields = array_map("lcfirst", $this->updateFields);
         return $this;
     }
 
@@ -132,7 +143,8 @@ class CurrentIPAddressProcessor implements Processor {
      * @param array $updateFields
      * @return self
      */
-    public function setUpdateFields(array $updateFields): self {
+    public function setUpdateFields(array $updateFields): self
+    {
         $this->updateFields = $updateFields;
         return $this;
     }

@@ -34,9 +34,7 @@ export function setupTestQuill(htmlBody?: string): Quill {
  *
  * @param initialValue The initial text area value to use.
  */
-export function setupLegacyEditor(
-    initialValue: DeltaOperation[],
-): Promise<{
+export function setupLegacyEditor(initialValue: DeltaOperation[]): Promise<{
     quill: Quill;
     textarea: HTMLTextAreaElement;
 }> {

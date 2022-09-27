@@ -19,7 +19,7 @@ const messages = {
 const cloudPluginsPath = path.resolve(PATH_ROOT, "cloud", "plugins");
 let cloudPlugins = [];
 if (fs.existsSync(cloudPluginsPath)) {
-    cloudPlugins = fs.readdirSync(path.resolve(cloudPluginsPath)).filter(dir => ![".", ".."].includes(dir));
+    cloudPlugins = fs.readdirSync(path.resolve(cloudPluginsPath)).filter((dir) => ![".", ".."].includes(dir));
 }
 
 const noCloudImportsInCore = {

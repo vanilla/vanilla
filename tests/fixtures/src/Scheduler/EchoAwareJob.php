@@ -22,8 +22,8 @@ class EchoAwareJob implements
     LocalJobInterface,
     JobTypeAwareInterface,
     JobPriorityAwareInterface,
-    JobDelayAwareInterface {
-
+    JobDelayAwareInterface
+{
     /** @var string */
     protected $jobType;
 
@@ -44,7 +44,8 @@ class EchoAwareJob implements
      *
      * @param LoggerInterface $logger
      */
-    public function __construct(LoggerInterface $logger) {
+    public function __construct(LoggerInterface $logger)
+    {
         $this->logger = $logger;
     }
 
@@ -53,7 +54,8 @@ class EchoAwareJob implements
      *
      * @param array $message
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
         $this->message = $message;
     }
 
@@ -62,8 +64,14 @@ class EchoAwareJob implements
      *
      * @return JobExecutionStatus
      */
-    public function run(): JobExecutionStatus {
-        $msg = get_class($this)." :: JobType :: ".$this->jobType." :: Message :: ".var_export($this->message, true);
+    public function run(): JobExecutionStatus
+    {
+        $msg =
+            get_class($this) .
+            " :: JobType :: " .
+            $this->jobType .
+            " :: Message :: " .
+            var_export($this->message, true);
         $this->logger->info($msg);
 
         return JobExecutionStatus::complete();
@@ -74,7 +82,8 @@ class EchoAwareJob implements
      *
      * @param string $jobType
      */
-    public function setJobType(string $jobType) {
+    public function setJobType(string $jobType)
+    {
         $this->jobType = $jobType;
     }
 
@@ -83,7 +92,8 @@ class EchoAwareJob implements
      *
      * @param JobPriority $priority
      */
-    public function setPriority(JobPriority $priority) {
+    public function setPriority(JobPriority $priority)
+    {
         $this->priority = $priority;
     }
 
@@ -92,7 +102,8 @@ class EchoAwareJob implements
      *
      * @param int $seconds
      */
-    public function setDelay(int $seconds) {
+    public function setDelay(int $seconds)
+    {
         $this->delay = $seconds;
     }
 }

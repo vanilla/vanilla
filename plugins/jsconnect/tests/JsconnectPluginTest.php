@@ -14,13 +14,13 @@ use VanillaTests\SiteTestCase;
 /**
  * Tests for the pockets model.
  */
-class JsconnectPLuginTest extends SiteTestCase {
-
+class JsconnectPLuginTest extends SiteTestCase
+{
     use ExpectExceptionTrait;
 
-    protected const CLIENT_ID_SINGLE = 'single';
+    protected const CLIENT_ID_SINGLE = "single";
 
-    public static $addons = ['jsconnect'];
+    public static $addons = ["jsconnect"];
 
     /**
      * @var \Gdn_AuthenticationProviderModel
@@ -30,7 +30,8 @@ class JsconnectPLuginTest extends SiteTestCase {
     /**
      * Setup.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->container()->call(function (
             \OAuth2Plugin $oauth2Plugin,
@@ -44,9 +45,10 @@ class JsconnectPLuginTest extends SiteTestCase {
      * Test getting getProvider.
      *
      */
-    public function testGetProviderNotConfigured() {
+    public function testGetProviderNotConfigured()
+    {
         /** @var array Provider */
-        $provider = \JsConnectPlugin::getProvider('facebook');
+        $provider = \JsConnectPlugin::getProvider("facebook");
         $this->assertSame(false, $provider);
     }
 
@@ -54,14 +56,15 @@ class JsconnectPLuginTest extends SiteTestCase {
      * Test getting getProvider.
      *
      */
-    public function testGetProviderConfiguredNotEntered() {
-        $cf =  static::container()->get(Gdn_Configuration::class);
+    public function testGetProviderConfiguredNotEntered()
+    {
+        $cf = static::container()->get(Gdn_Configuration::class);
 
-        $cf->set('Plugins.Facebook.ApplicationID', 'something');
-        $cf->set('Plugins.Facebook.Secret', 'somethingElse');
+        $cf->set("Plugins.Facebook.ApplicationID", "something");
+        $cf->set("Plugins.Facebook.Secret", "somethingElse");
 
         /** @var array Provider */
-        $provider = \JsConnectPlugin::getProvider('facebook');
+        $provider = \JsConnectPlugin::getProvider("facebook");
         $this->assertSame(false, $provider);
     }
 }

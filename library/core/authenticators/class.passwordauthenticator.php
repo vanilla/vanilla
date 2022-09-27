@@ -17,18 +17,19 @@
 /**
  * Handles authentication with a username and password combo.
  */
-class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
-
+class Gdn_PasswordAuthenticator extends Gdn_Authenticator
+{
     /**
      *
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->_DataSourceType = Gdn_Authenticator::DATA_FORM;
 
-        $this->hookDataField('Email', 'Email');
-        $this->hookDataField('Password', 'Password');
-        $this->hookDataField('RememberMe', 'RememberMe', false);
-        $this->hookDataField('ClientHour', 'ClientHour', false);
+        $this->hookDataField("Email", "Email");
+        $this->hookDataField("Password", "Password");
+        $this->hookDataField("RememberMe", "RememberMe", false);
+        $this->hookDataField("ClientHour", "ClientHour", false);
 
         // Initialize built-in authenticator functionality
         parent::__construct();
@@ -44,7 +45,8 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
      * @param string $password The password assigned to the user in the database.
      * @return int The UserID of the authenticated user or 0 if one isn't found.
      */
-    public function authenticate($email = '', $password = '') {
+    public function authenticate($email = "", $password = "")
+    {
         if (!$email || !$password) {
             // We werent given parameters, check if they exist in our DataSource
             if ($this->currentStep() != Gdn_Authenticator::MODE_VALIDATE) {
@@ -52,10 +54,10 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
             }
 
             // Get the values from the DataSource
-            $email = $this->getValue('Email');
-            $password = $this->getValue('Password');
-            $persistentSession = $this->getValue('RememberMe');
-            $clientHour = $this->getValue('ClientHour');
+            $email = $this->getValue("Email");
+            $password = $this->getValue("Password");
+            $persistentSession = $this->getValue("RememberMe");
+            $clientHour = $this->getValue("ClientHour");
         } else {
             $persistentSession = false;
             $clientHour = 0;
@@ -75,7 +77,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
             if ($signInPermission === false && !$userData->Banned) {
                 $permissionModel = Gdn::authenticator()->getPermissionModel();
                 foreach ($permissionModel->getUserPermissions($userID) as $permissions) {
-                    $signInPermission |= val('Garden.SignIn.Allow', $permissions, false);
+                    $signInPermission |= val("Garden.SignIn.Allow", $permissions, false);
                 }
             }
 
@@ -89,7 +91,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
                 $userModel->updateVisit($userID, $clientHour);
 
                 Gdn::authenticator()->trigger(Gdn_Authenticator::AUTH_SUCCESS);
-                $this->fireEvent('Authenticated');
+                $this->fireEvent("Authenticated");
             } else {
                 Gdn::authenticator()->trigger(Gdn_Authenticator::AUTH_DENIED);
             }
@@ -102,9 +104,13 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
      *
      * @return string
      */
-    public function currentStep() {
+    public function currentStep()
+    {
         // Was data submitted through the form already?
-        if (is_object($this->_DataSource) && ($this->_DataSource == $this || $this->_DataSource->isPostBack() === true)) {
+        if (
+            is_object($this->_DataSource) &&
+            ($this->_DataSource == $this || $this->_DataSource->isPostBack() === true)
+        ) {
             return $this->_checkHookedFields();
         }
 
@@ -114,42 +120,51 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
     /**
      * Destroys the user's session cookie - essentially de-authenticating them.
      */
-    public function deAuthenticate() {
+    public function deAuthenticate()
+    {
         $this->setIdentity(null);
 
         return Gdn_Authenticator::AUTH_SUCCESS;
     }
 
-    public function loginResponse() {
+    public function loginResponse()
+    {
         return Gdn_Authenticator::REACT_RENDER;
     }
 
-    public function partialResponse() {
+    public function partialResponse()
+    {
         return Gdn_Authenticator::REACT_REDIRECT;
     }
 
-    public function successResponse() {
+    public function successResponse()
+    {
         return Gdn_Authenticator::REACT_REDIRECT;
     }
 
-    public function logoutResponse() {
+    public function logoutResponse()
+    {
         return Gdn_Authenticator::REACT_REDIRECT;
     }
 
-    public function repeatResponse() {
+    public function repeatResponse()
+    {
         return Gdn_Authenticator::REACT_RENDER;
     }
 
     // What to do if the entry/auth/* page is triggered but login is denied or fails
-    public function failedResponse() {
+    public function failedResponse()
+    {
         return Gdn_Authenticator::REACT_RENDER;
     }
 
-    public function wakeUp() {
+    public function wakeUp()
+    {
         // Do nothing.
     }
 
-    public function getURL($uRLType) {
+    public function getURL($uRLType)
+    {
         // We aren't overriding anything
         return false;
     }

@@ -4,7 +4,7 @@ import Container from "@library/layout/components/Container";
 import { adminLayoutClasses } from "@dashboard/components/AdminLayout.classes";
 import { cx } from "@emotion/css";
 import AdminHeader from "@dashboard/components/AdminHeader";
-import ThreeColumnSection from "@library/layout/ThreeColumnSection";
+import SectionThreeColumns from "@library/layout/ThreeColumnSection";
 import AdminTitleBar from "@dashboard/components/AdminTitleBar";
 import { userContentClasses } from "@library/content/UserContent.styles";
 
@@ -30,6 +30,7 @@ type IProps = {
           title: string;
           /** Classes applied to the title bar container */
           containerClassName?: string;
+          titleBarContainerClassName?: string;
           /** Classes applied to the title bar container */
           titleAndActionsContainerClassName?: string;
           /** Any notes that should appear within the title bar, usually action buttons */
@@ -46,6 +47,7 @@ type IProps = {
           customTitleBar: ReactNode;
           title?: never;
           containerClassName?: never;
+          titleBarContainerClassName?: never;
           titleAndActionsContainerClassName?: never;
           titleBarActions?: never;
           actionsWrapperClassName?: never;
@@ -75,8 +77,10 @@ export default function AdminLayout(props: IProps) {
                 customTitleBar
             ) : (
                 <AdminTitleBar
+                    useTwoColumnContainer={!props.rightPanel}
                     title={title ?? ""}
                     description={description}
+                    containerClassName={props.titleBarContainerClassName}
                     titleAndActionsContainerClassName={titleAndActionsContainerClassName}
                     actions={titleBarActions}
                     titleLabel={titleLabel}
@@ -91,7 +95,7 @@ export default function AdminLayout(props: IProps) {
             <div className={classes.container}>
                 <Container fullGutter className={rightPanel ? classes.adjustedContainerPadding : undefined}>
                     {rightPanel && (
-                        <ThreeColumnSection
+                        <SectionThreeColumns
                             className={classes.threePanel}
                             leftTop={<aside className={classes.leftPanel}>{leftPanel}</aside>}
                             middleTop={topTitleBar}

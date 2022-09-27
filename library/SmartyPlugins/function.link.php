@@ -20,39 +20,40 @@
  * @param Smarty $smarty The smarty object rendering the template.
  * @return string The url.
  */
-function smarty_function_link($params, &$smarty) {
-    $path = val('path', $params, '', true);
-    $text = val('text', $params, '', true);
-    $noTag = val('notag', $params, false, true);
-    $customFormat = val('format', $params, false, true);
+function smarty_function_link($params, &$smarty)
+{
+    $path = val("path", $params, "", true);
+    $text = val("text", $params, "", true);
+    $noTag = val("notag", $params, false, true);
+    $customFormat = val("format", $params, false, true);
 
-    if (!$text && $path != 'signinout' && $path != 'signin') {
+    if (!$text && $path != "signinout" && $path != "signin") {
         $noTag = true;
     }
 
     if ($customFormat) {
         $format = $customFormat;
     } elseif ($noTag) {
-        $format = '%url';
+        $format = "%url";
     } else {
-      $format = '<a href="%url" class="%class">%text</a>';
+        $format = '<a href="%url" class="%class">%text</a>';
     }
 
     $options = [];
-    if (isset($params['withdomain'])) {
-        $options['WithDomain'] = $params['withdomain'];
+    if (isset($params["withdomain"])) {
+        $options["WithDomain"] = $params["withdomain"];
     }
-    if (isset($params['class'])) {
-        $options['class'] = $params['class'];
+    if (isset($params["class"])) {
+        $options["class"] = $params["class"];
     }
-    if (isset($params['tk'])) {
-        $options['TK'] = $params['tk'];
+    if (isset($params["tk"])) {
+        $options["TK"] = $params["tk"];
     }
-    if (isset($params['target'])) {
-        $options['Target'] = $params['target'];
+    if (isset($params["target"])) {
+        $options["Target"] = $params["target"];
     }
 
-   $result = Gdn_Theme::link($path, $text, $format, $options);
+    $result = Gdn_Theme::link($path, $text, $format, $options);
 
-   return $result;
+    return $result;
 }

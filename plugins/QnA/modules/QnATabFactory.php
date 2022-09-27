@@ -13,8 +13,8 @@ use Vanilla\Forums\Modules\DiscussionTabFactory;
 /**
  * Factories for QnA plugin tabs.
  */
-class QnATabFactory extends DiscussionTabFactory {
-
+class QnATabFactory extends DiscussionTabFactory
+{
     public const PRESET_NEW_QUESTIONS = "new-questions";
     public const PRESET_UNANSWERED_QUESTIONS = "unanswered-questions";
     public const PRESET_RECENTLY_ANSWERED_QUESTIONS = "recently-answered-questions";
@@ -24,14 +24,15 @@ class QnATabFactory extends DiscussionTabFactory {
      *
      * @return Reference
      */
-    public static function getNewQuestionReference(): Reference {
+    public static function getNewQuestionReference(): Reference
+    {
         return new Reference(static::class, [
             self::PRESET_NEW_QUESTIONS,
-            'Newest Questions',
+            "Newest Questions",
             [
-                'type' => 'question',
-                'sort' => '-dateInserted',
-            ]
+                "type" => "question",
+                "sort" => "-dateInserted",
+            ],
         ]);
     }
 
@@ -40,15 +41,16 @@ class QnATabFactory extends DiscussionTabFactory {
      *
      * @return Reference
      */
-    public static function getUnansweredQuestionReference(): Reference {
+    public static function getUnansweredQuestionReference(): Reference
+    {
         return new Reference(static::class, [
             self::PRESET_UNANSWERED_QUESTIONS,
-            'Unanswered Questions',
+            "Unanswered Questions",
             [
-                'type' => 'question',
-                'status' => 'unanswered',
-                'sort' => '-dateLastComment',
-            ]
+                "type" => "question",
+                "status" => "unanswered",
+                "sort" => "-dateLastComment",
+            ],
         ]);
     }
 
@@ -59,15 +61,16 @@ class QnATabFactory extends DiscussionTabFactory {
      *
      * @return Reference
      */
-    public static function getRecentlyAnsweredReference(): Reference {
+    public static function getRecentlyAnsweredReference(): Reference
+    {
         return new Reference(static::class, [
             self::PRESET_RECENTLY_ANSWERED_QUESTIONS,
-            'Recently Answered Questions',
+            "Recently Answered Questions",
             [
-                'type' => 'question',
-                'status' => 'answered',
-                'sort' => '-dateLastComment',
-            ]
+                "type" => "question",
+                "status" => "answered",
+                "sort" => "-dateLastComment",
+            ],
         ]);
     }
 }

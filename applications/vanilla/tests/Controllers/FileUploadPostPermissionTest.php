@@ -15,13 +15,15 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Test file upload permissions.
  */
-class FileUploadPostPermissionTest extends SiteTestCase {
+class FileUploadPostPermissionTest extends SiteTestCase
+{
     use UsersAndRolesApiTestTrait, CommunityApiTestTrait;
 
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
@@ -29,36 +31,42 @@ class FileUploadPostPermissionTest extends SiteTestCase {
      * Test that uploads.add permission is respected when setting the post form's "FileUpload" attribute when a user
      * has the permission.
      */
-    public function testFileUploadPermissionAllow() {
-        $this->runWithPermissions(function () {
-            $r = $this->bessy()->get(
-                "/post/discussion"
-            );
-            $uploadAllowed = $r->Form->EventArguments["Attributes"]["FileUpload"];
-            $this->assertTrue($uploadAllowed);
-        },
-           ["uploads.add" => true], $this->categoryPermission(-1, ["discussions.add" => true]));
+    public function testFileUploadPermissionAllow()
+    {
+        $this->runWithPermissions(
+            function () {
+                $r = $this->bessy()->get("/post/discussion");
+                $uploadAllowed = $r->Form->EventArguments["Attributes"]["FileUpload"];
+                $this->assertTrue($uploadAllowed);
+            },
+            ["uploads.add" => true],
+            $this->categoryPermission(-1, ["discussions.add" => true])
+        );
     }
 
     /**
      * Test that uploads.add permission is respected when setting the post form's "FileUpload" attribute when a user
      * doesn't have the permission.
      */
-    public function testFileUploadPermissionDisallow() {
-        $this->runWithPermissions(function () {
-            $r = $this->bessy()->get(
-                "/post/discussion"
-            );
-            $uploadAllowed = $r->Form->EventArguments["Attributes"]["FileUpload"];
-            $this->assertFalse($uploadAllowed);
-        }, ['uploads.add' => false], $this->categoryPermission(-1, ["discussions.add" => true]));
+    public function testFileUploadPermissionDisallow()
+    {
+        $this->runWithPermissions(
+            function () {
+                $r = $this->bessy()->get("/post/discussion");
+                $uploadAllowed = $r->Form->EventArguments["Attributes"]["FileUpload"];
+                $this->assertFalse($uploadAllowed);
+            },
+            ["uploads.add" => false],
+            $this->categoryPermission(-1, ["discussions.add" => true])
+        );
     }
 
     /**
      * Test deleting the old "Plugins.Attachments.Upload.Allow" permission and updating the value of "Garden.Uploads.Allow"
      * to true if the old permission is true.
      */
-    public function testUploadPermissionMigration() {
+    public function testUploadPermissionMigration()
+    {
         $oldPermission = "Plugins.Attachments.Upload.Allow";
 
         // Create a role without the new upload permission.
@@ -75,7 +83,7 @@ class FileUploadPostPermissionTest extends SiteTestCase {
         $this->assertTrue($oldPermissionExists);
 
         // Run structure.
-        include PATH_APPLICATIONS.'/dashboard/settings/structure.php';
+        include PATH_APPLICATIONS . "/dashboard/settings/structure.php";
 
         // Confirm the old permission column has been deleted.
         $oldPermissionExists = $structure->table("Permission")->columnExists("Plugins.Attachments.Upload.Allow");

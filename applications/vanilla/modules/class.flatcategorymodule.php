@@ -1,7 +1,7 @@
 <?php
 
-class FlatCategoryModule extends Gdn_Module {
-
+class FlatCategoryModule extends Gdn_Module
+{
     /**
      * Default limit for categories.
      */
@@ -43,7 +43,8 @@ class FlatCategoryModule extends Gdn_Module {
      * @param string|Gdn_Controller $sender
      * @param bool|string $applicationFolder
      */
-    public function __construct($sender = '', $applicationFolder = false) {
+    public function __construct($sender = "", $applicationFolder = false)
+    {
         parent::__construct($sender, $applicationFolder);
 
         $this->categoryModel = new CategoryModel();
@@ -52,9 +53,9 @@ class FlatCategoryModule extends Gdn_Module {
         // If this is coming from the module controller, populate some properties by query parameters.
         if ($sender instanceof ModuleController) {
             $paramWhitelist = [
-                'categoryID' => Gdn::request()->get('categoryID', Gdn::request()->get('CategoryID')),
-                'filter' => Gdn::request()->get('filter', Gdn::request()->get('Filter')),
-                'limit' => Gdn::request()->get('limit', Gdn::request()->get('Limit'))
+                "categoryID" => Gdn::request()->get("categoryID", Gdn::request()->get("CategoryID")),
+                "filter" => Gdn::request()->get("filter", Gdn::request()->get("Filter")),
+                "limit" => Gdn::request()->get("limit", Gdn::request()->get("Limit")),
             ];
 
             foreach ($paramWhitelist as $property => $value) {
@@ -70,8 +71,9 @@ class FlatCategoryModule extends Gdn_Module {
      *
      * @return string
      */
-    public function assetTarget() {
-        return 'Content';
+    public function assetTarget()
+    {
+        return "Content";
     }
 
     /**
@@ -79,7 +81,8 @@ class FlatCategoryModule extends Gdn_Module {
      *
      * @return array|null Array if the configured category is valid.  Otherwise, null.
      */
-    public function getCategory() {
+    public function getCategory()
+    {
         if (!isset($this->category)) {
             $this->category = CategoryModel::categories($this->categoryID);
         }
@@ -92,12 +95,13 @@ class FlatCategoryModule extends Gdn_Module {
      *
      * @return array|null
      */
-    public function getChildren() {
+    public function getChildren()
+    {
         $category = $this->getCategory();
 
         if ($category && !$this->children) {
             $this->children = $this->categoryModel->getTreeAsFlat(
-                val('CategoryID', $category),
+                val("CategoryID", $category),
                 0,
                 $this->getLimit(),
                 $this->getFilter()
@@ -113,11 +117,12 @@ class FlatCategoryModule extends Gdn_Module {
      *
      * @return null|string
      */
-    public function getFilter() {
+    public function getFilter()
+    {
         $filter = null;
 
         if ($this->filter) {
-            $filter = (string)$this->filter;
+            $filter = (string) $this->filter;
         }
 
         return $filter;
@@ -128,10 +133,11 @@ class FlatCategoryModule extends Gdn_Module {
      *
      * @return int
      */
-    public function getLimit() {
+    public function getLimit()
+    {
         $limit = $this->limit;
 
-        return is_numeric($limit) && $limit > 0 ? (int)$limit : $this::DEFAULT_LIMIT;
+        return is_numeric($limit) && $limit > 0 ? (int) $limit : $this::DEFAULT_LIMIT;
     }
 
     /**
@@ -139,19 +145,20 @@ class FlatCategoryModule extends Gdn_Module {
      *
      * @return string
      */
-    public function toString() {
+    public function toString()
+    {
         // Setup
-        $this->setData('Categories', $this->getChildren());
-        $this->setData('Layout', c('Vanilla.Categories.Layout', 'modern'));
-        $this->setData('ParentCategory', $this->getCategory());
+        $this->setData("Categories", $this->getChildren());
+        $this->setData("Layout", c("Vanilla.Categories.Layout", "modern"));
+        $this->setData("ParentCategory", $this->getCategory());
 
         // If our category isn't valid, or we have no child categories to display, then display nothing.
-        if (!$this->data('ParentCategory') || !$this->data('Categories')) {
-            return '';
+        if (!$this->data("ParentCategory") || !$this->data("Categories")) {
+            return "";
         }
 
         // Vanilla's category helper functions are beneficial in creating markdown in the views.
-        require_once Gdn::controller()->fetchViewLocation('helper_functions', 'categories', 'vanilla');
+        require_once Gdn::controller()->fetchViewLocation("helper_functions", "categories", "vanilla");
         return parent::toString();
     }
 }

@@ -117,7 +117,7 @@ export default function Tree<D = {}>(props: Props<D>) {
 
             return (
                 <Draggable
-                    key={flatItem.item.id}
+                    key={`${flatItem.item.id}-${index}`}
                     draggableId={flatItem.item.id.toString()}
                     index={index}
                     isDragDisabled={!isDragEnabled}
@@ -240,10 +240,10 @@ export default function Tree<D = {}>(props: Props<D>) {
         dragState.current = undefined;
     }
 
-    const renderedItems = useMemo(() => flattenedTree.map((fi, index) => renderItem(fi, index)), [
-        renderItem,
-        flattenedTree,
-    ]);
+    const renderedItems = useMemo(
+        () => flattenedTree.map((fi, index) => renderItem(fi, index)),
+        [renderItem, flattenedTree],
+    );
 
     /**
      * Keyboard handler for arrow up, arrow down, home, end and escape.

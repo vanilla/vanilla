@@ -5,7 +5,7 @@
 
 const path = require("path");
 const fs = require("fs");
-const glob = require("glob");
+const glob = require("globby");
 const VANILLA_ROOT = path.resolve(__dirname, "../../");
 
 const sectionEnv = process.env.STORYBOOK_SECTION;
@@ -17,7 +17,7 @@ const globs = [];
 
 function scanAddons(addonDir) {
     const keys = glob
-        .sync(path.join(VANILLA_ROOT, addonDir + "/*"))
+        .sync(path.join(VANILLA_ROOT, addonDir + "/*"), { onlyDirectories: true })
         .map((dir) => dir.replace(path.join(VANILLA_ROOT, addonDir + "/"), ""));
 
     keys.forEach((key) => {

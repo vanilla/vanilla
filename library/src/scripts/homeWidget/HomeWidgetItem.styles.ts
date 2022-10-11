@@ -593,6 +593,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
         ...Mixins.font(vars.name.font),
         color: ColorsUtils.colorOut(vars.background.fg.color),
         marginBottom: 16,
+        textAlign: vars.options.alignment,
     });
 
     const imageAspectRatio = percent((vars.image.ratio.height / vars.image.ratio.width) * 100);
@@ -644,6 +645,10 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
         ...Mixins.absolute.fullSizeOfParent(),
         objectFit: "cover",
         objectPosition: "center center",
+    });
+
+    const defaultImageSVG = css({
+        ...Mixins.absolute.fullSizeOfParent(),
     });
 
     const iconContainer = style(
@@ -768,6 +773,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
         imageContainer,
         imageContainerWrapper,
         image,
+        defaultImageSVG,
         description,
         icon,
         iconWrap,

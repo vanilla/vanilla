@@ -10,10 +10,11 @@ namespace Vanilla\Utility;
 /**
  * Some utilities to help with debugging and/or support.
  */
-class DebugUtils {
-    const WRAP_HTML_COMMENT = 'html-comment';
-    const WRAP_HTML = 'html';
-    const WRAP_HTML_NONE = 'html-none';
+class DebugUtils
+{
+    const WRAP_HTML_COMMENT = "html-comment";
+    const WRAP_HTML = "html";
+    const WRAP_HTML_NONE = "html-none";
 
     /**
      * Test whether or not we are in debug mode.
@@ -22,8 +23,9 @@ class DebugUtils {
      *
      * @return bool
      */
-    public static function isDebug(): bool {
-        return (bool)debug();
+    public static function isDebug(): bool
+    {
+        return (bool) debug();
     }
 
     /**
@@ -32,7 +34,8 @@ class DebugUtils {
      * @param bool $debug The new debug mode.
      * @return bool Returns the last value of debug.
      */
-    public static function setDebug(bool $debug): bool {
+    public static function setDebug(bool $debug): bool
+    {
         $r = self::isDebug();
         debug($debug);
         return $r;
@@ -43,8 +46,9 @@ class DebugUtils {
      *
      * @return bool
      */
-    public static function isTestMode(): bool {
-        return defined('TESTMODE_ENABLED') && TESTMODE_ENABLED;
+    public static function isTestMode(): bool
+    {
+        return defined("TESTMODE_ENABLED") && TESTMODE_ENABLED;
     }
 
     /**
@@ -55,7 +59,8 @@ class DebugUtils {
      * @param string $wrap How to wrap the output.
      * @return string
      */
-    public static function renderException(\Throwable $ex, string $message = '', string $wrap = self::WRAP_HTML): string {
+    public static function renderException(\Throwable $ex, string $message = "", string $wrap = self::WRAP_HTML): string
+    {
         $r = [];
 
         if (!empty($message)) {
@@ -78,12 +83,13 @@ class DebugUtils {
      * @param int $offset The part of the trace to start at.
      * @return string Returns a string with filenames and line numbers.
      */
-    public static function stackTraceString(array $trace, int $limit = null, int $offset = 0): string {
+    public static function stackTraceString(array $trace, int $limit = null, int $offset = 0): string
+    {
         $trace = array_slice($trace, $offset, $limit);
         $r = [];
         foreach ($trace as $item) {
-            $file = StringUtils::substringLeftTrim($item['file'] ?? '/unknown', PATH_ROOT);
-            $line = $item['line'] ?? 0;
+            $file = StringUtils::substringLeftTrim($item["file"] ?? "/unknown", PATH_ROOT);
+            $line = $item["line"] ?? 0;
 
             $r[] = "$file ($line)";
         }
@@ -97,7 +103,8 @@ class DebugUtils {
      * @param string $wrap One of the __WRAP_*__ constants.
      * @return string Returns the message properly wrapped and escaped.
      */
-    public static function wrapMessage(string $message, string $wrap = self::WRAP_HTML): string {
+    public static function wrapMessage(string $message, string $wrap = self::WRAP_HTML): string
+    {
         switch ($wrap) {
             case self::WRAP_HTML_NONE:
                 return htmlspecialchars($message);
@@ -115,8 +122,9 @@ class DebugUtils {
      * @param string $message The message to wrap.
      * @return string Returns an HTML comment.
      */
-    public static function wrapHtmlComment(string $message): string {
-        $message = str_replace(['<!--', '-->'], ['<!~~', '~~>'], $message);
+    public static function wrapHtmlComment(string $message): string
+    {
+        $message = str_replace(["<!--", "-->"], ["<!~~", "~~>"], $message);
         return "\n<!--\n$message\n-->\n";
     }
 
@@ -126,7 +134,8 @@ class DebugUtils {
      * @param string $message The message to wrap.
      * @return string Returns an HTML element string.
      */
-    public static function wrapDebug(string $message): string {
-        return "\n".'<pre class="debug-dontUseCssOnMe">'.htmlspecialchars($message)."</pre>\n";
+    public static function wrapDebug(string $message): string
+    {
+        return "\n" . '<pre class="debug-dontUseCssOnMe">' . htmlspecialchars($message) . "</pre>\n";
     }
 }

@@ -25,6 +25,12 @@ paths:
                       items:
                           type: integer
                   style: form
+                - name: excludeNoCountDiscussion
+                  description: Filter results by tagged discussion
+                  in: query
+                  schema:
+                      type: boolean
+                  style: form
                 - $ref: "#/components/parameters/Page"
                 - description: Desired number of tags per page.
                   in: query
@@ -33,7 +39,6 @@ paths:
                       type: integer
                       default: 20
                       minimum: 1
-
             responses:
                 "200":
                     content:

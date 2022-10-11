@@ -10,8 +10,8 @@ namespace Vanilla\Dashboard\Models;
 use Vanilla\Utility\ArrayUtils;
 
 /** Filter for the openapi */
-class ModerationMessagesFilterOpenApi {
-
+class ModerationMessagesFilterOpenApi
+{
     private $messageModel;
 
     /**
@@ -19,7 +19,8 @@ class ModerationMessagesFilterOpenApi {
      *
      * @param \MessageModel $messageModel
      */
-    public function __construct(\MessageModel $messageModel) {
+    public function __construct(\MessageModel $messageModel)
+    {
         $this->messageModel = $messageModel;
     }
 
@@ -28,13 +29,10 @@ class ModerationMessagesFilterOpenApi {
      *
      * @param array $openApi
      */
-    public function __invoke(array &$openApi): void {
+    public function __invoke(array &$openApi): void
+    {
         $layoutViewTypes = $this->messageModel->getLayoutViewTypes();
 
-        ArrayUtils::setByPath(
-            "components.schemas.LayoutViewType.enum",
-            $openApi,
-            $layoutViewTypes
-        );
+        ArrayUtils::setByPath("components.schemas.LayoutViewType.enum", $openApi, $layoutViewTypes);
     }
 }

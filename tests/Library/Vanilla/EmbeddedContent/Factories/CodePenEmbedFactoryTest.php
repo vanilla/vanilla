@@ -16,8 +16,8 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the giphy embed and factory.
  */
-class CodePenEmbedFactoryTest extends MinimalContainerTestCase {
-
+class CodePenEmbedFactoryTest extends MinimalContainerTestCase
+{
     /** @var CodePenEmbedFactory */
     private $factory;
 
@@ -27,12 +27,12 @@ class CodePenEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
         $this->factory = new CodePenEmbedFactory($this->httpClient);
     }
-
 
     /**
      * Test that all giphy domain types are supported.
@@ -40,42 +40,45 @@ class CodePenEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string $urlToTest
      * @dataProvider supportedDomainsProvider
      */
-    public function testSupportedDomains(string $urlToTest) {
+    public function testSupportedDomains(string $urlToTest)
+    {
         $this->assertTrue($this->factory->canHandleUrl($urlToTest));
     }
 
     /**
      * @return array
      */
-    public function supportedDomainsProvider(): array {
+    public function supportedDomainsProvider(): array
+    {
         return [
-            ['https://codepen.io/hiroshi_m/pen/YoKYVv'], // Only 1 image format.
+            ["https://codepen.io/hiroshi_m/pen/YoKYVv"], // Only 1 image format.
         ];
     }
 
     /**
      * Test network request fetching and handling.
      */
-    public function testCreateEmbedForUrl() {
-        $urlToCheck = 'https://codepen.io/hiroshi_m/pen/YoKYVv';
-        $endpoint = CodePenEmbedFactory::OEMBED_URL_BASE . '?url=' . urlencode($urlToCheck) . '&format=json';
+    public function testCreateEmbedForUrl()
+    {
+        $urlToCheck = "https://codepen.io/hiroshi_m/pen/YoKYVv";
+        $endpoint = CodePenEmbedFactory::OEMBED_URL_BASE . "?url=" . urlencode($urlToCheck) . "&format=json";
 
-        $name = 'Hello title';
+        $name = "Hello title";
         $width = 500;
         $height = 400;
-        $frameSrc = 'https://codepen.io/hiroshi_m/embed/preview/YoKYVv?height=300';
-        $cpId = 'YoKYVv';
+        $frameSrc = "https://codepen.io/hiroshi_m/embed/preview/YoKYVv?height=300";
+        $cpId = "YoKYVv";
 
         $this->httpClient->addMockResponse(
             $endpoint,
             new HttpResponse(
                 200,
-                'Content-Type: application/json',
+                "Content-Type: application/json",
                 json_encode([
-                    'width' => $width,
-                    'title' => $name,
-                    'height' => $height,
-                    'html' => "<iframe id='cp_embed_$cpId' src='$frameSrc'></iframe>",
+                    "width" => $width,
+                    "title" => $name,
+                    "height" => $height,
+                    "html" => "<iframe id='cp_embed_$cpId' src='$frameSrc'></iframe>",
                 ])
             )
         );
@@ -85,16 +88,16 @@ class CodePenEmbedFactoryTest extends MinimalContainerTestCase {
         $embedData = $embed->jsonSerialize();
         $this->assertEquals(
             [
-                'width' => $width,
-                'name' => $name,
-                'height' => $height,
-                'url' => $urlToCheck, // The original URL.
-                'embedType' => CodePenEmbed::TYPE,
-                'codePenID' => $cpId,
-                'author' => 'hiroshi_m',
+                "width" => $width,
+                "name" => $name,
+                "height" => $height,
+                "url" => $urlToCheck, // The original URL.
+                "embedType" => CodePenEmbed::TYPE,
+                "codePenID" => $cpId,
+                "author" => "hiroshi_m",
             ],
             $embedData,
-            'Data can be fetched over the network to create the embed from a URL.'
+            "Data can be fetched over the network to create the embed from a URL."
         );
 
         // Just verify that this doesn't throw an exception.

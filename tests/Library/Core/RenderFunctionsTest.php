@@ -15,27 +15,29 @@ use VanillaTests\SiteTestTrait;
 /**
  * Test some of the functions in functions.render.php.
  */
-class RenderFunctionsTest extends SiteTestCase {
-
+class RenderFunctionsTest extends SiteTestCase
+{
     use HtmlNormalizeTrait;
 
     /**
      * Make sure the render functions are included.
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         parent::setUpBeforeClass();
-        require_once PATH_ROOT.'/library/core/functions.render.php';
+        require_once PATH_ROOT . "/library/core/functions.render.php";
 
         // set config for disucussion filters test
         /** @var \Gdn_Configuration $config */
-        $config = static::container()->get('Config');
+        $config = static::container()->get("Config");
         $config->set(\CategoryModel::CONF_CATEGORY_FOLLOWING, true, true, false);
     }
 
     /**
      * Cleanup the html normalize trait.
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
         $this->shouldReplaceSVGs = true;
     }
@@ -45,7 +47,8 @@ class RenderFunctionsTest extends SiteTestCase {
      *
      * @return array[]
      */
-    public function provideUserAnchorValues(): array {
+    public function provideUserAnchorValues(): array
+    {
         $result = [
             "Simple user array" => [
                 [
@@ -53,15 +56,15 @@ class RenderFunctionsTest extends SiteTestCase {
                     "Name" => "Foo",
                 ],
                 null,
-                '<a href="/renderfunctionstest/profile/Foo" class="js-userCard" data-userid="1">Foo</a>'
+                '<a href="/renderfunctionstest/profile/Foo" class="js-userCard" data-userid="1">Foo</a>',
             ],
             "Simple user object" => [
-                (object)[
+                (object) [
                     "UserID" => 2,
                     "Name" => "Bar",
                 ],
                 null,
-                '<a href="/renderfunctionstest/profile/Bar" class="js-userCard" data-userid="2">Bar</a>'
+                '<a href="/renderfunctionstest/profile/Bar" class="js-userCard" data-userid="2">Bar</a>',
             ],
             "Post array with prefix" => [
                 [
@@ -69,15 +72,15 @@ class RenderFunctionsTest extends SiteTestCase {
                     "InsertName" => "Foo",
                 ],
                 ["Px" => "Insert"],
-                '<a href="/renderfunctionstest/profile/Foo" class="js-userCard" data-userid="1">Foo</a>'
+                '<a href="/renderfunctionstest/profile/Foo" class="js-userCard" data-userid="1">Foo</a>',
             ],
             "Post object with prefix" => [
-                 (object)[
+                (object) [
                     "InsertUserID" => 2,
                     "InsertName" => "Bar",
-                 ],
-                 ["Px" => "Insert"],
-                 '<a href="/renderfunctionstest/profile/Bar" class="js-userCard" data-userid="2">Bar</a>'
+                ],
+                ["Px" => "Insert"],
+                '<a href="/renderfunctionstest/profile/Bar" class="js-userCard" data-userid="2">Bar</a>',
             ],
         ];
         return $result;
@@ -91,7 +94,8 @@ class RenderFunctionsTest extends SiteTestCase {
      * @param string $expected
      * @dataProvider provideUserAnchorValues
      */
-    public function testUserAnchor($value, $options, $expected): void {
+    public function testUserAnchor($value, $options, $expected): void
+    {
         $actual = userAnchor($value, null, $options);
         $this->assertSame($expected, $actual);
     }
@@ -104,7 +108,8 @@ class RenderFunctionsTest extends SiteTestCase {
      * @param string $expected
      * @dataProvider provideUserPhotoValues
      */
-    public function testUserPhoto($value, $options, $expected): void {
+    public function testUserPhoto($value, $options, $expected): void
+    {
         $actual = userPhoto($value, $options);
         $this->assertSame($expected, $actual);
     }
@@ -114,9 +119,10 @@ class RenderFunctionsTest extends SiteTestCase {
      *
      * @return array[]
      */
-    public function provideUserPhotoValues(): array {
+    public function provideUserPhotoValues(): array
+    {
         $defaultAvatar = \UserModel::PATH_DEFAULT_AVATAR;
-        
+
         $result = [
             "User array" => [
                 [
@@ -124,38 +130,38 @@ class RenderFunctionsTest extends SiteTestCase {
                     "Name" => "System",
                 ],
                 null,
-                '<a title="System" href="/renderfunctionstest/profile/System" class="PhotoWrap js-userCard" aria-label="User: &quot;'.
-                'System&quot;" data-userid="1"><img src="https://vanilla.test/renderfunctionstest/applications/dashboard/design/images/usericon.png"'.
-                ' alt="System" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>'
+                '<a title="System" href="/renderfunctionstest/profile/System" class="PhotoWrap js-userCard" aria-label="User: &quot;' .
+                'System&quot;" data-userid="1"><img src="https://vanilla.test/renderfunctionstest/applications/dashboard/design/images/usericon.png"' .
+                ' alt="System" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>',
             ],
             "User array no id" => [
                 [
-                    "UserID" => null
+                    "UserID" => null,
                 ],
                 null,
-                '<a title="Unknown" href="/renderfunctionstest/profile/" class="PhotoWrap js-userCard" aria-label="User: &quot;Unknown&quot;"'.
-                " data-userid=\"\"><img src=\"http://vanilla.test/renderfunctionstest{$defaultAvatar}\"".
-                ' alt="Unknown" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>'
+                '<a title="Unknown" href="/renderfunctionstest/profile/" class="PhotoWrap js-userCard" aria-label="User: &quot;Unknown&quot;"' .
+                " data-userid=\"\"><img src=\"http://vanilla.test/renderfunctionstest{$defaultAvatar}\"" .
+                ' alt="Unknown" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>',
             ],
             "User object" => [
-                (object)[
+                (object) [
                     "UserID" => 1,
-                    "Name" => "System"
+                    "Name" => "System",
                 ],
                 null,
-                '<a title="System" href="/renderfunctionstest/profile/System" class="PhotoWrap js-userCard" aria-label="User: &quot;'.
-                'System&quot;" data-userid="1"><img src="https://vanilla.test/renderfunctionstest/applications/dashboard/design/images/usericon.png"'.
-                ' alt="System" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>'
+                '<a title="System" href="/renderfunctionstest/profile/System" class="PhotoWrap js-userCard" aria-label="User: &quot;' .
+                'System&quot;" data-userid="1"><img src="https://vanilla.test/renderfunctionstest/applications/dashboard/design/images/usericon.png"' .
+                ' alt="System" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>',
             ],
             "User object no id" => [
-                (object)[
-                    "UserID" => null
+                (object) [
+                    "UserID" => null,
                 ],
                 null,
-                '<a title="Unknown" href="/renderfunctionstest/profile/" class="PhotoWrap js-userCard" aria-label="User: &quot;Unknown&quot;"'.
-                " data-userid=\"\"><img src=\"http://vanilla.test/renderfunctionstest{$defaultAvatar}\"".
-                ' alt="Unknown" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>'
-            ]
+                '<a title="Unknown" href="/renderfunctionstest/profile/" class="PhotoWrap js-userCard" aria-label="User: &quot;Unknown&quot;"' .
+                " data-userid=\"\"><img src=\"http://vanilla.test/renderfunctionstest{$defaultAvatar}\"" .
+                ' alt="Unknown" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>',
+            ],
         ];
         return $result;
     }
@@ -163,37 +169,39 @@ class RenderFunctionsTest extends SiteTestCase {
     /**
      * Test a basic {@link userBuilder()}.
      */
-    public function testUserBuilder() {
+    public function testUserBuilder()
+    {
         $userRow = [
-            'InsertUserID' => 123,
-            'InsertName' => 'Fank',
-            'InsertPhoto' => 'foo.png',
-            'InsertEmail' => 'foo@noreply.com',
-            'InsertGender' => 'mf'
+            "InsertUserID" => 123,
+            "InsertName" => "Fank",
+            "InsertPhoto" => "foo.png",
+            "InsertEmail" => "foo@noreply.com",
+            "InsertGender" => "mf",
         ];
 
-        $user = userBuilder($userRow, 'Insert');
-        $this->assertSame(array_values($userRow), array_values((array)$user));
+        $user = userBuilder($userRow, "Insert");
+        $this->assertSame(array_values($userRow), array_values((array) $user));
     }
 
     /**
      * Test the multiple prefix version of {@link userBuilder()}.
      */
-    public function testUserBuilderMultiplePrefixes() {
+    public function testUserBuilderMultiplePrefixes()
+    {
         $userRow = [
-            'InsertUserID' => 123,
-            'InsertUserName' => 'Frank',
-            'FirstUserID' => 234,
-            'FirstName' => 'Barry'
+            "InsertUserID" => 123,
+            "InsertUserName" => "Frank",
+            "FirstUserID" => 234,
+            "FirstName" => "Barry",
         ];
 
-        $user = userBuilder($userRow, ['First', 'Insert']);
+        $user = userBuilder($userRow, ["First", "Insert"]);
         $this->assertSame(234, $user->UserID);
-        $this->assertSame('Barry', $user->Name);
+        $this->assertSame("Barry", $user->Name);
 
-        $user = userBuilder($userRow, ['Blarg', 'First']);
+        $user = userBuilder($userRow, ["Blarg", "First"]);
         $this->assertSame(234, $user->UserID);
-        $this->assertSame('Barry', $user->Name);
+        $this->assertSame("Barry", $user->Name);
     }
 
     /**
@@ -204,7 +212,8 @@ class RenderFunctionsTest extends SiteTestCase {
      *
      * @dataProvider provideSymbolArgs
      */
-    public function testDashboardSymbol(array $params, string $expectedHtml) {
+    public function testDashboardSymbol(array $params, string $expectedHtml)
+    {
         $actual = dashboardSymbol(...$params);
         $this->shouldReplaceSVGs = false;
         $this->assertHtmlStringEqualsHtmlString($expectedHtml, $actual);
@@ -213,22 +222,23 @@ class RenderFunctionsTest extends SiteTestCase {
     /**
      * @return array
      */
-    public function provideSymbolArgs(): array {
+    public function provideSymbolArgs(): array
+    {
         return [
-            'simple' => [
-                ['testName', 'testClass'],
+            "simple" => [
+                ["testName", "testClass"],
                 '<svg alt="testName" class="icon icon-svg testClass" viewbox="0 0 17 17">
                     <use xlink:href="#testName"></use>
                 </svg>',
             ],
-            'compat attributes' => [
-                ['testName', '', ['class' => 'testClass', 'alt' => 'testAlt']],
+            "compat attributes" => [
+                ["testName", "", ["class" => "testClass", "alt" => "testAlt"]],
                 '<svg alt="testAlt" class="icon icon-svg testClass" viewbox="0 0 17 17">
                     <use xlink:href="#testName"></use>
                 </svg>',
             ],
-            'arbitrary attributes' => [
-                ['testName', '', ['data-test' => 'test', 'data-xss' => "\"><script>alert('hi')</script>"]],
+            "arbitrary attributes" => [
+                ["testName", "", ["data-test" => "test", "data-xss" => "\"><script>alert('hi')</script>"]],
                 '<svg
                     alt="testName"
                     class="icon icon-svg"
@@ -250,7 +260,8 @@ class RenderFunctionsTest extends SiteTestCase {
      *
      * @dataProvider provideHeadingArgs
      */
-    public function testDashboardHeading(array $params, string $expectedHtml) {
+    public function testDashboardHeading(array $params, string $expectedHtml)
+    {
         $actual = heading(...$params);
         $this->assertHtmlStringEqualsHtmlString($expectedHtml, $actual);
     }
@@ -258,9 +269,10 @@ class RenderFunctionsTest extends SiteTestCase {
     /**
      * @return array
      */
-    public function provideHeadingArgs(): array {
+    public function provideHeadingArgs(): array
+    {
         return [
-            'simple title' => [
+            "simple title" => [
                 ["Hello! <dont-escape-me></dont-escape-me> me once"],
                 "
                 <header class=header-block>
@@ -268,29 +280,17 @@ class RenderFunctionsTest extends SiteTestCase {
                     <h1>Hello! <dont-escape-me></dont-escape-me> me once</h1></div>
                 </header>",
             ],
-            'title with return' => [
-                [
-                    'Hello',
-                    '',
-                    '',
-                    '',
-                    'https://test.com/back',
-                ],
+            "title with return" => [
+                ["Hello", "", "", "", "https://test.com/back"],
                 "<header class=header-block>
                     <div class=title-block>
                         <a aria-label=Return class='btn btn-icon btn-return' href=https://test.com/back><SVG /></a>
                         <h1>Hello</h1>
                     </div>
-                </header>"
+                </header>",
             ],
-            'with buttons' => [
-                [
-                    'Hello',
-                    'button',
-                    'http://test.com/button',
-                    ['data-test' => 'test'],
-                    'https://test.com/back',
-                ],
+            "with buttons" => [
+                ["Hello", "button", "http://test.com/button", ["data-test" => "test"], "https://test.com/back"],
                 "<header class=header-block>
                     <div class=title-block>
                         <a aria-label=Return class='btn btn-icon btn-return' href=https://test.com/back><SVG /></a>
@@ -299,8 +299,8 @@ class RenderFunctionsTest extends SiteTestCase {
                     <div class=btn-container>
                         <a class='btn btn-primary' data-test=test href=http://test.com/button>button</a>
                     </div>
-                </header>"
-            ]
+                </header>",
+            ],
         ];
     }
 
@@ -311,7 +311,8 @@ class RenderFunctionsTest extends SiteTestCase {
      *
      * @dataProvider provideDiscussionFilters
      */
-    public function testDiscussionFilters(string $expected) {
+    public function testDiscussionFilters(string $expected)
+    {
         $actual = discussionFilters();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
@@ -319,9 +320,11 @@ class RenderFunctionsTest extends SiteTestCase {
     /**
      * @return array
      */
-    public function provideDiscussionFilters() {
-        return ['simple filter' => [
-            <<<EOT
+    public function provideDiscussionFilters()
+    {
+        return [
+            "simple filter" => [
+                <<<EOT
 <div class="PageControls-filters">
     <span class="ToggleFlyout selectBox selectBox-following">
         <span class="selectBox-label">View: </span>
@@ -348,7 +351,8 @@ class RenderFunctionsTest extends SiteTestCase {
     </span>
 </div>
 EOT
-            ]
+            ,
+            ],
         ];
     }
 
@@ -359,7 +363,8 @@ EOT
      *
      * @dataProvider provideCategoryFilters
      */
-    public function testCategoryFilters(string $expected) {
+    public function testCategoryFilters(string $expected)
+    {
         $actual = categoryFilters();
         $this->assertHtmlStringEqualsHtmlString($expected, $actual);
     }
@@ -367,9 +372,11 @@ EOT
     /**
      * @return array
      */
-    public function provideCategoryFilters() {
-        return ['simple filter' => [
-            <<<EOT
+    public function provideCategoryFilters()
+    {
+        return [
+            "simple filter" => [
+                <<<EOT
 <div class="PageControls-filters">
     <span class="ToggleFlyout selectBox selectBox-following">
         <span class="selectBox-label">View: </span>
@@ -396,7 +403,8 @@ EOT
     </span>
 </div>
 EOT
-            ]
+            ,
+            ],
         ];
     }
 }

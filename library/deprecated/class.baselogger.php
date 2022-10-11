@@ -13,8 +13,8 @@
  *
  * @deprecated
  */
-class BaseLogger implements LoggerInterface {
-
+class BaseLogger implements LoggerInterface
+{
     /**
      * System is unusable.
      *
@@ -22,7 +22,8 @@ class BaseLogger implements LoggerInterface {
      * @param array $context
      * @return null
      */
-    public function emergency($message, array $context = []) {
+    public function emergency($message, array $context = [])
+    {
         $this->log(Logger::EMERGENCY, $message, $context);
     }
 
@@ -36,7 +37,8 @@ class BaseLogger implements LoggerInterface {
      * @param array $context
      * @return null
      */
-    public function alert($message, array $context = []) {
+    public function alert($message, array $context = [])
+    {
         $this->log(Logger::ALERT, $message, $context);
     }
 
@@ -49,7 +51,8 @@ class BaseLogger implements LoggerInterface {
      * @param array $context
      * @return null
      */
-    public function critical($message, array $context = []) {
+    public function critical($message, array $context = [])
+    {
         $this->log(Logger::CRITICAL, $message, $context);
     }
 
@@ -60,7 +63,8 @@ class BaseLogger implements LoggerInterface {
      * @param array $context
      * @return null
      */
-    public function error($message, array $context = []) {
+    public function error($message, array $context = [])
+    {
         $this->log(Logger::ERROR, $message, $context);
     }
 
@@ -74,7 +78,8 @@ class BaseLogger implements LoggerInterface {
      * @param array $context
      * @return null
      */
-    public function warning($message, array $context = []) {
+    public function warning($message, array $context = [])
+    {
         $this->log(Logger::WARNING, $message, $context);
     }
 
@@ -85,7 +90,8 @@ class BaseLogger implements LoggerInterface {
      * @param array $context
      * @return null
      */
-    public function notice($message, array $context = []) {
+    public function notice($message, array $context = [])
+    {
         $this->log(Logger::NOTICE, $message, $context);
     }
 
@@ -98,7 +104,8 @@ class BaseLogger implements LoggerInterface {
      * @param array $context
      * @return null
      */
-    public function info($message, array $context = []) {
+    public function info($message, array $context = [])
+    {
         $this->log(Logger::INFO, $message, $context);
     }
 
@@ -109,7 +116,8 @@ class BaseLogger implements LoggerInterface {
      * @param array $context
      * @return null
      */
-    public function debug($message, array $context = []) {
+    public function debug($message, array $context = [])
+    {
         $this->log(Logger::DEBUG, $message, $context);
     }
 
@@ -121,9 +129,9 @@ class BaseLogger implements LoggerInterface {
      * @param array $context
      * @return null
      */
-    public function log($level, $message, array $context = []) {
-        trace(formatString($message, $context), 'FormattedMessage');
-        trace($context, 'context');
-
+    public function log($level, $message, array $context = [])
+    {
+        trace(formatString($message, $context), "FormattedMessage");
+        trace($context, "context");
     }
 }

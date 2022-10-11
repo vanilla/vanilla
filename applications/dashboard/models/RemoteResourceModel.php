@@ -9,19 +9,18 @@ namespace Vanilla\Dashboard\Models;
 use Gdn_Cache;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Database\Operation;
-use Gdn_Session;
 use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Models\Model;
 use Vanilla\RemoteResource\LocalRemoteResourceJob;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
-use Vanilla\Scheduler\Job\JobExecutionStatus;
 use Vanilla\Scheduler\SchedulerInterface;
 
 /**
  * A model for managing products.
  */
-class RemoteResourceModel extends FullRecordCacheModel {
-
+class RemoteResourceModel extends FullRecordCacheModel
+{
+    const PREFIX = "URI-";
     /** Cache time to live. */
     const CACHE_TTL = 3600;
 
@@ -37,15 +36,13 @@ class RemoteResourceModel extends FullRecordCacheModel {
      * @param \Gdn_Cache $cache
      * @param SchedulerInterface $scheduler
      */
-    public function __construct(
-        \Gdn_Cache $cache,
-        SchedulerInterface $scheduler
-    ) {
+    public function __construct(\Gdn_Cache $cache, SchedulerInterface $scheduler)
+    {
         parent::__construct("remoteResource", $cache);
         $dateProcessor = new Operation\CurrentDateFieldProcessor();
-        $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])
-            ->setUpdateFields(["dateUpdated"]);
+        $dateProcessor->setInsertFields(["dateInserted", "dateUpdated"])->setUpdateFields(["dateUpdated"]);
         $this->addPipelineProcessor($dateProcessor);
+        $this->addPipelineProcessor(new Operation\PruneProcessor("dateUpdated"));
         $this->scheduler = $scheduler;
     }
 
@@ -60,22 +57,30 @@ class RemoteResourceModel extends FullRecordCacheModel {
      * returned(null|existing|stale).
      *
      * @param string $url
+     * @param array $headers
+     * @param mixed $callable
      * @return string|null
      */
-    public function getByUrl(string $url): ?string {
-        $resource = $this->select(
-            ["url" => $url],
-            ["cacheOptions" => [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]]
-        );
+    public function getByUrl(string $url, array $headers = [], $callable = null): ?string
+    {
+        $options = ["cacheOptions" => [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]];
+        if (!empty($headers)) {
+            $options = array_merge($options, $headers);
+        }
+        $resource = $this->select(["url" => self::PREFIX . $url], $options);
 
         $resource = is_array($resource) ? reset($resource) : $resource;
         $isValid = $resource ? !$this->checkIfContentIsStale($resource) : false;
 
         if (!$isValid) {
-            $this->triggerLocalRemoteResourceJob($url);
+            $this->triggerLocalRemoteResourceJob($url, $headers, $callable);
+            $this->modelCache->invalidateAll();
         }
 
-        $resourceContent = $resource['content'] ?? null;
+        $resourceContent = $resource["content"] ?? null;
+        if (!empty($resource) && (empty($resourceContent) || !empty($resource["lastError"]))) {
+            throw new \Exception("Invalid URL.", 400);
+        }
         return $resourceContent;
     }
 
@@ -85,8 +90,12 @@ class RemoteResourceModel extends FullRecordCacheModel {
      * @param array $set
      * @param array $options
      */
-    public function insert($set, $options = []) {
-        parent::insert($set, [Model::OPT_REPLACE => true, ["cacheOptions" => [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]]]);
+    public function insert($set, $options = [])
+    {
+        parent::insert($set, [
+            Model::OPT_REPLACE => true,
+            ["cacheOptions" => [Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL]],
+        ]);
     }
 
     /**
@@ -98,19 +107,27 @@ class RemoteResourceModel extends FullRecordCacheModel {
      * @return bool
      * @throws \Exception Only use insert method to update records.
      */
-    public function update(array $set, array $where, array $options = []): bool {
-        throw new \Exception('use insert method to update records');
+    public function update(array $set, array $where, array $options = []): bool
+    {
+        throw new \Exception("use insert method to update records");
     }
 
     /**
      * Trigger a remote resource job.
      *
      * @param string $url
+     * @param array $headers
+     * @param callable|null $callable
      * @return string
      */
-    public function triggerLocalRemoteResourceJob(string $url): string {
+    public function triggerLocalRemoteResourceJob(string $url, array $headers = [], ?callable $callable = null): string
+    {
         $jobDescriptor = new NormalJobDescriptor(LocalRemoteResourceJob::class);
-        $jobDescriptor->setMessage(["url" => $url]);
+        $jobDescriptor->setMessage([
+            "url" => $url,
+            "headers" => $headers,
+            "callable" => $callable,
+        ]);
         $response = $this->scheduler->addJobDescriptor($jobDescriptor);
         return $response->getStatus()->getStatus();
     }
@@ -121,8 +138,9 @@ class RemoteResourceModel extends FullRecordCacheModel {
      * @param array $resourceContent
      * @return bool
      */
-    private function checkIfContentIsStale(array $resourceContent): bool {
-        $resourceContentDateUpdated = $resourceContent['dateUpdated'] ?? null;
+    private function checkIfContentIsStale(array $resourceContent): bool
+    {
+        $resourceContentDateUpdated = $resourceContent["dateUpdated"] ?? null;
         $difference = null;
         if ($resourceContentDateUpdated) {
             $difference = CurrentTimeStamp::getCurrentTimeDifference($resourceContentDateUpdated);

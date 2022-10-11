@@ -13,8 +13,8 @@ use Vanilla\Contracts\SiteSync\SiteSyncResourceTypeSynchronizerInterface;
  * Service used to register and obtain a synchronizer to synchronizes content
  * for a specific resource type between a source site and a destination site.
  */
-final class SiteSyncService {
-
+final class SiteSyncService
+{
     /** @var SiteSyncResourceTypeSynchronizerInterface[] $resourceTypeSynchronizers */
     private $resourceTypeSynchronizers = [];
 
@@ -24,7 +24,8 @@ final class SiteSyncService {
      * @param SiteSyncResourceTypeSynchronizerInterface $resourceTypeSynchronizer
      * Synchronizer specific to a resource type
      */
-    public function register(SiteSyncResourceTypeSynchronizerInterface $resourceTypeSynchronizer): void {
+    public function register(SiteSyncResourceTypeSynchronizerInterface $resourceTypeSynchronizer): void
+    {
         $this->resourceTypeSynchronizers[] = $resourceTypeSynchronizer;
     }
 
@@ -33,7 +34,8 @@ final class SiteSyncService {
      *
      * @return SiteSyncResourceTypeSynchronizerInterface[]
      */
-    public function getResourceTypeSynchronizers(): array {
+    public function getResourceTypeSynchronizers(): array
+    {
         return $this->resourceTypeSynchronizers;
     }
 }

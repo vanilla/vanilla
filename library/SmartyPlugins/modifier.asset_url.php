@@ -16,6 +16,7 @@
  *
  * @see asset()
  */
-function smarty_modifier_asset_url($path, $withDomain = false, $addVersion = false) {
+function smarty_modifier_asset_url($path, $withDomain = false, $addVersion = false)
+{
     return asset($path, $withDomain, $addVersion);
 }

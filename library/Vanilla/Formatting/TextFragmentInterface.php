@@ -9,8 +9,8 @@ namespace Vanilla\Formatting;
 /**
  * Represents a text fragment that can be manipulated programmatically.
  */
-interface TextFragmentInterface {
-
+interface TextFragmentInterface
+{
     /**
      * Get the text of the fragment.
      *

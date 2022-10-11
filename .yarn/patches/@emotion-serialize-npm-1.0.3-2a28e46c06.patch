@@ -1,0 +1,44 @@
+diff --git a/types/index.d.ts b/types/index.d.ts
+index 9d32022d203c1de72a1a001aa7542feaa1acc047..f1d83cd3177afb5f08838d4ba718011d9d92d0b0 100644
+--- a/types/index.d.ts
++++ b/types/index.d.ts
+@@ -10,12 +10,12 @@ export type CSSProperties = CSS.PropertiesFallback<number | string>
+ export type CSSPropertiesWithMultiValues = {
+   [K in keyof CSSProperties]:
+     | CSSProperties[K]
+-    | Array<Extract<CSSProperties[K], string>>
++    | Array<CSSProperties[K]>
+ }
+ 
+ export type CSSPseudos = { [K in CSS.Pseudos]?: CSSObject }
+ 
+-export interface ArrayCSSInterpolation extends Array<CSSInterpolation> {}
++export type ArrayCSSInterpolation = Array<CSSInterpolation>;
+ 
+ export type InterpolationPrimitive =
+   | null
+@@ -34,10 +34,10 @@ export interface CSSOthersObject {
+   [propertiesName: string]: CSSInterpolation
+ }
+ 
+-export interface CSSObject
+-  extends CSSPropertiesWithMultiValues,
+-    CSSPseudos,
+-    CSSOthersObject {}
++export type CSSObject =
++  & CSSPropertiesWithMultiValues
++  & CSSPseudos
++  & CSSOthersObject;
+ 
+ export interface ComponentSelector {
+   __emotion_styles: any
+@@ -50,8 +50,7 @@ export type Keyframes = {
+   toString: () => string
+ } & string
+ 
+-export interface ArrayInterpolation<Props>
+-  extends Array<Interpolation<Props>> {}
++export type ArrayInterpolation<Props> = Array<Interpolation<Props>>;
+ 
+ export interface FunctionInterpolation<Props> {
+   (props: Props): Interpolation<Props>

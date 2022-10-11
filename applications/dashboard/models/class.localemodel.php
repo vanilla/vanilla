@@ -13,8 +13,8 @@ use Vanilla\Utility\ArrayUtils;
 /**
  * Used to manage adding/removing different locale files.
  */
-class LocaleModel {
-
+class LocaleModel
+{
     /** @var array|null Locales in the system.  */
     protected $_AvailableLocalePacks = null;
 
@@ -23,26 +23,26 @@ class LocaleModel {
      *
      * @return array|null
      */
-    public function availableLocalePacks() {
+    public function availableLocalePacks()
+    {
         if ($this->_AvailableLocalePacks === null) {
-            $localeInfoPaths = safeGlob(PATH_ROOT."/locales/*/definitions.php");
+            $localeInfoPaths = safeGlob(PATH_ROOT . "/locales/*/definitions.php");
             $availableLocales = [];
             foreach ($localeInfoPaths as $infoPath) {
-                $localeInfo = Gdn::pluginManager()->scanPluginFile($infoPath, 'LocaleInfo');
+                $localeInfo = Gdn::pluginManager()->scanPluginFile($infoPath, "LocaleInfo");
                 $this->calculateLocaleInfo($localeInfo);
 
-
-                if ($icon = val('Icon', $localeInfo)) {
-                    $localeInfo['IconUrl'] = "/locales/".basename(dirname($infoPath))."/$icon";
+                if ($icon = val("Icon", $localeInfo)) {
+                    $localeInfo["IconUrl"] = "/locales/" . basename(dirname($infoPath)) . "/$icon";
                 } else {
-                    $localeInfo['IconUrl'] = '/applications/dashboard/design/images/addon-placeholder.png';
+                    $localeInfo["IconUrl"] = "/applications/dashboard/design/images/addon-placeholder.png";
                 }
 
-                if ($enName = val('EnName', $localeInfo)) {
-                    $localeInfo['meta'][] = $enName;
+                if ($enName = val("EnName", $localeInfo)) {
+                    $localeInfo["meta"][] = $enName;
                 }
 
-                $availableLocales[$localeInfo['Index']] = $localeInfo;
+                $availableLocales[$localeInfo["Index"]] = $localeInfo;
             }
             $this->_AvailableLocalePacks = $availableLocales;
         }
@@ -54,10 +54,11 @@ class LocaleModel {
      *
      * @return array
      */
-    public function availableLocales() {
+    public function availableLocales()
+    {
         // Get the list of locales that are supported.
-        $locales = array_column($this->availableLocalePacks(), 'Locale', 'Locale');
-        $locales['en'] = 'en'; // the default locale is always available.
+        $locales = array_column($this->availableLocalePacks(), "Locale", "Locale");
+        $locales["en"] = "en"; // the default locale is always available.
         ksort($locales);
 
         return $locales;
@@ -68,11 +69,12 @@ class LocaleModel {
      *
      * @param $info
      */
-    protected function calculateLocaleInfo(&$info) {
-        $canonicalLocale = Gdn_Locale::canonicalize($info['Locale']);
-        if ($canonicalLocale !== $info['Locale']) {
-            $info['LocaleRaw'] = $info['Locale'];
-            $info['Locale'] = $canonicalLocale;
+    protected function calculateLocaleInfo(&$info)
+    {
+        $canonicalLocale = Gdn_Locale::canonicalize($info["Locale"]);
+        if ($canonicalLocale !== $info["Locale"]) {
+            $info["LocaleRaw"] = $info["Locale"];
+            $info["Locale"] = $canonicalLocale;
         }
     }
 
@@ -84,16 +86,17 @@ class LocaleModel {
      * @return mixed
      * @throws Exception
      */
-    public function copyDefinitions($sourcePath, $destPath) {
+    public function copyDefinitions($sourcePath, $destPath)
+    {
         // Load the definitions from the source path.
         $definitions = $this->loadDefinitions($sourcePath);
 
-        $tmpPath = dirname($destPath).'/tmp_'.randomString(10);
-        $key = trim(strchr($sourcePath, '/'), '/');
+        $tmpPath = dirname($destPath) . "/tmp_" . randomString(10);
+        $key = trim(strchr($sourcePath, "/"), "/");
 
-        $fp = fopen($tmpPath, 'wb');
+        $fp = fopen($tmpPath, "wb");
         if (!$fp) {
-            throw new Exception(sprintf(t('Could not open %s.'), $tmpPath));
+            throw new Exception(sprintf(t("Could not open %s."), $tmpPath));
         }
 
         fwrite($fp, $this->getFileHeader());
@@ -103,7 +106,7 @@ class LocaleModel {
 
         $result = rename($tmpPath, $destPath);
         if (!$result) {
-            throw new Exception(sprintf(t('Could not open %s.'), $destPath));
+            throw new Exception(sprintf(t("Could not open %s."), $destPath));
         }
         return $destPath;
     }
@@ -114,13 +117,14 @@ class LocaleModel {
      * @param bool $getInfo
      * @return array
      */
-    public function enabledLocalePacks($getInfo = false) {
-        $result = (array)c('EnabledLocales', []);
+    public function enabledLocalePacks($getInfo = false)
+    {
+        $result = (array) c("EnabledLocales", []);
         $translationDebug = c("TranslationDebug");
         if ($getInfo) {
             $addonManager = \Gdn::addonManager();
             foreach ($result as $key => $locale) {
-                $addon = $addonManager->lookupLocale('vf_'.$locale);
+                $addon = $addonManager->lookupLocale("vf_" . $locale);
                 if ($addon !== null) {
                     $localeInfo = $addon->getInfo();
                     $localeInfo = ArrayUtils::pascalCase($localeInfo);
@@ -129,7 +133,7 @@ class LocaleModel {
                 } else {
                     unset($result[$key]);
                 }
-                if ($localeInfo['Debug'] ?? null) {
+                if ($localeInfo["Debug"] ?? null) {
                     if (!$translationDebug) {
                         unset($result[$key]);
                     }
@@ -146,10 +150,11 @@ class LocaleModel {
      * @param null $Skip
      * @return array
      */
-    public function loadDefinitions($Path, $Skip = null) {
-        $Skip = (array)$Skip;
+    public function loadDefinitions($Path, $Skip = null)
+    {
+        $Skip = (array) $Skip;
 
-        $Paths = safeGlob($Path.'/*.php');
+        $Paths = safeGlob($Path . "/*.php");
         $Definition = [];
         foreach ($Paths as $Path) {
             if (in_array($Path, $Skip)) {
@@ -169,9 +174,10 @@ class LocaleModel {
      * @return null|string
      * @throws Exception
      */
-    public function generateChanges($path, $basePath, $destPath = null) {
+    public function generateChanges($path, $basePath, $destPath = null)
+    {
         if ($destPath == null) {
-            $destPath = $basePath.'/changes.php';
+            $destPath = $basePath . "/changes.php";
         }
 
         // Load the given locale pack.
@@ -185,14 +191,14 @@ class LocaleModel {
         $extraDefinitions = array_diff($definitions, $baseDefinitions);
 
         // Generate the changes file.
-        $tmpPath = dirname($basePath).'/tmp_'.randomString(10);
-        $fp = fopen($tmpPath, 'wb');
+        $tmpPath = dirname($basePath) . "/tmp_" . randomString(10);
+        $fp = fopen($tmpPath, "wb");
         if (!$fp) {
-            throw new Exception(sprintf(t('Could not open %s.'), $tmpPath));
+            throw new Exception(sprintf(t("Could not open %s."), $tmpPath));
         }
 
-        $key = trim(strchr($path, '/'), '/');
-        $baseKey = trim(strchr($basePath, '/'), '/');
+        $key = trim(strchr($path, "/"), "/");
+        $baseKey = trim(strchr($basePath, "/"), "/");
 
         fwrite($fp, $this->getFileHeader());
         fwrite($fp, "/** Changes file comparing $key to $baseKey. **/\n\n\n");
@@ -207,12 +213,13 @@ class LocaleModel {
 
         $result = rename($tmpPath, $destPath);
         if (!$result) {
-            throw new Exception(sprintf(t('Could not open %s.'), $destPath));
+            throw new Exception(sprintf(t("Could not open %s."), $destPath));
         }
         return $destPath;
     }
 
-    protected function getFileHeader() {
+    protected function getFileHeader()
+    {
         $now = Gdn_Format::toDateTime();
 
         $result = "<?php if (!defined('APPLICATION')) exit();
@@ -226,14 +233,15 @@ class LocaleModel {
      *
      * @param string $localeKey The key of the folder.
      */
-    public function testLocale($localeKey) {
+    public function testLocale($localeKey)
+    {
         $available = $this->availableLocalePacks();
         if (!isset($available[$localeKey])) {
-            throw notFoundException('Locale');
+            throw notFoundException("Locale");
         }
 
         // Grab all of the definition files from the locale.
-        $paths = safeGlob(PATH_ROOT."/locales/{$localeKey}/*.php");
+        $paths = safeGlob(PATH_ROOT . "/locales/{$localeKey}/*.php");
 
         // Unload the dynamic config
         Gdn::locale()->unload();
@@ -250,10 +258,11 @@ class LocaleModel {
      * @param resource $fp The file to write to.
      * @param array $definitions The definitions to write.
      */
-    public static function writeDefinitions($fp, $definitions) {
+    public static function writeDefinitions($fp, $definitions)
+    {
         // Write the definitions.
-        uksort($definitions, 'strcasecmp');
-        $lastC = '';
+        uksort($definitions, "strcasecmp");
+        $lastC = "";
         foreach ($definitions as $key => $value) {
             // Add a blank line between letters of the alphabet.
             if (isset($key[0]) && strcasecmp($lastC, $key[0]) != 0) {
@@ -261,7 +270,7 @@ class LocaleModel {
                 $lastC = $key[0];
             }
 
-            $str = '$Definition['.var_export($key, true).'] = '.var_export($value, true).";\n";
+            $str = '$Definition[' . var_export($key, true) . "] = " . var_export($value, true) . ";\n";
             fwrite($fp, $str);
         }
     }

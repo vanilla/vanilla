@@ -19,8 +19,8 @@ use CommentModel;
 /**
  * Class AnswerModel
  */
-class AnswerModel implements EventFromRowInterface {
-
+class AnswerModel implements EventFromRowInterface
+{
     /** @var CommentModel */
     private $commentModel;
 
@@ -36,7 +36,8 @@ class AnswerModel implements EventFromRowInterface {
      * @param CommentModel $commentModel
      * @param EventManager $eventManager
      */
-    public function __construct(CommentModel $commentModel, EventManager $eventManager) {
+    public function __construct(CommentModel $commentModel, EventManager $eventManager)
+    {
         $this->commentModel = $commentModel;
         $this->eventManager = $eventManager;
     }
@@ -47,11 +48,12 @@ class AnswerModel implements EventFromRowInterface {
      * @param array $row
      * @return array
      */
-    public function normalizeRow(array $row): array {
-        $row['attributes']['answer'] = [
-            'status' => !empty($row['qnA']) ? strtolower($row['qnA']) : 'pending',
-            'dateAccepted' => $row['dateAccepted'],
-            'acceptUserID' => $row['acceptedUserID'],
+    public function normalizeRow(array $row): array
+    {
+        $row["attributes"]["answer"] = [
+            "status" => !empty($row["qnA"]) ? strtolower($row["qnA"]) : "pending",
+            "dateAccepted" => $row["dateAccepted"],
+            "acceptUserID" => $row["acceptedUserID"],
         ];
 
         return $row;
@@ -65,15 +67,12 @@ class AnswerModel implements EventFromRowInterface {
      * @param array|object|null $sender
      * @return ResourceEvent
      */
-    public function eventFromRow(array $row, string $action, $sender = null): ResourceEvent {
+    public function eventFromRow(array $row, string $action, $sender = null): ResourceEvent
+    {
         $row = $this->commentModel->normalizeRow($row);
         $row = $this->normalizeRow($row);
 
-        return new AnswerEvent(
-            $action,
-            ["answer" => $row],
-            $sender
-        );
+        return new AnswerEvent($action, ["answer" => $row], $sender);
     }
 
     /**
@@ -81,9 +80,10 @@ class AnswerModel implements EventFromRowInterface {
      *
      * @param string|int $userID User identifier
      */
-    public function recalculateUserQnA($userID) {
-        $countAcceptedAnswers = Gdn::sql()->getCount('Comment', ['InsertUserID' => $userID, 'QnA' => 'Accepted']);
-        Gdn::userModel()->setField($userID, 'CountAcceptedAnswers', $countAcceptedAnswers);
+    public function recalculateUserQnA($userID)
+    {
+        $countAcceptedAnswers = Gdn::sql()->getCount("Comment", ["InsertUserID" => $userID, "QnA" => "Accepted"]);
+        Gdn::userModel()->setField($userID, "CountAcceptedAnswers", $countAcceptedAnswers);
     }
 
     /**
@@ -96,21 +96,22 @@ class AnswerModel implements EventFromRowInterface {
      *
      * @internal
      */
-    public function updateCommentQnA($discussion, $comment, $newQnA, \Gdn_Form $form = null) {
-        $currentQnA = val('QnA', $comment);
+    public function updateCommentQnA($discussion, $comment, $newQnA, \Gdn_Form $form = null)
+    {
+        $currentQnA = val("QnA", $comment);
 
         if ($currentQnA != $newQnA) {
-            $set = ['QnA' => $newQnA];
+            $set = ["QnA" => $newQnA];
 
-            if ($newQnA == 'Accepted') {
-                $set['DateAccepted'] = DateTimeFormatter::getCurrentDateTime();
-                $set['AcceptedUserID'] = Gdn::session()->UserID;
+            if ($newQnA == "Accepted") {
+                $set["DateAccepted"] = DateTimeFormatter::getCurrentDateTime();
+                $set["AcceptedUserID"] = Gdn::session()->UserID;
             } else {
-                $set['DateAccepted'] = null;
-                $set['AcceptedUserID'] = null;
+                $set["DateAccepted"] = null;
+                $set["AcceptedUserID"] = null;
             }
 
-            $commentID = $comment['CommentID'] ?? $comment['commentID'] ?? false;
+            $commentID = $comment["CommentID"] ?? ($comment["commentID"] ?? false);
 
             $this->commentModel->setField($commentID, $set);
             $updatedAnswer = $this->commentModel->getID($commentID, DATASET_TYPE_ARRAY);
@@ -133,27 +134,28 @@ class AnswerModel implements EventFromRowInterface {
      *
      * @internal
      */
-    public function applyCommentQnAChange($discussion, $updatedAnswer, $currentQnAStatus, $newQnAStatus) {
+    public function applyCommentQnAChange($discussion, $updatedAnswer, $currentQnAStatus, $newQnAStatus)
+    {
         // Determine QnA change
         if ($currentQnAStatus != $newQnAStatus) {
             $change = 0;
             switch ($newQnAStatus) {
-                case 'Rejected':
+                case "Rejected":
                     $change = -1;
-                    if ($currentQnAStatus != 'Accepted') {
+                    if ($currentQnAStatus != "Accepted") {
                         $change = 0;
                     }
                     break;
 
-                case 'Accepted':
+                case "Accepted":
                     $change = 1;
                     break;
 
                 default:
-                    if ($currentQnAStatus == 'Rejected') {
+                    if ($currentQnAStatus == "Rejected") {
                         $change = 0;
                     }
-                    if ($currentQnAStatus == 'Accepted') {
+                    if ($currentQnAStatus == "Accepted") {
                         $change = -1;
                     }
                     break;
@@ -163,32 +165,32 @@ class AnswerModel implements EventFromRowInterface {
             $this->eventManager->dispatch($answerEvent);
         }
 
-        $discussionInsertUserID = $discussion['InsertUserID'] ?? $discussion['insertUserID'] ?? null;
-        $updatedAnswerUserID = $updatedAnswer['InsertUserID'] ?? $updatedAnswer['insertUserID'] ?? null;
+        $discussionInsertUserID = $discussion["InsertUserID"] ?? ($discussion["insertUserID"] ?? null);
+        $updatedAnswerUserID = $updatedAnswer["InsertUserID"] ?? ($updatedAnswer["insertUserID"] ?? null);
 
         // Apply change effects
         if ($change && $discussionInsertUserID != null && $discussionInsertUserID != $updatedAnswerUserID) {
             // Update the user
-            $userID = val('InsertUserID', $updatedAnswer);
+            $userID = val("InsertUserID", $updatedAnswer);
             $this->recalculateUserQnA($userID);
 
             // Update reactions
             if ($this->Reactions) {
-                include_once(Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions'));
+                include_once Gdn::controller()->fetchViewLocation("reaction_functions", "", "plugins/Reactions");
                 $reactionModel = new ReactionModel();
 
                 // Assume that the reaction is done by the question's owner
                 $questionOwner = $discussionInsertUserID;
                 // If there's change, reactions will take care of it
-                $reactionModel->react('Comment', $updatedAnswer['CommentID'], 'AcceptAnswer', $questionOwner, true);
+                $reactionModel->react("Comment", $updatedAnswer["CommentID"], "AcceptAnswer", $questionOwner, true);
             } else {
-                $nbsPoint = $change * (int)c('QnA.Points.AcceptedAnswer', 1);
-                if ($nbsPoint && c('QnA.Points.Enabled', false)) {
+                $nbsPoint = $change * (int) c("QnA.Points.AcceptedAnswer", 1);
+                if ($nbsPoint && c("QnA.Points.Enabled", false)) {
                     CategoryModel::givePoints(
-                        $updatedAnswer['InsertUserID'],
+                        $updatedAnswer["InsertUserID"],
                         $nbsPoint,
-                        'QnA',
-                        $discussion['CategoryID']
+                        "QnA",
+                        $discussion["CategoryID"]
                     );
                 }
             }

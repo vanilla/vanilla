@@ -1,10 +1,11 @@
 /*
  * @author Carla França <cfranca@higherlogic.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { useEffect, useState } from "react";
+import { getMeta } from "@library/utility/appUtils";
 
 /**
  * Get saved data from sessionStorage or DefaultValue
@@ -18,7 +19,8 @@ function getStorageOrDefault<T>(key: string, defaultValue: T): T {
     return JSON.parse(stored);
 }
 
-const PREFIX = "vanilla";
+const host = getMeta("context.host", "");
+const PREFIX = `vanilla/${host}`;
 
 /**
  * Allow fetching and setting of a value in the user's sessionStorage.

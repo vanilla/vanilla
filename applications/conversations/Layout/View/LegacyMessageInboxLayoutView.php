@@ -10,26 +10,29 @@ namespace Vanilla\Conversations\Layout;
 /**
  * Legacy view type for inbox.
  */
-class LegacyMessageInboxLayoutView implements \Vanilla\Layout\View\LegacyLayoutViewInterface {
-
+class LegacyMessageInboxLayoutView implements \Vanilla\Layout\View\LegacyLayoutViewInterface
+{
     /**
      * @inheritDoc
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return "Inbox Page";
     }
 
     /**
      * @inheritDoc
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return "inbox";
     }
 
     /**
      * @inheritDoc
      */
-    public function getLegacyType(): string {
+    public function getLegacyType(): string
+    {
         return "Conversations/messages/inbox";
     }
 }

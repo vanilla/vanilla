@@ -21,8 +21,8 @@ use Garden\EventManager;
  *
  * @property string[] $CapturedSql
  */
-class Gdn_Database implements InjectableInterface {
-
+class Gdn_Database implements InjectableInterface
+{
     const SQL_MODE_NO_AUTO_VALUE_ZERO = "NO_AUTO_VALUE_ON_ZERO";
 
     /** @var string The instance name of this class or the class that inherits from this class. */
@@ -102,7 +102,8 @@ class Gdn_Database implements InjectableInterface {
      * @param array|string|null $config The configuration settings for this object.
      * @see Database::init()
      */
-    public function __construct($config = null) {
+    public function __construct($config = null)
+    {
         $this->ClassName = get_class($this);
         $this->init($config);
         $this->ConnectRetries = 1;
@@ -115,14 +116,16 @@ class Gdn_Database implements InjectableInterface {
      *
      * @param EventManager $eventManager the event manager
      */
-    public function setDependencies(EventManager $eventManager = null) {
+    public function setDependencies(EventManager $eventManager = null)
+    {
         $this->eventManager = $eventManager;
     }
 
     /**
      * Begin a transaction on the database.
      */
-    public function beginTransaction() {
+    public function beginTransaction()
+    {
         if (!$this->_InTransaction) {
             $this->_InTransaction = $this->connection()->beginTransaction();
         }
@@ -133,7 +136,8 @@ class Gdn_Database implements InjectableInterface {
      *
      * @return PDO The connection to the database.
      */
-    public function connection() {
+    public function connection()
+    {
         $this->_IsPersistent = val(PDO::ATTR_PERSISTENT, $this->ConnectionOptions, false);
         if ($this->_Connection === null) {
             $this->_Connection = $this->newPDO($this->Dsn, $this->User, $this->Password);
@@ -145,7 +149,8 @@ class Gdn_Database implements InjectableInterface {
     /**
      * Close the connection to the database.
      */
-    public function closeConnection() {
+    public function closeConnection()
+    {
         if (!$this->_IsPersistent) {
             $this->commitTransaction();
             $this->_Connection = null;
@@ -156,21 +161,24 @@ class Gdn_Database implements InjectableInterface {
     /**
      * Close connection regardless of persistence.
      */
-    public function forceCloseConnection() {
+    public function forceCloseConnection()
+    {
         $this->_Connection = null;
     }
 
     /**
      * Hook for cleanup via Gdn_Factory.
      */
-    public function cleanup() {
+    public function cleanup()
+    {
         $this->closeConnection();
     }
 
     /**
      * Commit a transaction on the database.
      */
-    public function commitTransaction() {
+    public function commitTransaction()
+    {
         if ($this->_InTransaction) {
             $this->_InTransaction = !$this->connection()->commit();
         }
@@ -196,21 +204,21 @@ class Gdn_Database implements InjectableInterface {
      * @return PDO
      * @throws Exception Throws an exception if there is an error connecting to the database.
      */
-    protected function newPDO($dsn, $user, $password) {
+    protected function newPDO($dsn, $user, $password)
+    {
         static $timeoutAt = null;
-        $timeoutAt = $timeoutAt ?? microtime(true) + ($this->SmoothTimeoutMillis / 1000);
+        $timeoutAt = $timeoutAt ?? microtime(true) + $this->SmoothTimeoutMillis / 1000;
         do {
             try {
-                $pDO = new PDO(strtolower($this->Engine).':'.$dsn, $user, $password, $this->ConnectionOptions);
+                $pDO = new PDO(strtolower($this->Engine) . ":" . $dsn, $user, $password, $this->ConnectionOptions);
                 $pDO->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
                 $pDO->query("set time_zone = '+0:0'");
-
-                // We only throw exceptions during connect
-                $pDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
+                $pDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 return $pDO;
             } catch (Exception $ex) {
-                if ($ex instanceof PDOException &&
+                if (
+                    $ex instanceof PDOException &&
                     microtime(true) < $timeoutAt &&
                     in_array($ex->getCode(), [1203, 1040, 1226])
                 ) {
@@ -231,19 +239,21 @@ class Gdn_Database implements InjectableInterface {
                     usleep(rand($this->SmoothWaitMinMillis, $this->SmoothWaitMaxMillis) * 1000);
                 } else {
                     $timeout = false;
-                    if ($ex->getCode() == '2002' && preg_match('/Operation timed out/i', $ex->getMessage())) {
+                    if ($ex->getCode() == "2002" && preg_match("/Operation timed out/i", $ex->getMessage())) {
                         $timeout = true;
                     }
-                    if ($ex->getCode() == '2003' && preg_match("/Can't connect to MySQL/i", $ex->getMessage())) {
+                    if ($ex->getCode() == "2003" && preg_match("/Can't connect to MySQL/i", $ex->getMessage())) {
                         $timeout = true;
                     }
 
                     if ($timeout) {
-                        throw new Exception('Timeout while connecting to the database.', 504);
+                        throw new Exception("Timeout while connecting to the database.", 504);
                     }
 
                     throw new Exception(
-                        "An error occurred while attempting to connect to the database. dsn: $dsn, error: ".$dsn.$ex->getMessage(),
+                        "An error occurred while attempting to connect to the database. dsn: $dsn, error: " .
+                            $dsn .
+                            $ex->getMessage(),
                         500
                     );
                 }
@@ -257,13 +267,14 @@ class Gdn_Database implements InjectableInterface {
      * @param mixed $expr The expression to quote.
      * @return string The quoted expression.
      */
-    public function quoteExpression($expr) {
+    public function quoteExpression($expr)
+    {
         if (is_null($expr)) {
-            return 'NULL';
+            return "NULL";
         } elseif (is_string($expr)) {
-            return '\''.str_replace('\'', '\\\'', $expr).'\'';
+            return '\'' . str_replace('\'', '\\\'', $expr) . '\'';
         } elseif (is_object($expr)) {
-            return '?OBJECT?';
+            return "?OBJECT?";
         } else {
             return $expr;
         }
@@ -283,14 +294,15 @@ class Gdn_Database implements InjectableInterface {
      *   - <b>Password</b>: The password to connect to the database.
      *   - <b>ConnectionOptions</b>: Other PDO connection attributes.
      */
-    public function init($config = null) {
+    public function init($config = null)
+    {
         if (is_null($config)) {
-            $config = Gdn::config('Database');
+            $config = Gdn::config("Database");
         } elseif (is_string($config)) {
             $config = Gdn::config($config);
         }
 
-        $defaultConfig = (array)Gdn::config('Database', []);
+        $defaultConfig = (array) Gdn::config("Database", []);
         if (is_null($config)) {
             $config = [];
         }
@@ -301,63 +313,63 @@ class Gdn_Database implements InjectableInterface {
 
         // Make sure the config has all the keys we need
         $config += $defaultConfig + [
-            'Dsn' => null,
-            'Engine' => null,
-            'Host' => '',
-            'Dbname' => '',
-            'Name' => '',
-            'Port' => null,
-            'User' => null,
-            'Password' => null,
-            'ConnectionOptions' => null,
-            'ExtendedProperties' => [],
-            'DatabasePrefix' => null,
-            'Prefix' => null,
-            'SmoothTimeoutMillis' => 5000,
-            'SmoothWaitMinMillis' => 250,
-            'SmoothWaitMaxMillis' => 750,
+            "Dsn" => null,
+            "Engine" => null,
+            "Host" => "",
+            "Dbname" => "",
+            "Name" => "",
+            "Port" => null,
+            "User" => null,
+            "Password" => null,
+            "ConnectionOptions" => null,
+            "ExtendedProperties" => [],
+            "DatabasePrefix" => null,
+            "Prefix" => null,
+            "SmoothTimeoutMillis" => 5000,
+            "SmoothWaitMinMillis" => 250,
+            "SmoothWaitMaxMillis" => 750,
         ];
 
-        $this->Engine = $config['Engine'];
-        $this->User = $config['User'];
-        $this->Password = $config['Password'];
-        $this->ConnectionOptions = $config['ConnectionOptions'];
-        $this->DatabasePrefix = $config['DatabasePrefix'] ?: $config['Prefix'];
-        $this->ExtendedProperties = $config['ExtendedProperties'];
-        $this->SmoothTimeoutMillis = $config['SmoothTimeoutMillis'];
-        $this->SmoothWaitMinMillis = $config['SmoothWaitMinMillis'];
-        $this->SmoothWaitMaxMillis = $config['SmoothWaitMaxMillis'];
+        $this->Engine = $config["Engine"];
+        $this->User = $config["User"];
+        $this->Password = $config["Password"];
+        $this->ConnectionOptions = $config["ConnectionOptions"];
+        $this->DatabasePrefix = $config["DatabasePrefix"] ?: $config["Prefix"];
+        $this->ExtendedProperties = $config["ExtendedProperties"];
+        $this->SmoothTimeoutMillis = $config["SmoothTimeoutMillis"];
+        $this->SmoothWaitMinMillis = $config["SmoothWaitMinMillis"];
+        $this->SmoothWaitMaxMillis = $config["SmoothWaitMaxMillis"];
 
-        if (!empty($config['Dsn'])) {
+        if (!empty($config["Dsn"])) {
             // Get the dsn from the property.
-            $dsn = $config['Dsn'];
+            $dsn = $config["Dsn"];
         } else {
-            $host = $config['Host'];
-            $dbname = $config['Dbname'] ?: $config['Name'];
+            $host = $config["Host"];
+            $dbname = $config["Dbname"] ?: $config["Name"];
 
             if (empty($dbname)) {
-                $dsn = '';
+                $dsn = "";
             } else {
                 // Was the port explicitly defined in the config?
-                $port = $config['Port'];
-                if (empty($port) && strpos($host, ':') !== false) {
+                $port = $config["Port"];
+                if (empty($port) && strpos($host, ":") !== false) {
                     // Was the port explicitly defined with the host name? (ie. 127.0.0.1:3306)
-                    [$host, $port] = explode(':', $host);
+                    [$host, $port] = explode(":", $host);
                 }
 
                 if (empty($port)) {
-                    $dsn = sprintf('host=%s;dbname=%s;', $host, $dbname);
+                    $dsn = sprintf("host=%s;dbname=%s;", $host, $dbname);
                 } else {
-                    $dsn = sprintf('host=%s;port=%s;dbname=%s;', $host, $port, $dbname);
+                    $dsn = sprintf("host=%s;port=%s;dbname=%s;", $host, $port, $dbname);
                 }
             }
         }
-        if (strpos($dsn, 'charset=') === false) {
-            $dsn .= rtrim($dsn, ';').';charset='.c('Database.CharacterEncoding', 'utf8mb4');
+        if (strpos($dsn, "charset=") === false) {
+            $dsn .= rtrim($dsn, ";") . ";charset=" . c("Database.CharacterEncoding", "utf8mb4");
         }
 
-        if (array_key_exists('Slave', $config)) {
-            $this->_SlaveConfig = $config['Slave'];
+        if (array_key_exists("Slave", $config)) {
+            $this->_SlaveConfig = $config["Slave"];
         }
 
         $this->Dsn = $dsn;
@@ -371,46 +383,55 @@ class Gdn_Database implements InjectableInterface {
      * @param array $options
      * @return mixed
      */
-    public function query($sql, $inputParameters = null, $options = []) {
+    public function query($sql, $inputParameters = null, $options = [])
+    {
         $this->LastInfo = [];
 
-        if ($sql == '') {
-            trigger_error(errorMessage('Database was queried with an empty string.', $this->ClassName, 'Query'), E_USER_ERROR);
+        if ($sql == "") {
+            trigger_error(
+                errorMessage("Database was queried with an empty string.", $this->ClassName, "Query"),
+                E_USER_ERROR
+            );
         }
 
         // Get the return type.
-        if (isset($options['ReturnType'])) {
-            $returnType = $options['ReturnType'];
+        if (isset($options["ReturnType"])) {
+            $returnType = $options["ReturnType"];
         } elseif (preg_match('/^\s*"?(insert)\s+/i', $sql)) {
-            $returnType = 'ID';
-        } elseif (!preg_match('/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i', $sql)) {
-            $returnType = 'DataSet';
+            $returnType = "ID";
+        } elseif (
+            !preg_match(
+                '/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i',
+                $sql
+            )
+        ) {
+            $returnType = "DataSet";
         } else {
             $returnType = null;
         }
 
         try {
-            $timerName = $returnType === 'DataSet' ? 'dbRead' : 'dbWrite';
-            $this->timers->start(['db', $timerName]);
+            $timerName = $returnType === "DataSet" ? "dbRead" : "dbWrite";
+            $this->timers->start(["db", $timerName]);
 
-            if (isset($options['Cache'])) {
+            if (isset($options["Cache"])) {
                 // Check to see if the query is cached.
-                $cacheKeys = (array)val('Cache', $options, null);
-                $cacheOperation = val('CacheOperation', $options, null);
+                $cacheKeys = (array) val("Cache", $options, null);
+                $cacheOperation = val("CacheOperation", $options, null);
                 if (is_null($cacheOperation)) {
                     switch ($returnType) {
-                        case 'DataSet':
-                            $cacheOperation = 'get';
+                        case "DataSet":
+                            $cacheOperation = "get";
                             break;
-                        case 'ID':
+                        case "ID":
                         case null:
-                            $cacheOperation = 'remove';
+                            $cacheOperation = "remove";
                             break;
                     }
                 }
 
                 switch ($cacheOperation) {
-                    case 'get':
+                    case "get":
                         foreach ($cacheKeys as $cacheKey) {
                             $data = Gdn::cache()->get($cacheKey);
                         }
@@ -424,15 +445,15 @@ class Gdn_Database implements InjectableInterface {
                         $storeCacheKey = $cacheKey;
                         break;
 
-                    case 'increment':
-                    case 'decrement':
+                    case "increment":
+                    case "decrement":
                         $cacheMethod = ucfirst($cacheOperation);
                         foreach ($cacheKeys as $cacheKey) {
                             $cacheResult = Gdn::cache()->$cacheMethod($cacheKey);
                         }
                         break;
 
-                    case 'remove':
+                    case "remove":
                         foreach ($cacheKeys as $cacheKey) {
                             $res = Gdn::cache()->remove($cacheKey);
                         }
@@ -446,17 +467,17 @@ class Gdn_Database implements InjectableInterface {
                 $tries = 1;
             }
 
-            if (val('Type', $options) == 'select' && val('Slave', $options, null) !== false) {
+            if (val("Type", $options) == "select" && val("Slave", $options, null) !== false) {
                 $pDO = $this->slave();
-                $this->LastInfo['connection'] = 'slave';
+                $this->LastInfo["connection"] = "slave";
             } else {
                 $pDO = $this->connection();
-                $this->LastInfo['connection'] = 'master';
+                $this->LastInfo["connection"] = "master";
             }
 
             if ($this->eventManager) {
                 $inputParameters = $this->eventManager->fireFilter(
-                    'database_query_before',
+                    "database_query_before",
                     $inputParameters,
                     $sql,
                     $options
@@ -478,12 +499,22 @@ class Gdn_Database implements InjectableInterface {
 
                         if (!is_object($pDOStatement)) {
                             trigger_error(
-                                errorMessage('PDO Statement failed to prepare', $this->ClassName, 'Query', $this->getPDOErrorMessage($pDO->errorInfo())),
+                                errorMessage(
+                                    "PDO Statement failed to prepare",
+                                    $this->ClassName,
+                                    "Query",
+                                    $this->getPDOErrorMessage($pDO->errorInfo())
+                                ),
                                 E_USER_ERROR
                             );
                         } elseif ($pDOStatement->execute($inputParameters) === false) {
                             trigger_error(
-                                errorMessage($this->getPDOErrorMessage($pDOStatement->errorInfo()), $this->ClassName, 'Query', $sql),
+                                errorMessage(
+                                    $this->getPDOErrorMessage($pDOStatement->errorInfo()),
+                                    $this->ClassName,
+                                    "Query",
+                                    $sql
+                                ),
                                 E_USER_ERROR
                             );
                         }
@@ -508,8 +539,20 @@ class Gdn_Database implements InjectableInterface {
                 } catch (Gdn_UserException $uex) {
                     // Rethrow.
                     throw $uex;
+                } catch (PDOException $pex) {
+                    $code = $pex->errorInfo[1] ?? $pex->getCode();
+                    $message = $pex->errorInfo[2] ?? $pex->getMessage();
+
+                    // Detect mysql "server has gone away" and try to reconnect.
+                    if ($code == 2006 && $try < $tries) {
+                        $this->closeConnection();
+                        continue;
+                    } else {
+                        throw new Gdn_UserException($message, $code, $pex);
+                    }
                 } catch (Exception $ex) {
-                    [$state, $code, $message] = $pDO->errorInfo();
+                    $errorInfo = $pDO->errorInfo();
+                    [$state, $code, $message] = $errorInfo;
 
                     // If the error code is consistent with a disconnect, attempt to retry
                     if ($code == 2006 && $try < $tries) {
@@ -523,47 +566,50 @@ class Gdn_Database implements InjectableInterface {
             }
 
             if ($pDOStatement instanceof PDOStatement) {
-                $this->LastInfo['RowCount'] = $pDOStatement->rowCount();
+                $this->LastInfo["RowCount"] = $pDOStatement->rowCount();
             }
 
             // Did this query modify data in any way?
-            if ($returnType === 'ID') {
+            if ($returnType === "ID") {
                 $this->_CurrentResultSet = $pDO->lastInsertId();
-                if (is_a($pDOStatement, 'PDOStatement')) {
+                if (is_a($pDOStatement, "PDOStatement")) {
                     $pDOStatement->closeCursor();
                 }
             } else {
-                if ($returnType === 'DataSet') {
+                if ($returnType === "DataSet") {
                     // Create a DataSet to manage the resultset
                     $this->_CurrentResultSet = Gdn::getContainer()->get(Gdn_DataSet::class);
                     $this->_CurrentResultSet->Connection = $pDO;
                     $this->_CurrentResultSet->pdoStatement($pDOStatement);
                     $this->_CurrentResultSet->setQueryOptions($options);
-                } elseif (is_a($pDOStatement, 'PDOStatement')) {
+                } elseif (is_a($pDOStatement, "PDOStatement")) {
                     $pDOStatement->closeCursor();
                 }
             }
 
             if (isset($storeCacheKey)) {
-                if ($cacheOperation == 'get') {
+                if ($cacheOperation == "get") {
                     Gdn::cache()->store(
                         $storeCacheKey,
-                        (($this->_CurrentResultSet instanceof Gdn_DataSet) ? $this->_CurrentResultSet->resultArray() : $this->_CurrentResultSet),
-                        val('CacheOptions', $options, [])
+                        $this->_CurrentResultSet instanceof Gdn_DataSet
+                            ? $this->_CurrentResultSet->resultArray()
+                            : $this->_CurrentResultSet,
+                        val("CacheOptions", $options, [])
                     );
                 }
             }
 
             return $this->_CurrentResultSet;
         } finally {
-            $this->timers->stop(['db', $timerName]);
+            $this->timers->stop(["db", $timerName]);
         }
     }
 
     /**
      * Rollback the active transaction.
      */
-    public function rollbackTransaction() {
+    public function rollbackTransaction()
+    {
         if ($this->_InTransaction) {
             $this->_InTransaction = !$this->connection()->rollBack();
         }
@@ -575,8 +621,9 @@ class Gdn_Database implements InjectableInterface {
      * @param string|array $errorInfo
      * @return string
      */
-    public function getPDOErrorMessage($errorInfo) {
-        $errorMessage = '';
+    public function getPDOErrorMessage($errorInfo)
+    {
+        $errorMessage = "";
         if (is_array($errorInfo)) {
             if (count($errorInfo) >= 2) {
                 $errorMessage = $errorInfo[2];
@@ -596,38 +643,39 @@ class Gdn_Database implements InjectableInterface {
      * @param string $fieldType
      * @return string
      */
-    private function simpleDataType(string $fieldType): string {
+    private function simpleDataType(string $fieldType): string
+    {
         $fieldType = strtolower($fieldType);
 
         switch ($fieldType) {
-            case 'bool':
-            case 'boolean':
-                $result = 'boolean';
+            case "bool":
+            case "boolean":
+                $result = "boolean";
                 break;
-            case 'bit':
-            case 'tinyint':
-            case 'smallint':
-            case 'mediumint':
-            case 'int':
-            case 'integer':
-            case 'bigint':
-                $result = 'integer';
+            case "bit":
+            case "tinyint":
+            case "smallint":
+            case "mediumint":
+            case "int":
+            case "integer":
+            case "bigint":
+                $result = "integer";
                 break;
-            case 'decimal':
-            case 'dec':
-            case 'float':
-            case 'double':
-                $result = 'number';
+            case "decimal":
+            case "dec":
+            case "float":
+            case "double":
+                $result = "number";
                 break;
-            case 'timestamp':
-                $result = 'timestamp';
+            case "timestamp":
+                $result = "timestamp";
                 break;
-            case 'date':
-            case 'datetime':
-                $result = 'datetime';
+            case "date":
+            case "datetime":
+                $result = "datetime";
                 break;
             default:
-                $result = 'string';
+                $result = "string";
         }
 
         return $result;
@@ -639,7 +687,8 @@ class Gdn_Database implements InjectableInterface {
      * @param string $table Target table for building the Schema.
      * @return \Garden\Schema\Schema
      */
-    public function simpleSchema(string $table): \Garden\Schema\Schema {
+    public function simpleSchema(string $table): \Garden\Schema\Schema
+    {
         $properties = [];
         $required = [];
         $databaseSchema = $this->sql()->fetchTableSchema($table);
@@ -647,8 +696,8 @@ class Gdn_Database implements InjectableInterface {
         /** @var object $databaseField */
         foreach ($databaseSchema as $databaseField) {
             $type = $this->simpleDataType($databaseField->Type);
-            $allowNull = (bool)$databaseField->AllowNull;
-            $isAutoIncrement = (bool)$databaseField->AutoIncrement;
+            $allowNull = (bool) $databaseField->AllowNull;
+            $isAutoIncrement = (bool) $databaseField->AutoIncrement;
             $hasDefault = !($databaseField->Default === null);
             $isRequired = !$allowNull && !$isAutoIncrement && !$hasDefault;
             if ($isRequired) {
@@ -656,23 +705,23 @@ class Gdn_Database implements InjectableInterface {
             }
 
             $field = [
-                'allowNull' => $allowNull,
-                'required' => $isRequired,
-                'type' => $type,
+                "allowNull" => $allowNull,
+                "required" => $isRequired,
+                "type" => $type,
             ];
-            if ($type === 'string') {
+            if ($type === "string") {
                 $maxLength = $databaseField->Length ?? null;
                 if ($maxLength !== null) {
-                    $field['maxLength'] = (int) $maxLength;
+                    $field["maxLength"] = (int) $maxLength;
                 }
 
                 $maxByteLength = $databaseField->ByteLength ?? null;
                 if ($maxByteLength !== null) {
-                    $field['maxByteLength'] = (int) $maxByteLength;
+                    $field["maxByteLength"] = (int) $maxByteLength;
                 }
             }
             if (is_array($databaseField->Enum) && !empty($databaseField->Enum)) {
-                $field['enum'] = $databaseField->Enum;
+                $field["enum"] = $databaseField->Enum;
             }
 
             // Garden Schema requires appending a question mark to the field name if it's not required.
@@ -680,7 +729,7 @@ class Gdn_Database implements InjectableInterface {
             $properties[$key] = $field;
         }
 
-        $schema = Schema::parse(['type' => 'object', 'properties' => $properties, 'required' => $required]);
+        $schema = Schema::parse(["type" => "object", "properties" => $properties, "required" => $required]);
         return $schema;
     }
 
@@ -692,14 +741,15 @@ class Gdn_Database implements InjectableInterface {
      *
      * @return int
      */
-    public function getEstimatedRowCount(string $tableName): int {
+    public function getEstimatedRowCount(string $tableName): int
+    {
         $data = $this->query(
-            'show table status like '.$this->connection()->quote($this->DatabasePrefix.$tableName),
+            "show table status like " . $this->connection()->quote($this->DatabasePrefix . $tableName),
             [],
-            ['ReturnType' => 'DataSet']
+            ["ReturnType" => "DataSet"]
         );
 
-        return $data->value('Rows', 0);
+        return $data->value("Rows", 0);
     }
 
     /**
@@ -707,12 +757,17 @@ class Gdn_Database implements InjectableInterface {
      *
      * @return PDO
      */
-    public function slave() {
+    public function slave()
+    {
         if ($this->_Slave === null) {
-            if (empty($this->_SlaveConfig) || empty($this->_SlaveConfig['Dsn'])) {
+            if (empty($this->_SlaveConfig) || empty($this->_SlaveConfig["Dsn"])) {
                 $this->_Slave = $this->connection();
             } else {
-                $this->_Slave = $this->newPDO($this->_SlaveConfig['Dsn'], val('User', $this->_SlaveConfig), val('Password', $this->_SlaveConfig));
+                $this->_Slave = $this->newPDO(
+                    $this->_SlaveConfig["Dsn"],
+                    val("User", $this->_SlaveConfig),
+                    val("Password", $this->_SlaveConfig)
+                );
             }
         }
 
@@ -724,9 +779,10 @@ class Gdn_Database implements InjectableInterface {
      *
      * @return Gdn_SQLDriver The database driver class associated with this database.
      */
-    public function sql() {
+    public function sql()
+    {
         if (is_null($this->_SQL)) {
-            $name = $this->Engine.'Driver';
+            $name = $this->Engine . "Driver";
             $this->_SQL = Gdn::factory($name);
             if (!$this->_SQL) {
                 throw new Exception("Could not instantiate database driver '$name'.");
@@ -742,7 +798,8 @@ class Gdn_Database implements InjectableInterface {
      *
      * @return Gdn_SQLDriver
      */
-    public function createSql(): Gdn_SQLDriver {
+    public function createSql(): Gdn_SQLDriver
+    {
         $sql = clone $this->sql();
         $sql->reset();
         return $sql;
@@ -753,8 +810,9 @@ class Gdn_Database implements InjectableInterface {
      *
      * @return Gdn_DatabaseStructure The database structure class for this database.
      */
-    public function structure() {
-        $name = $this->Engine.'Structure';
+    public function structure()
+    {
+        $name = $this->Engine . "Structure";
         $this->_Structure = Gdn::getContainer()->get($name);
 
         return $this->_Structure;
@@ -765,7 +823,8 @@ class Gdn_Database implements InjectableInterface {
      *
      * @return array
      */
-    public function getSqlModes(): array {
+    public function getSqlModes(): array
+    {
         $currentModes = $this->query("SELECT @@sql_mode", [])->column("@@sql_mode");
         $currentModes = reset($currentModes);
         $currentModes = explode(",", $currentModes);
@@ -777,9 +836,10 @@ class Gdn_Database implements InjectableInterface {
      *
      * @param string[] $modes MySQL modes to set.
      */
-    public function setSqlModes(array $modes): void {
+    public function setSqlModes(array $modes): void
+    {
         $modes = implode(",", $modes);
-        $this->query("SET SESSION sql_mode=:mode", [':mode' => $modes], []);
+        $this->query("SET SESSION sql_mode=:mode", [":mode" => $modes], []);
     }
 
     /**
@@ -790,7 +850,8 @@ class Gdn_Database implements InjectableInterface {
      *
      * @return mixed The result of the callback.
      */
-    public function runWithSqlMode(array $modes, callable $callback) {
+    public function runWithSqlMode(array $modes, callable $callback)
+    {
         $originalModes = $this->getSqlModes();
         $newModes = array_values(array_unique(array_merge($originalModes, $modes)));
 

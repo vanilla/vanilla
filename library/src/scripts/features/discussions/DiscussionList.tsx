@@ -4,8 +4,8 @@
  * @license gpl-2.0-only
  */
 
-import { IDiscussion, IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
-import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
+import { LoadStatus } from "@library/@types/api/core";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { useDiscussionList } from "@library/features/discussions/discussionHooks";
 import { DiscussionListView } from "@library/features/discussions/DiscussionList.views";
@@ -13,11 +13,10 @@ import { LegacyDiscussionListSelectAll } from "@library/features/discussions/Dis
 import Loader from "@library/loaders/Loader";
 import React from "react";
 
-interface IProps {
+interface IProps extends Partial<React.ComponentProps<typeof DiscussionListView>> {
     apiParams: IGetDiscussionListParams;
-    noCheckboxes?: boolean;
-    discussions?: IDiscussion[];
     isMainContent?: boolean;
+    isAsset?: boolean;
 }
 
 export function DiscussionList(props: IProps) {
@@ -28,16 +27,21 @@ export function DiscussionList(props: IProps) {
         return <Loader />;
     }
 
-    if (!discussions.data || discussions.status === LoadStatus.ERROR || discussions.error) {
+    if (!discussions.data?.discussionList || discussions.status === LoadStatus.ERROR || discussions.error) {
         return <CoreErrorMessages apiError={discussions.error} />;
     }
 
     return (
         <>
-            <DiscussionListView noCheckboxes={props.noCheckboxes} discussions={discussions.data} />
+            <DiscussionListView
+                noCheckboxes={props.noCheckboxes}
+                discussions={discussions.data.discussionList}
+                discussionOptions={props.discussionOptions}
+                disableButtonsInItems={props.disableButtonsInItems}
+            />
             {props.isMainContent && !props.noCheckboxes && (
                 <LegacyDiscussionListSelectAll
-                    discussionIDs={discussions.data?.map((discussion) => discussion.discussionID)}
+                    discussionIDs={discussions.data?.discussionList.map((discussion) => discussion.discussionID)}
                 />
             )}
         </>

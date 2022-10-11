@@ -9,11 +9,13 @@ namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\Embeds;
 use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
 use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\LinkSanitizeTrait;
 
-class LinkSanitizeTest extends SanitizeTest {
+class LinkSanitizeTest extends SanitizeTest
+{
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
+    protected function insertContentOperations(string $content): array
+    {
         $operations = [
             [
                 "insert" => [

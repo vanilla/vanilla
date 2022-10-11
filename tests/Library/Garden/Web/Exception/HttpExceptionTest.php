@@ -13,19 +13,20 @@ use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\MethodNotAllowedException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Guzzle\Tests\Http\Server;
+use VanillaTests\BootstrapTestCase;
 
 /**
  * Basic access tests for the `HttpException` class.
  */
-class HttpExceptionTest extends \PHPUnit\Framework\TestCase {
-
+class HttpExceptionTest extends BootstrapTestCase
+{
     /**
      * An exception with an empty message should use the response code for the message.
      */
-    public function testAutoMessage(): void {
+    public function testAutoMessage(): void
+    {
         $ex = new ClientException();
-        $this->assertSame('Bad Request', $ex->getMessage());
+        $this->assertSame("Bad Request", $ex->getMessage());
     }
 
     /**
@@ -35,7 +36,8 @@ class HttpExceptionTest extends \PHPUnit\Framework\TestCase {
      * @param string $class
      * @dataProvider provideStatusClasses
      */
-    public function testCreateFromStatus(int $status, string $class): void {
+    public function testCreateFromStatus(int $status, string $class): void
+    {
         $ex = HttpException::createFromStatus($status);
         $this->assertInstanceOf($class, $ex);
     }
@@ -45,7 +47,8 @@ class HttpExceptionTest extends \PHPUnit\Framework\TestCase {
      *
      * @return array
      */
-    public function provideStatusClasses(): array {
+    public function provideStatusClasses(): array
+    {
         $r = [
             [400, ClientException::class],
             [403, ForbiddenException::class],
@@ -59,18 +62,20 @@ class HttpExceptionTest extends \PHPUnit\Framework\TestCase {
     /**
      * A 405 should result in a `MethodNotAllowed` exception.
      */
-    public function testCreateFromStatus405(): void {
-        $ex = HttpException::createFromStatus(405, '', ['method' => 'GET', 'allow' => ['POST']]);
+    public function testCreateFromStatus405(): void
+    {
+        $ex = HttpException::createFromStatus(405, "", ["method" => "GET", "allow" => ["POST"]]);
         $this->assertInstanceOf(MethodNotAllowedException::class, $ex);
         /* @var \Garden\Web\Exception\MethodNotAllowedException $ex */
-        $this->assertSame(['POST'], $ex->getAllow());
-        $this->assertSame('GET not allowed.', $ex->getMessage());
+        $this->assertSame(["POST"], $ex->getAllow());
+        $this->assertSame("GET not allowed.", $ex->getMessage());
     }
 
     /**
      * Test creating an exception with an unknown HTTP status.
      */
-    public function testCreateFromStatusBad(): void {
+    public function testCreateFromStatusBad(): void
+    {
         $ex = HttpException::createFromStatus(-1000);
         $this->assertInstanceOf(ServerException::class, $ex);
     }
@@ -78,26 +83,29 @@ class HttpExceptionTest extends \PHPUnit\Framework\TestCase {
     /**
      * You can pass a description to the context.
      */
-    public function testDescriptionAccess(): void {
-        $ex = new NotFoundException('Page', ['description' => 'foo']);
-        $this->assertSame('foo', $ex->getDescription());
+    public function testDescriptionAccess(): void
+    {
+        $ex = new NotFoundException("Page", ["description" => "foo"]);
+        $this->assertSame("foo", $ex->getDescription());
     }
 
     /**
      * Test basic JSON serialization.
      */
-    public function testJsonSerializeBasic() {
-        $ex = new ClientException('', 400, ['HTTP_FOO' => 'foo', 'bar' => 'bar']);
+    public function testJsonSerializeBasic()
+    {
+        $ex = new ClientException("", 400, ["HTTP_FOO" => "foo", "bar" => "bar"]);
         $json = $ex->jsonSerialize();
-        $this->assertArrayNotHasKey('HTTP_FOO', $json);
-        $this->assertSame('bar', $json['bar']);
+        $this->assertArrayNotHasKey("HTTP_FOO", $json);
+        $this->assertSame("bar", $json["bar"]);
     }
 
     /**
      * The method not allowed exception can take an empty method name.
      */
-    public function testMethodNotAllowedNoMethod() {
-        $ex = new MethodNotAllowedException('');
-        $this->assertSame('Method not allowed.', $ex->getMessage());
+    public function testMethodNotAllowedNoMethod()
+    {
+        $ex = new MethodNotAllowedException("");
+        $this->assertSame("Method not allowed.", $ex->getMessage());
     }
 }

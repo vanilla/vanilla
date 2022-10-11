@@ -21,7 +21,7 @@ import { FormControlWrapper } from "./FormControlWrapper";
 import { FormWrapper } from "./FormWrapper";
 import { validateConditions } from "./utils";
 
-const RenderChildren = (props: React.PropsWithChildren<ISectionProps | IFormProps | IControlGroupProps>) => (
+export const RenderChildren = (props: React.PropsWithChildren<ISectionProps | IFormProps | IControlGroupProps>) => (
     <>{props.children}</>
 );
 
@@ -29,7 +29,12 @@ interface IPartialProps extends IBaseSchemaFormProps, ISchemaRenderProps {
     isRequired?: boolean;
     inheritSchema?: JsonSchema;
     onChange(instance: any): void;
+    onBlur?(): void;
     disabled?: boolean;
+    groupName?: string;
+    hideDescriptionInLabels?: boolean;
+    size?: "small" | "default";
+    autocompleteClassName?: string;
 }
 
 export function PartialSchemaForm(props: IPartialProps) {
@@ -39,12 +44,18 @@ export function PartialSchemaForm(props: IPartialProps) {
         instance,
         rootInstance,
         onChange,
+        onBlur,
         validation,
         FormControl,
         // Those default to a react component that simply renders children.
         Form = RenderChildren,
         FormSection = RenderChildren,
         FormControlGroup = RenderChildren,
+        FormGroupWrapper,
+        groupName,
+        hideDescriptionInLabels,
+        size,
+        autocompleteClassName,
     } = props;
 
     const schema = props.inheritSchema
@@ -55,7 +66,19 @@ export function PartialSchemaForm(props: IPartialProps) {
         : props.schema;
 
     const form: IForm | undefined = schema["x-form"];
-    const control: IFormControl | IFormControl[] | undefined = props.schema["x-control"];
+    let control: IFormControl | IFormControl[] | undefined = props.schema["x-control"];
+
+    //exclude descriptions from form field labels
+    if (control && hideDescriptionInLabels) {
+        if (!Array.isArray(control) && control.description) {
+            control = { ...control, description: "" };
+        } else if (Array.isArray(control)) {
+            control = control.map((controlEntry) => {
+                return { ...controlEntry, description: "" };
+            });
+        }
+    }
+
     const controls = control && (Array.isArray(control) ? control : [control]);
 
     // Render a tabbed form.
@@ -70,39 +93,59 @@ export function PartialSchemaForm(props: IPartialProps) {
         if (!Array.isArray(control) && control?.label) {
             sectionTitle = control?.label;
         }
+
         const section = (
-            <FormSection
-                path={path}
-                title={sectionTitle!}
-                instance={instance}
-                rootInstance={rootInstance}
-                schema={schema}
-                rootSchema={rootSchema}
-                validation={validation}
+            <ConditionalWrap
+                condition={!!FormGroupWrapper && sectionTitle}
+                wrapper={(children: React.ReactChildren) =>
+                    !!FormGroupWrapper && (
+                        <FormGroupWrapper groupName={groupName} header={sectionTitle ?? ""}>
+                            {children}
+                        </FormGroupWrapper>
+                    )
+                }
             >
-                {Object.entries(schema.properties).map(([key, value]: [string, JsonSchema]) => {
-                    return (
-                        <PartialSchemaForm
-                            disabled={props.disabled || value?.disabled}
-                            key={key}
-                            path={[...path, key]}
-                            schema={value}
-                            rootSchema={rootSchema}
-                            instance={instance?.[key]}
-                            rootInstance={rootInstance}
-                            Form={Form}
-                            FormSection={FormSection}
-                            FormControl={FormControl}
-                            FormControlGroup={FormControlGroup}
-                            onChange={(value) => {
-                                onChange({ ...instance, [key]: value });
-                            }}
-                            isRequired={requiredProperties.includes(key)}
-                        />
-                    );
-                })}
-            </FormSection>
+                <FormSection
+                    path={path}
+                    title={sectionTitle!}
+                    instance={instance}
+                    rootInstance={rootInstance}
+                    schema={schema}
+                    rootSchema={rootSchema}
+                    validation={validation}
+                >
+                    {Object.entries(schema.properties).map(([key, value]: [string, JsonSchema]) => {
+                        return (
+                            <PartialSchemaForm
+                                disabled={props.disabled || value?.disabled}
+                                key={key}
+                                path={[...path, key]}
+                                schema={value}
+                                rootSchema={rootSchema}
+                                instance={instance?.[key]}
+                                rootInstance={rootInstance}
+                                Form={Form}
+                                FormSection={FormSection}
+                                FormControl={FormControl}
+                                FormControlGroup={FormControlGroup}
+                                FormGroupWrapper={FormGroupWrapper}
+                                onChange={(value) => {
+                                    onChange({ ...instance, [key]: value });
+                                }}
+                                onBlur={onBlur}
+                                isRequired={requiredProperties.includes(key)}
+                                groupName={key}
+                                validation={validation}
+                                hideDescriptionInLabels={hideDescriptionInLabels}
+                                size={size}
+                                autocompleteClassName={autocompleteClassName}
+                            />
+                        );
+                    })}
+                </FormSection>
+            </ConditionalWrap>
         );
+
         if (form) {
             return (
                 <FormWrapper
@@ -142,7 +185,7 @@ export function PartialSchemaForm(props: IPartialProps) {
     return (
         <FormControlGroup
             path={path}
-            controls={validControls}
+            controls={visibleControls}
             instance={instance}
             rootInstance={rootInstance}
             schema={schema}
@@ -163,8 +206,15 @@ export function PartialSchemaForm(props: IPartialProps) {
                     required={props.isRequired}
                     validation={validation}
                     FormControl={FormControl}
+                    onBlur={onBlur}
+                    size={size}
+                    autocompleteClassName={autocompleteClassName}
                 />
             ))}
         </FormControlGroup>
     );
+}
+
+function ConditionalWrap({ condition, wrapper, children }) {
+    return condition ? wrapper(children) : children;
 }

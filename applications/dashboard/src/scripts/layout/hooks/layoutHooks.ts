@@ -9,7 +9,7 @@ import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks"
 import { useAsyncFn, useLastValue, useSessionStorage } from "@vanilla/react-utils";
 import { useEffect, useRef } from "react";
 
-const CONFIG_KEY = "labs.customLayoutHomePage";
+const CONFIG_KEY = "labs.useCustomLayout";
 
 const HARDCODED_DB_ID = 1;
 const HARDCODED_FILE_ID = "home";
@@ -28,7 +28,7 @@ async function ensureDbSpecExists() {
 
 export function usePlaygroundSetup() {
     const configPatcher = useConfigPatcher();
-    const configs = useConfigsByKeys(["labs.customLayoutHomePage"]);
+    const configs = useConfigsByKeys(["labs.useCustomLayout"]);
     const isSetup = configs.data?.[CONFIG_KEY];
     const isSetupLoading = configPatcher.isLoading;
     const setIsSetup = async (isSetup: boolean) => {

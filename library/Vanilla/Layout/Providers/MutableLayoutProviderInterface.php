@@ -13,8 +13,8 @@ use Garden\Web\Exception\NotFoundException;
  * Defines methods implemented by classes that provide layouts whose definitions are mutable, i.e. LayoutModel.
  * Assumes successful schema validation prior to method invocation.
  */
-interface MutableLayoutProviderInterface extends LayoutProviderInterface {
-
+interface MutableLayoutProviderInterface extends LayoutProviderInterface
+{
     /**
      * Update an existing layout, i.e. insert a new layout row
      *

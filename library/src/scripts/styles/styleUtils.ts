@@ -393,9 +393,9 @@ function getDebugVars(vars: any): any {
         if (value instanceof ColorHelper) {
             result[key] =
                 value.opacity() < 1
-                    ? `rgba(${value
+                    ? `rgba(${value.toRGBA().red()}, ${value.toRGBA().green()}, ${value.toRGBA().blue()}, ${value
                           .toRGBA()
-                          .red()}, ${value.toRGBA().green()}, ${value.toRGBA().blue()}, ${value.toRGBA().alpha()})`
+                          .alpha()})`
                     : value.toHexString();
         } else if (typeof value === "object" && value) {
             result[key] = getDebugVars(value);

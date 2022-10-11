@@ -20,7 +20,8 @@ use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 /**
  * Tests for rich text splitting and fragments.
  */
-class RichTextFragmentTest extends BootstrapTestCase {
+class RichTextFragmentTest extends BootstrapTestCase
+{
     use HtmlNormalizeTrait;
 
     /**
@@ -31,9 +32,12 @@ class RichTextFragmentTest extends BootstrapTestCase {
     /**
      * {@inheritDoc}
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        $this->container()->rule(EmbedService::class)->addCall("addCoreEmbeds");
+        $this->container()
+            ->rule(EmbedService::class)
+            ->addCall("addCoreEmbeds");
         $this->container()->call(function (FormatService $formatService) {
             $this->formatter = $formatService->getFormatter(RichFormat::FORMAT_KEY);
         });
@@ -45,7 +49,8 @@ class RichTextFragmentTest extends BootstrapTestCase {
      * @param string $rich A rich JSON string to test.
      * @param int $expectedReplacements The expected total of replacements to be made.
      */
-    private function assertFooSmoke(string $rich, int $expectedReplacements): void {
+    private function assertFooSmoke(string $rich, int $expectedReplacements): void
+    {
         $expected = json_decode($rich, true);
         $dom = $this->formatter->parseDOM($rich);
 
@@ -56,7 +61,7 @@ class RichTextFragmentTest extends BootstrapTestCase {
         $fn = function (TextFragmentInterface $text) use (&$actualReplacements) {
             $content = $text->getInnerContent();
             $replacementCount = 0;
-            $new = str_replace('foo', 'bar', $content, $replacementCount);
+            $new = str_replace("foo", "bar", $content, $replacementCount);
             $actualReplacements += $replacementCount;
             $text->setInnerContent($new);
         };
@@ -75,7 +80,7 @@ class RichTextFragmentTest extends BootstrapTestCase {
 
         array_walk_recursive($expected, function (&$str) {
             if (is_string($str)) {
-                $str = str_replace('foo', 'bar', $str);
+                $str = str_replace("foo", "bar", $str);
             }
         });
 
@@ -90,7 +95,8 @@ class RichTextFragmentTest extends BootstrapTestCase {
      * @param array $fragments
      * @return array
      */
-    private function debugFragments(array $fragments): array {
+    private function debugFragments(array $fragments): array
+    {
         $debug = array_map(function (TextFragmentInterface $f) {
             return $f->getInnerContent();
         }, $fragments);
@@ -100,9 +106,11 @@ class RichTextFragmentTest extends BootstrapTestCase {
     /**
      * Smoke test the canonical rich string.
      */
-    public function testBasic(): void {
-        $text = /** @lang JSON */
-        <<<'JSON'
+    public function testBasic(): void
+    {
+        $text =
+            /** @lang JSON */
+            <<<'JSON'
 [
   {
     "insert": "Hello "
@@ -144,8 +152,9 @@ JSON;
             $fragment->setInnerContent("Line <b>$i</b>");
         }
 
-        $expected = /** @lang HTML */
-        <<<'HTML'
+        $expected =
+            /** @lang HTML */
+            <<<'HTML'
 <p>Line <strong>0</strong></p>
 <div class=blockquote>
     <div class=blockquote-content>
@@ -162,9 +171,11 @@ HTML;
     /**
      * Establish canonical handling of rich text fragment generation.
      */
-    public function testCanonical(): void {
-        $text = /** @lang JSON */
-        <<<'JSON'
+    public function testCanonical(): void
+    {
+        $text =
+            /** @lang JSON */
+            <<<'JSON'
 [
   {
     "insert": "Heading"
@@ -289,8 +300,9 @@ JSON;
         }
 
         // TODO: Fix bug in code block when we fix our HtmlNormalizeTrait.
-        $expected = /** @lang HTML */
-        <<<'HTML'
+        $expected =
+            /** @lang HTML */
+            <<<'HTML'
 <h2>Line <strong>0</strong></h2>
 <p>Line <strong>1</strong></p>
 <div class=blockquote>
@@ -333,9 +345,11 @@ HTML;
      * @param ?string $expected
      * @dataProvider provideInlineFormattingTests
      */
-    public function testInlineFormatting(string $html, string $expected = null): void {
-        $text = /** @lang JSON */
-        <<<'JSON'
+    public function testInlineFormatting(string $html, string $expected = null): void
+    {
+        $text =
+            /** @lang JSON */
+            <<<'JSON'
 [
   {
     "insert": "test\n"
@@ -351,8 +365,9 @@ JSON;
         $fragments[0]->setInnerContent($html);
 
         $expected = $expected ?? $html;
-        $expected = /** @lang HTML */
-        <<<HTML
+        $expected =
+            /** @lang HTML */
+            <<<HTML
 <p>$expected</p>
 HTML;
 
@@ -365,18 +380,24 @@ HTML;
      *
      * @return array<string, string[]>
      */
-    public function provideInlineFormattingTests(): array {
+    public function provideInlineFormattingTests(): array
+    {
         $r = [
-            'bold italic' => ['hey <strong>bold</strong> and <em>italic</em>.'],
-            'b' => ['<b>foo</b>', '<strong>foo</strong>'],
-            'i' => ['<i>foo</i>', '<em>foo</em>'],
-            'link' => ['<a href="http://example.com">link</a>', '<a href="http://example.com" rel="nofollow noreferrer ugc">link</a>'],
-            'strike' => ['<s>strike</s>'],
-            'code' => ['<code>foo</code>', '<code class="code codeInline" spellcheck="false" tabindex="0">foo</code>'],
-            'nested' => ['<em><s>foo</s></em>'],
-            'nested 2' => ['<em><s>foo</s> bar</em>'],
-            'nested 3' => ['<em><s>foo</s> <strong>bar</strong></em>', '<em><s>foo</s> </em><strong><em>bar</em></strong>'],
-
+            "bold italic" => ["hey <strong>bold</strong> and <em>italic</em>."],
+            "b" => ["<b>foo</b>", "<strong>foo</strong>"],
+            "i" => ["<i>foo</i>", "<em>foo</em>"],
+            "link" => [
+                '<a href="http://example.com">link</a>',
+                '<a href="http://example.com" rel="nofollow noreferrer ugc">link</a>',
+            ],
+            "strike" => ["<s>strike</s>"],
+            "code" => ["<code>foo</code>", '<code class="code codeInline" spellcheck="false" tabindex="0">foo</code>'],
+            "nested" => ["<em><s>foo</s></em>"],
+            "nested 2" => ["<em><s>foo</s> bar</em>"],
+            "nested 3" => [
+                "<em><s>foo</s> <strong>bar</strong></em>",
+                "<em><s>foo</s> </em><strong><em>bar</em></strong>",
+            ],
         ];
 
         return $r;
@@ -385,8 +406,10 @@ HTML;
     /**
      * Rich nested lists should properly break their items up.
      */
-    public function testRichLists(): void {
-        $json = /** @lang json */
+    public function testRichLists(): void
+    {
+        $json =
+            /** @lang json */
             <<<'JSON'
 [
   {
@@ -499,13 +522,14 @@ HTML;
   }
 ]
 JSON;
-            $this->assertFooSmoke($json, 9);
+        $this->assertFooSmoke($json, 9);
     }
 
     /**
      * Verify ability to modify text attributes of an image.
      */
-    public function testImageFragment(): void {
+    public function testImageFragment(): void
+    {
         $text = $this->getExampleWithImage();
         $dom = $this->formatter->parseDOM($text);
 
@@ -527,7 +551,8 @@ JSON;
     /**
      * Verify ability to modify text attributes of an image.
      */
-    public function testEmbedFragment(): void {
+    public function testEmbedFragment(): void
+    {
         $text = $this->getExampleWithEmbed();
         $dom = $this->formatter->parseDOM($text);
 
@@ -546,9 +571,13 @@ JSON;
         $doc = new TestHtmlDocument($this->formatter->renderHTML($dom->stringify()->text));
         $doc->assertCssSelectorExists("a[href=\"$expectedUrl\"]");
 
-        $actual = json_decode($doc->queryCssSelector("div.js-embed")
-            ->item(0)
-            ->getAttribute("data-embedjson"), true);
+        $actual = json_decode(
+            $doc
+                ->queryCssSelector("div.js-embed")
+                ->item(0)
+                ->getAttribute("data-embedjson"),
+            true
+        );
         $this->assertSame($expectedBody, $actual["body"]);
         $this->assertSame($expectedName, $actual["name"]);
         $this->assertSame($expectedUrl, $actual["url"]);
@@ -559,7 +588,8 @@ JSON;
      *
      * @return string
      */
-    private function getExampleWithImage(): string {
+    private function getExampleWithImage(): string
+    {
         return /** @lang JSON */ <<<'JSON'
 [
   {
@@ -599,7 +629,8 @@ JSON;
      *
      * @return string
      */
-    private function getExampleWithEmbed(): string {
+    private function getExampleWithEmbed(): string
+    {
         return /** @lang JSON */ <<<'RICH'
 [
   {

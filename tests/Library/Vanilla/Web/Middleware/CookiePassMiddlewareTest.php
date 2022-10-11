@@ -18,8 +18,8 @@ use VanillaTests\MinimalContainerTestCase;
  * Class CookiePassMiddlewareTest
  * @package VanillaTests\Library\Vanilla\Web\Middleware
  */
-class CookiePassMiddlewareTest extends MinimalContainerTestCase {
-
+class CookiePassMiddlewareTest extends MinimalContainerTestCase
+{
     /** @var CookiePassMiddleware */
     protected $middleware;
 
@@ -31,10 +31,11 @@ class CookiePassMiddlewareTest extends MinimalContainerTestCase {
     /**
      * {@inheritDoc}
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        $this->request = new Request('/', 'GET', []);
-        $this->request->setHeader('Cookie', 'name=value');
+        $this->request = new Request("/", "GET", []);
+        $this->request->setHeader("Cookie", "name=value");
         $this->middleware = new CookiePassMiddleware($this->request);
     }
 
@@ -44,7 +45,8 @@ class CookiePassMiddlewareTest extends MinimalContainerTestCase {
      * @param HttpRequest $request The request being called.
      * @return HttpResponse Returns the augmented request.
      */
-    protected function callMiddleware(HttpRequest $request): HttpResponse {
+    protected function callMiddleware(HttpRequest $request): HttpResponse
+    {
         /** @var HttpResponse $response */
         $response = call_user_func($this->middleware, $request, function ($request) {
             return new HttpResponse();
@@ -56,14 +58,15 @@ class CookiePassMiddlewareTest extends MinimalContainerTestCase {
     /**
      * Test cookie pass
      */
-    public function testCookiePass(): void {
-        $httpRequest = new HttpRequest('GET', 'http://'.$this->request->getHost());
+    public function testCookiePass(): void
+    {
+        $httpRequest = new HttpRequest("GET", "http://" . $this->request->getHost());
         $this->callMiddleware($httpRequest);
-        $this->assertSame($this->request->getHeader('Cookie'), $httpRequest->getHeader('Cookie'));
+        $this->assertSame($this->request->getHeader("Cookie"), $httpRequest->getHeader("Cookie"));
 
         // test external domain, cookies should not be passed
-        $httpRequest = new HttpRequest('GET', 'https://vanillaforums.com');
+        $httpRequest = new HttpRequest("GET", "https://vanillaforums.com");
         $this->callMiddleware($httpRequest);
-        $this->assertSame('', $httpRequest->getHeader('Cookie'));
+        $this->assertSame("", $httpRequest->getHeader("Cookie"));
     }
 }

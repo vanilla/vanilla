@@ -12,16 +12,16 @@ use Vanilla\Web\CurlWrapper;
 /**
  * Class TwitterPlugin
  */
-class TwitterPlugin extends SSOAddon {
-
+class TwitterPlugin extends SSOAddon
+{
     /** Authentication provider key. */
-    const PROVIDER_KEY = 'Twitter';
+    const PROVIDER_KEY = "Twitter";
 
     /** AuthenticationSchemeAlias */
-    private const AUTHENTICATION_SCHEME = 'twitter';
+    private const AUTHENTICATION_SCHEME = "twitter";
 
     /** @var string Twitter's URL. */
-    public static $BaseApiUrl = 'https://api.twitter.com/1.1/';
+    public static $BaseApiUrl = "https://api.twitter.com/1.1/";
 
     /** @var string */
     protected $_AccessToken = null;
@@ -34,7 +34,8 @@ class TwitterPlugin extends SSOAddon {
      *
      * @return string The AuthenticationSchemeAlias.
      */
-    protected function getAuthenticationSchemeAlias(): string {
+    protected function getAuthenticationSchemeAlias(): string
+    {
         return self::AUTHENTICATION_SCHEME;
     }
 
@@ -46,7 +47,8 @@ class TwitterPlugin extends SSOAddon {
      *
      * @return OAuthToken
      */
-    public function accessToken($token = null, $secret = null) {
+    public function accessToken($token = null, $secret = null)
+    {
         if (!$this->isConfigured()) {
             return false;
         }
@@ -60,7 +62,7 @@ class TwitterPlugin extends SSOAddon {
             if ($token) {
                 $this->_AccessToken = $this->getOAuthToken($token);
             } elseif (Gdn::session()->User) {
-                $accessToken = valr(self::PROVIDER_KEY.'.AccessToken', Gdn::session()->User->Attributes);
+                $accessToken = valr(self::PROVIDER_KEY . ".AccessToken", Gdn::session()->User->Attributes);
 
                 if (is_array($accessToken)) {
                     $this->_AccessToken = new OAuthToken($accessToken[0], $accessToken[1]);
@@ -77,23 +79,24 @@ class TwitterPlugin extends SSOAddon {
      *
      * @return string
      */
-    protected function _authorizeHref($popup = false) {
-        $url = url('/entry/twauthorize', true);
-        $urlParts = explode('?', $url);
+    protected function _authorizeHref($popup = false)
+    {
+        $url = url("/entry/twauthorize", true);
+        $urlParts = explode("?", $url);
 
-        parse_str(val(1, $urlParts, ''), $query);
+        parse_str(val(1, $urlParts, ""), $query);
         $path = Gdn::request()->path();
 
-        $target = val('Target', $_GET, $path ? $path : '/');
-        if (ltrim($target, '/') == 'entry/signin') {
-            $target = '/';
+        $target = val("Target", $_GET, $path ? $path : "/");
+        if (ltrim($target, "/") == "entry/signin") {
+            $target = "/";
         }
-        $query['Target'] = $target;
+        $query["Target"] = $target;
 
         if ($popup) {
-            $query['display'] = 'popup';
+            $query["display"] = "popup";
         }
-        $result = $urlParts[0].'?'.http_build_query($query);
+        $result = $urlParts[0] . "?" . http_build_query($query);
 
         return $result;
     }
@@ -103,8 +106,9 @@ class TwitterPlugin extends SSOAddon {
      *
      * @param Gdn_Controller $sender
      */
-    public function entryController_signIn_handler($sender, $args) {
-        if (isset($sender->Data['Methods'])) {
+    public function entryController_signIn_handler($sender, $args)
+    {
+        if (isset($sender->Data["Methods"])) {
             if (!$this->socialSignIn()) {
                 return;
             }
@@ -113,11 +117,11 @@ class TwitterPlugin extends SSOAddon {
 
             // Add the twitter method to the controller.
             $twMethod = [
-                'Name' => 'Twitter',
-                'SignInHtml' => socialSigninButton('Twitter', $url, 'button', ['class' => 'js-extern'])
+                "Name" => "Twitter",
+                "SignInHtml" => socialSigninButton("Twitter", $url, "button", ["class" => "js-extern"]),
             ];
 
-            $sender->Data['Methods'][] = $twMethod;
+            $sender->Data["Methods"][] = $twMethod;
         }
     }
 
@@ -127,12 +131,13 @@ class TwitterPlugin extends SSOAddon {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_signInIcons_handler($sender, $args) {
+    public function base_signInIcons_handler($sender, $args)
+    {
         if (!$this->socialSignIn()) {
             return;
         }
 
-        echo "\n".$this->_getButton();
+        echo "\n" . $this->_getButton();
     }
 
     /**
@@ -141,12 +146,13 @@ class TwitterPlugin extends SSOAddon {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_beforeSignInButton_handler($sender, $args) {
+    public function base_beforeSignInButton_handler($sender, $args)
+    {
         if (!$this->socialSignIn()) {
             return;
         }
 
-        echo "\n".$this->_getButton();
+        echo "\n" . $this->_getButton();
     }
 
     /**
@@ -154,13 +160,14 @@ class TwitterPlugin extends SSOAddon {
      *
      * @param Gdn_Controller $sender
      */
-    public function base_beforeSignInLink_handler($sender) {
+    public function base_beforeSignInLink_handler($sender)
+    {
         if (!$this->socialSignIn()) {
             return;
         }
 
         if (!Gdn::session()->isValid()) {
-            echo "\n".wrap($this->_getButton(), 'li', ['class' => 'Connect TwitterConnect']);
+            echo "\n" . wrap($this->_getButton(), "li", ["class" => "Connect TwitterConnect"]);
         }
     }
 
@@ -170,15 +177,20 @@ class TwitterPlugin extends SSOAddon {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_discussionFormOptions_handler($sender, $args) {
+    public function base_discussionFormOptions_handler($sender, $args)
+    {
         if (!$this->socialSharing() || !$this->accessToken()) {
             return;
         }
 
-        $options =& $args['Options'];
-        $options .= ' <li>'.
-            $sender->Form->checkBox('ShareTwitter', '@'.sprite('ReactTwitter', 'ReactSprite'), ['value' => '1', 'title' => sprintf(t('Share to %s.'), 'Twitter')]).
-            '</li> ';
+        $options = &$args["Options"];
+        $options .=
+            " <li>" .
+            $sender->Form->checkBox("ShareTwitter", "@" . sprite("ReactTwitter", "ReactSprite"), [
+                "value" => "1",
+                "title" => sprintf(t("Share to %s."), "Twitter"),
+            ]) .
+            "</li> ";
     }
 
     /**
@@ -187,14 +199,18 @@ class TwitterPlugin extends SSOAddon {
      * @param discussionController $sender
      * @param array $args
      */
-    public function discussionController_afterBodyField_handler($sender, $args) {
+    public function discussionController_afterBodyField_handler($sender, $args)
+    {
         if (!$this->socialSharing() || !$this->accessToken()) {
             return;
         }
 
-        echo ' '.
-            $sender->Form->checkBox('ShareTwitter', '@'.sprite('ReactTwitter', 'ReactSprite'), ['value' => '1', 'title' => sprintf(t('Share to %s.'), 'Twitter')]).
-            ' ';
+        echo " " .
+            $sender->Form->checkBox("ShareTwitter", "@" . sprite("ReactTwitter", "ReactSprite"), [
+                "value" => "1",
+                "title" => sprintf(t("Share to %s."), "Twitter"),
+            ]) .
+            " ";
     }
 
     /**
@@ -205,24 +221,25 @@ class TwitterPlugin extends SSOAddon {
      *
      * @throws Gdn_UserException
      */
-    public function discussionModel_afterSaveDiscussion_handler($sender, $args) {
+    public function discussionModel_afterSaveDiscussion_handler($sender, $args)
+    {
         if (!$this->socialSharing() || !$this->accessToken()) {
             return;
         }
 
-        $share = valr('FormPostValues.ShareTwitter', $args);
+        $share = valr("FormPostValues.ShareTwitter", $args);
 
         if ($share && $this->accessToken()) {
-            $row = $args['Fields'];
-            $url = discussionUrl($row, '', true);
-            $message = sliceTwitter(Gdn_Format::plainText($row['Body'], $row['Format'])).' '.$url;
+            $row = $args["Fields"];
+            $url = discussionUrl($row, "", true);
+            $message = sliceTwitter(Gdn_Format::plainText($row["Body"], $row["Format"])) . " " . $url;
 
             $r = $this->api(
-                '/statuses/update.json',
+                "/statuses/update.json",
                 [
-                'status' => $message
+                    "status" => $message,
                 ],
-                'POST'
+                "POST"
             );
         }
     }
@@ -235,31 +252,32 @@ class TwitterPlugin extends SSOAddon {
      *
      * @throws Gdn_UserException
      */
-    public function commentModel_afterSaveComment_handler($sender, $args) {
+    public function commentModel_afterSaveComment_handler($sender, $args)
+    {
         if (!$this->socialSharing() || !$this->accessToken()) {
             return;
         }
 
-        $share = valr('FormPostValues.ShareTwitter', $args);
+        $share = valr("FormPostValues.ShareTwitter", $args);
 
         if ($share && $this->accessToken()) {
-            $row = $args['FormPostValues'];
+            $row = $args["FormPostValues"];
 
             $discussionModel = new DiscussionModel();
-            $discussion = $discussionModel->getID(val('DiscussionID', $row));
+            $discussion = $discussionModel->getID(val("DiscussionID", $row));
             if (!$discussion) {
                 return;
             }
 
-            $url = discussionUrl($discussion, '', true);
-            $message = sliceTwitter(Gdn_Format::plainText($row['Body'], $row['Format'])).' '.$url;
+            $url = discussionUrl($discussion, "", true);
+            $message = sliceTwitter(Gdn_Format::plainText($row["Body"], $row["Format"])) . " " . $url;
 
             $r = $this->aPI(
-                '/statuses/update.json',
+                "/statuses/update.json",
                 [
-                'status' => $message
+                    "status" => $message,
                 ],
-                'POST'
+                "POST"
             );
         }
     }
@@ -269,10 +287,11 @@ class TwitterPlugin extends SSOAddon {
      *
      * @return string
      */
-    private function _getButton() {
+    private function _getButton()
+    {
         $url = $this->_authorizeHref();
 
-        return socialSigninButton('Twitter', $url, 'icon', ['class' => 'js-extern', 'rel' => 'nofollow']);
+        return socialSigninButton("Twitter", $url, "icon", ["class" => "js-extern", "rel" => "nofollow"]);
     }
 
     /**
@@ -280,18 +299,19 @@ class TwitterPlugin extends SSOAddon {
      *
      * @param bool $query
      */
-    public function authorize($query = false) {
+    public function authorize($query = false)
+    {
         // Acquire the request token.
-        $consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
+        $consumer = new OAuthConsumer(c("Plugins.Twitter.ConsumerKey"), c("Plugins.Twitter.Secret"));
         $redirectUri = $this->redirectUri();
         if ($query) {
-            $redirectUri .= (strpos($redirectUri, '?') === false ? '?' : '&').$query;
+            $redirectUri .= (strpos($redirectUri, "?") === false ? "?" : "&") . $query;
         }
 
-        $params = ['oauth_callback' => $redirectUri];
+        $params = ["oauth_callback" => $redirectUri];
 
-        $url = 'https://api.twitter.com/oauth/request_token';
-        $request = OAuthRequest::from_consumer_and_token($consumer, null, 'POST', $url, $params);
+        $url = "https://api.twitter.com/oauth/request_token";
+        $request = OAuthRequest::from_consumer_and_token($consumer, null, "POST", $url, $params);
         $signatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
         $request->sign_request($signatureMethod, $consumer, null);
 
@@ -303,19 +323,19 @@ class TwitterPlugin extends SSOAddon {
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        if ($httpCode == '200') {
+        if ($httpCode == "200") {
             // Parse the reponse.
             $data = OAuthUtil::parse_parameters($response);
 
-            if (!isset($data['oauth_token']) || !isset($data['oauth_token_secret'])) {
-                $response = t('The response was not in the correct format.');
+            if (!isset($data["oauth_token"]) || !isset($data["oauth_token_secret"])) {
+                $response = t("The response was not in the correct format.");
             } else {
                 // Save the token for later reference.
-                $this->setOAuthToken($data['oauth_token'], $data['oauth_token_secret'], 'request');
+                $this->setOAuthToken($data["oauth_token"], $data["oauth_token_secret"], "request");
 
                 // Redirect to twitter's authorization page.
-                $params['oauth_token'] = $data['oauth_token'];
-                $url = 'https://api.twitter.com/oauth/authenticate?'.http_build_query($params);
+                $params["oauth_token"] = $data["oauth_token"];
+                $url = "https://api.twitter.com/oauth/authenticate?" . http_build_query($params);
                 redirectTo($url, 302, false);
             }
         }
@@ -332,10 +352,11 @@ class TwitterPlugin extends SSOAddon {
      * @param $sender
      * @param string $dir
      */
-    public function entryController_twauthorize_create($sender, $dir = '') {
-        $query = arrayTranslate($sender->Request->get(), ['display', 'Target']);
+    public function entryController_twauthorize_create($sender, $dir = "")
+    {
+        $query = arrayTranslate($sender->Request->get(), ["display", "Target"]);
 
-        if ($dir == 'profile') {
+        if ($dir == "profile") {
             // This is a profile connection.
             $this->redirectUri(self::profileConnectUrl());
         }
@@ -353,40 +374,47 @@ class TwitterPlugin extends SSOAddon {
      * @param string $oauth_token
      * @param string $oauth_verifier
      */
-    public function profileController_twitterConnect_create($sender, $userReference = '', $username = '', $oauth_token = '', $oauth_verifier = '') {
-        $sender->permission('Garden.SignIn.Allow');
+    public function profileController_twitterConnect_create(
+        $sender,
+        $userReference = "",
+        $username = "",
+        $oauth_token = "",
+        $oauth_verifier = ""
+    ) {
+        $sender->permission("Garden.SignIn.Allow");
 
-        $sender->getUserInfo($userReference, $username, '', true);
+        $sender->getUserInfo($userReference, $username, "", true);
 
-        $sender->_setBreadcrumbs(t('Connections'), '/profile/connections');
+        $sender->_setBreadcrumbs(t("Connections"), "/profile/connections");
 
         // Get the access token.
-        trace('GetAccessToken()');
+        trace("GetAccessToken()");
         $accessToken = $this->getAccessToken($oauth_token, $oauth_verifier, true);
         $this->accessToken($accessToken);
 
         // Get the profile.
-        trace('GetProfile()');
+        trace("GetProfile()");
         $profile = $this->getProfile();
 
         // Save the authentication.
         Gdn::userModel()->saveAuthentication([
-            'UserID' => $sender->User->UserID,
-            'Provider' => self::PROVIDER_KEY,
-            'UniqueID' => $profile['id']]);
+            "UserID" => $sender->User->UserID,
+            "Provider" => self::PROVIDER_KEY,
+            "UniqueID" => $profile["id"],
+        ]);
 
         // Save the information as attributes.
         $attributes = [
-            'AccessToken' => [$accessToken->key, $accessToken->secret],
-            'Profile' => $profile
+            "AccessToken" => [$accessToken->key, $accessToken->secret],
+            "Profile" => $profile,
         ];
         Gdn::userModel()->saveAttribute($sender->User->UserID, self::PROVIDER_KEY, $attributes);
 
-        $this->EventArguments['Provider'] = self::PROVIDER_KEY;
-        $this->EventArguments['User'] = $sender->User;
-        $this->fireEvent('AfterConnection');
+        $this->EventArguments["Provider"] = self::PROVIDER_KEY;
+        $this->EventArguments["User"] = $sender->User;
+        $this->fireEvent("AfterConnection");
 
-        redirectTo(userUrl($sender->User, '', 'connections'));
+        redirectTo(userUrl($sender->User, "", "connections"));
     }
 
     /**
@@ -399,24 +427,25 @@ class TwitterPlugin extends SSOAddon {
      * @return string OAuthToken
      * @throws Gdn_UserException
      */
-    public function getAccessToken($requestToken, $verifier, bool $mustSession = false) {
-        if ((!$requestToken || !$verifier) && Gdn::request()->get('denied')) {
-            throw new Gdn_UserException(t('Looks like you denied our request.'), 401);
+    public function getAccessToken($requestToken, $verifier, bool $mustSession = false)
+    {
+        if ((!$requestToken || !$verifier) && Gdn::request()->get("denied")) {
+            throw new Gdn_UserException(t("Looks like you denied our request."), 401);
         }
 
         // Get the request secret.
         $requestToken = $this->getOAuthToken($requestToken, $mustSession);
         if (!$requestToken) {
-            throw new Gdn_UserException('Token was not found or is invalid for the current action.');
+            throw new Gdn_UserException("Token was not found or is invalid for the current action.");
         }
 
-        $consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
+        $consumer = new OAuthConsumer(c("Plugins.Twitter.ConsumerKey"), c("Plugins.Twitter.Secret"));
 
-        $url = 'https://api.twitter.com/oauth/access_token';
+        $url = "https://api.twitter.com/oauth/access_token";
         $params = [
-            'oauth_verifier' => $verifier //GetValue('oauth_verifier', $_GET)
+            "oauth_verifier" => $verifier, //GetValue('oauth_verifier', $_GET)
         ];
-        $request = OAuthRequest::from_consumer_and_token($consumer, $requestToken, 'POST', $url, $params);
+        $request = OAuthRequest::from_consumer_and_token($consumer, $requestToken, "POST", $url, $params);
 
         $signatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
         $request->sign_request($signatureMethod, $consumer, $requestToken);
@@ -430,17 +459,16 @@ class TwitterPlugin extends SSOAddon {
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        if ($httpCode == '200') {
+        if ($httpCode == "200") {
             $data = OAuthUtil::parse_parameters($response);
 
-            $accessToken = new OAuthToken(val('oauth_token', $data), val('oauth_token_secret', $data));
+            $accessToken = new OAuthToken(val("oauth_token", $data), val("oauth_token_secret", $data));
 
             // Delete the request token.
             $this->deleteOAuthToken($requestToken);
-
         } else {
             // There was some sort of error.
-            throw new Gdn_UserException('There was an error authenticating with twitter. '.$response, $httpCode);
+            throw new Gdn_UserException("There was an error authenticating with twitter. " . $response, $httpCode);
         }
 
         return $accessToken;
@@ -452,16 +480,17 @@ class TwitterPlugin extends SSOAddon {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_connectData_handler($sender, $args) {
-        if (val(0, $args) != 'twitter') {
+    public function base_connectData_handler($sender, $args)
+    {
+        if (val(0, $args) != "twitter") {
             return;
         }
 
         /** @var Gdn_Form $form */
         $form = $sender->Form;
 
-        $requestToken = val('oauth_token', $_GET);
-        $accessToken = $form->getFormValue('AccessToken');
+        $requestToken = val("oauth_token", $_GET);
+        $accessToken = $form->getFormValue("AccessToken");
 
         if ($accessToken) {
             $accessToken = $this->getOAuthToken($accessToken);
@@ -473,13 +502,13 @@ class TwitterPlugin extends SSOAddon {
             // Get the request secret.
             $requestToken = $this->getOAuthToken($requestToken);
 
-            $consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
+            $consumer = new OAuthConsumer(c("Plugins.Twitter.ConsumerKey"), c("Plugins.Twitter.Secret"));
 
-            $url = 'https://api.twitter.com/oauth/access_token';
+            $url = "https://api.twitter.com/oauth/access_token";
             $params = [
-                'oauth_verifier' => val('oauth_verifier', $_GET)
+                "oauth_verifier" => val("oauth_verifier", $_GET),
             ];
-            $request = OAuthRequest::from_consumer_and_token($consumer, $requestToken, 'POST', $url, $params);
+            $request = OAuthRequest::from_consumer_and_token($consumer, $requestToken, "POST", $url, $params);
 
             $signatureMethod = new OAuthSignatureMethod_HMAC_SHA1();
             $request->sign_request($signatureMethod, $consumer, $requestToken);
@@ -493,21 +522,20 @@ class TwitterPlugin extends SSOAddon {
             $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             curl_close($curl);
 
-            if ($httpCode == '200') {
+            if ($httpCode == "200") {
                 $data = OAuthUtil::parse_parameters($response);
 
-                $accessToken = new OAuthToken(val('oauth_token', $data), val('oauth_token_secret', $data));
+                $accessToken = new OAuthToken(val("oauth_token", $data), val("oauth_token_secret", $data));
 
                 // Save the access token to the database.
-                $this->setOAuthToken($accessToken->key, $accessToken->secret, 'access');
+                $this->setOAuthToken($accessToken->key, $accessToken->secret, "access");
                 $this->accessToken($accessToken->key, $accessToken->secret);
 
                 // Delete the request token.
                 $this->deleteOAuthToken($requestToken);
-
             } else {
                 // There was some sort of error.
-                throw new Exception('There was an error authenticating with twitter.', 400);
+                throw new Exception("There was an error authenticating with twitter.", 400);
             }
 
             $newToken = true;
@@ -522,7 +550,7 @@ class TwitterPlugin extends SSOAddon {
                 if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
                     redirectTo($this->_AuthorizeHref(), 302, false);
                 } else {
-                    $sender->setHeader('Content-type', 'application/json');
+                    $sender->setHeader("Content-type", "application/json");
                     $sender->deliveryMethod(DELIVERY_METHOD_JSON);
                     $sender->setRedirectTo($this->_authorizeHref(), false);
                 }
@@ -532,26 +560,28 @@ class TwitterPlugin extends SSOAddon {
         }
 
         // This isn't a trusted connection. Don't allow it to automatically connect a user account.
-        saveToConfig('Garden.Registration.AutoConnect', false, false);
+        saveToConfig("Garden.Registration.AutoConnect", false, false);
 
-        $iD = val('id', $profile);
-        $form->setFormValue('UniqueID', $iD);
-        $form->setFormValue('Provider', self::PROVIDER_KEY);
-        $form->setFormValue('ProviderName', 'Twitter');
-        $form->setValue('ConnectName', val('screen_name', $profile));
-        $form->setFormValue('Name', val('screen_name', $profile));
-        $form->setFormValue('FullName', val('name', $profile));
-        $form->setFormValue('Photo', val('profile_image_url_https', $profile));
-        $form->addHidden('AccessToken', $accessToken->key);
+        $iD = val("id", $profile);
+        $form->setFormValue("UniqueID", $iD);
+        $form->setFormValue("Provider", self::PROVIDER_KEY);
+        $form->setFormValue("ProviderName", "Twitter");
+        $form->setValue("ConnectName", val("screen_name", $profile));
+        $form->setFormValue("Name", val("screen_name", $profile));
+        $form->setFormValue("FullName", val("name", $profile));
+        $form->setFormValue("Photo", val("profile_image_url_https", $profile));
+        $form->addHidden("AccessToken", $accessToken->key);
 
         // Save some original data in the attributes of the connection for later API calls.
-        $attributes = [self::PROVIDER_KEY => [
-            'AccessToken' => [$accessToken->key, $accessToken->secret],
-            'Profile' => $profile
-        ]];
-        $form->setFormValue('Attributes', $attributes);
+        $attributes = [
+            self::PROVIDER_KEY => [
+                "AccessToken" => [$accessToken->key, $accessToken->secret],
+                "Profile" => $profile,
+            ],
+        ];
+        $form->setFormValue("Attributes", $attributes);
 
-        $sender->setData('Verified', true);
+        $sender->setData("Verified", true);
     }
 
     /**
@@ -560,18 +590,19 @@ class TwitterPlugin extends SSOAddon {
      * @param $sender
      * @param $args
      */
-    public function base_getConnections_handler($sender, $args) {
-        $profile = valr('User.Attributes.'.self::PROVIDER_KEY.'.Profile', $args);
+    public function base_getConnections_handler($sender, $args)
+    {
+        $profile = valr("User.Attributes." . self::PROVIDER_KEY . ".Profile", $args);
 
         $sender->Data["Connections"][self::PROVIDER_KEY] = [
-            'Icon' => $this->getWebResource('icon.png', '/'),
-            'Name' => 'Twitter',
-            'ProviderKey' => self::PROVIDER_KEY,
-            'ConnectUrl' => '/entry/twauthorize/profile',
-            'Profile' => [
-                'Name' => '@'.getValue('screen_name', $profile),
-                'Photo' => val('profile_image_url_https', $profile)
-            ]
+            "Icon" => $this->getWebResource("icon.png", "/"),
+            "Name" => "Twitter",
+            "ProviderKey" => self::PROVIDER_KEY,
+            "ConnectUrl" => "/entry/twauthorize/profile",
+            "Profile" => [
+                "Name" => "@" . getValue("screen_name", $profile),
+                "Photo" => val("profile_image_url_https", $profile),
+            ],
         ];
     }
 
@@ -585,13 +616,14 @@ class TwitterPlugin extends SSOAddon {
      * @return mixed Response from the API.
      * @throws Gdn_UserException
      */
-    public function api($url, $params = null, $method = 'GET') {
-        if (strpos($url, '//') === false) {
-            $url = self::$BaseApiUrl.trim($url, '/');
+    public function api($url, $params = null, $method = "GET")
+    {
+        if (strpos($url, "//") === false) {
+            $url = self::$BaseApiUrl . trim($url, "/");
         }
-        $consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
+        $consumer = new OAuthConsumer(c("Plugins.Twitter.ConsumerKey"), c("Plugins.Twitter.Secret"));
 
-        if ($method == 'POST') {
+        if ($method == "POST") {
             $post = $params;
         } else {
             $post = null;
@@ -612,22 +644,22 @@ class TwitterPlugin extends SSOAddon {
         }
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         trace(curl_getinfo($curl, CURLINFO_HEADER_OUT));
-        trace($response, 'Response');
+        trace($response, "Response");
 
         curl_close($curl);
 
-        Gdn::controller()->setJson('Response', $response);
+        Gdn::controller()->setJson("Response", $response);
 
-        if (strpos($url, '.json') !== false) {
-            $result = @json_decode($response, true) or $response;
+        if (strpos($url, ".json") !== false) {
+            ($result = @json_decode($response, true)) or $response;
         } else {
             $result = $response;
         }
 
-        if ($httpCode == '200') {
+        if ($httpCode == "200") {
             return $result;
         } else {
-            throw new Gdn_UserException(valr('errors.0.message', $result, $response), $httpCode);
+            throw new Gdn_UserException(valr("errors.0.message", $result, $response), $httpCode);
         }
     }
 
@@ -637,8 +669,9 @@ class TwitterPlugin extends SSOAddon {
      * @return mixed Profile data.
      * @throws Gdn_UserException
      */
-    public function getProfile() {
-        $profile = $this->api('/account/verify_credentials.json', ['include_entities' => '0', 'skip_status' => '1']);
+    public function getProfile()
+    {
+        $profile = $this->api("/account/verify_credentials.json", ["include_entities" => "0", "skip_status" => "1"]);
         return $profile;
     }
 
@@ -649,23 +682,27 @@ class TwitterPlugin extends SSOAddon {
      * @param bool $mustSession Whether or not the token must have a session that matches.
      * @return null|OAuthToken
      */
-    public function getOAuthToken($token, bool $mustSession = false) {
+    public function getOAuthToken($token, bool $mustSession = false)
+    {
         $uatModel = new UserAuthenticationTokenModel();
         $result = null;
-        $row = $uatModel->getWhere([
-            'Token' => $token,
-            'ProviderKey' => self::PROVIDER_KEY
-        ])->firstRow(DATASET_TYPE_ARRAY);
+        $row = $uatModel
+            ->getWhere([
+                "Token" => $token,
+                "ProviderKey" => self::PROVIDER_KEY,
+            ])
+            ->firstRow(DATASET_TYPE_ARRAY);
 
         if ($row) {
-            if (!empty($row['ForeignUserKey']) || $mustSession) {
-                $canUseToken = Gdn::session()->isValid() && (int)$row['ForeignUserKey'] === (int)Gdn::session()->UserID;
+            if (!empty($row["ForeignUserKey"]) || $mustSession) {
+                $canUseToken =
+                    Gdn::session()->isValid() && (int) $row["ForeignUserKey"] === (int) Gdn::session()->UserID;
             } else {
                 $canUseToken = true;
             }
 
             if ($canUseToken) {
-                $result = new OAuthToken($row['Token'], $row['TokenSecret']);
+                $result = new OAuthToken($row["Token"], $row["TokenSecret"]);
             }
         }
         return $result;
@@ -676,8 +713,9 @@ class TwitterPlugin extends SSOAddon {
      *
      * @return bool
      */
-    public function isConfigured() {
-        $result = c('Plugins.Twitter.ConsumerKey') && c('Plugins.Twitter.Secret');
+    public function isConfigured()
+    {
+        $result = c("Plugins.Twitter.ConsumerKey") && c("Plugins.Twitter.Secret");
         return $result;
     }
 
@@ -686,8 +724,9 @@ class TwitterPlugin extends SSOAddon {
      *
      * @return bool
      */
-    public function socialSharing() {
-        return c('Plugins.Twitter.SocialSharing', true) && $this->isConfigured();
+    public function socialSharing()
+    {
+        return c("Plugins.Twitter.SocialSharing", true) && $this->isConfigured();
     }
 
     /**
@@ -695,8 +734,9 @@ class TwitterPlugin extends SSOAddon {
      *
      * @return bool
      */
-    public function socialReactions():bool {
-        return (bool)c("Plugins.Twitter.SocialReactions", true);
+    public function socialReactions(): bool
+    {
+        return (bool) c("Plugins.Twitter.SocialReactions", true);
     }
 
     /**
@@ -704,8 +744,9 @@ class TwitterPlugin extends SSOAddon {
      *
      * @return bool
      */
-    public function socialSignIn() {
-        return c('Plugins.Twitter.SocialSignIn', true) && $this->isConfigured();
+    public function socialSignIn()
+    {
+        return c("Plugins.Twitter.SocialSignIn", true) && $this->isConfigured();
     }
 
     /**
@@ -716,27 +757,28 @@ class TwitterPlugin extends SSOAddon {
      * @param string $type
      * @return bool
      */
-    public function setOAuthToken($token, $secret = null, $type = 'request') {
+    public function setOAuthToken($token, $secret = null, $type = "request")
+    {
         $uatModel = new UserAuthenticationTokenModel();
         $result = false;
 
-        if (is_a($token, 'OAuthToken')) {
+        if (is_a($token, "OAuthToken")) {
             $secret = $token->secret;
             $token = $token->key;
         }
 
         $set = [
-            'TokenSecret' => $secret,
-            'TokenType' => $type,
-            'ForeignUserKey' => Gdn::session()->isValid() ? Gdn::session()->UserID : 0,
-            'Authorized' => 0,
-            'Lifetime' => 60 * 5
+            "TokenSecret" => $secret,
+            "TokenType" => $type,
+            "ForeignUserKey" => Gdn::session()->isValid() ? Gdn::session()->UserID : 0,
+            "Authorized" => 0,
+            "Lifetime" => 60 * 5,
         ];
         $where = [
-            'Token' => $token,
-            'ProviderKey' => self::PROVIDER_KEY
+            "Token" => $token,
+            "ProviderKey" => self::PROVIDER_KEY,
         ];
-        $row = $uatModel->getWhere($where, '', '', 1)->firstRow();
+        $row = $uatModel->getWhere($where, "", "", 1)->firstRow();
 
         if ($row === false) {
             $result = $uatModel->insert(array_merge($set, $where));
@@ -750,16 +792,17 @@ class TwitterPlugin extends SSOAddon {
      *
      * @param string $token
      */
-    public function deleteOAuthToken($token) {
+    public function deleteOAuthToken($token)
+    {
         $uatModel = new UserAuthenticationTokenModel();
 
-        if (is_a($token, 'OAuthToken')) {
+        if (is_a($token, "OAuthToken")) {
             $token = $token->key;
         }
 
         $uatModel->delete([
-            'Token' => $token,
-            'ProviderKey' => self::PROVIDER_KEY
+            "Token" => $token,
+            "ProviderKey" => self::PROVIDER_KEY,
         ]);
     }
 
@@ -769,12 +812,13 @@ class TwitterPlugin extends SSOAddon {
      * @param OAuthRequest $request
      * @param $post Deprecated
      */
-    protected function _curl($request, $post = null) {
+    protected function _curl($request, $post = null)
+    {
         $c = curl_init();
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
         switch ($request->get_normalized_http_method()) {
-            case 'POST':
+            case "POST":
                 curl_setopt($c, CURLOPT_URL, $request->get_normalized_http_url());
                 curl_setopt($c, CURLOPT_POST, true);
                 curl_setopt($c, CURLOPT_POSTFIELDS, $request->to_postdata());
@@ -790,8 +834,9 @@ class TwitterPlugin extends SSOAddon {
      *
      * @return string
      */
-    public static function profileConnectUrl() {
-        return url('/profile/twitterconnect', true);
+    public static function profileConnectUrl()
+    {
+        return url("/profile/twitterconnect", true);
     }
 
     /**
@@ -800,11 +845,12 @@ class TwitterPlugin extends SSOAddon {
      * @param null $newValue
      * @return null|string
      */
-    public function redirectUri($newValue = null) {
+    public function redirectUri($newValue = null)
+    {
         if ($newValue !== null) {
             $this->_RedirectUri = $newValue;
         } elseif ($this->_RedirectUri === null) {
-            $redirectUri = url('/entry/connect/twitter', true);
+            $redirectUri = url("/entry/connect/twitter", true);
             $this->_RedirectUri = $redirectUri;
         }
 
@@ -817,12 +863,13 @@ class TwitterPlugin extends SSOAddon {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_afterReactions_handler($sender, $args) {
+    public function base_afterReactions_handler($sender, $args)
+    {
         if (!$this->socialReactions()) {
             return;
         }
 
-        echo Gdn_Theme::bulletItem('Share');
+        echo Gdn_Theme::bulletItem("Share");
         $this->addReactButton($sender, $args);
     }
 
@@ -832,24 +879,28 @@ class TwitterPlugin extends SSOAddon {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    protected function addReactButton($sender, $args) {
-        $recordType = $args['Type'] ?? null;
+    protected function addReactButton($sender, $args)
+    {
+        $recordType = $args["Type"] ?? null;
         if (!$recordType) {
             return;
         }
         $params = [];
         switch (strtolower($recordType)) {
-            case 'discussion':
-                $params['url'] = discussionUrl($args['Discussion']);
+            case "discussion":
+                $params["url"] = discussionUrl($args["Discussion"]);
                 break;
-            case 'comment':
-                $id = $args['Comment']->CommentID;
-                $params['url']  = url("/discussion/comment/{$id}#Comment_{$id}", true);
+            case "comment":
+                $id = $args["Comment"]->CommentID;
+                $params["url"] = url("/discussion/comment/{$id}#Comment_{$id}", true);
                 break;
         }
-        $url = url("https://twitter.com/share?".http_build_query($params), true);
-        $cssClass = 'ReactButton PopupWindow';
-        echo anchor(sprite('ReactTwitter', 'Sprite ReactSprite', t('Share on Twitter')), $url, $cssClass, ['rel' => 'nofollow', 'role' => 'button']);
+        $url = url("https://twitter.com/share?" . http_build_query($params), true);
+        $cssClass = "ReactButton PopupWindow";
+        echo anchor(sprite("ReactTwitter", "Sprite ReactSprite", t("Share on Twitter")), $url, $cssClass, [
+            "rel" => "nofollow",
+            "role" => "button",
+        ]);
     }
 
     /**
@@ -858,31 +909,31 @@ class TwitterPlugin extends SSOAddon {
      * @param socialController $sender
      * @param array $args
      */
-    public function socialController_twitter_create($sender, $args) {
-        $sender->permission('Garden.Settings.Manage');
+    public function socialController_twitter_create($sender, $args)
+    {
+        $sender->permission("Garden.Settings.Manage");
         if ($sender->Form->authenticatedPostBack()) {
             $settings = [
-                'Plugins.Twitter.ConsumerKey' => trim($sender->Form->getFormValue('ConsumerKey')),
-                'Plugins.Twitter.Secret' => trim($sender->Form->getFormValue('Secret')),
-                'Plugins.Twitter.SocialSignIn' => $sender->Form->getFormValue('SocialSignIn'),
-                'Plugins.Twitter.SocialReactions' => $sender->Form->getFormValue('SocialReactions'),
-                'Plugins.Twitter.SocialSharing' => $sender->Form->getFormValue('SocialSharing')
+                "Plugins.Twitter.ConsumerKey" => trim($sender->Form->getFormValue("ConsumerKey")),
+                "Plugins.Twitter.Secret" => trim($sender->Form->getFormValue("Secret")),
+                "Plugins.Twitter.SocialSignIn" => $sender->Form->getFormValue("SocialSignIn"),
+                "Plugins.Twitter.SocialReactions" => $sender->Form->getFormValue("SocialReactions"),
+                "Plugins.Twitter.SocialSharing" => $sender->Form->getFormValue("SocialSharing"),
             ];
 
             saveToConfig($settings);
             $sender->informMessage(t("Your settings have been saved."));
-
         } else {
-            $sender->Form->setValue('ConsumerKey', c('Plugins.Twitter.ConsumerKey'));
-            $sender->Form->setValue('Secret', c('Plugins.Twitter.Secret'));
-            $sender->Form->setValue('SocialSignIn', $this->socialSignIn());
-            $sender->Form->setValue('SocialReactions', $this->socialReactions());
-            $sender->Form->setValue('SocialSharing', $this->socialSharing());
+            $sender->Form->setValue("ConsumerKey", c("Plugins.Twitter.ConsumerKey"));
+            $sender->Form->setValue("Secret", c("Plugins.Twitter.Secret"));
+            $sender->Form->setValue("SocialSignIn", $this->socialSignIn());
+            $sender->Form->setValue("SocialReactions", $this->socialReactions());
+            $sender->Form->setValue("SocialSharing", $this->socialSharing());
         }
 
-        $sender->setHighlightRoute('dashboard/social');
-        $sender->setData('Title', t('Twitter Settings'));
-        $sender->render('Settings', '', 'plugins/Twitter');
+        $sender->setHighlightRoute("dashboard/social");
+        $sender->setData("Title", t("Twitter Settings"));
+        $sender->render("Settings", "", "plugins/Twitter");
     }
 
     /**
@@ -890,22 +941,29 @@ class TwitterPlugin extends SSOAddon {
      *
      * @throws Gdn_UserException
      */
-    public function setup() {
+    public function setup()
+    {
         // Make sure the user has curl.
-        if (!function_exists('curl_exec')) {
-            throw new Gdn_UserException('This plugin requires cURL for PHP.');
+        if (!function_exists("curl_exec")) {
+            throw new Gdn_UserException("This plugin requires cURL for PHP.");
         }
     }
 
     /**
      * Perform any necessary database or configuration updates.
      */
-    public function structure() {
+    public function structure()
+    {
         // Save the twitter provider type.
         Gdn::sql()->replace(
-            'UserAuthenticationProvider',
-            ['AuthenticationSchemeAlias' => self::AUTHENTICATION_SCHEME, 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'],
-            ['AuthenticationKey' => self::PROVIDER_KEY],
+            "UserAuthenticationProvider",
+            [
+                "AuthenticationSchemeAlias" => self::AUTHENTICATION_SCHEME,
+                "URL" => "...",
+                "AssociationSecret" => "...",
+                "AssociationHashMethod" => "...",
+            ],
+            ["AuthenticationKey" => self::PROVIDER_KEY],
             true
         );
     }
@@ -917,10 +975,10 @@ class TwitterPlugin extends SSOAddon {
  * @param string $str Input message to be truncated.
  * @return string Resulting message.
  */
-function sliceTwitter($str) {
-
-    $elips = '...';
-    $str = preg_replace('`\s+`', ' ', $str);
+function sliceTwitter($str)
+{
+    $elips = "...";
+    $str = preg_replace("`\s+`", " ", $str);
 
     $max = 140;
     $linkLen = 22;
@@ -928,7 +986,7 @@ function sliceTwitter($str) {
 
     $str = sliceParagraph($str, $max);
     if (strlen($str) > $max) {
-        $str = substr($str, 0, $max - strlen($elips)).$elips;
+        $str = substr($str, 0, $max - strlen($elips)) . $elips;
     }
 
     return $str;

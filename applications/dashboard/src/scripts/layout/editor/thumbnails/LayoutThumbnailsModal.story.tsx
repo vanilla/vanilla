@@ -18,28 +18,24 @@ const fauxData = {
     "react.section.1-column": {
         schema: {},
         $reactComponent: "Component 1",
-        recommendedWidgets: [{ widgetID: "test.widget1", widgetName: "TestWidget1" }],
         iconUrl: require("!file-loader!/applications/dashboard/design/images/sectionIcons/1column.svg").default,
         name: "1 column",
     },
     "react.section.2-columns": {
         schema: {},
         $reactComponent: "Component 2",
-        recommendedWidgets: [{ widgetID: "test.widget2", widgetName: "TestWidget2" }],
         iconUrl: require("!file-loader!/applications/dashboard/design/images/sectionIcons/2columnu.svg").default,
         name: "2 columns",
     },
     "react.section.3-columns": {
         schema: {},
         $reactComponent: "Component 3",
-        recommendedWidgets: [{ widgetID: "test.widget3", widgetName: "TestWidget3" }],
         iconUrl: require("!file-loader!/applications/dashboard/design/images/sectionIcons/3column.svg").default,
         name: "3 columns",
     },
     "react.section.full-width": {
         schema: {},
         $reactComponent: "Component for full width",
-        recommendedWidgets: [{ widgetID: "full.width.widget", widgetName: "TestFullWidthWidget" }],
         iconUrl: require("!file-loader!/applications/dashboard/design/images/sectionIcons/fullwidth.svg").default,
         name: "Full Width",
     },
@@ -143,9 +139,15 @@ const widgetsFauxData = {
         schema: {},
         name: "User Spotlight",
     },
+    "react.sitetotals": {
+        $reactComponent: "",
+        iconUrl: require("!file-loader!/applications/dashboard/design/images/widgetIcons/sitetotals.svg").default,
+        schema: {},
+        name: "Site Totals",
+    },
 };
 
-export function LayoutSectionsThumbnailsModal() {
+function LayoutSectionsThumbnailsModalStory() {
     const [modalIsVisible, setModalIsVisible] = useState(true);
     const openModal = () => {
         setModalIsVisible(true);
@@ -182,7 +184,7 @@ export function LayoutSectionsThumbnailsModal() {
     );
 }
 
-export function LayoutWidgetsThumbnailsModalWithSearch() {
+function LayoutWidgetsThumbnailsModalWithSearchStory() {
     const [modalIsVisible, setModalIsVisible] = useState(true);
     const openModal = () => {
         setModalIsVisible(true);
@@ -218,4 +220,12 @@ export function LayoutWidgetsThumbnailsModalWithSearch() {
             />
         </>
     );
+}
+
+export function LayoutSectionsThumbnailsModal() {
+    return <LayoutSectionsThumbnailsModalStory />;
+}
+
+export function LayoutWidgetsThumbnailsModalWithSearch() {
+    return <LayoutWidgetsThumbnailsModalWithSearchStory />;
 }

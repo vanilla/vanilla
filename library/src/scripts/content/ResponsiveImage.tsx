@@ -21,7 +21,7 @@ export function ResponsiveImage(_props: IProps) {
     const classes = responsiveImageClasses();
 
     return (
-        <div className={cx(classes.ratioContainer(ratio ?? { vertical: 9, horizontal: 16 }))}>
+        <div className={cx(classes.ratioContainer(ratio ?? { vertical: 9, horizontal: 16 }), className)}>
             <img {...imgProps} className={classes.image} loading="lazy" />
         </div>
     );

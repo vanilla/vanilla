@@ -1,16 +1,16 @@
 // Moderation
 
 .content-cell {
-  word-break: break-word;
+    word-break: break-word;
 }
 
 // Cateogories add/edit
 // Registration
 .category-url-code,
 .invite-url-code {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .category-url-code {
@@ -36,7 +36,6 @@
             width: 140px;
         }
 
-
         .Save.btn {
             padding-top: 1.5px;
             padding-bottom: 1.5px;
@@ -45,7 +44,7 @@
         #Form_UrlCode {
             display: inline !important;
             min-width: 140px;
-            padding: .5px 4px;
+            padding: 0.5px 4px;
             vertical-align: middle;
             margin-right: 2px;
         }
@@ -59,63 +58,62 @@
     padding-right: 2px;
 }
 
-
 // Emoji
 
 .radiolist-label[for="Form_Garden-dot-EmojiSet"] {
-  display: none;
+    display: none;
 }
 
 .CheckboxCell {
-  padding-left: $spacer;
-  padding-right: $spacer;
+    padding-left: $spacer;
+    padding-right: $spacer;
 
-  .icheckbox {
-    margin-right: 0;
-  }
+    .icheckbox {
+        margin-right: 0;
+    }
 }
 
 .dashboard-main .content .control-panel {
-  display: none;
+    display: none;
 }
 
 @include media-breakpoint-down(md) {
-  .dashboard-main .content .control-panel {
-    display: block;
-  }
+    .dashboard-main .content .control-panel {
+        display: block;
+    }
 }
 
 table,
 form {
-  h2 {
-    margin-top: 0;
-  }
+    h2 {
+        margin-top: 0;
+    }
 }
 
 .label-selector .theme-description {
-  display: none;
+    display: none;
 }
 
 body {
-  transition: all 250ms;
+    transition: all 250ms;
 }
 
 ul {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 .drop-enabled {
-  @extend .active;
+    @extend .active;
 }
 
 // TODO: I don't know where to put this yet.
 .dashboard-main {
-  background-color: $white;
-  border-left: $border-width solid $border-color;
-  border-right: $border-width solid $border-color;
+    background-color: $white;
+    border-left: $border-width solid $border-color;
+    border-right: $border-width solid $border-color;
 }
 
 // Makes room for the collapse button when it exists on the categories page.
 .nestable-collapse ~ .nestable-content > .plank-title {
-  padding-left: 39px;
+    padding-left: 39px;
 }

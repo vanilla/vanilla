@@ -25,9 +25,8 @@ interface IProps {
 export function ThemeBuilderUpload(props: IProps) {
     const { disabled, variableKey } = props;
 
-    const { rawValue, defaultValue, initialValue, error, setError, setValue } = useThemeVariableField<string>(
-        variableKey,
-    );
+    const { rawValue, defaultValue, initialValue, error, setError, setValue } =
+        useThemeVariableField<string>(variableKey);
 
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const { inputID, labelID } = useThemeBlock();

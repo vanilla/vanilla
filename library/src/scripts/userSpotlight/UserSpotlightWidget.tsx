@@ -12,8 +12,10 @@ import { UserSpotlight } from "@library/userSpotlight/UserSpotlight";
 import { IUserSpotlightOptions } from "@library/userSpotlight/UserSpotlight.variables";
 import { DeepPartial } from "redux";
 import { Widget } from "@library/layout/Widget";
+import { BorderType } from "@library/styles/styleHelpersBorders";
 interface IProps {
     title?: string;
+    subtitle?: string;
     description?: string;
     userTextAlignment?: "left" | "right";
     containerOptions?: IHomeWidgetContainerOptions;
@@ -24,14 +26,26 @@ interface IProps {
 }
 
 export function UserSpotlightWidget(props: IProps) {
-    const { title, description, containerOptions, userInfo, userTextAlignment = "left" } = props;
-    const options = { ...containerOptions, userTextAlignment } as DeepPartial<IUserSpotlightOptions>;
+    const { title, subtitle, description, containerOptions, userInfo, userTextAlignment = "left" } = props;
+    const options = {
+        ...containerOptions,
+        borderType: containerOptions?.borderType ?? BorderType.SHADOW,
+        userTextAlignment,
+    } as DeepPartial<IUserSpotlightOptions>;
 
     return (
         <Widget>
             <HomeWidgetContainer options={containerOptions}>
-                <UserSpotlight title={title} description={description} options={options} userInfo={userInfo} />
+                <UserSpotlight
+                    title={title}
+                    subtitle={subtitle}
+                    description={description}
+                    options={options}
+                    userInfo={userInfo}
+                />
             </HomeWidgetContainer>
         </Widget>
     );
 }
+
+export default UserSpotlightWidget;

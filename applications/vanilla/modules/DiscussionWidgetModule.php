@@ -16,20 +16,22 @@ use Vanilla\Utility\SchemaUtils;
  * @deprecated Use DiscussionDiscussionsWidget instead.
  * @package Vanilla\Forum\Modules
  */
-class DiscussionWidgetModule extends BaseDiscussionWidgetModule {
-
+class DiscussionWidgetModule extends BaseDiscussionWidgetModule
+{
     /**
      * @inheritDoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "List - Discussions";
     }
 
     /**
      * @inheritDoc
      */
-    public static function getApiSchema(): Schema {
-        $apiSchema =  parent::getApiSchema();
+    public static function getApiSchema(): Schema
+    {
+        $apiSchema = parent::getApiSchema();
 
         $apiSchema = $apiSchema->merge(
             SchemaUtils::composeSchemas(

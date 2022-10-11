@@ -23,8 +23,9 @@ use Vanilla\Dashboard\Controllers\API\OpenApiApiController;
  *
  * Note this isn't a real Vanilla model.
  */
-class SwaggerModel {
-    private static $httpMethods = ['get', 'post', 'patch', 'put', 'options', 'delete'];
+class SwaggerModel
+{
+    private static $httpMethods = ["get", "post", "patch", "put", "options", "delete"];
 
     /**
      * @var RequestInterface
@@ -56,9 +57,7 @@ class SwaggerModel {
      */
     private $container;
 
-    private $exclude = [
-        OpenApiApiController::class,
-    ];
+    private $exclude = [OpenApiApiController::class];
 
     /**
      * Construct a {@link SwaggerModel}.
@@ -79,7 +78,7 @@ class SwaggerModel {
         $this->request = $request;
         $this->addonManager = $addonManager;
         $this->dispatcher = $dispatcher;
-        $this->route = $this->dispatcher->getRoute('api-v2');
+        $this->route = $this->dispatcher->getRoute("api-v2");
         $this->eventManager = $eventManager;
         $this->container = $container;
     }
@@ -90,33 +89,30 @@ class SwaggerModel {
      * @return array Returns the root node.
      * @throws ServerException Throws an exception when the APIv2 router cannot be found.
      */
-    public function getSwaggerObject() {
+    public function getSwaggerObject()
+    {
         if ($this->route === null) {
-            throw new ServerException('Could not find the APIv2 router.', 500);
+            throw new ServerException("Could not find the APIv2 router.", 500);
         }
 
         $r = [
-            'swagger' => '2.0',
-            'info' => [
-                'title' => 'Vanilla API',
-                'description' => 'API access to your community.',
-                'version' => '2.0-alpha'
+            "swagger" => "2.0",
+            "info" => [
+                "title" => "Vanilla API",
+                "description" => "API access to your community.",
+                "version" => "2.0-alpha",
             ],
-            'host' => $this->request->getHost(),
-            'basePath' => $this->request->getRoot().'/api/v2',
-            'consumes' => [
-                'application/json',
-                'application/x-www-form-urlencoded',
-                'multipart/form-data'
-            ],
-            'paths' => []
+            "host" => $this->request->getHost(),
+            "basePath" => $this->request->getRoot() . "/api/v2",
+            "consumes" => ["application/json", "application/x-www-form-urlencoded", "multipart/form-data"],
+            "paths" => [],
         ];
 
         foreach ($this->getActions() as $action) {
             try {
-                $r['paths'][$action->getPath()][strtolower($action->getHttpMethod())] = $action->getOperation();
+                $r["paths"][$action->getPath()][strtolower($action->getHttpMethod())] = $action->getOperation();
             } catch (\Exception $ex) {
-                $r['paths'][$action->getPath()][strtolower($action->getHttpMethod())] = $ex->getTraceAsString();
+                $r["paths"][$action->getPath()][strtolower($action->getHttpMethod())] = $ex->getTraceAsString();
             }
         }
 
@@ -130,8 +126,9 @@ class SwaggerModel {
      *
      * @return \Generator|ReflectionAction[] Yields all of the API actions in a flat list.
      */
-    private function getActions() {
-        $controllers = $this->addonManager->findClasses('*\\*ApiController');
+    private function getActions()
+    {
+        $controllers = $this->addonManager->findClasses("*\\*ApiController");
         usort($controllers, function ($a, $b) {
             return strnatcasecmp(EventManager::classBasename($a), EventManager::classBasename($b));
         });
@@ -172,7 +169,6 @@ class SwaggerModel {
                 } else {
                     return strcmp($a->getHttpMethod(), $b->getHttpMethod());
                 }
-
             });
 
             foreach ($actions as $action) {
@@ -187,7 +183,8 @@ class SwaggerModel {
      * @param array $arr The schema array.
      * @return array Returns an array of models definitions.
      */
-    private function gatherDefinitions(array $arr) {
+    private function gatherDefinitions(array $arr)
+    {
         $definitions = [];
 
         $fn = function (array $arr, $itemKey = null) use (&$definitions, &$fn) {
@@ -199,9 +196,9 @@ class SwaggerModel {
                 }
             }
 
-            if ($itemKey !== 'properties' && isset($result['type'], $result['id'])) {
-                $id = $result['id'];
-                unset($result['id']);
+            if ($itemKey !== "properties" && isset($result["type"], $result["id"])) {
+                $id = $result["id"];
+                unset($result["id"]);
 
                 $definitions[$id] = $result;
                 return ['$ref' => "#/definitions/$id"];
@@ -213,7 +210,7 @@ class SwaggerModel {
 
         if (!empty($definitions)) {
             ksort($definitions);
-            $result['definitions'] = $definitions;
+            $result["definitions"] = $definitions;
         }
         return $result;
     }
@@ -225,19 +222,20 @@ class SwaggerModel {
      * @param object $controllerInstance The controller instance used to call the action and capture events.
      * @return \Generator|ReflectionAction[] Yields the actions for the controller.
      */
-    private function getControllerActions(ReflectionClass $controller, $controllerInstance) {
+    private function getControllerActions(ReflectionClass $controller, $controllerInstance)
+    {
         $controllerMethods = [
             // Controller instance methods
             [
-                'instance' => $controllerInstance,
-                'methods' => $controller->getMethods(ReflectionMethod::IS_PUBLIC),
+                "instance" => $controllerInstance,
+                "methods" => $controller->getMethods(ReflectionMethod::IS_PUBLIC),
             ],
         ];
 
         // Event bounds methods
         $handlers = $this->eventManager->getAllHandlers();
         foreach ($handlers as $handlerName => $callbacks) {
-            if (stripos($handlerName, $controller->getName().'_') === 0) {
+            if (stripos($handlerName, $controller->getName() . "_") === 0) {
                 foreach ($callbacks as $callbackInfo) {
                     try {
                         $callbackInstance = $this->container->get($callbackInfo->class);
@@ -247,25 +245,35 @@ class SwaggerModel {
                     $callbackClass = new ReflectionClass($callbackInstance);
 
                     $controllerMethods[] = [
-                        'instance' => $callbackInstance,
-                        'methods' => [$callbackClass->getMethod($callbackInfo->method)],
+                        "instance" => $callbackInstance,
+                        "methods" => [$callbackClass->getMethod($callbackInfo->method)],
                     ];
                 }
-
             }
         }
 
         foreach ($controllerMethods as $data) {
-            $methodInstance = $data['instance'];
-            $methods = $data['methods'];
+            $methodInstance = $data["instance"];
+            $methods = $data["methods"];
 
             foreach ($methods as $method) {
-                if ($method->isAbstract() || $method->isStatic() || $method->getName()[0] === '_' || $method->getName() === 'options') {
+                if (
+                    $method->isAbstract() ||
+                    $method->isStatic() ||
+                    $method->getName()[0] === "_" ||
+                    $method->getName() === "options"
+                ) {
                     continue;
                 }
 
                 try {
-                    $action = new ReflectionAction($method, $methodInstance, $controllerInstance, $this->route, $this->eventManager);
+                    $action = new ReflectionAction(
+                        $method,
+                        $methodInstance,
+                        $controllerInstance,
+                        $this->route,
+                        $this->eventManager
+                    );
 
                     yield $action;
                 } catch (\InvalidArgumentException $ex) {
@@ -275,7 +283,5 @@ class SwaggerModel {
                 }
             }
         }
-
-
     }
 }

@@ -20,8 +20,8 @@ use VanillaTests\Fixtures\MockSiteSectionProvider;
 /**
  * Tests for the comment/quote embed.
  */
-class CommentEmbedFactoryTest extends AbstractAPIv2Test {
-
+class CommentEmbedFactoryTest extends AbstractAPIv2Test
+{
     /**
      * Test that all domain types are supported.
      *
@@ -31,7 +31,12 @@ class CommentEmbedFactoryTest extends AbstractAPIv2Test {
      * @param SiteSectionInterface[] $siteSections
      * @dataProvider supportedDomainsProvider
      */
-    public function testSupportedDomains(string $urlToTest, bool $isSupported, string $customRoot = '', array $siteSections = []) {
+    public function testSupportedDomains(
+        string $urlToTest,
+        bool $isSupported,
+        string $customRoot = "",
+        array $siteSections = []
+    ) {
         $commentsApi = $this->createMock(\CommentsApiController::class);
 
         /** @var RequestInterface $request */
@@ -51,53 +56,31 @@ class CommentEmbedFactoryTest extends AbstractAPIv2Test {
     /**
      * @return array
      */
-    public function supportedDomainsProvider(): array {
-        $bootstrapBase = 'http://vanilla.test';
+    public function supportedDomainsProvider(): array
+    {
+        $bootstrapBase = "http://vanilla.test";
         return [
             // Allowed
-            'Correct' => [
-                $bootstrapBase . '/discussion/comment/41342',
-                true
+            "Correct" => [$bootstrapBase . "/discussion/comment/41342", true],
+            // Not allowed
+            "Correct webroot" => [$bootstrapBase . "/actual-root/discussion/comment/41342", true, "/actual-root"],
+            "Correct section" => [
+                $bootstrapBase . "/actual-root/actual-section/discussion/comment/41342",
+                true,
+                "/actual-root",
+                [new MockSiteSection("test", "en", "/actual-section", "test1", "test1")],
             ],
             // Not allowed
-            'Correct webroot' => [
-                $bootstrapBase . '/actual-root/discussion/comment/41342',
-                true,
-                '/actual-root'
-            ],
-            'Correct section' => [
-                $bootstrapBase . '/actual-root/actual-section/discussion/comment/41342',
-                true,
-                '/actual-root',
-                [new MockSiteSection('test', 'en', '/actual-section', 'test1', 'test1')]
-            ],
-            // Not allowed
-            'Wrong webroot' => [
-                $bootstrapBase . '/wrong-root/discussion/comment/41342',
+            "Wrong webroot" => [$bootstrapBase . "/wrong-root/discussion/comment/41342", false, "/actual-root"],
+            "Wrong section" => [
+                $bootstrapBase . "/actual-root/actual-section/discussion/comment/41342",
                 false,
-                '/actual-root'
+                "/actual-root",
             ],
-            'Wrong section' => [
-                $bootstrapBase . '/actual-root/actual-section/discussion/comment/41342',
-                false,
-                '/actual-root',
-            ],
-            'wrong host' => [
-                'https://otherdomain.com/discussion/comment/41342',
-                false
-            ],
-            'wrong url (typo)' => [
-                $bootstrapBase . '/discussions/comments/41342',
-                false
-            ],
-            'Wrong url (discussion)' => [
-                $bootstrapBase . '/discussion/41342',
-                false
-            ],
-            'bad ID' => [
-                $bootstrapBase . '/discussion/comment/asdfads',
-                false
-            ],
+            "wrong host" => ["https://otherdomain.com/discussion/comment/41342", false],
+            "wrong url (typo)" => [$bootstrapBase . "/discussions/comments/41342", false],
+            "Wrong url (discussion)" => [$bootstrapBase . "/discussion/41342", false],
+            "bad ID" => [$bootstrapBase . "/discussion/comment/asdfads", false],
         ];
     }
 }

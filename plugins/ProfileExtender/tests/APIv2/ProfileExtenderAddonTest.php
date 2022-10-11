@@ -15,8 +15,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Tests for the profile extender addon.
  */
-class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
-
+class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase
+{
     use ProfileExtenderTestTrait;
     use UsersAndRolesApiTestTrait;
 
@@ -26,14 +26,16 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
     /**
      * {@inheritdoc}
      */
-    public static function getAddons(): array {
-        return ['vanilla', 'profileextender'];
+    public static function getAddons(): array
+    {
+        return ["vanilla", "profileextender"];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->container()->call(function (\ProfileExtenderPlugin $profileExtender) {
@@ -46,27 +48,32 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
     /**
      * Test the basic profile extender get/set flow.
      */
-    public function testUpdateUserField(): void {
-        $this->profileExtender->updateUserFields($this->memberID, ['text' => __FUNCTION__]);
+    public function testUpdateUserField(): void
+    {
+        $this->profileExtender->updateUserFields($this->memberID, ["text" => __FUNCTION__]);
         $values = $this->profileExtender->getUserFields($this->memberID);
-        $this->assertSame(__FUNCTION__, $values['text']);
+        $this->assertSame(__FUNCTION__, $values["text"]);
     }
 
     /**
      * Test basic profile field expansion.
      */
-    public function testBasicExpansion(): void {
-        $fields = ['text' => __FUNCTION__, 'check' => true];
+    public function testBasicExpansion(): void
+    {
+        $fields = ["text" => __FUNCTION__, "check" => true];
 
         $this->profileExtender->updateUserFields($this->memberID, $fields);
-        $data = $this->api()->get("/users/{$this->memberID}", ['expand' => 'extended'])->getBody();
-        $this->assertArraySubsetRecursive($fields, $data['extended']);
+        $data = $this->api()
+            ->get("/users/{$this->memberID}", ["expand" => "extended"])
+            ->getBody();
+        $this->assertArraySubsetRecursive($fields, $data["extended"]);
     }
 
     /**
      * Verify our expander still creates an empty Attributes object for users with no extended profile fields.
      */
-    public function testEmptyExpansion(): void {
+    public function testEmptyExpansion(): void
+    {
         $result = $this->profileExtender->getUserProfileValuesChecked([$this->memberID]);
         $this->assertInstanceOf(Attributes::class, $result[$this->memberID]);
         $this->assertSame(0, $result[$this->memberID]->count());
@@ -75,54 +82,57 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
     /**
      * The /users/me endpoint should expand all fields.
      */
-    public function testMeDefaultExpansion(): void {
-        $fields = ['text' => __FUNCTION__, 'check' => true];
+    public function testMeDefaultExpansion(): void
+    {
+        $fields = ["text" => __FUNCTION__, "check" => true];
 
         $this->profileExtender->updateUserFields($this->api()->getUserID(), $fields);
-        $data = $this->api()->get("/users/me")->getBody();
-        $this->assertArraySubsetRecursive($fields, $data['extended']);
+        $data = $this->api()
+            ->get("/users/me")
+            ->getBody();
+        $this->assertArraySubsetRecursive($fields, $data["extended"]);
     }
 
     /**
      * Verify Profile Extender values appear when editing user profiles, complete with values.
      */
-    public function testFieldsOnEditProfile(): void {
+    public function testFieldsOnEditProfile(): void
+    {
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
-        $this->profileExtender->updateUserFields($session->UserID, ['text' => __FUNCTION__]);
+        $this->profileExtender->updateUserFields($session->UserID, ["text" => __FUNCTION__]);
 
         $result = $this->bessy()->getHtml("profile/edit");
         $result->assertFormInput("text", __FUNCTION__);
+        $result->assertNoFormInput("Dropdown", __FUNCTION__);
     }
 
     /**
      * Verify field validation for required fields.
      */
-    public function testRequiredFieldWarning(): void {
+    public function testRequiredFieldWarning(): void
+    {
         // We check if our Custom Required Field exists on the registration page.
-        $registerPage = $this->bessy()->getHtml('/entry/register');
-        $registerPage->assertCssSelectorExists('#Form_CustomRequiredField');
+        $registerPage = $this->bessy()->getHtml("/entry/register");
+        $registerPage->assertCssSelectorExists("#Form_CustomRequiredField");
 
         // Trying to register providing an empty CustomrequiredField should display an exception message.
-        $this->expectExceptionMessage('Custom Required Field');
-        $registrationResults = $this->bessy()->post(
-            '/entry/register',
-            [
-                'Email' => 'new@user.com',
-                'Name' => 'NewUserName',
-                'CustomRequiredField' => '',
-                'Password' => 'jXM>e!gL4#38cP3Z',
-                'PasswordMatch' => 'jXM>e!gL4#38cP3Z',
-                'TermsOfService' => '1',
-                'Save' => "Save"
-            ]
-        );
+        $this->expectExceptionMessage("Custom Required Field");
+        $registrationResults = $this->bessy()->post("/entry/register", [
+            "Email" => "new@user.com",
+            "Name" => "NewUserName",
+            "CustomRequiredField" => "",
+            "Password" => "jXM>e!gL4#38cP3Z",
+            "PasswordMatch" => "jXM>e!gL4#38cP3Z",
+            "TermsOfService" => "1",
+            "Save" => "Save",
+        ]);
 
         // Run the following with an authenticated user.
         $this->runWithUser(function () {
             // We also check if the field exists on profile edition page.
             $profilePage = $this->bessy()->getHtml("/profile/edit/");
-            $profilePage->assertCssSelectorExists('#Form_CustomRequiredField');
+            $profilePage->assertCssSelectorExists("#Form_CustomRequiredField");
         }, $this->adminID);
     }
 
@@ -135,9 +145,12 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
      * @param string|bool $expectedValue
      * @dataProvider provideTestPatchUsersExtendedEndpointData
      */
-    public function testPatchUsersExtendedEndpoint($field, $value, $fieldToCheck, $expectedValue) {
+    public function testPatchUsersExtendedEndpoint($field, $value, $fieldToCheck, $expectedValue)
+    {
         $id = $this->memberID;
-        $result = $this->api()->patch("/users/{$id}/extended", [$field => $value])->getBody();
+        $result = $this->api()
+            ->patch("/users/{$id}/extended", [$field => $value])
+            ->getBody();
         $this->assertSame($result[$fieldToCheck], $expectedValue);
     }
 
@@ -146,26 +159,12 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
      *
      * @return array
      */
-    public function provideTestPatchUsersExtendedEndpointData(): array {
+    public function provideTestPatchUsersExtendedEndpointData(): array
+    {
         $data = [
-            'testTextInput' => [
-                'text',
-                'sometext',
-                'text',
-                'sometext'
-            ],
-            'testCheckboxInput' => [
-                'check',
-                true,
-                'check',
-                true,
-            ],
-            'textDropdown' => [
-                'dropdown',
-                'Option2',
-                'dropdown',
-                'Option2',
-            ]
+            "testTextInput" => ["text", "sometext", "text", "sometext"],
+            "testCheckboxInput" => ["check", true, "check", true],
+            "textDropdown" => ["dropdown", "Option2", "dropdown", "Option2"],
         ];
 
         return $data;
@@ -174,33 +173,37 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
     /**
      * Test patching multiple fields from
      */
-    public function testPatchingMultipleFieldsFromExtendedEndpoint(): void {
+    public function testPatchingMultipleFieldsFromExtendedEndpoint(): void
+    {
         $id = $this->memberID;
         $fieldsToPatch = [
-            'text' => 'foo',
-            'check' => false,
-            'DateOfBirth' => '1980-06-17',
-            'dropdown' => 'Option1'
+            "text" => "foo",
+            "check" => false,
+            "DateOfBirth" => "1980-06-17",
+            "dropdown" => "Option1",
         ];
-        $result = $this->api()->patch("/users/{$id}/extended", $fieldsToPatch)->getBody();
-        $formattedDate = new \DateTimeImmutable($result['DateOfBirth']);
-        $result['DateOfBirth'] = $formattedDate->format('Y-m-d');
+        $result = $this->api()
+            ->patch("/users/{$id}/extended", $fieldsToPatch)
+            ->getBody();
+        $formattedDate = new \DateTimeImmutable($result["DateOfBirth"]);
+        $result["DateOfBirth"] = $formattedDate->format("Y-m-d");
         $this->assertEquals($fieldsToPatch, $result);
     }
 
     /**
      * Test patching invalid data.
      */
-    public function testPatchWithBadValues(): void {
+    public function testPatchWithBadValues(): void
+    {
         $this->expectException(Exception::class);
         $this->expectExceptionMessage("DateOfBirth is not a valid datetime.");
         $this->expectExceptionMessage("dropdown must be one of: Option1, Option2.");
         $this->expectExceptionMessage("text is not a valid string.");
         $id = $this->memberID;
         $fieldsToPatch = [
-            'text' => false,
-            'DateOfBirth' => true,
-            'dropdown' => 'Option3'
+            "text" => false,
+            "DateOfBirth" => true,
+            "dropdown" => "Option3",
         ];
         $this->api()->patch("/users/{$id}/extended", $fieldsToPatch);
     }
@@ -208,33 +211,37 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
     /**
      * Test schema.
      */
-    public function testSchemaExists(): void {
-        $openApi = $this->api()->get('/open-api/v3')->getBody();
-        $schemaProperties = $openApi['components']['schemas']['ExtendedUserFields']['properties'];
-        $this->assertSame($schemaProperties['text']['type'], 'string');
-        $this->assertSame($schemaProperties['check']['type'], 'boolean');
-        $this->assertSame($schemaProperties['DateOfBirth']['type'], 'string');
-        $this->assertSame($schemaProperties['DateOfBirth']['format'], 'date-time');
-        $this->assertSame($schemaProperties['dropdown']['type'], 'string');
-        $this->assertSame(count($schemaProperties['dropdown']['enum']), 2);
+    public function testSchemaExists(): void
+    {
+        $openApi = $this->api()
+            ->get("/open-api/v3")
+            ->getBody();
+        $schemaProperties = $openApi["components"]["schemas"]["ExtendedUserFields"]["properties"];
+        $this->assertSame($schemaProperties["text"]["type"], "string");
+        $this->assertSame($schemaProperties["check"]["type"], "boolean");
+        $this->assertSame($schemaProperties["DateOfBirth"]["type"], "string");
+        $this->assertSame($schemaProperties["DateOfBirth"]["format"], "date-time");
+        $this->assertSame($schemaProperties["dropdown"]["type"], "string");
+        $this->assertSame(count($schemaProperties["dropdown"]["enum"]), 2);
     }
 
     /**
      * Test profile fields reordering.
      */
-    public function testProfileFieldsReordering(): void {
+    public function testProfileFieldsReordering(): void
+    {
         $id = $this->memberID;
         $fieldsToPatch = [
-            'text' => 'foo',
-            'check' => false,
-            'DateOfBirth' => '1980-06-17',
-            'dropdown' => 'Option1'
+            "text" => "foo",
+            "check" => false,
+            "DateOfBirth" => "1980-06-17",
+            "dropdown" => "Option1",
         ];
 
         $this->api()->patch("/users/{$id}/extended", $fieldsToPatch);
         $profileFields = $this->profileExtender->getUserFields($this->memberID);
         $config = self::container()->get(Gdn_Configuration::class);
-        $fieldsInConfig = $config->get('ProfileExtender.Fields');
+        $fieldsInConfig = $config->get("ProfileExtender.Fields");
         $configFieldsNamesAsKey = array_flip(array_column($fieldsInConfig, "Name"));
 
         //order is not the same
@@ -250,8 +257,8 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase {
 
         //scenario when user has more profile fields than in config
         $newFieldsInConfig = array_splice($fieldsInConfig, 0, 3);
-        $config->set('ProfileExtender.Fields', $newFieldsInConfig);
-        $newFieldsInConfig = $config->get('ProfileExtender.Fields');
+        $config->set("ProfileExtender.Fields", $newFieldsInConfig);
+        $newFieldsInConfig = $config->get("ProfileExtender.Fields");
         $newConfigFieldsNamesAsKey = array_flip(array_column($newFieldsInConfig, "Name"));
         $this->assertNotEquals(array_key_first($profileFields), array_key_first($newConfigFieldsNamesAsKey));
         $newReorderedProfileFields = $this->profileExtender->reorderProfileFields($profileFields);

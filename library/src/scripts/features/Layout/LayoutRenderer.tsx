@@ -26,20 +26,28 @@ interface IProps<T> {
     applyContexts?: boolean;
     layout: Array<IHydratedLayoutWidget<T>>;
     layoutRef?: React.Ref<HTMLDivElement>;
-    fallbackWidget?: FallbackLayoutWidget;
-    componentFetcher?: IComponentFetcher;
-    componentWrapper?: IComponentWrapper<T>;
     allowInternalProps?: boolean;
 }
+
+interface ILayoutLookupContext<T> {
+    fallbackWidget?: FallbackLayoutWidget;
+    componentFetcher: IComponentFetcher;
+    componentWrapper?: IComponentWrapper<T>;
+}
+
+export const LayoutLookupContext = React.createContext<ILayoutLookupContext<any>>({
+    componentFetcher: getComponent,
+});
 
 /**
  * This component will render all registered components from the schema passed in the layout prop
  */
 export function LayoutRenderer<T>(props: IProps<T>): React.ReactElement {
     const parentSectionContext = useContext(SectionBehaviourContext);
+    const lookupContext = useContext(LayoutLookupContext);
     let content = (
         <div ref={props.layoutRef}>
-            <LayoutRendererImpl {...props} />
+            <LayoutRendererImpl {...lookupContext} {...props} />
         </div>
     );
     if (props.applyContexts ?? true) {
@@ -49,10 +57,10 @@ export function LayoutRenderer<T>(props: IProps<T>): React.ReactElement {
             </SectionBehaviourContext.Provider>
         );
     }
-    return <LayoutErrorBoundary>{content}</LayoutErrorBoundary>;
+    return <LayoutErrorBoundary componentName="Layout">{content}</LayoutErrorBoundary>;
 }
 
-function LayoutRendererImpl<T>(props: IProps<T>) {
+function LayoutRendererImpl<T>(props: IProps<T> & ILayoutLookupContext<T>) {
     const { layout } = props;
     const device = useDevice();
     const layoutDevice = [Devices.XS, Devices.MOBILE].includes(device) ? LayoutDevice.MOBILE : LayoutDevice.DESKTOP;
@@ -132,7 +140,7 @@ function resolveDynamicComponent(
     let result: React.ReactNode = null;
     // Return an error boundary wrapped component
     if (registeredComponent) {
-        result = React.createElement(LayoutErrorBoundary, { key }, [
+        result = React.createElement(LayoutErrorBoundary, { key, componentName: componentConfig?.$reactComponent }, [
             React.createElement(registeredComponent.Component, {
                 ...resolveNestedComponents(componentConfig.$reactProps, context),
                 key: key,

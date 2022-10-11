@@ -12,13 +12,14 @@ use VanillaTests\SharedBootstrapTestCase;
 /**
  * Test some of the global functions that operate (or mostly operate) on arrays.
  */
-class DbEncodeDecodeTest extends SharedBootstrapTestCase {
-
+class DbEncodeDecodeTest extends SharedBootstrapTestCase
+{
     /**
      * Test encoding/decoding an array.
      */
-    public function testDbEncodeArray() {
-        $data = ['Forum' => 'Vanilla'];
+    public function testDbEncodeArray()
+    {
+        $data = ["Forum" => "Vanilla"];
         $encoded = dbencode($data);
         $this->assertSame($data, dbdecode($encoded));
     }
@@ -29,7 +30,8 @@ class DbEncodeDecodeTest extends SharedBootstrapTestCase {
      * @param mixed $data The data to test.
      * @dataProvider provideDbEncodeValues
      */
-    public function testDbEncodeDecode($data) {
+    public function testDbEncodeDecode($data)
+    {
         $this->assertNotNull($data);
 
         $encoded = dbencode($data);
@@ -46,14 +48,15 @@ class DbEncodeDecodeTest extends SharedBootstrapTestCase {
      *
      * @return array Returns a data provider.
      */
-    public function provideDbEncodeValues() {
+    public function provideDbEncodeValues()
+    {
         $r = [
-            'string' => ['Hello world!'],
-            'int' => [123],
-            'true' => [true],
-            'false' => [false],
-            'array' => [['Forum' => 'Vanilla']],
-            'array-nested' => [['userID' => 123, 'prefs' => ['foo' => true, 'bar' => [1, 2, 3]]]]
+            "string" => ["Hello world!"],
+            "int" => [123],
+            "true" => [true],
+            "false" => [false],
+            "array" => [["Forum" => "Vanilla"]],
+            "array-nested" => [["userID" => 123, "prefs" => ["foo" => true, "bar" => [1, 2, 3]]]],
         ];
 
         return $r;
@@ -62,24 +65,27 @@ class DbEncodeDecodeTest extends SharedBootstrapTestCase {
     /**
      * Encoding a value of null should be null.
      */
-    public function testDbEncodeNull() {
+    public function testDbEncodeNull()
+    {
         $this->assertNull(dbencode(null));
-        $this->assertNull(dbencode(''));
+        $this->assertNull(dbencode(""));
     }
 
     /**
      * Decoding a value of null should be null.
      */
-    public function testDbDecodeNull() {
+    public function testDbDecodeNull()
+    {
         $this->assertNull(dbdecode(null));
-        $this->assertNull(dbdecode(''));
+        $this->assertNull(dbdecode(""));
     }
 
     /**
      * You should be able to call {@link dbdecode()} on an array and have it just pass through.
      */
-    public function testDoubleDecodeArray() {
-        $arr = [1, 2, 'foo' => [3, 4]];
+    public function testDoubleDecodeArray()
+    {
+        $arr = [1, 2, "foo" => [3, 4]];
         $encoded = dbencode($arr);
         $decoded = dbdecode($encoded);
         $decoded2 = dbdecode($decoded);
@@ -93,7 +99,8 @@ class DbEncodeDecodeTest extends SharedBootstrapTestCase {
      * @param string $str The bad string to decode.
      * @dataProvider provideBadDbDecodeStrings
      */
-    public function testBadDbDecodeString($str) {
+    public function testBadDbDecodeString($str)
+    {
         $this->expectNotice();
         $decoded = unserialize($str);
     }
@@ -107,7 +114,8 @@ class DbEncodeDecodeTest extends SharedBootstrapTestCase {
      * @dataProvider  provideBadDbDecodeStrings
      * @see testBadDbDecodeString()
      */
-    public function testDbDecodeError($str) {
+    public function testDbDecodeError($str)
+    {
         $decoded = dbdecode($str);
         $this->assertFalse($decoded);
     }
@@ -117,11 +125,9 @@ class DbEncodeDecodeTest extends SharedBootstrapTestCase {
      *
      * @return array Returns a data provider string.
      */
-    public function provideBadDbDecodeStrings() {
-        $r = [
-            ['a:3:{i:0;i:1;i:'],
-            ['{"foo": "bar"'],
-        ];
+    public function provideBadDbDecodeStrings()
+    {
+        $r = [["a:3:{i:0;i:1;i:"], ['{"foo": "bar"']];
 
         return $r;
     }

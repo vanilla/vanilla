@@ -11,8 +11,8 @@ use Vanilla\Database\Operation;
 /**
  * Pipeline class, specifically for database operations.
  */
-class Pipeline {
-
+class Pipeline
+{
     /** @var callable */
     private $primaryAction;
 
@@ -27,7 +27,8 @@ class Pipeline {
      *
      * @param callable $primaryAction
      */
-    public function __construct(callable $primaryAction) {
+    public function __construct(callable $primaryAction)
+    {
         $this->primaryAction = $primaryAction;
         $this->stack = function (Operation $operation) {
             return ($this->primaryAction)($operation);
@@ -44,10 +45,10 @@ class Pipeline {
      * @param Processor $processor
      * @return $this
      */
-    public function addProcessor(Processor $processor) {
+    public function addProcessor(Processor $processor)
+    {
         $stack = $this->stack;
         $this->stack = new class ($processor, $stack) {
-
             /** @var Processor */
             private $processor;
 
@@ -60,7 +61,8 @@ class Pipeline {
              * @param Processor $processor
              * @param callable $stack
              */
-            public function __construct(Processor $processor, callable $stack) {
+            public function __construct(Processor $processor, callable $stack)
+            {
                 $this->processor = $processor;
                 $this->stack = $stack;
             }
@@ -71,7 +73,8 @@ class Pipeline {
              * @param mixed $value
              * @return mixed
              */
-            public function __invoke($value) {
+            public function __invoke($value)
+            {
                 /**
                  * Passing the stack allows a processor to control whether it will be executed before or after the rest
                  * of the stack, or to avoid processing the rest of the stack, altogether.
@@ -90,7 +93,8 @@ class Pipeline {
      * @return $this
      * @deprecated Avoid using post-processors.
      */
-    public function addPostProcessor(Processor $processor) {
+    public function addPostProcessor(Processor $processor)
+    {
         $stack = $this->postProcessStack;
         $this->postProcessStack = function ($value) use ($processor, $stack) {
             /**
@@ -113,7 +117,8 @@ class Pipeline {
      * @return mixed
      * @deprecated Use processOperation where possible.
      */
-    public function process(Operation $op, ?callable $primaryAction = null, bool $executeStack = true) {
+    public function process(Operation $op, ?callable $primaryAction = null, bool $executeStack = true)
+    {
         if (!$executeStack) {
             return call_user_func($primaryAction, $op);
         }
@@ -129,7 +134,8 @@ class Pipeline {
      * @param Operation $op
      * @return mixed
      */
-    public function processOperation(Operation $op) {
+    public function processOperation(Operation $op)
+    {
         $result = ($this->stack)($op);
         return $result;
     }

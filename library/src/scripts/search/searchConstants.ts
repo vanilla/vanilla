@@ -7,7 +7,15 @@ import Result from "@library/result/Result";
 import { getMeta } from "@library/utility/appUtils";
 
 export const ALL_CONTENT_DOMAIN_NAME = "all_content";
-export const ALLOWED_GLOBAL_SEARCH_FIELDS = ["query", "name", "insertUserIDs", "dateInserted", "page", "types"];
+export const ALLOWED_GLOBAL_SEARCH_FIELDS = [
+    "domain",
+    "page",
+    "query",
+    "name",
+    "insertUserIDs",
+    "dateInserted",
+    "types",
+];
 export const NEW_SEARCH_PAGE_ENABLED = getMeta("themeFeatures.useNewSearchPage", false);
 export const MEMBERS_DOMAIN_NAME = "members";
 export const MEMBERS_RECORD_TYPE = "user";

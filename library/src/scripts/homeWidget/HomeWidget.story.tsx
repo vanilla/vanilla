@@ -852,8 +852,7 @@ export const ContainerBackgroundVariants = storyWithConfig({ useWrappers: false 
                     containerOptions={{
                         maxColumnCount: 2,
                         outerBackground: {
-                            image:
-                                "linear-gradient(0deg, rgba(181,219,255,1) 0%, rgba(223,246,255,1) 37%, rgba(255,255,255,1) 100%)",
+                            image: "linear-gradient(0deg, rgba(181,219,255,1) 0%, rgba(223,246,255,1) 37%, rgba(255,255,255,1) 100%)",
                         },
                         viewAll: { to: "#", displayType: ButtonTypes.TRANSPARENT },
                     }}

@@ -17,8 +17,8 @@ use VanillaTests\VanillaTestCase;
 /**
  * Assert basic functional requirements of HtmlToBlotsParser.
  */
-class HtmlToBlotsParserTest extends VanillaTestCase {
-
+class HtmlToBlotsParserTest extends VanillaTestCase
+{
     use BootstrapTrait, SetupTraitsTrait;
 
     /** @var RichFormat */
@@ -30,7 +30,8 @@ class HtmlToBlotsParserTest extends VanillaTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->setUpTestTraits();
         $this->container()->call(function (RichFormat $formatter, Parser $parser) {
             $this->formatter = $formatter;
@@ -41,15 +42,11 @@ class HtmlToBlotsParserTest extends VanillaTestCase {
     /**
      * Verify parseInlineHtml can gracefully handle an empty value.
      */
-    public function testParseInlineHtmlEmpty(): void {
-        $content = json_encode([
-            ["insert" => "\n"],
-        ]);
+    public function testParseInlineHtmlEmpty(): void
+    {
+        $content = json_encode([["insert" => "\n"]]);
         $operations = Parser::jsonToOperations($content);
-        $blotGroup = $this->parser->parse(
-            $operations,
-            Parser::PARSE_MODE_NORMAL
-        )->getGroups()[0];
+        $blotGroup = $this->parser->parse($operations, Parser::PARSE_MODE_NORMAL)->getGroups()[0];
 
         $html = $blotGroup->renderPartialLineGroupContent();
         $parent = new BlotGroupCollection([], [], Parser::PARSE_MODE_NORMAL);

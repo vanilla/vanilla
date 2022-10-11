@@ -13,8 +13,8 @@ use UserModel;
 /**
  * Model for creating trackable user instances.
  */
-class TrackableUserModel {
-
+class TrackableUserModel
+{
     use TrackableDecoratorTrait;
 
     /** @var UserModel */
@@ -32,7 +32,8 @@ class TrackableUserModel {
      * @param UserModel $userModel
      * @param \Gdn_Session $session
      */
-    public function __construct(UserModel $userModel, \Gdn_Session $session) {
+    public function __construct(UserModel $userModel, \Gdn_Session $session)
+    {
         $this->userModel = $userModel;
         $this->session = $session;
     }
@@ -40,7 +41,8 @@ class TrackableUserModel {
     /**
      * @param TrackableDecoratorInterface $decorator
      */
-    public function addUserDecorator(TrackableDecoratorInterface $decorator): void {
+    public function addUserDecorator(TrackableDecoratorInterface $decorator): void
+    {
         $this->userDecorators[] = $decorator;
     }
 
@@ -51,7 +53,8 @@ class TrackableUserModel {
      * @param  bool $isGuestCollection Will this data be used in a collection that contains guest data?
      * @return array An array representing the user data on success, false on failure.
      */
-    public function getTrackableUser(int $userID, bool $isGuestCollection = false): array {
+    public function getTrackableUser(int $userID, bool $isGuestCollection = false): array
+    {
         $user = $this->userModel->getID($userID);
         $roles = [];
         $roleIDs = [];
@@ -66,56 +69,56 @@ class TrackableUserModel {
             if ($userRoles->count() > 0) {
                 foreach ($userRoles->resultObject() as $currentRole) {
                     $roles[] = [
-                        'name' => $currentRole->Name,
-                        'roleID' => $currentRole->RoleID,
+                        "name" => $currentRole->Name,
+                        "roleID" => $currentRole->RoleID,
                     ];
                     $roleIDs[] = $currentRole->RoleID;
                     $roleNames[] = $currentRole->Name;
                 }
 
                 usort($roles, function ($a, $b) {
-                    return ($a['roleID'] <=> $b['roleID']);
+                    return $a["roleID"] <=> $b["roleID"];
                 });
             }
 
             $roleType = self::getRoleType((array) $user);
 
             $userInfo = [
-                'commentCount' => (int)$user->CountComments,
-                'dateFirstVisit' => TrackableDateUtils::getDateTime($user->DateFirstVisit),
-                'dateRegistered' => TrackableDateUtils::getDateTime($user->DateInserted),
-                'discussionCount' => (int)$user->CountDiscussions,
-                'name' => $user->Name,
-                'roles' => $roles,
-                'roleIDs' => $roleIDs,
-                'roleNames' => $roleNames,
-                'roleType' => $roleType,
-                'userID' => (int)$user->UserID,
+                "commentCount" => (int) $user->CountComments,
+                "dateFirstVisit" => TrackableDateUtils::getDateTime($user->DateFirstVisit),
+                "dateRegistered" => TrackableDateUtils::getDateTime($user->DateInserted),
+                "discussionCount" => (int) $user->CountDiscussions,
+                "name" => $user->Name,
+                "roles" => $roles,
+                "roleIDs" => $roleIDs,
+                "roleNames" => $roleNames,
+                "roleType" => $roleType,
+                "userID" => (int) $user->UserID,
                 "url" => userUrl($user),
 
                 // Kludge because this has always been set, even if the addon is disabled.
-                'rank' => [
-                    'rankID' => 0,
+                "rank" => [
+                    "rankID" => 0,
                 ],
             ];
 
             $timeFirstVisit = strtotime($user->DateFirstVisit) ?: 0;
             $timeRegistered = strtotime($user->DateInserted) ?: 0;
 
-            $userInfo['sinceFirstVisit'] = time() - $timeFirstVisit;
-            $userInfo['sinceRegistered'] = time() - $timeRegistered;
+            $userInfo["sinceFirstVisit"] = time() - $timeFirstVisit;
+            $userInfo["sinceRegistered"] = time() - $timeRegistered;
 
-            $userInfo['points'] = val('Points', $user, 0);
+            $userInfo["points"] = val("Points", $user, 0);
 
             // Apply decorators.
-            $boxedUserData = new Data($userInfo, ['isGuestCollection' => $isGuestCollection]);
+            $boxedUserData = new Data($userInfo, ["isGuestCollection" => $isGuestCollection]);
             $userInfo = $this->applyDecorators($boxedUserData, $this->userDecorators);
             return $userInfo;
         } else {
             // Fallback user data
             return [
-                'userID' => 0,
-                'name' => '@notfound',
+                "userID" => 0,
+                "name" => "@notfound",
             ];
         }
     }
@@ -125,14 +128,15 @@ class TrackableUserModel {
      *
      * @return array An array representing analytics data for the current user as a guest.
      */
-    public function getGuest(): array {
+    public function getGuest(): array
+    {
         $userInfo = [
-            'dateFirstVisit' => null,
-            'name' => '@guest',
-            'roleType' => 'guest',
-            'userID' => 0
+            "dateFirstVisit" => null,
+            "name" => "@guest",
+            "roleType" => "guest",
+            "userID" => 0,
         ];
-        $boxedUserData = new Data($userInfo, ['isGuestCollection' => true]);
+        $boxedUserData = new Data($userInfo, ["isGuestCollection" => true]);
         $userInfo = $this->applyDecorators($boxedUserData, $this->userDecorators);
 
         return $userInfo;
@@ -144,7 +148,8 @@ class TrackableUserModel {
      * @param  bool $isGuestCollection Will this data be used in a collection that contains guest data?
      * @return array
      */
-    public function getCurrentUser(bool $isGuestCollection = false): array {
+    public function getCurrentUser(bool $isGuestCollection = false): array
+    {
         return $this->session->isValid()
             ? $this->getTrackableUser($this->session->UserID, $isGuestCollection)
             : $this->getGuest();
@@ -157,12 +162,13 @@ class TrackableUserModel {
      * @return array
      *@see getTrackableUser
      */
-    public static function anonymizeUser(array $user): array {
+    public static function anonymizeUser(array $user): array
+    {
         return [
-            'dateFirstVisit' => null,
-            'name' => '@anonymous',
-            'roleType' => $user['roleType'] ?? null,
-            'userID' => -1
+            "dateFirstVisit" => null,
+            "name" => "@anonymous",
+            "roleType" => $user["roleType"] ?? null,
+            "userID" => -1,
         ];
     }
 
@@ -172,15 +178,16 @@ class TrackableUserModel {
      * @param array $user A user row.
      * @return string
      */
-    private function getRoleType(array $user): string {
-        if ($this->userModel->checkPermission($user, 'Garden.Settings.Manage')) {
-            $roleType = 'admin';
-        } elseif ($this->userModel->checkPermission($user, 'Garden.Community.Manage')) {
-            $roleType = 'cm';
-        } elseif ($this->userModel->checkPermission($user, 'Garden.Moderation.Manage')) {
-            $roleType = 'mod';
+    private function getRoleType(array $user): string
+    {
+        if ($this->userModel->checkPermission($user, "Garden.Settings.Manage")) {
+            $roleType = "admin";
+        } elseif ($this->userModel->checkPermission($user, "Garden.Community.Manage")) {
+            $roleType = "cm";
+        } elseif ($this->userModel->checkPermission($user, "Garden.Moderation.Manage")) {
+            $roleType = "mod";
         } else {
-            $roleType = 'member';
+            $roleType = "member";
         }
 
         return $roleType;
@@ -193,9 +200,10 @@ class TrackableUserModel {
      * @link http://php.net/manual/en/function.uniqid.php#94959
      * @return string A UUIDv4-compliant string
      */
-    public static function uuid(): string {
+    public static function uuid(): string
+    {
         return sprintf(
-            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+            "%04x%04x-%04x-%04x-%04x-%04x%04x%04x",
             mt_rand(0, 0xffff),
             mt_rand(0, 0xffff),
             mt_rand(0, 0xffff),

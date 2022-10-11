@@ -59,7 +59,6 @@
         justify-content: flex-end;
     }
 
-
     .col-copyRight,
     .col-logo {
         flex: 1;
@@ -74,9 +73,9 @@
 .Vanilla-logo {
     width: 120px;
     height: 28px;
-    opacity: .6;
+    opacity: 0.6;
 
-    @include maxWidth($theme-breakpoint_base){
+    @include maxWidth($theme-breakpoint_base) {
         margin: 0 auto;
     }
 }

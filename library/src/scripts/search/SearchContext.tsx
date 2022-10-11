@@ -1,5 +1,5 @@
 import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE } from "@library/search/searchReducer";
-import { ISearchForm, ISearchResults, ISearchFormBase } from "@library/search/searchTypes";
+import { ISearchForm, ISearchResponse } from "@library/search/searchTypes";
 import { ILoadable } from "@library/@types/api/core";
 import React, { useContext } from "react";
 import { ISearchDomain } from "./SearchService";
@@ -9,7 +9,7 @@ export const SearchContext = React.createContext<ISearchContextValue>({
     updateForm: () => {},
     resetForm: () => {},
     results: INITIAL_SEARCH_STATE.results,
-    domainSearchResults: INITIAL_SEARCH_STATE.domainSearchResults,
+    domainSearchResponse: INITIAL_SEARCH_STATE.domainSearchResponse,
     form: DEFAULT_CORE_SEARCH_FORM,
     search: () => {},
     searchInDomain: () => {},
@@ -23,10 +23,10 @@ export const SearchContext = React.createContext<ISearchContextValue>({
         return DEFAULT_CORE_SEARCH_FORM;
     },
 });
-interface ISearchContextValue<ExtraFormValues extends object = ISearchFormBase> {
-    results: ILoadable<ISearchResults>;
+interface ISearchContextValue<ExtraFormValues extends object = {}> {
+    results: ILoadable<ISearchResponse>;
 
-    domainSearchResults: Record<string, ILoadable<ISearchResults>>;
+    domainSearchResponse: Record<string, ILoadable<ISearchResponse>>;
 
     form: ISearchForm<ExtraFormValues>;
 

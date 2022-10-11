@@ -12,8 +12,8 @@ use Garden\Schema\Schema;
 /**
  * Plain old object to represent and attachment.
  */
-class Attachment implements \JsonSerializable {
-
+class Attachment implements \JsonSerializable
+{
     /** @var string The file name of the attachment. */
     public $name;
 
@@ -37,17 +37,18 @@ class Attachment implements \JsonSerializable {
      *
      * @return Schema
      */
-    private static function getSchema(): Schema {
+    private static function getSchema(): Schema
+    {
         static $schema;
         if ($schema === null) {
             $schema = Schema::parse([
-                'mediaID:i',
-                'name:s',
-                'mediaID:i',
-                'dateInserted:dt?',
-                'size:i',
-                'type:s',
-                'url:s',
+                "mediaID:i",
+                "name:s",
+                "mediaID:i",
+                "dateInserted:dt?",
+                "size:i",
+                "type:s",
+                "url:s",
             ]);
         }
         return $schema;
@@ -61,29 +62,31 @@ class Attachment implements \JsonSerializable {
      * @return Attachment
      * @throws \Garden\Schema\ValidationException If the schema validation fails.
      */
-    public static function fromArray(array $data): Attachment {
+    public static function fromArray(array $data): Attachment
+    {
         $validated = self::getSchema()->validate($data);
         $attachment = new Attachment();
-        $attachment->mediaID = $validated['mediaID'];
-        $attachment->url = $validated['url'];
-        $attachment->dateInserted = $validated['dateInserted'] ?? null;
-        $attachment->name = $validated['name'];
-        $attachment->size = $validated['size'];
-        $attachment->type = $validated['type'];
+        $attachment->mediaID = $validated["mediaID"];
+        $attachment->url = $validated["url"];
+        $attachment->dateInserted = $validated["dateInserted"] ?? null;
+        $attachment->name = $validated["name"];
+        $attachment->size = $validated["size"];
+        $attachment->type = $validated["type"];
         return $attachment;
     }
 
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return [
-            'name' => $this->name,
-            'dateInserted' => $this->dateInserted,
-            'mediaID' => $this->mediaID,
-            'size' => $this->size,
-            'type' => $this->type,
-            'url' => $this->url,
+            "name" => $this->name,
+            "dateInserted" => $this->dateInserted,
+            "mediaID" => $this->mediaID,
+            "size" => $this->size,
+            "type" => $this->type,
+            "url" => $this->url,
         ];
     }
 }

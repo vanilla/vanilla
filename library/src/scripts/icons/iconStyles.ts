@@ -82,8 +82,8 @@ export const iconVariables = useThemeCache(() => {
     });
 
     const vanillaLogo = themeVars("vanillaLogo", {
-        width: 80,
-        height: 32.3,
+        width: 79,
+        height: 33,
         mobile: {
             width: undefined,
             height: undefined,
@@ -249,6 +249,21 @@ export const iconVariables = useThemeCache(() => {
         height: 24,
     });
 
+    const siteTotalMembersIcon = themeVars("SiteTotalMembersIcon", {
+        width: 24,
+        height: 24,
+    });
+
+    const siteTotalPostsIcon = themeVars("SiteTotalPostsIcon", {
+        width: 24,
+        height: 24,
+    });
+
+    const siteTotalOnlineIcon = themeVars("SiteTotalOnlineIcon", {
+        width: 24,
+        height: 24,
+    });
+
     return {
         standard,
         newFolder,
@@ -288,6 +303,9 @@ export const iconVariables = useThemeCache(() => {
         typeFlag,
         downvote,
         upvote,
+        siteTotalMembersIcon,
+        siteTotalPostsIcon,
+        siteTotalOnlineIcon,
     };
 });
 
@@ -595,6 +613,21 @@ export const iconClasses = useThemeCache(() => {
         }),
     );
 
+    const siteTotalMembersIcon = css({
+        width: styleUnit(vars.siteTotalMembersIcon.width),
+        height: styleUnit(vars.siteTotalMembersIcon.height),
+    });
+
+    const siteTotalPostsIcon = css({
+        width: styleUnit(vars.siteTotalPostsIcon.width),
+        height: styleUnit(vars.siteTotalPostsIcon.height),
+    });
+
+    const siteTotalOnlineIcon = css({
+        width: styleUnit(vars.siteTotalOnlineIcon.width),
+        height: styleUnit(vars.siteTotalOnlineIcon.height),
+    });
+
     return {
         standard,
         newFolder,
@@ -646,5 +679,8 @@ export const iconClasses = useThemeCache(() => {
         typeKnowledgeBase,
         downvote,
         upvote,
+        siteTotalMembersIcon,
+        siteTotalPostsIcon,
+        siteTotalOnlineIcon,
     };
 });

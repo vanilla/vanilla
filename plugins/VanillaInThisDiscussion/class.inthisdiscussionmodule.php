@@ -10,8 +10,8 @@
 /**
  * Renders a list of users who are taking part in a particular discussion.
  */
-class InThisDiscussionModule extends Gdn_Module {
-
+class InThisDiscussionModule extends Gdn_Module
+{
     /** @var array */
     protected $_UserData;
 
@@ -20,7 +20,8 @@ class InThisDiscussionModule extends Gdn_Module {
      *
      * @param string $sender
      */
-    public function __construct($sender = '') {
+    public function __construct($sender = "")
+    {
         $this->_UserData = false;
         parent::__construct($sender);
     }
@@ -31,16 +32,17 @@ class InThisDiscussionModule extends Gdn_Module {
      * @param int $discussionID The discussion ID to fetch.
      * @param int $limit The max number of users to fetch.
      */
-    public function getData($discussionID, $limit = 50) {
+    public function getData($discussionID, $limit = 50)
+    {
         $sQL = Gdn::sql();
         $this->_UserData = $sQL
-            ->select('u.UserID, u.Name, u.Photo')
-            ->select('c.DateInserted', 'max', 'DateLastActive')
-            ->from('User u')
-            ->join('Comment c', 'u.UserID = c.InsertUserID')
-            ->where('c.DiscussionID', $discussionID)
-            ->groupBy('u.UserID, u.Name, u.Photo')
-            ->orderBy('DateLastActive', 'desc')
+            ->select("u.UserID, u.Name, u.Photo")
+            ->select("c.DateInserted", "max", "DateLastActive")
+            ->from("User u")
+            ->join("Comment c", "u.UserID = c.InsertUserID")
+            ->where("c.DiscussionID", $discussionID)
+            ->groupBy("u.UserID, u.Name, u.Photo")
+            ->orderBy("DateLastActive", "desc")
             ->limit($limit)
             ->get();
     }
@@ -50,8 +52,9 @@ class InThisDiscussionModule extends Gdn_Module {
      *
      * @return string
      */
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
     /**
@@ -59,30 +62,31 @@ class InThisDiscussionModule extends Gdn_Module {
      *
      * @return string HTML.
      */
-    public function toString() {
+    public function toString()
+    {
         if ($this->_UserData->numRows() == 0) {
-            return '';
+            return "";
         }
 
-        $string = '';
+        $string = "";
         ob_start();
         ?>
         <div class="Box BoxInThisDiscussion">
-            <?php echo panelHeading(t('In this Discussion')); ?>
+            <?php echo panelHeading(t("In this Discussion")); ?>
             <ul class="PanelInfo PanelInThisDiscussion">
-                <?php foreach ($this->_UserData->result() as $user) :
-?>
+                <?php foreach ($this->_UserData->result() as $user): ?>
                     <li>
-                        <?php
-                        echo anchor(
-                            wrap(wrap(Gdn_Format::date($user->DateLastActive, 'html')), 'span', ['class' => 'Aside']).' '.
-                            wrap(wrap(htmlspecialchars(val('Name', $user)), 'span', ['class' => 'Username']), 'span'),
+                        <?php echo anchor(
+                            wrap(wrap(Gdn_Format::date($user->DateLastActive, "html")), "span", ["class" => "Aside"]) .
+                                " " .
+                                wrap(
+                                    wrap(htmlspecialchars(val("Name", $user)), "span", ["class" => "Username"]),
+                                    "span"
+                                ),
                             userUrl($user)
-                        )
-                        ?>
+                        ); ?>
                     </li>
-                <?php
-endforeach; ?>
+                <?php endforeach; ?>
             </ul>
         </div>
         <?php

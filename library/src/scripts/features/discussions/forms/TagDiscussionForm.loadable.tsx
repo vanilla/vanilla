@@ -77,6 +77,7 @@ export default function TagDiscussionFormLoadable(props: IProps) {
                         <div className={cx("frameBody-contents", classesFrameBody.contents)}>
                             <TagsInput
                                 id="tagIDs"
+                                type="User"
                                 label={null}
                                 value={values.tagIDs}
                                 onChange={(options: IComboBoxOption[]) => {

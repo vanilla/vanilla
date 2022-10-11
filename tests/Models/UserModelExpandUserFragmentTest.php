@@ -14,7 +14,8 @@ use VanillaTests\SiteTestTrait;
 /**
  * Some basic tests for the `UserModel`.
  */
-class UserModelExpandUserFragmentTest extends TestCase {
+class UserModelExpandUserFragmentTest extends TestCase
+{
     use SiteTestTrait, ExpectExceptionTrait;
 
     /**
@@ -22,27 +23,23 @@ class UserModelExpandUserFragmentTest extends TestCase {
      */
     private $model;
 
-    const VALID_FRAGMENT_FIELDS = [
-        'userID',
-        'name',
-        'photoUrl',
-        'dateLastActive'
-    ];
+    const VALID_FRAGMENT_FIELDS = ["userID", "name", "photoUrl", "dateLastActive"];
 
     const INVALID_FRAGMENT_FIELDS = [
-        'email',
-        'password',
-        'hashMethod',
-        'updateIPAddress',
-        'insertIPAddress',
-        'lastIPAddress',
-        'permissions'
+        "email",
+        "password",
+        "hashMethod",
+        "updateIPAddress",
+        "insertIPAddress",
+        "lastIPAddress",
+        "permissions",
     ];
 
     /**
      * Get a new model for each test.
      */
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         parent::setUp();
 
         $this->model = $this->container()->get(\UserModel::class);
@@ -51,43 +48,41 @@ class UserModelExpandUserFragmentTest extends TestCase {
     /**
      * Test UserModel->expandUsers method
      */
-    public function testExpandUsers() {
-        $name = uniqid('User');
+    public function testExpandUsers()
+    {
+        $name = uniqid("User");
         $user = [
-            'name' => $name,
-            'email' => $name.'@mail.com',
-            'Password' => 'test',
-            'HashMethod' => 'text',
-            'DateInserted' => date("Y-m-d H:i:s"),
-            'DateLastActive' => date("Y-m-d H:i:s"),
+            "name" => $name,
+            "email" => $name . "@mail.com",
+            "Password" => "test",
+            "HashMethod" => "text",
+            "DateInserted" => date("Y-m-d H:i:s"),
+            "DateLastActive" => date("Y-m-d H:i:s"),
         ];
-        $userID = (int)$this->model->SQL->insert($this->model->Name, $user);
+        $userID = (int) $this->model->SQL->insert($this->model->Name, $user);
         $this->assertGreaterThan(0, $userID);
 
         $userRecord = $this->model->getByUsername($name);
         $this->assertEquals($userID, $userRecord->UserID);
 
-        $rows = [
-            ['insertUser' => $userID],
-            ['insertUser' => $userID*1000],
-        ];
-        $this->model->expandUsers($rows, ['insertUser']);
+        $rows = [["insertUser" => $userID], ["insertUser" => $userID * 1000]];
+        $this->model->expandUsers($rows, ["insertUser"]);
         $this->assertEquals(2, count($rows));
         $both = 0;
         foreach ($rows as $row) {
             foreach (self::VALID_FRAGMENT_FIELDS as $validField) {
-                $this->assertArrayHasKey($validField, $row['insertUser']);
+                $this->assertArrayHasKey($validField, $row["insertUser"]);
             }
             foreach (self::INVALID_FRAGMENT_FIELDS as $invalidField) {
-                $this->assertArrayNotHasKey($invalidField, $row['insertUser']);
+                $this->assertArrayNotHasKey($invalidField, $row["insertUser"]);
             }
-            if ($row['insertUser']['userID'] === $userID) {
+            if ($row["insertUser"]["userID"] === $userID) {
                 //existing user
-                $this->assertEquals($name, $row['insertUser']['name']);
+                $this->assertEquals($name, $row["insertUser"]["name"]);
                 $both += 10;
             } else {
                 //unknown user
-                $this->assertEquals(\UserModel::GENERATED_FRAGMENT_KEY_UNKNOWN, $row['insertUser']['name']);
+                $this->assertEquals(\UserModel::GENERATED_FRAGMENT_KEY_UNKNOWN, $row["insertUser"]["name"]);
                 $both += 1;
             }
         }
@@ -97,34 +92,36 @@ class UserModelExpandUserFragmentTest extends TestCase {
     /**
      * Test that empty username are replaced by 'Unknown' by UserModel::expandUsers.
      */
-    public function testExpandUserNoUserName() {
+    public function testExpandUserNoUserName()
+    {
         $user = [
-            'name' => '',
-            'email' => 'noUserName@mail.com',
-            'Password' => 'test',
-            'HashMethod' => 'text',
-            'DateInserted' => date("Y-m-d H:i:s")
+            "name" => "",
+            "email" => "noUserName@mail.com",
+            "Password" => "test",
+            "HashMethod" => "text",
+            "DateInserted" => date("Y-m-d H:i:s"),
         ];
-        $userID = (int)$this->model->SQL->insert($this->model->Name, $user);
-        $row = ['insertUser' => $userID];
-        $this->model->expandUsers($row, ['insertUser']);
-        $this->assertEquals('Unknown', $row['insertUser']['name']);
+        $userID = (int) $this->model->SQL->insert($this->model->Name, $user);
+        $row = ["insertUser" => $userID];
+        $this->model->expandUsers($row, ["insertUser"]);
+        $this->assertEquals("Unknown", $row["insertUser"]["name"]);
     }
 
     /**
      * Test UserModel->getFragmnetById method
      */
-    public function testGetFragmentById() {
-        $name = uniqid('User');
+    public function testGetFragmentById()
+    {
+        $name = uniqid("User");
         $user = [
-            'name' => $name,
-            'email' => $name.'@mail.com',
-            'Password' => 'test',
-            'HashMethod' => 'text',
-            'DateInserted' => date("Y-m-d H:i:s"),
-            'DateLastActive' => date("Y-m-d H:i:s")
+            "name" => $name,
+            "email" => $name . "@mail.com",
+            "Password" => "test",
+            "HashMethod" => "text",
+            "DateInserted" => date("Y-m-d H:i:s"),
+            "DateLastActive" => date("Y-m-d H:i:s"),
         ];
-        $userID = (int)$this->model->SQL->insert($this->model->Name, $user);
+        $userID = (int) $this->model->SQL->insert($this->model->Name, $user);
         $this->assertGreaterThan(0, $userID);
 
         // existing user fragment
@@ -139,8 +136,8 @@ class UserModelExpandUserFragmentTest extends TestCase {
         foreach (self::INVALID_FRAGMENT_FIELDS as $invalidField) {
             $this->assertArrayNotHasKey($invalidField, $row);
         }
-        $this->assertEquals($userID, $row['userID']);
-        $this->assertEquals($name, $row['name']);
+        $this->assertEquals($userID, $row["userID"]);
+        $this->assertEquals($name, $row["name"]);
 
         // unknown user fragment
         $row = $this->model->getFragmentByID(0, true);
@@ -151,7 +148,7 @@ class UserModelExpandUserFragmentTest extends TestCase {
         foreach (self::INVALID_FRAGMENT_FIELDS as $invalidField) {
             $this->assertArrayNotHasKey($invalidField, $row);
         }
-        $this->assertEquals(\UserModel::UNKNOWN_USER_ID, $row['userID']);
-        $this->assertEquals(\UserModel::GENERATED_FRAGMENT_KEY_UNKNOWN, $row['name']);
+        $this->assertEquals(\UserModel::UNKNOWN_USER_ID, $row["userID"]);
+        $this->assertEquals(\UserModel::GENERATED_FRAGMENT_KEY_UNKNOWN, $row["name"]);
     }
 }

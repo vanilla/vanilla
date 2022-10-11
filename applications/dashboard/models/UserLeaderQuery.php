@@ -8,11 +8,14 @@
 namespace Vanilla\Dashboard\Models;
 
 use Vanilla\Dashboard\UserLeaderService;
+use Vanilla\Utility\SerializedPublicPropertiesToJsonTrait;
 
 /**
  * Interface for containing Leaderboard query details.
  */
-class UserLeaderQuery {
+class UserLeaderQuery implements \JsonSerializable
+{
+    use SerializedPublicPropertiesToJsonTrait;
 
     /** @var string */
     public $slotType;
@@ -33,10 +36,10 @@ class UserLeaderQuery {
     public $pointsCategoryID;
 
     /** @var array  */
-    public $includedUserIDs;
+    public $includedRoleIDs;
 
     /** @var array  */
-    public $excludedUserIDs;
+    public $excludedRoleIDs;
 
     /**
      * Constructor of the User Leader.
@@ -44,23 +47,23 @@ class UserLeaderQuery {
      * @param string $slotType
      * @param int|null $categoryID
      * @param int|null $limit
-     * @param int[] $includedUserIDs
-     * @param int[] $excludedUserIDs
+     * @param int[] $includedRoleIDs
+     * @param int[] $excludedRoleIDs
      * @param string|null $leaderboardType
      */
     public function __construct(
         string $slotType,
         ?int $categoryID,
         ?int $limit,
-        ?array $includedUserIDs = [],
-        ?array $excludedUserIDs = [],
+        ?array $includedRoleIDs = [],
+        ?array $excludedRoleIDs = [],
         ?string $leaderboardType = UserLeaderService::LEADERBOARD_TYPE_REPUTATION
     ) {
         $this->slotType = $slotType;
         $this->categoryID = $categoryID;
         $this->limit = $limit;
-        $this->includedUserIDs = $includedUserIDs;
-        $this->excludedUserIDs = $excludedUserIDs;
+        $this->includedRoleIDs = $includedRoleIDs;
+        $this->excludedRoleIDs = $excludedRoleIDs;
         $this->leaderboardType = $leaderboardType;
     }
 }

@@ -11,17 +11,19 @@
 /**
  * Selfish bastard.
  */
-class MeModule extends Gdn_Module {
-
+class MeModule extends Gdn_Module
+{
     /** @var string  */
-    public $CssClass = '';
+    public $CssClass = "";
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->_ApplicationFolder = 'dashboard';
+        $this->_ApplicationFolder = "dashboard";
     }
 
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 }

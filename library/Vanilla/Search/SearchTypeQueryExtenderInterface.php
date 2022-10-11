@@ -10,8 +10,8 @@ namespace Vanilla\Search;
 /**
  * Interface to extend on a query type.
  */
-interface SearchTypeQueryExtenderInterface {
-
+interface SearchTypeQueryExtenderInterface
+{
     /**
      * Extend crawlable record
      *

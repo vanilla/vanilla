@@ -17,8 +17,8 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
 /**
  * Widget to search by tag.
  */
-class SearchWidgetModule extends AbstractReactModule {
-
+class SearchWidgetModule extends AbstractReactModule
+{
     /** @var string|null */
     private $title = null;
 
@@ -28,7 +28,8 @@ class SearchWidgetModule extends AbstractReactModule {
     /**
      * @param string|null $title
      */
-    public function setTitle(?string $title): void {
+    public function setTitle(?string $title): void
+    {
         $this->title = $title;
     }
 
@@ -37,14 +38,16 @@ class SearchWidgetModule extends AbstractReactModule {
      *
      * @param string|null $formSchema
      */
-    public function setFormSchema(?string $formSchema): void {
+    public function setFormSchema(?string $formSchema): void
+    {
         $this->formSchema = $formSchema;
     }
 
     /**
      * @param array<AbstractTabSearchFormSchema|string> $tabFormSchemaClasses
      */
-    public function setTabFormSchemaClasses(array $tabFormSchemaClasses): void {
+    public function setTabFormSchemaClasses(array $tabFormSchemaClasses): void
+    {
         /** @var AbstractTabSearchFormSchema[] $schemaInstances */
         $tabForms = [];
         foreach ($tabFormSchemaClasses as $schemaClass) {
@@ -69,7 +72,8 @@ class SearchWidgetModule extends AbstractReactModule {
      *
      * @return AbstractTabSearchFormSchema|null
      */
-    private function findDefaultTabSchema(array $tabForms): ?AbstractTabSearchFormSchema {
+    private function findDefaultTabSchema(array $tabForms): ?AbstractTabSearchFormSchema
+    {
         foreach ($tabForms as $tabForm) {
             if ($tabForm->isDefault()) {
                 return $tabForm;
@@ -86,7 +90,8 @@ class SearchWidgetModule extends AbstractReactModule {
      *
      * @return Schema
      */
-    private function buildFormSchema(array $tabForms): Schema {
+    private function buildFormSchema(array $tabForms): Schema
+    {
         $defaultTabForm = $this->findDefaultTabSchema($tabForms);
 
         $tabOptions = [];
@@ -94,26 +99,26 @@ class SearchWidgetModule extends AbstractReactModule {
             $tabOptions[$tabForm->getTabID()] = $tabForm->getTitle();
         }
         $schema = [
-            'type' => 'object',
-            'x-control' => [
-                'inputType' => 'tabs',
-                'property' => 'tabID',
-                'choices' => [
-                    'staticOptions' => $tabOptions,
+            "type" => "object",
+            "x-control" => [
+                "inputType" => "tabs",
+                "property" => "tabID",
+                "choices" => [
+                    "staticOptions" => $tabOptions,
                 ],
             ],
-            'properties' => [
-                'tabID' => [
-                    'type' => 'string',
-                    'enum' => array_keys($tabOptions),
-                    'default' => $defaultTabForm->getTabID(),
+            "properties" => [
+                "tabID" => [
+                    "type" => "string",
+                    "enum" => array_keys($tabOptions),
+                    "default" => $defaultTabForm->getTabID(),
                 ],
             ],
-            'required' => ['tabID'],
-            'discriminator' => [
-                'propertyName' => 'tabID',
+            "required" => ["tabID"],
+            "discriminator" => [
+                "propertyName" => "tabID",
             ],
-            'oneOf' => array_map(function (AbstractTabSearchFormSchema $tabForm) {
+            "oneOf" => array_map(function (AbstractTabSearchFormSchema $tabForm) {
                 return $tabForm->schema();
             }, $tabForms),
         ];
@@ -126,11 +131,9 @@ class SearchWidgetModule extends AbstractReactModule {
      *
      * @return Schema
      */
-    public static function getPropsSchema(): Schema {
-        return Schema::parse([
-            'title:s?',
-            'formSchema:s?',
-        ]);
+    public static function getPropsSchema(): Schema
+    {
+        return Schema::parse(["title:s?", "formSchema:s?"]);
     }
 
     /**
@@ -138,10 +141,11 @@ class SearchWidgetModule extends AbstractReactModule {
      *
      * @return array
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         $props = [];
-        $props['title'] = $this->title;
-        $props['formSchema'] = $this->formSchema;
+        $props["title"] = $this->title;
+        $props["formSchema"] = $this->formSchema;
 
         $props = $this->getPropsSchema()->validate($props);
 
@@ -151,23 +155,25 @@ class SearchWidgetModule extends AbstractReactModule {
     /**
      * @inheritdoc
      */
-    public static function getComponentName(): string {
-        return 'SearchWidget';
+    public static function getComponentName(): string
+    {
+        return "SearchWidget";
     }
 
     /**
      * @return Schema
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         $widgetSchema = Schema::parse([
-            'title:s?' => [
-                'x-control' => SchemaForm::textBox(new FormOptions('Title', 'Set a custom title.')),
+            "title:s?" => [
+                "x-control" => SchemaForm::textBox(new FormOptions("Title", "Set a custom title.")),
             ],
-            'formSchema:s?' => [
-                'x-control' => SchemaForm::codeBox(
-                    new FormOptions('Form Schema', 'Set the form schema.'),
-                    'application/json',
-                    'https://json-schema.org/draft-07/schema'
+            "formSchema:s?" => [
+                "x-control" => SchemaForm::codeBox(
+                    new FormOptions("Form Schema", "Set the form schema."),
+                    "application/json",
+                    "https://json-schema.org/draft-07/schema"
                 ),
             ],
         ]);
@@ -178,7 +184,8 @@ class SearchWidgetModule extends AbstractReactModule {
     /**
      * @inheritdoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Search Widget";
     }
 }

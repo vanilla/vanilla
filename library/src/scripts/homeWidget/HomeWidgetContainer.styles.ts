@@ -1,9 +1,9 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { HomeWidgetItemContentType, homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
 import { pageHeadingBoxVariables, SubtitleType } from "@library/layout/PageHeadingBox.variables";
@@ -16,7 +16,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { BorderType, extendItemContainer, negativeUnit } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
-import { getPixelNumber, styleFactory, variableFactory } from "@library/styles/styleUtils";
+import { getPixelNumber, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { Variables } from "@library/styles/Variables";
 import { IThemeVariables } from "@library/theming/themeReducer";
@@ -75,7 +75,7 @@ export const homeWidgetContainerVariables = useThemeCache(
         const itemVars = homeWidgetItemVariables({}, forcedVars);
         const pageHeadingVars = pageHeadingBoxVariables();
 
-        let options = makeVars(
+        let options: IHomeWidgetContainerOptions = makeVars(
             "options",
             {
                 outerBackground: Variables.background({}),
@@ -117,7 +117,7 @@ export const homeWidgetContainerVariables = useThemeCache(
             {
                 ...options,
                 borderType:
-                    options.innerBackground.color || options.innerBackground.image
+                    options.innerBackground?.color || options.innerBackground?.image
                         ? BorderType.SHADOW
                         : BorderType.NONE,
                 maxColumnCount:
@@ -204,15 +204,14 @@ export const homeWidgetContainerVariables = useThemeCache(
 );
 
 export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHomeWidgetContainerOptions) => {
-    const style = styleFactory("homeWidgetContainer");
     const globalVars = globalVariables();
     const vars = homeWidgetContainerVariables(optionOverrides);
     const navLinkVars = navLinksVariables();
 
-    const root = style(
+    const root = css(
         {
             ...Mixins.background(vars.options.outerBackground ?? {}),
-            color: ColorsUtils.colorOut(globalVars.getFgForBg(vars.options.outerBackground.color)),
+            color: ColorsUtils.colorOut(globalVars.getFgForBg(vars.options.outerBackground!.color)),
             width: "100%",
         },
         vars.options.borderType === "navLinks" &&
@@ -224,8 +223,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     );
 
     // For navLinks style only.
-    const separator = style(
-        "separator",
+    const separator = css(
         extendItemContainer(getPixelNumber(navLinkVars.linksWithHeadings.paddings.horizontal) * 2),
         vars.mobileMediaQuery(extendItemContainer(0)),
     );
@@ -238,8 +236,7 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         ...vars.mobileMediaQuery(extendItemContainer(getPixelNumber(vars.itemSpacing.mobile.horizontal))),
     };
 
-    const container = style(
-        "container",
+    const container = css(
         {
             // Backwards compatibility.
             clear: "both",
@@ -253,12 +250,9 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         vars.mobileMediaQuery(extendItemContainer(0)),
     );
 
-    const content = style("content", contentMixin);
+    const content = css(contentMixin);
 
-    const itemWrapper = style(
-        "borderedContent",
-        vars.hasVisibleContainer && Mixins.padding({ horizontal: halfHorizontalSpacing * 2 }),
-    );
+    const itemWrapper = css(vars.hasVisibleContainer && Mixins.padding({ horizontal: halfHorizontalSpacing * 2 }));
 
     const borderStyling: CSSObject = (() => {
         switch (vars.options.borderType) {
@@ -279,10 +273,9 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         }
     })();
 
-    const grid = style(
-        "grid",
+    const grid = css(
         {
-            ...Mixins.background(vars.options.innerBackground),
+            ...Mixins.background(vars.options.innerBackground!),
             display: "flex",
             alignItems: "stretch",
             justifyContent: vars.options.contentAlignment ?? "flex-start",
@@ -309,11 +302,10 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
 
     const itemMixin: CSSObject = {
         flex: 1,
-        flexBasis: percent(100 / vars.options.maxColumnCount),
+        flexBasis: percent(100 / vars.options.maxColumnCount!),
     };
 
-    const gridItem = style(
-        "gridItem",
+    const gridItem = css(
         itemMixin,
         vars.options.contentIsListWithSeparators && {
             "&:not(:first-child) a:before": {
@@ -322,13 +314,12 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
         },
     );
 
-    const gridItemSpacer = style("gridItemSpacer", {
+    const gridItemSpacer = css({
         ...itemMixin,
         minWidth: styleUnit(homeWidgetItemVariables().sizing.minWidth),
     });
 
-    const gridItemContent = style(
-        "gridItemContent",
+    const gridItemContent = css(
         {
             ...Mixins.padding({
                 horizontal: halfHorizontalSpacing,
@@ -344,13 +335,12 @@ export const homeWidgetContainerClasses = useThemeCache((optionOverrides?: IHome
     );
 
     const gridItemWidthConstraint = useThemeCache((maxWidth: number) =>
-        style("gridItemWidthConstraint", {
+        css({
             maxWidth: maxWidth > 0 ? maxWidth : "initial",
         }),
     );
 
-    const viewAllContainer = style(
-        "viewAllContainer",
+    const viewAllContainer = css(
         {
             display: "flex",
             justifyContent: "flex-end",

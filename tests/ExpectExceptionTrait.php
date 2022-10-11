@@ -12,15 +12,16 @@ use PHPUnit\Framework\TestCase;
 /**
  * Allows a test case to expect an error to occur.
  */
-trait ExpectExceptionTrait {
-
+trait ExpectExceptionTrait
+{
     /**
      * Run code the expects and exception and continue.
      *
      * @param string $expectedClass
      * @param callable $callable
      */
-    protected function runWithExpectedException(string $expectedClass, callable $callable) {
+    protected function runWithExpectedException(string $expectedClass, callable $callable)
+    {
         $caught = null;
         try {
             call_user_func($callable);
@@ -28,13 +29,16 @@ trait ExpectExceptionTrait {
             $caught = $e;
         }
 
-        TestCase::assertNotNull($caught, 'Expected to catch an exception, but none was thrown.');
+        TestCase::assertNotNull($caught, "Expected to catch an exception, but none was thrown.");
 
         TestCase::assertInstanceOf(
             $expectedClass,
             $caught,
-            'Expected an ' . $expectedClass . " to occur. Instead caught:\n" . formatException($caught)
+            "Expected an " . $expectedClass . " to occur. Instead caught:\n" . formatException($caught)
         );
+        if (method_exists($caught, "getContext")) {
+            return $caught->getContext();
+        }
     }
 
     /**
@@ -43,7 +47,8 @@ trait ExpectExceptionTrait {
      * @param string $expectedMessage
      * @param callable $callable
      */
-    protected function runWithExpectedExceptionMessage(string $expectedMessage, callable $callable) {
+    protected function runWithExpectedExceptionMessage(string $expectedMessage, callable $callable)
+    {
         $caught = null;
         try {
             call_user_func($callable);
@@ -51,12 +56,15 @@ trait ExpectExceptionTrait {
             $caught = $e;
         }
 
-        TestCase::assertNotNull($caught, 'Expected to catch an exception, but none was thrown.');
+        TestCase::assertNotNull($caught, "Expected to catch an exception, but none was thrown.");
 
         TestCase::assertStringContainsString(
             $expectedMessage,
             $caught->getMessage(),
-            'Expected an exception message containing \'' . $expectedMessage . "' to occur. Instead caught:\n" . formatException($caught)
+            'Expected an exception message containing \'' .
+                $expectedMessage .
+                "' to occur. Instead caught:\n" .
+                formatException($caught)
         );
     }
 
@@ -66,7 +74,8 @@ trait ExpectExceptionTrait {
      * @param int $expectedCode
      * @param callable $callable
      */
-    protected function runWithExpectedExceptionCode(int $expectedCode, callable $callable) {
+    protected function runWithExpectedExceptionCode(int $expectedCode, callable $callable)
+    {
         $caught = null;
         try {
             call_user_func($callable);

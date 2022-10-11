@@ -15,8 +15,8 @@ use Vanilla\Scheduler\SchedulerInterface;
 /**
  * Perform an HTTP request.
  */
-class HttpRequestJob implements LocalJobInterface {
-
+class HttpRequestJob implements LocalJobInterface
+{
     /** @var string|null */
     private $body;
 
@@ -53,7 +53,8 @@ class HttpRequestJob implements LocalJobInterface {
      * @param HttpClient $client
      * @param SchedulerInterface $scheduler
      */
-    public function __construct(HttpClient $client, SchedulerInterface $scheduler) {
+    public function __construct(HttpClient $client, SchedulerInterface $scheduler)
+    {
         $this->client = $client;
         $this->scheduler = $scheduler;
     }
@@ -63,7 +64,8 @@ class HttpRequestJob implements LocalJobInterface {
      *
      * @return Schema
      */
-    private function messageSchema(): Schema {
+    private function messageSchema(): Schema
+    {
         $schema = Schema::parse([
             "body" => [
                 "allowNull" => true,
@@ -102,14 +104,10 @@ class HttpRequestJob implements LocalJobInterface {
     /**
      * {@inheritDoc}
      */
-    public function run(): JobExecutionStatus {
+    public function run(): JobExecutionStatus
+    {
         $startTime = microtime(true);
-        $response = $this->client->request(
-            $this->method,
-            $this->uri,
-            $this->body ?? "",
-            $this->headers ?? []
-        );
+        $response = $this->client->request($this->method, $this->uri, $this->body ?? "", $this->headers ?? []);
         $endTime = microtime(true);
         $duration = intval(($endTime - $startTime) * 1000);
 
@@ -129,7 +127,8 @@ class HttpRequestJob implements LocalJobInterface {
      * @param integer $duration
      * @return void
      */
-    private function scheduleFeedback(HttpResponse $response, int $duration): void {
+    private function scheduleFeedback(HttpResponse $response, int $duration): void
+    {
         if (!is_string($this->feedbackJob)) {
             return;
         }
@@ -144,10 +143,7 @@ class HttpRequestJob implements LocalJobInterface {
             "responseCode" => $response->getStatusCode(),
         ];
         $message = $defaultMessage + $this->feedbackMessage;
-        $this->scheduler->addJob(
-            $this->feedbackJob,
-            $message
-        );
+        $this->scheduler->addJob($this->feedbackJob, $message);
     }
 
     /**
@@ -155,7 +151,8 @@ class HttpRequestJob implements LocalJobInterface {
      *
      * @return Schema
      */
-    public static function getFeedbackSchema(): Schema {
+    public static function getFeedbackSchema(): Schema
+    {
         return Schema::parse([
             "requestHeaders" => [
                 "type" => "string",
@@ -186,14 +183,16 @@ class HttpRequestJob implements LocalJobInterface {
      *
      * @param string $body
      */
-    private function setBody(?string $body): void {
+    private function setBody(?string $body): void
+    {
         $this->body = $body;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setDelay(int $seconds) {
+    public function setDelay(int $seconds)
+    {
         $this->delay = $seconds;
     }
 
@@ -203,7 +202,8 @@ class HttpRequestJob implements LocalJobInterface {
      * @param string|null $job
      * @return void
      */
-    private function setFeedbackJob(?string $job): void {
+    private function setFeedbackJob(?string $job): void
+    {
         $this->feedbackJob = $job;
     }
 
@@ -213,7 +213,8 @@ class HttpRequestJob implements LocalJobInterface {
      * @param array $message
      * @return void
      */
-    private function setFeedbackMessage(array $message): void {
+    private function setFeedbackMessage(array $message): void
+    {
         $this->feedbackMessage = $message;
     }
 
@@ -223,14 +224,16 @@ class HttpRequestJob implements LocalJobInterface {
      * @param array|null $headers
      * @return void
      */
-    private function setHeaders(?array $headers): void {
+    private function setHeaders(?array $headers): void
+    {
         $this->headers = $headers;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setMessage(array $message) {
+    public function setMessage(array $message)
+    {
         $message += [
             "headers" => [],
             "feedbackMessage" => [],
@@ -251,14 +254,16 @@ class HttpRequestJob implements LocalJobInterface {
      * @param string $method
      * @return void
      */
-    private function setMethod(string $method): void {
+    private function setMethod(string $method): void
+    {
         $this->method = $method;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setPriority(JobPriority $priority) {
+    public function setPriority(JobPriority $priority)
+    {
         $this->priority = $priority;
     }
 
@@ -268,7 +273,8 @@ class HttpRequestJob implements LocalJobInterface {
      * @param string $uri
      * @return void
      */
-    private function setUri(string $uri): void {
+    private function setUri(string $uri): void
+    {
         $this->uri = $uri;
     }
 
@@ -278,7 +284,8 @@ class HttpRequestJob implements LocalJobInterface {
      * @param array $headers
      * @return string
      */
-    private function stringifyHeaders(array $headers): string {
+    private function stringifyHeaders(array $headers): string
+    {
         $headerStrings = [];
         foreach ($headers as $directive => $values) {
             if (is_array($values)) {

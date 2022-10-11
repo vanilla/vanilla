@@ -16,15 +16,16 @@ use VanillaTests\Library\Vanilla\Formatting\HtmlNormalizeTrait;
 /**
  * Tests for the `PagerModule`.
  */
-class PagerModuleTest extends TestCase {
-
+class PagerModuleTest extends TestCase
+{
     use SiteTestTrait;
     use HtmlNormalizeTrait;
 
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->controller = self::container()->get(\DiscussionsController::class);
@@ -37,33 +38,37 @@ class PagerModuleTest extends TestCase {
     /**
      * A simple slash should always format properly.
      */
-    public function testFormatUrlSlash(): void {
-        $url = PagerModule::formatUrl('/', '');
-        $this->assertSame('/', $url);
+    public function testFormatUrlSlash(): void
+    {
+        $url = PagerModule::formatUrl("/", "");
+        $this->assertSame("/", $url);
     }
 
     /**
      * An empty page parameter should trim a trailing slash.
      */
-    public function testFormatUrlEmptyPage(): void {
-        $url = PagerModule::formatUrl('/discussions/{Page}', '');
-        $this->assertSame('/discussions', $url);
+    public function testFormatUrlEmptyPage(): void
+    {
+        $url = PagerModule::formatUrl("/discussions/{Page}", "");
+        $this->assertSame("/discussions", $url);
     }
 
     /**
      * If the URL format has a trailing slash then it should not be trimmed.
      */
-    public function testFormatUrlTrailing(): void {
-        $url = PagerModule::formatUrl('/discussions/', '');
-        $this->assertSame('/discussions/', $url);
+    public function testFormatUrlTrailing(): void
+    {
+        $url = PagerModule::formatUrl("/discussions/", "");
+        $this->assertSame("/discussions/", $url);
     }
 
     /**
      * The page parameter should show up in a formatted URL.
      */
-    public function testFormatUrlRegular(): void {
-        $url = PagerModule::formatUrl('/discussions/{Page}', 'p2');
-        $this->assertSame('/discussions/p2', $url);
+    public function testFormatUrlRegular(): void
+    {
+        $url = PagerModule::formatUrl("/discussions/{Page}", "p2");
+        $this->assertSame("/discussions/p2", $url);
     }
 
     /**
@@ -73,7 +78,8 @@ class PagerModuleTest extends TestCase {
      * @param string $expectedHtml
      * @dataProvider provideTestConfigure
      */
-    public function testConfigure(array $params, string $expectedHtml) {
+    public function testConfigure(array $params, string $expectedHtml)
+    {
         $pagerModule = new PagerModule($this->controller);
         $pagerModule->configure(...$params);
         $this->assertHtmlStringEqualsHtmlString($expectedHtml, $pagerModule);
@@ -82,10 +88,11 @@ class PagerModuleTest extends TestCase {
     /**
      * @return array
      */
-    public function provideTestConfigure() {
+    public function provideTestConfigure()
+    {
         return [
-            'simple pager' => [
-                [0, 30, 100, '/discussions/{Page}'],
+            "simple pager" => [
+                [0, 30, 100, "/discussions/{Page}"],
                 <<<EOT
 <div class="PagerWrap">
     <div aria-label="Pagination - Bottom" class="NumberedPager Pager PagerLinkCount-6" id="PagerAfter" role="navigation">
@@ -98,7 +105,8 @@ class PagerModuleTest extends TestCase {
     </div>
 </div>
 EOT
-            ]
+            ,
+            ],
         ];
     }
 }

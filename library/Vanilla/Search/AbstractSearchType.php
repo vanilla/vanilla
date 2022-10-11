@@ -15,8 +15,8 @@ use Vanilla\Search\SearchService;
 /**
  * Interface for a search item.
  */
-abstract class AbstractSearchType {
-
+abstract class AbstractSearchType
+{
     /** @var SearchService */
     protected $searchService;
 
@@ -55,7 +55,8 @@ abstract class AbstractSearchType {
      *
      * @return string
      */
-    public function getIndex(): string {
+    public function getIndex(): string
+    {
         return $this->getRecordType();
     }
 
@@ -64,7 +65,8 @@ abstract class AbstractSearchType {
      *
      * @param \Vanilla\Search\SearchService $searchService
      */
-    public function setSearchService(SearchService $searchService) {
+    public function setSearchService(SearchService $searchService)
+    {
         $this->searchService = $searchService;
     }
 
@@ -84,10 +86,11 @@ abstract class AbstractSearchType {
      * @param array $record
      * @return SearchResultItem
      */
-    public function convertForeignSearchItem(array $record): SearchResultItem {
-        $record['recordType'] = $this->getRecordType();
-        $record['type'] = $this->getType();
-        unset($record['breadcrumbs']);
+    public function convertForeignSearchItem(array $record): SearchResultItem
+    {
+        $record["recordType"] = $this->getRecordType();
+        $record["type"] = $this->getType();
+        unset($record["breadcrumbs"]);
 
         // Ensure the siteID gets expanded.
         return new static::$searchItemClass($record);
@@ -117,7 +120,8 @@ abstract class AbstractSearchType {
      *
      * @return Schema
      */
-    public function getQuerySchemaExtension(): ?Schema {
+    public function getQuerySchemaExtension(): ?Schema
+    {
         return null;
     }
     /**
@@ -134,14 +138,16 @@ abstract class AbstractSearchType {
      *
      * @return Schema|null
      */
-    public function getBoostSchema(): ?Schema {
+    public function getBoostSchema(): ?Schema
+    {
         return null;
     }
 
     /**
      * @return bool
      */
-    public function supportsCollapsing(): bool {
+    public function supportsCollapsing(): bool
+    {
         return false;
     }
 
@@ -150,7 +156,8 @@ abstract class AbstractSearchType {
      *
      * @return bool
      */
-    public function isLegacyTemplateAvailable(): bool {
+    public function isLegacyTemplateAvailable(): bool
+    {
         return true;
     }
 
@@ -160,25 +167,28 @@ abstract class AbstractSearchType {
      * @param Schema $schema
      * @return Schema
      */
-    protected function schemaWithTypes(Schema $schema): Schema {
-        return $schema->merge(Schema::parse([
-            'recordTypes:a?' => [
-                'items' => [
-                    'type' => 'string',
-                    'enum' => [$this->getRecordType()],
+    protected function schemaWithTypes(Schema $schema): Schema
+    {
+        return $schema->merge(
+            Schema::parse([
+                "recordTypes:a?" => [
+                    "items" => [
+                        "type" => "string",
+                        "enum" => [$this->getRecordType()],
+                    ],
+                    "style" => "form",
+                    "description" => "Restrict the search to the specified main type(s) of records.",
                 ],
-                'style' => 'form',
-                'description' => 'Restrict the search to the specified main type(s) of records.',
-            ],
-            'types:a?' => [
-                'items' => [
-                    'type' => 'string',
-                    'enum' => [$this->getType()]
+                "types:a?" => [
+                    "items" => [
+                        "type" => "string",
+                        "enum" => [$this->getType()],
+                    ],
+                    "style" => "form",
+                    "description" => "Restrict the search to the specified type(s) of records.",
                 ],
-                'style' => 'form',
-                'description' => 'Restrict the search to the specified type(s) of records.',
-            ],
-        ]));
+            ])
+        );
     }
 
     /**
@@ -186,7 +196,8 @@ abstract class AbstractSearchType {
      *
      * @return bool
      */
-    public function isExclusiveType(): bool {
+    public function isExclusiveType(): bool
+    {
         return false;
     }
 
@@ -195,7 +206,8 @@ abstract class AbstractSearchType {
      *
      * @return bool
      */
-    public function canBeOptimizedIntoRecordType(): bool {
+    public function canBeOptimizedIntoRecordType(): bool
+    {
         return false;
     }
 
@@ -204,7 +216,8 @@ abstract class AbstractSearchType {
      *
      * @return bool
      */
-    public function userHasPermission(): bool {
+    public function userHasPermission(): bool
+    {
         return true;
     }
 
@@ -215,8 +228,9 @@ abstract class AbstractSearchType {
     /**
      * @return string
      */
-    public function getLegacyCheckBoxID(): string {
-        return $this->getRecordType() . '_' . $this->getType();
+    public function getLegacyCheckBoxID(): string
+    {
+        return $this->getRecordType() . "_" . $this->getType();
     }
 
     /**
@@ -226,7 +240,8 @@ abstract class AbstractSearchType {
      *
      * @return string[]
      */
-    public function getLegacyIndexNames(SearchQuery $query): array {
+    public function getLegacyIndexNames(SearchQuery $query): array
+    {
         return [ucfirst($this->getIndex())];
     }
 

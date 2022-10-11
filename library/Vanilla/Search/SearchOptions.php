@@ -10,8 +10,8 @@ namespace Vanilla\Search;
 /**
  * Options for a search. Includes information like pagination.
  */
-class SearchOptions {
-
+class SearchOptions
+{
     const DEFAULT_LIMIT = 10;
 
     /** @var int */
@@ -26,7 +26,8 @@ class SearchOptions {
      * @param int $offset
      * @param int $limit
      */
-    public function __construct(int $offset = 0, int $limit = self::DEFAULT_LIMIT) {
+    public function __construct(int $offset = 0, int $limit = self::DEFAULT_LIMIT)
+    {
         $this->offset = $offset;
         $this->limit = $limit;
     }
@@ -34,14 +35,16 @@ class SearchOptions {
     /**
      * @return int
      */
-    public function getOffset(): int {
+    public function getOffset(): int
+    {
         return $this->offset;
     }
 
     /**
      * @return int
      */
-    public function getLimit(): int {
+    public function getLimit(): int
+    {
         return $this->limit;
     }
 }

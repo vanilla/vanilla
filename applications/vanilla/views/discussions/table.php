@@ -17,10 +17,21 @@ if ($this->data('_PagerUrl')) {
     $PagerOptions['Url'] = $this->data('_PagerUrl');
 }
 
-echo '<h1 class="H HomepageTitle">'.$this->data('Title').followButton($this->data('Category.CategoryID')).'</h1>';
+
+echo '<section class="headerBoxLayout">';
+echo '<div class="pageHeadingBox">';
+
+echo '<h1 class="H HomepageTitle">'.$this->data('Title').'</h1>';
 
 $Description = $this->data('Category.Description', $this->description());
 echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', ['class' => 'P PageDescription']);
+
+echo '</div>';
+
+echo followButton($this->data('Category.CategoryID'));
+
+echo '</section>';
+
 
 $this->fireEvent('AfterDescription');
 

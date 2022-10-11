@@ -144,6 +144,79 @@ describe("LayoutEditorContents", () => {
             );
         });
 
+        it("can modify widgets", () => {
+            const paramsForWidget = {
+                apiParams: {
+                    featured: true,
+                },
+                title: "My Widget",
+                containerOptions: {
+                    borderType: "border",
+                },
+            };
+
+            const modifiedParamsForWidget = {
+                apiParams: {
+                    featured: false,
+                },
+                title: "My Widget Renamed",
+                containerOptions: {
+                    borderType: "shadow",
+                },
+            };
+            let contents = LayoutEditorFixture.contents({});
+            contents = contents.insertSection(0, {
+                $hydrate: "react.section.2-columns",
+                testID: "section1",
+            });
+
+            contents = contents.insertWidget(
+                {
+                    sectionIndex: 0,
+                    sectionRegion: "mainBottom",
+                    sectionRegionIndex: 0,
+                },
+                {
+                    $hydrate: "react.my-widget",
+                    //testID is widget spec in this case
+                    testID: paramsForWidget,
+                },
+            );
+
+            //created widget
+            LayoutEditorFixture.assertContentStructure(
+                {
+                    section1: {
+                        mainBottom: [paramsForWidget],
+                    },
+                },
+                contents,
+            );
+
+            contents = contents.modifyWidget(
+                {
+                    sectionIndex: 0,
+                    sectionRegion: "mainBottom",
+                    sectionRegionIndex: 0,
+                },
+                {
+                    $hydrate: "react.my-widget",
+                    //testID is widget spec in this case
+                    testID: modifiedParamsForWidget,
+                },
+            );
+
+            //modified widget has different params
+            LayoutEditorFixture.assertContentStructure(
+                {
+                    section1: {
+                        mainBottom: [modifiedParamsForWidget],
+                    },
+                },
+                contents,
+            );
+        });
+
         it("can delete widgets and sections", () => {
             let contents = LayoutEditorFixture.contents({});
             contents = contents.insertSection(0, {
@@ -320,6 +393,34 @@ describe("LayoutEditorContents", () => {
                 },
                 contents,
             );
+        });
+    });
+
+    describe("validation", () => {
+        it("home layout view type required assets validation", () => {
+            let contents = LayoutEditorFixture.contents({});
+            //for now no required assets for home layout view type, but when we have one we should adjust this
+            expect(contents.validate().isValid).toBe(true);
+        });
+        it("discussion list layout view type required assets validation", () => {
+            let contents = LayoutEditorFixture.contents({}, "discussionList");
+
+            //validation should fail unless we have required asset in spec
+            expect(contents.validate().isValid).toBe(false);
+            expect(contents.validate().message).toBe("Missing required widget");
+            contents = contents.insertSection(0, {
+                $hydrate: "react.section.1-column",
+                testID: "section1",
+                children: [
+                    {
+                        $hydrate: "react.asset.discussionList",
+                        apiParams: {},
+                    },
+                ],
+            });
+
+            expect(contents.validate().isValid).toBe(true);
+            expect(contents.validate().message).toBe(null);
         });
     });
 });

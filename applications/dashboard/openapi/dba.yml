@@ -1,0 +1,72 @@
+openapi: 3.0.2
+info:
+    description: API to recalculate counts.
+    title: Vanilla API
+    version: "2.0"
+servers:
+    - url: /api/v2
+paths:
+    /dba/recalculate-aggregates:
+        x-hidden: true
+        put:
+            summary: Recalculate specific aggregates in the database.
+            tags:
+                - Recalculate Aggregates
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                aggregates:
+                                    description: The aggregates to recalculate.
+                                    type: array
+                                    example: ["user-mentions", "discussion.*"]
+                                    items:
+                                        type: string
+                                        enum:
+                                            - user-mentions
+                                            - discussion.*
+                                            - discussion.CountComments
+                                            - discussion.FirstCommentID
+                                            - discussion.LastCommentID
+                                            - discussion.DateLastComment
+                                            - discussion.LastCommentUserID
+                                            - discussion.Hot
+                                            - conversation.*
+                                            - conversation.CountMessages
+                                            - conversation.CountParticipants
+                                            - conversation.FirstMessageID
+                                            - conversation.LastMessageID
+                                            - conversation.DateUpdated
+                                            - conversation.UpdateUserID
+                                            - category.*
+                                            - category.CountChildCategories
+                                            - category.CountDiscussions
+                                            - category.CountComments
+                                            - category.LastDiscussionID
+                                            - category.LastCommentID
+                                            - category.LastDateInserted
+                                            - category.CountAllComments
+                                            - category.ParentLastCommentID
+                                            - category.ParentLastDateInserted
+                                batchSize:
+                                    type: integer
+                                    description: The maximum number of items to process per batch.
+                            required:
+                                - aggregates
+            responses:
+                "200":
+                    description: Success
+                "202":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
+                "403":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
+                "408":
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
+                "400":
+                    description: Bad Request
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "../../dashboard/openapi/responses.yml#/components/schemas/BasicError"

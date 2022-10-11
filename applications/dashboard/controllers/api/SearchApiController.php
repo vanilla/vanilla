@@ -20,8 +20,8 @@ use Vanilla\Search\SearchResults;
 /**
  * Class SearchApiController
  */
-class SearchApiController extends AbstractApiController {
-
+class SearchApiController extends AbstractApiController
+{
     /** Default limit on the number of rows returned in a page. */
     const LIMIT_DEFAULT = 30;
 
@@ -39,10 +39,8 @@ class SearchApiController extends AbstractApiController {
      *
      * @inheritdoc
      */
-    public function __construct(
-        UserModel $userModel,
-        SearchService $searchService
-    ) {
+    public function __construct(UserModel $userModel, SearchService $searchService)
+    {
         $this->userModel = $userModel;
         $this->searchService = $searchService;
     }
@@ -54,29 +52,30 @@ class SearchApiController extends AbstractApiController {
      *
      * @return Data
      */
-    public function index(array $query): Data {
+    public function index(array $query): Data
+    {
         $in = $this->searchService->buildQuerySchema();
         $query = $in->validate($query);
-        $driver = $this->searchService->getActiveDriver($query['driver'] ?? null);
+        $driver = $this->searchService->getActiveDriver($query["driver"] ?? null);
         // Paging
-        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
 
-        $searchResults = $this->searchService->search($query, new SearchOptions($offset, $limit));
+        $searchResults = $driver->search($query, new SearchOptions($offset, $limit));
 
-        $expands = $query['expand'] ?? [];
-        if (isset($query['collapse']) && $query['collapse']) {
-            $expands[] = 'collapse';
+        $expands = $query["expand"] ?? [];
+        if (isset($query["collapse"]) && $query["collapse"]) {
+            $expands[] = "collapse";
         }
         $this->applyExpandFields($searchResults, $expands);
 
         $this->userModel->expandUsers(
             $searchResults,
-            $this->resolveExpandFields($query, ['insertUser' => 'insertUserID'])
+            $this->resolveExpandFields($query, ["insertUser" => "insertUserID"])
         );
 
         $this->userModel->expandUsers(
             $searchResults,
-            $this->resolveExpandFields($query, ['updateUser' => 'updateUserID'])
+            $this->resolveExpandFields($query, ["updateUser" => "updateUserID"])
         );
 
         $totalCount = $searchResults->getTotalCount();
@@ -84,10 +83,10 @@ class SearchApiController extends AbstractApiController {
         return new Data(
             $searchResults,
             [
-                'paging' => ApiUtils::numberedPagerInfo($totalCount, '/api/v2/search', $query, $in),
+                "paging" => ApiUtils::numberedPagerInfo($totalCount, "/api/v2/search", $query, $in),
             ],
             [
-                'x-search-powered-by' => $driver->getName(),
+                "x-search-powered-by" => $driver->getName(),
             ]
         );
     }
@@ -98,7 +97,8 @@ class SearchApiController extends AbstractApiController {
      * @param SearchResults $rows
      * @param array|bool $expandFields
      */
-    public function applyExpandFields(SearchResults &$rows, $expandFields) {
+    public function applyExpandFields(SearchResults &$rows, $expandFields)
+    {
         $populate = function (SearchResultItem &$row) use ($expandFields) {
             $row->setExpands($expandFields);
         };

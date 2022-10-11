@@ -6,11 +6,11 @@
 
 namespace Vanilla\Theme;
 
- /**
-  * Interface for providing variables on a theme.
-  */
-interface VariablesProviderInterface {
-
+/**
+ * Interface for providing variables on a theme.
+ */
+interface VariablesProviderInterface
+{
     /**
      * Get variables to include with a theme.
      *

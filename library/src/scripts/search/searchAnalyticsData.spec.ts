@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { ISearchForm, ISearchResult, ISearchResults } from "@library/search/searchTypes";
+import { ISearchForm, ISearchResult, ISearchResponse } from "@library/search/searchTypes";
 import { getSearchAnalyticsData, IResultAnalyticsData, splitSearchTerms } from "./searchAnalyticsData";
 import * as _appUtils from "@library/utility/appUtils";
 import { SearchFixture } from "@library/search/__fixtures__/Search.fixture";
@@ -85,13 +85,13 @@ describe("splitSearchTerms", () => {
 
 describe("getSearchAnalyticsData", () => {
     let form: ISearchForm;
-    let results: ISearchResults;
+    let response: ISearchResponse;
     let actual: IResultAnalyticsData;
 
     beforeAll(() => {
         form = SearchFixture.createMockSearchForm();
-        results = SearchFixture.createMockSearchResults();
-        actual = getSearchAnalyticsData(form, results);
+        response = SearchFixture.createMockSearchResults();
+        actual = getSearchAnalyticsData(form, response);
     });
     it("The type field is correct", () => {
         expect(actual.type).toBe("search");
@@ -100,10 +100,10 @@ describe("getSearchAnalyticsData", () => {
         expect(actual.domain).toBe(form.domain);
     });
     it("The searchResults count field is derived from the total results", () => {
-        expect(actual.searchResults).toEqual(results.pagination.total);
+        expect(actual.searchResults).toEqual(response.pagination.total);
     });
     it("The page field is reflects the current page", () => {
-        expect(actual.searchResults).toEqual(results.pagination.total);
+        expect(actual.searchResults).toEqual(response.pagination.total);
     });
     it("The site section field is populated", () => {
         expect(actual.siteSection).toEqual(mockSiteSection);
@@ -113,13 +113,13 @@ describe("getSearchAnalyticsData", () => {
     });
     it("The source object is populated", () => {
         const source = { key: "community", label: "Community" };
-        actual = getSearchAnalyticsData(form, results, source);
+        actual = getSearchAnalyticsData(form, response, source);
         expect(actual).toHaveProperty("source");
         expect(actual.source?.key).toBe(source.key);
         expect(actual.source?.label).toBe(source.label);
     });
     it("The author field is populated", () => {
-        const formWithAuthor = SearchFixture.createMockSearchForm({
+        const formWithAuthors = SearchFixture.createMockSearchForm({
             authors: [
                 {
                     value: 1,
@@ -127,7 +127,7 @@ describe("getSearchAnalyticsData", () => {
                 },
             ],
         });
-        actual = getSearchAnalyticsData(formWithAuthor, results);
+        actual = getSearchAnalyticsData(formWithAuthors, response);
         expect(actual.author.authorID.length).toEqual(1);
         expect(actual.author.authorID).toEqual(expect.arrayContaining([1]));
         expect(actual.author.authorName).toEqual(expect.arrayContaining(["Bobby"]));
@@ -141,7 +141,7 @@ describe("getSearchAnalyticsData", () => {
                 },
             ],
         });
-        actual = getSearchAnalyticsData(formWithTags, results);
+        actual = getSearchAnalyticsData(formWithTags, response);
         expect(actual.tag.tagID.length).toEqual(1);
         expect(actual.tag.tagID).toEqual(expect.arrayContaining([1]));
         expect(actual.tag.tagName).toEqual(expect.arrayContaining(["Tag 1"]));
@@ -155,7 +155,7 @@ describe("getSearchAnalyticsData", () => {
                 },
             ],
         });
-        actual = getSearchAnalyticsData(formWithCategories, results);
+        actual = getSearchAnalyticsData(formWithCategories, response);
         expect(actual.category.categoryID.length).toEqual(1);
         expect(actual.category.categoryID).toEqual(expect.arrayContaining([0]));
         expect(actual.category.categoryName).toEqual(expect.arrayContaining(["General"]));
@@ -167,7 +167,7 @@ describe("getSearchAnalyticsData", () => {
                 label: "Guides",
             },
         });
-        actual = getSearchAnalyticsData(formWithKnowledgeBase, results);
+        actual = getSearchAnalyticsData(formWithKnowledgeBase, response);
         expect(actual).toHaveProperty("kb");
         expect(actual.kb.kbID).toEqual(1);
         expect(actual.kb.kbName).toEqual("Guides");

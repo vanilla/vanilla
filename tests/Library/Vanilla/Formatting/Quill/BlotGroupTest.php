@@ -12,15 +12,21 @@ use Vanilla\Formatting\Quill\BlotGroup;
 use Vanilla\Formatting\Quill\Blots\Lines\HeadingTerminatorBlot;
 use Vanilla\Formatting\Quill\Blots\TextBlot;
 
-class BlotGroupTest extends SharedBootstrapTestCase {
-
-    public function testGetIndexForBlockType() {
+class BlotGroupTest extends SharedBootstrapTestCase
+{
+    public function testGetIndexForBlockType()
+    {
         $block = new BlotGroup();
         $emptyBlot = new TextBlot([], [], []);
-        $headingBlot = new HeadingTerminatorBlot(["insert" => "H2",], [], [
-            "attributes" => [
-            "header" => 2,
-        ]]);
+        $headingBlot = new HeadingTerminatorBlot(
+            ["insert" => "H2"],
+            [],
+            [
+                "attributes" => [
+                    "header" => 2,
+                ],
+            ]
+        );
 
         $block->pushBlots([$emptyBlot]);
         $block->pushBlots([$emptyBlot]);

@@ -6,7 +6,7 @@
 
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { JsonSchema, ISchemaRenderProps, IValidationResult } from "./types";
-import { PartialSchemaForm } from "./PartialSchemaForm";
+import { PartialSchemaForm, RenderChildren } from "./PartialSchemaForm";
 import Ajv from "ajv";
 import produce from "immer";
 import { VanillaUIFormControl } from "./vanillaUIControl/VanillaUIFormControl";
@@ -15,11 +15,17 @@ import { VanillaUIFormControlGroup } from "./vanillaUIControl/VanillaUIFormContr
 interface IProps extends ISchemaRenderProps {
     schema: JsonSchema | string;
     instance: any;
-    /** true by default */
+    /** false by default */
     autoValidate?: boolean;
+    /** false by default */
+    validateOnBlur?: boolean;
     onChange(instance: any): void;
     disabled?: boolean;
     vanillaUI?: boolean;
+    onValidationStatusChange?(valid: boolean): void;
+    hideDescriptionInLabels?: boolean;
+    size?: "small" | "default";
+    autocompleteClassName?: string;
 }
 
 export interface IJsonSchemaFormHandle {
@@ -37,7 +43,8 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
     ref: React.Ref<IJsonSchemaFormHandle>,
 ) {
     const {
-        autoValidate,
+        autoValidate = false,
+        validateOnBlur = false,
         instance,
         onChange,
         Form,
@@ -45,8 +52,14 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
         FormTabs,
         FormControl,
         FormControlGroup,
+        FormGroupWrapper,
         vanillaUI = false,
+        onValidationStatusChange,
+        hideDescriptionInLabels = false,
+        size = "default",
+        autocompleteClassName,
     } = props;
+
     const [validation, setValidation] = useState<IValidationResult>();
 
     const schema = useMemo<JsonSchema>(
@@ -66,6 +79,8 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
         FormControl: useMemo(() => FormControl ?? (vanillaUI ? VanillaUIFormControl : undefined), []),
         // eslint-disable-next-line react-hooks/exhaustive-deps
         FormControlGroup: useMemo(() => FormControlGroup ?? (vanillaUI ? VanillaUIFormControlGroup : undefined), []),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        FormGroupWrapper: useMemo(() => FormGroupWrapper ?? (vanillaUI ? RenderChildren : undefined), []),
     };
 
     const schemaRef = useRef(schema);
@@ -79,6 +94,7 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
 
     const ajv = useMemo(() => {
         const ajv = new Ajv({
+            allErrors: true,
             // Will remove additional properties if a schema has { additionalProperties: false }.
             removeAdditional: true,
             // Will set defaults automatically.
@@ -94,6 +110,10 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
         ajv.addKeyword("x-control");
         // Add x-form as a suppported keyword of the schema.
         ajv.addKeyword("x-form");
+        ajv.addFormat(
+            "url",
+            /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/,
+        );
         return ajv;
     }, []);
 
@@ -116,7 +136,13 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
         };
         setValidation(result);
         return result;
-    }, [ajv, onChange]);
+    }, [ajv]);
+
+    useEffect(() => {
+        if (!!validation && typeof validation?.isValid !== undefined) {
+            onValidationStatusChange?.(validation.isValid);
+        }
+    }, [validation]);
 
     // Validate the form every time value changes.
     useEffect(() => {
@@ -143,6 +169,10 @@ export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
             rootSchema={schema}
             rootInstance={instance}
             validation={validation}
+            onBlur={validateOnBlur ? () => validate() : undefined}
+            hideDescriptionInLabels={hideDescriptionInLabels}
+            size={size}
+            autocompleteClassName={autocompleteClassName}
         />
     );
 });

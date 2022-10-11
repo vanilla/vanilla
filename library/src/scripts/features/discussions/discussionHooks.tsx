@@ -26,6 +26,7 @@ import { useUniqueID } from "@library/utility/idUtils";
 import { useDiscussionCheckBoxContext } from "@library/features/discussions/DiscussionCheckboxContext";
 import { useToast } from "@library/features/toaster/ToastContext";
 import ErrorMessages from "@library/forms/ErrorMessages";
+import { ILinkPages } from "@library/navigation/SimplePagerModel";
 
 export function useDiscussion(discussionID: IGetDiscussionByID["discussionID"]): ILoadable<IDiscussion> {
     const actions = useDiscussionActions();
@@ -125,7 +126,11 @@ export function useRemoveDiscussionReaction(discussionID: IDeleteDiscussionReact
 export function useDiscussionList(
     apiParams: IGetDiscussionListParams,
     prehydratedItems?: IDiscussion[],
-): ILoadable<IDiscussion[]> {
+    paging?: ILinkPages,
+): ILoadable<{
+    discussionList: IDiscussion[];
+    pagination?: ILinkPages;
+}> {
     const dispatch = useDispatch();
     const actions = useDiscussionActions();
     const paramHash = stableObjectHash(apiParams);
@@ -135,7 +140,7 @@ export function useDiscussionList(
             dispatch(
                 DiscussionActions.getDiscussionListACs.done({
                     params: apiParams,
-                    result: prehydratedItems,
+                    result: { data: prehydratedItems, pagination: paging },
                 }),
             );
         } else {
@@ -151,14 +156,23 @@ export function useDiscussionList(
     const discussions = useSelector((state: IDiscussionsStoreState) => {
         return loadStatus === LoadStatus.SUCCESS
             ? state.discussions.discussionIDsByParamHash[paramHash]
-                  .data!.map((discussionID) => state.discussions.discussionsByID[discussionID])
+                  .data!.discussions.map((discussionID) => state.discussions.discussionsByID[discussionID])
                   .filter(notEmpty)
             : [];
     });
 
+    const pagination = useSelector((state: IDiscussionsStoreState) => {
+        return loadStatus === LoadStatus.SUCCESS
+            ? state.discussions.discussionIDsByParamHash[paramHash].data?.pagination
+            : {};
+    });
+
     return {
         status: loadStatus,
-        data: discussions,
+        data: {
+            discussionList: discussions,
+            pagination,
+        },
     };
 }
 
@@ -184,13 +198,13 @@ export function useUserCanEditDiscussion(discussion: IDiscussion) {
     );
 }
 
-function usePatchStatus(discussionID: number, patchID: string): LoadStatus {
+function usePatchStatus(discussionID: IDiscussion["discussionID"], patchID: string): LoadStatus {
     return useSelector((state: IDiscussionsStoreState) => {
         return state.discussions.patchStatusByPatchID[`${discussionID}-${patchID}`]?.status ?? LoadStatus.PENDING;
     });
 }
 
-export function useDiscussionPatch(discussionID: number, patchID: string | null = null) {
+export function useDiscussionPatch(discussionID: IDiscussion["discussionID"], patchID: string | null = null) {
     const ownID = useUniqueID("discussionPatch");
     const actualPatchID = patchID ?? ownID;
     const isLoading = usePatchStatus(discussionID, actualPatchID) === LoadStatus.LOADING;
@@ -214,13 +228,13 @@ export function useDiscussionPatch(discussionID: number, patchID: string | null 
     };
 }
 
-function useDiscussionPutTypeStatus(discussionID: number): LoadStatus {
+function useDiscussionPutTypeStatus(discussionID: IDiscussion["discussionID"]): LoadStatus {
     return useSelector((state: IDiscussionsStoreState) => {
         return state.discussions.changeTypeByID[discussionID]?.status ?? LoadStatus.PENDING;
     });
 }
 
-export function useDiscussionPutType(discussionID: number) {
+export function useDiscussionPutType(discussionID: IDiscussion["discussionID"]) {
     const isLoading = useDiscussionPutTypeStatus(discussionID) === LoadStatus.LOADING;
     const actions = useDiscussionActions();
 
@@ -240,7 +254,7 @@ export function useDiscussionPutType(discussionID: number) {
     };
 }
 
-export function usePutDiscussionTags(discussionID: number) {
+export function usePutDiscussionTags(discussionID: IDiscussion["discussionID"]) {
     const actions = useDiscussionActions();
 
     async function putDiscussionTags(tagIDs: number[]) {
@@ -260,7 +274,9 @@ export function usePutDiscussionTags(discussionID: number) {
 /**
  * This hooks will return a selection of the already loaded discussions
  */
-export function useDiscussionByIDs(discussionIDs: RecordID[]): Record<RecordID, IDiscussion> | null {
+export function useDiscussionByIDs(
+    discussionIDs: Array<IDiscussion["discussionID"]>,
+): Record<RecordID, IDiscussion> | null {
     const { getDiscussionByIDs } = useDiscussionActions();
 
     // This state will handle the specific discussions requested
@@ -322,7 +338,7 @@ export function useDiscussionByIDs(discussionIDs: RecordID[]): Record<RecordID, 
 /**
  * This hook is used to display the correct status for the bulk delete form
  */
-export function useBulkDelete(discussionIDs: RecordID | RecordID[]) {
+export function useBulkDelete(discussionIDs: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>) {
     const { bulkDeleteDiscussion } = useDiscussionActions();
     const {
         addCheckedDiscussionsByIDs,
@@ -342,14 +358,9 @@ export function useBulkDelete(discussionIDs: RecordID | RecordID[]) {
         return false;
     }, [statusByID]);
 
-    const filterStatusByID = (
-        statusByID: Record<RecordID, LoadStatus> | null,
-        statusCondition: LoadStatus,
-    ): number[] | null => {
+    const filterStatusByID = (statusByID: Record<RecordID, LoadStatus> | null, statusCondition: LoadStatus) => {
         if (statusByID) {
-            const result = Object.keys(statusByID)
-                .filter((ID) => statusByID[ID] === statusCondition)
-                .map((value) => parseInt(value));
+            const result = Object.keys(statusByID).filter((ID) => statusByID[ID] === statusCondition);
             return result.length > 0 ? result : null;
         }
         return null;
@@ -386,7 +397,7 @@ export function useBulkDelete(discussionIDs: RecordID | RecordID[]) {
     // Execute the delete request and manage the discussion selection
     const deleteSelectedIDs = () => {
         // Fire off the request to delete
-        bulkDeleteDiscussion({ discussionIDs: discussionIDs as number[] });
+        bulkDeleteDiscussion({ discussionIDs: [discussionIDs].flat() });
         // Add these IDs to the pending list
         addPendingDiscussionByIDs(discussionIDs);
         // Remove them from the selection
@@ -401,7 +412,7 @@ export function useBulkDelete(discussionIDs: RecordID | RecordID[]) {
  * This hook is used to power the bulk move form
  */
 export function useBulkDiscussionMove(
-    discussionIDs: RecordID | RecordID[],
+    discussionIDs: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>,
     categoryID: RecordID | undefined,
     addRedirects: boolean,
 ) {
@@ -478,6 +489,64 @@ export function useBulkDiscussionMove(
         removeCheckedDiscussionsByIDs(discussionIDs);
     };
     return { isSuccess, isPending, failedDiscussions, moveSelectedDiscussions };
+}
+
+/**
+ * This hook is used to power the bulk close confirmation
+ */
+export function useBulkDiscussionClose(discussionIDs: Array<IDiscussion["discussionID"]>, closed: boolean = true) {
+    const { bulkCloseDiscussions } = useDiscussionActions();
+    const {
+        addCheckedDiscussionsByIDs,
+        removeCheckedDiscussionsByIDs,
+        addPendingDiscussionByIDs,
+        removePendingDiscussionByIDs,
+    } = useDiscussionCheckBoxContext();
+
+    const patchStatuses = useSelector((state: IDiscussionsStoreState) => state.discussions.patchStatusByPatchID);
+
+    const filterStatusByID = (
+        statusByID: Record<string, ILoadable> | null,
+        statusCondition: LoadStatus,
+    ): RecordID[] => {
+        if (statusByID) {
+            return Object.keys(statusByID)
+                .filter((ID) => statusByID[ID]?.status === statusCondition ?? null)
+                .map((ID) => Number(ID.replace("-close", "")))
+                .filter((ID) => discussionIDs.indexOf(ID) >= 0);
+        }
+        return [];
+    };
+
+    const pendingIDs = useMemo<RecordID[]>(() => filterStatusByID(patchStatuses, LoadStatus.LOADING), [patchStatuses]);
+    const successIDs = useMemo<RecordID[]>(() => filterStatusByID(patchStatuses, LoadStatus.SUCCESS), [patchStatuses]);
+    const failedIDs = useMemo<RecordID[]>(() => filterStatusByID(patchStatuses, LoadStatus.ERROR), [patchStatuses]);
+
+    const isSuccess = useMemo<boolean>(() => successIDs.length > 0, [successIDs]);
+    const isPending = useMemo<boolean>(() => pendingIDs.length > 0, [pendingIDs]);
+    const failedDiscussions = useDiscussionByIDs((failedIDs as number[]) ?? []);
+
+    useEffect(() => {
+        addCheckedDiscussionsByIDs(failedIDs);
+        removePendingDiscussionByIDs(failedIDs);
+    }, [failedIDs]);
+
+    useEffect(() => {
+        removePendingDiscussionByIDs(successIDs);
+    }, [successIDs]);
+
+    const closeSelectedDiscussions = () => {
+        addPendingDiscussionByIDs(discussionIDs);
+        removeCheckedDiscussionsByIDs(discussionIDs);
+        bulkCloseDiscussions({ discussionIDs, closed });
+    };
+
+    return {
+        isSuccess,
+        isPending,
+        failedDiscussions,
+        closeSelectedDiscussions,
+    };
 }
 
 function useCategoryByID(categoryID: RecordID | undefined) {

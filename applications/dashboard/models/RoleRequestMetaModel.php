@@ -23,8 +23,9 @@ use Vanilla\Schema\BasicSchemaSchema;
  *
  * In order for a role to support requests it must have an entry in this table for any request it wants to process.
  */
-final class RoleRequestMetaModel extends \Vanilla\Models\PipelineModel {
-    private const FIELD_SCHEMA = 'attributesSchema';
+final class RoleRequestMetaModel extends \Vanilla\Models\PipelineModel
+{
+    private const FIELD_SCHEMA = "attributesSchema";
     /**
      * @var Schema
      */
@@ -36,12 +37,10 @@ final class RoleRequestMetaModel extends \Vanilla\Models\PipelineModel {
      * @param CurrentUserFieldProcessor $userFields
      * @param CurrentIPAddressProcessor $ipFields
      */
-    public function __construct(
-        CurrentUserFieldProcessor $userFields,
-        CurrentIPAddressProcessor $ipFields
-    ) {
-        parent::__construct('roleRequestMeta');
-        $this->setPrimaryKey('roleID', 'type');
+    public function __construct(CurrentUserFieldProcessor $userFields, CurrentIPAddressProcessor $ipFields)
+    {
+        parent::__construct("roleRequestMeta");
+        $this->setPrimaryKey("roleID", "type");
         $this->schema = new BasicSchemaSchema();
 
         $dateFields = new CurrentDateFieldProcessor();
@@ -54,22 +53,19 @@ final class RoleRequestMetaModel extends \Vanilla\Models\PipelineModel {
         $ipFields->camelCase();
         $this->addPipelineProcessor($ipFields);
 
-        $attributes = new JsonFieldProcessor([self::FIELD_SCHEMA, 'attributes']);
+        $attributes = new JsonFieldProcessor([self::FIELD_SCHEMA, "attributes"]);
         $this->addPipelineProcessor($attributes);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function insert(array $set, array $options = []) {
+    public function insert(array $set, array $options = [])
+    {
         // Check an existing record and change it to an update.
         $current = $this->select($this->pluckPrimaryWhere($set));
         if (!empty($current)) {
-            return $this->update(
-                $set,
-                $this->pluckPrimaryWhere($set),
-                $options
-            );
+            return $this->update($set, $this->pluckPrimaryWhere($set), $options);
         }
 
         return parent::insert($set, $options);
@@ -83,38 +79,31 @@ final class RoleRequestMetaModel extends \Vanilla\Models\PipelineModel {
      *
      * @return Schema
      */
-    public function getAttributesSchema(): Schema {
-        $notificationSchema = Schema::parse([
-            'name:s?',
-            'body:s?',
-            'format?' => new FormatSchema(),
-            'url:s?',
-        ]);
+    public function getAttributesSchema(): Schema
+    {
+        $notificationSchema = Schema::parse(["name:s?", "body:s?", "format?" => new FormatSchema(), "url:s?"]);
 
         $r = Schema::parse([
-            'notification?' => [
-                'type' => 'object',
-                'properties' => [
-                    'approved?' => $notificationSchema,
-                    'denied?' => $notificationSchema,
-                    'communityManager?' => $notificationSchema,
-                ]
+            "notification?" => [
+                "type" => "object",
+                "properties" => [
+                    "approved?" => $notificationSchema,
+                    "denied?" => $notificationSchema,
+                    "communityManager?" => $notificationSchema,
+                ],
             ],
-            'link:o?' => [
-                'name:s?',
-                'description:s?',
+            "link:o?" => ["name:s?", "description:s?"],
+            "allowReapply" => [
+                "type" => "boolean",
+                "default" => "false",
             ],
-            'allowReapply' => [
-                'type' => 'boolean',
-                'default' => 'false'
+            "notifyDenied" => [
+                "type" => "boolean",
+                "default" => "false",
             ],
-            'notifyDenied' => [
-                'type' => 'boolean',
-                'default' => 'false'
-            ],
-            'notifyCommunityManager' => [
-                'type' => 'boolean',
-                'default' => 'false'
+            "notifyCommunityManager" => [
+                "type" => "boolean",
+                "default" => "false",
             ],
         ]);
         return $r;
@@ -123,11 +112,12 @@ final class RoleRequestMetaModel extends \Vanilla\Models\PipelineModel {
     /**
      * {@inheritDoc}
      */
-    protected function handleInnerOperation(Operation $op) {
+    protected function handleInnerOperation(Operation $op)
+    {
         // Validate the attributes schema.
         if ($op->hasSetItem(self::FIELD_SCHEMA)) {
             $schema = json_decode($op->getSetItem(self::FIELD_SCHEMA), true);
-            $schema['description'] = 'Meta';
+            $schema["description"] = "Meta";
             try {
                 $valid = $this->schema->validate($schema);
                 $op->setSetItem(self::FIELD_SCHEMA, json_encode($valid));

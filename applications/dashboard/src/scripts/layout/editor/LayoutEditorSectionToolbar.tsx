@@ -9,8 +9,11 @@ import { layoutEditorClasses } from "@dashboard/layout/editor/LayoutEditor.class
 import { LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditorSelection";
 import { IEditableLayoutWidget, ILayoutEditorPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { EmbedButton } from "@library/embeddedContent/components/EmbedButton";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { EmbedMenu } from "@rich-editor/editor/pieces/EmbedMenu";
+import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import React from "react";
 
@@ -18,6 +21,7 @@ interface IProps {
     path: ILayoutEditorPath;
     offset?: number;
     allowColumnInvert?: boolean;
+    hasAsset?: boolean;
 }
 
 export function LayoutEditorSectionToolbar(props: IProps) {
@@ -28,6 +32,18 @@ export function LayoutEditorSectionToolbar(props: IProps) {
     const globalVars = globalVariables();
     let offsetLeft = (document.body.clientWidth - globalVars.contentWidth - globalVars.gutter.size * 2) / 2;
     offsetLeft = Math.max(globalVars.gutter.size, offsetLeft);
+
+    const trashButton = (
+        <EmbedButton
+            onClick={() => {
+                editorContents.deleteSection(props.path.sectionIndex);
+            }}
+            disabled={props.hasAsset}
+        >
+            <Icon icon={"data-trash"} />
+        </EmbedButton>
+    );
+
     return (
         <EmbedMenu
             className={classes.toolbarOffset(offsetLeft)}
@@ -78,13 +94,14 @@ export function LayoutEditorSectionToolbar(props: IProps) {
                     <Icon icon={"data-swap"} />
                 </EmbedButton>
             )}
-            <EmbedButton
-                onClick={() => {
-                    editorContents.deleteSection(props.path.sectionIndex);
-                }}
+
+            <ConditionalWrap
+                component={ToolTip}
+                condition={!!props.hasAsset}
+                componentProps={{ label: t("This section contains a required widget and cannot be deleted") }}
             >
-                <Icon icon={"data-trash"} />
-            </EmbedButton>
+                {props.hasAsset ? <span>{trashButton}</span> : trashButton}
+            </ConditionalWrap>
         </EmbedMenu>
     );
 }

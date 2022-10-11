@@ -1,9 +1,9 @@
 <?php
 /**
-* @author Richard Flynn <richard.flynn@vanillaforums.com>
-* @copyright 2009-2019 Vanilla Forums Inc.
-* @license GPL-2.0-only
-*/
+ * @author Richard Flynn <richard.flynn@vanillaforums.com>
+ * @copyright 2009-2019 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
 
 namespace VanillaTests\Library\Core;
 
@@ -12,7 +12,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for debug().
  */
-class DebugTest extends TestCase {
+class DebugTest extends TestCase
+{
     /**
      * @var bool
      */
@@ -21,7 +22,8 @@ class DebugTest extends TestCase {
     /**
      * {@inheritDoc}
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->debug = debug();
     }
@@ -29,11 +31,11 @@ class DebugTest extends TestCase {
     /**
      * {@inheritDoc}
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
         debug($this->debug);
     }
-
 
     /**
      * Test {@link debug()} against several scenarios.
@@ -42,7 +44,8 @@ class DebugTest extends TestCase {
      * @param bool $expected The expected result.
      * @dataProvider provideDebugArrays
      */
-    public function testDebug($testValue, $expected) {
+    public function testDebug($testValue, $expected)
+    {
         $actual = debug($testValue);
         $this->assertSame($expected, $actual);
     }
@@ -52,20 +55,12 @@ class DebugTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideDebugArrays() {
+    public function provideDebugArrays()
+    {
         $r = [
-            'nullCase' => [
-                null,
-                false,
-            ],
-            'trueCase' => [
-                true,
-                true,
-            ],
-            'false case' => [
-                false,
-                false,
-            ],
+            "nullCase" => [null, false],
+            "trueCase" => [true, true],
+            "false case" => [false, false],
         ];
 
         return $r;

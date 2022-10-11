@@ -4,7 +4,7 @@
  */
 
 import qs from "qs";
-import { ensureString } from "@vanilla/utils";
+import { ensureString, RecordID } from "@vanilla/utils";
 
 /**
  * Represent pages potentially returned from a Link header.
@@ -15,6 +15,8 @@ export interface ILinkPages {
     limit?: number;
     total?: number;
     currentPage?: number;
+    nextURL?: string;
+    prevURL?: string;
 }
 
 export interface IWithPagination<T> {

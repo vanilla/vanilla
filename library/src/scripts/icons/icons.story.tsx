@@ -49,7 +49,7 @@ function IconSet({ icons }) {
 
 const vanillaIconsStyle = css({
     display: "flex",
-    maxHeight: 600, // Adjust this to fit more icons.
+    maxHeight: 1200, // Adjust this to fit more icons.
     flexFlow: "column wrap",
     width: "calc(100% + 240px)",
     transform: "translateX(-105px)",

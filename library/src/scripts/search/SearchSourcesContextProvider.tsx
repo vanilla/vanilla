@@ -35,8 +35,7 @@ export function SearchSourcesContextProvider(props: { children: ReactNode }) {
     useEffect(() => {
         sources.forEach((source) => {
             if (source.key !== currentSource.key) {
-                SearchService.sourceControllers[source.key]?.abort();
-                SearchService.createNewController(source.key);
+                source.abort?.();
             }
         });
     }, [currentSource, sources]);

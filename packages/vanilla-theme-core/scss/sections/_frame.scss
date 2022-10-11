@@ -109,14 +109,12 @@
 }
 
 .Frame-content {
-
     .HomepageTitle,
     .PageDescription {
         margin-bottom: $global-block_margin;
     }
 
     .HomepageTitle {
-
         .AdminCheck {
             padding: 0;
             height: calc(#{$global-title_fontSize} * #{$global-condensed_lineHeight});

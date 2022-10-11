@@ -12,13 +12,19 @@ import { RecordID, stableObjectHash } from "@vanilla/utils";
 import { IReaction } from "@dashboard/@types/api/reaction";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import difference from "lodash/difference";
+import { ILinkPages } from "@library/navigation/SimplePagerModel";
 export interface IDiscussionsStoreState {
     discussions: IDiscussionState;
 }
 interface IDiscussionState {
     discussionsByID: Record<RecordID, IDiscussion>;
-    discussionIDsByParamHash: Record<string, ILoadable<Array<IDiscussion["discussionID"]>>>;
-
+    discussionIDsByParamHash: Record<
+        RecordID,
+        ILoadable<{
+            discussions: Array<IDiscussion["discussionID"]>;
+            pagination?: ILinkPages;
+        }>
+    >;
     fullRecordStatusesByID: Record<number, ILoadable>;
     bookmarkStatusesByID: Record<number, ILoadable>;
     changeTypeByID: Record<number, ILoadable>;
@@ -34,7 +40,6 @@ interface IDiscussionState {
 export const INITIAL_DISCUSSIONS_STATE: IDiscussionState = {
     discussionsByID: {},
     discussionIDsByParamHash: {},
-
     fullRecordStatusesByID: {},
     bookmarkStatusesByID: {},
     patchStatusByPatchID: {},
@@ -159,9 +164,12 @@ export const discussionsReducer = produce(
             const paramHash = stableObjectHash(payload.params);
             state.discussionIDsByParamHash[paramHash] = {
                 status: LoadStatus.SUCCESS,
-                data: payload.result.map(({ discussionID }) => discussionID),
+                data: {
+                    discussions: payload.result.data.map(({ discussionID }) => discussionID),
+                    pagination: payload.result.pagination,
+                },
             };
-            payload.result.forEach((discussion) => {
+            payload.result.data.forEach((discussion) => {
                 state.discussionsByID[discussion.discussionID] = {
                     ...state.discussionsByID[discussion.discussionID],
                     ...discussion,
@@ -223,10 +231,10 @@ export const discussionsReducer = produce(
             delete state.discussionsByID[discussionID];
 
             Object.keys(state.discussionIDsByParamHash).forEach((paramHash) => {
-                if (state.discussionIDsByParamHash[paramHash].data !== undefined) {
-                    state.discussionIDsByParamHash[paramHash].data = state.discussionIDsByParamHash[
+                if (state.discussionIDsByParamHash[paramHash].data?.discussions !== undefined) {
+                    state.discussionIDsByParamHash[paramHash].data!.discussions = state.discussionIDsByParamHash[
                         paramHash
-                    ].data!.filter((key) => key !== discussionID);
+                    ].data!.discussions.filter((key) => key !== discussionID);
                 }
             });
 
@@ -420,10 +428,10 @@ export const discussionsReducer = produce(
                 });
 
                 Object.keys(state.discussionIDsByParamHash).forEach((paramHash) => {
-                    if (state.discussionIDsByParamHash[paramHash].data !== undefined) {
-                        state.discussionIDsByParamHash[paramHash].data = state.discussionIDsByParamHash[
+                    if (state.discussionIDsByParamHash[paramHash].data?.discussions !== undefined) {
+                        state.discussionIDsByParamHash[paramHash].data!.discussions = state.discussionIDsByParamHash[
                             paramHash
-                        ].data!.filter((key) => !successIDs.includes(key));
+                        ].data!.discussions.filter((key) => !successIDs.includes(key));
                     }
                 });
             }
@@ -477,6 +485,51 @@ export const discussionsReducer = produce(
                             },
                         };
                     }
+                });
+            }
+
+            return state;
+        })
+        .case(DiscussionActions.bulkCloseDiscussionsACs.started, (state, params) => {
+            const { discussionIDs } = params;
+            discussionIDs.forEach((ID) => {
+                state.patchStatusByPatchID[`${ID}-close`] = {
+                    status: LoadStatus.LOADING,
+                };
+            });
+            return state;
+        })
+        .case(DiscussionActions.bulkCloseDiscussionsACs.failed, (state, payload) => {
+            const { discussionIDs } = payload.params;
+            discussionIDs.forEach((ID) => {
+                state.patchStatusByPatchID[`${ID}-close`] = {
+                    status: LoadStatus.ERROR,
+                    error: payload.error,
+                };
+            });
+            return state;
+        })
+        .case(DiscussionActions.bulkCloseDiscussionsACs.done, (state, payload) => {
+            const { failedIDs, exceptionsByID, successIDs } = payload.result.progress;
+
+            if (failedIDs && failedIDs.length > 0) {
+                failedIDs.forEach((ID) => {
+                    state.patchStatusByPatchID[`${ID}-close`] = {
+                        status: LoadStatus.ERROR,
+                        error: exceptionsByID[ID],
+                    };
+                });
+            }
+
+            if (successIDs && successIDs.length > 0) {
+                successIDs.forEach((ID) => {
+                    state.patchStatusByPatchID[`${ID}-close`] = {
+                        status: LoadStatus.SUCCESS,
+                    };
+                    state.discussionsByID[ID] = {
+                        ...state.discussionsByID[ID],
+                        closed: true,
+                    };
                 });
             }
 

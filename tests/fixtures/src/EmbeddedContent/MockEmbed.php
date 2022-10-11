@@ -13,8 +13,8 @@ use Vanilla\EmbeddedContent\AbstractEmbed;
 /**
  * A configurable stub embed for usage in tests.
  */
-class MockEmbed extends AbstractEmbed {
-
+class MockEmbed extends AbstractEmbed
+{
     const TYPE = "testEmbedType";
 
     private $allowedTypes = [self::TYPE];
@@ -25,7 +25,8 @@ class MockEmbed extends AbstractEmbed {
      * @param array $data
      * @param array|null $allowedTypes
      */
-    public function __construct(array $data, array $allowedTypes = null) {
+    public function __construct(array $data, array $allowedTypes = null)
+    {
         if ($allowedTypes) {
             $this->allowedTypes = $allowedTypes;
         }
@@ -37,27 +38,28 @@ class MockEmbed extends AbstractEmbed {
      *
      * @return MockEmbed
      */
-    public static function nullEmbed(): MockEmbed {
+    public static function nullEmbed(): MockEmbed
+    {
         return new MockEmbed([
-            'embedType' => self::TYPE,
-            'url' => 'https://test.com',
-            'testProp' => 'test',
+            "embedType" => self::TYPE,
+            "url" => "https://test.com",
+            "testProp" => "test",
         ]);
     }
 
     /**
      * @return array
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return $this->allowedTypes;
     }
 
     /**
      * @return Schema
      */
-    protected function schema(): Schema {
-        return Schema::parse([
-            'testProp:s?',
-        ]);
+    protected function schema(): Schema
+    {
+        return Schema::parse(["testProp:s?"]);
     }
 }

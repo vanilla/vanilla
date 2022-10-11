@@ -10,8 +10,8 @@ namespace Vanilla\Contracts\Site;
 /**
  * Interface for provider childIDs related to a site section.
  */
-interface SiteSectionChildIDProviderInterface {
-
+interface SiteSectionChildIDProviderInterface
+{
     /**
      * Get child ids for a site section.
      *

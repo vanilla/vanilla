@@ -13,12 +13,13 @@ use PHPUnit\Framework\TestCase;
  * Tests for tagFullName().
  */
 
-class TagFullNameTest extends TestCase {
-
+class TagFullNameTest extends TestCase
+{
     /**
      * Test for {@link tagFullName()} with 'FullName' field.
      */
-    public function testTagFullName() {
+    public function testTagFullName()
+    {
         $testRow = ["FullName" => "John Q Public"];
         $expected = "John Q Public";
         $actual = tagFullName($testRow);
@@ -28,7 +29,8 @@ class TagFullNameTest extends TestCase {
     /**
      * Test for {@link tagFullName()} with 'Name' field.
      */
-    public function testTagFullNameWithOnlyNameField() {
+    public function testTagFullNameWithOnlyNameField()
+    {
         $testRow = ["Name" => "John"];
         $expected = "John";
         $actual = tagFullName($testRow);

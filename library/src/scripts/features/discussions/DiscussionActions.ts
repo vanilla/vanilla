@@ -15,17 +15,18 @@ import intersection from "lodash/intersection";
 import { IForumStoreState } from "@vanilla/addon-vanilla/redux/state";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { IDiscussionsStoreState } from "@library/features/discussions/discussionsReducer";
+import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
 
 const createAction = actionCreatorFactory("@@discussions");
 
 export interface IGetDiscussionByID {
-    discussionID: number;
+    discussionID: IDiscussion["discussionID"];
 }
 export interface IGetCategoryByID {
     categoryID: RecordID;
 }
 export interface IGetDiscussionsByIDs {
-    discussionIDs: RecordID[];
+    discussionIDs: Array<IDiscussion["discussionID"]>;
     limit?: number;
     expand?: string | string[];
 }
@@ -92,18 +93,24 @@ export interface IBulkDeleteDiscussion {
 }
 
 export interface IBulkMoveDiscussions {
-    discussionIDs: RecordID[];
+    discussionIDs: Array<IDiscussion["discussionID"]>;
     categoryID: RecordID;
     addRedirects: boolean;
     category?: ICategoryFragment;
 }
+
+export interface IBulkCloseDiscussions {
+    discussionIDs: Array<IDiscussion["discussionID"]>;
+    closed: boolean;
+}
+
 export interface IBulkActionSyncResult {
     callbackPayload: string | null;
     progress: {
         countTotalIDs: number;
         exceptionsByID: Record<string | number, any>;
-        failedIDs: number[];
-        successIDs: number[];
+        failedIDs: RecordID[];
+        successIDs: RecordID[];
     };
 }
 
@@ -116,22 +123,33 @@ export interface IPutDiscussionTags {
     tagIDs: number[];
 }
 
+export interface IGetDiscussionsListResponse {
+    data: IDiscussion[];
+    pagination?: ILinkPages;
+}
+
 export default class DiscussionActions extends ReduxActions<
     IForumStoreState & ICoreStoreState & IDiscussionsStoreState
 > {
-    public static getDiscussionListACs = createAction.async<IGetDiscussionListParams, IDiscussion[], IApiError>(
-        "GET_DISCUSSION_LIST",
-    );
+    public static getDiscussionListACs = createAction.async<
+        IGetDiscussionListParams,
+        IGetDiscussionsListResponse,
+        IApiError
+    >("GET_DISCUSSION_LIST");
 
     public getDiscussionList = (params: IGetDiscussionListParams) => {
         const thunk = bindThunkAction(DiscussionActions.getDiscussionListACs, async () => {
-            const reponse = await this.api.get(`/discussions`, {
+            const response = await this.api.get(`/discussions`, {
                 params: {
                     ...params,
                     expand: ["insertUser", "breadcrumbs"],
                 },
             });
-            return reponse.data;
+            const pagination = SimplePagerModel.parseHeaders(response.headers);
+            return {
+                data: response.data,
+                pagination,
+            };
         })(params);
         return this.dispatch(thunk);
     };
@@ -342,6 +360,29 @@ export default class DiscussionActions extends ReduxActions<
             DiscussionActions.bulkMoveDiscussionsACs,
             moveDiscussionsApi,
         )({ discussionIDs, categoryID, addRedirects, category });
+        return this.dispatch(thunk);
+    };
+
+    public static bulkCloseDiscussionsACs = createAction.async<IBulkCloseDiscussions, IBulkActionSyncResult, IApiError>(
+        "BULK_CLOSE_DISCUSSIONS",
+    );
+
+    public bulkCloseDiscussions = (query: IBulkCloseDiscussions) => {
+        const { discussionIDs, closed } = query;
+
+        const closeDiscussionsApi = async () => {
+            const response = await this.api.patch(
+                `discussions/close`,
+                { discussionIDs, closed },
+                { params: { longRunnerMode: "sync" } },
+            );
+            return response.data;
+        };
+
+        const thunk = bindThunkAction(
+            DiscussionActions.bulkCloseDiscussionsACs,
+            closeDiscussionsApi,
+        )({ discussionIDs, closed });
         return this.dispatch(thunk);
     };
 

@@ -1,0 +1,77 @@
+openapi: 3.0.2
+info:
+x-resourceEvents:
+    session:
+        x-addon: "vanilla"
+        name: "Session"
+        type: "session"
+paths:
+    /sessions:
+        get:
+            parameters:
+                - name: filter
+                  description: Filters records by valid/invalid session.
+                  in: query
+                  required: false
+                  schema:
+                      type: string
+                      enum:
+                          - valid
+                          - invalid
+                - name: userID
+                  description: The user ID.
+                  in: query
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        sessionID:
+                                            type: string
+                                        userID:
+                                            type: integer
+                                        dateInserted:
+                                            type: string
+                                            format: date-time
+                                        dateUpdated:
+                                            type: string
+                                            format: date-time
+                                        dateExpires:
+                                            type: string
+                                            format: date-time
+                                            nullable: true
+                    description: Success
+            tags:
+                - Sessions
+            summary: List sessions.
+        delete:
+            parameters:
+                - name: userID
+                  description: The user ID.
+                  in: query
+                  required: true
+                  schema:
+                      type: integer
+                - name: sessionID
+                  description: The session ID.
+                  in: query
+                  required: false
+                  schema:
+                      type: string
+            responses:
+                "204":
+                    description: Success
+                "404":
+                    description: Session couldn't be found.
+                "500":
+                    description: Session couldn't be deleted.
+            tags:
+                - Sessions
+            summary: Delete a session.

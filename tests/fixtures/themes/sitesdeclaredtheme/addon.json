@@ -3,9 +3,5 @@
     "name": "Test Theme",
     "type": "theme",
     "hidden": false,
-    "sites": [
-        "vanilla.vanillacommunities.com",
-        "vanilla.vanillastaging.com",
-        "vanilla"
-    ]
+    "sites": ["vanilla.vanillacommunities.com", "vanilla.vanillastaging.com", "vanilla"]
 }

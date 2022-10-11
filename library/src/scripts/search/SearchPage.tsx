@@ -30,7 +30,7 @@ import debounce from "lodash/debounce";
 import qs from "qs";
 import React, { useCallback, useEffect, useMemo } from "react";
 import { useLocation, useHistory } from "react-router";
-import TwoColumnSection from "@library/layout/TwoColumnSection";
+import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import { SectionProvider, useSection } from "@library/layout/LayoutContext";
 import PanelWidget from "@library/layout/components/PanelWidget";
 import PanelWidgetHorizontalPadding from "@library/layout/components/PanelWidgetHorizontalPadding";
@@ -58,15 +58,8 @@ interface IProps {
 }
 
 function SearchPage(props: IProps) {
-    const {
-        form,
-        updateForm,
-        search,
-        results,
-        getDomains,
-        getCurrentDomain,
-        getDefaultFormValues,
-    } = useSearchForm<{}>();
+    const { form, updateForm, search, results, getDomains, getCurrentDomain, getDefaultFormValues } =
+        useSearchForm<{}>();
 
     const { isCompact } = useSection();
     const classes = pageTitleClasses();
@@ -199,7 +192,7 @@ function SearchPage(props: IProps) {
                 tabType={TabsTypes.BROWSE}
                 data={sources.map((source) => ({
                     tabID: source.key,
-                    label: source.getLabel(),
+                    label: source.label,
                     contents: <SearchPageResults />,
                 }))}
                 onChange={({ tabID: newSourceKey }) => {
@@ -224,10 +217,12 @@ function SearchPage(props: IProps) {
                             scope,
                             needsResearch: undefined,
                             source: currentSource.key,
+                            pageURL: undefined,
+                            offset: undefined,
                         }}
                         defaults={getDefaultFormValues()}
                     />
-                    <TwoColumnSection
+                    <SectionTwoColumns
                         className="hasLargePadding"
                         mainTop={
                             <>
@@ -384,7 +379,7 @@ function useInitialQueryParamSync() {
             }
         }
 
-        const blockedKeys = ["needsResearch", "initialized"];
+        const blockedKeys = ["needsResearch", "initialized", "pageURL", "offset"];
         blockedKeys.forEach((key) => {
             if (queryForm[key] !== undefined) {
                 delete queryForm[key];

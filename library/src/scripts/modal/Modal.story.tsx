@@ -5,7 +5,7 @@
 
 import React, { useState } from "react";
 import Modal from "@library/modal/Modal";
-import { STORY_IPSUM_LONG, STORY_IPSUM_SHORT, StoryTextContent } from "@library/storybook/storyData";
+import { StoryTextContent } from "@library/storybook/storyData";
 import ModalSizes from "@library/modal/ModalSizes";
 import Frame from "@library/layout/frame/Frame";
 import FrameHeader from "@library/layout/frame/FrameHeader";
@@ -19,7 +19,7 @@ export default {
     title: "Layout/Modals",
 };
 
-export function DismissableModal() {
+function DismissableModalStory() {
     const [isVisible, setIsVisible] = useState(true);
     const close = () => setIsVisible(false);
 
@@ -113,4 +113,8 @@ export function ModalWithTabs() {
             />
         </Modal>
     );
+}
+
+export function DismissableModal() {
+    return <DismissableModalStory />;
 }

@@ -9,6 +9,8 @@ namespace Vanilla\Theme;
 
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
+use PHPUnit\Framework\Error\Notice;
+use PHPUnit\Framework\Error\Warning;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Theme\Asset\HtmlThemeAsset;
 use Vanilla\Theme\Asset\JavascriptThemeAsset;
@@ -27,8 +29,8 @@ use Vanilla\Web\JsInterpop\ReduxErrorAction;
 /**
  * Class for preloading theme data into the frontend.
  */
-class ThemePreloadProvider implements ReduxActionProviderInterface {
-
+class ThemePreloadProvider implements ReduxActionProviderInterface
+{
     /** @var SiteMeta */
     private $siteMeta;
 
@@ -76,28 +78,32 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /**
      * @param int|string $forcedThemeKey
      */
-    public function setForcedThemeKey($forcedThemeKey): void {
+    public function setForcedThemeKey($forcedThemeKey): void
+    {
         $this->forcedThemeKey = $forcedThemeKey;
     }
 
     /**
      * @param int|null $revisionID
      */
-    public function setForcedRevisionID(?int $revisionID = null): void {
+    public function setForcedRevisionID(?int $revisionID = null): void
+    {
         $this->revisionID = $revisionID;
     }
 
     /**
      * @return string|int
      */
-    private function getThemeKeyToPreload() {
+    private function getThemeKeyToPreload()
+    {
         return $this->forcedThemeKey ?: $this->siteMeta->getActiveThemeKey();
     }
 
     /**
      * @return int
      */
-    private function getThemeRevisionID(): ?int {
+    private function getThemeRevisionID(): ?int
+    {
         return $this->revisionID ?? $this->siteMeta->getActiveThemeRevisionID();
     }
 
@@ -107,7 +113,8 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      *
      * @return ThemeScriptAsset|null
      */
-    public function getThemeScript(): ?ThemeScriptAsset {
+    public function getThemeScript(): ?ThemeScriptAsset
+    {
         $theme = $this->getPreloadTheme();
         if (!$theme) {
             return null;
@@ -124,7 +131,8 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /**
      * Get the theme (with some local caching so it isn't requested twice).
      */
-    public function getPreloadTheme(): ?Theme {
+    public function getPreloadTheme(): ?Theme
+    {
         if (!$this->theme) {
             $this->loadData();
         }
@@ -135,28 +143,30 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /**
      * Load data from the theme API.
      */
-    private function loadData() {
+    private function loadData()
+    {
         $themeKey = $this->getThemeKeyToPreload();
 
         // Forced theme keys disable addon variables.
         $args = [
-            'allowAddonVariables' => !$this->forcedThemeKey,
-            'expand' => ['fonts.data', 'variables.data']
+            "allowAddonVariables" => !$this->forcedThemeKey,
+            "expand" => ["fonts.data", "variables.data"],
         ];
         if (!empty($this->revisionID)) {
             // when theme-settings/{id}/revisions preview
-            $args['revisionID'] = $this->revisionID;
-        } elseif (!$this->forcedThemeKey && !empty($revisionID = $this->siteMeta->getActiveThemeRevisionID())) {
-            $args['revisionID'] = $revisionID;
+            $args["revisionID"] = $this->revisionID;
+        } elseif (!$this->forcedThemeKey && !empty(($revisionID = $this->siteMeta->getActiveThemeRevisionID()))) {
+            $args["revisionID"] = $revisionID;
         }
 
         try {
-            $response = $this->themesApi->get(
-                $themeKey,
-                $args
-            );
-            $this->theme = $response->getMeta('theme');
+            $response = $this->themesApi->get($themeKey, $args);
+            $this->theme = $response->getMeta("theme");
         } catch (\Throwable $e) {
+            if ($e instanceof Warning || $e instanceof Notice) {
+                // Throw PHPUnit warnings and notices back up.
+                throw $e;
+            }
             // Prevent infinite loops.
             // Our error handling page uses the theme when possible.
             // As a result we absolutely CANNOT ever allow the this function to bubble up an error.
@@ -170,41 +180,37 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
     /**
      * @return array
      */
-    public function createActions(): array {
+    public function createActions(): array
+    {
         $data = $this->getPreloadTheme();
         if (!$data) {
             if ($this->themeFetchError) {
-                return [
-                    new ReduxErrorAction($this->themeFetchError),
-                ];
+                return [new ReduxErrorAction($this->themeFetchError)];
             } else {
                 return [];
             }
         }
 
         // Preload the theme variables for the frontend.
-        return [new ReduxAction(
-            \ThemesApiController::GET_THEME_ACTION,
-            new Data($data),
-            [ 'key' => $data ]
-        )];
+        return [new ReduxAction(\ThemesApiController::GET_THEME_ACTION, new Data($data), ["key" => $data])];
     }
 
     /** @var string */
-    private $inlineStyles = '';
+    private $inlineStyles = "";
 
     /**
      * Get an inline style tag for the header and footer.
      */
-    private function getThemeInlineCss(): string {
+    private function getThemeInlineCss(): string
+    {
         if (!$this->inlineStyles) {
             $theme = $this->getPreloadTheme();
             if (!$theme) {
-                return '';
+                return "";
             }
             $styles = $theme->getAssets()[ThemeAssetFactory::ASSET_STYLES] ?? null;
             if ($styles) {
-                $this->inlineStyles = '<style>' . $styles->__toString() . '</style>';
+                $this->inlineStyles = "<style>" . $styles->__toString() . "</style>";
             }
         }
 
@@ -216,10 +222,11 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      *
      * @return string
      */
-    public function getThemeFooterHtml(): string {
+    public function getThemeFooterHtml(): string
+    {
         $theme = $this->getPreloadTheme();
         if (!$theme) {
-            return '';
+            return "";
         }
 
         $footer = $theme->getAssets()[ThemeAssetFactory::ASSET_FOOTER] ?? null;
@@ -231,15 +238,16 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      *
      * @return string
      */
-    public function getThemeHeaderHtml(): string {
+    public function getThemeHeaderHtml(): string
+    {
         $theme = $this->getPreloadTheme();
         if (!$theme) {
-            return '';
+            return "";
         }
         $header = $theme->getAssets()[ThemeAssetFactory::ASSET_HEADER] ?? null;
         $variables = $theme->getAssets()[ThemeAssetFactory::ASSET_VARIABLES] ?? null;
         if ($variables instanceof JsonThemeAsset) {
-            $bgImage = $variables->get('titleBar.colors.bgImage', null);
+            $bgImage = $variables->get("titleBar.colors.bgImage", null);
             if ($bgImage !== null) {
                 $asset = new ExternalAsset($bgImage);
                 $preloader = new AssetPreloader($asset, AssetPreloader::REL_PRELOAD, AssetPreloader::AS_IMAGE);
@@ -250,7 +258,6 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
         return $this->renderAsset($header);
     }
 
-
     /**
      * Render a theme asset for the header or footer.
      *
@@ -258,14 +265,15 @@ class ThemePreloadProvider implements ReduxActionProviderInterface {
      *
      * @return string
      */
-    private function renderAsset(?ThemeAsset $themeAsset): string {
+    private function renderAsset(?ThemeAsset $themeAsset): string
+    {
         $styles = $this->getThemeInlineCss();
         if ($themeAsset instanceof HtmlThemeAsset) {
             return $styles . $themeAsset->renderHtml();
         } elseif ($themeAsset instanceof TwigThemeAsset) {
             return $styles . $themeAsset->renderHtml([]);
         } else {
-            return '';
+            return "";
         }
     }
 }

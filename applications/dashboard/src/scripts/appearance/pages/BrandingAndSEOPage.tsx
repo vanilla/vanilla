@@ -22,6 +22,7 @@ import isEqual from "lodash/isEqual";
 import React, { useEffect, useMemo, useState } from "react";
 import SmartLink from "@library/routing/links/SmartLink";
 import { BrandingAndSEOPageClasses } from "@dashboard/appearance/pages/BrandingAndSEOPage.classes";
+import { useToast } from "@library/features/toaster/ToastContext";
 
 const BRANDING_SETTINGS: JsonSchema = {
     type: "object",
@@ -31,9 +32,10 @@ const BRANDING_SETTINGS: JsonSchema = {
             minLength: 1,
             maxLength: 500,
             "x-control": {
-                label: "Homepage Title",
-                description:
+                label: t("Homepage Title"),
+                description: t(
                     "The homepage title is displayed on your home page. Pick a title that you would want to see appear in search engines.",
+                ),
                 inputType: "textBox",
             },
         },
@@ -41,9 +43,10 @@ const BRANDING_SETTINGS: JsonSchema = {
             type: "string",
             maxLength: 350,
             "x-control": {
-                label: "Site Description",
-                description:
-                    "The site description usually appears in search engines. You should try having a description that is 100–150 characters long.",
+                label: t("Site Description"),
+                description: t(
+                    "The site description usually appears in search engines. You should try having a description that is 100-150 characters long.",
+                ),
                 inputType: "textBox",
                 type: "textarea",
             },
@@ -51,19 +54,22 @@ const BRANDING_SETTINGS: JsonSchema = {
         "garden.title": {
             type: "string",
             maxLength: 20,
+            minLentgh: 1,
             "x-control": {
-                label: "Banner Title",
-                description:
+                label: t("Banner Title"),
+                description: t(
                     "This title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a logo is uploaded, it will replace this title on user-facing forum pages. Also, keep in mind some themes may hide this title.",
+                ),
                 inputType: "textBox",
+                default: "Vanilla",
             },
         },
         "garden.orgName": {
             type: "string",
             maxLength: 50,
             "x-control": {
-                label: "Organization",
-                description: "Your organization name is used for SEO microdata and JSON+LD",
+                label: t("Organization"),
+                description: t("Your organization name is used for SEO microdata and JSON+LD"),
                 inputType: "textBox",
             },
         },
@@ -71,9 +77,10 @@ const BRANDING_SETTINGS: JsonSchema = {
             type: "string",
             maxLength: 500,
             "x-control": {
-                label: "Logo",
-                description:
+                label: t("Logo"),
+                description: t(
                     "This logo appears at the top of your site. Themes made with the theme editor and some custom themes don't use this setting.",
+                ),
                 inputType: "upload",
             },
         },
@@ -81,9 +88,10 @@ const BRANDING_SETTINGS: JsonSchema = {
             type: "string",
             maxLength: 500,
             "x-control": {
-                label: "Mobile Logo",
-                description:
+                label: t("Mobile Logo"),
+                description: t(
                     "The mobile logo appears at the top of your site. Themes made with the theme editor and some custom themes don't use this setting.",
+                ),
                 inputType: "upload",
             },
         },
@@ -91,9 +99,10 @@ const BRANDING_SETTINGS: JsonSchema = {
             type: "string",
             maxLength: 500,
             "x-control": {
-                label: "Banner Image",
-                description:
+                label: t("Banner Image"),
+                description: t(
                     "The default banner image across the site. This can be overridden on a per category basis.",
+                ),
                 inputType: "upload",
             },
         },
@@ -101,9 +110,10 @@ const BRANDING_SETTINGS: JsonSchema = {
             type: "string",
             maxLength: 500,
             "x-control": {
-                label: "Favicon",
-                description:
+                label: t("Favicon"),
+                description: t(
                     "Your site's favicon appears in your browser's title bar. It will be scaled down appropriately.",
+                ),
                 inputType: "upload",
             },
         },
@@ -111,9 +121,10 @@ const BRANDING_SETTINGS: JsonSchema = {
             type: "string",
             maxLength: 500,
             "x-control": {
-                label: "Touch Icon",
-                description:
+                label: t("Touch Icon"),
+                description: t(
                     "The touch icon appears when you bookmark a website on the homescreen of a mobile device. These are usually 152 pixels.",
+                ),
                 inputType: "upload",
             },
         },
@@ -121,9 +132,10 @@ const BRANDING_SETTINGS: JsonSchema = {
             type: "string",
             maxLength: 500,
             "x-control": {
-                label: "Share Image",
-                description:
+                label: t("Share Image"),
+                description: t(
                     "When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50×50, but we recommend 200×200.",
+                ),
                 inputType: "upload",
             },
         },
@@ -131,24 +143,24 @@ const BRANDING_SETTINGS: JsonSchema = {
             type: "string",
             maxLength: 9,
             "x-control": {
-                label: "Address Bar Color",
-                description: "Some browsers support a color for the address bar.",
+                label: t("Address Bar Color"),
+                description: t("Some browsers support a color for the address bar."),
                 inputType: "color",
             },
         },
         "labs.deferredLegacyScripts": {
             type: "boolean",
             "x-control": {
-                label: "Defer Javascript Loading",
+                label: t("Defer Javascript Loading"),
                 description: (
                     <>
-                        This setting loads the page before executing Javascript which can improve your SEO.
-                        <b>**Warning: Enabling this feature may cause Javascript errors on your site.**</b>
+                        {t("This setting loads the page before executing Javascript which can improve your SEO.")}{" "}
+                        <b>{t("**Warning: Enabling this feature may cause Javascript errors on your site.**")}</b>
                         <br />
                         <SmartLink
                             to={"https://success.vanillaforums.com/kb/articles/140-defer-javascript-loading-feature"}
                         >
-                            More information
+                            {t("More information")}
                         </SmartLink>
                     </>
                 ),
@@ -158,9 +170,10 @@ const BRANDING_SETTINGS: JsonSchema = {
         "forum.disabled": {
             type: "boolean",
             "x-control": {
-                label: "Disable forum pages",
-                description:
+                label: t("Disable Forum Pages"),
+                description: t(
                     "Remove discussion and categories links from menus. Set discussion and category related pages to return not found page 404.",
+                ),
                 inputType: "toggle",
             },
         },
@@ -168,15 +181,18 @@ const BRANDING_SETTINGS: JsonSchema = {
 };
 
 export default function BrandingAndSEOPage() {
-    const { isLoading: isPatchLoading, patchConfig } = useConfigPatcher();
+    const { isLoading: isPatchLoading, patchConfig, error } = useConfigPatcher();
 
     // A setting values loadable for the schema from the `/config` endpoint
     const settings = useConfigsByKeys(Object.keys(BRANDING_SETTINGS["properties"]));
 
+    const toast = useToast();
+
     // Load state for the setting values
-    const isLoaded = useMemo<boolean>(() => [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status), [
-        settings,
-    ]);
+    const isLoaded = useMemo<boolean>(
+        () => [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status),
+        [settings],
+    );
 
     const [value, setValue] = useState<JsonSchema>(
         Object.fromEntries(
@@ -191,7 +207,7 @@ export default function BrandingAndSEOPage() {
         if (settings.data) {
             return Object.keys(value).reduce(
                 (delta: { [key: string]: string | number | boolean }, currentKey: string) => {
-                    if (!isEqual(value[currentKey], settings.data[currentKey])) {
+                    if (!isEqual(value[currentKey], settings.data?.[currentKey])) {
                         return { ...delta, [currentKey]: value[currentKey] };
                     }
                     return delta;
@@ -214,7 +230,13 @@ export default function BrandingAndSEOPage() {
                 return Object.fromEntries(Object.keys(settings.data ?? {}).map((key) => [key, settings?.data?.[key]]));
             });
         }
-    }, [isLoaded, settings]);
+        if (error && error.message) {
+            toast.addToast({
+                dismissible: true,
+                body: <>{error.message}</>,
+            });
+        }
+    }, [isLoaded, settings, error]);
 
     const settingsSchema = useMemo<JsonSchema>(() => {
         if (isLoaded) {

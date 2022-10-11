@@ -15,12 +15,14 @@ import {
     patchAddonByIdThunk,
     getAvailableLocalesThunk,
     getServicesByLocaleThunk,
+    updateConfigsLocal,
 } from "@library/config/configActions";
-import { createSlice } from "@reduxjs/toolkit";
+import { configureStore, createSlice } from "@reduxjs/toolkit";
 import { stableObjectHash } from "@vanilla/utils";
-import { meta } from "eslint/lib/rules/*";
+import { useDispatch } from "react-redux";
 
 type ConfigValuesByKey = Record<string, any>;
+
 type ServiceValuesByKey = Record<string, any>;
 export interface IConfigState {
     configsByLookupKey: Record<number, Loadable<ConfigValuesByKey>>;
@@ -157,6 +159,21 @@ export const configSlice = createSlice({
                     error: action.error,
                 };
             })
+            .addCase(updateConfigsLocal, (state, action) => {
+                for (const [key, value] of Object.entries(action.payload)) {
+                    Object.values(state.configsByLookupKey).forEach((config) => {
+                        if (!config.data) {
+                            return;
+                        }
+
+                        if (!(key in config.data)) {
+                            return;
+                        }
+
+                        config.data[key] = value;
+                    });
+                }
+            })
             .addCase(getAddonsByTypeThunk.pending, (state, action) => {
                 state.addons[action.meta.arg.values] = {
                     status: LoadStatus.LOADING,
@@ -239,3 +256,7 @@ export const configSlice = createSlice({
             });
     },
 });
+
+const store = configureStore({ reducer: { [configSlice.name]: configSlice.reducer } });
+export type ConfigDispatch = typeof store.dispatch;
+export const useConfigDispatch = () => useDispatch<typeof store.dispatch>();

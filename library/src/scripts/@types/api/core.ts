@@ -6,6 +6,8 @@
 import { AxiosError, AxiosResponse } from "axios";
 import { IUserFragment } from "@library/@types/api/users";
 import { RecordID } from "@vanilla/utils";
+import { ImageSourceSet } from "@library/utility/appUtils";
+import { ILinkPages } from "@library/navigation/SimplePagerModel";
 
 export enum LoadStatus {
     PENDING = "PENDING",
@@ -132,4 +134,15 @@ export enum Format {
     HTML = "html",
     BBCODE = "bbcode",
     RICH = "rich",
+}
+
+export interface IImage {
+    url?: string;
+    urlSrcSet?: ImageSourceSet;
+    alt?: string;
+}
+
+export interface IFeaturedImage {
+    display: boolean;
+    fallbackImage?: string;
 }

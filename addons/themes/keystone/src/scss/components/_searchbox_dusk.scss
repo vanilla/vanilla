@@ -24,7 +24,6 @@
 .Herobanner .SearchBox {
     .InputBox.BigInput,
     #Form_Search {
-
         @include maxWidth {
             background-color: $global-color_bg;
             color: $global-color_white;

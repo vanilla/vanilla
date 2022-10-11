@@ -11,26 +11,23 @@ use Vanilla\Contracts\ConfigurationInterface;
 /**
  * Http Strict Transport Security model.
  */
-class HttpStrictTransportSecurityModel {
-    const HSTS_HEADER = 'Strict-Transport-Security';
-    const MAX_AGE = 'max-age';
-    const INCLUDE_SUBDOMAINS = 'includeSubDomains';
-    const PRELOAD = 'preload';
+class HttpStrictTransportSecurityModel
+{
+    const HSTS_HEADER = "Strict-Transport-Security";
+    const MAX_AGE = "max-age";
+    const INCLUDE_SUBDOMAINS = "includeSubDomains";
+    const PRELOAD = "preload";
 
-    const MAX_AGE_KEY = 'Garden.Security.Hsts.MaxAge';
-    const INCLUDE_SUBDOMAINS_KEY = 'Garden.Security.Hsts.IncludeSubDomains';
-    const PRELOAD_KEY = 'Garden.Security.Hsts.Preload';
+    const MAX_AGE_KEY = "Garden.Security.Hsts.MaxAge";
+    const INCLUDE_SUBDOMAINS_KEY = "Garden.Security.Hsts.IncludeSubDomains";
+    const PRELOAD_KEY = "Garden.Security.Hsts.Preload";
 
     const DEFAULT_TTL = 15768000; // 6 months
     const DEFAULT_INCLUDE_SUBDOMAINS = false;
     const DEFAULT_PRELOAD = false;
 
     /** @var string[]  $additionalSecurityHeaders */
-    private $additionalSecurityHeaders = [
-                'contentTypeOptions',
-                'permittedCrossDomain',
-                'xssProtection'
-            ];
+    private $additionalSecurityHeaders = ["contentTypeOptions", "permittedCrossDomain", "xssProtection"];
 
     /**
      * @var ConfigurationInterface
@@ -41,7 +38,8 @@ class HttpStrictTransportSecurityModel {
      * HttpStrictTransportSecurityModel constructor.
      * @param ConfigurationInterface $config
      */
-    public function __construct(ConfigurationInterface $config) {
+    public function __construct(ConfigurationInterface $config)
+    {
         $this->config = $config;
     }
 
@@ -50,8 +48,9 @@ class HttpStrictTransportSecurityModel {
      *
      * @return string
      */
-    public function getHsts(): string {
-        $hsts[] = self::MAX_AGE.'='.$this->getMaxAge();
+    public function getHsts(): string
+    {
+        $hsts[] = self::MAX_AGE . "=" . $this->getMaxAge();
         if ($this->includeSubDomains()) {
             $hsts[] = self::INCLUDE_SUBDOMAINS;
         }
@@ -59,7 +58,7 @@ class HttpStrictTransportSecurityModel {
             $hsts[] = self::PRELOAD;
         }
 
-        return implode('; ', $hsts);
+        return implode("; ", $hsts);
     }
 
     /**
@@ -67,7 +66,8 @@ class HttpStrictTransportSecurityModel {
      *
      * @return int
      */
-    private function getMaxAge(): int {
+    private function getMaxAge(): int
+    {
         return $this->config->get(self::MAX_AGE_KEY, self::DEFAULT_TTL);
     }
 
@@ -76,7 +76,8 @@ class HttpStrictTransportSecurityModel {
      *
      * @return bool
      */
-    private function includeSubDomains(): bool {
+    private function includeSubDomains(): bool
+    {
         return $this->config->get(self::INCLUDE_SUBDOMAINS_KEY, self::DEFAULT_INCLUDE_SUBDOMAINS);
     }
 
@@ -85,7 +86,8 @@ class HttpStrictTransportSecurityModel {
      *
      * @return bool
      */
-    private function preload(): bool {
+    private function preload(): bool
+    {
         return $this->config->get(self::PRELOAD_KEY, self::DEFAULT_PRELOAD);
     }
 
@@ -94,7 +96,8 @@ class HttpStrictTransportSecurityModel {
      *
      * @return array
      */
-    public function getAdditionalSecurityHeaders(): array {
+    public function getAdditionalSecurityHeaders(): array
+    {
         return $this->additionalSecurityHeaders;
     }
 
@@ -104,7 +107,8 @@ class HttpStrictTransportSecurityModel {
      * @param string $headerName the method to get the specific response header name & value
      * @return array
      */
-    public function getSecurityHeaderEntry($headerName): array {
+    public function getSecurityHeaderEntry($headerName): array
+    {
         return $this->{$headerName}();
     }
 
@@ -113,7 +117,8 @@ class HttpStrictTransportSecurityModel {
      *
      * @return array
      */
-    private function contentTypeOptions() : array {
+    private function contentTypeOptions(): array
+    {
         return ["X-Content-Type-Options", "nosniff"];
     }
 
@@ -122,7 +127,8 @@ class HttpStrictTransportSecurityModel {
      *
      * @return array
      */
-    private function permittedCrossDomain() : array {
+    private function permittedCrossDomain(): array
+    {
         return ["X-Permitted-Cross-Domain-Policies", "master-only"];
     }
 
@@ -133,7 +139,8 @@ class HttpStrictTransportSecurityModel {
      *
      * @return array
      */
-    private function xssProtection() : array {
+    private function xssProtection(): array
+    {
         return ["X-XSS-Protection", "0"];
     }
 }

@@ -11,8 +11,8 @@ namespace Vanilla\Forms;
  *
  * @package Vanilla\Forms
  */
-class FormOptions {
-
+class FormOptions
+{
     /** @var string */
     private $description;
 
@@ -22,21 +22,27 @@ class FormOptions {
     /** @var string */
     private $placeholder;
 
+    /** @var string */
+    private $tooltip;
+
     /**
      * FormOptions constructor.
      *
      * @param string $description
      * @param string $label
      * @param string $placeholder
+     * @param string $tooltip
      */
     public function __construct(
-        string $label = '',
-        string $description = '',
-        string $placeholder = ''
+        string $label = "",
+        string $description = "",
+        string $placeholder = "",
+        string $tooltip = ""
     ) {
         $this->description = $description;
         $this->label = $label;
         $this->placeholder = $placeholder;
+        $this->tooltip = $tooltip;
     }
 
     /**
@@ -44,7 +50,8 @@ class FormOptions {
      *
      * @return string
      */
-    public function getDescription(): string {
+    public function getDescription(): string
+    {
         return $this->description;
     }
 
@@ -53,7 +60,8 @@ class FormOptions {
      *
      * @return string
      */
-    public function getLabel(): string {
+    public function getLabel(): string
+    {
         return $this->label;
     }
 
@@ -62,7 +70,18 @@ class FormOptions {
      *
      * @return string
      */
-    public function getPlaceHolder(): string {
+    public function getPlaceHolder(): string
+    {
         return $this->placeholder;
+    }
+
+    /**
+     * Get form option tooltip.
+     *
+     * @return string
+     */
+    public function getTooltip(): string
+    {
+        return $this->tooltip;
     }
 }

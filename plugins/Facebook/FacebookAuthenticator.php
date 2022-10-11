@@ -5,13 +5,13 @@
  * @license https://opensource.org/licenses/GPL-2.0 GPL-2.0
  */
 
-use \Vanilla\Authenticator\ShimAuthenticator;
+use Vanilla\Authenticator\ShimAuthenticator;
 
 /**
  * Class FacebookAuthenticator.
  */
-class FacebookAuthenticator extends ShimAuthenticator {
-
+class FacebookAuthenticator extends ShimAuthenticator
+{
     /** @var FacebookPlugin */
     private $facebookPlugin;
 
@@ -22,36 +22,40 @@ class FacebookAuthenticator extends ShimAuthenticator {
      *
      * @throws \Garden\Schema\ValidationException
      */
-    public function __construct(FacebookPlugin $facebookPlugin) {
+    public function __construct(FacebookPlugin $facebookPlugin)
+    {
         $this->facebookPlugin = $facebookPlugin;
 
-        parent::__construct('Facebook');
+        parent::__construct("Facebook");
     }
 
     /**
      * @inheritdoc
      */
-    protected static function getAuthenticatorTypeInfoImpl(): array {
+    protected static function getAuthenticatorTypeInfoImpl(): array
+    {
         return [
-            'ui' => [
-                'photoUrl' => '/applications/dashboard/design/images/authenticators/facebook.svg',
-                'backgroundColor' => '#4A70BD',
-                'foregroundColor' => '#fff',
-            ]
+            "ui" => [
+                "photoUrl" => "/applications/dashboard/design/images/authenticators/facebook.svg",
+                "backgroundColor" => "#4A70BD",
+                "foregroundColor" => "#fff",
+            ],
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function isActive(): bool {
+    public function isActive(): bool
+    {
         return $this->facebookPlugin->socialSignIn();
     }
 
     /**
      * @inheritdoc
      */
-    public static function isUnique(): bool {
+    public static function isUnique(): bool
+    {
         return true;
     }
 }

@@ -12,14 +12,15 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
 /**
  * Abstract class implementing a factory of tab widgets.
  */
-abstract class AbstractTabWidgetTabFactory {
-
+abstract class AbstractTabWidgetTabFactory
+{
     /**
      * Get the default label for the tab.
      *
      * @return string
      */
-    public function getDefaultTabLabelCode(): string {
+    public function getDefaultTabLabelCode(): string
+    {
         /** @var AbstractReactModule $class */
         $class = static::getWidgetClass();
         return $class::getWidgetName();
@@ -30,7 +31,8 @@ abstract class AbstractTabWidgetTabFactory {
      *
      * @return AbstractReactModule
      */
-    public function getTabModule(): AbstractReactModule {
+    public function getTabModule(): AbstractReactModule
+    {
         /** @var AbstractReactModule $module */
         $module = \Gdn::getContainer()->get(static::getWidgetClass());
         return $module;
@@ -41,7 +43,8 @@ abstract class AbstractTabWidgetTabFactory {
      *
      * @return string
      */
-    public function getTabPresetID(): string {
+    public function getTabPresetID(): string
+    {
         $tabCode = $this->getDefaultTabLabelCode();
         $id = slugify($tabCode);
         return $id;
@@ -60,7 +63,8 @@ abstract class AbstractTabWidgetTabFactory {
      *
      * @return bool
      */
-    public function isDefault(): bool {
+    public function isDefault(): bool
+    {
         return false;
     }
 }

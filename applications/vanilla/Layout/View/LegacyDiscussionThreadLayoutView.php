@@ -12,26 +12,29 @@ use Vanilla\Layout\View\LegacyLayoutViewInterface;
 /**
  * Legacy view type for discussion thread.
  */
-class LegacyDiscussionThreadLayoutView implements LegacyLayoutViewInterface {
-
+class LegacyDiscussionThreadLayoutView implements LegacyLayoutViewInterface
+{
     /**
      * @inheritDoc
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return "Comments Page";
     }
 
     /**
      * @inheritDoc
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return "discussionThread";
     }
 
     /**
      * @inheritDoc
      */
-    public function getLegacyType(): string {
+    public function getLegacyType(): string
+    {
         return "Vanilla/Discussion/Index";
     }
 }

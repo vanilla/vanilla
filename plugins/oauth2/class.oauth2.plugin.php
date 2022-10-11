@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -19,11 +19,12 @@ use Vanilla\Web\ApiFilterMiddleware;
  * Expose the functionality of the core class Gdn_OAuth2 to create SSO workflows.
  */
 
-class OAuth2Plugin extends Gdn_OAuth2 {
+class OAuth2Plugin extends Gdn_OAuth2
+{
     /**
      * @var string
      */
-    private $currentClientID = '';
+    private $currentClientID = "";
 
     /**
      * @var Gdn_AuthenticationProviderModel
@@ -37,10 +38,11 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      * Set the key for saving OAuth settings in GDN_UserAuthenticationProvider.
      * @codeCoverageIgnore
      */
-    public function __construct(SessionInterface $session) {
-        $this->setProviderKey('oauth2');
-        $this->settingsView = 'plugins/settings/oauth2';
-        $this->setAuthenticationSchemeAlias('oauth2');
+    public function __construct(SessionInterface $session)
+    {
+        $this->setProviderKey("oauth2");
+        $this->settingsView = "plugins/settings/oauth2";
+        $this->setAuthenticationSchemeAlias("oauth2");
         $this->clientIDField = Gdn_AuthenticationProviderModel::COLUMN_KEY;
         $this->session = $session;
     }
@@ -48,29 +50,33 @@ class OAuth2Plugin extends Gdn_OAuth2 {
     /**
      * Create the structure in the database.
      */
-    public function structure() {
-        $providers = Gdn_AuthenticationProviderModel::getWhereStatic(['AuthenticationSchemeAlias' => $this->getProviderKey()]);
+    public function structure()
+    {
+        $providers = Gdn_AuthenticationProviderModel::getWhereStatic([
+            "AuthenticationSchemeAlias" => $this->getProviderKey(),
+        ]);
         if (empty($providers)) {
             // TODO: Take this out when the multi-connection OAuth UI is done.
             $model = $this->getAuthenticationProviderModel();
             $provider = [
                 Gdn_AuthenticationProviderModel::COLUMN_KEY => $this->providerKey, // temp
                 Gdn_AuthenticationProviderModel::COLUMN_ALIAS => $this->providerKey,
-                'Name' => $this->providerKey,
-                'AcceptedScope' => 'openid email profile',
-                'ProfileKeyEmail' => 'email', // Can be overwritten in settings, the key the authenticator uses for email in response.
-                'ProfileKeyPhoto' => 'picture',
-                'ProfileKeyName' => 'nickname',
-                'ProfileKeyFullName' => 'name',
-                'ProfileKeyUniqueID' => 'sub',
-                'ProfileKeyRoles' => 'roles'
+                "Name" => $this->providerKey,
+                "AcceptedScope" => "openid email profile",
+                "ProfileKeyEmail" => "email", // Can be overwritten in settings, the key the authenticator uses for email in response.
+                "ProfileKeyPhoto" => "picture",
+                "ProfileKeyName" => "nickname",
+                "ProfileKeyFullName" => "name",
+                "ProfileKeyUniqueID" => "sub",
+                "ProfileKeyRoles" => "roles",
             ];
 
             $model->save($provider);
         } else {
             // Fix the providers by migrating their authentication keys to the proper column.
             foreach ($providers as $provider) {
-                if (!empty($provider[static::COLUMN_ASSOCIATION_KEY]) &&
+                if (
+                    !empty($provider[static::COLUMN_ASSOCIATION_KEY]) &&
                     $provider[Gdn_AuthenticationProviderModel::COLUMN_KEY] === $this->getProviderKey()
                 ) {
                     $provider[Gdn_AuthenticationProviderModel::COLUMN_KEY] = $provider[static::COLUMN_ASSOCIATION_KEY];
@@ -78,14 +84,14 @@ class OAuth2Plugin extends Gdn_OAuth2 {
                     $this->getAuthenticationProviderModel()->save($provider);
 
                     \Gdn::sql()->put(
-                        'UserAuthentication',
-                        ['ProviderKey' => $provider[Gdn_AuthenticationProviderModel::COLUMN_KEY]],
-                        ['ProviderKey' => $this->getProviderKey()]
+                        "UserAuthentication",
+                        ["ProviderKey" => $provider[Gdn_AuthenticationProviderModel::COLUMN_KEY]],
+                        ["ProviderKey" => $this->getProviderKey()]
                     );
                 }
             }
         }
-        \Gdn::config()->saveToConfig('OAuth2.Flags.SendScopeOnTokenRequest', $this->getSendScopeOnTokenRequest());
+        \Gdn::config()->saveToConfig("OAuth2.Flags.SendScopeOnTokenRequest", $this->getSendScopeOnTokenRequest());
     }
 
     /**
@@ -93,7 +99,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      *
      * @return bool True if there is a secret and a client_id, false if not.
      */
-    public function isConfigured() {
+    public function isConfigured()
+    {
         $provider = $this->provider();
         return $this->isProviderConfigured($provider);
     }
@@ -104,8 +111,9 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      * @param array $provider
      * @return bool
      */
-    protected function isProviderConfigured(array $provider): bool {
-        return is_array($provider) && !empty($provider['AssociationSecret']);
+    protected function isProviderConfigured(array $provider): bool
+    {
+        return is_array($provider) && !empty($provider["AssociationSecret"]);
     }
 
     /**
@@ -113,14 +121,18 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      *
      * @return Schema
      */
-    private function apiWriteSchema(): Schema {
+    private function apiWriteSchema(): Schema
+    {
         return Schema::parse([
             "name:s",
             "clientID:s",
             "secret:s",
+            "isOidc:b?" => [
+                "default" => false,
+            ],
             "urls:o" => [
                 "authorizeUrl:s",
-                "profileUrl:s",
+                "profileUrl:s?",
                 "registerUrl:s" => ["default" => null],
                 "signOutUrl:s" => ["default" => null],
                 "tokenUrl:s",
@@ -136,15 +148,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
             "useBasicAuthToken:b?",
             "postProfileRequest:b?",
             "allowAccessTokens:b?",
-            "userMappings:o?" => [
-                "uniqueID:s?",
-                "email:s?",
-                "name:s?",
-                "photoUrl:s?",
-                "fullName:s?",
-                "roles:s?",
-            ],
-        ]);
+            "userMappings:o?" => ["uniqueID:s?", "email:s?", "name:s?", "photoUrl:s?", "fullName:s?", "roles:s?"],
+        ])->requireOneOf(["isOidc", "urls.profileUrl"]);
     }
 
     /**
@@ -152,16 +157,14 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      *
      * @return Schema
      */
-    protected function apiReadSchema(): Schema {
+    protected function apiReadSchema(): Schema
+    {
         // Kludge the provider fragment schema to remove required fields
         // because of the way oauth2 plugin creates empty connections.
         $schema = Schema::parse([
             "secret:s?",
-            "urls:o" => [
-                "authorizeUrl:s?",
-                "profileUrl:s?",
-                "tokenUrl:s?"
-            ]
+            "isOidc:b?",
+            "urls:o" => ["authorizeUrl:s?", "profileUrl:s?", "tokenUrl:s?"],
         ]);
         $schema->merge($this->providerFragmentSchema());
         return $schema;
@@ -174,7 +177,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      * @param int $id
      * @return Data
      */
-    public function authenticatorsApiController_get_oauth2(AuthenticatorsApiController $controller, int $id): Data {
+    public function authenticatorsApiController_get_oauth2(AuthenticatorsApiController $controller, int $id): Data
+    {
         $controller->permission("Garden.Settings.Manage");
 
         $in = $controller->schema([], "in");
@@ -200,7 +204,11 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      * @param array $body
      * @return Data
      */
-    public function authenticatorsApiController_patch_oauth2(AuthenticatorsApiController $controller, int $id, array $body = []): Data {
+    public function authenticatorsApiController_patch_oauth2(
+        AuthenticatorsApiController $controller,
+        int $id,
+        array $body = []
+    ): Data {
         $controller->permission("Garden.Settings.Manage");
 
         $in = $controller->schema($this->apiWriteSchema(), "in");
@@ -234,7 +242,10 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      * @param array $body
      * @return Data
      */
-    public function authenticatorsApiController_post_oauth2(AuthenticatorsApiController $controller, array $body = []): Data {
+    public function authenticatorsApiController_post_oauth2(
+        AuthenticatorsApiController $controller,
+        array $body = []
+    ): Data {
         $controller->permission("Garden.Settings.Manage");
 
         $in = $controller->schema($this->apiWriteSchema(), "in");
@@ -266,7 +277,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      * @param array $input
      * @return array
      */
-    private function normalizeInput(array $input): array {
+    private function normalizeInput(array $input): array
+    {
         $transformer = new Transformer([
             "AcceptedScope" => "/authenticationRequest/scope",
             "AllowAccessTokens" => "allowAccessTokens",
@@ -288,6 +300,7 @@ class OAuth2Plugin extends Gdn_OAuth2 {
             "BearerToken" => "useBearerToken",
             "BasicAuthToken" => "useBasicAuthToken",
             "PostProfileRequest" => "postProfileRequest",
+            "isOidc" => "isOidc",
         ]);
         $result = $transformer->transform($input);
         return $result;
@@ -299,7 +312,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      * @param array $output
      * @return array
      */
-    private function normalizeOutput(array $output): array {
+    private function normalizeOutput(array $output): array
+    {
         $result = $this->getAuthenticationProviderModel()->normalizeRow($output, [
             "authenticationRequest" => [
                 "prompt" => "Prompt",
@@ -310,6 +324,7 @@ class OAuth2Plugin extends Gdn_OAuth2 {
                 "authorizeUrl" => "AuthorizeUrl",
                 "tokenUrl" => "TokenUrl",
             ],
+            "isOidc" => "isOidc",
             "userMappings" => [
                 "email" => "ProfileKeyEmail",
                 "fullName" => "ProfileKeyFullName",
@@ -334,7 +349,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      *
      * @return Gdn_AuthenticationProviderModel
      */
-    private function getAuthenticationProviderModel(): Gdn_AuthenticationProviderModel {
+    private function getAuthenticationProviderModel(): Gdn_AuthenticationProviderModel
+    {
         if ($this->authenticationProviderModel === null) {
             $this->authenticationProviderModel = new Gdn_AuthenticationProviderModel();
         }
@@ -346,7 +362,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      *
      * @return array Stored provider data (secret, client_id, etc.).
      */
-    public function provider() {
+    public function provider()
+    {
         if (!$this->provider) {
             if ($this->getCurrentClientID()) {
                 $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->getCurrentClientID());
@@ -354,15 +371,17 @@ class OAuth2Plugin extends Gdn_OAuth2 {
                 // There is no client ID. Make sure there is only one OAuth provider in this case.
                 $providers = Gdn_AuthenticationProviderModel::getWhereStatic(
                     [\Gdn_AuthenticationProviderModel::COLUMN_ALIAS => $this->getProviderKey()],
-                    '',
-                    'asc',
+                    "",
+                    "asc",
                     2
                 );
 
                 if (empty($providers)) {
                     throw new Gdn_UserException("There are no configured OAuth authenticators");
                 } elseif (count($providers) > 1) {
-                    throw new Gdn_UserException("There are multiple OAuth authenticators, but you didn't specify a client ID.");
+                    throw new Gdn_UserException(
+                        "There are multiple OAuth authenticators, but you didn't specify a client ID."
+                    );
                 }
 
                 $this->provider = reset($providers);
@@ -377,7 +396,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      *
      * @return string
      */
-    public function getCurrentClientID(): string {
+    public function getCurrentClientID(): string
+    {
         return $this->currentClientID;
     }
 
@@ -387,7 +407,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      * @param string $currentClientID
      * @return string Returns the previous client ID.
      */
-    public function setCurrentClientID(string $currentClientID): string {
+    public function setCurrentClientID(string $currentClientID): string
+    {
         $bak = $this->currentClientID;
         $this->currentClientID = $currentClientID;
         $this->provider = [];
@@ -403,11 +424,12 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      * @param array $provider
      * @return array
      */
-    public function setProvider(array $provider): array {
+    public function setProvider(array $provider): array
+    {
         $bak = $this->provider;
         $this->provider = $provider;
         $this->currentClientID = $provider[\Gdn_AuthenticationProviderModel::COLUMN_KEY];
-        return (array)$bak;
+        return (array) $bak;
     }
 
     /**
@@ -415,16 +437,18 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      *
      * @param \Garden\Web\RequestInterface $request
      */
-    public function setCurrentClientIDFromRequest(\Garden\Web\RequestInterface $request): void {
+    public function setCurrentClientIDFromRequest(\Garden\Web\RequestInterface $request): void
+    {
         $query = $request->getQuery();
-        $clientID = $query['client_id'] ?? ($query['clientID'] ?? '');
+        $clientID = $query["client_id"] ?? ($query["clientID"] ?? "");
         $this->setCurrentClientID($clientID);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function entryRedirectEndpoint(EntryController $sender, $state = '') {
+    public function entryRedirectEndpoint(EntryController $sender, $state = "")
+    {
         $this->setCurrentClientIDFromRequest($sender->Request);
         parent::entryRedirectEndpoint($sender, $state);
     }
@@ -432,47 +456,56 @@ class OAuth2Plugin extends Gdn_OAuth2 {
     /**
      * {@inheritDoc}
      */
-    public function entryEndpoint($sender, $code, $state = '') {
+    public function entryEndpoint($sender, $code, $state = "")
+    {
+        // In case of OIDC authentication, result is a postback request, not a get redirect.
+        if ($sender->Form->isPostBack()) {
+            $oauthValues = $sender->Form->formValues();
+            $state = $oauthValues["state"];
+        }
         $stateArray = $this->decodeState($state);
-        if (!array_key_exists('cid', $stateArray)) {
+        if (!array_key_exists("cid", $stateArray)) {
             throw new \Gdn_UserException("The client ID was missing from the state.", 400);
         }
-        $this->setCurrentClientID($stateArray['cid']);
+        $this->setCurrentClientID($stateArray["cid"]);
+
         parent::entryEndpoint($sender, $code, $state);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function entryController_signIn_handler($sender, $args) {
-        if (!isset($sender->Data['Methods'])) {
+    public function entryController_signIn_handler($sender, $args)
+    {
+        if (!isset($sender->Data["Methods"])) {
             return;
         }
 
         $providers = \Gdn_AuthenticationProviderModel::getWhereStatic([
             \Gdn_AuthenticationProviderModel::COLUMN_ALIAS => $this->getProviderKey(),
-            'Active' => true,
-            'Visible' => true,
-            'IsDefault' => false,
+            "Active" => true,
+            "Visible" => true,
+            "IsDefault" => false,
         ]);
 
         foreach ($providers as $provider) {
-            if (empty($provider['AuthorizeUrl'])) {
+            if (empty($provider["AuthorizeUrl"])) {
                 continue;
             }
             $this->setProvider($provider);
             $method = [
-                'Name' => $this->getProviderKey(),
-                'SignInHtml' => $this->signInButtonFromProvider($provider),
+                "Name" => $this->getProviderKey(),
+                "SignInHtml" => $this->signInButtonFromProvider($provider),
             ];
-            $sender->Data['Methods'][] = $method;
+            $sender->Data["Methods"][] = $method;
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    protected function issueAccessToken(string $clientID, string $oauthAccessToken): array {
+    protected function issueAccessToken(string $clientID, string $oauthAccessToken): array
+    {
         $this->setCurrentClientID($clientID);
         return parent::issueAccessToken($clientID, $oauthAccessToken);
     }
@@ -483,11 +516,13 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      * @param array $defaultProvider The current default provider.
      * @return bool Returns **true** if the default provider was OAuth and was set or **false** otherwise.
      */
-    private function trySetDefaultProvider($defaultProvider): bool {
+    private function trySetDefaultProvider($defaultProvider): bool
+    {
         if (!is_array($defaultProvider)) {
             return false;
         }
-        if ($defaultProvider[\Gdn_AuthenticationProviderModel::COLUMN_ALIAS] !== $this->getProviderKey() ||
+        if (
+            $defaultProvider[\Gdn_AuthenticationProviderModel::COLUMN_ALIAS] !== $this->getProviderKey() ||
             !$this->isProviderConfigured($defaultProvider)
         ) {
             return false;
@@ -499,8 +534,9 @@ class OAuth2Plugin extends Gdn_OAuth2 {
     /**
      * {@inheritdoc}
      */
-    public function entryController_overrideSignIn_handler($sender, $args) {
-        if (!$this->trySetDefaultProvider($args['DefaultProvider'])) {
+    public function entryController_overrideSignIn_handler($sender, $args)
+    {
+        if (!$this->trySetDefaultProvider($args["DefaultProvider"])) {
             return;
         }
         parent::entryController_overrideSignIn_handler($sender, $args);
@@ -509,8 +545,9 @@ class OAuth2Plugin extends Gdn_OAuth2 {
     /**
      * {@inheritdoc}
      */
-    public function entryController_overrideRegister_handler($sender, $args) {
-        if (!$this->trySetDefaultProvider($args['DefaultProvider'])) {
+    public function entryController_overrideRegister_handler($sender, $args)
+    {
+        if (!$this->trySetDefaultProvider($args["DefaultProvider"])) {
             return;
         }
         return parent::entryController_overrideRegister_handler($sender, $args);
@@ -522,10 +559,11 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      * @param array $state
      * @return string
      */
-    public function authorizeUri($state = []) {
+    public function authorizeUri($state = [])
+    {
         $r = parent::authorizeUri($state);
         if ($id = $this->getCurrentClientID()) {
-            $r = \Vanilla\Utility\UrlUtils::concatQuery($r, 'client_id='.urlencode($this->getCurrentClientID()));
+            $r = \Vanilla\Utility\UrlUtils::concatQuery($r, "client_id=" . urlencode($this->getCurrentClientID()));
         }
         return $r;
     }
@@ -535,7 +573,8 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      *
      * @param \DashboardNavModule $nav The menu to add the module to.
      */
-    public function dashboardNavModule_init_handler(\DashboardNavModule $nav) {
-        $nav->addLinkIf('Garden.Settings.Manage', t('OAuth2'), '/oauth2-settings', 'connect.oauth2-settings', '', []);
+    public function dashboardNavModule_init_handler(\DashboardNavModule $nav)
+    {
+        $nav->addLinkIf("Garden.Settings.Manage", t("OAuth2"), "/oauth2-settings", "connect.oauth2-settings", "", []);
     }
 }

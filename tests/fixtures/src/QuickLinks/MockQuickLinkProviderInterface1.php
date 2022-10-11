@@ -14,19 +14,15 @@ use Vanilla\Theme\VariableProviders\QuickLinkProviderInterface;
  *
  * @package VanillaTests\Fixtures\QuickLinks
  */
-class MockQuickLinkProviderInterface1 implements QuickLinkProviderInterface {
-
+class MockQuickLinkProviderInterface1 implements QuickLinkProviderInterface
+{
     /**
      * Provide some quick links.
      *
      * @return QuickLink[]
      */
-    public function provideQuickLinks(): array {
-        return [
-            new QuickLink(
-                'Mock Quick Link 1',
-                '/mockQuickLink1'
-            )
-        ];
+    public function provideQuickLinks(): array
+    {
+        return [new QuickLink("Mock Quick Link 1", "/mockQuickLink1")];
     }
 }

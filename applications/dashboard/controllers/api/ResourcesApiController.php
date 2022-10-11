@@ -22,7 +22,8 @@ use Vanilla\Web\Controller;
 /**
  * Gives meta information about the resource models in the system.
  */
-class ResourcesApiController extends Controller {
+class ResourcesApiController extends Controller
+{
     /**
      * @var ModelFactory
      */
@@ -39,7 +40,8 @@ class ResourcesApiController extends Controller {
      * @param ModelFactory $factory
      * @param DirtyRecordModel $dirtyRecordModel
      */
-    public function __construct(ModelFactory $factory, DirtyRecordModel $dirtyRecordModel) {
+    public function __construct(ModelFactory $factory, DirtyRecordModel $dirtyRecordModel)
+    {
         $this->factory = $factory;
         $this->dirtyRecordModel = $dirtyRecordModel;
     }
@@ -50,40 +52,40 @@ class ResourcesApiController extends Controller {
      * @param array $query
      * @return Data
      */
-    public function index(array $query = []): Data {
-        $this->permission('Garden.Settings.Manage');
+    public function index(array $query = []): Data
+    {
+        $this->permission("Garden.Settings.Manage");
 
         $in = Schema::parse([
-            'crawlable:b?',
-            'recordTypes:a?' => [
-                'items' => ['type' => 'string'],
+            "crawlable:b?",
+            "recordTypes:a?" => [
+                "items" => ["type" => "string"],
             ],
-            'dirtyRecords:b?' => [
-                'default' => false,
+            "dirtyRecords:b?" => [
+                "default" => false,
             ],
         ]);
         $query = $in->validate($query);
 
-
         $passThroughQueryParams = [];
-        if ($query['dirtyRecords'] ?? null) {
-            $passThroughQueryParams['dirtyRecords'] = $query['dirtyRecords'];
+        if ($query["dirtyRecords"] ?? null) {
+            $passThroughQueryParams["dirtyRecords"] = $query["dirtyRecords"];
         }
 
-        if (isset($query['crawlable'])) {
-            $models = $this->factory->getAllByInterface(CrawlableInterface::class, $query['crawlable']);
-            $passThroughQueryParams['expand'] = 'crawl';
+        if (isset($query["crawlable"])) {
+            $models = $this->factory->getAllByInterface(CrawlableInterface::class, $query["crawlable"]);
+            $passThroughQueryParams["expand"] = "crawl";
         } else {
             $models = $this->factory->getAll();
         }
 
-        $passthroughQuery = '';
+        $passthroughQuery = "";
         if (!empty($passThroughQueryParams)) {
             $passthroughQuery = http_build_query($passThroughQueryParams);
         }
 
         $r = [];
-        $allowedRecordTypes = $query['recordTypes'] ?? null;
+        $allowedRecordTypes = $query["recordTypes"] ?? null;
         foreach ($models as $recordType => $model) {
             if ($allowedRecordTypes !== null && !in_array($recordType, $allowedRecordTypes)) {
                 continue;
@@ -91,12 +93,12 @@ class ResourcesApiController extends Controller {
 
             $url = "/api/v2/resources/$recordType";
             if ($passthroughQuery) {
-                $url .= '?' . $passthroughQuery;
+                $url .= "?" . $passthroughQuery;
             }
             $r[] = [
-                'recordType' => $recordType,
-                'url' => \Gdn::request()->getSimpleUrl($url),
-                'crawlable' => ($model instanceof CrawlableInterface),
+                "recordType" => $recordType,
+                "url" => \Gdn::request()->getSimpleUrl($url),
+                "crawlable" => $model instanceof CrawlableInterface,
             ];
         }
         return new Data($r);
@@ -109,53 +111,54 @@ class ResourcesApiController extends Controller {
      * @param array $query
      * @return Data
      */
-    public function get(string $recordType, array $query = []): Data {
-        $this->permission('Garden.Settings.Manage');
+    public function get(string $recordType, array $query = []): Data
+    {
+        $this->permission("Garden.Settings.Manage");
 
         $in = Schema::parse([
-            'expand?' => ApiUtils::getExpandDefinition(['crawl']),
-            'dirtyRecords:b?',
-            'dateInserted?' => new DateFilterSchema(),
+            "expand?" => ApiUtils::getExpandDefinition(["crawl"]),
+            "dirtyRecords:b?",
+            "dateInserted?" => new DateFilterSchema(),
         ]);
-        $date = $query['dateInserted'] ?? '';
+        $date = $query["dateInserted"] ?? "";
         $query = $in->validate($query);
 
         $model = $this->factory->get($recordType);
         $recordType = $this->factory->getRecordType(get_class($model));
 
         $data = [
-            'recordType' => $recordType,
+            "recordType" => $recordType,
         ];
 
-        if (ModelUtils::isExpandOption('crawl', $query['expand']) && $model instanceof CrawlableInterface) {
-            $data['crawl'] = $model->getCrawlInfo();
-            $data['crawl']['url'] = \Gdn::request()->getSimpleUrl($data['crawl']['url']);
-            if (isset($query['dirtyRecords'])) {
-                $data['crawl']['url'] .= "&dirtyRecords=true";
+        if (ModelUtils::isExpandOption("crawl", $query["expand"]) && $model instanceof CrawlableInterface) {
+            $data["crawl"] = $model->getCrawlInfo();
+            $data["crawl"]["url"] = \Gdn::request()->getSimpleUrl($data["crawl"]["url"]);
+            if (isset($query["dirtyRecords"])) {
+                $data["crawl"]["url"] .= "&dirtyRecords=true";
             }
             if (isset($date)) {
-                $data['crawl']['url'] .= "&dateInserted={$date}";
+                $data["crawl"]["url"] .= "&dateInserted={$date}";
             }
-            if (!isset($data['crawl']['maxLimit'])) {
-                $data['crawl']['maxLimit'] = ApiUtils::getMaxLimit();
+            if (!isset($data["crawl"]["maxLimit"])) {
+                $data["crawl"]["maxLimit"] = ApiUtils::getMaxLimit();
             }
         }
 
         $out = Schema::parse([
-            'recordType:s',
-            'crawl?' => [
-                'url:s' => ['format' => 'uri'],
-                'parameter:s',
-                'unqiueIDField:s',
-                'count:i',
-                'maxLimit:i',
-                'min' => [
-                    'type' => ['integer', 'datetime'],
+            "recordType:s",
+            "crawl?" => [
+                "url:s" => ["format" => "uri"],
+                "parameter:s",
+                "unqiueIDField:s",
+                "count:i",
+                "maxLimit:i",
+                "min" => [
+                    "type" => ["integer", "datetime"],
                 ],
-                'max' => [
-                    'type' => ['integer', 'datetime'],
+                "max" => [
+                    "type" => ["integer", "datetime"],
                 ],
-            ]
+            ],
         ]);
         $data = $out->validate($data);
 
@@ -168,22 +171,23 @@ class ResourcesApiController extends Controller {
      * @param string $recordType
      * @param array $query
      */
-    public function delete_dirtyRecords(string $recordType, array $query = []) {
-        $this->permission('Garden.Settings.Manage');
+    public function delete_dirtyRecords(string $recordType, array $query = [])
+    {
+        $this->permission("Garden.Settings.Manage");
 
         $in = Schema::parse([
-            'dateInserted' => new DateFilterSchema([
-                'description' => '',
-                'x-filter' => [
-                    'field' => 'dateInserted',
-                    'processor' => [DateFilterSchema::class, 'dateFilterField'],
+            "dateInserted" => new DateFilterSchema([
+                "description" => "",
+                "x-filter" => [
+                    "field" => "dateInserted",
+                    "processor" => [DateFilterSchema::class, "dateFilterField"],
                 ],
             ]),
         ]);
 
         $query = $in->validate($query);
         $where = ApiUtils::queryToFilters($in, $query);
-        $where['recordType'] = $recordType;
+        $where["recordType"] = $recordType;
 
         $this->dirtyRecordModel->delete($where);
     }

@@ -26,11 +26,16 @@ interface IProps {
 }
 
 export function CategoriesWidget(props: IProps) {
+    const globalVariables = homeWidgetItemVariables().options;
     const itemVars = homeWidgetItemVariables(props.itemOptions).options;
     const isListWithNoBorder =
         props.containerOptions?.displayType === WidgetContainerDisplayType.LIST &&
         itemVars.box.borderType === BorderType.NONE;
-    const defaultItemOptions = {
+
+    const containerAsItemBorderType: BorderType | undefined =
+        props.containerOptions?.borderType === "navLinks" ? BorderType.SEPARATOR : props.containerOptions?.borderType;
+
+    const defaultItemOptions: DeepPartial<IHomeWidgetItemOptions> = {
         ...props.itemOptions,
         imagePlacement:
             props.containerOptions?.displayType === WidgetContainerDisplayType.LIST
@@ -38,8 +43,12 @@ export function CategoriesWidget(props: IProps) {
                 : props.itemOptions?.imagePlacement,
         box: {
             ...props.itemOptions?.box,
-            borderType: isListWithNoBorder ? BorderType.SEPARATOR : props.itemOptions?.box?.borderType,
+            borderType: isListWithNoBorder ? BorderType.SEPARATOR : containerAsItemBorderType,
         },
+        display: {
+            counts: globalVariables.display.counts,
+        },
+        alignment: props.containerOptions?.headerAlignment ?? globalVariables.alignment,
     };
 
     const quickLinks = props.itemData.map((item, index) => {
@@ -60,3 +69,5 @@ export function CategoriesWidget(props: IProps) {
         );
     }
 }
+
+export default CategoriesWidget;

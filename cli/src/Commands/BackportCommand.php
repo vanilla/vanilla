@@ -13,8 +13,8 @@ use Vanilla\Cli\Utils\SimpleScriptLogger;
 /**
  * Backport command.
  */
-class BackportCommand {
-
+class BackportCommand
+{
     /** @var int */
     private $pr;
 
@@ -30,7 +30,8 @@ class BackportCommand {
     /**
      * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->logger = new SimpleScriptLogger();
     }
 
@@ -40,7 +41,8 @@ class BackportCommand {
      * Used to apply a PR targeting 1 branch to another branch target.
      * Only the commits specific to that branch will be applied.
      */
-    public function backport() {
+    public function backport()
+    {
         $this->logger->title("Fetching remote branches");
         ShellUtils::shellOrThrow("git fetch --all");
 
@@ -54,20 +56,17 @@ class BackportCommand {
         $repo = $this->fetchRepositoryPath();
 
         // Try to backport.
-        ShellUtils::shellOrCallback(
-            "hub am -3 https://github.com/$repo/pull/{$this->pr}",
-            [$this, 'handleMergeConflict']
-        );
+        ShellUtils::shellOrCallback("hub am -3 https://github.com/$repo/pull/{$this->pr}", [
+            $this,
+            "handleMergeConflict",
+        ]);
 
         // Get the PR info
         $this->logger->title("Creating the backport PR on github.");
         [$title, $body] = $this->fetchTitleAndBody($repo);
 
         $ghLinks = $this->parseGithubUrls($body);
-        $messages = [
-            $title,
-            "Backporting #{$this->pr} to {$this->targetBranch}"
-        ];
+        $messages = [$title, "Backporting #{$this->pr} to {$this->targetBranch}"];
         foreach ($ghLinks as $link) {
             $messages[] = "Related {$link}";
         }
@@ -79,7 +78,8 @@ class BackportCommand {
      *
      * @param int $pr
      */
-    public function setPr(int $pr): void {
+    public function setPr(int $pr): void
+    {
         $this->pr = $pr;
     }
 
@@ -88,7 +88,8 @@ class BackportCommand {
      *
      * @param string $targetBranch
      */
-    public function setTarget(string $targetBranch): void {
+    public function setTarget(string $targetBranch): void
+    {
         $this->targetBranch = $targetBranch;
         $this->targetSlug = str_replace(["release/", "feature/", "fix/"], "", $this->targetBranch);
     }
@@ -96,11 +97,15 @@ class BackportCommand {
     /**
      * Prompt the user to handle a merger conflict.
      */
-    public function handleMergeConflict() {
+    public function handleMergeConflict()
+    {
         $this->logger->title("Error Resolution");
-        $this->logger->error('There was an error applying your commits.');
+        $this->logger->error("There was an error applying your commits.");
         $this->logger->info("You will need to resolve conflicts manually. Then come back to continue.\n");
-        ShellUtils::promptYesNo("Have you finished manually resolving the backport? Type 'y' to continue to make the PR.", true);
+        ShellUtils::promptYesNo(
+            "Have you finished manually resolving the backport? Type 'y' to continue to make the PR.",
+            true
+        );
     }
 
     /**
@@ -108,7 +113,8 @@ class BackportCommand {
      *
      * @param array $messages Messages for the PR. Each is a newline. First newline is the title.
      */
-    private function pushPr(array $messages) {
+    private function pushPr(array $messages)
+    {
         // Push up the PR.
         $pullRequestScript = "hub pull-request --base {$this->targetBranch} --browse";
         foreach ($messages as $message) {
@@ -128,10 +134,11 @@ class BackportCommand {
      *
      * @return string[]
      */
-    private function parseGithubUrls(string $markdownBody): array {
-        $regex = '/(?<links>https?:\/\/github.com.*(issues|pulls).*)\s/i';
+    private function parseGithubUrls(string $markdownBody): array
+    {
+        $regex = "/(?<links>https?:\/\/github.com.*(issues|pulls).*)\s/i";
         preg_match_all($regex, $markdownBody, $matches);
-        $links = $matches['links'] ?? [];
+        $links = $matches["links"] ?? [];
         return array_unique($links);
     }
 
@@ -140,7 +147,8 @@ class BackportCommand {
      *
      * @return string|string[]|null
      */
-    public function fetchRepositoryPath() {
+    public function fetchRepositoryPath()
+    {
         $url = ShellUtils::command("git remote get-url origin")[0];
         preg_match("/[a-z\-]+\/[a-z\-]+(?=\.git|$)/i", $url, $matches);
         return $matches[0];
@@ -152,12 +160,13 @@ class BackportCommand {
      * @param string $repo Path of the repository on GitHub. E.g. "vanilla/vanilla-cloud"
      * @return string[] Tuple[string $title, string $body].
      */
-    private function fetchTitleAndBody($repo): array {
+    private function fetchTitleAndBody($repo): array
+    {
         $prJson = shell_exec("hub api '/repos/$repo/pulls/{$this->pr}'");
         $prData = json_decode($prJson, true);
-        $title = $prData['title'] ?? "#{$this->pr} to `{$this->targetBranch}`";
+        $title = $prData["title"] ?? "#{$this->pr} to `{$this->targetBranch}`";
         $title = "[Backport $this->targetSlug] $title";
-        $body = $prData['body'] ?? '';
+        $body = $prData["body"] ?? "";
         return [$title, $body];
     }
 }

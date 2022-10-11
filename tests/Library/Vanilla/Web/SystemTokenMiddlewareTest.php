@@ -13,19 +13,19 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ServerException;
 use Gdn_Session;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use UnexpectedValueException;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Permissions;
 use Vanilla\Web\Middleware\SystemTokenMiddleware;
 use Vanilla\Web\SystemTokenUtils;
+use VanillaTests\BootstrapTestCase;
 use VanillaTests\Fixtures\Request;
 
 /**
  * Basic tests for SystemTokenMiddleware.
  */
-class SystemTokenMiddlewareTest extends TestCase {
-
+class SystemTokenMiddlewareTest extends BootstrapTestCase
+{
     private const CONTEXT_SECRET = "abc123";
 
     /** @var SystemTokenMiddleware */
@@ -44,7 +44,8 @@ class SystemTokenMiddlewareTest extends TestCase {
      * @param Data|array|null $response
      * @return Data|array
      */
-    private function invokeMiddleware(?Request $request = null, $response = null) {
+    private function invokeMiddleware(?Request $request = null, $response = null)
+    {
         $request = $request ?? new Request("/");
         $response = $response ?? new Data([]);
 
@@ -56,7 +57,8 @@ class SystemTokenMiddlewareTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->session = $this->getMockBuilder(Gdn_Session::class)
@@ -69,7 +71,8 @@ class SystemTokenMiddlewareTest extends TestCase {
     /**
      * Verify expired tokens fail.
      */
-    public function testExpiredToken(): void {
+    public function testExpiredToken(): void
+    {
         CurrentTimeStamp::mockTime(time() - SystemTokenUtils::TOKEN_TTL - 10);
         $expiredToken = $this->tokenUtils->encode();
         CurrentTimeStamp::clearMockTime();
@@ -85,7 +88,8 @@ class SystemTokenMiddlewareTest extends TestCase {
     /**
      * Verify an invalid token is a noisy failure.
      */
-    public function testInvalidToken(): void {
+    public function testInvalidToken(): void
+    {
         $invalidToken = JWT::encode(["sub" => 1337], "xyz456", SystemTokenUtils::JWT_ALGO);
         $request = new Request();
         $request->setHeader("Content-Type", SystemTokenMiddleware::AUTH_CONTENT_TYPE);
@@ -103,18 +107,25 @@ class SystemTokenMiddlewareTest extends TestCase {
      * @param array|null $query
      * @dataProvider provideValidTokens
      */
-    public function testValidToken(?array $body = null, ?array $query = null): void {
+    public function testValidToken(?array $body = null, ?array $query = null): void
+    {
         // Tokens would usually be generated in a separate request (or session), so simulate that here.
         $userID = 1337;
         $tokenSession = $this->createMock(Gdn_Session::class);
         $tokenSession->UserID = $userID;
         $tokenUtils = new SystemTokenUtils(self::CONTEXT_SECRET, $tokenSession);
 
-        $this->session->expects($this->once())->method("start")
+        $this->session
+            ->expects($this->once())
+            ->method("start")
             ->with($userID, false, false);
-        $this->session->expects($this->once())->method("setPermission")
+        $this->session
+            ->expects($this->once())
+            ->method("setPermission")
             ->with(Permissions::PERMISSION_SYSTEM, true);
-        $this->session->expects($this->once())->method("validateTransientKey")
+        $this->session
+            ->expects($this->once())
+            ->method("validateTransientKey")
             ->with(true, true);
 
         $token = $tokenUtils->encode($body, $query);
@@ -134,7 +145,8 @@ class SystemTokenMiddlewareTest extends TestCase {
      *
      * @return array
      */
-    public function provideValidTokens(): array {
+    public function provideValidTokens(): array
+    {
         return [
             "Basic token" => [null, null],
             "Body override" => [["foo" => "bar"]],
@@ -146,7 +158,8 @@ class SystemTokenMiddlewareTest extends TestCase {
     /**
      * Verify a valid token fails when the current request query does not match.
      */
-    public function testValidTokenInvalidQuery(): void {
+    public function testValidTokenInvalidQuery(): void
+    {
         $token = $this->tokenUtils->encode(null, ["foo" => "bar"]);
         $request = new Request();
         $request->setHeader("Content-Type", SystemTokenMiddleware::AUTH_CONTENT_TYPE);
@@ -160,7 +173,8 @@ class SystemTokenMiddlewareTest extends TestCase {
     /**
      * Verify a valid token fails when the current request query does not contain the same values.
      */
-    public function testValidTokenIncompatibleQuery(): void {
+    public function testValidTokenIncompatibleQuery(): void
+    {
         $token = $this->tokenUtils->encode(null, ["foo" => "bar"]);
         $request = new Request();
         $request->setHeader("Content-Type", SystemTokenMiddleware::AUTH_CONTENT_TYPE);
@@ -175,7 +189,8 @@ class SystemTokenMiddlewareTest extends TestCase {
     /**
      * Verify a plain ole request means no change to the session and no errors.
      */
-    public function testNoToken(): void {
+    public function testNoToken(): void
+    {
         $this->invokeMiddleware();
         $this->assertSame(0, $this->session->UserID);
         $this->assertFalse($this->session->checkPermission(Permissions::PERMISSION_SYSTEM));
@@ -184,7 +199,8 @@ class SystemTokenMiddlewareTest extends TestCase {
     /**
      * Verify an error is reported if the token utils does not have a proper secret configured.
      */
-    public function testNoSecretConfigured(): void {
+    public function testNoSecretConfigured(): void
+    {
         $tokenUtils = new SystemTokenUtils("", $this->session);
         $middleware = new SystemTokenMiddleware("/", $tokenUtils, $this->session);
 
@@ -193,7 +209,6 @@ class SystemTokenMiddlewareTest extends TestCase {
 
         $this->expectException(ServerException::class);
         $this->expectExceptionMessage("System token secret has not been configured.");
-        $middleware($request, function () {
-        });
+        $middleware($request, function () {});
     }
 }

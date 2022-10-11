@@ -30,9 +30,9 @@ In general, the command that you are going to be the most concerned with is the 
 
 There are a few things to know about the tool.
 
-- Always run `vnla backport` from the repo that you are backporting. It uses the current working directory to determine which git repo to use.
-- This command uses [hub](https://hub.github.com/) so make sure you have that set up properly on your machine.
-- You can run the command in *any* git repo as long as its origin is Github. Go nuts!
-- Although the command is called "backport" you can really port a PR to any other branch. So you can use it to "forward port" too.
-- If you have a merge conflict then the backport tool won't fix it. You'll have to resolve it yourself. If you are not comfortable resolving conflicts then it is best to ask for help from a colleague.
-- This tool really does save a lot of time and bugs when porting PRs. Please try and use it!
+-   Always run `vnla backport` from the repo that you are backporting. It uses the current working directory to determine which git repo to use.
+-   This command uses [hub](https://hub.github.com/) so make sure you have that set up properly on your machine.
+-   You can run the command in _any_ git repo as long as its origin is Github. Go nuts!
+-   Although the command is called "backport" you can really port a PR to any other branch. So you can use it to "forward port" too.
+-   If you have a merge conflict then the backport tool won't fix it. You'll have to resolve it yourself. If you are not comfortable resolving conflicts then it is best to ask for help from a colleague.
+-   This tool really does save a lot of time and bugs when porting PRs. Please try and use it!

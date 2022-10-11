@@ -11,38 +11,41 @@
 /**
  * Renders the 5 most recent activities for use in a side panel.
  */
-class RecentActivityModule extends Gdn_Module {
-
+class RecentActivityModule extends Gdn_Module
+{
     /**
      * @var Gdn_DataSet|null
      */
     public $ActivityData = null;
 
-    public $ActivityModuleTitle = '';
+    public $ActivityModuleTitle = "";
 
     public $Limit = 5;
 
-    public function getData($limit = false) {
+    public function getData($limit = false)
+    {
         if (!$limit) {
             $limit = $this->Limit;
         }
 
         $activityModel = new ActivityModel();
-        $data = $activityModel->getWhere(['NotifyUserID' => ActivityModel::NOTIFY_PUBLIC], '', '', $limit, 0);
+        $data = $activityModel->getWhere(["NotifyUserID" => ActivityModel::NOTIFY_PUBLIC], "", "", $limit, 0);
         $this->ActivityData = $data;
     }
 
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
-    public function toString() {
-        if (!Gdn::session()->checkPermission('Garden.Activity.View')) {
-            return '';
+    public function toString()
+    {
+        if (!Gdn::session()->checkPermission("Garden.Activity.View")) {
+            return "";
         }
 
         if (stringIsNullOrEmpty($this->ActivityModuleTitle)) {
-            $this->ActivityModuleTitle = t('Recent Activity');
+            $this->ActivityModuleTitle = t("Recent Activity");
         }
 
         if (!$this->ActivityData) {
@@ -54,6 +57,6 @@ class RecentActivityModule extends Gdn_Module {
             return parent::toString();
         }
 
-        return '';
+        return "";
     }
 }

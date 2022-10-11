@@ -26,3 +26,4 @@ export * from "./useThrowError";
 export * from "./useTracedState";
 export * from "./deconstructAttributesFromElement";
 export * from "./useSessionStorage";
+export * from "./StackingContext";

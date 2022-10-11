@@ -12,8 +12,8 @@ use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 /**
  * Fixtures for the embed system values.
  */
-class EmbedFixtures {
-
+class EmbedFixtures
+{
     /**
      * Wrap some embed data in a full insert.
      *
@@ -21,7 +21,8 @@ class EmbedFixtures {
      *
      * @return array
      */
-    public static function embedInsert($data): array {
+    public static function embedInsert($data): array
+    {
         return [
             "insert" => [
                 "embed-external" => [
@@ -38,14 +39,15 @@ class EmbedFixtures {
      *
      * @return array
      */
-    public static function discussion(string $username = "DiscussionQuote Username"): array {
+    public static function discussion(string $username = "DiscussionQuote Username"): array
+    {
         return [
             "url" => "https://dev.vanilla.localhost/discussion/8/test-file-upload",
             "embedType" => QuoteEmbed::TYPE,
             "recordType" => "discussion",
             "recordID" => 8,
             "name" => "discussion embed fixture title",
-            "bodyRaw" => [[ "insert" => "test test\\n" ]],
+            "bodyRaw" => [["insert" => "test test\\n"]],
             "dateInserted" => "2019-06-14T14:09:45+00:00",
             "dateUpdated" => null,
             "insertUser" => [
@@ -54,7 +56,7 @@ class EmbedFixtures {
                 "photoUrl" => "https://images.v-cdn.net/stubcontent/avatar_01.png",
                 "dateLastActive" => "2019-06-14T18:32:27+00:00",
             ],
-            "format" => "Rich"
+            "format" => "Rich",
         ];
     }
     /**
@@ -64,13 +66,14 @@ class EmbedFixtures {
      *
      * @return array
      */
-    public static function comment(string $username = "CommentQuote Username"): array {
+    public static function comment(string $username = "CommentQuote Username"): array
+    {
         return [
             "url" => "https://dev.vanilla.localhost/discussion/comment/5",
             "embedType" => QuoteEmbed::TYPE,
             "recordType" => "comment",
             "recordID" => 8,
-            "bodyRaw" => [[ "insert" => "test test\\n" ]],
+            "bodyRaw" => [["insert" => "test test\\n"]],
             "dateInserted" => "2019-06-14T14:09:45+00:00",
             "dateUpdated" => null,
             "insertUser" => [
@@ -79,7 +82,7 @@ class EmbedFixtures {
                 "photoUrl" => "https://images.v-cdn.net/stubcontent/avatar_01.png",
                 "dateLastActive" => "2019-06-14T18:32:27+00:00",
             ],
-            "format" => "Rich"
+            "format" => "Rich",
         ];
     }
 }

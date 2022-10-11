@@ -13,13 +13,14 @@ use PHPUnit\Framework\TestCase;
  * Tests for validatePhoneInt()
  */
 
-class ValidatePhoneIntTest extends TestCase {
-
+class ValidatePhoneIntTest extends TestCase
+{
     /**
      * Test with empty string.
      */
-    public function testValidatePhoneIntWithEmptyString() {
-        $actual = validatePhoneInt('');
+    public function testValidatePhoneIntWithEmptyString()
+    {
+        $actual = validatePhoneInt("");
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -27,8 +28,9 @@ class ValidatePhoneIntTest extends TestCase {
     /**
      * Test with string.
      */
-    public function testValidatePhoneIntWithIntegers() {
-        $actual = validatePhoneInt('+12345678901234');
+    public function testValidatePhoneIntWithIntegers()
+    {
+        $actual = validatePhoneInt("+12345678901234");
         $expected = true;
         $this->assertSame($expected, $actual);
     }

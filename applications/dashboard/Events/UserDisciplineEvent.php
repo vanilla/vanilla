@@ -17,12 +17,13 @@ use Vanilla\Logging\LoggerUtils;
 /**
  * Represent a user event for which a user is disciplined.
  */
-class UserDisciplineEvent extends UserEvent implements \Garden\Events\TrackingEventInterface {
-    const COLLECTION_NAME = 'moderation';
+class UserDisciplineEvent extends UserEvent implements \Garden\Events\TrackingEventInterface
+{
+    const COLLECTION_NAME = "moderation";
 
-    public const DISCIPLINE_TYPE_POSITIVE = 'positive';
+    public const DISCIPLINE_TYPE_POSITIVE = "positive";
 
-    public const DISCIPLINE_TYPE_NEGATIVE = 'negative';
+    public const DISCIPLINE_TYPE_NEGATIVE = "negative";
 
     /** @var null|string  */
     private $reason = null;
@@ -55,13 +56,14 @@ class UserDisciplineEvent extends UserEvent implements \Garden\Events\TrackingEv
         }
 
         parent::__construct($disciplinaryAction, $payload, $this->getSender());
-        $this->type = 'user';
+        $this->type = "user";
     }
 
     /**
      * @inheritDoc
      */
-    public function getTrackableCollection(): ?string {
+    public function getTrackableCollection(): ?string
+    {
         return self::COLLECTION_NAME;
     }
 
@@ -70,13 +72,15 @@ class UserDisciplineEvent extends UserEvent implements \Garden\Events\TrackingEv
      *
      * @param TrackableUserModel $trackableUserModel
      */
-    public function getTrackablePayload(TrackableUserModel $trackableUserModel) {
+    public function getTrackablePayload(TrackableUserModel $trackableUserModel)
+    {
         $eventPayload = $this->getPayload();
         $trackingData = [
             "disciplinedUser" => $trackableUserModel->getTrackableUser($eventPayload["disciplinedUser"]["userID"]),
-            "discipliningUser" => $eventPayload["discipliningUser"] !== null ?
-                $trackableUserModel->getTrackableUser($eventPayload["discipliningUser"]["userID"]) :
-                null,
+            "discipliningUser" =>
+                $eventPayload["discipliningUser"] !== null
+                    ? $trackableUserModel->getTrackableUser($eventPayload["discipliningUser"]["userID"])
+                    : null,
         ];
         return $trackingData;
     }
@@ -86,23 +90,29 @@ class UserDisciplineEvent extends UserEvent implements \Garden\Events\TrackingEv
      *
      * @param string $reason
      */
-    public function setReason(string $reason): void {
+    public function setReason(string $reason): void
+    {
         $this->reason = $reason;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getLogEntry(): LogEntry {
+    public function getLogEntry(): LogEntry
+    {
         $context = LoggerUtils::resourceEventLogContext($this);
-        $context[Logger::FIELD_TARGET_USERID] = $this->getPayload()['disciplinedUser']['userID'];
-        $context[Logger::FIELD_TARGET_USERNAME] = $this->getPayload()['disciplinedUser']['name'];
-        $context[Logger::FIELD_USERID] = $this->getPayload()["discipliningUser"]['userID'] ?? null;
-        $context[Logger::FIELD_USERNAME] = $this->getPayload()["discipliningUser"]['name'] ?? null;
+        $context[Logger::FIELD_TARGET_USERID] = $this->getPayload()["disciplinedUser"]["userID"];
+        $context[Logger::FIELD_TARGET_USERNAME] = $this->getPayload()["disciplinedUser"]["name"];
+        $context[Logger::FIELD_USERID] = $this->getPayload()["discipliningUser"]["userID"] ?? null;
+        $context[Logger::FIELD_USERNAME] = $this->getPayload()["discipliningUser"]["name"] ?? null;
 
         $log = new LogEntry(
             LogLevel::INFO,
-            $this->makeLogMessage($this->getAction(), $context[Logger::FIELD_TARGET_USERNAME] ?? null, $context[Logger::FIELD_USERNAME] ?? null),
+            $this->makeLogMessage(
+                $this->getAction(),
+                $context[Logger::FIELD_TARGET_USERNAME] ?? null,
+                $context[Logger::FIELD_USERNAME] ?? null
+            ),
             $context
         );
         return $log;
@@ -111,17 +121,18 @@ class UserDisciplineEvent extends UserEvent implements \Garden\Events\TrackingEv
     /**
      * {@inheritDoc}
      */
-    public function makeLogMessage(string $action, string $targetName, ?string $username): string {
+    public function makeLogMessage(string $action, string $targetName, ?string $username): string
+    {
         switch ($action) {
             case BanModel::ACTION_BAN:
             case BanModel::ACTION_UNBAN:
-                return $username ?
-                "User {$targetName} was {$action}ned by {$username}." :
-                "User {$targetName} was {$action}ned.";
+                return $username
+                    ? "User {$targetName} was {$action}ned by {$username}."
+                    : "User {$targetName} was {$action}ned.";
             default:
-                return $username ?
-                "User {$targetName} was {$action}ed by {$username}." :
-                "User {$targetName} was {$action}ed.";
+                return $username
+                    ? "User {$targetName} was {$action}ed by {$username}."
+                    : "User {$targetName} was {$action}ed.";
         }
     }
 }

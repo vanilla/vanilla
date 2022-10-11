@@ -17,7 +17,8 @@ use VanillaTests\SiteTestTrait;
 /**
  * Class LinkUserFromSessionTest.
  */
-class LinkUserFromSessionTest extends SharedBootstrapTestCase {
+class LinkUserFromSessionTest extends SharedBootstrapTestCase
+{
     use SiteTestTrait {
         SiteTestTrait::setUpBeforeClass as siteSetUpBeforeClass;
     }
@@ -27,28 +28,29 @@ class LinkUserFromSessionTest extends SharedBootstrapTestCase {
 
     /** @var array  */
     private static $users = [
-        'default' => [
+        "default" => [
             // 'UserID' // Will be filled in setUpBeforeClass()
-            'Name' => 'TypicalUser1',
-            'Email' => 'typicalUser1@example.com',
-            'Password' => 'trustno1',
+            "Name" => "TypicalUser1",
+            "Email" => "typicalUser1@example.com",
+            "Password" => "TypicalUserPassword",
         ],
     ];
 
     /**
      * @inheritdoc
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         self::siteSetUpBeforeClass();
 
         /** @var \UserModel $userModel */
         $userModel = self::container()->get(\UserModel::class);
         foreach (self::$users as &$user) {
-            $userID = $userModel->save($user, ['NoConfirmEmail' => true]);
+            $userID = $userModel->save($user, ["NoConfirmEmail" => true]);
             if ($userID) {
-                $user['UserID'] = $userID;
+                $user["UserID"] = $userID;
             } else {
-                self::fail('Something went wrong in setUp.'.PHP_EOL.print_r($userModel->validationResults(), true));
+                self::fail("Something went wrong in setUp." . PHP_EOL . print_r($userModel->validationResults(), true));
                 break;
             }
         }
@@ -57,7 +59,8 @@ class LinkUserFromSessionTest extends SharedBootstrapTestCase {
     /**
      * @inheritdoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         // Let's get a new SSOModel for this test.
@@ -65,16 +68,17 @@ class LinkUserFromSessionTest extends SharedBootstrapTestCase {
 
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
-        $session->start(self::$users['default']['UserID']);
+        $session->start(self::$users["default"]["UserID"]);
     }
 
     /**
      * @inheritdoc
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         /** @var \Gdn_SQLDriver $driver */
-        $driver = self::container()->get('SqlDriver');
-        $driver->truncate('UserAuthentication');
+        $driver = self::container()->get("SqlDriver");
+        $driver->truncate("UserAuthentication");
 
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
@@ -92,14 +96,15 @@ class LinkUserFromSessionTest extends SharedBootstrapTestCase {
      * @return \Vanilla\Models\SSOData
      * @throws \Exception
      */
-    private function createSSOData($name, $email) {
+    private function createSSOData($name, $email)
+    {
         return SSOData::fromArray([
-            'authenticatorType' => MockSSOAuthenticator::getType(),
-            'authenticatorID' => MockSSOAuthenticator::getType(),
-            'uniqueID' => 'ssouniqueid',
-            'user' => [
-                'name' => $name,
-                'email' => $email,
+            "authenticatorType" => MockSSOAuthenticator::getType(),
+            "authenticatorID" => MockSSOAuthenticator::getType(),
+            "uniqueID" => "ssouniqueid",
+            "user" => [
+                "name" => $name,
+                "email" => $email,
             ],
         ]);
     }
@@ -107,17 +112,16 @@ class LinkUserFromSessionTest extends SharedBootstrapTestCase {
     /**
      * Link a user using the current session.
      */
-    public function testLinkUser() {
-        $user = self::$users['default'];
+    public function testLinkUser()
+    {
+        $user = self::$users["default"];
 
-        $linkedUser = self::$ssoModel->linkUserFromSession(
-            $this->createSSOData($user['Name'], $user['Email'])
-        );
+        $linkedUser = self::$ssoModel->linkUserFromSession($this->createSSOData($user["Name"], $user["Email"]));
 
         $this->assertIsArray($linkedUser);
 
-        foreach($user as $field => $value) {
-            if ($field === 'Password') {
+        foreach ($user as $field => $value) {
+            if ($field === "Password") {
                 continue;
             }
             $this->assertArrayHasKey($field, $linkedUser);
@@ -128,18 +132,17 @@ class LinkUserFromSessionTest extends SharedBootstrapTestCase {
     /**
      * Try to link a user using the session while there's no user signed in.
      */
-    public function testLinkUserWNoSession() {
+    public function testLinkUserWNoSession()
+    {
         $this->expectException(ForbiddenException::class);
-        $this->expectExceptionMessage('Cannot link user from session while not signed in.');
+        $this->expectExceptionMessage("Cannot link user from session while not signed in.");
 
-        $user = self::$users['default'];
+        $user = self::$users["default"];
 
         /** @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
         $session->end();
 
-        self::$ssoModel->linkUserFromSession(
-            $this->createSSOData($user['Name'], $user['Email'])
-        );
+        self::$ssoModel->linkUserFromSession($this->createSSOData($user["Name"], $user["Email"]));
     }
 }

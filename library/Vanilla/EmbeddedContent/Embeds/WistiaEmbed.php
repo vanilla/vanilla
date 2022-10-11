@@ -13,8 +13,8 @@ use Vanilla\EmbeddedContent\EmbedUtils;
 /**
  * Embed data object for Wistia.
  */
-class WistiaEmbed extends AbstractEmbed {
-
+class WistiaEmbed extends AbstractEmbed
+{
     const TYPE = "wistia";
 
     /**
@@ -23,21 +23,26 @@ class WistiaEmbed extends AbstractEmbed {
      * @param array $data
      * @return string|null
      */
-    private function frameSource(array $data): ?string {
-        return array_key_exists("videoID", $data) ? "https://fast.wistia.net/embed/iframe/{$data['videoID']}?autoPlay=1" : null;
+    private function frameSource(array $data): ?string
+    {
+        return array_key_exists("videoID", $data)
+            ? "https://fast.wistia.net/embed/iframe/{$data["videoID"]}?autoPlay=1"
+            : null;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         $embedUrl = $data["attributes"]["embedUrl"] ?? null;
         if (is_string($embedUrl)) {
             $data["videoID"] = $this->urlToID($embedUrl);
@@ -49,7 +54,8 @@ class WistiaEmbed extends AbstractEmbed {
     /**
      * @return array|mixed
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         $data = parent::jsonSerialize();
         if (array_key_exists("videoID", $data) || array_key_exists("listID", $data)) {
             $data["frameSrc"] = $this->frameSource($data);
@@ -60,13 +66,9 @@ class WistiaEmbed extends AbstractEmbed {
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
-        return Schema::parse([
-            "height:i",
-            "width:i",
-            "photoUrl:s?",
-            "videoID:s",
-        ]);
+    protected function schema(): Schema
+    {
+        return Schema::parse(["height:i", "width:i", "photoUrl:s?", "videoID:s"]);
     }
 
     /**
@@ -75,7 +77,10 @@ class WistiaEmbed extends AbstractEmbed {
      * @param string $url
      * @return string|null
      */
-    private function urlToID(string $url): ?string {
-        return preg_match("`/?embed/iframe/(?<videoID>[\w-]+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches) ? $matches["videoID"] : null;
+    private function urlToID(string $url): ?string
+    {
+        return preg_match("`/?embed/iframe/(?<videoID>[\w-]+)`", parse_url($url, PHP_URL_PATH) ?? "", $matches)
+            ? $matches["videoID"]
+            : null;
     }
 }

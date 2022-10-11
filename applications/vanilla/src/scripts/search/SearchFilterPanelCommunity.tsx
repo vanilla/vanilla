@@ -99,6 +99,7 @@ export function SearchFilterPanelCommunity() {
 
             <TagsInput
                 label={t("Tags")}
+                placeholder={t("Select...")}
                 value={form.tagsOptions ?? []}
                 onChange={(options: IComboBoxOption[]) => {
                     updateForm({ tagsOptions: options });

@@ -59,7 +59,7 @@ function LayoutPreviewCard(props: ILayoutPreviewCardProps) {
                             <Translate
                                 source="You are about to apply a new layout option. This can be customized and previewed using our Theme Editor. <0>Learn more</0>."
                                 c0={(content) => (
-                                    <SmartLink to="https://success.vanillaforums.com/kb/articles/279-theme-editor-overview">
+                                    <SmartLink to="https://success.vanillaforums.com/kb/articles/279">
                                         {content}
                                     </SmartLink>
                                 )}
@@ -75,7 +75,7 @@ function LayoutPreviewCard(props: ILayoutPreviewCardProps) {
                         </Button>
                         <ModalConfirm
                             isVisible={editModalVisible}
-                            title={t("Edit Discussion Layout")}
+                            title={t("Edit Layout")}
                             onCancel={() => setEditModalVisible(false)}
                             confirmLinkTo={editUrl}
                             confirmTitle={t("Continue")}
@@ -83,7 +83,7 @@ function LayoutPreviewCard(props: ILayoutPreviewCardProps) {
                             <Translate
                                 source="This layout can be customized using our new Theme Editor. <0>Learn more.</0>"
                                 c0={(content) => (
-                                    <SmartLink to="https://success.vanillaforums.com/kb/articles/279-theme-editor-overview">
+                                    <SmartLink to="https://success.vanillaforums.com/kb/articles/279">
                                         {content}
                                     </SmartLink>
                                 )}

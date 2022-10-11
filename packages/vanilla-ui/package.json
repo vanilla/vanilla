@@ -3,10 +3,10 @@
     "main": "./src/index.ts",
     "module": "./src/index.ts",
     "version": "1.0.0",
-    "license": "gpl-2.0-only",
+    "license": "MIT",
     "dependencies": {
         "@reach/accordion": "^0.15.0",
-        "@reach/combobox": "^0.15.0",
+        "@reach/combobox": "0.16.2",
         "@vanilla/react-utils": "*"
     },
     "peerDependencies": {

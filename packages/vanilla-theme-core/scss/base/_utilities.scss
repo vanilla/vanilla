@@ -4,8 +4,10 @@
  * @license GPL-2.0-only
  */
 
+@use "sass:math";
+
 @mixin shadow-dropDown($baseColor: #000) {
-  box-shadow: 0 5px 10px 0 rgba($baseColor, .3);
+    box-shadow: 0 5px 10px 0 rgba($baseColor, 0.3);
 }
 
 @mixin font-style-base() {
@@ -56,7 +58,7 @@
             max-width: 800px;
         }
 
-         .Content {
+        .Content {
             width: 100%;
         }
 
@@ -73,7 +75,7 @@
     padding: 0;
     margin: -1px;
     overflow: hidden;
-    clip: rect(0,0,0,0);
+    clip: rect(0, 0, 0, 0);
     border: 0;
 }
 
@@ -164,13 +166,13 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     width: calc(100% + #{$margin});
-    margin-left: -#{$margin / 2};
+    margin-left: -#{$margin * 0.5};
 }
 
 @mixin tilesColumns($colNum: 6, $margin: $utility-baseUnitDouble) {
-    width: calc(#{100% / $colNum} - #{$margin});
-    margin-left: #{$margin / 2};
-    margin-right: #{$margin / 2};
+    width: calc(#{math.div(100%, $colNum)} - #{$margin});
+    margin-left: #{$margin * 0.5};
+    margin-right: #{$margin * 0.5};
 }
 
 @mixin aspectRatio($width, $height) {
@@ -180,7 +182,7 @@
         display: block;
         content: "";
         width: 100%;
-        padding-top: ($height / $width) * 100%;
+        padding-top: math.div($height, $width) * 100%;
     }
 
     > *:first-child {
@@ -221,7 +223,6 @@
                 border-bottom-right-radius: $component_borderRadius;
             }
         }
-
     } @else {
         border-radius: $component_borderRadius;
         margin-bottom: $component-item_spacing;
@@ -245,9 +246,7 @@
 
 @mixin TableItem {
     @if $component-item_spacing == 0 {
-
         &:first-child {
-
             @if $component_lateralBorder == true {
                 td:first-child {
                     border-top-left-radius: $component_borderRadius;
@@ -264,7 +263,6 @@
         }
 
         &:last-child {
-
             @if $component_lateralBorder == true {
                 td:first-child {
                     border-bottom-left-radius: $component_borderRadius;
@@ -294,7 +292,6 @@
                 border-right: $component_border;
             }
         }
-
     } @else {
         border-radius: $component_borderRadius;
 
@@ -318,7 +315,6 @@
         }
     }
 
-
     @if $staticVariables {
         .CategoryName h2 {
             color: $component-title_color;
@@ -335,12 +331,9 @@
 }
 
 @mixin categoriesTableItem {
-
     tbody tr {
         @include maxWidth($theme-breakpoint_mobile) {
-
             @if $component-item_spacing == 0 AND $component_lateralBorder == true {
-
                 &:first-child {
                     td {
                         border-top-right-radius: $component_borderRadius;
@@ -352,7 +345,6 @@
                         border-bottom-right-radius: $component_borderRadius;
                     }
                 }
-
             } @else {
                 td {
                     @if $component_lateralBorder == true {
@@ -365,13 +357,12 @@
             td {
                 @if $component_lateralBorder == true {
                     padding-right: $component-base_padding;
-                    border-right:$component_border;
+                    border-right: $component_border;
                 }
             }
         }
 
         @include maxWidth($theme-breakpoint_desktop) {
-
             @if $component-item_spacing == 0 AND $component_lateralBorder == true {
                 &:first-child {
                     .CountComments {
@@ -384,9 +375,7 @@
                         border-bottom-right-radius: $component_borderRadius;
                     }
                 }
-
             } @else {
-
                 .CountComments {
                     @if $component_lateralBorder == true {
                         border-top-right-radius: $component_borderRadius;
@@ -398,15 +387,13 @@
             .CountComments {
                 @if $component_lateralBorder == true {
                     padding-right: $component-base_padding;
-                    border-right:$component_border;
+                    border-right: $component_border;
                 }
             }
         }
 
         @include maxWidth($theme-breakpoint_smallTable) {
-
             @if $component-item_spacing == 0 AND $component_lateralBorder == true {
-
                 &:first-child {
                     .CountDiscussions {
                         border-top-right-radius: $component_borderRadius;
@@ -418,7 +405,6 @@
                         border-bottom-right-radius: $component_borderRadius;
                     }
                 }
-
             } @else {
                 .CountDiscussions {
                     @if $component_lateralBorder == true {
@@ -431,22 +417,17 @@
             .CountDiscussions {
                 @if $component_lateralBorder == true {
                     padding-right: $component-base_padding;
-                    border-right:$component_border;
+                    border-right: $component_border;
                 }
             }
         }
     }
-
-
 }
 
 @mixin discussionsTableItem {
-
     tbody tr {
         @include maxWidth($theme-breakpoint_mobile) {
-
             @if $component-item_spacing == 0 AND $component_lateralBorder == true {
-
                 &:first-child {
                     td {
                         border-top-right-radius: $component_borderRadius;
@@ -458,7 +439,6 @@
                         border-bottom-right-radius: $component_borderRadius;
                     }
                 }
-
             } @else {
                 td {
                     @if $component_lateralBorder == true {
@@ -469,10 +449,9 @@
             }
 
             td:not(.CheckBoxColumn) {
-
                 @if $component_lateralBorder == true {
                     padding-right: $component-base_padding;
-                    border-right:$component_border;
+                    border-right: $component_border;
                 }
             }
 
@@ -483,7 +462,6 @@
         }
 
         @include maxWidth($theme-breakpoint_desktop) {
-
             @if $component-item_spacing == 0 ANd $component_lateralBorder == true {
                 &:first-child {
                     .CountViews {
@@ -496,9 +474,7 @@
                         border-bottom-right-radius: $component_borderRadius;
                     }
                 }
-
             } @else {
-
                 .CountViews {
                     @if $component_lateralBorder == true {
                         border-top-right-radius: $component_borderRadius;
@@ -510,15 +486,13 @@
             .CountViews {
                 @if $component_lateralBorder == true {
                     padding-right: $component-base_padding;
-                    border-right:$component_border;
+                    border-right: $component_border;
                 }
             }
         }
 
         @include maxWidth($theme-breakpoint_smallTable) {
-
             @if $component-item_spacing == 0 AND $component_lateralBorder == true {
-
                 &:first-child {
                     .CountComments {
                         border-top-right-radius: $component_borderRadius;
@@ -530,7 +504,6 @@
                         border-bottom-right-radius: $component_borderRadius;
                     }
                 }
-
             } @else {
                 .CountComments {
                     @if $component_lateralBorder == true {
@@ -543,7 +516,7 @@
             .CountComments {
                 @if $component_lateralBorder == true {
                     padding-right: $component-base_padding;
-                    border-right:$component_border;
+                    border-right: $component_border;
                 }
             }
         }
@@ -551,12 +524,9 @@
 }
 
 @mixin groupsTableItem {
-
     tbody tr {
         @include maxWidth {
-
             @if $component-item_spacing == 0 AND $component_lateralBorder == true {
-
                 &:first-child {
                     td {
                         border-top-right-radius: $component_borderRadius;
@@ -568,7 +538,6 @@
                         border-bottom-right-radius: $component_borderRadius;
                     }
                 }
-
             } @else {
                 td {
                     @if $component_lateralBorder == true {
@@ -581,13 +550,12 @@
             td {
                 @if $component_lateralBorder == true {
                     padding-right: $component-base_padding;
-                    border-right:$component_border;
+                    border-right: $component_border;
                 }
             }
         }
 
         @include maxWidth($theme-breakpoint_desktop) {
-
             @if $component-item_spacing == 0 AND $component_lateralBorder == true {
                 &:first-child {
                     .CountDiscussions {
@@ -600,9 +568,7 @@
                         border-bottom-right-radius: $component_borderRadius;
                     }
                 }
-
             } @else {
-
                 .CountDiscussions {
                     @if $component_lateralBorder == true {
                         border-top-right-radius: $component_borderRadius;
@@ -614,15 +580,13 @@
             .CountDiscussions {
                 @if $component_lateralBorder == true {
                     padding-right: $component-base_padding;
-                    border-right:$component_border;
+                    border-right: $component_border;
                 }
             }
         }
 
         @include maxWidth($theme-breakpoint_smallTable) {
-
             @if $component-item_spacing == 0 {
-
                 &:first-child {
                     .CountMembers {
                         border-top-right-radius: $component_borderRadius;
@@ -634,7 +598,6 @@
                         border-bottom-right-radius: $component_borderRadius;
                     }
                 }
-
             } @else {
                 .CountMembers {
                     border-top-right-radius: $component_borderRadius;
@@ -644,7 +607,7 @@
 
             .CountMembers {
                 padding-right: $component-base_padding;
-                border-right:$component_border;
+                border-right: $component_border;
             }
         }
     }
@@ -657,7 +620,6 @@
         border-top-right-radius: $component_borderRadius;
         border-bottom-right-radius: $component_borderRadius;
     }
-
 }
 
 @mixin photoWrap($size: $theme-photo_size, $round: $theme-photo_round) {
@@ -738,7 +700,7 @@
     font-family: Arial, sans-serif;
     @if ($staticVariables) {
         background: transparent;
-        color: rgba($color, .7);
+        color: rgba($color, 0.7);
     }
     visibility: visible;
 
@@ -755,13 +717,12 @@
 \* -------------------------------------------------------------- */
 
 .NoPanel {
-
     .Frame-content {
         > .Container {
             max-width: 800px;
         }
 
-         .Content {
+        .Content {
             width: 100%;
         }
     }
@@ -773,7 +734,6 @@
 
 .flyoutIsOpen,
 .NoScroll {
-
     @include maxWidth {
         height: 100vh;
         overflow: hidden;
@@ -786,7 +746,7 @@
     transition-timing-function: ease;
 }
 
- @mixin spinnerLoader($dimension: 18px, $thickness: 3px, $color: $global-color_primary, $speed: 0.7s) {
+@mixin spinnerLoader($dimension: 18px, $thickness: 3px, $color: $global-color_primary, $speed: 0.7s) {
     @include defaultTransition(opacity);
     display: block;
     width: $dimension;
@@ -807,7 +767,6 @@
         height: $dimension;
     }
 }
-
 
 $spinnerOffset: 73deg;
 @keyframes spinnerLoader {

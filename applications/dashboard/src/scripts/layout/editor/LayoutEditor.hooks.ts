@@ -6,72 +6,57 @@
 
 import { useLayoutDispatch, useLayoutSelector } from "@dashboard/layout/layoutSettings/LayoutSettings.slice";
 import { LayoutViewType, ILayoutDraft } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import { Loadable, LoadStatus } from "@library/@types/api/core";
+import { LoadStatus } from "@library/@types/api/core";
 import { logError, RecordID } from "@vanilla/utils";
-import { useEffect, useDebugValue, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import * as layoutActions from "@dashboard/layout/layoutSettings/LayoutSettings.actions";
-import { getRelativeUrl } from "@library/utility/appUtils";
-import { useLastValue } from "@vanilla/react-utils";
-import { useHistory } from "react-router";
-import { LayoutEditorRoute } from "@dashboard/appearance/routes/appearanceRoutes";
+import { LayoutEditorAssetUtils } from "@dashboard/layout/editor/LayoutEditorAssetUtils";
 
 export function useLayoutDraft(layoutID?: RecordID, initialViewType?: LayoutViewType) {
     const dispatch = useLayoutDispatch();
 
-    const layoutDraft = useLayoutSelector(({ layoutSettings }) => layoutSettings.layoutDraft);
-    const layoutDraftLoadable = useLayoutSelector(
-        ({ layoutSettings }): Loadable<any> => {
-            if (layoutID == null) {
-                return {
-                    status: LoadStatus.SUCCESS,
-                    data: {},
-                };
-            } else {
-                return (
-                    layoutSettings.layoutJsonsByLayoutID[layoutID] ?? {
-                        status: LoadStatus.PENDING,
-                    }
-                );
-            }
-        },
-    );
-
-    // Load the initial layout into the draft.
+    // If no layoutID is passed, initialize new layout draft
     useEffect(() => {
-        if (layoutID != null) {
-            if (layoutDraft?.layoutID != layoutID) {
-                // We need to load the draft.
-                dispatch(layoutActions.fetchLayoutJson(layoutID))
-                    .unwrap()
-                    .then((editLayout) => {
-                        dispatch(layoutActions.initializeLayoutDraft({ initialLayout: editLayout }));
-                    });
-            }
-        } else if (initialViewType != null && layoutDraft?.layoutViewType != initialViewType) {
+        if (!layoutID && initialViewType) {
             dispatch(
                 layoutActions.initializeLayoutDraft({
                     initialLayout: { layoutViewType: initialViewType },
                 }),
             );
         }
-    }, [layoutID, layoutDraft]);
+    }, [layoutID, initialViewType]);
 
-    const persistLoadable = useLayoutSelector(
-        ({ layoutSettings }) =>
-            layoutSettings.layoutDraftPersistLoadable ?? {
-                status: LoadStatus.PENDING,
-            },
-    );
+    const layoutDraft = useLayoutSelector(({ layoutSettings }) => layoutSettings.layoutDraft);
+    const layoutDraftLoadable = useLayoutSelector(({ layoutSettings }) => {
+        return layoutID ? layoutSettings.layoutJsonsByLayoutID[layoutID] : undefined;
+    });
 
-    // Replace our route after a save.
-    const history = useHistory();
-    const persistStatus = persistLoadable.status;
-    const lastPersistStatus = useLastValue(persistStatus);
+    // If a layoutID is passed, load the initial layout into the draft.
     useEffect(() => {
-        if (lastPersistStatus !== LoadStatus.SUCCESS && persistStatus === LoadStatus.SUCCESS && persistLoadable.data) {
-            history.replace(getRelativeUrl(LayoutEditorRoute.url(persistLoadable.data)));
+        if (layoutID) {
+            if (layoutDraftLoadable?.status) {
+                if (layoutDraftLoadable.status === LoadStatus.SUCCESS) {
+                    // use existing layout, if it's available
+                    dispatch(
+                        layoutActions.initializeLayoutDraft({
+                            initialLayout: { ...layoutDraftLoadable.data, layoutViewType: initialViewType },
+                        }),
+                    );
+                }
+            } else {
+                // fetch the layout first, if necessary
+                dispatch(layoutActions.fetchLayoutJson(layoutID))
+                    .unwrap()
+                    .then((editLayout) => {
+                        dispatch(
+                            layoutActions.initializeLayoutDraft({
+                                initialLayout: { ...editLayout, layoutViewType: initialViewType },
+                            }),
+                        );
+                    });
+            }
         }
-    }, [history, persistStatus, lastPersistStatus, persistLoadable]);
+    }, [layoutID, layoutDraftLoadable]);
 
     const persistDraft = useCallback(
         async (extra: Partial<ILayoutDraft>) => {
@@ -79,16 +64,10 @@ export function useLayoutDraft(layoutID?: RecordID, initialViewType?: LayoutView
                 return;
             }
             dispatch(layoutActions.updateLayoutDraft(extra));
-            dispatch(layoutActions.persistLayoutDraft({ ...layoutDraft, ...extra }));
+            return dispatch(layoutActions.persistLayoutDraft({ ...layoutDraft, ...extra })).unwrap();
         },
         [dispatch, layoutDraft],
     );
-
-    useDebugValue({
-        layoutDraft,
-        persistLoadable,
-        layoutDraftLoadable,
-    });
 
     const updateDraft = useCallback(
         (modifications: Partial<ILayoutDraft>) => {
@@ -96,7 +75,7 @@ export function useLayoutDraft(layoutID?: RecordID, initialViewType?: LayoutView
         },
         [dispatch],
     );
-    return { layoutDraft, layoutDraftLoadable, persistLoadable, persistDraft, updateDraft };
+    return { layoutDraft, persistDraft, updateDraft };
 }
 
 export function useTextEditorJsonBuffer() {
@@ -122,11 +101,15 @@ export function useTextEditorJsonBuffer() {
     );
 
     const validateTextDraft = useCallback(
-        (textDraft): ILayoutDraft | null => {
+        (textDraft, layoutViewType?: LayoutViewType): ILayoutDraft | null => {
             try {
                 const parsed = JSON.parse(textDraft);
-                setJsonErrorMessage(null);
-                return parsed as ILayoutDraft;
+                const validateRequiredAssets = LayoutEditorAssetUtils.validateAssets({
+                    ...parsed,
+                    layoutViewType: layoutViewType,
+                });
+                setJsonErrorMessage(validateRequiredAssets.isValid ? null : validateRequiredAssets.message ?? "");
+                return validateRequiredAssets.isValid ? (parsed as ILayoutDraft) : null;
             } catch (err) {
                 logError(err);
                 setJsonErrorMessage(err.message);

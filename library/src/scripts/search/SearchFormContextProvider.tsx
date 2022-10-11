@@ -7,7 +7,7 @@ import { TypeAllIcon } from "@library/icons/searchIcons";
 import { FilterPanelAll } from "@library/search/panels/FilterPanelAll";
 import { SearchActions } from "@library/search/SearchActions";
 import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE, searchReducer } from "@library/search/searchReducer";
-import { ISearchForm, ISearchRequestQuery, ISearchFormBase, ISearchSource } from "@library/search/searchTypes";
+import { ISearchForm, ISearchRequestQuery, ISearchSource } from "@library/search/searchTypes";
 import {
     ALLOWED_GLOBAL_SEARCH_FIELDS,
     ALL_CONTENT_DOMAIN_NAME,
@@ -18,7 +18,6 @@ import {
 import { t } from "@vanilla/i18n";
 import React, { ReactNode, useCallback, useContext, useEffect, useReducer, useState } from "react";
 import merge from "lodash/merge";
-import Result from "@library/result/Result";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { useSearchScope } from "@library/features/search/SearchScopeContext";
 import { getCurrentLocale } from "@vanilla/i18n";
@@ -112,7 +111,6 @@ export function SearchFormContextProvider(props: IProps) {
             };
         },
         isIsolatedType: () => false,
-        ResultComponent: Result,
     };
 
     const getDomains = () => {
@@ -127,7 +125,7 @@ export function SearchFormContextProvider(props: IProps) {
         );
     };
 
-    const getDate = (form: ISearchFormBase): string | undefined => {
+    const getDate = (form: ISearchForm): string | undefined => {
         let dateInserted: string | undefined;
         if (form.startDate && form.endDate) {
             if (form.startDate === form.endDate) {
@@ -147,16 +145,10 @@ export function SearchFormContextProvider(props: IProps) {
         return dateInserted;
     };
 
-    const makeFilterForm = (form: ISearchFormBase): Partial<ISearchForm> => {
+    const makeFilterForm = (form: ISearchForm): ISearchForm => {
         const currentDomain = getCurrentDomain();
-        const filterForm: Partial<ISearchForm> = {};
         const allowedFields = [...ALL_CONTENT_DOMAIN.getAllowedFields(), ...currentDomain.getAllowedFields()];
-        for (const [key, value] of Object.entries(form)) {
-            if (allowedFields.includes(key)) {
-                filterForm[key] = value;
-            }
-        }
-        return filterForm;
+        return Object.fromEntries(allowedFields.map((field) => [field, form[field]])) as ISearchForm;
     };
 
     const searchScope = useSearchScope();
@@ -165,16 +157,17 @@ export function SearchFormContextProvider(props: IProps) {
         const currentDomain = getCurrentDomain();
 
         const allowedSorts = currentDomain.getSortValues().map((val) => val.value);
-        const sort = allowedSorts.includes(form.sort) ? form.sort : undefined;
+        const sort = !!form.sort && allowedSorts.includes(form.sort) ? form.sort : undefined;
 
-        const commonQueryEntries: ISearchRequestQuery = {
-            page: form.page,
+        const commonQueryEntries = {
+            ...filterForm,
             limit: SEARCH_LIMIT_DEFAULT,
             dateInserted: getDate(form),
             locale: getCurrentLocale(),
             collapse: true,
-            ...currentDomain.transformFormToQuery(filterForm),
             sort,
+            ...(form.offset && { offset: form.offset }),
+            ...currentDomain.transformFormToQuery?.(filterForm),
         };
         if (searchScope.value?.value) {
             commonQueryEntries.scope = searchScope.value.value;
@@ -182,6 +175,7 @@ export function SearchFormContextProvider(props: IProps) {
 
         let finalQuery: ISearchRequestQuery;
 
+        // FIXME: these following conditions should probably be moved to different domains' `transformFormToQuery` callbacks
         if (currentDomain.key === MEMBERS_DOMAIN_NAME) {
             finalQuery = {
                 ...commonQueryEntries,
@@ -202,8 +196,8 @@ export function SearchFormContextProvider(props: IProps) {
             };
         } else {
             finalQuery = {
-                domain: form.domain,
                 ...commonQueryEntries,
+                domain: form.domain,
                 insertUserIDs:
                     form.authors && form.authors.length
                         ? form.authors.map((author) => author.value as number)
@@ -226,7 +220,7 @@ export function SearchFormContextProvider(props: IProps) {
 
         // Filter out empty fields.
         Object.entries(finalQuery).forEach(([field, value]) => {
-            if (value === "") {
+            if (value === "" || value === undefined) {
                 delete finalQuery[field];
             }
         });
@@ -244,7 +238,7 @@ export function SearchFormContextProvider(props: IProps) {
      * Generate and store a hash representing the form query and the search source
      */
     const updateHashedEventStore = (form: ISearchForm, source: ISearchSource): void => {
-        const hash = stableObjectHash({ query: form.query, key: source.key });
+        const hash = stableObjectHash({ query: form.query, domain: form.domain, key: source.key });
         setHashedSearchEvents((prevValues) => {
             return [...new Set([...prevValues, hash])];
         });
@@ -256,7 +250,7 @@ export function SearchFormContextProvider(props: IProps) {
      * spams the search button
      */
     const shouldDispatchAnalyticsEvent = (form: ISearchForm, source: ISearchSource): boolean => {
-        const hash = stableObjectHash({ query: form.query, key: source.key });
+        const hash = stableObjectHash({ query: form.query, domain: form.domain, key: source.key });
         return !hashedSearchEvents.includes(hash);
     };
 
@@ -268,7 +262,7 @@ export function SearchFormContextProvider(props: IProps) {
         try {
             const query = buildQuery(form);
 
-            const result = await searchSource.performSearch(query);
+            const result = await searchSource.performSearch(query, form?.pageURL);
 
             dispatch(
                 SearchActions.performSearchACs.done({
@@ -290,7 +284,7 @@ export function SearchFormContextProvider(props: IProps) {
                     new CustomEvent("pageViewWithContext", {
                         detail: getSearchAnalyticsData(form, result, {
                             key: searchSource.key,
-                            label: searchSource.getLabel(),
+                            label: searchSource.label,
                         }),
                     }),
                 );
@@ -343,7 +337,7 @@ export function SearchFormContextProvider(props: IProps) {
     }, []);
 
     const getDefaultFormValues = () => {
-        const domainDefaults = getDomains().map((domain) => domain.getDefaultFormValues());
+        const domainDefaults = getDomains().map((domain) => domain.getDefaultFormValues?.() ?? {});
         const merged = merge({}, DEFAULT_CORE_SEARCH_FORM, ...domainDefaults);
         return merged;
     };
@@ -354,7 +348,7 @@ export function SearchFormContextProvider(props: IProps) {
                 getFilterComponentsForDomain,
                 updateForm,
                 results: state.results,
-                domainSearchResults: state.domainSearchResults,
+                domainSearchResponse: state.domainSearchResponse,
                 form: state.form,
                 search,
                 searchInDomain,

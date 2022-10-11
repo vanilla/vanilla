@@ -13,13 +13,14 @@
  * @param object $smarty
  * @return string
  */
-function smarty_function_signin_link($params, &$smarty) {
+function smarty_function_signin_link($params, &$smarty)
+{
     if (!Gdn::session()->isValid()) {
-        $wrap = val('wrap', $params, 'li');
+        $wrap = val("wrap", $params, "li");
         return Gdn_Theme::link(
-            'signinout',
-            val('text', $params, ''),
-            val('format', $params, wrap('<a href="%url" rel="nofollow" class="%class">%text</a>', $wrap)),
+            "signinout",
+            val("text", $params, ""),
+            val("format", $params, wrap('<a href="%url" rel="nofollow" class="%class">%text</a>', $wrap)),
             $params
         );
     }

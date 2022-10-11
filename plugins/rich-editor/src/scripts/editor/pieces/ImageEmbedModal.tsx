@@ -13,7 +13,7 @@ import { EditorEventWall } from "@rich-editor/editor/pieces/EditorEventWall";
 import { embedMenuClasses } from "@rich-editor/editor/pieces/embedMenuStyles";
 import Frame from "@library/layout/frame/Frame";
 import FrameHeader from "@library/layout/frame/FrameHeader";
-import LazyModal from "@library/modal/LazyModal";
+import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { useUniqueID } from "@library/utility/idUtils";
 import { useLastValue } from "@vanilla/react-utils";
@@ -63,7 +63,7 @@ export function ImageEmbedModal(props: IProps) {
     const titleID = useUniqueID("modalTitle");
 
     return (
-        <LazyModal isVisible={props.isVisible} size={ModalSizes.SMALL} titleID={titleID} exitHandler={props.onClose}>
+        <Modal isVisible={props.isVisible} size={ModalSizes.SMALL} titleID={titleID} exitHandler={props.onClose}>
             <EditorEventWall>
                 <form className={classes.form}>
                     <Frame
@@ -109,6 +109,6 @@ export function ImageEmbedModal(props: IProps) {
                     />
                 </form>
             </EditorEventWall>
-        </LazyModal>
+        </Modal>
     );
 }

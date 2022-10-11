@@ -25,8 +25,8 @@ use Vanilla\Web\Asset\DeploymentCacheBuster;
 /**
  * Factory for creating theme assets.
  */
-class ThemeAssetFactory {
-
+class ThemeAssetFactory
+{
     const ASSET_TYPE_HTML = "html";
     const ASSET_TYPE_JSON = "json";
     const ASSET_TYPE_CSS = "css";
@@ -34,13 +34,13 @@ class ThemeAssetFactory {
     const ASSET_TYPE_NEON = "neon";
     const ASSET_TYPE_TWIG = "twig";
 
-    const ASSET_HEADER = 'header';
-    const ASSET_FOOTER = 'footer';
-    const ASSET_VARIABLES = 'variables';
-    const ASSET_FONTS = 'fonts';
-    const ASSET_SCRIPTS = 'scripts';
-    const ASSET_STYLES = 'styles';
-    const ASSET_JAVASCRIPT = 'javascript';
+    const ASSET_HEADER = "header";
+    const ASSET_FOOTER = "footer";
+    const ASSET_VARIABLES = "variables";
+    const ASSET_FONTS = "fonts";
+    const ASSET_SCRIPTS = "scripts";
+    const ASSET_STYLES = "styles";
+    const ASSET_JAVASCRIPT = "javascript";
 
     const DEFAULT_ASSETS = [
         self::ASSET_HEADER => [
@@ -103,7 +103,11 @@ class ThemeAssetFactory {
      * @param DeploymentCacheBuster $cacheBuster
      * @param ConfigurationInterface $config
      */
-    public function __construct(\Gdn_Request $request, DeploymentCacheBuster $cacheBuster, ConfigurationInterface $config) {
+    public function __construct(
+        \Gdn_Request $request,
+        DeploymentCacheBuster $cacheBuster,
+        ConfigurationInterface $config
+    ) {
         $this->request = $request;
         $this->cacheBuster = $cacheBuster;
         $this->config = $config;
@@ -112,7 +116,8 @@ class ThemeAssetFactory {
     /**
      * @return ThemeAssetFactory
      */
-    public static function instance(): ThemeAssetFactory {
+    public static function instance(): ThemeAssetFactory
+    {
         return \Gdn::getContainer()->get(ThemeAssetFactory::class);
     }
 
@@ -126,14 +131,20 @@ class ThemeAssetFactory {
      * @param bool $throw Whether or not to throw an exception for an invalid asset.
      * @return ThemeAsset|null
      */
-    public function createAsset(?Theme $theme, string $assetType, string $assetName, string $assetContents, bool $throw = false): ?ThemeAsset {
-        if ($assetType === 'data') {
+    public function createAsset(
+        ?Theme $theme,
+        string $assetType,
+        string $assetName,
+        string $assetContents,
+        bool $throw = false
+    ): ?ThemeAsset {
+        if ($assetType === "data") {
             // Legacy shim.
-            $assetType = 'json';
+            $assetType = "json";
         }
         $defaultAsset = self::DEFAULT_ASSETS[$assetName] ?? null;
         if ($defaultAsset) {
-            $allowedTypes = $defaultAsset['allowedTypes'];
+            $allowedTypes = $defaultAsset["allowedTypes"];
             if (!in_array($assetType, $allowedTypes)) {
                 $message = "Invalid type '$assetType' for asset '$assetName'";
                 if ($throw) {
@@ -150,11 +161,13 @@ class ThemeAssetFactory {
             $buster = $this->getThemeAssetCacheBuster($theme);
         } else {
             $themeID = -1;
-            $buster = 'notheme';
+            $buster = "notheme";
         }
-        $defaultAssetType = self::DEFAULT_ASSETS[$assetName]['type'] ?? '';
+        $defaultAssetType = self::DEFAULT_ASSETS[$assetName]["type"] ?? "";
         $defaultAssetExtension = $defaultAssetType ? ".$defaultAssetType" : "";
-        $url = $this->request->getSimpleUrl("/api/v2/themes/$themeID/assets/$assetName$defaultAssetExtension?v=$buster");
+        $url = $this->request->getSimpleUrl(
+            "/api/v2/themes/$themeID/assets/$assetName$defaultAssetExtension?v=$buster"
+        );
 
         switch ($assetType) {
             case self::ASSET_TYPE_HTML:
@@ -182,7 +195,8 @@ class ThemeAssetFactory {
      *
      * @return ThemeAsset
      */
-    public function mergeAssets(ThemeAsset $min1ThemeAsset, ThemeAsset ...$restAssets): ThemeAsset {
+    public function mergeAssets(ThemeAsset $min1ThemeAsset, ThemeAsset ...$restAssets): ThemeAsset
+    {
         $assets = array_merge([$min1ThemeAsset], $restAssets);
         $lastAsset = $assets[count($assets) - 1] ?? $min1ThemeAsset;
         if (!$lastAsset->canMerge()) {
@@ -190,7 +204,7 @@ class ThemeAssetFactory {
         }
 
         if ($this->assetsAreInstancesOf($assets, CssThemeAsset::class)) {
-            $concattedValue = '';
+            $concattedValue = "";
             /** @var CssThemeAsset $asset */
             foreach ($assets as $asset) {
                 $concattedValue .= $asset->getValue();
@@ -198,7 +212,7 @@ class ThemeAssetFactory {
 
             return new CssThemeAsset($concattedValue, $lastAsset->getUrl());
         } elseif ($this->assetsAreInstancesOf($assets, JavascriptThemeAsset::class)) {
-            $concattedValue = '';
+            $concattedValue = "";
             /** @var JavascriptThemeAsset $asset */
             foreach ($assets as $asset) {
                 $concattedValue .= $asset->getValue();
@@ -233,7 +247,8 @@ class ThemeAssetFactory {
      *
      * @return bool
      */
-    private function assetsAreInstancesOf(array $assets, string $class): bool {
+    private function assetsAreInstancesOf(array $assets, string $class): bool
+    {
         foreach ($assets as $asset) {
             if (!($asset instanceof $class)) {
                 return false;
@@ -250,19 +265,20 @@ class ThemeAssetFactory {
      *
      * @return array
      */
-    public function getLogoAssets(?JsonThemeAsset $variables = null): array {
+    public function getLogoAssets(?JsonThemeAsset $variables = null): array
+    {
         $logoAssets = [];
         $desktopLogoUrl = null;
         $mobileLogoUrl = null;
         if ($variables) {
-            $desktopLogoUrl = $variables->get('titleBar.logo.desktop.url', null) ?: null;
-            $mobileLogoUrl = $variables->get('titleBar.logo.mobile.url', $desktopLogoUrl) ?: null;
+            $desktopLogoUrl = $variables->get("titleBar.logo.desktop.url", null) ?: null;
+            $mobileLogoUrl = $variables->get("titleBar.logo.mobile.url", $desktopLogoUrl) ?: null;
         }
 
         if ($desktopLogoUrl === null) {
             // Check the config.
-            $desktopConfig = $this->config->get('Garden.Logo') ?: null;
-            $mobileConfig = $this->config->get('Garden.MobileLogo', $desktopConfig) ?: null;
+            $desktopConfig = $this->config->get("Garden.Logo") ?: null;
+            $mobileConfig = $this->config->get("Garden.MobileLogo", $desktopConfig) ?: null;
 
             if ($desktopConfig) {
                 $desktopLogoUrl = \Gdn_Upload::url($desktopConfig);
@@ -274,11 +290,11 @@ class ThemeAssetFactory {
         }
 
         if ($desktopLogoUrl) {
-            $logoAssets['logo'] = new ImageThemeAsset($desktopLogoUrl);
+            $logoAssets["logo"] = new ImageThemeAsset($desktopLogoUrl);
         }
 
         if ($mobileLogoUrl) {
-            $logoAssets['mobileLogo'] = new ImageThemeAsset($mobileLogoUrl);
+            $logoAssets["mobileLogo"] = new ImageThemeAsset($mobileLogoUrl);
         }
 
         return $logoAssets;
@@ -290,7 +306,8 @@ class ThemeAssetFactory {
      * @param Theme $theme
      * @return string
      */
-    private function getThemeAssetCacheBuster(Theme $theme): string {
+    private function getThemeAssetCacheBuster(Theme $theme): string
+    {
         $themeBuster = $theme->getVersion();
         $deployBuster = $this->cacheBuster->value();
         return "$themeBuster-$deployBuster";

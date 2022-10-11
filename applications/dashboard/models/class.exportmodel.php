@@ -13,22 +13,22 @@
  *
  * @see Gdn_ImportModel
  */
-class ExportModel {
-
+class ExportModel
+{
     /** Comment character to use in export. */
-    const COMMENT = '//';
+    const COMMENT = "//";
 
     /** Delimiter character to use in export. */
-    const DELIM = ',';
+    const DELIM = ",";
 
     /** Escape character to use in export. */
-    const ESCAPE = '\\';
+    const ESCAPE = "\\";
 
     /** Newline character to use in export. */
     const NEWLINE = "\n";
 
     /** Null character to use in export. */
-    const NULL = '\N';
+    const NULL = "\N";
 
     /** Quote character to use in export. */
     const QUOTE = '"';
@@ -43,23 +43,71 @@ class ExportModel {
     public $UseCompression = true;
 
     /** @var string The database prefix that exportTable() it will replace :_ with in a query string. */
-    public $Prefix = '';
+    public $Prefix = "";
 
     /** @var array Data format we support exporting. */
     protected $_Structures = [
-        'Category' => ['CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'],
-        'Comment' => ['CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'],
-        'Conversation' => ['ConversationID' => 'int', 'FirstMessageID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'],
-        'ConversationMessage' => ['MessageID' => 'int', 'ConversationID' => 'int', 'Body' => 'text', 'InsertUserID' => 'int', 'DateInserted' => 'datetime'],
-        'Discussion' => [
-            'DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'Body' => 'text',
-            'Format' => 'varchar(20)', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime',
-            'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint'
+        "Category" => [
+            "CategoryID" => "int",
+            "Name" => "varchar(30)",
+            "Description" => "varchar(250)",
+            "ParentCategoryID" => "int",
+            "DateInserted" => "datetime",
+            "InsertUserID" => "int",
+            "DateUpdated" => "datetime",
+            "UpdateUserID" => "int",
         ],
-        'Role' => ['RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'],
-        'UserConversation' => ['UserID' => 'int', 'ConversationID' => 'int', 'LastMessageID' => 'int'],
-        'User' => ['UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => ['u', 'm', 'f'], 'Score' => 'float'],
-        'UserRole' => ['UserID' => 'int', 'RoleID' => 'int']
+        "Comment" => [
+            "CommentID" => "int",
+            "DiscussionID" => "int",
+            "DateInserted" => "datetime",
+            "InsertUserID" => "int",
+            "DateUpdated" => "datetime",
+            "UpdateUserID" => "int",
+            "Format" => "varchar(20)",
+            "Body" => "text",
+            "Score" => "float",
+        ],
+        "Conversation" => [
+            "ConversationID" => "int",
+            "FirstMessageID" => "int",
+            "DateInserted" => "datetime",
+            "InsertUserID" => "int",
+            "DateUpdated" => "datetime",
+            "UpdateUserID" => "int",
+        ],
+        "ConversationMessage" => [
+            "MessageID" => "int",
+            "ConversationID" => "int",
+            "Body" => "text",
+            "InsertUserID" => "int",
+            "DateInserted" => "datetime",
+        ],
+        "Discussion" => [
+            "DiscussionID" => "int",
+            "Name" => "varchar(100)",
+            "CategoryID" => "int",
+            "Body" => "text",
+            "Format" => "varchar(20)",
+            "DateInserted" => "datetime",
+            "InsertUserID" => "int",
+            "DateUpdated" => "datetime",
+            "UpdateUserID" => "int",
+            "Score" => "float",
+            "Announce" => "tinyint",
+            "Closed" => "tinyint",
+        ],
+        "Role" => ["RoleID" => "int", "Name" => "varchar(100)", "Description" => "varchar(200)"],
+        "UserConversation" => ["UserID" => "int", "ConversationID" => "int", "LastMessageID" => "int"],
+        "User" => [
+            "UserID" => "int",
+            "Name" => "varchar(20)",
+            "Email" => "varchar(200)",
+            "Password" => "varbinary(34)",
+            "Gender" => ["u", "m", "f"],
+            "Score" => "float",
+        ],
+        "UserRole" => ["UserID" => "int", "RoleID" => "int"],
     ];
 
     /**
@@ -68,23 +116,24 @@ class ExportModel {
      * @param string $path The path to the export file.
      * @param string $source The source program that created the export. This may be used by the import routine to do additional processing.
      */
-    public function beginExport($path, $source = '') {
+    public function beginExport($path, $source = "")
+    {
         $this->BeginTime = microtime(true);
-        $timeStart = list($sm, $ss) = explode(' ', microtime());
+        $timeStart = [$sm, $ss] = explode(" ", microtime());
 
-        if ($this->UseCompression && function_exists('gzopen')) {
-            $fp = gzopen($path, 'wb');
+        if ($this->UseCompression && function_exists("gzopen")) {
+            $fp = gzopen($path, "wb");
         } else {
-            $fp = fopen($path, 'wb');
+            $fp = fopen($path, "wb");
         }
         $this->_File = $fp;
 
-        fwrite($fp, 'Vanilla Export: '.$this->version());
+        fwrite($fp, "Vanilla Export: " . $this->version());
         if ($source) {
-            fwrite($fp, self::DELIM.' Source: '.$source);
+            fwrite($fp, self::DELIM . " Source: " . $source);
         }
-        fwrite($fp, self::NEWLINE.self::NEWLINE);
-        $this->comment('Exported Started: '.date('Y-m-d H:i:s'));
+        fwrite($fp, self::NEWLINE . self::NEWLINE);
+        $this->comment("Exported Started: " . date("Y-m-d H:i:s"));
     }
 
     /**
@@ -93,8 +142,15 @@ class ExportModel {
      * @param string $message The message to write.
      * @param bool $echo Whether or not to echo the message in addition to writing it to the file.
      */
-    public function comment($message, $echo = true) {
-        fwrite($this->_File, self::COMMENT.' '.str_replace(self::NEWLINE, self::NEWLINE.self::COMMENT.' ', $message).self::NEWLINE);
+    public function comment($message, $echo = true)
+    {
+        fwrite(
+            $this->_File,
+            self::COMMENT .
+                " " .
+                str_replace(self::NEWLINE, self::NEWLINE . self::COMMENT . " ", $message) .
+                self::NEWLINE
+        );
         if ($echo) {
             echo $message, "\n";
         }
@@ -105,15 +161,16 @@ class ExportModel {
      *
      * This method must be called if beginExport() has been called or else the export file will not be closed.
      */
-    public function endExport() {
+    public function endExport()
+    {
         $this->EndTime = microtime(true);
         $this->TotalTime = $this->EndTime - $this->BeginTime;
         $m = floor($this->TotalTime / 60);
         $s = $this->TotalTime - $m * 60;
 
-        $this->comment('Exported Completed: '.date('Y-m-d H:i:s').sprintf(', Elapsed Time: %02d:%02.2f', $m, $s));
+        $this->comment("Exported Completed: " . date("Y-m-d H:i:s") . sprintf(", Elapsed Time: %02d:%02.2f", $m, $s));
 
-        if ($this->UseCompression && function_exists('gzopen')) {
+        if ($this->UseCompression && function_exists("gzopen")) {
             gzclose($this->_File);
         } else {
             fclose($this->_File);
@@ -131,14 +188,15 @@ class ExportModel {
      * @param string $password The password for the database if a dsn is specified.
      * @return PDO The current database connection.
      */
-    public function pDO($dsnOrPDO = null, $username = null, $password = null) {
+    public function pDO($dsnOrPDO = null, $username = null, $password = null)
+    {
         if (!is_null($dsnOrPDO)) {
             if ($dsnOrPDO instanceof PDO) {
                 $this->_PDO = $dsnOrPDO;
             } else {
                 $this->_PDO = new PDO($dsnOrPDO, $username, $password);
-                if (strncasecmp($dsnOrPDO, 'mysql', 5) == 0) {
-                    $this->_PDO->exec('set names utf8mb4');
+                if (strncasecmp($dsnOrPDO, "mysql", 5) == 0) {
+                    $this->_PDO->exec("set names utf8mb4");
                 }
             }
         }
@@ -156,24 +214,28 @@ class ExportModel {
      * @param array $mappings Specifies mappings, if any, between the source and the export where the keys represent the export columns and the values represent the source columns.
      *  For a list of the export tables and columns see $this->structure().
      */
-    public function exportTable($tableName, $query, $mappings = []) {
+    public function exportTable($tableName, $query, $mappings = [])
+    {
         $fp = $this->_File;
 
         // Make sure the table is valid for export.
         if (!array_key_exists($tableName, $this->_Structures)) {
-            $this->comment("Error: $tableName is not a valid export."
-                ." The valid tables for export are ".implode(", ", array_keys($this->_Structures)));
+            $this->comment(
+                "Error: $tableName is not a valid export." .
+                    " The valid tables for export are " .
+                    implode(", ", array_keys($this->_Structures))
+            );
             fwrite($fp, self::NEWLINE);
             return;
         }
         $structure = $this->_Structures[$tableName];
 
         // Start with the table name.
-        fwrite($fp, 'Table: '.$tableName.self::NEWLINE);
+        fwrite($fp, "Table: " . $tableName . self::NEWLINE);
 
         // Get the data for the query.
         if (is_string($query)) {
-            $query = str_replace(':_', $this->Prefix, $query); // replace prefix.
+            $query = str_replace(":_", $this->Prefix, $query); // replace prefix.
             $data = $this->pDO()->query($query, PDO::FETCH_ASSOC);
         } elseif ($query instanceof PDOStatement) {
             $data = $query;
@@ -181,14 +243,19 @@ class ExportModel {
 
         // Set the search and replace to escape strings.
         $escapeSearch = [self::ESCAPE, self::DELIM, self::NEWLINE, self::QUOTE]; // escape must go first
-        $escapeReplace = [self::ESCAPE.self::ESCAPE, self::ESCAPE.self::DELIM, self::ESCAPE.self::NEWLINE, self::ESCAPE.self::QUOTE];
+        $escapeReplace = [
+            self::ESCAPE . self::ESCAPE,
+            self::ESCAPE . self::DELIM,
+            self::ESCAPE . self::NEWLINE,
+            self::ESCAPE . self::QUOTE,
+        ];
 
         // Write the column header.
-        fwrite($fp, implode(self::DELIM, array_keys($structure)).self::NEWLINE);
+        fwrite($fp, implode(self::DELIM, array_keys($structure)) . self::NEWLINE);
 
         // Loop through the data and write it to the file.
         foreach ($data as $row) {
-            $row = (array)$row;
+            $row = (array) $row;
             $first = true;
 
             // Loop through the columns in the export structure and grab their values from the row.
@@ -213,9 +280,7 @@ class ExportModel {
                     //if(mb_detect_encoding($Value) != 'UTF-8')
                     //   $Value = utf8_encode($Value);
 
-                    $value = self::QUOTE
-                        .str_replace($escapeSearch, $escapeReplace, $value)
-                        .self::QUOTE;
+                    $value = self::QUOTE . str_replace($escapeSearch, $escapeReplace, $value) . self::QUOTE;
                 } elseif (is_bool($value)) {
                     $value = $value ? 1 : 0;
                 } else {
@@ -239,15 +304,14 @@ class ExportModel {
         }
     }
 
-
-
     /**
      * Returns an array of all the expected export tables and expected columns in the exports.
      * When exporting tables using exportTable() all of the columns in this structure will always be exported in the order here, regardless of how their order in the query.
      * @return array
      * @see vnExport::exportTable()
      */
-    public function structures() {
+    public function structures()
+    {
         return $this->_Structures;
     }
 
@@ -256,7 +320,8 @@ class ExportModel {
      * The version is used when importing to determine the format of this file.
      * @return string
      */
-    public function version() {
-        return '1.0';
+    public function version()
+    {
+        return "1.0";
     }
 }

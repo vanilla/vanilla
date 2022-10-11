@@ -6,18 +6,19 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize;
 
-class BlockQuoteSanitizeTest extends SanitizeTest {
-
+class BlockQuoteSanitizeTest extends SanitizeTest
+{
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
+    protected function insertContentOperations(string $content): array
+    {
         $operations = [
             ["insert" => $content],
             [
                 "attributes" => ["blockquote-line" => true],
-                "insert" => "$content"
-            ]
+                "insert" => "$content",
+            ],
         ];
         return $operations;
     }

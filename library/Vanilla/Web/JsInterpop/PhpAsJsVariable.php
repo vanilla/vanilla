@@ -10,8 +10,8 @@ namespace Vanilla\Web\JsInterpop;
 /**
  * Class that handles rendering an PHP object or array in a javascript context.
  */
-class PhpAsJsVariable {
-
+class PhpAsJsVariable
+{
     /** @var string */
     private $variableName;
 
@@ -24,7 +24,8 @@ class PhpAsJsVariable {
      * @param string $variableName The name of variable to expose the script on the frontend.
      * @param array|object $data The JSON serializable data that should be serialized for a javascript context.
      */
-    public function __construct(string $variableName, $data) {
+    public function __construct(string $variableName, $data)
+    {
         $this->variableName = $variableName;
         $this->encodedData = json_encode($data);
     }
@@ -34,7 +35,8 @@ class PhpAsJsVariable {
      *
      * @return string
      */
-    public function __toString() {
+    public function __toString()
+    {
         return 'window["' . $this->variableName . '"]=' . $this->encodedData . ";\n";
     }
 }

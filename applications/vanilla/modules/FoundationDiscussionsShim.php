@@ -16,8 +16,8 @@ use Vanilla\Web\TwigStaticRenderer;
 /**
  * Class for converting legacy category items into new modules.
  */
-class FoundationDiscussionsShim {
-
+class FoundationDiscussionsShim
+{
     use JsonFilterTrait;
 
     /** @var \DiscussionsApiController */
@@ -37,7 +37,6 @@ class FoundationDiscussionsShim {
 
     /** @var EventManager */
     private $eventManager;
-
 
     /**
      * DI.
@@ -65,7 +64,6 @@ class FoundationDiscussionsShim {
         $this->eventManager = $eventManager;
     }
 
-
     /**
      * Render a list of legacy-style discussion data as the new discussion list widget.
      *
@@ -73,7 +71,8 @@ class FoundationDiscussionsShim {
      * @param FoundationShimOptions|null $options
      * @return string
      */
-    public function renderShim(array $legacyDiscussions, ?FoundationShimOptions $options = null): string {
+    public function renderShim(array $legacyDiscussions, ?FoundationShimOptions $options = null): string
+    {
         $newStyleDiscussions = $this->convertLegacyData($legacyDiscussions);
 
         /** @var DiscussionListModule $module */
@@ -91,7 +90,8 @@ class FoundationDiscussionsShim {
      * @param array $legacyDiscussions
      * @param FoundationShimOptions|null $options
      */
-    public static function printLegacyShim(array $legacyDiscussions, ?FoundationShimOptions $options = null) {
+    public static function printLegacyShim(array $legacyDiscussions, ?FoundationShimOptions $options = null)
+    {
         echo self::renderLegacyShim($legacyDiscussions, $options);
     }
 
@@ -103,20 +103,21 @@ class FoundationDiscussionsShim {
      *
      * @return string
      */
-    public static function renderLegacyShim(array $legacyDiscussions, ?FoundationShimOptions $options = null): string {
+    public static function renderLegacyShim(array $legacyDiscussions, ?FoundationShimOptions $options = null): string
+    {
         /** @var FoundationDiscussionsShim $shim */
         $shim = \Gdn::getContainer()->get(FoundationDiscussionsShim::class);
         return $shim->renderShim($legacyDiscussions, $options);
     }
-
 
     /**
      * Static utility to see if we should render with the shim or not.
      *
      * @return bool
      */
-    public static function isEnabled(): bool {
-        return \Gdn::config('Vanilla.Discussions.Layout') === 'foundation';
+    public static function isEnabled(): bool
+    {
+        return \Gdn::config("Vanilla.Discussions.Layout") === "foundation";
     }
 
     /**
@@ -125,14 +126,9 @@ class FoundationDiscussionsShim {
      * @param array $discussions
      * @return array
      */
-    public function convertLegacyData(array $discussions): array {
-        $expands = [
-            'category',
-            'insertUser',
-            'lastUser',
-            '-body',
-            'excerpt',
-        ];
+    public function convertLegacyData(array $discussions): array
+    {
+        $expands = ["category", "insertUser", "lastUser", "-body", "excerpt"];
         $normalized = [];
         $schema = $this->discussionsApiController->discussionSchema();
         foreach ($discussions as $discussion) {
@@ -145,21 +141,22 @@ class FoundationDiscussionsShim {
         }
 
         // Apply user expands that may not have been in the original data.
-        $this->userModel->expandUsers($normalized, ['insertUserID', 'lastUserID']);
+        $this->userModel->expandUsers($normalized, ["insertUserID", "lastUserID"]);
 
         // There is almost the data needed to reconstruct these manually, but it may not be there in all scenarios.
         // In any case the category cache in the app should be primed already from the initial fetch.
         // It's worth the CPU cycles to be sure.
-        $this->categoryModel->expandCategories($normalized, 'category');
+        $this->categoryModel->expandCategories($normalized, "category");
 
         // Apply validation
         foreach ($normalized as &$normalizedItem) {
-            $discussionID = $normalizedItem['discussionID'] ?? null;
+            $discussionID = $normalizedItem["discussionID"] ?? null;
             try {
                 $normalizedItem = $schema->validate($normalizedItem);
             } catch (ValidationException $e) {
                 trigger_error(
-                    "Discussion `$discussionID` rendering was skipped due to validation errors.\n" . formatException($e),
+                    "Discussion `$discussionID` rendering was skipped due to validation errors.\n" .
+                        formatException($e),
                     E_USER_WARNING
                 );
             }
@@ -170,11 +167,11 @@ class FoundationDiscussionsShim {
 
         // If reactions is enabled expand them on the results.
         $result = $this->eventManager->fireFilter(
-            'discussionsApiController_getOutput',
+            "discussionsApiController_getOutput",
             $result,
             $this->discussionsApiController,
             $schema,
-            ['expand' => ['reactions']],
+            ["expand" => ["reactions"]],
             $discussions
         );
 

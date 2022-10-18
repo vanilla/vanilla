@@ -9,14 +9,13 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ILayoutCatalog, LayoutSectionID } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import Frame from "@library/layout/frame/Frame";
 import FrameHeader from "@library/layout/frame/FrameHeader";
-import LazyModal from "@library/modal/LazyModal";
+import Modal from "@library/modal/Modal";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import Button from "@library/forms/Button";
 import ModalSizes from "@library/modal/ModalSizes";
 import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
-import Modal from "@library/modal/Modal";
 import { useUniqueID } from "@library/utility/idUtils";
 import LayoutSectionsThumbnails from "@dashboard/layout/editor/thumbnails/LayoutSectionsThumbnails";
 import LayoutWidgetsThumbnails from "@dashboard/layout/editor/thumbnails/LayoutWidgetsThumbnails";
@@ -40,7 +39,7 @@ export function LayoutThumbnailsModal<T extends "sections" | "widgets">(props: I
     const titleID = useUniqueID("layoutThumbnail");
 
     return (
-        <LazyModal noFocusOnExit isVisible={isVisible} size={ModalSizes.LARGE} exitHandler={exitHandler}>
+        <Modal noFocusOnExit isVisible={isVisible} size={ModalSizes.LARGE} exitHandler={exitHandler}>
             <form
                 data-layout-editor-modal
                 className={layoutThumbnailsClasses().form}
@@ -88,6 +87,6 @@ export function LayoutThumbnailsModal<T extends "sections" | "widgets">(props: I
                     }
                 />
             </form>
-        </LazyModal>
+        </Modal>
     );
 }

@@ -15,9 +15,10 @@
  * @param bool $repeat
  * @return string The url.
  */
-function smarty_block_widget($params, $content, &$smarty, &$repeat) {
-    if (!$repeat){
-        $class = '_widget '.trim(val('class', $params, ''));
+function smarty_block_widget($params, $content, &$smarty, &$repeat)
+{
+    if (!$repeat) {
+        $class = "_widget " . trim(val("class", $params, ""));
 
         return <<<EOT
         <div class="$class">
@@ -28,4 +29,3 @@ function smarty_block_widget($params, $content, &$smarty, &$repeat) {
 EOT;
     }
 }
-

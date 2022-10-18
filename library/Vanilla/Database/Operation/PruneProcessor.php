@@ -13,7 +13,8 @@ use Vanilla\PrunableTrait;
 /**
  * A processor that deletes old rows with each insert in order to keep a table size smaller.
  */
-class PruneProcessor implements Processor {
+class PruneProcessor implements Processor
+{
     use PrunableTrait {
         prune as protected;
         delete as protected;
@@ -31,7 +32,8 @@ class PruneProcessor implements Processor {
      * @param string $pruneAfter A `strtotime()` expression to filter which records to prune.
      * @param int $limit The number of rows to delete with each prune.
      */
-    public function __construct(string $field, string $pruneAfter = '30 days', int $limit = 10) {
+    public function __construct(string $field, string $pruneAfter = "30 days", int $limit = 10)
+    {
         $this->setPruneField($field);
         $this->setPruneAfter($pruneAfter);
         $this->setPruneLimit($limit);
@@ -40,7 +42,8 @@ class PruneProcessor implements Processor {
     /**
      * {@inheritdoc}
      */
-    public function handle(Operation $operation, callable $stack) {
+    public function handle(Operation $operation, callable $stack)
+    {
         switch ($operation->getType()) {
             case Operation::TYPE_INSERT:
                 $op = $this->operation;
@@ -59,7 +62,8 @@ class PruneProcessor implements Processor {
     /**
      * {@inheritdoc}
      */
-    public function delete($where = [], $options = []) {
+    public function delete($where = [], $options = [])
+    {
         $this->operation->getCaller()->delete($where, $options);
     }
 }

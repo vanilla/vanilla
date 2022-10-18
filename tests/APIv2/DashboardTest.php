@@ -10,13 +10,14 @@ namespace VanillaTests\APIv2;
 /**
  * Tests for the /api/v2/dashboard endpoints.
  */
-class DashboardTest extends AbstractAPIv2Test {
-
+class DashboardTest extends AbstractAPIv2Test
+{
     /**
      * A basic smoke test of the dashboard menus.
      */
-    public function testIndexMenusSmoke() {
-        $r = $this->api()->get('/dashboard/menus');
+    public function testIndexMenusSmoke()
+    {
+        $r = $this->api()->get("/dashboard/menus");
         $data = $r->getBody();
         $this->assertSame(4, count($data));
     }

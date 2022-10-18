@@ -12,28 +12,32 @@ use Vanilla\Dashboard\Models\RoleRequestModel;
  *
  * This module displays a list of links to role applications for roles the user doesn't have access to.
  */
-class RoleApplicationLinksModule extends Gdn_Module {
+class RoleApplicationLinksModule extends Gdn_Module
+{
     /**
      * @inheritDoc
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->_ApplicationFolder = 'dashboard';
+        $this->_ApplicationFolder = "dashboard";
     }
 
     /**
      * {@inheritDoc}
      */
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
     /**
      * @return string
      */
-    public function toString() {
+    public function toString()
+    {
         if (!Gdn::session()->isValid()) {
-            return '';
+            return "";
         }
         $this->loadData();
 
@@ -43,16 +47,17 @@ class RoleApplicationLinksModule extends Gdn_Module {
     /**
      * Load the role request metas for roles the user doesn't have.
      */
-    private function loadData() {
+    private function loadData()
+    {
         /** @var \Vanilla\Dashboard\Models\RoleRequestsApiController $api */
         $api = Gdn::getContainer()->get(\Vanilla\Dashboard\Models\RoleRequestsApiController::class);
         $metas = $api
             ->index_metas([
-                'type' => RoleRequestModel::TYPE_APPLICATION,
-                'hasRole' => false,
-                'expand' => true
+                "type" => RoleRequestModel::TYPE_APPLICATION,
+                "hasRole" => false,
+                "expand" => true,
             ])
             ->getData();
-        $this->setData('metas', $metas);
+        $this->setData("metas", $metas);
     }
 }

@@ -9,8 +9,8 @@ namespace Vanilla\Search;
 /**
  * Mysql search driver.
  */
-class MysqlSearchDriver extends AbstractSearchDriver {
-
+class MysqlSearchDriver extends AbstractSearchDriver
+{
     const MAX_RESULTS = 1000;
 
     /** @var \Gdn_Database $mysql */
@@ -21,8 +21,9 @@ class MysqlSearchDriver extends AbstractSearchDriver {
      *
      * @param \Gdn_Database $db
      */
-    public function __construct(\Gdn_Database $db) {
-        $this->db  = $db;
+    public function __construct(\Gdn_Database $db)
+    {
+        $this->db = $db;
     }
 
     /**
@@ -33,7 +34,8 @@ class MysqlSearchDriver extends AbstractSearchDriver {
      *
      * @return SearchResults
      */
-    public function search(array $queryData, SearchOptions $options): SearchResults {
+    public function search(array $queryData, SearchOptions $options): SearchResults
+    {
         $query = new MysqlSearchQuery($this->getSearchTypes(), $queryData, $this->db);
 
         $sql = $query->getSql();
@@ -44,24 +46,21 @@ class MysqlSearchDriver extends AbstractSearchDriver {
         }
 
         $search = $this->convertRecordsToResultItems($search, $query);
-        return new SearchResults(
-            $search,
-            count($search),
-            $options->getOffset(),
-            $options->getLimit()
-        );
+        return new SearchResults($search, count($search), $options->getOffset(), $options->getLimit());
     }
 
     /**
      * @inheritdoc
      */
-    public function getName(): string {
-        return 'MySQL';
+    public function getName(): string
+    {
+        return "MySQL";
     }
 
     /**
      * @inheritdoc
      */
-    public function createIndexes() {
+    public function createIndexes()
+    {
     }
 }

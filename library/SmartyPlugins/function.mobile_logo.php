@@ -13,11 +13,12 @@
  * @param Smarty $smarty The smarty object rendering the template.
  * @return string The url.
  */
-function smarty_function_mobile_logo($params, &$smarty) {
+function smarty_function_mobile_logo($params, &$smarty)
+{
     $options = [];
-    if (isset($params['fallbackLogo'])) {
-        $options['fallbackLogo']  = $params['fallbackLogo'];
+    if (isset($params["fallbackLogo"])) {
+        $options["fallbackLogo"] = $params["fallbackLogo"];
     }
     $result = Gdn_Theme::mobileLogo($params);
-	return $result;
+    return $result;
 }

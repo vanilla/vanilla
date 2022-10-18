@@ -13,22 +13,23 @@ use Vanilla\Utility\InstanceValidatorSchema;
 /**
  * Schema for a primary image in some content.
  */
-class MainImageSchema extends Schema {
-
+class MainImageSchema extends Schema
+{
     /**
      * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct([
-            'type' => 'object',
-            'properties' => [
-                'url' => [
-                    'type' => 'string',
+            "type" => "object",
+            "properties" => [
+                "url" => [
+                    "type" => "string",
                 ],
-                'urlSrcSet' => new InstanceValidatorSchema(ImageSrcSet::class),
-                'alt' => [
-                    'type' => 'string',
-                    'default' => t('Untitled'),
+                "urlSrcSet" => new InstanceValidatorSchema(ImageSrcSet::class),
+                "alt" => [
+                    "type" => "string",
+                    "default" => t("Untitled"),
                 ],
             ],
         ]);

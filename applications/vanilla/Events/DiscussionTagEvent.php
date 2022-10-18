@@ -15,8 +15,9 @@ use Vanilla\Logging\LoggableEventInterface;
  * Represent a Discussion Tag event.
  * We consider this a type of Discussion event, thus subclasses the DiscussionEvent class.
  */
-class DiscussionTagEvent extends DiscussionEvent implements LoggableEventInterface, TrackingEventInterface {
-    const ACTION_DISCUSSION_TAGGED = 'discussionTagged';
+class DiscussionTagEvent extends DiscussionEvent implements LoggableEventInterface, TrackingEventInterface
+{
+    const ACTION_DISCUSSION_TAGGED = "discussionTagged";
 
     /** @var array */
     private $tags = [];
@@ -28,25 +29,27 @@ class DiscussionTagEvent extends DiscussionEvent implements LoggableEventInterfa
      * @param DiscussionEvent $discussionEvent
      * @param array $tagsData
      */
-    public function __construct(DiscussionEvent $discussionEvent, array $tagsData) {
+    public function __construct(DiscussionEvent $discussionEvent, array $tagsData)
+    {
         $tagIDs = $tagNames = [];
 
         $payload = $discussionEvent->getPayload();
 
         foreach ($tagsData as $tag) {
-            $tagIDs[] = $tag['TagID'];
-            $tagNames[] = $tag['FullName'];
+            $tagIDs[] = $tag["TagID"];
+            $tagNames[] = $tag["FullName"];
         }
 
-        $this->tags = $payload['tags'] = ['tagNames' => $tagNames, 'tagIDs' => $tagIDs];
+        $this->tags = $payload["tags"] = ["tagNames" => $tagNames, "tagIDs" => $tagIDs];
         parent::__construct(self::ACTION_DISCUSSION_TAGGED, $payload, $discussionEvent->getSender());
-        $this->type = 'discussion';
+        $this->type = "discussion";
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getTrackableCollection(): ?string {
+    public function getTrackableCollection(): ?string
+    {
         switch ($this->getAction()) {
             case DiscussionTagEvent::ACTION_DISCUSSION_TAGGED:
                 return "post-modify";
@@ -62,10 +65,11 @@ class DiscussionTagEvent extends DiscussionEvent implements LoggableEventInterfa
      *
      * @return array
      */
-    public function getTrackablePayload(TrackableCommunityModel $trackableCommunity): array {
+    public function getTrackablePayload(TrackableCommunityModel $trackableCommunity): array
+    {
         $trackingData = [
-            'discussion' => $trackableCommunity->getTrackableDiscussion($this->getPayload()['discussion']),
-            'tags' => $this->tags
+            "discussion" => $trackableCommunity->getTrackableDiscussion($this->getPayload()["discussion"]),
+            "tags" => $this->tags,
         ];
         return $trackingData;
     }
@@ -73,7 +77,8 @@ class DiscussionTagEvent extends DiscussionEvent implements LoggableEventInterfa
     /**
      * {@inheritDoc}
      */
-    public function getTrackableAction(): string {
+    public function getTrackableAction(): string
+    {
         return $this->getAction();
     }
 }

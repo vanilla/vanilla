@@ -14,7 +14,8 @@ use VanillaTests\SiteTestCase;
 /**
  * Tests for our twig enhancement utilities.
  */
-class TwigEnhancerTest extends SiteTestCase {
+class TwigEnhancerTest extends SiteTestCase
+{
     /**
      * @var EventManager
      */
@@ -33,14 +34,11 @@ class TwigEnhancerTest extends SiteTestCase {
     /**
      * {@inheritDoc}
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
-        $this->container()->call(function (
-            EventManager $eventManager,
-            TwigEnhancer $enhancer,
-            \Gdn_Session $session
-        ) {
+        $this->container()->call(function (EventManager $eventManager, TwigEnhancer $enhancer, \Gdn_Session $session) {
             $this->eventManager = $eventManager;
             $this->enhancer = $enhancer;
             $this->session = $session;
@@ -52,31 +50,33 @@ class TwigEnhancerTest extends SiteTestCase {
     /**
      * Test rendering controller assets.
      */
-    public function testRenderControllerAsset(): void {
-        $this->eventManager->bind('base_beforeRenderAsset', function () {
+    public function testRenderControllerAsset(): void
+    {
+        $this->eventManager->bind("base_beforeRenderAsset", function () {
             echo "Before";
         });
 
-        $this->eventManager->bind('base_afterRenderAsset', function () {
+        $this->eventManager->bind("base_afterRenderAsset", function () {
             echo "After";
         });
 
         $controller = new \Gdn_Controller();
-        $controller->addAsset('Content', ' Content ', 'Item1');
+        $controller->addAsset("Content", " Content ", "Item1");
         \Gdn::controller($controller);
 
-        $result = $this->enhancer->renderControllerAsset('Content')->jsonSerialize();
+        $result = $this->enhancer->renderControllerAsset("Content")->jsonSerialize();
 
-        $this->assertEquals('Before Content After', $result);
+        $this->assertEquals("Before Content After", $result);
     }
 
     /**
      * A basic integration test of the `hasPermission()` method.
      */
-    public function testHasPermission(): void {
+    public function testHasPermission(): void
+    {
         $this->session->start($this->memberID);
-        $this->assertTrue($this->enhancer->hasPermission('Garden.SignIn.Allow'));
-        $this->assertTrue($this->enhancer->hasPermission('Vanilla.Discussions.View', 1));
-        $this->assertFalse($this->enhancer->hasPermission('Vanilla.Discussions.Announce', 1));
+        $this->assertTrue($this->enhancer->hasPermission("Garden.SignIn.Allow"));
+        $this->assertTrue($this->enhancer->hasPermission("Vanilla.Discussions.View", 1));
+        $this->assertFalse($this->enhancer->hasPermission("Vanilla.Discussions.Announce", 1));
     }
 }

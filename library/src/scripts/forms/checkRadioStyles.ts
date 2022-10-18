@@ -105,9 +105,9 @@ export const checkRadioClasses = useThemeCache(() => {
     const label = css({
         lineHeight: styleUnit(vars.sizing.width),
         paddingLeft: styleUnit(8),
+        paddingRight: styleUnit(8),
         cursor: "pointer",
         ...userSelect(),
-        width: calc(`100% - ${styleUnit(vars.sizing.width)}`),
     });
 
     const labelBold = css({
@@ -227,6 +227,10 @@ export const checkRadioClasses = useThemeCache(() => {
         },
     });
 
+    const fullWidth = css({
+        width: "100%",
+    });
+
     const grid = css({
         display: "flex",
         flexWrap: "wrap",
@@ -260,6 +264,7 @@ export const checkRadioClasses = useThemeCache(() => {
         iconContainer,
         radioIcon,
         checkIcon,
+        fullWidth,
         disk,
         diskIcon,
         input,

@@ -10,50 +10,54 @@ namespace VanillaTests\Addons\ProfileExtender;
 /**
  * Trait for testing the profile extender.
  */
-trait ProfileExtenderTestTrait {
-
+trait ProfileExtenderTestTrait
+{
     /**
      * Create extended fields.
      */
-    public static function setUpBeforeClassProfileExtenderTestTrait() {
+    public static function setUpBeforeClassProfileExtenderTestTrait()
+    {
         self::createExtendedFields();
     }
 
     /**
      * Create extended profile fields.
      */
-    protected static function createExtendedFields() {
-        self::bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'text',
-            'Label' => 'Text',
-            'FormType' => 'TextBox'
+    protected static function createExtendedFields()
+    {
+        self::bessy()->post("/settings/profile-field-add-edit", [
+            "Name" => "text",
+            "Label" => "Text",
+            "FormType" => "TextBox",
+            "OnProfile" => "1",
+            "OnRegister" => true,
         ]);
 
-        self::bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'check',
-            'Label' => 'Check',
-            'FormType' => 'CheckBox'
+        self::bessy()->post("/settings/profile-field-add-edit", [
+            "Name" => "check",
+            "Label" => "Check",
+            "FormType" => "CheckBox",
         ]);
 
-        self::bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'DateOfBirth',
-            'Label' => 'Birthday',
-            'FormType' => 'DateOfBirth'
+        self::bessy()->post("/settings/profile-field-add-edit", [
+            "Name" => "DateOfBirth",
+            "Label" => "Birthday",
+            "FormType" => "DateOfBirth",
         ]);
 
-        self::bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => 'dropdown',
-            'Label' => 'Dropdown',
-            'FormType' => 'Dropdown',
-            'Options' => "Option1\nOption2"
+        self::bessy()->post("/settings/profile-field-add-edit", [
+            "Name" => "dropdown",
+            "Label" => "Dropdown",
+            "FormType" => "Dropdown",
+            "Options" => "Option1\nOption2",
         ]);
 
-        self::bessy()->post('/settings/profile-field-add-edit', [
-            'Name' => "CustomRequiredField",
-            'Label' => "Custom Required Field",
-            'FormType' => "TextBox",
-            'Required' => "1",
-            'OnRegister' => true
+        self::bessy()->post("/settings/profile-field-add-edit", [
+            "Name" => "CustomRequiredField",
+            "Label" => "Custom Required Field",
+            "FormType" => "TextBox",
+            "Required" => "1",
+            "OnRegister" => true,
         ]);
     }
 
@@ -62,7 +66,8 @@ trait ProfileExtenderTestTrait {
      *
      * @return \ProfileExtenderPlugin
      */
-    protected static function getProfileExtenderPlugin(): \ProfileExtenderPlugin {
+    protected static function getProfileExtenderPlugin(): \ProfileExtenderPlugin
+    {
         return self::container()->get(\ProfileExtenderPlugin::class);
     }
 }

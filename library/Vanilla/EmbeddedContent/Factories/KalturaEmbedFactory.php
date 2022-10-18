@@ -20,8 +20,8 @@ use Vanilla\Utility\ArrayUtils;
 /**
  * Factory for KalturaEmbed.
  */
-class KalturaEmbedFactory extends AbstractEmbedFactory {
-
+class KalturaEmbedFactory extends AbstractEmbedFactory
+{
     const DOMAINS = ["mediaspace.kaltura.com", "videos.kaltura.com"];
 
     /** @var HttpClient */
@@ -32,18 +32,20 @@ class KalturaEmbedFactory extends AbstractEmbedFactory {
      *
      * @param HttpClient $httpClient
      */
-    public function __construct(HttpClient $httpClient) {
+    public function __construct(HttpClient $httpClient)
+    {
         $this->httpClient = $httpClient;
     }
 
     /**
      * @inheritdoc
      */
-    public function getSupportedDomains(): array {
+    public function getSupportedDomains(): array
+    {
         $domains = self::DOMAINS;
 
         // Fetch custom domains & add them to the list of supported domains.
-        $customDomains = Gdn::config(\VanillaSettingsController::CONFIG_KALTURA_DOMAINS, '');
+        $customDomains = Gdn::config(\VanillaSettingsController::CONFIG_KALTURA_DOMAINS, "");
         // If the custom domains config is a string, we split it to an array.
         if (is_string($customDomains)) {
             $customDomains = ArrayUtils::explodeTrim("\n", $customDomains);
@@ -56,7 +58,8 @@ class KalturaEmbedFactory extends AbstractEmbedFactory {
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain): string {
+    protected function getSupportedPathRegex(string $domain): string
+    {
         // This can be rather varied, depending on if the user provides the oEmbed URL or the video's URL.
         // That's why we are allowing a wildcard here. (Was previously "`^/id/.*$`")
         return "`.*`";
@@ -69,11 +72,12 @@ class KalturaEmbedFactory extends AbstractEmbedFactory {
      * @param string $url Source Video URL.
      * @return string oEmbed API URL.
      */
-    public function getOEmbedUrl(string $url): string {
-        $oembedParams = http_build_query([ "url" => $url ]);
+    public function getOEmbedUrl(string $url): string
+    {
+        $oembedParams = http_build_query(["url" => $url]);
         $parsedUrl = parse_url($url);
 
-        $oembedUrl = $parsedUrl['scheme'] . '://' . $parsedUrl['host'] . "/oembed?" . $oembedParams;
+        $oembedUrl = $parsedUrl["scheme"] . "://" . $parsedUrl["host"] . "/oembed?" . $oembedParams;
         return $oembedUrl;
     }
 
@@ -82,9 +86,10 @@ class KalturaEmbedFactory extends AbstractEmbedFactory {
      *
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         $oembedUrl = $this->getOEmbedUrl($url);
-        $response = $this->httpClient->get($oembedUrl, [], [], ['throw' => false]);
+        $response = $this->httpClient->get($oembedUrl, [], [], ["throw" => false]);
 
         // Example Response JSON
         // phpcs:disable Generic.Files.LineLength
@@ -114,10 +119,7 @@ class KalturaEmbedFactory extends AbstractEmbedFactory {
                     // Got an unexpected response.
                     // This can be reached by using https://mediaspace.valdosta.edu/id/1_0wsxajr as a source URL,
                     // provided you added mediaspace.valdosta.edu to the DOMAINS array.
-                    throw new ClientException(
-                        'URL did not result in a JSON type response.',
-                        406
-                    );
+                    throw new ClientException("URL did not result in a JSON type response.", 406);
                 } else {
                     // Got the expected response
                     $frameSrc = $this->getIframeSrcFromHtml($response["html"]);
@@ -136,22 +138,16 @@ class KalturaEmbedFactory extends AbstractEmbedFactory {
                 break;
             case 401:
                 // Unauthorized
-                throw new ClientException(
-                    'You are not authorized to access this URL.',
-                    $responseStatusCode
-                );
+                throw new ClientException("You are not authorized to access this URL.", $responseStatusCode);
                 break;
             default:
                 $message = $response->getReasonPhrase();
                 $responseBody = $response->getBody();
-                if (isset($responseBody['error']['message'])) {
-                    $message = $responseBody['error']['message'];
+                if (isset($responseBody["error"]["message"])) {
+                    $message = $responseBody["error"]["message"];
                 }
                 // Default thrown exception for any other unhandled error.
-                throw new ClientException(
-                    'Client exception: "' . $message . '".',
-                    $responseStatusCode
-                );
+                throw new ClientException('Client exception: "' . $message . '".', $responseStatusCode);
                 break;
         }
 
@@ -164,18 +160,19 @@ class KalturaEmbedFactory extends AbstractEmbedFactory {
      * @param string $html iFrame embed code provided from the Kaltura API
      * @return string iFrame video src attribute
      */
-    public function getIframeSrcFromHtml(string $html): string {
+    public function getIframeSrcFromHtml(string $html): string
+    {
         $dom = new HtmlDocument($html);
-        $iframeDomNodes = $dom->queryCssSelector('iframe');
+        $iframeDomNodes = $dom->queryCssSelector("iframe");
 
-        $frameSrc = '';
+        $frameSrc = "";
 
         $firstNode = $iframeDomNodes->item(0);
         if (!$firstNode instanceof \DOMElement) {
             throw new TypeError("iFrame node isn't an instance of DOMElement");
         }
 
-        $frameSrc = $firstNode->getAttribute('src');
+        $frameSrc = $firstNode->getAttribute("src");
 
         return $frameSrc;
     }

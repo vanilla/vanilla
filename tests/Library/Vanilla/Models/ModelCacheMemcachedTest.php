@@ -12,7 +12,7 @@ use VanillaTests\MemcachedTestTrait;
 /**
  * Tests for the `ModelCache` class with memcached enabled.
  */
-class ModelCacheMemcachedTest extends ModelCacheTest {
-
+class ModelCacheMemcachedTest extends ModelCacheTest
+{
     use MemcachedTestTrait;
 }

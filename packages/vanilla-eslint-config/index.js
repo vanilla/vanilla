@@ -56,11 +56,11 @@ module.exports = {
                     String: "Avoid using the `String` type. Did you mean `string`?",
                     Symbol: "Avoid using the `Symbol` type. Did you mean `symbol`?",
                     object: false,
-                    "{}": false
+                    "{}": false,
                 },
             },
         ],
-        "@typescript-eslint/array-type": ["error", { default: 'array-simple' }],
+        "@typescript-eslint/array-type": ["error", { default: "array-simple" }],
         "@typescript-eslint/ban-ts-comment": "off",
         "@typescript-eslint/camelcase": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",

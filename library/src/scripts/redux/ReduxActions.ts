@@ -67,7 +67,7 @@ export default class ReduxActions<S extends ICoreStoreState = ICoreStoreState> {
         ResponseActionType extends string,
         ErrorActionType extends string,
         ResponseDataType,
-        Meta = any
+        Meta = any,
     >(
         requestType: RequestActionType,
         responseType: ResponseActionType,
@@ -251,20 +251,23 @@ type ThunkActionCreator<Params, Result, State, Extra> = (
  * @param asyncWorker A redux-thunk with extra `params` as the first argument
  * @returns a ThunkActionCreator, the result of which you can pass to dispatch()
  */
-export const bindThunkAction = <Params, Succ, Err, State, Extra = any>(
-    actionCreators: AsyncActionCreators<Params, Succ, Err>,
-    asyncWorker: AsyncWorker<Params, Succ, State, Extra>,
-): ThunkActionCreator<Params, Promise<Succ>, State, Extra> => (params: Params) => async (dispatch, getState, extra) => {
-    try {
-        dispatch(actionCreators.started(params!));
-        const result = await asyncWorker(params!, dispatch, getState, extra);
-        dispatch(actionCreators.done({ params: params!, result }));
-        return result;
-    } catch (error) {
-        dispatch(actionCreators.failed({ params: params!, error }));
-        throw error;
-    }
-};
+export const bindThunkAction =
+    <Params, Succ, Err, State, Extra = any>(
+        actionCreators: AsyncActionCreators<Params, Succ, Err>,
+        asyncWorker: AsyncWorker<Params, Succ, State, Extra>,
+    ): ThunkActionCreator<Params, Promise<Succ>, State, Extra> =>
+    (params: Params) =>
+    async (dispatch, getState, extra) => {
+        try {
+            dispatch(actionCreators.started(params!));
+            const result = await asyncWorker(params!, dispatch, getState, extra);
+            dispatch(actionCreators.done({ params: params!, result }));
+            return result;
+        } catch (error) {
+            dispatch(actionCreators.failed({ params: params!, error }));
+            throw error;
+        }
+    };
 
 // Action interfaces
 export interface IAction<T extends string> {

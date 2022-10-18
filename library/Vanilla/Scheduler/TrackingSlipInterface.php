@@ -15,8 +15,8 @@ use Vanilla\Scheduler\Job\TrackableJobAwareInterface;
 /**
  * Interface TrackingSlipInterface
  */
-interface TrackingSlipInterface extends TrackableJobAwareInterface {
-
+interface TrackingSlipInterface extends TrackableJobAwareInterface
+{
     /**
      * Get the jobID.
      *

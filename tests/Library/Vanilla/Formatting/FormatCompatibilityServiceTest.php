@@ -17,16 +17,17 @@ use VanillaTests\SharedBootstrapTestCase;
 /**
  * Test for FormatCompatibilityServiceTest.
  */
-class FormatCompatibilityServiceTest extends SharedBootstrapTestCase {
-
+class FormatCompatibilityServiceTest extends SharedBootstrapTestCase
+{
     /**
      * Tests for converting of old rich embed formats.
      */
-    public function testRichEmbeds() {
+    public function testRichEmbeds()
+    {
         $discussionData = json_decode(LegacyEmbedFixtures::discussion(), true);
         $commentData = json_decode(LegacyEmbedFixtures::comment(), true);
         $normalInsert = [
-            'insert' => 'Hello world\n\n\n\n',
+            "insert" => 'Hello world\n\n\n\n',
         ];
         $initialValue = [
             $this->makeEmbedInsert($discussionData),
@@ -62,7 +63,8 @@ class FormatCompatibilityServiceTest extends SharedBootstrapTestCase {
      *
      * @dataProvider formatProvider
      */
-    public function testFormatPassthrough(string $format) {
+    public function testFormatPassthrough(string $format)
+    {
         $garbageInput = "asd;fjkasdlasdf<Script></Script>fjnvz.kjm,cnv;=<ap>4asdfasdxf</ap>";
         /** @var FormatCompatibilityService $service */
         $service = \Gdn::getContainer()->get(FormatCompatibilityService::class);
@@ -72,16 +74,9 @@ class FormatCompatibilityServiceTest extends SharedBootstrapTestCase {
     /**
      * @return array
      */
-    public function formatProvider(): array {
-        return [
-            ['non-existant-format'],
-            ['BBCode'],
-            ['Markdown'],
-            ['Text'],
-            ['TextEx'],
-            ['Html'],
-            ['Wysiwyg'],
-        ];
+    public function formatProvider(): array
+    {
+        return [["non-existant-format"], ["BBCode"], ["Markdown"], ["Text"], ["TextEx"], ["Html"], ["Wysiwyg"]];
     }
 
     /**
@@ -90,15 +85,16 @@ class FormatCompatibilityServiceTest extends SharedBootstrapTestCase {
      * @param mixed $data
      * @return array
      */
-    private function makeEmbedInsert($data): array {
+    private function makeEmbedInsert($data): array
+    {
         $value = [
-            'insert' => [
-                'embed-external' => [
-                    'data' => $data,
+            "insert" => [
+                "embed-external" => [
+                    "data" => $data,
                 ],
-                'other-garbage' => true,
+                "other-garbage" => true,
             ],
-            'other-garbage' => true,
+            "other-garbage" => true,
         ];
         return $value;
     }

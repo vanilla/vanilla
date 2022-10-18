@@ -14,33 +14,34 @@ use VanillaTests\Fixtures\MockWidgets\MockWidget1;
 /**
  * Tests for the widget factory.
  */
-class WidgetFactoryTest extends BootstrapTestCase {
-
+class WidgetFactoryTest extends BootstrapTestCase
+{
     /**
      * Test fetching of widget parameters.
      */
-    public function testWidgetParams() {
+    public function testWidgetParams()
+    {
         $factory = new WidgetFactory(MockWidget1::class);
         $expected = [
             [
-                'name' => 'Title',
-                'value' => 'Hello Title',
+                "name" => "Title",
+                "value" => "Hello Title",
             ],
             [
-                'name' => 'Nested Params',
-                'value' => [
+                "name" => "Nested Params",
+                "value" => [
                     [
-                        'name' => 'Timeframe',
-                        'value' => 'Monthly',
-                    ]
-                ]
-            ]
+                        "name" => "Timeframe",
+                        "value" => "Monthly",
+                    ],
+                ],
+            ],
         ];
         $actual = $factory->getWidgetSummaryParameters([
-            'name' => 'Hello Title',
-            'nested' => [
-                'slotType' => 'm',
-            ]
+            "name" => "Hello Title",
+            "nested" => [
+                "slotType" => "m",
+            ],
         ]);
 
         $this->assertSame($expected, $actual);

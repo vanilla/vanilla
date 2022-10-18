@@ -13,8 +13,8 @@ use Vanilla\Formatting\TextFragmentType;
 /**
  * Class BlotPointerTextFragment
  */
-class BlotPointerTextFragment implements TextFragmentInterface {
-
+class BlotPointerTextFragment implements TextFragmentInterface
+{
     /**
      * @var AbstractBlot
      */
@@ -30,7 +30,6 @@ class BlotPointerTextFragment implements TextFragmentInterface {
      */
     private $type;
 
-
     /**
      * BlotPointerTextFragment constructor.
      *
@@ -38,7 +37,8 @@ class BlotPointerTextFragment implements TextFragmentInterface {
      * @param string $path
      * @param string $type
      */
-    public function __construct(AbstractBlot $blot, string $path, string $type = TextFragmentType::TEXT) {
+    public function __construct(AbstractBlot $blot, string $path, string $type = TextFragmentType::TEXT)
+    {
         $this->blot = $blot;
         $this->path = $path;
         $this->type = $type;
@@ -47,7 +47,8 @@ class BlotPointerTextFragment implements TextFragmentInterface {
     /**
      * @inheritDoc
      */
-    public function getInnerContent(): string {
+    public function getInnerContent(): string
+    {
         return $this->blot->getCurrentOperationField($this->path);
     }
 
@@ -56,14 +57,16 @@ class BlotPointerTextFragment implements TextFragmentInterface {
      *
      * @param string $text
      */
-    public function setInnerContent(string $text) {
+    public function setInnerContent(string $text)
+    {
         $this->blot->setCurrentOperationField($this->path, $text);
     }
 
     /**
      * @inheritDoc
      */
-    public function getFragmentType(): string {
+    public function getFragmentType(): string
+    {
         return $this->type;
     }
 }

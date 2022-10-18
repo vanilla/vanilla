@@ -11,13 +11,15 @@
 /**
  * Renders the profile filter menu.
  */
-class ProfileFilterModule extends Gdn_Module {
-
-    public function assetTarget() {
-        return 'Panel';
+class ProfileFilterModule extends Gdn_Module
+{
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
-    public function toString() {
+    public function toString()
+    {
         return parent::toString();
     }
 }

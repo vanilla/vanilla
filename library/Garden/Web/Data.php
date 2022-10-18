@@ -12,13 +12,16 @@ use Garden\JsonFilterTrait;
 use Traversable;
 
 use Garden\MetaTrait;
+use Vanilla\Http\InternalResponse;
+use Vanilla\Utility\StringUtils;
 use Vanilla\Web\JsonView;
 use Vanilla\Web\Pagination\WebLinking;
 
 /**
  * Represents the data in a web response.
  */
-class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggregate {
+class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggregate
+{
     use MetaTrait, JsonFilterTrait;
 
     private $data;
@@ -30,11 +33,12 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param array|int $meta Either an array of meta information or an integer HTTP response status.
      * @param array $headers Headers to apply to the response.
      */
-    public function __construct($data = [], $meta = [], $headers = []) {
+    public function __construct($data = [], $meta = [], $headers = [])
+    {
         $this->data = $data;
 
         if (is_int($meta)) {
-            $this->meta = ['status' => $meta];
+            $this->meta = ["status" => $meta];
         } else {
             $this->meta = $meta;
         }
@@ -51,7 +55,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param mixed $default The default value if no item at the key exists.
      * @return mixed Returns the data value.
      */
-    public function getDataItem($name, $default = null) {
+    public function getDataItem($name, $default = null)
+    {
         if (!is_array($this->data) && !($this->data instanceof \ArrayAccess)) {
             throw new \Exception("Data is not an array.", 500);
         }
@@ -65,7 +70,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param mixed $value The new value.
      * @return $this
      */
-    public function setDataItem($name, $value) {
+    public function setDataItem($name, $value)
+    {
         if (!is_array($this->data) && !($this->data instanceof \ArrayAccess)) {
             throw new \Exception("Data is not an array.", 500);
         }
@@ -78,7 +84,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      *
      * @return mixed Returns the data.
      */
-    public function getData() {
+    public function getData()
+    {
         return $this->data;
     }
 
@@ -88,7 +95,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param mixed $data The new data array.
      * @return $this
      */
-    public function setData($data) {
+    public function setData($data)
+    {
         $this->data = $data;
         return $this;
     }
@@ -101,7 +109,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param bool $mergeMeta Whether or not to merge the meta array.
      * @return $this
      */
-    public function addData($data, $key, $mergeMeta = false) {
+    public function addData($data, $key, $mergeMeta = false)
+    {
         if (is_array($data)) {
             $this->data[$key] = $data;
         } else {
@@ -121,7 +130,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param array $data The data to merge.
      * @return $this
      */
-    public function mergeData(array $data): self {
+    public function mergeData(array $data): self
+    {
         $this->data = array_merge_recursive($this->data, $data);
         return $this;
     }
@@ -131,8 +141,9 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      *
      * @return int Returns the status.
      */
-    public function getStatus() {
-        $status = $this->getMeta('status', null);
+    public function getStatus()
+    {
+        $status = $this->getMeta("status", null);
         if ($status === null) {
             $status = $this->data === null ? 204 : 200;
         } elseif ($status < 100 || $status > 527) {
@@ -147,8 +158,9 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param int $status The new status.
      * @return $this
      */
-    public function setStatus($status) {
-        return $this->setMeta('status', $status);
+    public function setStatus($status)
+    {
+        return $this->setMeta("status", $status);
     }
 
     /**
@@ -158,7 +170,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * which is a value of any type other than a resource.
      * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         $data = $this->getData();
         $data = $this->jsonFilter($data);
         return $data;
@@ -171,20 +184,22 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      *
      * @return mixed
      */
-    public function getSerializedData() {
+    public function getSerializedData()
+    {
         return json_decode(json_encode($this), true);
     }
 
     /**
      * Get this data as an HTTP response.
      *
-     * @return HttpResponse
+     * @return InternalResponse
      */
-    public function asHttpResponse(): HttpResponse {
+    public function asHttpResponse(): InternalResponse
+    {
         $this->applyMetaHeaders();
-        $response = new HttpResponse(
+        $response = new InternalResponse(
             $this->getStatus(),
-            array_merge($this->getHeaders(), ['X-Data-Meta' => json_encode($this->getMetaArray())])
+            array_merge($this->getHeaders(), ["X-Data-Meta" => json_encode($this->getMetaArray())])
         );
         // Simulate that the data was sent over HTTP and thus was serialized.
         $body = $this->jsonSerialize();
@@ -199,7 +214,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param mixed $default The default value if the header does not exist.
      * @return mixed Returns the header value or {@link $default}.
      */
-    public function getHeader($name, $default = null) {
+    public function getHeader($name, $default = null)
+    {
         return $this->getMeta($this->headerKey($name), $default);
     }
 
@@ -210,7 +226,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param mixed $value The header value.
      * @return $this
      */
-    public function setHeader($name, $value) {
+    public function setHeader($name, $value)
+    {
         $this->setMeta($this->headerKey($name), $value);
         return $this;
     }
@@ -221,7 +238,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param string $name The name of the header to check.
      * @return bool Returns **true** if the header exists or **false** otherwise.
      */
-    public function hasHeader($name) {
+    public function hasHeader($name)
+    {
         return isset($this->meta[$this->headerKey($name)]);
     }
 
@@ -230,13 +248,14 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      *
      * @return array Returns the headers as an array.
      */
-    public function getHeaders() {
+    public function getHeaders()
+    {
         $result = [];
 
         foreach ($this->meta as $key => $value) {
-            if ($key === 'CONTENT_TYPE') {
-                $result['Content-Type'] = $value;
-            } elseif (substr_compare($key, 'HTTP_', 0, 5, true) === 0) {
+            if ($key === "CONTENT_TYPE") {
+                $result["Content-Type"] = $value;
+            } elseif (substr_compare($key, "HTTP_", 0, 5, true) === 0) {
                 $headerKey = $this->headerName(substr($key, 5));
 
                 $result[$headerKey] = $value;
@@ -252,10 +271,11 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param string $name The name of the header.
      * @return string Returns a string in the form **HTTP_***.
      */
-    private function headerKey($name) {
-        $key = strtoupper(str_replace('-', '_', $name));
-        if ($key !== 'CONTENT_TYPE') {
-            $key = 'HTTP_'.$key;
+    private function headerKey($name)
+    {
+        $key = strtoupper(str_replace("-", "_", $name));
+        if ($key !== "CONTENT_TYPE") {
+            $key = "HTTP_" . $key;
         }
         return $key;
     }
@@ -266,38 +286,62 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param string $name The header name to normalize.
      * @return string Returns a string in the form "Header-Name".
      */
-    private function headerName($name) {
-        static $special = ['Md5' => 'MD5', 'Dnt' => 'DNT', 'Etag' => 'ETag', 'P3p' => 'P3P', 'Tsv' => 'TSV', 'Www' => 'WWW'];
+    private function headerName($name)
+    {
+        static $special = [
+            "Md5" => "MD5",
+            "Dnt" => "DNT",
+            "Etag" => "ETag",
+            "P3p" => "P3P",
+            "Tsv" => "TSV",
+            "Www" => "WWW",
+        ];
 
-        if (strpos($name, '-') !== false) {
+        if (strpos($name, "-") !== false) {
             return $name;
         } else {
-            $parts = explode('_', $name);
+            $parts = explode("_", $name);
 
-            $result = implode('-', array_map(function ($part) use ($special) {
-                $r = ucfirst(strtolower($part));
-                return isset($special[$r]) ? $special[$r] : $r;
-            }, $parts));
+            $result = implode(
+                "-",
+                array_map(function ($part) use ($special) {
+                    $r = ucfirst(strtolower($part));
+                    return isset($special[$r]) ? $special[$r] : $r;
+                }, $parts)
+            );
 
             return $result;
         }
     }
 
     /**
-     * Render the response to the output.
+     * Old rendering method that was only rendering json.
+     *
+     * Use renderJson() instead.
+     *
+     * @deprecated
+     */
+    public function render()
+    {
+        $this->renderJson();
+    }
+
+    /**
+     * Render the response to the output in JSON.
      *
      * @codeCoverageIgnore
      */
-    public function render() {
+    public function renderJson()
+    {
         $this->applyMetaHeaders();
         http_response_code($this->getStatus());
 
         if (!headers_sent()) {
-            if (!$this->hasHeader('Content-Type')) {
-                header('Content-Type: application/json; charset=utf-8', true);
+            if (!$this->hasHeader("Content-Type")) {
+                header("Content-Type: application/json; charset=utf-8", true);
             }
             foreach ($this->getHeaders() as $name => $value) {
-                foreach ((array)$value as $line) {
+                foreach ((array) $value as $line) {
                     header("$name: $line");
                 }
             }
@@ -310,38 +354,72 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     }
 
     /**
+     * Render the response to the output in CSV.
+     *
+     * @codeCoverageIgnore
+     */
+    public function renderCsv()
+    {
+        $this->applyMetaHeaders();
+        http_response_code($this->getStatus());
+
+        if (!headers_sent()) {
+            if (!$this->hasHeader("Content-Type")) {
+                header("Content-Type: application/csv; charset=utf-8", true);
+            }
+            foreach ($this->getHeaders() as $name => $value) {
+                foreach ((array) $value as $line) {
+                    header("$name: $line");
+                }
+            }
+        }
+        if (is_string($this->data) || $this->data === null) {
+            echo $this->data;
+        } else {
+            $data = $this->getSerializedData();
+            if (!empty($data)) {
+                echo StringUtils::encodeCSV($data);
+            } else {
+                echo "";
+            }
+        }
+    }
+
+    /**
      * Apply headers that come from meta items.
      */
-    public function applyMetaHeaders() {
-        $paging = $this->getMeta('paging');
+    public function applyMetaHeaders()
+    {
+        $paging = $this->getMeta("paging");
 
         // Handle pagination.
         if ($paging) {
             $links = new WebLinking();
-            $hasPageCount = isset($paging['pageCount']);
+            $hasPageCount = isset($paging["pageCount"]);
 
-            $firstPageUrl = str_replace('%s', 1, $paging['urlFormat']);
-            $links->addLink('first', $firstPageUrl);
-            if ($paging['page'] > 1) {
-                $prevPageUrl = $paging['page'] > 2 ? str_replace('%s', $paging['page'] - 1, $paging['urlFormat']) : $firstPageUrl;
-                $links->addLink('prev', $prevPageUrl);
+            $firstPageUrl = str_replace("%s", 1, $paging["urlFormat"]);
+            $links->addLink("first", $firstPageUrl);
+            if ($paging["page"] > 1) {
+                $prevPageUrl =
+                    $paging["page"] > 2 ? str_replace("%s", $paging["page"] - 1, $paging["urlFormat"]) : $firstPageUrl;
+                $links->addLink("prev", $prevPageUrl);
             }
-            if (($paging['more'] ?? false) || ($hasPageCount && $paging['page'] < $paging['pageCount'])) {
-                $links->addLink('next', str_replace('%s', $paging['page'] + 1, $paging['urlFormat']));
+            if (($paging["more"] ?? false) || ($hasPageCount && $paging["page"] < $paging["pageCount"])) {
+                $links->addLink("next", str_replace("%s", $paging["page"] + 1, $paging["urlFormat"]));
             }
             if ($hasPageCount) {
-                $links->addLink('last', str_replace('%s', $paging['pageCount'], $paging['urlFormat']));
+                $links->addLink("last", str_replace("%s", $paging["pageCount"], $paging["urlFormat"]));
             }
             $links->setHeader($this);
 
-            $this->setHeader(JsonView::CURRENT_PAGE_HEADER, $paging['page']);
+            $this->setHeader(JsonView::CURRENT_PAGE_HEADER, $paging["page"]);
 
-            $totalCount = $paging['totalCount'] ?? null;
+            $totalCount = $paging["totalCount"] ?? null;
             if ($totalCount !== null) {
                 $this->setHeader(JsonView::TOTAL_COUNT_HEADER, $totalCount);
             }
 
-            $limit = $paging['limit'] ?? null;
+            $limit = $paging["limit"] ?? null;
             if ($limit !== null) {
                 $this->setHeader(JsonView::LIMIT_HEADER, $limit);
             }
@@ -356,7 +434,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * The return value will be casted to boolean if non-boolean was returned.
      * @link http://php.net/manual/en/arrayaccess.offsetexists.php
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return isset($this->data[$offset]);
     }
 
@@ -367,7 +446,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @return mixed Can return all value types.
      * @link http://php.net/manual/en/arrayaccess.offsetget.php
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return $this->getDataItem($offset);
     }
 
@@ -378,7 +458,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param mixed $value The value to set.
      * @link http://php.net/manual/en/arrayaccess.offsetset.php
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         $this->setDataItem($offset, $value);
     }
 
@@ -388,7 +469,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param mixed $offset The offset to unset.
      * @link http://php.net/manual/en/arrayaccess.offsetunset.php
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         unset($this->data[$offset]);
     }
 
@@ -398,7 +480,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @link http://php.net/manual/en/countable.count.php
      * @return int The custom count as an integer.
      */
-    public function count() {
+    public function count()
+    {
         return count($this->data);
     }
 
@@ -408,7 +491,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @return Traversable An instance of an object implementing <b>Iterator</b> or <b>Traversable</b>.
      * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
      */
-    public function getIterator() {
+    public function getIterator()
+    {
         return new \ArrayIterator($this->data);
     }
 
@@ -421,7 +505,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param Data|array $data The data to box.
      * @return Data Returns the boxed data.
      */
-    public static function box($data): Data {
+    public static function box($data): Data
+    {
         if ($data instanceof Data) {
             return $data;
         } elseif (is_array($data)) {
@@ -442,8 +527,9 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param string $class A string representation of the HTTP status code, with 'x' used as a wildcard.
      * @return boolean Returns `true` if the response code matches the {@link $class}, `false` otherwise.
      */
-    public function isResponseClass(string $class): bool {
-        $pattern = '`^'.str_ireplace('x', '\d', preg_quote($class, '`')).'$`';
+    public function isResponseClass(string $class): bool
+    {
+        $pattern = "`^" . str_ireplace("x", "\d", preg_quote($class, "`")) . '$`';
         $result = preg_match($pattern, $this->getStatus());
 
         return $result === 1;
@@ -454,7 +540,8 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      *
      * @return bool Returns `true` if the response was a successful 2xx code.
      */
-    public function isSuccessful(): bool {
-        return $this->isResponseClass('2xx');
+    public function isSuccessful(): bool
+    {
+        return $this->isResponseClass("2xx");
     }
 }

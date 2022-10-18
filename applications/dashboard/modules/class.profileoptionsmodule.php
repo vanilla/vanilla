@@ -11,67 +11,98 @@
 /**
  * Displays profile options like "Message", "Edit Profile", or "Back to Profile" buttons on the top of the profile page.
  */
-class ProfileOptionsModule extends Gdn_Module {
-
+class ProfileOptionsModule extends Gdn_Module
+{
     private $profileOptionsDropdown;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->profileOptionsDropdown = new DropdownModule();
-        $this->profileOptionsDropdown->setView('dropdown-navbutton');
+        $this->profileOptionsDropdown->setView("dropdown-navbutton");
         $this->profileOptionsDropdown->setTrigger(
-            sprite('SpEditProfile', 'Sprite16').' <span class="sr-only">'.t('Edit Profile').'</span>',
-            'button',
-            'ProfileButtons Button-EditProfile',
-            $icon = 'caret-down',
-            $url = '',
+            sprite("SpEditProfile", "Sprite16") . ' <span class="sr-only">' . t("Edit Profile") . "</span>",
+            "button",
+            "ProfileButtons Button-EditProfile",
+            $icon = "caret-down",
+            $url = "",
             [
-                "aria-label" => t("Edit Profile")
+                "aria-label" => t("Edit Profile"),
             ]
         );
         $this->fetchProfileOptionsData();
     }
 
-    public function assetTarget() {
-        return 'Content';
+    public function assetTarget()
+    {
+        return "Content";
     }
 
-    public function fetchProfileOptionsData() {
+    public function fetchProfileOptionsData()
+    {
         $session = Gdn::session();
         $controller = Gdn::controller();
         $userID = $controller->User->UserID;
 
         if (hasEditProfile($controller->User->UserID)) {
-            $this->profileOptionsDropdown->addLink(t('Edit Profile'), userUrl($controller->User, '', 'edit'), 'edit-profile');
+            $this->profileOptionsDropdown->addLink(
+                t("Edit Profile"),
+                userUrl($controller->User, "", "edit"),
+                "edit-profile"
+            );
         } else {
-            $this->profileOptionsDropdown->addLinkIf($session->isValid() && $userID == $session->UserID, t('Preferences'), userUrl($controller->User, '', 'preferences'), 'preferences');
+            $this->profileOptionsDropdown->addLinkIf(
+                $session->isValid() && $userID == $session->UserID,
+                t("Preferences"),
+                userUrl($controller->User, "", "preferences"),
+                "preferences"
+            );
         }
 
-        if ($userID != $session->UserID && multiCheckPermission(['Garden.Moderation.Manage', 'Garden.Users.Edit', 'Moderation.Users.Ban'])) {
+        if (
+            $userID != $session->UserID &&
+            multiCheckPermission(["Garden.Moderation.Manage", "Garden.Users.Edit", "Moderation.Users.Ban"])
+        ) {
             if (BanModel::isBanned($controller->User->Banned, BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL)) {
-                $this->profileOptionsDropdown->addLink(t('Unban'), "/user/ban?userid=$userID&unban=1", 'unban', 'Popup');
+                $this->profileOptionsDropdown->addLink(
+                    t("Unban"),
+                    "/user/ban?userid=$userID&unban=1",
+                    "unban",
+                    "Popup"
+                );
             } elseif (!$controller->User->Admin) {
-                $this->profileOptionsDropdown->addLink(t('Ban'), "/user/ban?userid=$userID", 'ban', 'Popup');
+                $this->profileOptionsDropdown->addLink(t("Ban"), "/user/ban?userid=$userID", "ban", "Popup");
             }
         }
 
-        $this->profileOptionsDropdown->addLinkIf(checkPermission('Garden.Moderation.Manage') == true, t('Delete Content'), "/user/deletecontent?userid=$userID", 'delete-content', 'Popup');
+        $this->profileOptionsDropdown->addLinkIf(
+            checkPermission("Garden.Moderation.Manage") == true,
+            t("Delete Content"),
+            "/user/deletecontent?userid=$userID",
+            "delete-content",
+            "Popup"
+        );
 
         $memberOptions = [];
         $profileOptions = [];
 
-        $controller->EventArguments['UserID'] = $userID;
-        $controller->EventArguments['ProfileOptions'] = &$profileOptions;
-        $controller->EventArguments['ProfileOptionsDropdown'] = &$this->profileOptionsDropdown;
-        $controller->EventArguments['MemberOptions'] = &$memberOptions;
-        $controller->fireEvent('BeforeProfileOptions');
+        $controller->EventArguments["UserID"] = $userID;
+        $controller->EventArguments["ProfileOptions"] = &$profileOptions;
+        $controller->EventArguments["ProfileOptionsDropdown"] = &$this->profileOptionsDropdown;
+        $controller->EventArguments["MemberOptions"] = &$memberOptions;
+        $controller->fireEvent("BeforeProfileOptions");
 
-        foreach($profileOptions as $option) {
-            if (val('Text', $option) && val('Url', $option)) {
-                $this->profileOptionsDropdown->addLink(val('Text', $option), val('Url', $option), NavModule::textToKey(val('Text', $option)), val('CssClass', $option, ''));
+        foreach ($profileOptions as $option) {
+            if (val("Text", $option) && val("Url", $option)) {
+                $this->profileOptionsDropdown->addLink(
+                    val("Text", $option),
+                    val("Url", $option),
+                    NavModule::textToKey(val("Text", $option)),
+                    val("CssClass", $option, "")
+                );
             }
         }
 
-        $this->setData('MemberOptions', $memberOptions);
-        $this->setData('ProfileOptionsDropdown', $this->profileOptionsDropdown);
+        $this->setData("MemberOptions", $memberOptions);
+        $this->setData("ProfileOptionsDropdown", $this->profileOptionsDropdown);
     }
 }

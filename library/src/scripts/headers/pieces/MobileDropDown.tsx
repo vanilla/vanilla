@@ -11,7 +11,7 @@ import Container from "@library/layout/components/Container";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
 import FrameFooter from "@library/layout/frame/FrameFooter";
-import LazyModal from "@library/modal/LazyModal";
+import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@library/utility/appUtils";
 import classNames from "classnames";
@@ -73,7 +73,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                     icon={<DownTriangleIcon className={"mobileDropDown-downTriangle"} />}
                     onClick={this.open}
                 />
-                <LazyModal
+                <Modal
                     isVisible={this.state.open}
                     size={ModalSizes.MODAL_AS_DROP_DOWN}
                     label={t("Menu")}
@@ -116,7 +116,7 @@ export default class MobileDropDown extends React.Component<IProps, IState> {
                             </FrameFooter>
                         }
                     />
-                </LazyModal>
+                </Modal>
             </div>
         ) : (
             <div className={classes.toggleButton}>

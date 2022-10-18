@@ -25,8 +25,8 @@ use Vanilla\Utility\SchemaUtils;
 /**
  * /api/v2/job-statuses
  */
-class JobStatusesApiController extends \AbstractApiController {
-
+class JobStatusesApiController extends \AbstractApiController
+{
     const POLL_MAX_SECONDS = 10;
     const POLL_FREQUENCY_MS = 500;
 
@@ -51,7 +51,8 @@ class JobStatusesApiController extends \AbstractApiController {
      * @param JobStatusModel $jobStatusModel
      * @param \UserModel $userModel
      */
-    public function __construct(JobStatusModel $jobStatusModel, \UserModel $userModel) {
+    public function __construct(JobStatusModel $jobStatusModel, \UserModel $userModel)
+    {
         $this->jobStatusModel = $jobStatusModel;
         $this->userModel = $userModel;
     }
@@ -65,20 +66,21 @@ class JobStatusesApiController extends \AbstractApiController {
      *
      * @return Data The response.
      */
-    public function index(array $query = []): Data {
-        $this->permission('Garden.SignIn.Allow');
+    public function index(array $query = []): Data
+    {
+        $this->permission("Garden.SignIn.Allow");
         $in = Schema::parse([
-            'jobTrackingID?' => RangeExpression::createSchema([':s'])->setField('x-filter', true),
-            'jobExecutionStatus:s?' => [
-                'minLength' => 1,
-                'x-filter' => true,
+            "jobTrackingID?" => RangeExpression::createSchema([":s"])->setField("x-filter", true),
+            "jobExecutionStatus:s?" => [
+                "minLength" => 1,
+                "x-filter" => true,
             ],
-            'trackingUserID:i' => [
-                'default' => $this->getSession()->UserID,
-                'min' => 0,
-                'x-filter' => true,
+            "trackingUserID:i" => [
+                "default" => $this->getSession()->UserID,
+                "min" => 0,
+                "x-filter" => true,
             ],
-        ])->addValidator('trackingUserID', [$this, 'validateTrackingUserID']);
+        ])->addValidator("trackingUserID", [$this, "validateTrackingUserID"]);
 
         $out = Schema::parse([
             ":a" => $this->jobStatusSchema(),
@@ -128,40 +130,40 @@ class JobStatusesApiController extends \AbstractApiController {
      *
      * @return Data The response.
      */
-    public function post_poll(array $body = []): Data {
-        $this->permission('Garden.SignIn.Allow');
+    public function post_poll(array $body = []): Data
+    {
+        $this->permission("Garden.SignIn.Allow");
         $in = Schema::parse([
-            'jobTrackingID?' => RangeExpression::createSchema([':s'])->setField('x-filter', true),
-            'trackingUserID:i' => [
-                'default' => $this->getSession()->UserID,
-                'min' => 0,
+            "jobTrackingID?" => RangeExpression::createSchema([":s"])->setField("x-filter", true),
+            "trackingUserID:i" => [
+                "default" => $this->getSession()->UserID,
+                "min" => 0,
             ],
-            'maxDuration:i' => [
-                'default' => self::POLL_MAX_SECONDS,
-                'max' => 10,
-            ]
-        ])->addValidator('trackingUserID', [$this, 'validateTrackingUserID']);
-        $out = Schema::parse([
-            'incompleteJobCount:i',
-            'updatedJobs:a' => $this->jobStatusSchema(),
-        ]);
+            "maxDuration:i" => [
+                "default" => self::POLL_MAX_SECONDS,
+                "max" => 10,
+            ],
+        ])->addValidator("trackingUserID", [$this, "validateTrackingUserID"]);
+        $out = Schema::parse(["incompleteJobCount:i", "updatedJobs:a" => $this->jobStatusSchema()]);
 
         $body = $in->validate($body);
-        $userID = $body['trackingUserID'];
+        $userID = $body["trackingUserID"];
         $where = ApiUtils::queryToFilters($in, $body);
 
         if (!$this->jobStatusModel->pollingCacheIsActive()) {
-            throw new ServerException('A memory cache (such as memcached) must be configured to poll for job statuses.');
+            throw new ServerException(
+                "A memory cache (such as memcached) must be configured to poll for job statuses."
+            );
         }
 
         if ($this->jobStatusModel->getIncompleteCountForUser($userID, $where) === 0) {
             // Prevent people from opening up a long polling session if they have no ongoing jobs.
-            throw new ForbiddenException('There were no matching job statuses to poll.');
+            throw new ForbiddenException("There were no matching job statuses to poll.");
         }
 
-         // User has some jobs to check.
+        // User has some jobs to check.
 
-        $maxIterations = $body['maxDuration'] / self::POLL_FREQUENCY_MS * 1000;
+        $maxIterations = ($body["maxDuration"] / self::POLL_FREQUENCY_MS) * 1000;
         $iterations = 0;
         $lastSeenTime = $this->jobStatusModel->getLastSeenTime($userID);
         while (true) {
@@ -199,12 +201,12 @@ class JobStatusesApiController extends \AbstractApiController {
         $this->jobStatusModel->trackLastSeenTime($userID);
 
         $result = [
-            'incompleteJobCount' => $newIncompleteCount,
-            'updatedJobs' => $changed,
+            "incompleteJobCount" => $newIncompleteCount,
+            "updatedJobs" => $changed,
         ];
         $result = $out->validate($result);
 
-        return new Data($result, ['status' => 200]);
+        return new Data($result, ["status" => 200]);
     }
 
     /**
@@ -216,13 +218,14 @@ class JobStatusesApiController extends \AbstractApiController {
      * @param int $userID Potential ID to be valided.
      * @param ValidationField $field Field to adding specific error messages.
      */
-    public function validateTrackingUserID(int $userID, ValidationField $field): bool {
+    public function validateTrackingUserID(int $userID, ValidationField $field): bool
+    {
         try {
             if ($userID !== $this->getSession()->UserID) {
-                $this->permission('Garden.Settings.Manage');
+                $this->permission("Garden.Settings.Manage");
                 $user = $this->userModel->getID($userID);
                 if (!$user) {
-                    throw new NotFoundException('User');
+                    throw new NotFoundException("User");
                 }
             }
             return true;
@@ -237,18 +240,19 @@ class JobStatusesApiController extends \AbstractApiController {
      *
      * @return Schema
      */
-    private function jobStatusSchema(): Schema {
+    private function jobStatusSchema(): Schema
+    {
         return Schema::parse([
-            'jobStatusID',
-            'jobTrackingID',
-            'trackingUserID',
-            'dateInserted',
-            'dateUpdated',
-            'jobExecutionStatus',
-            'errorMessage?',
-            'progressTotalQuantity:i?',
-            'progressCompleteQuantity:i?',
-            'progressFailedQuantity:i?',
+            "jobStatusID",
+            "jobTrackingID",
+            "trackingUserID",
+            "dateInserted",
+            "dateUpdated",
+            "jobExecutionStatus",
+            "errorMessage?",
+            "progressTotalQuantity:i?",
+            "progressCompleteQuantity:i?",
+            "progressFailedQuantity:i?",
         ])->add($this->jobStatusModel->getReadSchema());
     }
 }

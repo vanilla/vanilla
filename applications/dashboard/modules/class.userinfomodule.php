@@ -11,8 +11,8 @@
 /**
  * Renders information about a user in the user profile (email, join date, visits, etc).
  */
-class UserInfoModule extends Gdn_Module {
-
+class UserInfoModule extends Gdn_Module
+{
     /** @var array  */
     public $User;
 
@@ -24,28 +24,38 @@ class UserInfoModule extends Gdn_Module {
      *
      * @param string $sender
      */
-    public function __construct($sender = '') {
+    public function __construct($sender = "")
+    {
         $this->User = false;
         $this->path(__FILE__);
         parent::__construct($sender);
     }
 
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
-    public function loadData() {
-        $userID = Gdn::controller()->data('Profile.UserID', Gdn::session()->UserID);
+    public function loadData()
+    {
+        $userID = Gdn::controller()->data("Profile.UserID", Gdn::session()->UserID);
         $this->User = Gdn::userModel()->getID($userID);
-        $this->Roles = Gdn::userModel()->getRoles($userID)->resultArray();
+        $this->Roles = Gdn::userModel()
+            ->getRoles($userID)
+            ->resultArray();
         // Hide personal info roles
-        if (!checkPermission('Garden.PersonalInfo.View')) {
-            $this->Roles = array_filter($this->Roles, 'RoleModel::FilterPersonalInfo');
+        if (!checkPermission("Garden.PersonalInfo.View")) {
+            $this->Roles = array_filter($this->Roles, "RoleModel::FilterPersonalInfo");
         }
-        $this->setData('_canViewPersonalInfo', Gdn::session()->UserID === $this->User->UserID || gdn::session()->checkPermission('Garden.PersonalInfo.View'));
+        $this->setData(
+            "_canViewPersonalInfo",
+            Gdn::session()->UserID === $this->User->UserID ||
+                gdn::session()->checkPermission("Garden.PersonalInfo.View")
+        );
     }
 
-    public function toString() {
+    public function toString()
+    {
         if (!$this->User) {
             $this->loadData();
         }
@@ -54,6 +64,6 @@ class UserInfoModule extends Gdn_Module {
             return parent::toString();
         }
 
-        return '';
+        return "";
     }
 }

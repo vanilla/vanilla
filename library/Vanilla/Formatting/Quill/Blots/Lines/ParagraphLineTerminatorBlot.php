@@ -12,14 +12,16 @@ use Vanilla\Formatting\Quill\BlotGroup;
 /**
  * A blot to represent a paragraph line terminator.
  */
-class ParagraphLineTerminatorBlot extends AbstractLineTerminatorBlot {
+class ParagraphLineTerminatorBlot extends AbstractLineTerminatorBlot
+{
     /**
      * Paragraph lines only newline items with no attributes.
      * @see Parser::splitPlainTextNewlines()
      * @inheritdoc
      */
-    public static function matches(array $operation): bool {
-        $mainOpInsert = $operation['insert'] ?? null;
+    public static function matches(array $operation): bool
+    {
+        $mainOpInsert = $operation["insert"] ?? null;
         if (is_string($mainOpInsert)) {
             $mainOpMatch = preg_match("/^(\\n)+$/", $mainOpInsert);
             return $mainOpMatch && !array_key_exists("attributes", $operation);
@@ -34,7 +36,8 @@ class ParagraphLineTerminatorBlot extends AbstractLineTerminatorBlot {
      * @param BlotGroup $group
      * @return bool
      */
-    public function shouldClearCurrentGroup(BlotGroup $group): bool {
+    public function shouldClearCurrentGroup(BlotGroup $group): bool
+    {
         $overridingBlot = $group->getOverrideBlot();
         return !!$overridingBlot;
     }
@@ -43,7 +46,8 @@ class ParagraphLineTerminatorBlot extends AbstractLineTerminatorBlot {
      * Paragraph line blots should always be grouped as a single line.
      * @inheritdoc
      */
-    public function isOwnGroup(): bool {
+    public function isOwnGroup(): bool
+    {
         return true;
     }
 
@@ -51,7 +55,8 @@ class ParagraphLineTerminatorBlot extends AbstractLineTerminatorBlot {
      * We only use the line tags since the paragraph line is its own group.
      * @inheritdoc
      */
-    public function getGroupOpeningTag(): string {
+    public function getGroupOpeningTag(): string
+    {
         return "";
     }
 
@@ -59,21 +64,24 @@ class ParagraphLineTerminatorBlot extends AbstractLineTerminatorBlot {
      * We only use the line tags since the paragraph line is its own group.
      * @inheritdoc
      */
-    public function getGroupClosingTag(): string {
+    public function getGroupClosingTag(): string
+    {
         return "";
     }
 
     /**
      * @inheritdoc
      */
-    public function renderLineStart(): string {
+    public function renderLineStart(): string
+    {
         return "<p>";
     }
 
     /**
      * @inheritdoc
      */
-    public function renderLineEnd(): string {
+    public function renderLineEnd(): string
+    {
         return "</p>";
     }
 }

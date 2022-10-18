@@ -16,8 +16,8 @@ import { IHydratedEditableWidgetProps, ILayoutEditorPath } from "@dashboard/layo
 import { cx } from "@emotion/css";
 import { SectionFullWidth } from "@library/layout/SectionFullWidth";
 import { SectionOneColumn } from "@library/layout/SectionOneColumn";
-import ThreeColumnSection from "@library/layout/ThreeColumnSection";
-import TwoColumnSection from "@library/layout/TwoColumnSection";
+import SectionThreeColumns from "@library/layout/ThreeColumnSection";
+import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import { useFocusOnActivate } from "@vanilla/react-utils";
 import React, { useDebugValue, useRef } from "react";
 
@@ -88,7 +88,7 @@ export function EditorSectionOneColumn(props: EditorSectionProps<typeof SectionO
     );
 }
 
-export function EditorSectionTwoColumns(props: EditorSectionProps<typeof TwoColumnSection>) {
+export function EditorSectionTwoColumns(props: EditorSectionProps<typeof SectionTwoColumns>) {
     props = useSectionPropsWithAddButtons(props);
 
     const { $editorPath, $componentName, $hydrate, ...restProps } = props;
@@ -100,7 +100,7 @@ export function EditorSectionTwoColumns(props: EditorSectionProps<typeof TwoColu
 
     return (
         <>
-            <TwoColumnSection
+            <SectionTwoColumns
                 {...restProps}
                 role={"button"}
                 aria-label={`Two column section at position ${props.$editorPath.sectionIndex}`}
@@ -116,7 +116,7 @@ export function EditorSectionTwoColumns(props: EditorSectionProps<typeof TwoColu
     );
 }
 
-export function EditorSectionThreeColumns(props: EditorSectionProps<typeof ThreeColumnSection>) {
+export function EditorSectionThreeColumns(props: EditorSectionProps<typeof SectionThreeColumns>) {
     props = useSectionPropsWithAddButtons(props);
     const { $editorPath, $componentName, $hydrate, ...restProps } = props;
     const classes = layoutEditorClasses();
@@ -126,7 +126,7 @@ export function EditorSectionThreeColumns(props: EditorSectionProps<typeof Three
 
     return (
         <>
-            <ThreeColumnSection
+            <SectionThreeColumns
                 {...restProps}
                 role={"button"}
                 aria-label={`Three column section`}
@@ -245,6 +245,15 @@ function SectionDecorationAbsolute(
         offset = -16;
     }
 
+    const sectionHasAssets = LayoutSectionInfos[props.$hydrate].regionNames.some((region) => {
+        return (
+            props[region] &&
+            props[region].some(
+                (child) => child?.props && child.props.$hydrate && child.props.$hydrate.includes("asset"),
+            )
+        );
+    });
+
     return (
         <>
             {!props.skipBefore && (
@@ -262,6 +271,7 @@ function SectionDecorationAbsolute(
                     path={props.$editorPath}
                     offset={offset}
                     allowColumnInvert={allowColumnInvert}
+                    hasAsset={sectionHasAssets}
                 />
             )}
         </>

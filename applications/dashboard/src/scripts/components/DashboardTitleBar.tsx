@@ -72,24 +72,24 @@ export default function DashboardTitleBar(props: IProps) {
                                 </>
                             }
                             showCloseIcon={false}
-                            navigationItems={(sections as unknown) as INavigationVariableItem[]}
+                            navigationItems={sections as unknown as INavigationVariableItem[]}
                             forceHamburgerOpen={props.forceHamburgerOpen}
                         />
-                        <div className={classes.logo}>
-                            <Icon icon={"vanilla-logo"} />
+                        <div className={classes.logoContainer}>
+                            <Icon icon={"vanilla-logo"} className={classes.logo} />
                         </div>
                     </>
                 )}
                 {!isCompact && (
                     <>
                         <div className={classes.brand}>
-                            <div className={classes.logo}>
-                                <Icon icon={"vanilla-logo"} />
+                            <div className={classes.logoContainer}>
+                                <Icon icon={"vanilla-logo"} className={classes.logo} />
                             </div>
-                            <a href="/" className={classes.backBtn}>
-                                Visit Site
+                            <SmartLink to={"/"} className={classes.backBtn}>
+                                {t("Visit Site")}
                                 <Icon icon="external-link" size="compact" />
-                            </a>
+                            </SmartLink>
                         </div>
                         <nav className={classes.nav}>
                             {sections &&

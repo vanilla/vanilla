@@ -13,7 +13,8 @@ use Vanilla\Permissions;
 /**
  * A middleware that sets a permission ban for private communities.
  */
-class PrivateCommunityMiddleware {
+class PrivateCommunityMiddleware
+{
     /**
      * @var \Gdn_Session
      */
@@ -36,7 +37,8 @@ class PrivateCommunityMiddleware {
      * @param \Gdn_Session $session The session to set the ban on.
      * @param \Gdn_Locale $locale For translating messages.
      */
-    public function __construct(bool $isPrivate, \Gdn_Session $session, \Gdn_Locale $locale) {
+    public function __construct(bool $isPrivate, \Gdn_Session $session, \Gdn_Locale $locale)
+    {
         $this->session = $session;
         $this->isPrivate = $isPrivate;
         $this->locale = $locale;
@@ -49,15 +51,13 @@ class PrivateCommunityMiddleware {
      * @param callable $next The next middleware
      * @return mixed
      */
-    public function __invoke(RequestInterface $request, callable $next) {
+    public function __invoke(RequestInterface $request, callable $next)
+    {
         if ($this->isPrivate && !$this->session->isValid()) {
-            $this->session->getPermissions()->addBan(
-                Permissions::BAN_PRIVATE,
-                [
-                    'msg' => $this->locale->translate('You must sign in to the private community.'),
-                    'code' => 403
-                ]
-            );
+            $this->session->getPermissions()->addBan(Permissions::BAN_PRIVATE, [
+                "msg" => $this->locale->translate("You must sign in to the private community."),
+                "code" => 403,
+            ]);
         }
 
         return $next($request);
@@ -68,7 +68,8 @@ class PrivateCommunityMiddleware {
      *
      * @return bool
      */
-    public function isPrivate(): bool {
+    public function isPrivate(): bool
+    {
         return $this->isPrivate;
     }
 
@@ -77,7 +78,8 @@ class PrivateCommunityMiddleware {
      *
      * @param bool $isPrivate
      */
-    public function setIsPrivate(bool $isPrivate): void {
+    public function setIsPrivate(bool $isPrivate): void
+    {
         $this->isPrivate = $isPrivate;
     }
 }

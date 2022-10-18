@@ -11,5 +11,6 @@ use Garden\Web\Exception\ServerException;
 /**
  * An exception for when access to a disabled feature is attempted.
  */
-class FeatureNotEnabledException extends ServerException {
+class FeatureNotEnabledException extends ServerException
+{
 }

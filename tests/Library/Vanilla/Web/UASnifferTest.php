@@ -13,8 +13,8 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests for the user agent sniffer.
  */
-class UASnifferTest extends MinimalContainerTestCase {
-
+class UASnifferTest extends MinimalContainerTestCase
+{
     /**
      * Test the user agent sniffer.
      *
@@ -24,22 +24,24 @@ class UASnifferTest extends MinimalContainerTestCase {
      *
      * @dataProvider provideIEUAStrings
      */
-    public function testIsIE(\Gdn_Session $session, string $uaString, bool $isIE) {
+    public function testIsIE(\Gdn_Session $session, string $uaString, bool $isIE)
+    {
         $sniffer = new UASniffer($session);
-        $_SERVER['HTTP_USER_AGENT'] = $uaString;
+        $_SERVER["HTTP_USER_AGENT"] = $uaString;
         $this->assertEquals($isIE, $sniffer->isIE11());
     }
 
     /**
      * @return array
      */
-    public function provideIEUAStrings(): array {
+    public function provideIEUAStrings(): array
+    {
         $guest = new \Gdn_Session();
         $user = new \Gdn_Session();
 
-        $realIEAgent1 = 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; .NET4.0E; .NET4.0C; rv:11.0) like Gecko';
-        $realIEAgent2 = 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko';
-        $badIECompatString = 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.3; Trident/7.0; .NET4.0E; .NET4.0C)';
+        $realIEAgent1 = "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; .NET4.0E; .NET4.0C; rv:11.0) like Gecko";
+        $realIEAgent2 = "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko";
+        $badIECompatString = "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.3; Trident/7.0; .NET4.0E; .NET4.0C)";
         $user->UserID = 5;
         return [
             [$guest, $realIEAgent1, false],

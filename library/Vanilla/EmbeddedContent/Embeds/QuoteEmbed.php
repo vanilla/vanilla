@@ -18,73 +18,75 @@ use Vanilla\Utility\InstanceValidatorSchema;
 /**
  * Fallback scraped link embed.
  */
-class QuoteEmbed extends AbstractEmbed {
-
+class QuoteEmbed extends AbstractEmbed
+{
     const TYPE = "quote";
 
-    const SECURE_UNRENDERED_MESSAGE = 'Not rendered yet for security reasons. Did you forget to run QuoteEmbedFilter::filterEmbed()?';
+    const SECURE_UNRENDERED_MESSAGE = "Not rendered yet for security reasons. Did you forget to run QuoteEmbedFilter::filterEmbed()?";
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         $data = EmbedUtils::remapProperties($data, [
-            'name' => 'attributes.name',
-            'bodyRaw' => 'attributes.bodyRaw',
-            'format' => 'attributes.format',
-            'dateInserted' => 'attributes.dateInserted',
-            'insertUser' => 'attributes.insertUser',
-            'discussionID' => 'attributes.discussionID',
-            'commentID' => 'attributes.commentID',
+            "name" => "attributes.name",
+            "bodyRaw" => "attributes.bodyRaw",
+            "format" => "attributes.format",
+            "dateInserted" => "attributes.dateInserted",
+            "insertUser" => "attributes.insertUser",
+            "discussionID" => "attributes.discussionID",
+            "commentID" => "attributes.commentID",
         ]);
 
         // Handle the IDs
-        $discussionID = $data['discussionID'] ?? null;
-        $commentID = $data['commentID'] ?? null;
+        $discussionID = $data["discussionID"] ?? null;
+        $commentID = $data["commentID"] ?? null;
 
         if ($discussionID !== null) {
-            $data['recordID'] = $discussionID;
-            $data['recordType'] = 'discussion';
+            $data["recordID"] = $discussionID;
+            $data["recordType"] = "discussion";
         } elseif ($commentID !== null) {
-            $data['recordID'] = $commentID;
-            $data['recordType'] = 'comment';
+            $data["recordID"] = $commentID;
+            $data["recordType"] = "comment";
         }
 
         // values from the config take priority
-        $configDisplayOptions = c('embed.quote.displayOptions.'.$data['recordType']);
+        $configDisplayOptions = c("embed.quote.displayOptions." . $data["recordType"]);
 
         if (is_array($configDisplayOptions)) {
-            $data['displayOptions'] = QuoteEmbedDisplayOptions::from($configDisplayOptions);
+            $data["displayOptions"] = QuoteEmbedDisplayOptions::from($configDisplayOptions);
         } else {
-            if (!isset($data['displayOptions'])) {
-                $hasTitle = isset($data['name']);
-                $data['displayOptions'] = QuoteEmbedDisplayOptions::minimal($hasTitle);
-            } elseif (is_array($data['displayOptions'])) {
-                $data['displayOptions'] = QuoteEmbedDisplayOptions::from($data['displayOptions']);
+            if (!isset($data["displayOptions"])) {
+                $hasTitle = isset($data["name"]);
+                $data["displayOptions"] = QuoteEmbedDisplayOptions::minimal($hasTitle);
+            } elseif (is_array($data["displayOptions"])) {
+                $data["displayOptions"] = QuoteEmbedDisplayOptions::from($data["displayOptions"]);
             }
         }
 
         // Normalize the body into a string.
         // Some older quote embeds had rich quote bodies as arrays.
-        $format = $data['format'];
-        $bodyRaw = $data['bodyRaw'];
+        $format = $data["format"];
+        $bodyRaw = $data["bodyRaw"];
 
         if (strtolower($format) === RichFormat::FORMAT_KEY && is_array($bodyRaw)) {
-            $data['bodyRaw'] = json_encode($bodyRaw, JSON_UNESCAPED_UNICODE);
+            $data["bodyRaw"] = json_encode($bodyRaw, JSON_UNESCAPED_UNICODE);
         }
 
         // Due to security sentive nature of these they should always be rendered by the filterer.
-        $data['body'] = self::SECURE_UNRENDERED_MESSAGE;
-        $userLabel = $data['insertUser']['label'] ?? null;
+        $data["body"] = self::SECURE_UNRENDERED_MESSAGE;
+        $userLabel = $data["insertUser"]["label"] ?? null;
         if ($userLabel !== null) {
-            $data['insertUser']['label'] = self::SECURE_UNRENDERED_MESSAGE;
+            $data["insertUser"]["label"] = self::SECURE_UNRENDERED_MESSAGE;
         }
 
         return $data;
@@ -94,16 +96,17 @@ class QuoteEmbed extends AbstractEmbed {
      * Override to remove rawBody from output. It's unnecssary.
      * @inheritdoc
      */
-    public function renderHtml(): string {
-        $viewPath = dirname(__FILE__) . '/QuoteEmbed.twig';
+    public function renderHtml(): string
+    {
+        $viewPath = dirname(__FILE__) . "/QuoteEmbed.twig";
         $data = $this->getData();
 
         // No need to bloat the HTML with this.
-        unset($data['bodyRaw']);
+        unset($data["bodyRaw"]);
 
         return $this->renderTwig($viewPath, [
-            'url' => $this->getUrl(),
-            'data' => json_encode($this, JSON_UNESCAPED_UNICODE)
+            "url" => $this->getUrl(),
+            "data" => json_encode($this, JSON_UNESCAPED_UNICODE),
         ]);
     }
 
@@ -112,8 +115,9 @@ class QuoteEmbed extends AbstractEmbed {
      *
      * @return QuoteEmbedDisplayOptions
      */
-    public function getDisplayOptons(): QuoteEmbedDisplayOptions {
-        return $this->data['displayOptions'];
+    public function getDisplayOptons(): QuoteEmbedDisplayOptions
+    {
+        return $this->data["displayOptions"];
     }
 
     /**
@@ -121,8 +125,9 @@ class QuoteEmbed extends AbstractEmbed {
      *
      * @return int
      */
-    public function getUserID(): int {
-        return $this->data['insertUser']['userID'];
+    public function getUserID(): int
+    {
+        return $this->data["insertUser"]["userID"];
     }
 
     /**
@@ -130,32 +135,30 @@ class QuoteEmbed extends AbstractEmbed {
      *
      * @return string
      */
-    public function getUsername(): string {
-        return $this->data['insertUser']['name'];
+    public function getUsername(): string
+    {
+        return $this->data["insertUser"]["name"];
     }
 
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
+    protected function schema(): Schema
+    {
         return Schema::parse([
-            'recordID:i',
-            'recordType:s',
-            'body:s', // The body is need currnetly during edit mode,
+            "recordID:i",
+            "recordType:s",
+            "body:s", // The body is need currnetly during edit mode,
             // to prevent needing extra server roundtrips to render them.
-            'bodyRaw:s|a', // Raw body is the source of truth for the embed.
-            'format' => new FormatSchema(true),
-            'dateInserted:dt',
-            'insertUser' => new UserFragmentSchema(),
-            'displayOptions' => new InstanceValidatorSchema(QuoteEmbedDisplayOptions::class),
-            'discussionLink:s?',
+            "bodyRaw:s|a", // Raw body is the source of truth for the embed.
+            "format" => new FormatSchema(true),
+            "dateInserted:dt",
+            "insertUser" => new UserFragmentSchema(),
+            "displayOptions" => new InstanceValidatorSchema(QuoteEmbedDisplayOptions::class),
+            "discussionLink:s?",
 
             // Optional properties
-            'category:o?' => [
-                'categoryID',
-                'name',
-                'url',
-            ],
+            "category:o?" => ["categoryID", "name", "url"],
         ]);
     }
 }

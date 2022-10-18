@@ -18,8 +18,8 @@ namespace Vanilla;
  * - an autoloader for usage with spl_autoload_register to autoload the original class for an alias.
  * - a utility for creating alias from the mapping defined here.
  */
-trait AliasProviderTrait {
-
+trait AliasProviderTrait
+{
     /** @var array An array of className => AliasName[] */
     /**
      * @inheritdoc
@@ -43,7 +43,8 @@ trait AliasProviderTrait {
      *
      * @return array
      */
-    private static function getClassToAliases(): array {
+    private static function getClassToAliases(): array
+    {
         if (self::$classToAliases === null) {
             self::$classToAliases = static::provideAliases();
         }
@@ -56,7 +57,8 @@ trait AliasProviderTrait {
      *
      * @return array
      */
-    private static function getAliasesToClasses(): array {
+    private static function getAliasesToClasses(): array
+    {
         if (self::$aliasesToClasses === null) {
             self::$aliasesToClasses = [];
             foreach (static::getClassToAliases() as $className => $aliases) {
@@ -75,7 +77,8 @@ trait AliasProviderTrait {
      * @param string $className
      * @throws \Exception When attempting to create an alias that has no mappings.
      */
-    public static function createAliases(string $className) {
+    public static function createAliases(string $className)
+    {
         foreach (static::getAliases($className) as $alias) {
             class_alias($className, $alias);
         }
@@ -88,7 +91,8 @@ trait AliasProviderTrait {
      * @return array
      * @throws \Exception If you try and fetch aliases for a class that is not listed.
      */
-    public static function getAliases(string $className): array {
+    public static function getAliases(string $className): array
+    {
         $classes = static::getClassToAliases();
         if (!isset($classes[$className])) {
             throw new \Exception("Could not find any registered aliases for class $className");
@@ -106,7 +110,8 @@ trait AliasProviderTrait {
      *
      * @param string $aliasName the class name to try and load.
      */
-    public static function autoload(string $aliasName) {
+    public static function autoload(string $aliasName)
+    {
         $aliases = static::getAliasesToClasses();
         if (isset($aliases[$aliasName])) {
             $newName = $aliases[$aliasName];

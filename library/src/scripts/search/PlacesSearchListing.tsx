@@ -14,21 +14,21 @@ import { useSearchForm } from "@library/search/SearchContext";
 interface IProps {}
 
 export default function PlacesSearchListing(props: IProps) {
-    const { domainSearchResults } = useSearchForm<{}>();
+    const { domainSearchResponse } = useSearchForm<{}>();
 
-    const results = domainSearchResults[PLACES_DOMAIN_NAME];
-    // To prevent situation when component is mounted but results not yet
+    const response = domainSearchResponse[PLACES_DOMAIN_NAME];
+    // To prevent situation when component is mounted but response not yet
     // available
-    const status = (results && results.status) || LoadStatus.PENDING;
+    const status = (response && response.status) || LoadStatus.PENDING;
 
     switch (status) {
         case LoadStatus.PENDING:
         case LoadStatus.LOADING:
             return <PlacesListingPlaceHolder count={8} />;
         case LoadStatus.ERROR:
-            return <CoreErrorMessages error={results.error} />;
+            return <CoreErrorMessages error={response.error} />;
         case LoadStatus.SUCCESS:
-            const itemList = results.data?.results || [];
+            const itemList = response.data?.results || [];
             const items = itemList?.map((element) => {
                 const { type, name, url } = element;
                 return { type, name, url };

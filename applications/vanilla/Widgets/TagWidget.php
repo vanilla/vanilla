@@ -8,22 +8,24 @@
 namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
-use Vanilla\Layout\Section\SectionThreeColumns;
-use Vanilla\Layout\Section\SectionTwoColumns;
+use Vanilla\ApiUtils;
+use Vanilla\Forms\FormOptions;
+use Vanilla\Forms\SchemaForm;
+use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
 use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
 use Vanilla\Widgets\React\ReactWidgetInterface;
-use Vanilla\Widgets\React\SectionAwareInterface;
 
 /**
  * Class TagWidget
  */
-class TagWidget extends AbstractReactModule implements ReactWidgetInterface, CombinedPropsWidgetInterface, SectionAwareInterface {
-
-    use CombinedPropsWidgetTrait, HomeWidgetContainerSchemaTrait;
+class TagWidget extends AbstractReactModule implements ReactWidgetInterface, CombinedPropsWidgetInterface
+{
+    use CombinedPropsWidgetTrait;
+    use HomeWidgetContainerSchemaTrait;
 
     /** @var \TagsApiController */
     private $apiClient;
@@ -33,7 +35,8 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
      *
      * @param \TagsApiController $apiClient
      */
-    public function __construct(\TagsApiController $apiClient) {
+    public function __construct(\TagsApiController $apiClient)
+    {
         $this->apiClient = $apiClient;
         parent::__construct();
     }
@@ -41,39 +44,33 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
     /**
      * @inheridoc
      */
-    public static function getWidgetName(): string {
+    public static function getWidgetName(): string
+    {
         return "Tag Cloud";
     }
 
     /**
      * @inheridoc
      */
-    public static function getWidgetID(): string {
+    public static function getWidgetID(): string
+    {
         return "tag";
     }
 
     /**
      * @inheridoc
      */
-    public static function getComponentName(): string {
+    public static function getComponentName(): string
+    {
         return "TagWidget";
     }
 
     /**
      * @return string
      */
-    public static function getWidgetIconPath(): string {
-        return"/applications/dashboard/design/images/widgetIcons/tagcloud.svg";
-    }
-
-    /**
-     * @return array
-     */
-    public static function getRecommendedSectionIDs(): array {
-        return [
-            SectionTwoColumns::getWidgetID(),
-            SectionThreeColumns::getWidgetID(),
-        ];
+    public static function getWidgetIconPath(): string
+    {
+        return "/applications/dashboard/design/images/widgetIcons/tagcloud.svg";
     }
 
     /**
@@ -81,7 +78,8 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
      *
      * @return Schema
      */
-    private static function getItemSchema(): Schema {
+    private static function getItemSchema(): Schema
+    {
         return Schema::parse([
             "itemOptions?" => [
                 "description" => "Configure various item options",
@@ -89,42 +87,78 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
                 "properties" => [
                     "tagPreset:s" => [
                         "description" => "Collections of styles predefined for tags.",
-                        "enum" => ["STANDARD", "PRIMARY", "GREYSCALE", "COLORED"]
-                    ]
-                ]
-            ]
+                        "enum" => ["STANDARD", "PRIMARY", "GREYSCALE", "COLORED"],
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Get the schema for limit.
+     *
+     * @return Schema
+     */
+    private static function getLimitSchema(): Schema
+    {
+        return Schema::parse([
+            "limit:i?" => [
+                "description" => "Desired number of items per page.",
+                "x-control" => SchemaForm::dropDown(
+                    new FormOptions(t("Limit"), t("Choose how many records to display."), t("Default (20)")),
+                    new StaticFormChoices([
+                        "10" => 10,
+                        "20" => 20,
+                        "30" => 30,
+                        "40" => 40,
+                        "50" => 50,
+                    ])
+                ),
+            ],
         ]);
     }
 
     /**
      * @inheridoc
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         $schema = SchemaUtils::composeSchemas(
             self::widgetTitleSchema(),
             self::widgetSubtitleSchema("subtitle"),
             self::widgetDescriptionSchema(),
+            \TagModule::getWidgetSchema(),
+            self::getLimitSchema(),
             self::containerOptionsSchema("containerOptions", [
-                'outerBackground?', 'innerBackground?', 'borderType?', 'headerAlignment?'
-                ]),
-            self::getItemSchema(),
-            \TagModule::getWidgetSchema()
+                "outerBackground?",
+                "innerBackground?",
+                "borderType?",
+                "headerAlignment?",
+            ]),
+            self::getItemSchema()
         );
+
         return $schema;
     }
 
     /**
      * @inheridoc
      */
-    public function getProps(): ?array {
-        $tags = $this->apiClient->index(["sort" => "countDiscussions"]);
+    public function getProps(): ?array
+    {
+        $limit = $this->props["limit"] ?? 20;
+        $tags = $this->apiClient->index([
+            "sort" => "-countDiscussions",
+            "excludeNoCountDiscussion" => true,
+            "limit" => $limit,
+        ]);
 
         if (count($tags) === 0) {
             return null;
         }
 
         return array_merge($this->props, [
-            "tags" => $tags
+            "tags" => $tags,
         ]);
     }
 }

@@ -1,12 +1,13 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import BulkDeleteDiscussions from "@library/features/discussions/forms/BulkDeleteDiscussionsForm";
 import { BulkMergeDiscussionsForm } from "@library/features/discussions/forms/BulkMergeDiscussionsForm";
 import BulkMoveDiscussions from "@library/features/discussions/forms/BulkMoveDiscussionsForm";
+import BulkCloseDiscussions from "@library/features/discussions/forms/BulkCloseDiscussionsForm";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import React, { useMemo } from "react";
@@ -15,6 +16,7 @@ export enum BulkActionTypes {
     DELETE = "delete",
     MERGE = "merge",
     MOVE = "move",
+    CLOSE = "close",
 }
 
 export interface IBulkActionForm {
@@ -42,6 +44,7 @@ export function BulkActionsModal(props: IProps) {
                     delete: BulkDeleteDiscussions,
                     move: BulkMoveDiscussions,
                     merge: BulkMergeDiscussionsForm,
+                    close: BulkCloseDiscussions,
                 }[bulkActionType] ?? null
             );
         }

@@ -8,7 +8,6 @@
 
 $nestedList-margin: 0 0 0 1em;
 
-
 .userContent ul,
 .userContent ol {
     margin: 1em 0 1em 2em;
@@ -53,5 +52,5 @@ $nestedList-margin: 0 0 0 1em;
 // Too overcome bootstrap 3's hideous selector "form ul:not(.List) li"
 .userContent li,
 .userContent.userContent ul li {
-  margin: 5px 0;
+    margin: 5px 0;
 }

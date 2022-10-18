@@ -12,16 +12,17 @@ use Vanilla\Formatting\Html\HtmlDocument;
 /**
  * Processor to remove useless HTML from zendesk imports.
  */
-class ZendeskWysiwygProcessor extends HtmlProcessor {
+class ZendeskWysiwygProcessor extends HtmlProcessor
+{
+    const ZENDESK_ATTRIBUTES = ["data-editor", "data-block", "data-offset-key"];
 
-    const ZENDESK_ATTRIBUTES = ['data-editor', 'data-block', 'data-offset-key'];
-
-    const ZENDESK_NODE_XPATH = '//*[@data-editor]|//*[@data-block]|//*[@data-offset-key]';
+    const ZENDESK_NODE_XPATH = "//*[@data-editor]|//*[@data-block]|//*[@data-offset-key]";
 
     /**
      * @inheritdoc
      */
-    public function processDocument(HtmlDocument $document): HtmlDocument {
+    public function processDocument(HtmlDocument $document): HtmlDocument
+    {
         if ($this->hasZendeskContent($document)) {
             // Only process if we actually have zendesk content.
             $this->stripNonBreakingSpaces($document);
@@ -38,7 +39,8 @@ class ZendeskWysiwygProcessor extends HtmlProcessor {
      *
      * @return bool
      */
-    private function hasZendeskContent(HtmlDocument $document): bool {
+    private function hasZendeskContent(HtmlDocument $document): bool
+    {
         $html = $document->getInnerHtml();
         foreach (self::ZENDESK_ATTRIBUTES as $attribute) {
             if (strpos($html, $attribute) !== false) {
@@ -54,13 +56,14 @@ class ZendeskWysiwygProcessor extends HtmlProcessor {
      *
      * @param HtmlDocument $document The document to parse.
      */
-    private function stripNonBreakingSpaces(HtmlDocument $document) {
+    private function stripNonBreakingSpaces(HtmlDocument $document)
+    {
         $editorNodes = $document->queryXPath(self::ZENDESK_NODE_XPATH);
 
         /** @var \DOMNode $editorNode */
         foreach ($editorNodes as $editorNode) {
             $characters = htmlentities(trim($editorNode->textContent));
-            if ($characters === '&nbsp;') {
+            if ($characters === "&nbsp;") {
                 $editorNode->parentNode->removeChild($editorNode);
                 continue;
             }
@@ -72,8 +75,9 @@ class ZendeskWysiwygProcessor extends HtmlProcessor {
      *
      * @param HtmlDocument $document The document to parse.
      */
-    private function unwrapNestedDivs(HtmlDocument $document) {
-        $nestedDivs = $document->queryXPath('//div[@data-block]');
+    private function unwrapNestedDivs(HtmlDocument $document)
+    {
+        $nestedDivs = $document->queryXPath("//div[@data-block]");
 
         /** @var \DOMNode $nestedDiv */
         foreach ($nestedDivs as $nestedDiv) {
@@ -93,14 +97,15 @@ class ZendeskWysiwygProcessor extends HtmlProcessor {
      *
      * @param HtmlDocument $document The document to parse.
      */
-    private function stripUselessAttributes(HtmlDocument $document) {
+    private function stripUselessAttributes(HtmlDocument $document)
+    {
         $nodes = $document->queryXPath(self::ZENDESK_NODE_XPATH);
 
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
-            $node->removeAttribute('data-editor');
-            $node->removeAttribute('data-block');
-            $node->removeAttribute('data-offset-key');
+            $node->removeAttribute("data-editor");
+            $node->removeAttribute("data-block");
+            $node->removeAttribute("data-offset-key");
         }
     }
 }

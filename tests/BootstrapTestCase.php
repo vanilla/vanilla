@@ -16,19 +16,23 @@ namespace VanillaTests;
  * 1. You aren't testing functionality that requires the database.
  * 2. You are testing generic database functionality and not specific application tables.
  */
-class BootstrapTestCase extends VanillaTestCase {
+class BootstrapTestCase extends VanillaTestCase
+{
     use BootstrapTrait, SetupTraitsTrait;
 
     /**
      * @inheritDoc
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         parent::setUpBeforeClass();
         static::setUpBeforeClassTestTraits();
         // Clear all tables.
         $dbConfig = Bootstrap::testDbConfig();
-        $dbname = $dbConfig['Dbname'];
-        $pdo = self::container()->get(\Gdn_Database::class)->connection();
+        $dbname = $dbConfig["Dbname"];
+        $pdo = self::container()
+            ->get(\Gdn_Database::class)
+            ->connection();
         $pdo->exec("drop database if exists `$dbname`");
         $pdo->exec("create database if not exists `$dbname`");
         $pdo->exec("use `$dbname`");
@@ -37,7 +41,8 @@ class BootstrapTestCase extends VanillaTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->setUpTestTraits();
     }
@@ -45,7 +50,8 @@ class BootstrapTestCase extends VanillaTestCase {
     /**
      * @inheritDoc
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
         $this->tearDownTestTraits();
     }
@@ -53,7 +59,8 @@ class BootstrapTestCase extends VanillaTestCase {
     /**
      * @inheritDoc
      */
-    public static function tearDownAfterClass(): void {
+    public static function tearDownAfterClass(): void
+    {
         parent::tearDownAfterClass();
         static::tearDownAfterClassTestTraits();
     }

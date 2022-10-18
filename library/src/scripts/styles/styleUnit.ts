@@ -5,7 +5,7 @@
  */
 
 import { important, px } from "csx";
-import isNumeric from "validator/lib/isNumeric";
+import { isNumeric } from "@vanilla/utils";
 import { logError } from "@vanilla/utils";
 
 export function styleUnit(

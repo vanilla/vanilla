@@ -243,7 +243,7 @@ export function userContentMixin(): CSSObject {
         [`.embedText-title,
           .embedLink-source,
           .embedLink-excerpt`]: {
-            color: ColorsUtils.colorOut(vars.blocks.fg),
+            color: ColorsUtils.colorOut(vars.embeds.fg ?? vars.blocks.fg),
         },
         ".metaStyle": {
             opacity: 0.8,

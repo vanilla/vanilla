@@ -14,16 +14,16 @@ use Vanilla\Web\AbstractJsonLDItem;
  * Manages collections of items to be placed between the <HEAD> tags of the
  * page.
  */
-class HeadModule extends Gdn_Module {
-
+class HeadModule extends Gdn_Module
+{
     /** The name of the key in a tag that refers to the tag's name. */
-    const TAG_KEY = '_tag';
+    const TAG_KEY = "_tag";
 
     /**  */
-    const CONTENT_KEY = '_content';
+    const CONTENT_KEY = "_content";
 
     /**  */
-    const SORT_KEY = '_sort';
+    const SORT_KEY = "_sort";
 
     /** @var array A collection of tags to be placed in the head. */
     private $tags;
@@ -66,12 +66,13 @@ class HeadModule extends Gdn_Module {
      *
      * @param string $sender
      */
-    public function __construct($sender = '') {
+    public function __construct($sender = "")
+    {
         $this->tags = [];
         $this->strings = [];
-        $this->title = '';
-        $this->subtitle = '';
-        $this->titleDivider = ' — ';
+        $this->title = "";
+        $this->subtitle = "";
+        $this->titleDivider = " — ";
         parent::__construct($sender);
         // Workaround beacuse we can't do parameter injection.
         $this->assetPreloadModel = \Gdn::getContainer()->get(\Vanilla\Web\Asset\AssetPreloadModel::class);
@@ -88,22 +89,23 @@ class HeadModule extends Gdn_Module {
      * @param bool $addVersion Whether to append version number as query string.
      * @param array $options Additional properties to pass to AddTag, e.g. 'ie' => 'lt IE 7';
      */
-    public function addCss($href, $media = '', $addVersion = true, $options = null) {
+    public function addCss($href, $media = "", $addVersion = true, $options = null)
+    {
         $properties = [
-            'rel' => 'stylesheet',
-            'href' => asset($href, false, $addVersion),
-            'media' => $media,
-            'static' => $options['static'] ?? true,
+            "rel" => "stylesheet",
+            "href" => asset($href, false, $addVersion),
+            "media" => $media,
+            "static" => $options["static"] ?? true,
         ];
 
         // Use same underscore convention as AddScript
         if (is_array($options)) {
             foreach ($options as $key => $value) {
-                $properties['_'.strtolower($key)] = $value;
+                $properties["_" . strtolower($key)] = $value;
             }
         }
 
-        $this->addTag('link', $properties);
+        $this->addTag("link", $properties);
     }
 
     /**
@@ -112,12 +114,13 @@ class HeadModule extends Gdn_Module {
      * @param string $href
      * @param string $title
      */
-    public function addRss($href, $title) {
-        $this->addTag('link', [
-            'rel' => 'alternate',
-            'type' => 'application/rss+xml',
-            'title' => Gdn_Format::text($title),
-            'href' => asset($href)
+    public function addRss($href, $title)
+    {
+        $this->addTag("link", [
+            "rel" => "alternate",
+            "type" => "application/rss+xml",
+            "title" => Gdn_Format::text($title),
+            "href" => asset($href),
         ]);
     }
 
@@ -129,7 +132,8 @@ class HeadModule extends Gdn_Module {
      * @param string|null $content an index to give the tag for later manipulation.
      * @param string|null $index
      */
-    public function addTag($tag, $properties, $content = null, $index = null) {
+    public function addTag($tag, $properties, $content = null, $index = null)
+    {
         $tag = array_merge([self::TAG_KEY => strtolower($tag)], array_change_key_case($properties));
         if ($content) {
             $tag[self::CONTENT_KEY] = $content;
@@ -160,11 +164,12 @@ class HeadModule extends Gdn_Module {
      *  - string: This will hint the script (inline will inline the file in the page.
      *  - array: An array of options (ex. sort, hint, version).
      */
-    public function addScript($src, $type = 'text/javascript', $addVersion = true, $options = []) {
+    public function addScript($src, $type = "text/javascript", $addVersion = true, $options = [])
+    {
         if (is_numeric($options)) {
-            $options = ['sort' => $options];
+            $options = ["sort" => $options];
         } elseif (is_string($options)) {
-            $options = ['hint' => $options];
+            $options = ["hint" => $options];
         } elseif (!is_array($options)) {
             $options = [];
         }
@@ -176,22 +181,28 @@ class HeadModule extends Gdn_Module {
 
         $attributes = [];
         if ($src) {
-            $attributes['src'] = asset($src, false, $addVersion);
-            $attributes['static'] = $options['static'] ?? true;
+            $attributes["src"] = asset($src, false, $addVersion);
+            $attributes["static"] = $options["static"] ?? true;
         }
-        if ($type !== 'text/javascript') {
+        if ($type !== "text/javascript") {
             // Not needed in HTML5
-            $attributes['type'] = $type;
+            $attributes["type"] = $type;
         }
-        if (isset($options['defer'])) {
-            $attributes['defer'] = $options['defer'];
+        if (isset($options["defer"])) {
+            $attributes["defer"] = $options["defer"];
+        }
+        if (isset($options["async"])) {
+            $attributes["async"] = $options["async"];
+        }
+        if ($options["nomodule"] ?? false) {
+            $attributes["nomodule"] = "nomodule";
         }
 
         foreach ($options as $key => $value) {
-            $attributes['_'.strtolower($key)] = $value;
+            $attributes["_" . strtolower($key)] = $value;
         }
 
-        $this->addTag('script', $attributes);
+        $this->addTag("script", $attributes);
     }
 
     /**
@@ -199,7 +210,8 @@ class HeadModule extends Gdn_Module {
      *
      * @param string $string The string to be inserted.
      */
-    public function addString($string) {
+    public function addString($string)
+    {
         $this->strings[] = $string;
     }
 
@@ -208,22 +220,25 @@ class HeadModule extends Gdn_Module {
      *
      * @return string
      */
-    public function assetTarget() {
-        return 'Head';
+    public function assetTarget()
+    {
+        return "Head";
     }
 
     /**
      * Removes any added stylesheets from the head.
      */
-    public function clearCSS() {
-        $this->clearTag('link', ['rel' => 'stylesheet']);
+    public function clearCSS()
+    {
+        $this->clearTag("link", ["rel" => "stylesheet"]);
     }
 
     /**
      * Removes any script include tags from the head.
      */
-    public function clearScripts() {
-        $this->clearTag('script');
+    public function clearScripts()
+    {
+        $this->clearTag("script");
     }
 
     /**
@@ -236,7 +251,8 @@ class HeadModule extends Gdn_Module {
      *    - If this is an array then it will be treated as a query of attribute/value pairs to match against.
      * @param string $value Any value to search for in the specified property.
      */
-    public function clearTag($tag, $property = '', $value = '') {
+    public function clearTag($tag, $property = "", $value = "")
+    {
         $tag = strtolower($tag);
         if (is_array($property)) {
             $query = array_change_key_case($property);
@@ -262,7 +278,8 @@ class HeadModule extends Gdn_Module {
     /**
      * Return all strings.
      */
-    public function getStrings() {
+    public function getStrings()
+    {
         return $this->strings;
     }
 
@@ -272,11 +289,12 @@ class HeadModule extends Gdn_Module {
      * @param string $requestedType
      * @return array
      */
-    public function getTags($requestedType = '') {
+    public function getTags($requestedType = "")
+    {
         // Make sure that css loads before js (for jquery)
-        usort($this->tags, ['HeadModule', 'TagCmp']); // "link" comes before "script"
+        usort($this->tags, ["HeadModule", "TagCmp"]); // "link" comes before "script"
 
-        if ($requestedType == '') {
+        if ($requestedType == "") {
             return $this->tags;
         }
 
@@ -296,18 +314,19 @@ class HeadModule extends Gdn_Module {
      *
      * @param string $href The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
      */
-    public function setFavIcon($href) {
+    public function setFavIcon($href)
+    {
         if (!$this->faviconSet) {
             $this->faviconSet = true;
             $this->addTag(
-                'link',
+                "link",
                 [
-                    'rel' => 'shortcut icon',
-                    'href' => $href,
-                    'type' => 'image/x-icon'
+                    "rel" => "shortcut icon",
+                    "href" => $href,
+                    "type" => "image/x-icon",
                 ],
                 null,
-                'favicon'
+                "favicon"
             );
         }
     }
@@ -317,16 +336,14 @@ class HeadModule extends Gdn_Module {
      *
      * @param string $href The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
      */
-    public function setTouchIcon($href) {
+    public function setTouchIcon($href)
+    {
         if (!$this->touchIconSet) {
             $this->touchIconSet = true;
-            $this->addTag(
-                'link',
-                [
-                    'rel' => 'apple-touch-icon-precomposed',
-                    'href' => $href
-                ]
-            );
+            $this->addTag("link", [
+                "rel" => "apple-touch-icon-precomposed",
+                "href" => $href,
+            ]);
         }
     }
 
@@ -335,16 +352,14 @@ class HeadModule extends Gdn_Module {
      *
      * @param string $mobileAddressBarColor Meta tags for various browsers.
      */
-    public function setMobileAddressBarColor($mobileAddressBarColor) {
+    public function setMobileAddressBarColor($mobileAddressBarColor)
+    {
         if (!$this->mobileAddressBarColorSet && $mobileAddressBarColor) {
             $this->mobileAddressBarColorSet = true;
-            $this->addTag(
-                'meta',
-                [
-                    'name' => 'theme-color',
-                    'content' => $mobileAddressBarColor,
-                ]
-            );
+            $this->addTag("meta", [
+                "name" => "theme-color",
+                "content" => $mobileAddressBarColor,
+            ]);
         }
     }
 
@@ -354,7 +369,8 @@ class HeadModule extends Gdn_Module {
      * @param array|null $value
      * @return array
      */
-    public function tags($value = null) {
+    public function tags($value = null)
+    {
         if ($value != null) {
             $this->tags = $value;
         }
@@ -368,29 +384,26 @@ class HeadModule extends Gdn_Module {
      * @param bool $noSubtitle
      * @return mixed|string
      */
-    public function title($title = '', $noSubtitle = false) {
-        if ($title != '') {
+    public function title($title = "", $noSubtitle = false)
+    {
+        if ($title != "") {
             // Apply $Title to $this->_Title and to $this->_Sender.
             $this->title = $title;
             $this->_Sender->title($title);
-        } elseif ($this->title == '') {
+        } elseif ($this->title == "") {
             // Get Title from $this->_Sender if not supplied.
-            $this->title = valr('Data.Title', $this->_Sender, '');
+            $this->title = valr("Data.Title", $this->_Sender, "");
         }
         if ($noSubtitle) {
             return $this->title;
         } else {
-            if ($this->subtitle == '') {
+            if ($this->subtitle == "") {
                 // Get Subtitle from controller.
-                $this->subtitle = valr('Data._Subtitle', $this->_Sender, c('Garden.Title'));
+                $this->subtitle = valr("Data._Subtitle", $this->_Sender, c("Garden.Title"));
             }
 
             // Default Return title from controller's Data.Title + banner title;
-            return concatSep(
-                $this->titleDivider,
-                $this->title,
-                $this->subtitle
-            );
+            return concatSep($this->titleDivider, $this->title, $this->subtitle);
         }
     }
 
@@ -399,7 +412,8 @@ class HeadModule extends Gdn_Module {
      *
      * @param string $subtitle The subtitle which should be displayed in the title.
      */
-    public function setSubtitle($subtitle = '') {
+    public function setSubtitle($subtitle = "")
+    {
         $this->subtitle = $subtitle;
     }
 
@@ -411,7 +425,8 @@ class HeadModule extends Gdn_Module {
      *
      * @param string $titleDivider The string that concats title and subtitle.
      */
-    public function setTitleDivider($titleDivider = ' — ') {
+    public function setTitleDivider($titleDivider = " — ")
+    {
         $this->titleDivider = $titleDivider;
     }
 
@@ -422,11 +437,12 @@ class HeadModule extends Gdn_Module {
      * @param array $b
      * @return int
      */
-    public static function tagCmp($a, $b) {
-        if ($a[self::TAG_KEY] == 'title') {
+    public static function tagCmp($a, $b)
+    {
+        if ($a[self::TAG_KEY] == "title") {
             return -1;
         }
-        if ($b[self::TAG_KEY] == 'title') {
+        if ($b[self::TAG_KEY] == "title") {
             return 1;
         }
         $cmp = strcasecmp($a[self::TAG_KEY], $b[self::TAG_KEY]);
@@ -446,9 +462,10 @@ class HeadModule extends Gdn_Module {
     /**
      * Render the entire head module.
      */
-    public function toString() {
+    public function toString()
+    {
         // Add the canonical Url if necessary.
-        if (method_exists($this->_Sender, 'CanonicalUrl') && !c('Garden.Modules.NoCanonicalUrl', false)) {
+        if (method_exists($this->_Sender, "CanonicalUrl") && !c("Garden.Modules.NoCanonicalUrl", false)) {
             $canonicalUrl = $this->_Sender->canonicalUrl();
 
             if (!empty($canonicalUrl) && !isUrl($canonicalUrl)) {
@@ -456,95 +473,94 @@ class HeadModule extends Gdn_Module {
                 $this->_Sender->canonicalUrl($canonicalUrl);
             }
             if ($canonicalUrl) {
-                $this->addTag('link', ['rel' => 'canonical', 'href' => $canonicalUrl]);
+                $this->addTag("link", ["rel" => "canonical", "href" => $canonicalUrl]);
             }
         }
 
         // Include facebook open-graph meta information.
-        if ($fbAppID = c('Plugins.Facebook.ApplicationID')) {
-            $this->addTag('meta', ['property' => 'fb:app_id', 'content' => $fbAppID]);
+        if ($fbAppID = c("Plugins.Facebook.ApplicationID")) {
+            $this->addTag("meta", ["property" => "fb:app_id", "content" => $fbAppID]);
         }
 
-        $siteName = c('Garden.Title', '');
-        if ($siteName != '') {
-            $this->addTag('meta', ['property' => 'og:site_name', 'content' => $siteName]);
+        $siteName = c("Garden.Title", "");
+        if ($siteName != "") {
+            $this->addTag("meta", ["property" => "og:site_name", "content" => $siteName]);
         }
 
-        $title = htmlEntityDecode(Gdn_Format::text($this->title('', true)));
-        if ($title != '') {
-            $this->addTag('meta', ['name' => 'twitter:title', 'property' => 'og:title', 'content' => $title]);
+        $title = htmlEntityDecode(Gdn_Format::text($this->title("", true)));
+        if ($title != "") {
+            $this->addTag("meta", ["name" => "twitter:title", "property" => "og:title", "content" => $title]);
         }
 
         if (isset($canonicalUrl)) {
-            $this->addTag('meta', ['property' => 'og:url', 'content' => $canonicalUrl]);
+            $this->addTag("meta", ["property" => "og:url", "content" => $canonicalUrl]);
         }
 
         if ($description = trim(Gdn_Format::reduceWhiteSpaces($this->_Sender->description()))) {
-            $this->addTag('meta', ['name' => 'description', 'property' => 'og:description', 'content' => $description]);
+            $this->addTag("meta", ["name" => "description", "property" => "og:description", "content" => $description]);
         }
 
-        if ($robots = $this->_Sender->data('_robots')) {
-            $this->addTag('meta', ['name' => 'robots', 'content' => $robots]);
+        if ($robots = $this->_Sender->data("_robots")) {
+            $this->addTag("meta", ["name" => "robots", "content" => $robots]);
         }
 
         $hasRelevantImage = false;
 
         // Default to the site logo if there were no images provided by the controller.
         if (count($this->_Sender->image()) == 0) {
-            $logo = c('Garden.ShareImage', c('Garden.Logo', ''));
-            if ($logo != '') {
+            $logo = c("Garden.ShareImage", c("Garden.Logo", ""));
+            if ($logo != "") {
                 // Fix the logo path.
-                if (stringBeginsWith($logo, 'uploads/')) {
-                    $logo = substr($logo, strlen('uploads/'));
+                if (stringBeginsWith($logo, "uploads/")) {
+                    $logo = substr($logo, strlen("uploads/"));
                 }
 
                 $logo = Gdn_Upload::url($logo);
-                $this->addTag('meta', ['property' => 'og:image', 'content' => $logo]);
+                $this->addTag("meta", ["property" => "og:image", "content" => $logo]);
             }
         } else {
-            foreach ($this->_Sender->image() as $img) {
-                $this->addTag('meta', ['name' => 'twitter:image', 'property' => 'og:image', 'content' => $img]);
-                $hasRelevantImage = true;
-            }
+            $img = $this->_Sender->image()[0];
+            $this->addTag("meta", ["name" => "twitter:image", "property" => "og:image", "content" => $img]);
+            $hasRelevantImage = true;
         }
 
         // For the moment at least, only discussions are supported.
-        if ($title && val('DiscussionID', $this->_Sender)) {
+        if ($title && val("DiscussionID", $this->_Sender)) {
             if ($hasRelevantImage) {
-                $twitterCardType = 'summary_large_image';
+                $twitterCardType = "summary_large_image";
             } else {
-                $twitterCardType = 'summary';
+                $twitterCardType = "summary";
             }
 
             // Let's force a description for the image card since it makes sense to see a card with only an image and a title.
-            if (!$description && $twitterCardType === 'summary_large_image') {
-                $description = '...';
+            if (!$description && $twitterCardType === "summary_large_image") {
+                $description = "...";
             }
 
             // Card && Title && Description are required
             if ($twitterCardType && $description) {
-                $this->addTag('meta', ['name' => 'twitter:description', 'content' => $description]);
-                $this->addTag('meta', ['name' => 'twitter:card', 'content' => $twitterCardType]);
+                $this->addTag("meta", ["name" => "twitter:description", "content" => $description]);
+                $this->addTag("meta", ["name" => "twitter:card", "content" => $twitterCardType]);
             }
         }
 
         if ($this->jsonLD) {
-            $this->addTag('script', ['type' => 'application/ld+json'], json_encode($this->jsonLD));
+            $this->addTag("script", ["type" => "application/ld+json"], json_encode($this->jsonLD));
         }
 
         if ($this->jsonLDItems) {
-            $this->addTag('script', ['type' => 'application/ld+json'], $this->getJsonLDScriptContent());
+            $this->addTag("script", ["type" => "application/ld+json"], $this->getJsonLDScriptContent());
         }
 
-        $this->fireEvent('BeforeToString');
+        $this->fireEvent("BeforeToString");
 
         // Make sure that css loads before js (for jquery)
-        usort($this->tags, ['HeadModule', 'TagCmp']); // "link" comes before "script"
+        usort($this->tags, ["HeadModule", "TagCmp"]); // "link" comes before "script"
 
-        $this->eventManager->fireArray('HeadTagsBeforeRender', [&$this->tags]);
+        $this->eventManager->fireArray("HeadTagsBeforeRender", [&$this->tags]);
 
         // Start with the title.
-        $head = '<title>'.Gdn_Format::text($this->title())."</title>\n";
+        $head = "<title>" . Gdn_Format::text($this->title()) . "</title>\n";
 
         $tagStrings = [];
         // Loop through each tag.
@@ -552,18 +568,18 @@ class HeadModule extends Gdn_Module {
             $tag = $attributes[self::TAG_KEY];
 
             // Inline the content of the tag, if necessary.
-            if (($attributes['_hint'] ?? false) == 'inline') {
-                $path = ($attributes['_path'] ?? false);
-                if ($path && !stringBeginsWith($path, 'http')) {
+            if (($attributes["_hint"] ?? false) == "inline") {
+                $path = $attributes["_path"] ?? false;
+                if ($path && !stringBeginsWith($path, "http")) {
                     $attributes[self::CONTENT_KEY] = file_get_contents($path);
 
-                    if (isset($attributes['src'])) {
-                        $attributes['_src'] = $attributes['src'];
-                        unset($attributes['src']);
+                    if (isset($attributes["src"])) {
+                        $attributes["_src"] = $attributes["src"];
+                        unset($attributes["src"]);
                     }
-                    if (isset($attributes['href'])) {
-                        $attributes['_href'] = $attributes['href'];
-                        unset($attributes['href']);
+                    if (isset($attributes["href"])) {
+                        $attributes["_href"] = $attributes["href"];
+                        unset($attributes["href"]);
                     }
                 }
             }
@@ -571,47 +587,47 @@ class HeadModule extends Gdn_Module {
             // If we set an IE conditional AND a "Not IE" condition, we will need to make a second pass.
             do {
                 // Reset tag string
-                $tagString = '';
+                $tagString = "";
 
                 // IE conditional? Validates condition.
-                $iESpecific = (isset($attributes['_ie']) && preg_match('/((l|g)t(e)? )?IE [0-9\.]/', $attributes['_ie']));
+                $iESpecific = isset($attributes["_ie"]) && preg_match("/((l|g)t(e)? )?IE [0-9\.]/", $attributes["_ie"]);
 
                 // Only allow $NotIE if we're not doing a conditional this loop.
-                $notIE = (!$iESpecific && isset($attributes['_notie']));
+                $notIE = !$iESpecific && isset($attributes["_notie"]);
 
                 // Open IE conditional tag
                 if ($iESpecific) {
-                    $tagString .= '<!--[if '.$attributes['_ie'].']>';
+                    $tagString .= "<!--[if " . $attributes["_ie"] . "]>";
                 }
                 if ($notIE) {
-                    $tagString .= '<!--[if !IE]> -->';
+                    $tagString .= "<!--[if !IE]> -->";
                 }
 
                 // Build tag
-                $tagString .= '  <'.$tag.attribute($attributes, '_');
+                $tagString .= "  <" . $tag . attribute($attributes, "_");
                 if (array_key_exists(self::CONTENT_KEY, $attributes)) {
-                    $tagString .= '>'.$attributes[self::CONTENT_KEY].'</'.$tag.'>';
-                } elseif ($tag == 'script') {
-                    $tagString .= '></script>';
+                    $tagString .= ">" . $attributes[self::CONTENT_KEY] . "</" . $tag . ">";
+                } elseif ($tag == "script") {
+                    $tagString .= "></script>";
                 } else {
-                    $tagString .= ' />';
+                    $tagString .= " />";
                 }
 
                 // Close IE conditional tag
                 if ($iESpecific) {
-                    $tagString .= '<![endif]-->';
+                    $tagString .= "<![endif]-->";
                 }
                 if ($notIE) {
-                    $tagString .= '<!-- <![endif]-->';
+                    $tagString .= "<!-- <![endif]-->";
                 }
 
                 // Cleanup (prevent infinite loop)
                 if ($iESpecific) {
-                    unset($attributes['_ie']);
+                    unset($attributes["_ie"]);
                 }
 
                 $tagStrings[] = $tagString;
-            } while ($iESpecific && isset($attributes['_notie'])); // We need a second pass
+            } while ($iESpecific && isset($attributes["_notie"])); // We need a second pass
         } //endforeach
 
         $head .= implode("\n", array_unique($tagStrings));
@@ -635,7 +651,8 @@ class HeadModule extends Gdn_Module {
      *
      * @return array
      */
-    public function getJsonLD(): array {
+    public function getJsonLD(): array
+    {
         return $this->jsonLD;
     }
 
@@ -649,9 +666,10 @@ class HeadModule extends Gdn_Module {
      * @link https://json-ld.org
      * @deprecated Use addJsonLDItem instead.
      */
-    public function setJsonLD(string $type, array $data, string $context = 'https://schema.org'): array {
-        $data['@context'] = $context;
-        $data['@type'] = $type;
+    public function setJsonLD(string $type, array $data, string $context = "https://schema.org"): array
+    {
+        $data["@context"] = $context;
+        $data["@type"] = $type;
         return $this->jsonLD = $data;
     }
 
@@ -661,14 +679,16 @@ class HeadModule extends Gdn_Module {
      * @param AbstractJsonLDItem $item
      * @link https://json-ld.org
      */
-    public function addJsonLDItem(AbstractJsonLDItem $item): void {
+    public function addJsonLDItem(AbstractJsonLDItem $item): void
+    {
         $this->jsonLDItems[] = $item;
     }
 
     /**
      * @return AbstractJsonLDItem
      */
-    public function getJsonLDItems() {
+    public function getJsonLDItems()
+    {
         return $this->jsonLDItems;
     }
 
@@ -678,9 +698,10 @@ class HeadModule extends Gdn_Module {
      * @see PageHead::getJsonLDScriptContent()
      * @return string
      */
-    private function getJsonLDScriptContent(): string {
+    private function getJsonLDScriptContent(): string
+    {
         $data = [
-            '@context' => "https://schema.org",
+            "@context" => "https://schema.org",
             "@graph" => $this->jsonLDItems,
         ];
 

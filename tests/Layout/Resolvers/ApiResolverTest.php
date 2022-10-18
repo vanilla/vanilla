@@ -16,8 +16,8 @@ use VanillaTests\SiteTestCase;
 /**
  * Tests for the ApiResolver.
  */
-class ApiResolverTest extends SiteTestCase {
-
+class ApiResolverTest extends SiteTestCase
+{
     use CommunityApiTestTrait;
 
     /**
@@ -25,34 +25,31 @@ class ApiResolverTest extends SiteTestCase {
      *
      * @return void
      */
-    public function testResolvesAndTransforms() {
-        $discussion1 = $this->createDiscussion(
-            ['name' => 'myname1']
-        );
-        $discussion2 = $this->createDiscussion(
-            ['name' => 'myname2']
-        );
+    public function testResolvesAndTransforms()
+    {
+        $discussion1 = $this->createDiscussion(["name" => "myname1"]);
+        $discussion2 = $this->createDiscussion(["name" => "myname2"]);
 
         $input = [
-            'discussionNames' => [
-                '$hydrate' => 'api',
-                'url' => '/discussions',
-                'query' => [
-                    'discussionID' => [$discussion2['discussionID'], $discussion1['discussionID']],
+            "discussionNames" => [
+                '$hydrate' => "api",
+                "url" => "/discussions",
+                "query" => [
+                    "discussionID" => [$discussion2["discussionID"], $discussion1["discussionID"]],
                 ],
-                'jsont' => [
-                    '$each' => '/',
-                    '$item' => 'name',
+                "jsont" => [
+                    '$each' => "/",
+                    '$item' => "name",
                 ],
             ],
         ];
 
         $expected = [
-            'discussionNames' => ['myname2', 'myname1'],
+            "discussionNames" => ["myname2", "myname1"],
         ];
 
         $actual = $this->getHydrator()->resolve($input);
-        $this->assertEquals($expected, $actual);
+        $this->assertEqualsCanonicalizing($expected, $actual);
     }
 
     /**
@@ -60,18 +57,22 @@ class ApiResolverTest extends SiteTestCase {
      *
      * They can be handled by the hydrator's exception handler.
      */
-    public function testThrowsExceptions() {
+    public function testThrowsExceptions()
+    {
         $this->expectException(NotFoundException::class);
         $this->getHydrator()->resolve([
-            '$hydrate' => 'api',
-            'url' => '/doesnt/exist',
+            '$hydrate' => "api",
+            "url" => "/doesnt/exist",
         ]);
     }
 
     /**
      * @return DataHydrator
      */
-    private function getHydrator(): DataHydrator {
-        return self::container()->get(LayoutHydrator::class)->getHydrator(null);
+    private function getHydrator(): DataHydrator
+    {
+        return self::container()
+            ->get(LayoutHydrator::class)
+            ->getHydrator(null);
     }
 }

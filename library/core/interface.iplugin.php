@@ -13,8 +13,8 @@
  *
  * Aside from the Setup method, this is used more to identify plugins than to enforce structure upon them.
  */
-interface Gdn_IPlugin {
-
+interface Gdn_IPlugin
+{
     /**
      * Run any setup code that a plugin requires before it is ready for general use.
      *

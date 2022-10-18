@@ -18,6 +18,8 @@ interface IToast {
     dismissible?: boolean;
     /** React body of the toast */
     body: ReactNode;
+    /** Apply custom styling to the toast */
+    className?: string;
 }
 
 interface IToasterContext {
@@ -153,6 +155,7 @@ function ToastManager() {
                                         visibility={toast.visibility ?? true}
                                         autoCloseDuration={toast.autoDismiss ? 3000 : undefined}
                                         dismissible={toast.dismissible}
+                                        className={toast.className}
                                     >
                                         {toast.body}
                                     </Toast>
@@ -168,6 +171,7 @@ function ToastManager() {
                                         visibility={toast.visibility ?? true}
                                         autoCloseDuration={toast.autoDismiss ? 3000 : undefined}
                                         dismissible={toast.dismissible}
+                                        className={toast.className}
                                     >
                                         {toast.body}
                                     </Toast>

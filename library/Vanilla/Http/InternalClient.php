@@ -12,13 +12,14 @@ use Garden\Http\HttpClient;
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Exception\HttpException;
+use Vanilla\Utility\DebugUtils;
 use VanillaTests\TestInstallModel;
 
 /**
  * Http client for making requests internally against the dispatcher.
  */
-class InternalClient extends HttpClient {
-
+class InternalClient extends HttpClient
+{
     const DEFAULT_USER_ID = 2;
 
     /**
@@ -50,7 +51,8 @@ class InternalClient extends HttpClient {
      * @param Container $container The container used to create requests.
      * @param string $baseUrl The base Url for relative path requests.
      */
-    public function __construct(Container $container, $baseUrl = '/api/v2') {
+    public function __construct(Container $container, $baseUrl = "/api/v2")
+    {
         parent::__construct($baseUrl);
         $this->throwExceptions = true;
         $this->container = $container;
@@ -60,7 +62,7 @@ class InternalClient extends HttpClient {
         $this->addMiddleware(function (HttpRequest $request, callable $next): HttpResponse {
             /** @var HttpResponse $response */
             $response = $next($request);
-            if (stripos($response->getHeader('Content-Type'), 'application/json') !== false) {
+            if (stripos($response->getHeader("Content-Type"), "application/json") !== false) {
                 if ($response->getBody()) {
                     $response->setBody(json_decode($response->getRawBody(), true));
                 }
@@ -74,25 +76,27 @@ class InternalClient extends HttpClient {
      *
      * @param array $headers
      */
-    public function addTransientKeyHeader(array &$headers) {
+    public function addTransientKeyHeader(array &$headers)
+    {
         /** @var \Gdn_Configuration $config */
         $config = $session = $this->container->get(\Gdn_Configuration::class);
-        $name = $config->get('Garden.Cookie.Name').'-tk';
+        $name = $config->get("Garden.Cookie.Name") . "-tk";
         $value = rawurlencode($this->transientKeySigned);
-        $cookies = array_key_exists('Cookie', $headers) ? rtrim($headers['Cookie'], '; ').'; ' : '';
+        $cookies = array_key_exists("Cookie", $headers) ? rtrim($headers["Cookie"], "; ") . "; " : "";
         $cookies .= "$name=$value;";
-        $headers['Cookie'] = $cookies;
+        $headers["Cookie"] = $cookies;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createRequest(string $method, string $uri, $body, array $headers = [], array $options = []) {
+    public function createRequest(string $method, string $uri, $body, array $headers = [], array $options = [])
+    {
         // If we already have our own domain, strip it off.
         $uri = str_replace($this->baseUrl, "", $uri);
 
-        if (strpos($uri, '//') === false) {
-            $uri = $this->baseUrl.'/'.ltrim($uri, '/');
+        if (strpos($uri, "//") === false) {
+            $uri = $this->baseUrl . "/" . ltrim($uri, "/");
         }
 
         $headers = array_replace($this->defaultHeaders, $headers);
@@ -111,9 +115,10 @@ class InternalClient extends HttpClient {
      * @param array $options An array of additional options for the request.
      * @return HttpResponse Returns the {@link HttpResponse} object from the call.
      */
-    public function getWithTransientKey($uri, array $query = [], array $headers = [], $options = []) {
+    public function getWithTransientKey($uri, array $query = [], array $headers = [], $options = [])
+    {
         $this->addTransientKeyHeader($headers);
-        $query['TransientKey'] = $this->getTransientKey();
+        $query["TransientKey"] = $this->getTransientKey();
         $result = $this->get($uri, $query, $headers, $options);
         return $result;
     }
@@ -125,37 +130,52 @@ class InternalClient extends HttpClient {
      * @param array $options Options from the request invocation.
      * @throws \Exception Throws an exception representing the error.
      */
-    public function handleErrorResponse(HttpResponse $response, $options = []) {
-        if ($this->val('throw', $options, $this->throwExceptions)) {
+    public function handleErrorResponse(HttpResponse $response, $options = [])
+    {
+        if ($this->val("throw", $options, $this->throwExceptions)) {
             $body = $response->getBody();
             if (is_array($body)) {
-                if (!empty($body['errors'])) {
+                if (!empty($body["errors"])) {
                     // Concatenate all errors together.
-                    $messages = array_column($body['errors'], 'message');
-                    $message = implode(' ', $messages);
+                    $messages = array_column($body["errors"], "message");
+                    $message = implode(" ", $messages);
                 } else {
-                    $message = $this->val('message', $body, $response->getReasonPhrase());
+                    $message = $this->val("message", $body, $response->getReasonPhrase());
                 }
             } else {
                 $message = $response->getReasonPhrase();
             }
 
-            if (!empty($body['errors']) && count($body['errors']) > 1) {
-                $message .= ' '.implode(' ', array_column($body['errors'], 'message'));
+            if (!empty($body["errors"]) && count($body["errors"]) > 1) {
+                $message .= " " . implode(" ", array_column($body["errors"], "message"));
             }
 
-            $dataMeta = json_decode($response->getHeader('X-Data-Meta'), true);
-            if (!empty($dataMeta['errorTrace'])) {
-                if (isset($body['originalErrorTrace'])) {
-                    $body['originalErrorTrace'] .= "\n" . $dataMeta['errorTrace'];
-                } else {
-                    $message .= "\n" . $dataMeta['errorTrace'];
+            $previousEx = null;
+            if ($response instanceof InternalResponse) {
+                $throwable = $response->getThrowable();
+                if ($throwable instanceof \Throwable) {
+                    $previousEx = $throwable;
                 }
-            } else {
-                $message .= "\n" . json_encode($body, JSON_PRETTY_PRINT);
             }
+            $exception = HttpException::createFromStatus(
+                $response->getStatusCode(),
+                $message,
+                $body ?? [],
+                $previousEx
+            );
 
-            throw HttpException::createFromStatus($response->getStatusCode(), $message, $body ?? []);
+            if ($previousEx instanceof \Throwable) {
+                if ($previousEx instanceof HttpException) {
+                    $exception = $exception->withContext($previousEx->getContext());
+                }
+
+                if (DebugUtils::isDebug() || DebugUtils::isTestMode()) {
+                    $exception = $exception->withContext([
+                        "trace" => DebugUtils::stackTraceString($previousEx->getTrace()),
+                    ]);
+                }
+            }
+            throw $exception;
         }
     }
 
@@ -164,7 +184,8 @@ class InternalClient extends HttpClient {
      *
      * @return string
      */
-    public function getTransientKey() {
+    public function getTransientKey()
+    {
         return $this->transientKey;
     }
 
@@ -173,7 +194,8 @@ class InternalClient extends HttpClient {
      *
      * @return int Returns the userID.
      */
-    public function getUserID() {
+    public function getUserID()
+    {
         return $this->userID;
     }
 
@@ -186,9 +208,10 @@ class InternalClient extends HttpClient {
      * @param array $options An array of additional options for the request.
      * @return HttpResponse Returns the {@link HttpResponse} object from the call.
      */
-    public function postWithTransientKey($uri, array $body = [], array $headers = [], $options = []) {
+    public function postWithTransientKey($uri, array $body = [], array $headers = [], $options = [])
+    {
         $this->addTransientKeyHeader($headers);
-        $body['TransientKey'] = $this->getTransientKey();
+        $body["TransientKey"] = $this->getTransientKey();
         $result = $this->post($uri, $body, $headers, $options);
         return $result;
     }
@@ -200,7 +223,8 @@ class InternalClient extends HttpClient {
      * @throws \Exception if no active user session is available.
      * @return $this
      */
-    public function setTransientKey($transientKey) {
+    public function setTransientKey($transientKey)
+    {
         $this->transientKey = $transientKey;
 
         /** @var \Gdn_Session $session */
@@ -211,7 +235,7 @@ class InternalClient extends HttpClient {
             $signature = $session->generateTKSignature($payload);
             $this->transientKeySigned = "$payload:$signature";
         } else {
-            throw new \Exception('Cannot build transient key payload without an active session.');
+            throw new \Exception("Cannot build transient key payload without an active session.");
         }
 
         return $this;
@@ -223,7 +247,8 @@ class InternalClient extends HttpClient {
      * @param int $userID The new user ID.
      * @return $this
      */
-    public function setUserID($userID) {
+    public function setUserID($userID)
+    {
         $this->userID = $userID;
 
         /* @var \Gdn_Session $session */
@@ -244,7 +269,8 @@ class InternalClient extends HttpClient {
      * @param bool $value The new value.
      * @return bool Returns the previous value.
      */
-    public function setPermission(string $permission, bool $value): bool {
+    public function setPermission(string $permission, bool $value): bool
+    {
         /* @var \Gdn_Session $session */
         $session = $this->container->get(\Gdn_Session::class);
         $previous = $session->getPermissions()->has($permission);
@@ -261,7 +287,12 @@ class InternalClient extends HttpClient {
      * @param array $options An array of additional options for the request.
      * @return HttpResponse Returns the {@link HttpResponse} object from the call.
      */
-    public function deleteWithBody(string $uri, array $body = [], array $headers = [], array $options = []): HttpResponse {
+    public function deleteWithBody(
+        string $uri,
+        array $body = [],
+        array $headers = [],
+        array $options = []
+    ): HttpResponse {
         return $this->request(HttpRequest::METHOD_DELETE, $uri, $body, $headers, $options);
     }
 }

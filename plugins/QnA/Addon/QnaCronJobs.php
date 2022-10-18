@@ -14,14 +14,13 @@ use Vanilla\Scheduler\Descriptor\CronJobDescriptor;
 /**
  * Cron jobs for the QnA addon.
  */
-class QnaCronJobs extends AddonCronJobs {
-
+class QnaCronJobs extends AddonCronJobs
+{
     /**
      * @inheritdoc
      */
-    public function getCronJobDescriptors(): array {
-        return [
-            new CronJobDescriptor(QnaFollowupJob::class, "30 1,13 * * *"),
-        ];
+    public function getCronJobDescriptors(): array
+    {
+        return [new CronJobDescriptor(QnaFollowupJob::class, "30 1,13 * * *")];
     }
 }

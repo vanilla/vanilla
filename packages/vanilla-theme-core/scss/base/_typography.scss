@@ -109,7 +109,7 @@ abbr {
         font-size: inherit;
         font-weight: inherit;
         font-family: inherit;
-        @if ($staticVariables){
+        @if ($staticVariables) {
             color: inherit;
 
             &:focus,

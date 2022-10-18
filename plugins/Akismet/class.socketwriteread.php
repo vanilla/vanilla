@@ -24,7 +24,8 @@
  * @link        http://www.achingbrain.net/
  */
 
-class SocketWriteRead {
+class SocketWriteRead
+{
     private $host;
     private $port;
     private $request;
@@ -41,13 +42,14 @@ class SocketWriteRead {
      * @param string $request The data to send.
      * @param int $responseLength The amount of data to read.  Defaults to 1160 bytes.
      */
-    public function __construct($host, $port, $request, $responseLength = 1160) {
+    public function __construct($host, $port, $request, $responseLength = 1160)
+    {
         $this->host = $host;
         $this->port = $port;
         $this->request = $request;
         $this->responseLength = $responseLength;
         $this->errorNumber = 0;
-        $this->errorString = '';
+        $this->errorString = "";
     }
 
     /**
@@ -57,13 +59,21 @@ class SocketWriteRead {
      *
      * @throws Exception Exception is thrown if a connection cannot be made to the remote host.
      */
-    public function send() {
-        $this->response = '';
+    public function send()
+    {
+        $this->response = "";
 
-        $fs = fsockopen('ssl://' . $this->host, $this->port, $this->errorNumber, $this->errorString, 3);
+        $fs = fsockopen("ssl://" . $this->host, $this->port, $this->errorNumber, $this->errorString, 3);
 
         if ($this->errorNumber != 0) {
-            throw new Exception('Error connecting to host: ' . $this->host . ' Error number: ' . $this->errorNumber . ' Error message: ' . $this->errorString);
+            throw new Exception(
+                "Error connecting to host: " .
+                    $this->host .
+                    " Error number: " .
+                    $this->errorNumber .
+                    " Error message: " .
+                    $this->errorString
+            );
         }
 
         if ($fs !== false) {
@@ -82,7 +92,8 @@ class SocketWriteRead {
      *
      * @return string
      */
-    public function getResponse() {
+    public function getResponse()
+    {
         return $this->response;
     }
 
@@ -93,7 +104,8 @@ class SocketWriteRead {
      *
      * @return int
      */
-    public function getErrorNumner() {
+    public function getErrorNumner()
+    {
         return $this->errorNumber;
     }
 
@@ -104,7 +116,8 @@ class SocketWriteRead {
      *
      * @return string
      */
-    public function getErrorString() {
+    public function getErrorString()
+    {
         return $this->errorString;
     }
 }

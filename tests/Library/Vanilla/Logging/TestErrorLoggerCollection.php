@@ -14,8 +14,8 @@ use VanillaTests\TestLogger;
 /**
  * Error log collection for tests.
  */
-final class TestErrorLoggerCollection {
-
+final class TestErrorLoggerCollection
+{
     /** @var TestLogger */
     private $testLogger;
 
@@ -24,12 +24,13 @@ final class TestErrorLoggerCollection {
      *
      * @return string
      */
-    public static function createLogFilePath(): string {
-        $logDir = sys_get_temp_dir() . '/errorcollection-' . random_int(0, 100000);
+    public static function createLogFilePath(): string
+    {
+        $logDir = sys_get_temp_dir() . "/errorcollection-" . random_int(0, 100000);
         if (!file_exists($logDir)) {
             mkdir($logDir, 0777, true);
         }
-        return $logDir . '/' .  random_int(0, 100000);
+        return $logDir . "/" . random_int(0, 100000);
     }
 
     /**
@@ -37,12 +38,13 @@ final class TestErrorLoggerCollection {
      *
      * @param string $filepath The log file path.
      */
-    public function __construct(string $filepath) {
+    public function __construct(string $filepath)
+    {
         $this->testLogger = new TestLogger();
         if (file_exists($filepath)) {
             $data = file_get_contents($filepath);
         } else {
-            $data = '';
+            $data = "";
         }
         $pieces = explode("\n", $data);
         foreach ($pieces as $piece) {
@@ -58,8 +60,8 @@ final class TestErrorLoggerCollection {
             if ($isJson) {
                 $json = json_decode($rawMessage, true);
                 ArrayUtils::assertArray($json, "Expected log json to be valid json: " . $rawMessage);
-                $level = $json['level'];
-                $message = $json['message'];
+                $level = $json["level"];
+                $message = $json["message"];
                 $context = $json;
             }
 
@@ -70,7 +72,8 @@ final class TestErrorLoggerCollection {
     /**
      * @return TestLogger
      */
-    public function getTestLogger(): TestLogger {
+    public function getTestLogger(): TestLogger
+    {
         return $this->testLogger;
     }
 }

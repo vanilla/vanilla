@@ -9,8 +9,8 @@ namespace Garden\Events;
 /**
  * Provide a standard way for converting a DB row into a resource event.
  */
-interface EventFromRowInterface {
-
+interface EventFromRowInterface
+{
     /**
      * Generate an event based on a database row, including an optional sender.
      *

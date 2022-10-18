@@ -1,8 +1,8 @@
-$selectBox-toggle_lineHeight                    : 13px !default;
-$selectBox-toggle_fontSize                      : 13px !default;
-$selectBox-separator_color                      : #dddee0 !default;
+$selectBox-toggle_lineHeight: 13px !default;
+$selectBox-toggle_fontSize: 13px !default;
+$selectBox-separator_color: #dddee0 !default;
 
-$dropDown-asModal_fontSize                      : $global-subTitle_fontSize;
+$dropDown-asModal_fontSize: $global-subTitle_fontSize;
 
 .selectBox {
     display: inline-block;
@@ -29,8 +29,6 @@ $dropDown-asModal_fontSize                      : $global-subTitle_fontSize;
     margin-right: 5px;
 }
 
-
-
 .selectBox-main {
     display: flex;
     justify-content: flex-start;
@@ -42,7 +40,6 @@ $dropDown-asModal_fontSize                      : $global-subTitle_fontSize;
 
 .selectBox-content {
     display: none;
-
 
     left: 100%;
     margin: {
@@ -106,13 +103,13 @@ $dropDown-asModal_fontSize                      : $global-subTitle_fontSize;
     height: 18px;
 }
 
-
 .menu-separator {
     background: none; // TODO: get rid of when we get the new editor
     border-bottom: $selectBox-separator_height solid $selectBox-separator_color;
     margin: $selectBox-separator_margin 0;
 
-    hr { // We keep the <hr/> for accessibility
+    hr {
+        // We keep the <hr/> for accessibility
         @include sr-only();
     }
 }

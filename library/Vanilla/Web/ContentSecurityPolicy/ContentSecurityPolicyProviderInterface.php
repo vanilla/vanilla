@@ -9,7 +9,8 @@ namespace Vanilla\Web\ContentSecurityPolicy;
 /**
  * Content security policy provider interface
  */
-interface ContentSecurityPolicyProviderInterface {
+interface ContentSecurityPolicyProviderInterface
+{
     /**
      * Get content security policies.
      *

@@ -3,7 +3,7 @@
     "main": "./src/index.ts",
     "module": "./src/index.ts",
     "version": "1.0.0",
-    "license": "gpl-2.0-only",
+    "license": "MIT",
     "dependencies": {
         "@vanilla/ui": "*",
         "ajv": "^8.0.1"

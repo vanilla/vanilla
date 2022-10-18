@@ -17,12 +17,13 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Tests for various assets.
  */
-class AssetsTest extends MinimalContainerTestCase {
-
+class AssetsTest extends MinimalContainerTestCase
+{
     /**
      * Tests for the site asset.
      */
-    public function testStatic() {
+    public function testStatic()
+    {
         $polyfill = new PolyfillAsset(new Request());
         $this->assertTrue($polyfill->isStatic());
 

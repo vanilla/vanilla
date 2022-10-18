@@ -12,24 +12,23 @@ use Vanilla\EmbeddedContent\AbstractEmbed;
 /**
  * Fallback scraped link embed.
  */
-class LinkEmbed extends AbstractEmbed {
-
+class LinkEmbed extends AbstractEmbed
+{
     const TYPE = "link";
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
-        return Schema::parse([
-            'body:s?',
-            'photoUrl:s?',
-        ]);
+    protected function schema(): Schema
+    {
+        return Schema::parse(["body:s?", "photoUrl:s?"]);
     }
 }

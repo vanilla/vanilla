@@ -16,8 +16,8 @@ use VanillaTests\SharedBootstrapTestCase;
 /**
  * Tests for the Quill Renderer.
  */
-class RendererTest extends SharedBootstrapTestCase {
-
+class RendererTest extends SharedBootstrapTestCase
+{
     use AssertsFixtureRenderingTrait;
 
     /**
@@ -29,7 +29,8 @@ class RendererTest extends SharedBootstrapTestCase {
      * @throws \Garden\Container\ContainerException
      * @throws \Garden\Container\NotFoundException
      */
-    protected function render(array $ops): string {
+    protected function render(array $ops): string
+    {
         $filterer = \Gdn::getContainer()->get(Filterer::class);
         $renderer = \Gdn::getContainer()->get(Renderer::class);
         $parser = \Gdn::getContainer()->get(Parser::class);
@@ -48,10 +49,9 @@ class RendererTest extends SharedBootstrapTestCase {
      * @throws \Garden\Container\NotFoundException
      * @dataProvider provideHtml
      */
-    public function testRender(string $dirname) {
-        list($input, $expectedOutput) = $this->getFixture(
-            $dirname
-        );
+    public function testRender(string $dirname)
+    {
+        [$input, $expectedOutput] = $this->getFixture($dirname);
         $json = \json_decode($input, true);
 
         $output = $this->render($json);
@@ -67,8 +67,9 @@ class RendererTest extends SharedBootstrapTestCase {
      *
      * @return array
      */
-    public function provideHtml() {
-        $res = $this->createFixtureDataProvider('/formats/rich/html');
+    public function provideHtml()
+    {
+        $res = $this->createFixtureDataProvider("/formats/rich/html");
         return $res;
     }
 }

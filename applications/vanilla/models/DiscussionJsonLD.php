@@ -15,8 +15,8 @@ use Vanilla\Web\AbstractJsonLDItem;
  *
  * @see https://schema.org/DiscussionForumPosting
  */
-final class DiscussionJsonLD extends AbstractJsonLDItem {
-
+final class DiscussionJsonLD extends AbstractJsonLDItem
+{
     const TYPE = "DiscussionForumPosting";
 
     /** @var array */
@@ -32,10 +32,8 @@ final class DiscussionJsonLD extends AbstractJsonLDItem {
      * @param \DiscussionModel $discussionModel
      *
      */
-    public function __construct(
-        array $discussion,
-        \DiscussionModel $discussionModel
-    ) {
+    public function __construct(array $discussion, \DiscussionModel $discussionModel)
+    {
         $this->discussion = $discussion;
         $this->discussionModel = $discussionModel;
     }
@@ -43,10 +41,11 @@ final class DiscussionJsonLD extends AbstractJsonLDItem {
     /**
      * @inheritdoc
      */
-    public function calculateValue(): Data {
-        $structuredData = $this->discussionModel->structuredData((array)$this->discussion);
-//        $structuredData['@context'] = 'https://schema.org';
-        $structuredData['@type'] = self::TYPE;
+    public function calculateValue(): Data
+    {
+        $structuredData = $this->discussionModel->structuredData((array) $this->discussion);
+        //        $structuredData['@context'] = 'https://schema.org';
+        $structuredData["@type"] = self::TYPE;
         return new Data($structuredData);
     }
 }

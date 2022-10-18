@@ -5,7 +5,7 @@
 
 import { SearchActions } from "@library/search/SearchActions";
 import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
-import { ISearchForm, ISearchResults } from "@library/search/searchTypes";
+import { ISearchForm, ISearchResponse } from "@library/search/searchTypes";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { produce } from "immer";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
@@ -13,8 +13,8 @@ import { SEARCH_SCOPE_LOCAL } from "@library/features/search/SearchScopeContext"
 
 export interface ISearchState {
     form: ISearchForm;
-    results: ILoadable<ISearchResults>;
-    domainSearchResults: Record<string, ILoadable<ISearchResults>>;
+    results: ILoadable<ISearchResponse>;
+    domainSearchResponse: Record<string, ILoadable<ISearchResponse>>;
 }
 
 export const DEFAULT_CORE_SEARCH_FORM: ISearchForm = {
@@ -31,10 +31,10 @@ export const INITIAL_SEARCH_STATE: ISearchState = {
     results: {
         status: LoadStatus.PENDING,
     },
-    domainSearchResults: {},
+    domainSearchResponse: {},
 };
 
-const reinitilizeParams = ["sort", "domain", "scope", "page"];
+const reinitilizeParams = ["sort", "domain", "scope", "page", "pageURL"];
 
 export const searchReducer = produce(
     reducerWithoutInitialState<ISearchState>()
@@ -91,7 +91,7 @@ export const searchReducer = produce(
         })
         .case(SearchActions.performDomainSearchACs.started, (nextState, payload) => {
             const { domain } = payload;
-            nextState.domainSearchResults[domain] = {
+            nextState.domainSearchResponse[domain] = {
                 status: LoadStatus.LOADING,
             };
 
@@ -99,15 +99,15 @@ export const searchReducer = produce(
         })
         .case(SearchActions.performDomainSearchACs.done, (nextState, payload) => {
             const { domain } = payload.params;
-            nextState.domainSearchResults[domain].status = LoadStatus.SUCCESS;
-            nextState.domainSearchResults[domain].data = payload.result;
+            nextState.domainSearchResponse[domain].status = LoadStatus.SUCCESS;
+            nextState.domainSearchResponse[domain].data = payload.result;
 
             return nextState;
         })
         .case(SearchActions.performDomainSearchACs.failed, (nextState, payload) => {
             const { domain } = payload.params;
-            nextState.domainSearchResults[domain].status = LoadStatus.ERROR;
-            nextState.domainSearchResults[domain].error = payload.error;
+            nextState.domainSearchResponse[domain].status = LoadStatus.ERROR;
+            nextState.domainSearchResponse[domain].error = payload.error;
 
             return nextState;
         })

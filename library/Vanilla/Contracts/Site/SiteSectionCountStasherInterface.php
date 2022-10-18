@@ -10,8 +10,8 @@ namespace Vanilla\Contracts\Site;
 /**
  * Interface for stashing counts related to a site section.
  */
-interface SiteSectionCountStasherInterface {
-
+interface SiteSectionCountStasherInterface
+{
     /**
      * Save counts for a site section somewhere.
      *

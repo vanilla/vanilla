@@ -19,8 +19,8 @@ use Webmozart\PathUtil\Path;
 /**
  * Class to provide assets from the webpack build process.
  */
-class WebpackAssetProvider {
-
+class WebpackAssetProvider
+{
     use TwigRenderTrait;
 
     const COLLECTION_SECTION = "async";
@@ -41,7 +41,7 @@ class WebpackAssetProvider {
     private $themeService;
 
     /** @var string */
-    private $cacheBustingKey = '';
+    private $cacheBustingKey = "";
 
     /** @var string */
     private $localeKey = "";
@@ -84,7 +84,8 @@ class WebpackAssetProvider {
     /**
      * Clear the collections in memory.
      */
-    public function clearCollections() {
+    public function clearCollections()
+    {
         $this->collectionForSection = [];
     }
 
@@ -93,14 +94,16 @@ class WebpackAssetProvider {
      *
      * @param bool $enabled The enable value.
      */
-    public function setHotReloadEnabled(bool $enabled) {
+    public function setHotReloadEnabled(bool $enabled)
+    {
         $this->hotReloadEnabled = $enabled;
     }
 
     /**
      * @return bool
      */
-    public function isHotReloadEnabled(): bool {
+    public function isHotReloadEnabled(): bool
+    {
         return $this->hotReloadEnabled;
     }
 
@@ -109,7 +112,8 @@ class WebpackAssetProvider {
      *
      * @param string $key
      */
-    public function setLocaleKey(string $key) {
+    public function setLocaleKey(string $key)
+    {
         $this->localeKey = $key;
     }
 
@@ -118,7 +122,8 @@ class WebpackAssetProvider {
      *
      * @param string $key
      */
-    public function setCacheBusterKey(string $key) {
+    public function setCacheBusterKey(string $key)
+    {
         $this->cacheBustingKey = $key;
     }
 
@@ -136,7 +141,8 @@ class WebpackAssetProvider {
      * @param string $section - The section of the site to lookup.
      * @return WebpackAsset[] The assets files for all webpack scripts.
      */
-    public function getScripts(string $section, bool $includeAsync = false): array {
+    public function getScripts(string $section, bool $includeAsync = false): array
+    {
         $scripts = [];
 
         // Locale asset is always included if we have a locale set.
@@ -152,8 +158,7 @@ class WebpackAssetProvider {
         }
 
         $collection = $this->getCollectionForSection($section, $includeAsync);
-        $scripts =
-            array_merge($scripts, $collection->createAssets($this->request, $this->getEnabledAddonKeys(), 'js'));
+        $scripts = array_merge($scripts, $collection->createAssets($this->request, $this->getEnabledAddonKeys(), "js"));
         return $scripts;
     }
 
@@ -165,12 +170,19 @@ class WebpackAssetProvider {
      *
      * @return WebpackAssetDefinitionCollection
      */
-    private function getCollectionForSection(string $section, bool $includeAsync = false): WebpackAssetDefinitionCollection {
+    private function getCollectionForSection(
+        string $section,
+        bool $includeAsync = false
+    ): WebpackAssetDefinitionCollection {
         $key = $section . ($includeAsync ? self::COLLECTION_SECTION : "");
         if (!isset($this->collectionForSection[$key])) {
             $distPath = Path::join($this->fsRoot, PATH_DIST_NAME);
             if (WebpackAssetDefinitionCollection::sectionExists($section, $distPath)) {
-                $this->collectionForSection[$key] = WebpackAssetDefinitionCollection::loadFromDist($section, $distPath, $includeAsync);
+                $this->collectionForSection[$key] = WebpackAssetDefinitionCollection::loadFromDist(
+                    $section,
+                    $distPath,
+                    $includeAsync
+                );
             } else {
                 $this->collectionForSection[$key] = new WebpackAssetDefinitionCollection($section);
             }
@@ -179,16 +191,29 @@ class WebpackAssetProvider {
     }
 
     /**
+     * Get the embed asset.
+     *
+     * @return WebpackAsset
+     */
+    public function getEmbedAsset(): WebpackAsset
+    {
+        $collection = $this->getCollectionForSection("embed");
+        $assets = $collection->createAssets($this->request, [], "js");
+        return $assets[0];
+    }
+
+    /**
      * Get the enabled addon keys.
      *
      * @return string[]
      */
-    private function getEnabledAddonKeys(): array {
+    private function getEnabledAddonKeys(): array
+    {
         if ($this->enabledAddonKeys === null) {
-            $this->enabledAddonKeys = [];
+            $this->enabledAddonKeys = ["library"];
             foreach ($this->addonManager->getEnabled() as $addon) {
                 $addon = $this->checkReplacePreview($addon);
-                $this->enabledAddonKeys[] = $addon->getKey();
+                $this->enabledAddonKeys[] = strtolower($addon->getKey());
             }
         }
         return $this->enabledAddonKeys;
@@ -200,11 +225,12 @@ class WebpackAssetProvider {
      * @param Addon $addon
      * @return Addon
      */
-    private function checkReplacePreview(Addon $addon): Addon {
-        if ($addon->getType() !== 'theme') {
+    private function checkReplacePreview(Addon $addon): Addon
+    {
+        if ($addon->getType() !== "theme") {
             return $addon;
         }
-        if ($previewThemeKey = $this->session->getPreference('PreviewThemeKey')) {
+        if ($previewThemeKey = $this->session->getPreference("PreviewThemeKey")) {
             $addonKey = $this->themeService->getMasterThemeKey($previewThemeKey);
             if ($previewTheme = $this->addonManager->lookupTheme($addonKey)) {
                 $addon = $previewTheme;
@@ -221,14 +247,15 @@ class WebpackAssetProvider {
      *
      * @return WebpackAsset[]
      */
-    public function getStylesheets(string $section, bool $includeAsync = false): array {
+    public function getStylesheets(string $section, bool $includeAsync = false): array
+    {
         if ($this->hotReloadEnabled) {
             // All style sheets are managed by the hot javascript bundle.
             return [];
         }
 
         $collection = $this->getCollectionForSection($section, $includeAsync);
-        $styles = $collection->createAssets($this->request, $this->getEnabledAddonKeys(), 'css');
+        $styles = $collection->createAssets($this->request, $this->getEnabledAddonKeys(), "css");
         return $styles;
     }
 
@@ -239,7 +266,8 @@ class WebpackAssetProvider {
      *
      * @param string $fsRoot
      */
-    public function setFsRoot(string $fsRoot) {
+    public function setFsRoot(string $fsRoot)
+    {
         $this->fsRoot = $fsRoot;
     }
 
@@ -259,10 +287,12 @@ class WebpackAssetProvider {
      *
      * @return string The contents of the script.
      */
-    public function getInlinePolyfillContents(): string {
+    public function getInlinePolyfillContents(): string
+    {
         return $this->renderTwig("library/Vanilla/Web/Asset/InlinePolyfillContent.js.twig", [
-            'debugModeLiteral' => debug() ? "true" : "false",
-            'polyfillAsset' => new PolyfillAsset($this->request, $this->cacheBustingKey),
+            "debugModeLiteral" => debug() ? "true" : "false",
+            "polyfillAsset" => new PolyfillAsset($this->request, $this->cacheBustingKey),
+            "enabledAddonKeys" => json_encode($this->getEnabledAddonKeys()),
         ]);
     }
 }

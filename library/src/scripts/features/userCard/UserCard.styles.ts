@@ -22,7 +22,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean; zIndex
     // Global for reach
     injectGlobal({
         "[data-reach-popover]": {
-            zIndex: props.zIndex ?? 1051, // Get above our modals.
+            zIndex: props.zIndex ?? 1050, // Just like our modals.
         },
     });
 
@@ -110,39 +110,6 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean; zIndex
         ...Mixins.margin(vars.label.margin),
     });
 
-    const stat = css({
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        flexGrow: 1,
-        maxWidth: percent(50),
-        ...Mixins.font(vars.stat.font),
-    });
-
-    const statLink = cx(
-        stat,
-        css({
-            "&:hover, &:focus, &:active, &.focus-visible": {
-                ...Mixins.font(vars.stat.fontState),
-            },
-        }),
-    );
-
-    const statLabel = css({
-        marginTop: styleUnit(2),
-        marginBottom: styleUnit(3),
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("small"),
-            lineHeight: globalVars.lineHeights.condensed,
-        }),
-        ...mediaQueries.oneColumnDown({
-            ...Mixins.font({
-                ...globalVars.fontSizeAndWeightVars("medium"),
-                lineHeight: globalVars.lineHeights.condensed,
-            }),
-        }),
-    });
-
     const statLeft = css({
         borderRight: singleBorder({}),
         ...Mixins.padding({
@@ -155,14 +122,6 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean; zIndex
         ...Mixins.padding({
             right: globalVars.spacer.size,
             left: globalVars.spacer.size / 2,
-        }),
-    });
-
-    const count = css({
-        marginTop: styleUnit(3),
-        ...Mixins.font({
-            size: vars.count.size,
-            lineHeight: globalVars.lineHeights.condensed,
         }),
     });
 
@@ -227,12 +186,8 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean; zIndex
         buttonContainer,
         name,
         label,
-        stat,
-        statLink,
-        count,
         header,
         headerLink,
-        statLabel,
         statLeft,
         statRight,
         close,

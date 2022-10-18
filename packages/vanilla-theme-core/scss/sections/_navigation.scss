@@ -9,7 +9,6 @@
 \* -------------------------------------------------------------- */
 
 .Header.hasOpenNavigation {
-
     @include maxWidth {
         border-bottom-left-radius: $navigation_borderRadius;
         border-bottom-right-radius: $navigation_borderRadius;
@@ -73,7 +72,6 @@
             &:focus,
             &:hover,
             &:active {
-
                 .Button.Handle,
                 &.Open .Button.Handle {
                     border-color: $navigationButton-hover_border;
@@ -242,7 +240,6 @@
 }
 
 .UserLoggedOut {
-
     .Navigation-row.NewDiscussion {
         display: none;
     }
@@ -325,7 +322,6 @@
     }
 
     .MeButton-user {
-
         &::before {
             @include kbicon();
             font-size: 26px;
@@ -342,7 +338,6 @@
     }
 
     .MeButton {
-
         @if ($staticVariables) {
             &:focus,
             &:hover,

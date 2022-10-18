@@ -14,10 +14,11 @@ use Vanilla\Utility\ArrayUtils;
 /**
  * A test logger that collects all messages in an array.
  */
-class TestLogger implements LoggerInterface {
+class TestLogger implements LoggerInterface
+{
     use LoggerTrait;
 
-    private const SEARCH_FALLBACK = '_FALLBACK_DONT_USE';
+    private const SEARCH_FALLBACK = "_FALLBACK_DONT_USE";
 
     /**
      * @var array
@@ -27,8 +28,9 @@ class TestLogger implements LoggerInterface {
     /**
      * {@inheritdoc}
      */
-    public function log($level, $message, array $context = array()) {
-        $this->log[] = ['level' => $level, 'message' => $message] + $context;
+    public function log($level, $message, array $context = [])
+    {
+        $this->log[] = ["level" => $level, "message" => $message] + $context;
     }
 
     /**
@@ -36,7 +38,8 @@ class TestLogger implements LoggerInterface {
      *
      * @return array Returns the log.
      */
-    public function getLog(): array {
+    public function getLog(): array
+    {
         return $this->log;
     }
 
@@ -46,7 +49,8 @@ class TestLogger implements LoggerInterface {
      * @param array $log The new log array.
      * @return $this
      */
-    public function setLog(array $log) {
+    public function setLog(array $log)
+    {
         $this->log = $log;
         return $this;
     }
@@ -57,7 +61,8 @@ class TestLogger implements LoggerInterface {
      * @param array $filter The log filter.
      * @return array|null Returns the first found log entry or **null** if an entry isn't found.
      */
-    public function search($filter = []) {
+    public function search($filter = [])
+    {
         foreach ($this->log as $item) {
             $found = true;
             foreach ($filter as $key => $value) {
@@ -87,9 +92,10 @@ class TestLogger implements LoggerInterface {
      * @param string $message
      * @return bool
      */
-    public function hasMessage(string $message): bool {
+    public function hasMessage(string $message): bool
+    {
         foreach ($this->log as $item) {
-            if (strpos($item['message'], $message) !== false) {
+            if (strpos($item["message"], $message) !== false) {
                 return true;
             }
         }
@@ -99,7 +105,8 @@ class TestLogger implements LoggerInterface {
     /**
      * Clear the log.
      */
-    public function clear() {
+    public function clear()
+    {
         $this->log = [];
     }
 }

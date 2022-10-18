@@ -14,8 +14,8 @@ use Vanilla\Contracts\Site\SiteSectionInterface;
 /**
  * Provide site totals for categories.
  */
-class CategorySiteTotalProvider implements SiteSectionTotalProviderInterface {
-
+class CategorySiteTotalProvider implements SiteSectionTotalProviderInterface
+{
     /** @var \Gdn_Database */
     private $database;
 
@@ -28,7 +28,8 @@ class CategorySiteTotalProvider implements SiteSectionTotalProviderInterface {
      * @param \Gdn_Database $database
      * @param \CategoryModel $categoryModel
      */
-    public function __construct(\Gdn_Database $database, CategoryModel $categoryModel) {
+    public function __construct(\Gdn_Database $database, CategoryModel $categoryModel)
+    {
         $this->database = $database;
         $this->categoryModel = $categoryModel;
     }
@@ -36,7 +37,8 @@ class CategorySiteTotalProvider implements SiteSectionTotalProviderInterface {
     /**
      * @inheritdoc
      */
-    public function calculateSiteTotalCount(SiteSectionInterface $siteSection = null): int {
+    public function calculateSiteTotalCount(SiteSectionInterface $siteSection = null): int
+    {
         $rootCategoryID = $siteSection === null ? \CategoryModel::ROOT_ID : $siteSection->getCategoryID();
         $cats = array_merge([$rootCategoryID], $this->categoryModel->getCategoryDescendantIDs($rootCategoryID));
 
@@ -56,14 +58,16 @@ class CategorySiteTotalProvider implements SiteSectionTotalProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getSiteTotalRecordType(): string {
+    public function getSiteTotalRecordType(): string
+    {
         return "category";
     }
 
     /**
      * @inheritdoc
      */
-    public function getTableName(): string {
-        return 'Category';
+    public function getTableName(): string
+    {
+        return "Category";
     }
 }

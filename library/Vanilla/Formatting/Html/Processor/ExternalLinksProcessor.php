@@ -14,8 +14,8 @@ use Vanilla\Formatting\Html\HtmlDocument;
 /**
  * Processor for external links.
  */
-class ExternalLinksProcessor extends HtmlProcessor {
-
+class ExternalLinksProcessor extends HtmlProcessor
+{
     /** @var Gdn_Request */
     private $request;
 
@@ -27,7 +27,8 @@ class ExternalLinksProcessor extends HtmlProcessor {
      *
      * @param Gdn_Request $request
      */
-    public function __construct(Gdn_Request $request) {
+    public function __construct(Gdn_Request $request)
+    {
         $this->request = $request;
     }
 
@@ -36,7 +37,8 @@ class ExternalLinksProcessor extends HtmlProcessor {
      *
      * @return string
      */
-    public function getProcessorType(): string {
+    public function getProcessorType(): string
+    {
         return self::TYPE_DYNAMIC;
     }
 
@@ -45,7 +47,8 @@ class ExternalLinksProcessor extends HtmlProcessor {
      *
      * @param bool $warnLeaving
      */
-    public function setWarnLeaving(bool $warnLeaving): void {
+    public function setWarnLeaving(bool $warnLeaving): void
+    {
         $this->warnLeaving = $warnLeaving;
     }
 
@@ -55,25 +58,30 @@ class ExternalLinksProcessor extends HtmlProcessor {
      * @param HtmlDocument $document
      * @return HtmlDocument
      */
-    public function processDocument(HtmlDocument $document): HtmlDocument {
+    public function processDocument(HtmlDocument $document): HtmlDocument
+    {
         // Currently, this processor only redirects external links to the leaving page. If we aren't doing that, bail.
         if ($this->warnLeaving === false) {
             return $document;
         }
 
-        $linkNodes = $document->getDom()->getElementsByTagName('a');
+        $linkNodes = $document->getDom()->getElementsByTagName("a");
 
         if ($linkNodes->length > 0) {
             // Loop through the links and add home/leaving to external links.
             /** @var DOMElement $linkNode */
             foreach ($linkNodes as $linkNode) {
-                $rawHref = $linkNode->getAttribute('href');
+                $rawHref = $linkNode->getAttribute("href");
                 if (isExternalUrl($rawHref)) {
-                    $leavingHref = $this->request->url("/home/leaving?" . http_build_query([
-                        "allowTrusted" => 1,
-                        "target" => $rawHref,
-                    ]), true);
-                    $this->setAttribute($linkNode, 'href', $leavingHref);
+                    $leavingHref = $this->request->url(
+                        "/home/leaving?" .
+                            http_build_query([
+                                "allowTrusted" => 1,
+                                "target" => $rawHref,
+                            ]),
+                        true
+                    );
+                    $this->setAttribute($linkNode, "href", $leavingHref);
                 }
             }
         }

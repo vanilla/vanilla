@@ -52,12 +52,12 @@ export function StoryExampleModal(props: IProps) {
             <Modal
                 isVisible={open}
                 size={ModalSizes.SMALL}
-                elementToFocus={openButtonRef ? ((openButtonRef.current as unknown) as HTMLButtonElement) : undefined}
+                elementToFocus={openButtonRef ? (openButtonRef.current as unknown as HTMLButtonElement) : undefined}
                 exitHandler={() => {
                     setOpen(false);
                 }}
                 titleID={titleID}
-                elementToFocusOnExit={(openButtonRef.current as unknown) as HTMLButtonElement}
+                elementToFocusOnExit={openButtonRef.current as unknown as HTMLButtonElement}
             >
                 <Frame
                     header={

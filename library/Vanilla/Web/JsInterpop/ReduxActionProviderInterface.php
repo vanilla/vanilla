@@ -12,7 +12,8 @@ namespace Vanilla\Web\JsInterpop;
  *
  * This is useful if you want to lazily create actions for a controller through some container configuration.
  */
-interface ReduxActionProviderInterface {
+interface ReduxActionProviderInterface
+{
     /**
      * @return ReduxAction[]
      */

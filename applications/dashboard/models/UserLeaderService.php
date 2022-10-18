@@ -17,8 +17,8 @@ use Vanilla\Dashboard\Models\UserLeaderQuery;
 /**
  * Service to load leaderboards.
  */
-class UserLeaderService {
-
+class UserLeaderService
+{
     const LEADERBOARD_TYPE_REPUTATION = "reputation";
     const LEADERBOARD_TYPE_POSTS = "posts";
     const LEADERBOARD_TYPE_ACCEPTED_ANSWERS = "acceptedAnswers";
@@ -30,8 +30,8 @@ class UserLeaderService {
 
     const LIMIT_DEFAULT = 10;
     const DEFAULT_CACHE_TTL = 60 * 10; // 1 hour.
-    const CONF_CACHE_TTL = 'Badges.LeaderBoardModule.CacheDefaultTTL';
-    const CONF_EXCLUDE_PERMISSIONS = 'Badges.ExcludePermission';
+    const CONF_CACHE_TTL = "Badges.LeaderBoardModule.CacheDefaultTTL";
+    const CONF_EXCLUDE_PERMISSIONS = "Badges.ExcludePermission";
     const ROOT_POINTS_CATEGORYID = 0;
 
     /** @var UserLeaderProviderInterface[] */
@@ -46,21 +46,27 @@ class UserLeaderService {
     /** @var ConfigurationInterface */
     private $config;
 
+    /** @var bool */
+    private $trackPointsSeparately = false;
+
     /**
      * DI.
      *
      * @param UserModel $userModel
      * @param RoleModel $roleModel
      * @param ConfigurationInterface $config
+     * @param bool $trackPointsSeparately
      */
     public function __construct(
         \UserModel $userModel,
         \RoleModel $roleModel,
-        ConfigurationInterface $config
+        ConfigurationInterface $config,
+        bool $trackPointsSeparately = false
     ) {
         $this->userModel = $userModel;
         $this->roleModel = $roleModel;
         $this->config = $config;
+        $this->setTrackPointsSeparately($trackPointsSeparately);
     }
 
     /**
@@ -68,7 +74,8 @@ class UserLeaderService {
      *
      * @param UserLeaderProviderInterface $provider
      */
-    public function addProvider(UserLeaderProviderInterface $provider) {
+    public function addProvider(UserLeaderProviderInterface $provider)
+    {
         $this->providers[] = $provider;
     }
 
@@ -79,7 +86,8 @@ class UserLeaderService {
      * @return array
      * @throws \Exception Time slot exception.
      */
-    public function getLeaders(UserLeaderQuery $query): array {
+    public function getLeaders(UserLeaderQuery $query): array
+    {
         if ($query->limit === null) {
             $query->limit = self::LIMIT_DEFAULT;
         }
@@ -88,38 +96,48 @@ class UserLeaderService {
             $query->categoryID = 0;
         }
 
-        $query->timeSlot = gmdate('Y-m-d', \Gdn_Statistics::timeSlotStamp($query->slotType, false));
+        $query->timeSlot = gmdate("Y-m-d", \Gdn_Statistics::timeSlotStamp($query->slotType, false));
 
         $pointsCategory = $this->getPointsCategory($query->categoryID);
-        $query->pointsCategoryID = $pointsCategory['CategoryID'] ?? 0;
+        $query->pointsCategoryID = $pointsCategory["CategoryID"] ?? 0;
 
         // We add moderators' user IDs to the excluded user IDs.
-        $moderatorIDs = $this->getModeratorIDs();
-        $query->excludedUserIDs = array_merge($query->excludedUserIDs, $moderatorIDs);
+        if (empty($query->excludedRoleIDs)) {
+            $moderatorRoleIDs = $this->getModeratorRoleIDs();
+            if (!empty($query->includedRoleIDs)) {
+                $moderatorRoleIDs = array_filter($moderatorRoleIDs, function ($id) use ($query) {
+                    // Don't automatically add moderator's role ids if they weren't explicitly included.
+                    return !in_array($id, $query->includedRoleIDs);
+                });
+            }
+            $query->excludedRoleIDs = $moderatorRoleIDs;
+        }
 
         foreach ($this->providers as $provider) {
             if ($provider->canHandleQuery($query)) {
                 $leaderData = $provider->getLeaders($query);
-                $this->userModel->joinUsers($leaderData, ['UserID']);
+                $this->userModel->joinUsers($leaderData, ["UserID"]);
                 return $leaderData;
             }
         }
 
-        // Throw expection when no provider is found.
+        // Throw exception when no provider is found.
         throw new NotFoundException($query->leaderboardType . " provider could not be found");
     }
 
     /**
      * @return UserLeaderProviderInterface[]
      */
-    public function getProviders(): array {
+    public function getProviders(): array
+    {
         return $this->providers;
     }
 
     /**
      * @param UserLeaderProviderInterface[] $providers
      */
-    public function setProviders(array $providers): void {
+    public function setProviders(array $providers): void
+    {
         $this->providers = $providers;
     }
 
@@ -131,7 +149,8 @@ class UserLeaderService {
      *
      * @return string
      */
-    public function getTitleForSlotType(string $slotType, string $in = '') {
+    public function getTitleForSlotType(string $slotType, string $in = "")
+    {
         switch ($slotType) {
             case UserPointsModel::SLOT_TYPE_WEEK:
                 $str = "This Week's Leaders";
@@ -148,7 +167,7 @@ class UserLeaderService {
         }
 
         if ($in) {
-            return sprintf(t($str.' in %s'), htmlspecialchars($in));
+            return sprintf(t($str . " in %s"), htmlspecialchars($in));
         } else {
             return t($str);
         }
@@ -161,14 +180,15 @@ class UserLeaderService {
      *
      * @return array|null
      */
-    public function getPointsCategory(?int $categoryID = null): ?array {
+    public function getPointsCategory(?int $categoryID = null): ?array
+    {
         if ($categoryID !== null) {
             $categoryModel = \Gdn::getContainer()->get(\CategoryModel::class);
             // IMPORTANT: Since this is used in the dashboard addon during bootstrapping
             // We cannot constructor inject the category model, because it may not exist yet.
             // This is because during installation, the dashboard addon is the first addon initialized.
             $category = $categoryModel::categories($categoryID);
-            $categoryID = $category['PointsCategoryID'] ?? UserLeaderService::ROOT_POINTS_CATEGORYID;
+            $categoryID = $category["PointsCategoryID"] ?? UserLeaderService::ROOT_POINTS_CATEGORYID;
             $category = $categoryModel::categories($categoryID);
             return $category;
         }
@@ -180,43 +200,49 @@ class UserLeaderService {
      *
      * @return array
      */
-    private function getModeratorIDs(): array {
+    private function getModeratorRoleIDs(): array
+    {
         $excludePermission = $this->config->get(self::CONF_EXCLUDE_PERMISSIONS);
         if (!$excludePermission) {
             return [];
         }
 
-        $rankedPermissions = [
-            'Garden.Settings.Manage',
-            'Garden.Community.Manage',
-            'Garden.Moderation.Manage'
-        ];
+        $rankedPermissions = ["Garden.Settings.Manage", "Garden.Community.Manage", "Garden.Moderation.Manage"];
         if (!in_array($excludePermission, $rankedPermissions)) {
             return [];
         }
 
         $moderatorIDs = [];
         $moderatorRoleIDs = [];
-        $roles = $this->roleModel
-            ->getWithRankPermissions()
-            ->resultArray();
+        $roles = $this->roleModel->getWithRankPermissions()->resultArray();
 
         $currentPermissionRank = array_search($excludePermission, $rankedPermissions);
 
         foreach ($roles as $currentRole) {
             for ($i = 0; $i <= $currentPermissionRank; $i++) {
                 if (val($rankedPermissions[$i], $currentRole)) {
-                    $moderatorRoleIDs[] = $currentRole['RoleID'];
+                    $moderatorRoleIDs[] = $currentRole["RoleID"];
                     continue 2;
                 }
             }
         }
 
-        if (!empty($moderatorRoleIDs)) {
-            $moderators = $this->userModel->getByRole($moderatorRoleIDs)->resultArray();
-            $moderatorIDs = array_column($moderators, 'UserID');
-        }
+        return $moderatorRoleIDs;
+    }
 
-        return $moderatorIDs;
+    /**
+     * @return bool
+     */
+    public function isTrackPointsSeparately(): bool
+    {
+        return $this->trackPointsSeparately;
+    }
+
+    /**
+     * @param bool $trackPointsSeparately
+     */
+    public function setTrackPointsSeparately(bool $trackPointsSeparately = true): void
+    {
+        $this->trackPointsSeparately = $trackPointsSeparately;
     }
 }

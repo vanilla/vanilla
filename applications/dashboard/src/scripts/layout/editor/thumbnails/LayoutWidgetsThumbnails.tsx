@@ -5,13 +5,14 @@
 import { layoutThumbnailsClasses } from "@dashboard/layout/editor/thumbnails/LayoutThumbnails.classes";
 import { ILayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { cx } from "@emotion/css";
+import { LoadStatus } from "@library/@types/api/core";
+import { useConfigsByKeys } from "@library/config/configHooks";
 import Translate from "@library/content/Translate";
 import { userContentClasses } from "@library/content/UserContent.styles";
 import { searchBarClasses } from "@library/features/search/SearchBar.styles";
 import { ClearButton } from "@library/forms/select/ClearButton";
 import SmartLink from "@library/routing/links/SmartLink";
 import { useUniqueID } from "@library/utility/idUtils";
-import { delegateEvent } from "@vanilla/dom-utils";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import { CustomRadioGroup, CustomRadioInput } from "@vanilla/ui";
@@ -19,6 +20,8 @@ import { spaceshipCompare } from "@vanilla/utils";
 import debounce from "lodash/debounce";
 import * as React from "react";
 import { useCallback, useRef, useState } from "react";
+import { CONFIG_FEATURED_COLLECTIONS } from "@library/featuredCollections/FeaturedCollections.variables";
+
 interface IProps {
     labelID: string;
     value?: string;
@@ -32,8 +35,23 @@ export default function LayoutWidgetsThumbnails(props: IProps) {
     const classes = layoutThumbnailsClasses();
     const searchClasses = searchBarClasses();
 
-    //sort widgetIDs by name
-    const [visibleWidgetIDs, updateVisibleWidgetIDs] = useState(Object.keys(widgets));
+    // Featured collections is behind a feature dev flag. If it is not enable, do not show it.
+    const config = useConfigsByKeys([CONFIG_FEATURED_COLLECTIONS]);
+    const disabledWidgets = React.useMemo(() => {
+        return LoadStatus.SUCCESS && config.data
+            ? Object.entries(config.data)
+                  .filter(([_, display]) => !display)
+                  .map(([key]) => {
+                      const [_, widgetName] = key.toString().split(".");
+                      return `react.${widgetName.toLowerCase()}`;
+                  })
+            : [];
+    }, [config]);
+
+    //sort widgetIDs by name and exclude disabled widgets
+    const [visibleWidgetIDs, updateVisibleWidgetIDs] = useState(
+        Object.keys(widgets).filter((widgetID) => !disabledWidgets.includes(widgetID)),
+    );
 
     const [ownValue, ownOnChange] = useState(Object.keys(widgets)[0] as string);
     const [currentSearchInputValue, setCurrentSearchInputValue] = useState("");
@@ -76,10 +94,7 @@ export default function LayoutWidgetsThumbnails(props: IProps) {
             <div className={cx(userContentClasses().root, classes.description)} id={descriptionID}>
                 <Translate
                     source="Get started selecting the best widget for your Homepage. Find out more in the <1>documentation.</1>"
-                    c1={(text) => (
-                        //documentation link should be here when its ready
-                        <SmartLink to="">{text}</SmartLink>
-                    )}
+                    c1={(text) => <SmartLink to="https://success.vanillaforums.com/kb/articles/548">{text}</SmartLink>}
                 />
             </div>
             <div className={cx(searchClasses.content, classes.searchContent)}>

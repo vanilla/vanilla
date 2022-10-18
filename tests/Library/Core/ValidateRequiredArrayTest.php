@@ -13,12 +13,13 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateRequiredArray().
  */
 
-class ValidateRequiredArrayTest extends TestCase {
-
+class ValidateRequiredArrayTest extends TestCase
+{
     /**
      * Test with empty array.
      */
-    public function testWithEmptyArray() {
+    public function testWithEmptyArray()
+    {
         $actual = validateRequiredArray([]);
         $expected = false;
         $this->assertSame($expected, $actual);
@@ -27,7 +28,8 @@ class ValidateRequiredArrayTest extends TestCase {
     /**
      * Test with non-empty array.
      */
-    public function testWithNonEmptyArray() {
+    public function testWithNonEmptyArray()
+    {
         $actual = validateRequiredArray([false]);
         $expected = true;
         $this->assertSame($expected, $actual);
@@ -36,8 +38,9 @@ class ValidateRequiredArrayTest extends TestCase {
     /**
      * Test with string.
      */
-    public function testWithString() {
-        $actual = validateRequiredArray('not-an-array');
+    public function testWithString()
+    {
+        $actual = validateRequiredArray("not-an-array");
         $expected = false;
         $this->assertSame($actual, $expected);
     }

@@ -15,8 +15,8 @@ use Vanilla\Formatting\Html\HtmlSanitizer;
 /**
  * Class for rendering content of the markdown format.
  */
-class MarkdownFormat extends HtmlFormat {
-
+class MarkdownFormat extends HtmlFormat
+{
     const FORMAT_KEY = "markdown";
 
     /** @var \MarkdownVanilla */
@@ -52,14 +52,16 @@ class MarkdownFormat extends HtmlFormat {
      *
      * @inheritdoc
      */
-    protected function legacySpoilers(string $html): string {
+    protected function legacySpoilers(string $html): string
+    {
         return $html;
     }
 
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $content, bool $enhance = true): string {
+    public function renderHtml(string $content, bool $enhance = true): string
+    {
         $content = parent::legacySpoilers($content);
         $markdownParsed = $this->markdownParser->transform($content);
         return parent::renderHtml($markdownParsed, $enhance);
@@ -68,8 +70,28 @@ class MarkdownFormat extends HtmlFormat {
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $value): string {
+    public function renderQuote(string $value): string
+    {
         $markdownParsed = $this->markdownParser->transform($value);
         return parent::renderQuote($markdownParsed);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function removeUserPII(string $username, string $body): string
+    {
+        $pattern = [];
+        $replacement = [];
+
+        [$pattern["atMention"], $replacement["atMention"]] = $this->getNonRichAtMentionReplacePattern(
+            $username,
+            $this->anonymizeUsername
+        );
+
+        [$pattern["url"], $replacement["url"]] = $this->getUrlReplacementPattern($username, $this->anonymizeUrl);
+
+        $body = preg_replace($pattern, $replacement, $body);
+        return $body;
     }
 }

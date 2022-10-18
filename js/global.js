@@ -911,39 +911,6 @@ jQuery(document).ready(function($) {
         }
     }
 
-    gdn.stats = function() {
-        var StatsURL = gdn.url('settings/analyticstick.json');
-        var SendData = {
-            'TransientKey': gdn.definition('TransientKey'),
-            'Path': gdn.definition('Path'),
-            'Args': gdn.definition('Args'),
-            'ResolvedPath': gdn.definition('ResolvedPath'),
-            'ResolvedArgs': gdn.definition('ResolvedArgs')
-        };
-
-        if (gdn.definition('TickExtra', null) !== null)
-            SendData.TickExtra = gdn.definition('TickExtra');
-
-        jQuery.ajax({
-            dataType: 'json',
-            type: 'post',
-            url: StatsURL,
-            data: SendData,
-            success: function(json) {
-                gdn.inform(json);
-            },
-            complete: function(jqXHR, textStatus) {
-                jQuery(document).triggerHandler('analyticsTick', [SendData, jqXHR, textStatus]);
-            }
-        });
-    };
-
-    // Ping back to the deployment server to track views, and trigger
-    // conditional stats tasks
-    var AnalyticsTask = gdn.definition('AnalyticsTask', false);
-    if (AnalyticsTask == 'tick')
-        gdn.stats();
-
     // If a dismissable InformMessage close button is clicked, hide it.
     $(document).delegate('div.InformWrapper.Dismissable a.Close, div.InformWrapper .js-inform-close', 'click', function() {
         $(this).parents('div.InformWrapper').fadeOut('fast', function() {

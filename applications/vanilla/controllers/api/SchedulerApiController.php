@@ -9,14 +9,14 @@ use Garden\EventManager;
 use Vanilla\Scheduler\Auth\AdHocAuth;
 use Vanilla\Scheduler\Auth\AdHocAuthException;
 use Vanilla\Scheduler\Job\JobExecutionType;
-use Vanilla\Scheduler\Meta\SchedulerMetaDao;
 use Vanilla\Scheduler\SchedulerInterface;
 
 /**
  * Class SchedulerApiController
  */
-class SchedulerApiController extends AbstractApiController {
-    public const CRON_TRIGGER_EVENT = 'CRON_TRIGGER_EVENT';
+class SchedulerApiController extends AbstractApiController
+{
+    public const CRON_TRIGGER_EVENT = "CRON_TRIGGER_EVENT";
 
     /** @var SchedulerInterface */
     protected $scheduler;
@@ -27,27 +27,18 @@ class SchedulerApiController extends AbstractApiController {
     /** @var AdHocAuth */
     protected $auth;
 
-    /** @var SchedulerMetaDao */
-    protected $schedulerMetaDao;
-
     /**
      * SchedulerApiController constructor
      *
      * @param SchedulerInterface $scheduler
      * @param EventManager $eventManager
      * @param AdHocAuth $auth
-     * @param SchedulerMetaDao $schedulerMetaDao
      */
-    public function __construct(
-        SchedulerInterface $scheduler,
-        EventManager $eventManager,
-        AdHocAuth $auth,
-        SchedulerMetaDao $schedulerMetaDao
-    ) {
+    public function __construct(SchedulerInterface $scheduler, EventManager $eventManager, AdHocAuth $auth)
+    {
         $this->scheduler = $scheduler;
         $this->eventManager = $eventManager;
         $this->auth = $auth;
-        $this->schedulerMetaDao = $schedulerMetaDao;
     }
 
     /**
@@ -55,10 +46,12 @@ class SchedulerApiController extends AbstractApiController {
      *
      * @throws AdHocAuthException On bad authentication.
      */
-    public function post_cron() {
-        $this->permissionOrToken('Garden.Scheduler.Cron');
+    public function post_cron()
+    {
+        $this->permissionOrToken("Garden.Scheduler.Cron");
 
         $this->scheduler->setExecutionType(JobExecutionType::cron());
+        // Fire an event so addons can queue up their jobs.
         $this->eventManager->fire(self::CRON_TRIGGER_EVENT);
 
         return "success";
@@ -70,7 +63,8 @@ class SchedulerApiController extends AbstractApiController {
      * @param string|array $permission The permissions you are requiring.
      * @throws AdHocAuthException On bad authentication.
      */
-    protected function permissionOrToken($permission) {
+    protected function permissionOrToken($permission)
+    {
         try {
             $this->permission($permission);
         } catch (Exception $standardAuthenticationFailed) {

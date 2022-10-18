@@ -17,8 +17,8 @@ use Vanilla\Site\SiteSectionModel;
 /**
  * Quote embed factory for comments.
  */
-final class CommentEmbedFactory extends AbstractOwnSiteEmbedFactory {
-
+final class CommentEmbedFactory extends AbstractOwnSiteEmbedFactory
+{
     /** @var \CommentsApiController */
     private $commentApi;
 
@@ -41,7 +41,8 @@ final class CommentEmbedFactory extends AbstractOwnSiteEmbedFactory {
     /**
      * @inheritdoc
      */
-    protected function getSupportedPathRegex(string $domain = ''): string {
+    protected function getSupportedPathRegex(string $domain = ""): string
+    {
         $regexRoot = $this->getRegexRoot();
         return "/^$regexRoot\/discussion\/comment\/(?<commentID>\d+)/i";
     }
@@ -49,18 +50,19 @@ final class CommentEmbedFactory extends AbstractOwnSiteEmbedFactory {
     /**
      * @inheritdoc
      */
-    public function createEmbedForUrl(string $url): AbstractEmbed {
+    public function createEmbedForUrl(string $url): AbstractEmbed
+    {
         $path = parse_url($url, PHP_URL_PATH);
         preg_match($this->getSupportedPathRegex(), $path, $matches);
-        $id = $matches['commentID'] ?? null;
+        $id = $matches["commentID"] ?? null;
 
         if ($id === null) {
-            throw new NotFoundException('Comment');
+            throw new NotFoundException("Comment");
         }
 
         $comment = $this->commentApi->get_quote($id);
         $data = $comment + [
-            'embedType' => QuoteEmbed::TYPE,
+            "embedType" => QuoteEmbed::TYPE,
         ];
         return new QuoteEmbed($data);
     }

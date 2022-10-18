@@ -10,7 +10,8 @@ namespace Vanilla\Contracts\Models;
 /**
  * Models implement this interface to signify they are crawlable.
  */
-interface CrawlableInterface {
+interface CrawlableInterface
+{
     /**
      * Gets the crawl information
      *

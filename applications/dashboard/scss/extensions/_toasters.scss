@@ -4,30 +4,30 @@
 // alert-type message in a toaster.
 
 .InformMessages {
-  @extend .toasters;
+    @extend .toasters;
 
-  .InformMessage {
-    @extend .toaster;
+    .InformMessage {
+        @extend .toaster;
 
-    .Close {
-      @extend .toaster-close;
+        .Close {
+            @extend .toaster-close;
 
-      span {
-        display: none;
-      }
+            span {
+                display: none;
+            }
+        }
+
+        .InformSprite {
+            display: none;
+        }
     }
 
-    .InformSprite {
-      display: none;
+    .Messages.Errors {
+        @include list-reset;
+
+        background: 0;
+        padding: 0;
+        border: 0;
+        margin: 0;
     }
-  }
-
-  .Messages.Errors {
-    @include list-reset;
-
-    background: 0;
-    padding: 0;
-    border: 0;
-    margin: 0;
-  }
 }

@@ -15,24 +15,26 @@ namespace Vanilla\Scheduler;
  * @example
  * yield new LongRunnerCompleteID($someRecordID)
  */
-final class LongRunnerSuccessID implements LongRunnerItemResultInterface {
-
-    /** @var int */
+final class LongRunnerSuccessID implements LongRunnerItemResultInterface
+{
+    /** @var int|string */
     private $recordID;
 
     /**
      * Constructor.
      *
-     * @param int $recordID The completed ID.
+     * @param int|string $recordID The completed ID.
      */
-    public function __construct(int $recordID) {
+    public function __construct($recordID)
+    {
         $this->recordID = $recordID;
     }
 
     /**
      * @inheritdoc
      */
-    public function getRecordID(): int {
+    public function getRecordID()
+    {
         return $this->recordID;
     }
 }

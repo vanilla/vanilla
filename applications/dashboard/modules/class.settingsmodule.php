@@ -11,13 +11,13 @@
 /**
  * Varies functions related to Settings
  */
-class SettingsModule extends Gdn_Module {
+class SettingsModule extends Gdn_Module
+{
+    const TYPE_APPLICATION = "application";
 
-    const TYPE_APPLICATION = 'application';
+    const TYPE_PLUGIN = "plugin";
 
-    const TYPE_PLUGIN = 'plugin';
-
-    const TYPE_THEME = 'theme';
+    const TYPE_THEME = "theme";
 
     /**
      * Is the application/plugin/theme removable?
@@ -26,25 +26,25 @@ class SettingsModule extends Gdn_Module {
      * @param string $name
      * @return boolean
      */
-    public static function isRemovable($type, $name) {
-
+    public static function isRemovable($type, $name)
+    {
         switch ($type) {
             case self::TYPE_APPLICATION:
-                $applicationManager = Gdn::factory('ApplicationManager');
+                $applicationManager = Gdn::factory("ApplicationManager");
 
                 if ($isRemovable = !array_key_exists($name, $applicationManager->enabledApplications())) {
                     $applicationInfo = val($name, $applicationManager->availableApplications(), []);
-                    $applicationFolder = val('Folder', $applicationInfo, '');
+                    $applicationFolder = val("Folder", $applicationInfo, "");
 
-                    $isRemovable = isWritable(PATH_APPLICATIONS.DS.$applicationFolder);
+                    $isRemovable = isWritable(PATH_APPLICATIONS . DS . $applicationFolder);
                 }
                 break;
             case self::TYPE_PLUGIN:
                 if ($isRemovable = !array_key_exists($name, Gdn::pluginManager()->enabledPlugins())) {
                     $pluginInfo = val($name, Gdn::pluginManager()->availablePlugins(), false);
-                    $pluginFolder = val('Folder', $pluginInfo, false);
+                    $pluginFolder = val("Folder", $pluginInfo, false);
 
-                    $isRemovable = isWritable(PATH_PLUGINS.DS.$pluginFolder);
+                    $isRemovable = isWritable(PATH_PLUGINS . DS . $pluginFolder);
                 }
                 break;
             case self::TYPE_THEME:

@@ -103,81 +103,81 @@
 // Styleguide 12.1.2
 
 .card {
-  position: relative;
-  display: block;
-  background-color: $card-bg;
-  border: $card-border-width solid $card-border-color;
-  @include border-radius($card-border-radius);
-
-  // list-group uses twbs's scss.
-  .list-group-item {
-    font-weight: 600;
-    background-color: $grey-lighter;
-
-    &:hover {
-      background-color: lighten($grey-lighter, 1%);
-    }
-
-    .icon {
-      position: absolute;
-      right: 16px;
-      top: 16px;
-    }
-  }
-
-  svg {
     position: relative;
-    width: $font-size-base;
-  }
+    display: block;
+    background-color: $card-bg;
+    border: $card-border-width solid $card-border-color;
+    @include border-radius($card-border-radius);
+
+    // list-group uses twbs's scss.
+    .list-group-item {
+        font-weight: 600;
+        background-color: $grey-lighter;
+
+        &:hover {
+            background-color: lighten($grey-lighter, 1%);
+        }
+
+        .icon {
+            position: absolute;
+            right: 16px;
+            top: 16px;
+        }
+    }
+
+    svg {
+        position: relative;
+        width: $font-size-base;
+    }
 
     .card-title {
         margin-top: 0;
         font-size: 16px;
     }
 
-  .media-title {
-      font-weight: 600;
-  }
-
-  .media-sm {
-    .media-image-wrap {
-      @include image-wrap();
+    .media-title {
+        font-weight: 600;
     }
 
-    .media-left {
-      height: 84px;
-      padding-right: $spacer;
-    }
-  }
+    .media-sm {
+        .media-image-wrap {
+            @include image-wrap();
+        }
 
-  .media {
-    align-items: flex-start;
-  }
-
-  // Variant for panel.
-  .panel-nav & {
-    display: block;
-    padding: 0;
-    margin-top: $spacer / 2;
-    background: 0;
-    border: 0;
-    border-top: 1px dotted rgba(0,0,0,.0875);
-
-    .card-block {
-      padding-left: 0;
+        .media-left {
+            height: 84px;
+            padding-right: $spacer;
+        }
     }
 
-    .btn.btn-sm-rounded {
-      min-width: 312px;
-      padding: 1px 8px;
-      font-size: 9px;
-
-      svg {
-        position: relative;
-        width: 9px;
-      }
+    .media {
+        align-items: flex-start;
     }
-  }
+
+    // Variant for panel.
+    .panel-nav & {
+        display: block;
+        padding: 0;
+        margin-top: $spacer * 0.5;
+        background: 0;
+        border: 0;
+        border-top: 1px dotted rgba(0, 0, 0, 0.0875);
+
+        .card-block {
+            padding-left: 0;
+        }
+
+        .btn.btn-sm-rounded {
+            min-width: 312px;
+            padding: 1px 8px;
+            font-size: 9px;
+
+            svg {
+                position: relative;
+                width: 9px;
+            }
+        }
+    }
 }
 
 .card-label-list {
@@ -208,20 +208,20 @@
 }
 
 .card-footer {
-  @include has-top-border;
+    @include has-top-border;
 
-  padding: $spacer * 1.25;
-  text-align: center;
-  border-top: $border-width solid $card-border-color;
+    padding: $spacer * 1.25;
+    text-align: center;
+    border-top: $border-width solid $card-border-color;
 }
 
 .card-block {
-  padding: $spacer;
-  &.card-block-minimal {
-    padding: 9px;
-  }
+    padding: $spacer;
+    &.card-block-minimal {
+        padding: 9px;
+    }
 }
 
 .drop {
-  z-index: 1005;
+    z-index: 1005;
 }

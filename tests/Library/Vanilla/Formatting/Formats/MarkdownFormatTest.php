@@ -7,34 +7,39 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Formats;
 
-use PHP_CodeSniffer\Standards\MySource\Tests\PHP\EvalObjectFactoryUnitTest;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\Formats\MarkdownFormat;
 use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
+use VanillaTests\Library\Vanilla\Formatting\UserMentionTestTraits;
 
 /**
  * Tests for the MarkdownFormat.
  */
-class MarkdownFormatTest extends AbstractFormatTestCase {
+class MarkdownFormatTest extends AbstractFormatTestCase
+{
+    use UserMentionTestTraits;
 
     /**
      * @inheritDoc
      */
-    protected function prepareFormatter(): FormatInterface {
+    protected function prepareFormatter(): FormatInterface
+    {
         return self::container()->get(MarkdownFormat::class);
     }
 
     /**
      * @inheritDoc
      */
-    protected function prepareFixtures(): array {
-        return (new FormatFixtureFactory('markdown'))->getAllFixtures();
+    protected function prepareFixtures(): array
+    {
+        return (new FormatFixtureFactory("markdown"))->getAllFixtures();
     }
 
     /**
      * Test disallowing spoilers within a quote.
      */
-    public function testMarkdownSpoilerBug() {
+    public function testMarkdownSpoilerBug()
+    {
         $md = <<<EOT
 > [spoiler]
 > 
@@ -58,7 +63,8 @@ EOT;
     /**
      * Test a multi-line spoiler.
      */
-    public function testMultilineSpoiler() {
+    public function testMultilineSpoiler()
+    {
         $md = <<<EOT
 [spoiler]
 s
@@ -76,5 +82,17 @@ EOT;
         $actual = $formatter->renderHTML($md);
 
         $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @param string $body
+     * @param array $expected
+     * @dataProvider provideAtMention
+     * @dataProvider provideProfileUrl
+     */
+    public function testAllUserMentionParsing(string $body, array $expected = ["UserNoSpace"])
+    {
+        $result = $this->prepareFormatter()->parseAllMentions($body);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 }

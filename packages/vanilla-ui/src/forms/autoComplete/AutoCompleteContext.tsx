@@ -12,7 +12,7 @@ type AutoCompleteStatus = "initial" | "selected" | "suggesting";
 
 export interface IAutoCompleteInputState {
     status: AutoCompleteStatus;
-    value?: string;
+    value?: string | string[];
 }
 
 export interface IAutoCompleteContext {
@@ -20,7 +20,7 @@ export interface IAutoCompleteContext {
     onClear?(): void;
     inputState: IAutoCompleteInputState;
     setInputState: React.Dispatch<React.SetStateAction<IAutoCompleteInputState>>;
-    value?: any;
+    value?: string | number | string[] | number[];
     setOptions?(options: IAutoCompleteOptionProps[]);
     multiple?: boolean;
 }

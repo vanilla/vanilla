@@ -14,8 +14,8 @@
  *
  * This is a cache implementation that caches values in memory only for the time of the request.
  */
-class Gdn_Dirtycache extends Gdn_Cache {
-
+class Gdn_Dirtycache extends Gdn_Cache
+{
     /** @var array Track all get keys. */
     protected $countGets = [];
 
@@ -28,7 +28,8 @@ class Gdn_Dirtycache extends Gdn_Cache {
     /**
      * Class constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->cacheType = Gdn_Cache::CACHE_TYPE_NULL;
     }
@@ -36,21 +37,28 @@ class Gdn_Dirtycache extends Gdn_Cache {
     /**
      * {@inheritDoc}
      */
-    public function addContainer($options) {
+    public function addContainer($options)
+    {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function add($key, $value, $options = []) {
+    public function add($key, $value, $options = [])
+    {
+        if (isset($this->cache[$key])) {
+            // Add should fail if the item already exists.
+            return Gdn_Cache::CACHEOP_FAILURE;
+        }
         return $this->store($key, $value, $options);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function store($key, $value, $options = []) {
+    public function store($key, $value, $options = [])
+    {
         if (is_string($key)) {
             $this->trackSet($key);
         }
@@ -65,15 +73,17 @@ class Gdn_Dirtycache extends Gdn_Cache {
     /**
      * {@inheritDoc}
      */
-    public function exists($key) {
+    public function exists($key)
+    {
         return array_key_exists($key, $this->cache);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function get($key, $options = []) {
-        if ($hasDefault = array_key_exists(self::FEATURE_DEFAULT, $options)) {
+    public function get($key, $options = [])
+    {
+        if ($hasDefault = array_key_exists(self::FEATURE_DEFAULT, $options ?? [])) {
             $default = $options[self::FEATURE_DEFAULT];
         } else {
             $default = self::CACHEOP_FAILURE;
@@ -104,7 +114,8 @@ class Gdn_Dirtycache extends Gdn_Cache {
     /**
      * {@inheritDoc}
      */
-    public function remove($key, $options = []) {
+    public function remove($key, $options = [])
+    {
         unset($this->cache[$key]);
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
@@ -112,7 +123,8 @@ class Gdn_Dirtycache extends Gdn_Cache {
     /**
      * {@inheritDoc}
      */
-    public function replace($key, $value, $options = []) {
+    public function replace($key, $value, $options = [])
+    {
         $this->cache[$key] = $value;
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
@@ -120,9 +132,10 @@ class Gdn_Dirtycache extends Gdn_Cache {
     /**
      * {@inheritDoc}
      */
-    public function increment($key, $amount = 1, $options = []) {
+    public function increment($key, $amount = 1, $options = [])
+    {
         $options += [
-            self::FEATURE_INITIAL => 0
+            self::FEATURE_INITIAL => 0,
         ];
 
         if (array_key_exists($key, $this->cache)) {
@@ -138,9 +151,10 @@ class Gdn_Dirtycache extends Gdn_Cache {
     /**
      * {@inheritDoc}
      */
-    public function decrement($key, $amount = 1, $options = []) {
+    public function decrement($key, $amount = 1, $options = [])
+    {
         $options += [
-            self::FEATURE_INITIAL => 0
+            self::FEATURE_INITIAL => 0,
         ];
 
         if (array_key_exists($key, $this->cache)) {
@@ -156,7 +170,8 @@ class Gdn_Dirtycache extends Gdn_Cache {
     /**
      * {@inheritDoc}
      */
-    public function flush() {
+    public function flush()
+    {
         $this->cache = [];
         $this->countGets = [];
         $this->countSets = [];
@@ -166,7 +181,8 @@ class Gdn_Dirtycache extends Gdn_Cache {
     /**
      * @param string $key
      */
-    private function trackSet(string $key) {
+    private function trackSet(string $key)
+    {
         if (!isset($this->countSets[$key])) {
             $this->countSets[$key] = 1;
         } else {
@@ -177,7 +193,8 @@ class Gdn_Dirtycache extends Gdn_Cache {
     /**
      * @param string $key
      */
-    private function trackGet(string $key) {
+    private function trackGet(string $key)
+    {
         if (!isset($this->countGets[$key])) {
             $this->countGets[$key] = 1;
         } else {

@@ -15,8 +15,8 @@ use VanillaTests\SiteTestCase;
  *
  * @package VanillaTests\Models
  */
-class DirtyRecordModelTest extends SiteTestCase {
-
+class DirtyRecordModelTest extends SiteTestCase
+{
     /**
      * @var DirtyRecordModel
      */
@@ -25,7 +25,8 @@ class DirtyRecordModelTest extends SiteTestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->dirtyRecordModel = self::container()->get(DirtyRecordModel::class);
     }
@@ -33,15 +34,16 @@ class DirtyRecordModelTest extends SiteTestCase {
     /**
      * Test upserting a record.
      */
-    public function testUniqueRecordUpsert() {
+    public function testUniqueRecordUpsert()
+    {
         $this->dirtyRecordModel->insert([
             "recordType" => "category",
-            "recordID" => 1
+            "recordID" => 1,
         ]);
 
         $this->dirtyRecordModel->insert([
             "recordType" => "category",
-            "recordID" => 1
+            "recordID" => 1,
         ]);
 
         $record = $this->dirtyRecordModel->select(["recordType" => "category"]);
@@ -51,20 +53,21 @@ class DirtyRecordModelTest extends SiteTestCase {
     /**
      * Test upserting a record.
      */
-    public function testUniqueRecordUpsertWithRecordTypes() {
+    public function testUniqueRecordUpsertWithRecordTypes()
+    {
         $this->dirtyRecordModel->insert([
             "recordType" => "category",
-            "recordID" => 1
+            "recordID" => 1,
         ]);
 
         $this->dirtyRecordModel->insert([
             "recordType" => "category",
-            "recordID" => 2
+            "recordID" => 2,
         ]);
 
         $this->dirtyRecordModel->insert([
             "recordType" => "discussion",
-            "recordID" => 2
+            "recordID" => 2,
         ]);
 
         $record = $this->dirtyRecordModel->select(["recordType" => "category"]);
@@ -74,37 +77,38 @@ class DirtyRecordModelTest extends SiteTestCase {
     /**
      * Test deleting records less than a certain amount of time.
      */
-    public function testDeleteRecordsWithTimeStamp() {
-        CurrentTimeStamp::mockTime('Dec 19 2019');
+    public function testDeleteRecordsWithTimeStamp()
+    {
+        CurrentTimeStamp::mockTime("Dec 19 2019");
         $this->dirtyRecordModel->insert([
             "recordType" => "category",
-            "recordID" => 1
+            "recordID" => 1,
         ]);
 
         $this->dirtyRecordModel->insert([
             "recordType" => "category",
-            "recordID" => 2
+            "recordID" => 2,
         ]);
 
-        CurrentTimeStamp::mockTime('Sept 19 2020');
+        CurrentTimeStamp::mockTime("Sept 19 2020");
         $this->dirtyRecordModel->insert([
             "recordType" => "category",
-            "recordID" => 3
+            "recordID" => 3,
         ]);
         $this->dirtyRecordModel->insert([
             "recordType" => "category",
-            "recordID" => 5
+            "recordID" => 5,
         ]);
         $this->dirtyRecordModel->insert([
             "recordType" => "category",
-            "recordID" => 6
+            "recordID" => 6,
         ]);
         $this->dirtyRecordModel->insert([
             "recordType" => "category",
-            "recordID" => 7
+            "recordID" => 7,
         ]);
 
-        $this->dirtyRecordModel->clearRecordTypes('category', new \DateTimeImmutable("Sept 18 2020"));
+        $this->dirtyRecordModel->clearRecordTypes("category", new \DateTimeImmutable("Sept 18 2020"));
         $records = $this->dirtyRecordModel->select(["recordType" => "category"]);
         $this->assertEquals(4, count($records));
     }

@@ -9,7 +9,7 @@ import Section, { ISectionProps } from "@library/layout/Section";
 
 interface IProps extends ISectionProps {}
 
-function ThreeColumnSection(props: IProps) {
+function SectionThreeColumns(props: IProps) {
     return (
         <SectionProvider type={SectionTypes.THREE_COLUMNS}>
             <Section {...props} />
@@ -17,4 +17,4 @@ function ThreeColumnSection(props: IProps) {
     );
 }
 
-export default ThreeColumnSection;
+export default SectionThreeColumns;

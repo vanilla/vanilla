@@ -7,12 +7,11 @@
 
 namespace Vanilla\Formatting\Html;
 
-
 /**
  * Class for sanitizing HTML.
  */
-class HtmlSanitizer {
-
+class HtmlSanitizer
+{
     /** @var \VanillaHtmlFormatter */
     private $htmlFilterer;
 
@@ -24,7 +23,8 @@ class HtmlSanitizer {
      *
      * @param \VanillaHtmlFormatter $htmlFilterer
      */
-    public function __construct(\VanillaHtmlFormatter $htmlFilterer) {
+    public function __construct(\VanillaHtmlFormatter $htmlFilterer)
+    {
         $this->htmlFilterer = $htmlFilterer;
     }
 
@@ -38,7 +38,8 @@ class HtmlSanitizer {
      * @param bool $allowExtendedContent
      * @return string
      */
-    public function filter(string $content, bool $allowExtendedContent = false): string {
+    public function filter(string $content, bool $allowExtendedContent = false): string
+    {
         if (!self::containsHtmlTags($content)) {
             return htmlspecialchars($content);
         }
@@ -46,13 +47,13 @@ class HtmlSanitizer {
         $encodedCodeBlocks = $this->encodeCodeBlocks($content);
 
         $options = [
-            'codeBlockEntities' => false,
-            'spec' => [
-                'span' => [
-                    'style' => ['match' => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i']
-                ]
+            "codeBlockEntities" => false,
+            "spec" => [
+                "span" => [
+                    "style" => ["match" => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i'],
+                ],
             ],
-            'allowedExtendedContent' => $allowExtendedContent
+            "allowedExtendedContent" => $allowExtendedContent,
         ];
         return $this->htmlFilterer->format($encodedCodeBlocks, $options);
     }
@@ -64,7 +65,8 @@ class HtmlSanitizer {
      *
      * @param bool $shouldEncodeCodeBlocks
      */
-    public function setShouldEncodeCodeBlocks(bool $shouldEncodeCodeBlocks) {
+    public function setShouldEncodeCodeBlocks(bool $shouldEncodeCodeBlocks)
+    {
         $this->shouldEncodeCodeBlocks = $shouldEncodeCodeBlocks;
     }
 
@@ -77,8 +79,9 @@ class HtmlSanitizer {
      *
      * @return bool
      */
-    public static function containsHtmlTags(string $toCheck): bool {
-        return strpos($toCheck, '<') >= 0 || (bool)preg_match('/&#?[a-z0-9]{1,10};/i', $toCheck);
+    public static function containsHtmlTags(string $toCheck): bool
+    {
+        return strpos($toCheck, "<") >= 0 || (bool) preg_match("/&#?[a-z0-9]{1,10};/i", $toCheck);
     }
 
     /**
@@ -88,15 +91,18 @@ class HtmlSanitizer {
      *
      * @return string
      */
-    private function encodeCodeBlocks(string $value): string {
+    private function encodeCodeBlocks(string $value): string
+    {
         if (!$this->shouldEncodeCodeBlocks) {
             return $value;
         }
-        return preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function ($matches) {
-            $result = "<code{$matches[1]}>" .
-                htmlspecialchars(htmlspecialchars_decode($matches[2])) .
-                '</code>';
-            return $result;
-        }, $value);
+        return preg_replace_callback(
+            "`<code([^>]*)>(.+?)<\/code>`si",
+            function ($matches) {
+                $result = "<code{$matches[1]}>" . htmlspecialchars(htmlspecialchars_decode($matches[2])) . "</code>";
+                return $result;
+            },
+            $value
+        );
     }
 }

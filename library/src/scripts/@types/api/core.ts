@@ -6,6 +6,8 @@
 import { AxiosError, AxiosResponse } from "axios";
 import { IUserFragment } from "@library/@types/api/users";
 import { RecordID } from "@vanilla/utils";
+import { ImageSourceSet } from "@library/utility/appUtils";
+import { ILinkPages } from "@library/navigation/SimplePagerModel";
 
 export enum LoadStatus {
     PENDING = "PENDING",
@@ -70,6 +72,16 @@ interface IMultiType<T> {
 export type MultiTypeRecord<T, Subtract extends keyof T, TypeName extends string> = Omit<T, Subtract> &
     IMultiType<TypeName>;
 
+/**
+ * Require one of two properties ona given interface
+ *
+ * https://stackoverflow.com/questions/40510611/typescript-interface-require-one-of-two-properties-to-exist
+ */
+export type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<T, Exclude<keyof T, Keys>> &
+    {
+        [K in Keys]-?: Required<Pick<T, K>> & Partial<Pick<T, Exclude<Keys, K>>>;
+    }[Keys];
+
 export interface INavigationItemBadge {
     type: navigationItemBadgeType;
     text: string;
@@ -132,4 +144,15 @@ export enum Format {
     HTML = "html",
     BBCODE = "bbcode",
     RICH = "rich",
+}
+
+export interface IImage {
+    url?: string;
+    urlSrcSet?: ImageSourceSet;
+    alt?: string;
+}
+
+export interface IFeaturedImage {
+    display: boolean;
+    fallbackImage?: string;
 }

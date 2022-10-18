@@ -13,8 +13,8 @@ use Vanilla\EmbeddedContent\EmbedUtils;
 /**
  * Embed data object for the giphy.
  */
-class IFrameEmbed extends AbstractEmbed {
-
+class IFrameEmbed extends AbstractEmbed
+{
     const TYPE = "iframe";
 
     /**
@@ -22,21 +22,24 @@ class IFrameEmbed extends AbstractEmbed {
      *
      * @return bool
      */
-    public static function isExtendedContent(): bool {
+    public static function isExtendedContent(): bool
+    {
         return true;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         $data = EmbedUtils::ensureDimensions($data);
         return $data;
     }
@@ -44,10 +47,8 @@ class IFrameEmbed extends AbstractEmbed {
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
-        return Schema::parse([
-            'height:i',
-            'width:i',
-        ]);
+    protected function schema(): Schema
+    {
+        return Schema::parse(["height:i", "width:i"]);
     }
 }

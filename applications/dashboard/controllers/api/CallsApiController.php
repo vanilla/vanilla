@@ -21,8 +21,8 @@ use AbstractApiController;
 /**
  * Endpoints related to system calls in the application.
  */
-class CallsApiController extends AbstractApiController {
-
+class CallsApiController extends AbstractApiController
+{
     /** @var LongRunner */
     private $runner;
 
@@ -31,7 +31,8 @@ class CallsApiController extends AbstractApiController {
      *
      * @param LongRunner $runner
      */
-    public function __construct(LongRunner $runner) {
+    public function __construct(LongRunner $runner)
+    {
         $this->runner = $runner;
     }
 
@@ -41,21 +42,17 @@ class CallsApiController extends AbstractApiController {
      * @param array $body
      * @return Data
      */
-    public function post_run(array $body = []): Data {
+    public function post_run(array $body = []): Data
+    {
         // This is a special permission that can only be applied through `SystemTokenMiddleware`
         // if the request has a signed system token as the body.
         $this->permission(Permissions::PERMISSION_SYSTEM);
 
-        $in = $this->schema([
-            "class:s",
-            "method:s",
-            "args:a?",
-            "options:o?",
-        ], "in");
+        $in = $this->schema(["class:s", "method:s", "args:a?", "options:o?"], "in");
         $body = $in->validate($body);
 
-        $class = $body['class'];
-        $method = $body['method'];
+        $class = $body["class"];
+        $method = $body["method"];
         $args = $body["args"] ?? [];
         $options = $body["options"] ?? [];
         $data = $this->runner->runApi(new LongRunnerAction($class, $method, $args, $options));

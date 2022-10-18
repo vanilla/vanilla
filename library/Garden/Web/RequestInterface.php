@@ -7,8 +7,8 @@
 
 namespace Garden\Web;
 
-
-interface RequestInterface {
+interface RequestInterface
+{
     /**
      * Get the hostname of the request.
      *

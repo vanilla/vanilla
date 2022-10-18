@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -10,11 +10,11 @@ import { t } from "@vanilla/i18n";
 import ReactDOM from "react-dom";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import intersection from "lodash/intersection";
-import { css } from "@emotion/css";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
 
 interface IProps {
-    discussionIDs?: number[];
+    discussionIDs?: Array<IDiscussion["discussionID"]>;
     className?: string;
 }
 
@@ -25,7 +25,9 @@ export function DiscussionListSelectAll(props: IProps) {
     const context = useDiscussionCheckBoxContext();
 
     const discussionIDs = props.discussionIDs ?? [];
-    const allChecked = intersection(discussionIDs, context.checkedDiscussionIDs).length === discussionIDs.length;
+    const allChecked =
+        discussionIDs.length > 0 &&
+        intersection(discussionIDs, context.checkedDiscussionIDs).length === discussionIDs.length;
 
     return (
         <CheckBox

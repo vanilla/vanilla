@@ -11,8 +11,8 @@
 /**
  * Handles /message endpoint.
  */
-class MessageController extends DashboardController {
-
+class MessageController extends DashboardController
+{
     /** @var MessageModel */
     public $MessageModel;
 
@@ -22,12 +22,12 @@ class MessageController extends DashboardController {
     /**
      * {@inheritDoc}
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->MessageModel = \Gdn::getContainer()->get(MessageModel::class);
         $this->Form = \Gdn::getContainer()->get(Gdn_Form::class);
     }
-
 
     /**
      * Form to create a new message.
@@ -35,10 +35,11 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function add() {
-        $this->permission('Garden.Community.Manage');
+    public function add()
+    {
+        $this->permission("Garden.Community.Manage");
         // Use the edit form with no MessageID specified.
-        $this->View = 'Edit';
+        $this->View = "Edit";
         $this->edit();
     }
 
@@ -50,18 +51,19 @@ class MessageController extends DashboardController {
      *
      * @param int|string $messageID
      */
-    public function delete($messageID = '') {
-        $this->permission('Garden.Community.Manage');
+    public function delete($messageID = "")
+    {
+        $this->permission("Garden.Community.Manage");
 
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
+            throw new Exception("Requires POST", 405);
         }
-        $this->MessageModel->delete(['MessageID' => $messageID]);
+        $this->MessageModel->delete(["MessageID" => $messageID]);
 
-        $this->informMessage(sprintf(t('%s deleted'), t('Message')));
-        $this->jsonTarget('', '', 'Refresh');
+        $this->informMessage(sprintf(t("%s deleted"), t("Message")));
+        $this->jsonTarget("", "", "Refresh");
 
-        $this->render('blank', 'utility', 'dashboard');
+        $this->render("blank", "utility", "dashboard");
     }
 
     /**
@@ -73,19 +75,20 @@ class MessageController extends DashboardController {
      * @param int|string $messageID
      * @param mixed $transientKey
      */
-    public function dismiss($messageID = '', $transientKey = false) {
+    public function dismiss($messageID = "", $transientKey = false)
+    {
         $session = Gdn::session();
 
         $message = $this->MessageModel->getID($messageID, DATASET_TYPE_ARRAY);
-        $allowDismiss = $message['AllowDismiss'] ?? true;
+        $allowDismiss = $message["AllowDismiss"] ?? true;
         if ($allowDismiss && $transientKey !== false && $session->validateTransientKey($transientKey)) {
-            $prefs = $session->getPreference('DismissedMessages', []);
+            $prefs = $session->getPreference("DismissedMessages", []);
             $prefs[] = $messageID;
-            $session->setPreference('DismissedMessages', $prefs);
+            $session->setPreference("DismissedMessages", $prefs);
         }
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            redirectTo(getIncomingValue('Target', '/discussions'));
+            redirectTo(getIncomingValue("Target", "/discussions"));
         }
 
         $this->render();
@@ -99,14 +102,15 @@ class MessageController extends DashboardController {
      *
      * @param int|string $messageID
      */
-    public function edit($messageID = '') {
-        $this->addJsFile('jquery.autosize.min.js');
+    public function edit($messageID = "")
+    {
+        $this->addJsFile("jquery.autosize.min.js");
 
-        $this->permission('Garden.Community.Manage');
-        $this->setHighlightRoute('dashboard/message');
+        $this->permission("Garden.Community.Manage");
+        $this->setHighlightRoute("dashboard/message");
 
         // Generate some Controller & Asset data arrays
-        $this->setData('Locations', $this->_getLocationData());
+        $this->setData("Locations", $this->_getLocationData());
         $this->AssetData = $this->_getAssetData();
 
         // Set the model on the form.
@@ -116,32 +120,32 @@ class MessageController extends DashboardController {
 
         // Make sure the form knows which item we are editing.
         if (is_numeric($messageID) && $messageID > 0) {
-            $this->Form->addHidden('MessageID', $messageID);
+            $this->Form->addHidden("MessageID", $messageID);
         } else {
             // Enable newly created messages by default.
-            $this->Form->setValue('IsEnabled', true);
+            $this->Form->setValue("IsEnabled", true);
         }
 
         $categoriesData = CategoryModel::categories();
         $categories = [];
         foreach ($categoriesData as $row) {
-            if ($row['CategoryID'] < 0) {
+            if ($row["CategoryID"] < 0) {
                 continue;
             }
 
-            $categories[$row['CategoryID']] = str_repeat('&nbsp;&nbsp;&nbsp;', max(0, $row['Depth'] - 1)).$row['Name'];
+            $categories[$row["CategoryID"]] =
+                str_repeat("&nbsp;&nbsp;&nbsp;", max(0, $row["Depth"] - 1)) . $row["Name"];
         }
-        $this->setData('Categories', $categories);
+        $this->setData("Categories", $categories);
 
         // If seeing the form for the first time...
         if (!$this->Form->authenticatedPostBack()) {
             $this->Form->setData($this->Message);
         } else {
             if ($messageID = $this->Form->save()) {
-
                 // Redirect
-                $this->informMessage(t('Your changes have been saved.'));
-                $this->jsonTarget('', '', 'Refresh');
+                $this->informMessage(t("Your changes have been saved."));
+                $this->jsonTarget("", "", "Refresh");
             }
         }
         $this->render();
@@ -153,16 +157,17 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function index() {
-        $this->permission('Garden.Community.Manage');
-        $this->setHighlightRoute('dashboard/message');
-        $this->addJsFile('jquery.autosize.min.js');
-        $this->addJsFile('jquery.tablednd.js');
-        $this->title(t('Messages'));
-        Gdn_Theme::section('Moderation');
+    public function index()
+    {
+        $this->permission("Garden.Community.Manage");
+        $this->setHighlightRoute("dashboard/message");
+        $this->addJsFile("jquery.autosize.min.js");
+        $this->addJsFile("jquery.tablednd.js");
+        $this->title(t("Messages"));
+        Gdn_Theme::section("Moderation");
 
         // Load all messages from the db
-        $this->MessageData = $this->MessageModel->get('Sort');
+        $this->MessageData = $this->MessageModel->get("Sort");
         $this->render();
     }
 
@@ -172,11 +177,12 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function initialize() {
+    public function initialize()
+    {
         parent::initialize();
-        Gdn_Theme::section('Moderation');
+        Gdn_Theme::section("Moderation");
         if ($this->Menu) {
-            $this->Menu->highlightRoute('/dashboard/settings');
+            $this->Menu->highlightRoute("/dashboard/settings");
         }
     }
 
@@ -186,10 +192,11 @@ class MessageController extends DashboardController {
      * @param $messageID
      * @throws Exception
      */
-    public function enable($messageID) {
-        $this->permission('Garden.Community.Manage');
+    public function enable($messageID)
+    {
+        $this->permission("Garden.Community.Manage");
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
+            throw new Exception("Requires POST", 405);
         }
         if ($messageID && is_numeric($messageID)) {
             $this->setEnabled($messageID, 1);
@@ -202,10 +209,11 @@ class MessageController extends DashboardController {
      * @param $messageID
      * @throws Exception
      */
-    public function disable($messageID) {
-        $this->permission('Garden.Community.Manage');
+    public function disable($messageID)
+    {
+        $this->permission("Garden.Community.Manage");
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
+            throw new Exception("Requires POST", 405);
         }
         if ($messageID && is_numeric($messageID)) {
             $this->setEnabled($messageID, 0);
@@ -218,23 +226,40 @@ class MessageController extends DashboardController {
      * @param $messageID
      * @param $enabled
      */
-    protected function setEnabled($messageID, $enabled) {
+    protected function setEnabled($messageID, $enabled)
+    {
         $messageModel = new MessageModel();
-        $enabled = forceBool($enabled, '0', '1', '0');
-        $messageModel->setProperty($messageID, 'Enabled', $enabled);
-        if ($enabled === '1') {
-            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+        $enabled = forceBool($enabled, "0", "1", "0");
+        $messageModel->setProperty($messageID, "Enabled", $enabled);
+        if ($enabled === "1") {
+            $newToggle = wrap(
+                anchor(
+                    '<div class="toggle-well"></div><div class="toggle-slider"></div>',
+                    "/dashboard/message/disable/" . $messageID,
+                    "Hijack"
+                ),
+                "span",
+                ["class" => "toggle-wrap toggle-wrap-on"]
+            );
         } else {
-            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+            $newToggle = wrap(
+                anchor(
+                    '<div class="toggle-well"></div><div class="toggle-slider"></div>',
+                    "/dashboard/message/enable/" . $messageID,
+                    "Hijack"
+                ),
+                "span",
+                ["class" => "toggle-wrap toggle-wrap-off"]
+            );
         }
-        $this->jsonTarget("#toggle-".$messageID, $newToggle);
-        if ($enabled === '1') {
-            $this->informMessage(sprintf(t('%s enabled.'), t('Message')));
+        $this->jsonTarget("#toggle-" . $messageID, $newToggle);
+        if ($enabled === "1") {
+            $this->informMessage(sprintf(t("%s enabled."), t("Message")));
         } else {
-            $this->informMessage(sprintf(t('%s disabled.'), t('Message')));
+            $this->informMessage(sprintf(t("%s disabled."), t("Message")));
         }
-        Gdn::cache()->remove('Messages');
-        $this->render('Blank', 'Utility');
+        Gdn::cache()->remove("Messages");
+        $this->render("Blank", "Utility");
     }
 
     /**
@@ -245,14 +270,15 @@ class MessageController extends DashboardController {
      *
      * @return array
      */
-    protected function _getAssetData() {
+    protected function _getAssetData()
+    {
         $assetData = [
-            'Content' => t('Above Main Content'),
-            'Panel' => t('Below Sidebar')
+            "Content" => t("Above Main Content"),
+            "Panel" => t("Below Sidebar"),
         ];
 
-        $this->EventArguments['AssetData'] = &$assetData;
-        $this->fireEvent('AfterGetAssetData');
+        $this->EventArguments["AssetData"] = &$assetData;
+        $this->fireEvent("AfterGetAssetData");
 
         return $assetData;
     }
@@ -265,15 +291,16 @@ class MessageController extends DashboardController {
      *
      * @return array
      */
-    protected function _getLocationData(): array {
+    protected function _getLocationData(): array
+    {
         $legacyLayoutViews = $this->MessageModel->getLegacyLayoutViews();
         $controllerLocationsData = ["all" => t("All Pages")];
         foreach ($legacyLayoutViews as $legacyView) {
             $controllerLocationsData[$legacyView->getType()] = t($legacyView->getName(), $legacyView->getName());
         }
 
-        $this->EventArguments['ControllerData'] = &$controllerLocationsData;
-        $this->fireEvent('AfterGetLocationData');
+        $this->EventArguments["ControllerData"] = &$controllerLocationsData;
+        $this->fireEvent("AfterGetLocationData");
 
         return $controllerLocationsData;
     }

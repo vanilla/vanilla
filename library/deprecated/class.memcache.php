@@ -16,13 +16,13 @@
  *
  * @deprecated
  */
-class Gdn_Memcache extends Gdn_Cache {
-
+class Gdn_Memcache extends Gdn_Cache
+{
     /** Memcache option. */
     const OPT_MOD_SPLIT = 65000;
 
     /** Memcache option. */
-    const OPT_PASSTHRU_CONTAINER = 'passthru';
+    const OPT_PASSTHRU_CONTAINER = "passthru";
 
     /** O_CREATE. */
     const O_CREATE = 1;
@@ -36,11 +36,12 @@ class Gdn_Memcache extends Gdn_Cache {
     /**
      * Setup our caching configuration.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->cacheType = Gdn_Cache::CACHE_TYPE_MEMORY;
 
-        $this->memcache = new Memcache;
+        $this->memcache = new Memcache();
 
         $this->registerFeature(Gdn_Cache::FEATURE_COMPRESS, MEMCACHE_COMPRESSED);
         $this->registerFeature(Gdn_Cache::FEATURE_EXPIRY);
@@ -53,7 +54,7 @@ class Gdn_Memcache extends Gdn_Cache {
             Gdn_Cache::FEATURE_TIMEOUT => false,
             Gdn_Cache::FEATURE_EXPIRY => false,
             Gdn_Cache::FEATURE_NOPREFIX => false,
-            Gdn_Cache::FEATURE_FORCEPREFIX => null
+            Gdn_Cache::FEATURE_FORCEPREFIX => null,
         ];
     }
 
@@ -64,10 +65,11 @@ class Gdn_Memcache extends Gdn_Cache {
      * automatically, and needs to configure itself from the values in the global
      * config file.
      */
-    public function autorun() {
-        $servers = Gdn_Cache::activeStore('memcache');
+    public function autorun()
+    {
+        $servers = Gdn_Cache::activeStore("memcache");
         if (!is_array($servers)) {
-            $servers = explode(',', $servers);
+            $servers = explode(",", $servers);
         }
 
         $keys = [
@@ -76,10 +78,10 @@ class Gdn_Memcache extends Gdn_Cache {
             Gdn_Cache::CONTAINER_WEIGHT,
             Gdn_Cache::CONTAINER_TIMEOUT,
             Gdn_Cache::CONTAINER_ONLINE,
-            Gdn_Cache::CONTAINER_CALLBACK
+            Gdn_Cache::CONTAINER_CALLBACK,
         ];
         foreach ($servers as $cacheServer) {
-            $cacheServer = explode(' ', $cacheServer);
+            $cacheServer = explode(" ", $cacheServer);
             $cacheServer = array_pad($cacheServer, count($keys), null);
             $cacheServer = array_combine($keys, $cacheServer);
 
@@ -104,11 +106,9 @@ class Gdn_Memcache extends Gdn_Cache {
      * const CONTAINER_ONLINE = 5;
      * const CONTAINER_CALLBACK = 6;
      */
-    public function addContainer($options) {
-
-        $required = [
-            Gdn_Cache::CONTAINER_LOCATION
-        ];
+    public function addContainer($options)
+    {
+        $required = [Gdn_Cache::CONTAINER_LOCATION];
 
         $keyedRequirements = array_fill_keys($required, 1);
         if (sizeof(array_intersect_key($options, $keyedRequirements)) != sizeof($required)) {
@@ -125,12 +125,12 @@ class Gdn_Memcache extends Gdn_Cache {
             Gdn_Cache::CONTAINER_TIMEOUT => 1,
             Gdn_Cache::CONTAINER_RETRYINT => 15,
             Gdn_Cache::CONTAINER_ONLINE => true,
-            Gdn_Cache::CONTAINER_CALLBACK => null
+            Gdn_Cache::CONTAINER_CALLBACK => null,
         ];
 
         $finalContainer = array_merge($defaults, $options);
         $this->containers[$cacheLocation] = $finalContainer;
-        $pathInfo = explode(':', $cacheLocation);
+        $pathInfo = explode(":", $cacheLocation);
 
         $this->memcache->addServer(
             getValue(0, $pathInfo),
@@ -154,13 +154,14 @@ class Gdn_Memcache extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function add($key, $value, $options = []) {
+    public function add($key, $value, $options = [])
+    {
         $finalOptions = array_merge($this->StoreDefaults, $options);
 
         $flags = 0;
         $compress = 0;
         if (getValue(Gdn_Cache::FEATURE_COMPRESS, $finalOptions)) {
-            $compress = (int)$this->hasFeature(Gdn_Cache::FEATURE_COMPRESS);
+            $compress = (int) $this->hasFeature(Gdn_Cache::FEATURE_COMPRESS);
         }
 
         $flags |= $compress;
@@ -169,7 +170,7 @@ class Gdn_Memcache extends Gdn_Cache {
 
         $realKey = $this->makeKey($key, $finalOptions);
         $stored = $this->memcache->add($realKey, $value, $flags, $expiry);
-        return ($stored) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
+        return $stored ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
     }
 
     /**
@@ -180,22 +181,23 @@ class Gdn_Memcache extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function store($key, $value, $options = []) {
+    public function store($key, $value, $options = [])
+    {
         $finalOptions = array_merge($this->StoreDefaults, $options);
 
         $flags = 0;
         $compress = 0;
         if (getValue(Gdn_Cache::FEATURE_COMPRESS, $finalOptions)) {
-            $compress = (int)$this->hasFeature(Gdn_Cache::FEATURE_COMPRESS);
+            $compress = (int) $this->hasFeature(Gdn_Cache::FEATURE_COMPRESS);
         }
 
         $flags |= $compress;
 
-        $expiry = (int)getValue(Gdn_Cache::FEATURE_EXPIRY, $finalOptions, 0);
+        $expiry = (int) getValue(Gdn_Cache::FEATURE_EXPIRY, $finalOptions, 0);
 
         $realKey = $this->makeKey($key, $finalOptions);
         $stored = $this->memcache->set($realKey, $value, $flags, $expiry);
-        return ($stored) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
+        return $stored ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
     }
 
     /**
@@ -205,20 +207,21 @@ class Gdn_Memcache extends Gdn_Cache {
      * @param array $options
      * @return array|mixed|string
      */
-    public function get($key, $options = []) {
+    public function get($key, $options = [])
+    {
         $finalOptions = array_merge($this->StoreDefaults, $options);
 
         $flags = 0;
         $compress = 0;
         if (getValue(Gdn_Cache::FEATURE_COMPRESS, $finalOptions)) {
-            $compress = (int)$this->hasFeature(Gdn_Cache::FEATURE_COMPRESS);
+            $compress = (int) $this->hasFeature(Gdn_Cache::FEATURE_COMPRESS);
         }
 
         $flags |= $compress;
 
         $realKey = $this->makeKey($key, $finalOptions);
         $data = $this->memcache->get($realKey, $flags);
-        return ($data === false) ? $this->fallback($key, $options) : $data;
+        return $data === false ? $this->fallback($key, $options) : $data;
     }
 
     /**
@@ -228,8 +231,11 @@ class Gdn_Memcache extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function exists($key, $options = []) {
-        return ($this->get($key, $options) === Gdn_Cache::CACHEOP_FAILURE) ? Gdn_Cache::CACHEOP_FAILURE : Gdn_Cache::CACHEOP_SUCCESS;
+    public function exists($key, $options = [])
+    {
+        return $this->get($key, $options) === Gdn_Cache::CACHEOP_FAILURE
+            ? Gdn_Cache::CACHEOP_FAILURE
+            : Gdn_Cache::CACHEOP_SUCCESS;
     }
 
     /**
@@ -239,12 +245,13 @@ class Gdn_Memcache extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function remove($key, $options = []) {
+    public function remove($key, $options = [])
+    {
         $finalOptions = array_merge($this->StoreDefaults, $options);
 
         $realKey = $this->makeKey($key, $finalOptions);
         $deleted = $this->memcache->delete($realKey);
-        return ($deleted) ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
+        return $deleted ? Gdn_Cache::CACHEOP_SUCCESS : Gdn_Cache::CACHEOP_FAILURE;
     }
 
     /**
@@ -255,7 +262,8 @@ class Gdn_Memcache extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function replace($key, $value, $options = []) {
+    public function replace($key, $value, $options = [])
+    {
         return $this->store($key, $value, $options);
     }
 
@@ -267,12 +275,13 @@ class Gdn_Memcache extends Gdn_Cache {
      * @param array $options
      * @return bool
      */
-    public function increment($key, $amount = 1, $options = []) {
+    public function increment($key, $amount = 1, $options = [])
+    {
         $finalOptions = array_merge($this->StoreDefaults, $options);
 
         $realKey = $this->makeKey($key, $finalOptions);
         $incremented = $this->memcache->increment($realKey, $amount);
-        return ($incremented !== false) ? $incremented : Gdn_Cache::CACHEOP_FAILURE;
+        return $incremented !== false ? $incremented : Gdn_Cache::CACHEOP_FAILURE;
     }
 
     /**
@@ -283,7 +292,8 @@ class Gdn_Memcache extends Gdn_Cache {
      * @param array $options
      * @return int
      */
-    public function decrement($key, $amount = 1, $options = []) {
+    public function decrement($key, $amount = 1, $options = [])
+    {
         $finalOptions = array_merge($this->StoreDefaults, $options);
 
         $realKey = $this->makeKey($key, $finalOptions);
@@ -295,7 +305,8 @@ class Gdn_Memcache extends Gdn_Cache {
      *
      * @return bool
      */
-    public function flush() {
+    public function flush()
+    {
         return $this->memcache->flush();
     }
 }

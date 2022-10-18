@@ -5,6 +5,7 @@
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
+$this->Form->setStyles('legacy');
 
 switch ($this->data('Mode')) {
    case 'set':

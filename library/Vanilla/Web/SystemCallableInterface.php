@@ -9,8 +9,8 @@ namespace Vanilla\Web;
 /**
  * Signal that this class has opted into System job calls.
  */
-interface SystemCallableInterface {
-
+interface SystemCallableInterface
+{
     /**
      * Get the array of system callable method names.
      *

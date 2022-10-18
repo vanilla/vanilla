@@ -19,8 +19,8 @@ use VanillaTests\TestInstallModel;
 /**
  * @method InternalClient api()
  */
-trait MockSiteTestTrait {
-
+trait MockSiteTestTrait
+{
     /** @var MockOwnSite */
     private $backupOwnSite;
 
@@ -39,37 +39,36 @@ trait MockSiteTestTrait {
     /**
      * @return bool
      */
-    public static function shouldUseCaching(): bool {
+    public static function shouldUseCaching(): bool
+    {
         return false;
     }
 
     /**
      * @param Container $container
      */
-    public static function configureContainerBeforeStartup(Container $container) {
+    public static function configureContainerBeforeStartup(Container $container)
+    {
         parent::configureContainerBeforeStartup($container);
         self::configureMockSiteContainer($container);
 
         // No caching of models.
-        $container->rule(\Gdn_Model::class)
-            ->setShared(false)
-        ;
-        $container->rule(Model::class)
-            ->setShared(false)
-        ;
+        $container->rule(\Gdn_Model::class)->setShared(false);
+        $container->rule(Model::class)->setShared(false);
     }
 
     /**
      * @param Container $container
      */
-    protected static function configureMockSiteContainer(Container $container) {
-        $container->rule(AbstractSiteProvider::class)
+    protected static function configureMockSiteContainer(Container $container)
+    {
+        $container
+            ->rule(AbstractSiteProvider::class)
             ->setClass(MockSiteProvider::class)
             ->setShared(true)
             ->rule(OwnSite::class)
             ->setClass(MockOwnSite::class)
-            ->setShared(true)
-        ;
+            ->setShared(true);
     }
 
     /**
@@ -82,10 +81,11 @@ trait MockSiteTestTrait {
      * @param array|Site $siteOrOverrides
      * @param callable $callable
      */
-    protected function runWithMockedSite($siteOrOverrides, callable $callable) {
+    protected function runWithMockedSite($siteOrOverrides, callable $callable)
+    {
         $site = $this->mockCurrentSite($siteOrOverrides);
 
-        $dbNameForSite = 'vanilla_test_node' . $site->getSiteID();
+        $dbNameForSite = "vanilla_test_node" . $site->getSiteID();
 
         $dbOffsetBase = max(1, $site->getSiteID());
         $dbOffset = $dbOffsetBase * 1000;
@@ -100,7 +100,8 @@ trait MockSiteTestTrait {
      *
      * @return Site
      */
-    protected function mockCurrentSite($siteOrOverrides): Site {
+    protected function mockCurrentSite($siteOrOverrides): Site
+    {
         $this->mockSiteCount++;
         $this->backupOwnSite();
         $ownSite = $this->getOwnSite();
@@ -109,11 +110,11 @@ trait MockSiteTestTrait {
             $site = $siteOrOverrides;
         } else {
             $site = new Site(
-                $siteOrOverrides['name'] ?? 'Mocked Site ' . $this->mockSiteCount,
-                $siteOrOverrides['webUrl'] ?? 'http://vanilla.localhost/node' . $this->mockSiteCount,
-                $siteOrOverrides['siteID'] ?? $this->mockSiteCount,
-                $siteOrOverrides['accountID'] = $ownSite->getAccountID(),
-                $siteOrOverrides['httpClient'] ?? $ownSite->getHttpClient()
+                $siteOrOverrides["name"] ?? "Mocked Site " . $this->mockSiteCount,
+                $siteOrOverrides["webUrl"] ?? "http://vanilla.localhost/node" . $this->mockSiteCount,
+                $siteOrOverrides["siteID"] ?? $this->mockSiteCount,
+                ($siteOrOverrides["accountID"] = $ownSite->getAccountID()),
+                $siteOrOverrides["httpClient"] ?? $ownSite->getHttpClient()
             );
         }
 
@@ -124,14 +125,16 @@ trait MockSiteTestTrait {
     /**
      * Backup the current own site.
      */
-    protected function backupOwnSite() {
+    protected function backupOwnSite()
+    {
         $this->backupOwnSite = clone $this->getOwnSite();
     }
 
     /**
      * @return Site
      */
-    protected function restoreOwnSite(): Site {
+    protected function restoreOwnSite(): Site
+    {
         $backup = $this->backupOwnSite;
         $this->backupOwnSite = null;
 
@@ -143,7 +146,8 @@ trait MockSiteTestTrait {
     /**
      * @return MockOwnSite
      */
-    protected function getOwnSite(): MockOwnSite {
+    protected function getOwnSite(): MockOwnSite
+    {
         return $this->container()->get(OwnSite::class);
     }
 
@@ -154,9 +158,10 @@ trait MockSiteTestTrait {
      * @param int $dbOffset A database offset to apply for auto-incrementing keys.
      * @param callable $callable The callable to exucute with the new DB.
      */
-    private function runWithDB(string $newDbName, int $dbOffset, callable $callable) {
+    private function runWithDB(string $newDbName, int $dbOffset, callable $callable)
+    {
         $config = \Gdn::config();
-        $previousDbName = $config->get('Database.Name');
+        $previousDbName = $config->get("Database.Name");
         $previousUserID = \Gdn::session()->UserID;
 
         // Make the new database.
@@ -191,14 +196,15 @@ trait MockSiteTestTrait {
      *
      * @param int $offset The offest to use.
      */
-    protected function applyAutoIncrementingOffset(int $offset) {
+    protected function applyAutoIncrementingOffset(int $offset)
+    {
         $database = \Gdn::database();
-        $tables = $database->query('show table status')->resultArray();
-        $tableNames = array_column($tables, 'Name');
+        $tables = $database->query("show table status")->resultArray();
+        $tableNames = array_column($tables, "Name");
 
         // Maximum offset value.
         if ($offset > 1000000000) {
-            $offset = min(1000000, $offset) + $offset % 10;
+            $offset = min(1000000, $offset) + ($offset % 10);
         }
 
         foreach ($tableNames as $tableName) {
@@ -212,7 +218,8 @@ trait MockSiteTestTrait {
      * @param string $dbName
      * @param bool $makeFreshInstance Ensure the database is freshly created.
      */
-    private function switchDatabases(string $dbName, bool $makeFreshInstance = false) {
+    private function switchDatabases(string $dbName, bool $makeFreshInstance = false)
+    {
         $db = \Gdn::database();
         $config = \Gdn::config();
 
@@ -225,7 +232,7 @@ trait MockSiteTestTrait {
         }
 
         $db->closeConnection();
-        $config->saveToConfig('Database.Name', $dbName);
+        $config->saveToConfig("Database.Name", $dbName);
         $db->init();
         TestInstallModel::clearMemoryCaches();
         \Gdn::cache()->flush();

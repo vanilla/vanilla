@@ -3,8 +3,10 @@
  * @license Proprietary
  */
 
-import { ISearchForm, ISearchResults, ISearchSource } from "@library/search/searchTypes";
+import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { ISearchForm, ISearchResponse, ISearchSource } from "@library/search/searchTypes";
 import { getSiteSection } from "@library/utility/appUtils";
+import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
 import { RecordID } from "@vanilla/utils";
 
 interface ITrackedSearchSource {
@@ -20,9 +22,9 @@ export interface IResultAnalyticsData {
     title: string;
     author: { authorID: RecordID[]; authorName: string[] };
     recordType: string[];
-    tag: { tagID: number[]; tagName: string[] };
-    category: { categoryID: number[]; categoryName: string[] };
-    kb: { kbID: number | null; kbName: string };
+    tag: { tagID: RecordID[]; tagName: string[] };
+    category: { categoryID: RecordID[]; categoryName: string[] };
+    kb: { kbID: RecordID | null; kbName: string };
     siteSection: object;
     source?: ITrackedSearchSource;
 }
@@ -105,16 +107,20 @@ export const splitSearchTerms = (query: string): ISplitSearchTerms => {
  * Get structured data for search analytics
  */
 export const getSearchAnalyticsData = (
-    form: ISearchForm,
-    results: ISearchResults,
+    form: ISearchForm<
+        ICommunitySearchTypes & {
+            knowledgeBaseOption?: IComboBoxOption; //fixme: Knowledge should add this dynamically
+        }
+    >,
+    response: ISearchResponse,
     searchSource?: ITrackedSearchSource,
 ): IResultAnalyticsData => {
     const resultsWithAnalyticsData: IResultAnalyticsData = {
         type: "search",
         domain: form.domain,
-        searchResults: results.pagination.total ?? -1,
+        searchResults: response.pagination.total ?? -1,
         searchQuery: splitSearchTerms(form.query),
-        page: results.pagination?.currentPage ?? -1,
+        page: response.pagination?.currentPage ?? -1,
         title: form.name ?? "",
         author: {
             authorID: [],

@@ -24,6 +24,7 @@ interface IProps {
 
     // Common props.
     label: string;
+    tooltip?: string;
     description?: React.ReactNode;
     imageUploader?: typeof uploadFile;
     disabled?: boolean;
@@ -47,7 +48,9 @@ export function DashboardImageUploadGroup(props: IProps) {
     return (
         <>
             <DashboardFormGroup
+                inputType="upload"
                 label={props.label}
+                tooltip={props.tooltip}
                 description={props.description}
                 afterDescription={
                     imagePreviewSrc && (

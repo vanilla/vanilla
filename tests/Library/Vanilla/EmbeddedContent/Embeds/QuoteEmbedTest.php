@@ -20,7 +20,8 @@ use VanillaTests\Fixtures\EmbeddedContent\LegacyEmbedFixtures;
 /**
  * Test for the individual linkembed.
  */
-class QuoteEmbedTest extends MinimalContainerTestCase {
+class QuoteEmbedTest extends MinimalContainerTestCase
+{
     use HtmlNormalizeTrait;
 
     /** @var \Gdn_Configuration */
@@ -29,12 +30,13 @@ class QuoteEmbedTest extends MinimalContainerTestCase {
     /**
      * Setup.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $container = \Gdn::getContainer();
-        $container->rule(FormatService::class)
-            ->addCall('registerFormat', [RichFormat::FORMAT_KEY, $container->get(RichFormat::class)]);
-
+        $container
+            ->rule(FormatService::class)
+            ->addCall("registerFormat", [RichFormat::FORMAT_KEY, $container->get(RichFormat::class)]);
 
         self::$config = $container->get(\Gdn_Configuration::class);
     }
@@ -43,7 +45,8 @@ class QuoteEmbedTest extends MinimalContainerTestCase {
      * Ensure we can create discussion embed from the old data format that might still
      * live in the DB.
      */
-    public function testLegacyDiscussionFormat() {
+    public function testLegacyDiscussionFormat()
+    {
         $oldData = json_decode(LegacyEmbedFixtures::discussion(), true);
         // This should not throw any exception.
         $dataEmbed = new QuoteEmbed($oldData);
@@ -54,7 +57,8 @@ class QuoteEmbedTest extends MinimalContainerTestCase {
      * Ensure we can create a comment embed from the old data format that might still
      * live in the DB.
      */
-    public function testLegactCommentFormat() {
+    public function testLegactCommentFormat()
+    {
         $oldData = json_decode(LegacyEmbedFixtures::discussion(), true);
         // This should not throw any exception.
         $dataEmbed = new QuoteEmbed($oldData);
@@ -64,13 +68,14 @@ class QuoteEmbedTest extends MinimalContainerTestCase {
     /**
      * Test QuoteEmbed->normalizeData() with displayOptions set by the config
      */
-    public function testQuoteEmbedNormalizeDataWithConfig(): void {
+    public function testQuoteEmbedNormalizeDataWithConfig(): void
+    {
         $config = [
-            'showCompactUserInfo' => true,
+            "showCompactUserInfo" => true,
         ];
 
         //set config
-        self::$config->set('embed.quote.displayOptions.comment', $config, true, false);
+        self::$config->set("embed.quote.displayOptions.comment", $config, true, false);
 
         //generate quote
         /** @var QuoteEmbedFilter $filter */
@@ -78,7 +83,7 @@ class QuoteEmbedTest extends MinimalContainerTestCase {
         $quoteEmbed = new QuoteEmbed(EmbedFixtures::comment("commentUser"));
         $quoteEmbed = $filter->filterEmbed($quoteEmbed);
         /** @var QuoteEmbedDisplayOptions $displayOptions */
-        $displayOptions = $quoteEmbed->getData()['displayOptions'];
+        $displayOptions = $quoteEmbed->getData()["displayOptions"];
 
         //assert that the displayOptions match the $config
         $this->assertTrue($displayOptions->isShowCompactUserInfo());

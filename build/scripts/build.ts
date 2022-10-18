@@ -29,7 +29,7 @@ void getOptions().then(async (options) => {
             });
         dirs.push(path.join(VANILLA_ROOT, "js/**/*.js"));
 
-        await spawnChildProcess("yarn", ["es-check", "es5", ...dirs], {
+        await spawnChildProcess("yarn", ["es-check", "es7", ...dirs], {
             stdio: "inherit",
         }).catch((e) => {
             process.exit(1);

@@ -12,14 +12,15 @@ use Vanilla\Cli\Utils\ShellProfile;
 /**
  * Exception if someone tries a shell operation that wasn't supported.
  */
-class UnsupportedShellException extends \Exception {
-
+class UnsupportedShellException extends \Exception
+{
     /**
      * Constructor.
      *
      * @param string $shell The name of the unsupported shell.
      */
-    public function __construct(string $shell) {
+    public function __construct(string $shell)
+    {
         $msg = "Unsupported shell '$shell'. Expected one of:\n";
         $msg .= implode(", ", ShellProfile::SUPPORTED_SHELLS);
         parent::__construct($msg, 500);

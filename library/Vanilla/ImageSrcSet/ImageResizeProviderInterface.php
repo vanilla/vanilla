@@ -10,7 +10,8 @@ namespace Vanilla\ImageSrcSet;
 /**
  * Implementable interface to provide a resized image url.
  */
-interface ImageResizeProviderInterface {
+interface ImageResizeProviderInterface
+{
     /**
      * Returns a resized image URL.
      *

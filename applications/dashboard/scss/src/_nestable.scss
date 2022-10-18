@@ -53,59 +53,59 @@
 
 .nestable-list,
 .nestable-dragel {
-  @include list-reset();
+    @include list-reset();
 }
 
 .nestable-item .nestable-item,
 .nestable-item .nestable-placeholder {
-  margin-left: 30px;
+    margin-left: 30px;
 }
 
 .nestable-item,
 .nestable-empty,
 .nestable-placeholder {
-  display: block;
-  position: relative;
-  margin: 0 0 6px;
-  padding: 0;
+    display: block;
+    position: relative;
+    margin: 0 0 6px;
+    padding: 0;
 }
 
 // Placeholder positions or empty positions.
 .nestable-empty,
 .nestable-placeholder {
-  background: #f1faff;
-  border: $border-width dashed #0291db;
-  cursor: grabbing;
+    background: #f1faff;
+    border: $border-width dashed #0291db;
+    cursor: grabbing;
 }
 
 // Collapse button.
 .nestable-collapse {
-  position: absolute;
-  display: block;
-  width: 20px;
-  height: $control-height;
-  left: 36px;
+    position: absolute;
+    display: block;
+    width: 20px;
+    height: $control-height;
+    left: 36px;
 }
 
 // The section of the item that you can click on to reorder it.
 .nestable-handle {
-  position: absolute;
-  display: block;
-  width: $control-height;
-  height: $control-height;
-  cursor: move;
-  cursor: grab;
+    position: absolute;
+    display: block;
+    width: $control-height;
+    height: $control-height;
+    cursor: move;
+    cursor: grab;
 }
 
 // The floating preview during reordering.
 .nestable-dragel {
-  position: absolute;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: .8;
-  cursor: grabbing;
+    position: absolute;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.8;
+    cursor: grabbing;
 }
 
 .nestable-content {
-  margin-bottom: 6px;
+    margin-bottom: 6px;
 }

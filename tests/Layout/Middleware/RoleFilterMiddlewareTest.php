@@ -14,8 +14,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Tests for our middleware filters.
  */
-class RoleFilterMiddlewareTest extends SiteTestCase {
-
+class RoleFilterMiddlewareTest extends SiteTestCase
+{
     use UsersAndRolesApiTestTrait;
 
     /** @var $hydrator */
@@ -30,133 +30,137 @@ class RoleFilterMiddlewareTest extends SiteTestCase {
      *
      * @dataProvider provideMiddlewareFiltersTo
      */
-    public function testLayoutHydratesTo(array $input, array $expected, array $params = []) {
-            $user = $this->createUser();
-            $this->runWithUser(function () use ($input, $params, $expected) {
-                $this->hydrator = self::getLayoutService()->getHydrator('home');
-                $actual = $this->hydrator->resolve($input, $params);
-                // Make sure we see it as the API output would.
-                $actual = json_decode(json_encode($actual), true);
-                $this->assertSame($expected, $actual);
-            }, $this->lastUserID);
+    public function testLayoutHydratesTo(array $input, array $expected, array $params = [])
+    {
+        $user = $this->createUser();
+        $this->runWithUser(function () use ($input, $params, $expected) {
+            $this->hydrator = self::getLayoutService()->getHydrator("home");
+            $actual = $this->hydrator->resolve($input, $params);
+            // Make sure we see it as the API output would.
+            $actual = json_decode(json_encode($actual), true);
+            $this->assertSame($expected, $actual);
+        }, $this->lastUserID);
     }
 
     /**
      * @return iterable
      */
-    public function provideMiddlewareFiltersTo(): iterable {
+    public function provideMiddlewareFiltersTo(): iterable
+    {
         $roleMiddlewareDefinitionFail = [
             '$middleware' => [
                 "role-filter" => [
-                    "roleIDs" => [1]
-                ]
-            ]
+                    "roleIDs" => [1],
+                ],
+            ],
         ];
 
         yield "Fail to resolve node when role filter fails " => [
             [
                 "layoutViewType" => "home",
-                "layout" => [[
-                    "data" => [
-                        '$hydrate' => "sprintf",
-                        "format" => "not %s args",
-                        "args" => ["resolved"]
+                "layout" => [
+                    [
+                        "data" => [
+                            '$hydrate' => "sprintf",
+                            "format" => "not %s args",
+                            "args" => ["resolved"],
+                        ],
+                        $roleMiddlewareDefinitionFail,
                     ],
-                    $roleMiddlewareDefinitionFail
-                ]]
+                ],
             ],
             [
                 "layoutViewType" => "home",
                 "layout" => [
                     [
                         "data" => "not resolved args",
-                        0 => null // this indicates we have a null node returned
-                    ]
-                ]
+                        0 => null, // this indicates we have a null node returned
+                    ],
+                ],
             ],
-            [
-                [1]
-            ]
+            [[1]],
         ];
 
         $roleMiddlewareDefinitionPass = [
             '$middleware' => [
                 "role-filter" => [
-                    "roleIDs" => [8]
-                ]
-            ]
+                    "roleIDs" => [8],
+                ],
+            ],
         ];
 
         yield "Success resolving node when role filter passes " => [
             [
                 "layoutViewType" => "home",
-                "layout" => [[
-                    "data" => [
-                        '$hydrate' => "sprintf",
-                        "format" => "is %s args",
-                        "args" => ["resolved"]
+                "layout" => [
+                    [
+                        "data" => [
+                            '$hydrate' => "sprintf",
+                            "format" => "is %s args",
+                            "args" => ["resolved"],
+                        ],
+                        $roleMiddlewareDefinitionPass,
                     ],
-                    $roleMiddlewareDefinitionPass
-                ]]
+                ],
             ],
             [
                 "layoutViewType" => "home",
                 "layout" => [
                     [
                         "data" => "is resolved args",
-                        0 => [] //not null is successful node response
-                    ]
-                ]
+                        0 => [], //not null is successful node response
+                    ],
+                ],
             ],
-            [
-                [16]
-            ]
+            [[16]],
         ];
 
-        $permissions = ['noAds.use' => true];
+        $permissions = ["noAds.use" => true];
 
         yield "Success resolving node when user has doesn't have noAds.use permission " => [
             [
                 "layoutViewType" => "home",
-                "layout" => [[
-                    "data" => [
-                        "mainTop"=> [
-                            [
-                                '$hydrate' => "react.html",
-                                "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
-                                'isAdvertisement' => true
-                            ]],
+                "layout" => [
+                    [
+                        "data" => [
+                            "mainTop" => [
+                                [
+                                    "isAdvertisement" => true,
+                                    '$hydrate' => "react.html",
+                                    "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                                ],
+                            ],
+                        ],
                     ],
-                ]]
+                ],
             ],
             [
                 "layoutViewType" => "home",
                 "layout" => [
                     [
-                        'data' => [
-                            'mainTop' => [
-                                0 => [
-                                '$reactComponent' => 'HtmlWidget',
-                                '$reactProps' => [
-                                    'html' => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
-                                    'isAdvertisement' => true
-                                 ]
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
+                        "data" => [
+                            "mainTop" => [
+                                [
+                                    '$reactComponent' => "HtmlWidget",
+                                    '$reactProps' => [
+                                        "isAdvertisement" => true,
+                                        "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
             ],
-            [
-                [16]
-            ]
+            [[16]],
         ];
     }
 
     /**
      * @return LayoutHydrator
      */
-    private function getLayoutService(): LayoutHydrator {
+    private function getLayoutService(): LayoutHydrator
+    {
         return self::container()->get(LayoutHydrator::class);
     }
 }

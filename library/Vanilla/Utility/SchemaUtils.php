@@ -16,7 +16,8 @@ use Garden\Schema\ValidationField;
 /**
  * Utility functions useful for schemas.
  */
-final class SchemaUtils {
+final class SchemaUtils
+{
     /**
      * Return a validation function that will require only N keys be specified in an array.
      *
@@ -24,7 +25,8 @@ final class SchemaUtils {
      * @param int $count
      * @return callable
      */
-    public static function onlyOneOf(array $properties, int $count = 1): callable {
+    public static function onlyOneOf(array $properties, int $count = 1): callable
+    {
         return function ($value, ValidationField $field) use ($properties, $count) {
             if (!ArrayUtils::isArray($value)) {
                 return $value;
@@ -37,15 +39,15 @@ final class SchemaUtils {
             }
             if (count($has) > $count) {
                 if ($count === 1) {
-                    $message = 'Only one of {properties} are allowed.';
+                    $message = "Only one of {properties} are allowed.";
                 } else {
-                    $message = 'Only {count} of {properties} are allowed.';
+                    $message = "Only {count} of {properties} are allowed.";
                 }
 
-                $field->addError('onlyOneOf', [
-                    'messageCode' => $message,
-                    'properties' => $properties,
-                    'count' => $count
+                $field->addError("onlyOneOf", [
+                    "messageCode" => $message,
+                    "properties" => $properties,
+                    "count" => $count,
                 ]);
                 return Invalid::value();
             }
@@ -64,7 +66,8 @@ final class SchemaUtils {
      * @param Schema $schema The schema to validate against.
      * @param bool $sparse Whether or not to do a sparse validation.
      */
-    public static function validateArray(&$array, Schema $schema, bool $sparse = false) {
+    public static function validateArray(&$array, Schema $schema, bool $sparse = false)
+    {
         if (!is_array($array)) {
             // This should throw an appropriate validation error.
             $schema->validate($array, $sparse);
@@ -73,7 +76,7 @@ final class SchemaUtils {
         /** @var Validation $validation */
         $validationClass = $schema->getValidationClass();
         if (is_string($validationClass)) {
-            $validation = new $validationClass;
+            $validation = new $validationClass();
         } else {
             $validation = $validationClass;
         }
@@ -97,7 +100,8 @@ final class SchemaUtils {
      * @param Schema[] $schemas
      * @return Schema
      */
-    public static function composeSchemas(...$schemas): Schema {
+    public static function composeSchemas(...$schemas): Schema
+    {
         $accumulator = new Schema();
         foreach ($schemas as $schema) {
             $accumulator = $accumulator->merge($schema);
@@ -115,7 +119,8 @@ final class SchemaUtils {
      * @param string $joinCharacter
      * @return Schema
      */
-    public static function flattenSchema(Schema $schema, string $joinCharacter): Schema {
+    public static function flattenSchema(Schema $schema, string $joinCharacter): Schema
+    {
         $newProperties = [];
         $newRequired = [];
 
@@ -127,24 +132,22 @@ final class SchemaUtils {
          * @param bool $isRequired
          * @return void
          */
-        $flattenInternal = function (
-            string $schemaPath,
-            $schemaArray,
-            bool $isRequired = false
-        ) use (
+        $flattenInternal = function (string $schemaPath, $schemaArray, bool $isRequired = false) use (
             &$newProperties,
             &$newRequired,
             $joinCharacter,
             &$flattenInternal
         ) {
-            $type = $schemaArray['type'] ?? null;
-            $properties = $schemaArray['properties'] ?? null;
-            $requiredProperties = $schemaArray['required'] ?? [];
+            $type = $schemaArray["type"] ?? null;
+            $properties = $schemaArray["properties"] ?? null;
+            $requiredProperties = $schemaArray["required"] ?? [];
 
-            if ($type === 'object' && $properties !== null) {
+            if ($type === "object" && $properties !== null) {
                 foreach ($properties as $propertyName => $propertySchema) {
                     $isPropertyRequired = $isRequired && in_array($propertyName, $requiredProperties);
-                    $fullPropertyPath = empty($schemaPath) ? $propertyName : "{$schemaPath}{$joinCharacter}{$propertyName}";
+                    $fullPropertyPath = empty($schemaPath)
+                        ? $propertyName
+                        : "{$schemaPath}{$joinCharacter}{$propertyName}";
                     $flattenInternal($fullPropertyPath, $propertySchema, $isPropertyRequired);
                 }
             } else {
@@ -155,11 +158,11 @@ final class SchemaUtils {
             }
         };
 
-        $flattenInternal('', $schema, true);
+        $flattenInternal("", $schema, true);
         $newSchema = new Schema([
-            'type' => 'object',
-            'properties' => $newProperties,
-            'required' => $newRequired,
+            "type" => "object",
+            "properties" => $newProperties,
+            "required" => $newRequired,
         ]);
         return $newSchema;
     }

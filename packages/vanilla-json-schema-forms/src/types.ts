@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 
+import { InputSize } from "@vanilla/ui/src/types";
 import { JSONSchemaType } from "ajv";
 import { ErrorObject } from "ajv/dist/core";
 import { SomeJSONSchema } from "ajv/dist/types/json-schema";
@@ -13,6 +14,9 @@ export type Path = Array<string | number>;
 
 export interface ICommonControl {
     label?: string;
+    labelType?: string;
+    tooltip?: string;
+    disabledNote?: string;
     description?: string;
     placeholder?: string;
     conditions?: Condition[];
@@ -36,6 +40,7 @@ interface ICheckBoxControl extends ICommonControl {
 interface IDropdownControl extends ICommonControl {
     inputType: "dropDown";
     choices: IChoices;
+    multiple?: boolean;
 }
 
 interface IRadioControl extends ICommonControl {
@@ -60,6 +65,12 @@ export interface ITabsControl extends ICommonControl {
     choices: IChoices;
 }
 
+export interface IColorControl extends ICommonControl {
+    inputType: "color";
+    type?: string;
+    defaultBackground?: string;
+}
+
 export interface ISchemaTab {
     id: string;
     label: string;
@@ -78,6 +89,7 @@ export type IFormControl =
     | ICheckBoxControl
     | ICodeBoxControl
     | ITabsControl
+    | IColorControl
     | ICustomControl;
 
 export type IFormControlType = IFormControl["inputType"];
@@ -130,6 +142,9 @@ export interface IControlProps extends IBaseSchemaFormProps {
     required?: boolean;
     disabled?: boolean;
     onChange(instance: any): void;
+    onBlur?(): void;
+    size?: InputSize;
+    autocompleteClassName?: string;
 }
 
 export interface IValidationResult {
@@ -143,6 +158,7 @@ export interface ISchemaRenderProps {
     FormSection?: React.ComponentType<ISectionProps>;
     FormTabs?: React.ComponentType<ITabsProps>;
     FormControl?: React.ComponentType<IControlProps>;
+    FormGroupWrapper?: React.ComponentType<React.PropsWithChildren<{ groupName?: string; header?: string }>>;
 }
 
 export interface IPtrReference {

@@ -14,8 +14,8 @@ use Vanilla\Http\InternalClient;
 /**
  * Local job for with access to an internal http client.
  */
-abstract class LocalApiJob implements LocalJobInterface, InjectableInterface {
-
+abstract class LocalApiJob implements LocalJobInterface, InjectableInterface
+{
     /** @var InternalClient */
     protected $vanillaClient;
 
@@ -24,10 +24,10 @@ abstract class LocalApiJob implements LocalJobInterface, InjectableInterface {
      *
      * @param InternalClient $internalClient
      */
-    public function setDependencies(InternalClient $internalClient) {
-
+    public function setDependencies(InternalClient $internalClient)
+    {
         // Make an internal http client.
-        $internalClient->setBaseUrl('');
+        $internalClient->setBaseUrl("");
         $internalClient->setThrowExceptions(true);
         $this->vanillaClient = $internalClient;
     }

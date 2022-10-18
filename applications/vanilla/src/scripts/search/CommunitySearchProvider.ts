@@ -7,12 +7,10 @@ import { ISearchOptionProvider } from "@library/contexts/SearchContext";
 import { formatUrl } from "@library/utility/appUtils";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { ISearchOptionData } from "@library/features/search/SearchOption";
-import { AxiosResponse } from "axios";
-import apiv2 from "@library/apiv2";
 import qs from "qs";
 import pDebounce from "p-debounce";
-import { NEW_SEARCH_PAGE_ENABLED } from "@library/search/searchConstants";
-import { ISearchRequestQuery, ISearchResult } from "@library/search/searchTypes";
+import { ALL_CONTENT_DOMAIN_NAME, NEW_SEARCH_PAGE_ENABLED } from "@library/search/searchConstants";
+import { ISearchRequestQuery } from "@library/search/searchTypes";
 import { SearchService } from "@library/search/SearchService";
 
 /**
@@ -26,6 +24,7 @@ export class CommunitySearchProvider implements ISearchOptionProvider {
      */
     private fetchSearch = async (value: string, options = {}): Promise<Array<IComboBoxOption<ISearchOptionData>>> => {
         const queryObj: ISearchRequestQuery = {
+            domain: ALL_CONTENT_DOMAIN_NAME,
             query: value,
             expand: ["breadcrumbs", "-body"],
             limit: Math.floor(10 / SearchService.pluggableSources.length),

@@ -19,7 +19,8 @@ use VanillaTests\SiteTestCase;
  *
  * @package VanillaTests\Library\Core
  */
-class Gdn_ThemeTest extends SiteTestCase {
+class Gdn_ThemeTest extends SiteTestCase
+{
     use CommunityApiTestTrait;
 
     /**
@@ -30,7 +31,8 @@ class Gdn_ThemeTest extends SiteTestCase {
     /**
      * Set site section provider.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         /** @var MockSiteSectionProvider $siteSectionProvider */
         $this->siteSectionProvider = self::container()->get(MockSiteSectionProvider::class);
@@ -44,27 +46,28 @@ class Gdn_ThemeTest extends SiteTestCase {
      *
      * @return array[]
      */
-    public function breadcrumbsProviderDiscussions(): array {
+    public function breadcrumbsProviderDiscussions(): array
+    {
         return [
-            'with discussions as defaultController  on discussions page' => [
-                'defaultController' => 'discussions',
-                'on' => [
-                    'page' => '/discussions',
-                    'breadcrumbs' => ['Home'],
+            "with discussions as defaultController  on discussions page" => [
+                "defaultController" => "discussions",
+                "on" => [
+                    "page" => "/discussions",
+                    "breadcrumbs" => ["Home"],
                 ],
             ],
-            'with discussions as defaultController  on categories page' => [
-                'defaultController' => 'discussions',
-                'on' => [
-                    'page' => '/categories',
-                    'breadcrumbs' => ['Home'],
+            "with discussions as defaultController  on categories page" => [
+                "defaultController" => "discussions",
+                "on" => [
+                    "page" => "/categories",
+                    "breadcrumbs" => ["Home"],
                 ],
             ],
-            'with discussions as defaultController  on sub categories page' => [
-                'defaultController' => 'discussions',
-                'on' => [
-                    'page' => '/categories/{category2.urlcode}',
-                    'breadcrumbs' => ['Home', '{category1.name}', '{category2.name}'],
+            "with discussions as defaultController  on sub categories page" => [
+                "defaultController" => "discussions",
+                "on" => [
+                    "page" => "/categories/{category2.urlcode}",
+                    "breadcrumbs" => ["Home", "{category1.name}", "{category2.name}"],
                 ],
             ],
         ];
@@ -75,27 +78,28 @@ class Gdn_ThemeTest extends SiteTestCase {
      *
      * @return array[]
      */
-    public function breadcrumbsProviderCategories(): array {
+    public function breadcrumbsProviderCategories(): array
+    {
         return [
-            'with categories as defaultController  on discussions page' => [
-                'defaultController' => 'categories',
-                'on' => [
-                    'page' => '/discussions',
-                    'breadcrumbs' => ['Home', 'Recent Discussions'],
+            "with categories as defaultController  on discussions page" => [
+                "defaultController" => "categories",
+                "on" => [
+                    "page" => "/discussions",
+                    "breadcrumbs" => ["Home", "Recent Discussions"],
                 ],
             ],
-            'with categories as defaultController  on categories page' => [
-                'defaultController' => 'categories',
-                'on' => [
-                    'page' => '/categories',
-                    'breadcrumbs' => ['Home'],
+            "with categories as defaultController  on categories page" => [
+                "defaultController" => "categories",
+                "on" => [
+                    "page" => "/categories",
+                    "breadcrumbs" => ["Home"],
                 ],
             ],
-            'with categories as defaultController  on sub categories page' => [
-                'defaultController' => 'categories',
-                'on' => [
-                    'page' => '/categories/{category2.urlcode}',
-                    'breadcrumbs' => ['Home', '{category1.name}', '{category2.name}'],
+            "with categories as defaultController  on sub categories page" => [
+                "defaultController" => "categories",
+                "on" => [
+                    "page" => "/categories/{category2.urlcode}",
+                    "breadcrumbs" => ["Home", "{category1.name}", "{category2.name}"],
                 ],
             ],
         ];
@@ -106,20 +110,21 @@ class Gdn_ThemeTest extends SiteTestCase {
      *
      * @return array[]
      */
-    public function breadcrumbsProviderHome(): array {
+    public function breadcrumbsProviderHome(): array
+    {
         return [
-            'with discussions as defaultController  on home page' => [
-                'defaultController' => 'discussions',
-                'on' => [
-                    'page' => '/',
-                    'breadcrumbs' => [],
+            "with discussions as defaultController  on home page" => [
+                "defaultController" => "discussions",
+                "on" => [
+                    "page" => "/",
+                    "breadcrumbs" => [],
                 ],
             ],
-            'with categories as defaultController  on home page' => [
-                'defaultController' => 'categories',
-                'on' => [
-                    'page' => '/',
-                    'breadcrumbs' => [],
+            "with categories as defaultController  on home page" => [
+                "defaultController" => "categories",
+                "on" => [
+                    "page" => "/",
+                    "breadcrumbs" => [],
                 ],
             ],
         ];
@@ -133,28 +138,31 @@ class Gdn_ThemeTest extends SiteTestCase {
      * @dataProvider breadcrumbsProviderDiscussions
      * @dataProvider breadcrumbsProviderCategories
      */
-    public function testBreadcrumbsOnPage(string $defaultController, array $items): void {
-
+    public function testBreadcrumbsOnPage(string $defaultController, array $items): void
+    {
         $category1 = $this->createCategory();
-        $category2 = $this->createCategory(['parentCategoryID' => $category1['categoryID']]);
+        $category2 = $this->createCategory(["parentCategoryID" => $category1["categoryID"]]);
         /** @var \Gdn_Router $router */
         $router = self::container()->get(\Gdn_Router::class);
-        $defaultSection = new DefaultSiteSection(new MockConfig([
-            'Routes.DefaultController' => [$defaultController, 'Internal'],
-        ]), $router);
+        $defaultSection = new DefaultSiteSection(
+            new MockConfig([
+                "Routes.DefaultController" => [$defaultController, "Internal"],
+            ]),
+            $router
+        );
         $this->siteSectionProvider->setCurrentSiteSection($defaultSection);
         $values = [
-            '{category1.name}' => $category1['name'],
-            '{category1.urlcode}' => $category1['urlcode'],
-            '{category2.name}' => $category2['name'],
-            '{category2.urlcode}' => $category2['urlcode'],
+            "{category1.name}" => $category1["name"],
+            "{category1.urlcode}" => $category1["urlcode"],
+            "{category2.name}" => $category2["name"],
+            "{category2.urlcode}" => $category2["urlcode"],
         ];
-        $page = str_replace(array_keys($values), array_values($values), $items['page']);
+        $page = str_replace(array_keys($values), array_values($values), $items["page"]);
         $nodes = $this->bessy()
-            ->getHtml($page, [], ['deliveryType' => DELIVERY_TYPE_ALL])
-            ->queryCssSelector('.Breadcrumbs .CrumbLabel');
-        $this->assertEquals(count($items['breadcrumbs']), $nodes->length);
-        foreach ($items['breadcrumbs'] as $key => $crumbLabel) {
+            ->getHtml($page, [], ["deliveryType" => DELIVERY_TYPE_ALL])
+            ->queryCssSelector(".Breadcrumbs .CrumbLabel");
+        $this->assertEquals(count($items["breadcrumbs"]), $nodes->length);
+        foreach ($items["breadcrumbs"] as $key => $crumbLabel) {
             $crumbLabel = str_replace(array_keys($values), array_values($values), $crumbLabel);
             $this->assertEquals($crumbLabel, $nodes->item($key)->nodeValue);
         }
@@ -167,15 +175,19 @@ class Gdn_ThemeTest extends SiteTestCase {
      * @param array $items
      * @dataProvider breadcrumbsProviderHome
      */
-    public function testBreadcrumbsOnHomepage(string $defaultController, array $items): void {
+    public function testBreadcrumbsOnHomepage(string $defaultController, array $items): void
+    {
         /** @var \Gdn_Router $router */
         $router = self::container()->get(\Gdn_Router::class);
-        $defaultSection = new DefaultSiteSection(new MockConfig([
-            'Routes.DefaultController' => [$defaultController, 'Internal'],
-        ]), $router);
+        $defaultSection = new DefaultSiteSection(
+            new MockConfig([
+                "Routes.DefaultController" => [$defaultController, "Internal"],
+            ]),
+            $router
+        );
         $this->siteSectionProvider->setCurrentSiteSection($defaultSection);
         $this->bessy()
-            ->getHtml($items['page'], [], ['deliveryType' => DELIVERY_TYPE_ALL])
-            ->assertCssSelectorNotExists('.Breadcrumbs');
+            ->getHtml($items["page"], [], ["deliveryType" => DELIVERY_TYPE_ALL])
+            ->assertCssSelectorNotExists(".Breadcrumbs");
     }
 }

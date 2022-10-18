@@ -15,8 +15,8 @@ use Vanilla\Web\JsInterpop\ReduxActionProviderInterface;
 /**
  * Page preloader for dashboard menus data.
  */
-class DashboardPreloadProvider implements ReduxActionProviderInterface {
-
+class DashboardPreloadProvider implements ReduxActionProviderInterface
+{
     /** @var DashboardApiController */
     private $dashboardApi;
 
@@ -25,21 +25,17 @@ class DashboardPreloadProvider implements ReduxActionProviderInterface {
      *
      * @param DashboardApiController $dashboardApi
      */
-    public function __construct(DashboardApiController $dashboardApi) {
+    public function __construct(DashboardApiController $dashboardApi)
+    {
         $this->dashboardApi = $dashboardApi;
     }
 
     /**
      * @inheridoc
      */
-    public function createActions(): array {
+    public function createActions(): array
+    {
         $menus = $this->dashboardApi->index_menus();
-        return [
-            new ReduxAction(
-                '@@dashboardsections/fetchDashboardSections/fulfilled',
-                Data::box($menus),
-                []
-            )
-        ];
+        return [new ReduxAction("@@dashboardsections/fetchDashboardSections/fulfilled", Data::box($menus), [])];
     }
 }

@@ -10,6 +10,7 @@ import { flyoutPosition } from "@rich-editor/flyouts/pieces/flyoutPosition";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { TabHandler } from "@vanilla/dom-utils";
 import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";
+import { StackingContextProvider } from "@vanilla/react-utils";
 
 export interface IProps {
     id: string;
@@ -50,29 +51,31 @@ export default class DropDownContents extends React.Component<IProps> {
         }
 
         return (
-            <PageBoxDepthContextProvider depth={3}>
-                <div
-                    ref={this.props.contentRef}
-                    id={this.props.id}
-                    className={classNames(asDropDownClasses, asModalClasses, this.props.className, {
-                        [classes.verticalPadding]: !this.props.selfPadded,
-                        [classes.contentOffsetCenter]: this.props.renderCenter,
-                        [classes.contentOffsetLeft]: this.props.horizontalOffset && this.props.renderLeft,
-                        [classes.contentOffsetRight]: this.props.horizontalOffset && !this.props.renderLeft,
-                    })}
-                    style={flyoutPosition(
-                        this.props.renderAbove,
-                        this.props.renderLeft,
-                        !!this.props.legacyMode,
-                        this.props.renderCenter,
-                    )}
-                    onClick={this.doNothing}
-                    tabIndex={-1}
-                    onMouseDown={this.forceTryFocus}
-                >
-                    {this.props.children}
-                </div>
-            </PageBoxDepthContextProvider>
+            <StackingContextProvider>
+                <PageBoxDepthContextProvider depth={3}>
+                    <div
+                        ref={this.props.contentRef}
+                        id={this.props.id}
+                        className={classNames(asDropDownClasses, asModalClasses, this.props.className, {
+                            [classes.verticalPadding]: !this.props.selfPadded,
+                            [classes.contentOffsetCenter]: this.props.renderCenter,
+                            [classes.contentOffsetLeft]: this.props.horizontalOffset && this.props.renderLeft,
+                            [classes.contentOffsetRight]: this.props.horizontalOffset && !this.props.renderLeft,
+                        })}
+                        style={flyoutPosition(
+                            this.props.renderAbove,
+                            this.props.renderLeft,
+                            !!this.props.legacyMode,
+                            this.props.renderCenter,
+                        )}
+                        onClick={this.doNothing}
+                        tabIndex={-1}
+                        onMouseDown={this.forceTryFocus}
+                    >
+                        {this.props.children}
+                    </div>
+                </PageBoxDepthContextProvider>
+            </StackingContextProvider>
         );
     }
 

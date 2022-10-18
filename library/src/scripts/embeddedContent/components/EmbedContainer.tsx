@@ -20,7 +20,7 @@ export const EmbedContainer = forwardRef(function EmbedContainer(props: IProps, 
     const { size, withPadding, ...htmlProps } = props;
     const classes = embedContainerClasses();
 
-    const { inEditor, selectSelf } = useEmbedContext();
+    const { inEditor, selectSelf, isSelected } = useEmbedContext();
     return (
         <div
             ref={ref}
@@ -30,7 +30,9 @@ export const EmbedContainer = forwardRef(function EmbedContainer(props: IProps, 
                 if (inEditor) {
                     e.stopPropagation();
                     e.nativeEvent.stopImmediatePropagation();
-                    selectSelf?.();
+                    if (!isSelected) {
+                        selectSelf?.();
+                    }
                 }
             }}
             className={classNames(

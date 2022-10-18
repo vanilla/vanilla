@@ -6,8 +6,8 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize;
 
-trait TestAttributesTrait {
-
+trait TestAttributesTrait
+{
     /**
      * Get an array of testable attribute
      *
@@ -20,11 +20,12 @@ trait TestAttributesTrait {
      *
      * @return array
      */
-    private function badStrings(): array {
+    private function badStrings(): array
+    {
         $result = [
             "<script src=http://xss.rocks/xss.js></script>",
             "<script src=\"http://xss.rocks/xss.js\"></script>",
-            "'';!--\"<xss>=&{()}"
+            "'';!--\"<xss>=&{()}",
         ];
         return $result;
     }
@@ -34,7 +35,8 @@ trait TestAttributesTrait {
      *
      * @return array
      */
-    public function provideBadAttributes(): array {
+    public function provideBadAttributes(): array
+    {
         $badStrings = $this->badStrings();
         $attributeOperations = $this->attributeOperations();
 
@@ -55,9 +57,10 @@ trait TestAttributesTrait {
      * @param string $badAttribute
      * @dataProvider provideBadAttributes
      */
-    public function testSanitizeBadAttribute(array $operations, string $badAttribute) {
+    public function testSanitizeBadAttribute(array $operations, string $badAttribute)
+    {
         // Replace array members with a value of #VALUE# to the value of $badAttribute.
-        array_walk_recursive($operations, function(&$value) use ($badAttribute) {
+        array_walk_recursive($operations, function (&$value) use ($badAttribute) {
             if ($value === "#VALUE#") {
                 $value = $badAttribute;
             }

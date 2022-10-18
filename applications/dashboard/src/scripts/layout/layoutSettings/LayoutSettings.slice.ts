@@ -10,14 +10,17 @@ import { notEmpty } from "@vanilla/utils";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import {
     clearLayoutDraft,
+    deleteLayout,
     fetchAllLayouts,
     fetchLayout,
     fetchLayoutCatalogByViewType,
     fetchLayoutJson,
     initializeLayoutDraft,
     persistLayoutDraft,
-    putLayoutView,
+    putLayoutViews,
+    deleteLayoutView,
     updateLayoutDraft,
+    putLayoutLegacyView,
 } from "./LayoutSettings.actions";
 import {
     ILayoutDetails,
@@ -89,38 +92,40 @@ export const layoutSettingsSlice = createSlice({
                     data: action.payload,
                 };
             })
-            .addCase(persistLayoutDraft.pending, (state, action) => {
-                state.layoutDraftPersistLoadable = {
-                    status: LoadStatus.LOADING,
-                };
-            })
             .addCase(persistLayoutDraft.fulfilled, (state, action) => {
-                state.layoutDraftPersistLoadable = {
+                state.layoutJsonsByLayoutID[action.payload.layoutID] = {
                     status: LoadStatus.SUCCESS,
-                    data: action.payload,
+                    data: {
+                        ...(state.layoutJsonsByLayoutID[action.payload.layoutID]?.data ?? {}),
+                        ...action.payload,
+                    },
+                };
+
+                state.layoutJsonsByLayoutID[action.payload.layoutID] = {
+                    status: LoadStatus.SUCCESS,
+                    data: {
+                        ...(state.layoutJsonsByLayoutID[action.payload.layoutID]?.data ?? {}),
+                        ...action.payload,
+                    },
                 };
             })
-            .addCase(persistLayoutDraft.rejected, (state, action) => {
-                state.layoutDraftPersistLoadable = {
-                    status: LoadStatus.ERROR,
-                    error: action.error,
-                };
+            .addCase(deleteLayout.fulfilled, (state, action) => {
+                const { layoutID } = action.meta.arg;
+                delete state.layoutsByID[layoutID];
+                delete state.layoutJsonsByLayoutID[layoutID];
             })
             .addCase(initializeLayoutDraft, (state, action) => {
                 const { initialLayout = {} } = action.payload;
-                state.layoutDraftPersistLoadable = {
-                    status: LoadStatus.PENDING,
-                };
+
                 state.layoutDraft = {
                     name: t("My Layout"),
-                    layoutViewType: "home" as LayoutViewType,
+                    layoutViewType: initialLayout.layoutViewType as LayoutViewType,
                     layout: [],
                     ...initialLayout,
                 };
             })
             .addCase(clearLayoutDraft, (state, action) => {
                 state.layoutDraft = INITIAL_LAYOUTS_STATE.layoutDraft;
-                state.layoutDraftPersistLoadable = INITIAL_LAYOUTS_STATE.layoutDraftPersistLoadable;
             })
             .addCase(updateLayoutDraft, (state, action) => {
                 if (state.layoutDraft) {
@@ -130,43 +135,87 @@ export const layoutSettingsSlice = createSlice({
                     };
                 }
             })
-            .addCase(putLayoutView.pending, (state, action) => {
+            .addCase(putLayoutViews.pending, (state, action) => {
                 state.layoutsByID[action.meta.arg.layoutID]!.status = LoadStatus.LOADING;
             })
-            .addCase(putLayoutView.rejected, (state, action) => {
+            .addCase(putLayoutViews.rejected, (state, action) => {
                 state.layoutsByID[action.meta.arg.layoutID] = {
                     status: LoadStatus.ERROR,
                     error: action.error,
                 };
             })
-            .addCase(putLayoutView.fulfilled, (state, action) => {
-                const existingLayout = state.layoutsByID[action.meta.arg.layoutID]?.data as ILayoutDetails;
+            .addCase(putLayoutViews.fulfilled, (state, action) => {
+                const updatedLayoutID = action.meta.arg.layoutID;
+
+                // update the changed record
+                state.layoutsByID[updatedLayoutID] = {
+                    status: LoadStatus.SUCCESS,
+                    data: {
+                        ...(state.layoutsByID[updatedLayoutID]!.data as ILayoutDetails),
+                        layoutViews: [...action.payload],
+                    },
+                };
+
+                // TODO: Fix any once we upgrade immer. https://github.com/vanilla/vanilla-cloud/pull/3995
+                const layoutsByViewType = getLayoutsByViewType(state as any);
+                const layoutIdsToUpdate = Array.from(
+                    new Set(
+                        action.payload
+                            .map(({ layoutViewType }) => {
+                                return layoutsByViewType[layoutViewType].map(({ layoutID }) => layoutID);
+                            })
+                            .flat()
+                            .filter((layoutID) => layoutID !== updatedLayoutID),
+                    ),
+                );
+                // remove layoutViews with the same recordID from any other layouts.
+                layoutIdsToUpdate.forEach((layoutID) => {
+                    if (state.layoutsByID[layoutID]?.data) {
+                        state.layoutsByID[layoutID]!.data = {
+                            ...state.layoutsByID[layoutID]!.data!,
+                            layoutViews: state.layoutsByID[layoutID]!.data!.layoutViews.filter(
+                                ({ recordID }) =>
+                                    !action.payload.some((layoutView) => layoutView.recordID === recordID),
+                            ),
+                        };
+                    }
+                });
+            })
+            .addCase(deleteLayoutView.fulfilled, (state, action) => {
+                const { layoutID } = action.meta.arg;
+                const layoutData = (state.layoutsByID[layoutID]?.data ?? {}) as ILayoutDetails;
                 state.layoutsByID[action.meta.arg.layoutID] = {
                     status: LoadStatus.SUCCESS,
                     data: {
-                        ...existingLayout,
-                        layoutViews: [...(existingLayout.layoutViews ?? []), action.payload],
+                        ...layoutData,
+                        layoutViews: [],
                     },
                 };
-                //remove the layoutView from other layouts if applied
-                const layoutsByViewType = getLayoutsByViewType(state as any); // TODO: Fix any once we upgrade immer.
-                const layoutsWithSameViewType = layoutsByViewType[action.payload.layoutViewType];
-                layoutsWithSameViewType.forEach((layout) => {
-                    if (layout.layoutViews.length) {
-                        if (layout.layoutID != action.payload.layoutID) {
-                            const filteredLayoutViews = layout.layoutViews.filter(
-                                (layoutView) =>
-                                    layoutView.recordType !== action.payload.recordType &&
-                                    layoutView.recordID !== action.payload.recordID,
-                            );
-
-                            state.layoutsByID[layout.layoutID]!.data = {
-                                ...layout,
-                                layoutViews: filteredLayoutViews,
-                            };
-                        }
+            })
+            .addCase(putLayoutLegacyView.pending, (state, action) => {
+                const { layoutViewType } = action.meta.arg;
+                state.legacyStatusesByViewType[layoutViewType] = {
+                    status: LoadStatus.LOADING,
+                };
+            })
+            .addCase(putLayoutLegacyView.fulfilled, (state, action) => {
+                const { layoutViewType } = action.meta.arg;
+                state.legacyStatusesByViewType[layoutViewType] = {
+                    status: LoadStatus.SUCCESS,
+                    data: {},
+                };
+                Object.values(state.layoutsByID).forEach((layout) => {
+                    if (layout?.data?.layoutViewType === layoutViewType) {
+                        layout.data.layoutViews = [];
                     }
                 });
+            })
+            .addCase(putLayoutLegacyView.rejected, (state, action) => {
+                const { layoutViewType } = action.meta.arg;
+                state.legacyStatusesByViewType[layoutViewType] = {
+                    status: LoadStatus.ERROR,
+                    error: action.error,
+                };
             })
             .addCase(fetchLayoutCatalogByViewType.pending, (state, action) => {
                 state.catalogStatusByViewType[action.meta.arg] = { status: LoadStatus.LOADING };
@@ -192,10 +241,7 @@ export function getLayoutsByViewType(state: ILayoutsState): { [key in LayoutView
             return [
                 viewType,
                 Object.values(state.layoutsByID)
-                    .filter(
-                        (val) =>
-                            val?.status === LoadStatus.SUCCESS && !!val.data && val.data.layoutViewType === viewType,
-                    )
+                    .filter((val) => val?.data?.layoutViewType === viewType)
                     .filter(notEmpty)
                     .map((loadableLayout) => loadableLayout!.data!),
             ];

@@ -15,25 +15,26 @@ use Vanilla\Addons\Pockets\PocketsModel;
 /**
  * Container rules for the pockets addon.
  */
-class PocketsContainerRules extends AddonContainerRules {
-
+class PocketsContainerRules extends AddonContainerRules
+{
     /**
      * @inheritdoc
      */
-    public function configureContainer(ContainerConfigurationInterface $container): void {
+    public function configureContainer(ContainerConfigurationInterface $container): void
+    {
         // Nothing.
     }
 
     /**
      * @inheritdoc
      */
-    public function configureTestContainer(Container $container): void {
+    public function configureTestContainer(Container $container): void
+    {
         // Pockets test currently fail if these are shared.
         $container
             ->rule(PocketsModel::class)
             ->setShared(false)
             ->rule(\PocketsApiController::class)
-            ->setShared(false)
-        ;
+            ->setShared(false);
     }
 }

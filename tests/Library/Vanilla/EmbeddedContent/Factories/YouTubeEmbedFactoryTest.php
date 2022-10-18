@@ -15,8 +15,8 @@ use VanillaTests\Fixtures\MockHttpClient;
 /**
  * Tests for the embed and factory.
  */
-class YouTubeEmbedFactoryTest extends MinimalContainerTestCase {
-
+class YouTubeEmbedFactoryTest extends MinimalContainerTestCase
+{
     /** @var YouTubeEmbedFactory */
     private $factory;
 
@@ -26,7 +26,8 @@ class YouTubeEmbedFactoryTest extends MinimalContainerTestCase {
     /**
      * Set the factory and client.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->httpClient = new MockHttpClient();
         $this->factory = new YouTubeEmbedFactory($this->httpClient);
@@ -38,35 +39,37 @@ class YouTubeEmbedFactoryTest extends MinimalContainerTestCase {
      * @param string $urlToTest
      * @dataProvider supportedDomainsProvider
      */
-    public function testSupportedDomains(string $urlToTest) {
+    public function testSupportedDomains(string $urlToTest)
+    {
         $this->assertTrue($this->factory->canHandleUrl($urlToTest));
     }
 
     /**
      * @return array
      */
-    public function supportedDomainsProvider(): array {
-        return [
-            [ "https://www.youtube.com/watch?v=fy0fTFpqT48&t=2s" ],
-        ];
+    public function supportedDomainsProvider(): array
+    {
+        return [["https://www.youtube.com/watch?v=fy0fTFpqT48&t=2s"]];
     }
 
     /**
      * Test network request fetching and handling.
      */
-    public function testCreateEmbedForUrl() {
+    public function testCreateEmbedForUrl()
+    {
         $url = "https://www.youtube.com/watch?v=fy0fTFpqT48&t=2s";
         $videoID = "fy0fTFpqT48";
         $frameSrc = "https://www.youtube.com/embed/fy0fTFpqT48?feature=oembed&autoplay=1&start=2";
         $start = 2;
         $showRelated = false;
 
-        $oembedParams = http_build_query([ "url" => $url ]);
+        $oembedParams = http_build_query(["url" => $url]);
         $oembedUrl = YouTubeEmbedFactory::OEMBED_URL_BASE . "?" . $oembedParams;
 
         // phpcs:disable Generic.Files.LineLength
         $data = [
-            "html" => "<iframe width=\"459\" height=\"344\" src=\"https://www.youtube.com/embed/fy0fTFpqT48?feature=oembed\" frameborder=\"0\" allow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>",
+            "html" =>
+                "<iframe width=\"459\" height=\"344\" src=\"https://www.youtube.com/embed/fy0fTFpqT48?feature=oembed\" frameborder=\"0\" allow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>",
             "author_name" => "GravitasVODGlobal",
             "title" => "Attack of the Killer Tomatoes - Trailer",
             "version" => "1.0",
@@ -84,11 +87,7 @@ class YouTubeEmbedFactoryTest extends MinimalContainerTestCase {
 
         $this->httpClient->addMockResponse(
             $oembedUrl,
-            new HttpResponse(
-                200,
-                "Content-Type: application/json",
-                json_encode($data)
-            )
+            new HttpResponse(200, "Content-Type: application/json", json_encode($data))
         );
 
         // Check over the network.

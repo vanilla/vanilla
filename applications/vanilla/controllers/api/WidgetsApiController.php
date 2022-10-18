@@ -15,8 +15,8 @@ use Vanilla\Widgets\WidgetService;
 /**
  * API Controller for the `/widgets`.
  */
-class WidgetsApiController extends \AbstractApiController {
-
+class WidgetsApiController extends \AbstractApiController
+{
     /** @var WidgetService */
     private $widgetService;
 
@@ -25,7 +25,8 @@ class WidgetsApiController extends \AbstractApiController {
      *
      * @param WidgetService $widgetService
      */
-    public function __construct(WidgetService $widgetService) {
+    public function __construct(WidgetService $widgetService)
+    {
         $this->widgetService = $widgetService;
     }
 
@@ -34,7 +35,8 @@ class WidgetsApiController extends \AbstractApiController {
      *
      * @return Schema Returns a schema object.
      */
-    protected function widgetSchema() {
+    protected function widgetSchema()
+    {
         return new InstanceValidatorSchema(WidgetFactory::class);
     }
 
@@ -44,7 +46,8 @@ class WidgetsApiController extends \AbstractApiController {
      * @param array $query
      * @return Data
      */
-    public function index(array $query = []): Data {
+    public function index(array $query = []): Data
+    {
         $this->permission();
         $out = Schema::parse([":a" => $this->widgetSchema()]);
 
@@ -59,7 +62,8 @@ class WidgetsApiController extends \AbstractApiController {
      * @param string $id
      * @return Data
      */
-    public function get(string $id): Data {
+    public function get(string $id): Data
+    {
         $this->permission();
         $out = $this->widgetSchema();
 

@@ -15,8 +15,8 @@ use Garden\Schema\Schema;
 /**
  * Middleware that filters based on roleID.
  */
-class CategoryFilterMiddleware extends AbstractMiddleware {
-
+class CategoryFilterMiddleware extends AbstractMiddleware
+{
     /** @var CategoryModel */
 
     private $categoryModel;
@@ -26,7 +26,8 @@ class CategoryFilterMiddleware extends AbstractMiddleware {
      *
      * @param CategoryModel $categoryModel
      */
-    public function __construct(CategoryModel $categoryModel) {
+    public function __construct(CategoryModel $categoryModel)
+    {
         $this->categoryModel = $categoryModel;
     }
 
@@ -39,8 +40,13 @@ class CategoryFilterMiddleware extends AbstractMiddleware {
      * @param DataResolverInterface $next
      * @return mixed|null
      */
-    protected function processInternal(array $nodeData, array $middlewareParams, array $hydrateParams, DataResolverInterface $next) {
-        $categoryID = $hydrateParams['categoryID'] ?? null;
+    protected function processInternal(
+        array $nodeData,
+        array $middlewareParams,
+        array $hydrateParams,
+        DataResolverInterface $next
+    ) {
+        $categoryID = $hydrateParams["categoryID"] ?? null;
         // Filter on supplied categoryID middleware params here
         if ($categoryID !== null) {
             $response = $this->filterCategoryID($middlewareParams, $categoryID, $nodeData);
@@ -60,12 +66,13 @@ class CategoryFilterMiddleware extends AbstractMiddleware {
      *
      * @return int[]|null
      */
-    private function filterCategoryID(array $categoryFilter, int $categoryID, array $data): ?array {
-        $catChildren = $categoryFilter['includeChildCategories'] ?? false;
-        $catFilterID = $categoryFilter['categoryID'];
+    private function filterCategoryID(array $categoryFilter, int $categoryID, array $data): ?array
+    {
+        $catChildren = $categoryFilter["includeChildCategories"] ?? false;
+        $catFilterID = $categoryFilter["categoryID"];
         if (!is_int($catFilterID)) {
             $catArray = $this->categoryModel::categories($catFilterID);
-            $catFilterID = $catArray['CategoryID'];
+            $catFilterID = $catArray["CategoryID"];
         }
         $categoryFilterIDs[] = $catFilterID;
         if ($catChildren) {
@@ -82,22 +89,24 @@ class CategoryFilterMiddleware extends AbstractMiddleware {
      *
      * @return Schema
      */
-    public function getSchema(): Schema {
+    public function getSchema(): Schema
+    {
         $schema = new Schema([
             "x-no-hydrate" => true,
             "description" => "Category filter middleware.",
             "type" => "object",
             "properties" => [
                 "categoryID" => [
-                    "type" => ["string","integer"],
-                    "description" => "Add category based filter by ID or name for the current node."
-                            ."Only categories configured here will see the contents of the node.",
+                    "type" => ["string", "integer"],
+                    "description" =>
+                        "Add category based filter by ID or name for the current node." .
+                        "Only categories configured here will see the contents of the node.",
                 ],
                 "includeChildCategories" => [
                     "type" => "boolean",
                     "description" => "Filter will include all child categories.",
-                ]
-            ]
+                ],
+            ],
         ]);
         return $schema;
     }
@@ -105,7 +114,8 @@ class CategoryFilterMiddleware extends AbstractMiddleware {
     /**
      * @inheritdoc
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return "category-filter";
     }
 }

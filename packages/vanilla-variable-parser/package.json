@@ -8,11 +8,11 @@
     "license": "gpl-2.0-only",
     "private": true,
     "dependencies": {
-        "@babel/parser": "^7.12.10",
+        "@babel/parser": "^7.18.3",
         "@vanilla/utils": "*",
         "fs-extra": "^9.0.1",
         "globby": "^11.0.1",
-        "json-schema": "^0.2.5"
+        "json-schema": "^0.4.0"
     },
     "devDependencies": {
         "@types/fs-extra": "^9.0.5",

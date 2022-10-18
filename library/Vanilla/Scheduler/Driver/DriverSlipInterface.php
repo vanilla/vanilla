@@ -14,8 +14,8 @@ use Vanilla\Scheduler\Job\TrackableJobAwareTrait;
 /**
  * Interface representing a job that has been received by a particular driver.
  */
-interface DriverSlipInterface extends TrackableJobAwareInterface {
-
+interface DriverSlipInterface extends TrackableJobAwareInterface
+{
     /**
      * Get the jobID
      *

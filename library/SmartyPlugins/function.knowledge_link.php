@@ -13,10 +13,19 @@
  * @param object $smarty
  * @return string
  */
-function smarty_function_knowledge_link($params, &$smarty) {
+function smarty_function_knowledge_link($params, &$smarty)
+{
+    if (!\Gdn::config()->get("EnabledPlugins.knowledge")) {
+        return "";
+    }
+
     if (gdn::session()->checkPermission("knowledge.kb.view")) {
-        $wrap = val('wrap', $params, 'li');
-        return Gdn_Theme::link('kb', val('text', $params, t('Help Menu', "Help")), val('format', $params, wrap('<a href="%url" class="%class">%text</a>', $wrap)));
+        $wrap = val("wrap", $params, "li");
+        return Gdn_Theme::link(
+            "kb",
+            val("text", $params, t("Help Menu", "Help")),
+            val("format", $params, wrap('<a href="%url" class="%class">%text</a>', $wrap))
+        );
     } else {
         return "";
     }

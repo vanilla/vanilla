@@ -30,9 +30,9 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Class ReactionsPlugin
  */
-class ReactionsPlugin extends Gdn_Plugin {
-
-    const RECORD_REACTIONS_DEFAULT = 'popup';
+class ReactionsPlugin extends Gdn_Plugin
+{
+    const RECORD_REACTIONS_DEFAULT = "popup";
 
     const BEST_OF_MAX_PAGES = 300;
 
@@ -78,7 +78,6 @@ class ReactionsPlugin extends Gdn_Plugin {
         LocaleInterface $locale,
         SessionInterface $session
     ) {
-
         $this->discussionModel = $discussionModel;
         $this->commentModel = $commentModel;
         $this->reactionModel = $reactionModel;
@@ -96,24 +95,25 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param mixed $attributes
      * @return array
      */
-    private function addAttributes(array $row, $attributes) {
+    private function addAttributes(array $row, $attributes)
+    {
         if (is_array($attributes) || (is_object($attributes) && $attributes instanceof ArrayObject)) {
             // Normalize the casing of attributes and reaction URL codes.
-            if (isset($attributes['react'])) {
-                $attributes['React'] = $attributes['react'];
-                unset($attributes['react']);
+            if (isset($attributes["react"])) {
+                $attributes["React"] = $attributes["react"];
+                unset($attributes["react"]);
             }
-            if (isset($attributes['React']) && is_array($attributes['React'])) {
-                foreach ($attributes['React'] as $urlCode => $total) {
+            if (isset($attributes["React"]) && is_array($attributes["React"])) {
+                foreach ($attributes["React"] as $urlCode => $total) {
                     $type = ReactionModel::reactionTypes($urlCode);
                     if ($type) {
-                        $attributes['React'][$type['UrlCode']] = $total;
-                        unset($attributes['React'][$urlCode]);
+                        $attributes["React"][$type["UrlCode"]] = $total;
+                        unset($attributes["React"][$urlCode]);
                     }
                 }
             }
         }
-        $row += ['Attributes' => $attributes];
+        $row += ["Attributes" => $attributes];
         return $row;
     }
 
@@ -122,7 +122,8 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param PromotedContentModule $sender
      */
-    public function promotedContentModule_selectByReaction_handler($sender) {
+    public function promotedContentModule_selectByReaction_handler($sender)
+    {
         $model = new ReactionModel();
         $reactionType = ReactionModel::reactionTypes($sender->Selection);
 
@@ -131,17 +132,20 @@ class ReactionsPlugin extends Gdn_Plugin {
         }
 
         $data = $model->getRecordsWhere(
-            ['TagID' => $reactionType['TagID'], 'RecordType' => ['Discussion-Total', 'Comment-Total'], 'Total >=' => 1],
-            'DateInserted', 'desc',
-            $sender->Limit, 0);
+            ["TagID" => $reactionType["TagID"], "RecordType" => ["Discussion-Total", "Comment-Total"], "Total >=" => 1],
+            "DateInserted",
+            "desc",
+            $sender->Limit,
+            0
+        );
 
         // Massage the data for the promoted content module.
         foreach ($data as &$row) {
-            $row['ItemType'] = $row['RecordType'];
-            $row['Author'] = Gdn::userModel()->getID($row['InsertUserID']);
+            $row["ItemType"] = $row["RecordType"];
+            $row["Author"] = Gdn::userModel()->getID($row["InsertUserID"]);
         }
 
-        $sender->setData('Content', $data);
+        $sender->setData("Content", $data);
     }
 
     /**
@@ -149,15 +153,16 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param mixed $sender The simpleAPI plugin instance. Can't reference it here because of psalm.
      */
-    public function simpleApiPlugin_mapper_handler($sender) {
+    public function simpleApiPlugin_mapper_handler($sender)
+    {
         switch ($sender->Mapper->Version) {
-            case '1.0':
+            case "1.0":
                 $sender->Mapper->addMap([
-                    'reactions/list' => 'reactions',
-                    'reactions/get' => 'reactions/get',
-                    'reactions/add' => 'reactions/add',
-                    'reactions/edit' => 'reactions/edit',
-                    'reactions/toggle' => 'reactions/toggle'
+                    "reactions/list" => "reactions",
+                    "reactions/get" => "reactions/get",
+                    "reactions/add" => "reactions/add",
+                    "reactions/edit" => "reactions/edit",
+                    "reactions/toggle" => "reactions/toggle",
                 ]);
                 break;
         }
@@ -168,9 +173,10 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $sender
      */
-    private function addJs($sender) {
-        $sender->addJsFile('jquery-ui.min.js');
-        $sender->addJsFile('reactions.js', 'plugins/Reactions');
+    private function addJs($sender)
+    {
+        $sender->addJsFile("jquery-ui.min.js");
+        $sender->addJsFile("reactions.js", "plugins/Reactions");
     }
 
     /**
@@ -178,44 +184,45 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @return array
      */
-    public static function commentOrder() {
+    public static function commentOrder()
+    {
         if (!self::$_CommentOrder) {
             $setPreference = false;
 
             if (!Gdn::session()->isValid()) {
-                if (Gdn::controller() != null && strcasecmp(Gdn::controller()->RequestMethod, 'embed') == 0) {
-                    $orderColumn = c('Plugins.Reactions.DefaultEmbedOrderBy', 'Score');
+                if (Gdn::controller() != null && strcasecmp(Gdn::controller()->RequestMethod, "embed") == 0) {
+                    $orderColumn = c("Plugins.Reactions.DefaultEmbedOrderBy", "Score");
                 } else {
-                    $orderColumn = c('Plugins.Reactions.DefaultOrderBy', 'DateInserted');
+                    $orderColumn = c("Plugins.Reactions.DefaultOrderBy", "DateInserted");
                 }
             } else {
-                $defaultOrderParts = ['DateInserted', 'asc'];
+                $defaultOrderParts = ["DateInserted", "asc"];
 
-                $orderBy = Gdn::request()->get('orderby', '');
+                $orderBy = Gdn::request()->get("orderby", "");
                 if ($orderBy) {
                     $setPreference = true;
                 } else {
-                    $orderBy = Gdn::session()->getPreference('Comments.OrderBy');
+                    $orderBy = Gdn::session()->getPreference("Comments.OrderBy");
                 }
-                $orderParts = explode(' ', $orderBy);
+                $orderParts = explode(" ", $orderBy);
                 $orderColumn = getValue(0, $orderParts, $defaultOrderParts[0]);
 
                 // Make sure the order is correct.
-                if (!in_array($orderColumn, ['DateInserted', 'Score']))
-                    $orderColumn = 'DateInserted';
-
+                if (!in_array($orderColumn, ["DateInserted", "Score"])) {
+                    $orderColumn = "DateInserted";
+                }
 
                 if ($setPreference) {
-                    Gdn::session()->setPreference('Comments.OrderBy', $orderColumn);
+                    Gdn::session()->setPreference("Comments.OrderBy", $orderColumn);
                 }
             }
-            $orderDirection = $orderColumn == 'Score' ? 'desc' : 'asc';
+            $orderDirection = $orderColumn == "Score" ? "desc" : "asc";
 
-            $commentOrder = ['c.'.$orderColumn.' '.$orderDirection];
+            $commentOrder = ["c." . $orderColumn . " " . $orderDirection];
 
             // Add a unique order if we aren't ordering by a unique column.
-            if (!in_array($orderColumn, ['DateInserted', 'CommentID'])) {
-                $commentOrder[] = 'c.DateInserted asc';
+            if (!in_array($orderColumn, ["DateInserted", "CommentID"])) {
+                $commentOrder[] = "c.DateInserted asc";
             }
 
             self::$_CommentOrder = $commentOrder;
@@ -232,27 +239,27 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param int|null $userID
      * @return array
      */
-    public function commentsApiController_delete_reactions(CommentsApiController $sender, int $id, int $userID = null) {
-        $sender->permission('Garden.SignIn.Allow');
+    public function commentsApiController_delete_reactions(CommentsApiController $sender, int $id, int $userID = null)
+    {
+        $sender->permission("Garden.SignIn.Allow");
 
-        $in = $sender->schema(
-            $sender->idParamSchema()->merge(Schema::parse(['userID:i' => 'The target user ID.'])),
-            'in'
-        )->setDescription('Remove a user\'s reaction.');
-        $out = $sender->schema([], 'out');
+        $in = $sender
+            ->schema($sender->idParamSchema()->merge(Schema::parse(["userID:i" => "The target user ID."])), "in")
+            ->setDescription('Remove a user\'s reaction.');
+        $out = $sender->schema([], "out");
 
         $comment = $sender->commentByID($id);
 
         if ($userID === null) {
             $userID = $sender->getSession()->UserID;
         } elseif ($userID !== $sender->getSession()->UserID) {
-            $sender->permission('Garden.Moderation.Manage');
+            $sender->permission("Garden.Moderation.Manage");
         }
 
-        $reaction = $this->reactionModel->getUserReaction($userID, 'Comment', $id);
+        $reaction = $this->reactionModel->getUserReaction($userID, "Comment", $id);
         if ($reaction) {
-            $urlCode = $reaction['UrlCode'];
-            $this->reactionModel->react('Comment', $id, $urlCode, null, false, ReactionModel::FORCE_REMOVE);
+            $urlCode = $reaction["UrlCode"];
+            $this->reactionModel->react("Comment", $id, $urlCode, null, false, ReactionModel::FORCE_REMOVE);
         }
     }
 
@@ -266,15 +273,21 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $row Pre-validated data.
      * @return array
      */
-    public function commentsApiController_getOutput(array $result, CommentsApiController $sender, Schema $inSchema, array $query, array $row) {
-        $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
+    public function commentsApiController_getOutput(
+        array $result,
+        CommentsApiController $sender,
+        Schema $inSchema,
+        array $query,
+        array $row
+    ) {
+        $expand = array_key_exists("expand", $query) ? $query["expand"] : [];
 
-        if ($sender->isExpandField('reactions', $expand)) {
+        if ($sender->isExpandField("reactions", $expand)) {
             $schema = $this->getReactionSummaryFragment();
-            $withAttributes = $this->addAttributes($result, $row['attributes']);
+            $withAttributes = $this->addAttributes($result, $row["attributes"]);
             $summary = $this->reactionModel->getRecordSummary($withAttributes);
             $summary = $schema->validate($summary);
-            $result['reactions'] = $summary;
+            $result["reactions"] = $summary;
         }
 
         return $result;
@@ -288,44 +301,41 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $query The request query.
      * @return array
      */
-    public function commentsApiController_get_reactions(CommentsApiController $sender, $id, array $query) {
+    public function commentsApiController_get_reactions(CommentsApiController $sender, $id, array $query)
+    {
         $sender->permission();
 
         $sender->idParamSchema();
-        $in = $sender->schema([
-            'type:s|n' => [
-                'default' => null,
-                'description' => 'Filter to a specific reaction type by using its URL code.'
-            ],
-            'page:i?' => [
-                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
-                'default' => 1,
-                'minimum' => 1,
-                'maximum' => 100
-            ],
-            'limit:i?' => [
-                'description' => 'Desired number of items per page.',
-                'default' => $this->reactionModel->getDefaultLimit(),
-                'minimum' => 1,
-                'maximum' => 100
-            ],
-        ])->setDescription('Get reactions to a comment.');
-        $out = $sender->schema([':a' => $this->getReactionLogFragment($sender->getUserFragmentSchema())], 'out');
+        $in = $sender
+            ->schema([
+                "type:s|n" => [
+                    "default" => null,
+                    "description" => "Filter to a specific reaction type by using its URL code.",
+                ],
+                "page:i?" => [
+                    "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                    "default" => 1,
+                    "minimum" => 1,
+                    "maximum" => 100,
+                ],
+                "limit:i?" => [
+                    "description" => "Desired number of items per page.",
+                    "default" => $this->reactionModel->getDefaultLimit(),
+                    "minimum" => 1,
+                    "maximum" => 100,
+                ],
+            ])
+            ->setDescription("Get reactions to a comment.");
+        $out = $sender->schema([":a" => $this->getReactionLogFragment($sender->getUserFragmentSchema())], "out");
 
         $comment = $sender->commentByID($id);
-        $discussion = $sender->discussionByID($comment['DiscussionID']);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+        $discussion = $sender->discussionByID($comment["DiscussionID"]);
+        $this->discussionModel->categoryPermission("Vanilla.Discussions.View", $discussion["CategoryID"]);
 
         $query = $in->validate($query);
-        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
-        $comment += ['recordType' => 'Comment', 'recordID' => $comment['CommentID']];
-        $rows = $this->reactionModel->getRecordReactions(
-            $comment,
-            true,
-            $query['type'],
-            $offset,
-            $limit
-        );
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
+        $comment += ["recordType" => "Comment", "recordID" => $comment["CommentID"]];
+        $rows = $this->reactionModel->getRecordReactions($comment, true, $query["type"], $offset, $limit);
 
         $result = $out->validate($rows);
         return $result;
@@ -341,17 +351,23 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $rows Raw result.
      * @return array
      */
-    public function commentsApiController_indexOutput(array $result, CommentsApiController $sender, Schema $inSchema, array $query, array $rows) {
-        $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
+    public function commentsApiController_indexOutput(
+        array $result,
+        CommentsApiController $sender,
+        Schema $inSchema,
+        array $query,
+        array $rows
+    ) {
+        $expand = array_key_exists("expand", $query) ? $query["expand"] : [];
 
-        if ($sender->isExpandField('reactions', $expand)) {
-            $attributes = array_column($rows, 'attributes', 'commentID');
+        if ($sender->isExpandField("reactions", $expand)) {
+            $attributes = array_column($rows, "attributes", "commentID");
             $schema = $this->getReactionSummaryFragment();
-            array_walk($result, function(&$row) use ($attributes, $schema) {
-                $withAttributes = $this->addAttributes($row, $attributes[$row['commentID']]);
+            array_walk($result, function (&$row) use ($attributes, $schema) {
+                $withAttributes = $this->addAttributes($row, $attributes[$row["commentID"]]);
                 $summary = $this->reactionModel->getRecordSummary($withAttributes);
                 $summary = $schema->validate($summary);
-                $row['reactions'] = $summary;
+                $row["reactions"] = $summary;
             });
         }
 
@@ -366,21 +382,27 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $body The request query.
      * @return array
      */
-    public function commentsApiController_post_reactions(CommentsApiController $sender, $id, array $body) {
-        $sender->permission('Garden.SignIn.Allow');
+    public function commentsApiController_post_reactions(CommentsApiController $sender, $id, array $body)
+    {
+        $sender->permission("Garden.SignIn.Allow");
 
-        $in = $sender->schema([
-            'reactionType:s' => 'URL code of a reaction type.'
-        ], 'in')->setDescription('React to a comment.');
-        $out = $sender->schema($this->getReactionSummaryFragment(), 'out');
+        $in = $sender
+            ->schema(
+                [
+                    "reactionType:s" => "URL code of a reaction type.",
+                ],
+                "in"
+            )
+            ->setDescription("React to a comment.");
+        $out = $sender->schema($this->getReactionSummaryFragment(), "out");
 
         $comment = $sender->commentByID($id);
-        $discussion = $sender->discussionByID($comment['DiscussionID']);
+        $discussion = $sender->discussionByID($comment["DiscussionID"]);
         $session = $sender->getSession();
         $this->canViewDiscussion($discussion, $session);
         $body = $in->validate($body);
 
-        $this->reactionModel->react('Comment', $id, $body['reactionType'], null, false, ReactionModel::FORCE_ADD);
+        $this->reactionModel->react("Comment", $id, $body["reactionType"], null, false, ReactionModel::FORCE_ADD);
 
         // Refresh the comment to grab its updated attributes.
         $comment = $sender->commentByID($id);
@@ -395,7 +417,8 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Schema $schema
      */
-    public function commentGetSchema_init(Schema $schema) {
+    public function commentGetSchema_init(Schema $schema)
+    {
         $this->updatePostSchemaExpand($schema);
     }
 
@@ -404,7 +427,8 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Schema $schema
      */
-    public function commentIndexSchema_init(Schema $schema) {
+    public function commentIndexSchema_init(Schema $schema)
+    {
         $this->updatePostSchemaExpand($schema);
     }
 
@@ -413,10 +437,13 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Schema $schema
      */
-    public function commentSchema_init(Schema $schema) {
-        $schema->merge(Schema::parse([
-            'reactions?' => $this->getReactionSummaryFragment()
-        ]));
+    public function commentSchema_init(Schema $schema)
+    {
+        $schema->merge(
+            Schema::parse([
+                "reactions?" => $this->getReactionSummaryFragment(),
+            ])
+        );
     }
 
     /**
@@ -424,7 +451,8 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Schema $schema
      */
-    public function discussionGetSchema_init(Schema $schema) {
+    public function discussionGetSchema_init(Schema $schema)
+    {
         $this->updatePostSchemaExpand($schema);
     }
 
@@ -433,11 +461,10 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Schema $schema
      */
-    public function discussionIndexSchema_init(Schema $schema) {
+    public function discussionIndexSchema_init(Schema $schema)
+    {
         $this->updatePostSchemaExpand($schema);
-        $schema->merge(Schema::parse([
-            'reactionType:s?'
-        ]));
+        $schema->merge(Schema::parse(["reactionType:s?"]));
     }
 
     /**
@@ -445,10 +472,13 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Schema $schema
      */
-    public function discussionSchema_init(Schema $schema) {
-        $schema->merge(Schema::parse([
-            'reactions?' => $this->getReactionSummaryFragment()
-        ]));
+    public function discussionSchema_init(Schema $schema)
+    {
+        $schema->merge(
+            Schema::parse([
+                "reactions?" => $this->getReactionSummaryFragment(),
+            ])
+        );
     }
 
     /**
@@ -459,27 +489,30 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param int|null $userID
      * @return array
      */
-    public function discussionsApiController_delete_reactions(DiscussionsApiController $sender, int $id, int $userID = null) {
-        $sender->permission('Garden.SignIn.Allow');
+    public function discussionsApiController_delete_reactions(
+        DiscussionsApiController $sender,
+        int $id,
+        int $userID = null
+    ) {
+        $sender->permission("Garden.SignIn.Allow");
 
-        $in = $sender->schema(
-            $sender->idParamSchema()->merge(Schema::parse(['userID:i' => 'The target user ID.'])),
-            'in'
-        )->setDescription('Remove a user\'s reaction.');
-        $out = $sender->schema([], 'out');
+        $in = $sender
+            ->schema($sender->idParamSchema()->merge(Schema::parse(["userID:i" => "The target user ID."])), "in")
+            ->setDescription('Remove a user\'s reaction.');
+        $out = $sender->schema([], "out");
 
         $discussion = $sender->discussionByID($id);
 
         if ($userID === null) {
             $userID = $sender->getSession()->UserID;
         } elseif ($userID !== $sender->getSession()->UserID) {
-            $sender->permission('Garden.Moderation.Manage');
+            $sender->permission("Garden.Moderation.Manage");
         }
 
-        $reaction = $this->reactionModel->getUserReaction($userID, 'Discussion', $id);
+        $reaction = $this->reactionModel->getUserReaction($userID, "Discussion", $id);
         if ($reaction) {
-            $urlCode = $reaction['UrlCode'];
-            $this->reactionModel->react('Discussion', $id, $urlCode, null, false, ReactionModel::FORCE_REMOVE);
+            $urlCode = $reaction["UrlCode"];
+            $this->reactionModel->react("Discussion", $id, $urlCode, null, false, ReactionModel::FORCE_REMOVE);
         }
     }
 
@@ -491,44 +524,40 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $query The request query.
      * @return array
      */
-    public function discussionsApiController_get_reactions(DiscussionsApiController $sender, $id, array $query) {
+    public function discussionsApiController_get_reactions(DiscussionsApiController $sender, $id, array $query)
+    {
         $sender->permission();
 
-        $sender->idParamSchema()->setDescription('Get a summary of reactions on a discussion.');
-        $in = $sender->schema([
-            'type:s|n' => [
-                'default' => null,
-                'description' => 'Filter to a specific reaction type by using its URL code.'
-            ],
-            'page:i?' => [
-                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
-                'default' => 1,
-                'minimum' => 1,
-                'maximum' => 100
-            ],
-            'limit:i?' => [
-                'description' => 'Desired number of items per page.',
-                'default' => $this->reactionModel->getDefaultLimit(),
-                'minimum' => 1,
-                'maximum' => 100
-            ],
-        ])->setDescription('Get reactions to a discussion.');
-        $out = $sender->schema([':a' => $this->getReactionLogFragment($sender->getUserFragmentSchema())], 'out');
-
+        $sender->idParamSchema()->setDescription("Get a summary of reactions on a discussion.");
+        $in = $sender
+            ->schema([
+                "type:s|n" => [
+                    "default" => null,
+                    "description" => "Filter to a specific reaction type by using its URL code.",
+                ],
+                "page:i?" => [
+                    "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                    "default" => 1,
+                    "minimum" => 1,
+                    "maximum" => 100,
+                ],
+                "limit:i?" => [
+                    "description" => "Desired number of items per page.",
+                    "default" => $this->reactionModel->getDefaultLimit(),
+                    "minimum" => 1,
+                    "maximum" => 100,
+                ],
+            ])
+            ->setDescription("Get reactions to a discussion.");
+        $out = $sender->schema([":a" => $this->getReactionLogFragment($sender->getUserFragmentSchema())], "out");
 
         $discussion = $sender->discussionByID($id);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+        $this->discussionModel->categoryPermission("Vanilla.Discussions.View", $discussion["CategoryID"]);
 
         $query = $in->validate($query);
-        [$offset, $limit] = offsetLimit("p{$query['page']}", $query['limit']);
-        $discussion += ['recordType' => 'Discussion', 'recordID' => $discussion['DiscussionID']];
-        $rows = $this->reactionModel->getRecordReactions(
-            $discussion,
-            true,
-            $query['type'],
-            $offset,
-            $limit
-        );
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
+        $discussion += ["recordType" => "Discussion", "recordID" => $discussion["DiscussionID"]];
+        $rows = $this->reactionModel->getRecordReactions($discussion, true, $query["type"], $offset, $limit);
 
         $result = $out->validate($rows);
         return $result;
@@ -549,7 +578,7 @@ class ReactionsPlugin extends Gdn_Plugin {
         Schema $inSchema,
         array $query
     ) {
-        if (!isset($query['reactionType'])) {
+        if (!isset($query["reactionType"])) {
             return $where;
         }
 
@@ -557,12 +586,12 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         // If it's guest, they shouldn't get any discussions.
         if ($userID === 0) {
-            $where['d.DiscussionID'] = [];
+            $where["d.DiscussionID"] = [];
         }
 
-        $reactedDiscussions = $this->reactionModel->getReactedDiscussionIDsByUser($userID, [$query['reactionType']]);
+        $reactedDiscussions = $this->reactionModel->getReactedDiscussionIDsByUser($userID, [$query["reactionType"]]);
 
-        $where['d.DiscussionID'] = $reactedDiscussions;
+        $where["d.DiscussionID"] = $reactedDiscussions;
 
         return $where;
     }
@@ -586,32 +615,32 @@ class ReactionsPlugin extends Gdn_Plugin {
         array $rows,
         bool $single = false
     ) {
-        $expand = array_key_exists('expand', $query) ? $query['expand'] : [];
+        $expand = array_key_exists("expand", $query) ? $query["expand"] : [];
 
         // Put the $result and $row data in arrays if they aren't already.
-        $result = array_key_exists('discussionID', $result) ? [$result] : $result;
-        $rows = array_key_exists('discussionID', $rows) ? [$rows] : $rows;
+        $result = array_key_exists("discussionID", $result) ? [$result] : $result;
+        $rows = array_key_exists("discussionID", $rows) ? [$rows] : $rows;
 
-        if ($sender->isExpandField('reactions', $expand) && !empty($result)) {
-            $attributes = array_column($rows, 'attributes', 'discussionID');
+        if ($sender->isExpandField("reactions", $expand) && !empty($result)) {
+            $attributes = array_column($rows, "attributes", "discussionID");
             $schema = $this->getReactionSummaryFragment();
-            $discussionIDs = array_column($result, 'discussionID');
+            $discussionIDs = array_column($result, "discussionID");
             $userReactions = $this->reactionModel->getUserDiscussionTags(Gdn::session()->UserID, $discussionIDs);
             array_walk($result, function (&$row) use ($attributes, $schema, $userReactions) {
-                $withAttributes = $this->addAttributes($row, $attributes[$row['discussionID']] ?? null);
+                $withAttributes = $this->addAttributes($row, $attributes[$row["discussionID"]] ?? null);
                 $summary = $this->reactionModel->getRecordSummary($withAttributes);
                 // This is added so we don't get 422 errors when reaction name is empty.
                 foreach ($summary as &$reaction) {
                     $userReactionRecord = [
-                        'TagID' => $reaction['TagID'],
-                        'RecordID' => $row['discussionID']
+                        "TagID" => $reaction["TagID"],
+                        "RecordID" => $row["discussionID"],
                     ];
-                    $reaction['hasReacted'] = in_array($userReactionRecord, $userReactions);
-                    $reaction['Name'] = $reaction['Name'] ?: $this->locale->translate('None');
-                    $reaction['ReactionValue'] = $reaction['IncrementValue'] ?? $reaction['Points'] ?? 0;
+                    $reaction["hasReacted"] = in_array($userReactionRecord, $userReactions);
+                    $reaction["Name"] = $reaction["Name"] ?: $this->locale->translate("None");
+                    $reaction["ReactionValue"] = $reaction["IncrementValue"] ?? ($reaction["Points"] ?? 0);
                 }
                 $summary = $schema->validate($summary);
-                $row['reactions'] = $summary;
+                $row["reactions"] = $summary;
             });
         }
 
@@ -628,12 +657,13 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param Gdn_Session $session
      * @throws Exception If the user cannot view the discussion.
      */
-    private function canViewDiscussion(array $discussion, Gdn_Session $session): void {
+    private function canViewDiscussion(array $discussion, Gdn_Session $session): void
+    {
         $userID = $session->UserID;
         $canView = $this->discussionModel->canView($discussion, $userID);
-        $isAdmin = $session->checkRankedPermission('Garden.Moderation.Manage');
+        $isAdmin = $session->checkRankedPermission("Garden.Moderation.Manage");
         if (!$canView && !$isAdmin) {
-            throw permissionException('Vanilla.Discussions.View');
+            throw permissionException("Vanilla.Discussions.View");
         }
     }
 
@@ -645,19 +675,25 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $body The request query.
      * @return array
      */
-    public function discussionsApiController_post_reactions(DiscussionsApiController $sender, $id, array $body) {
-        $sender->permission('Garden.SignIn.Allow');
+    public function discussionsApiController_post_reactions(DiscussionsApiController $sender, $id, array $body)
+    {
+        $sender->permission("Garden.SignIn.Allow");
 
-        $in = $sender->schema([
-            'reactionType:s' => 'URL code of a reaction type.'
-        ], 'in')->setDescription('React to a discussion.');
-        $out = $sender->schema($this->getReactionSummaryFragment(), 'out');
+        $in = $sender
+            ->schema(
+                [
+                    "reactionType:s" => "URL code of a reaction type.",
+                ],
+                "in"
+            )
+            ->setDescription("React to a discussion.");
+        $out = $sender->schema($this->getReactionSummaryFragment(), "out");
         $discussion = $sender->discussionByID($id);
         $session = $sender->getSession();
         $this->canViewDiscussion($discussion, $session);
         $body = $in->validate($body);
 
-        $this->reactionModel->react('Discussion', $id, $body['reactionType'], null, false, ReactionModel::FORCE_ADD);
+        $this->reactionModel->react("Discussion", $id, $body["reactionType"], null, false, ReactionModel::FORCE_ADD);
 
         // Refresh the discussion to grab its updated attributes.
         $discussion = $sender->discussionByID($id);
@@ -673,7 +709,8 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param Schema $userFragmentSchema
      * @return Schema
      */
-    public function getReactionLogFragment(Schema $userFragmentSchema) {
+    public function getReactionLogFragment(Schema $userFragmentSchema)
+    {
         static $logFragment;
 
         if ($logFragment === null) {
@@ -688,15 +725,14 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @return Schema
      */
-    public function getReactionSummaryFragment() {
+    public function getReactionSummaryFragment()
+    {
         static $summaryFragment;
 
         if ($summaryFragment === null) {
             $typeFragment = clone $this->getReactionTypeFragment();
             $summaryFragment = Schema::parse([
-                ':a' => $typeFragment->merge(Schema::parse([
-                    'count:i'
-                ]))
+                ":a" => $typeFragment->merge(Schema::parse(["count:i"])),
             ]);
         }
 
@@ -708,7 +744,8 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @return Schema
      */
-    public function getReactionTypeFragment() {
+    public function getReactionTypeFragment()
+    {
         static $typeFragment;
 
         if ($typeFragment === null) {
@@ -721,8 +758,9 @@ class ReactionsPlugin extends Gdn_Plugin {
     /**
      * Database updates.
      */
-    public function structure() {
-        include dirname(__FILE__).'/structure.php';
+    public function structure()
+    {
+        include dirname(__FILE__) . "/structure.php";
     }
 
     /**
@@ -730,8 +768,9 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param \Vanilla\Web\Asset\LegacyAssetModel $sender
      */
-    public function assetModel_styleCss_handler($sender) {
-        $sender->addCssFile('reactions.css', 'plugins/Reactions');
+    public function assetModel_styleCss_handler($sender)
+    {
+        $sender->addCssFile("reactions.css", "plugins/Reactions");
     }
 
     /**
@@ -739,10 +778,11 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param ActivityController $sender
      */
-    public function activityController_render_before($sender) {
+    public function activityController_render_before($sender)
+    {
         if ($sender->deliveryMethod() == DELIVERY_METHOD_XHTML || $sender->deliveryType() == DELIVERY_TYPE_VIEW) {
             $this->addJs($sender);
-            include_once $sender->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+            include_once $sender->fetchViewLocation("reaction_functions", "", "plugins/Reactions");
         }
     }
 
@@ -752,9 +792,10 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @since 1.0.0
      * @param DashboardController $sender
      */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        $menu = $sender->EventArguments['SideMenu'];
-        $menu->addLink('Forum', t('Reactions'), 'reactions', 'Garden.Community.Manage', ['class' => 'nav-reactions']);
+    public function base_getAppSettingsMenuItems_handler($sender)
+    {
+        $menu = $sender->EventArguments["SideMenu"];
+        $menu->addLink("Forum", t("Reactions"), "reactions", "Garden.Community.Manage", ["class" => "nav-reactions"]);
     }
 
     /**
@@ -762,8 +803,11 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $sender
      */
-    public function base_afterDiscussionFilters_handler($sender) {
-        echo '<li class="Reactions-BestOf">'.anchor(sprite('SpBestOf').' '.t('Best Of...'), '/bestof/everything', '').'</li>';
+    public function base_afterDiscussionFilters_handler($sender)
+    {
+        echo '<li class="Reactions-BestOf">' .
+            anchor(sprite("SpBestOf") . " " . t("Best Of..."), "/bestof/everything", "") .
+            "</li>";
     }
 
     /**
@@ -771,16 +815,17 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $Sender
      */
-    public function discussionController_render_before($Sender) {
+    public function discussionController_render_before($Sender)
+    {
         $Sender->ReactionsVersion = 2;
 
         $OrderBy = self::commentOrder();
-        [$OrderColumn, $OrderDirection] = explode(' ', val('0', $OrderBy));
-        $OrderColumn = stringBeginsWith($OrderColumn, 'c.', true, true);
+        [$OrderColumn, $OrderDirection] = explode(" ", val("0", $OrderBy));
+        $OrderColumn = stringBeginsWith($OrderColumn, "c.", true, true);
 
         // Send back comment order for non-api calls.
         if ($Sender->deliveryType() !== DELIVERY_TYPE_DATA) {
-            $Sender->setData('CommentOrder', ['Column' => $OrderColumn, 'Direction' => $OrderDirection]);
+            $Sender->setData("CommentOrder", ["Column" => $OrderColumn, "Direction" => $OrderDirection]);
         }
 
         if ($Sender->ReactionsVersion != 1) {
@@ -788,16 +833,16 @@ class ReactionsPlugin extends Gdn_Plugin {
         }
 
         $ReactionModel = new ReactionModel();
-        if (c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars') {
-            $ReactionModel->joinUserTags($Sender->Data['Discussion'], 'Discussion');
-            $ReactionModel->joinUserTags($Sender->Data['Comments'], 'Comment');
+        if (c("Plugins.Reactions.ShowUserReactions", ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == "avatars") {
+            $ReactionModel->joinUserTags($Sender->Data["Discussion"], "Discussion");
+            $ReactionModel->joinUserTags($Sender->Data["Comments"], "Comment");
 
-            if (isset($Sender->Data['Answers'])) {
-                $ReactionModel->joinUserTags($Sender->Data['Answers'], 'Comment');
+            if (isset($Sender->Data["Answers"])) {
+                $ReactionModel->joinUserTags($Sender->Data["Answers"], "Comment");
             }
         }
 
-        include_once $Sender->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+        include_once $Sender->fetchViewLocation("reaction_functions", "", "plugins/Reactions");
     }
 
     /**
@@ -806,19 +851,20 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function commentModel_beforeUpdateCommentCount_handler($sender, $args) {
-        if (!isset($args['Discussion'])) {
+    public function commentModel_beforeUpdateCommentCount_handler($sender, $args)
+    {
+        if (!isset($args["Discussion"])) {
             return;
         }
 
         // A discussion with a low score counts as sunk.
-        $discussion =& $args['Discussion'];
-        if ((int)val('Score', $discussion) <= c('Reactions.BuryValue', -5)) {
+        $discussion = &$args["Discussion"];
+        if ((int) val("Score", $discussion) <= c("Reactions.BuryValue", -5)) {
             $controller = Gdn::controller();
             if ($controller instanceof Gdn_Controller) {
-                $controller->setData('Score', val('Score', $discussion));
+                $controller->setData("Score", val("Score", $discussion));
             }
-            setValue('Sink', $discussion, true);
+            setValue("Sink", $discussion, true);
         }
     }
 
@@ -827,8 +873,9 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function base_beforeCommentRender_handler($Sender) {
-        include_once $Sender->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+    public function base_beforeCommentRender_handler($Sender)
+    {
+        include_once $Sender->fetchViewLocation("reaction_functions", "", "plugins/Reactions");
     }
     /**
 
@@ -838,11 +885,12 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param $Args
      * @throws Exception
      */
-    public function base_afterUserInfo_handler($Sender, $Args) {
+    public function base_afterUserInfo_handler($Sender, $Args)
+    {
         // Fetch the view helper functions.
-        include_once Gdn::controller()->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+        include_once Gdn::controller()->fetchViewLocation("reaction_functions", "", "plugins/Reactions");
 
-        $reactionsModuleEnabled = \Gdn::themeFeatures()->get('NewReactionsModule');
+        $reactionsModuleEnabled = \Gdn::themeFeatures()->get("NewReactionsModule");
         if ($reactionsModuleEnabled) {
             /** @var ReactionsModule $reactionModule */
             $reactionModule = Gdn::getContainer()->get(ReactionsModule::class);
@@ -857,14 +905,15 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @see writeProfileCounts()
      */
-    public function displayProfileCounts() {
-        $heading = '<h2 class="H">'.t('Reactions').'</h2>';
+    public function displayProfileCounts()
+    {
+        $heading = '<h2 class="H">' . t("Reactions") . "</h2>";
         if (BoxThemeShim::isActive()) {
             BoxThemeShim::startWidget();
             BoxThemeShim::startHeading();
             echo $heading;
             BoxThemeShim::endHeading();
-            BoxThemeShim::startBox('ReactionsWrap');
+            BoxThemeShim::startBox("ReactionsWrap");
             writeProfileCounts();
             BoxThemeShim::endBox();
             BoxThemeShim::endWidget();
@@ -872,7 +921,7 @@ class ReactionsPlugin extends Gdn_Plugin {
             echo '<div class="ReactionsWrap">';
             echo $heading;
             writeProfileCounts();
-            echo '</div>';
+            echo "</div>";
         }
     }
 
@@ -882,11 +931,12 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function base_beforeCommentDisplay_handler($sender, $args) {
-        $cssClass = scoreCssClass($args['Object']);
+    public function base_beforeCommentDisplay_handler($sender, $args)
+    {
+        $cssClass = scoreCssClass($args["Object"]);
         if ($cssClass) {
-            $args['CssClass'] .= ' '.$cssClass;
-            setValue('_CssClass', $args['Object'], $cssClass);
+            $args["CssClass"] .= " " . $cssClass;
+            setValue("_CssClass", $args["Object"], $cssClass);
         }
     }
 
@@ -903,44 +953,41 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @throws \Garden\Web\Exception\NotFoundException Throws an exception if the reaction isn't found.
      * @throws \Vanilla\Exception\PermissionException Permission exception.
      */
-    public function usersApiController_get_reacted(
-        UsersApiController $sender,
-        int $userID,
-        array $query = []
-    ): Data {
-        $sender->permission('Garden.Profiles.View');
+    public function usersApiController_get_reacted(UsersApiController $sender, int $userID, array $query = []): Data
+    {
+        $sender->permission("Garden.Profiles.View");
 
         // Make the schemas
         $in = Schema::parse([
-            'reactionUrlcode:s',
-            'expand' => ApiUtils::getExpandDefinition(['all', 'insertUser', 'updateUser', 'reactions']),
-            'page:i?' => [
-                'description' => 'Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).',
-                'default' => 1,
-                'minimum' => 1,
+            "reactionUrlcode:s",
+            "expand" => ApiUtils::getExpandDefinition(["all", "insertUser", "updateUser", "reactions"]),
+            "page:i?" => [
+                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                "default" => 1,
+                "minimum" => 1,
             ],
-            'limit:i?' => [
-                'description' => 'Desired number of items per page.',
-                'default' => $this->reactionModel->getDefaultLimit(),
-                'minimum' => 1,
-                'maximum' => ApiUtils::getMaxLimit(100),
+            "limit:i?" => [
+                "description" => "Desired number of items per page.",
+                "default" => $this->reactionModel->getDefaultLimit(),
+                "minimum" => 1,
+                "maximum" => ApiUtils::getMaxLimit(100),
             ],
         ]);
 
         $out = Schema::parse([
-            ':a' => [
-                'name:s',
-                'body:s',
-                'format:s',
-                'insertUserID:i',
-                'updateUserID:i?',
-                'dateUpdated:dt?',
-                'recordID:i',
-                'recordType:s',
-                'url:s',
-                'reactions?' => $this->getReactionSummaryFragment(),
-                'insertUser?' => $sender->getUserFragmentSchema(),
-                'updateUser?' => $sender->getUserFragmentSchema(),
+            ":a" => [
+                "name:s",
+                "body:s",
+                "format:s",
+                "insertUserID:i",
+                "updateUserID:i?",
+                "dateUpdated:dt?",
+                "recordID:i",
+                "recordType:s",
+                "url:s",
+                "reactions?" => $this->getReactionSummaryFragment(),
+                "insertUser?" => $sender->getUserFragmentSchema(),
+                "updateUser?" => $sender->getUserFragmentSchema(),
             ],
         ]);
 
@@ -950,27 +997,21 @@ class ReactionsPlugin extends Gdn_Plugin {
         $user = $sender->userByID($userID);
 
         // Get the reaction and throw an error if it isn't found.
-        $reactionType = ReactionModel::reactionTypes($validatedQuery['reactionUrlcode']);
+        $reactionType = ReactionModel::reactionTypes($validatedQuery["reactionUrlcode"]);
         if (!$reactionType) {
-            throw new NotFoundException('Reaction');
+            throw new NotFoundException("Reaction");
         }
 
         $where = [
-            'UserID' => $user['UserID'],
-            'RecordType' => ['Discussion-Total', 'Comment-Total'],
-            'TagID' => $reactionType['TagID'],
-            'Total >' => 0,
+            "UserID" => $user["UserID"],
+            "RecordType" => ["Discussion-Total", "Comment-Total"],
+            "TagID" => $reactionType["TagID"],
+            "Total >" => 0,
         ];
-        [$offset, $limit] = offsetLimit("p{$validatedQuery['page']}", $validatedQuery['limit']);
-        $pascalData = $this->reactionModel->getRecordsWhere(
-            $where,
-            'DateInserted',
-            'desc',
-            $limit,
-            $offset
-        );
+        [$offset, $limit] = offsetLimit("p{$validatedQuery["page"]}", $validatedQuery["limit"]);
+        $pascalData = $this->reactionModel->getRecordsWhere($where, "DateInserted", "desc", $limit, $offset);
 
-        $expand = $validatedQuery['expand'] ?? [];
+        $expand = $validatedQuery["expand"] ?? [];
 
         // Convert the array keys for api output.
         $data = [];
@@ -979,37 +1020,36 @@ class ReactionsPlugin extends Gdn_Plugin {
         }
 
         // Add the user data, if requested.
-        ModelUtils::leftJoin(
-            $data,
-            ModelUtils::expandedFields(['insertUser', 'updateUser'], $expand),
-            [$this->userModel, 'fetchFragments']
-        );
+        ModelUtils::leftJoin($data, ModelUtils::expandedFields(["insertUser", "updateUser"], $expand), [
+            $this->userModel,
+            "fetchFragments",
+        ]);
 
         // Add the reaction data, if requested.
-        if (ModelUtils::expandedFields(['reactions'], $expand)) {
-            $attributes = array_column($pascalData, 'Attributes', 'RecordID');
+        if (ModelUtils::expandedFields(["reactions"], $expand)) {
+            $attributes = array_column($pascalData, "Attributes", "RecordID");
             array_walk($data, function (&$data) use ($attributes) {
-                $withAttributes = $this->addAttributes($data, $attributes[$data['recordID']]);
+                $withAttributes = $this->addAttributes($data, $attributes[$data["recordID"]]);
                 $summary = ApiUtils::convertOutputKeys($this->reactionModel->getRecordSummary($withAttributes));
-                $data['reactions'] = $summary;
+                $data["reactions"] = $summary;
             });
         }
 
         // Render the body in html.
         foreach ($data as &$record) {
-            $record['body'] = Gdn::formatService()->renderHTML($record['body'], $record['format']);
+            $record["body"] = Gdn::formatService()->renderHTML($record["body"], $record["format"]);
         }
         $data = $out->validate($data);
 
         // Get the paging info.
         $paging = ApiUtils::morePagerInfo(
             $data,
-            'url',
-            ['page' => $validatedQuery['page'], 'limit' => $validatedQuery['limit']],
+            "url",
+            ["page" => $validatedQuery["page"], "limit" => $validatedQuery["limit"]],
             $in
         );
 
-        return new Data($data, ['paging' => $paging]);
+        return new Data($data, ["paging" => $paging]);
     }
 
     /**
@@ -1021,8 +1061,14 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param string $reaction Which reaction is selected.
      * @param int|string $page What page to show. Defaults to 1.
      */
-    public function profileController_reactions_create($sender, $userReference, $username = '', $reaction = '', $page = '') {
-        $sender->permission('Garden.Profiles.View');
+    public function profileController_reactions_create(
+        $sender,
+        $userReference,
+        $username = "",
+        $reaction = "",
+        $page = ""
+    ) {
+        $sender->permission("Garden.Profiles.View");
 
         $reactionType = ReactionModel::reactionTypes($reaction);
         if (!$reactionType) {
@@ -1031,41 +1077,50 @@ class ReactionsPlugin extends Gdn_Plugin {
 
         $sender->editMode(false);
         $sender->getUserInfo($userReference, $username);
-        $userID = val('UserID', $sender->User);
+        $userID = val("UserID", $sender->User);
 
         [$offset, $limit] = offsetLimit($page, 5);
 
         // If this value is less-than-or-equal-to _CurrentRecords, we'll get a "next" pagination link.
-        $sender->setData('_Limit', $limit + 1);
+        $sender->setData("_Limit", $limit + 1);
 
         // Try to query five additional records to compensate for user permission and deleted record issues.
         $reactionModel = new ReactionModel();
         $data = $reactionModel->getRecordsWhere(
-            ['TagID' => $reactionType['TagID'], 'RecordType' => ['Discussion-Total', 'Comment-Total'], 'UserID' => $userID, 'Total >' => 0],
-            'DateInserted', 'desc',
-            $limit + 5, $offset);
-        $sender->setData('_CurrentRecords', count($data));
+            [
+                "TagID" => $reactionType["TagID"],
+                "RecordType" => ["Discussion-Total", "Comment-Total"],
+                "UserID" => $userID,
+                "Total >" => 0,
+            ],
+            "DateInserted",
+            "desc",
+            $limit + 5,
+            $offset
+        );
+        $sender->setData("_CurrentRecords", count($data));
 
         // If necessary, shave records off the end to get back down to the original size limit.
         while (count($data) > $limit) {
             array_pop($data);
         }
-        if (c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) === 'avatars') {
+        if (c("Plugins.Reactions.ShowUserReactions", ReactionsPlugin::RECORD_REACTIONS_DEFAULT) === "avatars") {
             $reactionModel->joinUserTags($data);
         }
 
-        $sender->setData('Data', $data);
-        $sender->setData('EditMode', false, true);
-        $sender->setData('_robots', 'noindex, nofollow');
+        $sender->setData("Data", $data);
+        $sender->setData("EditMode", false, true);
+        $sender->setData("_robots", "noindex, nofollow");
 
-        $canonicalUrl = userUrl($sender->User, '', 'reactions');
-        if (!empty($reaction) || !in_array($page, ['', 'p1'])) {
-            $canonicalUrl .= '?'.http_build_query(['reaction' => strtolower($reaction) ?: null, 'page' => $page ?: null]);
+        $canonicalUrl = userUrl($sender->User, "", "reactions");
+        if (!empty($reaction) || !in_array($page, ["", "p1"])) {
+            $canonicalUrl .=
+                "?" . http_build_query(["reaction" => strtolower($reaction) ?: null, "page" => $page ?: null]);
         }
         $sender->canonicalUrl(url($canonicalUrl, true));
 
-        $sender->_setBreadcrumbs(t($reactionType['Name']), $sender->canonicalUrl());
-        $sender->setTabView('Reactions', 'DataList', '', 'plugins/Reactions');
+        $sender->_setBreadcrumbs(t($reactionType["Name"]), $sender->canonicalUrl());
+        $sender->setTabView("Reactions", "DataList", "", "plugins/Reactions");
         $this->addJs($sender);
 
         $sender->render();
@@ -1076,36 +1131,44 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param ProfileController $sender
      */
-    public function profileController_render_before($sender) {
-        if (!$sender->data('Profile')) {
+    public function profileController_render_before($sender)
+    {
+        if (!$sender->data("Profile")) {
             return;
         }
 
         // Grab all of the counts for the user.
         $data = Gdn::sql()
-            ->getWhere('UserTag', ['RecordID' => $sender->data('Profile.UserID'), 'RecordType' => 'User', 'UserID' => ReactionModel::USERID_OTHER])
+            ->getWhere("UserTag", [
+                "RecordID" => $sender->data("Profile.UserID"),
+                "RecordType" => "User",
+                "UserID" => ReactionModel::USERID_OTHER,
+            ])
             ->resultArray();
-        $data = Gdn_DataSet::index($data, ['TagID']);
+        $data = Gdn_DataSet::index($data, ["TagID"]);
 
-        $counts = $sender->data('Counts', []);
+        $counts = $sender->data("Counts", []);
         foreach (ReactionModel::reactionTypes() as $code => $type) {
-            if (!$type['Active']) {
+            if (!$type["Active"]) {
                 continue;
             }
 
             $row = [
-                'Name' => $type['Name'],
-                'Url' => url(userUrl($sender->data('Profile'), '', 'reactions').'?reaction='.urlencode($code), true),
-                'Total' => 0
+                "Name" => $type["Name"],
+                "Url" => url(
+                    userUrl($sender->data("Profile"), "", "reactions") . "?reaction=" . urlencode($code),
+                    true
+                ),
+                "Total" => 0,
             ];
 
-            if (isset($data[$type['TagID']])) {
-                $row['Total'] = $data[$type['TagID']]['Total'];
+            if (isset($data[$type["TagID"]])) {
+                $row["Total"] = $data[$type["TagID"]]["Total"];
             }
-            $counts[$type['Name']] = $row;
+            $counts[$type["Name"]] = $row;
         }
 
-        $sender->setData('Counts', $counts);
+        $sender->setData("Counts", $counts);
         $this->addJs($sender);
     }
 
@@ -1120,40 +1183,41 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function rootController_react_create($Sender, $RecordType, $Reaction, $ID, $selfReact = false) {
+    public function rootController_react_create($Sender, $RecordType, $Reaction, $ID, $selfReact = false)
+    {
         if (!Gdn::session()->isValid()) {
-            throw new Gdn_UserException(t('You need to sign in before you can do this.'), 403);
+            throw new Gdn_UserException(t("You need to sign in before you can do this."), 403);
         }
 
-        include_once $Sender->fetchViewLocation('reaction_functions', '', 'plugins/Reactions');
+        include_once $Sender->fetchViewLocation("reaction_functions", "", "plugins/Reactions");
 
         if (!$Sender->Request->isAuthenticatedPostBack(true)) {
-            throw permissionException('Javascript');
+            throw permissionException("Javascript");
         }
 
         $ReactionType = ReactionModel::reactionTypes($Reaction);
-        $Sender->EventArguments['ReactionType'] = &$ReactionType;
-        $Sender->EventArguments['RecordType'] = $RecordType;
-        $Sender->EventArguments['RecordID'] = $ID;
-        $Sender->fireAs('ReactionModel')->fireEvent('GetReaction');
+        $Sender->EventArguments["ReactionType"] = &$ReactionType;
+        $Sender->EventArguments["RecordType"] = $RecordType;
+        $Sender->EventArguments["RecordID"] = $ID;
+        $Sender->fireAs("ReactionModel")->fireEvent("GetReaction");
 
         // Only allow enabled reactions
-        if (!val('Active', $ReactionType)) {
+        if (!val("Active", $ReactionType)) {
             throw forbiddenException("@You may not use that Reaction.");
         }
 
         // Permission
-        if ($Permission = val('Permission', $ReactionType)) {
+        if ($Permission = val("Permission", $ReactionType)) {
             // Check reaction's permission if a custom/specific one is applied
             $Sender->permission($Permission);
-        } elseif ($PermissionClass = val('Class', $ReactionType)) {
+        } elseif ($PermissionClass = val("Class", $ReactionType)) {
             // Check reaction's permission based on class
-            $Sender->permission('Reactions.'.$PermissionClass.'.Add');
+            $Sender->permission("Reactions." . $PermissionClass . ".Add");
         }
 
         $ReactionModel = new ReactionModel();
         $ReactionModel->react($RecordType, $ID, $Reaction, null, $selfReact);
-        $Sender->render('Blank', 'Utility', 'Dashboard');
+        $Sender->render("Blank", "Utility", "Dashboard");
     }
 
     /**
@@ -1161,15 +1225,18 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $sender
      */
-    public function base_render_before($sender) {
-        if (is_object($menu = val('Menu', $sender))) {
-            $menu->addLink('BestOf', t('Best Of...'), '/bestof/everything', false, ['class' => 'BestOf']);
+    public function base_render_before($sender)
+    {
+        if (is_object($menu = val("Menu", $sender))) {
+            $menu->addLink("BestOf", t("Best Of..."), "/bestof/everything", false, ["class" => "BestOf"]);
         }
         if (!isMobile()) {
-            $sender->addDefinition('ShowUserReactions', c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT));
+            $sender->addDefinition(
+                "ShowUserReactions",
+                c("Plugins.Reactions.ShowUserReactions", ReactionsPlugin::RECORD_REACTIONS_DEFAULT)
+            );
         }
     }
-
 
     /**
      * Add a "Best Of" view for reacted content.
@@ -1178,84 +1245,98 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param string $reaction Type of reaction content to show
      * @param int $page The current page of content
      */
-    public function rootController_bestOfOld_create($sender, $reaction = 'everything') {
+    public function rootController_bestOfOld_create($sender, $reaction = "everything")
+    {
         // Load all of the reaction types.
         try {
-            $reactionTypes = ReactionModel::getReactionTypes(['Class' => 'Positive', 'Active' => 1]);
-            $sender->setData('ReactionTypes', $reactionTypes);
+            $reactionTypes = ReactionModel::getReactionTypes(["Class" => "Positive", "Active" => 1]);
+            $sender->setData("ReactionTypes", $reactionTypes);
         } catch (Exception $ex) {
-            $sender->setData('ReactionTypes', []);
+            $sender->setData("ReactionTypes", []);
         }
         if (!isset($reactionTypes[$reaction])) {
-            $reaction = 'everything';
+            $reaction = "everything";
         }
-        $sender->setData('CurrentReaction', $reaction);
+        $sender->setData("CurrentReaction", $reaction);
 
         // Define the query offset & limit.
-        $page = 'p'.getIncomingValue('Page', 1);
-        $limit = c('Plugins.Reactions.BestOfPerPage', 30);
+        $page = "p" . getIncomingValue("Page", 1);
+        $limit = c("Plugins.Reactions.BestOfPerPage", 30);
         [$offset, $limit] = offsetLimit($page, $limit);
-        $sender->setData('_Limit', $limit + 1);
+        $sender->setData("_Limit", $limit + 1);
 
         $reactionModel = new ReactionModel();
-        if ($reaction === 'everything') {
-            $promotedTagID = $reactionModel->defineTag('Promoted', 'BestOf');
+        if ($reaction === "everything") {
+            $promotedTagID = $reactionModel->defineTag("Promoted", "BestOf");
             $data = $reactionModel->getRecordsWhere(
-                ['TagID' => $promotedTagID, 'RecordType' => ['Discussion', 'Comment']],
-                'DateInserted', 'desc',
-                $limit + 1, $offset);
+                ["TagID" => $promotedTagID, "RecordType" => ["Discussion", "Comment"]],
+                "DateInserted",
+                "desc",
+                $limit + 1,
+                $offset
+            );
         } else {
             $reactionType = $reactionTypes[$reaction];
             $data = $reactionModel->getRecordsWhere(
-                ['TagID' => $reactionType['TagID'], 'RecordType' => ['Discussion-Total', 'Comment-Total'], 'Total >=' => 1],
-                'DateInserted', 'desc',
-                $limit + 1, $offset);
+                [
+                    "TagID" => $reactionType["TagID"],
+                    "RecordType" => ["Discussion-Total", "Comment-Total"],
+                    "Total >=" => 1,
+                ],
+                "DateInserted",
+                "desc",
+                $limit + 1,
+                $offset
+            );
         }
 
-        $sender->setData('_CurrentRecords', count($data));
+        $sender->setData("_CurrentRecords", count($data));
         if (count($data) > $limit) {
             array_pop($data);
         }
-        if (c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars') {
+        if (c("Plugins.Reactions.ShowUserReactions", ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == "avatars") {
             $reactionModel->joinUserTags($data);
         }
-        $sender->setData('Data', $data);
+        $sender->setData("Data", $data);
 
         // Set up head.
         $sender->Head = new HeadModule($sender);
-        $sender->addJsFile('jquery.js');
-        $sender->addJsFile('jquery.livequery.js');
-        $sender->addJsFile('global.js');
-        $sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions'); // I customized this to get proper callbacks.
-        $sender->addJsFile('library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js', 'plugins/Reactions');
-        $sender->addJsFile('tile.js', 'plugins/Reactions');
-        $sender->addCssFile('style.css');
-        $sender->addCssFile('vanillicon.css', 'static');
+        $sender->addJsFile("jquery.js");
+        $sender->addJsFile("jquery.livequery.js");
+        $sender->addJsFile("global.js");
+        $sender->addJsFile("library/jQuery-Masonry/jquery.masonry.js", "plugins/Reactions"); // I customized this to get proper callbacks.
+        $sender->addJsFile("library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js", "plugins/Reactions");
+        $sender->addJsFile("tile.js", "plugins/Reactions");
+        $sender->addCssFile("style.css");
+        $sender->addCssFile("vanillicon.css", "static");
 
         // Set the title, breadcrumbs, canonical.
-        $sender->title(t('Best Of'));
-        $sender->setData('Breadcrumbs', [['Name' => t('Best Of'), 'Url' => '/bestof/everything']]);
+        $sender->title(t("Best Of"));
+        $sender->setData("Breadcrumbs", [["Name" => t("Best Of"), "Url" => "/bestof/everything"]]);
         $sender->canonicalUrl(
-            url(concatSep('/', 'bestof/'.$reaction, pageNumber($offset, $limit, true, Gdn::session()->UserID != 0)), true),
+            url(
+                concatSep("/", "bestof/" . $reaction, pageNumber($offset, $limit, true, Gdn::session()->UserID != 0)),
+                true
+            ),
             Gdn::session()->UserID == 0
         );
 
         // Modules
-        $sender->addModule('GuestModule');
-        $sender->addModule('SignedInModule');
-        $sender->addModule('BestOfFilterModule');
+        $sender->addModule("GuestModule");
+        $sender->addModule("SignedInModule");
+        $sender->addModule("BestOfFilterModule");
 
         // Render the page.
-        if (class_exists('LeaderBoardModule')) {
-            $sender->addModule('LeaderBoardModule');
+        if (class_exists("LeaderBoardModule")) {
+            $sender->addModule("LeaderBoardModule");
 
             $module = new LeaderBoardModule();
-            $module->SlotType = 'a';
+            $module->SlotType = "a";
             $sender->addModule($module);
         }
 
         // Render the page (or deliver the view)
-        $sender->render('bestof_old', '', 'plugins/Reactions');
+        $sender->render("bestof_old", "", "plugins/Reactions");
     }
 
     /**
@@ -1264,90 +1345,85 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param RootController $sender Controller firing the event.
      * @param string $reaction Type of reaction content to show
      */
-    public function rootController_bestOf_create($sender, $reaction = 'everything') {
-        Gdn_Theme::section('BestOf');
+    public function rootController_bestOf_create($sender, $reaction = "everything")
+    {
+        Gdn_Theme::section("BestOf");
         // Load all of the reaction types.
         try {
-            $reactionTypes = ReactionModel
-                ::getReactionTypes(['Class' => 'Positive', 'Active' => 1]);
+            $reactionTypes = ReactionModel::getReactionTypes(["Class" => "Positive", "Active" => 1]);
 
-            $sender->setData('ReactionTypes', $reactionTypes);
+            $sender->setData("ReactionTypes", $reactionTypes);
         } catch (Exception $ex) {
-            $sender->setData('ReactionTypes', []);
+            $sender->setData("ReactionTypes", []);
         }
 
         if (!isset($reactionTypes[$reaction])) {
-            $reaction = 'everything';
+            $reaction = "everything";
         }
-        $sender->setData('CurrentReaction', $reaction);
+        $sender->setData("CurrentReaction", $reaction);
 
         // Define the query offset & limit.
-        $page = Gdn::request()->get('Page', 1);
+        $page = Gdn::request()->get("Page", 1);
 
         // Limit the number of pages.
         if (self::BEST_OF_MAX_PAGES && $page > self::BEST_OF_MAX_PAGES) {
             $page = self::BEST_OF_MAX_PAGES;
         }
-        $page = 'p'.$page;
+        $page = "p" . $page;
 
-        $limit = c('Plugins.Reactions.BestOfPerPage', 10);
+        $limit = c("Plugins.Reactions.BestOfPerPage", 10);
         [$offset, $limit] = offsetLimit($page, $limit);
 
-        $sender->setData('_Limit', $limit + 1);
+        $sender->setData("_Limit", $limit + 1);
 
         $reactionModel = new ReactionModel();
-        saveToConfig('Plugins.Reactions.ShowUserReactions', false, false);
-        if ($reaction == 'everything') {
-            $promotedTagID = $reactionModel->defineTag('Promoted', 'BestOf');
-            $reactionModel->fireEvent('BeforeGet', ['ApplyRestrictions' => true]);
+        saveToConfig("Plugins.Reactions.ShowUserReactions", false, false);
+        if ($reaction == "everything") {
+            $promotedTagID = $reactionModel->defineTag("Promoted", "BestOf");
+            $reactionModel->fireEvent("BeforeGet", ["ApplyRestrictions" => true]);
             $data = $reactionModel->getRecordsWhere(
-                ['TagID' => $promotedTagID, 'RecordType' => ['Discussion', 'Comment']],
-                'UserTag.DateInserted',
-                'desc',
+                ["TagID" => $promotedTagID, "RecordType" => ["Discussion", "Comment"]],
+                "UserTag.DateInserted",
+                "desc",
                 $limit + 1,
                 $offset
             );
         } else {
             $reactionType = $reactionTypes[$reaction];
-            $reactionModel->fireEvent(
-                'BeforeGet',
-                [
-                    'RecordType' => [
-                        'Discussion' => 'Discussion-Total',
-                        'Comment' => 'Comment-Total'
-                    ],
-                    'ApplyRestrictions' => true
-                ]
-            );
+            $reactionModel->fireEvent("BeforeGet", [
+                "RecordType" => [
+                    "Discussion" => "Discussion-Total",
+                    "Comment" => "Comment-Total",
+                ],
+                "ApplyRestrictions" => true,
+            ]);
             $data = $reactionModel->getRecordsWhere(
                 [
-                    'TagID' => $reactionType['TagID'],
-                    'RecordType' => [
-                        'Discussion-Total', 'Comment-Total'
-                    ],
-                    'Total >=' => 1
+                    "TagID" => $reactionType["TagID"],
+                    "RecordType" => ["Discussion-Total", "Comment-Total"],
+                    "Total >=" => 1,
                 ],
-                'UserTag.DateInserted',
-                'desc',
+                "UserTag.DateInserted",
+                "desc",
                 $limit + 1,
                 $offset
             );
         }
 
-        $sender->setData('_CurrentRecords', $reactionModel->LastCount);
+        $sender->setData("_CurrentRecords", $reactionModel->LastCount);
         if (count($data) > $limit) {
             array_pop($data);
         }
-        $sender->setData('Data', $data);
+        $sender->setData("Data", $data);
 
         // Set up head
         $sender->Head = new HeadModule($sender);
 
-        $sender->addJsFile('jquery.js');
-        $sender->addJsFile('jquery.livequery.js');
-        $sender->addJsFile('global.js');
-        $sender->addJsFile('jquery.form.js');
-        $sender->addJsFile('jquery.popup.js');
+        $sender->addJsFile("jquery.js");
+        $sender->addJsFile("jquery.livequery.js");
+        $sender->addJsFile("global.js");
+        $sender->addJsFile("jquery.form.js");
+        $sender->addJsFile("jquery.popup.js");
 
         // A little ugly bit will do the trick until this tiled layout has been rewritten.
         // This janky jquery masonry plugin is not peformant and is very buggy.
@@ -1356,41 +1432,48 @@ class ReactionsPlugin extends Gdn_Plugin {
         //
         // See https://github.com/vanilla/support/issues/4368#issuecomment-920959129
         if (\Gdn::themeFeatures()->useDataDrivenTheme()) {
-            \Gdn::config()->touch('Plugins.Reactions.BestOfStyle', 'List', false);
+            \Gdn::config()->touch("Plugins.Reactions.BestOfStyle", "List", false);
         }
 
-        if (c('Plugins.Reactions.BestOfStyle', 'Tiles') == 'Tiles') {
-            $sender->addJsFile('library/jQuery-Masonry/jquery.masonry.js', 'plugins/Reactions'); // I customized this to get proper callbacks.
-            $sender->addJsFile('library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js', 'plugins/Reactions');
-            $sender->addJsFile('tile.js', 'plugins/Reactions');
-            $sender->CssClass .= ' NoPanel';
-            $view = $sender->deliveryType() == DELIVERY_TYPE_VIEW ? 'tile_items' : 'tiles';
+        if (c("Plugins.Reactions.BestOfStyle", "Tiles") == "Tiles") {
+            $sender->addJsFile("library/jQuery-Masonry/jquery.masonry.js", "plugins/Reactions"); // I customized this to get proper callbacks.
+            $sender->addJsFile("library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js", "plugins/Reactions");
+            $sender->addJsFile("tile.js", "plugins/Reactions");
+            $sender->CssClass .= " NoPanel";
+            $view = $sender->deliveryType() == DELIVERY_TYPE_VIEW ? "tile_items" : "tiles";
         } else {
-            $view = 'BestOf';
-            $sender->addModule('GuestModule');
-            $sender->addModule('SignedInModule');
-            $sender->addModule('BestOfFilterModule');
+            $view = "BestOf";
+            $sender->addModule("GuestModule");
+            $sender->addModule("SignedInModule");
+            $sender->addModule("BestOfFilterModule");
         }
 
-        $sender->addCssFile('style.css');
-        $sender->addCssFile('vanillicon.css', 'static');
+        $sender->addCssFile("style.css");
+        $sender->addCssFile("vanillicon.css", "static");
 
         // Set the title, breadcrumbs, canonical
-        $sender->title(t('Best Of'));
-        $sender->setData('Breadcrumbs', [['Name' => t('Best Of'), 'Url' => '/bestof/everything']]);
+        $sender->title(t("Best Of"));
+        $sender->setData("Breadcrumbs", [["Name" => t("Best Of"), "Url" => "/bestof/everything"]]);
 
         // set canonical url
-        if ($sender->Data['isHomepage']) {
-            $sender->canonicalUrl(url('/', true));
+        if ($sender->Data["isHomepage"]) {
+            $sender->canonicalUrl(url("/", true));
         } else {
             $sender->canonicalUrl(
-                url(concatSep('/', 'bestof/'.$reaction, pageNumber($offset, $limit, true, Gdn::session()->UserID != 0)), true),
+                url(
+                    concatSep(
+                        "/",
+                        "bestof/" . $reaction,
+                        pageNumber($offset, $limit, true, Gdn::session()->UserID != 0)
+                    ),
+                    true
+                ),
                 Gdn::session()->UserID == 0
             );
         }
 
         // Render the page (or deliver the view)
-        $sender->render($view, '', 'plugins/Reactions');
+        $sender->render($view, "", "plugins/Reactions");
     }
 
     /**
@@ -1398,42 +1481,21 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param utilityController $sender
      */
-    public function utilityController_recalculateReactions_create($sender) {
-        $sender->permission('Garden.Settings.Manage');
+    public function utilityController_recalculateReactions_create($sender)
+    {
+        $sender->permission("Garden.Settings.Manage");
 
         $this->form = new Gdn_Form();
 
         if ($this->form->authenticatedPostback()) {
             $reactionModel = new ReactionModel();
             $reactionModel->recalculateTotals();
-            $sender->setData('Recalculated', true);
+            $sender->setData("Recalculated", true);
         }
 
         $sender->addSideMenu();
-        $sender->setData('Title', t('Recalculate Reactions'));
-        $sender->render('Recalculate', '', 'plugins/Reactions');
-    }
-
-    /**
-     * Sort the comments by score if necessary.
-     *
-     * @param CommentModel $commentModel
-     */
-    public function commentModel_afterConstruct_handler($commentModel) {
-        if (!c('Plugins.Reactions.CommentSortEnabled')) {
-            return;
-        }
-
-        $sort = self::commentSort();
-        switch (strtolower($sort)) {
-            case 'score':
-                $commentModel->orderBy(['coalesce(c.Score, 0) desc', 'c.CommentID']);
-                break;
-            case 'date':
-            default:
-                $commentModel->orderBy('c.DateInserted');
-                break;
-        }
+        $sender->setData("Title", t("Recalculate Reactions"));
+        $sender->render("Recalculate", "", "plugins/Reactions");
     }
 
     /**
@@ -1441,16 +1503,18 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender
      */
-    public function vanillaSettingsController_afterCategorySettings_handler($sender) {
-        $showCustomPoints = c('Plugins.Reactions.TrackPointsSeparately', false);
+    public function vanillaSettingsController_afterCategorySettings_handler($sender)
+    {
+        $showCustomPoints = c("Plugins.Reactions.TrackPointsSeparately", false);
         if ($showCustomPoints) {
-            $desc = 'This allows you to create separate leaderboards for this category. Tracking points for this '
-                .'category separately will not be retroactive. To add a category-specific leaderboard module to your '
-                .'theme template, add <code>{module name="LeaderboardModule" CategoryID="7"}</code>, replacing the '
-                .'CategoryID value with the ID of the category with separate tracking enabled.';
-            $label = 'Track leaderboard points for this category separately.';
-            $toggle = $sender->Form->toggle('CustomPoints', $label, [], $desc);
-            echo wrap($toggle, 'li', ['class' => 'form-group']);
+            $desc =
+                "This allows you to create separate leaderboards for this category. Tracking points for this " .
+                "category separately will not be retroactive. To add a category-specific leaderboard module to your " .
+                'theme template, add <code>{module name="LeaderboardModule" CategoryID="7"}</code>, replacing the ' .
+                "CategoryID value with the ID of the category with separate tracking enabled.";
+            $label = "Track leaderboard points for this category separately.";
+            $toggle = $sender->Form->toggle("CustomPoints", $label, [], $desc);
+            echo wrap($toggle, "li", ["class" => "form-group"]);
         }
     }
 
@@ -1459,8 +1523,9 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @return array|bool|mixed|null|string|void
      */
-    public static function commentSort() {
-        if (!c('Plugins.Reactions.CommentSortEnabled')) {
+    public static function commentSort()
+    {
+        if (!c("Plugins.Reactions.CommentSortEnabled")) {
             return;
         }
 
@@ -1468,19 +1533,19 @@ class ReactionsPlugin extends Gdn_Plugin {
             return self::$_CommentSort;
         }
 
-        $sort = getIncomingValue('Sort', '');
+        $sort = getIncomingValue("Sort", "");
         if (Gdn::session()->isValid()) {
-            if ($sort == '') {
+            if ($sort == "") {
                 // No sort was specified so grab it from the user's preferences.
-                $sort = Gdn::session()->getPreference('Plugins.Reactions.CommentSort', 'score');
+                $sort = Gdn::session()->getPreference("Plugins.Reactions.CommentSort", "score");
             } else {
                 // Save the sort to the user's preferences.
-                Gdn::session()->setPreference('Plugins.Reactions.CommentSort', $sort == 'score' ? 'score' : $sort);
+                Gdn::session()->setPreference("Plugins.Reactions.CommentSort", $sort == "score" ? "score" : $sort);
             }
         }
 
-        if (!in_array($sort, ['score', 'date'])) {
-            $sort = 'date';
+        if (!in_array($sort, ["score", "date"])) {
+            $sort = "date";
         }
 
         self::$_CommentSort = $sort;
@@ -1493,40 +1558,40 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param discussionController $sender
      */
-    public function discussionController_beforeCommentDisplay_handler($sender) {
-        if (!c('Plugins.Reactions.CommentSortEnabled')) {
+    public function discussionController_beforeCommentDisplay_handler($sender)
+    {
+        if (!c("Plugins.Reactions.CommentSortEnabled")) {
             return;
         }
 
-        if (val('Type', $sender->EventArguments, 'Comment') == 'Comment' && !val('VoteHeaderWritten', $this)) {
-            ?>
+        if (val("Type", $sender->EventArguments, "Comment") == "Comment" && !val("VoteHeaderWritten", $this)) { ?>
             <li class="Item">
-                <span class="NavLabel"><?php echo t('Sort by'); ?></span>
+                <span class="NavLabel"><?php echo t("Sort by"); ?></span>
             <span class="DiscussionSort NavBar">
             <?php
-                $query = Gdn::request()->get();
+            $query = Gdn::request()->get();
 
-                $query['Sort'] = 'score';
+            $query["Sort"] = "score";
 
-                echo anchor('Points',
-                    url('?'.http_build_query($query), true),
-                    'NoTop Button'.(self::commentSort() == 'score' ? ' Active' : ''),
-                    ['rel' => 'nofollow', 'alt' => t('Sort by reaction points')]
-                );
+            echo anchor(
+                "Points",
+                url("?" . http_build_query($query), true),
+                "NoTop Button" . (self::commentSort() == "score" ? " Active" : ""),
+                ["rel" => "nofollow", "alt" => t("Sort by reaction points")]
+            );
 
-                $query['Sort'] = 'date';
+            $query["Sort"] = "date";
 
-                echo anchor('Date Added',
-                    url('?'.http_build_query($query), true),
-                    'NoTop Button'.(self::commentSort() == 'date' ? ' Active' : ''),
-                    ['rel' => 'nofollow', 'alt' => t('Sort by date added')]
-                );
+            echo anchor(
+                "Date Added",
+                url("?" . http_build_query($query), true),
+                "NoTop Button" . (self::commentSort() == "date" ? " Active" : ""),
+                ["rel" => "nofollow", "alt" => t("Sort by date added")]
+            );
             ?>
             </span>
             </li>
-            <?php
-            $this->VoteHeaderWritten = true;
-        }
+            <?php $this->VoteHeaderWritten = true;}
     }
 
     /**
@@ -1534,21 +1599,22 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param TagModel $sender
      */
-    public function tagModel_types_handler($sender) {
-        $sender->addType('BestOf', [
-            'key' => 'BestOf',
-            'name' => 'BestOf',
-            'plural' => 'BestOf',
-            'addtag' => false,
-            'default' => false
+    public function tagModel_types_handler($sender)
+    {
+        $sender->addType("BestOf", [
+            "key" => "BestOf",
+            "name" => "BestOf",
+            "plural" => "BestOf",
+            "addtag" => false,
+            "default" => false,
         ]);
 
-        $sender->addType('Reaction', [
-            'key' => 'Reaction',
-            'name' => 'Reaction',
-            'plural' => 'Reactions',
-            'addtag' => false,
-            'default' => false
+        $sender->addType("Reaction", [
+            "key" => "Reaction",
+            "name" => "Reaction",
+            "plural" => "Reactions",
+            "addtag" => false,
+            "default" => false,
         ]);
     }
 
@@ -1557,18 +1623,21 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Schema $schema
      */
-    private function updatePostSchemaExpand(Schema $schema) {
+    private function updatePostSchemaExpand(Schema $schema)
+    {
         /** @var Schema $expand */
-        $expandEnum = $schema->getField('properties.expand.items.enum');
+        $expandEnum = $schema->getField("properties.expand.items.enum");
         if (is_array($expandEnum)) {
-            if (!in_array('reactions', $expandEnum)) {
-                $expandEnum[] = 'reactions';
-                $schema->setField('properties.expand.items.enum', $expandEnum);
+            if (!in_array("reactions", $expandEnum)) {
+                $expandEnum[] = "reactions";
+                $schema->setField("properties.expand.items.enum", $expandEnum);
             }
         } else {
-            $schema->merge(Schema::parse([
-                'expand?' => ApiUtils::getExpandDefinition(['reactions'])
-            ]));
+            $schema->merge(
+                Schema::parse([
+                    "expand?" => ApiUtils::getExpandDefinition(["reactions"]),
+                ])
+            );
         }
     }
 
@@ -1577,7 +1646,8 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Schema $schema
      */
-    private function updateUserSchemaExpand(Schema $schema) {
+    private function updateUserSchemaExpand(Schema $schema)
+    {
         /** @var Schema $expand */
         $expandEnum = $schema->getField("properties.expand.items.enum");
         if (is_array($expandEnum)) {
@@ -1586,9 +1656,11 @@ class ReactionsPlugin extends Gdn_Plugin {
                 $schema->setField("properties.expand.items.enum", $expandEnum);
             }
         } else {
-            $schema->merge(Schema::parse([
-                "expand?" => ApiUtils::getExpandDefinition(["reactionsReceived"])
-            ]));
+            $schema->merge(
+                Schema::parse([
+                    "expand?" => ApiUtils::getExpandDefinition(["reactionsReceived"]),
+                ])
+            );
         }
     }
 
@@ -1598,28 +1670,29 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param UserModel $sender
      * @param array $args
      */
-    public function userModel_merge_handler($sender, $args) {
-        $oldUser = $args['OldUser'];
-        $newUser = $args['NewUser'];
+    public function userModel_merge_handler($sender, $args)
+    {
+        $oldUser = $args["OldUser"];
+        $newUser = $args["NewUser"];
 
         $reactionModel = new ReactionModel();
-        $reactionModel->mergeUsers(val('UserID', $oldUser), val('UserID', $newUser));
-        Gdn::sql()->put('UserMerge', ['ReactionsMerged' => 1], ['MergeID' => $args['MergeID']]);
+        $reactionModel->mergeUsers(val("UserID", $oldUser), val("UserID", $newUser));
+        Gdn::sql()->put("UserMerge", ["ReactionsMerged" => 1], ["MergeID" => $args["MergeID"]]);
     }
 
-     /**
-      * Add reaction tag names to reserved tags list.
+    /**
+     * Add reaction tag names to reserved tags list.
      *
      * @param DiscussionModel $sender
      * @param array $args
      */
-    public function discussionModel_reservedTags_handler($sender, $args) {
+    public function discussionModel_reservedTags_handler($sender, $args)
+    {
         $reactions = ReactionModel::getReactionTypes();
         $reactionNames = array_keys($reactions);
         foreach ($reactionNames as $tagName) {
-            $args['ReservedTags'][] = $tagName;
+            $args["ReservedTags"][] = $tagName;
         }
-
     }
 
     /**
@@ -1627,7 +1700,8 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Schema $schema
      */
-    public function userGetSchema_init(Schema $schema): void {
+    public function userGetSchema_init(Schema $schema): void
+    {
         $this->updateUserSchemaExpand($schema);
     }
 
@@ -1636,7 +1710,8 @@ class ReactionsPlugin extends Gdn_Plugin {
      *
      * @param Schema $schema
      */
-    public function userIndexSchema_init(Schema $schema): void {
+    public function userIndexSchema_init(Schema $schema): void
+    {
         $this->updateUserSchemaExpand($schema);
     }
 
@@ -1649,7 +1724,13 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $query
      * @param array $rows
      */
-    public function usersApiController_getOutput(array $result, UsersApiController $sender, Schema $inputSchema, array $query, array $rows): array {
+    public function usersApiController_getOutput(
+        array $result,
+        UsersApiController $sender,
+        Schema $inputSchema,
+        array $query,
+        array $rows
+    ): array {
         $expand = $query["expand"] ?? [];
 
         if (!$sender->isExpandField("reactionsReceived", $expand)) {
@@ -1669,7 +1750,13 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $query
      * @param array $rows
      */
-    public function usersApiController_indexOutput(array $result, UsersApiController $sender, Schema $inputSchema, array $query, array $rows): array {
+    public function usersApiController_indexOutput(
+        array $result,
+        UsersApiController $sender,
+        Schema $inputSchema,
+        array $query,
+        array $rows
+    ): array {
         $expand = $query["expand"] ?? [];
 
         if (!$sender->isExpandField("reactionsReceived", $expand)) {
@@ -1685,13 +1772,17 @@ class ReactionsPlugin extends Gdn_Plugin {
      * @param array $users
      * @return array
      */
-    private function expandUserReactionsReceived(array $users): array {
+    private function expandUserReactionsReceived(array $users): array
+    {
         $userIDs = array_column($users, "userID");
         $reactionsByUser = $this->reactionModel->getReceivedByUser($userIDs);
 
         $schema = $this->reactionModel->compoundTypeFragmentSchema();
         foreach ($users as &$userRow) {
-            if (!array_key_exists($userRow["userID"], $reactionsByUser) || !$this->userModel->shouldIncludePrivateRecord($userRow)) {
+            if (
+                !array_key_exists($userRow["userID"], $reactionsByUser) ||
+                !$this->userModel->shouldIncludePrivateRecord($userRow)
+            ) {
                 continue;
             }
             $userRow["reactionsReceived"] = $schema->validate($reactionsByUser[$userRow["userID"]]);
@@ -1700,42 +1791,43 @@ class ReactionsPlugin extends Gdn_Plugin {
     }
 }
 
-if (!function_exists('writeReactions')) {
+if (!function_exists("writeReactions")) {
     /**
      *
      *
      * @param $row
      * @throws Exception
      */
-    function writeReactions($row) {
+    function writeReactions($row)
+    {
         $dataDrivenColors = Gdn::themeFeatures()->useDataDrivenTheme();
-        $attributes = val('Attributes', $row);
+        $attributes = val("Attributes", $row);
         if (is_string($attributes)) {
             $attributes = dbdecode($attributes);
-            setValue('Attributes', $row, $attributes);
+            setValue("Attributes", $row, $attributes);
         }
 
         static $types = null;
         if ($types === null) {
-            $types = ReactionModel::getReactionTypes(['Class' => ['Positive', 'Negative'], 'Active' => 1]);
+            $types = ReactionModel::getReactionTypes(["Class" => ["Positive", "Negative"], "Active" => 1]);
         }
         // Since statically cache the types, we do a copy of type for this row so that plugin can modify the value by reference.
         // Not doing so would alter types for every rows and since Discussions and Comments have different behavior that could be a problem.
         $rowReactionTypesReference = $types;
-        Gdn::controller()->EventArguments['ReactionTypes'] = &$rowReactionTypesReference;
+        Gdn::controller()->EventArguments["ReactionTypes"] = &$rowReactionTypesReference;
 
-        if ($iD = val('CommentID', $row)) {
-            $recordType = 'comment';
-        } elseif ($iD = val('ActivityID', $row)) {
-            $recordType = 'activity';
+        if ($iD = val("CommentID", $row)) {
+            $recordType = "comment";
+        } elseif ($iD = val("ActivityID", $row)) {
+            $recordType = "activity";
         } else {
-            $recordType = 'discussion';
-            $iD = val('DiscussionID', $row);
+            $recordType = "discussion";
+            $iD = val("DiscussionID", $row);
         }
-        Gdn::controller()->EventArguments['RecordType'] = $recordType;
-        Gdn::controller()->EventArguments['RecordID'] = $iD;
+        Gdn::controller()->EventArguments["RecordType"] = $recordType;
+        Gdn::controller()->EventArguments["RecordID"] = $iD;
 
-        if (c('Plugins.Reactions.ShowUserReactions', ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == 'avatars') {
+        if (c("Plugins.Reactions.ShowUserReactions", ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == "avatars") {
             writeRecordReactions($row);
         }
 
@@ -1744,56 +1836,56 @@ if (!function_exists('writeReactions')) {
 
         // Write the flags.
         static $flags = null;
-        if ($flags === null && checkPermission('Reactions.Flag.Add')) {
-            $flags = ReactionModel::getReactionTypes(['Class' => 'Flag', 'Active' => 1]);
+        if ($flags === null && checkPermission("Reactions.Flag.Add")) {
+            $flags = ReactionModel::getReactionTypes(["Class" => "Flag", "Active" => 1]);
             $flagCodes = [];
             foreach ($flags as $flag) {
-                $flagCodes[] = $flag['UrlCode'];
+                $flagCodes[] = $flag["UrlCode"];
             }
-            Gdn::controller()->EventArguments['Flags'] = &$flags;
-            Gdn::controller()->fireEvent('Flags');
+            Gdn::controller()->EventArguments["Flags"] = &$flags;
+            Gdn::controller()->fireEvent("Flags");
         }
 
         // Allow addons to work with flags
-        Gdn::controller()->EventArguments['Flags'] = &$flags;
-        Gdn::controller()->fireEvent('BeforeFlag');
+        Gdn::controller()->EventArguments["Flags"] = &$flags;
+        Gdn::controller()->fireEvent("BeforeFlag");
 
         if (!empty($flags) && is_array($flags)) {
-            echo Gdn_Theme::bulletItem('Flags');
+            echo Gdn_Theme::bulletItem("Flags");
 
             echo ' <span class="FlagMenu ToggleFlyout">';
             // Write the handle.
-            echo reactionButton($row, 'Flag', ['LinkClass' => 'FlyoutButton', 'IsHeading' => true]);
+            echo reactionButton($row, "Flag", ["LinkClass" => "FlyoutButton", "IsHeading" => true]);
             echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
 
             foreach ($flags as $flag) {
                 if (is_callable($flag)) {
-                    echo '<li>'.call_user_func($flag, $row, $recordType, $iD).'</li>';
+                    echo "<li>" . call_user_func($flag, $row, $recordType, $iD) . "</li>";
                 } else {
-                    echo '<li>'.reactionButton($row, $flag['UrlCode']).'</li>';
+                    echo "<li>" . reactionButton($row, $flag["UrlCode"]) . "</li>";
                 }
             }
 
-            Gdn::controller()->fireEvent('AfterFlagOptions');
-            echo '</ul>';
-            echo '</span> ';
+            Gdn::controller()->fireEvent("AfterFlagOptions");
+            echo "</ul>";
+            echo "</span> ";
         }
-        Gdn::controller()->fireEvent('AfterFlag');
+        Gdn::controller()->fireEvent("AfterFlag");
 
-        $score = formatScore(val('Score', $row));
-        echo '<span class="Column-Score Hidden">'.$score.'</span>';
+        $score = formatScore(val("Score", $row));
+        echo '<span class="Column-Score Hidden">' . $score . "</span>";
 
         // Write the reactions.
         $reactionHtml = "";
         foreach ($rowReactionTypesReference as $type) {
-            if (isset($type['RecordTypes']) && !in_array($recordType, (array)$type['RecordTypes'])) {
+            if (isset($type["RecordTypes"]) && !in_array($recordType, (array) $type["RecordTypes"])) {
                 continue;
             }
-            $reactionHtml .= ' '.reactionButton($row, $type['UrlCode']).' ';
+            $reactionHtml .= " " . reactionButton($row, $type["UrlCode"]) . " ";
         }
 
         if ($reactionHtml !== "") {
-            echo Gdn_Theme::bulletItem('Reactions');
+            echo Gdn_Theme::bulletItem("Reactions");
         }
 
         if (!$dataDrivenColors) {
@@ -1804,22 +1896,22 @@ if (!function_exists('writeReactions')) {
         echo $reactionHtml;
 
         if (!$dataDrivenColors) {
-            echo '</span>';
-            echo '</span>';
+            echo "</span>";
+            echo "</span>";
         }
 
-        if (checkPermission(['Garden.Moderation.Manage', 'Moderation.Reactions.Edit'])) {
-            echo Gdn_Theme::bulletItem('ReactionsMod').anchor(
-                t('Log'),
-                "/reactions/logged/{$recordType}/{$iD}",
-                'Popup ReactButton ReactButton-Log',
-                ['rel' => 'nofollow']
-            );
+        if (checkPermission(["Garden.Moderation.Manage", "Moderation.Reactions.Edit"])) {
+            echo Gdn_Theme::bulletItem("ReactionsMod") .
+                anchor(t("Log"), "/reactions/logged/{$recordType}/{$iD}", "Popup ReactButton ReactButton-Log", [
+                    "rel" => "nofollow",
+                ]);
         }
 
-        Gdn::controller()->fireEvent('AfterReactions');
+        Gdn::controller()->fireEvent("AfterReactions");
 
-        echo '</div>';
-        Gdn::controller()->fireAs('DiscussionController')->fireEvent('Replies');
+        echo "</div>";
+        Gdn::controller()
+            ->fireAs("DiscussionController")
+            ->fireEvent("Replies");
     }
 }

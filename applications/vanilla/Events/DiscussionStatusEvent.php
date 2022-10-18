@@ -16,12 +16,13 @@ use Vanilla\Logging\LoggerUtils;
 /**
  * Defines the event dispatched when a status is applied to a discussion
  */
-class DiscussionStatusEvent extends ResourceEvent implements LoggableEventInterface {
-
+class DiscussionStatusEvent extends ResourceEvent implements LoggableEventInterface
+{
     //region Properties
-    public const ACTION_DISCUSSION_STATUS = 'statusUpdate';
+    public const ACTION_DISCUSSION_STATUS = "statusUpdate";
 
-
+    /** @var bool */
+    private $isInternal;
     //endregion
 
     //region Constructor
@@ -32,9 +33,11 @@ class DiscussionStatusEvent extends ResourceEvent implements LoggableEventInterf
      * @param array $payload
      * @param array|object|null $sender
      */
-    public function __construct(string $action, array $payload, $sender = null) {
+    public function __construct(string $action, array $payload, $sender = null, array $status = [])
+    {
         parent::__construct($action, $payload, $sender);
-        $this->type = 'discussion';
+        $this->type = "discussion";
+        $this->isInternal = (bool) $status["isInternal"];
     }
     //endregion
 
@@ -43,9 +46,10 @@ class DiscussionStatusEvent extends ResourceEvent implements LoggableEventInterf
     /**
      * @inheritDoc
      */
-    public function getLogEntry(): LogEntry {
+    public function getLogEntry(): LogEntry
+    {
         $context = LoggerUtils::resourceEventLogContext($this);
-        $context['discussion'] = array_intersect_key($this->payload["discussion"] ?? [], [
+        $context["discussion"] = array_intersect_key($this->payload["discussion"] ?? [], [
             "discussionID" => true,
             "dateInserted" => true,
             "dateUpdated" => true,
@@ -55,11 +59,7 @@ class DiscussionStatusEvent extends ResourceEvent implements LoggableEventInterf
             "name" => true,
         ]);
 
-        $log = new LogEntry(
-            LogLevel::INFO,
-            LoggerUtils::resourceEventLogMessage($this),
-            $context
-        );
+        $log = new LogEntry(LogLevel::INFO, LoggerUtils::resourceEventLogMessage($this), $context);
 
         return $log;
     }
@@ -67,8 +67,18 @@ class DiscussionStatusEvent extends ResourceEvent implements LoggableEventInterf
     /**
      * Convert to string.
      */
-    public function __toString() {
+    public function __toString()
+    {
         return json_encode($this, JSON_PRETTY_PRINT);
     }
+
+    /**
+     * @return bool
+     */
+    public function isInternal(): bool
+    {
+        return $this->isInternal;
+    }
+
     //endregion
 }

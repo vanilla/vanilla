@@ -11,7 +11,6 @@ import TruncatedText from "@library/content/TruncatedText";
 import { searchResultClasses } from "@library/features/search/searchResultsStyles";
 import { IAttachmentIcon } from "@library/content/attachments/AttachmentIcon";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
-import { IUser } from "@library/@types/api/users";
 import { ListItem } from "@library/lists/ListItem";
 import { ListItemMedia } from "@library/lists/ListItemMedia";
 export interface IResult {
@@ -22,23 +21,22 @@ export interface IResult {
     excerpt?: string;
     highlight?: string;
     image?: string;
+    imageSet?: string;
     attachments?: IAttachmentIcon[];
-    location: ICrumb[] | string[];
     icon?: React.ReactNode;
-    userInfo?: IUser;
     rel?: string;
 }
 
 export default function Result(props: IResult) {
-    const { name, className, meta, url, excerpt, image, attachments, icon, highlight } = props;
+    const { name, className, meta, url, excerpt, image, imageSet, attachments, icon, highlight } = props;
     const hasAttachments = !!(attachments && attachments.length > 0);
-    const showImage = !!image && !hasAttachments;
+    const showImage = (!!image || !!imageSet) && !hasAttachments;
     const hasMedia = hasAttachments || showImage;
     const classes = searchResultClasses();
 
     const media = hasMedia ? (
         showImage ? (
-            <ListItemMedia src={image!} alt={t("Thumbnail for: " + name)} />
+            <ListItemMedia src={image!} srcSet={imageSet} alt={t("Thumbnail for: " + name)} />
         ) : hasAttachments ? (
             <AttachmentIcons attachments={attachments!} />
         ) : null

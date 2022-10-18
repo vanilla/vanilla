@@ -12,8 +12,8 @@ use Vanilla\Theme\Asset\JsonThemeAsset;
 /**
  * Simple data class to represent a theme preview.
  */
-class ThemePreview implements \JsonSerializable {
-
+class ThemePreview implements \JsonSerializable
+{
     /** @var string|null */
     private $imageUrl = null;
 
@@ -29,7 +29,8 @@ class ThemePreview implements \JsonSerializable {
      * @param string $url
      * @return $this Chaining
      */
-    public function setImageUrl(string $url): ThemePreview {
+    public function setImageUrl(string $url): ThemePreview
+    {
         $this->imageUrl = $url;
         return $this;
     }
@@ -43,10 +44,11 @@ class ThemePreview implements \JsonSerializable {
      *
      * @return $this Chaining
      */
-    public function addInfo(string $type, string $label, string $value): ThemePreview {
+    public function addInfo(string $type, string $label, string $value): ThemePreview
+    {
         $this->info[$label] = [
-            'type' => $type,
-            'value' => $value,
+            "type" => $type,
+            "value" => $value,
         ];
         return $this;
     }
@@ -57,40 +59,43 @@ class ThemePreview implements \JsonSerializable {
      * @param JsonThemeAsset $jsonAsset
      * @return ThemePreview
      */
-    public function addVariablePreview(JsonThemeAsset $jsonAsset): ThemePreview {
+    public function addVariablePreview(JsonThemeAsset $jsonAsset): ThemePreview
+    {
         $this->variablePreview = [];
         $variables = $jsonAsset->getValue();
 
-        $preset = $variables['global']['options']['preset'] ?? null;
-        $bg = $variables['global']['mainColors']['bg'] ?? $preset === 'dark' ? "#323639" : "#fff";
-        $fg = $variables['global']['mainColors']['fg'] ?? $preset === 'dark' ? '#fff' : '#555a62';
-        $primary = $variables['global']['mainColors']['primary'] ?? null;
-        $this->variablePreview['globalPrimary'] = $primary;
-        $this->variablePreview['globalBg'] = $bg;
-        $this->variablePreview['globalFg'] = $fg;
-        $this->variablePreview['titleBarBg'] = $variables['titleBar']['colors']['bg'] ?? $primary ?? null;
-        $this->variablePreview['titleBarFg'] = $variables['titleBar']['colors']['fg'] ?? null;
-        $this->variablePreview['backgroundImage'] = $variables['splash']['outerBackground']['image']
-            ?? $variables['banner']['outerBackground']['image']
-            ?? null;
+        $preset = $variables["global"]["options"]["preset"] ?? null;
+        $bg = $variables["global"]["mainColors"]["bg"] ?? $preset === "dark" ? "#323639" : "#fff";
+        $fg = $variables["global"]["mainColors"]["fg"] ?? $preset === "dark" ? "#fff" : "#555a62";
+        $primary = $variables["global"]["mainColors"]["primary"] ?? null;
+        $this->variablePreview["globalPrimary"] = $primary;
+        $this->variablePreview["globalBg"] = $bg;
+        $this->variablePreview["globalFg"] = $fg;
+        $this->variablePreview["titleBarBg"] = $variables["titleBar"]["colors"]["bg"] ?? ($primary ?? null);
+        $this->variablePreview["titleBarFg"] = $variables["titleBar"]["colors"]["fg"] ?? null;
+        $this->variablePreview["backgroundImage"] =
+            $variables["splash"]["outerBackground"]["image"] ??
+            ($variables["banner"]["outerBackground"]["image"] ?? null);
         return $this;
     }
 
     /**
      * @return array
      */
-    public function asArray(): array {
+    public function asArray(): array
+    {
         return [
-            'info' => $this->info,
-            'imageUrl' => $this->imageUrl,
-            'variables' => $this->variablePreview,
+            "info" => $this->info,
+            "imageUrl" => $this->imageUrl,
+            "variables" => $this->variablePreview,
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return $this->asArray();
     }
 }

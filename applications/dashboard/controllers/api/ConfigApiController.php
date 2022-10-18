@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -12,18 +12,19 @@ use Garden\Web\Data;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\FileUtils;
 use Vanilla\OpenAPIBuilder;
-use Vanilla\Utility\ArrayUtils;
+use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Web\Controller;
 
 /**
  * API endpoints for the /config resource.
  */
-final class ConfigApiController extends Controller {
-    public const PERM_PUBLIC = 'public';
-    public const PERM_MEMBER = 'member';
-    public const PERM_MODERATOR = 'community.moderate';
-    public const PERM_COMMUNITY_MANAGER = 'community.manage';
-    public const PERM_ADMIN = 'site.manage';
+final class ConfigApiController extends Controller
+{
+    public const PERM_PUBLIC = "public";
+    public const PERM_MEMBER = "member";
+    public const PERM_MODERATOR = "community.moderate";
+    public const PERM_COMMUNITY_MANAGER = "community.manage";
+    public const PERM_ADMIN = "site.manage";
 
     /**
      * All of the permissions that are valid for config reading.
@@ -39,10 +40,7 @@ final class ConfigApiController extends Controller {
     /**
      * All of the permissions that are valid for config writing.
      */
-    public const WRITE_PERMS = [
-        self::PERM_COMMUNITY_MANAGER,
-        self::PERM_ADMIN,
-    ];
+    public const WRITE_PERMS = [self::PERM_COMMUNITY_MANAGER, self::PERM_ADMIN];
 
     /**
      * @var OpenAPIBuilder
@@ -60,16 +58,28 @@ final class ConfigApiController extends Controller {
     private $cachePath;
 
     /**
+     * @var HtmlPlainTextConverter
+     */
+    private $plainTextConverter;
+
+    /**
      * ConfigApiController constructor.
      *
      * @param OpenAPIBuilder $apiBuilder
      * @param ConfigurationInterface $config
+     * @param HtmlPlainTextConverter $plainTextConverter
      * @param string $cachePath
      */
-    public function __construct(OpenAPIBuilder $apiBuilder, ConfigurationInterface $config, string $cachePath = '') {
+    public function __construct(
+        OpenAPIBuilder $apiBuilder,
+        ConfigurationInterface $config,
+        HtmlPlainTextConverter $plainTextConverter,
+        string $cachePath = ""
+    ) {
         $this->apiBuilder = $apiBuilder;
         $this->config = $config;
-        $this->cachePath = $cachePath ?: PATH_CACHE.'/config-schema.php';
+        $this->plainTextConverter = $plainTextConverter;
+        $this->cachePath = $cachePath ?: PATH_CACHE . "/config-schema.php";
     }
 
     /**
@@ -78,23 +88,27 @@ final class ConfigApiController extends Controller {
      * @param array $query
      * @return Data
      */
-    public function get(array $query = []): Data {
-        $in = $this->schema([
-            'select?' => [
-                'type' => 'array',
-                'items' => [
-                    'type' => 'string'
+    public function get(array $query = []): Data
+    {
+        $in = $this->schema(
+            [
+                "select?" => [
+                    "type" => "array",
+                    "items" => [
+                        "type" => "string",
+                    ],
+                    "style" => "form",
                 ],
-                'style' => 'form',
-            ]
-        ], 'in');
+            ],
+            "in"
+        );
         $query = $in->validate($query);
 
-        $select = $query['select'] ?? null;
+        $select = $query["select"] ?? null;
 
         $out = $this->getConfigSchema();
         $result = [];
-        foreach ($out->getField('properties') as $key => $item) {
+        foreach ($out->getField("properties") as $key => $item) {
             if (is_array($select)) {
                 $matched = false;
                 foreach ($select as $pattern) {
@@ -108,13 +122,14 @@ final class ConfigApiController extends Controller {
                 }
             }
 
-            $permission = $this->realPermissionName($item['x-read'] ?? self::PERM_ADMIN);
-            if ($permission === 'public' ||
+            $permission = $this->realPermissionName($item["x-read"] ?? self::PERM_ADMIN);
+            if (
+                $permission === "public" ||
                 ($permission === self::PERM_MEMBER && $this->getSession()->isValid()) ||
                 $this->getSession()->checkPermission($permission)
             ) {
-                $configKey = $item['x-key'] ?? $key;
-                $result[$key] = $this->config->get($configKey, $item['default'] ?? null);
+                $configKey = $item["x-key"] ?? $key;
+                $result[$key] = $this->config->get($configKey, $item["default"] ?? null);
             }
         }
         return new Data($result);
@@ -126,19 +141,20 @@ final class ConfigApiController extends Controller {
      * @param array $body
      * @return Data
      */
-    public function patch(array $body): Data {
+    public function patch(array $body): Data
+    {
         $in = $this->getConfigSchema();
 
         // ApiKey => ConfigKey
         $propertyMapping = [];
         // Make sure the user has all necessary permissions.
         $permissions = [];
-        foreach ($in->getField('properties') as $key => $item) {
+        foreach ($in->getField("properties") as $key => $item) {
             if (array_key_exists($key, $body)) {
-                $permissions[$this->realPermissionName($item['x-write'] ?? self::PERM_ADMIN)] = true;
+                $permissions[$this->realPermissionName($item["x-write"] ?? self::PERM_ADMIN)] = true;
             }
 
-            $actualConfigKey = $item['x-key'] ?? $key;
+            $actualConfigKey = $item["x-key"] ?? $key;
             if ($actualConfigKey !== $key) {
                 $propertyMapping[$key] = $actualConfigKey;
             }
@@ -152,9 +168,8 @@ final class ConfigApiController extends Controller {
         $mapped = [];
         foreach ($valid as $key => $value) {
             $configKey = $propertyMapping[$key] ?? $key;
-            $mapped[$configKey] = $value;
+            $mapped[$configKey] = is_string($value) ? $this->plainTextConverter->convert($value) : $value;
         }
-
         $this->config->saveToConfig($mapped);
 
         return new Data(null);
@@ -165,8 +180,9 @@ final class ConfigApiController extends Controller {
      *
      * @return Data
      */
-    public function get_schema(): Data {
-        $this->permission('Garden.Settings.Manage');
+    public function get_schema(): Data
+    {
+        $this->permission("Garden.Settings.Manage");
 
         $schema = $this->getConfigSchema();
         $r = new Data($schema->getSchemaArray());
@@ -178,7 +194,8 @@ final class ConfigApiController extends Controller {
      *
      * @return Schema
      */
-    private function getConfigSchema(): Schema {
+    private function getConfigSchema(): Schema
+    {
         if (file_exists($this->cachePath)) {
             $r = FileUtils::getExport($this->cachePath);
         } else {
@@ -193,10 +210,11 @@ final class ConfigApiController extends Controller {
      *
      * @return array
      */
-    private function buildConfigSchemaArray(): array {
+    private function buildConfigSchemaArray(): array
+    {
         $openAPI = $this->apiBuilder->getFullOpenAPI();
-        $config = $openAPI['components']['schemas']['Config'];
-        ksort($config['properties']);
+        $config = $openAPI["components"]["schemas"]["Config"];
+        ksort($config["properties"]);
 
         return $config;
     }
@@ -207,11 +225,14 @@ final class ConfigApiController extends Controller {
      * @param string $permission
      * @return string
      */
-    private function realPermissionName(string $permission) {
+    private function realPermissionName(string $permission)
+    {
         if (in_array($permission, [self::PERM_PUBLIC, self::PERM_MEMBER])) {
             return $permission;
         }
 
-        return $this->getSession()->getPermissions()->untranslatePermission($permission);
+        return $this->getSession()
+            ->getPermissions()
+            ->untranslatePermission($permission);
     }
 }

@@ -16,7 +16,7 @@ describe("resolvePromisesSequentially()", () => {
             order.push(1);
         };
         const func2 = () => {
-            return new Promise(resolve => {
+            return new Promise((resolve) => {
                 setTimeout(() => {
                     order.push(2);
                     resolve();
@@ -37,7 +37,7 @@ describe("resolvePromisesSequentially()", () => {
     it("returns all of the results in order", () => {
         const func1 = () => Promise.resolve(1);
         const func2 = () => {
-            return new Promise(resolve => {
+            return new Promise((resolve) => {
                 setTimeout(() => {
                     resolve(2);
                 }, 50);
@@ -52,7 +52,7 @@ describe("resolvePromisesSequentially()", () => {
     });
 
     it("passes the value of one promise to the next", () => {
-        const func = prev => (Number.isInteger(prev) ? Promise.resolve(prev + 1) : Promise.resolve(0));
+        const func = (prev) => (Number.isInteger(prev) ? Promise.resolve(prev + 1) : Promise.resolve(0));
         const functions = [func, func, func];
         const expectation = [0, 1, 2];
 

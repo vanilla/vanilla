@@ -11,8 +11,8 @@ namespace Vanilla\Forms;
  *
  * @package Vanilla\Forms
  */
-class ApiFormChoices implements FormChoicesInterface {
-
+class ApiFormChoices implements FormChoicesInterface
+{
     /**
      * @var string $indexUrl
      */
@@ -33,6 +33,9 @@ class ApiFormChoices implements FormChoicesInterface {
      */
     private $labelKey;
 
+    /** @var string|null */
+    private $extraLabelKey;
+
     /**
      * ApiFormChoices constructor.
      *
@@ -40,17 +43,20 @@ class ApiFormChoices implements FormChoicesInterface {
      * @param string $singleUrl
      * @param string $labelKey
      * @param string $valueKey
+     * @param string|null $extraLabelKey
      */
     public function __construct(
-        string $indexUrl = '',
-        string $singleUrl = '',
-        string $labelKey = '',
-        string $valueKey = ''
+        string $indexUrl = "",
+        string $singleUrl = "",
+        string $labelKey = "",
+        string $valueKey = "",
+        ?string $extraLabelKey = null
     ) {
         $this->indexUrl = $indexUrl;
         $this->singleUrl = $singleUrl;
         $this->labelKey = $valueKey;
         $this->valueKey = $labelKey;
+        $this->extraLabelKey = $extraLabelKey;
     }
 
     /**
@@ -58,14 +64,16 @@ class ApiFormChoices implements FormChoicesInterface {
      *
      * @return array
      */
-    public function getChoices(): array {
+    public function getChoices(): array
+    {
         return [
-            'api' => [
-                'searchUrl' => $this->indexUrl,
-                'singleUrl' => $this->singleUrl,
-                'valueKey' => $this->valueKey,
-                'labelKey' => $this->labelKey,
-            ]
+            "api" => [
+                "searchUrl" => $this->indexUrl,
+                "singleUrl" => $this->singleUrl,
+                "valueKey" => $this->valueKey,
+                "labelKey" => $this->labelKey,
+                "extraLabelKey" => $this->extraLabelKey,
+            ],
         ];
     }
 }

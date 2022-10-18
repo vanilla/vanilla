@@ -151,6 +151,10 @@ components:
                     description: True if this status is defined by the application and is not accessible for modification or deletion.
                     type: boolean
                     default: false
+                isIntenral:
+                    description: True if this status is internal.
+                    type: boolean
+                    default: false
         RecordStatusPatch:
             type: object
             properties:
@@ -170,6 +174,10 @@ components:
                     description: Subtype of resource to which this status applies
                     type: string
                     nullable: true
+                isInternal:
+                    description: True if this status is internal status, false otherwise
+                    type: boolean
+                    nullable: true
         RecordStatusPost:
             type: object
             properties:
@@ -188,6 +196,10 @@ components:
                 recordSubtype:
                     description: Subtype of resource to which this status applies
                     type: string
+                    nullable: true
+                isInternal:
+                    description: True if the status is internal, defaults to false.
+                    type: boolean
                     nullable: true
             required:
                 - name

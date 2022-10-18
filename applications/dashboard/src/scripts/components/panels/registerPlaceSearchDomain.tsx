@@ -1,22 +1,21 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
-import { SearchService } from "@library/search/SearchService";
+import { ISearchDomain, SearchService } from "@library/search/SearchService";
 import { t, onReady } from "@library/utility/appUtils";
 import { TypePlacesIcon, TypeCategoriesIcon } from "@library/icons/searchIcons";
-import { ISearchForm, ISearchResult } from "@library/search/searchTypes";
+import { IPlacesSearchResult, ISearchResult } from "@library/search/searchTypes";
 import { IPlaceSearchTypes } from "@dashboard/components/placeSearchType";
 import PlacesSearchFilterPanel from "@dashboard/components/panels/PlacesSearchFilterPanel";
-import Result from "@library/result/Result";
 import flatten from "lodash/flatten";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
 import { PLACES_CATEGORY_TYPE, PLACES_DOMAIN_NAME } from "@library/search/searchConstants";
 import { ResultMeta } from "@library/result/ResultMeta";
 
-export function PlacesResultMeta(props: { searchResult: Partial<ISearchResult> }) {
+export function PlacesResultMeta(props: { searchResult: Partial<IPlacesSearchResult> }) {
     const { searchResult } = props;
     const { type, counts } = searchResult;
 
@@ -26,7 +25,7 @@ export function PlacesResultMeta(props: { searchResult: Partial<ISearchResult> }
 
 export function registerPlaceSearchDomain() {
     onReady(() => {
-        SearchService.addPluggableDomain({
+        const placesSearchDomain: ISearchDomain<IPlaceSearchTypes> = {
             key: PLACES_DOMAIN_NAME,
             name: t("Places"),
             sort: 3,
@@ -41,15 +40,10 @@ export function registerPlaceSearchDomain() {
             getAllowedFields: () => {
                 return ["description"];
             },
-            transformFormToQuery: (form: ISearchForm<IPlaceSearchTypes>) => {
-                const query = {
-                    query: form.query || "",
-                    description: form.description || "",
-                    name: form.name || "",
+            transformFormToQuery: (form) => {
+                return {
                     types: form.types || flatten(PlacesSearchTypeFilter.searchTypes.map((type) => type.values)),
                 };
-
-                return query;
             },
             getRecordTypes: () => {
                 return ["category"];
@@ -58,26 +52,27 @@ export function registerPlaceSearchDomain() {
             resultHeader: null,
             getDefaultFormValues: () => {
                 return {
-                    excerpt: "",
+                    description: "",
                     types: flatten(PlacesSearchTypeFilter.searchTypes.map((type) => type.values)),
                 };
             },
             getSortValues: () => {
                 return [
                     {
-                        content: "Best Match",
+                        content: t("Best Match"),
                         value: "relevance",
                     },
                     {
-                        content: "Name",
+                        content: t("Name"),
                         value: "name",
                     },
                 ];
             },
             isIsolatedType: () => false,
-            ResultComponent: Result,
             MetaComponent: PlacesResultMeta,
-        });
+        };
+
+        SearchService.addPluggableDomain(placesSearchDomain);
 
         SearchService.addSubType({
             domain: PLACES_DOMAIN_NAME,

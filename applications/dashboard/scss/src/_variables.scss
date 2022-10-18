@@ -4,191 +4,192 @@
 //
 // No styleguide reference.
 
-$enable-flex:                true;
+@use "sass:math";
+
+$enable-flex: true;
 
 // Colors
 
-$white:                     #fff;
-$black:                     #000;
+$white: #fff;
+$black: #000;
 
 // Override the grays
-$gray-dark:                 #555a62;
-$gray:                      lighten(#555a62, 25%);
-$gray-light:                #f6f9fb;
-$gray-lighter:              #f4f6fb;
-$gray-lightest:             #fbfcfc;
+$gray-dark: #555a62;
+$gray: lighten(#555a62, 25%);
+$gray-light: #f6f9fb;
+$gray-lighter: #f4f6fb;
+$gray-lightest: #fbfcfc;
 
 // Map our grEys
-$grey-dark:                 $gray-dark;
-$grey:                      $gray;
-$grey-light:                $gray-light;
-$grey-lighter:              $gray-lighter;
-$grey-lightest:             $gray-lightest;
+$grey-dark: $gray-dark;
+$grey: $gray;
+$grey-light: $gray-light;
+$grey-lighter: $gray-lighter;
+$grey-lightest: $gray-lightest;
 
-$grey-dark-border:          #ededed; // belongs between grey and grey-light.
-$grey-light-text:           #727d83; // belongs between grey and grey-dark.
+$grey-dark-border: #ededed; // belongs between grey and grey-light.
+$grey-light-text: #727d83; // belongs between grey and grey-dark.
 
-$brand-primary:             #0291db;
-$brand-secondary:           #f5296d;
-$brand-success:             #6bc573;
-$brand-info:                #a1b8c6;
-$brand-warning:             #faae42;
-$brand-danger:              #fa2e1f;
-
+$brand-primary: #0291db;
+$brand-secondary: #f5296d;
+$brand-success: #6bc573;
+$brand-info: #a1b8c6;
+$brand-warning: #faae42;
+$brand-danger: #fa2e1f;
 
 $semantic-colors: (
-  primary:                  $brand-primary,
-  secondary:                $brand-secondary,
-  success:                  $brand-success,
-  info:                     $brand-info,
-  warning:                  $brand-warning,
-  danger:                   $brand-danger
+    primary: $brand-primary,
+    secondary: $brand-secondary,
+    success: $brand-success,
+    info: $brand-info,
+    warning: $brand-warning,
+    danger: $brand-danger,
 );
 
 // Grid columns
 //
 // Set the number of columns and specify the width of the gutters.
 
-$grid-columns:               24;
-$grid-gutter-width:          36 / 1;
+$grid-columns: 24;
+$grid-gutter-width: math.div(36, 1);
 
 // Typography
 //
 // Font, line-height, and color for body text, headings, and more.
 
-$font-family-sans-serif:     "Helvetica Neue", Helvetica, Arial, sans-serif !default;
-$font-family-serif:          Georgia, "Times New Roman", Times, serif !default;
-$font-family-monospace:      Menlo, Monaco, Consolas, "Courier New", monospace !default;
-$font-family-base:           $font-family-sans-serif !default;
+$font-family-sans-serif: "Helvetica Neue", Helvetica, Arial, sans-serif !default;
+$font-family-serif: Georgia, "Times New Roman", Times, serif !default;
+$font-family-monospace: Menlo, Monaco, Consolas, "Courier New", monospace !default;
+$font-family-base: $font-family-sans-serif !default;
 
-$font-size-root:             16px;
+$font-size-root: 16px;
 
-$font-size-base:             14px;
-$font-size-lg:               18px;
-$font-size-md:               13px;
-$font-size-sm:               12px;
-$font-size-xs:               11px;
+$font-size-base: 14px;
+$font-size-lg: 18px;
+$font-size-md: 13px;
+$font-size-sm: 12px;
+$font-size-xs: 11px;
 
-$font-size-h1:               32px;
-$font-size-h2:               18px;
-$font-size-h3:               16px;
-$font-size-h4:               16px;
-$font-size-h5:               14px;
-$font-size-h6:               14px;
+$font-size-h1: 32px;
+$font-size-h2: 18px;
+$font-size-h3: 16px;
+$font-size-h4: 16px;
+$font-size-h5: 14px;
+$font-size-h6: 14px;
 
-$line-height:                1.5;
+$line-height: 1.5;
 
-$headings-font-weight:       400;
+$headings-font-weight: 400;
 
 $font-weight-helvetica-medium: 500;
 
-$header-block-height:        60px;
+$header-block-height: 60px;
 
 // Spacing
 //
 // Control the default styling of most Bootstrap elements by modifying these
 // variables. Mostly focused on spacing.
 
-$spacer:                     18px;
-$spacer-x:                   $spacer;
-$spacer-y:                   12px;
+$spacer: 18px;
+$spacer-x: $spacer;
+$spacer-y: 12px;
 
-$border-width:               1px;
+$border-width: 1px;
 
 // Body
 //
 // Settings for the `<body>` element.
 
-$body-bg:                    $grey-light;
-$body-color:                 $gray-dark !default;
+$body-bg: $grey-light;
+$body-color: $gray-dark !default;
 
 // Components
 //
 // Define common padding and border radius sizes and more.
 
-$line-height-lg:         (4 / 3);
-$line-height-sm:         1.5;
+$line-height-lg: math.div(4, 3);
+$line-height-sm: 1.5;
 
-$border-radius:          6px;
-$border-radius-lg:       6px;
-$border-radius-sm:       2px;
+$border-radius: 6px;
+$border-radius-lg: 6px;
+$border-radius-sm: 2px;
 
-$caret-width:            6px !default;
-$caret-width-lg:         $caret-width !default;
+$caret-width: 6px !default;
+$caret-width-lg: $caret-width !default;
 
 // Buttons
 //
 // For each of Bootstrap's buttons, define text, background and border color.
 
-$control-height:                 36px;
-$control-padding-y:              ($control-height - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
+$control-height: 36px;
+$control-padding-y: ($control-height - ($border-width * 2) - ($font-size-base * $line-height)) * 0.5;
 
-$btn-min-width:                  $spacer * 6.75;
-$btn-padding-x:                  16px !default;
-$btn-padding-y:                  $control-padding-y;
-$btn-font-weight:                normal !default;
-$btn-line-height:                1;
+$btn-min-width: $spacer * 6.75;
+$btn-padding-x: 16px !default;
+$btn-padding-y: $control-padding-y;
+$btn-font-weight: normal !default;
+$btn-line-height: 1;
 
-$btn-min-width:                  96px;
+$btn-min-width: 96px;
 
-$btn-primary-color:              $brand-primary;
-$btn-primary-bg:                 $white;
-$btn-primary-border:             $btn-primary-color !default;
+$btn-primary-color: $brand-primary;
+$btn-primary-bg: $white;
+$btn-primary-border: $btn-primary-color !default;
 
-$btn-secondary-color:            $gray-dark !default;
-$btn-secondary-bg:               #fff !default;
-$btn-secondary-border:           #ccc !default;
+$btn-secondary-color: $gray-dark !default;
+$btn-secondary-bg: #fff !default;
+$btn-secondary-border: #ccc !default;
 
-$btn-link-disabled-color:        $grey-dark-border;
+$btn-link-disabled-color: $grey-dark-border;
 
-$btn-padding-x-sm:               12px;
-$btn-padding-y-sm:               2px;
+$btn-padding-x-sm: 12px;
+$btn-padding-y-sm: 2px;
 
-$btn-padding-x-lg:               20px !default;
-$btn-padding-y-lg:               12px !default;
+$btn-padding-x-lg: 20px !default;
+$btn-padding-y-lg: 12px !default;
 
-$btn-border-radius-navbar:       12px;
+$btn-border-radius-navbar: 12px;
 
 // Navs
 
-$nav-link-padding:                          .375em 1em;
-$nav-pills-link-hover-bg:                   #e8ecf2;
-$nav-pills-panel-border-radius:             $border-radius 0 0 $border-radius;
+$nav-link-padding: 0.375em 1em;
+$nav-pills-link-hover-bg: #e8ecf2;
+$nav-pills-panel-border-radius: $border-radius 0 0 $border-radius;
 
-$navbar-height:                             60px;
-$navbar-short-height:                       46px;
-$navbar-active-link-active-bg:              lighten($brand-primary, 7%);
-$navbar-link-color:                         lighten($navbar-active-link-active-bg, 40%);
-$navbar-border-color:                       rgba(0,0,0,.125);
+$navbar-height: 60px;
+$navbar-short-height: 46px;
+$navbar-active-link-active-bg: lighten($brand-primary, 7%);
+$navbar-link-color: lighten($navbar-active-link-active-bg, 40%);
+$navbar-border-color: rgba(0, 0, 0, 0.125);
 
 // Footer
-$footer-height:                             60px;
+$footer-height: 60px;
 
 // Checkbox toggles
-$toggle-border-width:                       $border-width;
-$toggle-height:                             $control-height;
-$toggle-padding:                            2px;
+$toggle-border-width: $border-width;
+$toggle-height: $control-height;
+$toggle-padding: 2px;
 
 $toggle-height-sm: 24px;
 $toggle-padding-sm: 1px;
 
 // Padding
-$padding-row:                               $grid-gutter-width / 2;
-$border-color:                              #e7e8e9;
+$padding-row: $grid-gutter-width * 0.5;
+$border-color: #e7e8e9;
 
-$font-size-tables:                          13px;
+$font-size-tables: 13px;
 
 // Cards
-$card-spacer-x:            20px !default;
-$card-spacer-y:            12px !default;
-$card-border-width:        1px !default;
-$card-border-radius:       $border-radius !default;
-$card-border-color:        $border-color;
+$card-spacer-x: 20px !default;
+$card-spacer-y: 12px !default;
+$card-border-width: 1px !default;
+$card-border-radius: $border-radius !default;
+$card-border-color: $border-color;
 $card-border-radius-inner: $card-border-radius !default;
-$card-cap-bg:              $white;
-$card-bg:                  #fff !default;
+$card-cap-bg: $white;
+$card-bg: #fff !default;
 
-$card-link-hover-color:    #fff !default;
+$card-link-hover-color: #fff !default;
 
 // Grid breakpoints
 //
@@ -196,68 +197,67 @@ $card-link-hover-color:    #fff !default;
 // adapting to different screen sizes, for use in media queries.
 
 $grid-breakpoints: (
-  // Extra small screen / phone
-  xs: 0,
-  // Small screen / phone
-  sm: 544px,
-  // Medium screen / tablet
-  md: 768px,
-  // Large screen / desktop
-  lg: 992px,
-  // Extra large screen / wide desktop
-  xl: 1200px
+    // Extra small screen / phone
+    xs: 0,
+    // Small screen / phone
+    sm: 544px,
+    // Medium screen / tablet
+    md: 768px,
+    // Large screen / desktop
+    lg: 992px,
+    // Extra large screen / wide desktop
+    xl: 1200px
 ) !default;
 
-
 $icon-sizes: (
-  9: 9px,
-  10: 10px,
-  11: 11px,
-  12: 12px,
-  16: 16px,
-  24: 24px,
-  30: 30px,
-  48: 48px
+    9: 9px,
+    10: 10px,
+    11: 11px,
+    12: 12px,
+    16: 16px,
+    24: 24px,
+    30: 30px,
+    48: 48px,
 );
 
 // Dropdowns
-$dropdown-font-size:             16px;
-$dropdown-min-width:             180px;
-$dropdown-padding-y:             6px;
-$dropdown-margin-top:            2px;
-$dropdown-color:                 $body-color;
-$dropdown-bg:                    $white;
-$dropdown-divider-bg:            $border-color;
-$dropdown-box-shadow:            0 1px 3px rgba(0,0,0,.3);
-$dropdown-link-color:            $body-color;
-$dropdown-link-hover-bg:         $grey-light;
-$dropdown-item-padding-x:        12px;
-$dropdown-header-font-size:      12px;
-$dropdown-header-color:          #a3a3a3;
+$dropdown-font-size: 16px;
+$dropdown-min-width: 180px;
+$dropdown-padding-y: 6px;
+$dropdown-margin-top: 2px;
+$dropdown-color: $body-color;
+$dropdown-bg: $white;
+$dropdown-divider-bg: $border-color;
+$dropdown-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+$dropdown-link-color: $body-color;
+$dropdown-link-hover-bg: $grey-light;
+$dropdown-item-padding-x: 12px;
+$dropdown-header-font-size: 12px;
+$dropdown-header-color: #a3a3a3;
 
 // Form states and alerts
 //
 // Define colors for form feedback states and, by default, alerts.
 
-$state-success-text:             $white;
-$state-success-bg:               $brand-success;
-$state-success-border:           $brand-success;
+$state-success-text: $white;
+$state-success-bg: $brand-success;
+$state-success-border: $brand-success;
 
-$state-info-text:                $white;
-$state-info-bg:                  $brand-info;
-$state-info-border:              $brand-info;
+$state-info-text: $white;
+$state-info-bg: $brand-info;
+$state-info-border: $brand-info;
 
-$state-warning-text:             $white;
-$state-warning-bg:               $brand-warning;
-$state-warning-border:           $brand-warning;
+$state-warning-text: $white;
+$state-warning-bg: $brand-warning;
+$state-warning-border: $brand-warning;
 
-$state-danger-text:              $white;
-$state-danger-bg:                $brand-danger;
-$state-danger-border:            $brand-danger;
+$state-danger-text: $white;
+$state-danger-bg: $brand-danger;
+$state-danger-border: $brand-danger;
 
-$alert-border-radius:            0;
+$alert-border-radius: 0;
 
 // Drawer
 
-$drawer-width:                   222px;
-$modal-inner-padding:            18px;
+$drawer-width: 222px;
+$modal-inner-padding: 18px;

@@ -18,13 +18,15 @@ use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Web\ApiFilterMiddleware;
 use Vanilla\Web\Controller;
 
 /**
  * Handles the `/role-requests` endpoints.
  */
-class RoleRequestsApiController extends Controller {
-    public const DEFAULT_TTL = '5 days';
+class RoleRequestsApiController extends Controller
+{
+    public const DEFAULT_TTL = "5 days";
 
     /**
      * @var RoleRequestModel
@@ -54,7 +56,12 @@ class RoleRequestsApiController extends Controller {
      * @param \RoleModel $roleModel
      * @param \UserModel $userModel
      */
-    public function __construct(RoleRequestModel $requestModel, RoleRequestMetaModel $metaModel, \RoleModel $roleModel, \UserModel $userModel) {
+    public function __construct(
+        RoleRequestModel $requestModel,
+        RoleRequestMetaModel $metaModel,
+        \RoleModel $roleModel,
+        \UserModel $userModel
+    ) {
         $this->requestModel = $requestModel;
         $this->metaModel = $metaModel;
         $this->roleModel = $roleModel;
@@ -67,16 +74,23 @@ class RoleRequestsApiController extends Controller {
      * @param array $body
      * @return Data
      */
-    public function put_metas(array $body): Data {
-        $this->permission('Garden.Settings.Manage');
+    public function put_metas(array $body): Data
+    {
+        $this->permission("Garden.Settings.Manage");
 
-        $in = Schema::parse(
-            ['roleID', 'type', 'name', 'body', 'format', 'attributesSchema:o', 'attributes?' => $this->metaModel->getAttributesSchema()]
-        )->add($this->metaModel->getWriteSchema());
+        $in = Schema::parse([
+            "roleID",
+            "type",
+            "name",
+            "body",
+            "format",
+            "attributesSchema:o",
+            "attributes?" => $this->metaModel->getAttributesSchema(),
+        ])->add($this->metaModel->getWriteSchema());
         $body = $in->validate($body);
 
         $this->metaModel->insert($body);
-        $result = $this->metaModel->selectSingle(ArrayUtils::pluck($body, ['roleID', 'type']));
+        $result = $this->metaModel->selectSingle(ArrayUtils::pluck($body, ["roleID", "type"]));
 
         return new Data($this->filterMetaRow($result));
     }
@@ -87,29 +101,36 @@ class RoleRequestsApiController extends Controller {
      * @param array $query
      * @return Data
      */
-    public function index_metas(array $query): Data {
-        $this->permission('Garden.SignIn.Allow');
+    public function index_metas(array $query): Data
+    {
+        $this->permission("Garden.SignIn.Allow");
 
-        $in = $this->schema([
-            'roleID:i?',
-            'type:s?' => [
-                'enum' => [RoleRequestModel::TYPE_APPLICATION, RoleRequestModel::TYPE_INVITATION],
+        $in = $this->schema(
+            [
+                "roleID:i?",
+                "type:s?" => [
+                    "enum" => [RoleRequestModel::TYPE_APPLICATION, RoleRequestModel::TYPE_INVITATION],
+                ],
+                "hasRole:b?",
+                "expand?" => ApiUtils::getExpandDefinition(["role", "roleRequest"]),
             ],
-            'hasRole:b?',
-            'expand?' => ApiUtils::getExpandDefinition(['role', 'roleRequest']),
-        ], 'in');
+            "in"
+        );
         $query = $in->validate($query);
-        $data = array_map([$this, 'filterMetaRow'], $this->metaModel->select(ArrayUtils::pluck($query, ['roleID', 'type'])));
-        if (isset($query['hasRole'])) {
-            $hasRole = $query['hasRole'];
+        $data = array_map(
+            [$this, "filterMetaRow"],
+            $this->metaModel->select(ArrayUtils::pluck($query, ["roleID", "type"]))
+        );
+        if (isset($query["hasRole"])) {
+            $hasRole = $query["hasRole"];
             $roleIDs = $this->userModel->getRoleIDs($this->getSession()->UserID);
             $data = array_filter($data, function ($row) use ($hasRole, $roleIDs) {
-                $r = in_array($row['roleID'], $roleIDs);
+                $r = in_array($row["roleID"], $roleIDs);
                 return $hasRole ? $r : !$r;
             });
         }
 
-        $this->expandMeta($data, $query['expand'] ?? []);
+        $this->expandMeta($data, $query["expand"] ?? []);
 
         return new Data($data);
     }
@@ -121,21 +142,24 @@ class RoleRequestsApiController extends Controller {
      * @param int $roleID
      * @return Data
      */
-    public function get_metas(string $type, int $roleID): Data {
-        $this->permission('Garden.SignIn.Allow');
+    public function get_metas(string $type, int $roleID): Data
+    {
+        $this->permission("Garden.SignIn.Allow");
 
         $in = $this->schema([
-            'type:s' => ['enum' => [RoleRequestModel::TYPE_APPLICATION, RoleRequestModel::TYPE_INVITATION]],
-            'roleID:i'
+            "type:s" => ["enum" => [RoleRequestModel::TYPE_APPLICATION, RoleRequestModel::TYPE_INVITATION]],
+            "roleID:i",
         ]);
-        $query = $in->validate(['type' => $type, 'roleID' => $roleID]);
+        $query = $in->validate(["type" => $type, "roleID" => $roleID]);
 
         try {
             $data = $this->filterMetaRow($this->metaModel->selectSingle($query));
             $rows = [&$data];
-            $this->expandMeta($rows, ['expand' => 'all']);
+            $this->expandMeta($rows, ["expand" => "all"]);
         } catch (NoResultsException $ex) {
-            throw new NotFoundException('Application', [HttpException::FIELD_DESCRIPTION => 'The role does not support applications.']);
+            throw new NotFoundException("Application", [
+                HttpException::FIELD_DESCRIPTION => "The role does not support applications.",
+            ]);
         }
         return new Data($data);
     }
@@ -145,9 +169,10 @@ class RoleRequestsApiController extends Controller {
      *
      * @param int $roleRequestID
      */
-    public function delete_applications(int $roleRequestID) {
-        $this->permission('site.manage');
-        $result = $this->requestModel->delete(['roleRequestID' => $roleRequestID]);
+    public function delete_applications(int $roleRequestID)
+    {
+        $this->permission("site.manage");
+        $result = $this->requestModel->delete(["roleRequestID" => $roleRequestID]);
     }
 
     /**
@@ -157,8 +182,9 @@ class RoleRequestsApiController extends Controller {
      * @param int $roleID
      * @return Data
      */
-    public function delete_metas(string $type, int $roleID): Data {
-        $this->permission('Garden.Settings.Manage');
+    public function delete_metas(string $type, int $roleID): Data
+    {
+        $this->permission("Garden.Settings.Manage");
 
         $this->metaModel->delete($this->metaModel->primaryWhere($roleID, $type));
 
@@ -171,20 +197,19 @@ class RoleRequestsApiController extends Controller {
      * @param array $body
      * @return Data Data object for a web response;
      */
-    public function post_applications(array $body): Data {
-        $this->permission('Garden.SignIn.Allow');
+    public function post_applications(array $body): Data
+    {
+        $this->permission("Garden.SignIn.Allow");
 
-        $in = Schema::parse(
-            ['roleID', 'attributes']
-        )
+        $in = Schema::parse(["roleID", "attributes"])
             ->add($this->requestModel->getWriteSchema())
-            ->setField('properties.attributes', ['type' => 'object']);
+            ->setField("properties.attributes", ["type" => "object"]);
 
         $body = $in->validate($body);
         $body += [
-            'type' => RoleRequestModel::TYPE_APPLICATION,
-            'userID' => $this->getSession()->UserID,
-            'status' => RoleRequestModel::STATUS_PENDING,
+            "type" => RoleRequestModel::TYPE_APPLICATION,
+            "userID" => $this->getSession()->UserID,
+            "status" => RoleRequestModel::STATUS_PENDING,
         ];
 
         $id = $this->requestModel->insert($body);
@@ -201,69 +226,84 @@ class RoleRequestsApiController extends Controller {
      * @throws PermissionException Failed Permissions.
      * @throws \Garden\Schema\ValidationException Data failed to validate.
      */
-    public function index(array $query = []): Data {
-        $this->permission('Garden.SignIn.Allow');
+    public function index(array $query = []): Data
+    {
+        $this->permission("Garden.SignIn.Allow");
 
         $in = Schema::parse([
-            'type:s?' => [
-                'enum' => [RoleRequestModel::TYPE_APPLICATION, RoleRequestModel::TYPE_INVITATION],
-                'x-filter' => [
-                    'field' => 'type',
+            "type:s?" => [
+                "enum" => [RoleRequestModel::TYPE_APPLICATION, RoleRequestModel::TYPE_INVITATION],
+                "x-filter" => [
+                    "field" => "type",
                 ],
             ],
-            'roleID:i?' => [
-                'x-filter' => [
-                    'field' => 'roleID',
+            "roleID:i?" => [
+                "x-filter" => [
+                    "field" => "roleID",
                 ],
             ],
-            'status:s?' => [
-                'enum' => [RoleRequestModel::STATUS_PENDING, RoleRequestModel::STATUS_APPROVED, RoleRequestModel::STATUS_DENIED],
-                'x-filter' => [
-                    'field' => 'status',
+            "status:s?" => [
+                "enum" => [
+                    RoleRequestModel::STATUS_PENDING,
+                    RoleRequestModel::STATUS_APPROVED,
+                    RoleRequestModel::STATUS_DENIED,
+                ],
+                "x-filter" => [
+                    "field" => "status",
                 ],
             ],
-            'userID:i?' => [
-                'x-filter' => [
-                    'field' => 'userID',
+            "userID:i?" => [
+                "x-filter" => [
+                    "field" => "userID",
                 ],
             ],
-            'roleRequestID?' => RangeExpression::createSchema([':i'])->setField('x-filter', ['field' => 'roleRequestID']),
-            'page:i?' => [
-                'minimum' => 1,
-                'maximum' => 100,
+            "roleRequestID?" => RangeExpression::createSchema([":i"])->setField("x-filter", [
+                "field" => "roleRequestID",
+            ]),
+            "page:i?" => [
+                "minimum" => 1,
+                "maximum" => 100,
             ],
-            'offset:i?' => [
-                'minimum' => 0,
-                'maximum' => 3000,
+            "offset:i?" => [
+                "minimum" => 0,
+                "maximum" => 3000,
             ],
-            'limit:i?' => [
-                'default' => 30,
-                'minimum' => 1,
-                'maximum' => 100,
+            "limit:i?" => [
+                "default" => 30,
+                "minimum" => 1,
+                "maximum" => 100,
             ],
-            'sort:s?' => [
-                'default' => 'roleRequestID',
-                'enum' => ApiUtils::sortEnum('dateInserted', 'dateOfStatus', 'roleRequestID'),
+            "sort:s?" => [
+                "default" => "roleRequestID",
+                "enum" => ApiUtils::sortEnum("dateInserted", "dateOfStatus", "roleRequestID"),
             ],
-            'expand?' => ApiUtils::getExpandDefinition(['user', 'role']),
-        ])->addValidator('', SchemaUtils::onlyOneOf(['page', 'offset']));
+            "expand?" => ApiUtils::getExpandDefinition(["user", "role"]),
+        ])->addValidator("", SchemaUtils::onlyOneOf(["page", "offset"]));
 
         $query = $in->validate($query);
         // Members lower than community managers can only view their own requests.
-        if (!$this->getSession()->getPermissions()->has('Garden.Community.Manage')) {
-            $query['userID'] = $this->getSession()->UserID;
+        if (
+            !$this->getSession()
+                ->getPermissions()
+                ->has("Garden.Community.Manage")
+        ) {
+            $query["userID"] = $this->getSession()->UserID;
         }
 
         $where = ApiUtils::queryToFilters($in, $query);
         [$offset, $limit] = ApiUtils::offsetLimit($query);
 
-        $rows = $this->requestModel->select($where, ['orderFields' => $query['sort'], 'limit' => $limit, 'offset' => $offset]);
-        $rows = array_map([$this, 'filterRequestRow'], $rows);
+        $rows = $this->requestModel->select($where, [
+            "orderFields" => $query["sort"],
+            "limit" => $limit,
+            "offset" => $offset,
+        ]);
+        $rows = array_map([$this, "filterRequestRow"], $rows);
 
         // Join the other data in.
-        $this->expand($rows, $query['expand'] ?? []);
+        $this->expand($rows, $query["expand"] ?? []);
 
-        return new Data($rows);
+        return new Data($rows, [ApiFilterMiddleware::FIELD_ALLOW => ["email"]]);
     }
 
     /**
@@ -273,8 +313,9 @@ class RoleRequestsApiController extends Controller {
      * @param array $query
      * @return Data
      */
-    public function get(int $id, array $query): Data {
-        $this->permission('Garden.Community.Manage');
+    public function get(int $id, array $query): Data
+    {
+        $this->permission("Garden.Community.Manage");
 
         return $this->getInternal($id, $query);
     }
@@ -285,8 +326,9 @@ class RoleRequestsApiController extends Controller {
      * @param array $query
      * @return Data
      */
-    public function index_applications(array $query = []): Data {
-        $query = ['type' => RoleRequestModel::TYPE_APPLICATION] + $query;
+    public function index_applications(array $query = []): Data
+    {
+        $query = ["type" => RoleRequestModel::TYPE_APPLICATION] + $query;
         $result = $this->index($query);
         return $result;
     }
@@ -298,9 +340,10 @@ class RoleRequestsApiController extends Controller {
      * @param array $query
      * @return Data
      */
-    public function get_applications(int $roleRequestID, array $query): Data {
+    public function get_applications(int $roleRequestID, array $query): Data
+    {
         $result = $this->get($roleRequestID, $query);
-        if ($result['type'] !== RoleRequestModel::TYPE_APPLICATION) {
+        if ($result["type"] !== RoleRequestModel::TYPE_APPLICATION) {
             throw new NotFoundException("The specified ID is not an application");
         }
         return $result;
@@ -318,32 +361,28 @@ class RoleRequestsApiController extends Controller {
      * @throws \Garden\Schema\ValidationException Data passed to API is invalid.
      * @throws HttpException Failed API call.
      */
-    public function patch_applications(int $roleRequestID, array $body, array $query = []): Data {
-        $this->permission('Garden.Community.Manage');
+    public function patch_applications(int $roleRequestID, array $body, array $query = []): Data
+    {
+        $this->permission("Garden.Community.Manage");
 
-        $row = $this->requestModel->selectSingle(['roleRequestID' => $roleRequestID]);
-        $roleID = $row['roleID'];
+        $row = $this->requestModel->selectSingle(["roleRequestID" => $roleRequestID]);
+        $roleID = $row["roleID"];
 
         if (!$this->roleModel->canUserAssign($this->getSession()->UserID, $roleID)) {
-            throw new PermissionException('Garden.Settings.Manage');
+            throw new PermissionException("Garden.Settings.Manage");
         }
 
-        $in = Schema::parse(
-            ['status']
-        )->add($this->requestModel->getWriteSchema());
+        $in = Schema::parse(["status"])->add($this->requestModel->getWriteSchema());
         $body = $in->validate($body);
 
         // Set the expiry for closed applications.
-        if (in_array($body['status'], [RoleRequestModel::STATUS_APPROVED, RoleRequestModel::STATUS_DENIED])) {
-            $body['ttl'] = self::DEFAULT_TTL;
+        if (in_array($body["status"], [RoleRequestModel::STATUS_APPROVED, RoleRequestModel::STATUS_DENIED])) {
+            $body["ttl"] = self::DEFAULT_TTL;
         } else {
-            $body['dateExpires'] = null;
+            $body["dateExpires"] = null;
         }
 
-        $this->requestModel->update(
-            $body,
-            ['roleRequestID' => $roleRequestID, 'status <>' => $body['status']]
-        );
+        $this->requestModel->update($body, ["roleRequestID" => $roleRequestID, "status <>" => $body["status"]]);
         $result = $this->getInternal($roleRequestID, $query);
         return $result;
     }
@@ -357,18 +396,19 @@ class RoleRequestsApiController extends Controller {
      * @throws NoResultsException Failed to retrieve results.
      * @throws \Garden\Schema\ValidationException Data failed to validate.
      */
-    protected function getInternalWhere(array $where, array $query = []): Data {
+    protected function getInternalWhere(array $where, array $query = []): Data
+    {
         $in = Schema::parse([
-            'expand?' => ApiUtils::getExpandDefinition(['user', 'role']),
+            "expand?" => ApiUtils::getExpandDefinition(["user", "role"]),
         ]);
         $query = $in->validate($query);
 
         $row = $this->requestModel->selectSingle($where);
         $row = $this->filterRequestRow($row);
         $rows = [&$row];
-        $this->expand($rows, $query['expand'] ?? []);
+        $this->expand($rows, $query["expand"] ?? []);
 
-        return new Data($row);
+        return new Data($row, [ApiFilterMiddleware::FIELD_ALLOW => ["email"]]);
     }
 
     /**
@@ -380,7 +420,8 @@ class RoleRequestsApiController extends Controller {
      * @throws NoResultsException Failed to retrieve results.
      * @throws \Garden\Schema\ValidationException Data failed to validate.
      */
-    protected function getInternal(int $roleRequestID, array $query = []): Data {
+    protected function getInternal(int $roleRequestID, array $query = []): Data
+    {
         $where = $this->requestModel->primaryWhere($roleRequestID);
 
         $result = $this->getInternalWhere($where, $query);
@@ -393,16 +434,23 @@ class RoleRequestsApiController extends Controller {
      * @param array $row
      * @return array
      */
-    private function filterMetaRow(array $row) {
-        $r = ArrayUtils::pluck(
-            $row,
-            [
-                'roleID', 'type', 'name', 'body', 'format', 'attributesSchema', 'attributes',
-                'dateInserted', 'insertUserID', 'dateUpdated', 'updateUserID',
-            ]
-        );
-        $folder = $row['type'] === RoleRequestModel::TYPE_INVITATION ? 'role-invitations' : 'role-applications';
-        $r['url'] = url("/requests/$folder?role={$row['roleID']}", true);
+    private function filterMetaRow(array $row)
+    {
+        $r = ArrayUtils::pluck($row, [
+            "roleID",
+            "type",
+            "name",
+            "body",
+            "format",
+            "attributesSchema",
+            "attributes",
+            "dateInserted",
+            "insertUserID",
+            "dateUpdated",
+            "updateUserID",
+        ]);
+        $folder = $row["type"] === RoleRequestModel::TYPE_INVITATION ? "role-invitations" : "role-applications";
+        $r["url"] = url("/requests/$folder?role={$row["roleID"]}", true);
         return $r;
     }
 
@@ -412,15 +460,25 @@ class RoleRequestsApiController extends Controller {
      * @param array $row
      * @return array
      */
-    private function filterRequestRow(array $row) {
-        $extended = $this->getSession()->checkPermission('Garden.Community.Manage');
+    private function filterRequestRow(array $row)
+    {
+        $extended = $this->getSession()->checkPermission("Garden.Community.Manage");
 
         $fields = [
-            'roleRequestID', 'type', 'status', 'roleID', 'userID', 'dateExpires', 'attributes',
-            'dateInserted', 'insertUserID', 'dateUpdated', 'updateUserID',
+            "roleRequestID",
+            "type",
+            "status",
+            "roleID",
+            "userID",
+            "dateExpires",
+            "attributes",
+            "dateInserted",
+            "insertUserID",
+            "dateUpdated",
+            "updateUserID",
         ];
         if ($extended) {
-            $fields = array_merge($fields, ['dateOfStatus', 'statusUserID']);
+            $fields = array_merge($fields, ["dateOfStatus", "statusUserID"]);
         }
         return ArrayUtils::pluck($row, $fields);
     }
@@ -431,11 +489,17 @@ class RoleRequestsApiController extends Controller {
      * @param array $rows
      * @param array|true $query
      */
-    private function expand(array &$rows, $query): void {
-        ModelUtils::leftJoin($rows, ModelUtils::expandedFields('role', $query), [$this->roleModel, 'fetchFragments']);
+    private function expand(array &$rows, $query): void
+    {
+        ModelUtils::leftJoin($rows, ModelUtils::expandedFields("role", $query), [$this->roleModel, "fetchFragments"]);
 
-        $userFields = $this->getSession()->checkPermission('Garden.Community.Manage') ? ['user', 'statusUser'] : ['user'];
-        ModelUtils::leftJoin($rows, ModelUtils::expandedFields($userFields, $query), [$this->userModel, 'fetchFragments']);
+        $userFields = $this->getSession()->checkPermission("Garden.Community.Manage")
+            ? ["user", "statusUser"]
+            : ["user"];
+        ModelUtils::leftJoin($rows, ModelUtils::expandedFields($userFields, $query), [
+            $this->userModel,
+            "fetchFragments",
+        ]);
     }
 
     /**
@@ -444,18 +508,22 @@ class RoleRequestsApiController extends Controller {
      * @param array $rows
      * @param array|true $query
      */
-    private function expandMeta(array &$rows, $query): void {
-        ModelUtils::leftJoin($rows, ModelUtils::expandedFields('role', $query), [$this->roleModel, 'fetchFragments']);
-        if (ModelUtils::isExpandOption('roleRequest', $query)) {
+    private function expandMeta(array &$rows, $query): void
+    {
+        ModelUtils::leftJoin($rows, ModelUtils::expandedFields("role", $query), [$this->roleModel, "fetchFragments"]);
+        if (ModelUtils::isExpandOption("roleRequest", $query)) {
             $roleIDs = $this->userModel->getRoleIDs($this->getSession()->UserID);
             foreach ($rows as &$row) {
-                $row['hasRole'] = in_array($row['roleID'], $roleIDs);
+                $row["hasRole"] = in_array($row["roleID"], $roleIDs);
             }
 
             ModelUtils::leftJoin(
                 $rows,
-                ['roleID' => 'roleRequest'],
-                $this->requestModel->fetchFragmentsFunction(RoleRequestModel::TYPE_APPLICATION, $this->getSession()->UserID)
+                ["roleID" => "roleRequest"],
+                $this->requestModel->fetchFragmentsFunction(
+                    RoleRequestModel::TYPE_APPLICATION,
+                    $this->getSession()->UserID
+                )
             );
         }
     }

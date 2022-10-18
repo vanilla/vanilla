@@ -9,6 +9,7 @@
             "@openapi-embed/*": ["./plugins/openapi-embed/src/scripts/*"],
             "@knowledge/*": ["./plugins/knowledge/src/scripts/*"],
             "@vanillaanalytics/*": ["./plugins/vanillaanalytics/src/scripts/*"],
+            "@FederatedSearch/*": ["./plugins/FederatedSearch/src/scripts/*"],
             "@oauth2/*": ["./plugins/oauth2/src/scripts/*"],
             "@webhooks/*": ["./plugins/webhooks/src/scripts/*"],
             "@themingapi/*": ["./plugins/themingapi/src/scripts/*"],

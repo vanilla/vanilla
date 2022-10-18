@@ -9,13 +9,17 @@ namespace VanillaTests\Library\Garden\Web;
 
 use Garden\Web\Data;
 use PHPUnit\Framework\TestCase;
+use VanillaTests\Library\Vanilla\CsvProviderTrait;
 
 /**
  * Tests for the Data class's methods.
  */
 
-class DataTest extends TestCase {
-    const TEST_DATE = '1980-06-17T20:00:00+00:00';
+class DataTest extends TestCase
+{
+    use CsvProviderTrait;
+
+    const TEST_DATE = "1980-06-17T20:00:00+00:00";
 
     /**
      * @var Data
@@ -30,44 +34,45 @@ class DataTest extends TestCase {
     /**
      * Construct a Data object for testing.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        $this->dateTime = new \DateTimeImmutable(self::TEST_DATE, new \DateTimeZone('UTC'));
+        $this->dateTime = new \DateTimeImmutable(self::TEST_DATE, new \DateTimeZone("UTC"));
         $this->data = new Data(
             [
-                'userID' => 123,
-                'email' => 'rich@example.com',
-                'time' => $this->dateTime,
-                'encodedIPAddress' => ipEncode('127.0.0.1'),
-                'regularIPAddress' => '127.0.0.1',
-                'items' => [
-                    ['encodedIPAddress' => ipEncode('127.0.0.1')],
-                    ['v' => 'a'],
-                    ['v' => 'b'],
-                    ['v' => ['c' => 'd']],
-                ]
+                "userID" => 123,
+                "email" => "rich@example.com",
+                "time" => $this->dateTime,
+                "encodedIPAddress" => ipEncode("127.0.0.1"),
+                "regularIPAddress" => "127.0.0.1",
+                "items" => [
+                    ["encodedIPAddress" => ipEncode("127.0.0.1")],
+                    ["v" => "a"],
+                    ["v" => "b"],
+                    ["v" => ["c" => "d"]],
+                ],
             ],
-            [
-
-            ]
+            []
         );
     }
 
     /**
      * Test some of the JSON filter functions.
      */
-    public function testJsonFilter(): void {
+    public function testJsonFilter(): void
+    {
         $data = $this->data->jsonSerialize();
-        $this->assertSame('127.0.0.1', $data['encodedIPAddress']);
-        $this->assertSame('127.0.0.1', $data['regularIPAddress']);
-        $this->assertSame('127.0.0.1', $data['items'][0]['encodedIPAddress']);
-        $this->assertSame(self::TEST_DATE, $data['time']);
+        $this->assertSame("127.0.0.1", $data["encodedIPAddress"]);
+        $this->assertSame("127.0.0.1", $data["regularIPAddress"]);
+        $this->assertSame("127.0.0.1", $data["items"][0]["encodedIPAddress"]);
+        $this->assertSame(self::TEST_DATE, $data["time"]);
     }
 
     /**
      * Test JSON filtering of a non-array.
      */
-    public function testJsonFilterNonArray(): void {
+    public function testJsonFilterNonArray(): void
+    {
         $data = new Data($this->dateTime);
         $this->assertSame(self::TEST_DATE, $data->jsonSerialize());
     }
@@ -75,18 +80,19 @@ class DataTest extends TestCase {
     /**
      * Filtering a bad IP address shouldn't cause an error and shouldn't be encoded.
      */
-    public function testJsonFilterBadIP(): void {
-        $data = new Data(['ipAddress' => 'foo']);
+    public function testJsonFilterBadIP(): void
+    {
+        $data = new Data(["ipAddress" => "foo"]);
         $this->assertSame($data->getData(), $data->jsonSerialize());
     }
 
     /**
      * Test to make sure the Data object can be accessed like an array.
      */
-    public function testArrayAccess() {
-        $this->data['userID'] = 345;
-        $this->assertSame(345, $this->data['userID']);
-
+    public function testArrayAccess()
+    {
+        $this->data["userID"] = 345;
+        $this->assertSame(345, $this->data["userID"]);
 
         json_encode($this->data);
     }
@@ -98,8 +104,9 @@ class DataTest extends TestCase {
     /**
      * Test {@link getDataItem()}.
      */
-    public function testBasicGetDataItem() {
-        $actual = $this->data->getDataItem('userID');
+    public function testBasicGetDataItem()
+    {
+        $actual = $this->data->getDataItem("userID");
         $expected = 123;
         $this->assertSame($expected, $actual);
     }
@@ -107,9 +114,10 @@ class DataTest extends TestCase {
     /**
      * Tests for {@link setDataItem()}.
      */
-    public function testBasicSetDataItem() {
-        $alteredData = $this->data->setDataItem('userID', 345);
-        $actual = $alteredData['userID'];
+    public function testBasicSetDataItem()
+    {
+        $alteredData = $this->data->setDataItem("userID", 345);
+        $actual = $alteredData["userID"];
         $expected = 345;
         $this->assertSame($expected, $actual);
     }
@@ -117,9 +125,10 @@ class DataTest extends TestCase {
     /**
      * Tests for getting and setting entire Data object.
      */
-    public function testBasicSetAndGetData() {
-        $this->data->setData(['userID' => 345, 'email' => 'dick@example.com']);
-        $expected = ['userID' => 345, 'email' => 'dick@example.com'];
+    public function testBasicSetAndGetData()
+    {
+        $this->data->setData(["userID" => 345, "email" => "dick@example.com"]);
+        $expected = ["userID" => 345, "email" => "dick@example.com"];
         $actual = $this->data->getData();
         $this->assertSame($expected, $actual);
     }
@@ -131,40 +140,44 @@ class DataTest extends TestCase {
     /**
      * Test with an already existing key.
      */
-    public function testAddDataKeyAlreadyExists() {
-        $this->data->addData(['c' => 'd'], 'items');
-        $actual = $this->data['items'];
-        $expected = ['c' => 'd'];
+    public function testAddDataKeyAlreadyExists()
+    {
+        $this->data->addData(["c" => "d"], "items");
+        $actual = $this->data["items"];
+        $expected = ["c" => "d"];
         $this->assertSame($expected, $actual);
     }
 
     /**
      * Test with a new key.
      */
-    public function testAddDataNewKey() {
-        $this->data->addData(['dick@example.com'], 'secondary email');
-        $actual = $this->data['secondary email'];
-        $expected = ['dick@example.com'];
+    public function testAddDataNewKey()
+    {
+        $this->data->addData(["dick@example.com"], "secondary email");
+        $actual = $this->data["secondary email"];
+        $expected = ["dick@example.com"];
         $this->assertSame($expected, $actual);
     }
 
     /**
      * Test with adding a new Data object.
      */
-    public function testAddDataWithDataObject() {
-        $this->data->addData(new Data(['newData' => 'new']), 'newData');
-        $actual = $this->data['newData'];
-        $expected = ['newData' => 'new'];
+    public function testAddDataWithDataObject()
+    {
+        $this->data->addData(new Data(["newData" => "new"]), "newData");
+        $actual = $this->data["newData"];
+        $expected = ["newData" => "new"];
         $this->assertSame($expected, $actual);
     }
 
     /**
      * Test with mergeMeta set to true.
      */
-    public function testAddDataWithMergeMetaTrue() {
-        $this->data->addData(new Data(['newData' => 'new']), 'newData', true);
-        $actual = $this->data['newData'];
-        $expected = ['newData' => 'new'];
+    public function testAddDataWithMergeMetaTrue()
+    {
+        $this->data->addData(new Data(["newData" => "new"]), "newData", true);
+        $actual = $this->data["newData"];
+        $expected = ["newData" => "new"];
         $this->assertSame($expected, $actual);
     }
 
@@ -175,7 +188,8 @@ class DataTest extends TestCase {
     /**
      * Basic test for {@link setStatus()} and {@link getStatus()}
      */
-    public function testSetAndGetStatus() {
+    public function testSetAndGetStatus()
+    {
         $this->data->setStatus(499);
         $actual = $this->data->getStatus();
         $expected = 499;
@@ -185,7 +199,8 @@ class DataTest extends TestCase {
     /**
      * Test {@link getStatus()} for null status.
      */
-    public function testGetStatusNull() {
+    public function testGetStatusNull()
+    {
         $actual = $this->data->getStatus();
         $expected = 200;
         $this->assertSame($expected, $actual);
@@ -194,7 +209,8 @@ class DataTest extends TestCase {
     /**
      * Test status > 527.
      */
-    public function testGetStatusGreaterThan527() {
+    public function testGetStatusGreaterThan527()
+    {
         $this->data->setStatus(550);
         $actual = $this->data->getStatus();
         $expected = 500;
@@ -204,7 +220,8 @@ class DataTest extends TestCase {
     /**
      * Test status < 100.
      */
-    public function testGetStatusLessThan100() {
+    public function testGetStatusLessThan100()
+    {
         $this->data->setStatus(80);
         $actual = $this->data->getStatus();
         $expected = 500;
@@ -218,8 +235,9 @@ class DataTest extends TestCase {
     /**
      * Test {@link getHeader()} with nonexistent header.
      */
-    public function testGetHeaderNonexistent() {
-        $actual = $this->data->getHeader('Host');
+    public function testGetHeaderNonexistent()
+    {
+        $actual = $this->data->getHeader("Host");
         $expected = null;
         $this->assertSame($expected, $actual);
     }
@@ -227,10 +245,11 @@ class DataTest extends TestCase {
     /**
      * Test set and get.
      */
-    public function testSetAndGetHeader() {
-        $this->data->setHeader('Host', 'example.com');
-        $actual = $this->data->getHeader('Host');
-        $expected = 'example.com';
+    public function testSetAndGetHeader()
+    {
+        $this->data->setHeader("Host", "example.com");
+        $actual = $this->data->getHeader("Host");
+        $expected = "example.com";
         $this->assertSame($expected, $actual);
     }
 
@@ -241,8 +260,9 @@ class DataTest extends TestCase {
     /**
      * Test where return is false.
      */
-    public function testHasHeaderFalse() {
-        $actual = $this->data->hasHeader('Host');
+    public function testHasHeaderFalse()
+    {
+        $actual = $this->data->hasHeader("Host");
         $expected = false;
         $this->assertSame($expected, $actual);
     }
@@ -250,9 +270,10 @@ class DataTest extends TestCase {
     /**
      * Test where return is true.
      */
-    public function testHasHeaderTrue() {
-        $this->data->setHeader('Host', 'example.com');
-        $actual = $this->data->hasHeader('Host');
+    public function testHasHeaderTrue()
+    {
+        $this->data->setHeader("Host", "example.com");
+        $actual = $this->data->hasHeader("Host");
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -264,18 +285,20 @@ class DataTest extends TestCase {
     /**
      * Basic test.
      */
-    public function testGetHeadersBasic() {
-        $this->data->setHeader('Location', 'http://example.com/example');
-        $this->data->setHeader('Warning', '199 Miscellaneous warning');
+    public function testGetHeadersBasic()
+    {
+        $this->data->setHeader("Location", "http://example.com/example");
+        $this->data->setHeader("Warning", "199 Miscellaneous warning");
         $actual = $this->data->getHeaders();
-        $expected = ['Location' => 'http://example.com/example', 'Warning' => '199 Miscellaneous warning'];
+        $expected = ["Location" => "http://example.com/example", "Warning" => "199 Miscellaneous warning"];
         $this->assertSame($expected, $actual);
     }
 
     /**
      * Test with no headers.
      */
-    public function testGetHeadersNone() {
+    public function testGetHeadersNone()
+    {
         $actual = $this->data->getHeaders();
         $expected = [];
         $this->assertSame($expected, $actual);
@@ -284,11 +307,12 @@ class DataTest extends TestCase {
     /**
      * Test for altering CONTENT_TYPE and HTTP strings.
      */
-    public function testGetHeadersAlteredStrings() {
-        $this->data->setHeader('CONTENT_TYPE', 'text/html; charset=utf-8');
-        $this->data->setHeader('HTTP_xxx', 'xxx');
+    public function testGetHeadersAlteredStrings()
+    {
+        $this->data->setHeader("CONTENT_TYPE", "text/html; charset=utf-8");
+        $this->data->setHeader("HTTP_xxx", "xxx");
         $actual = $this->data->getHeaders();
-        $expected = ['Content-Type' => 'text/html; charset=utf-8', 'Http-Xxx' => 'xxx'];
+        $expected = ["Content-Type" => "text/html; charset=utf-8", "Http-Xxx" => "xxx"];
         $this->assertSame($expected, $actual);
     }
 
@@ -299,20 +323,22 @@ class DataTest extends TestCase {
     /**
      * Test with no headers sent.
      */
-    public function testRenderNoHeaders() {
+    public function testRenderNoHeaders()
+    {
         $expected = json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
         $this->expectOutputString($expected);
-        $this->data->render();
+        $this->data->renderJson();
     }
 
     /**
      * Test with one header sent.
      */
-    public function testRenderOneHeader() {
-        $this->data->setHeader('xxx', 'xxx');
+    public function testRenderOneHeader()
+    {
+        $this->data->setHeader("xxx", "xxx");
         $expected = json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
         $this->expectOutputString($expected);
-        $this->data->render();
+        $this->data->renderJson();
     }
 
     /**
@@ -322,8 +348,9 @@ class DataTest extends TestCase {
     /**
      * Test offsetExists() returns true.
      */
-    public function testOffsetExistsTrue() {
-        $actual = $this->data->offsetExists('userID');
+    public function testOffsetExistsTrue()
+    {
+        $actual = $this->data->offsetExists("userID");
         $expected = true;
         $this->assertSame($expected, $actual);
     }
@@ -331,8 +358,9 @@ class DataTest extends TestCase {
     /**
      * Test offsetExists() returns false.
      */
-    public function testOffsetExistsTrueInt() {
-        $actual = $this->data->offsetExists('foo');
+    public function testOffsetExistsTrueInt()
+    {
+        $actual = $this->data->offsetExists("foo");
         $expected = false;
         $this->assertSame($expected, $actual);
     }
@@ -340,28 +368,31 @@ class DataTest extends TestCase {
     /**
      * Test for {@link offsetUnset()}.
      */
-    public function testOffsetUnset() {
-        $this->assertArrayHasKey('userID', $this->data);
-        $this->data->offsetUnset('userID');
-        $this->assertArrayNotHasKey('userID', $this->data);
+    public function testOffsetUnset()
+    {
+        $this->assertArrayHasKey("userID", $this->data);
+        $this->data->offsetUnset("userID");
+        $this->assertArrayNotHasKey("userID", $this->data);
     }
 
     /**
      * Test for {@link count()}.
      */
-    public function testCount() {
+    public function testCount()
+    {
         $this->assertCount(6, $this->data);
-        $this->data->offsetUnset('userID');
+        $this->data->offsetUnset("userID");
         $this->assertCount(5, $this->data);
     }
 
     /**
      * Test for {@link getIterator()}
      */
-    public function testGetIterator() {
+    public function testGetIterator()
+    {
         $iteratorObject = $this->data->getIterator();
-        $actual = $iteratorObject['userID'];
-        $expected = $this->data['userID'];
+        $actual = $iteratorObject["userID"];
+        $expected = $this->data["userID"];
         $this->assertEquals($expected, $actual);
     }
 
@@ -372,7 +403,8 @@ class DataTest extends TestCase {
     /**
      * Test with data object.
      */
-    public function testBoxWithDataObject() {
+    public function testBoxWithDataObject()
+    {
         $actual = $this->data->box($this->data);
         $expected = $this->data;
         $this->assertSame($expected, $actual);
@@ -381,18 +413,20 @@ class DataTest extends TestCase {
     /**
      * Test with array.
      */
-    public function testBoxWithArray() {
-        $actual = $this->data->box(['foo' => 'bar']);
-        $expected = new Data(['foo' => 'bar']);
+    public function testBoxWithArray()
+    {
+        $actual = $this->data->box(["foo" => "bar"]);
+        $expected = new Data(["foo" => "bar"]);
         $this->assertEquals($actual, $expected);
     }
 
     /**
      * Test with string.
      */
-    public function testBoxWithString() {
+    public function testBoxWithString()
+    {
         $this->expectExceptionMessage("Data:box() expects an instance of Data or an array.");
-        $this->data->box('This should throw an exception');
+        $this->data->box("This should throw an exception");
     }
 
     /**
@@ -406,9 +440,10 @@ class DataTest extends TestCase {
     /**
      * Test with two arguments (name and value).
      */
-    public function testAddMetaNameValue() {
-        $this->data->addMeta('Location', 'www.example.com/example');
-        $expected = ['Location' => ['www.example.com/example']];
+    public function testAddMetaNameValue()
+    {
+        $this->data->addMeta("Location", "www.example.com/example");
+        $expected = ["Location" => ["www.example.com/example"]];
         $actual = $this->data->getMetaArray();
         $this->assertSame($expected, $actual);
     }
@@ -416,9 +451,10 @@ class DataTest extends TestCase {
     /**
      * Test with three arguments (name, key, and value).
      */
-    public function testAddMetaNameValueAndKey() {
-        $this->data->addMeta('foo', 'bar', 'baz');
-        $expected = ['foo' => ['bar' => 'baz']];
+    public function testAddMetaNameValueAndKey()
+    {
+        $this->data->addMeta("foo", "bar", "baz");
+        $expected = ["foo" => ["bar" => "baz"]];
         $actual = $this->data->getMetaArray();
         $this->assertSame($expected, $actual);
     }
@@ -426,11 +462,12 @@ class DataTest extends TestCase {
     /**
      * Test with already existing key.
      */
-    public function testAddMetaWithAlreadyExistingKey() {
-        $this->data->setMeta('foo', 'bar');
-        $this->assertSame($this->data->getMetaArray(), ['foo' => 'bar']);
-        $this->data->addMeta('foo', 'baz');
-        $expected = ['foo' => ['bar', 'baz']];
+    public function testAddMetaWithAlreadyExistingKey()
+    {
+        $this->data->setMeta("foo", "bar");
+        $this->assertSame($this->data->getMetaArray(), ["foo" => "bar"]);
+        $this->data->addMeta("foo", "baz");
+        $expected = ["foo" => ["bar", "baz"]];
         $actual = $this->data->getMetaArray();
         $this->assertSame($expected, $actual);
     }
@@ -438,20 +475,22 @@ class DataTest extends TestCase {
     /**
      * Test {@link setMetaArray()}.
      */
-    public function testSetMetaArray() {
-        $this->data->setMetaArray(['foo' => 'bar']);
+    public function testSetMetaArray()
+    {
+        $this->data->setMetaArray(["foo" => "bar"]);
         $actual = $this->data->getMetaArray();
-        $expected = ['foo' => 'bar'];
+        $expected = ["foo" => "bar"];
         $this->assertSame($expected, $actual);
     }
 
     /**
      * Test {@link mergeMetaArray()}
      */
-    public function testMergeMetaArray() {
-        $this->data->setMetaArray(['foo' => 'bar']);
-        $this->data->mergeMetaArray(['bar' => 'baz']);
-        $expected = ['foo' => 'bar', 'bar' => 'baz'];
+    public function testMergeMetaArray()
+    {
+        $this->data->setMetaArray(["foo" => "bar"]);
+        $this->data->mergeMetaArray(["bar" => "baz"]);
+        $expected = ["foo" => "bar", "bar" => "baz"];
         $actual = $this->data->getMetaArray();
         $this->assertSame($expected, $actual);
     }
@@ -459,25 +498,28 @@ class DataTest extends TestCase {
     /**
      * Trying to get a data item from a non-array data is an exception.
      */
-    public function testGetDataItemException() {
-        $data = new Data('foo');
+    public function testGetDataItemException()
+    {
+        $data = new Data("foo");
         $this->expectException(\Exception::class);
-        $data->getDataItem('0');
+        $data->getDataItem("0");
     }
 
     /**
      * Trying to set a data item on a non-array data is an exception.
      */
-    public function testSetDataItemException() {
-        $data = new Data('foo');
+    public function testSetDataItemException()
+    {
+        $data = new Data("foo");
         $this->expectException(\Exception::class);
-        $data->setDataItem('0', 'b');
+        $data->setDataItem("0", "b");
     }
 
     /**
      * Test the data constructor with an integer status.
      */
-    public function testIntStatusConstructor() {
+    public function testIntStatusConstructor()
+    {
         $data = new Data([], 200);
         $this->assertSame(200, $data->getStatus());
     }
@@ -485,9 +527,24 @@ class DataTest extends TestCase {
     /**
      * Test `Data::mergeData()`.
      */
-    public function testMergeData(): void {
-        $data = new Data(['conf' => ['foo' => 'bar']]);
-        $data->mergeData(['conf' => ['baz' => 'qux']]);
-        $this->assertSame(['conf' => ['foo' => 'bar', 'baz' => 'qux']], $data->getData());
+    public function testMergeData(): void
+    {
+        $data = new Data(["conf" => ["foo" => "bar"]]);
+        $data->mergeData(["conf" => ["baz" => "qux"]]);
+        $this->assertSame(["conf" => ["foo" => "bar", "baz" => "qux"]], $data->getData());
+    }
+
+    /**
+     * Test that the data is properly rendered into CSV.
+     *
+     * @param $toEncode
+     * @param $expected
+     * @dataProvider provideCsvData
+     */
+    public function testRenderCSV($toEncode, $expected)
+    {
+        $data = new Data($toEncode);
+        $this->expectOutputString($expected);
+        $data->renderCsv();
     }
 }

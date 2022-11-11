@@ -31,7 +31,6 @@ export interface ITokenProps extends IOptionalComponentID {
     showIndicator?: boolean;
     maxHeight?: number;
     hideSelectedOptions?: boolean;
-    fieldName?: string; //this one is for legacy form submits, hidden input should have a name so it appears in gdn form values
 }
 
 interface IState {
@@ -110,7 +109,6 @@ export default class TokensLoadable extends React.Component<ITokenProps, IState>
                         value={JSON.stringify(this.props.value)}
                         type="hidden"
                         tabIndex={-1}
-                        name={this.props.fieldName}
                     />
                 </div>
             </>

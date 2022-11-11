@@ -12,7 +12,7 @@ import { FormGroup, FormGroupLabel, FormGroupInput } from "../../index";
 import { AutoComplete as UIAutoComplete, AutoCompleteLookupOptions, ILookupApi } from "./";
 
 export default {
-    title: "Forms/Admin Form Fields",
+    title: "Vanilla UI/Forms",
 };
 
 const storyStyle = css({

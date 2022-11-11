@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -104,7 +104,7 @@ export function CallToAction(props: IProps) {
                                     <img
                                         className={ctaClasses.image}
                                         src={props.imageUrl}
-                                        alt={t(props.title)}
+                                        alt={props.title}
                                         loading="lazy"
                                     />
                                 </div>
@@ -112,10 +112,10 @@ export function CallToAction(props: IProps) {
                         )}
                         <div className={ctaClasses.content}>
                             <Heading renderAsDepth={3} className={ctaClasses.title}>
-                                {t(props.title)}
+                                {props.title}
                             </Heading>
 
-                            {props.description && <div className={ctaClasses.description}>{t(props.description)}</div>}
+                            {props.description && <div className={ctaClasses.description}>{props.description}</div>}
                             {!multipleLinks && (
                                 <LinkAsButton
                                     buttonType={options.linkButtonType}

@@ -270,7 +270,9 @@ class SetupController extends DashboardController
 
                 // Set up cookies now so that the user can be signed in.
                 $ExistingSalt = c("Garden.Cookie.Salt", false);
-                $ConfigurationFormValues["Garden.Cookie.Salt"] = $ExistingSalt ?: betterRandomString(32, "Aa0");
+                $ConfigurationFormValues["Garden.Cookie.Salt"] = $ExistingSalt
+                    ? $ExistingSalt
+                    : betterRandomString(16, "Aa0");
                 $ConfigurationFormValues["Garden.Cookie.Domain"] = ""; // Don't set this to anything by default. # Tim - 2010-06-23
                 // Additional default setup values.
                 $ConfigurationFormValues["Garden.Registration.ConfirmEmail"] = true;

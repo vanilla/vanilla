@@ -9,14 +9,13 @@ namespace Vanilla\Dashboard\Models;
 
 use Exception;
 
-use Garden\EventManager;
 use Gdn;
 use Generator;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use UserModel;
-use Vanilla\Dashboard\Events\AfterUserAnonymizeEvent;
 use Vanilla\Formatting\DateTimeFormatter;
+use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Logger;
 use Vanilla\Models\PipelineModel;
@@ -26,7 +25,6 @@ use Vanilla\Scheduler\LongRunnerNextArgs;
 use Vanilla\Scheduler\LongRunnerQuantityTotal;
 use Vanilla\Scheduler\LongRunnerSuccessID;
 use Vanilla\Scheduler\LongRunnerTimeoutException;
-use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Web\SystemCallableInterface;
 
 /**
@@ -45,17 +43,11 @@ class UserMentionsModel extends PipelineModel implements LoggerAwareInterface, S
         "comment" => ["name" => \CommentModel::class],
     ];
 
-    /** @var EventManager */
-    private $eventManager;
-
     /** @var UserModel */
     private $userModel;
 
     /** @var FormatService */
     private $formatService;
-
-    /** @var SchedulerInterface */
-    private $scheduler;
 
     const DISCUSSION = "discussion";
     const COMMENT = "comment";
@@ -65,20 +57,12 @@ class UserMentionsModel extends PipelineModel implements LoggerAwareInterface, S
      *
      * @param UserModel $userModel
      * @param FormatService $formatService
-     * @param SchedulerInterface $scheduler
-     * @param EventManager $eventManager
      */
-    public function __construct(
-        UserModel $userModel,
-        FormatService $formatService,
-        SchedulerInterface $scheduler,
-        EventManager $eventManager
-    ) {
+    public function __construct(UserModel $userModel, FormatService $formatService)
+    {
         parent::__construct("userMention");
         $this->userModel = $userModel;
         $this->formatService = $formatService;
-        $this->scheduler = $scheduler;
-        $this->eventManager = $eventManager;
     }
 
     /**
@@ -351,10 +335,6 @@ class UserMentionsModel extends PipelineModel implements LoggerAwareInterface, S
         } catch (LongRunnerTimeoutException $exception) {
             return new LongRunnerNextArgs([$id]);
         }
-
-        $afterUserAnonymizeEvent = new AfterUserAnonymizeEvent($id);
-        $this->eventManager->dispatch($afterUserAnonymizeEvent);
-
         return LongRunner::FINISHED;
     }
 

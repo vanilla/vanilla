@@ -20,9 +20,9 @@ class ApiExtensionHandlingTest extends SiteTestCase
      * Test that the
      * @dataProvider provideRouteWithExtension
      */
-    public function testRouteWithExtension($path, $contentType, array $query = [])
+    public function testRouteWithExtension($path, $contentType)
     {
-        $result = $this->api()->get($path, $query);
+        $result = $this->api()->get($path);
         $this->assertEquals(200, $result->getStatusCode());
         $this->assertEquals($contentType, $result->getHeader("Content-Type"));
     }
@@ -35,7 +35,7 @@ class ApiExtensionHandlingTest extends SiteTestCase
     public function provideRouteWithExtension(): array
     {
         $r = [
-            ["/users.csv", "application/csv; charset=utf-8", ["limit" => 5000]],
+            ["/users.csv", "application/csv; charset=utf-8"],
             ["/users/1.csv", "application/csv; charset=utf-8"],
             ["/categories.csv?categoryID=1..4", "application/csv; charset=utf-8"],
             ["/users", "application/json; charset=utf-8"],

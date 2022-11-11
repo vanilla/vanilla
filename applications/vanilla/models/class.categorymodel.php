@@ -957,7 +957,7 @@ class CategoryModel extends Gdn_Model implements
                 continue;
             }
             foreach ($category["AllowedDiscussionTypes"] as $discussionType) {
-                $result[] = strtolower($discussionType["apiType"] ?? $discussionType["Singular"]);
+                $result[] = str_replace(" ", "-", strtolower($this->locale->translate($discussionType["AddText"])));
             }
         }
 

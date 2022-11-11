@@ -66,9 +66,9 @@ export default function ProfileFieldsListClasses() {
     });
 
     const actionsLayout = css({
-        width: 75,
+        width: 150,
         display: "flex",
-        justifyContent: "flex-end",
+        justifyContent: "space-between",
         alignItems: "center",
         paddingTop: 9,
         paddingBottom: 9,

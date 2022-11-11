@@ -719,11 +719,3 @@ if (!$hotExists) {
         ->set("hot", "0 + COALESCE(Score, 0) + COALESCE(CountComments, 0)", false)
         ->put();
 }
-
-// Convert old 16 char default salt to 32 char.
-$cookieSalt = $config->get("Garden.Cookie.Salt");
-if (strlen($cookieSalt) === 16 && !$config->configKeyExists("Garden.Cookie.OldSalt")) {
-    // Assume if salt length is 16 then we are using the old default salt.
-    $config->set("Garden.Cookie.OldSalt", $cookieSalt);
-    $config->set("Garden.Cookie.Salt", betterRandomString(32, "Aa0"));
-}

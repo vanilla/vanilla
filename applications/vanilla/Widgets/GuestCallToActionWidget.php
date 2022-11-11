@@ -83,11 +83,11 @@ class GuestCallToActionWidget extends AbstractReactModule implements CombinedPro
     public static function getWidgetSchema(): Schema
     {
         return SchemaUtils::composeSchemas(
-            self::widgetTitleSchema(null, true, t("Welcome!")),
+            self::widgetTitleSchema(null, true, "Welcome!"),
             self::widgetDescriptionSchema(
                 null,
                 false,
-                t("It looks like you're new here. Sign in or register to get started.")
+                "It looks like you're new here. Sign in or register to get started."
             ),
             self::getWidgetSpecificSchema(true)
         );

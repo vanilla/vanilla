@@ -126,11 +126,6 @@ trait EntryControllerConnectTestTrait
 
                 // Make sure that everything posted in the body is also in the form from before.
                 foreach ($body as $key => $value) {
-                    //Special case for profile fields.
-                    if ($key == "Profile" && is_array($value)) {
-                        $fieldName = array_key_first($value);
-                        $key = $key . "[" . $fieldName . "]";
-                    }
                     $html->assertFormInput($key);
                 }
 

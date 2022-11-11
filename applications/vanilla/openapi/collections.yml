@@ -2,6 +2,7 @@ openapi: 3.0.3
 info:
 paths:
     /collections:
+        x-hidden: true
         get:
             summary: List collections.
             parameters:
@@ -67,6 +68,7 @@ paths:
             tags:
                 - Collections
     /collections/{id}:
+        x-hidden: true
         parameters:
             - description: The collection id
               in: path
@@ -127,6 +129,7 @@ paths:
             tags:
                 - Collections
     /collections/{id}/content/{locale}:
+        x-hidden: true
         get:
             summary: List collection with the each record expanded
             parameters:
@@ -156,6 +159,7 @@ paths:
             tags:
                 - Collections
     /collections/by-resource:
+        x-hidden: true
         get:
             summary: List the collections a given record belongs to.
             parameters:

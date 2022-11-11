@@ -967,37 +967,6 @@ class Gdn_Form extends Gdn_Pluggable
     }
 
     /**
-     * A react based tokens input for multi select values.
-     *
-     * @param string $fieldName The form field name for the input.
-     * @param array $options The data to fill the options in the token input select list.
-     * @param string $label The label.
-     * @param string $description The description for the form field.
-     *
-     * @return string
-     */
-    public function tokensInputReact(
-        string $fieldName,
-        array $options,
-        string $label = "",
-        string $description = ""
-    ): string {
-        $value = $this->getValue($fieldName, null);
-
-        return $this->react(
-            $fieldName,
-            "tokensInputInLegacyForm",
-            [
-                "options" => $options,
-                "label" => $label,
-                "description" => $description,
-                "initialValue" => $value,
-            ],
-            ""
-        );
-    }
-
-    /**
      * Outputs the entire form group with both the label and input. Adds an image preview and a link to delete the
      * current image. Handles the ajax clearing of the image preview on removal.
      * Requires dashboard.js and dashboard.css to look and work as intended.

@@ -238,9 +238,6 @@ class CollectionModel extends PipelineModel
                 $insertedKeys[] = $key;
             }
         }
-        if (count($insertedKeys)) {
-            $this->clearAllCache($collectionID);
-        }
     }
 
     /**
@@ -251,21 +248,14 @@ class CollectionModel extends PipelineModel
      */
     public function removeRecordFromCollections(array $record, array $collectionIDs): void
     {
-        if (count($collectionIDs)) {
-            $sql = $this->createSql();
-            $where = [
-                "collectionID" => $collectionIDs,
-                "recordID" => $record["recordID"],
-                "recordType" => $record["recordType"],
-            ];
+        $sql = $this->createSql();
+        $where = [
+            "collectionID" => $collectionIDs,
+            "recordID" => $record["recordID"],
+            "recordType" => $record["recordType"],
+        ];
 
-            $sql->delete("collectionRecord", $where);
-
-            //We need to clear existing cache
-            foreach ($collectionIDs as $collectionID) {
-                $this->clearAllCache($collectionID);
-            }
-        }
+        $sql->delete("collectionRecord", $where);
     }
 
     /**
@@ -294,6 +284,7 @@ class CollectionModel extends PipelineModel
             $this->database->rollbackTransaction();
             throw $e;
         }
+        $this->clearAllCache($collectionID);
     }
 
     /**

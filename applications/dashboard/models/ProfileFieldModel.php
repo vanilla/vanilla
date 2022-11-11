@@ -13,8 +13,10 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ForbiddenException;
 use Gdn;
+use Vanilla\Attributes;
 use Vanilla\Database\Operation\BooleanFieldProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Models\FullRecordCacheModel;
 
 /**
@@ -331,18 +333,16 @@ class ProfileFieldModel extends FullRecordCacheModel
         $formType = $data["formType"] ?? null;
         $dataType = $data["dataType"] ?? null;
         $dropdownOptions = $data["dropdownOptions"] ?? null;
-        $dropdownFormTypes = [self::FORM_TYPE_DROPDOWN, self::FORM_TYPE_TOKENS];
 
-        if ($dropdownOptions && !in_array($formType, $dropdownFormTypes)) {
-            $field->addError(
-                "dropdownOptions can only be set when the formType is one of: " . implode(", ", $dropdownFormTypes)
-            );
+        if ($dropdownOptions && $formType !== self::FORM_TYPE_DROPDOWN) {
+            $field->addError("dropdownOptions can only be set when the formType is " . self::FORM_TYPE_DROPDOWN . ".");
         }
 
-        if (in_array($formType, $dropdownFormTypes) && (!isset($dropdownOptions) || empty($dropdownOptions))) {
+        if ($formType === self::FORM_TYPE_DROPDOWN && (!isset($dropdownOptions) || empty($dropdownOptions))) {
             $field->addError(
-                "At least one dropdown option must be assigned when saving the following formTypes: " .
-                    implode(", ", $dropdownFormTypes)
+                "At least one dropdown option must be assigned when saving a formType of '" .
+                    self::FORM_TYPE_DROPDOWN .
+                    "'."
             );
         }
 

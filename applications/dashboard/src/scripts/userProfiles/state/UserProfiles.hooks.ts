@@ -4,7 +4,6 @@
  */
 
 import {
-    deleteProfileField,
     fetchProfileField,
     fetchProfileFields,
     fetchUserProfileFields,
@@ -128,16 +127,5 @@ export function useProfileFieldByUserID(userID: RecordID) {
     return {
         status: profileFieldStatus,
         ...(profileFieldStatus === LoadStatus.SUCCESS && { data: userProfileFields }),
-    };
-}
-
-/**
- * Delete the selected profile field by apiName
- */
-export function useDeleteProfileField() {
-    const dispatch = useUserProfilesDispatch();
-
-    return async function (apiName: ProfileField["apiName"]) {
-        return await dispatch(deleteProfileField(apiName)).unwrap();
     };
 }

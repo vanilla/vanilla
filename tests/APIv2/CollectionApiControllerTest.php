@@ -452,61 +452,6 @@ class CollectionApiControllerTest extends AbstractResourceTest
         }
     }
 
-    /** Test adding and removing records from collections also resets the cache data */
-    public function testPutByResourceClearsCache(): void
-    {
-        //create a collections with records
-        $collectionOne = $this->testCollectionPost();
-
-        //Verify that the collections show up when the get the full collection results based on locale
-        $locale = \Gdn::locale()->current() ?: "en";
-        $url = $this->baseUrl . "/content/{$collectionOne[$this->pk]}/$locale";
-        $response = $this->api()->get($url);
-        $this->assertEquals(200, $response->getStatusCode());
-        $collectionFullContent = $response->getBody();
-
-        $this->assertEquals($collectionOne["collectionID"], $collectionFullContent["collectionID"]);
-        $this->assertCount(count($collectionOne["records"]), $collectionFullContent["records"]);
-
-        $this->assertEqualsCanonicalizing(
-            array_column($collectionOne["records"], "recordID"),
-            array_column($collectionFullContent["records"], "recordID")
-        );
-
-        //Add a new record to the collection
-
-        $record = $this->getRecord()["records"][0];
-        $response = $this->api()->put($this->baseUrl . "/by-resource", [
-            "collectionIDs" => [$collectionOne["collectionID"]],
-            "record" => $record,
-        ]);
-        $this->assertEquals(200, $response->getStatusCode());
-
-        //Check if the new records shows in the collection
-        $response = $this->api()->get($url);
-        $this->assertEquals(200, $response->getStatusCode());
-        $collectionFullContent = $response->getBody();
-        $this->assertEquals($collectionOne["collectionID"], $collectionFullContent["collectionID"]);
-        $this->assertCount(count($collectionOne["records"]) + 1, $collectionFullContent["records"]);
-        $this->assertContains($record["recordID"], array_column($collectionFullContent["records"], "recordID"));
-
-        //create a new collection and add the same record to the collection and see if it gets removed from the existing collection
-
-        $collectionTwo = $this->testCollectionPost();
-        $response = $this->api()->put($this->baseUrl . "/by-resource", [
-            "collectionIDs" => [$collectionTwo["collectionID"]],
-            "record" => $record,
-        ]);
-
-        //Now test that the collection doesn't have the record anymore
-        $response = $this->api()->get($url);
-        $this->assertEquals(200, $response->getStatusCode());
-        $collectionFullContent = $response->getBody();
-        $this->assertEquals($collectionOne["collectionID"], $collectionFullContent["collectionID"]);
-        $this->assertCount(count($collectionOne["records"]), $collectionFullContent["records"]);
-        $this->assertNotContains($record["recordID"], array_column($collectionFullContent["records"], "recordID"));
-    }
-
     /**
      * Verify the required category data are returned
      * @param array $record

@@ -33,13 +33,11 @@ import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
 // This is a misleading place for the component to live. Its used in the /profile/preferences/[USER_ID]
 import { CategoryNotificationPreferences } from "@dashboard/components/CategoryNotificationPreferences";
 import { userProfilesSlice } from "@dashboard/userProfiles/state/UserProfiles.slice";
-import { TokensInputInLegacyForm } from "@library/forms/select/TokensInputInLegacyForm";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);
 
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
-addComponent("tokensInputInLegacyForm", TokensInputInLegacyForm, { overwrite: true });
 
 // Redux
 registerReducer("auth", authReducer);

@@ -8,16 +8,13 @@ import * as React from "react";
 import shuffle from "lodash/shuffle";
 import { Table as TableComponent } from "./Table";
 import Button from "@library/forms/Button";
-import { ButtonTypes } from "@library/forms/buttonTypes";
-import { Icon } from "@vanilla/icons";
-import { StoryParagraph } from "@library/storybook/StoryParagraph";
 
 export default {
     title: "Dashboard/Analytics",
 };
 
 type FauxData = {
-    type: "number" | "string" | "node" | "button";
+    type: "number" | "string" | "node";
     column: string;
 };
 
@@ -45,14 +42,7 @@ const makeFauxData = (config: IFauxDataProps) => {
                     .replace(/[^a-z]+/g, "")
                     .substr(0, 12);
             }
-            case "button": {
-                return (
-                    <Button buttonType={ButtonTypes.ICON}>
-                        <Icon icon="dashboard-edit" />
-                    </Button>
-                );
-            }
-            default: {
+            case "node": {
                 return <span>I am span element</span>;
             }
         }
@@ -120,7 +110,7 @@ function ColumnsSortableTableStory() {
     );
     return (
         <>
-            <StoryParagraph>Click on a column header to sort by it</StoryParagraph>
+            Click on a column header to sort by it
             <TableComponent data={fauxData} sortable={true} />
         </>
     );
@@ -159,33 +149,6 @@ function PaginatedTableStory() {
     );
     return <TableComponent data={fauxData} paginate={true} pageSize={10} />;
 }
-
-function HiddenColumnHeaderTableStory() {
-    const fauxData = React.useMemo(
-        () =>
-            makeFauxData({
-                columns: [
-                    { type: "number", column: "ID" },
-                    { type: "string", column: "Name" },
-                    { type: "node", column: "Description" },
-                    { type: "string", column: "label" },
-                    { type: "button", column: "Actions" },
-                ],
-            }),
-        [],
-    );
-
-    return (
-        <>
-            <StoryParagraph>
-                Last column has the header hidden on display, but the title &quot;Actions&quot; is accessible to screen
-                readers.
-            </StoryParagraph>
-            <TableComponent data={fauxData} hiddenHeaders={["Actions"]} />
-        </>
-    );
-}
-
 export function BasicTable() {
     return <BasicTableStory />;
 }
@@ -200,8 +163,4 @@ export function PresetSortableTable() {
 }
 export function PaginatedTable() {
     return <PaginatedTableStory />;
-}
-
-export function HiddenColumnHeaderTable() {
-    return <HiddenColumnHeaderTableStory />;
 }

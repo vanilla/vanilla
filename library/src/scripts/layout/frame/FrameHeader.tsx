@@ -78,7 +78,6 @@ export default class FrameHeader extends React.PureComponent<IFrameHeaderProps> 
                     className={classNames("frameHeader-heading", classes.heading, this.props.titleClass, {
                         "sr-only": this.props.srOnlyTitle,
                     })}
-                    tabIndex={0}
                 >
                     {backLink}
                     {this.props.title}

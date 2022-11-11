@@ -321,6 +321,7 @@ export default function ProfileFieldForm(props: IProps) {
                                     <ErrorMessages errors={errors.filter(notEmpty)} />
                                 </ErrorWrapper>
                             )}
+
                             <JsonSchemaForm
                                 schema={schema}
                                 instance={values}

@@ -25,9 +25,6 @@ class AccessTokenModel extends Gdn_Model
     /** @var ConfigurationInterface */
     private $config;
 
-    /** @var int */
-    private $version;
-
     /**
      * Construct an {@link AccessToken} object.
      *
@@ -38,7 +35,6 @@ class AccessTokenModel extends Gdn_Model
         parent::__construct("AccessToken");
         $this->PrimaryKey = "AccessTokenID";
         $secret = $secret ?: c("Garden.Cookie.Salt");
-        $this->version = Gdn::config()->configKeyExists("Garden.Cookie.OldSalt") ? 2 : 1;
         $this->setSecret($secret);
         $this->tokenIdentifier = "access token";
         $this->setPruneAfter("1 day")->setPruneField("DateExpires");
@@ -100,9 +96,6 @@ class AccessTokenModel extends Gdn_Model
             "Type" => $type,
             "DateExpires" => $expireDate,
             "Scope" => $scope,
-            "Attributes" => [
-                "version" => $this->version,
-            ],
         ]);
 
         if (!$token) {
@@ -241,25 +234,14 @@ class AccessTokenModel extends Gdn_Model
      */
     public function verify($accessToken, $throw = false)
     {
-        $token = $this->trim($accessToken);
-
-        // Need to get token first to check version
-        $row = $this->getToken($token);
-
-        if (($row["Attributes"]["version"] ?? 1) === 1 && Gdn::config()->configKeyExists("Garden.Cookie.OldSalt")) {
-            // Backup current secret and use old cookie salt for signature verification
-            $secret = $this->secret;
-            $this->setSecret(Gdn::config()->get("Garden.Cookie.OldSalt"));
-        }
-
+        // First verify the token without going to the database.
         if (!$this->verifyTokenSignature($accessToken, $throw)) {
             return false;
         }
 
-        if (isset($secret)) {
-            // Restore original secret in case we need to issue new tokens
-            $this->setSecret($secret);
-        }
+        $token = $this->trim($accessToken);
+
+        $row = $this->getToken($token);
 
         if (!$row) {
             return $this->tokenError("Access token not found.", 401, $throw);
@@ -383,13 +365,5 @@ class AccessTokenModel extends Gdn_Model
     public function randomSignedToken($expires = "2 months")
     {
         return $this->signToken($this->randomToken(), $expires);
-    }
-
-    /**
-     * @return int
-     */
-    public function getVersion(): int
-    {
-        return $this->version;
     }
 }

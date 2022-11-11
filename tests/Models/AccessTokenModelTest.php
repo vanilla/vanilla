@@ -33,53 +33,6 @@ class AccessTokenModelTest extends SharedBootstrapTestCase
     }
 
     /**
-     * Test issuing and verifying tokens using different config settings
-     *
-     * @return void
-     * @throws \Gdn_UserException
-     * @dataProvider provideIssueAndVerifyUsingSaltData
-     */
-    public function testIssueAndVerifyUsingSalt(array $issueConfig, array $verifyConfig, int $expectedVersion)
-    {
-        $token = $this->runWithConfig($issueConfig, function () use ($expectedVersion) {
-            $model = new AccessTokenModel();
-            $this->assertSame($expectedVersion, $model->getVersion());
-            return $model->issue(1);
-        });
-
-        $this->runWithConfig($verifyConfig, function () use ($token) {
-            $model = new AccessTokenModel();
-            $this->assertEquals(1, $model->verify($token)["UserID"]);
-        });
-    }
-
-    /**
-     * Provides config data for testIssueAndVerifyUsingSalt
-     *
-     * @return array
-     */
-    public function provideIssueAndVerifyUsingSaltData(): array
-    {
-        return [
-            "issued with version 1 and verified with Garden.Cookie.Salt" => [
-                ["Garden.Cookie.Salt" => "123"],
-                ["Garden.Cookie.Salt" => "123"],
-                1,
-            ],
-            "issued with version 1 and verified with Garden.Cookie.OldSalt" => [
-                ["Garden.Cookie.Salt" => "123"],
-                ["Garden.Cookie.Salt" => "456", "Garden.Cookie.OldSalt" => "123"],
-                1,
-            ],
-            "issued with version 2 and verified with Garden.Cookie.Salt" => [
-                ["Garden.Cookie.Salt" => "123", "Garden.Cookie.OldSalt" => "456"],
-                ["Garden.Cookie.Salt" => "123", "Garden.Cookie.OldSalt" => "456"],
-                2,
-            ],
-        ];
-    }
-
-    /**
      * Test revoking a token.
      *
      * @param string $token A valid access token to revoke.

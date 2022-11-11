@@ -1387,7 +1387,7 @@ class CategoryModelTest extends SiteTestCase
     }
 
     /**
-     * Test return of getPostableDiscussionTypes, that it would return ignores translated string.
+     * Test return of getPostableDiscussionTypes, that it would return translated string.
      */
     public function testGetPostableDiscussionTypes()
     {
@@ -1399,7 +1399,7 @@ class CategoryModelTest extends SiteTestCase
         $postableDiscussionTypes = $this->categoryModel->getPostableDiscussionTypes();
 
         $this->assertCount(3, $postableDiscussionTypes);
-        $this->assertContains("poll", $postableDiscussionTypes);
-        $this->assertContains("discussion", $postableDiscussionTypes);
+        $this->assertContains("funny-poll", $postableDiscussionTypes);
+        $this->assertContains("new-discussion", $postableDiscussionTypes);
     }
 }

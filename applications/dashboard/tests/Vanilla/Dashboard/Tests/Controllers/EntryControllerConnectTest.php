@@ -683,18 +683,14 @@ class EntryControllerConnectTest extends SiteTestCase
         $this->bessy()->assertNoFormErrors();
         $this->bessy()
             ->getLastHtml()
-            ->assertFormInput("Profile[{$profileFieldData["apiName"]}]");
+            ->assertFormInput($profileFieldData["apiName"]);
         $this->bessy()->assertNoFormErrors();
 
         //now lets connect again with submit and send some values so $isPostBack is true
         $body = $lastHTML->getFormValues();
         $body["ConnectName"] = $ssoUser["Name"];
-        $profileKey = "Profile[{$profileFieldData["apiName"]}]";
-        if (isset($body[$profileKey])) {
-            unset($body[$profileKey]);
-            $body["Profile"][$profileFieldData["apiName"]] = "testValue";
-        }
 
+        $body[$profileFieldData["apiName"]] = "testValue";
         $r = $this->entryConnect($ssoUser, $body);
 
         //we successfully created our user
@@ -725,11 +721,10 @@ class EntryControllerConnectTest extends SiteTestCase
         ]);
         $r = $this->entryConnect($ssoUser);
 
-        $body = $this->bessy()
+        $lastHTML = $this->bessy()
             ->getLastHtml()
             ->getFormValues();
         $body["ConnectName"] = $ssoUser["Name"];
-        $body["Profile"][$profileFieldData["apiName"]] = "";
 
         //should throw an error as we did not provide the required profile field
         $this->expectExceptionMessage($profileFieldData["label"] . " is required.");
@@ -752,7 +747,7 @@ class EntryControllerConnectTest extends SiteTestCase
             ->assertFormInput("ConnectName");
         $this->bessy()
             ->getLastHtml()
-            ->assertFormInput("Profile[" . $profileFieldData["apiName"] . "]");
+            ->assertFormInput($profileFieldData["apiName"]);
     }
     //endregion
 

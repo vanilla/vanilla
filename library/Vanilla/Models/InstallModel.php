@@ -98,7 +98,7 @@ class InstallModel
             "Database.Password" => $data["database"]["password"],
 
             "Garden.Title" => $data["site"]["title"],
-            "Garden.Cookie.Salt" => $this->config->get("Garden.Cookie.Salt") ?: betterRandomString(32, "Aa0"),
+            "Garden.Cookie.Salt" => $this->config->get("Garden.Cookie.Salt") ?: betterRandomString(16, "Aa0"),
             "Garden.Cookie.Domain" => "",
             "Garden.Registration.ConfirmEmail" => true,
             "Garden.Email.SupportName" => $data["site"]["title"],

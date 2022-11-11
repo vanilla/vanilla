@@ -7,10 +7,8 @@
 
 namespace VanillaTests\Library\Core;
 
-use Firebase\JWT\JWT;
 use Gdn;
 use Gdn_CookieIdentity;
-use Vanilla\CurrentTimeStamp;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 
 /**
@@ -41,32 +39,5 @@ class CookieIdentityTest extends AbstractAPIv2Test
         $this->cookieIdentity->setIdentity($this->memberID, true, $origSessionID);
         $sessionID = $this->cookieIdentity->getSession();
         $this->assertEquals($sessionID, $origSessionID);
-    }
-
-    /**
-     * Tests fallback to OldSalt for CookieIdentity::getJWTPayload
-     *
-     * @return void
-     * @throws \Exception
-     */
-    public function testGetJWTPayload()
-    {
-        $this->cookieIdentity->init(["Salt" => "1234567890123456"]);
-        $_COOKIE["blah"] = JWT::encode(["foo" => "bar"], "1234567890123456");
-
-        // Basic test
-        $payload = $this->cookieIdentity->getJWTPayload("blah");
-        $this->assertSame(["foo" => "bar"], $payload);
-
-        // Test if salt changes
-        $this->cookieIdentity->init(["Salt" => "12345678901234567890123456789012"]);
-        $payload = $this->cookieIdentity->getJWTPayload("blah");
-        $this->assertSame(null, $payload);
-
-        // Test with OldSalt fallback
-        $this->runWithConfig(["Garden.Cookie.OldSalt" => "1234567890123456"], function () {
-            $payload = $this->cookieIdentity->getJWTPayload("blah");
-            $this->assertSame(["foo" => "bar"], $payload);
-        });
     }
 }

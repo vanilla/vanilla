@@ -7,10 +7,10 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { JsonSchema, ISchemaRenderProps, IValidationResult } from "./types";
 import { PartialSchemaForm, RenderChildren } from "./PartialSchemaForm";
+import Ajv from "ajv";
 import produce from "immer";
 import { VanillaUIFormControl } from "./vanillaUIControl/VanillaUIFormControl";
 import { VanillaUIFormControlGroup } from "./vanillaUIControl/VanillaUIFormControlGroup";
-import { useFormValidation, ValidationProvider } from "./ValidationContext";
 
 interface IProps extends ISchemaRenderProps {
     schema: JsonSchema | string;
@@ -29,7 +29,7 @@ interface IProps extends ISchemaRenderProps {
 }
 
 export interface IJsonSchemaFormHandle {
-    validate(): IValidationResult | undefined;
+    validate(): IValidationResult;
 }
 
 /**
@@ -38,28 +38,7 @@ export interface IJsonSchemaFormHandle {
  * Note: Render props are memoized to prevent unnecessary re-rendering.
  * Please make sure you don't use any external dependencies that aren't passed as props to the component.
  */
-export const JsonSchemaForm = forwardRef(function JsonSchemaFormWithContextImpl(
-    props: IProps,
-    ref: React.Ref<IJsonSchemaFormHandle>,
-) {
-    const ownRef = useRef<IJsonSchemaFormHandle>(null);
-
-    useImperativeHandle(
-        ref,
-        () => ({
-            validate: () => ownRef.current?.validate(),
-        }),
-        [ownRef],
-    );
-
-    return (
-        <ValidationProvider>
-            <JsonSchemaFormInstance {...props} ref={ownRef} />
-        </ValidationProvider>
-    );
-});
-
-const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
+export const JsonSchemaForm = forwardRef(function JsonSchemaFormImpl(
     props: IProps,
     ref: React.Ref<IJsonSchemaFormHandle>,
 ) {
@@ -80,8 +59,6 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
         size = "default",
         autocompleteClassName,
     } = props;
-
-    const formValidation = useFormValidation();
 
     const [validation, setValidation] = useState<IValidationResult>();
 
@@ -115,12 +92,34 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
         instanceRef.current = instance;
     }, [instance]);
 
+    const ajv = useMemo(() => {
+        const ajv = new Ajv({
+            allErrors: true,
+            // Will remove additional properties if a schema has { additionalProperties: false }.
+            removeAdditional: true,
+            // Will set defaults automatically.
+            useDefaults: true,
+            // Will make sure types match the schema.
+            coerceTypes: true,
+            // Lets us use discriminators to validate oneOf schemas properly (and remove additional properties)
+            discriminator: true,
+            // AJV is out of date and it doesn't understand the new JSON schema specs.
+            strict: false,
+        });
+        // Add x-control as a suppported keyword of the schema.
+        ajv.addKeyword("x-control");
+        // Add x-form as a suppported keyword of the schema.
+        ajv.addKeyword("x-form");
+        ajv.addFormat(
+            "url",
+            /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/,
+        );
+        return ajv;
+    }, []);
+
     const validate = useCallback(() => {
-        let result: IValidationResult = {
-            isValid: true,
-        };
         const performValidation = (instance: any) => {
-            result = formValidation.validate(schemaRef.current, instance);
+            ajv.validate(schemaRef.current, instance);
         };
         // Validating might mutate the instance.
         const produced = produce(instanceRef.current, (draft) => {
@@ -130,10 +129,14 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
         if (produced !== instanceRef.current) {
             onChange(produced);
         }
-
+        // Create a validation result.
+        const result: IValidationResult = {
+            isValid: !ajv.errors || !ajv.errors.length,
+            errors: ajv.errors || [],
+        };
         setValidation(result);
         return result;
-    }, [formValidation]);
+    }, [ajv]);
 
     useEffect(() => {
         if (!!validation && typeof validation?.isValid !== undefined) {

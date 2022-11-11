@@ -3299,43 +3299,6 @@ class UserModel extends Gdn_Model implements
     }
 
     /**
-     * Updates given schema to include common expand properties for output
-     *
-     * @param Schema $schema
-     * @param array|bool|string $expand
-     * @return Schema
-     */
-    public function applyExpandSchema(Schema $schema, $expand): Schema
-    {
-        if (ModelUtils::isExpandOption(ModelUtils::EXPAND_ALL, $expand)) {
-            $properties = [
-                "countVisits:i?",
-                "inviteUserID:i?",
-                "inviteUser?" => SchemaFactory::get(UserFragmentSchema::class, "UserFragment"),
-            ];
-            if (($this->session->User->Admin ?? 0) > 0) {
-                $properties[] = "lastIPAddress:s|n";
-            }
-            return $schema->merge(Schema::parse($properties));
-        }
-        return $schema;
-    }
-
-    /**
-     * Joins common expand data with a user record set
-     *
-     * @param array $rows
-     * @param array|bool $expand
-     * @return void
-     */
-    public function joinExpandData(array &$rows, $expand)
-    {
-        if (ModelUtils::isExpandOption(ModelUtils::EXPAND_ALL, $expand)) {
-            ModelUtils::leftJoin($rows, ["InviteUserID"], [$this, "getUserFragments"]);
-        }
-    }
-
-    /**
      * Get a schema instance comprised of standard user fields.
      *
      * @return Schema

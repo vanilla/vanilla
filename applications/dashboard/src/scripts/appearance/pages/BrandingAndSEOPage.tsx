@@ -38,7 +38,6 @@ const BRANDING_SETTINGS: JsonSchema = {
                 ),
                 inputType: "textBox",
             },
-            errorMessage: t("Homepage titles can only be between 1 and 500 characters"),
         },
         "garden.description": {
             type: "string",

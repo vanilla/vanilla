@@ -247,6 +247,11 @@
 
         // A vanilla JS event wrapper for the contentLoad event so that the new framework can handle it.
         $(document).on("contentLoad", function(e) {
+            // Don't fire on initial document ready.
+            if (e.target === document) {
+                return;
+            }
+
             var event = document.createEvent('CustomEvent');
             event.initCustomEvent('X-DOMContentReady', true, false, {});
             e.target.dispatchEvent(event);

@@ -73,9 +73,9 @@ class NewPostWidgetTest extends SiteTestCase
                     ],
                 ],
                 "postableDiscussionTypes" => [
-                    0 => "discussion",
-                    1 => "question",
-                    2 => "poll",
+                    0 => "new-discussion",
+                    1 => "ask-a-question",
+                    2 => "new-poll",
                 ],
             ],
         ];

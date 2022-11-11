@@ -4,7 +4,6 @@
  */
 
 import {
-    deleteProfileField,
     fetchProfileField,
     fetchProfileFields,
     fetchUserProfileFields,
@@ -17,22 +16,16 @@ import { configureStore, createSlice, SerializedError } from "@reduxjs/toolkit";
 import { RecordID, stableObjectHash } from "@vanilla/utils";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 
-export interface IUserProfilesStoreState {
-    userProfiles: IUserProfilesState;
-}
-
 interface IUserProfilesState {
     profileFieldApiNamesByParamHash: Record<string, ILoadable<Array<ProfileField["apiName"]>, any>>;
     profileFieldsByApiName: Record<ProfileField["apiName"], ProfileField>;
     profileFieldsByUserID: Record<RecordID, ILoadable<UserProfileFields, SerializedError>>;
-    deleteStatusByApiName: Record<string, ILoadable<{}, SerializedError>>;
 }
 
 const INITIAL_USER_PROFILES_STATE: IUserProfilesState = {
     profileFieldApiNamesByParamHash: {},
     profileFieldsByApiName: {},
     profileFieldsByUserID: {},
-    deleteStatusByApiName: {},
 };
 
 export const userProfilesSlice = createSlice({
@@ -95,33 +88,6 @@ export const userProfilesSlice = createSlice({
             .addCase(fetchUserProfileFields.rejected, (state, action) => {
                 const userID = action.meta.arg.userID;
                 state.profileFieldsByUserID[userID] = {
-                    status: LoadStatus.ERROR,
-                    error: action.error,
-                };
-            })
-            .addCase(deleteProfileField.pending, (state, action) => {
-                const apiName = action.meta.arg;
-                state.deleteStatusByApiName[apiName] = {
-                    status: LoadStatus.LOADING,
-                };
-            })
-            .addCase(deleteProfileField.fulfilled, (state, action) => {
-                const apiName = action.meta.arg;
-                state.deleteStatusByApiName[apiName] = {
-                    status: LoadStatus.SUCCESS,
-                    data: action.payload,
-                };
-                delete state.profileFieldsByApiName[apiName];
-
-                Object.keys(state.profileFieldApiNamesByParamHash).forEach((key) => {
-                    state.profileFieldApiNamesByParamHash[key].data = state.profileFieldApiNamesByParamHash[
-                        key
-                    ].data?.filter((name) => name !== apiName);
-                });
-            })
-            .addCase(deleteProfileField.rejected, (state, action) => {
-                const apiName = action.meta.arg;
-                state.deleteStatusByApiName[apiName] = {
                     status: LoadStatus.ERROR,
                     error: action.error,
                 };

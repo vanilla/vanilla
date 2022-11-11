@@ -17,7 +17,6 @@ import { useToast } from "@library/features/toaster/ToastContext";
 import { ProfileFieldsList } from "@dashboard/userProfiles/components/ProfileFieldsList";
 import { ErrorBoundary } from "@library/errorPages/ErrorBoundary";
 import { useConfigsByKeys } from "@library/config/configHooks";
-import ProfileFieldDelete from "@dashboard/userProfiles/components/ProfileFieldDelete";
 
 const CONFIG_KEY = "labs.customProfileFields";
 
@@ -46,9 +45,6 @@ export function UserProfileSettings() {
         return settings?.data?.[CONFIG_KEY] ?? false;
     }, [settings]);
 
-    // Selected field to delete
-    const [confirmDelete, setConfirmDelete] = useState<ProfileField | null>(null);
-
     return (
         <MemoryRouter>
             <DashboardHeaderBlock title={t("User Profile")} />
@@ -56,10 +52,7 @@ export function UserProfileSettings() {
                 <ProfileRedirectForm />
                 <ErrorBoundary>
                     {customFieldsEnabled && (
-                        <ProfileFieldsList
-                            onEdit={(fieldToEdit) => setProfileFieldConfiguration(fieldToEdit)}
-                            onDelete={setConfirmDelete}
-                        />
+                        <ProfileFieldsList onEdit={(fieldToEdit) => setProfileFieldConfiguration(fieldToEdit)} />
                     )}
                 </ErrorBoundary>
             </section>
@@ -84,7 +77,6 @@ export function UserProfileSettings() {
                             }}
                         />
                     </ErrorBoundary>
-                    <ProfileFieldDelete field={confirmDelete} close={() => setConfirmDelete(null)} />
                 </section>
             )}
             <DashboardHelpAsset>

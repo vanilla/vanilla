@@ -8,6 +8,7 @@ namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
+use UserMetaModel;
 use UserModel;
 use UsersApiController;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
@@ -1001,20 +1002,20 @@ class UsersTest extends AbstractResourceTest
     public function providePatchAndGetUserProfileFieldsData(): array
     {
         return [
-            ["text", "text", [], "abc", "abc"],
-            ["text", "text", [], 123, "123"],
-            ["text", "text", [], true, null, true],
-            ["boolean", "checkbox", [], true, true],
-            ["boolean", "checkbox", [], "abc", null, true],
-            ["date", "date", [], "abc", null, true],
-            ["date", "date", [], "2022-09-01T05:54:26.990Z", "2022-09-01T05:54:26+00:00"],
-            ["number", "number", [], 42, 42],
-            ["number", "number", [], "42", 42],
-            ["number", "number", [], "abc", null, true],
-            ["string[]", "tokens", ["abc", "123"], "abc", null, true],
-            ["string[]", "tokens", ["one", "2", "3"], ["one", 2, 3], ["one", "2", "3"]],
-            ["number[]", "tokens", [1, 2, 3], "abc", null, true],
-            ["number[]", "tokens", [7, 8, 9], ["7", 8, 9], [7, 8, 9]],
+            ["text", "text", "abc", "abc"],
+            ["text", "text", 123, "123"],
+            ["text", "text", true, null, true],
+            ["boolean", "checkbox", true, true],
+            ["boolean", "checkbox", "abc", null, true],
+            ["date", "date", "abc", null, true],
+            ["date", "date", "2022-09-01T05:54:26.990Z", "2022-09-01T05:54:26+00:00"],
+            ["number", "number", 42, 42],
+            ["number", "number", "42", 42],
+            ["number", "number", "abc", null, true],
+            ["string[]", "tokens", "abc", null, true],
+            ["string[]", "tokens", ["one", 2, 3], ["one", "2", "3"]],
+            ["number[]", "tokens", "abc", null, true],
+            ["number[]", "tokens", ["7", 8, 9], [7, 8, 9]],
         ];
     }
 
@@ -1030,17 +1031,12 @@ class UsersTest extends AbstractResourceTest
     public function testPatchAndGetUserProfileFields(
         string $dataType,
         string $formType,
-        ?array $dropdownOptions,
         $patchValue,
         $expectedResponseValue,
         bool $expectsException = false
     ) {
         $user = $this->createUser();
-        $profileField = $this->createProfileField([
-            "dataType" => $dataType,
-            "formType" => $formType,
-            "dropdownOptions" => $dropdownOptions,
-        ]);
+        $profileField = $this->createProfileField(["dataType" => $dataType, "formType" => $formType]);
         $apiName = $profileField["apiName"];
 
         try {
@@ -1279,39 +1275,5 @@ class UsersTest extends AbstractResourceTest
         \Gdn::userModel()->deleteID($user3["userID"]);
 
         self::disableFeature("ImprovedUserProfileFields");
-    }
-
-    /**
-     * Tests that the `/users` endpoint returns the correct expand fields when expand=all
-     *
-     * @return void
-     */
-    public function testIndexWithExpands()
-    {
-        $testCaseProvider = function (array $hasKeys = [], array $notHasKeys = []) {
-            return function () use ($hasKeys, $notHasKeys) {
-                $response = $this->api()
-                    ->get("/users", ["expand" => "all", "sort" => "-userID"])
-                    ->getBody();
-
-                $firstResult = array_shift($response);
-                foreach ($hasKeys as $key) {
-                    $this->assertArrayHasKey($key, $firstResult);
-                }
-                foreach ($notHasKeys as $key) {
-                    $this->assertArrayNotHasKey($key, $firstResult);
-                }
-            };
-        };
-
-        $inviter = $this->createUser();
-        $invitee = $this->createUser([], ["InviteUserID" => $inviter["userID"]]);
-        $this->runWithUser(
-            $testCaseProvider(["countVisits", "inviteUserID", "inviteUser"], ["lastIPAddress"]),
-            $this->memberID
-        );
-        $this->runWithAdminUser($testCaseProvider(["countVisits", "lastIPAddress", "inviteUserID", "inviteUser"]));
-        \Gdn::userModel()->deleteID($inviter["userID"]);
-        \Gdn::userModel()->deleteID($invitee["userID"]);
     }
 }

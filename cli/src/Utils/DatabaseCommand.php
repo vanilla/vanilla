@@ -57,7 +57,7 @@ abstract class DatabaseCommand
 
         if (isset($this->user, $this->host, $this->dbname)) {
             $dbInfo = [
-                "Host" => $this->host ?? "database",
+                "Host" => ($this->host = "database"),
                 "Dbname" => $this->dbname,
                 "User" => $this->user ?? "root",
                 "Password" => $this->password ?? "",

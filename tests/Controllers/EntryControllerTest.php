@@ -9,7 +9,6 @@ namespace VanillaTests\Controllers;
 
 use BanModel;
 use League\Uri\Http;
-use Vanilla\Dashboard\Models\ProfileFieldModel;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestTrait;
 use VanillaTests\VanillaTestCase;
@@ -54,33 +53,31 @@ class EntryControllerTest extends VanillaTestCase
             ["Garden.Registration.Method" => "Basic", "Feature.CustomProfileFields.Enabled" => true],
             function () {
                 //first create some profile fields with different formType/dataType
-                $this->createProfileField(["apiName" => "field-test-textInput"]);
+                $this->createProfileField(["apiName" => "profile-field-test-textInput"]);
                 $this->createProfileField([
-                    "apiName" => "field-test-dropdown",
-                    "label" => "field test dropdown",
+                    "apiName" => "profile-field-test-dropdown",
+                    "label" => "profile field test dropdown",
                     "formType" => "dropdown",
                     "dataType" => "number",
                     "dropdownOptions" => [
                         "0" => 0,
                         "1" => 1,
                     ],
-                    "enabled" => true,
                 ]);
                 $this->createProfileField([
-                    "apiName" => "field-test-checkbox",
-                    "label" => "field test checkbox",
+                    "apiName" => "profile-field-test-checkbox",
+                    "label" => "profile field test checkbox",
                     "dataType" => "boolean",
                     "formType" => "checkbox",
-                    "enabled" => true,
                 ]);
 
-                $expected = '<li class="form-group"><label for="Form_Profilefield-test-textInput">profile field test</label>
-<input type="text" id="Form_Profilefield-test-textInput" name="Profile[field-test-textInput]" value="" class="InputBox" /></li><li class="form-group"><label for="Form_Profilefield-test-dropdown">field test dropdown</label>
-<select id="Form_Profilefield-test-dropdown" name="Profile[field-test-dropdown]" class="" data-value="">
+                $expected = '<li class="form-group"><label for="Form_profile-field-test-textInput">Profile Field Test</label>
+<input type="text" id="Form_profile-field-test-textInput" name="profile-field-test-textInput" value="" class="InputBox" /></li><li class="form-group"><label for="Form_profile-field-test-dropdown">Profile Field Test Dropdown</label>
+<select id="Form_profile-field-test-dropdown" name="profile-field-test-dropdown" class="" data-value="">
 <option value=""></option>
 <option value="0">0</option>
 <option value="1">1</option>
-</select></li><li><label for="Form_Profilefield-test-checkbox" class="CheckBoxLabel"><input type="hidden" name="Checkboxes[]" value="Profile[field-test-checkbox]" /><input type="checkbox" id="Form_Profilefield-test-checkbox" name="Profile[field-test-checkbox]" value="1" class="" /> field test checkbox</label></li>';
+</select></li><li><label for="Form_profile-field-test-checkbox" class="CheckBoxLabel"><input type="hidden" name="Checkboxes[]" value="profile-field-test-checkbox" /><input type="checkbox" id="Form_profile-field-test-checkbox" name="profile-field-test-checkbox" value="1" class="" /> Profile Field Test Checkbox</label></li>';
 
                 $this->expectOutputString($expected);
                 $this->controller->generateFormCustomProfileFields();
@@ -98,128 +95,42 @@ class EntryControllerTest extends VanillaTestCase
             function () {
                 //first create some profile fields
                 $result = $this->createProfileField([
-                    "apiName" => "field-test-textBox",
-                    "label" => "field test textBox",
+                    "apiName" => "profile-field-test-textBox",
+                    "label" => "profile field test textBox",
                     "registrationOptions" => "required",
-                ]);
-
-                $this->assertEquals(201, $result->getStatusCode());
-
-                //first create some profile fields
-                $result = $this->createProfileField([
-                    "apiName" => "field-test-tokens",
-                    "label" => "field test tokens",
-                    "formType" => "tokens",
-                    "dataType" => "string[]",
-                    "dropdownOptions" => [
-                        "0" => "apple",
-                        "1" => "orange",
-                    ],
-                    "registrationOptions" => "optional",
                 ]);
 
                 $this->assertEquals(201, $result->getStatusCode());
 
                 //We check if our custom field exists on the registration page.
                 $registerPage = $this->bessy()->getHtml("/entry/register");
-                $registerPage->assertCssSelectorExists("#Form_Profilefield-test-textBox");
+                $registerPage->assertCssSelectorExists("#Form_profile-field-test-textBox");
 
                 $formFields = [
                     "Email" => "new@user.com",
                     "Name" => "NewUserName",
-                    "Profile" => [
-                        "field-test-textBox" => "testValue",
-                        "field-test-tokens" =>
-                            '[{"value":"apple","label":"apple"}, {"value":"orange","label":"orange"}]',
-                    ],
+                    "profile-field-test-textBox" => "test",
                     "Password" => "jXM>e!gL4#38cP3Z",
                     "PasswordMatch" => "jXM>e!gL4#38cP3Z",
                     "TermsOfService" => "1",
                     "Save" => "Save",
                 ];
 
-                //test if tokens array from values will be generated correctly from json
-                $tokenValuesArr = $this->controller->tokenValuesData($formFields["Profile"]["field-test-tokens"]);
-                $this->assertIsArray($tokenValuesArr);
-                $this->assertEquals("apple", $tokenValuesArr[0]);
-
                 $registrationResults = $this->bessy()->post("/entry/register", $formFields);
 
                 //success
                 $this->assertIsObject($registrationResults);
-                $this->assertNotEmpty($registrationResults->Form->_FormValues["Profile"]["field-test-textBox"]);
-                $this->assertNotEmpty($registrationResults->Form->_FormValues["Profile"]["field-test-tokens"]);
+                $this->assertNotEmpty($registrationResults->Form->_FormValues["profile-field-test-textBox"]);
                 $this->assertNotEmpty($registrationResults->Data["UserID"]);
 
-                //profile fields should be successfully saved in userMeta
-                $userMetaData = \Gdn::userMetaModel()->getUserMeta($registrationResults->Data["UserID"]);
-                $this->assertEquals("testValue", $userMetaData["Profile.field-test-textBox"]);
-                $this->assertIsArray($userMetaData["Profile.field-test-tokens"]);
-                $this->assertEquals("apple", $userMetaData["Profile.field-test-tokens"][0]);
-                $this->assertEquals("orange", $userMetaData["Profile.field-test-tokens"][1]);
-
                 // Trying to register providing an empty required field, this will fail.
-                $formFields["Profile"]["field-test-textBox"] = "";
-                $this->expectExceptionMessage("field test textBox is required");
+                $formFields["profile-field-test-textBox"] = "";
+                $this->expectExceptionMessage("profile field test textBox is required");
                 $validationFailResults = $this->bessy()->post("/entry/register", $formFields);
             }
         );
     }
 
-    /**
-     * Test a basic registration flow with custom profile fields having column name of user Table will get saved to userMeta without errors.
-     */
-    public function testRegisterBasicWithCustomProfileFieldsHavingUserFieldColumnNames(): void
-    {
-        \Gdn::sql()->truncate("profileField");
-        $session = \Gdn::session();
-        $session->start(self::$siteInfo["adminUserID"]);
-        $this->runWithConfig(
-            ["Garden.Registration.Method" => "Basic", "Feature.CustomProfileFields.Enabled" => true],
-            function () {
-                //first create some profile fields having User table column names
-                $profileFieldTitle = $this->createProfileField([
-                    "apiName" => "Title",
-                    "label" => "Title",
-                    "registrationOptions" => "required",
-                ]);
-                $this->assertEquals(201, $profileFieldTitle->getStatusCode());
-                $profileFieldDateOfBirth = $this->createProfileField([
-                    "apiName" => "DateOfBirth",
-                    "label" => "Date Of Birth",
-                    "registrationOptions" => "optional",
-                ]);
-                $this->assertEquals(201, $profileFieldDateOfBirth->getStatusCode());
-
-                // Do a registration
-                $formFields = [
-                    "Email" => "testuser@test.com",
-                    "Name" => "TestUser",
-                    "Profile" => ["DateOfBirth" => "Hello", "Title" => "Tester"],
-                    "Password" => "2f3Rg1l@I#Hs",
-                    "PasswordMatch" => "2f3Rg1l@I#Hs",
-                    "TermsOfService" => "1",
-                    "Save" => "Save",
-                ];
-
-                $registrationResults = $this->bessy()->post("/entry/register", $formFields);
-
-                //make sure the registration is success and user is generated
-                $this->assertIsObject($registrationResults);
-                $this->assertNotEmpty($registrationResults->Form->_FormValues["Profile"]["Title"]);
-                $this->assertNotEmpty($registrationResults->Form->_FormValues["Profile"]["DateOfBirth"]);
-                $this->assertNotEmpty($registrationResults->Data["UserID"]);
-
-                // Make sure the profile field data gets stored properly in UserMeta table
-                $profileFieldModel = \Gdn::getContainer()->get(ProfileFieldModel::class);
-                $updatedUserMeta = $profileFieldModel->getUserProfileFields($registrationResults->Data["UserID"]);
-
-                $this->assertIsArray($updatedUserMeta);
-                $this->assertEquals($formFields["Profile"]["DateOfBirth"], $updatedUserMeta["DateOfBirth"]);
-                $this->assertEquals($formFields["Profile"]["Title"], $updatedUserMeta["Title"]);
-            }
-        );
-    }
     /**
      * Create profile fields.
      *

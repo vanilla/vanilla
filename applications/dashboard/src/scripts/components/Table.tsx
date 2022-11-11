@@ -1,6 +1,6 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2021 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -21,8 +21,6 @@ import { cx } from "@emotion/css";
 import { Scrollbars } from "react-custom-scrollbars";
 import TruncatedText from "@library/content/TruncatedText";
 import { getJSLocaleKey } from "@vanilla/i18n";
-import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import ConditionalWrap from "@library/layout/ConditionalWrap";
 
 export interface ITableHeaderProps {
     headerGroups: HeaderGroup[];
@@ -30,11 +28,10 @@ export interface ITableHeaderProps {
     rows: Row[];
     headerClassNames?: string;
     rowClassNames?: string;
-    hiddenHeaders?: string[];
 }
 
 const TableHeader = (props: ITableHeaderProps) => {
-    const { headerGroups, sortable, rows, headerClassNames, rowClassNames, hiddenHeaders } = props;
+    const { headerGroups, sortable, rows, headerClassNames, rowClassNames } = props;
     const classes = tableClasses();
     const valueTypeLookUp = useMemo<Record<string, string>>(
         () => Object.fromEntries(Object.keys(rows[0].original).map((key) => [key, typeof rows[0].original[key]])),
@@ -61,12 +58,7 @@ const TableHeader = (props: ITableHeaderProps) => {
                                     valueTypeLookUp[`${column.Header}`] === "string" && classes.leftAlignHead,
                                 )}
                             >
-                                <ConditionalWrap
-                                    condition={hiddenHeaders?.includes(column.id) ?? false}
-                                    component={ScreenReaderContent}
-                                >
-                                    {column.render("Header")}
-                                </ConditionalWrap>
+                                {column.render("Header")}
                                 <span>{column.isSorted ? (column.isSortedDesc ? " ▼" : " ▲") : ""}</span>
                             </th>
                         );
@@ -147,7 +139,6 @@ export interface ITableProps {
     pageSize?: number;
     customCellRenderer?: ICustomCellRender[];
     hiddenColumns?: string[];
-    hiddenHeaders?: string[];
     rowHeight?(size: number): void;
     tableClassNames?: string;
     headerClassNames?: string;
@@ -165,7 +156,6 @@ export const Table = (props: ITableProps) => {
         pageSize,
         customCellRenderer,
         hiddenColumns,
-        hiddenHeaders,
         rowHeight,
         tableClassNames,
         headerClassNames,
@@ -320,7 +310,6 @@ export const Table = (props: ITableProps) => {
                             rows={paginate ? page : rows}
                             headerClassNames={headerClassNames}
                             rowClassNames={rowClassNames}
-                            hiddenHeaders={hiddenHeaders}
                         />
                         <tbody {...getTableBodyProps}>
                             <TableRows

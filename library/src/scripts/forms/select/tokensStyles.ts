@@ -14,7 +14,6 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, px } from "csx";
 import { metasVariables } from "@library/metas/Metas.variables";
-import { css } from "@emotion/css";
 
 export const tokensVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -165,12 +164,5 @@ export const tokensClasses = useThemeCache(() => {
         },
     });
 
-    const containerLegacyForm = css({
-        "& label > span": {
-            fontWeight: 700,
-            marginBottom: 0,
-        },
-    });
-
-    return { root, removeIcon, inputWrap, withIndicator, containerLegacyForm };
+    return { root, removeIcon, inputWrap, withIndicator };
 });

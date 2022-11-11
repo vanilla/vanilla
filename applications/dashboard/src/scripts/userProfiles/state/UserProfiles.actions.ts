@@ -81,15 +81,3 @@ export const fetchUserProfileFields = createAsyncThunk<UserProfileFields, FetchU
         }
     },
 );
-
-export const deleteProfileField = createAsyncThunk<{}, ProfileField["apiName"]>(
-    "@@userProfiles/deleteProfileField",
-    async (apiName, { rejectWithValue }) => {
-        try {
-            const response = await apiv2.delete(`${API_ENDPOINT}/${apiName}`);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error);
-        }
-    },
-);

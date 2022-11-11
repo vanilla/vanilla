@@ -976,16 +976,16 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     $user = null;
                 }
             } elseif ($this->Form->errorCount() == 0) {
-                //if we have custom profile fields we'll apply validation rules on them
-                if ($this->hasCustomProfileFields()) {
-                    $this->applyValidationOnCustomProfileFields();
-                }
-
                 // The user doesn't exist so we need to add another user.
                 $user = $this->Form->formValues();
                 $user["Name"] = $user["ConnectName"] ?? ($user["Name"] ?? "");
                 $user["Password"] = randomString(16); // Required field.
                 $user["HashMethod"] = "Random";
+
+                //if we have custom profile fields we'll apply validation rules on them
+                if ($this->hasCustomProfileFields()) {
+                    $this->applyValidationOnCustomProfileFields();
+                }
 
                 $userID = $userModel->register($user, [
                     "CheckCaptcha" => false,
@@ -1033,8 +1033,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     Gdn::userModel()->fireEvent("AfterSignIn");
 
                     //if we have custom profile fields, we need to update user meta with those
-                    if ($this->hasCustomProfileFields() && !empty($this->Form->formValues()["Profile"])) {
-                        $this->updateUserCustomProfileFields($userID, $this->Form->formValues()["Profile"]);
+                    if ($this->hasCustomProfileFields()) {
+                        $this->updateUserCustomProfileFields($userID, $this->Form->formValues());
                     }
 
                     // Move along.
@@ -1560,8 +1560,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     $this->fireEvent("RegistrationPending");
 
                     //if we have custom profile fields, we need to update user meta with those
-                    if ($this->hasCustomProfileFields() && !empty($values["Profile"])) {
-                        $this->updateUserCustomProfileFields($authUserID, $values["Profile"]);
+                    if ($this->hasCustomProfileFields()) {
+                        $this->updateUserCustomProfileFields($authUserID, $values);
                     }
 
                     $this->View = "RegisterThanks"; // Tell the user their application will be reviewed by an administrator.
@@ -1646,8 +1646,8 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     $this->fireEvent("RegistrationSuccessful");
 
                     //if we have custom profile fields, we need to update user meta with those
-                    if ($this->hasCustomProfileFields() && !empty($values["Profile"])) {
-                        $this->updateUserCustomProfileFields($authUserID, $values["Profile"]);
+                    if ($this->hasCustomProfileFields()) {
+                        $this->updateUserCustomProfileFields($authUserID, $values);
                     }
 
                     // ... and redirect them appropriately
@@ -2200,62 +2200,64 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
     public function generateFormCustomProfileFields($wrapperOptions = null)
     {
         $profileFields = $this->profileFieldModel->getProfileFields() ?? [];
-        //only required/optional fields should be shown
-        $profileFields = array_filter($profileFields, function ($field) {
-            return ($field["registrationOptions"] === "required" || $field["registrationOptions"] === "optional") &&
-                ($field["enabled"] || false);
-        });
-
         $result = "";
 
         foreach ($profileFields as $key => $field) {
-            //adjust values for our form, default is TextBox
-            $formType = "TextBox";
-            switch ($field["formType"]) {
-                case "checkbox":
-                    $formType = "CheckBox";
-                    break;
-                case "dropdown":
-                    $formType = "Dropdown";
-                    break;
-                case "tokens":
-                    $formType = "tokensInputReact";
-                    break;
-            }
+            $fieldIsRequiredOrOptional =
+                $field["registrationOptions"] === "required" || $field["registrationOptions"] === "optional";
+            $isTokenInput = $field["formType"] === "tokens";
 
-            $name = "Profile[" . $field["apiName"] . "]";
-            $options = [];
-            $attributes = [];
+            //for now, no token inputs until we address this
+            //https://higherlogic.atlassian.net/browse/VNLA-2759
+            if ($fieldIsRequiredOrOptional && !$isTokenInput) {
+                //adjust values for our form, default is TextBox
+                $formType = "TextBox";
+                switch ($field["formType"]) {
+                    case "checkbox":
+                        $formType = "CheckBox";
+                        break;
+                    case "dropdown":
+                        $formType = "Dropdown";
+                        break;
+                }
 
-            if ($field["formType"] === "text-multiline") {
-                $options["MultiLine"] = true;
-            }
+                $name = $field["apiName"];
+                $options = [];
+                $attributes = [];
 
-            if ($formType == "Dropdown" || $formType == "tokensInputReact") {
-                $values = $field["dropdownOptions"];
+                if ($field["formType"] === "text-multiline") {
+                    $options["MultiLine"] = true;
+                }
 
-                // create key/value associative array so we send the right values from form, values and labels are the same.
-                $options = array_combine($values, $values);
+                if ($formType == "Dropdown") {
+                    $values = $field["dropdownOptions"];
 
-                $attributes = ["includeNull" => true];
-            }
+                    //this part should be adjusted so we take labels instead whenever we support them in dropdownOptions
+                    //for now, just capitalizing for string values
+                    $labels = $values;
+                    if ($values[0] === "string") {
+                        $labels = array_map(function ($option) {
+                            return \Vanilla\Utility\StringUtils::labelize($option);
+                        }, $values);
+                    }
 
-            if ($formType == "CheckBox") {
-                $result .= wrap($this->Form->{$formType}($name, $field["label"]), "li");
-            } elseif ($formType == "tokensInputReact") {
-                $result .= wrap(
-                    $this->Form->{$formType}($name, $options, $field["label"], $field["description"]),
-                    "li",
-                    [
-                        "class" => "form-group",
-                    ]
-                );
-            } else {
-                $result .= wrap(
-                    $this->Form->label($field["label"], $name) . $this->Form->{$formType}($name, $options, $attributes),
-                    "li",
-                    ["class" => "form-group"]
-                );
+                    // combine the arrays to create a drop-down with different values and labels.
+                    $options = array_combine($values, $labels);
+
+                    $attributes = ["includeNull" => true];
+                }
+
+                $fieldLabel = \Vanilla\Utility\StringUtils::labelize($field["label"]);
+
+                if ($formType == "CheckBox") {
+                    $result .= wrap($this->Form->{$formType}($name, $fieldLabel), "li");
+                } else {
+                    $result .= wrap(
+                        $this->Form->label($fieldLabel, $name) . $this->Form->{$formType}($name, $options, $attributes),
+                        "li",
+                        ["class" => "form-group"]
+                    );
+                }
             }
         }
 
@@ -2271,37 +2273,25 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
      */
     public function applyValidationOnCustomProfileFields()
     {
-        $profileFields = $this->profileFieldModel->getProfileFields() ?? [];
+        $profileFields = $this->profileFieldModel->getProfileFields();
         $userProfileFieldsSchema = $this->profileFieldModel->getUserProfileFieldSchema();
-        $profileFormFields = $this->Form->formValues()["Profile"] ?? [];
 
         try {
-            $requiredFieldCustomError = [];
             //if there is dataType/formType validation error from schema, this will fail, so we should not complete the registration
+            $userProfileFieldsSchema->validate($this->Form->formValues());
+
             foreach ($profileFields as $key => $field) {
-                //we need to decode token input values and reformat a bit so it is just array of strings instead of tokens value/label format
-                if ($field["formType"] === "tokens" && isset($profileFormFields[$field["apiName"]])) {
-                    $profileFormFields[$field["apiName"]] = $this->tokenValuesData(
-                        $profileFormFields[$field["apiName"]]
+                if ($field["registrationOptions"] === "required" && $field["formType"] !== "tokens") {
+                    $this->UserModel->Validation->applyRule(
+                        $field["apiName"],
+                        "Required",
+                        $field["label"] . t(" is required.")
                     );
                 }
-                //required rule
-                if ($field["registrationOptions"] === "required") {
-                    $requiredFieldCustomError[$field["apiName"]] = $field["label"] . t(" is required.");
-                    $userProfileFieldsSchema->addValidator($field["apiName"], "validateRequired");
-                }
             }
-            if (count($requiredFieldCustomError)) {
-                $userProfileFieldsSchema->setField("required", array_keys($requiredFieldCustomError));
-            }
-            $userProfileFieldsSchema->validate($profileFormFields);
         } catch (\Garden\Schema\ValidationException $ex) {
             $validation = $ex->getValidation();
             foreach ($validation->getErrors() as $error) {
-                //provide custom message only for empty fields
-                if (empty($profileFormFields[$error["field"]]) && !empty($requiredFieldCustomError[$error["field"]])) {
-                    $error["message"] = $requiredFieldCustomError[$error["field"]];
-                }
                 $this->UserModel->Validation->addValidationResult($error["field"], $error["message"]);
             }
         } catch (Exception $ex) {
@@ -2317,27 +2307,13 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
      * Update user with new custom profile fields.
      *
      * @param int $userID The user ID to update.
-     * @param array $formProfileFields Profile fields values by name from form.
+     * @param array $fields Key/value pairs of fields to update.
      */
-    public function updateUserCustomProfileFields(int $userID, array $formProfileFields)
+    public function updateUserCustomProfileFields(int $userID, array $fields)
     {
-        $profileFields = $this->profileFieldModel->getProfileFields() ?? [];
-
-        //pre-filter only fields with values and re-format token fields so they have the right values schema expects
-        $validFields = [];
-        foreach ($profileFields as $profileField) {
-            $apiName = $profileField["apiName"];
-            if (isset($formProfileFields[$apiName]) && $formProfileFields[$apiName] !== "") {
-                $validFields[$apiName] =
-                    $profileField["formType"] === "tokens"
-                        ? $this->tokenValuesData($formProfileFields[$apiName])
-                        : $formProfileFields[$apiName];
-            }
-        }
-
         $usersApiController = Gdn::getContainer()->get(UsersApiController::class);
         try {
-            $usersApiController->patch_profileFields($userID, $validFields);
+            $usersApiController->patch_profileFields($userID, $fields);
         } catch (Exception $ex) {
             $this->Form->addError($ex->getMessage());
         }
@@ -2353,34 +2329,13 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
         $renderCustomProfileFields = false;
         $profileFields = $this->profileFieldModel->getProfileFields();
         foreach ($profileFields as $field) {
-            $shouldRender =
-                ($field["registrationOptions"] === "required" || $field["registrationOptions"] === "optional") &&
-                ($field["enabled"] || false);
-            if ($shouldRender) {
+            $fieldIsRequiredOrOptional =
+                $field["registrationOptions"] === "required" || $field["registrationOptions"] === "optional";
+            if ($fieldIsRequiredOrOptional) {
                 $renderCustomProfileFields = true;
                 break;
             }
         }
         return Gdn::config()->get("Feature.CustomProfileFields.Enabled", false) && $renderCustomProfileFields;
-    }
-
-    /**
-     * Generates token values string array from json.
-     *
-     * @param string $tokensJSON Token input field json value
-     * @return array Array from values from original json
-     */
-    public function tokenValuesData(string $tokensJSON): array
-    {
-        $tokensData = json_decode($tokensJSON, true);
-
-        //generate an array from value string
-        if ($tokensData && count($tokensData) > 0) {
-            return array_map(function (array $token) {
-                return $token["value"];
-            }, $tokensData);
-        }
-
-        return [];
     }
 }

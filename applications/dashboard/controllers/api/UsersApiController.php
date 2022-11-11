@@ -11,7 +11,6 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Garden\Web\RequestInterface;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Dashboard\Models\UserLeaderQuery;
@@ -29,7 +28,6 @@ use Vanilla\PermissionsTranslationTrait;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\DelimitedScheme;
 use Vanilla\Menu\CounterModel;
-use Vanilla\Utility\FileGeneratorUtils;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Menu\Counter;
 use Vanilla\Utility\ModelUtils;
@@ -256,9 +254,7 @@ class UsersApiController extends AbstractApiController
         $outSchema = $showFullSchema ? $this->userSchema() : $this->viewProfileSchema();
         $row = $this->userByID($id);
         $outSchema = CrawlableRecordSchema::applyExpandedSchema($outSchema, "user", $expand);
-        $outSchema = $this->userModel->applyExpandSchema($outSchema, $expand);
         $out = $this->schema($outSchema, "out");
-        $this->userModel->joinExpandData($row, $expand);
         $row = $this->normalizeOutput($row, $expand);
 
         $showEmail = $row["showEmail"] ?? false;
@@ -568,13 +564,10 @@ class UsersApiController extends AbstractApiController
      * List users.
      *
      * @param array $query The query string.
-     * @param RequestInterface|null $request
      * @return Data
      */
-    public function index(array $query, ?RequestInterface $request = null)
+    public function index(array $query)
     {
-        $extension = isset($request) ? FileGeneratorUtils::getExtension($request) : null;
-        $maxLimit = $extension === "csv" ? ApiUtils::getMaxLimit(5000) : ApiUtils::getMaxLimit();
         $showFullSchema = $this->checkPermission();
 
         $in = $this->schema(
@@ -615,7 +608,7 @@ class UsersApiController extends AbstractApiController
                     "description" => "Desired number of items per page.",
                     "default" => 30,
                     "minimum" => 1,
-                    "maximum" => $maxLimit,
+                    "maximum" => ApiUtils::getMaxLimit(),
                 ],
                 "sort:s?" => [
                     "enum" => ApiUtils::sortEnum("dateInserted", "dateLastActive", "name", "userID"),
@@ -632,7 +625,6 @@ class UsersApiController extends AbstractApiController
         $expand = $query["expand"] ?? [];
         $outSchema = $showFullSchema ? $this->userSchema() : $this->viewProfileSchema();
         $outSchema = CrawlableRecordSchema::applyExpandedSchema($outSchema, "user", $expand);
-        $outSchema = $this->userModel->applyExpandSchema($outSchema, $expand);
         $out = $this->schema([":a" => $outSchema], "out");
 
         $where = ApiUtils::queryToFilters($in, $query);
@@ -653,8 +645,6 @@ class UsersApiController extends AbstractApiController
         // But isn't really appropriate for iterating over lists of users where the same user will not likely be seen twice.
         // Fetch all roles at once.
         $this->userModel->joinRoles($rows);
-
-        $this->userModel->joinExpandData($rows, $expand);
 
         foreach ($rows as &$row) {
             $this->userModel->setCalculatedFields($row);
@@ -792,10 +782,10 @@ class UsersApiController extends AbstractApiController
      *
      * @param ?int $id A valid user ID.
      * @param array $body The request body.
-     * @param RequestInterface|null $request
+     * @param \Garden\Web\RequestInterface|null $request
      * @return array
      */
-    public function post_photo($id = null, array $body = [], RequestInterface $request = null)
+    public function post_photo($id = null, array $body = [], \Garden\Web\RequestInterface $request = null)
     {
         $this->permission("Garden.SignIn.Allow");
 

@@ -13,10 +13,10 @@ import { IFormControl, JsonSchema } from "@vanilla/json-schema-forms";
 import React, { useState } from "react";
 
 export default {
-    title: "Forms/Front End Form Fields",
+    title: "Forms/Tree",
 };
 
-export const Tree = storyWithConfig(
+export const AutoCompleteAndText = storyWithConfig(
     {
         useWrappers: false,
     },

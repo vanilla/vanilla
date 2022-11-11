@@ -71,20 +71,13 @@ class NewDiscussionModule extends Gdn_Module
      * Add a button to the collection.
      *
      * @param string $text
-     * @param string $type
      * @param string $url
      * @param string $icon Icon name to use
      * @param bool $asOwnButton Whether to display as a separate button or not.
      */
-    public function addButton(string $text, string $type, string $url, string $icon, bool $asOwnButton = false)
+    public function addButton($text, $url, $icon, $asOwnButton = false)
     {
-        $this->Buttons[] = [
-            "Text" => $text,
-            "Type" => $type,
-            "Url" => $url,
-            "Icon" => $icon,
-            "asOwnButton" => $asOwnButton,
-        ];
+        $this->Buttons[] = ["Text" => $text, "Url" => $url, "Icon" => $icon, "asOwnButton" => $asOwnButton];
     }
 
     /**
@@ -159,13 +152,7 @@ class NewDiscussionModule extends Gdn_Module
             // Check whether to display in dropdown or as a separate button.
             $asOwnButton = $buttonsConfig[$type["Singular"]]["AsOwnButton"] ?? false;
 
-            $this->addButton(
-                $this->locale->translate($type["AddText"] ?? ""),
-                $type["apiType"] ?? $type["Singular"],
-                $url,
-                $icon,
-                $asOwnButton
-            );
+            $this->addButton($this->locale->translate($type["AddText"] ?? ""), $url, $icon, $asOwnButton);
         }
 
         // Add QueryString to URL if one is defined.
@@ -185,7 +172,7 @@ class NewDiscussionModule extends Gdn_Module
                     "label" => $button["Text"],
                     "action" => $button["Url"],
                     "type" => "link",
-                    "id" => strtolower($button["Type"]),
+                    "id" => str_replace(" ", "-", strtolower($button["Text"])),
                     "icon" => $button["Icon"],
                 ]);
             }

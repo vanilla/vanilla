@@ -12,7 +12,6 @@ use Gdn_Database;
 use Vanilla\Cli\Utils\DatabaseCommand;
 use Vanilla\Cli\Utils\SimpleScriptLogger;
 use Vanilla\Dashboard\Models\UserMentionsModel;
-use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\Timers;
 
@@ -28,7 +27,6 @@ class IndexMentionCommand extends DatabaseCommand
         "discussion" => [
             "id" => "DiscussionID",
             "parentRecordType" => "category",
-            "parentRecordID" => "CategoryID",
             "table" => "Discussion",
             "from" => 1,
             "to" => self::maxInt,
@@ -36,7 +34,6 @@ class IndexMentionCommand extends DatabaseCommand
         "comment" => [
             "id" => "CommentID",
             "parentRecordType" => "discussion",
-            "parentRecordID" => "DiscussionID",
             "table" => "Comment",
             "from" => 1,
             "to" => self::maxInt,
@@ -78,6 +75,7 @@ class IndexMentionCommand extends DatabaseCommand
 
         foreach ($this->records as $recordType) {
             $offset = 0;
+            $mentions = [];
             $record = $this->indexableRecords[$recordType];
 
             $results = $this->fetchPosts($record, $offset);
@@ -90,7 +88,6 @@ class IndexMentionCommand extends DatabaseCommand
             }
 
             while ($currentMax < $maxID) {
-                $mentions = [];
                 $startTime = microtime(true);
                 $id = $record["id"];
                 $parentRecordType = $record["parentRecordType"];
@@ -104,22 +101,13 @@ class IndexMentionCommand extends DatabaseCommand
                         continue;
                     }
 
-                    try {
-                        $userMentions = $this->userMentionsModel->parseMentions($body, $format);
-                    } catch (FormattingException $e) {
-                        $this->logger->error("Failed to index mentions from record: {$result[$record["id"]]}", [
-                            "recordID" => $result[$record["id"]],
-                            "recordType" => $recordType,
-                        ]);
-                    }
-
+                    $userMentions = $this->userMentionsModel->parseMentions($body, $format);
                     foreach ($userMentions as $userMention) {
                         $mentions[] = [
                             "userID" => $userMention["userID"],
                             "mentionedName" => $userMention["name"],
                             "recordType" => $recordType,
                             "recordID" => $result[$id],
-                            "parentRecordID" => $result[$record["parentRecordID"]],
                             "parentRecordType" => $parentRecordType,
                             "dateInserted" => $result["DateInserted"],
                         ];
@@ -154,7 +142,7 @@ class IndexMentionCommand extends DatabaseCommand
         $sql = $this->database->createSql();
 
         $result = $sql
-            ->select([$record["id"], "Body", "Format", "DateInserted", $record["parentRecordID"]])
+            ->select([$record["id"], "Body", "Format", "DateInserted"])
             ->from($record["table"])
             ->where([$record["id"] => new RangeExpression(">=", $record["from"], "<=", $record["to"])])
             ->offset($offset)

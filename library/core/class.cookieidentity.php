@@ -613,31 +613,17 @@ class Gdn_CookieIdentity
 
         if (array_key_exists($name, $_COOKIE)) {
             $jwt = $_COOKIE[$name];
-            $handleException = function (Exception $e) use ($jwt) {
+            try {
+                $payload = JWT::decode($jwt, $this->CookieSalt, [self::JWT_ALGORITHM]);
+                if (is_object($payload)) {
+                    $result = (array) $payload;
+                }
+            } catch (Exception $e) {
                 Logger::event("cookie_jwt_error", Logger::ERROR, $e->getMessage(), [
                     "jwt" => $jwt,
                     Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                 ]);
-            };
-            try {
-                $payload = JWT::decode($jwt, $this->CookieSalt, [self::JWT_ALGORITHM]);
-            } catch (Exception $e) {
-                // Try again with the old 16-char salt and update the cookie if successful
-                if (false !== ($oldSalt = Gdn::config("Garden.Cookie.OldSalt"))) {
-                    try {
-                        $payload = JWT::decode($jwt, $oldSalt, [self::JWT_ALGORITHM]);
-                        $this->setJWTPayload($this->CookieName, $payload, $payload->exp);
-                    } catch (Exception $e) {
-                        $handleException($e);
-                    }
-                } else {
-                    $handleException($e);
-                }
             }
-        }
-
-        if (isset($payload) && is_object($payload)) {
-            $result = (array) $payload;
         }
 
         return $result;

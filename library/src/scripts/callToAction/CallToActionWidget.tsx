@@ -38,9 +38,9 @@ export default function CallToActionWidget(props: IProps) {
     return (
         <CallToAction
             to={props.button?.url ?? ""}
-            textCTA={(props.button?.title as string) ?? ""}
-            title={props.title}
-            description={props.description ?? ""}
+            textCTA={t((props.button?.title as string) ?? "")}
+            title={t(props.title)}
+            description={t(props.description ?? "")}
             otherCTAs={
                 props.secondButton?.url
                     ? [

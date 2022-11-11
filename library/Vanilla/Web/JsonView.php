@@ -14,16 +14,17 @@ use Vanilla\Web\Pagination\WebLinking;
 /**
  * Class JsonView
  */
-class JsonView implements ViewInterface {
-
-    const CURRENT_PAGE_HEADER = 'x-app-page-current';
-    const TOTAL_COUNT_HEADER = 'x-app-page-result-count';
-    const LIMIT_HEADER = 'x-app-page-limit';
+class JsonView implements ViewInterface
+{
+    const CURRENT_PAGE_HEADER = "x-app-page-current";
+    const TOTAL_COUNT_HEADER = "x-app-page-result-count";
+    const LIMIT_HEADER = "x-app-page-limit";
 
     /**
      * {@inheritdoc}
      */
-    public function render(Data $data) {
-        echo $data->render();
+    public function render(Data $data)
+    {
+        $data->renderJson();
     }
 }

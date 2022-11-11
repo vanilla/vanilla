@@ -139,13 +139,23 @@ if (!$hasUserID) {
                         echo $this->Form->label('Username', 'ConnectName');
                         echo wrap(\Gdn::translate('ConnectChooseName', 'Choose a name to identify yourself on the site.'), 'div', ['class' => 'FinePrint']);
                         echo $this->Form->textbox('ConnectName', ["aria-label" => t("Username")]);
-
                     }
                     ?>
                 </li>
         <?php endif; ?>
 
-                <?php $this->fireEvent('RegisterBeforePassword'); ?>
+                <?php
+                $this->fireEvent('RegisterBeforePassword');
+
+                //if we have custom profile fields for the user, we need to render them
+                if ($this->hasCustomProfileFields() && (count($ExistingUsers) === 0 || (count($ExistingUsers) >= 1 && !$NoConnectName))) {
+                    //this one is the case when we found a user with same name in db, so we suggest to sign in with existing user or create an account,
+                    //profile fields are hidden until user chooses the option to create new account
+                    $wrapper = count($ExistingUsers) >= 1 ? ["tag" => "div", "attributes" => ["id" => "connect-custom-profile-fields", "style"=> "display: none"]] : null;
+
+                    $this->generateFormCustomProfileFields($wrapper);
+                }
+                ?>
 
                 <?php
                 /**

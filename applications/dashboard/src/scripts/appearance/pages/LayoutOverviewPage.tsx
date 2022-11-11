@@ -11,18 +11,16 @@ import { useCollisionDetector } from "@vanilla/react-utils";
 import { t } from "@vanilla/i18n";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { RouteComponentProps } from "react-router";
-import { useLayout, usePutLayoutView } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
+import { RouteComponentProps } from "react-router-dom";
+import { useLayout } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { LoadStatus } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { notEmpty } from "@vanilla/utils";
 import Translate from "@library/content/Translate";
 import DateTime from "@library/content/DateTime";
-import { useUser } from "@library/features/users/userHooks";
 import { ILayoutDetails, LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import layoutOverviewPageClasses from "./LayoutOverviewPage.classes";
-import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { ErrorWrapper } from "@dashboard/appearance/pages/ErrorWrapper";
 import { LayoutOverview } from "@dashboard/layout/overview/LayoutOverview";
@@ -30,16 +28,19 @@ import { MetaItem, Metas } from "@library/metas/Metas";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { metasClasses } from "@library/metas/Metas.styles";
 import { LayoutEditorRoute } from "@dashboard/appearance/routes/appearanceRoutes";
+import {
+    LayoutActionsContextProvider,
+    useLayoutActionsContext,
+} from "@dashboard/layout/layoutSettings/LayoutActionsContextProvider";
+import { useConfigsByKeys } from "@library/config/configHooks";
+import { LAYOUT_EDITOR_CONFIG_KEY } from "@dashboard/appearance/nav/AppearanceNav.hooks";
+import { ToolTip } from "@library/toolTip/ToolTip";
 
-interface IDescriptionProps {
-    layout: ILayoutDetails;
-}
+function LayoutOverviewPageMetasImpl(props: { layout: ILayoutDetails }) {
+    const { layout } = props;
 
-function LayoutOverviewPageMetasImpl(props: IDescriptionProps) {
     const classesMetas = metasClasses();
-    const layoutViewNames = props.layout?.layoutViews
-        ? props.layout?.layoutViews.map((layoutView) => layoutView.record.name)
-        : [];
+    const layoutViewNames = layout.layoutViews ? layout.layoutViews.map((layoutView) => layoutView.record.name) : [];
 
     const appliedGloballyOnly = layoutViewNames.length && !(layoutViewNames || []).some((value) => value !== "global");
 
@@ -48,32 +49,81 @@ function LayoutOverviewPageMetasImpl(props: IDescriptionProps) {
             <MetaItem>
                 <Translate
                     source="Created <0/> by <1/>."
-                    c0={<DateTime timestamp={props.layout?.dateInserted} />}
+                    c0={<DateTime timestamp={layout.dateInserted} />}
                     c1={
                         <ProfileLink
                             className={classesMetas.metaLink}
                             userFragment={{
-                                userID: props.layout.insertUserID as number,
-                                name: props.layout.insertUser!.name,
+                                userID: layout.insertUserID as number,
+                                name: layout.insertUser!.name,
                             }}
                         />
                     }
                 />
             </MetaItem>
-            {props.layout.updateUser && props.layout.dateUpdated && (
+            {layout.updateUser && layout.dateUpdated && (
                 <MetaItem>
                     <Translate
                         source="Last updated <0/> by <1/>. "
-                        c0={<DateTime timestamp={props.layout?.dateUpdated} />}
-                        c1={<ProfileLink className={classesMetas.metaLink} userFragment={props.layout.updateUser} />}
+                        c0={<DateTime timestamp={layout.dateUpdated} />}
+                        c1={<ProfileLink className={classesMetas.metaLink} userFragment={layout.updateUser} />}
                     />
                 </MetaItem>
             )}
             <MetaItem>
                 {!!layoutViewNames.length &&
-                    t("Applied on ") + (appliedGloballyOnly ? "homepage" : layoutViewNames.join(", ")) + "."}
+                    t("Applied on ") +
+                        (appliedGloballyOnly
+                            ? layout.layoutViewType === "discussionList"
+                                ? t("recent discussions page")
+                                : t("homepage")
+                            : layoutViewNames.join(", ")) +
+                        "."}
             </MetaItem>
         </Metas>
+    );
+}
+
+function TitleBarActionsContent(props: { layout: ILayoutDetails }) {
+    const { layout } = props;
+    const { layoutID, layoutViewType } = layout;
+
+    const { DeleteLayout, ApplyLayout } = useLayoutActionsContext();
+
+    const classes = layoutOverviewPageClasses();
+
+    const canEdit = !layout.isDefault;
+    let editButton = (
+        <LinkAsButton
+            buttonType={ButtonTypes.OUTLINE}
+            to={LayoutEditorRoute.url({
+                layoutID,
+                layoutViewType,
+            })}
+            disabled={!canEdit}
+        >
+            {t("Edit")}
+        </LinkAsButton>
+    );
+
+    if (!canEdit) {
+        editButton = (
+            <ToolTip label={t("This is a default layout and cannot be edited.")}>
+                <span>{editButton}</span>
+            </ToolTip>
+        );
+    }
+
+    return (
+        <>
+            <DropDown name={t("Layout Options")} flyoutType={FlyoutType.LIST} className={classes.layoutOptionsDropdown}>
+                {/* <DropDownItemButton onClick={() => {}}>{t("Preview")}</DropDownItemButton> */}
+                <ApplyLayout layout={layout} />
+                <DeleteLayout layout={layout} />
+            </DropDown>
+
+            {editButton}
+        </>
     );
 }
 
@@ -84,31 +134,20 @@ export default function LayoutOverviewPage(
     }>,
 ) {
     const layoutID = props.match.params.layoutID;
-    const layoutViewType = props.match.params.layoutViewType;
-    const layoutLoadable = useLayout(layoutID);
-    const layout = layoutLoadable.data;
 
     const classes = layoutOverviewPageClasses();
     const device = useTitleBarDevice();
     const { hasCollision } = useCollisionDetector();
     const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
-    const putLayoutView = usePutLayoutView(layoutID);
+
+    const config = useConfigsByKeys([LAYOUT_EDITOR_CONFIG_KEY]);
+    const isCustomLayoutsEnabled = !!config?.data?.[LAYOUT_EDITOR_CONFIG_KEY];
+
+    const layoutLoadable = useLayout(layoutID);
+    const layout = layoutLoadable.data;
 
     const layoutStatusIsPending = [LoadStatus.PENDING, LoadStatus.LOADING].includes(layoutLoadable.status);
     const layoutStatusIsError = !layoutLoadable.data || layoutLoadable.error;
-
-    //this should be dynamic in the future to be able to apply to different recordTypes, right now only global on homepage
-    const globalLayoutView = {
-        recordType: "global",
-        recordID: -1,
-    };
-    const viewIsAlreadyApplied =
-        layoutLoadable.status === LoadStatus.SUCCESS &&
-        (layout?.layoutViews || []).some(
-            (layoutView) =>
-                layoutView.recordType === globalLayoutView.recordType &&
-                layoutView.recordID === globalLayoutView.recordID,
-        );
 
     const errorContent = (errorLoadable) => (
         <ErrorWrapper message={errorLoadable.error.message}>
@@ -117,52 +156,42 @@ export default function LayoutOverviewPage(
     );
 
     const descriptionContent = layoutStatusIsPending ? (
-        <LoadingRectangle width={320} height={18} />
+        <LoadingRectangle width={320} height={22} />
     ) : layoutStatusIsError ? (
         errorContent(layoutLoadable)
     ) : (
-        <LayoutOverviewPageMetasImpl layout={layout as ILayoutDetails} />
-    );
-
-    const titleBarActionsContent = !layoutStatusIsError ? (
-        <>
-            <DropDown name={t("Layout Options")} flyoutType={FlyoutType.LIST} className={classes.layoutOptionsDropdown}>
-                <DropDownItemButton
-                    onClick={() => {
-                        !viewIsAlreadyApplied && putLayoutView(globalLayoutView);
-                    }}
-                >
-                    {t("Apply")}
-                </DropDownItemButton>
-
-                {/* <DropDownItemButton onClick={() => {}}>{t("Preview")}</DropDownItemButton>
-                 <DropDownItemButton onClick={() => {}}>{t("Delete")}</DropDownItemButton> */}
-            </DropDown>
-            <LinkAsButton
-                buttonType={ButtonTypes.OUTLINE}
-                to={LayoutEditorRoute.url({
-                    layoutID,
-                    layoutViewType,
-                })}
-            >
-                {t("Edit")}
-            </LinkAsButton>
-        </>
-    ) : (
-        <></>
+        isCustomLayoutsEnabled && <LayoutOverviewPageMetasImpl layout={layout!} />
     );
 
     return (
         <AdminLayout
             contentClassNames={classes.overviewContent}
             activeSectionID={"appearance"}
-            title={layout?.name || ""}
+            title={isCustomLayoutsEnabled ? layout?.name || "" : ""}
             description={descriptionContent}
-            titleBarActions={titleBarActionsContent}
+            titleBarActions={
+                !layoutStatusIsError && isCustomLayoutsEnabled ? (
+                    <LayoutActionsContextProvider>
+                        <TitleBarActionsContent layout={layout!} />
+                    </LayoutActionsContextProvider>
+                ) : (
+                    <></>
+                )
+            }
             adminBarHamburgerContent={<AppearanceNav asHamburger />}
             leftPanel={!isCompact && <AppearanceNav />}
-            content={<LayoutOverview layoutID={layoutID} />}
-            titleLabel={viewIsAlreadyApplied ? <span className={classes.titleLabel}>{t("Applied")}</span> : undefined}
+            content={
+                layoutID && isCustomLayoutsEnabled ? (
+                    <LayoutOverview layoutID={layoutID} />
+                ) : (
+                    config.status === LoadStatus.SUCCESS && <h1 style={{ padding: 24 }}>{t("Page Not Found")}</h1>
+                )
+            }
+            titleLabel={
+                (layout?.layoutViews ?? []).length > 0 && isCustomLayoutsEnabled ? (
+                    <span className={classes.titleLabel}>{t("Applied")}</span>
+                ) : undefined
+            }
         />
     );
 }

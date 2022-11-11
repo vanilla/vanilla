@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for getAllMentions().
  */
 
-class GetAllMentionsTest extends TestCase {
-
+class GetAllMentionsTest extends TestCase
+{
     /**
      * Test {@link getAllMentions()} against several scenarios.
      *
@@ -22,7 +22,8 @@ class GetAllMentionsTest extends TestCase {
      * @param array $expected The expected result.
      * @dataProvider provideTestGetAllMentionsArrays
      */
-    public function testGetAllMentions($testStr, $expected) {
+    public function testGetAllMentions($testStr, $expected)
+    {
         $actual = getAllMentions($testStr);
         $this->assertSame($expected, $actual);
     }
@@ -32,28 +33,20 @@ class GetAllMentionsTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestGetAllMentionsArrays() {
+    public function provideTestGetAllMentionsArrays()
+    {
         $r = [
-            'noMentions' => [
-                'this string has no mentions at all',
-                [],
+            "noMentions" => ["this string has no mentions at all", []],
+            "oneMention" => ["this string has one mention: @blutarch", ["blutarch"]],
+            "multipleMentions" => [
+                "this string mentions @blutarch and @herodotus and @gorgias and @pl@to",
+                ["blutarch", "herodotus", "gorgias", "pl@to"],
             ],
-            'oneMention' => [
-                'this string has one mention: @blutarch',
-                ['blutarch'],
-            ],
-            'multipleMentions' => [
-                'this string mentions @blutarch and @herodotus and @gorgias and @pl@to',
-                ['blutarch', 'herodotus', 'gorgias', 'pl@to'],
-            ],
-            'quotedMention' => [
+            "quotedMention" => [
                 '@"quoted mention" is quoted and @unquoted mention is not',
-                ['quoted mention', 'unquoted'],
+                ["quoted mention", "unquoted"],
             ],
-            'quotedMentionPartFalse' => [
-                '@"@',
-                [],
-            ],
+            "quotedMentionPartFalse" => ['@"@', []],
         ];
 
         return $r;

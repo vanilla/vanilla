@@ -8,6 +8,7 @@ import { IMe, IUser, IUserFragment } from "@library/@types/api/users";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { ITag } from "@library/features/tags/TagsReducer";
 import random from "lodash/random";
+import { slugify } from "@vanilla/utils";
 
 export const STORY_IMAGE = require("./storyDataImage.png");
 export const STORY_ICON = require("./storyDataImage.png");
@@ -73,6 +74,106 @@ export const STORY_ME_ADMIN: IMe = {
     countUnreadNotifications: 0,
 };
 
+export const STORY_LEADERS = [
+    {
+        user: STORY_USER,
+        points: 320,
+    },
+    {
+        user: {
+            ...STORY_USER,
+            name: "Christina Morton",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
+            userID: 2,
+        },
+        points: 280,
+    },
+    {
+        user: {
+            ...STORY_USER,
+            name: "Nazeem Kanaan",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/nA5BAUNMSEDPV.png",
+            userID: 3,
+        },
+        points: 278,
+    },
+    {
+        user: {
+            ...STORY_USER,
+            name: "Aiden Rosenstengel",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/n2K5HYT9EZOF6.png",
+            userID: 4,
+        },
+        points: 254,
+    },
+    {
+        user: {
+            ...STORY_USER,
+            name: "Tomás Barros",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
+            userID: 5,
+        },
+        points: 243,
+    },
+    {
+        user: { ...STORY_USER, name: "Lan Tai", userID: 6 },
+        points: 241,
+    },
+    {
+        user: {
+            ...STORY_USER,
+            name: "Ella Jespersen",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/nA5BAUNMSEDPV.png",
+            userID: 7,
+        },
+        points: 221,
+    },
+    {
+        user: { ...STORY_USER, name: "Teus van Uum", userID: 8 },
+        points: 212,
+    },
+    {
+        user: {
+            ...STORY_USER,
+            name: "Michael Baker",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/nA5BAUNMSEDPV.png",
+            userID: 9,
+        },
+        points: 206,
+    },
+    {
+        user: {
+            ...STORY_USER,
+            name: "Nicholas Lebrun",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
+            userID: 10,
+        },
+        points: 196,
+    },
+    {
+        user: { ...STORY_USER, name: "Matthias Friedman", userID: 11 },
+        points: 184,
+    },
+    {
+        user: {
+            ...STORY_USER,
+            name: "Pupa Zito",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/n2K5HYT9EZOF6.png",
+            userID: 12,
+        },
+        points: 165,
+    },
+    {
+        user: {
+            ...STORY_USER,
+            name: "Phoebe Cunningham",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
+            userID: 13,
+        },
+        points: 164,
+    },
+];
+
 export const StoryTextContent = (props: { firstTitle?: string }) => {
     return (
         <div style={{ padding: 16 }}>
@@ -123,4 +224,21 @@ export const getRandomIpsum = function () {
 export const storyTitleGenerator = function (length = 100) {
     const phrases = STORY_IPSUM_LONG.replace(/,/g, "").split(".");
     return phrases[random(0, 3)].slice(0, length).trim();
+};
+
+export const getArticlesStub = function (limit = 9, host = "#") {
+    const stub = [] as any;
+
+    for (let i = 0; i < limit; i++) {
+        const title = STORY_IPSUM_SHORT;
+        const slug = slugify(title);
+        stub.push({
+            id: `article-${i}`,
+            to: `${host}/kb/articles/${slug}`,
+            name: title,
+            description: STORY_IPSUM_MEDIUM,
+        });
+    }
+
+    return stub;
 };

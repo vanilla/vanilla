@@ -7,14 +7,8 @@ import React from "react";
 import { useDashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import CheckBox from "@library/forms/Checkbox";
 
-interface IProps {
-    disabled?: boolean;
-    className?: string;
-    label: string;
-    checked?: boolean;
-    name?: string;
+interface IProps extends Omit<React.ComponentProps<typeof CheckBox>, "onChange"> {
     onChange?: (newValue: boolean) => void;
-    excludeFromICheck?: boolean;
 }
 
 export function DashboardCheckBox(props: IProps) {

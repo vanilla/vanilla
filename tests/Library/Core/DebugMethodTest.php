@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for debugMethod().
  */
 
-class DebugMethodTest extends TestCase {
-
+class DebugMethodTest extends TestCase
+{
     /**
      * Tests {@link debugMethod()} against several scenarios.
      *
@@ -23,7 +23,8 @@ class DebugMethodTest extends TestCase {
      * @param string $expected The expected result.
      * @dataProvider provideTestDebugMethodArrays
      */
-    public function testDebugMethod($testMethodName, $testMethodArgs, $expected) {
+    public function testDebugMethod($testMethodName, $testMethodArgs, $expected)
+    {
         $this->expectOutputString($expected);
         debugMethod($testMethodName, $testMethodArgs);
     }
@@ -33,28 +34,13 @@ class DebugMethodTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestDebugMethodArrays() {
+    public function provideTestDebugMethodArrays()
+    {
         $r = [
-            'noArgs' => [
-                'methodWithNoArgs',
-                [],
-                "methodWithNoArgs()\n",
-            ],
-            'oneArgNull' => [
-                'methodWithOneArg',
-                [null],
-                "methodWithOneArg(null)\n",
-            ],
-            'twoArgs' => [
-                'methodWithTwoArgs',
-                [null, '10'],
-                "methodWithTwoArgs(null, '10')\n",
-            ],
-            'withArray' => [
-                'methodWithArrayArg',
-                [[1, 2, 3]],
-                "methodWithArrayArg('Array(3)')\n",
-            ],
+            "noArgs" => ["methodWithNoArgs", [], "methodWithNoArgs()\n"],
+            "oneArgNull" => ["methodWithOneArg", [null], "methodWithOneArg(null)\n"],
+            "twoArgs" => ["methodWithTwoArgs", [null, "10"], "methodWithTwoArgs(null, '10')\n"],
+            "withArray" => ["methodWithArrayArg", [[1, 2, 3]], "methodWithArrayArg('Array(3)')\n"],
         ];
 
         return $r;

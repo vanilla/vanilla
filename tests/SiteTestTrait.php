@@ -19,6 +19,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Http\InternalClient;
 use Vanilla\Models\AddonModel;
 use Vanilla\Permissions;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\VariablesProviderInterface;
 use Vanilla\Utility\ModelUtils;
@@ -28,7 +29,8 @@ use Vanilla\Web\Pagination\WebLinking;
 /**
  * Allow a class to test against
  */
-trait SiteTestTrait {
+trait SiteTestTrait
+{
     use BootstrapTrait {
         setupBeforeClass as private bootstrapBeforeClass;
         teardownAfterClass as private bootstrapAfterClass;
@@ -52,7 +54,7 @@ trait SiteTestTrait {
     /**
      * @var array The addons to install. Restored on teardownAfterClass();
      */
-    protected static $addons = ['vanilla', 'conversations', 'stubcontent'];
+    protected static $addons = ["vanilla", "conversations", "stubcontent"];
 
     /** @var array $enabledLocales */
     protected static $enabledLocales = [];
@@ -98,48 +100,50 @@ trait SiteTestTrait {
      *
      * @return string[] Returns an array of addon names.
      */
-    protected static function getAddons(): array {
+    protected static function getAddons(): array
+    {
         // These applications must currently all be enabled at startup or things can get flaky.
-        static::$addons = array_unique(array_merge(['dashboard', 'conversations', 'vanilla'], static::$addons));
+        static::$addons = array_unique(array_merge(["dashboard", "conversations", "vanilla"], static::$addons));
         return static::$addons;
     }
 
     /**
      * Install the site.
      */
-    public static function setupBeforeClass(): void {
+    public static function setupBeforeClass(): void
+    {
         self::setupBeforeClassSiteTestTrait();
     }
 
     /**
      * Setup before each test.
      */
-    public function setupSiteTestTrait(): void {
+    public function setupSiteTestTrait(): void
+    {
         $this->setUpBootstrap();
         $this->backupSession();
 
         // Clear out all notifications before each test.
-        static::container()->call(function (
-            \Gdn_SQLDriver $sql,
-            \UserModel $userModel,
-            \RoleModel $roleModel
-        ) {
-            $sql->truncate('Activity');
+        static::container()->call(function (\Gdn_SQLDriver $sql, \UserModel $userModel, \RoleModel $roleModel) {
+            $sql->truncate("Activity");
             $this->userModel = $userModel;
             $this->roleModel = $roleModel;
         });
-        $this->api = static::container()->getArgs(InternalClient::class, [static::container()->get('@baseUrl').'/api/v2']);
+        $this->api = static::container()->getArgs(InternalClient::class, [
+            static::container()->get("@baseUrl") . "/api/v2",
+        ]);
 
         // Save some configs.
         \Gdn::config()->saveToConfig([
-            'Garden.User.RateLimit' => 0
+            "Garden.User.RateLimit" => 0,
         ]);
     }
 
     /**
      * Tear down before each test.
      */
-    public function teardownSiteTest(): void {
+    public function teardownSiteTest(): void
+    {
         $this->restoreSession();
     }
 
@@ -148,14 +152,16 @@ trait SiteTestTrait {
      *
      * @param Container $container
      */
-    public static function configureContainerBeforeStartup(Container $container) {
+    public static function configureContainerBeforeStartup(Container $container)
+    {
         return;
     }
 
     /**
      * Setup the site. This is the full implementation for `setupBeforeClass()` for easier overriding.
      */
-    protected static function setupBeforeClassSiteTestTrait(): void {
+    protected static function setupBeforeClassSiteTestTrait(): void
+    {
         self::symlinkAddonFixtures();
         static::bootstrapBeforeClass();
 
@@ -167,18 +173,18 @@ trait SiteTestTrait {
 
         $installer->uninstall();
         $result = $installer->install([
-            'site' => ['title' => EventManager::classBasename(get_called_class())],
-            'addons' => static::getAddons(),
+            "site" => ["title" => EventManager::classBasename(get_called_class())],
+            "addons" => static::getAddons(),
         ]);
 
         self::preparelocales();
 
         $dic->call(function (\Gdn_Locale $locale) {
-            $locale->set('en');
+            $locale->set("en");
         });
 
         // Start Authenticators
-        $dic->get('Authenticator')->startAuthenticator();
+        $dic->get("Authenticator")->startAuthenticator();
         $dic->get(\Gdn_Dispatcher::class)->start();
 
         self::$siteInfo = $result;
@@ -190,22 +196,24 @@ trait SiteTestTrait {
     /**
      * @return bool
      */
-    public static function shouldUseCaching(): bool {
+    public static function shouldUseCaching(): bool
+    {
         return true;
     }
 
     /**
      * Create locale directory and locale definitions.php
      */
-    public static function preparelocales() {
-        $enabledLocales =[];
+    public static function preparelocales()
+    {
+        $enabledLocales = [];
         foreach (static::$enabledLocales as $localeKey => $locale) {
             $enabledLocales["test_$localeKey"] = $locale;
-            $localeDir = PATH_ROOT."/locales/$localeKey";
+            $localeDir = PATH_ROOT . "/locales/$localeKey";
             if (!(file_exists($localeDir) && is_dir($localeDir))) {
                 mkdir($localeDir);
             }
-            $localeFile = $localeDir.'/definitions.php';
+            $localeFile = $localeDir . "/definitions.php";
             if (!file_exists($localeFile)) {
                 $handle = fopen($localeFile, "w");
                 $localeDefinitions = <<<TEMPLATE
@@ -234,15 +242,16 @@ TEMPLATE;
         if (!empty($enabledLocales)) {
             /** @var ConfigurationInterface $config */
             $config = self::container()->get(ConfigurationInterface::class);
-            $config->set('EnabledLocales', $enabledLocales, true);
+            $config->set("EnabledLocales", $enabledLocales, true);
         }
     }
 
     /**
      * Cleanup the container after testing is done.
      */
-    public static function teardownAfterClass(): void {
-        self::$addons = ['vanilla', 'conversations', 'stubcontent'];
+    public static function teardownAfterClass(): void
+    {
+        self::$addons = ["vanilla", "conversations", "stubcontent"];
         static::bootstrapAfterClass();
         self::unSymlinkAddonFixtures();
     }
@@ -250,7 +259,8 @@ TEMPLATE;
     /**
      * Symlink all addon fixtures.
      */
-    private static function symlinkAddonFixtures(): void {
+    private static function symlinkAddonFixtures(): void
+    {
         self::mapAddonFixtures(function (string $path, string $dest): void {
             if (file_exists($dest)) {
                 if (realpath($dest) !== realpath($path)) {
@@ -267,7 +277,8 @@ TEMPLATE;
     /**
      * Remove symlinks to all addon fixtures.
      */
-    private static function unSymlinkAddonFixtures(): void {
+    private static function unSymlinkAddonFixtures(): void
+    {
         self::mapAddonFixtures(function (string $path, string $dest): void {
             if (isset(self::$symLinkedAddons[$path]) && file_exists($dest) && realpath($dest) === realpath($path)) {
                 unlink($dest);
@@ -281,10 +292,11 @@ TEMPLATE;
      *
      * @param callable $callback
      */
-    private static function mapAddonFixtures(callable $callback): void {
+    private static function mapAddonFixtures(callable $callback): void
+    {
         $testAddonPaths = array_merge(
-            glob(PATH_ROOT . '/tests/addons/*', GLOB_ONLYDIR),
-            glob(PATH_ROOT . '/plugins/*/tests/plugins/*', GLOB_ONLYDIR)
+            glob(PATH_ROOT . "/tests/addons/*", GLOB_ONLYDIR),
+            glob(PATH_ROOT . "/plugins/*/tests/plugins/*", GLOB_ONLYDIR)
         );
         foreach ($testAddonPaths as $path) {
             $dirname = basename($path);
@@ -302,7 +314,8 @@ TEMPLATE;
      *
      * @throws \Exception Throws an exception if the session has already been backed up.
      */
-    protected function backupSession() {
+    protected function backupSession()
+    {
         if (!empty($this->sessionBak)) {
             throw new \Exception("Cannot backup the session over a previous backup.", 500);
         }
@@ -311,9 +324,9 @@ TEMPLATE;
         $session = self::container()->get(\Gdn_Session::class);
 
         $this->sessionBak = [
-            'userID' => $session->UserID,
-            'user' => $session->User,
-            'permissions' => clone $session->getPermissions(),
+            "userID" => $session->UserID,
+            "user" => $session->User,
+            "permissions" => clone $session->getPermissions(),
         ];
     }
 
@@ -324,7 +337,8 @@ TEMPLATE;
      *
      * @throws \Exception Throws an exception if there isn't a session to restore.
      */
-    protected function restoreSession() {
+    protected function restoreSession()
+    {
         if (empty($this->sessionBak)) {
             throw new \Exception("No session to restore.", 500);
         }
@@ -332,8 +346,8 @@ TEMPLATE;
         /* @var \Gdn_Session $session */
         $session = self::container()->get(\Gdn_Session::class);
 
-        $session->UserID = $this->sessionBak['userID'];
-        $session->User = $this->sessionBak['user'];
+        $session->UserID = $this->sessionBak["userID"];
+        $session->User = $this->sessionBak["user"];
 
         // Hack to get past private property. Don't do outside of tests.
         $this->callOn(
@@ -341,7 +355,7 @@ TEMPLATE;
             function (Permissions $perms) {
                 $this->permissions = $perms;
             },
-            $this->sessionBak['permissions']
+            $this->sessionBak["permissions"]
         );
         $this->sessionBak = null;
     }
@@ -352,7 +366,8 @@ TEMPLATE;
      * @param ?string $sx The suffix to use for the usernames and email addresses.
      *
      */
-    protected function createUserFixtures(?string $sx = null): void {
+    protected function createUserFixtures(?string $sx = null): void
+    {
         // Create some users to help.
         if ($sx === null) {
             if ($this->userFixturesCreated) {
@@ -375,21 +390,20 @@ TEMPLATE;
      * @param string|null $sx
      * @return int
      */
-    protected function createUserFixture(string $role, string $sx = null): int {
+    protected function createUserFixture(string $role, string $sx = null): int
+    {
         static $count = 1;
         if ($sx === null) {
             $sx = $count++;
         }
 
-        $row = $this->api()->post('/users', [
-            'name' => "$role$sx",
-            'email' => "$role.$sx@example.com",
-            'password' => 'test15!AVeryS3cUR3pa55W0rd',
-            'roleID' => [
-                $this->roleID($role),
-            ],
+        $row = $this->api()->post("/users", [
+            "name" => "$role$sx",
+            "email" => "$role.$sx@example.com",
+            "password" => "test15!AVeryS3cUR3pa55W0rd",
+            "roleID" => [$this->roleID($role)],
         ]);
-        return $row['userID'];
+        return $row["userID"];
     }
 
     /**
@@ -397,12 +411,16 @@ TEMPLATE;
      *
      * @return array
      */
-    protected function getRoles(): array {
+    protected function getRoles(): array
+    {
         if ($this->roles === null) {
             $roles = array_column(
-                static::container()->get(\Gdn_SQLDriver::class)->getWhere('Role', [])->resultArray(),
-                'RoleID',
-                'Name'
+                static::container()
+                    ->get(\Gdn_SQLDriver::class)
+                    ->getWhere("Role", [])
+                    ->resultArray(),
+                "RoleID",
+                "Name"
             );
             $this->roles = $roles;
         }
@@ -416,10 +434,11 @@ TEMPLATE;
      * @param array $where An additional where passed to the activity table.
      * @return array Returns the notification row for further inspection.
      */
-    public function assertNotification(int $userID, array $where = []): array {
+    public function assertNotification(int $userID, array $where = []): array
+    {
         /** @var \ActivityModel $model */
         $model = static::container()->get(\ActivityModel::class);
-        $row = $model->getWhere(['NotifyUserID' => $userID] + $where)->firstRow(DATASET_TYPE_ARRAY);
+        $row = $model->getWhere(["NotifyUserID" => $userID] + $where)->firstRow(DATASET_TYPE_ARRAY);
         TestCase::assertIsArray($row, "Notification not found.");
         return $row;
     }
@@ -430,7 +449,8 @@ TEMPLATE;
      * @param string $name
      * @return int
      */
-    protected function roleID(string $name): int {
+    protected function roleID(string $name): int
+    {
         if (!isset($this->getRoles()[$name])) {
             throw new \Exception("Role not found: $name");
         }
@@ -444,13 +464,14 @@ TEMPLATE;
      * @param array $role
      * @return int
      */
-    protected function defineRole(array $role): int {
+    protected function defineRole(array $role): int
+    {
         $roleID = $this->roleModel->define($role);
         if (!$roleID) {
-            throw new \Exception("Role not defined: ".$this->roleModel->Validation->resultsText());
+            throw new \Exception("Role not defined: " . $this->roleModel->Validation->resultsText());
         }
         if ($this->roles !== null) {
-            $this->roles[$role['Name']] = $roleID;
+            $this->roles[$role["Name"]] = $roleID;
         }
         return $roleID;
     }
@@ -460,7 +481,8 @@ TEMPLATE;
      *
      * @return InternalClient Returns the API client.
      */
-    public function api() {
+    public function api()
+    {
         return $this->api;
     }
 
@@ -473,9 +495,10 @@ TEMPLATE;
      * @param array $overrides Overrides for the user row.
      * @return array
      */
-    protected function insertDummyUser(array $overrides = []): array {
+    protected function insertDummyUser(array $overrides = []): array
+    {
         $user = $this->dummyUser($overrides);
-        $user += ['Password' => $user['Email']];
+        $user += ["Password" => $user["Email"]];
         $userID = $this->userModel->register($user);
         ModelUtils::validationResultToValidationException($this->userModel, \Gdn::locale());
         $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
@@ -489,7 +512,8 @@ TEMPLATE;
      * @param int $userID The user to check.
      * @param array $roles The expected roles.
      */
-    protected function assertUserHasRoles(int $userID, array $roles) {
+    protected function assertUserHasRoles(int $userID, array $roles)
+    {
         $userRoles = $this->userModel->getRoleIDs($userID);
         foreach ($roles as $role) {
             if (!is_numeric($role)) {
@@ -505,7 +529,8 @@ TEMPLATE;
      *
      * @param string $message
      */
-    public static function assertNotSignedIn($message = ''): void {
+    public static function assertNotSignedIn($message = ""): void
+    {
         TestCase::assertFalse(\Gdn::session()->isValid(), $message ?: "There shouldn't be a user signed in right now.");
     }
 
@@ -515,35 +540,45 @@ TEMPLATE;
      * @param string $url The URL to test.
      * @param int $limit The limit to use when paging. The endpoint must return at least one page of data.
      */
-    public function assertApiPaging(string $url, int $limit): void {
-        $url = UrlUtils::concatQuery($url, ['limit' => $limit]);
+    public function assertApiPaging(string $url, int $limit): void
+    {
+        $url = UrlUtils::concatQuery($url, ["limit" => $limit]);
         $page = 0;
         do {
             $page++;
             $response = $this->api->get($url);
 
             $header = $response->getHeader(WebLinking::HEADER_NAME);
-            TestCase::assertNotEmpty($header, 'The paging headers were not in the API response.');
+            TestCase::assertNotEmpty($header, "The paging headers were not in the API response.");
 
             $paging = WebLinking::parseLinkHeaders($header);
-            $url = $paging['next'] ?? '';
+            $url = $paging["next"] ?? "";
 
             if (!empty($url)) {
-                TestCase::assertCount($limit, $response->getBody(), 'The API returned a row count different than the limit.');
+                TestCase::assertCount(
+                    $limit,
+                    $response->getBody(),
+                    "The API returned a row count different than the limit."
+                );
 
                 parse_str(parse_url($url, PHP_URL_QUERY), $query);
-                TestCase::assertSame($limit, (int)$query['limit'], 'The limit in the next URL is not the same as the previous.');
-                TestCase::assertSame($page + 1, (int)$query['page'], 'The next page URL is not the current page + 1.');
+                TestCase::assertSame(
+                    $limit,
+                    (int) $query["limit"],
+                    "The limit in the next URL is not the same as the previous."
+                );
+                TestCase::assertSame($page + 1, (int) $query["page"], "The next page URL is not the current page + 1.");
             }
         } while (!empty($url));
 
-        TestCase::assertNotSame(1, $page, 'The paging test must go past page 1.');
+        TestCase::assertNotSame(1, $page, "The paging test must go past page 1.");
     }
 
     /**
      * Enable our locale fixtures.
      */
-    public static function enableLocaleFixtures(): void {
+    public static function enableLocaleFixtures(): void
+    {
         $addonManager = self::container()->get(AddonManager::class);
         $addonModel = self::container()->get(AddonModel::class);
         $testLocaleAddon = new Addon("/tests/fixtures/locales/test");
@@ -562,7 +597,8 @@ TEMPLATE;
      * @param int $expectedCode The expected redirect status code.
      * @param callable $callback The callback to generate the redirect.
      */
-    public function assertRedirectsTo(string $expectedPath, int $expectedCode, callable $callback) {
+    public function assertRedirectsTo(string $expectedPath, int $expectedCode, callable $callback)
+    {
         $expectedPath = url($expectedPath);
         $caught = null;
         try {
@@ -570,9 +606,9 @@ TEMPLATE;
         } catch (ResponseException $e) {
             $caught = $e;
         }
-        TestCase::assertInstanceOf(ResponseException::class, $caught, 'Callback did not redirect.');
+        TestCase::assertInstanceOf(ResponseException::class, $caught, "Callback did not redirect.");
         $redirect = $caught->getResponse();
-        TestCase::assertInstanceOf(Redirect::class, $redirect, 'Callback did not redirect.');
+        TestCase::assertInstanceOf(Redirect::class, $redirect, "Callback did not redirect.");
         TestCase::assertEquals($expectedCode, $redirect->getStatus());
         TestCase::assertEquals($expectedPath, $redirect->getHeader("Location"));
     }
@@ -585,9 +621,9 @@ TEMPLATE;
      *
      * @return mixed The result of the callback.
      */
-    public function runWithThemeVariables(array $variables, callable $callback) {
-        $provider = new class($variables) implements VariablesProviderInterface {
-
+    public function runWithThemeVariables(array $variables, callable $callback)
+    {
+        $provider = new class ($variables) implements VariablesProviderInterface {
             /** @var array */
             private $variables;
 
@@ -596,14 +632,16 @@ TEMPLATE;
              *
              * @param array $variables
              */
-            public function __construct(array $variables) {
+            public function __construct(array $variables)
+            {
                 $this->variables = $variables;
             }
 
             /**
              * @inheritDoc
              */
-            public function getVariables(): array {
+            public function getVariables(): array
+            {
                 return $this->variables;
             }
         };

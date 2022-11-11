@@ -12,15 +12,16 @@ use Vanilla\Database\Operation;
 /**
  * Processor for doing some invalidation of cache.
  */
-class ModelCacheInvalidationProcessor extends Operation\InvalidateCallbackProcessor {
-
+class ModelCacheInvalidationProcessor extends Operation\InvalidateCallbackProcessor
+{
     /** @var ModelCache */
     private $cache;
 
     /**
      * @param ModelCache $cache
      */
-    public function __construct(ModelCache $cache) {
+    public function __construct(ModelCache $cache)
+    {
         $this->cache = $cache;
         parent::__construct(function () {
             $this->cache->invalidateAll();

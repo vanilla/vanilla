@@ -12,15 +12,14 @@ use Garden\PsrEventHandlersInterface;
 /**
  * Test psr event handler.
  */
-class TestPsrEventHandler implements PsrEventHandlersInterface {
-
+class TestPsrEventHandler implements PsrEventHandlersInterface
+{
     /**
      * @inheritdoc
      */
-    public static function getPsrEventHandlerMethods(): array {
-        return [
-            'handleResourceEvent',
-        ];
+    public static function getPsrEventHandlerMethods(): array
+    {
+        return ["handleResourceEvent"];
     }
 
     /**
@@ -28,7 +27,8 @@ class TestPsrEventHandler implements PsrEventHandlersInterface {
      *
      * @param TestResourceEvent $event
      */
-    public function handleResourceEvent(TestResourceEvent $event) {
+    public function handleResourceEvent(TestResourceEvent $event)
+    {
         $event->wasHandled = true;
     }
 }

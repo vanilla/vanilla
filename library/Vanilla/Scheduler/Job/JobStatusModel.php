@@ -7,7 +7,6 @@
 
 namespace Vanilla\Scheduler\Job;
 
-use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Database\Operation;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
@@ -15,14 +14,12 @@ use Vanilla\Database\Operation\JsonFieldProcessor;
 use Vanilla\Database\Operation\PruneProcessor;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Scheduler\Driver\DriverSlipInterface;
-use VanillaTests\Fixtures\NullCache;
-use VanillaTests\Fixtures\TestCache;
 
 /**
  * Model for tracking job statuses.
  */
-class JobStatusModel extends PipelineModel {
-
+class JobStatusModel extends PipelineModel
+{
     private const TABLE_NAME = "jobStatus";
     private const KEY_COUNT_CHANGED = "jobStatus/countChanged/{userID}";
     private const KEY_LAST_SEEN = "jobStatus/lastSeen/{userID}";
@@ -38,16 +35,17 @@ class JobStatusModel extends PipelineModel {
      *
      * @param \Gdn_Cache $cache
      */
-    public function __construct(\Gdn_Cache $cache) {
+    public function __construct(\Gdn_Cache $cache)
+    {
         parent::__construct(self::TABLE_NAME);
 
         $this->cache = $cache;
         $dateFields = new CurrentDateFieldProcessor();
         $dateFields->camelCase();
         $this->addPipelineProcessor($dateFields);
-        $this->addPipelineProcessor(new JsonFieldProcessor(['message']));
-        $this->addPipelineProcessor(new PruneProcessor('dateUpdated', '3 days'));
-        $this->addPipelineProcessor(new Operation\UpdateProcessor([$this, 'handleUpdate']));
+        $this->addPipelineProcessor(new JsonFieldProcessor(["message"]));
+        $this->addPipelineProcessor(new PruneProcessor("dateUpdated", "3 days"));
+        $this->addPipelineProcessor(new Operation\UpdateProcessor([$this, "handleUpdate"]));
     }
 
     /**
@@ -55,21 +53,22 @@ class JobStatusModel extends PipelineModel {
      *
      * @param \Gdn_DatabaseStructure $structure
      */
-    public static function structure(\Gdn_DatabaseStructure $structure) {
-        $structure->table(self::TABLE_NAME)
-            ->primaryKey('jobStatusID')
-            ->column('jobTrackingID', 'varchar(100)', false, ['index.jobTrackingID', 'unique'])
-            ->column('jobType', 'varchar(300)', false)
-            ->column('trackingUserID', 'int', false, ['index.recentlyChanged'])
-            ->column('dateInserted', 'datetime', true)
-            ->column('dateUpdated', 'datetime', true, 'index.recentlyChanged')
-            ->column('jobExecutionStatus', 'varchar(100)', false)
-            ->column('errorMessage', 'text', true)
-            ->column('progressTotalQuantity', 'int', true)
-            ->column('progressCompleteQuantity', 'int', true)
-            ->column('progressFailedQuantity', 'int', true)
-            ->set()
-        ;
+    public static function structure(\Gdn_DatabaseStructure $structure)
+    {
+        $structure
+            ->table(self::TABLE_NAME)
+            ->primaryKey("jobStatusID")
+            ->column("jobTrackingID", "varchar(100)", false, ["index.jobTrackingID", "unique"])
+            ->column("jobType", "varchar(300)", false)
+            ->column("trackingUserID", "int", false, ["index.recentlyChanged"])
+            ->column("dateInserted", "datetime", true)
+            ->column("dateUpdated", "datetime", true, "index.recentlyChanged")
+            ->column("jobExecutionStatus", "varchar(100)", false)
+            ->column("errorMessage", "text", true)
+            ->column("progressTotalQuantity", "int", true)
+            ->column("progressCompleteQuantity", "int", true)
+            ->column("progressFailedQuantity", "int", true)
+            ->set();
     }
 
     /**
@@ -77,17 +76,15 @@ class JobStatusModel extends PipelineModel {
      *
      * @param DriverSlipInterface $driverSlip The driver slip.
      */
-    public function updateDriverSlip(DriverSlipInterface $driverSlip) {
+    public function updateDriverSlip(DriverSlipInterface $driverSlip)
+    {
         $set = [
-            'jobExecutionStatus' => $driverSlip->getStatus()->getStatus(),
-            'errorMessage' => $driverSlip->getErrorMessage(),
+            "jobExecutionStatus" => $driverSlip->getStatus()->getStatus(),
+            "errorMessage" => $driverSlip->getErrorMessage(),
         ];
-        $this->update(
-            $set,
-            [
-                'jobTrackingID' => $driverSlip->getTrackingID(),
-            ]
-        );
+        $this->update($set, [
+            "jobTrackingID" => $driverSlip->getTrackingID(),
+        ]);
     }
 
     /**
@@ -96,19 +93,17 @@ class JobStatusModel extends PipelineModel {
      * @param TrackableJobAwareInterface $job
      * @param JobExecutionProgress $progress
      */
-    public function progressJob(TrackableJobAwareInterface $job, JobExecutionProgress $progress) {
+    public function progressJob(TrackableJobAwareInterface $job, JobExecutionProgress $progress)
+    {
         $set = [
-            'jobExecutionStatus' => $progress->getStatus(),
-            'progressTotalQuantity' => $progress->getQuantityTotal(),
-            'progressCompleteQuantity' => $progress->getQuantityComplete(),
-            'progressFailedQuantity' => $progress->getQuantityFailed(),
+            "jobExecutionStatus" => $progress->getStatus(),
+            "progressTotalQuantity" => $progress->getQuantityTotal(),
+            "progressCompleteQuantity" => $progress->getQuantityComplete(),
+            "progressFailedQuantity" => $progress->getQuantityFailed(),
         ];
-        $this->update(
-            $set,
-            [
-                'jobTrackingID' => $job->getTrackingID(),
-            ]
-        );
+        $this->update($set, [
+            "jobTrackingID" => $job->getTrackingID(),
+        ]);
     }
 
     /**
@@ -117,12 +112,13 @@ class JobStatusModel extends PipelineModel {
      * @param DriverSlipInterface $driverSlip The driver slip.
      * @param int $trackingUserID The user to track the job for.
      */
-    public function insertDriverSlip(DriverSlipInterface $driverSlip, int $trackingUserID) {
+    public function insertDriverSlip(DriverSlipInterface $driverSlip, int $trackingUserID)
+    {
         return $this->insert([
-            'jobTrackingID' => $driverSlip->getTrackingID(),
-            'trackingUserID' => $trackingUserID,
-            'jobExecutionStatus' => $driverSlip->getStatus()->getStatus(),
-            'jobType' => $driverSlip->getType(),
+            "jobTrackingID" => $driverSlip->getTrackingID(),
+            "trackingUserID" => $trackingUserID,
+            "jobExecutionStatus" => $driverSlip->getStatus()->getStatus(),
+            "jobType" => $driverSlip->getType(),
         ]);
     }
 
@@ -133,15 +129,14 @@ class JobStatusModel extends PipelineModel {
      * @param callable $stack
      * @return mixed
      */
-    public function handleUpdate(Operation $operation, callable $stack) {
+    public function handleUpdate(Operation $operation, callable $stack)
+    {
         $result = $stack($operation);
-        $items = $this
-            ->createSql()
+        $items = $this->createSql()
             ->select("trackingUserID")
             ->getWhere(self::TABLE_NAME)
-            ->resultArray()
-        ;
-        $userIDs = array_column($items, 'trackingUserID');
+            ->resultArray();
+        $userIDs = array_column($items, "trackingUserID");
         foreach ($userIDs as $userID) {
             $this->incrementUpdateCount($userID);
         }
@@ -155,17 +150,18 @@ class JobStatusModel extends PipelineModel {
      * @param array $where Extra parameters to filter.
      * @return int The count.
      */
-    public function getIncompleteCountForUser(int $trackingUserID, array $where = []): int {
-        $count = $this
-            ->createSql()
-            ->getCount(
-                self::TABLE_NAME,
-                array_merge([
-                    'trackingUserID' => $trackingUserID,
-                    'jobExecutionStatus' => JobExecutionStatus::incompleteStatuses(),
-                ], $where)
+    public function getIncompleteCountForUser(int $trackingUserID, array $where = []): int
+    {
+        $count = $this->createSql()->getCount(
+            self::TABLE_NAME,
+            array_merge(
+                [
+                    "trackingUserID" => $trackingUserID,
+                    "jobExecutionStatus" => JobExecutionStatus::incompleteStatuses(),
+                ],
+                $where
             )
-        ;
+        );
         return $count;
     }
 
@@ -174,13 +170,14 @@ class JobStatusModel extends PipelineModel {
      *
      * @param int $trackingUserID
      */
-    public function trackLastSeenTime(int $trackingUserID) {
-        $cacheKey = formatString(self::KEY_LAST_SEEN, ['userID' => $trackingUserID]);
+    public function trackLastSeenTime(int $trackingUserID)
+    {
+        $cacheKey = formatString(self::KEY_LAST_SEEN, ["userID" => $trackingUserID]);
         $this->cache->store($cacheKey, CurrentTimeStamp::get(), [
             \Gdn_Cache::FEATURE_EXPIRY => self::UPDATE_TIME_SECONDS,
         ]);
         // Also set our count to 0.
-        $changedCacheKey = formatString(self::KEY_COUNT_CHANGED, ['userID' => $trackingUserID]);
+        $changedCacheKey = formatString(self::KEY_COUNT_CHANGED, ["userID" => $trackingUserID]);
         $this->cache->store($changedCacheKey, 0, [
             \Gdn_Cache::FEATURE_EXPIRY => self::UPDATE_TIME_SECONDS,
         ]);
@@ -192,20 +189,19 @@ class JobStatusModel extends PipelineModel {
      * @param int $trackingUserID
      * @return \DateTimeInterface
      */
-    public function getLastSeenTime(int $trackingUserID): \DateTimeInterface {
-        $cacheKey = formatString(self::KEY_LAST_SEEN, ['userID' => $trackingUserID]);
+    public function getLastSeenTime(int $trackingUserID): \DateTimeInterface
+    {
+        $cacheKey = formatString(self::KEY_LAST_SEEN, ["userID" => $trackingUserID]);
         $cached = $this->cache->get($cacheKey);
         if ($cached !== \Gdn_Cache::CACHEOP_FAILURE) {
             // Coerce into datetime.
-            return new \DateTimeImmutable('@' . $cached);
+            return new \DateTimeImmutable("@" . $cached);
         }
 
         // Default last seen time.
-        return CurrentTimeStamp::getDateTime()
-            ->modify(
-                formatString("-{seconds} seconds", ['seconds' => self::UPDATE_TIME_SECONDS])
-            )
-        ;
+        return CurrentTimeStamp::getDateTime()->modify(
+            formatString("-{seconds} seconds", ["seconds" => self::UPDATE_TIME_SECONDS])
+        );
     }
 
     /**
@@ -216,11 +212,17 @@ class JobStatusModel extends PipelineModel {
      * @param array $where Filters to apply.
      * @return array
      */
-    public function selectUpdatedForUser(int $trackingUserID, \DateTimeInterface $since, array $where = []) {
-        $result = $this->select(array_merge([
-            'trackingUserID' => $trackingUserID,
-            'dateUpdated >' => $since,
-        ], $where));
+    public function selectUpdatedForUser(int $trackingUserID, \DateTimeInterface $since, array $where = [])
+    {
+        $result = $this->select(
+            array_merge(
+                [
+                    "trackingUserID" => $trackingUserID,
+                    "dateUpdated >" => $since,
+                ],
+                $where
+            )
+        );
         return $result;
     }
 
@@ -229,8 +231,9 @@ class JobStatusModel extends PipelineModel {
      *
      * @param int $userID
      */
-    public function incrementUpdateCount(int $userID) {
-        $cacheKey = formatString(self::KEY_COUNT_CHANGED, ['userID' => $userID]);
+    public function incrementUpdateCount(int $userID)
+    {
+        $cacheKey = formatString(self::KEY_COUNT_CHANGED, ["userID" => $userID]);
         $this->cache->incrementFrom($cacheKey, 1, 0);
     }
 
@@ -239,7 +242,8 @@ class JobStatusModel extends PipelineModel {
      *
      * @return bool
      */
-    public function pollingCacheIsActive(): bool {
+    public function pollingCacheIsActive(): bool
+    {
         return $this->cache::activeEnabled();
     }
 
@@ -252,20 +256,18 @@ class JobStatusModel extends PipelineModel {
      * @param \DateTimeInterface $since The time to check since.
      * @return int
      */
-    public function getCountUpdatedForUser(int $trackingUserID, \DateTimeInterface $since): int {
-        $cacheKey = formatString(self::KEY_COUNT_CHANGED, ['userID' => $trackingUserID]);
+    public function getCountUpdatedForUser(int $trackingUserID, \DateTimeInterface $since): int
+    {
+        $cacheKey = formatString(self::KEY_COUNT_CHANGED, ["userID" => $trackingUserID]);
         $cached = $this->cache->get($cacheKey);
         if ($cached !== \Gdn_Cache::CACHEOP_FAILURE) {
             return $cached;
         }
 
-        $count = $this
-            ->createSql()
-            ->getCount(self::TABLE_NAME, [
-                'trackingUserID' => $trackingUserID,
-                'dateUpdated >' => $since,
-            ])
-        ;
+        $count = $this->createSql()->getCount(self::TABLE_NAME, [
+            "trackingUserID" => $trackingUserID,
+            "dateUpdated >" => $since,
+        ]);
         $this->cache->store($cacheKey, $count, [
             \Gdn_Cache::FEATURE_EXPIRY => self::UPDATE_TIME_SECONDS,
         ]);

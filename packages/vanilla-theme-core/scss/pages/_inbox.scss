@@ -10,14 +10,12 @@
 
 .Section-ConversationList,
 .Section-Conversation {
-
     .H {
         margin-bottom: $global-block_margin;
     }
 
     .Conversation,
     .DataList.Conversations {
-
         .PhotoWrap {
             position: absolute;
             top: $component-vertical_padding;
@@ -41,14 +39,12 @@
 }
 
 .Section-ConversationList {
-
     @if $staticVariables {
         @include noPanel;
     }
 }
 
 .Section-Conversation {
-
     .SearchBox {
         display: none;
     }
@@ -70,4 +66,3 @@
         padding-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});
     }
 }
-

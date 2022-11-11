@@ -10,7 +10,8 @@ namespace VanillaTests\Fixtures;
 /**
  * An array object that just implements `ArrayAccess`.
  */
-class DumbArray implements \ArrayAccess {
+class DumbArray implements \ArrayAccess
+{
     /**
      * @var array
      */
@@ -21,28 +22,32 @@ class DumbArray implements \ArrayAccess {
      *
      * @param array $arr
      */
-    public function __construct(array $arr = []) {
+    public function __construct(array $arr = [])
+    {
         $this->arr = $arr;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return array_key_exists($offset, $this->arr);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return $this->arr[$offset];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         if ($offset === null) {
             $this->arr[] = $value;
         } else {
@@ -53,7 +58,8 @@ class DumbArray implements \ArrayAccess {
     /**
      * {@inheritDoc}
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         unset($this->arr[$offset]);
     }
 }

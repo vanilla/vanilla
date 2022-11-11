@@ -13,11 +13,14 @@
  * @param object $smarty
  * @return string
  */
-function smarty_function_category_link($params, &$smarty) {
-    $path = val('path', $params, '', true);
-    $text = val('text', $params, '', true);
-    $wrap = val('wrap', $params, 'li');
-    return Gdn_Theme::link('category',
-        val('text', $params, ''),
-        val('format', $params, wrap('<a href="%url" class="%class">%text</a>', $wrap)));
+function smarty_function_category_link($params, &$smarty)
+{
+    $path = val("path", $params, "", true);
+    $text = val("text", $params, "", true);
+    $wrap = val("wrap", $params, "li");
+    return Gdn_Theme::link(
+        "category",
+        val("text", $params, ""),
+        val("format", $params, wrap('<a href="%url" class="%class">%text</a>', $wrap))
+    );
 }

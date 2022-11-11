@@ -13,8 +13,8 @@ use PHPUnit\Framework\TestCase;
  * Tests for ipDecode() and ipEncode().
  */
 
-class IpEncodeDecodeNonRecursiveTest extends TestCase {
-
+class IpEncodeDecodeNonRecursiveTest extends TestCase
+{
     /**
      * Test {@link ipDecode()} against already valid IP address and a garbage string.
      *
@@ -22,7 +22,8 @@ class IpEncodeDecodeNonRecursiveTest extends TestCase {
      * @param string|null $expected The expected result.
      * @dataProvider provideTestIpDecodeArrays
      */
-    public function testIpDecode($nonPackedIP, $expected) {
+    public function testIpDecode($nonPackedIP, $expected)
+    {
         $actual = ipDecode($nonPackedIP);
         $this->assertSame($expected, $actual);
     }
@@ -33,7 +34,8 @@ class IpEncodeDecodeNonRecursiveTest extends TestCase {
      * @param string $ipAddress
      * @dataProvider provideIPAdresses
      */
-    public function testIpEncodeDecode(string $ipAddress): void {
+    public function testIpEncodeDecode(string $ipAddress): void
+    {
         $ipE = ipEncode($ipAddress);
         $ipD = ipDecode($ipE);
         $this->assertSame($ipAddress, $ipD);
@@ -44,20 +46,12 @@ class IpEncodeDecodeNonRecursiveTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideTestIpDecodeArrays() {
+    public function provideTestIpDecodeArrays()
+    {
         $r = [
-            'IPv4' => [
-                '92.120.48.49',
-                '92.120.48.49',
-            ],
-            'IPv6' => [
-                '5c78:6330:5c78:6138:5c78:3030:5c78:3031',
-                '5c78:6330:5c78:6138:5c78:3030:5c78:3031',
-            ],
-            'garbage' => [
-                'aiohadp089aw4tahija;slkjgpi9ia',
-                null,
-            ]
+            "IPv4" => ["92.120.48.49", "92.120.48.49"],
+            "IPv6" => ["5c78:6330:5c78:6138:5c78:3030:5c78:3031", "5c78:6330:5c78:6138:5c78:3030:5c78:3031"],
+            "garbage" => ["aiohadp089aw4tahija;slkjgpi9ia", null],
         ];
 
         return $r;
@@ -68,14 +62,11 @@ class IpEncodeDecodeNonRecursiveTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideIPAdresses() {
+    public function provideIPAdresses()
+    {
         $r = [
-            'ipV4' => [
-                '92.120.48.49',
-            ],
-            'ipV6' => [
-                '5c78:6330:5c78:6138:5c78:3030:5c78:3031',
-            ],
+            "ipV4" => ["92.120.48.49"],
+            "ipV6" => ["5c78:6330:5c78:6138:5c78:3030:5c78:3031"],
         ];
 
         return $r;

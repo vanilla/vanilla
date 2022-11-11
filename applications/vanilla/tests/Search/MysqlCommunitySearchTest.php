@@ -12,19 +12,21 @@ use Vanilla\Search\MysqlSearchDriver;
 /**
  * Community search tests for MySQL.
  */
-class MysqlCommunitySearchTest extends AbstractCommunitySearchTests {
-
+class MysqlCommunitySearchTest extends AbstractCommunitySearchTests
+{
     /**
      * @inheritdoc
      */
-    protected static function getSearchDriverClass(): string {
+    protected static function getSearchDriverClass(): string
+    {
         return MysqlSearchDriver::class;
     }
 
     /**
      * Not implemented.
      */
-    public function testSearchDiscussionTags() {
-        $this->markTestSkipped('MySQL driver does not support tag search.');
+    public function testSearchDiscussionTags()
+    {
+        $this->markTestSkipped("MySQL driver does not support tag search.");
     }
 }

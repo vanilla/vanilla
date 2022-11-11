@@ -18,8 +18,8 @@ use Gdn_Format;
 /**
  * Unit tests for Gdn_Format::links().
  */
-class GdnFormatLinksTest extends TestCase {
-
+class GdnFormatLinksTest extends TestCase
+{
     use AssertsFixtureRenderingTrait;
     use BootstrapTrait {
         setUpBeforeClass as bootstrapSetupBefore;
@@ -31,17 +31,18 @@ class GdnFormatLinksTest extends TestCase {
     /**
      * Initialize configuration.
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         self::bootstrapSetupBefore();
         self::$config = new MockConfig();
-        self::$container
-            ->setInstance(ConfigurationInterface::class, self::$config);
+        self::$container->setInstance(ConfigurationInterface::class, self::$config);
     }
 
     /**
      * Reset config before every test.
      */
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         parent::setUp();
         self::$config->reset();
     }
@@ -49,7 +50,8 @@ class GdnFormatLinksTest extends TestCase {
     /**
      * Restore various static Gdn_Format values.
      */
-    protected function tearDown(): void {
+    protected function tearDown(): void
+    {
         parent::tearDown();
         Gdn_Format::$FormatLinks = true;
         Gdn_Format::$DisplayNoFollow = true;
@@ -58,8 +60,9 @@ class GdnFormatLinksTest extends TestCase {
     /**
      * Testing a simple link conversion.
      */
-    public function testSimpleLink() {
-        $input = 'https://test.com';
+    public function testSimpleLink()
+    {
+        $input = "https://test.com";
         $expected = '<a href="' . htmlspecialchars($this->leavingUrl($input)) . '">https://test.com</a>';
         $output = Gdn_Format::links($input);
         $this->assertHtmlStringEqualsHtmlString($expected, $output);
@@ -68,10 +71,11 @@ class GdnFormatLinksTest extends TestCase {
     /**
      * Testing a link with Right-To-Left character override.
      */
-    public function testRightLeftOverrideLink() {
-        $input = 'https://‮test.com';
+    public function testRightLeftOverrideLink()
+    {
+        $input = "https://‮test.com";
         $href = url("/home/leaving?allowTrusted=1&target=" . urlencode("https://test.com"));
-        $expected = '<a href="' . htmlspecialchars($href). '">https://test.com</a>';
+        $expected = '<a href="' . htmlspecialchars($href) . '">https://test.com</a>';
         $output = Gdn_Format::links($input);
         $this->assertHtmlStringEqualsHtmlString($expected, $output);
     }
@@ -82,7 +86,8 @@ class GdnFormatLinksTest extends TestCase {
      *
      * @dataProvider providePunctuation
      */
-    public function testPunctuation(string $punc) {
+    public function testPunctuation(string $punc)
+    {
         $input = "https://test.com{$punc} Other text";
         $href = htmlspecialchars(url("/home/leaving?allowTrusted=1&target=" . urlencode("https://test.com")));
         $expected = <<<HTML
@@ -95,16 +100,9 @@ HTML;
     /**
      * @return array
      */
-    public function providePunctuation(): array {
-        return [
-            ['.'],
-            ['?'],
-            ['!'],
-            [','],
-            [':'],
-            [';'],
-            ['&nbsp;'],
-        ];
+    public function providePunctuation(): array
+    {
+        return [["."], ["?"], ["!"], [","], [":"], [";"], ["&nbsp;"]];
     }
 
     /**
@@ -114,7 +112,8 @@ HTML;
      * @param string $expected Expected output.
      * @dataProvider provideTestParenthesesData
      */
-    public function testParentheses($input, $expected) {
+    public function testParentheses($input, $expected)
+    {
         $actual = Gdn_Format::links($input);
         $this->assertSame($expected, $actual);
     }
@@ -122,19 +121,14 @@ HTML;
     /**
      * @return array Array of strings to test.
      */
-    public function provideTestParenthesesData(): array {
+    public function provideTestParenthesesData(): array
+    {
         $r = [
-            'parensBeforeSlashes' => [
-                'h(tt)p://www.foo.bar',
-                'h(tt)p://www.foo.bar',
-            ],
-            'parensBetweenSlashes' => [
-               'http:/(/www.foo.bar',
-               'http:/(/www.foo.bar',
-            ],
-            'parensAfterSlashes' => [
-                'http://www.(foo).bar',
-                '<a href="/gdnformatlinkstest/home/leaving?allowTrusted=1&amp;target=http%3A%2F%2Fwww.%28foo%29.bar">http://www.(foo).bar</a>'
+            "parensBeforeSlashes" => ["h(tt)p://www.foo.bar", "h(tt)p://www.foo.bar"],
+            "parensBetweenSlashes" => ["http:/(/www.foo.bar", "http:/(/www.foo.bar"],
+            "parensAfterSlashes" => [
+                "http://www.(foo).bar",
+                '<a href="/gdnformatlinkstest/home/leaving?allowTrusted=1&amp;target=http%3A%2F%2Fwww.%28foo%29.bar">http://www.(foo).bar</a>',
             ],
         ];
 
@@ -148,7 +142,8 @@ HTML;
      * @param string $expected Expected output.
      * @dataProvider provideTestBracesData
      */
-    public function testBraces($input, $expected) {
+    public function testBraces($input, $expected)
+    {
         $actual = Gdn_Format::links($input);
         $this->assertSame($expected, $actual);
     }
@@ -156,42 +151,37 @@ HTML;
     /**
      * @return array Array of strings to test.
      */
-    public function provideTestBracesData(): array {
+    public function provideTestBracesData(): array
+    {
         $r = [
-            'bracesBeforeSlashes' => [
-                'h{tt}p://www.foo.bar',
-                'h{tt}p://www.foo.bar',
+            "bracesBeforeSlashes" => ["h{tt}p://www.foo.bar", "h{tt}p://www.foo.bar"],
+            "bracesBetweenSlashes" => ["http:/{/www.foo.bar", "http:/{/www.foo.bar"],
+            "bracesAfterSlashes" => [
+                "http://www.foo.com/{bar}",
+                '<a href="/gdnformatlinkstest/home/leaving?allowTrusted=1&amp;target=http%3A%2F%2Fwww.foo.com%2F%7Bbar%7D">http://www.foo.com/{bar}</a>',
             ],
-            'bracesBetweenSlashes' => [
-                'http:/{/www.foo.bar',
-                'http:/{/www.foo.bar',
-            ],
-            'bracesAfterSlashes' => [
-                'http://www.foo.com/{bar}',
-                '<a href="/gdnformatlinkstest/home/leaving?allowTrusted=1&amp;target=http%3A%2F%2Fwww.foo.com%2F%7Bbar%7D">http://www.foo.com/{bar}</a>'
-            ],
-            'realWorldAgain' => [
-                  'https://example.com/en_gb/#mode=routes+viewport=60.60109,26.71257,2,0,-0+routes={%22departu'.
-                  're%22:true,%22traffic%22:true,%22routeType%22:%22FASTEST%22,%22travelMode%22:%22CAR%22,%22date%22:%22'.
-                  '1593608700000%22,%22points%22:%5B%22hw~60.16981,24.93813~A~Helsinki%20Uusimaa,%20FIN%22,%22hw~60.59796,'.
-                  '27.79943~A~Virolahti%20(Vaalimaa)%20Kymenlaakso,%20FIN%22,%22hw~60.59615,27.91827~A~Seleznevskoye%20(To'.
-                  'rfyanovka)%20Northwestern%20Federal%20District,%20RUS%22,%22hw~59.93848,30.31248~A~Saint%20Petersburg%20'.
-                  'Northwestern%20Federal%20District,%20RUS%22%5D,%22avoidCriteria%22:%5B%5D%7D+ver=3',
-                  '<a href="/gdnformatlinkstest/home/leaving?allowTrusted=1&amp;target=https%3A%2F%2Fexample.com%2Fen_' .
-                  'gb%2F%23mode%3Droutes%2Bviewport%3D60.60109%2C26.71257%2C2%2C0%2C-0%2Broutes%3D%7B%2522departure%2522' .
-                  '%3Atrue%2C%2522traffic%2522%3Atrue%2C%2522routeType%2522%3A%2522FASTEST%2522%2C%2522travelMode%2522%3' .
-                  'A%2522CAR%2522%2C%2522date%2522%3A%25221593608700000%2522%2C%2522points%2522%3A%255B%2522hw%7E60.1698' .
-                  '1%2C24.93813%7EA%7EHelsinki%2520Uusimaa%2C%2520FIN%2522%2C%2522hw%7E60.59796%2C27.79943%7EA%7EVirolah' .
-                  'ti%2520%28Vaalimaa%29%2520Kymenlaakso%2C%2520FIN%2522%2C%2522hw%7E60.59615%2C27.91827%7EA%7ESeleznevs' .
-                  'koye%2520%28Torfyanovka%29%2520Northwestern%2520Federal%2520District%2C%2520RUS%2522%2C%2522hw%7E59.9' .
-                  '3848%2C30.31248%7EA%7ESaint%2520Petersburg%2520Northwestern%2520Federal%2520District%2C%2520RUS%2522%' .
-                  '255D%2C%2522avoidCriteria%2522%3A%255B%255D%257D%2Bver%3D3">https://example.com/en_gb/#' .
-                  'mode=routes+viewport=60.60109,26.71257,2,0,-0+routes={&quot;departure&quot;:true,&quot;traffic&quot;:' .
-                  'true,&quot;routeType&quot;:&quot;FASTEST&quot;,&quot;travelMode&quot;:&quot;CAR&quot;,&quot;date&quot' .
-                  ';:&quot;1593608700000&quot;,&quot;points&quot;:[&quot;hw~60.16981,24.93813~A~Helsinki Uusimaa, FIN&qu' .
-                  'ot;,&quot;hw~60.59796,27.79943~A~Virolahti (Vaalimaa) Kymenlaakso, FIN&quot;,&quot;hw~60.59615,27.918' .
-                  '27~A~Seleznevskoye (Torfyanovka) Northwestern Federal District, RUS&quot;,&quot;hw~59.93848,30.31248~' .
-                  'A~Saint Petersburg Northwestern Federal District, RUS&quot;],&quot;avoidCriteria&quot;:[]}+ver=3</a>'
+            "realWorldAgain" => [
+                "https://example.com/en_gb/#mode=routes+viewport=60.60109,26.71257,2,0,-0+routes={%22departu" .
+                "re%22:true,%22traffic%22:true,%22routeType%22:%22FASTEST%22,%22travelMode%22:%22CAR%22,%22date%22:%22" .
+                "1593608700000%22,%22points%22:%5B%22hw~60.16981,24.93813~A~Helsinki%20Uusimaa,%20FIN%22,%22hw~60.59796," .
+                "27.79943~A~Virolahti%20(Vaalimaa)%20Kymenlaakso,%20FIN%22,%22hw~60.59615,27.91827~A~Seleznevskoye%20(To" .
+                "rfyanovka)%20Northwestern%20Federal%20District,%20RUS%22,%22hw~59.93848,30.31248~A~Saint%20Petersburg%20" .
+                "Northwestern%20Federal%20District,%20RUS%22%5D,%22avoidCriteria%22:%5B%5D%7D+ver=3",
+                '<a href="/gdnformatlinkstest/home/leaving?allowTrusted=1&amp;target=https%3A%2F%2Fexample.com%2Fen_' .
+                "gb%2F%23mode%3Droutes%2Bviewport%3D60.60109%2C26.71257%2C2%2C0%2C-0%2Broutes%3D%7B%2522departure%2522" .
+                "%3Atrue%2C%2522traffic%2522%3Atrue%2C%2522routeType%2522%3A%2522FASTEST%2522%2C%2522travelMode%2522%3" .
+                "A%2522CAR%2522%2C%2522date%2522%3A%25221593608700000%2522%2C%2522points%2522%3A%255B%2522hw%7E60.1698" .
+                "1%2C24.93813%7EA%7EHelsinki%2520Uusimaa%2C%2520FIN%2522%2C%2522hw%7E60.59796%2C27.79943%7EA%7EVirolah" .
+                "ti%2520%28Vaalimaa%29%2520Kymenlaakso%2C%2520FIN%2522%2C%2522hw%7E60.59615%2C27.91827%7EA%7ESeleznevs" .
+                "koye%2520%28Torfyanovka%29%2520Northwestern%2520Federal%2520District%2C%2520RUS%2522%2C%2522hw%7E59.9" .
+                "3848%2C30.31248%7EA%7ESaint%2520Petersburg%2520Northwestern%2520Federal%2520District%2C%2520RUS%2522%" .
+                '255D%2C%2522avoidCriteria%2522%3A%255B%255D%257D%2Bver%3D3">https://example.com/en_gb/#' .
+                "mode=routes+viewport=60.60109,26.71257,2,0,-0+routes={&quot;departure&quot;:true,&quot;traffic&quot;:" .
+                "true,&quot;routeType&quot;:&quot;FASTEST&quot;,&quot;travelMode&quot;:&quot;CAR&quot;,&quot;date&quot" .
+                ";:&quot;1593608700000&quot;,&quot;points&quot;:[&quot;hw~60.16981,24.93813~A~Helsinki Uusimaa, FIN&qu" .
+                "ot;,&quot;hw~60.59796,27.79943~A~Virolahti (Vaalimaa) Kymenlaakso, FIN&quot;,&quot;hw~60.59615,27.918" .
+                "27~A~Seleznevskoye (Torfyanovka) Northwestern Federal District, RUS&quot;,&quot;hw~59.93848,30.31248~" .
+                "A~Saint Petersburg Northwestern Federal District, RUS&quot;],&quot;avoidCriteria&quot;:[]}+ver=3</a>",
             ],
         ];
 
@@ -206,8 +196,9 @@ HTML;
      *
      * @dataProvider warnLeavingProvider
      */
-    public function testWarnLeaving(string $url, string $target) {
-        $body = htmlspecialchars(rawurldecode($url), ENT_QUOTES, 'UTF-8');
+    public function testWarnLeaving(string $url, string $target)
+    {
+        $body = htmlspecialchars(rawurldecode($url), ENT_QUOTES, "UTF-8");
         $exectedHref = htmlspecialchars($target);
         $expected = <<<HTML
 <a href="$exectedHref">$body</a>
@@ -228,8 +219,9 @@ HTML;
      *
      * @dataProvider warnLeavingProvider
      */
-    public function testAlreadyFormattedWarnLeaving(string $url, string $target) {
-        self::$config->loadData(['Garden.Format.WarnLeaving' => true]);
+    public function testAlreadyFormattedWarnLeaving(string $url, string $target)
+    {
+        self::$config->loadData(["Garden.Format.WarnLeaving" => true]);
         $input = <<<HTML
 <a href="$target">CustomSetBody</a>
 HTML;
@@ -246,16 +238,17 @@ HTML;
      *
      * The following flags are set so that the static values are restored properly.
      */
-    public function testLinkFormattingDisabled() {
-        self::$config->loadData(['Garden.Format.Links' => false]);
-        $inputOutput = 'https://test.com';
+    public function testLinkFormattingDisabled()
+    {
+        self::$config->loadData(["Garden.Format.Links" => false]);
+        $inputOutput = "https://test.com";
         $output = Gdn_Format::links($inputOutput);
         $this->assertSame($inputOutput, $output);
 
         // The other mode of warn leaving is done by settings a static value.
         Gdn_Format::$FormatLinks = false;
-        self::$config->loadData(['Garden.Format.Links' => true]);
-        $inputOutput = 'https://test.com';
+        self::$config->loadData(["Garden.Format.Links" => true]);
+        $inputOutput = "https://test.com";
         $output = Gdn_Format::links($inputOutput);
         $this->assertSame($inputOutput, $output);
     }
@@ -263,17 +256,15 @@ HTML;
     /**
      * @return array
      */
-    public function warnLeavingProvider(): array {
+    public function warnLeavingProvider(): array
+    {
         return [
-            [
-                'https://test.com',
-                "/gdnformatlinkstest/home/leaving?allowTrusted=1&target=https%3A%2F%2Ftest.com"
-            ],
+            ["https://test.com", "/gdnformatlinkstest/home/leaving?allowTrusted=1&target=https%3A%2F%2Ftest.com"],
             // Try some encoded values.
             [
-                'https://test.com/path?query=%5B%27one%27%2C%20%27two%27%2C%20%27three%27%5D',
-                '/gdnformatlinkstest/home/leaving?' .
-                'allowTrusted=1&target=https%3A%2F%2Ftest.com%2Fpath%3Fquery%3D%255B%2527one%2527%252C%2520%2527two%2527%252C%2520%2527three%2527%255D',
+                "https://test.com/path?query=%5B%27one%27%2C%20%27two%27%2C%20%27three%27%5D",
+                "/gdnformatlinkstest/home/leaving?" .
+                "allowTrusted=1&target=https%3A%2F%2Ftest.com%2Fpath%3Fquery%3D%255B%2527one%2527%252C%2520%2527two%2527%252C%2520%2527three%2527%255D",
             ],
         ];
     }
@@ -281,7 +272,8 @@ HTML;
     /**
      * Test link structures that are nested inside of other HTML.
      */
-    public function testNestedLinks() {
+    public function testNestedLinks()
+    {
         $input = <<<HTML
 <div><div>https://test.com</div></div>
 <a href="/test.com">https://othertest.com</a>
@@ -304,7 +296,8 @@ HTML;
      * @param string $url
      * @return string
      */
-    private function leavingUrl(string $url): string {
+    private function leavingUrl(string $url): string
+    {
         return url("/home/leaving?allowTrusted=1&target=" . urlencode($url));
     }
 
@@ -315,7 +308,8 @@ HTML;
      * fails because of another fix, the established behavior may be the issue. Gdn_Format::links and its usages are
      * in dire need of an overhaul.
      */
-    public function testLinksLeavingAnchors(): void {
+    public function testLinksLeavingAnchors(): void
+    {
         $content = /** @lang HTML */ <<<'HTML'
 <a href="https://example.com">
     <img src="https://example.com/image.bmp" alt="I am an image.">

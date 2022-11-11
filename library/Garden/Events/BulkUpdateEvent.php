@@ -10,8 +10,8 @@ namespace Garden\Events;
 /**
  * An event indicating bulk update of some resource.
  */
-class BulkUpdateEvent implements \JsonSerializable {
-
+class BulkUpdateEvent implements \JsonSerializable
+{
     /**
      * @var string The record type being updated.
      */
@@ -34,7 +34,8 @@ class BulkUpdateEvent implements \JsonSerializable {
      * @param array $where
      * @param array $fieldUpdates
      */
-    public function __construct(string $recordType, array $where, array $fieldUpdates) {
+    public function __construct(string $recordType, array $where, array $fieldUpdates)
+    {
         $this->recordType = $recordType;
         $this->where = $where;
         $this->fieldUpdates = $fieldUpdates;
@@ -43,39 +44,44 @@ class BulkUpdateEvent implements \JsonSerializable {
     /**
      * @return string
      */
-    public function getRecordType(): string {
+    public function getRecordType(): string
+    {
         return $this->recordType;
     }
 
     /**
      * @return array
      */
-    public function getWhere(): array {
+    public function getWhere(): array
+    {
         return $this->where;
     }
 
     /**
      * @return array
      */
-    public function getFieldUpdates(): array {
+    public function getFieldUpdates(): array
+    {
         return $this->fieldUpdates;
     }
 
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return [
-            'type' => $this->getRecordType(),
-            'where' => $this->getWhere(),
-            'fieldUpdates' => $this->getFieldUpdates(),
+            "type" => $this->getRecordType(),
+            "where" => $this->getWhere(),
+            "fieldUpdates" => $this->getFieldUpdates(),
         ];
     }
 
     /**
      * Convert to string.
      */
-    public function __toString() {
+    public function __toString()
+    {
         return json_encode($this, JSON_PRETTY_PRINT);
     }
 }

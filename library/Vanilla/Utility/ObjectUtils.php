@@ -10,7 +10,8 @@ namespace Vanilla\Utility;
 /**
  * Static methods usefull for operating on objects.
  */
-final class ObjectUtils {
+final class ObjectUtils
+{
     /**
      * Hydrate an object from an array.
      *
@@ -23,7 +24,8 @@ final class ObjectUtils {
      * @param array $data The data to hydrate with.
      * @return object Returns the same class or a new one in the case of with methods.
      */
-    public static function hydrate(object $object, array $data): object {
+    public static function hydrate(object $object, array $data): object
+    {
         $errors = [];
 
         foreach ($data as $key => $value) {
@@ -36,13 +38,13 @@ final class ObjectUtils {
                     $errors[] = $key;
                 }
             } catch (\Error $ex) {
-                    // Private access error, change to an exception.
-                    $errors[] = $key;
+                // Private access error, change to an exception.
+                $errors[] = $key;
             }
         }
 
         if (!empty($errors)) {
-            $msg = "Could not set properties: ".implode(', ', $errors);
+            $msg = "Could not set properties: " . implode(", ", $errors);
             throw new \InvalidArgumentException($msg, 400);
         }
 
@@ -58,7 +60,8 @@ final class ObjectUtils {
      * @param array $data The data to hydrate with.
      * @return object Returns a new object, hydrated with data.
      */
-    public static function with(object $object, array $data): object {
+    public static function with(object $object, array $data): object
+    {
         $clone = clone $object;
         return self::hydrate($clone, $data);
     }

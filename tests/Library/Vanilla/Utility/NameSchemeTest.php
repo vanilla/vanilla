@@ -14,7 +14,8 @@ use Vanilla\Utility\DelimitedScheme;
 /**
  * Tests for Vanilla\Utility\NameScheme classes.
  */
-class NameSchemeTest extends SharedBootstrapTestCase {
+class NameSchemeTest extends SharedBootstrapTestCase
+{
     /**
      * Test some camel case scheme cases.
      *
@@ -22,7 +23,8 @@ class NameSchemeTest extends SharedBootstrapTestCase {
      * @param string $expected The expected result.
      * @dataProvider provideCamelCaseNames
      */
-    public function testCamelCaseScheme($name, $expected) {
+    public function testCamelCaseScheme($name, $expected)
+    {
         $names = new CamelCaseScheme();
         $actual = $names->convert($name);
 
@@ -32,12 +34,13 @@ class NameSchemeTest extends SharedBootstrapTestCase {
     /**
      * Test a basic delimited scheme.
      */
-    public function testDelimitedName() {
-        $names = new DelimitedScheme('.', new CamelCaseScheme());
-        $name = 'Foo.Bar.BazBam';
+    public function testDelimitedName()
+    {
+        $names = new DelimitedScheme(".", new CamelCaseScheme());
+        $name = "Foo.Bar.BazBam";
 
         $converted = $names->convert($name);
-        $this->assertEquals('foo.bar.bazBam', $converted);
+        $this->assertEquals("foo.bar.bazBam", $converted);
     }
 
     /**
@@ -45,12 +48,9 @@ class NameSchemeTest extends SharedBootstrapTestCase {
      *
      * @return array Returns a data provider array.
      */
-    public function provideCamelCaseNames() {
-        $r = [
-            ['RoleId', 'roleID'],
-            ['role_id', 'roleID'],
-            ['RoleIds', 'roleIDs'],
-        ];
+    public function provideCamelCaseNames()
+    {
+        $r = [["RoleId", "roleID"], ["role_id", "roleID"], ["RoleIds", "roleIDs"]];
 
         return array_column($r, null, 1);
     }

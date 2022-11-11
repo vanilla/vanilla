@@ -291,7 +291,7 @@ export function removeItemFromTree<D>(
     position: ITreeSourcePosition,
     removeChildren: boolean = false,
 ): { tree: ITreeData<D>; itemRemoved: ItemID | null } {
-    // Remove the item from it's parents.
+    // Remove the item from its parents.
 
     // const newTree = produce(tree, (treeDraft) => {
     const sourceParent = tree.items[position.parentId];

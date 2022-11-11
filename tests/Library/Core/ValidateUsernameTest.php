@@ -13,10 +13,9 @@ use VanillaTests\SharedBootstrapTestCase;
 /**
  * Tests for `validateUsername()` and `validateUsernameRegex()`.
  */
-class ValidateUsernameTest extends SharedBootstrapTestCase {
-    protected const CONFIG_KEYS = [
-        'Garden.User'
-    ];
+class ValidateUsernameTest extends SharedBootstrapTestCase
+{
+    protected const CONFIG_KEYS = ["Garden.User"];
 
     /**
      * @var \Gdn_Configuration
@@ -31,7 +30,8 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
     /**
      * Back up the config before each test.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         /* @var \Gdn_Configuration $config */
@@ -47,7 +47,8 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
     /**
      * Restore the config after each test.
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         parent::tearDown();
 
         foreach ($this->configBak as $key => $value) {
@@ -63,9 +64,10 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
      * @param bool $expected The expected result of `validateUsername()`.
      * @dataProvider providePartialRegexTests
      */
-    public function testValidationRegex(string $pattern, string $username, bool $expected): void {
-        $this->config->set('Garden.User.ValidationRegex', $pattern, true, false);
-        $this->config->set('Garden.User.ValidationLength', '{3,20}', true, false);
+    public function testValidationRegex(string $pattern, string $username, bool $expected): void
+    {
+        $this->config->set("Garden.User.ValidationRegex", $pattern, true, false);
+        $this->config->set("Garden.User.ValidationLength", "{3,20}", true, false);
 
         $actual = validateUsername($username);
         $this->assertSame($expected, $actual);
@@ -79,8 +81,9 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
      * @param bool $expected
      * @dataProvider provideValidationRegexPatternTests
      */
-    public function testValidationRegexPattern(string $pattern, string $username, bool $expected): void {
-        $this->config->set('Garden.User.ValidationRegexPattern', $pattern, true, false);
+    public function testValidationRegexPattern(string $pattern, string $username, bool $expected): void
+    {
+        $this->config->set("Garden.User.ValidationRegexPattern", $pattern, true, false);
 
         $actual = validateUsername($username);
         $this->assertSame($expected, $actual);
@@ -94,8 +97,9 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
      * @param bool $expected
      * @dataProvider providePartialLengthTests
      */
-    public function testValidationLength(string $length, string $username, bool $expected) {
-        $this->config->set('Garden.User.ValidationLength', $length, true, false);
+    public function testValidationLength(string $length, string $username, bool $expected)
+    {
+        $this->config->set("Garden.User.ValidationLength", $length, true, false);
 
         $actual = validateUsername($username);
         $this->assertSame($expected, $actual);
@@ -106,15 +110,16 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
      *
      * @return array
      */
-    public function providePartialRegexTests(): array {
+    public function providePartialRegexTests(): array
+    {
         $r = [
-            'valid' => ['^0-9', 'todd', true],
-            'valid unescaped backtick' => ['^`', 'patches', true],
-            'valid escaped backtick' => ['^\\`', 'patches', true],
-            'invalid' => ['^0-9', 'todd0', false],
-            'invalid slash' => ['^/', 'to/dd', false],
-            'invalid unescaped backtick' => ['^`+', 'p`tches', false],
-            'invalid escaped backtick' => ['^\\`+', 'p`tches', false],
+            "valid" => ["^0-9", "todd", true],
+            "valid unescaped backtick" => ["^`", "patches", true],
+            "valid escaped backtick" => ["^\\`", "patches", true],
+            "invalid" => ["^0-9", "todd0", false],
+            "invalid slash" => ["^/", "to/dd", false],
+            "invalid unescaped backtick" => ["^`+", "p`tches", false],
+            "invalid escaped backtick" => ["^\\`+", "p`tches", false],
         ];
 
         return $r;
@@ -125,10 +130,11 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
      *
      * @return array
      */
-    public function provideValidationRegexPatternTests(): array {
+    public function provideValidationRegexPatternTests(): array
+    {
         $r = [
-            'valid' => ['`[tod]+`', 'todd', true],
-            'invalid' => ['`(\w+){3,30}`', 'sh', false],
+            "valid" => ["`[tod]+`", "todd", true],
+            "invalid" => ["`(\w+){3,30}`", "sh", false],
         ];
 
         return $r;
@@ -139,10 +145,11 @@ class ValidateUsernameTest extends SharedBootstrapTestCase {
      *
      * @return array
      */
-    public function providePartialLengthTests(): array {
+    public function providePartialLengthTests(): array
+    {
         $r = [
-            'valid' => ['{2,4}', 'todd', true],
-            'invalid' => ['{3}', 'todd', false],
+            "valid" => ["{2,4}", "todd", true],
+            "invalid" => ["{3}", "todd", false],
         ];
 
         return $r;

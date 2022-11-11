@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import IndependentSearch from "@library/features/search/IndependentSearch";
 import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -14,7 +14,7 @@ import Heading from "@library/layout/Heading";
 import { useBannerContainerDivRef, useBannerContext } from "@library/banner/BannerContext";
 import { bannerVariables, IBannerOptions } from "@library/banner/Banner.variables";
 import { bannerClasses } from "@library/banner/Banner.styles";
-import { assetUrl, t } from "@library/utility/appUtils";
+import { assetUrl, createSourceSetValue, ImageSourceSet, t } from "@library/utility/appUtils";
 import classNames from "classnames";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
@@ -28,6 +28,9 @@ import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { styleUnit } from "@library/styles/styleUnit";
 import { ISearchScopeNoCompact } from "@library/features/search/SearchScopeContext";
 import SmartLink from "@library/routing/links/SmartLink";
+import { Widget } from "@library/layout/Widget";
+import { twoColumnVariables } from "@library/layout/types/layout.twoColumns";
+import { IThemeVariables } from "@library/theming/themeReducer";
 
 export interface IBannerProps {
     action?: React.ReactNode;
@@ -35,9 +38,11 @@ export interface IBannerProps {
     description?: string;
     className?: string;
     backgroundImage?: string;
+    backgroundUrlSrcSet?: ImageSourceSet;
     contentImage?: string;
     logoImage?: string;
     iconImage?: string;
+    iconUrlSrcSet?: ImageSourceSet;
     searchBarNoTopMargin?: boolean;
     forceSearchOpen?: boolean;
     isContentBanner?: boolean;
@@ -46,20 +51,27 @@ export interface IBannerProps {
     hideSearch?: boolean;
     hideIcon?: boolean;
     options?: Partial<IBannerOptions>;
+    forcedVars?: IThemeVariables; // for test purposes
 }
 
 /**
  * A component representing a single crumb in a breadcrumb component.
  */
 export default function Banner(props: IBannerProps) {
-    const { isCompact, mediaQueries } = useSection();
+    const { isCompact } = useSection();
     const bannerContextRef = useBannerContainerDivRef();
     const { setOverlayTitleBar } = useBannerContext();
     const { action, className, isContentBanner } = props;
     const varsTitleBar = titleBarVariables();
     const classesTitleBar = titleBarClasses();
-    const classes = isContentBanner ? contentBannerClasses() : bannerClasses();
-    const vars = isContentBanner ? contentBannerVariables(props.options) : bannerVariables(props.options);
+    if (!props.backgroundImage && props.options) {
+        // Don't use an overlay if we don't have an image.
+        props.options.useOverlay = false;
+    }
+    const classes = isContentBanner ? contentBannerClasses(props.options) : bannerClasses(undefined, props.options);
+    const vars = isContentBanner
+        ? contentBannerVariables(props.options)
+        : bannerVariables(props.options, props.forcedVars);
     const { options } = vars;
     const device = useDevice();
 
@@ -69,6 +81,58 @@ export default function Banner(props: IBannerProps) {
     useEffect(() => {
         setOverlayTitleBar(options.overlayTitleBar);
     }, [options.overlayTitleBar]);
+
+    //src-sets for icon and background image
+    const iconUrlSrcSet = useMemo(() => {
+        return props.iconUrlSrcSet ? { srcSet: createSourceSetValue(props.iconUrlSrcSet) } : {};
+    }, [props.iconUrlSrcSet]);
+    const backgroundUrlSrcSet = useMemo(() => {
+        return props.backgroundUrlSrcSet ? { srcSet: createSourceSetValue(props.backgroundUrlSrcSet) } : {};
+    }, [props.backgroundUrlSrcSet]);
+
+    // We can have different sources for our background image
+    // 1. Received in props - means we uploaded it, should already come with source sets this will override whatever was before
+    // 2. Configured through variables - this can have different images for tablet/mobile
+    // 3. Default - If no background image from above 2, we'll just use our default
+    const backgroundImage = useMemo(() => {
+        const isDefaultBanner =
+            !props.backgroundImage && !vars.outerBackground.image && !vars.outerBackground.unsetBackground;
+
+        if (!isDefaultBanner) {
+            const imgProps = {
+                src: props.backgroundImage || vars.outerBackground.image,
+                ...backgroundUrlSrcSet,
+            };
+            return (
+                <picture>
+                    {vars.outerBackground.breakpoints.mobile.image && (
+                        <source
+                            srcSet={vars.outerBackground.breakpoints.mobile.image}
+                            media={`(max-width: ${twoColumnVariables().breakPoints.xs}px)`}
+                        />
+                    )}
+                    {vars.outerBackground.breakpoints.tablet.image && (
+                        <source
+                            srcSet={vars.outerBackground.breakpoints.tablet.image}
+                            media={`(max-width: ${twoColumnVariables().breakPoints.oneColumn}px)`}
+                        />
+                    )}
+                    <img className={classes.backgroundImage} {...imgProps} role="presentation" />
+                </picture>
+            );
+        }
+
+        return <DefaultBannerBg bgColor={vars.outerBackground.color} isContentBanner={isContentBanner} />;
+    }, [
+        props.backgroundImage,
+        vars.outerBackground.image,
+        vars.outerBackground.unsetBackground,
+        vars.outerBackground.breakpoints.tablet.image,
+        vars.outerBackground.breakpoints.mobile.image,
+        backgroundUrlSrcSet,
+        vars.outerBackground.color,
+        isContentBanner,
+    ]);
 
     if (!options.enabled) {
         return null;
@@ -136,7 +200,8 @@ export default function Banner(props: IBannerProps) {
     );
 
     return (
-        <div
+        <Widget
+            customContainer
             ref={bannerContextRef}
             className={classNames(className, classes.root, {
                 [classesTitleBar.negativeSpacer]: varsTitleBar.fullBleed.enabled && options.overlayTitleBar,
@@ -156,13 +221,7 @@ export default function Banner(props: IBannerProps) {
                             [classesTitleBar.bannerPadding]: varsTitleBar.fullBleed.enabled,
                         })}
                     >
-                        <div className={classNames(classes.outerBackground(props.backgroundImage || undefined))}>
-                            {!props.backgroundImage &&
-                                !vars.outerBackground.image &&
-                                !vars.outerBackground.unsetBackground && (
-                                    <DefaultBannerBg isContentBanner={isContentBanner} />
-                                )}
-                        </div>
+                        <div className={classNames(classes.outerBackground())}>{backgroundImage}</div>
                         {vars.backgrounds.useOverlay && <div className={classes.backgroundOverlay} />}
                         <Container className={classes.fullHeight}>
                             <div className={classes.imagePositioner}>
@@ -233,7 +292,12 @@ export default function Banner(props: IBannerProps) {
                                 <div className={classes.iconTextAndSearchContainer}>
                                     {isContentBanner && iconImageSrc && (
                                         <div className={classes.iconContainer}>
-                                            <img className={classes.icon} src={iconImageSrc} aria-hidden={true} />
+                                            <img
+                                                className={classes.icon}
+                                                src={iconImageSrc}
+                                                aria-hidden={true}
+                                                {...iconUrlSrcSet}
+                                            />
                                         </div>
                                     )}
                                     {Banner.extraBeforeSearchBarComponents.map((ComponentName, index) => {
@@ -293,7 +357,7 @@ export default function Banner(props: IBannerProps) {
                     })}
                 </>
             )}
-        </div>
+        </Widget>
     );
 }
 

@@ -11,15 +11,16 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Utility functions for working with file data.
  */
-class FileUtils {
-
+class FileUtils
+{
     /**
      * Check if a file was uploaded in the current request.
      *
      * @param string $filename
      * @return bool
      */
-    public function isUploadedFile($filename) {
+    public function isUploadedFile($filename)
+    {
         $result = is_uploaded_file($filename);
         return $result;
     }
@@ -31,7 +32,8 @@ class FileUtils {
      * @param string $destination
      * @return bool
      */
-    public function moveUploadedFile($filename, $destination) {
+    public function moveUploadedFile($filename, $destination)
+    {
         $result = move_uploaded_file($filename, $destination);
         return $result;
     }
@@ -48,16 +50,16 @@ class FileUtils {
     public static function generateUniqueUploadPath(
         string $extension,
         bool $chunk = true,
-        string $name = '',
+        string $name = "",
         string $targetDirectory = PATH_UPLOADS
     ) {
         do {
-            $subdir = '';
+            $subdir = "";
             if (!$name) {
                 $name = randomString(12);
             }
             if ($chunk) {
-                $subdir = randomString(12).'/';
+                $subdir = randomString(12) . "/";
             }
             $path = "${targetDirectory}/{$subdir}${name}.${extension}";
         } while (file_exists($path));
@@ -69,14 +71,15 @@ class FileUtils {
      *
      * @param string $root
      */
-    public static function deleteRecursively(string $root) {
+    public static function deleteRecursively(string $root)
+    {
         $files = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($root, \RecursiveDirectoryIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
         );
 
         foreach ($files as $fileinfo) {
-            $deleteFunction = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+            $deleteFunction = $fileinfo->isDir() ? "rmdir" : "unlink";
             $deleteFunction($fileinfo->getRealPath());
         }
 
@@ -94,12 +97,13 @@ class FileUtils {
      * @category Filesystem Functions
      * @see http://php.net/file_put_contents
      */
-    public static function putContents($filename, $data, $mode = 0644) {
-        $temp = tempnam(dirname($filename), 'atomic');
+    public static function putContents($filename, $data, $mode = 0644)
+    {
+        $temp = @tempnam(dirname($filename), "atomic");
 
-        if (!($fp = @fopen($temp, 'wb'))) {
-            $temp = dirname($filename).DIRECTORY_SEPARATOR.uniqid('atomic');
-            if (!($fp = @fopen($temp, 'wb'))) {
+        if (!($fp = @fopen($temp, "wb"))) {
+            $temp = dirname($filename) . DIRECTORY_SEPARATOR . uniqid("atomic");
+            if (!($fp = @fopen($temp, "wb"))) {
                 trigger_error(
                     __CLASS__ . "::" . __FUNCTION__ . "(): error writing temporary file '$temp'",
                     E_USER_WARNING
@@ -115,17 +119,14 @@ class FileUtils {
             $r = @unlink($filename);
             $r &= @rename($temp, $filename);
             if (!$r) {
-                trigger_error(
-                    __CLASS__ . "::" . __FUNCTION__ . "(): : error writing file '$filename'",
-                    E_USER_WARNING
-                );
+                trigger_error(__CLASS__ . "::" . __FUNCTION__ . "(): : error writing file '$filename'", E_USER_WARNING);
                 return false;
             }
         }
-        if (function_exists('apc_delete_file')) {
+        if (function_exists("apc_delete_file")) {
             // This fixes a bug with some configurations of apc.
             apc_delete_file($filename);
-        } elseif (function_exists('opcache_invalidate')) {
+        } elseif (function_exists("opcache_invalidate")) {
             opcache_invalidate($filename);
         }
 
@@ -140,7 +141,8 @@ class FileUtils {
      * @return mixed Returns the data from the file.
      * @see FileUtils::putExport()
      */
-    public static function getExport(string $filename) {
+    public static function getExport(string $filename)
+    {
         $result = require $filename;
         return $result;
     }
@@ -152,8 +154,9 @@ class FileUtils {
      * @param mixed $value The value to write.
      * @return bool
      */
-    public static function putExport(string $filename, $value): bool {
-        $data = '<?php return '.var_export($value, true).";\n";
+    public static function putExport(string $filename, $value): bool
+    {
+        $data = "<?php return " . var_export($value, true) . ";\n";
         return self::putContents($filename, $data);
     }
 
@@ -163,17 +166,18 @@ class FileUtils {
      * @param string $path The path to the file. The path must exist.
      * @return array Returns the data from the file after parsing.
      */
-    public static function getArray(string $path): array {
+    public static function getArray(string $path): array
+    {
         switch (pathinfo($path, PATHINFO_EXTENSION)) {
-            case 'json':
+            case "json":
                 $result = json_decode(file_get_contents($path), true);
                 break;
-            case 'yml':
-            case 'yaml':
+            case "yml":
+            case "yaml":
                 try {
                     $result = Yaml::parseFile($path);
                 } catch (\Throwable $ex) {
-                    throw new \Exception("Error parsing $path: ".$ex->getMessage(), 500, $ex);
+                    throw new \Exception("Error parsing $path: " . $ex->getMessage(), 500, $ex);
                 }
                 break;
             default:
@@ -196,7 +200,8 @@ class FileUtils {
      * @param callable $hydrate The function used to hydrate the cache.
      * @return mixed Returns the data from the cache or the hydration function.
      */
-    public static function getCached(string $cachePath, callable $hydrate) {
+    public static function getCached(string $cachePath, callable $hydrate)
+    {
         if (!file_exists($cachePath)) {
             $data = $hydrate();
             self::putExport($cachePath, $data);

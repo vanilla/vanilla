@@ -9,6 +9,7 @@ namespace VanillaTests\APIv0;
 
 use Garden\Container\Container;
 use Garden\EventManager;
+use Garden\Web\ControllerDispatchedEvent;
 use Garden\Web\Data;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +23,8 @@ use VanillaTests\VanillaTestCase;
 /**
  * A test dispatcher that dispatches to `Gdn_Controller` endpoints.
  */
-class TestDispatcher {
+class TestDispatcher
+{
     use PrivateAccessTrait;
 
     public const ALLOWED_DELIVERY_TYPES = [
@@ -44,10 +46,10 @@ class TestDispatcher {
         DELIVERY_METHOD_XML,
     ];
 
-    const OPT_THROW_FORM_ERRORS = 'throwFormErrors';
-    const OPT_DELIVERY_METHOD = 'deliveryMethod';
-    const OPT_DELIVERY_TYPE = 'deliveryType';
-    const OPT_PERMANENT = 'permanent';
+    const OPT_THROW_FORM_ERRORS = "throwFormErrors";
+    const OPT_DELIVERY_METHOD = "deliveryMethod";
+    const OPT_DELIVERY_TYPE = "deliveryType";
+    const OPT_PERMANENT = "permanent";
 
     /**
      * @var Container
@@ -62,6 +64,9 @@ class TestDispatcher {
     /** @var \Gdn_Controller|null */
     private $lastController;
 
+    /** @var ControllerDispatchedEvent|null */
+    private $lastDispatchedEvent;
+
     /** @var array */
     private $lastHeaders = [];
 
@@ -73,7 +78,8 @@ class TestDispatcher {
      *
      * @param Container $container
      */
-    public function __construct(Container $container) {
+    public function __construct(Container $container)
+    {
         $this->container = $container;
     }
 
@@ -87,8 +93,12 @@ class TestDispatcher {
      *
      * @return \Gdn_Request
      */
-    public function createRequest(string $method, string $path, $queryOrBody = [], ?\Gdn_Request $onRequest = null):
-    \Gdn_Request {
+    public function createRequest(
+        string $method,
+        string $path,
+        $queryOrBody = [],
+        ?\Gdn_Request $onRequest = null
+    ): \Gdn_Request {
         $request = $onRequest ?? \Gdn_Request::create();
         $request->fromEnvironment();
         $request->setMethod($method);
@@ -96,15 +106,15 @@ class TestDispatcher {
         // Kludge due to a bug in the dispatcher not understanding extensions properly.
         if ($request->getExt()) {
             $request->setPath($request->getPathExt());
-            $request->setExt('');
+            $request->setExt("");
         }
         // Kludge due to the request not understanding roots.
-        if ($request->getRoot() &&  (str_starts_with($request->getPath(), $request->getRoot().'/'))) {
+        if ($request->getRoot() && str_starts_with($request->getPath(), $request->getRoot() . "/")) {
             $path = StringUtils::substringLeftTrim($request->getPath(), $request->getRoot());
             $request->setPath($path);
         }
 
-        if ($method === 'POST') {
+        if ($method === "POST") {
             $request->setRequestArguments(\Gdn_Request::INPUT_POST, $queryOrBody);
         } elseif (!empty($queryOrBody)) {
             $get = $request->getRequestArguments(\Gdn_Request::INPUT_GET);
@@ -125,16 +135,17 @@ class TestDispatcher {
      * @param string $path The path of the request.
      * @param array $queryOrBody An array containing a parsed querystring or a post body.
      * @param array $options An array of additional options.
-     * @return \Gdn_Controller
+     * @return \Gdn_Controller|null
      */
-    public function request(string $method, string $path, $queryOrBody = [], array $options = []): \Gdn_Controller {
+    public function request(string $method, string $path, $queryOrBody = [], array $options = []): ?\Gdn_Controller
+    {
         $options += [
             self::OPT_PERMANENT => true,
             self::OPT_DELIVERY_TYPE => DELIVERY_TYPE_VIEW,
             self::OPT_DELIVERY_METHOD => DELIVERY_METHOD_XHTML,
             self::OPT_THROW_FORM_ERRORS => true,
         ];
-        $this->lastController = $this->lastOutput = null;
+        $this->lastController = $this->lastOutput = $this->lastDispatchedEvent = null;
 
         TestCase::assertContains($options[self::OPT_DELIVERY_TYPE], self::ALLOWED_DELIVERY_TYPES);
         TestCase::assertContains($options[self::OPT_DELIVERY_METHOD], self::ALLOWED_DELIVERY_METHODS);
@@ -163,16 +174,16 @@ class TestDispatcher {
         $oldRequest = clone \Gdn::request();
         $request = self::createRequest($method, $path, $queryOrBody);
 
-        if ($method === 'POST') {
+        if ($method === "POST") {
             $session->validateTransientKey(true);
         }
 
         $fn = function ($sender, $args) {
-            $this->lastController = $args['Controller'];
+            $this->lastController = $args["Controller"];
         };
-        $events->bind('base_beforeControllerMethod', $fn);
+        $events->bind("base_beforeControllerMethod", $fn);
+        $events->bind(ControllerDispatchedEvent::class, [$this, "handleControllerDispatched"]);
 
-        $ex = null;
         try {
             $this->lastOutput = null;
 
@@ -185,16 +196,18 @@ class TestDispatcher {
             $this->lastHeaders = $dispatcher->getSentHeaders();
         } finally {
             \Gdn::request($oldRequest);
-            $events->unbind('base_beforeControllerMethod', $fn);
+            $events->unbind("base_beforeControllerMethod", $fn);
 
             ob_end_clean();
             $obLevelEnd = ob_get_level();
-            Assert::assertSame($obLevelStart, $obLevelEnd, "Output buffer levels were different at the start and end of the request. Ending HTML:\n" . $this->lastOutput);
+            Assert::assertSame(
+                $obLevelStart,
+                $obLevelEnd,
+                "Output buffer levels were different at the start and end of the request. Ending HTML:\n" .
+                    $this->lastOutput
+            );
         }
 
-        if ($this->lastController === null) {
-            throw new \Exception("The controller was not properly rendered.");
-        }
         if ($options[self::OPT_THROW_FORM_ERRORS]) {
             $form = $this->lastController->Form ?? ($this->lastController->form ?? null);
 
@@ -207,6 +220,35 @@ class TestDispatcher {
     }
 
     /**
+     * Track our last dispatched controller.
+     *
+     * @param ControllerDispatchedEvent $event
+     * @return ControllerDispatchedEvent
+     */
+    public function handleControllerDispatched(ControllerDispatchedEvent $event)
+    {
+        $this->lastDispatchedEvent = clone $event;
+        return $event;
+    }
+
+    /**
+     * Assert that a particular controller and method were just dispatched.
+     *
+     * @param string $path
+     * @param string $className
+     * @param string $methodName
+     */
+    public function assertUrlDispatchesController(string $path, string $className, string $methodName)
+    {
+        $this->get($path);
+        TestCase::assertNotNull($this->lastDispatchedEvent, "No controller was dispatched.");
+        $lastDispatchedClass = $this->lastDispatchedEvent->getDispatchedClass();
+        $lastDispatchedMethod = $this->lastDispatchedEvent->getDispatchedMethod();
+        TestCase::assertEquals($className, $lastDispatchedClass, "The wrong class was dispatched.");
+        TestCase::assertEquals($methodName, $lastDispatchedMethod, "The wrong method was dispatched.");
+    }
+
+    /**
      * Get a controller instance for an url and make assertions about its trackable pageview data.
      *
      * @param string $path
@@ -215,7 +257,8 @@ class TestDispatcher {
      *
      * @return \Gdn_Controller
      */
-    public function getAndAssertTrackableData(string $path, array $query, array $expected): \Gdn_Controller {
+    public function getAndAssertTrackableData(string $path, array $query, array $expected): \Gdn_Controller
+    {
         $controller = $this->get($path, $query);
         TestCase::assertInstanceOf(TrackableLegacyControllerInterface::class, $controller);
         $trackableData = $controller->getTrackableData();
@@ -229,10 +272,11 @@ class TestDispatcher {
      * @param string $path
      * @param array $query
      * @param array $options
-     * @return \Gdn_Controller
+     * @return \Gdn_Controller|null
      */
-    public function get(string $path, array $query = [], array $options = []): \Gdn_Controller {
-        return $this->request('GET', $path, $query, $options);
+    public function get(string $path, array $query = [], array $options = []): ?\Gdn_Controller
+    {
+        return $this->request("GET", $path, $query, $options);
     }
 
     /**
@@ -243,11 +287,12 @@ class TestDispatcher {
      * @param array $options
      * @return TestHtmlDocument
      */
-    public function getHtml(string $path, array $query = [], $options = []): TestHtmlDocument {
+    public function getHtml(string $path, array $query = [], $options = []): TestHtmlDocument
+    {
         $controller = $this->get($path, $query, $options);
 
-        TestCase::assertIsString($this->lastOutput, 'Control must output HTML');
-        TestCase::assertNotEmpty($this->lastOutput, 'Controller output must not be empty');
+        TestCase::assertIsString($this->lastOutput, "Control must output HTML");
+        TestCase::assertNotEmpty($this->lastOutput, "Controller output must not be empty");
         $document = new TestHtmlDocument($this->lastOutput);
         return $document;
     }
@@ -259,8 +304,9 @@ class TestDispatcher {
      *
      * @return TestHtmlDocument
      */
-    public function getLastHtml(): TestHtmlDocument {
-        TestCase::assertIsString($this->lastOutput, 'Control must output HTML');
+    public function getLastHtml(): TestHtmlDocument
+    {
+        TestCase::assertIsString($this->lastOutput, "Control must output HTML");
         $document = new TestHtmlDocument($this->lastOutput);
         return $document;
     }
@@ -270,7 +316,8 @@ class TestDispatcher {
      *
      * @return bool
      */
-    public function hasLastHtml(): bool {
+    public function hasLastHtml(): bool
+    {
         return $this->lastOutput !== null;
     }
 
@@ -282,7 +329,8 @@ class TestDispatcher {
      * @param array $options
      * @return Data
      */
-    public function getJsonData(string $path, array $query = [], $options = []): Data {
+    public function getJsonData(string $path, array $query = [], $options = []): Data
+    {
         $options += [
             self::OPT_DELIVERY_TYPE => DELIVERY_TYPE_DATA,
             self::OPT_DELIVERY_METHOD => DELIVERY_METHOD_JSON,
@@ -290,7 +338,7 @@ class TestDispatcher {
         ];
 
         $this->get($path, $query, $options);
-        TestCase::assertIsString($this->lastOutput, 'Controller must output HTML');
+        TestCase::assertIsString($this->lastOutput, "Controller must output HTML");
         if ($options["decodeResponse"]) {
             $response = json_decode($this->lastOutput, true);
             TestCase::assertNotNull($response, "The controller did not return valid JSON.");
@@ -311,8 +359,9 @@ class TestDispatcher {
      * @param array $options
      * @return \Gdn_Controller
      */
-    public function post(string $path, $body = [], array $options = []): \Gdn_Controller {
-        return $this->request('POST', $path, $body, $options);
+    public function post(string $path, $body = [], array $options = []): \Gdn_Controller
+    {
+        return $this->request("POST", $path, $body, $options);
     }
 
     /**
@@ -323,7 +372,8 @@ class TestDispatcher {
      * @param array $options
      * @return TestHtmlDocument
      */
-    public function postHtml(string $path, array $post = [], $options = []): TestHtmlDocument {
+    public function postHtml(string $path, array $post = [], $options = []): TestHtmlDocument
+    {
         $controller = $this->post($path, $post, $options);
 
         return $this->getLastHtml();
@@ -336,10 +386,11 @@ class TestDispatcher {
      * @param array $options
      * @return \Gdn_Controller
      */
-    public function postBack($bodyOverride = [], array $options = []): \Gdn_Controller {
-        TestCase::assertNotNull($this->getLastHtml(), 'You must call get before you can postback.');
-        $form = $this->getLastHtml()->assertCssSelectorExists('form', 'There is no form on the page to post back to.');
-        $action = (string)$form->getAttribute('action');
+    public function postBack($bodyOverride = [], array $options = []): \Gdn_Controller
+    {
+        TestCase::assertNotNull($this->getLastHtml(), "You must call get before you can postback.");
+        $form = $this->getLastHtml()->assertCssSelectorExists("form", "There is no form on the page to post back to.");
+        $action = (string) $form->getAttribute("action");
         $action = StringUtils::substringLeftTrim($action, \Gdn::request()->getRoot(), true);
 
         $post = $this->getLastHtml()->getFormValues();
@@ -355,13 +406,14 @@ class TestDispatcher {
      * @param array $options
      * @return TestHtmlDocument
      */
-    public function postBackHtml($bodyOverride = [], array $options = []): TestHtmlDocument {
+    public function postBackHtml($bodyOverride = [], array $options = []): TestHtmlDocument
+    {
         $controller = $this->postBack($bodyOverride, $options);
 
         return $this->getLastHtml();
     }
 
-        /**
+    /**
      * Make a POST request and return its decoded data array.
      *
      * @param string $path
@@ -369,14 +421,15 @@ class TestDispatcher {
      * @param array $options
      * @return mixed
      */
-    public function postJsonData(string $path, array $post = [], $options = []) {
+    public function postJsonData(string $path, array $post = [], $options = [])
+    {
         $options += [
             self::OPT_DELIVERY_TYPE => DELIVERY_TYPE_DATA,
             self::OPT_DELIVERY_METHOD => DELIVERY_METHOD_JSON,
         ];
 
         $controller = $this->post($path, $post, $options);
-        TestCase::assertIsString($this->lastOutput, 'Controller must output HTML');
+        TestCase::assertIsString($this->lastOutput, "Controller must output HTML");
         $data = json_decode($this->lastOutput, true);
         TestCase::assertNotNull($data, "The controller did not return valid JSON.");
 
@@ -392,16 +445,17 @@ class TestDispatcher {
      *
      * @return Data
      */
-    private function createData($responseBody): Data {
+    private function createData($responseBody): Data
+    {
         $data = new Data($responseBody, [], $this->lastHeaders);
 
         // Try to extract a status code.
-        $status = $this->lastHeaders['Status'] ?? $this->lastHeaders['status'] ?? null;
+        $status = $this->lastHeaders["Status"] ?? ($this->lastHeaders["status"] ?? null);
         if ($status !== null) {
             // Status will be a string status. Extract out the actual status.
             $statusCode = explode(" ", $status)[0];
             TestCase::assertIsNumeric($statusCode, "Controller returned an invalid HTTP status code: " . $statusCode);
-            $data->setMeta('status', (int) $statusCode);
+            $data->setMeta("status", (int) $statusCode);
         }
 
         return $data;
@@ -412,7 +466,8 @@ class TestDispatcher {
      *
      * @param \Gdn_Controller|null $controller Optionally pass another controller to make this assertion.
      */
-    public function assertNoFormErrors(\Gdn_Controller $controller = null): void {
+    public function assertNoFormErrors(\Gdn_Controller $controller = null): void
+    {
         $controller = $controller ?? $this->lastController;
         TestCase::assertNotNull($controller, "The controller was not properly set to assert.");
 
@@ -426,7 +481,8 @@ class TestDispatcher {
      *
      * @param string $partialMessage A partial error message that will be checked against the form's errors.
      */
-    public function assertFormErrorMessage(string $partialMessage): void {
+    public function assertFormErrorMessage(string $partialMessage): void
+    {
         $controller = $this->lastController;
         TestCase::assertNotNull($controller, "The controller was not properly set to assert.");
 
@@ -441,7 +497,8 @@ class TestDispatcher {
      *
      * @param string $name The name of the form field.
      */
-    public function assertFormFieldError(string $name): void {
+    public function assertFormFieldError(string $name): void
+    {
         $controller = $this->lastController;
         TestCase::assertNotNull($controller, "The controller was not properly set to assert.");
 
@@ -456,7 +513,8 @@ class TestDispatcher {
      * This is to simulate a quasi-real request where you usually start with a clean slate. If you find static object
      * pollution to be hampering your tests then go ahead and add some resets here.
      */
-    private function resetStatics() {
+    private function resetStatics()
+    {
         \Gdn_Theme::resetSection();
         if (class_exists(\CategoryModel::class, false)) {
             \CategoryModel::reset();
@@ -471,7 +529,8 @@ class TestDispatcher {
      *
      * @return bool
      */
-    public function getRethrowExceptions(): bool {
+    public function getRethrowExceptions(): bool
+    {
         return $this->rethrowExceptions;
     }
 
@@ -480,7 +539,8 @@ class TestDispatcher {
      *
      * @param bool $rethrowExceptions
      */
-    public function setRethrowExceptions(bool $rethrowExceptions): void {
+    public function setRethrowExceptions(bool $rethrowExceptions): void
+    {
         $this->rethrowExceptions = $rethrowExceptions;
     }
 }

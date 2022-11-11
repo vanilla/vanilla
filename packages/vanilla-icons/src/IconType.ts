@@ -3,24 +3,31 @@
  * @license gpl-2.0-only
  */
 
-type DashboardIconType = "dashboard-edit" | "vanilla-logo";
+type AnalyticsIconType = "analytics-add" | "analytics-remove";
+
+type DashboardIconType = "dashboard-edit";
 
 type DataIconType =
+    | "data-add"
+    | "data-article"
+    | "data-down"
     | "data-folder-tabs"
+    | "data-left"
+    | "data-online"
     | "data-pencil"
     | "data-refresh"
-    | "data-trash"
-    | "data-add"
-    | "data-up"
-    | "data-down"
+    | "data-replace"
     | "data-right"
-    | "data-left"
+    | "data-site-metric"
     | "data-swap"
-    | "data-replace";
+    | "data-trash"
+    | "data-up";
 
 type DiscussionIconType = "discussion-bookmark-solid" | "discussion-bookmark";
 
 type EditorIconType = "editor-eye-slash" | "editor-eye";
+
+type ExternalIconType = "external-link";
 
 type MeIconType = "me-messages-solid" | "me-messages" | "me-notifications-solid" | "me-notifications" | "me-sign-in";
 
@@ -34,16 +41,35 @@ type MetaIconType =
     | "meta-unresolved"
     | "meta-view";
 
-type NavigationIconType = "navigation-ellipsis" | "navigation-languages";
+type NavigationIconType =
+    | "navigation-collapseAll"
+    | "navigation-ellipsis"
+    | "navigation-expandAll"
+    | "navigation-languages"
+    | "navigation-skip";
 
-type SearchIconType = "search-events" | "search-search";
+type NewIconType = "new-discussion" | "new-event" | "new-idea" | "new-poll" | "new-question";
 
-type AnalyticsIconType = "analytics-add" | "analytics-remove";
-type StatusIconTypes = "status-warning";
+type ProfileIconType = "profile-crown" | "profile-lock";
 
-type NewPostIconType = "new-question" | "new-poll" | "new-idea" | "new-discussion" | "new-event";
+type ReactionIconType = "reaction-comments";
 
-type ExternalIconType = "external-link";
+type SearchIconType =
+    | "search-answered"
+    | "search-categories"
+    | "search-discussion"
+    | "search-events"
+    | "search-groups"
+    | "search-ideas"
+    | "search-kb"
+    | "search-members"
+    | "search-post-count"
+    | "search-questions"
+    | "search-search";
+
+type StatusIconType = "status-warning";
+
+type VanillaIconType = "vanilla-logo";
 
 export type IconType =
     | AnalyticsIconType
@@ -55,6 +81,9 @@ export type IconType =
     | MeIconType
     | MetaIconType
     | NavigationIconType
-    | NewPostIconType
+    | NewIconType
+    | ProfileIconType
+    | ReactionIconType
     | SearchIconType
-    | StatusIconTypes;
+    | StatusIconType
+    | VanillaIconType;

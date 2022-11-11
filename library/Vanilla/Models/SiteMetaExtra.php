@@ -10,8 +10,8 @@ namespace Vanilla\Models;
 /**
  * Class for getting extra site meta information.
  */
-abstract class SiteMetaExtra {
-
+abstract class SiteMetaExtra
+{
     /**
      * @return array
      */

@@ -14,8 +14,8 @@ use Vanilla\Layout\View\LegacyLayoutViewInterface;
 /**
  * Used to mediate access to objects that can provide layouts
  */
-class LayoutService {
-
+class LayoutService
+{
     //region Properties
     /** @var LayoutProviderInterface[] $layoutProviders  */
     private $layoutProviders;
@@ -29,7 +29,8 @@ class LayoutService {
     /**
      * Default constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->layoutProviders = [];
         $this->layoutViews = [];
     }
@@ -41,7 +42,8 @@ class LayoutService {
      *
      * @param LayoutProviderInterface $provider
      */
-    public function addProvider(LayoutProviderInterface $provider): void {
+    public function addProvider(LayoutProviderInterface $provider): void
+    {
         $this->layoutProviders[] = $provider;
     }
 
@@ -50,7 +52,8 @@ class LayoutService {
      *
      * @param LayoutViewInterface $view
      */
-    public function addLayoutView(LayoutViewInterface $view): void {
+    public function addLayoutView(LayoutViewInterface $view): void
+    {
         $this->layoutViews[] = $view;
     }
 
@@ -59,7 +62,8 @@ class LayoutService {
      *
      * @return array|LayoutProviderInterface[]
      */
-    public function getProviders(): array {
+    public function getProviders(): array
+    {
         return $this->layoutProviders;
     }
 
@@ -69,7 +73,8 @@ class LayoutService {
      * @param int|string $layoutID ID of layout for which to retrieve a layout provider
      * @return LayoutProviderInterface|null
      */
-    public function getCompatibleProvider($layoutID): ?LayoutProviderInterface {
+    public function getCompatibleProvider($layoutID): ?LayoutProviderInterface
+    {
         foreach ($this->layoutProviders as $layoutProvider) {
             if ($layoutProvider->isIDFormatSupported($layoutID)) {
                 return $layoutProvider;
@@ -83,7 +88,8 @@ class LayoutService {
      *
      * @return LayoutViewInterface[]
      */
-    public function getLayoutViews(): array {
+    public function getLayoutViews(): array
+    {
         return $this->layoutViews;
     }
 
@@ -92,7 +98,8 @@ class LayoutService {
      *
      * @return LegacyLayoutViewInterface[]
      */
-    public function getLegacyLayoutViews(): array {
+    public function getLegacyLayoutViews(): array
+    {
         $legacyViews = [];
         foreach ($this->getLayoutViews() as $view) {
             if ($view instanceof LegacyLayoutViewInterface) {
@@ -101,6 +108,18 @@ class LayoutService {
         }
 
         return $legacyViews;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getLayoutViewTypes(): array
+    {
+        $result = [];
+        foreach ($this->getLayoutViews() as $layoutView) {
+            $result[] = $layoutView->getType();
+        }
+        return $result;
     }
 
     //endregion

@@ -10,8 +10,8 @@ use Vanilla\Menu\Counter;
 /**
  * Menu counter provider for activity model.
  */
-class ActivityCounterProvider implements CounterProviderInterface {
-
+class ActivityCounterProvider implements CounterProviderInterface
+{
     /** @var \ActivityModel */
     private $activityModel;
 
@@ -24,10 +24,8 @@ class ActivityCounterProvider implements CounterProviderInterface {
      * @param \ActivityModel $activityModel
      * @param \Gdn_Session $session
      */
-    public function __construct(
-        \ActivityModel $activityModel,
-        \Gdn_Session $session
-    ) {
+    public function __construct(\ActivityModel $activityModel, \Gdn_Session $session)
+    {
         $this->activityModel = $activityModel;
         $this->session = $session;
     }
@@ -35,8 +33,12 @@ class ActivityCounterProvider implements CounterProviderInterface {
     /**
      * @inheritdoc
      */
-    public function getMenuCounters(): array {
-        $counters[] = new Counter("UnreadNotifications", $this->activityModel->getUserTotalUnread($this->session->UserID));
+    public function getMenuCounters(): array
+    {
+        $counters[] = new Counter(
+            "UnreadNotifications",
+            $this->activityModel->getUserTotalUnread($this->session->UserID)
+        );
         return $counters;
     }
 }

@@ -24,8 +24,8 @@ use VanillaTests\Fixtures\Request;
 /**
  * Tests for RoleTokenAuthMiddleware
  */
-class RoleTokenAuthMiddlewareTest extends BootstrapTestCase implements CacheControlConstantsInterface {
-
+class RoleTokenAuthMiddlewareTest extends BootstrapTestCase implements CacheControlConstantsInterface
+{
     use RoleTokenAuthTrait;
 
     /**
@@ -36,16 +36,17 @@ class RoleTokenAuthMiddlewareTest extends BootstrapTestCase implements CacheCont
      * @throws \Garden\Web\Exception\MethodNotAllowedException Does not apply here.
      * @dataProvider roleTokenAuthMiddlewareDoesNotApplyDataProvider
      */
-    public function testRoleTokenAuthMiddlewareDoesNotApply(RequestInterface $request) {
+    public function testRoleTokenAuthMiddlewareDoesNotApply(RequestInterface $request)
+    {
         // Mock out all middleware dependencies so that if any methods on these mocks are called, test fails.
         [$mockSession, $mockPermissionModel, $mockRoleTokenFactory] = $this->getMockDependenciesForFailureTests();
 
         $middleware = new RoleTokenAuthMiddleware($mockSession, $mockPermissionModel, $mockRoleTokenFactory);
         $_ = $middleware($request, function ($request) {
             return [
-                'insertUserID' => 1,
-                'body' => 'foo',
-                'updateUserID' => 2,
+                "insertUserID" => 1,
+                "body" => "foo",
+                "updateUserID" => 2,
             ];
         });
     }
@@ -55,49 +56,50 @@ class RoleTokenAuthMiddlewareTest extends BootstrapTestCase implements CacheCont
      *
      * @return iterable
      */
-    public function roleTokenAuthMiddlewareDoesNotApplyDataProvider(): iterable {
-        $request = new Request('/', 'GET');
-        yield 'GET request w/o required query param, no path' => [$request];
+    public function roleTokenAuthMiddlewareDoesNotApplyDataProvider(): iterable
+    {
+        $request = new Request("/", "GET");
+        yield "GET request w/o required query param, no path" => [$request];
 
-        $request = new Request('/', 'GET');
+        $request = new Request("/", "GET");
         $request->setScheme("https");
-        yield 'GET request w/o required query param https' => [$request];
+        yield "GET request w/o required query param https" => [$request];
 
-        $request = new Request('/', 'GET', ['foo' => 'bar', 'fizz' => 'buzz']);
+        $request = new Request("/", "GET", ["foo" => "bar", "fizz" => "buzz"]);
         $request->setScheme("https");
-        yield 'GET request w/o required query param, no path with some query params' => [$request];
+        yield "GET request w/o required query param, no path with some query params" => [$request];
 
-        $request = new Request('/path/to/test', 'GET', ['foo' => 'bar', 'fizz' => 'buzz']);
+        $request = new Request("/path/to/test", "GET", ["foo" => "bar", "fizz" => "buzz"]);
         $request->setScheme("https");
-        yield 'GET request w/o required query param, with path with some query params' => [$request];
+        yield "GET request w/o required query param, with path with some query params" => [$request];
 
-        $request = new Request('/path/to/test', 'DELETE', ["id" => 12345]);
+        $request = new Request("/path/to/test", "DELETE", ["id" => 12345]);
         $request->setScheme("https");
-        yield 'DELETE request w/o required query param' => [$request];
+        yield "DELETE request w/o required query param" => [$request];
 
-        $request = new Request('/path/to/test', 'GET', ['foo' => 'bar', 'fizz' => 'buzz']);
+        $request = new Request("/path/to/test", "GET", ["foo" => "bar", "fizz" => "buzz"]);
         $request->setScheme("https");
         $request->setMethod("POST");
         $request->setBody(["flip" => ["flop" => "flap"], "drip" => "drop"]);
-        yield 'POST request w/o required query param with body' => [$request];
+        yield "POST request w/o required query param with body" => [$request];
 
-        $request = new Request('/path/to/test', 'GET', ['foo' => 'bar', 'fizz' => 'buzz']);
+        $request = new Request("/path/to/test", "GET", ["foo" => "bar", "fizz" => "buzz"]);
         $request->setScheme("https");
         $request->setMethod("PATCH");
         $request->setBody(["flip" => ["flop" => "flap"], "drip" => "drop"]);
-        yield 'PATCH request w/o required query param with body' => [$request];
+        yield "PATCH request w/o required query param with body" => [$request];
 
-        $request = new Request('/path/to/test', 'GET', ['foo' => 'bar', 'fizz' => 'buzz']);
+        $request = new Request("/path/to/test", "GET", ["foo" => "bar", "fizz" => "buzz"]);
         $request->setScheme("https");
         $request->setMethod("POST");
         $request->setBody(["flip" => "flop", static::getRoleTokenParamName() => "foo"]);
-        yield 'POST request w/o required query param with body that has query param name as prop' => [$request];
+        yield "POST request w/o required query param with body that has query param name as prop" => [$request];
 
-        $request = new Request('/path/to/test', 'GET', ['foo' => 'bar', 'fizz' => 'buzz']);
+        $request = new Request("/path/to/test", "GET", ["foo" => "bar", "fizz" => "buzz"]);
         $request->setScheme("https");
         $request->setMethod("PATCH");
         $request->setBody(["flip" => "flop", static::getRoleTokenParamName() => "foo"]);
-        yield 'PATCH request w/o required query param with body that has query param name as prop' => [$request];
+        yield "PATCH request w/o required query param with body that has query param name as prop" => [$request];
     }
 
     /**
@@ -128,36 +130,40 @@ class RoleTokenAuthMiddlewareTest extends BootstrapTestCase implements CacheCont
      *
      * @return iterable
      */
-    public function roleTokenAuthThrowsExceptionOnInvalidRequestDataProvider(): iterable {
+    public function roleTokenAuthThrowsExceptionOnInvalidRequestDataProvider(): iterable
+    {
         // Exception will get thrown before we attempt to decode query param so can just put a dummy value in here.
         $query = [static::getRoleTokenParamName() => "dummy"];
-        $request = new Request("/path/to/resource", 'GET', $query);
+        $request = new Request("/path/to/resource", "GET", $query);
         $expectedExceptionCode = 403;
-        $request->setScheme('http');
+        $request->setScheme("http");
         yield "GET http" => [$request, $expectedExceptionCode];
 
         $expectedExceptionCode = 405;
-        $request = new Request("/path/to/resource", 'GET', $query);
+        $request = new Request("/path/to/resource", "GET", $query);
         $request->setScheme("https");
         $request->setMethod("DELETE");
         yield "DELETE" => [$request, $expectedExceptionCode];
 
-        $request = new Request("/path/to/resource", 'GET', $query);
-        $request->setScheme("https")
+        $request = new Request("/path/to/resource", "GET", $query);
+        $request
+            ->setScheme("https")
             ->setMethod("POST")
-            ->setBody(['foo' => 'bar', 'flip' => ['flap','flop']]);
+            ->setBody(["foo" => "bar", "flip" => ["flap", "flop"]]);
         yield "POST" => [$request, $expectedExceptionCode];
 
-        $request = new Request("/path/to/resource", 'GET', $query);
-        $request->setScheme("https")
+        $request = new Request("/path/to/resource", "GET", $query);
+        $request
+            ->setScheme("https")
             ->setMethod("PATCH")
-            ->setBody(['foo' => 'bar', 'flip' => ['flap','flop']]);
+            ->setBody(["foo" => "bar", "flip" => ["flap", "flop"]]);
         yield "PATCH" => [$request, $expectedExceptionCode];
 
-        $request = new Request("/path/to/resource", 'GET', $query);
-        $request->setScheme("https")
+        $request = new Request("/path/to/resource", "GET", $query);
+        $request
+            ->setScheme("https")
             ->setMethod("PUT")
-            ->setBody(['foo' => 'bar', 'flip' => ['flap','flop']]);
+            ->setBody(["foo" => "bar", "flip" => ["flap", "flop"]]);
         yield "PUT" => [$request, $expectedExceptionCode];
     }
 
@@ -167,7 +173,8 @@ class RoleTokenAuthMiddlewareTest extends BootstrapTestCase implements CacheCont
      * @throws \Garden\Web\Exception\ForbiddenException Expected exception.
      * @throws \Garden\Web\Exception\MethodNotAllowedException Expected exception.
      */
-    public function testRoleTokenAuthThrowsExceptionOnSessionedUser(): void {
+    public function testRoleTokenAuthThrowsExceptionOnSessionedUser(): void
+    {
         // Mock out all middleware dependencies so that if any methods on these mocks are called, test fails.
         [, $mockPermissionModel, $mockRoleTokenFactory] = $this->getMockDependenciesForFailureTests();
         $mockSession = new \Gdn_Session();
@@ -175,8 +182,8 @@ class RoleTokenAuthMiddlewareTest extends BootstrapTestCase implements CacheCont
 
         // Exception will get thrown before we attempt to decode query param so can just put a dummy value in here.
         $query = [static::getRoleTokenParamName() => "dummy"];
-        $request = new Request("/path/to/resource", 'GET', $query);
-        $request->setScheme('https');
+        $request = new Request("/path/to/resource", "GET", $query);
+        $request->setScheme("https");
 
         $expectedExceptionCode = 403;
 
@@ -206,8 +213,8 @@ class RoleTokenAuthMiddlewareTest extends BootstrapTestCase implements CacheCont
         $mockSession->UserID = 0;
 
         $query = [static::getRoleTokenParamName() => $encodedJwt];
-        $request = new Request("/path/to/resource", 'GET', $query);
-        $request->setScheme('https');
+        $request = new Request("/path/to/resource", "GET", $query);
+        $request->setScheme("https");
 
         $expectedExceptionCode = 403;
 
@@ -223,12 +230,13 @@ class RoleTokenAuthMiddlewareTest extends BootstrapTestCase implements CacheCont
      *
      * @return iterable
      */
-    public function roleTokenAuthThrowsExceptionOnInvalidJwtDecodeDataProvider() : iterable {
+    public function roleTokenAuthThrowsExceptionOnInvalidJwtDecodeDataProvider(): iterable
+    {
         $dummySecret = "abcdefghijklmnopqurstuvwxyz1234567890";
         $roleTokenFactory = $this->getRoleTokenFactory($dummySecret);
 
         $encodedJwt = JWT::encode(
-            ['exp' => time() + 1000, 'iat' => time() - 5, 'nbf' => time() - 5],
+            ["exp" => time() + 1000, "iat" => time() - 5, "nbf" => time() - 5],
             $dummySecret,
             RoleToken::SIGNING_ALGORITHM
         );
@@ -256,68 +264,68 @@ class RoleTokenAuthMiddlewareTest extends BootstrapTestCase implements CacheCont
      * @throws \Garden\Web\Exception\ForbiddenException Does not apply here.
      * @throws \Garden\Web\Exception\MethodNotAllowedException Does not apply here.
      */
-    public function testRoleTokenAuthMiddlewareSuccess(): void {
+    public function testRoleTokenAuthMiddlewareSuccess(): void
+    {
         $dummySecret = "abcdefghijklmnopqrstuvwxyz1234567890";
         $roleTokenFactory = $this->getRoleTokenFactory($dummySecret);
         $roleToken = $roleTokenFactory->forEncoding([4, 5]);
         $encodedJwt = $roleToken->encode();
 
         $query = [static::getRoleTokenParamName() => $encodedJwt];
-        $request = new Request("/path/to/resource", 'GET', $query);
-        $request->setScheme('https');
+        $request = new Request("/path/to/resource", "GET", $query);
+        $request->setScheme("https");
 
         $mockRolePermissions = [
             [
-                'type' => 'category',
-                'id' => 12,
-                'permissions' => [
-                    'discussions.view' => true,
-                ]
+                "type" => "category",
+                "id" => 12,
+                "permissions" => [
+                    "discussions.view" => true,
+                ],
             ],
             [
-                'type' => 'category',
-                'id' => 21,
-                'permissions' => [
-                    'discussions.view' => true,
-                ]
+                "type" => "category",
+                "id" => 21,
+                "permissions" => [
+                    "discussions.view" => true,
+                ],
             ],
         ];
 
         $mockPermissions = $this->getMockBuilder(Permissions::class)->getMock();
-        $mockPermissions->expects($this->once())
-            ->method('addBan')
-            ->with(
-                $this->equalTo(Permissions::BAN_ROLE_TOKEN),
-                $this->anything()
-            );
+        $mockPermissions
+            ->expects($this->once())
+            ->method("addBan")
+            ->with($this->equalTo(Permissions::BAN_ROLE_TOKEN), $this->anything());
 
-        $mockPermissionModel = $this->getMockBuilder(\PermissionModel::class)
-            ->getMock();
-        $mockPermissionModel->expects($this->once())
-            ->method('getPermissionsByRole')
-            ->with(
-                $this->equalTo(4),
-                $this->equalTo(5)
-            )->willReturn($mockRolePermissions);
+        $mockPermissionModel = $this->getMockBuilder(\PermissionModel::class)->getMock();
+        $mockPermissionModel
+            ->expects($this->once())
+            ->method("getPermissionsByRole")
+            ->with($this->equalTo(4), $this->equalTo(5))
+            ->willReturn($mockRolePermissions);
 
         $mockSession = $this->getMockBuilder(\Gdn_Session::class)->getMock();
-        $mockSession->expects($this->once())
-            ->method('isValid')
+        $mockSession
+            ->expects($this->once())
+            ->method("isValid")
             ->willReturn(false);
-        $mockSession->expects($this->once())
-            ->method('getPermissions')
+        $mockSession
+            ->expects($this->once())
+            ->method("getPermissions")
             ->willReturn($mockPermissions);
-        $mockSession->expects($this->once())
-            ->method('addPermissions')
+        $mockSession
+            ->expects($this->once())
+            ->method("addPermissions")
             ->with($this->equalTo($mockRolePermissions));
 
         $middleware = new RoleTokenAuthMiddleware($mockSession, $mockPermissionModel, $roleTokenFactory);
         /** @var Data $response */
         $_ = $middleware($request, function ($_) {
             return Data::box([
-                'insertUserID' => 1,
-                'body' => 'foo',
-                'updateUserID' => 2,
+                "insertUserID" => 1,
+                "body" => "foo",
+                "updateUserID" => 2,
             ]);
         });
     }
@@ -327,25 +335,23 @@ class RoleTokenAuthMiddlewareTest extends BootstrapTestCase implements CacheCont
      *
      * @return array
      */
-    private function getMockDependenciesForFailureTests(): array {
+    private function getMockDependenciesForFailureTests(): array
+    {
         $mockSession = $this->getMockBuilder(\Gdn_Session::class)
             ->disableAutoReturnValueGeneration()
             ->getMock();
-        $mockSession->expects($this->never())
-            ->method($this->anything());
+        $mockSession->expects($this->never())->method($this->anything());
 
         $mockPermissionModel = $this->getMockBuilder(\PermissionModel::class)
             ->disableAutoReturnValueGeneration()
             ->getMock();
-        $mockPermissionModel->expects($this->never())
-            ->method($this->anything());
+        $mockPermissionModel->expects($this->never())->method($this->anything());
 
         $mockRoleTokenFactory = $this->getMockBuilder(RoleTokenFactory::class)
             ->disableOriginalConstructor()
             ->disableAutoReturnValueGeneration()
             ->getMock();
-        $mockRoleTokenFactory->expects($this->never())
-            ->method($this->anything());
+        $mockRoleTokenFactory->expects($this->never())->method($this->anything());
 
         return [$mockSession, $mockPermissionModel, $mockRoleTokenFactory];
     }
@@ -357,14 +363,14 @@ class RoleTokenAuthMiddlewareTest extends BootstrapTestCase implements CacheCont
      * @return RoleTokenFactory
      * @throws \Exception Does not apply here.
      */
-    private function getRoleTokenFactory(string $secret): RoleTokenFactory {
+    private function getRoleTokenFactory(string $secret): RoleTokenFactory
+    {
         $mockConfig = $this->getMockBuilder(ConfigurationInterface::class)->getMock();
-        $mockConfig->expects($this->atLeastOnce())
-            ->method('get')
-            ->with(
-                $this->stringContains('RoleToken'),
-                $this->anything()
-            )->willReturnCallback(function ($name, $default) use ($secret) {
+        $mockConfig
+            ->expects($this->atLeastOnce())
+            ->method("get")
+            ->with($this->stringContains("RoleToken"), $this->anything())
+            ->willReturnCallback(function ($name, $default) use ($secret) {
                 return str_contains($name, "Secret") ? $secret : $default;
             });
         $roleTokenFactory = new RoleTokenFactory($mockConfig);

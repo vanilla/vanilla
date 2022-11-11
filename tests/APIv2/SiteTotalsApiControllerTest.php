@@ -14,11 +14,12 @@ use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 /**
  * Tests for the SiteTotalsApiController.
  */
-class SiteTotalsApiControllerTest extends AbstractAPIv2Test {
+class SiteTotalsApiControllerTest extends AbstractAPIv2Test
+{
     use CommunityApiTestTrait;
 
     // Don't enable stub content.
-    public static $addons = ['vanilla'];
+    public static $addons = ["vanilla"];
 
     protected $baseUrl = "/site-totals";
 
@@ -27,7 +28,8 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         // Make sure we have a fresh cache for each test.
         self::$testCache->flush();
@@ -36,7 +38,8 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test {
     /**
      * Test getting a single site-totals count.
      */
-    public function testGettingSingleCount() {
+    public function testGettingSingleCount()
+    {
         $this->createDiscussion();
         $this->createDiscussion();
         $this->createDiscussion();
@@ -49,7 +52,8 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test {
      *
      * @depends testGettingSingleCount
      */
-    public function testGettingMultipleCounts() {
+    public function testGettingMultipleCounts()
+    {
         $this->createDiscussion();
         $this->createComment();
         $this->createComment();
@@ -57,9 +61,6 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test {
 
         // Make sure all counts are up-to-date.
         $categoryModel = Gdn::getContainer()->get(\CategoryModel::class);
-
-        $categoryModel->counts("CountComments");
-        $categoryModel->counts("CountAllComments");
 
         $commentAndDiscussionCounts = $this->api()->get($this->baseUrl . "?counts[]=discussion&counts[]=comment");
         $this->assertSame($commentAndDiscussionCounts["counts"]["discussion"]["count"], 4);
@@ -71,7 +72,8 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test {
      *
      * @depends testGettingMultipleCounts
      */
-    public function testPostCounts() {
+    public function testPostCounts()
+    {
         $postCounts = $this->api()->get($this->baseUrl . "?counts[]=post");
 
         $this->assertSame($postCounts["counts"]["post"]["count"], 7);
@@ -80,7 +82,8 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test {
     /**
      * Test site total category count.
      */
-    public function testCategoryCounts() {
+    public function testCategoryCounts()
+    {
         $this->createCategory();
         $this->createCategory();
         $catCount = $this->api()->get($this->baseUrl . "?counts[]=category");
@@ -90,7 +93,8 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test {
     /**
      * Test passing "all" to get all available counts.
      */
-    public function testGettingAllCounts() {
+    public function testGettingAllCounts()
+    {
         $siteTotalService = Gdn::getContainer()->get(SiteTotalService::class);
         $allRecordTypes = $siteTotalService->getCountRecordTypes();
         $allCountsResponse = $this->api()->get($this->baseUrl . "?counts[]=all");

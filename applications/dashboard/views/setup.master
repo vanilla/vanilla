@@ -3,7 +3,7 @@
 <head>
    <?php $this->RenderAsset('Head'); ?>
 </head>
-<body<?php echo Attribute(array('id' => $BodyIdentifier, 'class' => $this->CssClass)); ?>>
+<body<?php echo Attribute(array('id' => $this->BodyIdentifier, 'class' => $this->CssClass)); ?>>
    <div id="Frame">
 		<div id="Content">
 			<?php $this->RenderAsset('Content'); ?>

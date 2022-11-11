@@ -16,7 +16,7 @@ use Vanilla\Web\Asset\DeploymentCacheBuster;
 use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlMiddleware;
 
-if (!function_exists('asset')) {
+if (!function_exists("asset")) {
     /**
      * Takes the path to an asset (image, js file, css file, etc) and prepends the web root.
      *
@@ -26,23 +26,28 @@ if (!function_exists('asset')) {
      * @param string $version Forced version, skips auto-lookup.
      * @return string Returns the URL to the asset.
      */
-    function asset($destination = '', $withDomain = false, $addVersion = false, $version = null) {
-        $destination = str_replace('\\', '/', $destination);
+    function asset($destination = "", $withDomain = false, $addVersion = false, $version = null)
+    {
+        $destination = str_replace("\\", "/", $destination);
         if (isUrl($destination)) {
             $result = $destination;
         } else {
-            $result = Gdn::request()->urlDomain($withDomain).Gdn::request()->getAssetRoot().'/'.ltrim($destination, '/');
+            $result =
+                Gdn::request()->urlDomain($withDomain) .
+                Gdn::request()->getAssetRoot() .
+                "/" .
+                ltrim($destination, "/");
         }
 
         if ($addVersion) {
             $version = assetVersion($destination, $version);
-            $result .= (strpos($result, '?') === false ? '?' : '&').'v='.urlencode($version);
+            $result .= (strpos($result, "?") === false ? "?" : "&") . "v=" . urlencode($version);
         }
         return $result;
     }
 }
 
-if (!function_exists('assetVersion')) {
+if (!function_exists("assetVersion")) {
     /**
      * Get a version string for a given asset.
      *
@@ -50,15 +55,16 @@ if (!function_exists('assetVersion')) {
      * @param string|null $version A known version for the asset or **null** to grab it from the addon's info array.
      * @return string Returns a version string.
      */
-    function assetVersion($destination, $version = null) {
-        $result = $version ? $version .'-' : '';
+    function assetVersion($destination, $version = null)
+    {
+        $result = $version ? $version . "-" : "";
         $buster = \Gdn::getContainer()->get(DeploymentCacheBuster::class);
         $result .= $buster->value();
         return $result;
     }
 }
 
-if (!function_exists('c')) {
+if (!function_exists("c")) {
     /**
      * Retrieves a configuration setting.
      *
@@ -69,12 +75,13 @@ if (!function_exists('c')) {
      * @see Gdn::config()
      * @deprecated
      */
-    function c($name = false, $default = false) {
+    function c($name = false, $default = false)
+    {
         return Gdn::config($name, $default);
     }
 }
 
-if (!function_exists('config')) {
+if (!function_exists("config")) {
     /**
      * Retrieves a configuration setting.
      *
@@ -85,19 +92,21 @@ if (!function_exists('config')) {
      * @see Gdn::config()
      * @deprecated
      */
-    function config($name = false, $default = false) {
+    function config($name = false, $default = false)
+    {
         return Gdn::config($name, $default);
     }
 }
 
-if (!function_exists('debug')) {
+if (!function_exists("debug")) {
     /**
      * Get or set the current debug state of the application.
      *
      * @param bool|null $value The new debug value or null to just return the current value.
      * @return bool Returns the current debug level.
      */
-    function debug($value = null) {
+    function debug($value = null)
+    {
         static $debug = false;
         if ($value === null) {
             return $debug;
@@ -107,23 +116,23 @@ if (!function_exists('debug')) {
     }
 }
 
-if (!function_exists('increaseMaxExecutionTime')) {
+if (!function_exists("increaseMaxExecutionTime")) {
     /**
      * Used to increase php max_execution_time value.
      *
      * @param int $maxExecutionTime PHP max execution time in seconds.
      * @return bool Returns true if max_execution_time was increased (or stayed the same) or false otherwise.
      */
-    function increaseMaxExecutionTime($maxExecutionTime) {
-
-        $iniMaxExecutionTime = ini_get('max_execution_time');
+    function increaseMaxExecutionTime($maxExecutionTime)
+    {
+        $iniMaxExecutionTime = ini_get("max_execution_time");
 
         // max_execution_time == 0 means no limit.
-        if ($iniMaxExecutionTime === '0') {
+        if ($iniMaxExecutionTime === "0") {
             return true;
         }
 
-        if (((string)$maxExecutionTime) === '0') {
+        if (((string) $maxExecutionTime) === "0") {
             return set_time_limit(0);
         }
 
@@ -135,20 +144,21 @@ if (!function_exists('increaseMaxExecutionTime')) {
     }
 }
 
-if (!function_exists('inMaintenanceMode')) {
+if (!function_exists("inMaintenanceMode")) {
     /**
      * Determine if the site is in maintenance mode.
      *
      * @return bool
      */
-    function inMaintenanceMode() {
-        $updateMode = c('Garden.UpdateMode');
+    function inMaintenanceMode()
+    {
+        $updateMode = c("Garden.UpdateMode");
 
-        return (bool)$updateMode;
+        return (bool) $updateMode;
     }
 }
 
-if (!function_exists('isMobile')) {
+if (!function_exists("isMobile")) {
     /**
      * Determine whether or not the site is in mobile mode.
      *
@@ -159,9 +169,10 @@ if (!function_exists('isMobile')) {
      * - not specified: Use the current setting or use the system determined mobile setting.
      * @return bool
      */
-    function isMobile($value = '') {
+    function isMobile($value = "")
+    {
         if ($value === true || $value === false) {
-            $type = $value ? 'mobile' : 'desktop';
+            $type = $value ? "mobile" : "desktop";
             userAgentType($type);
         } elseif ($value === null) {
             userAgentType(false);
@@ -169,11 +180,11 @@ if (!function_exists('isMobile')) {
 
         $type = userAgentType();
         // Check the config for an override. (ex. Consider tablets mobile)
-        $type = c('Garden.Devices.'.ucfirst($type), $type);
+        $type = c("Garden.Devices." . ucfirst($type), $type);
 
         switch ($type) {
-            case 'app':
-            case 'mobile':
+            case "app":
+            case "mobile":
                 $isMobile = true;
                 break;
             default:
@@ -185,29 +196,30 @@ if (!function_exists('isMobile')) {
     }
 }
 
-if (!function_exists('isSearchEngine')) {
+if (!function_exists("isSearchEngine")) {
     /**
      * Determines whether or not the current request is being made by a search engine.
      *
      * @return bool Returns true if the current request is a search engine or false otherwise.
      */
-    function isSearchEngine() {
+    function isSearchEngine()
+    {
         $engines = [
-            'googlebot',
-            'slurp',
-            'search.msn.com',
-            'nutch',
-            'simpy',
-            'bot',
-            'aspseek',
-            'crawler',
-            'msnbot',
-            'libwww-perl',
-            'fast',
-            'baidu',
+            "googlebot",
+            "slurp",
+            "search.msn.com",
+            "nutch",
+            "simpy",
+            "bot",
+            "aspseek",
+            "crawler",
+            "msnbot",
+            "libwww-perl",
+            "fast",
+            "baidu",
         ];
-        $httpUserAgent = strtolower(val('HTTP_USER_AGENT', $_SERVER, ''));
-        if ($httpUserAgent != '') {
+        $httpUserAgent = strtolower(val("HTTP_USER_AGENT", $_SERVER, ""));
+        if ($httpUserAgent != "") {
             foreach ($engines as $engine) {
                 if (strpos($httpUserAgent, $engine) !== false) {
                     return true;
@@ -218,7 +230,7 @@ if (!function_exists('isSearchEngine')) {
     }
 }
 
-if (!function_exists('paramPreference')) {
+if (!function_exists("paramPreference")) {
     /**
      * Conditionally save and load a query parameter value from a user's preferences.
      *     If the parameter is not sent in the request query, attempt to load from the user's preferences.
@@ -231,7 +243,8 @@ if (!function_exists('paramPreference')) {
      * @param bool $save Save the parameter value to the user preference, if available.
      * @return mixed
      */
-    function paramPreference($param, $preference, $config = null, $configVal = null, $save = false) {
+    function paramPreference($param, $preference, $config = null, $configVal = null, $save = false)
+    {
         $value = Gdn::request()->get($param, null);
 
         if ($config === null || (($configVal === null && c($config)) || c($config) === $configVal)) {
@@ -250,7 +263,7 @@ if (!function_exists('paramPreference')) {
 }
 
 // Smarty
-if (!function_exists('checkPermission')) {
+if (!function_exists("checkPermission")) {
     /**
      * A functional version of {@link Gdn_Session::checkPermission()}.
      *
@@ -258,41 +271,44 @@ if (!function_exists('checkPermission')) {
      * @param string $type The type of permission. Either "Category" or empty.
      * @return bool Returns true if the current user has the given permission(s).
      */
-    function checkPermission($permissionName, $type = '') {
-        $result = Gdn::session()->checkPermission($permissionName, false, $type ? 'Category' : '', $type);
+    function checkPermission($permissionName, $type = "")
+    {
+        $result = Gdn::session()->checkPermission($permissionName, false, $type ? "Category" : "", $type);
         return $result;
     }
 }
 
 // Negative permission check
-if (!function_exists('checkRestriction')) {
+if (!function_exists("checkRestriction")) {
     /**
      * Check to see if a user **does not** have a permission.
      *
      * @param string|array[string] $permissionName The permission or permissions to check.
      * @return bool Returns true if the current user **does not** have the given permission(s).
      */
-    function checkRestriction($permissionName) {
+    function checkRestriction($permissionName)
+    {
         $result = Gdn::session()->checkPermission($permissionName);
-        $unrestricted = Gdn::session()->checkPermission('Garden.Admin.Only');
+        $unrestricted = Gdn::session()->checkPermission("Garden.Admin.Only");
         return $result && !$unrestricted;
     }
 }
 
-if (!function_exists('multiCheckPermission')) {
+if (!function_exists("multiCheckPermission")) {
     /**
      * Check to see if a use has any one of a set of permissions.
      *
      * @param string|array[string] $permissionName The permission or permissions to check.
      * @return bool Returns true if the current user has any one of the given permission(s).
      */
-    function multiCheckPermission($permissionName) {
+    function multiCheckPermission($permissionName)
+    {
         $result = Gdn::session()->checkPermission($permissionName, false);
         return $result;
     }
 }
 
-if (!function_exists('decho')) {
+if (!function_exists("decho")) {
     /**
      * Echo debug messages and variables.
      *
@@ -300,30 +316,31 @@ if (!function_exists('decho')) {
      * @param string $prefix The text to be used as a prefix for the output.
      * @param bool $public Whether or not output is visible for everyone.
      */
-    function decho($mixed, $prefix = 'DEBUG', $public = false) {
-        $prefix = stringEndsWith($prefix, ': ', true, true).': ';
+    function decho($mixed, $prefix = "DEBUG", $public = false)
+    {
+        $prefix = stringEndsWith($prefix, ": ", true, true) . ": ";
 
-        if ($public || Gdn::session()->checkPermission('Garden.Debug.Allow')) {
+        if ($public || Gdn::session()->checkPermission("Garden.Debug.Allow")) {
             $stack = debug_backtrace();
 
-            $backtrace = 'Line '.$stack[0]['line'].' in '.$stack[0]['file']."\n";
-            if (defined('PATH_ROOT')) {
-                $backtrace = str_replace(PATH_ROOT, '', $backtrace);
+            $backtrace = "Line " . $stack[0]["line"] . " in " . $stack[0]["file"] . "\n";
+            if (defined("PATH_ROOT")) {
+                $backtrace = str_replace(PATH_ROOT, "", $backtrace);
             }
 
-            echo '<pre style="text-align: left; padding: 0 4px;">'.$backtrace.$prefix;
+            echo '<pre style="text-align: left; padding: 0 4px;">' . $backtrace . $prefix;
             if (is_string($mixed)) {
                 echo $mixed;
             } else {
                 echo htmlspecialchars(safePrint($mixed, true));
             }
 
-            echo '</pre>';
+            echo "</pre>";
         }
     }
 }
 
-if (!function_exists('externalUrl')) {
+if (!function_exists("externalUrl")) {
     /**
      * Build a URL to an external site linked to this one.
      *
@@ -332,22 +349,23 @@ if (!function_exists('externalUrl')) {
      * @param string $path The path within Vanilla.
      * @return string Returns the external URL.
      */
-    function externalUrl($path) {
-        $urlFormat = c('Garden.ExternalUrlFormat');
+    function externalUrl($path)
+    {
+        $urlFormat = c("Garden.ExternalUrlFormat");
 
         if ($urlFormat && !isUrl($path)) {
-            if (false !== ($qpos = strpos($urlFormat, '?'))) {
-                $spos = strpos($urlFormat, '%s');
-                $hpos = strpos($urlFormat, '#');
+            if (false !== ($qpos = strpos($urlFormat, "?"))) {
+                $spos = strpos($urlFormat, "%s");
+                $hpos = strpos($urlFormat, "#");
 
                 if ($qpos < $spos && ($hpos === false || $hpos < $qpos)) {
-                    $path = str_replace('?', '&', $path);
+                    $path = str_replace("?", "&", $path);
                 }
             }
 
-            $result = sprintf($urlFormat, ltrim($path, '/'));
-        } elseif (stringBeginsWith($path, '//')) {
-            $result = Gdn::request()->scheme().':'.$path;
+            $result = sprintf($urlFormat, ltrim($path, "/"));
+        } elseif (stringBeginsWith($path, "//")) {
+            $result = Gdn::request()->scheme() . ":" . $path;
         } else {
             $result = url($path, true);
         }
@@ -356,7 +374,7 @@ if (!function_exists('externalUrl')) {
     }
 }
 
-if (!function_exists('fetchPageInfo')) {
+if (!function_exists("fetchPageInfo")) {
     /**
      * Examine a page at {@link $Url} for title, description & images.
      *
@@ -370,28 +388,29 @@ if (!function_exists('fetchPageInfo')) {
      * @return array Returns an array containing Url, Title, Description, Images (array) and Exception
      * (if there were problems retrieving the page).
      */
-    function fetchPageInfo($url, $timeout = 3, $sendCookies = false, $includeMedia = false) {
+    function fetchPageInfo($url, $timeout = 3, $sendCookies = false, $includeMedia = false)
+    {
         $pageInfo = [
-            'Url' => $url,
-            'Title' => '',
-            'Description' => '',
-            'Images' => [],
-            'Exception' => false
+            "Url" => $url,
+            "Title" => "",
+            "Description" => "",
+            "Images" => [],
+            "Exception" => false,
         ];
 
         try {
             // Make sure the URL is valid.
             $urlParts = parse_url($url);
-            if ($urlParts === false || !in_array(val('scheme', $urlParts), ['http', 'https'])) {
-                throw new Exception('Invalid URL.', 400);
+            if ($urlParts === false || !in_array(val("scheme", $urlParts), ["http", "https"])) {
+                throw new Exception("Invalid URL.", 400);
             }
 
             $request = Gdn::getContainer()->get(\ProxyRequest::class);
             $pageHtml = $request->request([
-                'URL' => $url,
-                'Timeout' => $timeout,
-                'Cookies' => $sendCookies,
-                'Redirects' => true,
+                "URL" => $url,
+                "Timeout" => $timeout,
+                "Cookies" => $sendCookies,
+                "Redirects" => true,
             ]);
 
             if (!$request->status()) {
@@ -400,7 +419,7 @@ if (!function_exists('fetchPageInfo')) {
 
             $dom = pQuery::parseStr($pageHtml);
             if (!$dom) {
-                throw new Exception('Failed to load page for parsing.');
+                throw new Exception("Failed to load page for parsing.");
             }
 
             /**
@@ -409,36 +428,31 @@ if (!function_exists('fetchPageInfo')) {
              * @param array $pageInfo
              */
             $getOpenGraphMedia = function (array &$pageInfo) use ($dom) {
-                $pageInfo['Media'] = [];
+                $pageInfo["Media"] = [];
 
                 // Only target og:image and og:video tags.
-                $mediaTypes = ['image', 'video'];
+                $mediaTypes = ["image", "video"];
                 foreach ($mediaTypes as $mediaType) {
-                    $tags = $dom->query('meta[property ^= "og:'.$mediaType.'"]');
+                    $tags = $dom->query('meta[property ^= "og:' . $mediaType . '"]');
 
                     /** @var pQuery\DomNode $node */
                     foreach ($tags as $node) {
-                        $property = $node->attr('property');
-                        $content = $node->attr('content');
+                        $property = $node->attr("property");
+                        $content = $node->attr("content");
 
                         // If this is a root type element, save any existing type row data and start a new row.
                         if ($property == "og:{$mediaType}") {
                             if (isset($media)) {
-                                if (!array_key_exists($mediaType, $pageInfo['Media'])) {
-                                    $pageInfo['Media'][$mediaType] = [];
+                                if (!array_key_exists($mediaType, $pageInfo["Media"])) {
+                                    $pageInfo["Media"][$mediaType] = [];
                                 }
-                                $pageInfo['Media'][$mediaType][] = $media;
+                                $pageInfo["Media"][$mediaType][] = $media;
                             }
-                            $media = ['value' => $content];
+                            $media = ["value" => $content];
                         } else {
                             // Shave off the type prefix. Save the content, if it's something we actually want.
-                            $subproperty = trim(stringBeginsWith(
-                                $property,
-                                "og:{$mediaType}",
-                                false,
-                                true
-                            ), ':');
-                            if (in_array($subproperty, ['height', 'width'])) {
+                            $subproperty = trim(stringBeginsWith($property, "og:{$mediaType}", false, true), ":");
+                            if (in_array($subproperty, ["height", "width"])) {
                                 if (isset($media)) {
                                     $media[$subproperty] = $content;
                                 }
@@ -448,70 +462,70 @@ if (!function_exists('fetchPageInfo')) {
 
                     // Save any outstanding information. Clear the row in preparation for the next iteration.
                     if (isset($media)) {
-                        if (!array_key_exists($mediaType, $pageInfo['Media'])) {
-                            $pageInfo['Media'][$mediaType] = [];
+                        if (!array_key_exists($mediaType, $pageInfo["Media"])) {
+                            $pageInfo["Media"][$mediaType] = [];
                         }
-                        $pageInfo['Media'][$mediaType][] = $media;
+                        $pageInfo["Media"][$mediaType][] = $media;
                         unset($media);
                     }
                 }
             };
 
             // FIRST PASS: Look for open graph title, desc, images
-            $pageInfo['Title'] = domGetContent($dom, 'meta[property="og:title"]');
+            $pageInfo["Title"] = domGetContent($dom, 'meta[property="og:title"]');
 
-            trace('Getting og:description');
-            $pageInfo['Description'] = domGetContent($dom, 'meta[property="og:description"]');
+            trace("Getting og:description");
+            $pageInfo["Description"] = domGetContent($dom, 'meta[property="og:description"]');
             foreach ($dom->query('meta[property="og:image"]') as $image) {
-                if ($image->attr('content')) {
-                    $pageInfo['Images'][] = $image->attr('content');
+                if ($image->attr("content")) {
+                    $pageInfo["Images"][] = $image->attr("content");
                 }
             }
 
             // SECOND PASS: Look in the page for title, desc, images
-            if ($pageInfo['Title'] == '') {
-                $pageInfo['Title'] = $dom->query('title')->text();
+            if ($pageInfo["Title"] == "") {
+                $pageInfo["Title"] = $dom->query("title")->text();
             }
 
-            if ($pageInfo['Description'] == '') {
-                trace('Getting meta description');
-                $pageInfo['Description'] = domGetContent($dom, 'meta[name="description"]');
+            if ($pageInfo["Description"] == "") {
+                trace("Getting meta description");
+                $pageInfo["Description"] = domGetContent($dom, 'meta[name="description"]');
             }
 
             // THIRD PASS: Look in the page contents
-            if ($pageInfo['Description'] == '') {
-                foreach ($dom->query('p') as $element) {
-                    trace('Looking at p for description.');
+            if ($pageInfo["Description"] == "") {
+                foreach ($dom->query("p") as $element) {
+                    trace("Looking at p for description.");
 
                     if (strlen($element->plaintext) > 150) {
-                        $pageInfo['Description'] = $element->text();
+                        $pageInfo["Description"] = $element->text();
                         break;
                     }
                 }
-                if (strlen($pageInfo['Description']) > 400) {
-                    $pageInfo['Description'] = sliceParagraph($pageInfo['Description'], 400);
+                if (strlen($pageInfo["Description"]) > 400) {
+                    $pageInfo["Description"] = sliceParagraph($pageInfo["Description"], 400);
                 }
             }
 
             // Final: Still nothing? remove limitations
-            if ($pageInfo['Description'] == '') {
-                foreach ($dom->query('p') as $element) {
-                    trace('Looking at p for description (no restrictions)');
-                    if (trim($element->text()) != '') {
-                        $pageInfo['Description'] = $element->text();
+            if ($pageInfo["Description"] == "") {
+                foreach ($dom->query("p") as $element) {
+                    trace("Looking at p for description (no restrictions)");
+                    if (trim($element->text()) != "") {
+                        $pageInfo["Description"] = $element->text();
                         break;
                     }
                 }
             }
 
             // Page Images
-            if (count($pageInfo['Images']) == 0) {
+            if (count($pageInfo["Images"]) == 0) {
                 $images = domGetImages($dom, $url);
-                $pageInfo['Images'] = array_values($images);
+                $pageInfo["Images"] = array_values($images);
             }
 
-            $pageInfo['Title'] = htmlEntityDecode($pageInfo['Title']);
-            $pageInfo['Description'] = htmlEntityDecode($pageInfo['Description']);
+            $pageInfo["Title"] = htmlEntityDecode($pageInfo["Title"]);
+            $pageInfo["Description"] = htmlEntityDecode($pageInfo["Description"]);
 
             /**
              * Add OpenGraph media information?
@@ -520,14 +534,14 @@ if (!function_exists('fetchPageInfo')) {
                 $getOpenGraphMedia($pageInfo);
             }
         } catch (Exception $ex) {
-            $pageInfo['Exception'] = $ex->getMessage();
+            $pageInfo["Exception"] = $ex->getMessage();
         }
 
         return $pageInfo;
     }
 }
 
-if (!function_exists('formatString')) {
+if (!function_exists("formatString")) {
     /**
      * Formats a string by inserting data from its arguments, similar to sprintf, but with a richer syntax.
      *
@@ -549,15 +563,16 @@ if (!function_exists('formatString')) {
      * // Hello Frank, It's 12:59PM.
      * </code>
      */
-    function formatString($string, $args = []) {
+    function formatString($string, $args = [])
+    {
         _formatStringCallback($args, true);
-        $result = preg_replace_callback('/{([^\s][^}]+[^\s]?)}/', '_formatStringCallback', $string);
+        $result = preg_replace_callback("/{([^\s][^}]+[^\s]?)}/", "_formatStringCallback", $string);
 
         return $result;
     }
 }
 
-if (!function_exists('_formatStringCallback')) {
+if (!function_exists("_formatStringCallback")) {
     /**
      * The callback helper for {@link formatString()}.
      *
@@ -566,81 +581,83 @@ if (!function_exists('_formatStringCallback')) {
      * @return mixed Returns the matching string or nothing when setting the arguments.
      * @access private
      */
-    function _formatstringcallback($match, $setArgs = false) {
-        static $args = [], $contextUserID = null;
+    function _formatstringcallback($match, $setArgs = false)
+    {
+        static $args = [],
+            $contextUserID = null;
         if ($setArgs) {
             $args = $match;
 
-            if (isset($args['_ContextUserID'])) {
-                $contextUserID = $args['_ContextUserID'];
+            if (isset($args["_ContextUserID"])) {
+                $contextUserID = $args["_ContextUserID"];
             } else {
                 $contextUserID = Gdn::session() && Gdn::session()->isValid() ? Gdn::session()->UserID : null;
             }
 
-            return '';
+            return "";
         }
 
         $match = $match[1];
-        if ($match == '{') {
+        if ($match == "{") {
             return $match;
         }
 
         // Parse out the field and format.
-        $parts = explode(',', $match);
+        $parts = explode(",", $match);
         $field = trim($parts[0]);
-        $format = trim(($parts[1] ?? ''));
-        $subFormat = isset($parts[2]) ? strtolower(trim($parts[2])) : '';
-        $formatArgs = $parts[3] ?? '';
+        $format = trim($parts[1] ?? "");
+        $subFormat = isset($parts[2]) ? strtolower(trim($parts[2])) : "";
+        $formatArgs = $parts[3] ?? "";
 
-        if (in_array($format, ['currency', 'integer', 'percent'])) {
+        if (in_array($format, ["currency", "integer", "percent"])) {
             $formatArgs = $subFormat;
             $subFormat = $format;
-            $format = 'number';
+            $format = "number";
         } elseif (is_numeric($subFormat)) {
             $formatArgs = $subFormat;
-            $subFormat = '';
+            $subFormat = "";
         }
 
         $value = valr($field, $args, null);
-        if ($value === null && !in_array($format, ['url', 'exurl', 'number', 'plural'])) {
-            $result = '';
+        if ($value === null && !in_array($format, ["url", "exurl", "number", "plural"])) {
+            $result = "";
         } else {
             switch (strtolower($format)) {
-                case 'date':
+                case "date":
                     switch ($subFormat) {
-                        case 'short':
-                            $result = Gdn_Format::date($value, '%d/%m/%Y');
+                        case "short":
+                            $result = Gdn_Format::date($value, "%d/%m/%Y");
                             break;
-                        case 'medium':
-                            $result = Gdn_Format::date($value, '%e %b %Y');
+                        case "medium":
+                            $result = Gdn_Format::date($value, "%e %b %Y");
                             break;
-                        case 'long':
-                            $result = Gdn_Format::date($value, '%e %B %Y');
+                        case "long":
+                            $result = Gdn_Format::date($value, "%e %B %Y");
                             break;
                         default:
                             $result = Gdn_Format::date($value);
                             break;
                     }
                     break;
-                case 'html':
-                case 'htmlspecialchars':
+                case "html":
+                case "htmlspecialchars":
                     $result = htmlspecialchars($value);
                     break;
-                case 'number':
+                case "number":
                     if (!is_numeric($value)) {
                         $result = $value;
                     } else {
                         switch ($subFormat) {
-                            case 'currency':
-                                $result = '$'.number_format($value, is_numeric($formatArgs) ? $formatArgs : 2);
+                            case "currency":
+                                $result = '$' . number_format($value, is_numeric($formatArgs) ? $formatArgs : 2);
                                 break;
-                            case 'integer':
-                                $result = (string)round($value);
+                            case "integer":
+                                $result = (string) round($value);
                                 if (is_numeric($formatArgs) && strlen($result) < $formatArgs) {
-                                    $result = str_repeat('0', $formatArgs - strlen($result)).$result;
+                                    $result = str_repeat("0", $formatArgs - strlen($result)) . $result;
                                 }
                                 break;
-                            case 'percent':
+                            case "percent":
                                 $result = round($value * 100, is_numeric($formatArgs) ? $formatArgs : 0);
                                 break;
                             default:
@@ -649,10 +666,10 @@ if (!function_exists('_formatStringCallback')) {
                         }
                     }
                     break;
-                case 'plural':
+                case "plural":
                     if (is_array($value)) {
                         $value = count($value);
-                    } elseif (stringEndsWith($field, 'UserID', true)) {
+                    } elseif (stringEndsWith($field, "UserID", true)) {
                         $value = 1;
                     }
 
@@ -660,46 +677,46 @@ if (!function_exists('_formatStringCallback')) {
                         $result = $value;
                     } else {
                         if (!$subFormat) {
-                            $subFormat = rtrim("%s $field", 's');
+                            $subFormat = rtrim("%s $field", "s");
                         }
                         if (!$formatArgs) {
-                            $formatArgs = $subFormat.'s';
+                            $formatArgs = $subFormat . "s";
                         }
 
                         $result = plural($value, $subFormat, $formatArgs);
                     }
                     break;
-                case 'rawurlencode':
+                case "rawurlencode":
                     $result = rawurlencode($value);
                     break;
-                case 'text':
+                case "text":
                     $result = Gdn_Format::text($value, false);
                     break;
-                case 'time':
-                    $result = Gdn_Format::date($value, '%l:%M%p');
+                case "time":
+                    $result = Gdn_Format::date($value, "%l:%M%p");
                     break;
-                case 'url':
-                    if (strpos($field, '/') !== false) {
+                case "url":
+                    if (strpos($field, "/") !== false) {
                         $value = $field;
                     }
-                    $result = url($value, $subFormat == 'domain');
+                    $result = url($value, $subFormat == "domain");
                     break;
-                case 'exurl':
-                    if (strpos($field, '/') !== false) {
+                case "exurl":
+                    if (strpos($field, "/") !== false) {
                         $value = $field;
                     }
                     $result = externalUrl($value);
                     break;
-                case 'urlencode':
+                case "urlencode":
                     $result = urlencode($value);
                     break;
-                case 'gender':
+                case "gender":
                     // Format in the form of FieldName,gender,male,female,unknown[,plural]
                     if (is_array($value) && count($value) == 1) {
                         $value = array_shift($value);
                     }
 
-                    $gender = 'u';
+                    $gender = "u";
 
                     if (!is_array($value)) {
                         $user = Gdn::userModel()->getID($value);
@@ -707,54 +724,54 @@ if (!function_exists('_formatStringCallback')) {
                             $gender = $user->Gender;
                         }
                     } else {
-                        $gender = 'p';
+                        $gender = "p";
                     }
 
                     switch ($gender) {
-                        case 'm':
+                        case "m":
                             $result = $subFormat;
                             break;
-                        case 'f':
+                        case "f":
                             $result = $formatArgs;
                             break;
-                        case 'p':
-                            $result = ($parts[5] ?? ($parts[4] ?? false));
+                        case "p":
+                            $result = $parts[5] ?? ($parts[4] ?? false);
                             break;
-                        case 'u':
+                        case "u":
                         default:
-                            $result = ($parts[4] ?? false);
+                            $result = $parts[4] ?? false;
                     }
 
                     break;
-                case 'user':
-                case 'you':
-                case 'his':
-                case 'her':
-                case 'your':
-//                    $Result = print_r($Value, true);
+                case "user":
+                case "you":
+                case "his":
+                case "her":
+                case "your":
+                    //                    $Result = print_r($Value, true);
                     $argsBak = $args;
                     if (is_array($value) && count($value) == 1) {
                         $value = array_shift($value);
                     }
 
                     if (is_array($value)) {
-                        if (isset($value['UserID'])) {
+                        if (isset($value["UserID"])) {
                             $user = $value;
-                            $user['Name'] = formatUsername($user, $format, $contextUserID);
+                            $user["Name"] = formatUsername($user, $format, $contextUserID);
 
                             $result = userAnchor($user);
                         } else {
-                            $max = c('Garden.FormatUsername.Max', 5);
+                            $max = c("Garden.FormatUsername.Max", 5);
                             // See if there is another count.
-                            $extraCount = valr($field.'_Count', $args, 0);
+                            $extraCount = valr($field . "_Count", $args, 0);
 
                             $count = count($value);
-                            $result = '';
+                            $result = "";
                             for ($i = 0; $i < $count; $i++) {
                                 if ($i >= $max && $count > $max + 1) {
                                     $others = $count - $i + $extraCount;
-                                    $result .= ' '.t('sep and', 'and').' '
-                                        .plural($others, '%s other', '%s others');
+                                    $result .=
+                                        " " . t("sep and", "and") . " " . plural($others, "%s other", "%s others");
                                     break;
                                 }
 
@@ -763,20 +780,20 @@ if (!function_exists('_formatStringCallback')) {
                                     continue;
                                 }
 
-                                $separator = '';
+                                $separator = "";
                                 if ($i == $count - 1) {
-                                    $separator = ' '.t('sep and', 'and').' ';
+                                    $separator = " " . t("sep and", "and") . " ";
                                 } elseif ($i > 0) {
-                                    $separator = ', ';
+                                    $separator = ", ";
                                 }
-                                $special = [-1 => t('everyone'), -2 => t('moderators'), -3 => t('administrators')];
+                                $special = [-1 => t("everyone"), -2 => t("moderators"), -3 => t("administrators")];
                                 if (isset($special[$iD])) {
-                                    $result .= $separator.$special[$iD];
+                                    $result .= $separator . $special[$iD];
                                 } else {
                                     $user = Gdn::userModel()->getID($iD);
                                     if ($user && $user->Deleted == 0) {
                                         $user->Name = formatUsername($user, $format, $contextUserID);
-                                        $result .= $separator.userAnchor($user);
+                                        $result .= $separator . userAnchor($user);
                                     }
                                 }
                             }
@@ -789,7 +806,7 @@ if (!function_exists('_formatStringCallback')) {
                             // Manually build instead of using userAnchor() because of special 'You' case.
                             $result = anchor(htmlspecialchars($name), userUrl($user));
                         } else {
-                            $result = '';
+                            $result = "";
                         }
                     }
 
@@ -804,7 +821,7 @@ if (!function_exists('_formatStringCallback')) {
     }
 }
 
-if (!function_exists('getAppCookie')) {
+if (!function_exists("getAppCookie")) {
     /**
      * Get a cookie with the application prefix.
      *
@@ -812,13 +829,14 @@ if (!function_exists('getAppCookie')) {
      * @param mixed $default The default to return if the cookie is not found.
      * @return string Returns the cookie value or {@link $default}.
      */
-    function getAppCookie($name, $default = null) {
-        $px = c('Garden.Cookie.Name');
+    function getAppCookie($name, $default = null)
+    {
+        $px = c("Garden.Cookie.Name");
         return getValue("$px-$name", $_COOKIE, $default);
     }
 }
 
-if (!function_exists('getMentions')) {
+if (!function_exists("getMentions")) {
     /**
      * Get all usernames mentioned in an HTML string.
      *
@@ -829,9 +847,10 @@ if (!function_exists('getMentions')) {
      * @param bool $skipCode Whether to call the callback function on code tag content.
      * @return array An array of usernames that are mentioned.
      */
-    function getMentions($html, $skipAnchors = true, $skipCode = true) {
+    function getMentions($html, $skipAnchors = true, $skipCode = true)
+    {
         // Check for a custom mentions formatter and use it.
-        $formatter = Gdn::factory('mentionsFormatter');
+        $formatter = Gdn::factory("mentionsFormatter");
         if (is_object($formatter)) {
             return $formatter->getMentions($html);
         }
@@ -849,31 +868,31 @@ if (!function_exists('getMentions')) {
         // within anchor tags or code tags.
         foreach ($parts as $i => $str) {
             if ($str) {
-                if ($str == '<') {
+                if ($str == "<") {
                     $inTag = true;
                 }
-                if ($str == '>') {
+                if ($str == ">") {
                     $inTag = false;
                 }
                 if ($inTag) {
-                    if ($str[0] == '/') {
-                        $tagName = preg_split('`\s`', substr($str, 1), 2);
+                    if ($str[0] == "/") {
+                        $tagName = preg_split("`\s`", substr($str, 1), 2);
                         $tagName = $tagName[0];
 
-                        if ($tagName == 'a') {
+                        if ($tagName == "a") {
                             $inAnchor = false;
                         }
-                        if ($tagName == 'code') {
+                        if ($tagName == "code") {
                             $inCode = false;
                         }
                     } else {
-                        $tagName = preg_split('`\s`', trim($str), 2);
+                        $tagName = preg_split("`\s`", trim($str), 2);
                         $tagName = $tagName[0];
 
-                        if ($tagName == 'a') {
+                        if ($tagName == "a") {
                             $inAnchor = true;
                         }
-                        if ($tagName == 'code') {
+                        if ($tagName == "code") {
                             $inCode = true;
                         }
                     }
@@ -887,7 +906,7 @@ if (!function_exists('getMentions')) {
     }
 }
 
-if (!function_exists('getRecord')) {
+if (!function_exists("getRecord")) {
     /**
      * Get a record from the database.
      *
@@ -898,44 +917,45 @@ if (!function_exists('getRecord')) {
      * @throws Exception Throws an exception with a 404 code if the record isn't found and {@link $throw} is true.
      * @throws Gdn_UserException Throws an exception when {@link $recordType} is unknown.
      */
-    function getRecord($recordType, $id, $throw = false) {
+    function getRecord($recordType, $id, $throw = false)
+    {
         $recordType = strtolower($recordType);
 
         /** @var \Garden\Container\Container $container */
         $container = Gdn::getContainer();
 
         switch ($recordType) {
-            case 'discussion':
+            case "discussion":
                 /** @var DiscussionModel $discussionModel */
                 $discussionModel = $container->get(DiscussionModel::class);
                 $row = $discussionModel->getID($id, DATASET_TYPE_ARRAY);
                 if (!$discussionModel->canView($row)) {
                     throw permissionException();
                 }
-                $row['ShareUrl'] = $row['Url'] = discussionUrl($row);
+                $row["ShareUrl"] = $row["Url"] = discussionUrl($row);
                 break;
-            case 'comment':
+            case "comment":
                 /** @var CommentModel $commentModel */
                 $commentModel = $container->get(CommentModel::class);
                 $row = $commentModel->getID($id, DATASET_TYPE_ARRAY);
                 if ($row) {
                     /** @var DiscussionModel $discussionModel */
                     $discussionModel = $container->get(DiscussionModel::class);
-                    $row['Url'] = url("/discussion/comment/{$id}#Comment_{$id}", true);
+                    $row["Url"] = url("/discussion/comment/{$id}#Comment_{$id}", true);
 
-                    $discussion = $discussionModel->getID($row['DiscussionID'], DATASET_TYPE_ARRAY);
+                    $discussion = $discussionModel->getID($row["DiscussionID"], DATASET_TYPE_ARRAY);
                     if ($discussion) {
                         if (!$discussionModel->canView($discussion)) {
                             throw permissionException();
                         }
-                        $discussion['Url'] = discussionUrl($discussion);
-                        $row['ShareUrl'] = $row['Url'];
-                        $row['Name'] = $discussion['Name'];
-                        $row['Discussion'] = $discussion;
+                        $discussion["Url"] = discussionUrl($discussion);
+                        $row["ShareUrl"] = $row["Url"];
+                        $row["Name"] = $discussion["Name"];
+                        $row["Discussion"] = $discussion;
                     }
                 }
                 break;
-            case 'activity':
+            case "activity":
                 /** @var ActivityModel $activityModel */
                 $activityModel = $container->get(ActivityModel::class);
                 $row = $activityModel->getID($id, DATASET_TYPE_ARRAY);
@@ -944,12 +964,12 @@ if (!function_exists('getRecord')) {
                         throw permissionException();
                     }
 
-                    $row['Name'] = $row['ActivityName'];
-                    $row['Body'] = $row['Story'];
+                    $row["Name"] = $row["ActivityName"];
+                    $row["Body"] = $row["Story"];
                 }
                 break;
             default:
-                throw new Gdn_UserException('Unknown record type requested.');
+                throw new Gdn_UserException("Unknown record type requested.");
         }
 
         if (!$row && $throw) {
@@ -960,7 +980,7 @@ if (!function_exists('getRecord')) {
     }
 }
 
-if (!function_exists('isSafeUrl')) {
+if (!function_exists("isSafeUrl")) {
     /**
      * Used to determine if a URL is on safe for use.
      *
@@ -969,26 +989,26 @@ if (!function_exists('isSafeUrl')) {
      * @param string $url The Http url to be checked.
      * @return bool Returns true if the URL is safe or false otherwise.
      */
-    function isSafeUrl($url) {
-
+    function isSafeUrl($url)
+    {
         $parsedUrl = parse_url($url);
-        if (empty($parsedUrl['host']) || $parsedUrl['host'] == Gdn::request()->host()) {
+        if (empty($parsedUrl["host"]) || $parsedUrl["host"] == Gdn::request()->host()) {
             return true;
         }
 
         return false;
     }
-
 }
 
-if (!function_exists('isTrustedDomain')) {
+if (!function_exists("isTrustedDomain")) {
     /**
      * Check to see if a URL or domain name is in a trusted domain.
      *
      * @param string $url The URL or domain name to check.
      * @return bool True if verified as a trusted domain.  False if unable to verify domain.
      */
-    function isTrustedDomain($url) {
+    function isTrustedDomain($url)
+    {
         static $trusted = null;
 
         if (DebugUtils::isTestMode()) {
@@ -1011,21 +1031,21 @@ if (!function_exists('isTrustedDomain')) {
             $trustedDomains = $trustedDomainModel->getAll();
             foreach ($trustedDomains as $domain) {
                 // Store the trusted domain by its host name.
-                if (strpos($domain, '//') === false) {
-                    $domain = '//'.$domain;
+                if (strpos($domain, "//") === false) {
+                    $domain = "//" . $domain;
                 }
-                $host = preg_replace('`^(\*?\.)`', '', parse_url($domain, PHP_URL_HOST));
+                $host = preg_replace("`^(\*?\.)`", "", parse_url($domain, PHP_URL_HOST));
                 $trusted[$host] = $domain;
             }
         }
 
         // Make sure the domain.
-        if (strpos($url, '//') === false) {
-            $url = '//'.$url;
+        if (strpos($url, "//") === false) {
+            $url = "//" . $url;
         }
 
         // Check the URL against all domains by host part.
-        for ($host = parse_url($url, PHP_URL_HOST); !empty($host); $host = ltrim(strstr($host, '.'), '.')) {
+        for ($host = parse_url($url, PHP_URL_HOST); !empty($host); $host = ltrim(strstr($host, "."), ".")) {
             if (isset($trusted[$host]) && urlMatch($trusted[$host], $url)) {
                 return true;
             }
@@ -1036,7 +1056,7 @@ if (!function_exists('isTrustedDomain')) {
     }
 }
 
-if (!function_exists('joinRecords')) {
+if (!function_exists("joinRecords")) {
     /**
      * Join external records to an array.
      *
@@ -1048,7 +1068,8 @@ if (!function_exists('joinRecords')) {
      * @param bool $checkCategoryPermission Only include results from categories the user has access to.
      * @since 2.3
      */
-    function joinRecords(&$data, $column = '', $unset = false, $checkCategoryPermission = true) {
+    function joinRecords(&$data, $column = "", $unset = false, $checkCategoryPermission = true)
+    {
         $iDs = [];
         $allowedCats = DiscussionModel::categoryPermissions();
 
@@ -1060,37 +1081,39 @@ if (!function_exists('joinRecords')) {
 
         // Gather all of the ids to fetch.
         foreach ($data as &$row) {
-            if (!$row['RecordType']) {
+            if (!$row["RecordType"]) {
                 continue;
             }
 
-            $recordType = ucfirst(stringEndsWith($row['RecordType'], '-Total', true, true));
-            $row['RecordType'] = $recordType;
-            $iD = $row['RecordID'];
+            $recordType = ucfirst(stringEndsWith($row["RecordType"], "-Total", true, true));
+            $row["RecordType"] = $recordType;
+            $iD = $row["RecordID"];
             $iDs[$recordType][$iD] = $iD;
         }
 
         // Fetch all of the data in turn.
         $joinData = [];
         foreach ($iDs as $recordType => $recordIDs) {
-            if ($recordType == 'Comment') {
-                Gdn::sql()->select('d.Name, d.CategoryID')->join('Discussion d', 'd.DiscussionID = r.DiscussionID');
+            if ($recordType == "Comment") {
+                Gdn::sql()
+                    ->select("d.Name, d.CategoryID")
+                    ->join("Discussion d", "d.DiscussionID = r.DiscussionID");
             }
 
             $rows = Gdn::sql()
-                ->select('r.*')
-                ->whereIn($recordType.'ID', array_values($recordIDs))
-                ->get($recordType.' r')
+                ->select("r.*")
+                ->whereIn($recordType . "ID", array_values($recordIDs))
+                ->get($recordType . " r")
                 ->resultArray();
 
-            $joinData[$recordType] = Gdn_DataSet::index($rows, [$recordType.'ID']);
+            $joinData[$recordType] = Gdn_DataSet::index($rows, [$recordType . "ID"]);
         }
 
         // Join the rows.
         $unsets = [];
         foreach ($data as $index => &$row) {
-            $recordType = $row['RecordType'];
-            $iD = $row['RecordID'];
+            $recordType = $row["RecordType"];
+            $iD = $row["RecordID"];
 
             if (!isset($joinData[$recordType][$iD])) {
                 if ($unset) {
@@ -1103,31 +1126,31 @@ if (!function_exists('joinRecords')) {
 
             if ($checkCategoryPermission && $allowedCats !== true) {
                 // Check to see if the user has permission to view this record.
-                $categoryID = getValue('CategoryID', $record, -1);
+                $categoryID = getValue("CategoryID", $record, -1);
                 if (!in_array($categoryID, $allowedCats)) {
                     if ($unset) {
                         $unsets[] = $index;
                     } else {
-                        $row['RecordType'] = null;
-                        $row['RecordID'] = null;
-                        unset($row['RecordBody'], $row['RecordFormat']);
+                        $row["RecordType"] = null;
+                        $row["RecordID"] = null;
+                        unset($row["RecordBody"], $row["RecordFormat"]);
                     }
                     continue;
                 }
             }
 
             switch ($recordType) {
-                case 'Discussion':
-                    $url = discussionUrl($record, '', '/').'#latest';
+                case "Discussion":
+                    $url = discussionUrl($record, "", "/") . "#latest";
                     break;
-                case 'Comment':
-                    $url = commentUrl($record, '/');
-                    $record['Name'] = sprintf(t('Re: %s'), $record['Name']);
+                case "Comment":
+                    $url = commentUrl($record, "/");
+                    $record["Name"] = sprintf(t("Re: %s"), $record["Name"]);
                     break;
                 default:
-                    $url = '';
+                    $url = "";
             }
-            $record['Url'] = $url;
+            $record["Url"] = $url;
 
             if ($column) {
                 $row[$column] = $record;
@@ -1141,16 +1164,15 @@ if (!function_exists('joinRecords')) {
         }
 
         // Join the users.
-        Gdn::userModel()->joinUsers($data, ['InsertUserID']);
+        Gdn::userModel()->joinUsers($data, ["InsertUserID"]);
 
         if (!empty($unsets)) {
             $data = array_values($data);
         }
     }
-
 }
 
-if (!function_exists('jsonEncodeChecked')) {
+if (!function_exists("jsonEncodeChecked")) {
     /**
      * Encode a value as JSON or throw an exception on error.
      *
@@ -1160,12 +1182,13 @@ if (!function_exists('jsonEncodeChecked')) {
      * @throws Exception If an error occurred while encoding.
      * @deprecated 2.8 Use \Vanilla\Utility\StringUtils::jsonEncodeChecked instead.
      */
-    function jsonEncodeChecked($value, $options = null) {
+    function jsonEncodeChecked($value, $options = null)
+    {
         return \Vanilla\Utility\StringUtils::jsonEncodeChecked($value, $options);
     }
 }
 
-if (!function_exists('passwordStrength')) {
+if (!function_exists("passwordStrength")) {
     /**
      * Check a password's strength.
      *
@@ -1179,73 +1202,77 @@ if (!function_exists('passwordStrength')) {
      *    - Entropy: The amount of entropy in the password.
      *    - Score: The password's complexity score.
      */
-    function passwordStrength($password, $username) {
-        $translations = explode(',', t('Password Translations', 'Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong'));
+    function passwordStrength($password, $username)
+    {
+        $translations = explode(
+            ",",
+            t("Password Translations", "Too Short,Contains Username,Very Weak,Weak,Ok,Good,Strong")
+        );
 
         // calculate $Entropy
         $alphabet = 0;
-        if (preg_match('/[0-9]/', $password)) {
+        if (preg_match("/[0-9]/", $password)) {
             $alphabet += 10;
         }
-        if (preg_match('/[a-z]/', $password)) {
+        if (preg_match("/[a-z]/", $password)) {
             $alphabet += 26;
         }
-        if (preg_match('/[A-Z]/', $password)) {
+        if (preg_match("/[A-Z]/", $password)) {
             $alphabet += 26;
         }
-        if (preg_match('/[^a-zA-Z0-9]/', $password)) {
+        if (preg_match("/[^a-zA-Z0-9]/", $password)) {
             $alphabet += 31;
         }
 
         $length = strlen($password);
         $entropy = log(pow($alphabet, $length), 2);
 
-        $requiredLength = c('Garden.Password.MinLength', 6);
-        $requiredScore = c('Garden.Password.MinScore', 2);
+        $requiredLength = c("Garden.Password.MinLength", 8);
+        $requiredScore = c("Garden.Password.MinScore", 2);
         $response = [
-            'Pass' => false,
-            'Symbols' => $alphabet,
-            'Length' => $length,
-            'Entropy' => $entropy,
-            'Required' => $requiredLength,
-            'Score' => 0
+            "Pass" => false,
+            "Symbols" => $alphabet,
+            "Length" => $length,
+            "Entropy" => $entropy,
+            "Required" => $requiredLength,
+            "Score" => 0,
         ];
 
         if ($length < $requiredLength) {
-            $response['Reason'] = $translations[0];
+            $response["Reason"] = $translations[0];
             return $response;
         }
 
         // password1 == username
         if (strpos(strtolower($username), strtolower($password)) !== false) {
-            $response['Reason'] = $translations[1];
+            $response["Reason"] = $translations[1];
             return $response;
         }
 
         if ($entropy < 30) {
-            $response['Score'] = 1;
-            $response['Reason'] = $translations[2];
+            $response["Score"] = 1;
+            $response["Reason"] = $translations[2];
         } elseif ($entropy < 40) {
-            $response['Score'] = 2;
-            $response['Reason'] = $translations[3];
+            $response["Score"] = 2;
+            $response["Reason"] = $translations[3];
         } elseif ($entropy < 55) {
-            $response['Score'] = 3;
-            $response['Reason'] = $translations[4];
+            $response["Score"] = 3;
+            $response["Reason"] = $translations[4];
         } elseif ($entropy < 70) {
-            $response['Score'] = 4;
-            $response['Reason'] = $translations[5];
+            $response["Score"] = 4;
+            $response["Reason"] = $translations[5];
         } else {
-            $response['Score'] = 5;
-            $response['Reason'] = $translations[6];
+            $response["Score"] = 5;
+            $response["Reason"] = $translations[6];
         }
 
-        $response['Pass'] = $response['Score'] >= $requiredScore;
+        $response["Pass"] = $response["Score"] >= $requiredScore;
 
         return $response;
     }
 }
 
-if (!function_exists('recordType')) {
+if (!function_exists("recordType")) {
     /**
      * Return the record type and id of a row.
      *
@@ -1255,22 +1282,23 @@ if (!function_exists('recordType')) {
      *  - 1: record ID
      * @since 2.1
      */
-    function recordType($row) {
-        if ($recordType = val('RecordType', $row)) {
-            return [$recordType, val('RecordID', $row)];
-        } elseif ($commentID = val('CommentID', $row)) {
-            return ['Comment', $commentID];
-        } elseif ($discussionID = val('DiscussionID', $row)) {
-            return ['Discussion', $discussionID];
-        } elseif ($activityID = val('ActivityID', $row)) {
-            return ['Activity', $activityID];
+    function recordType($row)
+    {
+        if ($recordType = val("RecordType", $row)) {
+            return [$recordType, val("RecordID", $row)];
+        } elseif ($commentID = val("CommentID", $row)) {
+            return ["Comment", $commentID];
+        } elseif ($discussionID = val("DiscussionID", $row)) {
+            return ["Discussion", $discussionID];
+        } elseif ($activityID = val("ActivityID", $row)) {
+            return ["Activity", $activityID];
         } else {
             return [null, null];
         }
     }
 }
 
-if (!function_exists('redirectTo')) {
+if (!function_exists("redirectTo")) {
     /**
      * Redirect to the supplied destination.
      *
@@ -1279,9 +1307,10 @@ if (!function_exists('redirectTo')) {
      * @param int $statusCode HTTP status code. 302 by default.
      * @param bool $trustedOnly Non trusted destinations will be redirected to /home/leaving?Target=$destination
      */
-    function redirectTo($destination = null, $statusCode = 302, $trustedOnly = true) {
+    function redirectTo($destination = null, $statusCode = 302, $trustedOnly = true)
+    {
         if ($destination === null) {
-            $url = url('');
+            $url = url("");
         } elseif ($trustedOnly) {
             $url = safeURL($destination);
         } else {
@@ -1300,7 +1329,7 @@ if (!function_exists('redirectTo')) {
 
         // Encode backslashes because most modern browsers convert backslashes to slashes.
         // This would cause http://evil.domain\@trusted.domain/ to be converted to http://evil.domain/@trusted.domain/
-        $url = str_replace('\\', '%5c', $url);
+        $url = str_replace("\\", "%5c", $url);
 
         if (DebugUtils::isTestMode()) {
             throw new ResponseException(new Redirect($url, $statusCode));
@@ -1313,34 +1342,37 @@ if (!function_exists('redirectTo')) {
             CacheControlMiddleware::sendCacheControlHeaders(CacheControlConstantsInterface::NO_CACHE);
         }
 
-        if (Gdn::controller() !== null
-            && in_array(Gdn::controller()->deliveryType(), [DELIVERY_TYPE_ASSET, DELIVERY_TYPE_VIEW], true)
-            && Gdn::controller()->deliveryMethod() === DELIVERY_METHOD_JSON) {
+        if (
+            Gdn::controller() !== null &&
+            in_array(Gdn::controller()->deliveryType(), [DELIVERY_TYPE_ASSET, DELIVERY_TYPE_VIEW], true) &&
+            Gdn::controller()->deliveryMethod() === DELIVERY_METHOD_JSON
+        ) {
             // This is a bit of a kludge, but it solves a perpetual gotcha when we switch full page forms to AJAX forms and forget about redirects.
             echo json_encode([
-                'FormSaved' => true,
-                'RedirectUrl' => $url,
-                'RedirectTo' => $url,
+                "FormSaved" => true,
+                "RedirectUrl" => $url,
+                "RedirectTo" => $url,
             ]);
         } else {
-            safeHeader('Location: ' . $url, true, $statusCode);
+            safeHeader("Location: " . $url, true, $statusCode);
         }
         exit();
     }
 }
 
-if (!function_exists('remoteIP')) {
+if (!function_exists("remoteIP")) {
     /**
      * Get the IP address of the current request.
      *
      * @return string Returns an IP address as a string.
      */
-    function remoteIP() {
+    function remoteIP()
+    {
         return Gdn::request()->ipAddress();
     }
 }
 
-if (!function_exists('removeFromConfig')) {
+if (!function_exists("removeFromConfig")) {
     /**
      * Remove a value from the configuration.
      *
@@ -1350,12 +1382,13 @@ if (!function_exists('removeFromConfig')) {
      * @param array $options An array of additional options for removal.
      * @see Gdn_Config::removeFromConfig()
      */
-    function removeFromConfig($name, $options = []) {
+    function removeFromConfig($name, $options = [])
+    {
         Gdn::config()->removeFromConfig($name, $options);
     }
 }
 
-if (!function_exists('safeURL')) {
+if (!function_exists("safeURL")) {
     /**
      * Transform a destination to make sure that the resulting URL is "Safe".
      *
@@ -1365,14 +1398,15 @@ if (!function_exists('safeURL')) {
      * @param bool $withDomain
      * @return string The destination if safe, /home/leaving?Target=$destination if not.
      */
-    function safeURL($destination, $withDomain = false) {
+    function safeURL($destination, $withDomain = false)
+    {
         /** @var TrustedDomainModel $trustedDomainModel */
         $trustedDomainModel = Gdn::getContainer()->get(TrustedDomainModel::class);
         return $trustedDomainModel->safeUrl($destination, $withDomain);
     }
 }
 
-if (!function_exists('saveToConfig')) {
+if (!function_exists("saveToConfig")) {
     /**
      * Save values to the application's configuration file.
      *
@@ -1386,12 +1420,13 @@ if (!function_exists('saveToConfig')) {
      * @return bool: Whether or not the save was successful. null if no changes were necessary.
      * @deprecated
      */
-    function saveToConfig($name, $value = '', $options = []) {
+    function saveToConfig($name, $value = "", $options = [])
+    {
         Gdn::config()->saveToConfig($name, $value, $options);
     }
 }
 
-if (!function_exists('setAppCookie')) {
+if (!function_exists("setAppCookie")) {
     /**
      * Set a cookie with the appropriate application cookie prefix and other cookie information.
      *
@@ -1400,8 +1435,9 @@ if (!function_exists('setAppCookie')) {
      * @param int $expire When the cookie should expire.
      * @param bool $force Whether or not to set the cookie even if already exists.
      */
-    function setAppCookie($name, $value, $expire = 0, $force = false) {
-        $px = c('Garden.Cookie.Name');
+    function setAppCookie($name, $value, $expire = 0, $force = false)
+    {
+        $px = c("Garden.Cookie.Name");
         $key = "$px-$name";
 
         // Check to see if the cookie is already set before setting it again.
@@ -1409,33 +1445,34 @@ if (!function_exists('setAppCookie')) {
             return;
         }
 
-        $domain = c('Garden.Cookie.Domain', '');
+        $domain = c("Garden.Cookie.Domain", "");
 
         // If the domain being set is completely incompatible with the current domain then make the domain work.
         $currentHost = Gdn::request()->host();
-        if (!stringEndsWith($currentHost, trim($domain, '.'))) {
-            $domain = '';
+        if (!stringEndsWith($currentHost, trim($domain, "."))) {
+            $domain = "";
         }
 
         // Create the cookie.
-        $path = c('Garden.Cookie.Path', '/');
+        $path = c("Garden.Cookie.Path", "/");
         safeCookie($key, $value, $expire, $path, $domain, null, true);
         $_COOKIE[$key] = $value;
     }
 }
 
-if (!function_exists('signInPopup')) {
+if (!function_exists("signInPopup")) {
     /**
      * Returns a boolean value indicating if sign in windows should be "popped" into modal in-page popups.
      *
      * @return bool Returns true if signin popups are used.
      */
-    function signInPopup() {
-        return c('Garden.SignIn.Popup');
+    function signInPopup()
+    {
+        return c("Garden.SignIn.Popup");
     }
 }
 
-if (!function_exists('smartAsset')) {
+if (!function_exists("smartAsset")) {
     /**
      * Takes the path to an asset (image, js file, css file, etc) and prepends the web root.
      *
@@ -1444,23 +1481,28 @@ if (!function_exists('smartAsset')) {
      * @param bool $addVersion Whether or not to add a cache-busting version querystring parameter to the URL.
      * @return string Returns the URL of the asset.
      */
-    function smartAsset($destination = '', $withDomain = false, $addVersion = false) {
-        $destination = str_replace('\\', '/', $destination);
+    function smartAsset($destination = "", $withDomain = false, $addVersion = false)
+    {
+        $destination = str_replace("\\", "/", $destination);
         if (isUrl($destination)) {
             $result = $destination;
         } else {
-            $result = Gdn::request()->urlDomain($withDomain).Gdn::request()->getAssetRoot().'/'.ltrim($destination, '/');
+            $result =
+                Gdn::request()->urlDomain($withDomain) .
+                Gdn::request()->getAssetRoot() .
+                "/" .
+                ltrim($destination, "/");
         }
 
         if ($addVersion) {
             $version = assetVersion($destination);
-            $result .= (strpos($result, '?') === false ? '?' : '&').'v='.urlencode($version);
+            $result .= (strpos($result, "?") === false ? "?" : "&") . "v=" . urlencode($version);
         }
         return $result;
     }
 }
 
-if (!function_exists('sprintft')) {
+if (!function_exists("sprintft")) {
     /**
      * A version of {@link sprintf()} That translates the string format.
      *
@@ -1468,14 +1510,15 @@ if (!function_exists('sprintft')) {
      * @param mixed $arg1 The arguments to pass to {@link sprintf()}.
      * @return string The translated string.
      */
-    function sprintft($formatCode, $arg1 = null) {
+    function sprintft($formatCode, $arg1 = null)
+    {
         $args = func_get_args();
         $args[0] = t($formatCode, $formatCode);
-        return call_user_func_array('sprintf', $args);
+        return call_user_func_array("sprintf", $args);
     }
 }
 
-if (!function_exists('t')) {
+if (!function_exists("t")) {
     /**
      * Translates a code into the selected locale's definition.
      *
@@ -1485,12 +1528,13 @@ if (!function_exists('t')) {
      * @return string The translated string or $code if there is no value in $default.
      * @see Gdn::translate()
      */
-    function t($code, $default = false) {
+    function t($code, $default = false)
+    {
         return Gdn::translate($code, $default);
     }
 }
 
-if (!function_exists('TagUrl')) {
+if (!function_exists("TagUrl")) {
     /**
      * Get a URL to a list of discussions with the specified tag.
      *
@@ -1500,32 +1544,33 @@ if (!function_exists('TagUrl')) {
      * @see url() for $withDomain docs.
      * @return string
      */
-    function tagUrl($row, $page = '', $withDomain = false) {
+    function tagUrl($row, $page = "", $withDomain = false)
+    {
         static $useCategories;
         if (!isset($useCategories)) {
-            $useCategories = c('Vanilla.Tagging.UseCategories');
+            $useCategories = c("Vanilla.Tagging.UseCategories");
         }
 
         // Add the p before a numeric page.
         if (is_numeric($page)) {
             if ($page > 1) {
-                $page = 'p'.$page;
+                $page = "p" . $page;
             } else {
-                $page = '';
+                $page = "";
             }
         }
         if ($page) {
-            $page = '/'.$page;
+            $page = "/" . $page;
         }
 
-        $tag = rawurlencode(val('Name', $row));
+        $tag = rawurlencode(val("Name", $row));
 
         if ($useCategories) {
-            $category = CategoryModel::categories($row['CategoryID']);
-            if ($category && $category['CategoryID'] > 0) {
-                $category = rawurlencode(val('UrlCode', $category, 'x'));
+            $category = CategoryModel::categories($row["CategoryID"]);
+            if ($category && $category["CategoryID"] > 0) {
+                $category = rawurlencode(val("UrlCode", $category, "x"));
             } else {
-                $category = 'x';
+                $category = "x";
             }
             $result = "/discussions/tagged/$category/$tag{$page}";
         } else {
@@ -1536,7 +1581,7 @@ if (!function_exists('TagUrl')) {
     }
 }
 
-if (!function_exists('translateContent')) {
+if (!function_exists("translateContent")) {
     /**
      * Translates user-generated content into the selected locale's definition.
      *
@@ -1549,26 +1594,28 @@ if (!function_exists('translateContent')) {
      * @see Gdn::translate()
      * @deprecated
      */
-    function translateContent($code, $default = false) {
+    function translateContent($code, $default = false)
+    {
         \Vanilla\Utility\Deprecation::log();
         return t($code, $default);
     }
 }
 
-if (!function_exists('theme')) {
+if (!function_exists("theme")) {
     /**
      * Get the name of the current theme.
      *
      * @return string Returns the name of the current theme.
      */
-    function theme() {
+    function theme()
+    {
         /** @var ThemeService $themeService */
         $themeService = Gdn::getContainer()->get(ThemeService::class);
         return $themeService->getCurrentThemeAddon()->getKey();
     }
 }
 
-if (!function_exists('trace')) {
+if (!function_exists("trace")) {
     /**
      * Trace some information for debugging.
      *
@@ -1580,7 +1627,8 @@ if (!function_exists('trace')) {
      * @param string $type One of the `TRACE_*` constants or a string label for the trace.
      * @return array|void Returns the array of traces.
      */
-    function trace($value = null, $type = TRACE_INFO) {
+    function trace($value = null, $type = TRACE_INFO)
+    {
         if (!debug()) {
             return [];
         }
@@ -1594,7 +1642,7 @@ if (!function_exists('trace')) {
     }
 }
 
-if (!function_exists('trustedDomains')) {
+if (!function_exists("trustedDomains")) {
     /**
      * Get an array of all of the trusted domains in the application.
      *
@@ -1602,7 +1650,8 @@ if (!function_exists('trustedDomains')) {
      *
      * @deprecated TrustedDomainModel
      */
-    function trustedDomains() {
+    function trustedDomains()
+    {
         deprecated(__FUNCTION__, TrustedDomainModel::class);
         /** @var TrustedDomainModel $domainModel */
         $domainModel = \Gdn::getContainer()->get(TrustedDomainModel::class);
@@ -1610,7 +1659,7 @@ if (!function_exists('trustedDomains')) {
     }
 }
 
-if (!function_exists('url')) {
+if (!function_exists("url")) {
     /**
      * Takes a route and prepends the web root (expects "/controller/action/params" as $Destination).
      *
@@ -1622,13 +1671,14 @@ if (!function_exists('url')) {
      * - /: Just return the path.
      * @return string Returns the resulting URL.
      */
-    function url($path = '', $withDomain = false) {
+    function url($path = "", $withDomain = false)
+    {
         $result = Gdn::request()->url(strval($path), $withDomain);
         return $result;
     }
 }
 
-if (!function_exists('userAgentType')) {
+if (!function_exists("userAgentType")) {
     /**
      * Get or set the type of user agent.
      *
@@ -1638,12 +1688,13 @@ if (!function_exists('userAgentType')) {
      * @param string|null|false $value The new value to set or **false** to clear. This should be one of desktop, mobile, tablet, or app.
      * @return string Returns one of desktop, mobile, tablet, or app.
      */
-    function userAgentType($value = null) {
+    function userAgentType($value = null)
+    {
         static $type = null;
 
         if ($value === false) {
             $type = null;
-            return '';
+            return "";
         } elseif ($value !== null) {
             $type = $value;
         }
@@ -1654,7 +1705,7 @@ if (!function_exists('userAgentType')) {
 
         // A function to make sure the type is one of our supported types.
         $validateType = function (string $type): string {
-            $validTypes = ['desktop', 'tablet', 'app', 'mobile'];
+            $validTypes = ["desktop", "tablet", "app", "mobile"];
 
             if (in_array($type, $validTypes)) {
                 return $type;
@@ -1666,96 +1717,174 @@ if (!function_exists('userAgentType')) {
                     }
                 }
             }
-            return 'desktop';
+            return "desktop";
         };
 
         // Try and get the user agent type from the header if it was set from the server, varnish, etc.
-        $type = strtolower(val('HTTP_X_UA_DEVICE', $_SERVER, ''));
+        $type = strtolower(val("HTTP_X_UA_DEVICE", $_SERVER, ""));
         if ($type) {
             return $validateType($type);
         }
 
         // See if there is an override in the cookie.
-        if ($type = val('X-UA-Device-Force', $_COOKIE)) {
+        if ($type = val("X-UA-Device-Force", $_COOKIE)) {
             return $validateType($type);
         }
 
         // Now we will have to figure out the type based on the user agent and other things.
-        $allHttp = strtolower(val('ALL_HTTP', $_SERVER));
-        $httpAccept = strtolower(val('HTTP_ACCEPT', $_SERVER));
-        $userAgent = strtolower(val('HTTP_USER_AGENT', $_SERVER));
+        $allHttp = strtolower(val("ALL_HTTP", $_SERVER));
+        $httpAccept = strtolower(val("HTTP_ACCEPT", $_SERVER));
+        $userAgent = strtolower(val("HTTP_USER_AGENT", $_SERVER));
 
         // Check for a mobile app.
-        if (strpos($userAgent, 'vanillamobileapp') !== false) {
-            return $type = 'app';
+        if (strpos($userAgent, "vanillamobileapp") !== false) {
+            return $type = "app";
         }
 
         // Match wap Accepts: header
-        if ((strpos($httpAccept, 'application/vnd.wap.xhtml+xml') > 0)
-            || ((isset($_SERVER['HTTP_X_WAP_PROFILE']) || isset($_SERVER['HTTP_PROFILE'])))
+        if (
+            strpos($httpAccept, "application/vnd.wap.xhtml+xml") > 0 ||
+            (isset($_SERVER["HTTP_X_WAP_PROFILE"]) || isset($_SERVER["HTTP_PROFILE"]))
         ) {
-            return $type = 'mobile';
+            return $type = "mobile";
         }
 
         // Match mobile androids
-        if (strpos($userAgent, 'android') !== false && strpos($userAgent, 'mobile') !== false) {
-            return $type = 'mobile';
+        if (strpos($userAgent, "android") !== false && strpos($userAgent, "mobile") !== false) {
+            return $type = "mobile";
         }
 
         // Match operamini in 'ALL_HTTP'
-        if (strpos($allHttp, 'operamini') > 0) {
-            return $type = 'mobile';
+        if (strpos($allHttp, "operamini") > 0) {
+            return $type = "mobile";
         }
 
         // Match discrete chunks of known mobile agents
         $directAgents = [
-            'up.browser',
-            'up.link',
-            'mmp',
-            'symbian',
-            'smartphone',
-            'midp',
-            'wap',
-            'phone',
-            'opera m',
-            'kindle',
-            'webos',
-            'playbook',
-            'bb10',
-            'playstation vita',
-            'windows phone',
-            'iphone',
-            'ipod',
-            'nintendo 3ds'
+            "up.browser",
+            "up.link",
+            "mmp",
+            "symbian",
+            "smartphone",
+            "midp",
+            "wap",
+            "phone",
+            "opera m",
+            "kindle",
+            "webos",
+            "playbook",
+            "bb10",
+            "playstation vita",
+            "windows phone",
+            "iphone",
+            "ipod",
+            "nintendo 3ds",
         ];
-        $directAgentsMatch = implode('|', $directAgents);
+        $directAgentsMatch = implode("|", $directAgents);
         if (preg_match("/({$directAgentsMatch})/i", $userAgent)) {
-            return $type = 'mobile';
+            return $type = "mobile";
         }
 
         // Match starting chunks of known
         $mobileUserAgent = substr($userAgent, 0, 4);
         $mobileUserAgents = [
-            'w3c ', 'acs-', 'alav', 'alca', 'amoi', 'audi', 'avan', 'benq', 'bird', 'blac',
-            'blaz', 'brew', 'cell', 'cldc', 'cmd-', 'dang', 'doco', 'eric', 'hipt', 'inno',
-            'ipaq', 'java', 'jigs', 'kddi', 'keji', 'leno', 'lg-c', 'lg-d', 'lg-g', 'lge-',
-            'maui', 'maxo', 'midp', 'mits', 'mmef', 'mobi', 'mot-', 'moto', 'mwbp', 'nec-',
-            'newt', 'noki', 'palm', 'pana', 'pant', 'phil', 'play', 'port', 'prox', 'qwap',
-            'sage', 'sams', 'sany', 'sch-', 'sec-', 'send', 'seri', 'sgh-', 'shar', 'sie-',
-            'siem', 'smal', 'smar', 'sony', 'sph-', 'symb', 't-mo', 'teli', 'tim-', 'tosh',
-            'tsm-', 'upg1', 'upsi', 'vk-v', 'voda', 'wap-', 'wapa', 'wapi', 'wapp', 'wapr',
-            'webc', 'winw', 'winw', 'xda', 'xda-'];
+            "w3c ",
+            "acs-",
+            "alav",
+            "alca",
+            "amoi",
+            "audi",
+            "avan",
+            "benq",
+            "bird",
+            "blac",
+            "blaz",
+            "brew",
+            "cell",
+            "cldc",
+            "cmd-",
+            "dang",
+            "doco",
+            "eric",
+            "hipt",
+            "inno",
+            "ipaq",
+            "java",
+            "jigs",
+            "kddi",
+            "keji",
+            "leno",
+            "lg-c",
+            "lg-d",
+            "lg-g",
+            "lge-",
+            "maui",
+            "maxo",
+            "midp",
+            "mits",
+            "mmef",
+            "mobi",
+            "mot-",
+            "moto",
+            "mwbp",
+            "nec-",
+            "newt",
+            "noki",
+            "palm",
+            "pana",
+            "pant",
+            "phil",
+            "play",
+            "port",
+            "prox",
+            "qwap",
+            "sage",
+            "sams",
+            "sany",
+            "sch-",
+            "sec-",
+            "send",
+            "seri",
+            "sgh-",
+            "shar",
+            "sie-",
+            "siem",
+            "smal",
+            "smar",
+            "sony",
+            "sph-",
+            "symb",
+            "t-mo",
+            "teli",
+            "tim-",
+            "tosh",
+            "tsm-",
+            "upg1",
+            "upsi",
+            "vk-v",
+            "voda",
+            "wap-",
+            "wapa",
+            "wapi",
+            "wapp",
+            "wapr",
+            "webc",
+            "winw",
+            "winw",
+            "xda",
+            "xda-",
+        ];
 
         if (in_array($mobileUserAgent, $mobileUserAgents)) {
-            return $type = 'mobile';
+            return $type = "mobile";
         }
 
         // None of the mobile matches work so we must be a desktop browser.
-        return $type = 'desktop';
+        return $type = "desktop";
     }
 }
 
-if (!function_exists('write_ini_file')) {
+if (!function_exists("write_ini_file")) {
     /**
      * Write an array to an INI file.
      *
@@ -1763,7 +1892,8 @@ if (!function_exists('write_ini_file')) {
      * @param array $data The data to write.
      * @throws Exception Throws an exception if there was an error writing the file.
      */
-    function write_ini_file($file, $data) {
+    function write_ini_file($file, $data)
+    {
         $string = write_ini_string($data);
         Gdn_FileSystem::saveFile($file, $string);
     }

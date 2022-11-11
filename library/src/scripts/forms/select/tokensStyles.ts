@@ -14,6 +14,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, px } from "csx";
 import { metasVariables } from "@library/metas/Metas.variables";
+import { css } from "@emotion/css";
 
 export const tokensVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -122,6 +123,17 @@ export const tokensClasses = useThemeCache(() => {
                     },
                 },
             },
+            ".suggestedTextInput-option": {
+                ...Mixins.padding({ all: 8 }),
+                width: "100%",
+                "& > .suggestedTextInput-head": {
+                    display: "flex",
+                    justifyContent: "space-between",
+                },
+                "&:hover": {
+                    background: globalVars.states.hover.highlight.toString(),
+                },
+            },
         },
     });
 
@@ -153,5 +165,12 @@ export const tokensClasses = useThemeCache(() => {
         },
     });
 
-    return { root, removeIcon, inputWrap, withIndicator };
+    const containerLegacyForm = css({
+        "& label > span": {
+            fontWeight: 700,
+            marginBottom: 0,
+        },
+    });
+
+    return { root, removeIcon, inputWrap, withIndicator, containerLegacyForm };
 });

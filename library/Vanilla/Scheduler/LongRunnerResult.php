@@ -16,15 +16,15 @@ use Vanilla\Web\JsonView;
 /**
  * Class for representing the result of a bulk action.
  */
-final class LongRunnerResult implements \JsonSerializable {
-
+final class LongRunnerResult implements \JsonSerializable
+{
     /** @var int|null */
     private $countTotalIDs = null;
 
-    /** @var int[] */
+    /** @var int|string[] */
     private $successIDs = [];
 
-    /** @var int[] */
+    /** @var int|string[] */
     private $failedIDs = [];
 
     /** @var \Exception[] */
@@ -36,7 +36,8 @@ final class LongRunnerResult implements \JsonSerializable {
     /**
      * Constructor.
      */
-    public function __construct() {
+    public function __construct()
+    {
         // Use the setters.
     }
 
@@ -45,7 +46,8 @@ final class LongRunnerResult implements \JsonSerializable {
      *
      * @return JobExecutionProgress
      */
-    public function asProgress(): JobExecutionProgress {
+    public function asProgress(): JobExecutionProgress
+    {
         $progress = new JobExecutionProgress($this->countTotalIDs, count($this->successIDs), count($this->failedIDs));
         $errorMessage = $this->getCombinedErrorMessage();
         if ($errorMessage) {
@@ -59,7 +61,8 @@ final class LongRunnerResult implements \JsonSerializable {
      *
      * @return JobExecutionStatus
      */
-    public function asFinalJobStatus(): JobExecutionStatus {
+    public function asFinalJobStatus(): JobExecutionStatus
+    {
         if (count($this->failedIDs) > 0) {
             return JobExecutionStatus::error();
         } else {
@@ -72,14 +75,13 @@ final class LongRunnerResult implements \JsonSerializable {
      *
      * @return string|null
      */
-    public function getCombinedErrorMessage(): ?string {
+    public function getCombinedErrorMessage(): ?string
+    {
         if (count($this->failedIDs) === 0) {
             return null;
         }
 
-        $resultMessages = [
-            "Bulk action failed for recordIDs " . implode(", ", $this->failedIDs)
-        ];
+        $resultMessages = ["Bulk action failed for recordIDs " . implode(", ", $this->failedIDs)];
         foreach ($this->exceptionsByID as $id => $exception) {
             $resultMessages[] = "ID '$id': " . $exception->getMessage();
         }
@@ -91,7 +93,8 @@ final class LongRunnerResult implements \JsonSerializable {
      *
      * @return Data
      */
-    public function asData(): Data {
+    public function asData(): Data
+    {
         $defaultCode = $this->callbackPayload === null ? 200 : 408;
         $allPossibleCodes = [$defaultCode];
         foreach ($this->exceptionsByID as $exception) {
@@ -105,7 +108,7 @@ final class LongRunnerResult implements \JsonSerializable {
             // Likely a server side issue.
             $maxCode = 500;
         }
-        return new Data($this, ['status' => $maxCode]);
+        return new Data($this, ["status" => $maxCode]);
     }
 
     /**
@@ -113,22 +116,24 @@ final class LongRunnerResult implements \JsonSerializable {
      *
      * @return array
      */
-    public function jsonSerialize(): array {
+    public function jsonSerialize(): array
+    {
         return [
-            'progress' => [
-                'successIDs' => $this->successIDs,
-                'failedIDs' => $this->failedIDs,
-                'exceptionsByID' => $this->serializeExceptions(),
-                'countTotalIDs' => $this->countTotalIDs,
+            "progress" => [
+                "successIDs" => $this->successIDs,
+                "failedIDs" => $this->failedIDs,
+                "exceptionsByID" => $this->serializeExceptions(),
+                "countTotalIDs" => $this->countTotalIDs,
             ],
-            'callbackPayload' => $this->callbackPayload,
+            "callbackPayload" => $this->callbackPayload,
         ];
     }
 
     /**
      * @return array|object
      */
-    private function serializeExceptions() {
+    private function serializeExceptions()
+    {
         return empty($this->exceptionsByID) ? new \stdClass() : $this->exceptionsByID;
     }
 
@@ -139,7 +144,8 @@ final class LongRunnerResult implements \JsonSerializable {
      *
      * @return void
      */
-    public function addResult(LongRunnerItemResultInterface $result): void {
+    public function addResult(LongRunnerItemResultInterface $result): void
+    {
         if ($result instanceof LongRunnerFailedID) {
             $this->addFailedResult($result->getRecordID(), $result->getException());
         } elseif ($result instanceof LongRunnerSuccessID) {
@@ -153,19 +159,21 @@ final class LongRunnerResult implements \JsonSerializable {
     /**
      * Add the ID of a record that succeeded in the bulk action.
      *
-     * @param int $successID
+     * @param int|string $successID
      */
-    private function addSuccessResult(int $successID): void {
+    private function addSuccessResult($successID): void
+    {
         $this->successIDs[] = $successID;
     }
 
     /**
      * Add the ID of a record that failed in the bulk action.
      *
-     * @param int $failedID The ID of the record.
+     * @param int|string $failedID The ID of the record.
      * @param \Exception|null $exception Optionally an exception about why the record failed.
      */
-    private function addFailedResult(int $failedID, \Exception $exception = null) {
+    private function addFailedResult($failedID, \Exception $exception = null)
+    {
         $this->failedIDs[] = $failedID;
 
         if ($exception !== null) {
@@ -176,49 +184,56 @@ final class LongRunnerResult implements \JsonSerializable {
     /**
      * @return \Exception[]
      */
-    public function getExceptionsByID(): array {
+    public function getExceptionsByID(): array
+    {
         return $this->exceptionsByID;
     }
 
     /**
-     * @return int[]
+     * @return int|string[]
      */
-    public function getSuccessIDs(): array {
+    public function getSuccessIDs(): array
+    {
         return $this->successIDs;
     }
 
     /**
-     * @return int[]
+     * @return int|string[]
      */
-    public function getFailedIDs(): array {
+    public function getFailedIDs(): array
+    {
         return $this->failedIDs;
     }
 
     /**
      * @return int|null
      */
-    public function getCountTotalIDs(): ?int {
+    public function getCountTotalIDs(): ?int
+    {
         return $this->countTotalIDs;
     }
 
     /**
      * @param int $countTotalIDs
      */
-    public function setCountTotalIDs(int $countTotalIDs): void {
+    public function setCountTotalIDs(int $countTotalIDs): void
+    {
         $this->countTotalIDs = $countTotalIDs;
     }
 
     /**
      * @param string $callbackPayload
      */
-    public function setCallbackPayload(string $callbackPayload): void {
+    public function setCallbackPayload(string $callbackPayload): void
+    {
         $this->callbackPayload = $callbackPayload;
     }
 
     /**
      * @return string|null
      */
-    public function getCallbackPayload(): ?string {
+    public function getCallbackPayload(): ?string
+    {
         return $this->callbackPayload;
     }
 
@@ -227,7 +242,8 @@ final class LongRunnerResult implements \JsonSerializable {
      *
      * @return bool
      */
-    public function isCompleted(): bool {
+    public function isCompleted(): bool
+    {
         return $this->getCallbackPayload() === null;
     }
 }

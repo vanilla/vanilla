@@ -24,8 +24,8 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Search record type for a user.
  */
-class UserSearchType extends AbstractSearchType {
-
+class UserSearchType extends AbstractSearchType
+{
     /** @var UsersApiController $usersApi */
     protected $usersApi;
 
@@ -44,44 +44,45 @@ class UserSearchType extends AbstractSearchType {
      * @param \UsersApiController $usersApi
      * @param \Gdn_Session $session
      */
-    public function __construct(
-        UsersApiController $usersApi,
-        \Gdn_Session $session
-    ) {
+    public function __construct(UsersApiController $usersApi, \Gdn_Session $session)
+    {
         $this->usersApi = $usersApi;
         $this->session = $session;
     }
 
-
     /**
      * @inheritdoc
      */
-    public function getKey(): string {
-        return 'user';
+    public function getKey(): string
+    {
+        return "user";
     }
 
     /**
      * @inheritdoc
      */
-    public function getRecordType(): string {
-        return 'user';
+    public function getRecordType(): string
+    {
+        return "user";
     }
 
     /**
      * @inheritdoc
      */
-    public function getType(): string {
-        return 'user';
+    public function getType(): string
+    {
+        return "user";
     }
 
     /**
      * @inheritdoc
      */
-    public function getResultItems(array $recordIDs, SearchQuery $query): array {
+    public function getResultItems(array $recordIDs, SearchQuery $query): array
+    {
         try {
             $results = $this->usersApi->index([
-                'userID' => implode(',', $recordIDs),
-                'expand' => [ModelUtils::EXPAND_CRAWL],
+                "userID" => implode(",", $recordIDs),
+                "expand" => [ModelUtils::EXPAND_CRAWL],
             ]);
             $results = $results->getData();
 
@@ -90,11 +91,11 @@ class UserSearchType extends AbstractSearchType {
 
             $resultItems = array_map(function ($result) use ($outSchema) {
                 $mapped = ArrayUtils::remapProperties($result, [
-                    'recordID' => 'userID',
+                    "recordID" => "userID",
                 ]);
-                $mapped['recordType'] = $this->getRecordType();
-                $mapped['type'] = $this->getType();
-                $mapped['userInfo'] = $result;
+                $mapped["recordType"] = $this->getRecordType();
+                $mapped["type"] = $this->getType();
+                $mapped["userInfo"] = $result;
 
                 $userResultItem = new UserSearchResultItem($outSchema, $mapped);
 
@@ -110,35 +111,36 @@ class UserSearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function applyToQuery(SearchQuery $query) {
+    public function applyToQuery(SearchQuery $query)
+    {
         if ($query instanceof MysqlSearchQuery) {
             $query->addSql($this->generateSql($query));
         } else {
             $query->addIndex($this->getIndex());
 
-            $searchableFields = ['sortName'];
+            $searchableFields = ["sortName"];
             if ($this->canSearchEmails()) {
-                if ($email = $query->getQueryParameter('email')) {
-                    $query->whereText($email, ['email'], SearchQuery::MATCH_WILDCARD);
+                if ($email = $query->getQueryParameter("email")) {
+                    $query->whereText($email, ["email"], SearchQuery::MATCH_WILDCARD);
                 }
-                $searchableFields[] = 'email';
+                $searchableFields[] = "email";
             }
 
-            if ($allFieldText = $query->getQueryParameter('query')) {
+            if ($allFieldText = $query->getQueryParameter("query")) {
                 $query->whereText(strtolower($allFieldText), $searchableFields, SearchQuery::MATCH_WILDCARD);
             }
 
-            if ($name = $query->getQueryParameter('name')) {
-                $query->whereText(strtolower($name), ['sortName'], SearchQuery::MATCH_WILDCARD);
+            if ($name = $query->getQueryParameter("name")) {
+                $query->whereText(strtolower($name), ["sortName"], SearchQuery::MATCH_WILDCARD);
             }
 
-            if ($roles = $query->getQueryParameter('roleIDs')) {
-                $query->setFilter('roles.roleID', $roles);
+            if ($roles = $query->getQueryParameter("roleIDs")) {
+                $query->setFilter("roles.roleID", $roles);
             }
 
             // Only users that are not banned are allowed.
             // Users are indexed with 0 for non-banned, >0 for various ban statuses.
-            $query->setFilter('banned', [0]);
+            $query->setFilter("banned", [0]);
 
             foreach ($this->filters as $filterName => $filterField) {
                 if ($filterValue = $query->getQueryParameter($filterName, false)) {
@@ -146,20 +148,20 @@ class UserSearchType extends AbstractSearchType {
                 }
             }
 
-            if ($dateInserted = $query->getQueryParameter('dateInserted')) {
-                $query->setDateFilterSchema('dateInserted', $dateInserted);
+            if ($dateInserted = $query->getQueryParameter("dateInserted")) {
+                $query->setDateFilterSchema("dateInserted", $dateInserted);
             }
 
-            if ($lastActiveDate = $query->getQueryParameter('dateLastActive')) {
-                $query->setDateFilterSchema('dateLastActive', $lastActiveDate);
+            if ($lastActiveDate = $query->getQueryParameter("dateLastActive")) {
+                $query->setDateFilterSchema("dateLastActive", $lastActiveDate);
             }
 
             // Sorts
-            $sort = $query->getQueryParameter('sort', 'dateLastActive');
-            $sortField = ltrim($sort, '-');
+            $sort = $query->getQueryParameter("sort", "dateLastActive");
+            $sortField = ltrim($sort, "-");
             $direction = $sortField === $sort ? SearchQuery::SORT_ASC : SearchQuery::SORT_DESC;
-            if ($sortField === 'name') {
-                $sortField = 'sortName.keyword';
+            if ($sortField === "name") {
+                $sortField = "sortName.keyword";
             }
 
             $query->setSort($direction, $sortField);
@@ -169,35 +171,32 @@ class UserSearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function getSorts(): array {
-        return [
-
-        ];
+    public function getSorts(): array
+    {
+        return [];
     }
 
     /**
      * @inheritdoc
      */
-    public function getQuerySchema(): Schema {
+    public function getQuerySchema(): Schema
+    {
         $schemaFields = array_merge(
             [
-                'email:s?' => [
-                    'x-search-filter' => true,
+                "email:s?" => [
+                    "x-search-filter" => true,
                 ],
-                'roleIDs:a?' => [
-                    'items' => [
-                        'type' => 'integer',
+                "roleIDs:a?" => [
+                    "items" => [
+                        "type" => "integer",
                     ],
-                    'x-search-filter' => true,
+                    "x-search-filter" => true,
                 ],
-                'dateLastActive?' => new DateFilterSchema([
-                    'x-search-filter' => true,
+                "dateLastActive?" => new DateFilterSchema([
+                    "x-search-filter" => true,
                 ]),
                 "sort:s?" => [
-                    "enum" => [
-                        "dateLastActive",
-                        "-dateLastActive",
-                    ],
+                    "enum" => ["dateLastActive", "-dateLastActive"],
                 ],
             ],
             $this->schemaFields
@@ -208,15 +207,11 @@ class UserSearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function getQuerySchemaExtension(): Schema {
+    public function getQuerySchemaExtension(): Schema
+    {
         return Schema::parse([
             "sort:s?" => [
-                "enum" => [
-                    "countPosts",
-                    "-countPosts",
-                    "name",
-                    "-name"
-                ],
+                "enum" => ["countPosts", "-countPosts", "name", "-name"],
             ],
         ]);
     }
@@ -227,24 +222,25 @@ class UserSearchType extends AbstractSearchType {
      * @param MysqlSearchQuery $query
      * @return string
      */
-    public function generateSql(MysqlSearchQuery $query): string {
+    public function generateSql(MysqlSearchQuery $query): string
+    {
         // mysql is not implemented
-        return '';
+        return "";
     }
 
     /**
      * @inheritdoc
      */
-    public function validateQuery(SearchQuery $query): void {
-        $hasSiteScope = $query->getQueryParameter('scope', 'site') === 'site';
-        $types = $query->getQueryParameter('types', []);
-        $recordTypes = $query->getQueryParameter('recordTypes', []);
+    public function validateQuery(SearchQuery $query): void
+    {
+        $hasSiteScope = $query->getQueryParameter("scope", "site") === "site";
+        $types = $query->getQueryParameter("types", []);
+        $recordTypes = $query->getQueryParameter("recordTypes", []);
         if (!$hasSiteScope && (in_array($this->getType(), $types) || in_array($this->getRecordType(), $recordTypes))) {
-            throw new ClientException('Cannot search users with any scope other than `site`.', 422);
+            throw new ClientException("Cannot search users with any scope other than `site`.", 422);
         }
 
-
-        if (!$this->canSearchEmails() && $query->getQueryParameter('email', null) !== null) {
+        if (!$this->canSearchEmails() && $query->getQueryParameter("email", null) !== null) {
             throw new PermissionException("You don't have permission to search by email.");
         }
     }
@@ -252,7 +248,8 @@ class UserSearchType extends AbstractSearchType {
     /**
      * @return bool
      */
-    private function canSearchEmails(): bool {
+    private function canSearchEmails(): bool
+    {
         return $this->usersApi->checkPermission();
     }
 
@@ -261,7 +258,8 @@ class UserSearchType extends AbstractSearchType {
      *
      * @param array $schemaFields
      */
-    public function addSchemaFields(array $schemaFields) {
+    public function addSchemaFields(array $schemaFields)
+    {
         $this->schemaFields = array_merge($this->schemaFields, $schemaFields);
     }
 
@@ -271,7 +269,8 @@ class UserSearchType extends AbstractSearchType {
      * @param string $filterName
      * @param string $filterField
      */
-    public function addFilter(string $filterName, string $filterField) {
+    public function addFilter(string $filterName, string $filterField)
+    {
         $this->filters[$filterName] = $filterField;
     }
 
@@ -279,14 +278,16 @@ class UserSearchType extends AbstractSearchType {
      * User's should not be searched with other types. Their
      * @inheritdoc
      */
-    public function isExclusiveType(): bool {
+    public function isExclusiveType(): bool
+    {
         return true;
     }
 
     /**
      * @inheritdoc
      */
-    public function userHasPermission(): bool {
+    public function userHasPermission(): bool
+    {
         try {
             $this->usersApi->checkPermission();
             return true;
@@ -298,28 +299,32 @@ class UserSearchType extends AbstractSearchType {
     /**
      * @return string
      */
-    public function getSingularLabel(): string {
-        return \Gdn::translate('User');
+    public function getSingularLabel(): string
+    {
+        return \Gdn::translate("User");
     }
 
     /**
      * @return string
      */
-    public function getPluralLabel(): string {
-        return \Gdn::translate('Users');
+    public function getPluralLabel(): string
+    {
+        return \Gdn::translate("Users");
     }
 
     /**
      * @inheritdoc
      */
-    public function getDTypes(): ?array {
+    public function getDTypes(): ?array
+    {
         return null;
     }
 
     /**
      * @inheritdoc
      */
-    public function guidToRecordID(int $guid): ?int {
+    public function guidToRecordID(int $guid): ?int
+    {
         return null;
     }
 }

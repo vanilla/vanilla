@@ -18,8 +18,8 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
  *
  * Other modules must have a factory extending TabWidgetTabFactory and be registered with the TabWidgetTabService.
  */
-class TabWidgetModule extends AbstractReactModule {
-
+class TabWidgetModule extends AbstractReactModule
+{
     /** @var TabWidgetTabService */
     private $tabService;
 
@@ -37,7 +37,8 @@ class TabWidgetModule extends AbstractReactModule {
      *
      * @param TabWidgetTabService $tabService
      */
-    public function __construct(TabWidgetTabService $tabService) {
+    public function __construct(TabWidgetTabService $tabService)
+    {
         parent::__construct();
         $this->tabService = $tabService;
     }
@@ -45,21 +46,22 @@ class TabWidgetModule extends AbstractReactModule {
     /**
      * @inheritDoc
      */
-    public function getProps(): ?array {
+    public function getProps(): ?array
+    {
         $tabConfiguration = $this->tabConfiguration ?? self::getDefaultOptions();
         $tabs = [];
         foreach ($tabConfiguration as $tab) {
-            if ($tab['isHidden'] ?? false) {
+            if ($tab["isHidden"] ?? false) {
                 continue;
             }
-            $tabComponent = $tab['tabPresetID'] ?? '';
+            $tabComponent = $tab["tabPresetID"] ?? "";
             $factory = $this->tabService->findTabFactory($tabComponent);
             if ($factory === null) {
                 trigger_error("Could not find tab factory for component '$tabComponent'", E_USER_NOTICE);
                 continue;
             }
 
-            $tabLabel = $tab['label'] ?? $factory->getDefaultTabLabelCode();
+            $tabLabel = $tab["label"] ?? $factory->getDefaultTabLabelCode();
             try {
                 $tabWidget = $factory->getTabModule();
                 if ($tabWidget instanceof LimitableWidgetInterface) {
@@ -73,9 +75,9 @@ class TabWidgetModule extends AbstractReactModule {
                 }
 
                 $tabs[] = [
-                    'label' => $tabLabel,
-                    'componentName' => $componentName,
-                    'componentProps' => $props,
+                    "label" => $tabLabel,
+                    "componentName" => $componentName,
+                    "componentProps" => $props,
                 ];
             } catch (\Exception $e) {
                 // Still try to render the other tabs.
@@ -83,14 +85,13 @@ class TabWidgetModule extends AbstractReactModule {
             }
         }
 
-
         if (count($tabs) === 0) {
             return null;
         }
 
         return [
-            'tabs' => $tabs,
-            'defaultTabIndex' => $this->defaultTabIndex,
+            "tabs" => $tabs,
+            "defaultTabIndex" => $this->defaultTabIndex,
         ];
     }
 
@@ -99,7 +100,8 @@ class TabWidgetModule extends AbstractReactModule {
      *
      * @param array $tabs
      */
-    public function setTabConfiguration(array $tabs): void {
+    public function setTabConfiguration(array $tabs): void
+    {
         $this->tabConfiguration = $tabs;
     }
 
@@ -108,7 +110,8 @@ class TabWidgetModule extends AbstractReactModule {
      *
      * @param int $defaultTabIndex
      */
-    public function setDefaultTabIndex(int $defaultTabIndex): void {
+    public function setDefaultTabIndex(int $defaultTabIndex): void
+    {
         $this->defaultTabIndex = $defaultTabIndex;
     }
 
@@ -117,7 +120,8 @@ class TabWidgetModule extends AbstractReactModule {
      *
      * @param string[] $presetIDs
      */
-    public function setTabPresetIDs(array $presetIDs): void {
+    public function setTabPresetIDs(array $presetIDs): void
+    {
         $options = self::getTabOptions();
         $configuration = [];
         foreach ($presetIDs as $presetID) {
@@ -132,58 +136,62 @@ class TabWidgetModule extends AbstractReactModule {
     /**
      * @param int $limit
      */
-    public function setLimit(int $limit): void {
+    public function setLimit(int $limit): void
+    {
         $this->limit = $limit;
     }
 
     /**
      * @inheritDoc
      */
-    public static function getComponentName(): string {
-        return 'TabWidget';
+    public static function getComponentName(): string
+    {
+        return "TabWidget";
     }
 
     /**
      * @return Schema
      */
-    public static function getWidgetSchema(): Schema {
+    public static function getWidgetSchema(): Schema
+    {
         $choices = self::getTabChoices();
         $itemSchema = Schema::parse([
-            'tabPresetID' => [
-                'type' => 'string',
-                'enum' => array_keys($choices),
-                'x-control' => SchemaForm::dropDown(new FormOptions('Content'), new StaticFormChoices($choices)),
+            "tabPresetID" => [
+                "type" => "string",
+                "enum" => array_keys($choices),
+                "x-control" => SchemaForm::dropDown(new FormOptions("Content"), new StaticFormChoices($choices)),
             ],
-            'label' => [
-                'type' => 'string',
-                'x-control' => SchemaForm::textBox(new FormOptions('Label')),
+            "label" => [
+                "type" => "string",
+                "x-control" => SchemaForm::textBox(new FormOptions("Label")),
             ],
-            'isHidden:b?'
+            "isHidden:b?",
         ]);
+
         return Schema::parse([
-            'tabConfiguration' => [
-                'type' => 'array',
-                'items' => $itemSchema,
-                'x-control' => SchemaForm::dragAndDrop(
+            "limit:i" => [
+                "default" => 5,
+                "x-control" => SchemaForm::dropDown(
+                    new FormOptions("Max Items", "Maximum number of items to display in each widget."),
+                    new StaticFormChoices([
+                        "3" => 3,
+                        "5" => 5,
+                        "10" => 10,
+                    ])
+                ),
+            ],
+            "tabConfiguration" => [
+                "type" => "array",
+                "items" => $itemSchema->getSchemaArray(),
+                "x-control" => SchemaForm::dragAndDrop(
                     new FormOptions(
-                        'Tab Configuration',
-                        'Selected the content you want to add in your Tabs List,'
-                                . ' rename if you want to and, drag & drop the order in which the tabs should appear. '
+                        "Edit Tabs",
+                        "Select the content you want to add in your Tabs," .
+                            " rename if you want to and, drag & drop the order in which the tabs should appear. "
                     ),
                     $itemSchema
                 ),
-                'default' => array_values(self::getDefaultOptions()),
-            ],
-            'limit:i' => [
-                'default' => 5,
-                'x-control' => SchemaForm::dropDown(new FormOptions(
-                    'Max Items',
-                    'Maximum number of items to display in each widget.'
-                ), new StaticFormChoices([
-                    '3' => 3,
-                    '5' => 5,
-                    '10' => 10,
-                ]))
+                "default" => array_values(self::getDefaultOptions()),
             ],
         ]);
     }
@@ -193,13 +201,14 @@ class TabWidgetModule extends AbstractReactModule {
      *
      * @return array
      */
-    private static function getTabOptions(): array {
+    private static function getTabOptions(): array
+    {
         // Cheating a little bit here, but it can't be helped. Widget schemas have to be static.
         /** @var TabWidgetTabService $tabService */
         $tabService = \Gdn::getContainer()->get(TabWidgetTabService::class);
 
         $allFactories = $tabService->getTabFactories();
-        $options = array_map([self::class, 'transformFactoryToOption'], $allFactories);
+        $options = array_map([self::class, "transformFactoryToOption"], $allFactories);
         return $options;
     }
 
@@ -208,7 +217,8 @@ class TabWidgetModule extends AbstractReactModule {
      *
      * @return array
      */
-    private static function getTabChoices(): array {
+    private static function getTabChoices(): array
+    {
         // Cheating a little bit here, but it can't be helped. Widget schemas have to be static.
         /** @var TabWidgetTabService $tabService */
         $tabService = \Gdn::getContainer()->get(TabWidgetTabService::class);
@@ -226,13 +236,14 @@ class TabWidgetModule extends AbstractReactModule {
      *
      * @return array
      */
-    private static function getDefaultOptions(): array {
+    private static function getDefaultOptions(): array
+    {
         // Cheating a little bit here, but it can't be helped. Widget schemas have to be static.
         /** @var TabWidgetTabService $tabService */
         $tabService = \Gdn::getContainer()->get(TabWidgetTabService::class);
 
         $defaultFactories = $tabService->getDefaultFactories();
-        $options = array_map([self::class, 'transformFactoryToOption'], $defaultFactories);
+        $options = array_map([self::class, "transformFactoryToOption"], $defaultFactories);
         return $options;
     }
 
@@ -243,17 +254,19 @@ class TabWidgetModule extends AbstractReactModule {
      *
      * @return array
      */
-    private static function transformFactoryToOption(AbstractTabWidgetTabFactory $factory): array {
+    private static function transformFactoryToOption(AbstractTabWidgetTabFactory $factory): array
+    {
         return [
-            'label' => $factory->getDefaultTabLabelCode(),
-            'tabPresetID' => $factory->getTabPresetID(),
+            "label" => $factory->getDefaultTabLabelCode(),
+            "tabPresetID" => $factory->getTabPresetID(),
         ];
     }
 
     /**
      * @return string
      */
-    public static function getWidgetName(): string {
-        return 'Tabs Widget';
+    public static function getWidgetName(): string
+    {
+        return "Tabs Widget";
     }
 }

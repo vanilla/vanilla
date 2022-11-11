@@ -10,8 +10,8 @@ namespace Vanilla\Contracts\Formatting;
 /**
  * Plain old object to represent a heading.
  */
-class Heading implements \JsonSerializable {
-
+class Heading implements \JsonSerializable
+{
     /** @var string The text content of the heading. */
     public $text;
 
@@ -28,7 +28,8 @@ class Heading implements \JsonSerializable {
      * @param int $level
      * @param string $ref
      */
-    public function __construct(string $text, int $level, string $ref) {
+    public function __construct(string $text, int $level, string $ref)
+    {
         $this->text = $text;
         $this->level = $level;
         $this->ref = $ref;
@@ -37,11 +38,12 @@ class Heading implements \JsonSerializable {
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return [
-            'text' => $this->text,
-            'level' => $this->level,
-            'ref' => $this->ref,
+            "text" => $this->text,
+            "level" => $this->level,
+            "ref" => $this->ref,
         ];
     }
 }

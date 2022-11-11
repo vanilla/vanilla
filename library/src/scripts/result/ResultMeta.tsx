@@ -5,7 +5,6 @@
  */
 
 import React from "react";
-import classNames from "classnames";
 import { IUserFragment } from "@library/@types/api/users";
 import { capitalizeFirstLetter } from "@vanilla/utils";
 import { t } from "@library/utility/appUtils";
@@ -69,6 +68,8 @@ export function ResultMeta(props: IProps) {
             );
         });
 
+    const displayDate = !!dateUpdated && !isNaN(new Date(dateUpdated).getTime());
+
     return (
         <>
             {labels &&
@@ -81,7 +82,7 @@ export function ResultMeta(props: IProps) {
             {typeMetaContents && (
                 <MetaItem>
                     {isDeleted ? (
-                        <span className={classNames("meta-inline", "isDeleted")}>
+                        <span className={"isDeleted"}>
                             <Translate source="Deleted <0/>" c0={type} />
                         </span>
                     ) : (
@@ -92,7 +93,7 @@ export function ResultMeta(props: IProps) {
 
             {isForeign && <MetaIcon icon="meta-external" />}
 
-            {dateUpdated && (
+            {displayDate && (
                 <MetaItem>
                     <Translate source="Last Updated: <0/>" c0={<DateTime timestamp={dateUpdated} />} />
                 </MetaItem>

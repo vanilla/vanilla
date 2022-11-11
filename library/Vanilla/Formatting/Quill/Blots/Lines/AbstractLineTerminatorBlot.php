@@ -14,8 +14,8 @@ use Vanilla\Formatting\Quill\Blots\TextBlot;
 /**
  * Base blot for line terminators. A line terminator should not have any text content. Only newlines and breaks.
  */
-abstract class AbstractLineTerminatorBlot extends TextBlot {
-
+abstract class AbstractLineTerminatorBlot extends TextBlot
+{
     /**
      * Render additional newlines inside of the line.
      *
@@ -27,11 +27,12 @@ abstract class AbstractLineTerminatorBlot extends TextBlot {
      *
      * @return string
      */
-    public function render(): string {
+    public function render(): string
+    {
         $result = "";
         $extraNewLines = substr_count($this->currentOperation["insert"], "\n") - 1;
         for ($i = 0; $i < $extraNewLines; $i++) {
-            $result .= $this->renderLineStart()."<br>".$this->renderLineEnd();
+            $result .= $this->renderLineStart() . "<br>" . $this->renderLineEnd();
         }
 
         return $result;
@@ -43,7 +44,8 @@ abstract class AbstractLineTerminatorBlot extends TextBlot {
      * @param BlotGroup $group The group to check.
      * @return bool
      */
-    public function shouldClearCurrentGroup(BlotGroup $group): bool {
+    public function shouldClearCurrentGroup(BlotGroup $group): bool
+    {
         $overridingBlot = $group->getOverrideBlot();
         if ($overridingBlot) {
             return get_class($overridingBlot) !== get_class($this);

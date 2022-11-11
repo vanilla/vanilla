@@ -12,8 +12,8 @@ use Vanilla\Utility\ModelUtils;
 /**
  * An event affecting a specific resource.
  */
-abstract class ResourceEvent implements \JsonSerializable {
-
+abstract class ResourceEvent implements \JsonSerializable
+{
     /** A resource has been removed. */
     public const ACTION_DELETE = EventAction::DELETE;
 
@@ -45,11 +45,12 @@ abstract class ResourceEvent implements \JsonSerializable {
      * @param array $payload
      * @param array|object|null $sender
      */
-    public function __construct(string $action, array $payload, $sender = null) {
+    public function __construct(string $action, array $payload, $sender = null)
+    {
         $this->action = $action;
         $this->payload = $payload;
         $this->apiParams = [
-            'expand' => [ModelUtils::EXPAND_CRAWL],
+            "expand" => [ModelUtils::EXPAND_CRAWL],
         ];
         $this->sender = $sender;
         $this->type = $this->typeFromClass();
@@ -60,7 +61,8 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @return string
      */
-    public function getAction(): string {
+    public function getAction(): string
+    {
         return $this->action;
     }
     /**
@@ -68,7 +70,8 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @return array|null
      */
-    public function getPayload(): ?array {
+    public function getPayload(): ?array
+    {
         return $this->payload;
     }
 
@@ -77,7 +80,8 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @param array $payload The key => value pairs to set on the payload.
      */
-    public function setPayload(array $payload): void {
+    public function setPayload(array $payload): void
+    {
         $this->payload = $payload;
     }
 
@@ -86,7 +90,8 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @return array|null
      */
-    public function getApiParams(): ?array {
+    public function getApiParams(): ?array
+    {
         return $this->apiParams;
     }
 
@@ -95,7 +100,8 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @param array $params
      */
-    public function addApiParams(array $params) {
+    public function addApiParams(array $params)
+    {
         $this->apiParams = array_merge($this->apiParams, $params);
     }
 
@@ -104,7 +110,8 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @return array|object|null
      */
-    public function getSender() {
+    public function getSender()
+    {
         return $this->sender;
     }
 
@@ -113,7 +120,8 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @return string
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return $this->type;
     }
 
@@ -122,7 +130,8 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @return string
      */
-    public function getUniquePrimaryKey(): string {
+    public function getUniquePrimaryKey(): string
+    {
         return $this->getType() . "ID";
     }
 
@@ -131,7 +140,8 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @return string|int
      */
-    public function getUniquePrimaryKeyValue() {
+    public function getUniquePrimaryKeyValue()
+    {
         return $this->getPayload()[$this->getType()][$this->getUniquePrimaryKey()];
     }
 
@@ -140,8 +150,9 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @return string
      */
-    public function getFullEventName(): string {
-        return $this->getType().'_'.$this->getAction();
+    public function getFullEventName(): string
+    {
+        return $this->getType() . "_" . $this->getAction();
     }
 
     /**
@@ -149,12 +160,13 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @return string
      */
-    public static function typeFromClass(): string {
+    public static function typeFromClass(): string
+    {
         $baseName = get_called_class();
-        if (($namespaceEnd = strrpos($baseName, '\\')) !== false) {
+        if (($namespaceEnd = strrpos($baseName, "\\")) !== false) {
             $baseName = substr($baseName, $namespaceEnd + 1);
         }
-        $type = lcfirst(preg_replace('/Event$/', '', $baseName));
+        $type = lcfirst(preg_replace('/Event$/', "", $baseName));
         return $type;
     }
 
@@ -163,17 +175,18 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @return array A tuple of [string, int]
      */
-    public function getRecordTypeAndID(): array {
+    public function getRecordTypeAndID(): array
+    {
         $recordType = $this->getType();
 
-        if ($idKey = ($this->payload['documentIdField'] ?? false)) {
+        if ($idKey = $this->payload["documentIdField"] ?? false) {
             $idKey = $this->$idKey;
         } else {
-            $idKey = $this->type . 'ID';
+            $idKey = $this->type . "ID";
         }
 
         $payloadRecord = $this->payload[$this->type] ?? $this->payload;
-        $recordID = $payloadRecord['recordID'] ?? $payloadRecord[$idKey] ?? null;
+        $recordID = $payloadRecord["recordID"] ?? ($payloadRecord[$idKey] ?? null);
 
         return [$recordType, $recordID];
     }
@@ -181,11 +194,12 @@ abstract class ResourceEvent implements \JsonSerializable {
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return [
-            'type' => $this->type,
-            'action' => $this->action,
-            'payload' => $this->getPayload(),
+            "type" => $this->type,
+            "action" => $this->action,
+            "payload" => $this->getPayload(),
         ];
     }
 
@@ -194,7 +208,8 @@ abstract class ResourceEvent implements \JsonSerializable {
      *
      * @return string
      */
-    public function getApiUrl() {
+    public function getApiUrl()
+    {
         [$recordType, $recordID] = $this->getRecordTypeAndID();
         return "/api/v2/{$recordType}s/$recordID";
     }
@@ -202,7 +217,8 @@ abstract class ResourceEvent implements \JsonSerializable {
     /**
      * Convert to string.
      */
-    public function __toString() {
+    public function __toString()
+    {
         return json_encode($this, JSON_PRETTY_PRINT);
     }
 }

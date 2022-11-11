@@ -13,23 +13,25 @@ use Vanilla\Utility\DebugUtils;
 /**
  * Class VanilliconPlugin
  */
-class VanilliconPlugin extends Gdn_Plugin {
-
+class VanilliconPlugin extends Gdn_Plugin
+{
     /** Truncated length for forty-character SHA1 email hash. */
     public const TRUNCATED_HASH_LENGTH = 32;
 
     /**
      * Set up the plugin.
      */
-    public function setup() {
+    public function setup()
+    {
         $this->structure();
     }
 
     /**
      * Perform any necessary database or configuration updates.
      */
-    public function structure() {
-        \Gdn::config()->touch('Plugins.Vanillicon.Type', 'v2');
+    public function structure()
+    {
+        \Gdn::config()->touch("Plugins.Vanillicon.Type", "v2");
     }
 
     /**
@@ -38,9 +40,10 @@ class VanilliconPlugin extends Gdn_Plugin {
      * @param ProfileController $sender
      * @param array $args
      */
-    public function profileController_afterAddSideMenu_handler($sender, $args) {
+    public function profileController_afterAddSideMenu_handler($sender, $args)
+    {
         if (!$sender->User->Photo) {
-            $sender->User->Photo = userPhotoDefaultUrl($sender->User, ['Size' => 200]);
+            $sender->User->Photo = userPhotoDefaultUrl($sender->User, ["Size" => 200]);
         }
     }
 
@@ -49,28 +52,28 @@ class VanilliconPlugin extends Gdn_Plugin {
      *
      * @param Gdn_Controller $sender
      */
-    public function settingsController_vanillicon_create($sender) {
-        $sender->permission('Garden.Settings.Manage');
+    public function settingsController_vanillicon_create($sender)
+    {
+        $sender->permission("Garden.Settings.Manage");
         $cf = new ConfigurationModule($sender);
 
         $items = [
-            'v1' => 'Vanillicon 1',
-            'v2' => 'Vanillicon 2'
+            "v1" => "Vanillicon 1",
+            "v2" => "Vanillicon 2",
         ];
 
         $cf->initialize([
-            'Plugins.Vanillicon.Type' => [
-                'LabelCode' => 'Vanillicon Set',
-                'Control' => 'radiolist',
-                'Description' => 'Which vanillicon set do you want to use?',
-                'Items' => $items,
-                'Options' => ['display' => 'after'],
-                'Default' => 'v1'
-            ]
+            "Plugins.Vanillicon.Type" => [
+                "LabelCode" => "Vanillicon Set",
+                "Control" => "radiolist",
+                "Description" => "Which vanillicon set do you want to use?",
+                "Items" => $items,
+                "Options" => ["display" => "after"],
+                "Default" => "v1",
+            ],
         ]);
 
-
-        $sender->setData('Title', sprintf(t('%s Settings'), 'Vanillicon'));
+        $sender->setData("Title", sprintf(t("%s Settings"), "Vanillicon"));
         $cf->renderAll();
     }
 
@@ -80,22 +83,23 @@ class VanilliconPlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender
      */
-    public function settingsController_avatarSettings_handler($sender) {
+    public function settingsController_avatarSettings_handler($sender)
+    {
         // We check if Gravatar is enabled before adding any messages as Gravatar overrides Vanillicon.
-        if (!Gdn::addonManager()->isEnabled('gravatar', \Vanilla\Addon::TYPE_ADDON)) {
+        if (!Gdn::addonManager()->isEnabled("gravatar", \Vanilla\Addon::TYPE_ADDON)) {
             $message = t('You\'re using Vanillicon avatars as your default avatars.');
-            $message .= ' '.t('To set a custom default avatar, disable the Vanillicon plugin.');
-            $messages = $sender->data('messages', []);
+            $message .= " " . t("To set a custom default avatar, disable the Vanillicon plugin.");
+            $messages = $sender->data("messages", []);
             $messages = array_merge($messages, [$message]);
-            $sender->setData('messages', $messages);
-            $sender->setData('canSetDefaultAvatar', false);
+            $sender->setData("messages", $messages);
+            $sender->setData("canSetDefaultAvatar", false);
             $help = t('Your users\' default avatars are Vanillicon avatars.');
             helpAsset(t('How are my users\' default avatars set?'), $help);
         }
     }
 }
 
-if (!function_exists('userPhotoDefaultUrl') && !DebugUtils::isTestMode()) {
+if (!function_exists("userPhotoDefaultUrl") && !DebugUtils::isTestMode()) {
     /**
      * Calculate the user's default photo url.
      *
@@ -104,26 +108,28 @@ if (!function_exists('userPhotoDefaultUrl') && !DebugUtils::isTestMode()) {
      * - Size: The size of the photo.
      * @return string Returns the vanillicon url for the user.
      */
-    function userPhotoDefaultUrl($user, $options = []) {
-        static $iconSize = null, $type = null;
+    function userPhotoDefaultUrl($user, $options = [])
+    {
+        static $iconSize = null,
+            $type = null;
         if ($iconSize === null) {
-            $thumbSize = c('Garden.Thumbnail.Size');
+            $thumbSize = c("Garden.Thumbnail.Size");
             $iconSize = $thumbSize <= 50 ? 50 : 100;
         }
         if ($type === null) {
-            $type = c('Plugins.Vanillicon.Type');
+            $type = c("Plugins.Vanillicon.Type");
         }
-        $size = val('Size', $options, $iconSize);
+        $size = val("Size", $options, $iconSize);
 
-        $email = val('Email', $user);
+        $email = val("Email", $user);
         if (!$email) {
-            $email = val('UserID', $user, 100);
+            $email = val("UserID", $user, 100);
         }
         $hash = substr(sha1($email), 0, VanilliconPlugin::TRUNCATED_HASH_LENGTH);
         $px = substr($hash, 0, 1);
 
         switch ($type) {
-            case 'v2':
+            case "v2":
                 $photoUrl = "https://w$px.vanillicon.com/v2/{$hash}.svg";
                 break;
             default:

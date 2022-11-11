@@ -1,27 +1,26 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import { getGlobalSearchSorts } from "@library/search/SearchFormContextProvider";
-import { SearchService } from "@library/search/SearchService";
+import { ISearchDomain, SearchService } from "@library/search/SearchService";
 import { TypeDiscussionsIcon } from "@library/icons/searchIcons";
-import { ISearchForm } from "@library/search/searchTypes";
+import { ISearchForm, ISearchRequestQuery } from "@library/search/searchTypes";
 import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
 import { t } from "@vanilla/i18n";
 import { onReady } from "@library/utility/appUtils";
 import flatten from "lodash/flatten";
 import { CommunityPostTypeFilter } from "@vanilla/addon-vanilla/search/CommunityPostTypeFilter";
 import { SearchFilterPanelCommunity } from "@vanilla/addon-vanilla/search/SearchFilterPanelCommunity";
-import Result from "@library/result/Result";
 import { SearchFilterPanelComments } from "@vanilla/addon-vanilla/search/SearchFilterPanelComments";
 import CollapseCommentsSearchMeta from "@vanilla/addon-vanilla/search/CollapseCommentsSearchMeta";
 import { notEmpty } from "@vanilla/utils";
 
 export function registerCommunitySearchDomain() {
     onReady(() => {
-        SearchService.addPluggableDomain({
+        const communitySearchDomain: ISearchDomain<ICommunitySearchTypes & { discussionID: string }> = {
             key: "discussions",
             name: t("Discussions"),
             sort: 1,
@@ -37,8 +36,8 @@ export function registerCommunitySearchDomain() {
                     "discussionID",
                 ];
             },
-            transformFormToQuery: (form: ISearchForm<ICommunitySearchTypes>) => {
-                const query: ISearchForm<ICommunitySearchTypes> = {
+            transformFormToQuery: (form) => {
+                let query: ISearchRequestQuery<ICommunitySearchTypes & { discussionID: string }> = {
                     ...form,
                 };
 
@@ -80,11 +79,11 @@ export function registerCommunitySearchDomain() {
                 if (SearchService.supportsExtensions()) {
                     sorts.push(
                         {
-                            content: "Top",
+                            content: t("Top"),
                             value: "-score",
                         },
                         {
-                            content: "Hot",
+                            content: t("Hot"),
                             value: "-hot",
                         },
                     );
@@ -92,14 +91,14 @@ export function registerCommunitySearchDomain() {
                 return sorts;
             },
             isIsolatedType: () => false,
-            ResultComponent: Result,
-            hasSpecificRecord: (form: ISearchForm<ICommunitySearchTypes>) =>
-                form.discussionID && typeof form.discussionID === "number",
-            getSpecificRecord: (form: ISearchForm<ICommunitySearchTypes>) => form.discussionID,
+            hasSpecificRecord: (form) => !!form.discussionID && typeof form.discussionID === "number",
+            getSpecificRecord: (form) => parseInt(form.discussionID),
             SpecificRecordPanel: SearchFilterPanelComments,
             SpecificRecordComponent: CollapseCommentsSearchMeta,
             showSpecificRecordCrumbs: () => false,
-        });
+        };
+
+        SearchService.addPluggableDomain(communitySearchDomain);
 
         SearchService.addSubType({
             label: t("Discussions"),

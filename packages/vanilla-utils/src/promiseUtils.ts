@@ -35,14 +35,14 @@ export function resolvePromisesSequentially(promiseFunctions: PromiseOrNormalCal
 
         function iterationFunction(previousPromise, currentPromise) {
             return previousPromise
-                .then(result => {
+                .then((result) => {
                     if (count++ !== 0) {
                         results = results.concat(result);
                     }
 
                     return currentPromise(result, results, count);
                 })
-                .catch(err => reject(err));
+                .catch((err) => reject(err));
         }
 
         promiseFunctions = promiseFunctions.concat(() => Promise.resolve());

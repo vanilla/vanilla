@@ -21,8 +21,8 @@ use Vanilla\Web\Pagination\ApiPaginationIterator;
  * Abstract implementation of a consumer of resources produced from a source site
  * used when synchronizing resources between a source and destination site
  */
-abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, LoggerAwareInterface {
-
+abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, LoggerAwareInterface
+{
     use LoggerAwareTrait;
 
     /** @var string $primaryIDColumnName */
@@ -60,7 +60,8 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
      * @inheritdoc
      * @codeCoverageIgnore
      */
-    public function setup(): void {
+    public function setup(): void
+    {
         /** empty */
     }
 
@@ -68,7 +69,8 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
      * @inheritdoc
      * @codeCoverageIgnore
      */
-    public function isConsumeAllEnabled(HttpClient $destinationClient): bool {
+    public function isConsumeAllEnabled(HttpClient $destinationClient): bool
+    {
         return true;
     }
 
@@ -77,7 +79,8 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
      *
      * @return string
      */
-    public function getApiEndpointPath(): string {
+    public function getApiEndpointPath(): string
+    {
         return $this->apiEndpointPath;
     }
 
@@ -90,16 +93,17 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
      *
      * @return string[]
      */
-    public function getUnsyncedProperties(): array {
+    public function getUnsyncedProperties(): array
+    {
         // Include some sensible defaults that may be shared across multiple table schema instances;
         // these can be overridden or augmented as needed when subclassed.
         return [
             $this->primaryIDColumnName,
             $this->foreignIDColumnName,
-            'dateInserted',
-            'insertUserID',
-            'dateUpdated',
-            'updateUserID'
+            "dateInserted",
+            "insertUserID",
+            "dateUpdated",
+            "updateUserID",
         ];
     }
 
@@ -118,7 +122,6 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
         array $sourceResources,
         ?string $foreignIDPrefix = null
     ): void {
-
         $destResources = $this->getDestResources($destinationClient, $this->apiEndpointPath, $foreignIDPrefix);
         if (is_null($destResources)) {
             // Null item indicates error when following pagination links,
@@ -137,7 +140,10 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
                 array_column($filteredSourceResources, $this->primaryIDColumnName)
             );
             if (!empty($filteredIDs)) {
-                $logMessage = "Sync skipped ".count($filteredIDs)." {$this->getResourceTypeName()}(s): ".
+                $logMessage =
+                    "Sync skipped " .
+                    count($filteredIDs) .
+                    " {$this->getResourceTypeName()}(s): " .
                     join(", ", $filteredIDs);
                 $this->logger->info($logMessage);
 
@@ -151,8 +157,11 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
             if (!empty($destResources)) {
                 $deleteIDs = array_column($destResources, $this->primaryIDColumnName);
                 foreach ($deleteIDs as $deleteID) {
-                    $isDeleted =
-                        $this->deleteResourceViaApi($destinationClient, $this->apiEndpointPath, strval($deleteID));
+                    $isDeleted = $this->deleteResourceViaApi(
+                        $destinationClient,
+                        $this->apiEndpointPath,
+                        strval($deleteID)
+                    );
                     if ($isDeleted) {
                         $deletedIDs[] = $deleteID;
                     } else {
@@ -172,8 +181,7 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
 
         $resourcesToDelete = $this->getResourcesToDelete($sourceResources, $destResources, $foreignIDPrefix);
         if (!empty($resourcesToDelete)) {
-            $destResources =
-                $this->processSyncAllApiDeletions($destinationClient, $resourcesToDelete, $destResources);
+            $destResources = $this->processSyncAllApiDeletions($destinationClient, $resourcesToDelete, $destResources);
 
             // If there are no resources after deletion at destination, there is nothing more to sync
             if (empty($destResources)) {
@@ -223,14 +231,11 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
                 // as indicated by a non-null foreign ID column value that begins with foreignID prefix, if provided.
                 $destResources = array_merge(
                     $destResources,
-                    array_filter(
-                        $records,
-                        function (array $record) use ($foreignIDPrefix) {
-                            return isset($record[$this->foreignIDColumnName])
-                                && (empty($foreignIDPrefix)
-                                    || str_starts_with($record[$this->foreignIDColumnName], $foreignIDPrefix));
-                        }
-                    )
+                    array_filter($records, function (array $record) use ($foreignIDPrefix) {
+                        return isset($record[$this->foreignIDColumnName]) &&
+                            (empty($foreignIDPrefix) ||
+                                str_starts_with($record[$this->foreignIDColumnName], $foreignIDPrefix));
+                    })
                 );
             } elseif (is_null($records)) {
                 // Null item indicates error when following pagination links,
@@ -255,7 +260,7 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
         HttpClient $destinationClient,
         string $apiEndpointPath,
         array $sourceResources
-    ) : array {
+    ): array {
         return $sourceResources;
     }
 
@@ -274,16 +279,12 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
         array $destResources,
         ?string $foreignIDPrefix = null
     ): array {
-
         // Return the set of IDs from the source that aren't referenced as a foreign ID in the destination.
         $createResourceIDs = array_diff(
             array_column($sourceResources, $this->primaryIDColumnName),
-            array_map(
-                function ($foreignID) use ($foreignIDPrefix) {
-                    return str_replace($foreignIDPrefix, "", $foreignID);
-                },
-                array_column($destResources, $this->foreignIDColumnName)
-            )
+            array_map(function ($foreignID) use ($foreignIDPrefix) {
+                return str_replace($foreignIDPrefix, "", $foreignID);
+            }, array_column($destResources, $this->foreignIDColumnName))
         );
 
         // Return the set of source resources whose IDs are in the set produced above.
@@ -340,21 +341,25 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
         ?string $foreignIDPrefix = null
     ): int {
         // Form the foreign ID from the source resource's ID.
-        $foreignID = ($foreignIDPrefix ?? "").$resourceToCreate[$this->primaryIDColumnName];
+        $foreignID = ($foreignIDPrefix ?? "") . $resourceToCreate[$this->primaryIDColumnName];
         // Exclude any unsynced properties from the source representation
         $unsyncedProperties = $this->getUnsyncedProperties();
-        $resourceToCreate = array_filter($resourceToCreate, function ($key) use ($unsyncedProperties) {
-            return !in_array($key, $unsyncedProperties);
-        }, ARRAY_FILTER_USE_KEY);
+        $resourceToCreate = array_filter(
+            $resourceToCreate,
+            function ($key) use ($unsyncedProperties) {
+                return !in_array($key, $unsyncedProperties);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
         // The foreignID may have been included in the unsynced properties and stripped out.
         // We want to set that in the destination resource but not with the source's value
         // but with a value derived from the source as above.
         $resourceToCreate[$this->foreignIDColumnName] = $foreignID;
 
         $logContext = [
-            'httpVerb' => 'POST',
-            'endpoint' => "{$destinationClient->getBaseUrl()}/{$apiEndpointPath}",
-            $this->getResourceTypeName() => json_encode($resourceToCreate)
+            "httpVerb" => "POST",
+            "endpoint" => "{$destinationClient->getBaseUrl()}/{$apiEndpointPath}",
+            $this->getResourceTypeName() => json_encode($resourceToCreate),
         ];
         $logLevel = LogLevel::ERROR;
 
@@ -363,12 +368,12 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
             // unsynced properties are omitted at the destination prior to persisting the resource
             // via the API's input schema validation
             $response = $destinationClient->post($apiEndpointPath, $resourceToCreate);
-            $logContext['status'] = $response->getStatus();
+            $logContext["status"] = $response->getStatus();
             if ($response->isSuccessful()) {
                 $logLevel = LogLevel::DEBUG;
                 $createdWebhook = $response->getBody();
                 $insertedID = intval($createdWebhook[$this->primaryIDColumnName]);
-                $logContext['message'] = "{$this->primaryIDColumnName} {$insertedID}";
+                $logContext["message"] = "{$this->primaryIDColumnName} {$insertedID}";
             }
         } catch (\Exception $exception) {
             $logContext = $this->addExceptionToLogContext($logContext, $exception);
@@ -394,16 +399,12 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
         array $destResources,
         ?string $foreignIDPrefix = null
     ): array {
-
         // Return the set of foreign IDs from the destination that aren't referenced as a primary ID in the source.
         $destDeleteForeignIDs = array_diff(
             array_column($destResources, $this->foreignIDColumnName),
-            array_map(
-                function ($primaryID) use ($foreignIDPrefix) {
-                    return ($foreignIDPrefix ?? "").$primaryID;
-                },
-                array_column($sourceResources, $this->primaryIDColumnName)
-            )
+            array_map(function ($primaryID) use ($foreignIDPrefix) {
+                return ($foreignIDPrefix ?? "") . $primaryID;
+            }, array_column($sourceResources, $this->primaryIDColumnName))
         );
 
         // Return the set of destination resources whose IDs are in the set produced above.
@@ -462,14 +463,14 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
         string $apiEndpointPath,
         string $resourceIDToDelete
     ): bool {
-        $endpoint = trim($apiEndpointPath, "/")."/{$resourceIDToDelete}";
-        $logContext =                 [
-            'endpoint' => "{$destinationClient->getBaseUrl()}/{$endpoint}",
-            'httpVerb' => 'DELETE',
+        $endpoint = trim($apiEndpointPath, "/") . "/{$resourceIDToDelete}";
+        $logContext = [
+            "endpoint" => "{$destinationClient->getBaseUrl()}/{$endpoint}",
+            "httpVerb" => "DELETE",
         ];
         try {
             $response = $destinationClient->delete($endpoint);
-            $logContext['status'] = $response->getStatus();
+            $logContext["status"] = $response->getStatus();
             // w/r/t delete, 404 Not Found is as good as 2xx in that the resource to delete is verified as gone.
             $isDeleted = $response->isSuccessful() || $response->getStatusCode() === 404;
         } catch (\Exception $exception) {
@@ -492,10 +493,8 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
      * @param array $resourcesToUpdate Associative array, indexed by ID of resource at destination,
      * of the set of properties at source that differ from corresponding set of properties at destination.
      */
-    protected function processSyncAllApiUpdates(
-        HttpClient $destinationClient,
-        array $resourcesToUpdate
-    ): void {
+    protected function processSyncAllApiUpdates(HttpClient $destinationClient, array $resourcesToUpdate): void
+    {
         $updatedIDs = [];
         $updateFailedIDs = [];
         foreach ($resourcesToUpdate as $destinationID => $resourceToUpdate) {
@@ -530,7 +529,6 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
         array $destResources,
         ?string $foreignIDPrefix = null
     ): array {
-
         // Create a dictionary indexed by the destination's foreign ID of destination resource IDs
         $destinationIDLookup = array_combine(
             array_column($destResources, $this->foreignIDColumnName),
@@ -542,9 +540,13 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
         $syncableSourceResources = array_combine(
             array_column($sourceResources, $this->primaryIDColumnName),
             array_map(function ($sourceResource) use ($unsyncedProperties) {
-                return array_filter($sourceResource, function ($key) use ($unsyncedProperties) {
-                    return !in_array($key, $unsyncedProperties);
-                }, ARRAY_FILTER_USE_KEY);
+                return array_filter(
+                    $sourceResource,
+                    function ($key) use ($unsyncedProperties) {
+                        return !in_array($key, $unsyncedProperties);
+                    },
+                    ARRAY_FILTER_USE_KEY
+                );
             }, array_values($sourceResources))
         );
 
@@ -553,9 +555,13 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
         $syncableDestResources = array_combine(
             array_column($destResources, $this->foreignIDColumnName),
             array_map(function ($destResource) use ($unsyncedProperties) {
-                return array_filter($destResource, function ($key) use ($unsyncedProperties) {
-                    return !in_array($key, $unsyncedProperties);
-                }, ARRAY_FILTER_USE_KEY);
+                return array_filter(
+                    $destResource,
+                    function ($key) use ($unsyncedProperties) {
+                        return !in_array($key, $unsyncedProperties);
+                    },
+                    ARRAY_FILTER_USE_KEY
+                );
             }, array_values($destResources))
         );
 
@@ -567,15 +573,12 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
             $syncableSourceResources,
             $syncableDestResources,
             function (array $sourceResource, array $destResource) {
-                return array_udiff_assoc(
-                    $sourceResource,
-                    $destResource,
-                    [$this, 'compareResourceValues']
-                );
+                return array_udiff_assoc($sourceResource, $destResource, [$this, "compareResourceValues"]);
             },
             function ($sourceResourceKey, $destResourceKey) use ($foreignIDPrefix) {
-                $destResourceKeyToCompare =
-                    empty($foreignIDPrefix) ? $destResourceKey : str_replace($foreignIDPrefix, "", $destResourceKey);
+                $destResourceKeyToCompare = empty($foreignIDPrefix)
+                    ? $destResourceKey
+                    : str_replace($foreignIDPrefix, "", $destResourceKey);
                 return intval($sourceResourceKey) <=> intval($destResourceKeyToCompare);
             }
         );
@@ -585,14 +588,13 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
         // whose value(s) differ from the syncable properties in the corresponding destination item.
         $syncCandidates = [];
         foreach ($sourceSyncCandidates as $id => $sourceSyncCandidate) {
-            $index = ($foreignIDPrefix ?? "").$id;
+            $index = ($foreignIDPrefix ?? "") . $id;
             if (array_key_exists($index, $destinationIDLookup) && array_key_exists($index, $syncableDestResources)) {
-                $syncCandidates[$destinationIDLookup[$index]] =
-                    array_udiff_assoc(
-                        $sourceSyncCandidate,
-                        $syncableDestResources[$index],
-                        [$this, 'compareResourceValues']
-                    );
+                $syncCandidates[$destinationIDLookup[$index]] = array_udiff_assoc(
+                    $sourceSyncCandidate,
+                    $syncableDestResources[$index],
+                    [$this, "compareResourceValues"]
+                );
             }
         }
 
@@ -608,14 +610,15 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
      * @return int integer less than, equal to, or greater than zero if the first argument is considered to be
      * respectively less than, equal to, or greater than the second
      */
-    protected function compareResourceValues($srcVal, $destVal) : int {
+    protected function compareResourceValues($srcVal, $destVal): int
+    {
         return is_scalar($srcVal) && is_scalar($destVal)
             ? $srcVal <=> $destVal
             : (is_array($srcVal) && is_array($destVal)
-                ? count(array_udiff_assoc($srcVal, $destVal, [$this, 'compareResourceValues']))
-                : -1);  // data types do not have the same "shape" so they're irreconcilably different
-                        // and all we care about is different or same, as order isn't useful in this context,
-                        // so use -1 to denote they're different.
+                ? count(array_udiff_assoc($srcVal, $destVal, [$this, "compareResourceValues"]))
+                : -1); // data types do not have the same "shape" so they're irreconcilably different
+        // and all we care about is different or same, as order isn't useful in this context,
+        // so use -1 to denote they're different.
     }
 
     /**
@@ -634,16 +637,16 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
         array $resourcePropsToUpdate
     ): bool {
         $isUpdated = false;
-        $endpoint = trim($apiEndpointPath, "/")."/{$resourceIDToUpdate}";
-        $logContext =                 [
-            'endpoint' => "{$destinationClient->getBaseUrl()}/{$endpoint}",
-            'httpVerb' => 'PATCH',
-            'update' => json_encode($resourcePropsToUpdate)
+        $endpoint = trim($apiEndpointPath, "/") . "/{$resourceIDToUpdate}";
+        $logContext = [
+            "endpoint" => "{$destinationClient->getBaseUrl()}/{$endpoint}",
+            "httpVerb" => "PATCH",
+            "update" => json_encode($resourcePropsToUpdate),
         ];
 
         try {
             $response = $destinationClient->patch($endpoint, $resourcePropsToUpdate);
-            $logContext['status'] = $response->getStatus();
+            $logContext["status"] = $response->getStatus();
             $isUpdated = $response->isSuccessful();
         } catch (\Exception $exception) {
             $logContext = $this->addExceptionToLogContext($logContext, $exception);
@@ -662,29 +665,28 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
      * @param array $failedIDs
      * @param string $verbPresentTense
      */
-    protected function logSyncSummary(
-        array $successIDs,
-        array $failedIDs,
-        string $verbPresentTense
-    ) {
+    protected function logSyncSummary(array $successIDs, array $failedIDs, string $verbPresentTense)
+    {
         $summaryLogContext = [
-            'action' => $verbPresentTense,
-            'resourceType' => "{$this->getResourceTypeName()}"
+            "action" => $verbPresentTense,
+            "resourceType" => "{$this->getResourceTypeName()}",
         ];
 
         $logMessageTemplate = "Sync {action} {count} {resourceType}(s) {outcome}: [{ids}]";
         if (!empty($successIDs)) {
-            $logContext = array_merge(
-                $summaryLogContext,
-                ['count' => count($successIDs), 'outcome' => 'succeeded', 'ids' => join(", ", $successIDs)]
-            );
+            $logContext = array_merge($summaryLogContext, [
+                "count" => count($successIDs),
+                "outcome" => "succeeded",
+                "ids" => join(", ", $successIDs),
+            ]);
             $this->logger->info($logMessageTemplate, $logContext);
         }
         if (!empty($failedIDs)) {
-            $logContext = array_merge(
-                $summaryLogContext,
-                ['count' => count($failedIDs), 'outcome' => 'failed', 'ids' => join(", ", $failedIDs)]
-            );
+            $logContext = array_merge($summaryLogContext, [
+                "count" => count($failedIDs),
+                "outcome" => "failed",
+                "ids" => join(", ", $failedIDs),
+            ]);
             $this->logger->error($logMessageTemplate, $logContext);
         }
     }
@@ -696,17 +698,16 @@ abstract class AbstractSiteSyncConsumer implements SiteSyncConsumerInterface, Lo
      * @param \Exception $exception Exception used to add additional context
      * @return string[] Log context containing additional properties derived from the provided exception
      */
-    protected function addExceptionToLogContext(array $logContext, \Exception $exception): array {
-        $logContext = array_merge(
-            $logContext,
-            [
-                'status' => $exception instanceof HttpResponseException
+    protected function addExceptionToLogContext(array $logContext, \Exception $exception): array
+    {
+        $logContext = array_merge($logContext, [
+            "status" =>
+                $exception instanceof HttpResponseException
                     ? $exception->getResponse()->getStatus()
-                    : "{$exception->getCode()} [".get_class($exception)."]",
-                'message' => $exception->getMessage(),
-                'exception' => $exception
-            ]
-        );
+                    : "{$exception->getCode()} [" . get_class($exception) . "]",
+            "message" => $exception->getMessage(),
+            "exception" => $exception,
+        ]);
         return $logContext;
     }
 }

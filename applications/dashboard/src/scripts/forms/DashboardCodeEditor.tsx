@@ -5,11 +5,12 @@
  */
 
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
+import { css } from "@emotion/css";
 import { IInputProps } from "@library/forms/InputTextBlock";
 import TextEditor from "@library/textEditor/TextEditor";
 import { mountReact } from "@vanilla/react-utils";
 import { logWarning } from "@vanilla/utils";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
 interface IProps {
     value: string;
@@ -18,12 +19,23 @@ interface IProps {
     inputName?: string;
     language?: string;
     jsonSchemaUri?: string;
+    boxHeightOverride?: number;
 }
 
 export function DashboardCodeEditor(props: IProps) {
-    const { value, onChange, inputName, language, jsonSchemaUri } = props;
+    const { value, onChange, inputName, language, jsonSchemaUri, boxHeightOverride } = props;
     const formGroup = useFormGroup();
     const inputID = props.inputID ?? formGroup.inputID;
+
+    const styleOverrides = useMemo(() => {
+        return {
+            ...(boxHeightOverride && {
+                className: css({
+                    height: boxHeightOverride,
+                }),
+            }),
+        };
+    }, [boxHeightOverride]);
 
     return (
         <div className="input-wrap">
@@ -34,6 +46,7 @@ export function DashboardCodeEditor(props: IProps) {
                 jsonSchemaUri={jsonSchemaUri}
                 value={value}
                 onChange={(e, value) => onChange(value ?? "")}
+                {...styleOverrides}
             />
         </div>
     );

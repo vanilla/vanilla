@@ -5,8 +5,8 @@
  */
 
 @mixin disabledInput {
-  pointer-events: none;
-  user-select: none;
-  cursor: default;
-  opacity: $formElement-disabled_opacity;
+    pointer-events: none;
+    user-select: none;
+    cursor: default;
+    opacity: $formElement-disabled_opacity;
 }

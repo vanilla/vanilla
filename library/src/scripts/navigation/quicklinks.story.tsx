@@ -10,7 +10,7 @@ import { QuickLinksView } from "@library/navigation/QuickLinks.view";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { BorderType } from "@library/styles/styleHelpers";
 import { ListSeparation } from "@library/styles/cssUtilsTypes";
-import TwoColumnSection from "@library/layout/TwoColumnSection";
+import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import PanelWidget from "@library/layout/components/PanelWidget";
 
 export default {
@@ -201,7 +201,7 @@ export const InPanel = storyWithConfig(
     },
     () => {
         return (
-            <TwoColumnSection
+            <SectionTwoColumns
                 mainTop={<PanelWidget />}
                 secondaryTop={
                     <PanelWidget>
@@ -249,7 +249,7 @@ export const InPanel = storyWithConfig(
                         />
                     </PanelWidget>
                 }
-            ></TwoColumnSection>
+            ></SectionTwoColumns>
         );
     },
 );

@@ -11,8 +11,8 @@
 /**
  * A template for handshake-aware Authenticator classes.
  */
-interface Gdn_IHandshake {
-
+interface Gdn_IHandshake
+{
     /**
      * Get handshake data, such as temporary foreign user identity info.
      *

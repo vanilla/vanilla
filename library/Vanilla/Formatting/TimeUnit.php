@@ -12,7 +12,8 @@ namespace Vanilla\Formatting;
  *
  * If you need exact time calculations, DON'T use these.
  */
-interface TimeUnit {
+interface TimeUnit
+{
     const ONE_MINUTE = 60;
     const ONE_HOUR = self::ONE_MINUTE * 60;
     const ONE_DAY = self::ONE_HOUR * 24;

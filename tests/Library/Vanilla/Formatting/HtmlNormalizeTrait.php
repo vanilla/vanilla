@@ -12,8 +12,8 @@ use voku\helper\HtmlMin;
 /**
  * Trait for normalizing some HTML to make test assertions easier.
  */
-trait HtmlNormalizeTrait {
-
+trait HtmlNormalizeTrait
+{
     /** @var HtmlMin */
     private $minifier;
 
@@ -26,14 +26,15 @@ trait HtmlNormalizeTrait {
      *
      * @return string
      */
-    private function minifyHTML(string $html): string {
+    private function minifyHTML(string $html): string
+    {
         if ($this->minifier === null) {
             $this->minifier = new HtmlMin();
-            $this->minifier->doRemoveSpacesBetweenTags()
+            $this->minifier
+                ->doRemoveSpacesBetweenTags()
                 ->doRemoveWhitespaceAroundTags()
                 ->doSortHtmlAttributes()
-                ->doRemoveOmittedHtmlTags(false)
-            ;
+                ->doRemoveOmittedHtmlTags(false);
         }
         return $this->minifier->minify($html);
     }
@@ -47,7 +48,8 @@ trait HtmlNormalizeTrait {
      *
      * @return string
      */
-    protected function normalizeHtml($html) {
+    protected function normalizeHtml($html)
+    {
         $html = $this->stripZeroWidthWhitespace($html);
         $html = $this->minifyHTML($html);
         // Stub out SVGs
@@ -71,8 +73,9 @@ trait HtmlNormalizeTrait {
      *
      * @return string
      */
-    private function stripZeroWidthWhitespace(string $text): string {
-        return preg_replace('/[\x{200B}-\x{200D}\x{FEFF}]/u', '', $text);
+    private function stripZeroWidthWhitespace(string $text): string
+    {
+        return preg_replace("/[\x{200B}-\x{200D}\x{FEFF}]/u", "", $text);
     }
 
     /**
@@ -82,7 +85,8 @@ trait HtmlNormalizeTrait {
      * @param string $actual
      * @param string|null $message
      */
-    protected function assertHtmlStringEqualsHtmlString(string $expected, string $actual, string $message = '') {
+    protected function assertHtmlStringEqualsHtmlString(string $expected, string $actual, string $message = "")
+    {
         $expected = $this->normalizeHtml($expected);
         $actual = $this->normalizeHtml($actual);
         $this->assertEquals($expected, $actual, $message);

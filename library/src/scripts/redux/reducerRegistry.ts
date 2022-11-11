@@ -18,6 +18,7 @@ import ConversationsModel from "@library/features/conversations/ConversationsMod
 import { tagsReducer } from "@library/features/tags/TagsReducer";
 import { discussionsReducer } from "@library/features/discussions/discussionsReducer";
 import { configSlice, IConfigState } from "@library/config/configReducer";
+import { collectionsReducer } from "@library/featuredCollections/collectionsReducer";
 
 let dynamicReducers = {};
 
@@ -50,6 +51,7 @@ export function getReducers(): ReducersMapObject<any, any> {
         notifications: new NotificationsModel().reducer,
         conversations: new ConversationsModel().reducer,
         theme: themeReducer,
+        collections: collectionsReducer,
         [configSlice.name]: configSlice.reducer,
         ...dynamicReducers,
     };

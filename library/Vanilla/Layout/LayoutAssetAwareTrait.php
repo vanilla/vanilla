@@ -10,8 +10,8 @@ namespace Vanilla\Layout;
 /**
  * Helper class to get Widget list.
  */
-trait LayoutAssetAwareTrait {
-
+trait LayoutAssetAwareTrait
+{
     /** @var bool */
     public $getAsset;
 
@@ -23,7 +23,8 @@ trait LayoutAssetAwareTrait {
      *
      * @param bool $getAsset
      */
-    public function setPartialHydrate(bool $getAsset) {
+    public function setPartialHydrate(bool $getAsset)
+    {
         $this->getAsset = $getAsset;
     }
 
@@ -32,7 +33,8 @@ trait LayoutAssetAwareTrait {
      *
      * @param string $widget
      */
-    public function addWidgetName(string $widget) {
+    public function addWidgetName(string $widget)
+    {
         if ($this->widgetList == null) {
             $this->widgetList = [];
         }
@@ -44,7 +46,8 @@ trait LayoutAssetAwareTrait {
      *
      * @return array
      */
-    public function getWidgetNames() {
+    public function getWidgetNames()
+    {
         return $this->widgetList;
     }
 }

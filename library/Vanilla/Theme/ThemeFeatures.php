@@ -15,8 +15,8 @@ use Vanilla\FeatureFlagHelper;
 /**
  * Class to hold information about a theme and it's configuration options.
  */
-class ThemeFeatures implements \JsonSerializable {
-
+class ThemeFeatures implements \JsonSerializable
+{
     /** @var Addon */
     private $theme;
 
@@ -27,50 +27,49 @@ class ThemeFeatures implements \JsonSerializable {
 
     private const FEATURE_NAMES = [
         // Used for keystone and newer to allow flyouts to convert to Modals o mobile.
-        'NewFlyouts',
+        "NewFlyouts",
 
         // Use twig master templates. You do not have access to the full master view.
-        'SharedMasterView',
+        "SharedMasterView",
 
         // Used foundation and some other themes, adds extra header information on top of the profile page.
-        'ProfileHeader',
+        "ProfileHeader",
 
         // Applies the Variabler driven CSS across the forum. (Eg. foundation based).
-        'DataDrivenTheme',
+        "DataDrivenTheme",
 
         // Turn on user cards.
-        'UserCards',
+        "UserCards",
 
         // Disable legacy based variables.json.
-        'DisableKludgedVars',
+        "DisableKludgedVars",
 
         // Use the new event list page, and new event view page.
-        'NewEventsPage',
+        "NewEventsPage",
 
         // Enable the new search UI (member directory, places, new interface).
         SearchRootController::ENABLE_FLAG,
 
         // Make backwards-incompatbile view changes for better accessibility.
-        'EnhancedAccessibility',
+        "EnhancedAccessibility",
 
         // Use the new themeable quicklinks.
-        'NewQuickLinks',
+        "NewQuickLinks",
 
         // New button style dropdown
-        'NewCategoryDropdown',
-
+        "NewCategoryDropdown",
 
         // New badges module.
-        'NewBadgesModule',
+        "NewBadgesModule",
 
         // NewReactionsModule (icons and count) to replace writeProfileCounts()
-        'NewReactionsModule',
+        "NewReactionsModule",
 
         // NewGuestModule to replace the view with react component
-        'NewGuestModule',
+        "NewGuestModule",
 
         // NewPostMenu for NewDiscussionModule
-        'NewPostMenu',
+        "NewPostMenu",
     ];
 
     /**
@@ -79,7 +78,8 @@ class ThemeFeatures implements \JsonSerializable {
      * @param ConfigurationInterface $config
      * @param Addon $theme
      */
-    public function __construct(ConfigurationInterface $config, Addon $theme) {
+    public function __construct(ConfigurationInterface $config, Addon $theme)
+    {
         $this->config = $config;
         $this->theme = $theme;
     }
@@ -89,26 +89,29 @@ class ThemeFeatures implements \JsonSerializable {
      *
      * @param array $forcedFeatures An array of Feature => boolean.
      */
-    public function forceFeatures(array $forcedFeatures) {
+    public function forceFeatures(array $forcedFeatures)
+    {
         $this->forcedFeatures = $forcedFeatures;
     }
 
     /**
      * @inheritDoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return $this->allFeatures();
     }
 
     /**
      * Get theme features pulled directly from the addon.
      */
-    public function allAddonFeatures(): array {
+    public function allAddonFeatures(): array
+    {
         $rawInfoFeatures = [];
         if ($this->theme !== null) {
-            $rawInfoFeatures = $this->theme->getInfoValue('Features', []);
+            $rawInfoFeatures = $this->theme->getInfoValue("Features", []);
         }
-        $defaultEnabled = (bool) ($rawInfoFeatures['DataDrivenTheme'] ?? false);
+        $defaultEnabled = (bool) ($rawInfoFeatures["DataDrivenTheme"] ?? false);
 
         $addonFeatures = [];
         foreach (self::FEATURE_NAMES as $featureName) {
@@ -121,7 +124,8 @@ class ThemeFeatures implements \JsonSerializable {
     /**
      * Get all of the current theme features.
      */
-    public function allFeatures(): array {
+    public function allFeatures(): array
+    {
         $addonFeatures = $this->allAddonFeatures();
 
         $featureFlagEnabledFeatures = [];
@@ -150,7 +154,8 @@ class ThemeFeatures implements \JsonSerializable {
      *
      * @return bool
      */
-    public function get(string $featureName): bool {
+    public function get(string $featureName): bool
+    {
         $result = $this->allFeatures()[$featureName] ?? false;
         return (bool) $result;
     }
@@ -158,42 +163,48 @@ class ThemeFeatures implements \JsonSerializable {
     /**
      * @return bool
      */
-    public function useNewFlyouts(): bool {
-        return (bool) $this->allFeatures()['NewFlyouts'];
+    public function useNewFlyouts(): bool
+    {
+        return (bool) $this->allFeatures()["NewFlyouts"];
     }
 
     /**
      * @return bool
      */
-    public function useSharedMasterView(): bool {
-        return (bool) $this->allFeatures()['SharedMasterView'];
+    public function useSharedMasterView(): bool
+    {
+        return (bool) $this->allFeatures()["SharedMasterView"];
     }
 
     /**
      * @return bool
      */
-    public function useProfileHeader(): bool {
-        return (bool) $this->allFeatures()['ProfileHeader'];
+    public function useProfileHeader(): bool
+    {
+        return (bool) $this->allFeatures()["ProfileHeader"];
     }
 
     /**
      * @return bool
      */
-    public function useNewQuickLinks(): bool {
-        return (bool) $this->allFeatures()['NewQuickLinks'];
+    public function useNewQuickLinks(): bool
+    {
+        return (bool) $this->allFeatures()["NewQuickLinks"];
     }
 
     /**
      * @return bool
      */
-    public function useDataDrivenTheme(): bool {
-        return (bool) $this->allFeatures()['DataDrivenTheme'];
+    public function useDataDrivenTheme(): bool
+    {
+        return (bool) $this->allFeatures()["DataDrivenTheme"];
     }
 
     /**
      * @return bool
      */
-    public function disableKludgedVars(): bool {
-        return (bool) $this->allFeatures()['DisableKludgedVars'];
+    public function disableKludgedVars(): bool
+    {
+        return (bool) $this->allFeatures()["DisableKludgedVars"];
     }
 }

@@ -12,8 +12,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Tests for calculateNumberOfPages().
  */
-class CalculateNumberOfPagesTest extends TestCase {
-
+class CalculateNumberOfPagesTest extends TestCase
+{
     /**
      * Test {@link calculateNumberOfPages() against several scenarios.
      *
@@ -22,7 +22,8 @@ class CalculateNumberOfPagesTest extends TestCase {
      * @param int $expected Expected result.
      * @dataProvider provideCalculateNumberOfPagesArrays
      */
-    public function testCalculateNumberOfPages(int $testItemCount, int $testItemsPerPage, int $expected) {
+    public function testCalculateNumberOfPages(int $testItemCount, int $testItemsPerPage, int $expected)
+    {
         $actual = calculateNumberOfPages($testItemCount, $testItemsPerPage);
         $this->assertSame($expected, $actual);
     }
@@ -32,33 +33,14 @@ class CalculateNumberOfPagesTest extends TestCase {
      *
      * @return array Returns an array of test data.
      */
-    public function provideCalculateNumberOfPagesArrays() {
+    public function provideCalculateNumberOfPagesArrays()
+    {
         $r = [
-            'itemsLessThanItemsPerPage' => [
-                4,
-                5,
-                1,
-            ],
-            'itemsSameAsItemsPerPage' => [
-                5,
-                5,
-                1,
-            ],
-            'itemsMultipleOfItemsPerPage' => [
-                9,
-                3,
-                3,
-            ],
-            'itemsNotMultipleOfItemsPerPage' => [
-                10,
-                3,
-                4,
-            ],
-            'noItems' => [
-                0,
-                5,
-                1,
-            ],
+            "itemsLessThanItemsPerPage" => [4, 5, 1],
+            "itemsSameAsItemsPerPage" => [5, 5, 1],
+            "itemsMultipleOfItemsPerPage" => [9, 3, 3],
+            "itemsNotMultipleOfItemsPerPage" => [10, 3, 4],
+            "noItems" => [0, 5, 1],
         ];
 
         return $r;

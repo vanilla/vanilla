@@ -13,12 +13,13 @@ use PHPUnit\Framework\TestCase;
  * Tests for validateEnum().
  */
 
-class ValidateEnumTest extends TestCase {
-
+class ValidateEnumTest extends TestCase
+{
     /**
      * Test validateEnum() with valid value.
      */
-    public function testValidateEnumValid() {
+    public function testValidateEnumValid()
+    {
         $testObject = new \stdClass();
         $testObject->Enum = [1, 2, 3];
         $actual = validateEnum(1, $testObject);
@@ -29,7 +30,8 @@ class ValidateEnumTest extends TestCase {
     /**
      * Test validateEnum() with invalid value.
      */
-    public function testValidateEnumInvalid() {
+    public function testValidateEnumInvalid()
+    {
         $testObject = new \stdClass();
         $testObject->Enum = [1, 2, 3];
         $testObject->AllowNull = false;

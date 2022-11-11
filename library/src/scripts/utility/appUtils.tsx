@@ -6,7 +6,7 @@
  */
 
 import gdn from "@library/gdn";
-import { PromiseOrNormalCallback } from "@vanilla/utils";
+import { logError, PromiseOrNormalCallback, RecordID } from "@vanilla/utils";
 import { ensureScript } from "@vanilla/dom-utils";
 import { sprintf } from "sprintf-js";
 
@@ -227,7 +227,13 @@ export function onReady(callback: PromiseOrNormalCallback) {
  */
 export function _executeReady(before?: () => void | Promise<void>): Promise<any[]> {
     return new Promise((resolve) => {
-        const handlerPromises = _readyHandlers.map((handler) => handler());
+        const handlerPromises = _readyHandlers.map((handler) => {
+            let result = handler();
+            if (result instanceof Promise) {
+                result.catch((err) => logError(err));
+            }
+            return result;
+        });
         const exec = () => {
             before?.();
             return Promise.all(handlerPromises).then(resolve);
@@ -308,4 +314,20 @@ export async function ensureReCaptcha(): Promise<IRecaptcha | null> {
  */
 export function accessibleLabel(template: string, variable: string[]) {
     return sprintf(template, variable);
+}
+
+export type ImageSourceSet = Record<RecordID, string>;
+
+/**
+ * This function creates a source set value from an object where the key indicates the
+ * the width and the corresponding values are the image URL.
+ */
+export function createSourceSetValue(sourceSet: ImageSourceSet): string {
+    return (
+        Object.entries(sourceSet ?? {})
+            // Filter out any values which are empty
+            .filter(([_, value]) => value)
+            .map((source) => `${source.reverse().join(" ")}w`)
+            .join(",")
+    );
 }

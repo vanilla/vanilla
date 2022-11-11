@@ -17,9 +17,9 @@ use Vanilla\Site\SiteSectionModel;
 /**
  * Tests for SingleSiteSectionProvider.
  */
-class SingleSiteSectionProviderTest extends MinimalContainerTestCase {
-
-    const LOCALE_KEY = 'en_US';
+class SingleSiteSectionProviderTest extends MinimalContainerTestCase
+{
+    const LOCALE_KEY = "en_US";
 
     /** @var SiteSectionModel $model */
     private static $siteSectionModel;
@@ -27,9 +27,10 @@ class SingleSiteSectionProviderTest extends MinimalContainerTestCase {
     /**
      * @inheritdoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
-        $this->setConfig('Garden.Locale', self::LOCALE_KEY);
+        $this->setConfig("Garden.Locale", self::LOCALE_KEY);
         $config = self::container()->get(ConfigurationInterface::class);
         $router = self::container()->get(\Gdn_Router::class);
         $provider = new SingleSiteSectionProvider(new DefaultSiteSection($config, $router));
@@ -42,7 +43,8 @@ class SingleSiteSectionProviderTest extends MinimalContainerTestCase {
     /**
      * Test for the getAll.
      */
-    public function testGetAll() {
+    public function testGetAll()
+    {
         $this->assertCount(1, self::$siteSectionModel->getAll());
         $this->assertInstanceOf(DefaultSiteSection::class, self::$siteSectionModel->getAll()[0]);
     }
@@ -50,22 +52,22 @@ class SingleSiteSectionProviderTest extends MinimalContainerTestCase {
     /**
      * Test for the getForLocale.
      */
-    public function testGetForLocale() {
+    public function testGetForLocale()
+    {
         $this->assertCount(1, self::$siteSectionModel->getForLocale(self::LOCALE_KEY));
-        $this->assertCount(0, self::$siteSectionModel->getForLocale('notlocalekey'));
+        $this->assertCount(0, self::$siteSectionModel->getForLocale("notlocalekey"));
     }
 
     /**
      * Test for the getByBasePath.
      */
-    public function getByBasePath() {
+    public function testGetByBasePath()
+    {
         $this->assertInstanceOf(
             DefaultSiteSection::class,
             self::$siteSectionModel->getByBasePath(DefaultSiteSection::EMPTY_BASE_PATH)
         );
 
-        $this->assertNull(
-            self::$siteSectionModel->getByBasePath('asdf')
-        );
+        $this->assertNull(self::$siteSectionModel->getByBasePath("asdf"));
     }
 }

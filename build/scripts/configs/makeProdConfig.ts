@@ -13,7 +13,7 @@ import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 import TerserWebpackPlugin from "terser-webpack-plugin";
 import EntryModel from "../utility/EntryModel";
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
-const { WebpackManifestPlugin } = require("webpack-manifest-plugin");
+import { makeManifestPlugin } from "./makeManifestPlugin";
 
 let analyzePort = 8888;
 
@@ -22,18 +22,15 @@ let analyzePort = 8888;
  *
  * @param section - The section of the app to build. Eg. forum | admin | knowledge.
  */
-export async function makeProdConfig(entryModel: EntryModel, section: string, isLegacy: boolean = true) {
-    const baseConfig: Configuration = await makeBaseConfig(entryModel, section, isLegacy);
-    const forumEntries = await entryModel.getProdEntries(section);
+export async function makeProdConfig(entryModel: EntryModel, section: string) {
+    const baseConfig: Configuration = await makeBaseConfig(entryModel, section);
+    const prodEntries = await entryModel.getProdEntries(section);
     const options = await getOptions();
 
     baseConfig.mode = "production";
-    baseConfig.entry = forumEntries;
+    baseConfig.entry = prodEntries;
     baseConfig.devtool = false;
-    baseConfig.target = ["web", "es5"];
-    if (options.modern) {
-        baseConfig.target = isLegacy ? ["web", "es5"] : ["web"];
-    }
+    baseConfig.target = ["web"];
     // These outputs are expected to have the directory of the addon they beng to in their "[name]".
     // Webpack does not along a function for name here.
     baseConfig.output = {
@@ -43,56 +40,54 @@ export async function makeProdConfig(entryModel: EntryModel, section: string, is
         path: path.join(DIST_DIRECTORY, section),
         library: `vanilla${section.replace("-", "_")}`,
     };
-    if (options.modern) {
-        baseConfig.output.publicPath = isLegacy ? `/${DIST_NAME}/${section}/` : `/${DIST_NAME}/${section}-modern/`;
-        baseConfig.output.path = path.join(DIST_DIRECTORY, isLegacy ? section : `${section}-modern`);
-    }
     baseConfig.optimization = {
         emitOnErrors: false,
         chunkIds: options.debug ? "named" : undefined,
         moduleIds: options.debug ? "named" : undefined,
-        // Create a single runtime chunk per section.
+        // Create a single runtime chunk.
         runtimeChunk: {
             name: `runtime`,
         },
-        // We want to split
+        // Split up chunks.
         splitChunks: {
-            usedExports: true,
-            maxInitialSize: 200000,
-            maxInitialRequests: 20,
+            // All of our addon chunks are async so we need to use "all" instead of "initial",
             chunks: "all",
-            // minSize: 10000000, // This should prevent webpack from creating extra chunks.
             cacheGroups: {
+                defaultVendors: false,
+                // The library chunk ensures that commonly used parts of library are shared between addons.
                 library: {
-                    test: /[\\/]library[\\/]/,
+                    test: /[\\/](library)[\\/]/,
+                    idHint: "library",
                     name: "library",
-                    chunks: "initial",
-                    reuseExistingChunk: true,
+                    chunks: "all",
+                    maxSize: 500000,
+                    minRemainingSize: 50000,
+                    priority: 1,
                 },
+                // Packages is similar to library
+                // This one is configured a little differently because
+                // webpack kept duplicating `@vanilla/icons` in addon chunks.
                 packages: {
-                    test: /[\\/]packages\/vanilla[\\/]/,
+                    test: /[\\/]packages[\\/]vanilla/,
+                    idHint: "packages",
                     name: "packages",
-                    chunks: "initial",
-                    reuseExistingChunk: true,
+                    reuseExistingChunk: false,
+                    priority: 100000,
+                    enforce: true,
                 },
+                // Increase the minimum size of the default chunk splitting.
+                // Webpack doesn't take gzip into account when measuring chunk sizes.
+                default: {
+                    minSize: 50000,
+                },
+                // Put our most stable vendor files into their own chunks.
                 vendors: {
-                    test: /[\\/]node_modules[\\/]/,
-                    priority: -10,
+                    test: /[\\/]node_modules[\\/](@emotion|react|react-dom|react-redux|redux|react-loadable|lodash)[\\/]/,
                     name: "vendors",
-                    chunks: "initial",
-                    reuseExistingChunk: true,
-                },
-                react: {
-                    test: /[\\/]node_modules[\\/](react|react-dom|react-redux|redux)[\\/]/,
-                    name: "react",
                     chunks: "all",
-                    priority: -5,
-                },
-                swagger: {
-                    test: /[\\/]node_modules[\\/]swagger-ui.*/,
-                    name: "swagger-ui",
-                    chunks: "all",
-                    priority: -1,
+                    priority: 10,
+                    enforce: true,
+                    reuseExistingChunk: false,
                 },
             },
         },
@@ -102,7 +97,10 @@ export async function makeProdConfig(entryModel: EntryModel, section: string, is
             : ([
                   new TerserWebpackPlugin({
                       parallel: options.lowMemory ? 1 : true,
+                      // SWC offers a much faster minimizer than the default.
+                      minify: TerserWebpackPlugin.swcMinify,
                       terserOptions: {
+                          ecma: 2015,
                           format: {
                               comments: false,
                           },
@@ -124,7 +122,7 @@ export async function makeProdConfig(entryModel: EntryModel, section: string, is
               ] as any),
     };
 
-    baseConfig.plugins?.push(new WebpackManifestPlugin({}));
+    baseConfig.plugins?.push(makeManifestPlugin());
 
     // Spawn a bundle size analyzer. This is super usefull if you find a bundle has jumped up in size.
     if (options.mode === BuildMode.ANALYZE) {

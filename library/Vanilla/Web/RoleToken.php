@@ -18,11 +18,11 @@ use Vanilla\CurrentTimeStamp;
  * endpoints that meet the criteria specified above. Role tokens are not intended to be persisted and are used
  * only for authenticating where the expiration period is fairly short (<= ~ 5min)
  */
-class RoleToken {
-
+class RoleToken
+{
     //region Constants
-    const SIGNING_ALGORITHM = 'HS512';
-    const PAYLOAD_CLAIM_ROLE_IDS = 'roleIDs';
+    const SIGNING_ALGORITHM = "HS512";
+    const PAYLOAD_CLAIM_ROLE_IDS = "roleIDs";
 
     const SECRET_MIN_LENGTH = 10;
     //endregion
@@ -57,7 +57,8 @@ class RoleToken {
      *
      * @param string $secret
      */
-    private function __construct(string $secret) {
+    private function __construct(string $secret)
+    {
         $this->secret = $secret;
     }
     //endregion
@@ -69,7 +70,8 @@ class RoleToken {
      * @param string $secret Signing secret for encoding and decoding role token
      * @return RoleToken
      */
-    public static function withSecret(string $secret): RoleToken {
+    public static function withSecret(string $secret): RoleToken
+    {
         $minLength = self::SECRET_MIN_LENGTH;
         if (strlen($secret) < $minLength) {
             throw new \LengthException("Secret must be at least {$minLength} characters long");
@@ -86,11 +88,8 @@ class RoleToken {
      * @param int|null $rolloverWithinSec Optional, Amount of time relative to the start of the next window
      * @return RoleToken
      */
-    public static function forEncoding(
-        string $secret,
-        int $windowSec,
-        ?int $rolloverWithinSec = null
-    ) : RoleToken {
+    public static function forEncoding(string $secret, int $windowSec, ?int $rolloverWithinSec = null): RoleToken
+    {
         $roleToken = static::withSecret($secret);
         if ($windowSec <= 0) {
             throw new \DomainException("Cannot set a zero or negative length window");
@@ -118,7 +117,8 @@ class RoleToken {
      *
      * @return string Signed encoded role token
      */
-    public function encode(): string {
+    public function encode(): string
+    {
         $now = CurrentTimeStamp::getDateTime();
         $this->expires = isset($this->window)
             ? CurrentTimeStamp::toNextWindow($this->window, $this->rolloverWithin)
@@ -133,13 +133,14 @@ class RoleToken {
         $payload = [
             "exp" => $this->expires->getTimestamp(),
             "nbf" => $notBefore->getTimestamp(),
-            self::PAYLOAD_CLAIM_ROLE_IDS => $this->getRoleIDs()
+            self::PAYLOAD_CLAIM_ROLE_IDS => $this->getRoleIDs(),
         ];
         if (isset($this->requestor)) {
-            $issuer = "{$this->requestor->getScheme()}://"
-                .rtrim($this->requestor->getHost(), '/')
-                ."/"
-                .trim($this->requestor->getPath(), '/');
+            $issuer =
+                "{$this->requestor->getScheme()}://" .
+                rtrim($this->requestor->getHost(), "/") .
+                "/" .
+                trim($this->requestor->getPath(), "/");
             $payload = array_merge(["iss" => $issuer], $payload);
         }
 
@@ -160,8 +161,9 @@ class RoleToken {
      * @throws \Firebase\JWT\BeforeValidException Attempting to use JWT before it's been created as defined by 'iat'.
      * @throws \Firebase\JWT\ExpiredException Provided JWT has since expired, as defined by the 'exp' claim.
      */
-    public function decode(string $encodedToken): RoleToken {
-        $this->decoded = (array)JWT::decode($encodedToken, $this->secret, [self::SIGNING_ALGORITHM]);
+    public function decode(string $encodedToken): RoleToken
+    {
+        $this->decoded = (array) JWT::decode($encodedToken, $this->secret, [self::SIGNING_ALGORITHM]);
         if (!empty($this->decoded[self::PAYLOAD_CLAIM_ROLE_IDS])) {
             $this->setRoleIDs($this->decoded[self::PAYLOAD_CLAIM_ROLE_IDS]);
         }
@@ -176,7 +178,8 @@ class RoleToken {
      *
      * @return \DateTimeInterface
      */
-    public function getExpires(): \DateTimeInterface {
+    public function getExpires(): \DateTimeInterface
+    {
         return $this->expires ?? CurrentTimeStamp::getDateTime();
     }
 
@@ -185,7 +188,8 @@ class RoleToken {
      *
      * @return array|null
      */
-    public function getDecoded(): ?array {
+    public function getDecoded(): ?array
+    {
         return $this->decoded;
     }
 
@@ -194,7 +198,8 @@ class RoleToken {
      *
      * @return RequestInterface
      */
-    public function getRequestor(): RequestInterface {
+    public function getRequestor(): RequestInterface
+    {
         return $this->requestor;
     }
 
@@ -203,7 +208,8 @@ class RoleToken {
      *
      * @param RequestInterface $request
      */
-    public function setRequestor(RequestInterface $request): RoleToken {
+    public function setRequestor(RequestInterface $request): RoleToken
+    {
         $this->requestor = $request;
         return $this;
     }
@@ -213,7 +219,8 @@ class RoleToken {
      *
      * @return array|string[]
      */
-    public function getRoleIDs(): array {
+    public function getRoleIDs(): array
+    {
         return $this->roleIDs ?? [];
     }
 
@@ -225,7 +232,8 @@ class RoleToken {
      * @throws \LengthException Empty role ID set.
      * @throws \InvalidArgumentException Array passed includes one or more invalid entries.
      */
-    public function setRoleIDs(array $roleIDs): RoleToken {
+    public function setRoleIDs(array $roleIDs): RoleToken
+    {
         if (empty($roleIDs)) {
             throw new \LengthException("Must specify at least one role ID");
         }

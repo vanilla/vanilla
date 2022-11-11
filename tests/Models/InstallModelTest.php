@@ -14,7 +14,8 @@ use VanillaTests\TestInstallModel;
 /**
  * Test basic Vanilla installation.
  */
-class InstallTest extends TestCase {
+class InstallTest extends TestCase
+{
     use BootstrapTrait {
         setupBeforeClass as private bootstrapBeforeClass;
         teardownAfterClass as private bootstrapAfterClass;
@@ -23,14 +24,16 @@ class InstallTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public static function setUpBeforeClass(): void {
+    public static function setUpBeforeClass(): void
+    {
         self::bootstrapBeforeClass();
     }
 
     /**
      * @inheritdoc
      */
-    public static function tearDownAfterClass(): void {
+    public static function tearDownAfterClass(): void
+    {
         /* @var TestInstallModel $installer */
         $installer = self::container()->get(TestInstallModel::class);
         $installer->uninstall();
@@ -41,19 +44,20 @@ class InstallTest extends TestCase {
     /**
      * Test installing Vanilla with the {@link \Vanilla\Models\InstallModel}.
      */
-    public function testInstall() {
+    public function testInstall()
+    {
         /* @var TestInstallModel $installer */
         $installer = self::container()->get(TestInstallModel::class);
 
         $result = $installer->install([
-            'site' => ['title' => __METHOD__]
+            "site" => ["title" => __METHOD__],
         ]);
 
-        $this->assertArrayHasKey('version', $result);
-        $this->assertGreaterThan(0, $result['adminUserID']);
+        $this->assertArrayHasKey("version", $result);
+        $this->assertGreaterThan(0, $result["adminUserID"]);
 
         /* @var \Gdn_Configuration $config */
         $config = self::container()->get(\Gdn_Configuration::class);
-        $this->assertNotEmpty($config->get('Garden.UpdateToken'));
+        $this->assertNotEmpty($config->get("Garden.UpdateToken"));
     }
 }

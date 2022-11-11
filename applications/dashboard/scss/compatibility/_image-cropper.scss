@@ -16,7 +16,8 @@ body.isMobile {
 
 // Hide on smaller screens
 
-@media (max-width: 600px){ // 600px is the size of the default popup styles
+@media (max-width: 600px) {
+    // 600px is the size of the default popup styles
     .box-crop .box-source {
         display: none;
     }

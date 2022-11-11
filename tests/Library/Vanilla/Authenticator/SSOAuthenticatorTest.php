@@ -13,7 +13,8 @@ use Vanilla\Models\SSOData;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
 use VanillaTests\SiteTestTrait;
 
-class SSOAuthenticatorTest extends TestCase {
+class SSOAuthenticatorTest extends TestCase
+{
     use SiteTestTrait;
 
     /** @var AuthenticatorModel */
@@ -22,7 +23,8 @@ class SSOAuthenticatorTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         /** @var AuthenticatorModel $authenticatorModel */
@@ -32,10 +34,11 @@ class SSOAuthenticatorTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function tearDown(): void {
+    public function tearDown(): void
+    {
         /** @var \Gdn_SQLDriver $driver */
-        $driver = self::container()->get('SqlDriver');
-        $driver->truncate('UserAuthenticationProvider');
+        $driver = self::container()->get("SqlDriver");
+        $driver->truncate("UserAuthenticationProvider");
 
         parent::tearDown();
     }
@@ -43,12 +46,13 @@ class SSOAuthenticatorTest extends TestCase {
     /**
      * Test that an authenticator with minimal/properly implemented methods will instantiate.
      */
-    public function testInstantiateAuthenticator() {
+    public function testInstantiateAuthenticator()
+    {
         $authType = MockSSOAuthenticator::getType();
         $this->authenticatorModel->createSSOAuthenticatorInstance([
-            'authenticatorID' => $authType,
-            'type' => $authType,
-            'SSOData' => json_decode(json_encode(new SSOData($authType, $authType, uniqid())), true),
+            "authenticatorID" => $authType,
+            "type" => $authType,
+            "SSOData" => json_decode(json_encode(new SSOData($authType, $authType, uniqid())), true),
         ]);
         $this->assertTrue(true);
     }

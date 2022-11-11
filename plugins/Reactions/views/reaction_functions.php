@@ -13,6 +13,132 @@ if (!defined('APPLICATION')) {
 }
 use Vanilla\Utility\HtmlUtils;
 
+
+if (!function_exists("writeReactions")) {
+    /**
+     *
+     *
+     * @param $row
+     * @throws Exception
+     */
+    function writeReactions($row)
+    {
+        $dataDrivenColors = Gdn::themeFeatures()->useDataDrivenTheme();
+        $attributes = val("Attributes", $row);
+        if (is_string($attributes)) {
+            $attributes = dbdecode($attributes);
+            setValue("Attributes", $row, $attributes);
+        }
+
+        static $types = null;
+        if ($types === null) {
+            $types = ReactionModel::getReactionTypes(["Class" => ["Positive", "Negative"], "Active" => 1]);
+        }
+        // Since statically cache the types, we do a copy of type for this row so that plugin can modify the value by reference.
+        // Not doing so would alter types for every rows and since Discussions and Comments have different behavior that could be a problem.
+        $rowReactionTypesReference = $types;
+        Gdn::controller()->EventArguments["ReactionTypes"] = &$rowReactionTypesReference;
+
+        if ($iD = val("CommentID", $row)) {
+            $recordType = "comment";
+        } elseif ($iD = val("ActivityID", $row)) {
+            $recordType = "activity";
+        } else {
+            $recordType = "discussion";
+            $iD = val("DiscussionID", $row);
+        }
+        Gdn::controller()->EventArguments["RecordType"] = $recordType;
+        Gdn::controller()->EventArguments["RecordID"] = $iD;
+
+        if (c("Plugins.Reactions.ShowUserReactions", ReactionsPlugin::RECORD_REACTIONS_DEFAULT) == "avatars") {
+            writeRecordReactions($row);
+        }
+
+        echo '<div class="Reactions">';
+        Gdn_Theme::bulletRow();
+
+        // Write the flags.
+        static $flags = null;
+        if ($flags === null && checkPermission("Reactions.Flag.Add")) {
+            $flags = ReactionModel::getReactionTypes(["Class" => "Flag", "Active" => 1]);
+            $flagCodes = [];
+            foreach ($flags as $flag) {
+                $flagCodes[] = $flag["UrlCode"];
+            }
+            Gdn::controller()->EventArguments["Flags"] = &$flags;
+            Gdn::controller()->fireEvent("Flags");
+        }
+
+        // Allow addons to work with flags
+        Gdn::controller()->EventArguments["Flags"] = &$flags;
+        Gdn::controller()->fireEvent("BeforeFlag");
+
+        if (!empty($flags) && is_array($flags)) {
+            echo Gdn_Theme::bulletItem("Flags");
+
+            echo ' <span class="FlagMenu ToggleFlyout">';
+            // Write the handle.
+            echo reactionButton($row, "Flag", ["LinkClass" => "FlyoutButton", "IsHeading" => true]);
+            echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
+
+            foreach ($flags as $flag) {
+                if (is_callable($flag)) {
+                    echo "<li>" . call_user_func($flag, $row, $recordType, $iD) . "</li>";
+                } else {
+                    echo "<li>" . reactionButton($row, $flag["UrlCode"]) . "</li>";
+                }
+            }
+
+            Gdn::controller()->fireEvent("AfterFlagOptions");
+            echo "</ul>";
+            echo "</span> ";
+        }
+        Gdn::controller()->fireEvent("AfterFlag");
+
+        $score = formatScore(val("Score", $row));
+        echo '<span class="Column-Score Hidden">' . $score . "</span>";
+
+        // Write the reactions.
+        $reactionHtml = "";
+        foreach ($rowReactionTypesReference as $type) {
+            if (isset($type["RecordTypes"]) && !in_array($recordType, (array) $type["RecordTypes"])) {
+                continue;
+            }
+            $reactionHtml .= " " . reactionButton($row, $type["UrlCode"]) . " ";
+        }
+
+        if ($reactionHtml !== "") {
+            echo Gdn_Theme::bulletItem("Reactions");
+        }
+
+        if (!$dataDrivenColors) {
+            echo '<span class="ReactMenu">';
+            echo '<span class="ReactButtons">';
+        }
+
+        echo $reactionHtml;
+
+        if (!$dataDrivenColors) {
+            echo "</span>";
+            echo "</span>";
+        }
+
+        if (checkPermission(["Garden.Moderation.Manage", "Moderation.Reactions.Edit"])) {
+            echo Gdn_Theme::bulletItem("ReactionsMod") .
+                anchor(t("Log"), "/reactions/logged/{$recordType}/{$iD}", "Popup ReactButton ReactButton-Log", [
+                    "rel" => "nofollow",
+                ]);
+        }
+
+        Gdn::controller()->fireEvent("AfterReactions");
+
+        echo "</div>";
+        Gdn::controller()
+            ->fireAs("DiscussionController")
+            ->fireEvent("Replies");
+    }
+}
+
 if (!function_exists('FormatScore')) {
     /**
      * Formats the score as an integer.

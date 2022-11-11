@@ -4,15 +4,13 @@ Users may designate a discussion as a Question and then officially accept one or
 
 ### Notes:
 
-- You can set  `NewDiscussionModule.Types.Question.AsOwnButton = true` in config to separate "New Discussion" and "Ask Question" into "separate" forms each with own big button in Panel.
+-   You can set `NewDiscussionModule.Types.Question.AsOwnButton = true` in config to separate "New Discussion" and "Ask Question" into "separate" forms each with own big button in Panel.
 
 ### Features:
 
-`Feature.DiscussionQnATag.Enabled`:  Displays a Q&A meta tag in the discussion header.
+`Feature.DiscussionQnATag.Enabled`: Displays a Q&A meta tag in the discussion header.
 
 `Feature.QnAFollowUp.Enabled`: Enables the "Question Follow Up Notifications".
-
-
 
 ## Question Follow-Up Notifications:
 
@@ -20,22 +18,20 @@ Sends an email to all authors of a question that has answers, but hasn't been ac
 
 This feature enables one field on the dashboard:
 
-- **Follow-up Interval:** Number of days the system should wait before triggering another batch of notifications.
+-   **Follow-up Interval:** Number of days the system should wait before triggering another batch of notifications.
 
 To activate this feature on a category, activate the toggle "Enable Q&A follow-up notifications". This toggle is only available on categories of type "Discussions".
 
-
-
 Follow-up notifications can be triggered in two ways:
 
-- Automatically: Once the feature flag is enabled, a service starts to run triggering notifications in a defined period of time.
-- Manually: Users with `Garden.Community.Manage` permission or higher can trigger this feature manually by clicking the discussion option "Send Q&A follow-up notification" on the discussion thread page.
+-   Automatically: Once the feature flag is enabled, a service starts to run triggering notifications in a defined period of time.
+-   Manually: Users with `Garden.Community.Manage` permission or higher can trigger this feature manually by clicking the discussion option "Send Q&A follow-up notification" on the discussion thread page.
 
 ### Setup
 
 This feature depends on a **cronjob** being executed twice daily on the cluster's data server, POSTing to the site's `/api/v2/discussions/question-notifications` endpoint and passing a valid system access token.
 
-**On vanilla-cloud with hosted-queue enabled, this cron is automatically configured with `Vanilla\QnA\Job\QnAFollowupJob`**. 
+**On vanilla-cloud with hosted-queue enabled, this cron is automatically configured with `Vanilla\QnA\Job\QnAFollowupJob`**.
 
 ```
 30 1,13 * * * curl -XPOST -H "Authorization: Bearer SYSTEM_USER_ACCESS_TOKEN" https://CUSTOMER.vanillacommunities.com/api/v2/discussions/question-notifications
@@ -51,4 +47,4 @@ This can happen for a number of reasons. Remember this feature is activated per 
 
 **The author is not receiving follow-up notifications:**
 
-- Make sure the author has the preference "Send me a follow-up for my answered questions." (`Notification.Email.QuestionFollowUp`) enabled. If you're triggering this notification manually, the pop-up will display a message with more information.
+-   Make sure the author has the preference "Send me a follow-up for my answered questions." (`Notification.Email.QuestionFollowUp`) enabled. If you're triggering this notification manually, the pop-up will display a message with more information.

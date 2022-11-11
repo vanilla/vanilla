@@ -11,7 +11,7 @@ import Portal from "@reach/portal";
 import { toolTipClasses, tooltipVariables } from "@library/toolTip/toolTipStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import throttle from "lodash/throttle";
-import { StackingContextProvider, useStackingContext } from "@library/modal/StackingContext";
+import { StackingContextProvider, useStackingContext } from "@vanilla/react-utils";
 import { cx } from "@emotion/css";
 
 const nubPosition = (triggerRect, hasOverflow) => {
@@ -28,9 +28,14 @@ const nubPosition = (triggerRect, hasOverflow) => {
     };
 };
 
-function TriangleTooltip(props: { children: React.ReactNode; label: React.ReactNode; ariaLabel?: React.ReactNode }) {
+function TriangleTooltip(props: {
+    children: React.ReactNode;
+    label: React.ReactNode;
+    ariaLabel?: React.ReactNode;
+    customZIndex?: number;
+}) {
     const globalVars = globalVariables();
-    const { children, label, ariaLabel } = props;
+    const { children, label, ariaLabel, customZIndex } = props;
 
     const { zIndex } = useStackingContext();
 
@@ -78,7 +83,7 @@ function TriangleTooltip(props: { children: React.ReactNode; label: React.ReactN
                     <>
                         <Portal>
                             <div
-                                className={cx(classes.nubPosition, classes.nubStackingLevel(zIndex))}
+                                className={cx(classes.nubPosition, classes.nubStackingLevel(customZIndex ?? zIndex))}
                                 style={nubPosition(triggerRect, hasOverflow) as any}
                             >
                                 <div className={classNames(classes.nub, hasOverflow ? "isDown" : "isUp")} />
@@ -89,7 +94,7 @@ function TriangleTooltip(props: { children: React.ReactNode; label: React.ReactN
                             label={label}
                             aria-label={ariaLabel ? ariaLabel : label}
                             position={toolBoxPosition}
-                            className={cx(classes.box, classes.boxStackingLevel(zIndex))}
+                            className={cx(classes.box, classes.boxStackingLevel(customZIndex ?? zIndex))}
                         />
                     </>
                 )}
@@ -128,11 +133,16 @@ function useIsScrolling() {
  *
  * Custom children (not base dom nodes), must use React.forwardRef().
  */
-export function ToolTip(props: { children: React.ReactNode; label: React.ReactNode; ariaLabel?: React.ReactNode }) {
-    const { children, label, ariaLabel } = props;
+export function ToolTip(props: {
+    children: React.ReactNode;
+    label: React.ReactNode;
+    ariaLabel?: React.ReactNode;
+    customZIndex?: number;
+}) {
+    const { children, label, ariaLabel, customZIndex } = props;
 
     return (
-        <TriangleTooltip label={label} ariaLabel={ariaLabel}>
+        <TriangleTooltip label={label} ariaLabel={ariaLabel} customZIndex={customZIndex}>
             {children}
         </TriangleTooltip>
     );

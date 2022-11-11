@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,7 +10,6 @@ use Garden\BasePathTrait;
 use Garden\Web\Data;
 use Garden\Web\RequestInterface;
 use Gdn_Session;
-use UserModel;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Permissions;
 use Vanilla\Utility\ArrayUtils;
@@ -25,14 +24,14 @@ use Vanilla\Utility\ModelUtils;
  * 4. Remove the values from the expand parameter.
  * 5. Reset the request query.
  */
-class APIExpandMiddleware {
-
+class APIExpandMiddleware
+{
     use BasePathTrait;
 
     private const EXPAND_FIELD = "expand";
 
     /** @var array<string, AbstractApiExpander> */
-    private $expanders;
+    private $expanders = [];
 
     /** @var Gdn_Session */
     private $session;
@@ -43,7 +42,8 @@ class APIExpandMiddleware {
      * @param string $basePath
      * @param Gdn_Session $session
      */
-    public function __construct(string $basePath, Gdn_Session $session) {
+    public function __construct(string $basePath, Gdn_Session $session)
+    {
         $this->setBasePath($basePath);
         $this->session = $session;
     }
@@ -53,7 +53,8 @@ class APIExpandMiddleware {
      *
      * @param AbstractApiExpander $expander
      */
-    public function addExpander(AbstractApiExpander $expander) {
+    public function addExpander(AbstractApiExpander $expander)
+    {
         $this->expanders[$expander->getFullKey()] = $expander;
     }
 
@@ -64,7 +65,8 @@ class APIExpandMiddleware {
      * @param callable $next
      * @return mixed
      */
-    public function __invoke(RequestInterface $request, callable $next) {
+    public function __invoke(RequestInterface $request, callable $next)
+    {
         $expands = $this->inBasePath($request->getPath()) ? $this->extractExpands($request) : [];
         $keysToExpand = [];
         foreach ($expands as $nestedExpands) {
@@ -76,8 +78,7 @@ class APIExpandMiddleware {
 
         $response = $next($request);
 
-        if (!empty($expands) &&
-            (is_array($response) || ($response instanceof Data && $response->isSuccessful()))) {
+        if (!empty($expands) && (is_array($response) || ($response instanceof Data && $response->isSuccessful()))) {
             $response = $this->updateResponse($response, $expands);
         }
 
@@ -90,7 +91,8 @@ class APIExpandMiddleware {
      * @param RequestInterface $request
      * @return array
      */
-    private function extractExpands(RequestInterface $request): array {
+    private function extractExpands(RequestInterface $request): array
+    {
         $result = [];
 
         $expand = $this->readExpand($request);
@@ -126,12 +128,15 @@ class APIExpandMiddleware {
      * @param bool $firstLevel
      * @return array
      */
-    public function getExpandFieldsByKey(string $pk, bool $firstLevel = false): array {
+    public function getExpandFieldsByKey(string $pk, bool $firstLevel = false): array
+    {
         $result = [];
-
+        if ($this->expanders == null) {
+            return $result;
+        }
         foreach ($this->expanders as $key => $expander) {
             foreach ($expander->getExpandFields() as $destination => $field) {
-                if ($field === $pk && (!$firstLevel || strpos($destination, '.') === false)) {
+                if ($field === $pk && (!$firstLevel || strpos($destination, ".") === false)) {
                     $result[$key][$field] = $destination;
                 }
             }
@@ -146,7 +151,8 @@ class APIExpandMiddleware {
      *
      * @throws PermissionException If current user does not have the configured permission.
      */
-    protected function verifyPermissions(array $keysToExpand): void {
+    protected function verifyPermissions(array $keysToExpand): void
+    {
         foreach ($this->expanders as $expander) {
             $permissionToCheck = $expander->getPermission();
             if ($permissionToCheck === null) {
@@ -163,7 +169,7 @@ class APIExpandMiddleware {
             if ($this->session->getPermissions()->hasRanked($permissionToCheck) !== true) {
                 $permission = Permissions::resolveRankedPermissionAlias($permissionToCheck);
                 throw new PermissionException($permission, [
-                    'expandFields' => $allValidExpands,
+                    "expandFields" => $allValidExpands,
                 ]);
             }
         }
@@ -175,7 +181,8 @@ class APIExpandMiddleware {
      * @param RequestInterface $request
      * @return array| null
      */
-    private function readExpand(RequestInterface $request): ?array {
+    private function readExpand(RequestInterface $request): ?array
+    {
         $query = $request->getQuery();
         $expand = $query[self::EXPAND_FIELD] ?? null;
 
@@ -194,7 +201,8 @@ class APIExpandMiddleware {
      * @param RequestInterface $request
      * @param array $fields
      */
-    private function scrubExpand(RequestInterface $request, array $fields): void {
+    private function scrubExpand(RequestInterface $request, array $fields): void
+    {
         $query = $request->getQuery();
         $expand = $this->readExpand($request);
         if (empty($expand)) {
@@ -220,18 +228,22 @@ class APIExpandMiddleware {
      *
      * @param array $openAPI
      */
-    public function filterOpenAPI(array &$openAPI) {
+    public function filterOpenAPI(array &$openAPI)
+    {
         foreach ($openAPI as $key => &$value) {
             if (is_array($value)) {
-                if (isset($value['parameters']) && is_array($value['parameters'])) {
-                    foreach ($value['parameters'] as &$parameter) {
-                        if (self::EXPAND_FIELD === ($parameter['name'] ?? '') && is_array($parameter['schema']['items']['enum'] ?? null)) {
-                            $enum = $parameter['schema']['items']['enum'];
+                if (isset($value["parameters"]) && is_array($value["parameters"])) {
+                    foreach ($value["parameters"] as &$parameter) {
+                        if (
+                            self::EXPAND_FIELD === ($parameter["name"] ?? "") &&
+                            is_array($parameter["schema"]["items"]["enum"] ?? null)
+                        ) {
+                            $enum = $parameter["schema"]["items"]["enum"];
                             foreach ($enum as $item) {
                                 $expandFields = $this->getExpandFields($item);
                                 $enum = array_merge($enum, $expandFields);
                             }
-                            $parameter['schema']['items']['enum'] = $enum;
+                            $parameter["schema"]["items"]["enum"] = $enum;
                         }
                     }
                 } else {
@@ -247,8 +259,9 @@ class APIExpandMiddleware {
      * @param APIExpandMiddleware $middleware
      * @return array
      */
-    public static function filterOpenAPIFactory(APIExpandMiddleware $middleware) {
-        return [$middleware, 'filterOpenAPI'];
+    public static function filterOpenAPIFactory(APIExpandMiddleware $middleware)
+    {
+        return [$middleware, "filterOpenAPI"];
     }
 
     /**
@@ -258,7 +271,8 @@ class APIExpandMiddleware {
      * @param array $fields The expand fields that were chosen with spec keys and join field values.
      * @return mixed
      */
-    private function updateResponse($response, array $fields): Data {
+    private function updateResponse($response, array $fields): Data
+    {
         $response = Data::box($response);
 
         $data = $response->getData();
@@ -269,7 +283,12 @@ class APIExpandMiddleware {
         }
         foreach ($fields as $key => $currentFields) {
             $expander = $this->expanders[$key];
-            ModelUtils::leftJoin($dataset, $currentFields, [$expander, 'resolveFragements'], $expander->getDefaultRecord());
+            ModelUtils::leftJoin(
+                $dataset,
+                $currentFields,
+                [$expander, "resolveFragements"],
+                $expander->getDefaultRecord()
+            );
         }
 
         $response->setData($data);
@@ -286,8 +305,12 @@ class APIExpandMiddleware {
      *
      * @return Data
      */
-    public function updateResponseByKey($response, string $pk, bool $firstLevel = false, array $excludedExpanders = []):
-    Data {
+    public function updateResponseByKey(
+        $response,
+        string $pk,
+        bool $firstLevel = false,
+        array $excludedExpanders = []
+    ): Data {
         $fields = $this->getExpandFieldsByKey($pk, $firstLevel);
         foreach ($excludedExpanders as $excludedExpander) {
             unset($fields[$excludedExpander]);
@@ -304,11 +327,12 @@ class APIExpandMiddleware {
      * @param string $currentExpandField
      * @return string[]
      */
-    private function getExpandFields(string $currentExpandField): array {
+    private function getExpandFields(string $currentExpandField): array
+    {
         $result = [];
         foreach ($this->expanders as $key => $expander) {
             foreach ($expander->getExpandFields() as $expandField => $_) {
-                if (str_starts_with($expandField, $currentExpandField.'.')) {
+                if (str_starts_with($expandField, $currentExpandField . ".")) {
                     $result[] = $expandField;
                 }
             }

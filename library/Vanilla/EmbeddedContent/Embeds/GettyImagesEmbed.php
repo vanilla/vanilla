@@ -13,25 +13,24 @@ use Vanilla\EmbeddedContent\EmbedUtils;
 /**
  * Embed data object for Getty Images.
  */
-class GettyImagesEmbed extends AbstractEmbed {
-
+class GettyImagesEmbed extends AbstractEmbed
+{
     const LEGACY_TYPE = "getty";
     const TYPE = "gettyimages";
 
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
-        return [
-            self::TYPE,
-            self::LEGACY_TYPE,
-        ];
+    protected function getAllowedTypes(): array
+    {
+        return [self::TYPE, self::LEGACY_TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         $data = EmbedUtils::remapProperties($data, [
             "embedSignature" => "attributes.sig",
             "foreignID" => "attributes.id",
@@ -44,7 +43,8 @@ class GettyImagesEmbed extends AbstractEmbed {
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
+    protected function schema(): Schema
+    {
         return Schema::parse([
             "height:i",
             "width:i",

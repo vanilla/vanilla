@@ -10,5 +10,6 @@ namespace Garden;
 /**
  * Apply this interface to your class to indicate that it's methods should be automatically bound.
  */
-interface EventHandlersInterface {
+interface EventHandlersInterface
+{
 }

@@ -1,4 +1,3 @@
-
 $authenticateUser-column_width: 334px !default;
 $authenticateUser-column_horizontalPadding: 26px !default;
 $authenticateUser-userImage_width: 117px !default;
@@ -12,11 +11,11 @@ $baseUnit: 6px !default;
 $fontSize-large: 16px !default;
 $fontSize-default: 14px !default;
 $fontSize-small: 12px !default;
-$authenticateUserName-opacity: .6 !default;
-$authenticateUserArrowDown-opacity: .6 !default;
+$authenticateUserName-opacity: 0.6 !default;
+$authenticateUserArrowDown-opacity: 0.6 !default;
 $icon_size: 24px !default;
 $icon-large_size: 42px !default;
-$authenticateMethod-button_boxShadow: 0 1px 3px 0 rgba(0, 0, 0, .3) !default;
+$authenticateMethod-button_boxShadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3) !default;
 $authenticateMethod-button_horizontalMargin: 12px !default;
 
 .authenticateUserCol {
@@ -57,9 +56,7 @@ $authenticateMethod-button_horizontalMargin: 12px !default;
     display: block;
     width: 100%;
     max-width: $authenticateUser-userImage_width;
-
 }
-
 
 .authenticateUser-photoCrop {
     overflow: hidden;
@@ -85,7 +82,6 @@ $authenticateMethod-button_horizontalMargin: 12px !default;
         color: $authenticateUser-socialIcon_bg;
         radius: 50%;
     }
-
 }
 
 .authenticateUser-photo {
@@ -94,7 +90,6 @@ $authenticateMethod-button_horizontalMargin: 12px !default;
     width: 100%;
     height: auto;
 }
-
 
 .authenticateUser-arrowDown {
     display: block;
@@ -202,4 +197,3 @@ $authenticateMethod-button_horizontalMargin: 12px !default;
         color: #ff3933;
     }
 }
-

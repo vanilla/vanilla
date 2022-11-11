@@ -7,8 +7,8 @@
  * javascript and css assets to the controller. Provides helper functions for retrieving the cropped image's dimensions
  * and location. Values are easily plugged into the options param for Gdn_UploadImage::saveImageAs()
  */
-class CropImageModule extends Gdn_Module {
-
+class CropImageModule extends Gdn_Module
+{
     /**
      * @var Gdn_Form The form to insert the crop module into.
      */
@@ -35,7 +35,7 @@ class CropImageModule extends Gdn_Module {
     private $existingCropUrl;
 
     /**
-     * @var string The URL to the the existing source image.
+     * @var string The URL to the existing source image.
      */
     private $sourceImageUrl;
 
@@ -55,7 +55,8 @@ class CropImageModule extends Gdn_Module {
      * @param int $height The height of the final cropped image.
      * @param string $source The path to the local copy of the image.
      */
-    public function __construct($sender, $form, $width, $height, $source) {
+    public function __construct($sender, $form, $width, $height, $source)
+    {
         $this->form = $form;
         $this->width = $width;
         $this->height = $height;
@@ -70,70 +71,80 @@ class CropImageModule extends Gdn_Module {
      *
      * @return bool Whether the image has been cropped.
      */
-    public function isCropped() {
-        return $this->form->getValue('w') > 0 && $this->form->getValue('h') > 0;
+    public function isCropped()
+    {
+        return $this->form->getValue("w") > 0 && $this->form->getValue("h") > 0;
     }
 
     /**
      * @return int The width of the final cropped image.
      */
-    public function getWidth() {
+    public function getWidth()
+    {
         return $this->width;
     }
 
     /**
      * @param int $width The width of the final cropped image.
      */
-    private function setWidth($width) {
+    private function setWidth($width)
+    {
         $this->width = $width;
     }
 
     /**
      * @return int The height of the final cropped image.
      */
-    public function getHeight() {
+    public function getHeight()
+    {
         return $this->height;
     }
 
     /**
      * @param int $height The height of the final cropped image.
      */
-    private function setHeight($height) {
+    private function setHeight($height)
+    {
         $this->height = $height;
     }
 
     /**
      * @return string The URL to the existing cropped image.
      */
-    public function getExistingCropUrl() {
+    public function getExistingCropUrl()
+    {
         return $this->existingCropUrl;
     }
 
     /**
      * @param string $existingCropUrl The URL to the existing cropped image.
      */
-    public function setExistingCropUrl($existingCropUrl) {
+    public function setExistingCropUrl($existingCropUrl)
+    {
         $this->existingCropUrl = $existingCropUrl;
     }
 
     /**
      * @return string The URL to the existing source image.
      */
-    public function getSourceImageUrl() {
+    public function getSourceImageUrl()
+    {
         return $this->sourceImageUrl;
     }
 
     /**
      * @param string $sourceImageUrl The URL to the existing source image.
      */
-    public function setSourceImageUrl($sourceImageUrl) {
+    public function setSourceImageUrl($sourceImageUrl)
+    {
         $this->sourceImageUrl = $sourceImageUrl;
     }
 
     /**
      * @param string $source The path to the local copy of the image.
      */
-    public function setSource($source) {
+    public function setSource($source)
+    {
         $this->source = $source;
         $this->updateHiddenSource($this->form, $this->source);
     }
@@ -144,7 +155,8 @@ class CropImageModule extends Gdn_Module {
      * @param int $width The width of the final cropped image.
      * @param int $height The height of the final cropped image.
      */
-    public function setSize($width, $height) {
+    public function setSize($width, $height)
+    {
         if ($width <= 0 || $height <= 0) {
             return;
         }
@@ -158,43 +170,45 @@ class CropImageModule extends Gdn_Module {
      *
      * @return array An array of the cropped image's dimension and location values.
      */
-    public function getCropValues() {
+    public function getCropValues()
+    {
         $x = $this->getCropXValue();
         $y = $this->getCropYValue();
         $w = $this->getCropWidth();
         $h = $this->getCropHeight();
-        return ['SourceX'      => $x,
-                     'SourceY'      => $y,
-                     'SourceWidth'  => $w,
-                     'SourceHeight' => $h];
+        return ["SourceX" => $x, "SourceY" => $y, "SourceWidth" => $w, "SourceHeight" => $h];
     }
 
     /**
      * @return int The height of the cropped image.
      */
-    public function getCropHeight() {
-        return $this->form->getValue('h');
+    public function getCropHeight()
+    {
+        return $this->form->getValue("h");
     }
 
     /**
      * @return int The width of the cropped image.
      */
-    public function getCropWidth() {
-        return $this->form->getValue('w');
+    public function getCropWidth()
+    {
+        return $this->form->getValue("w");
     }
 
     /**
      * @return int The x value of the cropped image's location.
      */
-    public function getCropXValue() {
-        return $this->form->getValue('x');
+    public function getCropXValue()
+    {
+        return $this->form->getValue("x");
     }
 
     /**
      * @return int The y value of the cropped image's location.
      */
-    public function getCropYValue() {
-        return $this->form->getValue('y');
+    public function getCropYValue()
+    {
+        return $this->form->getValue("y");
     }
 
     /**
@@ -205,19 +219,20 @@ class CropImageModule extends Gdn_Module {
      * @param int $height The height of the final cropped image.
      * @param string $source The path to the local copy of the image.
      */
-    private function addHiddenFields($form, $width, $height, $source) {
+    private function addHiddenFields($form, $width, $height, $source)
+    {
         // JS-manipulated values
-        $form->addHidden('x', '0');
-        $form->addHidden('y', '0');
-        $form->addHidden('w', '0');
-        $form->addHidden('h', '0');
+        $form->addHidden("x", "0");
+        $form->addHidden("y", "0");
+        $form->addHidden("w", "0");
+        $form->addHidden("h", "0");
 
         // Constants
         $sourceSize = getimagesize($source);
-        $form->addHidden('WidthSource', $sourceSize[0], true);
-        $form->addHidden('HeightSource', $sourceSize[1], true);
-        $form->addHidden('CropSizeWidth', $width, true);
-        $form->addHidden('CropSizeHeight', $height, true);
+        $form->addHidden("WidthSource", $sourceSize[0], true);
+        $form->addHidden("HeightSource", $sourceSize[1], true);
+        $form->addHidden("CropSizeWidth", $width, true);
+        $form->addHidden("CropSizeHeight", $height, true);
     }
 
     /**
@@ -227,9 +242,10 @@ class CropImageModule extends Gdn_Module {
      * @param int $width The width of the final cropped image.
      * @param int $height The height of the final cropped image.
      */
-    private function updateHiddenSize($form, $width, $height) {
-        $form->addHidden('CropSizeWidth', $width, true);
-        $form->addHidden('CropSizeHeight', $height, true);
+    private function updateHiddenSize($form, $width, $height)
+    {
+        $form->addHidden("CropSizeWidth", $width, true);
+        $form->addHidden("CropSizeHeight", $height, true);
     }
 
     /**
@@ -238,10 +254,11 @@ class CropImageModule extends Gdn_Module {
      * @param $form The form the crop module is inserted into.
      * @param $source The path to the local copy of the image.
      */
-    private function updateHiddenSource($form, $source) {
+    private function updateHiddenSource($form, $source)
+    {
         $sourceSize = getimagesize($source);
-        $form->addHidden('WidthSource', $sourceSize[0], true);
-        $form->addHidden('HeightSource', $sourceSize[1], true);
+        $form->addHidden("WidthSource", $sourceSize[0], true);
+        $form->addHidden("HeightSource", $sourceSize[1], true);
     }
 
     /**
@@ -249,8 +266,9 @@ class CropImageModule extends Gdn_Module {
      *
      * @param $sender The controller object to add assets to.
      */
-    private function addAssets($sender) {
-        $sender->addJsFile('jquery.jcrop.min.js', 'dashboard');
-        $sender->addJsFile('cropimage.js', 'dashboard');
+    private function addAssets($sender)
+    {
+        $sender->addJsFile("jquery.jcrop.min.js", "dashboard");
+        $sender->addJsFile("cropimage.js", "dashboard");
     }
 }

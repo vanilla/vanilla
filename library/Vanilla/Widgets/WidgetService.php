@@ -14,8 +14,8 @@ use Webmozart\Assert\Assert;
  *
  * @package Vanilla\Models
  */
-class WidgetService {
-
+class WidgetService
+{
     /** @var WidgetFactory[] */
     public $widgetFactories = [];
 
@@ -24,7 +24,8 @@ class WidgetService {
      *
      * @param string $widgetClass
      */
-    public function registerWidget(string $widgetClass) {
+    public function registerWidget(string $widgetClass)
+    {
         Assert::classExists($widgetClass);
         Assert::isAOf($widgetClass, WidgetInterface::class);
 
@@ -37,7 +38,8 @@ class WidgetService {
      *
      * @param string $widgetID
      */
-    public function unregisterWidget(string $widgetID) {
+    public function unregisterWidget(string $widgetID)
+    {
         if ($this->widgetFactories[$widgetID]) {
             unset($this->widgetFactories[$widgetID]);
         }
@@ -49,7 +51,8 @@ class WidgetService {
      * @param string|null $widgetID
      * @return WidgetFactory
      */
-    public function getFactoryByID(?string $widgetID): ?WidgetFactory {
+    public function getFactoryByID(?string $widgetID): ?WidgetFactory
+    {
         if (!$widgetID) {
             return null;
         }
@@ -66,7 +69,8 @@ class WidgetService {
      *
      * @return WidgetFactory[]
      */
-    public function getFactories(): array {
+    public function getFactories(): array
+    {
         $widgets = array_values($this->widgetFactories);
         usort($widgets, function (WidgetFactory $a, WidgetFactory $b) {
             return $a->getName() <=> $b->getName();

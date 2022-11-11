@@ -10,8 +10,8 @@ namespace Vanilla\EmbeddedContent\Embeds;
 /**
  * Preferences on how to display a quote.
  */
-class QuoteEmbedDisplayOptions implements \JsonSerializable {
-
+class QuoteEmbedDisplayOptions implements \JsonSerializable
+{
     /** @var bool */
     private $showUserLabel;
 
@@ -65,7 +65,8 @@ class QuoteEmbedDisplayOptions implements \JsonSerializable {
     /**
      * @inheritdoc
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return get_object_vars($this);
     }
 
@@ -75,15 +76,16 @@ class QuoteEmbedDisplayOptions implements \JsonSerializable {
      * @param array $data
      * @return QuoteEmbedDisplayOptions
      */
-    public static function from(array $data): QuoteEmbedDisplayOptions {
+    public static function from(array $data): QuoteEmbedDisplayOptions
+    {
         return new QuoteEmbedDisplayOptions(
-            $data['showUserLabel'] ?? false,
-            $data['showCompactUserInfo'] ?? false,
-            $data['showDiscussionLink'] ?? false,
-            $data['showPostLink'] ?? false,
-            $data['showCategoryLink'] ?? false,
-            $data['renderFullContent'] ?? false,
-            $data['expandByDefault'] ?? false
+            $data["showUserLabel"] ?? false,
+            $data["showCompactUserInfo"] ?? false,
+            $data["showDiscussionLink"] ?? false,
+            $data["showPostLink"] ?? false,
+            $data["showCategoryLink"] ?? false,
+            $data["renderFullContent"] ?? false,
+            $data["expandByDefault"] ?? false
         );
     }
 
@@ -93,16 +95,9 @@ class QuoteEmbedDisplayOptions implements \JsonSerializable {
      * @param bool $withDiscussionLink
      * @return QuoteEmbedDisplayOptions
      */
-    public static function minimal(bool $withDiscussionLink): QuoteEmbedDisplayOptions {
-        return new QuoteEmbedDisplayOptions(
-            false,
-            true,
-            $withDiscussionLink,
-            $withDiscussionLink,
-            false,
-            false,
-            false
-        );
+    public static function minimal(bool $withDiscussionLink): QuoteEmbedDisplayOptions
+    {
+        return new QuoteEmbedDisplayOptions(false, true, $withDiscussionLink, $withDiscussionLink, false, false, false);
     }
 
     /**
@@ -110,64 +105,64 @@ class QuoteEmbedDisplayOptions implements \JsonSerializable {
      *
      * @return QuoteEmbedDisplayOptions
      */
-    public static function full(): QuoteEmbedDisplayOptions {
-        return new QuoteEmbedDisplayOptions(
-            true,
-            false,
-            true,
-            true,
-            true,
-            true,
-            true
-        );
+    public static function full(): QuoteEmbedDisplayOptions
+    {
+        return new QuoteEmbedDisplayOptions(true, false, true, true, true, true, true);
     }
 
     /**
      * @return bool
      */
-    public function isShowUserLabel(): bool {
+    public function isShowUserLabel(): bool
+    {
         return $this->showUserLabel;
     }
 
     /**
      * @return bool
      */
-    public function isShowCompactUserInfo(): bool {
+    public function isShowCompactUserInfo(): bool
+    {
         return $this->showCompactUserInfo;
     }
 
     /**
      * @return bool
      */
-    public function isShowDiscussionLink(): bool {
+    public function isShowDiscussionLink(): bool
+    {
         return $this->showDiscussionLink;
     }
 
     /**
      * @return bool
      */
-    public function isShowPostLink(): bool {
+    public function isShowPostLink(): bool
+    {
         return $this->showPostLink;
     }
 
     /**
      * @return bool
      */
-    public function isShowCategoryLink(): bool {
+    public function isShowCategoryLink(): bool
+    {
         return $this->showCategoryLink;
     }
 
     /**
      * @return bool
      */
-    public function isRenderFullContent(): bool {
+    public function isRenderFullContent(): bool
+    {
         return $this->renderFullContent;
     }
 
     /**
      * @return bool
      */
-    public function isExpandByDefault(): bool {
+    public function isExpandByDefault(): bool
+    {
         return $this->expandByDefault;
     }
 }

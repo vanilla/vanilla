@@ -11,16 +11,21 @@ use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
 /**
  * Tests to ensure that @mentions are properly sanitized.
  */
-class EmojiSanitizeTest extends SanitizeTest {
-
+class EmojiSanitizeTest extends SanitizeTest
+{
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
+    protected function insertContentOperations(string $content): array
+    {
         $operations = [
-            ["insert" => ["emoji" => [
-                "emojiChar" => $content,
-            ]]],
+            [
+                "insert" => [
+                    "emoji" => [
+                        "emojiChar" => $content,
+                    ],
+                ],
+            ],
             ["insert" => $content],
         ];
 

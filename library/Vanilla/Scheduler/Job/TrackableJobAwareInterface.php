@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Job;
 /**
  * For tracking a job.
  */
-interface TrackableJobAwareInterface {
-
+interface TrackableJobAwareInterface
+{
     /**
      * Set the userID that the job is being tracked for.
      *

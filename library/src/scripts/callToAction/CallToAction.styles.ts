@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 import { useThemeCache } from "@library/styles/themeCache";
-import { styleFactory } from "@library/styles/styleUtils";
 import { Mixins } from "@library/styles/Mixins";
 import { callToActionVariables, ICallToActionOptions } from "@library/callToAction/CallToAction.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
@@ -11,26 +10,27 @@ import { DeepPartial } from "redux";
 import { styleUnit } from "@library/styles/styleUnit";
 import { percent } from "csx";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
-import { extendItemContainer, negativeUnit } from "@library/styles/styleHelpers";
+import { css } from "@emotion/css";
 
 export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial<ICallToActionOptions>) => {
     const vars = callToActionVariables(optionsOverrides);
-    const style = styleFactory("cta-widget");
     const globalVars = globalVariables();
 
-    const root = style({
+    const root = css({
         ...Mixins.box(vars.options.box, { noPaddings: true }),
         minWidth: styleUnit(vars.sizing.minWidth),
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
+
+        //we are going to use <img> with src-sets in the component directly, so no background-image css
+        backgroundImage: "none",
     });
 
     const isImageLeft = vars.options.imagePlacement === "left";
     const isImageTop = vars.options.imagePlacement === "top";
     const mediaQueries = vars.mediaQueries();
-    const container = style(
-        "container",
+    const container = css(
         {
             position: "relative",
             flex: 1,
@@ -44,55 +44,74 @@ export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial
             ...(isImageLeft ? { display: "block" } : {}),
         }),
     );
-    const title = style("title", {
+    const title = css({
+        position: "relative",
+        marginBottom: 0,
         ...Mixins.padding(vars.title.spacing),
-        ...Mixins.font(vars.title.font),
+        ...Mixins.font({ ...vars.title.font, color: optionsOverrides?.textColor }),
     });
-    const absoluteTitle = style("absoluteTitle", {
+    const absoluteTitle = css({
         ...Mixins.font(vars.title.font),
         marginBottom: 16,
     });
-    const absoluteDescription = style("absoluteDescription", {
+    const absoluteDescription = css({
         ...Mixins.font(vars.description.font),
         marginBottom: 16,
     });
-    const description = style("description", {
+    const description = css({
+        position: "relative",
         ...Mixins.padding(vars.description.spacing),
-        ...Mixins.font(vars.description.font),
+        ...Mixins.font({ ...vars.description.font, color: optionsOverrides?.textColor }),
     });
-    const link = style("link", {
+    const link = css({
         ...Mixins.margin(vars.link.spacing),
     });
 
-    const compactButton = style("compactButton", {
+    const button = css({
+        position: "relative",
+    });
+
+    const compactButton = css({
         "&&": {
             minWidth: 86,
         },
     });
 
-    const linksWrapper = style("linksWrapper", {
+    const linksWrapper = css({
         display: "inline-flex",
         flexWrap: "wrap",
         justifyContent: vars.options.alignment,
         ...Mixins.spaceChildrenEvenly(vars.link.spacing),
+        alignItems: "center",
     });
 
     const imageAspectRatio = percent((vars.image.ratio.height / vars.image.ratio.width) * 100);
 
-    const imageContainerWrapper = style("imageContainerWrapper", {
+    const imageContainerWrapper = css({
         maxHeight: styleUnit(vars.image.maxHeight),
         overflow: "hidden",
     });
 
-    const image = style("image", {
+    const image = css({
         ...Mixins.absolute.fullSizeOfParent(),
         objectFit: "cover",
         objectPosition: "center center",
     });
 
+    const absoluteFullParentSize = css({
+        ...Mixins.absolute.fullSizeOfParent(),
+    });
+
+    const overlayColor = ColorsUtils.isLightColor(optionsOverrides?.textColor ?? globalVars.mainColors.fg)
+        ? globalVars.elementaryColors.black.fade(0.25)
+        : globalVars.elementaryColors.white.fade(0.25);
+
+    const backgroundOverlay = css({
+        background: ColorsUtils.colorOut(overlayColor),
+    });
+
     const contentPaddings = Mixins.box(vars.options.box, { onlyPaddings: true });
-    const content = style(
-        "content",
+    const content = css(
         {
             textAlign: vars.options.alignment,
             flex: isImageLeft ? 1 : undefined,
@@ -103,8 +122,7 @@ export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial
         }),
     );
 
-    const imageContainer = style(
-        "imageContainer",
+    const imageContainer = css(
         {
             background: ColorsUtils.colorOut(globalVars.mixPrimaryAndBg(0.08)),
             width: percent(100),
@@ -130,8 +148,7 @@ export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial
             isImageLeft && !imageLeftMaxWidth && maxWidth > 0 && maxWidth <= vars.sizing.minWidth;
         const defaultMaxWidth = isImageLeft ? vars.sizing.minWidth : undefined;
         const maxWidthWithBreakpoint = vars.image?.maxWidth ?? percent(100);
-        return style(
-            "imageWidthConstraint",
+        return css(
             {
                 maxWidth: canApplyConstraint ? maxWidth : defaultMaxWidth,
             },
@@ -155,6 +172,9 @@ export const callToActionClasses = useThemeCache((optionsOverrides?: DeepPartial
         imageWidthConstraint,
         link,
         linksWrapper,
+        button,
         compactButton,
+        absoluteFullParentSize,
+        backgroundOverlay,
     };
 });

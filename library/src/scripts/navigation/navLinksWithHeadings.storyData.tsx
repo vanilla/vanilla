@@ -49,8 +49,7 @@ export const navLinksWithHeadingsData = {
                         recordType: "article",
                         parentID: 18,
                         recordID: 59,
-                        url:
-                            "https://staff.vanillaforums.com/kb/articles/59-how-do-posts-get-sent-to-the-spam-moderation-queues",
+                        url: "https://staff.vanillaforums.com/kb/articles/59-how-do-posts-get-sent-to-the-spam-moderation-queues",
                     },
                 ],
             },
@@ -200,8 +199,7 @@ export const navLinksWithHeadingsData = {
                         recordType: "article",
                         parentID: 37,
                         recordID: 114,
-                        url:
-                            "https://staff.vanillaforums.com/kb/articles/114-what-are-the-different-ways-to-theme-vanilla",
+                        url: "https://staff.vanillaforums.com/kb/articles/114-what-are-the-different-ways-to-theme-vanilla",
                     },
                     {
                         articleID: 107,
@@ -237,8 +235,7 @@ export const navLinksWithHeadingsData = {
                         recordType: "article",
                         parentID: 37,
                         recordID: 103,
-                        url:
-                            "https://staff.vanillaforums.com/kb/articles/103-how-to-implement-subcommunity-toggle-module",
+                        url: "https://staff.vanillaforums.com/kb/articles/103-how-to-implement-subcommunity-toggle-module",
                     },
                 ],
             },

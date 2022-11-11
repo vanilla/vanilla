@@ -11,8 +11,10 @@ use Garden\Container\Container;
 use Garden\EventManager;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Vanilla\Contracts;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\DebugUtils;
+use Vanilla\Utility\PhpClassParsed;
+use Vanilla\Utility\Timers;
 
 /**
  * A class to manage all of the addons in the application.
@@ -24,8 +26,8 @@ use Vanilla\Utility\ArrayUtils;
  * - The addon can declare a class ending in "Plugin" and its events will be registered.
  * - Any translations the addon has declared will be loaded for the currently enabled locale.
  */
-class AddonManager implements LoggerAwareInterface {
-
+class AddonManager implements LoggerAwareInterface
+{
     use LoggerAwareTrait;
 
     /// Constants ///
@@ -36,8 +38,8 @@ class AddonManager implements LoggerAwareInterface {
     const REQ_VERSION = 0x08; // addon isn't the correct version
 
     // These constants for default themes will eventually be used in the bootstrap.
-    const DEFAULT_DESKTOP_THEME = 'default';
-    const DEFAULT_MOBILE_THEME = 'mobile';
+    const DEFAULT_DESKTOP_THEME = "default";
+    const DEFAULT_MOBILE_THEME = "mobile";
 
     /// Properties ///
 
@@ -80,7 +82,7 @@ class AddonManager implements LoggerAwareInterface {
     private $themeSubdirs;
 
     /**
-     * @var array A list of autoload classes based on enabled addons.
+     * @var array<string, PhpClassParsed> A list of autoload classes based on enabled addons indexed by class name.
      */
     private $autoloadClasses = [];
 
@@ -95,7 +97,8 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @param null|string $cacheDir The path to the cache.
      */
-    public function __construct(array $scanDirs = [], $cacheDir = null) {
+    public function __construct(array $scanDirs = [], $cacheDir = null)
+    {
         $r = true;
         if ($cacheDir !== null) {
             $this->setCacheDir($cacheDir);
@@ -117,11 +120,11 @@ class AddonManager implements LoggerAwareInterface {
                 }
             }
 
-            $this->scanDirs[$type] = (array)$scanDirs[$type];
+            $this->scanDirs[$type] = (array) $scanDirs[$type];
         }
 
         if (!$r) {
-            trigger_error('Could not create necessary addon cache directories.', E_USER_WARNING);
+            trigger_error("Could not create necessary addon cache directories.", E_USER_WARNING);
         }
     }
 
@@ -130,11 +133,12 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @return array
      */
-    public static function getDefaultScanDirectories(): array {
+    public static function getDefaultScanDirectories(): array
+    {
         return [
-            Addon::TYPE_ADDON => ['/addons/addons', '/applications', '/plugins'],
-            Addon::TYPE_THEME => ['/addons/themes', '/themes'],
-            Addon::TYPE_LOCALE => '/locales'
+            Addon::TYPE_ADDON => ["/addons/addons", "/applications", "/plugins"],
+            Addon::TYPE_THEME => ["/addons/themes", "/themes"],
+            Addon::TYPE_LOCALE => "/locales",
         ];
     }
 
@@ -144,7 +148,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $type One of the **Addon::TYPE_*** constatns.
      * @return bool Returns **true** if the addon type uses multi caching or **false** if it uses single caching.
      */
-    private function typeUsesMultiCaching($type) {
+    private function typeUsesMultiCaching($type)
+    {
         return $type === Addon::TYPE_ADDON;
     }
 
@@ -153,17 +158,15 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @param string $fullClassName Fully qualified class name to load.
      */
-    public function autoload($fullClassName) {
-        $suppliedClassInfo = Addon::parseFullyQualifiedClass($fullClassName);
-        $classKey = strtolower($suppliedClassInfo['className']);
-
-        if (isset($this->autoloadClasses[$classKey])) {
-            foreach ($this->autoloadClasses[$classKey] as $namespaceKey => $classData) {
-                if (strtolower($suppliedClassInfo['namespace']) === $namespaceKey) {
-                    include_once $classData['filePath'];
-                }
-            }
+    public function autoload($fullClassName)
+    {
+        $classKey = strtolower($fullClassName);
+        $fileClass = $this->autoloadClasses[$classKey] ?? null;
+        if ($fileClass === null) {
+            return;
         }
+
+        include_once $fileClass->getFilePath();
     }
 
     /**
@@ -173,8 +176,26 @@ class AddonManager implements LoggerAwareInterface {
      * @param bool $prepend If true, **spl_autoload_register()** will prepend the autoloader on the autoload queue instead of appending it.
      * @return bool Returns **true** on success or **false** on failure.
      */
-    public function registerAutoloader($throw = true, $prepend = false) {
-        return spl_autoload_register([$this, 'autoload'], $throw, $prepend);
+    public function registerAutoloader($throw = true, $prepend = false)
+    {
+        return spl_autoload_register([$this, "autoload"], $throw, $prepend);
+    }
+
+    /**
+     * Method to preload classes for specified addons in a PHP 7.4+ preload file.
+     *
+     * @param array $addonKeysToPreload
+     */
+    public function preloadAddonClasses(array $addonKeysToPreload)
+    {
+        foreach ($addonKeysToPreload as $addonKey) {
+            $addon = $this->lookup($addonKey);
+            $this->autoloadClasses = array_merge($this->autoloadClasses, $addon->getClasses());
+        }
+        $this->registerAutoloader();
+        foreach ($this->autoloadClasses as $autoloadClass) {
+            require_once $autoloadClass->getFilePath();
+        }
     }
 
     /**
@@ -182,8 +203,9 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @return bool Returns **true** on success or **false** on failure.
      */
-    public function unregisterAutoloader() {
-        return spl_autoload_unregister([$this, 'autoload']);
+    public function unregisterAutoloader()
+    {
+        return spl_autoload_unregister([$this, "autoload"]);
     }
 
     /**
@@ -191,7 +213,8 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @return array
      */
-    public function getScanDirs() {
+    public function getScanDirs()
+    {
         return $this->scanDirs;
     }
 
@@ -201,30 +224,45 @@ class AddonManager implements LoggerAwareInterface {
      * This method should only be used with enabled addons as searching through all addons takes a performance hit.
      *
      * @param string $fullClassName Fully qualified class name.
-     * @param bool $searchAll Whether or not to search all addons or just the enabled ones.
+     * @param bool $searchAll Whether to search all addons or just the enabled ones.
      * @return Addon|null Returns an {@link Addon} object or **null** if one isn't found.
      */
-    public function lookupByClassName($fullClassName, $searchAll = false) {
-        $lookupClassInfo = Addon::parseFullyQualifiedClass($fullClassName);
-        $classKey = strtolower($lookupClassInfo['className']);
-        $namespaceKey = strtolower($lookupClassInfo['namespace']);
-
-        if ($addon = valr("$classKey.$namespaceKey.addon", $this->autoloadClasses)) {
-            return $addon;
-        } elseif ($searchAll) {
+    public function lookupByClassname($fullClassName, $searchAll = false): ?Addon
+    {
+        if ($searchAll) {
             foreach ($this->lookupAllByType(Addon::TYPE_ADDON) as $addon) {
-                /* @var Addon $addon */
-                $classes = $addon->getClasses();
-                if (isset($classes[$classKey])) {
-                    foreach ($classes[$classKey] as $classInfo) {
-                        if (strtolower($classInfo['namespace']) === $namespaceKey) {
-                            return $addon;
-                        }
-                    }
+                $found = $this->lookupByClassNameInClassList($addon->getClasses(), $fullClassName);
+                if ($found) {
+                    return $found;
                 }
             }
+        } else {
+            return $this->lookupByClassNameInClassList($this->autoloadClasses, $fullClassName);
         }
         return null;
+    }
+
+    /**
+     * Find an addon for a specific class in a list of classes.
+     *
+     * @param PhpClassParsed[] $classList
+     * @param string $className
+     *
+     * @return Addon|null
+     */
+    private function lookupByClassNameInClassList(array $classList, string $className): ?Addon
+    {
+        $foundClass = $classList[strtolower($className)] ?? null;
+        if (!$foundClass instanceof PhpClassParsed) {
+            return null;
+        }
+
+        $addonKey = $foundClass->addonKey ?? null;
+        if ($addonKey === null) {
+            return null;
+        }
+        $addon = $this->lookupAddon($addonKey);
+        return $addon;
     }
 
     /**
@@ -233,9 +271,10 @@ class AddonManager implements LoggerAwareInterface {
      * @param array $data
      * @return array|null
      */
-    public function filterDataByAddon($data) {
+    public function filterDataByAddon($data)
+    {
         $filter = function ($data) {
-            return (empty($data['x-addon']) || $this->checkAddonsEnabled($data['x-addon']));
+            return empty($data["x-addon"]) || $this->checkAddonsEnabled($data["x-addon"]);
         };
 
         return ArrayUtils::filterRecursiveArray($data, $filter);
@@ -246,52 +285,26 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @param string $pattern The pattern to match.
      * @param bool $searchAll Whether to search all classes or just the started ones.
-     * @return array Returns an array of fully qualified class names.
+     * @return string[] Returns an array of fully qualified class names.
      */
-    public function findClasses($pattern, $searchAll = false) {
-        $fn = function ($name) use ($pattern) {
-            return $this->matchClass($pattern, $name);
-        };
+    public function findClasses(string $pattern, bool $searchAll = false): array
+    {
+        $classList = $this->autoloadClasses;
 
-        $result = [];
-        if ($searchAll === false) {
-            // If the className does not contain a wildcard we can check the autloadClass index directly.
-            $fqPattern = Addon::parseFullyQualifiedClass($pattern);
-            if (strpos($fqPattern['className'], '*') === false) {
-                // Convert the pattern's class name to a class key.
-                $classKey = strtolower($fqPattern['className']);
-                if (array_key_exists($classKey, $this->autoloadClasses)) {
-                    $loadedClasses = [$classKey => $this->autoloadClasses[$classKey]];
-                } else {
-                    $loadedClasses = [];
-                }
-            } else {
-                $loadedClasses = $this->autoloadClasses;
-            }
-
-            foreach ($loadedClasses as $classKey => $classesEntry) {
-                foreach ($classesEntry as $namespaceKey => $classData) {
-                    if ($fn($namespaceKey.$classKey)) {
-                        $result[] = $classData['namespace'].$classData['className'];
-                    }
-                }
-            }
-        } else {
+        if ($searchAll) {
+            $classList = [];
             foreach ($this->lookupAllByType(Addon::TYPE_ADDON) as $addon) {
-                /* @var Addon $addon */
-
-                $classes = [];
-                foreach ($addon->getClasses() as $classesInfo) {
-                    foreach ($classesInfo as $classInfo) {
-                        $classes[] = $classInfo['namespace'].$classInfo['className'];
-
-                    }
-                }
-                $result = array_merge($result, array_filter($classes, $fn));
+                $classList = array_merge($classList, $addon->getClasses());
             }
         }
 
-        return $result;
+        $resultClassNames = [];
+        foreach ($classList as $classFile) {
+            if ($this->matchClass(strtolower($pattern), strtolower($classFile->className))) {
+                $resultClassNames[] = $classFile->className;
+            }
+        }
+        return $resultClassNames;
     }
 
     /**
@@ -301,23 +314,28 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $class The class to match.
      * @return bool
      */
-    protected function matchClass($pattern, $class) {
-        $class = '\\'.ltrim($class, '\\');
+    protected function matchClass($pattern, $class)
+    {
+        $class = "\\" . ltrim($class, "\\");
 
-        $regex = str_replace(['\\*\\', '*', '\\'], ['(\\.+\\|\\)', '.*', '\\\\'], '\\'.ltrim($pattern, '\\'));
+        $regex = str_replace(["\\*\\", "*", "\\"], ["(\\.+\\|\\)", ".*", "\\\\"], "\\" . ltrim($pattern, "\\"));
         $regex = "`^$regex$`i";
-
-        $r = preg_match($regex, $class);
-        return (bool)$r;
+        try {
+            $r = preg_match($regex, $class);
+            return (bool) $r;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
      * Get all of the addons of a certain type.
      *
      * @param string $type One of the **Addon::TYPE_*** constants.
-     * @return array Return an array of addon indexed by their keys.
+     * @return Addon[] Return an array of addon indexed by their keys.
      */
-    public function lookupAllByType($type) {
+    public function lookupAllByType($type)
+    {
         static::validateType($type);
 
         if ($this->typeUsesMultiCaching($type)) {
@@ -346,9 +364,10 @@ class AddonManager implements LoggerAwareInterface {
      * This method checks if the addon cache property is initialized. If it isn't it first looks for an addon cache and
      * then scans the addon directories.
      */
-    private function ensureMultiCache() {
+    public function ensureMultiCache()
+    {
         if (!isset($this->multiCache)) {
-            $cachePath = $this->cacheDir.'/'.Addon::TYPE_ADDON.'.php';
+            $cachePath = $this->cacheDir . "/" . Addon::TYPE_ADDON . ".php";
             if ($this->isCacheEnabled() && is_readable($cachePath)) {
                 $this->multiCache = FileUtils::getExport($cachePath);
             } else {
@@ -364,7 +383,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param bool $saveCache Whether or not to save the found addons to the cache.
      * @return array Returns an array of {@link Addon} objects.
      */
-    public function scan($type, $saveCache = false) {
+    public function scan($type, $saveCache = false)
+    {
         static::validateType($type);
 
         if ($saveCache && !$this->isCacheEnabled()) {
@@ -388,6 +408,9 @@ class AddonManager implements LoggerAwareInterface {
                     throw new \Exception("Duplicate addon: {$key}", 500);
                 }
             } catch (\Exception $ex) {
+                if (DebugUtils::isTestMode()) {
+                    throw $ex;
+                }
                 $exceptionMessage = $ex->getMessage();
                 $this->logAddonWarning("The $type in $subdir is invalid. $exceptionMessage");
             }
@@ -418,12 +441,13 @@ class AddonManager implements LoggerAwareInterface {
      * @return array Returns an array of root-relative addon directories.
      * @throws \Exception if a duplicate addon is detected.
      */
-    private function scanAddonDirs($type) {
+    private function scanAddonDirs($type)
+    {
         $strlen = strlen(PATH_ROOT);
         $result = [];
 
         foreach ($this->scanDirs[$type] as $subdir) {
-            $paths = glob(PATH_ROOT."$subdir/*", GLOB_ONLYDIR | GLOB_NOSORT);
+            $paths = glob(PATH_ROOT . "$subdir/*", GLOB_ONLYDIR | GLOB_NOSORT);
             foreach ($paths as $path) {
                 $basename = basename($path);
                 if (!AddonManager::validateKey($basename)) {
@@ -445,9 +469,10 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $path Relative path path to save the array to.
      * @param string $array The array to save.
      */
-    private function saveArrayCache($path, $array) {
+    private function saveArrayCache($path, $array)
+    {
         if ($this->isCacheEnabled()) {
-            FileUtils::putExport($this->cacheDir.'/'.$path, $array);
+            FileUtils::putExport($this->cacheDir . "/" . $path, $array);
         }
     }
 
@@ -457,7 +482,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $type One of the **Addon::TYPE_*** constants.
      * @return array Returns the index mapping [addonDirName => addonDirPath]
      */
-    private function getSingleIndex($type) {
+    private function getSingleIndex($type)
+    {
         if (!isset($this->singleIndex[$type])) {
             $cachePath = "$type-index.php";
 
@@ -481,12 +507,13 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $addonDirName The addon's directory name.
      * @return bool Returns **true** if the item was in the index or **false** otherwise.
      */
-    private function deleteSingleIndexKey($type, $addonDirName) {
+    private function deleteSingleIndexKey($type, $addonDirName)
+    {
         $index = $this->getSingleIndex($type);
         if (isset($index[$addonDirName])) {
             unset($index[$addonDirName]);
 
-            $this->saveArrayCache($this->cacheDir."/$type-index.php", $index);
+            $this->saveArrayCache($this->cacheDir . "/$type-index.php", $index);
 
             $this->singleIndex[$type] = $index;
             return true;
@@ -501,7 +528,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $type One of the **Addon::TYPE_*** constants.
      * @return Addon|null Returns an addon object or null if one isn't found.
      */
-    private function lookupSingleCachedAddon($addonDirName, $type) {
+    private function lookupSingleCachedAddon($addonDirName, $type)
+    {
         if (empty($addonDirName) || !static::validateKey($addonDirName)) {
             return null;
         }
@@ -523,8 +551,8 @@ class AddonManager implements LoggerAwareInterface {
         // Look for the addon itself.
         $addon = false;
         foreach ($this->scanDirs[$type] as $scanDir) {
-            $scanPath = PATH_ROOT."$scanDir/$addonDirName";
-            if (file_exists(PATH_ROOT."$scanDir/$addonDirName")) {
+            $scanPath = PATH_ROOT . "$scanDir/$addonDirName";
+            if (file_exists(PATH_ROOT . "$scanDir/$addonDirName")) {
                 $addon = new Addon("$scanDir/$addonDirName");
                 break;
             }
@@ -545,18 +573,19 @@ class AddonManager implements LoggerAwareInterface {
      * @param bool $throw Whether or not to throw an exception if the requirements are not met.
      * @return bool Returns **true** if the requirements are met or **false** otherwise.
      */
-    public function checkRequirements(Addon $addon, $throw = false) {
+    public function checkRequirements(Addon $addon, $throw = false)
+    {
         // Get all of the addon requirements.
         $requirements = $this->lookupRequirements($addon, self::REQ_MISSING | self::REQ_VERSION);
         $missing = [];
         foreach ($requirements as $addonKey => $requirement) {
-            switch ($requirement['status']) {
+            switch ($requirement["status"]) {
                 case self::REQ_MISSING:
                     $missing[] = $addonKey;
                     break;
                 case self::REQ_VERSION:
                     $checkAddon = $this->lookupAddon($addonKey);
-                    $missing[] = $checkAddon->getName()." {$requirement['req']}";
+                    $missing[] = $checkAddon->getName() . " {$requirement["req"]}";
                     break;
             }
         }
@@ -564,11 +593,7 @@ class AddonManager implements LoggerAwareInterface {
         if (!empty($missing)) {
             if ($throw) {
                 // TODO: Localize after dependency injection can be done.
-                $msg = sprintf(
-                    '%1$s requires: %2$s.',
-                    $addon->getName(),
-                    implode(', ', $missing)
-                );
+                $msg = sprintf('%1$s requires: %2$s.', $addon->getName(), implode(", ", $missing));
                 throw new \Exception($msg, 400);
             } else {
                 return false;
@@ -585,7 +610,8 @@ class AddonManager implements LoggerAwareInterface {
      * @return bool Returns **true** if there are no conflicts or **false** otherwise.
      * @throws \Exception Throws an exception if there are conflicts and **$throw** is **true**.
      */
-    public function checkConflicts(Addon $addon, $throw = false) {
+    public function checkConflicts(Addon $addon, $throw = false)
+    {
         $addons = $this->lookupConflicts($addon);
         $conflicts = [];
         foreach ($addons as $key => $_) {
@@ -594,11 +620,7 @@ class AddonManager implements LoggerAwareInterface {
 
         if (!empty($conflicts)) {
             if ($throw) {
-                $msg = sprintf(
-                    '%1$s conflicts with: %2$s.',
-                    $addon->getName(),
-                    implode(', ', $conflicts)
-                );
+                $msg = sprintf('%1$s conflicts with: %2$s.', $addon->getName(), implode(", ", $conflicts));
                 throw new \Exception($msg, 409);
             }
             return false;
@@ -623,14 +645,15 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @return array Returns the requirements array. An empty array represents an addon with no requirements.
      */
-    public function lookupRequirements(Addon $addon, $filter = null) {
+    public function lookupRequirements(Addon $addon, $filter = null)
+    {
         $array = [];
         $this->lookupRequirementsRecursive($addon, $array);
 
         // Filter the list.
         if ($filter) {
             $array = array_filter($array, function ($row) use ($filter) {
-                return ($row['status'] & $filter) > 0;
+                return ($row["status"] & $filter) > 0;
             });
         }
 
@@ -649,7 +672,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param Addon $addon The addon to lookup the conflicts for.
      * @return array Returns an array of conflicts.
      */
-    public function lookupConflicts(Addon $addon) {
+    public function lookupConflicts(Addon $addon)
+    {
         // Get a list of requirements to check their conflicts too.
         $addons = [$addon->getKey() => $addon];
         $reqs = $this->lookupRequirements($addon, self::REQ_DISABLED | self::REQ_ENABLED);
@@ -670,7 +694,7 @@ class AddonManager implements LoggerAwareInterface {
                 }
 
                 if ($conflict && Addon::checkVersion($conflict->getVersion(), $req)) {
-                    $conflicts[$conflict->getKey()]['from'][] = $a->getKey();
+                    $conflicts[$conflict->getKey()]["from"][] = $a->getKey();
                 }
             }
 
@@ -682,8 +706,11 @@ class AddonManager implements LoggerAwareInterface {
                 }
 
                 $a2Conflicts = $a2->getConflicts();
-                if (isset($a2Conflicts[$a->getKey()]) && Addon::checkVersion($a->getVersion(), $a2Conflicts[$a->getKey()])) {
-                    $conflicts[$a2->getKey()]['from'][] = $a->getKey();
+                if (
+                    isset($a2Conflicts[$a->getKey()]) &&
+                    Addon::checkVersion($a->getVersion(), $a2Conflicts[$a->getKey()])
+                ) {
+                    $conflicts[$a2->getKey()]["from"][] = $a->getKey();
                 }
             }
         }
@@ -698,7 +725,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param array &$array The current requirements list.
      * @see AddonManager::lookupRequirements()
      */
-    private function lookupRequirementsRecursive(Addon $addon, array &$array) {
+    private function lookupRequirementsRecursive(Addon $addon, array &$array)
+    {
         $addonReqs = $addon->getRequirements();
         foreach ($addonReqs as $addonKey => $versionReq) {
             $addonKey = strtolower($addonKey);
@@ -715,7 +743,7 @@ class AddonManager implements LoggerAwareInterface {
             } else {
                 $status = self::REQ_VERSION;
             }
-            $array[$addonKey] = ['req' => $versionReq, 'status' => $status];
+            $array[$addonKey] = ["req" => $versionReq, "status" => $status];
 
             // Check the required addon's requirements.
             if ($addonReq && $status !== self::REQ_ENABLED) {
@@ -730,9 +758,10 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $key The key of the addon.
      * @return Addon|null
      */
-    public function lookupAddon($key) {
+    public function lookupAddon(string $key): ?Addon
+    {
         if (!static::validateKey($key)) {
-            return false;
+            return null;
         }
 
         $this->ensureMultiCache();
@@ -752,7 +781,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $type One of the **Addon::TYPE_*** constants.
      * @return bool Returns
      */
-    public function isEnabled($key, $type) {
+    public function isEnabled($key, $type)
+    {
         static::validateType($type);
 
         if ($type === Addon::TYPE_ADDON) {
@@ -768,7 +798,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param string|string[] $addons
      * @return bool
      */
-    public function checkAddonsEnabled($addons): bool {
+    public function checkAddonsEnabled($addons): bool
+    {
         $addons = is_array($addons) ? $addons : [$addons];
         foreach ($addons as $addon) {
             $enabled = $this->isEnabled($addon, Addon::TYPE_ADDON);
@@ -791,8 +822,9 @@ class AddonManager implements LoggerAwareInterface {
      * @return bool Returns **true** if the addon a
      * @throws \Exception Throws an exception if {@link $throw} is **true** and there are enabled dependents.
      */
-    public function checkDependants(Addon $addon, $throw = false) {
-        trigger_error('checkDependants is deprecated. Use checkDependents instead.', E_USER_DEPRECATED);
+    public function checkDependants(Addon $addon, $throw = false)
+    {
+        trigger_error("checkDependants is deprecated. Use checkDependents instead.", E_USER_DEPRECATED);
         return $this->checkDependents($addon, $throw);
     }
 
@@ -807,7 +839,8 @@ class AddonManager implements LoggerAwareInterface {
      * @return bool Returns **true** if the addon a
      * @throws \Exception Throws an exception if {@link $throw} is **true** and there are enabled dependents.
      */
-    public function checkDependents(Addon $addon, $throw = false) {
+    public function checkDependents(Addon $addon, $throw = false)
+    {
         $dependents = $this->lookupDependents($addon);
 
         if (empty($dependents)) {
@@ -820,11 +853,7 @@ class AddonManager implements LoggerAwareInterface {
             foreach ($dependents as $dependent) {
                 $names[] = $dependent->getName();
             }
-            $msg = sprintf(
-                'The following addons depend on %1$s: %2$s.',
-                $addon->getName(),
-                implode(', ', $names)
-            );
+            $msg = sprintf('The following addons depend on %1$s: %2$s.', $addon->getName(), implode(", ", $names));
             throw new \Exception($msg, 400);
         }
     }
@@ -836,8 +865,9 @@ class AddonManager implements LoggerAwareInterface {
      * @param Addon $addon The addon to check the requirements.
      * @return array Returns an array of {@link Addon} objects.
      */
-    public function lookupDependants(Addon $addon) {
-        trigger_error('lookupDependants is deprecated. Use lookupDependents instead.', E_USER_DEPRECATED);
+    public function lookupDependants(Addon $addon)
+    {
+        trigger_error("lookupDependants is deprecated. Use lookupDependents instead.", E_USER_DEPRECATED);
         return $this->lookupDependents($addon);
     }
 
@@ -847,7 +877,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param Addon $addon The addon to check the requirements.
      * @return array Returns an array of {@link Addon} objects.
      */
-    public function lookupDependents(Addon $addon) {
+    public function lookupDependents(Addon $addon)
+    {
         $result = [];
         foreach ($this->getEnabled() as $enabledKey => $enabledAddon) {
             /* @var Addon $enabledAddon */
@@ -862,9 +893,10 @@ class AddonManager implements LoggerAwareInterface {
     /**
      * @return Addon[]
      */
-    public function getEnabled(): array {
+    public function getEnabled(): array
+    {
         if (!$this->enabledSorted) {
-            uasort($this->enabled, ['\Vanilla\Addon', 'comparePriority']);
+            uasort($this->enabled, ["\Vanilla\Addon", "comparePriority"]);
             $this->enabledSorted = true;
         }
         return $this->enabled;
@@ -876,7 +908,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $localeDirName The locale directory name.
      * @return null|Addon Returns an {@link Addon} object for the locale pack or **null** if it can't be found.
      */
-    public function lookupLocale($localeDirName) {
+    public function lookupLocale($localeDirName)
+    {
         $result = $this->lookupSingleCachedAddon($localeDirName, Addon::TYPE_LOCALE);
         return $result;
     }
@@ -889,25 +922,26 @@ class AddonManager implements LoggerAwareInterface {
      * @param bool $mustExist Whether or not the asset must exist in the addon.
      * @return string
      */
-    public function lookupAsset($subpath, Addon $addon = null, $mustExist = true) {
-        $subpath = '/'.ltrim($subpath, '\\/');
+    public function lookupAsset($subpath, Addon $addon = null, $mustExist = true)
+    {
+        $subpath = "/" . ltrim($subpath, "\\/");
 
         // First lookup the asset on the theme.
         foreach ($this->themeSubdirs() as $subdir) {
-            if (file_exists(PATH_ROOT.$subdir.$subpath)) {
-                return $subdir.$subpath;
+            if (file_exists(PATH_ROOT . $subdir . $subpath)) {
+                return $subdir . $subpath;
             }
         }
 
         if (isset($addon)) {
-            $path = $addon->getSubdir().$subpath;
-            if ($mustExist && !file_exists(PATH_ROOT.$path)) {
-                return '';
+            $path = $addon->getSubdir() . $subpath;
+            if ($mustExist && !file_exists(PATH_ROOT . $path)) {
+                return "";
             } else {
                 return $path;
             }
         } else {
-            return '';
+            return "";
         }
     }
 
@@ -916,7 +950,8 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @return array Returns an array of string paths.
      */
-    private function themeSubdirs() {
+    private function themeSubdirs()
+    {
         $subdirs = []; // prevent infinite loop
         /* @var Addon $theme */
         $theme = $this->getTheme();
@@ -927,7 +962,7 @@ class AddonManager implements LoggerAwareInterface {
             $subdirs[$theme->getKey()] = $theme->getSubdir();
 
             // Look for this theme's base theme.
-            if ($parentTheme = $theme->getInfoValue('parentTheme')) {
+            if ($parentTheme = $theme->getInfoValue("parentTheme")) {
                 $theme = $this->lookupTheme($parentTheme);
             } else {
                 break;
@@ -944,16 +979,17 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $key The info value key.
      * @param mixed $default The default value of the info value is not found.
      */
-    public function getAddonInfoValue(Addon $addon, string $key, $default = null) {
+    public function getAddonInfoValue(Addon $addon, string $key, $default = null)
+    {
         $loop = [];
 
-        for ($a = $addon; $a !== null; $a = $this->lookupByType($a->getInfoValue('parent', ''), $a->getType())) {
+        for ($a = $addon; $a !== null; $a = $this->lookupByType($a->getInfoValue("parent", ""), $a->getType())) {
             // Check for infinite loops.
             if (isset($loop[$a->getGlobalKey()])) {
                 return $default;
             }
 
-            if (null !== $value = $a->getInfoValue($key)) {
+            if (null !== ($value = $a->getInfoValue($key))) {
                 return $value;
             }
         }
@@ -966,7 +1002,8 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @return Addon|null Returns the theme.
      */
-    public function getTheme() {
+    public function getTheme()
+    {
         return $this->theme;
     }
 
@@ -976,7 +1013,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param Addon|null $theme The new theme to set.
      * @return AddonManager Returns `$this` for fluent calls.
      */
-    public function setTheme(Addon $theme) {
+    public function setTheme(Addon $theme)
+    {
         if ($theme !== null) {
             $this->startAddon($theme);
         } elseif ($this->theme !== null) {
@@ -993,7 +1031,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $themeDirName The theme's directory name.
      * @return null|Addon Returns an {@link Addon} object for the theme or **null** if it can't be found.
      */
-    public function lookupTheme($themeDirName) {
+    public function lookupTheme($themeDirName)
+    {
         $result = $this->lookupSingleCachedAddon($themeDirName, Addon::TYPE_THEME);
         return $result;
     }
@@ -1003,8 +1042,9 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @param Addon $addon The addon to start.
      */
-    public function startAddon(Addon $addon) {
-        $this->enabled[$addon->getType().'/'.$addon->getKey()] = $addon;
+    public function startAddon(Addon $addon)
+    {
+        $this->enabled[$addon->getType() . "/" . $addon->getKey()] = $addon;
         $this->enabledSorted = count($this->enabled) <= 1;
 
         if ($addon->getType() === Addon::TYPE_THEME) {
@@ -1017,50 +1057,7 @@ class AddonManager implements LoggerAwareInterface {
         }
 
         // Add the addon's classes to the autoload list.
-        $classes = $addon->getClasses();
-        foreach ($classes as $classKey => $classesInfo) {
-            foreach ($classesInfo as $classInfo) {
-                $subpath = $classInfo['path'];
-                $namespace = $classInfo['namespace'];
-                $namespaceKey = strtolower($classInfo['namespace']);
-                $className = $classInfo['className'];
-
-                if (isset($this->autoloadClasses[$classKey])) {
-                    $orderedByPriority = [];
-                    $addonAdded = false;
-                    foreach ($this->autoloadClasses[$classKey] as $loadedClassNamespaceKey => $loadedClassData) {
-                        $loadedClassAddon = $loadedClassData['addon'];
-                        if (!$addonAdded && $addon->getPriority() < $loadedClassAddon->getPriority()) {
-                            $orderedByPriority[$namespaceKey] = [
-                                'filePath' => $addon->path($subpath),
-                                'namespace' => $namespace,
-                                'className' => $className,
-                                'addon' => $addon,
-                            ];
-                            $addonAdded = true;
-                        }
-                        $orderedByPriority[$loadedClassNamespaceKey] = $loadedClassData;
-                    }
-                    // Make sure we add the addon hes last after the priority check!
-                    if (!$addonAdded) {
-                        $orderedByPriority[$namespaceKey] = [
-                            'filePath' => $addon->path($subpath),
-                            'namespace' => $namespace,
-                            'className' => $className,
-                            'addon' => $addon,
-                        ];
-                    }
-                    $this->autoloadClasses[$classKey] = $orderedByPriority;
-                } else {
-                    $this->autoloadClasses[$classKey][$namespaceKey] = [
-                        'filePath' => $addon->path($subpath),
-                        'namespace' => $namespace,
-                        'className' => $className,
-                        'addon' => $addon,
-                    ];
-                }
-            }
-        }
+        $this->autoloadClasses = array_merge($this->autoloadClasses, $addon->getClasses());
     }
 
     /**
@@ -1069,24 +1066,19 @@ class AddonManager implements LoggerAwareInterface {
      * @param Addon $addon The addon to stop.
      * @param bool $removeClasses If set to false, we won't remove classes from the autoloader.
      */
-    public function stopAddon(Addon $addon, bool $removeClasses = true) {
+    public function stopAddon(Addon $addon, bool $removeClasses = true)
+    {
         if (empty($addon)) {
             trigger_error("Null addon supplied to AddonManager->stopAddon().", E_USER_NOTICE);
             return;
         }
 
-        unset($this->enabled[$addon->getType().'/'.$addon->getKey()]);
+        unset($this->enabled[$addon->getType() . "/" . $addon->getKey()]);
 
-        // Remove all of the addon's classes from the autoloader.
+        // Remove all the addon's classes from the autoloader.
         if ($removeClasses) {
-            foreach ($addon->getClasses() as $classKey => $classInfo) {
-                if (isset($this->autoloadClasses[$classKey])) {
-                    foreach ($this->autoloadClasses[$classKey] as $namespaceKey => $classData) {
-                        if (strtolower($classData['namespace']) === $namespaceKey) {
-                            unset($this->autoloadClasses[$classKey][$namespaceKey]);
-                        }
-                    }
-                }
+            foreach (array_keys($addon->getClasses()) as $className) {
+                unset($this->autoloadClasses[$className]);
             }
         }
     }
@@ -1100,13 +1092,14 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $type One of the **Addon::TYPE_*** constants.
      * @return int Returns the number of addons that were enabled.
      */
-    public function startAddonsByKey($keys, $type) {
+    public function startAddonsByKey($keys, $type)
+    {
         // Filter out false keys.
-        $keys = array_filter((array)$keys);
+        $keys = array_filter((array) $keys);
 
         $count = 0;
         foreach ($keys as $key => $value) {
-            if (in_array($value, [true, 1, '1'], true)) {
+            if (in_array($value, [true, 1, "1"], true)) {
                 // This addon key is represented as addon => true.
                 $lookup = $key;
             } else {
@@ -1130,7 +1123,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $globalKey The global key of the addon.
      * @return null|Addon Returns the addon or **null** if one isn't found.
      */
-    public function lookup(string $globalKey) {
+    public function lookup(string $globalKey)
+    {
         return $this->lookupByType(...Addon::splitGlobalKey($globalKey));
     }
 
@@ -1141,7 +1135,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $type One of the **Addon::TYPE_*** constants.
      * @return null|Addon Returns the addon or **null** if one isn't found.
      */
-    public function lookupByType($key, $type) {
+    public function lookupByType($key, $type)
+    {
         if ($this->typeUsesMultiCaching($type)) {
             return $this->lookupAddon($key);
         } else {
@@ -1157,13 +1152,14 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $type One of the **Addon::TYPE_*** constants.
      * @return int Returns the number of addons that were stopped.
      */
-    public function stopAddonsByKey($keys, $type) {
+    public function stopAddonsByKey($keys, $type)
+    {
         // Filter out false keys.
-        $keys = array_filter((array)$keys);
+        $keys = array_filter((array) $keys);
 
         $count = 0;
         foreach ($keys as $key => $value) {
-            if (in_array($value, [true, 1, '1'], true)) {
+            if (in_array($value, [true, 1, "1"], true)) {
                 // This addon key is represented as addon => true.
                 $addon = $this->lookupByType($key, $type);
             } else {
@@ -1185,7 +1181,8 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @return bool Returns **true** if the files were removed or **false** otherwise.
      */
-    public function clearCache() {
+    public function clearCache()
+    {
         if (!$this->isCacheEnabled()) {
             return true;
         }
@@ -1207,7 +1204,8 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @return null|string Returns the cacheDir.
      */
-    public function getCacheDir() {
+    public function getCacheDir()
+    {
         return $this->cacheDir;
     }
 
@@ -1218,9 +1216,10 @@ class AddonManager implements LoggerAwareInterface {
      * prepended.
      * @return AddonManager Returns `$this` for fluent calls.
      */
-    public function setCacheDir($cacheDir) {
+    public function setCacheDir($cacheDir)
+    {
         if ($cacheDir !== null && strpos($cacheDir, PATH_ROOT) !== 0) {
-            $cacheDir = PATH_ROOT.$cacheDir;
+            $cacheDir = PATH_ROOT . $cacheDir;
         }
         $this->cacheDir = $cacheDir;
         return $this;
@@ -1232,7 +1231,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param string $locale The locale to get the translation paths for.
      * @return array Returns an array of paths.
      */
-    public function getEnabledTranslationPaths($locale) {
+    public function getEnabledTranslationPaths($locale)
+    {
         $addons = array_reverse($this->getEnabled(), true);
 
         $result = [];
@@ -1252,7 +1252,8 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @param EventManager $eventManager The event manager to bind the plugin classes to.
      */
-    public function bindAllEvents(EventManager $eventManager) {
+    public function bindAllEvents(EventManager $eventManager)
+    {
         $enabled = $this->getEnabled();
 
         foreach ($enabled as $addon) {
@@ -1270,7 +1271,8 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @deprecated Use the Addon::bindEvents()
      */
-    public function bindAddonEvents(Addon $addon, EventManager $eventManager) {
+    public function bindAddonEvents(Addon $addon, EventManager $eventManager)
+    {
         $addon->bindEvents($eventManager);
     }
 
@@ -1282,7 +1284,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param Addon $addon The addon to unbind.
      * @param EventManager $eventManager The event manager to bind the plugin classes to.
      */
-    public function unbindAddonEvents(Addon $addon, EventManager $eventManager) {
+    public function unbindAddonEvents(Addon $addon, EventManager $eventManager)
+    {
         $specialClasses = $addon->getSpecialClasses();
         if ($specialClasses === null) {
             // Nothing to do here.
@@ -1298,19 +1301,19 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @param \Gdn_Configuration $config
      */
-    public function applyConfigDefaults(\Gdn_Configuration $config) {
+    public function applyConfigDefaults(\Gdn_Configuration $config)
+    {
         // Load the configurations for enabled addons.
         foreach ($this->getEnabled() as $addon) {
             if ($specialClasses = $addon->getSpecialClasses()) {
                 foreach ($specialClasses->getAddonConfigurationClasses() as $configurationClass) {
                     /** @var AddonConfigurationDefaults $instance */
-                    $instance = new $configurationClass;
+                    $instance = new $configurationClass();
                     $config->touch($instance->getDefaults(), null, false);
                 }
             }
 
-
-            if ($configPath = $addon->getSpecial('config')) {
+            if ($configPath = $addon->getSpecial("config")) {
                 $config->load($addon->path($configPath));
             }
         }
@@ -1324,16 +1327,17 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @param Container $container
      */
-    public function configureContainer(Container $container) {
+    public function configureContainer(Container $container)
+    {
         $enabled = $this->getEnabled();
         // do new ones first.
         foreach ($enabled as $addon) {
-            $addon->configureContainer($container, 'new');
+            $addon->configureContainer($container, "new");
         }
 
         // Then the old ones.
         foreach ($enabled as $addon) {
-            $addon->configureContainer($container, 'old');
+            $addon->configureContainer($container, "old");
         }
     }
 
@@ -1342,7 +1346,8 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @return bool
      */
-    public function isCacheEnabled() {
+    public function isCacheEnabled()
+    {
         return $this->cacheDir !== null;
     }
 
@@ -1355,7 +1360,8 @@ class AddonManager implements LoggerAwareInterface {
      * @param bool $start Whether or not to start the addon after adding.
      * @return $this
      */
-    public function add(Addon $addon, $start = true) {
+    public function add(Addon $addon, $start = true)
+    {
         if ($this->typeUsesMultiCaching($addon->getType())) {
             $this->ensureMultiCache();
             $this->multiCache[$addon->getKey()] = $addon;
@@ -1378,7 +1384,8 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @param string $message
      */
-    private function logAddonWarning(string $message) {
+    private function logAddonWarning(string $message)
+    {
         trigger_error($message, E_USER_WARNING);
         $this->logger->critical($message);
     }
@@ -1388,7 +1395,8 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @param string $type The type to check.
      */
-    private static function validateType(string $type) {
+    private static function validateType(string $type)
+    {
         if (!in_array($type, [Addon::TYPE_ADDON, Addon::TYPE_LOCALE, Addon::TYPE_THEME])) {
             throw new \InvalidArgumentException("Addons cannot have a type of: $type", 400);
         }
@@ -1399,7 +1407,8 @@ class AddonManager implements LoggerAwareInterface {
      *
      * @param string $key The key to validate.
      */
-    private static function validateKey(string $key) {
+    private static function validateKey(string $key)
+    {
         if (!preg_match('`^[a-z0-9_-]*$`i', $key)) {
             trigger_error("Invalid addon key: $key.", E_USER_NOTICE);
             return false;

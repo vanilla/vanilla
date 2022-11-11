@@ -24,8 +24,7 @@ if (!utils.validateArgs(themeKey, themeName)) {
 try {
     //copy addon.json
     fse.copyFileSync(path.resolve(TOOL_ROOT, "addon.json"), path.resolve(DEST, "addon.json"));
-    fse.readFile(path.resolve(DEST, "addon.json"), 'utf8', function (err,data) {
-
+    fse.readFile(path.resolve(DEST, "addon.json"), "utf8", function (err, data) {
         data = data.replace(/theme-boilerplate/g, themeKey);
         data = data.replace(/Theme Boilerplate/g, themeName);
 
@@ -34,8 +33,7 @@ try {
 
     //copy README.md and swap theme name
     fse.copyFileSync(path.resolve(TOOL_ROOT, "setup/src/README.md"), path.resolve(DEST, "README.md"));
-    fse.readFile(path.resolve(DEST, "README.md"), 'utf8', function (err,data) {
-
+    fse.readFile(path.resolve(DEST, "README.md"), "utf8", function (err, data) {
         data = data.replace(/Vanilla Theme Boilerplate/g, themeName);
 
         fse.writeFileSync(path.resolve(DEST, "README.md"), data);
@@ -52,7 +50,6 @@ try {
 
     //create src/ dir
     fse.mkdir(path.resolve(DEST, "src"), function (err) {
-
         //create scss folder sctructure
         fse.mkdirSync(path.resolve(DEST, "src/scss"));
         fse.mkdirSync(path.resolve(DEST, "src/scss/base"));
@@ -64,7 +61,10 @@ try {
         fse.copyFileSync(path.resolve(TOOL_ROOT, "setup/src/custom.scss"), path.resolve(DEST, "src/scss/custom.scss"));
 
         //copy _variables.scss
-        fse.copyFileSync(path.resolve(TOOL_ROOT, "src/scss/base/_variables.scss"), path.resolve(DEST, "src/scss/base/_variables.scss"));
+        fse.copyFileSync(
+            path.resolve(TOOL_ROOT, "src/scss/base/_variables.scss"),
+            path.resolve(DEST, "src/scss/base/_variables.scss"),
+        );
 
         //create js folder
         fse.mkdirSync(path.resolve(DEST, "src/js"));
@@ -80,7 +80,6 @@ try {
     fse.copySync(path.resolve(TOOL_ROOT, "settings"), path.resolve(DEST, "settings"));
 
     console.log("Boilerplate successfully installed!");
-
 } catch (err) {
     console.error(err.message);
 }

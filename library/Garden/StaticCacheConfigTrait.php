@@ -13,7 +13,8 @@ use Gdn;
  * For classes that need to cache some static values and configs.
  *
  */
-trait StaticCacheConfigTrait {
+trait StaticCacheConfigTrait
+{
     use StaticCacheTrait {
         sc as c;
         scInit as cInit;
@@ -27,7 +28,8 @@ trait StaticCacheConfigTrait {
      *
      * @return array
      */
-    protected static function f(string $key, $default) {
+    protected static function f(string $key, $default)
+    {
         return Gdn::config($key, $default);
     }
 }

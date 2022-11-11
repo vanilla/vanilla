@@ -9,15 +9,16 @@ namespace Vanilla\Menu;
 /**
  * Provider of counter data.
  */
-class CounterModel {
-
+class CounterModel
+{
     /** @var array List of counter providers. */
     private $providers = [];
 
     /**
      * @param CounterProviderInterface $provider
      */
-    public function addProvider(CounterProviderInterface $provider) {
+    public function addProvider(CounterProviderInterface $provider)
+    {
         $this->providers[] = $provider;
     }
 
@@ -26,7 +27,8 @@ class CounterModel {
      *
      * @return Counter[]
      */
-    public function getAllCounters(): array {
+    public function getAllCounters(): array
+    {
         $counters = [];
         foreach ($this->providers as $provider) {
             $counters = array_merge($counters, $provider->getMenuCounters());

@@ -4,6 +4,7 @@
  * @license gpl-2.0-only
  */
 
+import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { LoadStatus } from "@library/@types/api/core";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { useDiscussionActions } from "@library/features/discussions/DiscussionActions";
@@ -34,8 +35,8 @@ import { count } from "console";
 import React, { useEffect, useMemo, useState } from "react";
 
 interface IMergeRequestBody {
-    discussionIDs: RecordID[];
-    destinationDiscussionID: RecordID;
+    discussionIDs: Array<IDiscussion["discussionID"]>;
+    destinationDiscussionID: IDiscussion["discussionID"];
     addRedirects?: boolean;
 }
 
@@ -44,11 +45,8 @@ interface IProps {
 }
 
 export default function DiscussionMergeFormImpl(props: IProps) {
-    const {
-        checkedDiscussionIDs,
-        addPendingDiscussionByIDs,
-        removePendingDiscussionByIDs,
-    } = useDiscussionCheckBoxContext();
+    const { checkedDiscussionIDs, addPendingDiscussionByIDs, removePendingDiscussionByIDs } =
+        useDiscussionCheckBoxContext();
 
     const discussionActions = useDiscussionActions();
 
@@ -144,7 +142,7 @@ export default function DiscussionMergeFormImpl(props: IProps) {
 }
 
 interface IDiscussionSelectorProps {
-    discussionIDs: RecordID[];
+    discussionIDs: Array<IDiscussion["discussionID"]>;
     value: RecordID | null;
     onChange: (value: RecordID) => void;
     maxRadioInputs: number;
@@ -153,7 +151,7 @@ interface IDiscussionSelectorProps {
 function DiscussionSelector(props: IDiscussionSelectorProps) {
     const discussions = useDiscussionList({ discussionID: props.discussionIDs, limit: props.discussionIDs.length });
 
-    if (discussions.status === LoadStatus.ERROR || !discussions.data) {
+    if (discussions.status === LoadStatus.ERROR || !discussions.data?.discussionList) {
         return (
             <Message icon={<ErrorIcon />} stringContents={discussions.error?.message ?? t("An error has occured.")} />
         );
@@ -180,7 +178,7 @@ function DiscussionSelector(props: IDiscussionSelectorProps) {
                                 onChange={(value) => {
                                     props.onChange(value);
                                 }}
-                                options={discussions.data?.map((discussion) => {
+                                options={discussions.data?.discussionList.map((discussion) => {
                                     return {
                                         label: discussion.name,
                                         value: discussion.discussionID,
@@ -210,7 +208,7 @@ function DiscussionSelector(props: IDiscussionSelectorProps) {
                     })}
                 </RadioButtonGroup>
             ) : (
-                discussions.data.map((discussion, i) => {
+                discussions.data.discussionList.map((discussion, i) => {
                     return (
                         <RadioButton
                             key={i}

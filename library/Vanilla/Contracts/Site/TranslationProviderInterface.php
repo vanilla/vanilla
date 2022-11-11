@@ -11,7 +11,8 @@ namespace Vanilla\Contracts\Site;
  * Interface TranslationProviderInterface
  * @package Vanilla\Contracts\Site
  */
-interface TranslationProviderInterface {
+interface TranslationProviderInterface
+{
     /**
      * Return true when translation model supports user content translation
      *

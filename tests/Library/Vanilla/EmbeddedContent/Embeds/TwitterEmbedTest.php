@@ -12,11 +12,13 @@ use VanillaTests\MinimalContainerTestCase;
 /**
  * Verify embed class capabilities.
  */
-class TwitterEmbedTest extends MinimalContainerTestCase {
+class TwitterEmbedTest extends MinimalContainerTestCase
+{
     /**
      * Ensure we can create an embed from legacy data that might still live in the DB.
      */
-    public function testLegacyDataFormat() {
+    public function testLegacyDataFormat()
+    {
         $legacyJSON = <<<JSON
 {
     "url": "https://twitter.com/hootsuite/status/1009883861617135617",

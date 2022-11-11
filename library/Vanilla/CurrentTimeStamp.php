@@ -8,7 +8,7 @@
 namespace Vanilla;
 
 use DateTimeImmutable;
-use Vanilla\Formatting\DateTimeFormatter;
+use Firebase\JWT\JWT;
 use Vanilla\Utility\DebugUtils;
 
 /**
@@ -17,7 +17,8 @@ use Vanilla\Utility\DebugUtils;
  * Dependency injecting times can be painful, which is this is structured as a static utility.
  * Any mocks are cleared between test cases.
  */
-final class CurrentTimeStamp {
+final class CurrentTimeStamp
+{
     /**
      * Format dates consistent with MySQL requirements.
      */
@@ -27,9 +28,20 @@ final class CurrentTimeStamp {
     private static $timeMock = null;
 
     /**
+     * Check if our time is mocked our not.
+     *
+     * @return bool
+     */
+    public static function isMocked(): bool
+    {
+        return self::$timeMock !== null;
+    }
+
+    /**
      * Get the current timestamp.
      */
-    public static function get(): int {
+    public static function get(): int
+    {
         return self::$timeMock ?? time();
     }
 
@@ -38,8 +50,9 @@ final class CurrentTimeStamp {
      *
      * @return \DateTimeImmutable
      */
-    public static function getDateTime(): \DateTimeImmutable {
-        return new \DateTimeImmutable('@'.self::get());
+    public static function getDateTime(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable("@" . self::get());
     }
 
     /**
@@ -47,7 +60,8 @@ final class CurrentTimeStamp {
      *
      * @return string
      */
-    public static function getMySQL(): string {
+    public static function getMySQL(): string
+    {
         return gmdate(self::MYSQL_DATE_FORMAT, self::get());
     }
 
@@ -58,7 +72,8 @@ final class CurrentTimeStamp {
      *
      * @return \DateTimeImmutable
      */
-    public static function coerceDateTime($toConvert): \DateTimeImmutable {
+    public static function coerceDateTime($toConvert): \DateTimeImmutable
+    {
         self::assertTestMode();
         if ($toConvert instanceof \DateTime) {
             \DateTimeImmutable::createFromMutable($toConvert);
@@ -81,10 +96,12 @@ final class CurrentTimeStamp {
      *
      * @codeCoverageIgnore
      */
-    public static function mockTime($toMock): \DateTimeImmutable {
+    public static function mockTime($toMock): \DateTimeImmutable
+    {
         self::assertTestMode();
         $date = self::coerceDateTime($toMock);
         self::$timeMock = $date->getTimestamp();
+        JWT::$timestamp = self::$timeMock;
         return $date;
     }
 
@@ -93,8 +110,10 @@ final class CurrentTimeStamp {
      *
      * @codeCoverageIgnore
      */
-    public static function clearMockTime() {
+    public static function clearMockTime()
+    {
         self::assertTestMode();
+        JWT::$timestamp = null;
         self::$timeMock = null;
     }
 
@@ -102,7 +121,8 @@ final class CurrentTimeStamp {
      * @throws \Exception If we aren't in test mode.
      * @codeCoverageIgnore
      */
-    private static function assertTestMode() {
+    private static function assertTestMode()
+    {
         assert(DebugUtils::isTestMode());
     }
 
@@ -112,7 +132,8 @@ final class CurrentTimeStamp {
      * @param DateTimeImmutable $date
      * @return int
      */
-    public static function getCurrentTimeDifference(\DateTimeImmutable $date): int {
+    public static function getCurrentTimeDifference(\DateTimeImmutable $date): int
+    {
         $currentTime = self::getDateTime();
         return $currentTime->getTimestamp() - $date->getTimestamp();
     }
@@ -129,7 +150,8 @@ final class CurrentTimeStamp {
      * e.g. 09:00:00, 09:02:00, 09:04:00, etc. If the current time is 08:59:17, the current window started at
      * 08:58:00 and ends at 08:59:59 and the function will return a DateTime specifying 08:58:00 in the time portion.
      */
-    public static function toWindowStart(\DateInterval $window): \DateTimeInterface {
+    public static function toWindowStart(\DateInterval $window): \DateTimeInterface
+    {
         if ($window->invert) {
             throw new \InvalidArgumentException("Cannot specify a negative time window");
         }
@@ -175,10 +197,9 @@ final class CurrentTimeStamp {
      * @throws \InvalidArgumentException Rollover equal to or greater than window.
      */
     public static function toNextWindow(
-        \DateInterval  $window,
+        \DateInterval $window,
         ?\DateInterval $rolloverWithin = null
     ): \DateTimeInterface {
-
         if ($window->invert) {
             throw new \InvalidArgumentException("Cannot specify a negative time window");
         }

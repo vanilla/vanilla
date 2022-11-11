@@ -8,11 +8,15 @@
 namespace Vanilla\Layout;
 
 use Garden\Schema\Schema;
+use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
+use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
+use Vanilla\Layout\View\AbstractCustomLayoutView;
 use Vanilla\Models\FullRecordCacheModel;
 use Vanilla\Models\Model;
 use Vanilla\Utility\ModelUtils;
@@ -20,13 +24,16 @@ use Vanilla\Utility\ModelUtils;
 /**
  * Model for managing persisted layout data
  */
-class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderInterface {
-
+class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderInterface
+{
     //region Properties
-    private const TABLE_NAME = 'layout';
+    private const TABLE_NAME = "layout";
 
-    /** @var LayoutModel $layoutViewModel */
+    /** @var LayoutViewModel $layoutViewModel */
     private $layoutViewModel;
+
+    /** @var LayoutService $layoutProviderService */
+    private $layoutProviderService;
 
     //endregion
 
@@ -38,13 +45,15 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      * @param CurrentDateFieldProcessor $dateFieldProcessor
      * @param JsonFieldProcessor $jsonFieldProcessor
      * @param LayoutViewModel $layoutViewModel
+     * @param LayoutService $layoutProviderService
      * @param \GDN_Cache $cache
      */
     public function __construct(
         CurrentUserFieldProcessor $userFieldProcessor,
         CurrentDateFieldProcessor $dateFieldProcessor,
-        JsonFieldProcessor        $jsonFieldProcessor,
-        LayoutViewModel           $layoutViewModel,
+        JsonFieldProcessor $jsonFieldProcessor,
+        LayoutViewModel $layoutViewModel,
+        LayoutService $layoutProviderService,
         \GDN_Cache $cache
     ) {
         parent::__construct(self::TABLE_NAME, $cache);
@@ -55,9 +64,10 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
         $dateFieldProcessor->camelCase();
         $this->addPipelineProcessor($dateFieldProcessor);
 
-        $jsonFieldProcessor->setFields(['layout']);
+        $jsonFieldProcessor->setFields(["layout"]);
         $this->addPipelineProcessor($jsonFieldProcessor);
         $this->layoutViewModel = $layoutViewModel;
+        $this->layoutProviderService = $layoutProviderService;
     }
     //endregion
 
@@ -71,9 +81,10 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      * @param bool $drop Optional, true to drop table if it already exists,
      * false to retain table if it already exists. Default false.
      */
-    public static function structure(\Gdn_Database $database, bool $explicit = false, bool $drop = false): void {
-        $database
-            ->structure()
+    public static function structure(\Gdn_Database $database, bool $explicit = false, bool $drop = false): void
+    {
+        $construct = $database->structure();
+        $construct
             ->table(self::TABLE_NAME)
             ->primaryKey("layoutID")
             ->column("name", "varchar(100)", false)
@@ -84,6 +95,26 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
             ->column("updateUserID", "int", null)
             ->column("dateUpdated", "datetime", null)
             ->set($explicit, $drop);
+
+        // Remove the layoutType column if it's there (it shouldn't be).
+        $removeLayoutTypeColumn = $construct->table(self::TABLE_NAME)->columnExists("layoutType");
+        if ($removeLayoutTypeColumn) {
+            $construct->table(self::TABLE_NAME)->dropColumn("layoutType");
+        }
+    }
+
+    /**
+     * Migrate configs for the 2022.011 release.
+     *
+     * @param \Gdn_Configuration $config
+     */
+    public static function migrateLegacyConfigs_2022_011(\Gdn_Configuration $config): void
+    {
+        $config->renameConfigKeys([
+            "Feature.UseCustomLayout.Enabled" => "Feature.customLayout.home.Enabled",
+            "Feature.LayoutEditor.Enabled" => "Feature.layoutEditor.Enabled",
+            "Feature.CustomLayoutDiscussionListPage.Enabled" => "Feature.customLayout.discussionList.Enabled",
+        ]);
     }
 
     /**
@@ -93,12 +124,15 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      * @param array|string|bool $expand Additional parameters used to expand output based on row property values
      * @return array Normalized row
      */
-    public function normalizeRow(array $row, $expand = false): array {
-
+    public function normalizeRow(array $row, $expand = false): array
+    {
         // File-based layouts are set as defaults, which have string IDs
-        $row['isDefault'] = !is_numeric($row['layoutID']);
-        if (ModelUtils::isExpandOption('layoutViews', $expand)) {
-            $row['layoutViews'] = $this->layoutViewModel->normalizeRows($this->layoutViewModel->getViewsByLayoutID($row['layoutID']), $expand);
+        $row["isDefault"] = !is_numeric($row["layoutID"]);
+        if (ModelUtils::isExpandOption("layoutViews", $expand)) {
+            $row["layoutViews"] = $this->layoutViewModel->normalizeRows(
+                $this->layoutViewModel->getViewsByLayoutID($row["layoutID"]),
+                $expand
+            );
         }
         return $row;
     }
@@ -110,25 +144,31 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      * @param array|string|bool $expand Additional parameters used to expand output based on row property values
      * @return array Normalized row
      */
-    public function normalizeRows(array $rows, $expand): array {
+    public function normalizeRows(array $rows, $expand): array
+    {
         $layoutViews = [];
-        if (ModelUtils::isExpandOption('layoutViews', $expand)) {
+        if (ModelUtils::isExpandOption("layoutViews", $expand)) {
             // Get all of the IDs from the result row
             $ids = array_map(function (array $row) {
-                return $row['layoutID'];
+                return $row["layoutID"];
             }, $rows);
             //expand layout Views based on layoutIDs .
-            $layoutViews = $this->layoutViewModel->normalizeRows($this->layoutViewModel->getViewsByLayoutIDs($ids), $expand);
+            $layoutViews = $this->layoutViewModel->normalizeRows(
+                $this->layoutViewModel->getViewsByLayoutIDs($ids),
+                $expand
+            );
         }
 
         $rows = array_map(function (array $row) use ($layoutViews, $expand) {
             $row = $this->normalizeRow($row);
             //If expand parameter present add layoutViews to the request.
-            if (ModelUtils::isExpandOption('layoutViews', $expand)) {
-                $currentLayoutModel = array_values(array_filter($layoutViews, function ($layoutView) use ($row) {
-                    return $layoutView['layoutID'] == $row['layoutID'];
-                }));
-                $row['layoutViews'] = $currentLayoutModel;
+            if (ModelUtils::isExpandOption("layoutViews", $expand)) {
+                $currentLayoutModel = array_values(
+                    array_filter($layoutViews, function ($layoutView) use ($row) {
+                        return $layoutView["layoutID"] == $row["layoutID"];
+                    })
+                );
+                $row["layoutViews"] = $currentLayoutModel;
             }
             return $row;
         }, $rows);
@@ -142,7 +182,8 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      *
      * @return Schema
      */
-    public function getIDSchema(): Schema {
+    public function getIDSchema(): Schema
+    {
         return Schema::parse(["layoutID:i|s"]);
     }
 
@@ -153,9 +194,10 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      *
      * @return Schema
      */
-    public function getQueryInputSchema($includesLayoutID = false): Schema {
+    public function getQueryInputSchema($includesLayoutID = false): Schema
+    {
         $schema = [
-            'expand?' => ApiUtils::getExpandDefinition(['layoutViews'])
+            "expand?" => ApiUtils::getExpandDefinition(["layoutViews"]),
         ];
         if ($includesLayoutID) {
             $schema += ["layoutID:i|s"];
@@ -168,7 +210,8 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      *
      * @return Schema
      */
-    public function getMetadataSchema(): Schema {
+    public function getMetadataSchema(): Schema
+    {
         return Schema::parse([
             "layoutID:i|s",
             "name:s",
@@ -178,7 +221,7 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
             "dateInserted:dt",
             "updateUserID:i?",
             "dateUpdated:dt?",
-            'layoutViews:a?'
+            "layoutViews:a?",
         ]);
     }
 
@@ -187,15 +230,9 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      *
      * @return Schema
      */
-    public function getHydratedSchema(): Schema {
-        return Schema::parse([
-            "layoutID:i|s",
-            "name:s",
-            "layoutViewType:s",
-            "isDefault:b",
-            "layout:a",
-            'seo:o',
-        ]);
+    public function getHydratedSchema(): Schema
+    {
+        return Schema::parse(["layoutID:i|s", "name:s", "layoutViewType:s", "isDefault:b", "layout:a", "seo:o"]);
     }
 
     /**
@@ -203,7 +240,8 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      *
      * @return Schema
      */
-    public function getFullSchema(): Schema {
+    public function getFullSchema(): Schema
+    {
         return $this->getMetadataSchema()->merge(Schema::parse(["layout:a"]));
     }
 
@@ -212,12 +250,9 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      *
      * @return Schema
      */
-    public function getEditSchema(): Schema {
-        return Schema::parse([
-            "layoutID:i|s",
-            "name:s" => ['maxLength' => 100],
-            "layout:a"
-        ]);
+    public function getEditSchema(): Schema
+    {
+        return Schema::parse(["layoutID:i|s", "name:s" => ["maxLength" => 100], "layout:a"]);
     }
 
     /**
@@ -225,10 +260,11 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      *
      * @return Schema
      */
-    public function getPatchSchema(): Schema {
+    public function getPatchSchema(): Schema
+    {
         return Schema::parse([
-            "name:s?" => ['maxLength' => 100],
-            "layout:a?"
+            "name:s?" => ["maxLength" => 100],
+            "layout:a?",
         ]);
     }
 
@@ -239,10 +275,11 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
      *
      * @return Schema
      */
-    public function getCreateSchema(array $viewTypes): Schema {
+    public function getCreateSchema(array $viewTypes): Schema
+    {
         return Schema::parse([
-            "name:s" => ['maxLength' => 100],
-            "layoutViewType:s" => ['enum' => $viewTypes],
+            "name:s" => ["maxLength" => 100],
+            "layoutViewType:s" => ["enum" => $viewTypes],
             "layout:a",
         ]);
     }
@@ -252,37 +289,72 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
     /**
      * @inheritdoc
      */
-    public function isIDFormatSupported($layoutID): bool {
+    public function isIDFormatSupported($layoutID): bool
+    {
         return filter_var($layoutID, FILTER_VALIDATE_INT) !== false;
     }
 
     /**
      * @inheritdoc
      */
-    public function getAll(): array {
-        return $this->select([], [self::OPT_ORDER => 'layoutID']);
+    public function getAll(): array
+    {
+        return $this->select([], [self::OPT_ORDER => "layoutID"]);
     }
 
     /**
      * @inheritdoc
      */
-    public function getByID($layoutID): array {
-        return $this->selectSingle(['layoutID' => $layoutID]);
+    public function getByID($layoutID): array
+    {
+        return $this->selectSingle(["layoutID" => $layoutID]);
     }
 
     /**
      * @inheritdoc
      */
-    public function updateLayout($layoutID, array $fields): array {
-        $_ = $this->update($fields, ['layoutID' => $layoutID], [Model::OPT_LIMIT => 1]);
+    public function updateLayout($layoutID, array $fields): array
+    {
+        $_ = $this->update($fields, ["layoutID" => $layoutID], [Model::OPT_LIMIT => 1]);
         return $this->getByID($layoutID);
     }
 
     /**
      * @inheritdoc
      */
-    public function deleteLayout($layoutID): void {
-        $this->delete(['layoutID' => $layoutID]);
+    public function deleteLayout($layoutID): void
+    {
+        $this->delete(["layoutID" => $layoutID]);
+    }
+
+    /**
+     * Get Layout to hydrate based on the layout Type.
+     *
+     * @param string $layoutType type of the layout.
+     * @param AbstractCustomLayoutView|null $fileLayoutView default file based layout for the given type.
+     *
+     * @throws ClientException Client Exception.
+     * @throws NotFoundException Not Found Exception.
+     */
+    public function getLayoutFromLayoutType(string $layoutType, ?AbstractCustomLayoutView $fileLayoutView)
+    {
+        $layoutView = $this->layoutViewModel->getLayoutViews(true, $layoutType);
+        if (count($layoutView) == 0) {
+            $layoutID = $fileLayoutView->getLayoutID();
+        } else {
+            $layoutID = $layoutView["layoutID"];
+        }
+
+        $provider = $this->layoutProviderService->getCompatibleProvider($layoutID);
+        if (!isset($provider)) {
+            throw new ClientException("Invalid layout ID format", 400, ["layoutID" => $layoutID]);
+        }
+        try {
+            $row = $provider->getByID($layoutID);
+        } catch (NoResultsException $e) {
+            throw new NotFoundException("Layout");
+        }
+        return $row;
     }
     //endregion
     //endregion

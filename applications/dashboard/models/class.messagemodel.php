@@ -15,12 +15,12 @@ use Vanilla\Utility\ArrayUtils;
 /**
  * Handles message data.
  */
-class MessageModel extends Gdn_Model {
-
+class MessageModel extends Gdn_Model
+{
     const MESSAGE_TYPES = ["casual", "info", "warning", "alert"];
 
     /** @var array Non-standard message location allowed. */
-    private $_SpecialLocations = ['[Base]', '[NonAdmin]'];
+    private $_SpecialLocations = ["[Base]", "[NonAdmin]"];
 
     /** @var array Current message data. */
     protected static $Messages;
@@ -34,16 +34,18 @@ class MessageModel extends Gdn_Model {
     /**
      * Class constructor. Defines the related database table name.
      */
-    public function __construct() {
-        parent::__construct('Message');
-        $this->modelCache = new \Vanilla\Models\ModelCache('moderationMessages', \Gdn::cache());
+    public function __construct()
+    {
+        parent::__construct("Message");
+        $this->modelCache = new \Vanilla\Models\ModelCache("moderationMessages", \Gdn::cache());
         $this->layoutService = Gdn::getContainer()->get(\Vanilla\Layout\LayoutService::class);
     }
 
     /**
      * Invalidate the cache on update.
      */
-    protected function onUpdate(): void {
+    protected function onUpdate(): void
+    {
         $this->modelCache->invalidateAll();
     }
 
@@ -53,20 +55,21 @@ class MessageModel extends Gdn_Model {
      * @param array|object $message Message data.
      * @return array|object Message data with Location property/key added.
      */
-    public function defineLocation($message) {
-        $controller = val('Controller', $message);
-        $application = val('Application', $message);
-        $method = val('Method', $message);
+    public function defineLocation($message)
+    {
+        $controller = val("Controller", $message);
+        $application = val("Application", $message);
+        $method = val("Method", $message);
 
         if (in_array($controller, $this->_SpecialLocations)) {
-            setValue('Location', $message, $controller);
+            setValue("Location", $message, $controller);
         } else {
-            setValue('Location', $message, $application);
+            setValue("Location", $message, $application);
             if (!stringIsNullOrEmpty($controller)) {
-                setValue('Location', $message, val('Location', $message).'/'.$controller);
+                setValue("Location", $message, val("Location", $message) . "/" . $controller);
             }
             if (!stringIsNullOrEmpty($method)) {
-                setValue('Location', $message, val('Location', $message).'/'.$method);
+                setValue("Location", $message, val("Location", $message) . "/" . $method);
             }
         }
 
@@ -81,7 +84,8 @@ class MessageModel extends Gdn_Model {
      * @param bool $includeSubcategories
      * @return bool
      */
-    protected static function inCategory($needleCategoryID, $haystackCategoryID, $includeSubcategories = false) {
+    protected static function inCategory($needleCategoryID, $haystackCategoryID, $includeSubcategories = false)
+    {
         if (!$haystackCategoryID) {
             return true;
         }
@@ -97,11 +101,11 @@ class MessageModel extends Gdn_Model {
                     break;
                 }
 
-                if ($cat['CategoryID'] == $haystackCategoryID) {
+                if ($cat["CategoryID"] == $haystackCategoryID) {
                     return true;
                 }
 
-                $cat = CategoryModel::categories($cat['ParentCategoryID']);
+                $cat = CategoryModel::categories($cat["ParentCategoryID"]);
             }
         }
 
@@ -116,32 +120,37 @@ class MessageModel extends Gdn_Model {
      * @param null $categoryID
      * @return array|null
      */
-    public function getMessagesForLocation(string $location, array $exceptions = ['[Base]'], $categoryID = null) {
+    public function getMessagesForLocation(string $location, array $exceptions = ["[Base]"], $categoryID = null)
+    {
         $session = Gdn::session();
-        $prefs = $session->getPreference('DismissedMessages', []);
+        $prefs = $session->getPreference("DismissedMessages", []);
 
         $category = null;
         if (!empty($categoryID)) {
             $category = CategoryModel::categories($categoryID);
         }
 
-        $exceptions = array_map('strtolower', $exceptions);
+        $exceptions = array_map("strtolower", $exceptions);
 
         // Get the messages from the cache.
         $messages = self::messages();
         $messagesByID = array_column($messages, null, "MessageID");
         $result = [];
         foreach ($messagesByID as $messageID => $message) {
-            if (in_array($messageID, $prefs) || !$message['Enabled']) {
+            if (in_array($messageID, $prefs) || !$message["Enabled"]) {
                 continue;
             }
 
             $legacyLocationMap = $this->getLocationMap();
-            $visible = strtolower($location) === strtolower($message["LayoutViewType"]) || in_array(strtolower($message["LayoutViewType"]), $exceptions);
+            $visible =
+                strtolower($location) === strtolower($message["LayoutViewType"]) ||
+                in_array(strtolower($message["LayoutViewType"]), $exceptions);
 
-            $visible = $visible && self::inCategory($categoryID, val('RecordID', $message), val('IncludeSubcategories', $message));
+            $visible =
+                $visible &&
+                self::inCategory($categoryID, val("RecordID", $message), val("IncludeSubcategories", $message));
             if ($category !== null) {
-                $visible &= CategoryModel::checkPermission($category, 'Vanilla.Discussions.View');
+                $visible &= CategoryModel::checkPermission($category, "Vanilla.Discussions.View");
             }
 
             if ($visible) {
@@ -156,12 +165,14 @@ class MessageModel extends Gdn_Model {
      *
      * @return array Locations with enabled messages.
      */
-    public function getEnabledLocations() {
+    public function getEnabledLocations()
+    {
         $data = $this->SQL
-            ->select('LayoutViewType')
-            ->from('Message')
-            ->where('Enabled', 1)
-            ->get()->resultArray();
+            ->select("LayoutViewType")
+            ->from("Message")
+            ->where("Enabled", 1)
+            ->get()
+            ->resultArray();
 
         return array_column($data, "LayoutViewType");
     }
@@ -174,7 +185,8 @@ class MessageModel extends Gdn_Model {
      * @param int|null $id ID of message to get.
      * @return array|null
      */
-    public static function messages($id = null) {
+    public static function messages($id = null)
+    {
         $messageModel = \Gdn::getContainer()->get(MessageModel::class);
         if (isset($id)) {
             return $messageModel->getID($id);
@@ -189,14 +201,30 @@ class MessageModel extends Gdn_Model {
      * @param array $where
      * @return mixed
      */
-    public function getMessages($where = []) {
-        $messages = $this->modelCache->getCachedOrHydrate(
-            [__FUNCTION__, "where" => $where],
-            function () use ($where) {
-                return $this->getWhere($where)->resultArray();
-            }
-        );
+    public function getMessages($where = [])
+    {
+        $messages = $this->modelCache->getCachedOrHydrate([__FUNCTION__, "where" => $where], function () use ($where) {
+            return $this->getWhere($where)->resultArray();
+        });
         return $messages;
+    }
+
+    /**
+     * Get the layoutViewTypes that we have messages for.
+     *
+     * @return array
+     */
+    public function getActiveLayoutViewTypes(): array
+    {
+        $layoutViewTypes = $this->modelCache->getCachedOrHydrate([__FUNCTION__], function () {
+            $result = $this->createSql()
+                ->select("LayoutViewType")
+                ->get("Message")
+                ->column("LayoutViewType");
+            $result = array_unique($result);
+            return $result;
+        });
+        return $layoutViewTypes;
     }
 
     /**
@@ -206,8 +234,9 @@ class MessageModel extends Gdn_Model {
      * @param bool $settings
      * @return int|bool The MessageID or false on failure.
      */
-    public function save($formPostValues, $settings = false) {
-        Gdn::cache()->remove('Messages');
+    public function save($formPostValues, $settings = false)
+    {
+        Gdn::cache()->remove("Messages");
 
         $input = $this->normalizeInput($formPostValues);
 
@@ -227,7 +256,8 @@ class MessageModel extends Gdn_Model {
      * @param array $data
      * @return array
      */
-    public function normalizeOutput(array $data): array {
+    public function normalizeOutput(array $data): array
+    {
         $outputData = ArrayUtils::camelCase($data);
         $outputData["moderationMessageID"] = $outputData["messageID"];
         $outputData["body"] = $outputData["content"];
@@ -245,7 +275,8 @@ class MessageModel extends Gdn_Model {
      * @param array $data
      * @return array
      */
-    public function normalizeInput(array $data) {
+    public function normalizeInput(array $data)
+    {
         $inputData = ArrayUtils::pascalCase($data);
 
         if (isset($inputData["ModerationMessageID"])) {
@@ -255,10 +286,13 @@ class MessageModel extends Gdn_Model {
         $inputData["Content"] = $inputData["Body"] ?? $inputData["Content"];
         $inputData["AllowDismiss"] = intval($inputData["IsDismissible"] ?? $inputData["AllowDismiss"]);
         $inputData["Enabled"] = intval($inputData["IsEnabled"] ?? $inputData["Enabled"]);
-        $inputData["IncludeSubcategories"] = intval($inputData["IncludeDescendants"] ?? $inputData["IncludeSubcategories"]);
-        $inputData["AssetTarget"] = ucfirst($inputData['ViewLocation'] ?? $inputData["AssetTarget"]);
-        $inputData["LayoutViewType"] = $inputData["LayoutViewType"] ?? $this->getLocationMap()[$inputData["Location"]] ?? "all";
-        $inputData["RecordID"] = $inputData["RecordID"] ?? $inputData["CategoryID"] ?? null;
+        $inputData["IncludeSubcategories"] = intval(
+            $inputData["IncludeDescendants"] ?? $inputData["IncludeSubcategories"]
+        );
+        $inputData["AssetTarget"] = ucfirst($inputData["ViewLocation"] ?? $inputData["AssetTarget"]);
+        $inputData["LayoutViewType"] =
+            $inputData["LayoutViewType"] ?? ($this->getLocationMap()[$inputData["Location"]] ?? "all");
+        $inputData["RecordID"] = $inputData["RecordID"] ?? ($inputData["CategoryID"] ?? null);
         $inputData["RecordID"] = empty($inputData["RecordID"]) ? null : $inputData["RecordID"];
         $inputData["RecordType"] = $inputData["RecordType"] ?? !is_null($inputData["RecordID"]) ? "category" : null;
 
@@ -270,7 +304,8 @@ class MessageModel extends Gdn_Model {
      *
      * @return Schema
      */
-    public function getPostSchema(): Schema {
+    public function getPostSchema(): Schema
+    {
         $schema = Schema::parse([
             "body:s",
             "format:s" => new \Vanilla\Models\FormatSchema(true),
@@ -285,7 +320,7 @@ class MessageModel extends Gdn_Model {
             "sort:i?",
             "type:s?" => [
                 "enum" => self::MESSAGE_TYPES,
-                "default" => "casual"
+                "default" => "casual",
             ],
             "viewLocation:s" => [
                 "enum" => ["content", "panel"],
@@ -294,12 +329,12 @@ class MessageModel extends Gdn_Model {
         ]);
 
         $schema->addValidator("", function ($data, \Garden\Schema\ValidationField $field): void {
-            if ($data["recordID"] !== null && $data["recordType"] ===  null) {
-                $field->addError("recordType is required when saving a recordID.", ['code' => 403]);
+            if ($data["recordID"] !== null && $data["recordType"] === null) {
+                $field->addError("recordType is required when saving a recordID.", ["code" => 403]);
             }
 
             if ($data["recordType"] !== null && $data["recordID"] === null) {
-                $field->addError("recordID is required when saving a recordType.", ['code' => 403]);
+                $field->addError("recordID is required when saving a recordType.", ["code" => 403]);
             }
         });
 
@@ -311,28 +346,26 @@ class MessageModel extends Gdn_Model {
      *
      * @return Schema
      */
-    public function getIndexSchema(): Schema {
-        $schema = Schema::parse(
-            [
-                "isEnabled:b|n" => ["default" => Gdn::session()->checkPermission("community.moderate") ? null : true],
-                "recordID?" => RangeExpression::createSchema([':int']),
-                "type:s?" => [
-                    "enum" => [
-                        "casual",
-                        "info",
-                        "alert",
-                        "warning",
-                    ],
-                ],
-                "layoutViewType:s?" => [
-                    "enum" => $this->getLayoutViewTypes(),
-                ],
-                "recordType:s?" => ["enum" => ["category"]],
-            ]
-        );
+    public function getIndexSchema(): Schema
+    {
+        $schema = Schema::parse([
+            "isEnabled:b|n" => ["default" => Gdn::session()->checkPermission("community.moderate") ? null : true],
+            "recordID?" => RangeExpression::createSchema([":int"]),
+            "type:s?" => [
+                "enum" => ["casual", "info", "alert", "warning"],
+            ],
+            "layoutViewType:s?" => [
+                "enum" => $this->getLayoutViewTypes(),
+            ],
+            "recordType:s?" => ["enum" => ["category"]],
+        ]);
 
         $schema->addValidator("isEnabled", function ($data, \Garden\Schema\ValidationField $field): void {
-            if (isset($data["isEnabled"]) && $data["isEnabled"] === false && !Gdn::session()->checkPermission('community.moderate')) {
+            if (
+                isset($data["isEnabled"]) &&
+                $data["isEnabled"] === false &&
+                !Gdn::session()->checkPermission("community.moderate")
+            ) {
                 $this->addError("You need the 'community.moderate' permission to view disabled messages.");
             }
         });
@@ -345,7 +378,8 @@ class MessageModel extends Gdn_Model {
      *
      * @return Schema
      */
-    public function getOutputSchema(): Schema {
+    public function getOutputSchema(): Schema
+    {
         return Schema::parse([
             "moderationMessageID:i",
             "body:s",
@@ -371,7 +405,8 @@ class MessageModel extends Gdn_Model {
      *
      * @return Schema
      */
-    public function getNormalizedInputSchema(): Schema {
+    public function getNormalizedInputSchema(): Schema
+    {
         return Schema::parse([
             "MessageID:i?",
             "Content:s",
@@ -383,7 +418,7 @@ class MessageModel extends Gdn_Model {
             "IncludeSubcategories:i",
             "AssetTarget:s",
             "LayoutViewType:s",
-            "Type:s"
+            "Type:s",
         ]);
     }
 
@@ -392,7 +427,8 @@ class MessageModel extends Gdn_Model {
      *
      * @return array
      */
-    public function getLegacyLayoutViews() {
+    public function getLegacyLayoutViews()
+    {
         return $this->layoutService->getLegacyLayoutViews();
     }
 
@@ -401,7 +437,8 @@ class MessageModel extends Gdn_Model {
      *
      * @return array
      */
-    public function getLayoutViewTypes() {
+    public function getLayoutViewTypes()
+    {
         $viewTypes = ["all"];
         foreach ($this->layoutService->getLayoutViews() as $view) {
             $viewTypes[] = $view->getType();
@@ -414,7 +451,8 @@ class MessageModel extends Gdn_Model {
      *
      * @return string[]
      */
-    public function getLocationMap(): array {
+    public function getLocationMap(): array
+    {
         $layoutViews = $this->layoutService->getLegacyLayoutViews();
         $map = ["[Base]" => "all", "[NonAdmin]" => "all"];
         foreach ($layoutViews as $view) {

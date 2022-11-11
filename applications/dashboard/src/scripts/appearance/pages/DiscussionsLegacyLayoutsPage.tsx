@@ -16,17 +16,19 @@ import FoundationLayout from "@dashboard/appearance/previews/FoundationLayout";
 import ModernLayout from "@dashboard/appearance/previews/ModernLayout";
 import TableLayout from "@dashboard/appearance/previews/TableLayout";
 import { LoadStatus } from "@library/@types/api/core";
-import { useConfigsByKeys, useConfigPatcher } from "@library/config/configHooks";
+import { useConfigsByKeys } from "@library/config/configHooks";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { LayoutOption } from "@dashboard/appearance/types";
 import AdminTitleBar from "@dashboard/components/AdminTitleBar";
 import Translate from "@library/content/Translate";
 import SmartLink from "@library/routing/links/SmartLink";
+import { useLegacyLayoutView } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 
 function DiscussionsLegacyLayoutsPage() {
-    const configs = useConfigsByKeys(["discussions.layout"]);
+    const configs = useConfigsByKeys(["discussions.layout", "customLayout.discussionList"]);
+    const isCustomDiscussionList = configs.data?.["customLayout.discussionList"] ?? false;
 
-    const { patchConfig } = useConfigPatcher();
+    const legacyPatcher = useLegacyLayoutView("discussionList", "discussions.layout");
 
     if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(configs.status)) {
         return <Loader />;
@@ -37,9 +39,7 @@ function DiscussionsLegacyLayoutsPage() {
     }
 
     function applyDiscussionsLayout(layout: LayoutOption) {
-        patchConfig({
-            "discussions.layout": layout,
-        });
+        legacyPatcher.putLegacyView(layout);
     }
 
     const editUrl = "/appearance/style-guides";
@@ -51,19 +51,19 @@ function DiscussionsLegacyLayoutsPage() {
                     label: t("Modern Layout"),
                     thumbnailComponent: ModernLayout,
                     onApply: () => applyDiscussionsLayout(LayoutOption.MODERN),
-                    active: configs.data["discussions.layout"] == LayoutOption.MODERN,
+                    active: !isCustomDiscussionList && configs.data["discussions.layout"] == LayoutOption.MODERN,
                 },
                 {
                     label: t("Table Layout"),
                     thumbnailComponent: TableLayout,
                     onApply: () => applyDiscussionsLayout(LayoutOption.TABLE),
-                    active: configs.data["discussions.layout"] == LayoutOption.TABLE,
+                    active: !isCustomDiscussionList && configs.data["discussions.layout"] == LayoutOption.TABLE,
                 },
                 {
                     label: t("Foundation Layout"),
                     thumbnailComponent: FoundationLayout,
                     onApply: () => applyDiscussionsLayout(LayoutOption.FOUNDATION),
-                    active: configs.data["discussions.layout"] == LayoutOption.FOUNDATION,
+                    active: !isCustomDiscussionList && configs.data["discussions.layout"] == LayoutOption.FOUNDATION,
                     editUrl,
                 },
             ]}
@@ -87,7 +87,7 @@ export default function Page() {
                                 "Choose the preferred layout for lists of discussions. You can edit the Foundation Layout. To learn more, see <0/>."
                             }
                             c0={
-                                <SmartLink to={"https://success.vanillaforums.com/kb/articles/430-layout-settings"}>
+                                <SmartLink to={"https://success.vanillaforums.com/kb/articles/430"}>
                                     {t("the documentation")}
                                 </SmartLink>
                             }

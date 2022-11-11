@@ -12,6 +12,7 @@ import { Property } from "csstype";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { Mixins } from "@library/styles/Mixins";
 import { Variables } from "@library/styles/Variables";
+import { css } from "@emotion/css";
 
 export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const makeThemeVars = variableFactory("dataList", forcedVars);
@@ -50,46 +51,62 @@ export const dataListVariables = useThemeCache((forcedVars?: IThemeVariables) =>
 });
 
 export const dataListClasses = useThemeCache((layoutMediaQueries?: { xs: any }) => {
-    const style = styleFactory("dataList");
     const vars = dataListVariables();
     const globalVars = globalVariables();
     const mediaQueries = layoutMediaQueries ?? oneColumnVariables().mediaQueries();
 
-    const root = style({});
+    const root = css({});
 
-    const table = style(
-        "table",
-        {},
-        mediaQueries.xs({
-            ...{
-                "&&": {
-                    display: "block",
-                },
-            },
-        }),
-    );
+    const table = css({
+        "&&": {
+            ...mediaQueries.xs({
+                display: "inline-table",
+            }),
+        },
+    });
 
-    const key = style("key", {
+    const title = css({
+        // Fighting with the _profile styles
+        "&&&&": {
+            ...Mixins.margin({
+                bottom: globalVars.spacer.headingBox,
+            }),
+        },
+    });
+
+    const key = css({
         textAlign: vars.key.textAlignment,
         verticalAlign: "top",
-        whiteSpace: "nowrap",
         fontWeight: globalVars.fonts.weights.bold,
         ...Mixins.padding(vars.key.padding),
     });
 
-    const value = style("value", {
+    const value = css({
         textAlign: vars.key.textAlignment,
         verticalAlign: "top",
         ...Mixins.padding(vars.value.padding),
     });
 
-    const row = style("row", {});
+    const tokenGap = css({
+        display: "flex",
+        gap: globalVars.fonts.size.small,
+    });
+
+    const checkBoxAlignment = css({
+        /**
+         * This is fighting with old classNames and since this instance
+         * is unique its the one that gets the !important
+         */
+        padding: "2px 0 0!important",
+    });
 
     return {
         root,
+        title,
         table,
-        row,
         key,
         value,
+        tokenGap,
+        checkBoxAlignment,
     };
 });

@@ -95,30 +95,26 @@ export function useCarousel(countSlides: number, sliderWidth: number, options: C
         onSwiping(e) {
             const { deltaX, absX, dir } = e;
 
-            //Define how far can user swipes
-            let distanceSwipe: number = 0;
-            const horizontalSwipe: boolean = dir === "Left" || dir === "Right";
-            const halfSwiped: number = (childWidth * toShow) / 4;
+            // If the gesture is horizontal
+            if (["left", "right"].includes(dir.toLowerCase())) {
+                //Define how far can user swipes
+                let distanceSwipe: number = 0;
+                const halfSwiped: number = (childWidth * toShow) / 4;
 
-            if (horizontalSwipe) {
                 if (dir === "Left") {
                     distanceSwipe = state.desiredIndex + toShow >= countSlides ? 0 : halfSwiped;
                 } else if (dir === "Right") {
                     distanceSwipe = state.desiredIndex === 0 ? 0 : halfSwiped;
                 }
-            }
 
-            //skip update
-            if (horizontalSwipe && absX >= distanceSwipe) {
-                // bail out of state update
-                return;
+                if (absX <= distanceSwipe) {
+                    // update swipeable element
+                    let swipedSliderPosition: number = sliderPosition + deltaX;
+                    const translate: string = `translate(${swipedSliderPosition}px, 0px)`;
+                    sliderWrapper.current.children[0].style.WebkitTransform = translate;
+                    sliderWrapper.current.children[0].style.translate = translate;
+                }
             }
-
-            //update swipeable element
-            let swipedSliderPosition: number = sliderPosition + deltaX;
-            const translate: string = `translate(${swipedSliderPosition}px, 0px)`;
-            sliderWrapper.current.children[0].style.WebkitTransform = translate;
-            sliderWrapper.current.children[0].style.translate = translate;
         },
         onSwiped(e) {
             //Stop sliding beyond limits
@@ -210,6 +206,7 @@ export function useCarousel(countSlides: number, sliderWidth: number, options: C
         handlers,
         sliderPosition: clamp(sliderPosition, -maximumOffset, minimumOffset),
     };
+
     useDebugValue({
         result,
         params: {

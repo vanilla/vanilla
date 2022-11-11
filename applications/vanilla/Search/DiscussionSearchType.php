@@ -31,8 +31,8 @@ use Vanilla\Contracts\ConfigurationInterface;
 /**
  * Search record type for a discussion.
  */
-class DiscussionSearchType extends AbstractSearchType {
-
+class DiscussionSearchType extends AbstractSearchType
+{
     /** @var \DiscussionsApiController */
     protected $discussionsApi;
 
@@ -54,7 +54,7 @@ class DiscussionSearchType extends AbstractSearchType {
     /** @var ConfigurationInterface */
     private $config;
 
-    protected $queryFullTextFields = ['name', 'bodyPlainText'];
+    protected $queryFullTextFields = ["name", "bodyPlainText"];
 
     /**
      * DI.
@@ -85,8 +85,9 @@ class DiscussionSearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function getKey(): string {
-        return 'discussion';
+    public function getKey(): string
+    {
+        return "discussion";
     }
 
     /**
@@ -94,42 +95,48 @@ class DiscussionSearchType extends AbstractSearchType {
      *
      * @param SearchTypeQueryExtenderInterface $extender
      */
-    public function registerQueryExtender(SearchTypeQueryExtenderInterface $extender) {
+    public function registerQueryExtender(SearchTypeQueryExtenderInterface $extender)
+    {
         $this->extenders[] = $extender;
     }
 
     /**
      * @inheritdoc
      */
-    public function getRecordType(): string {
-        return 'discussion';
+    public function getRecordType(): string
+    {
+        return "discussion";
     }
 
     /**
      * @inheritdoc
      */
-    public function getType(): string {
-        return 'discussion';
+    public function getType(): string
+    {
+        return "discussion";
     }
 
     /**
      * @return bool
      */
-    public function supportsCollapsing(): bool {
+    public function supportsCollapsing(): bool
+    {
         return true;
     }
 
     /**
      * @return bool
      */
-    public function canBeOptimizedIntoRecordType(): bool {
+    public function canBeOptimizedIntoRecordType(): bool
+    {
         return true;
     }
 
     /**
      * @inheritdoc
      */
-    public function getResultItems(array $recordIDs, SearchQuery $query): array {
+    public function getResultItems(array $recordIDs, SearchQuery $query): array
+    {
         if ($query->supportsExtenders()) {
             foreach ($this->extenders as $extender) {
                 $extender->extendPermissions();
@@ -137,9 +144,9 @@ class DiscussionSearchType extends AbstractSearchType {
         }
         try {
             $results = $this->discussionsApi->index([
-                'discussionID' => implode(",", $recordIDs),
-                'limit' => 100,
-                'expand' => [ModelUtils::EXPAND_CRAWL, 'tagIDs'],
+                "discussionID" => implode(",", $recordIDs),
+                "limit" => 100,
+                "expand" => [ModelUtils::EXPAND_CRAWL, "tagIDs"],
             ]);
             $results = $results->getData();
 
@@ -149,12 +156,14 @@ class DiscussionSearchType extends AbstractSearchType {
 
             $resultItems = array_map(function ($result) {
                 $mapped = ArrayUtils::remapProperties($result, [
-                    'recordID' => 'discussionID',
+                    "recordID" => "discussionID",
                 ]);
-                $mapped['recordType'] = $this->getRecordType();
-                $mapped['type'] = $this->getType();
-                $mapped['legacyType'] = $this->getSingularLabel();
-                $mapped['breadcrumbs'] = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($mapped['categoryID']));
+                $mapped["recordType"] = $this->getRecordType();
+                $mapped["type"] = $this->getType();
+                $mapped["legacyType"] = $this->getSingularLabel();
+                $mapped["breadcrumbs"] = $this->breadcrumbModel->getForRecord(
+                    new ForumCategoryRecordType($mapped["categoryID"])
+                );
                 return new DiscussionSearchResultItem($mapped);
             }, $results);
             return $resultItems;
@@ -167,31 +176,32 @@ class DiscussionSearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function applyToQuery(SearchQuery $query) {
+    public function applyToQuery(SearchQuery $query)
+    {
         if ($query instanceof MysqlSearchQuery) {
             $query->addSql($this->generateSql($query));
         } else {
             $query->addIndex($this->getIndex());
 
-            $locale = $query->getQueryParameter('locale');
+            $locale = $query->getQueryParameter("locale");
 
-            $name = $query->getQueryParameter('name');
+            $name = $query->getQueryParameter("name");
             if ($name) {
-                $query->whereText($name, ['name'], $query::MATCH_FULLTEXT_EXTENDED, $locale);
+                $query->whereText($name, ["name"], $query::MATCH_FULLTEXT_EXTENDED, $locale);
             }
 
-            $allTextQuery = $query->getQueryParameter('query');
+            $allTextQuery = $query->getQueryParameter("query");
             if ($allTextQuery) {
                 $fields = $query->setQueryMatchFields($this->queryFullTextFields);
                 $query->whereText($allTextQuery, $fields, $query::MATCH_FULLTEXT_EXTENDED, $locale);
             }
 
-            if ($discussionID = $query->getQueryParameter('discussionID', false)) {
-                $query->setFilter('DiscussionID', [$discussionID]);
-            };
+            if ($discussionID = $query->getQueryParameter("discussionID", false)) {
+                $query->setFilter("DiscussionID", [$discussionID]);
+            }
             $categoryIDs = $this->getCategoryIDs($query);
             if (!empty($categoryIDs)) {
-                $query->setFilter('CategoryID', $categoryIDs);
+                $query->setFilter("CategoryID", $categoryIDs);
             }
 
             if ($query->supportsExtenders()) {
@@ -201,20 +211,20 @@ class DiscussionSearchType extends AbstractSearchType {
                 }
             }
 
-            if ($query instanceof BoostableSearchQueryInterface && $query->getBoostParameter('discussionRecency')) {
+            if ($query instanceof BoostableSearchQueryInterface && $query->getBoostParameter("discussionRecency")) {
                 $query->startBoostQuery();
-                $query->boostFieldRecency('dateInserted');
+                $query->boostFieldRecency("dateInserted");
                 $query->boostType($this, $this->getBoostValue());
                 $query->endBoostQuery();
             }
 
             // tags
             // Notably includes 0 to still allow other normalized records if set.
-            $tagNames = $query->getQueryParameter('tags', []);
-            $tagIDs = $this->tagModel->getTagIDsByName($tagNames);
-            $tagOp = $query->getQueryParameter('tagOperator', 'or');
+            $tagNames = $query->getQueryParameter("tags", []);
+            $tagIDs = array_values($this->tagModel->getTagIDsByName($tagNames));
+            $tagOp = $query->getQueryParameter("tagOperator", "or");
             if (!empty($tagIDs)) {
-                $query->setFilter('tagIDs', $tagIDs, false, $tagOp);
+                $query->setFilter("tagIDs", $tagIDs, false, $tagOp);
             }
         }
     }
@@ -222,53 +232,56 @@ class DiscussionSearchType extends AbstractSearchType {
     /**
      * @return float|null
      */
-    protected function getBoostValue(): ?float {
-        return $this->config->get('Elastic.Boost.Discussion', 0.5);
+    protected function getBoostValue(): ?float
+    {
+        return $this->config->get("Elastic.Boost.Discussion", 0.5);
     }
 
     /**
      * @inheritdoc
      */
-    public function getSorts(): array {
+    public function getSorts(): array
+    {
         return [];
     }
 
     /**
      * @inheritdoc
      */
-    public function getQuerySchema(): Schema {
+    public function getQuerySchema(): Schema
+    {
         return Schema::parse([
-            'discussionID:i?' => [
-                'x-search-scope' => true,
+            "discussionID:i?" => [
+                "x-search-scope" => true,
             ],
-            'categoryID:i?' => [
-                'x-search-scope' => true,
+            "categoryID:i?" => [
+                "x-search-scope" => true,
             ],
-            'categoryIDs:a?' => [
-                'items' => [
-                    'type' => 'integer',
+            "categoryIDs:a?" => [
+                "items" => [
+                    "type" => "integer",
                 ],
-                'x-search-scope' => true,
+                "x-search-scope" => true,
             ],
-            'followedCategories:b?' => [
-                'x-search-filter' => true,
+            "followedCategories:b?" => [
+                "x-search-filter" => true,
             ],
-            'includeChildCategories:b?' => [
-                'x-search-filter' => true,
+            "includeChildCategories:b?" => [
+                "x-search-filter" => true,
             ],
-            'includeArchivedCategories:b?' => [
-                'x-search-filter' => true,
+            "includeArchivedCategories:b?" => [
+                "x-search-filter" => true,
             ],
-            'tags:a?' => [
-                'items' => [
-                    'type' => 'string',
+            "tags:a?" => [
+                "items" => [
+                    "type" => "string",
                 ],
-                'x-search-filter' => true,
+                "x-search-filter" => true,
             ],
-            'tagOperator:s?' => [
-                'items' => [
-                    'type' => 'string',
-                    'enum' => [SearchQuery::FILTER_OP_OR, SearchQuery::FILTER_OP_AND],
+            "tagOperator:s?" => [
+                "items" => [
+                    "type" => "string",
+                    "enum" => [SearchQuery::FILTER_OP_OR, SearchQuery::FILTER_OP_AND],
                 ],
             ],
         ]);
@@ -277,16 +290,12 @@ class DiscussionSearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function getQuerySchemaExtension(): Schema {
+    public function getQuerySchemaExtension(): Schema
+    {
         return Schema::parse([
             "sort:s?" => [
-                "enum" => [
-                    "score",
-                    "-score",
-                    "hot",
-                    "-hot"
-                ],
-            ]
+                "enum" => ["score", "-score", "hot", "-hot"],
+            ],
         ]);
     }
 
@@ -295,10 +304,11 @@ class DiscussionSearchType extends AbstractSearchType {
      *
      * @return Schema|null
      */
-    public function getBoostSchema(): ?Schema {
+    public function getBoostSchema(): ?Schema
+    {
         return Schema::parse([
-            'discussionRecency:b' => [
-                'default' => true,
+            "discussionRecency:b" => [
+                "default" => true,
             ],
         ]);
     }
@@ -306,16 +316,17 @@ class DiscussionSearchType extends AbstractSearchType {
     /**
      * @inheritdoc
      */
-    public function validateQuery(SearchQuery $query): void {
+    public function validateQuery(SearchQuery $query): void
+    {
         // Validate category IDs.
-        $categoryID = $query->getQueryParameter('categoryID', null);
-        if ($categoryID !== null && !$this->categoryModel::checkPermission($categoryID, 'Vanilla.Discussions.View')) {
-            throw new PermissionException('Vanilla.Discussions.View');
+        $categoryID = $query->getQueryParameter("categoryID", null);
+        if ($categoryID !== null && !$this->categoryModel::checkPermission($categoryID, "Vanilla.Discussions.View")) {
+            throw new PermissionException("Vanilla.Discussions.View");
         }
-        $categoryIDs = $query->getQueryParameter('categoryIDs', null);
+        $categoryIDs = $query->getQueryParameter("categoryIDs", null);
         if ($categoryID !== null && $categoryIDs !== null) {
             $validation = new Validation();
-            $validation->addError('categoryID', 'Only one of categoryID, categoryIDs are allowed.');
+            $validation->addError("categoryID", "Only one of categoryID, categoryIDs are allowed.");
             throw new ValidationException($validation);
         }
     }
@@ -326,58 +337,63 @@ class DiscussionSearchType extends AbstractSearchType {
      * @param MysqlSearchQuery $query
      * @return string
      */
-    public function generateSql(MysqlSearchQuery $query): string {
+    public function generateSql(MysqlSearchQuery $query): string
+    {
         /** @var \Gdn_SQLDriver $db */
         $db = clone $query->getDB();
 
         $categoryIDs = $this->getCategoryIDs($query);
 
         if ($categoryIDs === []) {
-            return '';
+            return "";
         }
 
         // Build base query
-        $db->from('Discussion d')
-            ->select('d.DiscussionID as recordID, d.Name as Title, d.Format, d.CategoryID, d.Score')
-            ->select('d.DiscussionID', "concat('/discussion/', %s)", 'Url')
-            ->select('d.DateInserted')
-            ->select('d.Type as recordType')
-            ->select('d.InsertUserID as UserID')
-            ->select("'discussion'", '', 'type')
-            ->orderBy('d.DateInserted', 'desc')
-        ;
-        if (false !== $query->get('expandBody', null)) {
-            $db->select('d.Body as body');
+        $db->from("Discussion d")
+            ->select("d.DiscussionID as recordID, d.Name as Title, d.Format, d.CategoryID, d.Score")
+            ->select("d.DiscussionID", "concat('/discussion/', %s)", "Url")
+            ->select("d.DateInserted")
+            ->select("d.Type as recordType")
+            ->select("d.InsertUserID as UserID")
+            ->select("'discussion'", "", "type")
+            ->orderBy("d.DateInserted", "desc");
+        if (false !== $query->get("expandBody", null)) {
+            $db->select("d.Body as body");
         }
 
-        $terms = $query->get('query', false);
+        $terms = $query->get("query", false);
         if ($terms) {
-            $terms = $db->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $terms).'%');
+            $terms = $db->quote("%" . str_replace(["%", "_"], ["\%", "\_"], $terms) . "%");
             $db->beginWhereGroup();
-            foreach (['d.Name', 'd.Body'] as $field) {
+            foreach (["d.Name", "d.Body"] as $field) {
                 $db->orWhere("$field like", $terms, true, false);
             }
             $db->endWhereGroup();
         }
 
-        if ($name = $query->get('name', false)) {
-            $db->where('d.Name like', $db->quote('%'.str_replace(['%', '_'], ['\%', '\_'], $name).'%'), true, false);
+        if ($name = $query->get("name", false)) {
+            $db->where(
+                "d.Name like",
+                $db->quote("%" . str_replace(["%", "_"], ["\%", "\_"], $name) . "%"),
+                true,
+                false
+            );
         }
 
-        $this->applyUserIDs($db, $query, 'd');
-        $this->applyDateInsertedSql($db, $query, 'd');
+        $this->applyUserIDs($db, $query, "d");
+        $this->applyDateInsertedSql($db, $query, "d");
 
-        $discussionID = $query->get('discussionID', false);
+        $discussionID = $query->get("discussionID", false);
         if ($discussionID !== false) {
-            $db->where('d.DiscussionID', $discussionID);
+            $db->where("d.DiscussionID", $discussionID);
         }
 
         if (!empty($categoryIDs)) {
-            $db->whereIn('d.CategoryID', $categoryIDs);
+            $db->whereIn("d.CategoryID", $categoryIDs);
         }
 
-        $limit = $query->get('limit', 100);
-        $offset = $query->get('offset', 0);
+        $limit = $query->get("limit", 100);
+        $offset = $query->get("offset", 0);
         $db->limit($limit + $offset);
 
         $sql = $db->getSelect(true);
@@ -393,12 +409,15 @@ class DiscussionSearchType extends AbstractSearchType {
      * @param MysqlSearchQuery $query
      * @param string $tableAlias
      */
-    protected function applyDateInsertedSql(\Gdn_SQLDriver $sql, MysqlSearchQuery $query, string $tableAlias) {
-        $dateInserted = $query->getQueryParameter('dateInserted');
+    protected function applyDateInsertedSql(\Gdn_SQLDriver $sql, MysqlSearchQuery $query, string $tableAlias)
+    {
+        $dateInserted = $query->getQueryParameter("dateInserted");
 
         if ($dateInserted) {
             $schema = new DateFilterSchema();
-            $sql->where(DateFilterSchema::dateFilterField("$tableAlias.DateInserted", $schema->validate($dateInserted)));
+            $sql->where(
+                DateFilterSchema::dateFilterField("$tableAlias.DateInserted", $schema->validate($dateInserted))
+            );
         }
     }
 
@@ -409,14 +428,17 @@ class DiscussionSearchType extends AbstractSearchType {
      * @param MysqlSearchQuery $query
      * @param string $tableAlias
      */
-    protected function applyUserIDs(\Gdn_SQLDriver $sql, MysqlSearchQuery $query, string $tableAlias) {
-        $insertUserIDs = $query->getQueryParameter('insertUserIDs', false);
-        $insertUserNames = $query->getQueryParameter('insertUserNames', false);
+    protected function applyUserIDs(\Gdn_SQLDriver $sql, MysqlSearchQuery $query, string $tableAlias)
+    {
+        $insertUserIDs = $query->getQueryParameter("insertUserIDs", false);
+        $insertUserNames = $query->getQueryParameter("insertUserNames", false);
         if (!$insertUserIDs && $insertUserNames) {
-            $users = $this->userModel->getWhere([
-                'name' => $insertUserNames,
-            ])->resultArray();
-            $insertUserIDs = array_column($users, 'UserID');
+            $users = $this->userModel
+                ->getWhere([
+                    "name" => $insertUserNames,
+                ])
+                ->resultArray();
+            $insertUserIDs = array_column($users, "UserID");
         }
 
         if ($insertUserIDs) {
@@ -430,13 +452,14 @@ class DiscussionSearchType extends AbstractSearchType {
      * @param SearchQuery $query
      * @return array|null
      */
-    protected function getCategoryIDs(SearchQuery $query): ?array {
+    protected function getCategoryIDs(SearchQuery $query): ?array
+    {
         $categoryIDs = $this->categoryModel->getSearchCategoryIDs(
-            $query->getQueryParameter('categoryID'),
-            $query->getQueryParameter('followedCategories'),
-            $query->getQueryParameter('includeChildCategories'),
-            $query->getQueryParameter('includeArchivedCategories'),
-            $query->getQueryParameter('categoryIDs'),
+            $query->getQueryParameter("categoryID"),
+            $query->getQueryParameter("followedCategories"),
+            $query->getQueryParameter("includeChildCategories"),
+            $query->getQueryParameter("includeArchivedCategories"),
+            $query->getQueryParameter("categoryIDs"),
             "Discussion"
         );
         if ($query->supportsExtenders()) {
@@ -454,12 +477,15 @@ class DiscussionSearchType extends AbstractSearchType {
      * @param array $userNames
      * @return array|null
      */
-    protected function getUserIDs(array $userNames): ?array {
+    protected function getUserIDs(array $userNames): ?array
+    {
         if (!empty($userNames)) {
-            $users = $this->userModel->getWhere([
-                'name' => $userNames,
-            ])->resultArray();
-            $userIDs = array_column($users, 'UserID');
+            $users = $this->userModel
+                ->getWhere([
+                    "name" => $userNames,
+                ])
+                ->resultArray();
+            $userIDs = array_column($users, "UserID");
             return $userIDs;
         } else {
             return null;
@@ -469,28 +495,32 @@ class DiscussionSearchType extends AbstractSearchType {
     /**
      * @return string
      */
-    public function getSingularLabel(): string {
-        return \Gdn::translate('Discussion');
+    public function getSingularLabel(): string
+    {
+        return \Gdn::translate("Discussion");
     }
 
     /**
      * @return string
      */
-    public function getPluralLabel(): string {
-        return \Gdn::translate('Discussions');
+    public function getPluralLabel(): string
+    {
+        return \Gdn::translate("Discussions");
     }
 
     /**
      * @inheritdoc
      */
-    public function getDTypes(): ?array {
+    public function getDTypes(): ?array
+    {
         return [0];
     }
 
     /**
      * @inheritdoc
      */
-    public function guidToRecordID(int $guid): ?int {
+    public function guidToRecordID(int $guid): ?int
+    {
         return ($guid - 1) / 10;
     }
 }

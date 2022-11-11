@@ -10,8 +10,8 @@ namespace Vanilla\Scheduler\Auth;
 /**
  * Class AdHocAuth412Exception
  */
-class AdHocAuth412Exception extends AdHocAuthException {
-
+class AdHocAuth412Exception extends AdHocAuthException
+{
     /**
      * AdHocAuth412Exception constructor
      *
@@ -20,9 +20,9 @@ class AdHocAuth412Exception extends AdHocAuthException {
      * @param array $context
      */
     public function __construct(
-        string $message = 'Precondition Failed',
+        string $message = "Precondition Failed",
         int $code = 412,
-        array $context = ['description' => 'AdHocAuth - Missing Token Configuration']
+        array $context = ["description" => "AdHocAuth - Missing Token Configuration"]
     ) {
         parent::__construct($message, $code, $context);
     }

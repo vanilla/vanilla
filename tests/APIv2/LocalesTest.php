@@ -13,19 +13,20 @@ use Vanilla\Contracts\ConfigurationInterface;
  *
  * @package VanillaTests\APIv2
  */
-class LocalesTest extends AbstractAPIv2Test {
-
+class LocalesTest extends AbstractAPIv2Test
+{
     /**
      * @var ConfigurationInterface
      */
     private $configuration;
 
-    protected static $enabledLocales = ['vf_en' => 'en', 'vf_zh' => 'zh'];
+    protected static $enabledLocales = ["vf_en" => "en", "vf_zh" => "zh"];
 
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->configuration = \Gdn::config();
     }
@@ -40,13 +41,12 @@ class LocalesTest extends AbstractAPIv2Test {
      * @dataProvider provideData
      * @return void
      */
-    public function testGet(
-        string $config,
-        string $value,
-        array $expected
-    ): void {
+    public function testGet(string $config, string $value, array $expected): void
+    {
         $this->configuration->saveToConfig($config, $value);
-        $results = $this->api()->get('locales')->getBody();
+        $results = $this->api()
+            ->get("locales")
+            ->getBody();
         $this->assertEqualsCanonicalizing($expected, $results);
         $this->configuration->remove($config);
     }
@@ -54,7 +54,8 @@ class LocalesTest extends AbstractAPIv2Test {
     /**
      * Test that the translations endpoint returns javascript.
      */
-    public function testTranslations() {
+    public function testTranslations()
+    {
         // This should support running in a private community.
         $this->runWithPrivateCommunity(function () {
             $response = $this->api()->get("/locales/en/translations.js");
@@ -66,7 +67,8 @@ class LocalesTest extends AbstractAPIv2Test {
     /**
      * Test that we fetch enabled locales from the index.
      */
-    public function testIndex() {
+    public function testIndex()
+    {
         // This should be accesible in a private community.
         $this->runWithPrivateCommunity(function () {
             $response = $this->api()->get("/locales");
@@ -82,128 +84,122 @@ class LocalesTest extends AbstractAPIv2Test {
      *
      * @return array Data provider.
      */
-    public function provideData(): array {
+    public function provideData(): array
+    {
         return [
             "zh-zh" => [
-                'localeOverrides.zh.zh',
-                '中文1',
+                "localeOverrides.zh.zh",
+                "中文1",
                 [
                     [
-                        'localeID' => 'test_vf_en',
-                        'localeKey' => 'en',
-                        'regionalKey' => 'en',
-                        'displayNames' =>
-                            [
-                                'en' => 'English',
-                                'zh' => '英语',
-                            ]
+                        "localeID" => "test_vf_en",
+                        "localeKey" => "en",
+                        "regionalKey" => "en",
+                        "displayNames" => [
+                            "en" => "English",
+                            "zh" => "英语",
+                        ],
                     ],
                     [
-                        'localeID' => 'test_vf_zh',
-                        'localeKey' => 'zh',
-                        'regionalKey' => 'zh',
-                        'displayNames' =>
-                            [
-                                'en' => 'Chinese',
-                                'zh' => '中文1',
-                            ],
+                        "localeID" => "test_vf_zh",
+                        "localeKey" => "zh",
+                        "regionalKey" => "zh",
+                        "displayNames" => [
+                            "en" => "Chinese",
+                            "zh" => "中文1",
+                        ],
                     ],
                 ],
-                ''
+                "",
             ],
             "en-zh" => [
-                'localeOverrides.en.zh',
-                '中文2',
+                "localeOverrides.en.zh",
+                "中文2",
                 [
                     [
-                        'localeID' => 'test_vf_en',
-                        'localeKey' => 'en',
-                        'regionalKey' => 'en',
-                        'displayNames' =>
-                            [
-                                'en' => 'English',
-                                'zh' => '中文2',
-                            ]
+                        "localeID" => "test_vf_en",
+                        "localeKey" => "en",
+                        "regionalKey" => "en",
+                        "displayNames" => [
+                            "en" => "English",
+                            "zh" => "中文2",
+                        ],
                     ],
                     [
-                        'localeID' => 'test_vf_zh',
-                        'localeKey' => 'zh',
-                        'regionalKey' => 'zh',
-                        'displayNames' =>
-                            [
-                                'en' => 'Chinese',
-                                'zh' => '中文',
-                            ],
+                        "localeID" => "test_vf_zh",
+                        "localeKey" => "zh",
+                        "regionalKey" => "zh",
+                        "displayNames" => [
+                            "en" => "Chinese",
+                            "zh" => "中文",
+                        ],
                     ],
                 ],
-                ''
+                "",
             ],
             "zh-en" => [
-                'localeOverrides.zh.en',
-                '中文3',
+                "localeOverrides.zh.en",
+                "中文3",
                 [
                     [
-                        'localeID' => 'test_vf_en',
-                        'localeKey' => 'en',
-                        'regionalKey' => 'en',
-                        'displayNames' =>
-                            [
-                                'en' => 'English',
-                                'zh' => '英语',
-                            ]
+                        "localeID" => "test_vf_en",
+                        "localeKey" => "en",
+                        "regionalKey" => "en",
+                        "displayNames" => [
+                            "en" => "English",
+                            "zh" => "英语",
+                        ],
                     ],
                     [
-                        'localeID' => 'test_vf_zh',
-                        'localeKey' => 'zh',
-                        'regionalKey' => 'zh',
-                        'displayNames' =>
-                            [
-                                'en' => '中文3',
-                                'zh' => '中文',
-                            ],
+                        "localeID" => "test_vf_zh",
+                        "localeKey" => "zh",
+                        "regionalKey" => "zh",
+                        "displayNames" => [
+                            "en" => "中文3",
+                            "zh" => "中文",
+                        ],
                     ],
                 ],
-                ''
+                "",
             ],
             "Override-all" => [
-                'localeOverrides.zh.*',
-                '中文4',
+                "localeOverrides.zh.*",
+                "中文4",
                 [
                     [
-                        'localeID' => 'test_vf_en',
-                        'localeKey' => 'en',
-                        'regionalKey' => 'en',
-                        'displayNames' =>
-                            [
-                                'en' => 'English',
-                                'zh' => '英语',
-                            ],
+                        "localeID" => "test_vf_en",
+                        "localeKey" => "en",
+                        "regionalKey" => "en",
+                        "displayNames" => [
+                            "en" => "English",
+                            "zh" => "英语",
+                        ],
                     ],
                     [
-                        'localeID' => 'test_vf_zh',
-                        'localeKey' => 'zh',
-                        'regionalKey' => 'zh',
-                        'displayNames' =>
-                            [
-                                'en' => '中文4',
-                                'zh' => '中文4',
-                            ],
-                    ]
-                ]
-            ]
+                        "localeID" => "test_vf_zh",
+                        "localeKey" => "zh",
+                        "regionalKey" => "zh",
+                        "displayNames" => [
+                            "en" => "中文4",
+                            "zh" => "中文4",
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
     /**
      * Test that event-based locale definitions are applied to the translations API.
      */
-    public function testTranslationsWithExtras() {
+    public function testTranslationsWithExtras()
+    {
         $before = $this->api->get("/locales/en/translations")->getBody();
-        $this->assertArrayNotHasKey('foo', $before);
+        $this->assertArrayNotHasKey("foo", $before);
         \Gdn::eventManager()->bindClass($this);
 
         $after = $this->api->get("/locales/en/translations")->getBody();
-        $this->assertEquals('bar', $after['foo']);
+        $this->assertEquals("bar", $after["foo"]);
     }
 
     /**
@@ -211,11 +207,12 @@ class LocalesTest extends AbstractAPIv2Test {
      *
      * @param \Gdn_Locale $locale
      */
-    public function gdn_locale_afterSet_handler(\Gdn_Locale $locale) {
+    public function gdn_locale_afterSet_handler(\Gdn_Locale $locale)
+    {
         $translations = [
-            'foo' => 'bar',
+            "foo" => "bar",
         ];
 
-        $locale->LocaleContainer->loadArray($translations, 'ClientLocale', 'Definition', true);
+        $locale->LocaleContainer->loadArray($translations, "ClientLocale", "Definition", true);
     }
 }

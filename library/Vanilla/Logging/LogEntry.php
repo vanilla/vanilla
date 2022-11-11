@@ -12,8 +12,8 @@ use Vanilla\Logger;
 /**
  * Simple class for representing a log entry.
  */
-class LogEntry {
-
+class LogEntry
+{
     /** @var string */
     private $level;
 
@@ -30,11 +30,12 @@ class LogEntry {
      * @param string $message
      * @param array $context
      */
-    public function __construct(string $level, string $message, array $context = []) {
+    public function __construct(string $level, string $message, array $context = [])
+    {
         $this->level = $level;
         $this->message = $message;
         $this->context = $context + [
-            Logger::FIELD_EVENT => '',
+            Logger::FIELD_EVENT => "",
             Logger::FIELD_CHANNEL => Logger::CHANNEL_APPLICATION,
         ];
     }
@@ -66,7 +67,8 @@ class LogEntry {
      *
      * @return string
      */
-    public function getLevel(): string {
+    public function getLevel(): string
+    {
         return $this->level;
     }
 
@@ -76,7 +78,8 @@ class LogEntry {
      * @param string $level
      * @return self
      */
-    public function withLevel(string $level): self {
+    public function withLevel(string $level): self
+    {
         return new static($level, $this->getMessage(), $this->getContext());
     }
 
@@ -85,7 +88,8 @@ class LogEntry {
      *
      * @return string
      */
-    public function getMessage(): string {
+    public function getMessage(): string
+    {
         return $this->message;
     }
 
@@ -95,7 +99,8 @@ class LogEntry {
      * @param string $message
      * @return self
      */
-    public function withMessage(string $message): self {
+    public function withMessage(string $message): self
+    {
         return new static($this->getLevel(), $message, $this->getContext());
     }
 
@@ -104,7 +109,8 @@ class LogEntry {
      *
      * @return array
      */
-    public function getContext(): array {
+    public function getContext(): array
+    {
         return $this->context;
     }
 
@@ -114,7 +120,8 @@ class LogEntry {
      * @param array $context
      * @return self
      */
-    public function withContext(array $context): self {
+    public function withContext(array $context): self
+    {
         return new static($this->getLevel(), $this->getMessage(), $context);
     }
 
@@ -125,7 +132,8 @@ class LogEntry {
      * @param mixed $value
      * @return self
      */
-    public function withContextItem(string $key, $value): self {
+    public function withContextItem(string $key, $value): self
+    {
         $context = $this->context;
         $context[$key] = $value;
         return $this->withContext($context);
@@ -136,8 +144,9 @@ class LogEntry {
      *
      * @return string
      */
-    public function getEvent(): string {
-        return $this->context[Logger::FIELD_EVENT] ?? '';
+    public function getEvent(): string
+    {
+        return $this->context[Logger::FIELD_EVENT] ?? "";
     }
 
     /**
@@ -146,7 +155,8 @@ class LogEntry {
      * @param string $event
      * @return self
      */
-    public function withEvent(string $event): self {
+    public function withEvent(string $event): self
+    {
         return $this->withContextItem(Logger::FIELD_EVENT, $event);
     }
 
@@ -155,7 +165,8 @@ class LogEntry {
      *
      * @return string
      */
-    public function getChannel(): string {
+    public function getChannel(): string
+    {
         return $this->context[Logger::FIELD_CHANNEL] ?? Logger::CHANNEL_APPLICATION;
     }
 
@@ -165,7 +176,8 @@ class LogEntry {
      * @param string $channel
      * @return self
      */
-    public function withChannel(string $channel): self {
+    public function withChannel(string $channel): self
+    {
         return $this->withContextItem(Logger::FIELD_CHANNEL, $channel);
     }
 
@@ -174,7 +186,8 @@ class LogEntry {
      *
      * @param LoggerInterface $logger
      */
-    public function log(LoggerInterface $logger) {
+    public function log(LoggerInterface $logger)
+    {
         $logger->log($this->getLevel(), $this->getMessage(), $this->getContext());
     }
 }

@@ -16,25 +16,31 @@ use VanillaTests\VanillaTestCase;
 /**
  * Verify basic behavior of the BlotPointerTextFragment class.
  */
-class BlotPointerTextFragmentTest extends VanillaTestCase {
-
+class BlotPointerTextFragmentTest extends VanillaTestCase
+{
     use BootstrapTrait, SetupTraitsTrait;
 
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         $this->setUpTestTraits();
     }
 
     /**
      * Verify ability to get the pointer's blot content and that it matches the blot.
      */
-    public function testGetInnerContent(): void {
+    public function testGetInnerContent(): void
+    {
         $expected = "bar";
-        $blot = new TextBlot([
-            "data" => ["foo" => $expected],
-        ], [], []);
+        $blot = new TextBlot(
+            [
+                "data" => ["foo" => $expected],
+            ],
+            [],
+            []
+        );
 
         $pointer = new BlotPointerTextFragment($blot, "data.foo");
 
@@ -45,11 +51,16 @@ class BlotPointerTextFragmentTest extends VanillaTestCase {
     /**
      * Verify ability to set the inner content of a blot via the pointer.
      */
-    public function testSetInnerContent(): void {
+    public function testSetInnerContent(): void
+    {
         $expected = "baz";
-        $blot = new TextBlot([
-            "data" => ["foo" => "bar"],
-        ], [], []);
+        $blot = new TextBlot(
+            [
+                "data" => ["foo" => "bar"],
+            ],
+            [],
+            []
+        );
 
         $pointer = new BlotPointerTextFragment($blot, "data.foo");
         $pointer->setInnerContent($expected);
@@ -61,11 +72,16 @@ class BlotPointerTextFragmentTest extends VanillaTestCase {
     /**
      * Verify ability to retrieve fragment type from a blot pointer.
      */
-    public function testGetFragmentType(): void {
+    public function testGetFragmentType(): void
+    {
         $expected = TextFragmentType::URL;
-        $blot = new TextBlot([
-            "data" => ["foo" => "bar"],
-        ], [], []);
+        $blot = new TextBlot(
+            [
+                "data" => ["foo" => "bar"],
+            ],
+            [],
+            []
+        );
 
         $pointer = new BlotPointerTextFragment($blot, "data.foo", $expected);
         $this->assertSame($expected, $pointer->getFragmentType());

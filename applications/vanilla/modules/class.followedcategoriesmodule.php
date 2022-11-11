@@ -11,8 +11,8 @@
 /**
  * Renders the followed categories.
  */
-class FollowedCategoriesModule extends Gdn_Module {
-
+class FollowedCategoriesModule extends Gdn_Module
+{
     /** @var int Count of categories to display. */
     public $limit;
 
@@ -36,9 +36,10 @@ class FollowedCategoriesModule extends Gdn_Module {
      *
      * @param int $limit Count of categories to display.
      */
-    public function __construct($limit = 5) {
-        parent::__construct('');
-        $this->_ApplicationFolder = 'vanilla';
+    public function __construct($limit = 5)
+    {
+        parent::__construct("");
+        $this->_ApplicationFolder = "vanilla";
         $this->limit = $limit;
         $this->categoryModel = CategoryModel::instance();
     }
@@ -48,16 +49,18 @@ class FollowedCategoriesModule extends Gdn_Module {
      *
      * @return string
      */
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
     /**
      * Get the data for this module.
      */
-    protected function getData() {
+    protected function getData()
+    {
         // Allow plugins to set different data.
-        $this->fireEvent('GetData');
+        $this->fireEvent("GetData");
         if ($this->Data) {
             return;
         }
@@ -69,7 +72,7 @@ class FollowedCategoriesModule extends Gdn_Module {
         $userCategories = $this->categoryModel->getFollowed($userId);
         $followedCategories = [];
         foreach ($userCategories as $userCategory) {
-            $followedCategories[] = CategoryModel::categories($userCategory['CategoryID']);
+            $followedCategories[] = CategoryModel::categories($userCategory["CategoryID"]);
         }
         $this->Data = new Gdn_DataSet($followedCategories, DATASET_TYPE_ARRAY);
         $this->hasMoreResult = count($userCategories) > $this->limit;
@@ -81,7 +84,8 @@ class FollowedCategoriesModule extends Gdn_Module {
      *
      * @return string
      */
-    public function toString() {
+    public function toString()
+    {
         if (!$this->Data) {
             $this->getData();
         }

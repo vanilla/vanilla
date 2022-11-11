@@ -52,7 +52,7 @@ export default class KeyboardBindings {
     }
 
     /**
-     * Special handling for the ENTER key for Mutliline Blots.
+     * Special handling for the ENTER key for Multiline Blots.
      *
      * @if
      * If there is 1 trailing newline line after the first line,
@@ -369,7 +369,7 @@ export default class KeyboardBindings {
      * Add keyboard options.bindings that allow the user to
      */
     private addBlockNewLineHandlers() {
-        this.bindings["MutliLine Enter"] = {
+        this.bindings["MultiLine Enter"] = {
             key: KeyboardModule.keys.ENTER,
             collapsed: true,
             format: ["spoiler-line", "blockquote-line"],

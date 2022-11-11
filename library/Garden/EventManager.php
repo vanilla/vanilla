@@ -19,13 +19,14 @@ use Vanilla\Contracts\Addons\EventListenerConfigInterface;
  * Addons can create callbacks that bind to events which are called throughout the code to allow extension of the
  * application and framework.
  */
-class EventManager implements EventDispatcherInterface, ListenerProviderInterface, EventListenerConfigInterface {
+class EventManager implements EventDispatcherInterface, ListenerProviderInterface, EventListenerConfigInterface
+{
     const PRIORITY_LOW = 10;
     const PRIORITY_NORMAL = 100;
     const PRIORITY_HIGH = 1000;
     const PRIORITY_MAX = 1000000;
 
-    const EVENT_META = 'meta';
+    const EVENT_META = "meta";
 
     /**
      * @var ContainerInterface An IOC container to create lazy objects.
@@ -52,7 +53,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      *
      * @param ContainerInterface|null $container The container used to fetch lazy classes.
      */
-    public function __construct(ContainerInterface $container = null) {
+    public function __construct(ContainerInterface $container = null)
+    {
         $this->container = $container;
     }
 
@@ -63,7 +65,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param callable $callback The callback of the event.
      * @param int $priority The priority of the event.
      */
-    public function bind($event, callable $callback, $priority = EventManager::PRIORITY_NORMAL) {
+    public function bind($event, callable $callback, $priority = EventManager::PRIORITY_NORMAL)
+    {
         $this->bindInternal($event, $callback, $priority);
     }
 
@@ -74,14 +77,15 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param callable|LazyEventHandler $callback The callback of the event.
      * @param int $priority The priority of the event.
      */
-    private function bindInternal($event, $callback, $priority = EventManager::PRIORITY_NORMAL) {
+    private function bindInternal($event, $callback, $priority = EventManager::PRIORITY_NORMAL)
+    {
         if ($priority > self::PRIORITY_MAX) {
-            trigger_error("Events cannot have a priority greater than ".self::PRIORITY_MAX.'.', E_USER_NOTICE);
+            trigger_error("Events cannot have a priority greater than " . self::PRIORITY_MAX . ".", E_USER_NOTICE);
             $priority = self::PRIORITY_MAX;
         }
 
         $event = strtolower($event);
-        $sortKey = (self::PRIORITY_MAX - $priority).'e'.$this->count;
+        $sortKey = self::PRIORITY_MAX - $priority . "e" . $this->count;
         $this->handlers[$event][$sortKey] = $callback;
         $this->toSort[$event] = true;
         $this->count++;
@@ -93,10 +97,11 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param string $event The name of the event to unbind.
      * @param callable $callback The event handler to remove.
      */
-    public function unbind($event, callable $callback) {
+    public function unbind($event, callable $callback)
+    {
         $event = strtolower($event);
 
-        if (!empty($this->handlers[$event]) && $index = array_search($callback, $this->handlers[$event], true)) {
+        if (!empty($this->handlers[$event]) && ($index = array_search($callback, $this->handlers[$event], true))) {
             unset($this->handlers[$event][$index]);
         }
     }
@@ -104,7 +109,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
     /**
      * Unbind all event handlers.
      */
-    public function unbindAll() {
+    public function unbindAll()
+    {
         $this->handlers = [];
     }
 
@@ -130,7 +136,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param int $priority The priority of the event.
      * @throws \InvalidArgumentException Throws an exception when binding to a class name with no `instance()` method.
      */
-    public function bindClass($class, $priority = EventManager::PRIORITY_NORMAL) {
+    public function bindClass($class, $priority = EventManager::PRIORITY_NORMAL)
+    {
         $psrEventMethods = [];
         if (is_a($class, PsrEventHandlersInterface::class, true)) {
             $psrEventMethods = $class::getPsrEventHandlerMethods();
@@ -141,31 +148,45 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
             $this->addListenerMethod($className, $psrEventMethod);
         }
 
-        $methodNames = get_class_methods($class);
+        $cachedClassMethods = null;
+        $cacheKey = "class.methods." . $className;
+        if (function_exists("apcu_fetch")) {
+            $cachedClassMethods = apcu_fetch($cacheKey);
+        }
+
+        if (!$cachedClassMethods) {
+            $cachedClassMethods = get_class_methods($className);
+            if (function_exists("apcu_store")) {
+                apcu_store($cacheKey, $cachedClassMethods, 5);
+            }
+        }
+
+        $methodNames = $cachedClassMethods;
 
         foreach ($methodNames as $method) {
             if (in_array($method, $psrEventMethods)) {
                 continue;
             }
 
-            if (strpos($method, '_') == false) { // == instead of === filters out methods starting with _
+            if (strpos($method, "_") == false) {
+                // == instead of === filters out methods starting with _
                 continue;
             }
 
             $method = strtolower($method);
-            $suffix = strrchr($method, '_');
+            $suffix = strrchr($method, "_");
             $basename = substr($method, 0, -strlen($suffix));
             switch ($suffix) {
-                case '_handler':
-                case '_override':
+                case "_handler":
+                case "_override":
                     $eventName = $basename;
                     break;
-                case '_create':
-                case '_method':
-                    $eventName = $basename.'_method';
+                case "_create":
+                case "_method":
+                    $eventName = $basename . "_method";
                     break;
-                case '_before':
-                case '_after':
+                case "_before":
+                case "_after":
                 default:
                     $eventName = $method;
                     break;
@@ -186,10 +207,15 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      *
      * @param string|object $class The name of the class to unbind.
      */
-    public function unbindClass($class) {
+    public function unbindClass($class)
+    {
         foreach ($this->handlers as $event => $handlers) {
             foreach ($handlers as $key => $handler) {
-                if ($handler instanceof LazyEventHandler && is_string($class) && strcasecmp($handler->class, $class) === 0) {
+                if (
+                    $handler instanceof LazyEventHandler &&
+                    is_string($class) &&
+                    strcasecmp($handler->class, $class) === 0
+                ) {
                     unset($this->handlers[$event][$key]);
                     continue;
                 }
@@ -219,7 +245,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param string $method The name of the method to call.
      * @param int $priority The priority of the event.
      */
-    public function bindLazy($event, $class, $method, $priority = EventManager::PRIORITY_NORMAL) {
+    public function bindLazy($event, $class, $method, $priority = EventManager::PRIORITY_NORMAL)
+    {
         $this->bindInternal($event, new LazyEventHandler($class, $method), $priority);
     }
 
@@ -229,12 +256,13 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param string|object $class The name of the class or a class instance.
      * @return string Returns the base name as a string.
      */
-    public static function classBasename($class) {
+    public static function classBasename($class)
+    {
         if (is_object($class)) {
             $class = get_class($class);
         }
 
-        if (($i = strrpos($class, '\\')) !== false) {
+        if (($i = strrpos($class, "\\")) !== false) {
             $result = substr($class, $i + 1);
         } else {
             $result = $class;
@@ -248,7 +276,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param string $event The name of the event.
      * @return bool Returns **true** if the event has at least one handler, **false** otherwise.
      */
-    public function hasHandler($event) {
+    public function hasHandler($event)
+    {
         return !empty($this->handlers[strtolower($event)]);
     }
 
@@ -260,7 +289,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param mixed ...$args The event arguments.
      * @return mixed|null Returns the result of the event handler or **null** if no event handler was found.
      */
-    public function fireClass($class, $event, ...$args) {
+    public function fireClass($class, $event, ...$args)
+    {
         $handlers = $this->getHandlers($event);
 
         if (empty($handlers)) {
@@ -286,17 +316,13 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param mixed ...$args Any arguments to pass along to the event handlers.
      * @return array Returns the result of the event handlers where each handler's result is an item in the array.
      */
-    public function fire($event, ...$args) {
+    public function fire($event, ...$args)
+    {
         $handlers = $this->getHandlers($event);
 
         if (empty($handlers) && empty($this->handlers[self::EVENT_META])) {
             return [];
         }
-
-        // Do some backwards compatible kludges here.
-//        if (count($args) === 1 && is_object($args[0]) && property_exists($args[0], 'EventArguments')) {
-//            $args[] = $args[0]->EventArguments;
-//        }
 
         $result = [];
         foreach ($handlers as $callback) {
@@ -321,7 +347,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param mixed ...$args Any arguments to pass along to the event handlers.
      * @return array Returns the result of the event handlers.
      */
-    public function fireDeprecated($event, ...$args) {
+    public function fireDeprecated($event, ...$args)
+    {
         if ($this->hasHandler($event)) {
             trigger_error("The $event event is deprecated.", E_USER_DEPRECATED);
             return $this->fire($event, ...$args);
@@ -334,7 +361,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      *
      * @return array Returns all the handlers.
      */
-    public function getAllHandlers() {
+    public function getAllHandlers()
+    {
         return $this->handlers;
     }
 
@@ -344,7 +372,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param string $name The name of the event.
      * @return array Returns the handlers that are watching {@link $name}.
      */
-    public function getHandlers($name) {
+    public function getHandlers($name)
+    {
         $name = strtolower($name);
 
         if (!isset($this->handlers[$name])) {
@@ -375,8 +404,9 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      *
      * @param array &$handlers The event handler array.
      */
-    public function sortHandlers(array &$handlers) {
-        uksort($handlers, 'strnatcasecmp');
+    public function sortHandlers(array &$handlers)
+    {
+        uksort($handlers, "strnatcasecmp");
     }
 
     /**
@@ -392,7 +422,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param array $args The arguments being called with the event.
      * @param mixed $result The result of the call.
      */
-    private function callMetaHandlers($event, array $args, $result) {
+    private function callMetaHandlers($event, array $args, $result)
+    {
         $metaHandlers = $this->getHandlers(self::EVENT_META);
         foreach ($metaHandlers as $metaHandler) {
             call_user_func($metaHandler, $event, $args, $result);
@@ -410,7 +441,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param array $args Any arguments the event takes.
      * @return mixed The result of the chained event or `$value` if there were no handlers.
      */
-    public function fireFilter($event, $value, ...$args) {
+    public function fireFilter($event, $value, ...$args)
+    {
         $handlers = $this->getHandlers($event);
         if (empty($handlers) && empty($this->handlers[self::EVENT_META])) {
             return $value; // gotcha, return value
@@ -439,7 +471,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      * @param array $args The arguments for the event handlers.
      * @return mixed Returns the result of the last event handler.
      */
-    public function fireArray($event, $args = []) {
+    public function fireArray($event, $args = [])
+    {
         $handlers = $this->getHandlers($event);
 
         if (empty($handlers) && empty($this->handlers[self::EVENT_META])) {
@@ -465,7 +498,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      *
      * @return ContainerInterface Returns the container.
      */
-    public function getContainer() {
+    public function getContainer()
+    {
         return $this->container;
     }
 
@@ -476,7 +510,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
      *
      * @return EventManager Returns `$this` for fluent calls.
      */
-    public function setContainer($container) {
+    public function setContainer($container)
+    {
         $this->container = $container;
         return $this;
     }
@@ -484,7 +519,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
     /**
      * {@inheritDoc}
      */
-    public function dispatch(object $event) {
+    public function dispatch(object $event)
+    {
         $listeners = $this->getListenersForEvent($event);
         foreach ($listeners as $listener) {
             $event = $listener($event);
@@ -499,7 +535,8 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
     /**
      * {@inheritDoc}
      */
-    public function getListenersForEvent(object $event): iterable {
+    public function getListenersForEvent(object $event): iterable
+    {
         // Get handlers for the class and its inherited classes.
         $class = new \ReflectionClass($event);
         do {
@@ -517,11 +554,12 @@ class EventManager implements EventDispatcherInterface, ListenerProviderInterfac
     /**
      * {@inheritDoc}
      */
-    public function addListenerMethod(string $class, string $method): EventListenerConfigInterface {
+    public function addListenerMethod(string $class, string $method): EventListenerConfigInterface
+    {
         $method = new \ReflectionMethod($class, $method);
         $params = $method->getParameters();
-        if (count($params) === 0 || null === $rType = $params[0]->getType()) {
-            throw new \InvalidArgumentException('Listeners must declare an object type they can accept.');
+        if (count($params) === 0 || null === ($rType = $params[0]->getType())) {
+            throw new \InvalidArgumentException("Listeners must declare an object type they can accept.");
         }
         $type = $rType->getName();
 

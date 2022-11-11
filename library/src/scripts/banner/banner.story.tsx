@@ -309,7 +309,7 @@ export const ImageAsElement = storyWithConfig(
                 },
                 outerBackground: {
                     color: "#FFF6F5",
-                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                    unsetBackground: true,
                 },
                 description: {
                     font: {
@@ -317,8 +317,7 @@ export const ImageAsElement = storyWithConfig(
                     },
                 },
                 rightImage: {
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                    image: "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 padding: {
                     top: 87,
@@ -368,7 +367,7 @@ export const LogoLarge = storyWithConfig(
                 },
                 outerBackground: {
                     color: "#FFF6F5",
-                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                    unsetBackground: true,
                 },
                 description: {
                     font: {
@@ -419,7 +418,7 @@ export const LogoSmall = storyWithConfig(
                 },
                 outerBackground: {
                     color: "#FFF6F5",
-                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                    unsetBackground: true,
                 },
                 description: {
                     font: {
@@ -469,7 +468,7 @@ export const LogoAndRightImage = storyWithConfig(
                 },
                 outerBackground: {
                     color: "#FFF6F5",
-                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                    unsetBackground: true,
                 },
                 description: {
                     font: {
@@ -477,8 +476,7 @@ export const LogoAndRightImage = storyWithConfig(
                     },
                 },
                 rightImage: {
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                    image: "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 logo: {
                     width: 150,
@@ -524,7 +522,7 @@ export const ImageAsElementWide = storyWithConfig(
                 },
                 outerBackground: {
                     color: "#FFF6F5",
-                    image: "linear-gradient(215.7deg, #FFFDFC 16.08%, #FFF6F5 63.71%), #C4C4C4",
+                    unsetBackground: true,
                 },
                 description: {
                     font: {
@@ -532,8 +530,7 @@ export const ImageAsElementWide = storyWithConfig(
                     },
                 },
                 rightImage: {
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                    image: "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 padding: {
                     top: 87,
@@ -593,8 +590,7 @@ export const SearchShadowNoSearchButton = storyWithConfig(
                     alignment: BannerAlignment.LEFT,
                 },
                 rightImage: {
-                    image:
-                        "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
+                    image: "https://user-images.githubusercontent.com/1770056/73629535-7fc98600-4621-11ea-8f0b-06b21dbd59e3.png",
                 },
                 padding: {
                     top: 87,

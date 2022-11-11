@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -21,7 +21,7 @@ import { Variables } from "@library/styles/Variables";
 import { t } from "@vanilla/i18n";
 import { useMeasure } from "@vanilla/react-utils";
 import classNames from "classnames";
-import React, { ReactNode, useMemo, useRef } from "react";
+import React, { ReactNode, useRef } from "react";
 
 export interface IHomeWidgetContainerProps {
     options?: IHomeWidgetContainerOptions;
@@ -31,37 +31,37 @@ export interface IHomeWidgetContainerProps {
     description?: string;
     titleCount?: string;
     contentIsListWithSeparators?: boolean;
+    extraHeader?: React.ReactNode;
 }
 
 export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
-    const vars = homeWidgetContainerVariables(props.options);
-    const { options } = vars;
-    const classes = homeWidgetContainerClasses(props.options);
+    const { options } = homeWidgetContainerVariables(props.options);
+    let { children: content } = props;
+    const classes = homeWidgetContainerClasses(options);
     const widgetClasses = useWidgetSectionClasses();
 
-    let content = props.children;
     if (options.displayType === WidgetContainerDisplayType.CAROUSEL) {
         content = (
             <Carousel maxSlidesToShow={options.maxColumnCount} carouselTitle={props.title}>
-                {props.children}
+                {content}
             </Carousel>
         );
     } else if (options.displayType) {
-        content = <HomeWidgetGridContainer {...props}>{props.children}</HomeWidgetGridContainer>;
+        content = <HomeWidgetGridContainer {...props}>{content}</HomeWidgetGridContainer>;
     }
 
     let viewAllLinkOrButton: ReactNode;
 
-    if (options?.viewAll) {
+    if (options.viewAll) {
         const label = t(options?.viewAll?.name ?? "View All");
-        if (options?.viewAll.onClick) {
+        if (options.viewAll.onClick) {
             viewAllLinkOrButton = (
                 <Button onClick={options?.viewAll?.onClick} buttonType={options.viewAll.displayType}>
                     {label}
                 </Button>
             );
         }
-        if (options?.viewAll.to) {
+        if (options.viewAll.to) {
             viewAllLinkOrButton = (
                 <LinkAsButton to={options?.viewAll?.to} buttonType={options.viewAll.displayType}>
                     {label}
@@ -96,18 +96,19 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                     <div className={classes.container}>
                         <PageHeadingBox
                             title={props.title}
-                            actions={options.viewAll.position === "top" && viewAllLinkOrButton}
+                            actions={options.viewAll!.position === "top" && viewAllLinkOrButton}
                             description={props.description ?? options.description}
                             subtitle={props.subtitle ?? options?.subtitle?.content}
                             options={{
-                                subtitleType: options.subtitle.type,
+                                subtitleType: options.subtitle!.type,
                                 alignment: options.headerAlignment,
                             }}
                             titleCount={props.titleCount}
                         />
+                        {props.extraHeader}
                         <div className={classes.content}>
                             <div className={classes.itemWrapper}>{content}</div>
-                            {viewAllLinkOrButton && options.viewAll.position === "bottom" && (
+                            {viewAllLinkOrButton && options.viewAll!.position === "bottom" && (
                                 <div className={classes.viewAllContainer}>{viewAllLinkOrButton}</div>
                             )}
                         </div>

@@ -10,8 +10,8 @@ namespace Vanilla\Widgets\React;
 /**
  * Interface for something that can tag a group of props.
  */
-interface CombinedPropsWidgetInterface {
-
+interface CombinedPropsWidgetInterface
+{
     /**
      * Set the props of a react component.
      *

@@ -29,7 +29,13 @@
                 echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.t('Name Unavailable').'</span>';
                 ?>
             </li>
-            <?php $this->fireEvent('RegisterBeforePassword'); ?>
+            <?php
+                $this->fireEvent('RegisterBeforePassword');
+                //if we have custom profile fields for the user, we need to render them
+                if ($this->hasCustomProfileFields()) {
+                    $this->generateFormCustomProfileFields();
+                }
+            ?>
             <li>
                 <?php
                 echo $this->Form->label('Password', 'Password');

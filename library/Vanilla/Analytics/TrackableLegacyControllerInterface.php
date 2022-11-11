@@ -7,10 +7,10 @@
 namespace Vanilla\Analytics;
 
 /**
-* For tracking groups/events.
-*/
-interface TrackableLegacyControllerInterface {
-
+ * For tracking groups/events.
+ */
+interface TrackableLegacyControllerInterface
+{
     /**
      * Get trackable data from groups/events.
      *

@@ -13,13 +13,13 @@
  * Handle the creation, usage, and deletion of file cache entries which map paths
  * to locale files.
  */
-class Gdn_LibraryMap {
+class Gdn_LibraryMap
+{
+    /** Sprintf format string that describes the on-disk name of the mapping caches. */
+    const DISK_CACHE_NAME_FORMAT = "%s_map.ini";
 
     /** Sprintf format string that describes the on-disk name of the mapping caches. */
-    const DISK_CACHE_NAME_FORMAT = '%s_map.ini';
-
-    /** Sprintf format string that describes the on-disk name of the mapping caches. */
-    const CACHE_CACHE_NAME_FORMAT = 'garden.librarymap.%s';
+    const CACHE_CACHE_NAME_FORMAT = "garden.librarymap.%s";
 
     /** @var array Holds the in-memory array of cache entries. */
     public static $Caches;
@@ -33,45 +33,44 @@ class Gdn_LibraryMap {
      * @param string $cacheMode An optional mode of the cache. Defaults to flat.
      * @return void
      */
-    public static function prepareCache($cacheName, $existingCacheArray = null, $cacheMode = 'flat') {
+    public static function prepareCache($cacheName, $existingCacheArray = null, $cacheMode = "flat")
+    {
         // Onetime initialization of in-memory file cache
         if (!is_array(self::$Caches)) {
             self::$Caches = [];
         }
 
-        if ($cacheName != 'locale') {
+        if ($cacheName != "locale") {
             return;
         }
 
         if (!array_key_exists($cacheName, self::$Caches)) {
             self::$Caches[$cacheName] = [
-                'cache' => [],
-                'mode' => $cacheMode
+                "cache" => [],
+                "mode" => $cacheMode,
             ];
 
-            $useCache = (Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled());
+            $useCache = Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled();
             if ($useCache) {
                 $cacheKey = sprintf(Gdn_LibraryMap::CACHE_CACHE_NAME_FORMAT, $cacheName);
                 $cacheContents = Gdn::cache()->get($cacheKey);
-                $loadedFromCache = ($cacheContents !== Gdn_Cache::CACHEOP_FAILURE);
+                $loadedFromCache = $cacheContents !== Gdn_Cache::CACHEOP_FAILURE;
                 if ($loadedFromCache && is_array($cacheContents)) {
                     self::import($cacheName, $cacheContents);
                 }
-
             } else {
                 $onDiskCacheName = sprintf(self::DISK_CACHE_NAME_FORMAT, strtolower($cacheName));
-                self::$Caches[$cacheName]['ondisk'] = $onDiskCacheName;
+                self::$Caches[$cacheName]["ondisk"] = $onDiskCacheName;
 
                 // Loading cache for the first time by name+path only... import data now.
-                if (file_exists(PATH_CACHE.DS.$onDiskCacheName)) {
-                    $cacheContents = parse_ini_file(PATH_CACHE.DS.$onDiskCacheName, true);
+                if (file_exists(PATH_CACHE . DS . $onDiskCacheName)) {
+                    $cacheContents = parse_ini_file(PATH_CACHE . DS . $onDiskCacheName, true);
                     if ($cacheContents != false && is_array($cacheContents)) {
                         self::import($cacheName, $cacheContents);
                     } else {
-                        @unlink(PATH_CACHE.DS.$onDiskCacheName);
+                        @unlink(PATH_CACHE . DS . $onDiskCacheName);
                     }
                 }
-
             }
         }
 
@@ -88,13 +87,15 @@ class Gdn_LibraryMap {
      * @param array $cacheContents well formed cache array
      * @param bool $autoSave
      */
-    protected static function import($cacheName, $cacheContents, $autoSave = false) {
+    protected static function import($cacheName, $cacheContents, $autoSave = false)
+    {
         if (!array_key_exists($cacheName, self::$Caches)) {
             return false;
         }
 
-        self::$Caches[$cacheName]['cache'] = array_merge(self::$Caches[$cacheName]['cache'], $cacheContents);
-        self::$Caches[$cacheName]['mode'] = (sizeof($cacheContents) == 1 && array_key_exists($cacheName, $cacheContents)) ? 'flat' : 'tree';
+        self::$Caches[$cacheName]["cache"] = array_merge(self::$Caches[$cacheName]["cache"], $cacheContents);
+        self::$Caches[$cacheName]["mode"] =
+            sizeof($cacheContents) == 1 && array_key_exists($cacheName, $cacheContents) ? "flat" : "tree";
         if ($autoSave) {
             self::saveCache($cacheName);
         }
@@ -106,9 +107,10 @@ class Gdn_LibraryMap {
      * @param string|bool $cacheName name of cache library
      * @return void
      */
-    public static function clearCache($cacheName = false) {
+    public static function clearCache($cacheName = false)
+    {
         Gdn_Autoloader::smartFree();
-        if ($cacheName != 'locale') {
+        if ($cacheName != "locale") {
             return;
         }
 
@@ -116,14 +118,14 @@ class Gdn_LibraryMap {
             return self::prepareCache($cacheName);
         }
 
-        $useCache = (Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled());
+        $useCache = Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled();
         if ($useCache) {
             $cacheKey = sprintf(Gdn_LibraryMap::CACHE_CACHE_NAME_FORMAT, $cacheName);
             $deleted = Gdn::cache()->remove($cacheKey);
         } else {
-            @unlink(PATH_CACHE.DS.self::$Caches[$cacheName]['ondisk']);
+            @unlink(PATH_CACHE . DS . self::$Caches[$cacheName]["ondisk"]);
         }
-        self::$Caches[$cacheName]['cache'] = [];
+        self::$Caches[$cacheName]["cache"] = [];
     }
 
     /**
@@ -132,12 +134,13 @@ class Gdn_LibraryMap {
      * @param string $cacheName name of cache library
      * @return bool ready state of cache
      */
-    public static function cacheReady($cacheName) {
+    public static function cacheReady($cacheName)
+    {
         if (!array_key_exists($cacheName, self::$Caches)) {
             return false;
         }
 
-        if (!sizeof(self::$Caches[$cacheName]['cache'])) {
+        if (!sizeof(self::$Caches[$cacheName]["cache"])) {
             return false;
         }
 
@@ -153,8 +156,9 @@ class Gdn_LibraryMap {
      * @param bool $cacheWrite optional, whether or not to perform a disk write after this set. default yes
      * @return mixed cache contents
      */
-    public static function cache($cacheName, $cacheKey, $cacheContents, $cacheWrite = true) {
-        if ($cacheName != 'locale') {
+    public static function cache($cacheName, $cacheKey, $cacheContents, $cacheWrite = true)
+    {
+        if ($cacheName != "locale") {
             return;
         }
 
@@ -163,10 +167,10 @@ class Gdn_LibraryMap {
         }
 
         // Set and save cache data to memory and disk
-        if (self::$Caches[$cacheName]['mode'] == 'flat') {
-            $target = &self::$Caches[$cacheName]['cache'][$cacheName];
+        if (self::$Caches[$cacheName]["mode"] == "flat") {
+            $target = &self::$Caches[$cacheName]["cache"][$cacheName];
         } else {
-            $target = &self::$Caches[$cacheName]['cache'];
+            $target = &self::$Caches[$cacheName]["cache"];
         }
 
         $target[$cacheKey] = $cacheContents;
@@ -177,13 +181,14 @@ class Gdn_LibraryMap {
         return $cacheContents;
     }
 
-    public static function safeCache($cacheName, $cacheKey, $cacheContents, $cacheWrite = true) {
-        if ($cacheName != 'locale') {
+    public static function safeCache($cacheName, $cacheKey, $cacheContents, $cacheWrite = true)
+    {
+        if ($cacheName != "locale") {
             return;
         }
 
         self::prepareCache($cacheName);
-        return self::cache($cacheName, str_replace('.', '__', $cacheKey), $cacheContents, $cacheWrite);
+        return self::cache($cacheName, str_replace(".", "__", $cacheKey), $cacheContents, $cacheWrite);
     }
 
     /**
@@ -196,8 +201,9 @@ class Gdn_LibraryMap {
      * @param bool $cacheWrite optional, whether or not to perform a disk write after this set. default yes
      * @return array cache contents
      */
-    public static function cacheArray($cacheName, $cacheKey, $cacheContents, $cacheWrite = true) {
-        if ($cacheName != 'locale') {
+    public static function cacheArray($cacheName, $cacheKey, $cacheContents, $cacheWrite = true)
+    {
+        if ($cacheName != "locale") {
             return;
         }
 
@@ -224,8 +230,9 @@ class Gdn_LibraryMap {
      * @param string|null $cacheKey name of cache entry
      * @return mixed cache entry or null on failure
      */
-    public static function getCache($cacheName, $cacheKey = null) {
-        if ($cacheName != 'locale') {
+    public static function getCache($cacheName, $cacheKey = null)
+    {
+        if ($cacheName != "locale") {
             return;
         }
 
@@ -233,12 +240,12 @@ class Gdn_LibraryMap {
             self::prepareCache($cacheName);
         }
 
-        if (self::$Caches[$cacheName]['mode'] == 'flat') {
-            $target = &self::$Caches[$cacheName]['cache'][$cacheName];
+        if (self::$Caches[$cacheName]["mode"] == "flat") {
+            $target = &self::$Caches[$cacheName]["cache"][$cacheName];
         } else {
-            $target = &self::$Caches[$cacheName]['cache'];
+            $target = &self::$Caches[$cacheName]["cache"];
         }
-        $target = (array)$target;
+        $target = (array) $target;
 
         if ($cacheKey === null) {
             return $target;
@@ -257,8 +264,9 @@ class Gdn_LibraryMap {
      * @param string $cacheName name of cache library
      * @return void
      */
-    public static function saveCache($cacheName) {
-        if ($cacheName != 'locale') {
+    public static function saveCache($cacheName)
+    {
+        if ($cacheName != "locale") {
             return;
         }
 
@@ -266,14 +274,14 @@ class Gdn_LibraryMap {
             return false;
         }
 
-        $useCache = (Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled());
+        $useCache = Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled();
         if ($useCache) {
             $cacheKey = sprintf(Gdn_LibraryMap::CACHE_CACHE_NAME_FORMAT, $cacheName);
-            $stored = Gdn::cache()->store($cacheKey, self::$Caches[$cacheName]['cache']);
+            $stored = Gdn::cache()->store($cacheKey, self::$Caches[$cacheName]["cache"]);
         } else {
-            $fileName = self::$Caches[$cacheName]['ondisk'];
+            $fileName = self::$Caches[$cacheName]["ondisk"];
             $cacheContents = "";
-            foreach (self::$Caches[$cacheName]['cache'] as $sectionTitle => $sectionData) {
+            foreach (self::$Caches[$cacheName]["cache"] as $sectionTitle => $sectionData) {
                 $cacheContents .= "[{$sectionTitle}]\n";
                 foreach ($sectionData as $storeKey => $storeValue) {
                     $cacheContents .= "{$storeKey} = \"{$storeValue}\"\n";
@@ -283,7 +291,7 @@ class Gdn_LibraryMap {
                 // Fix slashes to get around parse_ini_file issue that drops off \ when loading network file.
                 $cacheContents = str_replace("\\", "/", $cacheContents);
 
-                Gdn_FileSystem::saveFile(PATH_CACHE.DS.$fileName, $cacheContents, LOCK_EX);
+                Gdn_FileSystem::saveFile(PATH_CACHE . DS . $fileName, $cacheContents, LOCK_EX);
             } catch (Exception $e) {
             }
         }

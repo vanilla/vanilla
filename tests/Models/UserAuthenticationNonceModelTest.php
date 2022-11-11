@@ -14,14 +14,16 @@ use VanillaTests\SiteTestTrait;
 /**
  * Test the {@link UserAuthenticationNonceModel}.
  */
-class UserAuthenticationNonceModelTest extends SharedBootstrapTestCase {
+class UserAuthenticationNonceModelTest extends SharedBootstrapTestCase
+{
     use SiteTestTrait;
 
     /**
      * Test nonce is issued and verified
      */
-    public function testIssueAndVerify() {
-        $model = new UserAuthenticationNonceModel('hhh');
+    public function testIssueAndVerify()
+    {
+        $model = new UserAuthenticationNonceModel("hhh");
         $nonce = $model->issue();
         $this->assertEquals(true, $model->verify($nonce));
     }
@@ -29,14 +31,15 @@ class UserAuthenticationNonceModelTest extends SharedBootstrapTestCase {
     /**
      * That a nonce can be consumed.
      */
-    public function testConsume() {
+    public function testConsume()
+    {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Nonce was already used.');
+        $this->expectExceptionMessage("Nonce was already used.");
 
-        $model = new UserAuthenticationNonceModel('hhh');
+        $model = new UserAuthenticationNonceModel("hhh");
         $issuedNonce = $model->issue();
         $model->consume($issuedNonce);
         $consumedNonce = $model->getID($issuedNonce, DATASET_TYPE_ARRAY);
-        $model->verify($consumedNonce['Nonce'], true, true);
+        $model->verify($consumedNonce["Nonce"], true, true);
     }
 }

@@ -73,7 +73,6 @@
         margin-top: $component-vertical_padding;
 
         @if $component-item_spacing == 0 {
-
             // simulate bottom border for previous element
             &::before {
                 content: "";
@@ -109,20 +108,19 @@
     .Item h3 {
         font-size: $component-title_fontSize;
         font-weight: $component-title_fontWeight;
-        line-height: #{$theme-photo_size / 2};
+        line-height: #{$theme-photo_size * 0.5};
         color: $component-title_color;
         display: block;
         margin-bottom: $utility-baseUnit;
 
-        @if ($staticVariables){
+        @if ($staticVariables) {
             &:focus,
             &:hover {
                 color: $component-title-hover_color;
             }
         }
 
-
-        @if ($staticVariables){
+        @if ($staticVariables) {
             a {
                 font-size: inherit;
                 font-weight: inherit;
@@ -170,7 +168,6 @@
         margin-top: -1px;
     }
 
-
     .LastCommentBy,
     .MostRecent,
     .MostRecentBy {
@@ -185,7 +182,6 @@
     .MostRecentBy {
         display: inherit;
     }
-
 
     @if $staticVariables {
         .MostRecentBy,
@@ -330,7 +326,7 @@
 
     // overwrite ideation plugin styles
     .ItemIdea.ItemIdea.ItemIdea {
-        @if($staticVariables) {
+        @if ($staticVariables) {
             .PhotoWrap.IndexPhoto,
             .idea-counter-module .idea-counter-box {
                 margin: 0 $utility-baseUnitDouble 0 0;
@@ -355,12 +351,12 @@
         .OptionsLink {
             @if ($staticVariables) {
                 @include Button(
-                        $button-basic_bg,
-                        $button-basic_fg,
-                        $button-basic_border,
-                        $button-basic-hover_bg,
-                        $button-basic-hover_fg,
-                        $button-basic-hover_border
+                    $button-basic_bg,
+                    $button-basic_fg,
+                    $button-basic_border,
+                    $button-basic-hover_bg,
+                    $button-basic-hover_fg,
+                    $button-basic-hover_border
                 );
             }
             margin-left: $utility-baseUnitHalf;
@@ -396,7 +392,7 @@
     }
 
     mark {
-        background-color: rgba($global-color_warning, .5);
+        background-color: rgba($global-color_warning, 0.5);
     }
 
     .Reactions {
@@ -426,7 +422,6 @@
 
 .DataList:not(.CategoryList),
 .PageTitle + .ItemDiscussion {
-
     @if $component_lateralBorder == false {
         border-top-width: 0;
     }
@@ -452,9 +447,7 @@
 }
 
 .DataList.Discussions {
-
     .Item {
-
         .Title {
             display: block;
         }
@@ -492,12 +485,9 @@
 }
 
 .MessageList {
-
     .PageTitle,
     .ItemComment {
-
         .Options {
-
             .ToggleFlyout {
                 order: 2;
             }
@@ -507,7 +497,7 @@
     .PageTitle {
         margin-bottom: $global-block_margin;
 
-        h1{
+        h1 {
             font-size: $global-title_fontSize;
             line-height: $global-condensed_lineHeight;
 
@@ -542,7 +532,7 @@
                 bottom: calc(#{$component-vertical_padding} / 2);
                 left: $component-horizontal_padding;
                 right: $component-horizontal_padding;
-            };
+            }
 
             @if $component-item_spacing != 0 {
                 border-top-left-radius: $component_borderRadius;
@@ -560,97 +550,97 @@
         }
 
         .MItem.RoleTracker {
-                padding: 0 $utility-baseUnitHalf;
+            padding: 0 $utility-baseUnitHalf;
+
+            a {
+                @if ($staticVariables) {
+                    color: inherit;
+                }
+                margin: 0;
+
+                &:hover,
+                &:focus,
+                &:active {
+                    text-decoration: none;
+                }
+            }
+        }
+
+        .Meta,
+        .AuthorWrap {
+            font-size: $component-meta_fontSize;
+            line-height: $component-meta_lineHeight;
+            display: inline-block;
+            @if $staticVariables {
+                padding-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});
+            }
+
+            > * {
+                display: inline;
+                font-size: inherit;
+                line-height: inherit;
+            }
+        }
+
+        @if ($staticVariables) {
+            .InlineTags {
+                padding-left: 0;
 
                 a {
-                    @if ($staticVariables) {
-                        color: inherit;
-                    }
-                    margin: 0;
+                    font-size: inherit;
+                    color: $component-meta-link_color;
 
                     &:hover,
                     &:focus,
                     &:active {
-                        text-decoration: none;
-                    }
-                }
-            }
-
-            .Meta,
-            .AuthorWrap {
-                font-size: $component-meta_fontSize;
-                line-height: $component-meta_lineHeight;
-                display: inline-block;
-                @if $staticVariables {
-                    padding-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});
-                }
-
-                > * {
-                    display: inline;
-                    font-size: inherit;
-                    line-height: inherit;
-                }
-            }
-
-            @if ($staticVariables) {
-                .InlineTags {
-                    padding-left: 0;
-
-                    a {
-                        font-size: inherit;
-                        color: $component-meta-link_color;
-
-                        &:hover,
-                        &:focus,
-                        &:active {
-                            color: $component-meta-link-hover_color;
-                        }
-                    }
-                }
-            }
-
-            .Meta {
-                width: 100%;
-
-                @include maxWidth {
-                    margin-top: 0;
-                }
-            }
-
-            .MItem {
-                margin-bottom: 0;
-
-                @include maxWidth {
-                    margin-bottom: $utility-baseUnitHalf;
-                }
-            }
-
-            @if $staticVariables {
-                .AuthorWrap {
-                    max-width: calc(100% - 45px);
-                }
-            }
-            .MItem.Category {
-                display: none;
-            }
-
-            @if ($staticVariables) {
-                .MItem.RoleTitle,
-                .MItem.Rank {
-                    @include Tag;
-                    color: inherit;
-                }
-
-                .Username {
-                    color: $component-meta-link_color;
-                    font-weight: $component-meta_fontWeight;
-
-                    &:hover,
-                    &:focus {
                         color: $component-meta-link-hover_color;
                     }
                 }
             }
+        }
+
+        .Meta {
+            width: 100%;
+
+            @include maxWidth {
+                margin-top: 0;
+            }
+        }
+
+        .MItem {
+            margin-bottom: 0;
+
+            @include maxWidth {
+                margin-bottom: $utility-baseUnitHalf;
+            }
+        }
+
+        @if $staticVariables {
+            .AuthorWrap {
+                max-width: calc(100% - 45px);
+            }
+        }
+        .MItem.Category {
+            display: none;
+        }
+
+        @if ($staticVariables) {
+            .MItem.RoleTitle,
+            .MItem.Rank {
+                @include Tag;
+                color: inherit;
+            }
+
+            .Username {
+                color: $component-meta-link_color;
+                font-weight: $component-meta_fontWeight;
+
+                &:hover,
+                &:focus {
+                    color: $component-meta-link-hover_color;
+                }
+            }
+        }
 
         .flair {
             display: inline-flex;
@@ -671,8 +661,8 @@
             border-bottom-left-radius: $component_borderRadius;
             border-bottom-right-radius: $component_borderRadius;
             padding: {
-                top: calc(#{$component-vertical_padding / 2});
-            };
+                top: calc(#{$component-vertical_padding * 0.5});
+            }
         }
 
         .Item-Body > *:empty {
@@ -696,10 +686,8 @@
 }
 
 .MessageList {
-
     &.Comments,
     &.AcceptedAnswers {
-
         .Item:first-child {
             @if $component_lateralBorder == false {
                 border-top-width: 0;
@@ -716,10 +704,9 @@
 
 .Activities {
     .ItemContent {
-        margin-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});;
+        margin-left: calc(#{$theme-photo_size} + #{$component-horizontal_padding});
 
         .Title {
-
             @include maxWidth {
                 padding-right: $utility-baseUnitDouble;
             }
@@ -729,7 +716,6 @@
             display: block;
 
             .PhotoWrap {
-
                 @include maxWidth {
                     margin-right: 0;
                 }
@@ -780,7 +766,7 @@
         margin-right: 0;
     }
 
-    @if($staticVariables) {
+    @if ($staticVariables) {
         .MItem-Author a {
             font-size: inherit;
             font-weight: inherit;
@@ -797,7 +783,6 @@
 }
 
 .Group-Content .DataList {
-
     .ItemContent.Discussion {
         padding-left: 0;
     }
@@ -809,7 +794,6 @@
     }
 
     .Meta {
-
         @include maxWidth {
             margin-top: 0;
         }
@@ -817,9 +801,7 @@
 }
 
 .Group-Box.EventList {
-
     .Item {
-
         .Options {
             position: initial;
 
@@ -831,7 +813,6 @@
 }
 
 .ApplicantList .DataList {
-
     .PhotoWrap {
         margin-right: 0;
     }
@@ -841,8 +822,7 @@
     }
 }
 
-.DataList-Notes  {
-
+.DataList-Notes {
     .Item-Col {
         padding-left: 0;
     }
@@ -854,7 +834,7 @@
     .NoteType {
         font-size: $component-title_fontSize;
         font-weight: $component-title_fontWeight;
-        line-height: #{$theme-photo_size / 2};
+        line-height: #{$theme-photo_size * 0.5};
         color: $component-title_color;
         display: block;
         margin-bottom: $utility-baseUnit;
@@ -867,7 +847,6 @@
 }
 
 .CategoryBox {
-
     .Empty {
         @include listItem;
     }

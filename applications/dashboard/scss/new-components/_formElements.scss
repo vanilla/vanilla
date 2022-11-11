@@ -1,8 +1,8 @@
 // This is only for new pages, with new form element markup.
-$lineHeight-base    : 1.428571429;
-$fontSize-large     : 16px !default;
-$fontSize-default   : 14px !default;
-$fontSize-small     : 12px !default;
+$lineHeight-base: 1.428571429;
+$fontSize-large: 16px !default;
+$fontSize-default: 14px !default;
+$fontSize-small: 12px !default;
 
 .inputBlock {
     display: block;
@@ -25,7 +25,8 @@ $fontSize-small     : 12px !default;
         }
     }
 
-    ::-ms-clear { // IE fix
+    ::-ms-clear {
+        // IE fix
         display: none;
     }
 }
@@ -67,12 +68,11 @@ $fontSize-small     : 12px !default;
     display: block;
 }
 
-
 .inputBlock-labelNote {
     display: block;
     font-size: 12px;
     line-height: $lineHeight-base;
-    opacity: .6;
+    opacity: 0.6;
 
     + .inputBlock-inputWrap {
         margin-top: $baseUnit;
@@ -93,12 +93,11 @@ $fontSize-small     : 12px !default;
 }
 
 .FormWrapper {
-
     .form-group {
         margin: {
             top: $utility-baseUnit;
             bottom: $utility-baseUnit;
-        };
+        }
     }
 
     .file-upload {
@@ -158,5 +157,4 @@ $fontSize-small     : 12px !default;
         font-weight: $global-fontWeight_normal;
         font-family: $global-body_fontFamily;
     }
-
 }

@@ -4,7 +4,6 @@
  */
 
 import { LoadStatus } from "@library/@types/api/core";
-import { AnalyticsData } from "@library/analytics/AnalyticsData";
 import { IResult } from "@library/result/Result";
 import ResultList from "@library/result/ResultList";
 import { ResultMeta } from "@library/result/ResultMeta";
@@ -14,21 +13,21 @@ import { ISearchResult } from "@library/search/searchTypes";
 import { DEFAULT_SEARCH_SOURCE, SearchService } from "@library/search/SearchService";
 import { useSearchForm } from "@library/search/SearchContext";
 import { useLastValue } from "@vanilla/react-utils";
-import { hashString } from "@vanilla/utils";
-import React, { useEffect, useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect } from "react";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { ALL_CONTENT_DOMAIN_NAME, DEFAULT_RESULT_COMPONENT } from "@library/search/searchConstants";
 import { makeSearchUrl } from "@library/search/SearchPageRoute";
-import { formatUrl, t } from "@library/utility/appUtils";
+import { createSourceSetValue, formatUrl, t } from "@library/utility/appUtils";
 import qs from "qs";
 import { sprintf } from "sprintf-js";
 import { MetaLink } from "@library/metas/Metas";
 import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
+import QueryString from "qs";
 
 interface IProps {}
 
 export function SearchPageResults(props: IProps) {
-    const { updateForm, results, form, getCurrentDomain } = useSearchForm<{}>();
+    const { updateForm, results, getCurrentDomain } = useSearchForm<{}>();
 
     const currentDomain = getCurrentDomain();
     const { currentSource } = useSearchSources();
@@ -41,14 +40,6 @@ export function SearchPageResults(props: IProps) {
             window.scrollTo({ top: 0 });
         }
     }, [status, lastStatus]);
-
-    //this way, search page_view event won't be triggered multiple times with component rerendering, but only once when we visit the page
-    const isInitial = useRef(true);
-    useEffect(() => {
-        if (isInitial.current && status === LoadStatus.SUCCESS) {
-            isInitial.current = false;
-        }
-    });
 
     let content = <></>;
     switch (results.status) {
@@ -65,7 +56,7 @@ export function SearchPageResults(props: IProps) {
             break;
 
         case LoadStatus.SUCCESS:
-            const { next, prev } = results.data!.pagination;
+            const { next, prev, nextURL, prevURL } = results.data!.pagination;
             let paginationNextClick: React.MouseEventHandler | undefined;
             let paginationPreviousClick: React.MouseEventHandler | undefined;
 
@@ -79,14 +70,27 @@ export function SearchPageResults(props: IProps) {
                     updateForm({ page: prev });
                 };
             }
+            if (nextURL) {
+                paginationNextClick = (e) => {
+                    const params = QueryString.parse(nextURL.split("?")?.[1] ?? "");
+                    updateForm({ pageURL: nextURL, ...(params["offset"] && { offset: parseInt(`${params.offset}`) }) });
+                };
+            }
+            if (prevURL) {
+                paginationPreviousClick = (e) => {
+                    const params = QueryString.parse(prevURL.split("?")?.[1] ?? "");
+                    updateForm({ pageURL: prevURL, ...(params["offset"] && { offset: parseInt(`${params.offset}`) }) });
+                };
+            }
             content = (
                 <>
-                    {isInitial.current && (
-                        <AnalyticsData uniqueKey={hashString(form.query + JSON.stringify(results.data!.pagination))} />
-                    )}
                     <ResultList
-                        resultComponent={isCommunity ? currentDomain.ResultComponent : DEFAULT_RESULT_COMPONENT}
-                        results={results.data!.results.map(mapResult)}
+                        resultComponent={
+                            isCommunity
+                                ? currentDomain.ResultComponent ?? DEFAULT_RESULT_COMPONENT
+                                : DEFAULT_RESULT_COMPONENT
+                        }
+                        results={results.data!.results.map(currentDomain.mapResultToProps ?? mapResult)}
                         ResultWrapper={isCommunity ? currentDomain.ResultWrapper : undefined}
                         rel={"noindex nofollow"}
                     />
@@ -100,24 +104,26 @@ export function SearchPageResults(props: IProps) {
 }
 
 /**
- * Map a search API response into what the <SearchResults /> component is expecting.
+ * Map a search API response into what the <ResultList /> component is expecting.
  *
  * @param searchResult The API search result to map.
  */
-function mapResult(searchResult: ISearchResult): IResult | undefined {
-    const crumbs = searchResult.breadcrumbs || [];
-    const icon = SearchService.getSubType(searchResult.type)?.icon;
+export function mapResult(searchResult: ISearchResult): IResult {
+    const icon = searchResult.type ? SearchService.getSubType(searchResult.type)?.icon : null;
+
+    const sourceSet = {
+        imageSet: createSourceSetValue(searchResult?.image?.urlSrcSet ?? {}),
+    };
 
     return {
         name: searchResult.name,
+        url: searchResult.url,
         excerpt: searchResult.body,
         icon,
         meta: <MetaFactory searchResult={searchResult} />,
         image: searchResult.image?.url,
-        url: searchResult.url,
-        location: crumbs,
-        userInfo: searchResult.userInfo,
         highlight: searchResult.highlight,
+        ...(sourceSet.imageSet.length > 0 ? sourceSet : {}),
     };
 }
 
@@ -168,7 +174,7 @@ function MetaFactory(props: { searchResult: ISearchResult }) {
             <ResultMeta
                 status={searchResult.status}
                 type={searchResult.recordType}
-                updateUser={searchResult.insertUser!}
+                updateUser={searchResult.insertUser}
                 dateUpdated={searchResult.dateUpdated ?? searchResult.dateInserted}
                 labels={searchResult.labelCodes}
                 crumbs={crumbs}

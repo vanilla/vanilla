@@ -18,7 +18,7 @@ export async function makePolyfillConfig(entryModel: EntryModel) {
     const options = await getOptions();
     const baseConfig: Configuration = await makeBaseConfig(entryModel, "polyfill");
     baseConfig.mode = "production";
-    baseConfig.devtool = "source-map";
+    baseConfig.devtool = false;
     baseConfig.entry = POLYFILL_SOURCE_FILE;
     baseConfig.target = ["web", "es5"];
     baseConfig.output = {

@@ -9,12 +9,13 @@ namespace Vanilla\Setup;
 
 use Composer\Script\Event;
 use Composer\Factory;
+use Vanilla\AddonManager;
 
 /**
  * Contains helper methods for Vanilla's composer integration.
  */
-class ComposerHelper {
-
+class ComposerHelper
+{
     const NODE_ARGS_ENV = "VANILLA_BUILD_NODE_ARGS";
     const DISABLE_VALIDATION_ENV = "VANILLA_BUILD_DISABLE_CODE_VALIDATION";
     const LOW_MEMORY_ENV = "VANILLA_BUILD_LOW_MEMORY";
@@ -23,10 +24,11 @@ class ComposerHelper {
     /**
      * Clear cached php files.
      */
-    public static function clearPhpCache() {
-        $cacheDir = realpath(__DIR__.'/../../cache');
+    public static function clearPhpCache()
+    {
+        $cacheDir = realpath(__DIR__ . "/../../cache");
 
-        $paths = array_merge(glob($cacheDir.'/**/*.php'), glob($cacheDir.'/*.php'));
+        $paths = array_merge(glob($cacheDir . "/**/*.php"), glob($cacheDir . "/*.php"));
         foreach ($paths as $path) {
             if (file_exists($path)) {
                 unlink($path);
@@ -37,11 +39,12 @@ class ComposerHelper {
     /**
      * Clear the twig cache.
      */
-    public static function clearTwigCache() {
-        $cacheDir = realpath(__DIR__.'/../../cache');
+    public static function clearTwigCache()
+    {
+        $cacheDir = realpath(__DIR__ . "/../../cache");
 
         // Clear twig cache if it exists.
-        $twigCache = $cacheDir . '/twig';
+        $twigCache = $cacheDir . "/twig";
         if (file_exists($twigCache)) {
             self::deleteRecursively($twigCache);
         }
@@ -57,14 +60,15 @@ class ComposerHelper {
      *
      * @param string $root
      */
-    private static function deleteRecursively(string $root) {
+    private static function deleteRecursively(string $root)
+    {
         $files = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($root, \RecursiveDirectoryIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
         );
 
         foreach ($files as $fileinfo) {
-            $deleteFunction = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+            $deleteFunction = $fileinfo->isDir() ? "rmdir" : "unlink";
             $deleteFunction($fileinfo->getRealPath());
         }
 
@@ -86,19 +90,28 @@ class ComposerHelper {
      * reduces memory usage.
      * - VANILLA_BUILD_DISABLE_AUTO_BUILD - Prevent the build from running on composer install.
      */
-    public static function postUpdate() {
+    public static function postUpdate()
+    {
         require_once __DIR__ . "/../../environment.php";
+        printf("\nBuilding addon cache");
+        $addonManager = new AddonManager(AddonManager::getDefaultScanDirectories(), PATH_CACHE);
+        $addonManager->ensureMultiCache();
+        printf("\nAddon cache built");
 
         $vanillaRoot = PATH_ROOT;
-        $skipBuild = getenv(self::DISABLE_AUTO_BUILD) === 'true';
+        $skipBuild = getenv(self::DISABLE_AUTO_BUILD) === "true";
         if ($skipBuild) {
-            printf("\nSkipping automatic JS build because " . self::DISABLE_AUTO_BUILD . " env variable is set to \"true\".\n");
+            printf(
+                "\nSkipping automatic JS build because " .
+                    self::DISABLE_AUTO_BUILD .
+                    " env variable is set to \"true\".\n"
+            );
             return;
         }
 
         printf("\nInstalling core node_modules\n");
 
-        passthru('yarn install', $installReturn);
+        passthru("yarn install", $installReturn);
         if ($installReturn !== 0) {
             printf("Installing core node_modules failed\n");
             exit($installReturn);
@@ -132,7 +145,7 @@ class ComposerHelper {
 
         // Generate our vendor license file.
         $distDir = PATH_DIST;
-        $licensePath = $distDir . '/VENDOR_LICENSES.txt';
+        $licensePath = $distDir . "/VENDOR_LICENSES.txt";
         if (!file_exists($distDir)) {
             mkdir($distDir);
         }
@@ -162,12 +175,13 @@ class ComposerHelper {
      *
      * @param Event $event The event being fired.
      */
-    public static function preUpdate(Event $event) {
+    public static function preUpdate(Event $event)
+    {
         self::clearPhpCache();
         self::clearTwigCache();
 
         // Check for a composer-local.json.
-        $composerLocalPath = './composer-local.json';
+        $composerLocalPath = "./composer-local.json";
 
         if (!file_exists($composerLocalPath)) {
             return;
@@ -176,26 +190,20 @@ class ComposerHelper {
         $composer = $event->getComposer();
         $factory = new Factory();
 
-        $localComposer = $factory->createComposer(
-            $event->getIO(),
-            $composerLocalPath,
-            true,
-            null,
-            false
-        );
+        $localComposer = $factory->createComposer($event->getIO(), $composerLocalPath, true, null, false);
 
         // Merge repositories.
         $localRepositories = $localComposer->getRepositoryManager()->getRepositories();
         foreach ($localRepositories as $repository) {
             /* @var \Composer\Repository\RepositoryInterface $repository */
 
-            if (method_exists($repository, 'getRepoConfig')) {
+            if (method_exists($repository, "getRepoConfig")) {
                 $config = $repository->getRepoConfig();
             } else {
-                $config = ['url' => ''];
+                $config = ["url" => ""];
             }
             // Skip the packagist repo.
-            if (strpos($config['url'], 'packagist.org') !== false) {
+            if (strpos($config["url"], "packagist.org") !== false) {
                 continue;
             }
             $composer->getRepositoryManager()->addRepository($repository);
@@ -205,7 +213,10 @@ class ComposerHelper {
         $requires = array_merge($composer->getPackage()->getRequires(), $localComposer->getPackage()->getRequires());
         $composer->getPackage()->setRequires($requires);
 
-        $devRequires = array_merge($composer->getPackage()->getDevRequires(), $localComposer->getPackage()->getDevRequires());
+        $devRequires = array_merge(
+            $composer->getPackage()->getDevRequires(),
+            $localComposer->getPackage()->getDevRequires()
+        );
         $composer->getPackage()->setDevRequires($devRequires);
     }
 }

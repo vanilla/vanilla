@@ -6,7 +6,7 @@
  * @license GPL-2.0-only
  */
 
-if (!function_exists('addActivity')) {
+if (!function_exists("addActivity")) {
     /**
      * A convenience function that allows adding to the activity table with a single line.
      *
@@ -22,17 +22,17 @@ if (!function_exists('addActivity')) {
     function addActivity(
         $activityUserID,
         $activityType,
-        $story = '',
-        $regardingUserID = '',
-        $route = '',
-        $sendEmail = ''
+        $story = "",
+        $regardingUserID = "",
+        $route = "",
+        $sendEmail = ""
     ) {
         $activityModel = new ActivityModel();
-        return $activityModel->add($activityUserID, $activityType, $story, $regardingUserID, '', $route, $sendEmail);
+        return $activityModel->add($activityUserID, $activityType, $story, $regardingUserID, "", $route, $sendEmail);
     }
 }
 
-if (!function_exists('arrayInArray')) {
+if (!function_exists("arrayInArray")) {
     /**
      * Check to see if an array contains another array.
      *
@@ -45,7 +45,8 @@ if (!function_exists('arrayInArray')) {
      * @param bool $fullMatch Should all items in Needle be found in Haystack to return true?
      * @deprecated
      */
-    function arrayInArray($needle, $haystack, $fullMatch = true) {
+    function arrayInArray($needle, $haystack, $fullMatch = true)
+    {
         $count = count($needle);
         $return = $fullMatch ? true : false;
         for ($i = 0; $i < $count; ++$i) {
@@ -89,14 +90,17 @@ if (!function_exists('arrayInArray')) {
  * @author daniel@danielsmedegaardbuus.dk
  * @deprecated
  */
-function &arrayMergeRecursiveDistinct(array &$array1, &$array2 = null) {
-    deprecated('arrayMergeRecursiveDistinct');
+function &arrayMergeRecursiveDistinct(array &$array1, &$array2 = null)
+{
+    deprecated("arrayMergeRecursiveDistinct");
     $merged = $array1;
 
     if (is_array($array2)) {
         foreach ($array2 as $key => $val) {
             if (is_array($array2[$key])) {
-                $merged[$key] = is_array($merged[$key]) ? arrayMergeRecursiveDistinct($merged[$key], $array2[$key]) : $array2[$key];
+                $merged[$key] = is_array($merged[$key])
+                    ? arrayMergeRecursiveDistinct($merged[$key], $array2[$key])
+                    : $array2[$key];
             } else {
                 $merged[$key] = $val;
             }
@@ -106,7 +110,7 @@ function &arrayMergeRecursiveDistinct(array &$array1, &$array2 = null) {
     return $merged;
 }
 
-if (!function_exists('arrayValue')) {
+if (!function_exists("arrayValue")) {
     /**
      * Get the value associated with a {@link $Needle} key in a {@link $Haystack} array.
      *
@@ -115,14 +119,15 @@ if (!function_exists('arrayValue')) {
      * @param string $default The default value to return if the requested value is not found. Default is false.
      * @deprecated since 2.3
      */
-    function arrayValue($needle, $haystack, $default = false) {
-        deprecated('arrayValue', 'val');
+    function arrayValue($needle, $haystack, $default = false)
+    {
+        deprecated("arrayValue", "val");
         $result = val($needle, $haystack, $default);
         return $result;
     }
 }
 
-if (!function_exists('arrayValuesToKeys')) {
+if (!function_exists("arrayValuesToKeys")) {
     /**
      * Take an array's values and apply them to a new array as both the keys and values.
      *
@@ -130,12 +135,13 @@ if (!function_exists('arrayValuesToKeys')) {
      * @deprecated
      * @see array_combine()
      */
-    function arrayValuesToKeys($array) {
+    function arrayValuesToKeys($array)
+    {
         return array_combine(array_values($array), $array);
     }
 }
 
-if (!function_exists('boop')) {
+if (!function_exists("boop")) {
     /**
      * Logs a message or print_r()'s an array to the screen.
      *
@@ -144,8 +150,9 @@ if (!function_exists('boop')) {
      * @param bool $vardump Whether or not to dump
      * @deprecated
      */
-    function boop($message, $arguments = [], $vardump = false) {
-        if (!defined('BOOP') || !BOOP) {
+    function boop($message, $arguments = [], $vardump = false)
+    {
+        if (!defined("BOOP") || !BOOP) {
             return;
         }
 
@@ -160,14 +167,14 @@ if (!function_exists('boop')) {
         }
 
         if (!is_null($arguments) && sizeof($arguments)) {
-            echo " (".implode(', ', $arguments).")";
+            echo " (" . implode(", ", $arguments) . ")";
         }
 
         echo "\n";
     }
 }
 
-if (!function_exists('checkRequirements')) {
+if (!function_exists("checkRequirements")) {
     /**
      * Check an addon's requirements.
      *
@@ -177,8 +184,9 @@ if (!function_exists('checkRequirements')) {
      * @throws Gdn_UserException Throws an exception if there are missing requirements.
      * @deprecated
      */
-    function checkRequirements($itemName, $requiredItems, $enabledItems) {
-        deprecated('checkRequirements()', 'AddonManager');
+    function checkRequirements($itemName, $requiredItems, $enabledItems)
+    {
+        deprecated("checkRequirements()", "AddonManager");
 
         // 1. Make sure that $RequiredItems are present
         if (is_array($requiredItems)) {
@@ -187,11 +195,12 @@ if (!function_exists('checkRequirements')) {
             foreach ($requiredItems as $requiredItemName => $requiredVersion) {
                 if (!array_key_exists($requiredItemName, $enabledItems)) {
                     $missingRequirements[] = "$requiredItemName $requiredVersion";
-                } elseif ($requiredVersion && $requiredVersion != '*') { // * means any version
+                } elseif ($requiredVersion && $requiredVersion != "*") {
+                    // * means any version
                     // If the item exists and is enabled, check the version
-                    $enabledVersion = val('Version', val($requiredItemName, $enabledItems, []), '');
+                    $enabledVersion = val("Version", val($requiredItemName, $enabledItems, []), "");
                     // Compare the versions.
-                    if (version_compare($enabledVersion, $requiredVersion, '<')) {
+                    if (version_compare($enabledVersion, $requiredVersion, "<")) {
                         $missingRequirements[] = "$requiredItemName $requiredVersion";
                     }
                 }
@@ -200,7 +209,7 @@ if (!function_exists('checkRequirements')) {
                 $msg = sprintf(
                     "%s is missing the following requirement(s): %s.",
                     $itemName,
-                    implode(', ', $missingRequirements)
+                    implode(", ", $missingRequirements)
                 );
                 throw new Gdn_UserException($msg);
             }
@@ -208,7 +217,7 @@ if (!function_exists('checkRequirements')) {
     }
 }
 
-if (!function_exists('arrayCombine')) {
+if (!function_exists("arrayCombine")) {
     /**
      * PHP's array_combine has a limitation that doesn't allow array_combine to work if either of the arrays are empty.
      *
@@ -217,8 +226,9 @@ if (!function_exists('arrayCombine')) {
      * @return array
      * @deprecated
      */
-    function arrayCombine($keys, $values) {
-        deprecated('arrayCombine', 'array_combine');
+    function arrayCombine($keys, $values)
+    {
+        deprecated("arrayCombine", "array_combine");
         if (!is_array($keys)) {
             $keys = [];
         }
@@ -237,7 +247,7 @@ if (!function_exists('arrayCombine')) {
     }
 }
 
-if (!function_exists('compareHashDigest')) {
+if (!function_exists("compareHashDigest")) {
     /**
      * Determine whether or not two strings are equal in a time that is independent of partial matches.
      *
@@ -248,27 +258,29 @@ if (!function_exists('compareHashDigest')) {
      * @param string $digest2 The second digest to compare.
      * @return bool Returns true if the digests match or false otherwise.
      */
-    function compareHashDigest($digest1, $digest2) {
-        deprecated('compareHashDigest', 'hash_equals');
+    function compareHashDigest($digest1, $digest2)
+    {
+        deprecated("compareHashDigest", "hash_equals");
         return hash_equals($digest1, $digest2);
     }
 }
 
-if (!function_exists('condense')) {
+if (!function_exists("condense")) {
     /**
      *
      *
      * @param string $html
      * @return mixed
      */
-    function condense($html) {
-        $html = preg_replace('`(?:<br\s*/?>\s*)+`', "<br />", $html);
-        $html = preg_replace('`/>\s*<br />\s*<img`', "/> <img", $html);
+    function condense($html)
+    {
+        $html = preg_replace("`(?:<br\s*/?>\s*)+`", "<br />", $html);
+        $html = preg_replace("`/>\s*<br />\s*<img`", "/> <img", $html);
         return $html;
     }
 }
 
-if (!function_exists('ConsolidateArrayValuesByKey')) {
+if (!function_exists("ConsolidateArrayValuesByKey")) {
     /**
      * Return the values from a single column in the input array.
      *
@@ -281,13 +293,14 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
      * @param mixed $defaultValue The value to use if there is no {@link $valueKey} in the array.
      * @deprecated Use {@link array_column()} instead.
      */
-    function consolidateArrayValuesByKey($array, $key, $valueKey = '', $defaultValue = null) {
-        deprecated(__FUNCTION__, 'array_column');
+    function consolidateArrayValuesByKey($array, $key, $valueKey = "", $defaultValue = null)
+    {
+        deprecated(__FUNCTION__, "array_column");
 
         $return = [];
         foreach ($array as $index => $associativeArray) {
             if (is_object($associativeArray)) {
-                if ($valueKey === '') {
+                if ($valueKey === "") {
                     $return[] = $associativeArray->$key;
                 } elseif (property_exists($associativeArray, $valueKey)) {
                     $return[$associativeArray->$key] = $associativeArray->$valueKey;
@@ -295,7 +308,7 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
                     $return[$associativeArray->$key] = $defaultValue;
                 }
             } elseif (is_array($associativeArray) && array_key_exists($key, $associativeArray)) {
-                if ($valueKey === '') {
+                if ($valueKey === "") {
                     $return[] = $associativeArray[$key];
                 } elseif (array_key_exists($valueKey, $associativeArray)) {
                     $return[$associativeArray[$key]] = $associativeArray[$valueKey];
@@ -308,7 +321,7 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
     }
 }
 
-if (!function_exists('cTo')) {
+if (!function_exists("cTo")) {
     /**
      * Set a value in an deep array.
      *
@@ -317,23 +330,24 @@ if (!function_exists('cTo')) {
      * @param mixed $value The value to set.
      * @deprecated Use {@link setvalr()}.
      */
-    function cTo(&$data, $name, $value) {
-        $name = explode('.', $name);
+    function cTo(&$data, $name, $value)
+    {
+        $name = explode(".", $name);
         $lastKey = array_pop($name);
-        $current =& $data;
+        $current = &$data;
 
         foreach ($name as $key) {
             if (!isset($current[$key])) {
                 $current[$key] = [];
             }
 
-            $current =& $current[$key];
+            $current = &$current[$key];
         }
         $current[$lastKey] = $value;
     }
 }
 
-if (!function_exists('discussionLink')) {
+if (!function_exists("discussionLink")) {
     /**
      * Build URL for discussion.
      *
@@ -342,24 +356,21 @@ if (!function_exists('discussionLink')) {
      * @param bool $extended
      * @return string
      */
-    function discussionLink($discussion, $extended = true) {
-        deprecated('discussionLink', 'discussionUrl');
+    function discussionLink($discussion, $extended = true)
+    {
+        deprecated("discussionLink", "discussionUrl");
 
-        $discussionID = val('DiscussionID', $discussion);
-        $discussionName = val('Name', $discussion);
-        $parts = [
-            'discussion',
-            $discussionID,
-            Gdn_Format::url($discussionName)
-        ];
+        $discussionID = val("DiscussionID", $discussion);
+        $discussionName = val("Name", $discussion);
+        $parts = ["discussion", $discussionID, Gdn_Format::url($discussionName)];
         if ($extended) {
-            $parts[] = ($discussion->CountCommentWatch > 0) ? '#Item_'.$discussion->CountCommentWatch : '';
+            $parts[] = $discussion->CountCommentWatch > 0 ? "#Item_" . $discussion->CountCommentWatch : "";
         }
-        return url(implode('/', $parts), true);
+        return url(implode("/", $parts), true);
     }
 }
 
-if (!function_exists('explodeTrim')) {
+if (!function_exists("explodeTrim")) {
     /**
      * Split a string by a string and do some trimming to clean up faulty user input.
      *
@@ -369,9 +380,10 @@ if (!function_exists('explodeTrim')) {
      * @return array|string Returns the exploded string as an array or a string if {@link $implode} is true.
      * @deprecated Use ArrayUtils::explodeTrim() instead
      */
-    function explodeTrim($delimiter, $string, $implode = false) {
+    function explodeTrim($delimiter, $string, $implode = false)
+    {
         $arr = explode($delimiter, $string);
-        $arr = array_map('trim', $arr);
+        $arr = array_map("trim", $arr);
         $arr = array_filter($arr);
         if ($implode) {
             return implode($delimiter, $arr);
@@ -381,7 +393,7 @@ if (!function_exists('explodeTrim')) {
     }
 }
 
-if (!function_exists('fixnl2br')) {
+if (!function_exists("fixnl2br")) {
     /**
      * Removes the break above and below tags that have a natural margin.
      *
@@ -391,15 +403,16 @@ if (!function_exists('fixnl2br')) {
      *
      * @deprecated 3.2 - Use \Vanilla\Formatting\Html\HtmlFormat::cleanupLineBreaks
      */
-    function fixnl2br($text) {
-        deprecated(__FUNCTION__, '\Vanilla\Formatting\Formats\HtmlFormat::cleanupLineBreaks');
+    function fixnl2br($text)
+    {
+        deprecated(__FUNCTION__, "\Vanilla\Formatting\Formats\HtmlFormat::cleanupLineBreaks");
         /** @var Formats\HtmlFormat $htmlFormat */
         $htmlFormat = Gdn::getContainer()->get(Formats\HtmlFormat::class);
         return $htmlFormat->cleanupLineBreaks((string) $text);
     }
 }
 
-if (!function_exists('forceSSL')) {
+if (!function_exists("forceSSL")) {
     /**
      * Checks the current url for SSL and redirects to an SSL version if not currently on it.
      *
@@ -408,16 +421,17 @@ if (!function_exists('forceSSL')) {
      *
      * @deprecated
      */
-    function forceSSL() {
-        if (c('Garden.AllowSSL')) {
-            if (Gdn::request()->scheme() != 'https') {
-                redirectTo(Gdn::request()->url('', true, true));
+    function forceSSL()
+    {
+        if (c("Garden.AllowSSL")) {
+            if (Gdn::request()->scheme() != "https") {
+                redirectTo(Gdn::request()->url("", true, true));
             }
         }
     }
 }
 
-if (!function_exists('forceNoSSL')) {
+if (!function_exists("forceNoSSL")) {
     /**
      * Checks the current url for SSL and redirects to SSL version if not currently on it.
      *
@@ -426,14 +440,15 @@ if (!function_exists('forceNoSSL')) {
      *
      * @deprecated
      */
-    function forceNoSSL() {
-        if (Gdn::request()->scheme() != 'http') {
-            redirectTo(Gdn::request()->url('', true, false));
+    function forceNoSSL()
+    {
+        if (Gdn::request()->scheme() != "http") {
+            redirectTo(Gdn::request()->url("", true, false));
         }
     }
 }
 
-if (!function_exists('formatArrayAssignment')) {
+if (!function_exists("formatArrayAssignment")) {
     /**
      * Formats values to be saved as PHP arrays.
      *
@@ -442,35 +457,36 @@ if (!function_exists('formatArrayAssignment')) {
      * @param mixed $value The value in the final assignment.
      * @deprecated
      */
-    function formatArrayAssignment(&$array, $prefix, $value) {
+    function formatArrayAssignment(&$array, $prefix, $value)
+    {
         if (is_array($value)) {
             // If $Value doesn't contain a key of "0" OR it does and it's value IS
             // an array, this should be treated as an associative array.
             $isAssociativeArray = array_key_exists(0, $value) === false || is_array($value[0]) === true ? true : false;
             if ($isAssociativeArray === true) {
                 foreach ($value as $k => $v) {
-                    formatArrayAssignment($array, $prefix.'['.var_export($k, true).']', $v);
+                    formatArrayAssignment($array, $prefix . "[" . var_export($k, true) . "]", $v);
                 }
             } else {
                 // If $Value is not an associative array, just write it like a simple array definition.
-                $formattedValue = array_map(['Gdn_Format', 'ArrayValueForPhp'], $value);
+                $formattedValue = array_map(["Gdn_Format", "ArrayValueForPhp"], $value);
                 $f2 = var_export($value, true);
 
-                $array[] = $prefix .= ' = '.var_export($value, true).';';
+                $array[] = $prefix .= " = " . var_export($value, true) . ";";
             }
         } elseif (is_int($value)) {
-            $array[] = $prefix .= ' = '.$value.';';
+            $array[] = $prefix .= " = " . $value . ";";
         } elseif (is_bool($value)) {
-            $array[] = $prefix .= ' = '.($value ? 'true' : 'false').';';
-        } elseif (in_array($value, ['true', 'false'])) {
-            $array[] = $prefix .= ' = '.($value == 'true' ? 'true' : 'false').';';
+            $array[] = $prefix .= " = " . ($value ? "true" : "false") . ";";
+        } elseif (in_array($value, ["true", "false"])) {
+            $array[] = $prefix .= " = " . ($value == "true" ? "true" : "false") . ";";
         } else {
-            $array[] = $prefix .= ' = '.var_export($value, true).';';
+            $array[] = $prefix .= " = " . var_export($value, true) . ";";
         }
     }
 }
 
-if (!function_exists('formatDottedAssignment')) {
+if (!function_exists("formatDottedAssignment")) {
     /**
      * Formats values to be saved in dotted notation.
      *
@@ -479,7 +495,8 @@ if (!function_exists('formatDottedAssignment')) {
      * @param mixed $value The value to assign.
      * @deprecated
      */
-    function formatDottedAssignment(&$array, $prefix, $value) {
+    function formatDottedAssignment(&$array, $prefix, $value)
+    {
         \Vanilla\Utility\Deprecation::log();
         if (is_array($value)) {
             // If $Value doesn't contain a key of "0" OR it does and it's value IS
@@ -491,26 +508,26 @@ if (!function_exists('formatDottedAssignment')) {
                 }
             } else {
                 // If $Value is not an associative array, just write it like a simple array definition.
-                $formattedValue = array_map(['Gdn_Format', 'ArrayValueForPhp'], $value);
+                $formattedValue = array_map(["Gdn_Format", "ArrayValueForPhp"], $value);
                 $prefix .= "']";
-                $array[] = $prefix .= " = array('".implode("', '", $formattedValue)."');";
+                $array[] = $prefix .= " = array('" . implode("', '", $formattedValue) . "');";
             }
         } else {
             $prefix .= "']";
             if (is_int($value)) {
-                $array[] = $prefix .= ' = '.$value.';';
+                $array[] = $prefix .= " = " . $value . ";";
             } elseif (is_bool($value)) {
-                $array[] = $prefix .= ' = '.($value ? 'true' : 'false').';';
-            } elseif (in_array($value, ['true', 'false'])) {
-                $array[] = $prefix .= ' = '.($value == 'true' ? 'true' : 'false').';';
+                $array[] = $prefix .= " = " . ($value ? "true" : "false") . ";";
+            } elseif (in_array($value, ["true", "false"])) {
+                $array[] = $prefix .= " = " . ($value == "true" ? "true" : "false") . ";";
             } else {
-                $array[] = $prefix .= ' = '.var_export($value, true).';';
+                $array[] = $prefix .= " = " . var_export($value, true) . ";";
             }
         }
     }
 }
 
-if (!function_exists('getIncomingValue')) {
+if (!function_exists("getIncomingValue")) {
     /**
      * Grab {@link $fieldName} from either the GET or POST collections.
      *
@@ -522,7 +539,8 @@ if (!function_exists('getIncomingValue')) {
      *
      * @deprecated Use the various methods on {@link Gdn::request()}.
      */
-    function getIncomingValue($fieldName, $default = false) {
+    function getIncomingValue($fieldName, $default = false)
+    {
         if (array_key_exists($fieldName, $_POST) === true) {
             $result = filter_input(INPUT_POST, $fieldName, FILTER_SANITIZE_STRING); //FILTER_REQUIRE_ARRAY);
         } elseif (array_key_exists($fieldName, $_GET) === true) {
@@ -534,7 +552,7 @@ if (!function_exists('getIncomingValue')) {
     }
 }
 
-if (!function_exists('getObject')) {
+if (!function_exists("getObject")) {
     /**
      * Get a value off of an object.
      *
@@ -544,14 +562,15 @@ if (!function_exists('getObject')) {
      * @return mixed
      * @deprecated getObject() is deprecated. Use val() instead.
      */
-    function getObject($property, $object, $default) {
-        trigger_error('GetObject() is deprecated. Use GetValue() instead.', E_USER_DEPRECATED);
+    function getObject($property, $object, $default)
+    {
+        trigger_error("GetObject() is deprecated. Use GetValue() instead.", E_USER_DEPRECATED);
         $result = val($property, $object, $default);
         return $result;
     }
 }
 
-if (!function_exists('getPostValue')) {
+if (!function_exists("getPostValue")) {
     /**
      * Return the value for $fieldName from the $_POST collection.
      *
@@ -560,12 +579,13 @@ if (!function_exists('getPostValue')) {
      * @return mixed Returns the value of the field or {@link $default}.
      * @deprecated
      */
-    function getPostValue($fieldName, $default = false) {
+    function getPostValue($fieldName, $default = false)
+    {
         return array_key_exists($fieldName, $_POST) ? $_POST[$fieldName] : $default;
     }
 }
 
-if (!function_exists('getValue')) {
+if (!function_exists("getValue")) {
     /**
      * Return the value from an associative array or an object.
      *
@@ -576,7 +596,8 @@ if (!function_exists('getValue')) {
      * @return mixed The value from the array or object.
      * @deprecated Deprecated since 2.2. Use {@link val()} instead.
      */
-    function getValue($key, &$collection, $default = false, $remove = false) {
+    function getValue($key, &$collection, $default = false, $remove = false)
+    {
         $result = $default;
         if (is_array($collection) && array_key_exists($key, $collection)) {
             $result = $collection[$key];
@@ -594,7 +615,7 @@ if (!function_exists('getValue')) {
     }
 }
 
-if (!function_exists('mergeArrays')) {
+if (!function_exists("mergeArrays")) {
     /**
      * Merge two associative arrays into a single array.
      *
@@ -602,7 +623,8 @@ if (!function_exists('mergeArrays')) {
      * @param array $subservient The "subservient" array, who's values will be disregarded over those of the dominant.
      * @deprecated Use {@link array_merge_recursive()}
      */
-    function mergeArrays(&$dominant, $subservient) {
+    function mergeArrays(&$dominant, $subservient)
+    {
         foreach ($subservient as $key => $value) {
             if (!array_key_exists($key, $dominant)) {
                 // Add the key from the subservient array if it doesn't exist in the
@@ -621,7 +643,7 @@ if (!function_exists('mergeArrays')) {
     }
 }
 
-if (!function_exists('parseUrl')) {
+if (!function_exists("parseUrl")) {
     /**
      * A Vanilla wrapper for php's parse_url, which doesn't always return values for every url part.
      *
@@ -630,17 +652,18 @@ if (!function_exists('parseUrl')) {
      * PHP_URL_QUERY or PHP_URL_FRAGMENT to retrieve just a specific url component.
      * @deprecated
      */
-    function parseUrl($url, $component = -1) {
+    function parseUrl($url, $component = -1)
+    {
         \Vanilla\Utility\Deprecation::log();
         $defaults = [
-            'scheme' => 'http',
-            'host' => '',
-            'port' => null,
-            'user' => '',
-            'pass' => '',
-            'path' => '',
-            'query' => '',
-            'fragment' => ''
+            "scheme" => "http",
+            "host" => "",
+            "port" => null,
+            "user" => "",
+            "pass" => "",
+            "path" => "",
+            "query" => "",
+            "fragment" => "",
         ];
 
         $parts = parse_url($url);
@@ -650,35 +673,35 @@ if (!function_exists('parseUrl')) {
             $parts = $defaults;
         }
 
-        if ($parts['port'] === null) {
-            $parts['port'] = $parts['scheme'] === 'https' ? '443' : '80';
+        if ($parts["port"] === null) {
+            $parts["port"] = $parts["scheme"] === "https" ? "443" : "80";
         }
 
         // Return
         switch ($component) {
             case PHP_URL_SCHEME:
-                return $parts['scheme'];
+                return $parts["scheme"];
             case PHP_URL_HOST:
-                return $parts['host'];
+                return $parts["host"];
             case PHP_URL_PORT:
-                return $parts['port'];
+                return $parts["port"];
             case PHP_URL_USER:
-                return $parts['user'];
+                return $parts["user"];
             case PHP_URL_PASS:
-                return $parts['pass'];
+                return $parts["pass"];
             case PHP_URL_PATH:
-                return $parts['path'];
+                return $parts["path"];
             case PHP_URL_QUERY:
-                return $parts['query'];
+                return $parts["query"];
             case PHP_URL_FRAGMENT:
-                return $parts['fragment'];
+                return $parts["fragment"];
             default:
                 return $parts;
         }
     }
 }
 
-if (!function_exists('markString')) {
+if (!function_exists("markString")) {
     /**
      * Wrap occurrences of {@link $needle} in {@link $haystack} with `<mark>` tags.
      *
@@ -689,23 +712,24 @@ if (!function_exists('markString')) {
      * @return string Returns a marked version of {@link $haystack}.
      * @deprecated
      */
-    function markString($needle, $haystack) {
+    function markString($needle, $haystack)
+    {
         if (!$needle) {
             return $haystack;
         }
         if (!is_array($needle)) {
-            $needle = explode(' ', $needle);
+            $needle = explode(" ", $needle);
         }
 
         foreach ($needle as $n) {
             if (strlen($n) <= 2 && preg_match('`^\w+$`', $n)) {
-                $word = '\b';
+                $word = "\b";
             } else {
-                $word = '';
+                $word = "";
             }
 
             $haystack = preg_replace(
-                '#(?!<.*?)('.$word.preg_quote($n, '#').$word.')(?![^<>]*?>)#i',
+                "#(?!<.*?)(" . $word . preg_quote($n, "#") . $word . ")(?![^<>]*?>)#i",
                 '<mark>\1</mark>',
                 $haystack
             );
@@ -714,7 +738,7 @@ if (!function_exists('markString')) {
     }
 }
 
-if (!function_exists('prepareArray')) {
+if (!function_exists("prepareArray")) {
     /**
      * Makes sure that the key in question exists and is of the specified type, by default also an array.
      *
@@ -723,46 +747,47 @@ if (!function_exists('prepareArray')) {
      * @param string $prepareType Optional.
      * @deprecated
      */
-    function prepareArray($key, &$array, $prepareType = 'array') {
+    function prepareArray($key, &$array, $prepareType = "array")
+    {
         if (!array_key_exists($key, $array)) {
             $array[$key] = null;
         }
 
         switch ($prepareType) {
-            case 'array':
+            case "array":
                 if (!is_array($array[$key])) {
                     $array[$key] = [];
                 }
                 break;
 
-            case 'integer':
+            case "integer":
                 if (!is_integer($array[$key])) {
                     $array[$key] = 0;
                 }
                 break;
 
-            case 'float':
+            case "float":
                 if (!is_float($array[$key])) {
                     $array[$key] = 0.0;
                 }
                 break;
 
-            case 'null':
+            case "null":
                 if (!is_null($array[$key])) {
                     $array[$key] = null;
                 }
                 break;
 
-            case 'string':
+            case "string":
                 if (!is_string($array[$key])) {
-                    $array[$key] = '';
+                    $array[$key] = "";
                 }
                 break;
         }
     }
 }
 
-if (!function_exists('redirect')) {
+if (!function_exists("redirect")) {
     /**
      * Redirect to another URL.
      *
@@ -773,11 +798,12 @@ if (!function_exists('redirect')) {
      * Pass a falsey value to redirect to the current URL.
      * @param int|null $statusCode The status of the redirect. This defaults to 302.
      */
-    function redirect($destination = false, $statusCode = null) {
-        deprecated(__FUNCTION__, 'redirectTo');
+    function redirect($destination = false, $statusCode = null)
+    {
+        deprecated(__FUNCTION__, "redirectTo");
 
         if (!$destination) {
-            $destination = '';
+            $destination = "";
         }
 
         // Close any db connections before exit
@@ -789,15 +815,15 @@ if (!function_exists('redirect')) {
         @ob_end_clean();
 
         // assign status code
-        $sendCode = (is_null($statusCode)) ? 302 : $statusCode;
+        $sendCode = is_null($statusCode) ? 302 : $statusCode;
         // re-assign the location header
-        safeHeader("Location: ".url($destination), true, $sendCode);
+        safeHeader("Location: " . url($destination), true, $sendCode);
         // Exit
         exit();
     }
 }
 
-if (!function_exists('redirectUrl')) {
+if (!function_exists("redirectUrl")) {
     /**
      * Redirect to a specific url that can be outside of the site.
      *
@@ -805,11 +831,12 @@ if (!function_exists('redirectUrl')) {
      * @param string $url The url to redirect to.
      * @param int $code The http status code.
      */
-    function redirectUrl($url, $code = 302) {
-        deprecated(__FUNCTION__, 'redirectTo');
+    function redirectUrl($url, $code = 302)
+    {
+        deprecated(__FUNCTION__, "redirectTo");
 
         if (!$url) {
-            $url = url('', true);
+            $url = url("", true);
         }
 
         // Close any db connections before exit
@@ -822,14 +849,14 @@ if (!function_exists('redirectUrl')) {
             $code = 302;
         }
 
-        safeHeader("Location: ".$url, true, $code);
+        safeHeader("Location: " . $url, true, $code);
 
         exit();
     }
 }
 
 // Functions relating to data/variable types and type casting
-if (!function_exists('removeKeyFromArray')) {
+if (!function_exists("removeKeyFromArray")) {
     /**
      * Remove a value from an array at a certain key.
      *
@@ -838,7 +865,8 @@ if (!function_exists('removeKeyFromArray')) {
      * @return mixed Returns a copy of {@link $array} with the key removed.
      * @deprecated Use unset() instead.
      */
-    function removeKeyFromArray($array, $key) {
+    function removeKeyFromArray($array, $key)
+    {
         if (!is_array($key)) {
             $key = [$key];
         }
@@ -854,7 +882,7 @@ if (!function_exists('removeKeyFromArray')) {
     }
 }
 
-if (!function_exists('removeQuoteSlashes')) {
+if (!function_exists("removeQuoteSlashes")) {
     /**
      * Remove the slashes from escaped quotes in a string.
      *
@@ -862,13 +890,14 @@ if (!function_exists('removeQuoteSlashes')) {
      * @return string Returns a copy of {@link $string} with the slashes removed.
      * @deprecated
      */
-    function removeQuoteSlashes($string) {
-        deprecated('removeQuoteSlashes()');
+    function removeQuoteSlashes($string)
+    {
+        deprecated("removeQuoteSlashes()");
         return str_replace("\\\"", '"', $string);
     }
 }
 
-if (!function_exists('removeValueFromArray')) {
+if (!function_exists("removeValueFromArray")) {
     /**
      * Remove a value from an array.
      *
@@ -876,8 +905,9 @@ if (!function_exists('removeValueFromArray')) {
      * @param mixed $value The value to search for and remove.
      * @deprecated
      */
-    function removeValueFromArray(&$array, $value) {
-        deprecated('removeValueFromArray()');
+    function removeValueFromArray(&$array, $value)
+    {
+        deprecated("removeValueFromArray()");
         foreach ($array as $key => $val) {
             if ($val == $value) {
                 unset($array[$key]);
@@ -887,7 +917,7 @@ if (!function_exists('removeValueFromArray')) {
     }
 }
 
-if (!function_exists('safeParseStr')) {
+if (!function_exists("safeParseStr")) {
     /**
      * An alternate implementation of {@link parse_str()}.
      *
@@ -897,9 +927,10 @@ if (!function_exists('safeParseStr')) {
      * @deprecated
      * @see parse_str()
      */
-    function safeParseStr($str, &$output, $original = null) {
+    function safeParseStr($str, &$output, $original = null)
+    {
         \Vanilla\Utility\Deprecation::log();
-        $exploded = explode('&', $str);
+        $exploded = explode("&", $str);
         $output = [];
         if (is_array($original)) {
             $firstValue = reset($original);
@@ -907,9 +938,9 @@ if (!function_exists('safeParseStr')) {
             unset($original[$firstKey]);
         }
         foreach ($exploded as $parameter) {
-            $parts = explode('=', $parameter);
+            $parts = explode("=", $parameter);
             $key = $parts[0];
-            $value = count($parts) > 1 ? $parts[1] : '';
+            $value = count($parts) > 1 ? $parts[1] : "";
 
             if (!is_null($original)) {
                 $output[$key] = $firstValue;
@@ -922,7 +953,7 @@ if (!function_exists('safeParseStr')) {
     }
 }
 
-if (!function_exists('safeRedirect')) {
+if (!function_exists("safeRedirect")) {
     /**
      * Redirect, but only to a safe domain.
      *
@@ -930,11 +961,12 @@ if (!function_exists('safeRedirect')) {
      * @param string $destination Where to redirect.
      * @param int $statusCode The status of the redirect. Defaults to 302.
      */
-    function safeRedirect($destination = false, $statusCode = null) {
-        deprecated(__FUNCTION__, 'redirectTo');
+    function safeRedirect($destination = false, $statusCode = null)
+    {
+        deprecated(__FUNCTION__, "redirectTo");
 
         if (!$destination) {
-            $destination = url('', true);
+            $destination = url("", true);
         } else {
             $destination = url($destination, true);
         }
@@ -952,16 +984,16 @@ if (!function_exists('safeRedirect')) {
         if ($isTrustedDomain) {
             redirectTo($destination, $statusCode, false);
         } else {
-            Logger::notice('Redirect to untrusted domain: {url}.', [
-                'url' => $destination
+            Logger::notice("Redirect to untrusted domain: {url}.", [
+                "url" => $destination,
             ]);
 
-            redirectTo("/home/leaving?Target=".urlencode($destination));
+            redirectTo("/home/leaving?Target=" . urlencode($destination));
         }
     }
 }
 
-if (!function_exists('viewLocation')) {
+if (!function_exists("viewLocation")) {
     /**
      * Get the path of a view.
      *
@@ -971,46 +1003,47 @@ if (!function_exists('viewLocation')) {
      * @return string|false The path to the view or false if it wasn't found.
      * @deprecated
      */
-    function viewLocation($view, $controller, $folder) {
+    function viewLocation($view, $controller, $folder)
+    {
         \Vanilla\Utility\Deprecation::log();
         $paths = [];
 
-        if (strpos($view, '/') !== false) {
+        if (strpos($view, "/") !== false) {
             // This is a path to the view from the root.
             $paths[] = $view;
         } else {
             $view = strtolower($view);
-            $controller = strtolower(stringEndsWith($controller, 'Controller', true, true));
+            $controller = strtolower(stringEndsWith($controller, "Controller", true, true));
             if ($controller) {
-                $controller = '/'.$controller;
+                $controller = "/" . $controller;
             }
 
-            $extensions = ['tpl', 'php'];
+            $extensions = ["tpl", "php"];
 
             // 1. First we check the theme.
-            if (Gdn::controller() && $theme = Gdn::controller()->Theme) {
+            if (Gdn::controller() && ($theme = Gdn::controller()->Theme)) {
                 foreach ($extensions as $ext) {
-                    $paths[] = PATH_THEMES."/{$theme}/views{$controller}/$view.$ext";
+                    $paths[] = PATH_THEMES . "/{$theme}/views{$controller}/$view.$ext";
                 }
             }
 
             // 2. Then we check the application/plugin.
-            if (stringBeginsWith($folder, 'plugins/')) {
+            if (stringBeginsWith($folder, "plugins/")) {
                 // This is a plugin view.
                 foreach ($extensions as $ext) {
-                    $paths[] = PATH_ROOT."/{$folder}/views{$controller}/$view.$ext";
+                    $paths[] = PATH_ROOT . "/{$folder}/views{$controller}/$view.$ext";
                 }
             } else {
                 // This is an application view.
                 $folder = strtolower($folder);
                 foreach ($extensions as $ext) {
-                    $paths[] = PATH_APPLICATIONS."/{$folder}/views{$controller}/$view.$ext";
+                    $paths[] = PATH_APPLICATIONS . "/{$folder}/views{$controller}/$view.$ext";
                 }
 
-                if ($folder != 'dashboard' && stringEndsWith($view, '.master')) {
+                if ($folder != "dashboard" && stringEndsWith($view, ".master")) {
                     // This is a master view that can always fall back to the dashboard.
                     foreach ($extensions as $ext) {
-                        $paths[] = PATH_APPLICATIONS."/dashboard/views{$controller}/$view.$ext";
+                        $paths[] = PATH_APPLICATIONS . "/dashboard/views{$controller}/$view.$ext";
                     }
                 }
             }
@@ -1023,14 +1056,14 @@ if (!function_exists('viewLocation')) {
             }
         }
 
-        trace(['view' => $view, 'controller' => $controller, 'folder' => $folder], 'View');
-        trace($paths, 'ViewLocation()');
+        trace(["view" => $view, "controller" => $controller, "folder" => $folder], "View");
+        trace($paths, "ViewLocation()");
 
         return false;
     }
 }
 
-if (!function_exists('TagFullName')) {
+if (!function_exists("TagFullName")) {
     /**
      * Return the full name of a tag row.
      *
@@ -1038,16 +1071,17 @@ if (!function_exists('TagFullName')) {
      * @return mixed
      * @deprecated
      */
-    function tagFullName($row) {
-        $result = val('FullName', $row);
+    function tagFullName($row)
+    {
+        $result = val("FullName", $row);
         if (!$result) {
-            $result = val('Name', $row);
+            $result = val("Name", $row);
         }
         return $result;
     }
 }
 
-if (!function_exists('\Gdn::config()->touch')) {
+if (!function_exists("touchConfig")) {
     /**
      * Make sure the config has a setting.
      *
@@ -1059,13 +1093,13 @@ if (!function_exists('\Gdn::config()->touch')) {
      *
      * @deprecated 2.8 Use Gdn_Configuration::touch()
      */
-    function touchConfig($name, $default = null) {
-        deprecated(__FUNCTION__, 'Gdn_Configuration::touch()');
+    function touchConfig($name, $default = null)
+    {
         Gdn::config()->touch($name, $default);
     }
 }
 
-if (!function_exists('attribute')) {
+if (!function_exists("attribute")) {
     /**
      * Takes an attribute (or array of attributes) and formats them in attribute="value" format.
      *
@@ -1074,33 +1108,37 @@ if (!function_exists('attribute')) {
      * @return string Returns a string in attribute="value" format.
      * @deprecated Use HtmlUtils::attributes() instead.
      */
-    function attribute($name, $valueOrExclude = '') {
-        $return = '';
+    function attribute($name, $valueOrExclude = "")
+    {
+        $return = "";
         if (!is_array($name)) {
             $name = [$name => $valueOrExclude];
-            $exclude = '';
+            $exclude = "";
         } else {
             $exclude = $valueOrExclude;
         }
 
         foreach ($name as $attribute => $val) {
-            if ((empty($val) && !in_array($val, [0, '0'], true)) || ($exclude && stringBeginsWith($attribute, $exclude))) {
+            if (
+                (empty($val) && !in_array($val, [0, "0"], true)) ||
+                ($exclude && stringBeginsWith($attribute, $exclude))
+            ) {
                 continue;
             }
 
-            if (is_array($val) && strpos($attribute, 'data-') === 0) {
+            if (is_array($val) && strpos($attribute, "data-") === 0) {
                 $val = json_encode($val);
             }
 
-            if ($val != '' && $attribute != 'Standard') {
-                $return .= ' '.$attribute.'="'.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'"';
+            if ($val != "" && $attribute != "Standard") {
+                $return .= " " . $attribute . '="' . htmlspecialchars($val, ENT_COMPAT, "UTF-8") . '"';
             }
         }
         return $return;
     }
 }
 
-if (!function_exists('proxyHead')) {
+if (!function_exists("proxyHead")) {
     /**
      * Make a cURL HEAD request to a URL.
      *
@@ -1112,8 +1150,9 @@ if (!function_exists('proxyHead')) {
      * @throws Exception Throws an exception when there is an unrecoverable error making the request.
      * @deprecated
      */
-    function proxyHead($url, $headers = null, $timeout = false, $followRedirects = false) {
-        deprecated('proxyHead()', 'class ProxyRequest');
+    function proxyHead($url, $headers = null, $timeout = false, $followRedirects = false)
+    {
+        deprecated("proxyHead()", "class ProxyRequest");
 
         if (is_null($headers)) {
             $headers = [];
@@ -1122,36 +1161,36 @@ if (!function_exists('proxyHead')) {
         $originalHeaders = $headers;
         $originalTimeout = $timeout;
         if (!$timeout) {
-            $timeout = c('Garden.SocketTimeout', 1.0);
+            $timeout = c("Garden.SocketTimeout", 1.0);
         }
 
         $urlParts = parse_url($url);
-        $scheme = val('scheme', $urlParts, 'http');
-        $host = val('host', $urlParts, '');
-        $port = val('port', $urlParts, '80');
-        $path = val('path', $urlParts, '');
-        $query = val('query', $urlParts, '');
+        $scheme = val("scheme", $urlParts, "http");
+        $host = val("host", $urlParts, "");
+        $port = val("port", $urlParts, "80");
+        $path = val("path", $urlParts, "");
+        $query = val("query", $urlParts, "");
 
         // Get the cookie.
-        $cookie = '';
-        $encodeCookies = c('Garden.Cookie.Urlencode', true);
+        $cookie = "";
+        $encodeCookies = c("Garden.Cookie.Urlencode", true);
 
         foreach ($_COOKIE as $key => $value) {
-            if (strncasecmp($key, 'XDEBUG', 6) == 0) {
+            if (strncasecmp($key, "XDEBUG", 6) == 0) {
                 continue;
             }
 
             if (strlen($cookie) > 0) {
-                $cookie .= '; ';
+                $cookie .= "; ";
             }
 
-            $eValue = ($encodeCookies) ? urlencode($value) : $value;
+            $eValue = $encodeCookies ? urlencode($value) : $value;
             $cookie .= "{$key}={$eValue}";
         }
-        $cookie = ['Cookie' => $cookie];
+        $cookie = ["Cookie" => $cookie];
 
-        $response = '';
-        if (function_exists('curl_init')) {
+        $response = "";
+        if (function_exists("curl_init")) {
             //$Url = $Scheme.'://'.$Host.$Path;
             $handler = curl_init();
             curl_setopt($handler, CURLOPT_TIMEOUT, $timeout);
@@ -1159,12 +1198,12 @@ if (!function_exists('proxyHead')) {
             curl_setopt($handler, CURLOPT_PORT, $port);
             curl_setopt($handler, CURLOPT_HEADER, 1);
             curl_setopt($handler, CURLOPT_NOBODY, 1);
-            curl_setopt($handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
+            curl_setopt($handler, CURLOPT_USERAGENT, val("HTTP_USER_AGENT", $_SERVER, "Vanilla/2.0"));
             curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($handler, CURLOPT_HTTPHEADER, $headers);
 
-            if (strlen($cookie['Cookie'])) {
-                curl_setopt($handler, CURLOPT_COOKIE, $cookie['Cookie']);
+            if (strlen($cookie["Cookie"])) {
+                curl_setopt($handler, CURLOPT_COOKIE, $cookie["Cookie"]);
             }
 
             $response = curl_exec($handler);
@@ -1173,7 +1212,7 @@ if (!function_exists('proxyHead')) {
             }
 
             curl_close($handler);
-        } elseif (function_exists('fsockopen')) {
+        } elseif (function_exists("fsockopen")) {
             $referer = Gdn::request()->webRoot();
 
             // Make the request
@@ -1191,17 +1230,17 @@ if (!function_exists('proxyHead')) {
 
             $request = "HEAD $path?$query HTTP/1.1\r\n";
 
-            $hostHeader = $host.($port != 80) ? ":{$port}" : '';
+            $hostHeader = $host . ($port != 80) ? ":{$port}" : "";
             $header = [
-                'Host' => $hostHeader,
-                'User-Agent' => val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'),
-                'Accept' => '*/*',
-                'Accept-Charset' => 'utf-8',
-                'Referer' => $referer,
-                'Connection' => 'close'
+                "Host" => $hostHeader,
+                "User-Agent" => val("HTTP_USER_AGENT", $_SERVER, "Vanilla/2.0"),
+                "Accept" => "*/*",
+                "Accept-Charset" => "utf-8",
+                "Referer" => $referer,
+                "Connection" => "close",
             ];
 
-            if (strlen($cookie['Cookie'])) {
+            if (strlen($cookie["Cookie"])) {
                 $header = array_merge($header, $cookie);
             }
 
@@ -1222,34 +1261,38 @@ if (!function_exists('proxyHead')) {
             @fclose($pointer);
             $response = trim($response);
         } else {
-            throw new Exception(t('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
+            throw new Exception(
+                t(
+                    "Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests."
+                )
+            );
         }
 
         $responseLines = explode("\n", trim($response));
         $status = array_shift($responseLines);
         $response = [];
-        $response['HTTP'] = trim($status);
+        $response["HTTP"] = trim($status);
 
         /* get the numeric status code.
-       * - trim off excess edge whitespace,
-       * - split on spaces,
-       * - get the 2nd element (as a single element array),
-       * - pop the first (only) element off it...
-       * - return that.
-       */
-        $response['StatusCode'] = array_pop(array_slice(explode(' ', trim($status)), 1, 1));
+         * - trim off excess edge whitespace,
+         * - split on spaces,
+         * - get the 2nd element (as a single element array),
+         * - pop the first (only) element off it...
+         * - return that.
+         */
+        $response["StatusCode"] = array_pop(array_slice(explode(" ", trim($status)), 1, 1));
         foreach ($responseLines as $line) {
-            $line = explode(':', trim($line));
+            $line = explode(":", trim($line));
             $key = trim(array_shift($line));
-            $value = trim(implode(':', $line));
+            $value = trim(implode(":", $line));
             $response[$key] = $value;
         }
 
         if ($followRedirects) {
-            $code = getValue('StatusCode', $response, 200);
+            $code = getValue("StatusCode", $response, 200);
             if (in_array($code, [301, 302])) {
-                if (array_key_exists('Location', $response)) {
-                    $location = getValue('Location', $response);
+                if (array_key_exists("Location", $response)) {
+                    $location = getValue("Location", $response);
                     return proxyHead($location, $originalHeaders, $originalTimeout, $followRedirects);
                 }
             }
@@ -1257,10 +1300,9 @@ if (!function_exists('proxyHead')) {
 
         return $response;
     }
-
 }
 
-if (!function_exists('proxyRequest')) {
+if (!function_exists("proxyRequest")) {
     /**
      * Use curl or fsock to make a request to a remote server.
      *
@@ -1271,48 +1313,49 @@ if (!function_exists('proxyRequest')) {
      * @return string Returns the response body.
      * @deprecated
      */
-    function proxyRequest($url, $timeout = false, $followRedirects = false) {
-        deprecated('proxyRequest()', 'class ProxyRequest');
+    function proxyRequest($url, $timeout = false, $followRedirects = false)
+    {
+        deprecated("proxyRequest()", "class ProxyRequest");
 
         $originalTimeout = $timeout;
         if ($timeout === false) {
-            $timeout = c('Garden.SocketTimeout', 1.0);
+            $timeout = c("Garden.SocketTimeout", 1.0);
         }
 
         $urlParts = parse_url($url);
-        $scheme = getValue('scheme', $urlParts, 'http');
-        $host = getValue('host', $urlParts, '');
-        $port = getValue('port', $urlParts, $scheme == 'https' ? '443' : '80');
-        $path = getValue('path', $urlParts, '');
-        $query = getValue('query', $urlParts, '');
+        $scheme = getValue("scheme", $urlParts, "http");
+        $host = getValue("host", $urlParts, "");
+        $port = getValue("port", $urlParts, $scheme == "https" ? "443" : "80");
+        $path = getValue("path", $urlParts, "");
+        $query = getValue("query", $urlParts, "");
         // Get the cookie.
-        $cookie = '';
-        $encodeCookies = c('Garden.Cookie.Urlencode', true);
+        $cookie = "";
+        $encodeCookies = c("Garden.Cookie.Urlencode", true);
 
         foreach ($_COOKIE as $key => $value) {
-            if (strncasecmp($key, 'XDEBUG', 6) == 0) {
+            if (strncasecmp($key, "XDEBUG", 6) == 0) {
                 continue;
             }
 
             if (strlen($cookie) > 0) {
-                $cookie .= '; ';
+                $cookie .= "; ";
             }
 
-            $eValue = ($encodeCookies) ? urlencode($value) : $value;
+            $eValue = $encodeCookies ? urlencode($value) : $value;
             $cookie .= "{$key}={$eValue}";
         }
-        $response = '';
-        if (function_exists('curl_init')) {
+        $response = "";
+        if (function_exists("curl_init")) {
             //$Url = $Scheme.'://'.$Host.$Path;
             $handler = curl_init();
             curl_setopt($handler, CURLOPT_URL, $url);
             curl_setopt($handler, CURLOPT_PORT, $port);
             curl_setopt($handler, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($handler, CURLOPT_HEADER, 1);
-            curl_setopt($handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0'));
+            curl_setopt($handler, CURLOPT_USERAGENT, val("HTTP_USER_AGENT", $_SERVER, "Vanilla/2.0"));
             curl_setopt($handler, CURLOPT_RETURNTRANSFER, 1);
 
-            if ($cookie != '') {
+            if ($cookie != "") {
                 curl_setopt($handler, CURLOPT_COOKIE, $cookie);
             }
 
@@ -1331,12 +1374,12 @@ if (!function_exists('proxyRequest')) {
             $success = true;
             if ($response == false) {
                 $success = false;
-                $response = '';
+                $response = "";
                 throw new Exception(curl_error($handler));
             }
 
             curl_close($handler);
-        } elseif (function_exists('fsockopen')) {
+        } elseif (function_exists("fsockopen")) {
             $referer = Gdn_Url::webRoot(true);
 
             // Make the request
@@ -1357,19 +1400,22 @@ if (!function_exists('proxyRequest')) {
                 $cookie = "Cookie: $cookie\r\n";
             }
 
-            $hostHeader = $host.(($port != 80) ? ":{$port}" : '');
-            $header = "GET $path?$query HTTP/1.1\r\n"
-                ."Host: {$hostHeader}\r\n"
+            $hostHeader = $host . ($port != 80 ? ":{$port}" : "");
+            $header =
+                "GET $path?$query HTTP/1.1\r\n" .
+                "Host: {$hostHeader}\r\n" .
                 // If you've got basic authentication enabled for the app, you're going to need to explicitly define
                 // the user/pass for this fsock call.
                 // "Authorization: Basic ". base64_encode ("username:password")."\r\n" .
-                ."User-Agent: ".val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/2.0')."\r\n"
-                ."Accept: */*\r\n"
-                ."Accept-Charset: utf-8;\r\n"
-                ."Referer: {$referer}\r\n"
-                ."Connection: close\r\n";
+                "User-Agent: " .
+                val("HTTP_USER_AGENT", $_SERVER, "Vanilla/2.0") .
+                "\r\n" .
+                "Accept: */*\r\n" .
+                "Accept-Charset: utf-8;\r\n" .
+                "Referer: {$referer}\r\n" .
+                "Connection: close\r\n";
 
-            if ($cookie != '') {
+            if ($cookie != "") {
                 $header .= $cookie;
             }
 
@@ -1386,12 +1432,16 @@ if (!function_exists('proxyRequest')) {
             $success = true;
 
             $streamInfo = stream_get_meta_data($pointer);
-            if (getValue('timed_out', $streamInfo, false) === true) {
+            if (getValue("timed_out", $streamInfo, false) === true) {
                 $success = false;
                 $response = "Operation timed out after {$timeout} seconds with {$bytes} bytes received.";
             }
         } else {
-            throw new Exception(t('Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests.'));
+            throw new Exception(
+                t(
+                    "Encountered an error while making a request to the remote server: Your PHP configuration does not allow curl or fsock requests."
+                )
+            );
         }
 
         if (!$success) {
@@ -1404,32 +1454,32 @@ if (!function_exists('proxyRequest')) {
         $responseHeaderLines = explode("\n", trim($responseHeaderData));
         $status = array_shift($responseHeaderLines);
         $responseHeaders = [];
-        $responseHeaders['HTTP'] = trim($status);
+        $responseHeaders["HTTP"] = trim($status);
 
         /* get the numeric status code.
-       * - trim off excess edge whitespace,
-       * - split on spaces,
-       * - get the 2nd element (as a single element array),
-       * - pop the first (only) element off it...
-       * - return that.
-       */
+         * - trim off excess edge whitespace,
+         * - split on spaces,
+         * - get the 2nd element (as a single element array),
+         * - pop the first (only) element off it...
+         * - return that.
+         */
         $status = trim($status);
-        $status = explode(' ', $status);
+        $status = explode(" ", $status);
         $status = array_slice($status, 1, 1);
         $status = array_pop($status);
-        $responseHeaders['StatusCode'] = $status;
+        $responseHeaders["StatusCode"] = $status;
         foreach ($responseHeaderLines as $line) {
-            $line = explode(':', trim($line));
+            $line = explode(":", trim($line));
             $key = trim(array_shift($line));
-            $value = trim(implode(':', $line));
+            $value = trim(implode(":", $line));
             $responseHeaders[$key] = $value;
         }
 
         if ($followRedirects) {
-            $code = getValue('StatusCode', $responseHeaders, 200);
+            $code = getValue("StatusCode", $responseHeaders, 200);
             if (in_array($code, [301, 302])) {
-                if (array_key_exists('Location', $responseHeaders)) {
-                    $location = absoluteSource(getValue('Location', $responseHeaders), $url);
+                if (array_key_exists("Location", $responseHeaders)) {
+                    $location = absoluteSource(getValue("Location", $responseHeaders), $url);
                     return proxyRequest($location, $originalTimeout, $followRedirects);
                 }
             }

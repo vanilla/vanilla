@@ -4,8 +4,13 @@
  * @license Proprietary
  */
 
-import { ISearchForm, ISearchResult, ISearchResults } from "@library/search/searchTypes";
+import { ISearchForm, ISearchResult, ISearchResponse, IArticlesSearchResult } from "@library/search/searchTypes";
 import { RecordID } from "@vanilla/utils";
+
+interface IParams {
+    pagination?: ISearchResponse["pagination"];
+    result?: Partial<ISearchResult>;
+}
 
 /**
  * Utilities for testing search
@@ -14,24 +19,27 @@ export class SearchFixture {
     /**
      * Create search form
      */
-    public static createMockSearchForm(params?: Partial<ISearchForm>): ISearchForm {
+
+    public static createMockSearchForm<ExtraFormValues extends object = {}>(params?: ExtraFormValues) {
         return {
             domain: "test-domain",
             query: "test-query",
             page: 1,
             sort: "relevance",
             initialized: true,
-            ...params,
-        };
+            ...(params ?? {}),
+        } as ISearchForm<ExtraFormValues>;
     }
-
     /**
      * Create a single search result
      */
-    public static createMockSearchResult(id: number = 1): ISearchResult {
+    public static createMockSearchResult(
+        id: number = 1,
+        params?: Partial<IArticlesSearchResult>,
+    ): IArticlesSearchResult {
         return {
-            name: "test",
-            url: "/",
+            name: `test result ${id}`,
+            url: `test-url-${id}`,
             body: "test",
             excerpt: "test",
             recordID: id,
@@ -40,14 +48,15 @@ export class SearchFixture {
             breadcrumbs: [],
             dateUpdated: "",
             dateInserted: "",
-            insertUserID: 0,
+
             insertUser: {
                 userID: 1,
                 name: "Bob",
                 photoUrl: "",
                 dateLastActive: "2016-07-25 17:51:15",
             },
-            updateUserID: 0,
+
+            ...params,
         };
     }
 
@@ -56,15 +65,13 @@ export class SearchFixture {
      */
     public static createMockSearchResults(
         numberOfResults: number = 14,
-        params: Partial<ISearchResults> = {},
-    ): ISearchResults {
+        params?: { result?: Partial<ISearchResult>; pagination?: Partial<ISearchResponse["pagination"]> },
+    ): ISearchResponse {
         return {
-            results: {
-                ...Array(numberOfResults)
-                    .fill(null)
-                    .map((_, id) => this.createMockSearchResult(id)),
-                ...params?.results,
-            },
+            results: Array(numberOfResults)
+                .fill(null)
+                .map((_, id) => this.createMockSearchResult(id, params?.result)),
+
             pagination: {
                 next: 2,
                 prev: 0,

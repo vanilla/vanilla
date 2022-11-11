@@ -11,10 +11,11 @@
 /**
  * Class SignedInModule.
  */
-class SignedInModule extends Gdn_Module {
-
-    public function assetTarget() {
-        $this->_ApplicationFolder = 'dashboard';
-        return 'Panel';
+class SignedInModule extends Gdn_Module
+{
+    public function assetTarget()
+    {
+        $this->_ApplicationFolder = "dashboard";
+        return "Panel";
     }
 }

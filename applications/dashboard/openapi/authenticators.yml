@@ -38,6 +38,25 @@ paths:
                                 type: array
                                 items:
                                     $ref: "#/components/schemas/AuthenticatorFragment"
+        post:
+            x-hidden: true
+            summary: Post new authenticator.
+            tags:
+                - Authenticators
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/AuthenticatorPostSchema"
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AuthenticatorFragment"
+                    description: Success
+                "403":
+                    $ref: "#/components/responses/PermissionError"
     "/authenticators/{id}":
         parameters:
             - name: id
@@ -72,14 +91,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
-                            properties:
-                                default:
-                                    type: boolean
-                                active:
-                                    type: boolean
-                                visible:
-                                    type: boolean
+                            $ref: "#/components/schemas/AuthenticatorPatchSchema"
             responses:
                 "200":
                     description: Success
@@ -87,6 +99,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/AuthenticatorFragment"
+                "403":
+                    $ref: "#/components/responses/PermissionError"
+                "404":
+                    $ref: "#/components/responses/NotFound"
 components:
     schemas:
         AuthenticatorFragment:
@@ -111,33 +127,11 @@ components:
                     example: true
                 visible:
                     type: boolean
+                isOidc:
+                    type: boolean
+                    default: false
                 urls:
-                    type: object
-                    properties:
-                        signInUrl:
-                            nullable: true
-                            format: uri
-                            type: string
-                        signOutUrl:
-                            nullable: true
-                            format: uri
-                            type: string
-                        authenticateUrl:
-                            nullable: true
-                            format: uri
-                            type: string
-                        registerUrl:
-                            nullable: true
-                            format: uri
-                            type: string
-                        passwordUrl:
-                            nullable: true
-                            format: uri
-                            type: string
-                        profileUrl:
-                            nullable: true
-                            format: uri
-                            type: string
+                    $ref: "#/components/schemas/AuthenticatorUrlSchema"
             required:
                 - authenticatorID
                 - name
@@ -146,18 +140,82 @@ components:
                 - default
                 - active
                 - visible
-# AuthenticationKey           varchar(64)  - clientID
-# AuthenticationSchemeAlias   varchar(32)  - type
-# Name                        varchar(50)  - name
-# URL                         varchar(255)
-# AssociationSecret           text
-# AssociationHashMethod       varchar(20)
-# AuthenticateUrl             varchar(255) - urls.authenticateUrl
-# RegisterUrl                 varchar(255) - urls.registerUrl
-# SignInUrl                   varchar(255) - urls.signInUrl
-# SignOutUrl                  varchar(255) - urls.signOutUrl
-# PasswordUrl                 varchar(255) - urls.passwordUrl
-# ProfileUrl                  varchar(255) - urls.profileUrl
-# Attributes                  text
-# Active                      tinyint(4)   - active
-# IsDefault                   tinyint(4)   - default
+        AuthenticationTypeService:
+            # Schemas will be generated dynamically at runtime.
+            description: Authentication types configuration attributes.
+            oneOf: []
+        AuthenticatorPostSchema:
+            type: object
+            properties:
+                name:
+                    type: string
+                    description: A human readable name for the authenticator.
+                type:
+                    type: string
+                    description: The type of authenticator
+                    example: oauth2
+                clientID:
+                    type: string
+                default:
+                    type: boolean
+                    default: false
+                active:
+                    type: boolean
+                    default: false
+                    example: true
+                visible:
+                    type: boolean
+                    default: false
+                secret:
+                    type: string
+                urls:
+                    $ref: "#/components/schemas/AuthenticatorUrlSchema"
+                authenticatorConfig:
+                    $ref: "#/components/schemas/AuthenticationTypeService"
+            required:
+                - name
+                - type
+        AuthenticatorPatchSchema:
+            type: object
+            properties:
+                default:
+                    type: boolean
+                    default: false
+                active:
+                    type: boolean
+                    default: false
+                    example: true
+                visible:
+                    type: boolean
+                    default: false
+                urls:
+                    $ref: "#/components/schemas/AuthenticatorUrlSchema"
+                authenticatorConfig:
+                    $ref: "#/components/schemas/AuthenticationTypeService"
+        AuthenticatorUrlSchema:
+            type: object
+            properties:
+                signInUrl:
+                    nullable: true
+                    format: uri
+                    type: string
+                signOutUrl:
+                    nullable: true
+                    format: uri
+                    type: string
+                authenticateUrl:
+                    nullable: true
+                    format: uri
+                    type: string
+                registerUrl:
+                    nullable: true
+                    format: uri
+                    type: string
+                passwordUrl:
+                    nullable: true
+                    format: uri
+                    type: string
+                profileUrl:
+                    nullable: true
+                    format: uri
+                    type: string

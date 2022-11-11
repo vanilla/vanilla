@@ -1,0 +1,420 @@
+openapi: 3.0.2
+info:
+paths:
+    /profile-fields:
+        x-hidden: true
+        get:
+            summary: List profile fields.
+            parameters:
+                - name: dataType
+                  description: Filter by the dataType.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - text
+                          - boolean
+                          - date
+                          - number
+                          - string[]
+                          - number[]
+                - name: formType
+                  description: Filter by the formType.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - text
+                          - text-multiline
+                          - dropdown
+                          - tokens
+                          - checkbox
+                          - date
+                          - number
+                - name: visibility
+                  description: Filter by the visibility.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - public
+                          - private
+                          - internal
+                - name: mutability
+                  description: Filter by the mutability.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - all
+                          - restricted
+                          - none
+                - name: registrationOptions
+                  description: Filter by registrationOptions.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - required
+                          - optional
+                          - hidden
+                - name: enabled
+                  description: Filter by enabled state.
+                  in: query
+                  schema:
+                      type: boolean
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/ProfileField"
+                                type: array
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+            tags:
+                - Profile Fields
+        post:
+            summary: Create a profile field.
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ProfileFieldPost"
+            tags:
+                - Profile Fields
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ProfileField"
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+
+    /profile-fields/{apiName}:
+        x-hidden: true
+        patch:
+            summary: Update a profile field.
+            tags:
+                - Profile Fields
+            parameters:
+                - description: The ID of the profile field
+                  in: path
+                  name: apiName
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ProfileFieldPatch"
+                required: true
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/ProfileField"
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "404":
+                    description: Not Found
+                "500":
+                    description: Server Error
+        delete:
+            summary: Delete a profile field.
+            parameters:
+                - description: The ID of the profile field
+                  in: path
+                  name: apiName
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "204":
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "404":
+                    description: Not Found
+                "500":
+                    description: Server Error
+            tags:
+                - Profile Fields
+    /profile-fields/sorts:
+        x-hidden: true
+        put:
+            tags:
+                - Profile Fields
+            summary: Update profile fields' sort values
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties:
+                                type: integer
+
+            responses:
+                "200":
+                    description: Success
+                "400":
+                    description: Bad Request
+                "403":
+                    description: Forbidden
+                "500":
+                    description: Server Error
+components:
+    schemas:
+        ProfileFieldPost:
+            properties:
+                apiName:
+                    description: The ID of the profile field.
+                    minLength: 1
+                    type: string
+                label:
+                    description: The name of the profile field.
+                    minLength: 1
+                    type: string
+                description:
+                    description: The description of the profile field.
+                    type: string
+                dataType:
+                    description: The data type of the profile field.
+                    enum:
+                        - text
+                        - boolean
+                        - date
+                        - number
+                        - string[]
+                        - number[]
+                    type: string
+                formType:
+                    description: The form type of the profile field.
+                    enum:
+                        - text
+                        - text-multiline
+                        - dropdown
+                        - tokens
+                        - checkbox
+                        - date
+                        - number
+                    type: string
+                visibility:
+                    description: The visibility of the profile field.
+                    enum:
+                        - public
+                        - private
+                        - internal
+                    type: string
+                mutability:
+                    description: The mutability of the profile field.
+                    enum:
+                        - all
+                        - restricted
+                        - none
+                    type: string
+                displayOptions:
+                    description: The display options of the profile field.
+                    properties:
+                        userCards:
+                            description: The field appears on user cards.
+                            type: boolean
+                        posts:
+                            description: The field appears on user posts.
+                            type: boolean
+                    type: object
+                dropdownOptions:
+                    description: The list of availible options for a dropdown field.
+                    type: array
+                    items:
+                        oneOf:
+                            - type: string
+                            - type: number
+                            - type: integer
+                    nullable: true
+                registrationOptions:
+                    type: string
+                    enum:
+                        - required
+                        - optional
+                        - hidden
+                enabled:
+                    description: Is the profile field enabled?
+                    type: boolean
+            required:
+                - apiName
+                - label
+                - description
+                - dataType
+                - formType
+                - visibility
+                - mutability
+                - displayOptions
+                - registrationOptions
+            type: object
+        ProfileFieldPatch:
+            properties:
+                label:
+                    description: The name of the profile field.
+                    minLength: 1
+                    type: string
+                description:
+                    description: The description of the profile field.
+                    type: string
+                formType:
+                    description: The form type of the profile field.
+                    enum:
+                        - text
+                        - text-multiline
+                        - dropdown
+                        - tokens
+                        - checkbox
+                        - date
+                        - number
+                    type: string
+                visibility:
+                    description: The visibility of the profile field.
+                    enum:
+                        - public
+                        - private
+                        - internal
+                    type: string
+                mutability:
+                    description: The mutability of the profile field.
+                    enum:
+                        - all
+                        - restricted
+                        - none
+                    type: string
+                displayOptions:
+                    description: The display options of the profile field.
+                    properties:
+                        userCards:
+                            description: The field appears on user cards.
+                            type: boolean
+                        posts:
+                            description: The field appears on user posts.
+                            type: boolean
+                    type: object
+                dropdownOptions:
+                    description: The list of availible options for a dropdown field.
+                    type: array
+                    items:
+                        oneOf:
+                            - type: string
+                            - type: number
+                            - type: integer
+                    nullable: true
+                registrationOptions:
+                    type: string
+                    enum:
+                        - required
+                        - optional
+                        - hidden
+                enabled:
+                    description: Is the profile field enabled?
+                    type: boolean
+            type: object
+        ProfileField:
+            properties:
+                apiName:
+                    description: The ID of the profile field.
+                    type: string
+                label:
+                    description: The name of the profile field.
+                    type: string
+                description:
+                    description: The description of the profile field.
+                    type: string
+                dataType:
+                    description: The data type of the profile field.
+                    enum:
+                        - text
+                        - boolean
+                        - date
+                        - number
+                        - string[]
+                        - number[]
+                    type: string
+                formType:
+                    description: The form type of the profile field.
+                    enum:
+                        - text
+                        - text-multiline
+                        - dropdown
+                        - tokens
+                        - checkbox
+                        - date
+                        - number
+                    type: string
+                visibility:
+                    description: The visibility of the profile field.
+                    enum:
+                        - public
+                        - private
+                        - internal
+                    type: string
+                mutability:
+                    description: The mutability of the profile field.
+                    enum:
+                        - all
+                        - restricted
+                        - none
+                    type: string
+                displayOptions:
+                    description: The display options of the profile field.
+                    properties:
+                        userCards:
+                            description: The field appears on user cards.
+                            type: boolean
+                        posts:
+                            description: The field appears on user posts.
+                            type: boolean
+                    type: object
+                dropdownOptions:
+                    description: The list of availible options for a dropdown field. All dropdown options must be of the specified dataType.
+                    type: array
+                    items:
+                        oneOf:
+                            - type: string
+                            - type: number
+                    nullable: true
+                registrationOptions:
+                    type: string
+                    enum:
+                        - required
+                        - optional
+                        - hidden
+                enabled:
+                    description: Is the profile field enabled?
+                    type: boolean
+            required:
+                - apiName
+                - label
+                - description
+                - dataType
+                - formType
+                - visibility
+                - mutability
+                - displayOptions
+                - registrationOptions
+            type: object

@@ -205,12 +205,6 @@ function OAuth2AddEditSettings(props: ITabContentsProps) {
             >
                 <DashboardInput errors={fieldErrors?.["tokenUrl"]} inputProps={makeInputProps("urls.tokenUrl", true)} />
             </DashboardFormGroup>
-            <DashboardFormGroup label={t("Profile URL")} description={t("Endpoint to retrieve a user's profile.")}>
-                <DashboardInput
-                    errors={fieldErrors?.["profileUrl"]}
-                    inputProps={makeInputProps("urls.profileUrl", true)}
-                />
-            </DashboardFormGroup>
             <DashboardFormGroup
                 label={t("Register URL")}
                 description={t("Enter the endpoint to direct a user to register.")}
@@ -220,6 +214,25 @@ function OAuth2AddEditSettings(props: ITabContentsProps) {
             <DashboardFormGroup label={t("Sign Out URL")} description={t("Enter the endpoint to log a user out.")}>
                 <DashboardInput inputProps={makeInputProps("urls.signOutUrl", true)} />
             </DashboardFormGroup>
+            <DashboardFormGroup
+                label={t("This is an OIDC Connection")}
+                description={t("This connection should use OIDC ID Token instead of a profile URL.")}
+            >
+                <DashboardToggle
+                    checked={values.isOidc ?? false}
+                    onChange={(value) => {
+                        update({ isOidc: value });
+                    }}
+                />
+            </DashboardFormGroup>
+            {!values.isOidc && (
+                <DashboardFormGroup label={t("Profile URL")} description={t("Endpoint to retrieve a user's profile.")}>
+                    <DashboardInput
+                        errors={fieldErrors?.["profileUrl"]}
+                        inputProps={makeInputProps("urls.profileUrl", true)}
+                    />
+                </DashboardFormGroup>
+            )}
             <DashboardFormSubheading>{t("Advanced Settings")}</DashboardFormSubheading>
             <DashboardFormGroup
                 label={t("Request Scope")}

@@ -11,8 +11,8 @@ use Vanilla\Theme\ThemeAssetFactory;
 /**
  * Style theme asset.
  */
-class JavascriptThemeAsset extends ThemeAsset {
-
+class JavascriptThemeAsset extends ThemeAsset
+{
     /** @var bool */
     protected $canMerge = true;
 
@@ -25,7 +25,8 @@ class JavascriptThemeAsset extends ThemeAsset {
      * @param string $data
      * @param string $url
      */
-    public function __construct(string $data, string $url) {
+    public function __construct(string $data, string $url)
+    {
         $this->data = $data;
         $this->url = $url;
     }
@@ -33,28 +34,32 @@ class JavascriptThemeAsset extends ThemeAsset {
     /**
      * @inheritdoc
      */
-    public function getDefaultType(): string {
+    public function getDefaultType(): string
+    {
         return ThemeAssetFactory::ASSET_TYPE_JS;
     }
 
     /**
      * @inheritdoc
      */
-    public function getContentType(): string {
+    public function getContentType(): string
+    {
         return "application/javascript";
     }
 
     /**
      * @inheritdoc
      */
-    public function getValue() {
+    public function getValue()
+    {
         return $this->data;
     }
 
     /**
      * @inheritdoc
      */
-    public function __toString(): string {
+    public function __toString(): string
+    {
         return $this->data;
     }
 }

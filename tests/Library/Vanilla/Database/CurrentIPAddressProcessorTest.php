@@ -18,10 +18,11 @@ use VanillaTests\SetupTraitsTrait;
 /**
  * Tests for the `CurrentIPAddressProcessor` class.
  */
-class CurrentIPAddressProcessorTest extends TestCase {
+class CurrentIPAddressProcessorTest extends TestCase
+{
     use BootstrapTrait, SetupTraitsTrait;
 
-    private const TEST_IP = '2001:db8:85a3::8a2e:370:7334';
+    private const TEST_IP = "2001:db8:85a3::8a2e:370:7334";
 
     /**
      * @var CurrentIPAddressProcessor
@@ -36,23 +37,22 @@ class CurrentIPAddressProcessorTest extends TestCase {
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
 
         $this->container()->call(function (CurrentIPAddressProcessor $processor, \Gdn_Request $request) {
             $request->setIP(self::TEST_IP);
             $this->processor = $processor;
-            $this->processor->setInsertFields(['insertIP']);
-            $this->processor->setUpdateFields(['updateIP']);
-            $this->model = new class('test') extends Model {
+            $this->processor->setInsertFields(["insertIP"]);
+            $this->processor->setUpdateFields(["updateIP"]);
+            $this->model = new class ("test") extends Model {
                 /**
                  * {@inheritDoc}
                  */
-                public function getWriteSchema(): Schema {
-                    return Schema::parse([
-                        'insertIP:s',
-                        'updateIP:s',
-                    ]);
+                public function getWriteSchema(): Schema
+                {
+                    return Schema::parse(["insertIP:s", "updateIP:s"]);
                 }
             };
         });
@@ -61,7 +61,8 @@ class CurrentIPAddressProcessorTest extends TestCase {
     /**
      * Test IP generation on insert.
      */
-    public function testInsertIPGeneration(): void {
+    public function testInsertIPGeneration(): void
+    {
         $op = new Operation();
         $op->setType(Operation::TYPE_INSERT);
         $op->setCaller($this->model);
@@ -69,13 +70,14 @@ class CurrentIPAddressProcessorTest extends TestCase {
 
         $expected = ipEncode($this->processor->getCurrentIPAddress());
         $this->assertCount(1, $op->getSet());
-        $this->assertSame($expected, $op->getSet()['insertIP']);
+        $this->assertSame($expected, $op->getSet()["insertIP"]);
     }
 
     /**
      * Test IP generation on update.
      */
-    public function testUpdateIPGeneration(): void {
+    public function testUpdateIPGeneration(): void
+    {
         $op = new Operation();
         $op->setType(Operation::TYPE_UPDATE);
         $op->setCaller($this->model);
@@ -83,25 +85,27 @@ class CurrentIPAddressProcessorTest extends TestCase {
 
         $expected = ipEncode($this->processor->getCurrentIPAddress());
         $this->assertCount(1, $op->getSet());
-        $this->assertSame($expected, $op->getSet()['updateIP']);
+        $this->assertSame($expected, $op->getSet()["updateIP"]);
     }
 
     /**
      * IP addresses should be decoded to basic strings when fetched from the database.
      */
-    public function testIPDecoding(): void {
+    public function testIPDecoding(): void
+    {
         $op = new Operation();
         $op->setType(Operation::TYPE_SELECT);
         $rows = $this->handleOperation($op);
         $this->assertNotEmpty($rows);
-        $this->assertSame($this->processor->getCurrentIPAddress(), $rows[0]['insertIP']);
-        $this->assertSame($this->processor->getCurrentIPAddress(), $rows[0]['updateIP']);
+        $this->assertSame($this->processor->getCurrentIPAddress(), $rows[0]["insertIP"]);
+        $this->assertSame($this->processor->getCurrentIPAddress(), $rows[0]["updateIP"]);
     }
 
     /**
      * An operation that doesn't do anything shouldn't change the set.
      */
-    public function testDelete(): void {
+    public function testDelete(): void
+    {
         $op = new Operation();
         $op->setType(Operation::TYPE_DELETE);
         $r = $this->handleOperation($op);
@@ -115,7 +119,8 @@ class CurrentIPAddressProcessorTest extends TestCase {
      * @param Operation $op
      * @return array[]|bool
      */
-    public function handleOperation(Operation $op) {
+    public function handleOperation(Operation $op)
+    {
         $r = $this->processor->handle($op, function (Operation $op) {
             switch ($op->getType()) {
                 case Operation::TYPE_INSERT:
@@ -124,7 +129,10 @@ class CurrentIPAddressProcessorTest extends TestCase {
                     return true;
                 case Operation::TYPE_SELECT:
                     $row = [];
-                    foreach (array_merge($this->processor->getInsertFields(), $this->processor->getUpdateFields()) as $field) {
+                    foreach (
+                        array_merge($this->processor->getInsertFields(), $this->processor->getUpdateFields())
+                        as $field
+                    ) {
                         $row[$field] = ipEncode($this->processor->getCurrentIPAddress());
                     }
                     return [$row, []];

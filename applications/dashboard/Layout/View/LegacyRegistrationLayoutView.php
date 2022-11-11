@@ -12,26 +12,29 @@ use Vanilla\Layout\View\LegacyLayoutViewInterface;
 /**
  * Legacy view type for registration view.
  */
-class LegacyRegistrationLayoutView implements LegacyLayoutViewInterface {
-
+class LegacyRegistrationLayoutView implements LegacyLayoutViewInterface
+{
     /**
      * @inheritDoc
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return "Registration";
     }
 
     /**
      * @inheritDoc
      */
-    public function getType(): string {
+    public function getType(): string
+    {
         return "registration";
     }
 
     /**
      * @inheritDoc
      */
-    public function getLegacyType(): string {
+    public function getLegacyType(): string
+    {
         return "Dashboard/Entry/Register";
     }
 }

@@ -10,8 +10,8 @@ namespace Vanilla\Theme\VariableProviders;
 /**
  * Class representing a quick link default variable.
  */
-class QuickLink implements \JsonSerializable {
-
+class QuickLink implements \JsonSerializable
+{
     /** @var string */
     private $name;
 
@@ -56,20 +56,22 @@ class QuickLink implements \JsonSerializable {
     /**
      * @return array
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return [
-            'name' => $this->name,
-            'url' => $this->url,
-            'id' => $this->id,
-            'countLimit' => $this->countLimit,
-            'permission' => $this->permission,
+            "name" => $this->name,
+            "url" => $this->url,
+            "id" => $this->id,
+            "countLimit" => $this->countLimit,
+            "permission" => $this->permission,
         ];
     }
 
     /**
      * @return int|null
      */
-    public function getCount(): ?int {
+    public function getCount(): ?int
+    {
         return $this->count;
     }
 
@@ -78,21 +80,24 @@ class QuickLink implements \JsonSerializable {
      *
      * @return int|null
      */
-    public function getCountLimit(): ?int {
+    public function getCountLimit(): ?int
+    {
         return $this->countLimit;
     }
 
     /**
      * @return string
      */
-    public function getID(): string {
+    public function getID(): string
+    {
         return $this->id;
     }
 
     /**
      * @return int|null
      */
-    public function getSort(): int {
+    public function getSort(): int
+    {
         return $this->sort ?? 0;
     }
 
@@ -101,7 +106,8 @@ class QuickLink implements \JsonSerializable {
      *
      * @param int $countLimit
      */
-    public function setCountLimit(int $countLimit): void {
+    public function setCountLimit(int $countLimit): void
+    {
         $this->countLimit = $countLimit;
     }
 }

@@ -14,7 +14,8 @@ use VanillaTests\APIv0\TestDispatcher;
 /**
  * Common functionality for tests that need extensive entry/connect SSO tests.
  */
-trait EntryControllerConnectTestTrait {
+trait EntryControllerConnectTestTrait
+{
     /**
      * @var \Gdn_AuthenticationProviderModel
      */
@@ -40,7 +41,8 @@ trait EntryControllerConnectTestTrait {
     /**
      * Run setup logic.
      */
-    public function setUpEntryControllerConnectTest(): void {
+    public function setUpEntryControllerConnectTest(): void
+    {
         $this->createUserFixtures();
 
         $this->container()->call(function (
@@ -58,34 +60,34 @@ trait EntryControllerConnectTestTrait {
             [
                 \Gdn_AuthenticationProviderModel::COLUMN_KEY => self::PROVIDER_KEY,
                 \Gdn_AuthenticationProviderModel::COLUMN_ALIAS => self::PROVIDER_KEY,
-                'AssociationSecret' => self::PROVIDER_KEY,
-                'Name' => self::PROVIDER_KEY,
-                'Trusted' => true,
+                "AssociationSecret" => self::PROVIDER_KEY,
+                "Name" => self::PROVIDER_KEY,
+                "Trusted" => true,
             ],
-            ['checkExisting' => true]
+            ["checkExisting" => true]
         );
 
         // Save some default SSO config settings to make testing easier and document the settings!
         $this->config->saveToConfig([
             // Relax username validation so we don't have to worry during SSO testing.
-            'Garden.User.ValidationRegexPattern' => '`.+`',
+            "Garden.User.ValidationRegexPattern" => "`.+`",
             // If you don't know what this is then you haven't been at Vanilla long.
-            'Garden.Registration.AutoConnect' => true,
+            "Garden.Registration.AutoConnect" => true,
             // Allow SSO to connect with existing account via username/password.
-            'Garden.Registration.AllowConnect' => true,
+            "Garden.Registration.AllowConnect" => true,
             // DEPRECATED. Whether or not roles are synchronized during SSO.
-            'Garden.SSO.SyncRoles' => false,
+            "Garden.SSO.SyncRoles" => false,
             // Set to "register" to only sync roles during user registration.
-            'Garden.SSO.SyncRolesBehavior' => '',
+            "Garden.SSO.SyncRolesBehavior" => "",
             // Whether to synchronize user info on subsequent user SSO's.
-            'Garden.Registration.ConnectSynchronize' => true,
+            "Garden.Registration.ConnectSynchronize" => true,
             // Whether SSO acts like the "remember me" checkbox was selected.
-            'Garden.SSO.RememberMe' => true,
+            "Garden.SSO.RememberMe" => true,
             // Affects validation when SSOing. Also affects the users presented during SSO conflicts.
-            'Garden.Registration.NameUnique' => true,
-            'Garden.Registration.EmailUnique' => true,
+            "Garden.Registration.NameUnique" => true,
+            "Garden.Registration.EmailUnique" => true,
             // Whether or not to send a welcome email to SSO users. Almost always false.
-            'Garden.Registration.SendConnectEmail' => false,
+            "Garden.Registration.SendConnectEmail" => false,
         ]);
 
         // Test SSO as someone that isn't signed in yet.
@@ -112,24 +114,34 @@ trait EntryControllerConnectTestTrait {
      * @param bool $throw Whether or not to throw an exception if any form errors occur.
      * @return \EntryController
      */
-    protected function entryConnect($handlerOrUser, $body = [], string $subpath = self::PROVIDER_KEY, bool $throw = true): \EntryController {
+    protected function entryConnect(
+        $handlerOrUser,
+        $body = [],
+        string $subpath = self::PROVIDER_KEY,
+        bool $throw = true
+    ): \EntryController {
         if (!empty($body)) {
             if ($this->bessy()->hasLastHtml() && $throw) {
                 $html = $this->bessy()->getLastHtml();
 
                 // Make sure that everything posted in the body is also in the form from before.
                 foreach ($body as $key => $value) {
+                    //Special case for profile fields.
+                    if ($key == "Profile" && is_array($value)) {
+                        $fieldName = array_key_first($value);
+                        $key = $key . "[" . $fieldName . "]";
+                    }
                     $html->assertFormInput($key);
                 }
 
                 // This is a kludge for our constantly appearing password input.
-                if (!$html->hasFormInput('UserSelect') && !array_key_exists('ConnectPassword', $body)) {
-                    $html->assertNoFormInput('ConnectPassword');
+                if (!$html->hasFormInput("UserSelect") && !array_key_exists("ConnectPassword", $body)) {
+                    $html->assertNoFormInput("ConnectPassword");
                 }
             }
 
             $body += [
-                'Connect' => 'Vous vous connectez?', // needed for postback detection
+                "Connect" => "Vous vous connectez?", // needed for postback detection
             ];
         }
 
@@ -138,25 +150,29 @@ trait EntryControllerConnectTestTrait {
         } elseif (is_array($handlerOrUser)) {
             $handler = $this->basicConnectCallback($handlerOrUser);
         } else {
-            throw new \InvalidArgumentException(__METHOD__.' expects $handlerOrUser to be a callable or an array.');
+            throw new \InvalidArgumentException(__METHOD__ . ' expects $handlerOrUser to be a callable or an array.');
         }
 
         /** @var EventManager $events */
         $events = $this->container()->get(EventManager::class);
         try {
-            $events->bind('base_connectData', $handler);
+            $events->bind("base_connectData", $handler);
 
             if ($subpath) {
-                $subpath = '/'.ltrim($subpath, '/');
+                $subpath = "/" . ltrim($subpath, "/");
             }
 
-            $r = $this->bessy()->post('/entry/connect'.$subpath, $body, [TestDispatcher::OPT_THROW_FORM_ERRORS => $throw]);
+            $r = $this->bessy()->post("/entry/connect" . $subpath, $body, [
+                TestDispatcher::OPT_THROW_FORM_ERRORS => $throw,
+            ]);
             if (!($r instanceof \EntryController)) {
-                throw new \InvalidArgumentException(__METHOD__.' did not return the EntryController: '.get_class($r));
+                throw new \InvalidArgumentException(
+                    __METHOD__ . " did not return the EntryController: " . get_class($r)
+                );
             }
             return $r;
         } finally {
-            $events->unbind('base_connectData', $handler);
+            $events->unbind("base_connectData", $handler);
         }
     }
 
@@ -168,7 +184,11 @@ trait EntryControllerConnectTestTrait {
      * @param string $subpath
      * @return \EntryController
      */
-    protected function entryConnectNoThrow($handlerOrUser, $body = [], string $subpath = self::PROVIDER_KEY): \EntryController {
+    protected function entryConnectNoThrow(
+        $handlerOrUser,
+        $body = [],
+        string $subpath = self::PROVIDER_KEY
+    ): \EntryController {
         return $this->entryConnect($handlerOrUser, $body, $subpath, false);
     }
 
@@ -181,10 +201,11 @@ trait EntryControllerConnectTestTrait {
      * @param array $user The user to SSO.
      * @return callable Returns the callback.
      */
-    protected function basicConnectCallback(array $user): callable {
+    protected function basicConnectCallback(array $user): callable
+    {
         $user += [
-            'Provider' => self::PROVIDER_KEY,
-            'ProviderName' => self::PROVIDER_KEY,
+            "Provider" => self::PROVIDER_KEY,
+            "ProviderName" => self::PROVIDER_KEY,
         ];
 
         /**
@@ -197,7 +218,7 @@ trait EntryControllerConnectTestTrait {
                     $sender->Form->setFormValue($key, $value);
                 }
             }
-            $sender->setData('Verified', true);
+            $sender->setData("Verified", true);
         };
 
         return $handler;
@@ -210,13 +231,14 @@ trait EntryControllerConnectTestTrait {
      * @param string $provider The name of the provider.
      * @return array Returns the user for further assertions.
      */
-    protected function assertAuthentication($uniqueID, string $provider = self::PROVIDER_KEY): array {
+    protected function assertAuthentication($uniqueID, string $provider = self::PROVIDER_KEY): array
+    {
         if (is_array($uniqueID)) {
-            $uniqueID = $uniqueID['UniqueID'];
+            $uniqueID = $uniqueID["UniqueID"];
         }
         $auth = $this->userModel->getAuthentication($uniqueID, $provider);
         $this->assertNotFalse($auth, "The user doesn't have an authentication entry: $uniqueID, $provider");
-        $user = $this->userModel->getID($auth['UserID'], DATASET_TYPE_ARRAY);
+        $user = $this->userModel->getID($auth["UserID"], DATASET_TYPE_ARRAY);
         $this->assertNotFalse($user, "The user was not found with the specified authentication: $uniqueID, $provider");
         return $user;
     }
@@ -229,9 +251,10 @@ trait EntryControllerConnectTestTrait {
      * @param string|array $uniqueID The unique SSO ID of the user or a user with a `UniqueID` key.
      * @param string $provider The name of the provider.
      */
-    protected function assertNoAuthentication($uniqueID, string $provider = self::PROVIDER_KEY): void {
+    protected function assertNoAuthentication($uniqueID, string $provider = self::PROVIDER_KEY): void
+    {
         if (is_array($uniqueID)) {
-            $uniqueID = $uniqueID['UniqueID'];
+            $uniqueID = $uniqueID["UniqueID"];
         }
         $auth = $this->userModel->getAuthentication($uniqueID, $provider);
         $this->assertFalse($auth, "A user authentication record was found: $uniqueID, $provider");
@@ -244,13 +267,14 @@ trait EntryControllerConnectTestTrait {
      * @param bool $assertSession Also assert that the session has started with that user.
      * @return array Returns the user for further assertions.
      */
-    protected function assertSSOUser(array $ssoUser, bool $assertSession = false): array {
-        $dbUser = $this->assertAuthentication($ssoUser['UniqueID']);
-        unset($ssoUser['UniqueID'], $ssoUser['Provider'], $ssoUser['ProviderName']);
+    protected function assertSSOUser(array $ssoUser, bool $assertSession = false): array
+    {
+        $dbUser = $this->assertAuthentication($ssoUser["UniqueID"]);
+        unset($ssoUser["UniqueID"], $ssoUser["Provider"], $ssoUser["ProviderName"]);
         $this->assertArraySubsetRecursive($ssoUser, $dbUser);
 
         if ($assertSession) {
-            $this->assertEquals($dbUser['UserID'], $this->session->UserID);
+            $this->assertEquals($dbUser["UserID"], $this->session->UserID);
         }
 
         return $dbUser;
@@ -264,15 +288,16 @@ trait EntryControllerConnectTestTrait {
      * @param array $overrides Overrides for the user record.
      * @return array
      */
-    protected function ssoDummyUser(array $overrides = []): array {
+    protected function ssoDummyUser(array $overrides = []): array
+    {
         $user = $this->dummyUser($overrides);
-        $userID = $this->userModel->connect($user['Name'], self::PROVIDER_KEY, $user);
+        $userID = $this->userModel->connect($user["Name"], self::PROVIDER_KEY, $user);
         $this->assertNotEmpty($userID);
 
         $dbUser = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
 
         $r = array_intersect_key($dbUser, $user);
-        $r['UniqueID'] = $user['Name'];
+        $r["UniqueID"] = $user["Name"];
         return $r;
     }
 
@@ -291,13 +316,32 @@ trait EntryControllerConnectTestTrait {
      * entry/connect form.
      * @return array Returns the current user from the database for further assertions.
      */
-    public function assertSSORoundTrip(array $ssoUser, $postbackBody = []): array {
+    public function assertSSORoundTrip(array $ssoUser, $postbackBody = []): array
+    {
         $r = $this->entryConnect($ssoUser);
-        $this->assertFalse($this->session->isValid(), 'The user SSO\'d in even though there should be something to fix.');
+        $this->assertFalse(
+            $this->session->isValid(),
+            'The user SSO\'d in even though there should be something to fix.'
+        );
 
-        // Redo the the connect with the terms selected.
+        // Redo the connect with the terms selected.
         $r = $this->entryConnect($ssoUser, $postbackBody);
         return $this->assertSSOUser($ssoUser, true);
+    }
+    /**
+     * Create profile fields with privileged user - admin, to pass the permission.
+     *
+     * @param array $params For profile fields to override defaults.
+     * @return array
+     */
+    protected function createProfileFieldsWithPermission(array $params = []): array
+    {
+        $this->createUserFixtures();
+        $this->session->start($this->adminID);
+        $this->config->set("Feature.CustomProfileFields.Enabled", true);
+        $profileFieldData = $this->createProfileField($params);
+        $this->session->end();
+        return $profileFieldData;
     }
     //endregion
 }

@@ -1,0 +1,13 @@
+openapi: 3.0.2
+info:
+servers:
+    - url: /api/v2
+paths:
+    /assets/embed-script:
+        get:
+            responses:
+                "304":
+                    description: Redirects to the current embed script.
+            tags:
+                - Assets
+            summary: Redirect to the latest version of vanilla's embed script.

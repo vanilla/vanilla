@@ -8,12 +8,12 @@ import ModalSizes from "@library/modal/ModalSizes";
 import { modalClasses } from "@library/modal/modalStyles";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
-import React, { useMemo, useRef, useState, useLayoutEffect, useCallback } from "react";
+import React, { useMemo, useRef, useState, useLayoutEffect, useCallback, useEffect } from "react";
 import ScrollLock, { TouchScrollable } from "react-scrolllock";
 import { EntranceAnimation, ITargetTransform, FromDirection } from "@library/animation/EntranceAnimation";
 import { useLastValue } from "@vanilla/react-utils";
 import { useDropdownContext } from "../flyouts/DropDown";
-import { StackingContextProvider, useStackingContext } from "@library/modal/StackingContext";
+import { StackingContextProvider, useStackingContext } from "@vanilla/react-utils";
 
 interface IProps {
     id?: string;
@@ -42,12 +42,14 @@ export function ModalView(props: IProps) {
     const { titleID, label, size, isVisible, onDestroyed } = props;
     const [isAnimatingOut, setIsAnimatingOut] = useState(false);
     const dropdownContext = useDropdownContext();
+    const [removeTransform, setRemoveTransform] = useState(false);
 
     const lastVisible = useLastValue(isVisible);
     useLayoutEffect(() => {
         if (lastVisible && !isVisible) {
             // Lose visibility
             setIsAnimatingOut(true);
+            setRemoveTransform(false);
             dropdownContext.setIsForcedOpen(false);
         } else if (!lastVisible && isVisible) {
             // Gain visibility
@@ -94,8 +96,8 @@ export function ModalView(props: IProps) {
             case ModalSizes.LARGE:
             case ModalSizes.XL:
                 return {
-                    xPercent: -50,
-                    yPercent: -50,
+                    xPercent: 0,
+                    yPercent: 0,
                 };
             default:
                 return undefined;
@@ -168,6 +170,9 @@ export function ModalView(props: IProps) {
                             isEntered={props.isVisible}
                             role="dialog"
                             aria-modal={true}
+                            onTransitionEndCapture={() => {
+                                setRemoveTransform(true);
+                            }}
                             className={classNames(
                                 classes.root,
                                 {
@@ -184,6 +189,7 @@ export function ModalView(props: IProps) {
                                     isMedium: size === ModalSizes.MEDIUM,
                                     isSmall: size === ModalSizes.SMALL,
                                     isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
+                                    noTransform: removeTransform,
                                 },
                                 props.className,
                             )}

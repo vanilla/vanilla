@@ -15,6 +15,10 @@ export const truncatedTextClasses = useThemeCache(({ lineClamp = "none" }: { lin
         WebkitBoxOrient: "vertical",
         overflow: "hidden",
         textOverflow: "ellipsis",
+
+        img: {
+            display: "none",
+        },
     });
 
     return { truncated };

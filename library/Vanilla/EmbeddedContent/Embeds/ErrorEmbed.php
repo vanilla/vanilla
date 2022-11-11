@@ -13,7 +13,8 @@ use Vanilla\EmbeddedContent\EmbedUtils;
 /**
  * Embed for codepen.io.
  */
-class ErrorEmbed extends AbstractEmbed {
+class ErrorEmbed extends AbstractEmbed
+{
     const TYPE = "error";
 
     /** @var \Exception */
@@ -25,21 +26,22 @@ class ErrorEmbed extends AbstractEmbed {
      * @param \Exception $exception The exception that was thrown.
      * @param array $data The data if we have access to it.
      */
-    public function __construct(\Exception $exception, array $data = []) {
+    public function __construct(\Exception $exception, array $data = [])
+    {
         // Intentionally not calling the parent.
         $this->exception = $exception;
 
         // Try to ensure we have some URL and some Data.
-        if (($data['url'] ?? null) === null) {
-            $data['url'] = t('');
+        if (($data["url"] ?? null) === null) {
+            $data["url"] = t("");
         }
 
-        if (($data['embedType'] ?? null) === null) {
-            $data['embedType'] = self::TYPE;
+        if (($data["embedType"] ?? null) === null) {
+            $data["embedType"] = self::TYPE;
         }
 
         if (debug()) {
-            $data['exception'] = $exception->getMessage();
+            $data["exception"] = $exception->getMessage();
         }
 
         $this->data = $data;
@@ -48,20 +50,21 @@ class ErrorEmbed extends AbstractEmbed {
     /**
      * @inheritdoc
      */
-    public function renderHtml(): string {
-        $viewPath = dirname(__FILE__) . '/ErrorEmbed.twig';
+    public function renderHtml(): string
+    {
+        $viewPath = dirname(__FILE__) . "/ErrorEmbed.twig";
         return $this->renderTwig($viewPath, [
-            'url' => $this->getUrl(),
-            'data' => $this->data,
-            'errorMessage' => $this->exception->getMessage(),
+            "url" => $this->getUrl(),
+            "data" => $this->data,
+            "errorMessage" => $this->exception->getMessage(),
         ]);
     }
-
 
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
+    protected function schema(): Schema
+    {
         return Schema::parse([]);
     }
 
@@ -69,7 +72,8 @@ class ErrorEmbed extends AbstractEmbed {
      * Stubbed out because we aren't using validation on this one.
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [];
     }
 }

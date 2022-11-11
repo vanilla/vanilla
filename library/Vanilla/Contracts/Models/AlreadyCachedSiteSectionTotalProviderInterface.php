@@ -10,5 +10,6 @@ namespace Vanilla\Contracts\Models;
 /**
  * Interface for already cached record types with custom logic for crawlable counts for a specified site section.
  */
-interface AlreadyCachedSiteSectionTotalProviderInterface extends SiteSectionTotalProviderInterface {
+interface AlreadyCachedSiteSectionTotalProviderInterface extends SiteSectionTotalProviderInterface
+{
 }

@@ -24,17 +24,17 @@ use Vanilla\Models\AddonModel;
  *
  * @deprecated 3.0 - Use Vanilla\AddonManager.
  */
-class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
-
+class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface
+{
     const ACTION_ENABLE = 1;
 
     const ACTION_DISABLE = 2;
 
     //const ACTION_REMOVE  = 3;
 
-    const ACCESS_CLASSNAME = 'classname';
+    const ACCESS_CLASSNAME = "classname";
 
-    const ACCESS_PLUGINNAME = 'pluginname';
+    const ACCESS_PLUGINNAME = "pluginname";
 
     /** @var array Available plugins. Never access this directly, instead use $this->availablePlugins(); */
     protected $pluginCache = null;
@@ -88,7 +88,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param AddonManager $addonManager The addon manager that manages all of the addons.
      * @param EventManager $eventManager The event manager that handles all plugin events.
      */
-    public function __construct(AddonManager $addonManager = null, EventManager $eventManager = null) {
+    public function __construct(AddonManager $addonManager = null, EventManager $eventManager = null)
+    {
         parent::__construct();
         $this->addonManager = $addonManager;
         $this->eventManager = $eventManager ?: new EventManager($this);
@@ -98,12 +99,13 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
     /**
      * Set up the plugin framework.
      */
-    public function start() {
+    public function start()
+    {
         // Register hooked methods.
         $this->registerPlugins();
 
         $this->started = true;
-        $this->fireEvent('AfterStart');
+        $this->fireEvent("AfterStart");
     }
 
     /**
@@ -111,7 +113,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @return bool Returns **true** if the plugin manager is started or **false** otherwise.
      */
-    public function started() {
+    public function started()
+    {
         return $this->started;
     }
 
@@ -120,18 +123,19 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @deprecated Use {@link AddonManager::lookupAllByType()}.
      */
-    public function availablePlugins() {
+    public function availablePlugins()
+    {
         $addons = $this->addonManager->lookupAllByType(Addon::TYPE_ADDON);
 
         $result = [];
         foreach ($addons as $addon) {
             /* @var Addon $addon */
-            if ($addon->getInfoValue('oldType') !== 'plugin') {
+            if ($addon->getInfoValue("oldType") !== "plugin") {
                 continue;
             }
 
-            $infoArray  = static::calcOldInfoArray($addon);
-            $result[$infoArray['Index']] = $infoArray;
+            $infoArray = static::calcOldInfoArray($addon);
+            $result[$infoArray["Index"]] = $infoArray;
         }
         return $result;
     }
@@ -141,8 +145,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @deprecated
      */
-    public function forceAutoloaderIndex() {
-        deprecated('Gdn_PuginManager->forceAutoloaderIndex()');
+    public function forceAutoloaderIndex()
+    {
+        deprecated("Gdn_PuginManager->forceAutoloaderIndex()");
     }
 
     /**
@@ -150,8 +155,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @deprecated
      */
-    public function clearPluginCache() {
-        deprecated('Gdn_PluginManager->clearPluginCache()');
+    public function clearPluginCache()
+    {
+        deprecated("Gdn_PluginManager->clearPluginCache()");
     }
 
     /**
@@ -159,9 +165,10 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @return array
      */
-    public function enabledPlugins() {
+    public function enabledPlugins()
+    {
         $addons = $this->addonManager->getEnabled();
-        $plugins = array_filter($addons, Addon::makeFilterCallback(['oldType' => 'plugin']));
+        $plugins = array_filter($addons, Addon::makeFilterCallback(["oldType" => "plugin"]));
 
         $result = [];
         /* @var Addon $plugin */
@@ -181,7 +188,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @deprecated
      * @todo Remove this
      */
-    public function includePlugins() {
+    public function includePlugins()
+    {
         $enabled = $this->addonManager->getEnabled();
         foreach ($enabled as $addon) {
             /* @var \Vanilla\Addon $addon */
@@ -201,7 +209,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @return bool|string Deprecated.
      * @deprecated
      */
-    public function indexSearchPath($searchPath, &$pluginInfo, &$classInfo, $pathListing = null) {
+    public function indexSearchPath($searchPath, &$pluginInfo, &$classInfo, $pathListing = null)
+    {
         if (is_null($pathListing) || !is_array($pathListing)) {
             $pathListing = scandir($searchPath, 0);
             sort($pathListing);
@@ -212,7 +221,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         }
 
         foreach ($pathListing as $pluginFolderName) {
-            if (substr($pluginFolderName, 0, 1) == '.') {
+            if (substr($pluginFolderName, 0, 1) == ".") {
                 continue;
             }
 
@@ -231,24 +240,24 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             }
 
             $realPluginFile = realpath($pluginFile);
-            $searchPluginInfo['RealFile'] = $realPluginFile;
-            $searchPluginInfo['RealRoot'] = dirname($realPluginFile);
-            $searchPluginInfo['SearchPath'] = $searchPath;
-            $searchPluginInfo['Dir'] = "/plugins/$pluginFolderName";
+            $searchPluginInfo["RealFile"] = $realPluginFile;
+            $searchPluginInfo["RealRoot"] = dirname($realPluginFile);
+            $searchPluginInfo["SearchPath"] = $searchPath;
+            $searchPluginInfo["Dir"] = "/plugins/$pluginFolderName";
 
-            $iconUrl = $searchPluginInfo['Dir'].'/'.val('Icon', $searchPluginInfo, 'icon.png');
-            if (file_exists(PATH_ROOT.$iconUrl)) {
-                $searchPluginInfo['IconUrl'] = $iconUrl;
+            $iconUrl = $searchPluginInfo["Dir"] . "/" . val("Icon", $searchPluginInfo, "icon.png");
+            if (file_exists(PATH_ROOT . $iconUrl)) {
+                $searchPluginInfo["IconUrl"] = $iconUrl;
             }
 
             $pluginInfo[$pluginFolderName] = $searchPluginInfo;
 
-//            $addon = $this->addonManager->lookupAddon($SearchPluginInfo['Index']);
-//            $info = static::calcOldInfoArray($addon);
-//
-//            $diff = array_diff($SearchPluginInfo, $info);
+            //            $addon = $this->addonManager->lookupAddon($SearchPluginInfo['Index']);
+            //            $info = static::calcOldInfoArray($addon);
+            //
+            //            $diff = array_diff($SearchPluginInfo, $info);
 
-            $pluginClassName = val('ClassName', $searchPluginInfo);
+            $pluginClassName = val("ClassName", $searchPluginInfo);
             $classInfo[$pluginClassName] = $pluginFolderName;
         }
 
@@ -264,80 +273,80 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @return array Returns an info array.
      * @deprecated
      */
-    public static function calcOldInfoArray(Addon $addon) {
+    public static function calcOldInfoArray(Addon $addon)
+    {
         $info = $addon->getInfo();
 
         $capitalCaseSheme = new \Vanilla\Utility\CapitalCaseScheme();
-        $info = $capitalCaseSheme->convertArrayKeys($info, ['RegisterPermissions']);
+        $info = $capitalCaseSheme->convertArrayKeys($info, ["RegisterPermissions"]);
 
         // This is the basic information from scanPluginFile().
-        $name = $addon->getInfoValue('keyRaw', $addon->getKey());
-        $info['Index'] = $name;
-        $info['ClassName'] = $addon->getPluginClass();
-        $info['PluginFilePath'] = $addon->getClassPath($addon->getPluginClass(), Addon::PATH_FULL);
-        $info['PluginRoot'] = $addon->path();
-        touchValue('Name', $info, $name);
-        touchValue('Folder', $info, $name);
-        $info['Dir'] = $addon->path('', Addon::PATH_ADDON);
+        $name = $addon->getInfoValue("keyRaw", $addon->getKey());
+        $info["Index"] = $name;
+        $info["ClassName"] = $addon->getPluginClass();
+        $info["PluginFilePath"] = $addon->getClassPath($addon->getPluginClass(), Addon::PATH_FULL);
+        $info["PluginRoot"] = $addon->path();
+        touchValue("Name", $info, $name);
+        touchValue("Folder", $info, $name);
+        $info["Dir"] = $addon->path("", Addon::PATH_ADDON);
 
         if ($icon = $addon->getIcon(Addon::PATH_ADDON)) {
-            $info['IconUrl'] = $icon;
+            $info["IconUrl"] = $icon;
         }
-
 
         // This is some additional information from indexSearchPath().
-        if ($info['PluginFilePath']) {
-            $info['RealFile'] = realpath($info['PluginFilePath']);
+        if ($info["PluginFilePath"]) {
+            $info["RealFile"] = realpath($info["PluginFilePath"]);
         }
-        $info['RealRoot'] = realpath($info['PluginRoot']);
-        $info['SearchPath'] = dirname($addon->path());
+        $info["RealRoot"] = realpath($info["PluginRoot"]);
+        $info["SearchPath"] = dirname($addon->path());
 
         // Rejoin the authors.
         $names = [];
         $emails = [];
         $homepages = [];
-        foreach ($addon->getInfoValue('authors', []) as $author) {
-            if (isset($author['name'])) {
-                $names[] = $author['name'];
+        foreach ($addon->getInfoValue("authors", []) as $author) {
+            if (isset($author["name"])) {
+                $names[] = $author["name"];
             }
-            if (isset($author['email'])) {
-                $emails[] = $author['email'];
+            if (isset($author["email"])) {
+                $emails[] = $author["email"];
             }
-            if (isset($author['homepage'])) {
-                $homepages[] = $author['homepage'];
+            if (isset($author["homepage"])) {
+                $homepages[] = $author["homepage"];
             }
         }
         if (!empty($names)) {
-            $info['Author'] = implode(', ', $names);
+            $info["Author"] = implode(", ", $names);
         }
         if (!empty($emails)) {
-            $info['AuthorEmail'] = implode(', ', $emails);
+            $info["AuthorEmail"] = implode(", ", $emails);
         }
         if (!empty($homepages)) {
-            $info['AuthorUrl'] = implode(', ', $homepages);
+            $info["AuthorUrl"] = implode(", ", $homepages);
         }
-        unset($info['Authors']);
+        unset($info["Authors"]);
 
         // Themes have their own particular fields.
         if ($addon->getType() === Addon::TYPE_THEME) {
-            $info['ThemeRoot'] = $addon->path('');
-            if (file_exists($addon->path('about.php'))) {
-                $info['AboutFile'] = $addon->path('about.php');
-                $info['RealAboutFile'] = realpath($info['AboutFile']);
+            $info["ThemeRoot"] = $addon->path("");
+            if (file_exists($addon->path("about.php"))) {
+                $info["AboutFile"] = $addon->path("about.php");
+                $info["RealAboutFile"] = realpath($info["AboutFile"]);
             }
 
             if ($hooksClass = $addon->getPluginClass()) {
-                $info['HooksFile'] = $addon->getClassPath($hooksClass);
-                $info['RealHooksFile'] = realpath($info['HooksFile']);
+                $info["HooksFile"] = $addon->getClassPath($hooksClass);
+                $info["RealHooksFile"] = realpath($info["HooksFile"]);
             }
 
             if ($screenshot = $addon->getIcon(Addon::PATH_ADDON)) {
-                $info['ScreenshotUrl'] = $screenshot;
+                $info["ScreenshotUrl"] = $screenshot;
             }
 
-            $mobileIcon = 'mobile.png';
-            if (file_exists($addon->path('mobile.png'))) {
-                $info['MobileScreenshotUrl'] = $addon->path($mobileIcon, Addon::PATH_ADDON);
+            $mobileIcon = "mobile.png";
+            if (file_exists($addon->path("mobile.png"))) {
+                $info["MobileScreenshotUrl"] = $addon->path($mobileIcon, Addon::PATH_ADDON);
             }
         }
 
@@ -349,8 +358,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @return bool Deprecated.
      */
-    public function addSearchPath() {
-        deprecated('Gdn_PluginManager->addSearchPath()');
+    public function addSearchPath()
+    {
+        deprecated("Gdn_PluginManager->addSearchPath()");
         return true;
     }
 
@@ -359,8 +369,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @return bool Deprecated.
      */
-    public function removeSearchPath() {
-        deprecated('Gdn_PluginManager->removeSearchPath()');
+    public function removeSearchPath()
+    {
+        deprecated("Gdn_PluginManager->removeSearchPath()");
         return true;
     }
 
@@ -370,14 +381,13 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $path The root path of the plugin.
      * @return string|false Returns the path to the plugin class or **false** if one isn't found.
      */
-    private function findPluginFileOld($path) {
+    private function findPluginFileOld($path)
+    {
         if (!is_dir($path)) {
             return false;
         }
         $pluginFiles = scandir($path);
-        $testPatterns = [
-            'default.php', '*plugin.php'
-        ];
+        $testPatterns = ["default.php", "*plugin.php"];
         foreach ($pluginFiles as $pluginFile) {
             foreach ($testPatterns as $test) {
                 if (fnmatch($test, $pluginFile)) {
@@ -395,8 +405,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $path Deprecated.
      * @return string|false Deprecated.
      */
-    public function findPluginFile($path) {
-        deprecated('Gdn_PluginManager->findPluginFile()');
+    public function findPluginFile($path)
+    {
+        deprecated("Gdn_PluginManager->findPluginFile()");
         try {
             $addon = new Addon($path);
             if ($pluginClass = $addon->getPluginClass()) {
@@ -429,7 +440,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *   }
      *  }
      */
-    public function registerPlugins() {
+    public function registerPlugins()
+    {
         $enabled = $this->addonManager->getEnabled();
         foreach ($enabled as $addon) {
             /* @var \Vanilla\Addon $addon */
@@ -437,15 +449,12 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 // Include the plugin here, rather than wait for it to hit the autoloader. This way is much faster.
                 include_once $addon->getClassPath($pluginClass);
 
-                if (!is_a($pluginClass, 'Gdn_IPlugin', true)) {
+                if (!is_a($pluginClass, "Gdn_IPlugin", true)) {
                     trigger_error("$pluginClass does not implement Gdn_IPlugin", E_USER_DEPRECATED);
                 }
 
                 // Only register the plugin if it implements the Gdn_IPlugin interface.
-                if (is_a($pluginClass, 'Gdn_IPlugin', true) &&
-                    !isset($this->registeredPlugins[$pluginClass])
-                ) {
-
+                if (is_a($pluginClass, "Gdn_IPlugin", true) && !isset($this->registeredPlugins[$pluginClass])) {
                     // Register this plugin's methods
                     $this->registerPlugin($pluginClass, $addon->getPriority());
                 }
@@ -458,7 +467,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @return array
      */
-    public function registeredPlugins() {
+    public function registeredPlugins()
+    {
         return $this->registeredPlugins;
     }
 
@@ -468,7 +478,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $className The name of the class.
      * @throws Exception
      */
-    public function registerPlugin($className, $priority = EventManager::PRIORITY_NORMAL) {
+    public function registerPlugin($className, $priority = EventManager::PRIORITY_NORMAL)
+    {
         $className = strtolower($className);
         if (empty($this->registeredPlugins[$className])) {
             $this->eventManager->bindClass($className, $priority);
@@ -482,7 +493,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param $pluginClassName
      * @return bool
      */
-    public function unregisterPlugin($pluginClassName) {
+    public function unregisterPlugin($pluginClassName)
+    {
         $this->eventManager->unbindClass($pluginClassName);
         return true;
     }
@@ -490,13 +502,14 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
     /**
      * Removes all plugins that are marked as mobile unfriendly.
      */
-    public function removeMobileUnfriendlyPlugins() {
+    public function removeMobileUnfriendlyPlugins()
+    {
         $addons = $this->addonManager->getEnabled();
-        $plugins = array_filter($addons, Addon::makeFilterCallback(['oldType' => 'plugin']));
+        $plugins = array_filter($addons, Addon::makeFilterCallback(["oldType" => "plugin"]));
 
         /* @var Addon $plugin */
         foreach ($plugins as $key => $plugin) {
-            if (!$plugin->getInfoValue('mobileFriendly', true) && $plugin->getPluginClass()) {
+            if (!$plugin->getInfoValue("mobileFriendly", true) && $plugin->getPluginClass()) {
                 $this->unregisterPlugin($plugin->getPluginClass());
             }
         }
@@ -509,8 +522,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @return bool Returns **true** if the plugin is enabled or **false** otherwise.
      * @deprecated Use {@link AddonManager::isEnabled()} instead.
      */
-    public function checkPlugin($pluginName) {
-        deprecated('Gdn_PluginManager->checkPlugin()', 'AddonManager->isEnabled()');
+    public function checkPlugin($pluginName)
+    {
+        deprecated("Gdn_PluginManager->checkPlugin()", "AddonManager->isEnabled()");
         $result = $this->isEnabled($pluginName);
         return $result;
     }
@@ -524,12 +538,13 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param array $options
      * @return array
      */
-    public function getEventHandlers($sender, $eventName, $handlerType = 'Handler', $options = []) {
+    public function getEventHandlers($sender, $eventName, $handlerType = "Handler", $options = [])
+    {
         deprecated(__METHOD__);
         // Figure out the classname.
-        if (isset($options['ClassName'])) {
-            $className = $options['ClassName'];
-        } elseif (property_exists($sender, 'ClassName') && $sender->ClassName) {
+        if (isset($options["ClassName"])) {
+            $className = $options["ClassName"];
+        } elseif (property_exists($sender, "ClassName") && $sender->ClassName) {
             $className = $sender->ClassName;
         } else {
             $className = get_class($sender);
@@ -537,22 +552,19 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
         $handlerType = strtolower($handlerType);
         switch ($handlerType) {
-            case 'handler':
-                $handlerType = '';
+            case "handler":
+                $handlerType = "";
                 break;
-            case 'create':
-            case 'override':
-                $handlerType = '_method';
+            case "create":
+            case "override":
+                $handlerType = "_method";
                 break;
             default:
-                $handlerType = '_'.$handlerType;
+                $handlerType = "_" . $handlerType;
         }
 
         // Build the list of event handler names.
-        $names = [
-            "{$className}_{$eventName}{$handlerType}",
-            "Base_{$eventName}{$handlerType}"
-        ];
+        $names = ["{$className}_{$eventName}{$handlerType}", "Base_{$eventName}{$handlerType}"];
 
         // Grab the event handlers.
         $handlers = [];
@@ -560,7 +572,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             $handlers[] = $this->eventManager->getHandlers($name);
         }
 
-        return call_user_func('array_merge', $handlers);
+        return call_user_func("array_merge", $handlers);
     }
 
     /**
@@ -572,7 +584,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @return bool|array Returns an info array or **false** if the plugin isn't found.
      * @deprecated
      */
-    public function getPluginInfo($name, $accessType = self::ACCESS_PLUGINNAME) {
+    public function getPluginInfo($name, $accessType = self::ACCESS_PLUGINNAME)
+    {
         switch ($accessType) {
             case self::ACCESS_PLUGINNAME:
                 $addon = $this->addonManager->lookupAddon($name);
@@ -606,13 +619,14 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @throws \Garden\Container\NotFoundException  No entry was found for this identifier.
      * @throws \Garden\Container\ContainerException Error while retrieving the entry.
      */
-    public function getPluginInstance($name, $accessType = self::ACCESS_CLASSNAME, $sender = null) {
+    public function getPluginInstance($name, $accessType = self::ACCESS_CLASSNAME, $sender = null)
+    {
         $className = null;
         switch ($accessType) {
             case self::ACCESS_PLUGINNAME:
                 $addon = $this->addonManager->lookupAddon($name);
 
-                if ($addon === null || $addon->getPluginClass() == '') {
+                if ($addon === null || $addon->getPluginClass() == "") {
                     throw new InvalidArgumentException("The $name plugin doesn't have a plugin class.", 500);
                 }
                 $className = $addon->getPluginClass();
@@ -625,7 +639,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         }
 
         if (!class_exists($className)) {
-            throw new Exception("Tried to load plugin '{$className}' from access name '{$name}:{$accessType}', but it doesn't exist.");
+            throw new Exception(
+                "Tried to load plugin '{$className}' from access name '{$name}:{$accessType}', but it doesn't exist."
+            );
         }
 
         if (!isset($this->instances[$className])) {
@@ -638,7 +654,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                     $object = new $className($sender);
                 }
             }
-            if (method_exists($object, 'setAddon')) {
+            if ($addon instanceof Addon && method_exists($object, "setAddon")) {
                 $object->setAddon($addon);
             }
 
@@ -655,8 +671,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @return bool Whether or not the plugin is enabled.
      * @deprecated
      */
-    public function isEnabled($name) {
-        deprecated('Gdn_PluginManager->isEnabled()', 'AddonManager->isEnabled()');
+    public function isEnabled($name)
+    {
+        deprecated("Gdn_PluginManager->isEnabled()", "AddonManager->isEnabled()");
         $enabled = $this->addonManager->isEnabled($name, Addon::TYPE_ADDON);
         return $enabled;
     }
@@ -670,7 +687,13 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $eventName The name of the event that will fire.
      * @param string $eventHandlerType The type of event handler.
      */
-    public function registerHandler($handlerClassName, $handlerMethodName, $eventClassName = '', $eventName = '', $eventHandlerType = '') {
+    public function registerHandler(
+        $handlerClassName,
+        $handlerMethodName,
+        $eventClassName = "",
+        $eventName = "",
+        $eventHandlerType = ""
+    ) {
         deprecated(__METHOD__);
 
         $key = $this->normalizeEventKey($eventClassName ?: $handlerClassName, $eventName, $eventHandlerType);
@@ -685,19 +708,20 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $type The name of the type.
      * @return string Returns an event name as a string.
      */
-    private function normalizeEventKey($class, $event, $type = 'handler') {
-        $key = strtolower($class.'_'.$event);
+    private function normalizeEventKey($class, $event, $type = "handler")
+    {
+        $key = strtolower($class . "_" . $event);
         $type = strtolower($type);
 
         switch ($type) {
-            case 'handler':
-            case '':
+            case "handler":
+            case "":
                 return $key;
-            case 'create':
-            case 'override':
-                return $key.'_method';
+            case "create":
+            case "override":
+                return $key . "_method";
             default:
-                return $key.'_'.$type;
+                return $key . "_" . $type;
         }
     }
 
@@ -707,18 +731,19 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $eventName The name of the event to register.
      * @param callable $callback The callback to call when the event is fired.
      */
-    public function registerCallback($eventName, callable $callback) {
+    public function registerCallback($eventName, callable $callback)
+    {
         $eventName = strtolower($eventName);
-        $suffix = strrchr($eventName, '_');
+        $suffix = strrchr($eventName, "_");
         $basename = substr($eventName, 0, -strlen($suffix));
 
         switch ($suffix) {
-            case '_handler':
+            case "_handler":
                 $eventName = $basename;
                 break;
-            case '_create':
-            case '_override':
-                $eventName = $basename.'_method';
+            case "_create":
+            case "_override":
+                $eventName = $basename . "_method";
                 break;
         }
 
@@ -733,8 +758,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $eventClassName The name of the class that will fire the event.
      * @param string $eventName The name of the event that will fire.
      */
-    public function registerOverride($handlerClassName, $handlerMethodName, $eventClassName = '', $eventName = '') {
-        $this->registerHandler($handlerClassName, $handlerMethodName, $eventClassName, $eventName, 'method');
+    public function registerOverride($handlerClassName, $handlerMethodName, $eventClassName = "", $eventName = "")
+    {
+        $this->registerHandler($handlerClassName, $handlerMethodName, $eventClassName, $eventName, "method");
     }
 
     /**
@@ -745,8 +771,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $eventClassName The name of the class that will fire the event.
      * @param string $eventName The name of the event that will fire.
      */
-    public function registerNewMethod($handlerClassName, $handlerMethodName, $eventClassName = '', $eventName = '') {
-        $this->registerHandler($handlerClassName, $handlerMethodName, $eventClassName, $eventName, 'method');
+    public function registerNewMethod($handlerClassName, $handlerMethodName, $eventClassName = "", $eventName = "")
+    {
+        $this->registerHandler($handlerClassName, $handlerMethodName, $eventClassName, $eventName, "method");
     }
 
     /**
@@ -764,7 +791,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $eventHandlerType The type of handler being fired (Handler, Before, After).
      * @return bool Returns **true** if an event was executed.
      */
-    public function callEventHandlers($sender, $eventClassName, $eventName, $eventHandlerType = 'Handler') {
+    public function callEventHandlers($sender, $eventClassName, $eventName, $eventHandlerType = "Handler")
+    {
         $return = false;
 
         // Look through $this->_EventHandlerCollection for relevant handlers
@@ -773,7 +801,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         }
 
         // Look for "Base" (aka any class that has $EventName)
-        if ($this->callEventHandler($sender, 'Base', $eventName, $eventHandlerType)) {
+        if ($this->callEventHandler($sender, "Base", $eventName, $eventHandlerType)) {
             $return = true;
         }
 
@@ -789,23 +817,23 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $handlerType The type of event handler being looked for.
      * @return mixed Returns whatever the event handler returns or **false** of there is not event handler.
      */
-    public function callEventHandler($sender, $className, $eventName, $handlerType = 'handler') {
+    public function callEventHandler($sender, $className, $eventName, $handlerType = "handler")
+    {
         $eventKey = "{$className}_{$eventName}";
-        $originalEventKey = $eventKey.'_'.$handlerType;
+        $originalEventKey = $eventKey . "_" . $handlerType;
 
         switch ($handlerType) {
-            case 'handler':
-            case 'Handler':
+            case "handler":
+            case "Handler":
                 // Do nothing.
                 break;
-            case 'create':
-            case 'Create':
-                $eventKey = $originalEventKey.'_method';
+            case "create":
+            case "Create":
+                $eventKey = $originalEventKey . "_method";
                 break;
             default:
                 $eventKey = $originalEventKey;
         }
-
 
         $results = $this->eventManager->fire(
             $eventKey,
@@ -832,10 +860,11 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $methodName The name of the method that is being overridden.
      * @return mixed Returns the value of overridden method.
      */
-    public function callMethodOverride($sender, $className, $methodName) {
-        $callback = $this->getCallback($className, $methodName, 'Override');
+    public function callMethodOverride($sender, $className, $methodName)
+    {
+        $callback = $this->getCallback($className, $methodName, "Override");
         if (is_callable($callback)) {
-            return call_user_func($callback, $sender, val('RequestArgs', $sender, []));
+            return call_user_func($callback, $sender, val("RequestArgs", $sender, []));
         }
     }
 
@@ -846,8 +875,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $methodName The name of the method that is being overridden.
      * @return bool Returns **true** if an override exists or **false** otherwise.
      */
-    public function hasMethodOverride($className, $methodName) {
-        return $this->eventManager->hasHandler($this->normalizeEventKey($className, $methodName, 'method'));
+    public function hasMethodOverride($className, $methodName)
+    {
+        return $this->eventManager->hasHandler($this->normalizeEventKey($className, $methodName, "method"));
     }
 
     /**
@@ -861,10 +891,11 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $methodName The name of the method that is being created.
      * @return mixed Return value of new method.
      */
-    public function callNewMethod($sender, $className, $methodName) {
-        $callback = $this->getCallback($className, $methodName, 'Create');
+    public function callNewMethod($sender, $className, $methodName)
+    {
+        $callback = $this->getCallback($className, $methodName, "Create");
         if (is_callable($callback)) {
-            return call_user_func($callback, $sender, val('RequestArgs', $sender, []));
+            return call_user_func($callback, $sender, val("RequestArgs", $sender, []));
         }
     }
 
@@ -875,7 +906,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $methodName The name of the event.
      * @return callable|null
      */
-    public function getCallback($className, $methodName) {
+    public function getCallback($className, $methodName)
+    {
         $eventKey = "{$className}_{$methodName}_method";
         $handlers = $this->eventManager->getHandlers($eventKey);
 
@@ -894,7 +926,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $methodName The name of the method that is being created.
      * @return bool Returns **true** if the method exists.
      */
-    public function hasNewMethod($className, $methodName) {
+    public function hasNewMethod($className, $methodName)
+    {
         $event = "{$className}_{$methodName}_method";
         return $this->eventManager->hasHandler($event);
     }
@@ -906,7 +939,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param null $VariableName
      * @return array|null Return the plugin's information or null
      */
-    public function scanPluginFile($PluginFile, $VariableName = null) {
+    public function scanPluginFile($PluginFile, $VariableName = null)
+    {
         // Find the $PluginInfo array
         if (!file_exists($PluginFile)) {
             return null;
@@ -914,17 +948,17 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         $Lines = file($PluginFile);
         $InfoBuffer = false;
         $ClassBuffer = false;
-        $ClassName = '';
-        $PluginInfoString = '';
+        $ClassName = "";
+        $PluginInfoString = "";
         if (!$VariableName) {
-            $VariableName = 'PluginInfo';
+            $VariableName = "PluginInfo";
         }
 
-        $ParseVariableName = '$'.$VariableName;
+        $ParseVariableName = '$' . $VariableName;
 
         foreach ($Lines as $Line) {
             $TrimmedLine = trim($Line);
-            if ($InfoBuffer && substr($TrimmedLine, -1) == ';') {
+            if ($InfoBuffer && substr($TrimmedLine, -1) == ";") {
                 $PluginInfoString .= $Line;
                 $ClassBuffer = true;
                 $InfoBuffer = false;
@@ -938,15 +972,14 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 $PluginInfoString .= $Line;
             }
 
-            if ($ClassBuffer && strtolower(substr($TrimmedLine, 0, 6)) == 'class ') {
-                $Parts = explode(' ', $TrimmedLine);
+            if ($ClassBuffer && strtolower(substr($TrimmedLine, 0, 6)) == "class ") {
+                $Parts = explode(" ", $TrimmedLine);
                 if (count($Parts) > 2) {
                     $ClassName = $Parts[1];
                 }
 
                 break;
             }
-
         }
         unset($Lines);
 
@@ -959,17 +992,17 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
         // Define the folder name and assign the class name for the newly added item.
         $var = !empty(${$VariableName}) ? ${$VariableName} : null;
-        if (is_array($var) && !array_key_exists('Name', $var)) {
+        if (is_array($var) && !array_key_exists("Name", $var)) {
             reset($var);
             $name = key($var);
-            $var = (array)current($var);
+            $var = (array) current($var);
 
-            $var['Index'] = $name;
-            $var['ClassName'] = $ClassName;
-            $var['PluginFilePath'] = $PluginFile;
-            $var['PluginRoot'] = dirname($PluginFile);
-            touchValue('Name', $var, $name);
-            touchValue('Folder', $var, $name);
+            $var["Index"] = $name;
+            $var["ClassName"] = $ClassName;
+            $var["PluginFilePath"] = $PluginFile;
+            $var["PluginRoot"] = dirname($PluginFile);
+            touchValue("Name", $var, $name);
+            touchValue("Folder", $var, $name);
 
             return $var;
         }
@@ -986,27 +1019,28 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param boolean $onlyCustom whether or not to exclude the two default paths and return only config paths
      * @return array Search paths
      */
-    public function searchPaths($onlyCustom = false) {
+    public function searchPaths($onlyCustom = false)
+    {
         if (is_null($this->pluginSearchPaths) || is_null($this->alternatePluginSearchPaths)) {
             $this->pluginSearchPaths = [];
             $this->alternatePluginSearchPaths = [];
 
             // Add default search path(s) to list
-            $this->pluginSearchPaths[rtrim(PATH_PLUGINS, '/')] = 'core';
+            $this->pluginSearchPaths[rtrim(PATH_PLUGINS, "/")] = "core";
 
             // Check for, and load, alternate search paths from config
-            $rawAlternatePaths = c('Garden.PluginManager.Search', null);
+            $rawAlternatePaths = c("Garden.PluginManager.Search", null);
             if (!is_null($rawAlternatePaths)) {
                 $alternatePaths = $rawAlternatePaths;
 
                 if (!is_array($alternatePaths)) {
-                    $alternatePaths = [$alternatePaths => 'alternate'];
+                    $alternatePaths = [$alternatePaths => "alternate"];
                 }
 
                 foreach ($alternatePaths as $altPath => $altName) {
-                    $this->alternatePluginSearchPaths[rtrim($altPath, '/')] = $altName;
+                    $this->alternatePluginSearchPaths[rtrim($altPath, "/")] = $altName;
                     if (is_dir($altPath)) {
-                        $this->pluginSearchPaths[rtrim($altPath, '/')] = $altName;
+                        $this->pluginSearchPaths[rtrim($altPath, "/")] = $altName;
                     }
                 }
             }
@@ -1025,7 +1059,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param null $searchPath
      * @return array
      */
-    public function enabledPluginFolders($searchPath = null) {
+    public function enabledPluginFolders($searchPath = null)
+    {
         if (is_null($searchPath)) {
             return array_keys($this->enabledPlugins());
         } else {
@@ -1040,7 +1075,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param null $searchPath
      * @return array|mixed
      */
-    public function availablePluginFolders($searchPath = null) {
+    public function availablePluginFolders($searchPath = null)
+    {
         if (is_null($searchPath)) {
             return array_keys($this->availablePlugins());
         } else {
@@ -1054,10 +1090,11 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param string $pluginName The name of the plugin to test.
      * @deprecated
      */
-    public function testPlugin($pluginName) {
+    public function testPlugin($pluginName)
+    {
         $addon = $this->addonManager->lookupAddon($pluginName);
         if (!$addon) {
-            throw notFoundException('Plugin');
+            throw notFoundException("Plugin");
         }
 
         try {
@@ -1079,33 +1116,34 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function enablePlugin($pluginName, $validation, $options = []) {
-        $force = val('Force', $options, false);
+    public function enablePlugin($pluginName, $validation, $options = [])
+    {
+        $force = val("Force", $options, false);
 
         // Check to see if the plugin is already enabled.
         if ($this->addonManager->isEnabled($pluginName, Addon::TYPE_ADDON) && !$force) {
-            throw new Gdn_UserException(t('The plugin is already enabled.'));
+            throw new Gdn_UserException(t("The plugin is already enabled."));
         }
 
         $addon = $this->addonManager->lookupAddon($pluginName);
         if (!$addon) {
-            throw notFoundException('Plugin');
+            throw notFoundException("Plugin");
         }
 
         $addonModel = \Gdn::getContainer()->get(AddonModel::class);
-        $enabled = $addonModel->enable($addon, ['force' => $force]);
+        $enabled = $addonModel->enable($addon, ["force" => $force]);
 
         // Refresh the locale just in case there are some translations needed this request.
         Gdn::locale()->refresh();
 
-        $this->EventArguments['AddonName'] = $addon->getRawKey();
-        $this->fireEvent('AddonEnabled');
+        $this->EventArguments["AddonName"] = $addon->getRawKey();
+        $this->fireEvent("AddonEnabled");
 
         $result = [
-            'AddonEnabled' => true,
-            'RequirementsEnabled' => array_filter($enabled, function (Addon $addon) use ($pluginName) {
+            "AddonEnabled" => true,
+            "RequirementsEnabled" => array_filter($enabled, function (Addon $addon) use ($pluginName) {
                 return $addon->getKey() !== $pluginName;
-            })
+            }),
         ];
         return $result;
     }
@@ -1117,7 +1155,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @return bool
      * @throws Exception
      */
-    public function disablePlugin($pluginName) {
+    public function disablePlugin($pluginName)
+    {
         $addon = $this->addonManager->lookupAddon($pluginName);
 
         if (!$addon) {
@@ -1137,39 +1176,40 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @return array|string Returns the authors as an array or string if HTML is requested.
      * @deprecated The authors array is already properly split in the {@link Addon}.
      */
-    public static function splitAuthors($authorsString, $format = 'html') {
-        $authors = explode(';', $authorsString);
+    public static function splitAuthors($authorsString, $format = "html")
+    {
+        $authors = explode(";", $authorsString);
         $result = [];
         foreach ($authors as $authorString) {
-            $parts = explode(',', $authorString, 3);
+            $parts = explode(",", $authorString, 3);
             $author = [];
-            $author['Name'] = trim($parts[0]);
+            $author["Name"] = trim($parts[0]);
             for ($i = 1; $i < count($parts); $i++) {
-                if (strpos($parts[$i], '@') !== false) {
-                    $author['Email'] = $parts[$i];
-                } elseif (preg_match('`^https?://`', $parts[$i])) {
-                    $author['Url'] = $parts[$i];
+                if (strpos($parts[$i], "@") !== false) {
+                    $author["Email"] = $parts[$i];
+                } elseif (preg_match("`^https?://`", $parts[$i])) {
+                    $author["Url"] = $parts[$i];
                 }
             }
             $result[] = $author;
         }
 
-        if (strtolower($format) == 'html') {
+        if (strtolower($format) == "html") {
             // Build the html for the authors.
             $htmls = [];
             foreach ($result as $author) {
-                $name = $author['Name'];
-                if (isset($author['Url'])) {
-                    $url = $author['Url'];
-                } elseif (isset($author['Email'])) {
-                    $url = "mailto:{$author['Email']}";
+                $name = $author["Name"];
+                if (isset($author["Url"])) {
+                    $url = $author["Url"];
+                } elseif (isset($author["Email"])) {
+                    $url = "mailto:{$author["Email"]}";
                 }
 
                 if (isset($url)) {
-                    $htmls[] = '<a href="'.htmlspecialchars($url).'">'.htmlspecialchars($name).'</a>';
+                    $htmls[] = '<a href="' . htmlspecialchars($url) . '">' . htmlspecialchars($name) . "</a>";
                 }
             }
-            $result = implode(', ', $htmls);
+            $result = implode(", ", $htmls);
         }
         return $result;
     }
@@ -1182,16 +1222,17 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param boolean $callback whether to perform the hook method.
      * @return void
      */
-    private function pluginHook($pluginName, $forAction, $callback = false) {
+    private function pluginHook($pluginName, $forAction, $callback = false)
+    {
         switch ($forAction) {
             case self::ACTION_ENABLE:
-                $methodName = 'setup';
+                $methodName = "setup";
                 break;
             case self::ACTION_DISABLE:
-                $methodName = 'onDisable';
+                $methodName = "onDisable";
                 break;
             default:
-                $methodName = '';
+                $methodName = "";
         }
 
         $addon = $this->addonManager->lookupAddon($pluginName);
@@ -1203,7 +1244,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
         if ($callback && !empty($pluginClass) && class_exists($pluginClass)) {
             $plugin = $this->eventManager->getContainer()->get($pluginClass);
-            if (method_exists($plugin, 'setAddon')) {
+            if (method_exists($plugin, "setAddon")) {
                 $plugin->setAddon($addon);
             }
             if (method_exists($pluginClass, $methodName)) {
@@ -1218,9 +1259,10 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param Addon $addon The addon to enable.
      * @throws Exception Throws an exception if something goes bonkers during the process.
      */
-    private function enableAddon(Addon $addon) {
+    private function enableAddon(Addon $addon)
+    {
         $addonModel = \Gdn::getContainer()->get(AddonModel::class);
-        $addonModel->enable($addon, ['force' => true]);
+        $addonModel->enable($addon, ["force" => true]);
     }
 
     /**
@@ -1233,7 +1275,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @return mixed Entry.
      */
-    public function get($id) {
+    public function get($id)
+    {
         return $this->getPluginInstance($id, self::ACCESS_CLASSNAME);
     }
 
@@ -1244,7 +1287,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      *
      * @return boolean
      */
-    public function has($id) {
+    public function has($id)
+    {
         return class_exists($id);
     }
 }

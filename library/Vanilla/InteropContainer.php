@@ -13,7 +13,8 @@ use Psr\Container\ContainerInterface;
 /**
  * Adapts a PSR container to an interop container.
  */
-class InteropContainer implements InteropContainerInterface {
+class InteropContainer implements InteropContainerInterface
+{
     /**
      * @var ContainerInterface
      */
@@ -24,21 +25,24 @@ class InteropContainer implements InteropContainerInterface {
      *
      * @param ContainerInterface $container The container to adapt to.
      */
-    public function __construct(ContainerInterface $container) {
+    public function __construct(ContainerInterface $container)
+    {
         $this->container = $container;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get($id) {
+    public function get($id)
+    {
         return $this->container->get($id);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function has($id) {
+    public function has($id)
+    {
         return $this->container->has($id);
     }
 }

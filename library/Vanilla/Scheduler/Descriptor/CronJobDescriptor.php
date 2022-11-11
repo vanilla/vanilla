@@ -12,8 +12,8 @@ use Vanilla\Scheduler\Job\JobExecutionType;
 /**
  * Class CronJobDescriptor
  */
-class CronJobDescriptor extends NormalJobDescriptor implements CronJobDescriptorInterface {
-
+class CronJobDescriptor extends NormalJobDescriptor implements CronJobDescriptorInterface
+{
     /** @var string */
     protected $schedule;
 
@@ -23,7 +23,8 @@ class CronJobDescriptor extends NormalJobDescriptor implements CronJobDescriptor
      * @param string $jobType
      * @param string $schedule
      */
-    public function __construct(string $jobType, string $schedule) {
+    public function __construct(string $jobType, string $schedule)
+    {
         parent::__construct($jobType);
         $this->schedule = $schedule;
     }
@@ -31,14 +32,27 @@ class CronJobDescriptor extends NormalJobDescriptor implements CronJobDescriptor
     /**
      * @return string
      */
-    public function getSchedule(): string {
+    public function getSchedule(): string
+    {
         return $this->schedule;
     }
 
     /**
      * @return JobExecutionType
      */
-    public function getExecutionType(): JobExecutionType {
+    public function getExecutionType(): JobExecutionType
+    {
         return JobExecutionType::cron();
+    }
+
+    /**
+     * Cron jobs can only be executed when the execution type is cron
+     *
+     * @param JobExecutionType $jobExecutionType
+     * @return bool
+     */
+    public function canExecuteForType(JobExecutionType $jobExecutionType): bool
+    {
+        return $this->getExecutionType()->is($jobExecutionType);
     }
 }

@@ -15,8 +15,8 @@ use Vanilla\Scheduler\Job\TrackableJobAwareTrait;
 /**
  * Trackable job for tests that returns the status it was created with.
  */
-class MockTrackableJob implements LocalJobInterface, TrackableJobAwareInterface {
-
+class MockTrackableJob implements LocalJobInterface, TrackableJobAwareInterface
+{
     use TrackableJobAwareTrait;
 
     /** @var string */
@@ -25,14 +25,16 @@ class MockTrackableJob implements LocalJobInterface, TrackableJobAwareInterface 
     /**
      * @param array $message
      */
-    public function setMessage(array $message) {
-        $this->status = $message['status'];
+    public function setMessage(array $message)
+    {
+        $this->status = $message["status"];
     }
 
     /**
      * @return JobExecutionStatus
      */
-    public function run(): JobExecutionStatus {
+    public function run(): JobExecutionStatus
+    {
         return JobExecutionStatus::looseStatus($this->status);
     }
 }

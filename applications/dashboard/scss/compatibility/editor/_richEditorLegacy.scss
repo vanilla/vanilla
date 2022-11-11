@@ -3,16 +3,15 @@
  * @license GPL-2.0-only
  */
 
-$richEditor_horizontalPadding                     : 36px !default;
-$richEditor_verticalPadding                       : 12px !default;
-$richEditor_innerPadding                          : 12px !default;
+$richEditor_horizontalPadding: 36px !default;
+$richEditor_verticalPadding: 12px !default;
+$richEditor_innerPadding: 12px !default;
 
 body {
     visibility: hidden; // To prevent FOUC
 }
 
 .richEditor {
-
     blockquote {
         display: block;
         margin: 0;
@@ -22,7 +21,8 @@ body {
         left: 0;
     }
 
-    &.isDisabled { // Before React has replaced initial HTML
+    &.isDisabled {
+        // Before React has replaced initial HTML
         &,
         .richEditor-button {
             cursor: progress !important;
@@ -48,8 +48,13 @@ body {
 
     &.Message {
         margin-top: $global-medium_fontSize;
-        & > .embedImage + p {
-                @include clearfix();
+        // Target the last paragraph which is adjacent to the image and add a clear fix
+        & > .embedImage ~ p:last-child {
+            @include clearfix();
+        }
+        // If the image is floated and its the only content, add a clearfix
+        & > .embedImage:first-child:last-child {
+            @include clearfix();
         }
     }
 
@@ -71,7 +76,7 @@ body {
         }
 
         &:first-child:not(br):not(.embedExternal) {
-            margin-top: #{(1 - $global-base_lineHeight) * .5em} !important;
+            margin-top: #{(1 - $global-base_lineHeight) * 0.5em} !important;
         }
     }
 
@@ -79,7 +84,8 @@ body {
         margin-bottom: 0 !important;
     }
 
-    .float-left, .float-right {
+    .float-left,
+    .float-right {
         // Remove margin of the containing div and instead add margin to the floating element.
         margin: 0 !important;
         border: 0 !important;
@@ -106,8 +112,7 @@ body {
     td,
     th,
     a,
-    p
-    {
+    p {
         word-break: break-word;
         text-overflow: ellipsis;
     }
@@ -200,7 +205,6 @@ body.hasRichEditor {
 }
 
 .Popup.hasRichEditor {
-
     .Border {
         box-sizing: border-box;
     }
@@ -215,7 +219,6 @@ body.hasRichEditor {
 
 @include mediaQuery-richEditor_mobile {
     .Popup.hasRichEditor {
-
         .Border {
             width: 100%;
         }
@@ -324,7 +327,7 @@ body.hasRichEditor {
 
                 .Activity {
                     .Buttons {
-                        padding-left: $richEditor_horizontalPadding
+                        padding-left: $richEditor_horizontalPadding;
                     }
                 }
             }
@@ -378,7 +381,6 @@ body.hasRichEditor {
         }
     }
 }
-
 
 .richEditor-text {
     overflow: visible;

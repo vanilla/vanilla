@@ -11,11 +11,13 @@ use Garden\Hydrate\DataHydrator;
 use Monolog\Test\TestCase;
 use Vanilla\Layout\LayoutHydrator;
 
-trait LayoutTestTrait {
+trait LayoutTestTrait
+{
     /**
      * @return LayoutHydrator
      */
-    private function getLayoutService(): LayoutHydrator {
+    private function getLayoutService(): LayoutHydrator
+    {
         return self::container()->get(LayoutHydrator::class);
     }
 
@@ -46,10 +48,11 @@ trait LayoutTestTrait {
      *
      * @return array
      */
-    protected function layoutSection(array $content, array $middleware = []): array {
+    protected function layoutSection(array $content, array $middleware = []): array
+    {
         $node = [
-            DataHydrator::KEY_HYDRATE => 'react.section.1-column',
-            'children' => $content,
+            DataHydrator::KEY_HYDRATE => "react.section.1-column",
+            "children" => $content,
         ];
         if (!empty($middleware)) {
             $node[DataHydrator::KEY_MIDDLEWARE] = $middleware;
@@ -65,15 +68,77 @@ trait LayoutTestTrait {
      *
      * @return string[]
      */
-    protected function layoutHtml(string $html, array $middleware = []) {
+    protected function layoutHtml(string $html, array $middleware = [])
+    {
         $node = [
-            DataHydrator::KEY_HYDRATE => 'react.html',
-            'html' => $html,
+            DataHydrator::KEY_HYDRATE => "react.html",
+            "html" => $html,
         ];
 
         if (!empty($middleware)) {
             $node[DataHydrator::KEY_MIDDLEWARE] = $middleware;
         }
         return $node;
+    }
+
+    /**
+     * Remove the discussions from a discussionList layout for easier comparison.
+     *
+     * @param array $layout
+     * @return array
+     */
+    protected function getDiscussionListLayoutMinusDiscussions(array $layout): array
+    {
+        // Verify the layout was actually hydrated with some discussions.
+        $this->assertNotEmpty($layout[0]['$reactProps']["children"][0]['$reactProps']["discussions"]);
+
+        // Now remove them.
+        $layout[0]['$reactProps']["children"][0]['$reactProps']["discussions"] = [];
+        return $layout;
+    }
+
+    /**
+     * Get the expected discussionList layout for performing assertions.
+     *
+     * @return array[]
+     */
+    protected function getExpectedDiscussionListLayout(): array
+    {
+        $expected = [
+            [
+                '$reactComponent' => "SectionOneColumn",
+                '$reactProps' => [
+                    "children" => [
+                        [
+                            '$reactComponent' => "DiscussionsWidget",
+                            '$reactProps' => [
+                                "apiParams" => [
+                                    "featuredImage" => false,
+                                    "followed" => false,
+                                    "categoryID" => null,
+                                    "includeChildCategories" => true,
+                                    "siteSectionID" => "0",
+                                    "sort" => "-dateLastComment",
+                                    "limit" => 10,
+                                    "expand" => ["all", "-body"],
+                                ],
+                                "discussions" => [],
+                                "title" => null,
+                                "subtitle" => null,
+                                "description" => null,
+                                "noCheckboxes" => false,
+                                "containerOptions" => [],
+                                "discussionOptions" => [],
+                                "isAsset" => true,
+                                "categoryFollowEnabled" => false,
+                            ],
+                        ],
+                    ],
+                    "isNarrow" => false,
+                ],
+            ],
+        ];
+
+        return $expected;
     }
 }

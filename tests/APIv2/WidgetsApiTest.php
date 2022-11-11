@@ -9,24 +9,28 @@ namespace VanillaTests\APIv2;
 /**
  * Test the /api/v2/widgets endpoints.
  */
-class WidgetsApiTest extends AbstractAPIv2Test {
-
+class WidgetsApiTest extends AbstractAPIv2Test
+{
     /** @var array */
     protected static $addons = ["vanilla"];
 
     /**
      * @inheritDoc
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
     }
 
     /**
      * Test INDEX /widgets endpoint.
      */
-    public function testWidgetsIndex() {
-        $widgets = $this->api()->get('widgets')->getBody();
-        $this->assertEquals(7, count($widgets));
+    public function testWidgetsIndex()
+    {
+        $widgets = $this->api()
+            ->get("widgets")
+            ->getBody();
+        $this->assertEquals(8, count($widgets));
     }
 
     /**
@@ -38,11 +42,14 @@ class WidgetsApiTest extends AbstractAPIv2Test {
      * @param string $name
      * @param string $class
      */
-    public function testGetWidgets(string $id, string $name, string $class) {
-        $widget = $this->api()->get('widgets/' . $id)->getBody();
-        $this->assertEquals($id, $widget['widgetID']);
-        $this->assertEquals($name, $widget['name']);
-        $this->assertEquals($class, $widget['widgetClass']);
+    public function testGetWidgets(string $id, string $name, string $class)
+    {
+        $widget = $this->api()
+            ->get("widgets/" . $id)
+            ->getBody();
+        $this->assertEquals($id, $widget["widgetID"]);
+        $this->assertEquals($name, $widget["name"]);
+        $this->assertEquals($class, $widget["widgetClass"]);
     }
 
     /**
@@ -50,7 +57,8 @@ class WidgetsApiTest extends AbstractAPIv2Test {
      *
      * @return array
      */
-    public function widgetNameProvider() {
+    public function widgetNameProvider()
+    {
         $slugBase = "mock-widget-";
         $classBase = "VanillaTests\Fixtures\MockWidgets\MockWidget";
 

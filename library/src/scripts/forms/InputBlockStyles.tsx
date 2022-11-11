@@ -48,7 +48,7 @@ export const inputBlockClasses = useThemeCache(() => {
             },
             [`&.hasError .${inputText}`]: {
                 borderColor: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
-                backgroundColor: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+                backgroundColor: ColorsUtils.colorOut(globalVars.messageColors.error.bg),
                 color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
             },
             "&.isHorizontal": {

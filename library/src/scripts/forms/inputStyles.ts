@@ -109,6 +109,11 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
                     color: colors.state.fg,
                 }),
             },
+            "&.hasError": {
+                borderColor: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+                backgroundColor: ColorsUtils.colorOut(globalVars.messageColors.error.bg),
+                color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+            },
         },
     };
 };

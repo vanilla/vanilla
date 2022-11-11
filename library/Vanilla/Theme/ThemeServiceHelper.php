@@ -14,22 +14,22 @@ use Vanilla\Contracts\ConfigurationInterface;
 /**
  * Theme helper functions.
  */
-class ThemeServiceHelper {
-
+class ThemeServiceHelper
+{
     // Config holding all forced visiblity themes.
-    const CONFIG_THEMES_VISIBLE = 'Garden.Themes.Visible';
-    const ALL_VISIBLE = 'all';
+    const CONFIG_THEMES_VISIBLE = "Garden.Themes.Visible";
+    const ALL_VISIBLE = "all";
 
     // Old desktop config key.
-    const CONFIG_DESKTOP_THEME = 'Garden.Theme';
+    const CONFIG_DESKTOP_THEME = "Garden.Theme";
 
     // Old Mobile config key.
-    const CONFIG_MOBILE_THEME = 'Garden.MobileTheme';
+    const CONFIG_MOBILE_THEME = "Garden.MobileTheme";
 
     // New theme API config.
-    const CONFIG_CURRENT_THEME = 'Garden.CurrentTheme';
+    const CONFIG_CURRENT_THEME = "Garden.CurrentTheme";
 
-    const CORE_THEME_KEYS = ['theme-foundation', 'keystone'];
+    const CORE_THEME_KEYS = ["theme-foundation", "keystone"];
 
     /** @var SessionInterface $session */
     private $session;
@@ -47,26 +47,24 @@ class ThemeServiceHelper {
      * @param SessionInterface $session
      * @param ConfigurationInterface $config
      */
-    public function __construct(
-        AddonManager $addonManager,
-        SessionInterface $session,
-        ConfigurationInterface $config
-    ) {
+    public function __construct(AddonManager $addonManager, SessionInterface $session, ConfigurationInterface $config)
+    {
         $this->session = $session;
         $this->addonManager = $addonManager;
-        $this->config  = $config;
+        $this->config = $config;
     }
 
     /**
      * Filter themes based on their addon.json.
      *
-     * @param Addon $theme A themes data from it's addon.json.
+     * @param Addon $theme A themes data from its addon.json.
      * @param string $siteName The vanilla domain of the site.
      *
      * @return bool
      */
-    public function isThemeVisible(Addon $theme, ?string $siteName = null): bool {
-        if ($siteName === null && defined('CLIENT_NAME')) {
+    public function isThemeVisible(Addon $theme, ?string $siteName = null): bool
+    {
+        if ($siteName === null && defined("CLIENT_NAME")) {
             $siteName = CLIENT_NAME;
         }
         $confVisible = $this->config->get(self::CONFIG_THEMES_VISIBLE);
@@ -83,23 +81,23 @@ class ThemeServiceHelper {
         }
 
         $themeKey = $theme->getKey();
-        $alwaysVisibleThemes = array_map('trim', explode(",", $confVisible));
+        $alwaysVisibleThemes = array_map("trim", explode(",", $confVisible));
         $alwaysVisibleThemes = array_unique(array_merge($alwaysVisibleThemes, self::CORE_THEME_KEYS));
 
         if (in_array($themeKey, $alwaysVisibleThemes, true)) {
             return true;
         }
 
-        $currentTheme = $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+        $currentTheme = $this->config->get("Garden.CurrentTheme", $this->config->get("Garden.Theme"));
         if ($currentTheme === $themeKey) {
             // Always visible.
             return true;
         }
 
         // Check if theme visibility is set through the JSON.
-        $hidden = $theme->getInfoValue('hidden', null);
-        $sites = $theme->getInfoValue('sites', []);
-        $site = $theme->getInfoValue('site', null);
+        $hidden = $theme->getInfoValue("hidden", null);
+        $sites = $theme->getInfoValue("sites", []);
+        $site = $theme->getInfoValue("site", null);
         if ($site !== null) {
             $sites[] = $site;
         }
@@ -125,44 +123,41 @@ class ThemeServiceHelper {
      * @param Theme $theme
      * @param int|null $revisionID
      */
-    public function setSessionPreviewTheme(Theme $theme, ?int $revisionID = null) {
-        $this->session->setPreference('PreviewThemeKey', $theme->getThemeID());
-        $this->session->setPreference('PreviewThemeRevisionID', $revisionID);
+    public function setSessionPreviewTheme(Theme $theme, ?int $revisionID = null)
+    {
+        $this->session->setPreference("PreviewThemeKey", $theme->getThemeID());
+        $this->session->setPreference("PreviewThemeRevisionID", $revisionID);
 
         $addonKey = $theme->getAddon()->getKey();
         $displayName = $theme->getName();
 
         $themeInfo = $this->addonManager->lookupTheme($addonKey)->getInfo();
 
-        $isMobile = $themeInfo['IsMobile'] ?? false;
+        $isMobile = $themeInfo["IsMobile"] ?? false;
 
         if ($isMobile) {
-            $this->session->setPreference(
-                ['PreviewMobileThemeFolder' => $addonKey,
-                    'PreviewMobileThemeName' => $displayName]
-            );
+            $this->session->setPreference([
+                "PreviewMobileThemeFolder" => $addonKey,
+                "PreviewMobileThemeName" => $displayName,
+            ]);
         } else {
-            $this->session->setPreference(
-                ['PreviewThemeFolder' => $addonKey,
-                    'PreviewThemeName' => $displayName]
-            );
+            $this->session->setPreference(["PreviewThemeFolder" => $addonKey, "PreviewThemeName" => $displayName]);
         }
     }
 
     /**
      * Reset preview theme and switch back to current
      */
-    public function cancelSessionPreviewTheme() {
-        $this->session->setPreference(
-            [
-                'PreviewThemeKey' => '',
-                'PreviewThemeRevisionID' => '',
-                'PreviewMobileThemeFolder' => '',
-                'PreviewMobileThemeName' => '',
-                'PreviewThemeFolder' => '',
-                'PreviewThemeName' => ''
-            ]
-        );
+    public function cancelSessionPreviewTheme()
+    {
+        $this->session->setPreference([
+            "PreviewThemeKey" => "",
+            "PreviewThemeRevisionID" => "",
+            "PreviewMobileThemeFolder" => "",
+            "PreviewMobileThemeName" => "",
+            "PreviewThemeFolder" => "",
+            "PreviewThemeName" => "",
+        ]);
     }
 
     /**
@@ -170,8 +165,9 @@ class ThemeServiceHelper {
      *
      * @return string
      */
-    public function getConfigThemeKey(): string {
-        return $this->config->get('Garden.CurrentTheme', $this->config->get('Garden.Theme'));
+    public function getConfigThemeKey(): string
+    {
+        return $this->config->get("Garden.CurrentTheme", $this->config->get("Garden.Theme"));
     }
 
     /**
@@ -179,14 +175,15 @@ class ThemeServiceHelper {
      *
      * This way if themes are hidden in the future, a customer won't lose access to the theme.
      */
-    public function saveCurrentThemeToVisible() {
-        $currentVisible = $this->config->get(self::CONFIG_THEMES_VISIBLE, '');
+    public function saveCurrentThemeToVisible()
+    {
+        $currentVisible = $this->config->get(self::CONFIG_THEMES_VISIBLE, "");
         if ($currentVisible === self::ALL_VISIBLE) {
             // Don't modify because all are visible.
             return;
         }
 
-        $themes = array_filter(array_map('trim', explode(",", $currentVisible)));
+        $themes = array_filter(array_map("trim", explode(",", $currentVisible)));
         $desktopTheme = $this->config->get(self::CONFIG_DESKTOP_THEME);
         $mobileTheme = $this->config->get(self::CONFIG_MOBILE_THEME);
         $currentTheme = $this->config->get(self::CONFIG_CURRENT_THEME);

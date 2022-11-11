@@ -10,8 +10,8 @@ namespace Vanilla\Forum\Modules;
 /**
  * Options for the foundation shims.
  */
-final class FoundationShimOptions {
-
+final class FoundationShimOptions
+{
     /** @var string|null */
     private $title = null;
 
@@ -27,7 +27,8 @@ final class FoundationShimOptions {
     /**
      * @return FoundationShimOptions
      */
-    public static function create(): FoundationShimOptions {
+    public static function create(): FoundationShimOptions
+    {
         return new FoundationShimOptions();
     }
 
@@ -38,7 +39,8 @@ final class FoundationShimOptions {
      *
      * @return $this
      */
-    public function setTitle(?string $title): FoundationShimOptions {
+    public function setTitle(?string $title): FoundationShimOptions
+    {
         $this->title = $title;
         return $this;
     }
@@ -50,7 +52,8 @@ final class FoundationShimOptions {
      *
      * @return $this
      */
-    public function setDescription(?string $description): FoundationShimOptions {
+    public function setDescription(?string $description): FoundationShimOptions
+    {
         $this->description = $description;
         return $this;
     }
@@ -62,7 +65,8 @@ final class FoundationShimOptions {
      *
      * @return $this
      */
-    public function setViewAllUrl(?string $viewAllUrl): FoundationShimOptions {
+    public function setViewAllUrl(?string $viewAllUrl): FoundationShimOptions
+    {
         $this->viewAllUrl = $viewAllUrl;
         return $this;
     }
@@ -74,38 +78,41 @@ final class FoundationShimOptions {
      *
      * @return $this
      */
-    public function setIsMainContent(bool $isMainContent): FoundationShimOptions {
+    public function setIsMainContent(bool $isMainContent): FoundationShimOptions
+    {
         $this->isMainContent = $isMainContent;
         return $this;
     }
 
-
-
     /**
      * @return string|null
      */
-    public function getTitle(): ?string {
+    public function getTitle(): ?string
+    {
         return $this->title;
     }
 
     /**
      * @return string|null
      */
-    public function getDescription(): ?string {
+    public function getDescription(): ?string
+    {
         return $this->description;
     }
 
     /**
      * @return string|null
      */
-    public function getViewAllUrl(): ?string {
+    public function getViewAllUrl(): ?string
+    {
         return $this->viewAllUrl;
     }
 
     /**
      * @return bool
      */
-    public function isMainContent(): bool {
+    public function isMainContent(): bool
+    {
         return $this->isMainContent;
     }
 }

@@ -11,8 +11,8 @@ namespace Vanilla\Scheduler\Job;
  * Queue job interface
  * Interface for a runnable job payload.
  */
-interface LocalJobInterface extends JobInterface {
-
+interface LocalJobInterface extends JobInterface
+{
     /**
      * Do what the Job needs to do
      */

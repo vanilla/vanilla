@@ -16,42 +16,42 @@
 // Styleguide 18.1
 
 .bigcrumbs {
-  @include full-border(block);
+    @include full-border(block);
 
-  .crumb {
-    position: relative;
-    display: inline-block;
-    padding: 6px 24px 6px 12px;
-    line-height: 24px;
+    .crumb {
+        position: relative;
+        display: inline-block;
+        padding: 6px 24px 6px 12px;
+        line-height: 24px;
 
-    @include reverse-link();
+        @include reverse-link();
 
-    &:before,
-    &:after {
-      position: absolute;
-      display: block;
-      top: -1px;
-      bottom: -1px;
-      right: -12px;
-      width: 0;
-      border: solid 12px transparent;
-      border-top-width: 19px;
-      border-bottom-width: 19px;
-      border-left-color: $border-color;
-      content: '';
+        &:before,
+        &:after {
+            position: absolute;
+            display: block;
+            top: -1px;
+            bottom: -1px;
+            right: -12px;
+            width: 0;
+            border: solid 12px transparent;
+            border-top-width: 19px;
+            border-bottom-width: 19px;
+            border-left-color: $border-color;
+            content: "";
+        }
+
+        &:after {
+            right: -11px;
+            border-left-color: #fff;
+            content: "";
+        }
+
+        &:last-child {
+            &:before,
+            &:after {
+                display: none;
+            }
+        }
     }
-
-    &:after {
-      right: -11px;
-      border-left-color: #fff;
-      content: '';
-    }
-
-    &:last-child {
-      &:before,
-      &:after {
-        display: none;
-      }
-    }
-  }
 }

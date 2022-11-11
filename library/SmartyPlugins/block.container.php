@@ -15,11 +15,12 @@
  * @param bool $repeat
  * @return string The url.
  */
-function smarty_block_container($params, $content, &$smarty, &$repeat) {
-    if (!$repeat){
-        $class = trim('_container '.trim(val('class', $params, '')));
-        $selfPadded = val('selfPadded', $params, false);
-        $id = val('id', $params, false);
+function smarty_block_container($params, $content, &$smarty, &$repeat)
+{
+    if (!$repeat) {
+        $class = trim("_container " . trim(val("class", $params, "")));
+        $selfPadded = val("selfPadded", $params, false);
+        $id = val("id", $params, false);
         $idString = $id ? "id=\"$id\"" : "";
 
         if ($selfPadded) {

@@ -20,8 +20,8 @@ use Vanilla\Web\RoleTokenFactory;
 /**
  * Middleware used to authenticate via role token provided in request query parameters
  */
-class RoleTokenAuthMiddleware {
-
+class RoleTokenAuthMiddleware
+{
     use RoleTokenAuthTrait;
 
     //region Constants
@@ -30,7 +30,7 @@ class RoleTokenAuthMiddleware {
      * @see RoleTokenAuthTrait::getRoleTokenParamName() for method that most classes should use to access
      * this value, as traits cannot define constants
      */
-    const ROLE_TOKEN_QUERY_PARAM_NAME = 'role-token';
+    const ROLE_TOKEN_QUERY_PARAM_NAME = "role-token";
     //endregion
 
     //region Properties
@@ -73,7 +73,8 @@ class RoleTokenAuthMiddleware {
      * @throws ForbiddenException Invalid role token or used with other auth mechanism or sent on insecure channel.
      * @throws MethodNotAllowedException Non-idempotent method specified.
      */
-    public function __invoke(RequestInterface $request, callable $next) {
+    public function __invoke(RequestInterface $request, callable $next)
+    {
         if (static::isRoleTokenProvided($request)) {
             $this->throwIfInvalidRequest($request);
 
@@ -82,11 +83,14 @@ class RoleTokenAuthMiddleware {
             $this->applyRoleToken($roleToken);
             $schemaAdd = static::getRoleTokenAuthSchema();
             $query = $request->getQuery();
-            $query['schemaAdd'] = $schemaAdd;
+            $query["schemaAdd"] = $schemaAdd;
             $request->setQuery($query);
             $response = Data::box($next($request));
 
-            $response->setHeader(CacheControlConstantsInterface::HEADER_CACHE_CONTROL, CacheControlConstantsInterface::PUBLIC_CACHE);
+            $response->setHeader(
+                CacheControlConstantsInterface::HEADER_CACHE_CONTROL,
+                CacheControlConstantsInterface::PUBLIC_CACHE
+            );
             $response->setMeta(CacheControlConstantsInterface::META_NO_VARY, true);
 
             return $response;
@@ -106,20 +110,22 @@ class RoleTokenAuthMiddleware {
      * @throws ForbiddenException Request not sent over secure channel.
      * @throws ForbiddenException Role token auth is specified in addition to another authentication mechanism.
      */
-    protected function throwIfInvalidRequest(RequestInterface $request): void {
-        if (strtolower($request->getScheme()) !== 'https') {
+    protected function throwIfInvalidRequest(RequestInterface $request): void
+    {
+        if (strtolower($request->getScheme()) !== "https") {
             throw new ForbiddenException("Role token auth only applies to secure requests");
         }
         switch (strtoupper($request->getMethod())) {
-            case 'GET':
-            case 'HEAD':
-            case 'OPTIONS':
+            case "GET":
+            case "HEAD":
+            case "OPTIONS":
                 break;
             default:
-                throw new MethodNotAllowedException(
-                    "Role token auth only applies to idempotent methods",
-                    ['GET','HEAD','OPTIONS']
-                );
+                throw new MethodNotAllowedException("Role token auth only applies to idempotent methods", [
+                    "GET",
+                    "HEAD",
+                    "OPTIONS",
+                ]);
         }
         if ($this->session->isValid()) {
             throw new ForbiddenException("Cannot utilize role token auth with other auth mechanisms");
@@ -135,7 +141,8 @@ class RoleTokenAuthMiddleware {
      * @throws ForbiddenException Exception thrown during JWT decode.
      * @throws ForbiddenException Role token contains no roles.
      */
-    protected function extractRoleToken(RequestInterface &$request): RoleToken {
+    protected function extractRoleToken(RequestInterface &$request): RoleToken
+    {
         $emptyRoleToken = $this->roleTokenFactory->forDecoding();
         $query = $request->getQuery();
         $encodedJwt = $query[self::getRoleTokenParamName()];
@@ -160,7 +167,8 @@ class RoleTokenAuthMiddleware {
      *
      * @param RoleToken $roleToken Role token contained in request to be used when generating response
      */
-    protected function applyRoleToken(RoleToken $roleToken) : void {
+    protected function applyRoleToken(RoleToken $roleToken): void
+    {
         //apply permissions derived from roles to session
         $roleIDs = $roleToken->getRoleIDs();
         $currentPermissions = $this->session->getPermissions();
@@ -169,8 +177,8 @@ class RoleTokenAuthMiddleware {
 
         //apply role token permissions ban to the session
         $currentPermissions->addBan(Permissions::BAN_ROLE_TOKEN, [
-            'msg' => "A role token cannot be used to authenticate to this endpoint",
-            'code' => 403
+            "msg" => "A role token cannot be used to authenticate to this endpoint",
+            "code" => 403,
         ]);
     }
     //endregion

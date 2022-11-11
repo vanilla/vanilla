@@ -7,12 +7,12 @@
 namespace Vanilla\Dashboard\Models;
 
 /**
-  * Dumb data object representing an email notification for an activity.
-  *
-  * @internal This is a temporary class. Do not use. It will be removed in the near future.
-  */
-class ActivityEmail {
-
+ * Dumb data object representing an email notification for an activity.
+ *
+ * @internal This is a temporary class. Do not use. It will be removed in the near future.
+ */
+class ActivityEmail
+{
     /** @var int[] */
     private $activityIDs = [];
 
@@ -48,18 +48,22 @@ class ActivityEmail {
      *
      * @param integer $activityID
      */
-    public function addActivityID(int $activityID) {
+    private function addActivityID(int $activityID)
+    {
         $this->activityIDs[] = $activityID;
     }
 
     /**
-     * Add an email address to the list of recipients.
+     * Adds an activityID and an email address with the activityID it is associated with.
      *
+     * @param int $activityID
      * @param string $email
-     * @param string $name
+     * @param string|null $name
      */
-    public function addRecipient(string $email, ?string $name = null) {
-        $this->recipients[] = [$email, $name];
+    public function addActivityIDWithRecipient(int $activityID, string $email, ?string $name = null)
+    {
+        $this->addActivityID($activityID);
+        $this->recipients[] = [$activityID, $email, $name];
     }
 
     /**
@@ -67,7 +71,8 @@ class ActivityEmail {
      *
      * @return string|null
      */
-    public function getActionText(): ?string {
+    public function getActionText(): ?string
+    {
         return $this->actionText;
     }
 
@@ -76,7 +81,8 @@ class ActivityEmail {
      *
      * @return array
      */
-    public function getActivityIDs(): array {
+    public function getActivityIDs(): array
+    {
         return $this->activityIDs;
     }
 
@@ -85,7 +91,8 @@ class ActivityEmail {
      *
      * @return integer
      */
-    public function getActivityTypeID(): ?int {
+    public function getActivityTypeID(): ?int
+    {
         return $this->activityTypeID;
     }
 
@@ -94,7 +101,8 @@ class ActivityEmail {
      *
      * @return string
      */
-    public function getBody(): string {
+    public function getBody(): string
+    {
         return $this->body;
     }
 
@@ -103,7 +111,8 @@ class ActivityEmail {
      *
      * @return string
      */
-    public function getTitle(): string {
+    public function getTitle(): string
+    {
         return $this->title;
     }
 
@@ -112,7 +121,8 @@ class ActivityEmail {
      *
      * @return string|null
      */
-    public function getInternalRoute(): ?string {
+    public function getInternalRoute(): ?string
+    {
         return $this->internalRoute;
     }
 
@@ -121,7 +131,8 @@ class ActivityEmail {
      *
      * @return string[]
      */
-    public function getRecipients(): array {
+    public function getRecipients(): array
+    {
         return $this->recipients;
     }
 
@@ -130,7 +141,8 @@ class ActivityEmail {
      *
      * @return integer
      */
-    public function getRecordID(): ?int {
+    public function getRecordID(): ?int
+    {
         return $this->recordID;
     }
 
@@ -139,7 +151,8 @@ class ActivityEmail {
      *
      * @return string
      */
-    public function getRecordType(): ?string {
+    public function getRecordType(): ?string
+    {
         return $this->recordType;
     }
 
@@ -148,14 +161,16 @@ class ActivityEmail {
      *
      * @return string
      */
-    public function getSubject(): string {
+    public function getSubject(): string
+    {
         return $this->subject;
     }
 
     /**
      * Reset to defaults.
      */
-    public function reset() {
+    public function reset()
+    {
         $this->actionText = null;
         $this->activityIDs = [];
         $this->activityTypeID = null;
@@ -172,7 +187,8 @@ class ActivityEmail {
      *
      * @param string|null $actionText
      */
-    public function setActionText(?string $actionText) {
+    public function setActionText(?string $actionText)
+    {
         $this->actionText = $actionText;
     }
 
@@ -181,7 +197,8 @@ class ActivityEmail {
      *
      * @param string|null $internalRoute
      */
-    public function setInternalRoute(?string $internalRoute) {
+    public function setInternalRoute(?string $internalRoute)
+    {
         $this->internalRoute = $internalRoute;
     }
 
@@ -190,7 +207,8 @@ class ActivityEmail {
      *
      * @param integer|null $activityTypeID
      */
-    public function setActivityTypeID(?int $activityTypeID) {
+    public function setActivityTypeID(?int $activityTypeID)
+    {
         $this->activityTypeID = $activityTypeID;
     }
 
@@ -199,7 +217,8 @@ class ActivityEmail {
      *
      * @param string $body
      */
-    public function setBody(string $body) {
+    public function setBody(string $body)
+    {
         $this->body = $body;
     }
 
@@ -208,7 +227,8 @@ class ActivityEmail {
      *
      * @param string $title
      */
-    public function setTitle(string $title) {
+    public function setTitle(string $title)
+    {
         $this->title = $title;
     }
 
@@ -217,7 +237,8 @@ class ActivityEmail {
      *
      * @param integer|null $recordID
      */
-    public function setRecordID(?int $recordID) {
+    public function setRecordID(?int $recordID)
+    {
         $this->recordID = $recordID;
     }
 
@@ -226,7 +247,8 @@ class ActivityEmail {
      *
      * @param string|null $recordType
      */
-    public function setRecordType(?string $recordType) {
+    public function setRecordType(?string $recordType)
+    {
         $this->recordType = $recordType;
     }
 
@@ -235,7 +257,8 @@ class ActivityEmail {
      *
      * @param string $subject
      */
-    public function setSubject(string $subject) {
+    public function setSubject(string $subject)
+    {
         $this->subject = $subject;
     }
 }

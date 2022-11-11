@@ -8,29 +8,32 @@
  * @since 2.0
  */
 
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\UrlUtils;
 
 /**
  * Handles /home endpoint.
  */
-class HomeController extends Gdn_Controller {
-
+class HomeController extends Gdn_Controller
+{
     /**
      * JS & CSS includes for all methods in this controller.
      *
      * @since 2.0.0
      * @access public
      */
-    public function initialize() {
+    public function initialize()
+    {
         $this->Head = new HeadModule($this);
-        $this->addJsFile('jquery.js');
-        $this->addJsFile('jquery.form.js');
-        $this->addJsFile('jquery.popup.js');
-        $this->addJsFile('jquery.gardenhandleajaxform.js');
-        $this->addJsFile('global.js');
-        $this->addCssFile('admin.css');
-        $this->MasterView = 'empty';
-        $this->canonicalUrl('');
+        $this->addJsFile("jquery.js");
+        $this->addJsFile("jquery.form.js");
+        $this->addJsFile("jquery.popup.js");
+        $this->addJsFile("jquery.gardenhandleajaxform.js");
+        $this->addJsFile("global.js");
+        $this->addCssFile("admin.css");
+        $this->MasterView = "empty";
+        $this->canonicalUrl("");
         parent::initialize();
     }
 
@@ -40,31 +43,33 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function index() {
-        $this->View = 'FileNotFound';
+    public function index()
+    {
+        $this->View = "FileNotFound";
         $this->fileNotFound();
     }
 
     /**
      * Display error page.
      */
-    public function error() {
-        $this->removeCssFile('admin.css');
-        $this->addCssFile('style.css');
-        $this->addCssFile('vanillicon.css', 'static');
-        $this->MasterView = 'default';
+    public function error()
+    {
+        $this->removeCssFile("admin.css");
+        $this->addCssFile("style.css");
+        $this->addCssFile("vanillicon.css", "static");
+        $this->MasterView = "default";
 
-        $this->CssClass = 'SplashMessage NoPanel';
-        if ($this->data('CssClass')) {
-            $this->CssClass .= ' '.$this->data('CssClass');
+        $this->CssClass = "SplashMessage NoPanel";
+        if ($this->data("CssClass")) {
+            $this->CssClass .= " " . $this->data("CssClass");
         }
 
-        $this->setData('_NoMessages', true);
+        $this->setData("_NoMessages", true);
 
-        $code = $this->data('Code', 400);
+        $code = $this->data("Code", 400);
         $this->clearNavigationPreferences();
-        safeheader("HTTP/1.0 $code ".Gdn_Controller::getStatusMessage($code), true, $code);
-        Gdn_Theme::section('Error');
+        safeheader("HTTP/1.0 $code " . Gdn_Controller::getStatusMessage($code), true, $code);
+        Gdn_Theme::section("Error");
 
         $this->render();
     }
@@ -76,22 +81,26 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function fileNotFound() {
-        $this->removeCssFile('admin.css');
-        $this->addCssFile('style.css');
-        $this->addCssFile('vanillicon.css', 'static');
+    public function fileNotFound()
+    {
+        $this->removeCssFile("admin.css");
+        $this->addCssFile("style.css");
+        $this->addCssFile("vanillicon.css", "static");
 
-        $this->MasterView = 'default';
+        $this->MasterView = "default";
 
-        $this->CssClass = 'SplashMessage NoPanel';
+        $this->CssClass = "SplashMessage NoPanel";
 
-        if ($this->data('ViewPaths')) {
-            trace($this->data('ViewPaths'), 'View Paths');
+        if ($this->data("ViewPaths")) {
+            trace($this->data("ViewPaths"), "View Paths");
         }
 
-        $this->setData('_NoMessages', true);
-        Gdn_Theme::section('Error');
+        $this->setData("_NoMessages", true);
+        Gdn_Theme::section("Error");
 
+        if (DebugUtils::isTestMode()) {
+            throw new NotFoundException("Page");
+        }
         if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
             $this->clearNavigationPreferences();
             safeHeader("HTTP/1.0 404", true, 404);
@@ -106,9 +115,10 @@ class HomeController extends Gdn_Controller {
      * the dashboard if they saved a preference for a page that no longer exists or that they no longer have
      * permission to view.
      */
-    private function clearNavigationPreferences() {
+    private function clearNavigationPreferences()
+    {
         if (Gdn::session()->isValid()) {
-            $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'] ?? '';
+            $uri = Gdn::request()->getRequestArguments("server")["REQUEST_URI"] ?? "";
             $userModel = new UserModel();
             $userModel->clearSectionNavigationPreference($uri);
         }
@@ -122,8 +132,9 @@ class HomeController extends Gdn_Controller {
      *
      * @throws Gdn_UserException Throw an exception if the domain is invalid.
      */
-    public function leaving($target = '', $allowTrusted = false) {
-        $target = str_replace("\xE2\x80\xAE", '', $target);
+    public function leaving($target = "", $allowTrusted = false)
+    {
+        $target = str_replace("\xE2\x80\xAE", "", $target);
 
         $canAutoRedirect = $allowTrusted && $this->canAutoRedirect($target);
         if ($canAutoRedirect) {
@@ -133,15 +144,15 @@ class HomeController extends Gdn_Controller {
         try {
             $target = UrlUtils::domainAsAscii($target);
         } catch (Exception $e) {
-            throw new Gdn_UserException(t('Url is invalid.'));
+            throw new Gdn_UserException(t("Url is invalid."));
         }
 
-        $this->setData('Target', anchor(htmlspecialchars($target), $target, '', ['rel' => 'nofollow']));
-        $this->title(t('Leaving'));
-        $this->removeCssFile('admin.css');
-        $this->addCssFile('style.css');
-        $this->addCssFile('vanillicon.css', 'static');
-        $this->MasterView = 'default';
+        $this->setData("Target", anchor(htmlspecialchars($target), $target, "", ["rel" => "nofollow"]));
+        $this->title(t("Leaving"));
+        $this->removeCssFile("admin.css");
+        $this->addCssFile("style.css");
+        $this->addCssFile("vanillicon.css", "static");
+        $this->MasterView = "default";
         $this->render();
     }
 
@@ -151,11 +162,12 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function updateMode() {
+    public function updateMode()
+    {
         $this->clearNavigationPreferences();
         safeHeader("HTTP/1.0 503", true, 503);
-        $this->setData('UpdateMode', true);
-        Gdn_Theme::section('Error');
+        $this->setData("UpdateMode", true);
+        Gdn_Theme::section("Error");
         $this->render();
     }
 
@@ -165,10 +177,11 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function deleted() {
+    public function deleted()
+    {
         $this->clearNavigationPreferences();
         safeHeader("HTTP/1.0 410", true, 410);
-        Gdn_Theme::section('Error');
+        Gdn_Theme::section("Error");
         $this->render();
     }
 
@@ -178,8 +191,9 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function termsOfService() {
-        $this->canonicalUrl(url('/home/termsofservice', true));
+    public function termsOfService()
+    {
+        $this->canonicalUrl(url("/home/termsofservice", true));
         $this->render();
     }
 
@@ -195,13 +209,14 @@ class HomeController extends Gdn_Controller {
      * @param string $string The string to sanitize.
      * @return string Returns the sanitized string.
      */
-    protected function sanitize($string) {
-        switch ($this->data('_Filter', 'safe')) {
-            case 'none':
+    protected function sanitize($string)
+    {
+        switch ($this->data("_Filter", "safe")) {
+            case "none":
                 return $string;
-            case 'filter':
+            case "filter":
                 return Gdn_Format::htmlFilter($string);
-            case 'safe':
+            case "safe":
             default:
                 return htmlspecialchars($string);
         }
@@ -211,19 +226,20 @@ class HomeController extends Gdn_Controller {
      * Sanitize the main exception fields in the data array according to the _Filter key.
      * @see HomeController::sanitize()
      */
-    protected function sanitizeData() {
-        $fields = ['Exception', 'Message', 'Description'];
+    protected function sanitizeData()
+    {
+        $fields = ["Exception", "Message", "Description"];
 
-        $method = $this->data('_Filter', 'safe');
+        $method = $this->data("_Filter", "safe");
         switch ($method) {
-            case 'none':
+            case "none":
                 return;
-            case 'filter':
-                $callback = ['Gdn_Format', 'htmlFilter'];
+            case "filter":
+                $callback = ["Gdn_Format", "htmlFilter"];
                 break;
-            case 'safe':
+            case "safe":
             default:
-                $callback = 'htmlspecialchars';
+                $callback = "htmlspecialchars";
         }
 
         foreach ($fields as $field) {
@@ -239,7 +255,8 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function privacyPolicy() {
+    public function privacyPolicy()
+    {
         $this->render();
     }
 
@@ -249,8 +266,9 @@ class HomeController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function unauthorized() {
-        Gdn_Theme::section('Error');
+    public function unauthorized()
+    {
+        Gdn_Theme::section("Error");
 
         if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
             $this->clearNavigationPreferences();
@@ -267,7 +285,8 @@ class HomeController extends Gdn_Controller {
      * @param string $target
      * @return bool
      */
-    private function canAutoRedirect(string $target): bool {
+    private function canAutoRedirect(string $target): bool
+    {
         $targetDomain = parse_url($target, PHP_URL_HOST);
 
         if ($target === null) {

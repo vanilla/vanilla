@@ -11,12 +11,13 @@ use Vanilla\Dashboard\Models\RemoteResourceModel;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Metadata\Parser\RSSFeedParser;
+use Vanilla\Logging\ErrorLogger;
 
 /**
  * Trait for fetching items for RSS feeds.
  */
-trait RssWidgetTrait {
-
+trait RssWidgetTrait
+{
     /**
      * @var RSSFeedParser
      */
@@ -64,13 +65,17 @@ trait RssWidgetTrait {
      *
      * @return array|null
      */
-    protected function getRssFeedItems(string $feedUrl, ?string $fallbackImageUrl): ?array {
+    protected function getRssFeedItems(string $feedUrl, ?string $fallbackImageUrl): ?array
+    {
         $results = $this->loadParsedXMLData($feedUrl);
         if (!$results) {
             return null;
         }
-        $resultsItems = $results['item'] ?? [];
-        $fallbackImageUrl = $fallbackImageUrl ?? $results['channel']['image']['url'] ?? null;
+        $resultsItems = $results["item"] ?? [];
+        $fallbackImageUrl =
+            $fallbackImageUrl && $fallbackImageUrl !== ""
+                ? $fallbackImageUrl
+                : $results["channel"]["image"]["url"] ?? null;
 
         $feedItems = [];
         foreach ($resultsItems as $item) {
@@ -86,8 +91,9 @@ trait RssWidgetTrait {
      *
      * @return string
      */
-    private function getCacheKey(string $feedUrl): string {
-        return sprintf('rss.module.%s.parse.content', md5($feedUrl));
+    private function getCacheKey(string $feedUrl): string
+    {
+        return sprintf("rss.module.%s.parse.content", md5($feedUrl));
     }
 
     /**
@@ -97,7 +103,8 @@ trait RssWidgetTrait {
      *
      * @return array|null
      */
-    private function getFromCache(string $feedUrl): ?array {
+    private function getFromCache(string $feedUrl): ?array
+    {
         $key = $this->getCacheKey($feedUrl);
         $parsedContent = $this->cache->get($key);
 
@@ -111,23 +118,66 @@ trait RssWidgetTrait {
      *
      * @return array|null
      */
-    private function loadParsedXMLData(string $feedUrl): ?array {
-        $results = $this->getFromCache($feedUrl);
-        $rssFeedContent = !$results ? $this->remoteResourceModel->getByUrl($feedUrl) : null;
-        if (!$results && !$rssFeedContent) {
-            return null;
-        }
-        if (!$results && $rssFeedContent) {
-            $rssFeedDOM = new \DOMDocument();
-            $loaded = $rssFeedDOM->loadXML($rssFeedContent);
-            if ($loaded) {
-                $results = $this->feedParser->parse($rssFeedDOM);
-                $key = $this->getCacheKey($feedUrl);
-                $this->cache->store($key, $results, [\Gdn_Cache::FEATURE_EXPIRY => \Gdn_Cache::APC_CACHE_DURATION]);
+    private function loadParsedXMLData(string $feedUrl): ?array
+    {
+        $callback = function ($content) use ($feedUrl) {
+            $results = [];
+            if (!empty($content)) {
+                $rssFeedDOM = new \DOMDocument();
+                libxml_use_internal_errors(true);
+                $loaded = $rssFeedDOM->loadXML($content);
+                $errors = libxml_get_errors();
+                libxml_use_internal_errors(false);
+                libxml_clear_errors();
+                if (!$loaded) {
+                    ErrorLogger::warning(
+                        "RSS feed couldn't be parsed successfully",
+                        ["rss_feed"],
+                        [
+                            "url" => $feedUrl,
+                            "errors" => $errors,
+                        ]
+                    );
+                } else {
+                    try {
+                        $results = $this->feedParser->parse($rssFeedDOM);
+                    } catch (\Exception $exception) {
+                        ErrorLogger::warning(
+                            "RSS feed couldn't be parsed successfully",
+                            ["rss_feed"],
+                            [
+                                "url" => $feedUrl,
+                                "message" => $exception->getMessage(),
+                            ]
+                        );
+                    }
+                }
+            }
+            return !empty($results) ? json_encode($results) : "";
+        };
+        try {
+            $headers = [
+                "Accept" => [
+                    "application/rss+xml",
+                    "application/rdf+xml",
+                    "application/atom+xml",
+                    "application/xml",
+                    "text/xml",
+                ],
+            ];
+            $rssFeedContent = $this->remoteResourceModel->getByUrl($feedUrl, $headers, $callback);
+        } catch (\Exception $exception) {
+            //if debug is not enabled error out silently
+            if (debug()) {
+                throw new \Gdn_UserException("The url provided doesnt give back a valid rss feed.");
             }
         }
 
-        return $results;
+        if (!$rssFeedContent) {
+            return null;
+        }
+
+        return json_decode($rssFeedContent, true);
     }
 
     /**
@@ -137,19 +187,20 @@ trait RssWidgetTrait {
      * @param ?string $fallbackUrl
      * @return array
      */
-    private function mapRSSFeedToItem(array $result, ?string $fallbackUrl) {
-        $image = $result['img'] ?? null;
-        $imageValue = $image['src'] ?? null;
-        $enclosure = $result['enclosure'] ?? null;
-        $isEnclosureImage = $enclosure && substr($enclosure['type'], 0, 6) === 'image/';
-        $enclosureValue = $isEnclosureImage ? $enclosure['url'] : null;
+    private function mapRSSFeedToItem(array $result, ?string $fallbackUrl)
+    {
+        $image = $result["img"] ?? null;
+        $imageValue = $image["src"] ?? null;
+        $enclosure = $result["enclosure"] ?? null;
+        $isEnclosureImage = $enclosure && substr($enclosure["type"], 0, 6) === "image/";
+        $enclosureValue = $isEnclosureImage ? $enclosure["url"] : null;
         $imageUrl = $imageValue ?: $enclosureValue;
 
         return [
-            'to' => $result['link'],
-            'name' => $result['title'],
-            'imageUrl' => $imageUrl ?: $fallbackUrl,
-            'description' => $this->formatService->renderPlainText($result['description'], HtmlFormat::FORMAT_KEY),
+            "to" => $result["link"],
+            "name" => $result["title"],
+            "imageUrl" => $imageUrl ?: $fallbackUrl,
+            "description" => $this->formatService->renderPlainText($result["description"], HtmlFormat::FORMAT_KEY),
         ];
     }
 }

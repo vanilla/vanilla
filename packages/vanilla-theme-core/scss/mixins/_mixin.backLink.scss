@@ -5,9 +5,9 @@
  */
 
 @mixin backLinkNoBleedStyles {
-  .pageHeading-back {
-    position: relative;
-    margin-left: 0;
-    margin-right: $utility-baseUnit * 2;
-  }
+    .pageHeading-back {
+        position: relative;
+        margin-left: 0;
+        margin-right: $utility-baseUnit * 2;
+    }
 }

@@ -17,8 +17,8 @@
  * filters for the category.
  *
  */
-class DiscussionsSortFilterModule extends Gdn_Module {
-
+class DiscussionsSortFilterModule extends Gdn_Module
+{
     /** @var array The sorts to render. */
     protected $sorts;
 
@@ -41,14 +41,15 @@ class DiscussionsSortFilterModule extends Gdn_Module {
     protected $categoryID;
 
     /** @var string The view of the dropdown module to render. */
-    protected $dropdownView = 'dropdown-navbutton';
+    protected $dropdownView = "dropdown-navbutton";
 
     /**
      * @param int $categoryID The ID of the category we're in.
      * @param string $selectedSort The selected sort.
      * @param array $selectedFilters The selected filters.
      */
-    public function __construct($categoryID = 0, $selectedSort = '', $selectedFilters = []) {
+    public function __construct($categoryID = 0, $selectedSort = "", $selectedFilters = [])
+    {
         parent::__construct();
         if ($categoryID) {
             $this->categoryID = $categoryID;
@@ -62,7 +63,8 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      * @param $showSorts Whether to show the sorting options in the view.
      * @return DiscussionsSortFilterModule $this
      */
-    public function setShowSorts($showSorts) {
+    public function setShowSorts($showSorts)
+    {
         $this->showSorts = $showSorts;
         return $this;
     }
@@ -71,7 +73,8 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      * @param $showFilters Whether to show the filtering options in the view.
      * @return DiscussionsSortFilterModule $this
      */
-    public function setShowFilters($showFilters) {
+    public function setShowFilters($showFilters)
+    {
         $this->showFilters = $showFilters;
         return $this;
     }
@@ -79,14 +82,16 @@ class DiscussionsSortFilterModule extends Gdn_Module {
     /**
      * @return bool Whether to show the sorting options in the view.
      */
-    public function showSorts() {
+    public function showSorts()
+    {
         return $this->showSorts;
     }
 
     /**
      * @return bool Whether to show the filtering options in the view.
      */
-    public function showFilters() {
+    public function showFilters()
+    {
         return $this->showFilters;
     }
 
@@ -95,7 +100,8 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      *
      * @return bool Whether to render the module.
      */
-    public function prepare() {
+    public function prepare()
+    {
         $this->sorts = DiscussionModel::getAllowedSorts();
         $this->filters = DiscussionModel::getAllowedFilters();
         return !empty($this->sorts) || !empty($this->filters);
@@ -105,7 +111,8 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      * @param string $dropdownView The view of the dropdown module to render.
      * @return DiscussionsSortFilterModule $this
      */
-    public function setDropdownView($dropdownView) {
+    public function setDropdownView($dropdownView)
+    {
         $this->dropdownView = $dropdownView;
         return $this;
     }
@@ -116,40 +123,45 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      *
      * @return array An array of sorts consisting of the name, url, rel and cssClass of each sort item.
      */
-    protected function getSortData() {
+    protected function getSortData()
+    {
         $sortData = [];
-        $selectedElementKey = val('key', val($this->selectedSort, $this->sorts));
-        foreach($this->sorts as $key => $sort) {
+        $selectedElementKey = val("key", val($this->selectedSort, $this->sorts));
+        foreach ($this->sorts as $key => $sort) {
             // Check to see if there's a category restriction.
-            if ($categories = val('categories', $sort)) {
+            if ($categories = val("categories", $sort)) {
                 if (!in_array($this->categoryID, $categories)) {
                     continue;
                 }
             }
-            $key = val('key', $sort);
-            $queryString = val('key', $sort) !== DiscussionModel::EMPTY_FILTER_KEY ? DiscussionModel::getSortFilterQueryString($this->selectedSort, $this->selectedFilters, $key) : '';
-            $sortData[$key]['name'] = val('name', $sort);
-            $sortData[$key]['url'] = $this->getPagelessPath().$queryString;
-            $sortData[$key]['rel'] = 'nofollow';
+            $key = val("key", $sort);
+            $queryString =
+                val("key", $sort) !== DiscussionModel::EMPTY_FILTER_KEY
+                    ? DiscussionModel::getSortFilterQueryString($this->selectedSort, $this->selectedFilters, $key)
+                    : "";
+            $sortData[$key]["name"] = val("name", $sort);
+            $sortData[$key]["url"] = $this->getPagelessPath() . $queryString;
+            $sortData[$key]["rel"] = "nofollow";
         }
 
-
-        if ($selectedElementKey === false) { // No currently selected filter
+        if ($selectedElementKey === false) {
+            // No currently selected filter
             $defaultSort = DiscussionModel::getDefaultSortKey();
-            foreach($this->sorts as $key => $sort) {
-                if (val('key', $sort) === $defaultSort) {
+            foreach ($this->sorts as $key => $sort) {
+                if (val("key", $sort) === $defaultSort) {
                     $selectedElementKey = $key;
                     break;
                 }
             }
 
-            if (empty($selectedElementKey)) { // could still not of matched, in which case we pick the first element
+            if (empty($selectedElementKey)) {
+                // could still not of matched, in which case we pick the first element
                 $firstKey = key(reset($sortData));
                 $selectedElementKey = $firstKey;
             }
         }
 
-        $sortData[$selectedElementKey]['active'] = true;
+        $sortData[$selectedElementKey]["active"] = true;
 
         return $sortData;
     }
@@ -160,54 +172,52 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      *
      * @return array An array of dropdown menus or an array containing an empty string.
      */
-    protected function getFilterDropdowns() {
+    protected function getFilterDropdowns()
+    {
         if (!$this->filters) {
-            return [''];
+            return [""];
         }
 
         $filterDropdown = [];
         $dropdowns = [];
 
-        foreach($this->filters as $filter) {
+        foreach ($this->filters as $filter) {
             // Check if this is hidden from UI
-            if (empty($filter['display'])) {
+            if (empty($filter["display"])) {
                 continue;
             }
             // Check to see if there's a category restriction.
-            if (!empty($filter['categories'])) {
-                if (!in_array($this->categoryID, $filter['categories'])) {
+            if (!empty($filter["categories"])) {
+                if (!in_array($this->categoryID, $filter["categories"])) {
                     continue;
                 }
             }
 
-            $key = $filter['key'];
+            $key = $filter["key"];
 
             $selected = $this->selectedFilters[$key] ?? null;
 
             $currentGroup = null;
             $path = $this->getPagelessPath();
-            $values = array_values($filter['filters']);
+            $values = array_values($filter["filters"]);
             $totalValues = count($values);
 
             for ($i = 0; $i < $totalValues; $i++) {
                 $value = $values[$i];
-                $valueKey = $value['key'];
-                $query = DiscussionModel::getSortFilterQueryString(
-                    $this->selectedSort,
-                    $this->selectedFilters,
-                    '',
-                    [$key => $valueKey]
-                );
+                $valueKey = $value["key"];
+                $query = DiscussionModel::getSortFilterQueryString($this->selectedSort, $this->selectedFilters, "", [
+                    $key => $valueKey,
+                ]);
 
-                $url = $path.$query;
+                $url = $path . $query;
                 if (empty($url)) {
-                    $url = '/';
+                    $url = "/";
                 }
 
-                $group = $value['group'] ?? null;
-                if($i > 0 && $currentGroup !== $group) {
+                $group = $value["group"] ?? null;
+                if ($i > 0 && $currentGroup !== $group) {
                     $filterDropdown[] = [
-                        'separator' => true
+                        "separator" => true,
                     ];
                 }
 
@@ -220,9 +230,9 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                 }
 
                 $filterDropdown[] = [
-                    'name' => $value['name'],
-                    'url' => url($url),
-                    'active' => $isActive,
+                    "name" => $value["name"],
+                    "url" => url($url),
+                    "active" => $isActive,
                 ];
 
                 $currentGroup = $group;
@@ -240,8 +250,9 @@ class DiscussionsSortFilterModule extends Gdn_Module {
      *
      * @return string The path of the request without the page.
      */
-    protected function getPagelessPath() {
+    protected function getPagelessPath()
+    {
         // Remove page indicator.
-        return preg_replace('/\/p\d$/i', '', Gdn::request()->path());
+        return preg_replace('/\/p\d$/i', "", Gdn::request()->path());
     }
 }

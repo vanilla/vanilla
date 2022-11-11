@@ -19,8 +19,8 @@ use Vanilla\Scheduler\SchedulerInterface;
 /**
  * Service for generating efficient cached total record counts on a site.
  */
-class SiteTotalService {
-
+class SiteTotalService
+{
     public const CONF_EXPENSIVE_COUNT_THRESHOLD = "siteTotals.expensiveCountThreshold";
 
     /** @var int Threshold where counts start getting very expensive and should be deferred. */
@@ -49,17 +49,23 @@ class SiteTotalService {
      * @param \Gdn_Cache $cache
      * @param ConfigurationInterface $config
      */
-    public function __construct(SchedulerInterface $scheduler, \Gdn_Database $database, \Gdn_Cache $cache, ConfigurationInterface $config) {
+    public function __construct(
+        SchedulerInterface $scheduler,
+        \Gdn_Database $database,
+        \Gdn_Cache $cache,
+        ConfigurationInterface $config
+    ) {
         $this->scheduler = $scheduler;
         $this->database = $database;
-        $this->modelCache = new ModelCache('siteTotals', $cache);
+        $this->modelCache = new ModelCache("siteTotals", $cache);
         $this->config = $config;
     }
 
     /**
-     * @return array
+     * @return SiteTotalProviderInterface[]
      */
-    public function getSiteTotalProviders(): array {
+    public function getSiteTotalProviders(): array
+    {
         return $this->siteTotalProviders;
     }
 
@@ -68,7 +74,8 @@ class SiteTotalService {
      *
      * @param SiteTotalProviderInterface $provider
      */
-    public function registerProvider(SiteTotalProviderInterface $provider) {
+    public function registerProvider(SiteTotalProviderInterface $provider)
+    {
         $this->siteTotalProviders[strtolower($provider->getSiteTotalRecordType())] = $provider;
     }
 
@@ -79,10 +86,11 @@ class SiteTotalService {
      * @param SiteSectionInterface|null $siteSection
      * @return int
      */
-    public function getTotalForType(string $recordType, SiteSectionInterface $siteSection = null): int {
+    public function getTotalForType(string $recordType, SiteSectionInterface $siteSection = null): int
+    {
         $provider = $this->siteTotalProviders[strtolower($recordType)] ?? null;
         if ($provider === null) {
-            throw new NotFoundException('RecordType', ['recordType' => $recordType]);
+            throw new NotFoundException("RecordType", ["recordType" => $recordType]);
         }
 
         $cacheOpts = [
@@ -96,14 +104,11 @@ class SiteTotalService {
             $cacheOpts[ModelCache::OPT_SCHEDULER] = $this->scheduler;
             $cacheOpts[ModelCache::OPT_DEFAULT] = -1;
         }
-        $cacheKey = [
-            __FUNCTION__,
-            'recordType' => $recordType,
-        ];
+        $cacheKey = [__FUNCTION__, "recordType" => $recordType];
 
         if ($siteSection !== null && $provider instanceof SiteSectionTotalProviderInterface) {
             // Expand the cache key.
-            $cacheKey['siteSectionID'] = $siteSection->getSectionID();
+            $cacheKey["siteSectionID"] = $siteSection->getSectionID();
         } else {
             // If a site section is specified, but the provider doesn't support filtering by
             // site section, just get the site total.
@@ -115,9 +120,13 @@ class SiteTotalService {
             return $provider->calculateSiteTotalCount($siteSection);
         }
 
-        $result = $this->modelCache->getCachedOrHydrate($cacheKey, function () use ($provider, $siteSection) {
-            return $provider->calculateSiteTotalCount($siteSection);
-        }, $cacheOpts);
+        $result = $this->modelCache->getCachedOrHydrate(
+            $cacheKey,
+            function () use ($provider, $siteSection) {
+                return $provider->calculateSiteTotalCount($siteSection);
+            },
+            $cacheOpts
+        );
         return $result;
     }
 
@@ -127,12 +136,12 @@ class SiteTotalService {
      * @param SiteTotalProviderInterface $provider
      * @return bool
      */
-    private function isProviderExpensive(SiteTotalProviderInterface $provider): bool {
+    private function isProviderExpensive(SiteTotalProviderInterface $provider): bool
+    {
         $table = $provider->getTableName();
-        $estimatedRowCount = $this->modelCache->getCachedOrHydrate([
-            __FUNCTION__,
-            'table' => $table,
-        ], function () use ($table) {
+        $estimatedRowCount = $this->modelCache->getCachedOrHydrate([__FUNCTION__, "table" => $table], function () use (
+            $table
+        ) {
             return $this->database->getEstimatedRowCount($table);
         });
 
@@ -145,15 +154,16 @@ class SiteTotalService {
      *
      * @return Schema
      */
-    public function getCountsQuerySchema(): Schema {
+    public function getCountsQuerySchema(): Schema
+    {
         return Schema::parse([
             "siteSectionID:s?",
             "counts:a" => [
                 "items" => [
                     "type" => "string",
-                    "enum" => array_merge(["all"], $this->getCountRecordTypes())
+                    "enum" => array_merge(["all"], $this->getCountRecordTypes()),
                 ],
-                "style" => "form"
+                "style" => "form",
             ],
         ]);
     }
@@ -163,26 +173,21 @@ class SiteTotalService {
      *
      * @return Schema
      */
-    public function getCountsOutputSchema(): Schema {
+    public function getCountsOutputSchema(): Schema
+    {
         $availableCounts = $this->getCountRecordTypes();
-        $recordSchema = Schema::parse([
-            "count:i",
-            "isCalculating:b",
-            "isFiltered:b",
-        ]);
+        $recordSchema = Schema::parse(["count:i", "isCalculating:b", "isFiltered:b"]);
         $properties = array_map(function ($recordType) use ($recordSchema) {
             return [$recordType => $recordSchema];
         }, $availableCounts);
-        return Schema::parse([
-            "siteSectionID:s?",
-            "counts" => $properties,
-        ]);
+        return Schema::parse(["siteSectionID:s?", "counts" => $properties]);
     }
 
     /**
      * @return array
      */
-    public function getCountRecordTypes(): array {
+    public function getCountRecordTypes(): array
+    {
         $countRecordTypes = [];
         foreach ($this->siteTotalProviders as $provider) {
             $countRecordTypes[] = $provider->getSiteTotalRecordType();

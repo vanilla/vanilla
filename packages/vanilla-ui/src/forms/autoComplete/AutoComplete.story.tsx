@@ -12,7 +12,7 @@ import { FormGroup, FormGroupLabel, FormGroupInput } from "../../index";
 import { AutoComplete as UIAutoComplete, AutoCompleteLookupOptions, ILookupApi } from "./";
 
 export default {
-    title: "Vanilla UI/Forms",
+    title: "Forms/Admin Form Fields",
 };
 
 const storyStyle = css({
@@ -35,7 +35,7 @@ interface StoryAutoCompleteProps extends React.ComponentProps<typeof UIAutoCompl
 function StoryAutoComplete(props: StoryAutoCompleteProps) {
     const { label, ...autoCompleteProps } = props;
     const defaultValue = props.hasOwnProperty("value") ? props.value : 1;
-    const [value, setValue] = useState<any | any[] | undefined>(defaultValue);
+    const [value, setValue] = useState<any | any[] | undefined>(props.multiple ? [defaultValue] : defaultValue);
     const setDataValue = (values) => {
         setValue(Array.isArray(values) ? [...values] : values);
     };
@@ -51,9 +51,12 @@ function StoryAutoComplete(props: StoryAutoCompleteProps) {
                             value={value}
                             onChange={setDataValue}
                             options={[
-                                { value: 1, label: "Apple" },
-                                { value: 2, label: "Banana" },
-                                { value: 3, label: "Cherry" },
+                                { value: 0, label: "Pizza" },
+                                { value: 1, label: "Apple", group: "Fruits" },
+                                { value: 2, label: "Banana", group: "Fruits" },
+                                { value: 3, label: "Cherry", group: "Fruits" },
+                                { value: 4, label: "Broccoli", group: "Vegetables" },
+                                { value: 5, label: "Carrot", group: "Vegetables" },
                             ]}
                         />
                     )}
@@ -78,7 +81,7 @@ const lookup: ILookupApi = {
 
 function StoryAutoCompleteLookup(props: StoryAutoCompleteProps) {
     const { label, ...autoCompleteProps } = props;
-    const [value, setValue] = useState<any | any[]>("bulbasaur");
+    const [value, setValue] = useState<any | any[]>(props.value ?? "bulbasaur");
     const setDataValue = (values) => {
         setValue(Array.isArray(values) ? [...values] : values);
     };
@@ -123,7 +126,7 @@ export function AutoComplete() {
                 <StoryAutoCompleteLookup label="Lookup" clear />
             </div>
             <div>
-                <StoryAutoComplete label="Multiple - No Default Value" multiple value={undefined} />
+                <StoryAutoComplete label="Multiple - No Default Value" multiple />
             </div>
             <div>
                 <StoryAutoComplete
@@ -136,7 +139,7 @@ export function AutoComplete() {
                 <StoryAutoComplete label="Default multiple clearable" multiple clear />
             </div>
             <div>
-                <StoryAutoCompleteLookup label="Lookup Multiple" multiple />
+                <StoryAutoCompleteLookup label="Lookup Multiple" multiple value={["bulbasaur", "pikachu"]} />
             </div>
             <div>
                 <StoryAutoComplete

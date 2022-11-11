@@ -5,13 +5,14 @@
 
 import { IReaction } from "@dashboard/@types/api/reaction";
 import { IUserFragment } from "@library/@types/api/users";
+import { IImage } from "@library/@types/api/core";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { RecordID } from "@vanilla/utils";
 
 export interface IDiscussion {
-    discussionID: number;
+    discussionID: RecordID;
     type: string;
     name: string;
     url: string;
@@ -21,6 +22,7 @@ export interface IDiscussion {
     lastUserID?: number;
     dateUpdated?: string;
     dateLastComment?: string;
+    image?: IImage;
 
     // Stats
     pinned: boolean;
@@ -54,13 +56,13 @@ export interface IDiscussion {
 
 export interface IDiscussionEdit {
     commentID: number;
-    discussionID: number;
+    discussionID: IDiscussion["discussionID"];
     body: string;
     format: string;
 }
 
 export interface IDiscussionEmbed {
-    discussionID: number;
+    discussionID: IDiscussion["discussionID"];
     type: "quote";
     name: string;
     dateInserted: string;
@@ -75,7 +77,9 @@ export interface IDiscussionEmbed {
 export interface IGetDiscussionListParams {
     limit?: number;
     page?: number;
-    discussionID: string | RecordID | RecordID[];
+    discussionID?: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>;
     expand?: string | string[];
     followed?: boolean;
+    featuredImage?: boolean;
+    fallbackImage?: string;
 }

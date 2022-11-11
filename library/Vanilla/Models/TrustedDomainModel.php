@@ -14,16 +14,9 @@ use Vanilla\Contracts\ConfigurationInterface;
 /**
  * Model for fetching information about trustd domains.
  */
-class TrustedDomainModel {
-
-    private const PROVIDER_URLS = [
-        'PasswordUrl',
-        'ProfileUrl',
-        'RegisterUrl',
-        'SignInUrl',
-        'SignOutUrl',
-        'URL'
-    ];
+class TrustedDomainModel
+{
+    private const PROVIDER_URLS = ["PasswordUrl", "ProfileUrl", "RegisterUrl", "SignInUrl", "SignOutUrl", "URL"];
 
     /** @var EventManager */
     private $eventManager;
@@ -53,18 +46,15 @@ class TrustedDomainModel {
      * @param ConfigurationInterface $config
      * @param RequestInterface $request
      */
-    public function __construct(
-        EventManager $eventManager,
-        ConfigurationInterface $config,
-        RequestInterface $request
-    ) {
+    public function __construct(EventManager $eventManager, ConfigurationInterface $config, RequestInterface $request)
+    {
         $this->eventManager = $eventManager;
-        $configuredDomains = $config->get('Garden.TrustedDomains', []);
+        $configuredDomains = $config->get("Garden.TrustedDomains", []);
         if (!is_array($configuredDomains)) {
             $configuredDomains = is_string($configuredDomains) ? explode("\n", $configuredDomains) : [];
         }
         $this->configuredTrustedDomains = array_filter($configuredDomains);
-        $this->isInstalled = $config->get('Garden.Installed', false);
+        $this->isInstalled = $config->get("Garden.Installed", false);
 
         $this->linkWarnLeaving = $config->get("Garden.Format.WarnLeaving", true);
 
@@ -72,22 +62,23 @@ class TrustedDomainModel {
     }
 
     /**
-     * Lazily fetch the auth provider because some tests don't haver a DB connection.
+     * Lazily fetch the auth provider because some tests don't have a DB connection.
      *
      * @return \Gdn_AuthenticationProviderModel
      */
-    private function getAuthProviderModel(): \Gdn_AuthenticationProviderModel {
+    private function getAuthProviderModel(): \Gdn_AuthenticationProviderModel
+    {
         if ($this->authProviderModel === null) {
             $this->authProviderModel = \Gdn::getContainer()->get(\Gdn_AuthenticationProviderModel::class);
         }
         return $this->authProviderModel;
     }
 
-
     /**
      * @return array
      */
-    public function getAll(): array {
+    public function getAll(): array
+    {
         if ($this->localDomainCache !== null) {
             return $this->localDomainCache;
         }
@@ -102,7 +93,7 @@ class TrustedDomainModel {
         // Iterate through the providers, only grabbing URLs if they're not empty and not already present.
         foreach ($providers as $provider) {
             foreach (self::PROVIDER_URLS as $urlKey) {
-                $providerUrl = $provider[$urlKey] ?? '';
+                $providerUrl = $provider[$urlKey] ?? "";
                 if ($providerDomain = parse_url($providerUrl, PHP_URL_HOST)) {
                     $this->localDomainCache[] = $providerDomain;
                 }
@@ -110,10 +101,10 @@ class TrustedDomainModel {
         }
 
         $args = [
-            'TrustedDomains' => &$this->localDomainCache,
+            "TrustedDomains" => &$this->localDomainCache,
         ];
         $this->eventManager->fire(
-            'entryController_beforeTargetReturn',
+            "entryController_beforeTargetReturn",
             \Gdn::pluginManager(), // eww but needed for compatibility.
             $args
         );
@@ -130,7 +121,8 @@ class TrustedDomainModel {
      * @param bool $withDomain
      * @return string The destination if safe, /home/leaving?Target=$destination if not.
      */
-    public function safeUrl($destination, $withDomain = false) {
+    public function safeUrl($destination, $withDomain = false)
+    {
         $url = url($destination, true);
         $trustedDomains = $this->getAll();
         $isTrustedDomain = false;
@@ -142,7 +134,7 @@ class TrustedDomainModel {
             }
         }
 
-        return ($isTrustedDomain ? $url : url('/home/leaving?Target='.urlencode($destination), $withDomain));
+        return $isTrustedDomain ? $url : url("/home/leaving?Target=" . urlencode($destination), $withDomain);
     }
 
     /**
@@ -153,11 +145,10 @@ class TrustedDomainModel {
      * @param bool $withDomain
      * @return string The destination if safe, /home/leaving?Target=$destination if not.
      */
-    public function safeContentUrl($destination, $withDomain = false) {
+    public function safeContentUrl($destination, $withDomain = false)
+    {
         // If the Garden.Format.WarnLeaving Config is explicitly set to false we return the url as is
         // otherwise we process the url through safeUrl();
-        return (!$this->linkWarnLeaving)
-            ? url($destination, $withDomain)
-            : $this->safeUrl($destination, $withDomain);
+        return !$this->linkWarnLeaving ? url($destination, $withDomain) : $this->safeUrl($destination, $withDomain);
     }
 }

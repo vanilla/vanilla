@@ -9,6 +9,7 @@ namespace VanillaTests\Addons\Pockets;
 
 use Garden\Schema\ValidationException;
 use Vanilla\Addons\Pockets\PocketsModel;
+use Vanilla\Forum\Widgets\DiscussionDiscussionsWidget;
 use Vanilla\Utility\ModelUtils;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Fixtures\MockWidgets\MockWidget1;
@@ -18,11 +19,11 @@ use VanillaTests\SiteTestCase;
 /**
  * Tests for the pockets model.
  */
-class PocketsModelTest extends SiteTestCase {
-
+class PocketsModelTest extends SiteTestCase
+{
     use ExpectExceptionTrait;
 
-    public static $addons = ['pockets'];
+    public static $addons = ["pockets"];
 
     /** @var TestCache */
     private $cache;
@@ -33,7 +34,8 @@ class PocketsModelTest extends SiteTestCase {
     /**
      * Setup.
      */
-    public function setUp(): void {
+    public function setUp(): void
+    {
         parent::setUp();
         $this->cache = $this->enableCaching();
         $this->pocketModel = self::container()->get(PocketsModel::class);
@@ -42,33 +44,35 @@ class PocketsModelTest extends SiteTestCase {
     /**
      * Test getting all pockets.
      */
-    public function testGetAllCache() {
-        $pocket1 = \Pocket::touch('Pocket 1', 'Hello world');
+    public function testGetAllCache()
+    {
+        $pocket1 = \Pocket::touch("Pocket 1", "Hello world");
         $this->assertPocketCount(1);
-        $pocket2 = \Pocket::touch('Pocket 2', 'Hello world');
+        $pocket2 = \Pocket::touch("Pocket 2", "Hello world");
         $this->assertPocketCount(2);
         $this->assertPocketCount(2);
         $this->cache->assertSetCount(PocketsModel::CACHE_KEY_ENABLED, 2);
         $this->cache->assertGetCount(PocketsModel::CACHE_KEY_ENABLED, 1);
 
-        $this->pocketModel->delete(['PocketID' => $pocket2]);
+        $this->pocketModel->delete(["PocketID" => $pocket2]);
         $this->assertPocketCount(1);
     }
 
     /**
      * Test getting all pockets.
      */
-    public function testEnabledPockets() {
+    public function testEnabledPockets()
+    {
         /** @var PocketsModel $pocketModel */
         $pocketModel = $this->container()->get(PocketsModel::class);
-        $this->resetTable('Pocket');
-        $pocket1 = \Pocket::touch('Pocket 1', 'Hello world');
+        $this->resetTable("Pocket");
+        $pocket1 = \Pocket::touch("Pocket 1", "Hello world");
         $this->assertPocketCount(1);
-        $pocket2 = \Pocket::touch('Pocket 2', 'Hello world');
+        $pocket2 = \Pocket::touch("Pocket 2", "Hello world");
         $this->assertPocketCount(2);
-        $pocketModel->setField($pocket1, 'Disabled', false);
+        $pocketModel->setField($pocket1, "Disabled", false);
         $this->assertPocketCount(2, 1);
-        $pocketModel->setField($pocket1, 'Disabled', true);
+        $pocketModel->setField($pocket1, "Disabled", true);
         $this->assertPocketCount(2, 0);
         $pocketModel->deleteID($pocket2);
         $this->assertPocketCount(1, 0);
@@ -80,7 +84,8 @@ class PocketsModelTest extends SiteTestCase {
      * @param int $pocketCount
      * @param int $enabledCount
      */
-    private function assertPocketCount(int $pocketCount, int $enabledCount = 0) {
+    private function assertPocketCount(int $pocketCount, int $enabledCount = 0)
+    {
         $this->assertEquals($pocketCount, count($this->pocketModel->getAll()));
         $this->assertEquals($enabledCount, count($this->pocketModel->getEnabled()));
     }
@@ -88,21 +93,22 @@ class PocketsModelTest extends SiteTestCase {
     /**
      * Test that widgets can be saved and switched away.
      */
-    public function testWidgetPocket() {
+    public function testWidgetPocket()
+    {
         /** @var PocketsModel $pocketModel */
         $pocketModel = $this->container()->get(PocketsModel::class);
-        $this->resetTable('Pocket');
+        $this->resetTable("Pocket");
 
         $pocketID = $pocketModel->save([
-            'Name' => 'Widget Pocket',
-            'Format' => PocketsModel::FORMAT_WIDGET,
-            'WidgetID' => MockWidget1::getWidgetID(),
-            'WidgetParameters' => [
-                'name' => 'Hello Widget',
+            "Name" => "Widget Pocket",
+            "Format" => PocketsModel::FORMAT_WIDGET,
+            "WidgetID" => MockWidget1::getWidgetID(),
+            "WidgetParameters" => [
+                "name" => "Hello Widget",
             ],
-            'Location' => 'Content',
-            'Sort' => 1000,
-            'Repeat' => \Pocket::REPEAT_ONCE,
+            "Location" => "Content",
+            "Sort" => 1000,
+            "Repeat" => \Pocket::REPEAT_ONCE,
         ]);
 
         ModelUtils::validationResultToValidationException($pocketModel);
@@ -111,95 +117,102 @@ class PocketsModelTest extends SiteTestCase {
         $pocket = $pocketModel->getID($pocketID);
         $this->assertArraySubsetRecursive(
             [
-                'WidgetParameters' => [
-                    'name' => 'Hello Widget',
+                "WidgetParameters" => [
+                    "name" => "Hello Widget",
                 ],
-                'Format' => PocketsModel::FORMAT_WIDGET,
-                'WidgetID' => MockWidget1::getWidgetID(),
+                "Format" => PocketsModel::FORMAT_WIDGET,
+                "WidgetID" => MockWidget1::getWidgetID(),
             ],
             $pocket
         );
 
         // Switch back to an HTML pocket.
         $pocketModel->save([
-            'PocketID' => $pocketID,
-            'Format' => PocketsModel::FORMAT_CUSTOM,
-            'Body' => 'hello world',
-            'SomeFieldThatGoesIntoAttributes' => 'Foo!',
-            'AnotherFieldThatIsAnAttribute' => 'Bar!'
+            "PocketID" => $pocketID,
+            "Format" => PocketsModel::FORMAT_CUSTOM,
+            "Body" => "hello world",
+            "SomeFieldThatGoesIntoAttributes" => "Foo!",
+            "AnotherFieldThatIsAnAttribute" => "Bar!",
         ]);
         ModelUtils::validationResultToValidationException($pocketModel);
         $pocket = $pocketModel->getID($pocketID);
 
         $goodSubset = [
-            'Body' => 'hello world',
-            'Format' => PocketsModel::FORMAT_CUSTOM,
-            'WidgetID' => null,
-            'WidgetParameters' => null,
-            'SomeFieldThatGoesIntoAttributes' => 'Foo!',
-            'AnotherFieldThatIsAnAttribute' => 'Bar!'
+            "Body" => "hello world",
+            "Format" => PocketsModel::FORMAT_CUSTOM,
+            "WidgetID" => null,
+            "WidgetParameters" => null,
+            "SomeFieldThatGoesIntoAttributes" => "Foo!",
+            "AnotherFieldThatIsAnAttribute" => "Bar!",
         ];
 
-        $this->assertArraySubsetRecursive(
-            $goodSubset,
-            $pocket
-        );
+        $this->assertArraySubsetRecursive($goodSubset, $pocket);
 
         // Make sure enabled/disable don't break the pocket.
         $pocketModel->save([
-            'PocketID' => $pocketID,
-            'Disabled' => \Pocket::DISABLED,
+            "PocketID" => $pocketID,
+            "Disabled" => \Pocket::DISABLED,
         ]);
         $pocketModel->save([
-            'PocketID' => $pocketID,
-            'Disabled' => \Pocket::ENABLED,
+            "PocketID" => $pocketID,
+            "Disabled" => \Pocket::ENABLED,
         ]);
 
         // We have to reload the pocket to ensure the data in the database isn't broken.
         $pocket = $pocketModel->getID($pocketID);
 
-        $this->assertArraySubsetRecursive(
-            $goodSubset,
-            $pocket
-        );
+        $this->assertArraySubsetRecursive($goodSubset, $pocket);
     }
 
     /**
      * Test that widgets are properly found.
      */
-    public function testWidgetValidation() {
+    public function testWidgetValidation()
+    {
         /** @var PocketsModel $pocketModel */
         $pocketModel = $this->container()->get(PocketsModel::class);
-        $this->resetTable('Pocket');
+        $this->resetTable("Pocket");
 
         $this->runWithExpectedException(ValidationException::class, function () use ($pocketModel) {
             $pocketModel->save([
-                'Name' => 'Widget Failed Pocket',
-                'Format' => PocketsModel::FORMAT_WIDGET,
-                'WidgetID' => 'bad-id',
-                'WidgetParameters' => [
-                    'name' => 'Hello Widget',
+                "Name" => "Widget Failed Pocket",
+                "Format" => PocketsModel::FORMAT_WIDGET,
+                "WidgetID" => "bad-id",
+                "WidgetParameters" => [
+                    "name" => "Hello Widget",
                 ],
-                'Location' => 'Content',
-                'Sort' => 1000,
-                'Repeat' => \Pocket::REPEAT_ONCE,
+                "Location" => "Content",
+                "Sort" => 1000,
+                "Repeat" => \Pocket::REPEAT_ONCE,
             ]);
             ModelUtils::validationResultToValidationException($pocketModel);
         });
 
         $this->runWithExpectedException(ValidationException::class, function () use ($pocketModel) {
             $pocketModel->save([
-                'Name' => 'Widget Failed Pocket',
-                'Format' => PocketsModel::FORMAT_WIDGET,
-                'WidgetID' => MockWidget1::getWidgetID(),
-                'WidgetParameters' => [
-                    'name' => [],
+                "Name" => "Widget Failed Pocket",
+                "Format" => PocketsModel::FORMAT_WIDGET,
+                "WidgetID" => MockWidget1::getWidgetID(),
+                "WidgetParameters" => [
+                    "name" => [],
                 ],
-                'Location' => 'Content',
-                'Sort' => 1000,
-                'Repeat' => \Pocket::REPEAT_ONCE,
+                "Location" => "Content",
+                "Sort" => 1000,
+                "Repeat" => \Pocket::REPEAT_ONCE,
             ]);
             ModelUtils::validationResultToValidationException($pocketModel);
         });
+
+        // Smoke test saving discussions widget and WidgetParameters.apiParams is not required
+        $pocketModel->save([
+            "Name" => "Untitled",
+            "Format" => "widget",
+            "WidgetID" => DiscussionDiscussionsWidget::getWidgetID(),
+            "WidgetParameters" => [],
+            "Location" => "Panel",
+            "Sort" => 1000,
+            "Repeat" => \Pocket::REPEAT_ONCE,
+        ]);
+        ModelUtils::validationResultToValidationException($pocketModel);
     }
 }

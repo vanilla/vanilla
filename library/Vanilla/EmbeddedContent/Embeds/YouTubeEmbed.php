@@ -13,8 +13,8 @@ use Vanilla\EmbeddedContent\EmbedUtils;
 /**
  * Embed data object for YouTube.
  */
-class YouTubeEmbed extends AbstractEmbed {
-
+class YouTubeEmbed extends AbstractEmbed
+{
     const TYPE = "youtube";
 
     /**
@@ -23,7 +23,8 @@ class YouTubeEmbed extends AbstractEmbed {
      * @param array $data
      * @return string|null
      */
-    private function frameSource(array $data): ?string {
+    private function frameSource(array $data): ?string
+    {
         $listID = $data["listID"] ?? null;
         $start = $data["start"] ?? null;
         $videoID = $data["videoID"] ?? null;
@@ -40,7 +41,7 @@ class YouTubeEmbed extends AbstractEmbed {
             $params = "feature=oembed&autoplay=1";
 
             if ($rel !== null) {
-                $params .= "&rel=" . (int)$rel;
+                $params .= "&rel=" . (int) $rel;
             }
 
             if ($start) {
@@ -54,14 +55,16 @@ class YouTubeEmbed extends AbstractEmbed {
     /**
      * @inheritdoc
      */
-    protected function getAllowedTypes(): array {
+    protected function getAllowedTypes(): array
+    {
         return [self::TYPE];
     }
 
     /**
      * @inheritdoc
      */
-    public function normalizeData(array $data): array {
+    public function normalizeData(array $data): array
+    {
         $embedUrl = $data["attributes"]["embedUrl"] ?? null;
         if (is_string($embedUrl)) {
             $data["videoID"] = $this->urlToID($embedUrl);
@@ -73,7 +76,8 @@ class YouTubeEmbed extends AbstractEmbed {
     /**
      * @return array|mixed
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         $data = parent::jsonSerialize();
         if (array_key_exists("videoID", $data) || array_key_exists("listID", $data)) {
             $data["frameSrc"] = $this->frameSource($data);
@@ -84,7 +88,8 @@ class YouTubeEmbed extends AbstractEmbed {
     /**
      * @inheritdoc
      */
-    protected function schema(): Schema {
+    protected function schema(): Schema
+    {
         return Schema::parse([
             "height:i",
             "width:i",
@@ -102,7 +107,8 @@ class YouTubeEmbed extends AbstractEmbed {
      * @param string $url
      * @return string|null
      */
-    private function urlToID(string $url): ?string {
+    private function urlToID(string $url): ?string
+    {
         $path = parse_url($url, PHP_URL_PATH) ?? "";
         $query = [];
         parse_str(parse_url($url, PHP_URL_QUERY) ?? "", $query);

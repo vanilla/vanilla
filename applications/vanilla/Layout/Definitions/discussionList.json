@@ -1,0 +1,72 @@
+{
+    "$schema": "http://dev.vanilla.localhost/api/v2/layouts/schema?layoutViewType=discussionList&cacheBuster=5",
+    "dateInserted": "2022-01-01T00:00:00Z",
+    "layoutViewType": "discussionList",
+    "layoutID": "discussionList",
+    "name": "Default Discussion List Layout",
+    "layout": [
+        {
+            "$hydrate": "react.section.full-width",
+            "children": [
+                {
+                    "$hydrate": "react.app-banner",
+                    "showDescription": false,
+                    "showSearch": true,
+                    "background": {
+                        "useOverlay": true,
+                        "image": ""
+                    },
+                    "title": "Community Discussions",
+                    "alignment": "left",
+                    "description": "The most recent content from our members.",
+                    "searchPlacement": "middle",
+                    "textColor": "#FFFFFF"
+                }
+            ]
+        },
+        {
+            "$hydrate": "react.section.2-columns",
+            "mainBottom": [
+                {
+                    "$hydrate": "react.asset.discussionList",
+                    "apiParams": {
+                        "includeChildCategories": true,
+                        "sort": "-dateInserted",
+                        "slotType": "a"
+                    },
+                    "discussionOptions": {
+                        "excerpt": {
+                            "display": true
+                        },
+                        "metas": {
+                            "display": {
+                                "category": true,
+                                "commentCount": true,
+                                "lastCommentDate": true,
+                                "lastUser": true,
+                                "score": true,
+                                "startedByUser": true,
+                                "unreadCount": true,
+                                "userTags": true,
+                                "viewCount": true
+                            }
+                        }
+                    },
+                    "title": "Recent Discussions"
+                }
+            ],
+            "secondaryBottom": [
+                {
+                    "$hydrate": "react.newpost",
+                    "asOwnButtons": [],
+                    "excludedButtons": [],
+                    "postableDiscussionTypes": ["discussion", "question", "poll"]
+                },
+                {
+                    "$hydrate": "react.quick-links",
+                    "title": "Quick Links"
+                }
+            ]
+        }
+    ]
+}

@@ -11,12 +11,14 @@ export interface AutoCompleteClassesProps {
     size?: InputSize;
     isDisabled?: boolean;
     isClearable?: boolean;
+    zIndex?: number;
 }
 
 export const autoCompleteClasses = ({
     size = "default",
     isDisabled = false,
     isClearable = false,
+    zIndex = 1,
 }: AutoCompleteClassesProps) => ({
     arrowButton: css({}),
     reachCombobox: css({
@@ -53,8 +55,8 @@ export const autoCompleteClasses = ({
     inputTokenTag: css({
         display: "flex",
         ...{
-            small: { margin: "4px 0px 4px 8px", fontSize: "13px" },
-            default: { margin: "5px 0px 5px 8px", fontSize: "16px" },
+            small: { margin: "4px 0px 4px 8px", fontSize: "12px" },
+            default: { margin: "5px 0px 5px 8px", fontSize: "12px" },
         }[size],
         backgroundColor: "#eeefef",
         borderRadius: 2,
@@ -74,7 +76,7 @@ export const autoCompleteClasses = ({
     }),
     popover: css({
         "&[data-reach-combobox-popover]": {
-            zIndex: 9999,
+            zIndex: zIndex + 1, // Always one above the current stack height
             background: "#fff",
             border: 0,
             borderRadius: 6,
@@ -131,6 +133,28 @@ export const autoCompleteClasses = ({
     optionText: css({
         flex: 1,
     }),
+    separator: css({
+        listStyle: "none",
+        height: "1px",
+        backgroundColor: "rgb(221,222,224)",
+        marginTop: "8px",
+        marginBottom: "8px",
+        border: "none",
+        "& + &, &:last-child, &:first-child": {
+            height: 0,
+        },
+    }),
+    groupHeading: css({
+        textAlign: "center",
+        textTransform: "uppercase",
+        fontWeight: 600,
+        color: "#808080",
+        ...{
+            small: { padding: "6px 8px", fontSize: "13px" },
+            default: { padding: "6px 8px", fontSize: "13px" },
+        }[size],
+        margin: 0,
+    }),
     autoCompleteArrow: css({
         display: "flex",
     }),
@@ -140,10 +164,8 @@ export const autoCompleteClasses = ({
         cursor: "pointer",
     }),
     autoCompleteClose: css({
-        ...{
-            small: { height: 8, with: 8 },
-            default: { height: 10, width: 10 },
-        }[size],
+        height: 8,
+        width: 8,
         alignSelf: "center",
     }),
     input: css({

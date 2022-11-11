@@ -8,12 +8,13 @@ namespace VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\Embeds;
 
 use VanillaTests\Library\Vanilla\Formatting\Quill\Sanitize\SanitizeTest;
 
-class SoundCloudSanitizeTest extends SanitizeTest {
-
+class SoundCloudSanitizeTest extends SanitizeTest
+{
     /**
      * @inheritdoc
      */
-    protected function insertContentOperations(string $content): array {
+    protected function insertContentOperations(string $content): array
+    {
         $operations = [
             [
                 "insert" => [

@@ -273,3 +273,13 @@ function mergeCustomizer(into: any, source: any) {
 export function mergeAndReplaceArrays(item1: Record<any, any>, item2: Record<any, any>) {
     return mergeWith({}, item1, item2, mergeCustomizer);
 }
+
+export function isNumeric(value: any) {
+    if (typeof value === "number") {
+        return true;
+    }
+    if (typeof value === "string") {
+        return /^[+-]?([0-9]*[.])?[0-9]+$/.test(value);
+    }
+    return false;
+}

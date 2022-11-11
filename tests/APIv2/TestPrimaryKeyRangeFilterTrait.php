@@ -14,24 +14,27 @@ use Vanilla\ApiUtils;
 /**
  * Adds some tests for `AbstractResourceTest` subclasses that have support for primary key range filters.
  */
-trait TestPrimaryKeyRangeFilterTrait {
+trait TestPrimaryKeyRangeFilterTrait
+{
     /**
      * Test a basic integration of the PK range.
      */
-    public function testIndexRange(): void {
+    public function testIndexRange(): void
+    {
         [$_, $rows] = $this->testIndex();
 
-        TestCase::assertGreaterThanOrEqual(4, count($rows), "The testIndex() method doesn't provide enough rows to test.");
+        TestCase::assertGreaterThanOrEqual(
+            4,
+            count($rows),
+            "The testIndex() method doesn't provide enough rows to test."
+        );
 
         [$minID, $maxID] = $this->minMaxIDs($rows);
 
-        $r = $this->api()->get(
-            $this->baseUrl,
-            [
-                $this->pk => "($minID,$maxID)",
-                'limit' => count($rows) - 3,
-            ]
-        );
+        $r = $this->api()->get($this->baseUrl, [
+            $this->pk => "($minID,$maxID)",
+            "limit" => count($rows) - 3,
+        ]);
         $newRows = $r->getBody();
 
         [$newMinID, $newMaxID] = $this->minMaxIDs($newRows);
@@ -39,10 +42,13 @@ trait TestPrimaryKeyRangeFilterTrait {
         TestCase::assertLessThan($maxID, $newMaxID, "The max ID range was not respected.");
 
         TestCase::assertTrue($r->hasHeader("Link"), "No paging information was found.");
-        $paging = ApiUtils::parsePageHeader($r->getHeader('Link'));
+        $paging = ApiUtils::parsePageHeader($r->getHeader("Link"));
         TestCase::assertIsArray($paging, "The link header should parse to an array of page links.");
-        TestCase::assertArrayHasKey('next', $paging);
-        TestCase::assertIsString(filter_var($paging['next'], FILTER_VALIDATE_URL), "The next page is not a valid URL.");
+        TestCase::assertArrayHasKey("first", $paging);
+        TestCase::assertIsString(
+            filter_var($paging["first"], FILTER_VALIDATE_URL),
+            "The first page is not a valid URL."
+        );
     }
 
     /**
@@ -51,13 +57,14 @@ trait TestPrimaryKeyRangeFilterTrait {
      * @param array $rows
      * @return array
      */
-    private function minMaxIDs(array $rows): array {
+    private function minMaxIDs(array $rows): array
+    {
         $minID = null;
         $maxID = null;
         foreach ($rows as $row) {
             $minID = min($minID ?: PHP_INT_MAX, $row[$this->pk]);
             $maxID = max($maxID ?: PHP_INT_MIN, $row[$this->pk]);
         }
-        return array($minID, $maxID);
+        return [$minID, $maxID];
     }
 }

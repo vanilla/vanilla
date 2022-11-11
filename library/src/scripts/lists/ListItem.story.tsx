@@ -32,6 +32,28 @@ export function StoryListItems(props: { as?: string; withTitles?: boolean }) {
         </>
     );
     const as = props.as ?? "div";
+    const icon = (isFeatured?: boolean) => {
+        if (isFeatured) {
+            return (
+                <div>
+                    <img
+                        src={STORY_USER.photoUrl}
+                        alt={STORY_USER.name}
+                        style={{ borderRadius: "100%", width: 28, height: 28 }}
+                    />
+                </div>
+            );
+        }
+
+        return (
+            <img
+                src={STORY_USER.photoUrl}
+                alt={STORY_USER.name}
+                style={{ borderRadius: "100%", width: 44, height: 44 }}
+            />
+        );
+    };
+
     return (
         <>
             {withTitles && <StoryHeading>No Images</StoryHeading>}
@@ -40,13 +62,7 @@ export function StoryListItems(props: { as?: string; withTitles?: boolean }) {
                 url={"#"}
                 name={"No image, but everything else"}
                 description={STORY_IPSUM_MEDIUM}
-                icon={
-                    <img
-                        src={STORY_USER.photoUrl}
-                        alt={STORY_USER.name}
-                        style={{ borderRadius: "100%", height: 44, width: 44 }}
-                    />
-                }
+                icon={icon()}
                 metas={<StoryMetasAll />}
                 actions={actions}
             />
@@ -72,13 +88,7 @@ export function StoryListItems(props: { as?: string; withTitles?: boolean }) {
                 url={"#"}
                 name={"With everything"}
                 description={STORY_IPSUM_MEDIUM}
-                icon={
-                    <img
-                        src={STORY_USER.photoUrl}
-                        alt={STORY_USER.name}
-                        style={{ borderRadius: "100%", height: 44, width: 44 }}
-                    />
-                }
+                icon={icon(true)}
                 metas={<StoryMetasAll />}
                 mediaItem={<ListItemMedia src={STORY_IMAGE} alt="Media Item" />}
                 actions={actions}
@@ -90,13 +100,7 @@ export function StoryListItems(props: { as?: string; withTitles?: boolean }) {
                     url={"#"}
                     name={"With everything"}
                     description={STORY_IPSUM_MEDIUM}
-                    icon={
-                        <img
-                            src={STORY_USER.photoUrl}
-                            alt={STORY_USER.name}
-                            style={{ borderRadius: "100%", height: 44, width: 44 }}
-                        />
-                    }
+                    icon={icon(true)}
                     metas={<StoryMetasAll />}
                     mediaItem={<ListItemMedia src={STORY_IMAGE} alt="Media Item" />}
                 />
@@ -109,13 +113,7 @@ export function StoryListItems(props: { as?: string; withTitles?: boolean }) {
                     "Very long title on this one. It just goes on and on and on. It seems like it never ends. How long can it be?"
                 }
                 description={STORY_IPSUM_MEDIUM}
-                icon={
-                    <img
-                        src={STORY_USER.photoUrl}
-                        alt={STORY_USER.name}
-                        style={{ borderRadius: "100%", height: 44, width: 44 }}
-                    />
-                }
+                icon={icon(true)}
                 metas={<StoryMetasAll />}
                 mediaItem={<ListItemMedia src={STORY_IMAGE} alt="Media Item" />}
                 actions={actions}

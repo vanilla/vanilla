@@ -18,7 +18,7 @@ onReady(async () => {
 function SwaggerUI() {
     const { swaggerRef } = useSwaggerUI({
         requestInterceptor: (request: Request) => {
-            request.headers["x-transient-key"] = getMeta("TransientKey");
+            request.headers["x-requested-with"] = getMeta("vanilla");
             return request;
         },
         url: siteUrl("/api/v2/open-api/v3" + window.location.search),

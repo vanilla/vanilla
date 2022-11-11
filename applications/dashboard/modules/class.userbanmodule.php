@@ -11,12 +11,12 @@
 /**
  * Info about a user ban.
  */
-class UserBanModule extends GDN_Module {
-
+class UserBanModule extends GDN_Module
+{
     /** @var int The ban(s) to exclude from the reasons. */
     public $ExcludeBans = 0;
 
-    /** @var string The translation code for the the summary. */
+    /** @var string The translation code for the summary. */
     public $Summary;
 
     /** @var int UserID The user ID we are looking at. Default to the current user. */
@@ -25,9 +25,10 @@ class UserBanModule extends GDN_Module {
     /**
      * Initialize a new instance of the {@link UserBanModule} class.
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
-        $this->_ApplicationFolder = 'dashboard';
+        $this->_ApplicationFolder = "dashboard";
     }
 
     /**
@@ -35,11 +36,12 @@ class UserBanModule extends GDN_Module {
      *
      * @throws Exception
      */
-    protected function getData() {
+    protected function getData()
+    {
         $userID = $this->UserID ?: Gdn::session()->UserID;
         $user = Gdn::userModel()->getID($userID);
 
-        $banned = val('Banned', $user);
+        $banned = val("Banned", $user);
         $bits = BanModel::explodeBans($banned);
         $reasons = [];
 
@@ -50,12 +52,12 @@ class UserBanModule extends GDN_Module {
 
             // Add a link to identify the corresponding ban rule.
             if ($bit === 2) {
-                $text = t('Find the matching ban rule(s).');
-                $reasons[$bit] .= ' '.anchor($text, 'settings/bans/find/'.$userID);
+                $text = t("Find the matching ban rule(s).");
+                $reasons[$bit] .= " " . anchor($text, "settings/bans/find/" . $userID);
             }
         }
 
-        $this->setData('Reasons', $reasons);
+        $this->setData("Reasons", $reasons);
 
         if (!$this->Summary) {
             if ($this->ExcludeBans) {
@@ -64,10 +66,10 @@ class UserBanModule extends GDN_Module {
                 $summary = "Banned for the following:";
             }
         }
-        $this->setData('Summary', $this->Summary ?: $summary);
+        $this->setData("Summary", $this->Summary ?: $summary);
 
-        $this->EventArguments['User'] = $user;
-        $this->fireEvent('GetData');
+        $this->EventArguments["User"] = $user;
+        $this->fireEvent("GetData");
     }
 
     /**
@@ -75,16 +77,17 @@ class UserBanModule extends GDN_Module {
      *
      * @return string
      */
-    public function toString() {
-        if (!Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+    public function toString()
+    {
+        if (!Gdn::session()->checkPermission("Garden.Moderation.Manage")) {
             // Only moderators can view the reasons for being banned.
-            return '';
+            return "";
         }
 
         $this->getData();
 
-        if (empty($this->Data['Reasons'])) {
-            return '';
+        if (empty($this->Data["Reasons"])) {
+            return "";
         } else {
             return parent::toString();
         }

@@ -3,9 +3,8 @@
  * @license GPL-2.0-only
  */
 
-import React, { ComponentProps, ComponentType } from "react";
+import React, { ComponentProps, ComponentType, useMemo } from "react";
 import { IUser, IUserFragment } from "@library/@types/api/users";
-import NumberFormatted from "@library/content/NumberFormatted";
 import Permission, { PermissionMode } from "@library/features/users/Permission";
 import { userCardClasses } from "@library/features/userCard/UserCard.styles";
 import Button from "@library/forms/Button";
@@ -15,6 +14,8 @@ import { CloseCompactIcon } from "@library/icons/common";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { MetaItem, Metas } from "@library/metas/Metas";
+import { statClasses } from "@library/stats/Stat.styles";
+import { Stat } from "@library/stats/Stat";
 import LinkAsButton from "@library/routing/LinkAsButton";
 import {
     getMeta,
@@ -23,14 +24,13 @@ import {
     makeProfileUrl,
     t,
 } from "@library/utility/appUtils";
-import classNames from "classnames";
+import { cx } from "@emotion/css";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import DateTime from "@library/content/DateTime";
 import { hasPermission } from "@library/features/users/Permission";
 import { formatUrl } from "@library/utility/appUtils";
 import { useCurrentUserID } from "@library/features/users/userHooks";
-import SmartLink from "@library/routing/links/SmartLink";
-import { useStackingContext } from "@library/modal/StackingContext";
+import { useStackingContext } from "@vanilla/react-utils";
 
 interface IProps {
     user: IUser;
@@ -84,7 +84,6 @@ export function UserCardView(props: IProps) {
     const currentUseID = useCurrentUserID();
     const isOwnUser = user.userID === currentUseID;
 
-    let label = user.title ?? user.label;
     const privateProfile = user?.private ?? false;
     const hasPersonalInfoView = hasPermission("personalInfo.view");
     const banned = user?.banned ?? 0;
@@ -94,7 +93,21 @@ export function UserCardView(props: IProps) {
     const privateBannedProfileEnabled = bannedPrivateProfile !== "0";
     const showPrivateBannedProfile = isBanned && privateBannedProfileEnabled;
 
-    label = isBanned ? t(BANNED) : label;
+    const labelSection = useMemo(() => {
+        const { label, title } = user;
+        if (isBanned) {
+            return <div className={classes.label}>{t(BANNED)}</div>;
+        }
+        if (title) {
+            /* Title can be input by the user. */
+            return <div className={classes.label}>{title}</div>;
+        }
+        if (!title && label) {
+            /* Labels (from rank label) are sanitized server side. */
+            return <div className={classes.label} dangerouslySetInnerHTML={{ __html: label }} />;
+        }
+        return null;
+    }, [isBanned, user]);
 
     if ((privateProfile || showPrivateBannedProfile) && !hasPersonalInfoView && !isOwnUser) {
         return <UserCardMinimal user={user} onClose={props.onClose} />;
@@ -121,16 +134,7 @@ export function UserCardView(props: IProps) {
                 </div>
                 {
                     /* We don't want this section to show at all if there's no label */
-                    label && (
-                        <div className={classes.row}>
-                            {
-                                /* HTML here is sanitized server side. */
-                                label ? (
-                                    <div className={classes.label} dangerouslySetInnerHTML={{ __html: label }} />
-                                ) : null
-                            }
-                        </div>
-                    )
+                    labelSection && <div className={classes.row}>{labelSection}</div>
                 }
 
                 {user.email && (
@@ -148,13 +152,13 @@ export function UserCardView(props: IProps) {
                 ))}
 
                 {isBanned && (
-                    <div className={classNames(classes.row, classes.message)}>
+                    <div className={cx(classes.row, classes.message)}>
                         <div>{t(BANNED_USER_MSG)}</div>
                     </div>
                 )}
             </Container>
 
-            <div className={classNames(classes.row, classes.buttonsContainer)}>
+            <div className={cx(classes.row, classes.buttonsContainer)}>
                 <CardButton to={makeProfileUrl(user.name)}>{t("View Profile")}</CardButton>
                 <Permission permission={"conversations.add"}>
                     {isConversationsEnabled && !banned && (
@@ -167,17 +171,17 @@ export function UserCardView(props: IProps) {
             </div>
 
             <Container borderTop>
-                <StatLink
+                <Stat
                     to={makeProfileDiscussionsUrl(user.name)}
-                    count={user.countDiscussions}
-                    text={t("Discussions")}
-                    position={"left"}
+                    value={user.countDiscussions}
+                    label={t("Discussions")}
+                    classNames={classes.statLeft}
                 />
-                <StatLink
+                <Stat
                     to={makeProfileCommentsUrl(user.name)}
-                    count={user.countComments}
-                    text={t("Comments")}
-                    position={"right"}
+                    value={user.countComments}
+                    label={t("Comments")}
+                    classNames={classes.statRight}
                 />
             </Container>
 
@@ -251,17 +255,17 @@ export function UserCardSkeleton(props: ISkeletonProps) {
                 </Permission>
                 {!!userFragment?.userID &&
                     UserCardView.extraLinks.map((link, i) => (
-                        <>
+                        <React.Fragment key={i}>
                             {link.skeleton ? (
-                                <link.skeleton key={i} userID={userFragment.userID!} />
+                                <link.skeleton userID={userFragment.userID!} />
                             ) : (
                                 <LoadingRectangle inline height={12} width={120} />
                             )}
-                        </>
+                        </React.Fragment>
                     ))}
             </Container>
 
-            <div className={classNames(classes.row, classes.buttonsContainer)}>
+            <div className={cx(classes.row, classes.buttonsContainer)}>
                 <CardButton
                     disabled={!userFragment?.name}
                     to={userFragment?.name ? makeProfileUrl(userFragment?.name) : ""}
@@ -352,7 +356,7 @@ export function UserCardMinimal(props: IMinimalProps) {
                 <div className={classes.row}>
                     <div className={classes.label}>{labelText}</div>
                 </div>
-                <div className={classNames(classes.row, classes.message)}>
+                <div className={cx(classes.row, classes.message)}>
                     <div>{msg}</div>
                 </div>
             </Container>
@@ -388,7 +392,7 @@ export function UserCardError(props: IUserCardErrorProps) {
                 <div className={classes.row}>
                     <div className={classes.label}>{label}</div>
                 </div>
-                <div className={classNames(classes.row, classes.message)}>
+                <div className={cx(classes.row, classes.message)}>
                     <div>{msg}</div>
                 </div>
             </Container>
@@ -404,7 +408,7 @@ export function CardButton(props: { disabled?: boolean; to?: string; target?: st
         <div className={classes.buttonContainer}>
             <LinkAsButton
                 disabled={props.disabled}
-                to={props.to}
+                to={props.to ?? ""}
                 buttonType={ButtonTypes.STANDARD}
                 className={classes.button}
                 target={props.target}
@@ -417,48 +421,23 @@ export function CardButton(props: { disabled?: boolean; to?: string; target?: st
 
 function StatSkeleton(props: { text: string; position: "left" | "right" }) {
     const { zIndex } = useStackingContext();
-    const classes = userCardClasses({ zIndex: zIndex });
+    const classes = statClasses();
+    const cardClasses = userCardClasses({ zIndex: zIndex });
 
     const { text, position } = props;
     return (
         <div
-            className={classNames(classes.stat, {
-                [classes.statLeft]: position === "left",
-                [classes.statRight]: position === "right",
-            })}
+            className={cx(
+                classes.statItem,
+                { [cardClasses.statLeft]: position === "left" },
+                { [cardClasses.statRight]: position === "right" },
+            )}
         >
-            <div className={classes.count}>
+            <div className={classes.statData}>
                 <LoadingRectangle height={35} width={48} />
             </div>
             <div className={classes.statLabel}>{text}</div>
         </div>
-    );
-}
-
-function StatLink(props: {
-    to: ComponentProps<typeof SmartLink>["to"];
-    text: string;
-    position: "left" | "right";
-    count?: number;
-}) {
-    const { zIndex } = useStackingContext();
-    const classes = userCardClasses({ zIndex: zIndex });
-
-    const { to, count, text, position } = props;
-    return (
-        <SmartLink
-            title={text}
-            to={to}
-            className={classNames(classes.statLink, {
-                [classes.statLeft]: position === "left",
-                [classes.statRight]: position === "right",
-            })}
-        >
-            <div className={classes.count}>
-                <NumberFormatted fallbackTag={"div"} value={count || 0} title={text} />
-            </div>
-            <div className={classes.statLabel}>{text}</div>
-        </SmartLink>
     );
 }
 

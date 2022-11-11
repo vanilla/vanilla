@@ -16,8 +16,8 @@ use Vanilla\Http\InternalClient;
 /**
  * @method InternalClient api()
  */
-trait UsersAndRolesApiTestTrait {
-
+trait UsersAndRolesApiTestTrait
+{
     /** @var int|null */
     protected $lastUserID = null;
 
@@ -35,42 +35,48 @@ trait UsersAndRolesApiTestTrait {
      *
      * @return mixed
      */
-    protected function runWithPermissions(callable $callback, array $globalPermissions, array ...$otherPermissions) {
+    protected function runWithPermissions(callable $callback, array $globalPermissions, array ...$otherPermissions)
+    {
         // Sign in permission is needed to start a session with the user.
         $globalPermissions = [
-            'type' => 'global',
-            'permissions' => array_merge([
-                'session.valid' => true,
-            ], $globalPermissions),
+            "type" => "global",
+            "permissions" => array_merge(
+                [
+                    "session.valid" => true,
+                ],
+                $globalPermissions
+            ),
         ];
 
         $role = $this->createRole([
-            'permissions' => array_merge([$globalPermissions], $otherPermissions),
+            "permissions" => array_merge([$globalPermissions], $otherPermissions),
         ]);
 
-        $user = $this->createUser([
-            'roleID' => [$this->lastRoleID],
-        ]) ?? [];
+        $user =
+            $this->createUser([
+                "roleID" => [$this->lastRoleID],
+            ]) ?? [];
         try {
             $result = $this->runWithUser($callback, $user);
             return $result;
         } finally {
-            $id = $user['userID'] ?? $this->lastUserID;
+            $id = $user["userID"] ?? $this->lastUserID;
             // Cleanup.
             $this->api()->deleteWithBody("/users/{$id}");
-            $this->api()->delete("/roles/{$role['roleID']}");
+            $this->api()->delete("/roles/{$role["roleID"]}");
         }
     }
 
     /**
      * Delete all users except System and Admin(circleci).
      */
-    protected function clearUsers() {
+    protected function clearUsers()
+    {
         $userModel = \Gdn::userModel();
         $users = $userModel->get()->resultArray();
         foreach ($users as $user) {
-            if (!in_array($user['Name'], ['circleci', 'System'])) {
-                $userModel->deleteID($user['UserID']);
+            if (!in_array($user["Name"], ["circleci", "System"])) {
+                $userModel->deleteID($user["UserID"]);
             }
         }
     }
@@ -83,8 +89,9 @@ trait UsersAndRolesApiTestTrait {
      *
      * @return mixed The result of the callback.
      */
-    protected function runWithUser(callable $callback, $userOrUserID) {
-        $userID = is_array($userOrUserID) ? $userOrUserID['userID'] : $userOrUserID;
+    protected function runWithUser(callable $callback, $userOrUserID)
+    {
+        $userID = is_array($userOrUserID) ? $userOrUserID["userID"] : $userOrUserID;
         $apiUserBefore = $this->api()->getUserID();
         $this->api()->setUserID($userID);
         \CategoryModel::clearUserCache($userID);
@@ -104,11 +111,12 @@ trait UsersAndRolesApiTestTrait {
      * @param array $permissions
      * @return array
      */
-    protected function categoryPermission(int $categoryID, array $permissions): array {
+    protected function categoryPermission(int $categoryID, array $permissions): array
+    {
         return [
             "id" => $categoryID,
             "permissions" => $permissions,
-            "type" => "category"
+            "type" => "category",
         ];
     }
 
@@ -117,7 +125,8 @@ trait UsersAndRolesApiTestTrait {
      *
      * @param bool $resetRoles Whether or not roles should be wiped.
      */
-    public function setUpUsersAndRolesApiTestTrait(bool $resetRoles = true): void {
+    public function setUpUsersAndRolesApiTestTrait(bool $resetRoles = true): void
+    {
         $this->api()->setUserID(InternalClient::DEFAULT_USER_ID);
         $this->lastUserID = null;
         $this->lastRoleID = null;
@@ -136,23 +145,24 @@ trait UsersAndRolesApiTestTrait {
      *
      * @return array
      */
-    protected function createUser(array $overrides = [], array $extras = []): array {
-        $salt = '-' . round(microtime(true) * 1000) . rand(1, 1000);
+    protected function createUser(array $overrides = [], array $extras = []): array
+    {
+        $salt = $this->generateSalt();
 
         $body = $overrides + [
-            'bypassSpam' => false,
-            'email' => "test-$salt@test.com",
-            'emailConfirmed' => true,
-            'name' => "user-$salt",
-            'password' => 'testpassword',
-            'photo' => null,
-            'roleID' => [
-                \RoleModel::MEMBER_ID,
-            ]
+            "bypassSpam" => false,
+            "email" => "test-$salt@test.com",
+            "emailConfirmed" => true,
+            "name" => "user-$salt",
+            "password" => "testpassword",
+            "photo" => null,
+            "roleID" => [\RoleModel::MEMBER_ID],
         ];
 
-        $result = $this->api()->post('/users', $body)->getBody();
-        $this->lastUserID = $result['userID'];
+        $result = $this->api()
+            ->post("/users", $body)
+            ->getBody();
+        $this->lastUserID = $result["userID"];
 
         if (!empty($extras)) {
             \Gdn::userModel()->setField($this->lastUserID, $extras);
@@ -168,15 +178,18 @@ trait UsersAndRolesApiTestTrait {
      *
      * @return array
      */
-    protected function updateUser(array $updates): array {
-        $userID = $updates['userID'] ?? $this->lastUserID;
+    protected function updateUser(array $updates): array
+    {
+        $userID = $updates["userID"] ?? $this->lastUserID;
 
         if ($userID === null) {
-            throw new \Exception('There was no userID to update');
+            throw new \Exception("There was no userID to update");
         }
 
-        $result = $this->api()->patch("/users/$userID", $updates)->getBody();
-        $this->lastUserID = $result['userID'];
+        $result = $this->api()
+            ->patch("/users/$userID", $updates)
+            ->getBody();
+        $this->lastUserID = $result["userID"];
         return $result;
     }
 
@@ -187,11 +200,12 @@ trait UsersAndRolesApiTestTrait {
      * @param int $points
      * @param int|array|null $categoryIDOrCategory
      */
-    protected function givePoints($userIDOrUser, int $points, $categoryIDOrCategory = null) {
-        $userID = is_array($userIDOrUser) ? $userIDOrUser['userID'] : $userIDOrUser;
-        $categoryID = is_array($categoryIDOrCategory) ? $categoryIDOrCategory['categoryID'] : $categoryIDOrCategory;
+    protected function givePoints($userIDOrUser, int $points, $categoryIDOrCategory = null)
+    {
+        $userID = is_array($userIDOrUser) ? $userIDOrUser["userID"] : $userIDOrUser;
+        $categoryID = is_array($categoryIDOrCategory) ? $categoryIDOrCategory["categoryID"] : $categoryIDOrCategory;
         if ($categoryID !== null) {
-            \UserModel::givePoints($userID, $points, [0 => 'Test', 'CategoryID' => $categoryID]);
+            \UserModel::givePoints($userID, $points, [0 => "Test", "CategoryID" => $categoryID]);
         } else {
             \UserModel::givePoints($userID, $points);
         }
@@ -206,27 +220,33 @@ trait UsersAndRolesApiTestTrait {
      *
      * @return array
      */
-    public function createRole(array $overrides = [], array $globalPermissions = [], array ...$otherPermissions): array {
-        $salt = '-' . round(microtime(true) * 1000) . rand(1, 1000);
+    public function createRole(array $overrides = [], array $globalPermissions = [], array ...$otherPermissions): array
+    {
+        $salt = $this->generateSalt();
 
         $body = $overrides + [
             "canSession" => true,
             "deletable" => true,
             "description" => "A custom role.",
             "name" => "role$salt",
-            "permissions" => array_merge([
+            "permissions" => array_merge(
                 [
-                    "id" => 0,
-                    "permissions" => $globalPermissions,
-                    "type" => "global"
+                    [
+                        "id" => 0,
+                        "permissions" => $globalPermissions,
+                        "type" => "global",
+                    ],
                 ],
-            ], $otherPermissions),
+                $otherPermissions
+            ),
             "personalInfo" => true,
             "type" => "member",
         ];
 
-        $result = $this->api()->post('/roles', $body)->getBody();
-        $this->lastRoleID = $result['roleID'];
+        $result = $this->api()
+            ->post("/roles", $body)
+            ->getBody();
+        $this->lastRoleID = $result["roleID"];
         return $result;
     }
 
@@ -237,9 +257,51 @@ trait UsersAndRolesApiTestTrait {
      * @param mixed $expected the expected value.
      * @param int|null $userID The userID. Defaults to sessioned user.
      */
-    public function assertUserField(string $field, $expected, int $userID = null) {
+    public function assertUserField(string $field, $expected, int $userID = null)
+    {
         $userID = $userID ?? \Gdn::session()->UserID;
         $user = \Gdn::userModel()->getID($userID, DATASET_TYPE_ARRAY);
         $this->assertEquals($expected, $user[$field]);
+    }
+
+    /**
+     * Create a profile field through the API.
+     *
+     * @param array $overrides
+     * @return array
+     */
+    protected function createProfileField(array $overrides = []): array
+    {
+        $salt = $this->generateSalt();
+
+        $dataType = $overrides["dataType"] ?? "text";
+        $apiNameType = str_replace("[]", "-array", $dataType);
+        $body = $overrides + [
+            "apiName" => "apiName_{$apiNameType}_{$salt}",
+            "label" => "label_$salt",
+            "description" => "description $salt",
+            "dataType" => $dataType,
+            "formType" => "text",
+            "visibility" => "public",
+            "mutability" => "all",
+            "displayOptions" => [
+                "profiles" => true,
+                "userCards" => true,
+                "posts" => true,
+            ],
+            "required" => false,
+        ];
+        $result = $this->api()->post("/profile-fields", $body);
+        return $result->getBody();
+    }
+
+    /**
+     * Generates and returns a salt
+     *
+     * @return string
+     */
+    private function generateSalt(): string
+    {
+        return "-" . round(microtime(true) * 1000) . rand(1, 1000);
     }
 }

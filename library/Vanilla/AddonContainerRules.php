@@ -13,16 +13,17 @@ use Garden\Container\ContainerConfigurationInterface;
 /**
  * Class for implementing container configuration in an addon.
  */
-abstract class AddonContainerRules {
-
+abstract class AddonContainerRules
+{
     /**
      * You may NOT dependency inject anything in an addon configuration.
      */
-    final public function __construct() {
+    final public function __construct()
+    {
     }
 
     /**
-     * Implement this for configuring the the container from an addon.
+     * Implement this for configuring the container from an addon.
      *
      * Notably this provides a configuration-only container. You may not fetch any instances at this point.
      *
@@ -37,7 +38,8 @@ abstract class AddonContainerRules {
      *
      * @param ContainerConfigurationInterface $container A container configuration instance.
      */
-    public function configureProductionContainer(ContainerConfigurationInterface $container): void {
+    public function configureProductionContainer(ContainerConfigurationInterface $container): void
+    {
         $this->configureContainer($container);
     }
 
@@ -49,7 +51,8 @@ abstract class AddonContainerRules {
      *
      * @param Container $container A full container instance.
      */
-    public function configureTestContainer(Container $container): void {
+    public function configureTestContainer(Container $container): void
+    {
         $this->configureContainer($container);
     }
 }

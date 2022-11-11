@@ -58,15 +58,6 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         color: ColorsUtils.colorOut(globalVars.border.color),
     });
 
-    const stat = makeVars("stat", {
-        font: Variables.font({
-            color: ColorsUtils.colorOut(globalVars.mainColors.fg),
-        }),
-        fontState: Variables.font({
-            color: globalVars.mainColors.primary,
-        }),
-    });
-
     const message = makeVars("message", {
         font: Variables.font({
             size: globalVars.fonts.size.small,
@@ -74,10 +65,6 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         margin: Variables.spacing({
             top: 12,
         }),
-    });
-
-    const count = makeVars("count", {
-        size: 28,
     });
 
     const headerLink = makeVars("headerLink", {
@@ -95,9 +82,7 @@ export const userCardVariables = useThemeCache((forcedVars?: IThemeVariables) =>
         name,
         label,
         containerWithBorder,
-        stat,
         message,
-        count,
         headerLink,
     };
 });

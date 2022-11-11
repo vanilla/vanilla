@@ -5,5 +5,3 @@ VanillaConnect plugin allows SSO from a provider using the [VanillaConnect libra
 # Documentation
 
 [PUT LINK TO THE DOCUMENTATION]
-
-

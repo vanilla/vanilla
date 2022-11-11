@@ -16,8 +16,9 @@ use Vanilla\Community\Events\DiscussionEvent;
 /**
  * Represent a LogPostEvent. The event type will be either "discussion" or "comment", depending on the post's type.
  */
-class LogPostEvent implements \Garden\Events\TrackingEventInterface {
-    const COLLECTION_NAME = 'moderation';
+class LogPostEvent implements \Garden\Events\TrackingEventInterface
+{
+    const COLLECTION_NAME = "moderation";
 
     /** @var string */
     protected $action;
@@ -83,21 +84,24 @@ class LogPostEvent implements \Garden\Events\TrackingEventInterface {
     /**
      * {@inheritDoc}
      */
-    public function getPayload(): ?array {
+    public function getPayload(): ?array
+    {
         return $this->payload;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getAction(): string {
+    public function getAction(): string
+    {
         return $this->action;
     }
 
     /**
      * @inheritDoc
      */
-    public function getTrackableCollection(): ?string {
+    public function getTrackableCollection(): ?string
+    {
         return self::COLLECTION_NAME;
     }
 
@@ -108,24 +112,31 @@ class LogPostEvent implements \Garden\Events\TrackingEventInterface {
      * @param TrackableUserModel $trackableUserModel
      * @return array
      */
-    public function getTrackablePayload(TrackableCommunityModel $trackableCommunityModel, TrackableUserModel $trackableUserModel): array {
+    public function getTrackablePayload(
+        TrackableCommunityModel $trackableCommunityModel,
+        TrackableUserModel $trackableUserModel
+    ): array {
         $postEvent = $this->getPayload();
-        $commentID = $postEvent['comment']['commentID'] ?? null;
+        $commentID = $postEvent["comment"]["commentID"] ?? null;
         if ($commentID !== null) {
             $trackingData = $trackableCommunityModel->getTrackableComment($postEvent["comment"]["commentID"]);
-        } elseif (isset($postEvent['comment'])) {
+        } elseif (isset($postEvent["comment"])) {
             $trackingData = $trackableCommunityModel->getTrackableLogComment($postEvent["comment"]);
         }
 
-        $discussionID = $postEvent['discussion']['discussionID'] ?? null;
+        $discussionID = $postEvent["discussion"]["discussionID"] ?? null;
         if ($discussionID !== null) {
             $trackingData = $trackableCommunityModel->getTrackableDiscussion($postEvent["discussion"]["discussionID"]);
-        } elseif (isset($postEvent['discussion'])) {
+        } elseif (isset($postEvent["discussion"])) {
             $trackingData["discussion"] = $trackableCommunityModel->getTrackableLogDiscussion($postEvent["discussion"]);
         }
 
-        $trackingData["discipliningUser"] = $trackableUserModel->getTrackableUser($postEvent["discipliningUser"]["userID"]);
-        $trackingData["disciplinedUser"] = $trackableUserModel->getTrackableUser($postEvent["disciplinedUser"]["userID"]);
+        $trackingData["discipliningUser"] = $trackableUserModel->getTrackableUser(
+            $postEvent["discipliningUser"]["userID"]
+        );
+        $trackingData["disciplinedUser"] = $trackableUserModel->getTrackableUser(
+            $postEvent["disciplinedUser"]["userID"]
+        );
 
         return $trackingData;
     }

@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -14,7 +14,6 @@ import { useUniqueID } from "@library/utility/idUtils";
 import React, { useState, useRef } from "react";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { NBSP, DownTriangleIcon, CheckCompactIcon } from "@library/icons/common";
-import classNames from "classnames";
 import { cx } from "@emotion/css";
 
 export interface ISelectBoxItem {

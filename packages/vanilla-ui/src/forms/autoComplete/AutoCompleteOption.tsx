@@ -14,7 +14,9 @@ import { Checkmark } from "../shared/Checkmark";
 export interface IAutoCompleteOption {
     value: any;
     label?: string;
+    extraLabel?: string;
     data?: any;
+    group?: string;
 }
 
 export interface IAutoCompleteOptionProps
@@ -29,11 +31,13 @@ export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionIm
     props: IAutoCompleteOptionProps,
     ref: React.Ref<HTMLLIElement>,
 ) {
-    const { value, label = value, ...otherProps } = props;
+    const { value, label = value, extraLabel, ...otherProps } = props;
     const { size, value: autoCompleteValue, multiple } = useContext(AutoCompleteContext);
     const classes = useMemo(() => autoCompleteClasses({ size }), [size]);
     const values = multiple && Array.isArray(autoCompleteValue) ? autoCompleteValue : [autoCompleteValue];
     const selected = values.indexOf(value) > -1;
+
+    const extraLabelContent = props.data?.parentLabel ?? extraLabel;
 
     return (
         <ComboboxOption
@@ -45,9 +49,7 @@ export const AutoCompleteOption = React.forwardRef(function AutoCompleteOptionIm
         >
             <div className={classes.optionText}>
                 <ComboboxOptionText />
-                {props.data?.parentLabel && (
-                    <span className={classes.parentLabel}>{` - ${props.data.parentLabel}`}</span>
-                )}
+                {extraLabelContent && <span className={classes.parentLabel}>{` - ${extraLabelContent}`}</span>}
                 {props.data?.labelSuffix}
             </div>
             {selected && (

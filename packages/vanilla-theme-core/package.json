@@ -1,7 +1,7 @@
 {
     "name": "@vanilla/theme-core",
     "version": "3.1.6",
-    "license": "gpl-2.0-only",
+    "license": "MIT",
     "devDependencies": {
         "@vanilla/tsconfig": "^3.0.1"
     },

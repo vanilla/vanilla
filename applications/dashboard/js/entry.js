@@ -59,8 +59,15 @@ jQuery(document).ready(function ($) {
             var selectedName = $("input[name=UserSelect]:checked").val();
             if (selectedName && selectedName !== "other") {
                 $("#ConnectPassword").show();
+                if ($("#connect-custom-profile-fields")) {
+                    $("#connect-custom-profile-fields").hide();
+                }
             } else {
                 $("#ConnectPassword").hide();
+                //only if selected name is "other", when we are trying to create new account
+                if ($("#connect-custom-profile-fields") && selectedName) {
+                    $("#connect-custom-profile-fields").show();
+                }
             }
         }
     };

@@ -14,9 +14,9 @@ use Garden\Web\RequestInterface;
 /**
  * Middleware for applying a consistent transcationID for logs across a single request.
  */
-class LogTransactionMiddleware {
-
-    const HEADER_NAME = 'x-log-transaction-id';
+class LogTransactionMiddleware
+{
+    const HEADER_NAME = "x-log-transaction-id";
 
     /** @var int|null */
     private $transactionID = null;
@@ -28,7 +28,8 @@ class LogTransactionMiddleware {
      * @param callable $next The next middleware.
      * @return mixed Returns the response of the inner middleware.
      */
-    public function __invoke($request, callable $next) {
+    public function __invoke($request, callable $next)
+    {
         $transactionID = $request->getHeader(self::HEADER_NAME) ?: null;
 
         if (is_numeric($transactionID)) {
@@ -41,14 +42,16 @@ class LogTransactionMiddleware {
     /**
      * @return int
      */
-    public function getTransactionID(): ?int {
+    public function getTransactionID(): ?int
+    {
         return $this->transactionID;
     }
 
     /**
      * @param int|null $transactionID
      */
-    public function setTransactionID(?int $transactionID): void {
+    public function setTransactionID(?int $transactionID): void
+    {
         $this->transactionID = $transactionID;
     }
 }

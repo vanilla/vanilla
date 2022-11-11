@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -18,12 +18,11 @@ import { t } from "@vanilla/i18n";
 import React, { useState } from "react";
 import { ThemeToggle } from "@library/forms/themeEditor/ThemeToggle";
 import { ThemeBuilderBreakpoints, BreakpointViewType } from "@library/forms/themeEditor/ThemeBuilderBreakpoints";
+import { ThemeBuilderFontBlock } from "@library/forms/themeEditor/ThemeBuilderFontBlock";
 
 export default {
-    title: "Forms",
+    title: "Forms/Deprecated Form Fields",
 };
-import { ThemeInputText } from "@library/forms/themeEditor/ThemeInputText";
-import { ThemeBuilderFontBlock } from "@library/forms/themeEditor/ThemeBuilderFontBlock";
 
 export function ThemeEditor() {
     const [vars, setVars] = useState({});

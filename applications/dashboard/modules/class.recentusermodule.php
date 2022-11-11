@@ -11,24 +11,28 @@
 /**
  * Renders the recently active users. Built for use in a side panel.
  */
-class RecentUserModule extends Gdn_Module {
-
-    public function __construct($sender = '') {
+class RecentUserModule extends Gdn_Module
+{
+    public function __construct($sender = "")
+    {
         parent::__construct($sender);
     }
 
-    public function getData($limit = 20) {
+    public function getData($limit = 20)
+    {
         $userModel = new UserModel();
         $this->_Sender->RecentUserData = $userModel->getActiveUsers($limit);
     }
 
-    public function assetTarget() {
-        return 'Panel';
+    public function assetTarget()
+    {
+        return "Panel";
     }
 
-    public function toString() {
-        if (!c('Garden.Modules.ShowRecentUserModule')) {
-            return '';
+    public function toString()
+    {
+        if (!c("Garden.Modules.ShowRecentUserModule")) {
+            return "";
         }
 
         $data = $this->_Sender->RecentUserData;
@@ -36,6 +40,6 @@ class RecentUserModule extends Gdn_Module {
             return parent::toString();
         }
 
-        return '';
+        return "";
     }
 }

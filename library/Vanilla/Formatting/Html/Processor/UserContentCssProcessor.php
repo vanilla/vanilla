@@ -13,12 +13,13 @@ use Vanilla\Utility\HtmlUtils;
 /**
  * Process user content to ensure certain CSS classes are applied.
  */
-class UserContentCssProcessor extends HtmlProcessor {
-
+class UserContentCssProcessor extends HtmlProcessor
+{
     /**
      * @inheritdoc
      */
-    public function processDocument(HtmlDocument $document): HtmlDocument {
+    public function processDocument(HtmlDocument $document): HtmlDocument
+    {
         $this->cleanupBlockquotes($document);
         $this->cleanupImages($document);
         $this->cleanupIFrames($document);
@@ -32,8 +33,9 @@ class UserContentCssProcessor extends HtmlProcessor {
      *
      * @param HtmlDocument $document The document to parse.
      */
-    private function cleanupCodeBlocks(HtmlDocument $document) {
-        $blockCodeBlocks = $document->queryXPath('.//*[self::pre]');
+    private function cleanupCodeBlocks(HtmlDocument $document)
+    {
+        $blockCodeBlocks = $document->queryXPath(".//*[self::pre]");
         foreach ($blockCodeBlocks as $codeBlock) {
             if (!($codeBlock instanceof \DOMElement)) {
                 continue;
@@ -50,7 +52,6 @@ class UserContentCssProcessor extends HtmlProcessor {
                     }
                 }
             }
-
 
             $classes = $this->getClasses($codeBlock);
             if (!$this->hasClass($classes, "code")) {
@@ -71,8 +72,9 @@ class UserContentCssProcessor extends HtmlProcessor {
      *
      * @param HtmlDocument $document The document to parse.
      */
-    private function cleanupInlineCodeBlocks(HtmlDocument $document) {
-        $inlineCodeBlocks = $document->queryXPath('.//*[self::code]');
+    private function cleanupInlineCodeBlocks(HtmlDocument $document)
+    {
+        $inlineCodeBlocks = $document->queryXPath(".//*[self::code]");
         foreach ($inlineCodeBlocks as $c) {
             $this->appendClass($c, "code");
             $this->appendClass($c, "codeInline");
@@ -86,11 +88,12 @@ class UserContentCssProcessor extends HtmlProcessor {
      *
      * @param HtmlDocument $document The document to parse.
      */
-    private function cleanupImages(HtmlDocument $document) {
+    private function cleanupImages(HtmlDocument $document)
+    {
         $images = $document->queryXPath(ImageHtmlProcessor::EMBED_IMAGE_XPATH);
         foreach ($images as $image) {
-            HtmlUtils::appendClass($image, 'embedImage-img');
-            HtmlUtils::appendClass($image, 'importedEmbed-img');
+            HtmlUtils::appendClass($image, "embedImage-img");
+            HtmlUtils::appendClass($image, "importedEmbed-img");
         }
     }
 
@@ -99,10 +102,11 @@ class UserContentCssProcessor extends HtmlProcessor {
      *
      * @param HtmlDocument $document The document to parse.
      */
-    private function cleanupIFrames(HtmlDocument $document) {
-        $iFrames = $document->queryXPath(('.//*[self::iframe]'));
+    private function cleanupIFrames(HtmlDocument $document)
+    {
+        $iFrames = $document->queryXPath(".//*[self::iframe]");
         foreach ($iFrames as $iFrame) {
-            HtmlUtils::appendClass($iFrame, 'importedEmbed-iframe');
+            HtmlUtils::appendClass($iFrame, "importedEmbed-iframe");
         }
     }
 
@@ -111,10 +115,11 @@ class UserContentCssProcessor extends HtmlProcessor {
      *
      * @param HtmlDocument $document The document to parse.
      */
-    private function cleanupBlockquotes(HtmlDocument $document) {
-        $blockQuotes = $document->queryXPath('.//*[self::blockquote]');
+    private function cleanupBlockquotes(HtmlDocument $document)
+    {
+        $blockQuotes = $document->queryXPath(".//*[self::blockquote]");
         foreach ($blockQuotes as $blockQuote) {
-            HtmlUtils::appendClass($blockQuote, 'blockquote');
+            HtmlUtils::appendClass($blockQuote, "blockquote");
             $children = $blockQuote->childNodes;
             foreach ($children as $child) {
                 if (property_exists($child, "tagName") && $child->tagName === "div") {

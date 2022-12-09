@@ -1281,8 +1281,13 @@ class DiscussionModel extends Gdn_Model implements
         }
         $limit *= 100;
         $countQuery = $this->getWhereQuery($where, [], [], $limit, false, $filterType, $userID);
+        $countQuery = <<<SQL
+SELECT COUNT(*) as count FROM ({$countQuery}) cq
+SQL;
+
         $result = $this->SQL->query($countQuery);
-        return $result->count();
+
+        return $result->firstRow(DATASET_TYPE_ARRAY)["count"];
     }
 
     /**

@@ -543,4 +543,12 @@ class TestDispatcher
     {
         $this->rethrowExceptions = $rethrowExceptions;
     }
+
+    /**
+     * @return string|null
+     */
+    public function getLastOutput(): ?string
+    {
+        return $this->lastOutput;
+    }
 }

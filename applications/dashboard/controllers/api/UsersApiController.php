@@ -740,6 +740,12 @@ class UsersApiController extends AbstractApiController
         if (!empty($userData["RoleID"])) {
             $settings["SaveRoles"] = true;
         }
+
+        if (isset($userData["ResetPassword"]) ?? false) {
+            $userData["HashMethod"] = "Reset";
+            $settings["ResetPassword"] = true;
+        }
+
         $this->userModel->save($userData, $settings);
         $this->validateModel($this->userModel);
         $row = $this->userByID($id);
@@ -1232,12 +1238,17 @@ class UsersApiController extends AbstractApiController
                     "emailConfirmed?",
                     "bypassSpam?",
                     "password?",
+                    "resetPassword:b?" => [
+                        "const" => true,
+                    ],
                     "roleID?" => [
                         "type" => "array",
                         "items" => ["type" => "integer"],
                         "description" => "Roles to set on the user.",
                     ],
-                ])->add($this->fullSchema()),
+                ])
+                    ->add($this->fullSchema())
+                    ->addValidator("", SchemaUtils::onlyOneOf(["password", "resetPassword"])),
                 "UserPatch"
             );
         }

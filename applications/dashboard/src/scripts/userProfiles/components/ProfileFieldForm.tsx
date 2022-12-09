@@ -171,6 +171,16 @@ export default function ProfileFieldForm(props: IProps) {
                                   },
                               }
                         : {}),
+                    errorMessage: [
+                        {
+                            keyword: "minLength",
+                            message: t("API Label is required"),
+                        },
+                        {
+                            keyword: "not",
+                            message: t("Please enter a unique API Label, this one has been used before"),
+                        },
+                    ],
                 },
                 label: {
                     type: "string",
@@ -179,6 +189,12 @@ export default function ProfileFieldForm(props: IProps) {
                         label: t("Label"),
                         inputType: "textBox",
                     },
+                    errorMessage: [
+                        {
+                            keyword: "minLength",
+                            message: t("Label is required"),
+                        },
+                    ],
                 },
                 description: {
                     type: "string",

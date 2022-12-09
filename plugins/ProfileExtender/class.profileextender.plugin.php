@@ -868,11 +868,26 @@ class ProfileExtenderPlugin extends Gdn_Plugin
             // Add this field to the output
             $columnNames[] = val("Label", $fieldData, $slugName);
 
-            // Add this field to the query.
-            $quoted = $exportProfilesSQL->quote("Profile.$slugName");
-            $exportProfilesSQL
-                ->join("UserMeta a" . $i, "u.UserID = a$i.UserID and a$i.Name = $quoted", "left")
-                ->select("a" . $i . ".Value", "", $slugName);
+            // Subquery for left join to get minimum UserMetaID
+            $subquery1 = Gdn::database()->createSql();
+            $subquery1
+                ->select("m.UserMetaID", "MIN")
+                ->select("m.UserID")
+                ->from("UserMeta m")
+                ->where("m.Name", "Profile.$slugName")
+                ->groupBy("m.UserID");
+            $exportProfilesSQL->leftJoin("(" . $subquery1->getSelect(true) . ") s1_$i", "s1_$i.UserID = u.UserID");
+
+            // Subquery for left join to get corresponding UserMeta value
+            $subquery2 = Gdn::database()->createSql();
+            $subquery2->select("m.UserMetaID, m.Value")->from("UserMeta m");
+            $exportProfilesSQL->leftJoin(
+                "(" . $subquery2->getSelect(true) . ") s2_$i",
+                "s2_$i.UserMetaID = s1_$i.UserMetaID"
+            );
+
+            // Add field value to the query
+            $exportProfilesSQL->select("s2_$i.Value", "", $slugName);
             $i++;
         }
 
@@ -910,8 +925,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin
             "Roles",
         ];
         $output = fopen("php://output", "w");
-        header("Content-Type:application/csv");
-        header("Content-Disposition:attachment;filename=profiles_export.csv");
+        safeHeader("Content-Type:application/csv");
+        safeHeader("Content-Disposition:attachment;filename=profiles_export.csv");
         fputcsv($output, $columnNames);
 
         // Get our user data.
@@ -928,7 +943,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin
             $offset += self::EXPORT_PROFILE_CHUNK;
         } while ($userDataset->count());
         fclose($output);
-        die();
+
+        if (!\Vanilla\Utility\DebugUtils::isTestMode()) {
+            die();
+        }
     }
 
     /**

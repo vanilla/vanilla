@@ -2767,6 +2767,7 @@ class UserModel extends Gdn_Model implements
      *
      * - SaveRoles - Save 'RoleID' field as user's roles. Default false.
      * - HashPassword - Hash the provided password on update. Default true.
+     * - ResetPassword - Reset the user's password.
      * - FixUnique - Try to resolve conflicts with unique constraints on Name and Email. Default false.
      * - ValidateEmail - Make sure the provided email addresses is formatted properly. Default true.
      * - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
@@ -3000,13 +3001,14 @@ class UserModel extends Gdn_Model implements
                     }
 
                     // Determine if the password reset information needs to be cleared.
+                    $existing = $this->getID($userID, DATASET_TYPE_ARRAY);
+
                     $clearPasswordReset = false;
                     if (array_key_exists("Password", $fields)) {
                         // New password? Clear the password reset info.
                         $clearPasswordReset = true;
                     } elseif (array_key_exists("Email", $fields)) {
-                        $row = $this->getID($userID, DATASET_TYPE_ARRAY);
-                        if ($fields["Email"] != val("Email", $row)) {
+                        if ($fields["Email"] != $existing["Email"]) {
                             // New email? Clear the password reset info.
                             $clearPasswordReset = true;
                         }
@@ -3096,6 +3098,10 @@ class UserModel extends Gdn_Model implements
                                 "Story" => img($photoUrl, ["alt" => t("Thumbnail")]),
                             ]);
                         }
+                    }
+
+                    if ($settings["ResetPassword"] ?? false) {
+                        $this->passwordRequest($user["Email"], ["checkCaptcha" => false]);
                     }
                 } else {
                     $recordRoleChange = false;
@@ -3417,6 +3423,7 @@ class UserModel extends Gdn_Model implements
             "countComments?",
             "countPosts?",
             "label?",
+            "hashMethod?",
             "private?" => ["default" => false],
         ]);
         $result->add($this->schema());
@@ -4489,8 +4496,8 @@ class UserModel extends Gdn_Model implements
      * @param int $userID
      * @param null|int|float $clientHour
      *
-     * @throws Exception If the user ID is not valid.
      * @return bool True on success, false if the user is banned or deleted.
+     * @throws Exception If the user ID is not valid.
      */
     public function updateVisit($userID, $clientHour = null)
     {
@@ -6510,8 +6517,8 @@ SQL;
      * Do the registration values indicate SPAM?
      *
      * @param array $formPostValues
-     * @throws Gdn_UserException Throws an exception if the values trigger a positive SPAM match.
      * @return bool
+     * @throws Gdn_UserException Throws an exception if the values trigger a positive SPAM match.
      */
     public function isRegistrationSpam(array $formPostValues)
     {
@@ -6524,8 +6531,8 @@ SQL;
      *
      * @param string $password A password to test.
      * @param string $username The name of the user. Used to verify the password doesn't contain this value.
-     * @throws Gdn_UserException Throws an exception if the password is too weak.
      * @return bool
+     * @throws Gdn_UserException Throws an exception if the password is too weak.
      */
     public function validatePasswordStrength($password, $username)
     {

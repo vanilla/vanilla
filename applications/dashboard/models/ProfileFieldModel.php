@@ -749,4 +749,44 @@ class ProfileFieldModel extends FullRecordCacheModel
             $query->where("u.UserID in", "({$subquery->getSelect(true)})", false, false);
         }
     }
+
+    /**
+     * Check if a user has Custom Profile Fields visible to edit.
+     *
+     * @param \Gdn_Session $session Sessions
+     * @param string|int $userIDToCheckFor Requested UserID
+     * @return bool
+     */
+    public function hasVisibleFields($userIDToCheckFor = ""): bool
+    {
+        if (!Gdn::config("Feature.CustomProfileFields.Enabled")) {
+            return false;
+        }
+
+        $session = Gdn::session();
+
+        if ($userIDToCheckFor == "") {
+            $userIDToCheckFor = $session->UserID;
+        }
+        $isSelf = $userIDToCheckFor === $session->UserID;
+        $visibilityValues = [];
+
+        if ($isSelf || $session->checkPermission("profiles.view")) {
+            $visibilityValues[] = "public";
+        }
+
+        if ($isSelf || $session->checkPermission("personalInfo.view")) {
+            $visibilityValues[] = "private";
+        }
+
+        if ($session->checkPermission("internalInfo.view")) {
+            $visibilityValues[] = "internal";
+        }
+
+        $fields = $this->select([
+            "enabled" => true,
+            "visibility" => $visibilityValues,
+        ]);
+        return !empty($fields);
+    }
 }

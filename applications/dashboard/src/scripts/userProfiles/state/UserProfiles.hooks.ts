@@ -8,6 +8,7 @@ import {
     fetchProfileField,
     fetchProfileFields,
     fetchUserProfileFields,
+    patchUserProfileFields,
     patchProfileField,
     postProfileField,
 } from "@dashboard/userProfiles/state/UserProfiles.actions";
@@ -20,6 +21,7 @@ import {
     PatchProfileFieldParams,
     PostProfileFieldParams,
     ProfileField,
+    PatchUserProfileFieldsParams,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { RecordID, stableObjectHash } from "@vanilla/utils";
@@ -139,5 +141,13 @@ export function useDeleteProfileField() {
 
     return async function (apiName: ProfileField["apiName"]) {
         return await dispatch(deleteProfileField(apiName)).unwrap();
+    };
+}
+
+export function usePatchProfileFieldByUserID(userID: RecordID) {
+    const dispatch = useUserProfilesDispatch();
+
+    return async function (params: PatchUserProfileFieldsParams) {
+        return await dispatch(patchUserProfileFields({ userID, ...params })).unwrap();
     };
 }

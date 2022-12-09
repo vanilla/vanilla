@@ -41,6 +41,7 @@ export interface IInputBlockProps extends IOptionalComponentID {
     noMargin?: boolean;
     grid?: boolean;
     tight?: boolean;
+    icon?: ReactNode;
 }
 
 interface IState {
@@ -86,6 +87,7 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
                 {this.props.label && (
                     <span id={this.labelID} className={classesInputBlock.labelAndDescription}>
                         <LabelTag className={classNames(classesInputBlock.labelText, this.props.labelClassName)}>
+                            {this.props.icon}
                             {this.props.label}
                         </LabelTag>
                         <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>

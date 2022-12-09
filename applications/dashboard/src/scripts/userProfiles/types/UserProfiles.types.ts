@@ -101,6 +101,10 @@ export type FetchUserProfileFieldsParams = {
     userID: RecordID;
 };
 
+export type PatchUserProfileFieldsParams = {
+    [key: string]: any;
+};
+
 export interface UserProfileFields {
     [key: string]: ProfileField["apiName"];
 }

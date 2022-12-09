@@ -936,6 +936,9 @@ components:
                     description: Email address of the user.
                     minLength: 0
                     type: string
+                hashMethod:
+                    type: string
+                    description: Hashing mechanism used for this user's password.
                 roles:
                     items:
                         $ref: "schemas.yml#/components/schemas/RoleFragment"
@@ -1032,6 +1035,9 @@ components:
                     description: Password of the user.
                     minLength: 1
                     type: string
+                resetPassword:
+                    description: Set to true to reset the user's password and send them a notification email.
+                    type: boolean
                 photo:
                     description: Raw photo field value from the user record.
                     minLength: 0

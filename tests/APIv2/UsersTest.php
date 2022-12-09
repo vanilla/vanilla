@@ -488,6 +488,37 @@ class UsersTest extends AbstractResourceTest
     }
 
     /**
+     * Test that we can patch the hash method to reset.
+     */
+    public function testPatchEmailReset()
+    {
+        $existingUser = $this->createUser([
+            "name" => "emailResetUser",
+        ]);
+        $response = $this->api()->patch("/users/{$existingUser["userID"]}", ["resetPassword" => true]);
+        $this->assertEquals("Reset", $response->getBody()["hashMethod"]);
+        // User's password should be reset.
+        $fullUser = $this->userModel->getID($existingUser["userID"], DATASET_TYPE_ARRAY);
+        // Password reset email is sent.
+        $this->assertEmailSentTo($existingUser["email"]);
+        // User should have password reset info.
+        $passwordResetKey = $fullUser["Attributes"]["PasswordResetKey"];
+        $this->assertNotNull($passwordResetKey);
+
+        // Reset it again.
+        $response = $this->api()->patch("/users/{$existingUser["userID"]}", ["resetPassword" => true]);
+        $this->assertEquals("Reset", $response->getBody()["hashMethod"]);
+        $fullUser = $this->userModel->getID($existingUser["userID"], DATASET_TYPE_ARRAY);
+
+        // User should have password reset info.
+        $newPasswordResetKey = $fullUser["Attributes"]["PasswordResetKey"];
+        $this->assertNotNull($newPasswordResetKey);
+
+        // And it should be different.
+        $this->assertNotEquals($passwordResetKey, $newPasswordResetKey);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function testPost($record = null, array $extra = [])

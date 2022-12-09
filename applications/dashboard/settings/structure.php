@@ -444,15 +444,15 @@ if (
             $logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
             for ($i = 0; $i < $iterations; $i++) {
                 $offset = $limit * $i;
-                $query = "SELECT MIN(UserID) as minUser , MAX(UserID) as maxUser FROM 
+                $query = "SELECT MIN(UserID) as minUser , MAX(UserID) as maxUser FROM
                         (SELECT UserID FROM GDN_User WHERE DateOfBirth <> '' LIMIT $limit OFFSET $offset) U";
                 $users = $SQL->query($query)->resultArray();
 
                 // we need to select insert /update here based on limit
                 $Construct->executeQuery(
-                    "INSERT GDN_UserMeta(UserID, Name, Value, QueryValue) 
+                    "INSERT GDN_UserMeta(UserID, Name, Value, QueryValue)
                     SELECT UserID, 'Profile.DateOfBirth' AS Label, DateOfBirth, CONCAT('Profile.DateOfBirth.', DateOfBirth) as QueryValue
-                    FROM GDN_User U WHERE concat(DateOfBirth,'') <> '' LIMIT $limit OFFSET $offset 
+                    FROM GDN_User U WHERE concat(DateOfBirth,'') <> '' LIMIT $limit OFFSET $offset
                     ON DUPLICATE KEY UPDATE Value = U.DateOfBirth"
                 );
                 $logger->info(

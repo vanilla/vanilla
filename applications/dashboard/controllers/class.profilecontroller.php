@@ -10,6 +10,7 @@
 
 use Garden\EventManager;
 use Garden\Schema\ValidationException;
+use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Exception\ExitException;
 use Vanilla\FloodControlTrait;
 use Vanilla\Scheduler\LongRunner;
@@ -542,6 +543,29 @@ class ProfileController extends Gdn_Controller
         $this->title(t("Edit Profile"));
         $this->_setBreadcrumbs(t("Edit Profile"), "/profile/edit");
         $this->render();
+    }
+
+    /**
+     * Create EditProfileFields page.
+     *
+     * @param mixed $userReference Username or User ID.
+     * @param string $username
+     * @param string|int $userID
+     */
+    public function editFields($userReference = "", $username = "", $userID = "")
+    {
+        $this->permission(["Garden.SignIn.Allow", "Garden.Profiles.Edit"], true);
+        $profileFieldModel = Gdn::getContainer()->get(ProfileFieldModel::class);
+        $hasFields = $profileFieldModel->hasVisibleFields($userID);
+
+        if ($hasFields) {
+            $this->getUserInfo($userReference, $username, $userID, true);
+            $this->setData("userID", valr("User.UserID", $this));
+            $this->_setBreadcrumbs(t("Edit Fields"), "/profile/edit-fields");
+            $this->render();
+        } else {
+            $this->render("ConnectError");
+        }
     }
 
     /**
@@ -1794,6 +1818,8 @@ EOT;
         // Is the photo hosted remotely?
         $remotePhoto = isUrl($this->User->Photo);
 
+        $profileFieldModel = Gdn::getContainer()->get(ProfileFieldModel::class);
+
         if ($this->User->UserID != $viewingUserID) {
             // Include user js files for people with edit users permissions
             if (checkPermission("Garden.Users.Edit") || checkPermission("Moderation.Profiles.Edit")) {
@@ -1807,6 +1833,16 @@ EOT;
                 ["Garden.Users.Edit", "Moderation.Profiles.Edit"],
                 ["class" => "Popup EditAccountLink"]
             );
+            $hasFields = $profileFieldModel->hasVisibleFields($this->User->UserID);
+            if ($hasFields) {
+                $module->addLink(
+                    "Options",
+                    sprite("SpProfile") . " " . t("Edit Profile Fields"),
+                    userUrl($this->User, "", "edit-fields"),
+                    ["Garden.Users.Edit", "Moderation.Profiles.Edit"],
+                    ["class" => "Popup EditAccountLink"]
+                );
+            }
             $module->addLink(
                 "Options",
                 sprite("SpProfile") . " " . t("Edit Account"),
@@ -1860,6 +1896,20 @@ EOT;
                 $module->addLink("Options", sprite("SpEdit") . " " . t("Edit Profile"), $editLinkUrl, false, [
                     "class" => "Popup EditAccountLink",
                 ]);
+
+                $hasFields = $profileFieldModel->hasVisibleFields($this->User->UserID);
+                if ($hasFields) {
+                    $editFieldsLinkUrl = "profile/edit-fields";
+                    $module->addLink(
+                        "Options",
+                        sprite("SpEdit") . " " . t("Edit Profile Fields"),
+                        $editFieldsLinkUrl,
+                        false,
+                        [
+                            "class" => "Popup EditAccountLink",
+                        ]
+                    );
+                }
             }
 
             // Add profile options for the profile owner

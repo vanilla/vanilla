@@ -412,4 +412,36 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase
         ];
         return $data;
     }
+
+    /**
+     * This simply tests that the csv written to the response contains a specific user and
+     * the containing row also contains the user's profile field value
+     *
+     * @return void
+     */
+    public function testExportProfiles()
+    {
+        $user = $this->createUser();
+        $this->profileExtender->updateUserFields($user["userID"], ["text" => __FUNCTION__]);
+
+        $this->bessy()->get("/utility/export-profiles");
+        $output = $this->bessy()->getLastOutput();
+
+        // Convert response into array of rows
+        $rows = explode("\n", $output);
+
+        // Convert each row into an array of columns
+        $rows = array_map("str_getcsv", $rows);
+
+        // Get names of the users
+        $names = array_column($rows, 0);
+
+        // Find row with user
+        $rowIndex = array_search($user["name"], $names);
+        $this->assertNotFalse($rowIndex);
+
+        // Find profile field value in row
+        $columnIndex = array_search(__FUNCTION__, $rows[$rowIndex]);
+        $this->assertNotFalse($columnIndex);
+    }
 }

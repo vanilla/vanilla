@@ -1649,8 +1649,10 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         }
         [$popup, $email] = self::notificationPreference($preference, $activity["NotifyUserID"], "both");
 
-        $activity["Notified"] = $popup ? self::SENT_PENDING : self::SENT_SKIPPED;
-        $activity["Emailed"] = $email ? self::SENT_PENDING : self::SENT_SKIPPED;
+        $activity["Notified"] =
+            $popup && !Gdn::config("Garden.Popups.Disabled") ? self::SENT_PENDING : self::SENT_SKIPPED;
+        $activity["Emailed"] =
+            $email && !Gdn::config("Garden.Email.Disabled") ? self::SENT_PENDING : self::SENT_SKIPPED;
 
         return $activity;
     }

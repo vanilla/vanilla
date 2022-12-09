@@ -32,6 +32,7 @@ import { onReady } from "@library/utility/appUtils";
 import { AboutMeWidget } from "@library/aboutMeWidget/AboutMeWidget";
 import { ProfileOverviewWidget } from "@library/profileOverviewWidget/ProfileOverviewWidget";
 import { ProfileAnalyticsWidget } from "@library/profileAnalyticsWidget/ProfileAnalyticsWidget";
+import { EditProfileFields } from "@library/editProfileFields/EditProfileFields";
 
 registerReducer("forum", forumReducer);
 registerCommunitySearchDomain();
@@ -56,6 +57,7 @@ addComponent("CallToActionWidget", CallToActionWidget, { overwrite: true });
 addComponent("AboutMeWidget", AboutMeWidget, { overwrite: true });
 addComponent("ProfileOverviewWidget", ProfileOverviewWidget, { overwrite: true });
 addComponent("ProfileAnalyticsWidget", ProfileAnalyticsWidget, { overwrite: true });
+addComponent("EditProfileFields", EditProfileFields, { overwrite: true });
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();

@@ -29,7 +29,7 @@ export enum MockProfileFieldsFormat {
  * Utilities for testing User Profile Settings page.
  */
 export class ProfileFieldsFixture {
-    public static mockProfileFields(format?: MockProfileFieldsFormat) {
+    public static mockProfileFields(format?: MockProfileFieldsFormat, mutability?: ProfileFieldMutability) {
         const fields = Object.values(ProfileFieldFormType);
         if (format === MockProfileFieldsFormat.API_NAME) {
             return fields;
@@ -65,7 +65,7 @@ export class ProfileFieldsFixture {
                 description: `Mock ${label} for testing purposes`,
                 registrationOptions: ProfileFieldRegistrationOptions.OPTIONAL,
                 visibility: ProfileFieldVisibility.PUBLIC,
-                mutability: ProfileFieldMutability.ALL,
+                mutability: mutability ?? ProfileFieldMutability.ALL,
                 displayOptions: {
                     userCards: false,
                     posts: false,

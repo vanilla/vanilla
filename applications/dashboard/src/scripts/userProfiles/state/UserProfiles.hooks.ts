@@ -8,8 +8,10 @@ import {
     fetchProfileField,
     fetchProfileFields,
     fetchUserProfileFields,
+    patchUserProfileFields,
     patchProfileField,
     postProfileField,
+    putProfileFieldsSorts,
 } from "@dashboard/userProfiles/state/UserProfiles.actions";
 import {
     useUserProfilesDispatch,
@@ -20,6 +22,9 @@ import {
     PatchProfileFieldParams,
     PostProfileFieldParams,
     ProfileField,
+    PatchUserProfileFieldsParams,
+    PutUserProfileFieldsParams,
+    UserProfileFields,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { RecordID, stableObjectHash } from "@vanilla/utils";
@@ -103,7 +108,7 @@ export function usePatchProfileField() {
 /**
  * Get the profile field values for a given UserID
  */
-export function useProfileFieldByUserID(userID: RecordID) {
+export function useProfileFieldByUserID(userID: RecordID): ILoadable<UserProfileFields> {
     const dispatch = useUserProfilesDispatch();
 
     const profileFieldsByUserIDs = useUserProfilesSelectorByID(
@@ -116,7 +121,7 @@ export function useProfileFieldByUserID(userID: RecordID) {
         if (profileFieldsByUserIDs[userID] && profileFieldsByUserIDs[userID]?.data) {
             return profileFieldsByUserIDs[userID].data;
         }
-        return null;
+        return undefined;
     }, [profileFieldsByUserIDs, userID]);
 
     useEffect(() => {
@@ -139,5 +144,21 @@ export function useDeleteProfileField() {
 
     return async function (apiName: ProfileField["apiName"]) {
         return await dispatch(deleteProfileField(apiName)).unwrap();
+    };
+}
+
+export function usePatchProfileFieldByUserID(userID: RecordID) {
+    const dispatch = useUserProfilesDispatch();
+
+    return async function (params: PatchUserProfileFieldsParams) {
+        return await dispatch(patchUserProfileFields({ userID, ...params })).unwrap();
+    };
+}
+
+export function usePutProfileFieldsSorts() {
+    const dispatch = useUserProfilesDispatch();
+
+    return async function (params: PutUserProfileFieldsParams) {
+        return await dispatch(putProfileFieldsSorts(params)).unwrap();
     };
 }

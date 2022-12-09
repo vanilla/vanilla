@@ -26,11 +26,15 @@ import React, { useRef, useState } from "react";
 interface IProps<T> extends IFormTreeItemParams<T> {
     value: ITreeData<T>;
     onChange(treeData: ITreeData<T>): void;
+    displayLabels?: boolean;
     onEditStateChange?(isEditing: boolean): void;
     id?: string;
+
     ["aria-label"]?: string;
     ["aria-labelledby"]?: string;
     ["aria-describedby"]?: string;
+
+    RowContentsComponent?: React.ComponentType<T>;
 }
 
 export const DRAGGING_ITEM_PORTAL_ID = "dragging-item-portal";
@@ -43,7 +47,7 @@ export const DRAGGING_ITEM_PORTAL_ID = "dragging-item-portal";
  * - No collapsing/uncollapsing.
  */
 export default function FormTree<ItemDataType>(props: IProps<ItemDataType>) {
-    const { value, onChange, itemSchema } = props;
+    const { value, onChange, itemSchema, displayLabels = true } = props;
 
     const compactBreakpoint = formTreeVariables().row.compactBreakpoint;
 
@@ -103,12 +107,13 @@ export default function FormTree<ItemDataType>(props: IProps<ItemDataType>) {
                     itemSchema,
                     getRowIcon: props.getRowIcon,
                     markItemHidden: markItemHidden,
+                    isItemEditable: props.isItemEditable,
                     isItemDeletable: props.isItemDeletable,
                     isItemHideable: props.isItemHideable,
                     isItemHidden: props.isItemHidden,
                 }}
             >
-                <FormTreeLabels />
+                {displayLabels && <FormTreeLabels />}
                 <FormTreeContent<ItemDataType> {...props} />
             </FormTreeContext.Provider>
         </div>
@@ -116,10 +121,16 @@ export default function FormTree<ItemDataType>(props: IProps<ItemDataType>) {
 }
 
 function FormTreeContent<ItemDataType>(props: IProps<ItemDataType>) {
-    const { value, onChange } = props;
+    const { value, onChange, RowContentsComponent } = props;
     const firstItemID = getFirstItemID(value);
     const renderItem = (params: IRenderItemParams<ItemDataType>) => {
-        const rendered = <FormTreeRow {...params} isFirstItem={firstItemID === params.item.id} />;
+        const rendered = (
+            <FormTreeRow<ItemDataType>
+                {...params}
+                RowContentsComponent={RowContentsComponent}
+                isFirstItem={firstItemID === params.item.id}
+            />
+        );
         // Because of positioning issues in modals, we render the dragging item into a portal.
         if (params.snapshot.isDragging) {
             return mountPortal(rendered, DRAGGING_ITEM_PORTAL_ID, true) as any;

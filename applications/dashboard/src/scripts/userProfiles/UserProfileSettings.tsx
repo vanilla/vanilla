@@ -34,7 +34,7 @@ export function UserProfileSettings() {
 
     const toast = useToast();
 
-    function handleSuccess() {
+    function handleProfileFieldFormSuccess() {
         toast.addToast({
             autoDismiss: true,
             dismissible: true,
@@ -77,7 +77,7 @@ export function UserProfileSettings() {
                                     ? patchProfileField(values)
                                     : postProfileField(values));
                                 clearProfileFieldConfiguration();
-                                handleSuccess();
+                                handleProfileFieldFormSuccess();
                             }}
                             onExit={() => {
                                 clearProfileFieldConfiguration();

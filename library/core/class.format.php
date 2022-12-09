@@ -77,6 +77,8 @@ class Gdn_Format
      */
     public static function activityHeadline($activity, $profileUserID = "", $viewingUserID = "")
     {
+        // For the time being, we would rather have a genderless activity headline.
+        $activity["ActivityGender"] = "u";
         $activity = (object) $activity;
         if ($viewingUserID == "") {
             $session = Gdn::session();

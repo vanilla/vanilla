@@ -293,18 +293,18 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase
     /**
      * Test that legacy fields are properly migrated to the profileField table.
      *
-     * @param array $profleField Plugin provider field.
+     * @param array $profileField Plugin provider field.
      * @param array $expectedResult Expected migrated fields.
      *
      * @dataProvider LegacyFieldMigrationProvider
      */
-    public function testLegacyFieldMigration(array $profleField, array $expectedResult)
+    public function testLegacyFieldMigration(array $profileField, array $expectedResult)
     {
-        $key = "ProfileExtender.Fields." . $profleField["Label"];
+        $key = "ProfileExtender.Fields." . $profileField["Label"];
 
         $this->config->saveToConfig(["Feature.CustomProfileFields.Enabled" => true]);
-        $this->config->saveToConfig([$key => $profleField]);
-        $this->assertConfigValue($key, $profleField);
+        $this->config->saveToConfig([$key => $profileField]);
+        $this->assertConfigValue($key, $profileField);
 
         $this->bessy()->get("utility/update");
         $this->assertConfigValue($key, null);
@@ -411,5 +411,37 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase
             ],
         ];
         return $data;
+    }
+
+    /**
+     * This simply tests that the csv written to the response contains a specific user and
+     * the containing row also contains the user's profile field value
+     *
+     * @return void
+     */
+    public function testExportProfiles()
+    {
+        $user = $this->createUser();
+        $this->profileExtender->updateUserFields($user["userID"], ["text" => __FUNCTION__]);
+
+        $this->bessy()->get("/utility/export-profiles");
+        $output = $this->bessy()->getLastOutput();
+
+        // Convert response into array of rows
+        $rows = explode("\n", $output);
+
+        // Convert each row into an array of columns
+        $rows = array_map("str_getcsv", $rows);
+
+        // Get names of the users
+        $names = array_column($rows, 0);
+
+        // Find row with user
+        $rowIndex = array_search($user["name"], $names);
+        $this->assertNotFalse($rowIndex);
+
+        // Find profile field value in row
+        $columnIndex = array_search(__FUNCTION__, $rows[$rowIndex]);
+        $this->assertNotFalse($columnIndex);
     }
 }

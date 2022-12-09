@@ -19,49 +19,44 @@ import {
     ProfileFieldVisibility,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 
-export enum MockProfileFieldsFormat {
-    API_NAME = "apiName",
-    DATA_OBJECT = "object",
-    DATA_ARRAY = "array",
-}
-
 /**
  * Utilities for testing User Profile Settings page.
  */
 export class ProfileFieldsFixture {
-    public static mockProfileFields(format?: MockProfileFieldsFormat) {
-        const fields = Object.values(ProfileFieldFormType);
-        if (format === MockProfileFieldsFormat.API_NAME) {
-            return fields;
+    public static mockProfileField(
+        formType: ProfileFieldFormType,
+        data: Partial<Omit<ProfileField, "formType">> = {},
+    ): ProfileField {
+        let dataType: ProfileFieldDataType;
+
+        switch (formType) {
+            case ProfileFieldFormType.CHECKBOX:
+                dataType = ProfileFieldDataType.BOOLEAN;
+                break;
+
+            case ProfileFieldFormType.DROPDOWN:
+            case ProfileFieldFormType.TOKENS:
+                dataType = ProfileFieldDataType.STRING_MUL;
+                break;
+
+            default:
+                dataType = ProfileFieldDataType[formType] ?? ProfileFieldDataType.TEXT;
+                break;
         }
 
-        const fieldData = fields.map((apiName) => {
-            const label = `${apiName
-                .split("-")
-                .map((val) => capitalize(val))
-                .join(" ")} Field`;
-            let dataType: ProfileFieldDataType;
+        const fakeApiName = data.apiName ?? formType;
 
-            switch (apiName) {
-                case ProfileFieldFormType.CHECKBOX:
-                    dataType = ProfileFieldDataType.BOOLEAN;
-                    break;
+        const label = `${fakeApiName
+            .split("-")
+            .map((val) => capitalize(val))
+            .join(" ")} Field`;
 
-                case ProfileFieldFormType.DROPDOWN:
-                case ProfileFieldFormType.TOKENS:
-                    dataType = ProfileFieldDataType.STRING_MUL;
-                    break;
-
-                default:
-                    dataType = ProfileFieldDataType[apiName] ?? ProfileFieldDataType.TEXT;
-                    break;
-            }
-
-            return {
-                apiName,
+        return {
+            ...{
+                apiName: fakeApiName,
+                formType: formType,
                 label,
                 dataType,
-                formType: apiName,
                 description: `Mock ${label} for testing purposes`,
                 registrationOptions: ProfileFieldRegistrationOptions.OPTIONAL,
                 visibility: ProfileFieldVisibility.PUBLIC,
@@ -75,17 +70,22 @@ export class ProfileFieldsFixture {
                     dataType === ProfileFieldDataType.STRING_MUL
                         ? ["Option 1", "Option 2", "Option 3", "Option 4"]
                         : null,
-            };
+            },
+            ...data,
+        };
+    }
+
+    public static mockProfileFields(mutability: ProfileFieldMutability = ProfileFieldMutability.ALL): ProfileField[] {
+        const formTypes = Object.values(ProfileFieldFormType); //Use the form types as unique API names
+
+        return formTypes.map((formType) => {
+            return this.mockProfileField(formType, { mutability });
         });
-
-        if (format === MockProfileFieldsFormat.DATA_OBJECT) {
-            return Object.fromEntries(fieldData.map((field) => [field.apiName, field]));
-        }
-
-        return fieldData;
     }
 
     public static createMockProfileFieldsStore() {
+        const mockFields = this.mockProfileFields();
+
         const testReducer = createReducer(
             {
                 config: {
@@ -110,10 +110,10 @@ export class ProfileFieldsFixture {
                     profileFieldApiNamesByParamHash: {
                         [stableObjectHash({})]: {
                             status: LoadStatus.SUCCESS,
-                            data: this.mockProfileFields(MockProfileFieldsFormat.API_NAME),
+                            data: mockFields.map((field) => field.apiName),
                         },
                     },
-                    profileFieldsByApiName: this.mockProfileFields(MockProfileFieldsFormat.DATA_OBJECT),
+                    profileFieldsByApiName: Object.fromEntries(mockFields.map((field) => [field.apiName, field])),
                     deleteStatusByApiName: {},
                 },
             },

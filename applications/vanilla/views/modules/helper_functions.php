@@ -49,6 +49,7 @@ if (!function_exists('WriteModuleDiscussion')):
     }
 endif;
 
+
 if (!function_exists('WritePromotedContent')):
     /**
      * Generates html output of $content array
@@ -82,11 +83,12 @@ if (!function_exists('WritePromotedContent')):
             $sender->fireEvent('AuthorPhoto');
             ?>
          </span>
+
          <span class="AuthorInfo">
             <?php
-            echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
-            echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
-            $sender->fireEvent('AuthorInfo');
+                echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
+                echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
+                $sender->fireEvent('AuthorInfo');
             ?>
          </span>
             </div>

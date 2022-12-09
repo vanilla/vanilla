@@ -50,6 +50,8 @@ type NavigationIconType =
 
 type NewIconType = "new-discussion" | "new-event" | "new-idea" | "new-poll" | "new-question";
 
+type NotificationType = "notification-alert";
+
 type ProfileIconType = "profile-crown" | "profile-lock";
 
 type ReactionIconType = "reaction-comments";
@@ -82,6 +84,7 @@ export type IconType =
     | MetaIconType
     | NavigationIconType
     | NewIconType
+    | NotificationType
     | ProfileIconType
     | ReactionIconType
     | SearchIconType

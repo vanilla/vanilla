@@ -81,7 +81,7 @@ export default function ProfileFieldForm(props: IProps) {
 
     const [errors, setErrors] = useState<IError[]>([]);
 
-    const { values, handleSubmit, setValues, setFieldValue, isSubmitting, resetForm, dirty } =
+    const { values, submitForm, setValues, setFieldValue, isSubmitting, resetForm, dirty } =
         useFormik<ProfileFieldFormValues>({
             initialValues: mapProfileFieldToFormValues(profileFieldConfiguration ?? EMPTY_PROFILE_FIELD_CONFIGURATION),
             onSubmit: async (values, { setSubmitting }) => {
@@ -129,7 +129,7 @@ export default function ProfileFieldForm(props: IProps) {
             ProfileFieldType.SINGLE_SELECT_DROPDOWN,
         ].includes(values.type);
 
-        const schemaRequired = ["type", "apiName", "label", "description", "registrationOptions"];
+        const schemaRequired = ["type", "apiName", "label", "description", "registrationOptions", "mutability"];
         if (requiresDropdownOptions) {
             schemaRequired.push("dropdownOptions");
         }
@@ -171,6 +171,16 @@ export default function ProfileFieldForm(props: IProps) {
                                   },
                               }
                         : {}),
+                    errorMessage: [
+                        {
+                            keyword: "minLength",
+                            message: t("API Label is required"),
+                        },
+                        {
+                            keyword: "not",
+                            message: t("Please enter a unique API Label, this one has been used before"),
+                        },
+                    ],
                 },
                 label: {
                     type: "string",
@@ -179,6 +189,12 @@ export default function ProfileFieldForm(props: IProps) {
                         label: t("Label"),
                         inputType: "textBox",
                     },
+                    errorMessage: [
+                        {
+                            keyword: "minLength",
+                            message: t("Label is required"),
+                        },
+                    ],
                 },
                 description: {
                     type: "string",
@@ -211,6 +227,13 @@ export default function ProfileFieldForm(props: IProps) {
                             "x-control": {
                                 inputType: "dropDown",
                                 label: t("Visibility"),
+                                helperText:
+                                    (values.visibility.visibility === ProfileFieldVisibility.PRIVATE &&
+                                        t("This is private information and will not be shared with other members.")) ||
+                                    (values.visibility.visibility === ProfileFieldVisibility.INTERNAL &&
+                                        t(
+                                            "This information will only be shown to users with permission to view internal info.",
+                                        )),
                                 choices: {
                                     staticOptions: {
                                         [ProfileFieldVisibility.PUBLIC]: t("Public"),
@@ -220,33 +243,37 @@ export default function ProfileFieldForm(props: IProps) {
                                 },
                             },
                         },
-                    },
-                    required: ["visibility"],
-                },
-                editing: {
-                    type: "object",
-                    "x-control": {
-                        label: t("Editing !"),
-                    },
-                    properties: {
-                        mutability: {
-                            type: "string",
+                        posts: {
+                            type: "boolean",
+                            disabled: ![ProfileFieldType.TEXT_INPUT, ProfileFieldType.SINGLE_SELECT_DROPDOWN].includes(
+                                values.type,
+                            ),
                             "x-control": {
-                                inputType: "dropDown",
-                                label: t("Editing"),
-                                choices: {
-                                    staticOptions: {
-                                        ...(!visibilityIsNeitherPublicNorPrivate && {
-                                            [ProfileFieldMutability.ALL]: t("Allow"),
-                                        }),
-                                        [ProfileFieldMutability.RESTRICTED]: t("Restrict"),
-                                        [ProfileFieldMutability.NONE]: t("Block"),
-                                    },
-                                },
+                                inputType: "checkBox",
+                                label: t("Show on posts"),
                             },
                         },
                     },
-                    required: ["mutability"],
+                    required: ["visibility"],
+                },
+                mutability: {
+                    type: "string",
+                    "x-control": {
+                        inputType: "dropDown",
+                        label: t("Editing"),
+                        choices: {
+                            staticOptions:
+                                values.registrationOptions === ProfileFieldRegistrationOptions.REQUIRED
+                                    ? { [ProfileFieldMutability.ALL]: t("Allow") }
+                                    : {
+                                          ...(!visibilityIsNeitherPublicNorPrivate && {
+                                              [ProfileFieldMutability.ALL]: t("Allow"),
+                                          }),
+                                          [ProfileFieldMutability.RESTRICTED]: t("Restrict"),
+                                          [ProfileFieldMutability.NONE]: t("Block"),
+                                      },
+                        },
+                    },
                 },
                 registrationOptions: {
                     type: "string",
@@ -267,22 +294,42 @@ export default function ProfileFieldForm(props: IProps) {
             },
             required: schemaRequired,
         };
-    }, [profileFieldConfiguration, typeOptions, values.editing.mutability, values.visibility.visibility, values.type]);
+    }, [
+        profileFieldConfiguration,
+        typeOptions,
+        values.mutability,
+        values.visibility.visibility,
+        values.type,
+        values.registrationOptions,
+    ]);
 
-    const formGroupNames = ["visibility", "editing"];
+    const formGroupNames = ["visibility"];
 
     const classes = ProfileFieldFormClasses();
 
     useEffect(() => {
         // These dropdown values are being filtered based off the value of visibilty set to internal. Need to update the dropdown to what is available
-        if (values.visibility.visibility === "internal") {
-            setFieldValue("registrationOptions", "hidden");
-
-            if (values.editing.mutability === "all") {
-                setFieldValue("editing.mutability", "restricted");
+        if (values.visibility.visibility === ProfileFieldVisibility.INTERNAL) {
+            setFieldValue("registrationOptions", ProfileFieldRegistrationOptions.HIDDEN);
+            if (values.mutability === ProfileFieldMutability.ALL) {
+                setFieldValue("mutability", ProfileFieldMutability.RESTRICTED);
             }
         }
-    }, [values.visibility, values.editing.mutability, setFieldValue]);
+    }, [values.visibility, values.mutability, setFieldValue]);
+
+    useEffect(() => {
+        // Can only be visible on posts if it is a textInput
+        if (![ProfileFieldType.TEXT_INPUT, ProfileFieldType.SINGLE_SELECT_DROPDOWN].includes(values.type)) {
+            setFieldValue("visibility.posts", false);
+        }
+    }, [values.type, setFieldValue]);
+
+    useEffect(() => {
+        // To mark a field as required, mutability must be all
+        if (values.registrationOptions === ProfileFieldRegistrationOptions.REQUIRED) {
+            setFieldValue("mutability", ProfileFieldMutability.ALL);
+        }
+    }, [values.registrationOptions, setFieldValue]);
 
     const formGroupWrapper: React.ComponentProps<typeof JsonSchemaForm>["FormGroupWrapper"] = function (props) {
         if (
@@ -303,59 +350,66 @@ export default function ProfileFieldForm(props: IProps) {
             }}
             titleID={titleID}
         >
-            <Frame
-                header={
-                    <FrameHeader
-                        titleID={titleID}
-                        closeFrame={() => {
-                            onExit();
-                        }}
-                        title={title}
-                    />
-                }
-                body={
-                    <FrameBody>
-                        <div className={cx("frameBody-contents", classesFrameBody.contents)}>
-                            {errors.length > 0 && (
-                                <ErrorWrapper message={errors[0].message}>
-                                    <ErrorMessages errors={errors.filter(notEmpty)} />
-                                </ErrorWrapper>
-                            )}
-                            <JsonSchemaForm
-                                schema={schema}
-                                instance={values}
-                                FormControlGroup={DashboardFormControlGroup}
-                                FormControl={DashboardFormControl}
-                                onChange={setValues}
-                                FormGroupWrapper={formGroupWrapper}
-                                ref={schemaFormRef}
-                            />
-                        </div>
-                    </FrameBody>
-                }
-                footer={
-                    <FrameFooter justifyRight={true}>
-                        <Button
-                            className={classFrameFooter.actionButton}
-                            buttonType={ButtonTypes.TEXT}
-                            onClick={() => {
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    submitForm();
+                }}
+            >
+                <Frame
+                    header={
+                        <FrameHeader
+                            titleID={titleID}
+                            closeFrame={() => {
                                 onExit();
                             }}
-                            disabled={isSubmitting}
-                        >
-                            {t("Cancel")}
-                        </Button>
-                        <Button
-                            disabled={!dirty || isSubmitting}
-                            className={classFrameFooter.actionButton}
-                            onClick={() => handleSubmit()}
-                            buttonType={ButtonTypes.TEXT_PRIMARY}
-                        >
-                            {isSubmitting ? <ButtonLoader /> : t("Save")}
-                        </Button>
-                    </FrameFooter>
-                }
-            />
+                            title={title}
+                        />
+                    }
+                    body={
+                        <FrameBody>
+                            <div className={cx("frameBody-contents", classesFrameBody.contents)}>
+                                {errors.length > 0 && (
+                                    <ErrorWrapper message={errors[0].message}>
+                                        <ErrorMessages errors={errors.filter(notEmpty)} />
+                                    </ErrorWrapper>
+                                )}
+                                <JsonSchemaForm
+                                    schema={schema}
+                                    instance={values}
+                                    FormControlGroup={DashboardFormControlGroup}
+                                    FormControl={DashboardFormControl}
+                                    onChange={setValues}
+                                    FormGroupWrapper={formGroupWrapper}
+                                    ref={schemaFormRef}
+                                />
+                            </div>
+                        </FrameBody>
+                    }
+                    footer={
+                        <FrameFooter justifyRight={true}>
+                            <Button
+                                className={classFrameFooter.actionButton}
+                                buttonType={ButtonTypes.TEXT}
+                                onClick={() => {
+                                    onExit();
+                                }}
+                                disabled={isSubmitting}
+                            >
+                                {t("Cancel")}
+                            </Button>
+                            <Button
+                                submit
+                                disabled={!dirty || isSubmitting}
+                                className={classFrameFooter.actionButton}
+                                buttonType={ButtonTypes.TEXT_PRIMARY}
+                            >
+                                {isSubmitting ? <ButtonLoader /> : t("Save")}
+                            </Button>
+                        </FrameFooter>
+                    }
+                />
+            </form>
         </Modal>
     );
 }

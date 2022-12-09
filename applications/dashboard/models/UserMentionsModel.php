@@ -7,6 +7,8 @@
 
 namespace Vanilla\Dashboard\Models;
 
+use DateTime;
+use DateTimeInterface;
 use Exception;
 
 use Garden\EventManager;
@@ -351,8 +353,10 @@ class UserMentionsModel extends PipelineModel implements LoggerAwareInterface, S
         } catch (LongRunnerTimeoutException $exception) {
             return new LongRunnerNextArgs([$id]);
         }
-
-        $afterUserAnonymizeEvent = new AfterUserAnonymizeEvent($id);
+        $userModel = Gdn::getContainer()->get(UserModel::class);
+        $user = $userModel->getID($id, DATASET_TYPE_ARRAY);
+        $dateTime = new DateTime($user["DateInserted"]);
+        $afterUserAnonymizeEvent = new AfterUserAnonymizeEvent($id, $dateTime);
         $this->eventManager->dispatch($afterUserAnonymizeEvent);
 
         return LongRunner::FINISHED;

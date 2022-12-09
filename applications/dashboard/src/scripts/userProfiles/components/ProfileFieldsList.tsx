@@ -8,24 +8,28 @@ import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock
 import { Table } from "@dashboard/components/Table";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import ProfileFieldsListClasses from "@dashboard/userProfiles/components/ProfileFieldsList.classes";
-import { usePatchProfileField, useProfileFields } from "@dashboard/userProfiles/state/UserProfiles.hooks";
-import { ProfileField, ProfileFieldRegistrationOptions } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { ProfileFieldVisibilityIcon } from "@dashboard/userProfiles/components/ProfileFieldVisibilityIcon";
+import ReorderProfileFields from "@dashboard/userProfiles/components/ReorderProfileFields";
+import {
+    usePatchProfileField,
+    useProfileFields,
+    usePutProfileFieldsSorts,
+} from "@dashboard/userProfiles/state/UserProfiles.hooks";
+import { ProfileField } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { EMPTY_PROFILE_FIELD_CONFIGURATION } from "@dashboard/userProfiles/utils";
 import { cx } from "@emotion/css";
 import { LoadStatus } from "@library/@types/api/core";
+import Translate from "@library/content/Translate";
 import { ErrorBoundary } from "@library/errorPages/ErrorBoundary";
+import { useToast } from "@library/features/toaster/ToastContext";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import { FormToggle } from "@library/forms/FormToggle";
+import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
-import Message from "@library/messages/Message";
-import { messagesClasses } from "@library/messages/messageStyles";
-import ModalConfirm from "@library/modal/ModalConfirm";
-import ModalSizes from "@library/modal/ModalSizes";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
-import { StackingContextProvider } from "@vanilla/react-utils";
+import sortBy from "lodash/sortBy";
 import React, { useMemo, useState } from "react";
 
 interface IProps {
@@ -41,14 +45,61 @@ interface IProps {
 export function ProfileFieldsList(props: IProps) {
     const { onEdit, onDelete } = props;
     const profileFields = useProfileFields();
+    const profileFieldsLoaded = ![LoadStatus.PENDING, LoadStatus.LOADING].includes(profileFields.status);
+    const profileFieldsAvailable = profileFieldsLoaded && profileFields.data && profileFields.data.length > 0;
+
+    const sortedProfileFields = profileFieldsAvailable ? sortBy(profileFields.data, (field) => field.sort) : undefined;
+
     const patchProfileField = usePatchProfileField();
 
-    function labelFromBoolean(boolean: boolean, truthy: string, falsy: string): string {
-        return boolean ? truthy : falsy;
+    const putProfileFieldsSorts = usePutProfileFieldsSorts();
+
+    const toast = useToast();
+
+    const [reorderModalIsVisible, setReorderModalIsVisible] = useState(false);
+
+    const errorMessage = "There was an error saving your changes. Please try again.";
+
+    const toggleEnabled = async (field) => {
+        try {
+            await patchProfileField({
+                ...field,
+                enabled: !field.enabled,
+            });
+            toast.addToast({
+                autoDismiss: true,
+                body: (
+                    <Translate
+                        source={"<0/> has been <1/>"}
+                        c0={field.label}
+                        c1={field.enabled ? "disabled" : "enabled"}
+                    />
+                ),
+            });
+        } catch {
+            toast.addToast({
+                dismissible: true,
+                body: <>{t(errorMessage)}</>,
+            });
+        }
+    };
+
+    function handleReorderProfileFieldsFormSuccess() {
+        toast.addToast({
+            autoDismiss: true,
+            body: <Translate source={"Your changes have been saved."} />,
+        });
+        setReorderModalIsVisible(false);
+    }
+    function handleReorderProfileFieldsFormError(error: any) {
+        toast.addToast({
+            dismissible: true,
+            body: <>{t(errorMessage)}</>,
+        });
     }
 
     const rows = useMemo(() => {
-        if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(profileFields.status)) {
+        if (!profileFieldsLoaded) {
             return [
                 {
                     label: <LoadingRectangle width="80" height={16} />,
@@ -76,26 +127,20 @@ export function ProfileFieldsList(props: IProps) {
                 },
             ];
         }
-        if (profileFields.data && profileFields.data.length > 0) {
-            return profileFields.data.map((field: ProfileField) => {
+        if (profileFieldsAvailable) {
+            return sortedProfileFields!.map((field: ProfileField) => {
                 // To create a subset and customized labels
                 return {
                     label: field.label,
                     "api label": field.apiName,
                     type: field.formType,
-                    visibility: field.visibility,
-                    active: (
-                        <FormToggle
-                            labelID={field.apiName}
-                            enabled={field.enabled ?? false}
-                            onChange={() =>
-                                patchProfileField({
-                                    ...field,
-                                    enabled: !field.enabled,
-                                })
-                            }
-                        />
+                    visibility: (
+                        <>
+                            {field.visibility}
+                            <ProfileFieldVisibilityIcon visibility={field.visibility} />
+                        </>
                     ),
+                    active: <DashboardToggle checked={field.enabled ?? false} onChange={() => toggleEnabled(field)} />,
                     actions: (
                         <RowActions
                             fieldName={field.apiName}
@@ -117,13 +162,24 @@ export function ProfileFieldsList(props: IProps) {
                 <DashboardHeaderBlock
                     title={t("Custom Profile Fields")}
                     actionButtons={
-                        <Button
-                            onClick={() => {
-                                onEdit(EMPTY_PROFILE_FIELD_CONFIGURATION);
-                            }}
-                        >
-                            {t("Add Field")}
-                        </Button>
+                        <div className={classes.actionButtonsContainer}>
+                            <Button
+                                disabled={!profileFieldsAvailable}
+                                onClick={() => {
+                                    setReorderModalIsVisible(true);
+                                }}
+                            >
+                                {t("Reorder")}
+                            </Button>
+
+                            <Button
+                                onClick={() => {
+                                    onEdit(EMPTY_PROFILE_FIELD_CONFIGURATION);
+                                }}
+                            >
+                                {t("Add Field")}
+                            </Button>
+                        </div>
                     }
                 />
                 <div className={cx(dashboardClasses().extendRow, classes.scrollTable)}>
@@ -137,6 +193,19 @@ export function ProfileFieldsList(props: IProps) {
                     )}
                 </div>
             </section>
+
+            {profileFieldsAvailable && (
+                <ReorderProfileFields
+                    isVisible={reorderModalIsVisible}
+                    sortedProfileFields={sortedProfileFields!}
+                    onSubmit={async function (values) {
+                        await putProfileFieldsSorts(values);
+                    }}
+                    onCancel={() => setReorderModalIsVisible(false)}
+                    onSubmitSuccess={handleReorderProfileFieldsFormSuccess}
+                    onSubmitError={handleReorderProfileFieldsFormError}
+                />
+            )}
         </ErrorBoundary>
     );
 }

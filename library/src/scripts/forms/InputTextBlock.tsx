@@ -38,6 +38,7 @@ export interface IInputProps {
     autoComplete?: boolean;
     "aria-label"?: string;
     "aria-describedby"?: string;
+    inputID?: string;
 }
 
 export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {
@@ -105,8 +106,8 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                             placeholder={inputProps.placeholder}
                             aria-invalid={hasErrors}
                             aria-describedby={describedBy}
-                            aria-labelledby={labelID}
-                            aria-label={inputProps["aria-label"]}
+                            aria-labelledby={!inputProps["aria-label"] ? labelID : ""} //we should not have both
+                            aria-label={inputProps["aria-label"]} //we should not have both
                             maxLength={inputProps.maxLength}
                             onChange={this.onChange}
                             onFocus={this.onFocus}

@@ -62,6 +62,7 @@ export interface IUser extends IUserFragment, IUserRoles {
     countDiscussions: number;
     countComments: number;
     private: boolean;
+    profileFields?: {};
 }
 
 export interface IInvitees {

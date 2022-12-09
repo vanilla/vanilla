@@ -81,7 +81,6 @@ $Configuration['Garden']['Registration']['Method'] = 'Captcha'; // Options are: 
 $Configuration['Garden']['Registration']['InviteExpiration'] = '1 week'; // When invitations expire. This will be plugged into strtotime().
 $Configuration['Garden']['Registration']['InviteRoles'] = 'FALSE';
 $Configuration['Garden']['Registration']['ConfirmEmail'] = false;
-$Configuration['Garden']['Registration']['MinPasswordLength'] = 6;
 $Configuration['Garden']['Registration']['NameUnique'] = true;
 $Configuration['Garden']['TermsOfService'] = '/home/termsofservice'; // The url to the terms of service.
 $Configuration['Garden']['Password']['MinLength'] = 12;

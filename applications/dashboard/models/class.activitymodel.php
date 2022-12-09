@@ -2,7 +2,7 @@
 /**
  * Activity Model.
  *
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
@@ -16,7 +16,6 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Vanilla\CurrentTimeStamp;
-use Vanilla\Dashboard\Models\ActivityEmail;
 use Vanilla\FloodControlTrait;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\Formats;
@@ -167,11 +166,9 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         if ($join) {
             $this->SQL
                 ->select("au.Name", "", "ActivityName")
-                ->select("au.Gender", "", "ActivityGender")
                 ->select("au.Photo", "", "ActivityPhoto")
                 ->select("au.Email", "", "ActivityEmail")
                 ->select("ru.Name", "", "RegardingName")
-                ->select("ru.Gender", "", "RegardingGender")
                 ->select("ru.Email", "", "RegardingEmail")
                 ->select("ru.Photo", "", "RegardingPhoto")
                 ->join("User au", "a.ActivityUserID = au.UserID")
@@ -452,7 +449,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userModel->joinUsers(
             $result->resultArray(),
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Email", "Gender", "Photo"]]
+            ["Join" => ["Name", "Email", "Photo"]]
         );
         $this->calculateData($result->resultArray());
 
@@ -516,7 +513,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userModel->joinUsers(
             $result->resultArray(),
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Email", "Gender", "Photo"]]
+            ["Join" => ["Name", "Email", "Photo"]]
         );
         $this->calculateData($result->resultArray());
 
@@ -670,7 +667,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userModel->joinUsers(
             $result,
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Photo", "Email", "Gender"]]
+            ["Join" => ["Name", "Photo", "Email"]]
         );
 
         $this->EventArguments["Data"] = &$result;
@@ -883,7 +880,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userModel->joinUsers(
             $result->resultArray(),
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Photo", "Email", "Gender"]]
+            ["Join" => ["Name", "Photo", "Email"]]
         );
         $this->calculateData($result->resultArray());
 
@@ -1083,7 +1080,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         Gdn::userModel()->joinUsers(
             $activities,
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Email", "Gender", "Photo"]]
+            ["Join" => ["Name", "Email", "Photo"]]
         );
     }
 
@@ -1649,8 +1646,10 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         }
         [$popup, $email] = self::notificationPreference($preference, $activity["NotifyUserID"], "both");
 
-        $activity["Notified"] = $popup ? self::SENT_PENDING : self::SENT_SKIPPED;
-        $activity["Emailed"] = $email ? self::SENT_PENDING : self::SENT_SKIPPED;
+        $activity["Notified"] =
+            $popup && !Gdn::config("Garden.Popups.Disabled") ? self::SENT_PENDING : self::SENT_SKIPPED;
+        $activity["Emailed"] =
+            $email && !Gdn::config("Garden.Email.Disabled") ? self::SENT_PENDING : self::SENT_SKIPPED;
 
         return $activity;
     }

@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-use Garden\Web\Exception\ServerException;
 use Ramsey\Uuid\Uuid;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Utility\ModelUtils;

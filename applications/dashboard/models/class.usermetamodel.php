@@ -161,6 +161,17 @@ class UserMetaModel extends Gdn_Model
     }
 
     /**
+     * Clear UserMeta cache
+     *
+     * @param int $userID
+     *
+     */
+    public function clearUserMetaCache(int $userID)
+    {
+        $this->invalidateUserCaches($userID, ["Profile.%"]);
+    }
+
+    /**
      * Fetch some usermeta data from cache or from the database.
      *
      * @param int $userID

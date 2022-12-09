@@ -13,6 +13,7 @@ paths:
                       items:
                           enum:
                               - permissions
+                              - assignable
                               - all
                           type: string
                       type: array

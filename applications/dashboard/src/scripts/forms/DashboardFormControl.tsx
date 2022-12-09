@@ -6,16 +6,20 @@
 
 import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
 import { DashboardCodeEditor } from "@dashboard/forms/DashboardCodeEditor";
+import { DashboardCustomComponent } from "@dashboard/forms/DashboardCustomComponent";
+import { DashboardDatePicker } from "@dashboard/forms/DashboardDatePicker";
 import { DashboardColorPicker } from "@dashboard/forms/DashboardFormColorPicker";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
+import { DashboardPasswordInput } from "@dashboard/forms/DashboardPasswordInput";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
 import apiv2 from "@library/apiv2";
+import ErrorMessages from "@library/forms/ErrorMessages";
 import { FormTreeControl } from "@library/tree/FormTreeControl";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n";
@@ -23,7 +27,7 @@ import { IControlGroupProps, IControlProps } from "@vanilla/json-schema-forms";
 import { AutoComplete, IFormGroupProps } from "@vanilla/ui";
 import { AutoCompleteLookupOptions } from "@vanilla/ui/src/forms/autoComplete/AutoCompleteLookupOptions";
 import isEmpty from "lodash/isEmpty";
-import React, { useState } from "react";
+import React from "react";
 
 interface IControlOverride {
     /** This boolean controls if the associated component (in callback) should be rendered */
@@ -56,36 +60,33 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
         }
     }
 
+    const fieldErrors = props.errors;
     switch (control.inputType) {
         case "textBox":
             const isMultiline = control.type === "textarea";
             const typeIsNumber = control.type === "number";
             const typeIsUrl = control.type === "url";
-            const type = typeIsNumber ? "number" : typeIsUrl ? "url" : "text";
-
-            return (
+            const typeIsPassword = control.type === "password";
+            const type = typeIsNumber ? "number" : typeIsUrl ? "url" : typeIsPassword ? "password" : "text";
+            const inputProps = {
+                value: value ?? "",
+                required,
+                disabled,
+                onBlur,
+                onChange: (event) => onChange(event.target.value),
+                maxLength: schema.type === "string" ? schema.maxLength : undefined,
+                type: !isMultiline ? type : undefined,
+                placeholder: control.placeholder,
+                multiline: isMultiline ? true : false,
+                inputID: control.inputID,
+                "aria-label": control.inputAriaLabel,
+            };
+            return typeIsPassword ? (
+                <DashboardPasswordInput errors={fieldErrors} inputProps={inputProps} />
+            ) : (
                 <DashboardInput
-                    errors={
-                        validation?.errors
-                            ?.filter((error) => error.instancePath === `/${props.path[0]!}`)
-                            .map((e) => {
-                                return {
-                                    message: e.message!,
-                                    field: `${props.path[0]!}`,
-                                };
-                            }) ?? []
-                    }
-                    inputProps={{
-                        value: value ?? "",
-                        required,
-                        disabled,
-                        onBlur,
-                        onChange: (event) => onChange(event.target.value),
-                        maxLength: schema.type === "string" ? schema.maxLength : undefined,
-                        type: !isMultiline ? type : undefined,
-                        placeholder: control.placeholder,
-                        multiline: isMultiline ? true : false,
-                    }}
+                    errors={fieldErrors}
+                    inputProps={inputProps}
                     multiLineProps={
                         isMultiline
                             ? {
@@ -95,6 +96,7 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     }
                 />
             );
+
         case "codeBox":
             return (
                 <DashboardCodeEditor
@@ -152,6 +154,9 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                         required={required}
                         disabled={props.disabled}
                     />
+                    {fieldErrors && <ErrorMessages errors={fieldErrors} />}
+
+                    {control.helperText && <div className={dashboardClasses().helperText}>{control.helperText}</div>}
                 </div>
             );
         case "checkBox":
@@ -196,6 +201,20 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     defaultBackground={control.defaultBackground}
                 />
             );
+        case "datePicker": {
+            return (
+                <DashboardDatePicker
+                    value={value}
+                    onChange={onChange}
+                    disabled={props.disabled}
+                    placeholder={control.placeholder}
+                    inputAriaLabel={control.inputAriaLabel || control.label}
+                />
+            );
+        }
+        case "custom": {
+            return <DashboardCustomComponent control={control} />;
+        }
         case "empty":
             return <></>;
         default:
@@ -221,6 +240,7 @@ export function DashboardFormControlGroup(props: React.PropsWithChildren<IContro
             inputType={inputType}
             tooltip={tooltip}
             labelType={labelType as DashboardLabelType}
+            inputID={controls[0].inputID}
         >
             {children}
         </DashboardFormGroup>

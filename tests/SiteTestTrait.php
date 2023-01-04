@@ -525,6 +525,24 @@ TEMPLATE;
     }
 
     /**
+     * Make sure a user does not have any roles in a list.
+     *
+     * @param int $userID
+     * @param array $roles
+     */
+    protected function assertUserHasNotRoles(int $userID, array $roles)
+    {
+        $userRoles = $this->userModel->getRoleIDs($userID);
+        foreach ($roles as $role) {
+            if (!is_numeric($role)) {
+                $role = $this->roleID($role);
+            }
+
+            $this->assertNotContains($role, $userRoles);
+        }
+    }
+
+    /**
      * Make sure that there is no active session.
      *
      * @param string $message

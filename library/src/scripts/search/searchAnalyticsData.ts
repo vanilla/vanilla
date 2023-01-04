@@ -26,6 +26,7 @@ export interface IResultAnalyticsData {
     category: { categoryID: RecordID[]; categoryName: string[] };
     kb: { kbID: RecordID | null; kbName: string };
     siteSection: object;
+    siteSectionID: string;
     source?: ITrackedSearchSource;
 }
 
@@ -138,6 +139,7 @@ export const getSearchAnalyticsData = (
         //we don't allow multiple kb filter in search so no mapping here
         kb: { kbID: null, kbName: "" },
         siteSection: getSiteSection(),
+        siteSectionID: getSiteSection().sectionID,
     };
 
     if (form.authors && form.authors.length) {

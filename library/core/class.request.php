@@ -1442,8 +1442,10 @@ class Gdn_Request implements RequestInterface
      * @param string $inputFile Usually `php://input` for the raw input stream.
      * @param array|null $files Usually the `$_FILES` super-global.
      * @return mixed Returns the decoded post.
+     *
+     * @internal Do not use externally. For testing purpose only.
      */
-    private function decodePost($post, $server, $inputFile = "php://input", $files = null)
+    public function decodePost($post, $server, $inputFile = "php://input", $files = null)
     {
         $contentType = !isset($server["CONTENT_TYPE"]) ? "application/x-www-form-urlencoded" : $server["CONTENT_TYPE"];
 
@@ -1461,7 +1463,7 @@ class Gdn_Request implements RequestInterface
         // Add data from the PHP files array.
         if (is_array($files)) {
             $fileData = $this->parseFiles($files);
-            $result = array_merge($fileData, $result);
+            $result = array_replace($fileData, $result);
         }
 
         return $result;

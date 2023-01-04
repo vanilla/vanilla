@@ -36,6 +36,11 @@ export const INITIAL_USERS_STATE: IUsersState = {
     suggestions: suggestionReducer(undefined, "" as any),
     usersByID: {},
     usersInvitationsByID: {},
+    postFormSubmit: {
+        status: LoadStatus.PENDING,
+    },
+    patchStatusByUserID: {},
+    patchStatusByPatchID: {},
 };
 
 export const GUEST_USER_ID = 0;
@@ -108,6 +113,25 @@ export const usersReducer = produce(
             };
             return state;
         })
+        //POST
+        .case(UserActions.postUserACs.started, (state, payload) => {
+            state.postFormSubmit.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(UserActions.postUserACs.failed, (state, payload) => {
+            state.postFormSubmit.status = LoadStatus.ERROR;
+            state.postFormSubmit.error = payload.error;
+            return state;
+        })
+        .case(UserActions.postUserACs.done, (state, payload) => {
+            const userID = payload.result.userID;
+            state.postFormSubmit.status = LoadStatus.SUCCESS;
+            state.usersByID[userID] = {
+                data: payload.result,
+                status: LoadStatus.SUCCESS,
+            };
+            return state;
+        })
         .case(UserActions.inviteUsersACs.started, (state, params) => {
             const { userID } = params;
             state.usersInvitationsByID[userID].results = { status: LoadStatus.LOADING };
@@ -171,7 +195,35 @@ export const usersReducer = produce(
             };
             return state;
         })
-
+        .case(UserActions.patchUserAC.started, (state, params) => {
+            const { patchID } = params;
+            state.patchStatusByPatchID[patchID] = {
+                ...(state.patchStatusByPatchID[patchID] ?? {}),
+                status: LoadStatus.LOADING,
+            };
+            return state;
+        })
+        .case(UserActions.patchUserAC.done, (state, payload) => {
+            const { userID, patchID } = payload.params;
+            if (state.usersByID[userID]?.data) {
+                state.usersByID[userID].data = {
+                    ...state.usersByID[userID]?.data,
+                    ...payload.result,
+                };
+            }
+            state.patchStatusByPatchID[patchID] = {
+                status: LoadStatus.SUCCESS,
+            };
+            return state;
+        })
+        .case(UserActions.patchUserAC.failed, (state, payload) => {
+            const { patchID } = payload.params;
+            state.patchStatusByPatchID[patchID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
+            return state;
+        })
         .default((state, action) => {
             if (action.type === NotificationsActions.MARK_ALL_READ_RESPONSE) {
                 if (state.current.data) {

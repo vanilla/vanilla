@@ -52,20 +52,17 @@ export type ProfileField = {
     dropdownOptions?: string[] | number[] | null;
     enabled?: boolean;
     salesforceID?: string | null;
+    sort?: number;
 };
 
 // The form structure differs from the actual object's structure: some fields are nested in groups with others
 export type ProfileFieldFormValues = Pick<
     ProfileField,
-    "apiName" | "label" | "description" | "registrationOptions" | "enabled"
+    "apiName" | "label" | "description" | "registrationOptions" | "enabled" | "mutability"
 > & {
     visibility: {
         visibility: ProfileField["visibility"];
     } & ProfileField["displayOptions"];
-} & {
-    editing: {
-        mutability: ProfileField["mutability"];
-    };
 } & {
     type: ProfileFieldType; //there are utils to map the type selected in the form to valid combination dataType and formType.
 } & {
@@ -91,7 +88,9 @@ export enum ProfileFieldFormType {
     TOKENS = "tokens",
 }
 
-export type FetchProfileFieldsParams = {};
+export type FetchProfileFieldsParams = {
+    filterEnabled?: boolean;
+};
 
 export type PostProfileFieldParams = ProfileField;
 
@@ -101,6 +100,12 @@ export type FetchUserProfileFieldsParams = {
     userID: RecordID;
 };
 
-export interface UserProfileFields {
-    [key: string]: ProfileField["apiName"];
+export interface PutUserProfileFieldsParams {
+    [apiName: string]: NonNullable<ProfileField["sort"]>;
 }
+
+export interface UserProfileFields {
+    [apiName: string]: any;
+}
+
+export interface PatchUserProfileFieldsParams extends UserProfileFields {}

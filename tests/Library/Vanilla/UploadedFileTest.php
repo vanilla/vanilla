@@ -47,7 +47,7 @@ class UploadedFileTest extends BootstrapTestCase
     {
         $file = UploadedFile::fromRemoteResourceUrl("http://vanillaforums.com");
         $this->assertEquals("http://vanillaforums.com", $file->getForeignUrl());
-        $this->assertEquals("https://vanillaforums.com/", $file->getResolvedForeignUrl());
+        $this->assertEquals("https://vanilla.higherlogic.com/", $file->getResolvedForeignUrl());
 
         // Ensure we've temporarily stashed the file somewhere.
         $this->assertTrue(file_exists($file->getFile()));

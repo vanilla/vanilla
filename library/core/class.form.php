@@ -982,7 +982,8 @@ class Gdn_Form extends Gdn_Pluggable
         string $label = "",
         string $description = ""
     ): string {
-        $value = $this->getValue($fieldName, null);
+        $value = $options["value"] ?? $this->getValue($fieldName, null);
+        unset($options["value"]);
 
         return $this->react(
             $fieldName,

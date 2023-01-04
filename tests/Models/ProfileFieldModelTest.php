@@ -10,10 +10,11 @@ namespace VanillaTests\Models;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use VanillaTests\DatabaseTestTrait;
 use VanillaTests\SiteTestCase;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 class ProfileFieldModelTest extends SiteTestCase
 {
-    use DatabaseTestTrait;
+    use DatabaseTestTrait, UsersAndRolesApiTestTrait;
 
     /** @var ProfileFieldModel */
     private $profileFieldModel;
@@ -24,6 +25,7 @@ class ProfileFieldModelTest extends SiteTestCase
         $this->profileFieldModel = $this->container()->get(ProfileFieldModel::class);
         \Gdn::sql()->truncate("profileField");
         \Gdn::sql()->truncate("UserMeta");
+        \Gdn::config()->saveToConfig(ProfileFieldModel::CONFIG_FEATURE_FLAG, true);
     }
     /**
      * ProfileFieldModel::getValidTypeMapping() just returns mapping information. This test just makes sure
@@ -220,5 +222,34 @@ class ProfileFieldModelTest extends SiteTestCase
             $actual
         );
         $this->assertRecordsFound("UserMeta", ["UserID" => $myUserID, "QueryValue" => $queryValue], 1);
+    }
+
+    /**
+     * This tests that initial profile fields are created during site setup when no profile fields exist.
+     */
+    public function testInitialFieldsCreated()
+    {
+        $this->bessy()->get("utility/update");
+        $profileFields = $this->profileFieldModel->getProfileFields();
+        $profileFieldNames = array_column($profileFields, "apiName");
+        $this->assertEqualsCanonicalizing(
+            ["first-name", "last-name", "company", "pronouns", "bio", "Title", "Location", "DateOfBirth"],
+            $profileFieldNames
+        );
+    }
+
+    /**
+     * This tests that initial profile fields are not created if at least one profile field exists.
+     */
+    public function testInitialFieldsNotCreatedIfOneExists()
+    {
+        $existingProfileField = $this->createProfileField();
+        $this->bessy()->get("utility/update");
+        $profileFields = $this->profileFieldModel->getProfileFields();
+        $profileFieldNames = array_column($profileFields, "apiName");
+        $this->assertEqualsCanonicalizing(
+            [$existingProfileField["apiName"], "Title", "Location", "DateOfBirth"],
+            $profileFieldNames
+        );
     }
 }

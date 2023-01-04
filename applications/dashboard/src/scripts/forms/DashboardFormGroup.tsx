@@ -19,11 +19,13 @@ interface IProps {
     children: React.ReactNode;
     isIndependant?: boolean; // Setting this resets the side margins.
     tooltip?: string;
+    inputID?: string;
 }
 
 export function DashboardFormGroup(props: IProps) {
     const Tag = (props.tag || "li") as "li";
-    const inputID = useUniqueID("formGroup-");
+    const uniqueID = useUniqueID("formGroup-");
+    const inputID = props.inputID ?? uniqueID;
     const labelID = inputID + "-label";
 
     return (

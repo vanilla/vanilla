@@ -23,7 +23,7 @@
     ],
     "config": {
         "platform": {
-            "php": "7.2.34"
+            "php": "7.4.33"
         },
         "allow-plugins": {
             "wikimedia/composer-merge-plugin": true,
@@ -31,7 +31,7 @@
         }
     },
     "require": {
-        "php": "^7.2.34",
+        "php": "^7.4",
         "ext-pdo": "*",
         "ext-intl": "*",
         "ext-json": "*",
@@ -133,7 +133,10 @@
     "autoload-dev": {
         "psr-4": {
             "VanillaTests\\": "tests",
-            "VanillaTests\\Fixtures\\": "tests\\fixtures\\src",
+            "VanillaTests\\Fixtures\\": [
+                "tests\\fixtures\\src",
+                "tests\\fixtures\\"
+            ],
             "GardenTests\\": "tests",
             "GardenTests\\Fixtures\\": "tests\\fixtures\\src"
         }

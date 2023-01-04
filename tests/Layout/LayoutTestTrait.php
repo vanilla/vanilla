@@ -8,7 +8,7 @@
 namespace VanillaTests\Layout;
 
 use Garden\Hydrate\DataHydrator;
-use Monolog\Test\TestCase;
+use PHPUnit\Framework\TestCase;
 use Vanilla\Layout\LayoutHydrator;
 
 trait LayoutTestTrait

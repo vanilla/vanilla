@@ -153,7 +153,7 @@ if (!$hasUserID) {
                     //profile fields are hidden until user chooses the option to create new account
                     $wrapper = count($ExistingUsers) >= 1 ? ["tag" => "div", "attributes" => ["id" => "connect-custom-profile-fields", "style"=> "display: none"]] : null;
 
-                    $this->generateFormCustomProfileFields($wrapper);
+                    $this->generateFormCustomProfileFields($wrapper, true);
                 }
                 ?>
 

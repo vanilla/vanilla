@@ -18,7 +18,7 @@ import { ApiContext } from "@vanilla/ui";
 import { LongRunnerClient } from "@library/LongRunnerClient";
 import { formatUrl } from "./utility/appUtils";
 
-function fieldErrorTransformer(responseData, headers: any) {
+function fieldErrorTransformer(responseData) {
     if (responseData && responseData.status >= 400 && responseData.errors && responseData.errors.length > 0) {
         responseData.errors = indexArrayByKey(responseData.errors, "field");
     }
@@ -77,13 +77,17 @@ export function extractJsonErrorFromCFHtmlString(body: string): IError | null {
 }
 
 /**
- * Error handler for cloudflare errors when making APIv2 requests.
+ * Custom error handler for making APIv2 requests.
+ *
+ * - Hoists up response body errors.
+ * - Parsed cloudflare html type errors.
  */
-function cloudflareAxiosErrorHandler(error: AxiosError) {
+function customErrorHandler(error: AxiosError) {
     const data = error.response?.data || "";
 
     if (typeof data === "object" && data.message) {
-        (error as any).description = data.message;
+        (error as any).message = data.message;
+        (error as any).errors = data.errors ?? {};
     }
 
     const contentType = error.response?.headers?.["content-type"];
@@ -101,7 +105,7 @@ function cloudflareAxiosErrorHandler(error: AxiosError) {
 }
 
 // Apply the cloudflare error handler.
-apiv2.interceptors.response.use(undefined, cloudflareAxiosErrorHandler);
+apiv2.interceptors.response.use(undefined, customErrorHandler);
 
 export default apiv2;
 

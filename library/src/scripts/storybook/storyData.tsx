@@ -41,6 +41,7 @@ export const STORY_USER: IUser = {
     email: "joe.walsh@example.com",
     countDiscussions: 207,
     countComments: 3456,
+    countPosts: 3663,
     emailConfirmed: true,
     showEmail: true,
     bypassSpam: false,

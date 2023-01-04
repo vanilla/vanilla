@@ -14,18 +14,16 @@ use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Addon;
 use Vanilla\Attributes;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Exception\PermissionException;
 use Vanilla\OpenAPIBuilder;
 use Vanilla\Utility\StringUtils;
-use Vanilla\Web\APIExpandMiddleware;
 
 /**
  * Plugin to add additional fields to user profiles.
  *
- * If the field name is an existing column on user table (e.g. Title, About, Location)
+ * If the field name is an existing column on user table (e.g. Title, Location, Gender)
  * it will store there. Otherwise, it stores in UserMeta.
  *
  * @todo Option to show in discussions
@@ -90,10 +88,25 @@ class ProfileExtenderPlugin extends Gdn_Plugin
         "Preferences",
     ];
 
-    private const BUILTIN_FIELDS = ["Title", "Location"];
+    // As those are moved from fields in the `User` table to the `UserMeta` table, they will become irrelevant.
+    private const BUILTIN_FIELDS = ["Title", "Location", "Gender"];
 
     /** @var array */
     public $ProfileFields = [];
+
+    /** @var ProfileFieldModel */
+    private $profileFieldModel;
+
+    /**
+     * DI.
+     *
+     * @param \ProfileExtenderPlugin $profileExtenderPlugin
+     */
+    public function __construct(ProfileFieldModel $profileFieldModel)
+    {
+        parent::__construct();
+        $this->profileFieldModel = $profileFieldModel;
+    }
 
     /**
      * Hook in before content is rendered.
@@ -294,7 +307,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin
      */
     public function profileController_editMyAccountAfter_handler($sender)
     {
-        $this->profileFields($sender, true);
+        $this->profileFields($sender);
     }
 
     /**
@@ -320,21 +333,12 @@ class ProfileExtenderPlugin extends Gdn_Plugin
     }
 
     /**
-     * Add custom fields to discussions.
-     */
-    public function base_authorInfo_handler($sender, $args)
-    {
-        //echo ' '.wrapIf(htmlspecialchars(val('Department', $Args['Author'])), 'span', array('class' => 'MItem AuthorDepartment'));
-        //echo ' '.wrapIf(htmlspecialchars(val('Organization', $Args['Author'])), 'span', array('class' => 'MItem AuthorOrganization'));
-    }
-
-    /**
      * Get custom profile fields.
      *
      * @param bool $stripBuiltinFields Whether to strip out built-in fields replicated in the profileExtender.
      * @return array
      */
-    private function getProfileFields($stripBuiltinFields = false)
+    public function getProfileFields($stripBuiltinFields = false)
     {
         $fields = c("ProfileExtender.Fields", []);
         if (!is_array($fields)) {
@@ -344,11 +348,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin
         // Data checks
         foreach ($fields as $k => $field) {
             $name = isset($field["Name"]) ? $field["Name"] : $k;
-            // Remove duplicated fields to let the Profile Controller use the default profile fields instead when editing.
-            if (in_array($name, self::BUILTIN_FIELDS, true)) {
-                if ($stripBuiltinFields) {
-                    unset($fields[$k]);
-                }
+
+            // If the field is one of the `built-in` fields(ie. originally saved within the `User` table) & we want to exclude them.
+            if (in_array($name, self::BUILTIN_FIELDS, true) && $stripBuiltinFields) {
+                unset($fields[$k]);
             }
 
             // Require an array for each field
@@ -868,11 +871,26 @@ class ProfileExtenderPlugin extends Gdn_Plugin
             // Add this field to the output
             $columnNames[] = val("Label", $fieldData, $slugName);
 
-            // Add this field to the query.
-            $quoted = $exportProfilesSQL->quote("Profile.$slugName");
-            $exportProfilesSQL
-                ->join("UserMeta a" . $i, "u.UserID = a$i.UserID and a$i.Name = $quoted", "left")
-                ->select("a" . $i . ".Value", "", $slugName);
+            // Subquery for left join to get minimum UserMetaID
+            $subquery1 = Gdn::database()->createSql();
+            $subquery1
+                ->select("m.UserMetaID", "MIN")
+                ->select("m.UserID")
+                ->from("UserMeta m")
+                ->where("m.Name", "Profile.$slugName")
+                ->groupBy("m.UserID");
+            $exportProfilesSQL->leftJoin("(" . $subquery1->getSelect(true) . ") s1_$i", "s1_$i.UserID = u.UserID");
+
+            // Subquery for left join to get corresponding UserMeta value
+            $subquery2 = Gdn::database()->createSql();
+            $subquery2->select("m.UserMetaID, m.Value")->from("UserMeta m");
+            $exportProfilesSQL->leftJoin(
+                "(" . $subquery2->getSelect(true) . ") s2_$i",
+                "s2_$i.UserMetaID = s1_$i.UserMetaID"
+            );
+
+            // Add field value to the query
+            $exportProfilesSQL->select("s2_$i.Value", "", $slugName);
             $i++;
         }
 
@@ -910,8 +928,8 @@ class ProfileExtenderPlugin extends Gdn_Plugin
             "Roles",
         ];
         $output = fopen("php://output", "w");
-        header("Content-Type:application/csv");
-        header("Content-Disposition:attachment;filename=profiles_export.csv");
+        safeHeader("Content-Type:application/csv");
+        safeHeader("Content-Disposition:attachment;filename=profiles_export.csv");
         fputcsv($output, $columnNames);
 
         // Get our user data.
@@ -928,7 +946,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin
             $offset += self::EXPORT_PROFILE_CHUNK;
         } while ($userDataset->count());
         fclose($output);
-        die();
+
+        if (!\Vanilla\Utility\DebugUtils::isTestMode()) {
+            die();
+        }
     }
 
     /**
@@ -1001,69 +1022,6 @@ class ProfileExtenderPlugin extends Gdn_Plugin
         }
         if ($updateRequired) {
             Gdn::config()->saveToConfig("ProfileExtender.Fields", array_values($profileFields));
-        }
-
-        if (Gdn::config()->get("Feature.CustomProfileFields.Enabled", false)) {
-            $profileFieldModel = Gdn::getContainer()->get(ProfileFieldModel::class);
-            $profileField = [
-                "apiName" => "",
-                "label" => "",
-                "description" => "",
-                "dataType" => ProfileFieldModel::DATA_TYPE_TEXT,
-                "formType" => ProfileFieldModel::FORM_TYPE_TEXT,
-                "dropdownOptions" => null,
-                "visibility" => ProfileFieldModel::VISIBILITIES[0],
-                "mutability" => "",
-                "displayOptions" => ["profiles" => false, "userCards" => false, "posts" => false],
-                "registrationOptions" => ProfileFieldModel::REGISTRATION_OPTIONAL,
-                "sort" => "",
-                "enabled" => true,
-            ];
-            foreach ($profileFields as $k => $pField) {
-                $profile = $profileFieldModel->getByApiName($pField["Name"]);
-                // Profile field already exists.
-                if (!$profile) {
-                    $insertField = $profileField;
-                    $insertField["label"] = $pField["Label"];
-                    $insertField["description"] = $pField["Label"];
-                    $insertField["apiName"] = $pField["Name"];
-                    if ($pField["FormType"] == "TextBox") {
-                        $insertField["formType"] = ProfileFieldModel::FORM_TYPE_TEXT;
-                        $insertField["dataType"] = ProfileFieldModel::DATA_TYPE_TEXT;
-                    } elseif ($pField["FormType"] == "Dropdown") {
-                        $insertField["formType"] = ProfileFieldModel::FORM_TYPE_DROPDOWN;
-                        $insertField["dataType"] = ProfileFieldModel::DATA_TYPE_TEXT;
-                    } elseif ($pField["FormType"] == "CheckBox") {
-                        $insertField["formType"] = ProfileFieldModel::FORM_TYPE_CHECKBOX;
-                        $insertField["dataType"] = ProfileFieldModel::DATA_TYPE_BOOL;
-                    } elseif ($pField["FormType"] == "DateOfBirth" || $pField["FormType"] == "Date") {
-                        $insertField["formType"] = ProfileFieldModel::FORM_TYPE_DATE;
-                        $insertField["dataType"] = ProfileFieldModel::DATA_TYPE_DATE;
-                    }
-
-                    if ($pField["OnProfile"] ?? false) {
-                        $insertField["displayOptions"]["profiles"] = true;
-                    }
-                    if ($pField["OnDiscussion"] ?? false) {
-                        $insertField["displayOptions"]["posts"] = true;
-                    }
-
-                    $insertField["dropdownOptions"] = $pField["Options"] ?? [];
-                    $insertField["sort"] = $pField["Sort"] ?? null;
-                    if ($pField["OnRegister"] ?? false) {
-                        $insertField["registrationOptions"] =
-                            $pField["Required"] ?? false
-                                ? ProfileFieldModel::REGISTRATION_REQUIRED
-                                : ProfileFieldModel::REGISTRATION_OPTIONAL;
-                        $insertField["mutability"] = ProfileFieldModel::MUTABILITIES[0];
-                    } else {
-                        $insertField["mutability"] = ProfileFieldModel::MUTABILITIES[1];
-                    }
-                    $profileFieldModel->insert($insertField);
-                }
-            }
-            $eventManager = Gdn::getContainer()->get(EventManager::class);
-            $eventManager->fire("afterProfileFieldMigration");
         }
     }
 
@@ -1156,7 +1114,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin
         int $id,
         array $body
     ): \Garden\Web\Data {
-        if (\Vanilla\FeatureFlagHelper::featureEnabled("ImprovedUserProfileFields")) {
+        if (\Vanilla\FeatureFlagHelper::featureEnabled(ProfileFieldModel::FEATURE_FLAG)) {
             return $usersApi->patch_profileFields($id, $body);
         }
         $userID = $usersApi->getSession()->UserID;
@@ -1197,7 +1155,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin
      */
     public function filterOpenApi(array &$openApi): void
     {
-        if (\Vanilla\FeatureFlagHelper::featureEnabled("ImprovedUserProfileFields")) {
+        if (\Vanilla\FeatureFlagHelper::featureEnabled(ProfileFieldModel::FEATURE_FLAG)) {
             /** @var ProfileFieldModel $profileFieldModel */
             $profileFieldModel = Gdn::getContainer()->get(ProfileFieldModel::class);
             $schema = $profileFieldModel->getUserProfileFieldSchema();

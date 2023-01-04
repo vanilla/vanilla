@@ -34,7 +34,7 @@ export function UserProfileSettings() {
 
     const toast = useToast();
 
-    function handleSuccess() {
+    function handleProfileFieldFormSuccess() {
         toast.addToast({
             autoDismiss: true,
             dismissible: true,
@@ -67,6 +67,7 @@ export function UserProfileSettings() {
                 <section>
                     <ErrorBoundary>
                         <ProfileFieldForm
+                            key={`${profileFieldConfiguration}`}
                             title={
                                 profileFieldConfiguration?.apiName ? t("Edit Profile Field") : t("Add Profile Field")
                             }
@@ -77,7 +78,7 @@ export function UserProfileSettings() {
                                     ? patchProfileField(values)
                                     : postProfileField(values));
                                 clearProfileFieldConfiguration();
-                                handleSuccess();
+                                handleProfileFieldFormSuccess();
                             }}
                             onExit={() => {
                                 clearProfileFieldConfiguration();

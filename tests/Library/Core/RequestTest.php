@@ -1,12 +1,11 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Library\Core;
 
-use League\Uri\Http;
 use Vanilla\Utility\UrlUtils;
 use VanillaTests\SharedBootstrapTestCase;
 use Gdn_Request;
@@ -123,6 +122,22 @@ class RequestTest extends SharedBootstrapTestCase
 
         $req->setRequestArguments(Gdn_Request::INPUT_POST, ["foo" => "bar"]);
         $this->assertSame($req->getBody(), $req->getRequestArguments(Gdn_Request::INPUT_POST));
+    }
+
+    /**
+     * Test Gdn_Request's decodePost() function.
+     * See issue https://higherlogic.atlassian.net/browse/VNLA-3055
+     */
+    public function testDecodePostFunction()
+    {
+        $req = new Gdn_Request();
+
+        $payloadFile = PATH_ROOT . "/tests/fixtures/json/decodePostPayload.json";
+        $decodedPayload = json_decode(file_get_contents($payloadFile), true);
+
+        $returnedValue = $req->decodePost([], ["CONTENT_TYPE" => "application/json"], $payloadFile, []);
+
+        $this->assertEquals($decodedPayload, $returnedValue);
     }
 
     /**

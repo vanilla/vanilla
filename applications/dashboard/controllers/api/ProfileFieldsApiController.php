@@ -118,7 +118,7 @@ class ProfileFieldsApiController extends \AbstractApiController
         $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema(Schema::parse([":o" => "Key-value mapping of apiName => sort"]));
-        $in->validate($body);
+        $body = $in->validate($body);
         $this->profileFieldModel->updateSorts($body);
     }
 

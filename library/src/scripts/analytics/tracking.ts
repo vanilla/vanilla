@@ -4,7 +4,7 @@
  */
 import { logError } from "@vanilla/utils";
 import apiv2 from "@library/apiv2";
-import { getMeta, onReady } from "@library/utility/appUtils";
+import { getMeta, getSiteSection, onReady } from "@library/utility/appUtils";
 import { RecordID } from "@vanilla/utils";
 
 export enum ViewType {
@@ -25,6 +25,7 @@ export const trackPageView = (url: string = window.location.href, context?: obje
     const viewEventType: ViewType = viewType ? viewType : getMeta("viewEventType") ?? ViewType.DEFAULT;
     const discussionID: RecordID = getMeta("DiscussionID");
     const tickExtra: Record<string, any> = JSON.parse(getMeta("TickExtra", "{}"));
+    const siteSectionID: RecordID = getSiteSection()?.sectionID;
 
     // TickExtra could contain the categoryID
     const categoryID = tickExtra?.CategoryID;
@@ -33,6 +34,7 @@ export const trackPageView = (url: string = window.location.href, context?: obje
         url,
         ...(discussionID && { discussionID }),
         ...(categoryID && { categoryID }),
+        ...(siteSectionID && { siteSectionID }),
         ...(context && { ...context }),
     };
 

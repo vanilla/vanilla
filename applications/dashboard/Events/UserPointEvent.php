@@ -119,4 +119,15 @@ class UserPointEvent extends UserEvent implements TrackingEventInterface
                 return "";
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionID(): ?string
+    {
+        if (isset($this->payload["point"]["siteSectionIDs"])) {
+            return $this->payload["point"]["siteSectionIDs"][0] ?? null;
+        }
+        return null;
+    }
 }

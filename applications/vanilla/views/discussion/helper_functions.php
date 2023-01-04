@@ -9,7 +9,33 @@ if (!defined('APPLICATION')) {
 }
 
 use Vanilla\Theme\BoxThemeShim;
+use Vanilla\Dashboard\Controllers\Api\ProfileFieldsApiController;
 use Vanilla\Utility\HtmlUtils;
+
+
+
+if (!function_exists('getCustomFields')) :
+    /**
+     * Get the profile fields for a user to display next to their name.
+     *
+     * @since 2.1
+     * @param userID
+     * @return string all input field values for the userId that has posts in their displayOptions.
+     */
+    function getCustomFields($userID) {
+        if (Gdn::config("Feature.CustomProfileFields.Enabled")) {
+            $profileFields = Gdn::getContainer()->get("UsersAPIController")->get_profileFields($userID);
+            $index = Gdn::getContainer()->get(ProfileFieldsApiController::class)->index();
+            $string = "";
+            foreach ($index as $fieldFromIndex) {
+                if ($fieldFromIndex["displayOptions"]["posts"] && $profileFields[$fieldFromIndex["apiName"]]) {
+                    $string .= $profileFields[$fieldFromIndex["apiName"]] . " ";
+                }
+            }
+            return $string;
+        }
+    }
+endif;
 
 
 if (!function_exists('formatBody')) :
@@ -142,12 +168,17 @@ if (!function_exists('writeComment')) :
                            $sender->fireEvent('AuthorPhoto');
                            ?>
                         </span>
+
                         <span class="AuthorInfo">
-                           <?php
-                           echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
-                           echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
-                           $sender->fireEvent('AuthorInfo');
-                           ?>
+                            <?php
+                                if (Gdn::config("Feature.CustomProfileFields.Enabled") && function_exists('getCustomFields') && $author->UserID && !$author->Deleted) {
+                                    echo getCustomFields($author->UserID);
+                                } else {
+                                    echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
+                                    echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
+                                }
+                                $sender->fireEvent('AuthorInfo');
+                            ?>
                         </span>
                     </div>
                     <div class="Meta CommentMeta CommentInfo">
@@ -365,6 +396,8 @@ if (!function_exists('getDiscussionOptionsDropdown')):
             && !$discussion->Dismissed
             && $session->isValid();
         $canTag = c('Tagging.Discussions.Enabled') && checkPermission('Vanilla.Tagging.Add') && in_array(strtolower($sender->ControllerName), ['discussionscontroller', 'categoriescontroller']) ;
+        $canAddToCollection = $canEdit && checkPermission("Garden.Community.Manage");
+
 
         if ($canEdit && $timeLeft) {
             $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';
@@ -412,6 +445,23 @@ if (!function_exists('getDiscussionOptionsDropdown')):
             $dropdown
                 ->addDivider()
                 ->addLink(t('Delete Discussion'), '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
+        }
+
+        //add to collection option goes before analytics and other plugin options
+        if ($canAddToCollection) {
+            $dropdown->addLink(
+                t("Add to Collection"),
+                "#",
+                "discussionAddToCollection",
+                "js-addDiscussionToCollection",
+                [],
+                [
+                    "attributes" => [
+                        "data-discussionID" => $discussion->DiscussionID,
+                        "data-recordType" => "discussion",
+                    ],
+                ]
+            );
         }
 
         // DEPRECATED

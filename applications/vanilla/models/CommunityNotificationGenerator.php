@@ -173,6 +173,15 @@ class CommunityNotificationGenerator implements SystemCallableInterface
         $isValid = $this->fireDiscussionBeforeNotificationEvent($discussion, $eventArguments);
 
         if (!$isValid) {
+            ErrorLogger::warning(
+                "Attempted to send notification for a discussion, but it failed validation.",
+                ["notifications"],
+                [
+                    "discussionID" => $discussionID,
+                    "categoryID" => $categoryID,
+                    "eventArguments" => $eventArguments,
+                ]
+            );
             return;
         }
 

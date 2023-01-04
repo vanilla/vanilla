@@ -38,6 +38,33 @@ class RolesTest extends AbstractResourceTest
     }
 
     /**
+     * Test expand=assignable
+     *
+     * @return void
+     */
+    public function testIndexWithAssignableExpand()
+    {
+        $callApi = function () {
+            return $this->api()
+                ->get($this->baseUrl, ["expand" => "assignable"])
+                ->getBody();
+        };
+
+        // Test response has assignable property if user has users.edit
+        $roles = $this->runWithPermissions($callApi, ["users.edit" => true]);
+        foreach ($roles as $role) {
+            $this->assertArrayHasKey("assignable", $role);
+            $this->assertIsBool($role["assignable"]);
+        }
+
+        // Test response does not have assignable property if user does not have users.edit
+        $roles = $this->runWithPermissions($callApi, []);
+        foreach ($roles as $role) {
+            $this->assertArrayNotHasKey("assignable", $role);
+        }
+    }
+
+    /**
      * Given a role ID, get its full list of permissions.
      *
      * @param $roleID

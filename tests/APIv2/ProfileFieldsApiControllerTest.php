@@ -38,10 +38,10 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
         "registrationOptions" => ProfileFieldModel::REGISTRATION_HIDDEN,
     ];
 
-    public function tearDown(): void
+    public function setUp(): void
     {
-        parent::tearDown();
-        \Gdn::sql()->truncate("profileField");
+        parent::setUp();
+        $this->resetTable("profileField");
     }
 
     /**
@@ -541,5 +541,41 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
         }
 
         return $rows;
+    }
+
+    /**
+     * Test what happens if bad values somehow get inserted into dropdown options.
+     *
+     * @param mixed $input
+     * @param array $expected
+     *
+     * @dataProvider provideBadDropdownOptions
+     */
+    public function testGetWithBadDropdownOptions($input, array $expected)
+    {
+        $this->resetTable("profileField");
+        $field = $this->createProfileField([
+            "formType" => ProfileFieldModel::FORM_TYPE_DROPDOWN,
+            "dropdownOptions" => ["test"],
+        ]);
+
+        \Gdn::sql()
+            ->update("profileField", ["dropdownOptions" => json_encode($input)], ["apiName" => $field["apiName"]])
+            ->put();
+        \Gdn::cache()->flush();
+        $row = $this->api()
+            ->get("/profile-fields")
+            ->getBody()[0];
+        $this->assertEquals($expected, $row["dropdownOptions"]);
+    }
+
+    /**
+     * Provide bad migrated data.
+     */
+    public function provideBadDropdownOptions()
+    {
+        yield "not-array" => ["garbeldegook", []];
+        yield "object" => [["key1" => "val1", "key2" => "val2"], ["val1", "val2"]];
+        yield "empty-array" => [[], []];
     }
 }

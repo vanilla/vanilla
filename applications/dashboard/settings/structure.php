@@ -36,6 +36,7 @@ $LEGACYADDON = [
     "EnabledPlugins.Sphinx",
     "EnabledPlugins.Reputation",
     "EnabledPlugins.NBBC",
+    "EnabledPlugins.whispers",
 ];
 
 if (!defined("APPLICATION")) {
@@ -177,7 +178,7 @@ $Construct
     ->column("About", "text", true)
     ->column("Email", "varchar(100)", false, "index")
     ->column("ShowEmail", "tinyint(1)", "0")
-    ->column("Gender", ["u", "m", "f"], "u")
+    ->column("Gender", ["u", "m", "f", ""], "")
     ->column("CountVisits", "int", "0")
     ->column("CountInvitations", "int", "0")
     ->column("CountNotifications", "int", null)
@@ -423,52 +424,6 @@ $Construct
 
 if ($Construct->table("UserMeta")->columnExists("ShortValue")) {
     $Construct->dropColumn("ShortValue");
-}
-
-//Migrate Users DateOfBirth fields from Users Table to UserMeta table
-if (
-    $Construct->tableExists("User") &&
-    $Construct->table("User")->columnExists("DateOfBirth") &&
-    $Construct->tableExists("UserMeta") &&
-    $Construct->table("UserMeta")->columnExists("QueryValue")
-) {
-    $nonEmptyDateOfBirthCount = $SQL->getCount("User", ["DateOfBirth <>" => ""]);
-    $maxUpdatedUser = $SQL->getcount("UserMeta", ["Name" => "Profile.DateOfBirth"]);
-    $limit = 10000;
-    $iterations = 1;
-    if ($nonEmptyDateOfBirthCount && $nonEmptyDateOfBirthCount > $maxUpdatedUser) {
-        if ($nonEmptyDateOfBirthCount > $limit) {
-            $iterations = (int) ceil($nonEmptyDateOfBirthCount / $limit);
-        }
-        try {
-            $logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
-            for ($i = 0; $i < $iterations; $i++) {
-                $offset = $limit * $i;
-                $query = "SELECT MIN(UserID) as minUser , MAX(UserID) as maxUser FROM 
-                        (SELECT UserID FROM GDN_User WHERE DateOfBirth <> '' LIMIT $limit OFFSET $offset) U";
-                $users = $SQL->query($query)->resultArray();
-
-                // we need to select insert /update here based on limit
-                $Construct->executeQuery(
-                    "INSERT GDN_UserMeta(UserID, Name, Value, QueryValue) 
-                    SELECT UserID, 'Profile.DateOfBirth' AS Label, DateOfBirth, CONCAT('Profile.DateOfBirth.', DateOfBirth) as QueryValue
-                    FROM GDN_User U WHERE concat(DateOfBirth,'') <> '' LIMIT $limit OFFSET $offset 
-                    ON DUPLICATE KEY UPDATE Value = U.DateOfBirth"
-                );
-                $logger->info(
-                    "Migrated field DateofBirth of User's table for users between  {$users[0]["minUser"]} and {$users[0]["maxUser"]}  into UserMeta Table"
-                );
-            }
-        } catch (Exception $e) {
-            $logger->error(
-                "Error occurred while migrating user data DateOfBirth to UserMeta for records between {$users[0]["minUser"]} and  {$users[0]["maxUser"]} ",
-                [
-                    "event" => "UserTable_DateOfBirth_migration",
-                    "exception" => $e,
-                ]
-            );
-        }
-    }
 }
 
 // Similar to the user meta table, but without the need to cache the entire dataset.
@@ -1524,3 +1479,8 @@ ProfileFieldModel::structure();
 
 // Remove legacy Plugins
 Gdn::config()->removeFromConfig($LEGACYADDON);
+
+// Keep this until we have deprecated the ProfileExtender addon.
+if (Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG) && Gdn::config("EnabledPlugins.ProfileExtender")) {
+    Gdn::config()->saveToConfig("EnabledPlugins.ProfileExtender", false);
+}

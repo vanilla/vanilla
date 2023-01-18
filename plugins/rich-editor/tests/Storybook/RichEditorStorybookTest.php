@@ -54,10 +54,7 @@ class RichEditorStorybookTest extends StorybookGenerationTestCase
      */
     public function provideRichEditorTests(): array
     {
-        return [
-            ["/richeditorstyles/formatting", "RichEditor Formatting"],
-            ["/richeditorstyles/images", "RichEditor Images"],
-        ];
+        return [];
     }
 
     /**

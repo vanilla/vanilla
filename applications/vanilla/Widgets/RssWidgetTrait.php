@@ -200,7 +200,10 @@ trait RssWidgetTrait
             "to" => $result["link"],
             "name" => $result["title"],
             "imageUrl" => $imageUrl ?: $fallbackUrl,
-            "description" => $this->formatService->renderPlainText($result["description"], HtmlFormat::FORMAT_KEY),
+            "description" => $this->formatService->renderPlainText(
+                $result["description"] ?? $result["title"],
+                HtmlFormat::FORMAT_KEY
+            ),
         ];
     }
 }

@@ -194,6 +194,7 @@ abstract class AbstractEmbed implements \JsonSerializable
                 "enum" => $this->getAllowedTypes(),
             ],
             "name:s?",
+            "faviconUrl:s?",
         ]);
 
         return $this->schema()->merge($baseSchema);

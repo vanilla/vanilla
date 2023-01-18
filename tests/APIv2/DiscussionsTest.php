@@ -12,6 +12,7 @@ use DiscussionModel;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\ApiUtils;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\DiscussionTypeConverter;
@@ -1441,5 +1442,18 @@ class DiscussionsTest extends AbstractResourceTest
             "resourceType" => "discussion",
             "primaryKey" => "discussionID",
         ];
+    }
+
+    /**
+     * Test that crawl expands use a prev/next pager with no count.
+     */
+    public function testIndexCrawlPager()
+    {
+        $this->createDiscussion();
+        $this->createDiscussion();
+        $r = $this->api()->get("/discussions", ["expand" => ["crawl"], "limit" => 1]);
+        $paging = ApiUtils::parsePageHeader($r->getHeader("Link"));
+        self::assertArrayHasKey("next", $paging);
+        self::assertArrayNotHasKey("last", $paging);
     }
 }

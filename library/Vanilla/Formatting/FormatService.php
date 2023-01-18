@@ -230,7 +230,8 @@ class FormatService
             ->registerFormat(Formats\TextExFormat::FORMAT_KEY, Formats\TextExFormat::class)
             ->registerFormat(Formats\WysiwygFormat::FORMAT_KEY, Formats\WysiwygFormat::class)
             ->registerFormat(Formats\WysiwygFormat::ALT_FORMAT_KEY, Formats\WysiwygFormat::class)
-            ->registerFormat(Formats\DisplayFormat::FORMAT_KEY, Formats\DisplayFormat::class);
+            ->registerFormat(Formats\DisplayFormat::FORMAT_KEY, Formats\DisplayFormat::class)
+            ->registerFormat(Formats\Rich2Format::FORMAT_KEY, Formats\Rich2Format::class);
     }
 
     /**

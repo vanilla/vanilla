@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { IUserFragment, IUserFragmentAndRoles } from "@library/@types/api/users";
+import { IUserFragment } from "@library/@types/api/users";
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import UserContent from "@library/content/UserContent";
 import { UserLabel } from "@library/content/UserLabel";

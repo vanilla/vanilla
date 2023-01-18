@@ -366,6 +366,7 @@ export const bannerClasses = useThemeCache(
                     height: styleUnit(vars.searchBar.sizing.height),
                 },
 
+                // FIXME: why is this even here?
                 // Kludge for the layout editor
                 ".layoutEditorToolbarMenu": {
                     transform: "translate(-50%, 50%)",

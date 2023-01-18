@@ -70,9 +70,9 @@ class MarkdownFormat extends HtmlFormat
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $value): string
+    public function renderQuote(string $content): string
     {
-        $markdownParsed = $this->markdownParser->transform($value);
+        $markdownParsed = $this->markdownParser->transform($content);
         return parent::renderQuote($markdownParsed);
     }
 

@@ -34,6 +34,7 @@ export interface IBaseEmbedData {
     embedType: string;
     url: string;
     name?: string;
+    faviconUrl?: string;
 }
 
 export interface IBaseEmbedProps extends IEmbedContext, IBaseEmbedData {
@@ -143,7 +144,7 @@ let builtinsRegistered = false;
 /**
  * Mount the built-in embeds if they aren't already.
  */
-function ensureBuiltinEmbeds() {
+export function ensureBuiltinEmbeds() {
     if (builtinsRegistered) {
         return;
     }

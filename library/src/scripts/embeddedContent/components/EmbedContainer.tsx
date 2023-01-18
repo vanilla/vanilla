@@ -31,6 +31,7 @@ export const EmbedContainer = forwardRef(function EmbedContainer(props: IProps, 
                     e.stopPropagation();
                     e.nativeEvent.stopImmediatePropagation();
                     if (!isSelected) {
+                        e.preventDefault();
                         selectSelf?.();
                     }
                 }

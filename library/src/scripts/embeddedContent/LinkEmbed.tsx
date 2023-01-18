@@ -37,7 +37,7 @@ export function LinkEmbed(props: IProps) {
                     className={cx("embedLink-link", classesMetas.noUnderline)}
                     to={url}
                     rel="nofollow noreferrer ugc"
-                    tabIndex={props.inEditor ? -1 : 0}
+                    tabIndex={props.inEditor && !props.disableFocus ? -1 : 0}
                     aria-label={name}
                 >
                     <article className="embedText-body embedLink-body">

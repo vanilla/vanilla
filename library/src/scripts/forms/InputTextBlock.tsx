@@ -38,6 +38,7 @@ export interface IInputProps {
     autoComplete?: boolean;
     "aria-label"?: string;
     "aria-describedby"?: string;
+    inputID?: string;
 }
 
 export interface IInputTextProps extends Omit<IInputBlockProps, "children"> {

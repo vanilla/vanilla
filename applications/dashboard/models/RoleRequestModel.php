@@ -314,41 +314,7 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
      */
     private function createValidationClass(Schema $schema): Validation
     {
-        $r = new class ($schema) extends Validation {
-            /**
-             * @var Schema
-             */
-            private $schema;
-
-            /**
-             * Validation constructor.
-             *
-             * @param Schema $schema
-             */
-            public function __construct(Schema $schema)
-            {
-                $this->schema = $schema;
-            }
-
-            /**
-             * Translate an error message string.
-             *
-             * @param string $str
-             * @return string
-             */
-            public function translate($str)
-            {
-                $field = $this->schema->getField(["properties", $str]);
-                if (is_array($field)) {
-                    $str = $field["x-label"] ?? StringUtils::labelize($str);
-                }
-                $r = t($str);
-                return $r;
-            }
-        };
-        $r->setTranslateFieldNames(true);
-
-        return $r;
+        return new RoleRequestValidation($schema);
     }
 
     /**

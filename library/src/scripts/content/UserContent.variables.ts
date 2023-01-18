@@ -81,7 +81,7 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
          * @type string
          * @enum horizontalBorder|horizontalBorderStriped|verticalBorder|verticalBorderStriped
          */
-        style: TableStyle.HORIZONTAL_BORDER_STRIPED,
+        style: TableStyle.VERTICAL_BORDER,
         /**
          * @varGroup userContent.tables.borders
          * @title User Content - Tables - Borders
@@ -157,7 +157,7 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
          * @description Border radius of an embed in pixels.
          * @type string|number
          */
-        borderRadius: px(2),
+        borderRadius: px(4),
     });
 
     /**

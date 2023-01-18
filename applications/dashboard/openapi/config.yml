@@ -415,3 +415,25 @@ components:
                     x-key: "Garden.Messages.Add.RedirectUrl"
                     x-read: public
                     x-write: site.manage
+                "password.minLength":
+                    description: |
+                        The minimum number of characters a members password can be.
+                    type: string
+                    default: ""
+                    x-key: "Garden.Password.MinLength"
+                    x-read: public
+                    x-write: site.manage
+                "registration.method":
+                    description: |
+                        How members are able to register to the community.
+                    type: string
+                    enum:
+                        - "Basic"
+                        - "Approval"
+                        - "Invitation"
+                        - "Connect"
+                        - "Captcha"
+                    default: "Captcha"
+                    x-key: "Garden.Registration.Method"
+                    x-read: public
+                    x-write: site.manage

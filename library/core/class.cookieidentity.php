@@ -54,9 +54,6 @@ class Gdn_CookieIdentity
     /** @var string */
     public $PersistExpiry = "30 days";
 
-    /** @var string */
-    public $SessionExpiry = "2 days";
-
     /**
      *
      *
@@ -80,13 +77,9 @@ class Gdn_CookieIdentity
             $config = Gdn::config($config);
         }
 
-        $defaultConfig = array_replace(
-            ["PersistExpiry" => "30 days", "SessionExpiry" => "2 days"],
-            Gdn::config("Garden.Cookie")
-        );
-        $this->CookieName = val("Name", $config, $defaultConfig["Name"]);
-        $this->CookiePath = val("Path", $config, $defaultConfig["Path"]);
-        $this->CookieDomain = val("Domain", $config, $defaultConfig["Domain"]);
+        $this->CookieName = val("Name", $config);
+        $this->CookiePath = val("Path", $config);
+        $this->CookieDomain = val("Domain", $config);
 
         // If the domain being set is completely incompatible with the current domain then make the domain work.
         $currentHost = Gdn::request()->host();
@@ -102,11 +95,10 @@ class Gdn_CookieIdentity
             );
         }
 
-        $this->CookieHashMethod = val("HashMethod", $config, $defaultConfig["HashMethod"]);
-        $this->CookieSalt = val("Salt", $config, $defaultConfig["Salt"]);
+        $this->CookieHashMethod = val("HashMethod", $config);
+        $this->CookieSalt = val("Salt", $config);
         $this->VolatileMarker = $this->CookieName . "-Volatile";
-        $this->PersistExpiry = val("PersistExpiry", $config, $defaultConfig["PersistExpiry"]);
-        $this->SessionExpiry = val("SessionExpiry", $config, $defaultConfig["SessionExpiry"]);
+        $this->PersistExpiry = val("PersistExpiry", $config);
     }
 
     /**

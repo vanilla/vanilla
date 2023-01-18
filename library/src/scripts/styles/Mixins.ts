@@ -266,10 +266,12 @@ export class Mixins {
         return spacingVals;
     }
 
-    static verticallyAlignInContainer(height: number, containerHeight: number): CSSObject {
+    static verticallyAlignInContainer(height: number, parentLineHeight: number): CSSObject {
         return {
-            transform: `translateY(-${Math.abs((containerHeight - height) / 2)}px)`,
+            [`--offset`]: `calc(calc(1em * ${parentLineHeight}) - ${height}px) / 2`,
+            [`--negative-offset`]: `min(var(--offset), -1*var(--offset))`,
             verticalAlign: "top",
+            transform: `translateY(var(--negative-offset))`,
         };
     }
 

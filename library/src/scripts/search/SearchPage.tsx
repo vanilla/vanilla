@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -206,7 +206,7 @@ function SearchPage(props: IProps) {
     return (
         // Add a context provider so that smartlinks within search use dynamic navigation.
         <LinkContextProvider linkContexts={[formatUrl("/search", true)]}>
-            <DocumentTitle title={form.query ? form.query : t("Search Results")}>
+            <DocumentTitle title={form.query ? `${form.query}` : t("Search Results")}>
                 <TitleBar title={t("Search")} />
                 <Banner isContentBanner />
                 <Container>
@@ -246,7 +246,7 @@ function SearchPage(props: IProps) {
                                             <SearchBar
                                                 placeholder={props.placeholder}
                                                 onChange={(newQuery) => updateForm({ query: newQuery })}
-                                                value={form.query}
+                                                value={`${form.query}`}
                                                 onSearch={debouncedSearch}
                                                 isLoading={results.status === LoadStatus.LOADING}
                                                 optionComponent={SearchOption}

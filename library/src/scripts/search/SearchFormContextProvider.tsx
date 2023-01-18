@@ -161,13 +161,13 @@ export function SearchFormContextProvider(props: IProps) {
 
         const commonQueryEntries = {
             ...filterForm,
+            ...currentDomain.transformFormToQuery?.(filterForm),
             limit: SEARCH_LIMIT_DEFAULT,
             dateInserted: getDate(form),
             locale: getCurrentLocale(),
             collapse: true,
             sort,
             ...(form.offset && { offset: form.offset }),
-            ...currentDomain.transformFormToQuery?.(filterForm),
         };
         if (searchScope.value?.value) {
             commonQueryEntries.scope = searchScope.value.value;

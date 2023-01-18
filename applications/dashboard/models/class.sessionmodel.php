@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-use Garden\Web\Exception\ServerException;
 use Ramsey\Uuid\Uuid;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Utility\ModelUtils;
@@ -49,7 +48,7 @@ class SessionModel extends Gdn_Model
      */
     public function getPersistExpiry(): DateTimeImmutable
     {
-        return CurrentTimeStamp::getDateTime()->modify("+" . \Gdn::config("Garden.Cookie.PersistExpiry", "30 days"));
+        return CurrentTimeStamp::getDateTime()->modify("+" . \Gdn::config("Garden.Cookie.PersistExpiry"));
     }
 
     /**

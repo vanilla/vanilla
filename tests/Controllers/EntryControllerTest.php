@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Controllers;
 
+use AccessTokenModel;
 use BanModel;
 use League\Uri\Http;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
@@ -51,13 +52,14 @@ class EntryControllerTest extends VanillaTestCase
     public function testGenerateFormCustomProfileFields(): void
     {
         $this->runWithConfig(
-            ["Garden.Registration.Method" => "Basic", "Feature.CustomProfileFields.Enabled" => true],
+            ["Garden.Registration.Method" => "Basic", ProfileFieldModel::CONFIG_FEATURE_FLAG => true],
             function () {
                 //first create some profile fields with different formType/dataType
                 $this->createProfileField(["apiName" => "field-test-textInput"]);
                 $this->createProfileField([
                     "apiName" => "field-test-dropdown",
                     "label" => "field test dropdown",
+                    "description" => "this is a test description for dropdown",
                     "formType" => "dropdown",
                     "dataType" => "number",
                     "dropdownOptions" => [
@@ -75,12 +77,12 @@ class EntryControllerTest extends VanillaTestCase
                 ]);
 
                 $expected = '<li class="form-group"><label for="Form_Profilefield-test-textInput">profile field test</label>
-<input type="text" id="Form_Profilefield-test-textInput" name="Profile[field-test-textInput]" value="" class="InputBox" /></li><li class="form-group"><label for="Form_Profilefield-test-dropdown">field test dropdown</label>
-<select id="Form_Profilefield-test-dropdown" name="Profile[field-test-dropdown]" class="" data-value="">
+<div class="Gloss">this is a test</div><input type="text" id="Form_Profilefield-test-textInput" name="Profile[field-test-textInput]" value="" class="InputBox" /></li><li class="form-group"><label for="Form_Profilefield-test-dropdown">field test dropdown</label>
+<div class="Gloss">this is a test description for dropdown</div><select id="Form_Profilefield-test-dropdown" name="Profile[field-test-dropdown]" class="" data-value="">
 <option value=""></option>
 <option value="0">0</option>
 <option value="1">1</option>
-</select></li><li><label for="Form_Profilefield-test-checkbox" class="CheckBoxLabel"><input type="hidden" name="Checkboxes[]" value="Profile[field-test-checkbox]" /><input type="checkbox" id="Form_Profilefield-test-checkbox" name="Profile[field-test-checkbox]" value="1" class="" /> field test checkbox</label></li>';
+</select></li><li><div class="Gloss">this is a test</div><label for="Form_Profilefield-test-checkbox" class="CheckBoxLabel"><input type="hidden" name="Checkboxes[]" value="Profile[field-test-checkbox]" /><input type="checkbox" id="Form_Profilefield-test-checkbox" name="Profile[field-test-checkbox]" value="1" class="" /> field test checkbox</label></li>';
 
                 $this->expectOutputString($expected);
                 $this->controller->generateFormCustomProfileFields();
@@ -94,11 +96,11 @@ class EntryControllerTest extends VanillaTestCase
     public function testRegisterBasicWithCustomProfileFields(): void
     {
         $this->runWithConfig(
-            ["Garden.Registration.Method" => "Basic", "Feature.CustomProfileFields.Enabled" => true],
+            ["Garden.Registration.Method" => "Basic", ProfileFieldModel::CONFIG_FEATURE_FLAG => true],
             function () {
                 //first create some profile fields
                 $result = $this->createProfileField([
-                    "apiName" => "field-test-textBox",
+                    "apiName" => "fieldTextBox",
                     "label" => "field test textBox",
                     "registrationOptions" => "required",
                 ]);
@@ -122,13 +124,13 @@ class EntryControllerTest extends VanillaTestCase
 
                 //We check if our custom field exists on the registration page.
                 $registerPage = $this->bessy()->getHtml("/entry/register");
-                $registerPage->assertCssSelectorExists("#Form_Profilefield-test-textBox");
+                $registerPage->assertCssSelectorExists("#Form_ProfilefieldTextBox");
 
                 $formFields = [
                     "Email" => "new@user.com",
                     "Name" => "NewUserName",
                     "Profile" => [
-                        "field-test-textBox" => "testValue",
+                        "fieldTextBox" => "testValue",
                         "field-test-tokens" =>
                             '[{"value":"apple","label":"apple"}, {"value":"orange","label":"orange"}]',
                     ],
@@ -139,7 +141,9 @@ class EntryControllerTest extends VanillaTestCase
                 ];
 
                 //test if tokens array from values will be generated correctly from json
-                $tokenValuesArr = $this->controller->tokenValuesData($formFields["Profile"]["field-test-tokens"]);
+                $tokenValuesArr = $this->controller->convertTokenValueToArray(
+                    $formFields["Profile"]["field-test-tokens"]
+                );
                 $this->assertIsArray($tokenValuesArr);
                 $this->assertEquals("apple", $tokenValuesArr[0]);
 
@@ -147,20 +151,20 @@ class EntryControllerTest extends VanillaTestCase
 
                 //success
                 $this->assertIsObject($registrationResults);
-                $this->assertNotEmpty($registrationResults->Form->_FormValues["Profile"]["field-test-textBox"]);
+                $this->assertNotEmpty($registrationResults->Form->_FormValues["Profile"]["fieldTextBox"]);
                 $this->assertNotEmpty($registrationResults->Form->_FormValues["Profile"]["field-test-tokens"]);
                 $this->assertNotEmpty($registrationResults->Data["UserID"]);
 
                 //profile fields should be successfully saved in userMeta
                 $userMetaData = \Gdn::userMetaModel()->getUserMeta($registrationResults->Data["UserID"]);
-                $this->assertEquals("testValue", $userMetaData["Profile.field-test-textBox"]);
+                $this->assertEquals("testValue", $userMetaData["Profile.fieldTextBox"]);
                 $this->assertIsArray($userMetaData["Profile.field-test-tokens"]);
                 $this->assertEquals("apple", $userMetaData["Profile.field-test-tokens"][0]);
                 $this->assertEquals("orange", $userMetaData["Profile.field-test-tokens"][1]);
 
                 // Trying to register providing an empty required field, this will fail.
-                $formFields["Profile"]["field-test-textBox"] = "";
-                $this->expectExceptionMessage("field test textBox is required");
+                $formFields["Profile"]["fieldTextBox"] = "";
+                $this->expectExceptionMessage("fieldTextBox is required");
                 $validationFailResults = $this->bessy()->post("/entry/register", $formFields);
             }
         );
@@ -175,7 +179,7 @@ class EntryControllerTest extends VanillaTestCase
         $session = \Gdn::session();
         $session->start(self::$siteInfo["adminUserID"]);
         $this->runWithConfig(
-            ["Garden.Registration.Method" => "Basic", "Feature.CustomProfileFields.Enabled" => true],
+            ["Garden.Registration.Method" => "Basic", ProfileFieldModel::CONFIG_FEATURE_FLAG => true],
             function () {
                 //first create some profile fields having User table column names
                 $profileFieldTitle = $this->createProfileField([
@@ -217,6 +221,78 @@ class EntryControllerTest extends VanillaTestCase
                 $this->assertIsArray($updatedUserMeta);
                 $this->assertEquals($formFields["Profile"]["DateOfBirth"], $updatedUserMeta["DateOfBirth"]);
                 $this->assertEquals($formFields["Profile"]["Title"], $updatedUserMeta["Title"]);
+            }
+        );
+    }
+
+    public function testRegistrationWithHiddenOrInternalProfileFieldWillBeFiltered()
+    {
+        $session = \Gdn::session();
+        $session->start(self::$siteInfo["adminUserID"]);
+        $options = [
+            [
+                "apiName" => "publicField",
+                "label" => "Public  Field",
+            ],
+            [
+                "apiName" => "InternalField",
+                "label" => "Internal Field",
+                "visibility" => "internal",
+            ],
+            [
+                "apiName" => "publicHiddenField",
+                "label" => "Public Hidden Field",
+                "registrationOptions" => ProfileFieldModel::REGISTRATION_HIDDEN,
+            ],
+        ];
+        $this->runWithConfig(
+            ["Garden.Registration.Method" => "Basic", ProfileFieldModel::CONFIG_FEATURE_FLAG => true],
+            function () use ($options) {
+                //first create some profile fields
+                $profileFields = [];
+                //create our profileFields
+                foreach ($options as $option) {
+                    $result = $this->createProfileField($option);
+                    $this->assertEquals(201, $result->getStatusCode());
+                    $profileFields[$option["apiName"]] = $result->getBody();
+                }
+
+                $registerPage = $this->bessy()->getHtml("/entry/register");
+
+                $profileApiKeys = array_keys($profileFields);
+                //Check if our public profile field exists on the registration page.
+                $registerPage->assertFormInput("Profile[$profileApiKeys[0]]", null);
+                //Make sure our internal/Hidden field don't show up in registration form
+                $registerPage->assertNoFormInput("Profile[$profileApiKeys[1]]");
+                $registerPage->assertNoFormInput("Profile[$profileApiKeys[2]]");
+
+                $formFields = [
+                    "Email" => "malUser@user.com",
+                    "Name" => "MalUserName",
+                    "Profile" => [
+                        $profileApiKeys[0] => "publicField",
+                        //trying to force populate value
+                        $profileApiKeys[1] => "internalField",
+                        $profileApiKeys[2] => "hiddenField",
+                    ],
+                    "Password" => "jXM>e!gL4#38cP3Z",
+                    "PasswordMatch" => "jXM>e!gL4#38cP3Z",
+                    "TermsOfService" => "1",
+                    "Save" => "Save",
+                ];
+
+                $registrationResults = $this->bessy()->post("/entry/register", $formFields);
+
+                //success
+                $this->assertIsObject($registrationResults);
+                $this->assertNotEmpty($registrationResults->Data["UserID"]);
+
+                //profile fields should be successfully saved in userMeta
+                $userMetaData = \Gdn::userMetaModel()->getUserMeta($registrationResults->Data["UserID"]);
+                $this->assertArrayHasKey("Profile.$profileApiKeys[0]", $userMetaData);
+                $this->assertEquals("publicField", $userMetaData["Profile.$profileApiKeys[0]"]);
+                $this->assertArrayNotHasKey("Profile.$profileApiKeys[1]", $userMetaData);
+                $this->assertArrayNotHasKey("Profile.$profileApiKeys[2]", $userMetaData);
             }
         );
     }
@@ -397,6 +473,48 @@ class EntryControllerTest extends VanillaTestCase
     }
 
     /**
+     * Test that rejecting an application (when the registration method is "Approval") also invalidates that user's session.
+     */
+    public function testRejectedApplicantSessionExpires(): void
+    {
+        $this->runWithConfig(
+            [
+                "Garden.Registration.Method" => "Approval",
+                "Feature.sessionIDCookie.Enabled" => true,
+                "Feature.enforceSessionIDCookie.Enabled" => true,
+            ],
+            function () {
+                $user = self::sprintfCounter([
+                    "Name" => "test%s",
+                    "Email" => "test%s@example.com",
+                    "Password" => __FUNCTION__,
+                    "PasswordMatch" => __FUNCTION__,
+                    "TermsOfService" => "1",
+                    "DiscoveryText" => "test",
+                ]);
+
+                $r = $this->bessy()->post("/entry/register", $user);
+                $userID = (int) $r->Data["UserID"];
+                $userSession = $this->api()
+                    ->get("/sessions", ["userID" => $userID])
+                    ->getBody();
+                $this->assertCount(1, $userSession);
+
+                $this->api()->setUserID(self::$siteInfo["adminUserID"]);
+
+                // The session should be deleted when the user is rejected.
+                $this->api()->delete("/applicants/{$userID}");
+
+                $sessionAfterRejection = $this->api()
+                    ->get("/sessions", ["userID" => $userID])
+                    ->getBody();
+
+                $this->assertEmpty($sessionAfterRejection);
+            }
+        );
+    }
+
+    /**
      * Test checkAccessToken().
      *
      * @param string $path
@@ -420,6 +538,49 @@ class EntryControllerTest extends VanillaTestCase
         /** @var \Gdn_Auth $auth */
         $auth = $this->container()->get(\Gdn_Auth::class);
         $auth->startAuthenticator();
+        if ($valid) {
+            $this->assertEquals($userID, \Gdn::session()->UserID);
+        } else {
+            $this->assertEquals(0, \Gdn::session()->UserID);
+        }
+    }
+
+    /**
+     * Test checkAccessToken() with oldSalt config present.
+     *
+     * @param string $path
+     * @param bool $valid
+     * @dataProvider providePathData
+     */
+    public function testTokenAuthenticationOldSalt(string $path, bool $valid): void
+    {
+        /** @var \Gdn_Session $session */
+        $session = self::container()->get(\Gdn_Session::class);
+        $session->start([1]);
+        $userID = $this->createUserFixture(VanillaTestCase::ROLE_MEMBER);
+        $accessToken = $this->runWithConfig(["Garden.Cookie.Salt" => "123"], function () use ($userID) {
+            // Issue version 1 old style token.
+            /** @var \AccessTokenModel $tokenModel */
+            $tokenModel = $this->container()->get(\AccessTokenModel::class);
+            $tokenModel->issue($userID);
+            return $tokenModel->getWhere(["UserID" => $userID])->firstRow(DATASET_TYPE_ARRAY);
+        });
+        \Gdn::request()->setPath($path);
+        //Run with configs after update to new Sald value.
+        $this->runWithConfig(["Garden.Cookie.Salt" => "456", "Garden.Cookie.OldSalt" => "123"], function () use (
+            $accessToken,
+            $session
+        ) {
+            //After new release old tokens(version 1) should use oldSalt to sign and to verify signature.
+            /** @var \AccessTokenModel $tokenModel */
+            $tokenModel = new AccessTokenModel();
+            $signedToken = $tokenModel->signTokenRow($accessToken);
+            $_SERVER["HTTP_AUTHORIZATION"] = "Bearer " . $signedToken;
+            $session->end();
+            /** @var \Gdn_Auth $auth */
+            $auth = $this->container()->get(\Gdn_Auth::class);
+            $auth->startAuthenticator();
+        });
         if ($valid) {
             $this->assertEquals($userID, \Gdn::session()->UserID);
         } else {

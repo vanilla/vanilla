@@ -181,7 +181,7 @@ class AddonsApiController extends Controller
         $addons = $this->addonModel->getWhere($query);
 
         $themeType = empty($query["themeType"]) ? "desktop" : $query["themeType"];
-        $addons = array_map(function (&$row) use ($themeType) {
+        $addons = array_map(function ($row) use ($themeType) {
             return $this->filterOutput($row, $themeType);
         }, $addons);
         usort($addons, function ($a, $b) {

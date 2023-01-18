@@ -1095,7 +1095,7 @@ class DiscussionModel extends Gdn_Model implements
         if (!empty([$orderBy])) {
             // This is pseudo foreach loop.
             // We only take the first pair of $orderField => $orderDirection here.
-            // So the loop will only entered ones
+            // So the loop will be entered only once
             foreach (array_slice($orderBy, 0, 1, true) as $orderField => $orderDirection) {
                 $this->fixOrder($data, $orderField, $orderDirection);
             }
@@ -1281,8 +1281,13 @@ class DiscussionModel extends Gdn_Model implements
         }
         $limit *= 100;
         $countQuery = $this->getWhereQuery($where, [], [], $limit, false, $filterType, $userID);
+        $countQuery = <<<SQL
+SELECT COUNT(*) as count FROM ({$countQuery}) cq
+SQL;
+
         $result = $this->SQL->query($countQuery);
-        return $result->count();
+
+        return $result->firstRow(DATASET_TYPE_ARRAY)["count"];
     }
 
     /**
@@ -4499,10 +4504,15 @@ SQL;
         $session = \Gdn::session();
         if ($session->User) {
             $row["unread"] =
+                isset($row["CountUnreadComments"]) &&
                 $row["CountUnreadComments"] !== 0 &&
                 ($row["CountUnreadComments"] !== true ||
                     dateCompare(val("DateFirstVisit", $session->User), $row["DateInserted"]) <= 0);
-            if ($row["CountUnreadComments"] !== true && $row["CountUnreadComments"] > 0) {
+            if (
+                isset($row["CountUnreadComments"]) &&
+                $row["CountUnreadComments"] !== true &&
+                $row["CountUnreadComments"] > 0
+            ) {
                 $row["countUnread"] = $row["CountUnreadComments"];
             }
         } else {
@@ -4519,35 +4529,35 @@ SQL;
             unset($row["Category"]);
         }
 
-        $row["Announce"] = (bool) $row["Announce"];
+        $row["Announce"] = (bool) ($row["Announce"] ?? 0);
         $row["Url"] = discussionUrl($row);
         $row["CanonicalUrl"] =
             isset($row["CanonicalUrl"]) && is_string($row["CanonicalUrl"]) ? $row["CanonicalUrl"] : $row["Url"];
 
-        $rawBody = $row["Body"];
-        $format = $row["Format"];
+        $rawBody = $row["Body"] ?? "";
+        $format = $row["Format"] ?? null;
 
         $this->formatField($row, "Body", $format);
-        $row["Attributes"] = new Attributes($row["Attributes"]);
+        $row["Attributes"] = new Attributes($row["Attributes"] ?? null);
 
         if (array_key_exists("Bookmarked", $row)) {
-            $row["Bookmarked"] = (bool) $row["Bookmarked"];
+            $row["Bookmarked"] = (bool) ($row["Bookmarked"] ?? 0);
         }
 
         if (ModelUtils::isExpandOption("lastPost", $expand)) {
             $lastPost = [
-                "discussionID" => $row["DiscussionID"],
-                "insertUserID" => $row["LastUserID"],
+                "discussionID" => $row["DiscussionID"] ?? null,
+                "insertUserID" => $row["LastUserID"] ?? null,
             ];
-            $lastPost["dateInserted"] = $row["DateLastComment"] ?? $row["DateInserted"];
+            $lastPost["dateInserted"] = $row["DateLastComment"] ?? ($row["DateInserted"] ?? null);
             if ($row["LastCommentID"]) {
-                $lastPost["CommentID"] = $row["LastCommentID"];
-                $lastPost["CategoryID"] = $row["CategoryID"];
-                $lastPost["name"] = sprintft("Re: %s", $row["Name"]);
-                $lastPost["url"] = commentUrl($lastPost, true);
+                $lastPost["CommentID"] = $row["LastCommentID"] ?? null;
+                $lastPost["CategoryID"] = $row["CategoryID"] ?? null;
+                $lastPost["name"] = sprintft("Re: %s", $row["Name"] ?? "");
+                $lastPost["url"] = isset($lastPost) ? commentUrl($lastPost, true) : null;
             } else {
-                $lastPost["name"] = $row["Name"];
-                $lastPost["url"] = $row["Url"];
+                $lastPost["name"] = $row["Name"] ?? null;
+                $lastPost["url"] = $row["Url"] ?? null;
             }
 
             if (
@@ -4565,7 +4575,7 @@ SQL;
 
         // This shouldn't be necessary, but the db allows nulls for dateLastComment.
         if (empty($row["DateLastComment"])) {
-            $row["DateLastComment"] = $row["DateInserted"];
+            $row["DateLastComment"] = $row["DateInserted"] ?? null;
         }
 
         if (ModelUtils::isExpandOption("excerpt", $expand)) {
@@ -5056,14 +5066,14 @@ SQL;
         }
 
         $discussion = (object) $discussion;
-        $name = Gdn_Format::url($discussion->Name);
+        $name = isset($discussion->Name) ? Gdn_Format::url($discussion->Name) : null;
 
         // Disallow an empty name slug in discussion URLs.
         if (empty($name)) {
             $name = "x";
         }
 
-        $result = "/discussion/" . $discussion->DiscussionID . "/" . $name;
+        $result = "/discussion/" . ($discussion->DiscussionID ?? "") . "/" . $name;
 
         if ($page) {
             if ($page > 1 || Gdn::session()->UserID) {

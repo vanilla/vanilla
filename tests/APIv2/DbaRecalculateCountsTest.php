@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\CurrentTimeStamp;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Models\TestCategoryModelTrait;
 use VanillaTests\Models\TestCommentModelTrait;
@@ -45,6 +46,7 @@ class DbaRecalculateCountsTest extends SiteTestCase
         $this->sql = $this->discussionModel->SQL;
         $this->categories = $this->discussions = $this->comments = $this->conversations = $this->users = [];
         $this->batches = 1;
+        CurrentTimeStamp::mockTime("2022-01-01");
         \Gdn::config()->set("Dba.Limit", 2);
         $this->setDicussionCountTestData();
     }

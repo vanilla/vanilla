@@ -15,6 +15,7 @@ import { useFocusWatcher, useEscapeListener } from "@vanilla/react-utils";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { cx } from "@emotion/css";
 import classNames from "classnames";
+import { TabHandler } from "@vanilla/dom-utils";
 
 export interface IFlyoutToggleChildParameters {
     id: string;
@@ -30,6 +31,7 @@ interface IProps {
     name?: string;
     contentID: string;
     className?: string;
+    buttonProps?: React.ComponentProps<typeof Button>;
     buttonContents: React.ReactNode;
     disabled?: boolean;
     children: (props: IFlyoutToggleChildParameters) => JSX.Element;
@@ -46,6 +48,7 @@ interface IProps {
     modalSize?: ModalSizes;
     initialFocusElement?: HTMLElement | null;
     tag?: string;
+    alwaysRender?: boolean;
 }
 
 export default function FlyoutToggle(props: IProps) {
@@ -72,13 +75,22 @@ export default function FlyoutToggle(props: IProps) {
     );
 
     useEffect(() => {
-        if (isVisible && initialFocusElement) {
+        if (isVisible) {
             // Focus the inital focusable element when we gain visibility.
             if (initialFocusElement) {
                 initialFocusElement.focus();
+            } else {
+                // Try to find it ourselves
+                const tabRoot = document.getElementById(contentID);
+                if (!tabRoot) {
+                    return;
+                }
+
+                const tabber = new TabHandler(tabRoot);
+                tabber.getInitial()?.focus();
             }
         }
-    }, [isVisible, initialFocusElement]);
+    }, [isVisible, initialFocusElement, contentID]);
 
     /**
      * Toggle Menu menu
@@ -183,6 +195,7 @@ export default function FlyoutToggle(props: IProps) {
             onClick={handleBlockEventPropagation}
         >
             <Button
+                {...props.buttonProps}
                 id={id}
                 className={buttonClasses}
                 title={props.name}
@@ -212,7 +225,7 @@ export default function FlyoutToggle(props: IProps) {
                         {props.children(childrenData)}
                     </Modal>
                 ) : (
-                    isContentVisible && props.children(childrenData)
+                    (isContentVisible || props.alwaysRender) && props.children(childrenData)
                 )}
             </React.Fragment>
         </Tag>

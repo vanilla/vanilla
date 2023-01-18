@@ -18,6 +18,7 @@ import { CheckCompactIcon, CloseCompactIcon, ComposeIcon } from "@library/icons/
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { formElementsVariables } from "@library/forms/formElementStyles";
+import { PilcrowIcon } from "@library/icons/editorIcons";
 
 export default {
     title: "Components/Buttons",
@@ -81,6 +82,26 @@ function StoryButton() {
                 >
                     <Button buttonType={ButtonTypes.ICON_COMPACT}>
                         <CheckCompactIcon />
+                    </Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`Icon MenuBar`}>
+                    <Button buttonType={ButtonTypes.ICON_MENUBAR}>
+                        <PilcrowIcon />
+                    </Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`Icon MenuBar (active)`}>
+                    <Button buttonType={ButtonTypes.ICON_MENUBAR} className={"active"}>
+                        <PilcrowIcon />
+                    </Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`Icon MenuBar (focused)`}>
+                    <Button buttonType={ButtonTypes.ICON_MENUBAR} className={"focus-visible"}>
+                        <PilcrowIcon />
+                    </Button>
+                </StoryTileAndTextCompact>
+                <StoryTileAndTextCompact text={`Icon MenuBar (hovered)`}>
+                    <Button buttonType={ButtonTypes.ICON_MENUBAR} className={"hover"}>
+                        <PilcrowIcon />
                     </Button>
                 </StoryTileAndTextCompact>
                 <StoryTileAndTextCompact

@@ -1881,7 +1881,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
     }
 
     /**
-     * Normalize a reaction type database row for outuput.
+     * Normalize a reaction type database row for output.
      *
      * @param array $row
      * @return array

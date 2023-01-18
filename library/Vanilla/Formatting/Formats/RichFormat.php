@@ -42,6 +42,7 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     use UserMentionsTrait;
 
     const FORMAT_KEY = "rich";
+    const RICH2_FORMAT_KEY = "rich2";
 
     /** @var string */
     const RENDER_ERROR_MESSAGE = "There was an error rendering this rich post.";

@@ -273,4 +273,9 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     {
         $this->payload["oldStatusID"] = $oldStatusID;
     }
+
+    public function getSiteSectionID(): ?string
+    {
+        return $this->payload["discussion"]["siteSectionIDs"][0] ?? null;
+    }
 }

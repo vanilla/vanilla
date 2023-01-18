@@ -232,6 +232,9 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
             $apiParams["categoryID"] = null;
         }
 
+        // Hide discussions from hidden categories
+        $apiParams["excludeHiddenCategories"] = true;
+
         return $apiParams;
     }
 

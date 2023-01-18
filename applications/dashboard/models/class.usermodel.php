@@ -35,7 +35,6 @@ use Vanilla\Permissions;
 use Vanilla\SchemaFactory;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
-use Vanilla\Utility\StringUtils;
 
 /**
  * Handles user data.
@@ -131,6 +130,21 @@ class UserModel extends Gdn_Model implements
     public const AVATAR_SIZE_THUMBNAIL = "thumbnail";
     public const AVATAR_SIZE_PROFILE = "profile";
 
+    // Fields that should be saved with the `UserMeta` table instead of the `User` table.
+    private const USERMETA_TITLE = "Title";
+    private const USERMETA_LOCATION = "Location";
+    private const USERMETA_GENDER = "Gender";
+    private const USERMETA_DATE_OF_BIRTH = "DateOfBirth";
+    public const USERMETA_FIELDS = [
+        self::USERMETA_TITLE,
+        self::USERMETA_LOCATION,
+        self::USERMETA_DATE_OF_BIRTH,
+        self::USERMETA_GENDER,
+    ];
+
+    // Prefix for fields saved in the `UserMeta` table.
+    public const USERMETA_FIELDS_PREFIX = "Profile.";
+
     /** @var EventManager */
     private $eventManager;
 
@@ -146,25 +160,20 @@ class UserModel extends Gdn_Model implements
     /** @var int The number of users when extreme database optimizations kick in. */
     public $UserMegaThreshold = 1000000;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $nameUnique;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $emailUnique;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $connectRoleSync = [];
 
-    /**
-     * @var ProfileFieldModel
-     */
+    /** @var ProfileFieldModel */
     private $profileFieldModel;
+
+    /** @var UserMetaModel */
+    private $userMetaModel;
 
     /**
      * Class constructor. Defines the related database table name.
@@ -206,6 +215,7 @@ class UserModel extends Gdn_Model implements
         $this->emailUnique = (bool) c("Garden.Registration.EmailUnique", true);
         $this->setConnectRoleSync(c("Garden.SSO." . UserModel::OPT_ROLE_SYNC, []));
         $this->profileFieldModel = Gdn::getContainer()->get(ProfileFieldModel::class);
+        $this->userMetaModel = Gdn::getContainer()->get(UserMetaModel::class);
     }
 
     /**
@@ -276,6 +286,33 @@ class UserModel extends Gdn_Model implements
         $waitTime = $formatter->formatSeconds($lockoutTime);
 
         return sprintf(t("You’ve reached the maximum login attempts. Please wait %s and try again."), $waitTime);
+    }
+
+    /**
+     * Split properties in 2 arrays; one for the fields mapped to the `User` table, the other for the `UserMeta`.
+     *
+     * @param array $properties array of available properties.
+     * @return array[]
+     */
+    public function splitUserUserMetaFields(array $properties): array
+    {
+        $this->defineSchema();
+        $fields = $this->Schema->fields();
+
+        $userMetaFields = [];
+        foreach ($fields as $fieldKey => $field) {
+            // If the field is amongst the fields that should be placed within the `UserMeta` table.
+            if (in_array($fieldKey, $this::USERMETA_FIELDS)) {
+                $userMetaFields[$fieldKey] = $field;
+                unset($fields[$fieldKey]);
+            }
+        }
+
+        $userFieldsValues = array_intersect_key($properties, $fields);
+        $userMetaFieldsValues = array_intersect_key($properties, $userMetaFields);
+        self::serializeRow($userFieldsValues);
+        self::serializeRow($userMetaFieldsValues);
+        return [$userFieldsValues, $userMetaFieldsValues];
     }
 
     /**
@@ -1292,7 +1329,7 @@ class UserModel extends Gdn_Model implements
      */
     public function filterForm($data, $register = false)
     {
-        if (!$register && $this->session->checkPermission("Garden.Users.Edit") && !c("Garden.Profile.EditUsernames")) {
+        if (!$register && $this->session->checkPermission("Garden.Users.Edit")) {
             $this->removeFilterField("Name");
         }
 
@@ -1377,9 +1414,16 @@ class UserModel extends Gdn_Model implements
             $fields["Attributes"] = dbencode($fields["Attributes"]);
         }
 
-        $userID = $this->SQL->insert($this->Name, $fields);
+        [$userSet, $userMetaSet] = $this->splitUserUserMetaFields($fields);
+
+        $userID = $this->SQL->insert($this->Name, $userSet);
 
         if ($userID) {
+            // If values need to be saved in the `UserMeta` table.
+            if (count($userMetaSet) > 0) {
+                $this->profileFieldModel->updateUserProfileFields($userID, $userMetaSet);
+            }
+
             //force clear cache for that UserID
             $this->clearCache($userID, [self::CACHE_TYPE_USER]);
 
@@ -1716,6 +1760,7 @@ class UserModel extends Gdn_Model implements
      * @param int|false $limit
      * @param int|false $pageNumber
      * @return object DataSet
+     * @deprecated
      */
     public function get($orderFields = "", $orderDirection = "asc", $limit = false, $pageNumber = false)
     {
@@ -1778,6 +1823,8 @@ class UserModel extends Gdn_Model implements
                 ->get()
                 ->firstRow(DATASET_TYPE_ARRAY);
             if ($user) {
+                // Add relevant UserMeta elements to $user.
+                $this->joinUserMeta($user);
                 // If success, cache user
                 $this->userCache($user);
             }
@@ -2092,6 +2139,8 @@ class UserModel extends Gdn_Model implements
         // If not, query DB
         if ($user === Gdn_Cache::CACHEOP_FAILURE) {
             $user = parent::getID($id, DATASET_TYPE_ARRAY);
+            // Add relevant UserMeta elements to $user.
+            $this->joinUserMeta($user);
 
             // We want to cache a non-existent user no-matter what.
             if (!$user) {
@@ -2163,9 +2212,6 @@ class UserModel extends Gdn_Model implements
                 $data[$resultUserID] = $user;
             }
 
-            //echo "from cache:\n";
-            //print_r($Data);
-
             $databaseIDs = array_diff($databaseIDs, array_keys($data));
             unset($cacheData);
         }
@@ -2181,12 +2227,11 @@ class UserModel extends Gdn_Model implements
                 ->result(DATASET_TYPE_ARRAY);
             $databaseData = Gdn_DataSet::index($databaseData, "UserID");
 
-            //echo "from DB:\n";
-            //print_r($DatabaseData);
-
             foreach ($databaseIDs as $iD) {
                 if (isset($databaseData[$iD])) {
                     $user = $databaseData[$iD];
+                    // Add relevant UserMeta elements to $user.
+                    $this->joinUserMeta($user);
                     $this->userCache($user, $iD);
                     // Apply calculated fields
                     $this->setCalculatedFields($user);
@@ -2288,6 +2333,17 @@ class UserModel extends Gdn_Model implements
         $userMetaModel = \Gdn::getContainer()->get(UserMetaModel::class);
         $matchedMetas = $userMetaModel->getUserMeta($userID, $key, $default, $prefix);
         return $matchedMetas;
+    }
+
+    /**
+     * Returns an array of existing user meta.
+     *
+     * @param $userID
+     * @return array|mixed
+     */
+    private function getUserMeta($userID)
+    {
+        return $this->userMetaModel->getUserMeta($userID, "Profile.%", null, self::USERMETA_FIELDS_PREFIX);
     }
 
     /**
@@ -2767,6 +2823,7 @@ class UserModel extends Gdn_Model implements
      *
      * - SaveRoles - Save 'RoleID' field as user's roles. Default false.
      * - HashPassword - Hash the provided password on update. Default true.
+     * - ResetPassword - Reset the user's password.
      * - FixUnique - Try to resolve conflicts with unique constraints on Name and Email. Default false.
      * - ValidateEmail - Make sure the provided email addresses is formatted properly. Default true.
      * - ValidateName - Make sure the provided name is valid. Blacklisted names will always be blocked.
@@ -2951,7 +3008,7 @@ class UserModel extends Gdn_Model implements
                     !$this->session->checkPermission("Garden.Users.Edit");
 
                 // Email address has changed
-                if ($emailIsSet && ($emailIsNotConfirmed || $currentUserEmailIsBeingChanged)) {
+                if ($emailIsSet && $emailIsNotConfirmed && $currentUserEmailIsBeingChanged) {
                     $attributes = val("Attributes", $this->session->User);
                     if (is_string($attributes)) {
                         $attributes = dbdecode($attributes);
@@ -3000,13 +3057,14 @@ class UserModel extends Gdn_Model implements
                     }
 
                     // Determine if the password reset information needs to be cleared.
+                    $existing = $this->getID($userID, DATASET_TYPE_ARRAY);
+
                     $clearPasswordReset = false;
                     if (array_key_exists("Password", $fields)) {
                         // New password? Clear the password reset info.
                         $clearPasswordReset = true;
                     } elseif (array_key_exists("Email", $fields)) {
-                        $row = $this->getID($userID, DATASET_TYPE_ARRAY);
-                        if ($fields["Email"] != val("Email", $row)) {
+                        if ($fields["Email"] != $existing["Email"]) {
                             // New email? Clear the password reset info.
                             $clearPasswordReset = true;
                         }
@@ -3097,6 +3155,10 @@ class UserModel extends Gdn_Model implements
                             ]);
                         }
                     }
+
+                    if ($settings["ResetPassword"] ?? false) {
+                        $this->passwordRequest($user["Email"], ["checkCaptcha" => false]);
+                    }
                 } else {
                     $recordRoleChange = false;
                     if (!$this->validateUniqueFields($username, $email)) {
@@ -3112,6 +3174,10 @@ class UserModel extends Gdn_Model implements
                     }
                     $fields["Roles"] = $roleIDs;
                     $saveRoles = false; // insertInternal will take care of updating the roles.
+
+                    if (isset($private["Private"])) {
+                        $fields["Attributes"]["Private"] = $private["Private"];
+                    }
 
                     // And insert the new user.
                     $userID = $this->insertInternal($fields, $settings);
@@ -3417,6 +3483,7 @@ class UserModel extends Gdn_Model implements
             "countComments?",
             "countPosts?",
             "label?",
+            "hashMethod?",
             "private?" => ["default" => false],
         ]);
         $result->add($this->schema());
@@ -4489,8 +4556,8 @@ class UserModel extends Gdn_Model implements
      * @param int $userID
      * @param null|int|float $clientHour
      *
-     * @throws Exception If the user ID is not valid.
      * @return bool True on success, false if the user is banned or deleted.
+     * @throws Exception If the user ID is not valid.
      */
     public function updateVisit($userID, $clientHour = null)
     {
@@ -4980,6 +5047,7 @@ class UserModel extends Gdn_Model implements
             "About" => null,
             "Title" => null,
             "Location" => null,
+            "DateOfBirth" => null,
         ]);
 
         if ($log) {
@@ -5017,6 +5085,7 @@ class UserModel extends Gdn_Model implements
         }
 
         if ($applicantFound) {
+            $this->clearUserSessions($userID);
             $this->deleteID($userID);
         }
         return true;
@@ -6111,17 +6180,19 @@ SQL;
             $property = [$property => $value];
         }
 
-        $this->defineSchema();
-        $fields = $this->Schema->fields();
+        [$userSet, $userMetaSet] = $this->splitUserUserMetaFields($property);
 
-        $set = array_intersect_key($property, $fields);
-        self::serializeRow($set);
+        if (count($userSet) > 0) {
+            $this->SQL
+                ->update($this->Name)
+                ->set($userSet)
+                ->where("UserID", $rowID)
+                ->put();
+        }
 
-        $this->SQL
-            ->update($this->Name)
-            ->set($set)
-            ->where("UserID", $rowID)
-            ->put();
+        if (count($userMetaSet) > 0) {
+            $this->profileFieldModel->updateUserProfileFields($rowID, $userMetaSet);
+        }
 
         if (in_array($property, ["Permissions"])) {
             $this->clearCache($rowID, [self::CACHE_TYPE_PERMISSIONS]);
@@ -6201,7 +6272,7 @@ SQL;
     /**
      * Cache a user.
      *
-     * @param array $user The user to cache.
+     * @param array|null $user The user to cache.
      * @param int|null $userID The user's ID if not specified in the `$user` parameter.
      * @return bool Returns **true** if the user was cached or **false** otherwise.
      */
@@ -6510,8 +6581,8 @@ SQL;
      * Do the registration values indicate SPAM?
      *
      * @param array $formPostValues
-     * @throws Gdn_UserException Throws an exception if the values trigger a positive SPAM match.
      * @return bool
+     * @throws Gdn_UserException Throws an exception if the values trigger a positive SPAM match.
      */
     public function isRegistrationSpam(array $formPostValues)
     {
@@ -6524,8 +6595,8 @@ SQL;
      *
      * @param string $password A password to test.
      * @param string $username The name of the user. Used to verify the password doesn't contain this value.
-     * @throws Gdn_UserException Throws an exception if the password is too weak.
      * @return bool
+     * @throws Gdn_UserException Throws an exception if the password is too weak.
      */
     public function validatePasswordStrength($password, $username)
     {
@@ -6737,5 +6808,56 @@ SQL;
         $pointReceived["dateUpdated"] = date(DATE_ATOM, $pointData["timestamp"]);
 
         return new UserPointEvent($userEvent, $pointReceived);
+    }
+
+    /**
+     * Fetches relevant User Meta & add them to user array.
+     *
+     * @param $user
+     * @return void
+     * @throws Throwable
+     */
+    private function joinUserMeta(&$user): void
+    {
+        // If we have user data.
+        if (is_array($user) && ($user["UserID"] ?? false)) {
+            // Grab the corresponding user meta.
+            $userMeta = $this->getUserMeta($user["UserID"]);
+
+            $changedMeta = false;
+            // Soft-migration to UserMeta is behind a feature flag check.
+            if (Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG)) {
+                // We go through the fields that should be defined as user meta.
+                foreach (self::USERMETA_FIELDS as $userMetaField) {
+                    //If a meta value is not already set  If that user has a user meta value coming from the `User` table
+                    if (empty($userMeta[$userMetaField]) && $user[$userMetaField] ?? false) {
+                        $this->userMetaModel->setUserMeta(
+                            $user["UserID"],
+                            self::USERMETA_FIELDS_PREFIX . $userMetaField,
+                            $user[$userMetaField]
+                        );
+                        // We delete the value from the `User` table.
+                        $this->SQL
+                            ->update("User")
+                            ->set([$userMetaField => "default(" . $userMetaField . ")"], "", false)
+                            ->where("UserID", $user["UserID"])
+                            ->put();
+                        // Raise a flag that some meta have been changed.
+                        $changedMeta = true;
+                    }
+                }
+
+                // Reload corresponding user meta if they were changed.
+                if ($changedMeta) {
+                    $userMeta = $this->getUserMeta($user["UserID"]);
+                }
+            }
+
+            // If we have any user meta, merge them with the user's data.
+            if (count($userMeta) > 0) {
+                $UserMetaUSer = array_intersect_key($userMeta, array_flip(self::USERMETA_FIELDS));
+                $user = array_merge($user, $UserMetaUSer);
+            }
+        }
     }
 }

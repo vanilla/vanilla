@@ -5,6 +5,7 @@
 
 import { onContent } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { useEffect, useRef } from "react";
 
 type HLJS = typeof import("@library/content/highlightJs").default;
 
@@ -82,4 +83,12 @@ function importHLJS(): Promise<HLJS> {
 
     requestPromise = innerImport();
     return requestPromise;
+}
+
+export function useHLJS(): HLJS | null {
+    const ref = useRef<HLJS>(null);
+    useEffect(() => {
+        importHLJS().then((hljs) => (ref.current = hljs));
+    }, []);
+    return ref.current;
 }

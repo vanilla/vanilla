@@ -63,7 +63,7 @@ export default function Member(props: IMemberResultProps) {
             {!isCompact && (
                 <td className={classNames(classes.cell, classes.posts, classes.postsColumn)}>
                     <span className={classes.minHeight}>
-                        <NumberFormatted value={user.countComments || 0} />
+                        <NumberFormatted value={user.countPosts || 0} />
                     </span>
                 </td>
             )}

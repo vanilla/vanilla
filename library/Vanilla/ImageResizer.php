@@ -430,10 +430,12 @@ class ImageResizer
      * @param resource $srcImage
      * @param ?int $orientation
      * @return resource
+     *
+     * @psalm-suppress UndefinedClass
      */
     private function reorientImage($srcImage, ?int $orientation)
     {
-        if (!is_resource($srcImage)) {
+        if (!is_resource($srcImage) && class_exists(\Gd_Image::class) && !is_a($srcImage, \GdImage::class)) {
             throw new \InvalidArgumentException("Unable to reorient image. Not a valid resource.");
         }
 

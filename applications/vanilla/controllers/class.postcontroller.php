@@ -776,7 +776,7 @@ class PostController extends VanillaController
                 unset($FormValues["CommentID"]);
             }
 
-            if ($DraftID == 0) {
+            if ((int) $DraftID == 0) {
                 $DraftID = $this->Form->getFormValue("DraftID", 0);
                 if ($DraftID) {
                     $draft = $this->DraftModel->getID($DraftID, DATASET_TYPE_ARRAY);

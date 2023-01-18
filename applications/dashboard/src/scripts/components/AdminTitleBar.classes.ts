@@ -7,8 +7,9 @@ import { sticky } from "@library/styles/styleHelpersPositioning";
 import { useThemeCache } from "@library/styles/styleUtils";
 import { Variables } from "@library/styles/Variables";
 import { calc } from "csx";
+import { CSSProperties } from "react";
 
-export const adminTitleBarClasses = (props?) => {
+export const adminTitleBarClasses = useThemeCache((props?: { zIndex: CSSProperties["zIndex"] }) => {
     const { zIndex } = props ?? {};
     const panelLayoutVars = oneColumnVariables();
     const mediaQueries = titleBarVariables().mediaQueries();
@@ -102,7 +103,7 @@ export const adminTitleBarClasses = (props?) => {
         descriptionWrapper,
         description,
     };
-};
+});
 
 export const adminEditTitleBarClasses = useThemeCache(() => {
     const panelLayoutVars = oneColumnVariables();

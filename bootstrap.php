@@ -48,6 +48,7 @@ use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
+use Vanilla\Utility\Timers;
 use Vanilla\Web\Page;
 use Vanilla\Web\SafeCurlHttpHandler;
 use Vanilla\Web\TwigEnhancer;
@@ -80,6 +81,9 @@ if (!class_exists("Gdn")) {
 $dic = new Container();
 Gdn::setContainer($dic);
 
+$timers = new Timers();
+
+$timers->start("core-bootstrap");
 \Vanilla\Bootstrap::configureContainer($dic);
 
 $dic->setInstance(Container::class, $dic)
@@ -94,8 +98,7 @@ $dic->setInstance(Container::class, $dic)
     ->setShared(true)
     ->setClass(OwnSiteProvider::class)
 
-    ->rule(\Vanilla\Utility\Timers::class)
-    ->setShared(true)
+    ->setInstance(\Vanilla\Utility\Timers::class, $timers)
 
     // Root section
     ->rule(\Vanilla\Site\SiteSectionModel::class)
@@ -497,18 +500,22 @@ $dic->setInstance(Container::class, $dic)
     ->rule(DiscussionStatusModel::class)
     ->setShared(true);
 
+$timers->stop("core-bootstrap");
+
 // Run through the bootstrap with dependencies.
 $dic->call(function (
     Container $dic,
     Gdn_Configuration $config,
     \Vanilla\AddonManager $addonManager,
     Gdn_Request $request // remove later
-) {
+) use ($timers) {
+    $timers->start("core-defaults");
     // Load default baseline Garden configurations.
     $config->load(PATH_CONF . "/config-defaults.php");
 
     // Load installation-specific configuration so that we know what apps are enabled.
     $config->load($config->defaultPath(), "Configuration", true);
+    $timers->stop("core-defaults");
 
     /**
      * Bootstrap Early
@@ -517,9 +524,11 @@ $dic->call(function (
      * default config and the general and error functions. More control is possible
      * here, but some things have already been loaded and are immutable.
      */
+    $timers->start("bootstrap-early");
     if (file_exists(PATH_CONF . "/bootstrap.early.php")) {
         require_once PATH_CONF . "/bootstrap.early.php";
     }
+    $timers->stop("bootstrap-early");
 
     $config->caching(true);
     debug($config->get("Debug", false));
@@ -546,6 +555,7 @@ $dic->call(function (
      */
 
     // Start the addons, plugins, and applications.
+    $timers->start("start-addons");
     $addonManager->startAddonsByKey($config->get("EnabledPlugins"), Addon::TYPE_ADDON);
     $addonManager->startAddonsByKey($config->get("EnabledApplications"), Addon::TYPE_ADDON);
     $addonManager->startAddonsByKey(array_keys($config->get("EnabledLocales", [])), Addon::TYPE_LOCALE);
@@ -558,6 +568,7 @@ $dic->call(function (
     $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
 
     $addonManager->applyConfigDefaults($config);
+    $timers->stop("start-addons");
 
     /**
      * Bootstrap Late
@@ -565,9 +576,11 @@ $dic->call(function (
      * All configurations are loaded, as well as the Application, Plugin and Theme
      * managers.
      */
+    $timers->start("bootstrap-late");
     if (file_exists(PATH_CONF . "/bootstrap.late.php")) {
         require_once PATH_CONF . "/bootstrap.late.php";
     }
+    $timers->stop("bootstrap-late");
 
     /**
      * Extension Startup
@@ -575,13 +588,16 @@ $dic->call(function (
      * Allow installed addons to execute startup and bootstrap procedures that they may have, here.
      */
 
+    $timers->start("addons-container-config");
     $addonManager->configureContainer($dic);
-
+    $timers->stop("addons-container-config");
     // Delay instantiation in case an addon has configured it.
     $eventManager = $dic->get(EventManager::class);
 
     // Plugins startup
+    $timers->start("addons-events-binding");
     $addonManager->bindAllEvents($eventManager);
+    $timers->stop("addons-events-binding");
 
     // Prepare our locale.
     $locale = $dic->get(Gdn_Locale::class);
@@ -659,6 +675,9 @@ register_shutdown_function(function () use ($dic) {
 
         // Flush our buffers and close the request.
         $scheduler->finalizeRequest();
+
+        // Now extend our time limit a bit for the local jobs.
+        set_time_limit(60);
 
         // Now this will continue running.
         $timers->start("schedulerDispatch");

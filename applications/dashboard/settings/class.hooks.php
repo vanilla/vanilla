@@ -265,7 +265,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             $sender->addDefinition("Path", Gdn::request()->path());
 
             $get = Gdn::request()->get();
-            unset($get["p"]); // kludge for old index.php?p=/path
             $sender->addDefinition("Query", http_build_query($get));
             // $Sender->addDefinition('MasterView', $Sender->MasterView);
             $sender->addDefinition("InDashboard", $sender->MasterView == "admin" ? "1" : "0");

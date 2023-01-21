@@ -392,10 +392,10 @@ class ImageResizer
      * Read EXIF data from a supported image.
      *
      * @param string $source Path to an image on the file system.
-     * @param string $imageType Type of image being read, identified as one of the IMAGETYPE_* constants.
+     * @param int $imageType Type of image being read, identified as one of the IMAGETYPE_* constants.
      * @return array|null
      */
-    private function exif(string $source, string $imageType): ?array
+    private function exif(string $source, int $imageType): ?array
     {
         $result = null;
 

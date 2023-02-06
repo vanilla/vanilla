@@ -33,7 +33,7 @@ class RSSFeedParser extends AbstractXmlParser
             "item:a" => Schema::parse([
                 "title:s",
                 "link:s",
-                "description:s",
+                "description:s?",
                 "category:s?",
                 "pubDate:s?",
                 "img:o?" => Schema::parse(["src:s", "title:s?", "alt:s?"]),

@@ -13,6 +13,7 @@ import { FormToggle } from "@library/forms/FormToggle";
 import InputBlock from "@library/forms/InputBlock";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock, { IInputTextProps } from "@library/forms/InputTextBlock";
+import PasswordInput from "@library/forms/PasswordInput";
 import RadioButton from "@library/forms/RadioButton";
 import RadioButtonGroup from "@library/forms/RadioButtonGroup";
 import SelectOne from "@library/forms/select/SelectOne";
@@ -267,6 +268,21 @@ export function Labels() {
             <InputBlock label={"My Label"}>
                 <div>{"[Some Input]"}</div>
             </InputBlock>
+        </StoryContent>
+    );
+}
+
+export function Password() {
+    return (
+        <StoryContent>
+            <StoryHeading>Password Input</StoryHeading>
+            <PasswordInput />
+            <StoryHeading>Password Input with error</StoryHeading>
+            <PasswordInput hasError={true} />
+            <StoryHeading>Password Input with show/hide button</StoryHeading>
+            <PasswordInput showUnmask={true} value="myAwesomePassword" />
+            <StoryHeading>Password Input with show/hide button and error</StoryHeading>
+            <PasswordInput showUnmask={true} value="myAwesomePassword" hasError={true} />
         </StoryContent>
     );
 }

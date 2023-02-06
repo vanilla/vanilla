@@ -1,6 +1,4 @@
-<?php if (!defined("APPLICATION")) {
-    exit();
-}
+<?php
 /**
  * Conversations stub content for a new site.
  *

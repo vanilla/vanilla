@@ -342,6 +342,13 @@ paths:
                                         description: The URL code of the category.
                                         minLength: 1
                                         type: string
+                                    ideationType:
+                                        description: Voting type used for ideation posts.
+                                        enum:
+                                            - up
+                                            - up-down
+                                            - false
+                                        x-addon: ideation
                                 required:
                                     - categoryID
                                     - name
@@ -831,6 +838,13 @@ components:
                     description: Category is featured
                     type: boolean
                     default: false
+                ideationType:
+                    description: Voting type used for ideation posts.
+                    enum:
+                        - up
+                        - up-down
+                        - false
+                    x-addon: ideation
             required:
                 - name
                 - urlcode
@@ -917,6 +931,13 @@ components:
                     description: The URL code of the category.
                     minLength: 1
                     type: string
+                ideationType:
+                    description: Voting type used for ideation posts.
+                    enum:
+                        - up
+                        - up-down
+                        - false
+                    x-addon: ideation
             required:
                 - categoryID
                 - name

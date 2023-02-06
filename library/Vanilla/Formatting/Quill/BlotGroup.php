@@ -90,11 +90,11 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface
     /**
      * @inheritdoc
      */
-    public function canNest(BlotGroup $otherGroup): bool
+    public function canNest(BlotGroup $blotGroup): bool
     {
         $lastIndex = count($this->blotsAndGroups) - 1;
         $lastItem = $this->blotsAndGroups[$lastIndex] ?? null;
-        return $lastItem instanceof NestingParentInterface && $lastItem->canNest($otherGroup);
+        return $lastItem instanceof NestingParentInterface && $lastItem->canNest($blotGroup);
     }
 
     /**
@@ -122,13 +122,13 @@ class BlotGroup implements NestableItemInterface, NestingParentInterface
     /**
      * See if another blot group can be merged into this one.
      *
-     * @param BlotGroup $otherGroup
+     * @param BlotGroup $blotGroup
      *
      * @return bool
      */
-    public function canMerge(BlotGroup $otherGroup): bool
+    public function canMerge(BlotGroup $blotGroup): bool
     {
-        $otherGroupMainBlot = $otherGroup->getMainBlot();
+        $otherGroupMainBlot = $blotGroup->getMainBlot();
         return $otherGroupMainBlot instanceof NestingParentInterface &&
             $this->getMainBlot() instanceof NestingParentInterface &&
             !$otherGroupMainBlot->shouldClearCurrentGroup($this);

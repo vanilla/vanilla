@@ -13,7 +13,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, px } from "csx";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { userContentVariables } from "@library/content/UserContent.variables";
 
 export const embedContainerVariables = useThemeCache(() => {
@@ -65,6 +65,20 @@ export const embedContainerClasses = useThemeCache(() => {
     };
 
     const sizes: { [x in EmbedContainerSize]: CSSObject } = {
+        [EmbedContainerSize.INLINE]: {
+            width: "auto",
+            display: "inline-flex",
+            alignItems: "center",
+            maxWidth: percent(100),
+            padding: "2px 6px",
+            lineHeight: 1,
+            textAlign: "start",
+            // Tiny bit of margin so that our cursor appears on the left and right.
+            marginLeft: 1,
+            marginRight: 1,
+            position: "relative",
+            top: 2,
+        },
         [EmbedContainerSize.SMALL]: {
             width: px(500),
             maxWidth: percent(100),
@@ -89,7 +103,8 @@ export const embedContainerClasses = useThemeCache(() => {
             background: ColorsUtils.colorOut(userContentVariables().embeds.bg ?? vars.colors.bg),
             display: "block",
             position: "relative",
-            margin: "auto",
+            marginRight: "auto",
+            marginLeft: 0,
             padding: withPadding ? vars.spacing.padding : 0,
             ...(inEditor ? userSelect() : {}),
             ...sizes[size],
@@ -160,5 +175,13 @@ export const embedContentClasses = useThemeCache(() => {
         position: "relative",
     });
 
-    return { small, root };
+    const menuBar = css({
+        position: "absolute",
+        left: "50%",
+        top: 0,
+        transform: "translate(-50%, -20px)",
+        zIndex: 11,
+    });
+
+    return { small, root, menuBar };
 });

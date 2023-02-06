@@ -808,7 +808,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             /**
              * @var global.embed.text.width
              */
-            width: 640,
+            width: 720,
         },
         /**
          * @varGroup global.embed.select

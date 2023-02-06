@@ -70,14 +70,29 @@ export function userContentMixin(): CSSObject {
             ...{
                 [`& > li`]: {
                     // There are unrelated !important styles in _style.scss which is overrides
-                    listStyle: "none!important",
+                    listStyle: "disc !important",
                     position: "relative",
+                    "&::marker": {
+                        fontSize: ".85rem",
+                    },
                 },
-                [`& > li::before`]: {
-                    fontFamily: `'Arial', serif`,
-                    content: `"•"`,
-                    position: "absolute",
-                    left: em(-1),
+                [`& ul > li`]: {
+                    listStyle: "circle !important",
+                },
+                [`& ul ul > li`]: {
+                    listStyle: "square !important",
+                },
+                [`& ul ul ul > li`]: {
+                    listStyle: "disc !important",
+                },
+                [`& ul ul ul ul > li`]: {
+                    listStyle: "circle !important",
+                },
+                [`& ul ul ul ul ul > li`]: {
+                    listStyle: "square !important",
+                },
+                [`& ul ul ul ul ul ul > li`]: {
+                    listStyle: "disc !important",
                 },
                 [`& ol, & ul`]: {
                     margin: vars.list.nestedList.margin,
@@ -114,14 +129,18 @@ export function userContentMixin(): CSSObject {
         },
         [`& li`]: {
             margin: `5px 0`,
-            ...{
-                [`&, & *:first-child`]: {
-                    marginTop: 0,
-                },
-                [`&, & *:last-child`]: {
-                    marginBottom: 0,
-                },
+            [`&, & *:first-child`]: {
+                marginTop: 0,
             },
+            [`&, & *:last-child`]: {
+                marginBottom: 0,
+            },
+        },
+        [`& .listItemChild::after`]: {
+            // Clearfix for floating images in lists.
+            content: '""',
+            display: "table",
+            clear: "both",
         },
     };
 
@@ -212,6 +231,13 @@ export function userContentMixin(): CSSObject {
             color: ColorsUtils.colorOut(vars.codeBlock.fg),
             backgroundColor: ColorsUtils.colorOut(vars.codeBlock.bg),
             ...Mixins.padding(vars.codeBlock.padding),
+            "&::moz-selection, &&.codeBlock::selection": {
+                background: "#c1def1",
+            },
+        },
+
+        "& code": {
+            fontFamily: `Menlo, Monaco, Consolas, "Courier New", monospace`,
         },
     };
 
@@ -275,6 +301,12 @@ export function userContentMixin(): CSSObject {
     const blockquotes: CSSObject = {
         ".blockquote": {
             color: ColorsUtils.colorOut(blockQuoteVars.colors.fg),
+        },
+        ".blockquote-content": {
+            ...Mixins.margin({ top: 8 }),
+            "&:first-of-type": {
+                ...Mixins.margin({ top: 0 }),
+            },
         },
     };
 

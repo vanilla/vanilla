@@ -12,6 +12,7 @@ use Garden\StaticCacheTranslationTrait;
 use Logger;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
@@ -33,6 +34,8 @@ use Vanilla\Formatting\Quill;
 
 /**
  * Format service for the rich editor format. Rendered and parsed using Quill.
+ *
+ * @template-implements FormatInterface<RichFormatParsed>
  */
 class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAwareInterface
 {
@@ -42,6 +45,7 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     use UserMentionsTrait;
 
     const FORMAT_KEY = "rich";
+    const RICH2_FORMAT_KEY = "rich2";
 
     /** @var string */
     const RENDER_ERROR_MESSAGE = "There was an error rendering this rich post.";
@@ -80,8 +84,9 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
 
     /**
      * @inheritdoc
+     * @return RichFormatParsed
      */
-    public function renderHTML(string $content, bool $throw = false): string
+    public function parse(string $content)
     {
         try {
             $content = $this->filterer->filter($content);
@@ -91,6 +96,56 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
                 $operations,
                 $this->allowExtendedContent ? Quill\Parser::PARSE_MODE_EXTENDED : Quill\Parser::PARSE_MODE_NORMAL
             );
+            $parsed = new RichFormatParsed($content, $blotGroups);
+            return $parsed;
+        } catch (\Throwable $e) {
+            $this->logBadInput($content);
+            return new RichFormatParsed(
+                '[{"insert":"' . self::RENDER_ERROR_MESSAGE . '"}]',
+                $this->parser->parse([["insert" => self::RENDER_ERROR_MESSAGE]])
+            );
+        }
+    }
+
+    /**
+     * Ensure we have parsed content.
+     *
+     * @param RichFormatParsed|string $rawOrParsed
+     *
+     * @return RichFormatParsed
+     */
+    private function ensureParsed($rawOrParsed): RichFormatParsed
+    {
+        if ($rawOrParsed instanceof RichFormatParsed) {
+            return $rawOrParsed;
+        } else {
+            return $this->parse($rawOrParsed);
+        }
+    }
+
+    /**
+     * Ensure we have raw content.
+     *
+     * @param RichFormatParsed|string $rawOrParsed
+     *
+     * @return string
+     */
+    private function ensureRaw($rawOrParsed): string
+    {
+        if ($rawOrParsed instanceof RichFormatParsed) {
+            return $rawOrParsed->getRawContent();
+        } else {
+            return $rawOrParsed;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function renderHTML($content, bool $throw = false): string
+    {
+        try {
+            $blotGroups = $this->ensureParsed($content)->getBlotGroups();
             $html = $this->renderer->render($blotGroups);
             $html = $this->applyHtmlProcessors($html);
             return $html;
@@ -107,13 +162,11 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function renderPlainText(string $content): string
+    public function renderPlainText($content): string
     {
         $text = "";
         try {
-            $content = $this->filterer->filter($content);
-            $operations = Quill\Parser::jsonToOperations($content);
-            $blotGroups = $this->parser->parse($operations);
+            $blotGroups = $this->ensureParsed($content)->getBlotGroups();
 
             /** @var Quill\BlotGroup $blotGroup */
             foreach ($blotGroups as $blotGroup) {
@@ -129,12 +182,10 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $content): string
+    public function renderQuote($content): string
     {
         try {
-            $content = $this->filterer->filter($content);
-            $operations = Quill\Parser::jsonToOperations($content);
-            $blotGroups = $this->parser->parse($operations, Quill\Parser::PARSE_MODE_QUOTE);
+            $blotGroups = $this->ensureParsed($content)->getBlotGroups();
             $rendered = $this->renderer->render($blotGroups);
 
             // Trim out breaks and empty paragraphs.
@@ -150,8 +201,9 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function filter(string $content): string
+    public function filter($content): string
     {
+        $content = $this->ensureRaw($content);
         $filtered = $this->filterer->filter($content);
         $this->renderHTML($filtered, true);
         return $filtered;
@@ -193,8 +245,10 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseImageUrls(string $content): array
+    public function parseImageUrls($content): array
     {
+        $content = $this->ensureRaw($content);
+
         $urls = [];
 
         try {
@@ -213,8 +267,10 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseImages(string $content): array
+    public function parseImages($content): array
     {
+        $content = $this->ensureRaw($content);
+
         $props = [];
         try {
             $embeds = $this->parseEmbedsOfType($content, ImageEmbed::class);
@@ -235,8 +291,10 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseAttachments(string $content): array
+    public function parseAttachments($content): array
     {
+        $content = $this->ensureRaw($content);
+
         $attachments = [];
 
         try {
@@ -255,8 +313,10 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseMentions(string $content, bool $skipTaggedContent = true): array
+    public function parseMentions($content, bool $skipTaggedContent = true): array
     {
+        $content = $this->ensureRaw($content);
+
         try {
             $operations = Quill\Parser::jsonToOperations($content);
             return $this->parser->parseMentionUsernames($operations);
@@ -269,8 +329,10 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseHeadings(string $content): array
+    public function parseHeadings($content): array
     {
+        $content = $this->ensureRaw($content);
+
         $outline = [];
 
         try {
@@ -459,7 +521,7 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritDoc
      */
-    public function parseAllMentions(string $body): array
+    public function parseAllMentions($body): array
     {
         $mentions = [];
 

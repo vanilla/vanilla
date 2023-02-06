@@ -13,6 +13,7 @@ use Vanilla\Formatting\Formats\BBCodeFormat;
 use Vanilla\Formatting\Formats\DisplayFormat;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\Formats\MarkdownFormat;
+use Vanilla\Formatting\Formats\Rich2Format;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\Formats\WysiwygFormat;
@@ -467,6 +468,124 @@ EOT
                                         "label" => "",
                                     ],
                                     "embedType" => "quote",
+                                ],
+                            ],
+                        ],
+                    ],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Test the anonymization of Rich quotes.
+     *
+     * @param string $body
+     * @param string $expected
+     * @param string $username
+     * @dataProvider provideRich2Data
+     */
+    public function testRich2Anonymization(string $body, string $expected, string $username = self::USERNAME_NO_SPACE)
+    {
+        $formatter = self::container()->get(Rich2Format::class);
+        $result = $formatter->removeUserPII($username, $body);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Provide Rich post body/expected result in a way that can be consumed as a data provider.
+     *
+     * @return array Returns a data provider array.
+     */
+    public function provideRich2Data(): array
+    {
+        $baseUrl = $this->getBaseUrl();
+        $profileUrlNoSpace = $baseUrl . self::PROFILE_URL_NO_SPACE;
+        $profileUrlAnonymize = $baseUrl . self::PROFILE_URL_ANONYMIZE;
+
+        return [
+            "remove at-mention" => [
+                json_encode([
+                    [
+                        "type" => "p",
+                        "children" => [
+                            [
+                                "type" => "@",
+                                "children" => [
+                                    0 => [
+                                        "text" => "@admin",
+                                    ],
+                                ],
+                                "userID" => 7,
+                                "name" => self::USERNAME_NO_SPACE,
+                                "url" => $profileUrlNoSpace,
+                                "photoUrl" =>
+                                    "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+                                "dateLastActive" => "2022-12-20T17:41:59+00:00",
+                                "banned" => 0,
+                                "private" => false,
+                                "domID" => "mentionSuggestion7",
+                                "value" => "",
+                            ],
+                        ],
+                    ],
+                ]),
+                json_encode([
+                    [
+                        "type" => "p",
+                        "children" => [
+                            [
+                                "type" => "@",
+                                "userID" => -1,
+                                "name" => "[Deleted User]",
+                                "url" => $profileUrlAnonymize,
+                                "photoUrl" =>
+                                    "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+                                "dateLastActive" => "2022-12-20T17:41:59+00:00",
+                                "banned" => 0,
+                                "private" => false,
+                                "domID" => "mentionSuggestion7",
+                                "value" => "",
+                                "children" => [
+                                    [
+                                        "text" => "@admin",
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]),
+            ],
+            "remove profile url" => [
+                json_encode([
+                    [
+                        "type" => "p",
+                        "children" => [
+                            [
+                                "type" => "a",
+                                "url" => $profileUrlNoSpace,
+                                "target" => "_self",
+                                "children" => [
+                                    [
+                                        "text" => self::USERNAME_NO_SPACE,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]),
+                json_encode([
+                    [
+                        "type" => "p",
+                        "children" => [
+                            [
+                                "type" => "a",
+                                "url" => $profileUrlAnonymize,
+                                "target" => "_self",
+                                "children" => [
+                                    [
+                                        "text" => "[Deleted User]",
+                                    ],
                                 ],
                             ],
                         ],

@@ -41,6 +41,24 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
         return $this->makeDataProvider("getHtml", "HTML");
     }
 
+    private function formatKey(): string
+    {
+        return $this->prepareFormatter()::FORMAT_KEY;
+    }
+
+    /**
+     * Get a format service interface.
+     *
+     * @return FormatService
+     */
+    private function formatService(): FormatService
+    {
+        $preparedFormat = $this->prepareFormatter();
+        $service = self::container()->get(FormatService::class);
+        $service->registerFormat($this->formatKey(), $preparedFormat);
+        return $service;
+    }
+
     /**
      * Test the HTML rendering of the format against fixtures.
      *
@@ -52,8 +70,15 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testRenderHtml(string $input, string $expectedOutput, string $errorMessage)
     {
-        $format = $this->prepareFormatter();
-        $this->assertHtmlStringEqualsHtmlString($expectedOutput, $format->renderHTML($input), $errorMessage);
+        $format = $this->formatService();
+        $this->assertHtmlStringEqualsHtmlString(
+            $expectedOutput,
+            $format->renderHTML($input, $this->formatKey()),
+            $errorMessage
+        );
+        // Now with a parse first
+        $parsed = $format->parse($input, $this->formatKey());
+        $this->assertHtmlStringEqualsHtmlString($expectedOutput, $format->renderHTML($parsed), $errorMessage);
     }
 
     /**
@@ -77,8 +102,10 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testRenderExcerpt(string $input, string $expectedOutput, string $errorMessage)
     {
-        $format = $this->prepareFormatter();
-        $this->assertEquals(trim($expectedOutput), $format->renderExcerpt($input), $errorMessage);
+        $format = $this->formatService();
+        $this->assertEquals(trim($expectedOutput), $format->renderExcerpt($input, $this->formatKey()), $errorMessage);
+        $parsed = $format->parse($input, $this->formatKey());
+        $this->assertEquals(trim($expectedOutput), $format->renderExcerpt($parsed, $this->formatKey()), $errorMessage);
     }
 
     /**
@@ -102,11 +129,18 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testRenderPlainText(string $input, string $expectedOutput, string $errorMessage)
     {
-        $format = $this->prepareFormatter();
+        $format = $this->formatService();
         $this->assertEquals(
             trim($expectedOutput), // We can have extra trailing whitespace from our IDE.
-            $format->renderPlainText($input),
+            $format->renderPlainText($input, $this->formatKey()),
             $errorMessage
+        );
+
+        $parsed = $format->parse($input, $this->formatKey());
+        $this->assertEquals(
+            trim($expectedOutput), // We can have extra trailing whitespace from our IDE.
+            $format->renderPlainText($parsed, $this->formatKey()),
+            $errorMessage . " (pre-parsed)"
         );
     }
 
@@ -131,8 +165,18 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testRenderQuote(string $input, string $expectedOutput, string $errorMessage)
     {
-        $format = $this->prepareFormatter();
-        $this->assertHtmlStringEqualsHtmlString($expectedOutput, $format->renderQuote($input), $errorMessage);
+        $format = $this->formatService();
+        $this->assertHtmlStringEqualsHtmlString(
+            $expectedOutput,
+            $format->renderQuote($input, $this->formatKey()),
+            $errorMessage
+        );
+        $parsed = $format->parse($input, $this->formatKey());
+        $this->assertHtmlStringEqualsHtmlString(
+            $expectedOutput,
+            $format->renderQuote($parsed, $this->formatKey()),
+            $errorMessage
+        );
     }
 
     /**
@@ -155,8 +199,8 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testParseHeadings(string $input, array $expectedOutput)
     {
-        $format = $this->prepareFormatter();
-        $headings = $format->parseHeadings($input);
+        $format = $this->formatService();
+        $headings = $format->parseHeadings($input, $this->formatKey());
         $this->assertEquals(json_encode($expectedOutput, JSON_PRETTY_PRINT), json_encode($headings, JSON_PRETTY_PRINT));
     }
 
@@ -180,8 +224,8 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testParseImages(string $input, array $expectedOutput)
     {
-        $format = $this->prepareFormatter();
-        $images = $format->parseImages($input);
+        $format = $this->formatService();
+        $images = $format->parseImages($input, $this->formatKey());
         $this->assertEquals($expectedOutput, $images);
     }
 
@@ -205,8 +249,8 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testParseImageUrls(string $input, array $expectedOutput)
     {
-        $format = $this->prepareFormatter();
-        $images = $format->parseImageUrls($input);
+        $format = $this->formatService();
+        $images = $format->parseImageUrls($input, $this->formatKey());
         $this->assertEquals(json_encode($expectedOutput, JSON_PRETTY_PRINT), json_encode($images, JSON_PRETTY_PRINT));
     }
 
@@ -230,8 +274,8 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testParseAttachments(string $input, array $expectedOutput)
     {
-        $format = $this->prepareFormatter();
-        $headings = $format->parseAttachments($input);
+        $format = $this->formatService();
+        $headings = $format->parseAttachments($input, $this->formatKey());
         $this->assertEquals(json_encode($expectedOutput, JSON_PRETTY_PRINT), json_encode($headings, JSON_PRETTY_PRINT));
     }
 
@@ -255,8 +299,8 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testParseMentions(string $input, array $expectedOutput)
     {
-        $format = $this->prepareFormatter();
-        $this->assertSame($expectedOutput, $format->parseMentions($input));
+        $format = $this->formatService();
+        $this->assertSame($expectedOutput, $format->parseMentions($input, $this->formatKey()));
     }
 
     /**
@@ -264,7 +308,7 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testParseImageUrlsNullFormat()
     {
-        $formatService = self::container()->get(FormatService::class);
+        $formatService = $this->formatService();
         $result = $formatService->parseImageUrls("test content", null);
         $this->assertEquals([], $result, "NotFoundFormat::parseImageUrl returns an empty array");
     }
@@ -274,10 +318,10 @@ abstract class AbstractFormatTestCase extends MinimalContainerTestCase
      */
     public function testParseImageUrlsExcludeEmojis()
     {
-        $formatService = $this->prepareFormatter();
+        $formatService = $this->formatService();
         $content =
             '<img class="emoji" src="http://dev.vanilla.localhost/resources/emoji/smile.png" title=":)" alt=":)" height="20">';
-        $result = $formatService->parseImageUrls($content);
+        $result = $formatService->parseImageUrls($content, $this->formatKey());
         $this->assertEquals([], $result);
     }
 

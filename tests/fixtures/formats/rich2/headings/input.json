@@ -1,0 +1,7 @@
+[
+  { "type": "h2", "children": [{ "text": "Here is a H2 title" }] },
+  { "type": "h2", "children": [{ "text": "Here is a H2 title" }] },
+  { "type": "h3", "children": [{ "text": "Here is a H3 title" }] },
+  { "type": "h4", "children": [{ "text": "Here is a H4 title" }] },
+  { "type": "h5", "children": [{ "text": "Here is a H5 title" }] }
+]

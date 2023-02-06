@@ -35,14 +35,17 @@ export function NumberedPager(props: INumberedPagerProps) {
         currentPage = 0,
         pageLimit = 10,
         totalResults = 0,
-        isMobile = false,
         rangeOnly = false,
+        isMobile: _isMobile,
         className,
     } = props;
     const selfRef = useRef<HTMLDivElement>(null);
     const measure = useMeasure(selfRef);
-    const notMobile = !isMobile && measure.width > 600;
-    const classes = numberedPagerClasses(!notMobile);
+
+    //in test environment, measure.width is 0. so we must be able to force mobile/not mobile through props
+    const isMobile = _isMobile !== undefined ? _isMobile : measure.width > 600;
+
+    const classes = numberedPagerClasses(isMobile);
     const vars = numberedPagerVariables();
     const [showJumper, setShowJumper] = useState<boolean>(false);
     const [pageNumber, setPageNumber] = useState<number>(1);
@@ -127,7 +130,7 @@ export function NumberedPager(props: INumberedPagerProps) {
     // Return a full pager component
     return (
         <div className={cx(classes.root, className)} ref={selfRef}>
-            {notMobile && <div aria-hidden="true" />}
+            {!isMobile && <div aria-hidden="true" />}
             <div className={classes.nextPageWrapper}>
                 <Button
                     className={classes.nextPageButton}
@@ -150,7 +153,7 @@ export function NumberedPager(props: INumberedPagerProps) {
                 ) : (
                     <>
                         {displayRange}
-                        {notMobile && (
+                        {!isMobile && (
                             <>
                                 <NextPrevButton
                                     direction="prev"

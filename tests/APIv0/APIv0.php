@@ -11,9 +11,11 @@ use Garden\Container\Container;
 use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
 use Gdn;
+use League\Uri\Http;
 use PDO;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Vanilla\Utility\UrlUtils;
 use VanillaTests\TestDatabase;
 
 /**
@@ -106,7 +108,23 @@ class APIv0 extends HttpClient
      */
     public function getConfig($key, $default = null)
     {
-        return valr($key, $this->config, $default);
+        return $this->getGdnConfig()->get($key, $default);
+    }
+
+    /**
+     * Get a Gdn_Configuration for the site.
+     *
+     * @return \Gdn_Configuration
+     */
+    private function getGdnConfig(): \Gdn_Configuration
+    {
+        $config = new \Gdn_Configuration();
+        // Load default baseline Garden configurations.
+        $config->load(PATH_CONF . "/config-defaults.php");
+
+        // Load installation-specific configuration so that we know what apps are enabled.
+        $config->load($this->getConfigPath(), "Configuration", true);
+        return $config;
     }
 
     /**
@@ -219,7 +237,6 @@ class APIv0 extends HttpClient
             "Name" => "circleci",
             "Password" => "circleci",
             "PasswordMatch" => "circleci",
-            "HtaccessAction" => "skip",
         ];
 
         $r = $this->post("/dashboard/setup.json", $post);
@@ -254,6 +271,19 @@ class APIv0 extends HttpClient
     public function createRequest(string $method, string $uri, $body, array $headers = [], array $options = [])
     {
         $request = parent::createRequest($method, $uri, $body, $headers, $options);
+
+        $uri = Http::createFromString($request->getUrl());
+
+        if (str_ends_with($uri->getPath(), ".json")) {
+            // What a horrific bug. I still would rather not need to configure nginx for a couple old tests
+            // So instead we map the .json suffixes to just use the delivery type.
+            // https://bugs.php.net/bug.php?id=61286
+            $uri = $uri->withPath(str_replace(".json", "", $uri->getPath()));
+            $uri = UrlUtils::replaceQuery($uri, [
+                "DeliveryType" => DELIVERY_TYPE_DATA,
+            ]);
+            $request->setUrl((string) $uri);
+        }
 
         // Add the cookie of the calling user.
         if ($user = $this->getUser()) {
@@ -386,28 +416,27 @@ class APIv0 extends HttpClient
     }
 
     /**
-     * Save some config values via API.
-     *
-     * This method saves config values via a back-door endpoint copied to cgi-bin.
-     * This is necessary because HHVM runs as root and takes over the config file and so it can only be edited in an
-     * API context.
+     * Save some config values.
      *
      * @param array $values The values to save to the config.
      * @return array
      */
     public function saveToConfig(array $values)
     {
-        $r = $this->post("/cgi-bin/saveconfig.php", $values, ["Content-Type: application/json;charset=utf-8"]);
-        $this->config = $r->getBody();
-        return $this->config;
+        $config = $this->getGdnConfig();
+        $config->saveToConfig($values);
+        $config->save();
+        return $config->get(".");
     }
 
     /**
-     * Delete the config via API.
+     * Delete the config.
      */
     public function deleteConfig()
     {
-        $this->post("/cgi-bin/saveconfig.php?deleteConfig=true");
+        if (file_exists($this->getConfigPath())) {
+            unlink($this->getConfigPath());
+        }
 
         if (file_exists($this->getConfigPath())) {
             throw new \Exception("Delete config did not work!");

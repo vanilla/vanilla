@@ -12,6 +12,7 @@ use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Utility\HtmlUtils;
 $UserPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
 
+
 $Discussion = $this->data('Discussion');
 $Author = Gdn::userModel()->getID($Discussion->InsertUserID); // userBuilder($Discussion, 'Insert');
 
@@ -51,11 +52,16 @@ $this->fireEvent('BeforeDiscussionDisplay');
                     echo formatMeAction($Discussion);
     ?>
                 </span>
+
                 <span class="AuthorInfo">
                     <?php
-                    echo wrapIf(htmlspecialchars(val('Title', $Author)), 'span', ['class' => 'MItem AuthorTitle']);
-                    echo wrapIf(htmlspecialchars(val('Location', $Author)), 'span', ['class' => 'MItem AuthorLocation']);
-                    $this->fireEvent('AuthorInfo');
+                        if (Gdn::config("Feature.CustomProfileFields.Enabled") && function_exists('getCustomFields') && $Author->UserID && !$Author->Deleted) {
+                            echo getCustomFields($Author->UserID);
+                        } else {
+                            echo wrapIf(htmlspecialchars(val('Title', $Author)), 'span', ['class' => 'MItem AuthorTitle']);
+                            echo wrapIf(htmlspecialchars(val('Location', $Author)), 'span', ['class' => 'MItem AuthorLocation']);
+                        }
+                        $this->fireEvent("AuthorInfo");
                     ?>
                 </span>
             </div>

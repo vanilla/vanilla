@@ -1,0 +1,33 @@
+[
+  {
+    "type": "p",
+    "children": [
+      { "text": "" },
+      {
+        "type": "@",
+        "children": [{ "text": "@admin" }],
+        "userID": 7,
+        "name": "admin",
+        "url": "https://dev.vanilla.localhost/profile/admin",
+        "photoUrl": "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+        "dateLastActive": "2022-12-20T17:41:59+00:00",
+        "banned": 0,
+        "private": false,
+        "domID": "mentionSuggestion7",
+        "value": ""
+      },
+      { "text": "" }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "type": "a",
+        "url": "http://vanilla.test/minimal-container-test/profile/john",
+        "target": "_self",
+        "children": [{ "text": "This sentence is a link" }]
+      }
+    ]
+  }
+]

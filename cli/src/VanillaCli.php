@@ -53,6 +53,9 @@ class VanillaCli extends CliApplication
         $this->addMethod(Commands\UserMentionIndex\IndexMentionCommand::class, "indexMentions", [
             self::OPT_SETTERS => true,
         ]);
+        $this->addMethod(Commands\SplitTestsCommand::class, "splitTests", [
+            self::OPT_SETTERS => true,
+        ]);
 
         $addonManager = $this->getContainer()->get(AddonManager::class);
         $addonManager->startAddonsByKey(["dashboard"], Addon::TYPE_ADDON);

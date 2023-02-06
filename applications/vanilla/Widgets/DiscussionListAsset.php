@@ -68,11 +68,17 @@ class DiscussionListAsset extends AbstractLayoutAsset
     }
 
     /**
+     * @param array|null $inputParams
+     *
      * @inheritdoc
      */
-    public function getProps(): ?array
+    public function getProps(?array $inputParams = null): ?array
     {
         $params = $this->props;
+
+        $params["apiParams"]["siteSectionID"] =
+            $inputParams["siteSection"]["sectionID"] ?? $params["apiParams"]["siteSectionID"];
+
         $props = $this->baseDiscussionWidget->getProps($params);
 
         //at this point we should have some defaults

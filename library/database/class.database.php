@@ -601,7 +601,7 @@ class Gdn_Database implements InjectableInterface
 
             return $this->_CurrentResultSet;
         } finally {
-            $this->timers->stop(["db", $timerName]);
+            $this->timers->stop(["db", $timerName], ["query" => $sql, "input" => $inputParameters]);
         }
     }
 

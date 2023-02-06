@@ -42,7 +42,7 @@ class AltTest extends AbstractAPIv2Test
     public function testAltInstallWithNoUpdateToken()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionCode(403);
+        $this->expectExceptionCode(401);
         $this->doAltInstallWithUpdateToken(true, "xkcd", "");
     }
 
@@ -80,14 +80,13 @@ class AltTest extends AbstractAPIv2Test
         $apiv0->saveToConfig(["Garden.Installed" => true]);
 
         // Do a simple get to make sure there isn't an error.
-        $data = $this->dispatchData("/discussions", DELIVERY_TYPE_DATA);
+        $data = $apiv0->get("/discussions.json")->getBody();
         $this->assertIsArray($data);
         /** @var \Gdn_DataSet $discussions */
         $discussions = $data["Discussions"] ?? null;
-        $discussions = $discussions->resultArray();
         $this->assertIsArray($discussions, "Could not find discussions in: " . json_encode($data, JSON_PRETTY_PRINT));
 
-        if (count($discussions, 3)) {
+        if (count($discussions) === 3) {
             $this->assertCount(3, $discussions);
         } elseif (!$retried) {
             // This test is notoriously flaky.

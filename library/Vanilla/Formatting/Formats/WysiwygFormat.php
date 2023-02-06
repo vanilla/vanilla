@@ -40,9 +40,14 @@ class WysiwygFormat extends HtmlFormat
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $content, bool $enhance = true): string
+    public function renderHtml($content, bool $enhance = true): string
     {
-        $result = FormatUtil::replaceButProtectCodeBlocks('/\\\r\\\n/', "", $content);
+        if ($content instanceof HtmlFormatParsed) {
+            $result = $content;
+        } else {
+            $result = FormatUtil::replaceButProtectCodeBlocks('/\\\r\\\n/', "", $content);
+        }
+
         return parent::renderHtml($result, $enhance);
     }
 
@@ -88,8 +93,12 @@ class WysiwygFormat extends HtmlFormat
     /**
      * @inheritDoc
      */
-    public function parseAllMentions(string $body): array
+    public function parseAllMentions($body): array
     {
+        if ($body instanceof HtmlFormatParsed) {
+            $body = $body->getRawHtml();
+        }
+
         $matches = [];
         $atMention = $this->getNonRichAtMention();
         $urlMention = $this->getUrlPattern();

@@ -9,9 +9,11 @@ namespace VanillaTests\Library\Vanilla\Formatting\Formats;
 
 use PHPUnit\Framework\TestCase;
 use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\Contracts\Formatting\FormatParsedInterface;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Formatting\Formats\RichFormatParsed;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\Fixtures\Formatting\FormatFixtureFactory;
 use VanillaTests\Library\Vanilla\Formatting\UserMentionTestTraits;
@@ -162,5 +164,39 @@ class RichFormatTest extends TestCase
                 ["nested mention", $this->USERNAME_NO_SPACE],
             ],
         ];
+    }
+
+    /**
+     * Test parse method with good input
+     * @return void
+     */
+    public function testParseWithGoodInput()
+    {
+        $input = '[{"insert":"good input"}]';
+        $expected = $input;
+
+        /** @var RichFormatParsed $output */
+        $output = $this->prepareFormatter()->parse($input);
+        $this->assertInstanceOf(RichFormatParsed::class, $output);
+        $this->assertInstanceOf(FormatParsedInterface::class, $output);
+        $this->assertSame($expected, $output->getRawContent());
+        $this->assertSame($expected, $output->getBlotGroups()->stringify()->text);
+    }
+
+    /**
+     * Test parse method with bad input
+     * @return void
+     */
+    public function testParseWithBadInput()
+    {
+        $input = "invalid input";
+        $expected = '[{"insert":"' . RichFormat::RENDER_ERROR_MESSAGE . '"}]';
+
+        /** @var RichFormatParsed $output */
+        $output = $this->prepareFormatter()->parse($input);
+        $this->assertInstanceOf(RichFormatParsed::class, $output);
+        $this->assertInstanceOf(FormatParsedInterface::class, $output);
+        $this->assertSame($expected, $output->getRawContent());
+        $this->assertSame($expected, $output->getBlotGroups()->stringify()->text);
     }
 }

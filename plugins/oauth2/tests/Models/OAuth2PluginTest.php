@@ -9,8 +9,6 @@ namespace Vanilla\OAuth2\Tests\Models;
 
 use Firebase\JWT\JWT;
 use Garden\Web\Exception\ResponseException;
-use Garden\Web\Exception\ServerException;
-use Gdn_UserException;
 use PHPUnit\Framework\TestCase;
 use UserAuthenticationNonceModel;
 use VanillaTests\Fixtures\Request;
@@ -317,7 +315,7 @@ class OAuth2PluginTest extends SiteTestCase
      * Test the Post return URL that goes from `/entry/oauth2` -> `/entry/connect/oauth2`.
      *
      */
-    public function testSssertReturnPostUrlFlow(): void
+    public function testAssertReturnPostUrlFlow(): void
     {
         $this->setupSingleProvider();
         $user1 = $this->createUser(["name" => "test1_test1"]);

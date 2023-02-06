@@ -36,10 +36,6 @@ class Gdn_Session implements LoggerAwareInterface
     /** Short time interval for short term sessions, such as passwordReset */
     const SHORT_STASH_SESSION_LENGHT = "now + 10 minutes";
 
-    public const FEATURE_SESSION_ID_COOKIE = "sessionIDCookie";
-
-    public const FEATURE_ENFORCE_SESSION_ID_COOKIE = "enforceSessionIDCookie";
-
     /** @var int Unique user identifier. */
     public $UserID;
 
@@ -509,14 +505,10 @@ class Gdn_Session implements LoggerAwareInterface
                         ->get(\Garden\EventManager::class)
                         ->fire("gdn_session_set", $this);
                     if ($setIdentity) {
-                        if (\Vanilla\FeatureFlagHelper::featureEnabled(self::FEATURE_SESSION_ID_COOKIE)) {
-                            $sessionModel = new SessionModel();
-                            $session = $sessionModel->startNewSession($this->UserID, $sessionID);
-                            Gdn::authenticator()->setIdentity($this->UserID, $persist, $session["SessionID"]);
-                            $this->SessionID = $session["SessionID"];
-                        } else {
-                            Gdn::authenticator()->setIdentity($this->UserID, $persist);
-                        }
+                        $sessionModel = new SessionModel();
+                        $session = $sessionModel->startNewSession($this->UserID, $sessionID);
+                        Gdn::authenticator()->setIdentity($this->UserID, $persist, $session["SessionID"]);
+                        $this->SessionID = $session["SessionID"];
                         $this->logger->info("Session started for {username}.", [
                             Logger::FIELD_EVENT => "session_start",
                             Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
@@ -883,10 +875,7 @@ class Gdn_Session implements LoggerAwareInterface
     {
         $cookieName = c("Garden.Cookie.Name", "Vanilla");
         $name = $cookieName . "-sid";
-        $sessionID = "";
-        if (\Vanilla\FeatureFlagHelper::featureEnabled(Gdn_Session::FEATURE_SESSION_ID_COOKIE)) {
-            $sessionID = Gdn::session()->SessionID;
-        }
+        $sessionID = Gdn::session()->SessionID;
         if ($sessionID == "") {
             // Get session ID from cookie
             $sessionID = val($name, $_COOKIE, "");

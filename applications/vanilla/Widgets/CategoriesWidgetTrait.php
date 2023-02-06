@@ -79,7 +79,7 @@ trait CategoriesWidgetTrait
                         "x-control" => SchemaForm::dropDown(
                             new FormOptions("Categories", "Select the categories to use"),
                             new ApiFormChoices(
-                                "/api/v2/categories?outputFormat=flat",
+                                "/api/v2/categories/search?query=%s&limit=30",
                                 "/api/v2/categories/%s",
                                 "categoryID",
                                 "name"
@@ -100,7 +100,7 @@ trait CategoriesWidgetTrait
                         "x-control" => SchemaForm::dropDown(
                             new FormOptions("Category", "Select the category to use"),
                             new ApiFormChoices(
-                                "/api/v2/categories?outputFormat=flat",
+                                "/api/v2/categories/search?query=%s&limit=30",
                                 "/api/v2/categories/%s",
                                 "categoryID",
                                 "name"

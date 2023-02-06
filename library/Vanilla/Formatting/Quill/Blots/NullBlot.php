@@ -19,7 +19,7 @@ class NullBlot extends AbstractBlot
      * The NullBlot is the ultimate fallback blot. It matches anything so always return true.
      * @inheritDoc
      */
-    public static function matches(array $operations): bool
+    public static function matches(array $operation): bool
     {
         return true;
     }

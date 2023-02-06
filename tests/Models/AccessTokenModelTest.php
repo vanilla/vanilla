@@ -142,10 +142,19 @@ class AccessTokenModelTest extends SharedBootstrapTestCase
         $initialConfToken = \Gdn::config()->get(AccessTokenModel::CONFIG_SYSTEM_TOKEN);
         $this->assertNotFalse($model->verify($initialConfToken));
 
-        // Run again, should revoke the first token and save a new one.
+        // Run again, should remove the token from the Config file.
         $model->ensureSingleSystemToken();
         $secondConfToken = \Gdn::config()->get(AccessTokenModel::CONFIG_SYSTEM_TOKEN);
-        $this->assertFalse($model->verify($initialConfToken));
+        $this->assertNotEquals($initialConfToken, $secondConfToken);
         $this->assertNotFalse($model->verify($secondConfToken));
+
+        // Ensure that the old token is now only valid for another 6h. 5 and 7h are used for convenience.
+        $initialToken = $model->verify($initialConfToken);
+        $this->assertNotFalse($initialToken);
+        $tresholdBefore = \Gdn_Format::toDateTime(strtotime("5 hours"));
+        $this->assertGreaterThan($tresholdBefore, $initialToken["DateExpires"]);
+
+        $tresholdAfter = \Gdn_Format::toDateTime(strtotime("7 hours"));
+        $this->assertLessThan($tresholdAfter, $initialToken["DateExpires"]);
     }
 }

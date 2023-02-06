@@ -24,8 +24,10 @@ interface IProps {
     onChange: (value: string) => void;
     contentClassName?: string;
     inputClassName?: string;
+    datePickerDropdownClassName?: string;
     alignment: "left" | "right";
     disabledDays?: any; // See http://react-day-picker.js.org/examples/disabled
+    inputAriaLabel?: string;
 }
 
 interface IState {
@@ -61,6 +63,7 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
     private renderReactInput() {
         const value = this.props.value ? moment(this.props.value).toDate() : undefined;
         const classes = dayPickerClasses();
+        const ariaLabel = t("Date Input ") + "(yyyy-mm-dd)";
         return (
             <div className={classNames(classes.root)}>
                 <DayPickerInput
@@ -85,7 +88,9 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
                         className: classNames("inputText", this.props.inputClassName, {
                             isInvalid: this.state.hasBadValue && this.state.wasBlurred,
                         }),
-                        "aria-label": t("Date Input ") + "(yyyy-mm-dd)",
+                        "aria-label": this.props.inputAriaLabel
+                            ? `${this.props.inputAriaLabel} ${ariaLabel}`
+                            : ariaLabel,
                         onBlur: this.handleBlur,
                         onFocus: this.handleFocus,
                         onChange: this.handleNativeInputChange,
@@ -178,8 +183,16 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
         });
         return (
             // dayPickerClasses needs to be reapplied here, because it's rendered outside the root
-            <RelativePortal component="div" top={0} right={0} className={dayPickerClasses().root}>
-                <div className={classNames("dropDown", classes.root)} {...props}>
+            <RelativePortal
+                component="div"
+                top={0}
+                right={this.props.alignment === "right" ? 0 : undefined}
+                className={dayPickerClasses().root}
+            >
+                <div
+                    className={classNames("dropDown", classes.root, this.props.datePickerDropdownClassName)}
+                    {...props}
+                >
                     <div className={contentsClasses}>{children}</div>
                 </div>
             </RelativePortal>

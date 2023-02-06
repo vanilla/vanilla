@@ -9,6 +9,7 @@ namespace Vanilla\QnA\Models;
 use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
+use Garden\Schema\Schema;
 use Vanilla\QnA\Events\AnswerEvent;
 use Vanilla\Formatting\DateTimeFormatter;
 use Gdn;
@@ -50,13 +51,17 @@ class AnswerModel implements EventFromRowInterface
      */
     public function normalizeRow(array $row): array
     {
-        $row["attributes"]["answer"] = [
-            "status" => !empty($row["qnA"]) ? strtolower($row["qnA"]) : "pending",
-            "dateAccepted" => $row["dateAccepted"],
-            "acceptUserID" => $row["acceptedUserID"],
+        $out = $this->commentModel->schema()->merge(Schema::parse(["qnA:s?", "dateAccepted:s?", "acceptUserID:s?"]));
+
+        $validatedRow = $out->validate($row);
+
+        $validatedRow["attributes"]["answer"] = [
+            "status" => !empty($validatedRow["qnA"]) ? strtolower($validatedRow["qnA"]) : "pending",
+            "dateAccepted" => $validatedRow["dateAccepted"] ?? null,
+            "acceptUserID" => $validatedRow["acceptedUserID"] ?? null,
         ];
 
-        return $row;
+        return $validatedRow;
     }
 
     /**
@@ -139,8 +144,10 @@ class AnswerModel implements EventFromRowInterface
         // Determine QnA change
         if ($currentQnAStatus != $newQnAStatus) {
             $change = 0;
+            $eventAction = AnswerEvent::ACTION_UPDATE;
             switch ($newQnAStatus) {
                 case "Rejected":
+                    $eventAction = AnswerEvent::ACTION_ANSWER_REJECTED;
                     $change = -1;
                     if ($currentQnAStatus != "Accepted") {
                         $change = 0;
@@ -148,6 +155,7 @@ class AnswerModel implements EventFromRowInterface
                     break;
 
                 case "Accepted":
+                    $eventAction = AnswerEvent::ACTION_ANSWER_ACCEPTED;
                     $change = 1;
                     break;
 
@@ -160,8 +168,9 @@ class AnswerModel implements EventFromRowInterface
                     }
                     break;
             }
+
             //Trigger the chosen answer event
-            $answerEvent = $this->eventFromRow($updatedAnswer, AnswerEvent::ACTION_UPDATE);
+            $answerEvent = $this->eventFromRow($updatedAnswer, $eventAction);
             $this->eventManager->dispatch($answerEvent);
         }
 

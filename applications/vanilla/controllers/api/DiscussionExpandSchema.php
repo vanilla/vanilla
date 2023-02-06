@@ -104,6 +104,10 @@ class DiscussionExpandSchema
             $this->recordStatusModel->expandStatuses($rows);
         }
         if (ModelUtils::isExpandOption("status.log", $expandOption)) {
+            if (!ModelUtils::isExpandOption("status", $expandOption)) {
+                $this->recordStatusModel->expandStatuses($rows);
+            }
+
             $this->recordStatusLogModel->expandStatusLogs($rows, "discussion", "discussionID");
         }
     }

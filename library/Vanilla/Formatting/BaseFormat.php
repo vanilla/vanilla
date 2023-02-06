@@ -89,7 +89,7 @@ abstract class BaseFormat implements FormatInterface
      *
      * @inheritdoc
      */
-    public function renderExcerpt(string $content): string
+    public function renderExcerpt($content): string
     {
         $plainText = $this->renderPlainText($content);
 
@@ -108,7 +108,7 @@ abstract class BaseFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $content): string
+    public function renderQuote($content): string
     {
         return $this->renderHTML($content);
     }
@@ -116,7 +116,7 @@ abstract class BaseFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function getPlainTextLength(string $content): int
+    public function getPlainTextLength($content): int
     {
         return mb_strlen(trim($this->renderPlainText($content), "UTF-8"));
     }
@@ -159,5 +159,5 @@ abstract class BaseFormat implements FormatInterface
     /**
      * @inheritDoc
      */
-    abstract public function parseAllMentions(string $body): array;
+    abstract public function parseAllMentions($body): array;
 }

@@ -109,7 +109,7 @@ export const leaderboardWidgetClasses = () => {
 
     const cell = css({
         padding: 0,
-        minWidth: styleUnit(100),
+        minWidth: styleUnit(84),
         verticalAlign: "middle",
         textAlign: "right",
         "&:first-of-type": {

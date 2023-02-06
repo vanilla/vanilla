@@ -83,7 +83,7 @@ $Construct
     ->column("Description", "varchar(1000)", true)
     ->column("Sort", "int", true)
     ->column("CssClass", "varchar(50)", true)
-    ->column("Photo", "varchar(255)", true)
+    ->column("Photo", "varchar(767)", true)
     ->column("BannerImage", "varchar(255)", true)
     ->column("PermissionCategoryID", "int", "-1") // default to root.
     ->column("PointsCategoryID", "int", "0") // default to global.

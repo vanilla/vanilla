@@ -78,7 +78,7 @@ export class LongRunnerClient {
         }
 
         // TODO: Add support for async responses.
-        if (response.status >= 400 && response.data.callbackPayload !== undefined) {
+        if (response.status >= 400 && response.data?.callbackPayload !== undefined) {
             const polledResponse = await this.pollCallbackPayload(response.data.callbackPayload);
             return polledResponse;
         } else {

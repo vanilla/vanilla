@@ -1,0 +1,3 @@
+@admin
+
+This sentence is a link

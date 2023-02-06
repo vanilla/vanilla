@@ -45,19 +45,27 @@ class BBCodeFormat extends HtmlFormat
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $content, bool $enhance = true): string
+    public function renderHtml($content, bool $enhance = true): string
     {
-        $renderedBBCode = $this->bbcodeParser->format($content);
-        return parent::renderHtml($renderedBBCode, $enhance);
+        if ($content instanceof HtmlFormatParsed) {
+            return $content->getProcessedHtml();
+        } else {
+            $rendered = $this->bbcodeParser->format($content);
+        }
+        return parent::renderHtml($rendered, $enhance);
     }
 
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $value): string
+    public function renderQuote($content): string
     {
-        $renderedBBCode = $this->bbcodeParser->format($value);
-        return parent::renderQuote($renderedBBCode);
+        if ($content instanceof HtmlFormatParsed) {
+            $rendered = $content->getProcessedHtml();
+        } else {
+            $rendered = $this->bbcodeParser->format($content);
+        }
+        return parent::renderQuote($rendered);
     }
 
     /**
@@ -82,7 +90,7 @@ class BBCodeFormat extends HtmlFormat
     /**
      * @inheritDoc
      */
-    public function parseAllMentions(string $body): array
+    public function parseAllMentions($body): array
     {
         $matches = [];
         $atMention = $this->getNonRichAtMention();

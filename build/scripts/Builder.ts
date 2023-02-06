@@ -29,7 +29,7 @@ import { fail, print } from "./utility/utils";
  * - A production build that only builds polyfills. (BuildMode.POLYFILLS)
  */
 export default class Builder {
-    private statOptions: any = this.options.verbose ? "normal" : "minimal";
+    private statOptions: any;
 
     private entryModel: EntryModel;
 
@@ -38,6 +38,7 @@ export default class Builder {
      */
     constructor(private options: IBuildOptions) {
         this.entryModel = new EntryModel(options);
+        this.statOptions = this.options.verbose ? "normal" : "minimal";
     }
 
     /**

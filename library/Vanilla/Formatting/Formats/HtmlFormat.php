@@ -9,6 +9,7 @@ namespace Vanilla\Formatting\Formats;
 
 use Exception;
 use UserModel;
+use Vanilla\Contracts\Formatting\FormatParsedInterface;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Html\HtmlDocument;
@@ -20,6 +21,7 @@ use Vanilla\Formatting\Html\Processor\HeadingHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\ImageHtmlProcessor;
 use Vanilla\Formatting\Html\Processor\UserContentCssProcessor;
 use Vanilla\Formatting\ParsableDOMInterface;
+use Vanilla\Formatting\ParsedFormat;
 use Vanilla\Formatting\TextDOMInterface;
 use Vanilla\Formatting\UserMentionInterface;
 use Vanilla\Formatting\UserMentionsTrait;
@@ -27,6 +29,8 @@ use Vanilla\InjectableInterface;
 
 /**
  * Format definition for HTML based formats.
+ *
+ * @template-implements FormatParsedInterface<HtmlFormatParsed>
  */
 class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMInterface
 {
@@ -112,10 +116,44 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     }
 
     /**
+     * Given either html or parsed html, extract html.
+     *
+     * @param string|HtmlFormatParsed $parsedOrHtml
+     * @return string
+     */
+    private function ensureRenderedHtml($parsedOrHtml): string
+    {
+        if ($parsedOrHtml instanceof HtmlFormatParsed) {
+            return $parsedOrHtml->getProcessedHtml();
+        } else {
+            return $this->renderHTML($parsedOrHtml, false);
+        }
+    }
+
+    /**
+     * Given either html or parsed html, extract html.
+     *
+     * @param string|HtmlFormatParsed $parsedOrHtml
+     * @return string
+     */
+    private function ensureRawHtml($parsedOrHtml): string
+    {
+        if ($parsedOrHtml instanceof HtmlFormatParsed) {
+            return $parsedOrHtml->getRawHtml();
+        } else {
+            return $parsedOrHtml;
+        }
+    }
+
+    /**
      * @inheritdoc
      */
-    public function renderHtml(string $content, bool $enhance = true): string
+    public function renderHtml($content, bool $enhance = true): string
     {
+        if ($content instanceof HtmlFormatParsed) {
+            // We already did the work.
+            return $content->getProcessedHtml();
+        }
         $result = $this->htmlSanitizer->filter($content, $this->allowExtendedContent);
 
         if ($this->shouldCleanupLineBreaks) {
@@ -135,16 +173,16 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function renderPlainText(string $content): string
+    public function renderPlainText($content): string
     {
-        $html = $this->renderHtml($content, false);
+        $html = $this->ensureRenderedHtml($content);
         return $this->plainTextConverter->convert($html);
     }
 
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $content): string
+    public function renderQuote($content): string
     {
         $result = $this->htmlSanitizer->filter($content);
 
@@ -163,10 +201,10 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function filter(string $content): string
+    public function filter($content): string
     {
         try {
-            $this->renderHtml($content);
+            $this->ensureRenderedHtml($content);
         } catch (Exception $e) {
             // Rethrow as a formatting exception with exception chaining.
             throw new FormattingException($e->getMessage(), 500, $e);
@@ -177,18 +215,27 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function parseAttachments(string $content): array
+    public function parse(string $content)
     {
-        $document = new HtmlDocument($content);
-        return $this->attachmentHtmlProcessor->getAttachments($document);
+        return new HtmlFormatParsed(static::FORMAT_KEY, $content, $this->renderHTML($content));
     }
 
     /**
      * @inheritdoc
      */
-    public function parseHeadings(string $content): array
+    public function parseAttachments($content): array
     {
-        $rendered = $this->renderHtml($content);
+        // The HTML format hasn't actually historically supported attachements inline.
+        // Attachments are handled out of the post content by the Advanced Editor plugin.
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function parseHeadings($content): array
+    {
+        $rendered = $this->ensureRenderedHtml($content);
         $document = new HtmlDocument($rendered);
         return $this->headingHtmlProcessor->getHeadings($document);
     }
@@ -196,28 +243,30 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function parseImageUrls(string $content): array
+    public function parseImageUrls($content): array
     {
-        $rendered = $this->renderHtml($content, false);
-        $document = new HtmlDocument($rendered);
+        $html = $this->ensureRenderedHtml($content);
+        $document = new HtmlDocument($html);
         return $this->imageHtmlProcessor->getImageURLs($document);
     }
 
     /**
      * @inheritdoc
      */
-    public function parseImages(string $content): array
+    public function parseImages($content): array
     {
-        $rendered = $this->renderHtml($content, false);
-        $document = new HtmlDocument($rendered);
+        $html = $this->ensureRenderedHtml($content);
+        $document = new HtmlDocument($html);
         return $this->imageHtmlProcessor->getImages($document);
     }
 
     /**
      * @inheritdoc
      */
-    public function parseMentions(string $content, $skipTaggedContent = true): array
+    public function parseMentions($content, $skipTaggedContent = true): array
     {
+        $content = $this->ensureRawHtml($content);
+
         // Legacy Mention Fetcher.
         // This should get replaced in a future refactoring.
         return getMentions($content, $skipTaggedContent, $skipTaggedContent);
@@ -335,7 +384,7 @@ class HtmlFormat extends BaseFormat implements InjectableInterface, ParsableDOMI
     /**
      * @inheritdoc
      */
-    public function parseAllMentions(string $body): array
+    public function parseAllMentions($body): array
     {
         $matches = [];
         $atMention = $this->getNonRichAtMention();

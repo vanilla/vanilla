@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -72,19 +72,11 @@ function SearchPage(props: IProps) {
 
     const currentDomain = getCurrentDomain();
 
-    const debouncedSearch = useCallback(
-        debounce(() => {
-            search();
-            currentDomain.extraSearchAction?.();
-        }, 800),
-        [search],
-    );
-
     let scope = useSearchScope().value?.value ?? SEARCH_SCOPE_LOCAL;
-    const lastScope = useLastValue(scope);
     if (currentDomain.isIsolatedType()) {
         scope = SEARCH_SCOPE_LOCAL;
     }
+    const lastScope = useLastValue(scope);
 
     let currentFilter = <currentDomain.PanelComponent />;
 
@@ -114,17 +106,10 @@ function SearchPage(props: IProps) {
             return currentSource.queryFilterComponent ?? null;
         }
         return currentFilter;
-    }, [
-        currentDomain.SpecificRecordPanel,
-        currentFilter,
-        currentSource.queryFilterComponent,
-        hasSpecificRecord,
-        isCompact,
-    ]);
+    }, [currentDomain.SpecificRecordPanel, currentFilter, currentSource.queryFilterComponent, hasSpecificRecord]);
 
     const { needsResearch } = form;
     useEffect(() => {
-        // Trigger new search
         if (
             needsResearch ||
             (lastScope && lastScope !== scope) ||
@@ -133,7 +118,7 @@ function SearchPage(props: IProps) {
             search();
             currentDomain.extraSearchAction?.();
         }
-    }, [search, needsResearch, lastScope, scope, currentDomain, lastSourceKey, currentSource.key]);
+    });
 
     const domains = getDomains();
     const sortedNonIsolatedDomains = domains
@@ -206,7 +191,7 @@ function SearchPage(props: IProps) {
     return (
         // Add a context provider so that smartlinks within search use dynamic navigation.
         <LinkContextProvider linkContexts={[formatUrl("/search", true)]}>
-            <DocumentTitle title={form.query ? form.query : t("Search Results")}>
+            <DocumentTitle title={form.query ? `${form.query}` : t("Search Results")}>
                 <TitleBar title={t("Search")} />
                 <Banner isContentBanner />
                 <Container>
@@ -246,15 +231,15 @@ function SearchPage(props: IProps) {
                                             <SearchBar
                                                 placeholder={props.placeholder}
                                                 onChange={(newQuery) => updateForm({ query: newQuery })}
-                                                value={form.query}
-                                                onSearch={debouncedSearch}
+                                                value={`${form.query}`}
+                                                onSearch={search}
                                                 isLoading={results.status === LoadStatus.LOADING}
                                                 optionComponent={SearchOption}
                                                 triggerSearchOnClear={true}
                                                 titleAsComponent={t("Search")}
                                                 handleOnKeyDown={(event) => {
                                                     if (event.key === "Enter") {
-                                                        debouncedSearch();
+                                                        search();
                                                     }
                                                 }}
                                                 disableAutocomplete={true}

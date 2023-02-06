@@ -366,4 +366,25 @@ trait CommunityApiTestTrait
             ]);
         }, $userOrUserID);
     }
+
+    /**
+     * Assert that a category has a specific allowedDiscussionType.
+     *
+     * @param $expected array|string
+     * @param $actual array|int
+     */
+    public function assertCategoryAllowedDiscussionType($expected, $actual)
+    {
+        if (!is_array($expected)) {
+            $expected = [$expected];
+        }
+
+        if (!is_array($actual)) {
+            $actual = $this->categoryModel->getID($actual, DATASET_TYPE_ARRAY);
+        }
+
+        $permissionCategory = $this->categoryModel::permissionCategory($actual);
+        $result = $this->categoryModel->getAllowedDiscussionData($permissionCategory, $actual);
+        $this->assertEquals($expected, array_keys($result));
+    }
 }

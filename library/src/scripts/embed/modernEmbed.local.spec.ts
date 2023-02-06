@@ -12,7 +12,7 @@ import isEqual from "lodash/isEqual";
 jest.useFakeTimers();
 
 describe("modernEmbed.local", () => {
-    let _teardown: Function | null = null;
+    let _teardown: (() => void) | null = null;
 
     beforeEach(() => {
         // @ts-ignore

@@ -24,7 +24,7 @@ export const DashboardInput: React.FC<IProps> = (props: IProps) => {
     return (
         <div className={rootClass}>
             <InputTextBlock
-                id={inputID}
+                id={props.inputProps?.inputID ?? inputID}
                 inputProps={props.inputProps}
                 multiLineProps={props.multiLineProps}
                 className={classNames(props.inputProps ? props.inputProps.className : null, classes)}

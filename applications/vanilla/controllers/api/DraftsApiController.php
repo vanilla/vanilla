@@ -301,6 +301,8 @@ class DraftsApiController extends AbstractApiController
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body);
+        $body["attributes"]["format"] = $body["attributes"]["format"] ?? "Text";
+
         $draftData = $this->normalizeInput($body);
         $draftID = $this->draftModel->save($draftData);
         $this->validateModel($this->draftModel);

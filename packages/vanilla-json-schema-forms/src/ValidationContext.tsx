@@ -81,9 +81,28 @@ export function ValidationProvider(props: { children: ReactNode }) {
         return errors.map((error: ErrorObject) => {
             const instancePathAsKey = error.instancePath.replace("/", "");
             const hasCustomMessage = !!schema?.properties[instancePathAsKey]?.errorMessage;
+
+            const getMatchingCustomMessage = (): string => {
+                let messageToReturn: string = error.message ?? "";
+                if (Array.isArray(schema?.properties[instancePathAsKey]?.errorMessage)) {
+                    const customMessage: Record<"keyword" | "message", string> | undefined = schema?.properties[
+                        instancePathAsKey
+                    ]?.errorMessage.find(
+                        (item: Record<"keyword" | "message", string>) => item?.keyword === error.keyword,
+                    );
+                    if (customMessage) {
+                        messageToReturn = customMessage.message;
+                    }
+                }
+                if (typeof schema?.properties[instancePathAsKey]?.errorMessage === "string") {
+                    messageToReturn = schema?.properties[instancePathAsKey]?.errorMessage;
+                }
+                return messageToReturn;
+            };
+
             return {
                 ...error,
-                ...(hasCustomMessage && { message: schema?.properties[instancePathAsKey]?.errorMessage }),
+                ...(hasCustomMessage && { message: getMatchingCustomMessage() }),
             };
         });
     };

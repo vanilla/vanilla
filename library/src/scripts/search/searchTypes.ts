@@ -1,15 +1,14 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { PublishStatus } from "@library/@types/api/core";
-import { IUserFragment, IUser } from "@library/@types/api/users";
+import { IUserFragment } from "@library/@types/api/users";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { RecordID } from "@vanilla/utils";
 import { ImageSourceSet } from "@library/utility/appUtils";
 
@@ -34,7 +33,7 @@ export interface ISearchSource<RequestQueryType = ISearchRequestQuery, SearchRes
 
 interface ISearchFormBase {
     domain: string;
-    query: string;
+    query: RecordID;
     name?: string;
     authors?: IComboBoxOption[];
     startDate?: string;

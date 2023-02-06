@@ -34,7 +34,7 @@ interface IProps extends IFileAttachment {
     url: string;
 }
 
-export default function Attachment(props) {
+export default function Attachment(props: IProps) {
     const { title, name, url, dateUploaded, type, mimeType, size } = props;
     const label = title || name;
     const classes = attachmentClasses();

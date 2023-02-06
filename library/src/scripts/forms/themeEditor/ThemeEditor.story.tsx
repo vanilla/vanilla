@@ -25,6 +25,10 @@ export default {
 };
 
 export function ThemeEditor() {
+    return <ThemeEditorStoryImpl />;
+}
+
+function ThemeEditorStoryImpl() {
     const [vars, setVars] = useState({});
     return (
         <div style={{ maxWidth: 400, margin: "0 auto" }}>

@@ -896,7 +896,7 @@ class CategoriesApiController extends AbstractApiController
             Schema::parse([
                 "depth:i",
                 "children:a?" => $childSchema->merge(Schema::parse(["depth:i", "children:a", "sort:i"])),
-                "sort:i",
+                "sort:i?",
             ])
         );
         return $schema;
@@ -916,7 +916,7 @@ class CategoriesApiController extends AbstractApiController
                 $this->fullSchema()
             );
         }
-        $schema = $this->fullSchema();
+        $schema = $this->categorySchema();
         $result = $schema->merge(Schema::parse($attributes));
         return $this->schema($result, $type);
     }

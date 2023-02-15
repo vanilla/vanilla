@@ -121,7 +121,7 @@ EOT;
                     $seconds = $matches["seconds"] ?? false;
                     $fullUrl = $videoId . "?autoplay=1";
                     if (!empty($minutes) || !empty($seconds)) {
-                        $time = $minutes * 60 + $seconds;
+                        $time = (int)$minutes * 60 + (int)$seconds;
                         $fullUrl .= "&start=" . $time;
                     }
 

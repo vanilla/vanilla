@@ -10921,7 +10921,12 @@ body {
 .userContent.Message {
   margin-top: 14px;
 }
-.userContent.Message > .embedImage + p::after {
+.userContent.Message > .embedImage ~ p:last-child::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.userContent.Message > .embedImage:first-child:last-child::after {
   content: "";
   display: table;
   clear: both;
@@ -11338,7 +11343,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   display: block;
   margin: 0 auto;
   max-width: 100%;
-  width: 640px;
+  width: "100%";
   position: relative;
   justify-content: center;
   align-items: center;
@@ -11479,7 +11484,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedVideo .embedExternal-content {
   position: relative;
   display: block;
-  width: 640px;
+  width: 100%;
   max-width: 100%;
   margin: auto;
 }
@@ -11630,7 +11635,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedImage-link {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
 }
 

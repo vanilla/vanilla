@@ -21,7 +21,7 @@ describe("DateTime", () => {
         const time = container.querySelector("time");
         expect(time).not.equals(null);
         expect(time?.getAttribute("dateTime")).equals(timeStamp);
-        expect(time?.getAttribute("title")).equals("Wednesday, April 22, 2020, 2:31 PM");
+        expect(time?.getAttribute("title")).equals("Wednesday, April 22, 2020 at 2:31 PM");
         expect(time?.textContent).equals("Apr 22, 2020");
     });
 

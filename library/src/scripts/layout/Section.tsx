@@ -17,7 +17,7 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { useMeasure } from "@vanilla/react-utils";
 import { logError } from "@vanilla/utils";
 import classNames from "classnames";
-import React, { useContext, useMemo, useRef } from "react";
+import React, { ElementType, useContext, useMemo, useRef } from "react";
 import Panel from "./components/Panel";
 import PanelAreaHorizontalPadding from "./components/PanelAreaHorizontalPadding";
 import PanelOverflow from "./components/PanelOverflow";
@@ -26,7 +26,7 @@ import PanelWidgetHorizontalPadding from "./components/PanelWidgetHorizontalPadd
 export interface ISectionProps extends React.HTMLAttributes<HTMLElement> {
     className?: string;
     toggleMobileMenu?: (isOpen: boolean) => void;
-    contentTag?: keyof JSX.IntrinsicElements;
+    contentTag?: ElementType;
     growMiddleBottom?: boolean;
     topPadding?: boolean;
     leftTop?: React.ReactNode;

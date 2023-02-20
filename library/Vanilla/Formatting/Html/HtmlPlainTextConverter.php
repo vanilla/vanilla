@@ -72,39 +72,39 @@ class HtmlPlainTextConverter
         array $classStringMapping,
         array $tagNameStringMapping
     ) {
-        $contentID = "contentID";
+        $htmlDocument = new HtmlDocument($html);
 
-        // Use a big content prefix so we can force utf-8 parsing.
-        $contentPrefix = <<<HTML
-<html><head><meta content="text/html; charset=utf-8" http-equiv="Content-Type"></head>
-<body><div id='$contentID'>
-HTML;
-
-        $contentSuffix = "</div></body></html>";
-        $dom = new \DOMDocument();
-        @$dom->loadHTML($contentPrefix . $html . $contentSuffix);
+        // Replace emojis with their placetext versions.
+        $emojiImages = $htmlDocument->queryCssSelector(".emoji");
+        /** @var \DOMElement $emojiImage */
+        foreach ($emojiImages as $emojiImage) {
+            $this->replaceNodeWithString(
+                $htmlDocument->getDom(),
+                $emojiImage,
+                $emojiImage->getAttribute("alt"),
+                "inline"
+            );
+        }
 
         foreach ($classStringMapping as $cssClass => $replacementString) {
-            $xpath = new \DOMXPath($dom);
-            $foundItems = $xpath->query(".//*[contains(@class, '$cssClass')]");
+            $foundItems = $htmlDocument->queryCssSelector(".{$cssClass}");
 
             /** @var \DOMNode $foundItem */
             foreach ($foundItems as $foundItem) {
-                $this->replaceNodeWithString($dom, $foundItem, $replacementString);
+                $this->replaceNodeWithString($htmlDocument->getDom(), $foundItem, $replacementString);
             }
         }
 
         foreach ($tagNameStringMapping as $nodeName => $replacementString) {
-            $foundItems = $dom->getElementsByTagName($nodeName);
+            $foundItems = $htmlDocument->getDom()->getElementsByTagName($nodeName);
 
             /** @var \DOMNode $foundItem */
             foreach ($foundItems as $foundItem) {
-                $this->replaceNodeWithString($dom, $foundItem, $replacementString);
+                $this->replaceNodeWithString($htmlDocument->getDom(), $foundItem, $replacementString);
             }
         }
 
-        $content = $dom->getElementById("contentID");
-        $htmlBodyString = @$dom->saveXML($content, LIBXML_NOEMPTYTAG);
+        $htmlBodyString = $htmlDocument->renderHTML();
         return $htmlBodyString;
     }
 
@@ -114,20 +114,43 @@ HTML;
      * @param \DOMDocument $dom
      * @param \DOMNode $node
      * @param string $replacement
+     * @param string $elementType Either "auto", "inline" or "block".
      */
-    private function replaceNodeWithString(\DOMDocument $dom, \DOMNode $node, string $replacement)
-    {
+    private function replaceNodeWithString(
+        \DOMDocument $dom,
+        \DOMNode $node,
+        string $replacement,
+        string $elementType = "auto"
+    ) {
+        if ($elementType === "auto") {
+            if ($node instanceof \DOMElement) {
+                $elementType = in_array($node->tagName, HtmlDocument::TAG_INLINE_TEXT) ? "inline" : "block";
+            } else {
+                $elementType = "inline";
+            }
+        }
         /** @var \DOMElement $parent */
         $parent = $node->parentNode;
-        $nextSiblimg = $node->nextSibling;
+        $nextSibling = $node->nextSibling;
+        $isNextSiblingInline =
+            $nextSibling &&
+            $nextSibling instanceof \DOMElement &&
+            in_array($nextSibling->tagName, HtmlDocument::TAG_INLINE_TEXT);
         if (empty($replacement)) {
             $parent->removeChild($node);
         } else {
-            $textNode = $dom->createTextNode(self::t($replacement));
+            $replacement = self::t($replacement);
+            if ($elementType === "inline" && $nextSibling && !$isNextSiblingInline) {
+                $replacement .= " ";
+            }
+            $textNode = $dom->createTextNode($replacement);
             $parent->replaceChild($textNode, $node);
         }
-        $breakNode = $dom->createElement("br");
-        $parent->insertBefore($breakNode, $nextSiblimg);
+        if ($elementType === "block") {
+            // Add a break if it wasn't an inline element.
+            $breakNode = $dom->createElement("br");
+            $parent->insertBefore($breakNode, $nextSibling);
+        }
     }
 
     /**

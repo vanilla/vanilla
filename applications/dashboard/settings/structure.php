@@ -10,6 +10,7 @@
 
 use Vanilla\Addon;
 use Vanilla\Dashboard\Models\ModerationMessageStructure;
+use Vanilla\Dashboard\Models\QueuedJobModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
 use Vanilla\Dashboard\Models\UserMentionsModel;
@@ -17,6 +18,7 @@ use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Layout\LayoutModel;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Models\InstallModel;
+use Vanilla\Scheduler\CronModel;
 use Vanilla\Scheduler\Job\JobStatusModel;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
@@ -36,6 +38,7 @@ $LEGACYADDON = [
     "EnabledPlugins.Sphinx",
     "EnabledPlugins.Reputation",
     "EnabledPlugins.NBBC",
+    "EnabledPlugins.whispers",
 ];
 
 if (!defined("APPLICATION")) {
@@ -171,13 +174,13 @@ $Construct
     ->column("Name", "varchar(50)", false, "key")
     ->column("Password", "varbinary(100)") // keep this longer because of some imports.
     ->column("HashMethod", "varchar(10)", true)
-    ->column("Photo", "varchar(255)", null)
+    ->column("Photo", "varchar(767)", null)
     ->column("Title", "varchar(100)", null)
     ->column("Location", "varchar(100)", null)
     ->column("About", "text", true)
     ->column("Email", "varchar(100)", false, "index")
     ->column("ShowEmail", "tinyint(1)", "0")
-    ->column("Gender", ["u", "m", "f"], "u")
+    ->column("Gender", ["u", "m", "f", ""], "")
     ->column("CountVisits", "int", "0")
     ->column("CountInvitations", "int", "0")
     ->column("CountNotifications", "int", null)
@@ -277,6 +280,14 @@ if (empty(Gdn::config("Garden.UpdateToken"))) {
 //Make sure there is scheduler token
 if (empty(Gdn::config("Garden.Scheduler.Token"))) {
     Gdn::config()->saveToConfig("Garden.Scheduler.Token", uniqid("SchedulerToken", true));
+}
+
+// Make sure the site has a random cron offset
+if (Gdn::config(CronModel::CONF_OFFSET_SECONDS) === null) {
+    $maxSecondsInDay = 60 * 60 * 24;
+    $offsetInSeconds = random_int(0, $maxSecondsInDay);
+
+    Gdn::config()->saveToConfig(CronModel::CONF_OFFSET_SECONDS, $offsetInSeconds);
 }
 
 // UserIP Table
@@ -396,11 +407,12 @@ DROP PRIMARY KEY, ADD COLUMN `UserMetaID` int NOT NULL AUTO_INCREMENT PRIMARY KE
 $doesntHaveQueryValueColumn =
     $Construct->tableExists("UserMeta") && !$Construct->table("UserMeta")->columnExists("QueryValue");
 
+$maxNameLength = UserMetaModel::NAME_LENGTH;
 $Construct
     ->table("UserMeta")
     ->primaryKey("UserMetaID")
     ->column("UserID", "int", false, "index.UserID_Name")
-    ->column("Name", "varchar(100)", false, ["index.UserID_Name"])
+    ->column("Name", "varchar($maxNameLength)", false, ["index.UserID_Name"])
     ->column("Value", "text", true)
     ->column("QueryValue", "varchar(" . UserMetaModel::QUERY_VALUE_LENGTH . ")", true)
     ->set($Explicit, $Drop);
@@ -419,56 +431,11 @@ $Construct
     ->table("UserMeta")
     ->dropIndexIfExists("IX_UserMeta_Name")
     ->dropIndexIfExists("IX_UserMeta_Name_ShortValue")
-    ->createIndexIfNotExists("IX_UserMeta_QueryValue_UserID", ["QueryValue", "UserID"]);
+    ->createIndexIfNotExists("UX_UserMeta_QueryValue_UserID", ["QueryValue", "UserID"])
+    ->dropIndexIfExists("IX_UserMeta_QueryValue_UserID");
 
 if ($Construct->table("UserMeta")->columnExists("ShortValue")) {
     $Construct->dropColumn("ShortValue");
-}
-
-//Migrate Users DateOfBirth fields from Users Table to UserMeta table
-if (
-    $Construct->tableExists("User") &&
-    $Construct->table("User")->columnExists("DateOfBirth") &&
-    $Construct->tableExists("UserMeta") &&
-    $Construct->table("UserMeta")->columnExists("QueryValue")
-) {
-    $nonEmptyDateOfBirthCount = $SQL->getCount("User", ["DateOfBirth <>" => ""]);
-    $maxUpdatedUser = $SQL->getcount("UserMeta", ["Name" => "Profile.DateOfBirth"]);
-    $limit = 10000;
-    $iterations = 1;
-    if ($nonEmptyDateOfBirthCount && $nonEmptyDateOfBirthCount > $maxUpdatedUser) {
-        if ($nonEmptyDateOfBirthCount > $limit) {
-            $iterations = (int) ceil($nonEmptyDateOfBirthCount / $limit);
-        }
-        try {
-            $logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
-            for ($i = 0; $i < $iterations; $i++) {
-                $offset = $limit * $i;
-                $query = "SELECT MIN(UserID) as minUser , MAX(UserID) as maxUser FROM 
-                        (SELECT UserID FROM GDN_User WHERE DateOfBirth <> '' LIMIT $limit OFFSET $offset) U";
-                $users = $SQL->query($query)->resultArray();
-
-                // we need to select insert /update here based on limit
-                $Construct->executeQuery(
-                    "INSERT GDN_UserMeta(UserID, Name, Value, QueryValue) 
-                    SELECT UserID, 'Profile.DateOfBirth' AS Label, DateOfBirth, CONCAT('Profile.DateOfBirth.', DateOfBirth) as QueryValue
-                    FROM GDN_User U WHERE concat(DateOfBirth,'') <> '' LIMIT $limit OFFSET $offset 
-                    ON DUPLICATE KEY UPDATE Value = U.DateOfBirth"
-                );
-                $logger->info(
-                    "Migrated field DateofBirth of User's table for users between  {$users[0]["minUser"]} and {$users[0]["maxUser"]}  into UserMeta Table"
-                );
-            }
-        } catch (Exception $e) {
-            $logger->error(
-                "Error occurred while migrating user data DateOfBirth to UserMeta for records between {$users[0]["minUser"]} and  {$users[0]["maxUser"]} ",
-                [
-                    "event" => "UserTable_DateOfBirth_migration",
-                    "exception" => $e,
-                ]
-            );
-        }
-    }
 }
 
 // Similar to the user meta table, but without the need to cache the entire dataset.
@@ -582,6 +549,14 @@ $Construct
     ->column("DateExpires", "timestamp", ["Null" => false, "Default" => "current_timestamp"], "index")
     ->column("Attributes", "text", true)
     ->set($Explicit, $Drop);
+
+// Create or regenerate a system access token.
+// Only run the access token modification on real structure runs so as not to pollute the log.
+if (!$captureOnly) {
+    /** @var AccessTokenModel $accessTokenModel */
+    $accessTokenModel = \Gdn::getContainer()->get(AccessTokenModel::class);
+    $accessTokenModel->ensureSingleSystemToken();
+}
 
 // Fix the sync roles config spelling mistake.
 if (c("Garden.SSO.SynchRoles")) {
@@ -786,7 +761,7 @@ $Construct
     ->column("NotifyUserID", "int", 0, ["index.Notify", "index.Recent", "index.Feed", "index.UserGroupID"]) // user being notified or -1: public, -2 mods, -3 admins
     ->column("ActivityUserID", "int", true, "index.Feed")
     ->column("RegardingUserID", "int", true) // deprecated?
-    ->column("Photo", "varchar(255)", true)
+    ->column("Photo", "varchar(767)", true)
     ->column("HeadlineFormat", "varchar(255)", true)
     ->column("PluralHeadlineFormat", "varchar(255)", true)
     ->column("Story", "text", true)
@@ -1175,6 +1150,7 @@ if ($Construct->columnExists("Plugins.Tagging.Add")) {
 
 // Job status table.
 JobStatusModel::structure($Construct);
+QueuedJobModel::structure();
 
 $Construct
     ->table("Log")
@@ -1267,7 +1243,7 @@ if ($transientKeyExists) {
 $Construct
     ->primaryKey("MediaID")
     ->column("Name", "varchar(255)")
-    ->column("Path", "varchar(255)")
+    ->column("Path", "varchar(767)")
     ->column("Type", "varchar(128)")
     ->column("Size", "int(11)")
     ->column("Active", "tinyint", 1)
@@ -1279,7 +1255,7 @@ $Construct
     ->column("ImageHeight", "usmallint", null)
     ->column("ThumbWidth", "usmallint", null)
     ->column("ThumbHeight", "usmallint", null)
-    ->column("ThumbPath", "varchar(255)", null)
+    ->column("ThumbPath", "varchar(767)", null)
 
     // Lowercase to match new schemas.
     ->column("foreignUrl", "varchar(255)", true, "unique")
@@ -1524,3 +1500,8 @@ ProfileFieldModel::structure();
 
 // Remove legacy Plugins
 Gdn::config()->removeFromConfig($LEGACYADDON);
+
+// Keep this until we have deprecated the ProfileExtender addon.
+if (Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG) && Gdn::config("EnabledPlugins.ProfileExtender")) {
+    Gdn::config()->saveToConfig("EnabledPlugins.ProfileExtender", false);
+}

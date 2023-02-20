@@ -54,9 +54,6 @@ class Gdn_CookieIdentity
     /** @var string */
     public $PersistExpiry = "30 days";
 
-    /** @var string */
-    public $SessionExpiry = "2 days";
-
     /**
      *
      *
@@ -80,13 +77,9 @@ class Gdn_CookieIdentity
             $config = Gdn::config($config);
         }
 
-        $defaultConfig = array_replace(
-            ["PersistExpiry" => "30 days", "SessionExpiry" => "2 days"],
-            Gdn::config("Garden.Cookie")
-        );
-        $this->CookieName = val("Name", $config, $defaultConfig["Name"]);
-        $this->CookiePath = val("Path", $config, $defaultConfig["Path"]);
-        $this->CookieDomain = val("Domain", $config, $defaultConfig["Domain"]);
+        $this->CookieName = val("Name", $config);
+        $this->CookiePath = val("Path", $config);
+        $this->CookieDomain = val("Domain", $config);
 
         // If the domain being set is completely incompatible with the current domain then make the domain work.
         $currentHost = Gdn::request()->host();
@@ -102,11 +95,10 @@ class Gdn_CookieIdentity
             );
         }
 
-        $this->CookieHashMethod = val("HashMethod", $config, $defaultConfig["HashMethod"]);
-        $this->CookieSalt = val("Salt", $config, $defaultConfig["Salt"]);
+        $this->CookieHashMethod = val("HashMethod", $config);
+        $this->CookieSalt = val("Salt", $config);
         $this->VolatileMarker = $this->CookieName . "-Volatile";
-        $this->PersistExpiry = val("PersistExpiry", $config, $defaultConfig["PersistExpiry"]);
-        $this->SessionExpiry = val("SessionExpiry", $config, $defaultConfig["SessionExpiry"]);
+        $this->PersistExpiry = val("PersistExpiry", $config);
     }
 
     /**
@@ -154,47 +146,35 @@ class Gdn_CookieIdentity
                 default:
                     $payload = $this->getJWTPayload($name);
                     $userID = val("sub", $payload, 0);
-                    if (\Vanilla\FeatureFlagHelper::featureEnabled(Gdn_Session::FEATURE_SESSION_ID_COOKIE)) {
-                        $sessionName = "sid";
-                        $this->SessionID = val($sessionName, $payload, "");
-                        $sessionModel = new SessionModel();
-                        // If session was created before this session, lets convert it.
-                        if (stringIsNullOrEmpty($this->SessionID) && $userID != 0) {
-                            if (
-                                \Vanilla\FeatureFlagHelper::featureEnabled(
-                                    Gdn_Session::FEATURE_ENFORCE_SESSION_ID_COOKIE
-                                )
-                            ) {
+                    $sessionName = "sid";
+                    $this->SessionID = val($sessionName, $payload, "");
+                    $sessionModel = new SessionModel();
+                    // If session was created before this session, lets convert it.
+                    if (stringIsNullOrEmpty($this->SessionID) && $userID != 0) {
+                        $this->_clearIdentity();
+                        $cookie = Gdn::getContainer()->get(Cookie::class);
+                        // Pushed removal of cookie, to allow user to login again.
+                        $cookie->flush();
+                        throw new ForbiddenException("Cookie must have session ID.");
+                    } else {
+                        $session = $sessionModel->getID($this->SessionID, DATASET_TYPE_ARRAY);
+                        $refreshResult = $sessionModel->refreshSession($this->SessionID);
+                        switch ($refreshResult) {
+                            case SessionModel::REFRESH_NO_REFRESH:
+                                // We have a userID, but didn't refresh the session.
+                                $userID = $session["UserID"] ?? 0;
+                                break;
+                            case SessionModel::REFRESH_REFRESHED:
+                                // We have a userID, but did refresh the session.
+                                $userID = $session["UserID"] ?? 0;
+                                // Make sure we refresh the cookie too.
+                                $this->setIdentity($userID, true, $this->SessionID);
+                                break;
+                            case SessionModel::REFRESH_EXPIRED:
+                                // Our session expired.
                                 $this->_clearIdentity();
-                                $cookie = Gdn::getContainer()->get(Cookie::class);
-                                // Pushed removal of cookie, to allow user to login again.
-                                $cookie->flush();
-                                throw new ForbiddenException("Cookie must have session ID.");
-                            }
-                            $sessionModel = new SessionModel();
-                            $session = $sessionModel->startNewSession($userID);
-                            $this->SessionID = $session["SessionID"];
-                            $this->setIdentity($userID, true, $this->SessionID);
-                        } else {
-                            $session = $sessionModel->getID($this->SessionID, DATASET_TYPE_ARRAY);
-                            $refreshResult = $sessionModel->refreshSession($this->SessionID);
-                            switch ($refreshResult) {
-                                case SessionModel::REFRESH_NO_REFRESH:
-                                    // We have a userID, but didn't refresh the session.
-                                    $userID = $session["UserID"] ?? 0;
-                                    break;
-                                case SessionModel::REFRESH_REFRESHED:
-                                    // We have a userID, but did refresh the session.
-                                    $userID = $session["UserID"] ?? 0;
-                                    // Make sure we refresh the cookie too.
-                                    $this->setIdentity($userID, true, $this->SessionID);
-                                    break;
-                                case SessionModel::REFRESH_EXPIRED:
-                                    // Our session expired.
-                                    $this->_clearIdentity();
-                                    $userID = 0;
-                                    break;
-                            }
+                                $userID = 0;
+                                break;
                         }
                     }
             }
@@ -375,12 +355,9 @@ class Gdn_CookieIdentity
         $payload = [
             "exp" => $persistExpiry, // Expiration
             "iat" => $timestamp, // Issued at
+            "sid" => $sessionID, // Session ID
+            "sub" => $userID, // Subject
         ];
-        if (\Vanilla\FeatureFlagHelper::featureEnabled(Gdn_Session::FEATURE_SESSION_ID_COOKIE)) {
-            $payload["sid"] = $sessionID; // Session ID
-        }
-        $payload["sub"] = $userID; // Subject
-
         // Generate the token.
 
         Gdn::pluginManager()

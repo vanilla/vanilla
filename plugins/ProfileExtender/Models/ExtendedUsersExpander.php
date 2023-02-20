@@ -38,6 +38,7 @@ class ExtendedUsersExpander extends AbstractApiExpander
             ->addExpandField("lastPost.insertUser.extended", "lastPost.insertUserID")
             ->addExpandField("lastUser.extended", "lastUserID")
             ->addExpandField("updateUser.extended", "updateUserID")
+            ->addExpandField("inviteUser.extended", "inviteUserID")
             ->addExpandField("extended", "userID");
     }
 
@@ -54,7 +55,7 @@ class ExtendedUsersExpander extends AbstractApiExpander
      */
     public function resolveFragements(array $recordIDs): array
     {
-        if (FeatureFlagHelper::featureEnabled("ImprovedUserProfileFields")) {
+        if (FeatureFlagHelper::featureEnabled(ProfileFieldModel::FEATURE_FLAG)) {
             return $this->profileFieldModel->getUsersProfileFields($recordIDs);
         }
         return $this->profileExtenderPlugin->getUserProfileValuesChecked($recordIDs);

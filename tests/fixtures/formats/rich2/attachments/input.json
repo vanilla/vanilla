@@ -1,0 +1,44 @@
+[
+  {
+    "type": "rich_embed_card",
+    "children": [{ "text": "" }],
+    "dataSourceType": "file",
+    "url": "https://dev.vanilla.localhost/uploads/L5OCOMF86I74/20221214-094554.jpg",
+    "embedData": {
+      "url": "https://dev.vanilla.localhost/uploads/L5OCOMF86I74/20221214-094554.jpg",
+      "name": "20221214_094554.jpg",
+      "type": "image/jpeg",
+      "size": 2791542,
+      "width": 9248,
+      "height": 6936,
+      "displaySize": "large",
+      "float": "none",
+      "mediaID": 113,
+      "dateInserted": "2022-12-21T05:24:44+00:00",
+      "insertUserID": 2,
+      "foreignType": "embed",
+      "foreignID": 2,
+      "embedType": "file"
+    }
+  },
+  {
+    "type": "rich_embed_card",
+    "children": [{ "text": "" }],
+    "dataSourceType": "file",
+    "url": "https://dev.vanilla.localhost/uploads/SON7DOW86RO1/2022-hl-hours-1.pdf",
+    "embedData": {
+      "url": "https://dev.vanilla.localhost/uploads/SON7DOW86RO1/2022-hl-hours-1.pdf",
+      "name": "2022_HL_Hours__1_.pdf",
+      "type": "application/pdf",
+      "size": 106672,
+      "displaySize": "large",
+      "float": "none",
+      "mediaID": 114,
+      "dateInserted": "2022-12-21T05:24:52+00:00",
+      "insertUserID": 2,
+      "foreignType": "embed",
+      "foreignID": 2,
+      "embedType": "file"
+    }
+  }
+]

@@ -30,8 +30,13 @@ class ReactionsContainerRules extends AddonContainerRules
         // This used to be in the top level of the file but doesn't working with preloading there.
         // Notably we can't actually do tests for this because function declarations live for the whole duration
         // Of the test suit. This will need a full refactor to work in tests.
+        $addonManager = \Gdn::addonManager();
         if (!DebugUtils::isTestMode() && !function_exists("writeReactions")) {
-            include realpath(__DIR__ . "/../views/reaction_functions.php");
+            $path =
+                PATH_ROOT .
+                "/" .
+                $addonManager->lookupAsset("/views/reaction_functions.php", $addonManager->lookupAddon("Reactions"));
+            include $path;
         }
     }
 }

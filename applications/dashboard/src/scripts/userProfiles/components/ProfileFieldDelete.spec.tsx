@@ -8,6 +8,7 @@ import React from "react";
 import { render, waitFor, screen, fireEvent } from "@testing-library/react";
 import { ProfileFieldsFixture } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
 import ProfileFieldDelete from "@dashboard/userProfiles/components/ProfileFieldDelete";
+import { LiveAnnouncer } from "react-aria-live";
 
 const mockField = ProfileFieldsFixture.mockProfileFields()[0];
 const mockClose = jest.fn();
@@ -15,7 +16,9 @@ const mockClose = jest.fn();
 const renderInProvider = () => {
     return render(
         ProfileFieldsFixture.createMockProfileFieldsProvider(
-            <ProfileFieldDelete field={mockField} close={mockClose} />,
+            <LiveAnnouncer>
+                <ProfileFieldDelete field={mockField} close={mockClose} />,
+            </LiveAnnouncer>,
         ),
     );
 };

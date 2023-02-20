@@ -204,13 +204,13 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
     /**
      * Get a SearchType by a string name.
      *
-     * @param string $forType
+     * @param string $type
      *
      * @return AbstractSearchType|null
      */
-    public function getSearchTypeByType(string $forType): ?AbstractSearchType
+    public function getSearchTypeByType(string $type): ?AbstractSearchType
     {
-        return $this->searchTypesByType[$forType] ?? null;
+        return $this->searchTypesByType[$type] ?? null;
     }
 
     /**

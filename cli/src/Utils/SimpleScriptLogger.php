@@ -23,6 +23,14 @@ class SimpleScriptLogger implements \Psr\Log\LoggerInterface
     const ESCAPE_PURPLE = "1;35";
     const ESCAPE_CYAN = "0;36";
 
+    const ESCAPE_MAPPINGS = [
+        "red" => self::ESCAPE_RED,
+        "green" => self::ESCAPE_GREEN,
+        "yellow" => self::ESCAPE_YELLOW,
+        "purple" => self::ESCAPE_PURPLE,
+        "cyan" => self::ESCAPE_CYAN,
+    ];
+
     /**
      * @inheritdoc
      */
@@ -128,6 +136,7 @@ class SimpleScriptLogger implements \Psr\Log\LoggerInterface
      */
     private function logInternal($message, array $context = [])
     {
+        $isTty = stream_isatty(STDOUT);
         $countNewLines = $context[self::CONTEXT_LINE_COUNT] ?? 1;
         $escapeSequence = $context[self::CONTEXT_ESCAPE_SEQUENCE] ?? null;
 
@@ -137,9 +146,23 @@ class SimpleScriptLogger implements \Psr\Log\LoggerInterface
         }
         $result = "$message$newlines";
 
-        if ($escapeSequence !== null) {
+        if ($escapeSequence !== null && $isTty) {
             $result = "\033[${escapeSequence}m${result}\033[0m";
         }
+
+        // Now replace placeholders with escape sequences
+        $searches = [];
+        $replacements = [];
+        foreach (self::ESCAPE_MAPPINGS as $keyword => $escapeSequence) {
+            $searches[] = "<$keyword>";
+            $replacements[] = $isTty ? "\033[{$escapeSequence}m" : "";
+            $searches[] = "</$keyword>";
+            $replacements[] = $isTty ? "\033[0m" : "";
+            $searches[] = "</ $keyword>";
+            $replacements[] = $isTty ? "\033[0m" : "";
+        }
+        $result = str_replace($searches, $replacements, $result);
+
         echo $result;
     }
 

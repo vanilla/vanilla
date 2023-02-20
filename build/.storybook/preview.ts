@@ -13,7 +13,6 @@ import { loadThemeFonts } from "@library/theming/loadThemeFonts";
 
 // Make sure our fonts load
 loadThemeFonts();
-
 const panelLayoutBreakPoints = oneColumnVariables().breakPoints;
 
 const customViewports = {

@@ -54,5 +54,10 @@
         "addons/themes/*/src/scripts/**/*.tsx",
         ".storybookAppPages/*.ts*"
     ],
+    "files": [
+        "node_modules/jest-expect-message/types/index.d.ts",
+        "library/src/scripts/htmlWidget/HtmlWidgetEditor.d.ts",
+        "./library/src/scripts/vanilla-editor/plugins/richEmbedPlugin/toolbar/triggerFloatingLinkEdit.tsx"
+    ],
     "exclude": ["**/*.js", "**/*.jsx", "cloud/**/*", "node_modules/**/*", "node_modules", "packages/*/src/*"]
 }

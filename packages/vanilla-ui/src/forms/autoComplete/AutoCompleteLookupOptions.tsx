@@ -13,6 +13,7 @@ import { notEmpty } from "@vanilla/utils";
 import { IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
 import { AutoCompleteContext } from "./AutoCompleteContext";
 import { useApiContext } from "../../ApiContext";
+import { useIsMounted } from "@vanilla/react-utils";
 
 export interface ILookupApi {
     searchUrl: string;
@@ -121,12 +122,17 @@ function useApiLookup(
         [labelKey, extraLabelKey, valueKey],
     );
 
+    const isMounted = useIsMounted();
+
     // Loading of initial option.
     useEffect(() => {
         if (initialValue && !(excludeLookups ?? []).includes(initialValue)) {
             if ([initialValue].flat().length <= 1) {
                 const actualApiUrl = singleUrl.replace("/api/v2", "").replace("%s", initialValue);
                 api.get(actualApiUrl).then((response) => {
+                    if (!isMounted()) {
+                        return;
+                    }
                     if (response.data) {
                         let options = [transformApiToOption(response.data)];
                         if (processOptions) {
@@ -148,6 +154,9 @@ function useApiLookup(
 
                 // Fetch from API
                 api.get(actualSearchUrl).then((response) => {
+                    if (!isMounted()) {
+                        return;
+                    }
                     const { data } = response;
                     const results = resultsKey === "." ? data : get(data, resultsKey, "[]");
                     let options: IAutoCompleteOption[] = results.map(transformApiToOption);
@@ -177,6 +186,9 @@ function useApiLookup(
 
             // Fetch from API
             api.get(actualSearchUrl).then((response) => {
+                if (!isMounted()) {
+                    return;
+                }
                 const { data } = response;
                 const results = resultsKey === "." ? data : get(data, resultsKey, "[]");
                 let options: IAutoCompleteOption[] = results.map(transformApiToOption);

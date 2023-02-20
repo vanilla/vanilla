@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -34,6 +34,8 @@ export interface IBaseEmbedData {
     embedType: string;
     url: string;
     name?: string;
+    faviconUrl?: string;
+    embedStyle?: "rich_embed_inline" | "rich_embed_card";
 }
 
 export interface IBaseEmbedProps extends IEmbedContext, IBaseEmbedData {
@@ -143,7 +145,7 @@ let builtinsRegistered = false;
 /**
  * Mount the built-in embeds if they aren't already.
  */
-function ensureBuiltinEmbeds() {
+export function ensureBuiltinEmbeds() {
     if (builtinsRegistered) {
         return;
     }

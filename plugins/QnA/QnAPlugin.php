@@ -870,9 +870,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
                 $ActivityModel->saveQueue();
 
                 $this->EventArguments["Activity"] = &$activity;
-                $data = $this->commentModel->getID($commentID, DATASET_TYPE_ARRAY);
-                $answerEvent = new AnswerEvent(AnswerEvent::ACTION_ANSWER_ACCEPTED, ["answer" => $data], $sender);
-                $this->eventManager->dispatch($answerEvent);
             }
         }
         redirectTo("/discussion/comment/{$comment["CommentID"]}#Comment_{$comment["CommentID"]}", 302, false);

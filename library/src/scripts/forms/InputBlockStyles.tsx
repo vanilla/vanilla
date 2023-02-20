@@ -34,11 +34,13 @@ export const inputBlockClasses = useThemeCache(() => {
         display: "block",
         width: percent(100),
         color: ColorsUtils.colorOut(formElementVars.colors.fg),
+        marginBottom: 4,
     });
 
     const root = css({
         display: "block",
         width: percent(100),
+        margin: 0,
         ...{
             [`& + &`]: {
                 marginTop: styleUnit(formElementVars.spacing.margin),
@@ -86,8 +88,17 @@ export const inputBlockClasses = useThemeCache(() => {
 
     const errorsPadding = css(inputClasses().inputPaddingMixin);
 
+    const extendErrorPadding = css({
+        ...Mixins.padding({
+            horizontal: 0,
+        }),
+    });
+
     const error = css({
         display: "block",
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("small", "normal"),
+        }),
         color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
         ...{
             "& + &": {
@@ -103,12 +114,20 @@ export const inputBlockClasses = useThemeCache(() => {
         opacity: 0.6,
     });
 
+    const noteAfterInput = css({
+        display: "block",
+        ...Mixins.font({
+            ...globalVars.fontSizeAndWeightVars("small", "normal"),
+        }),
+        marginTop: 4, // This magic number to match the labels margin bottom
+        opacity: 0.6,
+    });
+
     const labelText = css({
         display: "block",
         ...Mixins.font({
             ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
         }),
-        marginBottom: styleUnit(formElementVars.spacing.margin),
     });
 
     const sectionTitle = css({
@@ -117,7 +136,7 @@ export const inputBlockClasses = useThemeCache(() => {
     });
 
     const fieldsetGroup = css({
-        marginTop: styleUnit(formElementVars.spacing.margin),
+        marginTop: 4,
         ...{
             "&.noMargin": {
                 marginTop: styleUnit(0),
@@ -175,5 +194,7 @@ export const inputBlockClasses = useThemeCache(() => {
         related,
         grid,
         tight,
+        noteAfterInput,
+        extendErrorPadding,
     };
 });

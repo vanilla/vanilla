@@ -15,8 +15,18 @@ helpAsset(t('See Also'), ul([
 ]));
 
 helpAsset(t('Need More Help?'), ul([
-    anchor(t('API Overview'), 'http://docs.vanillaforums.com/apiv2/', '', ['target' => '_blank']),
-    anchor(t('Authentication'), 'http://docs.vanillaforums.com/apiv2/authentication', '', ['target' => '_blank'])
+    anchor(
+        t('API Overview'),
+        'https://success.vanillaforums.com/kb/articles/40-api-v2-overview',
+        '',
+        ['target' => '_blank']
+    ),
+    anchor(
+        t('Authentication'),
+        'https://success.vanillaforums.com/kb/articles/218-authenticating-api-calls',
+        '',
+        ['target' => '_blank']
+    )
 ]));
 
 ?>

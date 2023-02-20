@@ -11,9 +11,30 @@ import getStore, { resetActionAC } from "@library/redux/getStore";
 import { INITIAL_LOCALE_STATE } from "@library/locales/localeReducer";
 import { INITIAL_THEME_STATE } from "@library/theming/themeReducer";
 import { INITIAL_CONFIG_STATE } from "@library/config/configReducer";
+import { UserFixture } from "@library/features/__fixtures__/User.fixture";
+import { LoadStatus } from "@library/@types/api/core";
 
 const DEFAULT_STATE: ICoreStoreState = {
-    users: INITIAL_USERS_STATE,
+    users: {
+        ...INITIAL_USERS_STATE,
+        permissions: {
+            status: LoadStatus.SUCCESS,
+            data: {
+                isAdmin: true,
+                isSysAdmin: true,
+                permissions: [],
+            },
+        },
+        current: {
+            ...UserFixture.adminAsCurrent,
+        },
+        usersByID: {
+            2: {
+                status: LoadStatus.SUCCESS,
+                data: UserFixture.createMockUser({ userID: 2 }),
+            },
+        },
+    },
     theme: INITIAL_THEME_STATE,
     locales: INITIAL_LOCALE_STATE,
     config: INITIAL_CONFIG_STATE,

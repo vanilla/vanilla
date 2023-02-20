@@ -23,6 +23,7 @@ use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
+use Vanilla\ReflectionHelper;
 
 /**
  * Dispatches requests and receives responses.
@@ -531,15 +532,15 @@ class Dispatcher implements LoggerAwareInterface
             /* @var \ReflectionParameter $param */
             $lname = strtolower($param->getName());
 
-            if ($param->getClass() !== null) {
-                $className = $param->getClass()->getName();
+            if (ReflectionHelper::getClass($param) !== null) {
+                $className = ReflectionHelper::getClass($param)->getName();
 
                 if (isset($largs[$lname]) && is_a($largs[$lname], $className)) {
                     $value = $largs[$lname];
                 } elseif (isset($largs[$index]) && is_a($largs[$index], $className)) {
                     $value = $largs[$index];
                 } elseif ($container->has($className)) {
-                    $value = $container->get($param->getClass()->getName());
+                    $value = $container->get(ReflectionHelper::getClass($param)->getName());
                 } else {
                     $value = null;
                     $missing[$lname] = '$' . $param->getName();

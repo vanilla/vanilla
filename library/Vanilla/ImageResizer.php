@@ -65,6 +65,23 @@ class ImageResizer
     ];
 
     /**
+     * Can the image's filetype be resized?
+     *
+     * @param string $source
+     * @return bool
+     */
+    public function canResize(string $source): bool
+    {
+        $result = getimagesize($source);
+        $srcType = $result[2] ?? null;
+
+        if (in_array($srcType, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Resize an image.
      *
      * @param string $source The path of the source image.
@@ -83,7 +100,7 @@ class ImageResizer
         }
 
         [$width, $height, $srcType] = getimagesize($source);
-        if (!in_array($srcType, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+        if (!$this->canResize($source)) {
             $ext = $this->extFromImageType($srcType);
             throw new \InvalidArgumentException("Cannot resize images of this type ($ext).", 400);
         }
@@ -430,10 +447,12 @@ class ImageResizer
      * @param resource $srcImage
      * @param ?int $orientation
      * @return resource
+     *
+     * @psalm-suppress UndefinedClass
      */
     private function reorientImage($srcImage, ?int $orientation)
     {
-        if (!is_resource($srcImage)) {
+        if (!is_resource($srcImage) && class_exists(\Gd_Image::class) && !is_a($srcImage, \GdImage::class)) {
             throw new \InvalidArgumentException("Unable to reorient image. Not a valid resource.");
         }
 

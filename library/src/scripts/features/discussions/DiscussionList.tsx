@@ -38,7 +38,7 @@ export function DiscussionList(props: IProps) {
                 discussionOptions={{
                     ...props.discussionOptions,
                     featuredImage: {
-                        display: !!props.apiParams.featuredImage,
+                        display: props.apiParams.featuredImage,
                         ...(props.apiParams.fallbackImage && { fallbackImage: props.apiParams.fallbackImage }),
                     },
                 }}

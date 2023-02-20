@@ -25,7 +25,14 @@ type DataIconType =
 
 type DiscussionIconType = "discussion-bookmark-solid" | "discussion-bookmark";
 
-type EditorIconType = "editor-eye-slash" | "editor-eye";
+type EditorIconType =
+    | "editor-eye-slash"
+    | "editor-eye"
+    | "editor-link"
+    | "editor-unlink"
+    | "editor-link-text"
+    | "editor-link-rich"
+    | "editor-link-card";
 
 type ExternalIconType = "external-link";
 
@@ -49,6 +56,8 @@ type NavigationIconType =
     | "navigation-skip";
 
 type NewIconType = "new-discussion" | "new-event" | "new-idea" | "new-poll" | "new-question";
+
+type NotificationType = "notification-alert";
 
 type ProfileIconType = "profile-crown" | "profile-lock";
 
@@ -82,6 +91,7 @@ export type IconType =
     | MetaIconType
     | NavigationIconType
     | NewIconType
+    | NotificationType
     | ProfileIconType
     | ReactionIconType
     | SearchIconType

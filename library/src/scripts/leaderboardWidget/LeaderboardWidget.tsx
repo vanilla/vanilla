@@ -1,28 +1,29 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React, { useMemo } from "react";
 
+import { cx } from "@emotion/css";
+import { IUserFragment } from "@library/@types/api/users";
+import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
+import { IWidgetCommonProps } from "@library/homeWidget/HomeWidget";
+import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import {
     IHomeWidgetContainerOptions,
     WidgetContainerDisplayType,
 } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { HomeWidgetItemContentType, IHomeWidgetItemOptions } from "@library/homeWidget/HomeWidgetItem.styles";
-import { DeepPartial } from "redux";
-import { IUserFragment } from "@library/@types/api/users";
+import { HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
+import { HomeWidgetItemContentType } from "@library/homeWidget/HomeWidgetItem.styles";
+import { UserIconTypes } from "@library/icons/titleBar";
+import { Widget } from "@library/layout/Widget";
+import { leaderboardWidgetClasses } from "@library/leaderboardWidget/LeaderboardWidget.styles";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { visibility } from "@library/styles/styleHelpersVisibility";
-import { cx } from "@emotion/css";
-import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
-import { leaderboardWidgetClasses } from "@library/leaderboardWidget/LeaderboardWidget.styles";
-import { HomeWidget, IWidgetCommonProps } from "@library/homeWidget/HomeWidget";
-import { HomeWidgetItem } from "@library/homeWidget/HomeWidgetItem";
-import { labelize, RecordID } from "@vanilla/utils";
 import { t } from "@vanilla/i18n";
-import { Widget } from "@library/layout/Widget";
+import { labelize, RecordID } from "@vanilla/utils";
 
 export interface ILeader {
     user: IUserFragment;
@@ -58,7 +59,13 @@ export function LeaderboardWidget(props: IProps) {
 
     return (
         <Widget>
-            <HomeWidgetContainer {...{ title, subtitle, description }} options={containerOptions}>
+            <HomeWidgetContainer
+                {...{ title, subtitle, description }}
+                options={{
+                    ...containerOptions,
+                    displayType: containerOptions?.displayType ?? WidgetContainerDisplayType.LIST, //defaulting to list so in HomeWidgetContainer it takes the right classes
+                }}
+            >
                 {leaders && !isDefaultView ? (
                     leaders.map((leader) => (
                         <HomeWidgetItem
@@ -117,11 +124,13 @@ function LeaderboardTable(props: ILeaderboardTableProps) {
                         <tr key={userFragment.userID} className={cx(classes.row)}>
                             <td className={cx(classes.cell)}>
                                 <span className={cx(classes.userStyles, "Leaderboard-User")}>
-                                    <img
-                                        src={userFragment.photoUrl}
-                                        className={cx(classes.profilePhotoStyles, "ProfilePhoto", "ProfilePhotoSmall")}
-                                        loading="lazy"
-                                    />
+                                    <ProfileLink userFragment={userFragment} isUserCard>
+                                        <UserPhoto
+                                            userInfo={userFragment}
+                                            size={UserPhotoSize.MEDIUM}
+                                            styleType={UserIconTypes.DEFAULT}
+                                        />
+                                    </ProfileLink>
                                     <span className={cx(classes.usernameStyles, "Username")}>
                                         <ProfileLink
                                             className={classes.linkStyles}

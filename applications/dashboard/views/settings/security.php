@@ -145,17 +145,29 @@ echo $form->errors();
         </div>
         <div class="input-wrap-right">
             <div class="textbox-suffix">
-                <?php echo $form->dropDown("Garden.Cookie.PersistExpiry", [
-                    "1 hour" => plural(1, "%s hour", "%s hours"),
-                    "6 hours" => plural(6, "%s hour", "%s hours"),
-                    "1 days" => plural(1, "%s day", "%s days"),
-                    "1 week" => plural(1, "%s week", "%s weeks"),
-                    "2 weeks" => plural(2, "%s week", "%s weeks"),
-                    "1 month" => plural(1, "%s month", "%s months"),
-                ]); ?>
+                <?php echo $form->dropDown(
+                    "Garden.Cookie.PersistExpiry",
+                    [
+                        "1 month" => plural(1, "%s month", "%s months"),
+                        "2 weeks" => plural(2, "%s week", "%s weeks"),
+                        "1 week" => plural(1, "%s week", "%s weeks"),
+                        "1 days" => plural(1, "%s day", "%s days"),
+                        "6 hours" => plural(6, "%s hour", "%s hours"),
+                        "1 hour" => plural(1, "%s hour", "%s hours"),
+                    ],
+                    [
+                        "addMissing" => true,
+                        "optionFormat" => function ($value) {
+                            $parts = explode(" ", $value);
+                            return plural($parts[0], "%s {$parts[1]}", "%s {$parts[1]}");
+                        },
+                    ]
+                ); ?>
             </div>
         </div>
     </li>
+
+
     <li class="form-group">
         <div class="label-wrap-wide">
             <?php echo $form->label("Password Minimum Length", "Garden.Password.MinLength"); ?>
@@ -203,7 +215,6 @@ echo $form->errors();
             </div>
         </div>
     </li>
-
     <li class="form-group">
         <div class="label-wrap-wide">
             <?php echo $form->label("Lockout Time (seconds)", "Garden.SignIn.LockoutTime"); ?>

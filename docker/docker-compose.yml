@@ -1,0 +1,164 @@
+name: "Vanilla"
+services:
+    database:
+        # This container currently only works on linux/amd64
+        # Forcing this causes other archs to use a translations layer if possible.
+        platform: "linux/amd64"
+        build:
+            context: "./images/mysql"
+        container_name: "database"
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+            MYSQL_DATABASE: vanilla_dev
+        networks:
+            - "vanilla-network"
+        volumes:
+            - "database:/var/lib/mysql"
+            - "logs-mysql:/var/log/mysql"
+    memcached:
+        build:
+            context: "./images/memcached"
+        networks:
+            - "vanilla-network"
+        container_name: memcached
+    nginx:
+        build:
+            context: "./images/nginx"
+        container_name: "nginx"
+        ports:
+            - "80:80"
+            - "8080:8080"
+            - "443:443"
+        depends_on:
+            - "php-fpm"
+        networks:
+            vanilla-network:
+                aliases: # Allows (sso|dev).vanilla.localhost to be resolved internally from php-fpm
+                    - "sso.vanilla.localhost"
+                    - "dev.vanilla.localhost"
+                    - "vanilla.test"
+                    - "vanilla.localhost"
+                    - "queue.vanilla.localhost"
+        volumes:
+            - "../../:/srv/vanilla-repositories:cached"
+            - "/srv/vanilla-repositories/vanilla/node_modules" # Don't sync this one.
+            - "/srv/vanilla-repositories/vanilla/.yarn" # Don't sync this one either.
+            - /srv/vanilla-repositories/vanilla-queue-service # Don't sync this in either if it's present.
+            - logs-nginx:/var/log/nginx
+    php-fpm:
+        build:
+            context: "./images/php"
+            dockerfile: "./8.0/Dockerfile"
+        container_name: "php-fpm"
+        networks:
+            - "vanilla-network"
+        volumes: &php-volumes
+            - "./images/nginx/certs:/usr/local/share/ca-certificates:cached" # Mount extra certificates
+            - "../../:/srv/vanilla-repositories:cached"
+            - "logs-php:/var/log"
+    php-fpm-xdebug:
+        build:
+            context: "./images/php"
+            dockerfile: "./8.0/Dockerfile"
+        container_name: "php-fpm-xdebug"
+        environment:
+            - "PHP_DEBUG=on"
+        networks:
+            - "vanilla-network"
+        volumes: *php-volumes
+
+    # https://docs.imgproxy.net/
+    imgproxy:
+        build:
+            context: "./images/imgproxy"
+        container_name: "imgproxy"
+        networks:
+            - "vanilla-network"
+        environment:
+            - "IMGPROXY_IGNORE_SSL_VERIFICATION=${IMGPROXY_IGNORE_SSL_VERIFICATION}"
+            - "IMGPROXY_KEY=${IMGPROXY_KEY}"
+            - "IMGPROXY_SALT=${IMGPROXY_SALT}"
+            - "IMGPROXY_SIGNATURE=${IMGPROXY_SIGNATURE}"
+    es-logs:
+        container_name: "es-logs"
+        image: docker.elastic.co/elasticsearch/elasticsearch:${ES_STACK_VERSION}
+        environment:
+            - "ELASTICSEARCH_URL=http://es-logs:9200"
+            - "ELASTICSEARCH_HOSTS=http://es-logs:9200"
+            - discovery.type=single-node
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+            - xpack.security.enabled=false
+            - xpack.security.enrollment.enabled=false
+        volumes:
+            - es-logs:/usr/share/elasticsearch/data
+        ports:
+            - 9200:9200
+        networks:
+            - vanilla-network
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 1
+                delay: 180s
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://0.0.0.0:9200/_cluster/health"]
+            interval: 5s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+    kibana-logs:
+        depends_on:
+            es-logs:
+                condition: service_healthy
+        container_name: "kibana-logs"
+        image: docker.elastic.co/kibana/kibana:${ES_STACK_VERSION}
+        ports:
+            - 5601:5601
+        volumes:
+            - kibana-data:/usr/share/kibana/data
+        environment:
+            ELASTICSEARCH_URL: http://es-logs:9200
+            ELASTICSEARCH_HOSTS: http://es-logs:9200
+            SERVER_PUBLICBASEURL: https://logs.vanilla.localhost
+            XPACK_APM_SERVICEMAPENABLED: "true"
+            XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
+        networks:
+            vanilla-network:
+    logstash:
+        container_name: logstash
+        build:
+            context: "./images/logstash"
+            args:
+                ES_STACK_VERSION: ${ES_STACK_VERSION}
+        expose:
+            - 10514
+        volumes:
+            - ./logs/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+            - ./logs/logstash/:/usr/share/logstash/pipeline/:ro
+            - logs-nginx:/var/log/nginx:ro
+            - logs-php:/var/log/php-fpm:ro
+        depends_on:
+            es-logs:
+                condition: service_healthy
+            kibana-logs:
+                condition: service_started
+        networks:
+            vanilla-network:
+
+volumes:
+    es-logs:
+    kibana-data:
+    database:
+    logs-php:
+    logs-mysql:
+    logs-nginx:
+    filebeat:
+
+networks:
+    vanilla-network:
+        external: true
+        driver: "bridge"
+        name: "vanilla-network"

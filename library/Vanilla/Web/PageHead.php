@@ -121,7 +121,6 @@ final class PageHead implements PageHeadInterface
     public function renderHtml(): Markup
     {
         $this->applyMetaTags();
-
         $this->inlineScripts[] = $this->assetProvider->getInlinePolyfillContents();
         $this->scripts = array_merge($this->scripts, $this->assetProvider->getScripts($this->assetSection));
         $this->styles = array_merge($this->styles, $this->assetProvider->getStylesheets($this->assetSection));
@@ -203,9 +202,9 @@ final class PageHead implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function setJsonLdItems(array $jsonLDItemsArray)
+    public function setJsonLdItems(array $setJsonLDItems)
     {
-        $this->jsonLDArray = $jsonLDItemsArray;
+        $this->jsonLDArray = $setJsonLDItems;
     }
 
     /**

@@ -154,7 +154,7 @@ class TwigEnhancer
      *
      * @return \Twig\Markup The echoed HTML wrapped as twig markup. All content here should be sanitized already.
      */
-    public function fireEchoEvent(string $eventName, array &$args = []): \Twig\Markup
+    public function fireEchoEvent(string $eventName, array $args = []): \Twig\Markup
     {
         ob_start();
         try {

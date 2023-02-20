@@ -146,7 +146,9 @@ class HomeController extends Gdn_Controller
         } catch (Exception $e) {
             throw new Gdn_UserException(t("Url is invalid."));
         }
-
+        if (!Gdn::config("Garden.Format.WarnLeaving", true)) {
+            throw \notFoundException();
+        }
         $this->setData("Target", anchor(htmlspecialchars($target), $target, "", ["rel" => "nofollow"]));
         $this->title(t("Leaving"));
         $this->removeCssFile("admin.css");

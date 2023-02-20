@@ -105,6 +105,9 @@ class DiscussionModel extends Gdn_Model implements
     /** @var string for type redirect */
     const REDIRECT_TYPE = "redirect";
 
+    /** @var string for type stub */
+    const STUB_TYPE = "stub";
+
     /** @var string for type discussion */
     const DISCUSSION_TYPE = "Discussion";
 
@@ -1095,7 +1098,7 @@ class DiscussionModel extends Gdn_Model implements
         if (!empty([$orderBy])) {
             // This is pseudo foreach loop.
             // We only take the first pair of $orderField => $orderDirection here.
-            // So the loop will only entered ones
+            // So the loop will be entered only once
             foreach (array_slice($orderBy, 0, 1, true) as $orderField => $orderDirection) {
                 $this->fixOrder($data, $orderField, $orderDirection);
             }
@@ -1260,12 +1263,11 @@ class DiscussionModel extends Gdn_Model implements
      * Get a count of the list of discussions.
      *
      * @param array $where The where condition of the get.
-     * @param int|false $limit records per page limit.
      * @param bool|string $filterType Query Filter.
      * @param bool|int $userID potential User ID.
      * @return string Returns query of discussions.
      */
-    public function getPagingCount(array $where = [], $limit = false, $filterType = false, $userID = false): int
+    public function getPagingCount(array $where = [], $filterType = false, $userID = false): int
     {
         // Check to see whether or not we are removing announcements.
         if (strtolower(val("Announce", $where)) == "all") {
@@ -1276,13 +1278,15 @@ class DiscussionModel extends Gdn_Model implements
         } else {
             $where["d.Announce"] = "0";
         }
-        if (empty($limit)) {
-            $limit = c("Vanilla.Discussions.PerPage", 30);
-        }
-        $limit *= 100;
+        $limit = Gdn::config("Vanilla.APIv2.MaxCount", 10000);
         $countQuery = $this->getWhereQuery($where, [], [], $limit, false, $filterType, $userID);
+        $countQuery = <<<SQL
+SELECT COUNT(*) as count FROM ({$countQuery}) cq
+SQL;
+
         $result = $this->SQL->query($countQuery);
-        return $result->count();
+
+        return $result->firstRow(DATASET_TYPE_ARRAY)["count"];
     }
 
     /**
@@ -1877,12 +1881,9 @@ class DiscussionModel extends Gdn_Model implements
      * @param int|false $limit Per page limit.
      * @return int row count.
      */
-    public function getAnnouncementsPagingCount($wheres = [], $limit = false): int
+    public function getAnnouncementsPagingCount($wheres = []): int
     {
-        if (empty($limit)) {
-            $limit = c("Vanilla.Discussions.PerPage", 30);
-        }
-        $limit *= 100;
+        $limit = Gdn::config("Vanilla.APIv2.MaxCount", 10000);
         $countQuery = $this->getAnnouncementsQuery($wheres, 0, $limit);
         if (empty($countQuery)) {
             return 0;
@@ -4499,10 +4500,15 @@ SQL;
         $session = \Gdn::session();
         if ($session->User) {
             $row["unread"] =
+                isset($row["CountUnreadComments"]) &&
                 $row["CountUnreadComments"] !== 0 &&
                 ($row["CountUnreadComments"] !== true ||
                     dateCompare(val("DateFirstVisit", $session->User), $row["DateInserted"]) <= 0);
-            if ($row["CountUnreadComments"] !== true && $row["CountUnreadComments"] > 0) {
+            if (
+                isset($row["CountUnreadComments"]) &&
+                $row["CountUnreadComments"] !== true &&
+                $row["CountUnreadComments"] > 0
+            ) {
                 $row["countUnread"] = $row["CountUnreadComments"];
             }
         } else {
@@ -4519,35 +4525,38 @@ SQL;
             unset($row["Category"]);
         }
 
-        $row["Announce"] = (bool) $row["Announce"];
+        $row["Announce"] = (bool) ($row["Announce"] ?? 0);
         $row["Url"] = discussionUrl($row);
         $row["CanonicalUrl"] =
             isset($row["CanonicalUrl"]) && is_string($row["CanonicalUrl"]) ? $row["CanonicalUrl"] : $row["Url"];
 
-        $rawBody = $row["Body"];
-        $format = $row["Format"];
+        $rawBody = $row["Body"] ?? "";
+        $format = $row["Format"] ?? null;
 
-        $this->formatField($row, "Body", $format);
-        $row["Attributes"] = new Attributes($row["Attributes"]);
+        $bodyParsed = $this->formatterService->parse($rawBody, $format);
+        if ($this->doFieldFormatting) {
+            $row["Body"] = $this->formatterService->renderHTML($bodyParsed, $format);
+        }
+        $row["Attributes"] = new Attributes($row["Attributes"] ?? null);
 
         if (array_key_exists("Bookmarked", $row)) {
-            $row["Bookmarked"] = (bool) $row["Bookmarked"];
+            $row["Bookmarked"] = (bool) ($row["Bookmarked"] ?? 0);
         }
 
         if (ModelUtils::isExpandOption("lastPost", $expand)) {
             $lastPost = [
-                "discussionID" => $row["DiscussionID"],
-                "insertUserID" => $row["LastUserID"],
+                "discussionID" => $row["DiscussionID"] ?? null,
+                "insertUserID" => $row["LastUserID"] ?? null,
             ];
-            $lastPost["dateInserted"] = $row["DateLastComment"] ?? $row["DateInserted"];
+            $lastPost["dateInserted"] = $row["DateLastComment"] ?? ($row["DateInserted"] ?? null);
             if ($row["LastCommentID"]) {
-                $lastPost["CommentID"] = $row["LastCommentID"];
-                $lastPost["CategoryID"] = $row["CategoryID"];
-                $lastPost["name"] = sprintft("Re: %s", $row["Name"]);
-                $lastPost["url"] = commentUrl($lastPost, true);
+                $lastPost["CommentID"] = $row["LastCommentID"] ?? null;
+                $lastPost["CategoryID"] = $row["CategoryID"] ?? null;
+                $lastPost["name"] = sprintft("Re: %s", $row["Name"] ?? "");
+                $lastPost["url"] = isset($lastPost) ? commentUrl($lastPost, true) : null;
             } else {
-                $lastPost["name"] = $row["Name"];
-                $lastPost["url"] = $row["Url"];
+                $lastPost["name"] = $row["Name"] ?? null;
+                $lastPost["url"] = $row["Url"] ?? null;
             }
 
             if (
@@ -4565,11 +4574,11 @@ SQL;
 
         // This shouldn't be necessary, but the db allows nulls for dateLastComment.
         if (empty($row["DateLastComment"])) {
-            $row["DateLastComment"] = $row["DateInserted"];
+            $row["DateLastComment"] = $row["DateInserted"] ?? null;
         }
 
         if (ModelUtils::isExpandOption("excerpt", $expand)) {
-            $row["excerpt"] = $this->formatterService->renderExcerpt($rawBody, $format);
+            $row["excerpt"] = $this->formatterService->renderExcerpt($bodyParsed, $format);
         }
         if (ModelUtils::isExpandOption("-body", $expand)) {
             unset($row["Body"]);
@@ -4579,9 +4588,9 @@ SQL;
 
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
             $row["recordCollapseID"] = "site{$this->ownSite->getSiteID()}_discussion{$row["DiscussionID"]}";
-            $row["excerpt"] = $row["excerpt"] ?? $this->formatterService->renderExcerpt($rawBody, $format);
-            $row["bodyPlainText"] = Gdn::formatService()->renderPlainText($rawBody, $format);
-            $row["image"] = $this->formatterService->parseImageUrls($rawBody, $format)[0] ?? null;
+            $row["excerpt"] = $row["excerpt"] ?? $this->formatterService->renderExcerpt($bodyParsed, $format);
+            $row["bodyPlainText"] = Gdn::formatService()->renderPlainText($bodyParsed, $format);
+            $row["image"] = $this->formatterService->parseImageUrls($bodyParsed, $format)[0] ?? null;
             $row["scope"] = $this->categoryModel->getRecordScope($row["CategoryID"]);
             $row["score"] = $row["Score"] ?? 0;
             $row["hot"] = $row["hot"];
@@ -4610,7 +4619,7 @@ SQL;
         $result["type"] = self::normalizeDiscussionType($result["type"] ?? null);
 
         // Get the discussion's parsed body's first image & get the srcset for it.
-        $result["image"] = $this->formatterService->parseMainImage($rawBody, $format);
+        $result["image"] = $this->formatterService->parseMainImage($bodyParsed, $format);
 
         return $result;
     }
@@ -4625,6 +4634,7 @@ SQL;
     public static function normalizeDiscussionType(?string $discussionType): string
     {
         if (!empty($discussionType)) {
+            $discussionType = $discussionType === self::STUB_TYPE ? self::DISCUSSION_TYPE : $discussionType;
             return lcfirst($discussionType);
         } else {
             return "discussion";
@@ -5056,14 +5066,14 @@ SQL;
         }
 
         $discussion = (object) $discussion;
-        $name = Gdn_Format::url($discussion->Name);
+        $name = isset($discussion->Name) ? Gdn_Format::url($discussion->Name) : null;
 
         // Disallow an empty name slug in discussion URLs.
         if (empty($name)) {
             $name = "x";
         }
 
-        $result = "/discussion/" . $discussion->DiscussionID . "/" . $name;
+        $result = "/discussion/" . ($discussion->DiscussionID ?? "") . "/" . $name;
 
         if ($page) {
             if ($page > 1 || Gdn::session()->UserID) {

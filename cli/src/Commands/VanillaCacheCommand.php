@@ -7,19 +7,32 @@
 
 namespace Vanilla\Cli\Commands;
 
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Vanilla\Setup\ComposerHelper;
+use Symfony\Component\Console;
 
 /**
  * Clear Caches command.
  */
-class VanillaCacheCommand
+class VanillaCacheCommand extends Console\Command\Command
 {
     /**
-     * Clear vanilla caches.
+     * @inheritdoc
      */
-    public function clearCaches()
+    protected function configure()
+    {
+        $this->setName("clear-caches");
+        $this->setDescription("Clear vanilla local file caches.");
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         ComposerHelper::clearPhpCache();
         ComposerHelper::clearTwigCache();
+        return 0;
     }
 }

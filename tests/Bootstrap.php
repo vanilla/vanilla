@@ -532,7 +532,6 @@ class Bootstrap
         // Set some server globals.
         $baseUrl = $this->getBaseUrl();
 
-        $this->setServerGlobal("X_REWRITE", true);
         $this->setServerGlobal("REMOTE_ADDR", "1.2.3.4"); // Simulate a test IP address.
         $this->setServerGlobal("HTTP_HOST", parse_url($baseUrl, PHP_URL_HOST));
         $this->setServerGlobal("SERVER_NAME", parse_url($baseUrl, PHP_URL_HOST));

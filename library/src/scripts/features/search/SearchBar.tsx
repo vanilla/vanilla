@@ -209,8 +209,9 @@ export default React.forwardRef(function SearchBar(
 
                     setOptions(results);
 
+                    //first we'll load results with no source specified (e.g. kb, which is still community results) or with "community" source, then results from custom connector
                     return [
-                        ...results.filter(({ source }) => source === DEFAULT_SEARCH_SOURCE.key),
+                        ...results.filter(({ source }) => !source || source === DEFAULT_SEARCH_SOURCE.key),
                         ...sources
                             .filter((source) => source.key !== DEFAULT_SEARCH_SOURCE.key)
                             .map((source) => ({

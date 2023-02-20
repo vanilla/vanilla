@@ -111,6 +111,7 @@ export default class TokensLoadable extends React.Component<ITokenProps, IState>
                         type="hidden"
                         tabIndex={-1}
                         name={this.props.fieldName}
+                        disabled={disabled}
                     />
                 </div>
             </>

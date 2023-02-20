@@ -7,9 +7,6 @@
 
 namespace Vanilla\Dashboard\Tests\Controllers;
 
-use Garden\Web\Exception\ResponseException;
-use Vanilla\Formatting\Formats\RichFormat;
-use Vanilla\Formatting\FormatService;
 use VanillaTests\SiteTestCase;
 
 /**
@@ -27,11 +24,14 @@ class HomeControllerTest extends SiteTestCase
         $this->runWithConfig(["Garden.TrustedDomains" => $destinationUrl], function () use ($destinationUrl) {
             // As example.com is trusted, reaching for /home/leaving should trigger a 302 redirection.
             try {
-                $this->bessy()->get("/home/leaving", ["target" => url("http://example.com"), "allowTrusted" => true]);
+                $this->bessy()->get("/home/leaving", [
+                    "target" => url("http://" . $destinationUrl),
+                    "allowTrusted" => true,
+                ]);
             } catch (\Throwable $exception) {
                 $exResponse = $exception->getResponse();
                 $this->assertEquals(302, $exResponse->getStatus());
-                $this->assertEquals("http://example.com", $exResponse->getMeta("HTTP_LOCATION"));
+                $this->assertEquals("http://" . $destinationUrl, $exResponse->getMeta("HTTP_LOCATION"));
             }
         });
     }
@@ -89,16 +89,42 @@ class HomeControllerTest extends SiteTestCase
      */
     public function testLeavingWithoutWarnLeaving(): void
     {
-        $destinationUrl = "http://example.com";
+        $destinationUrl = "example.com";
+
+        $this->runWithConfig(
+            ["Garden.TrustedDomains" => $destinationUrl, "Garden.Format.WarnLeaving" => false],
+            function () use ($destinationUrl) {
+                // As example.com is trusted, reaching for /home/leaving should trigger a 302 redirection.
+                try {
+                    $this->bessy()->get("/home/leaving", [
+                        "target" => url("http://" . $destinationUrl),
+                        "allowTrusted" => true,
+                    ]);
+                } catch (\Throwable $exception) {
+                    $exResponse = $exception->getResponse();
+                    $this->assertEquals(302, $exResponse->getStatus());
+                    $this->assertEquals("http://" . $destinationUrl, $exResponse->getMeta("HTTP_LOCATION"));
+                }
+            }
+        );
+    }
+
+    /**
+     * Test untrusted domain with Garden.Format.WarnLeaving off.
+     */
+    public function testLeavingUntrustedDomainWithoutWarnLeaving(): void
+    {
+        $destinationUrl = "http://domain.com";
 
         $this->runWithConfig(["Garden.Format.WarnLeaving" => false], function () use ($destinationUrl) {
-            // As example.com is trusted, reaching for /home/leaving should trigger a 302 redirection.
+            // With this feature off untrusted domain should redirect to 404 error page.
             try {
-                $this->bessy()->get("/home/leaving", ["target" => url("http://example.com"), "allowTrusted" => true]);
+                $this->bessy()->get("/home/leaving", ["target" => url($destinationUrl), "allowTrusted" => true]);
             } catch (\Throwable $exception) {
-                $exResponse = $exception->getResponse();
-                $this->assertEquals(302, $exResponse->getStatus());
-                $this->assertEquals("http://example.com", $exResponse->getMeta("HTTP_LOCATION"));
+                $responseMessage = $exception->getMessage();
+                $responseCode = $exception->getCode();
+                $this->assertEquals(404, $responseCode);
+                $this->assertEquals("Page Not Found", $responseMessage);
             }
         });
     }

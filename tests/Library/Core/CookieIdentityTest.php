@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Core;
 
 use Firebase\JWT\JWT;
+use Garden\Web\Exception\ForbiddenException;
 use Gdn;
 use Gdn_CookieIdentity;
 use Vanilla\CurrentTimeStamp;
@@ -41,6 +42,18 @@ class CookieIdentityTest extends AbstractAPIv2Test
         $this->cookieIdentity->setIdentity($this->memberID, true, $origSessionID);
         $sessionID = $this->cookieIdentity->getSession();
         $this->assertEquals($sessionID, $origSessionID);
+    }
+
+    /**
+     * Checking Exception if session ID is not in the cookie.
+     */
+    public function testGetIdentityException()
+    {
+        $this->cookieIdentity->setIdentity($this->memberID, true);
+        $this->cookieIdentity->UserID = 0;
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage("Cookie must have session ID.");
+        $this->cookieIdentity->getSession();
     }
 
     /**

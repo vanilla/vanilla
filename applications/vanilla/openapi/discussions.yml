@@ -30,7 +30,6 @@ paths:
                       ```
                       siteSectionID=$subcommunityID:{id|folder}
                       ```
-                  example: "$subcommunityID:en"
                   in: query
                   name: siteSectionID
                   schema:
@@ -158,7 +157,6 @@ paths:
                       type: array
                       items:
                           type: integer
-                  example: [1, 2, 3]
                 - description: List of internalStatusIDs to filter discussion by.
                   in: query
                   name: internalStatusID[]
@@ -166,7 +164,6 @@ paths:
                       type: array
                       items:
                           type: integer
-                  example: [1, 2, 3]
             responses:
                 "200":
                     content:

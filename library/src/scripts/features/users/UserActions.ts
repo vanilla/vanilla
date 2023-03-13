@@ -4,12 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import { IApiError, LoadStatus } from "@library/@types/api/core";
+import { IApiError, LoadStatus, RequireAtLeastOne } from "@library/@types/api/core";
 import { IMe, IMeCounts, IUser, IInvitees } from "@library/@types/api/users";
 import ReduxActions, { bindThunkAction, useReduxActions } from "@library/redux/ReduxActions";
 import { actionCreatorFactory } from "typescript-fsa";
 import { IPermissions } from "@library/features/users/userTypes";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { RecordID } from "@vanilla/utils";
+import omit from "lodash/omit";
 
 const createAction = actionCreatorFactory("@@users");
 
@@ -17,11 +19,16 @@ export interface IGetUserByIDQuery {
     userID: number;
 }
 
+export type IPostUserParams = Partial<IUser>;
 export interface IInviteUsersByGroupIDQuery {
     userID: number;
     groupID: number; // The group to be invited
     userIDs: number[]; // The invitees
     emails: string[]; // The invitees
+}
+
+export interface IPatchUserParams extends RequireAtLeastOne<Partial<IUser>, "userID"> {
+    password?: string;
 }
 
 // The duration we wait to check for new counts.
@@ -99,6 +106,16 @@ export default class UserActions extends ReduxActions {
         return this.dispatch(thunk);
     };
 
+    public static postUserACs = createAction.async<Partial<IPostUserParams>, IUser, IApiError>("POST_USER");
+
+    public postUser = (params: Partial<IPostUserParams>) => {
+        const thunk = bindThunkAction(UserActions.postUserACs, async () => {
+            const reponse = await this.api.post(`/users`, params);
+            return reponse.data;
+        })(params);
+        return this.dispatch(thunk);
+    };
+
     public static clearInviteUsersAC = createAction<{ userID: number }>("CLEAR_INVITE_USER");
     public clearInviteUsers = this.bindDispatch(UserActions.clearInviteUsersAC);
 
@@ -136,6 +153,20 @@ export default class UserActions extends ReduxActions {
     public static updateInviteesAC = createAction<{ userID: number; invitees: IComboBoxOption[] }>("UPDATE_INVITEES");
     public updateInvitees = ({ userID, invitees }) => {
         this.dispatch(UserActions.updateInviteesAC({ userID, invitees }));
+    };
+
+    public static patchUserAC = createAction.async<IPatchUserParams & { patchID: RecordID }, IUser, IApiError>(
+        "PATCH_USER",
+    );
+
+    public patchUser = (params: IPatchUserParams & { patchID: RecordID }) => {
+        const { userID } = params;
+        const patchID = `${userID}-${params.patchID}`;
+        const thunk = bindThunkAction(UserActions.patchUserAC, async () => {
+            const response = await this.api.patch(`/users/${userID}`, omit(params, "patchID"));
+            return response.data;
+        })({ ...params, patchID });
+        return this.dispatch(thunk);
     };
 }
 

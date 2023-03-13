@@ -77,6 +77,8 @@ class Gdn_Format
      */
     public static function activityHeadline($activity, $profileUserID = "", $viewingUserID = "")
     {
+        // For the time being, we would rather have a genderless activity headline.
+        $activity["ActivityGender"] = "u";
         $activity = (object) $activity;
         if ($viewingUserID == "") {
             $session = Gdn::session();
@@ -1043,7 +1045,7 @@ class Gdn_Format
             // Text before the mention.
             if ($i == 0) {
                 if (!empty($str)) {
-                    $str[0] = htmlspecialchars($str);
+                    $str[0] = htmlspecialchars(mb_substr($str, 0, 1));
                 }
                 continue;
             }
@@ -1055,7 +1057,7 @@ class Gdn_Format
             }
 
             if (preg_match('`\w$`', $parts[$i - 1])) {
-                $str[$i] = htmlspecialchars($str);
+                $str[$i] = htmlspecialchars(mb_substr($str, 0, 1));
                 continue;
             }
 

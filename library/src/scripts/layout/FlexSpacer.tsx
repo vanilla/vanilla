@@ -4,14 +4,14 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ElementType } from "react";
 import classNames from "classnames";
 import { css } from "@emotion/css";
 
 interface IProps {
     className?: string;
     children?: React.ReactNode;
-    tag?: keyof JSX.IntrinsicElements;
+    tag?: ElementType;
     actualSpacer?: boolean;
 }
 

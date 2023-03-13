@@ -5,17 +5,23 @@
  */
 
 import React from "react";
-import { fireEvent, render, waitFor, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within, act, waitFor } from "@testing-library/react";
 import { ProfileFieldsList } from "@dashboard/userProfiles/components/ProfileFieldsList";
 import { ProfileFieldsFixture } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
+import { ProfileField, ProfileFieldFormType } from "@dashboard/userProfiles/types/UserProfiles.types";
 
 const onEdit = jest.fn();
 const onDelete = jest.fn();
 
-const renderInProvider = () => {
-    return render(
-        ProfileFieldsFixture.createMockProfileFieldsProvider(<ProfileFieldsList onEdit={onEdit} onDelete={onDelete} />),
-    );
+const renderInProvider = async (mockFields?: ProfileField[]) => {
+    await act(async () => {
+        render(
+            ProfileFieldsFixture.createMockProfileFieldsProvider(
+                <ProfileFieldsList onEdit={onEdit} onDelete={onDelete} />,
+                mockFields,
+            ),
+        );
+    });
 };
 
 const columns = [
@@ -28,13 +34,13 @@ const columns = [
 ];
 
 describe("ProfileFieldsList", () => {
-    it("Custom Profile Fields header renders", () => {
-        renderInProvider();
+    it("Custom Profile Fields header renders", async () => {
+        await renderInProvider();
         expect(screen.getByText("Custom Profile Fields")).toBeInTheDocument();
     });
 
-    it("Render custom profile fields table headers and actions header is only visible to screen reader", () => {
-        renderInProvider();
+    it("Render custom profile fields table headers and actions header is only visible to screen reader", async () => {
+        await renderInProvider();
         columns.forEach(({ label }) => {
             expect(screen.getByRole("columnheader", { name: label })).toBeInTheDocument();
         });
@@ -43,9 +49,9 @@ describe("ProfileFieldsList", () => {
         expect(within(actionsHeader).getByText("actions")).toHaveClass("sr-only");
     });
 
-    it("Render profile fields in rows with toggle and action buttons", () => {
-        renderInProvider();
+    it("Render profile fields in rows with toggle and action buttons", async () => {
         const mockFields = ProfileFieldsFixture.mockProfileFields();
+        await renderInProvider(mockFields);
         screen.getAllByRole("row").forEach((row, rowIdx) => {
             if (rowIdx > 0) {
                 const field = mockFields[rowIdx - 1];
@@ -73,11 +79,24 @@ describe("ProfileFieldsList", () => {
         });
     });
 
-    it("Disable a profile field", () => {
-        renderInProvider();
+    it("Delete button is disabled for core fields", async () => {
+        const mockCoreField = ProfileFieldsFixture.mockProfileField(ProfileFieldFormType.DROPDOWN, {
+            isCoreField: true,
+        });
+        await renderInProvider([mockCoreField]);
+        const mockCoreFieldTableRow = screen.getAllByRole("row")[1];
+        expect(within(mockCoreFieldTableRow).getByRole("button", { name: "Delete" })).toBeDisabled();
+    });
+
+    it("Disable a profile field", async () => {
+        await renderInProvider();
         const checkbox = within(screen.getAllByRole("row")[1]).getByRole("checkbox");
         expect(checkbox).toBeChecked();
-        fireEvent.click(checkbox);
+
+        await act(async () => {
+            fireEvent.click(checkbox);
+        });
+
         waitFor(() => {
             expect(checkbox).not.toBeChecked();
         });

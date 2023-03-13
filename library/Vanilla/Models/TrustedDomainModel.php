@@ -113,6 +113,27 @@ class TrustedDomainModel
     }
 
     /**
+     * Check if a given url is trusted or not
+     *
+     * @param $url string The URL to check
+     * @return bool The url is trusted or not
+     */
+    public function isTrustedDomain(string $url): bool
+    {
+        $trustedDomains = $this->getAll();
+        $isTrustedDomain = false;
+
+        foreach ($trustedDomains as $trustedDomain) {
+            if (urlMatch($trustedDomain, $url)) {
+                $isTrustedDomain = true;
+                break;
+            }
+        }
+
+        return $isTrustedDomain;
+    }
+
+    /**
      * Transform a destination to make sure that the resulting URL is "Safe".
      *
      * "Safe" means that the domain of the URL is trusted.
@@ -124,15 +145,7 @@ class TrustedDomainModel
     public function safeUrl($destination, $withDomain = false)
     {
         $url = url($destination, true);
-        $trustedDomains = $this->getAll();
-        $isTrustedDomain = false;
-
-        foreach ($trustedDomains as $trustedDomain) {
-            if (urlMatch($trustedDomain, $url)) {
-                $isTrustedDomain = true;
-                break;
-            }
-        }
+        $isTrustedDomain = $this->isTrustedDomain($url);
 
         return $isTrustedDomain ? $url : url("/home/leaving?Target=" . urlencode($destination), $withDomain);
     }

@@ -34,6 +34,11 @@ interface TrackingEventInterface
     public function getPayload(): ?array;
 
     /**
+     * Get the site sectionID the event originated from.
+     */
+    public function getSiteSectionID(): ?string;
+
+    /**
      * If the tracking payload differs from the event payload, implement this method. This method will be called by the container,
      * and can take any number of arguments.
      *

@@ -65,7 +65,7 @@ class ErrorLoggerTest extends SiteTestCase
             "level" => "error",
             "message" => "foo",
             "request.method" => "POST",
-            "request.protocol" => "http",
+            "request.protocol" => "https",
             "request.hostname" => "vanilla.test",
             "request.path" => "/path/some-request",
             "request.clientIP" => "1.1.4.4",

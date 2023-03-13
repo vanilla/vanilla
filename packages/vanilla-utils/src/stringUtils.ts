@@ -283,3 +283,20 @@ export function isNumeric(value: any) {
     }
     return false;
 }
+
+/**
+ * Test if a given string matches a ruleset which could contain a wildcard selector (*)
+ *
+ * Example: Given string "vanillaforums" should match rule set "vanilla*"
+ */
+export function matchWithWildcard(target: string, matchers: string): boolean | null {
+    const escapeForRegex = (string: string) => string.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1");
+
+    if (!matchers || !target) {
+        return null;
+    }
+
+    return matchers.split("\n").some((match) => {
+        return new RegExp("^" + match.split("*").map(escapeForRegex).join(".*") + "$").test(target);
+    });
+}

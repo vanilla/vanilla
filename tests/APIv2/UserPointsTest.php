@@ -70,9 +70,6 @@ class UserPointsTest extends SiteTestCase
         $cat1 = $this->createCategory();
         $cat2 = $this->createCategory();
 
-        $this->categoryModel->setField($cat1["categoryID"], "PointsCategoryID", $cat1["categoryID"]);
-        $this->categoryModel->setField($cat2["categoryID"], "PointsCategoryID", $cat2["categoryID"]);
-
         $globalUser = $this->createUser(["name" => "GlobalUser"]);
         $cat1User = $this->createUser(["name" => "Cat1User"]);
         $cat2User = $this->createUser(["name" => "Cat2User"]);
@@ -81,8 +78,6 @@ class UserPointsTest extends SiteTestCase
         $this->givePoints($cat2User, 10, $cat2);
         $this->givePoints($globalUser, 10);
 
-        $userLeaderService = Gdn::getContainer()->get(UserLeaderService::class);
-        $userLeaderService->setTrackPointsSeparately(true);
         $leaders = $this->api()
             ->get("users/leaders", [
                 "leaderboardType" => UserLeaderService::LEADERBOARD_TYPE_REPUTATION,

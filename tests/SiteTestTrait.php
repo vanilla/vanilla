@@ -103,8 +103,8 @@ trait SiteTestTrait
     protected static function getAddons(): array
     {
         // These applications must currently all be enabled at startup or things can get flaky.
-        static::$addons = array_unique(array_merge(["dashboard", "conversations", "vanilla"], static::$addons));
-        return static::$addons;
+        $addons = array_unique(array_merge(["dashboard", "conversations", "vanilla"], static::$addons));
+        return $addons;
     }
 
     /**
@@ -162,7 +162,6 @@ trait SiteTestTrait
      */
     protected static function setupBeforeClassSiteTestTrait(): void
     {
-        self::symlinkAddonFixtures();
         static::bootstrapBeforeClass();
 
         $dic = self::$container;
@@ -251,60 +250,7 @@ TEMPLATE;
      */
     public static function teardownAfterClass(): void
     {
-        self::$addons = ["vanilla", "conversations", "stubcontent"];
         static::bootstrapAfterClass();
-        self::unSymlinkAddonFixtures();
-    }
-
-    /**
-     * Symlink all addon fixtures.
-     */
-    private static function symlinkAddonFixtures(): void
-    {
-        self::mapAddonFixtures(function (string $path, string $dest): void {
-            if (file_exists($dest)) {
-                if (realpath($dest) !== realpath($path)) {
-                    throw new AssertionFailedError("Cannot symlink addon fixture: $path");
-                }
-            } else {
-                self::$symLinkedAddons[$path] = $dest;
-
-                symlink($path, $dest);
-            }
-        });
-    }
-
-    /**
-     * Remove symlinks to all addon fixtures.
-     */
-    private static function unSymlinkAddonFixtures(): void
-    {
-        self::mapAddonFixtures(function (string $path, string $dest): void {
-            if (isset(self::$symLinkedAddons[$path]) && file_exists($dest) && realpath($dest) === realpath($path)) {
-                unlink($dest);
-            }
-        });
-        self::$symLinkedAddons = [];
-    }
-
-    /**
-     * Run a callback on all test addon fixtures.
-     *
-     * @param callable $callback
-     */
-    private static function mapAddonFixtures(callable $callback): void
-    {
-        $testAddonPaths = array_merge(
-            glob(PATH_ROOT . "/tests/addons/*", GLOB_ONLYDIR),
-            glob(PATH_ROOT . "/plugins/*/tests/plugins/*", GLOB_ONLYDIR)
-        );
-        foreach ($testAddonPaths as $path) {
-            $dirname = basename($path);
-
-            $dest = PATH_ROOT . "/plugins/$dirname";
-
-            $callback($path, $dest);
-        }
     }
 
     /**
@@ -521,6 +467,24 @@ TEMPLATE;
             }
 
             $this->assertContains($role, $userRoles);
+        }
+    }
+
+    /**
+     * Make sure a user does not have any roles in a list.
+     *
+     * @param int $userID
+     * @param array $roles
+     */
+    protected function assertUserHasNotRoles(int $userID, array $roles)
+    {
+        $userRoles = $this->userModel->getRoleIDs($userID);
+        foreach ($roles as $role) {
+            if (!is_numeric($role)) {
+                $role = $this->roleID($role);
+            }
+
+            $this->assertNotContains($role, $userRoles);
         }
     }
 

@@ -5,12 +5,13 @@
  */
 
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { JsonSchema, ISchemaRenderProps, IValidationResult } from "./types";
+import { JsonSchema, ISchemaRenderProps, IValidationResult, IFieldError } from "./types";
 import { PartialSchemaForm, RenderChildren } from "./PartialSchemaForm";
 import produce from "immer";
 import { VanillaUIFormControl } from "./vanillaUIControl/VanillaUIFormControl";
 import { VanillaUIFormControlGroup } from "./vanillaUIControl/VanillaUIFormControlGroup";
 import { useFormValidation, ValidationProvider } from "./ValidationContext";
+import { fieldErrorsToValidationErrors } from "./utils";
 
 interface IProps extends ISchemaRenderProps {
     schema: JsonSchema | string;
@@ -26,6 +27,7 @@ interface IProps extends ISchemaRenderProps {
     hideDescriptionInLabels?: boolean;
     size?: "small" | "default";
     autocompleteClassName?: string;
+    fieldErrors?: Record<string, IFieldError[]>;
 }
 
 export interface IJsonSchemaFormHandle {
@@ -83,7 +85,15 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
 
     const formValidation = useFormValidation();
 
-    const [validation, setValidation] = useState<IValidationResult>();
+    const [_validation, setValidation] = useState<IValidationResult>();
+
+    const validation = useMemo((): IValidationResult | undefined => {
+        const isValid = (_validation?.isValid ?? true) && (props.fieldErrors ?? []).length === 0;
+        return {
+            isValid: isValid,
+            errors: [...(_validation?.errors ?? []), ...fieldErrorsToValidationErrors(props.fieldErrors ?? {})],
+        };
+    }, [_validation, props.fieldErrors]);
 
     const schema = useMemo<JsonSchema>(
         () => (typeof props.schema === "string" ? JSON.parse(props.schema) : props.schema),
@@ -161,6 +171,8 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
             {...props}
             {...Memoized}
             disabled={props.disabled}
+            pathString="/"
+            errors={[]}
             path={[]}
             schema={schema}
             rootSchema={schema}

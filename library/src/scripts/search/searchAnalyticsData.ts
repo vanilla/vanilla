@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -26,6 +26,7 @@ export interface IResultAnalyticsData {
     category: { categoryID: RecordID[]; categoryName: string[] };
     kb: { kbID: RecordID | null; kbName: string };
     siteSection: object;
+    siteSectionID: string;
     source?: ITrackedSearchSource;
 }
 
@@ -119,7 +120,7 @@ export const getSearchAnalyticsData = (
         type: "search",
         domain: form.domain,
         searchResults: response.pagination.total ?? -1,
-        searchQuery: splitSearchTerms(form.query),
+        searchQuery: splitSearchTerms(`${form.query}`),
         page: response.pagination?.currentPage ?? -1,
         title: form.name ?? "",
         author: {
@@ -138,6 +139,7 @@ export const getSearchAnalyticsData = (
         //we don't allow multiple kb filter in search so no mapping here
         kb: { kbID: null, kbName: "" },
         siteSection: getSiteSection(),
+        siteSectionID: getSiteSection().sectionID,
     };
 
     if (form.authors && form.authors.length) {

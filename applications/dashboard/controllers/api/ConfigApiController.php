@@ -130,6 +130,10 @@ final class ConfigApiController extends Controller
             ) {
                 $configKey = $item["x-key"] ?? $key;
                 $result[$key] = $this->config->get($configKey, $item["default"] ?? null);
+                $isUpload = (bool) ($item["x-upload"] ?? false);
+                if (!empty($result[$key]) && $isUpload) {
+                    $result[$key] = \Gdn_Upload::url($result[$key]);
+                }
             }
         }
         return new Data($result);

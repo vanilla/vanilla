@@ -460,7 +460,7 @@ class DiscussionsApiController extends AbstractApiController
             throw new NotFoundException("Discussion", ["recordIDs" => $checked["nonexistentIDs"]]);
         }
         if (!empty($checked["noPermissionIDs"])) {
-            throw new PermissionException("Vanilla.Discussions.Edit", ["recordIDs" => $checked["noPermissionIDs"]]);
+            throw new PermissionException("Vanilla.Discussions.Delete", ["recordIDs" => $checked["noPermissionIDs"]]);
         }
 
         // Defer to the LongRunner for execution.
@@ -920,13 +920,18 @@ class DiscussionsApiController extends AbstractApiController
             $where[DirtyRecordModel::DIRTY_RECORD_OPT] = $joinDirtyRecords;
         }
 
+        $count = null;
+        // When using expand crawl (and crawling) we don't use numbered pagers.
+        $shouldCount = !ModelUtils::isExpandOption("crawl", $query["expand"]);
         $pinned = $query["pinned"] ?? null;
         [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection($query["sort"] ?? "");
         if ($bookmarkUserID) {
             $rows = $this->discussionModel
                 ->getWhere($where, $orderField, $orderDirection, $limit, $offset, false, "bookmarked", $bookmarkUserID)
                 ->resultArray();
-            $count = $this->discussionModel->getPagingCount($where, $limit, "bookmarked", $bookmarkUserID);
+            if ($shouldCount) {
+                $count = $this->discussionModel->getPagingCount($where, "bookmarked", $bookmarkUserID);
+            }
         } elseif ($participatedUserID) {
             $rows = $this->discussionModel
                 ->getWhere(
@@ -940,35 +945,47 @@ class DiscussionsApiController extends AbstractApiController
                     $participatedUserID
                 )
                 ->resultArray();
-            $count = $this->discussionModel->getPagingCount($where, $limit, "participated", $participatedUserID);
+            if ($shouldCount) {
+                $count = $this->discussionModel->getPagingCount($where, "participated", $participatedUserID);
+            }
         } elseif ($pinned === true) {
             $announceWhere = array_merge($where, ["d.Announce >" => "0"]);
             $rows = $this->discussionModel
                 ->getAnnouncements($announceWhere, $offset, $limit, $query["sort"] ?? "")
                 ->resultArray();
-            $count = $this->discussionModel->getAnnouncementsPagingCount($where, $limit);
+            if ($shouldCount) {
+                $count = $this->discussionModel->getAnnouncementsPagingCount($where);
+            }
         } else {
             $pinOrder = $query["pinOrder"] ?? null;
             if ($pinOrder == "first") {
                 $announcements = $this->discussionModel
                     ->getAnnouncements($where, $offset, $limit, $query["sort"] ?? "")
                     ->resultArray();
-                $count = $this->discussionModel->getAnnouncementsPagingCount($where, $limit);
                 $discussions = $this->discussionModel
                     ->getWhere($where, $orderField, $orderDirection, $limit, $offset, false)
                     ->resultArray();
                 $rows = array_merge($announcements, $discussions);
-                $count += $this->discussionModel->getPagingCount($where, $limit);
+                if ($shouldCount) {
+                    $count = $this->discussionModel->getAnnouncementsPagingCount($where);
+                    $count += $this->discussionModel->getPagingCount($where);
+                }
             } else {
                 $where["Announce"] = "all";
                 $rows = $this->discussionModel
                     ->getWhere($where, $orderField, $orderDirection, $limit, $offset, false)
                     ->resultArray();
-                $count = $this->discussionModel->getPagingCount($where, $limit);
+                if ($shouldCount) {
+                    $count = $this->discussionModel->getPagingCount($where);
+                }
             }
         }
 
-        $paging = ApiUtils::numberedPagerInfo($count, "/api/v2/discussions", $query, $in);
+        // When crawling the endpoint use a more pager.
+        $paging =
+            $count == null
+                ? ApiUtils::morePagerInfo($rows, "/api/v2/discussions", $query, $in)
+                : ApiUtils::numberedPagerInfo($count, "/api/v2/discussions", $query, $in);
         $pagingObject = ["paging" => $paging];
 
         // Expand associated rows.

@@ -85,6 +85,9 @@ export const spoilerCSS = useThemeCache(() => {
                 ...Mixins.padding({
                     all: globalVars.embed.text.padding,
                 }),
+                "& .spoiler-line": {
+                    ...Mixins.margin({ vertical: 8 }),
+                },
             },
             ".spoiler-content *:first-child": {
                 marginTop: 0,

@@ -4,17 +4,17 @@
  * @license Proprietary
  */
 
-import Loadable from "react-loadable";
 import React from "react";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import Loader from "@library/loaders/Loader";
+import { createLoadableComponent } from "@vanilla/react-utils";
 
-export const BulkMoveDiscussions = Loadable({
-    loader: () =>
+export const BulkMoveDiscussions = createLoadableComponent({
+    loadFunction: () =>
         import(
             /* webpackChunkName: "features/discussions/forms/BulkMoveDiscussionsForm" */ "@library/features/discussions/forms/BulkMoveDiscussionsForm.loadable"
         ),
-    loading() {
+    fallback() {
         return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
     },
 });

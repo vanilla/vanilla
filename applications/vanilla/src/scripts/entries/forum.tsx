@@ -32,6 +32,13 @@ import { onReady } from "@library/utility/appUtils";
 import { AboutMeWidget } from "@library/aboutMeWidget/AboutMeWidget";
 import { ProfileOverviewWidget } from "@library/profileOverviewWidget/ProfileOverviewWidget";
 import { ProfileAnalyticsWidget } from "@library/profileAnalyticsWidget/ProfileAnalyticsWidget";
+import { AccountSettings } from "@library/accountSettings/AccountSettings";
+import { EditProfileFields } from "@library/editProfileFields/EditProfileFields";
+import { delegateEvent } from "@vanilla/dom-utils";
+import { mountModal } from "@library/modal/mountModal";
+import { CollectionRecordTypes } from "@library/featuredCollections/Collections.variables";
+import React from "react";
+import { CollectionsOptionButton } from "@library/featuredCollections/CollectionsOptionButton";
 
 registerReducer("forum", forumReducer);
 registerCommunitySearchDomain();
@@ -56,9 +63,30 @@ addComponent("CallToActionWidget", CallToActionWidget, { overwrite: true });
 addComponent("AboutMeWidget", AboutMeWidget, { overwrite: true });
 addComponent("ProfileOverviewWidget", ProfileOverviewWidget, { overwrite: true });
 addComponent("ProfileAnalyticsWidget", ProfileAnalyticsWidget, { overwrite: true });
+addComponent("AccountSettings", AccountSettings, { overwrite: true });
+addComponent("EditProfileFields", EditProfileFields, { overwrite: true });
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();
 onReady(() => {
     triggerLegacyHashScrolling();
+});
+
+delegateEvent("click", ".js-addDiscussionToCollection", (event, triggeringElement) => {
+    event.preventDefault();
+    const discussionID = triggeringElement.getAttribute("data-discussionID") || null;
+    const recordType = triggeringElement.getAttribute("data-recordType");
+
+    if (discussionID === null) {
+        return;
+    }
+    const id = parseInt(discussionID, 10);
+    mountModal(
+        <CollectionsOptionButton
+            initialVisibility={true}
+            recordID={id}
+            recordType={recordType as CollectionRecordTypes}
+            modalOnly
+        />,
+    );
 });

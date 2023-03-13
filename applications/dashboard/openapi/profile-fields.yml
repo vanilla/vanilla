@@ -2,7 +2,6 @@ openapi: 3.0.2
 info:
 paths:
     /profile-fields:
-        x-hidden: true
         get:
             summary: List profile fields.
             parameters:
@@ -104,7 +103,6 @@ paths:
                     description: Server Error
 
     /profile-fields/{apiName}:
-        x-hidden: true
         patch:
             summary: Update a profile field.
             tags:
@@ -160,7 +158,6 @@ paths:
             tags:
                 - Profile Fields
     /profile-fields/sorts:
-        x-hidden: true
         put:
             tags:
                 - Profile Fields

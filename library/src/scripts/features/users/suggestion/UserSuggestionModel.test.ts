@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import { IMentionSuggestionData } from "@rich-editor/toolbars/pieces/MentionSuggestion";
+import { IMentionSuggestionData } from "@library/editor/pieces/MentionSuggestion";
 import { LoadStatus } from "@library/@types/api/core";
 import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";

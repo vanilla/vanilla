@@ -27,8 +27,8 @@ interface IState {}
  */
 export default class DateRange extends React.PureComponent<IProps> {
     public render() {
-        const endDate = this.props.end ? moment(this.props.end).toDate() : null;
-        const startDate = this.props.start ? moment(this.props.start).toDate() : null;
+        const endDate = this.props.end ? moment(rectifyDate(this.props.end)).toDate() : null;
+        const startDate = this.props.start ? moment(rectifyDate(this.props.start)).toDate() : null;
         const fromLabel = t("From");
         const toLabel = t("To");
         const rangeClasses = dateRangeClasses();
@@ -47,7 +47,7 @@ export default class DateRange extends React.PureComponent<IProps> {
                         alignment="right"
                         contentClassName={rangeClasses.input}
                         onChange={this.props.onStartChange}
-                        value={this.props.start}
+                        value={this.props.start && rectifyDate(this.props.start)}
                         disabledDays={[
                             {
                                 after: endDate,
@@ -61,7 +61,7 @@ export default class DateRange extends React.PureComponent<IProps> {
                         alignment="right"
                         contentClassName={rangeClasses.input}
                         onChange={this.props.onEndChange}
-                        value={this.props.end}
+                        value={this.props.end && rectifyDate(this.props.end)}
                         disabledDays={[
                             {
                                 before: startDate,
@@ -72,4 +72,13 @@ export default class DateRange extends React.PureComponent<IProps> {
             </fieldset>
         );
     }
+}
+
+/**
+ * Return a valid date which can be passed to moment or a date object
+ *
+ * Strips >=, <= or = from date strings
+ */
+function rectifyDate(date: string): string {
+    return date.replace(/(>|<)?=/, "");
 }

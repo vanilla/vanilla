@@ -81,8 +81,8 @@ class UserSpotlightModuleStorybookTest extends StorybookGenerationTestCase
                 "userInfo" => [
                     "banned" => 0,
                     "name" => $user["name"],
-                    "photoUrl" => "http://vanilla.test/applications/dashboard/design/images/defaulticon.png",
-                    "url" => "http://vanilla.test/profile/" . $user["name"],
+                    "photoUrl" => "https://vanilla.test/applications/dashboard/design/images/defaulticon.png",
+                    "url" => "https://vanilla.test/profile/" . $user["name"],
                     "userID" => $user["userID"],
                     "private" => false,
                     "punished" => 0,

@@ -1,6 +1,7 @@
-import { Condition, IPtrReference, Path } from "./types";
+import { Condition, IFieldError, IPtrReference, IValidationResult, Path } from "./types";
 import get from "lodash/get";
-import Ajv from "ajv";
+import Ajv, { ErrorObject } from "ajv";
+import { notEmpty } from "@vanilla/utils";
 
 const ajv = new Ajv({
     // Disables strict mode. Makes it possible to add unsupported properties to schemas.
@@ -51,4 +52,55 @@ export function findAllReferences(anyObj: any, path: Array<string | number> = []
         if (typeof value === "object" && value !== null) return findAllReferences(value, [...path, key]);
         return [];
     });
+}
+
+export function fieldErrorsToValidationErrors(fieldErrors: Record<string, IFieldError[]>): ErrorObject[] {
+    const result: ErrorObject[] = [];
+
+    for (const fieldError of Object.values(fieldErrors).flat()) {
+        const instancePath = ["", fieldError.path?.replace(".", "/"), fieldError.field].filter(notEmpty).join("/");
+        const newError: ErrorObject = {
+            keyword: fieldError.code ?? "unknown",
+            instancePath,
+            message: fieldError.message,
+            schemaPath: "",
+            params: {},
+        };
+
+        switch (newError.keyword) {
+            // Kludge because these messages are all horrible (referencing API type names when we should be referencing property names).
+            case "missingField":
+                newError.message = "Field is required.";
+                break;
+            case "ValidateOneOrMoreArrayItemRequired":
+                newError.message = "You must select at least one item.";
+                break;
+        }
+        result.push(newError);
+    }
+
+    return result;
+}
+
+export function validationErrorsToFieldErrors(
+    validationErrors: ErrorObject[] | null | undefined,
+    pathFilter?: string,
+): IFieldError[] {
+    const errors =
+        validationErrors
+            ?.filter((error) => {
+                if (!pathFilter) {
+                    return true;
+                } else {
+                    return error.instancePath === pathFilter;
+                }
+            })
+            .map((error) => {
+                return {
+                    code: error.keyword ?? "unknown",
+                    message: error.message!,
+                    field: error.instancePath,
+                };
+            }) ?? [];
+    return errors;
 }

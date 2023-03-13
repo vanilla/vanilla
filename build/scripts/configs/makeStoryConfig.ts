@@ -25,6 +25,8 @@ export async function makeStoryConfig(baseStorybookConfig: Configuration, entryM
     baseStorybookConfig.plugins?.push(
         new webpack.DefinePlugin({
             ["process.env.NODE_ENV"]: "'test'",
+            ["process.env.IS_WEBPACK"]: true,
+            __DIST__NAME__: null,
         }),
     );
 

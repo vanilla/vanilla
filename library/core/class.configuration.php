@@ -21,6 +21,9 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /** Cache key format. */
     const CONFIG_FILE_CACHE_KEY = "garden.config.%s";
 
+    /** @var array */
+    private $ConfigChangesData = [];
+
     /** @var string  */
     public $NotFound = "NOT_FOUND";
 
@@ -963,6 +966,17 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
             if (!$v && $removeEmpty) {
                 $this->remove($k);
             } else {
+                //If this is a change (different from what has been saved before)
+                // and we are queueing this change for saving, keep track of it.
+                if ($save && $this->get($k) != $v) {
+                    //Record Old value.
+                    $this->ConfigChangesData[$k] = $this->get($k);
+                    // Record New/changed value.
+                    if (!array_key_exists("_New", $this->ConfigChangesData)) {
+                        $this->ConfigChangesData["_New"] = [];
+                    }
+                    $this->ConfigChangesData["_New"][$k] = $v;
+                }
                 $result = $result & $this->set($k, $v, true, $save);
             }
         }
@@ -1014,6 +1028,12 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     public function shutdown()
     {
         foreach ($this->sources as $source) {
+            //If there where changes queued to save, record them in Log table when we save config changes to file.
+            if (count($this->ConfigChangesData) > 0) {
+                // Log root config changes
+                LogModel::insert("Edit", "Configuration", $this->ConfigChangesData);
+                $this->ConfigChangesData = [];
+            }
             $source->shutdown();
         }
     }

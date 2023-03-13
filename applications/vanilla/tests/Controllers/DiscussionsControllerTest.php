@@ -94,10 +94,10 @@ class DiscussionsControllerTest extends TestCase
     {
         foreach ($data["Discussions"] as $discussion) {
             $url = discussionUrl($discussion, "", "/");
-            $data = $this->bessy()->get($url)->Data;
+            $responseData = $this->bessy()->get($url)->Data;
 
-            $this->assertContains("Discussion", $data);
-            $this->assertContains("Comments", $data);
+            $this->assertArrayHasKey("Discussion", $responseData);
+            $this->assertArrayHasKey("Comments", $responseData);
 
             break;
         }

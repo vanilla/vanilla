@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,6 +9,7 @@ namespace Vanilla\Formatting\Html\Processor;
 
 use DOMElement;
 use Gdn_Request;
+use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\Formatting\Html\HtmlDocument;
 
 /**
@@ -65,8 +66,37 @@ class ExternalLinksProcessor extends HtmlProcessor
             return $document;
         }
 
-        $linkNodes = $document->getDom()->getElementsByTagName("a");
+        $jsonComponentNodeTags = ["span", "div"];
+        $targetedEmbedTypes = [LinkEmbed::TYPE];
+        foreach ($jsonComponentNodeTags as $jsonComponentNodeTag) {
+            $jsonComponentNodes = $document->getDom()->getElementsByTagName($jsonComponentNodeTag);
 
+            if ($jsonComponentNodes->length > 0) {
+                // Loop through spans/divs and add home/leaving to external links included within `data-embedjson` attributes.
+                /** @var DOMElement $linkNode */
+                foreach ($jsonComponentNodes as $jsonComponentNode) {
+                    $spanNodeClasses = explode(" ", $jsonComponentNode->getAttribute("class"));
+                    if (in_array("js-embed", $spanNodeClasses)) {
+                        $embedJson = json_decode($jsonComponentNode->getAttribute("data-embedjson"));
+                        $rawHref = $embedJson->url;
+                        if (isExternalUrl($rawHref) && in_array($embedJson->embedType, $targetedEmbedTypes)) {
+                            $leavingHref = $this->request->url(
+                                "/home/leaving?" .
+                                    http_build_query([
+                                        "allowTrusted" => 1,
+                                        "target" => $rawHref,
+                                    ]),
+                                true
+                            );
+                            $embedJson->url = $leavingHref;
+                            $this->setAttribute($jsonComponentNode, "data-embedjson", json_encode($embedJson));
+                        }
+                    }
+                }
+            }
+        }
+
+        $linkNodes = $document->getDom()->getElementsByTagName("a");
         if ($linkNodes->length > 0) {
             // Loop through the links and add home/leaving to external links.
             /** @var DOMElement $linkNode */

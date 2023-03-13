@@ -291,6 +291,7 @@ class PermissionModel extends Gdn_Model
             "Garden.Profiles.Edit" => 1,
             "Garden.AdvancedNotifications.Allow" => 1,
             "Garden.Email.View" => 1,
+            "Garden.Username.Edit" => 1,
             "Garden.Curation.Manage" => 1,
             "Garden.Moderation.Manage" => 1,
             "Garden.Uploads.Add" => 1,

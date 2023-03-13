@@ -52,4 +52,12 @@ class SearchPlacesEvent implements \Garden\Events\TrackingEventInterface
     {
         return $this->payload;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionID(): ?string
+    {
+        return $this->payload["siteSectionID"] ?? null;
+    }
 }

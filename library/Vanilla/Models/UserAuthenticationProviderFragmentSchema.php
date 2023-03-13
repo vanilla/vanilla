@@ -30,12 +30,12 @@ class UserAuthenticationProviderFragmentSchema extends Schema
                 "urls" => [
                     "type" => "object",
                     "properties" => [
-                        "signInUrl:s|n",
-                        "signOutUrl:s|n",
-                        "authenticateUrl:s|n",
-                        "registerUrl:s|n",
-                        "passwordUrl:s|n",
-                        "profileUrl:s|n",
+                        "signInUrl:s|n?",
+                        "signOutUrl:s|n?",
+                        "authenticateUrl:s|n?",
+                        "registerUrl:s|n?",
+                        "passwordUrl:s|n?",
+                        "profileUrl:s|n?",
                     ],
                     "allowNull" => true,
                 ],

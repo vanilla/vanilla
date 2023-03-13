@@ -158,12 +158,12 @@ class ModelCache
             if ($scheduler instanceof SchedulerInterface) {
                 // Defer hydration.
                 $fullKey = $this->createCacheKey($args);
-                $this->scheduleHydration($scheduler, $fullKey, $hydrate, $args);
+                $this->scheduleHydration($scheduler, $fullKey, $hydrate, array_values($args));
                 // Return the default for now.
                 return serialize($default);
             } else {
                 // Hydrate immediately.
-                $result = call_user_func_array($hydrate, $args);
+                $result = call_user_func_array($hydrate, array_values($args));
                 $result = serialize($result);
                 return $result;
             }

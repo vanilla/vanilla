@@ -44,7 +44,7 @@ class VanillaStructureTest extends SiteTestCase
         $categoryID = $categoryModel->save([
             "Name" => "Category Custom",
             "HeroImage" => "category.png",
-            "UrlCode" => randomString(5),
+            "UrlCode" => randomString(20),
         ]);
 
         // Apply the structure file.

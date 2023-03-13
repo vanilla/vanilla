@@ -741,9 +741,6 @@ paths:
                                         source:
                                             description: The score's source (Total, Badges, etc.) for the requested Slot type.
                                             type: string
-                                        categoryID:
-                                            description: The category on which the leaderboard is based on.
-                                            type: integer
                                         userID:
                                             description: ID of the user.
                                             type: integer
@@ -900,6 +897,8 @@ components:
                     enum:
                         - rank
                         - all
+                        - profileFields
+                        - extended
                     type: string
                 type: array
             style: form
@@ -936,6 +935,9 @@ components:
                     description: Email address of the user.
                     minLength: 0
                     type: string
+                hashMethod:
+                    type: string
+                    description: Hashing mechanism used for this user's password.
                 roles:
                     items:
                         $ref: "schemas.yml#/components/schemas/RoleFragment"
@@ -997,6 +999,16 @@ components:
                 showEmail:
                     description: Is the email address visible to other users?
                     type: boolean
+                lastIPAddress:
+                    description: Last known IP address of this user. Only visible to site administrators.
+                    type: string
+                countVisits:
+                    description: Number of visits the user has made to the site.
+                    type: integer
+                inviteUserID:
+                    description: UserID of the user that invited this user if applicable.
+                    type: integer
+                    nullable: true
             required:
                 - userID
                 - name
@@ -1024,6 +1036,9 @@ components:
                 emailConfirmed:
                     description: Has the email address for this user been confirmed?
                     type: boolean
+                showEmail:
+                    description: Is the email address visible to other users?
+                    type: boolean
                 name:
                     description: Name of the user.
                     minLength: 1
@@ -1031,6 +1046,12 @@ components:
                 password:
                     description: Password of the user.
                     minLength: 1
+                    type: string
+                resetPassword:
+                    description: Set to true to reset the user's password and send them a notification email.
+                    type: boolean
+                passwordConfirmation:
+                    description: Required when editing your own profile and when a password is associated with the account.
                     type: string
                 photo:
                     description: Raw photo field value from the user record.
@@ -1042,6 +1063,15 @@ components:
                     items:
                         type: integer
                     type: array
+                profileFields:
+                    $ref: "#/components/schemas/UserProfileFields"
+                private:
+                    description: Is the profile visible to other users?
+                    type: boolean
+                    default: false
+                banned:
+                    description: Set the banned status of the user.
+                    type: boolean
         UserPost:
             type: object
             properties:
@@ -1053,6 +1083,9 @@ components:
                     description: Email address of the user.
                     minLength: 1
                     type: string
+                showEmail:
+                    description: Is the email address visible to other users?
+                    type: boolean
                 emailConfirmed:
                     default: true
                     description: Has the email address for this user been confirmed?
@@ -1075,6 +1108,12 @@ components:
                     items:
                         type: integer
                     type: array
+                private:
+                    description: Is the profile visible to other users?
+                    type: boolean
+                    default: false
+                profileFields:
+                    $ref: "#/components/schemas/UserProfileFields"
             required:
                 - name
                 - email

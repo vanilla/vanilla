@@ -7,13 +7,17 @@
 
 namespace Vanilla\Formatting\Formats;
 
+use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\FormatConfig;
+use Vanilla\Formatting\FormatRegexReplacements;
 use Vanilla\Formatting\UserMentionInterface;
 use Vanilla\Formatting\UserMentionsTrait;
 
 /**
- * Class for rendering content of the markdown format.
+ * Class for rendering content of the plaintext format.
+ *
+ * @template-implements FormatInterface<TextFormatParsed>
  */
 class TextFormat extends BaseFormat
 {
@@ -43,8 +47,32 @@ class TextFormat extends BaseFormat
     /**
      * @inheritdoc
      */
-    public function renderHTML(string $content): string
+    public function parse(string $content)
     {
+        return new TextFormatParsed(static::FORMAT_KEY, $content);
+    }
+
+    /**
+     * Given either raw text or "parsed" raw text, pull out the raw text.
+     *
+     * @param $contentOrParsed
+     * @return string
+     */
+    protected function ensureRaw($contentOrParsed): string
+    {
+        if ($contentOrParsed instanceof TextFormatParsed) {
+            return $contentOrParsed->getRawText();
+        } else {
+            return $contentOrParsed;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function renderHTML($content): string
+    {
+        $content = $this->ensureRaw($content);
         $result = html_entity_decode($content, ENT_QUOTES, "UTF-8");
         $result = preg_replace("`<br\s?/?>`", "\n", $result);
         $result = htmlspecialchars($result, ENT_NOQUOTES, "UTF-8", false);
@@ -62,23 +90,25 @@ class TextFormat extends BaseFormat
     /**
      * @inheritdoc
      */
-    public function renderPlainText(string $content): string
+    public function renderPlainText($content): string
     {
+        $content = $this->ensureRaw($content);
         return trim($content);
     }
 
     /**
      * @inheritdoc
      */
-    public function filter(string $content): string
+    public function filter($content): string
     {
+        $content = $this->ensureRaw($content);
         return $content;
     }
 
     /**
      * @inheritdoc
      */
-    public function parseAttachments(string $content): array
+    public function parseAttachments($content): array
     {
         return [];
     }
@@ -86,7 +116,7 @@ class TextFormat extends BaseFormat
     /**
      * @inheritdoc
      */
-    public function parseImageUrls(string $content): array
+    public function parseImageUrls($content): array
     {
         return [];
     }
@@ -94,7 +124,7 @@ class TextFormat extends BaseFormat
     /**
      * @inheritdoc
      */
-    public function parseImages(string $content): array
+    public function parseImages($content): array
     {
         return [];
     }
@@ -102,7 +132,7 @@ class TextFormat extends BaseFormat
     /**
      * @inheritdoc
      */
-    public function parseHeadings(string $content): array
+    public function parseHeadings($content): array
     {
         return [];
     }
@@ -110,8 +140,9 @@ class TextFormat extends BaseFormat
     /**
      * @inheritdoc
      */
-    public function parseMentions(string $content, bool $skipTaggedContent = true): array
+    public function parseMentions($content, bool $skipTaggedContent = true): array
     {
+        $content = $this->ensureRaw($content);
         // Legacy Mention Fetcher.
         // This should get replaced in a future refactoring.
         return getMentions($content, $skipTaggedContent, $skipTaggedContent);
@@ -122,31 +153,19 @@ class TextFormat extends BaseFormat
      */
     public function removeUserPII(string $username, string $body): string
     {
-        $pattern = [];
-        $replacement = [];
-
-        [$pattern["atMention"], $replacement["atMention"]] = $this->getNonRichAtMentionReplacePattern(
-            $username,
-            $this->anonymizeUsername
-        );
-
-        [$pattern["url"], $replacement["url"]] = $this->getUrlReplacementPattern($username, $this->anonymizeUrl);
-
-        $body = preg_replace($pattern, $replacement, $body);
-        return $body;
+        $regex = new FormatRegexReplacements();
+        $regex->addReplacement(...$this->getNonRichAtMentionReplacePattern($username, $this->anonymizeUsername));
+        $regex->addReplacement(...$this->getUrlReplacementPattern($username, $this->anonymizeUrl));
+        return $regex->replace($body);
     }
 
     /**
      * @inheritDoc
      */
-    public function parseAllMentions(string $body): array
+    public function parseAllMentions($body): array
     {
-        $matches = [];
-        $atMention = $this->getNonRichAtMention();
-        $urlMention = $this->getUrlPattern();
+        $body = $this->ensureRaw($body);
 
-        $pattern = "~($atMention|$urlMention)~";
-        preg_match_all($pattern, $body, $matches, PREG_UNMATCHED_AS_NULL);
-        return $this->normalizeMatches($matches);
+        return $this->getNonRichMentions($body);
     }
 }

@@ -215,7 +215,7 @@ class JobStatusesApiController extends \AbstractApiController
      * - The user exists.
      * - The user is either the current sessioned user or we are an admin.
      *
-     * @param int $userID Potential ID to be valided.
+     * @param int $userID Potential ID to be validated.
      * @param ValidationField $field Field to adding specific error messages.
      */
     public function validateTrackingUserID(int $userID, ValidationField $field): bool

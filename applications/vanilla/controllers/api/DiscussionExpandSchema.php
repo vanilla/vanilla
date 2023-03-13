@@ -103,7 +103,13 @@ class DiscussionExpandSchema
         if (ModelUtils::isExpandOption("status", $expandOption)) {
             $this->recordStatusModel->expandStatuses($rows);
         }
-        if (ModelUtils::isExpandOption("status.log", $expandOption)) {
+        // This one can be slightly performance intensive so don't do it unless explicitly asked.
+        // Eg. Will not be included in expand=all
+        if (ModelUtils::isExpandOption("status.log", $expandOption, true)) {
+            if (!ModelUtils::isExpandOption("status", $expandOption)) {
+                $this->recordStatusModel->expandStatuses($rows);
+            }
+
             $this->recordStatusLogModel->expandStatusLogs($rows, "discussion", "discussionID");
         }
     }

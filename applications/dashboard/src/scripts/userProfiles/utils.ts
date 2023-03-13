@@ -104,9 +104,7 @@ export function mapProfileFieldToFormValues(profileField: ProfileField): Profile
             userCards,
             posts,
         },
-        editing: {
-            mutability,
-        },
+        mutability,
         enabled,
     };
 }
@@ -117,7 +115,7 @@ export function mapProfileFieldFormValuesToProfileField(formValues: ProfileField
         label,
         description,
         registrationOptions,
-        editing: { mutability },
+        mutability,
         visibility: { visibility, userCards, posts },
         type,
         enabled,

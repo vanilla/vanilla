@@ -6,6 +6,7 @@
  * @license GPL-2.0-only
  */
 
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Vanilla\Cli\Cloud\VanillaCloudCli;
 use Vanilla\Cli\Utils\SimpleScriptLogger;
 use Vanilla\Cli\VanillaCli;
@@ -22,7 +23,7 @@ set_error_handler(static function(
 
 $originalCwd = getcwd();
 $root = realpath(__DIR__ . "/../../");
-try {
+
     define('PATH_ROOT', $root);
     $paths = [
         __DIR__ . '/../../environment.php',
@@ -34,18 +35,13 @@ try {
         }
     }
 
-    $main = class_exists(VanillaCloudCli::class) ? new VanillaCloudCli() : new VanillaCli();
-    $result = $main->main($argv);
+    $main = new VanillaCli();
+try {
+    $main->run();
 } catch (\Throwable $t) {
     /** Restore the original CWD. */
     system("cd {$originalCwd}");
     $exitCode = $t->getCode() === 0 ? 1 : $t->getCode();
-
-    // Make a logger.
-    $logger = new SimpleScriptLogger();
-
-    $logger->critical($t->getMessage());
-    exit($exitCode);
+    $main->renderThrowable($t, new ConsoleOutput());
 }
 
-exit($result);

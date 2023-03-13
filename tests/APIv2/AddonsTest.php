@@ -21,7 +21,6 @@ class AddonsTest extends AbstractAPIv2Test
         "googleprettify",
         "gravatar",
         "indexphotos",
-        "profileextender",
         "quotes",
         "splitmerge",
         "stopforumspam",
@@ -164,21 +163,21 @@ class AddonsTest extends AbstractAPIv2Test
     public function testAddonModelPluginManagerInterop()
     {
         // Enable via the API.
-        $this->api()->patch("/addons/profileextender", ["enabled" => true]);
-        $this->assertPluginEnabled("profileextender", true);
+        $this->api()->patch("/addons/quotes", ["enabled" => true]);
+        $this->assertPluginEnabled("quotes", true);
 
         // Disable via plugin manager.
         $pm = \Gdn::pluginManager();
-        $pm->disablePlugin("profileextender");
-        $this->assertPluginEnabled("profileextender", false);
+        $pm->disablePlugin("quotes");
+        $this->assertPluginEnabled("quotes", false);
 
         // Enable via plugin manager.
-        $pm->enablePlugin("profileextender", new \Gdn_Validation());
-        $this->assertPluginEnabled("profileextender", true);
+        $pm->enablePlugin("quotes", new \Gdn_Validation());
+        $this->assertPluginEnabled("quotes", true);
 
         // Disable via API.
-        $this->api()->patch("/addons/profileextender", ["enabled" => false]);
-        $this->assertPluginEnabled("profileextender", false);
+        $this->api()->patch("/addons/quotes", ["enabled" => false]);
+        $this->assertPluginEnabled("quotes", false);
     }
 
     /**

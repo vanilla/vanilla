@@ -110,7 +110,7 @@ class NavModule extends Gdn_Module
      * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
      * @return NavModule $this The calling object.
      */
-    public function addDropdownIf($isAllowed = true, $dropdown, $key = "", $cssClass = "", $sort = [])
+    public function addDropdownIf($isAllowed = true, $dropdown = null, $key = "", $cssClass = "", $sort = [])
     {
         if (!$this->isAllowed($isAllowed)) {
             return $this;

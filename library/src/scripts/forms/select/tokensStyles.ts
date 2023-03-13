@@ -170,6 +170,13 @@ export const tokensClasses = useThemeCache(() => {
             fontWeight: 700,
             marginBottom: 0,
         },
+        "& label > p": {
+            color: "#666",
+            opacity: "unset",
+            fontSize: "80%",
+            marginTop: 3,
+            marginBottom: -4,
+        },
     });
 
     return { root, removeIcon, inputWrap, withIndicator, containerLegacyForm };

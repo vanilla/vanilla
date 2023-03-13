@@ -444,4 +444,19 @@ class ImageResizerTest extends TestCase
         $this->assertIsArray($actual);
         $this->assertNotEmpty($actual);
     }
+
+    /**
+     * Test that resizing a non-resizeable image (such as ico) throws an exception
+     */
+    public function testNonResizeableImage()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Cannot resize images of this type (ico).");
+        $this->expectExceptionCode(400);
+
+        $source = PATH_ROOT . "/tests/fixtures/apple.ico";
+        $dest = PATH_ROOT . "/tests/cache/image-resizer/" . __FUNCTION__ . ".ico";
+
+        $this->imageResizer->resize($source, $dest, ["width" => 128, "height" => 128]);
+    }
 }

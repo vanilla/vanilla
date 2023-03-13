@@ -129,11 +129,8 @@ class FoundationDiscussionShimTest extends SiteTestCase
 
         /** @var FoundationDiscussionsShim $shim */
         $shim = self::container()->get(FoundationDiscussionsShim::class);
-
-        $this->runWithExpectedException(Notice::class, function () use ($legacyItems, $shim) {
-            $actual = $shim->convertLegacyData($legacyItems);
-            $this->assertCount(1, $actual);
-        });
+        $actual = $shim->convertLegacyData($legacyItems);
+        $this->assertCount(1, $actual);
     }
 
     /**

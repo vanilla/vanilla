@@ -5,7 +5,6 @@
  */
 
 import { InputSize } from "@vanilla/ui/src/types";
-import { JSONSchemaType } from "ajv";
 import { ErrorObject } from "ajv/dist/core";
 import { SomeJSONSchema } from "ajv/dist/types/json-schema";
 import React from "react";
@@ -21,6 +20,8 @@ export interface ICommonControl {
     placeholder?: string;
     conditions?: Condition[];
     fullSize?: boolean;
+    inputID?: string;
+    errorPathString?: string;
 }
 
 interface IChoices {
@@ -41,6 +42,7 @@ interface IDropdownControl extends ICommonControl {
     inputType: "dropDown";
     choices: IChoices;
     multiple?: boolean;
+    helperText?: string;
 }
 
 interface IRadioControl extends ICommonControl {
@@ -51,6 +53,8 @@ interface IRadioControl extends ICommonControl {
 interface ITextBoxControl extends ICommonControl {
     inputType: "textBox";
     type?: string;
+    inputID?: string; //this one is non standard, for cases if we want to manipulate values of form elements
+    inputAriaLabel?: string; // and this one is in case we don't want visible label, but still want the input be accessible
 }
 
 interface ICodeBoxControl extends ICommonControl {
@@ -78,7 +82,7 @@ export interface ISchemaTab {
     isDefault?: boolean;
 }
 
-interface ICustomControl extends ICommonControl {
+export interface ICustomControl extends ICommonControl {
     inputType: string;
     [key: string]: any;
 }
@@ -101,6 +105,8 @@ export type Condition = { field: string; disable?: boolean } & JsonSchema;
 
 export interface IBaseSchemaFormProps {
     path: Array<string | number>;
+    pathString: string;
+    errors: IFieldError[];
     schema: JsonSchema;
     rootSchema: JsonSchema;
     instance: any;
@@ -165,4 +171,16 @@ export interface ISchemaRenderProps {
 export interface IPtrReference {
     path: Array<string | number>;
     ref: Path;
+}
+
+export interface IFieldError {
+    /** translated message */
+    message: string;
+    /** translation code */
+    code?: string;
+    field: string;
+    /** HTTP status */
+    status?: number;
+    /** If we are nested this the path we are nested in.*/
+    path?: string;
 }

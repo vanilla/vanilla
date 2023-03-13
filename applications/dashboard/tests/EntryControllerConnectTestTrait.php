@@ -9,6 +9,7 @@ namespace VanillaTests\Dashboard;
 
 use Garden\EventManager;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Dashboard\Models\ProfileFieldModel;
 use VanillaTests\APIv0\TestDispatcher;
 
 /**
@@ -338,7 +339,7 @@ trait EntryControllerConnectTestTrait
     {
         $this->createUserFixtures();
         $this->session->start($this->adminID);
-        $this->config->set("Feature.CustomProfileFields.Enabled", true);
+        $this->config->set(ProfileFieldModel::CONFIG_FEATURE_FLAG, true);
         $profileFieldData = $this->createProfileField($params);
         $this->session->end();
         return $profileFieldData;

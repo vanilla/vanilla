@@ -27,6 +27,16 @@ use VanillaTests\Fixtures\Scheduler\ThrowableEchoJob;
 class CronTest extends SchedulerTestCase
 {
     /**
+     * @return void
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+        \Gdn::config()->saveToConfig([CronModel::CONF_OFFSET_SECONDS => 0]);
+        \Gdn::cache()->flush();
+    }
+
+    /**
      * Test adding a simple Cron job.
      *
      * @throws ContainerException On error.
@@ -55,11 +65,7 @@ class CronTest extends SchedulerTestCase
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(JobExecutionStatus::received()));
 
-        $trackingSlips = $deferredScheduler->dispatchJobs();
-
-        $this->assertCount(1, $trackingSlips);
-        $this->assertStringContainsString("localDriverId", $trackingSlips[0]->getID());
-        $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::complete()));
+        $this->assertDispatchesToStatus(JobExecutionStatus::complete());
     }
 
     /**
@@ -75,10 +81,7 @@ class CronTest extends SchedulerTestCase
 
         $deferredScheduler->addJobDescriptor(new CronJobDescriptor(ParentJob::class, "* * * * *"));
 
-        $trackingSlips = $deferredScheduler->dispatchJobs();
-
-        $this->assertCount(1, $trackingSlips);
-        $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::abandoned()));
+        $this->assertDispatchesToStatus(JobExecutionStatus::abandoned());
     }
 
     /**
@@ -93,10 +96,7 @@ class CronTest extends SchedulerTestCase
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(JobExecutionStatus::received()));
 
-        $trackingSlips = $deferredScheduler->dispatchJobs();
-        $this->assertTrue(count($trackingSlips) == 1);
-        $this->assertStringContainsString("localDriverId", $trackingSlips[0]->getID());
-        $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::abandoned()));
+        $this->assertDispatchesToStatus(JobExecutionStatus::abandoned());
     }
 
     /**
@@ -112,12 +112,7 @@ class CronTest extends SchedulerTestCase
         $this->assertNotNull($trackingSlip);
         $this->assertTrue($trackingSlip->getStatus()->is(JobExecutionStatus::received()));
 
-        $trackingSlips = $deferredScheduler->dispatchJobs();
-        $this->assertTrue(count($trackingSlips) == 1);
-        $this->assertStringContainsString("localDriverId", $trackingSlips[0]->getID());
-        $complete = JobExecutionStatus::complete();
-        $this->assertTrue($trackingSlips[0]->getStatus()->is($complete));
-        $this->assertTrue($trackingSlips[0]->getExtendedStatus()["status"]->is($complete));
+        $this->assertDispatchesToStatus(JobExecutionStatus::complete());
     }
 
     /**
@@ -135,9 +130,7 @@ class CronTest extends SchedulerTestCase
         $this->assertTrue($lock->acquire());
 
         // This will not run and the jobs will be abandoned.
-        $trackingSlips = $deferredScheduler->dispatchJobs();
-        $this->assertCount(1, $trackingSlips);
-        $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::abandoned()));
+        $this->assertDispatchesToStatus(JobExecutionStatus::abandoned());
     }
 
     /**
@@ -154,17 +147,103 @@ class CronTest extends SchedulerTestCase
         $deferredScheduler->addJobDescriptor(new CronJobDescriptor(EchoJob::class, "*/15 * * * *"));
         // Only 14 minutes have passed. Job won't run.
         $lastRunTime = CurrentTimeStamp::mockTime($lastRunTime->modify("+13 minutes"));
-        $trackingSlips = $deferredScheduler->dispatchJobs();
-        $this->assertCount(1, $trackingSlips);
-        // Our tracking slip should be abandoned.
-        $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::abandoned()));
+        $this->assertDispatchesToStatus(JobExecutionStatus::abandoned());
 
         // Move forwards 15 minutes and try again.
         CurrentTimeStamp::mockTime($lastRunTime->modify("+15 minutes"));
-        $deferredScheduler->addJobDescriptor(new CronJobDescriptor(EchoJob::class, "*/15 * * * *"));
+        $this->assertDispatchesToStatus(JobExecutionStatus::complete());
+    }
+
+    /**
+     * Test that crons run at the right time with a configured offset.
+     *
+     * @return void
+     */
+    public function testCronSchedulingWithOffset()
+    {
+        // 3h30m offset.
+        \Gdn::config()->saveToConfig([CronModel::CONF_OFFSET_SECONDS => 60 * 60 * 3 + 60 * 30]);
+        // Job scheduled every 6 hours
+        $job = new CronJobDescriptor(EchoJob::class, "0 */6 * * *");
+        $lastRunTime = $this->mockLastRunTime("2022-12-01 00:01:00");
+        $deferredScheduler = $this->getDeferredScheduler();
+        $deferredScheduler->setExecutionType(JobExecutionType::cron());
+        $deferredScheduler->addJobDescriptor($job);
+        // A bunch of time has passed, but we due to the offset our next expected run time is 022-12-01 03:30:00
+        CurrentTimeStamp::mockTime("2022-12-01 03:29:00");
+        $this->assertDispatchesToStatus(JobExecutionStatus::abandoned());
+
+        // Now it's time to run.
+        CurrentTimeStamp::mockTime("2022-12-01 03:30:00");
+        $deferredScheduler->addJobDescriptor($job);
+        $this->assertDispatchesToStatus(JobExecutionStatus::complete());
+
+        // Next run time should be 09:30
+        // Couple attempts should abandon.
+        CurrentTimeStamp::mockTime("2022-12-01 06:29:00");
+        $deferredScheduler->addJobDescriptor($job);
+        $this->assertDispatchesToStatus(JobExecutionStatus::abandoned());
+        CurrentTimeStamp::mockTime("2022-12-01 07:29:00");
+        $deferredScheduler->addJobDescriptor($job);
+        $this->assertDispatchesToStatus(JobExecutionStatus::abandoned());
+
+        // Now it should run again.
+        CurrentTimeStamp::mockTime("2022-12-01 09:30:00");
+        $deferredScheduler->addJobDescriptor($job);
+        $this->assertDispatchesToStatus(JobExecutionStatus::complete());
+    }
+
+    /**
+     * Test that crons should run at the correct time with second based offsets.
+     *
+     * @return void
+     */
+    public function testCronSchedulingWithSecondsOffset()
+    {
+        // 3h30m offset.
+        \Gdn::config()->saveToConfig([CronModel::CONF_OFFSET_SECONDS => 43]);
+        // Job scheduled every 15 minutes
+        $job = new CronJobDescriptor(EchoJob::class, "*/15 * * * *");
+        $lastRunTime = $this->mockLastRunTime("2022-12-01 00:02:00");
+        $deferredScheduler = $this->getDeferredScheduler();
+        $deferredScheduler->setExecutionType(JobExecutionType::cron());
+        $deferredScheduler->addJobDescriptor($job);
+        // Next expected runtime should be 00:15:43
+        CurrentTimeStamp::mockTime("2022-12-01 00:15:40");
+        $this->assertDispatchesToStatus(JobExecutionStatus::abandoned());
+
+        // Now it's time to run.
+        CurrentTimeStamp::mockTime("2022-12-01 00:15:50");
+        $deferredScheduler->addJobDescriptor($job);
+        $this->assertDispatchesToStatus(JobExecutionStatus::complete());
+
+        // Next run time should be 00:30:43
+        // Couple attempts should abandon.
+        CurrentTimeStamp::mockTime("2022-12-01 00:30:39");
+        $deferredScheduler->addJobDescriptor($job);
+        $this->assertDispatchesToStatus(JobExecutionStatus::abandoned());
+        CurrentTimeStamp::mockTime("2022-12-01 00:30:40");
+        $deferredScheduler->addJobDescriptor($job);
+        $this->assertDispatchesToStatus(JobExecutionStatus::abandoned());
+
+        // Now it should run again.
+        CurrentTimeStamp::mockTime("2022-12-01 00:30:43");
+        $deferredScheduler->addJobDescriptor($job);
+        $this->assertDispatchesToStatus(JobExecutionStatus::complete());
+    }
+
+    /**
+     * Assert that we dispatch a job
+     *
+     * @param JobExecutionStatus $expectedStatus
+     */
+    private function assertDispatchesToStatus(JobExecutionStatus $expectedStatus)
+    {
+        $deferredScheduler = $this->getDeferredScheduler();
         $trackingSlips = $deferredScheduler->dispatchJobs();
         $this->assertCount(1, $trackingSlips);
-        $this->assertTrue($trackingSlips[0]->getStatus()->is(JobExecutionStatus::complete()));
+        // Our tracking slip should be abandoned.
+        $this->assertEquals((string) $expectedStatus, (string) $trackingSlips[0]->getStatus());
     }
 
     /**
@@ -178,7 +257,7 @@ class CronTest extends SchedulerTestCase
         $time = CurrentTimeStamp::mockTime($toMock);
         $cronModel = $this->container()->get(CronModel::class);
         // We've tracked our last run time.
-        $cronModel->trackRun();
+        $cronModel->trackRun(true);
         CurrentTimeStamp::clearMockTime();
         return $time;
     }
@@ -198,9 +277,6 @@ class CronTest extends SchedulerTestCase
 
         $deferredScheduler->addJobDescriptor(new CronJobDescriptor(EchoJob::class, "* * * * *"));
 
-        $trackingSlips = $deferredScheduler->dispatchJobs();
-        $this->assertTrue(count($trackingSlips) == 1);
-        $complete = JobExecutionStatus::complete();
-        $this->assertTrue($trackingSlips[0]->getStatus()->is($complete));
+        $this->assertDispatchesToStatus(JobExecutionStatus::complete());
     }
 }

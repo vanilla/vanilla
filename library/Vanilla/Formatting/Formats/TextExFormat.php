@@ -41,8 +41,9 @@ class TextExFormat extends TextFormat
     /**
      * @inheritdoc
      */
-    public function renderHTML(string $content): string
+    public function renderHTML($content): string
     {
+        $content = $this->ensureRaw($content);
         $result = parent::renderHTML($content);
         $result = $this->htmlEnhancer->enhance($result);
         return $result;
@@ -51,8 +52,9 @@ class TextExFormat extends TextFormat
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $content): string
+    public function renderQuote($content): string
     {
+        $content = $this->ensureRaw($content);
         $result = parent::renderHTML($content);
         $result = $this->htmlEnhancer->enhance($result, true, false);
         return $result;

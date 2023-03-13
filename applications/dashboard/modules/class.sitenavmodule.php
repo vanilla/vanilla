@@ -369,14 +369,20 @@ class SiteNavModule extends NavModule
      */
     public function addLinkToGlobalsIf(
         $isAllowed = true,
-        $text,
-        $url,
+        $text = "",
+        $url = "",
         $key = "",
         $cssClass = "",
         $sort = [],
         $modifiers = [],
         $disabled = false
     ) {
+        if (empty($text)) {
+            throw new InvalidArgumentException("Text field shouldn't be empty");
+        }
+        if (empty($text)) {
+            throw new InvalidArgumentException("Url field shouldn't be empty");
+        }
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {

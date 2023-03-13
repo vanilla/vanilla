@@ -195,9 +195,9 @@ export default function DiscussionListItem(props: IProps) {
 function qnaStatus(status) {
     switch (status) {
         case "unanswered":
+        case "rejected":
             return "Q&A Question";
         case "answered":
-        case "rejected":
             return "Q&A Answered";
         case "accepted":
             return "Q&A Accepted";

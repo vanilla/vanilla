@@ -28,16 +28,16 @@ class LocalFilePageScraper extends \Vanilla\PageScraper
     /**
      * Load a file from the file system as a successful HTTP response.
      *
-     * @param string $relativePath Path to the file, relative to the configured HTML directory.
+     * @param string $url Path to the file, relative to the configured HTML directory.
      * @return HttpResponse
      */
-    protected function getUrl(string $relativePath): HttpResponse
+    protected function getUrl(string $url): HttpResponse
     {
         if ($this->htmlDir === null) {
             throw new \RuntimeException("HTML directory has not been configured.");
         }
 
-        $fullPath = realpath("{$this->htmlDir}/{$relativePath}");
+        $fullPath = realpath("{$this->htmlDir}/{$url}");
         if ($fullPath === false) {
             throw new \InvalidArgumentException("File does not exist.");
         }

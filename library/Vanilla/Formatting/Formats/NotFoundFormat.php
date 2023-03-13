@@ -15,6 +15,8 @@ use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Stub format for rendering errors in every output format if content in an unregisterd format is encountered.
+ *
+ * @template-implements FormatInterface<TextFormatParsed>
  */
 class NotFoundFormat implements FormatInterface
 {
@@ -28,6 +30,14 @@ class NotFoundFormat implements FormatInterface
 
     /** @var array context*/
     private $context;
+
+    /**
+     * @inheritdoc
+     */
+    public function parse(string $content)
+    {
+        return new TextFormatParsed("not-found", $content);
+    }
 
     /**
      * Constructor.
@@ -51,7 +61,7 @@ class NotFoundFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function renderHTML(string $content): string
+    public function renderHTML($content): string
     {
         $viewData = [
             "title" => $this->getErrorMessage(),
@@ -62,7 +72,7 @@ class NotFoundFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function renderExcerpt(string $content, string $query = null): string
+    public function renderExcerpt($content, string $query = null): string
     {
         return $this->getErrorMessage();
     }
@@ -70,7 +80,7 @@ class NotFoundFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function renderPlainText(string $content): string
+    public function renderPlainText($content): string
     {
         return $this->getErrorMessage();
     }
@@ -78,7 +88,7 @@ class NotFoundFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function getPlainTextLength(string $content): int
+    public function getPlainTextLength($content): int
     {
         return 0;
     }
@@ -86,7 +96,7 @@ class NotFoundFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $content): string
+    public function renderQuote($content): string
     {
         return $this->renderHTML($content);
     }
@@ -94,7 +104,7 @@ class NotFoundFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function filter(string $content): string
+    public function filter($content): string
     {
         throw new FormatterNotFoundException($this->getErrorMessage());
     }
@@ -102,7 +112,7 @@ class NotFoundFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function parseAttachments(string $content): array
+    public function parseAttachments($content): array
     {
         return [];
     }
@@ -110,7 +120,7 @@ class NotFoundFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function parseHeadings(string $content): array
+    public function parseHeadings($content): array
     {
         return [];
     }
@@ -118,7 +128,7 @@ class NotFoundFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function parseImageUrls(string $content): array
+    public function parseImageUrls($content): array
     {
         return [];
     }
@@ -126,7 +136,7 @@ class NotFoundFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function parseImages(string $content): array
+    public function parseImages($content): array
     {
         return [];
     }
@@ -134,7 +144,7 @@ class NotFoundFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function parseMentions(string $content, bool $skipTaggedContent = true): array
+    public function parseMentions($content, bool $skipTaggedContent = true): array
     {
         return [];
     }
@@ -169,7 +179,7 @@ class NotFoundFormat implements FormatInterface
     /**
      * @inheritDoc
      */
-    public function parseAllMentions(string $body): array
+    public function parseAllMentions($body): array
     {
         return [];
     }

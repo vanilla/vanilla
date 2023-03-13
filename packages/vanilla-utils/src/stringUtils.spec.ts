@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import { hashString, splitStringLoosely, matchAtMention, labelize, isNumeric } from "./stringUtils";
+import { hashString, splitStringLoosely, matchAtMention, labelize, isNumeric, matchWithWildcard } from "./stringUtils";
 
 describe("hashString()", () => {
     it("the same string always results in the same value", () => {
@@ -148,5 +148,37 @@ describe("isNumeric()", () => {
         it(`is not numeric - '${val}'`, () => {
             expect(isNumeric(val)).toBe(false);
         });
+    });
+});
+
+describe("matchWithWildcard", () => {
+    it("Matches partial string", () => {
+        const string = "vanillaforums";
+        const rules = "vanilla*";
+        expect(matchWithWildcard(string, rules)).toBe(true);
+    });
+    it("Does not match unrelated strings", () => {
+        const string = "higherlogic";
+        const rules = "vanilla*";
+        expect(matchWithWildcard(string, rules)).toBe(false);
+    });
+    it("Does not match rule without wildcard", () => {
+        const string = "vanillaforums";
+        const rules = "vanilla";
+        expect(matchWithWildcard(string, rules)).toBe(false);
+    });
+    it("Match with preceding wildcard", () => {
+        const string = "vanillaforums";
+        const rules = "*forums";
+        expect(matchWithWildcard(string, rules)).toBe(true);
+    });
+    it("Match with ruleset delimited with new lines", () => {
+        const string = "vanillaforums";
+        const rules = "something\nelse\n*forums";
+        expect(matchWithWildcard(string, rules)).toBe(true);
+    });
+    it("Undefined matcher returns null", () => {
+        const string = "vanillaforums";
+        expect(matchWithWildcard(string, undefined as unknown as string)).toBeNull();
     });
 });

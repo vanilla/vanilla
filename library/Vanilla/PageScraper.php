@@ -19,6 +19,7 @@ use Garden\Http\HttpResponse;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\ServerException;
 use InvalidArgumentException;
+use Vanilla\Formatting\Html\HtmlDocument;
 use Vanilla\Metadata\Parser\Parser;
 use Vanilla\Web\RequestValidator;
 
@@ -113,6 +114,16 @@ class PageScraper implements LoggerAwareInterface
                 $description = $this->parseDescription($document, $metaTags);
                 if ($description) {
                     $info["Description"] = $description;
+                }
+            }
+
+            if (empty($info["Favicon"])) {
+                $faviconTag = HtmlDocument::queryCssSelectorForDocument($document, "link[rel*='icon']")->item(0);
+                if ($faviconTag instanceof DOMElement) {
+                    $href = $faviconTag->getAttribute("href");
+                    if ($href) {
+                        $info["Favicon"] = $href;
+                    }
                 }
             }
 

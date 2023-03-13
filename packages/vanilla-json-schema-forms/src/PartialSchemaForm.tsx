@@ -19,7 +19,7 @@ import { notEmpty } from "@vanilla/utils";
 import { TabbedSchemaForm } from "./TabbedSchemaForm";
 import { FormControlWrapper } from "./FormControlWrapper";
 import { FormWrapper } from "./FormWrapper";
-import { validateConditions } from "./utils";
+import { validateConditions, validationErrorsToFieldErrors } from "./utils";
 
 export const RenderChildren = (props: React.PropsWithChildren<ISectionProps | IFormProps | IControlGroupProps>) => (
     <>{props.children}</>
@@ -106,7 +106,9 @@ export function PartialSchemaForm(props: IPartialProps) {
                 }
             >
                 <FormSection
+                    errors={[]}
                     path={path}
+                    pathString={`/${path.join("/")}`}
                     title={sectionTitle!}
                     instance={instance}
                     rootInstance={rootInstance}
@@ -115,11 +117,17 @@ export function PartialSchemaForm(props: IPartialProps) {
                     validation={validation}
                 >
                     {Object.entries(schema.properties).map(([key, value]: [string, JsonSchema]) => {
+                        const pathString = `/${[...path, key].join("/")}`;
                         return (
                             <PartialSchemaForm
                                 disabled={props.disabled || value?.disabled}
                                 key={key}
                                 path={[...path, key]}
+                                errors={validationErrorsToFieldErrors(
+                                    validation?.errors,
+                                    value["x-control"]?.["errorPathString"] ?? pathString,
+                                )}
+                                pathString={pathString}
                                 schema={value}
                                 rootSchema={rootSchema}
                                 instance={instance?.[key]}
@@ -147,9 +155,16 @@ export function PartialSchemaForm(props: IPartialProps) {
         );
 
         if (form) {
+            const pathString = `/${path.join("/")}`;
+
             return (
                 <FormWrapper
                     path={path}
+                    pathString={pathString}
+                    errors={validationErrorsToFieldErrors(
+                        validation?.errors,
+                        schema["x-control"]?.["errorPathString"] ?? pathString,
+                    )}
                     form={form}
                     Form={Form}
                     instance={instance}
@@ -185,6 +200,8 @@ export function PartialSchemaForm(props: IPartialProps) {
     return (
         <FormControlGroup
             path={path}
+            pathString={`/${path.join("/")}`}
+            errors={props.errors}
             controls={visibleControls}
             instance={instance}
             rootInstance={rootInstance}
@@ -197,6 +214,8 @@ export function PartialSchemaForm(props: IPartialProps) {
                     disabled={props.disabled}
                     key={`${path.join("/")}[${index}]`}
                     path={path}
+                    pathString={`/${path.join("/")}`}
+                    errors={props.errors}
                     control={singleControl}
                     instance={instance}
                     rootInstance={rootInstance}

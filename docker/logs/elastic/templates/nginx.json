@@ -1,0 +1,85 @@
+{
+    "order": 20,
+    "index_patterns": ["nginx-*"],
+    "settings": {
+        "index": {
+            "lifecycle": {
+                "name": "delete_after_7_days",
+                "rollover_alias": "vanilla"
+            },
+            "refresh_interval": "5s",
+            "number_of_routing_shards": "30",
+            "query": {
+                "default_field": ["request.*"]
+            }
+        }
+    },
+    "mappings": {
+        "_meta": {},
+        "_source": {},
+        "dynamic_templates": [],
+        "properties": {
+            "@timestamp": {
+                "type": "date"
+            },
+            "geoip": {
+                "properties": {
+                    "location": {
+                        "type": "geo_point"
+                    }
+                }
+            },
+            "request": {
+                "properties": {
+                    "client_ip": {
+                        "type": "ip"
+                    },
+                    "cloudflare": {
+                        "properties": {
+                            "datacenter": {
+                                "type": "keyword"
+                            },
+                            "ip": {
+                                "type": "ip"
+                            },
+                            "rayid": {
+                                "type": "keyword"
+                            }
+                        }
+                    },
+                    "cluster": {
+                        "type": "keyword"
+                    },
+                    "elapsed_ms": {
+                        "type": "integer"
+                    },
+                    "engine": {
+                        "type": "keyword"
+                    },
+                    "forwarded_for": {
+                        "type": "keyword"
+                    },
+                    "hostname": {
+                        "type": "keyword"
+                    },
+                    "method": {
+                        "type": "keyword"
+                    },
+                    "response_code": {
+                        "type": "integer"
+                    },
+                    "sent_bytes": {
+                        "type": "integer"
+                    },
+                    "server": {
+                        "type": "keyword"
+                    },
+                    "vanilla_auth_user_id": {
+                        "type": "keyword"
+                    }
+                }
+            }
+        }
+    },
+    "aliases": {}
+}

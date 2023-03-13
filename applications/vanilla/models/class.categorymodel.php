@@ -402,7 +402,7 @@ class CategoryModel extends Gdn_Model implements
         $allowedDiscussionTypes = self::getAllowedDiscussionData($row);
         $allowedDiscussionTypes = array_keys($allowedDiscussionTypes);
 
-        $discussionTypes = array_intersect($allowedDiscussionTypes, $categoryAllowedDiscussionTypes);
+        $discussionTypes = array_intersect($categoryAllowedDiscussionTypes, $allowedDiscussionTypes);
 
         return $discussionTypes ?? [];
     }

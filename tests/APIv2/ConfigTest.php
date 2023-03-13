@@ -187,4 +187,16 @@ class ConfigTest extends AbstractAPIv2Test
         $this->assertConfigValue("Garden.Description", "Something TO Show");
         $this->assertConfigValue("Garden.Title", "Hello moo");
     }
+
+    /**
+     * Test that the x-upload attribute transforms upload fragments into upload urls.
+     */
+    public function testUploadUrls()
+    {
+        $this->api->patch("/config", [
+            "branding.bannerImage" => "/test123.png",
+        ]);
+        $response = $this->api->get("/config", ["select" => "branding.bannerImage"])->getBody();
+        $this->assertEquals(["branding.bannerImage" => url("/uploads/test123.png", true)], $response);
+    }
 }

@@ -19,7 +19,7 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import classNames from "classnames";
 import ToolbarContainer from "@rich-editor/toolbars/pieces/ToolbarContainer";
 import InlineToolbarMenuItems from "@rich-editor/toolbars/pieces/InlineToolbarMenuItems";
-import InlineToolbarLinkInput from "@rich-editor/toolbars/pieces/InlineToolbarLinkInput";
+import InlineToolbarLinkInput from "@library/editor/toolbars/pieces/InlineToolbarLinkInput";
 import { FocusWatcher } from "@vanilla/dom-utils";
 
 interface IProps extends IWithEditorProps {}
@@ -34,7 +34,7 @@ interface IState {
  * This __cannot__ be a pure component because it needs to re-render when quill emits, even if the selection is the same.
  */
 export class InlineToolbar extends React.PureComponent<IProps, IState> {
-    private quill: Quill;
+    private editor: Quill;
     private linkInput: React.RefObject<HTMLInputElement> = React.createRef();
     private selfRef: React.RefObject<HTMLDivElement> = React.createRef();
     private focusWatcher: FocusWatcher;
@@ -48,11 +48,11 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
     /**
      * @inheritDoc
      */
-    constructor(props) {
+    constructor(props: IProps) {
         super(props);
 
         // Quill can directly on the class as it won't ever change in a single instance.
-        this.quill = props.quill;
+        this.editor = props.editor!;
 
         this.state = {
             inputValue: "",
@@ -62,7 +62,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
     }
 
     private get formatter(): Formatter {
-        return new Formatter(this.quill, this.props.lastGoodSelection);
+        return new Formatter(this.editor, this.props.lastGoodSelection);
     }
 
     /**
@@ -104,6 +104,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
                         onInputChange={this.onInputChange}
                         onInputKeyDown={this.onInputKeyDown}
                         onCloseClick={this.onCloseClick}
+                        onSubmit={this.onLinkInputSubmit}
                     />
                 </ToolbarContainer>
             </div>
@@ -114,7 +115,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
      * Determine visibility of the link menu.
      */
     private get isLinkMenuVisible(): boolean {
-        const inCodeBlock = rangeContainsBlot(this.quill, CodeBlockBlot, this.props.lastGoodSelection);
+        const inCodeBlock = rangeContainsBlot(this.editor, CodeBlockBlot, this.props.lastGoodSelection);
         return (
             this.state.isLinkMenuOpen &&
             (this.hasFocus || this.ignoreLinkToolbarFocusRequirement) &&
@@ -129,7 +130,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
      */
     private get isFormatMenuVisible(): boolean {
         const selectionHasLength = this.props.lastGoodSelection.length > 0;
-        const inCodeBlock = rangeContainsBlot(this.quill, CodeBlockBlot, this.props.lastGoodSelection);
+        const inCodeBlock = rangeContainsBlot(this.editor, CodeBlockBlot, this.props.lastGoodSelection);
         return (
             !this.isLinkMenuVisible &&
             this.hasFocus &&
@@ -142,7 +143,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
 
     private get selectionHasContent(): boolean {
         const { lastGoodSelection } = this.props;
-        const text = this.quill.getText(lastGoodSelection.index, lastGoodSelection.length);
+        const text = this.editor.getText(lastGoodSelection.index, lastGoodSelection.length);
         return !!text && text !== "\n";
     }
 
@@ -151,7 +152,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
      */
     private get isOneLineOrLess(): boolean {
         const { lastGoodSelection } = this.props;
-        const numLines = this.quill.getLines(lastGoodSelection.index || 0, lastGoodSelection.length || 0).length;
+        const numLines = this.editor.getLines(lastGoodSelection.index || 0, lastGoodSelection.length || 0).length;
         return numLines <= 1;
     }
 
@@ -159,15 +160,15 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
      * Determine if the inline menu or the quill content editable has focus.
      */
     private get hasFocus() {
-        return this.state.menuHasFocus || this.quill.hasFocus();
+        return this.state.menuHasFocus || this.editor.hasFocus();
     }
 
     /**
      * Mount quill listeners.
      */
     public componentDidMount() {
-        this.quill.root.addEventListener("keydown", this.escFunction, false);
-        this.quill.root.addEventListener("keydown", this.commandKHandler, false);
+        this.editor.root.addEventListener("keydown", this.escFunction, false);
+        this.editor.root.addEventListener("keydown", this.commandKHandler, false);
         this.focusWatcher = new FocusWatcher(this.selfRef.current!, this.handleFocusChange);
         this.focusWatcher.start();
     }
@@ -176,8 +177,8 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
      * Be sure to remove the listeners when the component unmounts.
      */
     public componentWillUnmount() {
-        this.quill.root.removeEventListener("keydown", this.escFunction, false);
-        this.quill.root.removeEventListener("keydown", this.commandKHandler, false);
+        this.editor.root.removeEventListener("keydown", this.escFunction, false);
+        this.editor.root.removeEventListener("keydown", this.commandKHandler, false);
         this.focusWatcher.stop();
     }
 
@@ -201,19 +202,19 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
         e.stopImmediatePropagation();
 
         const { lastGoodSelection } = this.props;
-        const inCodeBlock = rangeContainsBlot(this.quill, CodeBlockBlot, lastGoodSelection);
+        const inCodeBlock = rangeContainsBlot(this.editor, CodeBlockBlot, lastGoodSelection);
 
         if (!this.isOneLineOrLess || this.isLinkMenuVisible || inCodeBlock) {
             return;
         }
 
-        const inLinkBlot = rangeContainsBlot(this.quill, LinkBlot, lastGoodSelection);
+        const inLinkBlot = rangeContainsBlot(this.editor, LinkBlot, lastGoodSelection);
 
         if (inLinkBlot) {
             this.formatter.link();
             this.reset();
         } else {
-            const currentText = this.quill.getText(lastGoodSelection.index, lastGoodSelection.length);
+            const currentText = this.editor.getText(lastGoodSelection.index, lastGoodSelection.length);
             if (isAllowedUrl(currentText)) {
                 this.setState({
                     inputValue: currentText,
@@ -262,12 +263,12 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
     };
 
     /**
-     * Clear the link input, focus quill, and restore the selection.
+     * Clear the link input, focus editor, and restore the selection.
      */
     private clearLinkInput() {
         this.setState({ isLinkMenuOpen: false, inputValue: "" });
-        this.quill.focus();
-        this.quill.setSelection(this.props.lastGoodSelection);
+        this.editor.focus();
+        this.editor.setSelection(this.props.lastGoodSelection);
     }
 
     /**
@@ -282,7 +283,7 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
      * Clear the link menu's input content and hide the link menu.
      */
     private reset = () => {
-        this.props.lastGoodSelection && this.quill.setSelection(this.props.lastGoodSelection, Emitter.sources.USER);
+        this.props.lastGoodSelection && this.editor.setSelection(this.props.lastGoodSelection, Emitter.sources.USER);
 
         this.setState({
             inputValue: "",
@@ -298,20 +299,19 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
         this.setState({
             inputValue: "",
         });
-        this.quill.setSelection(newSelection);
+        this.editor.setSelection(newSelection);
     };
 
     /**
      * Handle key-presses for the link toolbar.
      */
     private onInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (Keyboard.match(event.nativeEvent, "enter")) {
-            event.preventDefault();
-            this.formatter.link(this.state.inputValue);
-            this.clearLinkInput();
-        }
-
         this.escFunction(event.nativeEvent);
+    };
+
+    private onLinkInputSubmit = (_inputValue) => {
+        this.formatter.link(this.state.inputValue);
+        this.clearLinkInput();
     };
 
     /**
@@ -322,4 +322,4 @@ export class InlineToolbar extends React.PureComponent<IProps, IState> {
     };
 }
 
-export default withEditor<IProps>(InlineToolbar);
+export default withEditor(InlineToolbar);

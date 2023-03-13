@@ -444,14 +444,16 @@ class UserModelTest extends SiteTestCase
      */
     private function createUser(string $userName)
     {
-        $rand = rand(10, 1000);
+        $rand = randomString(25);
         $user = [
             "Name" => $userName,
             "Email" => $rand . "test@example.com",
             "Password" => randomString(\Gdn::config("Garden.Password.MinLength")),
         ];
 
-        return $this->userModel->save($user);
+        $id = $this->userModel->save($user);
+        ModelUtils::validationResultToValidationException($this->userModel);
+        return $id;
     }
 
     /**
@@ -761,13 +763,13 @@ class UserModelTest extends SiteTestCase
             "Body" => "This is a test message",
         ]);
 
-        $activityCountBeforeOldUser = $this->activityModel->getCount($oldUserID);
+        $activityCountBeforeOldUser = $this->activityModel->getCount([], $oldUserID);
 
         // Merge the 2 users.
         $result = $this->userModel->merge($oldUserID, $newUserID);
 
         // Verify all counts are correct after merging the users.=
-        $activityCountAfter = $this->activityModel->getCount($newUserID);
+        $activityCountAfter = $this->activityModel->getCount([], $newUserID);
         $this->assertEquals($activityCountBeforeOldUser, $activityCountAfter);
         $discussionCountAfter = $this->discussionModel->getCount(["d.InsertUserID" => $newUserID]);
         $commentCountAfter = $this->commentModel->getCountWhere([
@@ -1074,7 +1076,10 @@ class UserModelTest extends SiteTestCase
     {
         $user1 = $this->createUser("user1");
         $deleted1 = $this->createUser("Deleted User");
-        $deleted2 = $this->createUser("Deleted User");
+
+        // Hack around to create 2 users with the same name.
+        $deleted2 = $this->createUser("Deleted User2");
+        $this->userModel->setField($deleted2, "Name", "Deleted User");
 
         $actual = $this->userModel->getUserIDsForUserNames(["user1", "Deleted User"]);
         $this->assertEquals(

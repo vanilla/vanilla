@@ -11,6 +11,7 @@ import classNames from "classnames";
 import Paragraph from "@library/layout/Paragraph";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { IError } from "@library/errorPages/CoreErrorMessages";
+import { cx } from "@emotion/css";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",
@@ -31,8 +32,8 @@ export interface IInputBlockProps extends IOptionalComponentID {
     className?: string;
     wrapClassName?: string;
     labelClassName?: string;
-    noteAfterInput?: string;
-    labelNote?: string;
+    noteAfterInput?: string | ReactNode;
+    labelNote?: ReactNode;
     labelID?: string;
     descriptionID?: string;
     errors?: IError[];
@@ -41,6 +42,9 @@ export interface IInputBlockProps extends IOptionalComponentID {
     noMargin?: boolean;
     grid?: boolean;
     tight?: boolean;
+    icon?: ReactNode;
+    noErrorPadding?: boolean;
+    extendErrorMessage?: boolean;
 }
 
 interface IState {
@@ -87,6 +91,7 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
                     <span id={this.labelID} className={classesInputBlock.labelAndDescription}>
                         <LabelTag className={classNames(classesInputBlock.labelText, this.props.labelClassName)}>
                             {this.props.label}
+                            {this.props.icon}
                         </LabelTag>
                         <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
                     </span>
@@ -104,8 +109,13 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
                 >
                     {children}
                 </span>
-                <Paragraph className={classesInputBlock.labelNote}>{this.props.noteAfterInput}</Paragraph>
-                <ErrorMessages id={this.errorID} errors={this.props.errors} padded />
+                <Paragraph className={classesInputBlock.noteAfterInput}>{this.props.noteAfterInput}</Paragraph>
+                <ErrorMessages
+                    id={this.errorID}
+                    errors={this.props.errors}
+                    className={cx({ [classesInputBlock.extendErrorPadding]: this.props.extendErrorMessage })}
+                    padded={!this.props.noErrorPadding}
+                />
             </OuterTag>
         );
     }

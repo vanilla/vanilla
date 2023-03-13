@@ -696,7 +696,7 @@ class DiscussionModelTest extends SiteTestCase
     }
 
     /**
-     * Test that chaning a discussions category triggers a bulk update for all of it's comments.
+     * Test that changing a discussions category triggers a bulk update for all of it's comments.
      */
     public function testChangeTriggersBulkUpdate()
     {

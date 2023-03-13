@@ -4,17 +4,17 @@
  * @license Proprietary
  */
 
-import Loadable from "react-loadable";
 import React from "react";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import Loader from "@library/loaders/Loader";
+import { createLoadableComponent } from "@vanilla/react-utils";
 
-export const TagDiscussionForm = Loadable({
-    loader: () =>
+export const TagDiscussionForm = createLoadableComponent({
+    loadFunction: () =>
         import(
             /* webpackChunkName: "features/discussions/forms/TagDiscussionForm" */ "@library/features/discussions/forms/TagDiscussionForm.loadable"
         ),
-    loading() {
+    fallback() {
         return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
     },
 });

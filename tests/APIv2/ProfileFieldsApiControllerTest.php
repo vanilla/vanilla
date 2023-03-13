@@ -38,10 +38,10 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
         "registrationOptions" => ProfileFieldModel::REGISTRATION_HIDDEN,
     ];
 
-    public function tearDown(): void
+    public function setUp(): void
     {
-        parent::tearDown();
-        \Gdn::sql()->truncate("profileField");
+        parent::setUp();
+        $this->resetTable("profileField");
     }
 
     /**
@@ -401,7 +401,6 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
         $tests["Valid apiName"] = [["apiName" => "test"] + $record, false];
         $tests["Missing apiName"] = [array_diff_key($record, ["apiName" => 1]), true];
         $tests["Missing label"] = [array_diff_key($record, ["label" => 1]), true];
-        $tests["Missing description"] = [array_diff_key($record, ["description" => 1]), false];
         $tests["Missing dataType"] = [array_diff_key($record, ["dataType" => 1]), true];
         $tests["Missing formType"] = [array_diff_key($record, ["formType" => 1]), true];
         $tests["Missing visibility"] = [array_diff_key($record, ["visibility" => 1]), true];
@@ -469,6 +468,27 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
         // Test not found error (404)
         $this->runWithExpectedExceptionCode(404, function () {
             $this->api()->delete("$this->baseUrl/doesnt_exist");
+        });
+    }
+
+    /**
+     * Test exception when trying to delete a "core" profile field.
+     */
+    public function testCoreFieldsCantBeDeleted()
+    {
+        // Forcefully create a "core field".
+        $newProfileField = \Gdn::sql()->insert("profileField", [
+            "apiName" => "customApiName",
+            "label" => "Custom Profile Field",
+            "description" => "Custom Core Related Profile Field",
+            "displayOptions" => json_encode(["userCards" => false, "posts" => false]),
+            "sort" => 99,
+            "isCoreField" => "plugin",
+        ]);
+
+        // Deletion should trigger an exception.
+        $this->runWithExpectedExceptionMessage("This field is used by a core feature & can't be deleted.", function () {
+            $this->api()->delete("$this->baseUrl/customApiName");
         });
     }
 
@@ -541,5 +561,79 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
         }
 
         return $rows;
+    }
+
+    /**
+     * Test what happens if bad values somehow get inserted into dropdown options.
+     *
+     * @param mixed $input
+     * @param array $expected
+     *
+     * @dataProvider provideBadDropdownOptions
+     */
+    public function testGetWithBadDropdownOptions($input, array $expected)
+    {
+        $this->resetTable("profileField");
+        $field = $this->createProfileField([
+            "formType" => ProfileFieldModel::FORM_TYPE_DROPDOWN,
+            "dropdownOptions" => ["test"],
+        ]);
+
+        \Gdn::sql()
+            ->update("profileField", ["dropdownOptions" => json_encode($input)], ["apiName" => $field["apiName"]])
+            ->put();
+        \Gdn::cache()->flush();
+        $row = $this->api()
+            ->get("/profile-fields")
+            ->getBody()[0];
+        $this->assertEquals($expected, $row["dropdownOptions"]);
+    }
+
+    /**
+     * Test that `GDN_ProfileField`'s `isCoreField` can't be set through POST/PATCH `/profile-fields`.
+     */
+    public function testCantSetIsCoreField()
+    {
+        $this->resetTable("profileField");
+
+        // Create record using POST `/profile-fields`.
+        $newProfileField = $this->createProfileField(["isCoreField" => "CustomIsCoreFieldValue"]);
+
+        // Get every (1) existing profile fields.
+        $profileFields = $this->api()
+            ->get("/profile-fields")
+            ->getBody();
+
+        // Assert the GET request returned an array with an empty `isCoreField`.
+        foreach ($profileFields as $profileField) {
+            $this->assertArrayHasKey("isCoreField", $profileField);
+            $this->assertEmpty($profileField["isCoreField"]);
+        }
+
+        // Update previously created record using PATCH `/profile-fields/{apiName}`.
+        $patchResult = $this->api()->patch("/profile-fields/" . $newProfileField["apiName"], [
+            "isCoreField" => "PatchedCustomIsCoreFieldValue",
+        ]);
+
+        // Get every (1) existing profile fields.
+        $profileFields = $this->api()
+            ->get("/profile-fields")
+            ->getBody();
+
+        // Assert the GET request returned an array with an empty `isCoreField`.
+        foreach ($profileFields as $profileField) {
+            $this->assertArrayHasKey("isCoreField", $profileField);
+            $this->assertEmpty($profileField["isCoreField"]);
+        }
+    }
+
+    /**
+     * Provide bad migrated data.
+     */
+    public function provideBadDropdownOptions()
+    {
+        yield "not-array" => ["garbeldegook", []];
+        yield "object" => [["key1" => "val1", "key2" => "val2"], ["val1", "val2"]];
+        yield "empty-array" => [[], []];
     }
 }

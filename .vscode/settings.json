@@ -9,9 +9,8 @@
         "cloud/applications": true,
         "cloud/themes": true,
         ".idea": true,
-        "cgi-bin": true,
         "dist": true,
-        "**/node_modules": true,
+        "**/node_modules": false,
         "**/bower_components": true,
         "**/.phpunit.result.cache": true,
         ".htaccess.dist": true
@@ -27,7 +26,6 @@
         "cloud/applications": true,
         "cloud/themes": true,
         ".idea": true,
-        "cgi-bin": true,
         "**/bower_components": true,
         "vendor": true,
         "**/.phpunit.result.cache": true,
@@ -44,7 +42,6 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[yaml]": {
-        "editor.formatOnSave": false,
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[html]": {

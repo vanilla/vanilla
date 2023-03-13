@@ -36,13 +36,14 @@ trait UserMentionsTrait
      * @param string $replacement
      * @return string[] [$pattern, $replacement]
      */
-    public function getNonRichAtMentionReplacePattern(string $username, string $replacement)
+    public function getNonRichAtMentionReplacePattern(string $username, string $replacement): array
     {
+        $username = preg_quote($username);
         if (str_contains($username, " ")) {
             $pattern = "~@\"$username\"~";
             $replacement = '@"' . $replacement . '"';
         } else {
-            $pattern = "~@$username({$this->AFTER_AT_MENTION_TOKENS})~";
+            $pattern = "~@$username($this->AFTER_AT_MENTION_TOKENS)~";
             $replacement = '@"' . $replacement . '"$1';
         }
 
@@ -51,15 +52,15 @@ trait UserMentionsTrait
 
     public function getUrlPattern(): string
     {
-        $url = \Gdn::request()->getSimpleUrl();
-        $url .= "/profile/(?<url_mentions>.+?)(?:{$this->AFTER_URL_TOKENS})";
+        $url = preg_quote(\Gdn::request()->getSimpleUrl());
+        $url .= "/profile/(.+?)(?:$this->AFTER_URL_TOKENS)";
         return $url;
     }
 
     public function getNonRichAtMention(): string
     {
-        $pattern = "(?<!\w)@\"(?<quoted_at_mentions>[^\"]+?)\"";
-        $pattern .= "|(?<!\w)@(?<at_mentions>[^\"]+?)(?={$this->AFTER_AT_MENTION_TOKENS})";
+        $pattern = '(?<!\w)@"(.+?)"';
+        $pattern .= "|(?<!\w)@(.+?)(?:$this->AFTER_AT_MENTION_TOKENS)";
 
         return $pattern;
     }
@@ -73,33 +74,34 @@ trait UserMentionsTrait
      */
     public function getUrlReplacementPattern(string $username, string $replacement): array
     {
-        $profileUrl = UserModel::getProfileUrl(["name" => $username]);
+        $profileUrl = preg_quote(UserModel::getProfileUrl(["name" => $username]));
         $pattern = "~$profileUrl({$this->AFTER_URL_TOKENS})~";
         $replacement = $replacement . '$1';
         return [$pattern, $replacement];
     }
 
     /**
-     * This function extracts named matches from preg_match_all and returns them as an array of usernames
+     * This function extracts matches from preg_match_all and returns them as an array of usernames
      *
      * @param array $matches
+     * @param bool $urlDecode Decode matches when they contain URLs
      * @return string[]
      */
-    protected function normalizeMatches(array $matches = []): array
+    protected function normalizeMatches(array $matches = [], bool $urlDecode = false): array
     {
-        $allMentions = [];
-        foreach (["at_mentions", "quoted_at_mentions", "quote_mentions", "url_mentions"] as $type) {
-            $currentMentions = $matches[$type] ?? [];
-            foreach ($currentMentions as $mention) {
+        array_shift($matches);
+        $mentions = [];
+        foreach ($matches as $group) {
+            foreach ($group as $mention) {
                 if (is_null($mention)) {
                     continue;
                 }
-                if ($type === "url_mentions") {
+                if ($urlDecode) {
                     $mention = rawurldecode($mention);
                 }
-                $allMentions[] = $mention;
+                $mentions[] = $mention;
             }
         }
-        return $allMentions;
+        return $mentions;
     }
 }

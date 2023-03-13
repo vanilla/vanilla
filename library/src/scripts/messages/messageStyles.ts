@@ -164,6 +164,7 @@ export const messagesClasses = useThemeCache(() => {
 
     const root = css({
         width: percent(100),
+        textAlign: "start",
         backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
         ...shadowOrBorderBasedOnLightness(
             globalVars.body.backgroundImage.color,

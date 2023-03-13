@@ -12,7 +12,8 @@ import React, { useContext, useMemo } from "react";
 
 export interface IFormTreeItemParams<ItemDataType = any> {
     itemSchema: JsonSchema;
-    getRowIcon?(treeItem: ITreeItem<ItemDataType>): IconType;
+    getRowIcon?(treeItem: ITreeItem<ItemDataType>): IconType | null;
+    isItemEditable?(item: ItemDataType): boolean;
     isItemDeletable?(item: ItemDataType): boolean;
     isItemHideable?(item: ItemDataType): boolean;
     isItemHidden?(item: ItemDataType): boolean;

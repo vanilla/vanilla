@@ -65,6 +65,7 @@ components:
                     x-key: Garden.BannerImage
                     x-read: public
                     x-write: community.manage
+                    x-upload: true
                 "branding.favicon":
                     description: |
                         Your site's favicon appears in your browser's title bar. It will be scaled down appropriately.
@@ -75,6 +76,7 @@ components:
                     x-key: Garden.FavIcon
                     x-read: public
                     x-write: community.manage
+                    x-upload: true
                 "branding.logo":
                     description: |
                         The banner logo appears at the top of your site. Themes made with the theme editor and some custom themes don't use this setting.
@@ -85,6 +87,7 @@ components:
                     x-key: Garden.Logo
                     x-read: public
                     x-write: community.manage
+                    x-upload: true
                 "branding.mobileLogo":
                     description: |
                         The mobile banner logo appears at the top of your site. Themes made with the theme editor and some custom themes don't use this setting.
@@ -95,6 +98,7 @@ components:
                     x-key: Garden.MobileLogo
                     x-read: public
                     x-write: community.manage
+                    x-upload: true
                 "branding.shareImage":
                     description: >-
                         When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50×50, but we recommend 200×200.
@@ -105,6 +109,7 @@ components:
                     x-key: Garden.ShareImage
                     x-read: public
                     x-write: community.manage
+                    x-upload: true
                 "branding.touchIcon":
                     description: |
                         The touch icon appears when you bookmark a website on the homescreen of a mobile device. These are usually 152 pixels.
@@ -115,6 +120,7 @@ components:
                     x-key: Garden.TouchIcon
                     x-read: public
                     x-write: community.manage
+                    x-upload: true
                 "forum.disabled":
                     description: |
                         Remove discussion and categories links from menus. Set discussion and category related pages to return not found page 404.
@@ -413,5 +419,27 @@ components:
                     type: string
                     default: ""
                     x-key: "Garden.Messages.Add.RedirectUrl"
+                    x-read: public
+                    x-write: site.manage
+                "password.minLength":
+                    description: |
+                        The minimum number of characters a members password can be.
+                    type: string
+                    default: ""
+                    x-key: "Garden.Password.MinLength"
+                    x-read: public
+                    x-write: site.manage
+                "registration.method":
+                    description: |
+                        How members are able to register to the community.
+                    type: string
+                    enum:
+                        - "Basic"
+                        - "Approval"
+                        - "Invitation"
+                        - "Connect"
+                        - "Captcha"
+                    default: "Captcha"
+                    x-key: "Garden.Registration.Method"
                     x-read: public
                     x-write: site.manage

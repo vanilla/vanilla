@@ -8,10 +8,10 @@ import { UserCardPopup, useUserCardTrigger } from "@library/features/userCard/Us
 import { deconstructAttributesFromElement } from "@vanilla/react-utils";
 import { IMountable, mountReactMultiple, useDomNodeAttachment } from "@vanilla/react-utils";
 import { logError, notEmpty } from "@vanilla/utils";
-import React from "react";
+import React, { ElementType } from "react";
 
 interface IProps {
-    Tag: keyof JSX.IntrinsicElements;
+    Tag: ElementType;
     tagProps: any;
     domNodesToAttach: Node[];
 }
@@ -51,7 +51,7 @@ export function applyCompatibilityUserCards(scope: HTMLElement | Document | unde
             }
 
             const attrs = deconstructAttributesFromElement(userLink);
-            const Tag = userLink.tagName.toLowerCase() as keyof JSX.IntrinsicElements;
+            const Tag = userLink.tagName.toLowerCase() as ElementType;
             attrs.className = attrs.className ?? "";
             attrs.className += " js-userCardInitialized";
             return {

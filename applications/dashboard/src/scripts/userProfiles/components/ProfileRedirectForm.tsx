@@ -131,7 +131,7 @@ export function ProfileRedirectForm() {
     const classes = ProfileRedirectFormClasses();
 
     return (
-        <form>
+        <form data-testid="profile-redirect-form">
             {isLoaded ? (
                 <>
                     <JsonSchemaForm

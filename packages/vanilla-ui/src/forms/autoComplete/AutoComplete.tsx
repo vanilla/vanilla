@@ -137,6 +137,7 @@ export interface IAutoCompleteProps {
     onChange?(value: any | any[]): void;
     onSearch?(value: string): void;
     allowArbitraryInput?: boolean;
+    inputID?: string;
 }
 
 /**
@@ -159,6 +160,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         allowArbitraryInput,
         placeholder,
         optionProvider,
+        inputID: id,
         ...otherProps
     } = props;
     const { zIndex } = useStackingContext();
@@ -482,6 +484,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                     )}
                     <Reach.ComboboxInput
                         {...otherProps}
+                        id={id}
                         ref={inputRef}
                         selectOnClick
                         disabled={disabled}

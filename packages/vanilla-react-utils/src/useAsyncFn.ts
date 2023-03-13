@@ -5,7 +5,7 @@
  */
 
 import { DependencyList, useCallback, useRef, useState } from "react";
-import { useMountedState } from "./useMountedState";
+import { useIsMounted } from "./useIsMounted";
 
 export type FnReturningPromise = (...args: any[]) => Promise<any>;
 type PromiseType<P extends Promise<any>> = P extends Promise<infer T> ? T : never;
@@ -20,7 +20,7 @@ export type AsyncState<T> =
       }
     | {
           status: "error";
-          error: Error;
+          error: { message: string };
           data?: undefined;
       }
     | {
@@ -39,7 +39,7 @@ export function useAsyncFn<T extends FnReturningPromise>(
     initialState: StateFromFnReturningPromise<T> = { status: "pending" },
 ): AsyncFnReturn<T> {
     const lastCallId = useRef(0);
-    const isMounted = useMountedState();
+    const isMounted = useIsMounted();
     const [state, set] = useState<StateFromFnReturningPromise<T>>(initialState);
 
     const callback = useCallback((...args: Parameters<T>): ReturnType<T> => {

@@ -25,21 +25,6 @@ foreach ($classCompatibility as $class => $legacyClass) {
     }
 }
 
-// Copy the cgi-bin files.
-$dir = PATH_ROOT . "/cgi-bin";
-if (!file_exists($dir)) {
-    mkdir($dir);
-}
-
-$files = glob(PATH_ROOT . "/.circleci/scripts/templates/vanilla/cgi-bin/*.php");
-foreach ($files as $file) {
-    $dest = $dir . "/" . basename($file);
-    $r = copy($file, $dest);
-    if (!$r) {
-        throw new \Exception("Could not copy $dest.", 500);
-    }
-}
-
 // ===========================================================================
 // Adding the minimum dependencies to support unit testing for core libraries
 // ===========================================================================
@@ -70,6 +55,14 @@ require_once PATH_LIBRARY_CORE . "/functions.render.php";
 
 // Load this for psalm
 require_once PATH_PLUGINS . "/Reactions/views/reaction_functions.php";
+require_once PATH_PLUGINS . "/Reactions/views/settings_functions.php";
+require_once PATH_PLUGINS . "/ProfileExtender/views/helper_functions.php";
+require_once PATH_APPLICATIONS . "/dashboard/views/profile/connection_functions.php";
+require_once PATH_APPLICATIONS . "/dashboard/views/profile/helper_functions.php";
+require_once PATH_APPLICATIONS . "/dashboard/views/settings/helper_functions.php";
+require_once PATH_APPLICATIONS . "/vanilla/views/categories/helper_functions.php";
+require_once PATH_APPLICATIONS . "/vanilla/views/discussions/helper_functions.php";
+require_once PATH_APPLICATIONS . "/vanilla/views/discussion/helper_functions.php";
 
 // Include test utilities.
 $utilityFiles = array_merge(

@@ -9,6 +9,7 @@
  */
 
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\TwigStaticRenderer;
 
 /**
@@ -100,6 +101,14 @@ class NewDiscussionModule extends Gdn_Module
                 "Category.CategoryID",
                 Gdn::controller()->data("ContextualCategoryID", false)
             );
+
+            // If there is no CategoryID, try for the current siteSitection's CategoryID.
+            if (!$this->CategoryID) {
+                $this->CategoryID = Gdn::getContainer()
+                    ->get(SiteSectionModel::class)
+                    ->getCurrentSiteSection()
+                    ->getCategoryID();
+            }
         }
 
         // Allow plugins and themes to modify parameters.

@@ -159,6 +159,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         allowArbitraryInput,
         placeholder,
         optionProvider,
+        id,
         ...otherProps
     } = props;
     const { zIndex } = useStackingContext();
@@ -188,7 +189,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
     // this prevents switching from multiple to non-multiple when the value is cleared
     const isMultiple = useMemo(() => {
         return props.multiple || Array.isArray(value);
-    }, []);
+    }, [props, value]);
 
     // We need to control the value to be able to clear it.
     const displayValue = isMultiple
@@ -482,6 +483,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                     )}
                     <Reach.ComboboxInput
                         {...otherProps}
+                        id={id}
                         ref={inputRef}
                         selectOnClick
                         disabled={disabled}

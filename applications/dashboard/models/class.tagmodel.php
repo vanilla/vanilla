@@ -908,7 +908,6 @@ class TagModel extends Gdn_Model
 
         $discussionModel = new DiscussionModel();
         $discussions = $discussionModel->getWhere([
-            "Announce" => "all",
             "d.DiscussionID" => $taggedDiscussionIDs,
         ]);
 

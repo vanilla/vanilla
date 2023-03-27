@@ -24,6 +24,7 @@ import { DiscussionListAssetHeader } from "@library/features/discussions/Discuss
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import QuickLinks from "@library/navigation/QuickLinks";
 import { DiscussionGridView } from "@library/features/discussions/DiscussionGridView";
+import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 
 export default {
     title: "Components/DiscussionLists",
@@ -130,13 +131,6 @@ const loggedInStoreState = {
         current: {
             data: STORY_ME_ADMIN,
         },
-        permissions: {
-            status: LoadStatus.SUCCESS,
-            data: {
-                isAdmin: true,
-                permissions: [],
-            },
-        },
     },
     discussions: {
         discussionsByID: keyBy(fakeDiscussions, "discussionID"),
@@ -155,7 +149,9 @@ export const Default = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -188,7 +184,9 @@ export const Theme = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -214,7 +212,9 @@ export const CertainMetasHidden = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -236,7 +236,9 @@ export const MetasRenderedAsIcons = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -266,7 +268,9 @@ export const UserIconInMetas = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -298,7 +302,9 @@ export const UserIconInMetasWithBorder = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -328,7 +334,9 @@ export const UserIconInMetasWithoutBorder = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -358,7 +366,9 @@ export const IconHidden = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -419,7 +429,7 @@ export const FeaturedImage = storyWithConfig(
         storeState: loggedInStoreState,
     },
     () => (
-        <>
+        <PermissionsFixtures.AllPermissions>
             <StoryHeading>List View</StoryHeading>
             <DiscussionsWidget
                 discussions={fakeDiscussions}
@@ -450,7 +460,7 @@ export const FeaturedImage = storyWithConfig(
                 }}
                 containerOptions={{ displayType: WidgetContainerDisplayType.CAROUSEL }}
             />
-        </>
+        </PermissionsFixtures.AllPermissions>
     ),
 );
 
@@ -498,6 +508,7 @@ const DiscussionListStory = (props) => {
                 extraHeader={assetHeader}
             >
                 <DiscussionListView discussions={fakeDiscussions} discussionOptions={discussionOptions} />
+
                 {assetFooter}
             </HomeWidgetContainer>
         );
@@ -540,22 +551,24 @@ export const AsAssetWithHeader = storyWithConfig(
     },
     () => (
         <>
-            <StoryHeading>ListView</StoryHeading>
-            <DiscussionListStory isList />
-            <StoryHeading>Grid View, with featured images and default fallback image</StoryHeading>
-            <DiscussionListStory
-                apiParams={{ featuredImage: true }}
-                containerOptions={{ displayType: WidgetContainerDisplayType.GRID }}
-            />
-            <StoryHeading>Grid View, no featured image, no checkboxes</StoryHeading>
-            <DiscussionListStory containerOptions={{ displayType: WidgetContainerDisplayType.GRID }} noCheckboxes />
-            <StoryHeading>Carousel, with featured images and set fallback image</StoryHeading>
-            <DiscussionListStory
-                apiParams={{ featuredImage: true, fallbackImage: STORY_IMAGE }}
-                containerOptions={{ displayType: WidgetContainerDisplayType.CAROUSEL }}
-            />
-            <StoryHeading>Simple Links</StoryHeading>
-            <DiscussionListStory containerOptions={{ displayType: WidgetContainerDisplayType.LINK }} />
+            <PermissionsFixtures.AllPermissions>
+                <StoryHeading>ListView</StoryHeading>
+                <DiscussionListStory isList />
+                <StoryHeading>Grid View, with featured images and default fallback image</StoryHeading>
+                <DiscussionListStory
+                    apiParams={{ featuredImage: true }}
+                    containerOptions={{ displayType: WidgetContainerDisplayType.GRID }}
+                />
+                <StoryHeading>Grid View, no featured image, no checkboxes</StoryHeading>
+                <DiscussionListStory containerOptions={{ displayType: WidgetContainerDisplayType.GRID }} noCheckboxes />
+                <StoryHeading>Carousel, with featured images and set fallback image</StoryHeading>
+                <DiscussionListStory
+                    apiParams={{ featuredImage: true, fallbackImage: STORY_IMAGE }}
+                    containerOptions={{ displayType: WidgetContainerDisplayType.CAROUSEL }}
+                />
+                <StoryHeading>Simple Links</StoryHeading>
+                <DiscussionListStory containerOptions={{ displayType: WidgetContainerDisplayType.LINK }} />
+            </PermissionsFixtures.AllPermissions>
         </>
     ),
 );

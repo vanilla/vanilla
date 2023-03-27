@@ -89,7 +89,7 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface
         $roleSubQuery = $this->getAllowedRolesSubquery($query);
 
         $leaderQuery = $this->createSql()
-            ->select(["up.SlotType", "up.TimeSlot", "up.Source", "up.UserID", "up.Points"])
+            ->select(["up.SlotType", "up.TimeSlot", "up.Source", "up.UserID", "SUM(up.Points) as Points"])
             ->from("UserPoints up")
             ->join("User u", "up.UserID = u.UserID and u.Banned != 1")
             ->where([
@@ -98,12 +98,13 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface
                 "up.Source" => "Total",
                 "up.CategoryID" => $query->pointsCategoryID,
                 "up.Points > " => 0,
-            ]);
+            ])
+            ->groupBy(["up.SlotType", "up.TimeSlot", "up.Source", "up.UserID"]);
         if ($roleSubQuery !== null) {
             $leaderQuery = $leaderQuery->where("`up`.`UserID` in", "({$roleSubQuery->getSelect(true)})", false, false);
         }
 
-        $leaderQuery = $leaderQuery->orderBy("up.Points", "desc")->limit($query->limit);
+        $leaderQuery = $leaderQuery->orderBy("Points", "desc")->limit($query->limit);
 
         $results = $leaderQuery->get()->resultArray();
         return $results;
@@ -157,6 +158,30 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface
     }
 
     /**
+     * The site section schema for calculating leaders
+     *
+     * @return Schema
+     */
+    public static function siteSectionSchema(): Schema
+    {
+        return Schema::parse([
+            "type" => "string",
+            "default" => "",
+            "description" => "Filter User Points by site section ID (ex. subcommunity).
+                      The subcommunity ID or folder can be used if you use [smart IDs](https://success.vanillaforums.com/kb/articles/46-smart-ids).
+                      The query looks like:
+
+                      ```
+                      siteSectionID=\$subcommunityID:{id|folder}
+                      ```",
+            "x-control" => SchemaForm::textBox(
+                new FormOptions("SiteSectionID", "Filter User Points by site section ID ."),
+                "string"
+            ),
+        ]);
+    }
+
+    /**
      * Get a StaticFormChoices object.
      *
      * @return StaticFormChoices
@@ -188,8 +213,8 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface
                 new FormOptions("Leaderboard Type", "Choose the type of leaderboard this is."),
                 new StaticFormChoices([
                     UserLeaderService::LEADERBOARD_TYPE_REPUTATION => "Reputation points",
-                    UserLeaderService::LEADERBOARD_TYPE_POSTS => "Posts and comments count.",
-                    UserLeaderService::LEADERBOARD_TYPE_ACCEPTED_ANSWERS => "Accepted answers count.",
+                    UserLeaderService::LEADERBOARD_TYPE_POSTS => "Posts and comments count",
+                    UserLeaderService::LEADERBOARD_TYPE_ACCEPTED_ANSWERS => "Accepted answers count",
                 ])
             ),
         ]);

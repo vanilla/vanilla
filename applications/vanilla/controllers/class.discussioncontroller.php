@@ -598,12 +598,6 @@ class DiscussionController extends VanillaController
         $this->categoryPermission($discussion->CategoryID, "Vanilla.Discussions.Announce");
 
         if ($this->Form->authenticatedPostBack()) {
-            // Save the property.
-            $cacheKeys = [
-                $this->DiscussionModel->getAnnouncementCacheKey(),
-                $this->DiscussionModel->getAnnouncementCacheKey(val("CategoryID", $discussion)),
-            ];
-            $this->DiscussionModel->SQL->cache($cacheKeys);
             $this->DiscussionModel->setProperty(
                 $discussionID,
                 "Announce",

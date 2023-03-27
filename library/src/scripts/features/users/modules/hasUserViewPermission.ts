@@ -8,8 +8,8 @@ import { hasPermission } from "@library/features/users/Permission";
 /**
  * Check if the current user can view other users.
  */
-export function hasUserViewPermission() {
-    return hasPermission([
+export function hasUserViewPermission(permissionChecker: (permission: string | string[]) => boolean = hasPermission) {
+    return permissionChecker([
         // Any of these permissions will suffice.
         "profiles.view",
 

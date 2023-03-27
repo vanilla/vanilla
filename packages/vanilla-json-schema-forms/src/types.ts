@@ -5,7 +5,6 @@
  */
 
 import { InputSize } from "@vanilla/ui/src/types";
-import { JSONSchemaType } from "ajv";
 import { ErrorObject } from "ajv/dist/core";
 import { SomeJSONSchema } from "ajv/dist/types/json-schema";
 import React from "react";
@@ -21,6 +20,9 @@ export interface ICommonControl {
     placeholder?: string;
     conditions?: Condition[];
     fullSize?: boolean;
+    errorPathString?: string;
+    inputID?: string; //this one is non standard, for cases if we want to manipulate values of form elements
+    inputAriaLabel?: string; // and this one is in case we don't want visible label, but still want the input be accessible
 }
 
 interface IChoices {
@@ -37,10 +39,16 @@ interface ICheckBoxControl extends ICommonControl {
     inputType: "checkBox" | "toggle";
 }
 
+export interface ITokensControl extends ICommonControl {
+    inputType: "tokens";
+    choices: IChoices;
+}
+
 interface IDropdownControl extends ICommonControl {
     inputType: "dropDown";
     choices: IChoices;
     multiple?: boolean;
+    helperText?: string;
 }
 
 interface IRadioControl extends ICommonControl {
@@ -50,7 +58,7 @@ interface IRadioControl extends ICommonControl {
 
 interface ITextBoxControl extends ICommonControl {
     inputType: "textBox";
-    type?: string;
+    type?: "text" | "textarea" | "number" | "url" | "password";
 }
 
 interface ICodeBoxControl extends ICommonControl {
@@ -72,25 +80,51 @@ export interface IColorControl extends ICommonControl {
     defaultBackground?: string;
 }
 
-export interface ISchemaTab {
-    id: string;
-    label: string;
-    isDefault?: boolean;
+export interface IUploadControl extends ICommonControl {
+    inputType: "upload";
 }
 
-interface ICustomControl extends ICommonControl {
-    inputType: string;
-    [key: string]: any;
+export interface IDatePickerControl extends ICommonControl {
+    inputType: "datePicker";
+}
+
+export interface IDateRangeControl extends ICommonControl {
+    inputType: "dateRange";
+}
+
+export interface IDragAndDropControl extends ICommonControl {
+    inputType: "dragAndDrop";
+}
+
+export interface IEmptyControl extends ICommonControl {
+    inputType: "empty";
+}
+export interface IModalControl<T = ICommonControl> extends ICommonControl {
+    inputType: "modal";
+    modalContent: T;
+}
+
+export interface ICustomControl extends ICommonControl {
+    inputType: "custom";
+    component: React.ComponentType;
+    componentProps: React.ComponentProps<any>;
 }
 
 export type IFormControl =
     | IDropdownControl
     | IRadioControl
+    | ITokensControl
     | ITextBoxControl
     | ICheckBoxControl
     | ICodeBoxControl
     | ITabsControl
     | IColorControl
+    | IUploadControl
+    | IDatePickerControl
+    | IDateRangeControl
+    | IDragAndDropControl
+    | IEmptyControl
+    | IModalControl
     | ICustomControl;
 
 export type IFormControlType = IFormControl["inputType"];
@@ -99,8 +133,16 @@ export type JsonSchema = Partial<SomeJSONSchema>;
 
 export type Condition = { field: string; disable?: boolean } & JsonSchema;
 
+export interface ISchemaTab {
+    id: string;
+    label: string;
+    isDefault?: boolean;
+}
+
 export interface IBaseSchemaFormProps {
     path: Array<string | number>;
+    pathString: string;
+    errors: IFieldError[];
     schema: JsonSchema;
     rootSchema: JsonSchema;
     instance: any;
@@ -138,14 +180,16 @@ export interface IControlGroupProps extends IBaseSchemaFormProps {
     controls: IFormControl[];
 }
 
-export interface IControlProps extends IBaseSchemaFormProps {
-    control: IFormControl;
+export interface IControlProps<T = IFormControl> extends IBaseSchemaFormProps {
+    control: T;
     required?: boolean;
     disabled?: boolean;
     onChange(instance: any): void;
     onBlur?(): void;
     size?: InputSize;
     autocompleteClassName?: string;
+    /** If this form is rendered within a modal, allows for options boxes to be rendered outside */
+    inModal?: boolean;
 }
 
 export interface IValidationResult {
@@ -165,4 +209,16 @@ export interface ISchemaRenderProps {
 export interface IPtrReference {
     path: Array<string | number>;
     ref: Path;
+}
+
+export interface IFieldError {
+    /** translated message */
+    message: string;
+    /** translation code */
+    code?: string;
+    field: string;
+    /** HTTP status */
+    status?: number;
+    /** If we are nested this the path we are nested in.*/
+    path?: string;
 }

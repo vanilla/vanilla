@@ -8,7 +8,7 @@ import { ListType } from "@rich-editor/quill/blots/lists/ListUtils";
 import ClipboardModule from "@rich-editor/quill/ClipboardModule";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
 import { setupTestQuill } from "@rich-editor/__tests__/quillUtils";
-import { wait, waitFor } from "@testing-library/react";
+import { waitFor } from "@testing-library/react";
 import { registerEmbed } from "@library/embeddedContent/embedService";
 import { IFrameEmbed, supportsFrames } from "@library/embeddedContent/IFrameEmbed";
 import { expect } from "chai";

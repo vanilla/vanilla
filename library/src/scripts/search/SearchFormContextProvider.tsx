@@ -28,6 +28,7 @@ import { getSiteSection } from "@library/utility/appUtils";
 import { getSearchAnalyticsData } from "@library/search/searchAnalyticsData";
 import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
 import { stableObjectHash } from "@vanilla/utils";
+import { dateRangeToString } from "@library/search/utils";
 
 interface IProps {
     children?: React.ReactNode;
@@ -125,26 +126,6 @@ export function SearchFormContextProvider(props: IProps) {
         );
     };
 
-    const getDate = (form: ISearchForm): string | undefined => {
-        let dateInserted: string | undefined;
-        if (form.startDate && form.endDate) {
-            if (form.startDate === form.endDate) {
-                // Simple equality.
-                dateInserted = form.startDate;
-            } else {
-                // Date range
-                dateInserted = `[${form.startDate},${form.endDate}]`;
-            }
-        } else if (form.startDate) {
-            // Only start date
-            dateInserted = `>=${form.startDate}`;
-        } else if (form.endDate) {
-            // Only end date.
-            dateInserted = `<=${form.endDate}`;
-        }
-        return dateInserted;
-    };
-
     const makeFilterForm = (form: ISearchForm): ISearchForm => {
         const currentDomain = getCurrentDomain();
         const allowedFields = [...ALL_CONTENT_DOMAIN.getAllowedFields(), ...currentDomain.getAllowedFields()];
@@ -161,13 +142,13 @@ export function SearchFormContextProvider(props: IProps) {
 
         const commonQueryEntries = {
             ...filterForm,
-            limit: SEARCH_LIMIT_DEFAULT,
-            dateInserted: getDate(form),
-            locale: getCurrentLocale(),
             collapse: true,
+            ...currentDomain.transformFormToQuery?.(filterForm),
+            limit: SEARCH_LIMIT_DEFAULT,
+            dateInserted: dateRangeToString({ start: form.startDate, end: form.endDate }),
+            locale: getCurrentLocale(),
             sort,
             ...(form.offset && { offset: form.offset }),
-            ...currentDomain.transformFormToQuery?.(filterForm),
         };
         if (searchScope.value?.value) {
             commonQueryEntries.scope = searchScope.value.value;

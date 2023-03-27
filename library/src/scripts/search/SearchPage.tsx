@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -26,9 +26,8 @@ import Banner from "@library/banner/Banner";
 import { useSearchForm } from "@library/search/SearchContext";
 import { useLastValue } from "@vanilla/react-utils";
 import classNames from "classnames";
-import debounce from "lodash/debounce";
 import qs from "qs";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { ReactElement, useCallback, useEffect, useMemo } from "react";
 import { useLocation, useHistory } from "react-router";
 import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import { SectionProvider, useSection } from "@library/layout/LayoutContext";
@@ -46,7 +45,6 @@ import { LinkContextProvider } from "@library/routing/links/LinkContextProvider"
 import History from "history";
 import { Backgrounds } from "@library/layout/Backgrounds";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
-import moment from "moment";
 import { Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
@@ -72,59 +70,28 @@ function SearchPage(props: IProps) {
 
     const currentDomain = getCurrentDomain();
 
-    const debouncedSearch = useCallback(
-        debounce(() => {
-            search();
-            currentDomain.extraSearchAction?.();
-        }, 800),
-        [search],
-    );
-
     let scope = useSearchScope().value?.value ?? SEARCH_SCOPE_LOCAL;
-    const lastScope = useLastValue(scope);
     if (currentDomain.isIsolatedType()) {
         scope = SEARCH_SCOPE_LOCAL;
     }
+    const lastScope = useLastValue(scope);
 
     let currentFilter = <currentDomain.PanelComponent />;
 
-    const hasSpecificRecord = currentDomain.hasSpecificRecord?.(form);
+    const hasSpecificRecord = currentDomain.hasSpecificRecord?.(form) ?? false;
+    const specificRecordID = hasSpecificRecord ? currentDomain.getSpecificRecord?.(form) : undefined;
 
-    let SpecificRecordFilter;
-    if (hasSpecificRecord && currentDomain.SpecificRecordPanel) {
-        SpecificRecordFilter = currentDomain.SpecificRecordPanel;
-    }
+    const SpecificRecordFilter = hasSpecificRecord ? currentDomain.SpecificRecordPanelComponent ?? null : null;
+    const SpecificRecordComponent = hasSpecificRecord ? currentDomain.SpecificRecordComponent ?? null : null;
 
-    let SpecificRecordComponent;
-    if (hasSpecificRecord && currentDomain.SpecificRecordComponent) {
-        SpecificRecordComponent = currentDomain.SpecificRecordComponent;
-    }
-
-    let hasSpecificRecordID = typeof currentDomain.getSpecificRecord?.(form) === "number";
-    let specificRecordID;
-    if (hasSpecificRecord && hasSpecificRecordID) {
-        specificRecordID = currentDomain.getSpecificRecord?.(form);
-    }
-
-    const rightTopContent = useMemo<React.ReactNode>(() => {
-        if (hasSpecificRecord) {
-            return currentDomain.SpecificRecordPanel ?? null;
-        }
-        if (currentSource?.queryFilterComponent) {
-            return currentSource.queryFilterComponent ?? null;
-        }
-        return currentFilter;
-    }, [
-        currentDomain.SpecificRecordPanel,
-        currentFilter,
-        currentSource.queryFilterComponent,
-        hasSpecificRecord,
-        isCompact,
-    ]);
+    const rightTopContent: ReactElement | null = SpecificRecordFilter ? (
+        <SpecificRecordFilter />
+    ) : (
+        currentSource.queryFilterContent ?? currentFilter
+    );
 
     const { needsResearch } = form;
     useEffect(() => {
-        // Trigger new search
         if (
             needsResearch ||
             (lastScope && lastScope !== scope) ||
@@ -133,7 +100,7 @@ function SearchPage(props: IProps) {
             search();
             currentDomain.extraSearchAction?.();
         }
-    }, [search, needsResearch, lastScope, scope, currentDomain, lastSourceKey, currentSource.key]);
+    });
 
     const domains = getDomains();
     const sortedNonIsolatedDomains = domains
@@ -206,7 +173,7 @@ function SearchPage(props: IProps) {
     return (
         // Add a context provider so that smartlinks within search use dynamic navigation.
         <LinkContextProvider linkContexts={[formatUrl("/search", true)]}>
-            <DocumentTitle title={form.query ? form.query : t("Search Results")}>
+            <DocumentTitle title={form.query ? `${form.query}` : t("Search Results")}>
                 <TitleBar title={t("Search")} />
                 <Banner isContentBanner />
                 <Container>
@@ -246,15 +213,15 @@ function SearchPage(props: IProps) {
                                             <SearchBar
                                                 placeholder={props.placeholder}
                                                 onChange={(newQuery) => updateForm({ query: newQuery })}
-                                                value={form.query}
-                                                onSearch={debouncedSearch}
+                                                value={`${form.query}`}
+                                                onSearch={search}
                                                 isLoading={results.status === LoadStatus.LOADING}
                                                 optionComponent={SearchOption}
                                                 triggerSearchOnClear={true}
                                                 titleAsComponent={t("Search")}
                                                 handleOnKeyDown={(event) => {
                                                     if (event.key === "Enter") {
-                                                        debouncedSearch();
+                                                        search();
                                                     }
                                                 }}
                                                 disableAutocomplete={true}
@@ -265,7 +232,7 @@ function SearchPage(props: IProps) {
                                                 }}
                                             />
                                         </div>
-                                        {hasSpecificRecord && hasSpecificRecordID && (
+                                        {!!SpecificRecordComponent && (
                                             <SpecificRecordComponent discussionID={specificRecordID} />
                                         )}
                                     </ConditionalWrap>

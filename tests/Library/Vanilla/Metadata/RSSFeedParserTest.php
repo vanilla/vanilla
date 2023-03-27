@@ -49,6 +49,14 @@ class RSSFeedParserTest extends TestCase
                         <category>Cat 1</category>
                         <enclosure url="https://vanillaforums.com/media/video.mp4" length="123456" type="video/mp4" />
                     </item>
+                    <item>
+                        <link>https://vanillaforums.com/title-4</link>
+                        <pubDate>Sun, 18 Dec 2022 18:35:40 GMT</pubDate>
+                        <title>No Description Item</title>
+                        <description/>
+                        <category>Cat 1</category>
+                        <enclosure url="https://vanillaforums.com/media/video.mp4" length="123456" type="video/mp4" />
+                    </item>
                 </channel>
             </rss>',
             ],
@@ -68,7 +76,7 @@ class RSSFeedParserTest extends TestCase
         $xmlDOM->loadXML($xmlContent);
         $rssParser = new RSSFeedParser();
         $results = $rssParser->parse($xmlDOM);
-        $this->assertCount(2, $results["item"]);
+        $this->assertCount(3, $results["item"]);
         $this->assertNotEmpty($results["channel"]);
         $this->assertArrayHasKey("image", $results["channel"]);
         $this->assertEquals("https://vanillaforums.com/channel.png", $results["channel"]["image"]["url"]);
@@ -78,6 +86,9 @@ class RSSFeedParserTest extends TestCase
         $this->assertEquals("/imäges.JPG", $results["item"][0]["img"]["src"]);
         $this->assertEquals("Title 3", $results["item"][1]["title"]);
         $this->assertEquals("Cat 1", $results["item"][1]["category"]);
+
+        $this->assertEquals("No Description Item", $results["item"][2]["title"]);
+        $this->assertEquals(null, $results["item"][2]["description"]);
 
         $description = '<img src="/imäges.JPG" alt="An image" title="Image Title" /><p>Description.</p>';
         $this->assertEquals($description, $results["item"][0]["description"]);

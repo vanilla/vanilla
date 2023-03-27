@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ForbiddenException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Scheduler\LongRunner;
@@ -21,6 +22,7 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\TreeBuilder;
+use Garden\Web\Pagination;
 
 /**
  * API Controller for the `/categories` resource.
@@ -96,11 +98,24 @@ class CategoriesApiController extends AbstractApiController
                 "iconUrl?",
                 "bannerUrl?",
                 "pointsCategoryID?",
+                "allowedDiscussionTypes:a?",
             ];
             $this->categoryPostSchema = $this->schema(
                 Schema::parse(array_merge($fields, $extra))->add($this->schemaWithParent()),
                 "CategoryPost"
             );
+            $this->categoryPostSchema->addValidator("allowedDiscussionTypes", function ($data, ValidationField $field) {
+                $allowedDiscussionTypes = array_keys(DiscussionModel::discussionTypes());
+                $result = array_diff($data, $allowedDiscussionTypes);
+
+                if (!empty($result) || empty($data)) {
+                    $validTypes = implode(", ", $allowedDiscussionTypes);
+                    $field->addError("Validation Failed", [
+                        "messageCode" => "allowedDiscussionTypes can only contain the following values: $validTypes",
+                        "code" => 403,
+                    ]);
+                }
+            });
         }
         return $this->schema($this->categoryPostSchema, $type);
     }
@@ -384,6 +399,10 @@ class CategoriesApiController extends AbstractApiController
                     "minimum" => 1,
                     "maximum" => $this->categoryModel->getMaxPages(),
                 ],
+                "sort:s?" => [
+                    "enum" => ["categoryID", "-categoryID"],
+                    "description" => "Sort the results by the specified field.",
+                ],
                 "limit:i?" => [
                     "minimum" => 1,
                     "maximum" => ApiUtils::getMaxLimit(),
@@ -490,8 +509,8 @@ class CategoriesApiController extends AbstractApiController
         $format = $this->getIndexFormat($query, $parentCategory);
         $this->categoryModel->setJoinUserCategory(false);
 
-        $page = isset($query["page"]) ? $query["page"] : 1;
-        $limit = isset($query["limit"]) ? $query["limit"] : 30;
+        $page = $query["page"] ?? 1;
+        $limit = $query["limit"] ?? 30;
         [$offset, $limit] = offsetLimit("p{$page}", $limit);
         if ($format === self::OUTPUT_FORMAT_TREE) {
             $limit = "";
@@ -543,7 +562,19 @@ class CategoriesApiController extends AbstractApiController
 
         $where["CategoryID"] = $categoryIDs;
 
-        [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset, $sort, $filter);
+        [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection($query["sort"] ?? "");
+        if (!empty($orderField)) {
+            $sort = empty($sort) ? $orderField : $orderField . "," . $sort;
+        }
+
+        [$categories, $totalCountCallBack] = $this->getCategoriesWhere(
+            $where,
+            $limit,
+            $offset,
+            $sort,
+            $orderDirection,
+            $filter
+        );
 
         // Filter tree by the category "archived" fields.
         if (!isset($query["followed"]) && $query["archived"] !== null) {
@@ -571,7 +602,7 @@ class CategoriesApiController extends AbstractApiController
             $paging = [];
         }
 
-        return new Data($categories, ["paging" => $paging]);
+        return new Data($categories, Pagination::tryCursorPagination($paging, $query, $categories, "categoryID"));
     }
 
     /**
@@ -645,7 +676,6 @@ class CategoriesApiController extends AbstractApiController
         $out = $this->schemaWithParent(false, "out");
 
         $body = $in->validate($body, true);
-        // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->category($id);
 
         if (array_key_exists("parentCategoryID", $body)) {
@@ -653,17 +683,9 @@ class CategoriesApiController extends AbstractApiController
             unset($body["parentCategoryID"]);
         }
 
-        if (!empty($body)) {
-            if (array_key_exists("customPermissions", $body)) {
-                $this->categoryModel->save([
-                    "CategoryID" => $id,
-                    "CustomPermissions" => $body["customPermissions"],
-                ]);
-                unset($body["customPermissions"]);
-            }
-            $categoryData = $this->normalizeInput($body);
-            $this->categoryModel->setField($id, $categoryData);
-        }
+        $categoryData = $this->normalizeInput($body);
+        $categoryData["CategoryID"] = $body["CategoryID"] ?? (int) $id;
+        $this->categoryModel->save($categoryData);
 
         $row = $this->category($id);
         $row = $this->normalizeOutput($row);
@@ -896,7 +918,7 @@ class CategoriesApiController extends AbstractApiController
             Schema::parse([
                 "depth:i",
                 "children:a?" => $childSchema->merge(Schema::parse(["depth:i", "children:a", "sort:i"])),
-                "sort:i",
+                "sort:i?",
             ])
         );
         return $schema;
@@ -916,7 +938,7 @@ class CategoriesApiController extends AbstractApiController
                 $this->fullSchema()
             );
         }
-        $schema = $this->fullSchema();
+        $schema = $this->categorySchema();
         $result = $schema->merge(Schema::parse($attributes));
         return $this->schema($result, $type);
     }
@@ -931,15 +953,25 @@ class CategoriesApiController extends AbstractApiController
      * @param bool $filter Apply permission based filter
      * @return array
      */
-    private function getCategoriesWhere(array $where, $limit, $offset, $order = "", bool $filter = true): array
-    {
+    private function getCategoriesWhere(
+        array $where,
+        $limit,
+        $offset,
+        $order = "",
+        $orderDirection = "",
+        bool $filter = true
+    ): array {
         $dirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
         if ($dirtyRecords) {
             $this->categoryModel->applyDirtyWheres();
             unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
-            $categories = $this->categoryModel->getWhere($where, $order, "", $limit, $offset)->resultArray();
+            $categories = $this->categoryModel
+                ->getWhere($where, $order, $orderDirection, $limit, $offset)
+                ->resultArray();
         } else {
-            $categories = $this->categoryModel->getWhere($where, $order, "", $limit, $offset)->resultArray();
+            $categories = $this->categoryModel
+                ->getWhere($where, $order, $orderDirection, $limit, $offset)
+                ->resultArray();
         }
 
         // Index by ID for category calculation functions.

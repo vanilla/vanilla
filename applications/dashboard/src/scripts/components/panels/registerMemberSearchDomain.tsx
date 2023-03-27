@@ -14,6 +14,9 @@ import Member, { IMemberResultProps } from "@dashboard/components/Member";
 import { hasUserViewPermission } from "@library/features/users/modules/hasUserViewPermission";
 import { IUser } from "@library/@types/api/users";
 import { ISearchResult } from "@library/search/searchTypes";
+import { dateRangeToString } from "@library/search/utils";
+import { hasPermission } from "@library/features/users/Permission";
+import { isDateRange } from "@dashboard/components/panels/FilteredProfileFields";
 
 interface IMemberSearchResult {
     userInfo?: IUser;
@@ -21,7 +24,7 @@ interface IMemberSearchResult {
 
 export function registerMemberSearchDomain() {
     onReady(() => {
-        if (!hasUserViewPermission()) {
+        if (!hasUserViewPermission(hasPermission)) {
             // User doesn't have permission to search members.
             return;
         }
@@ -31,12 +34,33 @@ export function registerMemberSearchDomain() {
             sort: 4,
             icon: <TypeMemberIcon />,
             getAllowedFields: () => {
-                return ["username", "email", "roleIDs", "rankIDs"];
+                return ["username", "email", "roleIDs", "rankIDs", "profileFields"];
             },
-            transformFormToQuery: (form) => {
-                return {
+            transformFormToQuery: function (form) {
+                const query = {
                     name: form.username || "",
+                    profileFields: {},
                 };
+
+                // format date ranges
+                for (let key in form) {
+                    const property = form[key];
+                    if (isDateRange(property)) {
+                        query[key] = dateRangeToString(property);
+                    }
+                }
+
+                // format date ranges nested in profile fields
+                for (let key in form.profileFields) {
+                    const profileField = form.profileFields[key];
+                    if (isDateRange(profileField)) {
+                        query.profileFields[key] = dateRangeToString(profileField);
+                    } else {
+                        query.profileFields[key] = form.profileFields[key];
+                    }
+                }
+
+                return query;
             },
             getRecordTypes: () => {
                 return ["user"];

@@ -126,7 +126,7 @@ class Theme implements \JsonSerializable
 
         $assets = [];
         $addonAssets = $addon->getInfoValue("assets", []);
-        $optionAssetRegex = "/${currentOptionKey}_(.*)/";
+        $optionAssetRegex = "/{$currentOptionKey}_(.*)/";
         // Trim off the active theme option key.
         foreach ($addonAssets as $addonAssetKey => $addonAsset) {
             preg_match($optionAssetRegex, $addonAssetKey, $matches);

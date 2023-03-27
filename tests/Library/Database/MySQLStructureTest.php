@@ -290,7 +290,7 @@ class MySQLStructureTest extends SiteTestCase
      * @param string $expectedEngine The expected engine in the `create table` statement.
      * @dataProvider provideEngines
      */
-    final private function doCollationTest(array $config, string $explicitEngine, string $expectedEngine): void
+    final function doCollationTest(array $config, string $explicitEngine, string $expectedEngine): void
     {
         $this->runWithConfig($config, function () use ($explicitEngine, $expectedEngine) {
             $this->st

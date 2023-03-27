@@ -14,8 +14,6 @@ use Vanilla\Forms\StaticFormChoices;
 use Vanilla\InjectableInterface;
 use Gdn;
 use CategoryModel;
-use Vanilla\Layout\Section\SectionThreeColumns;
-use Vanilla\Layout\Section\SectionTwoColumns;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;

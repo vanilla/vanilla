@@ -44,7 +44,7 @@ class VanillaStructureTest extends SiteTestCase
         $categoryID = $categoryModel->save([
             "Name" => "Category Custom",
             "HeroImage" => "category.png",
-            "UrlCode" => randomString(5),
+            "UrlCode" => randomString(20),
         ]);
 
         // Apply the structure file.
@@ -52,7 +52,7 @@ class VanillaStructureTest extends SiteTestCase
         include_once PATH_LIBRARY . "/SmartyPlugins/function.hero_image_link.php";
         include_once PATH_LIBRARY . "/SmartyPlugins/function.banner_image_url.php";
 
-        $uploadBase = "http://vanilla.test/vanillastructuretest/uploads/";
+        $uploadBase = "https://vanilla.test/vanillastructuretest/uploads/";
 
         // Test that we can still fetch our information using the old functions after the migrations.
         $this->assertEquals("category.png", @\HeroImagePlugin::getHeroImageSlug($categoryID));

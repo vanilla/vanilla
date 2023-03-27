@@ -53,8 +53,7 @@ class HomeLayoutView extends AbstractCustomLayoutView
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
     {
         $resolvedParams = parent::resolveParams($paramInput, $pageHead);
-        $title = $pageHead->getSeoTitle();
-        $pageHead->setSeoTitle("Home - " . $title, false);
+        $pageHead->setSeoTitle("Home", false);
         return $resolvedParams;
     }
 }

@@ -3,12 +3,12 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ElementType } from "react";
 
 interface IProps {
     condition: boolean;
     className?: string;
-    tag?: keyof JSX.IntrinsicElements;
+    tag?: ElementType;
     component?: React.ComponentType<any>;
     children?: React.ReactNode;
     componentProps?: object;

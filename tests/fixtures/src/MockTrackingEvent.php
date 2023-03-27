@@ -46,4 +46,12 @@ class MockTrackingEvent extends ResourceEvent implements TrackingEventInterface
     {
         return "track";
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionID(): ?string
+    {
+        return null;
+    }
 }

@@ -269,7 +269,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $filterKeys = array_map("strtolower", [QnaModel::ACCEPTED, QnaModel::ANSWERED, QnaModel::UNANSWERED]);
         $this->discussionModel->addFilterSet("qna", "All Questions", [], false);
         foreach ($filterKeys as $filterKey) {
-            $this->discussionModel->addFilter($filterKey, "qna", ["QnA" => $filterKey], "", "qna");
+            $this->discussionModel->addFilter($filterKey, "qna", [], "", "qna");
         }
     }
 
@@ -870,9 +870,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
                 $ActivityModel->saveQueue();
 
                 $this->EventArguments["Activity"] = &$activity;
-                $data = $this->commentModel->getID($commentID, DATASET_TYPE_ARRAY);
-                $answerEvent = new AnswerEvent(AnswerEvent::ACTION_ANSWER_ACCEPTED, ["answer" => $data], $sender);
-                $this->eventManager->dispatch($answerEvent);
             }
         }
         redirectTo("/discussion/comment/{$comment["CommentID"]}#Comment_{$comment["CommentID"]}", 302, false);
@@ -1559,7 +1556,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             $category = (array) $categoryModel->getByCode($categoryUrlCode);
             $category = $categoryModel::permissionCategory($category);
             $isAllowedTypes = isset($category["AllowedDiscussionTypes"]);
-            $isAllowedQuestion = in_array("Question", $category["AllowedDiscussionTypes"]);
+            $isAllowedQuestion = in_array("Question", (array) $category["AllowedDiscussionTypes"]);
         }
 
         if ($category && !$isAllowedQuestion && $isAllowedTypes) {

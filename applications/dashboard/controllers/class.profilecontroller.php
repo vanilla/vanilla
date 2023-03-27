@@ -10,8 +10,10 @@
 
 use Garden\EventManager;
 use Garden\Schema\ValidationException;
+use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Exception\ExitException;
 use Vanilla\FloodControlTrait;
+use Vanilla\Models\ProfileFieldsPreloadProvider;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerAction;
 
@@ -323,8 +325,11 @@ class ProfileController extends Gdn_Controller
      * @param $Provider
      * @throws Exception
      */
-    public function disconnect($UserReference = "", $Username = "", $Provider)
+    public function disconnect($UserReference = "", $Username = "", $Provider = "")
     {
+        if (empty($Provider)) {
+            throw new InvalidArgumentException("Provider value shouldn't be empty");
+        }
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception("Requires POST", 405);
         }
@@ -376,6 +381,10 @@ class ProfileController extends Gdn_Controller
      */
     public function edit($userReference = "", $username = "", $userID = "")
     {
+        if (Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG)) {
+            redirectTo("/profile/account-privacy/" . $userReference);
+        }
+
         $this->permission(["Garden.SignIn.Allow", "Garden.Profiles.Edit"], true);
 
         $this->getUserInfo($userReference, $username, $userID, true);
@@ -395,8 +404,7 @@ class ProfileController extends Gdn_Controller
         $this->Form->setData($user);
 
         // Decide if they have ability to edit the username
-        $canEditUsername =
-            (bool) c("Garden.Profile.EditUsernames") || Gdn::session()->checkPermission("Garden.Users.Edit");
+        $canEditUsername = Gdn::session()->checkPermission("Garden.Users.Edit");
         $this->setData("_CanEditUsername", $canEditUsername);
 
         // Decide if they have ability to edit the email
@@ -419,20 +427,16 @@ class ProfileController extends Gdn_Controller
                 checkPermission("Garden.Users.Edit")
         );
 
-        // Decide if there will be a Titles field.
+        // Decide if there will be a `Titles` field.
         $canAddEditTitle = c("Garden.Profile.Titles", false);
         $this->setData("_CanAddEditTitle", $canAddEditTitle);
 
-        // Decide if there will be Locations field.
+        // Decide if there will be `Locations` field.
         $canAddEditLocations = c("Garden.Profile.Locations", false);
         $this->setData("_CanAddEditLocation", $canAddEditLocations);
 
         // Define gender dropdown options
-        $this->GenderOptions = [
-            "u" => t("Unspecified"),
-            "m" => t("Male"),
-            "f" => t("Female"),
-        ];
+        $this->GenderOptions = self::getGenderOptions();
 
         $this->fireEvent("BeforeEdit");
 
@@ -545,6 +549,59 @@ class ProfileController extends Gdn_Controller
     }
 
     /**
+     * Create EditProfileFields page.
+     *
+     * @param mixed $userReference Username or User ID.
+     * @param string $username
+     * @param string|int $userID
+     */
+    public function editFields($userReference = "", $username = "", $userID = "")
+    {
+        $this->permission(["Garden.SignIn.Allow", "Garden.Profiles.Edit"], true);
+        $profileFieldModel = Gdn::getContainer()->get(ProfileFieldModel::class);
+        $hasFields = $profileFieldModel->hasVisibleFields($userID);
+
+        $this->registerReduxActionProvider(\Gdn::getContainer()->get(ProfileFieldsPreloadProvider::class));
+
+        if ($hasFields) {
+            $this->getUserInfo($userReference, $username, $userID, true);
+            $this->setData("userID", valr("User.UserID", $this));
+            $this->_setBreadcrumbs(t("Edit Fields"), "/profile/edit-fields");
+            $this->render();
+        } else {
+            $this->render("ConnectError");
+        }
+    }
+
+    /**
+     * Edit Account & Privacy Settings Page
+     *
+     * @param mixed $userReference Username or User ID.
+     * @param string $username
+     * @param string|int $userID
+     */
+    public function accountPrivacy($userReference = "", $username = "", $userID = "")
+    {
+        if (!Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG)) {
+            redirectTo("/profile/edit");
+        }
+        $this->permission(["Garden.SignIn.Allow", "Garden.Profiles.Edit"], true);
+
+        $this->registerReduxActionProvider(\Gdn::getContainer()->get(ProfileFieldsPreloadProvider::class));
+
+        // Get the currently viewed user's information
+        $this->getUserInfo($userReference, $username, $userID, true);
+        $editingUserID = valr("User.UserID", $this);
+
+        // Pass it along to the view
+        $this->setData("_EditingUserID", $editingUserID);
+
+        $this->title(t("Account & Privacy Settings"));
+        $this->_setBreadcrumbs(t("Account & Privacy Settings"), "/profile/account-privacy");
+        $this->render();
+    }
+
+    /**
      * Default profile page.
      *
      * If current user's profile, get notifications. Otherwise show their activity (if available) or discussions.
@@ -555,7 +612,12 @@ class ProfileController extends Gdn_Controller
      */
     public function index($user = "", $username = "", $userID = "", $page = false)
     {
+        if (!$user && !$username && !$userID) {
+            $this->permission("session.valid");
+        }
+
         $this->editMode(false);
+
         $this->getUserInfo($user, $username, $userID);
 
         // Optional profile redirection.
@@ -848,6 +910,10 @@ class ProfileController extends Gdn_Controller
      */
     public function password()
     {
+        if (Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG)) {
+            redirectTo("/profile/account-privacy");
+        }
+
         $this->permission("Garden.SignIn.Allow");
 
         $isSpamming = false;
@@ -1331,10 +1397,8 @@ class ProfileController extends Gdn_Controller
                     }
 
                     if ($location == "Meta") {
-                        $newMetaPrefs[$pref] = $value ? $value : null;
-                        if ($value) {
-                            $userPrefs[$pref] = $value; // dup for notifications code.
-                        }
+                        $newMetaPrefs[$pref] = $value;
+                        $userPrefs[$pref] = $value; // dup for notifications code.
                     } else {
                         if (!$currentPrefs[$pref] && !$value) {
                             unset($userPrefs[$pref]); // save some space
@@ -1794,6 +1858,8 @@ EOT;
         // Is the photo hosted remotely?
         $remotePhoto = isUrl($this->User->Photo);
 
+        $profileFieldModel = Gdn::getContainer()->get(ProfileFieldModel::class);
+
         if ($this->User->UserID != $viewingUserID) {
             // Include user js files for people with edit users permissions
             if (checkPermission("Garden.Users.Edit") || checkPermission("Moderation.Profiles.Edit")) {
@@ -1807,6 +1873,16 @@ EOT;
                 ["Garden.Users.Edit", "Moderation.Profiles.Edit"],
                 ["class" => "Popup EditAccountLink"]
             );
+            $hasFields = $profileFieldModel->hasVisibleFields($this->User->UserID);
+            if ($hasFields) {
+                $module->addLink(
+                    "Options",
+                    sprite("SpProfile") . " " . t("Edit Profile Fields"),
+                    userUrl($this->User, "", "edit-fields"),
+                    ["Garden.Users.Edit", "Moderation.Profiles.Edit"],
+                    ["class" => "Popup EditAccountLink"]
+                );
+            }
             $module->addLink(
                 "Options",
                 sprite("SpProfile") . " " . t("Edit Account"),
@@ -1857,9 +1933,39 @@ EOT;
                     $editLinkUrl = $editUrl;
                 }
 
-                $module->addLink("Options", sprite("SpEdit") . " " . t("Edit Profile"), $editLinkUrl, false, [
-                    "class" => "Popup EditAccountLink",
-                ]);
+                if (Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG)) {
+                    $settingsLink = "/profile/account-privacy";
+                    $settingsUrl = "profile/account-privacy/{$this->User->Name}";
+                    if ($requestUrl === $settingsUrl) {
+                        $settingsLink = $settingsUrl;
+                    }
+
+                    $module->addLink(
+                        "Options",
+                        sprite("SpEdit") . " " . t("Account & Privacy Settings"),
+                        $settingsLink,
+                        false,
+                        ["class" => "Popup EditAccountLink"]
+                    );
+                } else {
+                    $module->addLink("Options", sprite("SpEdit") . " " . t("Edit Profile"), $editLinkUrl, false, [
+                        "class" => "Popup EditAccountLink",
+                    ]);
+                }
+
+                $hasFields = $profileFieldModel->hasVisibleFields($this->User->UserID);
+                if ($hasFields) {
+                    $editFieldsLinkUrl = "profile/edit-fields";
+                    $module->addLink(
+                        "Options",
+                        sprite("SpEdit") . " " . t("Edit Profile Fields"),
+                        $editFieldsLinkUrl,
+                        false,
+                        [
+                            "class" => "Popup EditAccountLink",
+                        ]
+                    );
+                }
             }
 
             // Add profile options for the profile owner
@@ -1871,7 +1977,11 @@ EOT;
             // password in Vanilla, they will then be able to log into Vanilla using
             // Vanilla's login form regardless of the state of their membership in the
             // external app.
-            if (c("Garden.UserAccount.AllowEdit") && c("Garden.Registration.Method") != "Connect") {
+            if (
+                c("Garden.UserAccount.AllowEdit") &&
+                c("Garden.Registration.Method") != "Connect" &&
+                !Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG)
+            ) {
                 // No password may have been set if they have only signed in with a connect plugin
                 $passwordLabel = t("Change My Password");
                 if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla") {
@@ -2279,5 +2389,19 @@ EOT;
         $users = array_values($users);
         $this->setData("Users", $users);
         $this->render();
+    }
+
+    /**
+     * Returns an array of [{values} => {translatable_caption}] for available gender options.
+     *
+     * @return array
+     */
+    public static function getGenderOptions(): array
+    {
+        return [
+            "u" => t("Unspecified"),
+            "m" => t("Male"),
+            "f" => t("Female"),
+        ];
     }
 }

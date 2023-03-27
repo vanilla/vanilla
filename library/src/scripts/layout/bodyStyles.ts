@@ -56,7 +56,10 @@ export const useBodyCSS = () => {
             }
         `;
 
-        document.head.prepend(stylesheet);
+        document.head.insertBefore(
+            stylesheet,
+            document.head.querySelector("[data-emotion]") ?? document.head.firstChild,
+        );
 
         return function cleanup() {
             document.head.removeChild(stylesheet);

@@ -31,4 +31,22 @@ class LinkEmbed extends AbstractEmbed
     {
         return Schema::parse(["body:s?", "photoUrl:s?"]);
     }
+
+    /**
+     * Override the parent method to render with InlineEmbed if embed style is inline.
+     *
+     * @return string
+     */
+    public function renderHtml(): string
+    {
+        $embedStyle = $this->data["embedStyle"] ?? null;
+        if ($embedStyle === self::EMBED_STYLE_INLINE) {
+            $viewPath = dirname(__FILE__) . "/InlineEmbed.twig";
+            return $this->renderTwig($viewPath, [
+                "url" => $this->getUrl(),
+                "data" => json_encode($this, JSON_UNESCAPED_UNICODE),
+            ]);
+        }
+        return parent::renderHtml();
+    }
 }

@@ -132,7 +132,7 @@ class PostAndDraftsControllerTest extends TestCase
                 "Body" => "Test Discussion Body",
                 "Format" => "markdown",
                 "CategoryID" => $this->discussion["CategoryID"],
-                "Announce" => 0,
+                "Announce" => false,
             ],
             $overrides
         );

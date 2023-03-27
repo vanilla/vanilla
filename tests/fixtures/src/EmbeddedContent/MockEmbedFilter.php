@@ -51,7 +51,7 @@ class MockEmbedFilter implements EmbedFilterInterface
     /**
      * @inheritdoc
      */
-    public function filterEmbed(AbstractEmbed $data): AbstractEmbed
+    public function filterEmbed(AbstractEmbed $embed): AbstractEmbed
     {
         return $this->filterResult;
     }

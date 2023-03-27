@@ -93,7 +93,7 @@ export function registerCommunitySearchDomain() {
             isIsolatedType: () => false,
             hasSpecificRecord: (form) => !!form.discussionID && typeof form.discussionID === "number",
             getSpecificRecord: (form) => parseInt(form.discussionID),
-            SpecificRecordPanel: SearchFilterPanelComments,
+            SpecificRecordPanelComponent: SearchFilterPanelComments,
             SpecificRecordComponent: CollapseCommentsSearchMeta,
             showSpecificRecordCrumbs: () => false,
         };

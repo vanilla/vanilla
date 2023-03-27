@@ -3,20 +3,14 @@
  * @license GPL-2.0-only
  */
 
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
-import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
-import { useEmbedContext } from "@library/embeddedContent/IEmbedContext";
-import classNames from "classnames";
-import React, { useRef, useState } from "react";
-import { ImageEmbedModal } from "@rich-editor/editor/pieces/ImageEmbedModal";
 import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
 import { EmbedContainerSize } from "@library/embeddedContent/components/EmbedContainerSize";
 import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
+import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { useEmbedContext } from "@library/embeddedContent/IEmbedContext";
+import { ImageEmbedModal } from "@library/embeddedContent/ImageEmbedModal";
 import { AccessibleImageMenuIcon } from "@library/icons/common";
-import { t } from "@vanilla/i18n/src";
-import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { accessibleLabel } from "@library/utility/appUtils";
-import { EmbedDropdown } from "@library/embeddedContent/components/EmbedDropdown";
 import {
     AlignCenterIcon,
     FloatLeftIcon,
@@ -25,8 +19,13 @@ import {
     ResizeMediumIcon,
     ResizeSmallIcon,
 } from "@library/icons/editorIcons";
-import { EmbedButton } from "@library/embeddedContent/components/EmbedButton";
-import { useUniqueID } from "@library/utility/idUtils";
+import { MenuBarItem } from "@library/MenuBar/MenuBarItem";
+import { MenuBarSubMenuItem } from "@library/MenuBar/MenuBarSubMenuItem";
+import { MenuBarSubMenuItemGroup } from "@library/MenuBar/MenuBarSubMenuItemGroup";
+import { accessibleLabel } from "@library/utility/appUtils";
+import { t } from "@vanilla/i18n/src";
+import classNames from "classnames";
+import React, { useRef, useState } from "react";
 interface IProps extends IBaseEmbedProps {
     type: string; // Mime type.
     size: number;
@@ -73,53 +72,56 @@ export function ImageEmbed(props: IProps) {
                 type={embedType}
                 embedActions={
                     <>
-                        <EmbedDropdown
-                            name="placement"
-                            value={float}
-                            label={floatOptions[float].label}
-                            Icon={() => floatOptions[float].icon}
+                        <MenuBarItem accessibleLabel={floatOptions[float].label} icon={floatOptions[float].icon}>
+                            <MenuBarSubMenuItemGroup>
+                                {Object.entries(floatOptions).map(([value, option]) => (
+                                    <MenuBarSubMenuItem
+                                        key={value}
+                                        icon={option.icon}
+                                        active={float === value}
+                                        onActivate={() =>
+                                            setValue({
+                                                float: value,
+                                                displaySize:
+                                                    displaySize === "large" && value !== "none"
+                                                        ? "medium"
+                                                        : displaySize,
+                                            })
+                                        }
+                                    >
+                                        {option.label}
+                                    </MenuBarSubMenuItem>
+                                ))}
+                            </MenuBarSubMenuItemGroup>
+                        </MenuBarItem>
+
+                        <MenuBarItem
+                            icon={displayOptions[displaySize].icon}
+                            accessibleLabel={displayOptions[displaySize].label}
                         >
-                            {Object.entries(floatOptions).map(([value, option]) => (
-                                <EmbedDropdown.Option
-                                    key={value}
-                                    Icon={() => option.icon}
-                                    value={value}
-                                    label={option.label}
-                                    onClick={() =>
-                                        setValue({
-                                            float: value,
-                                            displaySize:
-                                                displaySize === "large" && value !== "none" ? "medium" : displaySize,
-                                        })
-                                    }
-                                />
-                            ))}
-                        </EmbedDropdown>
-                        <EmbedDropdown
-                            name="displaySize"
-                            value={displaySize}
-                            label={displayOptions[displaySize].label}
-                            Icon={() => displayOptions[displaySize].icon}
-                        >
-                            {Object.entries(displayOptions).map(([value, option]) => (
-                                <EmbedDropdown.Option
-                                    key={value}
-                                    Icon={() => option.icon}
-                                    value={value}
-                                    label={option.label}
-                                    onClick={() =>
-                                        setValue({
-                                            displaySize: value,
-                                            float: float !== "none" && value === "large" ? "none" : float,
-                                        })
-                                    }
-                                />
-                            ))}
-                        </EmbedDropdown>
-                        <EmbedButton onClick={() => setIsOpen(true)}>
-                            <ScreenReaderContent>{t("Accessibility")}</ScreenReaderContent>
-                            <AccessibleImageMenuIcon />
-                        </EmbedButton>
+                            <MenuBarSubMenuItemGroup>
+                                {Object.entries(displayOptions).map(([value, option]) => (
+                                    <MenuBarSubMenuItem
+                                        key={value}
+                                        icon={option.icon}
+                                        active={displaySize === value}
+                                        onActivate={() => {
+                                            setValue({
+                                                displaySize: value,
+                                                float: float !== "none" && value === "large" ? "none" : float,
+                                            });
+                                        }}
+                                    >
+                                        {option.label}
+                                    </MenuBarSubMenuItem>
+                                ))}
+                            </MenuBarSubMenuItemGroup>
+                        </MenuBarItem>
+                        <MenuBarItem
+                            accessibleLabel={t("Accessibility")}
+                            onActivate={() => setIsOpen(true)}
+                            icon={<AccessibleImageMenuIcon />}
+                        />
                     </>
                 }
             >

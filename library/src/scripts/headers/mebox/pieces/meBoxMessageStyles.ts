@@ -13,9 +13,12 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { calc, percent, quote } from "csx";
 import { Mixins } from "@library/styles/Mixins";
 import { css } from "@emotion/css";
+import { StatusLightVariables } from "@library/statusLight/StatusLight.variables";
 
 export const meBoxMessageVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("meBoxMessage");
+
+    const statusLightVars = StatusLightVariables();
 
     const spacing = makeThemeVars("spacing", {
         padding: {
@@ -31,7 +34,7 @@ export const meBoxMessageVariables = useThemeCache(() => {
     });
 
     const unreadDot = makeThemeVars("unreadDot", {
-        width: 8,
+        width: statusLightVars.sizing.width,
     });
 
     return { spacing, imageContainer, unreadDot };
@@ -89,23 +92,7 @@ export const meBoxMessageClasses = useThemeCache(() => {
     });
 
     const status = css({
-        position: "relative",
-        width: styleUnit(vars.unreadDot.width),
         flexBasis: styleUnit(vars.unreadDot.width),
-        ...{
-            "&.isUnread": {
-                ...{
-                    "&:after": {
-                        ...Mixins.absolute.middleRightOfParent(),
-                        content: quote(""),
-                        height: styleUnit(vars.unreadDot.width),
-                        width: styleUnit(vars.unreadDot.width),
-                        backgroundColor: globalVars.mainColors.primary.toString(),
-                        borderRadius: percent(50),
-                    },
-                },
-            },
-        },
     });
 
     const contents = css({

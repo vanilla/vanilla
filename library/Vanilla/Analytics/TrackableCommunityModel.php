@@ -178,7 +178,7 @@ class TrackableCommunityModel
      */
     public function getTrackableComment($commentOrCommentID, string $type = "comment_add"): array
     {
-        if (is_int($commentOrCommentID)) {
+        if (is_numeric($commentOrCommentID)) {
             $comment = $this->commentModel->getID($commentOrCommentID, DATASET_TYPE_ARRAY);
             if (empty($comment)) {
                 return [

@@ -12,8 +12,6 @@ import KeyboardModule from "quill/modules/keyboard";
 import { SelectableEmbedBlot } from "@rich-editor/quill/blots/abstract/SelectableEmbedBlot";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";
 import { IEmbedValue } from "@rich-editor/quill/blots/embeds/ExternalEmbedBlot";
-import classNames from "classnames";
-import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import { setupTestQuill } from "@rich-editor/__tests__/quillUtils";
 
 const stubEmbedData: IEmbedValue = {

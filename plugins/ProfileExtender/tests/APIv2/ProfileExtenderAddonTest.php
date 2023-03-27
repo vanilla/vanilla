@@ -36,7 +36,7 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase
      */
     public static function getAddons(): array
     {
-        return ["vanilla", "profileextender"];
+        return ["vanilla", "profileextender", "Ranks"];
     }
 
     /**
@@ -57,6 +57,24 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase
     }
 
     /**
+     * Test that creating a profile field with a name in the restricted list will alter the name to avoid conflicts with core fields.
+     */
+    public function testCreateRestrictedField(): void
+    {
+        self::bessy()->post("/settings/profile-field-add-edit", [
+            "Label" => "UserID",
+            "FormType" => "TextBox",
+            "OnProfile" => "1",
+            "OnRegister" => true,
+        ]);
+
+        $fields = array_column($this->profileExtender->getProfileFields(), "Name", "Label");
+
+        // A "1" should have been appended to the fields name, so that we don't have a "UserID" profile field.
+        $this->assertSame($fields["UserID"], "UserID1");
+    }
+
+    /**
      * Test the basic profile extender get/set flow.
      */
     public function testUpdateUserField(): void
@@ -64,6 +82,26 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase
         $this->profileExtender->updateUserFields($this->memberID, ["text" => __FUNCTION__]);
         $values = $this->profileExtender->getUserFields($this->memberID);
         $this->assertSame(__FUNCTION__, $values["text"]);
+    }
+
+    /**
+     * Test that basic Profile Extender also updates UserMeta for system fields
+     */
+
+    public function testUpdateUserFieldWithSystemFields(): void
+    {
+        $this->createSystemDefaultProfileFields();
+        $fields = [
+            "Title" => "MyTitle",
+            "Location" => "MyLocation",
+            "text" => "Hello",
+        ];
+        $this->profileExtender->updateUserFields($this->memberID, $fields);
+        $values = $this->profileExtender->getUserFields($this->memberID);
+        foreach ($fields as $field => $value) {
+            $this->assertEquals($value, $values[$field]);
+        }
+        $this->removeSystemDefaultProfileFields();
     }
 
     /**
@@ -291,125 +329,41 @@ class ProfileExtenderAddonTest extends \VanillaTests\SiteTestCase
     }
 
     /**
-     * Test that legacy fields are properly migrated to the profileField table.
+     * This simply tests that the csv written to the response contains a specific user and
+     * the containing row also contains the user's profile field value
      *
-     * @param array $profleField Plugin provider field.
-     * @param array $expectedResult Expected migrated fields.
-     *
-     * @dataProvider LegacyFieldMigrationProvider
+     * @return void
      */
-    public function testLegacyFieldMigration(array $profleField, array $expectedResult)
+    public function testExportProfiles()
     {
-        $key = "ProfileExtender.Fields." . $profleField["Label"];
+        $user = $this->createUser();
+        $this->profileExtender->updateUserFields($user["userID"], ["text" => __FUNCTION__]);
 
-        $this->config->saveToConfig(["Feature.CustomProfileFields.Enabled" => true]);
-        $this->config->saveToConfig([$key => $profleField]);
-        $this->assertConfigValue($key, $profleField);
+        $this->bessy()->get("/utility/export-profiles");
+        $output = $this->bessy()->getLastOutput();
 
-        $this->bessy()->get("utility/update");
-        $this->assertConfigValue($key, null);
+        // Convert response into array of rows
+        $rows = explode("\n", $output);
 
-        $result = $this->profileFieldModel->getByLabel($expectedResult["label"]);
-        $this->assertNotEmpty($result);
-        $this->assertSame($expectedResult["label"], $result["label"]);
-        $this->assertSame($expectedResult["apiName"], $result["apiName"]);
-        $this->assertSame($expectedResult["dataType"], $result["dataType"]);
-        $this->assertSame($expectedResult["formType"], $result["formType"]);
-        $this->assertSame($expectedResult["mutability"], $result["mutability"]);
-        $this->assertSame($expectedResult["displayOptions"], $result["displayOptions"]);
-        $this->assertSame($expectedResult["registrationOptions"], $result["registrationOptions"]);
-        $this->config->saveToConfig(["Feature.CustomProfileFields.Enabled" => false]);
-    }
+        // Convert each row into an array of columns
+        $rows = array_map("str_getcsv", $rows);
 
-    /**
-     * Data Provider for testLegacyFieldMigration
-     */
-    public function LegacyFieldMigrationProvider(): array
-    {
-        $data = [
-            "textBox Field" => [
-                [
-                    "FormType" => "TextBox",
-                    "Label" => "TextBoxField",
-                    "Options" => "",
-                    "Required" => false,
-                    "OnRegister" => false,
-                    "OnProfile" => false,
-                    "Name" => "TextBoxField",
-                ],
-                [
-                    "label" => "TextBoxField",
-                    "apiName" => "TextBoxField",
-                    "dataType" => ProfileFieldModel::FORM_TYPE_TEXT,
-                    "formType" => ProfileFieldModel::DATA_TYPE_TEXT,
-                    "mutability" => ProfileFieldModel::MUTABILITIES[1],
-                    "displayOptions" => ["profiles" => false, "userCards" => false, "posts" => false],
-                    "registrationOptions" => ProfileFieldModel::REGISTRATION_OPTIONAL,
-                ],
-            ],
-            "checkBox Field" => [
-                [
-                    "FormType" => "CheckBox",
-                    "Label" => "CheckBoxField",
-                    "Options" => "",
-                    "Required" => true,
-                    "OnRegister" => true,
-                    "OnProfile" => true,
-                    "OnDiscussion" => true,
-                    "Name" => "ChecktBoxField",
-                ],
-                [
-                    "label" => "CheckBoxField",
-                    "apiName" => "CheckBoxField",
-                    "dataType" => ProfileFieldModel::DATA_TYPE_BOOL,
-                    "formType" => ProfileFieldModel::FORM_TYPE_CHECKBOX,
-                    "mutability" => ProfileFieldModel::MUTABILITIES[0],
-                    "displayOptions" => ["profiles" => true, "userCards" => false, "posts" => true],
-                    "registrationOptions" => ProfileFieldModel::REGISTRATION_REQUIRED,
-                ],
-            ],
-            "dropBox Field" => [
-                [
-                    "FormType" => "Dropdown",
-                    "Label" => "DropdownField",
-                    "Options" => ["select", "not select", "nothing"],
-                    "Required" => true,
-                    "OnRegister" => true,
-                    "OnProfile" => false,
-                    "OnDiscussion" => false,
-                    "Name" => "DropdownField",
-                ],
-                [
-                    "label" => "DropdownField",
-                    "apiName" => "DropdownField",
-                    "dataType" => ProfileFieldModel::DATA_TYPE_TEXT,
-                    "formType" => ProfileFieldModel::FORM_TYPE_DROPDOWN,
-                    "mutability" => ProfileFieldModel::MUTABILITIES[0],
-                    "displayOptions" => ["profiles" => false, "userCards" => false, "posts" => false],
-                    "registrationOptions" => ProfileFieldModel::REGISTRATION_REQUIRED,
-                ],
-            ],
-            "DateOfBirth Field" => [
-                [
-                    "FormType" => "DateOfBirth",
-                    "Label" => "BirthdayField",
-                    "Options" => "",
-                    "Required" => false,
-                    "OnRegister" => true,
-                    "OnProfile" => false,
-                    "Name" => "DateOfBirthField",
-                ],
-                [
-                    "label" => "Birthday",
-                    "apiName" => "DateOfBirth",
-                    "dataType" => ProfileFieldModel::DATA_TYPE_DATE,
-                    "formType" => ProfileFieldModel::FORM_TYPE_DATE,
-                    "mutability" => ProfileFieldModel::MUTABILITIES[1],
-                    "displayOptions" => ["profiles" => false, "userCards" => false, "posts" => false],
-                    "registrationOptions" => ProfileFieldModel::REGISTRATION_OPTIONAL,
-                ],
-            ],
-        ];
-        return $data;
+        // Get names of the users
+        $names = array_column($rows, 0);
+
+        // Find row with user
+        $rowIndex = array_search($user["name"], $names);
+        $this->assertNotFalse($rowIndex);
+
+        // Confirm Rank is set
+        $header = array_search("Ranks", $rows[0]);
+        $this->assertNotFalse($header, "Ranks is missing from the csv header.");
+
+        // Find profile field value in row
+        $header = array_search("Text", $rows[0]);
+        $this->assertNotFalse($header, "Custom profile field is missing from the csv header.");
+
+        $columnIndex = array_search(__FUNCTION__, $rows[$rowIndex]);
+        $this->assertNotFalse($columnIndex, "Custom profile field valid is missing.");
     }
 }

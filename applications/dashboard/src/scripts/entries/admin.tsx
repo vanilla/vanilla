@@ -34,6 +34,7 @@ import AdminHeader from "@dashboard/components/AdminHeader";
 import ModernEmbedSettings from "@library/embed/ModernEmbedSettings";
 import { userProfilesSlice } from "@dashboard/userProfiles/state/UserProfiles.slice";
 import { UserProfileSettings } from "@dashboard/userProfiles/UserProfileSettings";
+import DashboardAddEditUser from "@dashboard/users/DashboardAddEditUser";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
@@ -100,3 +101,4 @@ onContent(mountDashboardTabs);
 onContent(mountDashboardCodeEditors);
 
 bindToggleChildrenEventListeners();
+addComponent("DashboardAddEditUser", DashboardAddEditUser);

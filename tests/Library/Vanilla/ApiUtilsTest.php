@@ -95,15 +95,15 @@ class ApiUtilsTest extends BootstrapTestCase
     public function testParsePageHeader()
     {
         $link = <<<EOT
-<http://vanilla.test/categoriestest/api/v2/categories?page=1&limit=1>; rel="first",
-<http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1>; rel="next",
-<http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1>; rel="last"
+<https://vanilla.test/categoriestest/api/v2/categories?page=1&limit=1>; rel="first",
+<https://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1>; rel="next",
+<https://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1>; rel="last"
 EOT;
 
         $expected = [
-            "first" => "http://vanilla.test/categoriestest/api/v2/categories?page=1&limit=1",
-            "next" => "http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1",
-            "last" => "http://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1",
+            "first" => "https://vanilla.test/categoriestest/api/v2/categories?page=1&limit=1",
+            "next" => "https://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1",
+            "last" => "https://vanilla.test/categoriestest/api/v2/categories?page=2&limit=1",
         ];
 
         $actual = ApiUtils::parsePageHeader($link);

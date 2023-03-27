@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -48,6 +48,7 @@ use Vanilla\EmbeddedContent\Factories\InstagramEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\InstagramEmbed;
 use Vanilla\EmbeddedContent\Factories\GettyImagesEmbedFactory;
 use Vanilla\EmbeddedContent\Embeds\GettyImagesEmbed;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Utility\UrlUtils;
 use Vanilla\Web\RequestValidator;
 
@@ -307,7 +308,7 @@ class EmbedService implements EmbedCreatorInterface
      *
      * @param array $data
      * @param bool $allowExtendedContent Whether our not we allowed extended content.
-     * Notable iframe embeds are considered exteneded content.
+     * Notable iframe embeds are considered extended content.
      *
      * @return AbstractEmbed
      */
@@ -330,13 +331,14 @@ class EmbedService implements EmbedCreatorInterface
             $embed = $this->filterEmbed($embed);
             return $embed;
         } catch (ValidationException $e) {
-            trigger_error(
-                "Validation error while instantiating embed type $type with class $embedClass and data \n" .
-                    json_encode($data, JSON_PRETTY_PRINT) .
-                    "\n" .
-                    json_encode($e->jsonSerialize(), JSON_PRETTY_PRINT),
-                E_USER_WARNING
+            ErrorLogger::warning(
+                "Validation error while instantiating embed type $type with class $embedClass",
+                ["post", "embed"],
+                [
+                    "exception" => $e,
+                ]
             );
+
             return new ErrorEmbed($e, $data);
         }
     }

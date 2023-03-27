@@ -8,11 +8,10 @@ import React from "react";
 import { t } from "@library/utility/appUtils";
 import { IFormats, RangeStatic } from "quill/core";
 import classNames from "classnames";
-import { inlineToolbarClasses } from "@rich-editor/toolbars/inlineToolbarClasses";
-import { IMenuItemData } from "@rich-editor/toolbars/pieces/MenuItem";
-import MenuItems from "@rich-editor/toolbars/pieces/MenuItems";
-import Formatter from "@rich-editor/quill/Formatter";
 import { BoldIcon, ItalicIcon, LinkIcon, StrikeIcon, CodeIcon } from "@library/icons/editorIcons";
+import MenuItems from "@library/editor/toolbars/pieces/MenuItems";
+import { IMenuItemData } from "@library/editor/toolbars/pieces/MenuItem";
+import Formatter from "@rich-editor/quill/Formatter";
 
 interface IProps {
     formatter: Formatter;
@@ -25,15 +24,10 @@ interface IProps {
 
 export default class InlineToolbarMenuItems extends React.PureComponent<IProps> {
     public render() {
-        const classesInlineToolbar = inlineToolbarClasses(!!this.props.legacyMode);
         return (
             <MenuItems
                 menuItemData={this.menuItemData}
-                className={classNames(
-                    "richEditor-inlineToolbarContainer",
-                    this.props.className,
-                    classesInlineToolbar.root,
-                )}
+                className={classNames("richEditor-inlineToolbarContainer", this.props.className)}
             />
         );
     }

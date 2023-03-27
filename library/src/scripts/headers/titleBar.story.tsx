@@ -68,7 +68,6 @@ export default {
 const makeMockRegisterUser: IMe = {
     name: "Neena",
     userID: 1,
-    permissions: [],
     isAdmin: true,
     photoUrl: "",
     dateLastActive: "",
@@ -331,7 +330,6 @@ loadTranslations({});
 const makeMockGuestUser: IMe = {
     name: "test",
     userID: 0,
-    permissions: [],
     isAdmin: true,
     photoUrl: "",
     dateLastActive: "",

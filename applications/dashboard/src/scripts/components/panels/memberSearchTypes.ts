@@ -8,4 +8,7 @@ export interface IMemberSearchTypes {
     email?: string;
     roleIDs?: number[];
     rankIDs?: number[];
+    profileFields?: {
+        [key: string]: any;
+    };
 }

@@ -7,12 +7,15 @@
 
 namespace VanillaTests\Library\Vanilla\Formatting;
 
+use Vanilla\CurrentTimeStamp;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Formats\BBCodeFormat;
 use Vanilla\Formatting\Formats\DisplayFormat;
 use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Formatting\Formats\MarkdownFormat;
+use Vanilla\Formatting\Formats\Rich2Format;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\Formats\WysiwygFormat;
@@ -33,6 +36,8 @@ class UserMentionsRemovalTest extends SiteTestCase
     const PROFILE_URL_WITH_SPACE = "/profile/User%20To%20Anonymize";
     const PROFILE_URL_ANONYMIZE = "/profile/%5BDeleted%20User%5D";
 
+    private int $mockedTimeStamp = 1675123472;
+
     /**
      * @inheritDoc
      */
@@ -44,6 +49,15 @@ class UserMentionsRemovalTest extends SiteTestCase
         /** @var EmbedService $embedService */
         $embedService = \Gdn::getContainer()->get(EmbedService::class);
         $embedService->registerEmbed(QuoteEmbed::class, QuoteEmbed::TYPE);
+        $embedService->registerFilter($this->container()->get(QuoteEmbedFilter::class));
+        CurrentTimeStamp::mockTime($this->mockedTimeStamp);
+    }
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        CurrentTimeStamp::clearMockTime();
     }
 
     /**
@@ -249,7 +263,7 @@ class UserMentionsRemovalTest extends SiteTestCase
                 '<blockquote class="Quote"><div class="QuoteAuthor"><a href="' .
                 $baseUrl .
                 self::PROFILE_URL_ANONYMIZE .
-                '" class="js-userCard" data-userid="1">[Deleted User]</a> said:</div>
+                '" class="js-userCard" data-userid="-1">[Deleted User]</a> said:</div>
                  <div>UserToAnonymize is an amazing human slash genius.</div>
                  </blockquote>',
             ],
@@ -260,7 +274,7 @@ class UserMentionsRemovalTest extends SiteTestCase
                 '<blockquote class="Quote"><div class="QuoteAuthor"><a href="' .
                 $baseUrl .
                 self::PROFILE_URL_ANONYMIZE .
-                '" class="js-userCard" data-userid="1">[Deleted User]</a> said:</div>
+                '" class="js-userCard" data-userid="-1">[Deleted User]</a> said:</div>
                  <div>UserToAnonymize is an amazing human slash genius.</div>
                  </blockquote>',
                 self::USERNAME_WITH_SPACE,
@@ -284,6 +298,16 @@ class UserMentionsRemovalTest extends SiteTestCase
             "inlineTextMention" => [
                 "</div>UserToAnonymize is an amazing human slash genius.</div>",
                 "</div>UserToAnonymize is an amazing human slash genius.</div>",
+            ],
+            "Alternate quote format" => [
+                '<blockquote class="Quote">
+                 <div><a rel="nofollow">UserToAnonymize</a> said:</div>
+                 <div>UserToAnonymize is an amazing human slash genius.</div>
+                 </blockquote>',
+                '<blockquote class="Quote">
+                 <div><a rel="nofollow">[Deleted User]</a> said:</div>
+                 <div>UserToAnonymize is an amazing human slash genius.</div>
+                 </blockquote>',
             ],
         ];
     }
@@ -343,7 +367,7 @@ class UserMentionsRemovalTest extends SiteTestCase
                         "attributes" => [
                             "link" => $profileUrlNoSpace,
                         ],
-                        "insert" => "my profile link",
+                        "insert" => "my profile $profileUrlNoSpace",
                     ],
                 ]),
                 json_encode([
@@ -351,7 +375,7 @@ class UserMentionsRemovalTest extends SiteTestCase
                         "attributes" => [
                             "link" => $profileUrlAnonymize,
                         ],
-                        "insert" => "[Deleted User]",
+                        "insert" => "my profile $profileUrlAnonymize",
                     ],
                 ]),
             ],
@@ -361,52 +385,8 @@ class UserMentionsRemovalTest extends SiteTestCase
                         "insert" => [
                             "embed-external" => [
                                 "data" => [
-                                    "body" => "<p>test</p>",
-                                    "bodyRaw" => '[{"insert":"test\n"}]',
-                                    "format" => "rich",
-                                    "insertUser" => [
-                                        "userID" => 2,
-                                        "name" => "UserToAnonymize",
-                                        "url" => $profileUrlNoSpace,
-                                        "photoUrl" => "defaulticon.png",
-                                        "dateLastActive" => "2022-06-02T16:20:42+00:00",
-                                        "label" => "yay",
-                                    ],
-                                    "embedType" => "quote",
-                                ],
-                            ],
-                        ],
-                    ],
-                ]),
-                json_encode([
-                    [
-                        "insert" => [
-                            "embed-external" => [
-                                "data" => [
-                                    "body" => "<p>test</p>",
-                                    "bodyRaw" => '[{"insert":"test\n"}]',
-                                    "format" => "rich",
-                                    "insertUser" => [
-                                        "userID" => -1,
-                                        "name" => "[Deleted User]",
-                                        "url" => $profileUrlAnonymize,
-                                        "photoUrl" => null,
-                                        "dateLastActive" => "1970-01-01T00:00:00+00:00",
-                                        "label" => "",
-                                    ],
-                                    "embedType" => "quote",
-                                ],
-                            ],
-                        ],
-                    ],
-                ]),
-            ],
-            "remove user info from quote content of a different format" => [
-                json_encode([
-                    [
-                        "insert" => [
-                            "embed-external" => [
-                                "data" => [
+                                    "recordID" => 1365,
+                                    "recordType" => "comment",
                                     "body" => <<<EOT
 
 <blockquote class="Quote blockquote">test</blockquote>
@@ -423,6 +403,7 @@ EOT
 EOT
                                     ,
                                     "format" => "html",
+                                    "dateInserted" => "2023-01-27T20:53:01+00:00",
                                     "insertUser" => [
                                         "userID" => 2,
                                         "name" => "UserToAnonymize",
@@ -431,6 +412,7 @@ EOT
                                         "dateLastActive" => "2022-06-02T16:20:42+00:00",
                                         "label" => "yay",
                                     ],
+                                    "url" => "https://dev.vanilla.localhost/discussion/comment/1365#Comment_1365",
                                     "embedType" => "quote",
                                 ],
                             ],
@@ -442,6 +424,8 @@ EOT
                         "insert" => [
                             "embed-external" => [
                                 "data" => [
+                                    "recordID" => 1365,
+                                    "recordType" => "comment",
                                     "body" => <<<EOT
 
 <blockquote class="Quote blockquote">test</blockquote>
@@ -458,16 +442,250 @@ EOT
 EOT
                                     ,
                                     "format" => "html",
+                                    "dateInserted" => "2023-01-27T20:53:01+00:00",
                                     "insertUser" => [
-                                        "userID" => -1,
-                                        "name" => "[Deleted User]",
-                                        "url" => $profileUrlAnonymize,
-                                        "photoUrl" => null,
-                                        "dateLastActive" => "1970-01-01T00:00:00+00:00",
-                                        "label" => "",
+                                        "userID" => 0,
+                                        "name" => "unknown",
+                                        "url" => $baseUrl . "/profile/",
+                                        "photoUrl" =>
+                                            $baseUrl . "/applications/dashboard/design/images/defaulticon.png",
+                                        "dateLastActive" => date("c", $this->mockedTimeStamp),
+                                        "banned" => 0,
+                                        "punished" => 0,
+                                        "private" => false,
                                     ],
+                                    "displayOptions" => [
+                                        "showUserLabel" => false,
+                                        "showCompactUserInfo" => true,
+                                        "showDiscussionLink" => false,
+                                        "showPostLink" => false,
+                                        "showCategoryLink" => false,
+                                        "renderFullContent" => false,
+                                        "expandByDefault" => false,
+                                    ],
+                                    "url" => "https://dev.vanilla.localhost/discussion/comment/1365#Comment_1365",
                                     "embedType" => "quote",
                                 ],
+                            ],
+                        ],
+                    ],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * Test the anonymization of Rich quotes.
+     *
+     * @param string $body
+     * @param string $expected
+     * @param string $username
+     * @dataProvider provideRich2Data
+     */
+    public function testRich2Anonymization(string $body, string $expected, string $username = self::USERNAME_NO_SPACE)
+    {
+        $formatter = self::container()->get(Rich2Format::class);
+        $result = $formatter->removeUserPII($username, $body);
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Provide Rich post body/expected result in a way that can be consumed as a data provider.
+     *
+     * @return array Returns a data provider array.
+     */
+    public function provideRich2Data(): array
+    {
+        $baseUrl = $this->getBaseUrl();
+        $profileUrlNoSpace = $baseUrl . self::PROFILE_URL_NO_SPACE;
+        $profileUrlAnonymize = $baseUrl . self::PROFILE_URL_ANONYMIZE;
+        $usernameNoSpace = self::USERNAME_NO_SPACE;
+        $usernameAnonymize = self::USERNAME_ANONYMIZE;
+
+        return [
+            "remove at-mention" => [
+                json_encode([
+                    [
+                        "type" => "p",
+                        "children" => [
+                            [
+                                "type" => "@",
+                                "children" => [
+                                    0 => [
+                                        "text" => "",
+                                    ],
+                                ],
+                                "userID" => 7,
+                                "name" => self::USERNAME_NO_SPACE,
+                                "url" => $profileUrlNoSpace,
+                                "photoUrl" =>
+                                    "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+                                "dateLastActive" => "2022-12-20T17:41:59+00:00",
+                                "banned" => 0,
+                                "private" => false,
+                                "domID" => "mentionSuggestion7",
+                                "value" => "",
+                            ],
+                        ],
+                    ],
+                ]),
+                json_encode([
+                    [
+                        "type" => "p",
+                        "children" => [
+                            [
+                                "type" => "@",
+                                "userID" => -1,
+                                "name" => self::USERNAME_ANONYMIZE,
+                                "url" => $profileUrlAnonymize,
+                                "photoUrl" =>
+                                    "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+                                "dateLastActive" => "2022-12-20T17:41:59+00:00",
+                                "banned" => 0,
+                                "private" => false,
+                                "domID" => "mentionSuggestion7",
+                                "value" => "",
+                                "children" => [
+                                    [
+                                        "text" => "",
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]),
+            ],
+            "remove profile url" => [
+                json_encode([
+                    [
+                        "type" => "p",
+                        "children" => [
+                            [
+                                "type" => "a",
+                                "url" => $profileUrlNoSpace,
+                                "target" => "_self",
+                                "children" => [
+                                    [
+                                        "text" => "my profile $profileUrlNoSpace",
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]),
+                json_encode([
+                    [
+                        "type" => "p",
+                        "children" => [
+                            [
+                                "type" => "a",
+                                "url" => $profileUrlAnonymize,
+                                "target" => "_self",
+                                "children" => [
+                                    [
+                                        "text" => "my profile $profileUrlAnonymize",
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ]),
+            ],
+            "remove mentions in quote blocks" => [
+                json_encode([
+                    [
+                        "type" => "rich_embed_card",
+                        "dataSourceType" => "url",
+                        "url" => "https://dev.vanilla.localhost/discussion/1362/test",
+                        "embedData" => [
+                            "recordID" => 1362,
+                            "recordType" => "discussion",
+                            "body" => <<<EOD
+<blockquote class="Quote blockquote">abc</blockquote>
+<a href="$profileUrlNoSpace" rel="nofollow">@$usernameNoSpace</a> test<br><br><a rel="nofollow" href="$profileUrlNoSpace">$profileUrlNoSpace</a>
+EOD
+                            ,
+                            "bodyRaw" => <<<EOD
+<blockquote class="Quote" rel="$usernameNoSpace">abc</blockquote>
+
+@$usernameNoSpace test
+
+<a href="$profileUrlNoSpace">$profileUrlNoSpace</a>
+EOD
+                            ,
+                            "format" => "html",
+                            "dateInserted" => "2023-01-27T20:53:01+00:00",
+                            "insertUser" => [
+                                "userID" => 16,
+                                "name" => self::USERNAME_NO_SPACE,
+                                "url" => "https://dev.vanilla.localhost/profile/UserToAnonymize",
+                                "photoUrl" =>
+                                    "https://dev.vanilla.localhost/applications/dashboard/design/images/defaulticon.png",
+                                "dateLastActive" => date("c", $this->mockedTimeStamp),
+                                "banned" => 0,
+                                "punished" => 0,
+                                "private" => false,
+                            ],
+                            "url" => "https://dev.vanilla.localhost/discussion/1362/test",
+                            "embedType" => "quote",
+                            "name" => "test",
+                        ],
+                        "children" => [
+                            [
+                                "text" => "",
+                            ],
+                        ],
+                    ],
+                ]),
+                json_encode([
+                    [
+                        "type" => "rich_embed_card",
+                        "dataSourceType" => "url",
+                        "url" => "https://dev.vanilla.localhost/discussion/1362/test",
+                        "embedData" => [
+                            "recordID" => 1362,
+                            "recordType" => "discussion",
+                            "body" => <<<EOT
+<blockquote class="Quote blockquote">abc</blockquote>
+<a href="$profileUrlAnonymize" rel="nofollow">@$usernameAnonymize</a> test<br><br><a rel="nofollow" href="$profileUrlAnonymize">$profileUrlAnonymize</a>
+EOT
+                            ,
+                            "bodyRaw" => <<<EOT
+<blockquote class="Quote" rel="$usernameAnonymize">abc</blockquote>
+
+@"$usernameAnonymize" test
+
+<a href="$profileUrlAnonymize">$profileUrlAnonymize</a>
+EOT
+                            ,
+                            "format" => "html",
+                            "dateInserted" => "2023-01-27T20:53:01+00:00",
+                            "insertUser" => [
+                                "userID" => 0,
+                                "name" => "unknown",
+                                "url" => $baseUrl . "/profile/",
+                                "photoUrl" => $baseUrl . "/applications/dashboard/design/images/defaulticon.png",
+                                "dateLastActive" => date("c", $this->mockedTimeStamp),
+                                "banned" => 0,
+                                "punished" => 0,
+                                "private" => false,
+                            ],
+                            "displayOptions" => [
+                                "showUserLabel" => false,
+                                "showCompactUserInfo" => true,
+                                "showDiscussionLink" => true,
+                                "showPostLink" => true,
+                                "showCategoryLink" => false,
+                                "renderFullContent" => false,
+                                "expandByDefault" => false,
+                            ],
+                            "url" => "https://dev.vanilla.localhost/discussion/1362/test",
+                            "embedType" => "quote",
+                            "name" => "test",
+                        ],
+                        "children" => [
+                            [
+                                "text" => "",
                             ],
                         ],
                     ],
@@ -587,10 +805,5 @@ EOT
         $formatter = self::container()->get(DisplayFormat::class);
         $result = $formatter->removeUserPII($username, $body);
         $this->assertEquals($expected, $result);
-    }
-
-    private function getBaseUrl()
-    {
-        return preg_replace("/:[0-9]+/", "", getenv("TEST_BASEURL")) . "/usermentionsremovaltest";
     }
 }

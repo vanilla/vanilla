@@ -67,11 +67,12 @@ trait TestDiscussionModelTrait
      */
     protected function insertDiscussions(int $count, array $overrides = []): array
     {
+        $announce = $overrides["Announce"] ?? false;
         $ids = [];
         for ($i = 0; $i < $count; $i++) {
             $ids[] = $this->discussionModel->save($this->newDiscussion($overrides));
         }
-        $rows = $this->discussionModel->getWhere(["DiscussionID" => $ids, "Announce" => "All"])->resultArray();
+        $rows = $this->discussionModel->getWhere(["DiscussionID" => $ids, "Announce" => $announce])->resultArray();
         TestCase::assertCount($count, $rows, "Not enough test discussions were inserted.");
 
         return $rows;

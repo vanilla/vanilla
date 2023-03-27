@@ -7,13 +7,13 @@ import React from "react";
 import { cx } from "@emotion/css";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { DiscussionListSelectAll } from "@library/features/discussions/DiscussionListSelectAll";
-import { hasPermission } from "@library/features/users/Permission";
 import { getMeta } from "@library/utility/appUtils";
 import DiscussionListAssetCategoryFilter, {
     DiscussionsCategoryFollowFilter,
 } from "@library/features/discussions/DiscussionListAssetCategoryFilter";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
 import { NumberedPager, INumberedPagerProps } from "@library/features/numberedPager/NumberedPager";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 interface IProps {
     discussionIDs?: Array<IDiscussion["discussionID"]>;
@@ -29,6 +29,7 @@ interface IProps {
  */
 export function DiscussionListAssetHeader(props: IProps) {
     const classes = discussionListClasses();
+    const { hasPermission } = usePermissionsContext();
     const canUseCheckboxes =
         !props.noCheckboxes && getMeta("ui.useAdminCheckboxes", false) && hasPermission("discussions.manage");
 

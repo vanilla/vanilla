@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
+if (\Vanilla\FeatureFlagHelper::featureEnabled(\Vanilla\Dashboard\Models\ProfileFieldModel::FEATURE_FLAG)) redirectTo('/settings/home');
 $Fields = $this->data('ExtendedFields');
 echo heading(t('Custom Profile Fields'), t('Add Field'), '/settings/profilefieldaddedit/', 'js-modal btn btn-primary')
 ?>

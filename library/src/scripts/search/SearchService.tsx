@@ -129,7 +129,7 @@ export interface ISearchDomain<
     MetaComponent?: React.ComponentType<any>;
     hasSpecificRecord?(form: ISearchForm<ExtraFormValues>): boolean;
     getSpecificRecord?(form: ISearchForm<ExtraFormValues>): number;
-    SpecificRecordPanel?: React.ComponentType<any>;
+    SpecificRecordPanelComponent?: React.ComponentType<any>;
     SpecificRecordComponent?: React.ComponentType<any>;
     showSpecificRecordCrumbs?(): boolean; // We could later make this into a config object
 }

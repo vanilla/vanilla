@@ -34,6 +34,9 @@ import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
 import { CategoryNotificationPreferences } from "@dashboard/components/CategoryNotificationPreferences";
 import { userProfilesSlice } from "@dashboard/userProfiles/state/UserProfiles.slice";
 import { TokensInputInLegacyForm } from "@library/forms/select/TokensInputInLegacyForm";
+import { hasPermission } from "@library/features/users/Permission";
+import { hasUserViewPermission } from "@library/features/users/modules/hasUserViewPermission";
+import { LeavingPageRoute } from "@library/leavingPage/LeavingPageRoutes";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);
@@ -45,7 +48,7 @@ addComponent("tokensInputInLegacyForm", TokensInputInLegacyForm, { overwrite: tr
 registerReducer("auth", authReducer);
 registerReducer("notifications", new NotificationsModel().reducer);
 
-Router.addRoutes([NEW_SEARCH_PAGE_ENABLED ? SearchPageRoute.route : null].filter(notEmpty));
+Router.addRoutes([NEW_SEARCH_PAGE_ENABLED ? SearchPageRoute.route : null, LeavingPageRoute.route].filter(notEmpty));
 
 applySharedPortalContext((props) => {
     return (
@@ -100,16 +103,21 @@ applyReactElementsInForum({
 applyReactElementsInForum({
     metaPermissionKey: "themeFeatures.UserCards",
     onInitialLoad: () => {
-        applyCompatibilityUserCards();
+        if (hasUserViewPermission(hasPermission)) {
+            applyCompatibilityUserCards();
+        }
     },
+
     onNewHTML: (e) => {
-        applyCompatibilityUserCards(
-            e.target instanceof HTMLElement && e.target.parentElement ? e.target.parentElement : undefined,
-        );
+        if (hasUserViewPermission(hasPermission)) {
+            applyCompatibilityUserCards(
+                e.target instanceof HTMLElement && e.target.parentElement ? e.target.parentElement : undefined,
+            );
+        }
     },
 });
 
 addComponent("CategoryNotificationPreferences", CategoryNotificationPreferences, { overwrite: true });
 
-// For aboot page
+// For about page
 registerReducer(userProfilesSlice.name, userProfilesSlice.reducer);

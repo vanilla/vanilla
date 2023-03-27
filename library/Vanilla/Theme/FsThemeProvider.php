@@ -136,12 +136,12 @@ class FsThemeProvider implements ThemeProviderInterface
     /**
      * @inheritdoc
      */
-    public function setCurrentTheme($themeKey): Theme
+    public function setCurrentTheme($themeID): Theme
     {
-        $this->config->set("Garden.Theme", $themeKey);
-        $this->config->set("Garden.MobileTheme", $themeKey);
-        $this->config->set("Garden.CurrentTheme", $themeKey);
-        return $this->getTheme($themeKey);
+        $this->config->set("Garden.Theme", $themeID);
+        $this->config->set("Garden.MobileTheme", $themeID);
+        $this->config->set("Garden.CurrentTheme", $themeID);
+        return $this->getTheme($themeID);
     }
 
     /**

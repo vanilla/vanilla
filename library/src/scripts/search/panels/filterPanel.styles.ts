@@ -18,7 +18,7 @@ export const filterPanelClasses = useThemeCache((mediaQueries) => {
     const header = style(
         "header",
         {
-            marginBottom: styleUnit(globalVars.gutter.size * 1.5),
+            marginBottom: styleUnit(globalVars.gutter.size),
             ...{
                 "&&": {
                     border: 0,
@@ -51,6 +51,7 @@ export const filterPanelClasses = useThemeCache((mediaQueries) => {
     const footer = style("body", {
         ...{
             "&&": {
+                justifyContent: "space-between",
                 border: 0,
                 marginTop: styleUnit(globalVars.gutter.size),
                 ...Mixins.padding({

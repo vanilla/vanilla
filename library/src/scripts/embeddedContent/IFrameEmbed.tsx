@@ -33,7 +33,7 @@ export function IFrameEmbed(props: IProps): JSX.Element {
     };
 
     return (
-        <EmbedContainer className="embedIFrame">
+        <EmbedContainer className="embedIFrame" data-testid="iframe-embed">
             <EmbedContent type={props.embedType}>
                 <div className="embedExternal-ratio" style={ratioStyle}>
                     <iframe

@@ -21,6 +21,12 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     /** Cache key format. */
     const CONFIG_FILE_CACHE_KEY = "garden.config.%s";
 
+    /** @var array  configs to omit*/
+    const OMIT_LOGGING = ["SystemAccessToken"];
+
+    /** @var array */
+    public $ConfigChangesData = [];
+
     /** @var string  */
     public $NotFound = "NOT_FOUND";
 
@@ -951,6 +957,7 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     public function saveToConfig($name, $value = "", $options = [])
     {
         $save = $options === false ? false : val("Save", $options, true);
+        $bypassLogging = $options === false ? false : val("BypassLogging", $options, false);
         $removeEmpty = val("RemoveEmpty", $options);
 
         if (!is_array($name)) {
@@ -963,11 +970,40 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
             if (!$v && $removeEmpty) {
                 $this->remove($k);
             } else {
+                //If this is a change (different from what has been saved before)
+                // and we are queueing this change for saving, keep track of it.
+                if (!$bypassLogging && $save && $this->get($k) != $v) {
+                    if (!$this->omitConfigLog($k)) {
+                        //Record Old value.
+                        $this->ConfigChangesData[$k] = $this->get($k);
+                        // Record New/changed value.
+                        if (!array_key_exists("_New", $this->ConfigChangesData)) {
+                            $this->ConfigChangesData["_New"] = [];
+                        }
+                        $this->ConfigChangesData["_New"][$k] = $v;
+                    }
+                }
                 $result = $result & $this->set($k, $v, true, $save);
             }
         }
 
         return $result;
+    }
+
+    /**
+     * Determine if the config should be skipped.
+     *
+     * @param string $key Key of the config
+     * @return bool
+     */
+    private function omitConfigLog(string $key): bool
+    {
+        foreach (self::OMIT_LOGGING as $omitKey) {
+            if (stripos($key, $omitKey) !== false) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1014,6 +1050,12 @@ class Gdn_Configuration extends Gdn_Pluggable implements \Vanilla\Contracts\Conf
     public function shutdown()
     {
         foreach ($this->sources as $source) {
+            //If there were changes queued to save, record them in Log table when we save config changes to file.
+            if (count($this->ConfigChangesData) > 0) {
+                // Log root config changes
+                LogModel::insert("Edit", "Configuration", $this->ConfigChangesData);
+                $this->ConfigChangesData = [];
+            }
             $source->shutdown();
         }
     }

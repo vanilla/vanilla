@@ -15,7 +15,7 @@ import { ICommonControl, IControlProps, JsonSchema } from "@vanilla/json-schema-
 import { FormGroupLabel } from "@vanilla/ui";
 import React, { useEffect, useMemo, useState } from "react";
 
-interface IFormTreeControl extends ICommonControl {
+export interface IFormTreeControl extends ICommonControl {
     itemSchema: JsonSchema;
 }
 

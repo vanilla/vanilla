@@ -6,12 +6,30 @@ use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\Dispatcher;
 use Plugins\Spoof\Library\SpoofMiddleware;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Vanilla\Logger;
 
 /**
  * 1.2 - mosullivan - 2011-08-30 - Added "Spoof" button to various screens for admins.
  */
-class SpoofPlugin implements Gdn_IPlugin
+class SpoofPlugin implements Gdn_IPlugin, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
+    /** @var SessionModel */
+    private $sessionModel;
+
+    /**
+     * DI.
+     *
+     * @param SessionModel $sessionModel
+     */
+    public function __construct(SessionModel $sessionModel)
+    {
+        $this->sessionModel = $sessionModel;
+    }
+
     /**
      * Add the spoof admin screen to the dashboard menu.
      *
@@ -68,9 +86,32 @@ class SpoofPlugin implements Gdn_IPlugin
             Gdn::session()->checkPermission("Garden.Settings.Manage") &&
             $user->Admin !== 2
         ) {
-            Gdn::session()->start($spoofUserID, true, false);
+            $spoofedByUser = Gdn::session()->User;
+            $session = Gdn::session()->Session;
+            $attributes = $session["Attributes"] ?? [];
+            $context = ["SpoofUserID" => $spoofedByUser->UserID, "SpoofUserName" => $spoofedByUser->Name];
+            if (($attributes["orcUserId"] ?? false) && ($attributes["orcUserEmail"] ?? false)) {
+                $context = array_merge($attributes, $context);
+            }
+            if (($attributes["SpoofUserID"] ?? false) && ($attributes["SpoofUserName"] ?? false)) {
+                $context = $attributes;
+            }
+            //Record Whom the user spoofs in as.
+            $context["userSpoofedId"] = $user->UserID;
+            $context["userSpoofedName"] = $user->Name;
+
+            LogModel::insert("Spoof", "Spoof", $context);
+
+            Gdn::session()->start($spoofUserID);
+            $this->sessionModel->update(["Attributes" => $context], ["SessionID" => Gdn::session()->SessionID]);
+            $context[Logger::FIELD_TAGS] = ["user", "spoof"];
+            $context[Logger::FIELD_CHANNEL] = Logger::CHANNEL_SECURITY;
+            $this->logger->info(
+                "User $spoofedByUser->Name($spoofedByUser->UserID) has spoofed into as $user->Name($user->UserID)",
+                $context
+            );
         }
-        if ($this->_DeliveryType !== DELIVERY_TYPE_ALL) {
+        if (!isset($this->_DeliveryType) || $this->_DeliveryType !== DELIVERY_TYPE_ALL) {
             $sender->setRedirectTo("profile");
             $sender->render("blank", "utility", "dashboard");
         } else {
@@ -198,6 +239,30 @@ class SpoofPlugin implements Gdn_IPlugin
         }
 
         $sender->render(PATH_PLUGINS . DS . "Spoof" . DS . "views" . DS . "spoof.php");
+    }
+
+    /**
+     * Format Spoof information.
+     *
+     * @param LogModel $sender
+     * @param array $args
+     */
+    public function logModel_formatContent_handler(LogModel $sender, array &$args)
+    {
+        $log = $args["Log"];
+        $data = $log["Data"];
+        if ($log["Operation"] == "Spoof") {
+            $args["Result"] =
+                "Spoofed in User ID <b>" .
+                $sender->formatKey("SpoofUserName", $log) .
+                "</b>(" .
+                $sender->formatKey("SpoofUserID", $log) .
+                ") as <b>" .
+                $sender->formatKey("userSpoofedName", $data) .
+                "</b>(" .
+                $sender->formatKey("userSpoofedId", $data) .
+                ")";
+        }
     }
 
     /**

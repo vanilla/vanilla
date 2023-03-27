@@ -399,31 +399,14 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
 
         // Handle pagination.
         if ($paging) {
-            $links = new WebLinking();
-            $hasPageCount = isset($paging["pageCount"]);
-
-            $firstPageUrl = str_replace("%s", 1, $paging["urlFormat"]);
-            $links->addLink("first", $firstPageUrl);
-            if ($paging["page"] > 1) {
-                $prevPageUrl =
-                    $paging["page"] > 2 ? str_replace("%s", $paging["page"] - 1, $paging["urlFormat"]) : $firstPageUrl;
-                $links->addLink("prev", $prevPageUrl);
-            }
-            if (($paging["more"] ?? false) || ($hasPageCount && $paging["page"] < $paging["pageCount"])) {
-                $links->addLink("next", str_replace("%s", $paging["page"] + 1, $paging["urlFormat"]));
-            }
-            if ($hasPageCount) {
-                $links->addLink("last", str_replace("%s", $paging["pageCount"], $paging["urlFormat"]));
-            }
+            $pagination = new Pagination($paging);
+            $links = $pagination->getPageLinks();
             $links->setHeader($this);
-
             $this->setHeader(JsonView::CURRENT_PAGE_HEADER, $paging["page"]);
-
             $totalCount = $paging["totalCount"] ?? null;
             if ($totalCount !== null) {
                 $this->setHeader(JsonView::TOTAL_COUNT_HEADER, $totalCount);
             }
-
             $limit = $paging["limit"] ?? null;
             if ($limit !== null) {
                 $this->setHeader(JsonView::LIMIT_HEADER, $limit);

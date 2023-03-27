@@ -954,7 +954,7 @@ class CommentModel extends Gdn_Model implements
     {
         $this->options($options);
 
-        $this->commentQuery(false); // FALSE supresses FireEvent
+        $this->commentQuery(false); // `false` suppresses FireEvent
         $comment = $this->SQL
             ->where("c.CommentID", $id)
             ->get()

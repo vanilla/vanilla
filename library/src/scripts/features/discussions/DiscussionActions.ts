@@ -139,10 +139,12 @@ export default class DiscussionActions extends ReduxActions<
 
     public getDiscussionList = (params: IGetDiscussionListParams) => {
         const thunk = bindThunkAction(DiscussionActions.getDiscussionListACs, async () => {
+            const defaultExpand = ["insertUser", "breadcrumbs"];
             const response = await this.api.get(`/discussions`, {
                 params: {
                     ...params,
-                    expand: ["insertUser", "breadcrumbs"],
+                    expand:
+                        params.expand && params.expand.length ? [...defaultExpand, ...params.expand] : defaultExpand,
                 },
             });
             const pagination = SimplePagerModel.parseHeaders(response.headers);

@@ -10,6 +10,7 @@ namespace Garden\Web;
 use Garden\ClassLocator;
 use Psr\Container\ContainerInterface;
 use Vanilla\Utility\FileGeneratorUtils;
+use Vanilla\ReflectionHelper;
 
 /**
  * Maps requests to controllers using RESTful URLs.
@@ -305,7 +306,7 @@ class ResourceRoute extends Route
                     unset($defaults[$name]);
                 } else {
                     $defaults[$name] = array_shift($pathArgs);
-                    $defaults = array_merge($defaults, $pathArgs);
+                    $defaults = array_merge($defaults, array_combine($pathArgs, $pathArgs));
                     $pathArgs = [];
                 }
             } else {
@@ -352,14 +353,15 @@ class ResourceRoute extends Route
         }
 
         // Fix the path.
-        if ($pathParam !== null && !$pathParam->isArray()) {
+        if ($pathParam !== null && !ReflectionHelper::isArray($pathParam)) {
             $args[$pathParam->getName()] = $defaults[$pathParam->getName()] =
                 "/" . implode("/", $defaults[$pathParam->getName()]);
         }
 
         // Fill in all of the mappings now that everything has been reflected.
         foreach ($mapped as $name => $param) {
-            if ($param->getClass() !== null && is_a($sender, $param->getClass()->getName(), true)) {
+            $class = ReflectionHelper::getClass($param);
+            if ($class !== null && is_a($sender, $class->getName(), true)) {
                 $defaults[$name] = $sender;
             } else {
                 $defaults[$name] = $this->mapParam($param, $request, $args);
@@ -399,7 +401,7 @@ class ResourceRoute extends Route
                 $path = $param;
             } elseif ($this->isMapped($param)) {
                 $mapped[$name] = $param;
-            } elseif ($param->getClass() !== null) {
+            } elseif (ReflectionHelper::getClass($param) !== null) {
                 // Type-hinted parameters can't be mapped from the path.
                 $mapped[$name] = $param;
             } else {

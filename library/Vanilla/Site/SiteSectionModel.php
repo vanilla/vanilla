@@ -39,7 +39,7 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface
     /** @var SiteSectionInterface $currentSiteSection */
     private $currentSiteSection;
 
-    /** @var SiteSectionInterface $currentSiteSection */
+    /** @var SiteSectionInterface $defaultSiteSection */
     private $defaultSiteSection;
 
     /** @var array $defaultRoutes */

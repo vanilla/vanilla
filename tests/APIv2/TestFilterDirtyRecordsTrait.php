@@ -65,9 +65,9 @@ trait TestFilterDirtyRecordsTrait
 
         $dirtyRecordIDs = array_column($dirtyRecords, "recordID");
         $ids = array_column($records, $primaryKey);
+        sort($dirtyRecordIDs);
+        sort($ids);
 
-        foreach ($dirtyRecordIDs as $dirtyRecordID) {
-            $this->assertContains($dirtyRecordID, $ids);
-        }
+        $this->assertEquals($dirtyRecordIDs, $ids);
     }
 }

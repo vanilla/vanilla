@@ -1,0 +1,7 @@
+
+This is some paragraph text
+with a soft break, so it will appear in the same <p> tag
+
+While this is a new paragraph tag
+
+This is another paragraph tag

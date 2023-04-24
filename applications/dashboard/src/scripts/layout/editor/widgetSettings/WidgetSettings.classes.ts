@@ -135,6 +135,7 @@ export const widgetSettingsClasses = useThemeCache(() => {
                 justifyContent: "flex-end",
                 flex: "0 0 59%",
                 maxWidth: "59%",
+                flexDirection: "column",
 
                 "& textarea, & input": {
                     fontSize: 13,

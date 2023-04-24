@@ -5,24 +5,24 @@
  */
 
 import { AppearanceNav } from "@dashboard/appearance/nav/AppearanceNav";
-import { ButtonTypes } from "@library/forms/buttonTypes";
-import { cx } from "@emotion/css";
-import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
-import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import { LoadStatus } from "@library/@types/api/core";
-import { t } from "@vanilla/i18n";
-import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
-import { useCollisionDetector } from "@vanilla/react-utils";
-import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
+import { BrandingAndSEOPageClasses } from "@dashboard/appearance/pages/BrandingAndSEOPage.classes";
 import AdminLayout from "@dashboard/components/AdminLayout";
+import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
+import { cx } from "@emotion/css";
+import { LoadStatus } from "@library/@types/api/core";
+import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
+import { useToast } from "@library/features/toaster/ToastContext";
 import Button from "@library/forms/Button";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import PanelWidget from "@library/layout/components/PanelWidget";
+import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import isEmpty from "lodash/isEmpty";
+import SmartLink from "@library/routing/links/SmartLink";
+import { t } from "@vanilla/i18n";
+import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
+import { useCollisionDetector, useLastValue } from "@vanilla/react-utils";
 import isEqual from "lodash/isEqual";
 import React, { useEffect, useMemo, useState } from "react";
-import SmartLink from "@library/routing/links/SmartLink";
-import { BrandingAndSEOPageClasses } from "@dashboard/appearance/pages/BrandingAndSEOPage.classes";
-import { useToast } from "@library/features/toaster/ToastContext";
 
 const BRANDING_SETTINGS: JsonSchema = {
     type: "object",
@@ -149,6 +149,16 @@ const BRANDING_SETTINGS: JsonSchema = {
                 inputType: "color",
             },
         },
+        "seo.metaHtml": {
+            type: "string",
+            "x-control": {
+                label: t("Meta Tags"),
+                description: t(
+                    "Meta Tags are used for domain verification for Google Search Console and other services. Copy the required Meta Tags from your source and paste onto a new line.",
+                ),
+                inputType: "codeBox",
+            },
+        },
         "labs.deferredLegacyScripts": {
             type: "boolean",
             "x-control": {
@@ -189,68 +199,39 @@ export default function BrandingAndSEOPage() {
 
     const toast = useToast();
 
-    // Load state for the setting values
-    const isLoaded = useMemo<boolean>(
-        () => [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status),
-        [settings],
-    );
-
-    const [value, setValue] = useState<JsonSchema>(
-        Object.fromEntries(
-            Object.keys(BRANDING_SETTINGS["properties"]).map((key) => [
-                key,
-                BRANDING_SETTINGS["properties"]["type"] === "boolean" ? false : "",
-            ]),
-        ),
-    );
-
-    const dirtySettings = useMemo(() => {
-        if (settings.data) {
-            return Object.keys(value).reduce(
-                (delta: { [key: string]: string | number | boolean }, currentKey: string) => {
-                    if (!isEqual(value[currentKey], settings.data?.[currentKey])) {
-                        return { ...delta, [currentKey]: value[currentKey] };
-                    }
-                    return delta;
-                },
-                {},
-            );
-        }
-        return {};
-    }, [settings, value]);
-
-    const handleSubmit = () => {
-        if (!isEmpty(dirtySettings)) {
-            patchConfig(dirtySettings);
-        }
-    };
-
     useEffect(() => {
-        if (isLoaded) {
-            setValue(() => {
-                return Object.fromEntries(Object.keys(settings.data ?? {}).map((key) => [key, settings?.data?.[key]]));
-            });
-        }
-        if (error && error.message) {
+        // When we first receive an error message add a toast.
+        if (error?.message) {
             toast.addToast({
                 dismissible: true,
                 body: <>{error.message}</>,
             });
         }
-    }, [isLoaded, settings, error]);
+    }, [error?.message]);
 
-    const settingsSchema = useMemo<JsonSchema>(() => {
-        if (isLoaded) {
-            return BRANDING_SETTINGS;
+    // Load state for the setting values
+    const isLoaded = [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status);
+    const wasLoaded = useLastValue(isLoaded);
+
+    const [value, setValue] = useState<JsonSchema>(
+        Object.fromEntries(
+            Object.keys(BRANDING_SETTINGS["properties"]).map((key) => [
+                key,
+                BRANDING_SETTINGS["properties"][key]["type"] === "boolean" ? false : "",
+            ]),
+        ),
+    );
+
+    useEffect(() => {
+        // Initialize the values we just loaded.
+        if (!wasLoaded && isLoaded && settings.data) {
+            setValue((existing) => ({ ...existing, ...settings.data }));
         }
-        const disabledProperties = Object.fromEntries(
-            Object.keys(BRANDING_SETTINGS?.properties).map((key) => {
-                return [key, { ...BRANDING_SETTINGS.properties[key], disabled: true }];
-            }),
-        );
+    }, [wasLoaded, isLoaded, settings.data]);
 
-        return { ...BRANDING_SETTINGS, properties: disabledProperties };
-    }, [isLoaded]);
+    const handleSubmit = () => {
+        patchConfig(value);
+    };
 
     const device = useTitleBarDevice();
     const { hasCollision } = useCollisionDetector();
@@ -261,11 +242,12 @@ export default function BrandingAndSEOPage() {
             adminBarHamburgerContent={<AppearanceNav asHamburger />}
             activeSectionID={"appearance"}
             title={t("Branding & SEO")}
+            compactTitleBar
             titleBarActions={
                 <Button
                     buttonType={ButtonTypes.OUTLINE}
                     onClick={() => handleSubmit()}
-                    disabled={isPatchLoading || !Object.keys(dirtySettings).length}
+                    disabled={isPatchLoading || !isLoaded}
                 >
                     {isPatchLoading ? <ButtonLoader buttonType={ButtonTypes.DASHBOARD_PRIMARY} /> : t("Save")}
                 </Button>
@@ -275,7 +257,9 @@ export default function BrandingAndSEOPage() {
             content={
                 <section>
                     <JsonSchemaForm
-                        schema={settingsSchema}
+                        disabled={!isLoaded}
+                        fieldErrors={error?.errors ?? {}}
+                        schema={BRANDING_SETTINGS}
                         instance={value}
                         FormControlGroup={DashboardFormControlGroup}
                         FormControl={DashboardFormControl}
@@ -284,14 +268,14 @@ export default function BrandingAndSEOPage() {
                 </section>
             }
             rightPanel={
-                <>
+                <PanelWidget>
                     <h3>{t("Heads up!")}</h3>
                     <p>
                         {t(
                             "Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.",
                         )}
                     </p>
-                </>
+                </PanelWidget>
             }
         />
     );

@@ -432,7 +432,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model
             $postedAuthKey = val("AuthenticationKey", $formPostValues);
             if ($default) {
                 $existingDefault = self::getDefault();
-                $isAlreadyDefault = $existingDefault && $existingDefault["AuthenticationKey"] !== $postedAuthKey;
+                $isAlreadyDefault = $existingDefault && $existingDefault["AuthenticationKey"] == $postedAuthKey;
                 if (!$isAlreadyDefault) {
                     $this->SQL->put($this->Name, ["IsDefault" => 0], ["AuthenticationKey <>" => $postedAuthKey]);
                 }

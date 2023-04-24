@@ -152,8 +152,8 @@ class ContentSecurityPolicyModelTest extends MinimalContainerTestCase
         $provider = new DefaultContentSecurityPolicyProvider($config);
         $cspModel->addProvider($provider);
 
-        if (is_subclass_of($expected, \Exception::class)) {
-            $this->expectException($expected);
+        if ($expected === Warning::class) {
+            $this->expectWarning();
             $cspModel->getXFrameString();
         } else {
             $this->assertEquals($expected, $cspModel->getXFrameString());

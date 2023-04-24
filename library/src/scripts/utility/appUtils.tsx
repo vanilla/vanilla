@@ -93,6 +93,14 @@ export function isAllowedUrl(input: string): boolean {
     return isURL(input);
 }
 
+/**
+ * Normalize the URL with a prepended http if there isn't one.
+ */
+export function normalizeUrl(urlToNormalize: string) {
+    const result = urlToNormalize.match(/^https?:\/\//) ? urlToNormalize : "http://" + urlToNormalize;
+    return result;
+}
+
 export interface ISiteSection {
     basePath: string;
     contentLocale: string;

@@ -120,4 +120,15 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
     {
         return $this->payload["comment"]["insertUserID"];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionID(): ?string
+    {
+        if (isset($this->payload["comment"]["siteSectionIDs"])) {
+            return $this->payload["comment"]["siteSectionIDs"][0] ?? null;
+        }
+        return null;
+    }
 }

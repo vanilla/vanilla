@@ -1,70 +1,117 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { FilterFrame } from "@library/search/panels/FilterFrame";
-import InputTextBlock from "@library/forms/InputTextBlock";
-import { t } from "@vanilla/i18n";
-import { useSearchForm } from "@library/search/SearchContext";
-import { dateRangeClasses } from "@library/forms/dateRangeStyles";
-import Permission, { PermissionMode } from "@library/features/users/Permission";
-import { MultiRoleInput } from "@dashboard/roles/MultiRoleInput";
+import AdvancedMembersFilters from "@dashboard/components/panels/AdvancedMembersFilters";
+import { FilteredProfileFields } from "@dashboard/components/panels/FilteredProfileFields";
+import mapProfileFieldsToSchemaForFilterForm from "@dashboard/components/panels/mapProfileFieldsToSchemaForFilterForm";
 import { IMemberSearchTypes } from "@dashboard/components/panels/memberSearchTypes";
-import LazyDateRange from "@library/forms/LazyDateRange";
+import { useProfileFields } from "@dashboard/userProfiles/state/UserProfiles.hooks";
+import { ProfileField } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { FormControl, FormControlGroup } from "@library/forms/FormControl";
+import InputBlock from "@library/forms/InputBlock";
+import { FilterFrame } from "@library/search/panels/FilterFrame";
+import { useSearchForm } from "@library/search/SearchContext";
+import { t } from "@vanilla/i18n";
+import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
+import { useFormik } from "formik";
+import React, { useEffect, useMemo } from "react";
 
 interface IProps {}
 
-export function MembersSearchFilterPanel(props: IProps) {
-    const { form, updateForm, search, getFilterComponentsForDomain } = useSearchForm<IMemberSearchTypes>();
+export function MembersSearchFilterPanel(_props: IProps) {
+    const { form, updateForm, search, getFiltersSchemaForDomain } = useSearchForm<IMemberSearchTypes>();
 
-    const classesDateRange = dateRangeClasses();
+    const quickFiltersSchema = getFiltersSchemaForDomain("members");
+
+    const profileFieldConfigs = useProfileFields({ enabled: true }, { filterPermissions: true });
+
+    const searchableProfileFields = useMemo<ProfileField[]>(() => {
+        if (profileFieldConfigs.data) {
+            return profileFieldConfigs.data.filter((profileField) => profileField.displayOptions.search);
+        }
+        return [];
+    }, [profileFieldConfigs]);
+
+    const profileFieldsFiltersSchema = useMemo<JsonSchema | undefined>(() => {
+        if (searchableProfileFields) {
+            return mapProfileFieldsToSchemaForFilterForm(searchableProfileFields);
+        }
+    }, [searchableProfileFields]);
+
+    const combinedSchema: JsonSchema = {
+        ...quickFiltersSchema,
+        properties: {
+            ...quickFiltersSchema.properties,
+            profileFields: profileFieldsFiltersSchema,
+        },
+    };
+
+    const formKeys = [...new Set([...Object.keys(combinedSchema.properties)])];
+
+    const shouldRenderAdvancedFilters = Object.keys(profileFieldsFiltersSchema?.properties ?? {}).length > 0;
+
+    const valuesFromSearchForm = {
+        ...Object.fromEntries(formKeys.map((formKey) => [formKey, form[formKey] ?? undefined])),
+        profileFields: form["profileFields"] ?? {},
+    };
+
+    const { values, submitForm, setValues, setFieldValue, resetForm, isSubmitting } = useFormik({
+        initialValues: valuesFromSearchForm as any, //most of the form is dynamic... but tighten it up if possible
+        onSubmit: async () => {
+            await search();
+        },
+    });
+
+    useEffect(() => {
+        updateForm({ ...Object.fromEntries(formKeys.map((formKey) => [formKey, values[formKey] ?? undefined])) });
+    }, [values]);
+
+    const allFormValuesEmpty = useMemo(
+        () =>
+            !Object.values(values).some((value: any) =>
+                typeof value === "object" ? Object.values(value).some((val) => !!val) : !!value,
+            ),
+        [values],
+    );
+
     return (
-        <FilterFrame title={t("Filter Results")} handleSubmit={search}>
-            <InputTextBlock
-                label={t("Username")}
-                inputProps={{
-                    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                        const { value } = event.target;
-                        updateForm({ username: value });
-                    },
-                    value: form.username || undefined,
-                }}
-            ></InputTextBlock>
-            <Permission permission={"personalInfo.view"} mode={PermissionMode.GLOBAL}>
-                <InputTextBlock
-                    label={t("Email")}
-                    inputProps={{
-                        onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                            const { value } = event.target;
-                            updateForm({ email: value });
-                        },
-                        value: form.email || undefined,
-                    }}
-                ></InputTextBlock>
-            </Permission>
+        <FilterFrame
+            title={t("Filter Results")}
+            handleSubmit={submitForm}
+            handleClearAll={() => resetForm({ values: {} })}
+            disableClearAll={allFormValuesEmpty}
+        >
+            {shouldRenderAdvancedFilters && (
+                <InputBlock>
+                    <AdvancedMembersFilters
+                        schema={combinedSchema}
+                        values={values}
+                        onSubmit={async (newValues) => {
+                            await setValues(newValues);
+                            await submitForm();
+                        }}
+                    />
 
-            <LazyDateRange
-                label={t("Registered")}
-                onStartChange={(date: string) => {
-                    updateForm({ startDate: date });
+                    <FilteredProfileFields
+                        values={values.profileFields}
+                        onChange={(values) => {
+                            setFieldValue("profileFields", values);
+                        }}
+                    />
+                </InputBlock>
+            )}
+
+            <JsonSchemaForm
+                schema={quickFiltersSchema}
+                instance={values}
+                onChange={(quickFiltersValues) => {
+                    setValues({ ...values, ...quickFiltersValues });
                 }}
-                onEndChange={(date: string) => {
-                    updateForm({ endDate: date });
-                }}
-                start={form.startDate}
-                end={form.endDate}
-                className={classesDateRange.root}
+                FormControl={FormControl}
+                FormControlGroup={FormControlGroup}
             />
-            <MultiRoleInput
-                label={t("Role")}
-                value={form.roleIDs ?? []}
-                onChange={(ids: number[]) => {
-                    updateForm({ roleIDs: ids });
-                }}
-            />
-            {getFilterComponentsForDomain("members")}
         </FilterFrame>
     );
 }

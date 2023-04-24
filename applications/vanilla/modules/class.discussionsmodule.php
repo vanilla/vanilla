@@ -112,9 +112,8 @@ class DiscussionsModule extends Gdn_Module
         }
 
         $discussionModel = new DiscussionModel();
-
+        $where = [];
         $categoryIDs = $this->getCategoryIDs();
-        $where = ["Announce" => "all"];
 
         if ($categoryIDs) {
             $visibleCategoryIDs = CategoryModel::instance()->getVisibleCategoryIDs(["filterHideDiscussions" => true]);
@@ -124,7 +123,7 @@ class DiscussionsModule extends Gdn_Module
             $where["d.CategoryID"] = $categoryIDs;
         }
 
-        $this->setData("Discussions", $discussionModel->get(0, $limit, $where));
+        $this->setData("Discussions", $discussionModel->getWhere($where, "", "", $limit));
     }
 
     public function assetTarget()

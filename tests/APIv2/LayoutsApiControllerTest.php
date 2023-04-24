@@ -358,7 +358,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $response = $this->api()->post("/layouts/hydrate", [
             "layout" => $layoutDefinition,
             "params" => $params,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
         $layout = $this->getDiscussionListLayoutMinusDiscussions($response->getBody()["layout"]);
@@ -369,7 +369,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $layout = $this->api()->post("/layouts", [
             "name" => "My Layout",
             "layout" => $layoutDefinition,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
 
         $response = $this->api()->put("/layouts/{$layout["layoutID"]}/views", [
@@ -380,7 +380,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         ]);
 
         $response = $this->api()->get("/layouts/lookup-hydrate", [
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
             "recordID" => $category["categoryID"],
             "recordType" => "category",
             "params" => $params,
@@ -418,7 +418,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $response = $this->api()->post("/layouts/hydrate", [
             "layout" => $layoutDefinition,
             "params" => $params,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
         $layout = $response->getBody()["layout"];
@@ -431,7 +431,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $layout = $this->api()->post("/layouts", [
             "name" => "My Layout",
             "layout" => $layoutDefinition,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
         $response = $this->api()->get("/layouts/{$layout["layoutID"]}/hydrate-assets", [
             "params" => $params,
@@ -472,7 +472,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $response = $this->api()->post("/layouts/hydrate", [
             "layout" => $layoutDefinition,
             "params" => $params,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -481,7 +481,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $layout = $this->api()->post("/layouts", [
             "name" => "My Layout",
             "layout" => $layoutDefinition,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
 
         $response = $this->api()->put("/layouts/{$layout["layoutID"]}/views", [
@@ -492,7 +492,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         ]);
 
         $response = $this->api()->get("/layouts/lookup-hydrate-assets", [
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
             "recordID" => $category["categoryID"],
             "recordType" => "category",
             "params" => $params,
@@ -511,7 +511,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         // The actual schema generation is pretty well tested over in vanilla/garden-hydrate
         // so this is just requesting the endpoint to make sure it gets parameters applied properly.
 
-        $response = $this->api()->get("/layouts/schema", ["layoutViewType" => "home"]);
+        $response = $this->api()->get("/layouts/schema", ["layoutViewType" => "discussionList"]);
         $this->assertEquals(200, $response->getStatusCode());
 
         // Home asset was applied.

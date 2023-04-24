@@ -789,10 +789,11 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable
             $quotedColumns = array_map(function ($col) {
                 return "`$col`";
             }, $columns);
+            $indexType = str_starts_with("UX", $indexName) ? " UNIQUE " : "";
             $columnString = implode(",", $quotedColumns);
             $sql = <<<SQL
 ALTER TABLE `{$tableName}`
-ADD INDEX {$indexName} ({$columnString}), ALGORITHM=INPLACE, LOCK=NONE
+ADD $indexType INDEX {$indexName} ({$columnString}), ALGORITHM=INPLACE, LOCK=NONE
 SQL;
 
             $this->table($tableName);

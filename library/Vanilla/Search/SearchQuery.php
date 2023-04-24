@@ -328,13 +328,14 @@ abstract class SearchQuery
      * Set int range filter
      *
      * @param string $attribute The attribute to filter.
-     * @param int $min The minimum value for the attribute.
-     * @param int $max The maximum value for the attribute.
-     * @param bool $exclude Whether or not the values are exlusive.
+     * @param int|null $min The minimum value for the attribute.
+     * @param int|null $max The maximum value for the attribute.
+     * @param bool $exclude Whether the values are exclusive.
+     * @param bool $isDate Whether the attribute is a date and min and max are timestamps
      *
      * @return $this
      */
-    public function setFilterRange(string $attribute, int $min, int $max, bool $exclude = false)
+    public function setFilterRange(string $attribute, ?int $min, ?int $max, bool $exclude = false, bool $isDate = true)
     {
         return $this;
     }

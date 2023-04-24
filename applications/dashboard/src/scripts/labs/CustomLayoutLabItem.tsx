@@ -13,9 +13,10 @@ import { t } from "@vanilla/i18n";
 import React, { useMemo } from "react";
 
 const LAYOUT_PAGES = ["home", "discussionList", "categoryList"];
+export const configKeys = LAYOUT_PAGES.map((page) => `customLayout.${page}`);
 
 export function CustomLayoutLabItem() {
-    const config = useConfigsByKeys(LAYOUT_PAGES.map((page) => `customLayout.${page}`));
+    const config = useConfigsByKeys(configKeys);
 
     const disabledProps = useMemo(() => {
         const { status, data } = config;

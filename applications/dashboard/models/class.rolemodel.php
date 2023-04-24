@@ -205,8 +205,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
         if (Gdn::session()->checkPermission("Garden.Settings.Manage")) {
             return $this->getArray();
         }
-        // Users that can't edit other users can't assign any roles.
-        if (!Gdn::session()->checkPermission("Garden.Users.Edit")) {
+        // Users that can't edit or add other users can't assign any roles.
+        if (!Gdn::session()->checkPermission(["Garden.Users.Edit", "Garden.Users.Add"], false)) {
             return [];
         }
 

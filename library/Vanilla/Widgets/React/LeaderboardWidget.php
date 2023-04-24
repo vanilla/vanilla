@@ -13,10 +13,13 @@ use Vanilla\Dashboard\Models\UserLeaderQuery;
 use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\Forms\ApiFormChoices;
+use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
+use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
 use Vanilla\Models\UserFragmentSchema;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
@@ -57,7 +60,7 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
      */
     private function mapUserToWidgetItem(array $user): array
     {
-        $points = $user["Points"] ?? 0;
+        $points = $user["Points"] ?? ($user["points"] ?? 0);
         $user = UserFragmentSchema::normalizeUserFragment($user);
 
         return [
@@ -71,12 +74,24 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
      */
     public function getProps(): ?array
     {
+        //filter by category or siteSection (subcommunity)
+        $categoryID = null;
+        $siteSectionID = null;
+
+        if ($this->props["apiParams"]["filter"] === "category" && $this->props["apiParams"]["categoryID"]) {
+            $categoryID = $this->props["apiParams"]["categoryID"];
+        } elseif ($this->props["apiParams"]["filter"] === "siteSection" && $this->props["apiParams"]["siteSectionID"]) {
+            $siteSectionID = $this->props["apiParams"]["siteSectionID"];
+        }
+
         $query = new UserLeaderQuery(
             $this->props["apiParams"]["slotType"],
-            $this->props["apiParams"]["categoryID"] ?? null,
+            $categoryID,
+            $siteSectionID,
             $this->props["apiParams"]["limit"],
             $this->props["apiParams"]["includedRoleIDs"] ?? null,
-            $this->props["apiParams"]["excludedRoleIDs"] ?? null
+            $this->props["apiParams"]["excludedRoleIDs"] ?? null,
+            $this->props["apiParams"]["leaderboardType"] ?? null
         );
         $users = $this->userLeaderService->getLeaders($query);
         if (count($users) === 0) {
@@ -99,7 +114,15 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
             "type" => "integer",
             "default" => null,
             "description" => "The category user points should be calculated in.",
-            "x-control" => DiscussionsApiIndexSchema::getCategoryIDFormOptions(),
+            "x-control" => DiscussionsApiIndexSchema::getCategoryIDFormOptions(
+                new FieldMatchConditional(
+                    "apiParams.filter",
+                    Schema::parse([
+                        "type" => "string",
+                        "const" => "category",
+                    ])
+                )
+            ),
         ]);
 
         $includedRolesIDsSchema = Schema::parse([
@@ -128,20 +151,47 @@ class LeaderboardWidget extends AbstractReactModule implements ReactWidgetInterf
             ),
         ]);
 
-        // Check that the "Track points separately" feature is enabled.
-        $userLeaderService = Gdn::getContainer()->get(UserLeaderService::class);
-        $trackPointsSeparately = $userLeaderService->isTrackPointsSeparately();
+        $filterEnum = ["none", "category"];
+        $filterStaticFormChoices = ["none" => "None", "category" => "Category"];
+
+        $siteSectionModel = \Gdn::getContainer()->get(SiteSectionModel::class);
+        $siteSectionIDSchema = $siteSectionModel->getSiteSectionFormOption(
+            new FieldMatchConditional(
+                "apiParams.filter",
+                Schema::parse([
+                    "type" => "string",
+                    "const" => "siteSection",
+                ])
+            )
+        );
+
+        // include subcommunities filter
+        if ($siteSectionIDSchema !== null) {
+            $filterEnum[] = "siteSection";
+            $filterStaticFormChoices["siteSection"] = "Subcommunity";
+        }
+
+        $filterBySchema = Schema::parse([
+            "enum" => $filterEnum,
+            "description" => "Choose filter type.",
+            "default" => "none",
+            "type" => "string",
+            "x-control" => SchemaForm::dropDown(
+                new FormOptions("Filter By"),
+                new StaticFormChoices($filterStaticFormChoices)
+            ),
+        ]);
+
         $apiParams = [
             "slotType?" => UserPointsModel::slotTypeSchema(),
             "leaderboardType?" => UserPointsModel::leaderboardTypeSchema(),
+            "filter?" => $filterBySchema,
+            "categoryID?" => $categoryIDSchema,
+            "siteSectionID?" => $siteSectionIDSchema,
             "limit?" => UserPointsModel::limitSchema(),
             "includedRoleIDs?" => $includedRolesIDsSchema,
             "excludedRoleIDs?" => $excludedRolesIDsSchema,
         ];
-        // If the "Track points separately" feature is enabled we add `categoryID` to the schema.
-        if ($trackPointsSeparately) {
-            $apiParams["categoryID:i?"] = $categoryIDSchema;
-        }
 
         $widgetSpecificSchema = Schema::parse([
             "apiParams?" => Schema::parse($apiParams),

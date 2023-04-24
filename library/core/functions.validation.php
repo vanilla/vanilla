@@ -543,22 +543,27 @@ if (!function_exists("validateLength")) {
      */
     function validateLength($value, $field)
     {
-        $useByteLength = isset($field->ByteLength);
-
-        if (function_exists("mb_strlen") && !$useByteLength) {
-            $diff = mb_strlen($value, "UTF-8") - $field->Length;
+        $lengthDiff = mb_strlen($value, "UTF-8") - $field->Length;
+        if (isset($field->ByteLength)) {
+            $byteLengthDiff = mb_strlen($value, "8bit") - $field->ByteLength;
         } else {
-            $diff = strlen($value) - $field->ByteLength;
+            $byteLengthDiff = 0;
         }
 
-        if ($diff <= 0) {
-            return true;
-        } else {
-            $translationCode = $useByteLength
-                ? t("ValidateByteLength", '%1$s is %2$s bytes too long.')
-                : t("ValidateLength", '%1$s is %2$s characters too long.');
-            return sprintf($translationCode, t($field->Name), $diff);
+        $result = true;
+
+        if ($lengthDiff > 0) {
+            $result = sprintf(t("ValidateLength", '%1$s is %2$s characters too long.'), t($field->Name), $lengthDiff);
+        } elseif ($byteLengthDiff > 0) {
+            // Only show an error about byte length if there is no error about length.
+            $result = sprintf(
+                t("ValidateByteLength", '%1$s is %2$s bytes too long.'),
+                t($field->Name),
+                $byteLengthDiff
+            );
         }
+
+        return $result;
     }
 }
 

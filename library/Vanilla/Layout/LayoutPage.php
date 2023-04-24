@@ -91,8 +91,12 @@ class LayoutPage extends ThemedPage
         $this->setJsonLDItems($json);
         $this->setSeoTitle($seo["title"]);
         $this->setSeoDescription($seo["description"]);
-        $this->addMetaTag($seo["meta"]);
-        $this->addLinkTag($seo["links"]);
+        foreach ($seo["meta"] as $meta) {
+            $this->addMetaTag($meta);
+        }
+        foreach ($seo["links"] as $link) {
+            $this->addLinkTag($link);
+        }
 
         $reduxActionPending = new RawReduxAction([
             "type" => "@@layouts/lookup/pending",

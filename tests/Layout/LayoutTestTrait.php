@@ -8,7 +8,7 @@
 namespace VanillaTests\Layout;
 
 use Garden\Hydrate\DataHydrator;
-use Monolog\Test\TestCase;
+use PHPUnit\Framework\TestCase;
 use Vanilla\Layout\LayoutHydrator;
 
 trait LayoutTestTrait
@@ -120,7 +120,9 @@ trait LayoutTestTrait
                                     "siteSectionID" => "0",
                                     "sort" => "-dateLastComment",
                                     "limit" => 10,
+                                    "pinOrder" => "first",
                                     "expand" => ["all", "-body"],
+                                    "excludeHiddenCategories" => true,
                                 ],
                                 "discussions" => [],
                                 "title" => null,

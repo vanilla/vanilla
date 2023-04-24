@@ -9,6 +9,7 @@ namespace Vanilla\Utility;
 
 use Psr\Log\LoggerInterface;
 use Vanilla\Logger;
+use Vanilla\Logging\ErrorLogger;
 
 /**
  * Contains some light weight timers for profiling and logging application code.
@@ -23,6 +24,8 @@ final class Timers implements \JsonSerializable
 {
     const TIMERS = ["cacheRead", "cacheWrite", "dbRead", "dbWrite"];
 
+    const LOGGED_FIELDS = ["human", "time", "count", "max"];
+
     private const DEFAULT_TIMER = [
         "time" => 0.0,
         "human" => "0",
@@ -34,6 +37,11 @@ final class Timers implements \JsonSerializable
     private $timers = [];
 
     private $customTimers = [];
+
+    /**
+     * @var array<string, int>
+     */
+    private $warningLimitsMs = [];
 
     /**
      * Start a timer.
@@ -56,7 +64,7 @@ final class Timers implements \JsonSerializable
             if (isset($timer["start"]) && !isset($timer["stop"])) {
                 trigger_error("Timer was started while another one was running: $n", E_USER_NOTICE);
                 // This timer was started, but not stopped, stop it now.
-                $timer = $this->stopInternal($timer, $now);
+                $timer = $this->stopInternal($n, $timer, $now);
             }
             $this->timers[$n] = $result[$n] = $this->startInternal($timer, $now);
         }
@@ -66,14 +74,32 @@ final class Timers implements \JsonSerializable
     /**
      * Set a timer's stop fields and return it.
      *
-     * @param array $timer The name of the timer to stop.
+     * @param string $name The name of the timer.
+     * @param array $timer The timer to stop.
      * @param float $now The current time.
+     * @param array $warningContext Context to pass along to elapsed time warning.
+     *
      * @return array Returns the time array properly stopped.
      */
-    private function stopInternal(array $timer, float $now): array
+    private function stopInternal(string $name, array $timer, float $now, array $warningContext = []): array
     {
         $timer["stop"] = $now;
         $elapsed = ($timer["stop"] - $timer["start"]) * 1000.0;
+        $elapsedHuman = self::formatDuration($elapsed);
+
+        $warningLimitMs = $this->warningLimitsMs[$name] ?? null;
+        if ($warningLimitMs !== null && $elapsed > $warningLimitMs) {
+            // Issue a warning that the timer took too long.
+            ErrorLogger::warning(
+                "Timer {$name} took {$elapsedHuman}. This was longer than the allowed limit.",
+                ["timerWarning", $name],
+                [
+                    "elapsedMs" => $elapsed,
+                    "allowedMs" => $warningLimitMs,
+                ] + $warningContext
+            );
+        }
+
         $timer["time"] += $elapsed;
         $timer["human"] = self::formatDuration($timer["time"]);
         if ($timer["min"] === null || $timer["min"] > $elapsed) {
@@ -142,9 +168,11 @@ final class Timers implements \JsonSerializable
      * Stop a timer.
      *
      * @param string|string[] $name The name of the timer to stop or an array of names.
+     * @param array $warningContext Context to pass along to elapsed time warning.
+     *
      * @return array Returns the timer row or an array of timer rows..
      */
-    public function stop($name): array
+    public function stop($name, array $warningContext = []): array
     {
         if (!is_string($name) && !is_array($name)) {
             throw new \InvalidArgumentException("Timers::stop() expects a string or array.", 400);
@@ -162,7 +190,7 @@ final class Timers implements \JsonSerializable
                 $timer = $this->startInternal($timer, $now);
             }
 
-            $this->timers[$n] = $result[$n] = $this->stopInternal($timer, $now);
+            $this->timers[$n] = $result[$n] = $this->stopInternal($n, $timer, $now, $warningContext);
         }
         return is_string($name) ? $result[$name] : $result;
     }
@@ -195,9 +223,9 @@ final class Timers implements \JsonSerializable
     public function stopAll(): void
     {
         $now = microtime(true);
-        foreach ($this->timers as &$timer) {
+        foreach ($this->timers as $name => &$timer) {
             if (!isset($timer["stop"])) {
-                $timer = $this->stopInternal($timer, $now);
+                $timer = $this->stopInternal($name, $timer, $now);
             }
         }
     }
@@ -239,7 +267,16 @@ final class Timers implements \JsonSerializable
      */
     public function jsonSerialize()
     {
-        return $this->timers;
+        $res = [];
+
+        foreach ($this->timers as $name => $timer) {
+            foreach ($timer as $field => $val) {
+                if (in_array($field, self::LOGGED_FIELDS)) {
+                    $res[$name][$field] = $val;
+                }
+            }
+        }
+        return $res;
     }
 
     /**
@@ -273,6 +310,17 @@ final class Timers implements \JsonSerializable
     public function addCustomTimer(string $timer): void
     {
         $this->customTimers[] = $timer;
+    }
+
+    /**
+     * Set a number of ms at which a timer will generate a warning.
+     *
+     * @param string $timerName
+     * @param int $warnAtMs
+     */
+    public function setWarningLimit(string $timerName, int $warnAtMs)
+    {
+        $this->warningLimitsMs[$timerName] = $warnAtMs;
     }
 
     /**

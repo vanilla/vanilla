@@ -70,7 +70,7 @@ public function base_render_beforebase_render_beforebase_render_beforebase_rende
 
 <div class="embedExternal embedImage">
   <div class="embedExternal-content">
-      <a class="embedImage-link" href="https://us.v-cdn.net/5022541/uploads/293/WYDAXHVB5VP4.png" rel="nofollow noreferrer noopener ugc" target="_blank">
+      <a class="embedImage-link" href="https://us.v-cdn.net/5022541/uploads/293/WYDAXHVB5VP4.png" rel="nofollow noopener ugc" target="_blank">
          <img class="embedImage-img" src="https://us.v-cdn.net/5022541/uploads/293/WYDAXHVB5VP4.png" alt="image.png">
       </a>
   </div>
@@ -78,7 +78,7 @@ public function base_render_beforebase_render_beforebase_render_beforebase_rende
 
 <div class="embedExternal embedImage">
   <div class="embedExternal-content">
-      <a class="embedImage-link" href="https://us.v-cdn.net/5022541/uploads/605/ZWG1GNJIG7JL.png" rel="nofollow noreferrer noopener ugc" target="_blank">
+      <a class="embedImage-link" href="https://us.v-cdn.net/5022541/uploads/605/ZWG1GNJIG7JL.png" rel="nofollow noopener ugc" target="_blank">
          <img class="embedImage-img" src="https://us.v-cdn.net/5022541/uploads/605/ZWG1GNJIG7JL.png" alt="image.png">
       </a>
   </div>
@@ -86,7 +86,7 @@ public function base_render_beforebase_render_beforebase_render_beforebase_rende
 
 <div class="embedExternal embedImage">
   <div class="embedExternal-content">
-     <a class="embedImage-link" href="https://us.v-cdn.net/5022541/uploads/382/CIQR7QWIU422.jpg" rel="nofollow noreferrer noopener ugc" target="_blank">
+     <a class="embedImage-link" href="https://us.v-cdn.net/5022541/uploads/382/CIQR7QWIU422.jpg" rel="nofollow noopener ugc" target="_blank">
         <img class="embedImage-img" src="https://us.v-cdn.net/5022541/uploads/382/CIQR7QWIU422.jpg" alt="Untitled Image">
      </a>
   </div>

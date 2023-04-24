@@ -2,7 +2,7 @@
 /**
  * Activity Model.
  *
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
@@ -16,7 +16,6 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Vanilla\CurrentTimeStamp;
-use Vanilla\Dashboard\Models\ActivityEmail;
 use Vanilla\FloodControlTrait;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\Formats;
@@ -29,6 +28,7 @@ use Vanilla\Scheduler\LongRunnerNextArgs;
 use Vanilla\Scheduler\LongRunnerQuantityTotal;
 use Vanilla\Scheduler\LongRunnerSuccessID;
 use Vanilla\Scheduler\LongRunnerTimeoutException;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\DebugUtils;
 use Vanilla\Web\SystemCallableInterface;
@@ -112,6 +112,9 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
     /** @var UserModel */
     private $userModel;
 
+    /** @var UserMetaModel */
+    private UserMetaModel $userMetaModel;
+
     /** @var CacheInterface */
     private $cache;
 
@@ -145,6 +148,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
                 ? $eventDispatcher
                 : Gdn::getContainer()->get(EventDispatcherInterface::class);
         $this->userModel = Gdn::getContainer()->get(UserModel::class);
+        $this->userMetaModel = Gdn::getContainer()->get(UserMetaModel::class);
         $this->cache = Gdn::getContainer()->get(CacheInterface::class);
     }
 
@@ -167,11 +171,9 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         if ($join) {
             $this->SQL
                 ->select("au.Name", "", "ActivityName")
-                ->select("au.Gender", "", "ActivityGender")
                 ->select("au.Photo", "", "ActivityPhoto")
                 ->select("au.Email", "", "ActivityEmail")
                 ->select("ru.Name", "", "RegardingName")
-                ->select("ru.Gender", "", "RegardingGender")
                 ->select("ru.Email", "", "RegardingEmail")
                 ->select("ru.Photo", "", "RegardingPhoto")
                 ->join("User au", "a.ActivityUserID = au.UserID")
@@ -452,7 +454,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userModel->joinUsers(
             $result->resultArray(),
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Email", "Gender", "Photo"]]
+            ["Join" => ["Name", "Email", "Photo"]]
         );
         $this->calculateData($result->resultArray());
 
@@ -516,7 +518,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userModel->joinUsers(
             $result->resultArray(),
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Email", "Gender", "Photo"]]
+            ["Join" => ["Name", "Email", "Photo"]]
         );
         $this->calculateData($result->resultArray());
 
@@ -670,7 +672,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userModel->joinUsers(
             $result,
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Photo", "Email", "Gender"]]
+            ["Join" => ["Name", "Photo", "Email"]]
         );
 
         $this->EventArguments["Data"] = &$result;
@@ -740,17 +742,23 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
      *
      * Events: BeforeGetCount.
      *
-     * @param string $userID Unique ID of user.
+     * @param array|string $wheres Where conditions to apply to the query.
+     * @param int|null $userID Unique ID of user.
+     *
      * @return int Number of activity items found.
      * @since 2.0.0
      * @access public
      */
-    public function getCount($userID = "")
+    public function getCount($wheres = "", ?int $userID = null)
     {
         $this->SQL
             ->select("a.ActivityID", "count", "ActivityCount")
             ->from("Activity a")
             ->join("ActivityType t", "a.ActivityTypeID = t.ActivityTypeID");
+
+        if (is_array($wheres)) {
+            $this->SQL->where($wheres);
+        }
 
         if ($userID != "") {
             $this->SQL
@@ -883,7 +891,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userModel->joinUsers(
             $result->resultArray(),
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Photo", "Email", "Gender"]]
+            ["Join" => ["Name", "Photo", "Email"]]
         );
         $this->calculateData($result->resultArray());
 
@@ -1083,7 +1091,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         Gdn::userModel()->joinUsers(
             $activities,
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Email", "Gender", "Photo"]]
+            ["Join" => ["Name", "Email", "Photo"]]
         );
     }
 
@@ -1091,7 +1099,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
      * Get default notification preference for an activity type.
      *
      * @param string $activityType
-     * @param array $preferences
+     * @param array|int $preferencesOrUserID
      * @param null|string $type One of the following:
      *  - Popup: Popup a notification.
      *  - Email: Email the notification.
@@ -1101,14 +1109,23 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
      * @since 2.0.0
      * @access public
      */
-    public static function notificationPreference($activityType, $preferences, $type = null)
+    public static function notificationPreference($activityType, $preferencesOrUserID, $type = null)
     {
-        if (is_numeric($preferences)) {
-            $user = Gdn::userModel()->getID($preferences);
+        if (is_numeric($preferencesOrUserID)) {
+            $user = Gdn::userModel()->getID($preferencesOrUserID);
             if (!$user) {
                 return $type == "both" ? [false, false] : false;
             }
             $preferences = val("Preferences", $user);
+            if (!is_array($preferences)) {
+                $preferences = [];
+            }
+
+            // Grab preferences from usermeta as well.
+            $metaPrefs = \Gdn::userMetaModel()->getUserMeta($preferencesOrUserID, "Preferences.%", [], "Preferences.");
+            $preferences = array_merge($preferences, $metaPrefs);
+        } else {
+            $preferences = $preferencesOrUserID;
         }
 
         if ($type === null) {
@@ -1222,7 +1239,8 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $emailTemplate = $email
             ->getEmailTemplate()
             ->setButton($url, val("ActionText", $activity, t("Check it out")))
-            ->setTitle($this->getEmailSubject($activity, $options));
+            ->setTitle($this->getEmailSubject($activity, $options))
+            ->setFooter($this->getNotificationPreferencePageLink($email->getFormat()), "", "", false);
 
         if ($message = $this->getEmailMessage($activity)) {
             $emailTemplate->setMessage($message, true);
@@ -1255,6 +1273,25 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             $this->SQL->put("Activity", ["Emailed" => $activity["Emailed"]], ["ActivityID" => $activityID]);
         }
         return true;
+    }
+
+    /**
+     * Get a footer link for notifcation prefernce page
+     *
+     * @param $format
+     * @return string
+     */
+    public function getNotificationPreferencePageLink($format = "text"): string
+    {
+        $linkText = t("Log in here to update your notification preferences");
+        $linkUri = url("/profile/preferences", true);
+        if ($format == "text") {
+            $link = $linkText . ": " . $linkUri;
+        } else {
+            $link = anchor($linkText, $linkUri, ["target" => "_blank"]);
+        }
+
+        return $link;
     }
 
     /**
@@ -1572,7 +1609,8 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
                 $emailTemplate = $email
                     ->getEmailTemplate()
                     ->setButton($url, val("ActionText", $activity, t("Check it out")))
-                    ->setTitle(Gdn_Format::plainText(val("Headline", $activity)));
+                    ->setTitle(Gdn_Format::plainText(val("Headline", $activity)))
+                    ->setFooter($this->getNotificationPreferencePageLink($email->getFormat()), "", "", false);
 
                 if ($message = $this->getEmailMessage($activity)) {
                     $emailTemplate->setMessage($message, true);
@@ -1649,8 +1687,10 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         }
         [$popup, $email] = self::notificationPreference($preference, $activity["NotifyUserID"], "both");
 
-        $activity["Notified"] = $popup ? self::SENT_PENDING : self::SENT_SKIPPED;
-        $activity["Emailed"] = $email ? self::SENT_PENDING : self::SENT_SKIPPED;
+        $activity["Notified"] =
+            $popup && !Gdn::config("Garden.Popups.Disabled") ? self::SENT_PENDING : self::SENT_SKIPPED;
+        $activity["Emailed"] =
+            $email && !Gdn::config("Garden.Email.Disabled") ? self::SENT_PENDING : self::SENT_SKIPPED;
 
         return $activity;
     }

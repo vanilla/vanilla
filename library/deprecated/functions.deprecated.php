@@ -1130,7 +1130,7 @@ if (!function_exists("attribute")) {
                 $val = json_encode($val);
             }
 
-            if ($val != "" && $attribute != "Standard") {
+            if (!is_array($val) && $val != "" && $attribute != "Standard") {
                 $return .= " " . $attribute . '="' . htmlspecialchars($val, ENT_COMPAT, "UTF-8") . '"';
             }
         }

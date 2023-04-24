@@ -63,10 +63,10 @@ class SmartIDMiddleware
     /**
      * SmartIDMiddleware constructor.
      *
-     * @param string $basePath The base path to match in order to apply the middleware.
      * @param \Gdn_SQLDriver $sql Used to look up smart IDs.
+     * @param string $basePath The base path to match in order to apply the middleware.
      */
-    public function __construct(string $basePath = "/", \Gdn_SQLDriver $sql)
+    public function __construct(\Gdn_SQLDriver $sql, string $basePath = "/")
     {
         $this->setBasePath($basePath);
         $this->sql = clone $sql;

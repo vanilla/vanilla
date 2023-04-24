@@ -116,7 +116,7 @@ class ModelTest extends BootstrapTestCase
             "()max length" => [["tinytext" => str_repeat("a", 255)]],
             "too long plaintext" => [
                 ["tinytext" => str_repeat("a", 256)],
-                "tinytext is 1 bytes too long.",
+                "tinytext is 1 characters too long.",
                 "tinytext is 1 characters too long. tinytext is 1 byte too long",
             ],
             "too long multibyte" => [
@@ -125,7 +125,7 @@ class ModelTest extends BootstrapTestCase
             ],
             "short multibyte" => [["tinytext" => str_repeat("😱", 10)]],
             "max length varchar" => [["name" => str_repeat("😱", 20)]],
-            "too long varchar" => [["name" => str_repeat("😱", 51)], "name is 4 bytes too long"],
+            "too long varchar" => [["name" => str_repeat("😱", 51)], "name is 1 characters too long"],
         ];
     }
 

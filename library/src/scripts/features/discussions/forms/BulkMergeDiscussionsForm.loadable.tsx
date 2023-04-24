@@ -193,7 +193,7 @@ function DiscussionSelector(props: IDiscussionSelectorProps) {
     }
 
     return (
-        <RadioButtonGroup label={t("Choose the main discussion into which all comments will be merged:")}>
+        <RadioButtonGroup legend={t("Choose the main discussion into which all comments will be merged:")}>
             {discussions.status === LoadStatus.PENDING || discussions.status === LoadStatus.LOADING ? (
                 <RadioButtonGroup>
                     {props.discussionIDs.map((discussionID, i) => {

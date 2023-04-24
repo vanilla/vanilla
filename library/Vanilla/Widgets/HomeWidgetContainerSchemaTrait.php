@@ -101,7 +101,7 @@ trait HomeWidgetContainerSchemaTrait
         string $placeholder = null
     ): Schema {
         return Schema::parse([
-            "${fieldName}:s?" => [
+            "{$fieldName}:s?" => [
                 "type" => "string",
                 "description" => "Subtitle of the widget.",
                 "x-control" => SchemaForm::textBox(

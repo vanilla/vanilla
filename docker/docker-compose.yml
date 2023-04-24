@@ -1,0 +1,85 @@
+name: "vanilla"
+services:
+    database:
+        # This container currently only works on linux/amd64
+        # Forcing this causes other archs to use a translations layer if possible.
+        platform: "linux/amd64"
+        build:
+            context: "./images/mysql"
+        container_name: "database"
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+            MYSQL_DATABASE: vanilla_dev
+        networks:
+            - "vanilla-network"
+        volumes:
+            - "database:/var/lib/mysql"
+            - "logs-mysql:/var/log/mysql"
+    memcached:
+        build:
+            context: "./images/memcached"
+        networks:
+            - "vanilla-network"
+        container_name: memcached
+    nginx:
+        build:
+            context: "./images/nginx"
+        container_name: "nginx"
+        ports:
+            - "80:80"
+            - "8080:8080"
+            - "443:443"
+        depends_on:
+            - "php-fpm"
+        networks:
+            vanilla-network:
+                aliases: # Allows (sso|dev).vanilla.localhost to be resolved internally from php-fpm
+                    - "sso.vanilla.localhost"
+                    - "dev.vanilla.localhost"
+                    - "vanilla.test"
+                    - "vanilla.localhost"
+                    - "queue.vanilla.localhost"
+        volumes: &vanilla-volumes # Self-signed SSL certs
+            - "./images/nginx/certs:/usr/local/share/ca-certificates" # Mount self-signed certificates
+
+            # Link our parents so other useful minimal repos like our sso stubs and embed stubs can work.
+            # Also needed so relatively symlinked customer repositories work.
+            - "../../:/srv/vanilla-repositories"
+
+            # Needed in case our current directory is not named vanilla
+            - "../:/srv/vanilla-repositories/vanilla:cached"
+
+            # Not cached for consistency.
+            - "../conf:/srv/vanilla-repositories/conf"
+
+            # A few exclusions so that we don't have to sync some large directories.
+            - "/srv/vanilla-repositories/vanilla/.git" # Don't sync this one.
+            - "/srv/vanilla-repositories/vanilla/node_modules" # Don't sync this one.
+            - "/srv/vanilla-repositories/vanilla/.yarn" # Don't sync this one either.
+
+            # Specifically excluded because it runs in its own container.
+            - /srv/vanilla-repositories/vanilla-queue-service
+
+            # Sync nginx logs to a volume for usage in the logging container.
+            - logs-nginx:/var/log/nginx
+    php-fpm:
+        build:
+            context: "./images/php"
+            dockerfile: "./8.0/Dockerfile"
+        container_name: "php-fpm"
+        networks:
+            - "vanilla-network"
+        volumes: *vanilla-volumes
+
+volumes:
+    database:
+    logs-mysql:
+    logs-nginx:
+
+networks:
+    vanilla-network:
+        external: true
+        driver: "bridge"
+        name: "vanilla-network"

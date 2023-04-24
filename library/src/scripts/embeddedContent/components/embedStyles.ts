@@ -13,7 +13,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { important, percent, px } from "csx";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 import { userContentVariables } from "@library/content/UserContent.variables";
 
 export const embedContainerVariables = useThemeCache(() => {
@@ -65,6 +65,19 @@ export const embedContainerClasses = useThemeCache(() => {
     };
 
     const sizes: { [x in EmbedContainerSize]: CSSObject } = {
+        [EmbedContainerSize.INLINE]: {
+            width: "auto",
+            display: "inline-flex",
+            alignItems: "center",
+            maxWidth: percent(100),
+            padding: "2px 6px",
+            lineHeight: 1,
+            textAlign: "start",
+            // Tiny bit of margin so that our cursor appears on the left and right.
+            marginLeft: 1,
+            marginRight: 1,
+            position: "relative",
+        },
         [EmbedContainerSize.SMALL]: {
             width: px(500),
             maxWidth: percent(100),
@@ -79,7 +92,12 @@ export const embedContainerClasses = useThemeCache(() => {
         },
     };
 
-    const makeRootClass = (size: EmbedContainerSize, inEditor: boolean, withPadding: boolean = true) =>
+    const makeRootClass = (
+        size: EmbedContainerSize,
+        inEditor: boolean,
+        withPadding: boolean = true,
+        withShadow: boolean = true,
+    ) =>
         style(size, {
             ...Mixins.font({
                 ...globalVars.fontSizeAndWeightVars("medium"),
@@ -89,16 +107,20 @@ export const embedContainerClasses = useThemeCache(() => {
             background: ColorsUtils.colorOut(userContentVariables().embeds.bg ?? vars.colors.bg),
             display: "block",
             position: "relative",
-            margin: "auto",
+            marginRight: "auto",
+            marginLeft: 0,
             padding: withPadding ? vars.spacing.padding : 0,
             ...(inEditor ? userSelect() : {}),
             ...sizes[size],
             ...Mixins.border(vars.border),
-            ...shadowOrBorderBasedOnLightness(
-                globalVars.body.backgroundImage.color,
-                Mixins.border(),
-                shadowHelper().embed(),
-            ),
+
+            ...(withShadow &&
+                shadowOrBorderBasedOnLightness(
+                    globalVars.body.backgroundImage.color,
+                    Mixins.border(),
+                    shadowHelper().embed(),
+                )),
+
             ...{
                 // These 2 can't be joined together or their pseudselectors don't get created properly.
                 "&.isLoading": {
@@ -145,7 +167,11 @@ export const embedContainerClasses = useThemeCache(() => {
         },
     });
 
-    return { makeRootClass, title };
+    const inlineWithFavicon = css({
+        top: 2,
+    });
+
+    return { makeRootClass, title, inlineWithFavicon };
 });
 
 export const embedContentClasses = useThemeCache(() => {
@@ -160,5 +186,13 @@ export const embedContentClasses = useThemeCache(() => {
         position: "relative",
     });
 
-    return { small, root };
+    const menuBar = css({
+        position: "absolute",
+        left: "50%",
+        top: 0,
+        transform: "translate(-50%, -20px)",
+        zIndex: 11,
+    });
+
+    return { small, root, menuBar };
 });

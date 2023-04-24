@@ -168,11 +168,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             $sender->addCssFile("vendors/tomorrow.css", "dashboard");
         }
 
-        // Check the statistics.
-        if ($sender->isRenderingMasterView()) {
-            Gdn::statistics()->check();
-        }
-
         if ($session->isValid()) {
             $confirmed = val("Confirmed", Gdn::session()->User, true);
             if (UserModel::requireConfirmEmail() && !$confirmed) {
@@ -234,11 +229,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             $sender->MessagesLoaded = "1"; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
         }
 
-        if ($sender->isRenderingMasterView()) {
-            $gdn_Statistics = Gdn::factory("Statistics");
-            $gdn_Statistics->check($sender);
-        }
-
         // Allow forum embedding
         if ($embed = c("Garden.Embed.Allow")) {
             // Record the remote url where the forum is being embedded.
@@ -265,7 +255,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             $sender->addDefinition("Path", Gdn::request()->path());
 
             $get = Gdn::request()->get();
-            unset($get["p"]); // kludge for old index.php?p=/path
             $sender->addDefinition("Query", http_build_query($get));
             // $Sender->addDefinition('MasterView', $Sender->MasterView);
             $sender->addDefinition("InDashboard", $sender->MasterView == "admin" ? "1" : "0");
@@ -577,14 +566,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 $sort
             )
             ->addLinkIf("Garden.Settings.Manage", t("Routes"), "/dashboard/routes", "site-settings.routes", "", $sort)
-            ->addLinkIf(
-                "Garden.Settings.Manage",
-                t("Statistics"),
-                "/dashboard/statistics",
-                "site-settings.statistics",
-                "",
-                $sort
-            )
 
             ->addGroup("API Integrations", "api", "", ["after" => "site-settings"])
 

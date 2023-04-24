@@ -26,7 +26,7 @@ class UserPointEvent extends UserEvent implements TrackingEventInterface
     public $collectionName;
 
     /**
-     * Construct the UserBadgeEvent based on a UserEvent.
+     * Construct the UserPointEvent based on a UserEvent.
      *
      * @param UserEvent $userEvent
      * @param array $pointData
@@ -95,6 +95,7 @@ class UserPointEvent extends UserEvent implements TrackingEventInterface
                     "date" => TrackableDateUtils::getDateTime($this->payload["point"]["dateUpdated"]),
                 ],
             ],
+            "user" => $trackableUserModel->getTrackableUser($this->sender["userID"]),
         ];
 
         // If the siteSectionID is set, we add it to the payload. We only send the first canonical one to keen.
@@ -118,5 +119,16 @@ class UserPointEvent extends UserEvent implements TrackingEventInterface
             default:
                 return "";
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionID(): ?string
+    {
+        if (isset($this->payload["point"]["siteSectionIDs"])) {
+            return $this->payload["point"]["siteSectionIDs"][0] ?? null;
+        }
+        return null;
     }
 }

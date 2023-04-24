@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\CurrentTimeStamp;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Models\TestCategoryModelTrait;
 use VanillaTests\Models\TestCommentModelTrait;
@@ -45,6 +46,7 @@ class DbaRecalculateCountsTest extends SiteTestCase
         $this->sql = $this->discussionModel->SQL;
         $this->categories = $this->discussions = $this->comments = $this->conversations = $this->users = [];
         $this->batches = 1;
+        CurrentTimeStamp::mockTime("2022-01-01");
         \Gdn::config()->set("Dba.Limit", 2);
         $this->setDicussionCountTestData();
     }
@@ -108,7 +110,9 @@ class DbaRecalculateCountsTest extends SiteTestCase
         $this->assertNull($body["callbackPayload"]);
         $this->assertEmpty($body["progress"]["failedIDs"]);
         $randomDiscussionIds = array_rand($this->discussions, 2);
-        $updatedDiscussions = $this->discussionModel->getWhere(["DiscussionID" => $randomDiscussionIds])->resultArray();
+        $updatedDiscussions = $this->discussionModel
+            ->getWhere(["DiscussionID" => $randomDiscussionIds, "Announce" => false])
+            ->resultArray();
         $fieldsToCompare = array_keys($set);
         foreach ($updatedDiscussions as $updatedDiscussion) {
             $discussionId = $updatedDiscussion["DiscussionID"];
@@ -164,7 +168,7 @@ class DbaRecalculateCountsTest extends SiteTestCase
     {
         // Reload discussions
         $discussionsRows = $this->discussionModel
-            ->getWhere(["DiscussionID" => array_keys($this->discussions)])
+            ->getWhere(["DiscussionID" => array_keys($this->discussions), "Announce" => false])
             ->resultArray();
         $this->discussions = [];
         foreach ($discussionsRows as $discussionsRow) {

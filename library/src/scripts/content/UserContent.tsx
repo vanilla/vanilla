@@ -6,9 +6,11 @@
 
 import { useHashScrolling } from "@library/content/hashScrolling";
 import { userContentClasses } from "@library/content/UserContent.styles";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 
 import { cx } from "@emotion/css";
+import { notEmpty } from "@vanilla/utils";
+import { mountAllEmbeds } from "@library/embeddedContent/embedService";
 
 interface IProps {
     className?: string;
@@ -27,6 +29,10 @@ export default function UserContent(props: IProps) {
     useHashScrolling(content, props.ignoreHashScrolling);
 
     const classes = userContentClasses();
+
+    useEffect(() => {
+        mountAllEmbeds();
+    }, []);
 
     return (
         <div
@@ -51,7 +57,7 @@ function useUnsafeResponsiveTableHTML(html: string) {
     }, [html]);
 }
 
-function responsifyTable(table: HTMLTableElement) {
+export function responsifyTable(table: HTMLTableElement) {
     let head: HTMLElement | null = table.querySelector("thead");
     if (!head) {
         // Check if our first body row is all ths
@@ -75,7 +81,9 @@ function responsifyTable(table: HTMLTableElement) {
     if (head) {
         head.classList.add("tableHead");
         // Apply labels for each table cell.
-        headLabels = Array.from(head.querySelectorAll("th")).map((th) => th.innerText);
+        headLabels = Array.from(head.querySelectorAll("th"))
+            .map((th) => th.textContent ?? null)
+            .filter(notEmpty);
         head.querySelectorAll("th").forEach((th) => th.setAttribute("scope", "col"));
     }
 

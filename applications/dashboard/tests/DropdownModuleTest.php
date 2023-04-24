@@ -27,7 +27,7 @@ class DropdownModuleTest extends TestCase
         $module = new \DropdownModule();
         $module->addLinkIf(false, "not added", "https://notadded.com");
         $module->addLinkIf(true, "added", "https://added.com");
-        $module->addLinkIf(true, "match", "http://vanilla.test/dropdownmoduletest");
+        $module->addLinkIf(true, "match", "https://vanilla.test/dropdownmoduletest");
         $module->addLinkIf(true, "match partial", "/");
 
         $expected = [
@@ -45,7 +45,7 @@ class DropdownModuleTest extends TestCase
             ],
             "item2" => [
                 "text" => "match",
-                "url" => "http://vanilla.test/dropdownmoduletest",
+                "url" => "https://vanilla.test/dropdownmoduletest",
                 "key" => [
                     0 => "item2",
                 ],

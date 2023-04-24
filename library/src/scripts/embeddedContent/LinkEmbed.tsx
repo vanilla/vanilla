@@ -12,6 +12,10 @@ import TruncatedText from "@library/content/TruncatedText";
 import { EmbedTitle } from "@library/embeddedContent/components/EmbedTitle";
 import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 import { cx } from "@emotion/css";
+import { embedContainerClasses } from "@library/embeddedContent/components/embedStyles";
+import { EmbedContainerSize } from "@library/embeddedContent/components/EmbedContainerSize";
+import { t } from "@vanilla/i18n";
+import { EmbedInlineContent } from "@library/embeddedContent/components/EmbedInlineContent";
 
 interface IProps extends IBaseEmbedProps {
     photoUrl?: string;
@@ -19,7 +23,7 @@ interface IProps extends IBaseEmbedProps {
 }
 
 export function LinkEmbed(props: IProps) {
-    const { name, url, photoUrl, body } = props;
+    const { name, url, photoUrl, body, embedStyle, faviconUrl } = props;
     const classesMetas = metasClasses();
     const title = name ? <EmbedTitle>{name}</EmbedTitle> : null;
 
@@ -30,14 +34,45 @@ export function LinkEmbed(props: IProps) {
         linkImage = <img src={photoUrl} className="embedLink-image" aria-hidden="true" loading="lazy" />;
     }
 
-    return (
+    return embedStyle === "rich_embed_inline" ? (
+        <EmbedInlineContent type="link">
+            <SmartLink
+                className={cx(
+                    "embedLink-link",
+                    embedContainerClasses().makeRootClass(EmbedContainerSize.INLINE, !!props.inEditor),
+                    { [embedContainerClasses().inlineWithFavicon]: !!faviconUrl },
+                    classesMetas.noUnderline,
+                )}
+                to={url}
+                rel="nofollow noopener ugc"
+                tabIndex={props.inEditor && !props.disableFocus ? -1 : 0}
+                aria-label={name}
+                onClick={(e) => {
+                    if (props.inEditor) {
+                        e.preventDefault();
+                    }
+                }}
+            >
+                {faviconUrl && (
+                    <img
+                        style={{ height: "1em", width: "1em", marginRight: 6 }}
+                        src={faviconUrl}
+                        role="decoration"
+                        alt={t("Site favicon")}
+                        tabIndex={-1}
+                    ></img>
+                )}
+                {name || url}
+            </SmartLink>
+        </EmbedInlineContent>
+    ) : (
         <EmbedContainer className="embedText embedLink">
             <EmbedContent type="link">
                 <SmartLink
                     className={cx("embedLink-link", classesMetas.noUnderline)}
                     to={url}
-                    rel="nofollow noreferrer ugc"
-                    tabIndex={props.inEditor ? -1 : 0}
+                    rel="nofollow noopener ugc"
+                    tabIndex={props.inEditor && !props.disableFocus ? -1 : 0}
                     aria-label={name}
                 >
                     <article className="embedText-body embedLink-body">

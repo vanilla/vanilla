@@ -982,7 +982,8 @@ class Gdn_Form extends Gdn_Pluggable
         string $label = "",
         string $description = ""
     ): string {
-        $value = $this->getValue($fieldName, null);
+        $value = $options["value"] ?? $this->getValue($fieldName, null);
+        unset($options["value"]);
 
         return $this->react(
             $fieldName,
@@ -1629,6 +1630,13 @@ class Gdn_Form extends Gdn_Pluggable
      *   InlineErrors  Show inline error message?   TRUE
      *               Allows disabling per-dropdown
      *               for multi-fields like date()
+     *   addMissing  Add current field value to the FALSE
+     *               dropdown, if it is not already
+     *               and option.
+     *  optionFormat If addMissing is set, will     blank
+     *               use this function to set
+     *               display parameter of the
+     *               option tag.
      *
      * @return string
      */
@@ -1682,9 +1690,8 @@ class Gdn_Form extends Gdn_Pluggable
         } elseif ($includeNull) {
             $return .= "<option value=\"\">$includeNull</option>\n";
         }
-
+        $fieldsExist = false;
         if (is_object($dataSet)) {
-            $fieldsExist = false;
             $valueField = arrayValueI("ValueField", $attributes, "value");
             $textField = arrayValueI("TextField", $attributes, "text");
             $data = $dataSet->firstRow();
@@ -1693,6 +1700,7 @@ class Gdn_Form extends Gdn_Pluggable
                     $return .= '<option value="' . htmlspecialchars($data->$valueField) . '"';
                     if (in_array($data->$valueField, $value) && $hasValue) {
                         $return .= ' selected="selected"';
+                        $fieldsExist = true;
                     }
 
                     $return .= ">" . $data->$textField . "</option>\n";
@@ -1710,10 +1718,22 @@ class Gdn_Form extends Gdn_Pluggable
                 $return .= '<option value="' . htmlspecialchars($id) . '"';
                 if (in_array($id, $value) && $hasValue) {
                     $return .= ' selected="selected"';
+                    $fieldsExist = true;
                 }
 
                 $return .= attribute($attribs) . ">" . $text . "</option>\n";
             }
+        }
+
+        if ($hasValue && !$fieldsExist && val("addMissing", $attributes, false)) {
+            $label = is_array($value) ? $value[0] : $value;
+            $return .= '<option value="' . htmlspecialchars($label) . '" selected="selected"';
+            $return .=
+                attribute($attribs) .
+                ">" .
+                (is_callable(val("optionFormat", $attributes, null))
+                    ? $attributes["optionFormat"]($label)
+                    : $label . "</option>\n");
         }
         $return .= "</select>";
 
@@ -3572,6 +3592,8 @@ PASSWORDMETER;
             "inlineerrors",
             "wrap",
             "categorydata",
+            "optionformat",
+            "addmissing",
         ];
         $return = "";
 

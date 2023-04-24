@@ -29,6 +29,8 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
 
     const TYPE_EDIT = "Edit";
     const TYPE_DELETE = "Delete";
+    const TYPE_SPOOF = "Spoof";
+    const TYPE_VFSPOOF = "VFSpoof";
     const TYPE_SPAM = "Spam";
     const TYPE_MODERATE = "Moderate";
     const TYPE_PENDING = "Pending";
@@ -602,6 +604,7 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
      *  - Spam: The record has been marked spam.
      *  - Moderate: The record requires moderation.
      *  - Pending: The record needs pre-moderation.
+     *  - Spoofed: The user has Spoofed in.
      * @param string $recordType The type of record being logged. This usually correspond to the tablename of the record.
      * @param array $data The record data.
      *  - If you are logging just one row then pass the row as an array.
@@ -611,6 +614,9 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
      */
     public static function insert($operation, $recordType, $data, $options = [])
     {
+        if (!c("Garden.Installed", false)) {
+            return false;
+        }
         if ($operation === false) {
             return false;
         }
@@ -652,6 +658,8 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
             "ParentRecordID" => $parentRecordID,
             "CategoryID" => self::logValue($data, "CategoryID"),
             "OtherUserIDs" => implode(",", val("OtherUserIDs", $options, [])),
+            "SpoofUserID" => self::logValue($data, "SpoofUserID"),
+            "SpoofUserName" => self::logValue($data, "SpoofUserName"),
             "Data" => dbencode($data),
         ];
         if ($logRow["RecordDate"] == null) {
@@ -1026,6 +1034,8 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
 
                 break;
             case self::TYPE_DELETE:
+            case self::TYPE_SPOOF:
+            case self::TYPE_VFSPOOF:
             case self::TYPE_SPAM:
             case self::TYPE_MODERATE:
             case self::TYPE_PENDING:

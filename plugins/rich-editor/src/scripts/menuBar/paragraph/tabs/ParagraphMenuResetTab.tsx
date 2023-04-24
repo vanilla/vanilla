@@ -6,9 +6,9 @@
 
 import React from "react";
 import classNames from "classnames";
-import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
+import { richEditorClasses } from "@library/editor/richEditorStyles";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { IconForButtonWrap } from "@rich-editor/editor/pieces/IconForButtonWrap";
+import { IconForButtonWrap } from "@library/editor/pieces/IconForButtonWrap";
 import { PilcrowIcon } from "@library/icons/editorIcons";
 
 interface IProps {

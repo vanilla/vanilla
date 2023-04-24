@@ -53,10 +53,14 @@ export const useBodyCSS = () => {
             h1, h2, h3, h4, h5, h6 {
                 line-height: ${globalVars.lineHeights.condensed};
                 color: ${ColorsUtils.colorOut(globalVars.mainColors.fgHeading)};
+                font-family: ${globalVars.fonts.families.headings};
             }
         `;
 
-        document.head.prepend(stylesheet);
+        document.head.insertBefore(
+            stylesheet,
+            document.head.querySelector("[data-emotion]") ?? document.head.firstChild,
+        );
 
         return function cleanup() {
             document.head.removeChild(stylesheet);

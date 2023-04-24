@@ -313,7 +313,7 @@ class EditorPlugin extends Gdn_Plugin
         if (is_array($options)) {
             uasort($options, function ($a, $b) {
                 if (!empty($a["sort"]) && !empty($b["sort"])) {
-                    return $a["sort"] < $b["sort"];
+                    return $a["sort"] <=> $b["sort"];
                 }
             });
         }

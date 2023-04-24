@@ -118,7 +118,7 @@ class ProfileFieldsApiController extends \AbstractApiController
         $this->permission("Garden.Settings.Manage");
 
         $in = $this->schema(Schema::parse([":o" => "Key-value mapping of apiName => sort"]));
-        $in->validate($body);
+        $body = $in->validate($body);
         $this->profileFieldModel->updateSorts($body);
     }
 
@@ -136,7 +136,13 @@ class ProfileFieldsApiController extends \AbstractApiController
         $in = $this->schema(Schema::parse(["apiName:s"]));
         $in->validate(["apiName" => $apiName]);
 
-        $this->getProfileFieldByApiName($apiName);
+        $profileField = $this->getProfileFieldByApiName($apiName);
+
+        // If the profileField destined to deletion is a core field, throw an error.
+        if (!empty($profileField["isCoreField"])) {
+            throw new Exception("This field is used by a core feature & can't be deleted.", 403);
+        }
+
         $this->profileFieldModel->delete(["apiName" => $apiName]);
     }
 
@@ -153,7 +159,7 @@ class ProfileFieldsApiController extends \AbstractApiController
             unset($profileField["dropdownOptions"]);
         }
 
-        // If we're chaning the formType to something other than "dropdown", null out the options.
+        // If we're changing the formType to something other than "dropdown", null out the options.
         if (
             $profileField["formType"] === ProfileFieldModel::FORM_TYPE_DROPDOWN &&
             isset($body["formType"]) &&

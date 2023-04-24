@@ -28,6 +28,9 @@ import { getSiteSection } from "@library/utility/appUtils";
 import { getSearchAnalyticsData } from "@library/search/searchAnalyticsData";
 import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
 import { stableObjectHash } from "@vanilla/utils";
+import { dateRangeToString } from "@library/search/utils";
+import { JsonSchema } from "@vanilla/json-schema-forms";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 interface IProps {
     children?: React.ReactNode;
@@ -55,6 +58,8 @@ export function getGlobalSearchSorts(): ISelectBoxItem[] {
 
 export function SearchFormContextProvider(props: IProps) {
     const [state, dispatch] = useReducer(searchReducer, INITIAL_SEARCH_STATE);
+
+    const { hasPermission } = usePermissionsContext();
 
     const { currentSource: searchSource } = useSearchSources();
 
@@ -85,9 +90,7 @@ export function SearchFormContextProvider(props: IProps) {
             }
         },
         PanelComponent: FilterPanelAll,
-        getAllowedFields: () => {
-            return ALLOWED_GLOBAL_SEARCH_FIELDS;
-        },
+        getAllowedFields: (_permissionChecker) => ALLOWED_GLOBAL_SEARCH_FIELDS,
         getRecordTypes: () => {
             // Gather all other domains, and return their types.
             const allTypes: string[] = [];
@@ -113,7 +116,7 @@ export function SearchFormContextProvider(props: IProps) {
         isIsolatedType: () => false,
     };
 
-    const getDomains = () => {
+    const getDomains = (): ISearchDomain[] => {
         return [{ ...ALL_CONTENT_DOMAIN, name: t(ALL_CONTENT_DOMAIN.name) }, ...SearchService.pluggableDomains];
     };
 
@@ -125,29 +128,58 @@ export function SearchFormContextProvider(props: IProps) {
         );
     };
 
-    const getDate = (form: ISearchForm): string | undefined => {
-        let dateInserted: string | undefined;
-        if (form.startDate && form.endDate) {
-            if (form.startDate === form.endDate) {
-                // Simple equality.
-                dateInserted = form.startDate;
-            } else {
-                // Date range
-                dateInserted = `[${form.startDate},${form.endDate}]`;
-            }
-        } else if (form.startDate) {
-            // Only start date
-            dateInserted = `>=${form.startDate}`;
-        } else if (form.endDate) {
-            // Only end date.
-            dateInserted = `<=${form.endDate}`;
-        }
-        return dateInserted;
-    };
+    function getAllowedFieldsForDomain(domainKey: ISearchDomain["key"]) {
+        const domain = getDomains().find((pluggableDomain) => {
+            return pluggableDomain.key === domainKey;
+        });
+
+        return [
+            ...domain!.getAllowedFields(hasPermission),
+            ...SearchService.additionalDomainFilterSchemaFields
+                .filter((additionalSchemaField) => additionalSchemaField.searchDomain === domainKey)
+                .map(({ fieldName }) => fieldName),
+        ];
+    }
+
+    function getFiltersSchemaForDomain(domainKey: ISearchDomain["key"]): JsonSchema {
+        const domain = getDomains().find((pluggableDomain) => {
+            return pluggableDomain.key === domainKey;
+        });
+
+        const domainFilterSchema = domain!.getFilterSchema?.(hasPermission) ?? {
+            type: "object",
+            properties: {},
+            required: [],
+        };
+
+        const extraFields = SearchService.additionalDomainFilterSchemaFields.filter(
+            (additionalSchemaField) => additionalSchemaField.searchDomain === domain!.key,
+        );
+
+        const extraProperties = Object.fromEntries(
+            extraFields.map(({ fieldName, schema }) => {
+                return [fieldName, schema];
+            }),
+        );
+
+        return {
+            ...domainFilterSchema,
+            properties: {
+                ...domainFilterSchema.properties,
+                ...(extraProperties as JsonSchema),
+            },
+        };
+    }
 
     const makeFilterForm = (form: ISearchForm): ISearchForm => {
         const currentDomain = getCurrentDomain();
-        const allowedFields = [...ALL_CONTENT_DOMAIN.getAllowedFields(), ...currentDomain.getAllowedFields()];
+
+        const allowedFields = Array.from(
+            new Set([
+                ...ALL_CONTENT_DOMAIN.getAllowedFields(hasPermission),
+                ...getAllowedFieldsForDomain(currentDomain.key),
+            ]),
+        );
         return Object.fromEntries(allowedFields.map((field) => [field, form[field]])) as ISearchForm;
     };
 
@@ -161,13 +193,13 @@ export function SearchFormContextProvider(props: IProps) {
 
         const commonQueryEntries = {
             ...filterForm,
-            limit: SEARCH_LIMIT_DEFAULT,
-            dateInserted: getDate(form),
-            locale: getCurrentLocale(),
             collapse: true,
+            ...currentDomain.transformFormToQuery?.(filterForm),
+            limit: SEARCH_LIMIT_DEFAULT,
+            dateInserted: dateRangeToString({ start: form.startDate, end: form.endDate }),
+            locale: getCurrentLocale(),
             sort,
             ...(form.offset && { offset: form.offset }),
-            ...currentDomain.transformFormToQuery?.(filterForm),
         };
         if (searchScope.value?.value) {
             commonQueryEntries.scope = searchScope.value.value;
@@ -356,6 +388,7 @@ export function SearchFormContextProvider(props: IProps) {
                 getCurrentDomain,
                 getDefaultFormValues,
                 resetForm,
+                getFiltersSchemaForDomain,
             }}
         >
             {props.children}

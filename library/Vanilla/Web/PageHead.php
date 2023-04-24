@@ -44,6 +44,8 @@ final class PageHead implements PageHeadInterface
     /** @var RequestInterface */
     protected $request;
 
+    protected SeoMetaModel $seoMetaModel;
+
     /**
      * Dependency Injection.
      *
@@ -53,6 +55,7 @@ final class PageHead implements PageHeadInterface
      * @param SiteMeta $siteMeta
      * @param WebpackAssetProvider $assetProvider
      * @param RequestInterface $request
+     * @param SeoMetaModel $seoMetaModel
      */
     public function __construct(
         ContentSecurityPolicyModel $cspModel,
@@ -60,7 +63,8 @@ final class PageHead implements PageHeadInterface
         EventManager $eventManager,
         SiteMeta $siteMeta,
         WebpackAssetProvider $assetProvider,
-        RequestInterface $request
+        RequestInterface $request,
+        SeoMetaModel $seoMetaModel
     ) {
         $this->cspModel = $cspModel;
         $this->preloadModel = $preloadModel;
@@ -68,6 +72,7 @@ final class PageHead implements PageHeadInterface
         $this->siteMeta = $siteMeta;
         $this->assetProvider = $assetProvider;
         $this->request = $request;
+        $this->seoMetaModel = $seoMetaModel;
     }
 
     /** @var string */
@@ -121,7 +126,6 @@ final class PageHead implements PageHeadInterface
     public function renderHtml(): Markup
     {
         $this->applyMetaTags();
-
         $this->inlineScripts[] = $this->assetProvider->getInlinePolyfillContents();
         $this->scripts = array_merge($this->scripts, $this->assetProvider->getScripts($this->assetSection));
         $this->styles = array_merge($this->styles, $this->assetProvider->getStylesheets($this->assetSection));
@@ -203,9 +207,9 @@ final class PageHead implements PageHeadInterface
     /**
      * @inheritdoc
      */
-    public function setJsonLdItems(array $jsonLDItemsArray)
+    public function setJsonLdItems(array $setJsonLDItems)
     {
-        $this->jsonLDArray = $jsonLDItemsArray;
+        $this->jsonLDArray = $setJsonLDItems;
     }
 
     /**
@@ -349,6 +353,12 @@ final class PageHead implements PageHeadInterface
         // When the Twitter card processor looks for tags on a page, it first checks for the Twitter-specific property,
         // and if not present, falls back to the supported Open Graph property.
         // From https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started#twitter-cards-and-open-graph
+
+        // Apply config based seo meta tags.
+        $seoMetas = $this->seoMetaModel->getMetas();
+        foreach ($seoMetas as $seoMeta) {
+            $this->addMetaTag($seoMeta);
+        }
     }
 
     /**

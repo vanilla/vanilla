@@ -7,7 +7,6 @@
 import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
 import { languageSettingsStyles } from "@dashboard/languages/LanguageSettings.styles";
 import { IAddon, ITranslationService } from "@dashboard/languages/LanguageSettingsTypes";
-import { cx } from "@emotion/css";
 import { useLocaleConfig } from "@library/config/configHooks";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -127,7 +126,7 @@ export const LocaleConfigurationModal = (props: IProps) => {
                 bodyWrapClass={classes.modalSuggestionOverride}
                 body={
                     <FrameBody>
-                        <div className={cx("frameBody-contents", classesFrameBody.contents)}>
+                        <div className={classesFrameBody.contents}>
                             <JsonSchemaForm
                                 schema={schema}
                                 instance={value}

@@ -8,7 +8,6 @@
 namespace Vanilla\Dashboard\controller\api;
 
 use AbstractApiController;
-use Garden\EventManager;
 use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
@@ -28,24 +27,16 @@ class UserMentionsApiController extends AbstractApiController
     /** @var LongRunner */
     private $longRunner;
 
-    /** @var EventManager */
-    private $eventManager;
-
     /**
      * UserMentionsApiController constructor.
      *
      * @param UserMentionsModel $userMentionsModel
      * @param LongRunner $longRunner
-     * @param EventManager $eventManager
      */
-    public function __construct(
-        UserMentionsModel $userMentionsModel,
-        LongRunner $longRunner,
-        EventManager $eventManager
-    ) {
+    public function __construct(UserMentionsModel $userMentionsModel, LongRunner $longRunner)
+    {
         $this->longRunner = $longRunner;
         $this->userMentionModel = $userMentionsModel;
-        $this->eventManager = $eventManager;
     }
 
     /**

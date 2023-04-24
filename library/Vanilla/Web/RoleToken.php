@@ -8,6 +8,7 @@
 namespace Vanilla\Web;
 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Garden\Web\RequestInterface;
 use Vanilla\CurrentTimeStamp;
 
@@ -163,7 +164,7 @@ class RoleToken
      */
     public function decode(string $encodedToken): RoleToken
     {
-        $this->decoded = (array) JWT::decode($encodedToken, $this->secret, [self::SIGNING_ALGORITHM]);
+        $this->decoded = (array) JWT::decode($encodedToken, new Key($this->secret, self::SIGNING_ALGORITHM));
         if (!empty($this->decoded[self::PAYLOAD_CLAIM_ROLE_IDS])) {
             $this->setRoleIDs($this->decoded[self::PAYLOAD_CLAIM_ROLE_IDS]);
         }

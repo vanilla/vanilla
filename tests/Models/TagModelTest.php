@@ -423,6 +423,25 @@ class TagModelTest extends \VanillaTests\SiteTestCase
     }
 
     /**
+     * Check that we cannot Add Tags without the "Vanilla.Tagging.Add" Permission.
+     */
+    public function testAddCustomTagTypesThroughDashboardWithputPermission(): void
+    {
+        $this->getSession()->start($this->adminID);
+
+        $this->assertContains("Garden.Community.Manage", $this->getSession()->getPermissionsArray());
+        // By default Admin permissions do not include "Vanilla.Tagging.Add" permission
+        $this->assertNotContains("Vanilla.Tagging.Add", $this->getSession()->getPermissionsArray());
+        // We set ourselves tagging permissions.
+        $this->expectExceptionMessage("You don't have permission to do that.");
+        $this->bessy()->post("/settings/tags/add?type=usablecustomtype", [
+            "FullName" => "A New Tag",
+            "Name" => "a-new-tag",
+            "Type" => "usablecustomtype",
+        ]);
+    }
+
+    /**
      * Check if we can Add Tags of a certain type(has addtag set to true). Also, we shouldn't be able to add tags for
      * tag types that have addtag set to false.
      */

@@ -402,7 +402,7 @@ class CategoryModel extends Gdn_Model implements
         $allowedDiscussionTypes = self::getAllowedDiscussionData($row);
         $allowedDiscussionTypes = array_keys($allowedDiscussionTypes);
 
-        $discussionTypes = array_intersect($allowedDiscussionTypes, $categoryAllowedDiscussionTypes);
+        $discussionTypes = array_intersect($categoryAllowedDiscussionTypes, $allowedDiscussionTypes);
 
         return $discussionTypes ?? [];
     }
@@ -837,6 +837,7 @@ class CategoryModel extends Gdn_Model implements
      *   - filterHideDiscussions (bool): Filter out categories with a truthy HideAllDiscussions column?
      *   - filterArchivedCategories (bool): Filter out categories that are archived.
      *   - forceArrayReturn (bool): Force an array return value.
+     *   - filterNonDiscussionCategories (bool) : Filter out categories with no discussion in them
      * @return array|bool An array of filtered categories or true if no categories were filtered.
      */
     public function getVisibleCategories(array $options = [])
@@ -861,6 +862,7 @@ class CategoryModel extends Gdn_Model implements
         $filterHideDiscussions = $options["filterHideDiscussions"] ?? false;
         $filterArchivedCategories = $options["filterArchivedCategories"] ?? false;
         $filterNonPostableCategories = $options["filterNonPostableCategories"] ?? false;
+        $filterNonDiscussionCategories = $options["filterNonDiscussionCategories"] ?? false;
 
         foreach ($categories as $categoryID => $category) {
             if ($filterHideDiscussions && ($category["HideAllDiscussions"] ?? false)) {
@@ -869,6 +871,11 @@ class CategoryModel extends Gdn_Model implements
             }
 
             if ($filterArchivedCategories && ($category["Archived"] ?? false)) {
+                $unfiltered = false;
+                continue;
+            }
+
+            if ($filterNonDiscussionCategories && $category["CountDiscussions"] == 0) {
                 $unfiltered = false;
                 continue;
             }
@@ -1477,6 +1484,7 @@ class CategoryModel extends Gdn_Model implements
                         ? $this->getCategoryAllowedDiscussionTypes($category)
                         : ["Discussion"];
                     $discussionTypes = array_map("lcfirst", $discussionTypes);
+                    $discussionTypes = array_values($discussionTypes);
                     $category["AllowedDiscussionTypes"] = $discussionTypes;
                     setValue($field, $row, $category);
                 }

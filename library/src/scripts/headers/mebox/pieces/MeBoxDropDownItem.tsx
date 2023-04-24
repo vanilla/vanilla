@@ -16,6 +16,7 @@ import classNames from "classnames";
 import { NoUserPhotoIcon } from "@library/icons/titleBar";
 import { userPhotoClasses } from "@library/headers/mebox/pieces/userPhotoStyles";
 import DateTime from "@library/content/DateTime";
+import StatusLight from "@library/statusLight/StatusLight";
 
 export enum MeBoxItemType {
     NOTIFICATION = "notification",
@@ -118,23 +119,14 @@ export default class MeBoxDropDownItem extends React.Component<IProps> {
                             )}
                         </div>
                     </div>
-                    {!unread && (
-                        <FlexSpacer
-                            className={classNames("meBoxMessage-status", "isRead", classesMeBoxMessage.status)}
-                        />
-                    )}
-                    {unread && (
-                        <div
+
+                    {unread ? (
+                        <StatusLight
                             title={t("Unread")}
-                            className={classNames(
-                                "u-flexSpacer",
-                                "meBoxMessage-status",
-                                "isUnread",
-                                classesMeBoxMessage.status,
-                            )}
-                        >
-                            <span className="sr-only">{t("Unread")}</span>
-                        </div>
+                            className={classNames(classesMeBoxMessage.status, "isUnread")}
+                        />
+                    ) : (
+                        <FlexSpacer className={classesMeBoxMessage.status} />
                     )}
                 </SmartLink>
             </li>

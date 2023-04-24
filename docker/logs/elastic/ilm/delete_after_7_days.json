@@ -1,0 +1,20 @@
+{
+    "policy": {
+        "phases": {
+            "hot": {
+                "min_age": "0ms",
+                "actions": {
+                    "set_priority": {
+                        "priority": 100
+                    }
+                }
+            },
+            "delete": {
+                "min_age": "7d",
+                "actions": {
+                    "delete": {}
+                }
+            }
+        }
+    }
+}

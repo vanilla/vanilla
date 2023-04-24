@@ -9,6 +9,7 @@
  */
 
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\TwigStaticRenderer;
 
 /**

@@ -35,6 +35,7 @@ class UserFragmentSchema extends Schema
                 "punished:i?", // The jailed status of the user.
                 "private:b?", // The private profile status of the user.
                 "label:s?",
+                "profileFields:o?",
             ])
         );
     }

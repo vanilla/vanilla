@@ -19,14 +19,14 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { IDiscussion, IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
 import { logError, notEmpty, RecordID, stableObjectHash } from "@vanilla/utils";
 import { useCurrentUserID } from "@library/features/users/userHooks";
-import { hasPermission, PermissionMode } from "@library/features/users/Permission";
-import { usePermissions } from "@library/features/users/userModel";
+import { PermissionMode } from "@library/features/users/Permission";
 import { getMeta, t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { useDiscussionCheckBoxContext } from "@library/features/discussions/DiscussionCheckboxContext";
 import { useToast } from "@library/features/toaster/ToastContext";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 export function useDiscussion(discussionID: IGetDiscussionByID["discussionID"]): ILoadable<IDiscussion> {
     const actions = useDiscussionActions();
@@ -177,7 +177,7 @@ export function useDiscussionList(
 }
 
 export function useUserCanEditDiscussion(discussion: IDiscussion) {
-    usePermissions();
+    const { hasPermission } = usePermissionsContext();
 
     const currentUserID = useCurrentUserID();
     const currentUserIsDiscussionAuthor = discussion.insertUserID === currentUserID;

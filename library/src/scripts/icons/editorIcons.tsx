@@ -6,7 +6,7 @@
 
 import React from "react";
 import { t } from "@library/utility/appUtils";
-import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
+import { richEditorClasses } from "@library/editor/richEditorStyles";
 import classNames from "classnames";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
 import { cx } from "@library/styles/styleShim";

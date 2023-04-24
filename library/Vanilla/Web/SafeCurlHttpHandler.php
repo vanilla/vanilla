@@ -21,11 +21,12 @@ class SafeCurlHttpHandler extends CurlHandler
     /**
      * Execute a curl handle using the SafeCurl wrapper.
      *
-     * @param resource $curlHandle The curl handle to execute.
+     * @param resource $ch The curl handle to execute.
      * @return HttpResponse Returns an {@link RestResponse} object with the information from the request
      */
-    protected function execCurl($curlHandle)
+    protected function execCurl($ch)
     {
+        $curlHandle = $ch;
         $url = curl_getinfo($curlHandle, CURLINFO_EFFECTIVE_URL);
         $safeCurl = new SafeCurl($curlHandle);
         $safeCurl->setFollowLocation($this->followLocation);

@@ -102,7 +102,7 @@ class FeaturedCollectionsWidget implements ReactWidgetInterface, CombinedPropsWi
     {
         return SchemaUtils::composeSchemas(
             self::widgetTitleSchema(),
-            self::widgetSubtitleSchema(),
+            self::widgetSubtitleSchema("subtitle"),
             self::widgetDescriptionSchema(),
             Schema::parse(["apiParams" => self::getApiSchema()]),
             self::displayOptionsSchema(),

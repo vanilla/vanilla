@@ -817,4 +817,33 @@ class CategoriesTest extends AbstractResourceTest
             $this->assertArrayNotHasKey($excludedName, $flippedNames);
         }
     }
+
+    /**
+     * Test that description lengths are properly served as a validation error.
+     *
+     * @see https://higherlogic.atlassian.net/browse/VNLA-2316
+     */
+    public function testTooLongDescription()
+    {
+        $this->expectExceptionCode(400);
+        $this->expectExceptionMessage("Description is 201 characters too long.");
+        $this->createCategory([
+            "description" =>
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras placerat aliquet ligula eget finibus. Suspendisse porttitor lorem eu lacus scelerisque, eu efficitur ante tincidunt. Suspendisse potenti. Curabitur porta massa lacus. Nulla facilisi. Vestibulum cursus, eros ut congue porttitor, magna enim eleifend urna, id tempor ipsum elit tincidunt risus. Vivamus felis elit, elementum vitae purus commodo, tempus posuere odio. Vivamus nec tellus faucibus, bibendum nisl vitae, aliquet lacus. Etiam ex felis, ullamcorper sit amet sem ut, vulputate laoreet quam. Donec ullamcorper ultricies dui, at cursus nulla fermentum et. Etiam at ipsum sit amet sem tincidunt volutpat quis vitae sapien. Cras ac felis venenatis tellus tempor euismod.Vestibulum nec massa at velit faucibus sodales vitae sit amet tortor. Morbi pretium euismod massa, vel volutpat urna luctus at. Sed posuere orci non mi vestibulum condimentum. Nam imperdiet nunc ac odio varius condimentum. Nam nec turpis tempus, luctus odio nec, semper ipsum. Donec vestibulum lorem ac interdum luctus. Praesent vel magna libero. Pellentesque mattis turpis a facilisis fringilla. Phasellus scelerisque arcu ligula, vel pellentesque nunc placerat eu.",
+        ]);
+    }
+    /**
+     * Test that using emojis won't break validation .
+     *
+     * @see https://higherlogic.atlassian.net/browse/VNLA-2316
+     */
+    public function testLongEmojiStringInDescription()
+    {
+        $this->expectExceptionCode(400);
+        $this->expectExceptionMessage("Description is 4 characters too long.");
+        $this->createCategory([
+            "description" =>
+                "👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦‍👩‍👧‍👧👩‍👧‍👦‍👩‍👧‍👦",
+        ]);
+    }
 }

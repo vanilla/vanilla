@@ -401,6 +401,9 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
             return !$item["isHidden"] && in_array($item["recordType"], $availableCounts);
         });
 
+        // re-index the counts array.
+        $filteredCounts = array_values($filteredCounts);
+
         $counts = array_map(function ($item) {
             return $item["recordType"];
         }, $filteredCounts);

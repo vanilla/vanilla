@@ -232,6 +232,61 @@ class TestHtmlDocument extends HtmlDocument
     }
 
     /**
+     * Assert that there is a form dropdown with a given name and option value selected.
+     *
+     * @param string $name The form input name.
+     * @param string|null $value The desired value. Pass `null` to not assert and just return the node.
+     * @return \DOMElement Returns the matched node.
+     */
+    public function assertFormDropdown(string $name, ?string $value = null): \DOMElement
+    {
+        $node = $this->assertCssSelectorExists("select[name=\"$name\"]", "Could not find form dropdown: $name");
+        if ($value !== null) {
+            $attr = $node->getAttribute("data-value");
+            TestCase::assertSame($value, $attr);
+        }
+        return $node;
+    }
+
+    /**
+     * Assert that there is a form Token Multiselect with a given name and option value selected.
+     *
+     * @param string $name The form input name.
+     * @param array|null $values The desired value. Pass `null` to not assert and just return the node.
+     * @return \DOMElement Returns the matched node.
+     */
+    public function assertFormToken(string $name, ?array $values = null): \DOMElement
+    {
+        $resultNode = $this->queryCssSelector("div[data-react='tokensInputInLegacyForm']");
+        $tokenInputFound = false;
+        $tokenInputNode = null;
+        $attributes = [];
+        TestCase::assertNotNull($resultNode, "could not find any token input");
+        for ($i = 0; $i < $resultNode->count(); $i++) {
+            $tokenInputNode = $resultNode->item($i);
+            $attributes = $tokenInputNode->getAttribute("data-props");
+            if (empty($attributes)) {
+                break;
+            }
+            $attributes = json_decode($attributes, true);
+            if ($attributes["fieldName"] == $name) {
+                $tokenInputFound = true;
+                break;
+            }
+        }
+        TestCase::assertTrue($tokenInputFound, "could not find token input: $name");
+        if ($values !== null) {
+            $attributes["initialValue"] = json_decode($attributes["initialValue"], true);
+            foreach ($attributes["initialValue"] as $selectedValue) {
+                $selectedValues[] = $selectedValue["value"];
+            }
+
+            TestCase::assertEquals($values, $selectedValues);
+        }
+        return $tokenInputNode;
+    }
+
+    /**
      * Assert that a css selector does not match.
      *
      * @param string $cssSelector The CSS selector query.

@@ -13,6 +13,8 @@ use Vanilla\Dashboard\Models\UserLeaderProviderInterface;
 use UserModel;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Dashboard\Models\UserLeaderQuery;
+use Vanilla\Site\SiteSectionModel;
+use function PHPUnit\Framework\isEmpty;
 
 /**
  * Service to load leaderboards.
@@ -46,8 +48,8 @@ class UserLeaderService
     /** @var ConfigurationInterface */
     private $config;
 
-    /** @var bool */
-    private $trackPointsSeparately = false;
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
 
     /**
      * DI.
@@ -55,18 +57,18 @@ class UserLeaderService
      * @param UserModel $userModel
      * @param RoleModel $roleModel
      * @param ConfigurationInterface $config
-     * @param bool $trackPointsSeparately
+     * @param SiteSectionModel $siteSectionModel
      */
     public function __construct(
         \UserModel $userModel,
         \RoleModel $roleModel,
         ConfigurationInterface $config,
-        bool $trackPointsSeparately = false
+        SiteSectionModel $siteSectionModel
     ) {
         $this->userModel = $userModel;
         $this->roleModel = $roleModel;
         $this->config = $config;
-        $this->setTrackPointsSeparately($trackPointsSeparately);
+        $this->siteSectionModel = $siteSectionModel;
     }
 
     /**
@@ -98,9 +100,12 @@ class UserLeaderService
 
         $query->timeSlot = gmdate("Y-m-d", \Gdn_Statistics::timeSlotStamp($query->slotType, false));
 
-        $pointsCategory = $this->getPointsCategory($query->categoryID);
-        $query->pointsCategoryID = $pointsCategory["CategoryID"] ?? 0;
-
+        if (!empty($query->siteSectionID)) {
+            $siteSection = $this->siteSectionModel->getByID($query->siteSectionID);
+            $query->pointsCategoryID = $siteSection ? $siteSection->getAttributes()["allCategories"] : 0;
+        } else {
+            $query->pointsCategoryID = $query->categoryID ?? 0;
+        }
         // We add moderators' user IDs to the excluded user IDs.
         if (empty($query->excludedRoleIDs)) {
             $moderatorRoleIDs = $this->getModeratorRoleIDs();
@@ -174,28 +179,6 @@ class UserLeaderService
     }
 
     /**
-     * Get the points category from a categoryID.
-     *
-     * @param int|null $categoryID
-     *
-     * @return array|null
-     */
-    public function getPointsCategory(?int $categoryID = null): ?array
-    {
-        if ($categoryID !== null) {
-            $categoryModel = \Gdn::getContainer()->get(\CategoryModel::class);
-            // IMPORTANT: Since this is used in the dashboard addon during bootstrapping
-            // We cannot constructor inject the category model, because it may not exist yet.
-            // This is because during installation, the dashboard addon is the first addon initialized.
-            $category = $categoryModel::categories($categoryID);
-            $categoryID = $category["PointsCategoryID"] ?? UserLeaderService::ROOT_POINTS_CATEGORYID;
-            $category = $categoryModel::categories($categoryID);
-            return $category;
-        }
-        return null;
-    }
-
-    /**
      * Get Moderator IDs to exclude from results.
      *
      * @return array
@@ -228,21 +211,5 @@ class UserLeaderService
         }
 
         return $moderatorRoleIDs;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTrackPointsSeparately(): bool
-    {
-        return $this->trackPointsSeparately;
-    }
-
-    /**
-     * @param bool $trackPointsSeparately
-     */
-    public function setTrackPointsSeparately(bool $trackPointsSeparately = true): void
-    {
-        $this->trackPointsSeparately = $trackPointsSeparately;
     }
 }

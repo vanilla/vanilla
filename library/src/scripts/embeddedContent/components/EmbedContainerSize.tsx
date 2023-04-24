@@ -5,6 +5,7 @@
  */
 
 export enum EmbedContainerSize {
+    INLINE = "inline",
     SMALL = "small",
     MEDIUM = "medium",
     FULL_WIDTH = "fullwidth",

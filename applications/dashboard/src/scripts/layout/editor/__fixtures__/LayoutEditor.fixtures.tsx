@@ -138,14 +138,14 @@ export class LayoutEditorFixture {
         };
     }
 
-    public static createMockLayoutsStore(state: { config?: object } = {}) {
+    public static createMockLayoutsStore(state: { config?: object; multisite?: object } = {}) {
         const testReducer = createReducer(
             {
                 config: {
                     configPatchesByID: {},
                     ...state.config,
                 },
-                multisite: {
+                multisite: state.multisite ?? {
                     products: {
                         enabled: false,
                         enableStatus: "SUCCESS",
@@ -159,14 +159,14 @@ export class LayoutEditorFixture {
                         subcommunitiesByID: {
                             status: "SUCCESS",
                             data: {
-                                "1": {
+                                10: {
                                     subcommunityID: 10,
                                     name: "Test Subcommunity",
                                     folder: "en",
                                     description: "",
-                                    categoryID: 16,
+                                    categoryID: null,
                                     locale: "en",
-                                    url: "https://dev.vanilla.localhost/es",
+                                    url: "https://dev.vanilla.localhost/en",
                                     siteSectionGroup: "subcommunities-group-10",
                                     siteSectionID: "subcommunities-section-10",
                                     isDefault: false,

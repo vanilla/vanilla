@@ -57,6 +57,18 @@ class ProfileControllerTest extends SiteTestCase
     }
 
     /**
+     * Test that when a guest user navigates to the "/profile" page, an error is triggered.
+     */
+    public function testProfilePageGuestRedirect(): void
+    {
+        $this->runWithUser(function () {
+            // In production, the failed permission check will then redirect to the login page.
+            $this->expectException(\Gdn_UserException::class);
+            $this->bessy()->get("/profile");
+        }, \UserModel::GUEST_USER_ID);
+    }
+
+    /**
      * Provide test cases for private/banned profiles.
      */
     public function provideUsersPrivateProfile(): array
@@ -532,5 +544,15 @@ class ProfileControllerTest extends SiteTestCase
         $this->getSession()->start($adminID);
 
         $this->doProfileEditSteps(["ShowEmail" => true], [self::OPT_USER_ID => $memberID]);
+    }
+
+    public function testUserWithSlashInName()
+    {
+        $user = $this->createUser([
+            "name" => "IHave/Slash",
+        ]);
+
+        $r = $this->bessy()->getJsonData($user["url"]);
+        $this->assertEquals(200, $r->getStatus());
     }
 }

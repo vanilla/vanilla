@@ -165,6 +165,7 @@ class TagsApiController extends AbstractApiController
     public function post(array $body): Data
     {
         $this->permission("Garden.Community.Manage");
+        $this->permission("Vanilla.Tagging.Add");
         $in = $this->tagModel->getPostTagSchema();
         // A null type should be saved as an empty string in the DB.
         $body["type"] = $body["type"] ?? "";
@@ -196,6 +197,7 @@ class TagsApiController extends AbstractApiController
             $result = new Data($validatedTag);
             return $result;
         }
+        return new Data();
     }
 
     /**
@@ -246,6 +248,7 @@ class TagsApiController extends AbstractApiController
             $result = new Data($validatedTag);
             return $result;
         }
+        return new Data();
     }
 
     /**

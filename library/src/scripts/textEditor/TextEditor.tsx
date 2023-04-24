@@ -63,11 +63,13 @@ const minimalOptions: Monaco.IEditorConstructionOptions = {
         vertical: "hidden",
         verticalScrollbarSize: 0,
     },
+    scrollBeyondLastLine: false,
     overviewRulerLanes: 0,
     glyphMargin: false,
     folding: false,
     lineDecorationsWidth: 12,
     lineNumbersMinChars: 3,
+    wordWrap: "on",
 };
 
 const fullOptions: Monaco.IEditorConstructionOptions = {

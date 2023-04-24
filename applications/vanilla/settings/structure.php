@@ -83,7 +83,7 @@ $Construct
     ->column("Description", "varchar(1000)", true)
     ->column("Sort", "int", true)
     ->column("CssClass", "varchar(50)", true)
-    ->column("Photo", "varchar(255)", true)
+    ->column("Photo", "varchar(767)", true)
     ->column("BannerImage", "varchar(255)", true)
     ->column("PermissionCategoryID", "int", "-1") // default to root.
     ->column("PointsCategoryID", "int", "0") // default to global.
@@ -355,7 +355,7 @@ $Construct
     ->table("User")
     ->column("CountDiscussions", "int", null)
     ->column("CountUnreadDiscussions", "int", null)
-    ->column("CountComments", "int", null)
+    ->column("CountComments", "int", null, ["index"])
     ->column("CountDrafts", "int", null)
     ->column("CountBookmarks", "int", null)
     ->set();
@@ -365,6 +365,7 @@ $Construct
     ->primaryKey("DraftID")
     ->column("DiscussionID", "int", true, "key")
     ->column("CategoryID", "int", true, "key")
+    ->column("Type", "varchar(10)", false, "key")
     ->column("InsertUserID", "int", false, "key")
     ->column("UpdateUserID", "int")
     ->column("Name", "varchar(100)", true)

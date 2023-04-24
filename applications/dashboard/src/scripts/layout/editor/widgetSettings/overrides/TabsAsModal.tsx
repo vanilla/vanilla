@@ -14,15 +14,15 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
-import { FormTreeControl } from "@library/tree/FormTreeControl";
+import { FormTreeControl, IFormTreeControl } from "@library/tree/FormTreeControl";
 import { t } from "@vanilla/i18n";
-import { IControlProps } from "@vanilla/json-schema-forms";
+import { IControlProps, IModalControl } from "@vanilla/json-schema-forms";
 
 export const TABS_AS_MODAL = {
     condition: (props: IControlProps): boolean => {
         return props.control.inputType === "modal" && props.rootSchema.description === "Tabs";
     },
-    callback: function TabsListModalControl(props: IControlProps) {
+    callback: function TabsListModalControl(props: IControlProps<IModalControl<IFormTreeControl>>) {
         const classes = modalClasses();
 
         const [isOpen, setOpen] = useState(false);
@@ -34,7 +34,8 @@ export const TABS_AS_MODAL = {
             setOpen(false);
         }
 
-        const control = props.control as any;
+        const control = props.control;
+
         const { description } = control.modalContent;
 
         return (

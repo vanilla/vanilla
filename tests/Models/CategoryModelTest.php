@@ -1253,6 +1253,32 @@ class CategoryModelTest extends SiteTestCase
     }
 
     /**
+     * Test `categoryModel->getVisibleCategories()`'s `filterNonDiscussionCategories` option.
+     *
+     * @return void
+     */
+    public function testVisibleCategoryfilterNonDiscussionCategories(): void
+    {
+        //create two categories
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        $newCategory = $this->createCategory();
+        $newCategoryID = $newCategory["categoryID"];
+
+        //Add Discussions to the first one
+        $discussions = [
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+        ];
+        $filteredCategories = $this->categoryModel->getVisibleCategories(["filterNonDiscussionCategories" => true]);
+        $filteredCategoryIDs = array_column($filteredCategories, "CategoryID");
+        $this->assertContains($categoryID, $filteredCategoryIDs);
+        $this->assertNotContains($newCategoryID, $filteredCategoryIDs);
+    }
+
+    /**
      * Test that when a child category is deleted, the CountCategories field of its parent is updated.
      */
     public function testCountCategoriesUpdated(): void

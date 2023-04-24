@@ -64,6 +64,6 @@
 }
 
 .embedImage-link {
-    display: inline-flex; // https://github.com/vanilla/support/issues/3336
+    display: flex; // https://github.com/vanilla/support/issues/3336
     flex-direction: column;
 }

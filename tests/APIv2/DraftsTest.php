@@ -157,4 +157,24 @@ class DraftsTest extends AbstractResourceTest
             }
         );
     }
+
+    /**
+     * Assert that post made using the API default to the Text format if none is provided.
+     */
+    public function testDraftEmptyFormat()
+    {
+        $draft = $this->api()
+            ->post($this->baseUrl, [
+                "recordType" => "discussion",
+                "parentRecordID" => 1,
+                "attributes" => [
+                    "body" => "Check the category picker",
+                ],
+            ])
+            ->getBody();
+        $result = $this->api()
+            ->get("$this->baseUrl/{$draft["draftID"]}")
+            ->getBody();
+        $this->assertEquals($result["attributes"]["format"], "Text");
+    }
 }

@@ -58,6 +58,7 @@ export const siteNavClasses = useThemeCache(() => {
 
     const style = styleFactory("siteNav");
 
+    const offset = vars.nodeToggle.width - vars.nodeToggle.iconWidth / 2 - vars.spacer.default;
     const root = style(
         {
             position: "relative",
@@ -65,7 +66,8 @@ export const siteNavClasses = useThemeCache(() => {
             zIndex: 1,
         },
         mediaQueries.noBleedDown({
-            marginLeft: styleUnit(vars.nodeToggle.width - vars.nodeToggle.iconWidth / 2 - vars.spacer.default),
+            marginLeft: offset,
+            width: `calc(100% - ${offset}px)`,
         }),
     );
 

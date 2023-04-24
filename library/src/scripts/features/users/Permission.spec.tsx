@@ -10,6 +10,7 @@ import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import React, { ReactElement } from "react";
+import { PermissionsContextProvider } from "@library/features/users/PermissionsContext";
 
 jest.mock("@library/apiv2");
 
@@ -120,7 +121,7 @@ describe("<Permission />", () => {
                         },
                     }}
                 >
-                    {props.children}
+                    <PermissionsContextProvider>{props.children}</PermissionsContextProvider>
                 </TestReduxProvider>
             );
         }

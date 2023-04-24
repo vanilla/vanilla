@@ -141,7 +141,7 @@ class QnAEventsTest extends VanillaTestCase
         $this->assertTrue($patchResponse->isSuccessful());
 
         $this->assertEventDispatched(
-            $this->expectedResourceEvent(AnswerEvent::class, ResourceEvent::ACTION_UPDATE, [
+            $this->expectedResourceEvent(AnswerEvent::class, AnswerEvent::ACTION_ANSWER_REJECTED, [
                 "commentID" => $answer1["commentID"],
                 "discussionID" => $question["discussionID"],
                 "qnA" => "Rejected",
@@ -182,7 +182,7 @@ class QnAEventsTest extends VanillaTestCase
         $this->assertTrue($patchResponse->isSuccessful());
 
         $this->assertEventDispatched(
-            $this->expectedResourceEvent(AnswerEvent::class, ResourceEvent::ACTION_UPDATE, [
+            $this->expectedResourceEvent(AnswerEvent::class, AnswerEvent::ACTION_ANSWER_ACCEPTED, [
                 "commentID" => $answer2["commentID"],
                 "discussionID" => $question["discussionID"],
                 "qnA" => "Accepted",

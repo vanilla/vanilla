@@ -7,6 +7,7 @@
 
 namespace Vanilla\Formatting\Formats;
 
+use Vanilla\Formatting\FormatRegexReplacements;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Formatting\Html\HtmlSanitizer;
@@ -45,19 +46,27 @@ class BBCodeFormat extends HtmlFormat
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $content, bool $enhance = true): string
+    public function renderHtml($content, bool $enhance = true): string
     {
-        $renderedBBCode = $this->bbcodeParser->format($content);
-        return parent::renderHtml($renderedBBCode, $enhance);
+        if ($content instanceof HtmlFormatParsed) {
+            return $content->getProcessedHtml();
+        } else {
+            $rendered = $this->bbcodeParser->format($content);
+        }
+        return parent::renderHtml($rendered, $enhance);
     }
 
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $value): string
+    public function renderQuote($content): string
     {
-        $renderedBBCode = $this->bbcodeParser->format($value);
-        return parent::renderQuote($renderedBBCode);
+        if ($content instanceof HtmlFormatParsed) {
+            $rendered = $content->getProcessedHtml();
+        } else {
+            $rendered = $this->bbcodeParser->format($content);
+        }
+        return parent::renderQuote($rendered);
     }
 
     /**
@@ -65,33 +74,22 @@ class BBCodeFormat extends HtmlFormat
      */
     public function removeUserPII(string $username, string $body): string
     {
-        [$pattern["atMention"], $replacement["atMention"]] = $this->getNonRichAtMentionReplacePattern(
-            $username,
-            $this->anonymizeUsername
+        $regex = new FormatRegexReplacements();
+        $regex->addReplacement(...$this->getNonRichAtMentionReplacePattern($username, $this->anonymizeUsername));
+        $regex->addReplacement(...$this->getUrlReplacementPattern($username, $this->anonymizeUrl));
+        $regex->addReplacement(
+            sprintf('~\[(quote|QUOTE)="%s;~', preg_quote($username)),
+            sprintf('[quote="%s;', $this->anonymizeUsername)
         );
 
-        [$pattern["url"], $replacement["url"]] = $this->getUrlReplacementPattern($username, $this->anonymizeUrl);
-
-        $pattern["quote"] = "~quote=\"$username;~";
-        $replacement["quote"] = "quote=\"$this->anonymizeUsername;";
-
-        $body = preg_replace($pattern, $replacement, $body);
-        return $body;
+        return $regex->replace($body);
     }
 
     /**
      * @inheritDoc
      */
-    public function parseAllMentions(string $body): array
+    public function parseAllMentions($body): array
     {
-        $matches = [];
-        $atMention = $this->getNonRichAtMention();
-        $urlMention = $this->getUrlPattern();
-        $quoteMention = '\[(quote|QUOTE)="?(?<quote_mentions>.+?);.*?"?\]';
-
-        $pattern = "~($atMention|$urlMention|$quoteMention)~";
-        preg_match_all($pattern, $body, $matches, PREG_UNMATCHED_AS_NULL);
-
-        return $this->normalizeMatches($matches);
+        return $this->getNonRichMentions($body, ['\[(?:quote|QUOTE)="?(.+?);']);
     }
 }

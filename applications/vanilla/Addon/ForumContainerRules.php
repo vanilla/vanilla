@@ -21,10 +21,12 @@ use Vanilla\Forum\Layout\View\LegacyNewDiscussionLayoutView;
 use Vanilla\Forum\Layout\Middleware\CategoryFilterMiddleware;
 use Vanilla\Forum\Models\CategoryCollectionProvider;
 use Vanilla\Forum\Models\DiscussionCollectionProvider;
+use Vanilla\Forum\Models\PostingSiteMetaExtra;
 use Vanilla\Forum\Models\Totals\CategorySiteTotalProvider;
 use Vanilla\Forum\Models\Totals\CommentSiteTotalProvider;
 use Vanilla\Forum\Models\Totals\DiscussionSiteTotalProvider;
 use Vanilla\Forum\Models\Totals\PostSiteTotalProvider;
+use Vanilla\Forum\Search\UserSearchOpenApi;
 use Vanilla\Forum\Widgets\DiscussionAnnouncementsWidget;
 use Vanilla\Forum\Widgets\DiscussionDiscussionsWidget;
 use Vanilla\Forum\Widgets\TagWidget;
@@ -42,7 +44,9 @@ use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\View\HomeLayoutView;
 use Vanilla\Models\CollectionModel;
+use Vanilla\Models\SiteMeta;
 use Vanilla\Models\SiteTotalService;
+use Vanilla\OpenAPIBuilder;
 use Vanilla\Utility\ContainerUtils;
 
 /**
@@ -111,6 +115,8 @@ class ForumContainerRules extends AddonContainerRules
             "customLayout.discussionList"
         );
 
+        $container->rule(SiteMeta::class)->addCall("addExtra", [new Reference(PostingSiteMetaExtra::class)]);
+
         // Collections.
         $container
             ->rule(CollectionModel::class)
@@ -121,5 +127,7 @@ class ForumContainerRules extends AddonContainerRules
             "forum",
             ["name" => "Forum"],
         ]);
+
+        $container->rule(OpenAPIBuilder::class)->addCall("addFilter", [new Reference(UserSearchOpenApi::class)]);
     }
 }

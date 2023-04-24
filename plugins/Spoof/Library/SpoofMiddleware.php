@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -77,6 +77,14 @@ class SpoofMiddleware
                     "name" => $originalUser->Name ?? null,
                 ],
             ]);
+        }
+
+        if ($this->session->Session) {
+            $attributes = $this->session->Session["Attributes"];
+
+            if (($attributes["SpoofUserID"] ?? false) && ($attributes["SpoofUserName"] ?? false)) {
+                $this->logger->addStaticContextDefaults(["user" => $attributes]);
+            }
         }
 
         $response = Data::box($next($request));

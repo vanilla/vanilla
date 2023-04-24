@@ -1,0 +1,71 @@
+name: "Vanilla"
+services:
+    es-logs:
+        container_name: "es-logs"
+        image: docker.elastic.co/elasticsearch/elasticsearch:${ES_STACK_VERSION}
+        environment:
+            - "ELASTICSEARCH_URL=http://es-logs:9200"
+            - "ELASTICSEARCH_HOSTS=http://es-logs:9200"
+            - discovery.type=single-node
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+            - xpack.security.enabled=false
+            - xpack.security.enrollment.enabled=false
+        volumes:
+            - es-logs:/usr/share/elasticsearch/data
+        ports:
+            - 9200:9200
+        networks:
+            - vanilla-network
+        deploy:
+            replicas: 1
+            update_config:
+                parallelism: 1
+                delay: 180s
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://0.0.0.0:9200/_cluster/health"]
+            interval: 5s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+    kibana-logs:
+        depends_on:
+            es-logs:
+                condition: service_healthy
+        container_name: "kibana-logs"
+        image: docker.elastic.co/kibana/kibana:${ES_STACK_VERSION}
+        ports:
+            - 5601:5601
+        volumes:
+            - kibana-data:/usr/share/kibana/data
+        environment:
+            ELASTICSEARCH_URL: http://es-logs:9200
+            ELASTICSEARCH_HOSTS: http://es-logs:9200
+            SERVER_PUBLICBASEURL: https://logs.vanilla.localhost
+            XPACK_APM_SERVICEMAPENABLED: "true"
+            XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
+        networks:
+            vanilla-network:
+    logstash:
+        container_name: logstash
+        build:
+            context: "./images/logstash"
+            args:
+                ES_STACK_VERSION: ${ES_STACK_VERSION}
+        expose:
+            - 10514
+        volumes:
+            - ./logs/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+            - ./logs/logstash/:/usr/share/logstash/pipeline/:ro
+            - logs-nginx:/var/log/nginx:ro
+        depends_on:
+            es-logs:
+                condition: service_healthy
+            kibana-logs:
+                condition: service_started
+        networks:
+            vanilla-network:
+
+volumes:
+    es-logs:
+    kibana-data:

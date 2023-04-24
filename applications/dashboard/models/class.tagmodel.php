@@ -170,15 +170,11 @@ class TagModel extends Gdn_Model
 
             return $toID;
         } else {
-            if (Gdn::session()->checkPermission("Vanilla.Tagging.Add")) {
-                // Tag-type tags (i.e., user generated tags) are saved with no type.
-                if (strtolower(val("Type", $formPostValues)) == "tag") {
-                    $formPostValues["Type"] = "";
-                }
-                return parent::save($formPostValues, $settings);
-            } else {
-                return false;
+            // Tag-type tags (i.e., user generated tags) are saved with no type.
+            if (strtolower(val("Type", $formPostValues)) == "tag") {
+                $formPostValues["Type"] = "";
             }
+            return parent::save($formPostValues, $settings);
         }
     }
 
@@ -908,7 +904,6 @@ class TagModel extends Gdn_Model
 
         $discussionModel = new DiscussionModel();
         $discussions = $discussionModel->getWhere([
-            "Announce" => "all",
             "d.DiscussionID" => $taggedDiscussionIDs,
         ]);
 

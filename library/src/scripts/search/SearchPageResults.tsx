@@ -149,6 +149,7 @@ function MetaFactory(props: { searchResult: ISearchResult }) {
         const query = {
             ...form,
             ...searchResult.subqueryExtraParams,
+            page: 1, // start from the first page in the extra results
         };
         let root = searchResult.siteDomain ?? "";
         if (root && window.location.href.startsWith(root)) {

@@ -42,76 +42,76 @@ class BreadcrumbStructureTest extends SharedBootstrapTestCase
     {
         $r = [
             [
-                [["Name" => "Categories", "Url" => "http://vanilla.test/categories"]],
+                [["Name" => "Categories", "Url" => "https://vanilla.test/categories"]],
                 true,
                 [],
                 '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList">' .
-                '<span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>' .
+                '<span class="CrumbLabel HomeCrumb"><a href="https://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>' .
                 '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">' .
                 '<meta itemprop="position" content="1" /><span class="Crumb">›</span> ' .
-                '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories"><span itemprop="name">Categories</span></a></span></span></span>',
+                '<span class="CrumbLabel  Last"><a itemprop="item" href="https://vanilla.test/categories"><span itemprop="name">Categories</span></a></span></span></span>',
             ],
             [
-                [["Name" => "Categories", "Url" => "http://vanilla.test/categories/one"]],
+                [["Name" => "Categories", "Url" => "https://vanilla.test/categories/one"]],
                 true,
                 [],
                 '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList">' .
-                '<span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>' .
+                '<span class="CrumbLabel HomeCrumb"><a href="https://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>' .
                 '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> ' .
-                '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>',
+                '<span class="CrumbLabel  Last"><a itemprop="item" href="https://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>',
             ],
             [
                 [
-                    ["Name" => "Categories", "Url" => "http://vanilla.test/categories/one"],
-                    ["Name" => "Categories", "Url" => "http://vanilla.test/categories/two"],
+                    ["Name" => "Categories", "Url" => "https://vanilla.test/categories/one"],
+                    ["Name" => "Categories", "Url" => "https://vanilla.test/categories/two"],
                 ],
                 true,
                 [],
                 '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList">' .
-                '<span class="CrumbLabel HomeCrumb"><a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>' .
+                '<span class="CrumbLabel HomeCrumb"><a href="https://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>' .
                 '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> ' .
-                '<span class="CrumbLabel "><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span>' .
+                '<span class="CrumbLabel "><a itemprop="item" href="https://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span>' .
                 '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="2" /><span class="Crumb">›</span> ' .
-                '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/two"><span itemprop="name">Categories</span></a></span></span></span>',
+                '<span class="CrumbLabel  Last"><a itemprop="item" href="https://vanilla.test/categories/two"><span itemprop="name">Categories</span></a></span></span></span>',
             ],
             [
                 [
-                    ["Name" => "Categories", "Url" => "http://vanilla.test/categories/one"],
-                    ["Name" => "Categories", "Url" => "http://vanilla.test/categories/two"],
+                    ["Name" => "Categories", "Url" => "https://vanilla.test/categories/one"],
+                    ["Name" => "Categories", "Url" => "https://vanilla.test/categories/two"],
                 ],
                 false,
                 [],
                 '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList">' .
-                '<span class="CrumbLabel "><a href="http://vanilla.test/categories/one"><span>Categories</span></a></span>' .
+                '<span class="CrumbLabel "><a href="https://vanilla.test/categories/one"><span>Categories</span></a></span>' .
                 '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> ' .
-                '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/two"><span itemprop="name">Categories</span></a></span></span></span>',
+                '<span class="CrumbLabel  Last"><a itemprop="item" href="https://vanilla.test/categories/two"><span itemprop="name">Categories</span></a></span></span></span>',
             ],
             [
-                [["Name" => "Categories", "Url" => "http://vanilla.test/categories/one"]],
+                [["Name" => "Categories", "Url" => "https://vanilla.test/categories/one"]],
                 false,
                 [],
-                '<span class="Breadcrumbs" ><span class="CrumbLabel  Last"><a href="http://vanilla.test/categories/one"><span>Categories</span></a></span></span>',
+                '<span class="Breadcrumbs" ><span class="CrumbLabel  Last"><a href="https://vanilla.test/categories/one"><span>Categories</span></a></span></span>',
             ],
             [
-                [["Name" => "Categories", "Url" => "http://vanilla.test/categories/one"]],
+                [["Name" => "Categories", "Url" => "https://vanilla.test/categories/one"]],
                 true,
-                ["HomeUrl" => "http://vanilla.test/en"],
+                ["HomeUrl" => "https://vanilla.test/en"],
                 '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb">' .
-                '<a href="http://vanilla.test/en"><span>Home</span></a></span>' .
+                '<a href="https://vanilla.test/en"><span>Home</span></a></span>' .
                 '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> ' .
-                '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>',
+                '<span class="CrumbLabel  Last"><a itemprop="item" href="https://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>',
             ],
             [
                 [
-                    ["Name" => "Categories", "Url" => "http://vanilla.test/categories/one"],
-                    ["Name" => "Categories", "Url" => "http://vanilla.test/categories/two"],
+                    ["Name" => "Categories", "Url" => "https://vanilla.test/categories/one"],
+                    ["Name" => "Categories", "Url" => "https://vanilla.test/categories/two"],
                 ],
                 true,
                 ["HideLast" => true],
                 '<span class="Breadcrumbs" itemscope itemtype="http://schema.org/BreadcrumbList"><span class="CrumbLabel HomeCrumb">' .
-                '<a href="http://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>' .
+                '<a href="https://vanilla.test/sharedbootstrap/"><span>Home</span></a></span>' .
                 '<span itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><meta itemprop="position" content="1" /><span class="Crumb">›</span> ' .
-                '<span class="CrumbLabel  Last"><a itemprop="item" href="http://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>',
+                '<span class="CrumbLabel  Last"><a itemprop="item" href="https://vanilla.test/categories/one"><span itemprop="name">Categories</span></a></span></span></span>',
             ],
         ];
         return $r;

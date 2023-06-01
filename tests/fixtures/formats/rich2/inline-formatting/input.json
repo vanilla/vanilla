@@ -1,0 +1,12 @@
+[
+  {
+    "type": "p",
+    "children": [
+      { "text": "italic ", "italic": true },
+      { "text": "bold ", "bold": true },
+      { "text": "italic-bold ", "italic": true, "bold": true },
+      { "text": "code inline", "code": true },
+      { "text": "strike", "strikethrough": true }
+    ]
+  }
+]

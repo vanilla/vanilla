@@ -14,6 +14,9 @@ use Vanilla\Layout\Asset\AbstractLayoutAsset;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\WidgetSchemaTrait;
+use Vanilla\Forms\FormOptions;
+use Vanilla\Forms\SchemaForm;
+use Vanilla\Forms\StaticFormChoices;
 
 /**
  * Asset representing discussion list for the page.
@@ -68,11 +71,20 @@ class DiscussionListAsset extends AbstractLayoutAsset
     }
 
     /**
+     * @param array|null $inputParams
+     *
      * @inheritdoc
      */
-    public function getProps(): ?array
+    public function getProps(?array $inputParams = null): ?array
     {
         $params = $this->props;
+
+        $params["apiParams"]["siteSectionID"] =
+            $inputParams["siteSection"]["sectionID"] ?? $params["apiParams"]["siteSectionID"];
+
+        //announcements first by default
+        $params["apiParams"]["pinOrder"] = "first";
+
         $props = $this->baseDiscussionWidget->getProps($params);
 
         //at this point we should have some defaults
@@ -99,7 +111,25 @@ class DiscussionListAsset extends AbstractLayoutAsset
                 self::followedCategorySchema(),
                 static::categorySchema(),
                 self::siteSectionIDSchema(),
-                self::sortSchema(),
+                Schema::parse([
+                    "sort?" => [
+                        "type" => "string",
+                        "default" => "Recently Commented",
+                        "x-control" => SchemaForm::dropDown(
+                            new FormOptions(
+                                t("Default Sort Order"),
+                                t("Choose the order records are sorted by default.")
+                            ),
+                            new StaticFormChoices([
+                                "-dateLastComment" => t("Recently Commented"),
+                                "-dateInserted" => t("Recently Created"),
+                                "-score" => t("Top"),
+                                "-hot" => t("Trending"),
+                                "dateInserted" => t("Oldest"),
+                            ])
+                        ),
+                    ],
+                ]),
                 self::getSlotTypeSchema(),
                 self::limitSchema()
             )
@@ -117,5 +147,13 @@ class DiscussionListAsset extends AbstractLayoutAsset
         );
 
         return $schema;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        return $this->baseDiscussionWidget->renderSeoHtml($props);
     }
 }

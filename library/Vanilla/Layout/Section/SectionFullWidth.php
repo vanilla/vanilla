@@ -56,4 +56,13 @@ class SectionFullWidth extends AbstractLayoutSection
     {
         return "/applications/dashboard/design/images/sectionIcons/fullwidth.svg";
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $children = $this->renderSectionChildrenHtml($props["children"] ?? []);
+        return "<section>{$children}</section>";
+    }
 }

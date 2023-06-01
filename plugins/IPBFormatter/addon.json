@@ -1,0 +1,19 @@
+{
+    "name": "IPB Formatter",
+    "description": "Formats posts imported from Invision Power Board.",
+    "version": "1.1",
+    "hasLocale": false,
+    "icon": "ipb.png",
+    "key": "ipbformatter",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "http://vanillaforums.com/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

@@ -20,16 +20,20 @@ class SearchOptions
     /** @var int */
     private $limit;
 
+    private bool $skipConversion;
+
     /**
      * Constructor.
      *
      * @param int $offset
      * @param int $limit
+     * @param bool $skipConversion
      */
-    public function __construct(int $offset = 0, int $limit = self::DEFAULT_LIMIT)
+    public function __construct(int $offset = 0, int $limit = self::DEFAULT_LIMIT, bool $skipConversion = false)
     {
         $this->offset = $offset;
         $this->limit = $limit;
+        $this->skipConversion = $skipConversion;
     }
 
     /**
@@ -46,5 +50,15 @@ class SearchOptions
     public function getLimit(): int
     {
         return $this->limit;
+    }
+
+    /**
+     * Whether we should skip AbstractSearchDriver::convertRecordsToResultItems().
+     *
+     * @return bool
+     */
+    public function skipConversion(): bool
+    {
+        return $this->skipConversion;
     }
 }

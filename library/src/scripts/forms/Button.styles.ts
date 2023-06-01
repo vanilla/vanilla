@@ -57,18 +57,24 @@ export const buttonUtilityClasses = useThemeCache(() => {
         display: "flex",
         height: styleUnit(dimension),
         minWidth: styleUnit(dimension),
-        width: styleUnit(dimension),
         justifyContent: "center",
         border: "none",
         padding: 0,
         background: "transparent",
         color: "inherit",
         borderRadius: 3,
-        "&:hover, &:focus": {
-            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+        "&:disabled, &[aria-disabled='true']": {
+            opacity: 0.5,
+            cursor: "not-allowed",
         },
-        "&:focus": {
+        "&:not(:disabled):not([aria-disabled='true'])": {
+            "&:hover, &:focus, &.hover, &:focus-visible, &.focus-visible": {
+                background: ColorsUtils.colorOut(globalVars.mainColors.primary.fade(0.1)),
+            },
+        },
+        "&.active": {
             background: ColorsUtils.colorOut(globalVars.mainColors.primary.fade(0.1)),
+            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
         },
         "&&.focus-visible, &:focus-visible": {
             outline: "none",
@@ -83,6 +89,8 @@ export const buttonUtilityClasses = useThemeCache(() => {
             minWidth: vars.sizing.compactHeight,
         }),
     );
+
+    const buttonIconMenuBar = css({ ...iconMixin(formElementVars.sizing.height - 4), whiteSpace: "nowrap" });
 
     const buttonIconCompact = style("iconCompact", iconMixin(vars.sizing.compactHeight));
 
@@ -138,6 +146,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
         pushRight,
         iconMixin,
         buttonIconCompact,
+        buttonIconMenuBar,
         buttonIcon,
         buttonIconRightMargin,
         buttonIconLeftMargin,

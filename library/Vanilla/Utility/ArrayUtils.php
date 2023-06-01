@@ -305,7 +305,8 @@ final class ArrayUtils
                 $callback($array, $path);
 
                 foreach ($keys as $key) {
-                    if (static::isArray($array[$key])) {
+                    // Make sure we check existence because it could have been deleted.
+                    if (isset($array[$key]) && static::isArray($array[$key])) {
                         $currentPath = array_merge($path, [$key]);
                         $m($array[$key], $currentPath);
                     }
@@ -671,6 +672,17 @@ final class ArrayUtils
     public static function objToArrayRecursive(object $object): array
     {
         return json_decode(json_encode($object), true);
+    }
+
+    /**
+     * Given an object, attempt to convert it to an associative array.
+     *
+     * @param array $arr
+     * @return array
+     */
+    public static function jsonNormalizeArray(array $arr): array
+    {
+        return json_decode(json_encode($arr), true);
     }
 
     /**

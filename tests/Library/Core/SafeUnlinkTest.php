@@ -31,7 +31,7 @@ class SafeUnlinkTest extends TestCase
     public function testSafeUnlinkPhantom()
     {
         $filename = PATH_ROOT . "/tests/cache/safe-unlink/phantom-file";
-        $this->assertFileNotExists($filename);
+        $this->assertFileDoesNotExist($filename);
         $actual = safeUnlink($filename);
         $this->assertFalse($actual);
     }
@@ -46,6 +46,6 @@ class SafeUnlinkTest extends TestCase
         $this->assertFileExists($filename);
         $actual = safeUnlink($filename);
         $this->assertTrue($actual);
-        $this->assertFileNotExists($filename);
+        $this->assertFileDoesNotExist($filename);
     }
 }

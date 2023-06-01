@@ -1,12 +1,11 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
 use Garden\Container\Reference;
 use Garden\EventManager;
-use Garden\Events\ResourceEvent;
 use Garden\PsrEventHandlersInterface;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
@@ -19,7 +18,6 @@ use Vanilla\Dashboard\Models\RecordStatusStructureEvent;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Modules\QnAWidgetModule;
-use Vanilla\QnA\Events\AnswerEvent;
 use Vanilla\QnA\Models\AnswerSearchType;
 use Vanilla\QnA\Models\QnAJsonLD;
 use Vanilla\QnA\Models\QuestionSearchType;
@@ -269,7 +267,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $filterKeys = array_map("strtolower", [QnaModel::ACCEPTED, QnaModel::ANSWERED, QnaModel::UNANSWERED]);
         $this->discussionModel->addFilterSet("qna", "All Questions", [], false);
         foreach ($filterKeys as $filterKey) {
-            $this->discussionModel->addFilter($filterKey, "qna", ["QnA" => $filterKey], "", "qna");
+            $this->discussionModel->addFilter($filterKey, "qna", [], "", "qna");
         }
     }
 
@@ -870,9 +868,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
                 $ActivityModel->saveQueue();
 
                 $this->EventArguments["Activity"] = &$activity;
-                $data = $this->commentModel->getID($commentID, DATASET_TYPE_ARRAY);
-                $answerEvent = new AnswerEvent(AnswerEvent::ACTION_ANSWER_ACCEPTED, ["answer" => $data], $sender);
-                $this->eventManager->dispatch($answerEvent);
             }
         }
         redirectTo("/discussion/comment/{$comment["CommentID"]}#Comment_{$comment["CommentID"]}", 302, false);
@@ -1258,7 +1253,8 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      */
     public function discussionsController_unanswered_create($sender, $args)
     {
-        if (\Vanilla\FeatureFlagHelper::featureEnabled("customLayout.discussionList")) {
+        // The frontend part of this isn't ready yet as it doesn't handle the appropriate url querystring.
+        if (\Vanilla\FeatureFlagHelper::featureEnabled("customLayout.discussionList.QnAPlugin")) {
             redirectTo("/discussions?type=question&status=unanswered");
         }
         $sender->View = "Index";
@@ -1554,12 +1550,13 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      */
     public function postController_question_create($sender, $categoryUrlCode = "")
     {
+        $category = null;
         $categoryModel = new CategoryModel();
         if ($categoryUrlCode != "") {
             $category = (array) $categoryModel->getByCode($categoryUrlCode);
             $category = $categoryModel::permissionCategory($category);
             $isAllowedTypes = isset($category["AllowedDiscussionTypes"]);
-            $isAllowedQuestion = in_array("Question", $category["AllowedDiscussionTypes"]);
+            $isAllowedQuestion = in_array("Question", (array) $category["AllowedDiscussionTypes"]);
         }
 
         if ($category && !$isAllowedQuestion && $isAllowedTypes) {
@@ -1579,7 +1576,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     public function postController_beforeDiscussionRender_handler($sender)
     {
         // Override if we are looking at the question url.
-        if ($sender->RequestMethod == "question") {
+        if ($sender->RequestMethod == "question" || $sender->data("Type") == "Question") {
             $sender->Form->addHidden("Type", "Question");
             $sender->title(t("Ask a Question"));
             $sender->setData("Breadcrumbs", [["Name" => $sender->data("Title"), "Url" => "/post/question"]]);
@@ -1976,9 +1973,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      */
     public function dbaController_countJobs_handler($sender)
     {
-        $name = "Recalculate Discussion.QnA";
+        $name = "Recalculate Discussion.statusID";
         // We name the table QnA and not Discussion because the model is instantiated from the table name in DBAModel.
-        $url = "/dba/counts.json?" . http_build_query(["table" => "QnA", "column" => "QnA"]);
+        $url = "/dba/counts.json?" . http_build_query(["table" => "QnA", "column" => "statusID"]);
         $sender->Data["Jobs"][$name] = $url;
     }
 

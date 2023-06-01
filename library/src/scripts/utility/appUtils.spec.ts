@@ -86,6 +86,25 @@ describe("isUrl", () => {
     }
 });
 
+describe("makeProfileUrl", () => {
+    beforeEach(() => {
+        application.setMeta("context.basePath", "/test");
+    });
+    it("can make a simple url", () => {
+        expect(application.makeProfileUrl("hello")).toBe("http://localhost/test/profile/hello");
+    });
+
+    it("can encoded various url characters", () => {
+        expect(application.makeProfileUrl("hello-$%^^*()")).toBe("http://localhost/test/profile/hello-%24%25%5E%5E*()");
+    });
+
+    it("can has special encoding for / and & characters", () => {
+        // These are double encoded for compatibility with quirks in our backed router.
+        // The backend also encodes these characters this way in user urls (see \userUrl() and UserModel::getProfileUrl())
+        expect(application.makeProfileUrl("he&llo/user")).toBe("http://localhost/test/profile/he%2526llo%252fuser");
+    });
+});
+
 describe("createSourceSetValue", () => {
     it("generates a source string", () => {
         const mock = {

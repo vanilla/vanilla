@@ -74,6 +74,13 @@ class ResourceRouteTest extends TestCase
             "index w page" => ["GET", "/discussions/p1", [$dc, "index"], ["page" => "p1"]],
             "index with bad page" => ["GET", "/discussions/xxx", null],
 
+            "index with ignored special characters" => [
+                "GET",
+                "/discuss%#!@#$#*@%*.ions",
+                [$dc, "index"],
+                ["page" => ""],
+            ],
+
             "get" => ["GET", "/discussions/123", [$dc, "get"], ["id" => "123"]],
 
             "get recent" => ["GET", "/discussions/recent?after=1", [$dc, "get_recent"], ["query" => ["after" => "1"]]],
@@ -189,9 +196,10 @@ class ResourceRouteTest extends TestCase
     {
         $route = $this->createRoute();
         $request = new Request("/discussions/123/help/foo/bar/baz");
-
+        $expected = ["foo", "bar", "baz"];
         $match = $route->match($request);
-        $this->assertSame(["foo", "bar", "baz"], $match());
+        $actual = array_values($match());
+        $this->assertSame($expected, $actual);
     }
 
     /**

@@ -25,6 +25,9 @@ abstract class AbstractEmbed implements \JsonSerializable
     use TwigRenderTrait;
     use JsonFilterTrait;
 
+    const EMBED_STYLE_CARD = "rich_embed_card";
+    const EMBED_STYLE_INLINE = "rich_embed_inline";
+    const EMBED_STYLE_PLAIN_LINK = "plain_link";
     /** @var array */
     protected $data = [];
 
@@ -194,6 +197,10 @@ abstract class AbstractEmbed implements \JsonSerializable
                 "enum" => $this->getAllowedTypes(),
             ],
             "name:s?",
+            "faviconUrl:s?",
+            "embedStyle:s?" => [
+                "enum" => [self::EMBED_STYLE_CARD, self::EMBED_STYLE_INLINE, self::EMBED_STYLE_PLAIN_LINK],
+            ],
         ]);
 
         return $this->schema()->merge($baseSchema);

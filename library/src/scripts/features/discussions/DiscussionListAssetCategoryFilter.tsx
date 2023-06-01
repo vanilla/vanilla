@@ -32,12 +32,12 @@ export default function DiscussionListAssetCategoryFilter(props: IProps) {
     const id = uniqueIDFromPrefix("discussionCategoryFilter");
 
     return (
-        <div className={discussionListClasses().categoryFilterContainer}>
-            <span id={id} className={discussionListClasses().categoryFilterLabel}>
+        <div className={discussionListClasses().filterAndSortingContainer}>
+            <span id={id} className={discussionListClasses().filterAndSortingLabel}>
                 {t("Categories")}:
             </span>
             <SelectBox
-                className={discussionListClasses().categoryFilterDropdown}
+                className={discussionListClasses().filterAndSortingDropdown}
                 buttonType={ButtonTypes.TEXT_PRIMARY}
                 options={options}
                 describedBy={id}

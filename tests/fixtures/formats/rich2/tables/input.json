@@ -1,0 +1,200 @@
+[
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "Table 1:"
+      }
+    ]
+  },
+  {
+    "type": "table",
+    "children": [
+      {
+        "type": "thead",
+        "children": [
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "th",
+                "children": [{ "text": "column header 1" }]
+              },
+              {
+                "type": "th",
+                "children": [{ "text": "column header 2" }]
+              },
+              {
+                "type": "th",
+                "children": [{ "text": "column header 3" }]
+              },
+              {
+                "type": "th",
+                "children": [{ "text": "column header 4" }]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "tbody",
+        "children": [
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "td",
+                "children": [{ "text": "row 1 cell 1" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "row 1 cell 2" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "row 1 cell 3" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "row 1 cell 4" }]
+              }
+            ]
+          },
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "td",
+                "children": [{ "text": "row 2 cell 3" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "row 2 cell 3" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "row 2 cell 3" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "row 2 cell 3" }]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "Table 2:"
+      }
+    ]
+  },
+  {
+    "type": "table",
+    "children": [
+      {
+        "type": "thead",
+        "children": [
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "th",
+                "children": [{ "text": "column header 1" }]
+              },
+              {
+                "type": "th",
+                "children": [{ "text": "column header 2" }]
+              },
+              {
+                "type": "th",
+                "children": [{ "text": "column header 3" }]
+              },
+              {
+                "type": "th",
+                "children": [{ "text": "column header 4" }]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "tbody",
+        "children": [
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "td",
+                "children": [{ "text": "row 1 cell 1" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "row 1 cell 2" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "row 1 cell 3" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "row 1 cell 4" }]
+              }
+            ]
+          },
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "td",
+                "children": [{ "text": "row 2 cell 3" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "row 2 cell 3" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "row 2 cell 3" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "row 2 cell 3" }]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "tfoot",
+        "children": [
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "td",
+                "children": [{ "text": "column footer 1" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "column footer 2" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "column footer 3" }]
+              },
+              {
+                "type": "td",
+                "children": [{ "text": "column footer 4" }]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

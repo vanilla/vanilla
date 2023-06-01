@@ -16,22 +16,23 @@ import * as selectOverrides from "@library/forms/select/overwrites";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 
 export interface ITokenProps extends IOptionalComponentID {
-    label: string | null;
+    options: IComboBoxOption[] | undefined;
+    label?: string | null;
     labelNote?: string;
     disabled?: boolean;
     className?: string;
     placeholder?: string;
-    options: IComboBoxOption[] | undefined;
     isLoading?: boolean;
     value: IComboBoxOption[];
     onFocus?: () => void;
     onChange: (tokens: IComboBoxOption[]) => void;
     onInputChange?: (value: string) => void;
-    menuPlacement?: string;
+    menuPlacement?: string; // doesn't look like this is used anywhere?
     showIndicator?: boolean;
     maxHeight?: number;
     hideSelectedOptions?: boolean;
     fieldName?: string; //this one is for legacy form submits, hidden input should have a name so it appears in gdn form values
+    inModal?: boolean;
 }
 
 interface IState {
@@ -53,9 +54,16 @@ export default class TokensLoadable extends React.Component<ITokenProps, IState>
     };
 
     public render() {
-        const { className, disabled, options, isLoading, hideSelectedOptions = true } = this.props;
+        const { className, disabled, options, isLoading, inModal, hideSelectedOptions = true } = this.props;
         const classes = tokensClasses();
         const classesInputBlock = inputBlockClasses();
+
+        const portalProps = inModal
+            ? {
+                  styles: this.getStyles(1051), // This magic number from the stacking context
+                  menuPortalTarget: document.body,
+              }
+            : {};
 
         return (
             <>
@@ -64,10 +72,12 @@ export default class TokensLoadable extends React.Component<ITokenProps, IState>
                         [classes.withIndicator]: this.props.showIndicator,
                     })}
                 >
-                    {this.props.label !== null && (
+                    {!!this.props.label && (
                         <label htmlFor={this.inputID} className={classesInputBlock.labelAndDescription}>
                             <span className={classesInputBlock.labelText}>{this.props.label}</span>
-                            <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
+                            {!!this.props.labelNote && (
+                                <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
+                            )}
                         </label>
                     )}
 
@@ -102,6 +112,7 @@ export default class TokensLoadable extends React.Component<ITokenProps, IState>
                             onBlur={this.onBlur}
                             maxMenuHeight={this.props.maxHeight}
                             hideSelectedOptions={hideSelectedOptions}
+                            {...portalProps}
                         />
                     </div>
                     <input
@@ -111,6 +122,7 @@ export default class TokensLoadable extends React.Component<ITokenProps, IState>
                         type="hidden"
                         tabIndex={-1}
                         name={this.props.fieldName}
+                        disabled={disabled}
                     />
                 </div>
             </>
@@ -194,7 +206,7 @@ export default class TokensLoadable extends React.Component<ITokenProps, IState>
     /**
      * Overwrite styles in Select component
      */
-    private getStyles = () => {
+    private getStyles = (zIndex?: number) => {
         return {
             option: (provided: React.CSSProperties) => ({
                 ...provided,
@@ -216,6 +228,7 @@ export default class TokensLoadable extends React.Component<ITokenProps, IState>
             multiValueLabel: (provided: React.CSSProperties) => {
                 return { ...provided, borderRadius: undefined, padding: 0 };
             },
+            ...(zIndex && { menuPortal: (base) => ({ ...base, zIndex: zIndex + 1 }) }),
         };
     };
 }

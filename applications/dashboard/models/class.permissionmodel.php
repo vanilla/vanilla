@@ -8,15 +8,22 @@
  * @since 2.0
  */
 
+use Garden\Web\Exception\NotFoundException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\Dashboard\Models\PermissionJunctionModelInterface;
+use Vanilla\Logger;
 use Vanilla\Models\ModelCache;
 use Vanilla\Permissions;
+use Vanilla\Utility\DebugUtils;
 
 /**
  * Handles permission data.
  */
-class PermissionModel extends Gdn_Model
+class PermissionModel extends Gdn_Model implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /** @var array Default role permissions. */
     protected $DefaultPermissions = [];
 
@@ -37,6 +44,7 @@ class PermissionModel extends Gdn_Model
 
     /**
      * Class constructor. Defines the related database table name.
+     *
      */
     public function __construct()
     {
@@ -291,6 +299,7 @@ class PermissionModel extends Gdn_Model
             "Garden.Profiles.Edit" => 1,
             "Garden.AdvancedNotifications.Allow" => 1,
             "Garden.Email.View" => 1,
+            "Garden.Username.Edit" => 1,
             "Garden.Curation.Manage" => 1,
             "Garden.Moderation.Manage" => 1,
             "Garden.Uploads.Add" => 1,
@@ -1317,72 +1326,6 @@ class PermissionModel extends Gdn_Model
     }
 
     /**
-     * Returns all rows from the specified JunctionTable/Column combination. This
-     * method assumes that $JuntionTable has a "Name" column.
-     *
-     * @param string $JunctionTable The name of the table from which to retrieve data.
-     * @param string $JunctionColumn The name of the column that represents the JunctionID in $JunctionTable.
-     * @return DataSet
-     */
-    /*public function getJunctionData($JunctionTable, $JunctionColumn) {
-       return $this->SQL
-          ->select($JunctionColumn, '', 'JunctionID')
-          ->select('Name')
-          ->from($JunctionTable)
-          ->orderBy('Name', 'asc')
-          ->get();
-    }*/
-
-    /**
-     * Return a dataset of all available junction tables (as defined in
-     * Permission.JunctionTable).
-     *
-     * @return DataSet
-     */
-    /* public function getJunctionTables() {
-        return $this->SQL
-           ->select('JunctionTable, JunctionColumn')
-           ->from('Permission')
-           ->where('JunctionTable is not null')
-           ->groupBy('JunctionTable, JunctionColumn')
-           ->get();
-     }*/
-
-    /**
-     * Allows the insertion of new permissions. If the permission(s) already
-     * exist in the database, or is not formatted properly, it will be skipped.
-     *
-     * @param mixed $Permission The permission (or array of permissions) to be added.
-     * @param string $JunctionTable The junction table to relate the permission(s) to.
-     * @param string $JunctionColumn The junction column to relate the permission(s) to.
-     */
-    /* public function insertNew($Permission, $JunctionTable = '', $JunctionColumn = '') {
-        if (!is_array($Permission))
-           $Permission = array($Permission);
-
-        $PermissionCount = count($Permission);
-        // Validate the permissions first
-        if (validatePermissionFormat($Permission)) {
-           // Now save them
-           $this->defineSchema();
-           for ($i = 0; $i < $PermissionCount; ++$i) {
-              // Check to see if the permission already exists
-              $ResultSet = $this->getWhere(array('Name' => $Permission[$i]));
-              // If not, insert it now
-              if ($ResultSet->numRows() == 0) {
-                 $Values = array();
-                 $Values['Name'] = $Permission[$i];
-                 if ($JunctionTable != '') {
-                    $Values['JunctionTable'] = $JunctionTable;
-                    $Values['JunctionColumn'] = $JunctionColumn;
-                 }
-                 $this->insert($Values);
-              }
-           }
-        }
-     }*/
-
-    /**
      * Save a permission row.
      *
      * @param array $formPostValues The values you want to save. See the Permission table for possible columns.
@@ -1457,47 +1400,89 @@ class PermissionModel extends Gdn_Model
     }
 
     /**
+     * Perform bulk save of the permissions.
      *
-     *
-     * @param $permissions
-     * @param null $allWhere
+     * @param array $permissions rows of permissions to save.
+     * @param array $all Where where statement to select which permission rows are being replaced in this call.
      */
-    public function saveAll($permissions, $allWhere = null)
+    public function saveAll(array $permissions, array $allWhere)
     {
-        // Load the permission data corresponding to the where so unset permissions get ovewritten.
-        if (is_array($allWhere)) {
-            $allPermissions = $this->SQL->getWhere("Permission", $allWhere)->resultArray();
-            // Find the permissions that were loaded, but not saved.
-            foreach ($allPermissions as $i => $allRow) {
-                foreach ($permissions as $saveRow) {
-                    if (
-                        $allRow["RoleID"] == $saveRow["RoleID"] &&
-                        $allRow["JunctionTable"] == $saveRow["JunctionTable"] &&
-                        $allRow["JunctionID"] == $saveRow["JunctionID"]
-                    ) {
-                        unset($allPermissions[$i]); // saving handled already.
-                        break;
+        try {
+            $insertRows = [];
+            $globalRow = [];
+            // Get the list of columns that are available for permissions.
+            $permissionColumns = array_fill_keys(
+                array_keys(
+                    Gdn::permissionModel()
+                        ->defineSchema()
+                        ->fields()
+                ),
+                0
+            );
+
+            foreach ($permissions as $permission) {
+                $roleID = 0; // default role.
+                // Remove non-existing columns from input row, and add  missing, to match DB, to make sure all rows in array have the same size
+                //.
+                $permission = array_intersect_key($permission, $permissionColumns);
+                $permission = array_merge($permissionColumns, $permission);
+
+                if (array_key_exists("RoleID", $permission)) {
+                    $roleID = $permission["RoleID"];
+                } elseif (array_key_exists("Role", $permission)) {
+                    // Get the RoleID.
+                    $roleID = $this->SQL->getWhere("Role", ["Name" => $permission["Role"]])->value("RoleID");
+                    if (!$roleID) {
+                        throw new NotFoundException("Role");
                     }
                 }
-            }
-            // Make all permission false that need to be saved here.
-            foreach ($allPermissions as &$allRow) {
-                foreach ($allRow as $name => $value) {
+                // Convert all true/false options to 1 or 0 that DB expects.
+                foreach ($permission as $name => $value) {
                     if (strpos($name, ".") !== false) {
-                        $allRow[$name] = 0;
+                        $permission[$name] = $permission[$name] ? 1 : 0;
                     }
                 }
-            }
-            if (count($allPermissions) > 0) {
-                $permissions = array_merge($permissions, $allPermissions);
-            }
-        }
 
-        foreach ($permissions as $row) {
-            $this->save($row);
-        }
+                unset($permission["Role"], $permission["PermissionID"]);
+                if (!array_key_exists("JunctionTable", $permission) || empty($permission["JunctionTable"])) {
+                    unset(
+                        $permission["JunctionTable"],
+                        $permission["JunctionColumn"],
+                        $permission["JunctionID"],
+                        $permission["RoleID"]
+                    ); // no junction table.
 
-        // TODO: Clear the permissions for rows that aren't here.
+                    $globalRow = $this->_Backtick($permission);
+                    $globalRow["RoleID"] = $roleID;
+                } else {
+                    $permission["RoleID"] = $roleID;
+                    $insertRows[] = $permission;
+                }
+            }
+            $this->Database->beginTransaction();
+            // Delete all existing permissions for the given user, and re-save them again.
+            if (is_array($allWhere)) {
+                $this->SQL->delete($this->getTableName(), $allWhere);
+            }
+            if (count($globalRow) > 0) {
+                $this->SQL->insert($this->getTableName(), $globalRow);
+            }
+            if (count($insertRows) > 0) {
+                $this->SQL->insert($this->getTableName(), $insertRows);
+            }
+            $this->Database->commitTransaction();
+            $this->clearPermissions();
+        } catch (\Exception $e) {
+            $this->Database->rollbackTransaction();
+            $this->logger->error("Error saving permissions.", [
+                Logger::FIELD_EVENT => "permissions",
+                Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+                Logger::FIELD_TAGS => ["user permission"],
+                Logger::ERROR => $e->getMessage(),
+                "errorTrace" => DebugUtils::stackTraceString($e->getTrace()),
+            ]);
+            throw $e;
+        }
     }
 
     /**

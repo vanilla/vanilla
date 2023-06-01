@@ -78,7 +78,7 @@ trait BootstrapTrait
     {
         \Gdn::setController(null);
         StaticCache::clear();
-
+        \Gdn::sql()->reset();
         $this->setUpLoggerTrait();
         self::$emails = [];
         \Gdn_Form::resetIDs();
@@ -92,16 +92,27 @@ trait BootstrapTrait
      */
     protected static function createContainer()
     {
-        $folder = static::getBootstrapFolderName();
-        if ($folder !== "") {
-            $folder = "/" . $folder;
-        }
-        self::$bootstrap = new Bootstrap("https://vanilla.test{$folder}");
+        $baseUrl = static::getBaseUrl();
+        self::$bootstrap = new Bootstrap($baseUrl);
 
         self::$container = new Container();
         self::$bootstrap->run(self::$container);
         self::$bessy = self::$container->get(TestDispatcher::class);
         return self::$container;
+    }
+
+    /**
+     * Get the baseUrl to use for the tests.
+     *
+     * @return string
+     */
+    protected static function getBaseUrl(): string
+    {
+        $folder = static::getBootstrapFolderName();
+        if ($folder !== "") {
+            $folder = "/" . $folder;
+        }
+        return "https://vanilla.test{$folder}";
     }
 
     /**

@@ -36,22 +36,22 @@ class ResourcesTest extends AbstractAPIv2Test
         $expected = [
             [
                 "recordType" => "user",
-                "url" => "http://vanilla.test/resourcestest/api/v2/resources/user",
+                "url" => "https://vanilla.test/resourcestest/api/v2/resources/user",
                 "crawlable" => true,
             ],
             [
                 "recordType" => "category",
-                "url" => "http://vanilla.test/resourcestest/api/v2/resources/category",
+                "url" => "https://vanilla.test/resourcestest/api/v2/resources/category",
                 "crawlable" => true,
             ],
             [
                 "recordType" => "discussion",
-                "url" => "http://vanilla.test/resourcestest/api/v2/resources/discussion",
+                "url" => "https://vanilla.test/resourcestest/api/v2/resources/discussion",
                 "crawlable" => true,
             ],
             [
                 "recordType" => "comment",
-                "url" => "http://vanilla.test/resourcestest/api/v2/resources/comment",
+                "url" => "https://vanilla.test/resourcestest/api/v2/resources/comment",
                 "crawlable" => true,
             ],
         ];
@@ -73,12 +73,12 @@ class ResourcesTest extends AbstractAPIv2Test
         $expected = [
             [
                 "recordType" => "user",
-                "url" => "http://vanilla.test/resourcestest/api/v2/resources/user",
+                "url" => "https://vanilla.test/resourcestest/api/v2/resources/user",
                 "crawlable" => true,
             ],
             [
                 "recordType" => "category",
-                "url" => "http://vanilla.test/resourcestest/api/v2/resources/category",
+                "url" => "https://vanilla.test/resourcestest/api/v2/resources/category",
                 "crawlable" => true,
             ],
         ];

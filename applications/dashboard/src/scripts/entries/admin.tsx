@@ -34,6 +34,8 @@ import AdminHeader from "@dashboard/components/AdminHeader";
 import ModernEmbedSettings from "@library/embed/ModernEmbedSettings";
 import { userProfilesSlice } from "@dashboard/userProfiles/state/UserProfiles.slice";
 import { UserProfileSettings } from "@dashboard/userProfiles/UserProfileSettings";
+import DashboardAddEditUser from "@dashboard/users/userManagement/dashboardAddEditUser/DashboardAddEditUser";
+import UserManagementPage from "@dashboard/users/userManagement/UserManagementPage";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
@@ -100,3 +102,7 @@ onContent(mountDashboardTabs);
 onContent(mountDashboardCodeEditors);
 
 bindToggleChildrenEventListeners();
+addComponent("DashboardAddEditUser", DashboardAddEditUser); //this should be gone when we entirely switch into new react user management page
+addComponent("UserManagementPage", () => {
+    return <Router sectionRoots={["/dashboard/user"]} />;
+});

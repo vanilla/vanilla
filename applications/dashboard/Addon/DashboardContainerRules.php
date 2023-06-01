@@ -7,9 +7,11 @@
 
 namespace Vanilla\Dashboard\Addon;
 
+use ExtendedUserFieldsExpander;
 use Garden\Container\ContainerConfigurationInterface;
 use Garden\Container\Reference;
 use Garden\Web\PageControllerRoute;
+use UserProfileFieldsExpander;
 use SearchMembersEventProvider;
 use Vanilla\AddonContainerRules;
 use Vanilla\Analytics\EventProviderService;
@@ -19,17 +21,20 @@ use Vanilla\Analytics\SearchPlacesEventProvider;
 use Vanilla\Dashboard\AuthenticatorTypeService;
 use Vanilla\Dashboard\Controllers\Api\SiteTotalsFilterOpenApi;
 use Vanilla\Dashboard\Controllers\LayoutSettingsPageController;
+use Vanilla\Dashboard\Controllers\LeavingController;
 use Vanilla\Dashboard\Layout\View\LegacyProfileLayoutView;
 use Vanilla\Dashboard\Layout\View\LegacyRegistrationLayoutView;
 use Vanilla\Dashboard\Layout\View\LegacySigninLayoutView;
 use Vanilla\Dashboard\Controllers\Pages\AppearancePageController;
 use Vanilla\Dashboard\Controllers\Pages\HomePageController;
 use Vanilla\Dashboard\Models\ModerationMessagesFilterOpenApi;
+use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Dashboard\Models\ProfileFieldsOpenApi;
 use Vanilla\Dashboard\Models\SsoUsersExpander;
 use Vanilla\Dashboard\Models\UsersExpander;
 use Vanilla\Dashboard\Models\UserSiteTotalProvider;
 use Vanilla\Dashboard\UserLeaderService;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Middleware\LayoutPermissionFilterMiddleware;
 use Vanilla\Layout\LayoutHydrator;
@@ -52,6 +57,7 @@ class DashboardContainerRules extends AddonContainerRules
             [
                 "/settings/layout" => LayoutSettingsPageController::class,
                 "/appearance" => AppearancePageController::class,
+                "/home/leaving" => LeavingController::class,
             ],
             null,
             -1
@@ -94,6 +100,11 @@ class DashboardContainerRules extends AddonContainerRules
             ->rule(APIExpandMiddleware::class)
             ->addCall("addExpander", [new Reference(UsersExpander::class)])
             ->addCall("addExpander", [new Reference(SsoUsersExpander::class)]);
+        if (FeatureFlagHelper::featureEnabled(ProfileFieldModel::FEATURE_FLAG)) {
+            $container
+                ->addCall("addExpander", [new Reference(UserProfileFieldsExpander::class)])
+                ->addCall("addExpander", [new Reference(ExtendedUserFieldsExpander::class)]);
+        }
 
         $container
             ->rule(OpenAPIBuilder::class)

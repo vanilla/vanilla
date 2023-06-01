@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -128,6 +128,36 @@ class SpoofMiddlewareTest extends TestCase
                 "spoofBy" => [
                     "userID" => $user["UserID"],
                     "name" => $user["Name"],
+                ],
+            ]);
+
+        $this->callMiddleware($request);
+    }
+
+    /**
+     * Verify the logger has its context defaults updated to reflect a spoof in this session.
+     */
+    public function testSessionLogContext(): void
+    {
+        $request = new Request();
+
+        $user = [
+            "UserID" => 2,
+            "Name" => "Vanilla",
+        ];
+        $this->session->User = (object) $user;
+        $this->session->SessionID = 1012;
+        $this->session->Session = [
+            "Attributes" => ["SpoofUserID" => $user["UserID"], "SpoofUserName" => $user["Name"]],
+        ];
+
+        $this->logger
+            ->expects($this->once())
+            ->method("addStaticContextDefaults")
+            ->with([
+                "user" => [
+                    "SpoofUserID" => $user["UserID"],
+                    "SpoofUserName" => $user["Name"],
                 ],
             ]);
 

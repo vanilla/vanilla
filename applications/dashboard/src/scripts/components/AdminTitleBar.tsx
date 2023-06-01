@@ -19,6 +19,7 @@ export interface IProps {
     actionsWrapperClassName?: string;
     description?: ReactNode;
     titleLabel?: ReactNode;
+    compact?: boolean;
     useTwoColumnContainer?: boolean;
 }
 
@@ -29,7 +30,9 @@ export default function AdminTitleBar(props: IProps) {
 
     return (
         <div className={classes.root}>
-            <div className={cx(classes.container(props.useTwoColumnContainer), props.containerClassName)}>
+            <div
+                className={cx(classes.container(props.useTwoColumnContainer, props.compact), props.containerClassName)}
+            >
                 <div className={cx(classes.titleAndActionsContainer, props.titleAndActionsContainerClassName)}>
                     <div className={classes.titleAndDescriptionContainer}>
                         <h2 className={classes.titleWrap} title={props.title}>

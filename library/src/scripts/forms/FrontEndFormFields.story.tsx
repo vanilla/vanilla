@@ -13,6 +13,7 @@ import { FormToggle } from "@library/forms/FormToggle";
 import InputBlock from "@library/forms/InputBlock";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock, { IInputTextProps } from "@library/forms/InputTextBlock";
+import PasswordInput from "@library/forms/PasswordInput";
 import RadioButton from "@library/forms/RadioButton";
 import RadioButtonGroup from "@library/forms/RadioButtonGroup";
 import SelectOne from "@library/forms/select/SelectOne";
@@ -188,7 +189,7 @@ export function RadioGroups() {
     return (
         <StoryContent>
             <StoryHeading>Radio Buttons - In a Group</StoryHeading>
-            <RadioButtonGroup label={"Gaggle of radio buttons"}>
+            <RadioButtonGroup legend={"Gaggle of radio buttons"}>
                 <RadioButton label={"Option A"} name={radioButtonGroup1} defaultChecked />
                 <RadioButton label={"Option B"} name={radioButtonGroup1} />
                 <RadioButton label={"Option C (hovered)"} name={radioButtonGroup1} fakeFocus />
@@ -205,7 +206,7 @@ export function Checkboxes() {
             <StoryHeading>Checkboxes - In a Group</StoryHeading>
             <h3>Different states</h3>
             <br />
-            <CheckboxGroup label={"Label here"}>
+            <CheckboxGroup legend={"Label here"}>
                 <Checkbox label="Normal" />
                 <Checkbox label="Hover/Focus" fakeFocus />
                 <Checkbox label="Checked" defaultChecked />
@@ -216,7 +217,7 @@ export function Checkboxes() {
             <br /> <br />
             <h3>Hidden Label</h3>
             <br />
-            <CheckboxGroup label={"Some info"}>
+            <CheckboxGroup legend={"Some info"}>
                 <Checkbox label="Tooltip Label" tooltipLabel />
             </CheckboxGroup>
         </StoryContent>
@@ -267,6 +268,21 @@ export function Labels() {
             <InputBlock label={"My Label"}>
                 <div>{"[Some Input]"}</div>
             </InputBlock>
+        </StoryContent>
+    );
+}
+
+export function Password() {
+    return (
+        <StoryContent>
+            <StoryHeading>Password Input</StoryHeading>
+            <PasswordInput />
+            <StoryHeading>Password Input with error</StoryHeading>
+            <PasswordInput hasError={true} />
+            <StoryHeading>Password Input with show/hide button</StoryHeading>
+            <PasswordInput showUnmask={true} value="myAwesomePassword" />
+            <StoryHeading>Password Input with show/hide button and error</StoryHeading>
+            <PasswordInput showUnmask={true} value="myAwesomePassword" hasError={true} />
         </StoryContent>
     );
 }

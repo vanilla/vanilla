@@ -14,10 +14,16 @@ export default function ProfileFieldFormClasses() {
             },
             [`.formGroup-checkBox`]: {
                 paddingTop: 0,
-                //sorryyyy
+                paddingBottom: 0,
+                borderBottom: 0,
                 [`label > span:nth-of-type(2)`]: {
                     fontWeight: 500,
                 },
+            },
+
+            [`.formGroup-checkBox:last-of-type`]: {
+                paddingBottom: 16,
+                borderBottom: "1px dotted #e7e8e9",
             },
         }),
     };

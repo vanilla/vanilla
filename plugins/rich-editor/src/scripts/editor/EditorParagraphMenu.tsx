@@ -10,10 +10,10 @@ import { useDevice, Devices } from "@library/layout/DeviceContext";
 import ParagraphMenusBarToggle from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
 
 export function EditorParagraphMenu() {
-    const { isLoading, quill } = useEditor();
+    const { isLoading, editor } = useEditor();
     const device = useDevice();
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
-    if (!quill || isLoading || isMobile) {
+    if (!editor || isLoading || isMobile) {
         return null;
     } else {
         return <ParagraphMenusBarToggle />;

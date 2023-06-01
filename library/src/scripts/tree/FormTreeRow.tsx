@@ -22,10 +22,11 @@ import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from
 interface IProps<ItemDataType> extends IRenderItemParams<ItemDataType> {
     disabled?: boolean;
     isFirstItem?: boolean;
+    RowContentsComponent?: React.ComponentType<ItemDataType>;
 }
 
 /**
- * Component representing a single row of a form tree.
+ * as React.ComponentType<ItemDataType> Component representing a single row of a form tree.
  *
  * - Has a compact made triggered through the context.
  *   - Text buttons become icons.
@@ -39,10 +40,13 @@ export function FormTreeRow<ItemDataType>(props: IProps<ItemDataType>) {
     // Component state.
     //
     const treeContext = useFormTreeContext<ItemDataType>();
-    const { isCompact, isItemDeletable, isItemHideable, markItemHidden, isItemHidden } = treeContext;
+    const { isCompact, isItemEditable, isItemDeletable, isItemHideable, markItemHidden, isItemHidden } = treeContext;
+    const isEditable = isItemEditable?.(item.data) ?? true;
     const isHideable = isItemHideable?.(item.data) ?? false;
     const isDeletable = isItemDeletable?.(item.data) ?? !isHideable;
     const isHidden = isItemHidden?.(item.data) ?? false;
+
+    const anyActionsAvailable = isHideable || isEditable || isDeletable;
 
     // Hidden items get marked as disabled.
     const disabled = props.disabled || isHidden;
@@ -153,7 +157,7 @@ export function FormTreeRow<ItemDataType>(props: IProps<ItemDataType>) {
                 if (isEditing) {
                     save();
                 } else {
-                    startEditing();
+                    isEditable && startEditing();
                 }
                 break;
             case "Escape":
@@ -165,9 +169,9 @@ export function FormTreeRow<ItemDataType>(props: IProps<ItemDataType>) {
     }
 
     const classes = formTreeClasses();
-    const iconType = treeContext.getRowIcon?.(item) ?? "data-folder-tabs";
+    const iconType = treeContext.getRowIcon ? treeContext.getRowIcon(item) : "data-folder-tabs";
 
-    const cancelAction = (
+    const cancelAction = isEditable && (
         <Button
             onClick={(e) => {
                 e.preventDefault();
@@ -180,7 +184,7 @@ export function FormTreeRow<ItemDataType>(props: IProps<ItemDataType>) {
         </Button>
     );
 
-    const applyAction = (
+    const applyAction = isEditable && (
         <Button
             onClick={(e) => {
                 e.preventDefault();
@@ -194,14 +198,14 @@ export function FormTreeRow<ItemDataType>(props: IProps<ItemDataType>) {
         </Button>
     );
 
-    const editAction = !isHidden && (
+    const editAction = isEditable && !isHidden && (
         <Button
             key={"edit"}
             onClick={(e) => {
                 e.preventDefault();
                 // Make sure propagation doesn't go to the row.
                 e.stopPropagation();
-                startEditing();
+                isEditable && startEditing();
             }}
             buttonType={isCompact ? ButtonTypes.ICON : ButtonTypes.TEXT_PRIMARY}
         >
@@ -286,77 +290,88 @@ export function FormTreeRow<ItemDataType>(props: IProps<ItemDataType>) {
             }}
             onDoubleClick={(e) => {
                 e.preventDefault();
-                startEditing(e.target);
+                isEditable && startEditing(e.target);
             }}
             onKeyDown={onKeyDown}
             onFocus={onFocus}
             tabIndex={isFocusable ? 0 : -1}
             role="treeitem"
         >
-            <div className={classes.rowIconWrapper}>
-                <Icon className={classes.rowIcon} icon={iconType} />
-            </div>
-            <JsonSchemaForm
-                // Inputs are disabled when we aren't editing (to take them out of the tab order)
-                // However, in compact mode the actual editable inputs are in a modal
-                // So they are always hidden.
-                disabled={!isEditing || isCompact}
-                schema={treeContext.itemSchema}
-                instance={internalValue}
-                onChange={setInternalValue}
-                FormControl={FormTreeRowFormControl}
-            />
-            {isCompact ? (
-                <div className={cx(classes.actionWrapper, classes.actionWrapperCompact)}>
-                    {(isSelected || isHovered) && (
-                        <>
-                            {editAction}
-                            {deleteAction}
-                            {hideAction}
-                        </>
-                    )}
-                </div>
-            ) : (
-                <div className={classes.actionWrapper}>
-                    {/*
-                    Row actions on desktop
-                */}
-                    {isEditing && (
-                        <>
-                            {cancelAction}
-                            {applyAction}
-                        </>
-                    )}
-                    {!isEditing && (isSelected || isHovered) && (
-                        <>
-                            {editAction}
-                            {hideAction}
-                            {deleteAction}
-                        </>
-                    )}
+            {iconType && (
+                <div className={classes.rowIconWrapper}>
+                    <Icon className={classes.rowIcon} icon={iconType} />
                 </div>
             )}
-            {isCompact && (
-                <FormTreeRowEditModal
-                    isVisible={isEditing}
-                    onClose={() => {
-                        stopEditing(true);
-                    }}
-                    footerActions={
-                        <>
-                            {cancelAction}
-                            {applyAction}
-                        </>
-                    }
-                    form={
-                        <JsonSchemaForm
-                            schema={treeContext.itemSchema}
-                            instance={internalValue}
-                            onChange={setInternalValue}
-                            vanillaUI
-                        />
-                    }
+            {props.RowContentsComponent ? (
+                <props.RowContentsComponent {...props.item.data!} />
+            ) : (
+                // React.createElement(props.RowContentsComponent as React.ComponentType<ItemDataType>, props.item.data)
+                <JsonSchemaForm
+                    // Inputs are disabled when we aren't editing (to take them out of the tab order)
+                    // However, in compact mode the actual editable inputs are in a modal
+                    // So they are always hidden.
+                    disabled={!isEditing || isCompact}
+                    schema={treeContext.itemSchema}
+                    instance={internalValue}
+                    onChange={setInternalValue}
+                    FormControl={FormTreeRowFormControl}
                 />
+            )}
+            {anyActionsAvailable && (
+                <>
+                    {isCompact ? (
+                        <div className={cx(classes.actionWrapper, classes.actionWrapperCompact)}>
+                            {(isSelected || isHovered) && (
+                                <>
+                                    {editAction}
+                                    {deleteAction}
+                                    {hideAction}
+                                </>
+                            )}
+                        </div>
+                    ) : (
+                        <div className={classes.actionWrapper}>
+                            {/*
+                    Row actions on desktop
+                */}
+                            {isEditing && (
+                                <>
+                                    {cancelAction}
+                                    {applyAction}
+                                </>
+                            )}
+                            {!isEditing && (isSelected || isHovered) && (
+                                <>
+                                    {editAction}
+                                    {hideAction}
+                                    {deleteAction}
+                                </>
+                            )}
+                        </div>
+                    )}
+                    {isCompact && (
+                        <FormTreeRowEditModal
+                            isVisible={isEditing}
+                            onClose={() => {
+                                stopEditing(true);
+                            }}
+                            footerActions={
+                                <>
+                                    {cancelAction}
+                                    {applyAction}
+                                </>
+                            }
+                            form={
+                                <JsonSchemaForm
+                                    schema={treeContext.itemSchema}
+                                    instance={internalValue}
+                                    onChange={setInternalValue}
+                                    vanillaUI
+                                />
+                            }
+                        />
+                    )}
+                </>
             )}
         </div>
     );

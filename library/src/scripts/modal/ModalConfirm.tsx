@@ -83,23 +83,11 @@ export default class ModalConfirm extends React.Component<IProps> {
                     body={
                         <FrameBody>
                             {fullWidthContent ? (
-                                <div
-                                    className={cx(
-                                        "frameBody-contents",
-                                        classesFrameBody.contents,
-                                        this.props.bodyClassName,
-                                    )}
-                                >
+                                <div className={cx(classesFrameBody.contents, this.props.bodyClassName)}>
                                     {children}
                                 </div>
                             ) : (
-                                <SmartAlign
-                                    className={cx(
-                                        "frameBody-contents",
-                                        classesFrameBody.contents,
-                                        this.props.bodyClassName,
-                                    )}
-                                >
+                                <SmartAlign className={cx(classesFrameBody.contents, this.props.bodyClassName)}>
                                     {children}
                                 </SmartAlign>
                             )}

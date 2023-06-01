@@ -31,8 +31,11 @@ class ImageHtmlProcessor extends HtmlProcessor
         /** @var \DOMElement $domImage */
         foreach ($domImages as $domImage) {
             $srcSetValues = [];
-            $imageSrc = $domImage->getAttribute("src");
+            $imageSrc = $domImage->getAttribute("src") ?: null;
             $srcSetArray = $imageSrcSetService->getResizedSrcSet($imageSrc)->jsonSerialize();
+            if (empty($srcSetArray)) {
+                continue;
+            }
             foreach ($srcSetArray as $srcSetWidth => $srcSetUrl) {
                 // If for some reason we have an empty url, we do not bother adding it to the srcset.
                 if (!empty($srcSetUrl)) {

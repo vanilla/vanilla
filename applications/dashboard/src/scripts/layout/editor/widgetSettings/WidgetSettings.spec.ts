@@ -4,10 +4,11 @@
  */
 
 import { extractDataByKeyLookup } from "@dashboard/layout/editor/LayoutEditorAddWidget";
+import { EMPTY_SCHEMA, JsonSchema } from "@vanilla/json-schema-forms";
 
 describe("WidgetSettings", () => {
     //4 level nested complex object
-    const mockWidgetSchema = {
+    const mockWidgetSchema: JsonSchema = {
         type: "object",
         properties: {
             level1: {
@@ -28,6 +29,7 @@ describe("WidgetSettings", () => {
                         type: "string",
                     },
                 },
+                required: [],
             },
             level1_withDeepNested_value: {
                 type: "object",
@@ -61,15 +63,19 @@ describe("WidgetSettings", () => {
                                         default: null,
                                     },
                                 },
+                                required: [],
                             },
                         },
+                        required: [],
                     },
                     level2: {
                         type: "string",
                     },
                 },
+                required: [],
             },
         },
+        required: [],
     };
 
     it("extract default props from widget schema", () => {
@@ -93,6 +99,6 @@ describe("WidgetSettings", () => {
         expect(extractDataByKeyLookup(mockWidgetSchema, "someKey")).toStrictEqual({});
 
         //empty object, empty object sent to lookup
-        expect(extractDataByKeyLookup({}, "someKey")).toStrictEqual({});
+        expect(extractDataByKeyLookup(EMPTY_SCHEMA, "someKey")).toStrictEqual({});
     });
 });

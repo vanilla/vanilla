@@ -221,7 +221,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
         $apiParams["expand"] = ["all", "-body"];
 
         // Filter down to the current site section if we haven't set categoryID.
-        if (!isset($apiParams["categoryID"])) {
+        if (!isset($apiParams["categoryID"]) && !isset($apiParams["siteSectionID"])) {
             $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
             $apiParams["siteSectionID"] = $currentSiteSection->getSectionID();
         }
@@ -231,6 +231,9 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
             $apiParams["siteSectionID"] = null;
             $apiParams["categoryID"] = null;
         }
+
+        // Hide discussions from hidden categories
+        $apiParams["excludeHiddenCategories"] = true;
 
         return $apiParams;
     }
@@ -244,7 +247,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
     {
         $apiSchema = new Schema([
             "type" => "object",
-            "default" => [],
+            "default" => new \stdClass(),
             "properties" => [
                 "featuredImage" => [
                     "type" => "boolean",
@@ -399,5 +402,14 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
     public function setDiscussionOptions(array $discussionOptions): void
     {
         $this->discussionOptions = $discussionOptions;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["discussions"]));
+        return $result;
     }
 }

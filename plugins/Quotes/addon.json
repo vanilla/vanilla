@@ -7,6 +7,7 @@
     "icon": "quotes.png",
     "key": "quotes",
     "type": "addon",
+    "priority": 103,
     "authors": [
         {
             "name": "Tim Gunter",

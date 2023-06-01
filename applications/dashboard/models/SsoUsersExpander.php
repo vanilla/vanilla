@@ -40,6 +40,7 @@ class SsoUsersExpander extends AbstractApiExpander
             ->addExpandField("lastUser.ssoID", "lastUserID")
             ->addExpandField("updateUser.ssoID", "updateUserID")
             ->addExpandField("user.ssoID", "userID")
+            ->addExpandField("inviteUser.ssoID", "inviteUserID")
             ->addExpandField("ssoID", "userID");
     }
 

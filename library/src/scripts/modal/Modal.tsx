@@ -4,14 +4,14 @@
  * @license Proprietary
  */
 
-import Loadable from "react-loadable";
 import React from "react";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import Loader from "@library/loaders/Loader";
+import { createLoadableComponent } from "@vanilla/react-utils";
 
-const Modal = Loadable({
-    loader: () => import(/* webpackChunkName: "modal/Modal" */ "@library/modal/Modal.loadable"),
-    loading() {
+const Modal = createLoadableComponent({
+    loadFunction: () => import(/* webpackChunkName: "modal/Modal" */ "@library/modal/Modal.loadable"),
+    fallback() {
         return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
     },
 });

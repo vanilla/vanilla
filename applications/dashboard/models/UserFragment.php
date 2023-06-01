@@ -113,4 +113,17 @@ class UserFragment implements \ArrayAccess, \JsonSerializable, \IteratorAggregat
     {
         return count($this->data);
     }
+
+    /**
+     * Create a new UserFragment object with profile fields.
+     *
+     * @param array $profileFields
+     * @return UserFragment
+     */
+    public function withProfileFields(array $profileFields): UserFragment
+    {
+        $userFragment = new UserFragment(get_object_vars($this) + $this->data);
+        $userFragment["profileFields"] = $profileFields;
+        return $userFragment;
+    }
 }

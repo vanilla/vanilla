@@ -16,9 +16,9 @@ interface IProps extends Omit<React.ComponentProps<typeof DiscussionsWidget>, "d
 }
 
 export function DiscussionsWidgetPreview(props: IProps) {
-    const { discussions: discussionsFromProps, apiParams, containerOptions, discussionOptions } = props;
+    const { discussions: discussionsFromProps, containerOptions, discussionOptions, isAsset } = props;
 
-    const { limit } = apiParams;
+    const { limit } = props.apiParams;
 
     const includeUnread =
         (!containerOptions?.displayType || containerOptions.displayType === WidgetContainerDisplayType.LIST) &&
@@ -28,12 +28,26 @@ export function DiscussionsWidgetPreview(props: IProps) {
         return discussionsFromProps ?? LayoutEditorPreviewData.discussions(parseInt(`${limit ?? 10}`), includeUnread);
     }, [includeUnread, limit, discussionsFromProps]);
 
+    const apiParams = useMemo(() => {
+        const tmpParams = { ...props.apiParams };
+
+        if (isAsset) {
+            tmpParams.page = 1;
+        } else {
+            tmpParams.discussionID = discussions[0].discussionID;
+        }
+
+        return tmpParams;
+    }, [isAsset, props.apiParams, discussions]);
+
     return (
         <Widget>
             <DiscussionsWidget
                 {...props}
+                noCheckboxes={true}
+                isPreview={isAsset}
                 discussions={discussions}
-                apiParams={{ ...apiParams, discussionID: discussions[0].discussionID }}
+                apiParams={apiParams}
                 containerOptions={{
                     ...containerOptions,
                     maxColumnCount:
@@ -41,7 +55,6 @@ export function DiscussionsWidgetPreview(props: IProps) {
                             ? 2
                             : containerOptions?.maxColumnCount,
                 }}
-                noCheckboxes
                 disableButtonsInItems
             />
         </Widget>

@@ -775,6 +775,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable
      *
      * @param string $indexName Name of the index.
      * @param string[] $columns The columns making up the index in order.
+     *
      * @return $this
      */
     public function createIndexIfNotExists(string $indexName, array $columns)
@@ -789,15 +790,53 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable
             $quotedColumns = array_map(function ($col) {
                 return "`$col`";
             }, $columns);
+            $indexType = str_starts_with("UX", $indexName) ? " UNIQUE " : "";
             $columnString = implode(",", $quotedColumns);
             $sql = <<<SQL
 ALTER TABLE `{$tableName}`
-ADD INDEX {$indexName} ({$columnString}), ALGORITHM=INPLACE, LOCK=NONE
+ADD $indexType INDEX {$indexName} ({$columnString}), ALGORITHM=INPLACE, LOCK=NONE
 SQL;
 
-            $this->table($tableName);
             $this->executeQuery($sql, true);
         }
+        return $this;
+    }
+
+    /**
+     * Rename an old index to a new one if possible.
+     * Deletes the old index if both exist.
+     *
+     * @param string $oldName
+     * @param string $newName
+     *
+     * @return $this
+     */
+    public function tryRenameIndex(string $oldName, string $newName)
+    {
+        $px = $this->Database->DatabasePrefix;
+        $tableName = $this->tableName();
+        $tableName = $px . $tableName;
+
+        $oldIndexExists = $this->indexExists($tableName, $oldName);
+
+        if (!$oldIndexExists) {
+            // Nothing to do.
+            return $this;
+        }
+
+        $newIndexExists = $this->indexExists($tableName, $newName);
+        if ($newIndexExists) {
+            // We can drop the old index
+            $this->dropIndexIfExists($oldName);
+            return $this;
+        }
+
+        // At this point the old one exists, but the new one does not.
+        $sql = <<<SQL
+ALTER TABLE `{$tableName}`
+RENAME INDEX {$oldName} TO {$newName}
+SQL;
+        $this->executeQuery($sql);
         return $this;
     }
 

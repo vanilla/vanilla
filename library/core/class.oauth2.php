@@ -1496,7 +1496,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
      * @throws ClientException Throws an exception if the user cannot be connected for some reason.
      * @throws Garden\Schema\ValidationException Throws an exception if the payload doesn't contain the required fields.
      */
-    final private function sso(array $payload, string $providerKey): int
+    final function sso(array $payload, string $providerKey): int
     {
         unset($payload["UserID"]); // safety precaution due to Gdn_UserModel::connect() behaviour
 
@@ -1544,7 +1544,7 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
      * @return string
      * @throws NotFoundException Throws an exception if there is no provider with that client ID.
      */
-    final private function getProviderTypeFromClientID(string $clientID): string
+    final function getProviderTypeFromClientID(string $clientID): string
     {
         $key = "authenticationPoviderType.clientID.$clientID";
 

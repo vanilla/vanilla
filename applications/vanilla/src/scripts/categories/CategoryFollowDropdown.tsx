@@ -7,8 +7,9 @@
 import { useCurrentUser } from "@library/features/users/userHooks";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import RadioButton from "@library/forms/RadioButton";
-import RadioButtonGroup from "@library/forms/RadioButtonGroup";
+import Button from "@library/forms/Button";
+import CheckboxGroup from "@library/forms/CheckboxGroup";
+import Checkbox from "@library/forms/Checkbox";
 import { SettingsIcon } from "@library/icons/titleBar";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
@@ -17,15 +18,15 @@ import LinkAsButton from "@library/routing/LinkAsButton";
 import {
     DEFAULT_NOTIFICATION_PREFERENCES,
     ICategoryPreferences,
+    CategoryPostNotificationType,
 } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import {
-    categoryFollowDropDownClasses,
-    radioLabelClasses,
-} from "@vanilla/addon-vanilla/categories/categoryFollowDropDown.styles";
+import { categoryFollowDropDownClasses } from "@vanilla/addon-vanilla/categories/categoryFollowDropDown.styles";
 import { useCategoryNotifications } from "@vanilla/addon-vanilla/categories/categoryFollowHooks";
 import { t } from "@vanilla/i18n";
+import Translate from "@library/content/Translate";
 import { Icon } from "@vanilla/icons";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
+import FrameFooter from "@library/layout/frame/FrameFooter";
 
 enum EmailMode {
     DEFAULT_ON = "defaultOn",
@@ -36,22 +37,24 @@ enum EmailMode {
 interface IProps {
     userID: number;
     categoryID: number;
+    categoryName: string;
     notificationPreferences?: ICategoryPreferences | null;
     emailNotificationsMode?: EmailMode;
 }
 
 export const CategoryFollowDropDown = (props: IProps) => {
     const [isOpen, setOpen] = useState<boolean>(false);
+    const currentUser = useCurrentUser();
+
     /**
      * We need to maintain this state because the props are fed in
      * through the initial render and will be updated via an API
      */
-    const { setNotificationPreferences, setNotificationPreferencesState, notificationPreferences } =
-        useCategoryNotifications(
-            props.userID,
-            props.categoryID,
-            props.notificationPreferences ?? DEFAULT_NOTIFICATION_PREFERENCES,
-        );
+    const { setNotificationPreferences, notificationPreferences } = useCategoryNotifications(
+        props.userID,
+        props.categoryID,
+        props.notificationPreferences ?? DEFAULT_NOTIFICATION_PREFERENCES,
+    );
 
     useEffect(() => {
         if (
@@ -62,29 +65,11 @@ export const CategoryFollowDropDown = (props: IProps) => {
                 useEmailNotifications: false,
             });
         }
-    }, []);
+    }, [props.emailNotificationsMode, props.notificationPreferences, setNotificationPreferences]);
 
     const currentPreferences = notificationPreferences;
-
-    const originalEmailPref = useMemo(() => {
-        switch (props.emailNotificationsMode) {
-            case EmailMode.DISABLED:
-                return false;
-            case EmailMode.DEFAULT_ON:
-                return !props.notificationPreferences ||
-                    props.notificationPreferences?.useEmailNotifications ||
-                    props.notificationPreferences?.postNotifications === "follow"
-                    ? true
-                    : false;
-            case EmailMode.DEFAULT_OFF:
-            default:
-                return props.notificationPreferences?.useEmailNotifications;
-        }
-    }, []);
     const isFollowed = currentPreferences.postNotifications !== null;
     const classes = categoryFollowDropDownClasses({ isOpen, isFollowed });
-
-    const currentUser = useCurrentUser();
 
     return (
         <div className={classes.layout}>
@@ -94,7 +79,9 @@ export const CategoryFollowDropDown = (props: IProps) => {
                 buttonClassName={classes.followButton}
                 buttonContents={isFollowed ? <Icon icon="me-notifications-solid" /> : <Icon icon="me-notifications" />}
                 flyoutType={FlyoutType.FRAME}
-                onVisibilityChange={(b) => setOpen(b)}
+                onVisibilityChange={(b) => {
+                    setOpen(b);
+                }}
             >
                 <Frame
                     header={
@@ -104,106 +91,113 @@ export const CategoryFollowDropDown = (props: IProps) => {
                                     currentUser?.name ?? "",
                                 )}#followed-categories`}
                                 buttonType={ButtonTypes.ICON}
+                                className={classes.preferencesButton}
                             >
                                 <SettingsIcon />
                             </LinkAsButton>
                         </FrameHeaderWithAction>
                     }
                     body={
-                        <FrameBody selfPadded>
-                            <RadioButtonGroup wrapClassName={classes.groupLayout}>
-                                <RadioButton
-                                    className={classes.radioItem}
-                                    onChecked={() => {
+                        !isFollowed ? (
+                            <FrameBody hasVerticalPadding={true}>
+                                <Button
+                                    buttonType={ButtonTypes.PRIMARY}
+                                    className={classes.fullWidth}
+                                    onClick={() => {
                                         setNotificationPreferences({
-                                            useEmailNotifications: false,
-                                            postNotifications: "follow",
+                                            postNotifications: CategoryPostNotificationType.FOLLOW,
                                         });
                                     }}
-                                    checked={currentPreferences.postNotifications === "follow"}
-                                    value={"follow"}
-                                    label={<RadioLabel title={t("Follow")} description={t("Follow on my homepage.")} />}
-                                />
-                                <RadioButton
-                                    className={classes.radioItem}
-                                    onChecked={() => {
-                                        setNotificationPreferences({
-                                            postNotifications: "discussions",
-                                            useEmailNotifications: originalEmailPref,
-                                        });
-                                    }}
-                                    checked={currentPreferences.postNotifications === "discussions"}
-                                    value={"discussions"}
-                                    label={
-                                        <RadioLabel
-                                            title={t("Discussions")}
-                                            description={
-                                                originalEmailPref
-                                                    ? t("Notify of all new discussions by email.")
-                                                    : t("Notify of all new discussions.")
+                                >
+                                    {t("Follow Category")}
+                                </Button>
+                            </FrameBody>
+                        ) : (
+                            <>
+                                <FrameBody hasVerticalPadding={true}>
+                                    <p className={classes.heading}>
+                                        <Translate source="Preferences for <0/>" c0={props.categoryName} />
+                                    </p>
+                                    <CheckboxGroup>
+                                        <Checkbox
+                                            label={t("Notify of new posts")}
+                                            labelBold={false}
+                                            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                                event.target.checked
+                                                    ? setNotificationPreferences({
+                                                          postNotifications: CategoryPostNotificationType.DISCUSSIONS,
+                                                      })
+                                                    : setNotificationPreferences({
+                                                          postNotifications: CategoryPostNotificationType.FOLLOW,
+                                                          useEmailNotifications: false,
+                                                      });
+                                            }}
+                                            checked={
+                                                currentPreferences.postNotifications ===
+                                                    CategoryPostNotificationType.DISCUSSIONS ||
+                                                currentPreferences.postNotifications ===
+                                                    CategoryPostNotificationType.ALL
                                             }
+                                            hugLeft={true}
+                                            className={classes.checkBox}
                                         />
-                                    }
-                                />
-                                <RadioButton
-                                    className={classes.radioItem}
-                                    onChecked={() => {
-                                        setNotificationPreferences({
-                                            postNotifications: "all",
-                                            useEmailNotifications: originalEmailPref,
-                                        });
-                                    }}
-                                    checked={currentPreferences.postNotifications === "all"}
-                                    value={"all"}
-                                    label={
-                                        <RadioLabel
-                                            title={t("Discussions and Comments")}
-                                            description={
-                                                originalEmailPref
-                                                    ? t("Notify of all new posts by email.")
-                                                    : t("Notify of all new posts.")
-                                            }
-                                        />
-                                    }
-                                />
-                                <RadioButton
-                                    className={classes.radioItem}
-                                    onChecked={() => {
-                                        setNotificationPreferences({
-                                            useEmailNotifications: false,
-                                            postNotifications: null,
-                                        });
-                                    }}
-                                    checked={currentPreferences.postNotifications === null}
-                                    value={"null"}
-                                    label={
-                                        <RadioLabel
-                                            title={t("Unfollow")}
-                                            description={t("Only receive default notifications.")}
-                                        />
-                                    }
-                                />
-                            </RadioButtonGroup>
-                        </FrameBody>
+                                        <CheckboxGroup noMargin={true} className={classes.marginLeft}>
+                                            <Checkbox
+                                                label={t("Notify of new comments")}
+                                                labelBold={false}
+                                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                                    setNotificationPreferences({
+                                                        postNotifications: event.target.checked
+                                                            ? CategoryPostNotificationType.ALL
+                                                            : CategoryPostNotificationType.DISCUSSIONS,
+                                                    });
+                                                }}
+                                                checked={
+                                                    currentPreferences.postNotifications ===
+                                                    CategoryPostNotificationType.ALL
+                                                }
+                                                disabled={
+                                                    currentPreferences.postNotifications ===
+                                                    CategoryPostNotificationType.FOLLOW
+                                                }
+                                                className={classes.checkBox}
+                                            />
+                                            <Checkbox
+                                                label={t("Email notifications")}
+                                                labelBold={false}
+                                                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                                    setNotificationPreferences({
+                                                        useEmailNotifications: event.target.checked ? true : false,
+                                                    });
+                                                }}
+                                                checked={currentPreferences.useEmailNotifications}
+                                                disabled={
+                                                    currentPreferences.postNotifications ===
+                                                    CategoryPostNotificationType.FOLLOW
+                                                }
+                                                className={classes.checkBox}
+                                            />
+                                        </CheckboxGroup>
+                                    </CheckboxGroup>
+                                </FrameBody>
+                                <FrameFooter forDashboard={true}>
+                                    <Button
+                                        className={classes.fullWidth}
+                                        onClick={() => {
+                                            setNotificationPreferences({
+                                                postNotifications: null,
+                                                useEmailNotifications: false,
+                                            });
+                                        }}
+                                    >
+                                        {t("Unfollow Category")}
+                                    </Button>
+                                </FrameFooter>
+                            </>
+                        )
                     }
                 />
             </DropDown>
         </div>
     );
 };
-
-interface ILabelProps {
-    title: string;
-    description: string;
-}
-
-function RadioLabel(props: ILabelProps) {
-    const { title, description } = props;
-    const classes = radioLabelClasses();
-    return (
-        <span className={classes.layout}>
-            <span className={classes.title}>{title}</span>
-            <span className={classes.description}>{description}</span>
-        </span>
-    );
-}

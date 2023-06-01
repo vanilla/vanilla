@@ -68,7 +68,7 @@ class LayoutPageTest extends BootstrapTestCase
         $layoutPage = $this->container()->get(LayoutPage::class);
         $page = $layoutPage->preloadLayout(new LayoutFormAsset("home")); //, 'home', 1, $params);
 
-        $this->assertSame("Home - LayoutPageTest - LayoutPageTest", $page->getSeoTitle());
+        $this->assertSame("Home - LayoutPageTest", $page->getSeoTitle());
         $this->assertSame("", $page->getSeoDescription());
     }
 
@@ -90,7 +90,7 @@ class LayoutPageTest extends BootstrapTestCase
         $layoutPage = $this->container()->get(LayoutPage::class);
         $page = $layoutPage->preloadLayout(new LayoutFormAsset("home", "home", 1, []));
 
-        $this->assertSame("Home - LayoutPageTest - LayoutPageTest", $page->getSeoTitle());
+        $this->assertSame("Home - LayoutPageTest", $page->getSeoTitle());
         $this->assertSame("", $page->getSeoDescription());
     }
 

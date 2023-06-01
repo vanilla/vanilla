@@ -9,11 +9,12 @@ namespace VanillaTests\Library\Vanilla\Utility;
 
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\Timers;
+use VanillaTests\SiteTestCase;
 
 /**
  * Tests for the `Timers` class.
  */
-class TimersTest extends TestCase
+class TimersTest extends SiteTestCase
 {
     /**
      * @var Timers
@@ -124,8 +125,8 @@ class TimersTest extends TestCase
         $this->timers->stopAll();
         $timers = $this->timers->jsonSerialize();
         foreach ($timers as $name => $timer) {
-            $this->assertIsFloat($timer["stop"]);
-            $this->assertIsFloat($timer["min"]);
+            $this->assertIsFloat($timer["time"]);
+            $this->assertIsString($timer["human"]);
             $this->assertIsFloat($timer["max"]);
         }
     }
@@ -174,5 +175,20 @@ class TimersTest extends TestCase
         $str = $this->timers->getLogFormatString();
         $this->assertSame("foo: {foo.human}, test: {test.human}", $str);
         $this->timers->stopAll();
+    }
+
+    /**
+     * Test that timers can warn.
+     */
+    public function testTimerWarning()
+    {
+        $this->timers->setWarningLimit("slowTimer", 100);
+        $this->timers->start("slowTimer");
+        usleep(300 * 1000);
+        $timer = $this->timers->stop("slowTimer", [
+            "why" => "foo",
+        ]);
+        $this->assertErrorLogMessage("Timer slowTimer took {$timer["human"]}.");
+        $this->assertErrorLog(["tags" => ["timerWarning", "slowTimer"], "data.why" => "foo"]);
     }
 }

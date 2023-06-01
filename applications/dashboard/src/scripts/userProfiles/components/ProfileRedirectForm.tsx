@@ -18,12 +18,17 @@ import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import isEmpty from "lodash/isEmpty";
 import isEqual from "lodash/isEqual";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { JSONSchemaType } from "ajv";
 
-const REDIRECT_SCHEMA: JsonSchema = {
+const REDIRECT_SCHEMA: JSONSchemaType<{
+    "redirectURL.profile"?: string;
+    "redirectURL.message"?: string;
+}> = {
     type: "object",
     properties: {
         "redirectURL.profile": {
             type: "string",
+            nullable: true,
             minLength: 1,
             maxLength: 500,
             "x-control": {
@@ -35,6 +40,7 @@ const REDIRECT_SCHEMA: JsonSchema = {
         },
         "redirectURL.message": {
             type: "string",
+            nullable: true,
             minLength: 1,
             maxLength: 500,
             "x-control": {
@@ -45,6 +51,7 @@ const REDIRECT_SCHEMA: JsonSchema = {
             },
         },
     },
+    required: [],
 };
 
 export function ProfileRedirectForm() {
@@ -131,11 +138,11 @@ export function ProfileRedirectForm() {
     const classes = ProfileRedirectFormClasses();
 
     return (
-        <form>
+        <form data-testid="profile-redirect-form">
             {isLoaded ? (
                 <>
                     <JsonSchemaForm
-                        schema={REDIRECT_SCHEMA}
+                        schema={REDIRECT_SCHEMA as JsonSchema}
                         instance={formValues}
                         FormControlGroup={DashboardFormControlGroup}
                         FormControl={DashboardFormControl}

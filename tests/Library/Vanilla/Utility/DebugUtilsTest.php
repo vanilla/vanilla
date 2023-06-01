@@ -115,4 +115,28 @@ EOT;
     {
         $this->assertTrue(DebugUtils::isTestMode());
     }
+
+    /**
+     * @return void
+     */
+    public function testJsonEncodeSummary()
+    {
+        $input = [
+            "item1" => [
+                "item11" => ["item111"],
+                "item22" => ["item222"],
+            ],
+        ];
+
+        $expected = json_encode(
+            [
+                "item1" => [
+                    "item11" => "(Truncated)",
+                    "item22" => "(Truncated)",
+                ],
+            ],
+            JSON_PRETTY_PRINT
+        );
+        $this->assertEquals($expected, DebugUtils::jsonEncodeSummary($input, JSON_PRETTY_PRINT));
+    }
 }

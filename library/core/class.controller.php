@@ -14,7 +14,9 @@ use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemePreloadProvider;
 use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\HtmlUtils;
+use Vanilla\Utility\StringUtils;
 use Vanilla\Web\Asset\LegacyAssetModel;
+use Vanilla\Web\Asset\NoScriptStylesAsset;
 use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlTrait;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
@@ -23,6 +25,8 @@ use Vanilla\Web\ContentSecurityPolicy\Policy;
 use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
 use Vanilla\Web\MasterViewRenderer;
 use Vanilla\Dashboard\Pages\LegacyDashboardPage;
+use Vanilla\Web\SeoMetaModel;
+use Vanilla\Web\TwigStaticRenderer;
 
 /**
  * Controller base class.
@@ -681,6 +685,18 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     }
 
     /**
+     * Validate that our meta values serialize properly.
+     *
+     * @return string
+     */
+    public function validateDefinitionList()
+    {
+        // Generate the list.
+        $this->definitionList();
+        return StringUtils::jsonEncodeChecked($this->_Definitions);
+    }
+
+    /**
      * Gets the javascript definition list used to pass data to the client.
      *
      * @param bool $wrap Whether or not to wrap the result in a `script` tag.
@@ -725,16 +741,10 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         }
 
         if (!array_key_exists("ResolvedArgs", $this->_Definitions)) {
-            if (
-                sizeof($this->ReflectArgs) &&
-                ((isset($this->ReflectArgs[0]) && $this->ReflectArgs[0] instanceof Gdn_Pluggable) ||
-                    (isset($this->ReflectArgs["Sender"]) && $this->ReflectArgs["Sender"] instanceof Gdn_Pluggable) ||
-                    (isset($this->ReflectArgs["sender"]) && $this->ReflectArgs["sender"] instanceof Gdn_Pluggable))
-            ) {
-                $reflectArgs = array_slice($this->ReflectArgs, 1);
-            } else {
-                $reflectArgs = $this->ReflectArgs;
-            }
+            // Get a filtered list of arguments that are not pluggables.
+            $reflectArgs = array_filter($this->ReflectArgs, function ($arg) {
+                return !($arg instanceof Gdn_Pluggable);
+            });
 
             $this->_Definitions["ResolvedArgs"] = $reflectArgs;
         }
@@ -1965,11 +1975,12 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     /**
      * Render a page that hosts a react component.
      */
-    public function renderReact()
+    public function renderReact(string $innerContent = "")
     {
         if (!$this->data("hasPanel")) {
             $this->CssClass .= " NoPanel";
         }
+        $this->setData("seoReactContent", $innerContent);
         $this->render("react", "", "core");
     }
 
@@ -2306,6 +2317,13 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
                 $this->Head->setMobileAddressBarColor($mobileAddressBarColor);
             }
 
+            // Add config defined SEO metas.
+            $seoMetaModel = \Gdn::getContainer()->get(SeoMetaModel::class);
+            $seoMetas = $seoMetaModel->getMetas();
+            foreach ($seoMetas as $seoMeta) {
+                $this->Head->addTag("meta", $seoMeta);
+            }
+
             // Make sure the head module gets passed into the assets collection.
             $this->addModule("Head");
         }
@@ -2485,6 +2503,10 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         foreach ($styleAssets as $asset) {
             $this->Head->addCss($asset->getWebPath(), null, false);
         }
+
+        // Noscript stylesheet
+        $noScriptStyleAsset = \Gdn::getContainer()->get(NoScriptStylesAsset::class);
+        $this->Head->addTag("noscript", [], "<link rel='stylesheet' href='{$noScriptStyleAsset->getWebPath()}'>");
     }
 
     /**

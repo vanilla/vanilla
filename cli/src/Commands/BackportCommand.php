@@ -7,32 +7,82 @@
 
 namespace Vanilla\Cli\Commands;
 
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Vanilla\Cli\Utils\ScriptLoggerTrait;
 use Vanilla\Cli\Utils\ShellUtils;
 use Vanilla\Cli\Utils\SimpleScriptLogger;
+use Symfony\Component\Console;
 
 /**
  * Backport command.
  */
-class BackportCommand
+class BackportCommand extends Console\Command\Command
 {
+    use ScriptLoggerTrait;
+
     /** @var int */
-    private $pr;
+    private int $pr;
 
     /** @var string */
-    private $targetBranch;
+    private string $targetBranch;
 
     /** @var string */
-    private $targetSlug;
-
-    /** @var SimpleScriptLogger */
-    private $logger;
+    private string $targetSlug;
 
     /**
-     * Constructor.
+     * @inheritdoc
      */
-    public function __construct()
+    public function configure()
     {
-        $this->logger = new SimpleScriptLogger();
+        parent::configure();
+        $description = <<<TXT
+Backport a pull request to a target branch and open a pull request targeting that branch.
+
+Used to apply a PR targeting 1 branch to another branch target.
+Only the commits specific to that branch will be applied.
+TXT;
+
+        $this->setName("backport")
+            ->setDescription($description)
+            ->setDefinition(
+                new Console\Input\InputDefinition([
+                    new Console\Input\InputOption(
+                        "pr",
+                        null,
+                        Console\Input\InputOption::VALUE_REQUIRED,
+                        "The github PR number to backport."
+                    ),
+                    new Console\Input\InputOption(
+                        "target",
+                        null,
+                        Console\Input\InputOption::VALUE_REQUIRED,
+                        "The target branch to backport to."
+                    ),
+                ])
+            )
+            ->addUsage("backport --pr 5243 --target release/2023.001");
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        parent::initialize($input, $output);
+        $pr = $input->getOption("pr");
+        $target = $input->getOption("target");
+
+        if (!is_numeric($pr)) {
+            throw new \Exception("--pr flag is required.");
+        }
+
+        if ($target === null) {
+            throw new \Exception("--target flag is required.");
+        }
+
+        $this->setPr($pr);
+        $this->setTarget($target);
     }
 
     /**
@@ -40,17 +90,19 @@ class BackportCommand
      *
      * Used to apply a PR targeting 1 branch to another branch target.
      * Only the commits specific to that branch will be applied.
+     * @param InputInterface $input
+     * @param OutputInterface $output
      */
-    public function backport()
+    public function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->logger->title("Fetching remote branches");
+        $this->logger()->title("Fetching remote branches");
         ShellUtils::shellOrThrow("git fetch --all");
 
-        $this->logger->title("Checking out latest version of $this->targetBranch");
+        $this->logger()->title("Checking out latest version of $this->targetBranch");
         ShellUtils::shellOrThrow("git checkout {$this->targetBranch}");
         ShellUtils::shellOrThrow("git pull");
 
-        $this->logger->title("Copying commits of #{$this->pr} to a backport branch.");
+        $this->logger()->title("Copying commits of #{$this->pr} to a backport branch.");
         ShellUtils::shellOrThrow("git checkout -b \"backport/{$this->targetSlug}/$this->pr\"");
 
         $repo = $this->fetchRepositoryPath();
@@ -62,7 +114,7 @@ class BackportCommand
         ]);
 
         // Get the PR info
-        $this->logger->title("Creating the backport PR on github.");
+        $this->logger()->title("Creating the backport PR on github.");
         [$title, $body] = $this->fetchTitleAndBody($repo);
 
         $ghLinks = $this->parseGithubUrls($body);
@@ -71,6 +123,7 @@ class BackportCommand
             $messages[] = "Related {$link}";
         }
         $this->pushPr($messages);
+        return self::SUCCESS;
     }
 
     /**
@@ -99,9 +152,9 @@ class BackportCommand
      */
     public function handleMergeConflict()
     {
-        $this->logger->title("Error Resolution");
-        $this->logger->error("There was an error applying your commits.");
-        $this->logger->info("You will need to resolve conflicts manually. Then come back to continue.\n");
+        $this->logger()->title("Error Resolution");
+        $this->logger()->error("There was an error applying your commits.");
+        $this->logger()->info("You will need to resolve conflicts manually. Then come back to continue.\n");
         ShellUtils::promptYesNo(
             "Have you finished manually resolving the backport? Type 'y' to continue to make the PR.",
             true

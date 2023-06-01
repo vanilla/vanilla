@@ -160,7 +160,7 @@ class InternalClient extends HttpClient
             $exception = HttpException::createFromStatus(
                 $response->getStatusCode(),
                 $message,
-                $body ?? [],
+                is_array($body) ? $body : [],
                 $previousEx
             );
 

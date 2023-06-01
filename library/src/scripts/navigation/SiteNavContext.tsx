@@ -16,7 +16,7 @@ interface ISiteNavCtx {
     toggleItem: RecordToggle;
     openItem: RecordToggle;
     closeItem: RecordToggle;
-    setInitialOpenItems(initialOpenType: string | null, items: Array<Record>): void;
+    setInitialOpenItems(initialOpenType: string | null, items: Record[]): void;
     initialOpenType: string | null;
     openRecords: {
         [recordType: string]: Set<RecordID>;
@@ -105,7 +105,7 @@ export default function SiteNavProvider(props: IProps) {
         }
     };
 
-    const setInitialOpenItems = (newInitialOpenType: string | null, initialOpenItems: Array<Record>): void => {
+    const setInitialOpenItems = (newInitialOpenType: string | null, initialOpenItems: Record[]): void => {
         setInitialOpenType(newInitialOpenType);
         initialOpenItems.forEach((item) => {
             openItem(item.recordType, item.recordID);

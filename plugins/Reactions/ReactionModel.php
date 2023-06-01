@@ -7,6 +7,7 @@
 use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
+use Garden\Web\Exception\NotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addon;
@@ -495,28 +496,28 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
     /**
      *
      *
-     * @param $type
-     * @param $iD
+     * @param string $type
+     * @param int $recordID
      * @param null $operation
      * @return array
      * @throws Exception
      */
-    public function getRow($type, $iD, $operation = null)
+    public function getRow(string $type, int $recordID, $operation = null)
     {
         $attrColumn = "Attributes";
 
         switch ($type) {
             case "Comment":
                 $model = new CommentModel();
-                $row = $model->getID($iD, DATASET_TYPE_ARRAY);
+                $row = $model->getID($recordID, DATASET_TYPE_ARRAY);
                 break;
             case "Discussion":
                 $model = new DiscussionModel();
-                $row = $model->getID($iD);
+                $row = $model->getID($recordID);
                 break;
             case "Activity":
                 $model = new ActivityModel();
-                $row = $model->getID($iD, DATASET_TYPE_ARRAY);
+                $row = $model->getID($recordID, DATASET_TYPE_ARRAY);
                 $attrColumn = "Data";
                 break;
             default:
@@ -527,7 +528,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
         if (!$row && $operation) {
             // The row may have been logged so try and grab it.
             $logModel = new LogModel();
-            $log = $logModel->getWhere(["RecordType" => $type, "RecordID" => $iD, "Operation" => $operation]);
+            $log = $logModel->getWhere(["RecordType" => $type, "RecordID" => $recordID, "Operation" => $operation]);
 
             if (count($log) == 0) {
                 throw notFoundException($type);
@@ -535,6 +536,12 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
             $log = $log[0];
             $row = $log["Data"];
         }
+
+        // Throws an exception if the record doesn't exist.
+        if (!$row) {
+            throw new NotFoundException("Record is not found", ["type" => $type, "recordID" => $recordID]);
+        }
+
         $row = (array) $row;
 
         // Make sure the attributes are in the row and unserialized.
@@ -1095,16 +1102,23 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
     }
 
     /**
-     *
-     *
      * @param string $recordType
-     * @param int $iD
+     * @param int $recordID
      * @param string $reactionUrlCode
-     * @param bool $selfReact Whether a user can react to their own post
-     * @param string|null $force Force a reaction status. One of the FORCE_* class constants.
+     * @param int|null $userID
+     * @param bool $selfReact
+     * @param $force
+     * @return void
+     * @throws Gdn_UserException
      */
-    public function react($recordType, $iD, $reactionUrlCode, $userID = null, $selfReact = false, $force = null)
-    {
+    public function react(
+        string $recordType,
+        int $recordID,
+        string $reactionUrlCode,
+        int $userID = null,
+        bool $selfReact = false,
+        $force = null
+    ) {
         if (is_null($userID)) {
             $userID = Gdn::session()->UserID;
             $isModerator = checkPermission("Garden.Moderation.Manage");
@@ -1131,7 +1145,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
 
         $logOperation = val("Log", $reactionType);
 
-        [$row, $model, $log] = $this->getRow($recordType, $iD, $logOperation);
+        [$row, $model, $log] = $this->getRow($recordType, $recordID, $logOperation);
 
         if (!$selfReact && !$isModerator && $row["InsertUserID"] == $userID) {
             throw new Gdn_UserException(t("You can't react to your own post."));
@@ -1155,7 +1169,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
         // Save the user Tag.
         $data = [
             "RecordType" => $recordType,
-            "RecordID" => $iD,
+            "RecordID" => $recordID,
             "TagID" => $reactionType["TagID"],
             "UserID" => $userID,
             "Total" => $inc,
@@ -1168,7 +1182,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
         $data = $this->eventManager->fireFilter("reactionModel_react_saveData", $data, $this, $reactionType);
 
         // Create unique key based on the RecordID and UserID to limit requests on a record.
-        $lockKey = "Reactions." . $iD . "." . $userID;
+        $lockKey = "Reactions." . $recordID . "." . $userID;
         $haveLock = self::buildCacheLock($lockKey, self::CACHE_GRACE);
         if ($log) {
             $this->logger->info("Loggable Reaction: Try acquire lock", $loggerContext + ["haveLock" => $haveLock]);
@@ -1211,7 +1225,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
                 $otherUserData = $this->SQL
                     ->getWhere("UserTag", [
                         "RecordType" => $recordType,
-                        "RecordID" => $iD,
+                        "RecordID" => $recordID,
                         "TagID" => $reactionType["TagID"],
                     ])
                     ->resultArray();
@@ -1228,7 +1242,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
             if (!$noDelete && $score >= $removeThreshold) {
                 // Remove the record to the log.
                 $this->logger->info("Loggable Reaction: Requesting Model to Delete and Log", $loggerContext);
-                $model->deleteID($iD, ["Log" => $log, "LogOptions" => $logOptions]);
+                $model->deleteID($recordID, ["Log" => $log, "LogOptions" => $logOptions]);
                 if ($log) {
                     $this->logger->info("Loggable Reaction: Requested Model to Delete and Log", $loggerContext);
                 }
@@ -1243,7 +1257,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
                         Gdn::controller()->jsonTarget("#Content .Comments", "", "SlideUp");
                         Gdn::controller()->jsonTarget(".CommentForm", "", "SlideUp");
                     } else {
-                        Gdn::controller()->jsonTarget("#{$recordType}_$iD", "", "SlideUp");
+                        Gdn::controller()->jsonTarget("#{$recordType}_$recordID", "", "SlideUp");
                     }
                 }
             } elseif ($score >= $logThreshold) {
@@ -1307,7 +1321,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
 
         ReactionsPlugin::instance()->EventArguments = [
             "RecordType" => $recordType,
-            "RecordID" => $iD,
+            "RecordID" => $recordID,
             "Record" => $row,
             "ReactionUrlCode" => $reactionUrlCode,
             "ReactionType" => $reactionType,
@@ -1881,7 +1895,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
     }
 
     /**
-     * Normalize a reaction type database row for outuput.
+     * Normalize a reaction type database row for output.
      *
      * @param array $row
      * @return array

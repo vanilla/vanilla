@@ -22,6 +22,14 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
     const ADMIN_ID = 16;
     const MOD_ID = 32;
 
+    const DEFAULT_ROLE_IDS = [
+        RoleModel::GUEST_ID,
+        RoleModel::UNCONFIRMED_ID,
+        RoleModel::APPLICANT_ID,
+        RoleModel::MEMBER_ID,
+        RoleModel::ADMIN_ID,
+        RoleModel::MOD_ID,
+    ];
     /** Slug for Guest role type. */
     const TYPE_GUEST = "guest";
 
@@ -205,8 +213,8 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
         if (Gdn::session()->checkPermission("Garden.Settings.Manage")) {
             return $this->getArray();
         }
-        // Users that can't edit other users can't assign any roles.
-        if (!Gdn::session()->checkPermission("Garden.Users.Edit")) {
+        // Users that can't edit or add other users can't assign any roles.
+        if (!Gdn::session()->checkPermission(["Garden.Users.Edit", "Garden.Users.Add"], false)) {
             return [];
         }
 
@@ -362,6 +370,25 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
     }
 
     /**
+     * Get an array of default role types and their descriptions.
+     *
+     * @param bool $translate Whether to translate the type names or not.
+     * @return array Returns an array in the form `[type => name and description]`.
+     */
+    public static function getDefaultRoleTypes($translate = true)
+    {
+        $result = [
+            self::TYPE_MEMBER => "Members: All newly registered users",
+            self::TYPE_UNCONFIRMED => "Unconfirmed: Users who have not yet confirmed their email address",
+            self::TYPE_APPLICANT => "Applicants: Users whose membership is pending approval",
+            self::TYPE_GUEST => "Guests: Users who have not logged in",
+        ];
+        if ($translate) {
+            $result = array_map("t", $result);
+        }
+        return $result;
+    }
+    /**
      * Returns a resultset of all roles that have editable permissions.
      *
      * public function getEditablePermissions() {
@@ -379,9 +406,21 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
      *
      * @param int $roleID The RoleID to filter to.
      */
-    public function getByRoleID($roleID)
+    public function getByRoleID(int $roleID)
     {
         return $this->getWhere(["RoleID" => $roleID])->firstRow();
+    }
+
+    /**
+     * Returns a resultset of role data related to the email domain.
+     *
+     * @param string $domain The email domain to filter to.
+     *
+     * @return array
+     */
+    public function getByDomain(string $domain): array
+    {
+        return $this->getWhere(["Domains like" => $domain])->result(DATASET_TYPE_ARRAY);
     }
 
     /**
@@ -618,6 +657,10 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
         $insert = $roleID > 0 ? false : true;
         $doPermissions = val("DoPermissions", $settings, true);
 
+        if (!($formPostValues["EnableType"] ?? true)) {
+            $formPostValues["Type"] = "";
+            $formPostValues["Domains"] = "";
+        }
         if ($insert) {
             // Figure out the next role ID.
             $maxRoleID = $this->SQL
@@ -630,6 +673,9 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
             $this->addInsertFields($formPostValues);
             $formPostValues["RoleID"] = strval($roleID); // string for validation
         } else {
+            if (in_array($formPostValues["RoleID"], RoleModel::DEFAULT_ROLE_IDS)) {
+                unset($formPostValues["Type"]);
+            }
             $this->addUpdateFields($formPostValues);
         }
 

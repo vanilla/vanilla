@@ -7,7 +7,18 @@ helpAsset(t('Heads Up!'), t('Search by user or role.', 'Search for users by name
 helpAsset(t('Need More Help?'), anchor(t("Managing Users"), 'https://success.vanillaforums.com/kb/articles/27-moderation-overview#managing-users'));
 
 if (checkPermission('Garden.Users.Add')) {
-    echo heading(t('Manage Users'), t('Add User'), 'dashboard/user/add', 'js-modal btn btn-primary');
+    if (!Gdn::config("Feature.CustomProfileFields.Enabled")) {
+        echo heading(t('Manage Users'), t('Add User'), 'dashboard/user/add', 'js-modal btn btn-primary');
+    } else {
+        $props = [
+            "headingTitle" => "Manage Users",
+            "profileFields" => $this->getProfileFields(),
+            "passwordLength" => Gdn::config('Garden.Password.MinLength'),
+        ];
+        //need to get/send ranks here, ranks api does not accept params, so they fetched in front end based on manually applied param
+        $props = Gdn::eventManager()->fireFilter("user_add_edit_form", $props, $this);
+        echo \Vanilla\Web\TwigStaticRenderer::renderReactModule("DashboardAddEditUser", $props);
+    }
 } else {
     echo heading(t('Manage Users'));
 }

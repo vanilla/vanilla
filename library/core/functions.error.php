@@ -519,8 +519,7 @@ if (!function_exists("logException")) {
             return;
         }
 
-        // Attempt to log the exception in the PHP logs
-        errorLog(formatException($ex));
+        ErrorLogger::error($ex, ["logException"]);
     }
 }
 

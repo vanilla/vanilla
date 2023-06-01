@@ -1,4 +1,5 @@
-<?php use Vanilla\Dashboard\Models\RecordStatusModel;
+<?php
+use Vanilla\Dashboard\Models\RecordStatusModel;
 
 if (!defined("APPLICATION")) {
     exit();
@@ -83,7 +84,7 @@ $Construct
     ->column("Description", "varchar(1000)", true)
     ->column("Sort", "int", true)
     ->column("CssClass", "varchar(50)", true)
-    ->column("Photo", "varchar(255)", true)
+    ->column("Photo", "varchar(767)", true)
     ->column("BannerImage", "varchar(255)", true)
     ->column("PermissionCategoryID", "int", "-1") // default to root.
     ->column("PointsCategoryID", "int", "0") // default to global.
@@ -255,18 +256,41 @@ if (!$indexStatusDateLastCommentExists) {
         ALGORITHM=INPLACE, LOCK=NONE
     ");
 }
-
+$Construct->table("UserCategory");
+$followedDateExist = $Construct->columnExists("DateFollowed");
 $Construct
-    ->table("UserCategory")
     ->column("UserID", "int", false, "primary")
     ->column("CategoryID", "int", false, "primary")
     ->column("DateMarkedRead", "datetime", null)
     ->column("Followed", "tinyint(1)", 0);
-
 // This column should be removed when muting categories is dropped in favor of category following..
 $Construct->column("Unfollow", "tinyint(1)", 0);
-
+//adding columns DateFollowed and DateUnFollowed to track category followed and unfollowed dates
+if (!$followedDateExist) {
+    $Construct->column("DateFollowed", "datetime", null);
+    $Construct->column("DateUnFollowed", "datetime", null);
+}
 $Construct->set($Explicit, $Drop);
+if (!$followedDateExist) {
+    //Update the existing data with default values for the dates
+    $sql =
+        "UPDATE " .
+        $Px .
+        'UserCategory SET DateFollowed = 
+        CASE WHEN Followed = 1 
+        THEN "' .
+        CategoryModel::DEFAULT_PREFERENCE_DATE_FOLLOWED .
+        '" ELSE DateFollowed 
+        END, 
+        DateUnFollowed = 
+        CASE WHEN Unfollow = 1 
+         THEN "' .
+        CategoryModel::DEFAULT_PREFERENCE_DATE_FOLLOWED .
+        '"
+         ELSE DateUnFollowed
+        END';
+    $SQL->query($sql, "update");
+}
 
 // Allows the tracking of relationships between discussions and users (bookmarks, dismissed announcements, # of read comments in a discussion, etc)
 // column($Name, $Type, $Length = '', $Null = FALSE, $Default = null, $KeyType = FALSE, $AutoIncrement = FALSE)
@@ -275,21 +299,22 @@ $Construct->table("UserDiscussion");
 $ParticipatedExists = $Construct->columnExists("Participated");
 
 $Construct
-    ->column("UserID", "int", false, [
-        "primary",
-        "index.UserID_Bookmarked",
-        "index.UserID_Participated",
-        "index.DiscussionID_Bookmarked",
-        "index.DiscussionID_Participated",
-    ])
+    ->column("UserID", "int", false, ["primary"])
     ->column("DiscussionID", "int", false, ["primary", "key"])
     ->column("Score", "float", null)
     ->column("CountComments", "int", "0")
     ->column("DateLastViewed", "datetime", null) // null signals never
     ->column("Dismissed", "tinyint(1)", "0") // relates to dismissed announcements
-    ->column("Bookmarked", "tinyint(1)", "0", ["index.UserID_Bookmarked", "index.DiscussionID_Bookmarked"])
-    ->column("Participated", "tinyint(1)", "0", ["index.UserID_Participated", "index.DiscussionID_Participated"]) // whether or not the user has participated in the discussion.
+    ->column("Bookmarked", "tinyint(1)", "0")
+    ->column("Participated", "tinyint(1)", "0") // whether or not the user has participated in the discussion.
     ->set($Explicit, $Drop);
+
+$Construct
+    ->table("UserDiscussion")
+    ->createIndexIfNotExists("IX_UserDiscussion_UserID_Bookmarked", ["UserID", "Bookmarked"])
+    ->createIndexIfNotExists("IX_UserDiscussion_UserID_Participated", ["UserID", "Participated"])
+    ->createIndexIfNotExists("IX_UserDiscussion_DiscussionID_Bookmarked", ["DiscussionID", "Bookmarked"])
+    ->createIndexIfNotExists("IX_UserDiscussion_DiscussionID_Participated", ["DiscussionID", "Participated"]);
 
 $Construct->table("Comment");
 
@@ -355,7 +380,7 @@ $Construct
     ->table("User")
     ->column("CountDiscussions", "int", null)
     ->column("CountUnreadDiscussions", "int", null)
-    ->column("CountComments", "int", null)
+    ->column("CountComments", "int", null, ["index"])
     ->column("CountDrafts", "int", null)
     ->column("CountBookmarks", "int", null)
     ->set();
@@ -365,6 +390,7 @@ $Construct
     ->primaryKey("DraftID")
     ->column("DiscussionID", "int", true, "key")
     ->column("CategoryID", "int", true, "key")
+    ->column("Type", "varchar(10)", false, "key")
     ->column("InsertUserID", "int", false, "key")
     ->column("UpdateUserID", "int")
     ->column("Name", "varchar(100)", true)

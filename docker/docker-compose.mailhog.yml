@@ -1,0 +1,16 @@
+name: "Vanilla"
+services:
+    # https://github.com/mailhog/MailHog
+    mailhog:
+        container_name: "localmail"
+        image: mailhog/mailhog:latest
+        restart: always
+        ports:
+            - 1025:1025
+            - 8025:8025
+        networks:
+            - "vanilla-network"
+        environment:
+            MAIL_URL: http://localhost:8025
+            MAIL_HOSTS: http://localhost:8025
+            SERVER_PUBLICBASEURL: https://mail.vanilla.localhost

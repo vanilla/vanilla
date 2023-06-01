@@ -22,6 +22,9 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test
      */
     const INDEX_ROWS = 4;
 
+    /** @var int The limit used for the index test. */
+    protected int $indexLimit = 100;
+
     /**
      * @var string The resource route.
      */
@@ -429,7 +432,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test
     public function testIndex()
     {
         $indexUrl = $this->indexUrl();
-        $originalIndex = $this->api()->get($indexUrl, ["limit" => 100]);
+        $originalIndex = $this->api()->get($indexUrl, ["limit" => $this->indexLimit]);
         $this->assertEquals(200, $originalIndex->getStatusCode());
 
         $originalRows = $originalIndex->getBody();

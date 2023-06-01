@@ -33,12 +33,12 @@ class DiscussionsApiIndexSchema extends Schema
         parent::__construct(
             $this->parseInternal([
                 "discussionID?" => \Vanilla\Schema\RangeExpression::createSchema([":int"])->setField("x-filter", [
-                    "field" => "d.discussionID",
+                    "field" => "discussionID",
                 ]),
                 "categoryID:i?" => [
                     "description" => "Filter by a category.",
                     "x-filter" => [
-                        "field" => "d.CategoryID",
+                        "field" => "CategoryID",
                     ],
                     "x-control" => self::getCategoryIDFormOptions(),
                 ],
@@ -57,30 +57,34 @@ class DiscussionsApiIndexSchema extends Schema
                 "dateInserted?" => new DateFilterSchema([
                     "description" => "When the discussion was created.",
                     "x-filter" => [
-                        "field" => "d.DateInserted",
+                        "field" => "DateInserted",
                         "processor" => [DateFilterSchema::class, "dateFilterField"],
                     ],
                 ]),
                 "dateUpdated?" => new DateFilterSchema([
                     "description" => "When the discussion was updated.",
                     "x-filter" => [
-                        "field" => "d.DateUpdated",
+                        "field" => "DateUpdated",
                         "processor" => [DateFilterSchema::class, "dateFilterField"],
                     ],
                 ]),
                 "dateLastComment?" => new DateFilterSchema([
                     "description" => "When the last comment was posted.",
                     "x-filter" => [
-                        "field" => "d.DateLastComment",
+                        "field" => "DateLastComment",
                         "processor" => [DateFilterSchema::class, "dateFilterField"],
                     ],
                 ]),
                 "tagID?" => \Vanilla\Schema\RangeExpression::createSchema([":int"]),
-                "type:s?" => [
+                "type:a?" => [
                     "description" => "Filter by discussion type.",
                     "x-filter" => [
-                        "field" => "d.Type",
+                        "field" => "Type",
                     ],
+                    "items" => [
+                        "type" => "string",
+                    ],
+                    "style" => "form",
                     "x-control" => SchemaForm::dropDown(
                         new FormOptions("Discussion Type", "Choose a specific type of discussions to display."),
                         new StaticFormChoices($this->discussionTypesEnumValues())
@@ -97,11 +101,10 @@ class DiscussionsApiIndexSchema extends Schema
                         "Only fetch discussions from followed categories. Pinned discussions are mixed in.",
                 ],
                 "pinned:b?" => [
-                    "default" => false,
                     "x-control" => SchemaForm::toggle(new FormOptions("Announcements", "Only fetch announcements.")),
                 ],
                 "pinOrder:s?" => [
-                    "default" => "first",
+                    "default" => "mixed",
                     "enum" => ["first", "mixed"],
                     "x-control" => SchemaForm::dropDown(
                         new FormOptions("Announcement Pinning", "Choose how announcements display."),
@@ -132,7 +135,7 @@ class DiscussionsApiIndexSchema extends Schema
                 "insertUserID:i?" => [
                     "description" => "Filter by author.",
                     "x-filter" => [
-                        "field" => "d.InsertUserID",
+                        "field" => "InsertUserID",
                     ],
                 ],
                 "expand?" => \DiscussionExpandSchema::commonExpandDefinition(),
@@ -142,7 +145,7 @@ class DiscussionsApiIndexSchema extends Schema
                     ],
                     "x-search-scope" => true,
                     "x-filter" => [
-                        "field" => "d.statusID",
+                        "field" => "statusID",
                     ],
                 ],
                 "internalStatusID:a?" => [
@@ -151,7 +154,7 @@ class DiscussionsApiIndexSchema extends Schema
                     ],
                     "x-search-scope" => true,
                     "x-filter" => [
-                        "field" => "d.internalStatusID",
+                        "field" => "internalStatusID",
                     ],
                 ],
             ])

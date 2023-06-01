@@ -4,14 +4,16 @@
  * @license Proprietary
  */
 
-import { IFollowedCategory, useCategoryNotificationPreferences } from "@dashboard/components/CategoryNotificationHooks";
+import { getUserCategoryPreferences, IFollowedCategory } from "@dashboard/components/CategoryNotificationHooks";
 import { categoryNotificationPreferencesClasses } from "@dashboard/components/CategoryNotificationPreferences.styles";
 import { cx } from "@emotion/css";
+import { IError } from "@library/errorPages/CoreErrorMessages";
 import CheckBox from "@library/forms/Checkbox";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import SmartLink from "@library/routing/links/SmartLink";
 import { ToolTip } from "@library/toolTip/ToolTip";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCategoryNotifications } from "@vanilla/addon-vanilla/categories/categoryFollowHooks";
 import { t } from "@vanilla/i18n";
 import React, { useEffect } from "react";
@@ -57,9 +59,12 @@ export function CategoryNotificationPreferences(props: IProps) {
 }
 
 function TableContents(props: IProps) {
-    const preferencesLoadable = useCategoryNotificationPreferences(props.userID);
+    const preferencesQuery = useQuery<any, IError, IFollowedCategory[]>({
+        queryFn: async () => getUserCategoryPreferences(props.userID),
+        queryKey: ["notificationPrefs", props.userID],
+    });
 
-    if (["loading", "pending"].includes(preferencesLoadable.status)) {
+    if (preferencesQuery.isLoading) {
         return (
             <>
                 <LoadingRow />
@@ -69,11 +74,11 @@ function TableContents(props: IProps) {
         );
     }
 
-    if (preferencesLoadable.error || !preferencesLoadable.data) {
+    if (preferencesQuery.error) {
         return (
             <tr>
                 <td>
-                    <ErrorMessages errors={[preferencesLoadable.error ?? { message: t("There was an error") }]} />
+                    <ErrorMessages errors={[preferencesQuery.error]} />
                 </td>
             </tr>
         );
@@ -82,7 +87,7 @@ function TableContents(props: IProps) {
     // we actually have data now.
     return (
         <>
-            {preferencesLoadable.data.map((category) => (
+            {preferencesQuery.data.map((category) => (
                 <TableRow key={category.categoryID} {...props} {...category} />
             ))}
         </>

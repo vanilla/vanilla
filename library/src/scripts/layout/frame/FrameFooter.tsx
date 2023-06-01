@@ -30,8 +30,8 @@ export default class FrameFooter extends React.PureComponent<IFrameFooterProps> 
             <footer
                 className={classNames(
                     "frameFooter",
-                    this.props.className,
                     classes.root,
+                    this.props.className,
                     this.props.justifyRight && classes.justifiedRight,
                     this.props.selfPadded ? classes.selfPadded : "",
                     this.props.forDashboard ? classes.forDashboard : "",

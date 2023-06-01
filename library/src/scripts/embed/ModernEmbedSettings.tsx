@@ -19,12 +19,18 @@ import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import { userContentClasses } from "@library/content/UserContent.styles";
 import SmartLink from "@library/routing/links/SmartLink";
 import Translate from "@library/content/Translate";
+import { JSONSchemaType } from "ajv";
 
-const EMBED_SETTINGS: JsonSchema = {
+const EMBED_SETTINGS: JSONSchemaType<{
+    "embed.enabled"?: boolean;
+    "embed.remoteUrl"?: string;
+    "embed.forceEmbed"?: boolean;
+}> = {
     type: "object",
     properties: {
         "embed.enabled": {
             type: "boolean",
+            nullable: true,
             default: false,
             "x-control": {
                 label: "Embed My Community",
@@ -35,6 +41,7 @@ const EMBED_SETTINGS: JsonSchema = {
         },
         "embed.remoteUrl": {
             type: "string",
+            nullable: true,
             maxLength: 350,
             "x-control": {
                 label: "Remote URL",
@@ -45,6 +52,7 @@ const EMBED_SETTINGS: JsonSchema = {
         },
         "embed.forceEmbed": {
             type: "boolean",
+            nullable: true,
             default: false,
             "x-control": {
                 label: "Force Embedding",
@@ -53,6 +61,7 @@ const EMBED_SETTINGS: JsonSchema = {
             },
         },
     },
+    required: [],
 };
 
 export default function ModernEmbedSettings() {
@@ -67,7 +76,7 @@ export default function ModernEmbedSettings() {
         [settings],
     );
 
-    const [value, setValue] = useState<JsonSchema>(
+    const [value, setValue] = useState(
         Object.fromEntries(
             Object.keys(EMBED_SETTINGS["properties"]).map((key) => [
                 key,
@@ -105,7 +114,7 @@ export default function ModernEmbedSettings() {
         }
     }, [isLoaded, settings]);
 
-    const settingsSchema = useMemo<JsonSchema>(() => {
+    const settingsSchema = useMemo(() => {
         if (isLoaded) {
             return EMBED_SETTINGS;
         }
@@ -149,7 +158,7 @@ export default function ModernEmbedSettings() {
                 actionButtons={<Button type="submit">{isPatchLoading ? <ButtonLoader /> : t("Save")}</Button>}
             ></DashboardHeaderBlock>
             <JsonSchemaForm
-                schema={settingsSchema}
+                schema={settingsSchema as JsonSchema}
                 instance={value}
                 FormControlGroup={DashboardFormControlGroup}
                 FormControl={DashboardFormControl}

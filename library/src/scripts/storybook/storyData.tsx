@@ -41,6 +41,7 @@ export const STORY_USER: IUser = {
     email: "joe.walsh@example.com",
     countDiscussions: 207,
     countComments: 3456,
+    countPosts: 3663,
     emailConfirmed: true,
     showEmail: true,
     bypassSpam: false,
@@ -69,7 +70,6 @@ export const STORY_USER_PRIVATE: IUser = {
 export const STORY_ME_ADMIN: IMe = {
     ...STORY_USER,
     isAdmin: true,
-    permissions: [],
     countUnreadConversations: 0,
     countUnreadNotifications: 0,
 };
@@ -77,7 +77,7 @@ export const STORY_ME_ADMIN: IMe = {
 export const STORY_LEADERS = [
     {
         user: STORY_USER,
-        points: 320,
+        points: 999,
     },
     {
         user: {
@@ -86,7 +86,7 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
             userID: 2,
         },
-        points: 280,
+        points: 999,
     },
     {
         user: {
@@ -95,7 +95,7 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/nA5BAUNMSEDPV.png",
             userID: 3,
         },
-        points: 278,
+        points: 999,
     },
     {
         user: {
@@ -104,7 +104,7 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/n2K5HYT9EZOF6.png",
             userID: 4,
         },
-        points: 254,
+        points: 999,
     },
     {
         user: {
@@ -113,11 +113,11 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
             userID: 5,
         },
-        points: 243,
+        points: 999,
     },
     {
         user: { ...STORY_USER, name: "Lan Tai", userID: 6 },
-        points: 241,
+        points: 999,
     },
     {
         user: {
@@ -126,11 +126,11 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/nA5BAUNMSEDPV.png",
             userID: 7,
         },
-        points: 221,
+        points: 999,
     },
     {
         user: { ...STORY_USER, name: "Teus van Uum", userID: 8 },
-        points: 212,
+        points: 999,
     },
     {
         user: {
@@ -139,7 +139,7 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/nA5BAUNMSEDPV.png",
             userID: 9,
         },
-        points: 206,
+        points: 999,
     },
     {
         user: {
@@ -148,11 +148,11 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
             userID: 10,
         },
-        points: 196,
+        points: 999,
     },
     {
         user: { ...STORY_USER, name: "Matthias Friedman", userID: 11 },
-        points: 184,
+        points: 999,
     },
     {
         user: {
@@ -161,7 +161,7 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/n2K5HYT9EZOF6.png",
             userID: 12,
         },
-        points: 165,
+        points: 999,
     },
     {
         user: {
@@ -170,7 +170,7 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
             userID: 13,
         },
-        points: 164,
+        points: 999,
     },
 ];
 

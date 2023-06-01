@@ -27,7 +27,7 @@ class HtmlReactWidgetTest extends SiteTestCase
      *
      * @dataProvider provideHtmlDatasTo
      */
-    public function testHydrateCategoriesWidget(array $input, array $expected = null, array $permissions = [])
+    public function testHydrateHtmlWidget(array $input, ?array $expected = null, array $permissions = [])
     {
         $this->runWithPermissions(function () use ($input, $expected) {
             $this->assertHydratesTo($input, [], $expected);
@@ -88,11 +88,13 @@ class HtmlReactWidgetTest extends SiteTestCase
 
         yield "Html with isAdvertisement is true with noAdd.use permission" => [
             [
-                '$hydrate' => "react.html",
-                "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
-                "isAdvertisement" => true,
+                [
+                    '$hydrate' => "react.html",
+                    "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                    "isAdvertisement" => true,
+                ],
             ],
-            null,
+            [null],
             ["noAds.use" => true],
         ];
 
@@ -100,16 +102,27 @@ class HtmlReactWidgetTest extends SiteTestCase
             [
                 '$hydrate' => "react.html",
                 "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                "css" => "h1 { color: orange; }",
                 "javascript" => "console.log('hello world')",
+                '$reactTestID' => "htmlwidget",
             ],
             [
                 '$reactComponent' => "HtmlWidget",
                 '$reactProps' => [
                     "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                    "css" => "h1 { color: orange; }",
                     "javascript" => "console.log('hello world')",
                     "javascriptNonce" => "TEST_NONCE",
                     "isAdvertisement" => false,
                 ],
+                '$reactTestID' => "htmlwidget",
+                '$seoContent' => <<<HTML
+<template shadowrootmode=open>
+    <style>h1 { color: orange; }</style>
+    <h1 style="margin-top: 0">Hello Layout Editor</h1>
+</template>
+HTML
+            ,
             ],
             ["noAds.use" => true],
         ];

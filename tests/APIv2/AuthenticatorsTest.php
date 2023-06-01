@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -261,6 +261,33 @@ class AuthenticatorsTest extends AbstractAPIv2Test
                     ],
                 ],
             ],
+            "Valid information URLs not required" => [
+                [
+                    "name" => "Provider Test",
+                    "clientID" => "test1",
+                    "default" => false,
+                    "active" => false,
+                    "visible" => false,
+                    "type" => "OAuth2",
+                    "urls" => [
+                        "signInUrl" => "",
+                        "signOutUrl" => "",
+                        "authenticateUrl" => "",
+                        "registerUrl" => "",
+                        "passwordUrl" => "",
+                        "profileUrl" => "",
+                    ],
+                    "authenticationKey" => "key",
+                    "associationKey" => "key",
+                    "secret" => "secret",
+                    "authenticatorConfig" => [
+                        "associationKey" => "key",
+                        "authorizeUrl" => "https://google.com/authorize",
+                        "tokenUrl" => "https://google.com/token",
+                        "baseUrl" => "https://google.com",
+                    ],
+                ],
+            ],
             "Invalid OAUTH2 information" => [
                 [
                     "name" => "Provider Test",
@@ -342,6 +369,31 @@ class AuthenticatorsTest extends AbstractAPIv2Test
         //Check invalid patch requests get 404
         $this->expectExceptionCode("404");
         $apiResponse = $this->api()->patch("authenticators/" . 10, $patchData);
+    }
+
+    /**
+     * Test that saving a UserAuthenticationProvider's `isDefault` value keeps only 1 record with `isDefault` set to 1.
+     */
+    public function testSingleIsDefaultOnSave()
+    {
+        // Create 2 authenticators.
+        $this->addAuthenticator();
+        $this->addAuthenticator();
+
+        // Set every authenticator's `isDefault` to 1.
+        $this->authenticatorModel->update(["IsDefault" => 1]);
+
+        // Count every authenticator's that has `isDefault` set to 1.
+        $defaultAuthenticatorsCount = $this->authenticatorModel->getWhere(["IsDefault" => 1])->count();
+        $this->assertTrue($defaultAuthenticatorsCount > 1);
+
+        // Create a new authenticator that should be the sole default.
+        $authenticatorC = $this->addAuthenticator(["IsDefault" => 1]);
+
+        // Assert that the new authenticator is really a lone default.
+        $newAuthenticator = $this->authenticatorModel->getWhere(["IsDefault" => 1])->resultArray();
+        $this->assertCount(1, $newAuthenticator);
+        $this->assertArraySubsetRecursive($authenticatorC, $newAuthenticator["0"]);
     }
 
     /**

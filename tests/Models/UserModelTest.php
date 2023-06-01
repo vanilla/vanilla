@@ -444,14 +444,16 @@ class UserModelTest extends SiteTestCase
      */
     private function createUser(string $userName)
     {
-        $rand = rand(10, 1000);
+        $rand = randomString(25);
         $user = [
             "Name" => $userName,
             "Email" => $rand . "test@example.com",
             "Password" => randomString(\Gdn::config("Garden.Password.MinLength")),
         ];
 
-        return $this->userModel->save($user);
+        $id = $this->userModel->save($user);
+        ModelUtils::validationResultToValidationException($this->userModel);
+        return $id;
     }
 
     /**
@@ -761,13 +763,13 @@ class UserModelTest extends SiteTestCase
             "Body" => "This is a test message",
         ]);
 
-        $activityCountBeforeOldUser = $this->activityModel->getCount($oldUserID);
+        $activityCountBeforeOldUser = $this->activityModel->getCount([], $oldUserID);
 
         // Merge the 2 users.
         $result = $this->userModel->merge($oldUserID, $newUserID);
 
         // Verify all counts are correct after merging the users.=
-        $activityCountAfter = $this->activityModel->getCount($newUserID);
+        $activityCountAfter = $this->activityModel->getCount([], $newUserID);
         $this->assertEquals($activityCountBeforeOldUser, $activityCountAfter);
         $discussionCountAfter = $this->discussionModel->getCount(["d.InsertUserID" => $newUserID]);
         $commentCountAfter = $this->commentModel->getCountWhere([
@@ -1074,7 +1076,10 @@ class UserModelTest extends SiteTestCase
     {
         $user1 = $this->createUser("user1");
         $deleted1 = $this->createUser("Deleted User");
-        $deleted2 = $this->createUser("Deleted User");
+
+        // Hack around to create 2 users with the same name.
+        $deleted2 = $this->createUser("Deleted User2");
+        $this->userModel->setField($deleted2, "Name", "Deleted User");
 
         $actual = $this->userModel->getUserIDsForUserNames(["user1", "Deleted User"]);
         $this->assertEquals(
@@ -1148,5 +1153,74 @@ class UserModelTest extends SiteTestCase
         $userData["InvitationCode"] = $invitation["code"];
         $userID = $this->userModel->insertForInvite($userData);
         $doAssertions($userID);
+    }
+
+    /**
+     * Tests that when a user updates their password, their other open sessions are invalidated.
+     */
+    public function testPasswordChangeInvalidatesOtherSessions()
+    {
+        $sessionModel = new \SessionModel();
+        $userID = $this->createUser(__FUNCTION__);
+
+        $session = $this->getSession();
+        $session->start($userID);
+
+        // Clear cookie identity
+        \Gdn::factory("Identity")->setIdentity();
+
+        $session->start($userID);
+
+        // We should have 2 sessions in the database for the same user
+        $this->assertCount(2, $sessionModel->getSessions($userID));
+
+        // Password change
+        $this->userModel->save([
+            "UserID" => $userID,
+            "Password" => randomString(\Gdn::config("Garden.Password.MinLength")),
+        ]);
+
+        $sessions = $sessionModel->getSessions($userID);
+
+        // Now we should just have 1 session in the database with its sessionID matching the current session
+        $this->assertCount(1, $sessions);
+        $this->assertEquals(\Gdn::authenticator()->getSession(), $sessions[0]["SessionID"]);
+
+        $session->end();
+    }
+
+    /**
+     * Tests that getUserIDsForIPAddresses returns an array of userIDs for users associated with any of the given IP addresses.
+     */
+    public function testGetUserIDsForIPAddresses()
+    {
+        $user1ID = $this->createUser(__FUNCTION__ . "1");
+        $user2ID = $this->createUser(__FUNCTION__ . "2");
+        $this->userModel->saveIP($user1ID, "101.102.103.104");
+        $this->userModel->saveIP($user2ID, "2001:db8:3333:4444:5555:6666:7777:8888");
+        $userIDs = $this->userModel->getUserIDsForIPAddresses([
+            "101.102.103.104",
+            "2001:db8:3333:4444:5555:6666:7777:8888",
+        ]);
+        $this->assertSame(array_map("intval", [$user1ID, $user2ID]), $userIDs);
+    }
+
+    /**
+     * Test giveRolesByEmail method.
+     */
+    public function testGiveRolesByEmail()
+    {
+        $userID = $this->createUser(__FUNCTION__);
+        $role = $this->createRole(["Domains" => "hl.com example.com vanilla.com"]);
+        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+        $this->userModel->giveRolesByEmail($user);
+        $roles = $this->userModel->getRoleIDs($userID);
+        // Role not assigned when user's email is not confirmed.
+        $this->assertNotContains($role["roleID"], $roles);
+
+        $this->userModel->setField($userID, "Confirmed", 1);
+        $roles = $this->userModel->getRoleIDs($userID);
+        // Role is assigned when user's email is confirmed.
+        $this->assertContains($role["roleID"], $roles);
     }
 }

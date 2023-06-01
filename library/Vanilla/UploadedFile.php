@@ -111,6 +111,8 @@ class UploadedFile
      */
     public static function fromRemoteResourceUrl(string $remoteUrl, array $requestHeaders = []): UploadedFile
     {
+        // Normalize whitespace.
+        $remoteUrl = str_replace(" ", "%20", $remoteUrl);
         $curl = curl_init();
         // We don't want to load the body in memory. It could be quite large.
         curl_setopt($curl, CURLOPT_NOBODY, true);
@@ -208,7 +210,7 @@ class UploadedFile
             $persistDirectory .= $persistSubDirectory;
         }
         $ext = strtolower(pathinfo($this->getClientFilename(), PATHINFO_EXTENSION));
-        $baseName = basename($this->getClientFilename(), ".${ext}");
+        $baseName = basename($this->getClientFilename(), ".{$ext}");
         $baseName = sprintf($nameFormat, $baseName);
         $baseName = \Gdn_Format::url(urlencode($baseName));
         $uploadPath = FileUtils::generateUniqueUploadPath($ext, true, $baseName, $persistDirectory);
@@ -290,7 +292,9 @@ class UploadedFile
 
         // Resize and re-orient the image as necessary.
         $resizer = new ImageResizer();
-        $resizer->resize($file, null, $options);
+        if ($resizer->canResize($file)) {
+            $resizer->resize($file, null, $options);
+        }
 
         // Get the new details, after resizing and re-orienting the image.
         [$width, $height] = getimagesize($file);

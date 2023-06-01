@@ -77,7 +77,6 @@ class CategoriesController extends VanillaController
         [$offset, $limit] = offsetLimit($page, c("Vanilla.Discussions.PerPage", 30));
         $where = [
             "CategoryID" => $category["CategoryID"],
-            "Announce" => "all",
             "DateInserted >=" => $from,
             "DateInserted <" => $to,
         ];
@@ -448,7 +447,7 @@ class CategoriesController extends VanillaController
             if (c("Vanilla.ExpandCategories")) {
                 $categoryIDs = array_merge($categoryIDs, array_column($this->data("Categories"), "CategoryID"));
             }
-            $wheres = ["d.CategoryID" => $categoryIDs];
+            $wheres = ["CategoryID" => $categoryIDs];
             $this->setData("_ShowCategoryLink", count($categoryIDs) > 1);
 
             // Check permission.
@@ -487,10 +486,10 @@ class CategoriesController extends VanillaController
             $this->setData("_Limit", $limit);
 
             // We don't wan't child categories in announcements.
-            $wheres["d.CategoryID"] = $categoryID;
+            $wheres["CategoryID"] = $categoryID;
             $announceData = $offset == 0 ? $discussionModel->getAnnouncements($wheres) : false;
             $this->AnnounceData = $this->setData("Announcements", $announceData !== false ? $announceData : [], true);
-            $wheres["d.CategoryID"] = $categoryIDs;
+            $wheres["CategoryID"] = $categoryIDs;
 
             // RSS should include announcements.
             if ($this->SyndicationMethod !== SYNDICATION_NONE) {
@@ -710,7 +709,7 @@ class CategoriesController extends VanillaController
             $iD = $Category->CategoryID;
             if ($iD > 0 && $Category->CountDiscussions > 0) {
                 $announcements = $DiscussionModel->getAnnouncements(
-                    ["d.CategoryID" => $iD],
+                    ["CategoryID" => $iD],
                     0,
                     $this->DiscussionsPerCategory
                 );
@@ -719,7 +718,7 @@ class CategoriesController extends VanillaController
 
                 $this->CategoryDiscussionData[$iD] =
                     $newLimit > 0
-                        ? $DiscussionModel->getWhereRecent(["d.CategoryID" => $iD, "d.Announce" => 0], $newLimit)
+                        ? $DiscussionModel->getWhereRecent(["CategoryID" => $iD, "Announce" => false], $newLimit)
                         : new Gdn_DataSet();
 
                 $categoryDiscussions = $announcements->resultObject();

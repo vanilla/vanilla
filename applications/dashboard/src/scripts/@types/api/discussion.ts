@@ -82,4 +82,14 @@ export interface IGetDiscussionListParams {
     followed?: boolean;
     featuredImage?: boolean;
     fallbackImage?: string;
+    sort?: DiscussionListSortOptions;
+    pinOrder?: "mixed" | "first";
+}
+
+export enum DiscussionListSortOptions {
+    RECENTLY_COMMENTED = "-dateLastComment",
+    RECENTLY_CREATED = "-dateInserted",
+    TOP = "-score",
+    TRENDING = "-hot",
+    OLDEST = "dateInserted",
 }

@@ -24,6 +24,7 @@ $Configuration["Vanilla"]["Discussion"]["SpamCount"] = "3";
 $Configuration["Vanilla"]["Discussion"]["SpamTime"] = "60";
 $Configuration["Vanilla"]["Discussion"]["SpamLock"] = "120";
 
+$Configuration["Vanilla"]["Drafts"]["Autosave"] = true;
 $Configuration["Vanilla"]["Discussions"]["Layout"] = "modern";
 $Configuration["Vanilla"]["Discussions"]["MaxPages"] = 100;
 $Configuration["Vanilla"]["Comments"]["PerPage"] = "30";

@@ -78,18 +78,6 @@ class InstallModel
     {
         $data = $this->validate($data);
 
-        // Copy the .htaccess file.
-        if ($data["htaccess"] === "dist") {
-            $htaccessCopied = copy(PATH_ROOT . "/.htaccess.dist", PATH_ROOT . "/.htaccess");
-
-            if (!$htaccessCopied) {
-                throw new \Exception(
-                    "Unable to copy .htaccess.dist to .htaccess. You may need to manually copy this file.",
-                    400
-                );
-            }
-        }
-
         // Set the initial config values.
         $config = [
             "Database.Host" => $data["database"]["host"],
@@ -177,7 +165,6 @@ class InstallModel
     public function validateEnvironment(array $data = [])
     {
         $validation = new Validation();
-        $data += ["htaccess" => null];
 
         if ($this->config->get("Garden.Installed")) {
             $validation->addError("", "Vanilla is already installed.", 409);
@@ -227,26 +214,6 @@ class InstallModel
             if (file_exists($configPath) && (!is_readable($configPath) || !isWritable($configPath))) {
                 $validation->addError("", "{path} must be writable", ["path" => $configPath]);
             }
-        }
-
-        if ($this->htaccessRequired()) {
-            switch ($data["htaccess"]) {
-                case "skip":
-                    break;
-                case "dist":
-                    if (!is_writable(PATH_ROOT)) {
-                        $validation->addError("htaccess", "Vanilla cannot create the .htaccess file.");
-                    }
-                    break;
-                case "check":
-                    $data["htaccess"] = "missing";
-                    break;
-                default:
-                    $validation->addError("htaccess", "You are missing an .htaccess file.");
-                    break;
-            }
-        } else {
-            $data["htaccess"] = "ok";
         }
 
         // Make sure we can generate a strong random token.
@@ -366,19 +333,6 @@ class InstallModel
     }
 
     /**
-     * Determine whether or not the server needs an .htaccess file.
-     *
-     * TODO: Remove dependency on $_SERVER.
-     *
-     * @return bool Returns **true** if there should be an .htaccess file or **false** otherwise.
-     */
-    public function htaccessRequired()
-    {
-        $r = empty($_SERVER["X_REWRITE"]) && !file_exists(PATH_ROOT . "/.htaccess");
-        return $r;
-    }
-
-    /**
      * Get the schema for installation.
      *
      * @return Schema Returns the install schema.
@@ -394,11 +348,6 @@ class InstallModel
             ],
             "site:o" => [
                 "title:s" => 'Your application\'s title.',
-            ],
-            "htaccess:s" => [
-                "description" => "What to do with the .htaccess file.",
-                "enum" => ["skip", "dist"],
-                "default" => "skip",
             ],
             "admin:o" => [
                 "email:s" => ["description" => "Admin email.", "format" => "email"],

@@ -142,6 +142,15 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
     }
 
     /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["tags"]));
+        return $result;
+    }
+
+    /**
      * @inheridoc
      */
     public function getProps(): ?array

@@ -1,14 +1,17 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { EmbedButton } from "@library/embeddedContent/components/EmbedButton";
+
+import { EditorEventWall } from "@library/editor/pieces/EditorEventWall";
 import { embedContentClasses } from "@library/embeddedContent/components/embedStyles";
 import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
 import { useEmbedContext } from "@library/embeddedContent/IEmbedContext";
 import { DeleteIcon } from "@library/icons/common";
-import { EditorEmbedMenu } from "@rich-editor/editor/pieces/EmbedMenu";
-import classNames from "classnames";
+import { MenuBar } from "@library/MenuBar/MenuBar";
+import { MenuBarItem } from "@library/MenuBar/MenuBarItem";
+import { cx } from "@library/styles/styleShim";
+import { t } from "@vanilla/i18n";
 import React from "react";
 
 interface IProps {
@@ -22,28 +25,28 @@ interface IProps {
 }
 
 export const EmbedContent = React.forwardRef<HTMLDivElement, IProps>(function EmbedContent(props: IProps, ref) {
-    const { inEditor, isSelected, deleteSelf, descriptionID } = useEmbedContext();
+    const { inEditor, isSelected, isNewEditor, deleteSelf, descriptionID } = useEmbedContext();
     const classes = embedContentClasses();
 
     return (
         <div
             aria-describedby={descriptionID}
             aria-label={"External embed content - " + props.type}
-            className={classNames(props.className, classes.root, !props.noBaseClass && "embedExternal-content", {
-                [EMBED_FOCUS_CLASS]: inEditor,
+            className={cx(props.className, classes.root, !props.noBaseClass && "embedExternal-content", {
+                [EMBED_FOCUS_CLASS]: inEditor && !isNewEditor,
                 [classes.small]: props.isSmall,
             })}
-            tabIndex={inEditor ? -1 : undefined} // Should only as a whole when inside the editor.
+            tabIndex={inEditor && !isNewEditor ? -1 : undefined} // Should only as a whole when inside the editor.
             ref={ref}
         >
             {props.children}
-            {inEditor && isSelected && (
-                <EditorEmbedMenu>
-                    {props.embedActions}
-                    <EmbedButton onClick={deleteSelf}>
-                        <DeleteIcon />
-                    </EmbedButton>
-                </EditorEmbedMenu>
+            {(!isNewEditor || props.embedActions) && inEditor && isSelected && (
+                <EditorEventWall>
+                    <MenuBar className={classes.menuBar}>
+                        {props.embedActions as any}
+                        <MenuBarItem icon={<DeleteIcon />} accessibleLabel={t("Delete item")} onActivate={deleteSelf} />
+                    </MenuBar>
+                </EditorEventWall>
             )}
         </div>
     );

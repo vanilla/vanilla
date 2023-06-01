@@ -55,6 +55,8 @@ export function TabbedSchemaForm(props: IPartialProps) {
             selectedTabID={selectedTabID}
             onSelectTab={setSelectedTabID}
             path={path}
+            pathString={`/${path.join("/")}`}
+            errors={[]}
             rootInstance={rootInstance}
             instance={instance}
             rootSchema={rootSchema}

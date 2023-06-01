@@ -46,12 +46,11 @@ export const CategoryFollowDropDown = (props: IProps) => {
      * We need to maintain this state because the props are fed in
      * through the initial render and will be updated via an API
      */
-    const { setNotificationPreferences, setNotificationPreferencesState, notificationPreferences } =
-        useCategoryNotifications(
-            props.userID,
-            props.categoryID,
-            props.notificationPreferences ?? DEFAULT_NOTIFICATION_PREFERENCES,
-        );
+    const { setNotificationPreferences, notificationPreferences } = useCategoryNotifications(
+        props.userID,
+        props.categoryID,
+        props.notificationPreferences ?? DEFAULT_NOTIFICATION_PREFERENCES,
+    );
 
     useEffect(() => {
         if (

@@ -47,11 +47,7 @@ class LayoutHydratorTest extends BootstrapTestCase
      */
     public function testLayoutHydratesTo(array $input, array $expected, array $jsonLDExpected, array $params = [])
     {
-        $hydrator = self::getLayoutService()->getHydrator("home");
-        $actual = $hydrator->resolve($input, $params);
-        // Make sure we see it as the API output would.
-        $actual = json_decode(json_encode($actual), true);
-        $this->assertSame($expected, $actual);
+        $actual = $this->assertHydratesTo($input, $params, $expected);
     }
 
     /**
@@ -66,7 +62,8 @@ class LayoutHydratorTest extends BootstrapTestCase
      */
     public function testHydrateLayout(array $input, array $expected, array $jsonLDExpected, array $params = [])
     {
-        $actual = self::getLayoutService()->hydrateLayout("home", $params, $input);
+        $actual = self::getLayoutHydrator()->hydrateLayout("home", $params, $input);
+        $actual = $this->getLayoutService()->stripSeoHtmlFromHydratedLayout($actual);
         // Make sure we see it as the API output would.
         $this->assertArrayHasKey("seo", $actual);
         $seo = json_decode(json_encode($actual["seo"]), true);
@@ -100,7 +97,7 @@ class LayoutHydratorTest extends BootstrapTestCase
         ];
         $this->mockWebPackAsset();
         $expected = "LeaderboardWidget";
-        $actual = self::getLayoutService()->getAssetLayout("home", [], $leaderboard);
+        $actual = self::getLayoutHydrator()->getAssetLayout("home", [], $leaderboard);
         // Make sure we see it as the API output would.
         $this->assertArrayHasKey("js", $actual);
         $this->assertArrayHasKey("css", $actual);

@@ -74,7 +74,7 @@ class WebpackAssetTest extends TestCase
     }
 
     /**
-     * Provider for for testWebPath
+     * Provider for testWebPath
      */
     public function webPathProvider(): array
     {

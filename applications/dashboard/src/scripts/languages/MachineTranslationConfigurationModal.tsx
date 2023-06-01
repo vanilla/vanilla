@@ -6,7 +6,6 @@
 
 import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
 import { ITranslationService } from "@dashboard/languages/LanguageSettingsTypes";
-import { cx } from "@emotion/css";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Frame from "@library/layout/frame/Frame";
@@ -83,7 +82,7 @@ export const MachineTranslationConfigurationModal = (props: IProps) => {
                     service &&
                     service.configSchema && (
                         <FrameBody>
-                            <div className={cx("frameBody-contents", classesFrameBody.contents)}>
+                            <div className={classesFrameBody.contents}>
                                 <JsonSchemaForm
                                     schema={service && service.configSchema}
                                     instance={value}

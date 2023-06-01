@@ -8,6 +8,7 @@
 namespace Vanilla\Layout\Section;
 
 use Garden\Schema\Schema;
+use Vanilla\Web\TwigStaticRenderer;
 use Vanilla\Widgets\Schema\ReactChildrenSchema;
 
 /**
@@ -15,6 +16,40 @@ use Vanilla\Widgets\Schema\ReactChildrenSchema;
  */
 class SectionTwoColumns extends AbstractLayoutSection
 {
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $mainTop = $this->renderSectionChildrenHtml($props["mainTop"] ?? []);
+        $mainBottom = $this->renderSectionChildrenHtml($props["mainBottom"] ?? []);
+        $secondaryTop = $this->renderSectionChildrenHtml($props["secondaryTop"] ?? []);
+        $secondaryBottom = $this->renderSectionChildrenHtml($props["secondaryBottom"] ?? []);
+        $breadcrumbs = $this->renderSectionChildrenHtml($props["breadcrumbs"] ?? []);
+        $tpl = <<<TWIG
+<section>
+{{- breadcrumbs|raw -}}
+<div class="seoSectionColumn mainColumn">
+    {{- mainTop|raw -}}
+    {{- mainBottom|raw -}}
+</div>
+<div class="seoSectionColumn">
+    {{- secondaryTop|raw -}}
+    {{- secondaryBottom|raw -}}
+</div>
+</section>
+TWIG;
+
+        $result = $this->renderTwigFromString($tpl, [
+            "mainTop" => $mainTop,
+            "mainBottom" => $mainBottom,
+            "secondaryTop" => $secondaryTop,
+            "secondaryBottom" => $secondaryBottom,
+            "breadcrumbs" => $breadcrumbs,
+        ]);
+        return $result;
+    }
+
     /**
      * @inheritdoc
      */

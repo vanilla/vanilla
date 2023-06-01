@@ -58,40 +58,6 @@ class SetupController extends DashboardController
         } else {
             $this->View = "configure";
 
-            // Make sure the user has copied the htaccess file over.
-            if (!file_exists(PATH_ROOT . "/.htaccess")) {
-                $this->setData("NoHtaccess", true);
-
-                if ($this->Form->isPostBack()) {
-                    $htaccessAction = $this->Form->getFormValue("HtaccessAction");
-
-                    switch ($htaccessAction) {
-                        case "skip":
-                            break;
-                        case "dist":
-                            $htaccessCopied = copy(PATH_ROOT . "/.htaccess.dist", PATH_ROOT . "/.htaccess");
-
-                            if ($htaccessCopied === false) {
-                                $this->Form->addError(
-                                    t(
-                                        "Unable to copy .htaccess.dist to .htaccess.",
-                                        "Unable to copy .htaccess.dist to .htaccess. You may need to manually copy this file."
-                                    )
-                                );
-                            }
-
-                            break;
-                        default:
-                            $this->Form->addError(
-                                t(
-                                    'You are missing Vanilla\'s .htaccess file.',
-                                    'You are missing an <b>.htaccess</b> file. This file can be automatically created from Vanilla\'s <b>.htaccess.dist</b>.  However, it may not have been copied if you are using FTP to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess.dist</b> file before continuing.'
-                                )
-                            );
-                    }
-                }
-            }
-
             $applicationManager = Gdn::applicationManager();
 
             // Need to go through all of the setups for each application. Garden,

@@ -57,6 +57,14 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
                             "highlight.js",
                             "@simonwep.*",
                             "serialize-error", // Comes from swagger-ui
+                            // These are needed for plate
+                            "@udecode/.*",
+                            "jotai",
+                            "zustand",
+                            "@radix-ui/.*",
+                            "@floating-ui/.*",
+                            "downshift",
+                            "@tanstack/*",
                         ];
                         const exclusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
 
@@ -164,6 +172,7 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
             new webpack.DefinePlugin({
                 __DIST__NAME__: JSON.stringify(DIST_NAME),
                 __BUILD__SECTION__: JSON.stringify(section),
+                "process.env.IS_WEBPACK": true,
             }),
             new webpack.IgnorePlugin({
                 resourceRegExp: /^\.\/locale$/,

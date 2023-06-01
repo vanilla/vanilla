@@ -74,6 +74,13 @@ export const titleBarMegaMenuVariables = useThemeCache((forcedVars?: IThemeVaria
      */
     const wrapper = makeThemeVars("wrapper", {
         /**
+         * @var titleBarMegaMenu.wrapper.alignment
+         * @title Choose how to align the mega menu. "firstItem" will align the contents with the first navItem. "logo" will align the content with the logo.
+         * @type string
+         * @enum firstItem | logo
+         */
+        alignment: "firstItem" as "firstItem" | "logo",
+        /**
          * @var titleBarMegaMenu.wrapper.shadow
          * @description Shadow detail at the bottom of the mega menu
          * @title Shadow

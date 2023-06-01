@@ -11,6 +11,7 @@ use Garden\Http\HttpResponseException;
 use Garden\Hydrate\DataHydrator;
 use Garden\Web\Exception\HttpException;
 use Vanilla\Utility\DebugUtils;
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Exception handler for the layout service.
@@ -19,6 +20,8 @@ use Vanilla\Utility\DebugUtils;
  */
 class ReactLayoutExceptionHandler implements \Garden\Hydrate\ExceptionHandlerInterface
 {
+    use TwigRenderTrait;
+
     /**
      * @inheritdoc
      */
@@ -45,9 +48,21 @@ class ReactLayoutExceptionHandler implements \Garden\Hydrate\ExceptionHandlerInt
             $props["trace"] = DebugUtils::stackTraceString($ex->getTrace());
         }
 
+        $seoTpl = <<<TWIG
+<div class="error">
+<h3><strong>Component {{ componentName }} had an error.</strong></p></h3>
+<p>{{ message }}</p>
+{% if trace %}
+<pre class="trace">{{ trace }}</pre>
+{% endif %}
+</div>
+TWIG;
+        $seoContent = $this->renderTwigFromString($seoTpl, $props);
+
         return [
             '$reactComponent' => "LayoutError",
             '$reactProps' => $props,
+            '$seoContent' => $seoContent,
         ];
     }
 }

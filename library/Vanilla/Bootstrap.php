@@ -10,6 +10,7 @@ namespace Vanilla;
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\Dispatcher;
+use Garden\Web\PageControllerRoute;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -210,7 +211,6 @@ class Bootstrap
             ->rule(\Garden\Web\Dispatcher::class)
             ->setShared(true)
             ->addCall("addRoute", ["route" => new Reference("@api-v2-route"), "api-v2"])
-            ->addCall("addRoute", ["route" => new Reference("@new-search-route"), "new-search"])
             ->addCall("addRoute", [
                 "route" => new \Garden\Container\Callback(function () {
                     return new \Garden\Web\PreflightRoute("/api/v2", true);
@@ -229,13 +229,6 @@ class Bootstrap
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\ValidateJSONMiddleware::class)])
 
             // Specific route definitions and middlewares
-            ->rule("@new-search-route")
-            ->setClass(\Garden\Web\ResourceRoute::class)
-            ->setConstructorArgs(["/search", "*\\%sSearchPageController"])
-            ->addCall("setFeatureFlag", [SearchRootController::ENABLE_FLAG])
-            ->addCall("setMeta", ["CONTENT_TYPE", "text/html; charset=utf-8"])
-            ->addCall("setRootController", [SearchRootController::class])
-
             ->rule("@api-v2-route")
             ->setClass(\Garden\Web\ResourceRoute::class)
             ->setConstructorArgs(["/api/v2/", "*\\%sApiController"])
@@ -294,5 +287,11 @@ class Bootstrap
             ->setShared(true)
             ->addCall("addProvider", [new Reference(\Vanilla\Layout\LayoutModel::class)])
             ->addCall("addProvider", [new Reference(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)]);
+
+        PageControllerRoute::configurePageRoutes(
+            $container,
+            ["/search" => SearchRootController::class],
+            SearchRootController::ENABLE_FLAG
+        );
     }
 }

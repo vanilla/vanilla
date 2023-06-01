@@ -143,42 +143,39 @@ export const discussionListClasses = useThemeCache(
         const assetHeader = css({
             display: "flex",
             alignItems: "center",
+            justifyContent: "space-between",
             "& > *:not(:first-child)": {
                 paddingLeft: 8,
             },
             paddingBottom: 16,
-            "&.alignJustified": {
-                justifyContent: "space-between",
-            },
-            "&.alignRight": {
-                justifyContent: "flex-end",
-            },
             "& > div": {
                 display: "flex",
                 flexDirection: "row",
+                justifyContent: "flex-start",
             },
         });
 
         const selectAllCheckBox = css({
-            "&&": {
+            "&&&": {
                 ...Mixins.padding({ vertical: 0 }),
+                ...Mixins.margin({ right: 8 }),
             },
         });
 
-        const categoryFilterContainer = css({
+        const filterAndSortingContainer = css({
             display: "flex",
-            alignItems: "center",
+            alignItems: "baseline",
             "& > span": {
                 paddingRight: 8,
             },
         });
 
-        const categoryFilterLabel = css({
+        const filterAndSortingLabel = css({
             whiteSpace: "nowrap",
         });
 
-        const categoryFilterDropdown = css({
-            minWidth: 160,
+        const filterAndSortingDropdown = css({
+            marginRight: "2rem",
         });
 
         return {
@@ -196,9 +193,9 @@ export const discussionListClasses = useThemeCache(
             userIcon,
             assetHeader,
             selectAllCheckBox,
-            categoryFilterContainer,
-            categoryFilterLabel,
-            categoryFilterDropdown,
+            filterAndSortingContainer,
+            filterAndSortingLabel,
+            filterAndSortingDropdown,
         };
     },
 );

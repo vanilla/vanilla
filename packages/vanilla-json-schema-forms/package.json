@@ -6,7 +6,7 @@
     "license": "MIT",
     "dependencies": {
         "@vanilla/ui": "*",
-        "ajv": "^8.0.1"
+        "ajv": "^8.12.0"
     },
     "devDependencies": {
         "@vanilla/tsconfig": "^3.0.1"

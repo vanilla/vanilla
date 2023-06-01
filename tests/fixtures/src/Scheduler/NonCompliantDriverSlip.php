@@ -63,10 +63,10 @@ class NonCompliantDriverSlip implements DriverSlipInterface
     /**
      * Set stack execution error message.
      *
-     * @param string $msg
+     * @param string $errorMessage
      * @return DriverSlipInterface
      */
-    public function setStackExecutionFailed(string $msg): DriverSlipInterface
+    public function setStackExecutionFailed(string $errorMessage): DriverSlipInterface
     {
         return $this;
     }
@@ -103,9 +103,9 @@ class NonCompliantDriverSlip implements DriverSlipInterface
     /**
      * SetTrackingId
      *
-     * @param string $trackingId
+     * @param string $trackingID
      */
-    public function setTrackingID(string $trackingId): void
+    public function setTrackingID(string $trackingID): void
     {
         // void
     }

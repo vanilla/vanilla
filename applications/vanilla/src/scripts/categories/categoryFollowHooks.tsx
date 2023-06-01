@@ -5,8 +5,8 @@
  */
 
 import apiv2 from "@library/apiv2";
+import { useMutation } from "@tanstack/react-query";
 import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import { useAsyncFn } from "@vanilla/react-utils";
 import debounce from "lodash/debounce";
 import { useCallback, useState } from "react";
 
@@ -19,32 +19,33 @@ export function useCategoryNotifications(userID: number, categoryID: number, ini
      */
     const [localPreference, setLocalPreference] = useState<ICategoryPreferences>(initialPreferences);
 
-    const [setNotificationPreferencesState, _setNotificationPreferences] = useAsyncFn(
-        async (newPreferences: ICategoryPreferences) => {
-            await apiv2.patch<ICategoryPreferences>(`/categories/${categoryID}/preferences/${userID}`, newPreferences);
+    const notificationPrefsMutation = useMutation({
+        mutationFn: async (newPreferences: ICategoryPreferences) => {
+            return await apiv2.patch<ICategoryPreferences>(
+                `/categories/${categoryID}/preferences/${userID}`,
+                newPreferences,
+            );
         },
-        [],
-    );
+        mutationKey: [categoryID, userID],
+    });
 
-    const debouncedSetNotificationPreferences = useCallback(debounce(_setNotificationPreferences, 750), [
-        _setNotificationPreferences,
+    const debouncedSetNotificationPreferences = useCallback(debounce(notificationPrefsMutation.mutateAsync, 750), [
+        notificationPrefsMutation.mutateAsync,
     ]);
 
-    // Small wrapper to allow using a partial.
-    // useAsyncFn can't change the method reference in the middle of an async call
-    // so we need a wrapper.
     const setNotificationPreferences = async (change: Partial<ICategoryPreferences>) => {
         const newPreferences = {
             ...localPreference,
             ...change,
         };
+        // Update locally.
         setLocalPreference(newPreferences);
+        // Then persist (debounced).
         await debouncedSetNotificationPreferences(newPreferences);
     };
 
     return {
         notificationPreferences: localPreference,
         setNotificationPreferences,
-        setNotificationPreferencesState,
     };
 }

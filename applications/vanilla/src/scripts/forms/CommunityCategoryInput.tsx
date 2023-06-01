@@ -85,6 +85,7 @@ export function CommunityCategoryInput(props: IProps) {
                 showIndicator
                 options={options}
                 maxHeight={props.maxHeight}
+                labelNote={props.labelNote}
             />
         );
     }
@@ -102,6 +103,7 @@ export function CommunityCategoryInput(props: IProps) {
             label={props.label ?? t("Community Category")}
             value={(props.value ?? [])[0]}
             maxHeight={props.maxHeight}
+            labelNote={props.labelNote}
         />
     );
 }

@@ -18,7 +18,7 @@ import { cx } from "@library/styles/styleShim";
 import { Icon } from "@vanilla/icons";
 import { useFocusOnActivate } from "@vanilla/react-utils";
 import React, { useMemo, useRef, useState } from "react";
-import { JsonSchema } from "@vanilla/json-schema-forms";
+import { EMPTY_SCHEMA, JsonSchema } from "@vanilla/json-schema-forms";
 import merge from "lodash/merge";
 
 interface IProps {
@@ -36,7 +36,7 @@ export function LayoutEditorAddWidget(props: IProps) {
     const [isWidgetSettingsModalOpen, setWidgetSettingsModalOpen] = useState(false);
     const [selectedWidgetID, setSelectedWidgetID] = useState("");
 
-    const widgetSchema = catalog?.widgets[selectedWidgetID]?.schema ?? {};
+    const widgetSchema = catalog?.widgets[selectedWidgetID]?.schema ?? EMPTY_SCHEMA;
 
     const isSelected =
         LayoutEditorPath.areWidgetPathsEqual(props.path, editorSelection.getPath()) &&

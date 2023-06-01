@@ -267,4 +267,18 @@ class ActivityModelTest extends SiteTestCase
         $result = $this->activityModel->save($params);
         return $result;
     }
+
+    public function testNotificationLink()
+    {
+        $expected = "Log in here to update your notification preferences: " . url("/profile/preferences", true);
+        $link = $this->activityModel->getNotificationPreferencePageLink("text");
+        $this->assertEquals($expected, $link);
+
+        $expected =
+            '<a href="' .
+            url("/profile/preferences", true) .
+            '" target="_blank">Log in here to update your notification preferences</a>';
+        $link = $this->activityModel->getNotificationPreferencePageLink("html");
+        $this->assertEquals($expected, $link);
+    }
 }

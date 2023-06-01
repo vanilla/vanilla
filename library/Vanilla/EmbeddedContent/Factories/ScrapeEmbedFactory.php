@@ -106,6 +106,7 @@ class ScrapeEmbedFactory extends FallbackEmbedFactory
             "url" => $url,
             "name" => $scraped["Title"] ?? null,
             "body" => $scraped["Description"] ?? null,
+            "faviconUrl" => $scraped["Favicon"] ?? null,
             "photoUrl" => !empty($images) ? $images[0] : null,
         ];
         $linkEmbed = new LinkEmbed($data);

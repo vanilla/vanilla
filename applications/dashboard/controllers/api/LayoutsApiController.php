@@ -23,6 +23,7 @@ use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Providers\MutableLayoutProviderInterface;
 use Vanilla\Layout\Resolvers\ReactResolver;
 use Vanilla\Layout\Section\AbstractLayoutSection;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
@@ -47,8 +48,8 @@ class LayoutsApiController extends \AbstractApiController
     /** @var LayoutViewModel $layoutViewModel */
     private $layoutViewModel;
 
-    /** @var LayoutService $layoutProviderService */
-    private $layoutProviderService;
+    /** @var LayoutService $layoutService */
+    private $layoutService;
 
     /** @var ConfigurationInterface */
     private $config;
@@ -74,7 +75,7 @@ class LayoutsApiController extends \AbstractApiController
         $this->layoutHydrator = $layoutHydrator;
         $this->layoutModel = $layoutModel;
         $this->layoutViewModel = $layoutViewModel;
-        $this->layoutProviderService = $layoutProviderService;
+        $this->layoutService = $layoutProviderService;
         $this->config = $config;
     }
 
@@ -259,7 +260,7 @@ class LayoutsApiController extends \AbstractApiController
         $out = $this->schema($this->layoutModel->getMetadataSchema(), "out");
 
         $layouts = [];
-        foreach ($this->layoutProviderService->getProviders() as $layoutProvider) {
+        foreach ($this->layoutService->getProviders() as $layoutProvider) {
             $layouts = array_merge($layouts, $layoutProvider->getAll());
         }
         $layouts = $this->layoutModel->normalizeRows($layouts, $query["expand"]);
@@ -294,7 +295,7 @@ class LayoutsApiController extends \AbstractApiController
 
         $out = $this->schema($this->layoutModel->getMetadataSchema(), "out");
 
-        $provider = $this->layoutProviderService->getCompatibleProvider($layoutID);
+        $provider = $this->layoutService->getCompatibleProvider($layoutID);
         if (!isset($provider)) {
             throw new ClientException("Invalid layout ID format", 400, ["layoutID" => $layoutID]);
         }
@@ -327,7 +328,7 @@ class LayoutsApiController extends \AbstractApiController
 
         $this->schema($this->layoutModel->getIDSchema(), "in")->validate(["layoutID" => $layoutID]);
 
-        $layoutProvider = $this->layoutProviderService->getCompatibleProvider($layoutID);
+        $layoutProvider = $this->layoutService->getCompatibleProvider($layoutID);
         if (!isset($layoutProvider)) {
             throw new ClientException("Invalid layout ID format", 400, ["layoutID" => $layoutID]);
         }
@@ -373,7 +374,9 @@ class LayoutsApiController extends \AbstractApiController
         ];
         $result = $this->layoutHydrator->hydrateLayout($body["layoutViewType"], $body["params"], $rowData);
 
-        return new Data($result, ["status" => 200]);
+        $response = new Data($result, ["status" => 200]);
+        $response->hookJsonSerialize([$this->layoutService, "stripSeoHtmlFromHydratedLayout"]);
+        return $response;
     }
 
     /**
@@ -431,7 +434,7 @@ class LayoutsApiController extends \AbstractApiController
         $params = $query["params"] ?? [];
 
         // Grab the record from the database if it exists.
-        $provider = $this->layoutProviderService->getCompatibleProvider($layoutID);
+        $provider = $this->layoutService->getCompatibleProvider($layoutID);
         if (!isset($provider)) {
             throw new ClientException("Invalid layout ID format", 400, ["layoutID" => $layoutID]);
         }
@@ -447,7 +450,9 @@ class LayoutsApiController extends \AbstractApiController
         $result = $this->layoutModel->normalizeRow($hydrated);
         $result = $out->validate($result);
 
-        return new Data($result);
+        $response = new Data($result);
+        $response->hookJsonSerialize([$this->layoutService, "stripSeoHtmlFromHydratedLayout"]);
+        return $response;
     }
 
     /**
@@ -504,7 +509,7 @@ class LayoutsApiController extends \AbstractApiController
         $params = $query["params"] ?? [];
 
         // Grab the record from the database if it exists.
-        $provider = $this->layoutProviderService->getCompatibleProvider($layoutID);
+        $provider = $this->layoutService->getCompatibleProvider($layoutID);
         if (!isset($provider)) {
             throw new ClientException("Invalid layout ID format", 400, ["layoutID" => $layoutID]);
         }
@@ -679,7 +684,7 @@ class LayoutsApiController extends \AbstractApiController
         $this->permission("site.manage");
         $in = $this->schema([
             "layoutViewType:s" => [
-                "enum" => $this->layoutProviderService->getLayoutViewTypes(),
+                "enum" => $this->layoutService->getLayoutViewTypes(),
             ],
             "legacyViewValue:s?",
         ])->addValidator("", function (array $value, ValidationField $field) {
@@ -781,7 +786,7 @@ class LayoutsApiController extends \AbstractApiController
         });
         $in->validate($body);
         //Get layoutViewType from Layout.
-        $provider = $this->layoutProviderService->getCompatibleProvider($layoutID);
+        $provider = $this->layoutService->getCompatibleProvider($layoutID);
         if (!isset($provider)) {
             throw new ClientException("Invalid layout ID format", 400, ["layoutID" => $layoutID]);
         }
@@ -842,7 +847,7 @@ class LayoutsApiController extends \AbstractApiController
      */
     protected function tryGetMutableLayoutProvider($layoutID): MutableLayoutProviderInterface
     {
-        $layoutProvider = $this->layoutProviderService->getCompatibleProvider($layoutID);
+        $layoutProvider = $this->layoutService->getCompatibleProvider($layoutID);
         if (!isset($layoutProvider)) {
             throw new ClientException("Invalid layout ID format", 400, ["layoutID" => $layoutID]);
         }

@@ -955,6 +955,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable
      * @param Gdn_Request $request The request being dispatched.
      * @param array $routeArgs The result of {@link Gdn_Dispatcher::analyzeRequest()}.
      * @return mixed Returns the result of a dispatch not found if the controller wasn't found or is disabled.
+     * @throws ReflectionException
+     * @throws Throwable
      */
     private function dispatchController($request, $routeArgs)
     {

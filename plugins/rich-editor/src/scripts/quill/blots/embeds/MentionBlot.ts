@@ -6,7 +6,7 @@
 
 import EmbedBlot from "quill/blots/embed";
 import { makeProfileUrl } from "@library/utility/appUtils";
-import { IMentionSuggestionData } from "@rich-editor/toolbars/pieces/MentionSuggestion";
+import { IMentionSuggestionData } from "@library/editor/pieces/MentionSuggestion";
 
 /**
  * A blot that represents a completed mention.

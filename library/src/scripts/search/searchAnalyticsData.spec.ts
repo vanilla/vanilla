@@ -58,7 +58,7 @@ const mockSiteSection: _appUtils.ISiteSection = {
     },
 };
 
-jest.spyOn(_appUtils, "getSiteSection").mockReturnValue(mockSiteSection);
+_appUtils.setMeta("siteSection", mockSiteSection);
 
 describe("splitSearchTerms", () => {
     testCases.forEach((testCase) => {

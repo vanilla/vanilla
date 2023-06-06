@@ -7,7 +7,7 @@
 import React from "react";
 import classNames from "classnames";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
-import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
+import { richEditorClasses } from "@library/editor/richEditorStyles";
 
 interface IProps {
     className?: string;

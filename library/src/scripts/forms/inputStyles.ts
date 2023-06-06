@@ -16,7 +16,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { important, percent } from "csx";
 import merge from "lodash/merge";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
 
 export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -103,7 +103,7 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
                 lineHeight: undefined,
                 minHeight: 0,
             },
-            "&:active, &:hover, &:focus, &.focus-visible": {
+            "&:active, &:hover, &:focus, &.focus-visible, &:focus-within": {
                 ...Mixins.border({
                     ...border,
                     color: colors.state.fg,
@@ -120,9 +120,11 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
 
 export const inputClasses = useThemeCache(() => {
     const vars = inputVariables();
+    const variables = inputMixinVars(vars);
     const style = styleFactory("input");
     const formElementVars = formElementsVariables();
     const globalVars = globalVariables();
+    const { colors, border } = variables;
 
     const inputPaddingMixin: CSSObject = {
         padding: inputMixin().padding,
@@ -148,5 +150,50 @@ export const inputClasses = useThemeCache(() => {
         },
     });
 
-    return { text, inputText, inputPaddingMixin, inputMixin, applyInputCSSRules };
+    const inputWrapper = style("inputWrapper", {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+    });
+
+    const inputContainer = style("inputContainer", {
+        flex: 1,
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        ...inputMixin(),
+        ...Mixins.padding({ all: 0 }),
+        "& input": {
+            ...inputMixin(),
+            ...inputPaddingMixin,
+            flex: 1,
+            border: "none",
+            background: "none",
+            "&:active, &:hover, &:focus, &.focus-visible": {
+                outline: "none",
+                border: "none",
+            },
+        },
+    });
+
+    const errorIcon = style("invalidIcon", {
+        color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+        minWidth: globalVars.icon.sizes.large,
+    });
+
+    const hugRight = css({
+        marginRight: -6,
+    });
+
+    return {
+        text,
+        inputText,
+        inputPaddingMixin,
+        inputMixin,
+        applyInputCSSRules,
+        inputWrapper,
+        inputContainer,
+        errorIcon,
+        hugRight,
+    };
 });

@@ -43,6 +43,7 @@ class TagsApiController extends AbstractApiController
                 "id:i?",
                 "name:s",
                 "type:s?",
+                "url:s?",
                 "urlcode:s?",
                 "urlCode:s?",
                 "parentTagID:i|null?",
@@ -165,6 +166,7 @@ class TagsApiController extends AbstractApiController
     public function post(array $body): Data
     {
         $this->permission("Garden.Community.Manage");
+        $this->permission("Vanilla.Tagging.Add");
         $in = $this->tagModel->getPostTagSchema();
         // A null type should be saved as an empty string in the DB.
         $body["type"] = $body["type"] ?? "";
@@ -196,6 +198,7 @@ class TagsApiController extends AbstractApiController
             $result = new Data($validatedTag);
             return $result;
         }
+        return new Data();
     }
 
     /**
@@ -246,6 +249,7 @@ class TagsApiController extends AbstractApiController
             $result = new Data($validatedTag);
             return $result;
         }
+        return new Data();
     }
 
     /**
@@ -290,13 +294,13 @@ class TagsApiController extends AbstractApiController
      */
     private function normalizeTags(array &$tags, array $allowedTypes = []): array
     {
+        $result = [];
         foreach ($tags as $key => &$tag) {
             // we should remove tags that aren't explicitly whitelisted.
-            // in-case they some how are returned by the search.
+            // in-case they some-how are returned by the search.
             $type = $tag["type"] ?? "";
             if (!in_array("all", $allowedTypes)) {
                 if ($type !== "" && !in_array($type, $allowedTypes)) {
-                    array_splice($tags, $key, 1);
                     continue;
                 }
             }
@@ -304,8 +308,10 @@ class TagsApiController extends AbstractApiController
             $tag["name"] = $tag["fullName"] ?? "";
             $tag["tagID"] = $tag["id"] ?? -1;
             $tag["type"] = stringIsNullOrEmpty($tag["type"]) ? "User" : $tag["type"];
+            $tag["url"] = \Gdn::request()->url("/discussions/tagged/{$tag["urlCode"]}", true);
+            $result[] = $tag;
         }
-        return $tags;
+        return $result;
     }
 
     /**

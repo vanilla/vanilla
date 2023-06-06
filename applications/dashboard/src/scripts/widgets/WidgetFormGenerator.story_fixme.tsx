@@ -171,6 +171,7 @@ const widgetSchema: JsonSchema = {
             },
         },
     },
+    required: [],
 };
 
 const makeMockGetSingleQuery =

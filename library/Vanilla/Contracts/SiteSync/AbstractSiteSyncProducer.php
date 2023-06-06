@@ -41,7 +41,7 @@ abstract class AbstractSiteSyncProducer implements SiteSyncProducerInterface
     /**
      * @inheritdoc
      */
-    public function isProduceAllEnabled(HttpClient $sourceClient): bool
+    public function isProduceAllEnabled(HttpClient $destinationClient): bool
     {
         return true;
     }

@@ -15,6 +15,7 @@ import {
 import { useValidCounts } from "@library/siteTotalsWidget/SiteTotals";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import { formatNumberText } from "@library/content/NumberFormatted";
+import { JsonSchema } from "@vanilla/json-schema-forms";
 
 describe("SiteTotals", () => {
     const allCounts: ISiteTotalCount[] = LayoutEditorPreviewData.getSiteTotals([
@@ -187,7 +188,7 @@ describe("SiteTotals", () => {
             { recordType: "question", label: "Questions", isHidden: true },
         ];
 
-        const mockSchema = {
+        const mockSchema: JsonSchema = {
             description: "Site Totals",
             type: "object",
             required: ["apiParams"],
@@ -198,6 +199,16 @@ describe("SiteTotals", () => {
                     properties: {
                         options: {
                             type: "object",
+                            properties: {
+                                group: { type: "string" },
+                                event: { type: "string" },
+                                category: { type: "string" },
+                                discussion: { type: "string" },
+                                comment: { type: "string" },
+                                post: { type: "string" },
+                                user: { type: "string" },
+                            },
+
                             default: {
                                 group: "Groups",
                                 event: "Events",
@@ -207,6 +218,7 @@ describe("SiteTotals", () => {
                                 post: "Posts",
                                 user: "Members",
                             },
+                            required: [],
                         },
                     },
                 },

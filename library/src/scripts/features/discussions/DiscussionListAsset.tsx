@@ -4,11 +4,11 @@
  */
 
 import { DiscussionListModule } from "@library/features/discussions/DiscussionListModule";
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useDebugValue } from "react";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { useDiscussionList } from "@library/features/discussions/discussionHooks";
 import { LoadStatus } from "@library/@types/api/core";
-import { IDiscussion, IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
+import { DiscussionListSortOptions, IDiscussion, IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
 import isEqual from "lodash/isEqual";
 import { DiscussionListAssetHeader } from "@library/features/discussions/DiscussionListAssetHeader";
 import { DiscussionListView } from "@library/features/discussions/DiscussionList.views";
@@ -16,7 +16,6 @@ import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import QuickLinks from "@library/navigation/QuickLinks";
 import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { DiscussionGridView } from "@library/features/discussions/DiscussionGridView";
-import { SearchPageResultsLoader } from "@library/search/SearchPageResultsLoader";
 import { PageBox } from "@library/layout/PageBox";
 import { t } from "@vanilla/i18n";
 import NumberedPager, { INumberedPagerProps } from "@library/features/numberedPager/NumberedPager";
@@ -29,16 +28,17 @@ import { discussionListVariables } from "@library/features/discussions/Discussio
 import { ListItemIconPosition } from "@library/lists/ListItem.variables";
 import { Widget } from "@library/layout/Widget";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
+import { usePermissionsContext } from "../users/PermissionsContext";
+import { BorderType } from "@library/styles/styleHelpersBorders";
+import Message from "@library/messages/Message";
+import { Icon } from "@vanilla/icons";
 
 interface IProps extends React.ComponentProps<typeof DiscussionListModule> {
     categoryFollowEnabled?: boolean;
     isList?: boolean;
+    isPreview?: boolean;
+    defaultSort?: DiscussionListSortOptions;
 }
-
-const DEFAULT_PAGINATION = {
-    currentPage: 1,
-    limit: 10,
-};
 
 export function DiscussionListAsset(props: IProps) {
     const {
@@ -50,37 +50,41 @@ export function DiscussionListAsset(props: IProps) {
         containerOptions,
     } = props;
     const selfRef = useRef<HTMLDivElement>(null);
-    const location = useLocation();
-    const [apiParams, setApiParams] = useState<IGetDiscussionListParams>(props.apiParams);
-    const [pagination, setPagination] = useState<ILinkPages>({});
+    const [apiParams, setApiParams] = useState<IGetDiscussionListParams>(props.apiParams ?? {});
+    const [pagination, setPagination] = useState<ILinkPages>(props.initialPaging ?? {});
     const variables = discussionListVariables(props.discussionOptions);
+    const { hasPermission } = usePermissionsContext();
+    const [permissionError, setPermissionError] = useState<boolean>(false);
 
-    useEffect(() => {
-        const urlParams = QueryStringParams.parse(location.search.substring(1));
-        if (urlParams.page) {
-            const urlPage = parseInt(urlParams.page as string);
-            setApiParams({
-                ...apiParams,
-                page: urlPage,
-            });
-            setPagination({
-                ...pagination,
-                currentPage: urlPage,
-                limit: apiParams.limit ?? 10,
-            });
+    const isCommunityManager = hasPermission("community.manage");
+
+    const actualApiParams = useMemo(() => {
+        // if the rendered list is a Layout Editor preview, strictly use the sort
+        // from the passed apiParams and not the state or url query sort
+        const sort = apiParams.sort as DiscussionListSortOptions;
+
+        const finalParams = {
+            ...apiParams,
+            sort,
+            pinOrder: getPinOrder(sort),
+        };
+
+        // In case a community manager shared a link that had one of these set.
+        // Display a permission error and exclude the parameter.
+        if (finalParams.internalStatusID && !isCommunityManager) {
+            delete finalParams.internalStatusID;
+            setPermissionError(true);
         }
-    }, []);
+        return finalParams;
+    }, [props.apiParams, apiParams, props.isPreview]);
 
     //if our original apiParams has been changed from front end, we should keep using the changed one
     const preHydratedDiscussions = useMemo(
-        () =>
-            isEqual(props.apiParams, apiParams) && isEqual(DEFAULT_PAGINATION, pagination)
-                ? discussionsFromProps
-                : undefined,
-        [apiParams, pagination],
+        () => (isEqual(props.apiParams, actualApiParams) || props.isPreview ? discussionsFromProps : undefined),
+        [actualApiParams, pagination],
     );
 
-    const discussions = useDiscussionList(apiParams, preHydratedDiscussions, pagination);
+    const discussions = useDiscussionList(actualApiParams, preHydratedDiscussions, pagination);
     const isList = props.isList || containerOptions?.displayType === WidgetContainerDisplayType.LIST;
     const isLink = containerOptions?.displayType === WidgetContainerDisplayType.LINK;
 
@@ -88,21 +92,21 @@ export function DiscussionListAsset(props: IProps) {
     const noDiscussions =
         contentIsLoaded && discussions.data?.discussionList && discussions.data?.discussionList.length === 0;
 
-    const handlePageChange = (page: number) => {
-        setApiParams({
-            ...apiParams,
-            page,
-        });
-        window.scrollTo({ top: selfRef.current?.offsetTop ? selfRef.current?.offsetTop - 10 : 0 });
-    };
+    const updateApiParams = (newParams: Partial<IGetDiscussionListParams>) => {
+        const page = newParams.page || 1;
+        const sort = newParams.sort || actualApiParams.sort;
 
-    const handleFollowFilterChange = (followValue: boolean | undefined) => {
-        setApiParams({
+        const tmpParams = {
             ...apiParams,
-            followed: followValue,
-            page: 1,
-        });
-        setPagination({ currentPage: 1 });
+            ...newParams,
+            page,
+            pinOrder: getPinOrder(sort),
+        };
+        setApiParams(tmpParams);
+
+        if (newParams.page) {
+            window.scrollTo({ top: selfRef.current?.offsetTop ? selfRef.current?.offsetTop - 10 : 0 });
+        }
     };
 
     const paginationProps: INumberedPagerProps = {
@@ -110,16 +114,16 @@ export function DiscussionListAsset(props: IProps) {
         currentPage: pagination?.currentPage,
         pageLimit: pagination?.limit,
     };
-    const assetFooter = <NumberedPager {...paginationProps} onChange={handlePageChange} />;
+    const assetFooter = <NumberedPager {...paginationProps} onChange={(page: number) => updateApiParams({ page })} />;
 
     const assetHeader = (
         <DiscussionListAssetHeader
             discussionIDs={discussions.data?.discussionList?.map((discussion) => discussion.discussionID)}
             noCheckboxes={props.noCheckboxes || isLink}
             categoryFollowEnabled={categoryFollowEnabled}
-            categoryFollowFilter={apiParams.followed ? "followed" : "all"}
-            onCategoryFollowFilterChange={handleFollowFilterChange}
             paginationProps={paginationProps}
+            apiParams={actualApiParams}
+            updateApiParams={updateApiParams}
         />
     );
 
@@ -129,7 +133,7 @@ export function DiscussionListAsset(props: IProps) {
     if (discussions.status === LoadStatus.LOADING || discussions.status === LoadStatus.PENDING) {
         loading = (
             <DiscussionListLoader
-                count={props.apiParams.limit ?? 10}
+                count={actualApiParams.limit ?? 10}
                 displayType={containerOptions?.displayType}
                 containerProps={{
                     ...props,
@@ -160,6 +164,27 @@ export function DiscussionListAsset(props: IProps) {
         }
     }, [discussions]);
 
+    const queryParams = {
+        type: actualApiParams.type,
+        tagID: actualApiParams.tagID,
+        statusID: actualApiParams.statusID,
+        internalStatusID: actualApiParams.internalStatusID,
+        page: actualApiParams.page,
+        followed: actualApiParams.followed,
+        sort: actualApiParams.sort,
+    };
+    const urlQueryString = (
+        <QueryString
+            value={queryParams}
+            defaults={{
+                page: 1,
+                followed: false,
+                sort: props.defaultSort,
+            }}
+            syncOnFirstMount
+        />
+    );
+
     //for proper loading placeholder etc
     if (error || noDiscussions || isList) {
         return (
@@ -175,16 +200,32 @@ export function DiscussionListAsset(props: IProps) {
                 extraHeader={assetHeader}
             >
                 <div ref={selfRef}>
-                    <QueryString value={{ page: apiParams.page ?? 1 }} defaults={{ page: 1 }} syncOnFirstMount />
+                    {urlQueryString}
                     {!contentIsLoaded && (error || loading)}
-                    {contentIsLoaded && noDiscussions && <PageBox>{t("No discussions were found.")}</PageBox>}
+                    {contentIsLoaded && noDiscussions && (
+                        <PageBox options={{ borderType: BorderType.SEPARATOR }}>
+                            {t("No discussions were found.")}
+                        </PageBox>
+                    )}
                     {contentIsLoaded && !noDiscussions && (
-                        <DiscussionListView
-                            noCheckboxes={props.noCheckboxes}
-                            discussions={discussions.data?.discussionList as IDiscussion[]}
-                            discussionOptions={props.discussionOptions}
-                            disableButtonsInItems={props.disableButtonsInItems}
-                        />
+                        <>
+                            {permissionError && (
+                                <Message
+                                    stringContents={t(
+                                        "You do not have permission to access one or more filters in the provided link.",
+                                    )}
+                                    type="warning"
+                                    onConfirm={() => setPermissionError(false)}
+                                    icon={<Icon icon="status-warning" />}
+                                />
+                            )}
+                            <DiscussionListView
+                                noCheckboxes={props.noCheckboxes}
+                                discussions={discussions.data?.discussionList as IDiscussion[]}
+                                discussionOptions={props.discussionOptions}
+                                disableButtonsInItems={props.disableButtonsInItems}
+                            />
+                        </>
                     )}
                     {assetFooter}
                 </div>
@@ -195,7 +236,7 @@ export function DiscussionListAsset(props: IProps) {
     if (isLink) {
         return (
             <div ref={selfRef}>
-                <QueryString value={{ page: apiParams.page ?? 1 }} defaults={{ page: 1 }} syncOnFirstMount />
+                {urlQueryString}
                 {contentIsLoaded && !noDiscussions ? (
                     <QuickLinks
                         title={props.title}
@@ -228,7 +269,7 @@ export function DiscussionListAsset(props: IProps) {
 
     return (
         <div ref={selfRef}>
-            <QueryString value={{ page: apiParams.page ?? 1 }} defaults={{ page: 1 }} syncOnFirstMount />
+            {urlQueryString}
             {contentIsLoaded && !noDiscussions ? (
                 <DiscussionGridView
                     {...props}
@@ -241,6 +282,12 @@ export function DiscussionListAsset(props: IProps) {
             {assetFooter}
         </div>
     );
+}
+
+function getPinOrder(sort?: string): IGetDiscussionListParams["pinOrder"] {
+    const tmpSort = sort ?? DiscussionListSortOptions.RECENTLY_COMMENTED;
+    const pinMixed = [DiscussionListSortOptions.OLDEST, DiscussionListSortOptions.TOP];
+    return pinMixed.includes(tmpSort as DiscussionListSortOptions) ? "mixed" : "first";
 }
 
 export default DiscussionListAsset;

@@ -30,6 +30,8 @@ interface IProps extends IOptionalComponentID {
     tooltipLabel?: boolean;
     excludeFromICheck?: boolean;
     fullWidth?: boolean;
+    hugLeft?: boolean;
+    infoToolTip?: string;
 }
 
 export default function CheckBox(props: IProps) {
@@ -52,6 +54,7 @@ export default function CheckBox(props: IProps) {
         tooltipLabel,
         label,
         hideLabel,
+        infoToolTip,
     } = props;
 
     const icon = (
@@ -67,7 +70,14 @@ export default function CheckBox(props: IProps) {
     );
 
     return (
-        <label className={classNames(className, classes.root, { isHorizontal }, fullWidth && classes.fullWidth)}>
+        <label
+            className={classNames(
+                className,
+                classes.root,
+                { isHorizontal, hugLeft: props.hugLeft },
+                fullWidth && classes.fullWidth,
+            )}
+        >
             <input
                 className={classNames(classes.input, fakeFocus && "focus-visible", {
                     "exclude-icheck": excludeFromICheck,
@@ -96,6 +106,14 @@ export default function CheckBox(props: IProps) {
                 <ToolTip label={disabledNote}>
                     <ToolTipIcon>
                         <InformationIcon informationMessage={disabledNote} />
+                    </ToolTipIcon>
+                </ToolTip>
+            )}
+
+            {infoToolTip && (
+                <ToolTip label={infoToolTip}>
+                    <ToolTipIcon>
+                        <InformationIcon className={classes.infoToolTip} informationMessage={infoToolTip} />
                     </ToolTipIcon>
                 </ToolTip>
             )}

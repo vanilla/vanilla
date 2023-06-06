@@ -11,6 +11,7 @@ use Garden\EventManager;
 use Garden\SafeCurl\Exception\InvalidURLException;
 use Vanilla\UploadedFile;
 use VanillaTests\BootstrapTestCase;
+use VanillaTests\Fixtures\TestUploader;
 
 /**
  * Tests for uploaded files.
@@ -45,9 +46,9 @@ class UploadedFileTest extends BootstrapTestCase
      */
     public function testSavesRemoteUrls()
     {
-        $file = UploadedFile::fromRemoteResourceUrl("http://vanillaforums.com");
-        $this->assertEquals("http://vanillaforums.com", $file->getForeignUrl());
-        $this->assertEquals("https://vanillaforums.com/", $file->getResolvedForeignUrl());
+        $file = UploadedFile::fromRemoteResourceUrl("http://vanilla.higherlogic.com");
+        $this->assertEquals("http://vanilla.higherlogic.com", $file->getForeignUrl());
+        $this->assertEquals("https://vanilla.higherlogic.com/", $file->getResolvedForeignUrl());
 
         // Ensure we've temporarily stashed the file somewhere.
         $this->assertTrue(file_exists($file->getFile()));
@@ -66,7 +67,7 @@ class UploadedFileTest extends BootstrapTestCase
 
         // Save the upload.
         $file->persistUpload();
-        $this->assertFileNotExists($file->getFile(), "The original upload is moved and cleaned up.");
+        $this->assertFileDoesNotExist($file->getFile(), "The original upload is moved and cleaned up.");
         $this->assertFileExists(PATH_UPLOADS . "/" . $file->getPersistedPath(), "Final upload file is persisted");
 
         $this->assertStringContainsString(
@@ -259,5 +260,15 @@ class UploadedFileTest extends BootstrapTestCase
         ];
 
         return $r;
+    }
+
+    /**
+     * Test that errors caused by uploading non-resizeable images are ignored.
+     */
+    public function testUploadNonResizeableImage()
+    {
+        $this->expectNotToPerformAssertions();
+        $file = TestUploader::uploadFile("ico", PATH_ROOT . "/tests/fixtures/apple.ico");
+        $file->persistUpload();
     }
 }

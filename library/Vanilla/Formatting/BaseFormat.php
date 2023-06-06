@@ -16,6 +16,8 @@ use Vanilla\Formatting\Html\Processor\HtmlProcessor;
  */
 abstract class BaseFormat implements FormatInterface
 {
+    use UserMentionsTrait;
+
     /** @var int */
     const EXCERPT_MAX_LENGTH = 325;
 
@@ -89,7 +91,7 @@ abstract class BaseFormat implements FormatInterface
      *
      * @inheritdoc
      */
-    public function renderExcerpt(string $content): string
+    public function renderExcerpt($content): string
     {
         $plainText = $this->renderPlainText($content);
 
@@ -108,7 +110,7 @@ abstract class BaseFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $content): string
+    public function renderQuote($content): string
     {
         return $this->renderHTML($content);
     }
@@ -116,7 +118,7 @@ abstract class BaseFormat implements FormatInterface
     /**
      * @inheritdoc
      */
-    public function getPlainTextLength(string $content): int
+    public function getPlainTextLength($content): int
     {
         return mb_strlen(trim($this->renderPlainText($content), "UTF-8"));
     }
@@ -159,5 +161,28 @@ abstract class BaseFormat implements FormatInterface
     /**
      * @inheritDoc
      */
-    abstract public function parseAllMentions(string $body): array;
+    abstract public function parseAllMentions($body): array;
+
+    /**
+     * Helper method to parse mentions for non-rich formats.
+     *
+     * @param string $body
+     * @param array $patterns An extra array of patterns to check for.
+     * @return string[]
+     */
+    protected function getNonRichMentions(string $body, array $patterns = []): array
+    {
+        $patterns[] = $this->getNonRichAtMention();
+
+        $matches = [];
+        preg_match_all("~" . $this->getUrlPattern() . "~", $body, $matches, PREG_UNMATCHED_AS_NULL);
+        $urlMatches = $this->normalizeMatches($matches, true);
+
+        $matches = [];
+        $pattern = "~" . implode("|", $patterns) . "~";
+        preg_match_all($pattern, $body, $matches, PREG_UNMATCHED_AS_NULL);
+        $otherMatches = $this->normalizeMatches($matches);
+
+        return array_merge($urlMatches, $otherMatches);
+    }
 }

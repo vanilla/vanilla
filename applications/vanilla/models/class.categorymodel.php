@@ -2,7 +2,7 @@
 /**
  * Category model
  *
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0
@@ -42,6 +42,7 @@ use Garden\Events\EventFromRowInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Garden\Events\ResourceEvent;
 use Vanilla\Community\Events\CategoryEvent;
+use Vanilla\Community\Events\SubscriptionEvent;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\BannerImageModel;
@@ -96,6 +97,8 @@ class CategoryModel extends Gdn_Model implements
 
     public const NOTIFICATION_FOLLOW = "follow";
 
+    public const DEFAULT_PREFERENCE_DATE_FOLLOWED = "2023-04-18 23:59:59";
+
     /** Cache key. */
     const CACHE_KEY = "Categories";
 
@@ -107,6 +110,8 @@ class CategoryModel extends Gdn_Model implements
 
     /** Cache key. */
     const MASTER_VOTE_KEY = "Categories.Rebuild.Vote";
+
+    const DEFAULT_FOLLOWED_CATEGORIES_KEY = "Preferences.CategoryFollowed.Defaults";
 
     /** The default maximum number of categories a user can follow. */
     const MAX_FOLLOWED_CATEGORIES_DEFAULT = 100;
@@ -402,7 +407,7 @@ class CategoryModel extends Gdn_Model implements
         $allowedDiscussionTypes = self::getAllowedDiscussionData($row);
         $allowedDiscussionTypes = array_keys($allowedDiscussionTypes);
 
-        $discussionTypes = array_intersect($allowedDiscussionTypes, $categoryAllowedDiscussionTypes);
+        $discussionTypes = array_intersect($categoryAllowedDiscussionTypes, $allowedDiscussionTypes);
 
         return $discussionTypes ?? [];
     }
@@ -530,11 +535,12 @@ class CategoryModel extends Gdn_Model implements
     /**
      * Get searchable category IDs.
      *
-     * @param int $categoryID The root category ID.
+     * @param int|null $categoryID The root category ID.
      * @param bool|null $followedCategories If set, include or exclude followed categories.
      * @param bool|null $includeChildCategories Get child category IDs as well.
      * @param bool|null $includeArchivedCategories If set include archived categories.
-     *
+     * @param array|null $categoryIDs
+     * @param string|null $categorySearch
      * @return int[] CategoryIDs.
      */
     public function getSearchCategoryIDs(
@@ -744,12 +750,9 @@ class CategoryModel extends Gdn_Model implements
                 throw new ClientException(t("Already following the maximum number of categories."));
             }
         }
+        $fields = $this->getInsertUpdateCategoryPreferenceFields($userID, $categoryID, $followed);
 
-        $this->SQL->replace(
-            "UserCategory",
-            ["Followed" => $followed],
-            ["UserID" => $userID, "CategoryID" => $categoryID]
-        );
+        $this->SQL->replace("UserCategory", $fields, ["UserID" => $userID, "CategoryID" => $categoryID]);
         static::clearUserCache();
         Gdn::cache()->remove("Follow_{$userID}");
 
@@ -757,6 +760,20 @@ class CategoryModel extends Gdn_Model implements
         return $result;
     }
 
+    /**
+     * Get insert update fields for category following
+     *
+     * @param int $userID
+     * @param int $categoryID
+     * @param int $followed
+     * @return int[]
+     */
+    private function getInsertUpdateCategoryPreferenceFields(int $userID, int $categoryID, int $followed): array
+    {
+        $fields = ["Followed" => $followed, "Unfollow" => $followed ? 0 : 1];
+        $fields[$followed ? "DateFollowed" : "DateUnfollowed"] = DateTimeFormatter::getCurrentDateTime();
+        return $fields;
+    }
     /**
      * Get the enabled status of category following, returned as a boolean value.
      *
@@ -791,6 +808,33 @@ class CategoryModel extends Gdn_Model implements
         $result = array_key_exists($categoryID, $followed);
 
         return $result;
+    }
+
+    /**
+     * Check if the user has any followed categories
+     *
+     * @param int $userID
+     * @return bool
+     */
+    public function hasFollowed(int $userID): bool
+    {
+        $followed = $this->getFollowed($userID);
+        return (bool) count($followed);
+    }
+
+    /**
+     * Check if the user has any un-followed categories
+     *
+     * @param int $userID
+     * @return bool
+     */
+    public function hasUnfollowed(int $userID): bool
+    {
+        $where = [
+            "UserID" => $userID,
+            "Unfollow" => 1,
+        ];
+        return (bool) $this->SQL->getCount("UserCategory", $where);
     }
 
     /**
@@ -837,6 +881,7 @@ class CategoryModel extends Gdn_Model implements
      *   - filterHideDiscussions (bool): Filter out categories with a truthy HideAllDiscussions column?
      *   - filterArchivedCategories (bool): Filter out categories that are archived.
      *   - forceArrayReturn (bool): Force an array return value.
+     *   - filterNonDiscussionCategories (bool) : Filter out categories with no discussion in them
      * @return array|bool An array of filtered categories or true if no categories were filtered.
      */
     public function getVisibleCategories(array $options = [])
@@ -861,6 +906,7 @@ class CategoryModel extends Gdn_Model implements
         $filterHideDiscussions = $options["filterHideDiscussions"] ?? false;
         $filterArchivedCategories = $options["filterArchivedCategories"] ?? false;
         $filterNonPostableCategories = $options["filterNonPostableCategories"] ?? false;
+        $filterNonDiscussionCategories = $options["filterNonDiscussionCategories"] ?? false;
 
         foreach ($categories as $categoryID => $category) {
             if ($filterHideDiscussions && ($category["HideAllDiscussions"] ?? false)) {
@@ -869,6 +915,11 @@ class CategoryModel extends Gdn_Model implements
             }
 
             if ($filterArchivedCategories && ($category["Archived"] ?? false)) {
+                $unfiltered = false;
+                continue;
+            }
+
+            if ($filterNonDiscussionCategories && $category["CountDiscussions"] == 0) {
                 $unfiltered = false;
                 continue;
             }
@@ -1477,6 +1528,7 @@ class CategoryModel extends Gdn_Model implements
                         ? $this->getCategoryAllowedDiscussionTypes($category)
                         : ["Discussion"];
                     $discussionTypes = array_map("lcfirst", $discussionTypes);
+                    $discussionTypes = array_values($discussionTypes);
                     $category["AllowedDiscussionTypes"] = $discussionTypes;
                     setValue($field, $row, $category);
                 }
@@ -2513,14 +2565,15 @@ class CategoryModel extends Gdn_Model implements
      *
      * @param array $categories
      * @param bool $addUserCategory
+     * @param int | null $userID
      */
-    public static function joinUserData(&$categories, $addUserCategory = true)
+    public static function joinUserData(array &$categories, bool $addUserCategory = true, ?int $userID = null)
     {
         $iDs = array_column($categories, "CategoryID", "CategoryID");
         $categories = array_combine($iDs, $categories);
 
         if ($addUserCategory) {
-            $userData = self::instance()->getUserCategories();
+            $userData = self::instance()->getUserCategories($userID);
 
             foreach ($iDs as $iD) {
                 $category = $categories[$iD];
@@ -2549,6 +2602,8 @@ class CategoryModel extends Gdn_Model implements
                 $categories[$iD]["Following"] = $following;
 
                 $categories[$iD]["Followed"] = boolval($row["Followed"] ?? false);
+
+                $categories[$iD]["DateFollowed"] = $row["DateFollowed"] ?? null;
 
                 // Calculate the read field.
                 if ($category["DisplayAs"] == self::DISPLAY_HEADING) {
@@ -2627,6 +2682,33 @@ class CategoryModel extends Gdn_Model implements
 
         if ($dbRecord["ParentCategoryID"] <= 0) {
             $dbRecord["ParentCategoryID"] = null;
+        }
+
+        if (ModelUtils::isExpandOption("lastPost", $expand) && !empty($dbRecord["LastDiscussionID"])) {
+            $recentPost = [];
+            $valid = true;
+            $mappings = [
+                "discussionID" => "LastDiscussionID",
+                "commentID" => "LastCommentID",
+                "name" => "LastTitle",
+                "url" => "LastUrl",
+                "dateInserted" => "LastDateInserted",
+                "insertUserID" => "LastUserID",
+            ];
+            foreach ($mappings as $key => $mapping) {
+                if (empty($dbRecord[$mapping]) && $mapping != "LastCommentID") {
+                    $valid = false;
+                    break;
+                }
+                $recentPost[$key] = $dbRecord[$mapping];
+            }
+            if ($valid) {
+                $dbRecord["lastPost"] = $recentPost;
+                if (!empty($dbRecord["LastUser"])) {
+                    $dbRecord["lastPost"]["insertUser"] = $dbRecord["LastUser"];
+                    unset($dbRecord["LastUser"]);
+                }
+            }
         }
 
         $dbRecord["Name"] = empty($dbRecord["Name"]) ? t("Untitled") : $dbRecord["Name"];
@@ -2719,7 +2801,7 @@ class CategoryModel extends Gdn_Model implements
                 yield;
             }
         }
-        $this->prepareForDelete($categoryID);
+        $this->prepareForDelete($categoryID, false);
         $this->deleteInternal($categoryID, true);
         return LongRunner::FINISHED;
     }
@@ -3210,7 +3292,6 @@ class CategoryModel extends Gdn_Model implements
             }
             unset($where["Followed"]);
         }
-
         $result = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
         return $result;
     }
@@ -4743,6 +4824,57 @@ class CategoryModel extends Gdn_Model implements
         return $result;
     }
 
+    /***
+     * set default category preferences for a user
+     *
+     * @param int $userID
+     * @param bool $existingUser
+     * @return void
+     */
+    public function setDefaultCategoryPreferences(int $userID, bool $existingUser = false): void
+    {
+        $defaultPreferences = Gdn::config()->get(self::DEFAULT_FOLLOWED_CATEGORIES_KEY, false);
+        if (!$defaultPreferences) {
+            return;
+        }
+        if ($existingUser) {
+            $followed = $this->hasFollowed($userID);
+            $unFollowed = $this->hasUnfollowed($userID);
+            if ($followed || $unFollowed) {
+                return;
+            }
+        }
+        try {
+            $defaultPreferences = json_decode($defaultPreferences, true, 512, JSON_THROW_ON_ERROR);
+            if (!is_array($defaultPreferences)) {
+                throw new JsonException("Invalid format received");
+            }
+            foreach ($defaultPreferences as $categoryPreference) {
+                $categoryID = $categoryPreference["categoryID"];
+                if (!self::checkPermission($categoryID, "Vanilla.Discussions.View")) {
+                    continue;
+                }
+                // set the preferences here and it should be all set
+                $preferences = [
+                    self::PREFERENCE_KEY_NOTIFICATION => $categoryPreference[self::PREFERENCE_KEY_NOTIFICATION] ?? null,
+                    self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS =>
+                        $categoryPreference[self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS] ?? false,
+                ];
+                $this->setPreferences($userID, $categoryPreference["categoryID"], $preferences);
+            }
+        } catch (JsonException $exception) {
+            $this->logger->notice("Invalid format received for the category default configuration.", [
+                Vanilla\Logger::FIELD_CHANNEL => Vanilla\Logger::CHANNEL_APPLICATION,
+                Vanilla\Logger::FIELD_EVENT => "configuration",
+            ]);
+        } catch (Exception $exception) {
+            $this->logger->debug("Setting Default Category Preference for the user failed", [
+                "error" => $exception->getMessage(),
+                "trace" => $exception->getTraceAsString(),
+            ]);
+        }
+    }
+
     /**
      * Set a user's preferences for a single category.
      *
@@ -4817,7 +4949,7 @@ class CategoryModel extends Gdn_Model implements
             default:
                 throw new InvalidArgumentException("Unknown preference: {$notificationPreference}");
         }
-
+        $insert = !$this->isFollowed($userID, $categoryID);
         $this->follow($userID, $categoryID, $following);
         $userMeta = [
             sprintf(self::PREFERENCE_COMMENT_APP, $categoryID) => $commentApp,
@@ -4827,6 +4959,106 @@ class CategoryModel extends Gdn_Model implements
         ];
         UserModel::setMeta($userID, $userMeta);
         self::clearUserCache($userID);
+        //invalidate current cache on new inserts and when user unfollows a category
+        if ((!$insert && !$following) || $insert) {
+            $key = "FollowedCount_{$categoryID}";
+            Gdn::cache()->remove($key);
+        }
+        $this->dispatchSubscriptionEvent($userID, $categoryID, $notificationPreference);
+    }
+
+    /**
+     * Dispatch a subscription event for the category
+     *
+     * @param int $userId
+     * @param int $categoryID
+     * @param ?string $notificationPreference
+     * @return void
+     */
+    private function dispatchSubscriptionEvent(int $userId, int $categoryID, ?string $notificationPreference): void
+    {
+        $sender = Gdn::userModel()->currentFragment();
+        $senderSchema = new UserFragmentSchema();
+        $sender = $senderSchema->validate($sender);
+        if (is_null($notificationPreference)) {
+            //user has unsubscribed
+            $userUnFollowedCategory = $this->getUnfollowedData($userId, $categoryID);
+            $category = $userUnFollowedCategory[$categoryID];
+        } else {
+            $userFollowedCategories = $this->getFollowed($userId);
+            //We don't get a followed category if the user has unfollowed the category
+            $category = $userFollowedCategories[$categoryID];
+        }
+        $category["totalFollowedCount"] = $this->getTotalFollowedCount($categoryID);
+
+        $userPreferences = $this->getPreferencesByCategoryID($userId, $categoryID);
+        if (is_null($notificationPreference)) {
+            $action = SubscriptionEvent::ACTION_UNFOLLOW;
+        } elseif ($notificationPreference == self::NOTIFICATION_FOLLOW) {
+            $action = SubscriptionEvent::ACTION_FOLLOW;
+        } else {
+            $action = SubscriptionEvent::ACTION_UPDATE_PREFERENCES;
+        }
+        $categorySubscriptionData = [
+            "category" => $category,
+            "user" => ["userID" => $userId],
+            "type" => $action,
+            "preferences" => $userPreferences,
+        ];
+        $categorySubscriptionEvent = new SubscriptionEvent(
+            $action,
+            ["subscription" => $categorySubscriptionData],
+            $sender
+        );
+        $this->eventManager->dispatch($categorySubscriptionEvent);
+    }
+
+    /**
+     * Get total subscribers for a category
+     *
+     * @param int $categoryID
+     * @return int
+     */
+    public function getTotalFollowedCount(int $categoryID): int
+    {
+        $key = "FollowedCount_{$categoryID}";
+        $result = Gdn::cache()->get($key);
+        if ($result === Gdn_Cache::CACHEOP_FAILURE) {
+            $category = self::categories($categoryID);
+            if (!$category) {
+                throw new InvalidArgumentException("Category not found.");
+            }
+
+            $sql = clone $this->SQL;
+            $sql->reset();
+            $result = $sql->getCount("UserCategory", ["CategoryID" => $categoryID, "Followed" => 1]);
+            Gdn::cache()->store($key, $result);
+        }
+        return $result;
+    }
+
+    /**
+     * Get data on users unfollowed Category
+     *
+     * @param int $userID
+     * @param int|null $categoryID
+     * @return array
+     */
+    public function getUnfollowedData(int $userID, ?int $categoryID = null): array
+    {
+        $where = [
+            "UserID" => $userID,
+            "Unfollow" => 1,
+        ];
+        if (!empty($categoryID)) {
+            $where["CategoryID"] = $categoryID;
+        }
+
+        $userData = $this->SQL->getWhere("UserCategory", $where)->resultArray();
+        if (empty($userData)) {
+            return [];
+        }
+        return array_column($userData, null, "CategoryID");
     }
 
     /**
@@ -5475,6 +5707,7 @@ SQL;
                     "default" => false,
                     "description" => "Is the category being followed by the current user?",
                 ],
+                "dateFollowed:dt?" => "Date time the user started following the category",
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
                 "featured:b?" => "Featured category.",
                 "allowedDiscussionTypes:a",
@@ -5577,31 +5810,33 @@ SQL;
      *
      * @param int $categoryID
      */
-    private function prepareForDelete(int $categoryID): void
+    private function prepareForDelete(int $categoryID, bool $deleteContent = true): void
     {
         $this->deletePermissions($categoryID);
-
-        // Delete comments in this category
-        $this->SQL
-            ->from("Comment c")
-            ->join("Discussion d", "c.DiscussionID = d.DiscussionID")
-            ->where("d.CategoryID", $categoryID)
-            ->delete();
 
         // Delete discussions in this category
         $this->SQL->delete("Discussion", ["CategoryID" => $categoryID]);
 
-        // Make inherited permission local permission
-        $this->SQL
-            ->update("Category")
-            ->set("PermissionCategoryID", 0)
-            ->where("PermissionCategoryID", $categoryID)
-            ->where("CategoryID <>", $categoryID)
-            ->put();
+        if ($deleteContent) {
+            // Delete comments in this category
+            $this->SQL
+                ->from("Comment c")
+                ->join("Discussion d", "c.DiscussionID = d.DiscussionID")
+                ->where("d.CategoryID", $categoryID)
+                ->delete();
 
-        // Delete tags
-        $this->SQL->delete("Tag", ["CategoryID" => $categoryID]);
-        $this->SQL->delete("TagDiscussion", ["CategoryID" => $categoryID]);
+            // Make inherited permission local permission
+            $this->SQL
+                ->update("Category")
+                ->set("PermissionCategoryID", 0)
+                ->where("PermissionCategoryID", $categoryID)
+                ->where("CategoryID <>", $categoryID)
+                ->put();
+
+            // Delete tags
+            $this->SQL->delete("Tag", ["CategoryID" => $categoryID]);
+            $this->SQL->delete("TagDiscussion", ["CategoryID" => $categoryID]);
+        }
     }
 
     /**

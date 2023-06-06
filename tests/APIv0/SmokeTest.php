@@ -80,7 +80,7 @@ class SmokeTest extends SiteTestCase
      *
      * @param array $testUser The user to set.
      * @return $this
-     * @see APIv0::queryUserKey()
+     * @see E2ETestClient::queryUserKey()
      */
     public function setTestUser($testUser)
     {

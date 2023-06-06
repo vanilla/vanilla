@@ -10,6 +10,7 @@ export enum ButtonTypes {
     TEXT = "text",
     TEXT_PRIMARY = "textPrimary",
     ICON = "icon",
+    ICON_MENUBAR = "iconMenubar",
     ICON_COMPACT = "iconCompact",
     TITLEBAR_LINK = "titleBarLink",
     DASHBOARD_STANDARD = "dashboardStandard",

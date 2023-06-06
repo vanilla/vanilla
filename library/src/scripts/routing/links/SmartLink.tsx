@@ -9,7 +9,7 @@ import { NavLink, NavLinkProps, useLocation } from "react-router-dom";
 import { makeLocationDescriptorObject, LinkContext, useLinkContext } from "@library/routing/links/LinkContextProvider";
 import { sanitizeUrl } from "@vanilla/utils";
 import { LocationDescriptor } from "history";
-import { siteUrl } from "@library/utility/appUtils";
+import { getMeta, siteUrl } from "@library/utility/appUtils";
 import { cx } from "@emotion/css";
 
 export interface ISmartLinkProps extends NavLinkProps {
@@ -47,7 +47,13 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
         }
     }
 
-    const href = context.makeHref(props.to);
+    let href = context.makeHref(props.to);
+    // Subcommunity slug OR subcommunity
+    const siteRoot = getMeta("context.basePath", "");
+    if (siteRoot.length > 0 && href.search(siteRoot) === -1) {
+        href = href.replace(window.location.origin, window.location.origin + siteRoot);
+    }
+
     const tabIndex = context.areLinksDisabled ? -1 : props.tabIndex ?? 0;
     if (context.isDynamicNavigation(href)) {
         return (
@@ -68,7 +74,7 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
                 ref={ref}
                 href={sanitizeUrl(href)}
                 target={isForeign ? "_blank" : undefined}
-                rel={isForeign ? "noopener noreferrer" : props.rel}
+                rel={isForeign ? "noopener" : props.rel}
                 {...passthru}
                 tabIndex={tabIndex}
             />

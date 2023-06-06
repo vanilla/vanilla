@@ -10,6 +10,7 @@ namespace Vanilla\Layout;
 use Vanilla\Layout\Providers\LayoutProviderInterface;
 use Vanilla\Layout\View\LayoutViewInterface;
 use Vanilla\Layout\View\LegacyLayoutViewInterface;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Used to mediate access to objects that can provide layouts
@@ -122,5 +123,27 @@ class LayoutService
         return $result;
     }
 
+    /**
+     * Strip out seoContent values from API responses. These are only used internally and not externally.
+     *
+     * @param array|null $data
+     *
+     * @return array
+     */
+    public function stripSeoHtmlFromHydratedLayout(?array $data): ?array
+    {
+        if ($data === null) {
+            return null;
+        }
+        if (isset($data["seo"]["htmlContents"])) {
+            unset($data["seo"]["htmlContents"]);
+        }
+        ArrayUtils::walkRecursiveArray($data, function (&$value) {
+            if (ArrayUtils::isArray($value) && isset($value['$seoContent'])) {
+                unset($value['$seoContent']);
+            }
+        });
+        return $data;
+    }
     //endregion
 }

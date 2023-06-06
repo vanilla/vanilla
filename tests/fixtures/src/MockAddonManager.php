@@ -17,8 +17,8 @@ use Vanilla\AddonManager;
  */
 class MockAddonManager extends AddonManager
 {
-    /** @var array MockAddon[] */
-    private $addons = [];
+    /** @var MockAddon[] */
+    private array $addons = [];
 
     /**
      * MockAddonManager Constructor.
@@ -27,7 +27,12 @@ class MockAddonManager extends AddonManager
      */
     public function __construct(array $addons = [])
     {
-        $this->addons = $addons;
+        // Check if first argument is array of `MockAddon`s because parent constructor has different signature
+        foreach ($addons as $addon) {
+            if ($addon instanceof MockAddon) {
+                $this->pushAddon($addon);
+            }
+        }
     }
 
     /**
@@ -54,15 +59,15 @@ class MockAddonManager extends AddonManager
     /**
      * Get theme addon by key
      *
-     * @param int|string $themeKey Theme key or ID
+     * @param int|string $themeDirName Theme key or ID
      * @return Addon|null Get theme addon.
      */
-    public function lookupTheme($themeKey)
+    public function lookupTheme($themeDirName)
     {
         $addon = null;
         /** @var MockAddon $addon */
         foreach ($this->addons as $iterAddon) {
-            if ($iterAddon->getKey() === $themeKey) {
+            if ($iterAddon->getKey() === $themeDirName) {
                 $addon = $iterAddon;
                 break;
             }

@@ -181,8 +181,10 @@ trait CommunityApiTestTrait
             return $result;
         }
 
+        $needsRefetch = false;
         if (isset($overrides["score"])) {
             $this->setDiscussionScore($this->lastInsertedDiscussionID, $overrides["score"]);
+            $needsRefetch = true;
         }
 
         if (!empty($extras)) {
@@ -190,7 +192,15 @@ trait CommunityApiTestTrait
             $discussionModel = \Gdn::getContainer()->get(\DiscussionModel::class);
             $discussionModel->setField($this->lastInsertedDiscussionID, $extras);
             ModelUtils::validationResultToValidationException($discussionModel);
+            $needsRefetch = true;
         }
+        // Fetch again so we can handle the added extras
+        if ($needsRefetch) {
+            $result = $this->api()
+                ->get("/discussions/{$result["discussionID"]}")
+                ->getBody();
+        }
+
         return $result;
     }
 
@@ -365,5 +375,26 @@ trait CommunityApiTestTrait
                 \CategoryModel::PREFERENCE_KEY_NOTIFICATION => $mode,
             ]);
         }, $userOrUserID);
+    }
+
+    /**
+     * Assert that a category has a specific allowedDiscussionTypes.
+     *
+     * @param $expected array|string
+     * @param $actual array|int
+     */
+    public function assertCategoryAllowedDiscussionTypes($expected, $actual): void
+    {
+        if (!is_array($expected)) {
+            $expected = [$expected];
+        }
+
+        if (!is_array($actual)) {
+            $actual = $this->categoryModel->getID($actual, DATASET_TYPE_ARRAY);
+        }
+
+        $permissionCategory = $this->categoryModel::permissionCategory($actual);
+        $result = $this->categoryModel->getAllowedDiscussionData($permissionCategory, $actual);
+        $this->assertEquals($expected, array_keys($result));
     }
 }

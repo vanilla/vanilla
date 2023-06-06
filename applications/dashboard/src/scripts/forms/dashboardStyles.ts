@@ -173,6 +173,26 @@ export const dashboardClasses = useThemeCache(() => {
         },
     });
 
+    const helperText = css({
+        display: "block",
+        fontSize: 12,
+        lineHeight: 1.3333333333,
+        color: "#949aa2",
+        marginTop: "1em",
+    });
+
+    const passwordinput = css({
+        "& input": { fontSize: 14 },
+    });
+
+    const spaceBetweenFormGroup = css({
+        justifyContent: "space-between",
+
+        "& .input-wrap": {
+            flex: 0,
+        },
+    });
+
     return {
         formList,
         helpAsset,
@@ -191,5 +211,8 @@ export const dashboardClasses = useThemeCache(() => {
         label,
         labelIcon,
         noLeftPadding,
+        helperText,
+        passwordinput,
+        spaceBetweenFormGroup,
     };
 });

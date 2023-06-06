@@ -60,8 +60,9 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
                     idHint: "library",
                     name: "library",
                     chunks: "all",
-                    maxSize: 500000,
+                    maxSize: 1000000,
                     minRemainingSize: 50000,
+                    minSizeReduction: 50000,
                     priority: 1,
                 },
                 // Packages is similar to library
@@ -73,12 +74,13 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
                     name: "packages",
                     reuseExistingChunk: false,
                     priority: 100000,
+                    minSizeReduction: 50000,
                     enforce: true,
                 },
                 // Increase the minimum size of the default chunk splitting.
                 // Webpack doesn't take gzip into account when measuring chunk sizes.
                 default: {
-                    minSize: 50000,
+                    minSize: 100000,
                 },
                 // Put our most stable vendor files into their own chunks.
                 vendors: {

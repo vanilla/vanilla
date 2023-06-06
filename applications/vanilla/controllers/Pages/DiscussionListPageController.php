@@ -12,6 +12,8 @@ use Vanilla\Formatting\Formats\HtmlFormat;
 use Vanilla\Forum\Layout\View\DiscussionListLayoutView;
 use Vanilla\Layout\LayoutPage;
 use Vanilla\Web\PageDispatchController;
+use Vanilla\Layout\Asset\LayoutFormAsset;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * Controller for the custom layout discussion list page
@@ -21,12 +23,17 @@ class DiscussionListPageController extends PageDispatchController
     /** @var DiscussionListLayoutView */
     private $discussionListLayoutView;
 
+    /** @var SiteSectionModel */
+    private $siteSectionModel;
+
     /**
      * @param DiscussionListLayoutView $discussionListLayoutView
+     * @param SiteSectionModel $siteSectionModel
      */
-    public function __construct(DiscussionListLayoutView $discussionListLayoutView)
+    public function __construct(DiscussionListLayoutView $discussionListLayoutView, SiteSectionModel $siteSectionModel)
     {
         $this->discussionListLayoutView = $discussionListLayoutView;
+        $this->siteSectionModel = $siteSectionModel;
     }
 
     /**
@@ -38,9 +45,17 @@ class DiscussionListPageController extends PageDispatchController
      */
     public function index(array $query): Data
     {
+        $siteSection = $this->siteSectionModel->getCurrentSiteSection();
         $schema = $this->discussionListLayoutView->getParamInputSchema();
         $query = $schema->validate($query);
-        $status = $query["status"] ?? null;
+        $query["siteSectionID"] = (string) $siteSection->getSectionID();
+        $query["locale"] = $siteSection->getContentLocale();
+        $layoutFormAsset = new LayoutFormAsset(
+            "discussionList",
+            "siteSection",
+            (string) $siteSection->getSectionID(),
+            $query
+        );
 
         return $this->usePage(LayoutPage::class)
             ->permission("discussions.view")
@@ -49,6 +64,7 @@ class DiscussionListPageController extends PageDispatchController
             ->setSeoDescription(
                 \Gdn::formatService()->renderPlainText(c("Garden.Description", ""), HtmlFormat::FORMAT_KEY)
             )
+            ->preloadLayout($layoutFormAsset)
             ->render();
     }
 }

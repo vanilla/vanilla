@@ -21,6 +21,7 @@ class AccessTokenModel extends Gdn_Model
 
     const TYPE_SYSTEM = "system-access";
     const CONFIG_SYSTEM_TOKEN = "APIv2.SystemAccessToken";
+    const CONFIG_SYSTEM_TOKEN_ROTATION_CRON = "APIv2.RotationCronFrequency";
 
     /** @var ConfigurationInterface */
     private $config;
@@ -71,11 +72,12 @@ class AccessTokenModel extends Gdn_Model
         );
 
         // Save the new token into the config for access by orch or for system recovery.
-        $this->config->saveToConfig(self::CONFIG_SYSTEM_TOKEN, $newToken);
+        $this->config->saveToConfig(self::CONFIG_SYSTEM_TOKEN, $newToken, ["BypassLogging" => true]);
 
         // Revoke all previous tokens.
+        $expireDate = Gdn_Format::toDateTime($this->toTimestamp("6 hours"));
         foreach ($existingTokens as $existingToken) {
-            $this->revoke($existingToken["AccessTokenID"]);
+            $this->setField($existingToken["AccessTokenID"], ["DateExpires" => $expireDate]);
         }
     }
 
@@ -228,7 +230,20 @@ class AccessTokenModel extends Gdn_Model
         $token = val("Token", $row);
         $expires = val("DateExpires", $row);
 
-        return $this->signToken($token, $expires);
+        if (($row["Attributes"]["version"] ?? 1) === 1 && Gdn::config()->configKeyExists("Garden.Cookie.OldSalt")) {
+            // Backup current secret and use old cookie salt for signature verification
+            $originalSecret = $this->secret;
+            $this->setSecret(Gdn::config()->get("Garden.Cookie.OldSalt"));
+        }
+
+        $codedToken = $this->signToken($token, $expires);
+
+        if (isset($originalSecret)) {
+            // Restore original secret in case we need to issue new tokens
+            $this->setSecret($originalSecret);
+        }
+
+        return $codedToken;
     }
 
     /**
@@ -248,7 +263,7 @@ class AccessTokenModel extends Gdn_Model
 
         if (($row["Attributes"]["version"] ?? 1) === 1 && Gdn::config()->configKeyExists("Garden.Cookie.OldSalt")) {
             // Backup current secret and use old cookie salt for signature verification
-            $secret = $this->secret;
+            $originalSecret = $this->secret;
             $this->setSecret(Gdn::config()->get("Garden.Cookie.OldSalt"));
         }
 
@@ -256,9 +271,9 @@ class AccessTokenModel extends Gdn_Model
             return false;
         }
 
-        if (isset($secret)) {
+        if (isset($originalSecret)) {
             // Restore original secret in case we need to issue new tokens
-            $this->setSecret($secret);
+            $this->setSecret($originalSecret);
         }
 
         if (!$row) {

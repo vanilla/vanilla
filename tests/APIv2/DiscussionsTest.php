@@ -12,9 +12,11 @@ use DiscussionModel;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\ApiUtils;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\DiscussionTypeConverter;
+use Vanilla\Formatting\Formats\WysiwygFormat;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
@@ -358,38 +360,59 @@ class DiscussionsTest extends AbstractResourceTest
      */
     public function testIndexFollowed()
     {
+        // Make sure we have a post we aren't following
+        $this->createDiscussion();
+
         // Make sure we're starting from scratch.
         $preFollow = $this->api()
-            ->get($this->baseUrl, ["followed" => true])
+            ->get("/discussions", ["followed" => true])
             ->getBody();
         $this->assertEmpty($preFollow);
 
         // Create a new category to follow.
-        $category = $this->api()->post("categories", [
+        $category = $this->createCategory([
             "name" => __FUNCTION__,
-            "urlcode" => __FUNCTION__,
         ]);
         $testCategoryID = $category["categoryID"];
         $this->api()->put("categories/{$testCategoryID}/follow", ["followed" => true]);
 
-        // Add some discussions
-        $totalDiscussions = 3;
-        $record = $this->record();
-        $record["categoryID"] = $testCategoryID;
-        for ($i = 1; $i <= $totalDiscussions; $i++) {
-            $this->testPost($record);
-        }
+        // Add an old pinned discussion
+        CurrentTimeStamp::mockTime("2020-01-01");
+        $this->createDiscussion(["name" => "pinned globally", "pinned" => true, "pinLocation" => "recent"]);
 
-        // See if we have any discussions.
-        $postFollow = $this->api()
+        // Add a slightly new pinned in category
+        CurrentTimeStamp::mockTime("2020-01-02");
+        $this->createDiscussion(["name" => "pinned category", "pinned" => true, "pinLocation" => "category"]);
+
+        // Now add some a newer not pinned posts
+        CurrentTimeStamp::mockTime("2020-01-03");
+        $this->createDiscussion(["name" => "new 1"]);
+
+        // No pinOrder
+        $result = $this->api()
             ->get($this->baseUrl, ["followed" => true])
             ->getBody();
-        $this->assertCount($totalDiscussions, $postFollow);
+        $this->assertRowsLike(
+            [
+                "name" => ["new 1", "pinned category", "pinned globally"],
+            ],
+            $result,
+            true,
+            3
+        );
 
-        // Make sure discussions are only from the followed category.
-        $categoryIDs = array_unique(array_column($postFollow, "categoryID"));
-        $this->assertCount(1, $categoryIDs);
-        $this->assertEquals($testCategoryID, $categoryIDs[0]);
+        // With pinLocation
+        $result = $this->api()
+            ->get("/discussions", ["followed" => true, "pinOrder" => "first"])
+            ->getBody();
+        $this->assertRowsLike(
+            [
+                "name" => ["pinned globally", "new 1", "pinned category"],
+            ],
+            $result,
+            true,
+            3
+        );
     }
 
     /**
@@ -833,6 +856,8 @@ class DiscussionsTest extends AbstractResourceTest
     protected function triggerDirtyRecords()
     {
         $this->resetTable("dirtyRecord");
+        // This one is not dirty.
+        $this->createDiscussion();
         $discussion = $this->insertDiscussions(2);
         $ids = array_column($discussion, "DiscussionID");
         /** @var DiscussionModel $discussionModel */
@@ -1441,5 +1466,206 @@ class DiscussionsTest extends AbstractResourceTest
             "resourceType" => "discussion",
             "primaryKey" => "discussionID",
         ];
+    }
+
+    /**
+     * Test that crawl expands use a prev/next pager with no count.
+     */
+    public function testIndexCrawlPager()
+    {
+        $this->createDiscussion();
+        $this->createDiscussion();
+        $r = $this->api()->get("/discussions", ["expand" => ["crawl"], "limit" => 1]);
+        $paging = ApiUtils::parsePageHeader($r->getHeader("Link"));
+        self::assertArrayHasKey("next", $paging);
+        self::assertArrayNotHasKey("last", $paging);
+    }
+
+    /**
+     * Test fetching only the announcements of a specific category.
+     *
+     * @return void
+     */
+    public function testGetCategoryAnnouncement()
+    {
+        $this->createCategory();
+        $this->createDiscussion(["pinned" => true, "categoryID" => -1, "pinLocation" => "recent"]);
+        $this->createDiscussion(["pinned" => true, "pinLocation" => "category"]);
+        $this->createDiscussion();
+
+        $discussions = $this->api()
+            ->get($this->baseUrl, ["pinned" => true, "categoryID" => $this->lastInsertedCategoryID])
+            ->getBody();
+
+        // The table might already contain some discussions
+        foreach ($discussions as $discussion) {
+            $this->assertTrue($discussion["pinned"], "Unexpected non-pinned discussion.");
+            $this->assertEquals($this->lastInsertedCategoryID, $discussion["categoryID"]);
+        }
+    }
+
+    /**
+     * Test that fetching the discussions with pinOrder = first returns the global announcements first
+     * and that the discussions are sorted by descending DateLastComment.
+     *
+     * @return void
+     */
+    public function testIndexDefaultSortPinOrderFirst(): void
+    {
+        $announcement = $this->createDiscussion(["pinned" => true]);
+        $newDiscussion = $this->createDiscussion();
+
+        $discussions = $this->api()
+            ->get($this->baseUrl, ["pinOrder" => "first"])
+            ->getBody();
+
+        $lastAnnouncementDate = $announcement["dateLastComment"];
+        $lastDiscussionDate = $newDiscussion["dateLastComment"];
+        $isProcessingAnnouncements = true;
+
+        // These assertions are expected a bunch of random other discussions to have been in the test suite.
+        // That is why it is not asserting a specific order.
+        foreach ($discussions as $discussion) {
+            if ($discussion["pinned"] && $discussion["pinLocation"] == "recent") {
+                $this->assertLessThanOrEqual(
+                    $lastAnnouncementDate,
+                    $discussion["dateLastComment"],
+                    "Unexpected announcement dates out of order."
+                );
+                $this->assertTrue(
+                    $isProcessingAnnouncements,
+                    "Unexpected pinned discussion after a normal discussion."
+                );
+                $lastAnnouncementDate = $discussion["dateLastComment"];
+            } else {
+                $this->assertLessThanOrEqual(
+                    $lastDiscussionDate,
+                    $discussion["dateLastComment"],
+                    "Unexpected announcement dates out of order."
+                );
+                $isProcessingAnnouncements = false;
+                $lastDiscussionDate = $discussion["dateLastComment"];
+            }
+        }
+    }
+
+    /**
+     * Test that fetching the discussions with pinOrder = first and a categoryID returns the category announcements first.
+     *
+     * @return void
+     */
+    public function testIndexSortPinOrderFirstWithCategory(): void
+    {
+        $this->createCategory();
+        $this->createDiscussion();
+        $announcement = $this->createDiscussion(["pinned" => true]);
+        $lastAnnouncementDate = $announcement["dateLastComment"];
+        $newDiscussion = $this->createDiscussion();
+        $lastDiscussionDate = $newDiscussion["dateLastComment"];
+        $isProcessingAnnouncements = true;
+
+        $discussions = $this->api()
+            ->get($this->baseUrl, ["pinOrder" => "first", "categoryID" => $this->lastInsertedCategoryID])
+            ->getBody();
+
+        foreach ($discussions as $discussion) {
+            if ($discussion["pinned"]) {
+                $this->assertLessThanOrEqual(
+                    $lastAnnouncementDate,
+                    $discussion["dateLastComment"],
+                    "Unexpected announcement dates out of order."
+                );
+                $this->assertTrue(
+                    $isProcessingAnnouncements,
+                    "Unexpected pinned discussion after a normal discussion."
+                );
+                $lastAnnouncementDate = $discussion["dateLastComment"];
+            } else {
+                $this->assertLessThanOrEqual(
+                    $lastDiscussionDate,
+                    $discussion["dateLastComment"],
+                    "Unexpected announcement dates out of order."
+                );
+                $isProcessingAnnouncements = false;
+                $lastDiscussionDate = $discussion["dateLastComment"];
+            }
+        }
+    }
+
+    /**
+     * Test that fetching the discussions with pinOrder = mixed returns the discussions sorted by descending DateLastComment.
+     *
+     * @return void
+     */
+    public function testIndexDefaultSortPinOrderMixed(): void
+    {
+        $discussion = $this->createDiscussion();
+        $lastDiscussionDate = $discussion["dateLastComment"];
+
+        $discussions = $this->api()
+            ->get($this->baseUrl, ["pinOrder" => "mixed"])
+            ->getBody();
+
+        foreach ($discussions as $discussion) {
+            $this->assertLessThanOrEqual(
+                $lastDiscussionDate,
+                $discussion["dateLastComment"],
+                "Unexpected announcement dates out of order."
+            );
+            $lastDiscussionDate = $discussion["dateLastComment"];
+        }
+    }
+
+    /**
+     * Test fetching non announcements discussions.
+     *
+     * @return void
+     */
+    public function testNonAnnouncement()
+    {
+        $this->createCategory();
+        $this->createDiscussion(["pinned" => true, "categoryID" => -1, "pinLocation" => "recent"]);
+        $this->createDiscussion(["pinned" => true, "pinLocation" => "category"]);
+        $this->createDiscussion();
+
+        $discussions = $this->api()
+            ->get($this->baseUrl, ["pinned" => false])
+            ->getBody();
+
+        // The table might already contain some discussions
+        foreach ($discussions as $discussion) {
+            $this->assertFalse(
+                $discussion["pinned"] && $discussion["pinLocation"] != "category",
+                "Unexpected pinned discussion."
+            );
+        }
+    }
+
+    /**
+     * Test the wyswig content get properly formatted
+     *
+     * @return void
+     */
+    public function testFormatting()
+    {
+        $config = \Gdn::config();
+        $config->set("Garden.InputFormatter", "Wysiwyg");
+        $content = "<p><b>Et si on lançait un fil de discussion sur la gratitude?</b><br></p>\r\r
+<p>C’est l’idée qui vient de me passer par la tête, et a
+laquelle j’ai envie de donner vie.</p>";
+
+        $discussion = $this->createDiscussion([
+            "name" => "Format test",
+            "format" => WysiwygFormat::FORMAT_KEY,
+            "body" => $content,
+        ]);
+        $query = ["expand" => "excerpt"];
+        $expected =
+            "Et si on lançait un fil de discussion sur la gratitude? C’est l’idée qui vient de me passer par la tête, et alaquelle j’ai envie de donner vie.";
+        $result = $this->api()
+            ->get("$this->baseUrl/{$discussion["discussionID"]}", $query)
+            ->getBody();
+        $this->assertArrayHasKey("excerpt", $result);
+        $this->assertEquals($expected, $result["excerpt"]);
     }
 }

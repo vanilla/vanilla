@@ -23,10 +23,12 @@ import TruncatedText from "@library/content/TruncatedText";
 import { getJSLocaleKey } from "@vanilla/i18n";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
+import { Icon } from "@vanilla/icons";
 
 export interface ITableHeaderProps {
     headerGroups: HeaderGroup[];
     sortable?: boolean;
+    columnsNotSortable?: string[];
     rows: Row[];
     headerClassNames?: string;
     rowClassNames?: string;
@@ -34,7 +36,7 @@ export interface ITableHeaderProps {
 }
 
 const TableHeader = (props: ITableHeaderProps) => {
-    const { headerGroups, sortable, rows, headerClassNames, rowClassNames, hiddenHeaders } = props;
+    const { headerGroups, sortable, columnsNotSortable, rows, headerClassNames, rowClassNames, hiddenHeaders } = props;
     const classes = tableClasses();
     const valueTypeLookUp = useMemo<Record<string, string>>(
         () => Object.fromEntries(Object.keys(rows[0].original).map((key) => [key, typeof rows[0].original[key]])),
@@ -52,22 +54,41 @@ const TableHeader = (props: ITableHeaderProps) => {
                     {headerGroup.headers.map((column, columnIndex) => {
                         return (
                             <th
-                                {...column.getHeaderProps(sortable ? column.getSortByToggleProps() : undefined)}
+                                {...column.getHeaderProps(
+                                    sortable && !columnsNotSortable?.includes(column.id)
+                                        ? column.getSortByToggleProps()
+                                        : undefined,
+                                )}
                                 key={`header-group-${columnIndex}`}
                                 className={cx(
                                     classes.head,
                                     classes.basicColumn,
                                     columnIndex === 0 && classes.leftAlignHead,
+                                    sortable && !columnsNotSortable?.includes(column.id) && classes.isSortHead,
+                                    column.isSorted && classes.isSortedHead,
                                     valueTypeLookUp[`${column.Header}`] === "string" && classes.leftAlignHead,
                                 )}
+                                {...(column.isSorted && {
+                                    "aria-sort": column.isSortedDesc ? "descending" : "ascending",
+                                })}
                             >
                                 <ConditionalWrap
-                                    condition={hiddenHeaders?.includes(column.id) ?? false}
-                                    component={ScreenReaderContent}
+                                    condition={column.isSorted}
+                                    tag={"button"}
+                                    componentProps={{
+                                        onClick: (e) => {
+                                            e.preventDefault();
+                                        },
+                                    }}
                                 >
-                                    {column.render("Header")}
+                                    <ConditionalWrap
+                                        condition={hiddenHeaders?.includes(column.id) ?? false}
+                                        component={ScreenReaderContent}
+                                    >
+                                        {column.render("Header")}
+                                    </ConditionalWrap>
+                                    <Icon icon={column.isSortedDesc ? "data-down" : "data-up"} />
                                 </ConditionalWrap>
-                                <span>{column.isSorted ? (column.isSortedDesc ? " ▼" : " ▲") : ""}</span>
                             </th>
                         );
                     })}
@@ -142,6 +163,7 @@ export interface ITableProps {
     data: ITableData[];
     customColumnOrder?: string[];
     sortable?: boolean;
+    columnsNotSortable?: string[];
     customColumnSort?: ISortOption;
     paginate?: boolean;
     pageSize?: number;
@@ -160,6 +182,7 @@ export const Table = (props: ITableProps) => {
         data,
         customColumnOrder,
         sortable,
+        columnsNotSortable,
         customColumnSort,
         paginate,
         pageSize,
@@ -208,7 +231,7 @@ export const Table = (props: ITableProps) => {
                 });
         }
         return [];
-    }, [data, hiddenColumns]);
+    }, [data, hiddenColumns, customCellRenderer]);
 
     // Memoize data to prevent react-table from recalculating props (Deep equality is expensive)
     const memoizedData: any[] = useMemo(() => data, [data]);
@@ -317,6 +340,7 @@ export const Table = (props: ITableProps) => {
                         <TableHeader
                             headerGroups={headerGroups}
                             sortable={sortable}
+                            columnsNotSortable={columnsNotSortable}
                             rows={paginate ? page : rows}
                             headerClassNames={headerClassNames}
                             rowClassNames={rowClassNames}

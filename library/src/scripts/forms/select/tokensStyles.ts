@@ -123,6 +123,26 @@ export const tokensClasses = useThemeCache(() => {
                     },
                 },
             },
+            ".tokens__group": {
+                ...Mixins.padding({ vertical: 8 }),
+                ...Mixins.border({
+                    width: 0,
+                    top: {
+                        width: 1,
+                        radius: 0,
+                    },
+                }),
+                "&:first-of-type": {
+                    border: 0,
+                },
+                ".tokens__group-heading": {
+                    width: "100%",
+                    textAlign: "center",
+                    fontSize: "0.875em",
+                    color: "inherit",
+                    opacity: 0.75,
+                },
+            },
             ".suggestedTextInput-option": {
                 ...Mixins.padding({ all: 8 }),
                 width: "100%",
@@ -169,6 +189,13 @@ export const tokensClasses = useThemeCache(() => {
         "& label > span": {
             fontWeight: 700,
             marginBottom: 0,
+        },
+        "& label > p": {
+            color: "#666",
+            opacity: "unset",
+            fontSize: "80%",
+            marginTop: 3,
+            marginBottom: -4,
         },
     });
 

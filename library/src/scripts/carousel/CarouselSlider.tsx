@@ -64,7 +64,7 @@ export function CarouselSlider(props: IProps) {
     };
 
     const toRender = Children.map(children, (child, idx) => {
-        if (!React.isValidElement(child)) {
+        if (!React.isValidElement<{ tabIndex: number }>(child)) {
             return null;
         }
 

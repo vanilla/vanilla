@@ -101,36 +101,42 @@ export const adminLayoutClasses = useThemeCache(() => {
     const threePanel = css({
         "&&": {
             marginTop: 0,
-            "&& > main": {
-                marginTop: 0,
+        },
 
-                // The left panel
-                "& > div > div:nth-of-type(1)": {
-                    borderRight: singleBorder(),
-                    "& > div > div": {
-                        overflow: "visible",
-                        "& > div": {
-                            paddingRight: 0,
-                            "& aside": {
-                                border: 0,
-                            },
-                        },
+        "& main": {
+            marginTop: 0,
+        },
+
+        "& .leftColumn": {
+            borderRight: singleBorder(),
+            "& > div > div": {
+                overflow: "visible",
+                "& > div": {
+                    paddingRight: 0,
+                    "& aside": {
+                        border: 0,
                     },
                 },
-                // The content panel
-                "& > div > div:nth-of-type(2)": {
-                    backgroundColor: "#fff",
-                },
-                // The right panel
-                "& > div > div:nth-of-type(3)": {
-                    borderLeft: singleBorder(),
-                },
             },
+        },
 
-            "&& .panelArea": {
-                paddingLeft: 0,
-                paddingRight: 0,
-            },
+        // The content panel
+        "& .mainColumn": {
+            backgroundColor: "#fff",
+        },
+        // The right panel
+        "& .rightColumn": {
+            borderLeft: singleBorder(),
+        },
+
+        "& .panelArea": {
+            paddingLeft: 0,
+            paddingRight: 0,
+        },
+
+        "* .middleTopArea": {
+            // So sticky headers work.
+            display: "contents",
         },
     });
 

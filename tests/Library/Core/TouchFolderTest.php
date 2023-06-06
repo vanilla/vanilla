@@ -40,7 +40,7 @@ class TouchFolderTest extends TestCase
      */
     public function testTouchFolderCreate()
     {
-        $this->assertDirectoryNotExists(PATH_ROOT . "/tests/cache/touch-folder/inner-folder");
+        $this->assertDirectoryDoesNotExist(PATH_ROOT . "/tests/cache/touch-folder/inner-folder");
         touchFolder(PATH_ROOT . "/tests/cache/touch-folder/inner-folder");
         $this->assertDirectoryExists(PATH_ROOT . "/tests/cache/touch-folder/inner-folder");
     }

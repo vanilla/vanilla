@@ -3,13 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import { hasPermission } from "@library/features/users/Permission";
+import { PermissionChecker, hasPermission } from "@library/features/users/Permission";
 
 /**
  * Check if the current user can view other users.
  */
-export function hasUserViewPermission() {
-    return hasPermission([
+export function hasUserViewPermission(permissionChecker: PermissionChecker = hasPermission) {
+    return permissionChecker([
         // Any of these permissions will suffice.
         "profiles.view",
 

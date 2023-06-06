@@ -21,7 +21,7 @@ story.add("Modals", () => {
             <StoryHeading depth={1}>Modals</StoryHeading>
             <StoryParagraph>
                 Click button to see modals. Note that they are rendered through a{" "}
-                <a href="https://reactjs.org/docs/portals.html" rel="noopener noreferrer" target="_blank">
+                <a href="https://reactjs.org/docs/portals.html" rel="noopener" target="_blank">
                     react portal.
                 </a>
             </StoryParagraph>

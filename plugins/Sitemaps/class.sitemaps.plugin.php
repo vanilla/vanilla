@@ -6,6 +6,7 @@
 
 use Vanilla\Contracts\ConfigurationInterface;
 
+use Vanilla\Permissions;
 use Vanilla\Web\Robots;
 
 /**
@@ -23,6 +24,8 @@ class SitemapsPlugin extends Gdn_Plugin
      */
     private $eventManager;
 
+    private CategoryModel $categoryModel;
+
     /** @var bool */
     private $isSitePrivate;
 
@@ -37,14 +40,87 @@ class SitemapsPlugin extends Gdn_Plugin
      * @param \Garden\EventManager $eventManager
      * @param ConfigurationInterface $config
      */
-    public function __construct(\Garden\EventManager $eventManager, ConfigurationInterface $config)
-    {
+    public function __construct(
+        \Garden\EventManager $eventManager,
+        ConfigurationInterface $config,
+        CategoryModel $categoryModel
+    ) {
         parent::__construct();
         $this->eventManager = $eventManager;
         $this->isSitePrivate = $config->get("Garden.PrivateCommunity", false);
+        $this->categoryModel = $categoryModel;
     }
 
     /// Methods ///
+
+    /**
+     * Build a site map to point to list top level home pages
+     *
+     * @param array $urls
+     * @return void
+     */
+    private function buildHomePageSiteMap(array &$urls)
+    {
+        $siteSectionModel = \gdn::getContainer()->get(\Vanilla\Site\SiteSectionModel::class);
+        foreach ($siteSectionModel->getAll() as $siteSection) {
+            if (!empty($siteSection->getBasePath() && !empty($siteSection->getCategoryID()))) {
+                $canView = Gdn::session()->checkPermission(
+                    ["discussions.view"],
+                    true,
+                    "Category",
+                    $siteSection->getCategoryID(),
+                    Permissions::CHECK_MODE_RESOURCE_IF_JUNCTION
+                );
+
+                if (!$canView) {
+                    continue;
+                }
+            }
+            $urls[] = ["Loc" => \Gdn::request()->getSimpleUrl($siteSection->getBasePath())];
+        }
+    }
+
+    /**
+     * Build sitemap for categories
+     *
+     * @param string $pager
+     * @param array $urls
+     * @return void
+     */
+    private function buildCategorySiteMap(string $pager, array &$urls)
+    {
+        $categories = $this->categoryModel->getVisibleCategories([
+            "forceArrayReturn" => true,
+            "filterNonPostableCategories" => true,
+            "filterNonDiscussionCategories" => true,
+        ]);
+
+        [$min, $max] = explode("-", $pager);
+        if (empty($min) || empty($max)) {
+            throw notFoundException();
+        }
+        if (!isset($categories[$max])) {
+            $max = count($categories);
+        }
+
+        for ($i = $min - 1; $i < $max; $i++) {
+            $category = $categories[$i];
+            $url = [];
+            $discussionPageLimit = Gdn::config()->get("Vanilla.Discussions.PerPage", 30);
+            for ($j = 1; $j <= min(ceil($category["CountDiscussions"] / $discussionPageLimit), 100); $j++) {
+                $url = [];
+                $url["Loc"] = $category["Url"] . ($j > 1 ? "/p{$j}" : "");
+                if ($j === 1) {
+                    $lastModifiedDate =
+                        isset($category["DateLastComment"]) && $category["DateLastComment"] > $category["DateUpdated"]
+                            ? $category["DateLastComment"]
+                            : $category["DateUpdated"];
+                    $url["LastMod"] = $lastModifiedDate;
+                }
+                $urls[] = $url;
+            }
+        }
+    }
 
     /**
      * Build a site map for a category that points to the category archive pages.
@@ -143,16 +219,15 @@ class SitemapsPlugin extends Gdn_Plugin
         }
 
         /* @var \DiscussionModel $model */
-        $model = Gdn::getContainer()->get(\DiscussionModel::class);
-
-        $discussions = $model->getWhereRecent(["CategoryID" => $category["CategoryID"]], $limit, $offset, false);
+        $discussions = $this->selectRecentDiscussionForCategory($category["CategoryID"], $limit, $offset);
         foreach ($discussions as $discussion) {
+            $lastModified = $discussion->DateLastComment;
+            if ($discussion->DateUpdated && $discussion->DateUpdated > $discussion->DateLastComment) {
+                $lastModified = $discussion->DateUpdated;
+            }
             $url = [
                 "Loc" => discussionUrl($discussion),
-                "LastMod" => gmdate(
-                    "c",
-                    Gdn_Format::toTimestamp($discussion->DateUpdated ?: $discussion->DateInserted)
-                ),
+                "LastMod" => gmdate("c", Gdn_Format::toTimestamp($lastModified)),
             ];
 
             $urls[] = $url;
@@ -245,7 +320,33 @@ class SitemapsPlugin extends Gdn_Plugin
 
         $siteMaps = [];
 
+        //home page sitemap
+        $siteMaps[] = [
+            "Loc" => url("/sitemap-homepages.xml", true),
+        ];
+
+        // Sitemap Categories
         if (class_exists("CategoryModel")) {
+            // Get all available categories for the specific user
+            $options = [
+                "filterNonPostableCategories" => true,
+                "forceArrayReturn" => true,
+                "filterNonDiscussionCategories" => true,
+            ];
+            $availableCategories = $this->categoryModel->getVisibleCategories($options);
+            $availableCategoryCount = count($availableCategories);
+            $maxPage = $this->categoryModel->getMaxPages();
+            $totalPages = ceil($availableCategoryCount / $maxPage);
+            $start = 1;
+            $end = $maxPage;
+            for ($i = 1; $i <= min($totalPages, 100); $i++) {
+                $siteMaps[] = [
+                    "Loc" => url("/sitemap-categories-{$start}-{$end}.xml", true),
+                ];
+                $start = $end + 1;
+                $end = $end + $maxPage;
+            }
+
             $categories = CategoryModel::categories();
 
             $this->EventArguments["Categories"] = &$categories;
@@ -278,7 +379,7 @@ class SitemapsPlugin extends Gdn_Plugin
                     ];
 
                     if ($i === 0) {
-                        $siteMap["LastMod"] = $category["DateLastComment"];
+                        $siteMap["LastMod"] = $category["DateLastComment"] ?? "";
                     }
                     $siteMaps[] = $siteMap;
                 }
@@ -371,6 +472,12 @@ class SitemapsPlugin extends Gdn_Plugin
                     $this->buildCategoryArchiveSiteMap($arg, $urls);
                 }
                 break;
+            case "homepages":
+                $this->buildHomePageSiteMap($urls);
+                break;
+            case "categories":
+                $this->buildCategorySiteMap($arg, $urls);
+                break;
             default:
                 // See if a plugin can build the sitemap.
                 $this->EventArguments["Type"] = $type;
@@ -401,5 +508,22 @@ class SitemapsPlugin extends Gdn_Plugin
     {
         $this->discussionLimit = $discussionLimit;
         return $this;
+    }
+
+    /**
+     * Get a simple list of recent discussion based on their categoryID
+     *
+     * @param int $categoryID
+     * @return array|null
+     */
+    private function selectRecentDiscussionForCategory(int $categoryID, int $limit = 5000, int $offset = 0): ?array
+    {
+        $discussionModel = Gdn::getContainer()->get(\DiscussionModel::class);
+        $where = ["CategoryID" => $categoryID];
+        return $discussionModel->Database
+            ->sql()
+            ->select(["DiscussionID", "CategoryID", "Name", "DateLastComment", "DateUpdated"])
+            ->getWhere($discussionModel->getTableName(), $where, "DateLastComment", "desc", $limit, $offset)
+            ->result();
     }
 }

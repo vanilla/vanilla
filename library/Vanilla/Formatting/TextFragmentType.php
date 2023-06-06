@@ -16,6 +16,7 @@ class TextFragmentType
     public const TEXT = "text";
     public const URL = "url";
     public const CODE = "code";
+    public const CHILD = "child";
     /**
      * Use "other" when a text fragment might need special handling that the programmer must analyze. Please limit its
      * use as much as possible.

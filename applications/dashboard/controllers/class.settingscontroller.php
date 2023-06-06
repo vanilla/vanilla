@@ -544,6 +544,17 @@ class SettingsController extends DashboardController
     }
 
     /**
+     * User preferences page.
+     */
+    public function preferences()
+    {
+        $this->permission(["Garden.Settings.Manage"], false);
+        $this->setHighlightRoute("dashboard/settings/preferences");
+        $this->title(t("User Preferences"));
+        $this->render();
+    }
+
+    /**
      * Manage user bans (add, edit, delete, list).
      *
      * @since 2.0.18

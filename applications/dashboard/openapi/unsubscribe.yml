@@ -1,0 +1,71 @@
+openapi: 3.0.2
+info:
+x-resourceEvents:
+    unsubscribe:
+        x-addon: "dashboard"
+        name: "Unsubscribe"
+        type: "unsubscribe"
+paths:
+    /unsubscribe/{token}:
+        x-hidden: true
+        get:
+            parameters:
+                - description: |
+                      Unsubscribe token.
+                  in: path
+                  name: token
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/UnsubscribeSchema"
+                                type: array
+                    description: Success
+            tags:
+                - Unsubscribe
+            summary: List notifications for the current user.
+        patch:
+            summary: Mark preferences unsubscribe read.
+            tags:
+                - Unsubscribe
+            parameters:
+                - description: |
+                      Unsubscribe token.
+                  in: path
+                  name: token
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UnsubscribePatchSchema"
+                required: true
+            responses:
+                "204":
+                    description: Success
+
+components:
+    schemas:
+        UnsubscribeSchema:
+            properties:
+                preferences:
+                    description: "List of notification preferences that allow this email."
+                    type: array
+                    items:
+                        type: string
+        UnsubscribePatchSchema:
+            description: Unsubscribe patch schema.
+            type: object
+            properties:
+                preferences:
+                    description: "List of notification preferences that are disabled."
+                    type: array
+                    items:
+                        type: string

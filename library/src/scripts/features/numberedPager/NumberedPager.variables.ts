@@ -28,21 +28,6 @@ export const numberedPagerVariables = useThemeCache((overrides?: IOverrides, for
     const background = makeThemeVars("background", Variables.background({}));
 
     /**
-     * @varGroup numberedPager.border
-     * @expand border
-     * @description Set the border options for the pagination wrapper box.
-     */
-    const border = makeThemeVars(
-        "border",
-        Variables.border({
-            top: { width: 1, radius: 0 },
-            right: { width: 0, radius: 0 },
-            bottom: { width: 0, radius: 0 },
-            left: { width: 0, radius: 0 },
-        }),
-    );
-
-    /**
      * @varGroup numberedPager.font
      * @expand font
      * @description Set the font options for the pagination component.
@@ -221,7 +206,6 @@ export const numberedPagerVariables = useThemeCache((overrides?: IOverrides, for
 
     return {
         background,
-        border,
         font,
         buttons,
         formatNumber,

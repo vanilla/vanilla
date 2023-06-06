@@ -197,6 +197,15 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
     }
 
     /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["itemData"]));
+        return $result;
+    }
+
+    /**
      * @inheritdoc
      */
     public static function getWidgetSchema(): Schema

@@ -4,15 +4,18 @@
  * @license Proprietary
  */
 
-import { IFollowedCategory, useCategoryNotificationPreferences } from "@dashboard/components/CategoryNotificationHooks";
+import { getUserCategoryPreferences, IFollowedCategory } from "@dashboard/components/CategoryNotificationHooks";
 import { categoryNotificationPreferencesClasses } from "@dashboard/components/CategoryNotificationPreferences.styles";
 import { cx } from "@emotion/css";
+import { IError } from "@library/errorPages/CoreErrorMessages";
 import CheckBox from "@library/forms/Checkbox";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import SmartLink from "@library/routing/links/SmartLink";
 import { ToolTip } from "@library/toolTip/ToolTip";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCategoryNotifications } from "@vanilla/addon-vanilla/categories/categoryFollowHooks";
+import { CategoryPostNotificationType } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { t } from "@vanilla/i18n";
 import React, { useEffect } from "react";
 
@@ -57,9 +60,12 @@ export function CategoryNotificationPreferences(props: IProps) {
 }
 
 function TableContents(props: IProps) {
-    const preferencesLoadable = useCategoryNotificationPreferences(props.userID);
+    const preferencesQuery = useQuery<any, IError, IFollowedCategory[]>({
+        queryFn: async () => getUserCategoryPreferences(props.userID),
+        queryKey: ["notificationPrefs", props.userID],
+    });
 
-    if (["loading", "pending"].includes(preferencesLoadable.status)) {
+    if (preferencesQuery.isLoading) {
         return (
             <>
                 <LoadingRow />
@@ -69,11 +75,11 @@ function TableContents(props: IProps) {
         );
     }
 
-    if (preferencesLoadable.error || !preferencesLoadable.data) {
+    if (preferencesQuery.error) {
         return (
             <tr>
                 <td>
-                    <ErrorMessages errors={[preferencesLoadable.error ?? { message: t("There was an error") }]} />
+                    <ErrorMessages errors={[preferencesQuery.error]} />
                 </td>
             </tr>
         );
@@ -82,7 +88,7 @@ function TableContents(props: IProps) {
     // we actually have data now.
     return (
         <>
-            {preferencesLoadable.data.map((category) => (
+            {preferencesQuery.data.map((category) => (
                 <TableRow key={category.categoryID} {...props} {...category} />
             ))}
         </>
@@ -112,8 +118,8 @@ function TableRow(props: IRowProps) {
     }, []);
 
     const isPopupEnabled =
-        notificationPreferences.postNotifications === "discussions" ||
-        notificationPreferences.postNotifications === "all";
+        notificationPreferences.postNotifications === CategoryPostNotificationType.DISCUSSIONS ||
+        notificationPreferences.postNotifications === CategoryPostNotificationType.ALL;
 
     return (
         <tr className={cx(classes.row)} data-category-id={categoryID}>
@@ -131,8 +137,10 @@ function TableRow(props: IRowProps) {
                                     useEmailNotifications: true,
                                     postNotifications:
                                         // If we enable email, enable popups and receive notifications.
-                                        [null, "follow"].includes(notificationPreferences.postNotifications)
-                                            ? "all"
+                                        [null, CategoryPostNotificationType.FOLLOW].includes(
+                                            notificationPreferences.postNotifications,
+                                        )
+                                            ? CategoryPostNotificationType.ALL
                                             : notificationPreferences.postNotifications,
                                 });
                             } else {
@@ -158,7 +166,9 @@ function TableRow(props: IRowProps) {
                         onChange={(e) => {
                             setNotificationPreferences({
                                 useEmailNotifications: false,
-                                postNotifications: e.target.checked ? "all" : "follow",
+                                postNotifications: e.target.checked
+                                    ? CategoryPostNotificationType.ALL
+                                    : CategoryPostNotificationType.FOLLOW,
                             });
                         }}
                     />

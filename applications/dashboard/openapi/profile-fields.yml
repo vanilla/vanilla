@@ -2,7 +2,6 @@ openapi: 3.0.2
 info:
 paths:
     /profile-fields:
-        x-hidden: true
         get:
             summary: List profile fields.
             parameters:
@@ -104,7 +103,6 @@ paths:
                     description: Server Error
 
     /profile-fields/{apiName}:
-        x-hidden: true
         patch:
             summary: Update a profile field.
             tags:
@@ -160,7 +158,6 @@ paths:
             tags:
                 - Profile Fields
     /profile-fields/sorts:
-        x-hidden: true
         put:
             tags:
                 - Profile Fields
@@ -241,6 +238,9 @@ components:
                         posts:
                             description: The field appears on user posts.
                             type: boolean
+                        search:
+                            description: The field appears in the member search directory.
+                            type: boolean
                     type: object
                 dropdownOptions:
                     description: The list of availible options for a dropdown field.
@@ -313,6 +313,9 @@ components:
                             type: boolean
                         posts:
                             description: The field appears on user posts.
+                            type: boolean
+                        search:
+                            description: The field appears in the member search directory.
                             type: boolean
                     type: object
                 dropdownOptions:
@@ -388,6 +391,9 @@ components:
                             type: boolean
                         posts:
                             description: The field appears on user posts.
+                            type: boolean
+                        search:
+                            description: The field appears in the member search directory.
                             type: boolean
                     type: object
                 dropdownOptions:

@@ -13,6 +13,7 @@ import Container from "@library/layout/components/Container";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { cx } from "@emotion/css";
+import { ErrorIcon } from "@library/icons/common";
 
 export interface IMessageProps {
     /** Classes to be applied to the root of the component */
@@ -53,18 +54,31 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
     const contents = <div className={classes.content}>{props.contents || props.stringContents}</div>;
 
     const hasTitle = !!props.title;
-    const hasIcon = !!props.icon;
+    const isError: boolean = !!props.type && props.type === "error";
+    let icon = props.icon;
+    if (!icon && isError) {
+        icon = <ErrorIcon />;
+    }
+    const hasIcon = !!icon;
 
     const content = <div className={classes.text}>{contents}</div>;
-    const title = props.title && <h2 className={classes.title}>{props.title}</h2>;
+    const title = props.title && (
+        <h2
+            className={cx(
+                classes.title,
+                // .heading prevents rich editor content from screwing up our styles.
+                "heading",
+            )}
+        >
+            {props.title}
+        </h2>
+    );
 
     const icon_content = !hasTitle && hasIcon; //case - if message has icon and content.
     const icon_title_content = hasTitle && hasIcon; //case - if message has icon, title and content.
     const noIcon = !hasIcon; //case - if message has title, content and no icon
 
-    const iconMarkup = <div className={classes.iconPosition}>{props.icon}</div>;
-
-    const isError: boolean = !!props.type && props.type === "error";
+    const iconMarkup = <div className={classes.iconPosition}>{icon}</div>;
 
     return (
         <>
@@ -83,7 +97,7 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
                     <div
                         className={cx(classes.wrap, {
                             [classes.fixed]: props.isContained,
-                            [classes.wrapWithIcon]: !!props.icon,
+                            [classes.wrapWithIcon]: !!icon,
                         })}
                     >
                         <InnerWrapper>
@@ -133,7 +147,13 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
                 </OuterWrapper>
             </div>
             {/* Does not visually render, but sends message to screen reader users*/}
-            <LiveMessage clearOnUnmount={!!props.clearOnUnmount} message={props.stringContents} aria-live="assertive" />
+            {!!props.stringContents && (
+                <LiveMessage
+                    clearOnUnmount={!!props.clearOnUnmount}
+                    message={props.stringContents}
+                    aria-live="assertive"
+                />
+            )}
         </>
     );
 });

@@ -1,0 +1,24 @@
+[
+  {
+    "type": "rich_embed_card",
+    "children": [{ "text": "" }],
+    "dataSourceType": "image",
+    "url": "https://dev.vanilla.localhost/uploads/Y6Y7LHBWJ2LW/20221130-140836.jpg",
+    "embedData": {
+      "url": "https://dev.vanilla.localhost/uploads/Y6Y7LHBWJ2LW/20221130-140836.jpg",
+      "name": "20221130_140836.jpg",
+      "type": "image/jpeg",
+      "size": 6240115,
+      "width": 9248,
+      "height": 6936,
+      "displaySize": "small",
+      "float": "none",
+      "mediaID": 3,
+      "dateInserted": "2022-12-12T22:26:40+00:00",
+      "insertUserID": 7,
+      "foreignType": "embed",
+      "foreignID": 7,
+      "embedType": "image"
+    }
+  }
+]

@@ -70,6 +70,8 @@ class LayoutPage extends ThemedPage
         $query = (array) $layoutFormAsset;
 
         $layoutData = $this->layoutsApiController->get_lookupHydrate($query)->getData();
+        $this->setSeoContent($layoutData["seo"]["htmlContents"] ?? "");
+
         $layoutID = $layoutData["layoutID"];
         $layoutWidgetAssets = $this->layoutsApiController->get_hydrateAssets($layoutID)->getData();
 
@@ -91,8 +93,12 @@ class LayoutPage extends ThemedPage
         $this->setJsonLDItems($json);
         $this->setSeoTitle($seo["title"]);
         $this->setSeoDescription($seo["description"]);
-        $this->addMetaTag($seo["meta"]);
-        $this->addLinkTag($seo["links"]);
+        foreach ($seo["meta"] as $meta) {
+            $this->addMetaTag($meta);
+        }
+        foreach ($seo["links"] as $link) {
+            $this->addLinkTag($link);
+        }
 
         $reduxActionPending = new RawReduxAction([
             "type" => "@@layouts/lookup/pending",

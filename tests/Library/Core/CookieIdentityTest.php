@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Core;
 
 use Firebase\JWT\JWT;
+use Garden\Web\Exception\ForbiddenException;
 use Gdn;
 use Gdn_CookieIdentity;
 use Vanilla\CurrentTimeStamp;
@@ -44,6 +45,18 @@ class CookieIdentityTest extends AbstractAPIv2Test
     }
 
     /**
+     * Checking Exception if session ID is not in the cookie.
+     */
+    public function testGetIdentityException()
+    {
+        $this->cookieIdentity->setIdentity($this->memberID, true);
+        $this->cookieIdentity->UserID = 0;
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage("Cookie must have session ID.");
+        $this->cookieIdentity->getSession();
+    }
+
+    /**
      * Tests fallback to OldSalt for CookieIdentity::getJWTPayload
      *
      * @return void
@@ -52,7 +65,7 @@ class CookieIdentityTest extends AbstractAPIv2Test
     public function testGetJWTPayload()
     {
         $this->cookieIdentity->init(["Salt" => "1234567890123456"]);
-        $_COOKIE["blah"] = JWT::encode(["foo" => "bar"], "1234567890123456");
+        $_COOKIE["blah"] = JWT::encode(["foo" => "bar"], "1234567890123456", Gdn_CookieIdentity::JWT_ALGORITHM);
 
         // Basic test
         $payload = $this->cookieIdentity->getJWTPayload("blah");

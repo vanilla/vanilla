@@ -145,9 +145,18 @@ class RoleController extends DashboardController
         $permissionModel = Gdn::permissionModel();
         $roleSync = !empty(c("Garden.SSO." . UserModel::OPT_ROLE_SYNC));
         $this->Role = $this->RoleModel->getByRoleID($roleID);
-        // $this->EditablePermissions = is_object($this->Role) ? $this->Role->EditablePermissions : '1';
+        if ($this->Role) {
+            if (in_array($this->Role->Type, [RoleModel::TYPE_MODERATOR, RoleModel::TYPE_ADMINISTRATOR])) {
+                $this->Role->Type = "";
+            }
+            $this->Role->EnableType =
+                !stringIsNullOrEmpty($this->Role->Type) || !stringIsNullOrEmpty($this->Role->Domains);
+            if (in_array($this->Role->RoleID, RoleModel::DEFAULT_ROLE_IDS)) {
+                $this->Role->EnableType = false;
+            }
+        }
         $this->addJsFile("jquery.gardencheckboxgrid.js");
-
+        $this->addJsFile("manage-roles.js", "vanilla");
         // Set the model on the form.
         $this->Form->setModel($this->RoleModel);
 
@@ -227,7 +236,7 @@ class RoleController extends DashboardController
             $this->setData("PermissionData", $permissionData, true);
         }
 
-        $this->setData("_Types", $this->RoleModel->getDefaultTypes(true));
+        $this->setData("_Types", $this->RoleModel->getDefaultRoleTypes());
         $this->setData("_roleSyncVisible", $roleSync);
 
         $this->render();

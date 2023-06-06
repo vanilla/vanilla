@@ -1,12 +1,19 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React, { ReactNode } from "react";
+import React, { PropsWithChildren, ReactNode } from "react";
 import { Provider } from "react-redux";
-import { createReducer, configureStore } from "@reduxjs/toolkit";
+import {
+    createReducer,
+    configureStore,
+    combineReducers,
+    Reducer,
+    ReducersMapObject,
+    DeepPartial,
+} from "@reduxjs/toolkit";
 import { stableObjectHash } from "@vanilla/utils";
 import { LoadStatus } from "@library/@types/api/core";
 import capitalize from "lodash/capitalize";
@@ -18,112 +25,166 @@ import {
     ProfileFieldRegistrationOptions,
     ProfileFieldVisibility,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
+import { IUserProfilesState } from "@dashboard/userProfiles/state/UserProfiles.slice";
+import { IConfigState } from "@library/config/configReducer";
 
-export enum MockProfileFieldsFormat {
-    API_NAME = "apiName",
-    DATA_OBJECT = "object",
-    DATA_ARRAY = "array",
-}
+export const mockProfileFieldsByUserID: Partial<IUserProfilesState["profileFieldsByUserID"]> = {
+    2: {
+        status: LoadStatus.SUCCESS,
+        data: {
+            text: "Sample input text",
+            "text-multiline": "Sample textarea string",
+            dropdown: "Option 2",
+            checkbox: true,
+            date: "2022-11-19",
+            number: 1,
+            tokens: ["Token 1", "Token 4"],
+        },
+    },
+};
 
+const mockConfigReducer = createReducer(
+    {
+        configPatchesByID: {},
+        configsByLookupKey: {
+            // TODO: check if these configs are rly necessary for these tests to pass
+            [stableObjectHash(["redirectURL.profile", "redirectURL.message"])]: {
+                status: LoadStatus.SUCCESS,
+                data: {
+                    "redirectURL.profile": "profile-url-test",
+                    "redirectURL.message": "profile-message-test",
+                },
+            },
+            [stableObjectHash(["labs.customProfileFields"])]: {
+                status: LoadStatus.SUCCESS,
+                data: {
+                    "labs.customProfileFields": true,
+                },
+            },
+        },
+    } as Partial<IConfigState>,
+    () => {},
+);
 /**
- * Utilities for testing User Profile Settings page.
+ * Utilities for testing Profile Fields and User Profiles
  */
-export class ProfileFieldsFixture {
-    public static mockProfileFields(format?: MockProfileFieldsFormat) {
-        const fields = Object.values(ProfileFieldFormType);
-        if (format === MockProfileFieldsFormat.API_NAME) {
-            return fields;
+export class ProfileFieldsFixtures {
+    public static mockProfileField(
+        formType: ProfileFieldFormType,
+        data: DeepPartial<Omit<ProfileField, "formType">> = {},
+    ): ProfileField {
+        let dataType: ProfileFieldDataType;
+
+        switch (formType) {
+            case ProfileFieldFormType.CHECKBOX:
+                dataType = ProfileFieldDataType.BOOLEAN;
+                break;
+
+            case ProfileFieldFormType.DROPDOWN:
+            case ProfileFieldFormType.TOKENS:
+                dataType = ProfileFieldDataType.STRING_MUL;
+                break;
+
+            case ProfileFieldFormType.DATE:
+                dataType = ProfileFieldDataType.DATE;
+                break;
+
+            default:
+                dataType = ProfileFieldDataType.TEXT;
+                break;
         }
 
-        const fieldData = fields.map((apiName) => {
-            const label = `${apiName
+        const fakeApiName = data.apiName ?? formType;
+
+        const label =
+            data.label ??
+            `${fakeApiName
                 .split("-")
                 .map((val) => capitalize(val))
                 .join(" ")} Field`;
-            let dataType: ProfileFieldDataType;
 
-            switch (apiName) {
-                case ProfileFieldFormType.CHECKBOX:
-                    dataType = ProfileFieldDataType.BOOLEAN;
-                    break;
-
-                case ProfileFieldFormType.DROPDOWN:
-                case ProfileFieldFormType.TOKENS:
-                    dataType = ProfileFieldDataType.STRING_MUL;
-                    break;
-
-                default:
-                    dataType = ProfileFieldDataType[apiName] ?? ProfileFieldDataType.TEXT;
-                    break;
-            }
-
-            return {
-                apiName,
+        return {
+            ...{
+                apiName: fakeApiName,
+                formType: formType,
                 label,
                 dataType,
-                formType: apiName,
-                description: `Mock ${label} for testing purposes`,
-                registrationOptions: ProfileFieldRegistrationOptions.OPTIONAL,
-                visibility: ProfileFieldVisibility.PUBLIC,
-                mutability: ProfileFieldMutability.ALL,
+                isCoreField: data.isCoreField ?? false,
+                description: data.description ?? `Mock ${label} for testing purposes`,
+                registrationOptions: data.registrationOptions ?? ProfileFieldRegistrationOptions.OPTIONAL,
+                visibility: data.visibility ?? ProfileFieldVisibility.PUBLIC,
+                mutability: data.mutability ?? ProfileFieldMutability.ALL,
                 displayOptions: {
-                    userCards: false,
-                    posts: false,
+                    userCards: data.displayOptions?.userCards ?? false,
+                    posts: data.displayOptions?.posts ?? false,
+                    search: data.displayOptions?.search ?? false,
                 },
-                enabled: true,
+                enabled: data.enabled ?? true,
                 dropdownOptions:
-                    dataType === ProfileFieldDataType.STRING_MUL
-                        ? ["Option 1", "Option 2", "Option 3", "Option 4"]
+                    data.dropdownOptions ?? dataType === ProfileFieldDataType.STRING_MUL
+                        ? formType === ProfileFieldFormType.TOKENS
+                            ? ["Token 1", "Token 2", "Token 3", "Token 4"]
+                            : ["Option 1", "Option 2", "Option 3", "Option 4"]
                         : null,
-            };
-        });
-
-        if (format === MockProfileFieldsFormat.DATA_OBJECT) {
-            return Object.fromEntries(fieldData.map((field) => [field.apiName, field]));
-        }
-
-        return fieldData;
+                sort: data.sort ?? 0,
+            },
+        };
     }
 
-    public static createMockProfileFieldsStore() {
-        const testReducer = createReducer(
+    public static mockProfileFields(mutability: ProfileFieldMutability = ProfileFieldMutability.ALL): ProfileField[] {
+        const formTypes = Object.values(ProfileFieldFormType); //Use the form types as unique API names
+
+        return formTypes.map((formType) => {
+            return this.mockProfileField(formType, { mutability });
+        });
+    }
+
+    public static mockDisabledFields() {
+        return ProfileFieldsFixtures.mockProfileFields(ProfileFieldMutability.NONE);
+    }
+
+    static createMockProfileFieldsReducer(
+        fieldsData = this.mockProfileFields(),
+        profileFieldsByUserID = mockProfileFieldsByUserID,
+    ) {
+        return createReducer(
             {
-                config: {
-                    configPatchesByID: {},
-                    configsByLookupKey: {
-                        [stableObjectHash(["redirectURL.profile", "redirectURL.message"])]: {
-                            status: LoadStatus.SUCCESS,
-                            data: {
-                                "redirectURL.profile": "profile-url-test",
-                                "redirectURL.message": "profile-message-test",
-                            },
-                        },
-                        [stableObjectHash(["labs.customProfileFields"])]: {
-                            status: LoadStatus.SUCCESS,
-                            data: {
-                                "labs.customProfileFields": true,
-                            },
-                        },
+                profileFieldsByUserID: profileFieldsByUserID,
+                profileFieldApiNamesByParamHash: {
+                    [stableObjectHash({ enabled: true })]: {
+                        status: LoadStatus.SUCCESS,
+                        data: fieldsData.filter((field) => field.enabled).map((field) => field.apiName),
+                    },
+                    [stableObjectHash({})]: {
+                        status: LoadStatus.SUCCESS,
+                        data: fieldsData.map((field) => field.apiName),
                     },
                 },
-                userProfiles: {
-                    profileFieldApiNamesByParamHash: {
-                        [stableObjectHash({})]: {
-                            status: LoadStatus.SUCCESS,
-                            data: this.mockProfileFields(MockProfileFieldsFormat.API_NAME),
-                        },
-                    },
-                    profileFieldsByApiName: this.mockProfileFields(MockProfileFieldsFormat.DATA_OBJECT),
-                    deleteStatusByApiName: {},
-                },
+                profileFieldsByApiName: Object.fromEntries(fieldsData.map((field) => [field.apiName, field])),
+                deleteStatusByApiName: {},
             },
             () => {},
         );
-
-        return configureStore({ reducer: testReducer });
     }
 
-    public static createMockProfileFieldsProvider(children: ReactNode) {
-        return <Provider store={this.createMockProfileFieldsStore()}>{children}</Provider>;
+    public static createMockProfileFieldsProvider(options?: {
+        profileFields?: ProfileField[];
+        profileFieldsByUserID?: Partial<IUserProfilesState["profileFieldsByUserID"]>;
+        extraReducers?: ReducersMapObject;
+    }) {
+        const mockStore = configureStore({
+            reducer: combineReducers({
+                config: mockConfigReducer,
+                userProfiles: this.createMockProfileFieldsReducer(
+                    options?.profileFields,
+                    options?.profileFieldsByUserID,
+                ),
+                ...(options?.extraReducers ?? {}),
+            }),
+        });
+
+        return function WrappedChildren(props: PropsWithChildren<{}>) {
+            return <Provider store={mockStore}>{props.children}</Provider>;
+        };
     }
 }

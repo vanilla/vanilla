@@ -174,6 +174,7 @@ export default function TitleBar(_props: IProps) {
                             )}
                             {!isSearchOpen && !isCompact && (
                                 <TitleBarNav
+                                    forceOpen={props.forceMenuOpen}
                                     isCentered={vars.navAlignment.alignment === "center"}
                                     containerRef={
                                         vars.navAlignment.alignment === "center" && !isDesktopLogoCentered

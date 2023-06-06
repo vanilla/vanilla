@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Dani M <danim@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -37,11 +37,13 @@ class ApiFilterMiddleware
         /** @var Data $response */
         $response = $next($request);
         $data = $response->getData();
+
         $apiAllow = $response->getMeta(self::FIELD_ALLOW);
         if (!is_array($apiAllow)) {
             $apiAllow = [];
         }
         // Make sure filtering is done for apiv2.
+
         if (is_array($data)) {
             // Check for blacklisted fields.
             $blacklist = array_flip($this->blacklist);
@@ -55,6 +57,7 @@ class ApiFilterMiddleware
                 }
             });
         }
+
         return $response;
     }
 

@@ -290,7 +290,7 @@ class MySQLStructureTest extends SiteTestCase
      * @param string $expectedEngine The expected engine in the `create table` statement.
      * @dataProvider provideEngines
      */
-    final private function doCollationTest(array $config, string $explicitEngine, string $expectedEngine): void
+    final function doCollationTest(array $config, string $explicitEngine, string $expectedEngine): void
     {
         $this->runWithConfig($config, function () use ($explicitEngine, $expectedEngine) {
             $this->st
@@ -423,5 +423,46 @@ EOT;
         $this->assertTrue($this->st->indexExists("indexExists", "IX_indexExists_col1"));
         $this->assertFalse($this->st->indexExists("nonExistantTable", "IX_indexExists_col1"));
         $this->assertFalse($this->st->indexExists("nonExistantTable", "IX_nonexistent_index"));
+    }
+
+    /**
+     * Test index renaming.
+     *
+     * @return void
+     */
+    public function testTryRenameIndex()
+    {
+        $this->st
+            ->table("renameIndex")
+            ->column("col1", "int", false, ["index.DumbName"])
+            ->column("col2", "int", false, ["index.DumbName"])
+            ->set();
+
+        // Indexes were created
+        $this->assertIndexes(["IX_renameIndex_DumbName[col1]", "IX_renameIndex_DumbName[col2]"], "renameIndex");
+
+        // Then they can be renamed.
+        $this->st->table("renameIndex")->tryRenameIndex("IX_renameIndex_DumbName", "IX_renameIndex_GreatName");
+        $this->assertIndexes(["IX_renameIndex_GreatName[col1]", "IX_renameIndex_GreatName[col2]"], "renameIndex");
+
+        // Create them again
+        $this->st->table("renameIndex")->createIndexIfNotExists("IX_renameIndex_DumbName", ["col1", "col2"]);
+        $this->assertIndexes(
+            [
+                "IX_renameIndex_GreatName[col1]",
+                "IX_renameIndex_GreatName[col2]",
+                "IX_renameIndex_DumbName[col1]",
+                "IX_renameIndex_DumbName[col2]",
+            ],
+            "renameIndex"
+        );
+
+        // Now new and old name exist. Just get rid of the old name.
+        $this->st->table("renameIndex")->tryRenameIndex("IX_renameIndex_DumbName", "IX_renameIndex_GreatName");
+        $this->assertIndexes(["IX_renameIndex_GreatName[col1]", "IX_renameIndex_GreatName[col2]"], "renameIndex");
+
+        // And running again is harmless
+        $this->st->table("renameIndex")->tryRenameIndex("IX_renameIndex_DumbName", "IX_renameIndex_GreatName");
+        $this->assertIndexes(["IX_renameIndex_GreatName[col1]", "IX_renameIndex_GreatName[col2]"], "renameIndex");
     }
 }

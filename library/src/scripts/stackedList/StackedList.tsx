@@ -6,17 +6,17 @@ import { t } from "@library/utility/appUtils";
 import NumberFormatted from "@library/content/NumberFormatted";
 import Button from "@library/forms/Button";
 
-interface IStackedListProps<T> {
+interface IStackedListProps<T extends {}> {
     themingVariables: ReturnType<typeof stackedListVariables>;
     data: T[];
     maxCount?: number;
     extra?: number;
     openModal?(): void;
     tooltipText?: string;
-    ItemComponent: ComponentType<T>;
+    ItemComponent: ComponentType<T & JSX.IntrinsicAttributes>;
 }
 
-export function StackedList<T>(props: IStackedListProps<T>) {
+export function StackedList<T extends {}>(props: IStackedListProps<T>) {
     const { themingVariables, data, extra = 0, maxCount = Infinity, openModal, tooltipText, ItemComponent } = props;
     const { item: itemClass, lastItem: lastItemClass, root, plusLink } = stackedListClasses(themingVariables);
     const extraCount = Math.max(0, data.length + extra - maxCount);

@@ -3,37 +3,43 @@
  * @license gpl-2.0-only
  */
 
-import React from "react";
+import { DiscussionListSortOptions, IDiscussion, IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
 import { cx } from "@emotion/css";
-import { IDiscussion } from "@dashboard/@types/api/discussion";
-import { DiscussionListSelectAll } from "@library/features/discussions/DiscussionListSelectAll";
-import { hasPermission } from "@library/features/users/Permission";
-import { getMeta } from "@library/utility/appUtils";
-import DiscussionListAssetCategoryFilter, {
-    DiscussionsCategoryFollowFilter,
-} from "@library/features/discussions/DiscussionListAssetCategoryFilter";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
-import { NumberedPager, INumberedPagerProps } from "@library/features/numberedPager/NumberedPager";
+import DiscussionListAssetCategoryFilter from "@library/features/discussions/DiscussionListAssetCategoryFilter";
+import { DiscussionListSelectAll } from "@library/features/discussions/DiscussionListSelectAll";
+import DiscussionListSort from "@library/features/discussions/DiscussionListSort";
+import { DiscussionListFilter } from "@library/features/discussions/filters/DiscussionListFilter";
+import { INumberedPagerProps, NumberedPager } from "@library/features/numberedPager/NumberedPager";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { getMeta } from "@library/utility/appUtils";
+import React, { useRef } from "react";
+import { useMeasure } from "@vanilla/react-utils";
 
 interface IProps {
     discussionIDs?: Array<IDiscussion["discussionID"]>;
     noCheckboxes?: boolean;
     categoryFollowEnabled?: boolean;
-    onCategoryFollowFilterChange: (newFilter: boolean) => void;
-    categoryFollowFilter: DiscussionsCategoryFollowFilter;
     paginationProps?: INumberedPagerProps;
+    apiParams: IGetDiscussionListParams;
+    updateApiParams: (newParams: Partial<IGetDiscussionListParams>) => void;
 }
 
 /**
  * Header component for discussion list asset.
  */
 export function DiscussionListAssetHeader(props: IProps) {
+    const { updateApiParams, apiParams } = props;
     const classes = discussionListClasses();
+    const { hasPermission } = usePermissionsContext();
     const canUseCheckboxes =
         !props.noCheckboxes && getMeta("ui.useAdminCheckboxes", false) && hasPermission("discussions.manage");
+    const selfRef = useRef<HTMLDivElement>(null);
+    const measure = useMeasure(selfRef);
+    const isMobile = measure.width < 600;
 
     return (
-        <div className={cx(classes.assetHeader, props.categoryFollowEnabled ? "alignJustified" : "alignRight")}>
+        <div className={cx(classes.assetHeader)} ref={selfRef}>
             <div>
                 {canUseCheckboxes && (
                     <DiscussionListSelectAll
@@ -43,10 +49,17 @@ export function DiscussionListAssetHeader(props: IProps) {
                 )}
                 {props.categoryFollowEnabled && (
                     <DiscussionListAssetCategoryFilter
-                        filter={props.categoryFollowFilter}
-                        onFilterChange={props.onCategoryFollowFilterChange}
+                        filter={apiParams.followed ? "followed" : "all"}
+                        onFilterChange={(followed: boolean) => updateApiParams({ followed })}
+                        isMobile={isMobile}
                     />
                 )}
+                <DiscussionListSort
+                    currentSort={apiParams.sort ?? DiscussionListSortOptions.RECENTLY_COMMENTED}
+                    selectSort={(sort: DiscussionListSortOptions) => updateApiParams({ sort })}
+                    isMobile={isMobile}
+                />
+                <DiscussionListFilter apiParams={apiParams} updateApiParams={updateApiParams} />
             </div>
             <div>{props.paginationProps && <NumberedPager {...props.paginationProps} rangeOnly />}</div>
         </div>

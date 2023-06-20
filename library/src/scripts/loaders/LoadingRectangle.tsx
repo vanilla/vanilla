@@ -23,7 +23,7 @@ export function getLoadingPercentageForIndex(index: number) {
 export function LoadingRectangle(_props: IProps) {
     const { inline, ...props } = _props;
     return (
-        <div
+        <span
             {...props}
             className={classNames(loadingRectangleClass(props.height, props.width, inline), props.className)}
         />
@@ -31,10 +31,10 @@ export function LoadingRectangle(_props: IProps) {
 }
 
 export function LoadingSpacer(props: IProps) {
-    return <div {...props} className={classNames(loadingSpacerClass(props.height), props.className)} />;
+    return <span {...props} className={classNames(loadingSpacerClass(props.height), props.className)} />;
 }
 
 export function LoadingCircle(_props: IProps) {
     const { inline, ...props } = _props;
-    return <div {...props} className={classNames(loadingCircleClass(props.height, inline), props.className)} />;
+    return <span {...props} className={classNames(loadingCircleClass(props.height, inline), props.className)} />;
 }

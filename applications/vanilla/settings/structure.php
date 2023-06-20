@@ -1,4 +1,5 @@
-<?php use Vanilla\Dashboard\Models\RecordStatusModel;
+<?php
+use Vanilla\Dashboard\Models\RecordStatusModel;
 
 if (!defined("APPLICATION")) {
     exit();
@@ -83,7 +84,7 @@ $Construct
     ->column("Description", "varchar(1000)", true)
     ->column("Sort", "int", true)
     ->column("CssClass", "varchar(50)", true)
-    ->column("Photo", "varchar(255)", true)
+    ->column("Photo", "varchar(767)", true)
     ->column("BannerImage", "varchar(255)", true)
     ->column("PermissionCategoryID", "int", "-1") // default to root.
     ->column("PointsCategoryID", "int", "0") // default to global.
@@ -168,26 +169,9 @@ $Construct
     ->primaryKey("DiscussionID")
     ->column("Type", "varchar(10)", true, "index")
     ->column("ForeignID", "varchar(32)", true, "index") // For relating foreign records to discussions
-    ->column("CategoryID", "int", false, [
-        "index.CategoryPages",
-        "index.CategoryInserted",
-        "index.Status_DateInserted",
-        "index.Status_Hot",
-        "index.Status_Score",
-        "index.InternalStatus_DateInserted",
-        "index.InternalStatus_Hot",
-        "index.InternalStatus_Score",
-        "index.Category_DateInserted",
-        "index.Category_DateLastComment",
-        "index.Category_Hot",
-        "index.Category_Score",
-    ])
-    ->column("statusID", "int(11)", 0, ["index.Status_DateInserted", "index.Status_Hot", "index.Status_Score"])
-    ->column("internalStatusID", "int(11)", RecordStatusModel::DISCUSSION_INTERNAL_STATUS_NONE, [
-        "index.InternalStatus_DateInserted",
-        "index.InternalStatus_Hot",
-        "index.InternalStatus_Score",
-    ])
+    ->column("CategoryID", "int", false)
+    ->column("statusID", "int(11)", 0)
+    ->column("internalStatusID", "int(11)", RecordStatusModel::DISCUSSION_INTERNAL_STATUS_NONE, [])
     ->column("InsertUserID", "int", false, "key")
     ->column("UpdateUserID", "int", true)
     ->column("FirstCommentID", "int", true)
@@ -202,71 +186,124 @@ $Construct
     ->column("Closed", "tinyint(1)", "0")
     ->column("Announce", "tinyint(1)", "0", "index")
     ->column("Sink", "tinyint(1)", "0")
-    ->column("DateInserted", "datetime", false, [
-        "index.CategoryInserted",
-        "index.Status_DateInserted",
-        "index.InternalStatus_DateInserted",
-        "index.Category_DateInserted",
-    ])
+    ->column("DateInserted", "datetime", false)
     ->column("DateUpdated", "datetime", true)
     ->column("InsertIPAddress", "ipaddress", true)
     ->column("UpdateIPAddress", "ipaddress", true)
-    ->column("DateLastComment", "datetime", null, ["index.CategoryPages", "index.Category_DateLastComment"])
+    ->column("DateLastComment", "datetime", null)
     ->column("LastCommentUserID", "int", true)
-    ->column("Score", "float", null, [
-        "index",
-        "index.Status_Score",
-        "index.InternalStatus_Score",
-        "index.Category_Score",
-    ])
+    ->column("Score", "float", null)
     ->column("Attributes", "text", true)
     ->column("RegardingID", "int(11)", true, "index")
-    ->column("hot", "bigint(20)", 0, ["index.Status_Hot", "index.InternalStatus_Hot", "index.Category_Hot"]);
+    ->column("hot", "bigint(20)", 0);
 
 $Construct->set($Explicit, $Drop);
 
-// These indexes have been replaced with new ones for discussion API sorting and filtering
 $Construct
     ->table("Discussion")
+    // These ones had bespoke names
+    ->tryRenameIndex("IX_Discussion_CategoryPages", "IX_Discussion_CategoryID_DateLastComment")
+    ->tryRenameIndex("IX_Discussion_CategoryInserted", "IX_Discussion_CategoryID_DateInserted")
+    // These ones had Category instead of CategoryID
+    ->tryRenameIndex("IX_Discussion_Category_DateInserted", "IX_Discussion_CategoryID_DateInserted")
+    ->tryRenameIndex("IX_Discussion_Category_DateLastComment", "IX_Discussion_CategoryID_DateLastComment")
+    ->tryRenameIndex("IX_Discussion_Category_Hot", "IX_Discussion_CategoryID_hot")
+    ->tryRenameIndex("IX_Discussion_Category_Score", "IX_Discussion_CategoryID_Score")
+
+    // Old status index names
+    // Improper casing of status and no categoryID in name
+    ->tryRenameIndex("IX_Discussion_Status_DateInserted", "IX_Discussion_CategoryID_statusID_DateInserted")
+    ->tryRenameIndex("IX_Discussion_Status_DateLastComment", "IX_Discussion_CategoryID_statusID_DateLastComment")
+    ->tryRenameIndex("IX_Discussion_Status_Score", "IX_Discussion_CategoryID_statusID_Score")
+    ->tryRenameIndex("IX_Discussion_Status_Hot", "IX_Discussion_CategoryID_statusID_hot")
+
+    // Old internal status names
+    ->tryRenameIndex(
+        "IX_Discussion_InternalStatus_DateInserted",
+        "IX_Discussion_CategoryID_internalStatusID_DateInserted"
+    )
+    ->tryRenameIndex(
+        "IX_Discussion_InternalStatus_DateLastComment",
+        "IX_Discussion_CategoryID_internalStatusID_DateLastComment"
+    )
+    ->tryRenameIndex("IX_Discussion_InternalStatus_Score", "IX_Discussion_CategoryID_internalStatusID_Score")
+    ->tryRenameIndex("IX_Discussion_InternalStatus_Hot", "IX_Discussion_CategoryID_internalStatusID_hot");
+
+// These indexes are the primary combinations used for sorting and filtering discussion lists.
+// This is 20 indexes!
+$sorts = ["DateInserted", "DateLastComment", "Score", "hot"];
+$filters = [
+    ["CategoryID"],
+    ["CategoryID", "statusID"],
+    ["CategoryID", "internalStatusID"],
+    ["statusID"],
+    ["internalStatusID"],
+];
+
+foreach ($sorts as $sort) {
+    foreach ($filters as $filter) {
+        // We need indexes with the sort at the beginning for when we are filtering multiple sort values.
+        $forwardsColumns = array_merge([$sort], $filter);
+        $forwardsName = "IX_Discussion_" . implode("_", $forwardsColumns);
+        $Construct->table("Discussion")->createIndexIfNotExists($forwardsName, $forwardsColumns);
+
+        // And then with the sort at the end for when we have an optimal filter value.
+        $backwardsColumns = array_merge($filter, [$sort]);
+        $backwardsName = "IX_Discussion_" . implode("_", $backwardsColumns);
+        $Construct->table("Discussion")->createIndexIfNotExists($backwardsName, $backwardsColumns);
+    }
+}
+
+// Clear out legacy indexes
+$Construct
+    ->table("Discussion")
+    ->dropIndexIfExists("IX_Discussion_Score")
+    ->dropIndexIfExists("IX_Discussion_DiscussionID")
     ->dropIndexIfExists("IX_Discussion_QnA")
     ->dropIndexIfExists("IX_Discussion_DateInserted")
     ->dropIndexIfExists("IX_Discussion_DateLastComment")
-    ->dropIndexIfExists("IX_Discussion_statusID")
     ->dropIndexIfExists("IX_Discussion_hot");
 
-if ($DiscussionExists && !$FirstCommentIDExists) {
-    $Px = $SQL->Database->DatabasePrefix;
-    $UpdateSQL = "update {$Px}Discussion d set FirstCommentID = (select min(c.CommentID) from {$Px}Comment c where c.DiscussionID = d.DiscussionID)";
-    $SQL->query($UpdateSQL, "update");
-}
-$indexStatusDateLastCommentExists = $SQL
-    ->query(
-        "SELECT 1 IndexExists FROM INFORMATION_SCHEMA.STATISTICS
-WHERE table_schema=DATABASE() AND table_name='GDN_Discussion'
-AND index_name='IX_Discussion_Status_DateLastComment'"
-    )
-    ->count();
-
-if (!$indexStatusDateLastCommentExists) {
-    $SQL->query("
-        ALTER TABLE `GDN_Discussion`
-        ADD INDEX IX_Discussion_Status_DateLastComment (`CategoryID`, `statusID`, `DateLastComment`),
-        ADD INDEX IX_Discussion_InternalStatus_DateLastComment (`CategoryID`, `internalStatusID`, `DateLastComment`),
-        ALGORITHM=INPLACE, LOCK=NONE
-    ");
-}
-
+$Construct->table("UserCategory");
+$followedDateExist = $Construct->columnExists("DateFollowed");
 $Construct
-    ->table("UserCategory")
     ->column("UserID", "int", false, "primary")
     ->column("CategoryID", "int", false, "primary")
     ->column("DateMarkedRead", "datetime", null)
     ->column("Followed", "tinyint(1)", 0);
-
 // This column should be removed when muting categories is dropped in favor of category following..
 $Construct->column("Unfollow", "tinyint(1)", 0);
-
+//adding columns DateFollowed and DateUnFollowed to track category followed and unfollowed dates
+if (!$followedDateExist) {
+    $Construct->column("DateFollowed", "datetime", null);
+    $Construct->column("DateUnFollowed", "datetime", null);
+}
 $Construct->set($Explicit, $Drop);
+if (!$followedDateExist) {
+    //Update the existing data with default values for the dates
+    $sql =
+        "UPDATE " .
+        $Px .
+        'UserCategory SET DateFollowed =
+        CASE WHEN Followed = 1
+        THEN "' .
+        CategoryModel::DEFAULT_PREFERENCE_DATE_FOLLOWED .
+        '" ELSE DateFollowed
+        END,
+        DateUnFollowed =
+        CASE WHEN Unfollow = 1
+         THEN "' .
+        CategoryModel::DEFAULT_PREFERENCE_DATE_FOLLOWED .
+        '"
+         ELSE DateUnFollowed
+        END';
+    $SQL->query($sql, "update");
+}
+// Add new indexes to followed and unfollowed
+$Construct
+    ->table("UserCategory")
+    ->createIndexIfNotExists("IX_UserCategory_CategoryID_Followed", ["CategoryID", "Followed"])
+    ->createIndexIfNotExists("IX_UserCategory_CategoryID_Unfollow", ["CategoryID", "Unfollow"]);
 
 // Allows the tracking of relationships between discussions and users (bookmarks, dismissed announcements, # of read comments in a discussion, etc)
 // column($Name, $Type, $Length = '', $Null = FALSE, $Default = null, $KeyType = FALSE, $AutoIncrement = FALSE)
@@ -275,21 +312,22 @@ $Construct->table("UserDiscussion");
 $ParticipatedExists = $Construct->columnExists("Participated");
 
 $Construct
-    ->column("UserID", "int", false, [
-        "primary",
-        "index.UserID_Bookmarked",
-        "index.UserID_Participated",
-        "index.DiscussionID_Bookmarked",
-        "index.DiscussionID_Participated",
-    ])
+    ->column("UserID", "int", false, ["primary"])
     ->column("DiscussionID", "int", false, ["primary", "key"])
     ->column("Score", "float", null)
     ->column("CountComments", "int", "0")
     ->column("DateLastViewed", "datetime", null) // null signals never
     ->column("Dismissed", "tinyint(1)", "0") // relates to dismissed announcements
-    ->column("Bookmarked", "tinyint(1)", "0", ["index.UserID_Bookmarked", "index.DiscussionID_Bookmarked"])
-    ->column("Participated", "tinyint(1)", "0", ["index.UserID_Participated", "index.DiscussionID_Participated"]) // whether or not the user has participated in the discussion.
+    ->column("Bookmarked", "tinyint(1)", "0")
+    ->column("Participated", "tinyint(1)", "0") // whether or not the user has participated in the discussion.
     ->set($Explicit, $Drop);
+
+$Construct
+    ->table("UserDiscussion")
+    ->createIndexIfNotExists("IX_UserDiscussion_UserID_Bookmarked", ["UserID", "Bookmarked"])
+    ->createIndexIfNotExists("IX_UserDiscussion_UserID_Participated", ["UserID", "Participated"])
+    ->createIndexIfNotExists("IX_UserDiscussion_DiscussionID_Bookmarked", ["DiscussionID", "Bookmarked"])
+    ->createIndexIfNotExists("IX_UserDiscussion_DiscussionID_Participated", ["DiscussionID", "Participated"]);
 
 $Construct->table("Comment");
 
@@ -355,7 +393,7 @@ $Construct
     ->table("User")
     ->column("CountDiscussions", "int", null)
     ->column("CountUnreadDiscussions", "int", null)
-    ->column("CountComments", "int", null)
+    ->column("CountComments", "int", null, ["index"])
     ->column("CountDrafts", "int", null)
     ->column("CountBookmarks", "int", null)
     ->set();
@@ -365,6 +403,7 @@ $Construct
     ->primaryKey("DraftID")
     ->column("DiscussionID", "int", true, "key")
     ->column("CategoryID", "int", true, "key")
+    ->column("Type", "varchar(10)", false, "key")
     ->column("InsertUserID", "int", false, "key")
     ->column("UpdateUserID", "int")
     ->column("Name", "varchar(100)", true)
@@ -726,4 +765,9 @@ if (strlen($cookieSalt) === 16 && !$config->configKeyExists("Garden.Cookie.OldSa
     // Assume if salt length is 16 then we are using the old default salt.
     $config->set("Garden.Cookie.OldSalt", $cookieSalt);
     $config->set("Garden.Cookie.Salt", betterRandomString(32, "Aa0"));
+}
+
+// Create Unsubscribe salt if it does not exist.
+if (!$config->configKeyExists("Garden.Unsubscribe.Salt")) {
+    $config->set("Garden.Unsubscribe.Salt", betterRandomString(32, "Aa0"));
 }

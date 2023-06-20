@@ -8,6 +8,8 @@
 namespace VanillaTests\Layout\Middleware;
 
 use Vanilla\Layout\LayoutHydrator;
+use Vanilla\Utility\ArrayUtils;
+use VanillaTests\Layout\LayoutTestTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
@@ -17,29 +19,32 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 class RoleFilterMiddlewareTest extends SiteTestCase
 {
     use UsersAndRolesApiTestTrait;
-
-    /** @var $hydrator */
-    private $hydrator;
+    use LayoutTestTrait;
 
     /**
      * Test that middleware inputs filter specific outputs.
      *
      * @param array $input The input.
      * @param array $expected The expected result.
-     * @param array $params The parameters for rendering.
+     * @param array $rolesOrPermissions The parameters for rendering.
      *
      * @dataProvider provideMiddlewareFiltersTo
      */
-    public function testLayoutHydratesTo(array $input, array $expected, array $params = [])
+    public function testLayoutHydratesTo(array $input, array $expected, array $rolesOrPermissions = [])
     {
-        $user = $this->createUser();
-        $this->runWithUser(function () use ($input, $params, $expected) {
-            $this->hydrator = self::getLayoutService()->getHydrator("home");
-            $actual = $this->hydrator->resolve($input, $params);
-            // Make sure we see it as the API output would.
-            $actual = json_decode(json_encode($actual), true);
-            $this->assertSame($expected, $actual);
-        }, $this->lastUserID);
+        if (!ArrayUtils::isAssociative($rolesOrPermissions)) {
+            $user = $this->createUser([
+                "roleID" => $rolesOrPermissions,
+            ]);
+            $this->runWithUser(function () use ($input, $expected) {
+                $this->assertHydratesTo($input, [], $expected, "home");
+            }, $user);
+        } else {
+            // otherwise they are permissions.
+            $this->runWithPermissions(function () use ($input, $expected) {
+                $this->assertHydratesTo($input, [], $expected, "home");
+            }, $rolesOrPermissions);
+        }
     }
 
     /**
@@ -78,7 +83,7 @@ class RoleFilterMiddlewareTest extends SiteTestCase
                     ],
                 ],
             ],
-            [[1]],
+            [8],
         ];
 
         $roleMiddlewareDefinitionPass = [
@@ -112,55 +117,39 @@ class RoleFilterMiddlewareTest extends SiteTestCase
                     ],
                 ],
             ],
-            [[16]],
+            [8],
         ];
 
-        $permissions = ["noAds.use" => true];
-
-        yield "Success resolving node when user has doesn't have noAds.use permission " => [
+        yield "Ads appear when a user does not have noAds.use permission" => [
             [
-                "layoutViewType" => "home",
-                "layout" => [
-                    [
-                        "data" => [
-                            "mainTop" => [
-                                [
-                                    "isAdvertisement" => true,
-                                    '$hydrate' => "react.html",
-                                    "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
-                                ],
-                            ],
-                        ],
-                    ],
+                [
+                    '$hydrate' => "react.html",
+                    "isAdvertisement" => true,
+                    "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
                 ],
             ],
             [
-                "layoutViewType" => "home",
-                "layout" => [
-                    [
-                        "data" => [
-                            "mainTop" => [
-                                [
-                                    '$reactComponent' => "HtmlWidget",
-                                    '$reactProps' => [
-                                        "isAdvertisement" => true,
-                                        "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
-                                    ],
-                                ],
-                            ],
-                        ],
+                [
+                    '$reactComponent' => "HtmlWidget",
+                    '$reactProps' => [
+                        "isAdvertisement" => true,
+                        "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
                     ],
                 ],
             ],
-            [[16]],
+            ["noAds.use" => false],
         ];
-    }
 
-    /**
-     * @return LayoutHydrator
-     */
-    private function getLayoutService(): LayoutHydrator
-    {
-        return self::container()->get(LayoutHydrator::class);
+        yield "Ads do not appear when a user doeshas the noAds.use permission" => [
+            [
+                [
+                    '$hydrate' => "react.html",
+                    "isAdvertisement" => true,
+                    "html" => "<h1 style='margin-top: 0'>Hello Layout Editor</h1>",
+                ],
+            ],
+            [null],
+            ["noAds.use" => true],
+        ];
     }
 }

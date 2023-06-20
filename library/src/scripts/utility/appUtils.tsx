@@ -93,6 +93,14 @@ export function isAllowedUrl(input: string): boolean {
     return isURL(input);
 }
 
+/**
+ * Normalize the URL with a prepended http if there isn't one.
+ */
+export function normalizeUrl(urlToNormalize: string) {
+    const result = urlToNormalize.match(/^https?:\/\//) ? urlToNormalize : "http://" + urlToNormalize;
+    return result;
+}
+
 export interface ISiteSection {
     basePath: string;
     contentLocale: string;
@@ -267,26 +275,38 @@ export function removeOnContent(callback: (event: CustomEvent) => void) {
 }
 
 /**
+ * Encode a username the same way our backend does.
+ *
+ * Notably there is a long-standing issue where names certain characters that our dispatcher matches on need to be double encoded.
+ * @param username
+ */
+function encodeUserName(username?: string): string {
+    // Matching existing backend logic.
+    const specialEncoded = username?.replace("/", "%2f").replace("&", "%26") ?? "";
+    return encodeURIComponent(specialEncoded);
+}
+
+/**
  * Make a URL to a user's profile.
  */
-export function makeProfileUrl(username: string) {
-    const userPath = `/profile/${encodeURIComponent(username)}`;
+export function makeProfileUrl(username?: string) {
+    const userPath = `/profile/${encodeUserName(username)}`;
     return formatUrl(userPath, true);
 }
 
 /**
  * Make a URL to a user's discussions.
  */
-export function makeProfileDiscussionsUrl(username: string) {
-    const discussionsPath = `/profile/discussions/${encodeURIComponent(username)}`;
+export function makeProfileDiscussionsUrl(username?: string) {
+    const discussionsPath = `/profile/discussions/${encodeUserName(username)}`;
     return formatUrl(discussionsPath, true);
 }
 
 /**
  * Make a URL to a user's comments.
  */
-export function makeProfileCommentsUrl(username: string) {
-    const commentsPath = `/profile/comments/${encodeURIComponent(username)}`;
+export function makeProfileCommentsUrl(username?: string) {
+    const commentsPath = `/profile/comments/${encodeUserName(username)}`;
     return formatUrl(commentsPath, true);
 }
 
@@ -330,4 +350,20 @@ export function createSourceSetValue(sourceSet: ImageSourceSet): string {
             .map((source) => `${source.reverse().join(" ")}w`)
             .join(",")
     );
+}
+
+//https://stackoverflow.com/questions/15690706/recursively-looping-through-an-object-to-build-a-property-list/53620876#53620876
+export function getDeepPropertyListInDotNotation(obj: object): string[] {
+    const isObject = (val) => val && typeof val === "object" && !Array.isArray(val);
+
+    const addDelimiter = (a, b) => (a ? `${a}.${b}` : b);
+
+    const paths = (obj: any = {}, head = "") => {
+        return Object.entries(obj).reduce((product, [key, value]) => {
+            let fullPath = addDelimiter(head, key);
+            return isObject(value) ? product.concat(paths(value, fullPath)) : product.concat(fullPath);
+        }, []);
+    };
+
+    return paths(obj);
 }

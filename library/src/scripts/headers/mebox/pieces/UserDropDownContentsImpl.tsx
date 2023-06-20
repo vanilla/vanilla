@@ -6,7 +6,7 @@
 
 import apiv2 from "@library/apiv2";
 import gdn from "@library/gdn";
-import Permission, { hasPermission } from "@library/features/users/Permission";
+import Permission from "@library/features/users/Permission";
 import UserActions from "@library/features/users/UserActions";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
@@ -22,6 +22,7 @@ import { connect } from "react-redux";
 import { DropDownEditProfileLink } from "@library/flyouts/items/DropDownEditProfileLink";
 import { extraUserDropDownComponents } from "@library/headers/mebox/pieces/UserDropdownExtras";
 import { useSignOutLink } from "@library/contexts/EntryLinkContext";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 /**
  * Implements User Drop down for header
@@ -30,6 +31,7 @@ function UserDropDownContentsImpl(props: IProps) {
     const { userInfo } = props;
     const signOutUrl = useSignOutLink();
     const siteSection = getSiteSection();
+    const { hasPermission } = usePermissionsContext();
 
     const dashboardMenuItem: ReactNode = useMemo(() => {
         if (hasPermission(["site.manage", "settings.view"])) {

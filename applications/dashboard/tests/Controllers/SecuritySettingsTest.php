@@ -120,4 +120,19 @@ class SecuritySettingsTest extends AbstractAPIv2Test
         $this->assertConfigValue("Garden.SignIn.Attempts", 10);
         $this->assertConfigValue("Garden.SignIn.LockoutTime", 505);
     }
+
+    /**
+     * Test that Session Timeout dropdown displays user config settings, even if they are not default settings we have for the dropdown.
+     */
+    public function testPersistExpieryDisplay()
+    {
+        $this->runWithConfig(["Garden.Cookie.PersistExpiry" => "5 weeks"], function () {
+            $resultHtml = $this->bessy()->getHtml(
+                "/dashboard/settings/security",
+                [],
+                ["deliveryType" => DELIVERY_TYPE_ALL]
+            );
+            $resultHtml->assertFormDropdown("Garden-dot-Cookie-dot-PersistExpiry", "5 weeks");
+        });
+    }
 }

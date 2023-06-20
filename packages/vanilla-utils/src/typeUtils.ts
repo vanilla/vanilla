@@ -37,7 +37,7 @@ export function indexArrayByKey<T extends object>(
     array: T[],
     key: string,
 ): {
-    [key: string]: T;
+    [key: string]: T[];
 } {
     const object = {};
     for (const item of array) {

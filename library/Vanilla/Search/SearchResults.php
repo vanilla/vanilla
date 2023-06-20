@@ -29,6 +29,8 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
     /** @var string[] $terms */
     private $terms;
 
+    private ?string $cursor;
+
     /**
      * Constructor.
      *
@@ -37,13 +39,20 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
      * @param int $offset
      * @param int $limit
      */
-    public function __construct(array $resultItems, int $totalCount, int $offset, int $limit, array $terms = [])
-    {
+    public function __construct(
+        array $resultItems,
+        int $totalCount,
+        int $offset,
+        int $limit,
+        array $terms = [],
+        ?string $cursor = null
+    ) {
         $this->resultItems = $resultItems;
         $this->totalCount = $totalCount;
         $this->offset = $offset;
         $this->limit = $limit;
         $this->terms = $terms;
+        $this->cursor = $cursor;
     }
 
     /**
@@ -104,6 +113,16 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
     public function getTerms(): array
     {
         return $this->terms;
+    }
+
+    /**
+     * Token which may be used to fetch next page of results.
+     *
+     * @return string|null
+     */
+    public function getCursor(): ?string
+    {
+        return $this->cursor;
     }
 
     ///

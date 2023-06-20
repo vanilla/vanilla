@@ -1,0 +1,26 @@
+[
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "This is some paragraph text\nwith a soft break, so it will appear in the same <p> tag"
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "While this is a new paragraph tag"
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "This is another paragraph tag"
+      }
+    ]
+  }
+]

@@ -1,2 +1,2 @@
 @notAMention
- @@thisIsARealMention @@duplicateMention@@duplicateMention @@@@@@!@#$%^&amp;*()&quot;&quot;
+ @thisIsARealMention @duplicateMention@duplicateMention@mention/slashes @@@@@@!@#$%^&amp;*()&quot;&quot;

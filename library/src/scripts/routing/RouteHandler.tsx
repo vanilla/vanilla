@@ -5,9 +5,8 @@
 
 import React from "react";
 import { NavLink, NavLinkProps, Route } from "react-router-dom";
-import Loadable, { LoadableComponent } from "react-loadable";
 import Loader from "@library/loaders/Loader";
-import { Hoverable } from "@vanilla/react-utils";
+import { createLoadableComponent, Hoverable, LoadableComponent } from "@vanilla/react-utils";
 import SmartLink from "@library/routing/links/SmartLink";
 import { formatUrl } from "@library/utility/appUtils";
 
@@ -18,7 +17,7 @@ type LoadFunction = () => Promise<any>;
  */
 export default class RouteHandler<GeneratorProps> {
     /** A react-loadable instance. */
-    public loadable;
+    public loadable: LoadableComponent<any>;
 
     /** A react node representing the route of the component. */
     public route: React.ReactNode;
@@ -38,9 +37,9 @@ export default class RouteHandler<GeneratorProps> {
         function LoaderWrapper() {
             return <LoadingComponent />;
         }
-        this.loadable = Loadable({
-            loading: LoaderWrapper,
-            loader: componentPromise,
+        this.loadable = createLoadableComponent({
+            fallback: LoaderWrapper,
+            loadFunction: componentPromise,
         });
         this.url = (data: GeneratorProps) => formatUrl(url(data), true);
         const finalPath = Array.isArray(path) ? path : [path];
@@ -65,6 +64,6 @@ export default class RouteHandler<GeneratorProps> {
      * Call this to preload the route.
      */
     public preload = () => {
-        return (this.loadable as LoadableComponent).preload();
+        return this.loadable.preload();
     };
 }

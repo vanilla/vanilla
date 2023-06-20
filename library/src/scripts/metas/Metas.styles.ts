@@ -104,7 +104,7 @@ export const metasClasses = useThemeCache(() => {
     });
 
     const alignVerticallyInMetaItem = useThemeCache((height: number) =>
-        css(Mixins.verticallyAlignInContainer(height, vars.height)),
+        css(Mixins.verticallyAlignInContainer(height, vars.font.lineHeight as number)),
     );
 
     return {

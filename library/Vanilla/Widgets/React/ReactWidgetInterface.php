@@ -22,6 +22,15 @@ interface ReactWidgetInterface extends WidgetInterface
     public function getProps(): ?array;
 
     /**
+     * Render HTML content for SEO for the widget.
+     *
+     * @param array $props The props from getProps().
+     *
+     * @return string|null
+     */
+    public function renderSeoHtml(array $props): ?string;
+
+    /**
      * Get react component name.
      *
      * @return string

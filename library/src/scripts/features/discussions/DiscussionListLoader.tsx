@@ -33,6 +33,7 @@ export interface IDiscussionListLoaderItem {
     iconInMeta?: boolean;
     asTile?: boolean;
     excerpt?: boolean;
+    actionIcon?: string;
 }
 
 interface ILoaderContainerProps extends Partial<IHomeWidgetContainerProps> {
@@ -43,6 +44,7 @@ export interface IDiscussionListLoader {
     itemOptions?: IDiscussionListLoaderItem;
     displayType?: WidgetContainerDisplayType;
     containerProps?: ILoaderContainerProps;
+    actionIcon?: string;
 }
 
 const classes = {
@@ -100,8 +102,14 @@ const classes = {
 function DiscussionLoaderItemActions(props) {
     return (
         <div style={{ ...props.style, display: "flex", opacity: 0.5 }}>
-            <Icon icon="discussion-bookmark" style={{ fill: "transparent", marginRight: 6 }} />
-            <Icon icon="navigation-ellipsis" />
+            {props.icon ? (
+                <Icon icon={props.icon} />
+            ) : (
+                <>
+                    <Icon icon="discussion-bookmark" style={{ fill: "transparent", marginRight: 6 }} />
+                    <Icon icon="navigation-ellipsis" />
+                </>
+            )}
         </div>
     );
 }
@@ -253,7 +261,7 @@ export function DiscussionListLoaderItem(props: IDiscussionListLoaderItem) {
                             <LoadingRectangle height={props.iconInMeta ? 32 : 16} />
                         </div>
                     </div>
-                    <DiscussionLoaderItemActions style={{ marginLeft: 16 }} />
+                    <DiscussionLoaderItemActions style={{ marginLeft: 16 }} icon={props.actionIcon} />
                 </div>
             )}
         </PageBox>
@@ -279,7 +287,12 @@ export function DiscussionListLoader(props: IDiscussionListLoader) {
                     }}
                 >
                     {items.map((key) => (
-                        <DiscussionListLoaderItem key={key} {...itemOptions} asTile={isMobileMedia} />
+                        <DiscussionListLoaderItem
+                            key={key}
+                            {...itemOptions}
+                            asTile={isMobileMedia}
+                            actionIcon={props.actionIcon}
+                        />
                     ))}
                 </List>
             </div>

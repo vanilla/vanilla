@@ -30,11 +30,13 @@ interface IProps {
     title: string;
     otherCTAs?: ICTALink[];
     imageUrl?: string;
-    description?: string;
+    description?: string | React.ReactNode;
     desktopOnly?: boolean;
     backgroundImage?: string;
     backgroundImageSrcSet?: ImageSourceSet;
     options?: DeepPartial<ICallToActionOptions>;
+    className?: string;
+    customCTA?: React.ReactNode;
 }
 
 export function CallToAction(props: IProps) {
@@ -84,7 +86,7 @@ export function CallToAction(props: IProps) {
     return (
         <Widget>
             {showContent && (
-                <div className={ctaClasses.root}>
+                <div className={cx(ctaClasses.root, props.className)}>
                     <div className={ctaClasses.container}>
                         {backgroundFromOption?.image && (
                             <img className={ctaClasses.image} {...backgroundImageProps} role="presentation" />
@@ -114,17 +116,23 @@ export function CallToAction(props: IProps) {
                             <Heading renderAsDepth={3} className={ctaClasses.title}>
                                 {t(props.title)}
                             </Heading>
-
-                            {props.description && <div className={ctaClasses.description}>{t(props.description)}</div>}
-                            {!multipleLinks && (
-                                <LinkAsButton
-                                    buttonType={options.linkButtonType}
-                                    to={props.to}
-                                    className={ctaClasses.button}
-                                >
-                                    {t(props.textCTA ?? "")}
-                                </LinkAsButton>
+                            {props.description && (
+                                <div className={ctaClasses.description}>
+                                    {typeof props.description === "string" ? t(props.description) : props.description}
+                                </div>
                             )}
+                            {!multipleLinks &&
+                                (props.customCTA ? (
+                                    props.customCTA
+                                ) : (
+                                    <LinkAsButton
+                                        buttonType={options.linkButtonType}
+                                        to={props.to}
+                                        className={ctaClasses.button}
+                                    >
+                                        {t(props.textCTA ?? "")}
+                                    </LinkAsButton>
+                                ))}
                             {multipleLinks && <div className={ctaClasses.linksWrapper}>{multipleLinks}</div>}
                         </div>
                     </div>

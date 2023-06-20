@@ -22,6 +22,7 @@ interface IProps extends IOptionalComponentID {
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
     label?: React.ReactNode;
     "aria-labelledby"?: string;
+    "aria-describedby"?: string;
     labelBold?: boolean;
     hideLabel?: boolean;
     isHorizontal?: boolean;
@@ -30,6 +31,8 @@ interface IProps extends IOptionalComponentID {
     tooltipLabel?: boolean;
     excludeFromICheck?: boolean;
     fullWidth?: boolean;
+    hugLeft?: boolean;
+    infoToolTip?: string;
 }
 
 export default function CheckBox(props: IProps) {
@@ -52,6 +55,7 @@ export default function CheckBox(props: IProps) {
         tooltipLabel,
         label,
         hideLabel,
+        infoToolTip,
     } = props;
 
     const icon = (
@@ -67,12 +71,20 @@ export default function CheckBox(props: IProps) {
     );
 
     return (
-        <label className={classNames(className, classes.root, { isHorizontal }, fullWidth && classes.fullWidth)}>
+        <label
+            className={classNames(
+                className,
+                classes.root,
+                { isHorizontal, hugLeft: props.hugLeft },
+                fullWidth && classes.fullWidth,
+            )}
+        >
             <input
                 className={classNames(classes.input, fakeFocus && "focus-visible", {
                     "exclude-icheck": excludeFromICheck,
                 })}
                 aria-labelledby={labelID}
+                aria-describedby={props["aria-describedby"]}
                 type="checkbox"
                 onChange={onChange}
                 checked={checked}
@@ -96,6 +108,14 @@ export default function CheckBox(props: IProps) {
                 <ToolTip label={disabledNote}>
                     <ToolTipIcon>
                         <InformationIcon informationMessage={disabledNote} />
+                    </ToolTipIcon>
+                </ToolTip>
+            )}
+
+            {infoToolTip && (
+                <ToolTip label={infoToolTip}>
+                    <ToolTipIcon>
+                        <InformationIcon className={classes.infoToolTip} informationMessage={infoToolTip} />
                     </ToolTipIcon>
                 </ToolTip>
             )}

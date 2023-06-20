@@ -8,6 +8,7 @@
 namespace Garden\Web;
 
 use Garden\EventManager;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\ResponseException;
 use Gdn;
 use Gdn_Locale;
@@ -20,9 +21,11 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
+use Vanilla\ReflectionHelper;
 
 /**
  * Dispatches requests and receives responses.
@@ -205,18 +208,22 @@ class Dispatcher implements LoggerAwareInterface
                 // Pass to the next route.
                 continue;
             } catch (\Throwable $dispatchEx) {
-                if ($dispatchEx->getCode() >= 400 && $dispatchEx->getCode() < 500) {
-                    $this->logger->error($dispatchEx->getMessage(), [
-                        "event" => "api_error",
-                        "exception" => $dispatchEx,
-                    ]);
+                // Expected Exception when user tries to access private community while not logged in.  No need to log it.
+                if (
+                    $dispatchEx instanceof ForbiddenException &&
+                    ($dispatchEx->getContext()["type"] ?? "") == "!private"
+                ) {
+                } elseif ($dispatchEx->getCode() >= 400 && $dispatchEx->getCode() < 500) {
+                    ErrorLogger::warning(
+                        $dispatchEx,
+                        ["api_error", "dispatcher-caught"],
+                        ["responseCode" => $dispatchEx->getCode()]
+                    );
                 } else {
                     ErrorLogger::error(
                         $dispatchEx,
                         ["api_error", "dispatcher-caught"],
-                        [
-                            "responseCode" => $dispatchEx->getCode(),
-                        ]
+                        ["responseCode" => $dispatchEx->getCode()]
                     );
                 }
                 $response = null;
@@ -531,15 +538,15 @@ class Dispatcher implements LoggerAwareInterface
             /* @var \ReflectionParameter $param */
             $lname = strtolower($param->getName());
 
-            if ($param->getClass() !== null) {
-                $className = $param->getClass()->getName();
+            if (ReflectionHelper::getClass($param) !== null) {
+                $className = ReflectionHelper::getClass($param)->getName();
 
                 if (isset($largs[$lname]) && is_a($largs[$lname], $className)) {
                     $value = $largs[$lname];
                 } elseif (isset($largs[$index]) && is_a($largs[$index], $className)) {
                     $value = $largs[$index];
                 } elseif ($container->has($className)) {
-                    $value = $container->get($param->getClass()->getName());
+                    $value = $container->get(ReflectionHelper::getClass($param)->getName());
                 } else {
                     $value = null;
                     $missing[$lname] = '$' . $param->getName();

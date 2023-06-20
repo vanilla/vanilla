@@ -8,7 +8,7 @@ import { cx } from "@emotion/css";
 import { listItemClasses } from "@library/lists/ListItem.styles";
 import { Metas } from "@library/metas/Metas";
 import SmartLink from "@library/routing/links/SmartLink";
-import React, { ReactElement, useContext, useRef } from "react";
+import React, { ElementType, ReactElement, useContext, useRef } from "react";
 import { useMeasure } from "@vanilla/react-utils";
 import { PageBox } from "@library/layout/PageBox";
 import {
@@ -47,7 +47,7 @@ export interface IListItemProps {
     image?: IImage;
     featuredImage?: IFeaturedImage;
     actions?: React.ReactNode;
-    as?: keyof JSX.IntrinsicElements;
+    as?: ElementType;
     headingDepth?: number;
     options?: Partial<IListItemComponentOptions>;
     checkbox?: React.ReactNode;

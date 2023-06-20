@@ -14,7 +14,7 @@ import { EditorInlineMenus } from "@rich-editor/editor/EditorInlineMenus";
 import { EditorParagraphMenu } from "@rich-editor/editor/EditorParagraphMenu";
 import { FormatConversionNotice } from "@rich-editor/editor/FormatConversionNotice";
 import EditorDescriptions from "@rich-editor/editor/pieces/EditorDescriptions";
-import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
+import { richEditorClasses } from "@library/editor/richEditorStyles";
 import classNames from "classnames";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { Provider } from "react-redux";

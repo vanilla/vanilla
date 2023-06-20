@@ -100,6 +100,17 @@ class APIExpandMiddleware
             return [];
         }
 
+        if (in_array(ModelUtils::EXPAND_ALL, $expand)) {
+            foreach ($this->expanders as $expander) {
+                $hasPermission =
+                    $expander->getPermission() == null ||
+                    $this->session->getPermissions()->hasRanked($expander->getPermission());
+                if ($hasPermission) {
+                    $result[$expander->getFullKey()] = array_flip($expander->getExpandFields());
+                }
+            }
+        }
+
         foreach ($expand as $expandField) {
             $wholeMatchingExpandSpec = $this->expanders[$expandField] ?? null;
             if ($wholeMatchingExpandSpec instanceof AbstractApiExpander) {

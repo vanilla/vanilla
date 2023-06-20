@@ -37,6 +37,10 @@ export const tableClasses = () => {
             color: vars.separator.fg,
             width: vars.separator.width,
         }),
+        "& svg": {
+            marginBottom: -8,
+            color: "#FBFCFF",
+        },
     });
 
     const leftAlignHead = css({
@@ -44,6 +48,22 @@ export const tableClasses = () => {
         textAlign: "left",
         "& span": {
             justifyContent: "left",
+        },
+    });
+
+    const isSortHead = css({
+        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+    });
+
+    const isSortedHead = css({
+        "& button": {
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars("medium", "semiBold"),
+                transform: "uppercase",
+            }),
+        },
+        "& svg": {
+            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
         },
     });
 
@@ -160,5 +180,7 @@ export const tableClasses = () => {
         leftAlign,
         scrollThumb,
         leftAlignHead,
+        isSortHead,
+        isSortedHead,
     };
 };

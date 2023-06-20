@@ -62,4 +62,58 @@ trait TwigRenderTrait
         $template = $this->twig->createTemplate($templateString);
         return $template->render($data);
     }
+
+    /**
+     * Render a twig template of a list of links.
+     *
+     * @param array<array{name: string, url: string}|\ArrayAccess> $links
+     *
+     * @return string
+     */
+    public function renderSeoLinkList($links): string
+    {
+        foreach ($links as &$link) {
+            // Normalize certain widget items.
+            $link["url"] = $link["url"] ?? $link["to"];
+            $link["name"] = $link["name"] ?? ($link["label"] ?? ($link["title"] ?? null));
+            $link["excerpt"] = $link["excerpt"] ?? ($link["description"] ?? null);
+        }
+        $tpl = <<<TWIG
+<ul class="linkList">
+{% for link in links %}
+{% if link.url|default(false) and link.name|default(false) %}
+<li>
+<a href="{{ link.url }}">{{- link.name -}}</a>
+{% if link.excerpt|default(false) %}
+<p>{{ link.excerpt }}</p>
+{% endif %}
+</li>
+{% endif %}
+{% endfor %}
+</ul>
+TWIG;
+
+        $result = $this->renderTwigFromString($tpl, ["links" => $links]);
+        return $result;
+    }
+
+    /**
+     * Render a user for SEO content.
+     *
+     * @param array|\ArrayAccess $user
+     *
+     * @return string
+     */
+    public function renderSeoUser($user): string
+    {
+        $tpl = <<<TWIG
+<a href="{{ user.url }}" class="seoUser">
+<img height="24px" width="24px" src="{{ user.photoUrl }}" alt="Photo of {{ user.name }}" />
+<span class="seoUserName">{{ user.name }}</span>
+</a>
+TWIG;
+
+        $result = $this->renderTwigFromString($tpl, ["user" => $user]);
+        return $result;
+    }
 }

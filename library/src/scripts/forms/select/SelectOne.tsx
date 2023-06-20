@@ -35,7 +35,7 @@ export interface ISelectOneProps extends IMenuPlacement {
     noteAfterInput?: string;
     errors?: IFieldError[];
     searchable?: boolean;
-    value: IComboBoxOption | undefined;
+    value: IComboBoxOption | null | undefined;
     noOptionsMessage?: (props: OptionProps<any>) => JSX.Element | null;
     isLoading?: boolean;
     inputClassName?: string;

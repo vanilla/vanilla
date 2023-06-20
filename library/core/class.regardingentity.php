@@ -419,7 +419,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable
                             "CategoryID" => $categoryID,
                             "Body" => $this->OriginalContent,
                             "InsertUserID" => val("InsertUserID", $this->SourceElement),
-                            "Announce" => 0,
+                            "Announce" => false,
                             "Close" => 0,
                             "RegardingID" => $regardingID,
                         ]);

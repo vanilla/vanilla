@@ -44,7 +44,7 @@ export function InstagramPlaceholder(props: IProps) {
                         width: "100%",
                     }}
                     target="_blank"
-                    rel="noopener noreferrer"
+                    rel="noopener"
                 >
                     <div style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
                         <div
@@ -254,7 +254,7 @@ export function InstagramPlaceholder(props: IProps) {
                             textDecoration: "none",
                         }}
                         target="_blank"
-                        rel="noopener noreferrer"
+                        rel="noopener"
                     >
                         An instagram post.
                     </a>

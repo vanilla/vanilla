@@ -29,6 +29,7 @@
 !/conf/constants.php
 !/conf/readme.txt
 /dist/*
+/docker/install.json
 /locales/*
 !/locales/.gitkeep
 /plugins/*

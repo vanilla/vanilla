@@ -1,0 +1,111 @@
+openapi: 3.0.2
+info:
+x-resourceEvents:
+    unsubscribe:
+        x-addon: "dashboard"
+        name: "Unsubscribe"
+        type: "unsubscribe"
+paths:
+    /unsubscribe/{token}:
+        x-hidden: true
+        post:
+            parameters:
+                - description: |
+                      Unsubscribe token.
+                  in: path
+                  name: token
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "201":
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/UnsubscribeSchema"
+                                type: array
+                    description: Success
+            tags:
+                - Unsubscribe
+            summary: List notifications for the current user.
+
+        patch:
+            summary: Mark preferences unsubscribe read.
+            tags:
+                - Unsubscribe
+            parameters:
+                - description: |
+                      Unsubscribe token.
+                  in: path
+                  name: token
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UnsubscribeSchema"
+                required: true
+            responses:
+                "204":
+                    description: Success
+    /unsubscribe/resubscribe/{token}:
+        x-hidden: true
+        post:
+            parameters:
+                - description: |
+                      Unsubscribe token.
+                  in: path
+                  name: token
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    $ref: "#/components/schemas/UnsubscribeSchema"
+                                type: array
+                    description: Success
+            tags:
+                - Unsubscribe
+            summary: List notifications for the current user.
+
+components:
+    schemas:
+        UnsubscribeSchema:
+            description: Unsubscribe patch schema.
+            type: object
+            properties:
+                preferences:
+                    description: "List of notification preferences that are disabled."
+                    type: array
+                    items:
+                        type: object
+                        properties:
+                            preference:
+                                description: The name of preference to unsubscribe.
+                                type: string
+                            enabled:
+                                description: If the preference should be unsubscribed/subscribed.
+                                type: string
+                followCategory:
+                    description: "List of category following"
+                    type: object
+                    properties:
+                        categoryID:
+                            type: integer
+                            description: Category ID with following
+                        preference:
+                            type: string
+                            description: Name of the preference for this notification
+                        name:
+                            type: string
+                            description: Name of the category
+                        enabled:
+                            type: string
+                            description: is the category follow enabled.

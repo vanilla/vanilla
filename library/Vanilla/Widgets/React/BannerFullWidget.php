@@ -93,6 +93,7 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
         return Schema::parse([
             "showTitle:b?" => [
                 "description" => "Whether or not the title should be displayed",
+                "default" => true,
             ],
             "title:s?" => [
                 "description" => "Banner title.",
@@ -198,6 +199,23 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
             : $this->props["description"];
 
         return $this->props;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $tpl = <<<TWIG
+{% if showTitle|default(false) and title|default(false) %}
+<h1>{{ title }}</h1>
+{% endif %}
+{% if showDescription|default(false) and description|default(false) %}
+<p>{{ description }}</p>
+{% endif %}
+TWIG;
+        $result = trim($this->renderTwigFromString($tpl, $props));
+        return $result;
     }
 
     /**

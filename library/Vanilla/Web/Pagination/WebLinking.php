@@ -48,6 +48,15 @@ class WebLinking
     }
 
     /**
+     * @param string $rel
+     * @return string|null
+     */
+    public function getLinkUrl(string $rel): ?string
+    {
+        return $this->links[$rel][0]["uri"] ?? null;
+    }
+
+    /**
      * Remove a link.
      *
      * @param string $rel Link relation. Either an IANA registered type, or an absolute URL.

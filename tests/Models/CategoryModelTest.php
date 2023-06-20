@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Models;
 
+use CategoriesApiController;
 use CategoryModel;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
@@ -742,6 +743,7 @@ class CategoryModelTest extends SiteTestCase
         $result = $categoryModel->getCategoriesDescendantIDs([$cat2, $cat1]);
         $this->assertEqualsCanonicalizing([$cat1, $cat2, $cat3], $result);
     }
+
     /**
      * Test that caching works for getDescandants.
      */
@@ -1253,6 +1255,32 @@ class CategoryModelTest extends SiteTestCase
     }
 
     /**
+     * Test `categoryModel->getVisibleCategories()`'s `filterNonDiscussionCategories` option.
+     *
+     * @return void
+     */
+    public function testVisibleCategoryfilterNonDiscussionCategories(): void
+    {
+        //create two categories
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        $newCategory = $this->createCategory();
+        $newCategoryID = $newCategory["categoryID"];
+
+        //Add Discussions to the first one
+        $discussions = [
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+            $this->createDiscussion(["categoryID" => $categoryID]),
+        ];
+        $filteredCategories = $this->categoryModel->getVisibleCategories(["filterNonDiscussionCategories" => true]);
+        $filteredCategoryIDs = array_column($filteredCategories, "CategoryID");
+        $this->assertContains($categoryID, $filteredCategoryIDs);
+        $this->assertNotContains($newCategoryID, $filteredCategoryIDs);
+    }
+
+    /**
      * Test that when a child category is deleted, the CountCategories field of its parent is updated.
      */
     public function testCountCategoriesUpdated(): void
@@ -1401,5 +1429,192 @@ class CategoryModelTest extends SiteTestCase
         $this->assertCount(3, $postableDiscussionTypes);
         $this->assertContains("poll", $postableDiscussionTypes);
         $this->assertContains("discussion", $postableDiscussionTypes);
+    }
+
+    /**
+     * Test the user followed Category counts
+     *
+     * @return void
+     */
+    public function testFollowedCount(): void
+    {
+        //create category
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        //create a user
+        $user = $this->createUser();
+        $userID = $user["userID"];
+
+        //make the user follow the category
+        $this->categoryModel->setPreferences($userID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => true,
+        ]);
+
+        $this->assertTrue($this->categoryModel->isFollowed($userID, $categoryID));
+
+        // test that the count is now 1 for the category
+
+        $this->assertEquals(1, $this->categoryModel->getTotalFollowedCount($categoryID));
+
+        $newUser = $this->createUser();
+        $newUserID = $newUser["userID"];
+
+        $this->categoryModel->setPreferences($newUserID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => true,
+        ]);
+
+        // make sure  the count is now 2
+        $this->assertEquals(2, $this->categoryModel->getTotalFollowedCount($categoryID));
+
+        //make the user update their preferences
+
+        $this->categoryModel->setPreferences($newUserID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_APP) => true,
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_COMMENT_APP) => true,
+        ]);
+
+        // the count should still be 2
+        $this->assertEquals(2, $this->categoryModel->getTotalFollowedCount($categoryID));
+
+        // make the user unfollow the category
+
+        $this->categoryModel->setPreferences($newUserID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => false,
+        ]);
+
+        // the count should drop back to 1
+        $this->assertEquals(1, $this->categoryModel->getTotalFollowedCount($categoryID));
+
+        //Test invalid category ID
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Category not found.");
+
+        $this->categoryModel->getTotalFollowedCount(999);
+    }
+
+    /**
+     * Test that a user has followed categories
+     *
+     * @return void
+     */
+    public function testHasFollowed(): void
+    {
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        $newUser = $this->createUser();
+        $newUserID = $newUser["userID"];
+
+        $this->assertFalse($this->categoryModel->hasFollowed($newUserID));
+
+        $this->categoryModel->setPreferences($newUserID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => true,
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_APP) => true,
+        ]);
+
+        $this->assertTrue($this->categoryModel->hasFollowed($newUserID));
+    }
+
+    /**
+     * Test for unfollowed Categories
+     *
+     * @return void
+     */
+    public function testUnfollowedData(): void
+    {
+        // create 3 categories
+        $categoryIds = [];
+
+        for ($i = 1; $i <= 3; $i++) {
+            $categoryIds[] = $this->createCategory()["categoryID"];
+        }
+
+        //make the current session user unfollow one of the category
+        $userID = $this->getSession()->UserID;
+        $this->categoryModel->setPreferences($userID, $categoryIds[0], [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => false,
+        ]);
+
+        //assert that unfollowed call returns the unfollowed category data
+        $unFollowedCategory = $this->categoryModel->getUnfollowedData($userID, $categoryIds[0]);
+        $this->assertCount(1, $unFollowedCategory);
+
+        $this->assertArrayHasKey($categoryIds[0], $unFollowedCategory);
+        // make the user unfollow the rest of the categories
+
+        for ($i = 1; $i < 3; $i++) {
+            $this->categoryModel->setPreferences($userID, $categoryIds[$i], [
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => false,
+            ]);
+        }
+
+        $unFollowedCategory = $this->categoryModel->getUnfollowedData($userID);
+        $this->assertCount(3, $unFollowedCategory);
+
+        //passing invalid userID returns empty array
+
+        $unFollowedCategory = $this->categoryModel->getUnfollowedData(999);
+        $this->assertEmpty($unFollowedCategory);
+    }
+
+    /**
+     * Test that user has any unfollowed categories
+     *
+     * @depends testUnfollowedData
+     * @return void
+     */
+    public function testHasUnfollowed(): void
+    {
+        $userID = $this->getSession()->UserID;
+        $this->assertTrue($this->categoryModel->hasUnfollowed($userID));
+        $this->assertFalse($this->categoryModel->hasUnfollowed(999));
+    }
+
+    /**
+     * Test for default category preference
+     *
+     * @return void
+     * @throws \JsonException
+     */
+    public function testDefaultCategoryFollowedAddsLogsOrThrowsErrors(): void
+    {
+        $user = $this->createUser(["name" => "newUser"]);
+        $category = $this->createCategory(["name" => "Followed Category"]);
+        $config = \Gdn::config();
+        $config->set("Preferences.CategoryFollowed.Defaults", "123");
+        $this->categoryModel->setDefaultCategoryPreferences($user["userID"]);
+        //Test Invalid format for configuration gets logged
+        $this->assertLog([
+            "level" => "notice",
+            "message" => "Invalid format received for the category default configuration.",
+            "event" => "configuration",
+        ]);
+
+        //create a permission category and verify that it's not getting assigned
+        $permissionCategory = $this->createPermissionedCategory(
+            ["parentCategoryID" => CategoryModel::ROOT_ID],
+            [\RoleModel::ADMIN_ID]
+        );
+
+        $this->api()->setUserID($user["userID"]);
+        $config->set(
+            "Preferences.CategoryFollowed.Defaults",
+            '[{"categoryID":' .
+                $category["categoryID"] .
+                ',"name":"' .
+                $category["name"] .
+                '","Preferences.Follow":true,"Preferences.Popup.Posts":true,"Preferences.Popup.Comments":true},
+                {"categoryID":' .
+                $permissionCategory["categoryID"] .
+                ',"name":"' .
+                $permissionCategory["name"] .
+                '","Preferences.Follow":true,"Preferences.Popup.Posts":true,"Preferences.Popup.Comments":true}
+                ]'
+        );
+
+        $this->categoryModel->setDefaultCategoryPreferences($user["userID"]);
+        $this->assertTrue($this->categoryModel->isFollowed($user["userID"], $category["categoryID"]));
+        $this->assertFalse($this->categoryModel->isFollowed($user["userID"], $permissionCategory["categoryID"]));
     }
 }

@@ -25,7 +25,7 @@ export function guessOperatingSystem(): OS {
     }
 
     // iOS detection from: http://stackoverflow.com/a/9039885/177710
-    if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+    if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {
         return OS.IOS;
     }
 

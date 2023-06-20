@@ -5,6 +5,7 @@
  */
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ForbiddenException;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Scheduler\LongRunner;
@@ -13,6 +14,7 @@ use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Schema\RangeExpression;
+use Vanilla\SchemaFactory;
 use Vanilla\Site\SiteSectionModel;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
@@ -21,6 +23,8 @@ use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\TreeBuilder;
+use Garden\Web\Pagination;
+use Vanilla\Community\Schemas\PostFragmentSchema;
 
 /**
  * API Controller for the `/categories` resource.
@@ -48,6 +52,16 @@ class CategoriesApiController extends AbstractApiController
     public const OUTPUT_FORMAT_TREE = "tree";
     public const OUTPUT_FORMAT_FLAT = "flat";
     public const OUTPUT_FORMATS = [self::OUTPUT_FORMAT_TREE, self::OUTPUT_FORMAT_FLAT];
+
+    public const OUTPUT_PREFERENCE_FOLLOW = "preferences.followed";
+
+    public const OUTPUT_PREFERENCE_DISCUSSION_APP = "preferences.popup.posts";
+
+    public const OUTPUT_PREFERENCE_DISCUSSION_EMAIL = "preferences.email.posts";
+
+    public const OUTPUT_PREFERENCE_COMMENT_APP = "preferences.popup.comments";
+
+    public const OUTPUT_PREFERENCE_COMMENT_EMAIL = "preferences.email.comments";
 
     /** @var string */
     const ERRORINDEXMSG = "The following fields: {page, limit, outputFormat=flat} is incompatible with {maxDepth, outputFormat=tree}";
@@ -96,11 +110,24 @@ class CategoriesApiController extends AbstractApiController
                 "iconUrl?",
                 "bannerUrl?",
                 "pointsCategoryID?",
+                "allowedDiscussionTypes:a?",
             ];
             $this->categoryPostSchema = $this->schema(
                 Schema::parse(array_merge($fields, $extra))->add($this->schemaWithParent()),
                 "CategoryPost"
             );
+            $this->categoryPostSchema->addValidator("allowedDiscussionTypes", function ($data, ValidationField $field) {
+                $allowedDiscussionTypes = array_keys(DiscussionModel::discussionTypes());
+                $result = array_diff($data, $allowedDiscussionTypes);
+
+                if (!empty($result) || empty($data)) {
+                    $validTypes = implode(", ", $allowedDiscussionTypes);
+                    $field->addError("Validation Failed", [
+                        "messageCode" => "allowedDiscussionTypes can only contain the following values: $validTypes",
+                        "code" => 403,
+                    ]);
+                }
+            });
         }
         return $this->schema($this->categoryPostSchema, $type);
     }
@@ -123,8 +150,8 @@ class CategoriesApiController extends AbstractApiController
      * Lookup a single category by its numeric ID or its URL code.
      *
      * @param int|string $id The category ID or URL code.
-     * @throws NotFoundException if the category cannot be found.
      * @return array
+     * @throws NotFoundException if the category cannot be found.
      */
     public function category($id)
     {
@@ -176,11 +203,19 @@ class CategoriesApiController extends AbstractApiController
         if (array_key_exists("newCategoryID", $query)) {
             $deleteOptions["newCategoryID"] = $query["newCategoryID"];
         }
-        $args = [$id, $deleteOptions];
 
-        $response = $this->runner->runApi(
-            new LongRunnerAction(CategoryModel::class, "deleteIDIterable", $args, $options)
+        // Create and dispatch a category deletion event.
+        $deleteEvent = new \Vanilla\Community\Events\CategoryDeleteEvent($id, array_merge($deleteOptions, $options));
+        $this->getEventManager()->dispatch($deleteEvent);
+
+        $longRunnerArgs = [$id, $deleteOptions];
+
+        $actions = array_merge(
+            [new LongRunnerAction(CategoryModel::class, "deleteIDIterable", $longRunnerArgs, $options)],
+            $deleteEvent->getActions() ?? [] // Merge in any additional longrunner actions.
         );
+
+        $response = $this->runner->runApi(new \Vanilla\Scheduler\LongRunnerMultiAction($actions, $options));
         if ($response->getStatus() === 200) {
             $response->setStatus(204);
         }
@@ -233,8 +268,8 @@ class CategoriesApiController extends AbstractApiController
      * Get a category for editing.
      *
      * @param int $id The ID of the category.
-     * @throws NotFoundException if unable to find the category.
      * @return array
+     * @throws NotFoundException if unable to find the category.
      */
     public function get_edit($id)
     {
@@ -278,12 +313,13 @@ class CategoriesApiController extends AbstractApiController
         }
         $this->permission($permission);
 
-        $out = $this->categoryModel->preferencesSchema();
+        $out = $this->getPreferencesApiSchema();
 
         $this->category($id);
 
         $preferences = $this->categoryModel->getPreferencesByCategoryID($userID, $id);
-        $result = $out->validate($preferences);
+        $normalizedPreferences = $this->normalizePreferencesOutput($preferences);
+        $result = $out->validate($normalizedPreferences);
 
         return new Data($result);
     }
@@ -374,6 +410,7 @@ class CategoriesApiController extends AbstractApiController
                 "parentCategoryID:i?",
                 "parentCategoryCode:s?",
                 "followed:b?",
+                "followedUserID:i?",
                 "maxDepth:i?" => [
                     "description" => "",
                 ],
@@ -384,11 +421,15 @@ class CategoriesApiController extends AbstractApiController
                     "minimum" => 1,
                     "maximum" => $this->categoryModel->getMaxPages(),
                 ],
+                "sort:s?" => [
+                    "enum" => ApiUtils::sortEnum("categoryID", "name", "dateFollowed"),
+                    "description" => "Sort the results by the specified field.",
+                ],
                 "limit:i?" => [
                     "minimum" => 1,
                     "maximum" => ApiUtils::getMaxLimit(),
                 ],
-                "expand?" => ApiUtils::getExpandDefinition([]),
+                "expand?" => ApiUtils::getExpandDefinition(["lastPost", "preferences"]),
                 "featured:b?",
                 "dirtyRecords:b?",
                 "outputFormat:s?" => [
@@ -408,6 +449,7 @@ class CategoriesApiController extends AbstractApiController
                 "",
                 \Vanilla\Utility\SchemaUtils::onlyOneOf(["categoryID", "parentCategoryID", "parentCategoryCode"])
             )
+            ->addValidator("", \Vanilla\Utility\SchemaUtils::onlyOneOf(["followed", "followedUserID"]))
             ->setDescription("List categories.");
     }
 
@@ -490,8 +532,8 @@ class CategoriesApiController extends AbstractApiController
         $format = $this->getIndexFormat($query, $parentCategory);
         $this->categoryModel->setJoinUserCategory(false);
 
-        $page = isset($query["page"]) ? $query["page"] : 1;
-        $limit = isset($query["limit"]) ? $query["limit"] : 30;
+        $page = $query["page"] ?? 1;
+        $limit = $query["limit"] ?? 30;
         [$offset, $limit] = offsetLimit("p{$page}", $limit);
         if ($format === self::OUTPUT_FORMAT_TREE) {
             $limit = "";
@@ -529,8 +571,20 @@ class CategoriesApiController extends AbstractApiController
         }
 
         // Apply "followed" filtering.
-        if ($query["followed"] ?? false) {
-            $followedRecords = $this->categoryModel->getFollowed($this->getSession()->UserID);
+        if (($query["followed"] ?? false) || ($query["followedUserID"] ?? false)) {
+            if (!empty($query["followedUserID"])) {
+                if ($query["followedUserID"] != $this->getSession()->UserID) {
+                    $row = Gdn::userModel()->getID($query["followedUserID"], DATASET_TYPE_ARRAY);
+                    if (!$row || $row["Deleted"] > 0) {
+                        throw new NotFoundException("User");
+                    }
+                    $this->permission(["Garden.Users.Edit", "Moderation.Profiles.Edit"]);
+                }
+            }
+            $followed = 1;
+            $followedUserID = !empty($query["followedUserID"]) ? $query["followedUserID"] : $this->getSession()->UserID;
+            $where["userID"] = $followedUserID;
+            $followedRecords = $this->categoryModel->getFollowed($followedUserID);
             $followedIDs = array_column($followedRecords, "CategoryID");
             $categoryIDs = $categoryIDs->withFilteredValue("=", $followedIDs);
         }
@@ -543,13 +597,25 @@ class CategoriesApiController extends AbstractApiController
 
         $where["CategoryID"] = $categoryIDs;
 
-        [$categories, $totalCountCallBack] = $this->getCategoriesWhere($where, $limit, $offset, $sort, $filter);
-
-        // Filter tree by the category "archived" fields.
-        if (!isset($query["followed"]) && $query["archived"] !== null) {
-            $categories = $this->archiveFilter($categories, $query["archived"] ? 0 : 1);
+        [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection($query["sort"] ?? "");
+        if (!empty($orderField)) {
+            $sort = empty($sort) ? $orderField : $orderField . "," . $sort;
         }
 
+        [$categories, $totalCountCallBack] = $this->getCategoriesWhere(
+            $where,
+            $limit,
+            $offset,
+            $sort,
+            $orderDirection,
+            $filter
+        );
+
+        // Filter tree by the category "archived" fields.
+        if (!isset($followed) && $query["archived"] !== null) {
+            $categories = $this->archiveFilter($categories, $query["archived"] ? 0 : 1);
+        }
+        $this->joinCategoryExpandFields($categories, (array) $expand, $followedUserID ?? null);
         foreach ($categories as &$category) {
             $category = $this->normalizeOutput($category, $expand);
         }
@@ -571,7 +637,38 @@ class CategoriesApiController extends AbstractApiController
             $paging = [];
         }
 
-        return new Data($categories, ["paging" => $paging]);
+        return new Data($categories, Pagination::tryCursorPagination($paging, $query, $categories, "categoryID"));
+    }
+
+    /**
+     * Expand on Category
+     *
+     * @param array $rows
+     * @param array $expand
+     * @return void
+     */
+    private function joinCategoryExpandFields(array &$rows, array $expand, ?int $userID = null): void
+    {
+        if (ModelUtils::isExpandOption("lastPost", $expand)) {
+            CategoryModel::joinRecentPosts($rows, null);
+            // Expand associated rows.
+            $userModel = Gdn::getContainer()->get(UserModel::class);
+            $userModel->expandUsers($rows, ["LastUserID"]);
+        }
+        if (ModelUtils::isExpandOption("preferences", $expand)) {
+            //need to allow querying another USer
+            $userID = $userID ?: $this->getSession()->UserID;
+            $userPreferences = $this->categoryModel->getPreferences($userID);
+            foreach ($rows as $key => $row) {
+                if (empty($userPreferences[$row["CategoryID"]])) {
+                    continue;
+                } else {
+                    $rows[$key]["preferences"] = $this->normalizePreferencesOutput(
+                        $userPreferences[$row["CategoryID"]]["preferences"]
+                    );
+                }
+            }
+        }
     }
 
     /**
@@ -591,13 +688,37 @@ class CategoriesApiController extends AbstractApiController
 
         $out = $this->schema([
             ":a" => [
-                "items" => $this->categoryModel->fragmentWithPreferencesSchema(),
+                "items" => $this->fragmentWithPreferencesSchema(),
             ],
         ]);
 
         $preferences = $this->categoryModel->getPreferences($userID);
-        $result = $out->validate(array_values($preferences));
+
+        $normalizedPreferences = [];
+        foreach ($preferences as $key => $preferenceSet) {
+            $preferenceSet["preferences"] = $this->normalizePreferencesOutput($preferenceSet["preferences"]);
+            $normalizedPreferences[$key] = $preferenceSet;
+        }
+        $result = $out->validate(array_values($normalizedPreferences));
         return new Data($result);
+    }
+
+    /**
+     * Get a category fragment schema with the addition of a user preferences field.
+     *
+     * @return Schema
+     */
+    public function fragmentWithPreferencesSchema(): Schema
+    {
+        $fragmentSchema = $this->categoryModel->fragmentSchema();
+        $preferencesSchema = SchemaFactory::parse(
+            [
+                "preferences" => $this->getPreferencesApiSchema(),
+            ],
+            "CategoryFragmentPreferences"
+        );
+        $result = $fragmentSchema->merge($preferencesSchema);
+        return $result;
     }
 
     /**
@@ -630,8 +751,8 @@ class CategoriesApiController extends AbstractApiController
      *
      * @param int $id The ID of the category.
      * @param array $body The request body.
-     * @throws NotFoundException if unable to find the category.
      * @return array
+     * @throws NotFoundException if unable to find the category.
      */
     public function patch($id, array $body)
     {
@@ -645,7 +766,6 @@ class CategoriesApiController extends AbstractApiController
         $out = $this->schemaWithParent(false, "out");
 
         $body = $in->validate($body, true);
-        // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->category($id);
 
         if (array_key_exists("parentCategoryID", $body)) {
@@ -653,17 +773,9 @@ class CategoriesApiController extends AbstractApiController
             unset($body["parentCategoryID"]);
         }
 
-        if (!empty($body)) {
-            if (array_key_exists("customPermissions", $body)) {
-                $this->categoryModel->save([
-                    "CategoryID" => $id,
-                    "CustomPermissions" => $body["customPermissions"],
-                ]);
-                unset($body["customPermissions"]);
-            }
-            $categoryData = $this->normalizeInput($body);
-            $this->categoryModel->setField($id, $categoryData);
-        }
+        $categoryData = $this->normalizeInput($body);
+        $categoryData["CategoryID"] = $body["CategoryID"] ?? (int) $id;
+        $this->categoryModel->save($categoryData);
 
         $row = $this->category($id);
         $row = $this->normalizeOutput($row);
@@ -695,21 +807,18 @@ class CategoriesApiController extends AbstractApiController
         }
         $this->permission($permission);
 
-        $in = $this->schema([
-            CategoryModel::PREFERENCE_KEY_NOTIFICATION,
-            CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS,
-        ])->add($this->categoryModel->preferencesSchema());
-        $out = $this->categoryModel->preferencesSchema();
+        $apiSchema = $this->getPreferencesApiSchema();
 
         $this->category($id);
 
-        $body = $in->validate($body, true);
+        $body = $apiSchema->validate($body, true);
 
         // Make sure the user whose preferences are being changed has the Email.View permission if opting for email
         // notifications. Throw an error if they don't.
         if (
-            isset($body[CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS]) &&
-            $body[CategoryModel::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS]
+            (isset($body[self::OUTPUT_PREFERENCE_DISCUSSION_EMAIL]) ||
+                isset($body[self::OUTPUT_PREFERENCE_COMMENT_EMAIL])) &&
+            ($body[self::OUTPUT_PREFERENCE_DISCUSSION_EMAIL] ?? ($body[self::OUTPUT_PREFERENCE_COMMENT_EMAIL] ?? false))
         ) {
             $hasEmailViewPerm = $isSelfService
                 ? $this->getPermissions()->has("Garden.Email.View")
@@ -722,10 +831,14 @@ class CategoriesApiController extends AbstractApiController
             }
         }
 
-        $this->categoryModel->setPreferences($userID, $id, $body);
+        $normalizedBody = $this->normalizePreferencesInput($body);
+
+        $this->categoryModel->setPreferences($userID, $id, $normalizedBody);
 
         $preferences = $this->categoryModel->getPreferencesByCategoryID($userID, $id);
-        $result = $out->validate($preferences);
+
+        $normalizedOutput = $this->normalizePreferencesOutput($preferences);
+        $result = $apiSchema->validate($normalizedOutput);
         return new Data($result);
     }
 
@@ -733,8 +846,8 @@ class CategoriesApiController extends AbstractApiController
      * Add a category.
      *
      * @param array $body The request body.
-     * @throws ServerException if the category could not be created.
      * @return array
+     * @throws ServerException if the category could not be created.
      */
     public function post(array $body)
     {
@@ -839,12 +952,12 @@ class CategoriesApiController extends AbstractApiController
      * @param int $categoryID The ID of the category.
      * @param int $parentCategoryID The new parent category ID.
      * @param bool $rebuildTree Should the tree be rebuilt after moving?
-     * @throws NotFoundException if unable to find the category.
+     * @return array The updated category row.
      * @throws ClientException if the parent and category are the same.
      * @throws ClientException if the parent category ID is invalid.
      * @throws ClientException if the target parent category does not exist.
      * @throws ClientException if trying to move a category under one of its own children.
-     * @return array The updated category row.
+     * @throws NotFoundException if unable to find the category.
      */
     private function updateParent($categoryID, $parentCategoryID)
     {
@@ -896,7 +1009,9 @@ class CategoriesApiController extends AbstractApiController
             Schema::parse([
                 "depth:i",
                 "children:a?" => $childSchema->merge(Schema::parse(["depth:i", "children:a", "sort:i"])),
-                "sort:i",
+                "sort:i?",
+                "lastPost?" => \Vanilla\SchemaFactory::get(PostFragmentSchema::class, "PostFragment"),
+                "preferences?" => $this->getPreferencesApiSchema(),
             ])
         );
         return $schema;
@@ -916,9 +1031,77 @@ class CategoriesApiController extends AbstractApiController
                 $this->fullSchema()
             );
         }
-        $schema = $this->fullSchema();
+        $schema = $this->categorySchema();
         $result = $schema->merge(Schema::parse($attributes));
         return $this->schema($result, $type);
+    }
+
+    /**
+     * Get the api schema for category notification preferences.
+     *
+     * @return Schema
+     */
+    public static function getPreferencesApiSchema(): Schema
+    {
+        return Schema::parse([
+            self::OUTPUT_PREFERENCE_FOLLOW . ":b",
+            self::OUTPUT_PREFERENCE_DISCUSSION_APP . ":b",
+            self::OUTPUT_PREFERENCE_DISCUSSION_EMAIL . ":b",
+            self::OUTPUT_PREFERENCE_COMMENT_APP . ":b",
+            self::OUTPUT_PREFERENCE_COMMENT_EMAIL . ":b",
+        ]);
+    }
+
+    /**
+     * Get a map of the category preferences with the api fields as keys and the corresponding db fields as values.
+     *
+     * @return string[]
+     */
+    public static function getPreferencesMap(): array
+    {
+        $map = [
+            self::OUTPUT_PREFERENCE_FOLLOW => "Preferences.Follow",
+            self::OUTPUT_PREFERENCE_DISCUSSION_APP => "Preferences.Popup.NewDiscussion",
+            self::OUTPUT_PREFERENCE_DISCUSSION_EMAIL => "Preferences.Email.NewDiscussion",
+            self::OUTPUT_PREFERENCE_COMMENT_APP => "Preferences.Popup.NewComment",
+            self::OUTPUT_PREFERENCE_COMMENT_EMAIL => "Preferences.Email.NewComment",
+        ];
+
+        return $map;
+    }
+
+    /**
+     * Convert preference field names and values for db input.
+     *
+     * @param array $preferencesToInput
+     * @return array
+     */
+    public static function normalizePreferencesInput(array $preferencesToInput): array
+    {
+        $preferencesMap = self::getPreferencesMap();
+        $input = [];
+        foreach ($preferencesToInput as $apiName => $value) {
+            $input[$preferencesMap[$apiName]] = (bool) $value;
+        }
+
+        return $input;
+    }
+
+    /**
+     * Convert preference field names and values for api output.
+     *
+     * @param array $preferencesToOutput
+     * @return array
+     */
+    public static function normalizePreferencesOutput(array $preferencesToOutput): array
+    {
+        $preferencesMap = array_flip(self::getPreferencesMap());
+        $output = [];
+        foreach ($preferencesMap as $dbName => $apiName) {
+            $output[$apiName] = $preferencesToOutput[$dbName] ?? false;
+        }
+
+        return $output;
     }
 
     /**
@@ -931,15 +1114,34 @@ class CategoriesApiController extends AbstractApiController
      * @param bool $filter Apply permission based filter
      * @return array
      */
-    private function getCategoriesWhere(array $where, $limit, $offset, $order = "", bool $filter = true): array
-    {
+    private function getCategoriesWhere(
+        array $where,
+        $limit,
+        $offset,
+        $order = "",
+        $orderDirection = "",
+        bool $filter = true
+    ): array {
         $dirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
+        $userID = null;
+        if ($order == "dateFollowed") {
+            $sort = $order;
+            $order = "";
+        }
+        if (isset($where["userID"])) {
+            $userID = $where["userID"];
+            unset($where["userID"]);
+        }
         if ($dirtyRecords) {
             $this->categoryModel->applyDirtyWheres();
             unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
-            $categories = $this->categoryModel->getWhere($where, $order, "", $limit, $offset)->resultArray();
+            $categories = $this->categoryModel
+                ->getWhere($where, $order, $orderDirection, $limit, $offset)
+                ->resultArray();
         } else {
-            $categories = $this->categoryModel->getWhere($where, $order, "", $limit, $offset)->resultArray();
+            $categories = $this->categoryModel
+                ->getWhere($where, $order, $orderDirection, $limit, $offset)
+                ->resultArray();
         }
 
         // Index by ID for category calculation functions.
@@ -947,7 +1149,20 @@ class CategoriesApiController extends AbstractApiController
         // Drop off the root category.
         unset($categories[-1]);
 
-        categoryModel::joinUserData($categories);
+        categoryModel::joinUserData($categories, true, $userID);
+
+        if (isset($sort) && $sort == "dateFollowed" && count($categories) > 1) {
+            $compare = function ($compare1, $compare2) use ($orderDirection) {
+                $field = "DateFollowed";
+                $element1 = $orderDirection == "asc" ? $compare1[$field] : $compare2[$field];
+                $element2 = $orderDirection == "asc" ? $compare2[$field] : $compare1[$field];
+                $element1 = strtotime($element1);
+                $element2 = strtotime($element2);
+                return $element1 <=> $element2;
+            };
+            usort($categories, $compare);
+        }
+
         categoryModel::calculateData($categories);
 
         // Reset indexes for proper output detection as an indexed array.

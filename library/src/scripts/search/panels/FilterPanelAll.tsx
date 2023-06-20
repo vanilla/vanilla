@@ -5,7 +5,6 @@
 
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import MultiUserInput from "@library/features/users/MultiUserInput";
-import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import LazyDateRange from "@library/forms/LazyDateRange";
@@ -22,7 +21,6 @@ interface IProps {}
 export function FilterPanelAll(props: IProps) {
     const { form, updateForm, search } = useSearchForm();
     const classesInputBlock = inputBlockClasses();
-    const classesDateRange = dateRangeClasses();
     return (
         <FilterFrame title={t("Filter Results")} handleSubmit={search}>
             <InputTextBlock
@@ -43,6 +41,7 @@ export function FilterPanelAll(props: IProps) {
                 value={form.authors ?? []}
             />
             <LazyDateRange
+                label={t("Date Updated")}
                 onStartChange={(date: string) => {
                     updateForm({ startDate: date });
                 }}
@@ -51,7 +50,6 @@ export function FilterPanelAll(props: IProps) {
                 }}
                 start={form.startDate}
                 end={form.endDate}
-                className={classesDateRange.root}
             />
         </FilterFrame>
     );

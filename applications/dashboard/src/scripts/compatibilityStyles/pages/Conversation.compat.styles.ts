@@ -17,6 +17,9 @@ export const conversationCompatCSS = () => {
 
     injectGlobal({
         ".Section-Conversation .Panel": {
+            "& .pageBox > .Button:first-child": {
+                marginRight: 8,
+            },
             "& .Button + .Button": {
                 // fix excesive margins on the New message + Leave conversation buttons.
                 marginTop: 0,

@@ -2,7 +2,7 @@
 /**
  * Category model
  *
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Vanilla
  * @since 2.0
@@ -11,6 +11,7 @@
 use Garden\EventManager;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Dashboard\Models\AggregateCountableInterface;
@@ -42,6 +43,7 @@ use Garden\Events\EventFromRowInterface;
 use Vanilla\Contracts\Models\CrawlableInterface;
 use Garden\Events\ResourceEvent;
 use Vanilla\Community\Events\CategoryEvent;
+use Vanilla\Community\Events\SubscriptionEvent;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\BannerImageModel;
@@ -72,29 +74,22 @@ class CategoryModel extends Gdn_Model implements
 
     private const ADJUST_COUNT_INCREMENT = "increment";
 
-    /** Category preference key for communicating a user's post notification preferences. */
-    public const PREFERENCE_KEY_NOTIFICATION = "postNotifications";
-
-    /** Category preference key for whether a user's notifications should also be emailed. */
-    public const PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS = "useEmailNotifications";
+    /** @var string UserMeta key for determining whether a user is following a category */
+    public const PREFERENCE_FOLLOW = "Preferences.Follow.%d";
 
     /** UserMeta key for determining whether a user should receive in-app discussion notifications for a category. */
-    private const PREFERENCE_DISCUSSION_APP = "Preferences.Popup.NewDiscussion.%d";
+    public const PREFERENCE_DISCUSSION_APP = "Preferences.Popup.NewDiscussion.%d";
 
     /** UserMeta key for determining whether a user should receive email discussion notifications for a category. */
-    private const PREFERENCE_DISCUSSION_EMAIL = "Preferences.Email.NewDiscussion.%d";
+    public const PREFERENCE_DISCUSSION_EMAIL = "Preferences.Email.NewDiscussion.%d";
 
     /** UserMeta key for determining whether a user should receive in-app comment notifications for a category. */
-    private const PREFERENCE_COMMENT_APP = "Preferences.Popup.NewComment.%d";
+    public const PREFERENCE_COMMENT_APP = "Preferences.Popup.NewComment.%d";
 
     /** UserMeta key for determining whether a user should receive in-app comment notifications for a category. */
-    private const PREFERENCE_COMMENT_EMAIL = "Preferences.Email.NewComment.%d";
+    public const PREFERENCE_COMMENT_EMAIL = "Preferences.Email.NewComment.%d";
 
-    public const NOTIFICATION_ALL = "all";
-
-    public const NOTIFICATION_DISCUSSIONS = "discussions";
-
-    public const NOTIFICATION_FOLLOW = "follow";
+    public const DEFAULT_PREFERENCE_DATE_FOLLOWED = "2023-04-18 23:59:59";
 
     /** Cache key. */
     const CACHE_KEY = "Categories";
@@ -107,6 +102,8 @@ class CategoryModel extends Gdn_Model implements
 
     /** Cache key. */
     const MASTER_VOTE_KEY = "Categories.Rebuild.Vote";
+
+    const DEFAULT_FOLLOWED_CATEGORIES_KEY = "Preferences.CategoryFollowed.Defaults";
 
     /** The default maximum number of categories a user can follow. */
     const MAX_FOLLOWED_CATEGORIES_DEFAULT = 100;
@@ -402,7 +399,7 @@ class CategoryModel extends Gdn_Model implements
         $allowedDiscussionTypes = self::getAllowedDiscussionData($row);
         $allowedDiscussionTypes = array_keys($allowedDiscussionTypes);
 
-        $discussionTypes = array_intersect($allowedDiscussionTypes, $categoryAllowedDiscussionTypes);
+        $discussionTypes = array_intersect($categoryAllowedDiscussionTypes, $allowedDiscussionTypes);
 
         return $discussionTypes ?? [];
     }
@@ -530,11 +527,12 @@ class CategoryModel extends Gdn_Model implements
     /**
      * Get searchable category IDs.
      *
-     * @param int $categoryID The root category ID.
+     * @param int|null $categoryID The root category ID.
      * @param bool|null $followedCategories If set, include or exclude followed categories.
      * @param bool|null $includeChildCategories Get child category IDs as well.
      * @param bool|null $includeArchivedCategories If set include archived categories.
-     *
+     * @param array|null $categoryIDs
+     * @param string|null $categorySearch
      * @return int[] CategoryIDs.
      */
     public function getSearchCategoryIDs(
@@ -569,7 +567,7 @@ class CategoryModel extends Gdn_Model implements
             $resultIDs = array_intersect($selectedCategoryIDs, $resultIDs);
         } elseif (!empty($categoryIDs)) {
             if ($includeChildCategories) {
-                $categoryIDs = $this->getCategoriesDescendantIDs($categoryIDs);
+                $categoryIDs = array_unique(array_merge($this->getCategoriesDescendantIDs($categoryIDs), $categoryIDs));
             }
             $resultIDs = array_intersect($categoryIDs, $resultIDs);
         }
@@ -704,6 +702,24 @@ class CategoryModel extends Gdn_Model implements
     }
 
     /**
+     * Get category preference keys without the placeholders for the categoryID.
+     *
+     * @return array
+     */
+    public static function getGenericCategoryPreferenceKeys(): array
+    {
+        $preferences = [
+            self::stripCategoryPreferenceKey(self::PREFERENCE_FOLLOW),
+            self::stripCategoryPreferenceKey(self::PREFERENCE_DISCUSSION_APP),
+            self::stripCategoryPreferenceKey(self::PREFERENCE_DISCUSSION_EMAIL),
+            self::stripCategoryPreferenceKey(self::PREFERENCE_COMMENT_APP),
+            self::stripCategoryPreferenceKey(self::PREFERENCE_COMMENT_EMAIL),
+        ];
+
+        return $preferences;
+    }
+
+    /**
      * Set whether a user is following a category.
      *
      * @param int $userID The target user's ID.
@@ -744,12 +760,9 @@ class CategoryModel extends Gdn_Model implements
                 throw new ClientException(t("Already following the maximum number of categories."));
             }
         }
+        $fields = $this->getInsertUpdateCategoryPreferenceFields($userID, $categoryID, $followed);
 
-        $this->SQL->replace(
-            "UserCategory",
-            ["Followed" => $followed],
-            ["UserID" => $userID, "CategoryID" => $categoryID]
-        );
+        $this->SQL->replace("UserCategory", $fields, ["UserID" => $userID, "CategoryID" => $categoryID]);
         static::clearUserCache();
         Gdn::cache()->remove("Follow_{$userID}");
 
@@ -757,6 +770,20 @@ class CategoryModel extends Gdn_Model implements
         return $result;
     }
 
+    /**
+     * Get insert update fields for category following
+     *
+     * @param int $userID
+     * @param int $categoryID
+     * @param int $followed
+     * @return int[]
+     */
+    private function getInsertUpdateCategoryPreferenceFields(int $userID, int $categoryID, int $followed): array
+    {
+        $fields = ["Followed" => $followed, "Unfollow" => $followed ? 0 : 1];
+        $fields[$followed ? "DateFollowed" : "DateUnfollowed"] = DateTimeFormatter::getCurrentDateTime();
+        return $fields;
+    }
     /**
      * Get the enabled status of category following, returned as a boolean value.
      *
@@ -791,6 +818,33 @@ class CategoryModel extends Gdn_Model implements
         $result = array_key_exists($categoryID, $followed);
 
         return $result;
+    }
+
+    /**
+     * Check if the user has any followed categories
+     *
+     * @param int $userID
+     * @return bool
+     */
+    public function hasFollowed(int $userID): bool
+    {
+        $followed = $this->getFollowed($userID);
+        return (bool) count($followed);
+    }
+
+    /**
+     * Check if the user has any un-followed categories
+     *
+     * @param int $userID
+     * @return bool
+     */
+    public function hasUnfollowed(int $userID): bool
+    {
+        $where = [
+            "UserID" => $userID,
+            "Unfollow" => 1,
+        ];
+        return (bool) $this->SQL->getCount("UserCategory", $where);
     }
 
     /**
@@ -837,6 +891,7 @@ class CategoryModel extends Gdn_Model implements
      *   - filterHideDiscussions (bool): Filter out categories with a truthy HideAllDiscussions column?
      *   - filterArchivedCategories (bool): Filter out categories that are archived.
      *   - forceArrayReturn (bool): Force an array return value.
+     *   - filterNonDiscussionCategories (bool) : Filter out categories with no discussion in them
      * @return array|bool An array of filtered categories or true if no categories were filtered.
      */
     public function getVisibleCategories(array $options = [])
@@ -861,6 +916,7 @@ class CategoryModel extends Gdn_Model implements
         $filterHideDiscussions = $options["filterHideDiscussions"] ?? false;
         $filterArchivedCategories = $options["filterArchivedCategories"] ?? false;
         $filterNonPostableCategories = $options["filterNonPostableCategories"] ?? false;
+        $filterNonDiscussionCategories = $options["filterNonDiscussionCategories"] ?? false;
 
         foreach ($categories as $categoryID => $category) {
             if ($filterHideDiscussions && ($category["HideAllDiscussions"] ?? false)) {
@@ -869,6 +925,11 @@ class CategoryModel extends Gdn_Model implements
             }
 
             if ($filterArchivedCategories && ($category["Archived"] ?? false)) {
+                $unfiltered = false;
+                continue;
+            }
+
+            if ($filterNonDiscussionCategories && $category["CountDiscussions"] == 0) {
                 $unfiltered = false;
                 continue;
             }
@@ -1477,6 +1538,7 @@ class CategoryModel extends Gdn_Model implements
                         ? $this->getCategoryAllowedDiscussionTypes($category)
                         : ["Discussion"];
                     $discussionTypes = array_map("lcfirst", $discussionTypes);
+                    $discussionTypes = array_values($discussionTypes);
                     $category["AllowedDiscussionTypes"] = $discussionTypes;
                     setValue($field, $row, $category);
                 }
@@ -2513,14 +2575,15 @@ class CategoryModel extends Gdn_Model implements
      *
      * @param array $categories
      * @param bool $addUserCategory
+     * @param int | null $userID
      */
-    public static function joinUserData(&$categories, $addUserCategory = true)
+    public static function joinUserData(array &$categories, bool $addUserCategory = true, ?int $userID = null)
     {
         $iDs = array_column($categories, "CategoryID", "CategoryID");
         $categories = array_combine($iDs, $categories);
 
         if ($addUserCategory) {
-            $userData = self::instance()->getUserCategories();
+            $userData = self::instance()->getUserCategories($userID);
 
             foreach ($iDs as $iD) {
                 $category = $categories[$iD];
@@ -2549,6 +2612,8 @@ class CategoryModel extends Gdn_Model implements
                 $categories[$iD]["Following"] = $following;
 
                 $categories[$iD]["Followed"] = boolval($row["Followed"] ?? false);
+
+                $categories[$iD]["DateFollowed"] = $row["DateFollowed"] ?? null;
 
                 // Calculate the read field.
                 if ($category["DisplayAs"] == self::DISPLAY_HEADING) {
@@ -2627,6 +2692,33 @@ class CategoryModel extends Gdn_Model implements
 
         if ($dbRecord["ParentCategoryID"] <= 0) {
             $dbRecord["ParentCategoryID"] = null;
+        }
+
+        if (ModelUtils::isExpandOption("lastPost", $expand) && !empty($dbRecord["LastDiscussionID"])) {
+            $recentPost = [];
+            $valid = true;
+            $mappings = [
+                "discussionID" => "LastDiscussionID",
+                "commentID" => "LastCommentID",
+                "name" => "LastTitle",
+                "url" => "LastUrl",
+                "dateInserted" => "LastDateInserted",
+                "insertUserID" => "LastUserID",
+            ];
+            foreach ($mappings as $key => $mapping) {
+                if (empty($dbRecord[$mapping]) && $mapping != "LastCommentID") {
+                    $valid = false;
+                    break;
+                }
+                $recentPost[$key] = $dbRecord[$mapping];
+            }
+            if ($valid) {
+                $dbRecord["lastPost"] = $recentPost;
+                if (!empty($dbRecord["LastUser"])) {
+                    $dbRecord["lastPost"]["insertUser"] = $dbRecord["LastUser"];
+                    unset($dbRecord["LastUser"]);
+                }
+            }
         }
 
         $dbRecord["Name"] = empty($dbRecord["Name"]) ? t("Untitled") : $dbRecord["Name"];
@@ -2719,7 +2811,7 @@ class CategoryModel extends Gdn_Model implements
                 yield;
             }
         }
-        $this->prepareForDelete($categoryID);
+        $this->prepareForDelete($categoryID, false);
         $this->deleteInternal($categoryID, true);
         return LongRunner::FINISHED;
     }
@@ -3210,7 +3302,6 @@ class CategoryModel extends Gdn_Model implements
             }
             unset($where["Followed"]);
         }
-
         $result = parent::getWhere($where, $orderFields, $orderDirection, $limit, $offset);
         return $result;
     }
@@ -4641,47 +4732,6 @@ class CategoryModel extends Gdn_Model implements
     }
 
     /**
-     * Compile legacy notification settings from UserMeta and UserCategory into newer notification flags.
-     *
-     * @param int $categoryID
-     * @param array $userMeta
-     * @param array $userCategory
-     * @return array{postNotifications: string, useEmailNotifications: bool}
-     */
-    private function notificationFromLegacy(int $categoryID, array $userMeta, array $userCategory): array
-    {
-        $following = $userCategory[$categoryID]["Followed"] ?? false;
-
-        $discussionAppKey = sprintf(self::PREFERENCE_DISCUSSION_APP, $categoryID);
-        $discussionApp = $userMeta[$discussionAppKey]["Value"] ?? false;
-        $discussionEmailKey = sprintf(self::PREFERENCE_DISCUSSION_EMAIL, $categoryID);
-        $discussionEmail = $userMeta[$discussionEmailKey]["Value"] ?? false;
-        $discussions = $discussionEmail || $discussionApp;
-
-        $commentAppKey = sprintf(self::PREFERENCE_COMMENT_APP, $categoryID);
-        $commentApp = $userMeta[$commentAppKey]["Value"] ?? false;
-        $commentEmailKey = sprintf(self::PREFERENCE_COMMENT_EMAIL, $categoryID);
-        $commentEmail = $userMeta[$commentEmailKey]["Value"] ?? false;
-        $comments = $commentEmail || $commentApp;
-
-        if ($comments) {
-            $postNotifications = self::NOTIFICATION_ALL;
-        } elseif ($discussions) {
-            $postNotifications = self::NOTIFICATION_DISCUSSIONS;
-        } elseif ($following) {
-            $postNotifications = self::NOTIFICATION_FOLLOW;
-        } else {
-            $postNotifications = null;
-        }
-
-        $useEmailNotifications = $discussionEmail || $commentEmail;
-        return [
-            self::PREFERENCE_KEY_NOTIFICATION => $postNotifications,
-            self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => $useEmailNotifications,
-        ];
-    }
-
-    /**
      * Get all of a user's category preferences.
      *
      * @param int $userID
@@ -4711,12 +4761,6 @@ class CategoryModel extends Gdn_Model implements
 
             $preferences = $this->generatePreferences($id, $userMeta, $userCategory);
 
-            // Currently only tracking notification preferences. If there's nothing to add, skip the row.
-            $postNotifications = $preferences[self::PREFERENCE_KEY_NOTIFICATION] ?? null;
-            if ($postNotifications === null) {
-                continue;
-            }
-
             $result[$id] = [
                 "categoryID" => $id,
                 "name" => $category["Name"],
@@ -4743,6 +4787,62 @@ class CategoryModel extends Gdn_Model implements
         return $result;
     }
 
+    /***
+     * set default category preferences for a user
+     *
+     * @param int $userID
+     * @param bool $existingUser
+     * @return void
+     */
+    public function setDefaultCategoryPreferences(int $userID, bool $existingUser = false): void
+    {
+        $defaultPreferences = Gdn::config()->get(self::DEFAULT_FOLLOWED_CATEGORIES_KEY, false);
+        if (!$defaultPreferences) {
+            return;
+        }
+        if ($existingUser) {
+            $followed = $this->hasFollowed($userID);
+            $unFollowed = $this->hasUnfollowed($userID);
+            if ($followed || $unFollowed) {
+                return;
+            }
+        }
+        try {
+            $defaultPreferences = json_decode($defaultPreferences, true, 512, JSON_THROW_ON_ERROR);
+            if (!is_array($defaultPreferences)) {
+                throw new JsonException("Invalid format received");
+            }
+            foreach ($defaultPreferences as $categoryPreference) {
+                $categoryID = $categoryPreference["categoryID"];
+                if (!self::checkPermission($categoryID, "Vanilla.Discussions.View")) {
+                    continue;
+                }
+
+                // set the preferences here and it should be all set
+                $preferencesToSet = self::getGenericCategoryPreferenceKeys();
+
+                $preferences = [];
+                foreach ($preferencesToSet as $pref) {
+                    if (isset($categoryPreference[$pref])) {
+                        $preferences[$pref] = $categoryPreference[$pref];
+                    }
+                }
+
+                $this->setPreferences($userID, $categoryPreference["categoryID"], $preferences);
+            }
+        } catch (JsonException $exception) {
+            $this->logger->notice("Invalid format received for the category default configuration.", [
+                Vanilla\Logger::FIELD_CHANNEL => Vanilla\Logger::CHANNEL_APPLICATION,
+                Vanilla\Logger::FIELD_EVENT => "configuration",
+            ]);
+        } catch (Exception $exception) {
+            $this->logger->debug("Setting Default Category Preference for the user failed", [
+                "error" => $exception->getMessage(),
+                "trace" => $exception->getTraceAsString(),
+            ]);
+        }
+    }
+
     /**
      * Set a user's preferences for a single category.
      *
@@ -4752,81 +4852,167 @@ class CategoryModel extends Gdn_Model implements
      */
     public function setPreferences(int $userID, int $categoryID, array $preferences): void
     {
-        if (array_key_exists(self::PREFERENCE_KEY_NOTIFICATION, $preferences)) {
-            $useEmailNotifications = $preferences[self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS] ?? false;
-            $this->setNotificationPreference(
-                $userID,
-                $categoryID,
-                $preferences[self::PREFERENCE_KEY_NOTIFICATION],
-                $useEmailNotifications
-            );
-        } elseif (array_key_exists(self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS, $preferences)) {
-            $userPreferences = $this->getPreferencesByCategoryID($userID, $categoryID);
-            $this->setNotificationPreference(
-                $userID,
-                $categoryID,
-                $userPreferences[self::PREFERENCE_KEY_NOTIFICATION] ?? null,
-                $preferences[self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS]
-            );
+        $prefsToSet = [];
+        $currentPrefs = $this->getPreferencesByCategoryID($userID, $categoryID);
+        foreach ($preferences as $pref => $value) {
+            if (!isset($currentPrefs[$pref])) {
+                throw new InvalidArgumentException("Unknown preference: {$pref}");
+                // We'll set the preference if it's different than the current one or if it's the followed preference.
+            } elseif (
+                $value != $currentPrefs[$pref] ||
+                $pref === self::stripCategoryPreferenceKey(self::PREFERENCE_FOLLOW)
+            ) {
+                $prefsToSet[$pref . "." . $categoryID] = $value;
+            }
         }
+
+        $currentlyFollowed = $this->isFollowed($userID, $categoryID);
+
+        if (!$currentlyFollowed && !isset($preferences[self::stripCategoryPreferenceKey(self::PREFERENCE_FOLLOW)])) {
+            throw new ForbiddenException("You must follow a category to set its notification preferences.");
+        }
+
+        $followingPref = $preferences[self::stripCategoryPreferenceKey(self::PREFERENCE_FOLLOW)] ?? true;
+
+        if ($currentlyFollowed != $followingPref || (!$currentlyFollowed && !$followingPref)) {
+            $this->follow($userID, $categoryID, $followingPref);
+            // If we're unfollowing, wipe out all the preferences.
+            if (!$followingPref) {
+                $prefsToSet = [
+                    sprintf(self::PREFERENCE_FOLLOW, $categoryID) => false,
+                    sprintf(self::PREFERENCE_DISCUSSION_APP, $categoryID) => false,
+                    sprintf(self::PREFERENCE_DISCUSSION_EMAIL, $categoryID) => false,
+                    sprintf(self::PREFERENCE_COMMENT_APP, $categoryID) => false,
+                    sprintf(self::PREFERENCE_COMMENT_EMAIL, $categoryID) => false,
+                ];
+            }
+        }
+
+        UserModel::setMeta($userID, $prefsToSet);
+        self::clearUserCache($userID);
+        //invalidate current cache on new inserts and when user unfollows a category
+        if (($currentlyFollowed && !$followingPref) || !$currentlyFollowed) {
+            $key = "FollowedCount_{$categoryID}";
+            Gdn::cache()->remove($key);
+        }
+
+        $this->dispatchSubscriptionEvent($userID, $categoryID, $prefsToSet);
     }
 
     /**
-     * Set the notification preference for a single user.
+     * Strip a category preference key of its placeholder.
      *
-     * @param int $userID
-     * @param int $categoryID
-     * @param string|null $notificationPreference One of the NOTIFICATION_* constants or `null` to disable notifications.
-     * @param bool $useEmailNotifications
+     * @param $preferenceKey
+     * @return string
      */
-    private function setNotificationPreference(
-        int $userID,
-        int $categoryID,
-        ?string $notificationPreference,
-        bool $useEmailNotifications = false
-    ): void {
-        switch ($notificationPreference) {
-            case self::NOTIFICATION_ALL:
-                $following = true;
-                $discussionApp = true;
-                $discussionEmail = $useEmailNotifications ?: null;
-                $commentApp = true;
-                $commentEmail = $useEmailNotifications ?: null;
-                break;
-            case self::NOTIFICATION_DISCUSSIONS:
-                $following = true;
-                $discussionApp = true;
-                $discussionEmail = $useEmailNotifications ?: null;
-                $commentApp = null;
-                $commentEmail = null;
-                break;
-            case self::NOTIFICATION_FOLLOW:
-                $following = true;
-                $discussionApp = null;
-                $discussionEmail = null;
-                $commentApp = null;
-                $commentEmail = null;
-                break;
-            case null:
-                $following = false;
-                $discussionApp = null;
-                $discussionEmail = null;
-                $commentApp = null;
-                $commentEmail = null;
-                break;
-            default:
-                throw new InvalidArgumentException("Unknown preference: {$notificationPreference}");
+    public static function stripCategoryPreferenceKey($preferenceKey): string
+    {
+        return rtrim($preferenceKey, ".%d");
+    }
+
+    /**
+     * Dispatch a subscription event for the category
+     *
+     * @param int $userId
+     * @param int $categoryID
+     * @param ?array $notificationPreferences
+     * @return void
+     */
+    private function dispatchSubscriptionEvent(int $userId, int $categoryID, ?array $notificationPreferences): void
+    {
+        $sender = Gdn::userModel()->currentFragment();
+        $senderSchema = new UserFragmentSchema();
+        $sender = $senderSchema->validate($sender);
+
+        $followedPref = $notificationPreferences[sprintf(self::PREFERENCE_FOLLOW, $categoryID)] ?? true;
+
+        if (empty($notificationPreferences) || !$followedPref) {
+            //user has unsubscribed
+            $userUnFollowedCategory = $this->getUnfollowedData($userId, $categoryID);
+            $category = $userUnFollowedCategory[$categoryID];
+        } else {
+            $userFollowedCategories = $this->getFollowed($userId);
+            //We don't get a followed category if the user has unfollowed the category
+            $category = $userFollowedCategories[$categoryID];
+        }
+        $category["totalFollowedCount"] = $this->getTotalFollowedCount($categoryID);
+
+        $userPreferences = $this->getPreferencesByCategoryID($userId, $categoryID);
+
+        if (empty($notificationPreferences) || !$followedPref) {
+            //user has unsubscribed) {
+            $action = SubscriptionEvent::ACTION_UNFOLLOW;
+        } elseif (
+            isset($notificationPreferences[sprintf(self::PREFERENCE_FOLLOW, $categoryID)]) &&
+            $notificationPreferences[sprintf(self::PREFERENCE_FOLLOW, $categoryID)]
+        ) {
+            $action = SubscriptionEvent::ACTION_FOLLOW;
+        } else {
+            $action = SubscriptionEvent::ACTION_UPDATE_PREFERENCES;
         }
 
-        $this->follow($userID, $categoryID, $following);
-        $userMeta = [
-            sprintf(self::PREFERENCE_COMMENT_APP, $categoryID) => $commentApp,
-            sprintf(self::PREFERENCE_COMMENT_EMAIL, $categoryID) => $commentEmail,
-            sprintf(self::PREFERENCE_DISCUSSION_APP, $categoryID) => $discussionApp,
-            sprintf(self::PREFERENCE_DISCUSSION_EMAIL, $categoryID) => $discussionEmail,
+        $userPreferences = CategoriesApiController::normalizePreferencesOutput($userPreferences);
+
+        $categorySubscriptionData = [
+            "category" => $category,
+            "user" => ["userID" => $userId],
+            "type" => $action,
+            "preferences" => $userPreferences,
         ];
-        UserModel::setMeta($userID, $userMeta);
-        self::clearUserCache($userID);
+        $categorySubscriptionEvent = new SubscriptionEvent(
+            $action,
+            ["subscription" => $categorySubscriptionData],
+            $sender
+        );
+        $this->eventManager->dispatch($categorySubscriptionEvent);
+    }
+
+    /**
+     * Get total subscribers for a category
+     *
+     * @param int $categoryID
+     * @return int
+     */
+    public function getTotalFollowedCount(int $categoryID): int
+    {
+        $key = "FollowedCount_{$categoryID}";
+        $result = Gdn::cache()->get($key);
+        if ($result === Gdn_Cache::CACHEOP_FAILURE) {
+            $category = self::categories($categoryID);
+            if (!$category) {
+                throw new InvalidArgumentException("Category not found.");
+            }
+
+            $sql = clone $this->SQL;
+            $sql->reset();
+            $result = $sql->getCount("UserCategory", ["CategoryID" => $categoryID, "Followed" => 1]);
+            Gdn::cache()->store($key, $result);
+        }
+        return $result;
+    }
+
+    /**
+     * Get data on users unfollowed Category
+     *
+     * @param int $userID
+     * @param int|null $categoryID
+     * @return array
+     */
+    public function getUnfollowedData(int $userID, ?int $categoryID = null): array
+    {
+        $where = [
+            "UserID" => $userID,
+            "Unfollow" => 1,
+        ];
+        if (!empty($categoryID)) {
+            $where["CategoryID"] = $categoryID;
+        }
+
+        $userData = $this->SQL->getWhere("UserCategory", $where)->resultArray();
+        if (empty($userData)) {
+            return [];
+        }
+        return array_column($userData, null, "CategoryID");
     }
 
     /**
@@ -4839,13 +5025,20 @@ class CategoryModel extends Gdn_Model implements
      */
     private function generatePreferences(int $categoryID, array $userMeta, array $userCategory): array
     {
-        $notificationPreferences = $this->notificationFromLegacy($categoryID, $userMeta, $userCategory);
-
-        return [
-            self::PREFERENCE_KEY_NOTIFICATION => $notificationPreferences[self::PREFERENCE_KEY_NOTIFICATION],
-            self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS =>
-                $notificationPreferences[self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS],
+        $categoryPreferences = [
+            self::stripCategoryPreferenceKey(self::PREFERENCE_FOLLOW) =>
+                $userCategory[$categoryID]["Followed"] ?? false,
+            self::stripCategoryPreferenceKey(self::PREFERENCE_DISCUSSION_APP) =>
+                $userMeta[sprintf(self::PREFERENCE_DISCUSSION_APP, $categoryID)]["Value"] ?? false,
+            self::stripCategoryPreferenceKey(self::PREFERENCE_DISCUSSION_EMAIL) =>
+                $userMeta[sprintf(self::PREFERENCE_DISCUSSION_EMAIL, $categoryID)]["Value"] ?? false,
+            self::stripCategoryPreferenceKey(self::PREFERENCE_COMMENT_APP) =>
+                $userMeta[sprintf(self::PREFERENCE_COMMENT_APP, $categoryID)]["Value"] ?? false,
+            self::stripCategoryPreferenceKey(self::PREFERENCE_COMMENT_EMAIL) =>
+                $userMeta[sprintf(self::PREFERENCE_COMMENT_EMAIL, $categoryID)]["Value"] ?? false,
         ];
+
+        return $categoryPreferences;
     }
 
     /**
@@ -4857,18 +5050,11 @@ class CategoryModel extends Gdn_Model implements
     {
         $result = SchemaFactory::parse(
             [
-                self::PREFERENCE_KEY_NOTIFICATION => [
-                    "allowNull" => true,
-                    "type" => "string",
-                    "enum" => [
-                        CategoryModel::NOTIFICATION_ALL,
-                        CategoryModel::NOTIFICATION_DISCUSSIONS,
-                        CategoryModel::NOTIFICATION_FOLLOW,
-                    ],
-                ],
-                self::PREFERENCE_KEY_USE_EMAIL_NOTIFICATIONS => [
-                    "type" => "boolean",
-                ],
+                self::stripCategoryPreferenceKey(self::PREFERENCE_FOLLOW) => ["type" => "boolean"],
+                self::stripCategoryPreferenceKey(self::PREFERENCE_DISCUSSION_APP) => ["type" => "boolean"],
+                self::stripCategoryPreferenceKey(self::PREFERENCE_DISCUSSION_EMAIL) => ["type" => "boolean"],
+                self::stripCategoryPreferenceKey(self::PREFERENCE_COMMENT_APP) => ["type" => "boolean"],
+                self::stripCategoryPreferenceKey(self::PREFERENCE_COMMENT_EMAIL) => ["type" => "boolean"],
             ],
             "CategoryPreferences"
         );
@@ -5214,7 +5400,7 @@ SQL;
      * @return array
      */
     public function searchByName(
-        $name,
+        string $name,
         ?int $parentCategoryID,
         bool $expandParent = false,
         ?int $limit = null,
@@ -5475,6 +5661,7 @@ SQL;
                     "default" => false,
                     "description" => "Is the category being followed by the current user?",
                 ],
+                "dateFollowed:dt?" => "Date time the user started following the category",
                 "breadcrumbs:a?" => new InstanceValidatorSchema(Breadcrumb::class),
                 "featured:b?" => "Featured category.",
                 "allowedDiscussionTypes:a",
@@ -5577,31 +5764,33 @@ SQL;
      *
      * @param int $categoryID
      */
-    private function prepareForDelete(int $categoryID): void
+    private function prepareForDelete(int $categoryID, bool $deleteContent = true): void
     {
         $this->deletePermissions($categoryID);
-
-        // Delete comments in this category
-        $this->SQL
-            ->from("Comment c")
-            ->join("Discussion d", "c.DiscussionID = d.DiscussionID")
-            ->where("d.CategoryID", $categoryID)
-            ->delete();
 
         // Delete discussions in this category
         $this->SQL->delete("Discussion", ["CategoryID" => $categoryID]);
 
-        // Make inherited permission local permission
-        $this->SQL
-            ->update("Category")
-            ->set("PermissionCategoryID", 0)
-            ->where("PermissionCategoryID", $categoryID)
-            ->where("CategoryID <>", $categoryID)
-            ->put();
+        if ($deleteContent) {
+            // Delete comments in this category
+            $this->SQL
+                ->from("Comment c")
+                ->join("Discussion d", "c.DiscussionID = d.DiscussionID")
+                ->where("d.CategoryID", $categoryID)
+                ->delete();
 
-        // Delete tags
-        $this->SQL->delete("Tag", ["CategoryID" => $categoryID]);
-        $this->SQL->delete("TagDiscussion", ["CategoryID" => $categoryID]);
+            // Make inherited permission local permission
+            $this->SQL
+                ->update("Category")
+                ->set("PermissionCategoryID", 0)
+                ->where("PermissionCategoryID", $categoryID)
+                ->where("CategoryID <>", $categoryID)
+                ->put();
+
+            // Delete tags
+            $this->SQL->delete("Tag", ["CategoryID" => $categoryID]);
+            $this->SQL->delete("TagDiscussion", ["CategoryID" => $categoryID]);
+        }
     }
 
     /**

@@ -132,6 +132,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
         $this->addInlineScript($this->getReduxActionsAsJsVariable());
 
         $viewData = [
+            "breadcrumbs" => $this->getSeoBreadcrumbs(),
             "themeHeader" => new \Twig\Markup($this->headerHtml, "utf-8"),
             "themeFooter" => new \Twig\Markup($this->footerHtml, "utf-8"),
             "cssClasses" => ["isLoading"],

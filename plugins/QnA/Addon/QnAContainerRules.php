@@ -10,7 +10,11 @@ namespace Vanilla\QnA\Addon;
 use Garden\Container\ContainerConfigurationInterface;
 use Garden\Container\Reference;
 use Vanilla\AddonContainerRules;
+use Vanilla\Dashboard\Models\ActivityService;
 use Vanilla\Models\SiteTotalService;
+use Vanilla\QnA\Activity\AnswerAcceptedActivity;
+use Vanilla\QnA\Activity\QuestionAnswerActivity;
+use Vanilla\QnA\Activity\QuestionFollowUpActivity;
 use Vanilla\QnA\Models\QnaQuickLinksProvider;
 use Vanilla\QnA\Models\Totals\AcceptedSiteTotalProvider;
 use Vanilla\QnA\Models\Totals\QuestionSiteTotalProvider;
@@ -42,5 +46,11 @@ class QnAContainerRules extends AddonContainerRules
         $container
             ->rule(QuickLinksVariableProvider::class)
             ->addCall("addQuickLinkProvider", [new Reference(QnaQuickLinksProvider::class)]);
+
+        $container
+            ->rule(ActivityService::class)
+            ->addCall("registerActivity", [AnswerAcceptedActivity::class])
+            ->addCall("registerActivity", [QuestionAnswerActivity::class])
+            ->addCall("registerActivity", [QuestionFollowUpActivity::class]);
     }
 }

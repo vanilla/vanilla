@@ -83,6 +83,15 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
     }
 
     /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["itemData"]));
+        return $result;
+    }
+
+    /**
      * @inheridoc
      */
     public static function getWidgetSchema(): Schema

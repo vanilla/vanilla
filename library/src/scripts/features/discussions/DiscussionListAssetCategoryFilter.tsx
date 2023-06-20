@@ -3,7 +3,7 @@
  * @license gpl-2.0-only
  */
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import SelectBox, { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { t } from "@vanilla/i18n";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
@@ -15,12 +15,14 @@ interface IProps {
     filter: DiscussionsCategoryFollowFilter;
     onFilterChange: (newFilter: boolean) => void;
     className?: string;
+    isMobile?: boolean;
 }
 
 /**
  * Component for displaying an discussion category follow filters
  */
 export default function DiscussionListAssetCategoryFilter(props: IProps) {
+    const { filter, onFilterChange, isMobile } = props;
     const [followFilter, setFollowFilter] = useState<DiscussionsCategoryFollowFilter>(props.filter);
 
     const options: ISelectBoxItem[] = [
@@ -28,16 +30,21 @@ export default function DiscussionListAssetCategoryFilter(props: IProps) {
         { name: t("Following"), value: "followed" },
     ];
 
-    const activeOption = options.find((option) => option.value === followFilter);
+    const activeOption = useMemo(() => {
+        return options.find((option) => option.value === filter);
+    }, [filter]);
+
     const id = uniqueIDFromPrefix("discussionCategoryFilter");
 
     return (
-        <div className={discussionListClasses().categoryFilterContainer}>
-            <span id={id} className={discussionListClasses().categoryFilterLabel}>
-                {t("Categories")}:
-            </span>
+        <div className={discussionListClasses().filterAndSortingContainer}>
+            {!isMobile && (
+                <span id={id} className={discussionListClasses().filterAndSortingLabel}>
+                    {t("Categories")}:
+                </span>
+            )}
             <SelectBox
-                className={discussionListClasses().categoryFilterDropdown}
+                className={discussionListClasses().filterAndSortingDropdown}
                 buttonType={ButtonTypes.TEXT_PRIMARY}
                 options={options}
                 describedBy={id}
@@ -45,9 +52,8 @@ export default function DiscussionListAssetCategoryFilter(props: IProps) {
                 renderLeft={false}
                 horizontalOffset={true}
                 offsetPadding={true}
-                onChange={(value) => {
-                    setFollowFilter(value.value as DiscussionsCategoryFollowFilter);
-                    props.onFilterChange(value.value === "followed" ? true : false);
+                onChange={({ value }) => {
+                    onFilterChange(value === "followed" ? true : false);
                 }}
             />
         </div>

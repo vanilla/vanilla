@@ -185,7 +185,7 @@ class DiscussionApiStatusTest extends SiteTestCase
     {
         // Check a single discussion
         $discussionID = array_keys($discussionStatusData)[0];
-        $discussion = $this->api()->get("/discussions/{$discussionID}", ["expand" => "status,status.log"]);
+        $discussion = $this->api()->get("/discussions/{$discussionID}", ["expand" => "status.log"]);
 
         $this->assertEquals(\QnAPlugin::DISCUSSION_STATUS_REJECTED, $discussion["statusID"]);
         $this->assertEquals(\QnAPlugin::DISCUSSION_STATUS_REJECTED, $discussion["status"]["statusID"]);
@@ -193,6 +193,42 @@ class DiscussionApiStatusTest extends SiteTestCase
         $this->assertEquals(\Gdn::session()->User->Name, $discussion["status"]["log"]["updateUser"]["name"]);
         $this->assertEquals("Another some reason 10000", $discussion["internalStatus"]["log"]["reasonUpdated"]);
         $this->assertEquals(\Gdn::session()->User->Name, $discussion["internalStatus"]["log"]["updateUser"]["name"]);
+    }
+
+    /**
+     * Test that inactive statuses are replaced by the default one.
+     */
+    public function testExpandInactiveStatusLog(): void
+    {
+        $discussion = $this->createDiscussion();
+
+        $statusID = $this->recordStatusModel->insert([
+            "Name" => __FUNCTION__,
+            "State" => "open",
+            "RecordType" => "discussion",
+            "RecordSubtype" => "discussion",
+            "IsDefault" => 0,
+            "isActive" => 0,
+            "isInternal" => 0,
+        ]);
+        $this->api()->put("/discussions/{$discussion["discussionID"]}/status", ["statusID" => $statusID]);
+
+        $internalStatusID = $this->recordStatusModel->insert([
+            "Name" => "internal" . __FUNCTION__,
+            "State" => "open",
+            "RecordType" => "discussion",
+            "RecordSubtype" => "discussion",
+            "IsDefault" => 0,
+            "isActive" => 0,
+            "isInternal" => 1,
+        ]);
+        $this->api()->put("/discussions/{$discussion["discussionID"]}/status", ["statusID" => $internalStatusID]);
+
+        $result = $this->api()
+            ->get("/discussions/{$discussion["discussionID"]}", ["expand" => "status.log"])
+            ->getBody();
+        $this->assertEquals(RecordStatusModel::DISCUSSION_STATUS_NONE, $result["status"]["statusID"]);
+        $this->assertEquals(RecordStatusModel::DISCUSSION_INTERNAL_STATUS_NONE, $result["internalStatus"]["statusID"]);
     }
 
     /**

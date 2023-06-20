@@ -1,5 +1,5 @@
 codecov:
-    require_ci_to_pass: yes
+    require_ci_to_pass: true
 
 coverage:
     precision: 2
@@ -13,7 +13,7 @@ coverage:
         patch:
             front-end:
                 informational: true
-        changes: no
+        changes: false
 
 parsers:
     gcov:
@@ -23,10 +23,33 @@ parsers:
             method: no
             macro: no
 
+flag_management:
+    individual_flags: # exceptions to the default rules above, stated flag by flag
+        - name: frontend
+          paths:
+              - "**/*.ts"
+              - "**/*.tsx"
+          carryforward: true
+          statuses:
+              - type: project
+                target: auto
+              - type: patch
+                target: 60%
+        - name: backend
+          paths:
+              - "**/*.php"
+          carryforward: true
+          statuses:
+              - type: project
+                target: auto
+              - type: patch
+                target: 80%
+
 comment:
-    layout: "diff,flags,tree"
+    layout: "diff,flags"
     behavior: default
     require_changes: true
+    show_carryforward_flags: true
 
 ignore:
     - "**/views/**/*.php"

@@ -7,7 +7,6 @@
 import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
 import { languageSettingsStyles } from "@dashboard/languages/LanguageSettings.styles";
 import { IAddon, ITranslationService } from "@dashboard/languages/LanguageSettingsTypes";
-import { cx } from "@emotion/css";
 import { useLocaleConfig } from "@library/config/configHooks";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -21,10 +20,10 @@ import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n";
-import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
+import { JsonSchema, JsonSchemaForm, JSONSchemaType } from "@vanilla/json-schema-forms";
 import React, { useEffect, useMemo, useState } from "react";
 
-const baseSchema: JsonSchema = {
+const baseSchema: JSONSchemaType<{ translationService: string }> = {
     type: "object",
     properties: {
         translationService: {
@@ -53,7 +52,7 @@ export const LocaleConfigurationModal = (props: IProps) => {
     const classes = languageSettingsStyles();
     const classFrameFooter = frameFooterClasses();
     const classesFrameBody = frameBodyClasses();
-    const [value, setValue] = useState<JsonSchema>({});
+    const [value, setValue] = useState({});
 
     const [schema, setSchema] = useState(baseSchema);
 
@@ -82,9 +81,20 @@ export const LocaleConfigurationModal = (props: IProps) => {
             const choices = Object.fromEntries(configuredServices.map((service) => [service.type, service.name]));
             setSchema((prevSchema) => {
                 const loadedSchema = prevSchema;
-                loadedSchema.properties.translationService["x-control"].choices.staticOptions = {
-                    none: "None",
-                    ...choices,
+                loadedSchema.properties = {
+                    ...loadedSchema.properties,
+                    translationService: {
+                        ...loadedSchema.properties.translationService,
+                        "x-control": {
+                            inputType: "dropDown",
+                            choices: {
+                                staticOptions: {
+                                    none: "None",
+                                    ...choices,
+                                },
+                            },
+                        },
+                    },
                 };
                 return loadedSchema;
             });
@@ -127,9 +137,9 @@ export const LocaleConfigurationModal = (props: IProps) => {
                 bodyWrapClass={classes.modalSuggestionOverride}
                 body={
                     <FrameBody>
-                        <div className={cx("frameBody-contents", classesFrameBody.contents)}>
+                        <div className={classesFrameBody.contents}>
                             <JsonSchemaForm
-                                schema={schema}
+                                schema={schema as JsonSchema}
                                 instance={value}
                                 FormSection={({ children }) => (
                                     <>

@@ -64,6 +64,7 @@ export const autoCompleteClasses = ({
         maxWidth: "85%",
         "& > label": {
             margin: 0,
+            fontFamily: "inherit",
             ...{
                 small: { padding: "3px 6px", paddingRight: 0 },
                 default: { padding: "4px 8px", paddingRight: 0 },
@@ -162,6 +163,11 @@ export const autoCompleteClasses = ({
         display: "flex",
         pointerEvents: "auto",
         cursor: "pointer",
+
+        "& button": {
+            appearance: "none",
+            padding: "2px 6px 0",
+        },
     }),
     autoCompleteClose: css({
         height: 8,

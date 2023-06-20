@@ -102,4 +102,12 @@ class PageViewEvent implements TrackingEventInterface
     {
         return $this->discussionID;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionID(): ?string
+    {
+        return $this->payload["siteSectionID"] ?? null;
+    }
 }

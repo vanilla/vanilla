@@ -9,6 +9,7 @@
  */
 
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Web\RoleTokenAuthTrait;
 
 /**
@@ -689,8 +690,7 @@ class UserController extends DashboardController
         $user = $userModel->getID($userID, DATASET_TYPE_ARRAY);
 
         // Determine if username can be edited
-        $canEditUsername =
-            (bool) c("Garden.Profile.EditUsernames") || Gdn::session()->checkPermission("Garden.Users.Edit");
+        $canEditUsername = Gdn::session()->checkPermission("Garden.Users.Edit");
         $this->setData("_CanEditUsername", $canEditUsername);
 
         // Determine if emails can be edited
@@ -1300,5 +1300,18 @@ class UserController extends DashboardController
         $this->jsonTarget(".User-Verified", userVerified($User), "ReplaceWith");
 
         $this->render("Blank", "Utility", "Dashboard");
+    }
+
+    /**
+     * Get all custom profile fields.
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getProfileFields(): array
+    {
+        /** @var ProfileFieldModel $profileFieldModel */
+        $profileFieldModel = Gdn::getContainer()->get(ProfileFieldModel::class);
+        return $profileFieldModel->getProfileFields(["enabled" => true]) ?? [];
     }
 }

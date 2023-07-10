@@ -17,9 +17,14 @@
     // Hide unneeded inputs
     .parameters-col_description {
         input,
-        select {
+        select,
+        [data-reach-combobox] {
             display: none;
         }
+    }
+
+    .execute-wrapper:empty {
+        display: none;
     }
 
     thead .response-col_status {
@@ -28,6 +33,32 @@
 
     tbody .response-col_status {
         padding-top: 24px;
+    }
+
+    @media (screen and max-width: 600px) {
+        .table-container {
+            padding-bottom: 0;
+        }
+
+        tbody tr {
+            display: block;
+        }
+
+        tbody td {
+            display: block;
+        }
+
+        thead {
+            display: none;
+        }
+
+        .parameters-col_name {
+            padding: 0;
+        }
+
+        .parameter__name {
+            font-size: 18px;
+        }
     }
 
     // Fix the margin on the example tabs
@@ -110,12 +141,30 @@
             min-width: 48px;
         }
     }
+
+    .renderedMarkdown *:first-child {
+        margin-top: 0;
+    }
+
+    .parameter__name {
+        white-space: nowrap;
+
+        &.required::after {
+            display: block;
+            padding-left: 0;
+        }
+    }
+
+    select[multiple] {
+        min-height: 200px;
+    }
 }
 
 .tryIt .swagger-ui {
     .parameters-col_description {
         input,
-        select {
+        select,
+        [data-reach-combobox] {
             display: block;
         }
     }

@@ -102,7 +102,11 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      */
     public function handleException(\Throwable $e): Data
     {
-        $activePage = $this->activePage ?? $this->container->get(SimpleTitlePage::class);
+        $activePage = $this->activePage ?? null;
+        if ($activePage === null) {
+            $activePage = $this->container->get(SimpleTitlePage::class);
+            $activePage->getHead()->setAssetSection("layouts");
+        }
         return $activePage->handleException($e);
     }
 }

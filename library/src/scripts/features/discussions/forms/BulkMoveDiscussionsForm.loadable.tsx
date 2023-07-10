@@ -22,7 +22,6 @@ import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import Message from "@library/messages/Message";
-import { cx } from "@library/styles/styleShim";
 import { t } from "@library/utility/appUtils";
 import { CategoryDisplayAs } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
@@ -89,7 +88,7 @@ export default function BulkMoveDiscussionsForm(props: IBulkActionForm) {
                 header={<FrameHeader closeFrame={onCancel} title={t("Move")} />}
                 body={
                     <FrameBody>
-                        <div className={cx("frameBody-contents", classesFrameBody.contents)}>
+                        <div className={classesFrameBody.contents}>
                             {errorMessage && (
                                 <Message
                                     className={classes.errorMessageOffset}

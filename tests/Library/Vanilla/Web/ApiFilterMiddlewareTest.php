@@ -39,7 +39,7 @@ class ApiFilterMiddlewareTest extends TestCase
     public function testValidationFail()
     {
         $this->expectException(ServerException::class);
-        $this->expectExceptionMessage("Unexpected field in content: insertipaddress");
+        $this->expectExceptionMessage("Unexpected field in content: updateipaddress");
         $request = new Request();
         $apiMiddleware = new ApiFilterMiddleware();
         $testFailureArray = [
@@ -47,7 +47,7 @@ class ApiFilterMiddlewareTest extends TestCase
                 "discussionid" => 1,
                 "type" => "Discussion",
                 "name" => "testdiscussion",
-                "insertIPAddress" => "10.10.10.10",
+                "updateIPAddress" => "10.10.10.10",
             ],
         ];
         call_user_func($apiMiddleware, $request, function ($request) use ($testFailureArray) {
@@ -130,7 +130,7 @@ class ApiFilterMiddlewareTest extends TestCase
     {
         $apiMiddleware = new ApiFilterMiddleware();
         $actual = $apiMiddleware->getBlacklistFields();
-        $expected = ["password", "email", "insertipaddress", "updateipaddress"];
+        $expected = ["password", "email", "updateipaddress"];
         $this->assertSame($expected, $actual);
     }
 

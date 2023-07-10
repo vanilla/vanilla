@@ -34,14 +34,14 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
         "formType" => "text",
         "visibility" => "public",
         "mutability" => "all",
-        "displayOptions" => ["userCards" => true, "posts" => true],
+        "displayOptions" => ["userCards" => true, "posts" => true, "search" => true],
         "registrationOptions" => ProfileFieldModel::REGISTRATION_HIDDEN,
     ];
 
-    public function tearDown(): void
+    public function setUp(): void
     {
-        parent::tearDown();
-        \Gdn::sql()->truncate("profileField");
+        parent::setUp();
+        $this->resetTable("profileField");
     }
 
     /**
@@ -147,7 +147,7 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
             "formType" => "text",
             "visibility" => "private",
             "mutability" => "restricted",
-            "displayOptions" => ["userCards" => false, "posts" => false],
+            "displayOptions" => ["userCards" => false, "posts" => false, "search" => true],
             "registrationOptions" => ProfileFieldModel::REGISTRATION_HIDDEN,
         ];
 
@@ -398,10 +398,10 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
 
         $tests["Invalid apiName with whitespace"] = [["apiName" => " test "] + $record, true];
         $tests["Invalid apiName with periods"] = [["apiName" => "te.st"] + $record, true];
+        $tests["Invalid apiName with forward slash"] = [["apiName" => "te/st"] + $record, true];
         $tests["Valid apiName"] = [["apiName" => "test"] + $record, false];
         $tests["Missing apiName"] = [array_diff_key($record, ["apiName" => 1]), true];
         $tests["Missing label"] = [array_diff_key($record, ["label" => 1]), true];
-        $tests["Missing description"] = [array_diff_key($record, ["description" => 1]), false];
         $tests["Missing dataType"] = [array_diff_key($record, ["dataType" => 1]), true];
         $tests["Missing formType"] = [array_diff_key($record, ["formType" => 1]), true];
         $tests["Missing visibility"] = [array_diff_key($record, ["visibility" => 1]), true];
@@ -469,6 +469,27 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
         // Test not found error (404)
         $this->runWithExpectedExceptionCode(404, function () {
             $this->api()->delete("$this->baseUrl/doesnt_exist");
+        });
+    }
+
+    /**
+     * Test exception when trying to delete a "core" profile field.
+     */
+    public function testCoreFieldsCantBeDeleted()
+    {
+        // Forcefully create a "core field".
+        $newProfileField = \Gdn::sql()->insert("profileField", [
+            "apiName" => "customApiName",
+            "label" => "Custom Profile Field",
+            "description" => "Custom Core Related Profile Field",
+            "displayOptions" => json_encode(["userCards" => false, "posts" => false]),
+            "sort" => 99,
+            "isCoreField" => "plugin",
+        ]);
+
+        // Deletion should trigger an exception.
+        $this->runWithExpectedExceptionMessage("This field is used by a core feature & can't be deleted.", function () {
+            $this->api()->delete("$this->baseUrl/customApiName");
         });
     }
 
@@ -541,5 +562,127 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
         }
 
         return $rows;
+    }
+
+    /**
+     * Test what happens if bad values somehow get inserted into dropdown options.
+     *
+     * @param mixed $input
+     * @param array $expected
+     *
+     * @dataProvider provideBadDropdownOptions
+     */
+    public function testGetWithBadDropdownOptions($input, array $expected)
+    {
+        $this->resetTable("profileField");
+        $field = $this->createProfileField([
+            "formType" => ProfileFieldModel::FORM_TYPE_DROPDOWN,
+            "dropdownOptions" => ["test"],
+        ]);
+
+        \Gdn::sql()
+            ->update("profileField", ["dropdownOptions" => json_encode($input)], ["apiName" => $field["apiName"]])
+            ->put();
+        \Gdn::cache()->flush();
+        $row = $this->api()
+            ->get("/profile-fields")
+            ->getBody()[0];
+        $this->assertEquals($expected, $row["dropdownOptions"]);
+    }
+
+    /**
+     * Test that `GDN_ProfileField`'s `isCoreField` can't be set through POST/PATCH `/profile-fields`.
+     */
+    public function testCantSetIsCoreField()
+    {
+        $this->resetTable("profileField");
+
+        // Create record using POST `/profile-fields`.
+        $newProfileField = $this->createProfileField(["isCoreField" => "CustomIsCoreFieldValue"]);
+
+        // Get every (1) existing profile fields.
+        $profileFields = $this->api()
+            ->get("/profile-fields")
+            ->getBody();
+
+        // Assert the GET request returned an array with an empty `isCoreField`.
+        foreach ($profileFields as $profileField) {
+            $this->assertArrayHasKey("isCoreField", $profileField);
+            $this->assertEmpty($profileField["isCoreField"]);
+        }
+
+        // Update previously created record using PATCH `/profile-fields/{apiName}`.
+        $patchResult = $this->api()->patch("/profile-fields/" . $newProfileField["apiName"], [
+            "isCoreField" => "PatchedCustomIsCoreFieldValue",
+        ]);
+
+        // Get every (1) existing profile fields.
+        $profileFields = $this->api()
+            ->get("/profile-fields")
+            ->getBody();
+
+        // Assert the GET request returned an array with an empty `isCoreField`.
+        foreach ($profileFields as $profileField) {
+            $this->assertArrayHasKey("isCoreField", $profileField);
+            $this->assertEmpty($profileField["isCoreField"]);
+        }
+    }
+
+    /**
+     * Provide bad migrated data.
+     */
+    public function provideBadDropdownOptions()
+    {
+        yield "not-array" => ["garbeldegook", []];
+        yield "object" => [["key1" => "val1", "key2" => "val2"], ["val1", "val2"]];
+        yield "empty-array" => [[], []];
+    }
+
+    /**
+     * Test displayOptions values when post/patch.
+     *
+     */
+    public function testDisplayOptions()
+    {
+        //post
+        $record = $this->record();
+        $record["displayOptions"] = ["userCards" => false, "posts" => true];
+        $result = $this->api()->post($this->baseUrl, ["apiName" => "test_profile_field"] + $record);
+        $this->assertEquals(201, $result->getStatusCode());
+
+        $body = $result->getBody();
+
+        //we have "search" in displayOptions and its value is false by default
+        $this->assertSame(count($record["displayOptions"]) + 1, count($body["displayOptions"]));
+        $this->assertArrayHasKey("search", $body["displayOptions"]);
+        $this->assertFalse($body["displayOptions"]["search"]);
+
+        //existing entry does not have "search" in displayOptions and we are patching it
+        \Gdn::sql()->insert("profileField", [
+            "apiName" => "test-custom-profile-field",
+            "label" => "Test Custom Profile Field",
+            "description" => "Custom Description",
+            "displayOptions" => json_encode(["userCards" => false, "posts" => false]),
+            "sort" => 99,
+        ]);
+
+        $patchData = [
+            "label" => "Test Custom Profile Field  - UPDATED",
+            "description" => "Custom Description - UPDATED",
+            "displayOptions" => ["userCards" => false, "posts" => false],
+        ];
+
+        $result = $this->api()->patch("{$this->baseUrl}/test-custom-profile-field", $patchData);
+        $this->assertEquals(200, $result->getStatusCode());
+
+        //search should be in the return even if did not send it in request
+        $this->assertEquals($patchData["displayOptions"] + ["search" => false], $result->getBody()["displayOptions"]);
+
+        //and finally, just another patch with search value to false
+        $result = $this->api()->patch("{$this->baseUrl}/test-custom-profile-field", [
+            "displayOptions" => ["userCards" => false, "posts" => false, "search" => true],
+        ]);
+        $this->assertEquals(200, $result->getStatusCode());
+        $this->assertTrue($result->getBody()["displayOptions"]["search"]);
     }
 }

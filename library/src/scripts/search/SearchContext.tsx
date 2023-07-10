@@ -3,6 +3,7 @@ import { ISearchForm, ISearchResponse } from "@library/search/searchTypes";
 import { ILoadable } from "@library/@types/api/core";
 import React, { useContext } from "react";
 import { ISearchDomain } from "./SearchService";
+import { EMPTY_SCHEMA, JsonSchema } from "@vanilla/json-schema-forms";
 
 export const SearchContext = React.createContext<ISearchContextValue>({
     getFilterComponentsForDomain: () => null,
@@ -11,10 +12,13 @@ export const SearchContext = React.createContext<ISearchContextValue>({
     results: INITIAL_SEARCH_STATE.results,
     domainSearchResponse: INITIAL_SEARCH_STATE.domainSearchResponse,
     form: DEFAULT_CORE_SEARCH_FORM,
-    search: () => {},
+    search: async () => {},
     searchInDomain: () => {},
     getDomains: () => {
         return [];
+    },
+    getFiltersSchemaForDomain: function (_domainKey): JsonSchema {
+        return EMPTY_SCHEMA;
     },
     getCurrentDomain: () => {
         throw new Error("Context implementation is required for this method");
@@ -49,7 +53,7 @@ interface ISearchContextValue<ExtraFormValues extends object = {}> {
     /**
      * Perform a search.
      */
-    search(): void;
+    search(): Promise<void>;
 
     /**
      * Perform a separate search in any domain outside of the current domain
@@ -65,6 +69,12 @@ interface ISearchContextValue<ExtraFormValues extends object = {}> {
      * Get the current search domain of the form.
      */
     getCurrentDomain(): ISearchDomain;
+
+    /**
+     * Get the filter schema for the current domain.
+     * Only the Members domain makes use of this currently.
+     */
+    getFiltersSchemaForDomain(domainKey: ISearchDomain["key"]): JsonSchema;
 
     /**
      * Get the default values for the form.

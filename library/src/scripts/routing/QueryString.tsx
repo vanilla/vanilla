@@ -42,28 +42,30 @@ export function useQueryStringSync(value: IStringMap, defaults?: IStringMap, syn
     const isMountedRef = useRef(false);
 
     const debouncedQsUpdate = useCallback(
-        debounce((location: History.LocationDescriptor) => {
+        debounce((query: string) => {
             if (!isMountedRef.current) {
                 // Do not perform any updates after we've unmounted.
                 // This can result in bugs like https://github.com/vanilla/support/issues/4202
                 return;
             }
-            history.replace(location);
+            let newPath = `${window.location.pathname}`;
+            if (query.length > 0) {
+                newPath += "?" + decodeURIComponent(query);
+            }
+
+            window.history.replaceState(null, "", newPath);
         }),
         [history],
     );
 
-    const filteredCurrent = qs.stringify(getFilteredValue(value, defaults || {}));
+    const filteredCurrent = qs.stringify(getFilteredValue(value, defaults || {}), { arrayFormat: "brackets" });
     const filteredLast = useLastValue(filteredCurrent);
 
     // Handle continuous updates updates.
     useEffect(() => {
         // Only runs when mounted.
         if (isMountedRef.current && filteredLast !== filteredCurrent) {
-            debouncedQsUpdate({
-                ...location,
-                search: filteredCurrent,
-            });
+            debouncedQsUpdate(filteredCurrent);
         }
     }, [filteredLast, filteredCurrent, debouncedQsUpdate, location]);
 
@@ -71,10 +73,7 @@ export function useQueryStringSync(value: IStringMap, defaults?: IStringMap, syn
         // Handles first mount if needed.
         isMountedRef.current = true;
         if (syncOnFirstMount) {
-            debouncedQsUpdate({
-                ...location,
-                search: filteredCurrent,
-            });
+            debouncedQsUpdate(filteredCurrent);
         }
 
         return () => {

@@ -1,0 +1,117 @@
+{
+    "order": 20,
+    "index_patterns": ["vanilla-*"],
+    "settings": {
+        "index": {
+            "lifecycle": {
+                "name": "delete_after_7_days",
+                "rollover_alias": "vanilla"
+            },
+            "mapping": {
+                "total_fields": {
+                    "limit": "10000"
+                }
+            },
+            "refresh_interval": "1s",
+            "number_of_routing_shards": "30",
+            "query": {
+                "default_field": ["request.*"]
+            }
+        }
+    },
+    "mappings": {
+        "_meta": {},
+        "_source": {},
+        "dynamic_templates": [],
+        "properties": {
+            "@timestamp": {
+                "type": "date"
+            },
+            "message": {
+                "type": "wildcard"
+            },
+            "channel": {
+                "type": "keyword"
+            },
+            "level": {
+                "type": "keyword"
+            },
+            "tags": {
+                "type": "keyword"
+            },
+            "stacktrace": {
+                "type": "wildcard"
+            },
+            "site": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "keyword"
+                    },
+                    "siteID": {
+                        "type": "keyword"
+                    },
+                    "accountID": {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "request": {
+                "properties": {
+                    "hostname": {
+                        "type": "keyword"
+                    },
+                    "method": {
+                        "type": "keyword"
+                    },
+                    "path": {
+                        "type": "wildcard"
+                    },
+                    "protocol": {
+                        "type": "keyword"
+                    },
+                    "url": {
+                        "type": "wildcard"
+                    },
+                    "clientIP": {
+                        "type": "ip"
+                    },
+                    "country": {
+                        "type": "keyword"
+                    },
+                    "requestID": {
+                        "type": "keyword"
+                    },
+                    "server": {
+                        "type": "keyword"
+                    },
+                    "cluster": {
+                        "type": "keyword"
+                    },
+                    "cloudflare": {
+                        "properties": {
+                            "datacenter": {
+                                "type": "keyword"
+                            },
+                            "rayID": {
+                                "type": "keyword"
+                            }
+                        }
+                    }
+                }
+            },
+            "vanilla": {
+                "type": "object",
+                "dynamic": true
+            },
+            "data": {
+                "type": "object",
+                "enabled": false
+            },
+            "rawdata": {
+                "type": "wildcard"
+            }
+        }
+    },
+    "aliases": {}
+}

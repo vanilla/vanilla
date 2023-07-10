@@ -58,7 +58,7 @@ class DiscussionEmbedFactoryTest extends AbstractAPIv2Test
      */
     public function supportedDomainsProvider(): array
     {
-        $bootstrapBase = "http://vanilla.test";
+        $bootstrapBase = "https://vanilla.test";
         return [
             // Allowed
             "Correct" => [$bootstrapBase . "/discussion/41342", true],

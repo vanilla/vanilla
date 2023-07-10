@@ -474,6 +474,19 @@ class Gdn_Auth extends Gdn_Pluggable
     }
 
     /**
+     * Returns the array of the session in the database.
+     *
+     * This is retrieved from the session cookie if the cookie authenticates or false if not found or authentication fails.
+     *
+     * @return array
+     */
+    public function getSessionArray(): array
+    {
+        $result = $this->_Identity->getSessionArray();
+        return $result ?? [];
+    }
+
+    /**
      *
      *
      * @return mixed

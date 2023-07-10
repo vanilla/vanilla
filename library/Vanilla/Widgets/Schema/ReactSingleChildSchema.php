@@ -36,10 +36,19 @@ class ReactSingleChildSchema extends Schema
                     "type" => "object",
                     "additionalProperties" => true,
                 ],
+                '$reactTestID' => [
+                    HydrateableSchema::X_NO_HYDRATE => true,
+                    "type" => "string",
+                ],
                 '$reactComponent' => [
                     HydrateableSchema::X_NO_HYDRATE => true,
                     "type" => "string",
                     "description" => "The name of a registered react component.",
+                ],
+                '$seoContent' => [
+                    HydrateableSchema::X_NO_HYDRATE => true,
+                    "type" => "string",
+                    "description" => "Used to represent SEO version of the content used when scripting is disabled.",
                 ],
                 '$reactProps' => [
                     "type" => "object",

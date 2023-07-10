@@ -461,6 +461,11 @@ class OAuth2Plugin extends Gdn_OAuth2
         // In case of OIDC authentication, result is a postback request, not a get redirect.
         if ($sender->Form->isPostBack()) {
             $oauthValues = $sender->Form->formValues();
+            //if we get a postback error message. We should throw exception with the error
+            if (!empty($oauthValues["error"])) {
+                $message = $oauthValues["error"] . ": " . val("error_description", $oauthValues, null);
+                throw new Gdn_UserException($message);
+            }
             $state = $oauthValues["state"];
         }
         $stateArray = $this->decodeState($state);

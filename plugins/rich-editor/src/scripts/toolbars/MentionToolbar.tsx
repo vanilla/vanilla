@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ComponentProps } from "react";
 import Quill, { Sources, DeltaStatic } from "quill/core";
 import uniqueId from "lodash/uniqueId";
 import isEqual from "lodash/isEqual";
@@ -20,8 +20,9 @@ import UserSuggestionModel, {
 } from "@library/features/users/suggestion/UserSuggestionModel";
 import UserSuggestionActions from "@library/features/users/suggestion/UserSuggestionActions";
 import apiv2 from "@library/apiv2";
-import { IMentionSuggestionData, IMentionProps } from "@rich-editor/toolbars/pieces/MentionSuggestion";
-import MentionSuggestionList from "@rich-editor/toolbars/pieces/MentionSuggestionList";
+import MentionSuggestionListPositioner from "@rich-editor/toolbars/pieces/MentionSuggestionListPositioner";
+import { IMentionSuggestionData, IMentionProps } from "@library/editor/pieces/MentionSuggestion";
+import MentionSuggestionList from "@library/editor/pieces/MentionSuggestionList";
 
 interface IProps extends IWithEditorProps, IInjectableSuggestionsProps {
     suggestionActions: UserSuggestionActions;
@@ -36,16 +37,18 @@ interface IMentionState {
  */
 export class MentionToolbar extends React.Component<IProps, IMentionState> {
     private static SUGGESTION_LIMIT = 5;
-    private quill: Quill;
+    private editor: Quill;
     private ID = uniqueId("mentionList-");
     private loaderID = uniqueId("mentionList-noResults-");
     private comboBoxID = uniqueId("mentionComboBox-");
     private isConvertingMention = false;
     private readonly MENTION_COMPLETION_CHARACTERS = [".", "!", "?", " ", "\n"];
 
+    private mentionSuggestionListRef = React.createRef<HTMLElement>();
+
     constructor(props: IProps) {
         super(props);
-        this.quill = props.quill!;
+        this.editor = props.editor!;
         this.state = {
             autoCompleteBlot: null,
         };
@@ -54,13 +57,13 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
     public componentDidMount() {
         document.addEventListener("keydown", this.keyDownListener, true);
         document.addEventListener("click", this.onDocumentClick, false);
-        this.quill.on("text-change", this.onTextChange);
+        this.editor.on("text-change", this.onTextChange);
     }
 
     public componentWillUnmount() {
         document.removeEventListener("keydown", this.keyDownListener, true);
         document.removeEventListener("click", this.onDocumentClick, false);
-        this.quill.off("text-change", this.onTextChange);
+        this.editor.off("text-change", this.onTextChange);
     }
 
     /**
@@ -71,7 +74,7 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         const prevMentionSelection = prevProps.mentionSelection;
 
         if (!isEqual(mentionSelection, prevMentionSelection) && mentionSelection) {
-            const text = this.quill.getText(mentionSelection.index, mentionSelection.length).replace("@", "");
+            const text = this.editor.getText(mentionSelection.index, mentionSelection.length).replace("@", "");
             this.props.suggestionActions.loadUsers(text);
         }
 
@@ -97,32 +100,42 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         }
 
         if (this.state.autoCompleteBlot) {
-            const selection = this.quill!.getSelection();
+            const selection = this.editor!.getSelection();
             this.cancelActiveMention();
 
             // We need to restore back the selection we had if the editor is still focused because
             // the cancelation might have messed up our position.
-            if (this.quill.hasFocus()) {
-                this.quill!.setSelection(selection);
+            if (this.editor.hasFocus()) {
+                this.editor!.setSelection(selection);
             }
         }
     }
 
     public render() {
-        const { suggestions, lastSuccessfulUsername, activeSuggestionID, isLoading } = this.props;
+        const { suggestions, lastSuccessfulUsername, activeSuggestionID, isLoading, mentionSelection } = this.props;
+
         const data =
             suggestions && suggestions.status === LoadStatus.SUCCESS && suggestions.data ? suggestions.data : [];
 
+        const mentionProps = this.createMentionProps(data);
+
         return (
-            <MentionSuggestionList
-                onItemClick={this.onItemClick}
-                mentionProps={this.createMentionProps(data)}
-                matchedString={lastSuccessfulUsername || ""}
-                activeItemID={activeSuggestionID}
-                id={this.ID}
-                loaderID={this.loaderID}
-                showLoader={isLoading}
-            />
+            <MentionSuggestionListPositioner
+                isVisible={(mentionProps.length > 0 || isLoading) && !!mentionSelection}
+                mentionSelection={mentionSelection}
+                flyoutRef={this.mentionSuggestionListRef}
+            >
+                <MentionSuggestionList
+                    ref={this.mentionSuggestionListRef}
+                    onItemClick={this.onItemClick}
+                    mentionProps={mentionProps}
+                    matchedString={lastSuccessfulUsername || ""}
+                    activeItemID={activeSuggestionID}
+                    id={this.ID}
+                    loaderID={this.loaderID}
+                    showLoader={isLoading}
+                />
+            </MentionSuggestionListPositioner>
         );
     }
 
@@ -135,17 +148,17 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             return null;
         }
 
-        this.quill.formatText(
+        this.editor.formatText(
             mentionSelection.index,
             mentionSelection.length,
             "mention-autocomplete",
             true,
             Quill.sources.API,
         );
-        this.quill.setSelection(currentSelection.index, 0, Quill.sources.API);
+        this.editor.setSelection(currentSelection.index, 0, Quill.sources.API);
 
         // Get the autoCompleteBlot
-        const autoCompleteBlot = getBlotAtIndex(this.quill, currentSelection.index - 1, MentionAutoCompleteBlot)!;
+        const autoCompleteBlot = getBlotAtIndex(this.editor, currentSelection.index - 1, MentionAutoCompleteBlot)!;
 
         return autoCompleteBlot;
     }
@@ -178,14 +191,14 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
             return;
         }
 
-        if (this.quill.hasFocus() && inActiveMention && !this.hasApiResponse) {
+        if (this.editor.hasFocus() && inActiveMention && !this.hasApiResponse) {
             if (Keyboard.match(event, Keyboard.keys.ENTER)) {
                 this.cancelActiveMention();
             }
             return;
         }
 
-        if (this.quill.hasFocus() && inActiveMention) {
+        if (this.editor.hasFocus() && inActiveMention) {
             const firstIndex = 0;
             const nextIndex = activeSuggestionIndex + 1;
             const prevIndex = activeSuggestionIndex - 1;
@@ -258,7 +271,9 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
         }
     };
 
-    private createMentionProps(suggestions: IMentionSuggestionData[]): Array<Partial<IMentionProps>> {
+    private createMentionProps(
+        suggestions: IMentionSuggestionData[],
+    ): ComponentProps<typeof MentionSuggestionList>["mentionProps"] {
         return suggestions.slice(0, MentionToolbar.SUGGESTION_LIMIT).map((data, index) => {
             const onMouseEnter = () => {
                 this.props.suggestionActions.setActive(data.domID, index);
@@ -307,16 +322,16 @@ export class MentionToolbar extends React.Component<IProps, IMentionState> {
 
         this.isConvertingMention = true;
         const activeSuggestion = suggestions.data[activeSuggestionIndex];
-        const start = autoCompleteBlot.offset(this.quill.scroll);
+        const start = autoCompleteBlot.offset(this.editor.scroll);
 
         autoCompleteBlot.finalize(activeSuggestion);
-        this.quill.insertText(start + 1, insertCharacter, Quill.sources.SILENT);
-        this.quill.setSelection(start + 2, 0, Quill.sources.SILENT);
+        this.editor.insertText(start + 1, insertCharacter, Quill.sources.SILENT);
+        this.editor.setSelection(start + 2, 0, Quill.sources.SILENT);
         this.cancelActiveMention();
     }
 
     private onDocumentClick = (event: MouseEvent) => {
-        if (!this.quill.root.contains(event.target as Node)) {
+        if (!this.editor.root.contains(event.target as Node)) {
             this.cancelActiveMention();
         }
     };

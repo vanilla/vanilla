@@ -16,7 +16,7 @@ import debounce from "lodash/debounce";
  *
  * @return A teardown function if applicable.
  */
-export function initModernEmbed(): Function | null {
+export function initModernEmbed() {
     const remoteUrl = getMeta("embed.remoteUrl");
     const isEnabled = getMeta("embed.enabled") && getMeta("embed.isModernEmbed");
     if (!isEnabled || !remoteUrl) {
@@ -158,7 +158,7 @@ function addLinkListener() {
  * Send a message to our parent iframe.
  */
 function sendMessageToParentFrame(event: EmbedEvent) {
-    window.top.postMessage(event, getMeta("embed.remoteUrl"));
+    window.top?.postMessage(event, getMeta("embed.remoteUrl"));
 }
 
 /**

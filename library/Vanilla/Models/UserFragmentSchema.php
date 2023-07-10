@@ -35,8 +35,17 @@ class UserFragmentSchema extends Schema
                 "punished:i?", // The jailed status of the user.
                 "private:b?", // The private profile status of the user.
                 "label:s?",
+                "profileFields:o?",
             ])
         );
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function schemaProperties(): array
+    {
+        return array_keys((new UserFragmentSchema())->getField("properties"));
     }
 
     /** @var UserFragmentSchema */
@@ -79,11 +88,13 @@ class UserFragmentSchema extends Schema
             "name" => $dbRecord["Name"] ?? ($dbRecord["name"] ?? "Unknown"),
             "private" => (bool) $privateProfile,
             "banned" => $dbRecord["Banned"] ?? 0,
-            "punished" => $dbRecord["Punished"] ?? 0,
             "dateLastActive" => $dbRecord["DateLastActive"] ?? ($dbRecord["dateLastActive"] ?? null),
             "title" => $dbRecord["Title"] ?? null,
             "label" => $dbRecord["Label"] ?? ($dbRecord["label"] ?? null),
         ];
+        if (isset($dbRecord["Punished"])) {
+            $schemaRecord["punished"] = $dbRecord["Punished"];
+        }
         $schemaRecord = ApiUtils::convertOutputKeys($schemaRecord);
         $schemaRecord = self::instance()->validate($schemaRecord);
         return $schemaRecord;

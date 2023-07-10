@@ -86,7 +86,7 @@ export function mapProfileFieldToFormValues(profileField: ProfileField): Profile
         enabled,
     } = profileField;
 
-    const { userCards = false, posts = false } = displayOptions;
+    const { userCards = false, posts = false, search = false } = displayOptions;
 
     const type = Object.entries(DATA_TYPE_AND_FORM_TYPE_MAP).find(([key, val]) => {
         return val.dataType === dataType && val.formType === formType;
@@ -103,10 +103,9 @@ export function mapProfileFieldToFormValues(profileField: ProfileField): Profile
             visibility,
             userCards,
             posts,
+            search,
         },
-        editing: {
-            mutability,
-        },
+        mutability,
         enabled,
     };
 }
@@ -117,8 +116,8 @@ export function mapProfileFieldFormValuesToProfileField(formValues: ProfileField
         label,
         description,
         registrationOptions,
-        editing: { mutability },
-        visibility: { visibility, userCards, posts },
+        mutability,
+        visibility: { visibility, userCards, posts, search },
         type,
         enabled,
         dropdownOptions,
@@ -153,6 +152,7 @@ export function mapProfileFieldFormValuesToProfileField(formValues: ProfileField
         displayOptions: {
             userCards,
             posts,
+            search,
         },
         dropdownOptions: requiresDropdownOptions ? dropdownOptionArray : null,
     };
@@ -167,6 +167,6 @@ export const EMPTY_PROFILE_FIELD_CONFIGURATION: ProfileField = {
     registrationOptions: ProfileFieldRegistrationOptions.OPTIONAL,
     visibility: ProfileFieldVisibility.PUBLIC,
     mutability: ProfileFieldMutability.ALL,
-    displayOptions: { userCards: false, posts: false },
+    displayOptions: { userCards: false, posts: false, search: true },
     enabled: true,
 };

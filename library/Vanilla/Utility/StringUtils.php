@@ -302,4 +302,16 @@ final class StringUtils
         }
         return $payload;
     }
+
+    /**
+     * Sanitize an exception message to prevent displaying path ref.
+     * The primary case here is PHP TypeErrors which have file paths directly in them.
+     *
+     * @param string $message actual exception message.
+     * @return string modified exception.
+     */
+    public static function sanitizeExceptionMessage(string $message): string
+    {
+        return str_replace(PATH_ROOT, "", $message);
+    }
 }

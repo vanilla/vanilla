@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,14 +9,13 @@ import { storiesOf } from "@storybook/react";
 import React from "react";
 import { LinkEmbed } from "@library/embeddedContent/LinkEmbed";
 import { EmbedContext } from "@library/embeddedContent/IEmbedContext";
+import { css } from "@emotion/css";
 
 const story = storiesOf("Embeds", module);
 
 const ipsum = `
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus. Fusce vitae porttitor augue. Integer sagittis justo vitae nibh aliquet, a viverra ipsum laoreet. Interdum et malesuada fames ac ante ipsum primis in faucibus. Curabitur elit ligula, fermentum nec felis vel, aliquam interdum justo. Suspendisse et egestas neque. Vivamus volutpat odio eget enim tincidunt, in pretium arcu consectetur. Nulla sodales molestie pharetra.
 `;
-
-const date = "2019-06-05 20:59:01";
 
 story.add("LinkEmbed", () => {
     return (
@@ -39,6 +38,37 @@ story.add("LinkEmbed", () => {
                 embedType="link"
                 body={ipsum}
             />
+
+            <StoryHeading>Inline Variant </StoryHeading>
+            <p style={{ fontSize: 16 }}>
+                some text here
+                <span style={{ marginLeft: 4, marginRight: 4 }}>
+                    <LinkEmbed
+                        url="https://test.com/test/test/test"
+                        name="Online Community Software and Customer Forum Software by Vanilla Forums"
+                        embedType="link"
+                        body={ipsum}
+                        embedStyle="rich_embed_inline"
+                    />
+                </span>
+                some more text here
+            </p>
+            <StoryHeading>Inline Variant With Favicon</StoryHeading>
+            <p style={{ fontSize: 16 }}>
+                some text here
+                <span style={{ marginLeft: 4, marginRight: 4 }}>
+                    <LinkEmbed
+                        url="https://test.com/test/test/test"
+                        name="Online Community Software and Customer Forum Software by Vanilla Forums"
+                        embedType="link"
+                        body={ipsum}
+                        faviconUrl="https://us.v-cdn.net/6030677/uploads/ZQ4WYB5DOIVQ/microsoftteams-image-2818-29.png"
+                        embedStyle="rich_embed_inline"
+                    />
+                </span>
+                some more text here
+            </p>
+
             <StoryHeading>In Editor</StoryHeading>
             <EmbedContext.Provider value={{ inEditor: true, isSelected: true }}>
                 <LinkEmbed

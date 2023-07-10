@@ -1,11 +1,22 @@
-import { Condition, IPtrReference, Path } from "./types";
+import { Condition, IFieldError, IPtrReference } from "./types";
 import get from "lodash/get";
-import Ajv from "ajv";
+import { logError, notEmpty } from "@vanilla/utils";
+import { FormikErrors } from "formik";
+import { ValidationResult, OutputUnit, Validator, Schema } from "@cfworker/json-schema";
+import cloneDeep from "lodash/cloneDeep";
 
-const ajv = new Ajv({
-    // Disables strict mode. Makes it possible to add unsupported properties to schemas.
-    strict: false,
-});
+/**
+ * Get a validation result
+ */
+export function getValidationResult(conditions: Condition, value: any): ValidationResult {
+    /**
+     * The Validator will try to augment the condition which is
+     * not extensible so we clone it instead
+     */
+    const mutableConditions = cloneDeep(conditions);
+    const validator = new Validator(mutableConditions as Schema, "2020-12", false);
+    return validator.validate(value);
+}
 
 /**
  * Returns invalid conditions.
@@ -15,18 +26,46 @@ const ajv = new Ajv({
 export function validateConditions(conditions: Condition[], rootInstance: any) {
     const invalid = conditions.flatMap((condition) => {
         try {
-            const val = get(rootInstance, condition.field, condition.default ?? null);
-            if (!ajv.validate(condition, val)) {
+            let val = get(rootInstance, condition.field ?? "", condition.default ?? null);
+            if (condition.type === "object") {
+                // If were checking multiple properties for conditions, value validation must occur for each field
+                /**
+                 * In some instances, a condition can reference an entire object and validate that each field within the
+                 * object matches the instance. However, its possible for an instance not have the same shape
+                 * as the schema or be entirely empty if the value is undefined.
+                 *
+                 * This value reassignment uses sets explicit falsy values for fields that might not exists
+                 * on the instance.
+                 *
+                 * This is especially needed for conditionals which match falsy on initialization as the instance
+                 * would be empty
+                 */
+                const properties = condition.properties ?? {};
+                val = Object.keys(properties).reduce((acc, key) => {
+                    if (!val?.[key]) {
+                        if (properties[key]?.type === "null") {
+                            return { ...acc, [key]: null };
+                        }
+                        if (properties[key]?.const === false) {
+                            return { ...acc, [key]: false };
+                        }
+                    }
+                    return val;
+                }, val);
+            }
+            const validationResult = getValidationResult(condition, val);
+            if (!validationResult.valid) {
                 return [condition];
             }
-        } catch {
+        } catch (error) {
+            logError(error);
             // Not able to dereference the pointer, assume it is invalid.
             return [condition];
         }
         return [];
     });
     return {
-        isValid: !invalid.length,
+        valid: !invalid.length,
         conditions: invalid,
     };
 }
@@ -35,10 +74,6 @@ export function validateConditions(conditions: Condition[], rootInstance: any) {
  * Finds all references recursively in an object and returns their definition.
  *
  * findAllReferences({ item: { priceDisplay: "{price} $", price: 1.99 }});
-
- * // returns: [{ path: ["item", "priceDisplay"], ref: "price" }]
- * @param anyObj
- * @returns
  */
 export function findAllReferences(anyObj: any, path: Array<string | number> = []): IPtrReference[] {
     return Object.entries(anyObj).flatMap(([key, value]) => {
@@ -51,4 +86,79 @@ export function findAllReferences(anyObj: any, path: Array<string | number> = []
         if (typeof value === "object" && value !== null) return findAllReferences(value, [...path, key]);
         return [];
     });
+}
+
+export function fieldErrorsToValidationErrors(fieldErrors: Record<string, IFieldError[]>): OutputUnit[] {
+    const result: OutputUnit[] = [];
+
+    for (const fieldError of Object.values(fieldErrors).flat()) {
+        const instancePath = ["", fieldError.path?.replace(".", "/"), fieldError.field].filter(notEmpty).join("/");
+        const newError: OutputUnit = {
+            keyword: fieldError.code ?? "unknown",
+            instanceLocation: instancePath,
+            keywordLocation: "fieldLevelError",
+            error: fieldError.message,
+        };
+
+        switch (newError.keyword) {
+            // Kludge because these messages are all horrible (referencing API type names when we should be referencing property names).
+            case "missingField":
+                newError.error = "Field is required.";
+                break;
+            case "ValidateOneOrMoreArrayItemRequired":
+                newError.error = "You must select at least one item.";
+                break;
+        }
+        result.push(newError);
+    }
+
+    return result;
+}
+
+export function validationErrorsToFieldErrors(
+    validationErrors: OutputUnit[] | null | undefined,
+    pathFilter?: string,
+): IFieldError[] {
+    const errors =
+        validationErrors
+            ?.filter((error) => {
+                if (!pathFilter) {
+                    return true;
+                } else {
+                    return error.instanceLocation === pathFilter;
+                }
+            })
+            .map((error) => {
+                return {
+                    code: error.keyword ?? "unknown",
+                    message: error.error!,
+                    field: error.instanceLocation,
+                };
+            }) ?? [];
+    return errors;
+}
+
+export function mapValidationErrorsToFormikErrors(validationErrors: ValidationResult["errors"]): FormikErrors<any> {
+    return Object.fromEntries(
+        validationErrors
+            .filter((error) => !!error.instanceLocation && !!error.error)
+            .map((error) => [error.instanceLocation, error.error])
+            .map(([instanceLocation, error]) => {
+                const key = instanceLocation!.slice(1, instanceLocation!.length).replace(/\//g, ".");
+                return [key, error];
+            }),
+    );
+}
+
+export function recursivelyCleanInstance(instance: Record<string, any>) {
+    return Object.keys(instance).reduce((acc, key) => {
+        const value = instance[key];
+        if (typeof value !== "undefined") {
+            if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+                return { ...acc, [key]: recursivelyCleanInstance(value) };
+            }
+            return { ...acc, [key]: value };
+        }
+        return acc;
+    }, {});
 }

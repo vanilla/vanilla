@@ -187,6 +187,9 @@ components:
                           type: integer
                           description: The parent ID of the tag.
                           nullable: true
+                      url:
+                          type: string
+                          description: URL to view items tagged with this tag.
                   required:
                       - id
                       - urlCode

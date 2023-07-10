@@ -71,4 +71,12 @@ class MockAsset extends \Vanilla\Layout\Asset\AbstractLayoutAsset
             "mockProps" => $mockProps,
         ];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        return "";
+    }
 }

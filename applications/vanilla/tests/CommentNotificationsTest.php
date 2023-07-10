@@ -477,7 +477,13 @@ class CommentNotificationsTest extends SiteTestCase
         $this->runWithUser(function () {
             $this->createDiscussion();
         }, $otherUser);
-        $this->setCategoryPreference($notifyUser, $category, CategoryModel::NOTIFICATION_ALL);
+        $this->setCategoryPreference($notifyUser, $category, [
+            "preferences.followed" => true,
+            "preferences.popup.posts" => true,
+            "preferences.email.posts" => true,
+            "preferences.popup.comments" => true,
+            "preferences.email.comments" => true,
+        ]);
 
         // The discussion is commented on.
         $this->runWithUser(function () {
@@ -613,9 +619,20 @@ class CommentNotificationsTest extends SiteTestCase
             new ExpectedNotification("Comment", [], "participated"),
         ]);
 
+        // User has opted into popups in the past, but popups have been turned off globablly.
+        \Gdn::config()->saveToConfig([
+            "Garden.Popups.Disabled" => true,
+        ]);
+        $this->resetTable("Activity");
+        $this->runWithUser(function () {
+            $this->createComment();
+        }, $otherUser);
+        $this->assertUserHasNoNotifications($notifyUser);
+
         // User has opted into emails in the past, but does not have permission to receive emails.
         \Gdn::config()->saveToConfig([
             "Garden.Email.Disabled" => false,
+            "Garden.Popups.Disabled" => false,
         ]);
         $this->setMemberRoleEmailPermission(false);
         $this->resetTable("Activity");

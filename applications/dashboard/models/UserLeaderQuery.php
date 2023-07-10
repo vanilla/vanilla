@@ -32,7 +32,7 @@ class UserLeaderQuery implements \JsonSerializable
     /** @var string  */
     public $timeSlot;
 
-    /** @var int  */
+    /** @var int|int[] */
     public $pointsCategoryID;
 
     /** @var array  */
@@ -41,11 +41,15 @@ class UserLeaderQuery implements \JsonSerializable
     /** @var array  */
     public $excludedRoleIDs;
 
+    /** @var string */
+    public $siteSectionID;
+
     /**
      * Constructor of the User Leader.
      *
      * @param string $slotType
      * @param int|null $categoryID
+     * @param string|null $siteSectionID
      * @param int|null $limit
      * @param int[] $includedRoleIDs
      * @param int[] $excludedRoleIDs
@@ -54,16 +58,18 @@ class UserLeaderQuery implements \JsonSerializable
     public function __construct(
         string $slotType,
         ?int $categoryID,
+        ?string $siteSectionID,
         ?int $limit,
         ?array $includedRoleIDs = [],
         ?array $excludedRoleIDs = [],
-        ?string $leaderboardType = UserLeaderService::LEADERBOARD_TYPE_REPUTATION
+        ?string $leaderboardType = null
     ) {
         $this->slotType = $slotType;
         $this->categoryID = $categoryID;
         $this->limit = $limit;
         $this->includedRoleIDs = $includedRoleIDs;
         $this->excludedRoleIDs = $excludedRoleIDs;
-        $this->leaderboardType = $leaderboardType;
+        $this->leaderboardType = $leaderboardType ?? UserLeaderService::LEADERBOARD_TYPE_REPUTATION;
+        $this->siteSectionID = $siteSectionID;
     }
 }

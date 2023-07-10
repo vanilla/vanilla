@@ -13,12 +13,16 @@ import { INavigationTreeItem } from "@library/@types/api/core";
 import { notEmpty } from "@vanilla/utils";
 import { cx } from "@emotion/css";
 import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 export default function MobileOnlyNavigation(props: {}) {
+    const { hasPermission } = usePermissionsContext();
     const { mobileOnlyNavigationItems } = navigationVariables();
 
     const [treeItems, activeRecord] = useMemo(() => {
-        const treeItems = mobileOnlyNavigationItems.map((item) => varItemToNavTreeItem(item)).filter(notEmpty);
+        const treeItems = mobileOnlyNavigationItems
+            .map((item) => varItemToNavTreeItem(item, hasPermission))
+            .filter(notEmpty);
         const activeRecord = getActiveRecord(treeItems);
         return [treeItems, activeRecord];
     }, [mobileOnlyNavigationItems]);

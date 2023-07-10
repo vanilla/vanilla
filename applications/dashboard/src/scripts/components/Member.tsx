@@ -33,7 +33,9 @@ export default function Member(props: IMemberResultProps) {
         <tr className={classes.root}>
             <td className={classNames(classes.cell, classes.isLeft, classes.mainColumn)}>
                 <span className={classes.user}>
-                    <UserPhoto size={UserPhotoSize.MEDIUM} userInfo={user} />
+                    <ProfileLink userFragment={user} isUserCard>
+                        <UserPhoto size={UserPhotoSize.MEDIUM} userInfo={user} />
+                    </ProfileLink>
                     <span
                         className={classNames(classes.mainContent, {
                             [classes.mainContentCompact]: isCompact,
@@ -63,7 +65,7 @@ export default function Member(props: IMemberResultProps) {
             {!isCompact && (
                 <td className={classNames(classes.cell, classes.posts, classes.postsColumn)}>
                     <span className={classes.minHeight}>
-                        <NumberFormatted value={user.countComments || 0} />
+                        <NumberFormatted value={user.countPosts || 0} />
                     </span>
                 </td>
             )}

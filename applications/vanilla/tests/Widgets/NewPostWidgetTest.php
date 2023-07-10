@@ -38,6 +38,7 @@ class NewPostWidgetTest extends SiteTestCase
         $spec = [
             '$hydrate' => "react.newpost",
             "title" => "My New Post Button",
+            '$reactTestID' => "newpost",
         ];
 
         $expected = [
@@ -78,6 +79,20 @@ class NewPostWidgetTest extends SiteTestCase
                     2 => "poll",
                 ],
             ],
+            '$reactTestID' => "newpost",
+            '$seoContent' => <<<HTML
+<div class=pageBox>
+    <div class=pageHeadingBox>
+        <h2>My New Post Button</h2>
+    </div>
+    <ul class=linkList>
+        <li><a href=/post/discussion>New Discussion</a></li>
+        <li><a href=/post/question>Ask a Question</a></li>
+        <li><a href=/post/poll>New Poll</a></li>
+    </ul>
+</div>
+HTML
+        ,
         ];
 
         $this->assertHydratesTo($spec, [], $expected);
@@ -88,6 +103,18 @@ class NewPostWidgetTest extends SiteTestCase
         $expected['$reactProps']["asOwnButtons"] = ["question"];
         $expected['$reactProps']["excludedButtons"] = ["poll"];
         $expected['$reactProps']["items"][1]["asOwnButton"] = true;
+        $expected['$seoContent'] = <<<HTML
+<div class=pageBox>
+    <div class=pageHeadingBox>
+        <h2>My New Post Button</h2>
+    </div>
+    <ul class=linkList>
+        <li><a href=/post/discussion>New Discussion</a></li>
+        <li><a href=/post/question>Ask a Question</a></li>
+    </ul>
+</div>
+HTML;
+
         unset($expected['$reactProps']["items"][2]);
 
         $this->assertHydratesTo($spec, [], $expected);

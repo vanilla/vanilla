@@ -2,24 +2,26 @@
 /**
  * DashboardHooks class.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
  */
 
-use Garden\Container\Callback;
 use Garden\Container\Container;
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\Container\Reference;
 use Garden\Web\Exception\ClientException;
-use Vanilla\Dashboard\Modules\CommunityLeadersModule;
-use Vanilla\Exception\PermissionException;
-use Vanilla\Contracts;
-use Vanilla\FeatureFlagHelper;
-use Vanilla\Utility\ContainerUtils;
+use Garden\Web\Exception\ResponseException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Vanilla\Web\APIExpandMiddleware;
+use Vanilla\AddonManager;
+use Vanilla\Contracts;
+use Vanilla\Dashboard\Modules\CommunityLeadersModule;
+use Vanilla\Exception\PermissionException;
+use Vanilla\FeatureFlagHelper;
+use Vanilla\Utility\ContainerUtils;
 use Vanilla\Widgets\WidgetService;
 
 /**
@@ -30,26 +32,39 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
     use LoggerAwareTrait;
 
     /** @var string */
-    private $mobileThemeKey;
+    private string $mobileThemeKey;
 
     /** @var string */
-    private $desktopThemeKey;
+    private string $desktopThemeKey;
 
-    /** @var \Vanilla\AddonManager */
-    private $addonManager;
+    /** @var AddonManager */
+    private AddonManager $addonManager;
+
+    /** @var SessionModel */
+    private SessionModel $sessionModel;
+
+    /** @var Contracts\ConfigurationInterface $config */
+    private $config;
+
+    /** @var null|bool */
+    private $spoofEnabled = null;
 
     /**
      * Constructor for DI.
      *
-     * @param \Vanilla\AddonManager $addonManager
+     * @param AddonManager $addonManager
+     * @param SessionModel $sessionModel
      * @param Contracts\ConfigurationInterface $config
-     * @throws \Garden\Container\ContainerException Catch container errors.
-     * @throws \Garden\Container\NotFoundException Catch if ther is no container.
      */
-    public function __construct(\Vanilla\AddonManager $addonManager, Contracts\ConfigurationInterface $config)
-    {
+    public function __construct(
+        AddonManager $addonManager,
+        SessionModel $sessionModel,
+        Contracts\ConfigurationInterface $config
+    ) {
         parent::__construct();
         $this->addonManager = $addonManager;
+        $this->sessionModel = $sessionModel;
+        $this->config = $config;
         $this->mobileThemeKey = $config->get("Garden.MobileTheme");
         $this->desktopThemeKey = $config->get("Garden.Theme");
     }
@@ -58,6 +73,8 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
      * Add emoji config to a controller's JavaScript definitions object.
      *
      * @param Gdn_Controller $controller
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     private function addEmojiDefinitions(Gdn_Controller $controller)
     {
@@ -114,6 +131,8 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
      * Fire before every page render.
      *
      * @param Gdn_Controller $sender
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public function base_render_before($sender)
     {
@@ -166,11 +185,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             $sender->addJsFile("vendors/ace/ace.js", "dashboard");
             $sender->addJsFile("vendors/ace/ext-searchbox.js", "dashboard");
             $sender->addCssFile("vendors/tomorrow.css", "dashboard");
-        }
-
-        // Check the statistics.
-        if ($sender->isRenderingMasterView()) {
-            Gdn::statistics()->check();
         }
 
         if ($session->isValid()) {
@@ -234,11 +248,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             $sender->MessagesLoaded = "1"; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
         }
 
-        if ($sender->isRenderingMasterView()) {
-            $gdn_Statistics = Gdn::factory("Statistics");
-            $gdn_Statistics->check($sender);
-        }
-
         // Allow forum embedding
         if ($embed = c("Garden.Embed.Allow")) {
             // Record the remote url where the forum is being embedded.
@@ -265,7 +274,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
             $sender->addDefinition("Path", Gdn::request()->path());
 
             $get = Gdn::request()->get();
-            unset($get["p"]); // kludge for old index.php?p=/path
             $sender->addDefinition("Query", http_build_query($get));
             // $Sender->addDefinition('MasterView', $Sender->MasterView);
             $sender->addDefinition("InDashboard", $sender->MasterView == "admin" ? "1" : "0");
@@ -312,6 +320,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
      * Checks if the user is previewing a theme and, if so, updates the default master view.
      *
      * @param Gdn_Controller $sender
+     * @throws Gdn_UserException
      */
     public function base_beforeFetchMaster_handler($sender)
     {
@@ -513,6 +522,14 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 "",
                 $sort
             )
+            ->addLinkIf(
+                "Garden.Settings.Manage",
+                t("User Preferences"),
+                "/dashboard/settings/preferences",
+                "users.preferences",
+                "",
+                $sort
+            )
 
             ->addGroup(t("Discussions"), "forum", "", ["after" => "users"])
             ->addLinkIf("Garden.Settings.Manage", t("Tagging"), "settings/tagging", "forum.tagging", $sort)
@@ -577,14 +594,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 $sort
             )
             ->addLinkIf("Garden.Settings.Manage", t("Routes"), "/dashboard/routes", "site-settings.routes", "", $sort)
-            ->addLinkIf(
-                "Garden.Settings.Manage",
-                t("Statistics"),
-                "/dashboard/statistics",
-                "site-settings.statistics",
-                "",
-                $sort
-            )
 
             ->addGroup("API Integrations", "api", "", ["after" => "site-settings"])
 
@@ -652,6 +661,10 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
      * List all tags and allow searching
      *
      * @param SettingsController $sender
+     * @param null $search
+     * @param null $type
+     * @param null $page
+     * @throws Gdn_UserException
      */
     public function settingsController_tagging_create($sender, $search = null, $type = null, $page = null)
     {
@@ -744,7 +757,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
      *
      * @param SettingsController $sender
      * @param string $action
-     *
+     * @throws Gdn_UserException
      */
     public function settingsController_tags_create($sender, $action)
     {
@@ -813,6 +826,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 break;
             case "add":
             default:
+                $sender->permission("Vanilla.Tagging.Add");
                 $sender->setHighlightRoute("settings/tagging");
                 $sender->title("Add Tag");
 
@@ -919,6 +933,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
      * This is done so comment & forum embedding can work in old IE.
      *
      * @param Gdn_Dispatcher $sender
+     * @throws ResponseException
      */
     public function gdn_dispatcher_appStartup_handler($sender)
     {
@@ -1030,9 +1045,8 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
         }
 
         $m = [];
-        $hasAuthHeader =
-            !empty($_SERVER["HTTP_AUTHORIZATION"]) &&
-            preg_match("`^Bearer\s+(v[a-z]\.[^\s]+)`i", $_SERVER["HTTP_AUTHORIZATION"], $m);
+        $authHeader = \Gdn::request()->getHeader("Authorization");
+        $hasAuthHeader = !empty($authHeader) && preg_match("`^Bearer\s+(v[a-z]\.[^\s]+)`i", $authHeader, $m);
         $hasTokenParam = !empty($_GET["access_token"]);
         if (!$hasAuthHeader && !$hasTokenParam) {
             return;
@@ -1047,6 +1061,18 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
 
                 Gdn::session()->start($authRow["UserID"], false, false);
                 Gdn::session()->validateTransientKey(true);
+
+                $username = Gdn::session()->User->Name ?? "unknown";
+                $tokenName = $authRow["Attributes"]["name"] ?? "id {$authRow["AccessTokenID"]}";
+                $this->logger->info("User $username used access token $tokenName", [
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+                    "userID" => $authRow["UserID"],
+                    "userName" => $username,
+                    "tokenID" => $authRow["AccessTokenID"],
+                    "tokenName" => $tokenName,
+                    "tags" => ["accessToken"],
+                    "event" => "accessToken_auth",
+                ]);
             } catch (\Exception $ex) {
                 // Add a psuedo-WWW-Authenticate header. We want the response to know, but don't want to kill everything.
                 $msg = $ex->getMessage();
@@ -1078,6 +1104,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
      *
      * @param RootController $sender
      * @param string $target The url to redirect to after sso.
+     * @throws ResponseException
      */
     public function rootController_sso_create($sender, $target = "")
     {
@@ -1345,6 +1372,178 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
     {
         if (!\Vanilla\FeatureFlagHelper::featureEnabled(\Vanilla\Utility\SqlUtils::FEATURE_ALTER_TEXT_FIELD_LENGTHS)) {
             \Vanilla\Utility\SqlUtils::keepTextFieldLengths($structure);
+        }
+    }
+
+    /**
+     * Check the actual value of $spoofEnabled. If there is a config for the previous Spoof plugin, use it, otherwise default to true.
+     *
+     * @return bool
+     */
+    private function checkSpoofEnabled(): bool
+    {
+        $this->spoofEnabled = $this->config->get("EnabledPlugins.Spoof", true);
+        return $this->spoofEnabled;
+    }
+
+    /**
+     * Validates the current user's permissions & transientkey and then spoofs
+     * the userid passed as the first arg and redirects to profile.
+     *
+     * @param UserController $sender
+     * @throws ResponseException
+     */
+    public function userController_autoSpoof_create(UserController $sender): void
+    {
+        if (!$this->checkSpoofEnabled()) {
+            return;
+        }
+        $spoofUserID = getValue("0", $sender->RequestArgs);
+        $user = $sender->userModel->getId(intval($spoofUserID));
+        $transientKey = getValue("1", $sender->RequestArgs);
+        // Validate the transient key && permissions
+        if (
+            Gdn::session()->validateTransientKey($transientKey) &&
+            Gdn::session()->checkPermission("Garden.Settings.Manage") &&
+            $user->Admin !== 2
+        ) {
+            $spoofedByUser = Gdn::session()->User;
+            $session = Gdn::session()->Session;
+            $attributes = $session["Attributes"] ?? [];
+            $context = ["SpoofUserID" => $spoofedByUser->UserID, "SpoofUserName" => $spoofedByUser->Name];
+            if (($attributes["orcUserId"] ?? false) && ($attributes["orcUserEmail"] ?? false)) {
+                $context = array_merge($attributes, $context);
+            }
+            if (($attributes["SpoofUserID"] ?? false) && ($attributes["SpoofUserName"] ?? false)) {
+                $context = $attributes;
+            }
+            //Record Whom the user spoofs in as.
+            $context["userSpoofedId"] = $user->UserID;
+            $context["userSpoofedName"] = $user->Name;
+
+            LogModel::insert("Spoof", "Spoof", $context);
+
+            Gdn::session()->start($spoofUserID);
+            $this->sessionModel->update(["Attributes" => $context], ["SessionID" => Gdn::session()->SessionID]);
+            $context[\Vanilla\Logger::FIELD_TAGS] = ["user", "spoof"];
+            $context[\Vanilla\Logger::FIELD_CHANNEL] = \Vanilla\Logger::CHANNEL_SECURITY;
+            $this->logger->info(
+                "User $spoofedByUser->Name($spoofedByUser->UserID) has spoofed into as $user->Name($user->UserID)",
+                $context
+            );
+        }
+        if (!isset($this->_DeliveryType) || $this->_DeliveryType !== DELIVERY_TYPE_ALL) {
+            $sender->setRedirectTo("profile");
+            $sender->render("blank", "utility", "dashboard");
+        } else {
+            redirectTo("profile");
+        }
+    }
+
+    /**
+     * Adds a "Spoof" link to the user management list.
+     *
+     * @param UserController $sender
+     */
+    public function userController_userListOptions_handler(UserController $sender): void
+    {
+        if (!$this->checkSpoofEnabled()) {
+            return;
+        }
+        if (!Gdn::session()->checkPermission("Garden.Settings.Manage")) {
+            return;
+        }
+
+        $user = getValue("User", $sender->EventArguments);
+        if ($user && $user->Admin !== 2) {
+            $attr = [
+                "aria-label" => t("Spoof"),
+                "title" => t("Spoof"),
+                "data-follow-link" => "true",
+            ];
+            $class = "js-modal-confirm btn btn-icon";
+            echo anchor(
+                dashboardSymbol("spoof"),
+                "/user/autospoof/" . $user->UserID . "/" . Gdn::session()->transientKey(),
+                $class,
+                $attr
+            );
+        }
+    }
+
+    /**
+     * Adds a "Spoof" link to the site management list.
+     *
+     * @param ManageController $sender
+     */
+    public function manageController_siteListOptions_handler(ManageController $sender): void
+    {
+        if (!$this->checkSpoofEnabled()) {
+            return;
+        }
+        if (!Gdn::session()->checkPermission("Garden.Settings.Manage")) {
+            return;
+        }
+
+        $site = getValue("Site", $sender->EventArguments);
+        if ($site) {
+            echo anchor(
+                t("Spoof"),
+                "/user/autospoof/" . $site->InsertUserID . "/" . Gdn::session()->transientKey(),
+                "PopConfirm SmallButton"
+            );
+        }
+    }
+
+    /**
+     * Add items to the profile dashboard.
+     *
+     * @param ProfileController $sender
+     */
+    public function profileController_afterAddSideMenu_handler(ProfileController $sender): void
+    {
+        if (!$this->checkSpoofEnabled()) {
+            return;
+        }
+        if (!Gdn::session()->checkPermission("Garden.Settings.Manage")) {
+            return;
+        }
+
+        $sideMenu = $sender->EventArguments["SideMenu"];
+        $viewingUserID = Gdn::session()->UserID;
+
+        if ($sender->User->UserID != $viewingUserID) {
+            $sideMenu->addLink(
+                "Options",
+                t("Spoof User"),
+                "/user/autospoof/" . $sender->User->UserID . "/" . Gdn::session()->transientKey(),
+                "",
+                ["class" => "PopConfirm"]
+            );
+        }
+    }
+
+    /**
+     * Format Spoof information.
+     *
+     * @param LogModel $sender
+     * @param array $args
+     */
+    public function logModel_formatContent_handler(LogModel $sender, array $args): void
+    {
+        $log = $args["Log"];
+        $data = $log["Data"];
+        if ($log["Operation"] == "Spoof") {
+            $args["Result"] =
+                "Spoofed in User ID <b>" .
+                $sender->formatKey("SpoofUserName", $log) .
+                "</b>(" .
+                $sender->formatKey("SpoofUserID", $log) .
+                ") as <b>" .
+                $sender->formatKey("userSpoofedName", $data) .
+                "</b>(" .
+                $sender->formatKey("userSpoofedId", $data) .
+                ")";
         }
     }
 }

@@ -3,6 +3,7 @@
  * @license gpl-2.0-only
  */
 
+import { DiscussionListSortOptions } from "@dashboard/@types/api/discussion";
 import { LayoutSectionInfos } from "@dashboard/layout/editor/LayoutSectionInfos";
 import {
     IEditableLayoutSpec,
@@ -69,7 +70,7 @@ export class LayoutEditorAssetUtils {
                     $hydrate: "react.asset.discussionList",
                     apiParams: {
                         includeChildCategories: true,
-                        sort: "-dateInserted",
+                        sort: DiscussionListSortOptions.RECENTLY_COMMENTED,
                         slotType: "a",
                     },
                     discussionOptions: {
@@ -91,6 +92,7 @@ export class LayoutEditorAssetUtils {
                         },
                     },
                     title: "Recent Discussions",
+                    isAsset: true,
                 },
             ],
         };

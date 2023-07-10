@@ -252,6 +252,7 @@ class ActivityModelTest extends SiteTestCase
     /**
      * Send a notification to a user.
      * @param array $overrides
+     *
      * @return array
      */
     private function notifyUser(array $overrides = []): array
@@ -266,5 +267,95 @@ class ActivityModelTest extends SiteTestCase
         ];
         $result = $this->activityModel->save($params);
         return $result;
+    }
+
+    /**
+     * Test notification link test.
+     *
+     * @return void
+     */
+    public function testNotificationLink()
+    {
+        $expected = "Log in here to update your notification preferences: " . url("/profile/preferences", true);
+        $link = $this->activityModel->getNotificationPreferencePageLink("text");
+        $this->assertEquals($expected, $link);
+
+        $expected =
+            '<a href="' .
+            url("/profile/preferences", true) .
+            '" target="_blank">Log in here to update your notification preferences</a>';
+        $link = $this->activityModel->getNotificationPreferencePageLink("html");
+        $this->assertEquals($expected, $link);
+    }
+
+    /**
+     * Test unsubscribe link and token.
+     *
+     * @return void
+     */
+    public function testUnsubscribeLinkToken()
+    {
+        $activityUserID = 1;
+        $notifyUserID = 2;
+        $this->activityModel->save([
+            "ActivityUserID" => $activityUserID,
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+            "HeadlineFormat" => __FUNCTION__,
+            "Notified" => ActivityModel::SENT_PENDING,
+            "NotifyUserID" => $notifyUserID,
+            "Data" => ["Reason" => "badge"],
+        ]);
+
+        $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
+        $unsubscribeLink = $this->activityModel->getUnsubscribeLink($activityUserID, $notifyUser, "text");
+
+        $link = explode("/unsubscribe/", $unsubscribeLink);
+        $token = $link[1];
+
+        $activity = $this->activityModel->decodeNotificationToken($token);
+        $this->assertEquals("badge", $activity["reason"]);
+    }
+
+    /**
+     * Test unsubscribe link and wrong token.
+     *
+     * @return void
+     */
+    public function testUnsubscribeLinkWrongToken()
+    {
+        $activityUserID = 1;
+        $notifyUserID = 2;
+        $this->activityModel->save([
+            "ActivityUserID" => $activityUserID,
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+            "HeadlineFormat" => __FUNCTION__,
+            "Notified" => ActivityModel::SENT_PENDING,
+            "NotifyUserID" => $notifyUserID,
+            "Data" => ["Reason" => "badge"],
+        ]);
+
+        // $expected = '<a href="' . url("/profile/unsubscribe?token=", true) . '" target="_blank">Unsubscribe</a>';
+        $notifyUser = $this->userModel->getID(1, DATASET_TYPE_ARRAY);
+        $unsubscribeLink = $this->activityModel->getUnsubscribeLink($activityUserID, $notifyUser, "html");
+
+        $link = explode("/unsubscribe/", $unsubscribeLink);
+        $token = $link[1];
+        $broken = explode("\"", $token);
+        $token = $broken[0];
+        $this->expectExceptionMessage("Notification not found.");
+        $this->activityModel->decodeNotificationToken($token);
+    }
+
+    /**
+     * Test unsubscribe wrong token.
+     *
+     * @return void
+     */
+    public function testUnsubscribeLinkInvalidToken()
+    {
+        $this->expectExceptionMessage("Wrong number of segments");
+        $this->activityModel->decodeNotificationToken("sadgasdgasdg");
     }
 }

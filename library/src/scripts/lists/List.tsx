@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import React from "react";
+import React, { ElementType } from "react";
 import { PageBox } from "@library/layout/PageBox";
 import { PageBoxContextProvider } from "@library/layout/PageBox.context";
 import { IListOptions, listVariables } from "@library/lists/List.variables";
@@ -16,7 +16,7 @@ export interface IListProps {
     options?: Partial<IListOptions>;
     children?: React.ReactNode;
     className?: string;
-    as?: keyof JSX.IntrinsicElements;
+    as?: ElementType;
 }
 
 export function List(props: IListProps) {

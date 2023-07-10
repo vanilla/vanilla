@@ -39,7 +39,7 @@ trait TestSortingTrait
      */
     public function testIndexSort(string $field): void
     {
-        $rows = $this->generateIndexRows();
+        $this->generateIndexRows();
 
         $fields = [$field, "-" . $field];
 

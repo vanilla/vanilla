@@ -2,6 +2,7 @@ import { ILoadable } from "@library/@types/api/core";
 import { IMe, IMeCounts, IUser, IInvitees } from "@library/@types/api/users";
 import { IUserSuggestionState } from "@library/features/users/suggestion/UserSuggestionModel";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
+import { RecordID } from "@vanilla/utils";
 
 export interface IInjectableUserState {
     currentUser: ILoadable<IMe>;
@@ -34,6 +35,9 @@ export interface IUsersState {
     suggestions: IUserSuggestionState;
     usersByID: Record<number, ILoadable<IUser>>;
     usersInvitationsByID: Record<number, IInvitationState>;
+    postFormSubmit: ILoadable<{}>;
+    patchStatusByUserID: Record<number, ILoadable<{}>>;
+    patchStatusByPatchID: Record<RecordID, ILoadable<{}>>;
 }
 
 export interface IInvitationState {

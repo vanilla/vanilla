@@ -9,12 +9,11 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { css } from "@emotion/css";
 import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
 import { singleBorder } from "@library/styles/styleHelpersBorders";
-import { inputMixinVars } from "@library/forms/inputStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { Mixins } from "@library/styles/Mixins";
 
 export const dashboardClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const _inputMixinVars = inputMixinVars();
 
     const style = styleFactory("dashboard");
 
@@ -161,6 +160,12 @@ export const dashboardClasses = useThemeCache(() => {
     const label = css({
         display: "inline-flex",
         alignItems: "center",
+        ...Mixins.font({
+            weight: globalVars.fonts.weights.semiBold,
+        }),
+        ...Mixins.margin({
+            bottom: 0,
+        }),
     });
 
     const labelIcon = css({
@@ -170,6 +175,26 @@ export const dashboardClasses = useThemeCache(() => {
     const noLeftPadding = css({
         "&&": {
             paddingLeft: 0,
+        },
+    });
+
+    const helperText = css({
+        display: "block",
+        fontSize: 12,
+        lineHeight: 1.3333333333,
+        color: "#949aa2",
+        marginTop: "1em",
+    });
+
+    const passwordinput = css({
+        "& input": { fontSize: 14 },
+    });
+
+    const spaceBetweenFormGroup = css({
+        justifyContent: "space-between",
+
+        "& .input-wrap": {
+            flex: 0,
         },
     });
 
@@ -191,5 +216,8 @@ export const dashboardClasses = useThemeCache(() => {
         label,
         labelIcon,
         noLeftPadding,
+        helperText,
+        passwordinput,
+        spaceBetweenFormGroup,
     };
 });

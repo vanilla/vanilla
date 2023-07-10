@@ -104,7 +104,7 @@ class QnAModule extends AbstractWidgetModule
             $where["d.CategoryID"] = $visibleCategoriesResult;
         }
 
-        $items = $this->discussionModel->getWhere($where, null, null, $this->limit)->resultObject();
+        $items = $this->discussionModel->getWhere($where, "", "", $this->limit)->resultObject();
 
         return $items;
     }

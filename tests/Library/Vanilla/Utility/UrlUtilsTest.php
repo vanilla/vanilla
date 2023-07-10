@@ -235,4 +235,76 @@ class UrlUtilsTest extends TestCase
         ];
         return array_column($r, null, 0);
     }
+
+    /**
+     * Provides test data for `testEnsureAbsoluteUrl()`.
+     *
+     * @return array
+     */
+    public function provideEnsureAbsoluteUrlTests(): array
+    {
+        return [
+            "root" => ["/foo", "http://example.com/bar/baz", "http://example.com/foo"],
+            "relative" => ["bar", "http://example.com/foo", "http://example.com/bar"],
+            "relative with base URL trailing slash" => ["bar", "http://example.com/foo/", "http://example.com/foo/bar"],
+            "scheme" => ["https://example.com", "http://example.com", "https://example.com"],
+            "scheme-less" => ["//example.com", "https://baz.com", "https://example.com"],
+            "bad scheme" => ["bad://example.com", "http://example.com", null],
+            "bad scheme 2" => ["foo", "bad://example.com", null],
+            ".." => ["../foo", "http://example.com/bar/baz", "http://example.com/foo"],
+            ".. 2" => ["../foo", "http://example.com/bar/baz/", "http://example.com/bar/foo"],
+            "../.." => ["../../foo", "http://example.com/bar/baz/booze", "http://example.com/foo"],
+            "../.. 2" => ["../.././foo", "http://example.com/bar/baz/booze", "http://example.com/foo"],
+            "no url" => ["images/picture", "", null],
+            "invalid source path" => ["http:///example.com", "https://example.com", null],
+            "no source path" => ["", "https://example.com", null],
+        ];
+    }
+
+    /**
+     * Tests that `UrlUtils::ensureAbsoluteUrl()` returns an absolute URL for a given source and base URL.
+     *
+     * @return void
+     * @dataProvider provideEnsureAbsoluteUrlTests
+     */
+    public function testEnsureAbsoluteUrl($href, $url, $expected)
+    {
+        $actual = UrlUtils::ensureAbsoluteUrl($href, $url);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Provides test data for `testBuildUrl()`.
+     *
+     * @return array[]
+     */
+    public function provideBuildUrlTests(): array
+    {
+        return [
+            ["https://example.com"],
+            ["https://user@example.com"],
+            ["https://user:pass@example.com"],
+            ["https://example.com:8080"],
+            ["https://example.com:8080/foo/bar/baz"],
+            ["https://example.com:8080/foo/bar/baz?query=string"],
+            ["https://example.com:8080/foo/bar/baz?query=string#fragement"],
+            ["https://example.com/foo/bar/baz"],
+            ["https://example.com/foo/bar/baz?query=string"],
+            ["https://example.com/foo/bar/baz?query=string#fragement"],
+        ];
+    }
+
+    /**
+     * Tests the output of `UrlUtils::buildUrl()` for different inputs.
+     *
+     * @param $url
+     * @return void
+     * @dataProvider provideBuildUrlTests
+     */
+    public function testBuildUrl($url)
+    {
+        $parsed = parse_url($url);
+        $rebuiltUrl = UrlUtils::buildUrl($parsed);
+        $this->assertSame($url, $rebuiltUrl);
+    }
 }

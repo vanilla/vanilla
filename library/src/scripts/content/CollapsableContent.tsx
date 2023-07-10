@@ -68,7 +68,7 @@ export function CollapsableContent(props: IProps) {
 
     useLayoutEffect(() => {
         setTimeout(() => {
-            scrollRef.current!.scrollTo({ top: 0 });
+            scrollRef.current?.scrollTo?.({ top: 0 });
         }, 0);
     });
 

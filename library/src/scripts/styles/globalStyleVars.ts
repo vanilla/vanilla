@@ -613,6 +613,12 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
                 ...fontFallbacks,
             ],
             monospace: monoFallbacks,
+            headings: [
+                fontsInit0.customFont.name && !fontsInit0.forceGoogleFont
+                    ? fontsInit0.customFont.name
+                    : fontsInit0.googleFontFamily ?? defaultFontFamily,
+                ...fontFallbacks,
+            ],
         },
     });
 
@@ -808,7 +814,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             /**
              * @var global.embed.text.width
              */
-            width: 640,
+            width: 720,
         },
         /**
          * @varGroup global.embed.select

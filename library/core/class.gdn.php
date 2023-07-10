@@ -388,6 +388,8 @@ class Gdn
      * @staticvar string $installationID
      * @param string $setInstallationID
      * @return string Installation ID or NULL
+     *
+     * @deprecated Don't use installationID  for new things.
      */
     public static function installationID($setInstallationID = null)
     {
@@ -414,6 +416,8 @@ class Gdn
      * @staticvar string $installationSecret
      * @param string $setInstallationSecret
      * @return string Installation Secret or NULL
+     *
+     * @deprecated Don't use installationSecret for new things.
      */
     public static function installationSecret($setInstallationSecret = null)
     {

@@ -3,7 +3,7 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
-import { LoadStatus } from "@library/@types/api/core";
+import { IApiError, ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IUserFragment } from "@library/@types/api/users";
 import UserSuggestionModel from "@library/features/users/suggestion/UserSuggestionModel";
 import UserActions, { useUserActions } from "@library/features/users/UserActions";
@@ -12,8 +12,8 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import NotificationsActions from "@library/features/notifications/NotificationsActions";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
-import { IUsersState, IInjectableUserState } from "./userTypes";
+import { useContext, useEffect } from "react";
+import { IUsersState, IInjectableUserState, IPermissions } from "./userTypes";
 import clone from "lodash/clone";
 
 const suggestionReducer = new UserSuggestionModel().reducer;
@@ -36,6 +36,11 @@ export const INITIAL_USERS_STATE: IUsersState = {
     suggestions: suggestionReducer(undefined, "" as any),
     usersByID: {},
     usersInvitationsByID: {},
+    postFormSubmit: {
+        status: LoadStatus.PENDING,
+    },
+    patchStatusByUserID: {},
+    patchStatusByPatchID: {},
 };
 
 export const GUEST_USER_ID = 0;
@@ -108,6 +113,25 @@ export const usersReducer = produce(
             };
             return state;
         })
+        //POST
+        .case(UserActions.postUserACs.started, (state, payload) => {
+            state.postFormSubmit.status = LoadStatus.LOADING;
+            return state;
+        })
+        .case(UserActions.postUserACs.failed, (state, payload) => {
+            state.postFormSubmit.status = LoadStatus.ERROR;
+            state.postFormSubmit.error = payload.error;
+            return state;
+        })
+        .case(UserActions.postUserACs.done, (state, payload) => {
+            const userID = payload.result.userID;
+            state.postFormSubmit.status = LoadStatus.SUCCESS;
+            state.usersByID[userID] = {
+                data: payload.result,
+                status: LoadStatus.SUCCESS,
+            };
+            return state;
+        })
         .case(UserActions.inviteUsersACs.started, (state, params) => {
             const { userID } = params;
             state.usersInvitationsByID[userID].results = { status: LoadStatus.LOADING };
@@ -171,7 +195,35 @@ export const usersReducer = produce(
             };
             return state;
         })
-
+        .case(UserActions.patchUserAC.started, (state, params) => {
+            const { patchID } = params;
+            state.patchStatusByPatchID[patchID] = {
+                ...(state.patchStatusByPatchID[patchID] ?? {}),
+                status: LoadStatus.LOADING,
+            };
+            return state;
+        })
+        .case(UserActions.patchUserAC.done, (state, payload) => {
+            const { userID, patchID } = payload.params;
+            if (state.usersByID[userID]?.data) {
+                state.usersByID[userID].data = {
+                    ...state.usersByID[userID]?.data,
+                    ...payload.result,
+                };
+            }
+            state.patchStatusByPatchID[patchID] = {
+                status: LoadStatus.SUCCESS,
+            };
+            return state;
+        })
+        .case(UserActions.patchUserAC.failed, (state, payload) => {
+            const { patchID } = payload.params;
+            state.patchStatusByPatchID[patchID] = {
+                status: LoadStatus.ERROR,
+                error: payload.error,
+            };
+            return state;
+        })
         .default((state, action) => {
             if (action.type === NotificationsActions.MARK_ALL_READ_RESPONSE) {
                 if (state.current.data) {
@@ -197,18 +249,4 @@ export function mapUsersStoreState(state: ICoreStoreState): IInjectableUserState
 
 export function useUsersState(): IInjectableUserState {
     return useSelector(mapUsersStoreState);
-}
-
-export function usePermissions() {
-    const permissions = useSelector((state: ICoreStoreState) => state.users.permissions);
-    const { getPermissions } = useUserActions();
-    const { status } = permissions;
-
-    useEffect(() => {
-        if ([LoadStatus.PENDING, LoadStatus.LOADING].includes(status)) {
-            void getPermissions();
-        }
-    }, [status, getPermissions]);
-
-    return permissions;
 }

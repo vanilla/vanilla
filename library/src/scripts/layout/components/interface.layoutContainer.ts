@@ -4,13 +4,13 @@
  */
 
 import { ISectionProps } from "@library/layout/LayoutContext";
-import React from "react";
+import React, { ElementType } from "react";
 import { ISectionClasses } from "@library/layout/Section.styles";
 
 export interface ILayoutContainer extends ISectionProps {
     className?: string;
     children?: React.ReactNode;
-    tag?: keyof JSX.IntrinsicElements;
+    tag?: ElementType;
     ariaHidden?: boolean;
     innerRef?: React.RefObject<HTMLDivElement>;
     panelClasses?: ISectionClasses;

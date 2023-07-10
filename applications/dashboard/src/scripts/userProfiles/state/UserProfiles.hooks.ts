@@ -8,8 +8,10 @@ import {
     fetchProfileField,
     fetchProfileFields,
     fetchUserProfileFields,
+    patchUserProfileFields,
     patchProfileField,
     postProfileField,
+    putProfileFieldsSorts,
 } from "@dashboard/userProfiles/state/UserProfiles.actions";
 import {
     useUserProfilesDispatch,
@@ -17,17 +19,34 @@ import {
     useUserProfilesSelectorByID,
 } from "@dashboard/userProfiles/state/UserProfiles.slice";
 import {
+    FetchProfileFieldsParams,
     PatchProfileFieldParams,
     PostProfileFieldParams,
     ProfileField,
+    PatchUserProfileFieldsParams,
+    PutUserProfileFieldsParams,
+    UserProfileFields,
+    ProfileFieldVisibility,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import { RecordID, stableObjectHash } from "@vanilla/utils";
 import { useEffect, useMemo } from "react";
 
-export function useProfileFields(params = {}): ILoadable<ProfileField[]> {
+export function useProfileFields(
+    params: FetchProfileFieldsParams = {},
+    options?: {
+        filterPermissions?: true; //if we only want the profile fields whose corresponding data the session user has permission to view
+        isOwnProfile?: boolean; //whether we're getting fields for a user's own profile.
+    },
+): ILoadable<ProfileField[]> {
     const dispatch = useUserProfilesDispatch();
 
+    const { hasPermission } = usePermissionsContext();
+    const filterPermissions = options?.filterPermissions ?? false;
+    const isOwnProfile = options?.isOwnProfile ?? false;
+
+    const paramsAreEmpty = Object.keys(params).length === 0;
     const paramHash = stableObjectHash(params ?? {});
 
     const profileFieldApiNamesByParamHash = useUserProfilesSelector(
@@ -44,8 +63,26 @@ export function useProfileFields(params = {}): ILoadable<ProfileField[]> {
         if (!profileFieldApiNames || profileFieldApiNames?.status !== LoadStatus.SUCCESS) {
             return undefined;
         }
-        return Object.values(profileFieldsByApiName);
-    }, [profileFieldApiNames, profileFieldsByApiName]);
+        return (
+            Object.values(profileFieldsByApiName)
+                // if params are empty, that means we want to retrieve all the profile fields, including any that might be added while this hook is being used.
+                .filter(paramsAreEmpty ? () => true : ({ apiName }) => profileFieldApiNames.data!.includes(apiName))
+                .filter(
+                    filterPermissions
+                        ? (profileField) => {
+                              switch (profileField.visibility) {
+                                  case ProfileFieldVisibility.PUBLIC:
+                                      return true;
+                                  case ProfileFieldVisibility.PRIVATE:
+                                      return hasPermission("personalInfo.view") || isOwnProfile;
+                                  case ProfileFieldVisibility.INTERNAL:
+                                      return hasPermission("internalInfo.view");
+                              }
+                          }
+                        : () => true,
+                )
+        );
+    }, [profileFieldApiNames, profileFieldsByApiName, filterPermissions]);
 
     useEffect(() => {
         if (params && !profileFieldApiNames) {
@@ -103,7 +140,7 @@ export function usePatchProfileField() {
 /**
  * Get the profile field values for a given UserID
  */
-export function useProfileFieldByUserID(userID: RecordID) {
+export function useProfileFieldsByUserID(userID: RecordID): ILoadable<UserProfileFields> {
     const dispatch = useUserProfilesDispatch();
 
     const profileFieldsByUserIDs = useUserProfilesSelectorByID(
@@ -116,7 +153,7 @@ export function useProfileFieldByUserID(userID: RecordID) {
         if (profileFieldsByUserIDs[userID] && profileFieldsByUserIDs[userID]?.data) {
             return profileFieldsByUserIDs[userID].data;
         }
-        return null;
+        return undefined;
     }, [profileFieldsByUserIDs, userID]);
 
     useEffect(() => {
@@ -139,5 +176,21 @@ export function useDeleteProfileField() {
 
     return async function (apiName: ProfileField["apiName"]) {
         return await dispatch(deleteProfileField(apiName)).unwrap();
+    };
+}
+
+export function usePatchProfileFieldByUserID(userID: RecordID) {
+    const dispatch = useUserProfilesDispatch();
+
+    return async function (params: PatchUserProfileFieldsParams) {
+        return await dispatch(patchUserProfileFields({ userID, ...params })).unwrap();
+    };
+}
+
+export function usePutProfileFieldsSorts() {
+    const dispatch = useUserProfilesDispatch();
+
+    return async function (params: PutUserProfileFieldsParams) {
+        return await dispatch(putProfileFieldsSorts(params)).unwrap();
     };
 }

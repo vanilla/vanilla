@@ -8,6 +8,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { styleFactory } from "@library/styles/styleUtils";
 import { Mixins } from "@library/styles/Mixins";
+import { css } from "@emotion/css";
 
 export const pageErrorMessageClasses = () => {
     const style = styleFactory("pageErrorMessage");
@@ -49,6 +50,14 @@ export const pageErrorMessageClasses = () => {
         }),
     });
 
+    const trace = css({
+        marginTop: 24,
+
+        "& > h2": {
+            marginBottom: 12,
+        },
+    });
+
     const errorIcon = style("icon", {
         ...{
             "&&": {
@@ -71,5 +80,6 @@ export const pageErrorMessageClasses = () => {
         cta,
         titleAsParagraph,
         errorIcon,
+        trace,
     };
 };

@@ -61,6 +61,10 @@ class StubContentPlugin extends Gdn_Plugin
      */
     public function gdn_configurationSource_beforeSave_handler($sender)
     {
+        if (!\Gdn::structure()->tableExists("UserMeta")) {
+            // We're not installed yet in an alt-install.
+            return;
+        }
         // Don't re-check inserted stub content unless an admin caused a config change
         if (!Gdn::session()->checkPermission("Garden.Settings.Manage")) {
             return;
@@ -84,6 +88,10 @@ class StubContentPlugin extends Gdn_Plugin
      */
     public function processStubContent()
     {
+        if (\Gdn::structure()->CaptureOnly) {
+            // Don't perform DB writes constantly when we are in capture mode.
+            return;
+        }
         // User
         $this->addStubContent("user");
 

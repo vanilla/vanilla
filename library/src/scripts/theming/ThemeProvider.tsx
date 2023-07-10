@@ -18,6 +18,7 @@ import { Backgrounds, BackgroundsProvider } from "@library/layout/Backgrounds";
 import { BrowserRouter } from "react-router-dom";
 import { useThemeCacheID } from "@library/styles/themeCache";
 import { loadThemeShadowDom } from "@library/theming/loadThemeShadowDom";
+import { logError } from "@vanilla/utils";
 
 interface IProps {
     children: React.ReactNode;
@@ -49,7 +50,14 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
         }
 
         if (assets.status === LoadStatus.PENDING) {
-            void getAssets(themeKey, revisionID);
+            try {
+                if (process.env.NODE_ENV !== "test") {
+                    return;
+                }
+                void getAssets(themeKey, revisionID);
+            } catch (error) {
+                logError("Failed to load theme", error);
+            }
             return;
         }
 

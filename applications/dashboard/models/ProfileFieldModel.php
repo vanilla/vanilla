@@ -8,29 +8,38 @@
 namespace Vanilla\Dashboard\Models;
 
 use DateTimeZone;
+use Garden\EventManager;
 use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ForbiddenException;
 use Gdn;
+use Vanilla\Dashboard\Events\UserEvent;
 use Vanilla\Database\Operation\BooleanFieldProcessor;
 use Vanilla\Database\Operation\JsonFieldProcessor;
+use Vanilla\DateFilterSchema;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Models\FullRecordCacheModel;
+use Vanilla\Schema\RangeExpression;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Model for interacting with the profileFields table
  */
 class ProfileFieldModel extends FullRecordCacheModel
 {
+    const CONFIG_FEATURE_FLAG = "Feature.CustomProfileFields.Enabled";
+    const FEATURE_FLAG = "CustomProfileFields";
+
     private const TABLE_NAME = "profileField";
 
+    // Data types.
     const DATA_TYPE_TEXT = "text";
     const DATA_TYPE_BOOL = "boolean";
     const DATA_TYPE_DATE = "date";
     const DATA_TYPE_NUMBER = "number";
     const DATA_TYPE_STRING_MUL = "string[]";
     const DATA_TYPE_NUMBER_MUL = "number[]";
-
     const DATA_TYPES = [
         self::DATA_TYPE_TEXT,
         self::DATA_TYPE_BOOL,
@@ -40,12 +49,13 @@ class ProfileFieldModel extends FullRecordCacheModel
         self::DATA_TYPE_NUMBER_MUL,
     ];
 
+    // Registration Options.
     const REGISTRATION_REQUIRED = "required";
     const REGISTRATION_OPTIONAL = "optional";
     const REGISTRATION_HIDDEN = "hidden";
-
     const REGISTRATION_OPTIONS = [self::REGISTRATION_REQUIRED, self::REGISTRATION_OPTIONAL, self::REGISTRATION_HIDDEN];
 
+    // Form Types.
     const FORM_TYPE_TEXT = "text";
     const FORM_TYPE_TEXT_MULTILINE = "text-multiline";
     const FORM_TYPE_DROPDOWN = "dropdown";
@@ -53,7 +63,6 @@ class ProfileFieldModel extends FullRecordCacheModel
     const FORM_TYPE_CHECKBOX = "checkbox";
     const FORM_TYPE_DATE = "date";
     const FORM_TYPE_NUMBER = "number";
-
     const FORM_TYPES = [
         self::FORM_TYPE_TEXT,
         self::FORM_TYPE_TEXT_MULTILINE,
@@ -64,19 +73,137 @@ class ProfileFieldModel extends FullRecordCacheModel
         self::FORM_TYPE_NUMBER,
     ];
 
-    const VISIBILITIES = ["public", "private", "internal"];
+    // Visibilities.
+    const VISIBILITY_PUBLIC = "public";
+    const VISIBILITY_PRIVATE = "private";
+    const VISIBILITY_INTERNAL = "internal";
+    const VISIBILITIES = [self::VISIBILITY_PUBLIC, self::VISIBILITY_PRIVATE, self::VISIBILITY_INTERNAL];
 
-    const MUTABILITIES = ["all", "restricted", "none"];
+    // Mutabilities.
+    const MUTABILITY_ALL = "all";
+    const MUTABILITY_RESTRICTED = "restricted";
+    const MUTABILITY_NONE = "none";
+    const MUTABILITIES = [self::MUTABILITY_ALL, self::MUTABILITY_RESTRICTED, self::MUTABILITY_NONE];
+
+    // Default fields.
+    const DEFAULT_FIELD_TITLE = [
+        "associatedPermission" => "Garden.Profile.Titles",
+        "apiName" => "Title",
+        "label" => "Title",
+        "description" => "The user's title",
+        "dataType" => self::DATA_TYPE_TEXT,
+        "formType" => self::FORM_TYPE_TEXT,
+        "visibility" => self::VISIBILITY_PUBLIC,
+        "mutability" => self::MUTABILITY_ALL,
+        "displayOptions" => ["userCards" => false, "posts" => false, "search" => false],
+        "registrationOptions" => self::REGISTRATION_OPTIONAL,
+    ];
+    const DEFAULT_FIELD_LOCATION = [
+        "associatedPermission" => "Garden.Profile.Locations",
+        "apiName" => "Location",
+        "label" => "Location",
+        "description" => "The user's location",
+        "dataType" => self::DATA_TYPE_TEXT,
+        "formType" => self::FORM_TYPE_TEXT,
+        "visibility" => self::VISIBILITY_PRIVATE,
+        "mutability" => self::MUTABILITY_ALL,
+        "displayOptions" => ["userCards" => false, "posts" => false, "search" => false],
+        "registrationOptions" => self::REGISTRATION_OPTIONAL,
+    ];
+    const DEFAULT_FIELD_DATE_OF_BIRTH = [
+        "apiName" => "DateOfBirth",
+        "label" => "Birthday",
+        "description" => "The user's birthday",
+        "dataType" => self::DATA_TYPE_DATE,
+        "formType" => self::FORM_TYPE_DATE,
+        "visibility" => self::VISIBILITY_INTERNAL,
+        "mutability" => self::MUTABILITY_RESTRICTED,
+        "displayOptions" => ["profiles" => false, "userCards" => false, "posts" => false],
+        "registrationOptions" => self::REGISTRATION_OPTIONAL,
+    ];
+    private const DEFAULT_FIELDS = [
+        self::DEFAULT_FIELD_TITLE["apiName"] => self::DEFAULT_FIELD_TITLE,
+        self::DEFAULT_FIELD_LOCATION["apiName"] => self::DEFAULT_FIELD_LOCATION,
+        self::DEFAULT_FIELD_DATE_OF_BIRTH["apiName"] => self::DEFAULT_FIELD_DATE_OF_BIRTH,
+    ];
+    public const INITIAL_FIELDS = [
+        [
+            "apiName" => "first-name",
+            "label" => "First Name",
+            "description" => "The user's first name",
+            "dataType" => self::DATA_TYPE_TEXT,
+            "formType" => self::FORM_TYPE_TEXT,
+            "visibility" => self::VISIBILITY_PUBLIC,
+            "mutability" => self::MUTABILITY_ALL,
+            "displayOptions" => ["userCards" => true, "posts" => false, "search" => false],
+            "registrationOptions" => self::REGISTRATION_OPTIONAL,
+            "enabled" => false,
+        ],
+        [
+            "apiName" => "last-name",
+            "label" => "Last Name",
+            "description" => "The user's last name",
+            "dataType" => self::DATA_TYPE_TEXT,
+            "formType" => self::FORM_TYPE_TEXT,
+            "visibility" => self::VISIBILITY_PRIVATE,
+            "mutability" => self::MUTABILITY_ALL,
+            "displayOptions" => ["userCards" => true, "posts" => false, "search" => false],
+            "registrationOptions" => self::REGISTRATION_OPTIONAL,
+            "enabled" => false,
+        ],
+        [
+            "apiName" => "company",
+            "label" => "Company",
+            "description" => "The user's company",
+            "dataType" => self::DATA_TYPE_TEXT,
+            "formType" => self::FORM_TYPE_TEXT,
+            "visibility" => self::VISIBILITY_PUBLIC,
+            "mutability" => self::MUTABILITY_ALL,
+            "displayOptions" => ["userCards" => true, "posts" => false, "search" => false],
+            "registrationOptions" => self::REGISTRATION_OPTIONAL,
+            "enabled" => false,
+        ],
+        [
+            "apiName" => "pronouns",
+            "label" => "Preferred Pronouns",
+            "description" => "The user's preferred pronouns",
+            "dataType" => self::DATA_TYPE_TEXT,
+            "formType" => self::FORM_TYPE_TEXT,
+            "visibility" => self::VISIBILITY_PUBLIC,
+            "mutability" => self::MUTABILITY_ALL,
+            "displayOptions" => ["userCards" => true, "posts" => false, "search" => false],
+            "registrationOptions" => self::REGISTRATION_OPTIONAL,
+            "enabled" => false,
+        ],
+        [
+            "apiName" => "bio",
+            "label" => "Bio",
+            "description" => "The user's bio",
+            "dataType" => self::DATA_TYPE_TEXT,
+            "formType" => self::FORM_TYPE_TEXT_MULTILINE,
+            "visibility" => self::VISIBILITY_PUBLIC,
+            "mutability" => self::MUTABILITY_ALL,
+            "displayOptions" => ["userCards" => true, "posts" => false, "search" => false],
+            "registrationOptions" => self::REGISTRATION_OPTIONAL,
+            "enabled" => false,
+        ],
+    ];
+    // Fields that should be handled by `userMeta` while not necessarily having a corresponding `profileField` record.
+    private const GHOST_DEFAULT_FIELDS = ["Gender"];
 
     /** @var \UserMetaModel */
     private $userMetaModel;
 
+    /** @var EventManager */
+    public $eventManager;
+
     /**
      * ProfileFieldModel constructor.
      */
-    public function __construct(\UserMetaModel $userMetaModel, \Gdn_Cache $cache)
+    public function __construct(\UserMetaModel $userMetaModel, \Gdn_Cache $cache, EventManager $eventManager)
     {
         $this->userMetaModel = $userMetaModel;
+        $this->eventManager = $eventManager;
         parent::__construct(self::TABLE_NAME, $cache, [
             \Gdn_Cache::FEATURE_EXPIRY => 3600, // 1 hour.
         ]);
@@ -109,11 +236,13 @@ class ProfileFieldModel extends FullRecordCacheModel
      */
     public static function structure()
     {
+        $apiNameMaxLength = \UserMetaModel::NAME_LENGTH - strlen("profile.");
+
         \Gdn::structure()
             ->table(self::TABLE_NAME)
-            ->column("apiName", "varchar(50)", false, "primary")
-            ->column("label", "varchar(100)", false, "unique")
-            ->column("description", "varchar(100)")
+            ->column("apiName", "varchar($apiNameMaxLength)", false, "primary")
+            ->column("label", "varchar(700)", false, "unique")
+            ->column("description", "text", true)
             ->column("dataType", self::DATA_TYPES)
             ->column("formType", self::FORM_TYPES)
             ->column("visibility", self::VISIBILITIES)
@@ -122,6 +251,7 @@ class ProfileFieldModel extends FullRecordCacheModel
             ->column("dropdownOptions", "mediumtext", true)
             ->column("registrationOptions", self::REGISTRATION_OPTIONS, self::REGISTRATION_HIDDEN)
             ->column("sort", "int")
+            ->column("isCoreField", "varchar(100)", "")
             ->column("enabled", "tinyint", 1)
             ->set();
 
@@ -147,6 +277,94 @@ class ProfileFieldModel extends FullRecordCacheModel
                 ->table(self::TABLE_NAME)
                 ->dropColumn("required");
         }
+
+        if (!FeatureFlagHelper::featureEnabled(ProfileFieldModel::FEATURE_FLAG)) {
+            // Don't perform the migration until things are enabled.
+            return;
+        }
+        // Migrate legacy fields.
+        $legacyMigrator = \Gdn::getContainer()->get(LegacyProfileFieldMigrator::class);
+        $legacyMigrator->runMigration();
+
+        $profileFieldModel = \Gdn::getContainer()->get(ProfileFieldModel::class);
+        $sortMax = $profileFieldModel->getMaxSort();
+        $profileFields = $profileFieldModel->getProfileFields();
+
+        // Add initial fields if there are no profile fields.
+        if (empty($profileFields) && !\Gdn::structure()->CaptureOnly) {
+            foreach (self::INITIAL_FIELDS as $field) {
+                $sortMax++;
+                $field["sort"] = $sortMax;
+                $profileFieldModel->insert($field, [self::OPT_IGNORE => true]);
+            }
+        }
+
+        // Look for pre-existing default `Title`, `Location` & `DateOfBirth` profile fields.
+        $existingFields = $profileFieldModel->getAll();
+        $existingApiNames = array_column($existingFields, "apiName");
+        $defaultFieldsApiName = array_keys(self::DEFAULT_FIELDS);
+        $shouldInsertApiNames = array_diff($defaultFieldsApiName, $existingApiNames);
+        foreach ($shouldInsertApiNames as $defaultFieldApiName) {
+            $sortMax++;
+            $insertValues = self::DEFAULT_FIELDS[$defaultFieldApiName];
+            $insertValues["sort"] = $sortMax;
+            $insertValues["enabled"] = isset($insertValues["associatedPermission"])
+                ? \Gdn::config($insertValues["associatedPermission"])
+                : false;
+            unset($insertValues["associatedPermission"]);
+
+            if (!\Gdn::structure()->CaptureOnly) {
+                $profileFieldModel->insert($insertValues, [self::OPT_IGNORE => true]);
+            }
+        }
+
+        // Previous automated field creation may have created pre-json-encoded `displayOptions`.
+        // What follows fixes it & restores functionality.
+        $wrongDisplayOptions = '"{\"userCards\":false,\"posts\":false,\"search\":false}"';
+        $RSWithWrongDisplayOptions = Gdn::database()
+            ->sql()
+            ->select("apiName")
+            ->from(self::TABLE_NAME)
+            ->where(["displayOptions" => $wrongDisplayOptions])
+            ->get()
+            ->result(DATASET_TYPE_ARRAY);
+        if (count($RSWithWrongDisplayOptions) > 0) {
+            Gdn::database()
+                ->sql()
+                ->update(self::TABLE_NAME)
+                ->set(["displayOptions" => "'{\"userCards\":false,\"posts\":false, \"search\":false}'"], "", false)
+                ->where(["displayOptions" => $wrongDisplayOptions])
+                ->put();
+        }
+    }
+
+    /**
+     * Add some normalization to the dropdownoptions field.
+     */
+    protected function configureReadSchema(Schema $schema): Schema
+    {
+        $schema = parent::configureReadSchema($schema);
+
+        $schema->addFilter("dropdownOptions", function ($dropdownOptions) {
+            if ($dropdownOptions === null) {
+                return null;
+            }
+
+            $dropdownOptions = json_decode($dropdownOptions, true);
+            // In case some bad values got migrated into dropdownOptions, make sure it is cleaned up.
+            if ($dropdownOptions === null) {
+                return json_encode(null);
+            } elseif (ArrayUtils::isAssociative($dropdownOptions)) {
+                return json_encode(array_values($dropdownOptions));
+            } elseif (ArrayUtils::isArray($dropdownOptions)) {
+                // Leave it alone.
+                return json_encode($dropdownOptions);
+            } else {
+                return json_encode([]);
+            }
+        });
+
+        return $schema;
     }
 
     /**
@@ -184,9 +402,16 @@ class ProfileFieldModel extends FullRecordCacheModel
             "dropdownOptions:a|n",
             "visibility:s" => ["enum" => self::VISIBILITIES],
             "mutability:s" => ["enum" => self::MUTABILITIES],
-            "displayOptions:o" => Schema::parse(["userCards:b", "posts:b"]),
+            "displayOptions:o" => Schema::parse([
+                "userCards:b",
+                "posts:b",
+                "search:b?" => [
+                    "default" => false,
+                ],
+            ]),
             "registrationOptions:s" => ["x-filter" => true, "enum" => self::REGISTRATION_OPTIONS],
             "sort:i",
+            "isCoreField:s?",
             "enabled:b",
         ]);
     }
@@ -207,7 +432,7 @@ class ProfileFieldModel extends FullRecordCacheModel
             "dropdownOptions:a|n?",
             "visibility:s?" => ["enum" => self::VISIBILITIES],
             "mutability:s?" => ["enum" => self::MUTABILITIES],
-            "displayOptions:o?" => Schema::parse(["userCards:b", "posts:b"]),
+            "displayOptions:o?" => Schema::parse(["userCards:b", "posts:b", "search:b?"]),
             "registrationOptions:s?" => ["x-filter" => true, "enum" => self::REGISTRATION_OPTIONS],
             "sort:i?",
             "enabled:b?",
@@ -229,15 +454,13 @@ class ProfileFieldModel extends FullRecordCacheModel
             "label:s" => [
                 "minLength" => 1,
             ],
-            "description:s" => [
-                "default" => "",
-            ],
+            "description:s?",
             "dataType:s" => ["enum" => self::DATA_TYPES],
             "formType:s" => ["enum" => self::FORM_TYPES],
             "dropdownOptions:a|n?",
             "visibility:s" => ["enum" => self::VISIBILITIES],
             "mutability:s" => ["enum" => self::MUTABILITIES],
-            "displayOptions:o" => Schema::parse(["userCards:b", "posts:b"]),
+            "displayOptions:o" => Schema::parse(["userCards:b", "posts:b", "search:b?"]),
             "registrationOptions:s" => ["enum" => self::REGISTRATION_OPTIONS, "default" => self::REGISTRATION_HIDDEN],
             "sort:i?",
             "enabled:b?",
@@ -246,8 +469,8 @@ class ProfileFieldModel extends FullRecordCacheModel
             ->addValidator("", [$this, "validateTypeFields"])
             ->addValidator("", [$this, "validateRequired"])
             ->addValidator("apiName", function (string $apiName, ValidationField $field) {
-                if (preg_match("/[.\s]/", $apiName)) {
-                    $field->addError("Whitespace and periods are not allowed");
+                if (preg_match("/[.\s\/]/", $apiName)) {
+                    $field->addError("Whitespace, slashes, and periods are not allowed");
                 }
             });
     }
@@ -284,13 +507,8 @@ class ProfileFieldModel extends FullRecordCacheModel
     public function insert(array $set, array $options = [])
     {
         if (!isset($set["sort"])) {
-            // By default, set the sort value to the max sort value + 1
-            $max = (int) $this->createSql()
-                ->select("max(sort) as max")
-                ->from(self::TABLE_NAME)
-                ->get()
-                ->value("max");
-            $set["sort"] = $max + 1;
+            // By default, set the sort value to the max sort value + 1;
+            $set["sort"] = $this->getMaxSort() + 1;
         }
 
         return parent::insert($set, $options);
@@ -429,12 +647,12 @@ class ProfileFieldModel extends FullRecordCacheModel
      *
      * @return Schema
      */
-    public function getUserProfileFieldSchema(): Schema
+    public function getUserProfileFieldSchema(bool $withRequiredFields = false): Schema
     {
         // Dynamically build the schema based on the fields and data types.
         $schemaArray = [];
 
-        foreach ($this->select() as $field) {
+        foreach ($this->select(["enabled" => true]) as $field) {
             $name = $field["apiName"];
             $dataType = $field["dataType"];
 
@@ -443,14 +661,97 @@ class ProfileFieldModel extends FullRecordCacheModel
                 case self::DATA_TYPE_BOOL:
                 case self::DATA_TYPE_DATE:
                 case self::DATA_TYPE_NUMBER:
-                    $schemaArray["$name?"] = [
+                    $options = [
                         "type" => $this->getSchemaType($dataType),
                     ];
+                    if ($withRequiredFields && $field["registrationOptions"] === self::REGISTRATION_REQUIRED) {
+                        $options["minLength"] = 1;
+                    }
+                    $schemaArray["$name?"] = $options;
                     break;
                 case self::DATA_TYPE_STRING_MUL:
                 case self::DATA_TYPE_NUMBER_MUL:
-                    $schemaArray["$name:a?"] = ["items" => ["type" => $this->getSchemaType($dataType)]];
+                    $options = ["items" => ["type" => $this->getSchemaType($dataType)]];
+                    if ($field["registrationOptions"] === self::REGISTRATION_REQUIRED) {
+                        $options["minItems"] = 1;
+                    }
+                    $schemaArray["$name:a?"] = $options;
                     break;
+            }
+        }
+
+        $schema = Schema::parse($schemaArray);
+        if ($withRequiredFields) {
+            $requiredFields = [];
+            foreach ($this->select(["enabled" => true]) as $field) {
+                // Set required fields.
+                if ($field["registrationOptions"] === self::REGISTRATION_REQUIRED) {
+                    $schema->setField("properties.{$field["apiName"]}.minLength", 1);
+                    $schema->setField("properties.{$field["apiName"]}.minItems", 1);
+                    $requiredFields[] = $field["apiName"];
+                }
+            }
+            $schema->setField("required", $requiredFields);
+        }
+        return $schema;
+    }
+
+    /**
+     * Returns a validator which checks if the profile fields being validated can be edited by the current user.
+     *
+     * @param int|null $userID If set, check if this specific user's profile fields can be edited.
+     * @return \Closure
+     */
+    public function validateEditable(?int $userID = null): \Closure
+    {
+        return function (array $data, ValidationField $field) use ($userID) {
+            $profileFields = array_column($this->select(), null, "apiName");
+            foreach ($data as $fieldName => $fieldValue) {
+                $profileField = $profileFields[$fieldName];
+                if (!$this->canEdit($userID, $profileField)) {
+                    $field->addError("Cannot update $fieldName", ["status" => 403]);
+                }
+            }
+        };
+    }
+
+    /**
+     * Return a schema for validating profile field filters.
+     *
+     * @return Schema
+     */
+    public function getProfileFieldFilterSchema(): Schema
+    {
+        $schemaArray = [];
+
+        foreach ($this->getEnabledProfileFieldsIndexed() as $name => $field) {
+            $formType = $field["formType"];
+            $dataType = $field["dataType"];
+
+            switch ([$dataType, $formType]) {
+                case [ProfileFieldModel::DATA_TYPE_BOOL, ProfileFieldModel::FORM_TYPE_CHECKBOX]:
+                    $schemaArray["$name?"] = ["type" => "boolean", "example" => "true|false"];
+                    break;
+                case [ProfileFieldModel::DATA_TYPE_TEXT, ProfileFieldModel::FORM_TYPE_DROPDOWN]:
+                case [ProfileFieldModel::DATA_TYPE_STRING_MUL, ProfileFieldModel::FORM_TYPE_DROPDOWN]:
+                case [ProfileFieldModel::DATA_TYPE_STRING_MUL, ProfileFieldModel::FORM_TYPE_TOKENS]:
+                    $schemaArray["$name:a?"] = [
+                        "items" => ["type" => "string"],
+                        "style" => "form",
+                        "example" => "option1,option2,option3",
+                    ];
+                    break;
+                case [ProfileFieldModel::DATA_TYPE_NUMBER_MUL, ProfileFieldModel::FORM_TYPE_TOKENS]:
+                case [ProfileFieldModel::DATA_TYPE_NUMBER, ProfileFieldModel::FORM_TYPE_NUMBER]:
+                case [ProfileFieldModel::DATA_TYPE_NUMBER, ProfileFieldModel::FORM_TYPE_DROPDOWN]:
+                    $schemaArray["$name?"] = RangeExpression::createSchema([":int"], true);
+                    break;
+                case [ProfileFieldModel::DATA_TYPE_DATE, ProfileFieldModel::FORM_TYPE_DATE]:
+                    $schemaArray["$name?"] = new DateFilterSchema();
+                    break;
+                case [ProfileFieldModel::DATA_TYPE_TEXT, ProfileFieldModel::FORM_TYPE_TEXT]:
+                case [ProfileFieldModel::DATA_TYPE_TEXT, ProfileFieldModel::FORM_TYPE_TEXT_MULTILINE]:
+                    $schemaArray["$name?"] = ["type" => "string"];
             }
         }
 
@@ -458,47 +759,50 @@ class ProfileFieldModel extends FullRecordCacheModel
     }
 
     /**
-     * Returns a schema object used to validate filters passed to the user list api
+     * Returns a filtered array of profile field filters from the given array that
+     * can only be handled by Elastic via the SearchService.
      *
-     * @return Schema
+     * @param array|null $profileFields
+     * @return array
      */
-    public function getProfileFieldQuerySchema(): Schema
+    public function getSearchFilters(?array $profileFields): array
     {
-        // Dynamically build the schema based on the fields and data types.
-        $schemaArray = [];
+        $searchOnlyFilters = [];
+        if (empty($profileFields)) {
+            return [];
+        }
+        // Need to validate to make sure we get fields in the correct format.
+        $profileFields = $this->getProfileFieldFilterSchema()->validate($profileFields);
 
-        foreach ($this->select() as $field) {
-            $name = $field["apiName"];
+        // Get the enabled profile fields to get extra information about each profile field.
+        $databaseProfileFields = $this->getEnabledProfileFieldsIndexed();
+        foreach ($profileFields as $apiName => $profileField) {
+            $databaseProfileField = $databaseProfileFields[$apiName] ?? null;
+            $formType = $databaseProfileField["formType"] ?? null;
+            $dataType = $databaseProfileField["dataType"] ?? null;
 
-            switch ($field["dataType"]) {
-                case ProfileFieldModel::DATA_TYPE_STRING_MUL:
-                case ProfileFieldModel::DATA_TYPE_TEXT:
-                    $schemaArray["$name:s?"] = [
-                        "example" => "first,second,third",
-                    ];
+            switch ([$dataType, $formType]) {
+                case [ProfileFieldModel::DATA_TYPE_TEXT, ProfileFieldModel::FORM_TYPE_TEXT]:
+                case [ProfileFieldModel::DATA_TYPE_TEXT, ProfileFieldModel::FORM_TYPE_TEXT_MULTILINE]:
+                    // Text types (except for dropdown) should be filtered through elastic search
+                    // to leverage full-text search.
+                    $searchOnlyFilters[$apiName] = $profileField;
                     break;
-                case ProfileFieldModel::DATA_TYPE_NUMBER_MUL:
-                case ProfileFieldModel::DATA_TYPE_NUMBER:
-                    $schemaArray["$name:s?"] = [
-                        "example" => "1,2,3",
-                    ];
-                    break;
-                case ProfileFieldModel::DATA_TYPE_BOOL:
-                    $schemaArray["$name:s?"] = [
-                        "example" => "true",
-                    ];
-                    break;
-                case ProfileFieldModel::DATA_TYPE_DATE:
-                    $schemaArray["$name:s?"] = [
-                        "example" => "2022-10-10",
-                    ];
+                case [ProfileFieldModel::DATA_TYPE_NUMBER, ProfileFieldModel::FORM_TYPE_NUMBER]:
+                case [ProfileFieldModel::DATA_TYPE_NUMBER_MUL, ProfileFieldModel::FORM_TYPE_TOKENS]:
+                case [ProfileFieldModel::DATA_TYPE_DATE, ProfileFieldModel::FORM_TYPE_DATE]:
+                    // Number and dates types use range expressions. We need to use elastic search if we are
+                    // doing anything except for exact matching (using `=` comparison).
+                    if ($profileField instanceof RangeExpression) {
+                        $operators = array_diff(array_keys($profileField->getValues()), ["="]);
+                        if (!empty($operators)) {
+                            $searchOnlyFilters[$apiName] = $profileField;
+                        }
+                    }
                     break;
             }
         }
-
-        return Schema::parse([
-            "extended:o?" => $schemaArray,
-        ]);
+        return $searchOnlyFilters;
     }
 
     /**
@@ -524,12 +828,13 @@ class ProfileFieldModel extends FullRecordCacheModel
      * Get profile field values for given user ID
      *
      * @param int $userID
+     * @param bool $ignoreVisibility
      * @return array<string, mixed> Example: [$apiName => $value, ...]
      */
-    public function getUserProfileFields(int $userID): array
+    public function getUserProfileFields(int $userID, bool $ignoreVisibility = false): array
     {
         $values = $this->userMetaModel->getUserMeta($userID, "Profile.%", null, "Profile.");
-        $this->processUserProfileFields($userID, $values);
+        $this->processUserProfileFields($userID, $values, $ignoreVisibility);
         return $values;
     }
 
@@ -547,13 +852,27 @@ class ProfileFieldModel extends FullRecordCacheModel
     }
 
     /**
+     * Convenience method to get all enabled profile fields indexed by apiName.
+     *
+     * @param array $where
+     * @param array $options
+     * @return array
+     */
+    public function getEnabledProfileFieldsIndexed(array $where = [], array $options = []): array
+    {
+        $profileFields = $this->getProfileFields($where + ["enabled" => true], $options);
+        return array_column($profileFields, null, "apiName");
+    }
+
+    /**
      * Helper method for processing the retrieved fields of a single user.
      *
      * @param int $userID
      * @param array $values
+     * @param bool $ignoreVisibility
      * @return void
      */
-    private function processUserProfileFields(int $userID, array &$values)
+    private function processUserProfileFields(int $userID, array &$values, bool $ignoreVisibility = false): void
     {
         $fields = array_column($this->select(), null, "apiName");
         $utc = new DateTimeZone("UTC");
@@ -564,7 +883,7 @@ class ProfileFieldModel extends FullRecordCacheModel
                 continue;
             }
 
-            if (!$this->canView($userID, $fields[$name])) {
+            if (!$ignoreVisibility && !$this->canView($userID, $fields[$name])) {
                 unset($values[$name]);
                 continue;
             }
@@ -573,6 +892,9 @@ class ProfileFieldModel extends FullRecordCacheModel
             switch ($dataType) {
                 case ProfileFieldModel::DATA_TYPE_BOOL:
                     $value = (bool) $value;
+                    break;
+                case ProfileFieldModel::DATA_TYPE_NUMBER:
+                    $value = (int) $value;
                     break;
                 case ProfileFieldModel::DATA_TYPE_DATE:
                     try {
@@ -583,12 +905,16 @@ class ProfileFieldModel extends FullRecordCacheModel
                     break;
                 case ProfileFieldModel::DATA_TYPE_STRING_MUL:
                 case ProfileFieldModel::DATA_TYPE_NUMBER_MUL:
-                    //                    $value = json_decode($value);
                     if (!is_array($value)) {
                         $value = [$value];
                     }
+                    if ($dataType === self::DATA_TYPE_NUMBER_MUL) {
+                        $value = array_map("intval", $value);
+                    }
                     break;
             }
+
+            $value = self::normnalizeDuplicatedFields($value, $dataType);
         }
     }
 
@@ -597,18 +923,42 @@ class ProfileFieldModel extends FullRecordCacheModel
      *
      * @param int $userID The user ID to update.
      * @param array $values Key/value pairs of fields to update.
+     * @param bool $dispatchEvent Whether this should dispatch a UserEvent::ACTION_UPDATE event.
      */
-    public function updateUserProfileFields(int $userID, array $values)
+    public function updateUserProfileFields(int $userID, array $values, bool $dispatchEvent = false)
     {
-        // Retrieve whitelist
-        $allowedFields = array_column($this->getProfileFields(), null, "apiName");
+        // Retrieve whitelist (A combination of existing profileField records + pre-determined _ghost_ default fields.
+        $allowedFields = array_replace(
+            array_column($this->getProfileFields(), null, "apiName"),
+            array_flip(self::GHOST_DEFAULT_FIELDS)
+        );
+        $updateFields = [];
+        $refreshUserCache = false;
 
         foreach ($values as $name => $value) {
             if (!isset($allowedFields[$name])) {
                 continue;
             }
+            $updateFields[$name] = $value;
 
             $this->userMetaModel->setUserMeta($userID, "Profile." . $name, $value);
+            // if the fields are part of former UserData table we need to refresh user cache too
+            if (in_array($name, \UserModel::USERMETA_FIELDS)) {
+                $refreshUserCache = true;
+            }
+        }
+        $this->userMetaModel->clearUserMetaCache($userID);
+        $this->eventManager->fire("userProfileMetaUpdate", $this, $userID, $updateFields);
+        $userModel = Gdn::getContainer()->get(\UserModel::class);
+        if ($dispatchEvent) {
+            $userEvent = $userModel->eventFromRow(
+                $userModel->getID($userID, DATASET_TYPE_ARRAY),
+                UserEvent::ACTION_UPDATE
+            );
+            $this->eventManager->dispatch($userEvent);
+        }
+        if ($refreshUserCache) {
+            $userModel->clearCache($userID, ["user"]);
         }
     }
 
@@ -641,11 +991,11 @@ class ProfileFieldModel extends FullRecordCacheModel
     /**
      * Returns true if the currently signed-in user can edit a profile field based on mutability
      *
-     * @param int $userID
+     * @param int|null $userID If set, check if the specific user's profile fields can be edited.
      * @param array $profileField A profileField record
      * @return bool
      */
-    public function canEdit(int $userID, array $profileField): bool
+    public function canEdit(?int $userID, array $profileField): bool
     {
         $session = Gdn::session();
         if (!$profileField["enabled"]) {
@@ -654,7 +1004,7 @@ class ProfileFieldModel extends FullRecordCacheModel
         $mutability = $profileField["mutability"] ?? null;
         switch ($mutability) {
             case "all":
-                return $session->UserID === $userID || $session->checkPermission("users.edit");
+                return (!is_null($userID) && $session->UserID === $userID) || $session->checkPermission("users.edit");
             case "restricted":
                 return $session->checkPermission("users.edit");
             case "none":
@@ -664,24 +1014,7 @@ class ProfileFieldModel extends FullRecordCacheModel
     }
 
     /**
-     * Get a ProfileField record by it's label.
-     *
-     * @param $label
-     * @return array|bool
-     */
-    public function getByLabel($label)
-    {
-        $result = $this->select(["label" => $label]);
-
-        if (isset($result[0])) {
-            return $result[0];
-        }
-
-        return false;
-    }
-
-    /**
-     * Get a ProfileField record by it's $apiName.
+     * Get a ProfileField record by its $apiName.
      *
      * @param string $apiName
      * @return array|bool
@@ -700,47 +1033,49 @@ class ProfileFieldModel extends FullRecordCacheModel
     /**
      * Apply filters for profile field data
      *
-     * @param \Gdn_SQLDriver $query
+     * @param \Gdn_MySQLDriver $query
      * @param array $where
      * @return void
-     * @throws \Garden\Schema\ValidationException
+     * @throws ForbiddenException
      */
-    public function applyExtendedFilter(\Gdn_MySQLDriver $query, array &$where)
+    public function applyProfileFieldFilter(\Gdn_MySQLDriver $query, array &$where): void
     {
-        $extended = $where["extended"] ?? null;
-        unset($where["extended"]);
+        $filters = $where["profileFields"] ?? null;
+        unset($where["profileFields"]);
 
-        if (!\Vanilla\FeatureFlagHelper::featureEnabled("ImprovedUserProfileFields")) {
+        if (!FeatureFlagHelper::featureEnabled(ProfileFieldModel::FEATURE_FLAG)) {
             return;
         }
 
-        if (!is_array($extended)) {
+        if (!is_array($filters)) {
             return;
         }
 
-        $profileFields = $this->getProfileFields();
-        foreach ($profileFields as $field) {
-            $apiName = $field["apiName"];
+        $profileFields = $this->getEnabledProfileFieldsIndexed();
+        foreach ($profileFields as $apiName => $field) {
+            // If the user can't view it.
             if (!$this->canView(null, $field)) {
                 throw new ForbiddenException(
                     "You do not have permission to view profile field '$apiName' of another user."
                 );
             }
 
-            if (!isset($extended[$apiName])) {
+            if (!isset($filters[$apiName])) {
                 continue;
             }
 
-            $filterValues = str_getcsv($extended[$apiName]);
-            $schema = Schema::parse([
-                ":a" => ["items" => ["type" => $this->getSchemaType($field["dataType"])]],
-            ]);
-            $filterValues = $schema->validate($filterValues);
+            $filterValues = $filters[$apiName];
 
+            if ($filterValues instanceof RangeExpression) {
+                $filterValues = $filterValues->getValues()["="] ?? [];
+            }
+            $filterValues = is_array($filterValues) ? $filterValues : [$filterValues];
             $queryValues = [];
+
             foreach ($filterValues as $filterValue) {
                 $queryValues[] = $this->userMetaModel->createQueryValue("Profile.$apiName", $filterValue);
             }
+
             $subquery = $this->createSql();
             $subquery
                 ->select("m.UserID")
@@ -748,5 +1083,82 @@ class ProfileFieldModel extends FullRecordCacheModel
                 ->where("QueryValue", $queryValues);
             $query->where("u.UserID in", "({$subquery->getSelect(true)})", false, false);
         }
+    }
+
+    /**
+     * Check if a user has Custom Profile Fields visible to edit.
+     *
+     * @param \Gdn_Session $session Sessions
+     * @param string|int $userIDToCheckFor Requested UserID
+     * @return bool
+     */
+    public function hasVisibleFields($userIDToCheckFor = ""): bool
+    {
+        if (!Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG)) {
+            return false;
+        }
+
+        $session = Gdn::session();
+
+        if ($userIDToCheckFor == "") {
+            $userIDToCheckFor = $session->UserID;
+        }
+        $isSelf = $userIDToCheckFor === $session->UserID;
+        $visibilityValues = [];
+
+        if ($isSelf || $session->checkPermission("profiles.view")) {
+            $visibilityValues[] = "public";
+        }
+
+        if ($isSelf || $session->checkPermission("personalInfo.view")) {
+            $visibilityValues[] = "private";
+        }
+
+        if ($session->checkPermission("internalInfo.view")) {
+            $visibilityValues[] = "internal";
+        }
+
+        $fields = $this->select([
+            "enabled" => true,
+            "visibility" => $visibilityValues,
+        ]);
+        return !empty($fields);
+    }
+
+    /**
+     * Get current max sort value from the table
+     *
+     * @return int
+     */
+    private function getMaxSort(): int
+    {
+        return (int) $this->createSql()
+            ->select("max(sort) as sortMax")
+            ->from(self::TABLE_NAME)
+            ->get()
+            ->value("sortMax");
+    }
+
+    /**
+     * Normalize single fields that have multiple records in GDN_UserMeta into single value by only returning the most recent one.
+     *
+     * This will prevent the schema validation from failing when it's expecting a single value rather than an array.
+     *
+     * @param $value
+     * @param string $dataType
+     */
+    public static function normnalizeDuplicatedFields($value, string $dataType)
+    {
+        if (
+            is_array($value) &&
+            !(
+                $dataType === ProfileFieldModel::DATA_TYPE_STRING_MUL ||
+                $dataType === ProfileFieldModel::DATA_TYPE_NUMBER_MUL
+            )
+        ) {
+            $value = end($value);
+        }
+
+        return $value;
     }
 }

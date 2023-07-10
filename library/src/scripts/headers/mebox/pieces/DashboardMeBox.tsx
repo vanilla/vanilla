@@ -49,7 +49,7 @@ export default function DashboardMeBox(props: DashboardMeBoxProps) {
 
     const supportLinks = (
         <div className={classes.supportSection}>
-            <a href="https://support.vanillaforums.com" className={classes.supportLink}>
+            <a href="https://success.vanillaforums.com/categories/support" className={classes.supportLink}>
                 {t("Customer Support")}
                 <Icon icon="external-link" size="compact" />
             </a>
@@ -89,15 +89,12 @@ export default function DashboardMeBox(props: DashboardMeBoxProps) {
                                 size={UserPhotoSize.LARGE}
                             />
                             <div className={classes.dropdownUserInfo}>
-                                <SmartLink
-                                    to={makeProfileUrl(user.data?.name as string)}
-                                    className={classes.dropdownUserName}
-                                >
+                                <SmartLink to={makeProfileUrl(user.data?.name)} className={classes.dropdownUserName}>
                                     {userInfo?.name}
                                 </SmartLink>
                                 <div className={classes.dropdownUserRank}>{user.data?.rank?.name}</div>
                                 <LinkAsButton
-                                    to={makeProfileUrl(user.data?.name as string)}
+                                    to={makeProfileUrl(user.data?.name)}
                                     buttonType={ButtonTypes.STANDARD}
                                     className={classes.dropdownProfileLink}
                                 >

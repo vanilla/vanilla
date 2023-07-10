@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -42,7 +42,7 @@ export const INITIAL_LAYOUTS_STATE: ILayoutsState = {
 };
 
 export const LAYOUT_VIEW_TYPES = ["home", "discussionList", "categoryList"] as const;
-export type LayoutViewType = typeof LAYOUT_VIEW_TYPES[number];
+export type LayoutViewType = (typeof LAYOUT_VIEW_TYPES)[number];
 
 export interface ILayoutDetails {
     layoutID: RecordID;

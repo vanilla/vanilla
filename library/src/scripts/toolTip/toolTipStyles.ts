@@ -36,7 +36,7 @@ export const tooltipVariables = useThemeCache(() => {
     };
 });
 
-export const toolTipClasses = useThemeCache(() => {
+export const toolTipClasses = useThemeCache((customWidth?: number) => {
     const style = styleFactory("toolTip");
     const globalVars = globalVariables();
     const vars = tooltipVariables();
@@ -69,7 +69,7 @@ export const toolTipClasses = useThemeCache(() => {
             ...globalVars.fontSizeAndWeightVars("medium"),
             lineHeight: globalVars.lineHeights.base,
         }),
-        minWidth: styleUnit(vars.sizes.min),
+        minWidth: customWidth ?? styleUnit(vars.sizes.min),
         maxWidth: styleUnit(vars.sizes.max),
         backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
         ...Mixins.border(),

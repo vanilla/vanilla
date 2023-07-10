@@ -62,7 +62,7 @@ class MentionBlot extends AbstractInlineEmbedBlot
 
         $sanitizedUserID = filter_var($userID, FILTER_SANITIZE_NUMBER_INT);
         $sanitizedName = htmlspecialchars($name);
-        $url = $this->getMentionUrl($name);
+        $url = userUrl(["Name" => $name, "userID" => $sanitizedUserID]);
 
         return [
             "class" => "atMention",
@@ -70,19 +70,5 @@ class MentionBlot extends AbstractInlineEmbedBlot
             "data-userid" => $sanitizedUserID,
             "href" => $url,
         ];
-    }
-
-    /**
-     * Get a valid URL for a users profile for the mention,
-     *
-     * @param string $name The name of user to get the url for. This shouldn't be escaped yet.
-     *
-     * @return string
-     */
-    private function getMentionUrl(string $name): string
-    {
-        $encodedName = rawurlencode($name);
-        $mentionPath = "/profile/$encodedName";
-        return url($mentionPath, true);
     }
 }

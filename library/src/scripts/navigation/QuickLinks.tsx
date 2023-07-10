@@ -5,6 +5,7 @@
 
 import { INavigationTreeItem } from "@library/@types/api/core";
 import { DynamicComponentTypes, useHamburgerMenuContext } from "@library/contexts/HamburgerMenuContext";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import { varItemToNavTreeItem } from "@library/flyouts/Hamburger";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
@@ -25,6 +26,7 @@ interface IProps {
 }
 
 export function QuickLinks(props: IProps) {
+    const { hasPermission } = usePermissionsContext();
     const { addComponent, removeComponentByID, isCompact } = useHamburgerMenuContext();
 
     const links = !!props.links && props.links.length > 0 ? props.links : quickLinksVariables().links;
@@ -61,7 +63,7 @@ export function QuickLinks(props: IProps) {
                 recordID: "quickLinks",
                 recordType: "quickLinks",
                 children: linksWithCounts
-                    .map((link) => varItemToNavTreeItem(link, "quickLinks"))
+                    .map((link) => varItemToNavTreeItem(link, hasPermission, "quickLinks"))
                     .filter((item) => item), // Omit hidden (undefined) links
             },
         ] as INavigationTreeItem[];

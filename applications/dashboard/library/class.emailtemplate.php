@@ -5,6 +5,8 @@
  */
 
 use Vanilla\Formatting\Formats\WysiwygFormat;
+use Vanilla\Formatting\Html\HtmlDocument;
+use Vanilla\Formatting\Html\Processor\ImageHtmlProcessor;
 use Vanilla\Web\Asset\LegacyAssetModel;
 
 /**
@@ -278,7 +280,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate
      * @param string $backgroundColor The hex color code of the footer background, must include the leading '#'.
      * @return EmailTemplate $this The calling object.
      */
-    public function setFooter($text, $textColor = "", $backgroundColor = "")
+    public function setFooter($text, $textColor = "", $backgroundColor = "", $formatContent = true)
     {
         if (!$textColor) {
             $textColor = $this->defaultButtonTextColor;
@@ -286,8 +288,18 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate
         if (!$backgroundColor) {
             $backgroundColor = $this->defaultButtonBackgroundColor;
         }
+
+        // Make sure the links have proper styling.
+        $textDoc = new HtmlDocument($text);
+        $links = $textDoc->queryCssSelector("a");
+        /** @var DOMElement $link */
+        foreach ($links as $link) {
+            $link->setAttribute("style", "color: {$textColor}; font-weight: 600;");
+        }
+        $text = $textDoc->getInnerHtml();
+
         $this->footer = [
-            "text" => htmlspecialchars($this->formatContent($text)),
+            "text" => $formatContent ? htmlspecialchars($this->formatContent($text)) : $text,
             "textColor" => htmlspecialchars($textColor),
             "backgroundColor" => htmlspecialchars($backgroundColor),
         ];
@@ -588,6 +600,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate
                     $email[$key] = "<br>$val<br>";
                 } elseif ($key == "banner") {
                     $email["banner"] = "{$val}<br>";
+                } elseif ($key == "footer") {
+                    $email["footer"] = "<br>{$val["text"]}<br/>";
                 }
             }
         }

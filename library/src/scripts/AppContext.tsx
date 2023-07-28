@@ -27,6 +27,8 @@ import { css } from "@emotion/css";
 import { ApiV2Context } from "@library/apiv2";
 import { ToastProvider } from "@library/features/toaster/ToastContext";
 import { SearchSourcesContextProvider } from "@library/search/SearchSourcesContextProvider";
+import { PermissionsContextProvider } from "@library/features/users/PermissionsContext";
+import { ReactQueryContext } from "@library/ReactQueryContext";
 
 interface IProps {
     children: React.ReactNode;
@@ -64,8 +66,10 @@ export function AppContext(props: IProps) {
 
     const content = composeProviders(
         [
+            ReactQueryContext,
             [Provider, { store }],
             ApiV2Context,
+            PermissionsContextProvider,
             LocaleProvider,
             SearchSourcesContextProvider,
             SearchContextProvider,

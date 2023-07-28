@@ -77,14 +77,15 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
     const tableInit = makeThemeVars("tables", {
         /**
          * @var userContent.tables.style
+         * @title UserContent - Tables - Style
          * @description Choose a preset for the table styles.
          * @type string
          * @enum horizontalBorder|horizontalBorderStriped|verticalBorder|verticalBorderStriped
          */
-        style: TableStyle.HORIZONTAL_BORDER_STRIPED,
+        style: TableStyle.VERTICAL_BORDER_STRIPED,
         /**
          * @varGroup userContent.tables.borders
-         * @title User Content - Tables - Borders
+         * @title UserContent - Tables - Border Styles
          * @expand border
          */
         borders: globalVars.border,
@@ -92,7 +93,7 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
         cell: {
             /**
              * @var userContent.tables.cell.alignment
-             * @title Cell Alignment
+             * @title UserContent - Tables - Cell Alignment
              * @description Choose the alignment of table cells.
              * @type string
              * @enum "center" | "left" | "right",
@@ -102,25 +103,79 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
 
         /**
          * @var userContent.tables.mobileBreakpoint
-         * @title Mobile Breakpoint
+         * @title UserContent - Tables - Mobile Breakpoint
          * @description The device width (pixels) where the table switches to a mobile layout.
+         * @type number
          */
         mobileBreakpoint: 600,
     });
 
+    /**
+     * @varGroup userContent.tables
+     * @title User Content - Tables
+     */
     const tables = makeThemeVars("tables", {
         ...tableInit,
+        /**
+         * @var userContent.tables.striped
+         * @title UserContent - Tables - Striped Rows
+         * @description Display even numbered rows with a different background
+         * @type boolean
+         */
         striped: [TableStyle.HORIZONTAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER_STRIPED].includes(tableInit.style),
+        /**
+         * @var userContent.tables.stripeColor
+         * @title UserContent - Tables - Stripe Row Color
+         * @description Color for the striped rows
+         * @type string
+         * @format hex-color
+         */
         stripeColor: globalVars.mixBgAndFg(0.05),
+        /**
+         * @var userContent.tables.outerBorderRadius
+         * @title UserContent - Tables - Outer Border Radius
+         * @description Set the radius of the table's outer border. Numerical units are interpreted as pixels.
+         * @type string | number
+         */
         outerBorderRadius: [TableStyle.VERTICAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER].includes(tableInit.style)
             ? 4
             : 0,
+        /**
+         * @varGroup userContent.tables.horizontalBorders
+         * @title UserContent - Tables - Horizontal Borders
+         */
         horizontalBorders: {
+            /**
+             * @var userContent.tables.horizontalBorders.enabled
+             * @title UserContent - Tables - Horizontal Borders - Enabled
+             * @description Display horizontal table borders
+             * @type boolean
+             */
             enabled: true, // All current variants have horizontal borders.
+            /**
+             * @varGroup userContent.tables.horizontalBorders.borders
+             * @title UserContent - Tables - Horizontal Borders - Border Styles
+             * @expand border
+             */
             borders: tableInit.borders,
         },
+        /**
+         * @varGroup userContent.tables.verticalBorders
+         * @title UserContent - Tables - Vertical Borders
+         */
         verticalBorders: {
+            /**
+             * @var userContent.tables.verticalBorders.enabled
+             * @title UserContent - Tables - Vertical Borders - Enabled
+             * @description Display vertical table borders
+             * @type boolean
+             */
             enabled: [TableStyle.VERTICAL_BORDER_STRIPED, TableStyle.VERTICAL_BORDER].includes(tableInit.style),
+            /**
+             * @varGroup userContent.tables.verticalBorders.borders
+             * @title UserContent - Tables - Vertical Borders - Border Styles
+             * @expand border
+             */
             borders: tableInit.borders,
         },
     });
@@ -157,7 +212,7 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
          * @description Border radius of an embed in pixels.
          * @type string|number
          */
-        borderRadius: px(2),
+        borderRadius: px(4),
     });
 
     /**

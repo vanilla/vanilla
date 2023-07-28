@@ -102,7 +102,7 @@ class FeaturedCollectionsWidget implements ReactWidgetInterface, CombinedPropsWi
     {
         return SchemaUtils::composeSchemas(
             self::widgetTitleSchema(),
-            self::widgetSubtitleSchema(),
+            self::widgetSubtitleSchema("subtitle"),
             self::widgetDescriptionSchema(),
             Schema::parse(["apiParams" => self::getApiSchema()]),
             self::displayOptionsSchema(),
@@ -122,5 +122,17 @@ class FeaturedCollectionsWidget implements ReactWidgetInterface, CombinedPropsWi
         $collection = $this->api->get_content($apiParams["collectionID"], "en");
         $this->props["collection"] = $collection;
         return $this->props;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $result = $this->renderWidgetContainerSeoContent(
+            $props,
+            $this->renderSeoLinkList(array_column($props["collection"]["records"], "record"))
+        );
+        return $result;
     }
 }

@@ -18,7 +18,7 @@ trait FormatCompatTrait
     }
 
     /**
-     * Apply the format compatibility layer to the a particular field.
+     * Apply the format compatibility layer to a particular field.
      *
      * @param mixed $row An array representing a database row.
      * @param string $field The field name.

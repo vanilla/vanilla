@@ -11,6 +11,8 @@ import apiv2 from "@library/apiv2";
 import SimplePagerModel from "@library/navigation/SimplePagerModel";
 import { t } from "@vanilla/i18n";
 import Result, { IResult } from "@library/result/Result";
+import { JsonSchema, PartialSchemaDefinition } from "@vanilla/json-schema-forms";
+import { PermissionChecker } from "@library/features/users/Permission";
 
 export class SearchService {
     private static _supportsExtensions = false;
@@ -20,11 +22,26 @@ export class SearchService {
     static supportsExtensions(): boolean {
         return this._supportsExtensions;
     }
+
     static extraFilters = [] as IExtraFilter[];
     static addSearchFilter = (domain: string, filterNode: React.ReactNode) => {
         SearchService.extraFilters.push({
             searchDomain: domain,
             filterNode,
+        });
+    };
+
+    static additionalDomainFilterSchemaFields = [] as IAdditionalFilterSchemaField[];
+
+    static addFieldToDomainFilterSchema = (
+        searchDomain: IAdditionalFilterSchemaField["searchDomain"],
+        fieldName: IAdditionalFilterSchemaField["fieldName"],
+        schema: IAdditionalFilterSchemaField["schema"],
+    ) => {
+        SearchService.additionalDomainFilterSchemaFields.push({
+            searchDomain,
+            fieldName,
+            schema,
         });
     };
 
@@ -103,6 +120,11 @@ interface IExtraFilter {
     filterNode: React.ReactNode;
 }
 
+interface IAdditionalFilterSchemaField {
+    searchDomain: string;
+    fieldName: string;
+    schema: JsonSchema | PartialSchemaDefinition;
+}
 export interface ISearchDomain<
     ExtraFormValues extends object = {},
     ResultType extends object = ISearchResult,
@@ -117,7 +139,8 @@ export interface ISearchDomain<
     getName?(): string;
     PanelComponent: React.ComponentType<any>;
     resultHeader?: React.ReactNode;
-    getAllowedFields(): string[];
+    getAllowedFields: (permissionChecker: PermissionChecker) => string[];
+    getFilterSchema?: (permissionChecker: PermissionChecker) => JsonSchema<any>;
     getRecordTypes(): string[];
     transformFormToQuery?(form: ISearchForm<ExtraFormValues>): Partial<ISearchRequestQuery<ExtraFormValues>>;
     getDefaultFormValues?(): Partial<ISearchForm<ExtraFormValues>>; //fixme: these don't seem to have any effect on form fields' initial state
@@ -129,7 +152,7 @@ export interface ISearchDomain<
     MetaComponent?: React.ComponentType<any>;
     hasSpecificRecord?(form: ISearchForm<ExtraFormValues>): boolean;
     getSpecificRecord?(form: ISearchForm<ExtraFormValues>): number;
-    SpecificRecordPanel?: React.ComponentType<any>;
+    SpecificRecordPanelComponent?: React.ComponentType<any>;
     SpecificRecordComponent?: React.ComponentType<any>;
     showSpecificRecordCrumbs?(): boolean; // We could later make this into a config object
 }

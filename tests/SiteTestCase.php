@@ -8,6 +8,7 @@
 namespace VanillaTests;
 
 use Garden\Container\Container;
+use Vanilla\Models\AddonModel;
 
 /**
  * A base class for tests that require Vanilla to be installed.
@@ -60,5 +61,33 @@ class SiteTestCase extends VanillaTestCase
     {
         parent::tearDownAfterClass();
         static::tearDownAfterClassTestTraits();
+    }
+
+    /**
+     * Enable an addon on the site.
+     *
+     * @param string $key
+     */
+    public function enableAddon(string $key)
+    {
+        $addonModel = \Gdn::getContainer()->get(AddonModel::class);
+        $addonManager = $addonModel->getAddonManager();
+
+        $addon = $addonManager->lookupAddon($key);
+        $addonModel->enable($addon);
+    }
+
+    /**
+     * Disable an addon on the site.
+     *
+     * @param string $key
+     */
+    public function disableAddon(string $key)
+    {
+        $addonModel = \Gdn::getContainer()->get(AddonModel::class);
+        $addonManager = $addonModel->getAddonManager();
+
+        $addon = $addonManager->lookupAddon($key);
+        $addonModel->disable($addon);
     }
 }

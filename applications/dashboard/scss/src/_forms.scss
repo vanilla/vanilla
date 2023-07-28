@@ -193,6 +193,10 @@ label,
     .SelectOne__single-value,
     .SelectOne__placeholder {
         font-size: 14px;
+
+        @media (max-width: 600px) {
+            font-size: 16px;
+        }
     }
 
     &:not(.inline) label {

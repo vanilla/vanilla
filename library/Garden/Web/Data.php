@@ -10,12 +10,14 @@ namespace Garden\Web;
 use Garden\Http\HttpResponse;
 use Garden\JsonFilterTrait;
 use Gdn;
+use Google\Api\Http;
 use Traversable;
 
 use Garden\MetaTrait;
 use Vanilla\Http\InternalResponse;
 use Vanilla\Utility\FileGeneratorUtils;
 use Vanilla\Utility\StringUtils;
+use Vanilla\Utility\UrlUtils;
 use Vanilla\Web\JsonView;
 use Vanilla\Web\Pagination\WebLinking;
 
@@ -27,6 +29,9 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     use MetaTrait, JsonFilterTrait;
 
     private $data;
+
+    /** @var callable(array $value): array */
+    private $beforeJsonSerialize;
 
     /**
      * Create a {@link Data} instance representing the data in a web response.
@@ -57,12 +62,13 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @param mixed $default The default value if no item at the key exists.
      * @return mixed Returns the data value.
      */
-    public function getDataItem($name, $default = null)
+    public function &getDataItem($name, $default = null)
     {
         if (!is_array($this->data) && !($this->data instanceof \ArrayAccess)) {
             throw new \Exception("Data is not an array.", 500);
         }
-        return isset($this->data[$name]) ? $this->data[$name] : $default;
+        $result = isset($this->data[$name]) ? $this->data[$name] : $default;
+        return $result;
     }
 
     /**
@@ -89,6 +95,30 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * Get pagination info for the response.
+     *
+     * @return Pagination
+     */
+    public function getPaging(): Pagination
+    {
+        $pagination = new Pagination($this->getMeta("paging", []));
+        return $pagination;
+    }
+
+    /**
+     * Get the data wrapped with paging information for the frontend. Useful for preloading for react-query.
+     *
+     * @return array
+     */
+    public function withPaging(): array
+    {
+        return [
+            "paging" => $this->getPaging(),
+            "data" => $this,
+        ];
     }
 
     /**
@@ -166,6 +196,17 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     }
 
     /**
+     * Register a callback to run before rendering JSON.
+     *
+     * @param callable $beforeJsonSerialize
+     * @return void
+     */
+    public function hookJsonSerialize(callable $beforeJsonSerialize): void
+    {
+        $this->beforeJsonSerialize = $beforeJsonSerialize;
+    }
+
+    /**
      * Specify data which should be serialized to JSON.
      *
      * @return mixed data which can be serialized by <b>json_encode</b>,
@@ -175,6 +216,9 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     public function jsonSerialize()
     {
         $data = $this->getData();
+        if (isset($this->beforeJsonSerialize)) {
+            $data = call_user_func($this->beforeJsonSerialize, $data);
+        }
         $data = $this->jsonFilter($data);
         return $data;
     }
@@ -203,8 +247,20 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
             $this->getStatus(),
             array_merge($this->getHeaders(), ["X-Data-Meta" => json_encode($this->getMetaArray())])
         );
+
         // Simulate that the data was sent over HTTP and thus was serialized.
-        $body = $this->jsonSerialize();
+        $contentType = $response->getHeader("Content-Type", "");
+        if (preg_match("`([a-z]+/[a-z0-9.-]+)`i", $contentType, $m)) {
+            $contentType = strtolower($m[1]);
+        } else {
+            $contentType = "application/json";
+        }
+
+        if ($contentType === "application/csv") {
+            $body = $this->getCsvData();
+        } else {
+            $body = $this->jsonSerialize();
+        }
         $response->setBody($body);
         return $response;
     }
@@ -354,12 +410,32 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     }
 
     /**
+     * Get CSV data of the response.
+     *
+     * @return string
+     */
+    private function getCsvData(): string
+    {
+        $data = $this->getSerializedData();
+        if (!empty($data)) {
+            return StringUtils::encodeCSV($data);
+        } else {
+            return "";
+        }
+    }
+
+    /**
      * Render the response to the output in CSV.
      *
      * @codeCoverageIgnore
      */
     public function renderCsv()
     {
+        if (!$this->isSuccessful()) {
+            $this->renderJson();
+            return;
+        }
+
         $this->applyMetaHeaders();
         http_response_code($this->getStatus());
 
@@ -381,13 +457,25 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
         if (is_string($this->data) || $this->data === null) {
             echo $this->data;
         } else {
-            $data = $this->getSerializedData();
-            if (!empty($data)) {
-                echo StringUtils::encodeCSV($data);
-            } else {
-                echo "";
-            }
+            echo $this->getCsvData();
         }
+    }
+
+    /**
+     * Sometimes a middleware will be making use of a query parameter that will be stripped off
+     * or not part of an endpoint's schema. As a result these parameter do not make it into
+     * the pagination headers of the endpoint.
+     *
+     * In order to resolve this issue, a middleware may call this method on the response
+     * and when the pagination headers are rendered they will include that query parameter.
+     *
+     * @param string $paramName
+     * @param mixed $value
+     * @return void
+     */
+    public function stashMiddlewareQueryParameter(string $paramName, $value): void
+    {
+        $this->setMeta("pagingQueryParams.{$paramName}", $value);
     }
 
     /**
@@ -396,37 +484,44 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
     public function applyMetaHeaders()
     {
         $paging = $this->getMeta("paging");
+        $pagingQueryParams = $this->getMeta("pagingQueryParams", []);
 
         // Handle pagination.
         if ($paging) {
-            $links = new WebLinking();
-            $hasPageCount = isset($paging["pageCount"]);
+            $pagingUri = \League\Uri\Http::createFromString($paging["urlFormat"]);
 
-            $firstPageUrl = str_replace("%s", 1, $paging["urlFormat"]);
-            $links->addLink("first", $firstPageUrl);
-            if ($paging["page"] > 1) {
-                $prevPageUrl =
-                    $paging["page"] > 2 ? str_replace("%s", $paging["page"] - 1, $paging["urlFormat"]) : $firstPageUrl;
-                $links->addLink("prev", $prevPageUrl);
+            if ($ext = $this->getMeta("extension")) {
+                $pagingUri = $pagingUri->withPath("{$pagingUri->getPath()}.{$ext}");
             }
-            if (($paging["more"] ?? false) || ($hasPageCount && $paging["page"] < $paging["pageCount"])) {
-                $links->addLink("next", str_replace("%s", $paging["page"] + 1, $paging["urlFormat"]));
+
+            if (!empty($pagingQueryParams)) {
+                $pagingUri = UrlUtils::replaceQuery($pagingUri, $pagingQueryParams);
             }
-            if ($hasPageCount) {
-                $links->addLink("last", str_replace("%s", $paging["pageCount"], $paging["urlFormat"]));
+
+            $paging["urlFormat"] = (string) $pagingUri;
+
+            $pagination = new Pagination($paging);
+
+            if (!empty($paging["cursor"])) {
+                // Add an explicit next url to replace the generated one.
+                $cursorNextUri = UrlUtils::replaceQuery($pagingUri, ["page" => null, "cursor" => $paging["cursor"]]);
+                $pagination->nextUrl = (string) $cursorNextUri;
             }
+
+            $links = $pagination->getPageLinks();
             $links->setHeader($this);
-
             $this->setHeader(JsonView::CURRENT_PAGE_HEADER, $paging["page"]);
-
             $totalCount = $paging["totalCount"] ?? null;
             if ($totalCount !== null) {
                 $this->setHeader(JsonView::TOTAL_COUNT_HEADER, $totalCount);
             }
-
             $limit = $paging["limit"] ?? null;
             if ($limit !== null) {
                 $this->setHeader(JsonView::LIMIT_HEADER, $limit);
+            }
+            $cursor = $paging["cursor"] ?? null;
+            if (isset($cursor)) {
+                $this->setHeader(JsonView::PAGE_CURSOR_HEADER, $cursor);
             }
         }
     }
@@ -451,7 +546,7 @@ class Data implements \JsonSerializable, \ArrayAccess, \Countable, \IteratorAggr
      * @return mixed Can return all value types.
      * @link http://php.net/manual/en/arrayaccess.offsetget.php
      */
-    public function offsetGet($offset)
+    public function &offsetGet($offset)
     {
         return $this->getDataItem($offset);
     }

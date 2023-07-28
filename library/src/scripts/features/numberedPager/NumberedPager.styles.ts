@@ -6,7 +6,6 @@
 
 import { css } from "@emotion/css";
 import { useThemeCache } from "@library/styles/themeCache";
-import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { numberedPagerVariables } from "@library/features/numberedPager/NumberedPager.variables";
 
@@ -15,14 +14,13 @@ export const numberedPagerClasses = useThemeCache((isMobile?: boolean) => {
 
     const root = css({
         ...Mixins.background(vars.background),
-        ...Mixins.border(vars.border),
         display: "flex",
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
         ...Mixins.font(vars.font),
         lineHeight: 1,
-        ...Mixins.padding({ vertical: 16, horizontal: 8 }),
+        ...Mixins.padding({ vertical: 16 }),
         "& > div": {
             // the first and last divs should flex to ensure proper alignment of the controls
             "&:first-child, &:last-child": {

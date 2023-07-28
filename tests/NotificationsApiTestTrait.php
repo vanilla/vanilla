@@ -65,6 +65,25 @@ trait NotificationsApiTestTrait
     }
 
     /**
+     * Assert that a user has no email notifications.
+     *
+     * @param int|array $userOrUserID
+     */
+    public function assertUserHasNoEmails($userOrUserID)
+    {
+        $userID = is_array($userOrUserID) ? $userOrUserID["userID"] : $userOrUserID;
+        $activityModel = \Gdn::getContainer()->get(\ActivityModel::class);
+        $emailActivities = $activityModel
+            ->getWhere([
+                "Notified >" => 0, // Apply this to not filter to only items with in app notifications.
+                "NotifyUserID" => $userID,
+                "Emailed" => [\ActivityModel::SENT_OK, \ActivityModel::SENT_PENDING, \ActivityModel::SENT_FAIL],
+            ])
+            ->resultArray();
+        $this->assertCount(0, $emailActivities);
+    }
+
+    /**
      * Assert that a user has certain email notifications with a specific status.
      *
      * @param int|array $userOrUserID

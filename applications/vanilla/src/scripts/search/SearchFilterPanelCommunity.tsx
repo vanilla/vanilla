@@ -4,13 +4,12 @@
  */
 
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import { dateRangeClasses } from "@library/forms/dateRangeStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
 import { useSearchForm } from "@library/search/SearchContext";
 import { getSiteSection, t } from "@library/utility/appUtils";
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import Checkbox from "@library/forms/Checkbox";
 import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCategoryInput";
 import { ICommunitySearchTypes } from "@vanilla/addon-vanilla/search/communitySearchTypes";
@@ -19,15 +18,53 @@ import CheckboxGroup from "@library/forms/CheckboxGroup";
 import { CommunityPostTypeFilter } from "@vanilla/addon-vanilla/search/CommunityPostTypeFilter";
 import { TagsInput } from "@library/features/tags/TagsInput";
 import LazyDateRange from "@library/forms/LazyDateRange";
+import { SEARCH_SCOPE_LOCAL, useSearchScope } from "@library/features/search/SearchScopeContext";
 
 /**
  * Implement search filter panel for discussions
  */
 export function SearchFilterPanelCommunity() {
     const { form, updateForm, search } = useSearchForm<ICommunitySearchTypes>();
+    const { value, setValue } = useSearchScope();
 
     const classesInputBlock = inputBlockClasses();
-    const classesDateRange = dateRangeClasses();
+
+    /**
+     * Category and Scope are exclusive
+     */
+    const isFilteringCategories = useMemo(() => {
+        return form?.categoryOptions && form.categoryOptions.length > 0;
+    }, [form]);
+
+    const isFilteringTags = useMemo(() => {
+        return form?.tagsOptions && form.tagsOptions.length > 0;
+    }, [form]);
+
+    // If the scope is everywhere, the category or tag filters should be cleared
+    useEffect(() => {
+        if (value?.value !== SEARCH_SCOPE_LOCAL) {
+            if (isFilteringCategories) {
+                updateForm({ categoryOptions: [] });
+            }
+            if (isFilteringTags) {
+                updateForm({ tagsOptions: [] });
+            }
+        }
+    }, [value]);
+
+    // If a category filter is selected, the scope must be local
+    useEffect(() => {
+        if (value?.value !== SEARCH_SCOPE_LOCAL && isFilteringCategories) {
+            setValue && setValue(SEARCH_SCOPE_LOCAL);
+        }
+    }, [isFilteringCategories]);
+
+    // If a tag filter is selected, the scope must be local
+    useEffect(() => {
+        if (value?.value !== SEARCH_SCOPE_LOCAL && isFilteringTags) {
+            setValue && setValue(SEARCH_SCOPE_LOCAL);
+        }
+    }, [isFilteringTags]);
 
     return (
         <FilterFrame handleSubmit={search}>
@@ -49,6 +86,7 @@ export function SearchFilterPanelCommunity() {
                 value={form.authors ?? []}
             />
             <LazyDateRange
+                label={t("Date Updated")}
                 onStartChange={(date: string) => {
                     updateForm({ startDate: date });
                 }}
@@ -57,7 +95,6 @@ export function SearchFilterPanelCommunity() {
                 }}
                 start={form.startDate}
                 end={form.endDate}
-                className={classesDateRange.root}
             />
             <CommunityCategoryInput
                 label={t("Category")}
@@ -67,6 +104,7 @@ export function SearchFilterPanelCommunity() {
                 }}
                 parentCategoryID={getSiteSection().attributes.categoryID ?? null}
                 value={form.categoryOptions ?? []}
+                labelNote={isFilteringCategories ? t("Searching categories on this community only") : undefined}
             />
 
             <CheckboxGroup tight={true}>
@@ -104,6 +142,7 @@ export function SearchFilterPanelCommunity() {
                 onChange={(options: IComboBoxOption[]) => {
                     updateForm({ tagsOptions: options });
                 }}
+                labelNote={isFilteringTags ? t("Searching tags on this community only") : undefined}
             />
 
             <CommunityPostTypeFilter />

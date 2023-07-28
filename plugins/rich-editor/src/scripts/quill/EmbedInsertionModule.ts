@@ -133,8 +133,10 @@ export default class EmbedInsertionModule extends Module {
 
     public createImageEmbed(file: File) {
         const imagePromise = uploadFile(file).then((data) => {
-            data.embedType = "image";
-            return data;
+            return {
+                ...data,
+                embedType: "image",
+            };
         });
         this.createEmbed({ loaderData: { type: "image" }, dataPromise: imagePromise });
     }
@@ -143,8 +145,10 @@ export default class EmbedInsertionModule extends Module {
         const progressEventEmitter = new ProgressEventEmitter();
 
         const filePromise = uploadFile(file, { onUploadProgress: progressEventEmitter.emit }).then((data) => {
-            data.embedType = "file";
-            return data;
+            return {
+                ...data,
+                embedType: "file",
+            };
         });
         this.createEmbed({ loaderData: { type: "file", file, progressEventEmitter }, dataPromise: filePromise });
     }

@@ -56,7 +56,7 @@ class RenderFunctionsTest extends SiteTestCase
                     "Name" => "Foo",
                 ],
                 null,
-                '<a href="/renderfunctionstest/profile/Foo" class="js-userCard" data-userid="1">Foo</a>',
+                '<a href="https://vanilla.test/renderfunctionstest/profile/Foo" class="js-userCard" data-userid="1">Foo</a>',
             ],
             "Simple user object" => [
                 (object) [
@@ -64,7 +64,7 @@ class RenderFunctionsTest extends SiteTestCase
                     "Name" => "Bar",
                 ],
                 null,
-                '<a href="/renderfunctionstest/profile/Bar" class="js-userCard" data-userid="2">Bar</a>',
+                '<a href="https://vanilla.test/renderfunctionstest/profile/Bar" class="js-userCard" data-userid="2">Bar</a>',
             ],
             "Post array with prefix" => [
                 [
@@ -72,7 +72,7 @@ class RenderFunctionsTest extends SiteTestCase
                     "InsertName" => "Foo",
                 ],
                 ["Px" => "Insert"],
-                '<a href="/renderfunctionstest/profile/Foo" class="js-userCard" data-userid="1">Foo</a>',
+                '<a href="https://vanilla.test/renderfunctionstest/profile/Foo" class="js-userCard" data-userid="1">Foo</a>',
             ],
             "Post object with prefix" => [
                 (object) [
@@ -80,7 +80,7 @@ class RenderFunctionsTest extends SiteTestCase
                     "InsertName" => "Bar",
                 ],
                 ["Px" => "Insert"],
-                '<a href="/renderfunctionstest/profile/Bar" class="js-userCard" data-userid="2">Bar</a>',
+                '<a href="https://vanilla.test/renderfunctionstest/profile/Bar" class="js-userCard" data-userid="2">Bar</a>',
             ],
         ];
         return $result;
@@ -130,7 +130,7 @@ class RenderFunctionsTest extends SiteTestCase
                     "Name" => "System",
                 ],
                 null,
-                '<a title="System" href="/renderfunctionstest/profile/System" class="PhotoWrap js-userCard" aria-label="User: &quot;' .
+                '<a title="System" href="https://vanilla.test/renderfunctionstest/profile/System" class="PhotoWrap js-userCard" aria-label="User: &quot;' .
                 'System&quot;" data-userid="1"><img src="https://vanilla.test/renderfunctionstest/applications/dashboard/design/images/usericon.png"' .
                 ' alt="System" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>',
             ],
@@ -139,8 +139,8 @@ class RenderFunctionsTest extends SiteTestCase
                     "UserID" => null,
                 ],
                 null,
-                '<a title="Unknown" href="/renderfunctionstest/profile/" class="PhotoWrap js-userCard" aria-label="User: &quot;Unknown&quot;"' .
-                " data-userid=\"\"><img src=\"http://vanilla.test/renderfunctionstest{$defaultAvatar}\"" .
+                '<a title="Unknown" href="https://vanilla.test/renderfunctionstest/profile" class="PhotoWrap js-userCard" aria-label="User: &quot;Unknown&quot;"' .
+                " data-userid=\"\"><img src=\"https://vanilla.test/renderfunctionstest{$defaultAvatar}\"" .
                 ' alt="Unknown" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>',
             ],
             "User object" => [
@@ -149,7 +149,7 @@ class RenderFunctionsTest extends SiteTestCase
                     "Name" => "System",
                 ],
                 null,
-                '<a title="System" href="/renderfunctionstest/profile/System" class="PhotoWrap js-userCard" aria-label="User: &quot;' .
+                '<a title="System" href="https://vanilla.test/renderfunctionstest/profile/System" class="PhotoWrap js-userCard" aria-label="User: &quot;' .
                 'System&quot;" data-userid="1"><img src="https://vanilla.test/renderfunctionstest/applications/dashboard/design/images/usericon.png"' .
                 ' alt="System" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>',
             ],
@@ -158,8 +158,8 @@ class RenderFunctionsTest extends SiteTestCase
                     "UserID" => null,
                 ],
                 null,
-                '<a title="Unknown" href="/renderfunctionstest/profile/" class="PhotoWrap js-userCard" aria-label="User: &quot;Unknown&quot;"' .
-                " data-userid=\"\"><img src=\"http://vanilla.test/renderfunctionstest{$defaultAvatar}\"" .
+                '<a title="Unknown" href="https://vanilla.test/renderfunctionstest/profile" class="PhotoWrap js-userCard" aria-label="User: &quot;Unknown&quot;"' .
+                " data-userid=\"\"><img src=\"https://vanilla.test/renderfunctionstest{$defaultAvatar}\"" .
                 ' alt="Unknown" class="ProfilePhoto ProfilePhotoMedium" data-fallback="avatar" loading="lazy" /></a>',
             ],
         ];
@@ -290,14 +290,14 @@ class RenderFunctionsTest extends SiteTestCase
                 </header>",
             ],
             "with buttons" => [
-                ["Hello", "button", "http://test.com/button", ["data-test" => "test"], "https://test.com/back"],
+                ["Hello", "button", "https://test.com/button", ["data-test" => "test"], "https://test.com/back"],
                 "<header class=header-block>
                     <div class=title-block>
                         <a aria-label=Return class='btn btn-icon btn-return' href=https://test.com/back><SVG /></a>
                         <h1>Hello</h1>
                     </div>
                     <div class=btn-container>
-                        <a class='btn btn-primary' data-test=test href=http://test.com/button>button</a>
+                        <a class='btn btn-primary' data-test=test href=https://test.com/button>button</a>
                     </div>
                 </header>",
             ],
@@ -336,7 +336,7 @@ class RenderFunctionsTest extends SiteTestCase
             <ul class="Flyout MenuItems selectBox-content" role="menu">
                 <li class="isActive selectBox-item" role="menuitem">
                     <a class="dropdown-menu-link selectBox-link" href="/renderfunctionstest/discussions?save=1&amp;TransientKey=0" tabindex="0">
-                        <svg class="vanillaIcon selectBox-selectedIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
+                        <svg class="vanillaIcon selectBox-selectedIcon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 18 18">
                             <title>✓</title>
                             <polygon fill="currentColor" points="1.938,8.7 0.538,10.1 5.938,15.5 17.337,3.9 15.938,2.5 5.938,12.8"></polygon>
                         </svg>
@@ -388,7 +388,7 @@ EOT
             <ul class="Flyout MenuItems selectBox-content" role="menu">
                 <li class="isActive selectBox-item" role="menuitem">
                     <a class="dropdown-menu-link selectBox-link" href="/renderfunctionstest/categories?save=1&amp;TransientKey=0" tabindex="0">
-                        <svg class="vanillaIcon selectBox-selectedIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18">
+                        <svg class="vanillaIcon selectBox-selectedIcon" xmlns="https://www.w3.org/2000/svg" viewBox="0 0 18 18">
                             <title>✓</title>
                             <polygon fill="currentColor" points="1.938,8.7 0.538,10.1 5.938,15.5 17.337,3.9 15.938,2.5 5.938,12.8"></polygon>
                         </svg>

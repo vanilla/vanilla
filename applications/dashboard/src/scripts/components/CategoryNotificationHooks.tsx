@@ -7,7 +7,6 @@
 import { IUser } from "@library/@types/api/users";
 import apiv2 from "@library/apiv2";
 import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import { useAsync } from "@vanilla/react-utils";
 
 export interface IFollowedCategory {
     name: string;
@@ -16,16 +15,7 @@ export interface IFollowedCategory {
     url: string;
 }
 
-async function getUserCategoryPreferences(userID: IUser["userID"]) {
+export async function getUserCategoryPreferences(userID: IUser["userID"]) {
     const { data } = await apiv2.get<IFollowedCategory[]>(`/categories/preferences/${userID}`);
     return data;
-}
-
-export function useCategoryNotificationPreferences(userID: number) {
-    const preferences = useAsync(async () => {
-        const prefs = await getUserCategoryPreferences(userID);
-        return prefs;
-    }, [userID]);
-
-    return preferences;
 }

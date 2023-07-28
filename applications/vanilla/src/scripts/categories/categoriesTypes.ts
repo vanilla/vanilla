@@ -17,8 +17,8 @@ export interface ICategoryFragment {
 export interface ICategory extends ICategoryFragment {
     description: RecordID;
     parentCategoryID: number | null;
-    customPermissions: false;
-    isArchived: false;
+    customPermissions: boolean;
+    isArchived: boolean;
     urlcode: string;
     displayAs: CategoryDisplayAs;
     countCategories: number;
@@ -31,6 +31,7 @@ export interface ICategory extends ICategoryFragment {
     breadcrumbs?: ICrumb[];
     children: ICategory[];
     dateInserted: string;
+    iconUrl?: string;
 }
 
 export enum CategoryDisplayAs {
@@ -41,16 +42,26 @@ export enum CategoryDisplayAs {
     HEADING = "heading",
 }
 
-export type CategoryPostNotificationType = "follow" | "discussions" | "all" | null;
-
+export enum CategoryPostNotificationType {
+    FOLLOW = "follow",
+    DISCUSSIONS = "discussions",
+    ALL = "all",
+}
 export interface ICategoryPreferences {
-    useEmailNotifications: boolean;
-    postNotifications: CategoryPostNotificationType;
+    "preferences.followed": boolean;
+    "preferences.email.comments": boolean;
+    "preferences.email.posts": boolean;
+    "preferences.popup.comments": boolean;
+    "preferences.popup.posts": boolean;
+    "preferences.email.digest"?: boolean;
 }
 
 export const DEFAULT_NOTIFICATION_PREFERENCES: ICategoryPreferences = {
-    useEmailNotifications: false,
-    postNotifications: null,
+    "preferences.followed": false,
+    "preferences.email.comments": false,
+    "preferences.email.posts": false,
+    "preferences.popup.comments": false,
+    "preferences.popup.posts": false,
 };
 
 export const CATEGORIES_STORE_KEY = "categories";

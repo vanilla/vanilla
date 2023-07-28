@@ -1,0 +1,5 @@
+{
+    "docker.wasDbMigrated": true,
+    "docker.wereLogsSetup": true,
+    "docker.wasQueueCloned": true
+}

@@ -20,16 +20,19 @@ use Vanilla\Widgets\AbstractHomeWidgetModule;
 class CommunityLeadersModule extends AbstractHomeWidgetModule
 {
     /** @var string One of the SLOT_TYPE constants */
-    private $slotType = UserPointsModel::SLOT_TYPE_WEEK;
+    private string $slotType = UserPointsModel::SLOT_TYPE_WEEK;
 
     /** @var int|null $categoryID */
-    private $categoryID = null;
+    private ?int $categoryID = null;
 
     /** @var int */
-    private $limit = 10;
+    private int $limit = 10;
+
+    /** @var string|null  */
+    public ?string $siteSectionID = null;
 
     /** @var UserLeaderService */
-    private $userLeaderService;
+    private UserLeaderService $userLeaderService;
 
     public $contentType = self::CONTENT_TYPE_ICON;
     public $borderType = "none";
@@ -80,7 +83,8 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule
         if ($this->title) {
             return $this->title;
         }
-        $category = $this->userLeaderService->getPointsCategory($this->categoryID);
+        $categoryModel = \Gdn::getContainer()->get(\CategoryModel::class);
+        $category = $categoryModel::categories($this->categoryID);
         return $this->userLeaderService->getTitleForSlotType($this->slotType, $category ? $category["Name"] : "");
     }
 
@@ -89,7 +93,7 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule
      */
     protected function getData(): ?array
     {
-        $query = new UserLeaderQuery($this->slotType, $this->categoryID, $this->limit);
+        $query = new UserLeaderQuery($this->slotType, $this->categoryID, $this->siteSectionID, $this->limit);
         $users = $this->userLeaderService->getLeaders($query);
         if (count($users) === 0) {
             return null;
@@ -163,6 +167,7 @@ class CommunityLeadersModule extends AbstractHomeWidgetModule
         $ownSchema = Schema::parse([
             "slotType?" => UserPointsModel::slotTypeSchema(),
             "limit?" => UserPointsModel::limitSchema(),
+            "siteSectionID?" => UserPointsModel::siteSectionSchema(),
         ]);
 
         return SchemaUtils::composeSchemas(

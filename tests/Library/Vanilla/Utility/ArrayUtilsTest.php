@@ -8,6 +8,7 @@
 namespace VanillaTests\Library\Vanilla\Utility;
 
 use ArrayAccess;
+use Garden\Web\Data;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\ArrayUtils;
 use VanillaTests\Fixtures\DumbArray;
@@ -34,6 +35,40 @@ class ArrayUtilsTest extends TestCase
         });
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testWalkArrayDeletes()
+    {
+        $actual = [
+            "item1" => [1, 2, 3],
+            "item2" => [3, 2, 1],
+        ];
+        ArrayUtils::walkRecursiveArray($actual, function (&$node) {
+            if (isset($node["item2"])) {
+                unset($node["item2"]);
+            }
+        });
+        $this->assertSame(["item1" => [1, 2, 3]], $actual);
+    }
+
+    /**
+     * This handles an edge case of Data where it wasn't properly returning references inside of it.
+     *
+     * It's more of a test of data than anything else, but this functions blows up
+     * if it's handling something implementing ArrayAccess that is offsetGet() instead of &offsetGet
+     */
+    public function testWalkWithWebData()
+    {
+        $data = Data::box(["dataItem" => ["hello" => "world"]]);
+        $actual = [
+            "properties" => [
+                "data" => $data,
+            ],
+            "item2" => [3, 2, 1],
+        ];
+
+        ArrayUtils::walkRecursiveArray($actual, function (&$node) {});
+        $this->assertSame($actual, $actual);
     }
 
     /**

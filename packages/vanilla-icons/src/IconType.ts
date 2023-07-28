@@ -19,17 +19,33 @@ type DataIconType =
     | "data-replace"
     | "data-right"
     | "data-site-metric"
+    | "data-sort-dropdown"
     | "data-swap"
     | "data-trash"
-    | "data-up";
+    | "data-up"
+    | "data-settings"
+    | "data-drag-and-drop";
 
 type DiscussionIconType = "discussion-bookmark-solid" | "discussion-bookmark";
 
-type EditorIconType = "editor-eye-slash" | "editor-eye";
+type EditorIconType =
+    | "editor-eye-slash"
+    | "editor-eye"
+    | "editor-link"
+    | "editor-unlink"
+    | "editor-link-text"
+    | "editor-link-rich"
+    | "editor-link-card";
 
 type ExternalIconType = "external-link";
 
-type MeIconType = "me-messages-solid" | "me-messages" | "me-notifications-solid" | "me-notifications" | "me-sign-in";
+type MeIconType =
+    | "me-messages-solid"
+    | "me-messages"
+    | "me-notifications-solid"
+    | "me-notifications"
+    | "me-sign-in"
+    | "me-inbox";
 
 type MetaIconType =
     | "meta-comment"
@@ -50,6 +66,8 @@ type NavigationIconType =
 
 type NewIconType = "new-discussion" | "new-event" | "new-idea" | "new-poll" | "new-question";
 
+type NotificationType = "notification-alert";
+
 type ProfileIconType = "profile-crown" | "profile-lock";
 
 type ReactionIconType = "reaction-comments";
@@ -59,6 +77,10 @@ type SearchIconType =
     | "search-categories"
     | "search-discussion"
     | "search-events"
+    | "search-filter-small" // normally used in front end facing pages
+    | "search-filter-small-applied"
+    | "search-filter" // normally used in admin/dashboard pages
+    | "search-filter-applied"
     | "search-groups"
     | "search-ideas"
     | "search-kb"
@@ -71,6 +93,8 @@ type StatusIconType = "status-warning";
 
 type VanillaIconType = "vanilla-logo";
 
+type UserManagementIconType = "user-spoof";
+
 export type IconType =
     | AnalyticsIconType
     | DashboardIconType
@@ -82,8 +106,10 @@ export type IconType =
     | MetaIconType
     | NavigationIconType
     | NewIconType
+    | NotificationType
     | ProfileIconType
     | ReactionIconType
     | SearchIconType
     | StatusIconType
-    | VanillaIconType;
+    | VanillaIconType
+    | UserManagementIconType;

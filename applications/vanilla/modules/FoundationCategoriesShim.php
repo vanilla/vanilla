@@ -141,7 +141,7 @@ class FoundationCategoriesShim
     }
 
     /**
-     * Utility for for mapping category data into a widget item.
+     * Utility to map category data into a widget item.
      *
      * @param array $category
      * @param array|null $options

@@ -14,6 +14,7 @@ use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\AddonStructure;
+use Vanilla\Utility\DebugUtils;
 
 /**
  * Handles updating.
@@ -773,7 +774,7 @@ class UpdateModel extends Gdn_Model implements LoggerAwareInterface
         $hasError = false;
         $handleThrowable = function (Throwable $ex) use ($logContext, &$hasError) {
             $hasError = true;
-            if (debug()) {
+            if (DebugUtils::isDebug()) {
                 throw $ex;
             } else {
                 $this->logger->error(

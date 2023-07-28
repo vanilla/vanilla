@@ -204,7 +204,7 @@ final class StringUtils
 
             $headings = self::getCsvHeading($result);
             $result = self::normalizeCsvRows($result, $headings);
-            fputcsv($fp, array_keys($headings));
+            fputcsv($fp, $headings);
 
             foreach ($result as $fields) {
                 fputcsv($fp, $fields);
@@ -247,17 +247,33 @@ final class StringUtils
      * Return a CSV heading based on the keys of every row.
      *
      * @param array $rows
-     * @return array
+     * @return array<string>
      */
     public static function getCsvHeading(array $rows)
     {
-        $headings = [];
+        $headingsHashIndex = [];
         foreach ($rows as $row) {
             foreach (array_keys($row) as $rowKey) {
-                $headings[$rowKey] = null;
+                $headingsHashIndex[$rowKey] = null;
             }
         }
-        ksort($headings);
+
+        $headings = array_keys($headingsHashIndex);
+
+        // Filter out subkeys
+        $headings = array_filter($headings, function (string $heading) use ($headings) {
+            foreach ($headings as $headingToCheck) {
+                if (str_starts_with($headingToCheck, $heading . ".")) {
+                    // There a heading that is a "child" of us. We should not include this value.
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
+        sort($headings);
+
         return $headings;
     }
 
@@ -265,7 +281,7 @@ final class StringUtils
      * Normalize a CSV array by setting missing fields to $defaultValue.
      *
      * @param array $rows
-     * @param array $headings
+     * @param string[] $headings
      * @return array
      */
     public static function normalizeCsvRows(array $rows, array $headings, $defaultValue = null)
@@ -273,9 +289,12 @@ final class StringUtils
         $result = [];
 
         foreach ($rows as $row) {
-            $row = $row + $headings;
-            ksort($row);
-            $result[] = $row;
+            $newRow = [];
+            foreach ($headings as $heading) {
+                $newRow[$heading] = $row[$heading] ?? null;
+            }
+            ksort($newRow);
+            $result[] = $newRow;
         }
 
         return $result;
@@ -301,5 +320,17 @@ final class StringUtils
             throw new \InvalidArgumentException("json_decode error: " . json_last_error_msg());
         }
         return $payload;
+    }
+
+    /**
+     * Sanitize an exception message to prevent displaying path ref.
+     * The primary case here is PHP TypeErrors which have file paths directly in them.
+     *
+     * @param string $message actual exception message.
+     * @return string modified exception.
+     */
+    public static function sanitizeExceptionMessage(string $message): string
+    {
+        return str_replace(PATH_ROOT, "", $message);
     }
 }

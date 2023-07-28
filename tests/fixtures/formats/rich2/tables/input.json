@@ -1,0 +1,241 @@
+[
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "Table 1:"
+      }
+    ]
+  },
+  {
+    "type": "table",
+    "children": [
+      {
+        "type": "thead",
+        "children": [
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "th",
+                "children": [
+                  {
+                    "text": "table header cell 1"
+                  }
+                ]
+              },
+              {
+                "type": "th",
+                "children": [
+                  {
+                    "text": "table header cell 2"
+                  }
+                ]
+              },
+              {
+                "type": "th",
+                "children": [
+                  {
+                    "text": "table header cell 3"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "tbody",
+        "children": [
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "text": "table data cell 1"
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "text": "table data cell 2"
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "text": "table data cell 3"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "tfoot",
+        "children": [
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "text": "table footer cell 1"
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "text": "table footer cell 2"
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "text": "table footer cell 3"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "Table 2:"
+      }
+    ]
+  },
+  {
+    "type": "table",
+    "children": [
+      {
+        "type": "thead",
+        "children": [
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "th",
+                "children": [
+                  {
+                    "text": "header 1 "
+                  }
+                ]
+              },
+              {
+                "type": "th",
+                "children": [
+                  {
+                    "text": "header 2"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "tbody",
+        "children": [
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "ul",
+                    "children": [
+                      {
+                        "type": "li",
+                        "children": [
+                          {
+                            "type": "lic",
+                            "children": [
+                              {
+                                "text": "cell 1 list item 1"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "type": "li",
+                        "children": [
+                          {
+                            "type": "lic",
+                            "children": [
+                              {
+                                "text": "cell 1 list item 2 "
+                              }
+                            ]
+                          },
+                          {
+                            "type": "ul",
+                            "children": [
+                              {
+                                "type": "li",
+                                "children": [
+                                  {
+                                    "type": "lic",
+                                    "children": [
+                                      {
+                                        "text": "cell 1 list item 2.1"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "li",
+                                "children": [
+                                  {
+                                    "type": "lic",
+                                    "children": [
+                                      {
+                                        "text": "cell 1 list item 2.2"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "text": "cell 2"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

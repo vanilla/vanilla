@@ -32,7 +32,7 @@ class FileGeneratorUtilsTest extends SiteTestCase
         $request = \Gdn_Request::create();
         $request->setPath("/api/v2/users/2.csv");
         $result = FileGeneratorUtils::getContentDisposition($request);
-        $this->assertRegExp("~attachment; filename=\"users-2-\d{8}-\d{6}\.csv\"~", $result);
+        $this->assertMatchesRegularExpression("~attachment; filename=\"users-2-\d{8}-\d{6}\.csv\"~", $result);
     }
 
     /**
@@ -54,6 +54,6 @@ class FileGeneratorUtilsTest extends SiteTestCase
         $request = \Gdn_Request::create();
         $request->setPath("/api/v2/users/2.csv");
         $result = FileGeneratorUtils::generateFileName($request);
-        $this->assertRegExp("~users-2-\d{8}-\d{6}\.csv~", $result);
+        $this->assertMatchesRegularExpression("~users-2-\d{8}-\d{6}\.csv~", $result);
     }
 }

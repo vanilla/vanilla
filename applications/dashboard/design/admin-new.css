@@ -4916,6 +4916,15 @@ label,
 .color-picker .SelectOne__placeholder {
   font-size: 14px;
 }
+@media (max-width: 600px) {
+  .input-wrap input, .color-picker input,
+.input-wrap .SelectOne__single-value,
+.color-picker .SelectOne__single-value,
+.input-wrap .SelectOne__placeholder,
+.color-picker .SelectOne__placeholder {
+    font-size: 16px;
+  }
+}
 .input-wrap:not(.inline) label, .color-picker:not(.inline) label {
   display: block;
 }

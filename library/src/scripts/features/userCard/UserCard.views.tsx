@@ -27,10 +27,10 @@ import {
 import { cx } from "@emotion/css";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import DateTime from "@library/content/DateTime";
-import { hasPermission } from "@library/features/users/Permission";
 import { formatUrl } from "@library/utility/appUtils";
 import { useCurrentUserID } from "@library/features/users/userHooks";
 import { useStackingContext } from "@vanilla/react-utils";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 interface IProps {
     user: IUser;
@@ -74,6 +74,7 @@ UserCardView.registerLinks = function (registeredLinks: IExtraUserCardContent) {
 
 export function UserCardView(props: IProps) {
     const { zIndex } = useStackingContext();
+    const { hasPermission } = usePermissionsContext();
     const classes = userCardClasses({ zIndex: zIndex });
     const { user } = props;
     const device = useDevice();
@@ -81,8 +82,8 @@ export function UserCardView(props: IProps) {
     const photoSize: UserPhotoSize = isCompact ? UserPhotoSize.XLARGE : UserPhotoSize.LARGE;
     const isConversationsEnabled = getMeta("context.conversationsEnabled", false);
 
-    const currentUseID = useCurrentUserID();
-    const isOwnUser = user.userID === currentUseID;
+    const currentUserID = useCurrentUserID();
+    const isOwnUser = user.userID === currentUserID;
 
     const privateProfile = user?.private ?? false;
     const hasPersonalInfoView = hasPermission("personalInfo.view");

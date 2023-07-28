@@ -93,7 +93,9 @@ class CommonLayoutView extends AbstractCustomLayoutView
             $siteSectionID === null
                 ? $this->siteSectionModel->getDefaultSiteSection()
                 : $this->siteSectionModel->getByID($siteSectionID);
-
+        if ($siteSectionID != 0) {
+            $this->siteSectionModel->setCurrentSiteSection($siteSection);
+        }
         $result["locale"] = $siteSection->getContentLocale();
         $result["siteSection"] = SiteSectionSchema::toArray($siteSection);
 
@@ -114,7 +116,8 @@ class CommonLayoutView extends AbstractCustomLayoutView
         }
 
         $pageHead->setSeoTitle(
-            Gdn::formatService()->renderPlainText(Gdn::config("Garden.HomepageTitle"), HtmlFormat::FORMAT_KEY)
+            Gdn::formatService()->renderPlainText(Gdn::config("Garden.HomepageTitle"), HtmlFormat::FORMAT_KEY),
+            false
         );
         $pageHead->setSeoDescription(
             Gdn::formatService()->renderPlainText(Gdn::config("Garden.Description"), HtmlFormat::FORMAT_KEY)

@@ -34,9 +34,9 @@ trait HydrateAwareTrait
      *
      * Params will have been resolved already using {@link LayoutHydrator}.
      *
-     * @return array
+     * @return array|null
      */
-    public function getHydrateParams(): array
+    public function getHydrateParams(): ?array
     {
         return $this->hydrateParams;
     }

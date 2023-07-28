@@ -23,7 +23,7 @@ const actionSanitizer = (action: AnyAction) =>
 // Browser may have redux dev tools installed, if so integrate with it.
 const composeEnhancers =
     "__REDUX_DEVTOOLS_EXTENSION_COMPOSE__" in window
-        ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ actionSanitizer, trace: true })
+        ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ actionSanitizer, trace: true, serialize: false })
         : compose;
 const enhancer = composeEnhancers(applyMiddleware(...middleware));
 

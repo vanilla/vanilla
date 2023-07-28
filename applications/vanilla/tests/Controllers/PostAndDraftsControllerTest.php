@@ -132,7 +132,7 @@ class PostAndDraftsControllerTest extends TestCase
                 "Body" => "Test Discussion Body",
                 "Format" => "markdown",
                 "CategoryID" => $this->discussion["CategoryID"],
-                "Announce" => 0,
+                "Announce" => false,
             ],
             $overrides
         );
@@ -683,5 +683,38 @@ HTML
         // Additional check with api
         $discussion = $this->api()->get("/discussions/{$discussion["discussionID"]}");
         $this->assertFalse($discussion["unread"]);
+    }
+
+    /**
+     * Tests that a discussion comment form does not have discussion's initial format from draft but current input format from config
+     */
+    public function testDiscussionCommentFormFormat()
+    {
+        // initial format is markdown
+        $this->bessy()
+            ->post(
+                "/post/discussion",
+                $this->discussion([
+                    "DraftID" => $this->discussionDraft["DraftID"],
+                    "Body" => __FUNCTION__,
+                    "Save_Draft" => "Save Le Draft",
+                ]),
+                ["deliveryMethod" => DELIVERY_METHOD_JSON]
+            )
+            ->getJson();
+
+        // if draft format is different from current input format, we won't assign the draft to the form
+        $this->runWithConfig(["Garden.InputFormatter" => "Rich2"], function () {
+            $r = $this->bessy()->get("/discussion/{$this->discussion["DiscussionID"]}");
+            $this->assertSame(false, $r->Form->getValue("Body"));
+            $this->assertSame(false, $r->Form->getValue("Format"));
+        });
+
+        // if draft format is the same as current input format, we assign the draft to the form
+        $this->runWithConfig(["Garden.InputFormatter" => "markdown"], function () {
+            $r = $this->bessy()->get("/discussion/{$this->discussion["DiscussionID"]}");
+            $this->assertSame($this->commentDraft["Body"], $r->Form->getValue("Body"));
+            $this->assertSame($this->commentDraft["Format"], $r->Form->getValue("Format"));
+        });
     }
 }

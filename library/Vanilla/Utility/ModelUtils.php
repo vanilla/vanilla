@@ -33,23 +33,30 @@ class ModelUtils
      *
      * @param string $value The field name to search for.
      * @param array|bool $options An array of fields to expand, or true for all.
+     * @param bool $excludeAll If set to true, then an expand=all or expand=true will not expand this field.
+     *
      * @return bool
      */
-    public static function isExpandOption(string $value, $options): bool
+    public static function isExpandOption(string $value, $options, bool $excludeAll = false): bool
     {
         if ($value === self::EXPAND_CRAWL) {
             // Specific handling for crawl.
             // It does not match all, or true.
             return is_array($options) && in_array(self::EXPAND_CRAWL, $options);
         }
-        $result = false;
         $isStartWithMinus = str_starts_with($value, "-");
-        if ($options === true) {
-            // A boolean true allows everything except when starting with "-"
-            $result = $isStartWithMinus ? false : true;
-        } elseif (is_array($options)) {
-            $result = !empty(array_intersect([self::EXPAND_ALL, "true", "1", $value], $options));
+        $expandAllValues = [self::EXPAND_ALL, "true", true, "1"];
+        $validValues = [$value];
+        if (!$excludeAll && !$isStartWithMinus) {
+            $validValues = array_merge($validValues, $expandAllValues);
         }
+
+        if (is_array($options)) {
+            $result = !empty(array_intersect($validValues, $options));
+        } else {
+            $result = in_array($options, $validValues, true);
+        }
+
         return $result;
     }
 
@@ -203,7 +210,7 @@ class ModelUtils
                 // Some old tests would use the alias field directly as an id. See if that works.
                 // At this point the id field wasn't there. Maybe the alias field is an ID?
                 $currentID = ArrayUtils::getByPath($aliasField, $row);
-                if ($currentID !== null && (is_string($aliasField) || is_int($aliasField))) {
+                if ($currentID !== null && (is_string($currentID) || is_int($currentID))) {
                     $ids[$currentID] = $currentID;
                     // Kludge it into the row.
                     $row[$idField] = $currentID;

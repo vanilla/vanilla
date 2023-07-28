@@ -16,6 +16,7 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Heading from "@library/layout/Heading";
 import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
 import { storyWithConfig } from "@library/storybook/StoryContext";
+import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 
 export default {
     title: "Headers/Dashboard Title Bar",
@@ -416,7 +417,6 @@ const mockSections = [
 const makeMockRegisterUserInfo: IMe = {
     name: "Neena",
     userID: 1,
-    permissions: [],
     isAdmin: true,
     photoUrl: "",
     dateLastActive: "",
@@ -450,13 +450,6 @@ const initialState = testStoreState({
             status: LoadStatus.SUCCESS,
             data: makeMockRegisterUserInfo,
         },
-        permissions: {
-            status: LoadStatus.SUCCESS,
-            data: {
-                isAdmin: true,
-                permissions: [],
-            },
-        },
     },
 });
 
@@ -470,7 +463,9 @@ export const TitleBarWithMeboxOpen = storyWithConfig({ useWrappers: false }, () 
     });
     return (
         <Provider store={getStore(initialState, true)}>
-            <DashboardTitleBar forceMeBoxOpen={true} sections={mockSections} />
+            <PermissionsFixtures.AllPermissions>
+                <DashboardTitleBar forceMeBoxOpen={true} sections={mockSections} />
+            </PermissionsFixtures.AllPermissions>
         </Provider>
     );
 });
@@ -481,7 +476,9 @@ export const MeboxOpenWithAccountAndSupportLinks = storyWithConfig({ useWrappers
     });
     return (
         <Provider store={getStore(initialState, true)}>
-            <DashboardTitleBar forceMeBoxOpen={true} sections={mockSections} />
+            <PermissionsFixtures.AllPermissions>
+                <DashboardTitleBar forceMeBoxOpen={true} sections={mockSections} />
+            </PermissionsFixtures.AllPermissions>
         </Provider>
     );
 });
@@ -496,12 +493,14 @@ export const TitleBarWithHamburgerOpenOnSmallerViews = storyWithConfig(
         });
         return (
             <Provider store={getStore(initialState, true)}>
-                <DashboardTitleBar
-                    hamburgerContent={dumbHumburgerContent}
-                    isCompact={true}
-                    forceHamburgerOpen={true}
-                    sections={[]}
-                />
+                <PermissionsFixtures.AllPermissions>
+                    <DashboardTitleBar
+                        hamburgerContent={dumbHumburgerContent}
+                        isCompact={true}
+                        forceHamburgerOpen={true}
+                        sections={[]}
+                    />
+                </PermissionsFixtures.AllPermissions>
             </Provider>
         );
     },
@@ -513,12 +512,14 @@ export const MeboxOpenOnSmallerViews = storyWithConfig({ useWrappers: false }, (
     });
     return (
         <Provider store={getStore(initialState, true)}>
-            <DashboardTitleBar
-                forceMeBoxOpen={true}
-                forceMeBoxOpenAsModal={true}
-                isCompact={true}
-                sections={mockSections}
-            />
+            <PermissionsFixtures.AllPermissions>
+                <DashboardTitleBar
+                    forceMeBoxOpen={true}
+                    forceMeBoxOpenAsModal={true}
+                    isCompact={true}
+                    sections={mockSections}
+                />
+            </PermissionsFixtures.AllPermissions>
         </Provider>
     );
 });

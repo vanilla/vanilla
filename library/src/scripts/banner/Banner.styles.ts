@@ -32,9 +32,28 @@ export const bannerClasses = useThemeCache(
         const borderRadius =
             vars.searchBar.border.radius !== undefined ? vars.searchBar.border.radius : vars.border.radius;
         const isUnifiedBorder = vars.presets.input.preset === SearchBarPresets.UNIFIED_BORDER;
+        const { almostBlack, white } = globalVars.elementaryColors;
 
-        const searchButton = css(Mixins.button(vars.searchButton));
         const mediaQueries = twoColumnVariables().mediaQueries();
+
+        const searchButtonHoverBg = ColorsUtils.modifyColorBasedOnLightness({
+            color: vars.searchButton.colors?.bg ?? globalVars.mainColors.primary,
+            weight: 0.05,
+            inverse: true,
+        });
+        const searchButtonVars = {
+            ...vars.searchButton,
+            hover: {
+                borders: vars.searchButton.borders,
+                colors: {
+                    ...vars.searchButton.colors,
+                    bg: searchButtonHoverBg,
+                    fg: ColorsUtils.isLightColor(searchButtonHoverBg) ? almostBlack : white,
+                },
+                opacity: vars.searchButton.opacity,
+            },
+        };
+        const searchButton = css(Mixins.button(searchButtonVars));
 
         const outerBackground = useThemeCache(() => {
             return css({
@@ -366,6 +385,7 @@ export const bannerClasses = useThemeCache(
                     height: styleUnit(vars.searchBar.sizing.height),
                 },
 
+                // FIXME: why is this even here?
                 // Kludge for the layout editor
                 ".layoutEditorToolbarMenu": {
                     transform: "translate(-50%, 50%)",

@@ -1,0 +1,580 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+        <meta name="format-detection" content="telephone=no, date=no, address=no, email=no" />
+        <meta name="x-apple-disable-message-reformatting" />
+
+        <!--target dark mode-->
+        <meta name="color-scheme" content="light dark" />
+        <meta name="supported-color-schemes" content="light dark only" />
+        <!--[if !mso]><!-->
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <!--<![endif]-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!--[if (gte mso 9)|(IE)]>
+            {literal}
+            <style type="text/css">
+                table {
+                    border-collapse: collapse;
+                }
+            </style>
+            {/literal}
+        <![endif]-->
+
+        <!-- Allow for better image rendering on Windows hi-DPI displays. -->
+        <!--[if mso]>
+            <noscript>
+                <xml>
+                    <o:OfficeDocumentSettings>
+                        <o:AllowPNG />
+                        <o:PixelsPerInch>96</o:PixelsPerInch>
+                    </o:OfficeDocumentSettings>
+                </xml>
+            </noscript>
+        <![endif]-->
+
+        <!--to support dark mode meta tags-->
+        <style type="text/css">
+            :root {
+                color-scheme: light dark;
+                supported-color-schemes: light dark;
+            }
+        </style>
+
+        <style>
+            body {
+                height: 100% !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
+                width: 100% !important;
+                -webkit-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
+                word-spacing: normal;
+            }
+
+            div[style*="margin:16px 0"] {
+                margin: 0 !important;
+            }
+
+            table,
+            td {
+                border-collapse: collapse !important;
+                mso-table-lspace: 0pt;
+                mso-table-rspace: 0pt;
+                -webkit-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
+            }
+
+            img {
+                border: 0;
+                line-height: 100%;
+                outline: none;
+                text-decoration: none;
+                display: block;
+                margin: auto;
+            }
+            p,
+            img {
+                font-size: 18px;
+                line-height: 28px;
+            }
+
+            a[x-apple-data-detectors] {
+                color: inherit !important;
+                font-size: inherit !important;
+                font-family: inherit !important;
+                font-weight: inherit !important;
+                line-height: inherit !important;
+            }
+
+            u + #body a {
+                color: inherit;
+                font-size: inherit;
+                font-family: inherit;
+                font-weight: inherit;
+                line-height: inherit;
+            }
+
+            .footer p {
+                font-size: 14px;
+                line-height: 24px;
+                color: #4b525d;
+            }
+            .footer a {
+                color: #4b525d !important;
+            }
+        </style>
+
+        <!--[if (gte mso 9)|(IE)]>
+            <style>
+                .keep-black {
+                    mso-style-textfill-type: gradient;
+                    mso-style-textfill-fill-gradientfill-stoplist: "0 \#000000 1 100000\,99000 \#000000 1 100000";
+                    color: #ffffff !important;
+                }
+                a.keep-black {
+                    mso-style-textfill-type: gradient;
+                    mso-style-textfill-fill-gradientfill-stoplist: "0 \#000000 1 100000\,99000 \#000000 1 100000";
+                    color: #ffffff !important;
+                }
+                .keep-white {
+                    mso-style-textfill-type: gradient;
+                    mso-style-textfill-fill-gradientfill-stoplist: "0 \#FFFFFF 0 100000\,100000 \#FFFFFF 0 100000";
+                    color: #000000 !important;
+                }
+                a.keep-white {
+                    mso-style-textfill-type: gradient;
+                    mso-style-textfill-fill-gradientfill-stoplist: "0 \#ffffff 1 100000\,100000 \#ffffff 1 100000";
+                    color: #000000 !important;
+                }
+            </style>
+        <![endif]-->
+
+        <style>
+            @media screen and (max-width: 600px) {
+                .wInner {
+                    width: 90% !important;
+                }
+                .wFull {
+                    width: 100% !important;
+                }
+                img.feature-image {
+                    width: 100%;
+                    height: auto;
+                }
+            }
+        </style>
+
+        <style>
+            @media screen and (max-width: 600px) {
+                .block {
+                    display: block !important;
+                    width: 100% !important;
+                }
+            }
+        </style>
+
+        <!--dark mode styles-->
+        <style>
+            @media (prefers-color-scheme: dark) {
+                .darkmode {
+                    background-color: #262524 !important;
+                    background: #262524 !important;
+                }
+
+                h1,
+                p,
+                span,
+                img {
+                    color: #edeeef !important;
+                }
+                a {
+                    color: #fff !important;
+                }
+                .footer a {
+                    color: #fdfdfd !important;
+                }
+            }
+
+            [data-ogsb] .darkmode {
+                background-color: #272623 !important;
+            }
+            [data-ogsc] h1,
+            [data-ogsc] p,
+            [data-ogsc] span,
+            [data-ogsc] .footer a,
+            [data-ogsc] img {
+                color: #edeeef !important;
+            }
+            [data-ogsc] p a {
+                color: #7eabce !important;
+            }
+            [data-ogsc] .footer a {
+                color: #fdfdfd !important;
+            }
+        </style>
+    </head>
+
+    <body id="body" class="darkmode body">
+        <div role="article" aria-roledescription="email" xml:lang="en" lang="en">
+            <!--hidden preheader with preh-header spacer hack-->
+            <div style="display: none">
+                {{ str_repeat("&nbsp;&zwnj;", 144) }}
+            </div>
+
+            {% set wInner = '
+                class="wInner"
+                cellpadding="0"
+                cellspacing="0"
+                border="0"
+                role="presentation"
+                style="width: 600px"
+            ' %}
+
+            {% set spacerRow %}
+                <tr>
+                    <td
+                        aria-hidden="true"
+                        align="left"
+                        valign="top"
+                        style="font-size: 20px; line-height: 20px; mso-line-height-rule: exactly"
+                    >
+                        &nbsp;
+                    </td>
+                </tr>
+            {% endset %}
+
+            {% set dividerLine %}
+                            <tr>
+                                <td
+                                    colspan="3"
+                                    align="left"
+                                    valign="top"
+                                    style="
+                                        background-color: #dddee0;
+                                        font-size: 2px;
+                                        line-height: 2px;
+                                        mso-line-height-rule: exactly;
+                                    "
+                                >
+                                    &nbsp;
+                                </td>
+                            </tr>
+            {% endset %}
+            
+            {% set fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif" %}
+
+            {% set metaText = "font-family: #{fontFamily};
+                                            color: #767676;
+                                            font-size: 16px;
+                                            line-height: 21px;
+                                            font-weight: 400;
+                                            margin-bottom: 0;" %}
+
+            {% set footerText = "font-family: #{fontFamily};
+                                            color: #{email.textColor};
+                                            font-weight: 400;
+                                            text-align: center;
+                                            font-size: 14px;
+                                            line-height: 20px;
+                                            margin-bottom: 0;" %}
+
+            <table
+                class="darkmode"
+                cellpadding="0"
+                cellspacing="0"
+                border="0"
+                role="presentation"
+                style="width: 100%; background-color: {{ email.backgroundColor }}"
+            >
+                 <tr>
+                    <td align="center" valign="top">
+                        <table {{ wInner | raw }}>
+                            {% if email.imageUrl|default(false) %}
+                            <tr>
+                                <td align="center" valign="top" style="padding: 30px 0 0 0">
+                                    <div>
+                                        <a
+                                            href="{{ email.siteUrl }}"
+                                            target="_blank"
+                                            style="text-decoration: none"
+                                        >
+                                            <img
+                                                src="{{ email.imageUrl }}"
+                                                width="163"
+                                                height="60"
+                                                alt="{{ email.imageAlt }}"
+                                                style="
+                                                    font-family: {{ fontFamily | raw }};
+                                                    color: {{ email.textColor | raw }};
+                                                    text-align: center;
+                                                    font-weight: bold;
+                                                    font-size: 36px;
+                                                    line-height: 40px;
+                                                    text-decoration: none;
+                                                    margin: 0 auto;
+                                                    padding: 0;
+                                                "
+                                                border="0"
+                                            />
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td align="center" valign="top" style="padding: 30px 0">
+                        {% if email.title|default(false) %}
+                        <h1
+                            style="
+                                font-family: {{ fontFamily | raw }};
+                                color: {{ email.textColor }};
+                                font-weight: 300;
+                                font-size: 36px;
+                                line-height: 36px;
+                                margin: 0;
+                                margin-bottom: 36px;
+                            "
+                        >
+                            {{ email.title | raw }}
+                        </h1>
+                        {% endif %}
+
+                        {% for category in email.categories %}
+
+                        <table {{ wInner | raw }}>
+                            <tr>
+                                {% if category.iconUrl|default(false) %}
+                                <td align="left" valign="middle" style="padding: 10px 10px 10px 0px" width="7%">
+                                    <img
+                                        src="{{ category.iconUrl }}"
+                                        width="24"
+                                        height="24"
+                                        border="0"
+                                    />
+                                </td>
+                                {% endif %}
+                                <td align="left" valign="middle" style="padding: 10px 10px 10px 0px" width="61%">
+                                    <p
+                                        style="
+                                            font-family: {{ fontFamily | raw }};
+                                            color: {{ email.textColor | raw }};
+                                            font-size: 16px;
+                                            line-height: 16px;
+                                            mso-line-height-rule: exactly;
+                                            font-weight: 700;
+                                            margin-top: 0;
+                                            margin-bottom: 0;
+                                        "
+                                    >
+                                        <a
+                                            href="{{ category.url }}"
+                                            style="
+                                                text-decoration: underline;
+                                                font-family: {{ fontFamily | raw }};
+                                                color: {{ email.textColor | raw }};
+                                                font-size: 16px;
+                                                line-height: 16px;
+                                                mso-line-height-rule: exactly;
+                                                font-weight: 700;
+                                            "
+                                        >
+                                            {{ category.name }}
+                                        </a>
+                                    </p>
+                                </td>
+                                <td align="right" valign="middle" style="padding: 10px 0" width="30%">
+                                    {% if category.unsubscribeLink|default(false) %}
+                                    <a href="{{ category.unsubscribeLink }}" target="_blank" style="text-decoration: none">
+                                        <span
+                                            style="
+                                                font-family: {{ fontFamily | raw }};
+                                                color: {{ email.textColor | raw }};
+                                                text-decoration: underline;
+                                                font-weight: 400;
+                                                font-size: 14px;
+                                            "
+                                        >
+                                            {{t("Hide category")}}
+                                        </span>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {{ dividerLine | raw }}
+                        </table>
+
+                        {% for discussion in category.discussions %}
+                        <table {{ wInner | raw }}>
+                            <tr>
+                                <td
+                                    class="block"
+                                    align="left"
+                                    valign="top"
+                                    style="padding: 20px 10px 10px 0px"
+                                    width="70%"
+                                >
+                                    <a
+                                        href="{{ discussion.url }}"
+                                        target="_blank"
+                                        style="color: {{ email.textColor | raw }}; text-decoration: underline; font-weight: 700"
+                                    >
+                                        <span
+                                            style="
+                                                font-family: {{ fontFamily | raw }};
+                                                color: {{ email.textColor | raw }};
+                                                text-decoration: none;
+                                                font-weight: 700;
+                                                font-size: 21px;
+                                                line-height: 24px;
+                                            "
+                                        >
+                                            {{ discussion.name }}
+                                        </span>
+                                    </a>
+
+                                    <p
+                                        style="
+                                            font-family: {{ fontFamily | raw }};
+                                            color: {{ email.textColor | raw }};
+                                            font-size: 16px;
+                                            line-height: 21px;
+                                            font-weight: 400;
+                                            margin-top: 9px;
+                                            margin-bottom: 0;
+                                        "
+                                    >
+                                        {{ discussion.excerpt }}
+                                        <a
+                                            href="{{ discussion.url }}"
+                                            target="_blank"
+                                            style="
+                                                font-family: {{ fontFamily | raw }};
+                                                color: {{ email.textColor | raw }};
+                                                text-decoration: underline;
+                                                font-weight: 400;
+                                            "
+                                        >
+                                            {{t("view more")}}
+                                        </a>
+                                    </p>
+                                    <p
+                                        style="
+                                            {{ metaText | raw }}
+                                            margin-top: 9px;
+                                        "
+                                    >
+                                        {% if discussion.countViews|default(false) %}
+                                        <span style="margin-right: 10px">{{ discussion.countViews }}&nbsp;views</span>
+                                        {% endif %}
+                                        {% if discussion.countComments|default(false) %}
+                                        <span style="margin-right: 10px">{{ discussion.countComments }}&nbsp;comments</span>
+                                        {% endif %}
+                                        {% if discussion.score|default(false) %}
+                                        <span style="margin-right: 10px">{{ discussion.score }}&nbsp;reactions</span>
+                                        {% endif %}
+                                    </p>
+                                    {% if discussion.insertUser|default(false) %}
+                                    <p
+                                        style="
+                                            {{ metaText | raw }}
+                                            margin-top: 0px;
+                                        "
+                                    >
+                                    {{sprintf(t("Started by %s"), discussion.insertUser.name)}}
+
+                                    </p>
+                                    {% endif %}
+                                </td>
+                                {% if discussion.image|default(false) %}
+                                <td class="block" align="right" valign="top" style="padding: 10px 0" width="30%">
+                                    <img
+                                        src="{{ discussion.image.url }}"
+                                        width="190"
+                                        height="auto"
+                                        border="0"
+                                        alt="{{ discussion.image.alt }}"
+                                        class="feature-image"
+                                    />
+                                </td>
+                                {% endif %}
+                            </tr>
+                        </table>
+                        {% endfor %}
+                            
+                        <table {{ wInner | raw }}>
+                            {{ spacerRow | raw }}
+                        </table>
+                        {% endfor %}
+
+                        <table {{ wInner | raw }}>
+                            {{ spacerRow | raw }}
+                            <tr>
+                                <td width="33%"></td>
+                                <td
+                                    width="33%"
+                                    align="center"
+                                    valign="top"
+                                    style="background-color: {{ email.buttonBackgroundColor | raw }}; padding: 12px 12px 12px 12px; width: 130px"
+                                >
+                                    <a
+                                        href="{{ email.siteUrl }}/discussions?followed=true&sort=-hot"
+                                        style="
+                                            font-family: {{ fontFamily | raw }};
+                                            background-color: {{ email.buttonBackgroundColor | raw }};
+                                            color: {{ email.buttonTextColor | raw }};
+                                            text-decoration: none;
+                                            font-size: 16px;
+                                            white-space: nowrap;
+                                        "
+                                        target="_blank"
+                                    >
+                                        {{t("View More Posts")}}
+                                    </a>
+                                </td>
+                                <td width="33%"></td>
+                            </tr>
+                        </table>
+
+                        <table {{ wInner | raw }}>
+                            {{ spacerRow | raw }}
+                            {{ dividerLine | raw }}
+
+                            {{ spacerRow | raw }}
+                            <!-- FOOTER -->
+                            <tr class="footer">
+                                <td align="center">
+                                    {% if email.footer|default(false) %}
+                                    <p>
+                                        {{ email.footer | raw }}
+                                    </p>
+                                    {% endif %}
+
+                                    <p
+                                        style="
+                                            {{ footerText | raw }}
+                                        "
+                                    >
+                                        <a
+                                            href="{{ email.digestUnsubscribeLink }}"
+                                            target="_blank"
+                                            data-saferedirecturl="{{ email.digestUnsubscribeLink }}"
+                                            style="color: {{ email.textColor | raw }}; text-decoration: underline"
+                                            >{{t("Unsubscribe")}}</a
+                                        >
+                                        {{t("from the email digest or")}}
+                                    </p>
+
+                                    <p
+                                        style="
+                                            {{ footerText | raw }}
+                                        "
+                                    >
+                                        <a
+                                            href="{{ email.siteUrl }}/profile/preferences"
+                                            target="_blank"
+                                            data-saferedirecturl="{{ email.siteUrl }}/profile/preferences"
+                                            style="color: {{ email.textColor | raw }}; text-decoration: underline"
+                                            >{{t("Manage")}}</a
+                                        >
+                                        {{t("your notification preferences")}}
+                                    </p>
+                                </td>
+                            </tr>
+                            {{ spacerRow | raw }}
+                            {{ spacerRow | raw }}
+                        </table>
+                        
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>

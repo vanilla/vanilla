@@ -23,7 +23,7 @@ import React, { useMemo, useState } from "react";
 import DiscussionOptionsMenu from "@library/features/discussions/DiscussionOptionsMenu";
 import DiscussionVoteCounter from "@library/features/discussions/DiscussionVoteCounter";
 import qs from "qs";
-import { hasPermission, PermissionMode } from "@library/features/users/Permission";
+import { PermissionMode } from "@library/features/users/Permission";
 import { ReactionUrlCode } from "@dashboard/@types/api/reaction";
 import DateTime from "@library/content/DateTime";
 import { metasClasses } from "@library/metas/Metas.styles";
@@ -35,6 +35,7 @@ import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { pointerEventsClass } from "@library/styles/styleHelpersFeedback";
 import { slugify } from "@vanilla/utils";
 import { ListItemIconPosition } from "@library/lists/ListItem.variables";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 interface IProps {
     discussion: IDiscussion;
     noCheckboxes?: boolean;
@@ -50,6 +51,8 @@ interface IDiscussionItemMetaProps extends IDiscussion {
 
 export default function DiscussionListItem(props: IProps) {
     const { discussion } = props;
+
+    const { hasPermission } = usePermissionsContext();
 
     const classes = discussionListClasses(props.discussionOptions, props.asTile);
     const variables = discussionListVariables(props.discussionOptions);
@@ -195,9 +198,9 @@ export default function DiscussionListItem(props: IProps) {
 function qnaStatus(status) {
     switch (status) {
         case "unanswered":
+        case "rejected":
             return "Q&A Question";
         case "answered":
-        case "rejected":
             return "Q&A Answered";
         case "accepted":
             return "Q&A Accepted";
@@ -208,6 +211,7 @@ function qnaStatus(status) {
 }
 
 function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
+    const { hasPermission } = usePermissionsContext();
     const {
         item: {
             metas: { display, asIcons: renderAsIcons },
@@ -373,22 +377,22 @@ function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
                 </MetaItem>
             )}
             {renderViewCountAsIcon && (
-                <MetaIcon icon="meta-view" aria-label={t("Views")}>
+                <MetaIcon icon="meta-view" aria-label={`${countViews} ${t("Views")}`} tabIndex={0}>
                     {countViews}
                 </MetaIcon>
             )}
             {renderLastCommentDateAsIcon && dateLastComment && (
-                <MetaIcon icon="meta-time" aria-label={t("Last comment")}>
+                <MetaIcon icon="meta-time" aria-label={`${t("Last comment")} ${dateLastComment}`} tabIndex={0}>
                     <DateTime timestamp={dateLastComment} />
                 </MetaIcon>
             )}
             {renderScoreAsIcon && (
-                <MetaIcon icon="meta-like" aria-label={t("Score")}>
+                <MetaIcon icon="meta-like" aria-label={`${score} ${t("Score")}`} tabIndex={0}>
                     {score ?? 0}
                 </MetaIcon>
             )}
             {renderCommentCountAsIcon && (
-                <MetaIcon icon="meta-comment" aria-label={t("Comments")}>
+                <MetaIcon icon="meta-comment" aria-label={`${countComments} ${t("Comments")}`} tabIndex={0}>
                     {countComments}
                 </MetaIcon>
             )}

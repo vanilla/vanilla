@@ -62,4 +62,15 @@ class IgnorePluginTest extends \VanillaTests\SiteTestCase
             "action" => \Garden\Events\ResourceEvent::ACTION_INSERT,
         ]);
     }
+
+    /**
+     * Test that the ignore preferences are reachable.
+     */
+    public function testIgnoreProfilePage()
+    {
+        $response = $this->bessy()
+            ->getJsonData("/profile/ignore")
+            ->asHttpResponse();
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 }

@@ -1,4 +1,5 @@
-bolditalicstrikeAll inline formats:D  :(  :o  :s
+bolditalicstrikeAll inline formats:D :( :o :s
 Link
 Code Inline
 Code Inline
+@simpleUser @user/withslashes

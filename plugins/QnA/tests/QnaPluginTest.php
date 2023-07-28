@@ -142,4 +142,32 @@ class QnAPluginTest extends SiteTestCase
         $question = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
         $this->assertEquals(QnAPlugin::DISCUSSION_STATUS_ACCEPTED, $question["statusID"]);
     }
+
+    /**
+     *  Test creating Question draft
+     */
+    public function testQuestionDraft()
+    {
+        $categoryID = $this->lastInsertedCategoryID ?? -1;
+        $draft = $this->bessy()->post("/post/question", [
+            "CategoryID" => $categoryID,
+            "Name" => "Question",
+            "Body" => "Question being asked!",
+            "Format" => "markdown",
+            "Type" => "Question",
+            "Save_Draft" => true,
+        ]);
+        $draftID = $draft->Form->HiddenInputs["DraftID"];
+        $draftModel = $this->container()->get(\DraftModel::class);
+        $dbDraft = $draftModel->getID($draftID, DATASET_TYPE_ARRAY);
+        $this->assertEquals("Question", $draft->Form->HiddenInputs["Type"]);
+        $this->assertEquals("Question", $dbDraft["Type"]);
+
+        $draftHtml = $this->bessy()->getHtml(
+            "/post/editdiscussion/0/$draftID",
+            [],
+            ["deliveryType" => DELIVERY_TYPE_ALL]
+        );
+        $draftHtml->assertContainsString("Ask a Question");
+    }
 }

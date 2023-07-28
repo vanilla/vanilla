@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
@@ -12,7 +12,6 @@
 
 use Garden\Schema\ValidationException;
 use Vanilla\Invalid;
-use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
 
 /**
@@ -729,11 +728,11 @@ class Gdn_Validation
     /**
      * Add a validation result (error) to the validation.
      *
-     * @param string $fieldName The name of the form field that has the error.
+     * @param string|array $fieldName The name of the form field that has the error.
      * @param string $errorCode The translation code of the error.
      *    Codes that begin with an '@' symbol are treated as literals and not translated.
      */
-    public function addValidationResult($fieldName, $errorCode = "")
+    public function addValidationResult($fieldName, string $errorCode = "")
     {
         if (!is_array($this->_ValidationResults)) {
             $this->_ValidationResults = [];

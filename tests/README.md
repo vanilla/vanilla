@@ -32,7 +32,6 @@ The `Library` testsuite is actual unit testing. For more thorough results, you m
 1. Your copy of Vanilla must respond to `http://vanilla.test:8080`.
 
     - You can use the nginx template in `.circleci/scripts/templates/nginx/sites-enabled/default-site.tpl.conf` as a guideline.
-    - Pay particular attention to the `/cgi-bin` mapping
     - If you are on Apache, the default `.htaccess` file should work for you.
 
 1. You must put `.circleci/scripts/templates/vanilla/conf/bootstrap.before.php` in your `conf/` folder.

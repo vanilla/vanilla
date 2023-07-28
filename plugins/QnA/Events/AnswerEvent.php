@@ -17,7 +17,9 @@ use Vanilla\Analytics\TrackableCommunityModel;
 class AnswerEvent extends ResourceEvent implements TrackingEventInterface
 {
     const COLLECTION_NAME = "qna";
-    const ACTION_ANSWER_ACCEPTED = "answer_accepted";
+    const ACTION_ANSWER_ACCEPTED = "accepted";
+    const ACTION_ANSWER_REJECTED = "rejected";
+
     /**
      * Create a payload suitable for tracking.
      *
@@ -39,8 +41,27 @@ class AnswerEvent extends ResourceEvent implements TrackingEventInterface
     /**
      * {@inheritDoc}
      */
+    public function getTrackableAction(): string
+    {
+        return "answer_{$this->getAction()}";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getTrackableCollection(): ?string
     {
         return self::COLLECTION_NAME;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionID(): ?string
+    {
+        if (isset($this->payload["answer"]["siteSectionIDs"])) {
+            return $this->payload["answer"]["siteSectionIDs"][0];
+        }
+        return null;
     }
 }

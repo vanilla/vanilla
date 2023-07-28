@@ -1,0 +1,101 @@
+openapi: 3.0.2
+info:
+paths:
+    /emails/preview:
+        post:
+            summary: Generate and Email Preview
+            tags:
+                - Emails
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                emailFormat:
+                                    $ref: "#/components/schemas/EmailFormat"
+                                templateStyles:
+                                    $ref: "#/components/schemas/TemplateStyles"
+                                footer:
+                                    $ref: "#/components/schemas/Footer"
+                            required:
+                                - emailFormat
+                                - templateStyles
+                required: true
+            responses:
+                "200":
+                    content:
+                        "text/html":
+                            example: <html>Email Content Here</html>
+                            schema:
+                                type: string
+                    description: Success
+    /emails/send-test:
+        post:
+            summary: Send out a test email to a specified address
+            tags:
+                - Emails
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                destinationAddress:
+                                    description: Where the email should be sent.
+                                    type: string
+                                from:
+                                    type: object
+                                    properties:
+                                        supportAddress:
+                                            type: string
+                                        supportName:
+                                            type: string
+                                emailFormat:
+                                    $ref: "#/components/schemas/EmailFormat"
+                                templateStyles:
+                                    $ref: "#/components/schemas/TemplateStyles"
+                                footer:
+                                    $ref: "#/components/schemas/Footer"
+                            required:
+                                - destinationAddress
+                                - emailFormat
+                                - templateStyles
+                required: true
+            responses:
+                "201":
+                    content:
+                        "application/json":
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                    description: Success
+components:
+    schemas:
+        Footer:
+            description: A Rich2 formatted JSON body to use for a footer contents.
+            type: string
+        EmailFormat:
+            description: The format the email should be in.
+            type: string
+            enum:
+                - html
+                - text
+        TemplateStyles:
+            description: Configurable style properties on an email template
+            type: object
+            properties:
+                logoUrl:
+                    type: string
+                textColor:
+                    type: string
+                backgroundColor:
+                    type: string
+                containerBackgroundColor:
+                    type: string
+                buttonTextColor:
+                    type: string
+                buttonBackgroundColor:
+                    type: string

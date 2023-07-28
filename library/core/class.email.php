@@ -7,6 +7,9 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Formatting\Formats\Rich2Format;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Utility\DebugUtils;
 
 /**
@@ -44,6 +47,8 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
     /** @var string The format of the email. */
     protected $format;
 
+    private ConfigurationInterface $config;
+
     /** @var string[] The supported email formats. */
     public static $supportedFormats = ["html", "text"];
 
@@ -67,6 +72,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
 
         // This class is largely instantiated at the usage site, not the container, so we can't rely on it to wire up the dependency.
         $this->setLogger(Logger::getLogger());
+        $this->config = \Gdn::config();
 
         $this->resolveFormat();
         parent::__construct();
@@ -653,5 +659,41 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
     public function isDebug(): bool
     {
         return $this->debug;
+    }
+
+    /**
+     * Get email footer html string if available
+     *
+     * @return string
+     */
+    public function getFooterContent(string $content = null): string
+    {
+        $footerConfig = $content ?? $this->config->get("Garden.Email.Footer", "");
+        if (empty(trim($footerConfig))) {
+            return "";
+        }
+        $rich2Formatter = Gdn::getContainer()->get(Rich2Format::class);
+        try {
+            if ($this->format === "html") {
+                $footerText = $rich2Formatter->renderHTML($footerConfig);
+            } else {
+                $footerText = $rich2Formatter->renderPlainText($footerConfig);
+            }
+
+            if (str_contains($footerText, Rich2Format::RENDER_ERROR_MESSAGE)) {
+                return "";
+            }
+        } catch (\Exception $exception) {
+            ErrorLogger::error(
+                "Failed to render email footer.",
+                ["email"],
+                [
+                    "exception" => $exception,
+                ]
+            );
+            $footerText = "";
+        }
+
+        return $footerText;
     }
 }

@@ -128,7 +128,6 @@ trait CallToActionWidgetTrait
                     "text" => "Text",
                 ])
             );
-            $schema["button?"] = Schema::parse($buttonSchema);
 
             //second button
             $secondButtonSchema = $buttonSchema;
@@ -144,7 +143,7 @@ trait CallToActionWidgetTrait
                 ])
             );
 
-            $schema["secondButton"] = Schema::parse($secondButtonSchema);
+            $schema["secondButton?"] = Schema::parse($secondButtonSchema);
         }
 
         $schema["button?"] = Schema::parse($buttonSchema)->setField(

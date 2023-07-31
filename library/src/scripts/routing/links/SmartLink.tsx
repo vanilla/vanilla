@@ -9,7 +9,7 @@ import { NavLink, NavLinkProps, useLocation } from "react-router-dom";
 import { makeLocationDescriptorObject, LinkContext, useLinkContext } from "@library/routing/links/LinkContextProvider";
 import { sanitizeUrl } from "@vanilla/utils";
 import { LocationDescriptor } from "history";
-import { siteUrl } from "@library/utility/appUtils";
+import { getMeta, siteUrl } from "@library/utility/appUtils";
 import { cx } from "@emotion/css";
 
 export interface ISmartLinkProps extends NavLinkProps {
@@ -37,7 +37,7 @@ export interface ISmartLinkProps extends NavLinkProps {
  * Result = https://test.com/root/someUrl/deeper/nested (full refresh)
  */
 export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: React.Ref<HTMLAnchorElement>) {
-    const { replace, active = false, ...passthru } = props;
+    const { replace, active = false, to, ...passthru } = props;
     const context = useLinkContext();
 
     // Filter out undefined props
@@ -47,15 +47,16 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
         }
     }
 
-    const href = context.makeHref(props.to);
+    let href = context.makeHref(to);
+
     const tabIndex = context.areLinksDisabled ? -1 : props.tabIndex ?? 0;
     if (context.isDynamicNavigation(href)) {
         return (
             <NavLink
-                rel={props.target === "_blank" ? "noreferer noopener ugc" : undefined}
+                rel={props.target === "_blank" ? "noopener ugc" : undefined}
                 {...passthru}
                 innerRef={ref}
-                to={makeLocationDescriptorObject(props.to, href)}
+                to={makeLocationDescriptorObject(to, href)}
                 tabIndex={tabIndex}
                 replace={replace}
             />
@@ -68,7 +69,7 @@ export default React.forwardRef(function SmartLink(props: ISmartLinkProps, ref: 
                 ref={ref}
                 href={sanitizeUrl(href)}
                 target={isForeign ? "_blank" : undefined}
-                rel={isForeign ? "noopener noreferrer" : props.rel}
+                rel={isForeign ? "noopener" : props.rel}
                 {...passthru}
                 tabIndex={tabIndex}
             />

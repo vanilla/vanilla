@@ -19,7 +19,9 @@ use Garden\Http\HttpResponse;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\ServerException;
 use InvalidArgumentException;
+use Vanilla\Formatting\Html\HtmlDocument;
 use Vanilla\Metadata\Parser\Parser;
+use Vanilla\Utility\UrlUtils;
 use Vanilla\Web\RequestValidator;
 
 /**
@@ -113,6 +115,23 @@ class PageScraper implements LoggerAwareInterface
                 $description = $this->parseDescription($document, $metaTags);
                 if ($description) {
                     $info["Description"] = $description;
+                }
+            }
+
+            if (empty($info["Favicon"])) {
+                // Prioritize `rel="icon"`, then `rel="shortcut icon"`, then any rel that contains `icon` as a fallback.
+                foreach (["link[rel='icon']", "link[rel='shortcut icon']", "link[rel*='icon']"] as $query) {
+                    $faviconTag = HtmlDocument::queryCssSelectorForDocument($document, $query)->item(0);
+                    if (!is_null($faviconTag)) {
+                        break;
+                    }
+                }
+
+                if ($faviconTag instanceof DOMElement) {
+                    $href = $faviconTag->getAttribute("href");
+                    if ($href) {
+                        $info["Favicon"] = UrlUtils::ensureAbsoluteUrl($href, $url);
+                    }
                 }
             }
 

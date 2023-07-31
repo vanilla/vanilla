@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`VariableParser can handle type expanders: font expansions 1`] = `
-Array [
-  Object {
+[
+  {
     "commonTitle": "Thing Font",
     "description": "Text color",
     "expand": "font",
@@ -10,7 +10,7 @@ Array [
     "title": "Thing Font - Color",
     "type": "string",
   },
-  Object {
+  {
     "commonTitle": "Thing Font",
     "description": "Text size",
     "expand": "font",
@@ -22,26 +22,26 @@ Array [
 `;
 
 exports[`VariableParser can parse a single file 1`] = `
-Object {
-  "errors": Array [],
-  "variableGroups": Array [
-    Object {
+{
+  "errors": [],
+  "variableGroups": [
+    {
       "commonTitle": "Banner",
       "description": "Control different variants for the banner. These options can affect multiple parts of the banner at once.",
       "key": "banner.options",
       "title": "Banner",
     },
   ],
-  "variables": Array [
-    Object {
+  "variables": [
+    {
       "description": "When disabled the banner will not appear at all.",
       "key": "banner.options.enabled",
       "title": "Enabled",
       "type": "boolean",
     },
-    Object {
+    {
       "description": "Align the banner",
-      "enum": Array [
+      "enum": [
         "center",
         "left",
         "right",
@@ -50,9 +50,9 @@ Object {
       "title": "Alignment",
       "type": "string",
     },
-    Object {
+    {
       "description": "Align the banner on mobile. Defaults to match desktop alignment.",
-      "enum": Array [
+      "enum": [
         "center",
         "left",
         "right",
@@ -61,27 +61,27 @@ Object {
       "title": "Alignment (Mobile)",
       "type": "string",
     },
-    Object {
+    {
       "description": undefined,
       "key": "banner.options.hideDescription",
       "title": "Hide Description",
       "type": "boolean",
     },
-    Object {
+    {
       "description": undefined,
       "key": "banner.options.hideTitle",
       "title": "Hide Title",
       "type": "boolean",
     },
-    Object {
+    {
       "description": undefined,
       "key": "banner.options.hideSearch",
       "title": "Hide SearchBar",
       "type": "boolean",
     },
-    Object {
+    {
       "description": "Place the search bar in different parts of the banner.",
-      "enum": Array [
+      "enum": [
         "middle",
         "bottom",
       ],
@@ -89,7 +89,7 @@ Object {
       "title": "SearchBar Placement",
       "type": "string",
     },
-    Object {
+    {
       "description": "When set turn the title into a link to this url.",
       "key": "banner.options.url",
       "title": "Title Url",

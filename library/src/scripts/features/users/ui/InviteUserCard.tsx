@@ -17,9 +17,10 @@ import MultiUserInput from "@library/features/users/MultiUserInput";
 import InputTextBlock, { InputTextBlockBaseClass } from "@library/forms/InputTextBlock";
 import Checkbox from "@library/forms/Checkbox";
 import { userCardClasses } from "@library/features/users/ui/inviteUserCardStyles";
-import Permission, { hasPermission, PermissionMode } from "@library/features/users/Permission";
+import Permission, { PermissionMode } from "@library/features/users/Permission";
 import { IApiError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 interface IProps {
     defaultUsers: IComboBoxOption[];
@@ -43,6 +44,8 @@ export default function InviteUserCard(props: IProps) {
         closeModal,
         errors,
     } = props;
+
+    const { hasPermission } = usePermissionsContext();
 
     const hasEmailInvitePermission = hasPermission("emailInvitations.add");
     const [boxChecked, setBoxChecked] = useState(false);

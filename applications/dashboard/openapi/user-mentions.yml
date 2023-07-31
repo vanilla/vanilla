@@ -5,7 +5,7 @@ paths:
         x-hidden: false
         get:
             parameters:
-                - description: The discussion ID.
+                - description: The user ID.
                   in: path
                   name: userID
                   required: true

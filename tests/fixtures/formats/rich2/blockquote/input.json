@@ -1,0 +1,31 @@
+[
+  {
+    "type": "blockquote",
+    "children": [
+      {
+        "type": "blockquote-line",
+        "children": [
+          {
+            "text": "Line 1"
+          }
+        ]
+      },
+      {
+        "type": "blockquote-line",
+        "children": [
+          {
+            "text": ""
+          }
+        ]
+      },
+      {
+        "type": "blockquote-line",
+        "children": [
+          {
+            "text": "Line 3"
+          }
+        ]
+      }
+    ]
+  }
+]

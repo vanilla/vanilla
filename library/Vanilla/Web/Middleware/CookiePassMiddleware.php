@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,8 +9,11 @@ namespace Vanilla\Web\Middleware;
 
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
-use Garden\Web\Cookie;
 use Garden\Web\RequestInterface;
+use Gdn;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Vanilla\Logger;
 
 /**
  * Class CookiePassMiddleware

@@ -4,7 +4,6 @@
  * @license GPL-2.0-only
  */
 
-import { hasPermission } from "@library/features/users/Permission";
 import { hamburgerClasses } from "@library/flyouts/hamburgerStyles";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
@@ -22,6 +21,8 @@ import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
 import { IPanelNavItemsProps } from "@library/flyouts/panelNav/PanelNavItems";
 import MobileOnlyNavigation from "@library/headers/MobileOnlyNavigation";
 import { useHamburgerMenuContext } from "@library/contexts/HamburgerMenuContext";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { PermissionChecker } from "@library/features/users/Permission";
 
 interface IProps {
     className?: string;
@@ -119,11 +120,12 @@ interface ISiteNavigationProps {
 
 export function varItemToNavTreeItem(
     variableItem: INavigationVariableItem,
+    permissionChecker: PermissionChecker,
     parentID: string = "root",
 ): INavigationTreeItem | null {
     const { permission, name, url, id, children, isHidden, badge } = variableItem;
 
-    if (permission && !hasPermission(permission)) {
+    if (permission && !permissionChecker(permission)) {
         return null;
     }
 
@@ -137,7 +139,8 @@ export function varItemToNavTreeItem(
         recordID: id,
         recordType: "customLink",
         parentID: parentID,
-        children: children?.map((child) => varItemToNavTreeItem(child, id)).filter(notEmpty) ?? [],
+        children:
+            children?.map((child) => varItemToNavTreeItem(child, permissionChecker, parentID)).filter(notEmpty) ?? [],
         sort: 0,
     };
 
@@ -163,13 +166,14 @@ export function getActiveRecord(navTreeItems: INavigationTreeItem[]): IPanelNavI
 }
 
 function SiteNavigation(props: ISiteNavigationProps) {
+    const { hasPermission } = usePermissionsContext();
     const navigationItems =
         props.navigationItems && props.navigationItems.length
             ? props.navigationItems
             : navigationVariables().navigationItems;
 
     const [treeItems, activeRecord] = useMemo(() => {
-        const treeItems = navigationItems.map((item) => varItemToNavTreeItem(item)).filter(notEmpty);
+        const treeItems = navigationItems.map((item) => varItemToNavTreeItem(item, hasPermission)).filter(notEmpty);
         const activeRecord = getActiveRecord(treeItems);
         return [treeItems, activeRecord];
     }, [navigationItems]);

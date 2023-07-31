@@ -4,20 +4,19 @@
  * @license Proprietary
  */
 
-import { useProfileFieldByUserID, useProfileFields } from "@dashboard/userProfiles/state/UserProfiles.hooks";
+import { useProfileFieldsByUserID, useProfileFields } from "@dashboard/userProfiles/state/UserProfiles.hooks";
 import { ProfileField, ProfileFieldVisibility } from "@dashboard/userProfiles/types/UserProfiles.types";
-import { css } from "@emotion/css";
 import { LoadStatus } from "@library/@types/api/core";
 import { IDataListNode } from "@library/dataLists/DataList";
-import { globalVariables } from "@library/styles/globalStyleVars";
-import { ToolTip } from "@library/toolTip/ToolTip";
-import { t } from "@vanilla/i18n";
-import { Icon } from "@vanilla/icons";
-import { labelize, RecordID } from "@vanilla/utils";
+import { ProfileFieldVisibilityIcon } from "@dashboard/userProfiles/components/ProfileFieldVisibilityIcon";
+import { RecordID } from "@vanilla/utils";
 import React, { ReactNode, useMemo } from "react";
+import sortBy from "lodash/sortBy";
+import DateTime from "@library/content/DateTime";
+import { formatDateStringIgnoringTimezone } from "@library/editProfileFields/utils";
 
 export function useUserProfileFields(userID: RecordID) {
-    const userProfileFields = useProfileFieldByUserID(userID);
+    const userProfileFields = useProfileFieldsByUserID(userID);
     const profileFieldConfigs = useProfileFields();
 
     const isLoading = useMemo<boolean>(() => {
@@ -26,8 +25,8 @@ export function useUserProfileFields(userID: RecordID) {
         );
     }, [userProfileFields, profileFieldConfigs]);
 
-    // Lets make the configured profile fields easier to lookup
-    const profileConfigsByAPIName = useMemo<Record<ProfileField["apiName"], ProfileField>>(() => {
+    // Let's make the configured profile fields easier to lookup
+    const profileConfigsByApiName = useMemo<Record<ProfileField["apiName"], ProfileField>>(() => {
         if (profileFieldConfigs.data) {
             return Object.fromEntries(
                 profileFieldConfigs.data.map((profileFieldConfig) => [profileFieldConfig.apiName, profileFieldConfig]),
@@ -37,70 +36,45 @@ export function useUserProfileFields(userID: RecordID) {
     }, [profileFieldConfigs]);
 
     const createListLabel = (labelText: string, visibility: ProfileFieldVisibility): ReactNode => {
-        const iconClasses = css({
-            height: "100%",
-            width: "auto",
-            verticalAlign: "bottom",
-            lineHeight: globalVariables().lineHeights.base,
-            marginLeft: 4,
-            marginBottom: -2,
-        });
-
-        const icon = () => {
-            switch (visibility) {
-                case ProfileFieldVisibility.INTERNAL: {
-                    return (
-                        <ToolTip label={t("Internal Field - Only some users can see this")}>
-                            <span>
-                                <Icon className={iconClasses} icon="profile-crown" />
-                            </span>
-                        </ToolTip>
-                    );
-                }
-                case ProfileFieldVisibility.PRIVATE: {
-                    return (
-                        <ToolTip label={t("Private Field - Only you and some users can see this")}>
-                            <span>
-                                <Icon className={iconClasses} icon="profile-lock" />
-                            </span>
-                        </ToolTip>
-                    );
-                }
-                default: {
-                    return <></>;
-                }
-            }
-        };
-
         return (
             <span>
-                {labelize(labelText)}
-                {icon()}
+                {labelText}
+                <ProfileFieldVisibilityIcon visibility={visibility} />
             </span>
         );
     };
 
     const profileFields = useMemo<IDataListNode[] | null>(() => {
         // Ensure both are loaded to do the look up
-        const isBothLoaded = [
+        const dependenciesLoaded = [
             userProfileFields.status === LoadStatus.SUCCESS,
             profileFieldConfigs.status === LoadStatus.SUCCESS,
         ].every((status) => status === true);
 
-        if (isBothLoaded) {
-            return Object.keys(userProfileFields?.data ?? {}).map((apiName: ProfileField["apiName"]) => {
+        if (dependenciesLoaded) {
+            const sortedUserProfileFields = sortBy(
+                Object.keys(userProfileFields.data!),
+                (apiName) => profileConfigsByApiName[apiName].sort,
+            );
+
+            return sortedUserProfileFields.map((apiName: ProfileField["apiName"]) => {
+                const value = userProfileFields.data![apiName];
+                const profileField = profileConfigsByApiName[apiName];
+
                 return {
-                    key: createListLabel(
-                        profileConfigsByAPIName[apiName].label ?? apiName,
-                        profileConfigsByAPIName[apiName].visibility,
-                    ),
-                    value: userProfileFields?.data?.[apiName],
+                    key: createListLabel(profileField.label ?? apiName, profileConfigsByApiName[apiName].visibility),
+                    value:
+                        profileField.dataType === "date" ? (
+                            <DateTime timestamp={formatDateStringIgnoringTimezone(value)} />
+                        ) : (
+                            value
+                        ),
                 };
             });
         }
 
         return null;
-    }, [userProfileFields, profileConfigsByAPIName]);
+    }, [userProfileFields, profileFieldConfigs]);
 
     return {
         isLoading,

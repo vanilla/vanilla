@@ -21,6 +21,8 @@ import { CloseTinyIcon, CheckCompactIcon, DownTriangleIcon } from "@library/icon
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { selectOneClasses } from "@library/forms/select/selectOneStyles";
 import { GroupProps } from "react-select/lib/components/Group";
+import { selectBoxClasses } from "@library/forms/select/selectBoxStyles";
+import { cx } from "@emotion/css";
 
 /**
  * Overwrite for the controlContainer component in React Select
@@ -148,7 +150,7 @@ export function SelectOption(props: ISelectOptionOverwrite) {
                 })}
             >
                 <span className="suggestedTextInput-head">
-                    <span className="suggestedTextInput-title">
+                    <span className={cx("suggestedTextInput-title", selectBoxClasses().selectOptionLabel)}>
                         {props.children}
                         {props.data?.data?.parentLabel && (
                             <span

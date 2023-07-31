@@ -34,14 +34,14 @@ class ForumQuickLinksProvider implements QuickLinkProviderInterface
     public function provideQuickLinks(): array
     {
         $result = [];
-        $result[] = new QuickLink(t("All Categories"), "/categories", null, -4, "discussions.view");
+        $result[] = new QuickLink("All Categories", "/categories", null, -4, "discussions.view");
 
         $result[] = new QuickLink("Recent Discussions", "/discussions", null, -3, "discussions.view");
 
-        $result[] = new QuickLink(t("Activity"), "/activity", null, -2, "discussions.view");
+        $result[] = new QuickLink("Activity", "/activity", null, -2, "discussions.view");
 
         $result[] = new QuickLink(
-            t("My Bookmarks"),
+            "My Bookmarks",
             "/discussions/bookmarked",
             $this->session->User->CountBookmarks ?? 0,
             -1,
@@ -49,20 +49,14 @@ class ForumQuickLinksProvider implements QuickLinkProviderInterface
         );
 
         $result[] = new QuickLink(
-            t("My Discussions"),
+            "My Discussions",
             "/discussions/mine",
             $this->session->User->CountDiscussions ?? 0,
             -1,
             "session.valid"
         );
 
-        $result[] = new QuickLink(
-            t("My Drafts"),
-            "/drafts",
-            $this->session->User->CountDrafts ?? 0,
-            -1,
-            "session.valid"
-        );
+        $result[] = new QuickLink("My Drafts", "/drafts", $this->session->User->CountDrafts ?? 0, -1, "session.valid");
 
         return $result;
     }

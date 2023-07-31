@@ -195,6 +195,37 @@ export const dropDownClasses = useThemeCache(() => {
                     horizontal: important(0),
                 }),
             },
+            ".tokens__group": {
+                ...Mixins.padding({ vertical: 8 }),
+                ...Mixins.border({
+                    width: 0,
+                    top: {
+                        width: 1,
+                        radius: 0,
+                    },
+                }),
+                "&:first-of-type": {
+                    border: 0,
+                },
+                ".tokens__group-heading": {
+                    width: "100%",
+                    textAlign: "center",
+                    fontSize: "0.875em",
+                    color: "inherit",
+                    opacity: 0.75,
+                },
+            },
+            ".suggestedTextInput-option": {
+                ...Mixins.padding({ all: 8 }),
+                width: "100%",
+                "& > .suggestedTextInput-head": {
+                    display: "flex",
+                    justifyContent: "space-between",
+                },
+                "&:hover": {
+                    background: globalVars.states.hover.highlight.toString(),
+                },
+            },
         },
         mediaQueries.oneColumnDown({
             ...{
@@ -623,6 +654,7 @@ export const actionMixin = (classBasedStates?: IStateSelectors): CSSObject => {
         textAlign: "left",
         minHeight: styleUnit(vars.item.minHeight),
         lineHeight: globalVars.lineHeights.condensed,
+        fontWeight: globalVars.fonts.weights.normal,
         ...Mixins.padding({
             vertical: 4,
             horizontal: vars.item.padding.horizontal,

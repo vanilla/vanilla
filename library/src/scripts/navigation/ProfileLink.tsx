@@ -45,7 +45,7 @@ export default function ProfileLink(props: IProps) {
 function InnerLink(props: IProps) {
     const { userFragment, isUserCard = true } = props;
     const children = props.children || userFragment.name;
-    const profileURL = makeProfileUrl(userFragment.name);
+    const profileURL = makeProfileUrl(userFragment.userID, userFragment.name);
     const context = useUserCardTrigger();
 
     return (

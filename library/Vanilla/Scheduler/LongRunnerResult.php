@@ -108,7 +108,7 @@ final class LongRunnerResult implements \JsonSerializable
             // Likely a server side issue.
             $maxCode = 500;
         }
-        return new Data($this, ["status" => $maxCode]);
+        return new Data($this->jsonSerialize(), ["status" => $maxCode]);
     }
 
     /**

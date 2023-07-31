@@ -216,6 +216,11 @@ class TestDispatcher
             }
         }
 
+        // Validate that our site meta serialize properly.
+        if ($this->lastController instanceof \Gdn_Controller) {
+            TestCase::assertIsString($this->lastController->validateDefinitionList());
+        }
+
         return $this->lastController;
     }
 
@@ -542,5 +547,13 @@ class TestDispatcher
     public function setRethrowExceptions(bool $rethrowExceptions): void
     {
         $this->rethrowExceptions = $rethrowExceptions;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLastOutput(): ?string
+    {
+        return $this->lastOutput;
     }
 }

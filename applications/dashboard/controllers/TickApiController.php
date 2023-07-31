@@ -1,14 +1,13 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Gdn_Statistics as Statistics;
 use Vanilla\Analytics\EventProviderService;
-use Vanilla\Community\Events\PageViewEvent;
+use Vanilla\Utility\UrlUtils;
 
 /**
  * API Controller for site analytics.
@@ -37,12 +36,17 @@ class TickApiController extends AbstractApiController
      * Collect an analytics tick.
      *
      * @return Data
-     * @throws ValidationException
      */
     public function post(array $body): Data
     {
         $this->statistics->tick();
         $this->statistics->fireEvent("AnalyticsTick");
+
+        // Convert the `referrer` url to punycode.
+        if (key_exists("referrer", $body)) {
+            $body["referrer"] = UrlUtils::domainAsAscii($body["referrer"]);
+        }
+
         $this->eventProviderService->handleRequest($body);
         return new Data("");
     }

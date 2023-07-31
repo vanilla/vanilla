@@ -39,7 +39,7 @@ export class VanillaEmbedElement extends HTMLElement {
     private getFrameSource(): string {
         // Check for an sso string
         this.ssoString = this.getAttribute("sso-string") ?? window.vanilla_sso ?? null;
-        const initialHash = window.location.hash.replace(/^\#/, "").trim();
+        const initialHash = window.location.hash.replace(/^#/, "").trim();
 
         const frameSource =
             initialHash.length === 0 && this.getAttribute("initial-path")
@@ -304,7 +304,7 @@ export class VanillaEmbedElement extends HTMLElement {
     public currentFrameUrlFromHash = () => {
         const realHash = window.location.hash;
         // Trim off the trialing hash.
-        const trimmedStart = realHash.replace(/^\#/, "");
+        const trimmedStart = realHash.replace(/^#/, "");
         const unescapeHash = unescape(trimmedStart);
         return this.createFrameUrl(unescapeHash);
     };

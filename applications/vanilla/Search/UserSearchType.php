@@ -10,10 +10,14 @@ namespace Vanilla\Forum\Search;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
-use Garden\Web\Exception\ServerException;
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\ApiUtils;
+use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\DateFilterSchema;
 use Vanilla\Exception\PermissionException;
+use Vanilla\Schema\RangeExpression;
 use Vanilla\Search\MysqlSearchQuery;
 use Vanilla\Search\SearchQuery;
 use Vanilla\Search\AbstractSearchType;
@@ -26,6 +30,8 @@ use Vanilla\Utility\ModelUtils;
  */
 class UserSearchType extends AbstractSearchType
 {
+    const TYPE = "user";
+
     /** @var UsersApiController $usersApi */
     protected $usersApi;
 
@@ -38,16 +44,28 @@ class UserSearchType extends AbstractSearchType
     /** @var \Gdn_Session */
     private $session;
 
+    private \UserModel $userModel;
+
+    /** @var ProfileFieldModel */
+    private ProfileFieldModel $profileFieldModel;
+
     /**
      * UserSearchType constructor.
      *
      * @param \UsersApiController $usersApi
      * @param \Gdn_Session $session
+     * @param ProfileFieldModel $profileFieldModel
      */
-    public function __construct(UsersApiController $usersApi, \Gdn_Session $session)
-    {
+    public function __construct(
+        UsersApiController $usersApi,
+        \Gdn_Session $session,
+        \UserModel $userModel,
+        ProfileFieldModel $profileFieldModel
+    ) {
         $this->usersApi = $usersApi;
         $this->session = $session;
+        $this->userModel = $userModel;
+        $this->profileFieldModel = $profileFieldModel;
     }
 
     /**
@@ -55,7 +73,7 @@ class UserSearchType extends AbstractSearchType
      */
     public function getKey(): string
     {
-        return "user";
+        return self::TYPE;
     }
 
     /**
@@ -63,7 +81,7 @@ class UserSearchType extends AbstractSearchType
      */
     public function getRecordType(): string
     {
-        return "user";
+        return self::TYPE;
     }
 
     /**
@@ -71,7 +89,7 @@ class UserSearchType extends AbstractSearchType
      */
     public function getType(): string
     {
-        return "user";
+        return self::TYPE;
     }
 
     /**
@@ -121,9 +139,9 @@ class UserSearchType extends AbstractSearchType
             $searchableFields = ["sortName"];
             if ($this->canSearchEmails()) {
                 if ($email = $query->getQueryParameter("email")) {
-                    $query->whereText($email, ["email"], SearchQuery::MATCH_WILDCARD);
+                    $query->whereText(strtolower($email), ["sortEmail"], SearchQuery::MATCH_WILDCARD);
                 }
-                $searchableFields[] = "email";
+                $searchableFields[] = "sortEmail";
             }
 
             if ($allFieldText = $query->getQueryParameter("query")) {
@@ -138,9 +156,18 @@ class UserSearchType extends AbstractSearchType
                 $query->setFilter("roles.roleID", $roles);
             }
 
+            if ($ipAddresses = $query->getQueryParameter("ipAddresses")) {
+                $userIDs = $this->userModel->getUserIDsForIPAddresses($ipAddresses);
+                $query->setFilter("userID", $userIDs);
+            }
+
+            $this->applyProfileFieldFilters($query);
+
             // Only users that are not banned are allowed.
             // Users are indexed with 0 for non-banned, >0 for various ban statuses.
-            $query->setFilter("banned", [0]);
+            if (!$query->getQueryParameter("includeBanned")) {
+                $query->setFilter("banned", [0]);
+            }
 
             foreach ($this->filters as $filterName => $filterField) {
                 if ($filterValue = $query->getQueryParameter($filterName, false)) {
@@ -156,12 +183,21 @@ class UserSearchType extends AbstractSearchType
                 $query->setDateFilterSchema("dateLastActive", $lastActiveDate);
             }
 
+            if ($dateUpdated = $query->getQueryParameter("dateUpdated")) {
+                $query->setDateFilterSchema("dateUpdated", $dateUpdated);
+            }
+
             // Sorts
             $sort = $query->getQueryParameter("sort", "dateLastActive");
             $sortField = ltrim($sort, "-");
             $direction = $sortField === $sort ? SearchQuery::SORT_ASC : SearchQuery::SORT_DESC;
-            if ($sortField === "name") {
-                $sortField = "sortName.keyword";
+            switch ($sortField) {
+                case "name":
+                    $sortField = "sortName.keyword";
+                    break;
+                case "userID":
+                    $sortField = "userID.numeric";
+                    break;
             }
 
             $query->setSort($direction, $sortField);
@@ -183,21 +219,24 @@ class UserSearchType extends AbstractSearchType
     {
         $schemaFields = array_merge(
             [
-                "email:s?" => [
-                    "x-search-filter" => true,
-                ],
+                "email:s?",
                 "roleIDs:a?" => [
                     "items" => [
                         "type" => "integer",
                     ],
-                    "x-search-filter" => true,
                 ],
-                "dateLastActive?" => new DateFilterSchema([
-                    "x-search-filter" => true,
-                ]),
+                "dateLastActive?" => new DateFilterSchema(),
+                "dateUpdated?" => new DateFilterSchema(),
                 "sort:s?" => [
-                    "enum" => ["dateLastActive", "-dateLastActive"],
+                    "enum" => ApiUtils::sortEnum("dateLastActive", "userID", "points"),
                 ],
+                "profileFields:o?",
+                "ipAddresses:a?" => [
+                    "items" => [
+                        "type" => "string",
+                    ],
+                ],
+                "includeBanned:b?",
             ],
             $this->schemaFields
         );
@@ -230,6 +269,7 @@ class UserSearchType extends AbstractSearchType
 
     /**
      * @inheritdoc
+     * @throws NotFoundException|ForbiddenException|ClientException|ValidationException
      */
     public function validateQuery(SearchQuery $query): void
     {
@@ -243,6 +283,22 @@ class UserSearchType extends AbstractSearchType
         if (!$this->canSearchEmails() && $query->getQueryParameter("email", null) !== null) {
             throw new PermissionException("You don't have permission to search by email.");
         }
+
+        $ipAddresses = $query->getQueryParameter("ipAddresses", []);
+        if (!empty($ipAddresses) && !$this->usersApi->checkPermission()) {
+            throw new PermissionException("You don't have permission to search by IP address.");
+        }
+
+        if ($query->getQueryParameter("includeBanned") === true && !$this->usersApi->checkPermission()) {
+            throw new PermissionException("You don't have permission to search banned users.");
+        }
+
+        foreach ($ipAddresses as $ipAddress) {
+            if (!filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
+                throw new ClientException("$ipAddress is not a valid IP address");
+            }
+        }
+        $this->validateProfileFieldFilters($query);
     }
 
     /**
@@ -326,5 +382,112 @@ class UserSearchType extends AbstractSearchType
     public function guidToRecordID(int $guid): ?int
     {
         return null;
+    }
+
+    /**
+     * Validates profile field filters in the SearchQuery object.
+     *
+     * @param SearchQuery $query
+     * @return void
+     * @throws NotFoundException|ForbiddenException|ValidationException
+     */
+    private function validateProfileFieldFilters(SearchQuery $query)
+    {
+        $profileFields = $query->getQueryParameter("profileFields", []);
+        $databaseProfileFields = $this->getIndexedProfileFields();
+
+        foreach (array_keys($profileFields) as $apiName) {
+            if (!isset($databaseProfileFields[$apiName])) {
+                throw new NotFoundException("No profile field found with name $apiName");
+            }
+            if (!$this->profileFieldModel->canView(null, $databaseProfileFields[$apiName])) {
+                throw new ForbiddenException("You are not allowed to filter by profile field with name $apiName");
+            }
+        }
+        $this->profileFieldModel->getProfileFieldFilterSchema()->validate($profileFields);
+    }
+
+    /**
+     * Updates the SearchQuery object to add filters for profile fields.
+     *
+     * @param SearchQuery $query
+     * @return void
+     */
+    private function applyProfileFieldFilters(SearchQuery $query)
+    {
+        if (!($profileFields = $query->getQueryParameter("profileFields"))) {
+            return;
+        }
+        try {
+            // Validate again to get profile fields with the correct data types.
+            $profileFields = $this->profileFieldModel->getProfileFieldFilterSchema()->validate($profileFields);
+        } catch (\Throwable $e) {
+            // This shouldn't happen because we did a validation pass already.
+            return;
+        }
+
+        $databaseProfileFields = $this->getIndexedProfileFields();
+
+        foreach ($profileFields as $apiName => $value) {
+            $databaseProfileField = $databaseProfileFields[$apiName] ?? null;
+            $formType = $databaseProfileField["formType"] ?? null;
+            $dataType = $databaseProfileField["dataType"] ?? null;
+            switch ([$dataType, $formType]) {
+                case [ProfileFieldModel::DATA_TYPE_TEXT, ProfileFieldModel::FORM_TYPE_TEXT]:
+                case [ProfileFieldModel::DATA_TYPE_TEXT, ProfileFieldModel::FORM_TYPE_TEXT_MULTILINE]:
+                    if (strpos($value, "*") !== false) {
+                        $query->whereText($value, ["profileFields.$apiName.keyword"], SearchQuery::MATCH_WILDCARD);
+                    } else {
+                        $query->whereText($value, ["profileFields.$apiName"]);
+                    }
+                    break;
+                case [ProfileFieldModel::DATA_TYPE_BOOL, ProfileFieldModel::FORM_TYPE_CHECKBOX]:
+                    $query->setFilter("profileFields.$apiName", [$value]);
+                    break;
+                case [ProfileFieldModel::DATA_TYPE_NUMBER, ProfileFieldModel::FORM_TYPE_NUMBER]:
+                case [ProfileFieldModel::DATA_TYPE_NUMBER_MUL, ProfileFieldModel::FORM_TYPE_TOKENS]:
+                    /** @var $value RangeExpression */
+                    foreach ($value->getValues() as $op => $val) {
+                        switch ($op) {
+                            case "=":
+                                $query->setFilter("profileFields.$apiName", is_array($val) ? $val : [$val]);
+                                break;
+                            case "<":
+                                $query->setFilterRange("profileFields.$apiName", null, $val, true, false);
+                                break;
+                            case ">":
+                                $query->setFilterRange("profileFields.$apiName", $val, null, true, false);
+                                break;
+                            case "<=":
+                                $query->setFilterRange("profileFields.$apiName", null, $val, false, false);
+                                break;
+                            case ">=":
+                                $query->setFilterRange("profileFields.$apiName", $val, null, false, false);
+                                break;
+                        }
+                    }
+                    break;
+                case [ProfileFieldModel::DATA_TYPE_TEXT, ProfileFieldModel::FORM_TYPE_DROPDOWN]:
+                case [ProfileFieldModel::DATA_TYPE_STRING_MUL, ProfileFieldModel::FORM_TYPE_TOKENS]:
+                    $databaseOptions = $databaseProfileField["dropdownOptions"] ?? [];
+                    $filteredOptions = array_intersect($databaseOptions, $value);
+                    $query->setFilter("profileFields.$apiName.keyword", $filteredOptions);
+                    break;
+                case [ProfileFieldModel::DATA_TYPE_DATE, ProfileFieldModel::FORM_TYPE_DATE]:
+                    $query->setDateFilterSchema("profileFields.$apiName", $value);
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Helper method to get enabled profile fields indexed by apiName
+     *
+     * @return array
+     */
+    private function getIndexedProfileFields(): array
+    {
+        $profileFields = $this->profileFieldModel->getProfileFields(["enabled" => true]);
+        return array_column($profileFields, null, "apiName");
     }
 }

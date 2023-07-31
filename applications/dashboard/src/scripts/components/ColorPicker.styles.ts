@@ -47,6 +47,7 @@ export const colorPickerClasses = () => {
         position: "absolute",
         right: 54,
         height: 30,
+        top: 3,
         color: "#777a80",
     });
 

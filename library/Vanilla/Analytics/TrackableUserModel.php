@@ -117,7 +117,7 @@ class TrackableUserModel
         } else {
             // Fallback user data
             return [
-                "userID" => 0,
+                "userID" => $this->userModel::NOT_FOUND_USER_ID,
                 "name" => "@notfound",
             ];
         }

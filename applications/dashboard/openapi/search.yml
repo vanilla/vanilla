@@ -22,6 +22,7 @@ paths:
                               - discussion
                               - comment
                               - group
+                              - user
                           type: string
                       type: array
                   style: form
@@ -208,6 +209,7 @@ paths:
                           type: string
                       type: array
                   style: form
+                - $ref: "#/components/parameters/ProfileFieldFilters"
             responses:
                 "200":
                     content:
@@ -221,6 +223,16 @@ paths:
                 - Search
             summary: Search for records matching specific criteria.
 components:
+    parameters:
+        ProfileFieldFilters:
+            x-hidden: true
+            name: profileFields
+            description: >
+                Profile field values to filter user search.
+            in: query
+            schema:
+                type: object
+
     schemas:
         SearchResult:
             properties:

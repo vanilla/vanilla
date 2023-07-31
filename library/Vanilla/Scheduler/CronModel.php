@@ -17,6 +17,9 @@ use Vanilla\Scheduler\Descriptor\CronJobDescriptorInterface;
 
 final class CronModel
 {
+    public const CONF_MINIMUM_TIMESPAN = "Garden.Scheduler.CronMinimumTimeSpan";
+    public const CONF_OFFSET_SECONDS = "Garden.Scheduler.CronOffsetSeconds";
+
     private const CACHE_KEY_LOCK = "cron_lock";
 
     private const CACHE_KEY_LAST_RUN = "cron_time";
@@ -60,19 +63,27 @@ final class CronModel
     /**
      * Track the time of the last successful cron run.
      *
+     * @param bool $useOffset Use the random cron offset from the site when tracking the last run time.
+     *
      * @return void
      * @throws ServerException If we failed to track the run.
      */
     public function trackRun()
     {
-        $result = $this->cache->store(self::CACHE_KEY_LAST_RUN, CurrentTimeStamp::getDateTime());
+        $runDate = CurrentTimeStamp::getDateTime();
+        $result = $this->cache->store(self::CACHE_KEY_LAST_RUN, $runDate);
         if ($result !== \Gdn_Cache::CACHEOP_SUCCESS) {
             throw new ServerException("Failed to track scheduled cron run.");
         }
     }
 
     /**
-     * ShouldRun
+     * Determine if the cron should run.
+     *
+     * - Get the last time we ran. This defaults to a day ago in case our cache is empty.
+     * - Add a random offset for the current site to the last run date. This can push crons into the future for certain sites.
+     * - Calculate the next expected run date for the cron.
+     * - If we have passed that date, we should run.
      *
      * @param CronJobDescriptorInterface $jobDescriptor
      *
@@ -85,15 +96,21 @@ final class CronModel
             return false;
         }
 
-        $cron = CronExpression::factory($jobDescriptor->getSchedule());
+        $cron = new CronExpression($jobDescriptor->getSchedule());
 
+        $offsetSeconds = $this->config->get(self::CONF_OFFSET_SECONDS, 0);
         $lastRunDate = $this->lastRunDate();
+        $lastRunDate = $lastRunDate->modify("-{$offsetSeconds} seconds");
+
         // See when the next run date is based off our last runtime.
-        $nextRunDate = $cron->getNextRunDate($lastRunDate, 0, true);
+        $nextRunDate = $cron->getNextRunDate($lastRunDate);
+        $nextRunDate = $nextRunDate->modify("+{$offsetSeconds} seconds");
 
         // Return if we've passed the next runtime.
         $currentDate = CurrentTimeStamp::getDateTime();
-        return $currentDate >= $nextRunDate;
+
+        $result = $currentDate >= $nextRunDate;
+        return $result;
     }
 
     /**

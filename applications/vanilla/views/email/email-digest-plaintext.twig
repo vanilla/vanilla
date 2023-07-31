@@ -1,0 +1,32 @@
+{% autoescape false %}
+{{ email.title }}
+
+{% for category in email.categories %}
+{{ category.name }} ({{ category.url }})
+
+{% for discussion in category.discussions %}
+{{ discussion.name }} ({{ discussion.url }})
+{{ discussion.excerpt }}
+{%-set metas %}
+{% if discussion.countViews|default(false) %}
+{{ discussion.countViews }} views {% endif %}
+{% if discussion.countComments|default(false) %}
+{{ discussion.countComments }} comments {% endif %}
+{% if discussion.score|default(false) %}
+{{ discussion.score }} reactions {% endif %}
+{% endset %}
+{{ "\n" }}{{ metas|trim }}
+{% if discussion.insertUser|default(false) %}
+{{sprintf(t("Started by %s"), discussion.insertUser.name)}}
+{% endif %}
+
+{% endfor %}
+{% endfor %}
+
+{% if email.footer|default(false) %}
+{{ email.footer }}
+{% endif %}
+
+Unsubscribe ({{ email.digestUnsubscribeLink }}) from the email digest or
+
+Manage ({{ email.siteUrl }}/profile/preferences) your notification preferences{% endautoescape %}

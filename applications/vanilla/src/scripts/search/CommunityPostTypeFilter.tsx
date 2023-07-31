@@ -38,7 +38,7 @@ export function CommunityPostTypeFilter(props: IProps) {
     const formTypes = form.types;
 
     return (
-        <CheckboxGroup label={t("What to search")} grid={true} tight={true}>
+        <CheckboxGroup legend={t("What to search")} grid tight>
             {registeredTypes.map((registeredType, i) => {
                 const noTypesSelected = !formTypes || formTypes.length === 0;
                 let isChecked = false;

@@ -42,6 +42,9 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
+    /** @var string Determine if all queue job scheduling should be blocking. Ideal for E2E tests. */
+    public const CONF_USE_BLOCKING_MODE = "VanillaQueue.UseBlockingMode";
+
     /** @var JobExecutionType */
     protected $executionType;
 
@@ -275,6 +278,12 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
      */
     public function finalizeRequest(): void
     {
+        $shouldFinalize = $this->config->get(self::CONF_USE_BLOCKING_MODE, true);
+        if (!$shouldFinalize) {
+            // Nothing to do.
+            return;
+        }
+
         // Finish Flushes all response data to the client
         // so that job payloads can run without affecting the browser experience
         session_write_close();

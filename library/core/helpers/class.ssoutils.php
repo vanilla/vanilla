@@ -6,6 +6,7 @@
  */
 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Garden\Web\Cookie;
 use Vanilla\Logger;
 use Vanilla\Events\EventAction;
@@ -149,7 +150,7 @@ class SsoUtils
         $jwt = $this->cookie->get($this->cookieName);
         if ($jwt) {
             try {
-                $stateTokenData = (array) JWT::decode($jwt, $this->cookieSalt, [self::JWT_ALGORITHM]);
+                $stateTokenData = (array) JWT::decode($jwt, new Key($this->cookieSalt, self::JWT_ALGORITHM));
             } catch (Exception $e) {
             }
         }

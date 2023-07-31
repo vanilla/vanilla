@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -26,9 +26,8 @@ import Banner from "@library/banner/Banner";
 import { useSearchForm } from "@library/search/SearchContext";
 import { useLastValue } from "@vanilla/react-utils";
 import classNames from "classnames";
-import debounce from "lodash/debounce";
 import qs from "qs";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { ReactElement, useEffect, useMemo } from "react";
 import { useLocation, useHistory } from "react-router";
 import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import { SectionProvider, useSection } from "@library/layout/LayoutContext";
@@ -45,275 +44,194 @@ import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { LinkContextProvider } from "@library/routing/links/LinkContextProvider";
 import History from "history";
 import { Backgrounds } from "@library/layout/Backgrounds";
-import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
-import moment from "moment";
 import { Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
-import { DEFAULT_SEARCH_SOURCE } from "@library/search/SearchService";
-import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
+import { ALL_CONTENT_DOMAIN_KEY } from "./searchConstants";
+import PlacesSearchListing from "./PlacesSearchListing";
+import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain";
 
 interface IProps {
     placeholder?: string;
 }
 
-function SearchPage(props: IProps) {
-    const { form, updateForm, search, results, getDomains, getCurrentDomain, getDefaultFormValues } =
+export function SearchPageContent(props: IProps) {
+    const { form, updateForm, search, response, domainSearchResponse, handleSourceChange, domains, currentDomain } =
         useSearchForm<{}>();
 
     const { isCompact } = useSection();
     const classes = pageTitleClasses();
-    useInitialQueryParamSync();
 
-    const { sources, currentSource, setCurrentSource } = useSearchSources();
-    const lastSourceKey = useLastValue(currentSource.key);
-
-    const currentSourceIsCommunity = currentSource.key === DEFAULT_SEARCH_SOURCE.key;
-
-    const currentDomain = getCurrentDomain();
-
-    const debouncedSearch = useCallback(
-        debounce(() => {
-            search();
-            currentDomain.extraSearchAction?.();
-        }, 800),
-        [search],
-    );
+    const { sources, currentSource } = useSearchSources();
+    const lastSourceKey = useLastValue(currentSource?.key);
 
     let scope = useSearchScope().value?.value ?? SEARCH_SCOPE_LOCAL;
-    const lastScope = useLastValue(scope);
-    if (currentDomain.isIsolatedType()) {
+    if (currentDomain.isIsolatedType) {
         scope = SEARCH_SCOPE_LOCAL;
     }
+    const lastScope = useLastValue(scope);
 
-    let currentFilter = <currentDomain.PanelComponent />;
+    const hasSpecificRecord = currentDomain.getSpecificRecordID?.(form) ?? false;
+    const specificRecordID = hasSpecificRecord ? currentDomain.getSpecificRecordID?.(form) : undefined;
 
-    const hasSpecificRecord = currentDomain.hasSpecificRecord?.(form);
+    const SpecificRecordFilter = hasSpecificRecord ? currentDomain.SpecificRecordPanelComponent ?? null : null;
+    const SpecificRecordComponent = hasSpecificRecord ? currentDomain.SpecificRecordComponent ?? null : null;
 
-    let SpecificRecordFilter;
-    if (hasSpecificRecord && currentDomain.SpecificRecordPanel) {
-        SpecificRecordFilter = currentDomain.SpecificRecordPanel;
-    }
-
-    let SpecificRecordComponent;
-    if (hasSpecificRecord && currentDomain.SpecificRecordComponent) {
-        SpecificRecordComponent = currentDomain.SpecificRecordComponent;
-    }
-
-    let hasSpecificRecordID = typeof currentDomain.getSpecificRecord?.(form) === "number";
-    let specificRecordID;
-    if (hasSpecificRecord && hasSpecificRecordID) {
-        specificRecordID = currentDomain.getSpecificRecord?.(form);
-    }
-
-    const rightTopContent = useMemo<React.ReactNode>(() => {
-        if (hasSpecificRecord) {
-            return currentDomain.SpecificRecordPanel ?? null;
-        }
-        if (currentSource?.queryFilterComponent) {
-            return currentSource.queryFilterComponent ?? null;
-        }
-        return currentFilter;
-    }, [
-        currentDomain.SpecificRecordPanel,
-        currentFilter,
-        currentSource.queryFilterComponent,
-        hasSpecificRecord,
-        isCompact,
-    ]);
+    const rightTopContent: ReactElement | undefined = SpecificRecordFilter ? (
+        <SpecificRecordFilter />
+    ) : currentDomain.PanelComponent ? (
+        <currentDomain.PanelComponent />
+    ) : undefined;
 
     const { needsResearch } = form;
     useEffect(() => {
-        // Trigger new search
         if (
-            needsResearch ||
-            (lastScope && lastScope !== scope) ||
-            (lastSourceKey && lastSourceKey !== currentSource.key)
+            currentSource &&
+            (needsResearch ||
+                (lastScope && lastScope !== scope) ||
+                (lastSourceKey && lastSourceKey !== currentSource.key))
         ) {
             search();
-            currentDomain.extraSearchAction?.();
         }
-    }, [search, needsResearch, lastScope, scope, currentDomain, lastSourceKey, currentSource.key]);
-
-    const domains = getDomains();
-    const sortedNonIsolatedDomains = domains
-        .filter((domain) => !domain.isIsolatedType())
-        .sort((a, b) => a.sort - b.sort);
-
-    const availableDomainKeys = currentSource.searchableDomainKeys ?? domains.map(({ key }) => key);
-
-    const handleSourceChange = useCallback(
-        (newSourceKey: string) => {
-            const nextSource = sources.find((source) => source.key === newSourceKey)!;
-            const nextAvailableDomainKeys = nextSource.searchableDomainKeys ?? domains.map(({ key }) => key);
-
-            updateForm({
-                // reset page so pagination doesn't carry over from one source to another.
-                page: 1,
-                ...(nextAvailableDomainKeys.includes(currentDomain.key)
-                    ? //don't change the domain, if the new source supports the current domain.
-                      {}
-                    : // change to the new source's default domain, if it exists, or fall back to searching all domains.
-                      {
-                          domain: nextSource.defaultDomainKey ?? ALL_CONTENT_DOMAIN_NAME,
-                      }),
-            });
-
-            setCurrentSource(newSourceKey);
-        },
-        [currentDomain.key, setCurrentSource, sources, updateForm],
-    );
+    });
 
     const sortAndPaginationContent = useMemo(() => {
         return (
             <SortAndPaginationInfo
-                pages={results.data?.pagination}
+                pages={response.data?.pagination}
                 sortValue={form.sort}
                 onSortChange={(newSort) => updateForm({ sort: newSort })}
-                sortOptions={currentDomain?.getSortValues() ?? currentSource?.sortOptions ?? []}
+                sortOptions={currentDomain?.sortValues ?? currentSource?.sortOptions ?? []}
             />
         );
-    }, [currentDomain, form.sort, results, updateForm, currentSource]);
+    }, [currentDomain, form.sort, response, updateForm, currentSource]);
 
-    let mainBottomContent = (
+    const sortedNonIsolatedDomains = domains.filter((domain) => !domain.isIsolatedType).sort((a, b) => a.sort - b.sort);
+    const availableDomainKeys = domains.map(({ key }) => key);
+
+    const hasPlacesDomain = availableDomainKeys.includes(PLACES_SEARCH_DOMAIN.key);
+
+    const extraHeadingContent = (
         <>
-            {sortAndPaginationContent}
+            {!hasSpecificRecord && domains.length > 1 && (
+                <SearchInFilter
+                    setData={(newDomain) => {
+                        updateForm({ domain: newDomain, page: undefined });
+                    }}
+                    activeItem={form.domain}
+                    filters={sortedNonIsolatedDomains.map((domain) => {
+                        return {
+                            label: domain.name,
+                            icon: domain.icon,
+                            data: domain.key,
+                        };
+                    })}
+                    endFilters={domains
+                        .filter((domain) => domain.isIsolatedType)
+                        .map((domain) => {
+                            return {
+                                label: domain.name,
+                                icon: domain.icon,
+                                data: domain.key,
+                            };
+                        })}
+                />
+            )}
+
+            {currentDomain.key === ALL_CONTENT_DOMAIN_KEY && hasPlacesDomain ? (
+                <PlacesSearchListing domainSearchResponse={domainSearchResponse} />
+            ) : undefined}
+        </>
+    );
+
+    const searchPageResultsContent = (
+        <>
+            {extraHeadingContent}
+            {isCompact && !!rightTopContent && (
+                <PanelWidgetHorizontalPadding>
+                    <Drawer title={t("Filter Results")}>{rightTopContent}</Drawer>
+                </PanelWidgetHorizontalPadding>
+            )}
+            {sources.length <= 1 && sortAndPaginationContent}
             <SearchPageResults />
         </>
     );
 
-    if (sources.length > 1) {
-        mainBottomContent = (
-            <Tabs
-                defaultTabIndex={sources.map(({ key }) => key).indexOf(currentSource.key)}
-                includeVerticalPadding={false}
-                includeBorder={false}
-                largeTabs
-                tabType={TabsTypes.BROWSE}
-                data={sources.map((source) => ({
-                    tabID: source.key,
-                    label: source.label,
-                    contents: <SearchPageResults />,
-                }))}
-                onChange={({ tabID: newSourceKey }) => {
-                    handleSourceChange(`${newSourceKey!}`);
-                }}
-                extraButtons={sortAndPaginationContent}
-            />
-        );
-    }
-
     return (
-        // Add a context provider so that smartlinks within search use dynamic navigation.
-        <LinkContextProvider linkContexts={[formatUrl("/search", true)]}>
-            <DocumentTitle title={form.query ? form.query : t("Search Results")}>
-                <TitleBar title={t("Search")} />
-                <Banner isContentBanner />
-                <Container>
-                    <QueryString
-                        value={{
-                            ...form,
-                            initialized: undefined,
-                            scope,
-                            needsResearch: undefined,
-                            source: currentSource.key,
-                            pageURL: undefined,
-                            offset: undefined,
-                        }}
-                        defaults={getDefaultFormValues()}
-                    />
-                    <SectionTwoColumns
-                        className="hasLargePadding"
-                        mainTop={
-                            <>
-                                <PanelWidget>
-                                    <PageHeading
-                                        className={classNames(
-                                            "searchBar-heading",
-                                            searchBarClasses({}).heading,
-                                            classes.smallBackLink,
-                                        )}
-                                        headingClassName={classNames(typographyClasses().pageTitle)}
-                                        title={t("Search")}
-                                        includeBackLink={true}
-                                        isCompactHeading={true}
-                                    />
-                                    <ConditionalWrap
-                                        condition={currentDomain.isIsolatedType()}
-                                        component={EmptySearchScopeProvider}
-                                    >
-                                        <div className={searchBarClasses({}).standardContainer}>
-                                            <SearchBar
-                                                placeholder={props.placeholder}
-                                                onChange={(newQuery) => updateForm({ query: newQuery })}
-                                                value={form.query}
-                                                onSearch={debouncedSearch}
-                                                isLoading={results.status === LoadStatus.LOADING}
-                                                optionComponent={SearchOption}
-                                                triggerSearchOnClear={true}
-                                                titleAsComponent={t("Search")}
-                                                handleOnKeyDown={(event) => {
-                                                    if (event.key === "Enter") {
-                                                        debouncedSearch();
-                                                    }
-                                                }}
-                                                disableAutocomplete={true}
-                                                buttonType={ButtonTypes.PRIMARY}
-                                                needsPageTitle={false}
-                                                overwriteSearchBar={{
-                                                    preset: SearchBarPresets.BORDER,
-                                                }}
-                                            />
-                                        </div>
-                                        {hasSpecificRecord && hasSpecificRecordID && (
-                                            <SpecificRecordComponent discussionID={specificRecordID} />
-                                        )}
-                                    </ConditionalWrap>
-                                    {!hasSpecificRecord && (
-                                        <SearchInFilter
-                                            setData={(newDomain) => {
-                                                updateForm({ domain: newDomain });
-                                            }}
-                                            activeItem={form.domain}
-                                            filters={sortedNonIsolatedDomains.map((domain) => {
-                                                return {
-                                                    label: domain.getName?.() || domain.name,
-                                                    icon: domain.icon,
-                                                    data: domain.key,
-                                                    disabled: !availableDomainKeys.includes(domain.key),
-                                                };
-                                            })}
-                                            endFilters={domains
-                                                .filter((domain) => domain.isIsolatedType())
-                                                .map((domain) => {
-                                                    return {
-                                                        label: domain.name,
-                                                        icon: domain.icon,
-                                                        data: domain.key,
-                                                        disabled: !availableDomainKeys.includes(domain.key),
-                                                    };
-                                                })}
-                                        />
-                                    )}
-                                    {currentSourceIsCommunity &&
-                                        PlacesSearchTypeFilter.searchTypes.length > 0 &&
-                                        currentDomain.heading}
-                                </PanelWidget>
-                                {isCompact && currentSourceIsCommunity && (
-                                    <PanelWidgetHorizontalPadding>
-                                        <Drawer title={t("Filter Results")}>
-                                            {currentSourceIsCommunity ? currentFilter : rightTopContent}
-                                        </Drawer>
-                                    </PanelWidgetHorizontalPadding>
+        <Container>
+            <SectionTwoColumns
+                className="hasLargePadding"
+                mainTop={
+                    <>
+                        <PanelWidget>
+                            <PageHeading
+                                className={classNames(
+                                    "searchBar-heading",
+                                    searchBarClasses({}).heading,
+                                    classes.smallBackLink,
                                 )}
-                            </>
-                        }
-                        mainBottom={<PanelWidgetHorizontalPadding>{mainBottomContent}</PanelWidgetHorizontalPadding>}
-                        secondaryTop={!isCompact && <PanelWidget>{rightTopContent}</PanelWidget>}
-                    />
-                </Container>
-            </DocumentTitle>
-        </LinkContextProvider>
+                                headingClassName={classNames(typographyClasses().pageTitle)}
+                                title={t("Search")}
+                                includeBackLink={true}
+                                isCompactHeading={true}
+                            />
+                            <ConditionalWrap
+                                condition={currentDomain.isIsolatedType}
+                                component={EmptySearchScopeProvider}
+                            >
+                                <div className={searchBarClasses({}).standardContainer}>
+                                    <SearchBar
+                                        placeholder={props.placeholder}
+                                        onChange={(newQuery) => updateForm({ query: newQuery })}
+                                        value={`${form.query}`}
+                                        onSearch={search}
+                                        isLoading={response.status === LoadStatus.LOADING}
+                                        optionComponent={SearchOption}
+                                        triggerSearchOnClear={true}
+                                        titleAsComponent={t("Search")}
+                                        disableAutocomplete={true}
+                                        buttonType={ButtonTypes.PRIMARY}
+                                        overwriteSearchBar={{
+                                            preset: SearchBarPresets.BORDER,
+                                        }}
+                                    />
+                                </div>
+                                {!!SpecificRecordComponent && (
+                                    <SpecificRecordComponent discussionID={specificRecordID} />
+                                )}
+                            </ConditionalWrap>
+                        </PanelWidget>
+                    </>
+                }
+                mainBottom={
+                    <PanelWidgetHorizontalPadding>
+                        {sources.length > 1 ? (
+                            <Tabs
+                                defaultTabIndex={
+                                    currentSource ? sources.map(({ key }) => key).indexOf(currentSource.key) : 0
+                                }
+                                includeVerticalPadding={false}
+                                includeBorder
+                                largeTabs
+                                tabType={TabsTypes.BROWSE}
+                                data={sources.map((source) => ({
+                                    tabID: source.key,
+                                    label: source.label,
+                                    contents: searchPageResultsContent,
+                                }))}
+                                onChange={({ tabID: newSourceKey }) => {
+                                    handleSourceChange(`${newSourceKey!}`);
+                                }}
+                                extraButtons={sortAndPaginationContent}
+                            />
+                        ) : (
+                            <>{searchPageResultsContent}</>
+                        )}
+                    </PanelWidgetHorizontalPadding>
+                }
+                secondaryTop={!isCompact && !!rightTopContent && <PanelWidget>{rightTopContent}</PanelWidget>}
+            />
+        </Container>
     );
 }
 
@@ -358,7 +276,8 @@ function useInitialQueryParamSync() {
             if (
                 // turn pure integer values into numbers.
                 typeof value === "string" &&
-                value.match(/^[\d]*$/)
+                value.match(/^[\d]*$/) &&
+                !value.match(/^0/)
             ) {
                 let intVal = parseInt(value, 10);
                 if (!Number.isNaN(intVal)) {
@@ -379,6 +298,7 @@ function useInitialQueryParamSync() {
             }
         }
 
+        // fixme
         const blockedKeys = ["needsResearch", "initialized", "pageURL", "offset"];
         blockedKeys.forEach((key) => {
             if (queryForm[key] !== undefined) {
@@ -402,11 +322,40 @@ function useInitialQueryParamSync() {
     }, [initialized]);
 }
 
-export default function ExportedSearchPage(props: IProps) {
+export default function SearchPage(props: IProps) {
+    const { form, defaultFormValues, currentDomain } = useSearchForm<{}>();
+    const { currentSource } = useSearchSources();
+
+    let scope = useSearchScope().value?.value ?? SEARCH_SCOPE_LOCAL;
+    if (currentDomain.isIsolatedType) {
+        scope = SEARCH_SCOPE_LOCAL;
+    }
+
+    useInitialQueryParamSync();
+
     return (
         <SectionProvider type={SectionTypes.TWO_COLUMNS}>
+            <QueryString
+                value={{
+                    ...form,
+                    initialized: undefined,
+                    scope,
+                    needsResearch: undefined,
+                    source: currentSource?.key,
+                    pageURL: undefined,
+                    offset: undefined,
+                }}
+                defaults={defaultFormValues}
+            />
             <Backgrounds />
-            <SearchPage {...props} />
+            {/* Add a context provider so that smartlinks within search use dynamic navigation. */}
+            <LinkContextProvider linkContexts={[formatUrl("/search", true)]}>
+                <DocumentTitle title={form.query ? `${form.query}` : t("Search Results")}>
+                    <TitleBar title={t("Search")} />
+                    <Banner isContentBanner />
+                    <SearchPageContent {...props} />
+                </DocumentTitle>
+            </LinkContextProvider>
         </SectionProvider>
     );
 }

@@ -1,17 +1,18 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { ISearchOptionProvider } from "@library/contexts/SearchContext";
-import { formatUrl } from "@library/utility/appUtils";
+import { formatUrl, getSiteSection } from "@library/utility/appUtils";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { ISearchOptionData } from "@library/features/search/SearchOption";
 import qs from "qs";
 import pDebounce from "p-debounce";
-import { ALL_CONTENT_DOMAIN_NAME, NEW_SEARCH_PAGE_ENABLED } from "@library/search/searchConstants";
+import { ALL_CONTENT_DOMAIN_KEY, NEW_SEARCH_PAGE_ENABLED } from "@library/search/searchConstants";
 import { ISearchRequestQuery } from "@library/search/searchTypes";
 import { SearchService } from "@library/search/SearchService";
+import { getCurrentLocale } from "@vanilla/i18n";
 
 /**
  * Advanced Search implementation of autocomplete using sphinx.
@@ -24,16 +25,33 @@ export class CommunitySearchProvider implements ISearchOptionProvider {
      */
     private fetchSearch = async (value: string, options = {}): Promise<Array<IComboBoxOption<ISearchOptionData>>> => {
         const queryObj: ISearchRequestQuery = {
-            domain: ALL_CONTENT_DOMAIN_NAME,
+            domain: ALL_CONTENT_DOMAIN_KEY,
             query: value,
             expand: ["breadcrumbs", "-body"],
-            limit: Math.floor(10 / SearchService.pluggableSources.length),
+            limit: Math.floor(10 / SearchService.sources.length),
             collapse: true,
+            locale: getCurrentLocale(),
             ...options,
         };
 
+        //siteSection information
+        const siteSection = getSiteSection();
+
+        //include siteSectionCategoryID in query object if not the global
+        const siteSectionCategoryID = siteSection && siteSection.attributes && siteSection.attributes.categoryID;
+        if (!("categoryID" in queryObj) && siteSectionCategoryID > 0) {
+            queryObj.categoryID = siteSectionCategoryID;
+            queryObj.includeChildCategories = true;
+        }
+
+        //include siteSectionGroup in query object if not the default (for proper kb articles filter)
+        const siteSectionGroup = siteSection && siteSection.sectionGroup;
+        if (!("siteSectionGroup" in queryObj) && siteSectionGroup !== "vanilla") {
+            queryObj["siteSectionGroup"] = siteSectionGroup;
+        }
+
         // TODO [VNLA-1313]: Fix this so that we don't need to wait for all calls to resolve before showing the results
-        const searchAllSources = SearchService.pluggableSources.map((source) =>
+        const searchAllSources = SearchService.sources.map((source) =>
             source.performSearch(queryObj).then((response) => ({
                 ...response,
                 source: source.key,

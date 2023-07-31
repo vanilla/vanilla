@@ -3,7 +3,7 @@
  * @license gpl-2.0-only
  */
 
-import React, { ComponentProps, useEffect, useState } from "react";
+import React, { ComponentProps, ReactEventHandler, useEffect, useState } from "react";
 import classNames from "classnames";
 import { t } from "@vanilla/i18n";
 import { useUniqueID } from "@library/utility/idUtils";
@@ -19,8 +19,10 @@ import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import { WidgetSettingsPreview } from "@dashboard/layout/editor/widgetSettings/WidgetSettingsPreview";
 import { widgetSettingsClasses } from "@dashboard/layout/editor/widgetSettings/WidgetSettings.classes";
 import { WidgetSettings } from "@dashboard/layout/editor/widgetSettings/WidgetSettings";
-import { JsonSchema } from "@vanilla/json-schema-forms";
+import { IFieldError, JsonSchema, PartialSchemaDefinition } from "@vanilla/json-schema-forms";
 import { ILayoutCatalog, IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import isEmpty from "lodash/isEmpty";
+
 export interface IWidgetConfigurationComponentProps {
     schema: JsonSchema;
     value: any;
@@ -47,13 +49,57 @@ export function WidgetSettingsModal(props: IProps) {
     const classFrameFooter = frameFooterClasses();
     const classesFrameBody = frameBodyClasses();
     const titleID = useUniqueID("widgetSettings_Modal");
-    const [value, setValue] = useState(initialValue ?? {});
+    const [value, setValue] = useState<any>(initialValue ?? {});
+    const [fieldErrors, setFieldErrors] = useState<Record<string, IFieldError[]>>({});
 
     useEffect(() => {
         setValue(initialValue ?? {});
     }, [initialValue]);
 
     const widgetOrAssetCatalog = assetCatalog && assetCatalog[widgetID] ? assetCatalog : widgetCatalog;
+
+    const validateAndSaveForm = (evt: React.FormEvent<HTMLFormElement>) => {
+        evt.preventDefault();
+
+        const schema: JsonSchema = widgetOrAssetCatalog[widgetID]?.schema ?? {};
+        const errors: Record<string, IFieldError[]> = {};
+
+        const checkFields = (tmpValue: any, tmpSchema: JsonSchema | PartialSchemaDefinition, path?: string[]) => {
+            const requiredProps = tmpSchema.required ?? [];
+            requiredProps.forEach((fieldName) => {
+                const fieldPath = path ? [...path] : [];
+                fieldPath.push(fieldName);
+                const fieldSchema = tmpSchema.properties ? tmpSchema.properties[fieldName] : tmpSchema;
+
+                if (tmpValue && fieldSchema?.properties) {
+                    checkFields(tmpValue[fieldName], fieldSchema, fieldPath);
+                } else if (!tmpValue) {
+                    errors[fieldPath.join("/")] = [
+                        {
+                            field: fieldName,
+                            message: t("Invalid entry."),
+                            path: path?.join("/"),
+                        },
+                    ];
+                }
+            });
+        };
+
+        checkFields(value, schema);
+
+        const isValid = isEmpty(errors);
+
+        setFieldErrors(errors);
+
+        if (isValid) {
+            onSave(value);
+        }
+    };
+
+    const changeValue = (newValue) => {
+        setValue(newValue);
+        setFieldErrors({});
+    };
 
     return (
         <Modal
@@ -63,13 +109,7 @@ export function WidgetSettingsModal(props: IProps) {
             titleID={titleID}
             className={classes.container}
         >
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    onSave(value);
-                }}
-                className={classes.modalForm}
-            >
+            <form onSubmit={validateAndSaveForm} className={classes.modalForm}>
                 <Frame
                     header={
                         <FrameHeader
@@ -79,24 +119,23 @@ export function WidgetSettingsModal(props: IProps) {
                         />
                     }
                     body={
-                        <section
-                            className={classNames("frameBody-contents", classesFrameBody.contents, classes.section)}
-                        >
+                        <section className={classNames(classesFrameBody.contents, classes.section)}>
                             <WidgetSettingsPreview
                                 widgetID={widgetID}
                                 config={value}
                                 widgetCatalog={widgetCatalog}
                                 value={value}
-                                onChange={setValue}
+                                onChange={changeValue}
                                 schema={widgetOrAssetCatalog[widgetID]?.schema ?? {}}
                                 middlewares={middlewaresCatalog}
                                 assetCatalog={assetCatalog}
                             />
                             <WidgetSettings
                                 value={value}
-                                onChange={setValue}
+                                onChange={changeValue}
                                 schema={widgetOrAssetCatalog[widgetID]?.schema ?? {}}
                                 middlewares={middlewaresCatalog}
+                                fieldErrors={fieldErrors}
                             />
                         </section>
                     }

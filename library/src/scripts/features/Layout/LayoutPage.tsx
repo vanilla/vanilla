@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import React, { Suspense } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
 import { useLayoutSpec } from "@library/features/Layout/LayoutPage.hooks";
@@ -15,18 +15,22 @@ import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
 import { matchPath } from "react-router";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
+import { spaceshipCompare } from "@vanilla/utils";
 
 interface IProps {
     layoutQuery: ILayoutQuery;
 }
 
 export function LayoutPage(props: IProps) {
+    // Keep the layout query stable even with location updates. If you want to a layout to refresh it's layout spec
+    // Based off of some URL parameter, add them as part of the `key` of the `LayoutPage`.
+    const { layoutQuery } = props; // useMemo(() => props.layoutQuery, []);
     const layout = useLayoutSpec({
-        layoutViewType: props.layoutQuery.layoutViewType,
-        recordID: props.layoutQuery.recordID ?? -1,
-        recordType: props.layoutQuery.recordType ?? "global",
+        layoutViewType: layoutQuery.layoutViewType,
+        recordID: layoutQuery.recordID ?? -1,
+        recordType: layoutQuery.recordType ?? "global",
         params: {
-            ...props.layoutQuery.params,
+            ...layoutQuery.params,
         },
     });
 

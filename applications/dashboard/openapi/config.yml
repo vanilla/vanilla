@@ -65,6 +65,7 @@ components:
                     x-key: Garden.BannerImage
                     x-read: public
                     x-write: community.manage
+                    x-upload: true
                 "branding.favicon":
                     description: |
                         Your site's favicon appears in your browser's title bar. It will be scaled down appropriately.
@@ -75,6 +76,7 @@ components:
                     x-key: Garden.FavIcon
                     x-read: public
                     x-write: community.manage
+                    x-upload: true
                 "branding.logo":
                     description: |
                         The banner logo appears at the top of your site. Themes made with the theme editor and some custom themes don't use this setting.
@@ -85,6 +87,7 @@ components:
                     x-key: Garden.Logo
                     x-read: public
                     x-write: community.manage
+                    x-upload: true
                 "branding.mobileLogo":
                     description: |
                         The mobile banner logo appears at the top of your site. Themes made with the theme editor and some custom themes don't use this setting.
@@ -95,6 +98,7 @@ components:
                     x-key: Garden.MobileLogo
                     x-read: public
                     x-write: community.manage
+                    x-upload: true
                 "branding.shareImage":
                     description: >-
                         When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50×50, but we recommend 200×200.
@@ -105,6 +109,7 @@ components:
                     x-key: Garden.ShareImage
                     x-read: public
                     x-write: community.manage
+                    x-upload: true
                 "branding.touchIcon":
                     description: |
                         The touch icon appears when you bookmark a website on the homescreen of a mobile device. These are usually 152 pixels.
@@ -115,6 +120,7 @@ components:
                     x-key: Garden.TouchIcon
                     x-read: public
                     x-write: community.manage
+                    x-upload: true
                 "forum.disabled":
                     description: |
                         Remove discussion and categories links from menus. Set discussion and category related pages to return not found page 404.
@@ -126,7 +132,7 @@ components:
                     x-write: community.manage
                 "garden.description":
                     description: |
-                        The site description usually appears in search engines. You should try having a description that is 100–150
+                        The site description usually appears in search engines. You should try having a description that is 100-150
                         characters long.
                     type: string
                     default: ""
@@ -309,6 +315,15 @@ components:
                     x-key: Feature.NewPostMenu.Enabled
                     x-read: public
                     x-write: site.manage
+                "labs.newUserManagement":
+                    description: |
+                        Enable the new user management page with new table and control buttons.
+                    type: boolean
+                    default: false
+                    example: true
+                    x-key: Feature.NewUserManagement.Enabled
+                    x-read: public
+                    x-write: site.manage
                 "labs.newEmbedSystem":
                     description: |
                         Enable the new embed system beta.
@@ -415,3 +430,215 @@ components:
                     x-key: "Garden.Messages.Add.RedirectUrl"
                     x-read: public
                     x-write: site.manage
+                "password.minLength":
+                    description: |
+                        The minimum number of characters a members password can be.
+                    type: string
+                    default: ""
+                    x-key: "Garden.Password.MinLength"
+                    x-read: public
+                    x-write: site.manage
+                "registration.method":
+                    description: |
+                        How members are able to register to the community.
+                    type: string
+                    enum:
+                        - "Basic"
+                        - "Approval"
+                        - "Invitation"
+                        - "Connect"
+                        - "Captcha"
+                    default: "Captcha"
+                    x-key: "Garden.Registration.Method"
+                    x-read: public
+                    x-write: site.manage
+                "profile.editEmails":
+                    description: |
+                        Responsible to allow users viewing own account, be able to edit their email.
+                    type: boolean
+                    default: true
+                    x-key: "Garden.Profile.EditEmails"
+                    x-read: public
+                    x-write: site.manage
+                "seo.metaHtml":
+                    description: |
+                        HTML <meta> tags for SEO purposes. This content is strictly validated to only contain meta tags `name` and `content` properties.
+                    type: string
+                    default: ""
+                    minLength: 0
+                    x-read: community.manage
+                    x-write: community.manage
+                    x-allowHtml: true
+                "debug":
+                    description: |
+                        Enable debug mode across the whole site for all requests. Only to be used for development purposes. DO NOT call set this on production sites. It is recommend to turn this on only when needed even on development sites because it slows performance and exposes server paths in stack traces.
+
+                         Debug mode causes errors to show stack traces, disables various caches, and causes certaining warnings to turn into exceptions.
+                    type: boolean
+                    default: false
+                    x-key: "Debug"
+                    x-read: public
+                    x-write: site.manage
+                "plugins.qna":
+                    description: Questions plugin enabled
+                    type: boolean
+                    default: false
+                    x-key: "EnabledPlugins.QnA"
+                    x-read: public
+                "plugins.ideation":
+                    description: Ideation plugin enabled
+                    type: boolean
+                    default: false
+                    x-key: "EnabledPlugins.ideation"
+                    x-read: public
+                "plugins.polls":
+                    description: Polls plugin enabled
+                    type: boolean
+                    default: false
+                    x-key: "EnabledPlugins.Polls"
+                    x-read: public
+                "plugins.resolved":
+                    description: Resolved plugin enabled
+                    type: boolean
+                    default: false
+                    x-key: "EnabledPlugins.resolved2"
+                    x-read: public
+                "preferences.categoryFollowed.defaults":
+                    description: |
+                        This is where we store the default followed categories
+                    type: string
+                    default: ""
+                    x-key: "Preferences.CategoryFollowed.Defaults"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.format":
+                    description: |
+                        Enable HTML emails
+                    type: string
+                    default: "html"
+                    enum:
+                        - "html"
+                        - "text"
+                    x-key: "Garden.Email.Format"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.image":
+                    description: |
+                        HTML email image
+                    type: string
+                    default: ""
+                    x-key: "Garden.EmailTemplate.Image"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.textColor":
+                    description: |
+                        HTML email text color
+                    type: string
+                    default: "#333333"
+                    x-key: "Garden.EmailTemplate.TextColor"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.backgroundColor":
+                    description: |
+                        HTML email background color
+                    type: string
+                    default: "#eeeeee"
+                    x-key: "Garden.EmailTemplate.BackgroundColor"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.containerBackgroundColor":
+                    description: |
+                        HTML email page color
+                    type: string
+                    default: "#ffffff"
+                    x-key: "Garden.EmailTemplate.ContainerBackgroundColor"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.buttonTextColor":
+                    description: |
+                        HTML email button text color
+                    type: string
+                    default: "#ffffff"
+                    x-key: "Garden.EmailTemplate.ButtonTextColor"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailStyles.buttonBackgroundColor":
+                    description: |
+                        HTML email button background text color
+                    type: string
+                    default: "#38abe3"
+                    x-key: "Garden.EmailTemplate.ButtonBackgroundColor"
+                    x-read: community.manage
+                    x-write: community.manage
+                "outgoingEmails.supportName":
+                    description: |
+                        Email sent from the application will be addressed from this name
+                    type: string
+                    default: ""
+                    x-key: "Garden.Email.SupportName"
+                    x-read: community.manage
+                    x-write: community.manage
+                "outgoingEmails.supportAddress":
+                    description: |
+                        Email sent from the application will be addressed from this email address
+                    type: string
+                    default: ""
+                    x-key: "Garden.Email.SupportAddress"
+                    x-read: community.manage
+                    x-write: community.manage
+                "outgoingEmails.footer":
+                    description: |
+                        This may be used to include content such as organization name and address in all outgoing emails.
+                    type: string
+                    default: '[{"children":[{"text":""}],"type":"p"}]'
+                    x-key: "Garden.Email.Footer"
+                    x-read: community.manage
+                    x-write: community.manage
+                    x-allowHtml: true
+                "emailNotifications.disabled":
+                    description: |
+                        When enabled, users may choose to receive notifications from the community
+                    type: boolean
+                    default: false
+                    x-key: "Garden.Email.Disabled"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailNotifications.fullPost":
+                    description: |
+                        Include full post in email notifications
+                    type: boolean
+                    default: true
+                    x-key: "Vanilla.Email.FullPost"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.enabled":
+                    description: |
+                        Use weekly community email digest
+                    type: boolean
+                    default: false
+                    x-key: "Garden.Digest.Enabled"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.imageEnabled":
+                    description: |
+                        Include featured images with posts in email digest
+                    type: boolean
+                    default: false
+                    x-key: "Garden.Digest.ImageEnabled"
+                    x-read: community.manage
+                    x-write: community.manage
+                "emailDigest.dayOfWeek":
+                    description: |
+                        Email digests will be sent on the selected day every week.
+                        1 - Monday
+                        2 - Tuesday
+                        3 - Wednesday
+                        4 - Thursday
+                        5 - Friday
+                        6 - Saturday
+                        7 - Sunday
+                    type: number
+                    default: 1
+                    x-key: "Garden.Digest.DayOfWeek"
+                    x-read: community.manage
+                    x-write: community.manage

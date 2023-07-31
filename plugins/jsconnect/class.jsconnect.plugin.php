@@ -980,7 +980,11 @@ class JsConnectPlugin extends SSOAddon implements CacheControlConstantsInterface
         ];
         $sender->setData("_Controls", $controls);
         $sender->setData("Title", sprintf(t($client_id ? "Edit %s" : "Add %s"), t("Connection")));
-
+        $hiddenDefaults = [
+            "Trusted" => 0,
+            "IsDefault" => 0,
+        ];
+        $sender->setData("_Hidden", $hiddenDefaults);
         // Throw a render event as this plugin so that handlers can call our methods.
         Gdn::pluginManager()->callEventHandlers($this, __CLASS__, "addedit", "render");
         if ($generate && $sender->deliveryType() === DELIVERY_TYPE_VIEW) {

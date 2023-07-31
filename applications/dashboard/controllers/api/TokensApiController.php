@@ -143,6 +143,7 @@ class TokensApiController extends AbstractApiController
                     "accessTokenID:i" => "The unique numeric ID.",
                     "name:s|n" => "A user-specified label.",
                     "dateInserted:dt" => "When the token was generated.",
+                    "dateLastUsed:dt?" => "Last time a token was used.",
                 ],
                 "Token"
             );
@@ -200,16 +201,23 @@ class TokensApiController extends AbstractApiController
      * List active tokens for the current user.
      *
      * @return array
+     * @throws ForbiddenException
      */
     public function index()
     {
         $this->permission("Garden.Tokens.Add");
 
+        if ($this->getSession()->UserID == $this->userModel->getSystemUserID()) {
+            throw new ForbiddenException("The System user is not allowed to see its existing tokens.");
+        }
+
         $in = $this->schema([], "in")->setDescription("Get a list of access token IDs for the current user.");
         // Full access token details are not available in the index. Use GET on a single ID for sensitive information.
         $out = $this->schema(
             [
-                ":a" => $this->schema(["accessTokenID", "name", "dateInserted"])->add($this->fullSchema()),
+                ":a" => $this->schema(["accessTokenID", "name", "dateInserted", "dateLastUsed?"])->add(
+                    $this->fullSchema()
+                ),
             ],
             "out"
         );
@@ -244,10 +252,16 @@ class TokensApiController extends AbstractApiController
      *
      * @param array $body
      * @return mixed
+     * @throws ForbiddenException
      */
     public function post(array $body)
     {
         $this->permission("Garden.Tokens.Add");
+
+        // System token should not be visible.
+        if ($this->getSession()->UserID == $this->userModel->getSystemUserID()) {
+            throw new ForbiddenException("The System user is not allowed to create access tokens.");
+        }
 
         $in = $this->schema(
             [

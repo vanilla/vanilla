@@ -8,6 +8,7 @@
 namespace Vanilla\Dashboard;
 
 use Garden\Schema\Schema;
+use Vanilla\Addon;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Dashboard\Models\UserLeaderProviderInterface;
 use Vanilla\Dashboard\Models\UserLeaderQuery;
@@ -89,21 +90,30 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface
         $roleSubQuery = $this->getAllowedRolesSubquery($query);
 
         $leaderQuery = $this->createSql()
-            ->select(["up.SlotType", "up.TimeSlot", "up.Source", "up.UserID", "up.Points"])
+            ->select(["up.SlotType", "up.TimeSlot", "up.Source", "up.UserID"])
             ->from("UserPoints up")
             ->join("User u", "up.UserID = u.UserID and u.Banned != 1")
             ->where([
-                "up.TimeSlot" => $query->timeSlot,
                 "up.SlotType" => $query->slotType,
+                "up.TimeSlot" => $query->timeSlot,
                 "up.Source" => "Total",
                 "up.CategoryID" => $query->pointsCategoryID,
                 "up.Points > " => 0,
             ]);
+        // Only group by if we have more than one category.
+        if (is_array($query->pointsCategoryID) && count($query->pointsCategoryID) > 1) {
+            $leaderQuery
+                ->select("SUM(up.Points) as Points")
+                ->groupBy(["up.SlotType", "up.TimeSlot", "up.Source", "up.UserID"]);
+        } else {
+            $leaderQuery->select("up.Points");
+        }
+
         if ($roleSubQuery !== null) {
             $leaderQuery = $leaderQuery->where("`up`.`UserID` in", "({$roleSubQuery->getSelect(true)})", false, false);
         }
 
-        $leaderQuery = $leaderQuery->orderBy("up.Points", "desc")->limit($query->limit);
+        $leaderQuery = $leaderQuery->orderBy("Points", "desc")->limit($query->limit);
 
         $results = $leaderQuery->get()->resultArray();
         return $results;
@@ -157,6 +167,30 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface
     }
 
     /**
+     * The site section schema for calculating leaders
+     *
+     * @return Schema
+     */
+    public static function siteSectionSchema(): Schema
+    {
+        return Schema::parse([
+            "type" => "string",
+            "default" => "",
+            "description" => "Filter User Points by site section ID (ex. subcommunity).
+                      The subcommunity ID or folder can be used if you use [smart IDs](https://success.vanillaforums.com/kb/articles/46-smart-ids).
+                      The query looks like:
+
+                      ```
+                      siteSectionID=\$subcommunityID:{id|folder}
+                      ```",
+            "x-control" => SchemaForm::textBox(
+                new FormOptions("SiteSectionID", "Filter User Points by site section ID ."),
+                "string"
+            ),
+        ]);
+    }
+
+    /**
      * Get a StaticFormChoices object.
      *
      * @return StaticFormChoices
@@ -179,6 +213,15 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface
      */
     public static function leaderboardTypeSchema(): Schema
     {
+        $formChoices = [
+            UserLeaderService::LEADERBOARD_TYPE_REPUTATION => "Reputation points",
+        ];
+        if (\Gdn::addonManager()->isEnabled("vanillaanalytics", Addon::TYPE_ADDON)) {
+            $formChoices = array_merge($formChoices, [
+                UserLeaderService::LEADERBOARD_TYPE_POSTS => "Posts and comments count",
+                UserLeaderService::LEADERBOARD_TYPE_ACCEPTED_ANSWERS => "Accepted answers count",
+            ]);
+        }
         return Schema::parse([
             "type" => "string",
             "default" => UserLeaderService::LEADERBOARD_TYPE_REPUTATION,
@@ -186,11 +229,7 @@ class UserPointsModel extends Model implements UserLeaderProviderInterface
             "enum" => UserLeaderService::LEADERBOARD_TYPES,
             "x-control" => SchemaForm::dropDown(
                 new FormOptions("Leaderboard Type", "Choose the type of leaderboard this is."),
-                new StaticFormChoices([
-                    UserLeaderService::LEADERBOARD_TYPE_REPUTATION => "Reputation points",
-                    UserLeaderService::LEADERBOARD_TYPE_POSTS => "Posts and comments count.",
-                    UserLeaderService::LEADERBOARD_TYPE_ACCEPTED_ANSWERS => "Accepted answers count.",
-                ])
+                new StaticFormChoices($formChoices)
             ),
         ]);
     }

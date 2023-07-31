@@ -23,7 +23,6 @@ import { onContent, getMeta, _executeReady } from "@library/utility/appUtils";
 import { logError, debug } from "@vanilla/utils";
 import { translationDebug } from "@vanilla/i18n";
 import apiv2 from "@library/apiv2";
-import { mountInputs } from "@library/forms/mountInputs";
 import { onPageView } from "@library/pageViews/pageViewTracking";
 import { History } from "history";
 import { _mountComponents } from "@library/utility/componentRegistry";
@@ -93,7 +92,6 @@ export function bootstrapVanilla() {
                     }, 0);
                 });
                 blotCSS();
-                mountInputs();
             });
 
             window.__VANILLA_INTERNAL_IS_READY__ = true;

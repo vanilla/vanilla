@@ -14,7 +14,7 @@ export const getAllAuthenticators = createAsyncThunk<IAuthenticatorList, IGetAll
     "@@authenticators/getAll",
     async ({ page, limit = 10, type = "oauth2" }) => {
         const response = await apiv2.get(`/authenticators?page=${page}&limit=${limit}&type=${type}`, {});
-        const pagination = SimplePagerModel.parseLinkHeader(response.headers["link"], "page");
+        const pagination = SimplePagerModel.parseHeaders(response.headers);
         const result: IAuthenticatorList = {
             items: response.data,
             pagination,

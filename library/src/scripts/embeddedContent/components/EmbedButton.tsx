@@ -17,7 +17,6 @@ interface IProps extends IButtonProps {
 export function EmbedButton(props: PropsWithChildren<IProps>) {
     const { isActive, children, buttonRef, ...otherProps } = props;
     const ownRef = useRef<HTMLButtonElement | null>(null);
-    const classes = embedButtonClasses();
     const [isFocusable, setIsFocusable] = useState(false);
 
     const checkFocusable = useCallback((activeElement: Element | null) => {

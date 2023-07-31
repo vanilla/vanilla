@@ -716,8 +716,10 @@ class PocketsPlugin extends Gdn_Plugin
             $controller = Gdn::controller();
         }
 
-        //if we are in unauthorized page, homecontroller will render error page, so no pockets on error page
-        $isOnUnauthorizedPage = $controller instanceof HomeController && $controller->RequestMethod === "unauthorized";
+        //if we are in unauthorized page or on a page with deleted content (e.g. deleted user), homecontroller will render error/deleted content page, so no pockets
+        $isOnUnauthorizedPage =
+            $controller instanceof HomeController &&
+            ($controller->RequestMethod === "unauthorized" || $controller->RequestMethod === "deleted");
 
         if ($controller->deliveryMethod() != DELIVERY_METHOD_XHTML || $isOnUnauthorizedPage) {
             return;

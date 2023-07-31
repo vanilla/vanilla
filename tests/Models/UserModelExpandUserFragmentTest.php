@@ -9,14 +9,17 @@ namespace VanillaTests\Models;
 
 use PHPUnit\Framework\TestCase;
 use VanillaTests\ExpectExceptionTrait;
+use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Some basic tests for the `UserModel`.
  */
-class UserModelExpandUserFragmentTest extends TestCase
+class UserModelExpandUserFragmentTest extends SiteTestCase
 {
-    use SiteTestTrait, ExpectExceptionTrait;
+    use ExpectExceptionTrait;
+    use UsersAndRolesApiTestTrait;
 
     /**
      * @var \UserModel
@@ -38,7 +41,7 @@ class UserModelExpandUserFragmentTest extends TestCase
     /**
      * Get a new model for each test.
      */
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -105,6 +108,36 @@ class UserModelExpandUserFragmentTest extends TestCase
         $row = ["insertUser" => $userID];
         $this->model->expandUsers($row, ["insertUser"]);
         $this->assertEquals("Unknown", $row["insertUser"]["name"]);
+    }
+
+    /**
+     * Test a case where we have corrupted usermeta rows for the title field that now only allows a single value.
+     *
+     * Other profile fields have their own tests, but this one has special handling for legacy reasons.
+     */
+    public function testExpandUserCorruptedTitle()
+    {
+        $user = $this->createUser();
+        // When using the users APIs this can't happen anymore.
+        // However some dbs have duped records.
+        \Gdn::userMetaModel()->insert([
+            "UserID" => $user["userID"],
+            "Name" => "Profile.Title",
+            "Value" => "Title 1",
+            "QueryValue" => "Profile.Title.Title 1",
+        ]);
+        \Gdn::userMetaModel()->insert([
+            "UserID" => $user["userID"],
+            "Name" => "Profile.Title",
+            "Value" => "Title 2",
+            "QueryValue" => "Profile.Title.Title 2",
+        ]);
+        \Gdn::cache()->flush();
+
+        $row = $this->api()
+            ->get("/users/{$user["userID"]}", ["expand" => "all"])
+            ->getBody();
+        $this->assertEquals("Title 2", $row["user"]["title"]);
     }
 
     /**

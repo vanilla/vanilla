@@ -6,7 +6,7 @@
 
 import { styleFactory } from "@library//styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import { richEditorVariables } from "@library/editor/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, percent } from "csx";
 import { appearance } from "@library/styles/styleHelpers";

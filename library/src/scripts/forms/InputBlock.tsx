@@ -11,6 +11,7 @@ import classNames from "classnames";
 import Paragraph from "@library/layout/Paragraph";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { IError } from "@library/errorPages/CoreErrorMessages";
+import { cx } from "@emotion/css";
 
 export enum InputTextBlockBaseClass {
     STANDARD = "inputBlock",
@@ -26,13 +27,13 @@ type CallbackChildren = (props: ICallbackProps) => React.ReactNode;
 
 export interface IInputBlockProps extends IOptionalComponentID {
     label?: ReactNode;
-    legend?: boolean;
+    legend?: ReactNode;
     children: React.ReactNode | CallbackChildren;
     className?: string;
     wrapClassName?: string;
     labelClassName?: string;
-    noteAfterInput?: string;
-    labelNote?: string;
+    noteAfterInput?: string | ReactNode;
+    labelNote?: ReactNode;
     labelID?: string;
     descriptionID?: string;
     errors?: IError[];
@@ -41,6 +42,9 @@ export interface IInputBlockProps extends IOptionalComponentID {
     noMargin?: boolean;
     grid?: boolean;
     tight?: boolean;
+    icon?: ReactNode;
+    noErrorPadding?: boolean;
+    extendErrorMessage?: boolean;
 }
 
 interface IState {
@@ -62,6 +66,11 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
 
     public render() {
         const { label, legend } = this.props;
+        const OuterTag = legend ? "fieldset" : label ? "label" : "div";
+        const LegendOrSpanTag = legend ? "legend" : "span";
+
+        const hasLegendOrLabel = !!this.props.legend || !!this.props.label;
+
         const classesInputBlock = inputBlockClasses();
         const componentClasses = classNames(
             this.props.baseClass === InputTextBlockBaseClass.STANDARD ? classesInputBlock.root : "",
@@ -78,16 +87,14 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
             children = this.props.children;
         }
 
-        const OuterTag = label ? (legend ? "fieldset" : "label") : "div";
-        const LabelTag = label && legend ? "legend" : "span";
-
         return (
             <OuterTag className={componentClasses}>
-                {this.props.label && (
+                {hasLegendOrLabel && (
                     <span id={this.labelID} className={classesInputBlock.labelAndDescription}>
-                        <LabelTag className={classNames(classesInputBlock.labelText, this.props.labelClassName)}>
-                            {this.props.label}
-                        </LabelTag>
+                        <LegendOrSpanTag className={classNames(classesInputBlock.labelText, this.props.labelClassName)}>
+                            {this.props.legend ?? this.props.label!}
+                            {this.props.icon}
+                        </LegendOrSpanTag>
                         <Paragraph className={classesInputBlock.labelNote}>{this.props.labelNote}</Paragraph>
                     </span>
                 )}
@@ -104,8 +111,13 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
                 >
                     {children}
                 </span>
-                <Paragraph className={classesInputBlock.labelNote}>{this.props.noteAfterInput}</Paragraph>
-                <ErrorMessages id={this.errorID} errors={this.props.errors} padded />
+                <Paragraph className={classesInputBlock.noteAfterInput}>{this.props.noteAfterInput}</Paragraph>
+                <ErrorMessages
+                    id={this.errorID}
+                    errors={this.props.errors}
+                    className={cx({ [classesInputBlock.extendErrorPadding]: this.props.extendErrorMessage })}
+                    padded={!this.props.noErrorPadding}
+                />
             </OuterTag>
         );
     }

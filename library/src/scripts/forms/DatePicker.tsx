@@ -16,16 +16,25 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { dayPickerClasses } from "@library/forms/datePickerStyles";
 import classNames from "classnames";
 import { LeftChevronIcon, RightChevronIcon } from "@library/icons/common";
+/**
+ * fixme: Use our own flyout, or wrap in a stacking context in the next iteration
+ * https://higherlogic.atlassian.net/browse/VNLA-3384
+ */
 import RelativePortal from "react-relative-portal";
 import "@library/forms/DatePicker.libStyles.scss";
+import { getRequiredID } from "@library/utility/idUtils";
 
 interface IProps {
     value: string; // ISO formatted date
     onChange: (value: string) => void;
     contentClassName?: string;
     inputClassName?: string;
+    datePickerDropdownClassName?: string;
     alignment: "left" | "right";
     disabledDays?: any; // See http://react-day-picker.js.org/examples/disabled
+    inputAriaLabel?: string;
+    id?: string;
+    fieldName?: string; //this one is for legacy form submits, hidden input should have a name so it appears in gdn form values
 }
 
 interface IState {
@@ -61,6 +70,9 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
     private renderReactInput() {
         const value = this.props.value ? moment(this.props.value).toDate() : undefined;
         const classes = dayPickerClasses();
+        const ariaLabel = t("Date Input ") + "(yyyy-mm-dd)";
+        const id = getRequiredID({ id: this.props.id }, "datePicker");
+
         return (
             <div className={classNames(classes.root)}>
                 <DayPickerInput
@@ -82,14 +94,24 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
                         showOutsideDays: true,
                     }}
                     inputProps={{
+                        id,
                         className: classNames("inputText", this.props.inputClassName, {
                             isInvalid: this.state.hasBadValue && this.state.wasBlurred,
                         }),
-                        "aria-label": t("Date Input ") + "(yyyy-mm-dd)",
+                        "aria-label": this.props.inputAriaLabel
+                            ? `${this.props.inputAriaLabel} ${ariaLabel}`
+                            : ariaLabel,
                         onBlur: this.handleBlur,
                         onFocus: this.handleFocus,
                         onChange: this.handleNativeInputChange,
                     }}
+                />
+                <input
+                    aria-hidden={true}
+                    value={this.props.value ? this.normalizeIsoString(this.props.value) : ""}
+                    type="hidden"
+                    tabIndex={-1}
+                    name={this.props.fieldName}
                 />
             </div>
         );
@@ -102,13 +124,16 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
         // The native date input MUST have it's value in short ISO format, even it doesn't display that way.
         const value = this.props.value ? this.normalizeIsoString(this.props.value) : "";
         return (
-            <input
-                className="inputText"
-                type="date"
-                placeholder={t(`yyyy-mm-dd`)}
-                onChange={this.handleNativeInputChange}
-                value={value}
-            />
+            <>
+                <input
+                    className="inputText"
+                    type="date"
+                    placeholder={t(`yyyy-mm-dd`)}
+                    onChange={this.handleNativeInputChange}
+                    value={value}
+                />
+                <input aria-hidden={true} value={value} type="hidden" tabIndex={-1} name={this.props.fieldName} />
+            </>
         );
     }
 
@@ -178,8 +203,16 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
         });
         return (
             // dayPickerClasses needs to be reapplied here, because it's rendered outside the root
-            <RelativePortal component="div" top={0} right={0} className={dayPickerClasses().root}>
-                <div className={classNames("dropDown", classes.root)} {...props}>
+            <RelativePortal
+                component="div"
+                top={0}
+                right={this.props.alignment === "right" ? 0 : undefined}
+                className={dayPickerClasses().root}
+            >
+                <div
+                    className={classNames("dropDown", classes.root, this.props.datePickerDropdownClassName)}
+                    {...props}
+                >
                     <div className={contentsClasses}>{children}</div>
                 </div>
             </RelativePortal>

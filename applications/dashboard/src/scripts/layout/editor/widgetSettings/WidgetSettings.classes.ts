@@ -132,9 +132,9 @@ export const widgetSettingsClasses = useThemeCache(() => {
 
             "& .input-wrap": {
                 display: "flex",
-                justifyContent: "flex-end",
                 flex: "0 0 59%",
                 maxWidth: "59%",
+                flexWrap: "wrap",
 
                 "& textarea, & input": {
                     fontSize: 13,
@@ -218,6 +218,7 @@ export const widgetSettingsClasses = useThemeCache(() => {
 
             "& .input-wrap": {
                 flex: "0 0 33.33333333%",
+                justifyContent: "flex-end",
             },
         },
 

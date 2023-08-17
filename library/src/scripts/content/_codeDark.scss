@@ -3,4 +3,91 @@
  * @license GPL-2.0-only
  */
 
+/* Highlight JS for User Content Codeblocks */
 @import "~highlight.js/styles/darcula.css";
+
+/* Matching colour scheme for Prism syntax highlighting */
+.code.codeBlock {
+    code.language-php {
+        color: #7f7f7f;
+    }
+
+    code.language-css {
+        color: #6896ba;
+    }
+
+    .token {
+        color: rgb(245, 246, 247);
+
+        &.important,
+        &.bold {
+            font-weight: bold;
+        }
+
+        &.italic {
+            font-style: italic;
+        }
+
+        &.strong,
+        &.emphasis {
+            color: #a8a8a2;
+        }
+
+        &.bullet,
+        &.quote,
+        &.link,
+        &.number,
+        &.regexp,
+        &.literal {
+            color: #6896ba;
+        }
+
+        &.code,
+        &.selector,
+        &.selector-class {
+            color: #a6e22e;
+        }
+
+        &.emphasis {
+            font-style: italic;
+        }
+
+        &.keyword,
+        &.selector-tag,
+        &.section,
+        &.attribute,
+        &.property,
+        &.name,
+        &.variable {
+            color: #cb7832;
+        }
+
+        &.params {
+            color: #b9b9b9;
+        }
+
+        &.string {
+            color: #6a8759;
+        }
+
+        &.subst,
+        &.type,
+        &.built_in,
+        &.builtin-name,
+        &.symbol,
+        &.selector-id,
+        &.selector-attr,
+        &.selector-pseudo,
+        &.template-tag,
+        &.template-variable,
+        &.addition {
+            color: #e0c46c;
+        }
+
+        &.comment,
+        &.deletion,
+        &.meta {
+            color: #7f7f7f;
+        }
+    }
+}

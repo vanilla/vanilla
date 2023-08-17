@@ -4,6 +4,7 @@
  * @license gpl-2.0-only
  */
 
+import { getDashboardUserManagementRoutes } from "@dashboard/users/userManagement/UserManagementRoutes";
 import RouteHandler from "@library/routing/RouteHandler";
 
 const RoleApplicationsRoute = new RouteHandler(
@@ -13,5 +14,5 @@ const RoleApplicationsRoute = new RouteHandler(
 );
 
 export function getDashboardRoutes() {
-    return [RoleApplicationsRoute.route];
+    return [RoleApplicationsRoute.route, ...getDashboardUserManagementRoutes()];
 }

@@ -13,6 +13,7 @@ paths:
                       items:
                           enum:
                               - permissions
+                              - assignable
                               - all
                           type: string
                       type: array
@@ -156,6 +157,11 @@ paths:
                                         minLength: 0
                                         nullable: true
                                         type: string
+                                    domains:
+                                        description: Email domains of roles.
+                                        minLength: 0
+                                        nullable: true
+                                        type: string
                                 required:
                                     - roleID
                                     - name
@@ -289,6 +295,11 @@ components:
                     minLength: 0
                     nullable: true
                     type: string
+                domains:
+                    description: Email domains of roles.
+                    minLength: 0
+                    nullable: true
+                    type: string
             required:
                 - roleID
                 - name
@@ -324,6 +335,11 @@ components:
                     type: boolean
                 type:
                     description: Default type of this role.
+                    minLength: 0
+                    nullable: true
+                    type: string
+                domains:
+                    description: Email domains of roles.
                     minLength: 0
                     nullable: true
                     type: string

@@ -169,6 +169,7 @@ components:
                 - dateUpdated
                 - read
             type: object
+
         NotificationPatchSchema:
             description: Fields for patching a notification.
             type: object

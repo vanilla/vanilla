@@ -3,36 +3,32 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ElementType } from "react";
 import { useUniqueID } from "@library/utility/idUtils";
 import { DashboardFormLabel, DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { FormGroupContext } from "./DashboardFormGroupContext";
 import { cx } from "@emotion/css";
 
-interface IProps {
-    label: React.ReactNode;
-    description?: React.ReactNode;
-    afterDescription?: React.ReactNode;
-    labelType?: DashboardLabelType;
-    inputType?: string;
-    tag?: keyof JSX.IntrinsicElements;
-    children: React.ReactNode;
-    isIndependant?: boolean; // Setting this resets the side margins.
-    tooltip?: string;
+interface IProps extends React.ComponentProps<typeof DashboardFormLabel> {
+    tag?: ElementType;
+    children?: React.ReactNode;
+    inputID?: string;
+    className?: string;
+    required?: boolean;
 }
 
 export function DashboardFormGroup(props: IProps) {
-    const Tag = (props.tag || "li") as "li";
-    const inputID = useUniqueID("formGroup-");
+    const { fieldset = false } = props;
+    const Tag = fieldset ? "div" : props.tag ?? "li";
+    const uniqueID = useUniqueID("formGroup-");
+    const inputID = props.inputID ?? uniqueID;
     const labelID = inputID + "-label";
 
     return (
         <Tag
-            className={cx(
-                "form-group",
-                { ["row"]: !!props.isIndependant },
-                { [`formGroup-${props.inputType}`]: !!props.inputType },
-            )}
+            className={cx("form-group", { [`formGroup-${props.inputType}`]: !!props.inputType }, props.className)}
+            role={"group"}
+            aria-labelledby={fieldset ? labelID : undefined}
         >
             <FormGroupContext.Provider
                 value={{ inputID, labelID, labelType: props.labelType || DashboardLabelType.STANDARD }}

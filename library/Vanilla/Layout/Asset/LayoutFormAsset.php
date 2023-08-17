@@ -8,6 +8,7 @@
 namespace Vanilla\Layout\Asset;
 
 use stdClass;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Asset class for hydration parameters.
@@ -125,7 +126,21 @@ class LayoutFormAsset
      */
     public function getParams()
     {
-        return empty($this->params) ? new stdClass() : $this->params;
+        if (is_array($this->params)) {
+            $params = $this->params;
+            array_walk_recursive($params, function (&$val) {
+                if ($val === true) {
+                    $val = "true";
+                } elseif ($val === false) {
+                    $val = "false";
+                } elseif (is_integer($val)) {
+                    $val = (string) $val;
+                }
+            });
+            return $params;
+        } else {
+            return new stdClass();
+        }
     }
 
     /**

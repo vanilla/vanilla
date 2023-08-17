@@ -28,9 +28,6 @@ use Vanilla\Scheduler\SchedulerInterface;
  */
 class ModelCache
 {
-    /** @var int When we hit this size of incrementing key, we reset from 0. */
-    const MAX_INCREMENTING_KEY = 1000000;
-
     /** @var string */
     const INCREMENTING_KEY_NAMESPACE = "vanillaIncrementingKey";
 
@@ -53,8 +50,10 @@ class ModelCache
     /** @var array */
     private $defaultCacheOptions;
 
-    /** @var CacheInterface */
-    private $cache;
+    private \Gdn_Cache $gdnCache;
+
+    /** @var CacheCacheAdapter */
+    private CacheCacheAdapter $cache;
 
     /** @var \Symfony\Contracts\Cache\CacheInterface */
     private $cacheContract;
@@ -74,6 +73,7 @@ class ModelCache
      */
     public function __construct(string $cacheNameSpace, \Gdn_Cache $cache, array $defaultCacheOptions = [])
     {
+        $this->gdnCache = $cache;
         $this->cache = new CacheCacheAdapter($cache);
         $this->cacheContract = new Psr16Adapter($this->cache, $cacheNameSpace);
 
@@ -158,12 +158,12 @@ class ModelCache
             if ($scheduler instanceof SchedulerInterface) {
                 // Defer hydration.
                 $fullKey = $this->createCacheKey($args);
-                $this->scheduleHydration($scheduler, $fullKey, $hydrate, $args);
+                $this->scheduleHydration($scheduler, $fullKey, $hydrate, array_values($args));
                 // Return the default for now.
                 return serialize($default);
             } else {
                 // Hydrate immediately.
-                $result = call_user_func_array($hydrate, $args);
+                $result = call_user_func_array($hydrate, array_values($args));
                 $result = serialize($result);
                 return $result;
             }
@@ -237,7 +237,11 @@ class ModelCache
         }
 
         $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . "-" . $this->cacheNameSpace;
-        $result = $this->cache->get($incrementKeyCacheKey, 0);
+        $result = $this->cache->get($incrementKeyCacheKey);
+        if ($result === null) {
+            $result = $time = CurrentTimeStamp::get();
+            $this->cache->set($incrementKeyCacheKey, $time);
+        }
         return $result;
     }
 
@@ -251,12 +255,6 @@ class ModelCache
         }
 
         $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . "-" . $this->cacheNameSpace;
-        $existingKey = $this->getIncrementingKey();
-        $newKey = $existingKey + 1;
-        if ($newKey > self::MAX_INCREMENTING_KEY) {
-            // Restart from 0.
-            $newKey = 0;
-        }
-        $this->cache->set($incrementKeyCacheKey, $newKey);
+        $this->gdnCache->increment($incrementKeyCacheKey, 1, [\Gdn_Cache::FEATURE_INITIAL => CurrentTimeStamp::get()]);
     }
 }

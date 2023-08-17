@@ -13,8 +13,10 @@ use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\Community\Schemas\CategoryFragmentSchema;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
+use Vanilla\Database\Select;
 use Vanilla\DiscussionTypeConverter;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Exception\PermissionException;
@@ -34,6 +36,7 @@ use Vanilla\Search\SearchResultItem;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
+use Garden\Web\Pagination;
 
 /**
  * API Controller for the `/discussions` resource.
@@ -107,7 +110,6 @@ class DiscussionsApiController extends AbstractApiController
      * @param CommentModel $commentModel
      * @param TagModel $tagModel
      * @param SiteSectionModel $siteSectionModel
-     * @param DiscussionTypeConverter $discussionTypeConverter
      * @param DiscussionExpandSchema $discussionExpandableSchema
      * @param RecordStatusModel $recordStatusModel
      * @param RecordStatusLogModel $recordStatusLogModel
@@ -121,7 +123,6 @@ class DiscussionsApiController extends AbstractApiController
         CommentModel $commentModel,
         TagModel $tagModel,
         SiteSectionModel $siteSectionModel,
-        DiscussionTypeConverter $discussionTypeConverter,
         DiscussionExpandSchema $discussionExpandableSchema,
         RecordStatusModel $recordStatusModel,
         RecordStatusLogModel $recordStatusLogModel,
@@ -134,7 +135,6 @@ class DiscussionsApiController extends AbstractApiController
         $this->commentModel = $commentModel;
         $this->tagModel = $tagModel;
         $this->siteSectionModel = $siteSectionModel;
-        $this->discussionTypeConverter = $discussionTypeConverter;
         $this->discussionExpandSchema = $discussionExpandableSchema;
         $this->recordStatusModel = $recordStatusModel;
         $this->recordStatusLogModel = $recordStatusLogModel;
@@ -182,13 +182,11 @@ class DiscussionsApiController extends AbstractApiController
 
         $query = $in->validate($query);
         [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
-
-        $rows = $this->discussionModel
-            ->get($offset, $limit, [
-                "w.Bookmarked" => 1,
-                "w.UserID" => $this->getSession()->UserID,
-            ])
-            ->resultArray();
+        $where = [
+            "ud.Bookmarked" => 1,
+            "ud.UserID" => $this->getSession()->UserID,
+        ];
+        $rows = $this->discussionModel->getWhere($where, "", "", $limit, $offset)->resultArray();
 
         $this->userModel->expandUsers(
             $rows,
@@ -460,7 +458,7 @@ class DiscussionsApiController extends AbstractApiController
             throw new NotFoundException("Discussion", ["recordIDs" => $checked["nonexistentIDs"]]);
         }
         if (!empty($checked["noPermissionIDs"])) {
-            throw new PermissionException("Vanilla.Discussions.Edit", ["recordIDs" => $checked["noPermissionIDs"]]);
+            throw new PermissionException("Vanilla.Discussions.Delete", ["recordIDs" => $checked["noPermissionIDs"]]);
         }
 
         // Defer to the LongRunner for execution.
@@ -670,6 +668,14 @@ class DiscussionsApiController extends AbstractApiController
     {
         $normalizedRow = $this->discussionModel->normalizeRow($dbRecord, $expand);
 
+        if (isset($dbRecord[DiscussionModel::SORT_EXPIRIMENTAL_TRENDING])) {
+            $normalizedRow["trending"] = [
+                "value" => $dbRecord[DiscussionModel::SORT_EXPIRIMENTAL_TRENDING],
+                "aggregateScore" => $dbRecord["aggregateScore"],
+                "hoursSinceCreation" => $dbRecord["hoursSinceCreation"],
+            ];
+        }
+
         // Fetch the crumb model lazily to prevent DI issues.
         /** @var BreadcrumbModel $breadcrumbModel */
         $breadcrumbModel = \Gdn::getContainer()->get(BreadcrumbModel::class);
@@ -829,18 +835,18 @@ class DiscussionsApiController extends AbstractApiController
         $out = $this->schema([":a" => $discussionSchema], "out");
 
         $where = ApiUtils::queryToFilters($in, $query);
-        if ($where["d.statusID"] ?? false) {
-            $where["d.statusID"] = $this->recordStatusModel->validateStatusesAreActive($where["d.statusID"], false);
+        if ($where["statusID"] ?? false) {
+            $where["statusID"] = $this->recordStatusModel->validateStatusesAreActive($where["statusID"], false);
         }
 
-        if ($where["d.internalStatusID"] ?? false) {
+        if ($where["internalStatusID"] ?? false) {
             if (\Gdn::session()->checkPermission("staff.allow")) {
-                $where["d.internalStatusID"] = $this->recordStatusModel->validateStatusesAreActive(
-                    $where["d.internalStatusID"],
+                $where["internalStatusID"] = $this->recordStatusModel->validateStatusesAreActive(
+                    $where["internalStatusID"],
                     true
                 );
             } else {
-                unset($where["d.internalStatusID"]);
+                unset($where["internalStatusID"]);
             }
         }
 
@@ -861,18 +867,37 @@ class DiscussionsApiController extends AbstractApiController
             }
         }
 
-        if (array_key_exists("d.CategoryID", $where)) {
+        if (array_key_exists("CategoryID", $where)) {
+            $filterCategories = $where["CategoryID"]->getValues();
+            if (key($filterCategories) != "=") {
+                throw new InvalidArgumentException(
+                    "Invalid category argument received. You must provide comma seperated values."
+                );
+            }
+            $where["CategoryID"] = (array) $filterCategories[key($filterCategories)];
             $includeChildCategories = $query["includeChildCategories"] ?? false;
+            $childCategories = [];
             if ($includeChildCategories) {
-                $where["d.CategoryID"] = $this->getNestedCategoriesIDs($where["d.CategoryID"], $followed);
+                $childCategories = $this->categoryModel->getSearchCategoryIDs(
+                    null,
+                    $followed,
+                    true,
+                    null,
+                    $where["CategoryID"]
+                );
             } else {
-                $this->discussionModel->categoryPermission("Vanilla.Discussions.View", $where["d.CategoryID"]);
+                foreach ($where["CategoryID"] as $filterCategory) {
+                    $this->discussionModel->categoryPermission("Vanilla.Discussions.View", $filterCategory);
+                }
+            }
+            if (!empty($childCategories)) {
+                $where["CategoryID"] = $childCategories;
             }
         } elseif ($siteSectionID) {
             $siteSection = $this->siteSectionModel->getByID($query["siteSectionID"]);
             $categoryID = $siteSection ? $siteSection->getCategoryID() : null;
             if ($categoryID) {
-                $where["d.CategoryID"] = $this->getNestedCategoriesIDs($categoryID, $followed);
+                $where["CategoryID"] = $this->getNestedCategoriesIDs($categoryID, $followed);
             }
         }
 
@@ -882,12 +907,12 @@ class DiscussionsApiController extends AbstractApiController
                 ->getWhere(["HideAllDiscussions" => 0])
                 ->column("CategoryID");
             if (count($categoriesShowingDiscussions) > 0) {
-                if (array_key_exists("d.CategoryID", $where)) {
+                if (array_key_exists("CategoryID", $where)) {
                     // If we already have a subset of categories, filter them out.
-                    $where["d.CategoryID"] = array_intersect($where["d.CategoryID"], $categoriesShowingDiscussions);
+                    $where["CategoryID"] = array_intersect($where["CategoryID"], $categoriesShowingDiscussions);
                 } else {
                     // Otherwise, ensure the discussions are from categories that have `HideAllDiscussions` set to 0.
-                    $where["d.CategoryID"] = $categoriesShowingDiscussions;
+                    $where["CategoryID"] = $categoriesShowingDiscussions;
                 }
             }
         }
@@ -897,8 +922,33 @@ class DiscussionsApiController extends AbstractApiController
             $cond = ["TagID" => $query["tagID"]];
             $discussionIDs = $this->tagModel->getTagDiscussionIDs($cond);
             if (!empty($discussionIDs)) {
-                $where["d.DiscussionID"] = array_column($discussionIDs, "DiscussionID");
+                $where["DiscussionID"] = array_column($discussionIDs, "DiscussionID");
             }
+        }
+
+        // SlotType support
+        $slotType = $query["slotType"] ?? "";
+        $currentTime = CurrentTimeStamp::getDateTime();
+        $filterTime = null;
+        switch ($slotType) {
+            case "d":
+                $filterTime = $currentTime->modify("-1 day");
+                break;
+            case "w":
+                $filterTime = $currentTime->modify("-1 week");
+                break;
+            case "m":
+                $filterTime = $currentTime->modify("-1 month");
+                break;
+            case "y":
+                $filterTime = $currentTime->modify("-1 year");
+                break;
+            case "a":
+            default:
+                break;
+        }
+        if ($filterTime !== null) {
+            $where["DateInserted >"] = $filterTime;
         }
 
         // Allow addons to update the where clause.
@@ -912,7 +962,6 @@ class DiscussionsApiController extends AbstractApiController
 
         if ($followed) {
             $where["Followed"] = true;
-            $query["pinOrder"] = "mixed";
         }
 
         $joinDirtyRecords = $query[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
@@ -920,13 +969,86 @@ class DiscussionsApiController extends AbstractApiController
             $where[DirtyRecordModel::DIRTY_RECORD_OPT] = $joinDirtyRecords;
         }
 
-        $pinned = $query["pinned"] ?? null;
-        [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection($query["sort"] ?? "");
+        $count = null;
+        // When using expand crawl (and crawling) we don't use numbered pagers.
+        $shouldCount = !ModelUtils::isExpandOption("crawl", $query["expand"]);
+        [$orderField, $orderDirection] = \Vanilla\Models\LegacyModelUtils::orderFieldDirection(
+            $query["sort"] ?? "-DateLastComment"
+        );
+
+        $selects = [];
+
+        if ($orderField === DiscussionModel::SORT_EXPIRIMENTAL_TRENDING) {
+            // Experimental trending works on the following equation
+            // sc = score
+            // hc = Hours since creation
+            // he = Hour exponent - Make the time decay curve stronger. Size this to your time window.
+            // wo = Window offset hours - Offset all posts by a certain amount of the curve. Stronger lessens the effect of the curve over a time period.
+            // Our equation is
+            //
+            // sc / (hc + wo)^he
+            //
+            // The idea is that we take some aggregate score
+            // Then divide by a time factor that makes older posts require a higher score to come to the top
+            // Performance of this was tested to be reasonable for discussion datasets of up to ~10k rows
+            // Our biggest communities don't tend to make more posts than this in a month.
+            // Query time was similar to a DateInserted sort with that many posts.
+            //
+            // We can't index this easily for bigger datasets because of the time component so at
+            // the moment we are relying on the validation to prevent time windows greater than 1 month.
+
+            // Validation requires that we must have a slotType.
+            $slotType = $query["slotType"];
+            switch ($slotType) {
+                case "d":
+                    $windowOffsetHours = 2;
+                    $hourExponent = 1.5;
+                    break;
+                case "w":
+                    $windowOffsetHours = 24 * 7;
+                    $hourExponent = 1.15;
+                    break;
+                case "m":
+                default:
+                    $windowOffsetHours = 24 * 30;
+                    $hourExponent = 1.1;
+                    break;
+            }
+
+            // We need to add a select for our trending.
+            $selects = array_merge($selects, [
+                new Select(
+                    "@aggregateScore := COALESCE(d.Score, 0) + COALESCE(d.CountComments, 0) * 2 + COALESCE(d.CountViews, 0) / 10",
+                    "aggregateScore"
+                ),
+                new Select(
+                    "@hoursSinceCreation := (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(d.DateInserted)) / 60 / 24",
+                    "hoursSinceCreation"
+                ),
+                new Select(
+                    "@aggregateScore / POWER(@hoursSinceCreation + {$windowOffsetHours}, {$hourExponent})",
+                    DiscussionModel::SORT_EXPIRIMENTAL_TRENDING
+                ),
+            ]);
+        }
+        $this->discussionModel->SQL->reset();
         if ($bookmarkUserID) {
             $rows = $this->discussionModel
-                ->getWhere($where, $orderField, $orderDirection, $limit, $offset, false, "bookmarked", $bookmarkUserID)
+                ->getWhere(
+                    $where,
+                    $orderField,
+                    $orderDirection,
+                    $limit,
+                    $offset,
+                    false,
+                    "bookmarked",
+                    $bookmarkUserID,
+                    $selects
+                )
                 ->resultArray();
-            $count = $this->discussionModel->getPagingCount($where, $limit, "bookmarked", $bookmarkUserID);
+            if ($shouldCount) {
+                $count = $this->discussionModel->getPagingCount($where, "bookmarked", $bookmarkUserID);
+            }
         } elseif ($participatedUserID) {
             $rows = $this->discussionModel
                 ->getWhere(
@@ -937,39 +1059,59 @@ class DiscussionsApiController extends AbstractApiController
                     $offset,
                     false,
                     "participated",
-                    $participatedUserID
+                    $participatedUserID,
+                    $selects
                 )
                 ->resultArray();
-            $count = $this->discussionModel->getPagingCount($where, $limit, "participated", $participatedUserID);
-        } elseif ($pinned === true) {
-            $announceWhere = array_merge($where, ["d.Announce >" => "0"]);
+            if ($shouldCount) {
+                $count = $this->discussionModel->getPagingCount($where, "participated", $participatedUserID);
+            }
+        } elseif (isset($query["pinned"])) {
+            $where["Announce"] = $this->discussionModel->getAnnouncementWhere($query, $query["pinned"]);
             $rows = $this->discussionModel
-                ->getAnnouncements($announceWhere, $offset, $limit, $query["sort"] ?? "")
+                ->getWhere($where, $orderField, $orderDirection, $limit, $offset, false, null, null, $selects)
                 ->resultArray();
-            $count = $this->discussionModel->getAnnouncementsPagingCount($where, $limit);
+            if ($shouldCount) {
+                $count = $this->discussionModel->getPagingCount($where);
+            }
         } else {
             $pinOrder = $query["pinOrder"] ?? null;
+
             if ($pinOrder == "first") {
+                $whereAnnouncement = $where;
+                $whereAnnouncement["Announce"] = $this->discussionModel->getAnnouncementWhere($query, true);
+                $where["Announce"] = $this->discussionModel->getAnnouncementWhere($query);
+
                 $announcements = $this->discussionModel
-                    ->getAnnouncements($where, $offset, $limit, $query["sort"] ?? "")
+                    ->getWhere(
+                        $whereAnnouncement,
+                        $orderField,
+                        $orderDirection,
+                        $limit,
+                        $offset,
+                        false,
+                        null,
+                        null,
+                        $selects
+                    )
                     ->resultArray();
-                $count = $this->discussionModel->getAnnouncementsPagingCount($where, $limit);
                 $discussions = $this->discussionModel
-                    ->getWhere($where, $orderField, $orderDirection, $limit, $offset, false)
+                    ->getWhere($where, $orderField, $orderDirection, $limit, $offset, false, null, null, $selects)
                     ->resultArray();
                 $rows = array_merge($announcements, $discussions);
-                $count += $this->discussionModel->getPagingCount($where, $limit);
+                if ($shouldCount) {
+                    $count = $this->discussionModel->getPagingCount($whereAnnouncement);
+                    $count += $this->discussionModel->getPagingCount($where);
+                }
             } else {
-                $where["Announce"] = "all";
                 $rows = $this->discussionModel
-                    ->getWhere($where, $orderField, $orderDirection, $limit, $offset, false)
+                    ->getWhere($where, $orderField, $orderDirection, $limit, $offset, false, null, null, $selects)
                     ->resultArray();
-                $count = $this->discussionModel->getPagingCount($where, $limit);
+                if ($shouldCount) {
+                    $count = $this->discussionModel->getPagingCount($where);
+                }
             }
         }
-
-        $paging = ApiUtils::numberedPagerInfo($count, "/api/v2/discussions", $query, $in);
-        $pagingObject = ["paging" => $paging];
 
         // Expand associated rows.
         $this->userModel->expandUsers(
@@ -999,7 +1141,12 @@ class DiscussionsApiController extends AbstractApiController
         if ($this->isExpandField("tags", $query["expand"]) ?? false) {
             $this->tagModel->expandTags($result);
         }
-
+        // When crawling the endpoint use a more pager.
+        $paging =
+            $count === null
+                ? ApiUtils::morePagerInfo($rows, "/api/v2/discussions", $query, $in)
+                : ApiUtils::numberedPagerInfo($count, "/api/v2/discussions", $query, $in);
+        $pagingObject = Pagination::tryCursorPagination($paging, $query, $result, "discussionID");
         return new Data($result, $pagingObject);
     }
 
@@ -1453,8 +1600,9 @@ class DiscussionsApiController extends AbstractApiController
             $result = $this->normalizeOutput($from);
             return $out->validate($result);
         }
-
-        $this->discussionTypeConverter->convert($from, $toType);
+        // We need to fetch it now rather than at the initialization to prevent load order problems.
+        $discussionTypeConverter = Gdn::getContainer()->get(DiscussionTypeConverter::class);
+        $discussionTypeConverter->convert($from, $toType);
         $record = $this->discussionModel->getID($id, DATASET_TYPE_ARRAY);
         $result = $this->normalizeOutput($record);
         $result = $out->validate($result);

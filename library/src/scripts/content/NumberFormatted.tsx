@@ -12,6 +12,7 @@ interface IProps {
     value: number;
     className?: string;
     title?: string;
+    showFullValue?: boolean;
     fallbackTag?: string;
 }
 /**
@@ -59,11 +60,14 @@ export function numberWithCommas(value: number, precision: number = 0): string {
  *
  * @param props
  */
-export function formatNumberText(props: { value: number }) {
+export function formatNumberText(props: IProps) {
     const { value } = props;
-    const compactValue = stripTrailingZeros(humanReadableNumber(value));
+    let compactValue = stripTrailingZeros(humanReadableNumber(value));
     const fullValue = numberWithCommas(value);
-    const isAbbreviated = fullValue !== value.toString();
+    if (props.showFullValue) {
+        compactValue = fullValue;
+    }
+    const isAbbreviated = !props.showFullValue && fullValue !== value.toString();
 
     return {
         compactValue,
@@ -76,7 +80,7 @@ export function formatNumberText(props: { value: number }) {
  * If you're building a translated stirng, it can be helpful to get the same data as "NumberFormatted" but decomposed
  */
 export function decomposedNumberFormatted(props: IProps) {
-    const formattedNumber = formatNumberText({ value: props.value });
+    const formattedNumber = formatNumberText(props);
     const { fullValue, isAbbreviated } = formattedNumber;
     const Tag = (isAbbreviated ? `abbr` : props.fallbackTag ?? `span`) as "span";
     const className = classNames("number", props.className, numberFormattedClasses().root);

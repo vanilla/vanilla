@@ -70,4 +70,31 @@ trait ProfileExtenderTestTrait
     {
         return self::container()->get(\ProfileExtenderPlugin::class);
     }
+
+    public function createSystemDefaultProfileFields()
+    {
+        self::bessy()->post("/settings/profile-field-add-edit", [
+            "Name" => "Title",
+            "Label" => "Your Job Title",
+            "FormType" => "TextBox",
+            "Required" => "1",
+            "OnRegister" => true,
+        ]);
+
+        self::bessy()->post("/settings/profile-field-add-edit", [
+            "Name" => "Location",
+            "Label" => "Your Job Location",
+            "FormType" => "TextBox",
+            "Required" => "1",
+            "OnRegister" => true,
+        ]);
+    }
+
+    public function removeSystemDefaultProfileFields()
+    {
+        $profileFields = ["Title", "Location"];
+        foreach ($profileFields as $field) {
+            self::bessy()->post("/settings/profile-field-delete/$field");
+        }
+    }
 }

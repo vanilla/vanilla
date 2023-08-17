@@ -14,6 +14,7 @@ use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
 use Garden\EventManager;
 use Vanilla\Community\Events\CommentEvent;
+use VanillaTests\TestLoggerTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
@@ -26,7 +27,8 @@ class CommentModelTest extends SiteTestCase
         TestCommentModelTrait,
         CommunityApiTestTrait,
         EventSpyTestTrait,
-        UsersAndRolesApiTestTrait;
+        UsersAndRolesApiTestTrait,
+        TestLoggerTrait;
 
     /** @var CommentEvent */
     private $lastEvent;
@@ -379,5 +381,23 @@ class CommentModelTest extends SiteTestCase
                 ->getBody();
             $this->assertCount(1, $notifications);
         });
+    }
+
+    /**
+     * Test that user counts do not get updated when the user do not exist.
+     *
+     * @return void
+     */
+    public function testUpdateUserExpectFail(): void
+    {
+        $discussionID = $this->createDiscussion();
+        $comment = $this->createComment(["DiscussionID" => $discussionID]);
+
+        // Set an invalid use
+        $sql = $this->commentModel->Database->createSql();
+        $sql->update("Comment", ["InsertUserID" => 1234567], ["CommentID" => $comment["commentID"]])->put();
+
+        $this->commentModel->deleteID($comment["commentID"]);
+        $this->assertLogMessage("Failed updating the user 1234567, this user do not exists.");
     }
 }

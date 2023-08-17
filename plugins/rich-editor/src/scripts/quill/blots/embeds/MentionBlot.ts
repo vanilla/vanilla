@@ -6,7 +6,7 @@
 
 import EmbedBlot from "quill/blots/embed";
 import { makeProfileUrl } from "@library/utility/appUtils";
-import { IMentionSuggestionData } from "@rich-editor/toolbars/pieces/MentionSuggestion";
+import { IMentionSuggestionData } from "@library/editor/pieces/MentionSuggestion";
 
 /**
  * A blot that represents a completed mention.
@@ -21,7 +21,7 @@ export default class MentionBlot extends EmbedBlot {
         node.textContent = "@" + data.name;
         node.dataset.userid = data.userID.toString();
         node.dataset.username = data.name;
-        node.href = makeProfileUrl(data.name);
+        node.href = makeProfileUrl(data.userID, data.name);
         return node;
     }
 

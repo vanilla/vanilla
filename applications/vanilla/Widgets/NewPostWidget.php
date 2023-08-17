@@ -14,8 +14,6 @@ use Vanilla\Forms\StaticFormChoices;
 use Vanilla\InjectableInterface;
 use Gdn;
 use CategoryModel;
-use Vanilla\Layout\Section\SectionThreeColumns;
-use Vanilla\Layout\Section\SectionTwoColumns;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
@@ -264,5 +262,20 @@ class NewPostWidget implements ReactWidgetInterface, CombinedPropsWidgetInterfac
     public static function getWidgetSchema(): Schema
     {
         return SchemaUtils::composeSchemas(self::widgetTitleSchema(), self::widgetSpecificSchema());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $links = array_map(function (array $item) {
+            return [
+                "url" => $item["action"],
+                "name" => $item["label"] ?? null,
+            ];
+        }, $props["items"] ?? []);
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($links));
+        return $result;
     }
 }

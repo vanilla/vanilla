@@ -12,7 +12,7 @@ use JsonSerializable;
 /**
  * Job Status
  */
-class JobExecutionStatus implements JsonSerializable
+class JobExecutionStatus implements JsonSerializable, \Stringable
 {
     /**
      * @var string
@@ -46,6 +46,14 @@ class JobExecutionStatus implements JsonSerializable
     }
 
     /**
+     * @inheritdoc
+     */
+    public function __toString()
+    {
+        return $this->myStatus;
+    }
+
+    /**
      * Is that JobExecutionStatus
      *
      * @param JobExecutionStatus $jes
@@ -70,6 +78,14 @@ class JobExecutionStatus implements JsonSerializable
     public static function complete()
     {
         return new JobExecutionStatus("complete");
+    }
+
+    /**
+     * @return JobExecutionStatus
+     */
+    public static function success()
+    {
+        return new JobExecutionStatus("success");
     }
 
     /**

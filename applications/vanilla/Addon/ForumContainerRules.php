@@ -14,13 +14,17 @@ use Vanilla\AddonContainerRules;
 use Vanilla\Analytics\EventProviderService;
 use Vanilla\Analytics\SearchDiscussionEventProvider;
 use Vanilla\Forum\Controllers\Pages\DiscussionListPageController;
+use Vanilla\Forum\Controllers\Pages\UnsubscribePageController;
 use Vanilla\Forum\Layout\View\LegacyCategoryListLayoutView;
 use Vanilla\Forum\Layout\View\DiscussionListLayoutView;
 use Vanilla\Forum\Layout\View\LegacyDiscussionThreadLayoutView;
 use Vanilla\Forum\Layout\View\LegacyNewDiscussionLayoutView;
 use Vanilla\Forum\Layout\Middleware\CategoryFilterMiddleware;
 use Vanilla\Forum\Models\CategoryCollectionProvider;
+use Vanilla\Forum\Models\CategorySiteMetaExtra;
 use Vanilla\Forum\Models\DiscussionCollectionProvider;
+use Vanilla\Forum\Models\ForumQuickLinksProvider;
+use Vanilla\Forum\Models\PostingSiteMetaExtra;
 use Vanilla\Forum\Models\Totals\CategorySiteTotalProvider;
 use Vanilla\Forum\Models\Totals\CommentSiteTotalProvider;
 use Vanilla\Forum\Models\Totals\DiscussionSiteTotalProvider;
@@ -42,7 +46,9 @@ use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\View\HomeLayoutView;
 use Vanilla\Models\CollectionModel;
+use Vanilla\Models\SiteMeta;
 use Vanilla\Models\SiteTotalService;
+use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
 
 /**
@@ -82,6 +88,11 @@ class ForumContainerRules extends AddonContainerRules
                 PATH_ROOT . "/applications/vanilla/Layout/Definitions/discussionList.json",
             ]);
 
+        // Quick links
+        $container
+            ->rule(QuickLinksVariableProvider::class)
+            ->addCall("addQuickLinkProvider", [new Reference(ForumQuickLinksProvider::class)]);
+
         $container
             ->rule(SiteTotalService::class)
             ->addCall("registerProvider", [new Reference(CategorySiteTotalProvider::class)])
@@ -110,6 +121,20 @@ class ForumContainerRules extends AddonContainerRules
             ],
             "customLayout.discussionList"
         );
+
+        PageControllerRoute::configurePageRoutes(
+            $container,
+            [
+                "/unsubscribe" => UnsubscribePageController::class,
+            ],
+            null,
+            -1
+        );
+
+        $container
+            ->rule(SiteMeta::class)
+            ->addCall("addExtra", [new Reference(PostingSiteMetaExtra::class)])
+            ->addCall("addExtra", [new Reference(CategorySiteMetaExtra::class)]);
 
         // Collections.
         $container

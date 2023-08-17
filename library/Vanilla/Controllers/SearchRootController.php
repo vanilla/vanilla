@@ -7,6 +7,7 @@
 
 namespace Vanilla\Controllers;
 
+use Vanilla\Models\ProfileFieldsPreloadProvider;
 use Vanilla\Web\PageDispatchController;
 
 /**
@@ -16,13 +17,24 @@ class SearchRootController extends PageDispatchController
 {
     const ENABLE_FLAG = "useNewSearchPage";
 
+    private ProfileFieldsPreloadProvider $profileFieldsPreloadProvider;
+
+    /**
+     * @param ProfileFieldsPreloadProvider $profileFieldsPreloadProvider
+     */
+    public function __construct(ProfileFieldsPreloadProvider $profileFieldsPreloadProvider)
+    {
+        $this->profileFieldsPreloadProvider = $profileFieldsPreloadProvider;
+    }
+
     /**
      * Serve the root search page.
      */
     public function index()
     {
-        return $this->useSimplePage(t("Search"))
-            ->blockRobots("noindex nofollow")
-            ->render();
+        $page = $this->useSimplePage(t("Search"));
+        $page->registerReduxActionProvider($this->profileFieldsPreloadProvider);
+
+        return $page->blockRobots("noindex nofollow")->render();
     }
 }

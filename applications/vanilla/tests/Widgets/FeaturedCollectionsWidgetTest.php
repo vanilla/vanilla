@@ -50,6 +50,7 @@ class FeaturedCollectionsWidgetTest extends SiteTestCase
             '$hydrate' => "react.featuredcollections",
             "title" => "Featured Collection",
             "apiParams" => $apiParams,
+            '$reactTestID' => "collection",
         ];
         $collectionController = \Gdn::getContainer()->get(CollectionsApiController::class);
         $expectedCollection = $collectionController->get_content($collection["collectionID"], "en");
@@ -61,6 +62,19 @@ class FeaturedCollectionsWidgetTest extends SiteTestCase
                 "apiParams" => $apiParams,
                 "collection" => $expectedCollection,
             ],
+            '$reactTestID' => "collection",
+            '$seoContent' => <<<HTML
+<div class=pageBox>
+    <div class=pageHeadingBox>
+        <h2>Featured Collection</h2>
+    </div>
+    <ul class=linkList>
+        <li><a href={$discussion1["url"]}>Discussion 1</a><p>Hello Discussion</p></li>
+        <li><a href={$discussion2["url"]}>Discussion 2</a><p>Hello Discussion</p></li>
+    </ul>
+</div>
+HTML
+        ,
         ];
 
         $this->assertHydratesTo($spec, [], $expected);

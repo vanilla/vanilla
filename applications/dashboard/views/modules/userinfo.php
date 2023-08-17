@@ -36,7 +36,11 @@ if (Gdn::config("Garden.Profile.ShowAbout")) {
             if (Gdn::session()->checkPermission("Garden.Moderation.Manage")) {
                 array_push($userRoles, val("Verified", $this->User) ? t("Verified") : t("Not Verified"));
             }
-            array_push($userRoles, empty($this->Roles) ? t("No Roles") : array_column($this->Roles, "Name"));
+            if (empty($this->Roles)) {
+                array_push($userRoles, t("No Roles"));
+            } else {
+                $userRoles = array_merge($userRoles, array_column($this->Roles, "Name"));
+            }
             $roleData = [
                 "key" => t("Roles"),
                 "value" => $userRoles,

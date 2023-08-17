@@ -251,7 +251,7 @@ final class LayoutHydrator
     /**
      * Validate and hydrate provided layout.
      *
-     * @param string $layoutViewType Layout Type.
+     * @param string|null $layoutViewType Layout Type.
      * @param array $params parameters to hydrate the layout.
      * @param array $layout layout data
      * @param bool $includeMeta should metadata be included?
@@ -259,7 +259,7 @@ final class LayoutHydrator
      * @return array returns hydrated content.
      */
     public function hydrateLayout(
-        string $layoutViewType,
+        ?string $layoutViewType,
         array $params,
         array $layout,
         ?bool $includeMeta = true
@@ -271,9 +271,12 @@ final class LayoutHydrator
 
         $hydrator = $this->getHydrator($layoutViewType, $cleanPageHead, false, $params);
         $result = $hydrator->resolve($layout, $params);
+        $seoContents = array_column($result["layout"] ?? [], '$seoContent');
+        $seoContent = implode("", $seoContents);
         if ($includeMeta) {
             // Apply pageHead meta
             $result["seo"] = [
+                "htmlContents" => $seoContent,
                 "title" => $cleanPageHead->getSeoTitle(),
                 "description" => $cleanPageHead->getSeoDescription(),
                 "meta" => $cleanPageHead->getMetaTags(),
@@ -357,7 +360,7 @@ final class LayoutHydrator
         $resolvers = array_filter([$this->commonLayout, $layoutView]);
         $resolvedParams = $inputParams;
         foreach ($resolvers as $resolver) {
-            $resolvedParams = $resolver->resolveParams($resolvedParams, $pageHead);
+            $resolvedParams = $resolver->resolveParams($resolvedParams, $pageHead) + $resolvedParams;
         }
         $resolvedParams = $resolvedParamSchema->validate($resolvedParams);
 

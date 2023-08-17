@@ -55,6 +55,7 @@ interface IProps {
     forceVisibility?: boolean; // For storybook, as it will disable closing the search
     scope?: ISearchScopeNoCompact;
     forceMenuOpen?: boolean; // For storybook, will force nested menu open
+    onlyLogo?: boolean; // display only the logo
 }
 
 /**
@@ -136,69 +137,10 @@ export default function TitleBar(_props: IProps) {
                 >
                     <div className={classes.titleBarContainer}>
                         <div className={classNames(classes.bar, { isHome: showSubNav })}>
-                            {isCompact &&
-                                (props.useMobileBackButton ? (
-                                    <BackLink
-                                        hideIfNoHistory={true}
-                                        className={classes.leftFlexBasis}
-                                        linkClassName={classes.button}
-                                    />
-                                ) : (
-                                    <FlexSpacer className="pageHeading-leftSpacer" />
-                                ))}
-                            {!isCompact && (isDesktopLogoCentered ? !isSearchOpen : true) && (
-                                <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
-                                    <span
-                                        className={classNames("logoAlignment", {
-                                            [classes.logoCenterer]: isDesktopLogoCentered,
-                                            [classes.logoLeftAligned]: !isDesktopLogoCentered,
-                                        })}
-                                    >
-                                        <>
-                                            <SkipNavLink className={classes.skipNav}>
-                                                {t("Skip to content")}
-                                            </SkipNavLink>
-
-                                            <HeaderLogo
-                                                className={classNames("titleBar-logoContainer", classes.logoContainer)}
-                                                logoClassName="titleBar-logo"
-                                                logoType={LogoType.DESKTOP}
-                                                overwriteLogo={props.overwriteLogo}
-                                            />
-                                        </>
-                                    </span>
-                                </animated.div>
-                            )}
-                            {!isCompact && !isDesktopLogoCentered && (
-                                <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }} />
-                            )}
-                            {!isSearchOpen && !isCompact && (
-                                <TitleBarNav
-                                    isCentered={vars.navAlignment.alignment === "center"}
-                                    containerRef={
-                                        vars.navAlignment.alignment === "center" && !isDesktopLogoCentered
-                                            ? collisionSourceRef
-                                            : undefined
-                                    }
-                                    className={classes.nav}
-                                    linkClassName={classes.topElement}
-                                    afterNode={
-                                        !isCompact &&
-                                        isDesktopLogoCentered && (
-                                            <div ref={hBoundary2Ref} style={{ width: 1, height: 20 }} />
-                                        )
-                                    }
-                                />
-                            )}
-                            {isCompact && (
+                            {props.onlyLogo ? (
                                 <>
-                                    {!isSearchOpen && (
+                                    {isCompact ? (
                                         <>
-                                            <Hamburger
-                                                className={classes.hamburger}
-                                                extraNavTop={props.extraBurgerNavigation}
-                                                showCloseIcon={false}
-                                            />
                                             {isMobileLogoCentered && <FlexSpacer actualSpacer />}
                                             <div
                                                 className={classNames(
@@ -216,69 +158,190 @@ export default function TitleBar(_props: IProps) {
                                                 </animated.span>
                                             </div>
                                         </>
+                                    ) : (
+                                        <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
+                                            <span
+                                                className={classNames("logoAlignment", {
+                                                    [classes.logoCenterer]: isDesktopLogoCentered,
+                                                    [classes.logoLeftAligned]: !isDesktopLogoCentered,
+                                                })}
+                                            >
+                                                <>
+                                                    <SkipNavLink className={classes.skipNav}>
+                                                        {t("Skip to content")}
+                                                    </SkipNavLink>
+
+                                                    <HeaderLogo
+                                                        className={classNames(
+                                                            "titleBar-logoContainer",
+                                                            classes.logoContainer,
+                                                        )}
+                                                        logoClassName="titleBar-logo"
+                                                        logoType={LogoType.DESKTOP}
+                                                        overwriteLogo={props.overwriteLogo}
+                                                    />
+                                                </>
+                                            </span>
+                                        </animated.div>
                                     )}
                                 </>
-                            )}
-                            {!isCompact && !isDesktopLogoCentered && (
-                                <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }} />
-                            )}
-                            <ConditionalWrap className={classes.rightFlexBasis} condition={!!showMobileDropDown}>
-                                {!isSearchOpen && (
-                                    <div className={classes.extraMeBoxIcons}>
-                                        {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
-                                            return <ComponentName key={index} />;
-                                        })}
-                                    </div>
-                                )}
-                                <CompactSearch
-                                    className={classNames(classes.compactSearch, {
-                                        isCentered: isSearchOpen,
-                                    })}
-                                    focusOnMount
-                                    placeholder={t("Search")}
-                                    open={isSearchOpen}
-                                    onSearchButtonClick={() => {
-                                        SearchPageRoute.preload();
-                                        setIsSearchOpen(true);
-                                    }}
-                                    onCloseSearch={() => {
-                                        setIsSearchOpen(props.forceVisibility); // will be false if not used
-                                    }}
-                                    cancelButtonClassName={classNames(
-                                        classes.topElement,
-                                        classes.searchCancel,
-                                        titleBarNavClasses().link,
+                            ) : (
+                                <>
+                                    {isCompact &&
+                                        (props.useMobileBackButton ? (
+                                            <BackLink
+                                                hideIfNoHistory={true}
+                                                className={classes.leftFlexBasis}
+                                                linkClassName={classes.button}
+                                            />
+                                        ) : (
+                                            <FlexSpacer className="pageHeading-leftSpacer" />
+                                        ))}
+                                    {!isCompact && (isDesktopLogoCentered ? !isSearchOpen : true) && (
+                                        <animated.div className={classNames(classes.logoAnimationWrap)} {...logoProps}>
+                                            <span
+                                                className={classNames("logoAlignment", {
+                                                    [classes.logoCenterer]: isDesktopLogoCentered,
+                                                    [classes.logoLeftAligned]: !isDesktopLogoCentered,
+                                                })}
+                                            >
+                                                <>
+                                                    <SkipNavLink className={classes.skipNav}>
+                                                        {t("Skip to content")}
+                                                    </SkipNavLink>
+
+                                                    <HeaderLogo
+                                                        className={classNames(
+                                                            "titleBar-logoContainer",
+                                                            classes.logoContainer,
+                                                        )}
+                                                        logoClassName="titleBar-logo"
+                                                        logoType={LogoType.DESKTOP}
+                                                        overwriteLogo={props.overwriteLogo}
+                                                    />
+                                                </>
+                                            </span>
+                                        </animated.div>
                                     )}
-                                    cancelContentClassName="meBox-buttonContent"
-                                    buttonClass={classNames(classes.button, {
-                                        [classes.buttonOffset]: !isCompact && isGuest,
-                                    })}
-                                    showingSuggestions={isShowingSuggestions}
-                                    onOpenSuggestions={() => setIsShowingSuggestions(true)}
-                                    onCloseSuggestions={() => setIsShowingSuggestions(false)}
-                                    buttonContentClassName={classNames(
-                                        classesMeBox.buttonContent,
-                                        "meBox-buttonContent",
+                                    {!isCompact && !isDesktopLogoCentered && (
+                                        <div ref={hBoundary1Ref} style={{ width: 1, height: 1 }} />
                                     )}
-                                    clearButtonClass={classes.clearButtonClass}
-                                    scope={
-                                        props.scope
-                                            ? {
-                                                  ...props.scope,
-                                              }
-                                            : undefined
-                                    }
-                                    searchCloseOverwrites={{
-                                        source: "fromTitleBar",
-                                        ...vars.stateColors,
-                                    }}
-                                    overwriteSearchBar={{
-                                        compact: isCompact,
-                                    }}
-                                    withLabel={meboxVars.withLabel}
-                                />
-                                {meBox}
-                            </ConditionalWrap>
+                                    {!isSearchOpen && !isCompact && (
+                                        <TitleBarNav
+                                            forceOpen={props.forceMenuOpen}
+                                            isCentered={vars.navAlignment.alignment === "center"}
+                                            containerRef={
+                                                vars.navAlignment.alignment === "center" && !isDesktopLogoCentered
+                                                    ? collisionSourceRef
+                                                    : undefined
+                                            }
+                                            className={classes.nav}
+                                            linkClassName={classes.topElement}
+                                            afterNode={
+                                                !isCompact &&
+                                                isDesktopLogoCentered && (
+                                                    <div ref={hBoundary2Ref} style={{ width: 1, height: 20 }} />
+                                                )
+                                            }
+                                        />
+                                    )}
+                                    {isCompact && (
+                                        <>
+                                            {!isSearchOpen && (
+                                                <>
+                                                    <Hamburger
+                                                        className={classes.hamburger}
+                                                        extraNavTop={props.extraBurgerNavigation}
+                                                        showCloseIcon={false}
+                                                    />
+                                                    {isMobileLogoCentered && <FlexSpacer actualSpacer />}
+                                                    <div
+                                                        className={classNames(
+                                                            isMobileLogoCentered && classes.logoCenterer,
+                                                            logoClasses.mobileLogo,
+                                                        )}
+                                                    >
+                                                        <animated.span
+                                                            className={classes.logoAnimationWrap}
+                                                            {...logoProps}
+                                                        >
+                                                            <HeaderLogo
+                                                                className={classes.logoContainer}
+                                                                logoClassName="titleBar-logo"
+                                                                logoType={LogoType.MOBILE}
+                                                                overwriteLogo={props.overwriteLogo}
+                                                            />
+                                                        </animated.span>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </>
+                                    )}
+                                    {!isCompact && !isDesktopLogoCentered && (
+                                        <div ref={hBoundary2Ref} style={{ width: 1, height: 1 }} />
+                                    )}
+                                    <ConditionalWrap
+                                        className={classes.rightFlexBasis}
+                                        condition={!!showMobileDropDown}
+                                    >
+                                        {!isSearchOpen && (
+                                            <div className={classes.extraMeBoxIcons}>
+                                                {TitleBar.extraMeBoxComponents.map((ComponentName, index) => {
+                                                    return <ComponentName key={index} />;
+                                                })}
+                                            </div>
+                                        )}
+                                        <CompactSearch
+                                            className={classNames(classes.compactSearch, {
+                                                isCentered: isSearchOpen,
+                                            })}
+                                            focusOnMount
+                                            placeholder={t("Search")}
+                                            open={isSearchOpen}
+                                            onSearchButtonClick={() => {
+                                                SearchPageRoute.preload();
+                                                setIsSearchOpen(true);
+                                            }}
+                                            onCloseSearch={() => {
+                                                setIsSearchOpen(props.forceVisibility); // will be false if not used
+                                            }}
+                                            cancelButtonClassName={classNames(
+                                                classes.topElement,
+                                                classes.searchCancel,
+                                                titleBarNavClasses().link,
+                                            )}
+                                            cancelContentClassName="meBox-buttonContent"
+                                            buttonClass={classNames(classes.button, {
+                                                [classes.buttonOffset]: !isCompact && isGuest,
+                                            })}
+                                            showingSuggestions={isShowingSuggestions}
+                                            onOpenSuggestions={() => setIsShowingSuggestions(true)}
+                                            onCloseSuggestions={() => setIsShowingSuggestions(false)}
+                                            buttonContentClassName={classNames(
+                                                classesMeBox.buttonContent,
+                                                "meBox-buttonContent",
+                                            )}
+                                            clearButtonClass={classes.clearButtonClass}
+                                            scope={
+                                                props.scope
+                                                    ? {
+                                                          ...props.scope,
+                                                      }
+                                                    : undefined
+                                            }
+                                            searchCloseOverwrites={{
+                                                source: "fromTitleBar",
+                                                ...vars.stateColors,
+                                            }}
+                                            overwriteSearchBar={{
+                                                compact: isCompact,
+                                            }}
+                                            withLabel={meboxVars.withLabel}
+                                        />
+                                        {meBox}
+                                    </ConditionalWrap>
+                                </>
+                            )}
                         </div>
                     </div>
                 </Container>

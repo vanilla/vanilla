@@ -22,14 +22,14 @@ use Vanilla\Utility\ModelUtils;
 class UserEvent extends ResourceEvent implements LoggableEventInterface
 {
     /**
-     * The users API needs expand all to be applied so certain fields work correctly.
+     * The users API needs expand=all to be applied so certain fields work correctly.
      *
-     * @return array
+     * @return array|null
      */
     public function getApiParams(): ?array
     {
         return [
-            "expand" => [ModelUtils::EXPAND_CRAWL, ModelUtils::EXPAND_ALL],
+            "expand" => implode(",", [ModelUtils::EXPAND_CRAWL, ModelUtils::EXPAND_ALL]),
         ];
     }
 

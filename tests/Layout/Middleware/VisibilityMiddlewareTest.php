@@ -77,7 +77,6 @@ class VisibilityMiddlewareTest extends BootstrapTestCase
             "notReact" => "No middleware here",
         ];
 
-        $output = $hydrator->getHydrator(null)->resolve($input);
-        $this->assertSame($expected, $output);
+        $this->assertHydratesTo($input, [], $expected);
     }
 }

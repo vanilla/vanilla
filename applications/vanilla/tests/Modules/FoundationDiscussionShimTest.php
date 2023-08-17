@@ -1,13 +1,12 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Forum\Modules;
 
-use PHPUnit\Framework\Error\Notice;
 use Vanilla\Forum\Modules\FoundationDiscussionsShim;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
@@ -50,10 +49,9 @@ class FoundationDiscussionShimTest extends SiteTestCase
         $currentUserFragment = [
             "userID" => 2,
             "name" => "circleci",
-            "url" => "http://vanilla.test/foundationdiscussionshimtest/profile/circleci",
-            "photoUrl" => "http://vanilla.test/foundationdiscussionshimtest" . \UserModel::PATH_DEFAULT_AVATAR,
+            "url" => "https://vanilla.test/foundationdiscussionshimtest/profile/circleci",
+            "photoUrl" => "https://vanilla.test/foundationdiscussionshimtest" . \UserModel::PATH_DEFAULT_AVATAR,
             "banned" => 0,
-            "punished" => 0,
             "private" => false,
         ];
 
@@ -78,8 +76,8 @@ class FoundationDiscussionShimTest extends SiteTestCase
                 "countViews" => 1,
                 "score" => null,
                 "hot" => 0,
-                "url" => "http://vanilla.test/foundationdiscussionshimtest/discussion/$id/hello-name",
-                "canonicalUrl" => "http://vanilla.test/foundationdiscussionshimtest/discussion/$id/hello-name",
+                "url" => "https://vanilla.test/foundationdiscussionshimtest/discussion/$id/hello-name",
+                "canonicalUrl" => "https://vanilla.test/foundationdiscussionshimtest/discussion/$id/hello-name",
                 "format" => "text",
                 "statusID" => 0,
                 "bookmarked" => false,
@@ -87,7 +85,7 @@ class FoundationDiscussionShimTest extends SiteTestCase
                 "category" => [
                     "categoryID" => -1,
                     "name" => "FoundationDiscussionShimTest",
-                    "url" => "http://vanilla.test/foundationdiscussionshimtest/categories",
+                    "url" => "https://vanilla.test/foundationdiscussionshimtest/categories",
                     "allowedDiscussionTypes" => [],
                 ],
                 "tags" => [],
@@ -129,11 +127,8 @@ class FoundationDiscussionShimTest extends SiteTestCase
 
         /** @var FoundationDiscussionsShim $shim */
         $shim = self::container()->get(FoundationDiscussionsShim::class);
-
-        $this->runWithExpectedException(Notice::class, function () use ($legacyItems, $shim) {
-            $actual = $shim->convertLegacyData($legacyItems);
-            $this->assertCount(1, $actual);
-        });
+        $actual = $shim->convertLegacyData($legacyItems);
+        $this->assertCount(1, $actual);
     }
 
     /**

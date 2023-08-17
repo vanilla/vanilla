@@ -10,6 +10,8 @@
  * @since 2.0
  */
 
+use Vanilla\ImageResizer;
+
 /**
  * Handles image uploads
  */
@@ -181,7 +183,7 @@ class Gdn_UploadImage extends Gdn_Upload
         }
 
         if (!$outputType) {
-            $outputTypes = [1 => "gif", 2 => "jpeg", 3 => "png", 17 => "ico"];
+            $outputTypes = [1 => "gif", 2 => "jpeg", 3 => "png"];
             $outputType = val($type, $outputTypes, "jpg");
         } elseif ($type == 17 && $outputType != "ico") {
             // Icons cannot be converted
@@ -325,8 +327,6 @@ class Gdn_UploadImage extends Gdn_Upload
                 imagegif($targetImage, $targetPath);
             } elseif ($outputType == "png") {
                 imagepng($targetImage, $targetPath, Gdn_UploadImage::PNG_COMPRESSION);
-            } elseif ($outputType == "ico") {
-                self::imageIco($targetImage, $targetPath);
             } else {
                 imagejpeg($targetImage, $targetPath, $imageQuality);
             }
@@ -347,21 +347,5 @@ class Gdn_UploadImage extends Gdn_Upload
         $sender->Returns = [];
         Gdn::pluginManager()->callEventHandlers($sender, "Gdn_Upload", "SaveAs");
         return $sender->EventArguments["Parsed"];
-    }
-
-    /**
-     *
-     *
-     * @param $GD
-     * @param $TargetPath
-     */
-    public static function imageIco($gd, $targetPath)
-    {
-        $imagePath = tempnam(sys_get_temp_dir(), "iconify");
-        imagepng($gd, $imagePath);
-
-        $icoLib = new PHP_ICO($imagePath, [[48, 48]]);
-        $icoLib->save_ico($targetPath);
-        unlink($imagePath);
     }
 }

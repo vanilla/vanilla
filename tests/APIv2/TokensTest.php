@@ -230,4 +230,43 @@ class TokensTest extends AbstractAPIv2Test
         $r = $this->api()->get($this->baseUrl);
         $this->assertEquals(CacheControlConstantsInterface::NO_CACHE, $r->getHeader("cache-control"));
     }
+
+    /**
+     * Test that the System user get an error when calling [GET] `/api/v2/access-tokens`
+     *
+     * @return void
+     */
+    public function testSystemGetExpectFail(): void
+    {
+        $this->expectException(ForbiddenException::class);
+        $this->runWithUser(function () {
+            $this->api()->get("/tokens");
+        }, $this->userModel->getSystemUserID());
+    }
+
+    /**
+     * Test that the System user get an error when calling [POST] `/api/v2/access-tokens`
+     *
+     * @return void
+     */
+    public function testSystemPostExpectFail(): void
+    {
+        $this->expectException(ForbiddenException::class);
+        $this->runWithUser(function () {
+            $this->api()->post("/tokens", ["name" => __FUNCTION__]);
+        }, $this->userModel->getSystemUserID());
+    }
+
+    /**
+     * Test that the System user get can't reach the `/profile/tokens` page.
+     *
+     * @return void
+     */
+    public function testSystemProfileTokenPageExpectFail(): void
+    {
+        $this->expectException(ForbiddenException::class);
+        $this->runWithUser(function () {
+            $this->bessy()->get("/profile/tokens");
+        }, $this->userModel->getSystemUserID());
+    }
 }

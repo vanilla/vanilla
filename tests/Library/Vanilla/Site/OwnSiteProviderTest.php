@@ -47,7 +47,7 @@ class OwnSiteProviderTest extends AbstractAPIv2Test
 
         $crumbs = $ownSite->toBreadcrumbs();
         $this->assertEquals(
-            [new Breadcrumb("Hello Title", "http://vanilla.test/" . static::getBootstrapFolderName())],
+            [new Breadcrumb("Hello Title", "https://vanilla.test/" . static::getBootstrapFolderName())],
             $crumbs
         );
 

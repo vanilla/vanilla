@@ -8,15 +8,21 @@
 namespace Vanilla\Forum\Layout\View;
 
 use Garden\Schema\Schema;
+use Vanilla\Forum\Controllers\Api\DiscussionsApiIndexSchema;
 use Vanilla\Forum\Widgets\DiscussionListAsset;
+use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Layout\View\AbstractCustomLayoutView;
 use Vanilla\Layout\View\LegacyLayoutViewInterface;
+use Vanilla\Web\PageHeadInterface;
+use Vanilla\Formatting\Formats\HtmlFormat;
 
 /**
  * Legacy view type for discussion list
  */
 class DiscussionListLayoutView extends AbstractCustomLayoutView implements LegacyLayoutViewInterface
 {
+    use HydrateAwareTrait;
+
     /**
      * Constructor.
      */
@@ -62,11 +68,35 @@ class DiscussionListLayoutView extends AbstractCustomLayoutView implements Legac
      */
     public function getParamInputSchema(): Schema
     {
-        return Schema::parse([
-            "type:s?" => [
-                "enum" => \DiscussionModel::apiDiscussionTypes(),
-            ],
-            "status:s?",
-        ]);
+        return self::paramInputSchema();
+    }
+
+    /**
+     * Statically expose input schema.
+     *
+     * @return Schema
+     */
+    public static function paramInputSchema(): Schema
+    {
+        $mainSchema = new DiscussionsApiIndexSchema(30);
+        $schema = Schema::parse([
+            "type?",
+            "sort?",
+            "followed?",
+            "page?",
+            "tagID?",
+            "internalStatusID?",
+            "statusID?",
+        ])->add($mainSchema->withNoDefaults());
+        return $schema;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
+    {
+        $resolvedParams = parent::resolveParams($paramInput, $pageHead);
+        return $resolvedParams;
     }
 }

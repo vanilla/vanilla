@@ -35,7 +35,7 @@ export const textInputSizingFromSpacing = (fontSize: number, paddingTop: number,
 };
 
 export const getVerticalPaddingForTextInput = (height: number, fontSize: number, fullBorderWidth: number) => {
-    return (height - fullBorderWidth - fontSize * 1.5) / 2;
+    return (height - fullBorderWidth - 24) / 2;
 };
 
 export const getHorizontalPaddingForTextInput = (height: number, fontSize: number, fullBorderWidth: number) => {

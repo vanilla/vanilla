@@ -31,7 +31,7 @@ export function UserLabel(props: IUserLabel) {
     const { user, date, dateLink, displayOptions = {}, category, compact = false, fixLineHeight = false } = props;
     const { showRole = true, showCategory = false } = displayOptions;
 
-    const userUrl = makeProfileUrl(user.name);
+    const userUrl = makeProfileUrl(user.userID, user.name);
     const classes = userLabelClasses();
     const classesMeta = metasClasses();
 

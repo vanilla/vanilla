@@ -2,7 +2,7 @@
 /**
  * UI functions
  *
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
@@ -774,6 +774,7 @@ if (!function_exists("discussionFilters")) {
                 "name" => t("Following"),
                 "param" => "followed",
                 "extra" => ["save" => 1, "TransientKey" => $transientKey],
+                "value" => Gdn::request()->get("followed") == "true" ? true : 1,
             ],
         ];
 
@@ -900,7 +901,7 @@ if (!function_exists("filtersDropDown")) {
             ]);
 
             // Generate the markup for the drop down menu.
-            $output .= linkDropDown($links, "selectBox-following " . trim($extraClasses), t($label) . ": ");
+            $output .= linkDropDown($links, t($label) . ": ", "selectBox-following " . trim($extraClasses));
         }
 
         if (Gdn::themeFeatures()->useDataDrivenTheme()) {
@@ -1052,11 +1053,14 @@ if (!function_exists("hasEditProfile")) {
 
         $result = checkPermission("Garden.Profiles.Edit") && c("Garden.UserAccount.AllowEdit");
 
-        $result =
-            $result &&
-            (c("Garden.Profile.Titles") ||
-                c("Garden.Profile.Locations", false) ||
-                c("Garden.Registration.Method") != "Connect");
+        //we don't need legacy dependencies if the new CustomProfileFields feature is enabled
+        if (!Gdn::config("Feature.CustomProfileFields.Enabled")) {
+            $result =
+                $result &&
+                (c("Garden.Profile.Titles") ||
+                    c("Garden.Profile.Locations", false) ||
+                    c("Garden.Registration.Method") != "Connect");
+        }
 
         return $result;
     }
@@ -1181,11 +1185,12 @@ if (!function_exists("linkDropDown")) {
      *     ** 'url': string: The url for the link
      *     ** 'name': string: The text for the link
      *     ** 'active': boolean: is it the current page
+     *
+     * @param string $label the label of the dropdown
      * @param string $extraClasses any extra classes you add to the drop down
-     * @param string $label the label of the drop down
      *
      */
-    function linkDropDown($links, $extraClasses = "", $label)
+    function linkDropDown($links, $label, $extraClasses = "")
     {
         $output = "";
         $selectedKey = 0;
@@ -1571,7 +1576,7 @@ if (!function_exists("userPhoto")) {
             $profileHref = url(userUrl($fullUser));
         } else {
             $fullUser = [];
-            $profileHref = "/renderfunctionstest/profile/";
+            $profileHref = url("/profile", true);
         }
         $href = val("NoLink", $options) ? "" : ' href="' . $profileHref . '"';
         $userCssClass = val("_CssClass", $fullUser);
@@ -1656,10 +1661,12 @@ if (!function_exists("userUrl")) {
     {
         static $nameUnique = null;
         if ($nameUnique === null) {
-            $nameUnique = c("Garden.Registration.NameUnique");
+            $nameUnique = c("Garden.Registration.NameUnique", true);
         }
 
-        $userName = val($px . "Name", $user);
+        $userName = val($px . "Name", $user, val($px . "name", $user));
+        $userNameIsNumeric = is_numeric($userName);
+
         // Make sure that the name will not be split if the p parameter is set.
         // Prevent p=/profile/a&b to be translated to $_GET['p'=>'/profile/a?', 'b'=>'']
         $userName = str_replace(["/", "&"], ["%2f", "%26"], $userName);
@@ -1667,12 +1674,15 @@ if (!function_exists("userUrl")) {
         $result =
             "/profile/" .
             ($method ? trim($method, "/") . "/" : "") .
-            ($nameUnique ? "" : val($px . "UserID", $user, 0) . "/") .
+            ($nameUnique && !$userNameIsNumeric
+                ? ""
+                : val($px . "UserID", $user, val($px . "userID", $user, 0)) . "/") .
             rawurlencode($userName);
 
         if (!empty($get)) {
             $result .= "?" . http_build_query($get);
         }
+        $result = url($result, true);
 
         return $result;
     }
@@ -1682,12 +1692,12 @@ if (!function_exists("wrap")) {
     /**
      * Wrap the provided string in the specified tag.
      *
-     * @example wrap('This is bold!', 'b');
-     *
      * @param $string
      * @param string $tag
      * @param string $attributes
      * @return string
+     * @example wrap('This is bold!', 'b');
+     *
      */
     function wrap($string, $tag = "span", $attributes = "")
     {

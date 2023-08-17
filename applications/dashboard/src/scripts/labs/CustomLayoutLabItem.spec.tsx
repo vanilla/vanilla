@@ -5,14 +5,12 @@
  */
 
 import React from "react";
-import { CustomLayoutLabItem } from "@dashboard/labs/CustomLayoutLabItem";
-import { render, screen } from "@testing-library/react";
+import { CustomLayoutLabItem, configKeys } from "@dashboard/labs/CustomLayoutLabItem";
+import { render } from "@testing-library/react";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { LoadStatus } from "@library/@types/api/core";
 import "@testing-library/jest-dom/extend-expect";
-/**
- *
- */
+import { stableObjectHash } from "@vanilla/utils";
 
 describe("Custom Layout Lab Item", () => {
     it("Checkbox is disabled while loading", () => {
@@ -21,9 +19,12 @@ describe("Custom Layout Lab Item", () => {
                 state={{
                     config: {
                         configsByLookupKey: {
-                            // StableObjectHash
-                            [-26466324173]: {
+                            [stableObjectHash(configKeys)]: {
                                 status: LoadStatus.LOADING,
+                            },
+                            [stableObjectHash(["labs.*"])]: {
+                                status: LoadStatus.SUCCESS,
+                                data: {},
                             },
                         },
                     },
@@ -41,14 +42,17 @@ describe("Custom Layout Lab Item", () => {
                 state={{
                     config: {
                         configsByLookupKey: {
-                            // StableObjectHash
-                            [-26466324173]: {
+                            [stableObjectHash(configKeys)]: {
                                 status: LoadStatus.SUCCESS,
                                 data: {
                                     "customLayout.categoryList": false,
                                     "customLayout.discussionList": false,
                                     "customLayout.home": true,
                                 },
+                            },
+                            [stableObjectHash(["labs.*"])]: {
+                                status: LoadStatus.SUCCESS,
+                                data: {},
                             },
                         },
                     },
@@ -66,13 +70,16 @@ describe("Custom Layout Lab Item", () => {
                 state={{
                     config: {
                         configsByLookupKey: {
-                            // StableObjectHash
-                            [-26466324173]: {
+                            [stableObjectHash(configKeys)]: {
                                 status: LoadStatus.SUCCESS,
                                 data: {
                                     "customLayout.categoryList": false,
                                     "customLayout.discussionList": false,
                                     "customLayout.home": false,
+                                },
+                                [stableObjectHash(["labs.*"])]: {
+                                    status: LoadStatus.SUCCESS,
+                                    data: {},
                                 },
                             },
                         },

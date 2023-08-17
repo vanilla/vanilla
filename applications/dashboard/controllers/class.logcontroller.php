@@ -177,25 +177,27 @@ class LogController extends DashboardController
         $this->setData("Title", t("Change Log"));
         $this->setData("_flaggedByTitle", t("Updated By"));
 
-        $operations = ["Edit", "Delete", "Ban"];
+        $operations = ["Edit", "Delete", "Ban", "Spoof"];
         if ($op && in_array(ucfirst($op), $operations)) {
             $operations = ucfirst($op);
         }
 
         $where = [
-            "Operation" => $operations, //,
-            //          'RecordType' => array('Discussion', 'Comment', 'Activity')
+            "Operation" => $operations,
         ];
 
         $allowedTypes = ["Discussion", "Comment", "Activity", "User"];
 
-        $type = strtolower($type);
-        if ($type == "configuration") {
-            $this->permission("Garden.Settings.Manage");
-            $where["RecordType"] = ["Configuration"];
+        if (Gdn::session()->checkPermission("site.manage")) {
+            $allowedTypes[] = "Configuration";
+        }
+        $type = ucfirst(strtolower($type));
+        if (in_array($type, ["Configuration", "Spoof"])) {
+            $this->permission("site.manage");
+            $where["RecordType"] = $type;
         } else {
-            if (in_array(ucfirst($type), $allowedTypes)) {
-                $where["RecordType"] = ucfirst($type);
+            if (in_array($type, $allowedTypes)) {
+                $where["RecordType"] = $type;
             } else {
                 $where["RecordType"] = $allowedTypes;
             }

@@ -50,7 +50,7 @@ class DBAModel extends Gdn_Model
     {
         $modelName = $table . "Model";
         if (class_exists($modelName)) {
-            return new $modelName();
+            return Gdn::getContainer()->get($modelName);
         } else {
             return new Gdn_Model($table);
         }

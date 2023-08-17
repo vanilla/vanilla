@@ -9,6 +9,7 @@ namespace Vanilla\Web;
 
 use Twig\Loader\LoaderInterface;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Utility\DebugUtils;
 
 /**
  * Class for rendering twig views.
@@ -25,7 +26,7 @@ class TwigRenderer extends \Twig\Environment
     {
         $loader = new \Twig\Loader\FilesystemLoader(PATH_ROOT);
 
-        $isDebug = $configuration->get("Debug") === true;
+        $isDebug = DebugUtils::isTestMode() || DebugUtils::isDebug();
         $envArgs = [
             "cache" => $enhancer->getCompileCacheDirectory() ?? false, // Null not allowed. Only false or string.
             "debug" => $isDebug,

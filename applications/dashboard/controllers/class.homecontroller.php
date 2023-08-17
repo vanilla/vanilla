@@ -125,38 +125,6 @@ class HomeController extends Gdn_Controller
     }
 
     /**
-     * Present the user with a confirmation page that they are leaving the site.
-     *
-     * @param string $target
-     * @param bool $allowTrusted
-     *
-     * @throws Gdn_UserException Throw an exception if the domain is invalid.
-     */
-    public function leaving($target = "", $allowTrusted = false)
-    {
-        $target = str_replace("\xE2\x80\xAE", "", $target);
-
-        $canAutoRedirect = $allowTrusted && $this->canAutoRedirect($target);
-        if ($canAutoRedirect) {
-            redirectTo($target, 302, false);
-        }
-
-        try {
-            $target = UrlUtils::domainAsAscii($target);
-        } catch (Exception $e) {
-            throw new Gdn_UserException(t("Url is invalid."));
-        }
-
-        $this->setData("Target", anchor(htmlspecialchars($target), $target, "", ["rel" => "nofollow"]));
-        $this->title(t("Leaving"));
-        $this->removeCssFile("admin.css");
-        $this->addCssFile("style.css");
-        $this->addCssFile("vanillicon.css", "static");
-        $this->MasterView = "default";
-        $this->render();
-    }
-
-    /**
      * Display 'site down for maintenance' page.
      *
      * @since 2.0.0

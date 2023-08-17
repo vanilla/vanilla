@@ -94,7 +94,7 @@ registerLoadableWidgets({
     UserSpotlightWidget: () =>
         import(/* webpackChunkName: "widgets/UserSpotlightWidget" */ "@library/userSpotlight/UserSpotlightWidget"),
     SiteTotalsWidget: () =>
-        import(/* webpackChunkName: "widgets/SiteTotalsWidget" */ "@library/siteTotalsWidget/SiteTotalsWidget"),
+        import(/* webpackChunkName: "widgets/SiteTotalsWidget" */ "@library/siteTotals/SiteTotalsWidget"),
     NewPostMenu: () => import(/* webpackChunkName: "widgets/NewPostMenu" */ "@library/newPostMenu/NewPostMenu"),
     LeaderboardWidget: () =>
         import(/* webpackChunkName: "widgets/LeaderboardWidget" */ "@library/leaderboardWidget/LeaderboardWidget"),

@@ -13,6 +13,7 @@ import { notEmpty } from "@vanilla/utils";
 import { IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
 import { AutoCompleteContext } from "./AutoCompleteContext";
 import { useApiContext } from "../../ApiContext";
+import { useIsMounted } from "@vanilla/react-utils";
 
 export interface ILookupApi {
     searchUrl: string;
@@ -85,10 +86,27 @@ function useApiLookup(
     currentInputValue: string | number | Array<string | number>,
     initialValue: any,
 ): [IAutoCompleteOption[] | null, IAutoCompleteOption[] | null] {
-    const [options, setOptions] = useState<IAutoCompleteOption[] | null>(null);
-    const [initialOptionsOrOption, setInitialOptionsOrOption] = useState<
+    const isMounted = useIsMounted();
+
+    const [options, _setOptions] = useState<IAutoCompleteOption[] | null>(null);
+    const [initialOptionsOrOption, _setInitialOptionsOrOption] = useState<
         IAutoCompleteOption | IAutoCompleteOption[] | null
     >(null);
+
+    function setOptions(opts: typeof options) {
+        if (!isMounted()) {
+            return;
+        }
+        _setOptions(opts);
+    }
+
+    function setInitialOptionsOrOption(opts: typeof initialOptionsOrOption) {
+        if (!isMounted()) {
+            return;
+        }
+        _setInitialOptionsOrOption(opts);
+    }
+
     const {
         searchUrl,
         singleUrl,
@@ -127,12 +145,16 @@ function useApiLookup(
             if ([initialValue].flat().length <= 1) {
                 const actualApiUrl = singleUrl.replace("/api/v2", "").replace("%s", initialValue);
                 api.get(actualApiUrl).then((response) => {
+                    if (!isMounted()) {
+                        return;
+                    }
                     if (response.data) {
                         let options = [transformApiToOption(response.data)];
                         if (processOptions) {
                             options = processOptions(options);
                         }
                         apiCaches.set(actualApiUrl, options);
+
                         setInitialOptionsOrOption(options[0]);
                     }
                 });
@@ -148,6 +170,9 @@ function useApiLookup(
 
                 // Fetch from API
                 api.get(actualSearchUrl).then((response) => {
+                    if (!isMounted()) {
+                        return;
+                    }
                     const { data } = response;
                     const results = resultsKey === "." ? data : get(data, resultsKey, "[]");
                     let options: IAutoCompleteOption[] = results.map(transformApiToOption);
@@ -157,7 +182,6 @@ function useApiLookup(
                     apiCaches.set(actualSearchUrl, options);
                     // select the current ones from the response
                     setInitialOptionsOrOption(options.filter(({ value }) => initialValue.includes(value)));
-
                     // fixme: this may be redundant
                     setOptions(options);
                 });
@@ -177,6 +201,9 @@ function useApiLookup(
 
             // Fetch from API
             api.get(actualSearchUrl).then((response) => {
+                if (!isMounted()) {
+                    return;
+                }
                 const { data } = response;
                 const results = resultsKey === "." ? data : get(data, resultsKey, "[]");
                 let options: IAutoCompleteOption[] = results.map(transformApiToOption);
@@ -192,7 +219,9 @@ function useApiLookup(
 
     // This hook will update the available options whenever the input has changed
     useEffect(() => {
-        updateOptions(currentInputValue);
+        if (isMounted()) {
+            updateOptions(currentInputValue);
+        }
     }, [updateOptions, currentInputValue]);
 
     const currentOptionOrOptions = useMemo(() => {

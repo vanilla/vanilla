@@ -8,6 +8,7 @@
 namespace Vanilla\Analytics;
 
 use Garden\Web\Data;
+use UserMetaModel;
 use UserModel;
 
 /**
@@ -17,11 +18,17 @@ class TrackableUserModel
 {
     use TrackableDecoratorTrait;
 
+    /** Anonymize Meta */
+    const ANONYMIZE_DATA_USER_META = "AnonymizeData";
+
     /** @var UserModel */
     private $userModel;
 
     /** @var \Gdn_Session */
     private $session;
+
+    /** @var UserMetaModel  */
+    private $userMetaModel;
 
     /** @var TrackableDecoratorInterface[] */
     private $userDecorators = [];
@@ -32,9 +39,10 @@ class TrackableUserModel
      * @param UserModel $userModel
      * @param \Gdn_Session $session
      */
-    public function __construct(UserModel $userModel, \Gdn_Session $session)
+    public function __construct(UserModel $userModel, \Gdn_Session $session, UserMetaModel $userMetaModel)
     {
         $this->userModel = $userModel;
+        $this->userMetaModel = $userMetaModel;
         $this->session = $session;
     }
 
@@ -47,7 +55,7 @@ class TrackableUserModel
     }
 
     /**
-     * Retrieve information about a particular user for user in analytics.
+     * Retrieve information about a particular user for use in analytics.
      *
      * @param int $userID Record ID of the user to fetch.
      * @param  bool $isGuestCollection Will this data be used in a collection that contains guest data?
@@ -61,6 +69,8 @@ class TrackableUserModel
         $roleNames = [];
 
         if ($user) {
+            $anonymize = \Gdn::config("VanillaAnalytics.AnonymizeData");
+            $anonymizeUser = $this->userMetaModel->getUserMeta($userID, self::ANONYMIZE_DATA_USER_META, "-1");
             /**
              * Fetch the target user's roles.  If we have any (and we should), iterate through them and grab the
              * relevant attributes.
@@ -113,11 +123,19 @@ class TrackableUserModel
             // Apply decorators.
             $boxedUserData = new Data($userInfo, ["isGuestCollection" => $isGuestCollection]);
             $userInfo = $this->applyDecorators($boxedUserData, $this->userDecorators);
+            if (
+                ($anonymize && $anonymizeUser[self::ANONYMIZE_DATA_USER_META] == "-1") ||
+                $anonymizeUser[self::ANONYMIZE_DATA_USER_META] == "1"
+            ) {
+                $userInfo["name"] = "Anonymous";
+                $userInfo["userID"] = -1;
+                $userInfo["url"] = "";
+            }
             return $userInfo;
         } else {
             // Fallback user data
             return [
-                "userID" => 0,
+                "userID" => $this->userModel::NOT_FOUND_USER_ID,
                 "name" => "@notfound",
             ];
         }

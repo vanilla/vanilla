@@ -47,4 +47,4 @@ This can happen for a number of reasons. Remember this feature is activated per 
 
 **The author is not receiving follow-up notifications:**
 
--   Make sure the author has the preference "Send me a follow-up for my answered questions." (`Notification.Email.QuestionFollowUp`) enabled. If you're triggering this notification manually, the pop-up will display a message with more information.
+-   Make sure the author has the preference "Send me a follow-up for my answered questions" (`Notification.Email.QuestionFollowUp`) enabled. If you're triggering this notification manually, the pop-up will display a message with more information.

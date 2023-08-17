@@ -33,9 +33,10 @@ function TriangleTooltip(props: {
     label: React.ReactNode;
     ariaLabel?: React.ReactNode;
     customZIndex?: number;
+    customWidth?: number;
 }) {
     const globalVars = globalVariables();
-    const { children, label, ariaLabel, customZIndex } = props;
+    const { children, label, ariaLabel, customZIndex, customWidth } = props;
 
     const { zIndex } = useStackingContext();
 
@@ -46,7 +47,7 @@ function TriangleTooltip(props: {
     const { isVisible, triggerRect } = tooltip;
 
     const [hasOverflow, setHasOverflow] = useState(false);
-    const classes = toolTipClasses();
+    const classes = toolTipClasses(customWidth);
     const toolTipVars = tooltipVariables();
     const borderOffset = globalVars.border.width * 2;
 
@@ -138,14 +139,11 @@ export function ToolTip(props: {
     label: React.ReactNode;
     ariaLabel?: React.ReactNode;
     customZIndex?: number;
+    customWidth?: number;
 }) {
-    const { children, label, ariaLabel, customZIndex } = props;
+    const { children, ...rest } = props;
 
-    return (
-        <TriangleTooltip label={label} ariaLabel={ariaLabel} customZIndex={customZIndex}>
-            {children}
-        </TriangleTooltip>
-    );
+    return <TriangleTooltip {...rest}>{children}</TriangleTooltip>;
 }
 
 interface IIconProps extends React.HTMLAttributes<HTMLSpanElement> {}

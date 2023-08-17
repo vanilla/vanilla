@@ -12,7 +12,7 @@ import { IThemeFont } from "@library/theming/themeReducer";
 
 const defaultFontConfig: WebFont.Config = {
     google: {
-        families: ["Open Sans:400,400italic,600,700"],
+        families: ["Open Sans:400,400italic,600,700,700italic"],
     },
 };
 

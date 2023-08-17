@@ -43,7 +43,7 @@ export interface IActiveRecord {
  */
 export default class SiteNavNode extends React.Component<IProps> {
     public static contextType = SiteNavContext;
-    public context!: React.ContextType<typeof SiteNavContext>;
+    declare context: React.ContextType<typeof SiteNavContext>;
 
     public render() {
         const { siteNavNodeTypes } = this.props;

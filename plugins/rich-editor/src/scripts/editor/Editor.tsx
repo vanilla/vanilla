@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, PropsWithChildren } from "react";
 import { IEditorProps, EditorContext } from "@rich-editor/editor/context";
 import Quill from "quill/core";
 import { useDevice, Devices } from "@library/layout/DeviceContext";
@@ -16,8 +16,8 @@ import { EditorContentContextProvider } from "@rich-editor/editor/contentContext
  * It maintains the context for the rest of the editor pieces.
  * @see EditorContent, EditorInlineMenus, EditorParagraphMenu, etc.
  */
-export const Editor = (props: IEditorProps) => {
-    const [quill, setQuillInstance] = useState<Quill | null>(null);
+export const Editor = (props: PropsWithChildren<IEditorProps>) => {
+    const [editor, setEditorInstance] = useState<Quill | null>(null);
     const device = useDevice();
     const isMobile = device === Devices.MOBILE || device === Devices.XS;
 
@@ -26,12 +26,12 @@ export const Editor = (props: IEditorProps) => {
             value={{
                 ...props,
                 onFocus: props.onFocus,
-                quill,
-                setQuillInstance,
+                editor,
+                setEditorInstance,
                 isMobile,
             }}
         >
-            <EditorContentContextProvider quill={quill}>{props.children}</EditorContentContextProvider>
+            <EditorContentContextProvider editor={editor}>{props.children}</EditorContentContextProvider>
         </EditorContext.Provider>
     );
 };

@@ -8,13 +8,14 @@ import React, { useRef, useState } from "react";
 import titleBarNavClasses from "@library/headers/titleBarNavStyles";
 import classNames from "classnames";
 import { TitleBarNavItem } from "@library/headers/mebox/pieces/TitleBarNavItem";
-import Permission from "@library/features/users/Permission";
 import { INavigationVariableItem, navigationVariables } from "@library/headers/navigationVariables";
 import FlexSpacer from "@library/layout/FlexSpacer";
 import { IMegaMenuHandle, TitleBarMegaMenu } from "@library/headers/TitleBarMegaMenu";
 import { formatUrl, siteUrl, t } from "@library/utility/appUtils";
 import { useLocation } from "react-router";
 import { useMeasure } from "@vanilla/react-utils";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { titleBarMegaMenuVariables } from "@library/headers/TitleBarMegaMenu.styles";
 
 export interface ITitleBarNavProps {
     className?: string;
@@ -26,6 +27,8 @@ export interface ITitleBarNavProps {
     containerRef?: React.RefObject<HTMLElement | null>;
     isCentered?: boolean;
     afterNode?: React.ReactNode;
+    // For storybook.
+    forceOpen?: boolean;
 }
 
 /**
@@ -44,16 +47,25 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
 
     const active = expanded && expanded.children?.length && expanded;
 
-    const firstItemDimensions = useMeasure(firstItemRef as any);
+    const firstItemDimensions = useMeasure(firstItemRef as any, false, true);
+    const { hasPermission } = usePermissionsContext();
 
     const classes = titleBarNavClasses();
-    const dataLength = Object.keys(navigationItems).length;
     let haveActiveNavItem = false;
-    const content = navigationItems.map((item, key) => {
+    const filteredNavItems = navigationItems.filter((item) => {
         if (item.isHidden) {
-            return <React.Fragment key={key}></React.Fragment>;
+            return false;
         }
+        if (!item.permission) {
+            return true;
+        } else {
+            return hasPermission(item.permission);
+        }
+    });
 
+    const dataLength = Object.keys(filteredNavItems).length;
+
+    const content = filteredNavItems.map((item, key) => {
         function onActive(element) {
             setExpanded(item);
             setMenuItem(element);
@@ -109,7 +121,7 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
             haveActiveNavItem = true;
         }
 
-        const component = (
+        return (
             <TitleBarNavItem
                 to={item.url}
                 ref={(ref) => {
@@ -130,16 +142,6 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
                 {t(item.name)}
             </TitleBarNavItem>
         );
-
-        if (item.permission) {
-            return (
-                <Permission key={key} permission={item.permission}>
-                    {component}
-                </Permission>
-            );
-        } else {
-            return component;
-        }
     });
 
     return (
@@ -167,8 +169,8 @@ export default function TitleBarNav(props: ITitleBarNavProps) {
                 ref={megaMenuRef}
                 leftOffset={firstItemDimensions.left}
                 menuItem={menuItem}
-                expanded={expanded}
-                onClose={() => setExpanded(undefined)}
+                expanded={props.forceOpen ? filteredNavItems[0] : expanded}
+                onClose={props.forceOpen ? () => {} : () => setExpanded(undefined)}
             />
         </>
     );

@@ -1,11 +1,11 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { INavigationTreeItem } from "@library/@types/api/core";
-import { getRelativeUrl, t } from "@library/utility/appUtils";
+import { getMeta, getRelativeUrl, t } from "@library/utility/appUtils";
 import {
     BrandingPageRoute,
     LegacyLayoutsRoute,
@@ -54,6 +54,7 @@ function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigatio
     const layoutViewTypesTranslatedNames: { [key in LayoutViewType]: string } = {
         home: t("Home"),
         discussionList: t("Discussions"),
+        discussionThread: t("Discussion Thread"),
         categoryList: t("Categories"),
     };
 
@@ -116,7 +117,7 @@ function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigatio
     };
 
     if (config.data) {
-        LAYOUT_VIEW_TYPES.forEach((viewType) => {
+        LAYOUT_VIEW_TYPES.filter(filterFlaggedLayouts).forEach((viewType) => {
             if (config.data?.[LAYOUT_EDITOR_CONFIG_KEY] && config.data?.[`layoutEditor.${viewType}`]) {
                 topLevelItem.children.push(editorNav(viewType));
             } else {
@@ -125,6 +126,24 @@ function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigatio
         });
     }
     return topLevelItem;
+}
+
+function filterFlaggedLayouts(viewType: LayoutViewType) {
+    /**
+     * If a feature flag is explicitly set, we should respect it
+     */
+    const flaggedLayoutConfig = {
+        // TODO: Remove this feature flag when we ready to ship threads
+        discussionThread: getMeta("featureFlags.layoutEditor.discussionThread.Enabled", false),
+    };
+    if (flaggedLayoutConfig.hasOwnProperty(viewType) && flaggedLayoutConfig[viewType]) {
+        return viewType;
+    }
+
+    // Otherwise it should be enabled
+    if (!flaggedLayoutConfig.hasOwnProperty(viewType)) {
+        return viewType;
+    }
 }
 
 export function useAppearanceNavItems(parentID: RecordID): INavigationTreeItem[] {

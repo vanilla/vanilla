@@ -11,7 +11,7 @@ import SectionThreeColumns from "@library/layout/ThreeColumnSection";
 import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import { QuickLinks } from "@library/navigation/QuickLinks";
 import { UserSpotlightWidgetPreview } from "@library/userSpotlight/UserSpotlightWidget.preview";
-import { SiteTotalsWidgetPreview } from "@library/siteTotalsWidget/SiteTotalsWidget.preview";
+import { SiteTotalsWidgetPreview } from "@library/siteTotals/SiteTotalsWidget.preview";
 import { CategoriesWidgetPreview } from "@library/categoriesWidget/CategoriesWidget.preview";
 import { LeaderboardWidgetPreview } from "@library/leaderboardWidget/LeaderboardWidget.preview";
 import { DiscussionsWidgetPreview } from "@library/discussions/DiscussionsWidget.preview";

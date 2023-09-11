@@ -32,6 +32,10 @@ class ConversationsHooks implements Gdn_IPlugin
         $dic->rule(LayoutService::class)->addCall("addLayoutView", [
             new Reference(LegacyMessageInboxLayoutView::class),
         ]);
+
+        $dic->rule(\Vanilla\Dashboard\Models\ActivityService::class)
+            ->addCall("registerActivity", [\Activity\ConversationMessageActivity::class])
+            ->addCall("registerActivity", [\Activity\AddedToConversationActivity::class]);
     }
 
     /**

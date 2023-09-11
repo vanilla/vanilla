@@ -12,16 +12,21 @@ import classNames from "classnames";
 import React from "react";
 import { checkRadioClasses } from "./checkRadioStyles";
 import { InformationIcon } from "@library/icons/common";
+import { Icon, IconType } from "@vanilla/icons";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { Mixins } from "@library/styles/Mixins";
+import { css, cx } from "@emotion/css";
 
 interface IProps extends IOptionalComponentID {
     id?: string;
     className?: string;
     checked?: boolean;
     disabled?: boolean;
-    disabledNote?: string;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onBlur?: React.InputHTMLAttributes<HTMLInputElement>["onBlur"];
     label?: React.ReactNode;
     "aria-labelledby"?: string;
+    "aria-describedby"?: string;
     labelBold?: boolean;
     hideLabel?: boolean;
     isHorizontal?: boolean;
@@ -30,9 +35,17 @@ interface IProps extends IOptionalComponentID {
     tooltipLabel?: boolean;
     excludeFromICheck?: boolean;
     fullWidth?: boolean;
+    hugLeft?: boolean;
+
+    tooltip?: string;
+    tooltipIcon?: IconType;
+
+    name?: string;
 }
 
 export default function CheckBox(props: IProps) {
+    const ownInputID = useUniqueID("checkbox");
+    const inputID = props.id ?? ownInputID;
     const ownLabelID = useUniqueID("checkbox_label");
     const labelID = props["aria-labelledby"] ?? ownLabelID;
     const classes = checkRadioClasses();
@@ -42,9 +55,9 @@ export default function CheckBox(props: IProps) {
         fullWidth,
         labelBold = true,
         onChange,
+        onBlur,
         checked,
         disabled,
-        disabledNote,
         className,
         fakeFocus,
         excludeFromICheck,
@@ -52,6 +65,11 @@ export default function CheckBox(props: IProps) {
         tooltipLabel,
         label,
         hideLabel,
+
+        tooltip,
+        tooltipIcon = "data-information",
+
+        name,
     } = props;
 
     const icon = (
@@ -67,18 +85,29 @@ export default function CheckBox(props: IProps) {
     );
 
     return (
-        <label className={classNames(className, classes.root, { isHorizontal }, fullWidth && classes.fullWidth)}>
+        <label
+            className={classNames(
+                className,
+                classes.root,
+                { isHorizontal, hugLeft: props.hugLeft },
+                fullWidth && classes.fullWidth,
+            )}
+        >
             <input
                 className={classNames(classes.input, fakeFocus && "focus-visible", {
                     "exclude-icheck": excludeFromICheck,
                 })}
                 aria-labelledby={labelID}
+                aria-describedby={props["aria-describedby"]}
                 type="checkbox"
                 onChange={onChange}
+                onBlur={onBlur}
                 checked={checked}
                 defaultChecked={defaultChecked}
                 disabled={disabled}
                 tabIndex={0}
+                name={name}
+                id={inputID}
             />
             {tooltipLabel && label ? <ToolTip label={label}>{icon}</ToolTip> : icon}
             {!!label && (
@@ -92,10 +121,13 @@ export default function CheckBox(props: IProps) {
                     {label}
                 </span>
             )}
-            {disabled && disabledNote && (
-                <ToolTip label={disabledNote}>
+
+            {tooltip && (
+                <ToolTip label={tooltip}>
                     <ToolTipIcon>
-                        <InformationIcon informationMessage={disabledNote} />
+                        <span className={classes.tooltipIconContainer}>
+                            <Icon icon={tooltipIcon} className={classes.tooltipIcon} />
+                        </span>
                     </ToolTipIcon>
                 </ToolTip>
             )}

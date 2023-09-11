@@ -54,6 +54,9 @@ class PageViewEventProvider implements EventProviderInterface
             "discussionID:i?" => [
                 "description" => "The ID of a discussion to fetch discussion data for",
             ],
+            "siteSectionID:s?" => [
+                "description" => "The ID of the current site section",
+            ],
         ]);
     }
 

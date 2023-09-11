@@ -1,24 +1,20 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Library\Vanilla\Logging;
 
 use Garden\Http\HttpClient;
-use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use PHPUnit\Framework\Error\Notice;
 use Psr\Log\LogLevel;
 use Vanilla\Contracts\Site\Site;
-use Vanilla\Formatting\Html\HtmlDocument;
 use Vanilla\Logger;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Logging\LogDecorator;
 use Vanilla\Site\OwnSite;
-use VanillaTests\BootstrapTestCase;
 use VanillaTests\Fixtures\RecursiveSerializable;
 use VanillaTests\Site\MockOwnSite;
 use VanillaTests\SiteTestCase;
@@ -65,7 +61,7 @@ class ErrorLoggerTest extends SiteTestCase
             "level" => "error",
             "message" => "foo",
             "request.method" => "POST",
-            "request.protocol" => "http",
+            "request.protocol" => "https",
             "request.hostname" => "vanilla.test",
             "request.path" => "/path/some-request",
             "request.clientIP" => "1.1.4.4",

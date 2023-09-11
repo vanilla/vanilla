@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,6 +10,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import classNames from "classnames";
 import DropDownItem from "@library/flyouts/items/DropDownItem";
+import ButtonLoader from "@library/loaders/ButtonLoader";
 
 interface IProps {
     name?: string;
@@ -23,6 +24,7 @@ interface IProps {
     isActive?: boolean;
     buttonRef?: React.RefObject<HTMLButtonElement>;
     role?: string;
+    isLoading?: boolean;
 }
 
 /**
@@ -47,7 +49,8 @@ export default function DropDownItemButton(props: IProps) {
                 lang={props.lang}
                 role={props.role}
             >
-                {buttonContent}
+                <span className={classes.text}>{buttonContent}</span>
+                {props.isLoading && <ButtonLoader className={classes.loader} />}
             </Button>
         </DropDownItem>
     );

@@ -1,0 +1,81 @@
+{
+    "$schema": "http://dev.vanilla.localhost/api/v2/layouts/schema?layoutViewType=categoryList&cacheBuster=5",
+    "dateInserted": "2023-08-13T00:00:00Z",
+    "layoutViewType": "categoryList",
+    "layoutID": "categoryList",
+    "name": "Default Category List Layout",
+    "layout": [
+        {
+            "$hydrate": "react.section.full-width",
+            "children": [
+                {
+                    "$hydrate": "react.app-banner",
+                    "showDescription": false,
+                    "showSearch": true,
+                    "background": {
+                        "useOverlay": true,
+                        "image": ""
+                    },
+                    "title": "Community Discussions",
+                    "alignment": "left",
+                    "description": "The most recent content from our members.",
+                    "searchPlacement": "middle",
+                    "textColor": "#FFFFFF"
+                }
+            ]
+        },
+        {
+            "$hydrate": "react.section.2-columns",
+            "mainBottom": [
+                {
+                    "$hydrate": "react.asset.categoryList",
+                    "apiParams": {
+                        "filter": "none"
+                    },
+                    "title": "Categories",
+                    "isAsset": true
+                },
+                {
+                    "$hydrate": "react.asset.discussionList",
+                    "apiParams": {
+                        "includeChildCategories": true,
+                        "sort": "-dateLastComment",
+                        "slotType": "a"
+                    },
+                    "discussionOptions": {
+                        "excerpt": {
+                            "display": true
+                        },
+                        "metas": {
+                            "display": {
+                                "category": true,
+                                "commentCount": true,
+                                "lastCommentDate": true,
+                                "lastUser": true,
+                                "score": true,
+                                "startedByUser": true,
+                                "unreadCount": true,
+                                "userTags": true,
+                                "viewCount": true
+                            }
+                        }
+                    },
+                    "title": "Recent Discussions",
+                    "isAsset": true
+                }
+            ],
+            "secondaryBottom": [
+                {
+                    "$hydrate": "react.newpost",
+                    "asOwnButtons": [],
+                    "excludedButtons": [],
+                    "postableDiscussionTypes": ["discussion", "question", "poll"]
+                },
+                {
+                    "$hydrate": "react.quick-links",
+                    "title": "Quick Links"
+                }
+            ]
+        }
+    ]
+}

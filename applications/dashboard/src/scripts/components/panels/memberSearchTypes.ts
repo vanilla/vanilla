@@ -7,5 +7,7 @@ export interface IMemberSearchTypes {
     username?: string;
     email?: string;
     roleIDs?: number[];
-    rankIDs?: number[];
+    profileFields?: {
+        [key: string]: any;
+    };
 }

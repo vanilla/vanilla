@@ -76,6 +76,7 @@ export function CommunityMemberInput(props: IProps) {
             label={props.label ?? ""}
             value={(props.value ?? [])[0]}
             maxHeight={props.maxHeight}
+            inputClassName={"form-control"}
         />
     );
 }

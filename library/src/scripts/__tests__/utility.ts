@@ -18,8 +18,8 @@ export function importAll(r: any) {
 /**
  * Wrap an API endoint with a mock wrapper.
  */
-export function mockAPI() {
-    const mock = new MockAdapter(apiv2, {});
+export function mockAPI(options?: any) {
+    const mock = new MockAdapter(apiv2, { ...options });
     return mock;
 }
 

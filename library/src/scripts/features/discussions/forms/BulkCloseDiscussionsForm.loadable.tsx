@@ -19,7 +19,6 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import Message from "@library/messages/Message";
-import { cx } from "@library/styles/styleShim";
 import { t } from "@library/utility/appUtils";
 import { RecordID } from "@vanilla/utils";
 import React, { useEffect, useMemo, useState } from "react";
@@ -65,7 +64,7 @@ export default function BulkCloseDiscussionsForm(props: IBulkActionForm) {
                 header={<FrameHeader closeFrame={onCancel} title={t("Close Discussions")} />}
                 body={
                     <FrameBody>
-                        <div className={cx("frameBody-contents", classesFrameBody.contents)}>
+                        <div className={classesFrameBody.contents}>
                             {errorMessage && (
                                 <Message
                                     className={classes.errorMessageOffset}

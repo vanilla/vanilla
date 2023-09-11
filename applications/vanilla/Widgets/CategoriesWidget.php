@@ -1,12 +1,18 @@
 <?php
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Forum\Widgets;
 
+use CategoriesApiController;
+use CategoryModel;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Exception\PermissionException;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
@@ -36,29 +42,29 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
     public const FILTER_CURRENT_CATEGORY = "currentCategory";
     public const FILTER_NONE = "none";
 
-    /** @var \CategoriesApiController */
+    /** @var CategoriesApiController */
     private $api;
 
-    /** @var \CategoryModel */
-    private $categoryModel;
+    /** @var CategoryModel */
+    private CategoryModel $categoryModel;
 
     /** @var SiteSectionModel */
-    private $siteSectionModel;
+    private SiteSectionModel $siteSectionModel;
 
     /** @var ImageSrcSetService */
-    private $imageSrcSetService;
+    private ImageSrcSetService $imageSrcSetService;
 
     /**
      * DI.
      *
-     * @param \CategoriesApiController $api
-     * @param \CategoryModel $categoryModel
+     * @param CategoriesApiController $api
+     * @param CategoryModel $categoryModel
      * @param SiteSectionModel $siteSectionModel
      * @param ImageSrcSetService $imageSrcSetService
      */
     public function __construct(
-        \CategoriesApiController $api,
-        \CategoryModel $categoryModel,
+        CategoriesApiController $api,
+        CategoryModel $categoryModel,
         SiteSectionModel $siteSectionModel,
         ImageSrcSetService $imageSrcSetService
     ) {
@@ -104,6 +110,10 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
      * Get props for component
      *
      * @return array
+     * @throws ValidationException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws PermissionException
      */
     public function getProps(): ?array
     {
@@ -194,6 +204,14 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
         }, $categories);
 
         return $this->props;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        return $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["itemData"]));
     }
 
     /**

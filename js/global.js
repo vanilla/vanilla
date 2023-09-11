@@ -1135,7 +1135,7 @@ jQuery(document).ready(function($) {
 
         $.ajax({
             type: "POST",
-            url: gdn.getMeta('context')["dynamicPathFolder"] + gdn.url('/notifications/inform'),
+            url: gdn.url('/notifications/inform'),
             data: {
                 'TransientKey': gdn.definition('TransientKey'),
                 'Path': gdn.definition('Path'),

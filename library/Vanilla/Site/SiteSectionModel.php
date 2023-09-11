@@ -39,7 +39,7 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface
     /** @var SiteSectionInterface $currentSiteSection */
     private $currentSiteSection;
 
-    /** @var SiteSectionInterface $currentSiteSection */
+    /** @var SiteSectionInterface $defaultSiteSection */
     private $defaultSiteSection;
 
     /** @var array $defaultRoutes */
@@ -270,6 +270,14 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface
     public function resetCurrentSiteSection()
     {
         $this->currentSiteSection = null;
+    }
+
+    /**
+     * @param SiteSectionInterface $currentSiteSection
+     */
+    public function setCurrentSiteSection(SiteSectionInterface $currentSiteSection): void
+    {
+        $this->currentSiteSection = $currentSiteSection;
     }
 
     /**

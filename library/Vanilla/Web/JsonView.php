@@ -19,6 +19,7 @@ class JsonView implements ViewInterface
     const CURRENT_PAGE_HEADER = "x-app-page-current";
     const TOTAL_COUNT_HEADER = "x-app-page-result-count";
     const LIMIT_HEADER = "x-app-page-limit";
+    const PAGE_CURSOR_HEADER = "x-app-page-cursor";
 
     /**
      * {@inheritdoc}

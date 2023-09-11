@@ -240,7 +240,7 @@ class CommentsAnswerTest extends AbstractAPIv2Test
             ->resultArray();
 
         foreach ($unansweredQuestions as $question) {
-            $this->assertContains(strtolower($question["statusID"]), [
+            $this->assertContains((int) $question["statusID"], [
                 \QnAPlugin::DISCUSSION_STATUS_UNANSWERED,
                 \QnAPlugin::DISCUSSION_STATUS_REJECTED,
             ]);

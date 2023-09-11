@@ -226,6 +226,16 @@ class DiscussionSearchType extends AbstractSearchType
             if (!empty($tagIDs)) {
                 $query->setFilter("tagIDs", $tagIDs, false, $tagOp);
             }
+
+            $includedInsertUserRoleIDs = $query->getQueryParameter("includedInsertUserRoleIDs");
+            if (!empty($includedInsertUserRoleIDs)) {
+                $query->setFilter("insertUserRoleIDs", $includedInsertUserRoleIDs);
+            }
+
+            $excludedInsertUserRoleIDs = $query->getQueryParameter("excludedInsertUserRoleIDs");
+            if (!empty($excludedInsertUserRoleIDs)) {
+                $query->setFilter("insertUserRoleIDs", $excludedInsertUserRoleIDs, false, SearchQuery::FILTER_OP_NOT);
+            }
         }
     }
 
@@ -251,37 +261,35 @@ class DiscussionSearchType extends AbstractSearchType
     public function getQuerySchema(): Schema
     {
         return Schema::parse([
-            "discussionID:i?" => [
-                "x-search-scope" => true,
-            ],
-            "categoryID:i?" => [
-                "x-search-scope" => true,
-            ],
+            "discussionID:i?",
+            "categoryID:i?",
             "categoryIDs:a?" => [
                 "items" => [
                     "type" => "integer",
                 ],
-                "x-search-scope" => true,
             ],
-            "followedCategories:b?" => [
-                "x-search-filter" => true,
-            ],
-            "includeChildCategories:b?" => [
-                "x-search-filter" => true,
-            ],
-            "includeArchivedCategories:b?" => [
-                "x-search-filter" => true,
-            ],
+            "followedCategories:b?",
+            "includeChildCategories:b?",
+            "includeArchivedCategories:b?",
             "tags:a?" => [
                 "items" => [
                     "type" => "string",
                 ],
-                "x-search-filter" => true,
             ],
             "tagOperator:s?" => [
                 "items" => [
                     "type" => "string",
                     "enum" => [SearchQuery::FILTER_OP_OR, SearchQuery::FILTER_OP_AND],
+                ],
+            ],
+            "includedInsertUserRoleIDs:a?" => [
+                "items" => [
+                    "type" => "integer",
+                ],
+            ],
+            "excludedInsertUserRoleIDs:a?" => [
+                "items" => [
+                    "type" => "integer",
                 ],
             ],
         ]);

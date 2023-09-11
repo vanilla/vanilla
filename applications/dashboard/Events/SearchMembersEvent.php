@@ -53,4 +53,12 @@ class SearchMembersEvent implements TrackingEventInterface
     {
         return $this->payload;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionID(): ?string
+    {
+        return $this->payload["siteSectionID"] ?? null;
+    }
 }

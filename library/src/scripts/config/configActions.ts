@@ -16,16 +16,13 @@ export const patchConfigThunk = createAsyncThunk(
         try {
             const response = await apiv2.patch("/config", params.values);
             return response.data;
-        } catch (initialError) {
-            const detailedErrors =
-                initialError.response && initialError.response.data && initialError.response.data.errors;
-            const errorNames =
-                detailedErrors && typeof detailedErrors === "object" ? Object.keys(detailedErrors) : null;
-            const errors = errorNames && errorNames.length && detailedErrors[errorNames[0]];
-            //one at a time
-            const finalError = errors && errors.length ? errors[0] : initialError;
-
-            throw finalError;
+        } catch (err) {
+            // Workaround for reduxes crappy config serialization.
+            if (err?.response?.data) {
+                return thunkAPI.rejectWithValue(err?.response?.data);
+            } else {
+                throw err;
+            }
         }
     },
 );

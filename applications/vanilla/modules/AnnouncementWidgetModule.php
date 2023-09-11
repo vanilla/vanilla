@@ -33,8 +33,9 @@ class AnnouncementWidgetModule extends BaseDiscussionWidgetModule
     public static function getApiSchema(): Schema
     {
         $apiSchema = parent::getApiSchema();
-        $apiSchema->merge(
+        $apiSchema = $apiSchema->merge(
             SchemaUtils::composeSchemas(
+                self::followedCategorySchema(),
                 self::categorySchema(),
                 self::siteSectionIDSchema(),
                 self::sortSchema(),

@@ -47,7 +47,7 @@ export function RadioGroup(props: IProps) {
             buttonClass={buttonClass}
             classes={classes}
         >
-            <fieldset className={classNames(classesInputBlock.root, rootClass, className)}>
+            <fieldset className={classNames(classesInputBlock.root, rootClass, className)} role="radiogroup">
                 <ScreenReaderContent tag="legend">{accessibleTitle}</ScreenReaderContent>
                 <div className={classes.items}>{children}</div>
             </fieldset>

@@ -15,6 +15,7 @@ import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { QuickLinks } from "@library/navigation/QuickLinks";
 import { Widget } from "@library/layout/Widget";
+import CategoryListAsset from "@library/categoriesWidget/CategoryListAsset";
 interface IProps {
     title?: string;
     subtitle?: string;
@@ -23,6 +24,7 @@ interface IProps {
     itemOptions?: DeepPartial<IHomeWidgetItemOptions>;
     itemData: IHomeWidgetItemProps[];
     maxItemCount?: number; //this will probably go away with categories API "limit" full support
+    isAsset?: boolean;
 }
 
 export function CategoriesWidget(props: IProps) {
@@ -58,6 +60,11 @@ export function CategoriesWidget(props: IProps) {
             url: (item.to as string) ?? "",
         };
     });
+
+    // right now CategoryListAsset is pretty much a copy of CategoriesWidget component, keeping this like this as probably later we'll make asset specific tweaks in it
+    if (props.isAsset) {
+        return <CategoryListAsset {...props} />;
+    }
 
     if (props.containerOptions?.displayType === WidgetContainerDisplayType.LINK) {
         return <QuickLinks title={props.title} links={quickLinks} containerOptions={props.containerOptions} />;

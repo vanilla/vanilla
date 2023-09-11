@@ -13,6 +13,7 @@ use Vanilla\Knowledge\Models\SearchJsonLD;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Widget for rendering raw HTML in react.
@@ -20,6 +21,7 @@ use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 class HtmlReactWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface
 {
     use AllSectionTrait;
+    use TwigRenderTrait;
     use CombinedPropsWidgetTrait;
 
     /** @var ContentSecurityPolicyModel */
@@ -76,6 +78,21 @@ class HtmlReactWidget implements ReactWidgetInterface, CombinedPropsWidgetInterf
                 "description" => "Sanitized CSS to render.",
             ],
         ]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $tpl = <<<TWIG
+<template shadowrootmode="open">
+{% if css|default(false) %}<style>{{ css|raw }}</style>{% endif %}
+{{ html|raw }}
+</template>
+TWIG;
+        $result = $this->renderTwigFromString($tpl, $props);
+        return $result;
     }
 
     /**

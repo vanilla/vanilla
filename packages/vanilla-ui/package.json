@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "license": "MIT",
     "dependencies": {
-        "@reach/accordion": "^0.15.0",
+        "@reach/accordion": "^0.15.3",
         "@reach/combobox": "0.16.2",
         "@vanilla/react-utils": "*"
     },

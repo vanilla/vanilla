@@ -51,6 +51,7 @@ export const Tree = storyWithConfig(
                     },
                 },
             },
+            required: [],
         };
         const [value, onChange] = useState(
             itemsToTree([

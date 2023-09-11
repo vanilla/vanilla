@@ -527,14 +527,6 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable
 
                 // Do a sanity check on the config save.
                 if ($this->Source == Gdn::config()->defaultPath()) {
-                    // Log root config changes
-                    try {
-                        $logData = $this->Initial;
-                        $logData["_New"] = $this->Settings;
-                        LogModel::insert("Edit", "Configuration", $logData);
-                    } catch (Exception $ex) {
-                    }
-
                     if (!isset($data["Database"])) {
                         if ($pm = Gdn::pluginManager()) {
                             $pm->EventArguments["Data"] = $data;

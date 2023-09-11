@@ -18,7 +18,7 @@ interface IProps {
 }
 
 export function TokensInputInLegacyForm(props: IProps) {
-    const { label, fieldName } = props;
+    const { label, fieldName, description } = props;
 
     //initial value might be a json from the back end, so we need to do a bit of validation/format here
     const [values, setValues] = useState<IComboBoxOption[]>(() => {
@@ -47,6 +47,7 @@ export function TokensInputInLegacyForm(props: IProps) {
                 onChange={(newValues) => setValues(newValues)}
                 value={values ?? []}
                 fieldName={fieldName}
+                labelNote={description}
             />
         </div>
     );

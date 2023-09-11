@@ -401,6 +401,9 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
             return !$item["isHidden"] && in_array($item["recordType"], $availableCounts);
         });
 
+        // re-index the counts array.
+        $filteredCounts = array_values($filteredCounts);
+
         $counts = array_map(function ($item) {
             return $item["recordType"];
         }, $filteredCounts);
@@ -425,5 +428,26 @@ class SiteTotalsWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
 
         $this->props["totals"] = $totals;
         return $this->props;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $result = "";
+        foreach ($props["totals"] as $total) {
+            if ($total["count"] < 0) {
+                continue;
+            }
+            $result .= "<span class='padded'>{$total["count"]} {$total["label"]}</span>";
+        }
+        $result = $this->renderWidgetContainerSeoContent(
+            [
+                "title" => t("Site Totals"),
+            ],
+            "<div class='row gapped'>{$result}</div>"
+        );
+        return $result;
     }
 }

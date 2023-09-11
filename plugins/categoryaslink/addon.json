@@ -1,7 +1,8 @@
 {
     "name": "Category As Link",
-    "description": "Configure a category to show up on the Category List but link to a custom URL. This addon is not fully supported and may not work with all <a href=\"https://success.vanillaforums.com/kb/articles/316-category-link-conflicts\">other addons</a>.",
+    "description": "Configure a category to show up on the Category List and in Widgets but link to a custom URL.",
     "version": "1.0",
+    "icon": "category_as_link.png",
     "key": "categoryaslink",
     "type": "addon",
     "priority": 1000,
@@ -13,10 +14,10 @@
         }
     ],
     "conflict": {
-        "subcommunities": "*",
         "seolinks": "*"
     },
     "require": {
         "vanilla": ">=2.3.0"
-    }
+    },
+    "hidden": false
 }

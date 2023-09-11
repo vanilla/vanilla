@@ -82,6 +82,32 @@ class UserFragment implements \ArrayAccess, \JsonSerializable, \IteratorAggregat
      */
     public function serializeWithSensitiveData(int $flags): array
     {
+        $sensitive = $this->getSensitiveData($flags);
+
+        return array_merge($this->data, $sensitive);
+    }
+
+    /**
+     * Add sensitive data to the user fragment.
+     *
+     * @param int $flags
+     * @return void
+     */
+    public function addSensitiveData(int $flags): void
+    {
+        $sensitive = $this->getSensitiveData($flags);
+
+        $this->addExtraData($sensitive);
+    }
+
+    /**
+     * Get specified PII data.
+     *
+     * @param int $flags
+     * @return array
+     */
+    private function getSensitiveData(int $flags): array
+    {
         $sensitive = [];
 
         if (self::INCLUDE_EMAIL === $flags) {
@@ -92,8 +118,7 @@ class UserFragment implements \ArrayAccess, \JsonSerializable, \IteratorAggregat
             $sensitive["insertIPAddress"] = $this->insertIPAddress;
             $sensitive["lastIPAddress"] = $this->insertIPAddress;
         }
-
-        return array_merge($this->data, $sensitive);
+        return $sensitive;
     }
 
     /**
@@ -112,5 +137,18 @@ class UserFragment implements \ArrayAccess, \JsonSerializable, \IteratorAggregat
     public function count()
     {
         return count($this->data);
+    }
+
+    /**
+     * Create a new UserFragment object with profile fields.
+     *
+     * @param array $profileFields
+     * @return UserFragment
+     */
+    public function withProfileFields(array $profileFields): UserFragment
+    {
+        $userFragment = new UserFragment(get_object_vars($this) + $this->data);
+        $userFragment["profileFields"] = $profileFields;
+        return $userFragment;
     }
 }

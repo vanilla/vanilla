@@ -78,6 +78,7 @@ class VanillaSettingsController extends Gdn_Controller
             "ImageUpload.Limits.Enabled",
             "ImageUpload.Limits.Width",
             "ImageUpload.Limits.Height",
+            "Vanilla.Drafts.Autosave",
             self::CONFIG_KALTURA_DOMAINS => [],
         ]);
 

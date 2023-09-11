@@ -30,12 +30,12 @@ const initialState: IState = {
  * Reducer for the content of the rich editor.
  *
  * Maintains the active selections and formats.
- * @param quill
+ * @param editor
  */
-function useEditorContentReducer(quill: Quill | null) {
+function useEditorContentReducer(editor: Quill | null) {
     const reducer = useCallback(
         (prevState: IState, action: { selection: RangeStatic | null }): IState => {
-            if (!quill) {
+            if (!editor) {
                 return prevState;
             }
             const newSelection = action.selection;
@@ -43,11 +43,11 @@ function useEditorContentReducer(quill: Quill | null) {
             return {
                 currentSelection: newSelection,
                 lastGoodSelection,
-                mentionSelection: getMentionRange(quill, newSelection),
-                activeFormats: lastGoodSelection ? quill.getFormat(lastGoodSelection) : {},
+                mentionSelection: getMentionRange(editor, newSelection),
+                activeFormats: lastGoodSelection ? editor.getFormat(lastGoodSelection) : {},
             };
         },
-        [quill],
+        [editor],
     );
 
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -72,7 +72,7 @@ const EditorContentContext = React.createContext<IContextValue>(null as any);
 export function useEditorContents() {
     return useContext(EditorContentContext);
 }
-export function EditorContentContextProvider(props: { children: React.ReactNode; quill: Quill | null }) {
-    const value = useEditorContentReducer(props.quill);
+export function EditorContentContextProvider(props: { children: React.ReactNode; editor: Quill | null }) {
+    const value = useEditorContentReducer(props.editor);
     return <EditorContentContext.Provider value={value}>{props.children}</EditorContentContext.Provider>;
 }

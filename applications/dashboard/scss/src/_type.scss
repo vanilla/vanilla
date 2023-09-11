@@ -160,11 +160,25 @@
     justify-content: space-between;
     align-items: center;
     min-height: $header-block-height;
+    flex-wrap: wrap;
 
     h1 {
         margin: 0;
         padding: ($spacer * 0.5) 0;
         font-size: $font-size-lg;
+        flex: 1;
+    }
+}
+
+.dashboard-main .header-block {
+    position: sticky;
+    top: $navbar-height;
+    z-index: 35;
+    background-color: $white;
+
+    & .no-sticky {
+        position: static;
+        top: initial;
     }
 }
 
@@ -307,6 +321,9 @@
     line-height: $line-height;
     font-weight: 600;
     border-top: $border-width solid #e7e8e9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 // Subheading Block

@@ -5,13 +5,13 @@
  */
 
 import React from "react";
-import Loadable from "react-loadable";
 import Loader from "@library/loaders/Loader";
 import { loaderClasses } from "@library/loaders/loaderStyles";
+import { createLoadableComponent } from "@vanilla/react-utils";
 
-const MessagesContents = Loadable({
-    loader: () => import(/* webpackChunkName: "mebox/messages" */ "./MessagesContentsImpl"),
-    loading() {
+const MessagesContents = createLoadableComponent({
+    loadFunction: () => import(/* webpackChunkName: "mebox/messages" */ "./MessagesContentsImpl"),
+    fallback() {
         return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
     },
 });

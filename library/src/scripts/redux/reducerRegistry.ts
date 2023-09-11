@@ -19,6 +19,7 @@ import { tagsReducer } from "@library/features/tags/TagsReducer";
 import { discussionsReducer } from "@library/features/discussions/discussionsReducer";
 import { configSlice, IConfigState } from "@library/config/configReducer";
 import { collectionsReducer } from "@library/featuredCollections/collectionsReducer";
+import routeReducer, { IRouteState } from "@library/RouteReducer";
 
 let dynamicReducers = {};
 
@@ -39,6 +40,7 @@ export interface ICoreStoreState extends IUsersStoreState {
     theme: IThemeState;
     locales: ILocaleState;
     config: IConfigState;
+    route: IRouteState;
 }
 
 export function getReducers(): ReducersMapObject<any, any> {
@@ -52,6 +54,7 @@ export function getReducers(): ReducersMapObject<any, any> {
         conversations: new ConversationsModel().reducer,
         theme: themeReducer,
         collections: collectionsReducer,
+        route: routeReducer,
         [configSlice.name]: configSlice.reducer,
         ...dynamicReducers,
     };

@@ -21,8 +21,8 @@ import { t } from "@vanilla/i18n";
 import { StackingContextProvider, useFocusWatcher } from "@vanilla/react-utils";
 import React, { useCallback, useRef, useState } from "react";
 import { UserCardError } from "@library/features/userCard/UserCard.views";
-import { hasPermission } from "@library/features/users/Permission";
 import { getMeta } from "@library/utility/appUtils";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 interface IProps {
     /** UserID of the user being loaded. */
@@ -45,7 +45,8 @@ interface IProps {
  * Component representing the inner contents of a user card.
  */
 export function UserCard(props: IProps) {
-    if (!hasUserViewPermission()) {
+    const { hasPermission } = usePermissionsContext();
+    if (!hasUserViewPermission(hasPermission)) {
         return <></>;
     }
 
@@ -58,6 +59,8 @@ export function UserCard(props: IProps) {
 }
 
 export function UserCardPopup(props: React.PropsWithChildren<IProps> & { forceOpen?: boolean }) {
+    const { hasPermission } = usePermissionsContext();
+
     const [_isOpen, _setIsOpen] = useState(false);
     const isOpen = props.forceOpen ?? _isOpen;
 
@@ -76,7 +79,7 @@ export function UserCardPopup(props: React.PropsWithChildren<IProps> & { forceOp
     const device = useDevice();
     const forceModal = device === Devices.MOBILE || device === Devices.XS;
 
-    if (!hasUserViewPermission()) {
+    if (!hasUserViewPermission(hasPermission)) {
         return <>{props.children}</>;
     }
 
@@ -140,6 +143,7 @@ export function useUserCardTrigger(): {
     contents: React.ReactNode;
     isOpen?: boolean;
 } {
+    const { hasPermission } = usePermissionsContext();
     const context = useUserCardContext();
 
     const handleFocusChange = useCallback(
@@ -157,7 +161,7 @@ export function useUserCardTrigger(): {
     useFocusWatcher(context.triggerRef, handleFocusChange);
 
     return {
-        props: hasUserViewPermission()
+        props: hasUserViewPermission(hasPermission)
             ? {
                   "aria-controls": context.contentID,
                   "aria-expanded": context.isOpen,
@@ -260,6 +264,7 @@ function UserCardDynamic(props: IProps) {
     const user = useUser({ userID: props.userID });
     const currentUseID = useCurrentUserID();
     const isOwnUser = userFragment?.userID === currentUseID;
+    const { hasPermission } = usePermissionsContext();
     const hasPersonalInfoView = hasPermission("personalInfo.view");
     let bannedPrivateProfile = getMeta("ui.bannedPrivateProfile", "0");
     bannedPrivateProfile = bannedPrivateProfile === "" ? "0" : "1";

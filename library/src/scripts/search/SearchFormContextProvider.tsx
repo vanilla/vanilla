@@ -10,24 +10,23 @@ import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE, searchReducer } from "@
 import { ISearchForm, ISearchRequestQuery, ISearchSource } from "@library/search/searchTypes";
 import {
     ALLOWED_GLOBAL_SEARCH_FIELDS,
-    ALL_CONTENT_DOMAIN_NAME,
     MEMBERS_RECORD_TYPE,
-    MEMBERS_DOMAIN_NAME,
-    PLACES_DOMAIN_NAME,
+    ALL_CONTENT_DOMAIN_KEY,
 } from "@library/search/searchConstants";
 import { t } from "@vanilla/i18n";
-import React, { ReactNode, useCallback, useContext, useEffect, useReducer, useState } from "react";
+import React, { useCallback, useMemo, useReducer, useState } from "react";
 import merge from "lodash/merge";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { useSearchScope } from "@library/features/search/SearchScopeContext";
 import { getCurrentLocale } from "@vanilla/i18n";
 import { SearchContext } from "./SearchContext";
-import { SearchService, ISearchDomain, DEFAULT_SEARCH_SOURCE } from "./SearchService";
-import PlacesSearchListing from "@library/search/PlacesSearchListing";
-import { getSiteSection } from "@library/utility/appUtils";
 import { getSearchAnalyticsData } from "@library/search/searchAnalyticsData";
 import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
 import { stableObjectHash } from "@vanilla/utils";
+import { dateRangeToString } from "@library/search/SearchUtils";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain";
+import SearchDomain from "@library/search/SearchDomain";
 
 interface IProps {
     children?: React.ReactNode;
@@ -54,178 +53,142 @@ export function getGlobalSearchSorts(): ISelectBoxItem[] {
 }
 
 export function SearchFormContextProvider(props: IProps) {
-    const [state, dispatch] = useReducer(searchReducer, INITIAL_SEARCH_STATE);
+    const { sources, currentSource, setCurrentSource } = useSearchSources();
 
-    const { currentSource: searchSource } = useSearchSources();
+    const currentSourceDomains = currentSource?.domains ?? [];
 
-    const getFilterComponentsForDomain = (domain: string) => {
-        return SearchService.extraFilters.map((extraFilter, i) => {
-            if (extraFilter.searchDomain === domain) {
-                return <React.Fragment key={i}>{extraFilter.filterNode}</React.Fragment>;
-            } else {
-                return null;
-            }
-        });
-    };
+    const { children } = props;
 
-    const hasPlacesDomain = SearchService.pluggableDomains.map((domain) => domain.key).includes(PLACES_DOMAIN_NAME);
+    // This is special "SearchDomain", that aggregates all the SearchDomains registered to a SearchSource.
+    // It is used only if a SearchSource has multiple SearchDomains. (e.g. for Community)
+    const ALL_CONTENT_DOMAIN = useMemo<SearchDomain>(
+        () =>
+            new (class AllContentDomain extends SearchDomain<{ startDate?: string; endDate?: string }> {
+                public key = ALL_CONTENT_DOMAIN_KEY;
+                public sort = 0;
 
-    const ALL_CONTENT_DOMAIN: ISearchDomain = {
-        key: ALL_CONTENT_DOMAIN_NAME,
-        name: "All",
-        sort: 0,
-        icon: <TypeAllIcon />,
-        heading: hasPlacesDomain ? <PlacesSearchListing /> : null,
-        // To be called when performing a search in the current domain. We need to be aware of PLACES_DOMAIN_NAME
-        // here because the component <PlacesSearchListing /> is specific to Places Search and yet we want it in
-        // all domains and we want to make the query to the places domain
-        extraSearchAction: () => {
-            if (hasPlacesDomain) {
-                searchInDomain(PLACES_DOMAIN_NAME);
-            }
+                public get name() {
+                    return t("All");
+                }
+
+                public icon = (<TypeAllIcon />);
+
+                public subTypes = currentSourceDomains.map(({ subTypes }) => subTypes).flat();
+
+                public addSubType = () => {
+                    throw new Error("ALL_CONTENT_DOMAIN does not support adding subtypes");
+                };
+
+                public PanelComponent = FilterPanelAll;
+
+                public getAllowedFields = () => ["name", "authors", "insertUserIDs", "startDate", "endDate"];
+
+                public get recordTypes() {
+                    return currentSourceDomains // Gather all other domains, and return their types.
+                        .map(({ recordTypes }) => recordTypes)
+                        .flat()
+                        .filter((t) => t !== MEMBERS_RECORD_TYPE);
+                }
+
+                public get sortValues() {
+                    return getGlobalSearchSorts();
+                }
+
+                public transformFormToQuery(form: ISearchForm<{ startDate?: string; endDate?: string }>) {
+                    const query: ISearchRequestQuery<{ startDate?: string; endDate?: string }> = { ...form };
+
+                    if (query.sort === "relevance") {
+                        delete query.sort;
+                    }
+                    query.expand = ["insertUser", "breadcrumbs", "image", "excerpt", "-body"];
+                    query.dateInserted = dateRangeToString({ start: form.startDate, end: form.endDate });
+                    query.startDate = undefined;
+                    query.endDate = undefined;
+                    if (form.authors && form.authors.length) {
+                        query.insertUserIDs = form.authors.map((author) => author.value as number);
+                    }
+                    return query;
+                }
+
+                public defaultFormValues = {
+                    sort: "relevance",
+                };
+            })(),
+        [currentSourceDomains],
+    );
+
+    const domains =
+        currentSourceDomains.filter(({ isIsolatedType }) => !isIsolatedType).length > 1
+            ? [ALL_CONTENT_DOMAIN, ...currentSourceDomains]
+            : currentSourceDomains;
+
+    const [state, dispatch] = useReducer(searchReducer, {
+        ...INITIAL_SEARCH_STATE,
+        form: {
+            ...INITIAL_SEARCH_STATE.form,
+            domain: ALL_CONTENT_DOMAIN_KEY,
         },
-        PanelComponent: FilterPanelAll,
-        getAllowedFields: () => {
-            return ALLOWED_GLOBAL_SEARCH_FIELDS;
-        },
-        getRecordTypes: () => {
-            // Gather all other domains, and return their types.
-            const allTypes: string[] = [];
-            for (const pluggableDomain of SearchService.pluggableDomains) {
-                allTypes.push(...pluggableDomain.getRecordTypes());
-            }
+    });
 
-            return allTypes.filter((t) => t !== MEMBERS_RECORD_TYPE);
-        },
-        getSortValues: getGlobalSearchSorts,
-        transformFormToQuery: (form: ISearchForm) => {
-            const query: ISearchRequestQuery = { ...form };
-            if (query.sort === "relevance") {
-                delete query.sort;
-            }
-            return query;
-        },
-        getDefaultFormValues: () => {
-            return {
-                sort: "relevance",
-            };
-        },
-        isIsolatedType: () => false,
-    };
+    const { hasPermission } = usePermissionsContext();
 
-    const getDomains = () => {
-        return [{ ...ALL_CONTENT_DOMAIN, name: t(ALL_CONTENT_DOMAIN.name) }, ...SearchService.pluggableDomains];
-    };
-
-    const getCurrentDomain = (): ISearchDomain => {
-        return (
-            getDomains().find((pluggableDomain) => {
-                return pluggableDomain.key === state.form.domain;
-            }) ?? ALL_CONTENT_DOMAIN
-        );
-    };
-
-    const getDate = (form: ISearchForm): string | undefined => {
-        let dateInserted: string | undefined;
-        if (form.startDate && form.endDate) {
-            if (form.startDate === form.endDate) {
-                // Simple equality.
-                dateInserted = form.startDate;
-            } else {
-                // Date range
-                dateInserted = `[${form.startDate},${form.endDate}]`;
-            }
-        } else if (form.startDate) {
-            // Only start date
-            dateInserted = `>=${form.startDate}`;
-        } else if (form.endDate) {
-            // Only end date.
-            dateInserted = `<=${form.endDate}`;
-        }
-        return dateInserted;
-    };
+    const currentDomain = useMemo((): SearchDomain => {
+        return domains.length === 1
+            ? domains[0]
+            : domains.find(({ key }) => key === state.form.domain) ?? ALL_CONTENT_DOMAIN;
+    }, [domains, currentSource, state.form.domain]);
 
     const makeFilterForm = (form: ISearchForm): ISearchForm => {
-        const currentDomain = getCurrentDomain();
-        const allowedFields = [...ALL_CONTENT_DOMAIN.getAllowedFields(), ...currentDomain.getAllowedFields()];
-        return Object.fromEntries(allowedFields.map((field) => [field, form[field]])) as ISearchForm;
+        const queryDomain = domains.find(({ key }) => key == form.domain) ?? currentDomain;
+
+        const allowedFields = Array.from(
+            new Set([...ALLOWED_GLOBAL_SEARCH_FIELDS, ...(queryDomain.getAllowedFields(hasPermission) ?? [])]),
+        );
+
+        const filterForm = Object.fromEntries(
+            allowedFields
+                .map((field) => [field, form[field]])
+                .filter(([_key, val]) => {
+                    return val !== "" && val !== undefined;
+                }),
+        ) as ISearchForm;
+
+        return filterForm;
     };
 
     const searchScope = useSearchScope();
     const buildQuery = (form: ISearchForm): ISearchRequestQuery => {
         const filterForm = makeFilterForm(form);
-        const currentDomain = getCurrentDomain();
+        const queryDomain = domains.find(({ key }) => key == form.domain) ?? currentDomain;
 
-        const allowedSorts = currentDomain.getSortValues().map((val) => val.value);
+        const allowedSorts = (queryDomain.sortValues ?? []).map((val) => val.value);
         const sort = !!form.sort && allowedSorts.includes(form.sort) ? form.sort : undefined;
 
-        const commonQueryEntries = {
+        const searchForm: ISearchForm = {
             ...filterForm,
-            limit: SEARCH_LIMIT_DEFAULT,
-            dateInserted: getDate(form),
-            locale: getCurrentLocale(),
             collapse: true,
+            recordTypes: queryDomain.recordTypes,
+            scope: searchScope.value?.value ?? undefined,
             sort,
-            ...(form.offset && { offset: form.offset }),
-            ...currentDomain.transformFormToQuery?.(filterForm),
         };
-        if (searchScope.value?.value) {
-            commonQueryEntries.scope = searchScope.value.value;
-        }
 
-        let finalQuery: ISearchRequestQuery;
-
-        // FIXME: these following conditions should probably be moved to different domains' `transformFormToQuery` callbacks
-        if (currentDomain.key === MEMBERS_DOMAIN_NAME) {
-            finalQuery = {
-                ...commonQueryEntries,
-                scope: "site", // Force site domain for members.
-                recordTypes: [MEMBERS_RECORD_TYPE],
-                expand: [],
-            };
-        } else if (currentDomain.key === PLACES_DOMAIN_NAME) {
-            // No recordTypes, only types (from form)
-            finalQuery = {
-                ...commonQueryEntries,
-                expand: ["breadcrumbs", "image", "excerpt", "-body"],
-            };
-        } else if (currentDomain.hasSpecificRecord?.(form)) {
-            finalQuery = {
-                ...commonQueryEntries,
-                expand: ["insertUser", "breadcrumbs", "image", "excerpt", "-body"],
-            };
-        } else {
-            finalQuery = {
-                ...commonQueryEntries,
-                domain: form.domain,
-                insertUserIDs:
-                    form.authors && form.authors.length
-                        ? form.authors.map((author) => author.value as number)
-                        : undefined,
-                recordTypes: currentDomain.getRecordTypes(),
-                expand: ["insertUser", "breadcrumbs", "image", "excerpt", "-body"],
-            };
-        }
-
-        const siteSection = getSiteSection();
-        const siteSectionCategoryID = siteSection.attributes.categoryID;
-        /**
-         * finalQuery["categoryIDs"] could be a populated array, an empty array, or undefined
-         */
-        const hasCategoryIDs = !!(finalQuery["categoryIDs"] && finalQuery["categoryIDs"].length);
-        if (!("categoryID" in finalQuery) && !hasCategoryIDs && siteSectionCategoryID > 0) {
-            finalQuery.categoryID = siteSectionCategoryID;
-            finalQuery.includeChildCategories = true;
-        }
+        let query = {
+            ...(queryDomain.transformFormToQuery?.(searchForm) ?? searchForm),
+        } as ISearchRequestQuery;
 
         // Filter out empty fields.
-        Object.entries(finalQuery).forEach(([field, value]) => {
+        Object.entries(query).forEach(([field, value]) => {
             if (value === "" || value === undefined) {
-                delete finalQuery[field];
+                delete query[field];
             }
         });
 
-        return finalQuery;
+        return {
+            ...query,
+            limit: SEARCH_LIMIT_DEFAULT,
+            locale: getCurrentLocale(),
+            offset: form.offset,
+        };
     };
 
     /**
@@ -257,64 +220,72 @@ export function SearchFormContextProvider(props: IProps) {
     const search = async () => {
         const { form } = state;
 
-        dispatch(SearchActions.performSearchACs.started(form));
+        if (currentSource) {
+            dispatch(SearchActions.performSearchACs.started(form));
 
-        try {
-            const query = buildQuery(form);
+            // When searching the Community "All Content" domain, we also want to search Places.
+            if (
+                currentDomain.key === ALL_CONTENT_DOMAIN.key &&
+                currentSourceDomains.some((domain) => domain.key == PLACES_SEARCH_DOMAIN.key)
+            ) {
+                searchInDomain(PLACES_SEARCH_DOMAIN.key);
+            }
 
-            const result = await searchSource.performSearch(query, form?.pageURL);
+            try {
+                const query = buildQuery(form);
+                const result = await currentSource.performSearch(query, form?.pageURL);
 
-            dispatch(
-                SearchActions.performSearchACs.done({
-                    params: form,
-                    result,
-                }),
-            );
-
-            /**
-             * Search event tracking
-             */
-            // Check if we should dispatch an event, or if one has been dispatched already
-            const shouldTrack = shouldDispatchAnalyticsEvent(form, searchSource);
-
-            if (shouldTrack) {
-                // Make sure to update the store, to prevent subsequent event dispatch
-                updateHashedEventStore(form, searchSource);
-                document.dispatchEvent(
-                    new CustomEvent("pageViewWithContext", {
-                        detail: getSearchAnalyticsData(form, result, {
-                            key: searchSource.key,
-                            label: searchSource.label,
-                        }),
+                dispatch(
+                    SearchActions.performSearchACs.done({
+                        params: form,
+                        result,
                     }),
                 );
+
+                /**
+                 * Search event tracking
+                 */
+                // Check if we should dispatch an event, or if one has been dispatched already
+                const shouldTrack = shouldDispatchAnalyticsEvent(form, currentSource);
+
+                if (shouldTrack) {
+                    // Make sure to update the store, to prevent subsequent event dispatch
+                    updateHashedEventStore(form, currentSource);
+                    document.dispatchEvent(
+                        new CustomEvent("pageViewWithContext", {
+                            detail: getSearchAnalyticsData(form, result, {
+                                key: currentSource.key,
+                                label: currentSource.label,
+                            }),
+                        }),
+                    );
+                }
+            } catch (error) {
+                dispatch(SearchActions.performSearchACs.failed({ params: form, error }));
             }
-        } catch (error) {
-            dispatch(SearchActions.performSearchACs.failed({ params: form, error }));
         }
     };
 
-    const searchInDomain = async (domain: string) => {
-        // We only do this for our own community search
-        if (searchSource.key === DEFAULT_SEARCH_SOURCE.key) {
+    const searchInDomain = async (domainKey: string) => {
+        if (currentSource) {
             const { form } = state;
-            const formWithDomain = { ...form, domain };
+            const formWithDomain = { ...form, domain: domainKey };
+
+            const domain = domains.find(({ key }) => key === domainKey);
 
             dispatch(SearchActions.performDomainSearchACs.started(formWithDomain));
 
-            const subTypes = SearchService.getSubTypes()
-                .filter((subType) => subType.domain === domain)
-                .map((subType) => subType.type);
+            const subTypes = (domain?.subTypes ?? []).map((subType) => subType.type);
 
             try {
                 const query = {
                     ...buildQuery(formWithDomain),
                     limit: DOMAIN_SEARCH_LIMIT_DEFAULT,
                     types: subTypes,
-                    recordTypes: [],
+                    recordTypes: undefined,
                 };
 
-                const result = await searchSource.performSearch(query);
+                const result = await currentSource.performSearch(query);
 
                 dispatch(
                     SearchActions.performDomainSearchACs.done({
@@ -328,37 +299,84 @@ export function SearchFormContextProvider(props: IProps) {
         }
     };
 
-    const updateForm = useCallback((update: Partial<ISearchForm>) => {
-        dispatch(SearchActions.updateSearchFormAC(update));
-    }, []);
+    const updateForm = useCallback(
+        (update: Partial<ISearchForm>) => {
+            let updatedForm = {
+                ...state.form,
+                //Reset page on new searches. Pagination buttons can override this behaviour by passing a page option to this function
+                page: undefined,
+                ...update,
+            };
+
+            if ("domain" in update) {
+                const nextDomain = domains.find(({ key }) => key === updatedForm.domain);
+                const nextDomainAllowedFields = Array.from(
+                    new Set([...ALLOWED_GLOBAL_SEARCH_FIELDS, ...(nextDomain?.getAllowedFields(hasPermission) ?? [])]),
+                );
+
+                const nextDomainAllowedSortValues = (nextDomain?.sortValues ?? []).map((val) => val.value);
+
+                for (let key in updatedForm) {
+                    if (!["initialized"].includes(key)) {
+                        if (
+                            !nextDomainAllowedFields.includes(key) ||
+                            (key === "sort" &&
+                                !!updatedForm[key] &&
+                                !nextDomainAllowedSortValues.includes(updatedForm[key]!))
+                        ) {
+                            updatedForm[key] = undefined;
+                        }
+                    }
+                }
+            }
+
+            dispatch(SearchActions.updateSearchFormAC(updatedForm));
+        },
+        [domains, currentDomain, state.form],
+    );
 
     const resetForm = useCallback(() => {
         dispatch(SearchActions.resetFormAC());
     }, []);
 
-    const getDefaultFormValues = () => {
-        const domainDefaults = getDomains().map((domain) => domain.getDefaultFormValues?.() ?? {});
-        const merged = merge({}, DEFAULT_CORE_SEARCH_FORM, ...domainDefaults);
+    const defaultFormValues = useMemo<ISearchForm>(() => {
+        const domainDefaults = currentDomain.defaultFormValues ?? {};
+        const merged = merge({}, DEFAULT_CORE_SEARCH_FORM, domainDefaults);
         return merged;
-    };
+    }, [currentDomain]);
+
+    const handleSourceChange = useCallback(
+        (newSourceKey: string) => {
+            const nextSource = sources.find((source) => source.key === newSourceKey)!;
+            const nextDomainKey = nextSource.domains.some(({ key }) => key === currentDomain.key)
+                ? currentDomain.key
+                : nextSource.domains.length === 1
+                ? nextSource.domains[0]?.key ?? ALL_CONTENT_DOMAIN_KEY
+                : ALL_CONTENT_DOMAIN_KEY;
+
+            updateForm({
+                domain: nextDomainKey,
+            });
+
+            setCurrentSource(newSourceKey);
+        },
+        [currentDomain.key, setCurrentSource, sources, updateForm],
+    );
 
     return (
         <SearchContext.Provider
             value={{
-                getFilterComponentsForDomain,
+                ...state,
                 updateForm,
-                results: state.results,
-                domainSearchResponse: state.domainSearchResponse,
-                form: state.form,
                 search,
-                searchInDomain,
-                getDomains,
-                getCurrentDomain,
-                getDefaultFormValues,
+                domains,
+                currentDomain,
+                defaultFormValues,
                 resetForm,
+                handleSourceChange,
             }}
         >
-            {props.children}
+            {children}
         </SearchContext.Provider>
     );
 }

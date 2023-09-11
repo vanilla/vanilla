@@ -6,6 +6,8 @@
 
 namespace Vanilla\Forum\Widgets;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\Schema\Schema;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FieldMatchConditional;
@@ -23,10 +25,20 @@ trait CategoriesWidgetTrait
     /**
      * Get the schema of our api params.
      *
+     * @param bool $filter
+     * @param bool $limit
+     * @param bool $featured
+     * @param bool $followed
      * @return Schema
+     * @throws ContainerException
+     * @throws NotFoundException
      */
-    public static function getApiSchema(): Schema
-    {
+    public static function getApiSchema(
+        bool $filter = true,
+        bool $limit = true,
+        bool $featured = true,
+        bool $followed = true
+    ): Schema {
         $apiSchema = new Schema([
             "type" => "object",
             "default" => new \stdClass(),
@@ -60,85 +72,111 @@ trait CategoriesWidgetTrait
             $staticFormChoices["siteSection"] = "Subcommunity";
         }
 
-        $apiSchema = $apiSchema->merge(
-            SchemaUtils::composeSchemas(
-                Schema::parse([
-                    "filter:s" => [
-                        "enum" => $filterEnum,
-                        "description" => "Choose which categories to be included in the widget.",
-                        "default" => "none",
-                        "x-control" => SchemaForm::dropDown(
-                            new FormOptions("Filter By"),
-                            new StaticFormChoices($staticFormChoices)
+        $filterSchema = [];
+        $limitSchema = [];
+        $featuredSchema = [];
+        $followedSchema = [];
+
+        if ($filter) {
+            $filterSchema = [
+                "filter:s" => [
+                    "enum" => $filterEnum,
+                    "description" => "Choose which categories to be included in the widget.",
+                    "default" => "none",
+                    "x-control" => SchemaForm::dropDown(
+                        new FormOptions("Filter By"),
+                        new StaticFormChoices($staticFormChoices)
+                    ),
+                ],
+                "categoryID?" => [
+                    "type" => "array",
+                    "items" => ["type" => ["integer", "string", "null"]],
+                    "description" => "One or range of categoryIDs",
+                    "x-control" => SchemaForm::dropDown(
+                        new FormOptions("Categories", "Select the categories to use"),
+                        new ApiFormChoices(
+                            "/api/v2/categories/search?query=%s&limit=30",
+                            "/api/v2/categories/%s",
+                            "categoryID",
+                            "name"
                         ),
-                    ],
-                    "categoryID?" => [
-                        "type" => "array",
-                        "items" => ["type" => ["integer", "string", "null"]],
-                        "description" => "One or range of categoryIDs",
-                        "x-control" => SchemaForm::dropDown(
-                            new FormOptions("Categories", "Select the categories to use"),
-                            new ApiFormChoices(
-                                "/api/v2/categories?outputFormat=flat",
-                                "/api/v2/categories/%s",
-                                "categoryID",
-                                "name"
-                            ),
-                            new FieldMatchConditional(
-                                "apiParams.filter",
-                                Schema::parse([
-                                    "type" => "string",
-                                    "const" => "category",
-                                ])
-                            ),
-                            true
-                        ),
-                    ],
-                    "parentCategoryID?" => [
-                        "type" => ["integer", "string", "null"],
-                        "description" => "Category ID",
-                        "x-control" => SchemaForm::dropDown(
-                            new FormOptions("Category", "Select the category to use"),
-                            new ApiFormChoices(
-                                "/api/v2/categories?outputFormat=flat",
-                                "/api/v2/categories/%s",
-                                "categoryID",
-                                "name"
-                            ),
-                            new FieldMatchConditional(
-                                "apiParams.filter",
-                                Schema::parse([
-                                    "type" => "string",
-                                    "const" => "parentCategory",
-                                ])
-                            )
-                        ),
-                    ],
-                    "siteSectionID?" => $siteSectionSchema,
-                    "limit?" => [
-                        "type" => "integer",
-                        "minimum" => 1,
-                        "default" => 10,
-                        "description" => "Number of results to fetch.",
-                        "x-control" => SchemaForm::dropDown(
-                            new FormOptions(t("Limit"), t("Choose how many records to display.")),
-                            new StaticFormChoices([
-                                "3" => 3,
-                                "5" => 5,
-                                "10" => 10,
+
+                        new FieldMatchConditional(
+                            "apiParams.filter",
+                            Schema::parse([
+                                "type" => "string",
+                                "const" => "category",
                             ])
                         ),
-                    ],
-                    "featured:b?" => [
-                        "description" => "Followed categories filter",
-                        "x-control" => SchemaForm::toggle(new FormOptions("Featured", "Only featured categories.")),
-                    ],
-                    "followed:b?" => [
-                        "description" => "Followed categories filter",
-                        "x-control" => SchemaForm::toggle(new FormOptions("Followed", "Only followed categories.")),
-                    ],
-                ])
-            )
+                        true
+                    ),
+                ],
+                "parentCategoryID?" => [
+                    "type" => ["integer", "string", "null"],
+                    "description" => "Category ID",
+                    "x-control" => SchemaForm::dropDown(
+                        new FormOptions("Category", "Select the category to use"),
+                        new ApiFormChoices(
+                            "/api/v2/categories/search?query=%s&limit=30",
+                            "/api/v2/categories/%s",
+                            "categoryID",
+                            "name"
+                        ),
+                        new FieldMatchConditional(
+                            "apiParams.filter",
+                            Schema::parse([
+                                "type" => "string",
+                                "const" => "parentCategory",
+                            ])
+                        )
+                    ),
+                ],
+                "siteSectionID?" => $siteSectionSchema,
+            ];
+        }
+
+        if ($limit) {
+            $limitSchema = [
+                "limit" => [
+                    "type" => "integer",
+                    "description" => t("Desired number of items."),
+                    "minimum" => 1,
+                    "step" => 1,
+                    "maximum" => 100,
+                    "default" => 10,
+                    "x-control" => SchemaForm::textBox(
+                        new FormOptions(
+                            t("Limit"),
+                            t("Choose how many records to display."),
+                            "",
+                            t("Up to a maximum of 100 items may be displayed.")
+                        ),
+                        "number"
+                    ),
+                ],
+            ];
+        }
+
+        if ($featured) {
+            $featuredSchema = [
+                "featured:b?" => [
+                    "description" => "Followed categories filter",
+                    "x-control" => SchemaForm::toggle(new FormOptions("Featured", "Only featured categories.")),
+                ],
+            ];
+        }
+
+        if ($followed) {
+            $followedSchema = [
+                "followed:b?" => [
+                    "description" => "Followed categories filter",
+                    "x-control" => SchemaForm::toggle(new FormOptions("Followed", "Only followed categories.")),
+                ],
+            ];
+        }
+
+        $apiSchema = $apiSchema->merge(
+            SchemaUtils::composeSchemas(Schema::parse($filterSchema + $limitSchema + $featuredSchema + $followedSchema))
         );
 
         return $apiSchema;

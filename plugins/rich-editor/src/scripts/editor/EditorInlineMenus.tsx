@@ -10,9 +10,9 @@ import InlineToolbar from "@rich-editor/toolbars/InlineToolbar";
 import MentionToolbar from "@rich-editor/toolbars/MentionToolbar";
 
 export function EditorInlineMenus() {
-    const { quill, isLoading } = useEditor();
+    const { editor, isLoading } = useEditor();
 
-    if (!quill || isLoading) {
+    if (!editor || isLoading) {
         return null;
     } else {
         return (

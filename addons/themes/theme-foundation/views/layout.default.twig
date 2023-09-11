@@ -6,7 +6,7 @@
                 <div class="Container">
                     <div class="Frame-contentWrap">
                         <div class="Frame-details">
-                            {% if not isHomepage %}
+                            {% if not isHomepage|default(false) %}
                                 <div class="Frame-row">
                                     <nav class="BreadcrumbsBox" aria-label={{ t("Breadcrumb") }}>
                                         {{ renderBreadcrumbs() }}

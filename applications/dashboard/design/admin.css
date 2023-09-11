@@ -2426,7 +2426,7 @@ input[type=checkbox].disabled {
   margin-right: -18px;
 }
 
-.col-xl-24, .col-xl-23, .col-xl-22, .col-xl-21, .col-xl-20, .col-xl-19, .col-xl-18, .col-xl-17, .col-xl-16, .col-xl-15, .col-xl-14, .col-xl-13, .col-xl-12, .col-xl-11, .col-xl-10, .col-xl-9, .col-xl-8, .plank-container-grid .plank-wrapper, .Homepage .label-selector-item, .col-xl-7, .col-xl-6, .media-callout .media-left, .label-selector-item, .col-xl-5, .col-xl-4, .col-xl-3, .col-xl-2, .col-xl-1, .col-lg-24, .col-lg-23, .col-lg-22, .col-lg-21, .col-lg-20, .col-lg-19, .col-lg-18, .col-lg-17, .col-lg-16, .col-lg-15, .col-lg-14, .col-lg-13, .col-lg-12, .plank-container-grid .plank-wrapper, .Homepage .label-selector-item, .col-lg-11, .col-lg-10, .col-lg-9, .col-lg-8, .media-callout .media-left, .label-selector-item, .col-lg-7, .col-lg-6, .col-lg-5, .col-lg-4, .col-lg-3, .col-lg-2, .col-lg-1, .col-md-24, .col-md-23, .col-md-22, .col-md-21, .col-md-20, .col-md-19, .col-md-18, .col-md-17, .col-md-16, .col-md-15, .col-md-14, .col-md-13, .col-md-12, .col-md-11, .col-md-10, .col-md-9, .col-md-8, .col-md-7, .col-md-6, .col-md-5, .col-md-4, .col-md-3, .col-md-2, .col-md-1, .col-sm-24, .col-sm-23, .col-sm-22, .col-sm-21, .col-sm-20, .col-sm-19, .col-sm-18, .col-sm-17, .col-sm-16, .col-sm-15, .col-sm-14, .form-group > .input-wrap, .form-group > .color-picker, .col-sm-13, .col-sm-12, .col-sm-11, .col-sm-10, .form-group > .label-wrap-wide, .form-group > .label-wrap, .col-sm-9, .col-sm-8, .plank-container-grid .plank-wrapper, .media-callout .media-left, .label-selector-item, .Homepage .label-selector-item, .col-sm-7, .col-sm-6, .col-sm-5, .col-sm-4, .col-sm-3, .col-sm-2, .col-sm-1, .col-xs-24, .form-group > .label-wrap, .form-group > .input-wrap, .form-group > .color-picker, .col-xs-23, .col-xs-22, .col-xs-21, .col-xs-20, .col-xs-19, .col-xs-18, .col-xs-17, .col-xs-16, .col-xs-15, .col-xs-14, .col-xs-13, .col-xs-12, .plank-container-grid .plank-wrapper, .modal .media-callout .media-left, .media-callout .media-left, .label-selector-item, .Homepage .label-selector-item, .form-group > .label-wrap-wide, .col-xs-11, .col-xs-10, .col-xs-9, .col-xs-8, .col-xs-7, .col-xs-6, .col-xs-5, .col-xs-4, .col-xs-3, .col-xs-2, .col-xs-1 {
+.col-xl-24, .col-xl-23, .col-xl-22, .col-xl-21, .col-xl-20, .col-xl-19, .col-xl-18, .col-xl-17, .col-xl-16, .col-xl-15, .col-xl-14, .col-xl-13, .col-xl-12, .col-xl-11, .col-xl-10, .col-xl-9, .col-xl-8, .plank-container-grid .plank-wrapper, .Homepage .label-selector-item, .col-xl-7, .col-xl-6, .media-callout .media-left, .label-selector-item, .col-xl-5, .col-xl-4, .col-xl-3, .col-xl-2, .col-xl-1, .col-lg-24, .col-lg-23, .col-lg-22, .col-lg-21, .col-lg-20, .col-lg-19, .col-lg-18, .col-lg-17, .col-lg-16, .col-lg-15, .col-lg-14, .col-lg-13, .col-lg-12, .plank-container-grid .plank-wrapper, .Homepage .label-selector-item, .col-lg-11, .col-lg-10, .col-lg-9, .col-lg-8, .media-callout .media-left, .label-selector-item, .col-lg-7, .col-lg-6, .col-lg-5, .col-lg-4, .col-lg-3, .col-lg-2, .col-lg-1, .col-md-24, .col-md-23, .col-md-22, .col-md-21, .col-md-20, .col-md-19, .col-md-18, .col-md-17, .col-md-16, .col-md-15, .col-md-14, .col-md-13, .col-md-12, .col-md-11, .col-md-10, .col-md-9, .col-md-8, .col-md-7, .col-md-6, .col-md-5, .col-md-4, .col-md-3, .col-md-2, .col-md-1, .col-sm-24, .col-sm-23, .col-sm-22, .col-sm-21, .col-sm-20, .col-sm-19, .col-sm-18, .col-sm-17, .col-sm-16, .col-sm-15, .col-sm-14, .form-group.formGroup-checkBox .input-wrap, .form-group.formGroup-checkBox .color-picker, .form-group > .label-wrap, .col-sm-13, .col-sm-12, .col-sm-11, .col-sm-10, .form-group > .label-wrap-wide, .form-group > .input-wrap, .form-group > .color-picker, .col-sm-9, .col-sm-8, .plank-container-grid .plank-wrapper, .media-callout .media-left, .label-selector-item, .Homepage .label-selector-item, .col-sm-7, .col-sm-6, .col-sm-5, .col-sm-4, .col-sm-3, .col-sm-2, .col-sm-1, .col-xs-24, .form-group.formGroup-checkBox .input-wrap, .form-group.formGroup-checkBox .color-picker, .form-group > .label-wrap, .form-group > .input-wrap, .form-group > .color-picker, .col-xs-23, .col-xs-22, .col-xs-21, .col-xs-20, .col-xs-19, .col-xs-18, .col-xs-17, .col-xs-16, .col-xs-15, .col-xs-14, .col-xs-13, .col-xs-12, .plank-container-grid .plank-wrapper, .modal .media-callout .media-left, .media-callout .media-left, .label-selector-item, .Homepage .label-selector-item, .form-group > .label-wrap-wide, .col-xs-11, .col-xs-10, .col-xs-9, .col-xs-8, .col-xs-7, .col-xs-6, .col-xs-5, .col-xs-4, .col-xs-3, .col-xs-2, .col-xs-1 {
   position: relative;
   min-height: 1px;
   padding-left: 18px;
@@ -2525,7 +2525,7 @@ input[type=checkbox].disabled {
   flex: 0 0 95.8333333333%;
 }
 
-.col-xs-24, .form-group > .label-wrap, .form-group > .input-wrap, .form-group > .color-picker {
+.col-xs-24, .form-group.formGroup-checkBox .input-wrap, .form-group.formGroup-checkBox .color-picker, .form-group > .label-wrap, .form-group > .input-wrap, .form-group > .color-picker {
   flex: 0 0 100%;
 }
 
@@ -2866,7 +2866,7 @@ input[type=checkbox].disabled {
     flex: 0 0 37.5%;
   }
 
-  .col-sm-10, .form-group > .label-wrap-wide, .form-group > .label-wrap {
+  .col-sm-10, .form-group > .label-wrap-wide, .form-group > .input-wrap, .form-group > .color-picker {
     flex: 0 0 41.6666666667%;
   }
 
@@ -2882,7 +2882,7 @@ input[type=checkbox].disabled {
     flex: 0 0 54.1666666667%;
   }
 
-  .col-sm-14, .form-group > .input-wrap, .form-group > .color-picker {
+  .col-sm-14, .form-group.formGroup-checkBox .input-wrap, .form-group.formGroup-checkBox .color-picker, .form-group > .label-wrap {
     flex: 0 0 58.3333333333%;
   }
 
@@ -6323,14 +6323,11 @@ form ol li {
   padding-top: 16px;
   padding-bottom: 16px;
   margin-bottom: 0;
-  border-bottom: 1px dotted #e7e8e9;
+  border-bottom: 1px solid #d8d8d8;
 }
 .form-group > .no-grid {
   padding-left: 18px;
   padding-right: 18px;
-}
-.form-group > .input-wrap, .form-group > .color-picker {
-  max-width: 58.3333333333%;
 }
 .form-group > .label-wrap-wide {
   flex-grow: 1;
@@ -6351,6 +6348,15 @@ form ol li {
 .dashboard-main .form-group {
   margin-bottom: 0;
 }
+.form-group.formGroup-upload {
+  align-items: center;
+}
+.form-group.formGroup-upload img {
+  max-width: 100%;
+}
+.form-group.formGroup-richeditor {
+  display: block;
+}
 
 label,
 .label {
@@ -6364,6 +6370,15 @@ label,
 .input-wrap .SelectOne__placeholder,
 .color-picker .SelectOne__placeholder {
   font-size: 14px;
+}
+@media (max-width: 600px) {
+  .input-wrap input, .color-picker input,
+.input-wrap .SelectOne__single-value,
+.color-picker .SelectOne__single-value,
+.input-wrap .SelectOne__placeholder,
+.color-picker .SelectOne__placeholder {
+    font-size: 16px;
+  }
 }
 .input-wrap:not(.inline) label, .color-picker:not(.inline) label {
   display: block;
@@ -6633,6 +6648,8 @@ label,
   color: #555a62;
   border: 1px solid #ccc;
   border-radius: 6px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .file-upload-browse {
@@ -8343,7 +8360,6 @@ button.close {
 }
 
 .dashboard-main {
-  position: relative;
   flex-grow: 1;
   order: 2;
   display: flex;
@@ -8354,7 +8370,8 @@ button.close {
   padding-left: 18px;
   padding-right: 18px;
   max-width: 1024px;
-  overflow-y: hidden;
+  min-width: 0;
+  overflow-y: visible;
 }
 .dashboard-main .content {
   flex-grow: 1;
@@ -8452,6 +8469,11 @@ button.close {
 
   .drawer-toggle {
     display: block;
+  }
+
+  .dashboard-main {
+    min-width: 100%;
+    width: 100%;
   }
 
   .drawer-show .panel-left {
@@ -9157,11 +9179,25 @@ ul {
   justify-content: space-between;
   align-items: center;
   min-height: 48px;
+  flex-wrap: wrap;
 }
 .header-block h1 {
   margin: 0;
   padding: 9px 0;
   font-size: 18px;
+  flex: 1;
+}
+
+.dashboard-main .header-block {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 48px;
+  z-index: 35;
+  background-color: #fff;
+}
+.dashboard-main .header-block .no-sticky {
+  position: static;
+  top: initial;
 }
 
 .title-block {
@@ -9240,6 +9276,9 @@ ul {
   line-height: 1.5;
   font-weight: 600;
   border-top: 1px solid #e7e8e9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .subheading-block {
@@ -10921,7 +10960,12 @@ body {
 .userContent.Message {
   margin-top: 14px;
 }
-.userContent.Message > .embedImage + p::after {
+.userContent.Message > .embedImage ~ p:last-child::after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.userContent.Message > .embedImage:first-child:last-child::after {
   content: "";
   display: table;
   clear: both;
@@ -11338,7 +11382,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   display: block;
   margin: 0 auto;
   max-width: 100%;
-  width: 640px;
+  width: 100%;
   position: relative;
   justify-content: center;
   align-items: center;
@@ -11479,7 +11523,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 .embedVideo .embedExternal-content {
   position: relative;
   display: block;
-  width: 640px;
+  width: 100%;
   max-width: 100%;
   margin: auto;
 }
@@ -11630,7 +11674,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 }
 
 .embedImage-link {
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
 }
 
@@ -12116,7 +12160,7 @@ body.isMobile .Popup.hasRichEditor .Border {
 
 .userContent li,
 .userContent.userContent ul li {
-  margin: 5px 0;
+  margin: 0;
 }
 
 body:not(.dashboard) svg {

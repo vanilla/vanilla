@@ -60,6 +60,7 @@ class SchemaForm
             "placeholder" => $options->getPlaceHolder(),
             "choices" => $choices->getChoices(),
             "multiple" => $multiple,
+            "tooltip" => $options->getTooltip(),
         ];
 
         if ($conditions) {
@@ -88,6 +89,7 @@ class SchemaForm
             "inputType" => self::TEXT_TYPE,
             "placeholder" => $options->getPlaceHolder(),
             "type" => $type,
+            "tooltip" => $options->getTooltip(),
         ];
 
         if ($conditions) {

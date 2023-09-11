@@ -56,4 +56,12 @@ class SearchAllEvent implements TrackingEventInterface
     {
         return self::COLLECTION_NAME;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionID(): ?string
+    {
+        return $this->payload["siteSectionID"] ?? null;
+    }
 }

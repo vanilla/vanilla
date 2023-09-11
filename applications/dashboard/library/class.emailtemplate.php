@@ -4,7 +4,10 @@
  * @license GPL-2.0-only
  */
 
+use Garden\Schema\Schema;
 use Vanilla\Formatting\Formats\WysiwygFormat;
+use Vanilla\Formatting\Html\HtmlDocument;
+use Vanilla\Formatting\Html\Processor\ImageHtmlProcessor;
 use Vanilla\Web\Asset\LegacyAssetModel;
 
 /**
@@ -261,7 +264,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate
     /**
      * Get the HTML footer.
      *
-     * @return string The HTML formatted email footer.
+     * @return array{text: string, textColor:string, backgroundColor: string} The HTML formatted email footer.
      */
     public function getFooter()
     {
@@ -273,21 +276,26 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate
      *
      * The footer background and text colors default to the button background and text colors.
      *
-     * @param string $text The HTML formatted email footer text.
-     * @param string $textColor The hex color code of the footer text, must include the leading '#'.
-     * @param string $backgroundColor The hex color code of the footer background, must include the leading '#'.
+     * @param string $html The HTML formatted email footer text.
      * @return EmailTemplate $this The calling object.
      */
-    public function setFooter($text, $textColor = "", $backgroundColor = "")
+    public function setFooterHtml(string $html)
     {
-        if (!$textColor) {
-            $textColor = $this->defaultButtonTextColor;
+        $textColor = $this->textColor;
+        $backgroundColor = $this->backgroundColor;
+
+        // Make sure the links have proper styling.
+        $textDoc = new HtmlDocument($html);
+        $links = $textDoc->queryCssSelector("a");
+
+        /** @var DOMElement $link */
+        foreach ($links as $link) {
+            $link->setAttribute("style", "color: {$textColor}; font-weight: 600;");
         }
-        if (!$backgroundColor) {
-            $backgroundColor = $this->defaultButtonBackgroundColor;
-        }
+        $html = $textDoc->getInnerHtml();
+
         $this->footer = [
-            "text" => htmlspecialchars($this->formatContent($text)),
+            "text" => $html,
             "textColor" => htmlspecialchars($textColor),
             "backgroundColor" => htmlspecialchars($backgroundColor),
         ];
@@ -588,6 +596,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate
                     $email[$key] = "<br>$val<br>";
                 } elseif ($key == "banner") {
                     $email["banner"] = "{$val}<br>";
+                } elseif ($key == "footer") {
+                    $email["footer"] = "<br>{$val["text"]}<br/>";
                 }
             }
         }

@@ -17,7 +17,7 @@ import { inheritHeightClass } from "@library/styles/styleHelpers";
 import { useMeasure } from "@vanilla/react-utils";
 import { logError } from "@vanilla/utils";
 import classNames from "classnames";
-import React, { useContext, useMemo, useRef } from "react";
+import React, { ElementType, useContext, useMemo, useRef } from "react";
 import Panel from "./components/Panel";
 import PanelAreaHorizontalPadding from "./components/PanelAreaHorizontalPadding";
 import PanelOverflow from "./components/PanelOverflow";
@@ -26,7 +26,7 @@ import PanelWidgetHorizontalPadding from "./components/PanelWidgetHorizontalPadd
 export interface ISectionProps extends React.HTMLAttributes<HTMLElement> {
     className?: string;
     toggleMobileMenu?: (isOpen: boolean) => void;
-    contentTag?: keyof JSX.IntrinsicElements;
+    contentTag?: ElementType;
     growMiddleBottom?: boolean;
     topPadding?: boolean;
     leftTop?: React.ReactNode;
@@ -97,6 +97,7 @@ export default function Section(props: ISectionProps) {
         children,
         childrenBefore,
         childrenAfter,
+        renderLeftPanelBackground,
         displayRightColumn = true,
         displayLeftColumn = true,
         ...elementProps
@@ -202,7 +203,7 @@ export default function Section(props: ISectionProps) {
                                     headingBlockClass={classes.secondaryPanelHeadingBlock}
                                 >
                                     <Panel
-                                        className={classNames(classes.leftColumn, {
+                                        className={classNames("leftColumn", classes.leftColumn, {
                                             [classes.isSticky]: isSticky,
                                             [panelOffsetClass]: isSticky,
                                             [offsetClass]: isSticky,
@@ -211,7 +212,7 @@ export default function Section(props: ISectionProps) {
                                         <PanelOverflow
                                             offset={overflowOffset}
                                             isLeft={true}
-                                            renderLeftPanelBackground={props.renderLeftPanelBackground}
+                                            renderLeftPanelBackground={renderLeftPanelBackground}
                                         >
                                             {childComponents.leftTop !== undefined && (
                                                 <PanelArea>{childComponents.leftTop}</PanelArea>
@@ -237,12 +238,13 @@ export default function Section(props: ISectionProps) {
                             >
                                 <Panel
                                     className={classNames(
+                                        "mainColumn",
                                         classes.mainColumn,
                                         props.growMiddleBottom ? inheritHeightClass() : "",
                                     )}
                                 >
                                     {childComponents.middleTop !== undefined && (
-                                        <PanelArea>{childComponents.middleTop}</PanelArea>
+                                        <PanelArea className="middleTopArea">{childComponents.middleTop}</PanelArea>
                                     )}
                                     {!shouldRenderLeftPanel && childComponents.leftTop !== undefined && (
                                         <PanelArea>{childComponents.leftTop}</PanelArea>
@@ -270,7 +272,7 @@ export default function Section(props: ISectionProps) {
                                     headingBlockClass={classes.secondaryPanelHeadingBlock}
                                 >
                                     <Panel
-                                        className={classNames(classes.rightColumn, {
+                                        className={classNames("rightColumn", classes.rightColumn, {
                                             [classes.isSticky]: isSticky,
                                             [panelOffsetClass]: isSticky,
                                             [offsetClass]: isSticky,

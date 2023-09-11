@@ -54,9 +54,9 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
 
     if (options.viewAll) {
         const label = t(options?.viewAll?.name ?? "View All");
-        if (options.viewAll.onClick) {
+        if (props?.options?.viewAll?.onClick) {
             viewAllLinkOrButton = (
-                <Button onClick={options?.viewAll?.onClick} buttonType={options.viewAll.displayType}>
+                <Button onClick={props?.options?.viewAll?.onClick} buttonType={options.viewAll.displayType}>
                     {label}
                 </Button>
             );

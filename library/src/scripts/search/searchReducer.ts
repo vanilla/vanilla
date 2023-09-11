@@ -4,21 +4,21 @@
  */
 
 import { SearchActions } from "@library/search/SearchActions";
-import { ALL_CONTENT_DOMAIN_NAME } from "@library/search/searchConstants";
 import { ISearchForm, ISearchResponse } from "@library/search/searchTypes";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { produce } from "immer";
 import { reducerWithoutInitialState } from "typescript-fsa-reducers";
 import { SEARCH_SCOPE_LOCAL } from "@library/features/search/SearchScopeContext";
+import { EMPTY_SEARCH_DOMAIN_KEY } from "./searchConstants";
 
-export interface ISearchState {
-    form: ISearchForm;
-    results: ILoadable<ISearchResponse>;
+export interface ISearchState<ExtraFormValues extends object = {}> {
+    form: ISearchForm<ExtraFormValues>;
+    response: ILoadable<ISearchResponse>;
     domainSearchResponse: Record<string, ILoadable<ISearchResponse>>;
 }
 
 export const DEFAULT_CORE_SEARCH_FORM: ISearchForm = {
-    domain: ALL_CONTENT_DOMAIN_NAME,
+    domain: EMPTY_SEARCH_DOMAIN_KEY,
     query: "",
     page: 1,
     sort: "relevance",
@@ -28,7 +28,7 @@ export const DEFAULT_CORE_SEARCH_FORM: ISearchForm = {
 
 export const INITIAL_SEARCH_STATE: ISearchState = {
     form: DEFAULT_CORE_SEARCH_FORM,
-    results: {
+    response: {
         status: LoadStatus.PENDING,
     },
     domainSearchResponse: {},
@@ -39,53 +39,56 @@ const reinitilizeParams = ["sort", "domain", "scope", "page", "pageURL"];
 export const searchReducer = produce(
     reducerWithoutInitialState<ISearchState>()
         .case(SearchActions.updateSearchFormAC, (nextState, payload) => {
-            nextState.form.needsResearch = false;
+            let needsResearch = false;
+
             if (nextState.form.initialized) {
                 for (const reinitParam of reinitilizeParams) {
                     if (payload[reinitParam] !== undefined && nextState.form[reinitParam] !== payload[reinitParam]) {
-                        nextState.form.needsResearch = true;
+                        needsResearch = true;
                     }
                 }
             }
 
             if (!nextState.form.initialized && payload.initialized) {
-                nextState.form.needsResearch = true;
+                needsResearch = true;
             }
 
-            nextState.form = {
+            const nextForm = {
                 ...nextState.form,
                 ...payload,
+                needsResearch,
             };
 
             if (!payload.initialized) {
-                // Only when the search form changes outside of initialization.
                 if (!("page" in payload)) {
-                    nextState.form.page = 1;
+                    nextForm.page = 1;
                 }
 
-                if ("domain" in payload) {
-                    delete nextState.form.types;
+                if ("domain" in payload || "source" in payload) {
+                    delete nextForm.types;
                 }
             }
+
+            nextState.form = nextForm;
 
             return nextState;
         })
         .case(SearchActions.performSearchACs.started, (nextState, payload) => {
             nextState.form.needsResearch = false;
             nextState.form.initialized = true;
-            nextState.results.status = LoadStatus.LOADING;
+            nextState.response.status = LoadStatus.LOADING;
 
             return nextState;
         })
         .case(SearchActions.performSearchACs.done, (nextState, payload) => {
-            nextState.results.status = LoadStatus.SUCCESS;
-            nextState.results.data = payload.result;
+            nextState.response.status = LoadStatus.SUCCESS;
+            nextState.response.data = payload.result;
 
             return nextState;
         })
         .case(SearchActions.performSearchACs.failed, (nextState, payload) => {
-            nextState.results.status = LoadStatus.ERROR;
-            nextState.results.error = payload.error;
+            nextState.response.status = LoadStatus.ERROR;
+            nextState.response.error = payload.error;
 
             return nextState;
         })
@@ -113,7 +116,7 @@ export const searchReducer = produce(
         })
         .case(SearchActions.resetFormAC, (nextState) => {
             nextState.form = { ...DEFAULT_CORE_SEARCH_FORM };
-            nextState.results = {
+            nextState.response = {
                 status: LoadStatus.PENDING,
             };
             return nextState;

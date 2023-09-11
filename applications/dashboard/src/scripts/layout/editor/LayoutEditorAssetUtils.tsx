@@ -1,8 +1,9 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
+import { DiscussionListSortOptions } from "@dashboard/@types/api/discussion";
 import { LayoutSectionInfos } from "@dashboard/layout/editor/LayoutSectionInfos";
 import {
     IEditableLayoutSpec,
@@ -22,7 +23,7 @@ export class LayoutEditorAssetUtils {
             case "discussionList":
                 return ["react.asset.discussionList"];
             case "categoryList":
-                return [];
+                return ["react.asset.categoryList", "react.asset.discussionList", "react.asset.events"];
             default:
                 return [];
         }
@@ -59,40 +60,105 @@ export class LayoutEditorAssetUtils {
     }
 
     /**
-     * Return initial hydrate spec for discussion list asset.
+     * Return initial hydrate spec for categoryList layoutViewType, category list asset and discussion list asset.
      */
-    public static discussionList(): IEditableLayoutWidget {
+    public static categoryAndDiscussionListSection(): IEditableLayoutWidget {
+        let children = this.categoryList();
+        children = children.concat(this.discussionList());
+        children = children.concat(this.eventList());
         return {
             $hydrate: "react.section.1-column",
-            children: [
-                {
-                    $hydrate: "react.asset.discussionList",
-                    apiParams: {
-                        includeChildCategories: true,
-                        sort: "-dateInserted",
-                        slotType: "a",
-                    },
-                    discussionOptions: {
-                        excerpt: {
-                            display: true,
-                        },
-                        metas: {
-                            display: {
-                                category: true,
-                                commentCount: true,
-                                lastCommentDate: true,
-                                lastUser: true,
-                                score: true,
-                                startedByUser: true,
-                                unreadCount: true,
-                                userTags: true,
-                                viewCount: true,
-                            },
-                        },
-                    },
-                    title: "Recent Discussions",
-                },
-            ],
+            children: children,
         };
+    }
+
+    /**
+     * Return initial hydrate spec for discussion list asset.
+     */
+    public static discussionListSection(): IEditableLayoutWidget {
+        return {
+            $hydrate: "react.section.1-column",
+            children: this.discussionList(),
+        };
+    }
+
+    /**
+     * Return the categoryList asset initial spec.
+     * @private
+     */
+    private static categoryList(): object[] {
+        return [
+            {
+                $hydrate: "react.asset.categoryList",
+                apiParams: {
+                    filter: "none",
+                },
+                title: "Categories",
+                isAsset: true,
+            },
+        ];
+    }
+
+    /**
+     * Return the discussionList asset initial spec.
+     * @private
+     */
+    private static discussionList(): object[] {
+        return [
+            {
+                $hydrate: "react.asset.discussionList",
+                apiParams: {
+                    includeChildCategories: true,
+                    sort: DiscussionListSortOptions.RECENTLY_COMMENTED,
+                    slotType: "a",
+                },
+                discussionOptions: {
+                    excerpt: {
+                        display: true,
+                    },
+                    metas: {
+                        display: {
+                            category: true,
+                            commentCount: true,
+                            lastCommentDate: true,
+                            lastUser: true,
+                            score: true,
+                            startedByUser: true,
+                            unreadCount: true,
+                            userTags: true,
+                            viewCount: true,
+                        },
+                    },
+                },
+                title: "Recent Discussions",
+                isAsset: true,
+            },
+        ];
+    }
+
+    /**
+     * Return the eventList asset initial spec.
+     * @private
+     */
+    private static eventList(): object[] {
+        return [
+            {
+                $hydrate: "react.asset.events",
+                apiParams: {
+                    mode: "upcoming",
+                    limit: 5,
+                },
+                title: "Events",
+                isAsset: true,
+                containerOptions: {
+                    viewAll: {
+                        showViewAll: true,
+                        position: "bottom",
+                        to: "/events",
+                        name: "View All",
+                    },
+                },
+            },
+        ];
     }
 }

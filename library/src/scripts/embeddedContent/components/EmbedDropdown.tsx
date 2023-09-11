@@ -5,11 +5,11 @@
  */
 
 import React, { createContext, PropsWithChildren, useContext, useEffect, useRef } from "react";
-import { EmbedMenuContext } from "@rich-editor/editor/pieces/EmbedMenu";
 import { embedDropdownClasses } from "@library/embeddedContent/components/embedDropdownStyles";
 import { CheckIcon } from "@library/icons/common";
 import { EmbedButton } from "@library/embeddedContent/components/EmbedButton";
 import { useUniqueID } from "@library/utility/idUtils";
+import { EmbedMenuContext } from "@library/editor/pieces/EmbedMenu";
 
 interface IEmbedDropdownContext {
     selected?: string;
@@ -39,7 +39,7 @@ export function EmbedDropdown(props: PropsWithChildren<IEmbedDropdownProps>) {
         <>
             <EmbedButton
                 id={buttonId}
-                aria-aria-haspopup="true"
+                aria-haspopup="true"
                 aria-controls={contentId}
                 aria-expanded={isSelected ? "true" : "false"}
                 aria-label={label}

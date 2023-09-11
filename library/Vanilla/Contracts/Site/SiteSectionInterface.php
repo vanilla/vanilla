@@ -132,4 +132,11 @@ interface SiteSectionInterface extends \JsonSerializable
      * @return array
      */
     public function getLayoutIdLookupParams(string $layoutViewType, string $recordType, string $recordID): array;
+
+    /**
+     * Get a payload to apply to tracking events. This will be merged with an event payload.
+     *
+     * @return array
+     */
+    public function getTrackablePayload(): array;
 }

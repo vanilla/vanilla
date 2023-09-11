@@ -81,6 +81,14 @@ export const selectBoxClasses = useThemeCache(() => {
         paddingBottom: styleUnit(0),
     });
 
+    const selectOptionLabel = css({
+        "&&&": {
+            "@media (max-width: 600px)": {
+                fontSize: globalVars.fonts.size.large,
+            },
+        },
+    });
+
     return {
         toggle,
         buttonItem,
@@ -90,5 +98,6 @@ export const selectBoxClasses = useThemeCache(() => {
         spacer,
         itemLabel,
         offsetPadding,
+        selectOptionLabel,
     };
 });

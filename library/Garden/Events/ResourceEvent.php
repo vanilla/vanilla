@@ -6,7 +6,9 @@
 
 namespace Garden\Events;
 
+use Gdn;
 use Vanilla\Events\EventAction;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\ModelUtils;
 
 /**
@@ -220,5 +222,17 @@ abstract class ResourceEvent implements \JsonSerializable
     public function __toString()
     {
         return json_encode($this, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * Get the site sectionID the event originated from.
+     */
+    public function getSiteSectionID(): ?string
+    {
+        $siteSection = Gdn::getContainer()
+            ->get(SiteSectionModel::class)
+            ->getCurrentSiteSection();
+
+        return $siteSection->getSectionID() ?? null;
     }
 }

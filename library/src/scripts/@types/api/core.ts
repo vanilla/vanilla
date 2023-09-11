@@ -7,7 +7,7 @@ import { AxiosError, AxiosResponse } from "axios";
 import { IUserFragment } from "@library/@types/api/users";
 import { RecordID } from "@vanilla/utils";
 import { ImageSourceSet } from "@library/utility/appUtils";
-import { ILinkPages } from "@library/navigation/SimplePagerModel";
+import { IFieldError } from "@vanilla/json-schema-forms";
 
 export enum LoadStatus {
     PENDING = "PENDING",
@@ -45,12 +45,8 @@ export interface IApiResponse<DataType = any> {
     headers?: any;
 }
 
-export interface IFieldError {
-    message: string; // translated message
-    code?: string; // translation code
-    field: string;
-    status?: number; // HTTP status
-}
+// Moved
+export type { IFieldError };
 
 export interface IServerError {
     message: string;
@@ -60,7 +56,7 @@ export interface IServerError {
     };
 }
 
-export interface IApiError extends AxiosError {
+export interface IApiError extends AxiosError, IServerError {
     response: AxiosResponse<IServerError | null>;
 }
 
@@ -155,4 +151,9 @@ export interface IImage {
 export interface IFeaturedImage {
     display: boolean;
     fallbackImage?: string;
+}
+
+export interface IDateTimeRange {
+    start?: string;
+    end?: string;
 }

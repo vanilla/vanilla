@@ -26,6 +26,7 @@ interface IDateTimeProps {
     /** Display a fixed or relative visible time. */
     mode?: "relative" | "fixed";
     type?: DateFormats;
+    monthOnlyForSameYear?: boolean;
 }
 
 /**
@@ -123,6 +124,14 @@ export default class DateTime extends Component<IDateTimeProps> {
                             timeZone: this.props.timezone,
                         })
                         .toLowerCase();
+                }
+                // If it's the same year and we don't want the year included
+                if (this.props.monthOnlyForSameYear && inputDateObject.getFullYear() === nowDate.getFullYear()) {
+                    return inputDateObject.toLocaleString(localeKey, {
+                        month: "short",
+                        day: "numeric",
+                        timeZone: this.props.timezone,
+                    });
                 }
                 // Otherwise return the date.
                 return inputDateObject.toLocaleString(localeKey, this.options);

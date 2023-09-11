@@ -13,7 +13,7 @@ $embedVideo_width: $embed_width;
     .embedExternal-content {
         position: relative;
         display: block;
-        width: $embedVideo_width;
+        width: 100%;
         max-width: 100%;
         margin: auto;
 

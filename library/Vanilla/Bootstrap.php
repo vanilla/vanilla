@@ -8,8 +8,11 @@
 namespace Vanilla;
 
 use Garden\Container\Container;
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\Container\Reference;
 use Garden\Web\Dispatcher;
+use Garden\Web\PageControllerRoute;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -20,7 +23,6 @@ use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Vanilla\Analytics\AnalyticsActionsProvider;
 use Vanilla\Analytics\TrackableDecoratorInterface;
 use Vanilla\Cache\CacheCacheAdapter;
-use Vanilla\ImageSrcSet\ImageResizeProviderInterface;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\ImageSrcSet\Providers\DefaultImageResizeProvider;
 use Vanilla\Layout\LayoutHydrator;
@@ -32,7 +34,6 @@ use Vanilla\Scheduler\LongRunnerMiddleware;
 use Vanilla;
 use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeFeatures;
-use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
@@ -57,6 +58,8 @@ class Bootstrap
      * THIS METHOD SHOULD NOT HAVE SIDE EFFECTS BEYOND CONTAINER CONFIG. DO NOT CREATE INSTANCES IN THIS METHOD.
      *
      * @param Container $container
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public static function configureContainer(Container $container): void
     {
@@ -210,7 +213,6 @@ class Bootstrap
             ->rule(\Garden\Web\Dispatcher::class)
             ->setShared(true)
             ->addCall("addRoute", ["route" => new Reference("@api-v2-route"), "api-v2"])
-            ->addCall("addRoute", ["route" => new Reference("@new-search-route"), "new-search"])
             ->addCall("addRoute", [
                 "route" => new \Garden\Container\Callback(function () {
                     return new \Garden\Web\PreflightRoute("/api/v2", true);
@@ -225,17 +227,12 @@ class Bootstrap
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\APIExpandMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(\Vanilla\Web\ApiSelectMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(Vanilla\Web\ApiExtensionMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\ValidateUTF8Middleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\ValidateJSONMiddleware::class)])
 
             // Specific route definitions and middlewares
-            ->rule("@new-search-route")
-            ->setClass(\Garden\Web\ResourceRoute::class)
-            ->setConstructorArgs(["/search", "*\\%sSearchPageController"])
-            ->addCall("setFeatureFlag", [SearchRootController::ENABLE_FLAG])
-            ->addCall("setMeta", ["CONTENT_TYPE", "text/html; charset=utf-8"])
-            ->addCall("setRootController", [SearchRootController::class])
-
             ->rule("@api-v2-route")
             ->setClass(\Garden\Web\ResourceRoute::class)
             ->setConstructorArgs(["/api/v2/", "*\\%sApiController"])
@@ -294,5 +291,11 @@ class Bootstrap
             ->setShared(true)
             ->addCall("addProvider", [new Reference(\Vanilla\Layout\LayoutModel::class)])
             ->addCall("addProvider", [new Reference(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)]);
+
+        PageControllerRoute::configurePageRoutes(
+            $container,
+            ["/search" => SearchRootController::class],
+            SearchRootController::ENABLE_FLAG
+        );
     }
 }

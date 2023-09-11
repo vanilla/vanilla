@@ -8,6 +8,7 @@
 namespace Vanilla\Utility;
 
 use ArrayAccess;
+use function Vanilla\Web;
 
 /**
  * Utility functions that operate on arrays or array-like objects.
@@ -305,7 +306,8 @@ final class ArrayUtils
                 $callback($array, $path);
 
                 foreach ($keys as $key) {
-                    if (static::isArray($array[$key])) {
+                    // Make sure we check existence because it could have been deleted.
+                    if (isset($array[$key]) && static::isArray($array[$key])) {
                         $currentPath = array_merge($path, [$key]);
                         $m($array[$key], $currentPath);
                     }
@@ -601,6 +603,7 @@ final class ArrayUtils
 
         $keys = array_fill_keys($keys, true);
         $result = array_intersect_key($arr, $keys);
+
         return $result;
     }
 
@@ -674,6 +677,17 @@ final class ArrayUtils
     }
 
     /**
+     * Given an object, attempt to convert it to an associative array.
+     *
+     * @param array $arr
+     * @return array
+     */
+    public static function jsonNormalizeArray(array $arr): array
+    {
+        return json_decode(json_encode($arr), true);
+    }
+
+    /**
      * Recursively apply `json_decode()` to a provided array's values.
      *
      * @param array $array
@@ -722,5 +736,47 @@ final class ArrayUtils
             }
         }
         return $result;
+    }
+
+    /**
+     * Convert dot notation formatted flat array to multidimensional array
+     *
+     * @param array $dotNotation
+     * @return array
+     */
+    public static function dotNotationToArray(array $dotNotation): array
+    {
+        $res = [];
+        foreach ($dotNotation as $path => $value) {
+            ArrayUtils::setByPath($path, $res, $value);
+        }
+
+        return $res;
+    }
+
+    /**
+     * Convert multidimensional array to dot notation flat array
+     *
+     * @param array $arr
+     * @return array
+     */
+    public static function arrayToDotNotation(array $arr): array
+    {
+        $dotFlatten = function (array $input, array $resultArray, string $currentPrefix) use (&$dotFlatten): array {
+            foreach ($input as $key => $value) {
+                $newKey = $currentPrefix . $key;
+
+                // check if it's associative array 99% good
+                if (is_array($value) && ArrayUtils::isAssociative($value)) {
+                    $resultArray = array_merge($resultArray, $dotFlatten($value, $resultArray, $newKey . "."));
+                } else {
+                    $resultArray[$newKey] = $value;
+                }
+            }
+
+            return $resultArray;
+        };
+
+        return $dotFlatten($arr, [], "");
     }
 }

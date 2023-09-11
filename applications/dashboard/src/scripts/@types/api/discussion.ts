@@ -1,15 +1,15 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { IReaction } from "@dashboard/@types/api/reaction";
 import { IUserFragment } from "@library/@types/api/users";
 import { IImage } from "@library/@types/api/core";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { RecordID } from "@vanilla/utils";
+import { IReaction } from "@dashboard/@types/api/reaction";
 
 export interface IDiscussion {
     discussionID: RecordID;
@@ -82,4 +82,18 @@ export interface IGetDiscussionListParams {
     followed?: boolean;
     featuredImage?: boolean;
     fallbackImage?: string;
+    sort?: DiscussionListSortOptions;
+    pinOrder?: "mixed" | "first";
+    type?: string[];
+    tagID?: string;
+    internalStatusID?: number[];
+    statusID?: number[];
+}
+
+export enum DiscussionListSortOptions {
+    RECENTLY_COMMENTED = "-dateLastComment",
+    RECENTLY_CREATED = "-dateInserted",
+    TOP = "-score",
+    TRENDING = "-hot",
+    OLDEST = "dateInserted",
 }

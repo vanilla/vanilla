@@ -7,14 +7,12 @@
 import React, { useEffect, useState } from "react";
 import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
 import { tabStandardClasses, tabBrowseClasses, tabGroupClasses } from "@library/sectioning/tabStyles";
-import classNames from "classnames";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { InformationIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconStyles";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { DomNodeAttacher } from "@vanilla/react-utils";
 import { cx } from "@emotion/css";
-import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { Icon } from "@vanilla/icons";
 import TruncatedText from "@library/content/TruncatedText";
 
@@ -42,6 +40,7 @@ export interface ITabsProps {
     tabListClasses?: string;
     tabPanelClasses?: string;
     tabsRootClass?: string;
+    tabClass?: string;
 }
 
 function PassThruKludge(props: any) {
@@ -58,6 +57,7 @@ export function Tabs(props: ITabsProps) {
         tabListClasses,
         tabPanelClasses,
         tabsRootClass,
+        tabClass,
     } = props;
     const [activeTab, setActiveTab] = useState(defaultTabIndex ?? 0);
 
@@ -74,9 +74,6 @@ export function Tabs(props: ITabsProps) {
     ]);
     const classes = tabType && classVariants.get(tabType) ? classVariants.get(tabType) : tabStandardClasses();
 
-    // Need "disabled" applied as a prop on the top level element so it isn't recognized as a tab.
-    const FragmentKludge = React.Fragment as any;
-
     return (
         <ReachTabs
             index={activeTab}
@@ -92,9 +89,13 @@ export function Tabs(props: ITabsProps) {
                     return (
                         <Tab
                             key={index}
-                            className={classNames(classes?.tab(props.largeTabs, props.legacyButtons), {
-                                [classes!.isActive]: isActive,
-                            })}
+                            className={cx(
+                                classes?.tab(props.largeTabs, props.legacyButtons),
+                                {
+                                    [classes!.isActive]: isActive,
+                                },
+                                tabClass,
+                            )}
                             disabled={tab.disabled}
                         >
                             <TruncatedText lines={1} maxCharCount={25}>

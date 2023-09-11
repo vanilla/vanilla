@@ -126,6 +126,13 @@ export const buttonGlobalVariables = useThemeCache((forcedVars?: IThemeVariables
          * @type number
          */
         compactHeight: 24,
+
+        /**
+         * @var buttonGlobals.sizing.medHeight
+         * @title Medium Height
+         * @type number
+         */
+        medHeight: 32,
     });
 
     /**

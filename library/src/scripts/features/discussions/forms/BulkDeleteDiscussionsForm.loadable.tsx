@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import { css, cx } from "@emotion/css";
+import { css } from "@emotion/css";
 import Translate from "@library/content/Translate";
 import { IBulkActionForm } from "@library/features/discussions/BulkActionsModal";
 import { useDiscussionCheckBoxContext } from "@library/features/discussions/DiscussionCheckboxContext";
@@ -68,7 +68,7 @@ export default function BulkDeleteDiscussionsForm(props: IBulkActionForm) {
                 header={<FrameHeader closeFrame={onCancel} title={t("Delete")} />}
                 body={
                     <FrameBody>
-                        <div className={cx("frameBody-contents", classesFrameBody.contents)}>
+                        <div className={classesFrameBody.contents}>
                             {errorMessage && (
                                 <Message
                                     className={errorMessageOffset}

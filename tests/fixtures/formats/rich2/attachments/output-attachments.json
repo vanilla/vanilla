@@ -1,0 +1,26 @@
+[
+  {
+    "name": "20221214_094554.jpg",
+    "dateInserted": {
+      "date": "2022-12-21 05:24:44.000000",
+      "timezone_type": 1,
+      "timezone": "+00:00"
+    },
+    "mediaID": 113,
+    "size": 2791542,
+    "type": "image/jpeg",
+    "url": "https://dev.vanilla.localhost/uploads/L5OCOMF86I74/20221214-094554.jpg"
+  },
+  {
+    "name": "2022_HL_Hours__1_.pdf",
+    "dateInserted": {
+      "date": "2022-12-21 05:24:52.000000",
+      "timezone_type": 1,
+      "timezone": "+00:00"
+    },
+    "mediaID": 114,
+    "size": 106672,
+    "type": "application/pdf",
+    "url": "https://dev.vanilla.localhost/uploads/SON7DOW86RO1/2022-hl-hours-1.pdf"
+  }
+]

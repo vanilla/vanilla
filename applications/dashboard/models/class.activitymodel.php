@@ -2,21 +2,25 @@
 /**
  * Activity Model.
  *
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Dashboard
  * @since 2.0
  */
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Schema\Schema;
+use Garden\Web\Exception\NotFoundException;
 use PHPMailer\PHPMailer\PHPMailer;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Vanilla\CurrentTimeStamp;
-use Vanilla\Dashboard\Models\ActivityEmail;
+use Vanilla\Dashboard\Activity\Activity;
+use Vanilla\Dashboard\Models\ActivityService;
 use Vanilla\FloodControlTrait;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Formatting\Formats;
@@ -112,8 +116,17 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
     /** @var UserModel */
     private $userModel;
 
+    /** @var UserMetaModel */
+    private UserMetaModel $userMetaModel;
+
     /** @var CacheInterface */
     private $cache;
+
+    /** @var ActivityService */
+    private $activityService;
+
+    /** @var string */
+    private $unsubscribeSalt;
 
     /**
      * Defines the related database table name.
@@ -127,7 +140,8 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         Gdn_Validation $validation = null,
         ?LoggerInterface $logger = null,
         ?FormatService $formatService = null,
-        ?EventDispatcherInterface $eventDispatcher = null
+        ?EventDispatcherInterface $eventDispatcher = null,
+        ActivityService $activityService = null
     ) {
         parent::__construct("Activity", $validation);
 
@@ -145,7 +159,13 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
                 ? $eventDispatcher
                 : Gdn::getContainer()->get(EventDispatcherInterface::class);
         $this->userModel = Gdn::getContainer()->get(UserModel::class);
+        $this->userMetaModel = Gdn::getContainer()->get(UserMetaModel::class);
         $this->cache = Gdn::getContainer()->get(CacheInterface::class);
+        $this->unsubscribeSalt = \Gdn::config()->get("Garden.Unsubscribe.Salt");
+        $this->activityService =
+            $activityService instanceof ActivityService
+                ? $activityService
+                : Gdn::getContainer()->get(ActivityService::class);
     }
 
     /**
@@ -167,11 +187,9 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         if ($join) {
             $this->SQL
                 ->select("au.Name", "", "ActivityName")
-                ->select("au.Gender", "", "ActivityGender")
                 ->select("au.Photo", "", "ActivityPhoto")
                 ->select("au.Email", "", "ActivityEmail")
                 ->select("ru.Name", "", "RegardingName")
-                ->select("ru.Gender", "", "RegardingGender")
                 ->select("ru.Email", "", "RegardingEmail")
                 ->select("ru.Photo", "", "RegardingPhoto")
                 ->join("User au", "a.ActivityUserID = au.UserID")
@@ -452,7 +470,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userModel->joinUsers(
             $result->resultArray(),
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Email", "Gender", "Photo"]]
+            ["Join" => ["Name", "Email", "Photo"]]
         );
         $this->calculateData($result->resultArray());
 
@@ -516,7 +534,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userModel->joinUsers(
             $result->resultArray(),
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Email", "Gender", "Photo"]]
+            ["Join" => ["Name", "Email", "Photo"]]
         );
         $this->calculateData($result->resultArray());
 
@@ -670,7 +688,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userModel->joinUsers(
             $result,
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Photo", "Email", "Gender"]]
+            ["Join" => ["Name", "Photo", "Email"]]
         );
 
         $this->EventArguments["Data"] = &$result;
@@ -740,17 +758,23 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
      *
      * Events: BeforeGetCount.
      *
-     * @param string $userID Unique ID of user.
+     * @param array|string $wheres Where conditions to apply to the query.
+     * @param int|null $userID Unique ID of user.
+     *
      * @return int Number of activity items found.
      * @since 2.0.0
      * @access public
      */
-    public function getCount($userID = "")
+    public function getCount($wheres = "", ?int $userID = null)
     {
         $this->SQL
             ->select("a.ActivityID", "count", "ActivityCount")
             ->from("Activity a")
             ->join("ActivityType t", "a.ActivityTypeID = t.ActivityTypeID");
+
+        if (is_array($wheres)) {
+            $this->SQL->where($wheres);
+        }
 
         if ($userID != "") {
             $this->SQL
@@ -883,7 +907,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $this->userModel->joinUsers(
             $result->resultArray(),
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Photo", "Email", "Gender"]]
+            ["Join" => ["Name", "Photo", "Email"]]
         );
         $this->calculateData($result->resultArray());
 
@@ -1083,15 +1107,16 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         Gdn::userModel()->joinUsers(
             $activities,
             ["ActivityUserID", "RegardingUserID"],
-            ["Join" => ["Name", "Email", "Gender", "Photo"]]
+            ["Join" => ["Name", "Email", "Photo"]]
         );
     }
 
     /**
-     * Get default notification preference for an activity type.
+     * Get the notification preference for an activity type for a set of preferences or a user. Return the
+     * default value if the preference isn't found.
      *
      * @param string $activityType
-     * @param array $preferences
+     * @param array|int $preferencesOrUserID
      * @param null|string $type One of the following:
      *  - Popup: Popup a notification.
      *  - Email: Email the notification.
@@ -1101,14 +1126,23 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
      * @since 2.0.0
      * @access public
      */
-    public static function notificationPreference($activityType, $preferences, $type = null)
+    public static function notificationPreference($activityType, $preferencesOrUserID, $type = null)
     {
-        if (is_numeric($preferences)) {
-            $user = Gdn::userModel()->getID($preferences);
+        if (is_numeric($preferencesOrUserID)) {
+            $user = Gdn::userModel()->getID($preferencesOrUserID);
             if (!$user) {
                 return $type == "both" ? [false, false] : false;
             }
             $preferences = val("Preferences", $user);
+            if (!is_array($preferences)) {
+                $preferences = [];
+            }
+
+            // Grab preferences from usermeta as well.
+            $metaPrefs = \Gdn::userMetaModel()->getUserMeta($preferencesOrUserID, "Preferences.%", [], "Preferences.");
+            $preferences = array_merge($preferences, $metaPrefs);
+        } else {
+            $preferences = $preferencesOrUserID;
         }
 
         if ($type === null) {
@@ -1123,6 +1157,10 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
                 self::notificationPreference($activityType, $preferences, "Email"),
             ];
             return $result;
+        } elseif ($type === "Popup" || $type === "Email") {
+            if (isset($preferences[$type . "." . $activityType])) {
+                return (bool) $preferences[$type . "." . $activityType];
+            }
         }
 
         $configPreference = c("Preferences.$type.$activityType", "0");
@@ -1218,11 +1256,16 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         $email->to($user);
 
         $url = externalUrl(val("Route", $activity) == "" ? "/" : val("Route", $activity));
+        $footer = $email->getFooterContent();
+        $footer = $footer ? $footer . " <br/>" : "";
+        $footer .= $this->getNotificationPreferencePageLink($email->getFormat());
+        $footer .= $this->getUnsubscribeLink($activityID, $user, $email->getFormat());
 
         $emailTemplate = $email
             ->getEmailTemplate()
             ->setButton($url, val("ActionText", $activity, t("Check it out")))
-            ->setTitle($this->getEmailSubject($activity, $options));
+            ->setTitle($this->getEmailSubject($activity, $options))
+            ->setFooterHtml($footer);
 
         if ($message = $this->getEmailMessage($activity)) {
             $emailTemplate->setMessage($message, true);
@@ -1255,6 +1298,219 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             $this->SQL->put("Activity", ["Emailed" => $activity["Emailed"]], ["ActivityID" => $activityID]);
         }
         return true;
+    }
+
+    /**
+     * Get a footer link for notifcation prefernce page
+     *
+     * @param $format
+     * @return string
+     */
+    public function getNotificationPreferencePageLink($format = "text"): string
+    {
+        $linkText = t("Log in here to update your notification preferences");
+        $linkUri = url("/profile/preferences", true);
+        if ($format == "text") {
+            $link = $linkText . ": " . $linkUri;
+        } else {
+            $link = anchor($linkText, $linkUri, ["target" => "_blank"]);
+        }
+
+        return $link;
+    }
+
+    /**
+     * Decode Notification Token.
+     *
+     * @param string $token Encode token string.
+     * @return array
+     * @throws NotFoundException
+     */
+    public function decodeNotificationToken(string $token): array
+    {
+        $payload = JWT::decode($token, new Key($this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM));
+        $activityID = val("ActivityID", $payload);
+        $categoryID = val("CategoryID", $payload);
+        $activityType = val("ActivityType", $payload);
+
+        $userID = val("UserID", $payload);
+        if ($activityID == 0) {
+            $notificationRow = ["notifyUserID" => $userID, "activityType" => "Digest", "ActivityTypeList" => []];
+            if ($activityType == "FollowedCategory" && $categoryID > 0) {
+                $notificationRow["data"] = val("ActivityData", $payload);
+                $notificationRow["reason"] = "advanced";
+            }
+            if ($activityType == "DigestEnabled") {
+                $notificationRow["data"] = val("ActivityData", $payload);
+                $notificationRow["reason"] = $activityType;
+            }
+        } else {
+            $activity = $this->getID($activityID, DATASET_TYPE_ARRAY);
+            if ($activity == null || $activity["NotifyUserID"] != $userID) {
+                throw new NotFoundException("Notification");
+            }
+            $notificationRow = $this->normalizeNotificationRow($activity);
+            $notificationRow["ActivityTypeList"] = val("ActivityTypes", $payload);
+        }
+        return $notificationRow;
+    }
+
+    /**
+     * Generate Unassigned link.
+     *
+     * @param int $activityID An activityID.
+     * @param array{UserID: int, Name: string, Email: string, PhotoUrl: string} $user User object.
+     * @param string $format Email format.
+     * @return string
+     */
+    public function getUnsubscribeLink(int $activityID, array $user, string $format): string
+    {
+        $activity = $this->getID($activityID, DATASET_TYPE_ARRAY);
+        $linkText = t("Unsubscribe");
+        $activityType = val("ActivityType", $activity, false);
+        $data = val("Data", $activity, []);
+
+        if ($activityType == "WallPost") {
+            $activityType = "WallComment";
+        }
+
+        $tokenData = [
+            "UserID" => val("UserID", $user, false),
+            "Name" => val("Name", $user, false),
+            "PhotoUrl" => val("PhotoUrl", $user, false),
+            "Email" => val("Email", $user, false),
+            "ActivityTypes" => [$activityType],
+            "ActivityType" => $activityType,
+            "ActivityID" => val("ActivityID", $activity, false),
+            "CategoryID" => 0,
+        ];
+
+        $activityData = [];
+
+        if (isset($data["Reason"])) {
+            $activityData["reasons"] = explode(", ", $data["Reason"]);
+        }
+
+        if (isset($data["Category"])) {
+            $activityData["category"] = $data["Category"];
+        }
+
+        $tokenData["ActivityData"] = $activityData;
+
+        if ($activityType == "Comment") {
+            if (in_array("mine", $activityData["reasons"])) {
+                $tokenData["ActivityTypes"][] = "DiscussionComment";
+                $tokenData["ActivityType"] = "DiscussionComment";
+            } elseif (in_array("participated", $activityData["reasons"])) {
+                $tokenData["ActivityTypes"][] = "ParticipateComment";
+                $tokenData["ActivityType"] = "ParticipateComment";
+            }
+            if (in_array("bookmark", $activityData["reasons"])) {
+                $tokenData["ActivityTypes"][] = "BookmarkComment";
+                $tokenData["ActivityType"] = "BookmarkComment";
+            }
+        }
+
+        if (isset($data["Category"]) && in_array("advanced", $activityData["reasons"])) {
+            $tokenData["ActivityTypes"][] = "FollowedCategory";
+        }
+
+        $token = JWT::encode($tokenData, $this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM);
+
+        $linkUri = url("/unsubscribe/$token", true);
+        if ($format == "text") {
+            $link = "<br />" . $linkText . ": " . $linkUri;
+        } else {
+            $link = " " . anchor($linkText, $linkUri, ["target" => "_blank"]);
+        }
+
+        // Form a message as to why the user is receiving this email and give them the opportunity to unsubscribe
+        if ($activityType == "DigestEnabled") {
+            $notifyReason = t(
+                "You are receiving this email because you are currently subscribed to receive email digests."
+            );
+        } elseif (
+            in_array("FollowedCategory", $tokenData["ActivityTypes"]) &&
+            count($activityData["reasons"]) === 1 &&
+            $activityData["reasons"][0] == "advanced"
+        ) {
+            $notifyReason = sprintf(
+                t("You are receiving this email because you are following category %1\$s."),
+                $data["Category"]
+            );
+        } elseif (count($tokenData["ActivityTypes"]) == 1) {
+            $activityTypeObj = $this->activityService->getActivityByTypeID($tokenData["ActivityType"]);
+            /** @var <class-string<Activity>> $activityTypeObj */
+            $notifyReason = sprintf(
+                t("You are receiving this email because you have requested to be notified %1\$s."),
+                t($activityTypeObj != null ? $activityTypeObj::getActivityReason() : "")
+            );
+        } else {
+            $notifyReason = t("You are receiving this email because of multiple notification settings.");
+        }
+
+        $unsubscribeBody = "<br /><br />" . $notifyReason . $link;
+
+        return $unsubscribeBody;
+    }
+
+    /**
+     * Generate Unfollow link.
+     *
+     * @param array{UserID: int, Name: string, Email: string, PhotoUrl: string} $user User object.
+     * @param int $categoryID Categorty ID.
+     *
+     * @return string
+     */
+    public function getUnfollowCategoryLink(array $user, int $categoryID): string
+    {
+        $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+        if ($categoryID == 0) {
+            throw new InvalidArgumentException('Invalid Category ID must be provided".', 400);
+        }
+        $category = $categoryModel->getID($categoryID, DATASET_TYPE_ARRAY);
+        $tokenData = [
+            "UserID" => val("UserID", $user, false),
+            "Name" => val("Name", $user, false),
+            "PhotoUrl" => val("PhotoUrl", $user, false),
+            "Email" => val("Email", $user, false),
+            "ActivityTypes" => ["FollowedCategory"],
+            "ActivityType" => "FollowedCategory",
+            "ActivityID" => 0,
+            "CategoryID" => $categoryID,
+            "ActivityData" => ["category" => $category["Name"]],
+        ];
+
+        $token = JWT::encode($tokenData, $this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM);
+
+        $linkUrl = url("/unsubscribe/$token", true);
+        return $linkUrl;
+    }
+
+    /**
+     * Generate unsubscribe digest link.
+     *
+     * @param array{UserID: int, Name: string, Email: string, PhotoUrl: string} $user User object.
+     *
+     * @return string
+     */
+    public function getUnsubscribeDigestLink(array $user): string
+    {
+        $categoryModel = Gdn::getContainer()->get(CategoryModel::class);
+        $tokenData = [
+            "UserID" => val("UserID", $user, false),
+            "Name" => val("Name", $user, false),
+            "PhotoUrl" => val("PhotoUrl", $user, false),
+            "Email" => val("Email", $user, false),
+            "ActivityTypes" => ["DigestEnabled"],
+            "ActivityType" => "DigestEnabled",
+            "ActivityID" => 0,
+        ];
+
+        $token = JWT::encode($tokenData, $this->unsubscribeSalt, Gdn_CookieIdentity::JWT_ALGORITHM);
+
+        $linkUrl = url("/unsubscribe/$token", true);
+        return $linkUrl;
     }
 
     /**
@@ -1568,11 +1824,15 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
                 $email->subject(sprintf(t('[%1$s] %2$s'), Gdn::config("Garden.Title"), $activityHeadline));
                 $email->to($user);
                 $url = externalUrl(val("Route", $activity) == "" ? "/" : val("Route", $activity));
+                $footerText = $email->getFooterContent();
+                $footerText = $footerText ? $footerText . " <br/>" : "";
+                $footerText .= $this->getNotificationPreferencePageLink($email->getFormat());
 
                 $emailTemplate = $email
                     ->getEmailTemplate()
                     ->setButton($url, val("ActionText", $activity, t("Check it out")))
-                    ->setTitle(Gdn_Format::plainText(val("Headline", $activity)));
+                    ->setTitle(Gdn_Format::plainText(val("Headline", $activity)))
+                    ->setFooterHtml($footerText);
 
                 if ($message = $this->getEmailMessage($activity)) {
                     $emailTemplate->setMessage($message, true);
@@ -1649,8 +1909,10 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         }
         [$popup, $email] = self::notificationPreference($preference, $activity["NotifyUserID"], "both");
 
-        $activity["Notified"] = $popup ? self::SENT_PENDING : self::SENT_SKIPPED;
-        $activity["Emailed"] = $email ? self::SENT_PENDING : self::SENT_SKIPPED;
+        $activity["Notified"] =
+            $popup && !Gdn::config("Garden.Popups.Disabled") ? self::SENT_PENDING : self::SENT_SKIPPED;
+        $activity["Emailed"] =
+            $email && !Gdn::config("Garden.Email.Disabled") ? self::SENT_PENDING : self::SENT_SKIPPED;
 
         return $activity;
     }
@@ -1725,6 +1987,11 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             return null;
         }
 
+        $activity["Data"] = !isset($activity["Data"]) ? ["Reason" => $activity["ActivityType"]] : $activity["Data"];
+        $activity["Data"]["Reason"] = !isset($activity["Data"]["Reason"])
+            ? $activity["ActivityType"]
+            : $activity["Data"]["Reason"] . ", {$activity["ActivityType"]}";
+
         $activityType = self::getActivityType($activity["ActivityType"]);
         $activityTypeID = val("ActivityTypeID", $activityType);
         if (!$activityTypeID) {
@@ -1732,7 +1999,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             $activityType = self::getActivityType("Default");
             $activityTypeID = val("ActivityTypeID", $activityType);
         }
-
+        $emailFields["ActivityType"] = val("Name", $activityType);
         $activity["ActivityTypeID"] = $activityTypeID;
 
         $notificationInc = 0;
@@ -1793,13 +2060,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             }
         }
 
-        if ($activity["Emailed"] == self::SENT_PENDING) {
-            $emailActivity = $emailFields + $activity;
-            $this->email($emailActivity, $options);
-            $activity["Emailed"] = $emailActivity["Emailed"];
-        }
-
-        $activityData = $activity["Data"];
+        $emailFields["Data"] = $activityData = $activity["Data"];
         if (isset($activity["Data"]) && is_array($activity["Data"])) {
             $activity["Data"] = dbencode($activity["Data"]);
         }
@@ -1852,9 +2113,17 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
                     return UNAPPROVED;
                 }
             }
-
             $activityID = $this->SQL->insert("Activity", $activity);
             $activity["ActivityID"] = $activityID;
+            //Sent Notification email only if the activity is not skipped, and it's not a spam
+            if ($activity["Emailed"] == self::SENT_PENDING) {
+                $emailActivity = $emailFields + $activity;
+                $this->email($emailActivity, $options);
+                $activity["Emailed"] = $emailActivity["Emailed"];
+                $this->SQL
+                    ->update("Activity", ["Emailed" => $emailActivity["Emailed"]], ["ActivityID" => $activityID])
+                    ->put();
+            }
 
             if ($activity["Notified"] === self::SENT_PENDING || $activity["Emailed"] == self::SENT_PENDING) {
                 $eventActivity = $this->getID($activityID, DATASET_TYPE_ARRAY) ?? [];

@@ -5,129 +5,147 @@
  */
 
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { NumberedPager } from "@library/features/numberedPager/NumberedPager";
 
 const TOTAL_RESULTS = 12345;
 const PAGE_LIMIT = 30;
 
-const renderDefault = (props = {}) =>
-    render(<NumberedPager totalResults={TOTAL_RESULTS} pageLimit={PAGE_LIMIT} currentPage={1} {...props} />);
+const renderDefault = async (props: React.ComponentProps<typeof NumberedPager> = {}) => {
+    await act(async () => {
+        render(
+            <NumberedPager
+                totalResults={TOTAL_RESULTS}
+                pageLimit={PAGE_LIMIT}
+                currentPage={1}
+                isMobile={false}
+                {...props}
+            />,
+        );
+    });
+};
 
 describe("NumberedPager", () => {
-    it("Default Properties", () => {
-        render(<NumberedPager />);
+    it("Default Properties", async () => {
+        await act(async () => {
+            render(<NumberedPager />);
+        });
         expect(screen.getByText("Next Page")).toBeInTheDocument();
         expect(screen.getByText("0 - 0 of 0")).toBeInTheDocument();
         expect(screen.getByLabelText("Jump to a specific page")).toBeInTheDocument();
     });
 
-    it("Display range only", () => {
-        renderDefault({ rangeOnly: true });
+    it("Display range only", async () => {
+        await renderDefault({ rangeOnly: true });
 
-        waitFor(() => {
-            expect(screen.getByText("1 - 30 of 3.0k+")).toBeInTheDocument();
-            expect(screen.getByText("Next Page")).not.toBeInTheDocument();
-            expect(screen.getByLabelText("Next Page")).not.toBeInTheDocument();
-            expect(screen.getByLabelText("Previous Page")).not.toBeInTheDocument();
-            expect(screen.getByLabelText("Jump to a specific page")).not.toBeInTheDocument();
-        });
+        expect(screen.getByText("1 - 30 of 12.3k")).toBeInTheDocument();
+        expect(screen.queryByText("Next Page")).not.toBeInTheDocument();
+        expect(screen.queryByText("Next Page")).not.toBeInTheDocument();
+        expect(screen.queryByText("Previous Page")).not.toBeInTheDocument();
+        expect(screen.queryByText("Jump to a specific page")).not.toBeInTheDocument();
     });
 
-    it("Render mobile view", () => {
-        renderDefault({ isMobile: true });
+    it("Render mobile view", async () => {
+        await renderDefault({ isMobile: true });
+
         expect(screen.getByText("Next Page")).toBeInTheDocument();
         expect(screen.getByLabelText("Jump to a specific page")).toBeInTheDocument();
 
-        waitFor(() => {
-            expect(screen.getByText("1 - 30 of 3.0k+")).toBeInTheDocument();
-            expect(screen.getByLabelText("Next Page")).not.toBeInTheDocument();
-            expect(screen.getByLabelText("Previous Page")).not.toBeInTheDocument();
-        });
+        expect(screen.getByText("1 - 30 of 12.3k")).toBeInTheDocument();
+        expect(screen.queryByLabelText("Next Page")).not.toBeInTheDocument();
+        expect(screen.queryByLabelText("Previous Page")).not.toBeInTheDocument();
     });
 
-    it("Pass in total results count and page limit", () => {
-        renderDefault();
-        waitFor(() => {
-            expect(screen.getByText("1 - 30 of 3.0k+")).toBeInTheDocument();
-        });
+    it("Pass in total results count and page limit", async () => {
+        await renderDefault();
+
+        expect(screen.getByText("1 - 30 of 12.3k")).toBeInTheDocument();
     });
 
-    it("Toggle the page jumper", () => {
-        renderDefault();
+    it("Toggle the page jumper", async () => {
+        await renderDefault();
 
-        fireEvent.click(screen.getByLabelText("Jump to a specific page"));
-
-        waitFor(() => {
-            expect(screen.getByLabelText("Jump to a specific page")).not.toBeInTheDocument();
-            expect(screen.getByText("1 - 30 of 3.0k+")).not.toBeInTheDocument();
-            expect(screen.getByText("Jump to page")).toBeInTheDocument();
-            expect(screen.getByLabelText("Jump to page")).toBeInTheDocument();
-            expect(screen.getByText("Go")).toBeInTheDocument();
-            expect(screen.getByLabelText("Back to post count")).toBeInTheDocument();
+        await act(async () => {
+            fireEvent.click(screen.getByLabelText("Jump to a specific page"));
         });
 
-        fireEvent.click(screen.getByLabelText("Back to post count"));
+        expect(screen.queryByLabelText("Jump to a specific page")).not.toBeInTheDocument();
+        expect(screen.queryByText("1 - 30 of 12.3k")).not.toBeInTheDocument();
+        expect(screen.getByText(/Jump to page/)).toBeInTheDocument();
 
-        waitFor(() => {
-            expect(screen.getByLabelText("Jump to a specific page")).toBeInTheDocument();
-            expect(screen.getByText("1 - 30 of 3.0k+")).toBeInTheDocument();
-            expect(screen.getByText("Jump to page")).not.toBeInTheDocument();
-            expect(screen.getByLabelText("Jump to page")).not.toBeInTheDocument();
-            expect(screen.getByText("Go")).not.toBeInTheDocument();
-            expect(screen.getByLabelText("Back to post count")).not.toBeInTheDocument();
+        expect(screen.getByLabelText("Jump to page")).toBeInTheDocument();
+        expect(screen.getByText("Go")).toBeInTheDocument();
+        expect(screen.getByLabelText("Back to post count")).toBeInTheDocument();
+
+        await act(async () => {
+            fireEvent.click(screen.getByLabelText("Back to post count"));
         });
+
+        expect(screen.getByLabelText("Jump to a specific page")).toBeInTheDocument();
+        expect(screen.getByText("1 - 30 of 12.3k")).toBeInTheDocument();
+        expect(screen.queryByText("Jump to page")).not.toBeInTheDocument();
+        expect(screen.queryByLabelText("Jump to page")).not.toBeInTheDocument();
+        expect(screen.queryByText("Go")).not.toBeInTheDocument();
+        expect(screen.queryByLabelText("Back to post count")).not.toBeInTheDocument();
     });
 
-    it("Navigate to next page using 'Next Page' button", () => {
-        renderDefault();
+    it("Navigate to next page using 'Next Page' button", async () => {
+        await renderDefault();
 
-        fireEvent.click(screen.getByText("Next Page"));
-
-        waitFor(() => {
-            expect(screen.getByText("31 - 60 of 3.0k+")).toBeInTheDocument();
-            expect(screen.getByText("1 - 30 of 3.0k+")).not.toBeInTheDocument();
+        await act(async () => {
+            fireEvent.click(screen.getByText("Next Page"));
         });
+
+        expect(screen.getByText("31 - 60 of 12.3k")).toBeInTheDocument();
+        expect(screen.queryByText("1 - 30 of 12.3k")).not.toBeInTheDocument();
     });
 
-    it("Navigate to page using page jumper", () => {
-        renderDefault();
+    it("Navigate to page using page jumper", async () => {
+        await renderDefault();
 
-        fireEvent.click(screen.getByLabelText("Jump to a specific page"));
-
-        waitFor(() => {
-            expect(screen.getByLabelText("Jump to a specific page")).not.toBeInTheDocument();
-            expect(screen.getByText("1 - 30 of 3.0k+")).not.toBeInTheDocument();
-            expect(screen.getByText("Jump to page")).toBeInTheDocument();
-            expect(screen.getByLabelText("Jump to page")).toBeInTheDocument();
-            expect(screen.getByText("Go")).toBeInTheDocument();
+        await act(async () => {
+            fireEvent.click(screen.getByLabelText("Jump to a specific page"));
         });
 
-        fireEvent.input(screen.getByLabelText("Jump to page"), { target: { value: "3" } });
-        fireEvent.click(screen.getByText("Go"));
+        expect(screen.queryByLabelText("Jump to a specific page")).not.toBeInTheDocument();
+        expect(screen.queryByText("1 - 30 of 12.3k")).not.toBeInTheDocument();
 
-        waitFor(() => {
-            expect(screen.getByLabelText("Jump to a specific page")).toBeInTheDocument();
-            expect(screen.getByText("61 - 90 of 3.0k+")).toBeInTheDocument();
-            expect(screen.getByText("Jump to page")).not.toBeInTheDocument();
-            expect(screen.getByLabelText("Jump to page")).not.toBeInTheDocument();
-            expect(screen.getByText("Go")).not.toBeInTheDocument();
+        expect(screen.getByText(/Jump to page/)).toBeInTheDocument();
+        expect(screen.getByLabelText("Jump to page")).toBeInTheDocument();
+        expect(screen.getByText("Go")).toBeInTheDocument();
+
+        await act(async () => {
+            fireEvent.input(screen.getByLabelText("Jump to page"), { target: { value: "3" } });
         });
+
+        await act(async () => {
+            fireEvent.click(screen.getByText("Go"));
+        });
+
+        expect(screen.getByLabelText("Jump to a specific page")).toBeInTheDocument();
+        expect(screen.getByText("61 - 90 of 12.3k")).toBeInTheDocument();
+        expect(screen.queryByText("Jump to page")).not.toBeInTheDocument();
+        expect(screen.queryByLabelText("Jump to page")).not.toBeInTheDocument();
+        expect(screen.queryByText("Go")).not.toBeInTheDocument();
     });
 
-    it("Navigate beyond page 100", () => {
-        renderDefault({ currentPage: 100 });
+    it("Navigate beyond page 100", async () => {
+        await renderDefault({ currentPage: 100 });
 
-        waitFor(() => {
-            expect(screen.getByText("2,971 - 3,000 of 3.0k+")).toBeInTheDocument();
-            expect(screen.getByText("100")).toBeInTheDocument();
+        expect(screen.getByText("2,971 - 3,000 of 12.3k")).toBeInTheDocument();
+        expect(screen.getByText("100")).toBeInTheDocument();
+
+        await act(async () => {
+            fireEvent.click(screen.getByText("Next Page"));
         });
 
-        fireEvent.click(screen.getByText("Next Page"));
+        expect(screen.getByText("3,001 - 3,030 of 12.3k")).toBeInTheDocument();
+        expect(screen.getByText("101")).toBeInTheDocument();
+    });
 
-        waitFor(() => {
-            expect(screen.getByText("3,001 - 3,030 of 3.0k+")).toBeInTheDocument();
-            expect(screen.getByText("101")).toBeInTheDocument();
-        });
+    it("Actual pages are more than total results, APIs normally have limit for total", async () => {
+        await renderDefault({ hasMorePages: true });
+
+        expect(screen.getByText("1 - 30 of 12.3k+")).toBeInTheDocument();
     });
 });

@@ -17,8 +17,8 @@ interface IProps {
     className?: string;
     searchTerm?: string;
     results: any[];
-    resultComponent?: React.ComponentType<any>;
     emptyMessage?: string;
+    ResultComponent?: React.ComponentType<any>;
     ResultWrapper?: React.ComponentType<any>;
     rel?: string;
 }
@@ -32,7 +32,7 @@ export default function ResultList(props: IProps) {
         searchTerm,
         results,
         emptyMessage = t("No results found."),
-        resultComponent = Result,
+        ResultComponent = Result,
         ResultWrapper,
     } = props;
 
@@ -41,7 +41,6 @@ export default function ResultList(props: IProps) {
     let content;
 
     if (hasResults) {
-        const ResultComponent = resultComponent;
         content = results.map((result, i) => {
             return <ResultComponent {...result} key={i} rel={props.rel} />;
         });

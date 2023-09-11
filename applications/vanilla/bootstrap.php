@@ -58,8 +58,6 @@ Gdn::getContainer()
     ->addCall("registerTabFactory", [DiscussionTabFactory::getTrendingReference()])
     ->addCall("registerTabFactory", [DiscussionTabFactory::getTopReference()])
     ->addCall("registerTabFactory", [DiscussionTabFactory::getAnnouncedReference()])
-    ->rule(QuickLinksVariableProvider::class)
-    ->addCall("addQuickLinkProvider", [new Reference(ForumQuickLinksProvider::class)])
     ->rule(PermissionModel::class)
     ->addCall("addJunctionModel", ["Category", new Reference(CategoryModel::class)]);
 

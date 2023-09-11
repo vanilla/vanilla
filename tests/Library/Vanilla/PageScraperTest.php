@@ -1,15 +1,18 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Library\Vanilla;
 
 use Exception;
+use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
 use Garden\Http\Mocks\MockHttpClient;
+use Vanilla\HttpCacheMiddleware;
 use Vanilla\PageScraper;
+use Vanilla\Web\RequestValidator;
 use VanillaTests\BootstrapTestCase;
 use VanillaTests\Fixtures\LocalFilePageScraper;
 use Vanilla\Metadata\Parser\OpenGraphParser;
@@ -327,5 +330,71 @@ Disallow: /disallow
                 $serialized
             );
         }
+    }
+
+    /**
+     * Provides test data for `testScrapeFavicon()`.
+     *
+     * @return array[]
+     */
+    public function provideScrapeFaviconTests(): array
+    {
+        return [
+            "default to `icon`" => [
+                <<<HTML
+                    <html>
+                    <head>
+                        <link rel="apple-touch-icon" sizes="any" href="assets/apple-touch-icon.png">
+                        <link rel="shortcut icon" sizes="any" href="assets/shortcut-icon.png">
+                        <link rel="icon" type="image/vnd.microsoft.icon" href="assets/icon.ico"/>
+                    </head>
+                    </html>
+HTML
+                ,
+                ["Favicon" => "https://example.com/assets/icon.ico"],
+            ],
+            "fallback to `shortcut icon` if no icon" => [
+                <<<HTML
+                    <html>
+                    <head>
+                        <link rel="apple-touch-icon" sizes="any" href="assets/apple-touch-icon.png">
+                        <link rel="shortcut icon" sizes="any" href="assets/shortcut-icon.png">
+                    </head>
+                    </html>
+HTML
+                ,
+                ["Favicon" => "https://example.com/assets/shortcut-icon.png"],
+            ],
+            "fallback to any link that contains `icon` in its `rel` attribute" => [
+                <<<HTML
+                    <html>
+                    <head>
+                        <link rel="apple-touch-icon" sizes="any" href="assets/apple-touch-icon.png">
+                    </head>
+                    </html>
+HTML
+                ,
+                ["Favicon" => "https://example.com/assets/apple-touch-icon.png"],
+            ],
+        ];
+    }
+
+    /**
+     * @param string $content
+     * @return void
+     * @dataProvider provideScrapeFaviconTests
+     */
+    public function testScrapeFavicon(string $content, array $expected)
+    {
+        $mockHttpClient = $this->createMock(HttpClient::class);
+        $mockHttpClient
+            ->expects($this->any())
+            ->method("get")
+            ->willReturn(new HttpResponse(200, "", $content));
+        $mockRequestValidator = $this->createMock(RequestValidator::class);
+        $mockHttpCacheMiddleware = $this->createMock(HttpCacheMiddleware::class);
+        $scraper = new PageScraper($mockHttpClient, $mockRequestValidator, $mockHttpCacheMiddleware);
+        $actual = $scraper->pageInfo("https://example.com");
+        $this->assertArraySubsetRecursive($expected, $actual);
     }
 }

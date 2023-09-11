@@ -23,6 +23,7 @@ import { t } from "@vanilla/i18n";
 export enum BorderType {
     BORDER = "border",
     SEPARATOR = "separator",
+    SEPARATOR_BETWEEN = "separator_between",
     NONE = "none",
     SHADOW = "shadow",
     SHADOW_AS_BORDER = "shadow_as_border", // Note that is applied on a different element
@@ -33,6 +34,7 @@ export function borderTypeToLabel(type: BorderType): string {
         case BorderType.BORDER:
             return t("Solid");
         case BorderType.SEPARATOR:
+        case BorderType.SEPARATOR_BETWEEN:
             return t("Separator");
         case BorderType.SHADOW:
         case BorderType.SHADOW_AS_BORDER:

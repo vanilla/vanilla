@@ -85,6 +85,7 @@ export const dataListClasses = useThemeCache((layoutMediaQueries?: { xs: any }) 
         textAlign: vars.key.textAlignment,
         verticalAlign: "top",
         ...Mixins.padding(vars.value.padding),
+        whiteSpace: "pre-line",
     });
 
     const tokenGap = css({

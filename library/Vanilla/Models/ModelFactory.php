@@ -52,12 +52,12 @@ class ModelFactory implements ContainerInterface
     /**
      * Get the model associated with a record type.
      *
-     * @param string $recordType The record type or alias to lookup.
+     * @param string $id The record type or alias to lookup.
      * @return \Gdn_Model|Model
      */
-    public function get($recordType)
+    public function get(string $id)
     {
-        $r = $this->container->get(self::key($recordType));
+        $r = $this->container->get(self::key($id));
         return $r;
     }
 
@@ -143,12 +143,12 @@ class ModelFactory implements ContainerInterface
     /**
      * Check whether or not the record type is recognized.
      *
-     * @param string $recordType
+     * @param string $id
      * @return bool
      */
-    public function has($recordType)
+    public function has($id)
     {
-        return $this->container->has(self::key($recordType));
+        return $this->container->has(self::key($id));
     }
 
     /**

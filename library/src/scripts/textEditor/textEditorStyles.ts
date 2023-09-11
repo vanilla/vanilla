@@ -41,7 +41,7 @@ export const textEditorClasses = useThemeCache(() => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "stretch",
-            height: minimal ? "300px" : viewHeight(100),
+            height: minimal ? "240px" : viewHeight(100),
             backgroundColor:
                 theme === "vs-dark"
                     ? ColorsUtils.colorOut("#1E1E1E")
@@ -70,7 +70,7 @@ export const textEditorClasses = useThemeCache(() => {
     const themeToggleIcon = style("themeToggleIcon", {
         position: "absolute",
         zIndex: 1,
-        top: vars.themeToggleIcon.top,
+        bottom: vars.themeToggleIcon.top,
         right: vars.themeToggleIcon.right,
         border: "none",
         padding: 0,

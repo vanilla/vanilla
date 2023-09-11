@@ -1,12 +1,17 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 namespace VanillaTests\QnA;
 
+use DiscussionModel;
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+use QnaModel;
+use QnAPlugin;
 use Vanilla\QnA\Models\QnaQuickLinksProvider;
 use VanillaTests\APIv2\QnaApiTestTrait;
 use VanillaTests\EventSpyTestTrait;
@@ -22,10 +27,23 @@ class QnaModelTest extends SiteTestCase
     use EventSpyTestTrait;
     use UsersAndRolesApiTestTrait;
 
-    public static $addons = ["vanilla", "QnA"];
+    public static $addons = ["QnA"];
 
     /** @var QnaQuickLinksProvider */
     private $linksProvider;
+
+    /** @var DiscussionModel */
+    private $discussionModel;
+
+    /** @var QnaModel */
+    private $qnAModel;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->qnAModel = self::container()->get(QnaModel::class);
+        $this->discussionModel = self::container()->get(DiscussionModel::class);
+    }
 
     /**
      * Test unanswered count fetching, caching, and permissions.
@@ -85,6 +103,52 @@ class QnaModelTest extends SiteTestCase
             $this->assertCounts(2, 3);
             $this->assertCounts(1, 1);
         }, $memberUser);
+    }
+
+    /**
+     * Test QnA status recalculations.
+     */
+    public function testQnARecounts()
+    {
+        // Create a few questions with an answer for each.
+        $acceptedQuestion = $this->createQuestion();
+        $acceptedAnswer = $this->createAnswer();
+        $rejectedQuestion = $this->createQuestion();
+        $rejectedAnswer = $this->createAnswer();
+
+        $this->setAnswerStatus($acceptedQuestion, $acceptedAnswer, QnaModel::ACCEPTED);
+        $this->setAnswerStatus($rejectedQuestion, $rejectedAnswer, QnaModel::REJECTED);
+
+        // Force `statusID` to `0` so we can trigger a recount afterwards.
+        $this->discussionModel->setField($acceptedQuestion["discussionID"], "statusID", 0);
+        $this->discussionModel->setField($rejectedQuestion["discussionID"], "statusID", 0);
+
+        // Verify that the QnA discussions statuses are improperly set to `0`.
+        $blankedAcceptedDiscussion = $this->discussionModel->getID(
+            $acceptedQuestion["discussionID"],
+            DATASET_TYPE_ARRAY
+        );
+        $blankedRejectedDiscussion = $this->discussionModel->getID(
+            $rejectedQuestion["discussionID"],
+            DATASET_TYPE_ARRAY
+        );
+        $this->assertEquals(0, $blankedAcceptedDiscussion["statusID"]);
+        $this->assertEquals(0, $blankedRejectedDiscussion["statusID"]);
+
+        // Trigger recounts
+        $this->qnAModel->counts("statusID");
+
+        // Verify that the QnA discussions statuses are properly set again.
+        $recountedAcceptedDiscussion = $this->discussionModel->getID(
+            $acceptedQuestion["discussionID"],
+            DATASET_TYPE_ARRAY
+        );
+        $recountedRejectedDiscussion = $this->discussionModel->getID(
+            $rejectedQuestion["discussionID"],
+            DATASET_TYPE_ARRAY
+        );
+        $this->assertEquals(QnAPlugin::DISCUSSION_STATUS_ACCEPTED, $recountedAcceptedDiscussion["statusID"]);
+        $this->assertEquals(QnAPlugin::DISCUSSION_STATUS_REJECTED, $recountedRejectedDiscussion["statusID"]);
     }
 
     /**

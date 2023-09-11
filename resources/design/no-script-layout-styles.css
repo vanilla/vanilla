@@ -1,0 +1,134 @@
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2023 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+    box-sizing: border-box;
+}
+
+* {
+    box-sizing: inherit;
+}
+#app, .Frame {
+    margin: 40px auto;
+    max-width: 1400px;
+    line-height: 1.6;
+    font-size: 18px;
+    color: #444;
+    padding: 0 10px
+}
+
+h1, h2, h3, h4 {
+    line-height: 1.25;
+}
+
+.pageHeadingBox > * {
+    margin-bottom: 12px;
+}
+
+a, a:visited {
+    color: #037DBC;
+    text-decoration: underline !important;
+}
+
+section, .Frame-row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-bottom: 40px;
+    gap: 20px;
+}
+
+@media screen and (max-width: 1000px) {
+    section {
+        flex-direction: column;
+    }
+}
+
+.seoSectionPiece {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.seoSectionColumn, .MainContent, .Panel {
+    flex: 1;
+    border: 1px solid #D6D6D6;
+    border-radius: 4px;
+    padding: 24px;
+}
+
+.separated {
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+
+.separated + .separated {
+    border-top: 1px solid #D6D6D6;
+}
+
+.seoSectionColumn.mainColumn, .MainContent {
+    flex: 2;
+}
+
+.seoBreadcrumbs:empty {
+    display: none;
+}
+
+.seoUser {
+    display: inline-flex;
+    align-items: center;
+}
+
+.seoUser img {
+    margin-right: 6px;
+    border-radius: 24px;
+}
+
+.linkList li {
+    line-height: 1.2;
+    margin-bottom: 12px;
+}
+
+.linkList li a {
+    font-weight: 600;
+}
+
+.linkList li p {
+    margin-top: 4px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.row.gapped {
+    gap: 12px;
+}
+
+.breadcrumbs {
+    padding-bottom: 12px;
+}
+
+.crumb::after {
+    content: ">";
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.crumb:last-child::after {
+    display: none;
+}
+
+.button-spoiler {
+    font-weight: bold;
+}
+
+.button-spoiler svg {
+    display: none;
+}

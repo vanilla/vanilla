@@ -121,7 +121,7 @@ class FoundationDiscussionsShim
     }
 
     /**
-     * Utility for for mapping discussion data into the new style.
+     * Utility to map discussion data into the new style.
      *
      * @param array $discussions
      * @return array
@@ -132,6 +132,9 @@ class FoundationDiscussionsShim
         $normalized = [];
         $schema = $this->discussionsApiController->discussionSchema();
         foreach ($discussions as $discussion) {
+            if (empty($discussion)) {
+                continue;
+            }
             if (is_object($discussion)) {
                 // Some parts of the codebase may have been working with objects here.
                 $discussion = (array) $discussion;

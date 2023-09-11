@@ -96,6 +96,11 @@ export const dayPickerClasses = useThemeCache(() => {
         },
     });
 
+    const wrapper = style({
+        display: "flex",
+        position: "relative",
+    });
+
     const header = style("header", {
         display: "flex",
         alignItems: "center",
@@ -116,6 +121,7 @@ export const dayPickerClasses = useThemeCache(() => {
 
     return {
         root,
+        wrapper,
         header,
         title,
         navigation,

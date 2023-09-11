@@ -23,6 +23,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Exception\ExitException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Utility\DebugUtils;
+use Vanilla\Utility\StringUtils;
 use Vanilla\Utility\Timers;
 
 /**
@@ -955,6 +956,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable
      * @param Gdn_Request $request The request being dispatched.
      * @param array $routeArgs The result of {@link Gdn_Dispatcher::analyzeRequest()}.
      * @return mixed Returns the result of a dispatch not found if the controller wasn't found or is disabled.
+     * @throws ReflectionException
+     * @throws Throwable
      */
     private function dispatchController($request, $routeArgs)
     {
@@ -1372,7 +1375,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable
     {
         if (str_contains($exception->getMessage(), ", called in")) {
             $exception_type = get_class($exception);
-            $message = substr($exception->getMessage(), 0, strrpos($exception->getMessage(), ", called in"));
+            $message = StringUtils::sanitizeExceptionMessage($exception->getMessage());
             $reflectedObject = new \ReflectionClass($exception_type);
             $property = $reflectedObject->getProperty("message");
             $property->setAccessible(true);

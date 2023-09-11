@@ -29,6 +29,8 @@ class VanillaTestCase extends TestCase
     public const ROLE_MOD = "Moderator";
     public const ROLE_MEMBER = "Member";
 
+    public const KEY_SPARSE_COMPARISON = "x-do-sparse-comparision";
+
     /**
      * @var array An array of counters for applying to records.
      */
@@ -387,5 +389,56 @@ class VanillaTestCase extends TestCase
                     json_encode($actualValue, JSON_PRETTY_PRINT)
             );
         }
+    }
+
+    /**
+     * Mark an array of values in an expectations array for a sparse comparsion with {@link VanillaTestCase::assertEqualsSparse()}.
+     *
+     * @param array $arr The array to mark.
+     * @return array The marked array.
+     */
+    public static function markForSparseComparision(array $arr): array
+    {
+        $arr[self::KEY_SPARSE_COMPARISON] = true;
+        return $arr;
+    }
+
+    /**
+     * Like {@link TestCase::assertEquals()} but with sparse comparison implemented.
+     *
+     * Arrays that were marked with {@link VanillaTestCase::markForSparseComparision()} in the expectation will only comparse values properties that were passed in the expectation. Other values will be ignored.
+     *
+     * @param array $expected The expected value.
+     * @param array $actual The actual value.
+     * @param string $message Message to print on failure.
+     *
+     * @return void
+     */
+    public static function assertEqualsSparse(array $expected, array $actual, string $message = ""): void
+    {
+        // Extract the sparse paths
+        $expectedSparseKeysByPath = [];
+        ArrayUtils::walkRecursiveArray($expected, function (&$node, $path) use (&$expectedSparseKeysByPath) {
+            $pathStr = implode("/", $path);
+            if (isset($node[self::KEY_SPARSE_COMPARISON])) {
+                $expectedSparseKeysByPath[$pathStr] = array_keys($node);
+                unset($node[self::KEY_SPARSE_COMPARISON]);
+            }
+        });
+
+        // Now filter out the properties so we are only looking at the sparse paths.
+        ArrayUtils::walkRecursiveArray($actual, function (&$node, $path) use ($expectedSparseKeysByPath) {
+            $pathStr = implode("/", $path);
+            $expectedKeys = $expectedSparseKeysByPath[$pathStr] ?? null;
+            if (is_array($expectedKeys)) {
+                $actualKeys = array_keys($node);
+                $keysToRemove = array_diff($actualKeys, $expectedKeys);
+                foreach ($keysToRemove as $keyToremove) {
+                    unset($node[$keyToremove]);
+                }
+            }
+        });
+
+        self::assertEquals($expected, $actual, $message);
     }
 }

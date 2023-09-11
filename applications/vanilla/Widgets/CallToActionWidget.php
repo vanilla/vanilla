@@ -86,4 +86,18 @@ class CallToActionWidget extends AbstractReactModule implements CombinedPropsWid
             self::getWidgetSpecificSchema()
         );
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $links = array_filter([
+            $props["button"] ?? null,
+            $props["firstButton"] ?? null,
+            $props["secondButton"] ?? null,
+        ]);
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($links));
+        return $result;
+    }
 }

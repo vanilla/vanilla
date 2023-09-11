@@ -169,6 +169,33 @@ class DispatcherTest extends BootstrapTestCase
     }
 
     /**
+     * Test the conversion of an exception to a response and that errors like TypeErrors are sanitized.
+     */
+    public function testDispatchExceptionSanitized()
+    {
+        $dis = new Dispatcher();
+        $dis->addMiddleware(function (RequestInterface $r, callable $next) {
+            // Generate a type error.
+            $fn = function (int $needsInt) {};
+            // @psalm-suppress
+            $fn([]);
+        });
+
+        $r = $dis->dispatch(new Request());
+
+        $this->assertSame(500, $r->getStatus());
+        // Exact match. Filepath was stripped off the exception.
+        $expected =
+            "VanillaTests\Library\Garden\Web\DispatcherTest::VanillaTests\Library\Garden\Web\{closure}(): Argument #1 (\$needsInt) must be of type int, array given, called in /tests/Library/Garden/Web/DispatcherTest.php on line 181";
+        if (PHP_MAJOR_VERSION < 8) {
+            $expected =
+                "Argument 1 passed to VanillaTests\Library\Garden\Web\DispatcherTest::VanillaTests\Library\Garden\Web\{closure}() must be of the type int, array given, called in /tests/Library/Garden/Web/DispatcherTest.php on line 181";
+        }
+
+        $this->assertSame($expected, $r["message"]);
+    }
+
+    /**
      * Test happy paths for `Dispatcher::reflectArgs()`.
      *
      * @param \ReflectionFunctionAbstract $func

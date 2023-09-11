@@ -487,10 +487,7 @@ export class LayoutEditorContents {
      * @param nodePath The path to the node.
      * @returns The hydrated node.
      */
-    private hydrateNode = <T extends unknown>(
-        node: T | IHydratedEditableLayoutWidget,
-        nodePath: Partial<ILayoutEditorPath>,
-    ) => {
+    private hydrateNode = (node: unknown | IHydratedEditableLayoutWidget, nodePath: Partial<ILayoutEditorPath>) => {
         if (node == null || typeof node !== "object") {
             return node;
         }

@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -20,5 +20,6 @@
 // https://reach.tech/styling/
 :root {
     --reach-tooltip: 1;
-    --react-skip-nav: 1;
+    --reach-skip-nav: 1;
+    --reach-menu-button: 1;
 }

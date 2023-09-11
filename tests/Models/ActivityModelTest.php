@@ -8,6 +8,7 @@ namespace VanillaTests\Models;
 
 use ActivityModel;
 use Garden\EventManager;
+use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Dashboard\Events\NotificationEvent;
 use VanillaTests\ExpectedNotification;
 use VanillaTests\NotificationsApiTestTrait;
@@ -19,7 +20,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  */
 class ActivityModelTest extends SiteTestCase
 {
-    use NotificationsApiTestTrait, UsersAndRolesApiTestTrait;
+    use NotificationsApiTestTrait, UsersAndRolesApiTestTrait, TestCategoryModelTrait;
 
     /** @var NotificationEvent */
     private $lastEvent;
@@ -252,6 +253,7 @@ class ActivityModelTest extends SiteTestCase
     /**
      * Send a notification to a user.
      * @param array $overrides
+     *
      * @return array
      */
     private function notifyUser(array $overrides = []): array
@@ -266,5 +268,218 @@ class ActivityModelTest extends SiteTestCase
         ];
         $result = $this->activityModel->save($params);
         return $result;
+    }
+
+    /**
+     * Test notification link test.
+     *
+     * @return void
+     */
+    public function testNotificationLink()
+    {
+        $expected = "Log in here to update your notification preferences: " . url("/profile/preferences", true);
+        $link = $this->activityModel->getNotificationPreferencePageLink("text");
+        $this->assertEquals($expected, $link);
+
+        $expected =
+            '<a href="' .
+            url("/profile/preferences", true) .
+            '" target="_blank">Log in here to update your notification preferences</a>';
+        $link = $this->activityModel->getNotificationPreferencePageLink("html");
+        $this->assertEquals($expected, $link);
+    }
+
+    /**
+     * Test unsubscribe link and token.
+     *
+     * @return void
+     */
+    public function testUnsubscribeLinkToken()
+    {
+        $activityUserID = 1;
+        $notifyUserID = 2;
+        $this->activityModel->save([
+            "ActivityUserID" => $activityUserID,
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+            "HeadlineFormat" => __FUNCTION__,
+            "Notified" => ActivityModel::SENT_PENDING,
+            "NotifyUserID" => $notifyUserID,
+            "ActivityType" => "badge",
+        ]);
+
+        $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
+        $unsubscribeLink = $this->activityModel->getUnsubscribeLink($activityUserID, $notifyUser, "text");
+
+        $link = explode("/unsubscribe/", $unsubscribeLink);
+        $token = $link[1];
+
+        $activity = $this->activityModel->decodeNotificationToken($token);
+        $this->assertEquals("badge", $activity["reason"]);
+    }
+
+    /**
+     * Test unsubscribe link and wrong token.
+     *
+     * @return void
+     */
+    public function testUnsubscribeLinkWrongToken()
+    {
+        $activityUserID = 1;
+        $notifyUserID = 2;
+        $this->activityModel->save([
+            "ActivityUserID" => $activityUserID,
+            "Body" => "Hello world.",
+            "Format" => "markdown",
+            "HeadlineFormat" => __FUNCTION__,
+            "Notified" => ActivityModel::SENT_PENDING,
+            "NotifyUserID" => $notifyUserID,
+            "Data" => ["Reason" => "badge"],
+        ]);
+
+        // $expected = '<a href="' . url("/profile/unsubscribe?token=", true) . '" target="_blank">Unsubscribe</a>';
+        $notifyUser = $this->userModel->getID(1, DATASET_TYPE_ARRAY);
+        $unsubscribeLink = $this->activityModel->getUnsubscribeLink($activityUserID, $notifyUser, "html");
+
+        $link = explode("/unsubscribe/", $unsubscribeLink);
+        $token = $link[1];
+        $broken = explode("\"", $token);
+        $token = $broken[0];
+        $this->expectExceptionMessage("Notification not found.");
+        $this->activityModel->decodeNotificationToken($token);
+    }
+
+    /**
+     * Test unfollowCategory link and token.
+     *
+     * @return void
+     */
+    public function testUnfollowCategoryLinkToken()
+    {
+        $notifyUserID = 2;
+        $categoryID = $this->categoryModel->save($this->newCategory([]));
+
+        $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
+        $unsubscribeLink = $this->activityModel->getUnfollowCategoryLink($notifyUser, $categoryID);
+
+        $link = explode("/unsubscribe/", $unsubscribeLink);
+        $token = $link[1];
+
+        $activity = $this->activityModel->decodeNotificationToken($token);
+        $this->assertEquals("advanced", $activity["reason"]);
+        $this->assertEquals("Digest", $activity["activityType"]);
+    }
+
+    /**
+     * Test unsubscribe digest link.
+     *
+     * @return void
+     */
+    public function testUnsubscribeDigestinkToken()
+    {
+        $notifyUserID = 2;
+
+        $notifyUser = $this->userModel->getID($notifyUserID, DATASET_TYPE_ARRAY);
+        $unsubscribeLink = $this->activityModel->getUnsubscribeDigestLink($notifyUser);
+
+        $link = explode("/unsubscribe/", $unsubscribeLink);
+        $token = $link[1];
+
+        $activity = $this->activityModel->decodeNotificationToken($token);
+        $this->assertEquals("DigestEnabled", $activity["reason"]);
+    }
+
+    /**
+     * Test unsubscribe wrong token.
+     *
+     * @return void
+     */
+    public function testUnsubscribeLinkInvalidToken()
+    {
+        $this->expectExceptionMessage("Wrong number of segments");
+        $this->activityModel->decodeNotificationToken("sadgasdgasdg");
+    }
+
+    /**
+     * Test that the notificationPreference() method returns the correct values.
+     *
+     * @param array $defaultPrefs
+     * @param array $userPrefs
+     * @param bool $expectedPopupPref
+     * @param bool $expectedEmailPref
+     * @return void
+     * @dataProvider provideTestGettingNotificationPreference
+     */
+    public function testGettingNotificationPreference(
+        array $defaultPrefs,
+        array $userPrefs,
+        bool $expectedPopupPref,
+        bool $expectedEmailPref
+    ): void {
+        $config = $this->container()->get(ConfigurationInterface::class);
+        $config->saveToConfig($defaultPrefs);
+        $preferences = ActivityModel::notificationPreference("Mention", $userPrefs, "both");
+        $this->assertSame($expectedPopupPref, $preferences[0]);
+        $this->assertSame($expectedEmailPref, $preferences[1]);
+    }
+
+    /**
+     * Provide test data for testing notificationPreference() method.
+     *
+     * @return array[]
+     */
+    public function provideTestGettingNotificationPreference(): array
+    {
+        $r = [
+            "defaultsFalsePrefsFalse" => [
+                [
+                    "Preferences.Popup.Mention" => false,
+                    "Preferences.Email.Mention" => false,
+                ],
+                [
+                    "Popup.Mention" => false,
+                    "Email.Mention" => false,
+                ],
+                false,
+                false,
+            ],
+            "defaultsFalsePrefsTrue" => [
+                [
+                    "Preferences.Popup.Mention" => false,
+                    "Preferences.Email.Mention" => false,
+                ],
+                [
+                    "Popup.Mention" => true,
+                    "Email.Mention" => true,
+                ],
+                true,
+                true,
+            ],
+            "defaultsTruePrefsFalse" => [
+                [
+                    "Preferences.Popup.Mention" => true,
+                    "Preferences.Email.Mention" => true,
+                ],
+                [
+                    "Popup.Mention" => false,
+                    "Email.Mention" => false,
+                ],
+                false,
+                false,
+            ],
+            "defaultsTruePrefsTrue" => [
+                [
+                    "Preferences.Popup.Mention" => true,
+                    "Preferences.Email.Mention" => true,
+                ],
+                [
+                    "Popup.Mention" => true,
+                    "Email.Mention" => true,
+                ],
+                true,
+                true,
+            ],
+        ];
+        return $r;
     }
 }

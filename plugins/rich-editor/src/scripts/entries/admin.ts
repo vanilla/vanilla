@@ -21,7 +21,9 @@ function handleRichEditorInputFormatterOptions() {
 
 function updateRichFormValues(inputFormatter: string) {
     const richFormGroups = document.querySelectorAll(".js-richFormGroup");
-    if (inputFormatter === "Rich" || inputFormatter === "rich") {
+    const shouldShowRichFormGroups =
+        inputFormatter === "Rich" || inputFormatter === "rich" || inputFormatter === "Rich2";
+    if (shouldShowRichFormGroups) {
         richFormGroups.forEach((group) => {
             group.classList.remove("Hidden");
         });

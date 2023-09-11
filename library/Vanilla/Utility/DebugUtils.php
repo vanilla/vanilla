@@ -138,4 +138,25 @@ class DebugUtils
     {
         return "\n" . '<pre class="debug-dontUseCssOnMe">' . htmlspecialchars($message) . "</pre>\n";
     }
+
+    /**
+     * JSON encode something as a summary for debugging purposes.
+     *
+     * @param mixed $toEncode The thing to encode.
+     * @param int $options JSON encode options.
+     * @param int $maxDepth Omit properties deeper than this.
+     */
+    public static function jsonEncodeSummary($toEncode, $options, int $maxDepth = 2): string
+    {
+        if (ArrayUtils::isArray($toEncode)) {
+            ArrayUtils::walkRecursiveArray($toEncode, function (&$node, $path) use ($maxDepth) {
+                if (count($path) >= $maxDepth - 1 && ArrayUtils::isArray($node)) {
+                    foreach ($node as $key => $val) {
+                        $node[$key] = "(Truncated)";
+                    }
+                }
+            });
+        }
+        return StringUtils::jsonEncodeChecked($toEncode, $options);
+    }
 }

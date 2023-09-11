@@ -28,14 +28,15 @@ class IconRegistry {
 // Singleton.
 const iconRegistry = new IconRegistry();
 
-// Build up our built-in icons.
-// Icons are processed through SVGR.
-const iconContext = require.context("../icons/", false, /.*\.svg/);
-iconContext.keys().forEach((key: string) => {
-    // Trim down the key.
-    const trimmedKey = key.replace("./", "").replace(".svg", "");
+const isWebpack = process.env.IS_WEBPACK ?? false;
+if (isWebpack) {
+    const iconContext = require.context("../icons/", false, /.*\.svg/);
+    iconContext.keys().forEach((key: string) => {
+        // Trim down the key.
+        const trimmedKey = key.replace("./", "").replace(".svg", "");
 
-    iconRegistry.registerIcon(trimmedKey as IconType, iconContext(key));
-});
+        iconRegistry.registerIcon(trimmedKey as IconType, iconContext(key));
+    });
+}
 
 export { iconRegistry };

@@ -1,15 +1,16 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import { VanillaLabsPage } from "@dashboard/pages/VanillaLabsPage";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { LoadStatus } from "@library/@types/api/core";
 import { stableObjectHash } from "@vanilla/utils";
+import { configKeys } from "@dashboard/labs/CustomLayoutLabItem";
 
 describe("VanillaLabsPage", () => {
     it("Toggles are disabled while loading", async () => {
@@ -18,6 +19,10 @@ describe("VanillaLabsPage", () => {
                 state={{
                     config: {
                         configsByLookupKey: {
+                            [stableObjectHash(configKeys)]: {
+                                status: LoadStatus.SUCCESS,
+                                data: {},
+                            },
                             [stableObjectHash(["labs.*"])]: {
                                 status: LoadStatus.LOADING,
                             },
@@ -42,6 +47,10 @@ describe("VanillaLabsPage", () => {
                 state={{
                     config: {
                         configsByLookupKey: {
+                            [stableObjectHash(configKeys)]: {
+                                status: LoadStatus.SUCCESS,
+                                data: {},
+                            },
                             [stableObjectHash(["labs.*"])]: {
                                 status: LoadStatus.SUCCESS,
                                 data: {
@@ -82,6 +91,10 @@ describe("VanillaLabsPage", () => {
                 state={{
                     config: {
                         configsByLookupKey: {
+                            [stableObjectHash(configKeys)]: {
+                                status: LoadStatus.SUCCESS,
+                                data: {},
+                            },
                             [stableObjectHash(["labs.*"])]: {
                                 status: LoadStatus.SUCCESS,
                                 data: {

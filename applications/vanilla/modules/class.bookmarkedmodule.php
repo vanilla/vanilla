@@ -44,8 +44,7 @@ class BookmarkedModule extends Gdn_Module
             if (count($bookmarkIDs)) {
                 $discussionModel = new DiscussionModel();
                 DiscussionModel::categoryPermissions();
-
-                $bookmarks = $discussionModel->get(0, $this->Limit, ["d.DiscussionID" => $bookmarkIDs]);
+                $bookmarks = $discussionModel->getWhere(["d.DiscussionID" => $bookmarkIDs], "", "", $this->Limit);
                 $this->setData("Bookmarks", $bookmarks);
             } else {
                 $this->setData("Bookmarks", new Gdn_DataSet());

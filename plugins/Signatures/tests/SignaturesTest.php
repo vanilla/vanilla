@@ -135,4 +135,15 @@ class SignaturesTest extends SiteTestCase
             "Format" => $format,
         ]);
     }
+
+    /**
+     * Test that the signature preferences are reachable.
+     */
+    public function testSignaturesProfilePage()
+    {
+        $response = $this->bessy()
+            ->getJsonData("/profile/signature")
+            ->asHttpResponse();
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 }

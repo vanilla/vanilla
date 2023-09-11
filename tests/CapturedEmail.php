@@ -7,6 +7,8 @@
 
 namespace VanillaTests;
 
+use VanillaTests\Fixtures\Html\TestHtmlDocument;
+
 /**
  * A data class for capturing sent emails in tests.
  */
@@ -42,6 +44,8 @@ class CapturedEmail
      */
     private $bcc;
 
+    public string $format;
+
     /**
      * CapturedEmail constructor.
      */
@@ -75,14 +79,15 @@ class CapturedEmail
         if ($to) {
             return $to;
         }
-        $to = $this->findRecipientOn($this->cc, $email, $name);
+        $to = $this->findRecipientOn($this->cc ?? [], $email, $name);
         if ($to) {
             return $to;
         }
-        $to = $this->findRecipientOn($this->bcc, $email, $name);
+        $to = $this->findRecipientOn($this->bcc ?? [], $email, $name);
         if ($to) {
             return $to;
         }
+        return null;
     }
 
     /**
@@ -109,6 +114,16 @@ class CapturedEmail
     }
 
     /**
+     * Get a test HTML document of the email contents.
+     *
+     * @return TestHtmlDocument
+     */
+    public function getHtmlDocument(): TestHtmlDocument
+    {
+        return new TestHtmlDocument($this->body, false);
+    }
+
+    /**
      * Create a captured email from a `Gdn_Email` object.
      *
      * @param \Gdn_Email $email
@@ -119,6 +134,7 @@ class CapturedEmail
         $r = new self();
         $r->subject = $email->PhpMailer->Subject;
         $r->body = $email->PhpMailer->Body;
+        $r->format = $email->getFormat();
         $r->addEmailAddresses($r->to, $email->PhpMailer->getToAddresses());
         $r->addEmailAddresses($r->cc, $email->PhpMailer->getCcAddresses());
         $r->addEmailAddresses($r->bcc, $email->PhpMailer->getBccAddresses());

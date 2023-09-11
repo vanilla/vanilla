@@ -15,6 +15,7 @@ import { formElementsVariables } from "@library/forms/formElementStyles";
 import { important, percent, px } from "csx";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { css } from "@emotion/css";
+import { inputMixin } from "@library/forms/inputStyles";
 
 export const tokensVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -81,6 +82,9 @@ export const tokensClasses = useThemeCache(() => {
                             vertical: 0,
                         }),
                         minHeight: styleUnit(vars.token.minHeight),
+                        "@media(max-width: 600px)": {
+                            fontSize: 16,
+                        },
                     },
                     input: {
                         width: percent(100),
@@ -123,6 +127,26 @@ export const tokensClasses = useThemeCache(() => {
                     },
                 },
             },
+            ".tokens__group": {
+                ...Mixins.padding({ vertical: 8 }),
+                ...Mixins.border({
+                    width: 0,
+                    top: {
+                        width: 1,
+                        radius: 0,
+                    },
+                }),
+                "&:first-of-type": {
+                    border: 0,
+                },
+                ".tokens__group-heading": {
+                    width: "100%",
+                    textAlign: "center",
+                    fontSize: "0.875em",
+                    color: "inherit",
+                    opacity: 0.75,
+                },
+            },
             ".suggestedTextInput-option": {
                 ...Mixins.padding({ all: 8 }),
                 width: "100%",
@@ -157,18 +181,19 @@ export const tokensClasses = useThemeCache(() => {
         },
     });
 
-    const withIndicator = style("withIndicator", {
-        ...{
-            ".inputText.inputText": {
-                fontSize: "inherit",
-            },
-        },
-    });
+    const withIndicator = style("withIndicator", {});
 
     const containerLegacyForm = css({
         "& label > span": {
             fontWeight: 700,
             marginBottom: 0,
+        },
+        "& label > p": {
+            color: "#666",
+            opacity: "unset",
+            fontSize: "80%",
+            marginTop: 3,
+            marginBottom: -4,
         },
     });
 

@@ -34,6 +34,10 @@ class SiteTotalsWidgetTest extends SiteTestCase
      */
     public function testHydrateSiteTotalsWidget()
     {
+        $this->createDiscussion();
+        $this->createDiscussion([
+            "type" => "question",
+        ]);
         $spec1 = [
             '$hydrate' => "react.sitetotals",
             "apiParams" => [
@@ -70,6 +74,7 @@ class SiteTotalsWidgetTest extends SiteTestCase
                     ],
                 ],
             ],
+            '$reactTestID' => "hello",
         ];
 
         $countsResponse = $this->api->get("/site-totals", ["counts" => ["all"]])->getBody()["counts"];
@@ -110,6 +115,20 @@ class SiteTotalsWidgetTest extends SiteTestCase
                     ],
                 ],
             ],
+            '$reactTestID' => "hello",
+            '$seoContent' => <<<HTML
+<div class=pageBox>
+    <div class=pageHeadingBox>
+        <h2>Site Totals</h2>
+    </div>
+    <div class="gapped row">
+        <span class=padded>2 Members</span>
+        <span class=padded>2 Posts</span>
+        <span class=padded>0 Online Users</span>
+    </div>
+</div>
+HTML
+        ,
         ];
 
         $spec2 = [
@@ -153,6 +172,7 @@ class SiteTotalsWidgetTest extends SiteTestCase
             ],
             "labelType" => "icon",
             "formatNumbers" => true,
+            '$reactTestID' => "hello",
         ];
 
         $expected2 = [
@@ -203,6 +223,21 @@ class SiteTotalsWidgetTest extends SiteTestCase
                     ],
                 ],
             ],
+            '$reactTestID' => "hello",
+            '$seoContent' => <<<HTML
+<div class=pageBox>
+    <div class=pageHeadingBox>
+        <h2>Site Totals</h2>
+    </div>
+    <div class="gapped row">
+        <span class=padded>2 Members</span>
+        <span class=padded>1 Questions</span>
+        <span class=padded>2 Posts</span>
+        <span class=padded>0 Online</span>
+    </div>
+</div>
+HTML
+        ,
         ];
 
         $this->assertHydratesTo($spec1, [], $expected1);

@@ -8,3 +8,7 @@
 $Configuration["Garden"]["Profile"]["EditUsernames"] = false;
 $Configuration["Garden"]["Activities"]["PerPage"] = 30;
 $Configuration["Garden"]["Format"]["WarnLeaving"] = true;
+
+// The CustomProfileFields feature should be enabled by default.
+
+$Configuration["Feature"]["CustomProfileFields"]["Enabled"] = true;

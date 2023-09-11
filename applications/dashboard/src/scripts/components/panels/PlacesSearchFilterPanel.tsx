@@ -11,9 +11,7 @@ import { t } from "@library/utility/appUtils";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
 import { IPlaceSearchTypes } from "@dashboard/components/placeSearchType";
 
-interface IProps {}
-
-export default function PlacesSearchFilterPanel(props: IProps) {
+export default function PlacesSearchFilterPanel() {
     const { form, updateForm, search } = useSearchForm<IPlaceSearchTypes>();
 
     return (

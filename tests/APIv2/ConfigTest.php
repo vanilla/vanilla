@@ -8,6 +8,8 @@
 namespace VanillaTests\APIv2;
 
 use Garden\Web\Exception\ForbiddenException;
+use Gdn_Configuration;
+use LogModel;
 use Vanilla\Dashboard\Controllers\API\ConfigApiController;
 
 /**
@@ -175,16 +177,58 @@ class ConfigTest extends AbstractAPIv2Test
     }
 
     /**
-     * Test that properties are mapped correctly when writing.
+     * Test that properties are mapped correctly when writing, and test that the change is recorded in the log table.
      */
     public function testPatchHTMLInjection()
     {
+        $r = $this->api()
+            ->get("/config")
+            ->getBody();
+        $expected = [
+            "Garden.Description" => stringIsNullOrEmpty($r["garden.description"]) ? false : $r["garden.description"],
+            "Garden.Title" => $r["garden.title"],
+            "_New" => ["Garden.Description" => "Something TO Show", "Garden.Title" => "Hello moo"],
+        ];
+
         $this->api->patch("/config", [
             "garden.description" => "<title>Something TO Show</title>",
             "garden.title" => "Hello <all>moo<all>",
+            "seo.metaHtml" => "<meta name='allowsHtml' content='yes' />", // This one is annotated to allow HTML.
         ]);
 
         $this->assertConfigValue("Garden.Description", "Something TO Show");
         $this->assertConfigValue("Garden.Title", "Hello moo");
+        $this->assertConfigValue("seo.metaHtml", "<meta name='allowsHtml' content='yes' />");
+
+        // Test Log Model has saved configuration change.
+        $config = $this->container()->get(Gdn_Configuration::class);
+        $config->shutdown();
+        $logModel = $this->container()->get(LogModel::class);
+        //Load last config edit entry.
+        $record = $logModel->getWhere(
+            ["recordType" => "Configuration", "operation" => "Edit"],
+            "RecordDate",
+            "desc",
+            0,
+            1
+        )[0];
+        $data = $record["Data"];
+
+        $this->assertSame($expected["Garden.Title"], $data["Garden.Title"]);
+        $this->assertSame($expected["Garden.Description"], $data["Garden.Description"]);
+        $this->assertSame($expected["_New"]["Garden.Title"], $data["_New"]["Garden.Title"]);
+        $this->assertSame($expected["_New"]["Garden.Description"], $data["_New"]["Garden.Description"]);
+    }
+
+    /**
+     * Test that the x-upload attribute transforms upload fragments into upload urls.
+     */
+    public function testUploadUrls()
+    {
+        $this->api->patch("/config", [
+            "branding.bannerImage" => "/test123.png",
+        ]);
+        $response = $this->api->get("/config", ["select" => "branding.bannerImage"])->getBody();
+        $this->assertEquals(["branding.bannerImage" => url("/uploads/test123.png", true)], $response);
     }
 }

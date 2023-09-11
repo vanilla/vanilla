@@ -13,6 +13,8 @@ use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
 use Garden\Web\Data;
 use Garden\Web\Dispatcher;
+use Garden\Web\Exception\ResponseException;
+use Garden\Web\Redirect;
 use Garden\Web\RequestInterface;
 use League\Uri\Http;
 use Vanilla\Utility\DebugUtils;
@@ -117,7 +119,12 @@ class InternalRequest extends HttpRequest implements RequestInterface
             $_COOKIE = $cookieStash;
         }
 
+        if (DebugUtils::isTestMode() && $data instanceof Redirect) {
+            throw new ResponseException($data);
+        }
+
         $response = $data->asHttpResponse();
+        $response->setRequest($this);
         if ($ex = $data->getMeta("exception")) {
             $response->setThrowable($ex);
         }

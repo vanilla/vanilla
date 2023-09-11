@@ -47,6 +47,9 @@ export const messagesVariables = useThemeCache(() => {
         error: {
             bg: color("#FBE8E8"),
         },
+        neutral: {
+            bg: color("#EEEEEF"),
+        },
     });
     const title = themeVars("title", {
         margin: {
@@ -164,6 +167,7 @@ export const messagesClasses = useThemeCache(() => {
 
     const root = css({
         width: percent(100),
+        textAlign: "start",
         backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
         ...shadowOrBorderBasedOnLightness(
             globalVars.body.backgroundImage.color,
@@ -182,6 +186,10 @@ export const messagesClasses = useThemeCache(() => {
 
     const error = css({
         backgroundColor: ColorsUtils.colorOut(vars.colors.error.bg),
+    });
+
+    const neutral = css({
+        backgroundColor: ColorsUtils.colorOut(vars.colors.neutral.bg),
     });
 
     const setWidth = css({
@@ -283,6 +291,7 @@ export const messagesClasses = useThemeCache(() => {
     return {
         root,
         error,
+        neutral,
         wrap,
         wrapWithIcon,
         actionButton,

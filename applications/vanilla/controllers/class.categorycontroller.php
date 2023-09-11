@@ -49,9 +49,11 @@ class CategoryController extends VanillaController
     /**
      * Allows user to follow or unfollow a category.
      *
-     * @param int $DiscussionID Unique discussion ID.
+     * @param ?int $categoryID // Category if to be followed
+     * @param ?string $tKey // transient key
+     * @param ?int $value // follow / unfollow flag
      */
-    public function followed($categoryID = null, $tKey = null)
+    public function followed(?int $categoryID = null, ?string $tKey = null, ?int $value = null)
     {
         // Make sure we are posting back.
         if (!$this->Request->isAuthenticatedPostBack() && !Gdn::session()->validateTransientKey($tKey)) {
@@ -73,14 +75,15 @@ class CategoryController extends VanillaController
         // Check the form to see if the data was posted.
         $form = new Gdn_Form();
         $categoryID = $form->getFormValue("CategoryID", $categoryID);
-        $followed = $form->getFormValue("Followed", null);
+        $followed = $form->getFormValue("Followed", $value);
         $hasPermission = $categoryModel::checkPermission($categoryID, "Vanilla.Discussions.View");
         if (!$hasPermission) {
             throw permissionException("Vanilla.Discussion.View");
         }
-
         try {
-            $result = $categoryModel->follow($userID, $categoryID, $followed);
+            $this->CategoryModel->setPreferences($userID, $categoryID, [
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => $followed,
+            ]);
         } catch (Exception $e) {
             throw new \Gdn_UserException($e->getMessage(), 403, $e);
         }
@@ -89,7 +92,7 @@ class CategoryController extends VanillaController
         $this->setData([
             "UserID" => $userID,
             "CategoryID" => $categoryID,
-            "Followed" => $result,
+            "Followed" => $this->CategoryModel->isFollowed($userID, $categoryID),
         ]);
 
         $parentCategory = false;

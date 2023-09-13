@@ -1,5 +1,4 @@
 <img src="https://user-images.githubusercontent.com/1770056/51494323-414e8980-1d86-11e9-933c-e647b5ea49f4.png" alt="Vanilla Repo Logo" width=500/>
-![Static Badge](https://img.shields.io/badge/license-GPL--2.0-orange)
 
 ## Howdy, Stranger!
 

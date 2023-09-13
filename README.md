@@ -1,5 +1,7 @@
 <img src="https://user-images.githubusercontent.com/1770056/51494323-414e8980-1d86-11e9-933c-e647b5ea49f4.png" alt="Vanilla Repo Logo" width=500/>
 
+[![](https://img.shields.io/github/license/vanilla/vanilla.svg)](https://github.com/vanilla/vanilla/blob/master/LICENSE)
+
 ## Howdy, Stranger!
 
 Vanilla was born out of the desire to create flexible, customizable, and downright entertaining

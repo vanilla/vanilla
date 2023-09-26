@@ -169,7 +169,6 @@ class LongRunner implements SystemCallableInterface
         $this->validateLongRunnable($action);
 
         $generator = $this->generatorFromAction($action);
-        $callableName = $action->getCallableName();
 
         // Start preparing our result.
         $result = new LongRunnerResult();

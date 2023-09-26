@@ -68,7 +68,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
 
     useDebugValue({ opts: options });
 
-    if (props.children) {
+    if (props.children && !Array.isArray(props.children)) {
         return (
             <SmartLink
                 to={props.to}

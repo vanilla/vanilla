@@ -8,10 +8,12 @@
 namespace Vanilla\Dashboard\Events;
 
 use Garden\Events\ResourceEvent;
+use Gdn;
 use Vanilla\Analytics\TrackableCommunityModel;
 use Vanilla\Analytics\TrackableUserModel;
 use Vanilla\Community\Events\CommentEvent;
 use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * Represent a LogPostEvent. The event type will be either "discussion" or "comment", depending on the post's type.
@@ -139,5 +141,17 @@ class LogPostEvent implements \Garden\Events\TrackingEventInterface
         );
 
         return $trackingData;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionID(): ?string
+    {
+        $siteSection = Gdn::getContainer()
+            ->get(SiteSectionModel::class)
+            ->getCurrentSiteSection();
+
+        return $siteSection->getSectionID() ?? null;
     }
 }

@@ -1,13 +1,16 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Layout;
 
+use CategoryModel;
 use Exception;
+use Garden\Container\ContainerException;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
@@ -36,6 +39,8 @@ class LayoutViewModel extends FullRecordCacheModel
     /** @var array A mapping of recordType to breadcrumb provider. */
     private $providers = [];
 
+    private CategoryModel $categoryModel;
+
     //region Constructor
     /**
      * DI Constructor.
@@ -49,7 +54,8 @@ class LayoutViewModel extends FullRecordCacheModel
         CurrentUserFieldProcessor $userFields,
         CurrentDateFieldProcessor $dateFields,
         LayoutHydrator $layoutHydrator,
-        \GDN_Cache $cache
+        \GDN_Cache $cache,
+        CategoryModel $categoryModel
     ) {
         parent::__construct(self::TABLE_NAME, $cache);
         $userFields->camelCase();
@@ -57,6 +63,7 @@ class LayoutViewModel extends FullRecordCacheModel
         $dateFields->camelCase();
         $this->addPipelineProcessor($dateFields);
         $this->layoutHydrator = $layoutHydrator;
+        $this->categoryModel = $categoryModel;
     }
 
     //endregion
@@ -104,7 +111,8 @@ class LayoutViewModel extends FullRecordCacheModel
      * @param string $layoutViewType Layout type.
      * @param string $layoutID Layout ID.
      *
-     * @return int
+     * @return array
+     * @throws NotFoundException
      */
     public function saveLayoutViews(array $body, string $layoutViewType, string $layoutID): array
     {
@@ -156,6 +164,9 @@ class LayoutViewModel extends FullRecordCacheModel
      *
      * @return string
      * @throws NotFoundException In case layout ID is not found based on provided parameters.
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws ValidationException
      */
     public function getLayoutIdLookup(string $layoutViewType, string $recordType, string $recordID): string
     {
@@ -188,6 +199,7 @@ class LayoutViewModel extends FullRecordCacheModel
      * @param int|null $recordID ID of the record
      *
      * @return array
+     * @throws ValidationException
      */
     public function getLayoutViews(
         bool $allowNull,
@@ -226,6 +238,7 @@ class LayoutViewModel extends FullRecordCacheModel
      * @param array $row Layout View record from database row
      * @param array|string|bool $expand Additional parameters used to expand output based on row property values
      * @return array Normalized row
+     * @throws NotFoundException
      */
     public function normalizeRow(array $row, $expand = false): array
     {
@@ -241,6 +254,7 @@ class LayoutViewModel extends FullRecordCacheModel
      * @param array $rows Layout View records from database rows
      * @param array|string|bool $expand Additional parameters used to expand output based on row property values
      * @return array Normalized row
+     * @throws NotFoundException
      */
     public function normalizeRows(array $rows, $expand): array
     {
@@ -300,11 +314,15 @@ class LayoutViewModel extends FullRecordCacheModel
      * @param string $recordType recordType.
      * @param string $recordID recordID.
      * @return array
-     * @throws \Garden\Container\ContainerException Container Exception.
+     * @throws ContainerException Container Exception.
      * @throws \Garden\Container\NotFoundException Container not found exception.
      */
     public function getProviderLayoutIdLookupParams(string $layoutViewType, string $recordType, string $recordID): array
     {
+        if (!is_numeric($recordID) && $recordType === "category") {
+            $recordID = $this->categoryModel->ensureCategoryID($recordID);
+        }
+
         // If the recordID is non-numeric(a slug), we see if we can rely on the SiteSectionModel to provide
         // alternative parameters for getLayOutIdLookup().
         if (!is_numeric($recordID) || $recordType == "siteSection") {
@@ -315,6 +333,7 @@ class LayoutViewModel extends FullRecordCacheModel
                 return $section->getLayoutIdLookupParams($layoutViewType, $recordType, $recordID);
             }
         }
+
         return ["layoutViewType" => $layoutViewType, "recordType" => $recordType, "recordID" => $recordID];
     }
 
@@ -359,6 +378,7 @@ class LayoutViewModel extends FullRecordCacheModel
      * false to retain those columns. Default false.
      * @param bool $drop Optional, true to drop table if it already exists,
      * false to retain table if it already exists. Default false.
+     * @throws Exception
      */
     public static function structure(\Gdn_Database $database, bool $explicit = false, bool $drop = false): void
     {

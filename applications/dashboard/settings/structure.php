@@ -8,8 +8,10 @@
  * @since 2.0
  */
 
+use Ramsey\Uuid\Uuid;
 use Vanilla\Addon;
 use Vanilla\Dashboard\Models\ModerationMessageStructure;
+use Vanilla\Dashboard\Models\QueuedJobModel;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RecordStatusLogModel;
 use Vanilla\Dashboard\Models\UserMentionsModel;
@@ -17,6 +19,7 @@ use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Layout\LayoutModel;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Models\InstallModel;
+use Vanilla\Scheduler\CronModel;
 use Vanilla\Scheduler\Job\JobStatusModel;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
@@ -36,6 +39,8 @@ $LEGACYADDON = [
     "EnabledPlugins.Sphinx",
     "EnabledPlugins.Reputation",
     "EnabledPlugins.NBBC",
+    "EnabledPlugins.whispers",
+    "EnabledPlugins.autorolebyemail2",
 ];
 
 if (!defined("APPLICATION")) {
@@ -48,6 +53,12 @@ if (!isset($Drop)) {
 if (!isset($Explicit)) {
     $Explicit = false;
 }
+
+// These used to be managed by vanillastats installation, but that no longer exists.
+// These have some usage in custom domain provisioning nowadays.
+// Please don't use them for new things.
+\Gdn::config()->touch("Garden.InstallationID", Uuid::uuid4()->toString());
+\Gdn::config()->touch("Garden.InstallationSecret", Uuid::uuid4()->toString());
 
 $captureOnly = isset($Structure) && val("CaptureOnly", $Structure);
 
@@ -83,6 +94,7 @@ $Construct
     ->column("Deletable", "tinyint(1)", "1")
     ->column("CanSession", "tinyint(1)", "1")
     ->column("PersonalInfo", "tinyint(1)", "0")
+    ->column("Domains", "text", null)
     ->set($Explicit, $Drop);
 
 $RoleModel = new RoleModel();
@@ -95,7 +107,7 @@ if (!$RoleTableExists || $Drop) {
     $RoleModel->define([
         "Name" => "Guest",
         "Type" => RoleModel::TYPE_GUEST,
-        "RoleID" => 2,
+        "RoleID" => RoleModel::GUEST_ID,
         "Sort" => $Sort++,
         "Deletable" => "0",
         "CanSession" => "0",
@@ -107,7 +119,7 @@ if (!$RoleTableExists || $Drop) {
     $RoleModel->define([
         "Name" => "Unconfirmed",
         "Type" => RoleModel::TYPE_UNCONFIRMED,
-        "RoleID" => 3,
+        "RoleID" => RoleModel::UNCONFIRMED_ID,
         "Sort" => $Sort++,
         "Deletable" => "0",
         "CanSession" => "1",
@@ -119,7 +131,7 @@ if (!$RoleTableExists || $Drop) {
     $RoleModel->define([
         "Name" => "Applicant",
         "Type" => RoleModel::TYPE_APPLICANT,
-        "RoleID" => 4,
+        "RoleID" => RoleModel::APPLICANT_ID,
         "Sort" => $Sort++,
         "Deletable" => "0",
         "CanSession" => "1",
@@ -131,7 +143,7 @@ if (!$RoleTableExists || $Drop) {
     $RoleModel->define([
         "Name" => "Member",
         "Type" => RoleModel::TYPE_MEMBER,
-        "RoleID" => 8,
+        "RoleID" => RoleModel::MEMBER_ID,
         "Sort" => $Sort++,
         "Deletable" => "1",
         "CanSession" => "1",
@@ -140,7 +152,7 @@ if (!$RoleTableExists || $Drop) {
     $RoleModel->define([
         "Name" => "Moderator",
         "Type" => RoleModel::TYPE_MODERATOR,
-        "RoleID" => 32,
+        "RoleID" => RoleModel::MOD_ID,
         "Sort" => $Sort++,
         "Deletable" => "1",
         "CanSession" => "1",
@@ -149,7 +161,7 @@ if (!$RoleTableExists || $Drop) {
     $RoleModel->define([
         "Name" => "Administrator",
         "Type" => RoleModel::TYPE_ADMINISTRATOR,
-        "RoleID" => 16,
+        "RoleID" => RoleModel::ADMIN_ID,
         "Sort" => $Sort++,
         "Deletable" => "1",
         "CanSession" => "1",
@@ -164,20 +176,19 @@ $PhotoIDExists = $Construct->columnExists("PhotoID");
 $PhotoExists = $Construct->columnExists("Photo");
 $UserExists = $Construct->tableExists();
 $ConfirmedExists = $Construct->columnExists("Confirmed");
-$AllIPAddressesExists = $Construct->columnExists("AllIPAddresses");
 
 $Construct
     ->primaryKey("UserID")
-    ->column("Name", "varchar(50)", false, "key")
+    ->column("Name", "varchar(" . UserModel::USERNAME_LENGTH . ")", false, "key")
     ->column("Password", "varbinary(100)") // keep this longer because of some imports.
     ->column("HashMethod", "varchar(10)", true)
-    ->column("Photo", "varchar(255)", null)
+    ->column("Photo", "varchar(767)", null)
     ->column("Title", "varchar(100)", null)
     ->column("Location", "varchar(100)", null)
     ->column("About", "text", true)
     ->column("Email", "varchar(100)", false, "index")
     ->column("ShowEmail", "tinyint(1)", "0")
-    ->column("Gender", ["u", "m", "f"], "u")
+    ->column("Gender", ["u", "m", "f", ""], "")
     ->column("CountVisits", "int", "0")
     ->column("CountInvitations", "int", "0")
     ->column("CountNotifications", "int", null)
@@ -193,7 +204,7 @@ $Construct
     ->column("LastIPAddress", "ipaddress", true, "index") // Index this for the admin dashboard.
     ->column("DateInserted", "datetime", false, "index")
     ->column("InsertIPAddress", "ipaddress", true)
-    ->column("DateUpdated", "datetime", true)
+    ->column("DateUpdated", "datetime", true, "index")
     ->column("UpdateIPAddress", "ipaddress", true)
     ->column("HourOffset", "int", "0")
     ->column("Score", "float", null)
@@ -202,7 +213,7 @@ $Construct
     ->column("Verified", "tinyint(1)", "0") // 1 means verified (non spammer), otherwise not verified
     ->column("Banned", "tinyint(1)", "0") // 1 means banned, otherwise not banned
     ->column("Deleted", "tinyint(1)", "0", "index")
-    ->column("Points", "int", 0)
+    ->column("Points", "int", 0, "index")
     ->set($Explicit, $Drop);
 
 // Modify all users with ConfirmEmail role to be unconfirmed
@@ -277,6 +288,14 @@ if (empty(Gdn::config("Garden.UpdateToken"))) {
 //Make sure there is scheduler token
 if (empty(Gdn::config("Garden.Scheduler.Token"))) {
     Gdn::config()->saveToConfig("Garden.Scheduler.Token", uniqid("SchedulerToken", true));
+}
+
+// Make sure the site has a random cron offset
+if (Gdn::config(CronModel::CONF_OFFSET_SECONDS) === null) {
+    $maxSecondsInDay = 60 * 60 * 24;
+    $offsetInSeconds = random_int(0, $maxSecondsInDay);
+
+    Gdn::config()->saveToConfig(CronModel::CONF_OFFSET_SECONDS, $offsetInSeconds);
 }
 
 // UserIP Table
@@ -396,11 +415,12 @@ DROP PRIMARY KEY, ADD COLUMN `UserMetaID` int NOT NULL AUTO_INCREMENT PRIMARY KE
 $doesntHaveQueryValueColumn =
     $Construct->tableExists("UserMeta") && !$Construct->table("UserMeta")->columnExists("QueryValue");
 
+$maxNameLength = UserMetaModel::NAME_LENGTH;
 $Construct
     ->table("UserMeta")
     ->primaryKey("UserMetaID")
     ->column("UserID", "int", false, "index.UserID_Name")
-    ->column("Name", "varchar(100)", false, ["index.UserID_Name"])
+    ->column("Name", "varchar($maxNameLength)", false, ["index.UserID_Name"])
     ->column("Value", "text", true)
     ->column("QueryValue", "varchar(" . UserMetaModel::QUERY_VALUE_LENGTH . ")", true)
     ->set($Explicit, $Drop);
@@ -419,56 +439,11 @@ $Construct
     ->table("UserMeta")
     ->dropIndexIfExists("IX_UserMeta_Name")
     ->dropIndexIfExists("IX_UserMeta_Name_ShortValue")
-    ->createIndexIfNotExists("IX_UserMeta_QueryValue_UserID", ["QueryValue", "UserID"]);
+    ->createIndexIfNotExists("UX_UserMeta_QueryValue_UserID", ["QueryValue", "UserID"])
+    ->dropIndexIfExists("IX_UserMeta_QueryValue_UserID");
 
 if ($Construct->table("UserMeta")->columnExists("ShortValue")) {
     $Construct->dropColumn("ShortValue");
-}
-
-//Migrate Users DateOfBirth fields from Users Table to UserMeta table
-if (
-    $Construct->tableExists("User") &&
-    $Construct->table("User")->columnExists("DateOfBirth") &&
-    $Construct->tableExists("UserMeta") &&
-    $Construct->table("UserMeta")->columnExists("QueryValue")
-) {
-    $nonEmptyDateOfBirthCount = $SQL->getCount("User", ["DateOfBirth <>" => ""]);
-    $maxUpdatedUser = $SQL->getcount("UserMeta", ["Name" => "Profile.DateOfBirth"]);
-    $limit = 10000;
-    $iterations = 1;
-    if ($nonEmptyDateOfBirthCount && $nonEmptyDateOfBirthCount > $maxUpdatedUser) {
-        if ($nonEmptyDateOfBirthCount > $limit) {
-            $iterations = (int) ceil($nonEmptyDateOfBirthCount / $limit);
-        }
-        try {
-            $logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
-            for ($i = 0; $i < $iterations; $i++) {
-                $offset = $limit * $i;
-                $query = "SELECT MIN(UserID) as minUser , MAX(UserID) as maxUser FROM 
-                        (SELECT UserID FROM GDN_User WHERE DateOfBirth <> '' LIMIT $limit OFFSET $offset) U";
-                $users = $SQL->query($query)->resultArray();
-
-                // we need to select insert /update here based on limit
-                $Construct->executeQuery(
-                    "INSERT GDN_UserMeta(UserID, Name, Value, QueryValue) 
-                    SELECT UserID, 'Profile.DateOfBirth' AS Label, DateOfBirth, CONCAT('Profile.DateOfBirth.', DateOfBirth) as QueryValue
-                    FROM GDN_User U WHERE concat(DateOfBirth,'') <> '' LIMIT $limit OFFSET $offset 
-                    ON DUPLICATE KEY UPDATE Value = U.DateOfBirth"
-                );
-                $logger->info(
-                    "Migrated field DateofBirth of User's table for users between  {$users[0]["minUser"]} and {$users[0]["maxUser"]}  into UserMeta Table"
-                );
-            }
-        } catch (Exception $e) {
-            $logger->error(
-                "Error occurred while migrating user data DateOfBirth to UserMeta for records between {$users[0]["minUser"]} and  {$users[0]["maxUser"]} ",
-                [
-                    "event" => "UserTable_DateOfBirth_migration",
-                    "exception" => $e,
-                ]
-            );
-        }
-    }
 }
 
 // Similar to the user meta table, but without the need to cache the entire dataset.
@@ -482,12 +457,12 @@ $Construct
 // User Points Table
 $Construct
     ->table("UserPoints")
-    ->column("SlotType", ["d", "w", "m", "y", "a"], false, "primary")
-    ->column("TimeSlot", "datetime", false, "primary")
-    ->column("Source", "varchar(10)", "Total", "primary")
-    ->column("CategoryID", "int", 0, "primary")
+    ->column("SlotType", ["d", "w", "m", "y", "a"], false, ["primary", "index.Points"])
+    ->column("TimeSlot", "datetime", false, ["primary", "index.Points"])
+    ->column("Source", "varchar(10)", "Total", ["primary", "index.Points"])
+    ->column("CategoryID", "int", 0, ["primary", "index.Points"])
     ->column("UserID", "int", false, "primary")
-    ->column("Points", "int", 0)
+    ->column("Points", "int", 0, "index.Points")
     ->set($Explicit, $Drop);
 
 // Create the authentication table.
@@ -524,7 +499,7 @@ $Construct
     ->column("URL", "varchar(255)", true)
     ->column("AssociationSecret", "text", true)
     ->column("AssociationHashMethod", "varchar(20)", true)
-    ->column("AuthenticateUrl", "varchar(255)", true)
+    ->column("AuthenticateUrl", "varchar(2048)", true)
     ->column("RegisterUrl", "varchar(255)", true)
     ->column("SignInUrl", "varchar(255)", true)
     ->column("SignOutUrl", "varchar(255)", true)
@@ -581,7 +556,16 @@ $Construct
     ->column("InsertIPAddress", "ipaddress", false)
     ->column("DateExpires", "timestamp", ["Null" => false, "Default" => "current_timestamp"], "index")
     ->column("Attributes", "text", true)
+    ->column("DateLastUsed", "timestamp", true)
     ->set($Explicit, $Drop);
+
+// Create or regenerate a system access token.
+// Only run the access token modification on real structure runs so as not to pollute the log.
+if (!$captureOnly) {
+    /** @var AccessTokenModel $accessTokenModel */
+    $accessTokenModel = \Gdn::getContainer()->get(AccessTokenModel::class);
+    $accessTokenModel->ensureSingleSystemToken();
+}
 
 // Fix the sync roles config spelling mistake.
 if (c("Garden.SSO.SynchRoles")) {
@@ -611,14 +595,6 @@ if (!$dateExpireExists) {
 }
 $Construct->column("Attributes", "text", null)->set($Explicit, $Drop);
 
-$Construct
-    ->table("AnalyticsLocal")
-    ->engine("InnoDB")
-    ->column("TimeSlot", "varchar(8)", false, "unique")
-    ->column("Views", "int", null)
-    ->column("EmbedViews", "int", true)
-    ->set(false, false);
-
 $uploadPermission = "Garden.Uploads.Add";
 $uploadPermissionExists = $Construct->table("Permission")->columnExists($uploadPermission);
 $oldUploadPermission = "Plugins.Attachments.Upload.Allow";
@@ -635,10 +611,11 @@ if ($PermissionModel instanceof PermissionModel) {
     $Construct
         ->table("Permission")
         ->primaryKey("PermissionID")
-        ->column("RoleID", "int", 0, "key")
-        ->column("JunctionTable", "varchar(100)", true)
-        ->column("JunctionColumn", "varchar(100)", true)
-        ->column("JunctionID", "int", true)
+        ->column("JunctionID", "int", true, "index.Junction")
+        ->column("RoleID", "int", 0, ["key", "index.Junction"])
+        ->column("JunctionTable", "varchar(100)", true, "index.Junction")
+        ->column("JunctionColumn", "varchar(100)", true, "index.Junction")
+
         // The actual permissions will be added by PermissionModel::define()
         ->set($Explicit, $Drop);
 }
@@ -646,6 +623,7 @@ if ($PermissionModel instanceof PermissionModel) {
 // Define the set of permissions that Garden uses.
 $PermissionModel->define([
     "Garden.Email.View" => "Garden.SignIn.Allow",
+    "Garden.Exports.Manage" => "Garden.Settings.Manage",
     "Garden.Settings.Manage",
     "Garden.Settings.View",
     "Garden.SignIn.Allow" => 1,
@@ -658,6 +636,7 @@ $PermissionModel->define([
     "Garden.Profiles.View" => 1,
     "Garden.Profiles.Edit" => "Garden.SignIn.Allow",
     "Garden.ProfilePicture.Edit" => "Garden.Profiles.Edit",
+    "Garden.Username.Edit" => "Garden.Users.Edit",
     "Garden.Curation.Manage" => "Garden.Moderation.Manage",
     "Garden.Moderation.Manage",
     "Garden.PersonalInfo.View" => "Garden.Moderation.Manage",
@@ -783,10 +762,16 @@ $Construct
     ->primaryKey("ActivityID")
     ->column("ActivityTypeID", "int")
     ->column("ActivityEventID", "varchar(32)", true, "index.UserGroupID")
-    ->column("NotifyUserID", "int", 0, ["index.Notify", "index.Recent", "index.Feed", "index.UserGroupID"]) // user being notified or -1: public, -2 mods, -3 admins
+    ->column("NotifyUserID", "int", 0, [
+        "index.Notify",
+        "index.Recent",
+        "index.Feed",
+        "index.UserGroupID",
+        "index.NotifyUserID_DateInserted",
+    ]) // user being notified or -1: public, -2 mods, -3 admins
     ->column("ActivityUserID", "int", true, "index.Feed")
     ->column("RegardingUserID", "int", true) // deprecated?
-    ->column("Photo", "varchar(255)", true)
+    ->column("Photo", "varchar(767)", true)
     ->column("HeadlineFormat", "varchar(255)", true)
     ->column("PluralHeadlineFormat", "varchar(255)", true)
     ->column("Story", "text", true)
@@ -798,7 +783,7 @@ $Construct
     ->column("BatchID", "varchar(20)", true)
     //   ->column('CountComments', 'int', '0')
     ->column("InsertUserID", "int", true, "key")
-    ->column("DateInserted", "datetime")
+    ->column("DateInserted", "datetime", false, "index.NotifyUserID_DateInserted")
     ->column("InsertIPAddress", "ipaddress", true)
     ->column("DateUpdated", "datetime", !$DateUpdatedExists, ["index", "index.Recent", "index.Feed"])
     ->column("Notified", "tinyint(1)", 0, "index.Notify")
@@ -1175,27 +1160,13 @@ if ($Construct->columnExists("Plugins.Tagging.Add")) {
 
 // Job status table.
 JobStatusModel::structure($Construct);
+QueuedJobModel::structure();
 
 $Construct
     ->table("Log")
     ->primaryKey("LogID")
-    ->column("Operation", ["Delete", "Edit", "Spam", "Moderate", "Pending", "Ban", "Error"], false, "index")
-    ->column(
-        "RecordType",
-        [
-            "Discussion",
-            "Comment",
-            "User",
-            "Registration",
-            "Activity",
-            "ActivityComment",
-            "Configuration",
-            "Group",
-            "Event",
-        ],
-        false,
-        "index"
-    )
+    ->column("Operation", "varchar(55)", false, "index")
+    ->column("RecordType", "varchar(55)", false, "index")
     ->column("TransactionLogID", "int", null)
     ->column("RecordID", "int", null, "index")
     ->column("RecordUserID", "int", null, "index") // user responsible for the record; indexed for user deletion
@@ -1210,6 +1181,8 @@ $Construct
     ->column("CategoryID", "int", null, "key")
     ->column("Data", "mediumtext", null) // the data from the record.
     ->column("CountGroup", "int", null)
+    ->column("SpoofUserID", "int", true)
+    ->column("SpoofUserName", "varchar(" . UserModel::USERNAME_LENGTH . ")", true)
     ->engine("InnoDB")
     ->set($Explicit, $Drop);
 
@@ -1267,7 +1240,7 @@ if ($transientKeyExists) {
 $Construct
     ->primaryKey("MediaID")
     ->column("Name", "varchar(255)")
-    ->column("Path", "varchar(255)")
+    ->column("Path", "varchar(767)")
     ->column("Type", "varchar(128)")
     ->column("Size", "int(11)")
     ->column("Active", "tinyint", 1)
@@ -1279,7 +1252,7 @@ $Construct
     ->column("ImageHeight", "usmallint", null)
     ->column("ThumbWidth", "usmallint", null)
     ->column("ThumbHeight", "usmallint", null)
-    ->column("ThumbPath", "varchar(255)", null)
+    ->column("ThumbPath", "varchar(767)", null)
 
     // Lowercase to match new schemas.
     ->column("foreignUrl", "varchar(255)", true, "unique")
@@ -1343,7 +1316,7 @@ $Construct
     ->table("reaction")
     ->primaryKey("reactionID")
     ->column("reactionOwnerID", "int", false, ["index", "index.record"])
-    ->column("recordID", "int", false, "index.record")
+    ->column("recordID", "int", false, ["index.record"])
     ->column("reactionValue", "int", false)
     ->column("insertUserID", "int", false, ["index"])
     ->column("dateInserted", "datetime")
@@ -1375,72 +1348,6 @@ RecordStatusLogModel::structure($Database, $Explicit, $Drop);
 LayoutModel::structure($Database, $Explicit, $Drop);
 LayoutViewModel::structure($Database, $Explicit, $Drop);
 LayoutModel::migrateLegacyConfigs_2022_011(\Gdn::config());
-
-// If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
-if (!$captureOnly && $AllIPAddressesExists) {
-    $limit = 10000;
-    $resetBatch = 100;
-
-    // Grab initial count.
-    $legacyIPAddressesCount = $Database->createSql()->getCount("User", "AllIPAddresses is not null");
-
-    while ($legacyIPAddressesCount > 0) {
-        $legacyIPAddresses = $SQL
-            ->select(["UserID", "AllIPAddresses", "InsertIPAddress", "LastIPAddress", "DateLastActive"])
-            ->from("User")
-            ->where("AllIPAddresses is not null")
-            ->limit($limit)
-            ->get()
-            ->resultArray();
-        $processedUsers = [];
-
-        // Iterate through the records of users with data needing to be migrated.
-        foreach ($legacyIPAddresses as $currentLegacy) {
-            // Pull out and format the relevant bits, where necessary.
-            $allIPAddresses = explode(",", $currentLegacy["AllIPAddresses"]);
-            $dateLastActive = val("DateLastActive", $currentLegacy);
-            $insertIPAddress = val("InsertIPAddress", $currentLegacy);
-            $lastIPAddress = val("LastIPAddress", $currentLegacy);
-            $userID = val("UserID", $currentLegacy);
-
-            // If we have a LastIPAddress record, use it.  Give it a DateUpdated of the user's DateLastActive.
-            if (!empty($lastIPAddress)) {
-                Gdn::userModel()->saveIP($userID, $lastIPAddress, $dateLastActive);
-            }
-
-            // Only save InsertIPAddress if it differs from LastIPAddress and is in AllIPAddresses (to avoid admin IPs).
-            if ($insertIPAddress !== $lastIPAddress && in_array($insertIPAddress, $allIPAddresses)) {
-                Gdn::userModel()->saveIP($userID, $insertIPAddress);
-            }
-
-            // Record the processed user's ID.
-            $processedUsers[] = $userID;
-
-            // Every X records (determined by $resetBatch), clear out the AllIPAddresses field for processed users.
-            if (count($processedUsers) > 0 && count($processedUsers) % $resetBatch === 0) {
-                $SQL->update("User")
-                    ->set("AllIPAddresses", null)
-                    ->whereIn("UserID", $processedUsers)
-                    ->limit(count($processedUsers))
-                    ->put();
-            }
-        }
-
-        // Any stragglers that need to be wiped out?
-        if (count($processedUsers) > 0) {
-            $SQL->update("User")
-                ->set("AllIPAddresses", null)
-                ->where("UserID", $processedUsers)
-                ->limit(count($processedUsers))
-                ->put();
-        }
-
-        // Look how many legacyIPs are left.
-        $legacyIPAddressesCount = $Database->createSql()->getCount("User", "AllIPAddresses is not null");
-    }
-
-    unset($allIPAddresses, $dateLastActive, $insertIPAddress, $lastIPAddress, $userID, $processedUsers);
-}
 
 // Save the current input formatter to the user's config.
 // This will allow us to change the default later and grandfather existing forums in.

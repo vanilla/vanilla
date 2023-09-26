@@ -29,12 +29,20 @@
             {%- else -%}
                 <header id="titleBar"></header>
                 <div id="app" class="page-minHeight">
+                    {% if breadcrumbs|default(false) %}
+                        <noscript>
+                            <div class="breadcrumbs">
+                            {% for breadcrumb in breadcrumbs %}
+                                <span class="crumb">
+                                    <a href="{{ breadcrumb.getUrl() }}">{{ breadcrumb.getName() }}</a>
+                                </span>
+                            {% endfor %}
+                            </div>
+                        </noscript>
+                    {% endif %}
                     {%- if seoContent|default(false) -%}
                         <noscript id="fallbackPageContent">
-                            <h1 class="heading heading-1 pageTitle">
-                                {{- title -}}
-                            </h1>
-                            {{- seoContent -}}
+                            {{- seoContent|raw -}}
                         </noscript>
                     {%- endif -%}
                     <div class="fullPageLoader"></div>

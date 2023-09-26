@@ -136,47 +136,59 @@ export function RadioGroups() {
             <form>
                 <DashboardFormList>
                     <DashboardFormSubheading>Radio Groups</DashboardFormSubheading>
-                    <DashboardFormGroup label="Radio Group Vertical (default)">
+                    <DashboardFormGroup fieldset label="Radio Group Vertical (default)">
                         <DashboardRadioGroup onChange={setGroup1} value={group1}>
-                            <DashboardRadioButton value={"option1"} label="Option 1" />
-                            <DashboardRadioButton value={"option2"} label="Option 2" />
-                            <DashboardRadioButton value={"option3"} label="Option 3" />
+                            <DashboardRadioButton name={"radiogroup1_option1"} value={"option1"} label="Option 1" />
+                            <DashboardRadioButton name={"radiogroup1_option2"} value={"option2"} label="Option 2" />
+                            <DashboardRadioButton name={"radiogroup1_option3"} value={"option3"} label="Option 3" />
                         </DashboardRadioGroup>
                     </DashboardFormGroup>
-                    <DashboardFormGroup label="Radio Group Inline">
+                    <DashboardFormGroup fieldset label="Radio Group Inline">
                         <DashboardRadioGroup onChange={setGroup2} value={group2} isInline>
-                            <DashboardRadioButton value={"option1"} label="Option 1" />
-                            <DashboardRadioButton value={"option2"} label="Option 2" />
-                            <DashboardRadioButton value={"option3"} label="Option 3" disabled />
+                            <DashboardRadioButton name={"radiogroup2_option1"} value={"option1"} label="Option 1" />
+                            <DashboardRadioButton name={"radiogroup2_option2"} value={"option2"} label="Option 2" />
+                            <DashboardRadioButton
+                                name={"radiogroup2_option3"}
+                                value={"option3"}
+                                label="Option 3"
+                                disabled
+                            />
                         </DashboardRadioGroup>
                     </DashboardFormGroup>
-                    <DashboardFormGroup label="Radio Group Grid">
+                    <DashboardFormGroup fieldset label="Radio Group Grid">
                         <DashboardRadioGroup onChange={setGroup3} value={group3} isGrid>
-                            <DashboardRadioButton value={"option1"} label="Option 1" />
+                            <DashboardRadioButton name={"radiogroup3_option1"} value={"option1"} label="Option 1" />
                             <DashboardRadioButton
+                                name={"radiogroup3_option2"}
                                 value={"option2"}
                                 label="Option 2 with a little bit more text to test layout responsiveness"
                             />
-                            <DashboardRadioButton value={"option3"} label="Option 3" />
-                            <DashboardRadioButton value={"option4"} label="Option 4" disabled />
+                            <DashboardRadioButton name={"radiogroup3_option3"} value={"option3"} label="Option 3" />
+                            <DashboardRadioButton
+                                name={"radiogroup3_option4"}
+                                value={"option4"}
+                                label="Option 4"
+                                disabled
+                            />
                         </DashboardRadioGroup>
                     </DashboardFormGroup>
                     <DashboardFormGroup
+                        fieldset
                         label="Checkbox Group Vertical (default)"
                         description={longDescription}
                         labelType={DashboardLabelType.WIDE}
                     >
                         <DashboardCheckGroup>
-                            <DashboardCheckBox label="Check 1" />
-                            <DashboardCheckBox label="Option 2" />
-                            <DashboardCheckBox label="Option 3" disabled />
+                            <DashboardCheckBox name={"checkboxgroup1_option1"} label="Check 1" />
+                            <DashboardCheckBox name={"checkboxgroup1_option2"} label="Option 2" />
+                            <DashboardCheckBox name={"checkboxgroup1_option3"} label="Option 3" disabled />
                         </DashboardCheckGroup>
                     </DashboardFormGroup>
-                    <DashboardFormGroup label="Checkbox Group Inline" description="Check out this description">
+                    <DashboardFormGroup fieldset label="Checkbox Group Inline" description="Check out this description">
                         <DashboardCheckGroup isInline>
-                            <DashboardCheckBox label="Option 1" />
-                            <DashboardCheckBox label="Option 2" />
-                            <DashboardCheckBox label="Option 3" disabled />
+                            <DashboardCheckBox name={"checkboxgroup2_option1"} label="Option 1" />
+                            <DashboardCheckBox name={"checkboxgroup2_option1"} label="Option 2" />
+                            <DashboardCheckBox name={"checkboxgroup2_option1"} label="Option 3" disabled />
                         </DashboardCheckGroup>
                     </DashboardFormGroup>
                 </DashboardFormList>

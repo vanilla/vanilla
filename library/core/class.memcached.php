@@ -433,7 +433,7 @@ class Gdn_Memcached extends Gdn_Cache
 
             $stored = $this->memcache->add($realKey, $value, $expiry);
         } finally {
-            $this->timers->stop(["cache", "cacheWrite"]);
+            $this->timers->stop(["cache", "cacheWrite"], ["cacheKey" => $realKey]);
         }
 
         // Check if things went ok
@@ -513,7 +513,7 @@ class Gdn_Memcached extends Gdn_Cache
             // Unsharded, write key
             $stored = $this->memcache->set($realKey, $value, $expiry);
         } finally {
-            $this->timers->stop(["cache", "cacheWrite"]);
+            $this->timers->stop(["cache", "cacheWrite"], ["cacheKey" => $realKey]);
         }
 
         if ($stored === false) {
@@ -609,13 +609,13 @@ class Gdn_Memcached extends Gdn_Cache
             if ($numKeys > 1) {
                 $this->timers->start(self::TIMER_READ);
                 $data = $this->memcache->getMulti($realKeys);
-                $this->timers->stop(self::TIMER_READ);
+                $this->timers->stop(self::TIMER_READ, ["cacheKeys" => $realKeys]);
 
                 $ok = $this->lastAction();
             } else {
                 $this->timers->start(self::TIMER_READ);
                 $data = $this->memcache->get($realKey);
-                $this->timers->stop(self::TIMER_READ);
+                $this->timers->stop(self::TIMER_READ, ["cacheKey" => $realKey]);
 
                 if ($data === false && $this->memcache->getResultCode() === \Memcached::RES_NOTFOUND) {
                     $data = $default;
@@ -732,7 +732,7 @@ class Gdn_Memcached extends Gdn_Cache
         $this->timers->start(self::TIMER_READ);
         $value = $this->memcache->get($realKey);
         $exists = $value !== false || $this->memcache->getResultCode() !== \Memcached::RES_NOTFOUND;
-        $this->timers->stop(self::TIMER_READ);
+        $this->timers->stop(self::TIMER_READ, ["cacheKeys" => $realKey]);
 
         return $exists;
     }
@@ -752,7 +752,7 @@ class Gdn_Memcached extends Gdn_Cache
 
         $this->timers->start(["cache", "cacheWrite"]);
         $deleted = $this->memcache->delete($realKey);
-        $this->timers->stop(["cache", "cacheWrite"]);
+        $this->timers->stop(["cache", "cacheWrite"], ["cacheKey" => $realKey]);
 
         // Check if things went ok
         $ok = $this->lastAction($realKey);
@@ -810,7 +810,7 @@ class Gdn_Memcached extends Gdn_Cache
                 $incremented = $this->memcache->increment($realKey, $amount, $initial, $expiry);
                 break;
         }
-        $this->timers->stop(["cache", "cacheWrite"]);
+        $this->timers->stop(["cache", "cacheWrite"], ["cacheKey" => $realKey]);
 
         // Check if things went ok
         $ok = $this->lastAction($realKey);
@@ -859,7 +859,7 @@ class Gdn_Memcached extends Gdn_Cache
                 $decremented = $this->memcache->decrement($realKey, $amount, $initial, $expiry);
                 break;
         }
-        $this->timers->stop(["cache", "cacheWrite"]);
+        $this->timers->stop(["cache", "cacheWrite"], ["cacheKey" => $realKey]);
 
         // Check if things went ok
         $ok = $this->lastAction($realKey);
@@ -963,7 +963,7 @@ class Gdn_Memcached extends Gdn_Cache
         foreach ($manifest->keys as $serverKey => $keys) {
             $this->timers->start(self::TIMER_READ);
             $serverKeys = $this->memcache->getMultiByKey($serverKey, $keys);
-            $this->timers->stop(self::TIMER_READ);
+            $this->timers->stop(self::TIMER_READ, ["cacheKeys" => $serverKeys]);
             $shardKeys = array_merge($shardKeys, $serverKeys);
         }
         ksort($shardKeys, SORT_NATURAL);

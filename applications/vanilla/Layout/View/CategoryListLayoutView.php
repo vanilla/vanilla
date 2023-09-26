@@ -1,0 +1,81 @@
+<?php
+/**
+ * @copyright 2009-2023 Vanilla Forums Inc.
+ * @license GPL-2.0-only
+ */
+
+namespace Vanilla\Forum\Layout\View;
+
+use Garden\Schema\Schema;
+use Vanilla\Forum\Widgets\CategoryFollowAsset;
+use Vanilla\Forum\Widgets\CategoryListAsset;
+use Vanilla\Forum\Widgets\DiscussionListAsset;
+use Vanilla\Layout\HydrateAwareTrait;
+use Vanilla\Layout\View\AbstractCustomLayoutView;
+use Vanilla\Web\PageHeadInterface;
+
+/**
+ * View type for categories
+ */
+class CategoryListLayoutView extends AbstractCustomLayoutView
+{
+    use HydrateAwareTrait;
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->registerAssetClass(CategoryListAsset::class);
+        $this->registerAssetClass(DiscussionListAsset::class);
+        $this->registerAssetClass(CategoryFollowAsset::class);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getName(): string
+    {
+        return "Categories Page";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getType(): string
+    {
+        return "categoryList";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLayoutID(): string
+    {
+        return "categoryList";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getParamInputSchema(): Schema
+    {
+        return DiscussionListAsset::getDiscussionListSchema();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getParamResolvedSchema(): Schema
+    {
+        return Schema::parse(["layoutViewType:s"]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
+    {
+        return $paramInput + ["layoutViewType" => $this->getType()];
+    }
+}

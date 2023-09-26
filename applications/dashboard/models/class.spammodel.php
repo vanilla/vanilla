@@ -153,7 +153,7 @@ class SpamModel extends Gdn_Pluggable
                  * just treat it with regular SPAM logging.
                  */
                 if (!empty($recordID) && $options["Operation"] === LogModel::TYPE_SPAM) {
-                    // Pass the source as a $data field, so we can propogate it to the LogPostEvent created in flagForReview()..
+                    // Pass the source as a $data field, so we can propagate it to the LogPostEvent created in flagForReview()..
                     $data["Source"] = $sp->EventArguments["Source"] ?? "unknown";
                     self::flagForReview($recordType, $recordID, $data);
                 } else {

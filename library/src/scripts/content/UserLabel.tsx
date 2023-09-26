@@ -1,14 +1,16 @@
-import React from "react";
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2023 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
 import { IUserFragment } from "@library/@types/api/users";
-import SmartLink from "@library/routing/links/SmartLink";
-import { makeProfileUrl } from "@library/utility/appUtils";
-import { userLabelClasses } from "@library/content/userLabelStyles";
-import { Roles } from "@library/content/Roles";
-import classNames from "classnames";
-import { metasClasses } from "@library/metas/Metas.styles";
-import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import DateTime from "@library/content/DateTime";
-import { MetaItem, MetaLink } from "@library/metas/Metas";
+import { userLabelClasses } from "@library/content/UserLabel.classes";
+import { UserTitle } from "@library/content/UserTitle";
+import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
+import { MetaItem, Metas } from "@library/metas/Metas";
+import ProfileLink from "@library/navigation/ProfileLink";
+import React from "react";
 
 /**
  * Contains, user avatar, name, and optionnal meta data
@@ -16,67 +18,30 @@ import { MetaItem, MetaLink } from "@library/metas/Metas";
 
 interface IUserLabel {
     user: IUserFragment;
-    date?: string;
-    dateLink?: string;
-    category?: ICategoryFragment;
-    displayOptions?: {
-        showRole?: boolean;
-        showCategory?: boolean;
-    };
-    compact?: boolean;
-    fixLineHeight?: boolean;
+    metas: React.ReactNode;
 }
 
 export function UserLabel(props: IUserLabel) {
-    const { user, date, dateLink, displayOptions = {}, category, compact = false, fixLineHeight = false } = props;
-    const { showRole = true, showCategory = false } = displayOptions;
+    const { user } = props;
 
-    const userUrl = makeProfileUrl(user.name);
     const classes = userLabelClasses();
-    const classesMeta = metasClasses();
 
-    const dateComponent = (
-        <MetaItem>
-            {dateLink && date ? (
-                <SmartLink to={dateLink}>
-                    <DateTime timestamp={date} />
-                </SmartLink>
-            ) : date ? (
-                <DateTime timestamp={date} />
-            ) : null}
-        </MetaItem>
-    );
-    const categoryComponent = showCategory && category ? <MetaLink to={category.url}>{category.name}</MetaLink> : null;
-
-    if (compact) {
-        return (
-            <div className={classNames(classes.compact, classesMeta.root, { [classes.fixLineHeight]: fixLineHeight })}>
-                <MetaLink to={userUrl} className={classNames(classes.userName, classes.isCompact)}>
-                    {user.name}
-                </MetaLink>
-                {dateComponent}
-                {categoryComponent}
+    return (
+        <div className={classes.root}>
+            <ProfileLink className={classes.userName} userFragment={user} isUserCard aria-hidden="true">
+                <UserPhoto size={UserPhotoSize.MEDIUM} userInfo={user} />
+            </ProfileLink>
+            <div className={classes.main}>
+                <Metas>
+                    <MetaItem>
+                        <ProfileLink className={classes.userName} userFragment={user} isUserCard />
+                    </MetaItem>
+                    <MetaItem>
+                        <UserTitle user={user} />
+                    </MetaItem>
+                </Metas>
+                {props.metas && <Metas>{props.metas}</Metas>}
             </div>
-        );
-    } else {
-        return (
-            <article className={classes.root}>
-                <SmartLink to={userUrl} className={classes.avatarLink}>
-                    <img src={user.photoUrl} alt={user.name} className={classes.avatar} loading="lazy" />
-                </SmartLink>
-                <div className={classes.main}>
-                    <div className={classNames(classesMeta.root, "isFlexed", classes.topRow)}>
-                        <MetaLink to={userUrl} className={classes.userName}>
-                            {user.name}
-                        </MetaLink>
-                        {showRole && user.label && <Roles roles={[{ roleID: 0, name: user.label }]} wrapper={false} />}
-                    </div>
-                    <div className={classNames(classesMeta.root, "isFlexed", classes.bottomRow)}>
-                        {dateComponent}
-                        {categoryComponent}
-                    </div>
-                </div>
-            </article>
-        );
-    }
+        </div>
+    );
 }

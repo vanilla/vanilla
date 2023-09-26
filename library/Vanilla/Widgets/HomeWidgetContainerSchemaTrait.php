@@ -12,6 +12,8 @@ use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
 use Vanilla\Forms\FieldMatchConditional;
+use Vanilla\Utility\ArrayUtils;
+use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Widgets\Schema\WidgetBackgroundSchema;
 
 /**
@@ -19,6 +21,8 @@ use Vanilla\Widgets\Schema\WidgetBackgroundSchema;
  */
 trait HomeWidgetContainerSchemaTrait
 {
+    use TwigRenderTrait;
+
     /**
      * Get the schema for the widget title.
      *
@@ -101,7 +105,7 @@ trait HomeWidgetContainerSchemaTrait
         string $placeholder = null
     ): Schema {
         return Schema::parse([
-            "${fieldName}:s?" => [
+            "{$fieldName}:s?" => [
                 "type" => "string",
                 "description" => "Subtitle of the widget.",
                 "x-control" => SchemaForm::textBox(
@@ -166,13 +170,30 @@ trait HomeWidgetContainerSchemaTrait
      * Get the schema for container options.
      *
      * @param string $fieldName
+     * @param array|null $allowedProperties
+     * @param bool $minimalProperties
+     * @param array $displayTypes
+     * @param bool $viewAll
      * @return Schema
      */
     public static function containerOptionsSchema(
         string $fieldName = "options",
         array $allowedProperties = null,
-        bool $minimalProperties = false
+        bool $minimalProperties = false,
+        array $displayTypes = [
+            "grid" => "Grid",
+            "list" => "List",
+            "carousel" => "Carousel",
+            "link" => "Link",
+        ],
+        bool $viewAll = true
     ): Schema {
+        $viewAllSchema = [];
+
+        if ($viewAll) {
+            $viewAllSchema = ["viewAll?" => self::viewAllSchema("Configure a view all link for the widget.")];
+        }
+
         $basicPropertiesSchema = [
             "outerBackground?" => new WidgetBackgroundSchema("Set a full width background for the container.", false),
             "innerBackground?" => new WidgetBackgroundSchema(
@@ -220,28 +241,29 @@ trait HomeWidgetContainerSchemaTrait
                 ),
             ],
             "displayType:s?" => [
-                "enum" => ["grid", "list", "carousel", "link"],
+                "enum" => array_keys($displayTypes),
                 "description" => "Describe the widget display format.",
                 "x-control" => SchemaForm::dropDown(
-                    new FormOptions("Display Type", "Choose the widget display type.", "Style Guide Default"),
-                    new StaticFormChoices([
-                        "grid" => "Grid",
-                        "list" => "List",
-                        "carousel" => "Carousel",
-                        "link" => "Link",
-                    ])
+                    new FormOptions(
+                        "Display Type",
+                        "Choose the widget display type.",
+                        "Style Guide Default",
+                        "Selection will affect the item options available."
+                    ),
+                    new StaticFormChoices($displayTypes)
                 ),
             ],
-            "viewAll?" => self::viewAllSchema("Configure a view all link for the widget."),
-            "isGrid:b?" => [
-                "deprecationMessage" => "This is deprecated. Use displayType instead.",
-                "description" => "Configure if the widget should display as a grid. Defaults to false.",
-            ],
-            "isCarousel:b?" => [
-                "deprecationMessage" => "This is deprecated. Use displayType instead.",
-                "description" => "Configure if the widget should display in a carousel. Defaults to false.",
-            ],
-        ];
+        ] +
+            $viewAllSchema + [
+                "isGrid:b?" => [
+                    "deprecationMessage" => "This is deprecated. Use displayType instead.",
+                    "description" => "Configure if the widget should display as a grid. Defaults to false.",
+                ],
+                "isCarousel:b?" => [
+                    "deprecationMessage" => "This is deprecated. Use displayType instead.",
+                    "description" => "Configure if the widget should display in a carousel. Defaults to false.",
+                ],
+            ];
 
         if ($minimalProperties) {
             $propertiesSchema = Schema::parse($basicPropertiesSchema);
@@ -344,5 +366,33 @@ trait HomeWidgetContainerSchemaTrait
     public static function displayTypeOptions(): array
     {
         return ["grid", "list", "carousel", "link"];
+    }
+
+    /**
+     * Render seo content for the home widget container.
+     *
+     * @param array $props Array with home widget container props.
+     * @param string $childHtml Child HTML content to put after the headings.
+     */
+    protected function renderWidgetContainerSeoContent(array $props, string $childHtml): string
+    {
+        $tpl = <<<TWIG
+<div class="pageBox">
+    {% if title|default(false) or subtitle|default(false) or description|default(false) %}
+    <div class="pageHeadingBox">
+        {% if title|default(false) %}<h2>{{ t(title) }}</h2>{% endif %}
+        {% if subtitle|default(false) %}<h3>{{ t(subtitle) }}</h3>{% endif %}
+        {% if description|default(false) %}<p>{{ t(description) }}</p>{% endif %}
+    </div>
+    {% endif %}
+    {{ childHtml|raw }}
+    {% if containerOptions.viewAll.to|default(false) %}
+    <div><a href="{{ containerOptions.viewAll.to }}">{{ containerOptions.viewAll.name|default(t("View All")) }}</a></div>
+    {% endif %}
+</div>
+TWIG;
+
+        $result = $this->renderTwigFromString($tpl, $props + ["childHtml" => $childHtml]);
+        return $result;
     }
 }

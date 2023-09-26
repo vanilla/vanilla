@@ -23,8 +23,12 @@ class CategoriesWidgetTest extends SiteTestCase
     public function testHydrateCategoriesWidget()
     {
         $this->resetTable("Category");
-        $category1 = $this->createCategory(["name" => "My category 1"]);
-        $category2 = $this->createCategory(["name" => "My category 2", "parentCategoryID" => "-1"]);
+        $category1 = $this->createCategory(["name" => "My category 1", "urlCode" => "cat1"]);
+        $category2 = $this->createCategory([
+            "name" => "My category 2",
+            "parentCategoryID" => "-1",
+            "urlCode" => "cat2",
+        ]);
 
         //the case when we don't specify limit or categoryID/parentCategoryID in apiParams
         $defaultApiParams = [
@@ -54,6 +58,7 @@ class CategoriesWidgetTest extends SiteTestCase
             "itemOptions" => [
                 "contentType" => "title-description",
             ],
+            '$reactTestID' => "catwidget",
         ];
 
         $expected = [
@@ -121,6 +126,18 @@ class CategoriesWidgetTest extends SiteTestCase
                     ],
                 ],
             ],
+            '$reactTestID' => "catwidget",
+            '$seoContent' => <<<HTML
+<div class=pageBox>
+    <div class=pageHeadingBox>
+        <h2>My Categories</h2>
+    </div>
+    <ul class=linkList>
+        <li><a href=https://vanilla.test/categorieswidgettest/categories/cat1>My category 1</a></li>
+    </ul>
+</div>
+HTML
+        ,
         ];
         $this->assertHydratesTo($spec, [], $expected);
         $this->assertHydratesTo($spec2, [], $expected2);

@@ -156,7 +156,10 @@ final class ShellUtils
      */
     public static function promptYesNo(string $prompt, bool $exit = false): bool
     {
-        echo "$prompt (y/n)";
+        $logger = new SimpleScriptLogger();
+        $logger->info("$prompt (y/n)", [
+            SimpleScriptLogger::CONTEXT_LINE_COUNT => 0,
+        ]);
         $line = strtolower(trim(fgets(STDIN)));
         $isYes = in_array($line, self::YESSES);
         if (!$isYes && $exit) {

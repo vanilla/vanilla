@@ -114,6 +114,7 @@ class VanillaHooks extends Gdn_Plugin
                 "LastDateInserted",
             ],
             "Tag" => ["CountDiscussions"],
+            "User" => ["CountDiscussions", "CountComments"],
         ];
 
         foreach ($counts as $table => $columns) {
@@ -683,35 +684,6 @@ class VanillaHooks extends Gdn_Plugin
         $options = is_array($options) ? $options : [];
         $content = &$sender->EventArguments["Content"];
         $this->deleteUserData($userID, $options, $content);
-    }
-
-    /**
-     * Check whether a user has access to view discussions in a particular category.
-     *
-     * @since 2.0.18
-     * @example $UserModel->getCategoryViewPermission($userID, $categoryID).
-     *
-     * @param $sender UserModel.
-     * @return bool Whether user has permission.
-     */
-    public function userModel_getCategoryViewPermission_create($sender)
-    {
-        $userID = val(0, $sender->EventArguments, "");
-        $categoryID = val(1, $sender->EventArguments, "");
-        $permission = val(2, $sender->EventArguments, "Vanilla.Discussions.View");
-        if ($userID && $categoryID) {
-            $category = CategoryModel::categories($categoryID);
-            if ($category) {
-                $permissionCategoryID = $category["PermissionCategoryID"];
-            } else {
-                $permissionCategoryID = -1;
-            }
-
-            $options = ["ForeignID" => $permissionCategoryID];
-            $result = Gdn::userModel()->checkPermission($userID, $permission, $options);
-            return $result;
-        }
-        return false;
     }
 
     /**

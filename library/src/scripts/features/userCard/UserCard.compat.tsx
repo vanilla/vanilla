@@ -3,15 +3,14 @@
  * @license GPL-2.0-only
  */
 
-import { hasUserViewPermission } from "@library/features/users/modules/hasUserViewPermission";
 import { UserCardPopup, useUserCardTrigger } from "@library/features/userCard/UserCard";
 import { deconstructAttributesFromElement } from "@vanilla/react-utils";
 import { IMountable, mountReactMultiple, useDomNodeAttachment } from "@vanilla/react-utils";
 import { logError, notEmpty } from "@vanilla/utils";
-import React from "react";
+import React, { ElementType } from "react";
 
 interface IProps {
-    Tag: keyof JSX.IntrinsicElements;
+    Tag: ElementType;
     tagProps: any;
     domNodesToAttach: Node[];
 }
@@ -31,10 +30,7 @@ export function applyCompatibilityUserCards(scope: HTMLElement | Document | unde
     if (scope === undefined) {
         return;
     }
-    if (!hasUserViewPermission()) {
-        // No need to mount anything if the user doesn't have permission.
-        return;
-    }
+
     const userCards = scope.querySelectorAll(".js-userCard:not(.js-userCardInitialized)");
     const mountables: IMountable[] = Array.from(userCards)
         .map((userLink) => {
@@ -51,7 +47,7 @@ export function applyCompatibilityUserCards(scope: HTMLElement | Document | unde
             }
 
             const attrs = deconstructAttributesFromElement(userLink);
-            const Tag = userLink.tagName.toLowerCase() as keyof JSX.IntrinsicElements;
+            const Tag = userLink.tagName.toLowerCase() as ElementType;
             attrs.className = attrs.className ?? "";
             attrs.className += " js-userCardInitialized";
             return {

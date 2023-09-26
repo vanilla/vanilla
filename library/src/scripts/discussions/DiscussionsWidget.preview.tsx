@@ -16,24 +16,36 @@ interface IProps extends Omit<React.ComponentProps<typeof DiscussionsWidget>, "d
 }
 
 export function DiscussionsWidgetPreview(props: IProps) {
-    const { discussions: discussionsFromProps, apiParams, containerOptions, discussionOptions } = props;
-
-    const { limit } = apiParams;
+    const { discussions: discussionsFromProps, containerOptions, discussionOptions, isAsset } = props;
 
     const includeUnread =
         (!containerOptions?.displayType || containerOptions.displayType === WidgetContainerDisplayType.LIST) &&
         discussionOptions?.metas?.display?.unreadCount;
 
     const discussions = useMemo(() => {
-        return discussionsFromProps ?? LayoutEditorPreviewData.discussions(parseInt(`${limit ?? 10}`), includeUnread);
-    }, [includeUnread, limit, discussionsFromProps]);
+        return discussionsFromProps ?? LayoutEditorPreviewData.discussions(10, includeUnread);
+    }, [includeUnread, discussionsFromProps]);
+
+    const apiParams = useMemo(() => {
+        const tmpParams = { ...props.apiParams };
+
+        if (isAsset) {
+            tmpParams.page = 1;
+        } else {
+            tmpParams.discussionID = discussions[0].discussionID;
+        }
+
+        return tmpParams;
+    }, [isAsset, props.apiParams, discussions]);
 
     return (
         <Widget>
             <DiscussionsWidget
                 {...props}
+                noCheckboxes={true}
+                isPreview={isAsset}
                 discussions={discussions}
-                apiParams={{ ...apiParams, discussionID: discussions[0].discussionID }}
+                apiParams={apiParams}
                 containerOptions={{
                     ...containerOptions,
                     maxColumnCount:
@@ -41,7 +53,6 @@ export function DiscussionsWidgetPreview(props: IProps) {
                             ? 2
                             : containerOptions?.maxColumnCount,
                 }}
-                noCheckboxes
                 disableButtonsInItems
             />
         </Widget>

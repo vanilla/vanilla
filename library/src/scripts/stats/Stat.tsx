@@ -10,6 +10,7 @@ import { cx } from "@emotion/css";
 import SmartLink from "@library/routing/links/SmartLink";
 import NumberFormatted from "@library/content/NumberFormatted";
 import { RecordID, labelize } from "@vanilla/utils";
+import { t } from "@vanilla/i18n";
 
 export function Stat(props: {
     to?: ComponentProps<typeof SmartLink>["to"];
@@ -29,7 +30,7 @@ export function Stat(props: {
                     value
                 )}
             </div>
-            <label className={classes.statLabel}>{labelize(label)}</label>
+            <label className={classes.statLabel}>{t(labelize(label))}</label>
         </>
     );
 

@@ -136,9 +136,12 @@ if (!$hasUserID) {
                     // No Name was passed over SSO and...
                     // No Users were found in GDN_User
                     if (count($ExistingUsers) === 0 && !$NoConnectName) {
-                        echo $this->Form->label('Username', 'ConnectName');
-                        echo wrap(\Gdn::translate('ConnectChooseName', 'Choose a name to identify yourself on the site.'), 'div', ['class' => 'FinePrint']);
-                        echo $this->Form->textbox('ConnectName', ["aria-label" => t("Username")]);
+                        //if we have custom profile fields and name was passed here from sso, we'll just take the same name and won't render username fields (!$NoConnectName seems weird with above comments, so checking Name instead)
+                        if (!$this->hasRegistrationCustomFields() || !$this->Form->getFormValue('Name') || $usernameNotValid) {
+                            echo $this->Form->label('Username', 'ConnectName');
+                            echo wrap(\Gdn::translate('ConnectChooseName', 'Choose a name to identify yourself on the site.'), 'div', ['class' => 'FinePrint']);
+                            echo $this->Form->textbox('ConnectName', ["aria-label" => t("Username")]);
+                        }
                     }
                     ?>
                 </li>
@@ -148,12 +151,12 @@ if (!$hasUserID) {
                 $this->fireEvent('RegisterBeforePassword');
 
                 //if we have custom profile fields for the user, we need to render them
-                if ($this->hasCustomProfileFields() && (count($ExistingUsers) === 0 || (count($ExistingUsers) >= 1 && !$NoConnectName))) {
+                if ($this->hasRegistrationCustomFields() && (count($ExistingUsers) === 0 || (count($ExistingUsers) >= 1 && !$NoConnectName))) {
                     //this one is the case when we found a user with same name in db, so we suggest to sign in with existing user or create an account,
                     //profile fields are hidden until user chooses the option to create new account
                     $wrapper = count($ExistingUsers) >= 1 ? ["tag" => "div", "attributes" => ["id" => "connect-custom-profile-fields", "style"=> "display: none"]] : null;
 
-                    $this->generateFormCustomProfileFields($wrapper);
+                    $this->generateFormCustomProfileFields($wrapper, true);
                 }
                 ?>
 

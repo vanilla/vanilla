@@ -113,7 +113,7 @@ class LogDecoratorTest extends SiteTestCase
         $this->assertLog([
             "message" => "foo",
             "request.method" => "POST",
-            "request.protocol" => "http",
+            "request.protocol" => "https",
             "request.hostname" => "vanilla.test",
             "request.path" => "/my-path/nested",
             "request.clientIP" => "0.0.0.5",

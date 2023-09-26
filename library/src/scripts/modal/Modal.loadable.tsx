@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -133,6 +133,10 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
      */
     public componentWillUnmount() {
         document.removeEventListener("keydown", this.handleDocumentEscapePress);
+        if (!this.props.noFocusOnExit) {
+            // We were destroyed so we should focus back to the last element.
+            this.closeFocusElement?.focus();
+        }
     }
 
     public onMountIn = () => {
@@ -159,11 +163,6 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
         } else {
             pageContainer && pageContainer.setAttribute("aria-hidden", true);
         }
-
-        // We were destroyed so we should focus back to the last element.
-        if (!this.props.noFocusOnExit) {
-            this.closeFocusElement?.focus();
-        }
     };
 
     public componentDidUpdate(prevProps: IProps, prevState: IState) {
@@ -177,6 +176,12 @@ Please wrap your primary content area with the ID "${PAGE_CONTAINER_ID}" so it c
 
         if (!prevProps.isVisible && this.props.isVisible) {
             this.setState({ wasDestroyed: false });
+            this.setCloseFocusElement();
+        }
+
+        if (prevProps.isVisible && !this.props.isVisible && !this.props.noFocusOnExit) {
+            // We were destroyed so we should focus back to the last element.
+            this.closeFocusElement?.focus();
         }
     }
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author David Barbier <dbarbier@higherlogic.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -19,6 +19,8 @@ class CategoryRecordProvider implements LayoutViewRecordProviderInterface
     private static $recordType = "category";
 
     private static $parentRecordType = "siteSection";
+
+    private static $fallbackRecordType = "file";
 
     /* CategoryModel $categoryModel */
     private $categoryModel;
@@ -85,6 +87,10 @@ class CategoryRecordProvider implements LayoutViewRecordProviderInterface
     public function getParentRecordTypeAndID(string $recordType, string $recordID): array
     {
         $siteSection = $this->siteSectionModel->getSiteSectionForAttribute("categoryID", (int) $recordID);
+        if ($siteSection->getCategoryID() == -1) {
+            return [self::$fallbackRecordType, "categoryList"];
+        }
+
         return [self::$parentRecordType, $siteSection->getSectionID()];
     }
 }

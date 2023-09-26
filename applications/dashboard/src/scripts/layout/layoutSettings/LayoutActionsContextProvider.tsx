@@ -17,6 +17,7 @@ import layoutOverviewPageClasses from "@dashboard/appearance/pages/LayoutOvervie
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { iconClasses } from "@library/icons/iconStyles";
 import { Icon } from "@vanilla/icons";
+import ApplyLayoutOnCategory from "@dashboard/appearance/components/ApplyLayoutOnCategory";
 
 interface ILayoutActionsContext {
     ApplyLayout: React.ComponentType<{ layout: ILayoutDetails }>;
@@ -49,6 +50,10 @@ function ApplyLayoutImpl(props: { layout: ILayoutDetails }) {
     const toast = useToast();
 
     const viewIsAlreadyApplied = (layout?.layoutViews || []).length > 0;
+
+    if (layout.layoutViewType === "categoryList") {
+        return <ApplyLayoutOnCategory layout={layout} />;
+    }
 
     return (
         <DropDownItemButton

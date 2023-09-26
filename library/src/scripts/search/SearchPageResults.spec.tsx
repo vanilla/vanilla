@@ -4,15 +4,14 @@
  * @license Proprietary
  */
 
-import React from "react";
-import { fireEvent, render, waitFor } from "@testing-library/react";
-import { SearchFixture } from "@library/search/__fixtures__/Search.fixture";
-import { mapResult } from "@library/search/SearchPageResults";
+import { MOCK_SEARCH_DOMAIN, SearchFixture } from "@library/search/__fixtures__/Search.fixture";
 
 describe("SearchPageResults", () => {
     it("mapResults: without image is undefined", () => {
         const resultWithoutImage = SearchFixture.createMockSearchResults(3);
-        expect(resultWithoutImage.results.map(mapResult)[0]?.["image"]).toBeFalsy();
+        expect(
+            resultWithoutImage.results.map((result) => MOCK_SEARCH_DOMAIN.mapResultToProps(result))[0]?.["image"],
+        ).toBeFalsy();
     });
     it("mapResults: with image has URL value", () => {
         const resultWithImage = SearchFixture.createMockSearchResults(3, {
@@ -23,8 +22,12 @@ describe("SearchPageResults", () => {
                 },
             },
         });
-        expect(resultWithImage.results.map(mapResult)[0]).toHaveProperty("image");
-        expect(resultWithImage.results.map(mapResult)[0]?.["image"]).toBe("test-image-url");
+        expect(resultWithImage.results.map((result) => MOCK_SEARCH_DOMAIN.mapResultToProps(result))[0]).toHaveProperty(
+            "image",
+        );
+        expect(resultWithImage.results.map((result) => MOCK_SEARCH_DOMAIN.mapResultToProps(result))[0]?.["image"]).toBe(
+            "test-image-url",
+        );
     });
     it("mapResults: with source set has image URL string fallback", () => {
         const resultWithImageAndSourceSet = SearchFixture.createMockSearchResults(3, {
@@ -40,8 +43,14 @@ describe("SearchPageResults", () => {
                 },
             },
         });
-        expect(resultWithImageAndSourceSet.results.map(mapResult)[0]).toHaveProperty("image");
-        expect(resultWithImageAndSourceSet.results.map(mapResult)[0]?.["image"]).toBe("test-image-url");
+        expect(
+            resultWithImageAndSourceSet.results.map((result) => MOCK_SEARCH_DOMAIN.mapResultToProps(result))[0],
+        ).toHaveProperty("image");
+        expect(
+            resultWithImageAndSourceSet.results.map((result) => MOCK_SEARCH_DOMAIN.mapResultToProps(result))[0]?.[
+                "image"
+            ],
+        ).toBe("test-image-url");
     });
     it("mapResults: with source set has valid source set string", () => {
         const resultWithImageAndSourceSet = SearchFixture.createMockSearchResults(3, {
@@ -57,7 +66,9 @@ describe("SearchPageResults", () => {
                 },
             },
         });
-        const imageSet = resultWithImageAndSourceSet.results.map(mapResult)[0]?.["imageSet"];
+        const imageSet = resultWithImageAndSourceSet.results.map((result) =>
+            MOCK_SEARCH_DOMAIN.mapResultToProps(result),
+        )[0]?.["imageSet"];
         expect(imageSet).toBeTruthy();
         expect(imageSet?.split(",").length).toBe(3);
         expect(imageSet?.split(",")[0]).toBe("test-image-10 10w");

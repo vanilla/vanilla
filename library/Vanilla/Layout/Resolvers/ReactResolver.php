@@ -72,6 +72,10 @@ class ReactResolver extends AbstractDataResolver implements
      */
     protected function resolveInternal(array $data, array $params)
     {
+        $testID = $data['$reactTestID'] ?? null;
+        if (isset($data['$reactTestID'])) {
+            unset($data['$reactTestID']);
+        }
         /** @var ReactWidgetInterface $module */
         $module = $this->container->get($this->reactWidgetClass);
 
@@ -107,10 +111,16 @@ class ReactResolver extends AbstractDataResolver implements
         }
 
         // Returns something matching ReactChildrenSchema.
-        return [
+        $result = [
+            '$seoContent' => $module->renderSeoHtml($props),
             '$reactComponent' => $module->getComponentName(),
             '$reactProps' => $props,
         ];
+
+        if ($testID !== null) {
+            $result['$reactTestID'] = $testID;
+        }
+        return $result;
     }
 
     /**
@@ -132,6 +142,7 @@ class ReactResolver extends AbstractDataResolver implements
      */
     public function getAllowedSectionIDs(): array
     {
+        /** @var class-string<ReactWidgetInterface> $widgetClass */
         $widgetClass = $this->getReactWidgetClass();
         return $widgetClass::getAllowedSectionIDs();
     }
@@ -147,6 +158,10 @@ class ReactResolver extends AbstractDataResolver implements
         if ($schema->getField("description", null) === null) {
             $schema->setField("description", $class::getWidgetName());
         }
+
+        $schema->setField("properties.\$reactTestID", [
+            "type" => "string",
+        ]);
         return $schema;
     }
 

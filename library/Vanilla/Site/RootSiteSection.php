@@ -198,4 +198,19 @@ class RootSiteSection implements SiteSectionInterface
             "recordID" => self::DEFAULT_CATEGORY_ID,
         ];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTrackablePayload(): array
+    {
+        return [
+            "Subcommunity" => [
+                "SubcommunityID" => $this->getSectionID(),
+                "Locale" => $this->getContentLocale(),
+                "Folder" => $this->getBasePath(),
+                "Name" => $this->getSectionName(),
+            ],
+        ];
+    }
 }

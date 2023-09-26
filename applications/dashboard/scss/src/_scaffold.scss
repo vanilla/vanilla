@@ -49,7 +49,6 @@
 }
 
 .dashboard-main {
-    position: relative;
     flex-grow: 1;
     // The panels are fixed width and the main content fills the rest of the screen.
     // We want the content to load after the other assets to prevent janky loading, so we
@@ -64,7 +63,8 @@
     padding-left: $padding-row;
     padding-right: $padding-row;
     max-width: 1024px;
-    overflow-y: hidden; // Setting overflow property stops content from widening into the panels.
+    min-width: 0;
+    overflow-y: visible;
 
     .content {
         flex-grow: 1;
@@ -180,6 +180,11 @@ $panelMaxHeight: calc(100vh - #{$navbar-height * 2});
 
     .drawer-toggle {
         display: block;
+    }
+
+    .dashboard-main {
+        min-width: 100%;
+        width: 100%;
     }
 
     .drawer-show .panel-left {

@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
+import { SwaggerSelect } from "@library/features/swagger/SwaggerSelect";
 import { VanillaSwaggerDeepLink } from "@library/features/swagger/VanillaSwaggerDeepLink";
 import { VanillaSwaggerLayout } from "@library/features/swagger/VanillaSwaggerLayout";
 
@@ -12,6 +13,7 @@ export function VanillaSwaggerPlugin() {
         components: {
             VanillaSwaggerLayout: VanillaSwaggerLayout,
             DeepLink: VanillaSwaggerDeepLink,
+            Select: SwaggerSelect,
         },
     };
 }

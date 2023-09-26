@@ -59,4 +59,13 @@ class SectionOneColumn extends AbstractLayoutSection
     {
         return "/applications/dashboard/design/images/sectionIcons/1column.svg";
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $children = $this->renderSectionChildrenHtml($props["children"] ?? []);
+        return "<section>{$children}</section>";
+    }
 }

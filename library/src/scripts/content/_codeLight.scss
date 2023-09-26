@@ -3,4 +3,127 @@
  * @license GPL-2.0-only
  */
 
+/* Highlight JS for User Content Codeblocks */
 @import "~highlight.js/styles/github.css";
+
+/* Matching colour scheme for Prism syntax highlighting */
+.code.codeBlock {
+    code.language-php {
+        color: #998;
+    }
+
+    code.language-css {
+        color: #008080;
+    }
+
+    .token {
+        &.important,
+        &.bold {
+            font-weight: bold;
+        }
+
+        &.italic {
+            font-style: italic;
+        }
+
+        &.punctuation,
+        &.operator,
+        &.comment,
+        &.quote {
+            color: #998;
+            font-style: italic;
+        }
+
+        &.keyword,
+        &.selector-tag,
+        &.subst {
+            color: #333;
+            font-weight: bold;
+        }
+
+        &.url,
+        &.inserted,
+        &.boolean,
+        &.symbol,
+        &.number,
+        &.literal,
+        &.variable,
+        &.template-variable,
+        &.tag,
+        &.attr {
+            color: #008080;
+        }
+
+        &.string,
+        &.doctag {
+            color: #d14;
+        }
+
+        &.function,
+        &.function-definition,
+        &.title,
+        &.section,
+        &.selector-id {
+            color: #900;
+            font-weight: bold;
+        }
+
+        &.subst {
+            font-weight: normal;
+        }
+
+        &.type,
+        &.class,
+        &.class-name,
+        &.class-name-definition,
+        &.title {
+            color: #458;
+            font-weight: bold;
+        }
+
+        &.tag,
+        &.name,
+        &.attribute,
+        &.property {
+            color: #000080;
+            font-weight: normal;
+        }
+
+        &.regexp,
+        &.link {
+            color: #009926;
+        }
+
+        &.symbol,
+        &.bullet {
+            color: #990073;
+        }
+
+        &.built_in,
+        &.builtin-name {
+            color: #0086b3;
+        }
+
+        &.meta,
+        &.important {
+            color: #999;
+            font-weight: bold;
+        }
+
+        &.deletion {
+            background: #fdd;
+        }
+
+        &.addition {
+            background: #dfd;
+        }
+
+        &.emphasis {
+            font-style: italic;
+        }
+
+        &.strong {
+            font-weight: bold;
+        }
+    }
+}

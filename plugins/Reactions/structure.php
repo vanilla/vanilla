@@ -241,3 +241,8 @@ if ($mergeReactions) {
 }
 
 ReactionModel::resetStaticCache();
+
+if (Gdn::addonManager()->isEnabled("badges", Addon::TYPE_ADDON)) {
+    $reactionBadges = Gdn::getContainer()->get(\Vanilla\Reactions\Addon\ReactionBadges::class);
+    $reactionBadges->generateDefaultBadges();
+}

@@ -4,6 +4,7 @@
  */
 
 import { create } from "@storybook/theming/create";
+import vanillaWhite from "../../applications/dashboard/styleguide/public/resources/images/vanilla-white.svg";
 
 export default create({
     base: "dark",
@@ -13,5 +14,5 @@ export default create({
     inputBorderRadius: 6,
     brandTitle: "Vanilla Forums Storybook",
     brandUrl: "https://vanillaforums.com",
-    brandImage: "https://vanillaforums.com/svgs/logo.svg",
+    brandImage: vanillaWhite,
 });

@@ -48,17 +48,4 @@ trait TestPutFieldTrait
      * @return InternalClient Returns the API client.
      */
     abstract function api();
-
-    /**
-     * {@inheritDoc}
-     */
-    abstract public function assertEquals(
-        $expected,
-        $actual,
-        string $message = "",
-        float $delta = 0.0,
-        int $maxDepth = 10,
-        bool $canonicalize = false,
-        bool $ignoreCase = false
-    );
 }

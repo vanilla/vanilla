@@ -3,6 +3,7 @@
  * @license Proprietary
  */
 
+import React from "react";
 import * as layoutActions from "@dashboard/layout/layoutSettings/LayoutSettings.actions";
 import {
     getLayoutsByViewType,

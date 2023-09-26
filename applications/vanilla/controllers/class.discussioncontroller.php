@@ -10,6 +10,7 @@
 
 use Vanilla\Message;
 use Vanilla\Models\DiscussionJsonLD;
+use Vanilla\Formatting\FormatConfig;
 
 /**
  * Handles accessing & displaying a single discussion via /discussion endpoint.
@@ -298,8 +299,13 @@ class DiscussionController extends VanillaController
             $Draft = $DraftModel->getByUser($Session->UserID, 0, 1, $this->Discussion->DiscussionID)->firstRow();
             $this->Form->addHidden("DraftID", $Draft ? $Draft->DraftID : "");
             if ($Draft && !$this->Form->isPostBack()) {
-                $this->Form->setValue("Body", $Draft->Body);
-                $this->Form->setValue("Format", $Draft->Format);
+                // We don't want to apply draft format to the current editor, if current input format is changed after draft save
+                $formatConfig = Gdn::getContainer()->get(FormatConfig::class);
+                $defaultFormat = $formatConfig->getDefaultFormat();
+                if ($Draft->Format === $defaultFormat) {
+                    $this->Form->setValue("Body", $Draft->Body);
+                    $this->Form->setValue("Format", $Draft->Format);
+                }
             }
         }
 
@@ -598,12 +604,6 @@ class DiscussionController extends VanillaController
         $this->categoryPermission($discussion->CategoryID, "Vanilla.Discussions.Announce");
 
         if ($this->Form->authenticatedPostBack()) {
-            // Save the property.
-            $cacheKeys = [
-                $this->DiscussionModel->getAnnouncementCacheKey(),
-                $this->DiscussionModel->getAnnouncementCacheKey(val("CategoryID", $discussion)),
-            ];
-            $this->DiscussionModel->SQL->cache($cacheKeys);
             $this->DiscussionModel->setProperty(
                 $discussionID,
                 "Announce",

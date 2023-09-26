@@ -11,6 +11,7 @@ export const stackedListClasses = useThemeCache((vars: ReturnType<typeof stacked
         position: "relative",
         zIndex: 1,
         width: styleUnit(sizing.width - sizing.offset),
+        height: styleUnit(sizing.width),
 
         transitionDelay: "0.05s",
         ":hover, :focus, :focus-within, :active": {

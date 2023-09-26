@@ -25,6 +25,11 @@ paths:
                   required: false
                   schema:
                       type: boolean
+                - description: List the categories followed by the given UserID
+                  in: query
+                  name: followedUserID
+                  schema:
+                      type: integer
                 - description: >-
                       The maximum tree depth to return when getting a tree structure.
                       This parameter is incompatible with a flat structure.
@@ -64,6 +69,30 @@ paths:
                       type: integer
                       maximum: 100
                       minimum: 1
+                - name: sort
+                  description: Sort the results.
+                  in: query
+                  schema:
+                      type: string
+                      enum:
+                          - categoryID
+                          - -categoryID
+                          - name
+                          - -name
+                          - dateFollowed
+                          - -dateFollowed
+                - name: expand[]
+                  description: >
+                      Expand associated records using one or more valid field names. A value of "all" will expand all expandable fields.
+                  in: query
+                  schema:
+                      type: array
+                      items:
+                          type: string
+                          enum:
+                              - all
+                              - lastPost
+                              - preferences
                 - description: |-
                       Filter categories by site section ID (ex. subcommunity).
                       The subcommunity ID or folder can be used if you use [smart IDs](https://success.vanillaforums.com/kb/articles/46-smart-ids).
@@ -72,7 +101,7 @@ paths:
                       ```
                       siteSectionID=$subcommunityID:{id|folder}
                       ```
-                  example: "$subcommunityID:en"
+                      example: "$subcommunityID:en".
                   in: query
                   name: siteSectionID
                   schema:
@@ -123,6 +152,9 @@ paths:
                                                         type: integer
                                                     countDiscussions:
                                                         description: Total discussions in the category.
+                                                        type: integer
+                                                    countFollowers:
+                                                        description: Total followers in the category.
                                                         type: integer
                                                     customPermissions:
                                                         description: Are custom permissions set for this category?
@@ -186,6 +218,7 @@ paths:
                                                     - countCategories
                                                     - countDiscussions
                                                     - countComments
+                                                    - countFollowers
                                                     - countAllDiscussions
                                                     - countAllComments
                                                     - depth
@@ -206,6 +239,9 @@ paths:
                                             type: integer
                                         countDiscussions:
                                             description: Total discussions in the category.
+                                            type: integer
+                                        countFollowers:
+                                            description: Total followers in the category.
                                             type: integer
                                         customPermissions:
                                             description: Are custom permissions set for this category?
@@ -255,6 +291,10 @@ paths:
                                             description: The URL code of the category.
                                             minLength: 1
                                             type: string
+                                        lastPost:
+                                            $ref: "#/components/schemas/PostFragment"
+                                        preferences:
+                                            $ref: "#/components/schemas/CategoryPreferences"
                                     required:
                                         - categoryID
                                         - name
@@ -268,6 +308,7 @@ paths:
                                         - countCategories
                                         - countDiscussions
                                         - countComments
+                                        - countFollowers
                                         - countAllDiscussions
                                         - countAllComments
                                         - depth
@@ -301,6 +342,9 @@ paths:
                                         type: integer
                                     countDiscussions:
                                         description: Total discussions in the category.
+                                        type: integer
+                                    countFollowers:
+                                        description: Total followers in the category.
                                         type: integer
                                     customPermissions:
                                         description: Are custom permissions set for this category?
@@ -342,6 +386,13 @@ paths:
                                         description: The URL code of the category.
                                         minLength: 1
                                         type: string
+                                    ideationType:
+                                        description: Voting type used for ideation posts.
+                                        enum:
+                                            - up
+                                            - up-down
+                                            - false
+                                        x-addon: ideation
                                 required:
                                     - categoryID
                                     - name
@@ -355,6 +406,7 @@ paths:
                                     - countCategories
                                     - countDiscussions
                                     - countComments
+                                    - countFollowers
                                     - countAllDiscussions
                                     - countAllComments
                                 type: object
@@ -430,6 +482,9 @@ paths:
                                         countDiscussions:
                                             description: Total discussions in the category.
                                             type: integer
+                                        countFollowers:
+                                            description: Total followers in the category.
+                                            type: integer
                                         customPermissions:
                                             description: Are custom permissions set for this category?
                                             type: boolean
@@ -499,6 +554,7 @@ paths:
                                         - countCategories
                                         - countDiscussions
                                         - countComments
+                                        - countFollowers
                                         - countAllDiscussions
                                         - countAllComments
                                     type: object
@@ -574,6 +630,9 @@ paths:
                                     countDiscussions:
                                         description: Total discussions in the category.
                                         type: integer
+                                    countFollowers:
+                                        description: Total followers in the category.
+                                        type: integer
                                     customPermissions:
                                         description: Are custom permissions set for this category?
                                         type: boolean
@@ -627,6 +686,7 @@ paths:
                                     - countCategories
                                     - countDiscussions
                                     - countComments
+                                    - countFollowers
                                     - countAllDiscussions
                                     - countAllComments
                                 type: object
@@ -734,6 +794,7 @@ paths:
                             type: object
                 required: true
     /categories/preferences/{userID}:
+        x-hidden: true
         parameters:
             - in: "path"
               name: "userID"
@@ -765,6 +826,7 @@ paths:
               schema:
                   type: integer
         get:
+            x-hidden: true
             tags:
                 - Categories
             summary: "List a user's category preferences."
@@ -831,6 +893,19 @@ components:
                     description: Category is featured
                     type: boolean
                     default: false
+                ideationType:
+                    description: Voting type used for ideation posts.
+                    enum:
+                        - up
+                        - up-down
+                        - false
+                    x-addon: ideation
+                allowedDiscussionTypes:
+                    description: Allowed discussion types in this category.
+                    type: array
+                    items:
+                        type: string
+                        example: Discussion
             required:
                 - name
                 - urlcode
@@ -838,16 +913,16 @@ components:
         CategoryPreferences:
             type: object
             properties:
-                useEmailNotifications:
-                    nullable: true
+                preferences.followed:
                     type: boolean
-                postNotifications:
-                    nullable: true
-                    type: string
-                    enum:
-                        - follow
-                        - discussions
-                        - all
+                preferences.popup.posts:
+                    type: boolean
+                preferences.email.posts:
+                    type: boolean
+                preferences.popup.comments:
+                    type: boolean
+                preferences.email.comments:
+                    type: boolean
         CategoryPreferencesMulti:
             type: array
             items:
@@ -876,6 +951,9 @@ components:
                     type: integer
                 countDiscussions:
                     description: Total discussions in the category.
+                    type: integer
+                countFollowers:
+                    description: Total followers in the category.
                     type: integer
                 customPermissions:
                     description: Are custom permissions set for this category?
@@ -917,6 +995,13 @@ components:
                     description: The URL code of the category.
                     minLength: 1
                     type: string
+                ideationType:
+                    description: Voting type used for ideation posts.
+                    enum:
+                        - up
+                        - up-down
+                        - false
+                    x-addon: ideation
             required:
                 - categoryID
                 - name
@@ -930,6 +1015,7 @@ components:
                 - countCategories
                 - countDiscussions
                 - countComments
+                - countFollowers
                 - countAllDiscussions
                 - countAllComments
             type: object

@@ -3,7 +3,7 @@
  * Database manager
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
@@ -601,7 +601,7 @@ class Gdn_Database implements InjectableInterface
 
             return $this->_CurrentResultSet;
         } finally {
-            $this->timers->stop(["db", $timerName]);
+            $this->timers->stop(["db", $timerName], ["query" => $sql, "input" => $inputParameters]);
         }
     }
 
@@ -613,6 +613,14 @@ class Gdn_Database implements InjectableInterface
         if ($this->_InTransaction) {
             $this->_InTransaction = !$this->connection()->rollBack();
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInTransaction(): bool
+    {
+        return $this->_InTransaction;
     }
 
     /**

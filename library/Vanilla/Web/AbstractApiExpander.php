@@ -94,4 +94,12 @@ abstract class AbstractApiExpander
     {
         return $this->expandFields[$destinationKey] ?? null;
     }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled(): bool
+    {
+        return true;
+    }
 }

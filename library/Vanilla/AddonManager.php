@@ -300,7 +300,7 @@ class AddonManager implements LoggerAwareInterface
 
         $resultClassNames = [];
         foreach ($classList as $classFile) {
-            if ($this->matchClass(strtolower($pattern), strtolower($classFile->className))) {
+            if ($this->matchClass($pattern, $classFile->className)) {
                 $resultClassNames[] = $classFile->className;
             }
         }
@@ -316,13 +316,14 @@ class AddonManager implements LoggerAwareInterface
      */
     protected function matchClass($pattern, $class)
     {
+        if (!str_starts_with($pattern, "*")) {
+            $pattern = "\\" . ltrim($pattern, "\\");
+        }
         $class = "\\" . ltrim($class, "\\");
 
-        $regex = str_replace(["\\*\\", "*", "\\"], ["(\\.+\\|\\)", ".*", "\\\\"], "\\" . ltrim($pattern, "\\"));
-        $regex = "`^$regex$`i";
         try {
-            $r = preg_match($regex, $class);
-            return (bool) $r;
+            $r = fnmatch(strtolower($pattern), strtolower($class), FNM_NOESCAPE);
+            return $r;
         } catch (\Exception $e) {
             return false;
         }

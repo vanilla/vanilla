@@ -1,18 +1,18 @@
 /**
  * Compatibility styles, using the color variables.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { extendItemContainer, userSelect } from "@library/styles/styleHelpers";
-import { styleUnit } from "@library/styles/styleUnit";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { mixinClickInput } from "@dashboard/compatibilityStyles/clickableItemHelpers";
 import { important } from "csx";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
+import { injectGlobal } from "@emotion/css";
 
 export const paginationCSS = () => {
     const globalVars = globalVariables();
@@ -135,5 +135,15 @@ export const paginationCSS = () => {
                 weight: 0.05,
             }),
         ),
+    });
+
+    // always show the first page even on mobile views, just like we have on desktop
+    // mostly when we have big number of discussions and we are in last pages, its hard to get to the first page
+    injectGlobal({
+        ".Pager.NumberedPager .Pager-p.FirstPage": {
+            "@media(max-width: 500px)": {
+                display: "flex",
+            },
+        },
     });
 };

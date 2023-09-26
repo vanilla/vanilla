@@ -27,7 +27,7 @@
     "homepage": "https://github.com/vanilla/vanilla-cloud/blob/master/addons/themes/theme-boilerplate/README.md",
     "devDependencies": {
         "@vanilla/theme-core": "^3.0.4",
-        "fs-extra": "^7.0.0"
+        "fs-extra": "^9.1.0"
     },
     "dependencies": {
         "@vanilla/theme-core": "^3.1.5"

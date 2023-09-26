@@ -129,13 +129,13 @@ class CommentNotificationsTest extends SiteTestCase
 
         // The first, but not the second, mention notification should have been processed, and we should have a callback payload.
         $longRunnerResult = $response->getData();
-        $callbackPayload = $longRunnerResult->getCallbackPayload();
+        $callbackPayload = $longRunnerResult["callbackPayload"];
         $this->assertNotNull($callbackPayload);
-        $this->assertSame(2, $longRunnerResult->getCountTotalIDs());
-        $this->assertCount(1, $longRunnerResult->getSuccessIDs());
+        $this->assertSame(2, $longRunnerResult["progress"]["countTotalIDs"]);
+        $this->assertCount(1, $longRunnerResult["progress"]["successIDs"]);
         $this->assertEquals(
             "Comment_{$comment["commentID"]}_User_{$user1["userID"]}_NotificationType_mention",
-            $longRunnerResult->getSuccessIDs()[0]
+            $longRunnerResult["progress"]["successIDs"][0]
         );
 
         $longRunner->setMaxIterations(100);
@@ -184,13 +184,13 @@ class CommentNotificationsTest extends SiteTestCase
 
         // The first, but not the second, participated notification should have been processed, and we should have a callback payload.
         $longRunnerResult = $response->getData();
-        $callbackPayload = $longRunnerResult->getCallbackPayload();
+        $callbackPayload = $longRunnerResult["callbackPayload"];
         self::assertNotNull($callbackPayload);
-        self::assertSame(2, $longRunnerResult->getCountTotalIDs());
-        self::assertCount(1, $longRunnerResult->getSuccessIDs());
+        self::assertSame(2, $longRunnerResult["progress"]["countTotalIDs"]);
+        self::assertCount(1, $longRunnerResult["progress"]["successIDs"]);
         self::assertEquals(
             "Comment_{$comment["commentID"]}_User_{$firstCommentUser["userID"]}_NotificationType_participated",
-            $longRunnerResult->getSuccessIDs()[0]
+            $longRunnerResult["progress"]["successIDs"][0]
         );
 
         $longRunner->setMaxIterations(100);
@@ -244,13 +244,13 @@ class CommentNotificationsTest extends SiteTestCase
 
         // The first, but not the second, mention notification should have been processed, and we should have a callback payload.
         $longRunnerResult = $response->getData();
-        $callbackPayload = $longRunnerResult->getCallbackPayload();
+        $callbackPayload = $longRunnerResult["callbackPayload"];
         $this->assertNotNull($callbackPayload);
-        $this->assertSame(2, $longRunnerResult->getCountTotalIDs());
-        $this->assertCount(1, $longRunnerResult->getSuccessIDs());
+        $this->assertSame(2, $longRunnerResult["progress"]["countTotalIDs"]);
+        $this->assertCount(1, $longRunnerResult["progress"]["successIDs"]);
         $this->assertEquals(
             "Comment_{$comment["commentID"]}_User_{$user1["userID"]}_NotificationType_category",
-            $longRunnerResult->getSuccessIDs()[0]
+            $longRunnerResult["progress"]["successIDs"][0]
         );
 
         $longRunner->setMaxIterations(100);
@@ -287,7 +287,7 @@ class CommentNotificationsTest extends SiteTestCase
             new ExpectedNotification(
                 "Comment",
                 [$commentUser["name"], "commented on", $discussion["name"]],
-                "mine, participated"
+                "mine, Comment, participated"
             ),
         ]);
 
@@ -296,7 +296,7 @@ class CommentNotificationsTest extends SiteTestCase
             new ExpectedNotification(
                 "Comment",
                 [$commentUser["name"], "commented on", $discussion["name"]],
-                "bookmark"
+                "bookmark, Comment"
             ),
         ]);
 
@@ -322,7 +322,7 @@ class CommentNotificationsTest extends SiteTestCase
             new ExpectedNotification(
                 "Comment",
                 [$secondCommentUser["name"], "commented on", $discussion["name"]],
-                "participated"
+                "participated, Comment"
             ),
         ]);
 
@@ -378,7 +378,7 @@ class CommentNotificationsTest extends SiteTestCase
             new ExpectedNotification(
                 "Comment",
                 [$otherUser["name"], "commented on", $discussion["name"]],
-                "mine, participated"
+                "mine, Comment, participated"
             ),
         ]);
 
@@ -394,7 +394,7 @@ class CommentNotificationsTest extends SiteTestCase
             new ExpectedNotification(
                 "CommentMention",
                 [$otherUser["name"], "mentioned you", $discussion["name"]],
-                "mention, mine, participated"
+                "mention, CommentMention, mine, participated"
             ),
         ]);
     }
@@ -416,7 +416,7 @@ class CommentNotificationsTest extends SiteTestCase
         }, $otherUser);
 
         $this->assertUserHasNotificationsLike($notifyUser, [
-            new ExpectedNotification("Comment", [], "mine, participated"),
+            new ExpectedNotification("Comment", [], "mine, Comment, participated"),
         ]);
 
         // Disable preference for mine (which normally gets priority).
@@ -427,7 +427,9 @@ class CommentNotificationsTest extends SiteTestCase
             $this->createComment();
         }, $otherUser);
 
-        $this->assertUserHasNotificationsLike($notifyUser, [new ExpectedNotification("Comment", [], "participated")]);
+        $this->assertUserHasNotificationsLike($notifyUser, [
+            new ExpectedNotification("Comment", [], "participated, Comment"),
+        ]);
     }
 
     /**
@@ -450,7 +452,7 @@ class CommentNotificationsTest extends SiteTestCase
         }, $otherUser);
 
         $this->assertUserHasNotificationsLike($notifyUser, [
-            new ExpectedNotification("Comment", [], "participated, bookmark"),
+            new ExpectedNotification("Comment", [], "participated, Comment, bookmark"),
         ]);
 
         // Disable preference for participated (which normally gets priority).
@@ -461,7 +463,9 @@ class CommentNotificationsTest extends SiteTestCase
             $this->createComment();
         }, $otherUser);
 
-        $this->assertUserHasNotificationsLike($notifyUser, [new ExpectedNotification("Comment", [], "bookmark")]);
+        $this->assertUserHasNotificationsLike($notifyUser, [
+            new ExpectedNotification("Comment", [], "bookmark, Comment"),
+        ]);
     }
 
     /**
@@ -477,7 +481,13 @@ class CommentNotificationsTest extends SiteTestCase
         $this->runWithUser(function () {
             $this->createDiscussion();
         }, $otherUser);
-        $this->setCategoryPreference($notifyUser, $category, CategoryModel::NOTIFICATION_ALL);
+        $this->setCategoryPreference($notifyUser, $category, [
+            "preferences.followed" => true,
+            "preferences.popup.posts" => true,
+            "preferences.email.posts" => true,
+            "preferences.popup.comments" => true,
+            "preferences.email.comments" => true,
+        ]);
 
         // The discussion is commented on.
         $this->runWithUser(function () {
@@ -485,7 +495,9 @@ class CommentNotificationsTest extends SiteTestCase
         }, $otherUser);
 
         // We get the category following notification.
-        $this->assertUserHasNotificationsLike($notifyUser, [new ExpectedNotification("Comment", [], "advanced")]);
+        $this->assertUserHasNotificationsLike($notifyUser, [
+            new ExpectedNotification("Comment", [], "advanced, Comment"),
+        ]);
 
         // Now bookmark the discussion and try again. The bookmark should get prioritized.
         $this->runWithUser(function () {
@@ -498,7 +510,7 @@ class CommentNotificationsTest extends SiteTestCase
         }, $otherUser);
 
         $this->assertUserHasNotificationsLike($notifyUser, [
-            new ExpectedNotification("Comment", [], "bookmark, advanced"),
+            new ExpectedNotification("Comment", [], "bookmark, Comment, advanced"),
         ]);
 
         // Disable preference for bookmarked (which normally gets priority).
@@ -509,7 +521,9 @@ class CommentNotificationsTest extends SiteTestCase
             $this->createComment();
         }, $otherUser);
 
-        $this->assertUserHasNotificationsLike($notifyUser, [new ExpectedNotification("Comment", [], "advanced")]);
+        $this->assertUserHasNotificationsLike($notifyUser, [
+            new ExpectedNotification("Comment", [], "advanced, Comment"),
+        ]);
     }
 
     /**
@@ -550,10 +564,12 @@ class CommentNotificationsTest extends SiteTestCase
 
         // We should have 1 participated popup notification and 1 email notification for the bookmark.
         // For the email notification we check for SENT_FAIL because we attempt to send an email but shouldn't be able to inside a test
-        $this->assertUserHasNotificationsLike($notifyUser, [new ExpectedNotification("Comment", [], "bookmark")]);
+        $this->assertUserHasNotificationsLike($notifyUser, [
+            new ExpectedNotification("Comment", [], "bookmark, Comment"),
+        ]);
 
         $this->assertUserHasEmailsLike($notifyUser, \ActivityModel::SENT_OK, [
-            new ExpectedNotification("Comment", [], "participated, bookmark"),
+            new ExpectedNotification("Comment", [], "participated, Comment, bookmark"),
         ]);
     }
 
@@ -584,9 +600,11 @@ class CommentNotificationsTest extends SiteTestCase
         $this->runWithUser(function () {
             $this->createComment();
         }, $otherUser);
-        $this->assertUserHasNotificationsLike($notifyUser, [new ExpectedNotification("Comment", [], "participated")]);
+        $this->assertUserHasNotificationsLike($notifyUser, [
+            new ExpectedNotification("Comment", [], "participated, Comment"),
+        ]);
         $this->assertUserHasEmailsLike($notifyUser, \ActivityModel::SENT_SKIPPED, [
-            new ExpectedNotification("Comment", [], "participated"),
+            new ExpectedNotification("Comment", [], "participated, Comment"),
         ]);
 
         // Default preference is off, but user specific preference overrides that.
@@ -595,9 +613,11 @@ class CommentNotificationsTest extends SiteTestCase
         $this->runWithUser(function () {
             $this->createComment();
         }, $otherUser);
-        $this->assertUserHasNotificationsLike($notifyUser, [new ExpectedNotification("Comment", [], "participated")]);
+        $this->assertUserHasNotificationsLike($notifyUser, [
+            new ExpectedNotification("Comment", [], "participated, Comment"),
+        ]);
         $this->assertUserHasEmailsLike($notifyUser, \ActivityModel::SENT_OK, [
-            new ExpectedNotification("Comment", [], "participated"),
+            new ExpectedNotification("Comment", [], "participated, Comment"),
         ]);
 
         // User opted into emails in the past but emails have been turned off globally.
@@ -608,23 +628,38 @@ class CommentNotificationsTest extends SiteTestCase
         $this->runWithUser(function () {
             $this->createComment();
         }, $otherUser);
-        $this->assertUserHasNotificationsLike($notifyUser, [new ExpectedNotification("Comment", [], "participated")]);
-        $this->assertUserHasEmailsLike($notifyUser, \ActivityModel::SENT_SKIPPED, [
-            new ExpectedNotification("Comment", [], "participated"),
+        $this->assertUserHasNotificationsLike($notifyUser, [
+            new ExpectedNotification("Comment", [], "participated, Comment"),
         ]);
+        $this->assertUserHasEmailsLike($notifyUser, \ActivityModel::SENT_SKIPPED, [
+            new ExpectedNotification("Comment", [], "participated, Comment"),
+        ]);
+
+        // User has opted into popups in the past, but popups have been turned off globablly.
+        \Gdn::config()->saveToConfig([
+            "Garden.Popups.Disabled" => true,
+        ]);
+        $this->resetTable("Activity");
+        $this->runWithUser(function () {
+            $this->createComment();
+        }, $otherUser);
+        $this->assertUserHasNoNotifications($notifyUser);
 
         // User has opted into emails in the past, but does not have permission to receive emails.
         \Gdn::config()->saveToConfig([
             "Garden.Email.Disabled" => false,
+            "Garden.Popups.Disabled" => false,
         ]);
         $this->setMemberRoleEmailPermission(false);
         $this->resetTable("Activity");
         $this->runWithUser(function () {
             $this->createComment();
         }, $otherUser);
-        $this->assertUserHasNotificationsLike($notifyUser, [new ExpectedNotification("Comment", [], "participated")]);
+        $this->assertUserHasNotificationsLike($notifyUser, [
+            new ExpectedNotification("Comment", [], "participated, Comment"),
+        ]);
         $this->assertUserHasEmailsLike($notifyUser, \ActivityModel::SENT_SKIPPED, [
-            new ExpectedNotification("Comment", [], "participated"),
+            new ExpectedNotification("Comment", [], "participated, Comment"),
         ]);
 
         // User has been banned. They should not receive email notifications.

@@ -1,14 +1,13 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Library\Vanilla\Formatting;
 
 use VanillaTests\MinimalContainerTestCase;
-use VanillaTests\Library\Vanilla\Formatting\AssertsFixtureRenderingTrait;
 
 /**
  * Unit tests for the Gdn_Format class.

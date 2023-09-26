@@ -5,8 +5,11 @@
 
 import { onContent } from "@library/utility/appUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { useEffect, useRef } from "react";
 
 type HLJS = typeof import("@library/content/highlightJs").default;
+
+const highlightStateIndicator = "highlighted";
 
 export function initCodeHighlighting() {
     void highlightCodeBlocks();
@@ -14,15 +17,21 @@ export function initCodeHighlighting() {
 }
 
 export async function highlightCodeBlocks(domNode: HTMLElement = document.body) {
+    // Omit any blocks which are already highlighted
+    const blocks = domNode.querySelectorAll(`.code.codeBlock:not([data-${highlightStateIndicator}])`);
+
     // Make sure we actually have some codeblocks before initializing.
-    const blocks = domNode.querySelectorAll(".code.codeBlock");
     if (blocks.length === 0) {
         return;
     }
 
     const hljs = await importHLJS();
-    blocks.forEach((node) => {
-        hljs.highlightBlock(node);
+    blocks.forEach((node: HTMLElement) => {
+        // Check if the highlighted state is set on the node before trying to highlight
+        if (!node.dataset[highlightStateIndicator]) {
+            node.setAttribute(`data-${highlightStateIndicator}`, true);
+            hljs.highlightBlock(node);
+        }
     });
 }
 
@@ -82,4 +91,12 @@ function importHLJS(): Promise<HLJS> {
 
     requestPromise = innerImport();
     return requestPromise;
+}
+
+export function useHLJS(): HLJS | null {
+    const ref = useRef<HLJS>(null);
+    useEffect(() => {
+        importHLJS().then((hljs) => (ref.current = hljs));
+    }, []);
+    return ref.current;
 }

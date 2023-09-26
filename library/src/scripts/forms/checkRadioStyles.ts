@@ -103,9 +103,8 @@ export const checkRadioClasses = useThemeCache(() => {
     //.radioButton-label,
     // .checkbox-label
     const label = css({
-        lineHeight: styleUnit(vars.sizing.width),
+        lineHeight: 1,
         paddingLeft: styleUnit(8),
-        paddingRight: styleUnit(8),
         cursor: "pointer",
         ...userSelect(),
     });
@@ -158,6 +157,14 @@ export const checkRadioClasses = useThemeCache(() => {
         margin: "auto",
     });
 
+    const tooltipIcon = css({
+        ...Mixins.verticallyAlignInContainer(24, 1),
+    });
+    const tooltipIconContainer = css({
+        marginLeft: 4,
+        maxHeight: "1em",
+    });
+
     const disk = css({
         borderRadius: percent(50),
     });
@@ -206,24 +213,24 @@ export const checkRadioClasses = useThemeCache(() => {
     //.checkbox
     const root = css({
         display: important("flex"),
-        flexWrap: "wrap",
         alignItems: "center",
         outline: 0,
         ...Mixins.padding(vars.spacing),
-        ...{
-            [`&&`]: {
-                margin: 0,
-            },
-            [`&.isHorizontal.isHorizontal.isHorizontal`]: Mixins.margin({
-                all: 0,
-                right: px(globalVars.spacer.size / 2),
+        [`&&`]: {
+            margin: 0,
+        },
+        "&.hugLeft": {
+            paddingLeft: 0,
+        },
+        [`&.isHorizontal.isHorizontal.isHorizontal`]: Mixins.margin({
+            all: 0,
+            right: px(globalVars.spacer.size / 2),
+        }),
+        [`&.${isDashboard} + .info`]: {
+            ...Mixins.margin({
+                top: styleUnit(2),
+                bottom: styleUnit(6),
             }),
-            [`&.${isDashboard} + .info`]: {
-                ...Mixins.margin({
-                    top: styleUnit(2),
-                    bottom: styleUnit(6),
-                }),
-            },
         },
     });
 
@@ -256,6 +263,11 @@ export const checkRadioClasses = useThemeCache(() => {
         },
     });
 
+    const checkBoxDescription = css({
+        marginLeft: 30,
+        marginTop: -5,
+    });
+
     return {
         root,
         label,
@@ -264,11 +276,14 @@ export const checkRadioClasses = useThemeCache(() => {
         iconContainer,
         radioIcon,
         checkIcon,
+        tooltipIcon,
+        tooltipIconContainer,
         fullWidth,
         disk,
         diskIcon,
         input,
         grid,
         isDashboard,
+        checkBoxDescription,
     };
 });

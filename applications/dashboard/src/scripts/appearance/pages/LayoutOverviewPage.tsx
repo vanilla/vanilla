@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { AppearanceNav } from "@dashboard/appearance/nav/AppearanceNav";
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
@@ -76,6 +76,8 @@ function LayoutOverviewPageMetasImpl(props: { layout: ILayoutDetails }) {
                         (appliedGloballyOnly
                             ? layout.layoutViewType === "discussionList"
                                 ? t("recent discussions page")
+                                : layout.layoutViewType === "categoryList"
+                                ? t("categories page")
                                 : t("homepage")
                             : layoutViewNames.join(", ")) +
                         "."}

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -283,7 +283,11 @@ final class WebpackAssetDefinitionCollection
                 $collection->runtimeJsAsset = $asset;
                 break;
             case "bootstrap":
-                $collection->bootstrapJsAsset = $asset;
+                if ($asset->getAssetType() === "css") {
+                    $collection->cssAssetsGlobal[] = $asset;
+                } else {
+                    $collection->bootstrapJsAsset = $asset;
+                }
                 break;
             default:
                 $collection->addAsset($asset);

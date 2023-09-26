@@ -12,10 +12,13 @@ use Garden\StaticCacheTranslationTrait;
 use Logger;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
+use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\Contracts\Formatting\HeadingProviderInterface;
+use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Contracts\Formatting\Heading;
@@ -33,6 +36,8 @@ use Vanilla\Formatting\Quill;
 
 /**
  * Format service for the rich editor format. Rendered and parsed using Quill.
+ *
+ * @template-implements FormatInterface<RichFormatParsed>
  */
 class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAwareInterface
 {
@@ -58,6 +63,9 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /** @var FormatService */
     private $formatService;
 
+    /** @var EmbedService */
+    private $embedService;
+
     /**
      * Constructor for DI.
      *
@@ -69,28 +77,94 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
         Quill\Parser $parser,
         Quill\Renderer $renderer,
         Quill\Filterer $filterer,
-        FormatService $formatService
+        FormatService $formatService,
+        EmbedService $embedService
     ) {
         $this->parser = $parser;
         $this->renderer = $renderer;
         $this->filterer = $filterer;
         $this->formatService = $formatService;
         $this->setLogger(Logger::getLogger());
+        $this->embedService = $embedService;
+    }
+
+    /**
+     * @inheritdoc
+     * @return RichFormatParsed
+     */
+    public function parse(string $content)
+    {
+        try {
+            $parseMode = $this->allowExtendedContent
+                ? Quill\Parser::PARSE_MODE_EXTENDED
+                : Quill\Parser::PARSE_MODE_NORMAL;
+            return $this->parseInternal($content, $parseMode);
+        } catch (\Throwable $e) {
+            $this->logBadInput($content);
+            return new RichFormatParsed(
+                '[{"insert":"' . self::RENDER_ERROR_MESSAGE . '"}]',
+                $this->parser->parse([["insert" => self::RENDER_ERROR_MESSAGE]])
+            );
+        }
+    }
+
+    /**
+     * Makes the actual call to the Quill\Parser::parse() method, passing it the parse mode.
+     *
+     * @param string $content
+     * @param string $parseMode
+     * @return RichFormatParsed
+     * @throws FormattingException
+     */
+    private function parseInternal(string $content, string $parseMode): RichFormatParsed
+    {
+        $content = $this->filterer->filter($content);
+        $operations = Quill\Parser::jsonToOperations($content);
+
+        $blotGroups = $this->parser->parse($operations, $parseMode);
+        $parsed = new RichFormatParsed($content, $blotGroups);
+        return $parsed;
+    }
+
+    /**
+     * Ensure we have parsed content.
+     *
+     * @param RichFormatParsed|string $rawOrParsed
+     *
+     * @return RichFormatParsed
+     */
+    private function ensureParsed($rawOrParsed): RichFormatParsed
+    {
+        if ($rawOrParsed instanceof RichFormatParsed) {
+            return $rawOrParsed;
+        } else {
+            return $this->parse($rawOrParsed);
+        }
+    }
+
+    /**
+     * Ensure we have raw content.
+     *
+     * @param RichFormatParsed|string $rawOrParsed
+     *
+     * @return string
+     */
+    private function ensureRaw($rawOrParsed): string
+    {
+        if ($rawOrParsed instanceof RichFormatParsed) {
+            return $rawOrParsed->getRawContent();
+        } else {
+            return $rawOrParsed;
+        }
     }
 
     /**
      * @inheritdoc
      */
-    public function renderHTML(string $content, bool $throw = false): string
+    public function renderHTML($content, bool $throw = false): string
     {
         try {
-            $content = $this->filterer->filter($content);
-            $operations = Quill\Parser::jsonToOperations($content);
-
-            $blotGroups = $this->parser->parse(
-                $operations,
-                $this->allowExtendedContent ? Quill\Parser::PARSE_MODE_EXTENDED : Quill\Parser::PARSE_MODE_NORMAL
-            );
+            $blotGroups = $this->ensureParsed($content)->getBlotGroups();
             $html = $this->renderer->render($blotGroups);
             $html = $this->applyHtmlProcessors($html);
             return $html;
@@ -107,13 +181,11 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function renderPlainText(string $content): string
+    public function renderPlainText($content): string
     {
         $text = "";
         try {
-            $content = $this->filterer->filter($content);
-            $operations = Quill\Parser::jsonToOperations($content);
-            $blotGroups = $this->parser->parse($operations);
+            $blotGroups = $this->ensureParsed($content)->getBlotGroups();
 
             /** @var Quill\BlotGroup $blotGroup */
             foreach ($blotGroups as $blotGroup) {
@@ -129,12 +201,11 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function renderQuote(string $content): string
+    public function renderQuote($content): string
     {
         try {
-            $content = $this->filterer->filter($content);
-            $operations = Quill\Parser::jsonToOperations($content);
-            $blotGroups = $this->parser->parse($operations, Quill\Parser::PARSE_MODE_QUOTE);
+            $content = $this->ensureRaw($content);
+            $blotGroups = $this->parseInternal($content, Quill\Parser::PARSE_MODE_QUOTE)->getBlotGroups();
             $rendered = $this->renderer->render($blotGroups);
 
             // Trim out breaks and empty paragraphs.
@@ -150,8 +221,9 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function filter(string $content): string
+    public function filter($content): string
     {
+        $content = $this->ensureRaw($content);
         $filtered = $this->filterer->filter($content);
         $this->renderHTML($filtered, true);
         return $filtered;
@@ -193,8 +265,10 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseImageUrls(string $content): array
+    public function parseImageUrls($content): array
     {
+        $content = $this->ensureRaw($content);
+
         $urls = [];
 
         try {
@@ -213,8 +287,10 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseImages(string $content): array
+    public function parseImages($content): array
     {
+        $content = $this->ensureRaw($content);
+
         $props = [];
         try {
             $embeds = $this->parseEmbedsOfType($content, ImageEmbed::class);
@@ -235,8 +311,10 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseAttachments(string $content): array
+    public function parseAttachments($content): array
     {
+        $content = $this->ensureRaw($content);
+
         $attachments = [];
 
         try {
@@ -255,8 +333,10 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseMentions(string $content, bool $skipTaggedContent = true): array
+    public function parseMentions($content, bool $skipTaggedContent = true): array
     {
+        $content = $this->ensureRaw($content);
+
         try {
             $operations = Quill\Parser::jsonToOperations($content);
             return $this->parser->parseMentionUsernames($operations);
@@ -269,8 +349,10 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritdoc
      */
-    public function parseHeadings(string $content): array
+    public function parseHeadings($content): array
     {
+        $content = $this->ensureRaw($content);
+
         $outline = [];
 
         try {
@@ -411,44 +493,52 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
 
         foreach ($operations as &$op) {
             if (isset($op["insert"]["mention"]["name"])) {
-                ArrayUtils::setByPath("insert.mention.name", $op, $this->getAnonymizeUserName());
-                ArrayUtils::setByPath("insert.mention.userID", $op, -1);
+                // Anonymize at-mentions
+                if ($username === $op["insert"]["mention"]["name"]) {
+                    ArrayUtils::setByPath("insert.mention.name", $op, $this->getAnonymizeUserName());
+                    ArrayUtils::setByPath("insert.mention.userID", $op, -1);
+                }
             }
 
             if (isset($op["attributes"]["link"])) {
+                // Anonymize profile URLs that are in the href attribute of anchor tags
                 $link = ArrayUtils::getByPath("attributes.link", $op);
                 $profileLink = \UserModel::getProfileUrl(["name" => $username]);
                 if ($link === $profileLink) {
-                    ArrayUtils::setByPath("insert", $op, $this->getAnonymizeUserName());
                     ArrayUtils::setByPath("attributes.link", $op, $this->getAnonymizeUserUrl());
                 }
             }
 
-            if (isset($op["insert"]["embed-external"])) {
-                $embedType = ArrayUtils::getByPath("insert.embed-external.data.embedType", $op);
-                if ($embedType === "quote") {
-                    $prefix = "insert.embed-external.data";
+            if (isset($op["insert"]) && is_string($op["insert"])) {
+                // Anonymize plain-text profile URLs
+                [$pattern, $replacement] = $this->getUrlReplacementPattern($username, $this->getAnonymizeUserUrl());
+                $op["insert"] = preg_replace($pattern, $replacement, $op["insert"]);
+            }
 
-                    $format = ArrayUtils::getByPath("$prefix.format", $op);
-                    $bodyRaw = ArrayUtils::getByPath("$prefix.bodyRaw", $op);
+            if (isset($op["insert"]["embed-external"])) {
+                // Anonymize mentions in a quote.
+                $data = ExternalBlot::getEmbedDataFromOperation($op);
+                $embedType = $data["embedType"] ?? null;
+                if ($embedType === "quote") {
+                    $quoteName = ArrayUtils::getByPath("insertUser.name", $data);
+                    if ($quoteName === $username) {
+                        ArrayUtils::setByPath("insertUser.userID", $data, -1);
+                        ArrayUtils::setByPath("insertUser.name", $data, $this->getAnonymizeUserName());
+                        ArrayUtils::setByPath("insertUser.url", $data, $this->getAnonymizeUserUrl());
+                    }
+
+                    $format = ArrayUtils::getByPath("format", $data);
+                    $bodyRaw = ArrayUtils::getByPath("bodyRaw", $data);
                     if (is_array($bodyRaw)) {
                         $bodyRaw = json_encode($bodyRaw, JSON_UNESCAPED_UNICODE);
                     }
                     $bodyRaw = $this->formatService->removeUserPII($username, $bodyRaw, $format);
-                    $body = $this->formatService->renderQuote($bodyRaw, $format);
+                    ArrayUtils::setByPath("bodyRaw", $data, $bodyRaw);
 
-                    ArrayUtils::setByPath("$prefix.bodyRaw", $op, $bodyRaw);
-                    ArrayUtils::setByPath("$prefix.body", $op, $body);
+                    $embed = $this->embedService->createEmbedFromData($data);
 
-                    $quoteName = ArrayUtils::getByPath("$prefix.insertUser.name", $op);
-
-                    if ($quoteName === $username) {
-                        ArrayUtils::setByPath("$prefix.insertUser.userID", $op, -1);
-                        ArrayUtils::setByPath("$prefix.insertUser.name", $op, $this->getAnonymizeUserName());
-                        ArrayUtils::setByPath("$prefix.insertUser.url", $op, $this->getAnonymizeUserUrl());
-                        ArrayUtils::setByPath("$prefix.insertUser.photoUrl", $op, null);
-                        ArrayUtils::setByPath("$prefix.insertUser.dateLastActive", $op, "1970-01-01T00:00:00+00:00");
-                        ArrayUtils::setByPath("$prefix.insertUser.label", $op, "");
+                    if (!($embed instanceof ErrorEmbed)) {
+                        $op["insert"]["embed-external"]["data"] = $embed->getData();
                     }
                 }
             }
@@ -459,23 +549,30 @@ class RichFormat extends BaseFormat implements ParsableDOMInterface, LoggerAware
     /**
      * @inheritDoc
      */
-    public function parseAllMentions(string $body): array
+    public function parseAllMentions($body): array
     {
         $mentions = [];
 
         $operations = Quill\Parser::jsonToOperations($body);
         foreach ($operations as $op) {
             if (isset($op["insert"]["mention"]["name"])) {
+                // Get at-mentions
                 $mentions[] = ArrayUtils::getByPath("insert.mention.name", $op);
             }
             if (isset($op["attributes"]["link"])) {
+                // Get profile URLs that are in the href attribute of anchor tags
                 $matches = [];
-                preg_match("~{$this->getUrlPattern()}~", $op["attributes"]["link"], $matches);
-                if (isset($matches["url_mentions"])) {
-                    $mentions[] = $matches["url_mentions"];
-                }
+                preg_match_all("~{$this->getUrlPattern()}~", $op["attributes"]["link"], $matches);
+                $mentions = array_merge($mentions, $this->normalizeMatches($matches, true));
+            }
+            if (isset($op["insert"]) && is_string($op["insert"])) {
+                // Get plain-text profile URLs
+                $matches = [];
+                preg_match_all("~{$this->getUrlPattern()}~", $op["insert"], $matches);
+                $mentions = array_merge($mentions, $this->normalizeMatches($matches, true));
             }
             if (isset($op["insert"]["embed-external"])) {
+                // Get mentions in a quote.
                 $embedType = ArrayUtils::getByPath("insert.embed-external.data.embedType", $op);
                 if ($embedType === "quote") {
                     $prefix = "insert.embed-external.data";

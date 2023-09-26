@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Ryan Perry <ryan.p@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -11,19 +11,16 @@ use CategoriesApiController;
 use CategoryModel;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
-use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Container\ContainerInterface;
 use UserModel;
+use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Scheduler\Job\LongRunnerJob;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Scheduler\LongRunnerAction;
-use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Web\SystemTokenUtils;
 use VanillaTests\DatabaseTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SchedulerTestTrait;
-use VanillaTests\SetupTraitsTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
@@ -306,6 +303,22 @@ class CategoriesTest extends AbstractResourceTest
     }
 
     /**
+     *  Test that listing of Followed Categories also provides Date Followed
+     *  @depends testIndexFollowed
+     */
+
+    public function testFollowedCategoriesProvidesDateFollowedOnCategoryIndex(): void
+    {
+        $postFollowResult = $this->api()
+            ->get($this->baseUrl, ["followed" => true])
+            ->getBody();
+        $this->assertCount(1, $postFollowResult);
+        $followedPost = array_shift($postFollowResult);
+        $this->assertEquals(true, $followedPost["followed"]);
+        $this->assertArrayHasKey("dateFollowed", $followedPost);
+    }
+
+    /**
      * Ensure moving a category actually moves it and updates the new parent's category count.
      */
     public function testMove()
@@ -500,7 +513,10 @@ class CategoriesTest extends AbstractResourceTest
         $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
         $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
         $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
-        $discussions[] = $this->createDiscussion(["categoryID" => $origCategory["categoryID"]]);
+        $discussions[] = $this->createDiscussion([
+            "categoryID" => $origCategory["categoryID"],
+            "pinned" => true,
+        ]);
 
         $origDiscussions = $this->api()
             ->get("discussions", ["categoryID" => $origCategory["categoryID"]])
@@ -816,5 +832,315 @@ class CategoriesTest extends AbstractResourceTest
         foreach ($excludedNames as $excludedName) {
             $this->assertArrayNotHasKey($excludedName, $flippedNames);
         }
+    }
+
+    /**
+     * Test that description lengths are properly served as a validation error.
+     *
+     * @see https://higherlogic.atlassian.net/browse/VNLA-2316
+     */
+    public function testTooLongDescription()
+    {
+        $this->expectExceptionCode(400);
+        $this->expectExceptionMessage("Description is 201 characters too long.");
+        $this->createCategory([
+            "description" =>
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras placerat aliquet ligula eget finibus. Suspendisse porttitor lorem eu lacus scelerisque, eu efficitur ante tincidunt. Suspendisse potenti. Curabitur porta massa lacus. Nulla facilisi. Vestibulum cursus, eros ut congue porttitor, magna enim eleifend urna, id tempor ipsum elit tincidunt risus. Vivamus felis elit, elementum vitae purus commodo, tempus posuere odio. Vivamus nec tellus faucibus, bibendum nisl vitae, aliquet lacus. Etiam ex felis, ullamcorper sit amet sem ut, vulputate laoreet quam. Donec ullamcorper ultricies dui, at cursus nulla fermentum et. Etiam at ipsum sit amet sem tincidunt volutpat quis vitae sapien. Cras ac felis venenatis tellus tempor euismod.Vestibulum nec massa at velit faucibus sodales vitae sit amet tortor. Morbi pretium euismod massa, vel volutpat urna luctus at. Sed posuere orci non mi vestibulum condimentum. Nam imperdiet nunc ac odio varius condimentum. Nam nec turpis tempus, luctus odio nec, semper ipsum. Donec vestibulum lorem ac interdum luctus. Praesent vel magna libero. Pellentesque mattis turpis a facilisis fringilla. Phasellus scelerisque arcu ligula, vel pellentesque nunc placerat eu.",
+        ]);
+    }
+    /**
+     * Test that using emojis won't break validation .
+     *
+     * @see https://higherlogic.atlassian.net/browse/VNLA-2316
+     */
+    public function testLongEmojiStringInDescription()
+    {
+        $this->expectExceptionCode(400);
+        $this->expectExceptionMessage("Description is 4 characters too long.");
+        $this->createCategory([
+            "description" =>
+                "👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦👩‍👧‍👧👩‍👧‍👦‍👩‍👧‍👧👩‍👧‍👦‍👩‍👧‍👦",
+        ]);
+    }
+
+    /**
+     * Test Category Index expand on last post
+     * @return void
+     */
+    public function testExpandOnLatestPost(): void
+    {
+        $record = $this->record();
+        $record["displayAs"] = "discussions";
+        $firstCategory = $this->testPost($record);
+        $discussion = [
+            "name" => "Discussion one",
+            "body" => "Body one",
+            "categoryID" => $firstCategory["categoryID"],
+        ];
+        $firstDiscussion = $this->createDiscussion($discussion);
+
+        $record = $this->record();
+        $record["displayAs"] = "discussions";
+        $secondCategory = $this->testPost($record);
+
+        $user = $this->createUser();
+        $userID = $user["userID"];
+
+        $comment = $this->runWithUser(function () use ($firstDiscussion) {
+            return $this->createComment(["body" => "comment1", "discussionID" => $firstDiscussion["discussionID"]]);
+        }, $user);
+
+        //expand on RecentPost
+
+        $categories = $this->api()
+            ->get($this->baseUrl, [
+                "expand" => "lastPost",
+                "outputFormat" => "flat",
+            ])
+            ->getBody();
+
+        $categories = array_column($categories, null, "categoryID");
+        // Assert first category has expanded lasPost
+        $this->assertArrayHasKey("lastPost", $categories[$firstCategory["categoryID"]]);
+        $lastPost = $categories[$firstCategory["categoryID"]]["lastPost"];
+        $this->assertEquals($firstDiscussion["discussionID"], $lastPost["discussionID"]);
+        $this->assertEquals($comment["commentID"], $lastPost["commentID"]);
+        $this->assertEquals($userID, $lastPost["insertUserID"]);
+        $this->assertArrayHasKey("insertUser", $lastPost);
+        $this->assertIsArray($lastPost["insertUser"]);
+
+        // Assert that Second category has no expand on  lasPost
+        $this->assertArrayNotHasKey("lastPost", $categories[$secondCategory["categoryID"]]);
+    }
+
+    /**
+     * Test category index expand on preferences
+     *
+     * @depends testIndexFollowed
+     */
+    public function testCategoryIndexExpandOnPreferences(): void
+    {
+        $followedCategory = $this->api()
+            ->get($this->baseUrl, ["followed" => true, "expand" => "preferences"])
+            ->getBody();
+
+        $this->assertCount(1, $followedCategory);
+        $followedCategory = array_shift($followedCategory);
+        $this->assertArrayHasKey("preferences", $followedCategory);
+        $this->assertEquals(
+            [
+                CategoriesApiController::OUTPUT_PREFERENCE_FOLLOW => true,
+                CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_APP => false,
+                CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_EMAIL => false,
+                CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_APP => false,
+                CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_EMAIL => false,
+            ],
+            $followedCategory["preferences"]
+        );
+    }
+
+    /**
+     * Test Api category index sort by name
+     *
+     * @return void
+     */
+    public function testCategoryIndexSortByName(): void
+    {
+        $this->resetTable("Category");
+        $names = ["first" => "catA", "second" => "catZ", "third" => "catB"];
+        $categories = [];
+        foreach ($names as $key => $name) {
+            $categories[$key] = $this->createCategory([
+                "name" => $name,
+            ]);
+        }
+        $fields = ["name", "-name"];
+        foreach ($fields as $field) {
+            $response = $this->api()
+                ->get($this->baseUrl, ["outputFormat" => "flat", "sort" => $field])
+                ->getBody();
+            $this->assertSorted($response, $field);
+        }
+    }
+
+    /**
+     * Test Category index sorting by dateFollowed
+     *
+     * @depends testIndexFollowed
+     */
+    public function testFollowedCategoriesSortingByDateFollowed()
+    {
+        $preFollow = $this->api()
+            ->get($this->baseUrl, ["followed" => true])
+            ->getBody();
+        $this->assertCount(1, $preFollow);
+
+        $record = $this->record();
+        $record["displayAs"] = "discussions";
+        $category = $this->testPost($record);
+        $categoryID = $category[$this->pk];
+
+        $result = $this->api()
+            ->put("{$this->baseUrl}/{$categoryID}/follow", ["followed" => true])
+            ->getBody();
+        $this->assertTrue($result["followed"]);
+        $followedCategories = $this->api()
+            ->get($this->baseUrl, ["followed" => true])
+            ->getBody();
+        $this->assertCount(2, $followedCategories);
+
+        // Manually modify the latest category followed date to an older date
+
+        $changeDateTime = DateTimeFormatter::timeStampToDateTime(strtotime("-1 day"));
+        $currentUSerID = $this->getSession()->UserID;
+        \Gdn::sql()
+            ->update(
+                "UserCategory",
+                ["DateFollowed" => $changeDateTime],
+                ["CategoryID" => $categoryID, "UserID" => $currentUSerID]
+            )
+            ->put();
+        // Invalidate current cache so that it updates
+        self::$categoryModel::clearUserCache();
+        \Gdn::cache()->remove("Follow_{$currentUSerID}");
+
+        $fields = ["dateFollowed", "-dateFollowed"];
+        foreach ($fields as $field) {
+            $followedCategories = $this->api()
+                ->get($this->baseUrl, ["followed" => true, "sort" => $field])
+                ->getBody();
+            $this->assertSorted($followedCategories, $field);
+        }
+    }
+
+    /**
+     * Test when filtering by followed, on category index will discard deleted categories
+     */
+    public function testDeletionOfCategoryWillRemoveTheCategoryFromFollowed(): void
+    {
+        $record = $this->record();
+        $record["displayAs"] = "discussions";
+        $category = $this->testPost($record);
+        $categoryID = $category[$this->pk];
+
+        $result = $this->api()
+            ->put("{$this->baseUrl}/{$categoryID}/follow", ["followed" => true])
+            ->getBody();
+        $this->assertTrue($result["followed"]);
+        $followedCategory = $this->api()
+            ->get($this->baseUrl, ["followed" => true])
+            ->getBody();
+        $followedCategoryIDS = array_column($followedCategory, "categoryID");
+        $this->assertContains($categoryID, $followedCategoryIDS);
+        //Delete the category
+        $row = $this->api()->request(\Garden\Http\HttpRequest::METHOD_DELETE, "{$this->baseUrl}/{$categoryID}", []);
+        $followedCategory = $this->api()
+            ->get($this->baseUrl, ["followed" => true])
+            ->getBody();
+        $followedCategoryIDS = array_column($followedCategory, "categoryID");
+        $this->assertNotContains($categoryID, $followedCategoryIDS);
+    }
+
+    /**
+     * Test filter followed categories using userID
+     */
+    public function testFilterByFollowedUserID()
+    {
+        $currentUserID = $this->getSession()->UserID;
+        $guestUser = $this->createUserFixture("Guest");
+        $this->runWithUser(function () {
+            $this->expectException(ForbiddenException::class);
+            $this->api()
+                ->get($this->baseUrl, ["followedUserID" => 1])
+                ->getBody();
+        }, $guestUser);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->api()
+            ->get($this->baseUrl, ["followed" => 1, "followedUserID" => 1])
+            ->getBody();
+
+        $category1 = $this->createCategory(["name" => "categoryA"]);
+        $category2 = $this->createCategory(["name" => "categoryB"]);
+        $memberUser = $this->createUser();
+        $this->api()->setUserID($memberUser["userID"]);
+
+        $this->api()->put("{$this->baseUrl}/{$category1[$this->pk]}/follow", ["followed" => true]);
+        $this->api()->put("{$this->baseUrl}/{$category2[$this->pk]}/follow", ["followed" => true]);
+
+        $this->api()->setUserID($currentUserID);
+
+        $userFollowedCategories = $this->api()
+            ->get($this->baseUrl, ["followedUserID" => 1])
+            ->getBody();
+        $userFollowedCategoryIds = array_column($userFollowedCategories, "categoryID");
+        $this->assertEquals([$category2["categoryID"], $category1["categoryID"]], $userFollowedCategoryIds);
+    }
+
+    /**
+     * Verify Category's countFollowers
+     */
+    public function testCountFollowers()
+    {
+        // create category
+        $category = $this->createCategory();
+        $categoryID = $category["categoryID"];
+
+        // create a user
+        $user = $this->createUser();
+        $userID = $user["userID"];
+
+        $category = $this->api()
+            ->get("/categories/$categoryID")
+            ->getBody();
+        self::assertEquals(0, $category["countFollowers"]);
+
+        // make the user follow the category
+        self::$categoryModel->setPreferences($userID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => true,
+        ]);
+
+        // test that the count is now 1 for the category
+        $category = $this->api()
+            ->get("/categories/$categoryID")
+            ->getBody();
+        self::assertEquals(1, $category["countFollowers"]);
+
+        $newUser = $this->createUser();
+        $newUserID = $newUser["userID"];
+
+        self::$categoryModel->setPreferences($newUserID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => true,
+        ]);
+
+        // make sure  the count is now 2
+        $category = $this->api()
+            ->get("/categories/$categoryID")
+            ->getBody();
+        self::assertEquals(2, $category["countFollowers"]);
+
+        // make the user update their preferences
+
+        self::$categoryModel->setPreferences($newUserID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_APP) => true,
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_COMMENT_APP) => true,
+        ]);
+
+        // the count should still be 2
+        $category = $this->api()
+            ->get("/categories/$categoryID")
+            ->getBody();
+        self::assertEquals(2, $category["countFollowers"]);
+
+        // make the user unfollow the category
+        self::$categoryModel->setPreferences($newUserID, $categoryID, [
+            CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => false,
+        ]);
+
+        // the count should drop back to 1
+        $category = $this->api()
+            ->get("/categories/$categoryID")
+            ->getBody();
+        self::assertEquals(1, $category["countFollowers"]);
     }
 }

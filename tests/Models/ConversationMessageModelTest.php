@@ -120,6 +120,11 @@ class ConversationMessageModelTest extends BootstrapTestCase
         $id = $this->conversationMessageModel->save($row);
         $message = $this->conversationMessageModel->getID($id, DATASET_TYPE_ARRAY);
         $this->assertArraySubsetRecursive($row, $message);
+
+        $conversation = $this->conversationModel->getID($id, DATASET_TYPE_ARRAY, [
+            "viewingUserID" => $this->getSession()->UserID,
+        ]);
+        $this->assertLessThanOrEqual($message["DateInserted"], $conversation["DateLastViewed"]);
     }
 
     /**

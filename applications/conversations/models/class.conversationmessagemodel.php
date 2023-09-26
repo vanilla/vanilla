@@ -281,7 +281,8 @@ class ConversationMessageModel extends ConversationsModel
             $this->fireEvent("AfterSave");
 
             // Get the new message count for the conversation.
-            $result = $this->SQL
+            $result = $this->Database
+                ->createSql()
                 ->select("MessageID", "count", "CountMessages")
                 ->select("MessageID", "max", "LastMessageID")
                 ->from("ConversationMessage")
@@ -297,20 +298,21 @@ class ConversationMessageModel extends ConversationsModel
             // Update the conversation's DateUpdated field.
             $dateUpdated = Gdn_Format::toDateTime();
 
-            $this->SQL
-                ->update("Conversation c")
+            $sql = $this->Database->createSql();
+            $sql->update("Conversation c")
                 ->set("CountMessages", $countMessages)
                 ->set("LastMessageID", $lastMessageID)
                 ->set("UpdateUserID", Gdn::session()->UserID)
                 ->set("DateUpdated", $dateUpdated)
                 ->where("ConversationID", $conversationID);
             if ($countMessages == 1) {
-                $this->SQL->set("FirstMessageID", $lastMessageID);
+                $sql->set("FirstMessageID", $lastMessageID);
             }
-            $this->SQL->put();
+            $sql->put();
 
             // Update the last message of the users that were previously up-to-date on their read messages.
-            $this->SQL
+            $this->Database
+                ->createSql()
                 ->update("UserConversation uc")
                 ->set("uc.LastMessageID", $messageID)
                 ->set("uc.DateConversationUpdated", $dateUpdated)
@@ -321,7 +323,8 @@ class ConversationMessageModel extends ConversationsModel
                 ->put();
 
             // Update the date updated of the users that were not up-to-date.
-            $this->SQL
+            $this->Database
+                ->createSql()
                 ->update("UserConversation uc")
                 ->set("uc.DateConversationUpdated", $dateUpdated)
                 ->where("uc.ConversationID", $conversationID)
@@ -331,19 +334,20 @@ class ConversationMessageModel extends ConversationsModel
                 ->put();
 
             // Update the sending user.
-            $this->SQL->update("UserConversation uc")->set("uc.CountReadMessages", $countMessages);
+            $sql = $this->Database->createSql();
+            $sql->update("UserConversation uc")->set("uc.CountReadMessages", $countMessages);
             if ($countMessages == 1) {
-                $this->SQL->set("uc.LastMessageID", $messageID);
+                $sql->set("uc.LastMessageID", $messageID);
             }
-            $this->SQL
-                ->set("Deleted", 0)
+            $sql->set("Deleted", 0)
                 ->set("uc.DateConversationUpdated", $dateUpdated)
                 ->where("ConversationID", $conversationID)
                 ->where("UserID", $session->UserID)
                 ->put();
 
             // Find users involved in this conversation
-            $userData = $this->SQL
+            $userData = $this->Database
+                ->createSql()
                 ->select("UserID")
                 ->select("LastMessageID")
                 ->select("Deleted")
@@ -351,6 +355,9 @@ class ConversationMessageModel extends ConversationsModel
                 ->where("ConversationID", $conversationID)
                 ->get()
                 ->result(DATASET_TYPE_ARRAY);
+
+            // Mark the conversation as read for the sending user.
+            $this->conversationModel->markRead($conversationID, $session->UserID);
 
             $updateCountUserIDs = [];
             $notifyUserIDs = [];

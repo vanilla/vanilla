@@ -9,7 +9,8 @@ import Translate from "@library/content/Translate";
 import { IGetDiscussionByID } from "@library/features/discussions/DiscussionActions";
 import { useDiscussionByIDs } from "@library/features/discussions/discussionHooks";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
-import { hasPermission, PermissionMode } from "@library/features/users/Permission";
+import { PermissionMode } from "@library/features/users/Permission";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
@@ -50,6 +51,8 @@ export function BulkActionsToast(props: IProps) {
     const countSelectedDiscussions = sanitizedIDs.length;
 
     const discussions = useDiscussionByIDs(sanitizedIDs ?? []);
+
+    const { hasPermission } = usePermissionsContext();
 
     /**
      * Check one permission against a list of discussions

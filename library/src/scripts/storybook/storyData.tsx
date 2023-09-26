@@ -1,14 +1,15 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
-import { IMe, IUser, IUserFragment } from "@library/@types/api/users";
+import { IMe, IUser } from "@library/@types/api/users";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { ITag } from "@library/features/tags/TagsReducer";
 import random from "lodash/random";
 import { slugify } from "@vanilla/utils";
+import { ILeader } from "@library/leaderboardWidget/LeaderboardWidget";
 
 export const STORY_IMAGE = require("./storyDataImage.png");
 export const STORY_ICON = require("./storyDataImage.png");
@@ -29,9 +30,13 @@ export const STORY_IPSUM_MEDIUM = STORY_IPSUM_LONG.slice(0, 160) + "…";
 
 export const STORY_IPSUM_SHORT = STORY_IPSUM_LONG.slice(0, 50) + "…";
 
-export const STORY_DATE = "2019-05-05T15:51:23+00:00";
+export const STORY_DATE_STARTS = "2019-05-05T15:51:23+00:00";
+export const STORY_DATE_ENDS = "2019-05-05T16:51:23+00:00";
 
 export const STORY_USER: IUser = {
+    admin: 0,
+    isAdmin: false,
+    isSysAdmin: false,
     userID: 1,
     name: "Joe Walsh",
     dateLastActive: "2016-07-25 17:51:15",
@@ -41,6 +46,7 @@ export const STORY_USER: IUser = {
     email: "joe.walsh@example.com",
     countDiscussions: 207,
     countComments: 3456,
+    countPosts: 3663,
     emailConfirmed: true,
     showEmail: true,
     bypassSpam: false,
@@ -69,15 +75,14 @@ export const STORY_USER_PRIVATE: IUser = {
 export const STORY_ME_ADMIN: IMe = {
     ...STORY_USER,
     isAdmin: true,
-    permissions: [],
     countUnreadConversations: 0,
     countUnreadNotifications: 0,
 };
 
-export const STORY_LEADERS = [
+export const STORY_LEADERS: ILeader[] = [
     {
         user: STORY_USER,
-        points: 320,
+        points: 999,
     },
     {
         user: {
@@ -85,8 +90,9 @@ export const STORY_LEADERS = [
             name: "Christina Morton",
             photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
             userID: 2,
+            title: "Product Manager",
         },
-        points: 280,
+        points: 999,
     },
     {
         user: {
@@ -94,8 +100,9 @@ export const STORY_LEADERS = [
             name: "Nazeem Kanaan",
             photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/nA5BAUNMSEDPV.png",
             userID: 3,
+            title: "Community Leader",
         },
-        points: 278,
+        points: 999,
     },
     {
         user: {
@@ -104,7 +111,7 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/n2K5HYT9EZOF6.png",
             userID: 4,
         },
-        points: 254,
+        points: 999,
     },
     {
         user: {
@@ -112,12 +119,13 @@ export const STORY_LEADERS = [
             name: "Tomás Barros",
             photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
             userID: 5,
+            label: "SuccessTeam",
         },
-        points: 243,
+        points: 999,
     },
     {
         user: { ...STORY_USER, name: "Lan Tai", userID: 6 },
-        points: 241,
+        points: 999,
     },
     {
         user: {
@@ -126,11 +134,11 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/nA5BAUNMSEDPV.png",
             userID: 7,
         },
-        points: 221,
+        points: 999,
     },
     {
         user: { ...STORY_USER, name: "Teus van Uum", userID: 8 },
-        points: 212,
+        points: 999,
     },
     {
         user: {
@@ -139,7 +147,7 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/nA5BAUNMSEDPV.png",
             userID: 9,
         },
-        points: 206,
+        points: 999,
     },
     {
         user: {
@@ -148,11 +156,11 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
             userID: 10,
         },
-        points: 196,
+        points: 999,
     },
     {
         user: { ...STORY_USER, name: "Matthias Friedman", userID: 11 },
-        points: 184,
+        points: 999,
     },
     {
         user: {
@@ -161,7 +169,7 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/n2K5HYT9EZOF6.png",
             userID: 12,
         },
-        points: 165,
+        points: 999,
     },
     {
         user: {
@@ -170,7 +178,7 @@ export const STORY_LEADERS = [
             photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
             userID: 13,
         },
-        points: 164,
+        points: 999,
     },
 ];
 
@@ -241,4 +249,104 @@ export const getArticlesStub = function (limit = 9, host = "#") {
     }
 
     return stub;
+};
+
+export const STORY_COMMENT = {
+    commentID: 999999,
+    discussionID: 999999,
+    insertUser: {
+        ...STORY_USER,
+        userID: 13,
+    },
+    insertUserID: 13,
+    dateInserted: "2020-10-06T15:30:44+00:00",
+    dateUpdated: "2020-10-06T15:30:44+00:00",
+    score: 999,
+    url: "#",
+    attributes: {},
+    body: "This content is generated by users on the site. You can't update it here.",
+    name: "This content is generated by users on the site. You can't update it here.",
+};
+
+export const STORY_COMMENTS = [
+    {
+        ...STORY_COMMENT,
+        insertUser: {
+            ...STORY_USER,
+            userID: 13,
+        },
+        insertUserID: 13,
+        body: STORY_IPSUM_MEDIUM,
+    },
+    {
+        ...STORY_COMMENT,
+        insertUser: {
+            ...STORY_USER,
+            name: "Christina Morton",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
+            userID: 2,
+            title: "Product Manager",
+        },
+        insertUserID: 2,
+        body: STORY_IPSUM_LONG,
+    },
+    {
+        ...STORY_COMMENT,
+        insertUser: {
+            ...STORY_USER,
+            name: "Phoebe Cunningham",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/defaultavatar/nOGOPGSGY4ISZ.jpg",
+            userID: 12,
+        },
+        insertUserID: 12,
+        body: STORY_IPSUM_SHORT,
+    },
+    {
+        ...STORY_COMMENT,
+        insertUser: {
+            ...STORY_USER,
+            name: "Pupa Zito",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/n2K5HYT9EZOF6.png",
+            userID: 15,
+        },
+        insertUserID: 15,
+        body: STORY_IPSUM_LONG2,
+    },
+    {
+        ...STORY_COMMENT,
+        insertUser: {
+            ...STORY_USER,
+            name: "Ella Jespersen",
+            photoUrl: "https://us.v-cdn.net/6032207/uploads/avatarstock/nA5BAUNMSEDPV.png",
+            userID: 7,
+        },
+        insertUserID: 7,
+        body: STORY_IPSUM_LONG3,
+    },
+];
+
+export const STORY_DISCUSSION = {
+    discussionID: 9999999,
+    type: "discussion",
+    name: "Discussion Title",
+    body: "This content is generated by users on the site. You can't update it here.<br><br>This content is generated by users on the site. You can't update it here. This content is generated by users on the site. You can't update it here.<br><br>This content is generated by users on the site. You can't update it here.",
+    url: "#",
+    canonicalUrl: "#",
+    dateInserted: "2020-10-06T15:30:44+00:00",
+    insertUserID: STORY_USER.userID,
+    insertUser: STORY_USER,
+    lastUser: STORY_USER,
+    dateUpdated: "2020-10-06T15:30:44+00:00",
+    dateLastComment: "2020-10-06T15:30:44+00:00",
+    pinned: false,
+    closed: false,
+    score: 0,
+    countViews: 999,
+    countComments: 9999,
+    categoryID: 1111111111111111,
+    category: {
+        name: "Category 1",
+        url: "#",
+        categoryID: 1111111111111111,
+    },
 };

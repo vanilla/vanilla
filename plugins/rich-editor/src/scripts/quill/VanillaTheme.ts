@@ -8,10 +8,9 @@
 import Quill, { QuillOptionsStatic, RangeStatic } from "quill/core";
 import ThemeBase from "quill/core/theme";
 import KeyboardBindings from "@rich-editor/quill/KeyboardBindings";
-import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
 import MarkdownModule from "@rich-editor/quill/MarkdownModule";
 import NewLineClickInsertionModule from "./NewLineClickInsertionModule";
-import { isEditorWalledEvent } from "@rich-editor/editor/pieces/EditorEventWall";
+import { isEditorWalledEvent } from "@library/editor/pieces/EditorEventWall";
 
 export default class VanillaTheme extends ThemeBase {
     /** The previous selection */

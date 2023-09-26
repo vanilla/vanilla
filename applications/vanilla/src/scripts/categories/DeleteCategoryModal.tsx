@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import React, { useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import React, { useMemo, useState } from "react";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { t } from "@library/utility/appUtils";
 import ModalSizes from "@library/modal/ModalSizes";
@@ -20,9 +20,8 @@ import { MenuPlacement } from "@library/forms/select/SelectOne";
 import { RecordID } from "@vanilla/utils";
 import apiv2 from "@library/apiv2";
 import debounce from "lodash/debounce";
-import { useAsyncFn } from "@vanilla/react-utils";
-import { LoadStatus } from "@library/@types/api/core";
 import { CategoryDisplayAs } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import { useMutation } from "@tanstack/react-query";
 
 interface IProps {
     categoryID: number;
@@ -40,16 +39,22 @@ export function DeleteCategoryModal(props: IProps) {
     const [replacementCategoryID, setReplacementCategoryID] = useState<RecordID | undefined>();
     const [searchFilter, setSearchFilter] = useState<string>("");
     const suggestions = useCategorySuggestions(searchFilter, null, true);
-    const [performDeleteState, performDelete] = useAsyncFn(async () => {
-        await apiv2.delete(`/categories/${categoryID}`, {
-            params: {
-                newCategoryID: actionType === "move" ? replacementCategoryID : undefined,
-                longRunnerMode: "sync",
-            },
-        });
-        window.location.reload();
-        setIsVisible(false);
-    }, [categoryID, actionType, replacementCategoryID]);
+
+    const deleteMutation = useMutation({
+        mutationKey: [categoryID, replacementCategoryID, actionType],
+        mutationFn: async () => {
+            return await apiv2.delete(`/categories/${categoryID}`, {
+                params: {
+                    newCategoryID: actionType === "move" ? replacementCategoryID : undefined,
+                    longRunnerMode: "sync",
+                },
+            });
+        },
+        onSuccess: () => {
+            window.location.reload();
+            setIsVisible(false);
+        },
+    });
     const filteredSuggestions = useMemo(
         () =>
             suggestions.data?.filter(
@@ -71,7 +76,7 @@ export function DeleteCategoryModal(props: IProps) {
     const isMoveValid = replacementCategoryID !== undefined;
     const isDeleteValid = !discussionsCount || confirmDelete;
     const isConfirmDisabled = (actionType == "move" && isMoveValid) || (actionType === "delete" && isDeleteValid);
-    const isSubmitting = performDeleteState.status === "loading";
+    const isSubmitting = deleteMutation.isLoading;
 
     const handleSearchFilter = debounce((value) => {
         setSearchFilter(value);
@@ -90,7 +95,7 @@ export function DeleteCategoryModal(props: IProps) {
             isConfirmDisabled={!isConfirmDisabled}
             isConfirmLoading={isSubmitting}
             onConfirm={() => {
-                performDelete();
+                deleteMutation.mutate();
             }}
             confirmTitle={t("Delete Category")}
         >

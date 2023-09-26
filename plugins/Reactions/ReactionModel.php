@@ -7,6 +7,8 @@
 use Garden\EventManager;
 use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\NotFoundException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Addon;
@@ -179,17 +181,23 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
      * @param bool $restricted Filter result based on the current user's permissions.
      * @param string|null $urlCode Filter reaction results by a particular type's URL code.
      * @param int $offset
-     * @param int $limit
+     * @param int|null $limit
      * @return array
+     * @throws Exception
      */
-    public function getByRecord($recordType, $id, $restricted = true, $urlCode = null, $offset = 0, $limit = null)
-    {
+    public function getByRecord(
+        string $recordType,
+        int $id,
+        bool $restricted = true,
+        string $urlCode = null,
+        int $offset = 0,
+        int $limit = null
+    ): array {
         [$record, $model, $_] = $this->getRow($recordType, $id);
         $record["recordType"] = $recordType;
         $record["recordID"] = $id;
 
-        $result = $this->getRecordReactions($record, $restricted, $urlCode, $offset, $limit);
-        return $result;
+        return $this->getRecordReactions($record, $restricted, $urlCode, $offset, $limit);
     }
 
     /**
@@ -495,28 +503,28 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
     /**
      *
      *
-     * @param $type
-     * @param $iD
+     * @param string $type
+     * @param int $recordID
      * @param null $operation
      * @return array
      * @throws Exception
      */
-    public function getRow($type, $iD, $operation = null)
+    public function getRow(string $type, int $recordID, $operation = null)
     {
         $attrColumn = "Attributes";
 
         switch ($type) {
             case "Comment":
                 $model = new CommentModel();
-                $row = $model->getID($iD, DATASET_TYPE_ARRAY);
+                $row = $model->getID($recordID, DATASET_TYPE_ARRAY);
                 break;
             case "Discussion":
                 $model = new DiscussionModel();
-                $row = $model->getID($iD);
+                $row = $model->getID($recordID);
                 break;
             case "Activity":
                 $model = new ActivityModel();
-                $row = $model->getID($iD, DATASET_TYPE_ARRAY);
+                $row = $model->getID($recordID, DATASET_TYPE_ARRAY);
                 $attrColumn = "Data";
                 break;
             default:
@@ -527,7 +535,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
         if (!$row && $operation) {
             // The row may have been logged so try and grab it.
             $logModel = new LogModel();
-            $log = $logModel->getWhere(["RecordType" => $type, "RecordID" => $iD, "Operation" => $operation]);
+            $log = $logModel->getWhere(["RecordType" => $type, "RecordID" => $recordID, "Operation" => $operation]);
 
             if (count($log) == 0) {
                 throw notFoundException($type);
@@ -535,6 +543,12 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
             $log = $log[0];
             $row = $log["Data"];
         }
+
+        // Throws an exception if the record doesn't exist.
+        if (!$row) {
+            throw new NotFoundException("Record is not found", ["type" => $type, "recordID" => $recordID]);
+        }
+
         $row = (array) $row;
 
         // Make sure the attributes are in the row and unserialized.
@@ -838,10 +852,12 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
      * - DateInserted: Optional. The date of the reaction.
      * @param array $record The record being reacted to as obtained from {@link ReactionModel::getRow()}.
      * @param Gdn_Model $model The model of the record being reacted to as obtained from {@link ReactionModel::getRow()}.
-     * @param bool $delete A hint to the toggle. One of the following:
+     * @param ?string $delete A hint to the toggle. One of the following:
      * - ReactionModel::FORCE_ADD: Add the reaction if it does not exist. Otherwise do nothing.
      * - ReactionModel::FORCE_REMOVE: Remove the reaction if it exists. Otherwise do nothing.
      * @return mixed
+     * @throws Gdn_UserException
+     * @throws ValidationException
      */
     public function toggleUserTag(&$data, &$record, $model, $delete = null)
     {
@@ -1095,16 +1111,23 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
     }
 
     /**
-     *
-     *
      * @param string $recordType
-     * @param int $iD
+     * @param int $recordID
      * @param string $reactionUrlCode
-     * @param bool $selfReact Whether a user can react to their own post
-     * @param string|null $force Force a reaction status. One of the FORCE_* class constants.
+     * @param int|null $userID
+     * @param bool $selfReact
+     * @param $force
+     * @return void
+     * @throws Gdn_UserException
      */
-    public function react($recordType, $iD, $reactionUrlCode, $userID = null, $selfReact = false, $force = null)
-    {
+    public function react(
+        string $recordType,
+        int $recordID,
+        string $reactionUrlCode,
+        int $userID = null,
+        bool $selfReact = false,
+        $force = null
+    ) {
         if (is_null($userID)) {
             $userID = Gdn::session()->UserID;
             $isModerator = checkPermission("Garden.Moderation.Manage");
@@ -1131,7 +1154,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
 
         $logOperation = val("Log", $reactionType);
 
-        [$row, $model, $log] = $this->getRow($recordType, $iD, $logOperation);
+        [$row, $model, $log] = $this->getRow($recordType, $recordID, $logOperation);
 
         if (!$selfReact && !$isModerator && $row["InsertUserID"] == $userID) {
             throw new Gdn_UserException(t("You can't react to your own post."));
@@ -1155,7 +1178,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
         // Save the user Tag.
         $data = [
             "RecordType" => $recordType,
-            "RecordID" => $iD,
+            "RecordID" => $recordID,
             "TagID" => $reactionType["TagID"],
             "UserID" => $userID,
             "Total" => $inc,
@@ -1168,7 +1191,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
         $data = $this->eventManager->fireFilter("reactionModel_react_saveData", $data, $this, $reactionType);
 
         // Create unique key based on the RecordID and UserID to limit requests on a record.
-        $lockKey = "Reactions." . $iD . "." . $userID;
+        $lockKey = "Reactions." . $recordID . "." . $userID;
         $haveLock = self::buildCacheLock($lockKey, self::CACHE_GRACE);
         if ($log) {
             $this->logger->info("Loggable Reaction: Try acquire lock", $loggerContext + ["haveLock" => $haveLock]);
@@ -1211,7 +1234,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
                 $otherUserData = $this->SQL
                     ->getWhere("UserTag", [
                         "RecordType" => $recordType,
-                        "RecordID" => $iD,
+                        "RecordID" => $recordID,
                         "TagID" => $reactionType["TagID"],
                     ])
                     ->resultArray();
@@ -1228,7 +1251,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
             if (!$noDelete && $score >= $removeThreshold) {
                 // Remove the record to the log.
                 $this->logger->info("Loggable Reaction: Requesting Model to Delete and Log", $loggerContext);
-                $model->deleteID($iD, ["Log" => $log, "LogOptions" => $logOptions]);
+                $model->deleteID($recordID, ["Log" => $log, "LogOptions" => $logOptions]);
                 if ($log) {
                     $this->logger->info("Loggable Reaction: Requested Model to Delete and Log", $loggerContext);
                 }
@@ -1243,7 +1266,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
                         Gdn::controller()->jsonTarget("#Content .Comments", "", "SlideUp");
                         Gdn::controller()->jsonTarget(".CommentForm", "", "SlideUp");
                     } else {
-                        Gdn::controller()->jsonTarget("#{$recordType}_$iD", "", "SlideUp");
+                        Gdn::controller()->jsonTarget("#{$recordType}_$recordID", "", "SlideUp");
                     }
                 }
             } elseif ($score >= $logThreshold) {
@@ -1307,7 +1330,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
 
         ReactionsPlugin::instance()->EventArguments = [
             "RecordType" => $recordType,
-            "RecordID" => $iD,
+            "RecordID" => $recordID,
             "Record" => $row,
             "ReactionUrlCode" => $reactionUrlCode,
             "ReactionType" => $reactionType,
@@ -1326,6 +1349,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
      * @param string $action
      * @param array|object|null $sender
      * @return ResourceEvent
+     * @throws ValidationException
      */
     public function eventFromRow(array $row, string $action, $sender = null): ResourceEvent
     {
@@ -1378,9 +1402,8 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
      * Recalculate a single records total.
      *
      * @param string|int $discussionID Identifier of the discussion.
-     * @param string $type The record type.
      */
-    public function recalculateRecordTotal($discussionID, $type)
+    public function recalculateRecordTotal($discussionID)
     {
         $this->SQL
             ->whereIn("RecordType", ["Discussion-Total", "Comment-Total"])
@@ -1395,15 +1418,15 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
             Total
          )
          select
-            '{$type}-Total',
+            'Discussion-Total',
             ut.RecordID,
             ut.TagID,
             t.InsertUserID,
             min(ut.DateInserted),
             sum(ut.Total) as SumTotal
          from GDN_UserTag ut
-         join GDN_{$type} t
-         	on ut.RecordID = t.{$type}ID
+         join GDN_Discussion t
+         	on ut.RecordID = t.DiscussionID
          where ut.RecordType = 'Discussion' and ut.RecordID = {$discussionID}
          group by
             RecordType,
@@ -1430,7 +1453,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
          min(ut.DateInserted),
          sum(ut.Total) as SumTotal
       from GDN_UserTag ut
-      where ut.RecordType = '{$type}-Total' and ut.RecordID = {$discussionID}
+      where ut.RecordType = 'Discussion-Total' and ut.RecordID = {$discussionID}
       group by
          ut.UserID,
          ut.TagID";
@@ -1881,7 +1904,7 @@ class ReactionModel extends Gdn_Model implements EventFromRowInterface, LoggerAw
     }
 
     /**
-     * Normalize a reaction type database row for outuput.
+     * Normalize a reaction type database row for output.
      *
      * @param array $row
      * @return array

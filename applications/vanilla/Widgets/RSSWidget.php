@@ -83,6 +83,15 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
     }
 
     /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["itemData"]));
+        return $result;
+    }
+
+    /**
      * @inheridoc
      */
     public static function getWidgetSchema(): Schema
@@ -106,11 +115,21 @@ class RSSWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, I
                             )
                         ),
                     ],
-                    "limit:i?" => [
+                    "limit" => [
+                        "type" => "integer",
+                        "description" => t("Desired number of items."),
+                        "minimum" => 1,
+                        "maximum" => 100,
+                        "step" => 1,
                         "default" => 10,
-                        "x-control" => SchemaForm::dropDown(
-                            new FormOptions("Limit", "Maximum amount of items to display."),
-                            new StaticFormChoices(array_combine(range(1, 10), range(1, 10)))
+                        "x-control" => SchemaForm::textBox(
+                            new FormOptions(
+                                t("Limit"),
+                                t("Choose how many records to display."),
+                                "",
+                                t("Up to a maximum of 100 items may be displayed.")
+                            ),
+                            "number"
                         ),
                     ],
                 ]),

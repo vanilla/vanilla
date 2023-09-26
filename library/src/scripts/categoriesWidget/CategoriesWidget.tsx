@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -15,17 +15,36 @@ import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { QuickLinks } from "@library/navigation/QuickLinks";
 import { Widget } from "@library/layout/Widget";
-interface IProps {
+import CategoriesListView from "@library/categoriesWidget/CategoriesListView";
+import { getMeta } from "@library/utility/appUtils";
+import CategoriesGridView from "@library/categoriesWidget/CategoriesGridView";
+import { CategoryGridItemsGroup } from "@library/categoriesWidget/CategoriesWidget.utils";
+
+export interface ICategoryItem extends IHomeWidgetItemProps {
+    categoryID: number | null;
+    parentCategoryID?: number;
+    depth: number;
+    displayAs: string;
+    children?: ICategoryItem[] | CategoryGridItemsGroup[];
+    noChildCategoriesMessage?: string;
+}
+
+export interface ICategoriesWidgetProps {
     title?: string;
     subtitle?: string;
     description?: string;
     containerOptions?: IHomeWidgetContainerOptions;
     itemOptions?: DeepPartial<IHomeWidgetItemOptions>;
-    itemData: IHomeWidgetItemProps[];
-    maxItemCount?: number; //this will probably go away with categories API "limit" full support
+    itemData: ICategoryItem[];
+    isAsset?: boolean;
 }
 
-export function CategoriesWidget(props: IProps) {
+export function CategoriesWidget(props: ICategoriesWidgetProps) {
+    const isList =
+        !props.containerOptions?.displayType || props.containerOptions?.displayType === WidgetContainerDisplayType.LIST;
+    const isGrid = props.containerOptions?.displayType === WidgetContainerDisplayType.GRID;
+    const categoryListLayoutsEnabled = getMeta("featureFlags.layoutEditor.categoryList.Enabled", false);
+
     const globalVariables = homeWidgetItemVariables().options;
     const itemVars = homeWidgetItemVariables(props.itemOptions).options;
     const isListWithNoBorder =
@@ -58,6 +77,16 @@ export function CategoriesWidget(props: IProps) {
             url: (item.to as string) ?? "",
         };
     });
+
+    // under a feature flag for now
+    if (categoryListLayoutsEnabled && (isList || isGrid)) {
+        return (
+            <Widget>
+                {isList && <CategoriesListView {...props} itemOptions={defaultItemOptions} />}
+                {isGrid && <CategoriesGridView {...props} itemOptions={defaultItemOptions} />}
+            </Widget>
+        );
+    }
 
     if (props.containerOptions?.displayType === WidgetContainerDisplayType.LINK) {
         return <QuickLinks title={props.title} links={quickLinks} containerOptions={props.containerOptions} />;

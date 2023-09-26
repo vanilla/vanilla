@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -34,9 +34,9 @@ trait HydrateAwareTrait
      *
      * Params will have been resolved already using {@link LayoutHydrator}.
      *
-     * @return array
+     * @return array|null
      */
-    public function getHydrateParams(): array
+    public function getHydrateParams(): ?array
     {
         return $this->hydrateParams;
     }
@@ -52,6 +52,6 @@ trait HydrateAwareTrait
      */
     public function getHydrateParam(string $paramPath)
     {
-        return ArrayUtils::getByPath($paramPath, $this->hydrateParams);
+        return ArrayUtils::getByPath($paramPath, $this->hydrateParams ?? []);
     }
 }

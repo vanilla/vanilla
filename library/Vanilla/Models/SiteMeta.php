@@ -16,6 +16,7 @@ use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Search\SearchService;
 use Vanilla\Site\OwnSite;
 use Vanilla\Site\SiteSectionModel;
@@ -112,6 +113,9 @@ class SiteMeta implements \JsonSerializable
     /** @var Contracts\Site\SiteSectionInterface */
     private $currentSiteSection;
 
+    /** @var string[] */
+    private array $siteSectionSlugs = [];
+
     /** @var string */
     private $logo;
 
@@ -120,12 +124,6 @@ class SiteMeta implements \JsonSerializable
 
     /** @var string */
     private $cacheBuster;
-
-    /** @var string */
-    private $staticPathFolder = "";
-
-    /** @var string */
-    private $dynamicPathFolder = "";
 
     /** @var Gdn_Session */
     private $session;
@@ -211,6 +209,12 @@ class SiteMeta implements \JsonSerializable
 
         $this->currentSiteSection = $siteSectionModel->getCurrentSiteSection();
 
+        foreach ($siteSectionModel->getAll() as $siteSection) {
+            if ($basePath = $siteSection->getBasePath()) {
+                $this->siteSectionSlugs[] = $basePath;
+            }
+        }
+
         // Get some ui metadata
         // This title may become knowledge base specific or may come down in a different way in the future.
         // For now it needs to come from some where, so I'm putting it here.
@@ -223,6 +227,12 @@ class SiteMeta implements \JsonSerializable
 
         // Fetch Uploading metadata.
         $this->allowedExtensions = $config->get("Garden.Upload.AllowedFileExtensions", []);
+        if ($session->getPermissions()->has("Garden.Community.Manage")) {
+            $this->allowedExtensions = array_merge(
+                $this->allowedExtensions,
+                \MediaApiController::UPLOAD_RESTRICTED_ALLOWED_FILE_EXTENSIONS
+            );
+        }
         $maxSize = $config->get("Garden.Upload.MaxFileSize", ini_get("upload_max_filesize"));
         $this->maxUploadSize = \Gdn_Upload::unformatFileSize($maxSize);
         $this->maxUploads = (int) $config->get("Garden.Upload.maxFileUploads", ini_get("max_file_uploads"));
@@ -337,7 +347,18 @@ class SiteMeta implements \JsonSerializable
     public function value(array $localizedExtraMetas = []): array
     {
         $extras = array_map(function (SiteMetaExtra $extra) {
-            return $extra->getValue();
+            try {
+                return $extra->getValue();
+            } catch (\Throwable $throwable) {
+                ErrorLogger::error(
+                    "Failed to load site meta   value for class " . get_class($extra),
+                    ["siteMeta"],
+                    [
+                        "exception" => $throwable,
+                    ]
+                );
+                return [];
+            }
         }, array_merge($this->extraMetas, $localizedExtraMetas));
 
         $embedAllowValue = $this->config->get("Garden.Embed.Allow", false);
@@ -352,8 +373,6 @@ class SiteMeta implements \JsonSerializable
                     "translationDebug" => $this->translationDebugModeEnabled,
                     "conversationsEnabled" => $this->conversationsEnabled,
                     "cacheBuster" => $this->cacheBuster,
-                    "staticPathFolder" => $this->staticPathFolder,
-                    "dynamicPathFolder" => $this->dynamicPathFolder,
                     "siteID" => $this->siteID,
                 ],
                 "embed" => [
@@ -380,6 +399,7 @@ class SiteMeta implements \JsonSerializable
                     "editContentTimeout" => $this->editContentTimeout,
                     "bannedPrivateProfile" => $this->bannedPrivateProfiles,
                     "useAdminCheckboxes" => boolval($this->config->get("Vanilla.AdminCheckboxes.Use", false)),
+                    "autoOffsetComments" => boolval($this->config->get("Vanilla.Comments.AutoOffset", true)),
                 ],
                 "search" => [
                     "defaultScope" => $this->defaultSearchScope,
@@ -400,6 +420,7 @@ class SiteMeta implements \JsonSerializable
                 "themeFeatures" => $this->themeFeatures->allFeatures(),
                 "addonFeatures" => $this->themeFeatures->allAddonFeatures(),
                 "siteSection" => $this->currentSiteSection->jsonSerialize(),
+                "siteSectionSlugs" => $this->siteSectionSlugs,
                 "themePreview" => $this->themePreview,
                 "reCaptchaKey" => $this->reCaptchaKey,
                 "TransientKey" => $this->session->transientKey(),
@@ -541,22 +562,6 @@ class SiteMeta implements \JsonSerializable
     public function getMobileAddressBarColor(): ?string
     {
         return $this->mobileAddressBarColor;
-    }
-
-    /**
-     * @param string $staticPathFolder
-     */
-    public function setStaticPathFolder(string $staticPathFolder)
-    {
-        $this->staticPathFolder = $staticPathFolder;
-    }
-
-    /**
-     * @param string $dynamicPathFolder
-     */
-    public function setDynamicPathFolder(string $dynamicPathFolder)
-    {
-        $this->dynamicPathFolder = $dynamicPathFolder;
     }
 
     /**

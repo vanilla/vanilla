@@ -7,102 +7,111 @@
 import { css } from "@emotion/css";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { Mixins } from "@library/styles/Mixins";
-import { singleBorder } from "@library/styles/styleHelpersBorders";
 import { useThemeCache } from "@library/styles/themeCache";
+import { color } from "csx";
 
 interface IFollowClassParams {
     isOpen: boolean;
     isFollowed: boolean;
+    /** These can be overridden in the asset settings */
+    borderRadius?: number;
+    buttonColor?: string;
+    textColor?: string;
+    alignment?: "start" | "center" | "end";
 }
 
 export const categoryFollowDropDownClasses = useThemeCache((params: IFollowClassParams) => {
-    const { isOpen, isFollowed } = params;
+    const { isOpen, borderRadius, buttonColor, textColor, alignment } = params;
     const globalVars = globalVariables();
 
     const layout = css({
-        marginLeft: "auto",
-        marginBottom: globalVars.spacer.size,
-    });
-
-    const groupLayout = css({
-        margin: 0,
-        ...Mixins.padding({
-            top: 17,
-            bottom: 20,
-            horizontal: 16,
-        }),
+        // Alignment is only set in custom layouts but other layout styles are required for legacy layouts
+        ...(alignment
+            ? {
+                  display: "flex",
+                  justifyContent: alignment,
+              }
+            : {
+                  marginLeft: "auto",
+                  marginBottom: globalVars.spacer.size,
+              }),
     });
 
     const followButton = css({
-        aspectRatio: "1/1",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: globalVars.spacer.componentInner / 2,
         borderRadius: globalVars.border.radius,
-        "&&": {
-            backgroundColor: isOpen ? ColorsUtils.colorOut(globalVars.mainColors.primary.fade(0.1)) : "transparent",
-            color: isFollowed || isOpen ? ColorsUtils.colorOut(globalVars.mainColors.primary) : "inherit",
-            padding: 4,
-            "&:hover": {
-                color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+        // Override from props
+        ...(borderRadius && {
+            borderRadius: `${borderRadius}px`,
+            "&:not([disabled]):hover, &:not([disabled]):active, &:not([disabled]):focus": {
+                borderRadius: `${borderRadius}px`,
             },
+        }),
+        // These fight with the legacy page css
+        "&&": {
+            padding: `5px ${globalVars.spacer.componentInner}px`,
+            backgroundColor: isOpen ? ColorsUtils.colorOut(globalVars.mainColors.primary.fade(0.1)) : "transparent",
+            // Override from props
+            ...(buttonColor && {
+                borderColor: buttonColor,
+                backgroundColor: isOpen ? ColorsUtils.colorOut(color(buttonColor).fade(0.1)) : "transparent",
+                "&:not([disabled]):hover, &:not([disabled]):active, &:not([disabled]):focus": {
+                    borderColor: buttonColor,
+                    backgroundColor: buttonColor,
+                },
+            }),
+            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+            // Override from props
+            ...(textColor && {
+                color: textColor,
+            }),
         },
     });
 
-    const radioItem = css({
-        alignItems: "flex-start",
-        ...Mixins.padding({
-            vertical: 0,
-            horizontal: 0,
-        }),
-        "&:not(:last-of-type)": {
-            ...Mixins.padding({
-                bottom: 18,
-            }),
-        },
-        "& > span:first-of-type": {
-            marginTop: 2,
-        },
+    const preferencesButton = css({
+        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
     });
 
     const heading = css({
-        fontSize: globalVars.fonts.size.large,
-        ...Mixins.padding({
-            vertical: 12,
-            horizontal: 16,
-        }),
-        borderBottom: singleBorder(),
-    });
-
-    return {
-        layout,
-        groupLayout,
-        followButton,
-        radioItem,
-        heading,
-    };
-});
-
-export const radioLabelClasses = useThemeCache(() => {
-    const globalVars = globalVariables();
-
-    const layout = css({
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-start",
-        paddingLeft: 8,
-    });
-
-    const title = css({
         fontWeight: globalVars.fonts.weights.semiBold,
-        fontSize: globalVars.fonts.size.medium,
-        lineHeight: globalVars.lineHeights.condensed,
-        marginBottom: 7,
     });
 
-    const description = css({});
+    const checkBox = css({
+        paddingLeft: 0,
+        paddingBottom: 4,
+        "& > span": {
+            fontWeight: "normal",
+        },
+    });
+
+    const fullWidth = css({
+        width: "100%",
+    });
+
+    const inset = css({
+        marginLeft: 26,
+    });
+
+    const errorBlock = css({
+        paddingLeft: 7,
+    });
+
+    const unClickable = css({
+        pointerEvents: "none",
+    });
 
     return {
         layout,
-        title,
-        description,
+        followButton,
+        preferencesButton,
+        heading,
+        checkBox,
+        fullWidth,
+        inset,
+        errorBlock,
+        unClickable,
     };
 });

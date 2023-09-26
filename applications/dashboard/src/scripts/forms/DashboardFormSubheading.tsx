@@ -4,14 +4,21 @@
  */
 
 import React from "react";
-import classNames from "classnames";
+import { cx } from "@emotion/css";
+import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 
-interface IProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface IProps extends React.HTMLAttributes<HTMLDivElement> {
+    hasBackground?: boolean;
+}
 
 export function DashboardFormSubheading(props: IProps) {
+    const { hasBackground, ...restProps } = props;
     return (
         <li>
-            <h2 {...props} className={classNames("subheading", props.className)}></h2>
+            <h2
+                {...restProps}
+                className={cx("subheading", props.className, hasBackground && dashboardClasses().subHeadingBackground)}
+            ></h2>
         </li>
     );
 }

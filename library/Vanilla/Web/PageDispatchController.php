@@ -72,6 +72,8 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      * @param string $title The title to use.
      *
      * @return Page
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     protected function useSimplePage(string $title): Page
     {
@@ -102,7 +104,11 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      */
     public function handleException(\Throwable $e): Data
     {
-        $activePage = $this->activePage ?? $this->container->get(SimpleTitlePage::class);
+        $activePage = $this->activePage ?? null;
+        if ($activePage === null) {
+            $activePage = $this->container->get(SimpleTitlePage::class);
+            $activePage->getHead()->setAssetSection("layouts");
+        }
         return $activePage->handleException($e);
     }
 }

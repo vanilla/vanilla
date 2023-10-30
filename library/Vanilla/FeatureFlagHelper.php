@@ -2,6 +2,7 @@
 
 namespace Vanilla;
 
+use Gdn;
 use Vanilla\Exception\FeatureNotEnabledException;
 use Garden\StaticCacheConfigTrait;
 
@@ -25,6 +26,18 @@ class FeatureFlagHelper
         // Force a true boolean.
         $result = filter_var($configValue, FILTER_VALIDATE_BOOLEAN);
         return $result;
+    }
+
+    /**
+     * Has a feature been explicitly enabled or disabled?
+     *
+     * @param string $feature
+     * @return bool
+     */
+    public static function featureExplicitlySet(string $feature): bool
+    {
+        $configValue = Gdn::config()->get(self::featureConfigKey($feature), null);
+        return !($configValue === null);
     }
 
     /**

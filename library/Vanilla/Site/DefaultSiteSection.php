@@ -110,6 +110,7 @@ class DefaultSiteSection implements SiteSectionInterface
     public function getDefaultRoute(): array
     {
         $configDefaultController = $this->config->get("Routes.DefaultController");
+
         return $this->router->parseRoute($configDefaultController) + ["OverridesCustomLayout" => false];
     }
 
@@ -119,6 +120,7 @@ class DefaultSiteSection implements SiteSectionInterface
     public function applications(): array
     {
         $apps = ["forum" => !(bool) $this->config->get("Vanilla.Forum.Disabled")];
+
         return array_merge($apps, $this->appOverrides);
     }
 
@@ -183,6 +185,21 @@ class DefaultSiteSection implements SiteSectionInterface
             "layoutViewType" => $layoutViewType,
             "recordType" => GlobalRecordProvider::getValidRecordTypes()[0],
             "recordID" => -1,
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTrackablePayload(): array
+    {
+        return [
+            "Subcommunity" => [
+                "SubcommunityID" => $this->getSectionID(),
+                "Locale" => $this->getContentLocale(),
+                "Folder" => $this->getBasePath(),
+                "Name" => $this->getSectionName(),
+            ],
         ];
     }
 }

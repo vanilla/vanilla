@@ -206,31 +206,6 @@ class VanillaSettingsControllerTest extends SiteTestCase
     }
 
     /**
-     * Test "enabling/disabling including full posts within email digests" option.
-     */
-    public function testEnableDisableEmailFullPost(): void
-    {
-        $config = \Gdn::config();
-
-        // This config defaults to false.
-        $this->assertFalse($config->get("Vanilla.Email.FullPost"));
-
-        // Setting the config to true.
-        $this->bessy()->post("/dashboard/settings/toggleemailfullpost/1");
-        $this->assertTrue($config->get("Vanilla.Email.FullPost"));
-        $html = $this->bessy()->getHtml("/dashboard/settings/emailstyles");
-        // Verify that the interface has a turned on toggle.
-        $html->assertCssSelectorExists('span.toggle-wrap-on a[href$="/dashboard/settings/toggleemailfullpost/0"]');
-
-        // Setting the config back to false again.
-        $this->bessy()->post("/dashboard/settings/toggleemailfullpost/0");
-        $this->assertFalse($config->get("Vanilla.Email.FullPost"));
-        $html = $this->bessy()->getHtml("/dashboard/settings/emailstyles");
-        // Verify that the interface has a turned off toggle.
-        $html->assertCssSelectorExists('span.toggle-wrap-off a[href$="/dashboard/settings/toggleemailfullpost/1"]');
-    }
-
-    /**
      * Test saving/loading custom domains for Kaltura embeds.
      */
     public function testSaveLoadKalturaCustomDomains(): void

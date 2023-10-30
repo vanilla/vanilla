@@ -58,8 +58,8 @@ class RecordStatusLogModel extends PipelineModel
             ->column("statusID", "int", false, "index")
             ->column("insertUserID", "int")
             ->column("dateInserted", "datetime")
-            ->column("recordType", "varchar(100)", false, "index.record")
-            ->column("recordID", "int", false, "index.record")
+            ->column("recordType", "varchar(100)", false)
+            ->column("recordID", "int", false)
             ->column("reason", "text", null)
             ->set($explicit, $drop);
 
@@ -72,6 +72,14 @@ class RecordStatusLogModel extends PipelineModel
             ->structure()
             ->table("recordStatusLog")
             ->dropIndexIfExists("FK_recordStatusLog_recordID");
+        $database
+            ->structure()
+            ->table("recordStatusLog")
+            ->createIndexIfNotExists("IX_recordStatusLog_record_statusID", ["recordType", "recordID", "statusID"]);
+        $database
+            ->structure()
+            ->table("recordStatusLog")
+            ->dropIndexIfExists("IX_recordStatusLog_record");
     }
 
     /**
@@ -132,6 +140,7 @@ class RecordStatusLogModel extends PipelineModel
             ->select("recordLogID", "MAX", "recordLogID")
             ->from("recordStatusLog rsl3")
             ->join("recordStatus as rs", "rsl3.statusID = rs.statusID")
+            ->where(["rsl3.recordID" => $recordIDs, "rsl3.recordType" => $recordType])
             ->where(["rs.isInternal" => $isInternal])
             ->groupBy(["rsl3.recordType", "rsl3.recordID"]);
 

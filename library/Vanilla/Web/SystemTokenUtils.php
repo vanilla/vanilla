@@ -7,6 +7,7 @@
 namespace Vanilla\Web;
 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Garden\Web\RequestInterface;
 use Gdn_Session;
 use UnexpectedValueException;
@@ -52,7 +53,7 @@ class SystemTokenUtils
      */
     public function decode(string $jwt, RequestInterface $context): array
     {
-        $payload = JWT::decode($jwt, $this->secret, [self::JWT_ALGO]);
+        $payload = JWT::decode($jwt, new Key($this->secret, self::JWT_ALGO));
         $payload = ArrayUtils::objToArrayRecursive($payload);
 
         $requestQuery = $context->getQuery() ?? [];

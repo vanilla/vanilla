@@ -209,4 +209,19 @@ class MockSiteSection implements SiteSectionInterface
             "recordID" => -1,
         ];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTrackablePayload(): array
+    {
+        return [
+            "Subcommunity" => [
+                "SubcommunityID" => $this->getSectionID(),
+                "Locale" => $this->getContentLocale(),
+                "Folder" => $this->getBasePath(),
+                "Name" => $this->getSectionName(),
+            ],
+        ];
+    }
 }

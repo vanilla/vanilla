@@ -28,7 +28,7 @@ class HtmlDocument implements TextDOMInterface
     const FRAGMENT_ATTRIBUTES = ["alt", "title"];
 
     /** @var string[]  */
-    private const TAG_INLINE_TEXT = [
+    public const TAG_INLINE_TEXT = [
         "a",
         "abbr",
         "acronym",

@@ -9,20 +9,23 @@ namespace Vanilla\Contracts\Formatting;
 
 use Vanilla\Formatting\Attachment;
 use Vanilla\Formatting\Exception\FormattingException;
+use Vanilla\Formatting\ParsedFormat;
 
 /**
  * An interface for rendering, filtering, and parsing user content.
+ *
+ * @template T extends ParsedFormat
  */
 interface FormatInterface
 {
     /**
      * Render a safe, sanitized, HTML version of some content.
      *
-     * @param string $content The content to render.
+     * @param string|T $content The content to render.
      *
      * @return string
      */
-    public function renderHTML(string $content): string;
+    public function renderHTML($content): string;
 
     /**
      * Render a safe, sanitized, HTML version of some content.
@@ -36,92 +39,103 @@ interface FormatInterface
     /**
      * Render a safe, sanitized, short version of some content.
      *
-     * @param string $content The content to render.
+     * @param string|T $content The content to render.
+     * @param int|null $length the trim length for the content
      *
      * @return string
      */
-    public function renderExcerpt(string $content): string;
+    public function renderExcerpt($content, ?int $length = null): string;
 
     /**
      * Render a plain text version of some content.
      *
-     * @param string $content The content to render.
+     * @param string|T $content The content to render.
      *
      * @return string
      */
-    public function renderPlainText(string $content): string;
+    public function renderPlainText($content): string;
 
     /**
      * Calculate the length of content with formatting and metadata removed.
      *
-     * @param string $content
+     * @param string|T $content
      * @return int
      */
-    public function getPlainTextLength(string $content): int;
+    public function getPlainTextLength($content): int;
 
     /**
      * Render a version of the content   suitable to be quoted in other content.
      *
-     * @param string $content The raw content to render.
+     * @param string|T $content The raw content to render.
      *
      * @return string
      */
-    public function renderQuote(string $content): string;
+    public function renderQuote($content): string;
 
     /**
      * Format a particular string.
      *
-     * @param string $content The content to render.
+     * @param string|T $content The content to render.
      * @return string
      *
      * @throws FormattingException If the post content wasn't valid and couldn't be filtered.
      */
-    public function filter(string $content): string;
+    public function filter($content): string;
+
+    /**
+     * Generate an intermediary parsed format that we can use pass into other formatting methods.
+     * This can help optimize cases where we are processing the same content in multiple ways.
+     *
+     * @param string $content
+     *
+     * @return T
+     */
+    public function parse(string $content);
 
     /**
      * Parse a list of attachments from some contents.
      *
-     * @param string $content The raw content to parse.
+     * @param string|T $content The raw content to parse.
      *
      * @return Attachment[]
      */
-    public function parseAttachments(string $content): array;
+    public function parseAttachments($content): array;
 
     /**
      * Parse out a list of headings from the post contents.
      *
-     * @param string $content The raw content to parse.
+     * @param string|T $content The raw content to parse.
      *
      * @return Heading[]
      */
-    public function parseHeadings(string $content): array;
+    public function parseHeadings($content): array;
 
     /**
      * Parse images out of the post contents.
      *
-     * @param string $content
+     * @param string|T $content
      *
      * @return string[]
      */
-    public function parseImageUrls(string $content): array;
+    public function parseImageUrls($content): array;
 
     /**
      * Parse image data from post content.
      *
-     * @param string $content
+     * @param string|T $content
      *
      * @return array
      */
-    public function parseImages(string $content): array;
+    public function parseImages($content): array;
 
     /**
      * Parse out a list of usernames mentioned in the post contents.
      *
-     * @param string $content The raw content to parse.
+     * @param string|T $content The raw content to parse.
      *
      * @return string[] A list of usernames.
      */
-    public function parseMentions(string $content, bool $skipTaggedContent = true): array;
+    public function parseMentions($content, bool $skipTaggedContent = true): array;
 
     /**
      * @param bool $extendContent
@@ -140,8 +154,8 @@ interface FormatInterface
     /**
      * Parse out every user mention from a post.
      *
-     * @param string $body
+     * @param string|T $body
      * @return array Username mentioned in the post.
      */
-    public function parseAllMentions(string $body): array;
+    public function parseAllMentions($body): array;
 }

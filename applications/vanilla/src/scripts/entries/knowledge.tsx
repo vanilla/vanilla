@@ -4,8 +4,12 @@
  */
 
 import { registerReducer } from "@library/redux/reducerRegistry";
+import COMMUNITY_SEARCH_SOURCE from "@library/search/CommunitySearchSource";
+import { onReady } from "@library/utility/appUtils";
 import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
-import { registerCommunitySearchDomain } from "@vanilla/addon-vanilla/search/registerCommunitySearchDomain";
+import DISCUSSIONS_SEARCH_DOMAIN from "../search/DiscussionsSearchDomain";
 
 registerReducer("forum", forumReducer);
-registerCommunitySearchDomain();
+onReady(() => {
+    COMMUNITY_SEARCH_SOURCE.addDomain(DISCUSSIONS_SEARCH_DOMAIN);
+});

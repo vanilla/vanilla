@@ -11,7 +11,6 @@ use Garden\Schema\Invalid;
 use Garden\Schema\Schema;
 use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
-use Vanilla\Utility\ArrayUtils;
 
 /**
  * A chippy little class that represents a range of values. It supports string parsing and data validation.
@@ -217,10 +216,11 @@ EOT;
     /**
      * Create a range validation schema.
      *
-     * @param Schema $valueSchema
+     * @param Schema|null $valueSchema
+     * @param bool $allowRevalidate
      * @return Schema
      */
-    public static function createSchema($valueSchema = null): Schema
+    public static function createSchema($valueSchema = null, bool $allowRevalidate = false): Schema
     {
         if (is_array($valueSchema)) {
             $valueSchema = Schema::parse($valueSchema);
@@ -235,7 +235,8 @@ EOT;
                 "format" => "range-filter",
             ],
             $class,
-            $valueSchema
+            $valueSchema,
+            $allowRevalidate
         ) extends Schema {
             /**
              * @var Schema|null
@@ -247,14 +248,22 @@ EOT;
              */
             private $class;
 
+            /** @var bool */
+            private bool $allowRevalidate;
+
             /**
              *  {@inheritDoc}
              */
-            public function __construct($schema, string $class, ?Schema $valueSchema = null)
-            {
+            public function __construct(
+                $schema,
+                string $class,
+                ?Schema $valueSchema = null,
+                bool $allowRevalidate = false
+            ) {
                 parent::__construct($schema);
                 $this->valueSchema = $valueSchema;
                 $this->class = $class;
+                $this->allowRevalidate = $allowRevalidate;
             }
 
             /**
@@ -262,8 +271,21 @@ EOT;
              */
             public function validate($data, $sparse = false)
             {
+                if ($this->allowRevalidate && $data instanceof RangeExpression) {
+                    return $data;
+                }
                 $r = call_user_func([$this->class, "parse"], $data, $this->valueSchema);
                 return $r;
+            }
+
+            /**
+             * Override jsonSerialize to change the type to a value that Open API understands.
+             *
+             * @return string[]
+             */
+            public function jsonSerialize(): array
+            {
+                return ["type" => "string"] + parent::jsonSerialize();
             }
         };
 

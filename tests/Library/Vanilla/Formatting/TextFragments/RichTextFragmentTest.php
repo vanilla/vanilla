@@ -311,13 +311,25 @@ JSON;
         <p class=blockquote-line>Line <strong>3</strong></p>
     </div>
 </div>
-<pre class="code codeBlock" spellcheck=false tabindex=0>Code Block 1Code Block 2</pre>
+<pre class="code codeBlock" spellcheck=false tabindex=0>Code Block 1
+Code Block 2
+</pre>
 <div class=spoiler>
     <div class=spoiler-buttonContainer contenteditable=false>
     <button class="button-spoiler iconButton js-toggleSpoiler" title="Toggle Spoiler">
         <span class=spoiler-warning>
             <span class=spoiler-warningMain>
-                <SVG />
+                <svg class=spoiler-icon viewbox="0 0 24 24">
+                    <title>Spoiler</title>
+                    <path d="M11.469 15.47c-2.795-.313-4.73-3.017-4.06-5.8l4.06 5.8zM12 16.611a9.65
+                    9.65 0 0 1-8.333-4.722 9.569 9.569 0 0 1 3.067-3.183L5.778 7.34a11.235 11.235 0 0 0-3.547 3.703 1.667
+                    1.667 0 0 0 0 1.692A11.318 11.318 0 0 0 12 18.278c.46 0 .92-.028 1.377-.082l-1.112-1.589a9.867 9.867
+                    0 0 1-.265.004zm9.77-3.876a11.267 11.267 0 0 1-4.985 4.496l1.67 2.387a.417.417 0 0 1-.102.58l-.72.504a.417.417
+                    0 0 1-.58-.102L5.545 4.16a.417.417 0 0 1 .102-.58l.72-.505a.417.417 0 0 1 .58.103l1.928 2.754A11.453 11.453 0
+                    0 1 12 5.5c4.162 0 7.812 2.222 9.77 5.543.307.522.307 1.17 0 1.692zm-1.437-.846A9.638 9.638 0 0 0 12.828
+                    7.2a1.944 1.944 0 1 0 3.339 1.354 4.722 4.722 0 0 1-1.283 5.962l.927 1.324a9.602 9.602 0 0 0 4.522-3.952z" fill=currentColor>
+</path>
+</svg>
                 <span class=spoiler-warningLabel> Spoiler Warning </span>
             </span>
             <span class=spoiler-chevron>
@@ -388,7 +400,7 @@ HTML;
             "i" => ["<i>foo</i>", "<em>foo</em>"],
             "link" => [
                 '<a href="http://example.com">link</a>',
-                '<a href="http://example.com" rel="nofollow noreferrer ugc">link</a>',
+                '<a href="http://example.com" rel="nofollow noopener ugc">link</a>',
             ],
             "strike" => ["<s>strike</s>"],
             "code" => ["<code>foo</code>", '<code class="code codeInline" spellcheck="false" tabindex="0">foo</code>'],

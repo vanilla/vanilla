@@ -8,7 +8,7 @@ import React from "react";
 import classNames from "classnames";
 import { t } from "@library/utility/appUtils";
 import { splitStringLoosely } from "@vanilla/utils";
-import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
+import { richEditorClasses } from "@library/editor/richEditorStyles";
 import { IUserFragment } from "@library/@types/api/users";
 import { UserPhoto } from "@library/headers/mebox/pieces/UserPhoto";
 

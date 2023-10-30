@@ -4,14 +4,14 @@
  * @license Proprietary
  */
 
-import Loadable from "react-loadable";
 import React from "react";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import Loader from "@library/loaders/Loader";
+import { createLoadableComponent } from "@vanilla/react-utils";
 
-export const Tokens = Loadable({
-    loader: () => import(/* webpackChunkName: "forms/select/Tokens" */ "@library/forms/select/Tokens.loadable"),
-    loading() {
+export const Tokens = createLoadableComponent({
+    loadFunction: () => import(/* webpackChunkName: "forms/select/Tokens" */ "@library/forms/select/Tokens.loadable"),
+    fallback() {
         return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
     },
 });

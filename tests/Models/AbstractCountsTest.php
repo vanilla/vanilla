@@ -99,7 +99,7 @@ abstract class AbstractCountsTest extends SiteTestCase
 
         // Reload discussions
         $discussionsRows = $this->discussionModel
-            ->getWhere(["DiscussionID" => array_keys($this->discussions)])
+            ->getWhere(["DiscussionID" => array_keys($this->discussions), "Announce" => false])
             ->resultArray();
         $this->discussions = [];
         foreach ($discussionsRows as $discussionsRow) {

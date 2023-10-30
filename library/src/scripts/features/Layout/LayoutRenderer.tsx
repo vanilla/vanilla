@@ -98,7 +98,7 @@ interface ILayoutRenderContext {
  * This function will turn a component configuration into its matching registered react component
  */
 function resolveDynamicComponent(
-    componentConfig: IHydratedLayoutWidget | null,
+    componentConfig: IHydratedLayoutWidget<any> | null,
     context: ILayoutRenderContext,
     reactKey?: React.Key,
 ): React.ReactNode {

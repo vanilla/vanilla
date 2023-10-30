@@ -13,14 +13,19 @@ import { StackingContextProvider } from "@vanilla/react-utils";
 import { CollectionsForm } from "@library/featuredCollections/CollectionsForm";
 import { ICollectionResource } from "@library/featuredCollections/Collections.variables";
 
-export function CollectionsOptionButton(props: ICollectionResource) {
-    const [isVisible, setIsVisible] = useState(false);
+interface IProps extends ICollectionResource {
+    modalOnly?: boolean;
+    initialVisibility?: boolean;
+}
+
+export function CollectionsOptionButton(props: IProps) {
+    const [isVisible, setIsVisible] = useState(props.initialVisibility || false);
     const open = () => setIsVisible(true);
     const close = () => setIsVisible(false);
 
     return (
         <>
-            <DropDownItemButton onClick={open}>{t("Add to Collection")}</DropDownItemButton>
+            {!props.modalOnly && <DropDownItemButton onClick={open}>{t("Add to Collection")}</DropDownItemButton>}
             <StackingContextProvider>
                 <Modal isVisible={isVisible} size={ModalSizes.MEDIUM} exitHandler={close}>
                     <CollectionsForm {...props} onSuccess={close} onCancel={close} />

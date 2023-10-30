@@ -25,7 +25,7 @@ use Vanilla\Community\CategoriesModule;
 use Vanilla\Contracts\Addons\EventListenerConfigInterface;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
-use Vanilla\Contracts\Site\AbstractSiteProvider;
+use Vanilla\Contracts\Site\VanillaSiteProvider;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Dashboard\Controllers\API\ConfigApiController;
@@ -58,6 +58,7 @@ use Vanilla\Widgets\WidgetService;
 use VanillaTests\APIv0\TestDispatcher;
 use VanillaTests\Fixtures\Authenticator\MockAuthenticator;
 use VanillaTests\Fixtures\Authenticator\MockSSOAuthenticator;
+use VanillaTests\Fixtures\FileUtils;
 use VanillaTests\Fixtures\MockEmail;
 use VanillaTests\Fixtures\MockWidgets\MockWidget1;
 use VanillaTests\Fixtures\MockWidgets\MockWidget2;
@@ -165,7 +166,7 @@ class Bootstrap
             ->addAlias("Config")
             ->addAlias(\Gdn_Configuration::class)
 
-            ->rule(AbstractSiteProvider::class)
+            ->rule(VanillaSiteProvider::class)
             ->setClass(OwnSiteProvider::class)
 
             ->rule(SiteSectionProviderInterface::class)
@@ -532,7 +533,6 @@ class Bootstrap
         // Set some server globals.
         $baseUrl = $this->getBaseUrl();
 
-        $this->setServerGlobal("X_REWRITE", true);
         $this->setServerGlobal("REMOTE_ADDR", "1.2.3.4"); // Simulate a test IP address.
         $this->setServerGlobal("HTTP_HOST", parse_url($baseUrl, PHP_URL_HOST));
         $this->setServerGlobal("SERVER_NAME", parse_url($baseUrl, PHP_URL_HOST));
@@ -540,7 +540,7 @@ class Bootstrap
         $this->setServerGlobal("SCRIPT_NAME", parse_url($baseUrl, PHP_URL_PATH));
         $this->setServerGlobal("PATH_INFO", "");
         $this->setServerGlobal("REQUEST_URI", "");
-        $this->setServerGlobal("HTTPS", parse_url($baseUrl, PHP_URL_SCHEME) === "https");
+        $this->setServerGlobal("HTTPS", parse_url($baseUrl, PHP_URL_SCHEME) === "https" ? "on" : "off");
 
         $GLOBALS["dic"] = $container;
         Gdn::setContainer($container);
@@ -640,13 +640,8 @@ class Bootstrap
      */
     public function getConfigPath()
     {
-        $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
-        $path = parse_url($this->getBaseUrl(), PHP_URL_PATH);
-        if ($path) {
-            $path = "-" . ltrim(str_replace("/", "-", $path), "-");
-        }
-
-        return PATH_ROOT . "/conf/{$host}{$path}.php";
+        $configPath = str_replace(["http://", "https://"], ["", ""], $this->getBaseUrl());
+        return PATH_ROOT . "/conf/{$configPath}.php";
     }
 
     /**
@@ -678,8 +673,8 @@ class Bootstrap
         }
 
         // And set caching to the 'temp' directory
-        $loader->setAutoRefresh(true);
-        $loader->setTempDirectory(PATH_CACHE . "/tests/autoloader");
+        $loader->setAutoRefresh();
+        $loader->setTempDirectory(sys_get_temp_dir());
         $loader->register();
     }
 }

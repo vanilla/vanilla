@@ -9,6 +9,7 @@ import smoothscroll from "smoothscroll-polyfill";
 
 smoothscroll.polyfill();
 
+export * from "./downloadAsFile";
 export * from "./domData";
 export * from "./emoji";
 export * from "./EscapeListener";

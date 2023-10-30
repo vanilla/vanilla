@@ -18,9 +18,7 @@
             ],
             "type": "node"
         },
-
         {
-            // Execute "yarn test:browser:debug" prior to attaching.
             "type": "chrome",
             "request": "attach",
             "name": "Attach to \"yarn test:browser:debug\"",
@@ -46,6 +44,30 @@
                 "max_children": 100,
                 "max_depth": 5
             }
+        },
+        {
+            "type": "node",
+            "name": "vscode-jest-tests.v2",
+            "request": "launch",
+            "env": {
+                "JEST": "true"
+            },
+            "runtimeArgs": [
+                "--preserve-symlinks",
+                "--preserve-symlinks-main",
+            ],
+            "args": [
+                "--runInBand",
+                "--watchAll=false",
+                "--testNamePattern",
+                "${jest.testNamePattern}",
+                "--runTestsByPath",
+                "${jest.testFile}"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "program": "node_modules/.bin/jest"
         }
     ]
 }

@@ -48,7 +48,7 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     public function __construct(string $action, array $payload, $sender = null)
     {
         parent::__construct($action, $payload, $sender);
-        $this->addApiParams(["expand" => ["tagIDs", "crawl"]]);
+        $this->addApiParams(["expand" => "tagIDs,crawl,roles"]);
     }
 
     /**
@@ -272,5 +272,10 @@ class DiscussionEvent extends ResourceEvent implements LoggableEventInterface, T
     public function setOldStatusID(int $oldStatusID)
     {
         $this->payload["oldStatusID"] = $oldStatusID;
+    }
+
+    public function getSiteSectionID(): ?string
+    {
+        return $this->payload["discussion"]["siteSectionIDs"][0] ?? null;
     }
 }

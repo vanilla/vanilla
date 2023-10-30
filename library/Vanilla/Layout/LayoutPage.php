@@ -7,9 +7,13 @@
 
 namespace Vanilla\Layout;
 
+use Garden\Container\ContainerException;
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Dashboard\Controllers\API\LayoutsApiController;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Layout\Asset\LayoutFormAsset;
 use Vanilla\Web\Asset\ExternalAsset;
 use Vanilla\Web\JsInterpop\RawReduxAction;
@@ -21,13 +25,12 @@ use Vanilla\Web\ThemedPage;
 class LayoutPage extends ThemedPage
 {
     /** @var LayoutsApiController */
-    public $layoutsApiController;
+    public LayoutsApiController $layoutsApiController;
 
     /**
      * Constructor.
      *
-     * @throws \Garden\Container\ContainerException Container Axception.
-     * @throws \Garden\Container\NotFoundException Not found Exception.
+     * @param LayoutsApiController $layoutsApiController
      */
     public function __construct(LayoutsApiController $layoutsApiController)
     {
@@ -61,15 +64,20 @@ class LayoutPage extends ThemedPage
      *
      * @return $this
      * @throws ClientException Client Exception.
+     * @throws HttpException Http Exception.
      * @throws NotFoundException Not Found Exception.
-     * @throws \Garden\Schema\ValidationException Validation Exception.
-     * @throws \Garden\Web\Exception\HttpException Http Exception.
+     * @throws ValidationException Validation Exception.
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws PermissionException
      */
     public function preloadLayout(LayoutFormAsset $layoutFormAsset): self
     {
         $query = (array) $layoutFormAsset;
 
         $layoutData = $this->layoutsApiController->get_lookupHydrate($query)->getData();
+        $this->setSeoContent($layoutData["seo"]["htmlContents"] ?? "");
+
         $layoutID = $layoutData["layoutID"];
         $layoutWidgetAssets = $this->layoutsApiController->get_hydrateAssets($layoutID)->getData();
 
@@ -91,8 +99,12 @@ class LayoutPage extends ThemedPage
         $this->setJsonLDItems($json);
         $this->setSeoTitle($seo["title"]);
         $this->setSeoDescription($seo["description"]);
-        $this->addMetaTag($seo["meta"]);
-        $this->addLinkTag($seo["links"]);
+        foreach ($seo["meta"] as $meta) {
+            $this->addMetaTag($meta);
+        }
+        foreach ($seo["links"] as $link) {
+            $this->addLinkTag($link);
+        }
 
         $reduxActionPending = new RawReduxAction([
             "type" => "@@layouts/lookup/pending",

@@ -33,7 +33,9 @@ export interface IHomeWidgetItemProps {
     iconUrl?: string;
     iconUrlSrcSet?: ImageSourceSet;
     name?: string;
+    nameClassName?: string;
     description?: string;
+    descriptionClassName?: string;
     metas?: string;
     counts?: ICountResult[];
     url?: string;
@@ -68,7 +70,7 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
 
     useDebugValue({ opts: options });
 
-    if (props.children) {
+    if (props.children && !Array.isArray(props.children)) {
         return (
             <SmartLink
                 to={props.to}
@@ -185,7 +187,7 @@ function HomeWidgetStaticContent(props: IHomeWidgetItemProps & { extraChildren?:
 
     return (
         <div className={classes.content}>
-            <Heading depth={3} className={classes.name}>
+            <Heading depth={3} className={cx(classes.name, props.nameClassName)}>
                 {props.name}
             </Heading>
             {[
@@ -196,7 +198,11 @@ function HomeWidgetStaticContent(props: IHomeWidgetItemProps & { extraChildren?:
             ].includes(options.contentType) &&
                 options.display.description &&
                 props.description && (
-                    <TruncatedText maxCharCount={160} tag={"div"} className={classes.description}>
+                    <TruncatedText
+                        maxCharCount={160}
+                        tag={"div"}
+                        className={cx(classes.description, props.descriptionClassName)}
+                    >
                         {props.description}
                     </TruncatedText>
                 )}
@@ -216,7 +222,7 @@ function HomeWidgetAbsoluteContent(props: IHomeWidgetItemProps) {
         <>
             <div className={classes.absoluteContent}>
                 {options.display.name && (
-                    <Heading depth={3} className={classes.absoluteName}>
+                    <Heading depth={3} className={cx(classes.absoluteName, props.nameClassName)}>
                         {props.name}
                     </Heading>
                 )}

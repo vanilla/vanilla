@@ -1,0 +1,28 @@
+[
+  {
+    "type": "table",
+    "children": [
+      {
+        "type": "p",
+        "children": [
+          {
+            "text": "paragraph in table"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "table",
+    "children": [
+      {
+        "type": "td",
+        "children": [
+          {
+            "text": "paragraph in table"
+          }
+        ]
+      }
+    ]
+  }
+]

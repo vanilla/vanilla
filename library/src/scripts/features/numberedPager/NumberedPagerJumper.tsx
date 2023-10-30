@@ -33,7 +33,6 @@ export function NumberedPagerJumper(props: IProps) {
             tempValue = parseInt(tempValue);
             if (tempValue < 1) tempValue = 1;
             if (tempValue > props.totalPages) tempValue = props.totalPages;
-            if (tempValue > 100) tempValue = 100;
         }
         setPageNumber(tempValue.toString());
     };
@@ -57,7 +56,7 @@ export function NumberedPagerJumper(props: IProps) {
                     </Button>
                 </span>
             </ToolTip>
-            Jump to page
+            {t("Jump to page")}
             <InputTextBlock
                 inputProps={{
                     value: pageNumber,
@@ -67,9 +66,9 @@ export function NumberedPagerJumper(props: IProps) {
                 className={classes.jumperInput}
                 baseClass={InputTextBlockBaseClass.CUSTOM}
             />
-            of {props.hasMorePages ? "100" : props.totalPages}
+            {t("of")} {props.totalPages}
             <Button onClick={handleSelectPage} className={classes.jumperButton} buttonType={ButtonTypes.PRIMARY}>
-                Go
+                {t("Go")}
             </Button>
         </>
     );

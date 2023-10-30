@@ -31,7 +31,11 @@ class DiscussionNotificationsTest extends \VanillaTests\SiteTestCase
         $user = $this->createUser();
         $discussion = $this->createDiscussion(["body" => "I'm mentioning @{$user["name"]}"]);
         $this->assertUserHasNotificationsLike($user, [
-            new ExpectedNotification("DiscussionMention", ["mentioned you in", $discussion["name"]], "mention"),
+            new ExpectedNotification(
+                "DiscussionMention",
+                ["mentioned you in", $discussion["name"]],
+                "mention, DiscussionMention"
+            ),
         ]);
     }
 
@@ -44,7 +48,10 @@ class DiscussionNotificationsTest extends \VanillaTests\SiteTestCase
             $notifyUser = $this->createUser();
             $authorUser = $this->createUser();
             $notifyCategory = $this->createCategory();
-            $this->setCategoryPreference($notifyUser, $notifyCategory, \CategoryModel::NOTIFICATION_DISCUSSIONS);
+            $this->setCategoryPreference($notifyUser, $notifyCategory, [
+                "preferences.followed" => true,
+                "preferences.popup.posts" => true,
+            ]);
 
             $notifyDiscussion = $this->runWithUser(function () use ($notifyUser) {
                 return $this->createDiscussion([
@@ -56,7 +63,7 @@ class DiscussionNotificationsTest extends \VanillaTests\SiteTestCase
                 new ExpectedNotification(
                     "DiscussionMention",
                     ["mentioned you in", $notifyDiscussion["name"]],
-                    "mention, advanced"
+                    "mention, DiscussionMention, advanced"
                 ),
             ]);
 
@@ -74,7 +81,7 @@ class DiscussionNotificationsTest extends \VanillaTests\SiteTestCase
                 new ExpectedNotification(
                     "Discussion",
                     ["Started a new discussion", $notifyDiscussion["name"]],
-                    "advanced"
+                    "advanced, Discussion"
                 ),
             ]);
         });

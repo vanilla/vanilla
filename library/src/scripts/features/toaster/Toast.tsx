@@ -24,13 +24,15 @@ interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     className?: string;
     /** If a close button be rendered */
     dismissible?: boolean;
+
+    wide?: boolean;
 }
 
 /**
  * Render a toast component
  */
 export function Toast(props: IProps) {
-    const { children, role, className, visibility, autoCloseDuration, onVisibilityChange, dismissible } = props;
+    const { children, role, className, visibility, autoCloseDuration, onVisibilityChange, wide, dismissible } = props;
 
     const classes = toastClasses();
 
@@ -54,7 +56,7 @@ export function Toast(props: IProps) {
     return (
         <EntranceAnimation isEntered={display} fromDirection={FromDirection.LEFT}>
             <div
-                className={cx(classes.root, className)}
+                className={cx(classes.root, className, wide && classes.wide)}
                 role={role ?? "status"}
                 aria-live={"assertive"}
                 aria-atomic={true}

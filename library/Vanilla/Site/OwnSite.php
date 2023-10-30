@@ -7,10 +7,12 @@
 
 namespace Vanilla\Site;
 
+use Garden\Container\Container;
+use Garden\Sites\Cluster;
+use Garden\Sites\Mock\MockSiteProvider;
+use Garden\Sites\SiteRecord;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Contracts\Site\Site;
-use Vanilla\Formatting\Formats\HtmlFormat;
-use Vanilla\Formatting\FormatService;
+use Vanilla\Contracts\Site\VanillaSite;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
 use Vanilla\Http\InternalClient;
 
@@ -20,10 +22,14 @@ use Vanilla\Http\InternalClient;
  * - IDs are pulled from configuration.
  * - HttpClient is an `InternalClient` so requests don't actually go through HTTP.
  */
-class OwnSite extends Site
+class OwnSite extends VanillaSite
 {
     const CONF_ACCOUNT_ID = "Vanilla.AccountID";
     const CONF_SITE_ID = "Vanilla.SiteID";
+    const CONF_CLUSTER_ID = "Vanilla.ClusterID";
+    const CONF_CLUSTER_REGION_ID = "Vanilla.ClusterRegionID";
+
+    private ConfigurationInterface $config;
 
     /**
      * DI.
@@ -31,24 +37,60 @@ class OwnSite extends Site
      * @param ConfigurationInterface $config
      * @param HtmlPlainTextConverter $plainTextConverter
      * @param \Gdn_Request $request
-     * @param InternalClient $internalClient
+     * @param Container $container
      */
     public function __construct(
         ConfigurationInterface $config,
         HtmlPlainTextConverter $plainTextConverter,
         \Gdn_Request $request,
-        InternalClient $internalClient
+        Container $container
     ) {
+        $this->config = $config;
         $name = $plainTextConverter->convert($config->get("Garden.Title", ""));
-        $internalClient->setBaseUrl("");
-        $internalClient->setThrowExceptions(true);
-
         parent::__construct(
             $name,
-            $request->getSimpleUrl(""),
-            $config->get(self::CONF_SITE_ID, -1),
-            $config->get(self::CONF_ACCOUNT_ID, -1),
-            $internalClient
+            new SiteRecord(
+                $config->get(self::CONF_SITE_ID, -1),
+                $config->get(self::CONF_ACCOUNT_ID, -1),
+                $config->get(self::CONF_CLUSTER_ID, "cl00000"),
+                $request->getSimpleUrl("")
+            ),
+            new MockSiteProvider()
         );
+        $ownSiteProvider = new OwnSiteProvider($this);
+        $this->setSiteProvider($ownSiteProvider);
+        $internalClient = new InternalClient($container, $this, "");
+        $internalClient->setThrowExceptions(true);
+
+        $this->setHttpClient($internalClient);
+    }
+
+    /**
+     * @param int $siteID
+     * @return void
+     */
+    public function setSiteID(int $siteID): void
+    {
+        $this->siteRecord = new SiteRecord($siteID, $this->getAccountID(), $this->getClusterID(), $this->getBaseUrl());
+    }
+
+    /**
+     * @return Cluster
+     */
+    public function getCluster(): Cluster
+    {
+        return new Cluster(
+            $this->getClusterID(),
+            $this->config->get(self::CONF_CLUSTER_REGION_ID, Cluster::REGION_LOCALHOST)
+        );
+    }
+
+    /**
+     * Overridden to provide local site config.
+     * @inheritDoc
+     */
+    protected function loadSiteConfig(): array
+    {
+        return $this->config->get(".", []);
     }
 }

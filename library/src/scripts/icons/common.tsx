@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,7 +10,6 @@ import { t } from "@library/utility/appUtils";
 import { iconClasses } from "@library/icons/iconStyles";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
 import { cx } from "@emotion/css";
-import { Icon } from "@vanilla/icons";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -152,7 +151,6 @@ export function RightChevronSmallIcon(props: { className?: string; "aria-hidden"
         >
             <title>{title}</title>
             <path
-                transform="translate(0 50%)"
                 fill="currentColor"
                 d="M13.8,12l-6,6c-0.4,0.4-0.4,1.2,0,1.6c0.4,0.4,1.2,0.4,1.6,0l6.8-6.9c0.4-0.4,0.4-1.2,0-1.6L9.4,4.3
 				C9,3.9,8.3,3.9,7.8,4.3C7.4,4.8,7.4,5.5,7.8,6L13.8,12z"
@@ -173,7 +171,6 @@ export function LeftChevronSmallIcon(props: { className?: string; "aria-hidden"?
         >
             <title>{title}</title>
             <path
-                transform="translate(0 50%)"
                 fill="currentColor"
                 d="M9.2,12l6-6c0.4-0.4,0.4-1.2,0-1.6c-0.4-0.4-1.2-0.4-1.6,0l-6.8,6.9c-0.4,0.4-0.4,1.2,0,1.6l6.8,6.9
 				c0.4,0.4,1.2,0.4,1.6,0c0.4-0.4,0.4-1.2,0-1.6L9.2,12z"
@@ -1064,32 +1061,6 @@ export function NewPollIcon(props: { className?: string; "area-hidden"?: areaHid
                 strokeWidth="0.9px"
                 fillRule="evenodd"
             />
-        </svg>
-    );
-}
-
-export function FeatureIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
-    const classes = iconClasses();
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            className={classNames(classes.featureIcon, props.className)}
-            style={{ height: 24, width: 24 }}
-            aria-hidden={props["aria-hidden"]}
-        >
-            <g fill="none" fillRule="evenodd" opacity="1.0">
-                <g stroke="currentColor" strokeWidth="1.0">
-                    <g>
-                        <path
-                            d="M10 14.329L5.365 16.766 6.25 11.604 2.5 7.949 7.682 7.196 10 2.5 12.318 7.196 17.5 7.949 13.75 11.604 14.635 16.766z"
-                            transform="translate(-1167 -297) translate(1167 297)"
-                        />
-                    </g>
-                </g>
-            </g>
         </svg>
     );
 }

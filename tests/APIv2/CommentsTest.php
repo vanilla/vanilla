@@ -18,6 +18,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  */
 class CommentsTest extends AbstractResourceTest
 {
+    public static $addons = ["stubcontent"];
+
     use TestExpandTrait;
     use AssertLoggingTrait;
     use TestPrimaryKeyRangeFilterTrait;

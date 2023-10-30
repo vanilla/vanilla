@@ -9,6 +9,7 @@ namespace VanillaTests\Models;
 use League\Uri\Http;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Utility\ModelUtils;
 use VanillaTests\Bootstrap;
@@ -27,7 +28,9 @@ use ActivityModel;
 class UserModelTest extends SiteTestCase
 {
     use EventSpyTestTrait;
-    use UsersAndRolesApiTestTrait;
+    use UsersAndRolesApiTestTrait {
+        createUser as protected createUserByApi;
+    }
 
     public static $addons = ["vanilla", "dashboard", "conversations"];
 
@@ -62,6 +65,8 @@ class UserModelTest extends SiteTestCase
     /** @var \SessionModel */
     private $sessionModel;
 
+    private ProfileFieldModel $profileFieldModel;
+
     /** @var \Gdn_Configuration */
     private $config;
 
@@ -94,6 +99,7 @@ class UserModelTest extends SiteTestCase
         $this->conversationModel = $this->container()->get(\ConversationModel::class);
         $this->conversationMessageModel = $this->container()->get(\ConversationMessageModel::class);
         $this->sessionModel = $this->container()->get(\SessionModel::class);
+        $this->profileFieldModel = $this->container()->get(ProfileFieldModel::class);
 
         // Add a couple of test SSO roles.
         $this->ssoRoleID1 = $this->defineRole(["Name" => "SSO 1", "Sync" => "sso"]);
@@ -444,14 +450,16 @@ class UserModelTest extends SiteTestCase
      */
     private function createUser(string $userName)
     {
-        $rand = rand(10, 1000);
+        $rand = randomString(25);
         $user = [
             "Name" => $userName,
             "Email" => $rand . "test@example.com",
             "Password" => randomString(\Gdn::config("Garden.Password.MinLength")),
         ];
 
-        return $this->userModel->save($user);
+        $id = $this->userModel->save($user);
+        ModelUtils::validationResultToValidationException($this->userModel);
+        return $id;
     }
 
     /**
@@ -761,13 +769,13 @@ class UserModelTest extends SiteTestCase
             "Body" => "This is a test message",
         ]);
 
-        $activityCountBeforeOldUser = $this->activityModel->getCount($oldUserID);
+        $activityCountBeforeOldUser = $this->activityModel->getCount([], $oldUserID);
 
         // Merge the 2 users.
         $result = $this->userModel->merge($oldUserID, $newUserID);
 
         // Verify all counts are correct after merging the users.=
-        $activityCountAfter = $this->activityModel->getCount($newUserID);
+        $activityCountAfter = $this->activityModel->getCount([], $newUserID);
         $this->assertEquals($activityCountBeforeOldUser, $activityCountAfter);
         $discussionCountAfter = $this->discussionModel->getCount(["d.InsertUserID" => $newUserID]);
         $commentCountAfter = $this->commentModel->getCountWhere([
@@ -789,10 +797,14 @@ class UserModelTest extends SiteTestCase
         // As an admin...
         $this->getSession()->start($this->adminID);
 
-        $html = $this->bessy()->getHtml("/dashboard/user", [], ["deliveryType" => DELIVERY_TYPE_ALL]);
+        // on legacy table only, we don't have password column on new one (even on the existing one?)
+        // cleanup NewUserManagement, will be gone here https://higherlogic.atlassian.net/browse/VNLA-4044 once we permanently release the new page/table
+        $this->runWithConfig(["Feature.NewUserManagement.Enabled" => false], function () {
+            $html = $this->bessy()->getHtml("/dashboard/user", [], ["deliveryType" => DELIVERY_TYPE_ALL]);
 
-        // There should be a "Password" column.
-        $html->assertCssSelectorTextContains("#Users.table-data", "Password");
+            // There should be a "Password" column.
+            $html->assertCssSelectorTextContains("#Users.table-data", "Password");
+        });
     }
 
     /**
@@ -831,34 +843,42 @@ class UserModelTest extends SiteTestCase
      */
     public function testSearchDashboardUserByPassword(): void
     {
-        // Load users.
-        $users = $this->userModel->getLike()->resultArray();
+        // on legacy table only, we don't have password column on new one (even on the existing one?)
+        // cleanup NewUserManagement, will be gone here https://higherlogic.atlassian.net/browse/VNLA-4044 once we permanently release the new page/table
+        $this->runWithConfig(["Feature.NewUserManagement.Enabled" => false], function () {
+            // Load users.
+            $users = $this->userModel->getLike()->resultArray();
 
-        // We pick 2 users with different Passwords
-        $firstUser = reset($users);
-        $lastUser = end($users);
-        $this->assertNotEquals($firstUser["Password"], $lastUser["Password"]);
+            // We pick 2 users with different Passwords
+            $firstUser = reset($users);
+            $lastUser = end($users);
+            $this->assertNotEquals($firstUser["Password"], $lastUser["Password"]);
 
-        // As an admin...
-        $this->getSession()->start($this->adminID);
+            // As an admin...
+            $this->getSession()->start($this->adminID);
 
-        // We do a search for one, confirm the other is not listed.
-        $formValues = [
-            "Keywords" => $firstUser["Password"],
-        ];
+            // We do a search for one, confirm the other is not listed.
+            $formValues = [
+                "Keywords" => $firstUser["Password"],
+            ];
 
-        $html = $this->bessy()->getHtml("/dashboard/user/browse", $formValues, ["deliveryType" => DELIVERY_TYPE_ALL]);
-        $html->assertCssSelectorTextContains("#Users.table-data", $firstUser["Name"]);
-        $html->assertCssSelectorNotTextContains("#Users.table-data", $lastUser["Name"]);
+            $html = $this->bessy()->getHtml("/dashboard/user/browse", $formValues, [
+                "deliveryType" => DELIVERY_TYPE_ALL,
+            ]);
+            $html->assertCssSelectorTextContains("#Users.table-data", $firstUser["Name"]);
+            $html->assertCssSelectorNotTextContains("#Users.table-data", $lastUser["Name"]);
 
-        // We do a search for the other one & confirm the first one is not listed.
-        $formValues = [
-            "Keywords" => $lastUser["Password"],
-        ];
+            // We do a search for the other one & confirm the first one is not listed.
+            $formValues = [
+                "Keywords" => $lastUser["Password"],
+            ];
 
-        $html = $this->bessy()->getHtml("/dashboard/user/browse", $formValues, ["deliveryType" => DELIVERY_TYPE_ALL]);
-        $html->assertCssSelectorTextContains("#Users.table-data", $lastUser["Name"]);
-        $html->assertCssSelectorNotTextContains("#Users.table-data", $firstUser["Name"]);
+            $html = $this->bessy()->getHtml("/dashboard/user/browse", $formValues, [
+                "deliveryType" => DELIVERY_TYPE_ALL,
+            ]);
+            $html->assertCssSelectorTextContains("#Users.table-data", $lastUser["Name"]);
+            $html->assertCssSelectorNotTextContains("#Users.table-data", $firstUser["Name"]);
+        });
     }
 
     /**
@@ -1074,7 +1094,10 @@ class UserModelTest extends SiteTestCase
     {
         $user1 = $this->createUser("user1");
         $deleted1 = $this->createUser("Deleted User");
-        $deleted2 = $this->createUser("Deleted User");
+
+        // Hack around to create 2 users with the same name.
+        $deleted2 = $this->createUser("Deleted User2");
+        $this->userModel->setField($deleted2, "Name", "Deleted User");
 
         $actual = $this->userModel->getUserIDsForUserNames(["user1", "Deleted User"]);
         $this->assertEquals(
@@ -1148,5 +1171,142 @@ class UserModelTest extends SiteTestCase
         $userData["InvitationCode"] = $invitation["code"];
         $userID = $this->userModel->insertForInvite($userData);
         $doAssertions($userID);
+    }
+
+    /**
+     * Tests that when a user updates their password, their other open sessions are invalidated.
+     */
+    public function testPasswordChangeInvalidatesOtherSessions()
+    {
+        $sessionModel = new \SessionModel();
+        $userID = $this->createUser(__FUNCTION__);
+
+        $session = $this->getSession();
+        $session->start($userID);
+
+        // Clear cookie identity
+        \Gdn::factory("Identity")->setIdentity();
+
+        $session->start($userID);
+
+        // We should have 2 sessions in the database for the same user
+        $this->assertCount(2, $sessionModel->getSessions($userID));
+
+        // Password change
+        $this->userModel->save([
+            "UserID" => $userID,
+            "Password" => randomString(\Gdn::config("Garden.Password.MinLength")),
+        ]);
+
+        $sessions = $sessionModel->getSessions($userID);
+
+        // Now we should just have 1 session in the database with its sessionID matching the current session
+        $this->assertCount(1, $sessions);
+        $this->assertEquals(\Gdn::authenticator()->getSession(), $sessions[0]["SessionID"]);
+
+        $session->end();
+    }
+
+    /**
+     * Tests that getUserIDsForIPAddresses returns an array of userIDs for users associated with any of the given IP addresses.
+     */
+    public function testGetUserIDsForIPAddresses()
+    {
+        $user1ID = $this->createUser(__FUNCTION__ . "1");
+        $user2ID = $this->createUser(__FUNCTION__ . "2");
+        $this->userModel->saveIP($user1ID, "101.102.103.104");
+        $this->userModel->saveIP($user2ID, "2001:db8:3333:4444:5555:6666:7777:8888");
+        $userIDs = $this->userModel->getUserIDsForIPAddresses([
+            "101.102.103.104",
+            "2001:db8:3333:4444:5555:6666:7777:8888",
+        ]);
+        $this->assertSame(array_map("intval", [$user1ID, $user2ID]), $userIDs);
+    }
+
+    /**
+     * Test giveRolesByEmail method.
+     */
+    public function testGiveRolesByEmail()
+    {
+        $userID = $this->createUser(__FUNCTION__);
+        $role = $this->createRole(["Domains" => "hl.com example.com vanilla.com"]);
+        $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+        $this->userModel->giveRolesByEmail($user);
+        $roles = $this->userModel->getRoleIDs($userID);
+        // Role not assigned when user's email is not confirmed.
+        $this->assertNotContains($role["roleID"], $roles);
+
+        $this->userModel->setField($userID, "Confirmed", 1);
+        $roles = $this->userModel->getRoleIDs($userID);
+        // Role is assigned when user's email is confirmed.
+        $this->assertContains($role["roleID"], $roles);
+    }
+
+    /**
+     * Tests that searchCount returns the correct result with or without an explicit max limit.
+     */
+    public function testSearchCount()
+    {
+        $role = $this->createRole();
+        $this->createUserByApi(["roleID" => [$role["roleID"]]]);
+        $this->createUserByApi(["roleID" => [$role["roleID"]]]);
+        $this->createUserByApi(["roleID" => [$role["roleID"]]]);
+        $count = $this->userModel->searchCount(["roleID" => $role["roleID"]]);
+        $this->assertSame(3, $count);
+
+        // Test with explicit upper limit.
+        $this->runWithConfig(["Vanilla.APIv2.MaxCount" => 2], function () use ($role) {
+            $count = $this->userModel->searchCount(["roleID" => $role["roleID"]]);
+            $this->assertSame(2, $count);
+        });
+    }
+
+    /**
+     * Test user permission for a category
+     *
+     * @return void
+     */
+    public function testCategoryViewPermission()
+    {
+        $viewPermission = $this->userModel->getCategoryViewPermission(0, 2);
+        $this->assertFalse($viewPermission);
+        $viewPermission = $this->userModel->getCategoryViewPermission(2, 0);
+        $this->assertFalse($viewPermission);
+        $viewPermission = $this->userModel->getCategoryViewPermission(2, 999);
+        $this->assertTrue($viewPermission);
+    }
+
+    /**
+     * This tests that user events for inserts are dispatched after profile fields are updated
+     * so that listeners have access to profile fields.
+     *
+     * @return void
+     */
+    public function testProfileFieldsUpdatedBeforeEventDispatch()
+    {
+        $this->enableFeature(ProfileFieldModel::FEATURE_FLAG);
+        $profileField = $this->createProfileField(["registrationOptions" => "optional"]);
+        $this->getEventManager()->bind(UserEvent::class, function (UserEvent $event) use ($profileField) {
+            $userID = $event->getUniquePrimaryKeyValue();
+            $userProfileFields = $this->profileFieldModel->getUserProfileFields($userID);
+            $this->assertArrayHasKey($profileField["apiName"], $userProfileFields);
+            $this->assertEquals("hehehe", $userProfileFields[$profileField["apiName"]]);
+
+            return $event;
+        });
+        $this->runWithConfig(["Garden.Registration.Method" => "Basic"], function () use ($profileField) {
+            $this->bessy()->postHtml("/entry/register", [
+                "Email" => "u105@example.com",
+                "Name" => "u105",
+                "Profile" => [
+                    $profileField["apiName"] => "hehehe",
+                ],
+                "Password" => "passwordpassword",
+                "PasswordMatch" => "passwordpassword",
+                "TermsOfService" => "1",
+            ]);
+        });
+
+        $this->disableFeature(ProfileFieldModel::FEATURE_FLAG);
     }
 }

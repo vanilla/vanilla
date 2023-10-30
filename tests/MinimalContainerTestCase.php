@@ -54,7 +54,15 @@ use VanillaTests\Fixtures\SpyingEventManager;
  */
 class MinimalContainerTestCase extends TestCase
 {
-    protected $baseUrl = "http://vanilla.test/minimal-container-test/";
+    protected $baseUrl = "https://vanilla.test/minimal-container-test/";
+
+    /**
+     * @return string
+     */
+    public static function getBaseUrl()
+    {
+        return "https://vanilla.test/minimal-container-test";
+    }
 
     /**
      * Whether or not we should apply the common bootstrap.
@@ -270,6 +278,9 @@ class MinimalContainerTestCase extends TestCase
         parent::setUp();
         $this->setGlobals();
         $this->configureContainer();
+        $this->setConfigs([
+            "Garden.Html.AllowedUrlSchemes" => ["http", "https"],
+        ]);
     }
 
     /**
@@ -279,7 +290,6 @@ class MinimalContainerTestCase extends TestCase
     {
         // Set some server globals.
         $baseUrl = $this->baseUrl;
-        $_SERVER["X_REWRITE"] = true;
         $_SERVER["REMOTE_ADDR"] = "::1"; // Simulate requests from local IPv6 address.
         $_SERVER["HTTP_HOST"] = parse_url($baseUrl, PHP_URL_HOST);
         $_SERVER["SERVER_PORT"] = parse_url($baseUrl, PHP_URL_PORT) ?: null;

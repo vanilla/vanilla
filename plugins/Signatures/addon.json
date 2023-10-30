@@ -13,6 +13,7 @@
     "icon": "signatures.png",
     "key": "signatures",
     "type": "addon",
+    "priority": 102,
     "authors": [
         {
             "name": "Tim Gunter",

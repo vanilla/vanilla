@@ -48,7 +48,7 @@ const getVariationsOfRatio = (ratio: "square" | "flush" | "tall" | "wide") => {
     return testCases;
 };
 
-const TitleBarLogoTests = (props: { title?: string }) => {
+const TitleBarLogoTests = (props: { title?: string; onlyLogo?: boolean }) => {
     const { title = "Testing all logo cases" } = props;
 
     const squareRatio = getVariationsOfRatio("square");
@@ -61,7 +61,12 @@ const TitleBarLogoTests = (props: { title?: string }) => {
                 <BannerContextProvider>
                     <TitleBarDeviceProvider>
                         <StoryHeading>{`${capitalizeFirstLetter(testCase.type)} ${testCase.ratio} logo`}</StoryHeading>
-                        <TitleBar useMobileBackButton={false} isFixed={false} overwriteLogo={testCase.src} />
+                        <TitleBar
+                            useMobileBackButton={false}
+                            isFixed={false}
+                            overwriteLogo={testCase.src}
+                            onlyLogo={props.onlyLogo}
+                        />
                     </TitleBarDeviceProvider>
                 </BannerContextProvider>
             </MemoryRouter>
@@ -164,3 +169,5 @@ export const LogoTestMaxDesktopMinMobile = storyWithConfig(
     },
     () => <TitleBarLogoTests />,
 );
+
+export const LogoOnlyTitleBar = storyWithConfig({}, () => <TitleBarLogoTests onlyLogo />);

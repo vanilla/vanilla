@@ -53,8 +53,8 @@ class DiscussionListPageControllerTest extends SiteTestCase
         $response = $data->asHttpResponse();
         $this->assertSame(200, $response->getStatusCode());
 
-        // Test request with invalid type parameter returns non-200 response
-        $data = $dispatcher->dispatch(new Request("/discussions?type=invalidtype"));
+        // Test request with invalid sort parameter returns non-200 response
+        $data = $dispatcher->dispatch(new Request("/discussions?sort=invalidtype"));
         $response = $data->asHttpResponse();
         $this->assertNotSame(200, $response->getStatusCode());
 

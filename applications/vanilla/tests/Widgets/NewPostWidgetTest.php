@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2008-2022 Vanilla Forums, Inc.
+ * @copyright 2008-2023 Vanilla Forums, Inc.
  * @license Proprietary
  */
 
@@ -9,23 +9,18 @@ namespace VanillaTests\Forum\Widgets;
 use VanillaTests\SiteTestCase;
 use VanillaTests\Layout\LayoutTestTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
+use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Test New Post Widget.
  */
 class NewPostWidgetTest extends SiteTestCase
 {
-    use LayoutTestTrait, CommunityApiTestTrait;
+    use LayoutTestTrait;
+    use CommunityApiTestTrait;
+    use UsersAndRolesApiTestTrait;
 
-    /**
-     * Get the names of addons to install.
-     *
-     * @return string[] Returns an array of addon names.
-     */
-    protected static function getAddons(): array
-    {
-        return ["vanilla", "qna", "polls"];
-    }
+    public static $addons = ["qna", "polls", "groups"];
 
     /**
      * Test that we can hydrate New Post Widget.
@@ -38,6 +33,7 @@ class NewPostWidgetTest extends SiteTestCase
         $spec = [
             '$hydrate' => "react.newpost",
             "title" => "My New Post Button",
+            '$reactTestID' => "newpost",
         ];
 
         $expected = [
@@ -71,13 +67,37 @@ class NewPostWidgetTest extends SiteTestCase
                         "icon" => $allowedDiscussions["Poll"]["AddIcon"],
                         "asOwnButton" => false,
                     ],
+                    [
+                        "label" => $allowedDiscussions["Event"]["AddText"],
+                        "action" => $allowedDiscussions["Event"]["AddUrl"],
+                        "type" => "link",
+                        "id" => str_replace(" ", "-", strtolower($allowedDiscussions["Event"]["AddText"])),
+                        "icon" => $allowedDiscussions["Event"]["AddIcon"],
+                        "asOwnButton" => false,
+                    ],
                 ],
                 "postableDiscussionTypes" => [
                     0 => "discussion",
                     1 => "question",
                     2 => "poll",
+                    3 => "event",
                 ],
             ],
+            '$reactTestID' => "newpost",
+            '$seoContent' => <<<HTML
+<div class=pageBox>
+    <div class=pageHeadingBox>
+        <h2>My New Post Button</h2>
+    </div>
+    <ul class=linkList>
+        <li><a href=/post/discussion>New Discussion</a></li>
+        <li><a href=/post/question>Ask a Question</a></li>
+        <li><a href=/post/poll>New Poll</a></li>
+        <li><a href=/events/new?parentRecordID=-1&amp;parentRecordType=category>New Event</a></li>
+    </ul>
+</div>
+HTML
+        ,
         ];
 
         $this->assertHydratesTo($spec, [], $expected);
@@ -88,7 +108,21 @@ class NewPostWidgetTest extends SiteTestCase
         $expected['$reactProps']["asOwnButtons"] = ["question"];
         $expected['$reactProps']["excludedButtons"] = ["poll"];
         $expected['$reactProps']["items"][1]["asOwnButton"] = true;
+        $expected['$seoContent'] = <<<HTML
+<div class=pageBox>
+    <div class=pageHeadingBox>
+        <h2>My New Post Button</h2>
+    </div>
+    <ul class=linkList>
+        <li><a href=/post/discussion>New Discussion</a></li>
+        <li><a href=/post/question>Ask a Question</a></li>
+        <li><a href=/events/new?parentRecordID=-1&amp;parentRecordType=category>New Event</a></li>
+    </ul>
+</div>
+HTML;
+
         unset($expected['$reactProps']["items"][2]);
+        $expected['$reactProps']["items"] = array_values($expected['$reactProps']["items"]);
 
         $this->assertHydratesTo($spec, [], $expected);
     }

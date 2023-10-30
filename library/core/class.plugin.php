@@ -393,7 +393,8 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin
         if (is_array($requestArgs) && sizeof($sender->RequestArgs)) {
             [$methodName] = $sender->RequestArgs;
             // Account for suffix
-            $methodName = array_shift($trash = explode(".", $methodName));
+            $trash = explode(".", $methodName);
+            $methodName = array_shift($trash);
             $testControllerMethod = "Controller_" . $methodName;
             if (method_exists($this, $testControllerMethod)) {
                 $controllerMethod = $testControllerMethod;

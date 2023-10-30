@@ -8,7 +8,7 @@ namespace Vanilla\Search;
 
 use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
-use Vanilla\Contracts\Site\AbstractSiteProvider;
+use Vanilla\Contracts\Site\VanillaSiteProvider;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Search\SearchService;
 

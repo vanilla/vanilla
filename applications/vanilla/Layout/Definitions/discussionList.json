@@ -26,12 +26,17 @@
         },
         {
             "$hydrate": "react.section.2-columns",
+            "breadcrumbs": [
+                {
+                    "$hydrate": "react.breadcrumbs"
+                }
+            ],
             "mainBottom": [
                 {
                     "$hydrate": "react.asset.discussionList",
                     "apiParams": {
                         "includeChildCategories": true,
-                        "sort": "-dateInserted",
+                        "sort": "-dateLastComment",
                         "slotType": "a"
                     },
                     "discussionOptions": {
@@ -52,7 +57,8 @@
                             }
                         }
                     },
-                    "title": "Recent Discussions"
+                    "title": "Recent Discussions",
+                    "isAsset": true
                 }
             ],
             "secondaryBottom": [

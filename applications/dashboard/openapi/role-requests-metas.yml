@@ -25,6 +25,8 @@ paths:
                                     description: The default text to display to the user.
                                 format:
                                     $ref: "#/components/schemas/Format"
+                                attributes:
+                                    $ref: "#/components/schemas/RoleRequestMetaAttributes"
                                 attributesSchema:
                                     $ref: "#/components/schemas/BasicSchema"
                             required:

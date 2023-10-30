@@ -553,13 +553,14 @@ SQL;
         $runStructure();
         $cache->flush();
         $this->sql->fetchTableSchema($tableName);
-        $cache->assertSetCount("*mysql*", 1);
+        $cache->assertSetCount("mysql*", 1);
         $this->sql->fetchTableSchema($tableName);
-        $cache->assertSetCount("*mysql*", 1);
+        $cache->assertSetCount("mysql*", 1);
         $cache->assertNotEmpty();
 
         $runStructure(true);
-        $cache->assertSetCount("*mysql*", 2);
+        $this->sql->fetchTableSchema($tableName);
+        $cache->assertSetCount("mysql*", 2);
         $this->assertTableSchemaHasColumn($tableName, "new");
     }
 

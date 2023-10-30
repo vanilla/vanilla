@@ -67,19 +67,17 @@ export const leaderboardCSS = () => {
     };
 
     const userStyles: CSSObject = {
-        whiteSpace: "nowrap",
         display: "flex",
+        alignItems: "center",
     };
 
     const usernameStyles = {
         verticalAlign: "middle",
         display: "inline-block",
-        ...singleLineEllipsis(),
-        maxWidth: `calc(100% - ${vars.profilePhoto.size}px - ${vars.username.margin.horizontal}px)`,
         ...Mixins.margin(vars.username.margin),
         ...Mixins.font({
             ...vars.username.font,
-            lineHeight: px(vars.profilePhoto.size),
+            lineHeight: 1.125,
         }),
     };
 

@@ -1,11 +1,11 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { INavigationTreeItem } from "@library/@types/api/core";
-import { getRelativeUrl, t } from "@library/utility/appUtils";
+import { getMeta, getRelativeUrl, t } from "@library/utility/appUtils";
 import {
     BrandingPageRoute,
     LegacyLayoutsRoute,
@@ -50,47 +50,55 @@ function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigatio
     const perPageAppliedConfigs = LAYOUT_VIEW_TYPES.map((type) => `customLayout.${type}`);
     const config = useConfigsByKeys([LAYOUT_EDITOR_CONFIG_KEY, ...perPageEditorConfigs, ...perPageAppliedConfigs]);
     const { layoutsByViewType } = useLayouts();
-
+    const layoutViewTypeArray = ["discussionCategoryPage", "nestedCategoryList", "subcommunityHome"];
     const layoutViewTypesTranslatedNames: { [key in LayoutViewType]: string } = {
         home: t("Home"),
+        subcommunityHome: t("Subcommunity Home"),
         discussionList: t("Discussions"),
+        discussionThread: t("Discussion Thread"),
         categoryList: t("Categories"),
+        discussionCategoryPage: t("Discussion Categories"),
+        nestedCategoryList: t("Nested Categories"),
     };
 
     function editorNav(layoutViewType: LayoutViewType): INavigationTreeItem {
+        let children = [
+            {
+                name: t("Legacy Layouts"),
+                parentID: layoutViewType,
+                sort: 0,
+                recordID: uuidv4(),
+                recordType: "appearanceNavItem",
+                children: [],
+                url: getRelativeUrl(LegacyLayoutsRoute.url(layoutViewType)),
+                withCheckMark: config?.data?.[`customLayout.${layoutViewType}`] == false,
+            },
+            ...(!isEmpty(layoutsByViewType)
+                ? [
+                      ...makeTreeChildren(layoutsByViewType[layoutViewType] ?? [], layoutViewType),
+                      {
+                          name: t("Add Custom Layout"),
+                          parentID: layoutViewType,
+                          sort: 0,
+                          recordID: -1,
+                          recordType: "addLayout",
+                          isLink: true,
+                          children: [],
+                          url: getRelativeUrl(LayoutEditorRoute.url({ layoutViewType })),
+                      },
+                  ]
+                : []),
+        ];
+        if (layoutViewTypeArray.includes(layoutViewType)) {
+            children.shift();
+        }
         return {
             name: t(`${layoutViewTypesTranslatedNames[layoutViewType]} Page`),
             parentID: ownID,
             sort: 0,
             recordID: layoutViewType,
             recordType: "panelMenu",
-            children: [
-                {
-                    name: t("Legacy Layouts"),
-                    parentID: layoutViewType,
-                    sort: 0,
-                    recordID: uuidv4(),
-                    recordType: "appearanceNavItem",
-                    children: [],
-                    url: getRelativeUrl(LegacyLayoutsRoute.url(layoutViewType)),
-                    withCheckMark: config?.data?.[`customLayout.${layoutViewType}`] == false,
-                },
-                ...(!isEmpty(layoutsByViewType)
-                    ? [
-                          ...makeTreeChildren(layoutsByViewType[layoutViewType] ?? [], layoutViewType),
-                          {
-                              name: t("Add Custom Layout"),
-                              parentID: layoutViewType,
-                              sort: 0,
-                              recordID: -1,
-                              recordType: "addLayout",
-                              isLink: true,
-                              children: [],
-                              url: getRelativeUrl(LayoutEditorRoute.url({ layoutViewType })),
-                          },
-                      ]
-                    : []),
-            ],
+            children: children,
         };
     }
 
@@ -116,15 +124,40 @@ function useLayoutEditorNavTree(ownID: RecordID, parentID: RecordID): INavigatio
     };
 
     if (config.data) {
-        LAYOUT_VIEW_TYPES.forEach((viewType) => {
-            if (config.data?.[LAYOUT_EDITOR_CONFIG_KEY] && config.data?.[`layoutEditor.${viewType}`]) {
+        let categoryListEnabled = false;
+        LAYOUT_VIEW_TYPES.filter(filterFlaggedLayouts).forEach((viewType) => {
+            if (viewType == "categoryList") {
+                categoryListEnabled =
+                    config.data?.[LAYOUT_EDITOR_CONFIG_KEY] && config.data?.[`layoutEditor.${viewType}`];
+            }
+            if (!categoryListEnabled && (viewType == "discussionCategoryPage" || viewType == "nestedCategoryList")) {
+                return;
+            } else if (config.data?.[LAYOUT_EDITOR_CONFIG_KEY] && config.data?.[`layoutEditor.${viewType}`]) {
                 topLevelItem.children.push(editorNav(viewType));
-            } else {
+            } else if (!layoutViewTypeArray.includes(viewType)) {
                 topLevelItem.children.push(legacyNav(viewType));
             }
         });
     }
     return topLevelItem;
+}
+
+function filterFlaggedLayouts(viewType: LayoutViewType) {
+    /**
+     * If a feature flag is explicitly set, we should respect it
+     */
+    const flaggedLayoutConfig = {
+        // TODO: Remove this feature flag when we ready to ship threads
+        discussionThread: getMeta("featureFlags.layoutEditor.discussionThread.Enabled", false),
+    };
+    if (flaggedLayoutConfig.hasOwnProperty(viewType) && flaggedLayoutConfig[viewType]) {
+        return viewType;
+    }
+
+    // Otherwise it should be enabled
+    if (!flaggedLayoutConfig.hasOwnProperty(viewType)) {
+        return viewType;
+    }
 }
 
 export function useAppearanceNavItems(parentID: RecordID): INavigationTreeItem[] {

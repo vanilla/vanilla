@@ -12,10 +12,18 @@ import { useConfigsByKeys } from "@library/config/configHooks";
 import { t } from "@vanilla/i18n";
 import React, { useMemo } from "react";
 
-const LAYOUT_PAGES = ["home", "discussionList", "categoryList"];
+const LAYOUT_PAGES = [
+    "home",
+    "subcommunityHome",
+    "discussionList",
+    "categoryList",
+    "nestedCategoryList",
+    "discussionCategoryPage",
+];
+export const configKeys = LAYOUT_PAGES.map((page) => `customLayout.${page}`);
 
 export function CustomLayoutLabItem() {
-    const config = useConfigsByKeys(LAYOUT_PAGES.map((page) => `customLayout.${page}`));
+    const config = useConfigsByKeys(configKeys);
 
     const disabledProps = useMemo(() => {
         const { status, data } = config;

@@ -214,7 +214,7 @@ class PostController extends VanillaController
         }
 
         touchValue("Type", $this->Data, "Discussion");
-
+        $this->Form->addHidden("Type", $this->Data["Type"]);
         $id = $category["CategoryID"] ?? null;
         // Remove Announce parameter if it was injected into the form.
         if (!CategoryModel::checkPermission($id, "Vanilla.Discussions.Announce")) {
@@ -380,6 +380,7 @@ class PostController extends VanillaController
 
                 if ($this->Form->errorCount() == 0) {
                     if ($draft) {
+                        $formValues["Type"] = $formValues["Type"] ?? "Discussion";
                         $draftID = $this->DraftModel->save($formValues);
                         $this->Form->setValidationResults($this->DraftModel->validationResults());
                     } else {
@@ -432,6 +433,7 @@ class PostController extends VanillaController
                 $this->setJson("DiscussionID", $discussionID);
                 $this->setJson("CategoryID", $this->Form->getFormValue("CategoryID", $this->CategoryID));
                 $this->setJson("DraftID", $draftID);
+                $this->setJson("Type", $this->Data["Type"]);
 
                 if (!$preview) {
                     // If the discussion was not a draft
@@ -509,7 +511,7 @@ class PostController extends VanillaController
         if ($draftID != 0) {
             $record = $this->Draft = $this->DraftModel->getID($draftID);
             $this->CategoryID = $this->Draft->CategoryID;
-
+            $this->setData("Type", $record->Type ?? "Discussion");
             // Verify this is their draft
             if (val("InsertUserID", $this->Draft) != Gdn::session()->UserID) {
                 throw permissionException();
@@ -776,7 +778,7 @@ class PostController extends VanillaController
                 unset($FormValues["CommentID"]);
             }
 
-            if ($DraftID == 0) {
+            if ((int) $DraftID == 0) {
                 $DraftID = $this->Form->getFormValue("DraftID", 0);
                 if ($DraftID) {
                     $draft = $this->DraftModel->getID($DraftID, DATASET_TYPE_ARRAY);

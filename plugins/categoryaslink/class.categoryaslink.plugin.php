@@ -121,8 +121,8 @@ if (!function_exists("categoryUrl")) {
         if (val("RedirectUrl", $category)) {
             /* @var TrustedDomainModel $trustedDomainModel */
             $trustedDomainModel = Gdn::getContainer()->get(TrustedDomainModel::class);
-            // SafeURL because you may be linking to another web property, another forum or knowledgebase.
-            return $trustedDomainModel->safeContentUrl(val("RedirectUrl", $category));
+            // SafeURL because you may be linking to another web property, another forum or knowledge base.
+            return $trustedDomainModel->safeContentUrl(val("RedirectUrl", $category), true);
         }
 
         $categoryURL = "";

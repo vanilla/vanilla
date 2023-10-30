@@ -27,6 +27,8 @@ use VanillaTests\Layout\LayoutTestTrait;
  */
 class LayoutsApiControllerTest extends AbstractResourceTest
 {
+    public static $addons = ["stubcontent"];
+
     use CommunityApiTestTrait;
     use ExpectExceptionTrait;
     use LayoutTestTrait;
@@ -289,7 +291,9 @@ class LayoutsApiControllerTest extends AbstractResourceTest
                     [
                         // Assets should be available.
                         '$hydrate' => "react.asset.discussionList",
-                        "apiParams" => [],
+                        "apiParams" => [
+                            "sort" => "-dateLastComment",
+                        ],
                     ],
                 ],
             ],
@@ -342,7 +346,9 @@ class LayoutsApiControllerTest extends AbstractResourceTest
                     [
                         // Assets should be available.
                         '$hydrate' => "react.asset.discussionList",
-                        "apiParams" => [],
+                        "apiParams" => [
+                            "sort" => "-dateLastComment",
+                        ],
                     ],
                 ],
             ],
@@ -358,7 +364,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $response = $this->api()->post("/layouts/hydrate", [
             "layout" => $layoutDefinition,
             "params" => $params,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
         $layout = $this->getDiscussionListLayoutMinusDiscussions($response->getBody()["layout"]);
@@ -369,7 +375,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $layout = $this->api()->post("/layouts", [
             "name" => "My Layout",
             "layout" => $layoutDefinition,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
 
         $response = $this->api()->put("/layouts/{$layout["layoutID"]}/views", [
@@ -380,7 +386,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         ]);
 
         $response = $this->api()->get("/layouts/lookup-hydrate", [
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
             "recordID" => $category["categoryID"],
             "recordType" => "category",
             "params" => $params,
@@ -404,7 +410,9 @@ class LayoutsApiControllerTest extends AbstractResourceTest
                     [
                         // Assets should be available.
                         '$hydrate' => "react.asset.discussionList",
-                        "apiParams" => [],
+                        "apiParams" => [
+                            "sort" => "-dateLastComment",
+                        ],
                     ],
                 ],
             ],
@@ -418,7 +426,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $response = $this->api()->post("/layouts/hydrate", [
             "layout" => $layoutDefinition,
             "params" => $params,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
         $layout = $response->getBody()["layout"];
@@ -431,7 +439,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $layout = $this->api()->post("/layouts", [
             "name" => "My Layout",
             "layout" => $layoutDefinition,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
         $response = $this->api()->get("/layouts/{$layout["layoutID"]}/hydrate-assets", [
             "params" => $params,
@@ -458,7 +466,9 @@ class LayoutsApiControllerTest extends AbstractResourceTest
                     [
                         // Assets should be available.
                         '$hydrate' => "react.asset.discussionList",
-                        "apiParams" => [],
+                        "apiParams" => [
+                            "sort" => "-dateLastComment",
+                        ],
                     ],
                 ],
             ],
@@ -472,7 +482,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $response = $this->api()->post("/layouts/hydrate", [
             "layout" => $layoutDefinition,
             "params" => $params,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -481,7 +491,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $layout = $this->api()->post("/layouts", [
             "name" => "My Layout",
             "layout" => $layoutDefinition,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
 
         $response = $this->api()->put("/layouts/{$layout["layoutID"]}/views", [
@@ -492,7 +502,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         ]);
 
         $response = $this->api()->get("/layouts/lookup-hydrate-assets", [
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
             "recordID" => $category["categoryID"],
             "recordType" => "category",
             "params" => $params,
@@ -511,7 +521,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         // The actual schema generation is pretty well tested over in vanilla/garden-hydrate
         // so this is just requesting the endpoint to make sure it gets parameters applied properly.
 
-        $response = $this->api()->get("/layouts/schema", ["layoutViewType" => "home"]);
+        $response = $this->api()->get("/layouts/schema", ["layoutViewType" => "discussionList"]);
         $this->assertEquals(200, $response->getStatusCode());
 
         // Home asset was applied.
@@ -533,6 +543,21 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $this->assertSchemaExists($response, "layoutParams", "category/categoryID");
         $this->assertSchemaExists($response, "middlewares", "role-filter");
         $this->assertWidgetsHaveAllowedSections($response);
+    }
+
+    /**
+     * Test the assets available to the `categoryList` layoutViewType.
+     */
+    public function testCategoryListViewAssets()
+    {
+        $layoutViewType = "categoryList";
+
+        $response = $this->api()->get("/layouts/catalog", ["layoutViewType" => $layoutViewType]);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $this->assertSame($layoutViewType, $response["layoutViewType"]);
+        $this->assertSchemaExists($response, "assets", "react.asset.categoryList");
+        $this->assertSchemaExists($response, "assets", "react.asset.categoryFollow");
     }
 
     /**

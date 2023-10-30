@@ -10,6 +10,7 @@ namespace Vanilla\Analytics;
 use CategoryModel;
 use CommentModel;
 use DiscussionModel;
+use Vanilla\Community\Events\SubscriptionEvent;
 use Vanilla\Utility\ArrayUtils;
 
 /**
@@ -178,7 +179,7 @@ class TrackableCommunityModel
      */
     public function getTrackableComment($commentOrCommentID, string $type = "comment_add"): array
     {
-        if (is_int($commentOrCommentID)) {
+        if (is_numeric($commentOrCommentID)) {
             $comment = $this->commentModel->getID($commentOrCommentID, DATASET_TYPE_ARRAY);
             if (empty($comment)) {
                 return [
@@ -292,5 +293,46 @@ class TrackableCommunityModel
         $commentData["body"] = null;
 
         return $commentData;
+    }
+
+    /**
+     * provide trackable data for category subscription
+     *
+     * @param array $categorySubscriptionData
+     * @return array
+     */
+    public function getTrackableCategorySubscription(array $categorySubscriptionData): array
+    {
+        $data = [
+            "follower" => $this->userUtils->getTrackableUser($categorySubscriptionData["user"]["userID"]),
+            "category" => $this->getTrackableCategory($categorySubscriptionData["category"]["CategoryID"]),
+        ];
+        $data["category"]["totalFollowedCount"] = $categorySubscriptionData["category"]["totalFollowedCount"] ?? 0;
+        $data["category"]["totalDigestCount"] = $categorySubscriptionData["category"]["totalDigestCount"] ?? 0;
+        $type = $categorySubscriptionData["type"];
+        $data["dateTime"] = TrackableDateUtils::getDateTime(
+            $type === SubscriptionEvent::ACTION_UNFOLLOW
+                ? $categorySubscriptionData["category"]["DateUnFollowed"]
+                : $categorySubscriptionData["category"]["DateFollowed"]
+        );
+        $data["type"] = $type;
+        $data["preferences"] = $this->normalizePreferences($categorySubscriptionData["preferences"]);
+        return $data;
+    }
+
+    protected function normalizePreferences(array $preferences): array
+    {
+        $trackablePreferences["followed"] = $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_FOLLOW];
+        $trackablePreferences["emailDigest"] =
+            $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_DIGEST] ?? false;
+        $trackablePreferences["inAppDiscussions"] =
+            $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_APP];
+        $trackablePreferences["emailDiscussions"] =
+            $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_EMAIL];
+        $trackablePreferences["inAppComments"] = $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_APP];
+        $trackablePreferences["emailComments"] =
+            $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_EMAIL];
+
+        return $trackablePreferences;
     }
 }

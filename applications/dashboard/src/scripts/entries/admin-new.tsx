@@ -19,8 +19,8 @@ import { applySharedPortalContext } from "@vanilla/react-utils";
 import React from "react";
 import "../../../design/admin-new.css";
 import { layoutSettingsSlice } from "@dashboard/layout/layoutSettings/LayoutSettings.slice";
-import { hasPermission } from "@library/features/users/Permission";
 import { t } from "@vanilla/i18n";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 registerContextProvider(TextEditorContextProvider);
 registerReducer(dashboardSectionSlice.name, dashboardSectionSlice.reducer);
@@ -43,6 +43,7 @@ const SETTINGS_PERMISSIONS = ["settings.manage", "community.moderate"];
 const ANALYTICS_PERMISSIONS = ["data.view", "dashboards.manage"];
 
 function AdminApp() {
+    const { hasPermission } = usePermissionsContext();
     if (hasPermission([...SETTINGS_PERMISSIONS, ...ANALYTICS_PERMISSIONS])) {
         return (
             <SiteNavProvider categoryRecordType="panelMenu">

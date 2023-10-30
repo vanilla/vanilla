@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useEffect } from "react";
 import { AppearanceNav } from "@dashboard/appearance/nav/AppearanceNav";
 import AdminLayout from "@dashboard/components/AdminLayout";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
@@ -72,13 +72,23 @@ function LayoutOverviewPageMetasImpl(props: { layout: ILayoutDetails }) {
             )}
             <MetaItem>
                 {!!layoutViewNames.length &&
-                    t("Applied on ") +
-                        (appliedGloballyOnly
-                            ? layout.layoutViewType === "discussionList"
-                                ? t("recent discussions page")
-                                : t("homepage")
-                            : layoutViewNames.join(", ")) +
-                        "."}
+                    (appliedGloballyOnly ? (
+                        layout.layoutViewType === "discussionList" ? (
+                            t("Applied on recent discussions page")
+                        ) : layout.layoutViewType === "categoryList" ? (
+                            t("Applied on categories page")
+                        ) : layout.layoutViewType === "discussionCategoryPage" ? (
+                            t("Applied on discussion categories page")
+                        ) : layout.layoutViewType === "nestedCategoryList" ? (
+                            t("Applied on nested categories page")
+                        ) : layout.layoutViewType === "subcommunityHome" ? (
+                            t("Applied on Subcommunity homepage")
+                        ) : (
+                            t("Applied on  homepage")
+                        )
+                    ) : (
+                        <Translate source="Applied on <0/>" c0={layoutViewNames.join(", ")} />
+                    ))}
             </MetaItem>
         </Metas>
     );

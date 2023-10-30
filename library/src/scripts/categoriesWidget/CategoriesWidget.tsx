@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,22 +10,35 @@ import {
     IHomeWidgetContainerOptions,
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { DeepPartial } from "redux";
-import { IHomeWidgetItemProps } from "@library/homeWidget/HomeWidgetItem";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { QuickLinks } from "@library/navigation/QuickLinks";
 import { Widget } from "@library/layout/Widget";
-interface IProps {
+import CategoryList from "@library/categoriesWidget/CategoryList";
+import { getMeta } from "@library/utility/appUtils";
+import CategoryGrid from "@library/categoriesWidget/CategoryGrid";
+import { ICategoryItemOptions } from "@library/categoriesWidget/CategoryList.variables";
+import { ICategoryItem } from "@library/categoriesWidget/CategoryItem";
+
+export interface ICategoriesWidgetProps {
     title?: string;
     subtitle?: string;
     description?: string;
     containerOptions?: IHomeWidgetContainerOptions;
     itemOptions?: DeepPartial<IHomeWidgetItemOptions>;
-    itemData: IHomeWidgetItemProps[];
-    maxItemCount?: number; //this will probably go away with categories API "limit" full support
+    itemData: ICategoryItem[];
+    isAsset?: boolean;
+    isPreview?: boolean; // preview in layout editor
+    categoryOptions?: ICategoryItemOptions;
 }
 
-export function CategoriesWidget(props: IProps) {
+export function CategoriesWidget(props: ICategoriesWidgetProps) {
+    const isList =
+        !props.containerOptions?.displayType || props.containerOptions?.displayType === WidgetContainerDisplayType.LIST;
+    const isLink = props.containerOptions?.displayType === WidgetContainerDisplayType.LINK;
+
+    const categoryListLayoutsEnabled = getMeta("featureFlags.layoutEditor.categoryList.Enabled", false);
+
     const globalVariables = homeWidgetItemVariables().options;
     const itemVars = homeWidgetItemVariables(props.itemOptions).options;
     const isListWithNoBorder =
@@ -59,7 +72,20 @@ export function CategoriesWidget(props: IProps) {
         };
     });
 
-    if (props.containerOptions?.displayType === WidgetContainerDisplayType.LINK) {
+    // under a feature flag for now
+    if (categoryListLayoutsEnabled && !isLink) {
+        return (
+            <Widget>
+                {isList ? (
+                    <CategoryList {...props} categoryOptions={props.categoryOptions} isPreview={props.isPreview} />
+                ) : (
+                    <CategoryGrid {...props} itemOptions={defaultItemOptions} />
+                )}
+            </Widget>
+        );
+    }
+
+    if (isLink) {
         return <QuickLinks title={props.title} links={quickLinks} containerOptions={props.containerOptions} />;
     } else {
         return (

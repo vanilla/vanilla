@@ -43,7 +43,6 @@ export interface ISearchBarProps extends IOptionalComponentID {
     resultsAsModalClasses?: string;
     forceMenuOpen?: boolean;
     forcedOptions?: any[];
-    needsPageTitle?: boolean;
     scope?: ISearchScopeNoCompact;
     overwriteSearchBar?: ISearchBarOverwrites;
 }

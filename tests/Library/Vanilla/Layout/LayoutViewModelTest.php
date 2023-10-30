@@ -10,6 +10,7 @@ use Garden\Web\Exception\ClientException;
 use Gdn;
 use Vanilla\Layout\LayoutModel;
 use Vanilla\Layout\LayoutViewModel;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestCategoryModelTrait;
 use VanillaTests\SiteTestCase;
 
@@ -19,6 +20,7 @@ use VanillaTests\SiteTestCase;
 class LayoutViewModelTest extends SiteTestCase
 {
     use TestCategoryModelTrait;
+    use CommunityApiTestTrait;
 
     /* @var LayoutViewModel */
     private $layoutViewModel;
@@ -72,16 +74,72 @@ class LayoutViewModelTest extends SiteTestCase
     public function testInsertMultipleViewsAndGetLayoutIdLookup()
     {
         $layout = ["layoutID" => 1, "layoutViewType" => "home", "name" => "Home Test", "layout" => "test"];
-        $layoutID = $this->layoutModel->insert($layout);
+        $layoutID1 = $this->layoutModel->insert($layout);
+        $layout = [
+            "layoutID" => 2,
+            "layoutViewType" => "discussionCategoryPage",
+            "name" => "Discussion Category Page Test",
+            "layout" => "test",
+        ];
+        $layoutID2 = $this->layoutModel->insert($layout);
 
-        $layoutViews = [["recordID" => -1, "recordType" => "global"], ["recordID" => 1, "recordType" => "category"]];
-        $this->layoutViewModel->saveLayoutViews($layoutViews, "home", $layoutID);
+        $layoutViews = [["recordID" => -1, "recordType" => "global"]];
+        $this->layoutViewModel->saveLayoutViews($layoutViews, "home", $layoutID1);
+        $this->layoutViewModel->saveLayoutViews(
+            [["recordID" => 1, "recordType" => "category"]],
+            "discussionCategoryPage",
+            $layoutID2
+        );
 
         $resultLayoutID = $this->layoutViewModel->getLayoutIdLookup("home", "global", -1);
-        $resultFileLayoutID = $this->layoutViewModel->getLayoutIdLookup("home", "category", 1);
+        $resultFileLayoutID = $this->layoutViewModel->getLayoutIdLookup("discussionCategoryPage", "category", 1);
 
-        $this->assertEquals($layoutID, $resultLayoutID);
-        $this->assertEquals($layoutID, $resultFileLayoutID);
+        $resultFileLayoutID2 = $this->layoutViewModel->getLayoutIdLookup("categoryList", "category", 1);
+
+        $this->assertEquals($layoutID1, $resultLayoutID);
+        $this->assertEquals($layoutID2, $resultFileLayoutID);
+        $this->assertEquals($layoutID2, $resultFileLayoutID2);
+    }
+
+    /**
+     * Test LayoutView model getViewLayout method with NestedCategorylist
+     */
+    public function testInsertNestedViewsAndGetLayoutIdLookup()
+    {
+        $nestedCategory = $this->createCategory(["displayAs" => strtolower(\CategoryModel::DISPLAY_NESTED)]);
+        $headingCategory = $this->createCategory(["displayAs" => strtolower(\CategoryModel::DISPLAY_HEADING)]);
+        $layout = [
+            "layoutID" => 2,
+            "layoutViewType" => "nestedCategoryList",
+            "name" => "Discussion Category Page Test",
+            "layout" => "test",
+        ];
+        $nestedLayoutID = $this->layoutModel->insert($layout);
+
+        $this->layoutViewModel->saveLayoutViews(
+            [["recordID" => $nestedCategory["categoryID"], "recordType" => "category"]],
+            "nestedCategoryList",
+            $nestedLayoutID
+        );
+        //Test Default
+        $resultFileLayoutID = $this->layoutViewModel->getLayoutIdLookup("categoryList", "category", 1);
+
+        $this->assertEquals("discussionCategoryPage", $resultFileLayoutID);
+
+        $resultFileLayoutID = $this->layoutViewModel->getLayoutIdLookup(
+            "categoryList",
+            "category",
+            $nestedCategory["categoryID"]
+        );
+
+        $this->assertEquals($nestedLayoutID, $resultFileLayoutID);
+
+        $this->expectExceptionMessage("Heading categories cannot be viewed directly.");
+        $resultFileLayoutID = $this->layoutViewModel->getLayoutIdLookup(
+            "categoryList",
+            "category",
+            $headingCategory["categoryID"]
+        );
     }
 
     /**

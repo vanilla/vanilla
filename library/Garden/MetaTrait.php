@@ -7,6 +7,8 @@
 
 namespace Garden;
 
+use Vanilla\Utility\ArrayUtils;
+
 /**
  * For classes that want to store meta data.
  *
@@ -28,9 +30,9 @@ trait MetaTrait
      * @param mixed $default The default value if no item at the key exists.
      * @return mixed Returns the meta value.
      */
-    public function getMeta($name, $default = null)
+    public function getMeta(string $name, $default = null)
     {
-        return isset($this->meta[$name]) ? $this->meta[$name] : $default;
+        return ArrayUtils::getByPath($name, $this->meta, $default);
     }
 
     /**
@@ -40,9 +42,9 @@ trait MetaTrait
      * @param mixed $value The new value.
      * @return $this
      */
-    public function setMeta($name, $value)
+    public function setMeta(string $name, $value)
     {
-        $this->meta[$name] = $value;
+        ArrayUtils::setByPath($name, $this->meta, $value);
         return $this;
     }
 

@@ -61,22 +61,11 @@ trait UserMentionTestTraits
      */
     public function provideProfileUrl(): array
     {
-        $baseUrl = $this->getBaseUrl("minimal-container-test");
+        $baseUrl = static::getBaseUrl();
         return [
             "validUrlNoSpace" => [$baseUrl . $this->PROFILE_URL_NO_SPACE],
             "validUrlWithSpace" => [$baseUrl . $this->PROFILE_URL_WITH_SPACE, [$this->USERNAME_WITH_SPACE]],
             "invalidUrlOtherCommunity" => ["https://dev.vanilla.com/profile/UserToAnonymize", []],
         ];
-    }
-
-    /**
-     * Get base url for test environment with suffixed root path
-     *
-     * @param string $root
-     * @return string
-     */
-    public function getBaseUrl(string $root): string
-    {
-        return preg_replace("/:[0-9]+/", "", getenv("TEST_BASEURL")) . "/$root";
     }
 }

@@ -1,0 +1,105 @@
+{
+    "$schema": "http://dev.vanilla.localhost/api/v2/layouts/schema?layoutViewType=discussionCategoryPage&cacheBuster=5",
+    "dateInserted": "2023-08-13T00:00:00Z",
+    "layoutViewType": "discussionCategoryPage",
+    "layoutID": "discussionCategoryPage",
+    "name": "Default Discussion Category Page Layout",
+    "layout": [
+        {
+            "$hydrate": "react.section.full-width",
+            "children": [
+                {
+                    "$hydrate": "react.app-banner",
+                    "showTitle": true,
+                    "showDescription": true,
+                    "showSearch": true
+                }
+            ]
+        },
+        {
+            "$hydrate": "react.section.1-column",
+            "children": [
+                {
+                    "$hydrate": "react.breadcrumbs"
+                },
+                {
+                    "$hydrate": "react.asset.categoryFollow",
+                    "isAsset": true
+                },
+                {
+                    "$hydrate": "react.asset.categoryList",
+                    "apiParams": {
+                        "filter": "none"
+                    },
+                    "title": "Subcategories",
+                    "itemOptions": {},
+                    "containerOptions": {
+                        "displayType": "grid"
+                    },
+                    "isAsset": true
+                }
+            ]
+        },
+        {
+            "$hydrate": "react.section.2-columns",
+            "mainBottom": [
+                {
+                    "$hydrate": "react.asset.discussionList",
+                    "apiParams": {
+                        "includeChildCategories": true,
+                        "sort": "-dateLastComment",
+                        "slotType": "a"
+                    },
+                    "discussionOptions": {
+                        "excerpt": {
+                            "display": true
+                        },
+                        "metas": {
+                            "display": {
+                                "category": true,
+                                "commentCount": true,
+                                "lastCommentDate": true,
+                                "lastUser": true,
+                                "score": true,
+                                "startedByUser": true,
+                                "unreadCount": true,
+                                "userTags": true,
+                                "viewCount": true
+                            }
+                        }
+                    },
+                    "title": "Recent Discussions",
+                    "isAsset": true
+                }
+            ],
+            "secondaryBottom": [
+                {
+                    "$hydrate": "react.guest-cta",
+                    "title": "Welcome!",
+                    "description": "It looks like you're new here. Sign in or register to get started.",
+                    "secondButton": {
+                        "title": "Register",
+                        "type": "standard"
+                    },
+                    "button": {
+                        "title": "Sign In",
+                        "type": "primary"
+                    },
+                    "background": {
+                        "useOverlay": true
+                    }
+                },
+                {
+                    "$hydrate": "react.newpost",
+                    "asOwnButtons": [],
+                    "excludedButtons": [],
+                    "postableDiscussionTypes": ["discussion", "question", "poll"]
+                },
+                {
+                    "$hydrate": "react.quick-links",
+                    "title": "Quick Links"
+                }
+            ]
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -11,14 +11,14 @@ import { LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditor
 import { WidgetSettingsModal } from "@dashboard/layout/editor/widgetSettings/WidgetSettingsModal";
 import { LayoutThumbnailsModal } from "@dashboard/layout/editor/thumbnails/LayoutThumbnailsModal";
 import { useLayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
-import { ILayoutEditorDestinationPath, IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { ILayoutEditorDestinationPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { cx } from "@library/styles/styleShim";
 import { Icon } from "@vanilla/icons";
 import { useFocusOnActivate } from "@vanilla/react-utils";
-import React, { useMemo, useRef, useState } from "react";
-import { JsonSchema } from "@vanilla/json-schema-forms";
+import React, { useRef, useState } from "react";
+import { EMPTY_SCHEMA, JsonSchema } from "@vanilla/json-schema-forms";
 import merge from "lodash/merge";
 
 interface IProps {
@@ -36,7 +36,7 @@ export function LayoutEditorAddWidget(props: IProps) {
     const [isWidgetSettingsModalOpen, setWidgetSettingsModalOpen] = useState(false);
     const [selectedWidgetID, setSelectedWidgetID] = useState("");
 
-    const widgetSchema = catalog?.widgets[selectedWidgetID]?.schema ?? {};
+    const widgetSchema = catalog?.widgets[selectedWidgetID]?.schema ?? EMPTY_SCHEMA;
 
     const isSelected =
         LayoutEditorPath.areWidgetPathsEqual(props.path, editorSelection.getPath()) &&
@@ -45,11 +45,13 @@ export function LayoutEditorAddWidget(props: IProps) {
 
     const currentSectionID = editorContents.getSection(props.path)?.$hydrate ?? "";
     const currentSectionAllowedItems = catalog?.sections?.[currentSectionID].allowedWidgetIDs ?? null;
+    // Breadcrumbs are special in this iteration. They are added to a specific section region and have no config.
+    const allowedWidgetIDs = currentSectionAllowedItems?.filter((id) => id !== "react.breadcrumbs") ?? [];
     let allowedWidgets = catalog?.widgets ?? {};
     if (currentSectionAllowedItems != null) {
         allowedWidgets = Object.fromEntries(
             Object.entries(allowedWidgets).filter(([widgetID, widget]) => {
-                if (currentSectionAllowedItems.includes(widgetID)) {
+                if (allowedWidgetIDs.includes(widgetID)) {
                     return true;
                 } else {
                     return false;
@@ -114,7 +116,7 @@ export function LayoutEditorAddWidget(props: IProps) {
     );
 }
 
-//get schema object withdefault values only as props for a widget in order to set them in widget previews
+//get schema object with default values only as props for a widget in order to set them in widget previews
 export function extractDataByKeyLookup(schema: JsonSchema, keyToLookup: string, path?: string, currentData?: object) {
     let generatedData = currentData ?? {};
     if (schema && schema.type === "object") {

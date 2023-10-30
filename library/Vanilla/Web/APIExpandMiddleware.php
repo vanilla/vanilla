@@ -67,6 +67,7 @@ class APIExpandMiddleware
      */
     public function __invoke(RequestInterface $request, callable $next)
     {
+        $rawExpands = $request->getQuery()["expand"] ?? "";
         $expands = $this->inBasePath($request->getPath()) ? $this->extractExpands($request) : [];
         $keysToExpand = [];
         foreach ($expands as $nestedExpands) {
@@ -76,9 +77,11 @@ class APIExpandMiddleware
         }
         $this->verifyPermissions($keysToExpand);
 
-        $response = $next($request);
+        $response = Data::box($next($request));
 
         if (!empty($expands) && (is_array($response) || ($response instanceof Data && $response->isSuccessful()))) {
+            // Stash our expand values
+            $response->stashMiddlewareQueryParameter("expand", $rawExpands);
             $response = $this->updateResponse($response, $expands);
         }
 
@@ -100,8 +103,19 @@ class APIExpandMiddleware
             return [];
         }
 
+        if (in_array(ModelUtils::EXPAND_ALL, $expand)) {
+            foreach ($this->enabledExpanders() as $expander) {
+                $hasPermission =
+                    $expander->getPermission() == null ||
+                    $this->session->getPermissions()->hasRanked($expander->getPermission());
+                if ($hasPermission) {
+                    $result[$expander->getFullKey()] = array_flip($expander->getExpandFields());
+                }
+            }
+        }
+
         foreach ($expand as $expandField) {
-            $wholeMatchingExpandSpec = $this->expanders[$expandField] ?? null;
+            $wholeMatchingExpandSpec = $this->enabledExpanders()[$expandField] ?? null;
             if ($wholeMatchingExpandSpec instanceof AbstractApiExpander) {
                 $fields = $wholeMatchingExpandSpec->getExpandFields();
                 // We need to flip these because our result is "sourcefield" => "destinationField"
@@ -109,7 +123,7 @@ class APIExpandMiddleware
                 $result[$expandField] = array_flip($fields);
             }
 
-            foreach ($this->expanders as $key => $expander) {
+            foreach ($this->enabledExpanders() as $key => $expander) {
                 $sourceField = $expander->getFieldByDestination($expandField);
                 if ($sourceField !== null) {
                     $result[$key][$sourceField] = $expandField;
@@ -131,10 +145,10 @@ class APIExpandMiddleware
     public function getExpandFieldsByKey(string $pk, bool $firstLevel = false): array
     {
         $result = [];
-        if ($this->expanders == null) {
+        if (count($this->enabledExpanders()) === 0) {
             return $result;
         }
-        foreach ($this->expanders as $key => $expander) {
+        foreach ($this->enabledExpanders() as $key => $expander) {
             foreach ($expander->getExpandFields() as $destination => $field) {
                 if ($field === $pk && (!$firstLevel || strpos($destination, ".") === false)) {
                     $result[$key][$field] = $destination;
@@ -153,7 +167,7 @@ class APIExpandMiddleware
      */
     protected function verifyPermissions(array $keysToExpand): void
     {
-        foreach ($this->expanders as $expander) {
+        foreach ($this->enabledExpanders() as $expander) {
             $permissionToCheck = $expander->getPermission();
             if ($permissionToCheck === null) {
                 // No permissions to check for this expander.
@@ -282,7 +296,7 @@ class APIExpandMiddleware
             $dataset = &$data;
         }
         foreach ($fields as $key => $currentFields) {
-            $expander = $this->expanders[$key];
+            $expander = $this->enabledExpanders()[$key];
             ModelUtils::leftJoin(
                 $dataset,
                 $currentFields,
@@ -330,7 +344,7 @@ class APIExpandMiddleware
     private function getExpandFields(string $currentExpandField): array
     {
         $result = [];
-        foreach ($this->expanders as $key => $expander) {
+        foreach ($this->enabledExpanders() as $key => $expander) {
             foreach ($expander->getExpandFields() as $expandField => $_) {
                 if (str_starts_with($expandField, $currentExpandField . ".")) {
                     $result[] = $expandField;
@@ -338,5 +352,15 @@ class APIExpandMiddleware
             }
         }
         return $result;
+    }
+
+    /**
+     * @return AbstractApiExpander[]
+     */
+    private function enabledExpanders(): array
+    {
+        return array_filter($this->expanders, function (AbstractApiExpander $expander) {
+            return $expander->isEnabled();
+        });
     }
 }

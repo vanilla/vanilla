@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -12,7 +12,6 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import CloseButton from "@library/navigation/CloseButton";
 import classNames from "classnames";
-import backLinkClasses from "@library/routing/links/backLinkStyles";
 import { LeftChevronIcon } from "@library/icons/common";
 
 export interface IFrameHeaderProps extends ICommonHeadingProps {

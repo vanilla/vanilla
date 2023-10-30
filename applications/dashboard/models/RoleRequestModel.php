@@ -21,7 +21,6 @@ use Vanilla\Database\Operation\StatusFieldProcessor;
 use Vanilla\Exception\Database\NoResultsException;
 use Vanilla\Models\PipelineModel;
 use Vanilla\Utility\ArrayUtils;
-use Vanilla\Utility\StringUtils;
 use Webmozart\Assert\Assert;
 
 /**
@@ -31,7 +30,6 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
 {
     public const TYPE_APPLICATION = "application";
     public const TYPE_INVITATION = "invitation";
-
     public const STATUS_PENDING = "pending";
     public const STATUS_APPROVED = "approved";
     public const STATUS_DENIED = "denied";
@@ -314,41 +312,7 @@ class RoleRequestModel extends PipelineModel implements FragmentFetcherInterface
      */
     private function createValidationClass(Schema $schema): Validation
     {
-        $r = new class ($schema) extends Validation {
-            /**
-             * @var Schema
-             */
-            private $schema;
-
-            /**
-             * Validation constructor.
-             *
-             * @param Schema $schema
-             */
-            public function __construct(Schema $schema)
-            {
-                $this->schema = $schema;
-            }
-
-            /**
-             * Translate an error message string.
-             *
-             * @param string $str
-             * @return string
-             */
-            public function translate($str)
-            {
-                $field = $this->schema->getField(["properties", $str]);
-                if (is_array($field)) {
-                    $str = $field["x-label"] ?? StringUtils::labelize($str);
-                }
-                $r = t($str);
-                return $r;
-            }
-        };
-        $r->setTranslateFieldNames(true);
-
-        return $r;
+        return new RoleRequestValidation($schema);
     }
 
     /**

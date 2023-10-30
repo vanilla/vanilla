@@ -10,6 +10,7 @@ import CategoriesLegacyLayoutsPage from "@dashboard/appearance/pages/CategoriesL
 import DiscussionsLegacyLayoutsPage from "@dashboard/appearance/pages/DiscussionsLegacyLayoutsPage";
 import HomepageLegacyLayoutsPage from "@dashboard/appearance/pages/HomepageLegacyLayoutsPage";
 import NotFoundPage from "@library/routing/NotFoundPage";
+import DiscussionThreadsLegacyLayoutsPage from "@dashboard/appearance/pages/DiscussionThreadsLegacyLayoutsPage";
 
 export default function LegacyLayoutsPage(
     props: RouteComponentProps<{
@@ -19,11 +20,16 @@ export default function LegacyLayoutsPage(
     const { layoutViewType } = props.match.params;
     switch (layoutViewType) {
         case "home":
+        case "subcommunityHome":
             return <HomepageLegacyLayoutsPage />;
+        case "nestedCategoryList":
+        case "discussionCategoryPage":
         case "categoryList":
             return <CategoriesLegacyLayoutsPage />;
         case "discussionList":
             return <DiscussionsLegacyLayoutsPage />;
+        case "discussionThread":
+            return <DiscussionThreadsLegacyLayoutsPage />;
         default:
             return <NotFoundPage />;
     }

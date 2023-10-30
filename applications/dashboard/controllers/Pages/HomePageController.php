@@ -7,8 +7,10 @@
 
 namespace Vanilla\Dashboard\Controllers\Pages;
 
+use Gdn;
 use Vanilla\Layout\Asset\LayoutFormAsset;
 use Vanilla\Layout\LayoutPage;
+use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\PageDispatchController;
 
@@ -35,12 +37,19 @@ class HomePageController extends PageDispatchController
      */
     public function index()
     {
+        $subcommunityEnabled = Gdn::config("Feature.customLayout.subcommunityHome.Enabled", false);
         $siteSection = $this->siteSectionModel->getCurrentSiteSection();
-
-        $query = new LayoutFormAsset("home", "siteSection", (string) $siteSection->getSectionID(), [
-            "siteSectionID" => (string) $siteSection->getSectionID(),
-            "locale" => $siteSection->getContentLocale(),
-        ]);
+        $query = new LayoutFormAsset(
+            $subcommunityEnabled && $siteSection->getSectionID() != DefaultSiteSection::DEFAULT_ID
+                ? "subcommunityHome"
+                : "home",
+            "siteSection",
+            (string) $siteSection->getSectionID(),
+            [
+                "siteSectionID" => (string) $siteSection->getSectionID(),
+                "locale" => $siteSection->getContentLocale(),
+            ]
+        );
 
         return $this->usePage(LayoutPage::class)
             ->permission()

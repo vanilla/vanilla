@@ -2,7 +2,7 @@
 $Session = Gdn::session();
 $desc = t('Messages can appear anywhere in your application.', 'Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.');
 helpAsset(sprintf(t('About %s'), t('Messages')), $desc);
-helpAsset(t('Need More Help?'), anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'));
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on managing appearance"), 'https://success.vanillaforums.com/kb/articles/465-moderation-messaging-video'));
 echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'js-modal btn btn-primary');
 ?>
 <?php if ($this->MessageData->numRows() > 0) { ?>

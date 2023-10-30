@@ -18,6 +18,7 @@ class NullContainer extends \Garden\Container\Container
 
     /**
      * Make sure that we fail!
+     * @inheritDoc
      */
     public function rule($id)
     {
@@ -25,6 +26,7 @@ class NullContainer extends \Garden\Container\Container
             "NullContainer is being called which means that the bootstrapping process failed somewhere.",
             E_USER_ERROR
         );
+        return $this;
     }
 
     /**

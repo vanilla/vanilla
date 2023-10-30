@@ -10,8 +10,11 @@
 namespace Vanilla\Dashboard\Tests\Controllers;
 
 use EntryController;
+use Garden\Schema\ValidationException;
 use VanillaTests\Bootstrap;
 use VanillaTests\Dashboard\EntryControllerConnectTestTrait;
+use VanillaTests\ExpectExceptionTrait;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
 use VanillaTests\VanillaTestCase;
@@ -50,6 +53,8 @@ class EntryControllerConnectTest extends SiteTestCase
 {
     use EntryControllerConnectTestTrait;
     use UsersAndRolesApiTestTrait;
+    use ExpectExceptionTrait;
+    use CommunityApiTestTrait;
 
     protected const PROVIDER_KEY = "ec-test";
 
@@ -102,6 +107,50 @@ class EntryControllerConnectTest extends SiteTestCase
 
         $dbUser = $this->assertSSOUser($newSSOInfo);
         $this->assertEquals($dbUser["UserID"], $this->session->UserID);
+    }
+
+    /**
+     * Test that a user connecting Via sso gets the default followed category,
+     *  when default category setting is enabled
+     *
+     */
+    public function testSSOUserGetsDefaultFollowedCategories(): void
+    {
+        $this->api()->setUserID(3);
+        $categoryA = $this->createCategory([
+            "parentCategoryID" => \CategoryModel::ROOT_ID,
+            "name" => "Custom Category A",
+        ]);
+        $defaultCategoryPreferences = [
+            [
+                "categoryID" => $categoryA["categoryID"],
+                "preferences" => [
+                    "preferences.followed" => true,
+                    "preferences.email.comments" => false,
+                    "preferences.email.posts" => true,
+                    "preferences.popup.comments" => true,
+                    "preferences.popup.posts" => false,
+                ],
+            ],
+        ];
+        //set default category followed settings in configuration
+        \Gdn::config()->saveToConfig(
+            \CategoryModel::DEFAULT_FOLLOWED_CATEGORIES_KEY,
+            json_encode($defaultCategoryPreferences),
+            false
+        );
+        $this->api()->setUserID(0);
+        $ssoUSer = $this->testMinimalSSORegistration();
+        $categoryModel = $this->container()->get(\CategoryModel::class);
+        $followedCategories = $categoryModel->getFollowed($ssoUSer["UserID"]);
+        $userPreference = $categoryModel->getPreferencesByCategoryID($ssoUSer["UserID"], $categoryA["categoryID"]);
+        $this->assertEquals(
+            \CategoriesApiController::normalizePreferencesInput($defaultCategoryPreferences[0]["preferences"]),
+            $userPreference
+        );
+
+        $this->assertCount(1, $followedCategories);
+        $this->assertArrayHasKey($categoryA["categoryID"], $followedCategories);
     }
 
     /**
@@ -288,6 +337,40 @@ class EntryControllerConnectTest extends SiteTestCase
         $this->entryConnect($ssoUser);
         $this->bessy()->assertNoFormErrors();
         $this->assertUserHasRoles($this->session->UserID, [Bootstrap::ROLE_ADMIN]);
+    }
+
+    /**
+     * If the user roles are passed via SSO and allowed explicitly,
+     * we should follow basic registration process if the registration process is set to approval
+     *
+     * @return void
+     */
+    public function testSSORegistrationWithRoleSynch()
+    {
+        $this->runWithConfig(["Garden.Registration.Method" => "Approval"], function () {
+            //Test sso registration with roles passed. It should follow basic registration
+            $ssoUser = $this->dummyUser([
+                "UniqueID" => "User-with-roles",
+                "Roles" => [self::ROLE_MOD, self::ROLE_MEMBER],
+            ]);
+            //make a registration with existing roles set
+            $this->entryConnect(function (\EntryController $sender) use ($ssoUser) {
+                $this->basicConnectCallback($ssoUser)($sender);
+                $sender->setData("Trusted", true);
+            });
+            $this->bessy()->assertNoFormErrors();
+            $this->assertUserHasRoles($this->session->UserID, [self::ROLE_MOD, self::ROLE_MEMBER]);
+            $this->assertUserHasNotRoles($this->session->UserID, ["Applicant"]);
+
+            //test sso registration with no roles passed. It should follow approval process.
+            $ssoUser = $this->dummyUser(["UniqueID" => "User-without-roles"]);
+            $this->entryConnect(function (\EntryController $sender) use ($ssoUser) {
+                $this->basicConnectCallback($ssoUser)($sender);
+                $sender->setData("Trusted", true);
+            });
+            $this->bessy()->assertNoFormErrors();
+            $this->assertUserHasRoles($this->session->UserID, ["Applicant"]);
+        });
     }
     //endregion
 
@@ -688,7 +771,6 @@ class EntryControllerConnectTest extends SiteTestCase
 
         //now lets connect again with submit and send some values so $isPostBack is true
         $body = $lastHTML->getFormValues();
-        $body["ConnectName"] = $ssoUser["Name"];
         $profileKey = "Profile[{$profileFieldData["apiName"]}]";
         if (isset($body[$profileKey])) {
             unset($body[$profileKey]);
@@ -710,12 +792,250 @@ class EntryControllerConnectTest extends SiteTestCase
     }
 
     /**
+     * A new user coming in for registration through sso should be able to register and update data through connect page
+     * Any existing data for profile fields should be pre-populated and available for edit
+     * Any hidden/internal fields shouldn't be shown on connect page
+     * Internal/Hidden Fields available on SSO data should be captured and updated.
+     */
+    public function testConnectPageWithMultipleCustomProfileFields()
+    {
+        $options = [
+            [
+                "dataType" => "text",
+                "registrationOptions" => "required",
+            ],
+            [
+                "dataType" => "text",
+                "visibility" => "internal",
+                "registrationOptions" => "optional",
+            ],
+            [
+                "dataType" => "text",
+                "mutability" => "restricted",
+                "registrationOptions" => "optional",
+            ],
+            [
+                "dataType" => "text",
+                "registrationOptions" => "hidden",
+            ],
+        ];
+        //Create necessary profile fields
+        for ($i = 0; $i < count($options); $i++) {
+            $profileFieldData[] = $this->createProfileFieldsWithPermission($options[$i]);
+        }
+        $permitted_chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+        //Now create a new sso user having profile field data
+        $uniqueID = uniqid("connect_");
+        $ssodata = ["UniqueID" => $uniqueID];
+
+        foreach ($profileFieldData as $key => $value) {
+            $ssodata[$value["apiName"]] = substr(str_shuffle($permitted_chars), 0, 10);
+        }
+        $ssoUser = $this->dummyUser($ssodata);
+        // First time coming in he will given a form with profile fields
+        $r = $this->entryConnect($ssoUser);
+        $formValues = $r->Form->formValues();
+        $visibleFields = $notVisisbleFields = [];
+        foreach ($profileFieldData as $key => $value) {
+            if ($value["visibility"] != "internal" && $value["registrationOptions"] != "hidden") {
+                $visibleFields[$value["apiName"]] = $ssodata[$value["apiName"]];
+            } else {
+                $notVisisbleFields[$value["apiName"]] = $ssodata[$value["apiName"]];
+            }
+        }
+        $this->assertEquals($visibleFields, $formValues["Profile"]);
+
+        $lastHTML = $this->bessy()->getLastHtml();
+        $this->bessy()->assertNoFormErrors();
+
+        //Verify visible profile fields  are pre-populated for modification
+        foreach ($visibleFields as $apiKey => $val) {
+            $lastHTML->assertFormInput("Profile[$apiKey]", $val);
+        }
+
+        //Verify internal and hidden fields are not shown on the form
+        foreach ($notVisisbleFields as $apiKey => $val) {
+            $lastHTML->assertNoFormInput("Profile[$apiKey]");
+        }
+
+        // We need to now verify that all the profile fields are being saved on the post call
+        $body = $lastHTML->getFormValues();
+        foreach ($body as $key => $value) {
+            if (substr($key, 0, 7) == "Profile") {
+                unset($body[$key]);
+            }
+        }
+        $body["Profile"] = $formValues["Profile"];
+
+        $r = $this->entryConnect($ssoUser, $body);
+
+        //we successfully created our user
+        $dbUser = $this->assertSSOUser(array_splice($ssoUser, 0, 3));
+        // Verify all the profilefield values passed from sso got saved
+
+        $userMetaModel = \Gdn::userMetaModel();
+        $metaData = $userMetaModel->getUserMeta($dbUser["UserID"]);
+        $profileMetaData = $this->getProfileMetaData($metaData);
+        $this->assertCount(count($ssoUser), $profileMetaData);
+        foreach ($profileMetaData as $key => $val) {
+            $key = str_replace("Profile.", "", $key);
+            $this->assertEquals($ssoUser[$key], $val);
+        }
+        $dbUser["Profile"] = $ssoUser;
+        $dbUser["UniqueID"] = $uniqueID;
+        return $dbUser;
+    }
+
+    /**
+     * A new user coming in via sso with only hidden user profile fields gets their profile data saved.
+     *
+     * @return void
+     */
+    public function testConnectPageWithOnlyHiddenUserProfileFields(): void
+    {
+        $this->resetTable("profileField");
+        $field = [
+            "apiName" => "hidden-text",
+            "registrationOptions" => "hidden",
+            "mutability" => "restricted",
+        ];
+        $hiddenProfileField = $this->createProfileFieldsWithPermission($field);
+        $ssoData = [
+            $hiddenProfileField["apiName"] => "hidden data",
+            "UniqueID" => uniqid("connect_"),
+        ];
+        $ssoUser = $this->dummyUser($ssoData);
+        $r = $this->entryConnect($ssoUser);
+        $userData = $this->userModel->getByEmail($ssoUser["Email"], false, ["dataType" => "array"]);
+        $this->assertNotEmpty($userData, "SSO user not created");
+        //We need to make sure our hidden data got saved
+        $userMetaModel = \Gdn::userMetaModel();
+        $metaData = $userMetaModel->getUserMeta($userData["UserID"]);
+
+        $this->assertEquals($ssoData[$hiddenProfileField["apiName"]], $metaData["Profile." . $field["apiName"]]);
+    }
+
+    /**
+     * A new user coming in via sso with only hidden user profile fields and having an invalid user profile field
+     * will have the user created without throwing errors and will have the invalid field skipped.
+     *
+     * @return void
+     */
+    public function testConnectPageWithInvalidHiddenUserProfileFields(): void
+    {
+        $this->resetTable("profileField");
+        $fields = [
+            "valid" => [
+                "apiName" => "hidden-valid-field",
+                "registrationOptions" => "hidden",
+                "mutability" => "restricted",
+            ],
+            "inValid" => [
+                "apiName" => "hidden-invalid-field",
+                "registrationOptions" => "hidden",
+                "dataType" => "number",
+                "formType" => "number",
+                "mutability" => "restricted",
+            ],
+        ];
+        $hiddenProfileFields = [];
+        foreach ($fields as $key => $val) {
+            $hiddenProfileFields[$key] = $this->createProfileFieldsWithPermission($val);
+        }
+        $ssoData = [
+            $hiddenProfileFields["valid"]["apiName"] => "hidden text data",
+            $hiddenProfileFields["inValid"]["apiName"] => "hidden invalid numeric data",
+            "UniqueID" => uniqid("connect_"),
+        ];
+        $ssoUser = $this->dummyUser($ssoData);
+        $r = $this->entryConnect($ssoUser);
+        $userData = $this->userModel->getByEmail($ssoUser["Email"], false, ["dataType" => "array"]);
+        $this->assertNotEmpty($userData, "SSO user not created");
+
+        //We need to verify  that the invalid field got skipped and only valid field has been saved
+        $userMetaModel = \Gdn::userMetaModel();
+        $metaData = $userMetaModel->getUserMeta($userData["UserID"]);
+        $profileMetaData = $this->getProfileMetaData($metaData);
+
+        $this->assertCount(1, $profileMetaData);
+        $this->assertArrayHasKey(
+            "Profile.{$hiddenProfileFields["valid"]["apiName"]}",
+            $profileMetaData,
+            "Missing {$hiddenProfileFields["valid"]["apiName"]} profile field value"
+        );
+        $this->assertArrayNotHasKey("Profile.{$hiddenProfileFields["inValid"]["apiName"]}", $profileMetaData);
+    }
+
+    /**
+     * Test some edge case scenarios for connect
+     */
+    public function testConnectPageEdgeCases()
+    {
+        $options = [
+            [
+                "dataType" => "text",
+                "formType" => "dropdown",
+                "registrationOptions" => "optional",
+                "dropdownOptions" => ["A", "B", "C"],
+            ],
+            [
+                "dataType" => "text",
+                "formType" => "dropdown",
+                "visibility" => "internal",
+                "registrationOptions" => "optional",
+                "dropdownOptions" => ["1", "2", "3"],
+            ],
+            [
+                "dataType" => "string[]",
+                "formType" => "tokens",
+                "registrationOptions" => "optional",
+                "dropdownOptions" => ["Token-1", "Token-2", "Token-3"],
+            ],
+        ];
+        for ($i = 0; $i < count($options); $i++) {
+            $profileFieldData[] = $this->createProfileFieldsWithPermission($options[$i]);
+        }
+        //Now create a new sso user having profile field data
+        $ssodata = ["UniqueID" => uniqid("connect_")];
+        $ssodata[$profileFieldData[0]["apiName"]] = "B";
+        $ssodata[$profileFieldData[2]["apiName"]] = ["Token-2", "Token-3"];
+        $ssoUser = $this->dummyUser($ssodata);
+        //the values should be selected for the users in the form
+        $r = $this->entryConnect($ssoUser);
+        $formValues = $r->Form->formValues();
+        $this->assertArrayHasKey("Profile", $formValues);
+        foreach ($formValues["Profile"] as $key => $value) {
+            $this->assertEquals($ssoUser[$key], $value);
+        }
+        $lastHTML = $this->bessy()->getLastHtml();
+        //Test that our fields are selected
+        $lastHTML->assertFormDropdown("Profile[{$profileFieldData[0]["apiName"]}]", "B");
+        $lastHTML->assertFormToken("Profile[{$profileFieldData[2]["apiName"]}]", ["Token-2", "Token-3"]);
+
+        //if we get values that was not part of our options we shouldn't select them by default
+        $ssoUser[$profileFieldData[0]["apiName"]] = "X";
+        $ssoUser[$profileFieldData[2]["apiName"]] = ["Token-10"];
+        $r = $this->entryConnect($ssoUser);
+        $lastHTML = $this->bessy()->getLastHtml();
+        $body = $lastHTML->getFormValues();
+        $dropdownField = $lastHTML->assertFormDropdown("Profile[{$profileFieldData[0]["apiName"]}]", null);
+        $this->assertEmpty($dropdownField->getAttribute("data-value"));
+        $tokenField = $lastHTML->assertFormToken("Profile[{$profileFieldData[2]["apiName"]}]", null);
+        $tokenAttributes = json_decode($tokenField->getAttribute("data-props"), true);
+        $this->assertEmpty($tokenAttributes["initialValue"]);
+    }
+
+    /**
      * A new user should not be able to register through connect page as the validation for required custom profile field will fail.
      *
      */
     public function testConnectPageWithCustomProfileFieldsValidation()
     {
-        $profileFieldData = $this->createProfileFieldsWithPermission(["registrationOptions" => "required"]);
+        $profileFieldData = $this->createProfileFieldsWithPermission([
+            "registrationOptions" => "required",
+            "apiName" => "myField",
+        ]);
 
         //Connect button is not pressed yet, checking if our profile fields are there
         $ssoUser = $this->dummyUser([
@@ -728,11 +1048,10 @@ class EntryControllerConnectTest extends SiteTestCase
         $body = $this->bessy()
             ->getLastHtml()
             ->getFormValues();
-        $body["ConnectName"] = $ssoUser["Name"];
         $body["Profile"][$profileFieldData["apiName"]] = "";
 
         //should throw an error as we did not provide the required profile field
-        $this->expectExceptionMessage($profileFieldData["label"] . " is required.");
+        $this->expectExceptionMessage("myField is required.");
         $r = $this->entryConnect($ssoUser, $body);
     }
 
@@ -754,6 +1073,48 @@ class EntryControllerConnectTest extends SiteTestCase
             ->getLastHtml()
             ->assertFormInput("Profile[" . $profileFieldData["apiName"] . "]");
     }
+
+    /**
+     * A returning sso user should be able to connect again and have their user information synchronized.
+     *
+     * 1. Someone has already SSO'd.
+     * 2. They come back to the site and SSO again.
+     *
+     * They should be recognized by their `UniqueID` and their new user information should be updated.
+     *
+     * @param array $existingUser Pass a user that has already registered via SSO
+     * @depends testconnectPageWithMultipleCustomProfileFields
+     */
+    public function testSSOSyncWithProfileFields(array $existingUser): void
+    {
+        $newSSOInfo = $this->dummyUser();
+        $newSSOInfo["UniqueID"] = $existingUser["UniqueID"];
+
+        // We need to now modify the api data and verify if they are being updated
+        $i = 1;
+        foreach ($existingUser["Profile"] as $key => $data) {
+            $newSSOInfo[$key] = "Updated" . $data;
+            $i++;
+            if ($i > 2) {
+                break;
+            }
+        }
+
+        // We can now connect so that new data can be updated and the user will be loggedIn.
+        $r = $this->entryConnect($newSSOInfo);
+        $this->bessy()->assertNoFormErrors();
+
+        $dbUser = $this->assertSSOUser(array_slice($newSSOInfo, 0, 3));
+        $this->assertEquals($dbUser["UserID"], $this->session->UserID);
+
+        //We need to make sure our data got updated
+        $userMetaModel = \Gdn::userMetaModel();
+        $metaData = $userMetaModel->getUserMeta($dbUser["UserID"]);
+        foreach (array_slice($newSSOInfo, -2, 2) as $key => $val) {
+            $this->assertEquals($val, $metaData["Profile." . $key]);
+        }
+    }
+
     //endregion
 
     //region Basic SSO errors.
@@ -888,6 +1249,62 @@ class EntryControllerConnectTest extends SiteTestCase
         $this->bessy()->assertFormErrorMessage("The site does not allow you connect with an existing user.");
         $this->assertFalse($this->session->isValid());
         $this->assertNoAuthentication($ssoUser["UniqueID"]);
+    }
+
+    /**
+     * Validate the ConnectName  field gets properly validated
+     *
+     * @return void
+     */
+    public function testConnectNameGetsValidatedOnPostCall(): void
+    {
+        $data = [
+            "UniqueID" => "validationTest",
+            "Email" => "testUSer@test.com",
+        ];
+        $body = [
+            "ConnectName" => "Test%02",
+            "Connect" => "connect",
+        ];
+
+        //A post request with injected data  should throw a validation error
+        $this->runWithExpectedExceptionMessage("The connection data has not been verified", function () use (
+            $data,
+            $body
+        ) {
+            $this->bessy()->request("POST", "/entry/connect", $data + $body);
+        });
+
+        $this->config->removeFromConfig("Garden.User.ValidationRegexPattern");
+
+        //Post back without providing Name Field
+        $this->runWithExpectedExceptionMessage(
+            "Usernames must be 3-20 characters and consist of letters, numbers, and underscores.",
+            function () use ($data, $body) {
+                $r = $this->entryConnect($data, $body);
+            }
+        );
+
+        //Post back with Name Field
+        $newSSOInfo = $this->dummyUser(["UniqueID" => "validationTest"]);
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage(
+            "Usernames must be 3-20 characters and consist of letters, numbers, and underscores."
+        );
+        $r = $this->entryConnect($newSSOInfo, $body);
+    }
+
+    /**
+     * Extract the Profile field metatdata from an array of metadata.
+     *
+     * @param array $metaData
+     * @return array
+     */
+    private function getProfileMetaData(array $metaData): array
+    {
+        $profileMetaData = array_filter($metaData, fn($key) => str_contains($key, "Profile"), ARRAY_FILTER_USE_KEY);
+
+        return $profileMetaData;
     }
     //endregion
 }

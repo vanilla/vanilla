@@ -62,7 +62,7 @@ class ExternalUrlTest extends BootstrapTestCase
                 "https://example.com/foo/bar?baz=qux",
             ],
             "full schemaless url" => [
-                "http://example.com/foo/bar?baz=qux",
+                "https://example.com/foo/bar?baz=qux",
                 "https://example.com/%s",
                 "//example.com/foo/bar?baz=qux",
             ],

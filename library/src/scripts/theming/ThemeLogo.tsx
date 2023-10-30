@@ -27,7 +27,17 @@ class ThemeLogo extends React.Component<IProps> {
         const finalUrl = this.props.overwriteLogo ?? themeUrl ?? this.props.logoUrl;
 
         if (finalUrl) {
-            content = <img className={this.props.className} src={finalUrl} alt={t("Home")} />;
+            content = (
+                <img
+                    className={this.props.className}
+                    src={finalUrl}
+                    alt={t("Home")}
+                    onLoad={() => {
+                        // This helps the MegaMenu re-position
+                        window.dispatchEvent(new Event("resize"));
+                    }}
+                />
+            );
         } else {
             content = <VanillaLogo className={this.props.className} isMobile={!isDesktop} />;
         }

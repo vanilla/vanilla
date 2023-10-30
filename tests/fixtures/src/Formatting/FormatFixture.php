@@ -160,4 +160,17 @@ class FormatFixture
 
         return null;
     }
+
+    /**
+     * @return array|null
+     */
+    public function getAllMentions(): ?array
+    {
+        $json = $this->getFixtureContentsWithFileName("output-allMentions.json");
+        if ($json) {
+            return json_decode($json, true);
+        }
+
+        return null;
+    }
 }

@@ -25,5 +25,5 @@ export function Icon(_props: IProps) {
     if (!FoundIcon || (process.env.NODE_ENV === "test" && typeof FoundIcon === "object")) {
         return null;
     }
-    return <FoundIcon focusable={false} aria-hidden="true" {...props} width={IconSize[size]} height={IconSize[size]} />;
+    return <FoundIcon focusable={false} {...props} width={IconSize[size]} height={IconSize[size]} />;
 }

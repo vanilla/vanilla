@@ -396,6 +396,67 @@ describe("LayoutEditorContents", () => {
         });
     });
 
+    describe("assertions", () => {
+        it("asserts a two or three column section contains a breadcrumb", () => {
+            let contents = LayoutEditorFixture.contents({});
+            contents = contents.insertSection(0, {
+                $hydrate: "react.section.2-columns",
+                testID: "section1",
+            });
+
+            // No breadcrumbs
+            let hasBreadcrumb = contents.hasBreadcrumb({
+                sectionIndex: 0,
+            });
+            expect(hasBreadcrumb).toEqual(false);
+
+            // Insert breadcrumb
+            contents = contents.insertWidget(
+                {
+                    sectionIndex: 0,
+                    sectionRegion: "breadcrumbs",
+                    sectionRegionIndex: 0,
+                },
+                {
+                    $hydrate: "react.breadcrumbs",
+                },
+            );
+            hasBreadcrumb = contents.hasBreadcrumb({
+                sectionIndex: 0,
+            });
+            expect(hasBreadcrumb).toEqual(true);
+        });
+        it("asserts a one column section contains a breadcrumb", () => {
+            let contents = LayoutEditorFixture.contents({});
+            contents = contents.insertSection(0, {
+                $hydrate: "react.section.1-column",
+                testID: "section1",
+            });
+
+            // No breadcrumbs
+            let hasBreadcrumb = contents.hasBreadcrumb({
+                sectionIndex: 0,
+            });
+            expect(hasBreadcrumb).toEqual(false);
+
+            // Insert breadcrumb
+            contents = contents.insertWidget(
+                {
+                    sectionIndex: 0,
+                    sectionRegion: "children",
+                    sectionRegionIndex: 0,
+                },
+                {
+                    $hydrate: "react.breadcrumbs",
+                },
+            );
+            hasBreadcrumb = contents.hasBreadcrumb({
+                sectionIndex: 0,
+            });
+            expect(hasBreadcrumb).toEqual(true);
+        });
+    });
+
     describe("validation", () => {
         it("home layout view type required assets validation", () => {
             let contents = LayoutEditorFixture.contents({});

@@ -78,7 +78,7 @@ trait BootstrapTrait
     {
         \Gdn::setController(null);
         StaticCache::clear();
-
+        \Gdn::sql()->reset();
         $this->setUpLoggerTrait();
         self::$emails = [];
         \Gdn_Form::resetIDs();
@@ -92,16 +92,27 @@ trait BootstrapTrait
      */
     protected static function createContainer()
     {
-        $folder = static::getBootstrapFolderName();
-        if ($folder !== "") {
-            $folder = "/" . $folder;
-        }
-        self::$bootstrap = new Bootstrap("https://vanilla.test{$folder}");
+        $baseUrl = static::getBaseUrl();
+        self::$bootstrap = new Bootstrap($baseUrl);
 
         self::$container = new Container();
         self::$bootstrap->run(self::$container);
         self::$bessy = self::$container->get(TestDispatcher::class);
         return self::$container;
+    }
+
+    /**
+     * Get the baseUrl to use for the tests.
+     *
+     * @return string
+     */
+    protected static function getBaseUrl(): string
+    {
+        $folder = static::getBootstrapFolderName();
+        if ($folder !== "") {
+            $folder = "/" . $folder;
+        }
+        return "https://vanilla.test{$folder}";
     }
 
     /**
@@ -149,6 +160,23 @@ trait BootstrapTrait
             }
         }
         self::fail($message ?: "Email not found: $email $name");
+    }
+
+    /**
+     * Assert that an email was not sent to the recipient.
+     *
+     * @param string|null $email The email address to search.
+     * @param string|null $name The name to search.
+     * @param string $message An error message if the test fails.
+     */
+    public static function assertEmailNotSentTo(?string $email, ?string $name = null, string $message = ""): void
+    {
+        foreach (self::$emails as $row) {
+            $found = $row->findRecipient($email, $name);
+            if ($found !== null) {
+                self::fail($message ?: "Unexpected email found: $email $name");
+            }
+        }
     }
 
     /**

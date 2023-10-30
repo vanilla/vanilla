@@ -56,10 +56,10 @@ class DateRangeExpression extends RangeExpression
     /**
      * {@inheritDoc}
      */
-    public static function createSchema($valueSchema = null): Schema
+    public static function createSchema($valueSchema = null, bool $allowRevalidate = false): Schema
     {
         $valueSchema = self::ensureSchema($valueSchema);
-        return parent::createSchema($valueSchema);
+        return parent::createSchema($valueSchema, $allowRevalidate);
     }
 
     /**

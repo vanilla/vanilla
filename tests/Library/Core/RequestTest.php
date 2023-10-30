@@ -1,12 +1,11 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Library\Core;
 
-use League\Uri\Http;
 use Vanilla\Utility\UrlUtils;
 use VanillaTests\SharedBootstrapTestCase;
 use Gdn_Request;
@@ -42,7 +41,6 @@ class RequestTest extends SharedBootstrapTestCase
             "QUERY_STRING",
             "REDIRECT_STATUS",
             "REDIRECT_X_PATH_INFO",
-            "REDIRECT_X_REWRITE",
             "REMOTE_ADDR",
             "REMOTE_PORT",
             "REQUEST_METHOD",
@@ -55,7 +53,6 @@ class RequestTest extends SharedBootstrapTestCase
             "SERVER_PROTOCOL",
             "USER",
             "X_PATH_INFO",
-            "X_REWRITE",
         ];
 
         // Grab all of the headers.
@@ -123,6 +120,22 @@ class RequestTest extends SharedBootstrapTestCase
 
         $req->setRequestArguments(Gdn_Request::INPUT_POST, ["foo" => "bar"]);
         $this->assertSame($req->getBody(), $req->getRequestArguments(Gdn_Request::INPUT_POST));
+    }
+
+    /**
+     * Test Gdn_Request's decodePost() function.
+     * See issue https://higherlogic.atlassian.net/browse/VNLA-3055
+     */
+    public function testDecodePostFunction()
+    {
+        $req = new Gdn_Request();
+
+        $payloadFile = PATH_ROOT . "/tests/fixtures/json/decodePostPayload.json";
+        $decodedPayload = json_decode(file_get_contents($payloadFile), true);
+
+        $returnedValue = $req->decodePost([], ["CONTENT_TYPE" => "application/json"], $payloadFile, []);
+
+        $this->assertEquals($decodedPayload, $returnedValue);
     }
 
     /**
@@ -600,9 +613,6 @@ class RequestTest extends SharedBootstrapTestCase
      */
     public function testUrlEquivalence()
     {
-        // Simulate that rewrite is ON
-        $_SERVER["X_REWRITE"] = 1;
-
         $req = new Gdn_Request();
 
         $req->setScheme("http");
@@ -689,7 +699,6 @@ class RequestTest extends SharedBootstrapTestCase
             "HTTP_CACHE_CONTROL" => "max-age=0",
             "HTTP_CONNECTION" => "keep-alive",
             "HTTP_HOST" => "dev.vanilla.localhost",
-            "X_REWRITE" => "1",
             "SCRIPT_FILENAME" => "/srv/vanilla-repositories/vanilla/index.php",
             "REDIRECT_STATUS" => "200",
             "SERVER_NAME" => "dev.vanilla.localhost",
@@ -814,19 +823,6 @@ class RequestTest extends SharedBootstrapTestCase
     {
         $request = self::createRequest(["HTTPS" => "on"]);
         $this->assertSame("https", $request->getScheme());
-    }
-
-    /**
-     * Test paths when rewriting is off.
-     *
-     * @param array $get
-     * @param string $expected
-     * @dataProvider provideNonRewrittenPaths
-     */
-    public function testNonRewrittenPath(array $get, string $expected): void
-    {
-        $request = self::createRequest(["X_REWRITE" => 0], $get);
-        $this->assertSame($expected, $request->getPath());
     }
 
     /**

@@ -10,119 +10,133 @@ import {
     HamburgerMenuContextProvider,
     useHamburgerMenuContext,
 } from "@library/contexts/HamburgerMenuContext";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { HamburgerWithComponents } from "@library/contexts/__fixtures__/HamburgerContextFixture";
-import { renderHook } from "@testing-library/react-hooks";
+import { renderHook, act } from "@testing-library/react-hooks";
 
 describe("Hamburger Context", () => {
-    it("Renders an added node component", () => {
-        render(
-            <HamburgerMenuContextProvider>
-                <HamburgerWithComponents
-                    componentsAddedToContext={[
-                        {
-                            title: "nodeTest",
-                            type: DynamicComponentTypes.node,
-                            node: <span>Node Test</span>,
-                        },
-                    ]}
-                />
-            </HamburgerMenuContextProvider>,
-        );
-        expect(screen.findByText(/Node Test/)).toBeTruthy();
+    it("Renders an added node component", async () => {
+        await act(async () => {
+            render(
+                <HamburgerMenuContextProvider>
+                    <HamburgerWithComponents
+                        componentsAddedToContext={[
+                            {
+                                title: "nodeTest",
+                                type: DynamicComponentTypes.node,
+                                node: <span>Node Test</span>,
+                            },
+                        ]}
+                    />
+                </HamburgerMenuContextProvider>,
+            );
+        });
+        expect(await screen.findByText(/Node Test/)).toBeTruthy();
     });
 
-    it("Renders multiple added node components", () => {
-        render(
-            <HamburgerMenuContextProvider>
-                <HamburgerWithComponents
-                    componentsAddedToContext={[
-                        {
-                            title: "nodeTestOne",
-                            type: DynamicComponentTypes.node,
-                            node: <span>Node Test One</span>,
-                        },
-                        {
-                            title: "nodeTestTwo",
-                            type: DynamicComponentTypes.node,
-                            node: <span>Node Test Two</span>,
-                        },
-                    ]}
-                />
-            </HamburgerMenuContextProvider>,
-        );
-        expect(screen.findByText(/Node Test One/)).toBeTruthy();
-        expect(screen.findByText(/Node Test Two/)).toBeTruthy();
+    it("Renders multiple added node components", async () => {
+        await act(async () => {
+            render(
+                <HamburgerMenuContextProvider>
+                    <HamburgerWithComponents
+                        componentsAddedToContext={[
+                            {
+                                title: "nodeTestOne",
+                                type: DynamicComponentTypes.node,
+                                node: <span>Node Test One</span>,
+                            },
+                            {
+                                title: "nodeTestTwo",
+                                type: DynamicComponentTypes.node,
+                                node: <span>Node Test Two</span>,
+                            },
+                        ]}
+                    />
+                </HamburgerMenuContextProvider>,
+            );
+        });
+        expect(await screen.findByText(/Node Test One/)).toBeTruthy();
+        expect(await screen.findByText(/Node Test Two/)).toBeTruthy();
     });
 
-    it("Renders a added tree component", () => {
-        render(
-            <HamburgerMenuContextProvider>
-                <HamburgerWithComponents
-                    componentsAddedToContext={[
-                        {
-                            title: "testTree",
-                            type: DynamicComponentTypes.tree,
-                            tree: [
-                                {
-                                    name: "Test Menu Item",
-                                    parentID: 0,
-                                    recordID: 1,
-                                    sort: 1,
-                                    recordType: "menuItem",
-                                    isLink: false,
-                                    children: [],
-                                },
-                            ],
-                        },
-                    ]}
-                />
-            </HamburgerMenuContextProvider>,
-        );
-        expect(screen.findByText(/Test Menu Item/)).toBeTruthy();
+    it("Renders a added tree component", async () => {
+        await act(async () => {
+            render(
+                <HamburgerMenuContextProvider>
+                    <HamburgerWithComponents
+                        componentsAddedToContext={[
+                            {
+                                title: "testTree",
+                                type: DynamicComponentTypes.tree,
+                                tree: [
+                                    {
+                                        name: "Test Menu Item",
+                                        parentID: 0,
+                                        recordID: 1,
+                                        sort: 1,
+                                        recordType: "menuItem",
+                                        isLink: false,
+                                        children: [],
+                                    },
+                                ],
+                            },
+                        ]}
+                    />
+                </HamburgerMenuContextProvider>,
+            );
+        });
+        expect(await screen.findByText(/Test Menu Item/)).toBeTruthy();
     });
 
     it("Renders a sub tree", async () => {
-        render(
-            <HamburgerMenuContextProvider>
-                <HamburgerWithComponents
-                    componentsAddedToContext={[
-                        {
-                            title: "testTree",
-                            type: DynamicComponentTypes.tree,
-                            tree: [
-                                {
-                                    name: "Test Parent Item",
-                                    parentID: 0,
-                                    recordID: 1,
-                                    sort: 1,
-                                    recordType: "parentItem",
-                                    isLink: false,
-                                    children: [
-                                        {
-                                            name: "Test Child Item",
-                                            parentID: 1,
-                                            recordID: 2,
-                                            sort: 1,
-                                            recordType: "childItem",
-                                            isLink: false,
-                                            children: [],
-                                        },
-                                    ],
-                                },
-                            ],
-                        },
-                    ]}
-                />
-            </HamburgerMenuContextProvider>,
-        );
-        fireEvent.click(await screen.findByText(/Test Parent Item/));
-        expect(screen.findByText(/Test Child Item/)).toBeTruthy();
+        await act(async () => {
+            render(
+                <HamburgerMenuContextProvider>
+                    <HamburgerWithComponents
+                        componentsAddedToContext={[
+                            {
+                                title: "testTree",
+                                type: DynamicComponentTypes.tree,
+                                tree: [
+                                    {
+                                        name: "Test Parent Item",
+                                        parentID: 0,
+                                        recordID: 1,
+                                        sort: 1,
+                                        recordType: "parentItem",
+                                        isLink: false,
+                                        children: [
+                                            {
+                                                name: "Test Child Item",
+                                                parentID: 1,
+                                                recordID: 2,
+                                                sort: 1,
+                                                recordType: "childItem",
+                                                isLink: false,
+                                                children: [],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ]}
+                    />
+                </HamburgerMenuContextProvider>,
+            );
+        });
+
+        await act(async () => {
+            const parentItem = await screen.findByText(/Test Parent Item/);
+            fireEvent.click(parentItem);
+        });
+
+        expect(await screen.findByText(/Test Child Item/)).toBeTruthy();
     });
-    it("Hook has initial methods", () => {
+
+    it("Hook has initial methods", async () => {
         const { result } = renderHook(() => useHamburgerMenuContext());
         let id;
-        act(() => {
+        await act(async () => {
             id = result.current.addComponent({
                 title: "addTest",
                 type: DynamicComponentTypes.node,
@@ -130,14 +144,15 @@ describe("Hamburger Context", () => {
             });
         });
         expect(id).toBe(-1);
-        act(() => {
+        await act(async () => {
             result.current.removeComponentByID(id);
         });
     });
-    it("Add component adds to the dynamicComponent list", () => {
+
+    it("Add component adds to the dynamicComponent list", async () => {
         const wrapper = ({ children }) => <HamburgerMenuContextProvider>{children}</HamburgerMenuContextProvider>;
         const { result } = renderHook(() => useHamburgerMenuContext(), { wrapper });
-        act(() => {
+        await act(async () => {
             result.current.addComponent({
                 title: "addTest",
                 type: DynamicComponentTypes.node,
@@ -145,9 +160,13 @@ describe("Hamburger Context", () => {
             });
         });
 
+        // await act(async () => {
+
         expect(Object.keys(result.current.dynamicComponents ?? {}).length).toEqual(1);
+        // });
     });
-    it("Remove component removes dynamicComponent entry", () => {
+
+    it("Remove component removes dynamicComponent entry", async () => {
         const wrapper = ({ children }) => <HamburgerMenuContextProvider>{children}</HamburgerMenuContextProvider>;
         const { result, rerender } = renderHook(() => useHamburgerMenuContext(), { wrapper });
 
@@ -156,7 +175,7 @@ describe("Hamburger Context", () => {
         let id;
 
         // First render
-        act(() => {
+        await act(async () => {
             id = result.current.addComponent({
                 title: "addTest",
                 type: DynamicComponentTypes.node,
@@ -166,7 +185,7 @@ describe("Hamburger Context", () => {
         expect(result.current.dynamicComponents?.[id].component).toEqual(testNodeOne);
 
         // Second render
-        act(() => {
+        await act(async () => {
             result.current.removeComponentByID(id);
         });
 

@@ -132,9 +132,9 @@ export const widgetSettingsClasses = useThemeCache(() => {
 
             "& .input-wrap": {
                 display: "flex",
-                justifyContent: "flex-end",
                 flex: "0 0 59%",
                 maxWidth: "59%",
+                flexWrap: "wrap",
 
                 "& textarea, & input": {
                     fontSize: 13,
@@ -207,10 +207,6 @@ export const widgetSettingsClasses = useThemeCache(() => {
             },
         },
 
-        "& .form-group:last-of-type": {
-            paddingBottom: 24,
-        },
-
         "& .formGroup-toggle": {
             "& .label-wrap": {
                 flex: "0 0 66.66666666%",
@@ -218,12 +214,42 @@ export const widgetSettingsClasses = useThemeCache(() => {
 
             "& .input-wrap": {
                 flex: "0 0 33.33333333%",
+                justifyContent: "flex-end",
             },
         },
 
         "& .formGroup-radio": {
             "& .input-wrap": {
                 flexDirection: "column",
+            },
+        },
+
+        "& .formGroup-upload": {
+            "& .input-wrap": {
+                maxWidth: "none",
+                "& .input-wrap": {
+                    maxWidth: "100%",
+                    flex: "0 0 100%",
+                },
+            },
+        },
+
+        // no label for this, lets just take all the space
+        "& .formGroup-custom": {
+            "& .label-wrap": {
+                display: "none",
+            },
+            "& .input-wrap": {
+                flex: "none",
+                maxWidth: "none",
+            },
+        },
+
+        // a bit of alignment when we have inline errors
+        "& .form-group.hasError ": {
+            "& .label-wrap": {
+                alignSelf: "normal",
+                marginTop: 6,
             },
         },
     });

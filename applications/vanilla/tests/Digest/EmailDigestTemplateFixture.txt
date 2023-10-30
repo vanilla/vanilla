@@ -1,0 +1,41 @@
+This Week's Trending Posts
+
+Category 1 (https://vanilla.test/emaildigesttemplatetest/categories/category-1)
+
+Discussion 1 (https://vanilla.test/emaildigesttemplatetest/discussion/1/discussion-1)
+A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart. I am alone, and feel the charm of existence in this
+1 views 50 comments 5 reactions
+Started by circleci
+
+Discussion 2 (https://vanilla.test/emaildigesttemplatetest/discussion/2/discussion-2)
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla…
+1 views 60 reactions
+Started by circleci
+
+Discussion 3 (https://vanilla.test/emaildigesttemplatetest/discussion/3/discussion-3)
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla…
+1 views 20 reactions
+Started by circleci
+
+Category 2 (https://vanilla.test/emaildigesttemplatetest/categories/category-2)
+
+Discussion 4 (https://vanilla.test/emaildigesttemplatetest/discussion/4/discussion-4)
+Biscuit caramels pudding. Sweet roll jelly gummi bears lemon drops biscuit croissant tootsie roll danish.
+1 views
+Started by circleci
+
+Discussion 5 (https://vanilla.test/emaildigesttemplatetest/discussion/5/discussion-5)
+The quick, brown fox jumps over a lazy dog. DJs flock by when MTV ax quiz prog. Junk MTV quiz graced
+1 views
+Started by circleci
+
+
+Higher Logic Vanilla
+1234 North Pole Lane
+Anotherline could go in here
+And Another Line
+Erin, ON, Canada, N0B 1T0
+
+Unsubscribe (https://demo.vanillawip.com/unsubscribe/token) from the email digest or
+
+Manage (https://demo.vanillawip.com/profile/preferences) your notification preferences

@@ -102,17 +102,21 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
     private static function getLimitSchema(): Schema
     {
         return Schema::parse([
-            "limit:i?" => [
-                "description" => "Desired number of items per page.",
-                "x-control" => SchemaForm::dropDown(
-                    new FormOptions(t("Limit"), t("Choose how many records to display."), t("Default (20)")),
-                    new StaticFormChoices([
-                        "10" => 10,
-                        "20" => 20,
-                        "30" => 30,
-                        "40" => 40,
-                        "50" => 50,
-                    ])
+            "limit" => [
+                "type" => "integer",
+                "description" => t("Desired number of items."),
+                "minimum" => 1,
+                "maximum" => 100,
+                "step" => 1,
+                "default" => 10,
+                "x-control" => SchemaForm::textBox(
+                    new FormOptions(
+                        t("Limit"),
+                        t("Choose how many records to display."),
+                        "",
+                        t("Up to a maximum of 100 items may be displayed.")
+                    ),
+                    "number"
                 ),
             ],
         ]);
@@ -139,6 +143,15 @@ class TagWidget extends AbstractReactModule implements ReactWidgetInterface, Com
         );
 
         return $schema;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["tags"]));
+        return $result;
     }
 
     /**

@@ -1,26 +1,38 @@
 <?php
 /**
  * @author Isis Graziatto <igraziatto@higherlogic.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Forum\Addon;
 
+use BreadcrumbWidget;
 use Garden\Container\ContainerConfigurationInterface;
 use Garden\Container\Reference;
 use Garden\Web\PageControllerRoute;
 use Vanilla\AddonContainerRules;
 use Vanilla\Analytics\EventProviderService;
 use Vanilla\Analytics\SearchDiscussionEventProvider;
+use Vanilla\Forum\Controllers\Pages\CategoryListPageController;
+use Vanilla\Forum\Controllers\Pages\DiscussionCategoryPageController;
 use Vanilla\Forum\Controllers\Pages\DiscussionListPageController;
+use Vanilla\Forum\Controllers\Pages\DiscussionThreadPageController;
+use Vanilla\Forum\Controllers\Pages\NestedCategoryListPageController;
+use Vanilla\Forum\Controllers\Pages\UnsubscribePageController;
+use Vanilla\Forum\Layout\View\CategoryListLayoutView;
+use Vanilla\Forum\Layout\View\DiscussionCategoryPageLayoutView;
 use Vanilla\Forum\Layout\View\LegacyCategoryListLayoutView;
 use Vanilla\Forum\Layout\View\DiscussionListLayoutView;
-use Vanilla\Forum\Layout\View\LegacyDiscussionThreadLayoutView;
+use Vanilla\Forum\Layout\View\DiscussionThreadLayoutView;
 use Vanilla\Forum\Layout\View\LegacyNewDiscussionLayoutView;
 use Vanilla\Forum\Layout\Middleware\CategoryFilterMiddleware;
+use Vanilla\Forum\Layout\View\NestedCategoryListPageLayoutView;
 use Vanilla\Forum\Models\CategoryCollectionProvider;
+use Vanilla\Forum\Models\CategorySiteMetaExtra;
 use Vanilla\Forum\Models\DiscussionCollectionProvider;
+use Vanilla\Forum\Models\ForumQuickLinksProvider;
+use Vanilla\Forum\Models\PostingSiteMetaExtra;
 use Vanilla\Forum\Models\Totals\CategorySiteTotalProvider;
 use Vanilla\Forum\Models\Totals\CommentSiteTotalProvider;
 use Vanilla\Forum\Models\Totals\DiscussionSiteTotalProvider;
@@ -42,7 +54,9 @@ use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\View\HomeLayoutView;
 use Vanilla\Models\CollectionModel;
+use Vanilla\Models\SiteMeta;
 use Vanilla\Models\SiteTotalService;
+use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
 
 /**
@@ -70,17 +84,48 @@ class ForumContainerRules extends AddonContainerRules
             ->addCall("addReactResolver", [GuestCallToActionWidget::class])
             ->addCall("addReactResolver", [DiscussionListAsset::class])
             ->addCall("addReactResolver", [FeaturedCollectionsWidget::class])
+            ->addCall("addReactResolver", [BreadcrumbWidget::class])
             ->addCall("addMiddleware", [new Reference(CategoryFilterMiddleware::class)])
 
             // Modern layout views.
-            ->addCall("addLayoutView", [new Reference(DiscussionListLayoutView::class)]);
+            ->addCall("addLayoutView", [new Reference(DiscussionListLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(CategoryListLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(NestedCategoryListPageLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(DiscussionCategoryPageLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(DiscussionThreadLayoutView::class)]);
 
         $container
             ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
             ->addCall("registerStaticLayout", [
                 "discussionList",
                 PATH_ROOT . "/applications/vanilla/Layout/Definitions/discussionList.json",
+            ])
+            ->addCall("registerStaticLayout", [
+                "discussionThread",
+                PATH_ROOT . "/applications/vanilla/Layout/Definitions/discussionThread.json",
             ]);
+
+        $container
+            ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
+            ->addCall("registerStaticLayout", [
+                "categoryList",
+                PATH_ROOT . "/applications/vanilla/Layout/Definitions/categoryList.json",
+            ])
+            ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
+            ->addCall("registerStaticLayout", [
+                "nestedCategoryList",
+                PATH_ROOT . "/applications/vanilla/Layout/Definitions/nestedCategoryList.json",
+            ])
+            ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
+            ->addCall("registerStaticLayout", [
+                "discussionCategoryPage",
+                PATH_ROOT . "/applications/vanilla/Layout/Definitions/discussionCategoryPage.json",
+            ]);
+
+        // Quick links
+        $container
+            ->rule(QuickLinksVariableProvider::class)
+            ->addCall("addQuickLinkProvider", [new Reference(ForumQuickLinksProvider::class)]);
 
         $container
             ->rule(SiteTotalService::class)
@@ -99,7 +144,10 @@ class ForumContainerRules extends AddonContainerRules
             ->rule(LayoutService::class)
             ->addCall("addLayoutView", [new Reference(LegacyCategoryListLayoutView::class)])
             ->addCall("addLayoutView", [new Reference(DiscussionListLayoutView::class)])
-            ->addCall("addLayoutView", [new Reference(LegacyDiscussionThreadLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(CategoryListLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(NestedCategoryListPageLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(DiscussionCategoryPageLayoutView::class)])
+            ->addCall("addLayoutView", [new Reference(DiscussionThreadLayoutView::class)])
             ->addCall("addLayoutView", [new Reference(LegacyNewDiscussionLayoutView::class)])
             ->addCall("addLayoutView", [new Reference(HomeLayoutView::class)]);
 
@@ -110,6 +158,36 @@ class ForumContainerRules extends AddonContainerRules
             ],
             "customLayout.discussionList"
         );
+
+        PageControllerRoute::configurePageRoutes(
+            $container,
+            [
+                "/discussion" => DiscussionThreadPageController::class,
+            ],
+            "customLayout.discussionThread"
+        );
+
+        PageControllerRoute::configurePageRoutes(
+            $container,
+            [
+                "/categories" => CategoryListPageController::class,
+            ],
+            "customLayout.categoryList"
+        );
+
+        PageControllerRoute::configurePageRoutes(
+            $container,
+            [
+                "/unsubscribe" => UnsubscribePageController::class,
+            ],
+            null,
+            -1
+        );
+
+        $container
+            ->rule(SiteMeta::class)
+            ->addCall("addExtra", [new Reference(PostingSiteMetaExtra::class)])
+            ->addCall("addExtra", [new Reference(CategorySiteMetaExtra::class)]);
 
         // Collections.
         $container

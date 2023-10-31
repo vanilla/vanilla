@@ -39,7 +39,7 @@ import {
 } from "react-beautiful-dnd";
 import { getBox } from "css-box-model";
 
-interface Props<D> {
+interface Props<D extends {}> {
     tree: ITreeData<D>;
     onExpand: (itemID: ItemID, path: Path) => void;
     onCollapse: (itemID: ItemID, path: Path) => void;
@@ -52,7 +52,7 @@ interface Props<D> {
     renderItem(params: IRenderItemParams<D>);
 }
 
-export default function Tree<D = {}>(props: Props<D>) {
+export default function Tree<D extends {} = {}>(props: Props<D>) {
     const { tree, onExpand, onCollapse, isNestingEnabled, isDragEnabled, offsetPerLevel } = props;
 
     const expandTimer = useDelayedFunction(500);

@@ -33,7 +33,7 @@ export const messagesVariables = useThemeCache(() => {
     const spacing = themeVars("spacing", {
         padding: {
             vertical: 8,
-            withIcon: 44,
+            withIcon: 40,
             withoutIcon: 18,
         },
     });
@@ -46,6 +46,9 @@ export const messagesVariables = useThemeCache(() => {
         },
         error: {
             bg: color("#FBE8E8"),
+        },
+        neutral: {
+            bg: color("#EEEEEF"),
         },
     });
     const title = themeVars("title", {
@@ -117,7 +120,6 @@ export const messagesClasses = useThemeCache(() => {
     });
 
     const message = css({
-        ...userSelect(),
         ...Mixins.font(vars.text.font),
         width: percent(100),
         flex: 1,
@@ -164,6 +166,7 @@ export const messagesClasses = useThemeCache(() => {
 
     const root = css({
         width: percent(100),
+        textAlign: "start",
         backgroundColor: ColorsUtils.colorOut(vars.colors.bg),
         ...shadowOrBorderBasedOnLightness(
             globalVars.body.backgroundImage.color,
@@ -182,6 +185,10 @@ export const messagesClasses = useThemeCache(() => {
 
     const error = css({
         backgroundColor: ColorsUtils.colorOut(vars.colors.error.bg),
+    });
+
+    const neutral = css({
+        backgroundColor: ColorsUtils.colorOut(vars.colors.neutral.bg),
     });
 
     const setWidth = css({
@@ -219,13 +226,13 @@ export const messagesClasses = useThemeCache(() => {
     const iconPosition = css({
         position: "absolute",
         left: 0,
-        top: 0,
+        top: "50%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         height: percent(100),
         maxHeight: em(2),
-        transform: translate(negativeUnit(vars.spacing.padding.withIcon)),
+        transform: translate(negativeUnit(vars.spacing.padding.withIcon), "-50%"),
         width: styleUnit(vars.spacing.padding.withIcon),
     });
 
@@ -269,7 +276,18 @@ export const messagesClasses = useThemeCache(() => {
         [`& + .${text}`]: {
             marginTop: styleUnit(vars.title.margin.top),
         },
+        [`& .${iconPosition}`]: {
+            transform: translate(negativeUnit(vars.spacing.padding.withIcon), "calc(-50% - 2px)"),
+        },
     });
+
+    const paragraphContent = css({
+        position: "relative",
+        [`& + .${text}`]: {
+            marginTop: styleUnit(vars.title.margin.top),
+        },
+    });
+
     const title = css({
         ...Mixins.font(vars.text.font),
         fontWeight: globalVars.fonts.weights.bold,
@@ -283,6 +301,7 @@ export const messagesClasses = useThemeCache(() => {
     return {
         root,
         error,
+        neutral,
         wrap,
         wrapWithIcon,
         actionButton,
@@ -292,6 +311,7 @@ export const messagesClasses = useThemeCache(() => {
         setWidth,
         iconPosition,
         titleContent,
+        paragraphContent,
         content,
         inlineBlock,
         confirm,

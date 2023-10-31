@@ -10,6 +10,9 @@ namespace Vanilla\Layout\Middleware;
 use Garden\Hydrate\DataResolverInterface;
 use Garden\Hydrate\Middleware\AbstractMiddleware;
 use Garden\Schema\Schema;
+use Gdn_Session;
+use RoleModel;
+use UserModel;
 use Vanilla\Forms\ApiFormChoices;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
@@ -19,23 +22,23 @@ use Vanilla\Forms\SchemaForm;
  */
 class LayoutPermissionFilterMiddleware extends AbstractMiddleware
 {
-    /** @var \Gdn_Session $session */
-    private $session;
+    /** @var Gdn_Session $session */
+    private Gdn_Session $session;
 
-    /** @var \UserModel */
-    private $userModel;
+    /** @var UserModel */
+    private UserModel $userModel;
 
-    /** @var \RoleModel */
-    private $roleModel;
+    /** @var RoleModel */
+    private RoleModel $roleModel;
 
     /**
      * DI.
      *
-     * @param \Gdn_Session $session
-     * @param \UserModel $userModel
-     * @param \RoleModel $roleModel
+     * @param Gdn_Session $session
+     * @param UserModel $userModel
+     * @param RoleModel $roleModel
      */
-    public function __construct(\Gdn_Session $session, \UserModel $userModel, \RoleModel $roleModel)
+    public function __construct(Gdn_Session $session, UserModel $userModel, RoleModel $roleModel)
     {
         $this->session = $session;
         $this->userModel = $userModel;

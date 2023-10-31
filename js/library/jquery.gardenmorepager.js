@@ -93,8 +93,12 @@
                self.pager_row.remove();
                self.pager_row = $('#' + self.pager_row_id);
 
-               if (self.after_page_loaded != null)
+               if (self.after_page_loaded != null) {
                   self.after_page_loaded();
+               }
+               // to re-trigger mounting all "data-react" for this area     
+               $(self.page_container).trigger('contentLoad');
+
             }
          });
       }

@@ -4,17 +4,17 @@
  * @license gpl-2.0-only
  */
 
-import Loadable from "react-loadable";
 import React from "react";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import Loader from "@library/loaders/Loader";
+import { createLoadableComponent } from "@vanilla/react-utils";
 
-export const BulkMergeDiscussionsForm = Loadable({
-    loader: () =>
+export const BulkMergeDiscussionsForm = createLoadableComponent({
+    loadFunction: () =>
         import(
             /* webpackChunkName: "features/discussions/forms/BulkMergeDiscussionsForm" */ "@library/features/discussions/forms/BulkMergeDiscussionsForm.loadable"
         ),
-    loading() {
+    fallback() {
         return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
     },
 });

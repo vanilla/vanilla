@@ -7,54 +7,36 @@
 
 namespace Vanilla\Site;
 
-use Garden\Http\HttpClient;
-use Garden\Web\Exception\NotFoundException;
-use Vanilla\Contracts\LocaleInterface;
-use Vanilla\Contracts\Site\AbstractSiteProvider;
-use Vanilla\Contracts\Site\Site;
+use Garden\Sites\Exceptions\SiteNotFoundException;
+use Garden\Sites\Site;
+use Symfony\Component\Cache\Adapter\NullAdapter;
+use Vanilla\Contracts\Site\VanillaSiteProvider;
+use Vanilla\Contracts\Site\VanillaSite;
 
 /**
  * Default site provider for when no other one is registered.
  *
- * Only knows about it's own site and the IDs don't mean anything.
+ * Only knows about its own site and the IDs don't mean anything.
  */
-class OwnSiteProvider extends AbstractSiteProvider
+class OwnSiteProvider extends VanillaSiteProvider
 {
-    /** @var Site */
-    protected $ownSite;
-
-    /** @var Site */
-    protected $unknownSite;
+    private OwnSite $ownSite;
 
     /**
-     * DI.
-     *
      * @param OwnSite $ownSite
-     * @param LocaleInterface $locale
      */
-    public function __construct(OwnSite $ownSite, LocaleInterface $locale)
+    public function __construct(OwnSite $ownSite)
     {
         $this->ownSite = $ownSite;
-
-        $unknownSiteHttp = new HttpClient();
-        $unknownSiteHttp->addMiddleware(function () {
-            throw new NotFoundException("Site");
-        });
-        $this->unknownSite = new Site($locale->translate("Unknown Site"), "/", -1, -1, $unknownSiteHttp);
-    }
-
-    /**
-     * @return Site[]
-     */
-    public function getAllSites(): array
-    {
-        return [$this->ownSite];
+        $this->ownSite->setSiteProvider($this);
+        parent::__construct([$ownSite->getCluster()->getRegionID()]);
+        $this->setCache(new NullAdapter());
     }
 
     /**
      * @inheritdoc
      */
-    public function getOwnSite(): Site
+    public function getOwnSite(): VanillaSite
     {
         return $this->ownSite;
     }
@@ -62,8 +44,33 @@ class OwnSiteProvider extends AbstractSiteProvider
     /**
      * @inheritdoc
      */
-    public function getUnknownSite(): Site
+    protected function loadAllSiteRecords(): array
     {
-        return $this->unknownSite;
+        return [
+            $this->ownSite->getSiteID() => $this->ownSite->getSiteRecord(),
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSite(int $siteID): Site
+    {
+        if ($siteID !== $this->ownSite->getSiteID()) {
+            throw new SiteNotFoundException($siteID);
+        }
+
+        return $this->ownSite;
+    }
+
+    /**
+     * @return array|\Garden\Sites\Cluster[]
+     */
+    protected function loadAllClusters(): array
+    {
+        $cluster = $this->ownSite->getCluster();
+        return [
+            $cluster->getClusterID() => $cluster,
+        ];
     }
 }

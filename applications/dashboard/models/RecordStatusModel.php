@@ -631,7 +631,15 @@ class RecordStatusModel extends FullRecordCacheModel implements LoggerAwareInter
     {
         ModelUtils::leftJoin($rows, ["statusID"], [$this, "getActiveStatuses"]);
         if (\Gdn::session()->checkPermission("staff.allow")) {
-            ModelUtils::leftJoin($rows, ["internalStatusID"], [$this, "getActiveStatuses"]);
+            ModelUtils::leftJoin(
+                $rows,
+                ["internalStatusID"],
+                function () {
+                    $r = $this->getStatuses(true, true);
+                    return $r;
+                },
+                $this->getDefaultActiveInternalStatus()
+            );
         }
     }
     //endregion

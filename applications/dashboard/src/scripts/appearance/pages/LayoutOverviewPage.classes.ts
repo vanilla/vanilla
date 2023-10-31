@@ -4,7 +4,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { Mixins } from "@library/styles/Mixins";
 import { useThemeCache } from "@library/styles/styleUtils";
 
-export default useThemeCache(() => {
+export const layoutOverviewPageClasses = useThemeCache(() => {
     const layoutOptionsDropdown = css({
         marginRight: 8,
     });

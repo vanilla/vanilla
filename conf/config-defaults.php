@@ -46,11 +46,12 @@ $Configuration['HotReload']['IP'] = '127.0.0.1';
 
 $Configuration['ContentSecurityPolicy']['ScriptSrc']['AllowedDomains'] = [];
 
+$Configuration['ContentSecurityPolicy']['StrictDynamic'] = false;
+
 // Site specifics.
 $Configuration['Garden']['Installed'] = false; // Has Garden been installed yet? This blocks setup when true.
 $Configuration['Garden']['Title'] = 'Vanilla';
 $Configuration['Garden']['Domain'] = '';
-$Configuration['Garden']['WebRoot'] = false; // You can set this value if you are using htaccess to direct into the application, but the correct webroot isn't being recognized.
 $Configuration['Garden']['StripWebRoot'] = false;
 $Configuration['Garden']['AllowSSL'] = true;
 $Configuration['Garden']['ForceSSL'] = true;
@@ -70,6 +71,7 @@ $Configuration['Garden']['Cookie']['Name'] = 'Vanilla';
 $Configuration['Garden']['Cookie']['Path']  = '/';
 $Configuration['Garden']['Cookie']['Domain'] = '';
 $Configuration['Garden']['Cookie']['HashMethod'] = 'md5'; // md5 or sha1
+$Configuration['Garden']['Cookie']['PersistExpiry'] = '30 days';
 $Configuration['Garden']['Authenticator']['DefaultScheme'] = 'password'; // Types include 'Password', 'Handshake', 'Openid'
 $Configuration['Garden']['Authenticator']['RegisterUrl'] = '/entry/register?Target=%2$s';
 $Configuration['Garden']['Authenticator']['SignInUrl'] = '/entry/signin?Target=%2$s';
@@ -81,10 +83,10 @@ $Configuration['Garden']['Registration']['Method'] = 'Captcha'; // Options are: 
 $Configuration['Garden']['Registration']['InviteExpiration'] = '1 week'; // When invitations expire. This will be plugged into strtotime().
 $Configuration['Garden']['Registration']['InviteRoles'] = 'FALSE';
 $Configuration['Garden']['Registration']['ConfirmEmail'] = false;
-$Configuration['Garden']['Registration']['MinPasswordLength'] = 6;
 $Configuration['Garden']['Registration']['NameUnique'] = true;
 $Configuration['Garden']['TermsOfService'] = '/home/termsofservice'; // The url to the terms of service.
 $Configuration['Garden']['Password']['MinLength'] = 12;
+$Configuration['Garden']['Password']['BulkImportResetTime'] = '1 week';
 $Configuration['Garden']['Roles']['Manage'] = true; // @deprecated
 
 // Garden security features

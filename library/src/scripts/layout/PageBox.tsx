@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useRef } from "react";
+import React, { ElementType, useRef } from "react";
 import { cx, css } from "@emotion/css";
 import { IBoxOptions } from "@library/styles/cssUtilsTypes";
 import { Variables } from "@library/styles/Variables";
@@ -13,7 +13,7 @@ import { PageBoxDepthContextProvider, usePageBoxContext } from "@library/layout/
 interface IProps extends React.HTMLAttributes<HTMLElement> {
     children?: React.ReactNode;
     options?: Partial<IBoxOptions>;
-    as?: keyof JSX.IntrinsicElements;
+    as?: ElementType;
 }
 
 export const PageBox = React.forwardRef(function Box(_props: IProps, passedRef: React.Ref<HTMLElement>) {

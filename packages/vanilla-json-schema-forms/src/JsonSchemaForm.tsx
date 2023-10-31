@@ -5,31 +5,32 @@
  */
 
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
-import { JsonSchema, ISchemaRenderProps, IValidationResult } from "./types";
+import { ISchemaRenderProps, IFieldError, JSONSchemaType, JsonSchema } from "./types";
 import { PartialSchemaForm, RenderChildren } from "./PartialSchemaForm";
-import produce from "immer";
 import { VanillaUIFormControl } from "./vanillaUIControl/VanillaUIFormControl";
 import { VanillaUIFormControlGroup } from "./vanillaUIControl/VanillaUIFormControlGroup";
 import { useFormValidation, ValidationProvider } from "./ValidationContext";
+import { fieldErrorsToValidationErrors, recursivelyCleanInstance } from "./utils";
+import { ValidationResult } from "@cfworker/json-schema";
 
 interface IProps extends ISchemaRenderProps {
-    schema: JsonSchema | string;
+    /** When possible, define `schema` as `JSONSchemaType<YourSchemaInterface>` and cast `as JsonSchema` when passing props to this component  */
+    schema: JSONSchemaType | string;
     instance: any;
     /** false by default */
     autoValidate?: boolean;
-    /** false by default */
-    validateOnBlur?: boolean;
     onChange(instance: any): void;
+    onBlur?(fieldName: string): void;
     disabled?: boolean;
     vanillaUI?: boolean;
-    onValidationStatusChange?(valid: boolean): void;
     hideDescriptionInLabels?: boolean;
     size?: "small" | "default";
     autocompleteClassName?: string;
+    fieldErrors?: Record<string, IFieldError[]>;
 }
 
 export interface IJsonSchemaFormHandle {
-    validate(): IValidationResult | undefined;
+    validate(): ValidationResult | undefined;
 }
 
 /**
@@ -65,9 +66,8 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
 ) {
     const {
         autoValidate = false,
-        validateOnBlur = false,
+        onBlur,
         instance,
-        onChange,
         Form,
         FormSection,
         FormTabs,
@@ -75,7 +75,6 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
         FormControlGroup,
         FormGroupWrapper,
         vanillaUI = false,
-        onValidationStatusChange,
         hideDescriptionInLabels = false,
         size = "default",
         autocompleteClassName,
@@ -83,7 +82,15 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
 
     const formValidation = useFormValidation();
 
-    const [validation, setValidation] = useState<IValidationResult>();
+    const [_validation, setValidation] = useState<ValidationResult>();
+
+    const validation = useMemo((): ValidationResult | undefined => {
+        const isValid = (_validation?.valid ?? true) && (props.fieldErrors ?? []).length === 0;
+        return {
+            valid: isValid,
+            errors: [...(_validation?.errors ?? []), ...fieldErrorsToValidationErrors(props.fieldErrors ?? {})],
+        };
+    }, [_validation, props.fieldErrors]);
 
     const schema = useMemo<JsonSchema>(
         () => (typeof props.schema === "string" ? JSON.parse(props.schema) : props.schema),
@@ -116,30 +123,23 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
     }, [instance]);
 
     const validate = useCallback(() => {
-        let result: IValidationResult = {
-            isValid: true,
+        let result: ValidationResult = {
+            valid: true,
+            errors: [],
         };
-        const performValidation = (instance: any) => {
-            result = formValidation.validate(schemaRef.current, instance);
-        };
-        // Validating might mutate the instance.
-        const produced = produce(instanceRef.current, (draft) => {
-            performValidation(draft);
-        });
 
-        if (produced !== instanceRef.current) {
-            onChange(produced);
-        }
+        /**
+         * undefined is not a value JSON Schema value, we should omit these from the instance
+         * prior to validating to resolve type mismatch errors
+         * required validation will continue to function as expected
+         */
+        const cleanInstance = recursivelyCleanInstance(instance);
+
+        result = formValidation.validate(schemaRef.current, cleanInstance);
 
         setValidation(result);
         return result;
     }, [formValidation]);
-
-    useEffect(() => {
-        if (!!validation && typeof validation?.isValid !== undefined) {
-            onValidationStatusChange?.(validation.isValid);
-        }
-    }, [validation]);
 
     // Validate the form every time value changes.
     useEffect(() => {
@@ -161,12 +161,14 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
             {...props}
             {...Memoized}
             disabled={props.disabled}
+            pathString="/"
+            errors={[]}
             path={[]}
             schema={schema}
             rootSchema={schema}
             rootInstance={instance}
             validation={validation}
-            onBlur={validateOnBlur ? () => validate() : undefined}
+            onBlur={onBlur}
             hideDescriptionInLabels={hideDescriptionInLabels}
             size={size}
             autocompleteClassName={autocompleteClassName}

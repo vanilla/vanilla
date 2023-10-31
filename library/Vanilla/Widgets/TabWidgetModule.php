@@ -20,6 +20,8 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
  */
 class TabWidgetModule extends AbstractReactModule
 {
+    use HomeWidgetContainerSchemaTrait;
+
     /** @var TabWidgetTabService */
     private $tabService;
 
@@ -69,12 +71,14 @@ class TabWidgetModule extends AbstractReactModule
                 }
                 $componentName = $tabWidget->getComponentName();
                 $props = $tabWidget->getProps();
+                $seoContent = $tabWidget->renderSeoHtml(array_merge($props, ["title" => $tabLabel]));
                 if ($props === null) {
                     // User is unable to render this tab.
                     continue;
                 }
 
                 $tabs[] = [
+                    '$seoContent' => $seoContent,
                     "label" => $tabLabel,
                     "componentName" => $componentName,
                     "componentProps" => $props,
@@ -93,6 +97,15 @@ class TabWidgetModule extends AbstractReactModule
             "tabs" => $tabs,
             "defaultTabIndex" => $this->defaultTabIndex,
         ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $result = implode("", array_column($props["tabs"], '$seoContent'));
+        return $result;
     }
 
     /**

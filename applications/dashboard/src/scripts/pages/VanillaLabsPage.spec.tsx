@@ -1,11 +1,11 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import { VanillaLabsPage } from "@dashboard/pages/VanillaLabsPage";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { LoadStatus } from "@library/@types/api/core";
@@ -63,9 +63,6 @@ describe("VanillaLabsPage", () => {
                 const isChecked = !!toggle.getAttribute("checked");
                 const labName =
                     toggle.parentElement?.parentElement?.parentElement?.parentElement?.querySelector("h3")?.innerText;
-                if (labName === "Layout Editor") {
-                    expect(isChecked).toBeTruthy();
-                }
                 if (labName === "Analytics BETA") {
                     expect(isChecked).toBeFalsy();
                 }

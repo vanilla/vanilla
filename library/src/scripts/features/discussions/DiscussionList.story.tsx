@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useState } from "react";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { DiscussionListView } from "@library/features/discussions/DiscussionList.views";
@@ -24,6 +24,8 @@ import { DiscussionListAssetHeader } from "@library/features/discussions/Discuss
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import QuickLinks from "@library/navigation/QuickLinks";
 import { DiscussionGridView } from "@library/features/discussions/DiscussionGridView";
+import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
+import { IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
 
 export default {
     title: "Components/DiscussionLists",
@@ -130,13 +132,6 @@ const loggedInStoreState = {
         current: {
             data: STORY_ME_ADMIN,
         },
-        permissions: {
-            status: LoadStatus.SUCCESS,
-            data: {
-                isAdmin: true,
-                permissions: [],
-            },
-        },
     },
     discussions: {
         discussionsByID: keyBy(fakeDiscussions, "discussionID"),
@@ -155,7 +150,9 @@ export const Default = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -188,7 +185,9 @@ export const Theme = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -214,7 +213,9 @@ export const CertainMetasHidden = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -236,7 +237,9 @@ export const MetasRenderedAsIcons = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -266,7 +269,9 @@ export const UserIconInMetas = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -298,7 +303,9 @@ export const UserIconInMetasWithBorder = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -328,7 +335,9 @@ export const UserIconInMetasWithoutBorder = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -358,7 +367,9 @@ export const IconHidden = storyWithConfig(
     () => {
         return (
             <StoryContent>
-                <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                <PermissionsFixtures.AllPermissions>
+                    <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
+                </PermissionsFixtures.AllPermissions>
             </StoryContent>
         );
     },
@@ -419,7 +430,7 @@ export const FeaturedImage = storyWithConfig(
         storeState: loggedInStoreState,
     },
     () => (
-        <>
+        <PermissionsFixtures.AllPermissions>
             <StoryHeading>List View</StoryHeading>
             <DiscussionsWidget
                 discussions={fakeDiscussions}
@@ -450,18 +461,20 @@ export const FeaturedImage = storyWithConfig(
                 }}
                 containerOptions={{ displayType: WidgetContainerDisplayType.CAROUSEL }}
             />
-        </>
+        </PermissionsFixtures.AllPermissions>
     ),
 );
 
 // Using a story only component for to use the mock data since the real DiscussionListAsset component does it's own fetching
 const DiscussionListStory = (props) => {
+    const [apiParams, setApiParams] = useState<IGetDiscussionListParams>({
+        ...props.apiParams,
+        discussionID: fakeDiscussions[0].discussionID,
+    });
+
     const mockProps = {
         ...props,
-        apiParams: {
-            ...props.apiParams,
-            discussionID: fakeDiscussions[0].discussionID,
-        },
+        apiParams,
     };
 
     const discussionOptions = {
@@ -476,14 +489,21 @@ const DiscussionListStory = (props) => {
 
     const isLink = mockProps.containerOptions?.displayType === WidgetContainerDisplayType.LINK;
 
+    const updateApiParams = (newParams: Partial<IGetDiscussionListParams>) => {
+        setApiParams({
+            ...apiParams,
+            ...newParams,
+        });
+    };
+
     const assetHeader = (
         <DiscussionListAssetHeader
             discussionIDs={fakeDiscussions.map(({ discussionID }) => discussionID)}
             noCheckboxes={mockProps.noCheckboxes || isLink}
             categoryFollowEnabled
-            categoryFollowFilter="all"
-            onCategoryFollowFilterChange={() => null}
             paginationProps={{ totalResults: fakeDiscussions.length }}
+            apiParams={apiParams}
+            updateApiParams={updateApiParams}
         />
     );
     const assetFooter = <NumberedPager totalResults={fakeDiscussions.length} />;
@@ -498,6 +518,7 @@ const DiscussionListStory = (props) => {
                 extraHeader={assetHeader}
             >
                 <DiscussionListView discussions={fakeDiscussions} discussionOptions={discussionOptions} />
+
                 {assetFooter}
             </HomeWidgetContainer>
         );
@@ -540,22 +561,24 @@ export const AsAssetWithHeader = storyWithConfig(
     },
     () => (
         <>
-            <StoryHeading>ListView</StoryHeading>
-            <DiscussionListStory isList />
-            <StoryHeading>Grid View, with featured images and default fallback image</StoryHeading>
-            <DiscussionListStory
-                apiParams={{ featuredImage: true }}
-                containerOptions={{ displayType: WidgetContainerDisplayType.GRID }}
-            />
-            <StoryHeading>Grid View, no featured image, no checkboxes</StoryHeading>
-            <DiscussionListStory containerOptions={{ displayType: WidgetContainerDisplayType.GRID }} noCheckboxes />
-            <StoryHeading>Carousel, with featured images and set fallback image</StoryHeading>
-            <DiscussionListStory
-                apiParams={{ featuredImage: true, fallbackImage: STORY_IMAGE }}
-                containerOptions={{ displayType: WidgetContainerDisplayType.CAROUSEL }}
-            />
-            <StoryHeading>Simple Links</StoryHeading>
-            <DiscussionListStory containerOptions={{ displayType: WidgetContainerDisplayType.LINK }} />
+            <PermissionsFixtures.AllPermissions>
+                <StoryHeading>ListView</StoryHeading>
+                <DiscussionListStory isList />
+                <StoryHeading>Grid View, with featured images and default fallback image</StoryHeading>
+                <DiscussionListStory
+                    apiParams={{ featuredImage: true }}
+                    containerOptions={{ displayType: WidgetContainerDisplayType.GRID }}
+                />
+                <StoryHeading>Grid View, no featured image, no checkboxes</StoryHeading>
+                <DiscussionListStory containerOptions={{ displayType: WidgetContainerDisplayType.GRID }} noCheckboxes />
+                <StoryHeading>Carousel, with featured images and set fallback image</StoryHeading>
+                <DiscussionListStory
+                    apiParams={{ featuredImage: true, fallbackImage: STORY_IMAGE }}
+                    containerOptions={{ displayType: WidgetContainerDisplayType.CAROUSEL }}
+                />
+                <StoryHeading>Simple Links</StoryHeading>
+                <DiscussionListStory containerOptions={{ displayType: WidgetContainerDisplayType.LINK }} />
+            </PermissionsFixtures.AllPermissions>
         </>
     ),
 );

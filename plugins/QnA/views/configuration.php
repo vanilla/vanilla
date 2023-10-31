@@ -11,7 +11,7 @@ if (!$pointsAwardEnabled) {
     $pointsAwardChildrenAttributes['disabled'] = 'disabled';
 }
 
-$featureFollowUpEnabled = (bool)c('Feature.QnAFollowUp.Enabled');
+$featureFollowUpEnabled = (bool)c('QnA.FollowUp.Enabled');
 if (!$featureFollowUpEnabled) {
     $featureFollowUpChildrenAttributes['disabled'] = 'disabled';
 }
@@ -35,17 +35,14 @@ if (!$featureFollowUpEnabled) {
         echo $this->Form->labelWrap(t('Points per accepted answer'), 'QnA.Points.AcceptedAnswer');
         echo $this->Form->textBoxWrap('QnA.Points.AcceptedAnswer', $pointsAwardChildrenAttributes);
     ?></li>
-<!--    Hide toggle until this feature is ready for release -->
     <li class="form-group">
         <?php
-        if ($featureFollowUpEnabled) {
             echo $this->Form->toggle(
-                'Feature.QnAFollowUp.Enabled',
+                'QnA.FollowUp.Enabled',
                 t('Enable Follow-up Notifications'),
                 ['id' => 'IsQnAFollowUpEnabled', 'data-children' => 'js-feature-followup'],
                 t('QnAFollowup.Feature.Enabled', "This feature sends emails to the authors of answered questions that do not have an accepted answer.")
             );
-        }
         ?>
     </li>
     <li class="form-group js-feature-followup" <?php echo $featureFollowUpEnabled ? '' : ' style="display:none;"'?> >

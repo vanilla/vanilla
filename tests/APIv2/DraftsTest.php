@@ -6,6 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\CurrentTimeStamp;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 
 /**
@@ -13,6 +14,8 @@ use VanillaTests\Forum\Utils\CommunityApiTestTrait;
  */
 class DraftsTest extends AbstractResourceTest
 {
+    public static $addons = ["stubcontent"];
+
     use CommunityApiTestTrait;
 
     /**
@@ -156,5 +159,62 @@ class DraftsTest extends AbstractResourceTest
                 $content->assertCssSelectorText("option[selected]", $newCat["name"]);
             }
         );
+    }
+
+    /**
+     * Assert that post made using the API default to the Text format if none is provided.
+     */
+    public function testDraftEmptyFormat()
+    {
+        $draft = $this->api()
+            ->post($this->baseUrl, [
+                "recordType" => "discussion",
+                "parentRecordID" => 1,
+                "attributes" => [
+                    "body" => "Check the category picker",
+                ],
+            ])
+            ->getBody();
+        $result = $this->api()
+            ->get("$this->baseUrl/{$draft["draftID"]}")
+            ->getBody();
+        $this->assertEquals($result["attributes"]["format"], "Text");
+    }
+
+    /**
+     * Test that when there are multiple drafts for the same comment,
+     * only the most recently updated draft is returned.
+     *
+     * @return void
+     */
+    public function testMultipleCommentDrafts(): void
+    {
+        $discussion = $this->createDiscussion();
+
+        CurrentTimeStamp::mockTime("now");
+
+        $firstDraft = $this->api()->post($this->baseUrl, [
+            "recordType" => "comment",
+            "parentRecordID" => $discussion["discussionID"],
+            "attributes" => [
+                "body" => "draft1",
+            ],
+        ]);
+
+        CurrentTimeStamp::mockTime("+1 second");
+
+        $secondDraft = $this->api()->post($this->baseUrl, [
+            "recordType" => "comment",
+            "parentRecordID" => $discussion["discussionID"],
+            "attributes" => [
+                "body" => "draft2",
+            ],
+        ]);
+
+        $rows = $this->api()
+            ->get($this->baseUrl, ["recordType" => "comment", "parentRecordID" => $discussion["discussionID"]])
+            ->getBody();
+        $this->assertCount(1, $rows);
+        $this->assertSame($secondDraft["attributes"]["body"], $rows[0]["attributes"]["body"]);
     }
 }

@@ -14,6 +14,7 @@ export enum DateFormats {
     DEFAULT = "default",
     EXTENDED = "extended",
     COMPACT = "compact",
+    TIME = "time",
 }
 
 interface IDateTimeProps {
@@ -26,6 +27,7 @@ interface IDateTimeProps {
     /** Display a fixed or relative visible time. */
     mode?: "relative" | "fixed";
     type?: DateFormats;
+    isSameYear?: boolean;
 }
 
 /**
@@ -80,16 +82,22 @@ export default class DateTime extends Component<IDateTimeProps> {
         switch (this.props.type) {
             case DateFormats.EXTENDED:
                 return {
-                    year: "numeric",
+                    ...(!this.props.isSameYear && { year: "numeric" }),
                     month: "short",
                     day: "numeric",
                     hour: "numeric",
                     minute: "numeric",
                     timeZone: this.props.timezone,
                 };
+            case DateFormats.TIME:
+                return {
+                    hour: "numeric",
+                    minute: "numeric",
+                    timeZone: this.props.timezone,
+                };
             default:
                 return {
-                    year: "numeric",
+                    ...(!this.props.isSameYear && { year: "numeric" }),
                     month: "short",
                     day: "numeric",
                     timeZone: this.props.timezone,

@@ -5,23 +5,21 @@
  */
 
 import { TypeQuestionIcon } from "@library/icons/searchIcons";
-import { SearchService } from "@library/search/SearchService";
 import { CommunityPostTypeFilter } from "@vanilla/addon-vanilla/search/CommunityPostTypeFilter";
+import DISCUSSIONS_SEARCH_DOMAIN from "@vanilla/addon-vanilla/search/DiscussionsSearchDomain";
 import { t } from "@vanilla/i18n";
 import React from "react";
 
 export function registerQnaSearchTypes() {
-    SearchService.addSubType({
+    DISCUSSIONS_SEARCH_DOMAIN.addSubType({
         label: t("Question"),
         icon: <TypeQuestionIcon />,
-        recordType: "discussion",
         type: "question",
     });
 
-    SearchService.addSubType({
+    DISCUSSIONS_SEARCH_DOMAIN.addSubType({
         label: t("Answer"),
         icon: <TypeQuestionIcon />,
-        recordType: "comment",
         type: "answer",
     });
 

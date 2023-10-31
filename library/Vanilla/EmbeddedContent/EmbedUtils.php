@@ -39,10 +39,19 @@ class EmbedUtils
         $width = $response["width"] ?? null;
         $height = $response["height"] ?? null;
 
-        // If we don't have our width/height ratio, fall back to a 16/9 ratio.
+        // If we don't have our width/height ratio fall back to a 16/9 ratio.
         if ($width === null || $response === null) {
-            $width = 16 * 20;
-            $height = 9 * 20;
+            $sizeAdjust = 1;
+
+            // If display size is defined, adjust the size
+            if (isset($response["displaySize"])) {
+                // adjust sizes based on defined display size
+                $sizes = ["small", "medium", "large"];
+                $sizeAdjust = array_search($response["displaySize"], $sizes) + 1;
+            }
+
+            $width = 16 * (20 * $sizeAdjust);
+            $height = 9 * (20 * $sizeAdjust);
         }
 
         return [$height, $width];

@@ -1,0 +1,678 @@
+[
+  {
+    "type": "h2",
+    "children": [
+      {
+        "text": "Here is a H2 title"
+      }
+    ]
+  },
+  {
+    "type": "h3",
+    "children": [
+      {
+        "text": "Here is a H3 title"
+      }
+    ]
+  },
+  {
+    "type": "h4",
+    "children": [
+      {
+        "text": "Here is a H4 title"
+      }
+    ]
+  },
+  {
+    "type": "h5",
+    "children": [
+      {
+        "text": "Here is a H5 title"
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "This is some paragraph text\nwith a coft break, so it will appear in the same <p> tag"
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "While this is a new paragraph tag"
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "This sentence is bold",
+        "bold": true
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "This sentence is italic",
+        "italic": true
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "This sentence is strike through",
+        "strikethrough": true
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "strikethrough": true,
+        "text": "This sentence is bold, italic and strike through",
+        "bold": true,
+        "italic": true
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "This is: "
+      },
+      {
+        "text": "some inline code",
+        "code": true
+      },
+      {
+        "text": "\n\nThis is:\n"
+      }
+    ]
+  },
+  {
+    "type": "code_block",
+    "children": [
+      {
+        "type": "code_line",
+        "children": [
+          {
+            "text": "A code block"
+          }
+        ]
+      },
+      {
+        "type": "code_line",
+        "children": [
+          {
+            "text": "with some text content within"
+          }
+        ]
+      }
+    ],
+    "lang": "sql"
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": ""
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": ""
+      },
+      {
+        "type": "a",
+        "url": "http://higherlogic.com",
+        "target": "_self",
+        "children": [
+          {
+            "text": "This sentence is a link"
+          }
+        ]
+      },
+      {
+        "text": ""
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": ""
+      }
+    ]
+  },
+  {
+    "type": "rich_embed_card",
+    "dataSourceType": "url",
+    "url": "http://higherlogic.com",
+    "embedData": {
+      "body": "Need to engage customers, members or employees? Our SaaS online community platform & email campaign software helps you reach your goals.",
+      "photoUrl": "https://www.higherlogic.com/wp-content/uploads/2021/03/Homepage.png",
+      "url": "http://higherlogic.com",
+      "embedType": "link",
+      "name": "Member and Customer Engagement Platform - Higher Logic",
+      "faviconUrl": "https://sp-ao.shortpixel.ai/client/to_auto,q_lossy,ret_img,w_32,h_32/https://www.higherlogic.com/wp-content/uploads/2020/05/higherlogic_favicon.png"
+    },
+    "children": [
+      {
+        "text": ""
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "\nYoutube video: "
+      }
+    ]
+  },
+  {
+    "type": "rich_embed_card",
+    "dataSourceType": "url",
+    "url": "https://www.youtube.com/watch?v=NL6CDFn2i3I",
+    "embedData": {
+      "height": 150,
+      "width": 200,
+      "photoUrl": "https://i.ytimg.com/vi/NL6CDFn2i3I/hqdefault.jpg",
+      "videoID": "NL6CDFn2i3I",
+      "showRelated": false,
+      "start": 0,
+      "url": "https://www.youtube.com/watch?v=NL6CDFn2i3I",
+      "embedType": "youtube",
+      "name": "Badger song (Badger badger badger , mushroom mushroom)",
+      "frameSrc": "https://www.youtube.com/embed/NL6CDFn2i3I?feature=oembed&autoplay=1"
+    },
+    "children": [
+      {
+        "text": ""
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "\n"
+      }
+    ]
+  },
+  {
+    "type": "rich_embed_card",
+    "children": [
+      {
+        "text": ""
+      }
+    ],
+    "dataSourceType": "image",
+    "url": "https://dev.vanilla.localhost/uploads/Y6Y7LHBWJ2LW/20221130-140836.jpg",
+    "embedData": {
+      "url": "https://dev.vanilla.localhost/uploads/Y6Y7LHBWJ2LW/20221130-140836.jpg",
+      "name": "20221130_140836.jpg",
+      "type": "image/jpeg",
+      "size": 6240115,
+      "width": 9248,
+      "height": 6936,
+      "displaySize": "small",
+      "float": "none",
+      "mediaID": 3,
+      "dateInserted": "2022-12-12T22:26:40+00:00",
+      "insertUserID": 7,
+      "foreignType": "embed",
+      "foreignID": 7,
+      "embedType": "image"
+    }
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "\n"
+      }
+    ]
+  },
+  {
+    "type": "rich_embed_card",
+    "children": [
+      {
+        "text": ""
+      }
+    ],
+    "dataSourceType": "file",
+    "url": "https://dev.vanilla.localhost/uploads/EGZK6OLN0T2L/failed-staging.txt",
+    "embedData": {
+      "url": "https://dev.vanilla.localhost/uploads/EGZK6OLN0T2L/failed-staging.txt",
+      "name": "failed staging.txt",
+      "type": "text/plain",
+      "size": 204,
+      "displaySize": "large",
+      "float": "none",
+      "mediaID": 5,
+      "dateInserted": "2022-12-12T22:27:46+00:00",
+      "insertUserID": 7,
+      "foreignType": "embed",
+      "foreignID": 7,
+      "embedType": "file"
+    }
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": ""
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "This is a table"
+      }
+    ]
+  },
+  {
+    "type": "table",
+    "children": [
+      {
+        "type": "thead",
+        "children": [
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "th",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "th",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "th",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "th",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "tbody",
+        "children": [
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "tr",
+            "children": [
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "td",
+                "children": [
+                  {
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": ""
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": ""
+      }
+    ]
+  },
+  {
+    "type": "blockquote",
+    "children": [
+      {
+        "type": "blockquote-line",
+        "children": [
+          {
+            "text": "Blockquote Line 1"
+          }
+        ]
+      },
+      {
+        "type": "blockquote-line",
+        "children": [
+          {
+            "text": ""
+          }
+        ]
+      },
+      {
+        "type": "blockquote-line",
+        "children": [
+          {
+            "text": "Blockquote Line 3"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "ul",
+    "children": [
+      {
+        "type": "li",
+        "children": [
+          {
+            "type": "lic",
+            "children": [
+              {
+                "text": "List Item 1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "li",
+        "children": [
+          {
+            "type": "lic",
+            "children": [
+              {
+                "text": "List Item 2"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "spoiler",
+    "children": [
+      {
+        "type": "spoiler-content",
+        "children": [
+          {
+            "type": "spoiler-item",
+            "children": [
+              {
+                "text": "Spoiler Content"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

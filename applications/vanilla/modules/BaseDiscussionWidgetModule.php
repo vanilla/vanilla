@@ -1,23 +1,29 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Community;
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\NotFoundException;
+use Gdn;
 use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
-use Vanilla\CurrentTimeStamp;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Forum\Widgets\DiscussionsWidgetSchemaTrait;
+use Vanilla\Layout\HydrateAwareInterface;
+use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\LimitableWidgetInterface;
+use Vanilla\Widgets\React\FilterableWidgetTrait;
 use Vanilla\Widgets\WidgetSchemaTrait;
 
 /**
@@ -25,9 +31,13 @@ use Vanilla\Widgets\WidgetSchemaTrait;
  *
  * @package Vanilla\Community
  */
-class BaseDiscussionWidgetModule extends AbstractReactModule implements LimitableWidgetInterface
+class BaseDiscussionWidgetModule extends AbstractReactModule implements LimitableWidgetInterface, HydrateAwareInterface
 {
-    use HomeWidgetContainerSchemaTrait, WidgetSchemaTrait, DiscussionsWidgetSchemaTrait;
+    use HomeWidgetContainerSchemaTrait;
+    use FilterableWidgetTrait;
+    use WidgetSchemaTrait;
+    use DiscussionsWidgetSchemaTrait;
+    use HydrateAwareTrait;
 
     /** @var \DiscussionsApiController */
     protected $discussionsApi;
@@ -97,9 +107,13 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
      *
      * @param array|null $params
      * @return array|null
+     * @throws ValidationException
+     * @throws HttpException
+     * @throws NotFoundException
      */
     public function getProps(?array $params = null): ?array
     {
+        $isAsset = $params["isAsset"] ?? false;
         $apiParams = $this->getRealApiParams($params["apiParams"] ?? null);
 
         $isFollowed = $apiParams["followed"] ?? false;
@@ -110,7 +124,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
             }
 
             $followedCategoryIDs = $this->categoryModel->getFollowed($this->session->UserID);
-            if (empty($followedCategoryIDs)) {
+            if (empty($followedCategoryIDs) && !$isAsset) {
                 // They didn't follow any categories.
                 return null;
             }
@@ -126,7 +140,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
         }
 
         if ($isFollowed) {
-            if (count($this->discussions->getData()) == 0) {
+            if (count($this->discussions->getData()) == 0 && !$isAsset) {
                 // They do not have any discussions for their followed categories
                 return null;
             }
@@ -135,6 +149,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
         $props = [
             "apiParams" => $apiParams,
             "discussions" => $this->discussions,
+            "initialPaging" => $this->discussions->getPaging(),
             "title" => $params["title"] ?? $this->title,
             "subtitle" => $params["subTitle"] ?? $this->subtitle,
             "description" => $params["description"] ?? $this->description,
@@ -177,6 +192,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
      * Get the real parameters that we will pass to the API.
      * @param array|null $params
      * @return array
+     * @throws ValidationException
      */
     protected function getRealApiParams(?array $params = null): array
     {
@@ -188,48 +204,50 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
         // the widget's form.
         $apiParams = array_merge($apiParams, $validatedParams);
 
-        // Handle the slotType.
-        $slotType = $apiParams["slotType"] ?? "";
-        $currentTime = CurrentTimeStamp::getDateTime();
-        $filterTime = null;
-        switch ($slotType) {
-            case "w":
-                $filterTime = $currentTime->modify("-1 week");
+        $explicitNoneFilter = ($apiParams["filter"] ?? "notNone") == "none";
+        switch ($apiParams["filter"] ?? "none") {
+            // Filtering by subcommunity
+            case "subcommunity":
+                // Unset apiParams unrelated to subcommuny filtering.
+                unset($apiParams["filterCategorySubType"]);
+                unset($apiParams["categoryID"]);
+
+                if ($apiParams["filterSubcommunitySubType"] == "contextual") {
+                    $apiParams["siteSectionID"] = $this->siteSectionModel->getCurrentSiteSection()->getSectionID();
+                }
+
                 break;
-            case "m":
-                $filterTime = $currentTime->modify("-1 month");
+            // Filtering by category
+            case "category":
+                // Unset apiParams unrelated to category filtering.
+                unset($apiParams["filterSubcommunitySubType"]);
+                unset($apiParams["siteSectionID"]);
+
+                // If we are trying to filter contextually by category
+                if ($apiParams["filterCategorySubType"] == "contextual") {
+                    $apiParams["categoryID"] =
+                        $this->getHydrateParam("category.categoryID") ?? $this->categoryModel::ROOT_ID;
+                }
                 break;
-            case "y":
-                $filterTime = $currentTime->modify("-1 year");
-                break;
-            case "a":
-            default:
+            // Filtering by no specific parameter
+            case "none":
+                if ($explicitNoneFilter) {
+                    unset($apiParams["categoryID"]);
+                    unset($apiParams["siteSectionID"]);
+                }
+                // Remove any restrictive filtering options.
+                unset($apiParams["filterSubcommunitySubType"]);
+                unset($apiParams["filterCategorySubType"]);
                 break;
         }
-        // Not a real API parameter.
-        unset($apiParams["slotType"]);
 
-        if ($filterTime !== null) {
-            // Convert into an API filter.
-            $formattedTime = $filterTime->format(\DateTime::RFC3339_EXTENDED);
-            $apiParams["dateInserted"] = ">$formattedTime";
-        }
-
-        // Force some common expands
-        // Default sort.
+        // Force some common expands & default sort.
         $apiParams["sort"] = $apiParams["sort"] ?? "-dateLastComment";
         $apiParams["expand"] = ["all", "-body"];
 
-        // Filter down to the current site section if we haven't set categoryID.
-        if (!isset($apiParams["categoryID"])) {
-            $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
-            $apiParams["siteSectionID"] = $currentSiteSection->getSectionID();
-        }
-
-        // If we enabled to display only categories the user follows, we need to remove the category & subcommunity.
-        if ($apiParams["followed"]) {
-            $apiParams["siteSectionID"] = null;
-            $apiParams["categoryID"] = null;
+        if (!key_exists("excludeHiddenCategories", $apiParams)) {
+            // Hide discussions from hidden categories
+            $apiParams["excludeHiddenCategories"] = true;
         }
 
         return $apiParams;
@@ -244,7 +262,7 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
     {
         $apiSchema = new Schema([
             "type" => "object",
-            "default" => [],
+            "default" => new \stdClass(),
             "properties" => [
                 "featuredImage" => [
                     "type" => "boolean",
@@ -399,5 +417,47 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
     public function setDiscussionOptions(array $discussionOptions): void
     {
         $this->discussionOptions = $discussionOptions;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["discussions"]));
+        return $result;
+    }
+
+    /**
+     * Return filterTypeSchemaExtraOptions depending on the current `layoutViewType`.
+     *
+     * @return array|false[]
+     */
+    public static function getFilterTypeSchemaExtraOptions(): array
+    {
+        // We may have a provided `layoutViewType`, or not.
+        $layoutViewType = Gdn::request()->get("layoutViewType", false);
+        switch ($layoutViewType) {
+            case "home":
+                $filterTypeSchemaExtraOptions = [
+                    "hasSubcommunitySubTypeOptions" => false,
+                    "hasCategorySubTypeOptions" => false,
+                ];
+                break;
+            case "subcommunityHome":
+            case "discussionList":
+                $filterTypeSchemaExtraOptions = [
+                    "hasCategorySubTypeOptions" => false,
+                ];
+                break;
+            case "categoryList":
+            case "discussionCategoryPage":
+            case "nestedCategoryList":
+            default:
+                $filterTypeSchemaExtraOptions = [];
+                break;
+        }
+
+        return $filterTypeSchemaExtraOptions;
     }
 }

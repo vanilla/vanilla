@@ -61,6 +61,10 @@ class StubContentPlugin extends Gdn_Plugin
      */
     public function gdn_configurationSource_beforeSave_handler($sender)
     {
+        if (!\Gdn::structure()->tableExists("UserMeta")) {
+            // We're not installed yet in an alt-install.
+            return;
+        }
         // Don't re-check inserted stub content unless an admin caused a config change
         if (!Gdn::session()->checkPermission("Garden.Settings.Manage")) {
             return;
@@ -84,6 +88,10 @@ class StubContentPlugin extends Gdn_Plugin
      */
     public function processStubContent()
     {
+        if (\Gdn::structure()->CaptureOnly) {
+            // Don't perform DB writes constantly when we are in capture mode.
+            return;
+        }
         // User
         $this->addStubContent("user");
 
@@ -147,7 +155,7 @@ class StubContentPlugin extends Gdn_Plugin
      * is checked and updated if needed.
      *
      * @param string $type
-     * @return boolean
+     * @return void
      */
     public function addStubContent($type)
     {
@@ -176,8 +184,8 @@ class StubContentPlugin extends Gdn_Plugin
             $record = $this->getRecordByContent($content);
 
             // If no receipt, add record
-            if (!$record["receipt"]) {
-                $record = $this->insertContent($content);
+            if (!$record["row"]) {
+                $this->insertContent($content);
 
                 // Otherwise, perhaps update
             } else {
@@ -468,10 +476,10 @@ class StubContentPlugin extends Gdn_Plugin
         switch ($content["type"]) {
             case "user":
                 $model = new UserModel();
-
+                $attributes = ["Attributes" => $record["row"]["Attributes"] ?? ["StubLocale" => $activeLocale]];
                 // Nothing to update except locale
-
-                $model->save($record["row"], [
+                $attributes["UserID"] = $record["row"]["UserID"];
+                $model->save($attributes, [
                     "ValidateEmail" => false,
                     "NoConfirmEmail" => true,
                 ]);

@@ -56,4 +56,23 @@ class HtmlFormatTest extends AbstractFormatTestCase
             ],
         ];
     }
+
+    /**
+     * Esnure htmLawed is being run.
+     *
+     * @return void
+     *
+     * @link https://higherlogic.atlassian.net/browse/VNLA-5166
+     */
+    public function testSanitizeXss()
+    {
+        $input = <<<HTML
+<a data-<a  <a data-%a0id='z <b onmouseover=self[&apos;con&apos;+&apos;firm&apos;](&apos;hehe&apos;) style=position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0, 0, 0, 0.0);z-index: 5000;'href="#xss">click here</a>
+HTML;
+
+        $output = $this->prepareFormatter()->renderHTML($input);
+        $expected = "a data-click here";
+
+        $this->assertEquals($expected, $output);
+    }
 }

@@ -166,4 +166,109 @@ class UrlUtils
         $result = $url->withPath($str);
         return $result;
     }
+
+    /**
+     * Get the full url of a source path relative to a base url.
+     *
+     * Takes a source (or href) path (i.e. an image src from an HTML page), and an
+     * associated URL (i.e. the page that the image appears on), and returns the
+     * absolute URL for the source path (including host & protocol).
+     *
+     * @param string $href The source path to make absolute (if not absolute already).
+     * @param string $url The full url to the page containing the src reference.
+     * @return string|null Absolute source path or null if not possible.
+     */
+    public static function ensureAbsoluteUrl(string $href, string $url): ?string
+    {
+        $parsedUrl = parse_url($url);
+        $parsedHref = parse_url($href);
+
+        if ($parsedUrl === false || $parsedHref === false) {
+            return null;
+        }
+
+        // If the href already has a protocol, then it's an absolute URL and can be used as-is.
+        if (isset($parsedHref["scheme"])) {
+            // We only consider http and https protocols, return null if we have neither of those.
+            return in_array($parsedHref["scheme"], ["http", "https"], true) ? $href : null;
+        }
+
+        // The HREF must provide a host or path. If it has neither, return null.
+        if (empty($parsedHref["host"]) && empty($parsedHref["path"])) {
+            return null;
+        }
+
+        // Combine into one parsed array.
+        $parts = $parsedHref + $parsedUrl + ["path" => null];
+
+        // Make sure final URL array has a host and a valid protocol.
+        if (empty($parts["host"]) || !in_array($parts["scheme"] ?? null, ["http", "https"], true)) {
+            return null;
+        }
+
+        // Build the path relative to the current `$url`.
+        // If the href path starts with `/`, then we have a host-relative path, so we can skip building the path.
+        if (isset($parsedHref["path"]) && !str_starts_with($parsedHref["path"], "/")) {
+            $urlPathParts = self::pathToArray($parsedUrl["path"] ?? "");
+            $hrefPathParts = self::pathToArray($parsedHref["path"]);
+
+            // If there is a trailing slash, this pops off resulting empty string from the end of the array.
+            // If not, this pops of the basename of the path which should not be included in the final URL.
+            array_pop($urlPathParts);
+
+            foreach ($hrefPathParts as $part) {
+                if ($part === ".") {
+                    // Skip for current directory marker.
+                    continue;
+                }
+
+                if ($part === "..") {
+                    // Pop off path segment for upper directory marker.
+                    array_pop($urlPathParts);
+                    continue;
+                }
+
+                $urlPathParts[] = $part;
+            }
+
+            $parts["path"] = "/" . implode("/", $urlPathParts);
+        }
+
+        return self::buildUrl($parts);
+    }
+
+    /**
+     * Helper method which takes a http path and normalizes backslashes to forward slashes,
+     * trims leading slashes, and the converts the path to an array.
+     *
+     * @param string $path
+     * @return array
+     */
+    private static function pathToArray(string $path): array
+    {
+        $path = str_replace("\\", "/", $path);
+        $path = ltrim($path, "/");
+        return explode("/", $path);
+    }
+
+    /**
+     * Builds a URL string out of the output of `parse_url`.
+     *
+     * @param array $parsedUrl
+     * @return string
+     */
+    public static function buildUrl(array $parsedUrl): string
+    {
+        $scheme = isset($parsedUrl["scheme"]) ? $parsedUrl["scheme"] . "://" : "";
+        $host = $parsedUrl["host"] ?? "";
+        $port = isset($parsedUrl["port"]) ? ":" . $parsedUrl["port"] : "";
+        $user = $parsedUrl["user"] ?? "";
+        $pass = isset($parsedUrl["pass"]) ? ":" . $parsedUrl["pass"] : "";
+        $pass = $user || $pass ? "$pass@" : "";
+        $path = $parsedUrl["path"] ?? "";
+        $query = isset($parsedUrl["query"]) ? "?" . $parsedUrl["query"] : "";
+        $fragment = isset($parsedUrl["fragment"]) ? "#" . $parsedUrl["fragment"] : "";
+
+        return "$scheme$user$pass$host$port$path$query$fragment";
+    }
 }

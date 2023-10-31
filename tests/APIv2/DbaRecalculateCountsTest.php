@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\CurrentTimeStamp;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Models\TestCategoryModelTrait;
 use VanillaTests\Models\TestCommentModelTrait;
@@ -45,6 +46,7 @@ class DbaRecalculateCountsTest extends SiteTestCase
         $this->sql = $this->discussionModel->SQL;
         $this->categories = $this->discussions = $this->comments = $this->conversations = $this->users = [];
         $this->batches = 1;
+        CurrentTimeStamp::mockTime("2022-01-01");
         \Gdn::config()->set("Dba.Limit", 2);
         $this->setDicussionCountTestData();
     }
@@ -108,7 +110,9 @@ class DbaRecalculateCountsTest extends SiteTestCase
         $this->assertNull($body["callbackPayload"]);
         $this->assertEmpty($body["progress"]["failedIDs"]);
         $randomDiscussionIds = array_rand($this->discussions, 2);
-        $updatedDiscussions = $this->discussionModel->getWhere(["DiscussionID" => $randomDiscussionIds])->resultArray();
+        $updatedDiscussions = $this->discussionModel
+            ->getWhere(["DiscussionID" => $randomDiscussionIds, "Announce" => false])
+            ->resultArray();
         $fieldsToCompare = array_keys($set);
         foreach ($updatedDiscussions as $updatedDiscussion) {
             $discussionId = $updatedDiscussion["DiscussionID"];
@@ -164,7 +168,7 @@ class DbaRecalculateCountsTest extends SiteTestCase
     {
         // Reload discussions
         $discussionsRows = $this->discussionModel
-            ->getWhere(["DiscussionID" => array_keys($this->discussions)])
+            ->getWhere(["DiscussionID" => array_keys($this->discussions), "Announce" => false])
             ->resultArray();
         $this->discussions = [];
         foreach ($discussionsRows as $discussionsRow) {
@@ -195,9 +199,6 @@ class DbaRecalculateCountsTest extends SiteTestCase
      */
     public function testTimeout()
     {
-        $body = [
-            "tables" => ["discussion"],
-        ];
         $this->getLongRunner()->setMaxIterations(1);
         $this->runWithExpectedExceptionCode(408, function () {
             $body = [
@@ -349,6 +350,7 @@ class DbaRecalculateCountsTest extends SiteTestCase
             "LastCommentID" => null,
             "LastDiscussionID" => null,
             "LastDateInserted" => null,
+            "CountFollowers" => 0,
         ];
         $this->resetTableCounts("Category", "CategoryID", array_keys($this->categories), $columns);
         $body = [
@@ -357,7 +359,7 @@ class DbaRecalculateCountsTest extends SiteTestCase
         $response = $this->api()->put("/dba/recalculate-aggregates", $body);
         // Request should be successful.
         $this->assertEquals(200, $response->getStatusCode());
-        $body = $response->getBody();
+
         $updatedCategories = $this->categoryModel
             ->getWhere(["CategoryID" => array_column($this->categories, "CategoryID")])
             ->resultArray();

@@ -5,11 +5,11 @@
 
 import React from "react";
 import { placesSearchListingClasses } from "@library/search/placesSearchListing.styles";
-import { SearchService } from "@library/search/SearchService";
 import { TypeQuestionIcon } from "@library/icons/searchIcons";
 import { buttonUtilityClasses } from "@library/forms/Button.styles";
 import classNames from "classnames";
 import SmartLink from "@library/routing/links/SmartLink";
+import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain";
 
 export interface IPlacesSearchListingItem {
     name: string;
@@ -26,7 +26,11 @@ interface IPlacesSearchListingContainer {
 export function PlacesSearchListingItem(props: IPlacesSearchListingItem) {
     const { name, type, url, className, embedLinkClassName } = props;
 
-    const icon = SearchService.getSubType(type || "")?.icon || <TypeQuestionIcon />;
+    const icon = type ? (
+        PLACES_SEARCH_DOMAIN.subTypes.find((subType) => subType.type === type)?.icon
+    ) : (
+        <TypeQuestionIcon />
+    );
 
     const classes = placesSearchListingClasses();
     return (

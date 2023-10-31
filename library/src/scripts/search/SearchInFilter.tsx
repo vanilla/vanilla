@@ -28,10 +28,9 @@ interface IProps {
  * Implements filters for search page
  */
 export function SearchInFilter(props: IProps) {
-    const { filters = [], setData, endFilters = [], activeItem } = props;
-    if (filters.length + endFilters.length <= 1) {
-        return null; // no filters, or only 1 is not helpful
-    }
+    let { filters = [], setData, endFilters = [], activeItem } = props;
+    const shouldRenderSeparator = filters.length > 0;
+
     const classes = searchInFilterClasses();
     const buttonClass = buttonClasses().radio;
     return (
@@ -49,7 +48,7 @@ export function SearchInFilter(props: IProps) {
                 })}
                 {endFilters.length > 0 && (
                     <>
-                        <span className={classes.separator} role="separator" />
+                        {shouldRenderSeparator && <span className={classes.separator} role="separator" />}
                         {endFilters.map((filter, i) => {
                             return <RadioInputAsButton buttonAutoMinWidth={true} key={i} {...filter} />;
                         })}

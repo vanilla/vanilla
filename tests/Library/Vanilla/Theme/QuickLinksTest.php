@@ -89,6 +89,7 @@ class QuickLinksTest extends SiteTestCase
         $spec = [
             '$hydrate' => "react.quick-links",
             "title" => "Quick Links",
+            "titleType" => "static",
             "containerOptions" => [
                 "borderType" => "border",
             ],
@@ -108,6 +109,7 @@ class QuickLinksTest extends SiteTestCase
             '$reactProps' => [
                 "containerOptions" => $spec["containerOptions"],
                 "title" => $spec["title"],
+                "titleType" => "static",
                 "links" => $spec["links"],
             ],
         ];

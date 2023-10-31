@@ -15,14 +15,17 @@ final class ControllerDispatchedEvent
     /** @var callable */
     private $controllerCallable;
 
+    private RequestInterface $request;
+
     /**
      * DI.
      *
      * @param callable $controllerCallable
      */
-    public function __construct(callable $controllerCallable)
+    public function __construct(callable $controllerCallable, RequestInterface $request)
     {
         $this->controllerCallable = $controllerCallable;
+        $this->request = $request;
     }
 
     /**
@@ -48,5 +51,13 @@ final class ControllerDispatchedEvent
     public function getDispatchedMethod(): string
     {
         return $this->controllerCallable[1];
+    }
+
+    /**
+     * @return RequestInterface
+     */
+    public function getRequest(): RequestInterface
+    {
+        return $this->request;
     }
 }

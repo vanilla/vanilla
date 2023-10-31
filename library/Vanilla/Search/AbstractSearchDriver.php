@@ -7,7 +7,8 @@
 namespace Vanilla\Search;
 
 use Garden\Schema\Schema;
-use Vanilla\Contracts\Site\AbstractSiteProvider;
+use Garden\Sites\Exceptions\SiteNotFoundException;
+use Vanilla\Contracts\Site\VanillaSiteProvider;
 use Vanilla\InjectableInterface;
 
 /**
@@ -21,13 +22,13 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
     /** @var AbstractSearchType[] */
     protected $searchTypesByDtype = [];
 
-    /** @var AbstractSiteProvider */
+    /** @var VanillaSiteProvider */
     private $siteProvider;
 
     /**
-     * @param AbstractSiteProvider $siteProvider
+     * @param VanillaSiteProvider $siteProvider
      */
-    public function setDependencies(AbstractSiteProvider $siteProvider)
+    public function setDependencies(VanillaSiteProvider $siteProvider)
     {
         $this->siteProvider = $siteProvider;
     }
@@ -131,7 +132,12 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
             if ($resultItemForKey !== null) {
                 $siteID = $resultItemForKey->getSiteID();
                 if ($siteID !== null) {
-                    $site = $this->siteProvider->getBySiteID($siteID);
+                    try {
+                        $site = $this->siteProvider->getSite($siteID);
+                    } catch (SiteNotFoundException $exception) {
+                        // Ignore these.
+                        continue;
+                    }
                     $resultItemForKey->setSiteDomain($site->getWebUrl());
                 }
                 if ($highlight) {
@@ -167,8 +173,8 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
         $ownSiteIDs = [];
         $foreignRecords = [];
 
-        /** @var AbstractSiteProvider $siteProvider */
-        $siteProvider = \Gdn::getContainer()->get(AbstractSiteProvider::class);
+        /** @var VanillaSiteProvider $siteProvider */
+        $siteProvider = \Gdn::getContainer()->get(VanillaSiteProvider::class);
         $ownSiteID = $siteProvider->getOwnSite()->getSiteID();
         foreach ($recordSet as $record) {
             if (isset($record["siteID"]) && $record["siteID"] !== $ownSiteID && $this->supportsForeignRecords()) {
@@ -204,13 +210,13 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
     /**
      * Get a SearchType by a string name.
      *
-     * @param string $forType
+     * @param string $type
      *
      * @return AbstractSearchType|null
      */
-    public function getSearchTypeByType(string $forType): ?AbstractSearchType
+    public function getSearchTypeByType(string $type): ?AbstractSearchType
     {
-        return $this->searchTypesByType[$forType] ?? null;
+        return $this->searchTypesByType[$type] ?? null;
     }
 
     /**

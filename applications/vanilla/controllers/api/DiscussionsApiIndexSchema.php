@@ -8,6 +8,7 @@
 namespace Vanilla\Forum\Controllers\Api;
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Vanilla\ApiUtils;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\DateFilterSchema;
@@ -16,6 +17,7 @@ use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
 use Vanilla\Forms\StaticFormChoices;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\SchemaUtils;
 
 /**
@@ -33,15 +35,14 @@ class DiscussionsApiIndexSchema extends Schema
         parent::__construct(
             $this->parseInternal([
                 "discussionID?" => \Vanilla\Schema\RangeExpression::createSchema([":int"])->setField("x-filter", [
-                    "field" => "d.discussionID",
+                    "field" => "discussionID",
                 ]),
-                "categoryID:i?" => [
-                    "description" => "Filter by a category.",
-                    "x-filter" => [
-                        "field" => "d.CategoryID",
-                    ],
-                    "x-control" => self::getCategoryIDFormOptions(),
-                ],
+                "categoryID:i?" => \Vanilla\Schema\RangeExpression::createSchema([":int"])
+                    ->setField("x-filter", [
+                        "field" => "CategoryID",
+                    ])
+                    ->setField("x-control", self::getCategoryIDFormOptions())
+                    ->setDescription("Filter by a range of categories."),
                 "bookmarkUserID:i?" => [
                     "description" => "Filter on bookmarked UserID.",
                     "minimum" => 1,
@@ -57,30 +58,39 @@ class DiscussionsApiIndexSchema extends Schema
                 "dateInserted?" => new DateFilterSchema([
                     "description" => "When the discussion was created.",
                     "x-filter" => [
-                        "field" => "d.DateInserted",
+                        "field" => "DateInserted",
                         "processor" => [DateFilterSchema::class, "dateFilterField"],
                     ],
                 ]),
+                "slotType?" => [
+                    "type" => "string",
+                    // Daily, weekly, monthly, yearly, all time.
+                    "enum" => ["d", "w", "m", "y", "a"],
+                ],
                 "dateUpdated?" => new DateFilterSchema([
                     "description" => "When the discussion was updated.",
                     "x-filter" => [
-                        "field" => "d.DateUpdated",
+                        "field" => "DateUpdated",
                         "processor" => [DateFilterSchema::class, "dateFilterField"],
                     ],
                 ]),
                 "dateLastComment?" => new DateFilterSchema([
                     "description" => "When the last comment was posted.",
                     "x-filter" => [
-                        "field" => "d.DateLastComment",
+                        "field" => "DateLastComment",
                         "processor" => [DateFilterSchema::class, "dateFilterField"],
                     ],
                 ]),
                 "tagID?" => \Vanilla\Schema\RangeExpression::createSchema([":int"]),
-                "type:s?" => [
+                "type:a?" => [
                     "description" => "Filter by discussion type.",
                     "x-filter" => [
-                        "field" => "d.Type",
+                        "field" => "Type",
                     ],
+                    "items" => [
+                        "type" => "string",
+                    ],
+                    "style" => "form",
                     "x-control" => SchemaForm::dropDown(
                         new FormOptions("Discussion Type", "Choose a specific type of discussions to display."),
                         new StaticFormChoices($this->discussionTypesEnumValues())
@@ -97,11 +107,10 @@ class DiscussionsApiIndexSchema extends Schema
                         "Only fetch discussions from followed categories. Pinned discussions are mixed in.",
                 ],
                 "pinned:b?" => [
-                    "default" => false,
                     "x-control" => SchemaForm::toggle(new FormOptions("Announcements", "Only fetch announcements.")),
                 ],
                 "pinOrder:s?" => [
-                    "default" => "first",
+                    "default" => "mixed",
                     "enum" => ["first", "mixed"],
                     "x-control" => SchemaForm::dropDown(
                         new FormOptions("Announcement Pinning", "Choose how announcements display."),
@@ -119,7 +128,14 @@ class DiscussionsApiIndexSchema extends Schema
                     "minimum" => 1,
                 ],
                 "sort:s?" => [
-                    "enum" => ApiUtils::sortEnum("dateLastComment", "dateInserted", "discussionID", "score", "hot"),
+                    "enum" => ApiUtils::sortEnum(
+                        "dateLastComment",
+                        "dateInserted",
+                        "discussionID",
+                        "score",
+                        "hot",
+                        \DiscussionModel::SORT_EXPIRIMENTAL_TRENDING
+                    ),
                     "x-control" => self::getSortFormOptions(),
                 ],
                 "limit:i?" => [
@@ -132,7 +148,7 @@ class DiscussionsApiIndexSchema extends Schema
                 "insertUserID:i?" => [
                     "description" => "Filter by author.",
                     "x-filter" => [
-                        "field" => "d.InsertUserID",
+                        "field" => "InsertUserID",
                     ],
                 ],
                 "expand?" => \DiscussionExpandSchema::commonExpandDefinition(),
@@ -142,7 +158,7 @@ class DiscussionsApiIndexSchema extends Schema
                     ],
                     "x-search-scope" => true,
                     "x-filter" => [
-                        "field" => "d.statusID",
+                        "field" => "statusID",
                     ],
                 ],
                 "internalStatusID:a?" => [
@@ -151,12 +167,46 @@ class DiscussionsApiIndexSchema extends Schema
                     ],
                     "x-search-scope" => true,
                     "x-filter" => [
-                        "field" => "d.internalStatusID",
+                        "field" => "internalStatusID",
                     ],
                 ],
             ])
         );
-        $this->addValidator("", SchemaUtils::onlyOneOf(["internalStatusID", "statusID"]));
+        $this->addValidator("", function (array $value, ValidationField $field) {
+            if (!ArrayUtils::isArray($value)) {
+                return $value;
+            }
+            $slotType = $value["slotType"] ?? null;
+            $sort = $value["sort"] ?? null;
+            $validSlotTypes = ["w", "d", "m"];
+            if (
+                str_contains($sort ?? "", \DiscussionModel::SORT_EXPIRIMENTAL_TRENDING) &&
+                !in_array($slotType, ["d", "w", "m"])
+            ) {
+                $field->getValidation()->addError("sort", "badSlotType", [
+                    "messageCode" => "The {sort} sort requires 'slotType' to be one of {validSlotTypes}.",
+                    "sort" => $sort,
+                    "validSlotTypes" => $validSlotTypes,
+                ]);
+            }
+            return $value;
+        });
+    }
+
+    /**
+     * Get the schema without default values.
+     *
+     * @return Schema
+     */
+    public function withNoDefaults(): Schema
+    {
+        $schemaArray = $this->getSchemaArray();
+        foreach ($schemaArray["properties"] as $key => &$val) {
+            if (isset($val["default"])) {
+                unset($val["default"]);
+            }
+        }
+        return new Schema($schemaArray);
     }
 
     /**
@@ -183,11 +233,13 @@ class DiscussionsApiIndexSchema extends Schema
      * Get CategoryID form options.
      *
      * @param FieldMatchConditional|null $conditional
-     *
+     * @param bool $multiple Is the dropdown control allowing multiple simultaneous choices?
      * @return array
      */
-    public static function getCategoryIDFormOptions(FieldMatchConditional $conditional = null): array
-    {
+    public static function getCategoryIDFormOptions(
+        FieldMatchConditional $conditional = null,
+        bool $multiple = false
+    ): array {
         return SchemaForm::dropDown(
             new FormOptions(t("Category"), t("Display records from this category.")),
             new ApiFormChoices(
@@ -196,7 +248,8 @@ class DiscussionsApiIndexSchema extends Schema
                 "categoryID",
                 "name"
             ),
-            $conditional
+            $conditional,
+            $multiple
         );
     }
 

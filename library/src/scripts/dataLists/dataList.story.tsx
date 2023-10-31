@@ -9,7 +9,7 @@ import { StoryHeading } from "@library/storybook/StoryHeading";
 import { t } from "@vanilla/i18n/src";
 import { FromToDateTime } from "@library/content/FromToDateTime";
 import { DataList, IDataListNode } from "@library/dataLists/DataList";
-import { STORY_DATE } from "@library/storybook/storyData";
+import { STORY_DATE_STARTS, STORY_DATE_ENDS } from "@library/storybook/storyData";
 
 export default {
     title: "Components/Data List",
@@ -20,7 +20,7 @@ export function Standard(props: { data: [] }) {
     const dummyData = [
         {
             key: t("When"),
-            value: <FromToDateTime dateStarts={STORY_DATE} dateEnds={STORY_DATE} />,
+            value: <FromToDateTime dateStarts={STORY_DATE_STARTS} dateEnds={STORY_DATE_ENDS} />,
         },
         {
             key: t("Where"),

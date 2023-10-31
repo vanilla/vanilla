@@ -129,10 +129,17 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
         // File-based layouts are set as defaults, which have string IDs
         $row["isDefault"] = !is_numeric($row["layoutID"]);
         if (ModelUtils::isExpandOption("layoutViews", $expand)) {
+            $allLayoutViewsForLayoutViewType = $this->layoutViewModel->normalizeRows(
+                $this->layoutViewModel->select(["layoutViewType" => $row["layoutViewType"]]),
+                $expand
+            );
+
             $row["layoutViews"] = $this->layoutViewModel->normalizeRows(
                 $this->layoutViewModel->getViewsByLayoutID($row["layoutID"]),
                 $expand
             );
+
+            $row = $this->synthesizeTemplateLayoutViews($row, $allLayoutViewsForLayoutViewType);
         }
         return $row;
     }
@@ -152,7 +159,7 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
             $ids = array_map(function (array $row) {
                 return $row["layoutID"];
             }, $rows);
-            //expand layout Views based on layoutIDs .
+            // expand layout Views based on layoutIDs .
             $layoutViews = $this->layoutViewModel->normalizeRows(
                 $this->layoutViewModel->getViewsByLayoutIDs($ids),
                 $expand
@@ -161,19 +168,56 @@ class LayoutModel extends FullRecordCacheModel implements MutableLayoutProviderI
 
         $rows = array_map(function (array $row) use ($layoutViews, $expand) {
             $row = $this->normalizeRow($row);
-            //If expand parameter present add layoutViews to the request.
+            // If expand parameter present add layoutViews to the request.
             if (ModelUtils::isExpandOption("layoutViews", $expand)) {
-                $currentLayoutModel = array_values(
+                $appliedLayouts = array_values(
                     array_filter($layoutViews, function ($layoutView) use ($row) {
                         return $layoutView["layoutID"] == $row["layoutID"];
                     })
                 );
-                $row["layoutViews"] = $currentLayoutModel;
+                $row["layoutViews"] = $appliedLayouts;
+
+                $allLayoutViews = array_filter($layoutViews, function (array $layoutView) use ($row) {
+                    return $layoutView["layoutViewType"] === $row["layoutViewType"];
+                });
+                $row = $this->synthesizeTemplateLayoutViews($row, $allLayoutViews);
             }
             return $row;
         }, $rows);
 
         return $rows;
+    }
+
+    /**
+     * A default layout with applied children may be the actual fallback layout.
+     * If that is the case we will synthethize an applied layout for the record.
+     * The actual lookup process reflects this so we want the UI to also reflect it.
+     *
+     * @param array $layout The layout to check.
+     * @param array $layoutViewsForViewType All layout views for this layoutViewType
+     *
+     * @return array The modified layout.
+     */
+    private function synthesizeTemplateLayoutViews(array $layout, array $layoutViewsForViewType): array
+    {
+        $appliedLayouts = $layout["layoutViews"] ?? [];
+        if (empty($appliedLayouts) && $layout["isDefault"]) {
+            // A default layout with applied children may be the actual fallback layout.
+            // If that is the case we will synthethize an applied layout for the record.
+            // The actual lookup process reflects this so we want the UI to also reflect it.
+            $hasAnyAppliedLayout = count($layoutViewsForViewType) > 0;
+
+            if (!$hasAnyAppliedLayout) {
+                $appliedLayouts[] = [
+                    "layoutViewID" => -1,
+                    "layoutID" => $layout["layoutID"],
+                    "recordID" => -1,
+                    "recordType" => "global",
+                ];
+            }
+        }
+        $layout["layoutViews"] = $appliedLayouts;
+        return $layout;
     }
 
     //region Schema retrieval methods

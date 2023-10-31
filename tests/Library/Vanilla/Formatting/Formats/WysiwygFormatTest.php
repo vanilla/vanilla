@@ -58,6 +58,12 @@ class WysiwygFormatTest extends AbstractFormatTestCase
                   <div class="QuoteText">test</div>
                 </blockquote>',
             ],
+            "alt (broken) quote format" => [
+                '<blockquote class="Quote">
+                  <div><a rel="nofollow">UserNoSpace</a> said:</div>
+                  <div><p>adsf</p></div>
+                </blockquote>',
+            ],
         ];
     }
 }

@@ -21,16 +21,18 @@ class ProfileFieldsOpenApi
 
     public function __invoke(array &$openApi): void
     {
+        // Add the profile field schema for updating users' profile fields to openapi.
         $schema = $this->profileFieldModel->getUserProfileFieldSchema();
         $properties = $schema->jsonSerialize()["properties"] ?? [];
-
-        // Add the profile fields schema to openapi.
         ArrayUtils::setByPath("components.schemas.UserProfileFields.properties", $openApi, $properties);
 
+        // Add the profile field schema for filtering users to openapi.
+        $schema = $this->profileFieldModel->getProfileFieldFilterSchema();
+        $properties = $schema->jsonSerialize()["properties"] ?? [];
         ArrayUtils::setByPath(
-            "components.parameters.ExtendedQuerySchema.schema",
+            "components.parameters.ProfileFieldFilters.schema.properties.profileFields.properties",
             $openApi,
-            $this->profileFieldModel->getProfileFieldQuerySchema()->jsonSerialize() ?? []
+            $properties
         );
     }
 }

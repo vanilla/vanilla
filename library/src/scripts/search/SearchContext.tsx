@@ -1,75 +1,66 @@
-import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE } from "@library/search/searchReducer";
-import { ISearchForm, ISearchResponse } from "@library/search/searchTypes";
-import { ILoadable } from "@library/@types/api/core";
+import { DEFAULT_CORE_SEARCH_FORM, INITIAL_SEARCH_STATE, ISearchState } from "@library/search/searchReducer";
+import { ISearchForm, ISearchResult } from "@library/search/searchTypes";
 import React, { useContext } from "react";
-import { ISearchDomain } from "./SearchService";
+import { TypeAllIcon } from "@library/icons/searchIcons";
+import SearchDomain from "@library/search/SearchDomain";
+import { EMPTY_SEARCH_DOMAIN_KEY } from "./searchConstants";
+import { IResult } from "@library/result/Result";
+
+export const EMPTY_SEARCH_DOMAIN = new (class EmptySearchDomain extends SearchDomain {
+    public key = EMPTY_SEARCH_DOMAIN_KEY;
+    public sort = 0;
+    public name = "All";
+    public icon = (<TypeAllIcon />);
+    public recordTypes = [];
+})();
 
 export const SearchContext = React.createContext<ISearchContextValue>({
-    getFilterComponentsForDomain: () => null,
     updateForm: () => {},
     resetForm: () => {},
-    results: INITIAL_SEARCH_STATE.results,
+    response: INITIAL_SEARCH_STATE.response,
     domainSearchResponse: INITIAL_SEARCH_STATE.domainSearchResponse,
-    form: DEFAULT_CORE_SEARCH_FORM,
-    search: () => {},
-    searchInDomain: () => {},
-    getDomains: () => {
-        return [];
-    },
-    getCurrentDomain: () => {
-        throw new Error("Context implementation is required for this method");
-    },
-    getDefaultFormValues: () => {
-        return DEFAULT_CORE_SEARCH_FORM;
-    },
+    form: INITIAL_SEARCH_STATE.form,
+    search: async () => {},
+    domains: [EMPTY_SEARCH_DOMAIN],
+    currentDomain: EMPTY_SEARCH_DOMAIN,
+    handleSourceChange: (nextSource: string) => {},
+    defaultFormValues: DEFAULT_CORE_SEARCH_FORM,
 });
-interface ISearchContextValue<ExtraFormValues extends object = {}> {
-    results: ILoadable<ISearchResponse>;
-
-    domainSearchResponse: Record<string, ILoadable<ISearchResponse>>;
-
-    form: ISearchForm<ExtraFormValues>;
-
-    /**
-     * Get all of the DOM elements for selecting query values for a search domain.
-     * @param domain The search domain to get values for.
-     */
-    getFilterComponentsForDomain(domain: string): React.ReactNode;
-
+interface ISearchContextValue<ExtraFormValues extends object = {}> extends ISearchState<ExtraFormValues> {
     /**
      * Update some form values.
      */
     updateForm(updateValues: Partial<ISearchForm<ExtraFormValues>>): void;
 
     /**
-     * Update some form values.
+     * Reset all form values.
      */
     resetForm(): void;
 
     /**
      * Perform a search.
      */
-    search(): void;
+    search(): Promise<void>;
 
     /**
-     * Perform a separate search in any domain outside of the current domain
+     * Get all the available search domains.
      */
-    searchInDomain(domain: string): void;
+    domains: SearchDomain[];
 
     /**
-     * Get all of the regitered search domains.
+     * Get the current search domain.
      */
-    getDomains(): ISearchDomain[];
+    currentDomain: SearchDomain;
 
     /**
-     * Get the current search domain of the form.
+     * Handle changing SearchSource
      */
-    getCurrentDomain(): ISearchDomain;
+    handleSourceChange: (nextSourceKey: string) => void;
 
     /**
      * Get the default values for the form.
      */
-    getDefaultFormValues(): ISearchForm;
+    defaultFormValues: ISearchForm;
 }
 
 export function useSearchForm<T extends object>() {

@@ -66,11 +66,15 @@ class VanillaMediaSchema extends Schema
      * Medium images will be less than 400px wide;
      * Images are large by default.
      *
-     * @param int $imageWidth
+     * @param int|null $imageWidth
      * @return string
      */
-    public static function getDefaultDisplaySize(int $imageWidth): string
+    public static function getDefaultDisplaySize(?int $imageWidth): string
     {
+        if ($imageWidth === null) {
+            return "small";
+        }
+
         if ($imageWidth <= 200) {
             return "small";
         } elseif ($imageWidth <= 400) {
@@ -106,7 +110,7 @@ class VanillaMediaSchema extends Schema
 
         // Determine the default displaySize of the image from its size.
         if (!array_key_exists("displaySize", $row) && array_key_exists("width", $row)) {
-            $row["displaySize"] = self::getDefaultDisplaySize($row["width"]);
+            $row["displaySize"] = self::getDefaultDisplaySize($row["width"] ?? null);
         }
 
         $schemaRecord = ApiUtils::convertOutputKeys($row);

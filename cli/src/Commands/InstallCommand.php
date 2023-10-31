@@ -7,39 +7,43 @@
 
 namespace Vanilla\Cli\Commands;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Symfony\Component\Console;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Vanilla\Cli\Utils\ScriptLoggerTrait;
 use Vanilla\Cli\Utils\ShellProfile;
-use Vanilla\Cli\Utils\SimpleScriptLogger;
 
 /**
  * Install command.
  */
-class InstallCommand implements LoggerAwareInterface
+class InstallCommand extends Console\Command\Command
 {
-    use LoggerAwareTrait;
+    use ScriptLoggerTrait;
 
     public const BIN_DIR = PATH_ROOT . "/cli/bin";
 
     /**
-     * The logger instance.
-     *
-     * @var SimpleScriptLogger
+     * @inheritdoc
      */
-    protected $logger;
+    protected function configure()
+    {
+        $this->setName("install")->setDescription(
+            "Install the vnla utility onto your \$PATH. Only installs to /usr/local/bin."
+        );
+    }
 
     /**
-     * Install the vnla utility onto your $PATH. Only installs to /usr/local/bin.
-     * If you need to install somewhere else, symlink it yourself.
+     * @inheritdoc
      */
-    public function install()
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (self::isInstalled()) {
-            $this->logger->success("vnla is already installed.");
-            return;
+            $this->logger()->success("vnla is already installed.");
+            return Console\Command\Command::SUCCESS;
         }
 
         ShellProfile::prependPath(self::BIN_DIR);
+        return Console\Command\Command::SUCCESS;
     }
 
     /**

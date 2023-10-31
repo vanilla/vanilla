@@ -27,6 +27,7 @@ export const toastClasses = () => {
         ...shadowHelper().dropDown(),
         background: ColorsUtils.colorOut(globalVars.mainColors.bg),
         width: 280,
+        maxWidth: "100%",
         maxHeight: 120,
         overflowX: "hidden",
         overflowY: "auto",
@@ -38,11 +39,15 @@ export const toastClasses = () => {
         },
     });
 
+    const wide = css({
+        width: 380,
+    });
+
     const closeButton = css({
         position: "absolute",
         top: 16,
         right: 0,
     });
 
-    return { root, closeButton };
+    return { root, closeButton, wide };
 };

@@ -11,12 +11,14 @@ import { useDiscussionList } from "@library/features/discussions/discussionHooks
 import { DiscussionListView } from "@library/features/discussions/DiscussionList.views";
 import DiscussionListLoader from "@library/features/discussions/DiscussionListLoader";
 import { LegacyDiscussionListSelectAll } from "@library/features/discussions/DiscussionListSelectAll";
+import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import React from "react";
 
 interface IProps extends Partial<React.ComponentProps<typeof DiscussionListView>> {
     apiParams: IGetDiscussionListParams;
     isMainContent?: boolean;
     isAsset?: boolean;
+    initialPaging?: ILinkPages;
 }
 
 export function DiscussionList(props: IProps) {
@@ -38,7 +40,7 @@ export function DiscussionList(props: IProps) {
                 discussionOptions={{
                     ...props.discussionOptions,
                     featuredImage: {
-                        display: !!props.apiParams.featuredImage,
+                        display: props.apiParams.featuredImage,
                         ...(props.apiParams.fallbackImage && { fallbackImage: props.apiParams.fallbackImage }),
                     },
                 }}

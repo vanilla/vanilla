@@ -12,6 +12,8 @@ use Garden\Events\ResourceEvent;
 use Garden\Events\EventFromRowInterface;
 use Garden\Schema\Schema;
 use Garden\Web\Exception\NotFoundException;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\SimpleCache\CacheInterface;
 use Vanilla\Attributes;
 use Vanilla\Community\Schemas\PostFragmentSchema;
@@ -23,11 +25,13 @@ use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Forum\Jobs\DeferredResourceEventJob;
 use Vanilla\ImageSrcSet\ImageSrcSet;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\ImageSrcSet\MainImageSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\UserFragmentSchema;
+use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\SchemaFactory;
 use Vanilla\Community\Events\CommentEvent;
 use Vanilla\Contracts\Formatting\FormatFieldInterface;
@@ -47,7 +51,8 @@ class CommentModel extends Gdn_Model implements
     FormatFieldInterface,
     EventFromRowInterface,
     \Vanilla\Contracts\Models\CrawlableInterface,
-    UserMentionsInterface
+    UserMentionsInterface,
+    LoggerAwareInterface
 {
     use \Vanilla\FloodControlTrait;
 
@@ -56,6 +61,8 @@ class CommentModel extends Gdn_Model implements
     use FormatFieldTrait;
 
     use LegacyDirtyRecordTrait;
+
+    use LoggerAwareTrait;
 
     /** Threshold. */
     const COMMENT_THRESHOLD_SMALL = 1000;
@@ -954,7 +961,7 @@ class CommentModel extends Gdn_Model implements
     {
         $this->options($options);
 
-        $this->commentQuery(false); // FALSE supresses FireEvent
+        $this->commentQuery(false); // `false` suppresses FireEvent
         $comment = $this->SQL
             ->where("c.CommentID", $id)
             ->get()
@@ -1319,12 +1326,15 @@ class CommentModel extends Gdn_Model implements
                 );
                 $notificationGenerator->notifyNewComment($comment, $discussion);
             }
-            $commentEvent = $this->eventFromRow(
-                $comment,
-                $insert ? CommentEvent::ACTION_INSERT : CommentEvent::ACTION_UPDATE,
-                $this->userModel->currentFragment()
+
+            $action = $insert ? CommentEvent::ACTION_INSERT : CommentEvent::ACTION_UPDATE;
+            \Gdn::scheduler()->addJobDescriptor(
+                new NormalJobDescriptor(DeferredResourceEventJob::class, [
+                    "id" => $commentID,
+                    "model" => CommentModel::class,
+                    "action" => $action,
+                ])
             );
-            $this->getEventManager()->dispatch($commentEvent);
         }
         return $commentID;
     }
@@ -1603,6 +1613,11 @@ class CommentModel extends Gdn_Model implements
     public function updateUser($userID, $inc = false)
     {
         $user = $this->userModel->getID($userID, DATASET_TYPE_ARRAY);
+        if (!$user) {
+            $this->logger->info("Failed updating the user $userID, this user do not exists.");
+            return;
+        }
+
         if ($inc) {
             $countComments = val("CountComments", $user);
             // Increment if 100 or greater; Recalculate on 120, 140 etc.
@@ -1869,7 +1884,7 @@ class CommentModel extends Gdn_Model implements
     {
         $r = \Vanilla\Models\LegacyModelUtils::getCrawlInfoFromPrimaryKey(
             $this,
-            "/api/v2/comments?sort=-commentID&expand[]=crawl",
+            "/api/v2/comments?sort=-commentID&expand=crawl,roles",
             "commentID"
         );
         return $r;

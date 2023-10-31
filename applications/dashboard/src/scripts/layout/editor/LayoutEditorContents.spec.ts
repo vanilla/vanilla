@@ -87,6 +87,33 @@ describe("LayoutEditorContents", () => {
                 ],
             });
         });
+        it("resolves specific field params to mapped strings", () => {
+            const spec: IEditableLayoutSpec = {
+                layoutViewType: "home",
+                layout: [
+                    {
+                        $hydrate: "react.section.2-columns",
+                        mainBottom: [
+                            {
+                                $hydrate: "react.my-widget",
+                                title: {
+                                    $hydrate: "param",
+                                    ref: "siteSection/name",
+                                },
+                                description: {
+                                    $hydrate: "param",
+                                    ref: "siteSection/description",
+                                },
+                            },
+                        ],
+                    },
+                ],
+            };
+            const hydrated = new LayoutEditorContents(spec, LayoutEditorFixture.catalog()).hydrate();
+            const resolved = hydrated["layout"][0]["$reactProps"]["mainBottom"][0]["$reactProps"];
+            expect(resolved["title"]).toBe("Contextual Title");
+            expect(resolved["description"]).toBe("Contextual Description");
+        });
     });
 
     describe("modification", () => {
@@ -393,6 +420,67 @@ describe("LayoutEditorContents", () => {
                 },
                 contents,
             );
+        });
+    });
+
+    describe("assertions", () => {
+        it("asserts a two or three column section contains a breadcrumb", () => {
+            let contents = LayoutEditorFixture.contents({});
+            contents = contents.insertSection(0, {
+                $hydrate: "react.section.2-columns",
+                testID: "section1",
+            });
+
+            // No breadcrumbs
+            let hasBreadcrumb = contents.hasBreadcrumb({
+                sectionIndex: 0,
+            });
+            expect(hasBreadcrumb).toEqual(false);
+
+            // Insert breadcrumb
+            contents = contents.insertWidget(
+                {
+                    sectionIndex: 0,
+                    sectionRegion: "breadcrumbs",
+                    sectionRegionIndex: 0,
+                },
+                {
+                    $hydrate: "react.breadcrumbs",
+                },
+            );
+            hasBreadcrumb = contents.hasBreadcrumb({
+                sectionIndex: 0,
+            });
+            expect(hasBreadcrumb).toEqual(true);
+        });
+        it("asserts a one column section contains a breadcrumb", () => {
+            let contents = LayoutEditorFixture.contents({});
+            contents = contents.insertSection(0, {
+                $hydrate: "react.section.1-column",
+                testID: "section1",
+            });
+
+            // No breadcrumbs
+            let hasBreadcrumb = contents.hasBreadcrumb({
+                sectionIndex: 0,
+            });
+            expect(hasBreadcrumb).toEqual(false);
+
+            // Insert breadcrumb
+            contents = contents.insertWidget(
+                {
+                    sectionIndex: 0,
+                    sectionRegion: "children",
+                    sectionRegionIndex: 0,
+                },
+                {
+                    $hydrate: "react.breadcrumbs",
+                },
+            );
+            hasBreadcrumb = contents.hasBreadcrumb({
+                sectionIndex: 0,
+            });
+            expect(hasBreadcrumb).toEqual(true);
         });
     });
 

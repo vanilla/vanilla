@@ -11,6 +11,7 @@ import { t } from "@library/utility/appUtils";
 import { UserWarningIcon } from "@library/icons/titleBar";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { EmbedTitle } from "@library/embeddedContent/components/EmbedTitle";
+import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
 
 interface IProps {
     error: IError;

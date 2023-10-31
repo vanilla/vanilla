@@ -15,6 +15,7 @@ import { WidgetContextProvider } from "@library/layout/Widget";
 import { LinkContext } from "@library/routing/links/LinkContextProvider";
 import { IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { MemoryRouter } from "react-router-dom";
+import { resolveFieldParams } from "@dashboard/layout/editor/widgetSettings/resolveFieldParams";
 
 interface IWidgetSettingsPreviewProps {
     widgetCatalog: IWidgetCatalog;
@@ -34,13 +35,14 @@ export function WidgetSettingsPreview(props: IWidgetConfigurationComponentProps 
         : assetCatalog && assetCatalog[widgetID]
         ? assetCatalog[widgetID].$reactComponent
         : "";
+
     const rendererConfig = {
         layout: [
             {
                 $reactComponent: reactComponent,
                 $reactProps: {
                     $hydrate: widgetID,
-                    ...config,
+                    ...resolveFieldParams(config),
                 },
             },
         ],

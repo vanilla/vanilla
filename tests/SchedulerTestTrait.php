@@ -12,6 +12,7 @@ use Garden\Http\HttpResponse;
 use Garden\Web\Data;
 use Garden\Web\Dispatcher;
 use PHPUnit\Framework\TestCase;
+use Vanilla\Http\InternalClient;
 use Vanilla\Scheduler\Job\JobStatusModel;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerResult;
@@ -111,8 +112,13 @@ trait SchedulerTestTrait
         $response = $this->api()->post(
             "/calls/run",
             $callbackPayload,
-            ["Content-Type" => SystemTokenMiddleware::AUTH_CONTENT_TYPE],
-            ["throw" => false]
+            [
+                "content-type" => "application/system+jwt",
+            ],
+            [
+                "timeout" => 25,
+                "throw" => false,
+            ]
         );
         return $response;
     }

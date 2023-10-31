@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -12,7 +12,7 @@ use Garden\Web\Data;
 use Gdn;
 use Vanilla\Theme\ThemePreloadProvider;
 use Vanilla\Web\ContentSecurityPolicyMiddleware;
-use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
+use Vanilla\Web\JsInterpop\StatePreloadTrait;
 use Vanilla\Web\PageDispatchController;
 
 /**
@@ -20,7 +20,7 @@ use Vanilla\Web\PageDispatchController;
  */
 class AppearancePageController extends PageDispatchController
 {
-    use ReduxActionPreloadTrait;
+    use StatePreloadTrait;
 
     /**
      * /appearance/*

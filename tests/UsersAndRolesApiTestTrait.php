@@ -153,6 +153,7 @@ trait UsersAndRolesApiTestTrait
             "bypassSpam" => false,
             "email" => "test-$salt@test.com",
             "emailConfirmed" => true,
+            "sendWelcomeEmail" => false,
             "name" => "user-$salt",
             "password" => "testpassword",
             "photo" => null,

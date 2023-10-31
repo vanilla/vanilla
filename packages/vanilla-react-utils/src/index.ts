@@ -4,11 +4,10 @@
  */
 
 export * from "./createContextProvider";
+export * from "./createLoadableComponent";
 export * from "./Hoverable";
 export * from "./mergeRefs";
 export * from "./mounting";
-export * from "./useAsync";
-export * from "./useAsyncFn";
 export * from "./useCollisionDetector";
 export * from "./useComponentDebug";
 export * from "./useDelayedFunction";
@@ -17,9 +16,10 @@ export * from "./useEscapeListener";
 export * from "./useFocusOnActivate";
 export * from "./useFocusWatcher";
 export * from "./useInterval";
+export * from "./useIsMounted";
 export * from "./useLastValue";
 export * from "./useMeasure";
-export * from "./useMountedState";
+export * from "./useIsMounted";
 export * from "./useRouteChangePrompt";
 export * from "./useTabKeyboardHandler";
 export * from "./useThrowError";
@@ -27,3 +27,4 @@ export * from "./useTracedState";
 export * from "./deconstructAttributesFromElement";
 export * from "./useSessionStorage";
 export * from "./StackingContext";
+export * from "./useLocalStorage";

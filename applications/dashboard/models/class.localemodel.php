@@ -274,4 +274,14 @@ class LocaleModel
             fwrite($fp, $str);
         }
     }
+
+    /**
+     * Check if the site has multi locales enabled
+     *
+     * @return bool
+     */
+    public function hasMultiLocales(): bool
+    {
+        return (bool) count($this->enabledLocalePacks());
+    }
 }

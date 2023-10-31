@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -170,7 +170,7 @@ final class StringUtils
      */
     public static function stripUnicodeWhitespace(string $text)
     {
-        $text = preg_replace('/^[\pZ\pC]+|[\pZ\pC]+$|(?! )[\pZ\pC]/u', "", $text);
+        $text = preg_replace('/^[\pZ\pC]+|[\pZ\pC]+$|(?![ \r\n])[\pZ\pC]/u', "", $text);
         $text = trim($text);
         return $text;
     }
@@ -204,7 +204,7 @@ final class StringUtils
 
             $headings = self::getCsvHeading($result);
             $result = self::normalizeCsvRows($result, $headings);
-            fputcsv($fp, array_keys($headings));
+            fputcsv($fp, $headings);
 
             foreach ($result as $fields) {
                 fputcsv($fp, $fields);
@@ -247,17 +247,33 @@ final class StringUtils
      * Return a CSV heading based on the keys of every row.
      *
      * @param array $rows
-     * @return array
+     * @return array<string>
      */
     public static function getCsvHeading(array $rows)
     {
-        $headings = [];
+        $headingsHashIndex = [];
         foreach ($rows as $row) {
             foreach (array_keys($row) as $rowKey) {
-                $headings[$rowKey] = null;
+                $headingsHashIndex[$rowKey] = null;
             }
         }
-        ksort($headings);
+
+        $headings = array_keys($headingsHashIndex);
+
+        // Filter out subkeys
+        $headings = array_filter($headings, function (string $heading) use ($headings) {
+            foreach ($headings as $headingToCheck) {
+                if (str_starts_with($headingToCheck, $heading . ".")) {
+                    // There a heading that is a "child" of us. We should not include this value.
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
+        sort($headings);
+
         return $headings;
     }
 
@@ -265,7 +281,8 @@ final class StringUtils
      * Normalize a CSV array by setting missing fields to $defaultValue.
      *
      * @param array $rows
-     * @param array $headings
+     * @param string[] $headings
+     * @param null $defaultValue
      * @return array
      */
     public static function normalizeCsvRows(array $rows, array $headings, $defaultValue = null)
@@ -273,9 +290,12 @@ final class StringUtils
         $result = [];
 
         foreach ($rows as $row) {
-            $row = $row + $headings;
-            ksort($row);
-            $result[] = $row;
+            $newRow = [];
+            foreach ($headings as $heading) {
+                $newRow[$heading] = $row[$heading] ?? null;
+            }
+            ksort($newRow);
+            $result[] = $newRow;
         }
 
         return $result;
@@ -301,5 +321,113 @@ final class StringUtils
             throw new \InvalidArgumentException("json_decode error: " . json_last_error_msg());
         }
         return $payload;
+    }
+
+    /**
+     * Parse an urlCode, as provided from CategoryListpageController's `get()` (aka without the `/categories` part) out of a path.
+     *
+     * @param string|null $path The path to parse (doesn't include the `/categories`. part.
+     * @return string|null The parsed ID or null.
+     * @internal Marked public for testing.
+     */
+    public static function parseUrlCodeFromPath(?string $path): ?string
+    {
+        /** Regex pattern for retrieving the record ID from a URL path. */
+        $URL_PATH_PATTERN = "/([^\/]*)?^\/(?<urlPath>[\w-]+).*/";
+
+        if (!$path) {
+            return null;
+        }
+
+        $matches = [];
+        if (preg_match($URL_PATH_PATTERN, $path, $matches) === 0) {
+            return null;
+        }
+
+        $urlCode = filter_var($matches["urlPath"], FILTER_SANITIZE_STRING);
+
+        if ($urlCode === false) {
+            return null;
+        }
+
+        return strtolower($urlCode);
+    }
+
+    /**
+     * Parse an ID out of a path with the formulation /:id-:slug.
+     * -:slug is optional.
+     *
+     * @param string|null $path The path to parse.
+     *
+     * @return int|null The parsed ID or null.
+     * @internal Marked public for testing.
+     */
+    public static function parseIDFromPath(?string $path, string $pathSeparator = "-"): ?int
+    {
+        /** Regex pattern for retrieving the record ID from a URL path. */
+        $ID_PATH_PATTERN = "/^\/(?<recordID>\d+)({$pathSeparator}[^\/]*)?.*/";
+
+        if (!$path) {
+            return null;
+        }
+
+        $matches = [];
+        if (preg_match($ID_PATH_PATTERN, $path, $matches) === 0) {
+            return null;
+        }
+
+        $id = filter_var($matches["recordID"], FILTER_VALIDATE_INT);
+
+        if ($id === false) {
+            return null;
+        }
+
+        return $id;
+    }
+
+    /**
+     * Get the page number out of some path.
+     *
+     * Works in the following format:
+     * "/path/some/path" -> 1
+     * "/path/some/path/p2" -> 2
+     * "/path/some/path/p142" -> 142
+     *
+     * @param string|null $path
+     *
+     * @return int
+     * @internal Marked public for testing.
+     */
+    public static function parsePageNumberFromPath(?string $path): int
+    {
+        $PAGE_PATH_PATTERN = "/.*\/p(?<pageNumber>\d+)$/";
+        if (!$path) {
+            return 1;
+        }
+
+        $matches = [];
+        if (preg_match($PAGE_PATH_PATTERN, $path, $matches) === 0) {
+            return 1;
+        }
+
+        $pageNumber = filter_var($matches["pageNumber"], FILTER_VALIDATE_INT);
+
+        if ($pageNumber === false) {
+            return 1;
+        }
+
+        return $pageNumber;
+    }
+
+    /**
+     * Sanitize an exception message to prevent displaying path ref.
+     * The primary case here is PHP TypeErrors which have file paths directly in them.
+     *
+     * @param string $message actual exception message.
+     * @return string modified exception.
+     */
+    public static function sanitizeExceptionMessage(string $message): string
+    {
+        return str_replace(PATH_ROOT, "", $message);
     }
 }

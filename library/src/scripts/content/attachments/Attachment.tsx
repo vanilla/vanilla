@@ -34,7 +34,7 @@ interface IProps extends IFileAttachment {
     url: string;
 }
 
-export default function Attachment(props) {
+export default function Attachment(props: IProps) {
     const { title, name, url, dateUploaded, type, mimeType, size } = props;
     const label = title || name;
     const classes = attachmentClasses();
@@ -44,7 +44,10 @@ export default function Attachment(props) {
 
     return (
         <EmbedContainer size={EmbedContainerSize.SMALL}>
-            <EmbedContent type={props.type}>
+            <EmbedContent
+                type={props.type}
+                embedActions={<></>} //empty fragment is passed just to make the delete button show up
+            >
                 <SmartLink
                     to={url}
                     className={classNames(classes.link, classes.box)}

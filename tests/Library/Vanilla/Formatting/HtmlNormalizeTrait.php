@@ -44,7 +44,7 @@ trait HtmlNormalizeTrait
      *
      * It is not capable of accurately testing code blocks or anything with white-space:pre.
      *
-     * @param string $html The html to filter
+     * @param string $html The html to filter.
      *
      * @return string
      */

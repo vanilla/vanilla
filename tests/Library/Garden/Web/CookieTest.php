@@ -172,6 +172,21 @@ class CookieTest extends SharedBootstrapTestCase
     }
 
     /**
+     * Test generating a Cookie header.
+     */
+    public function testParseCookieHeader()
+    {
+        $data = "foo=bar; UserID=123; TransientKey=abcdefghij1234567890";
+        $cookie = new Cookie();
+
+        $cookie->importCookies($data, ["foo", "UserID", "TransientKey"]);
+
+        $this->assertEquals("bar", $cookie->get("foo"));
+        $this->assertEquals("123", $cookie->get("UserID"));
+        $this->assertEquals("abcdefghij1234567890", $cookie->get("TransientKey"));
+    }
+
+    /**
      * Test building parameters for deleted cookies.
      */
     public function testMakeDeleteCookieCalls()

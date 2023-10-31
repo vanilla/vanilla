@@ -5,14 +5,14 @@
  */
 
 import React from "react";
-import Loadable from "react-loadable";
 import Loader from "@library/loaders/Loader";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import { registerBeforeUserDropDown } from "@library/headers/mebox/pieces/UserDropdownExtras";
+import { createLoadableComponent } from "@vanilla/react-utils";
 
-const LoadableUserDropDownContents = Loadable({
-    loader: () => import(/* webpackChunkName: "mebox/user" */ "./UserDropDownContentsImpl"),
-    loading() {
+const LoadableUserDropDownContents = createLoadableComponent({
+    loadFunction: () => import(/* webpackChunkName: "mebox/user" */ "./UserDropDownContentsImpl"),
+    fallback() {
         return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
     },
 });

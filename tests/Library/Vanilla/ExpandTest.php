@@ -113,4 +113,20 @@ class ExpandTest extends TestCase
             ],
         ];
     }
+
+    /**
+     * Test that an expand check can ignore "all" values.
+     */
+    public function testExcludeAll()
+    {
+        $schema = Schema::parse([
+            "expand" => ApiUtils::getExpandDefinition(["field1", "field2", "field3.val"]),
+        ]);
+        $expand = $schema->validate(["expand" => ["all", "field2"]])["expand"];
+
+        $this->assertTrue(ModelUtils::isExpandOption("field1", $expand));
+        $this->assertTrue(ModelUtils::isExpandOption("field2", $expand));
+        $this->assertFalse(ModelUtils::isExpandOption("field3.val", $expand, true));
+        $this->assertTrue(ModelUtils::isExpandOption("field2", $expand, true));
+    }
 }

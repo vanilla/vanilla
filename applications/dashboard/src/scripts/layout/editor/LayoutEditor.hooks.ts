@@ -11,8 +11,9 @@ import { logError, RecordID } from "@vanilla/utils";
 import { useEffect, useState, useCallback } from "react";
 import * as layoutActions from "@dashboard/layout/layoutSettings/LayoutSettings.actions";
 import { LayoutEditorAssetUtils } from "@dashboard/layout/editor/LayoutEditorAssetUtils";
+import { useQueryClient } from "@tanstack/react-query";
 
-export function useLayoutDraft(layoutID?: RecordID, initialViewType?: LayoutViewType) {
+export function useLayoutDraft(layoutID?: RecordID, initialViewType?: LayoutViewType, isCopy: boolean = false) {
     const dispatch = useLayoutDispatch();
 
     // If no layoutID is passed, initialize new layout draft
@@ -39,7 +40,14 @@ export function useLayoutDraft(layoutID?: RecordID, initialViewType?: LayoutView
                     // use existing layout, if it's available
                     dispatch(
                         layoutActions.initializeLayoutDraft({
-                            initialLayout: { ...layoutDraftLoadable.data, layoutViewType: initialViewType },
+                            initialLayout: {
+                                ...layoutDraftLoadable.data,
+                                layoutViewType: initialViewType,
+                                layoutID: isCopy ? undefined : layoutDraftLoadable.data.layoutID,
+                                name: isCopy
+                                    ? layoutDraftLoadable.data.name + " (copy)"
+                                    : layoutDraftLoadable.data.name,
+                            },
                         }),
                     );
                 }
@@ -50,7 +58,12 @@ export function useLayoutDraft(layoutID?: RecordID, initialViewType?: LayoutView
                     .then((editLayout) => {
                         dispatch(
                             layoutActions.initializeLayoutDraft({
-                                initialLayout: { ...editLayout, layoutViewType: initialViewType },
+                                initialLayout: {
+                                    ...editLayout,
+                                    layoutViewType: initialViewType,
+                                    name: isCopy ? editLayout.name + " (copy)" : editLayout.name,
+                                    layoutID: isCopy ? undefined : editLayout.layoutID,
+                                },
                             }),
                         );
                     });
@@ -58,15 +71,19 @@ export function useLayoutDraft(layoutID?: RecordID, initialViewType?: LayoutView
         }
     }, [layoutID, layoutDraftLoadable]);
 
+    const queryClient = useQueryClient();
+
     const persistDraft = useCallback(
         async (extra: Partial<ILayoutDraft>) => {
             if (!layoutDraft) {
                 return;
             }
             dispatch(layoutActions.updateLayoutDraft(extra));
-            return dispatch(layoutActions.persistLayoutDraft({ ...layoutDraft, ...extra })).unwrap();
+            const result = dispatch(layoutActions.persistLayoutDraft({ ...layoutDraft, ...extra })).unwrap();
+            queryClient.invalidateQueries(["layouts"]);
+            return result;
         },
-        [dispatch, layoutDraft],
+        [dispatch, layoutDraft, queryClient],
     );
 
     const updateDraft = useCallback(

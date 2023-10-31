@@ -173,6 +173,15 @@ class CommunityNotificationGenerator implements SystemCallableInterface
         $isValid = $this->fireDiscussionBeforeNotificationEvent($discussion, $eventArguments);
 
         if (!$isValid) {
+            ErrorLogger::warning(
+                "Attempted to send notification for a discussion, but it failed validation.",
+                ["notifications"],
+                [
+                    "discussionID" => $discussionID,
+                    "categoryID" => $categoryID,
+                    "eventArguments" => $eventArguments,
+                ]
+            );
             return;
         }
 
@@ -278,7 +287,6 @@ class CommunityNotificationGenerator implements SystemCallableInterface
         $actions = array_values(array_filter($actions));
 
         $multiAction = new LongRunnerMultiAction($actions);
-
         $this->longRunner->runDeferred($multiAction);
     }
 
@@ -587,6 +595,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                 $notification["HeadlineFormat"] = $headlineFormat;
                 $notification["NotifyUserID"] = $notifyUserID;
                 $notification["Data"]["Reason"] = $reason;
+                $notification["Data"]["Preference"] = $preference;
                 $this->activityModel->queue($notification, $preference, $options);
                 $maxNotifiedUserID = $notifyUserID;
                 yield new LongRunnerSuccessID(
@@ -660,6 +669,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                 $notification["HeadlineFormat"] = $headlineFormat;
                 $notification["NotifyUserID"] = $notifyUserID;
                 $notification["Data"]["Reason"] = $reason;
+                $notification["Data"]["Preference"] = $preference;
                 $this->activityModel->queue($notification, $preference, $options);
                 $maxNotifiedUserID = $notifyUserID;
                 yield new LongRunnerSuccessID(

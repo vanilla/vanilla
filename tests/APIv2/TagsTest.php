@@ -450,6 +450,7 @@ class TagsTest extends AbstractResourceTest
      */
     public function createEditLink(int $tagID): string
     {
-        return 'href="/tagstest/settings/tags/edit/' . $tagID . '"';
+        $url = url("/settings/tags/edit/$tagID", true);
+        return "href=\"$url\"";
     }
 }

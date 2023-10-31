@@ -22,14 +22,14 @@ use Vanilla\Utility\ModelUtils;
 class UserEvent extends ResourceEvent implements LoggableEventInterface
 {
     /**
-     * The users API needs expand all to be applied so certain fields work correctly.
+     * The users API needs expand=all to be applied so certain fields work correctly.
      *
-     * @return array
+     * @return array|null
      */
     public function getApiParams(): ?array
     {
         return [
-            "expand" => [ModelUtils::EXPAND_CRAWL, ModelUtils::EXPAND_ALL],
+            "expand" => implode(",", [ModelUtils::EXPAND_CRAWL, ModelUtils::EXPAND_ALL]),
         ];
     }
 
@@ -66,16 +66,17 @@ class UserEvent extends ResourceEvent implements LoggableEventInterface
     {
         switch ($action) {
             case ResourceEvent::ACTION_INSERT:
-                return $username ? "User {targetName} was added by {username}." : "User {targetName} registered.";
+                return $username ? "User {$targetName} was added by {$username}." : "User {$targetName} registered.";
             case ResourceEvent::ACTION_UPDATE:
                 return $username !== $targetName
-                    ? "User {targetName} was updated by {username}."
-                    : "User {targetName} was updated.";
+                    ? "User {$targetName} was updated by {$username}."
+                    : "User {$targetName} was updated.";
             case ResourceEvent::ACTION_DELETE:
                 return $username !== $targetName
-                    ? "User {targetName} was deleted by {username}."
-                    : "User {targetName} was deleted.";
+                    ? "User {$targetName} was deleted by {$username}."
+                    : "User {$targetName} was deleted.";
         }
+        return "";
     }
 }
 

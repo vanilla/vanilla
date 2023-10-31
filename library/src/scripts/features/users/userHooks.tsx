@@ -4,14 +4,21 @@
  */
 
 import { useSelector } from "react-redux";
-import { IGetUserByIDQuery, IInviteUsersByGroupIDQuery, useUserActions } from "@library/features/users/UserActions";
+import {
+    IGetUserByIDQuery,
+    IInviteUsersByGroupIDQuery,
+    IPostUserParams,
+    IPatchUserParams,
+    useUserActions,
+} from "@library/features/users/UserActions";
 import { IUsersStoreState } from "@library/features/users/userTypes";
-import { useDebugValue, useEffect } from "react";
+import { useCallback, useDebugValue, useEffect } from "react";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { GUEST_USER_ID } from "@library/features/users/userModel";
 import { IMe, IUser } from "@library/@types/api/users";
+import { useUniqueID } from "@library/utility/idUtils";
 
 export function useCurrentUserID(): IUser["userID"] | undefined {
     return useSelector((state: ICoreStoreState) => {
@@ -60,6 +67,16 @@ export function useUser(query: Partial<IGetUserByIDQuery>): ILoadable<IUser> {
     useDebugValue(existingResult);
 
     return existingResult;
+}
+
+export function usePostUser() {
+    const actions = useUserActions();
+
+    async function postUser(params: IPostUserParams) {
+        const userData = await actions.postUser(params);
+    }
+
+    return postUser;
 }
 
 function getEmails(emails: string): string[] {
@@ -126,4 +143,30 @@ export function useInviteUsers(params: { userID: number; groupID: number; onSucc
     });
 
     return { emailsString, updateStoreEmails, invitees, updateStoreInvitees, sentInvitations, errors };
+}
+
+export function usePatchUser(userID: IUser["userID"]) {
+    const userActions = useUserActions();
+    const patchID = useUniqueID("userPatch");
+
+    const patchStatus = useSelector((state: IUsersStoreState) => {
+        return state.users.patchStatusByPatchID[`${userID}-${patchID}`]?.status ?? LoadStatus.PENDING;
+    });
+
+    const patchErrors = useSelector(
+        (state: IUsersStoreState) => state.users.patchStatusByPatchID[`${userID}-${patchID}`]?.error,
+    );
+
+    const patchUser = useCallback(
+        async (params: IPatchUserParams) => {
+            return await userActions.patchUser({ ...params, patchID });
+        },
+        [userActions, patchID],
+    );
+
+    return {
+        patchUser,
+        patchErrors,
+        patchStatus,
+    };
 }

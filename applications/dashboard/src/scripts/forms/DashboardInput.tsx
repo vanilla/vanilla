@@ -1,15 +1,15 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
-import classNames from "classnames";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import InputTextBlock, { IInputTextProps } from "@library/forms/InputTextBlock";
 import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
+import { cx } from "@emotion/css";
 
 interface IProps extends IInputTextProps {
     errors?: IFieldError[];
@@ -18,7 +18,7 @@ interface IProps extends IInputTextProps {
 
 export const DashboardInput: React.FC<IProps> = (props: IProps) => {
     const { inputID, labelType } = useFormGroup();
-    const classes = classNames(props.className);
+
     const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
 
     return (
@@ -27,7 +27,7 @@ export const DashboardInput: React.FC<IProps> = (props: IProps) => {
                 id={inputID}
                 inputProps={props.inputProps}
                 multiLineProps={props.multiLineProps}
-                className={classNames(props.inputProps ? props.inputProps.className : null, classes)}
+                className={cx(props.inputProps ? props.inputProps.className : null, props.className)}
                 noMargin={true}
             />
             {props.errors && <ErrorMessages errors={props.errors} />}

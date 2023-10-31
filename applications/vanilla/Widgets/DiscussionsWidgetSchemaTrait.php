@@ -1,11 +1,13 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Forum\Widgets;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\Schema\Schema;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
@@ -166,27 +168,6 @@ trait DiscussionsWidgetSchemaTrait
     }
 
     /**
-     * Get only followed categories trigger schema.
-     *
-     * @return Schema
-     */
-    public static function followedCategorySchema(): Schema
-    {
-        return Schema::parse([
-            "followed?" => [
-                "type" => "boolean",
-                "default" => false,
-                "x-control" => SchemaForm::toggle(
-                    new FormOptions(
-                        t("Display content from followed categories"),
-                        t("Enable to only show posts from categories a user follows.")
-                    )
-                ),
-            ],
-        ]);
-    }
-
-    /**
      * Get categorySchema.
      *
      * @return Schema
@@ -201,12 +182,8 @@ trait DiscussionsWidgetSchemaTrait
                     new FieldMatchConditional(
                         "apiParams",
                         Schema::parse([
-                            "siteSectionID" => [
-                                "type" => "null",
-                            ],
-                            "followed" => [
-                                "const" => false,
-                            ],
+                            "siteSectionID" => ["type" => "null"],
+                            "followed" => ["const" => false],
                         ])
                     )
                 ),
@@ -219,45 +196,9 @@ trait DiscussionsWidgetSchemaTrait
                     new FieldMatchConditional(
                         "apiParams",
                         Schema::parse([
-                            "categoryID" => [
-                                "type" => "integer",
-                            ],
-                            "siteSectionID" => [
-                                "type" => "null",
-                            ],
-                            "followed" => [
-                                "const" => false,
-                            ],
-                        ])
-                    )
-                ),
-            ],
-        ]);
-    }
-
-    /**
-     * Get site-section-id schema.
-     *
-     * @return Schema
-     */
-    protected static function siteSectionIDSchema(): Schema
-    {
-        return Schema::parse([
-            "siteSectionID?" => [
-                "type" => ["string", "null"],
-                "default" => null,
-                "x-control" => SchemaForm::dropDown(
-                    new FormOptions(t("Subcommunity"), t("Display records from this subcommunity.")),
-                    new StaticFormChoices(self::getSiteSectionFormChoices()),
-                    new FieldMatchConditional(
-                        "apiParams",
-                        Schema::parse([
-                            "categoryID" => [
-                                "type" => "null",
-                            ],
-                            "followed" => [
-                                "const" => false,
-                            ],
+                            "categoryID" => ["type" => "integer"],
+                            "siteSectionID" => ["type" => "null"],
+                            "followed" => ["const" => false],
                         ])
                     )
                 ),
@@ -313,35 +254,5 @@ trait DiscussionsWidgetSchemaTrait
                 ],
             ],
         ]);
-    }
-
-    /**
-     * Get all site-sections form choices.
-     *
-     * @return array
-     */
-    protected static function getSiteSectionFormChoices(): array
-    {
-        /** @var SiteSectionModel $siteSectionModel */
-        $siteSectionModel = \Gdn::getContainer()->get(SiteSectionModel::class);
-        $siteSections = $siteSectionModel->getAll();
-
-        // If there's only one site-section (default) then we don't
-        // need to build the choices.
-        if (count($siteSections) === 1) {
-            return [];
-        }
-
-        $siteSectionFormChoices = [];
-        foreach ($siteSections as $siteSection) {
-            $id = $siteSection->getSectionID();
-            $name = $siteSection->getSectionName();
-
-            if ($id !== (string) DefaultSiteSection::DEFAULT_ID) {
-                $siteSectionFormChoices[$id] = $name;
-            }
-        }
-
-        return $siteSectionFormChoices;
     }
 }

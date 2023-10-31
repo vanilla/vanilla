@@ -9,6 +9,7 @@ namespace Vanilla\VanillaConnect;
 
 use Exception;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Garden\Schema\Schema;
 use Garden\Web\Cookie;
 use Garden\Web\RequestInterface;
@@ -340,7 +341,7 @@ class VanillaConnectAuthenticator extends SSOAuthenticator
         $jwt = $this->cookie->get($this->cookieName);
         if ($jwt) {
             try {
-                $decoded = (array) JWT::decode($jwt, $this->cookieSalt, [self::JWT_ALGORITHM]);
+                $decoded = (array) JWT::decode($jwt, new Key($this->cookieSalt, self::JWT_ALGORITHM));
                 $cookiedNonce = $decoded["nonce"] ?? null;
             } catch (Exception $e) {
             }

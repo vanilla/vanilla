@@ -1,7 +1,7 @@
 /**
  * Primary bootstrapping of the frontend JS. This entrypoint should be the last once executed.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -14,18 +14,16 @@ window.onerror = (error) => {
     setTimeout(() => {
         if (window.getComputedStyle(document.body).visibility !== "visible") {
             document.body.style.visibility = "visible";
-            debuglog("Javascript error encountered, forcing body visibility");
+            logDebug("Javascript error encountered, forcing body visibility");
         }
     }, 800);
 };
 
 import { onContent, getMeta, _executeReady } from "@library/utility/appUtils";
-import { logError, debug } from "@vanilla/utils";
+import { logError, debug, logDebug } from "@vanilla/utils";
 import { translationDebug } from "@vanilla/i18n";
 import apiv2 from "@library/apiv2";
-import { mountInputs } from "@library/forms/mountInputs";
 import { onPageView } from "@library/pageViews/pageViewTracking";
-import { History } from "history";
 import { _mountComponents } from "@library/utility/componentRegistry";
 import { blotCSS } from "@rich-editor/quill/components/blotStyles";
 import { bootstrapLocales } from "@library/locales/localeBootstrap";
@@ -36,7 +34,6 @@ import "@library/gdn";
 import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
 import { loadThemeShadowDom } from "@library/theming/loadThemeShadowDom";
 import { initModernEmbed } from "@library/embed/modernEmbed.local";
-import { debuglog } from "util";
 
 export function bootstrapVanilla() {
     performance.mark("Bootstrap - Start");
@@ -93,7 +90,6 @@ export function bootstrapVanilla() {
                     }, 0);
                 });
                 blotCSS();
-                mountInputs();
             });
 
             window.__VANILLA_INTERNAL_IS_READY__ = true;

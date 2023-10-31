@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -31,13 +31,13 @@ class DiscussionWidgetModule extends BaseDiscussionWidgetModule
      */
     public static function getApiSchema(): Schema
     {
+        $filterTypeSchemaExtraOptions = parent::getFilterTypeSchemaExtraOptions();
+
         $apiSchema = parent::getApiSchema();
 
         $apiSchema = $apiSchema->merge(
             SchemaUtils::composeSchemas(
-                self::followedCategorySchema(),
-                static::categorySchema(),
-                self::siteSectionIDSchema(),
+                self::filterTypeSchema(["subcommunity", "category", "none"], false, $filterTypeSchemaExtraOptions),
                 self::sortSchema(),
                 self::getSlotTypeSchema(),
                 self::limitSchema()

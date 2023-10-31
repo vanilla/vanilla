@@ -19,6 +19,12 @@ use Vanilla\Logging\LoggerUtils;
  */
 class CommentEvent extends ResourceEvent implements LoggableEventInterface, TrackingEventInterface
 {
+    public function __construct(string $action, array $payload, $sender = null)
+    {
+        parent::__construct($action, $payload, $sender);
+        $this->addApiParams(["expand" => "crawl,roles"]);
+    }
+
     /**
      * @inheritDoc
      */
@@ -119,5 +125,16 @@ class CommentEvent extends ResourceEvent implements LoggableEventInterface, Trac
     public function getInsertUserID(): int
     {
         return $this->payload["comment"]["insertUserID"];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSiteSectionID(): ?string
+    {
+        if (isset($this->payload["comment"]["siteSectionIDs"])) {
+            return $this->payload["comment"]["siteSectionIDs"][0] ?? null;
+        }
+        return null;
     }
 }

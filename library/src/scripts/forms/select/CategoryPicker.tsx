@@ -14,7 +14,7 @@ import { categoryPickerClasses } from "./CategoryPicker.classes";
 import classNames from "classnames";
 import CategoryInfo from "@library/forms/select/CategoryInfo";
 
-interface ICategoryItem {
+interface ICategoryItemForSelect {
     value: string;
     label: string;
     depth: number;
@@ -35,7 +35,7 @@ interface IProps {
         breadcrumbs?: null;
         description?: undefined;
     };
-    items: ICategoryItem[];
+    items: ICategoryItemForSelect[];
 }
 
 /**
@@ -45,7 +45,9 @@ export function CategoryPicker(props: IProps) {
     const { selectAttributes, items, defaultItem, initialValue, categoryInfoOnly } = props;
     const classes = categoryPickerClasses();
     const initialSelectedItem = initialValue ? items.find((item) => item.value == initialValue) : defaultItem;
-    const [selectedItem, setSelectedItem] = useState<ICategoryItem | typeof defaultItem | null>(initialSelectedItem!);
+    const [selectedItem, setSelectedItem] = useState<ICategoryItemForSelect | typeof defaultItem | null>(
+        initialSelectedItem!,
+    );
     const [selectedValue, setSelectedValue] = useState<string | undefined>(initialValue || defaultItem?.value);
 
     const handleChange = (e) => {

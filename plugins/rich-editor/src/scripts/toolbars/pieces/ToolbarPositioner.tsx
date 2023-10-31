@@ -6,34 +6,19 @@
 
 import React from "react";
 import debounce from "lodash/debounce";
-import Quill, { RangeStatic, BoundsStatic } from "quill/core";
+import Quill, { BoundsStatic } from "quill/core";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";
-import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import { richEditorVariables } from "@library/editor/richEditorVariables";
 
-interface IXCoordinates {
-    position: number;
-    nubPosition?: number;
-}
+import { IParameters, IXCoordinates, IYCoordinates } from "@library/editor/toolbars/FloatingToolbarContent";
+import floatingToolbarVariables from "@library/editor/toolbars/FloatingToolbar.variables";
 
-interface IYCoordinates {
-    position: number;
-    nubPosition?: number;
-    nubPointsDown?: boolean;
-}
-
-interface IParameters {
-    x: IXCoordinates | null;
-    y: IYCoordinates | null;
-    offsetX?: IXCoordinates | null;
-}
-
-type HorizontalAlignment = "center" | "start";
-type VerticalAlignment = "above" | "below";
+export type HorizontalAlignment = "center" | "start";
+export type VerticalAlignment = "above" | "below";
 
 interface IProps extends IWithEditorProps {
     children: (params: IParameters) => JSX.Element;
-    selectionTransformer?: (selection: RangeStatic) => RangeStatic | null;
     flyoutHeight: number | null;
     flyoutWidth: number | null;
     nubHeight?: number | null;
@@ -42,24 +27,23 @@ interface IProps extends IWithEditorProps {
     isActive: boolean;
     selectionIndex: number | null;
     selectionLength: number | null;
-    className?: string;
 }
 
 interface IState {
-    quillWidth: number;
+    editorWidth: number;
 }
 
 class ToolbarPositioner extends React.Component<IProps, IState> {
-    private quill: Quill;
+    private editor: Quill;
 
-    constructor(props) {
+    constructor(props: IProps) {
         super(props);
 
         // Quill can directly on the class as it won't ever change in a single instance.
-        this.quill = props.quill;
+        this.editor = props.editor!;
 
         this.state = {
-            quillWidth: this.quill.root.offsetWidth,
+            editorWidth: this.editor.root.offsetWidth,
         };
     }
 
@@ -89,7 +73,7 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
             }
         }
 
-        if (this.state.quillWidth !== nextState.quillWidth) {
+        if (this.state.editorWidth !== nextState.editorWidth) {
             shouldUpdate = true;
         }
 
@@ -97,7 +81,7 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
     }
 
     public render() {
-        const vars = richEditorVariables();
+        const vars = floatingToolbarVariables();
         const params = this.props.isActive
             ? {
                   x: this.getXCoordinates(this.props.legacyMode ? 0 : -vars.scrollContainer.overshoot),
@@ -139,7 +123,7 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
      */
     private windowResizeListener = () => {
         const debouncedWidthUpdate = debounce(() => {
-            this.setState({ quillWidth: this.quill.root.offsetWidth });
+            this.setState({ editorWidth: this.editor.root.offsetWidth });
         }, 200);
         debouncedWidthUpdate();
     };
@@ -155,17 +139,17 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
             return null;
         }
 
-        const numLines = this.quill.getLines(selectionIndex, selectionLength);
+        const numLines = this.editor.getLines(selectionIndex, selectionLength);
         let bounds;
 
         if (numLines.length <= 1) {
-            bounds = this.quill.getBounds(selectionIndex, selectionLength);
+            bounds = this.editor.getBounds(selectionIndex, selectionLength);
         } else {
             // If multi-line we want to position at the center of the last line's selection.
             const lastLine = numLines[numLines.length - 1];
-            const index = this.quill.getIndex(lastLine);
+            const index = this.editor.getIndex(lastLine);
             const length = Math.min(lastLine.length() - 1, selectionIndex + selectionLength - index);
-            bounds = this.quill.getBounds(index, length);
+            bounds = this.editor.getBounds(index, length);
         }
         bounds.y += offsetY;
         bounds.x += offsetX;
@@ -182,7 +166,7 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
             return null;
         }
 
-        const quillWidth = this.state.quillWidth;
+        const editorWidth = this.state.editorWidth;
         const { flyoutWidth } = this.props;
 
         const start = bounds.left;
@@ -194,7 +178,7 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
 
             const halfToolbarSize = flyoutWidth / 2;
             const min = halfToolbarSize + padding;
-            const max = quillWidth - halfToolbarSize - padding;
+            const max = editorWidth - halfToolbarSize - padding;
             const averageOffset = Math.round((start + end) / 2);
 
             const position = Math.max(min, Math.min(max, averageOffset)) - halfToolbarSize;
@@ -207,7 +191,7 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
         } else {
             const inset = 6;
             const min = start;
-            const max = quillWidth - flyoutWidth - inset;
+            const max = editorWidth - flyoutWidth - inset;
             const position = Math.min(max, Math.max(min, start));
 
             return {
@@ -251,4 +235,4 @@ class ToolbarPositioner extends React.Component<IProps, IState> {
     }
 }
 
-export default withEditor<IProps>(ToolbarPositioner);
+export default withEditor(ToolbarPositioner);

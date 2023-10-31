@@ -3,7 +3,7 @@
     "dateInserted": "2022-01-01T00:00:00Z",
     "layoutViewType": "discussionList",
     "layoutID": "discussionList",
-    "name": "Default Discussion List Layout",
+    "name": "Discussions Template",
     "layout": [
         {
             "$hydrate": "react.section.full-width",
@@ -17,8 +17,10 @@
                         "image": ""
                     },
                     "title": "Community Discussions",
+                    "titleType": "static",
                     "alignment": "left",
                     "description": "The most recent content from our members.",
+                    "descriptionType": "static",
                     "searchPlacement": "middle",
                     "textColor": "#FFFFFF"
                 }
@@ -26,12 +28,17 @@
         },
         {
             "$hydrate": "react.section.2-columns",
+            "breadcrumbs": [
+                {
+                    "$hydrate": "react.breadcrumbs"
+                }
+            ],
             "mainBottom": [
                 {
                     "$hydrate": "react.asset.discussionList",
                     "apiParams": {
                         "includeChildCategories": true,
-                        "sort": "-dateInserted",
+                        "sort": "-dateLastComment",
                         "slotType": "a"
                     },
                     "discussionOptions": {
@@ -52,10 +59,32 @@
                             }
                         }
                     },
-                    "title": "Recent Discussions"
+                    "title": "Recent Discussions",
+                    "titleType": "static",
+                    "descriptionType": "none",
+                    "isAsset": true
                 }
             ],
             "secondaryBottom": [
+                {
+                    "$hydrate": "react.guest-cta",
+                    "title": "Welcome!",
+                    "description": "It looks like you're new here. Sign in or register to get started.",
+                    "titleType": "static",
+                    "descriptionType": "static",
+                    "secondButton": {
+                        "title": "Register",
+                        "type": "standard"
+                    },
+                    "button": {
+                        "title": "Sign In",
+                        "type": "primary"
+                    },
+                    "background": {
+                        "useOverlay": true
+                    },
+                    "alignment": "left"
+                },
                 {
                     "$hydrate": "react.newpost",
                     "asOwnButtons": [],
@@ -64,7 +93,8 @@
                 },
                 {
                     "$hydrate": "react.quick-links",
-                    "title": "Quick Links"
+                    "title": "Quick Links",
+                    "titleType": "static"
                 }
             ]
         }

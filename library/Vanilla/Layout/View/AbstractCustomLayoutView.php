@@ -63,7 +63,7 @@ abstract class AbstractCustomLayoutView implements LayoutViewInterface
      * Given a set of parameters matching paramInputSchema, resolve them into paramResolve schema.
      *
      * @param array $paramInput The input parameters.
-     *
+     * @param PageHeadInterface|null $pageHead
      * @return array
      */
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array

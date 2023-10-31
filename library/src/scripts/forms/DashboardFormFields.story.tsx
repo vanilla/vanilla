@@ -276,6 +276,23 @@ export function RadioGroups() {
                     <DashboardRadioButton value={"option3"} label="Option 3" />
                 </DashboardRadioGroup>
             </DashboardFormGroup>
+            <DashboardFormGroup fieldset label="Radio Group With Tooltips Per Option">
+                <DashboardRadioGroup onChange={setGroup1} value={group1}>
+                    <DashboardRadioButton
+                        name={"radiogroup1_option1"}
+                        value={"option1"}
+                        label="Option 1"
+                        tooltip="Some explanatory text for Option 1"
+                    />
+                    <DashboardRadioButton
+                        name={"radiogroup1_option2"}
+                        value={"option2"}
+                        label="Option 2"
+                        tooltip="Some explanatory text for Option 2"
+                    />
+                    <DashboardRadioButton name={"radiogroup1_option3"} value={"option3"} label="Option 3" />
+                </DashboardRadioGroup>
+            </DashboardFormGroup>
             <br />
             <h2
                 style={{ color: "#4FA095" }}

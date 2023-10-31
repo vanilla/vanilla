@@ -9,13 +9,8 @@ import RadioButton from "@library/forms/RadioButton";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import classNames from "classnames";
 
-interface IProps {
-    disabled?: boolean;
-    className?: string;
-    label: string;
+interface IProps extends React.ComponentProps<typeof RadioButton> {
     value: string;
-    name?: string;
-    note?: string;
 }
 
 export function DashboardRadioButton(props: IProps) {

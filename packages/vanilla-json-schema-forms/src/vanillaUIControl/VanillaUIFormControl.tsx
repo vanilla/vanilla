@@ -51,7 +51,7 @@ export function VanillaUIFormControl(props: IProps) {
                         props.onChange(newValue);
                     }}
                     disabled={props.disabled}
-                    optionProvider={api ? <AutoCompleteLookupOptions api={api} lookup={api} /> : undefined}
+                    optionProvider={api ? <AutoCompleteLookupOptions lookup={api} /> : undefined}
                     options={
                         staticOptions
                             ? Object.entries(staticOptions).map(([value, label]) => ({

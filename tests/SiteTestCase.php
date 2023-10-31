@@ -1,13 +1,14 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests;
 
 use Garden\Container\Container;
+use Vanilla\Models\AddonModel;
 
 /**
  * A base class for tests that require Vanilla to be installed.
@@ -51,6 +52,9 @@ class SiteTestCase extends VanillaTestCase
     {
         parent::tearDown();
         $this->tearDownTestTraits();
+        if (\Gdn::database()->isInTransaction()) {
+            self::fail("Test run ended with an open database transaction.");
+        }
     }
 
     /**
@@ -60,5 +64,33 @@ class SiteTestCase extends VanillaTestCase
     {
         parent::tearDownAfterClass();
         static::tearDownAfterClassTestTraits();
+    }
+
+    /**
+     * Enable an addon on the site.
+     *
+     * @param string $key
+     */
+    public function enableAddon(string $key)
+    {
+        $addonModel = \Gdn::getContainer()->get(AddonModel::class);
+        $addonManager = $addonModel->getAddonManager();
+
+        $addon = $addonManager->lookupAddon($key);
+        $addonModel->enable($addon);
+    }
+
+    /**
+     * Disable an addon on the site.
+     *
+     * @param string $key
+     */
+    public function disableAddon(string $key)
+    {
+        $addonModel = \Gdn::getContainer()->get(AddonModel::class);
+        $addonManager = $addonModel->getAddonManager();
+
+        $addon = $addonManager->lookupAddon($key);
+        $addonModel->disable($addon);
     }
 }

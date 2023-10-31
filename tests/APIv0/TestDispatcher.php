@@ -173,6 +173,7 @@ class TestDispatcher
         // Back up the old request so that it doesn't pollute future tests.
         $oldRequest = clone \Gdn::request();
         $request = self::createRequest($method, $path, $queryOrBody);
+        $request->setMeta("trackDispatch", true);
 
         if ($method === "POST") {
             $session->validateTransientKey(true);
@@ -216,6 +217,11 @@ class TestDispatcher
             }
         }
 
+        // Validate that our site meta serialize properly.
+        if ($this->lastController instanceof \Gdn_Controller) {
+            TestCase::assertIsString($this->lastController->validateDefinitionList());
+        }
+
         return $this->lastController;
     }
 
@@ -227,7 +233,9 @@ class TestDispatcher
      */
     public function handleControllerDispatched(ControllerDispatchedEvent $event)
     {
-        $this->lastDispatchedEvent = clone $event;
+        if ($event->getRequest()->getMeta("trackDispatch")) {
+            $this->lastDispatchedEvent = clone $event;
+        }
         return $event;
     }
 
@@ -542,5 +550,13 @@ class TestDispatcher
     public function setRethrowExceptions(bool $rethrowExceptions): void
     {
         $this->rethrowExceptions = $rethrowExceptions;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLastOutput(): ?string
+    {
+        return $this->lastOutput;
     }
 }

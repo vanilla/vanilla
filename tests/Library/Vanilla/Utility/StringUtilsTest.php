@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,7 +9,6 @@ namespace VanillaTests\Library\Vanilla\Utility;
 
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\StringUtils;
-use VanillaTests\Fixtures\Tuple;
 use VanillaTests\Library\Vanilla\CsvProviderTrait;
 
 /**
@@ -34,6 +33,7 @@ class StringUtilsTest extends TestCase
      * @param mixed $in
      * @param string $message
      * @dataProvider provideJsonEncodeExceptions
+     * @throws \Exception
      */
     public function testJsonEncodeExceptions($in, $message): void
     {
@@ -184,6 +184,7 @@ class StringUtilsTest extends TestCase
             [" thisIsATest ", "thisIsATest"],
             ["En français", "En français"],
             ["ช่องโปรไฟล์", "ช่องโปรไฟล์"],
+            ["This\nis\non\nmultiple\nlines", "This\nis\non\nmultiple\nlines"],
         ];
         return $r;
     }
@@ -254,5 +255,73 @@ class StringUtilsTest extends TestCase
             null,
             "json_decode error: Syntax error",
         ];
+    }
+
+    /**
+     * Test page number parsing.
+     *
+     * @param string $path
+     * @param int $expectedNumber
+     *
+     * @dataProvider providePageNumbers
+     */
+    public function testPageNumber(string $path, int $expectedNumber)
+    {
+        $this->assertEquals($expectedNumber, StringUtils::parsePageNumberFromPath($path));
+    }
+
+    /**
+     * @return array
+     */
+    public function providePageNumbers(): array
+    {
+        return [["/test/test/path/p642/p12", 12], ["/test/p6", 6], ["asdf", 1], ['asdf$#%$^%&*&^%$#!/', 1]];
+    }
+
+    /**
+     * Test the UrlCode is extracted from a given path.
+     *
+     * @dataProvider provideParseUrlCodeFromPath
+     * @return void
+     */
+    public function testParseUrlCodeFromPath($expected, $url)
+    {
+        $this->assertEquals($expected, StringUtils::parseUrlCodeFromPath($url));
+    }
+
+    /**
+     * Provide data for testParseUrlCodeFromPath().
+     * `/categories` isn't part of the url.
+     *
+     * @return array
+     */
+    public function provideParseUrlCodeFromPath(): array
+    {
+        // `/categories`isn't included.
+        return [
+            ["some-category-slug", "/some-category-slug"],
+            ["some-category-slug", "/some-category-slug/1"],
+            ["some1categoryslug", "/some1CategorySlug?param1=one&param2=two"],
+            ["somecategoryslug", "/SomeCategorySlug/social-groups?param=value#anchor"],
+        ];
+    }
+
+    /**
+     * Test the IDs are extracted from a given path
+     *
+     * @return void
+     */
+    public function testParseIDFromPath()
+    {
+        $pathWithoutID = "/";
+        $pathWithNumericID = "/100";
+        $pathWithStringID = "/some-string";
+        $pathWithIDAndSlug = "/100/some-slug";
+
+        $this->assertEquals("100", StringUtils::parseIDFromPath($pathWithIDAndSlug, "\/"));
+        $this->assertEquals("100", StringUtils::parseIDFromPath($pathWithNumericID, "\/"));
+        $this->assertEquals(null, StringUtils::parseIDFromPath($pathWithStringID, "\/"));
+        $this->assertEquals(null, StringUtils::parseIDFromPath($pathWithoutID, "\/"));
+        $this->assertEquals(null, StringUtils::parseIDFromPath(null));
     }
 }

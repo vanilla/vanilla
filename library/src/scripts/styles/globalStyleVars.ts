@@ -1,9 +1,8 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { ButtonPreset } from "@library/forms/ButtonPreset";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { IBackground, IFont, LinkDecorationType } from "@library/styles/cssUtilsTypes";
 import { fontFallbacks, monoFallbacks } from "@library/styles/fontFallbacks";
@@ -613,6 +612,12 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
                 ...fontFallbacks,
             ],
             monospace: monoFallbacks,
+            headings: [
+                fontsInit0.customFont.name && !fontsInit0.forceGoogleFont
+                    ? fontsInit0.customFont.name
+                    : fontsInit0.googleFontFamily ?? defaultFontFamily,
+                ...fontFallbacks,
+            ],
         },
     });
 
@@ -808,7 +813,7 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
             /**
              * @var global.embed.text.width
              */
-            width: 640,
+            width: 720,
         },
         /**
          * @varGroup global.embed.select

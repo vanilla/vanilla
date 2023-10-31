@@ -45,8 +45,63 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test
         ]);
 
         self::setupQnAFollowUpFeature();
-
+        Gdn::database()
+            ->sql()
+            ->truncate("Discussion");
         $session->end();
+    }
+    /**
+     * Test /discussions filters by type = "question".
+     */
+    public function testGetDiscussionTypes()
+    {
+        $postedQuestions[] = $this->testPostQuestion();
+        $postedQuestions[] = $this->testPostQuestion();
+        $postedQuestions[] = $this->testPostQuestion();
+        $postedQuestionIDs = array_column($postedQuestions, "discussionID");
+        // Add a regular discussion to ensure it's filtered out.
+        $response = $this->api()->post("discussions", [
+            "categoryID" => 1,
+            "name" => "Test Discussion",
+            "body" => "Hello world!",
+            "format" => "markdown",
+        ]);
+        $this->assertTrue($response->isSuccessful());
+        $postBody = $response->getBody();
+        $this->assertArrayHasKey("discussionID", $postBody);
+        $nonQuestionDiscussionID = intval($postBody["discussionID"]);
+
+        $response = $this->api()->get("discussions", ["type" => "Question"]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $body = $response->getBody();
+        $this->assertNotEmpty($body);
+        $allQuestionIDs = array_column($body, "discussionID");
+        $this->assertNotContains(
+            $nonQuestionDiscussionID,
+            $allQuestionIDs,
+            "Non-question discussion found in question-specific discussion set"
+        );
+
+        $this->assertEqualsCanonicalizing(
+            $postedQuestionIDs,
+            $allQuestionIDs,
+            "One or more questions posted in this test were not included in the question-specific discussion set"
+        );
+
+        $response = $this->api()->get("discussions", ["type" => "Question,Discussion"]);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $body = $response->getBody();
+        $this->assertNotEmpty($body);
+        $allQuestionIDs = array_column($body, "discussionID");
+        $postedQuestionIDs[] = $nonQuestionDiscussionID;
+        $this->assertEqualsCanonicalizing(
+            $postedQuestionIDs,
+            $allQuestionIDs,
+            "One or more posts in this test were not included in the question and discussion set"
+        );
     }
 
     /**
@@ -314,7 +369,7 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test
         // enable feature flag
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get(\Gdn_Configuration::class);
-        $config->set("Feature." . \QnAPlugin::FOLLOWUP_FLAG . ".Enabled", true, true, false);
+        $config->set("QnA.FollowUp.Enabled", true, true, false);
 
         // add user preference
         $config->touch(["Preferences.Email.QuestionFollowUp" => 1]);

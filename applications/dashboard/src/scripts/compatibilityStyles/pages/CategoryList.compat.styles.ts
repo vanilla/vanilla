@@ -5,9 +5,9 @@
  * @license GPL-2.0-only
  */
 
+import { categoryListVariables } from "@library/categoriesWidget/CategoryList.variables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { MixinsFoundation } from "@library/styles/MixinsFoundation";
-import { categoryListVariables } from "@dashboard/compatibilityStyles/pages/CategoryList.variables";
 
 export const categoryListCompatCSS = () => {
     const globalVars = globalVariables();

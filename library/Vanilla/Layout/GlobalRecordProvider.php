@@ -14,8 +14,8 @@ use Vanilla\Layout\Providers\LayoutViewRecordProviderInterface;
  */
 class GlobalRecordProvider implements LayoutViewRecordProviderInterface
 {
-    private static $recordType = "global";
-    private static $recordID = -1;
+    public const RECORD_TYPE = "global";
+    public const RECORD_ID = -1;
 
     /**
      * @inheritdoc
@@ -36,7 +36,7 @@ class GlobalRecordProvider implements LayoutViewRecordProviderInterface
     public function validateRecords(array $recordIDs): bool
     {
         $recordIDs = array_filter($recordIDs, function ($id) {
-            return $id == $this::$recordID;
+            return $id == self::RECORD_ID;
         });
         return count($recordIDs) > 0;
     }
@@ -46,15 +46,11 @@ class GlobalRecordProvider implements LayoutViewRecordProviderInterface
      */
     public static function getValidRecordTypes(): array
     {
-        return [self::$recordType];
-    }
-
-    /**
-     * Returns the provider's `recordType` & `recordID`.
-     */
-    public static function getRecordTypeAndID(): array
-    {
-        return ["recordType" => self::$recordType, "recordID" => self::$recordID];
+        return [
+            self::RECORD_TYPE,
+            // Legacy support
+            "root",
+        ];
     }
 
     /**
@@ -62,6 +58,6 @@ class GlobalRecordProvider implements LayoutViewRecordProviderInterface
      */
     public function getParentRecordTypeAndID(string $recordType, string $recordID): array
     {
-        return [LayoutViewModel::FILE_RECORD_TYPE, $this::$recordID];
+        return [LayoutViewModel::FILE_RECORD_TYPE, self::RECORD_ID];
     }
 }

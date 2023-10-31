@@ -57,11 +57,7 @@ class DiscussionQuestionsWidget extends QnAWidgetModule implements ReactWidgetIn
      */
     public static function getWidgetSchema(): Schema
     {
-        $schema = SchemaUtils::composeSchemas(
-            parent::getWidgetSchema(),
-            self::optionsSchema(),
-            self::containerOptionsSchema("containerOptions")
-        );
+        $schema = SchemaUtils::composeSchemas(parent::getWidgetSchema());
         return $schema;
     }
 }

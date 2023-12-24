@@ -16,7 +16,7 @@ use Vanilla\EmbeddedContent\Embeds\TwitterEmbed;
  */
 class TwitterEmbedFactory extends AbstractEmbedFactory
 {
-    const DOMAINS = ["twitter.com"];
+    const DOMAINS = ["twitter.com", "x.com"];
 
     /** @var HttpClient */
     private $httpClient;

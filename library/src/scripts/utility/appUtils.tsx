@@ -93,6 +93,14 @@ export function isAllowedUrl(input: string): boolean {
     return isURL(input);
 }
 
+/**
+ * Normalize the URL with a prepended http if there isn't one.
+ */
+export function normalizeUrl(urlToNormalize: string) {
+    const result = urlToNormalize.match(/^https?:\/\//) ? urlToNormalize : "http://" + urlToNormalize;
+    return result;
+}
+
 export interface ISiteSection {
     basePath: string;
     contentLocale: string;
@@ -110,6 +118,14 @@ export function getSiteSection(): ISiteSection {
     return getMeta("siteSection");
 }
 
+export function getDefaultSiteSection(): ISiteSection {
+    return getMeta("defaultSiteSection", getSiteSection());
+}
+
+export function hasMultipleSiteSections(): boolean {
+    return getMeta("siteSectionSlugs", []).length > 0;
+}
+
 /**
  * Format a URL in the format passed from the controller.
  *
@@ -120,12 +136,15 @@ export function getSiteSection(): ISiteSection {
 export function formatUrl(path: string, withDomain: boolean = false): string {
     // Test if this is an absolute path
     if (ABSOLUTE_PATH_REGEX.test(path)) {
-        return path;
+        // Attempt to inject a site section into the url if we can.
+        const absoluteUrl = tryInjectSiteSectionIntoAbsoluteUrl(path);
+        return absoluteUrl;
     }
 
     // Subcommunity slug OR subcommunity
     let siteRoot = getMeta("context.basePath", "");
 
+    // Urls starting with a tilde, indicate that we should NOT be attaching a site section automatically.
     if (path.startsWith("~")) {
         path = path.replace(/^~/, "");
         siteRoot = getMeta("context.host", "");
@@ -136,6 +155,44 @@ export function formatUrl(path: string, withDomain: boolean = false): string {
     // When we don't have that we want to fallback to "" so that our path with a / can get passed.
     const urlBase = withDomain ? window.location.origin + siteRoot : siteRoot;
     return urlBase + path;
+}
+
+/**
+ * Try to inject a site section slug into an absolute URL meeting the following criteria
+ *
+ * - The URL is on the same Vanilla site as us (not just domain, in a hub/node it must be our node).
+ * - The URL path does not already start with a site section already. (All site sections paths are injected from the backend).
+ * - The URL path has content (eg. not empty or just /).
+ *
+ * @param url A fully qualified URL.
+ * @returns Another fully qualified URL. This could be an original or a modification.
+ */
+function tryInjectSiteSectionIntoAbsoluteUrl(url: string): string {
+    // First see that it's one of our own urls.
+    const expectedHost = window.location.origin + getMeta("context.host", "");
+    if (!url.startsWith(expectedHost)) {
+        // Nothing to do. It's not our url.
+        return url;
+    }
+
+    // No trim off the host from the url.
+    const path = url.replace(expectedHost, "");
+    if (path.length <= 1) {
+        // Don't muck around with no path or just `/`.
+        return url;
+    }
+    const siteSectionSlugs = getMeta("siteSectionSlugs", []);
+
+    for (const siteSectionSlug of siteSectionSlugs) {
+        if (path.match(new RegExp(`^${siteSectionSlug}(/.*)?$`, "gi"))) {
+            // We have a site section slug.
+            return url;
+        }
+    }
+
+    // We don't have a site section slug.
+    // Take our stripped path, and make a url out of it.
+    return formatUrl(path, true);
 }
 
 /**
@@ -236,7 +293,12 @@ export function _executeReady(before?: () => void | Promise<void>): Promise<any[
         });
         const exec = () => {
             before?.();
-            return Promise.all(handlerPromises).then(resolve);
+            return Promise.all(handlerPromises)
+                .then(resolve)
+                .finally(() => {
+                    const contentEvent = new CustomEvent("X-VanillaReady", { bubbles: true, cancelable: false });
+                    document.dispatchEvent(contentEvent);
+                });
         };
 
         if (document.readyState !== "loading") {
@@ -267,26 +329,47 @@ export function removeOnContent(callback: (event: CustomEvent) => void) {
 }
 
 /**
+ * Encode a username the same way our backend does.
+ *
+ * Notably there is a long-standing issue where names certain characters that our dispatcher matches on need to be double encoded.
+ * @param username
+ */
+function encodeUserName(username?: string): string {
+    // Matching existing backend logic.
+    const specialEncoded = username?.replace("/", "%2f").replace("&", "%26") ?? "";
+    return encodeURIComponent(specialEncoded);
+}
+
+/**
  * Make a URL to a user's profile.
  */
-export function makeProfileUrl(username: string) {
-    const userPath = `/profile/${encodeURIComponent(username)}`;
+export function makeProfileUrl(userID?: RecordID, username?: string) {
+    let userPath = "/profile/";
+    if (userID) userPath += `${userID}/`;
+    if (username) userPath += `${encodeUserName(username)}`;
+
     return formatUrl(userPath, true);
 }
 
 /**
  * Make a URL to a user's discussions.
  */
-export function makeProfileDiscussionsUrl(username: string) {
-    const discussionsPath = `/profile/discussions/${encodeURIComponent(username)}`;
+export function makeProfileDiscussionsUrl(userID?: RecordID, username?: string) {
+    let discussionsPath = "/profile/discussions/";
+    if (userID) discussionsPath += `${userID}/`;
+    if (username) discussionsPath += `${encodeUserName(username)}`;
+
     return formatUrl(discussionsPath, true);
 }
 
 /**
  * Make a URL to a user's comments.
  */
-export function makeProfileCommentsUrl(username: string) {
-    const commentsPath = `/profile/comments/${encodeURIComponent(username)}`;
+export function makeProfileCommentsUrl(userID?: RecordID, username?: string) {
+    let commentsPath = "/profile/comments/";
+    if (userID) commentsPath += `${userID}/`;
+    if (username) commentsPath += `${encodeUserName(username)}`;
+
     return formatUrl(commentsPath, true);
 }
 
@@ -330,4 +413,44 @@ export function createSourceSetValue(sourceSet: ImageSourceSet): string {
             .map((source) => `${source.reverse().join(" ")}w`)
             .join(",")
     );
+}
+
+//https://stackoverflow.com/questions/15690706/recursively-looping-through-an-object-to-build-a-property-list/53620876#53620876
+export function getDeepPropertyListInDotNotation(obj: object): string[] {
+    const isObject = (val) => val && typeof val === "object" && !Array.isArray(val);
+
+    const addDelimiter = (a, b) => (a ? `${a}.${b}` : b);
+
+    const paths = (obj: any = {}, head = "") => {
+        return Object.entries(obj).reduce((product, [key, value]) => {
+            let fullPath = addDelimiter(head, key);
+            return isObject(value) ? product.concat(paths(value, fullPath)) : product.concat(fullPath);
+        }, []);
+    };
+
+    return paths(obj);
+}
+
+/**
+ * Wrapped JSON.stringify method so that is
+ * does not explode if JSON is malformed
+ */
+export function safelySerializeJSON(json: unknown) {
+    try {
+        return JSON.stringify(json);
+    } catch (error) {
+        logError(error);
+    }
+}
+
+/**
+ * Wrapped JSON.parse method so that is
+ * does not explode if JSON is malformed
+ */
+export function safelyParseJSON(string: string) {
+    try {
+        return JSON.parse(string);
+    } catch (error) {
+        logError(error);
+    }
 }

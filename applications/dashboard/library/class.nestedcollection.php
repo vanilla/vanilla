@@ -417,7 +417,7 @@ trait NestedCollection
     {
         $link = [
             "text" => $text,
-            "url" => $url,
+            "url" => url($url, true),
             "key" => $key,
         ];
 

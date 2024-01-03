@@ -6,7 +6,9 @@
 
 namespace VanillaTests\APIv2;
 
+use Exception;
 use Garden\Web\Exception\NotFoundException;
+use PHPUnit\Framework\Error\Notice;
 use ReactionModel;
 
 /**
@@ -122,15 +124,15 @@ class ReactionsReactTest extends AbstractAPIv2Test
         $user = $this->createReactionsTestUser(rand(1, 100000));
         $userID = (int) $user["userID"];
         $this->api()->setUserID($userID);
-
         $this->api()->post("/comments/1/reactions", [
             "reactionType" => $type,
         ]);
-
-        $postResponse = $this->api()->get("/comments/1/reactions");
-        $this->assertTrue($this->hasUserReaction($this->api()->getUserID(), $type, $postResponse->getBody()));
-
-        $this->api()->delete("/comments/1/reactions/{$userID}");
+        // Run as admin, to remove comments for user selected.
+        $this->runWithAdminUser(function () use ($type, $userID) {
+            $postResponse = $this->api()->get("/comments/1/reactions");
+            $this->assertTrue($this->hasUserReaction($this->api()->getUserID(), $type, $postResponse->getBody()));
+            $this->api()->delete("/comments/1/reactions/{$userID}");
+        });
         $response = $this->api()->get("/comments/1/reactions");
         $this->assertFalse($this->hasUserReaction($this->api()->getUserID(), $type, $response->getBody()));
     }
@@ -680,6 +682,37 @@ class ReactionsReactTest extends AbstractAPIv2Test
         }
 
         $this->assertTrue($result, "Unable to find a greater-than-zero count for reaction type: {$type}");
+    }
+
+    /**
+     * Test APIV1 reaction validation: Invalid Record ID.
+     */
+    public function testApiV1InvalidRecordId()
+    {
+        $discussion = $this->createDiscussion(1, "Test invalid record ID");
+        $reactionEndpoint = "/react/discussion/like?id={$discussion["discussionID"]}";
+
+        $this->bessy()->post($reactionEndpoint);
+
+        // APIV1 Call. Different PHP versions are giving different error message, thus, we aren't expecting any
+        // specific one, just that this will error out.
+        $this->expectError();
+        $this->bessy()->post($reactionEndpoint . "aa");
+    }
+
+    /**
+     * Test APIV1 reaction validation: Record is not found.
+     */
+    public function testApiV1RecordIsNotFound()
+    {
+        $discussion = $this->createDiscussion(1, "Test record is not found");
+        $reactionEndpoint = "/react/discussion/like?id={$discussion["discussionID"]}";
+
+        $this->bessy()->post($reactionEndpoint);
+
+        // APIV1 Call.
+        $this->expectExceptionMessage("Record is not found");
+        $this->bessy()->post($reactionEndpoint . "00000");
     }
 
     /**

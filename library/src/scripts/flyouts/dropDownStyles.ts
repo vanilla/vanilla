@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -195,6 +195,37 @@ export const dropDownClasses = useThemeCache(() => {
                     horizontal: important(0),
                 }),
             },
+            ".tokens__group": {
+                ...Mixins.padding({ vertical: 8 }),
+                ...Mixins.border({
+                    width: 0,
+                    top: {
+                        width: 1,
+                        radius: 0,
+                    },
+                }),
+                "&:first-of-type": {
+                    border: 0,
+                },
+                ".tokens__group-heading": {
+                    width: "100%",
+                    textAlign: "center",
+                    fontSize: "0.875em",
+                    color: "inherit",
+                    opacity: 0.75,
+                },
+            },
+            ".suggestedTextInput-option": {
+                ...Mixins.padding({ all: 8 }),
+                width: "100%",
+                "& > .suggestedTextInput-head": {
+                    display: "flex",
+                    justifyContent: "space-between",
+                },
+                "&:hover": {
+                    background: globalVars.states.hover.highlight.toString(),
+                },
+            },
         },
         mediaQueries.oneColumnDown({
             ...{
@@ -305,7 +336,7 @@ export const dropDownClasses = useThemeCache(() => {
     });
 
     const text = css({
-        display: "block",
+        display: "flex",
         flex: 1,
     });
 
@@ -556,6 +587,12 @@ export const dropDownClasses = useThemeCache(() => {
         width: "100%",
     });
 
+    const loader = css({
+        width: "initial",
+        padding: "0px",
+        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+    });
+
     return {
         root,
         contents,
@@ -603,6 +640,7 @@ export const dropDownClasses = useThemeCache(() => {
         gridItem,
         gridItemSmall,
         badge,
+        loader,
     };
 });
 
@@ -623,6 +661,7 @@ export const actionMixin = (classBasedStates?: IStateSelectors): CSSObject => {
         textAlign: "left",
         minHeight: styleUnit(vars.item.minHeight),
         lineHeight: globalVars.lineHeights.condensed,
+        fontWeight: globalVars.fonts.weights.normal,
         ...Mixins.padding({
             vertical: 4,
             horizontal: vars.item.padding.horizontal,

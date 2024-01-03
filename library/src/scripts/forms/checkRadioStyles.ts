@@ -81,6 +81,7 @@ export const checkRadioVariables = useThemeCache(() => {
     const spacing = themeVars("spacing", {
         horizontal: 6,
         vertical: 9,
+        left: 0,
     });
 
     return {
@@ -98,15 +99,22 @@ export const checkRadioClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = checkRadioVariables();
 
-    const isDashboard = css({});
+    const isDashboard = css({
+        ...Mixins.padding({
+            vertical: 5,
+            horizontal: 6,
+        }),
+    });
 
     //.radioButton-label,
     // .checkbox-label
     const label = css({
-        lineHeight: styleUnit(vars.sizing.width),
+        lineHeight: 1,
         paddingLeft: styleUnit(8),
-        paddingRight: styleUnit(8),
         cursor: "pointer",
+        ...Mixins.font({
+            weight: globalVars.fonts.weights.normal,
+        }),
         ...userSelect(),
     });
 
@@ -135,6 +143,7 @@ export const checkRadioClasses = useThemeCache(() => {
         width: styleUnit(vars.sizing.width),
         height: styleUnit(vars.sizing.width),
         flexBasis: styleUnit(vars.sizing.width),
+        minWidth: styleUnit(vars.sizing.width),
         verticalAlign: "middle",
         cursor: "pointer",
         backgroundColor: ColorsUtils.colorOut(vars.main.bg),
@@ -158,8 +167,17 @@ export const checkRadioClasses = useThemeCache(() => {
         margin: "auto",
     });
 
+    const tooltipIcon = css({
+        ...Mixins.verticallyAlignInContainer(24, 1),
+    });
+    const tooltipIconContainer = css({
+        marginLeft: 4,
+        maxHeight: "1em",
+    });
+
     const disk = css({
         borderRadius: percent(50),
+        aspectRatio: "1 / 1",
     });
 
     const diskIcon = css({
@@ -206,24 +224,21 @@ export const checkRadioClasses = useThemeCache(() => {
     //.checkbox
     const root = css({
         display: important("flex"),
-        flexWrap: "wrap",
         alignItems: "center",
         outline: 0,
         ...Mixins.padding(vars.spacing),
-        ...{
-            [`&&`]: {
-                margin: 0,
-            },
-            [`&.isHorizontal.isHorizontal.isHorizontal`]: Mixins.margin({
-                all: 0,
-                right: px(globalVars.spacer.size / 2),
+        [`&&`]: {
+            margin: 0,
+        },
+        [`&.isHorizontal.isHorizontal.isHorizontal`]: Mixins.margin({
+            all: 0,
+            right: px(globalVars.spacer.size / 2),
+        }),
+        [`&.${isDashboard} + .info`]: {
+            ...Mixins.margin({
+                top: styleUnit(2),
+                bottom: styleUnit(6),
             }),
-            [`&.${isDashboard} + .info`]: {
-                ...Mixins.margin({
-                    top: styleUnit(2),
-                    bottom: styleUnit(6),
-                }),
-            },
         },
     });
 
@@ -256,6 +271,16 @@ export const checkRadioClasses = useThemeCache(() => {
         },
     });
 
+    const checkBoxDescription = css({
+        marginLeft: 30,
+        marginTop: -5,
+    });
+
+    const tooltipPerOption = css({
+        marginLeft: 8,
+        marginBottom: -4,
+    });
+
     return {
         root,
         label,
@@ -264,11 +289,15 @@ export const checkRadioClasses = useThemeCache(() => {
         iconContainer,
         radioIcon,
         checkIcon,
+        tooltipIcon,
+        tooltipIconContainer,
+        tooltipPerOption,
         fullWidth,
         disk,
         diskIcon,
         input,
         grid,
         isDashboard,
+        checkBoxDescription,
     };
 });

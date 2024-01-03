@@ -100,6 +100,31 @@ class GeneralFunctionsTest extends SharedBootstrapTestCase
     }
 
     /**
+     * Test current domain is always marked trusted
+     *
+     * @return void
+     */
+    public function testCurrentDomainIsValidatedAsTrusted()
+    {
+        $currentUrl = \Gdn::request()->getSimpleUrl();
+        $this->assertTrue(isTrustedDomain($currentUrl));
+    }
+
+    /**
+     * Test that url\'s with username is marked untrusted
+     */
+
+    public function testUrlWithUsernameIsMarkedUntrusted()
+    {
+        $currentUrl = \Gdn::request()->getSimpleUrl();
+        $domain = parse_url($currentUrl, PHP_URL_HOST);
+        $urls = ["https://evil.com\\@$domain", "http://username:password@hostname:9090/path?arg=value"];
+        foreach ($urls as $url) {
+            $this->assertFalse(isTrustedDomain($url));
+        }
+    }
+
+    /**
      * Provide tests for {@link testIsTrustedDomainConfig()}.
      *
      * @return array Returns a data provider.

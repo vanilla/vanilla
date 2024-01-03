@@ -3,18 +3,15 @@
  * @license GPL-2.0-only
  */
 
-import React, { useLayoutEffect } from "react";
-import { t } from "@library/utility/appUtils";
-import DocumentTitle from "@library/routing/DocumentTitle";
-import { sprintf } from "sprintf-js";
-import { useHistory } from "react-router";
+import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";
+import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { SectionOneColumn } from "@library/layout/SectionOneColumn";
 import { Widget } from "@library/layout/Widget";
-import { PageHeadingBox } from "@library/layout/PageHeadingBox";
-import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";
-import { useBackRouting } from "@library/routing/links/BackRoutingProvider";
-import { PageBox } from "@library/layout/PageBox";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
+import DocumentTitle from "@library/routing/DocumentTitle";
+import { t } from "@library/utility/appUtils";
+import React from "react";
+import { sprintf } from "sprintf-js";
 
 interface IProps {
     type?: string;
@@ -25,7 +22,6 @@ interface IProps {
 export default function NotFoundPage(props: IProps) {
     const type = props.type ?? "Page";
     const title = props.title || sprintf(t("%s Not Found"), t(type));
-
     return (
         <div className="Center SplashInfo">
             <WidgetLayout>

@@ -10,14 +10,13 @@ Users may designate a discussion as a Question and then officially accept one or
 
 `Feature.DiscussionQnATag.Enabled`: Displays a Q&A meta tag in the discussion header.
 
-`Feature.QnAFollowUp.Enabled`: Enables the "Question Follow Up Notifications".
-
 ## Question Follow-Up Notifications:
 
 Sends an email to all authors of a question that has answers, but hasn't been accepted after a certain amount of time has passed. The goal is to re-enforce the Q&A workflow and increase the number of accepted answers or allow staff to go in and make sure the leftovers have adequate answers. This feature is enabled per category.
 
-This feature enables one field on the dashboard:
+The following settings control Question Follow-Up Notifications:
 
+-   **Enable Follow-up Notifications:** Enable or disable "Question Follow Up Notifications".
 -   **Follow-up Interval:** Number of days the system should wait before triggering another batch of notifications.
 
 To activate this feature on a category, activate the toggle "Enable Q&A follow-up notifications". This toggle is only available on categories of type "Discussions".
@@ -47,4 +46,4 @@ This can happen for a number of reasons. Remember this feature is activated per 
 
 **The author is not receiving follow-up notifications:**
 
--   Make sure the author has the preference "Send me a follow-up for my answered questions." (`Notification.Email.QuestionFollowUp`) enabled. If you're triggering this notification manually, the pop-up will display a message with more information.
+-   Make sure the author has the preference "Send me a follow-up for my answered questions" (`Notification.Email.QuestionFollowUp`) enabled. If you're triggering this notification manually, the pop-up will display a message with more information.

@@ -9,11 +9,13 @@ namespace VanillaTests\Site;
 
 use Garden\Container\Container;
 use Garden\Container\Tests\Fixtures\PdoDb;
-use Vanilla\Contracts\Site\AbstractSiteProvider;
-use Vanilla\Contracts\Site\Site;
+use Garden\Sites\SiteRecord;
+use Vanilla\Contracts\Site\VanillaSiteProvider;
+use Vanilla\Contracts\Site\VanillaSite;
 use Vanilla\Http\InternalClient;
 use Vanilla\Models\Model;
 use Vanilla\Site\OwnSite;
+use Vanilla\Site\OwnSiteProvider;
 use VanillaTests\TestInstallModel;
 
 /**
@@ -21,7 +23,7 @@ use VanillaTests\TestInstallModel;
  */
 trait MockSiteTestTrait
 {
-    /** @var MockOwnSite */
+    /** @var SiteRecord */
     private $backupOwnSite;
 
     /** @var int */
@@ -63,8 +65,9 @@ trait MockSiteTestTrait
     protected static function configureMockSiteContainer(Container $container)
     {
         $container
-            ->rule(AbstractSiteProvider::class)
+            ->rule(VanillaSiteProvider::class)
             ->setClass(MockSiteProvider::class)
+            ->addAlias(MockSiteProvider::class)
             ->setShared(true)
             ->rule(OwnSite::class)
             ->setClass(MockOwnSite::class)
@@ -78,7 +81,7 @@ trait MockSiteTestTrait
      * - The previous site will be restored.
      * - All created content in the $cleanupTables will be deleted.
      *
-     * @param array|Site $siteOrOverrides
+     * @param array|VanillaSite $siteOrOverrides
      * @param callable $callable
      */
     protected function runWithMockedSite($siteOrOverrides, callable $callable)
@@ -96,29 +99,33 @@ trait MockSiteTestTrait
     /**
      * Create a mock site.
      *
-     * @param Site|array $siteOrOverrides Overrides to pass when constructuring the site. All values are defaulted.
+     * @param VanillaSite|array $siteOrOverrides Overrides to pass when constructuring the site. All values are defaulted.
      *
-     * @return Site
+     * @return VanillaSite
      */
-    protected function mockCurrentSite($siteOrOverrides): Site
+    protected function mockCurrentSite($siteOrOverrides): VanillaSite
     {
         $this->mockSiteCount++;
         $this->backupOwnSite();
         $ownSite = $this->getOwnSite();
 
-        if ($siteOrOverrides instanceof Site) {
+        if ($siteOrOverrides instanceof VanillaSite) {
             $site = $siteOrOverrides;
         } else {
-            $site = new Site(
-                $siteOrOverrides["name"] ?? "Mocked Site " . $this->mockSiteCount,
-                $siteOrOverrides["webUrl"] ?? "http://vanilla.localhost/node" . $this->mockSiteCount,
+            $site = new SiteRecord(
                 $siteOrOverrides["siteID"] ?? $this->mockSiteCount,
-                ($siteOrOverrides["accountID"] = $ownSite->getAccountID()),
-                $siteOrOverrides["httpClient"] ?? $ownSite->getHttpClient()
+                $siteOrOverrides["accountID"] ?? $ownSite->getAccountID(),
+                "cl00000",
+                $siteOrOverrides["webUrl"] ?? "http://vanilla.localhost/node" . $this->mockSiteCount
             );
         }
 
+        $mockSiteProvider = self::container()->get(MockSiteProvider::class);
         $ownSite->applyFrom($site);
+
+        // Keep track of ths for later.
+        $mockSiteProvider->addMockSite(clone $ownSite);
+
         return $ownSite;
     }
 
@@ -127,20 +134,20 @@ trait MockSiteTestTrait
      */
     protected function backupOwnSite()
     {
-        $this->backupOwnSite = clone $this->getOwnSite();
+        $this->backupOwnSite = clone $this->getOwnSite()->getSiteRecord();
     }
 
     /**
-     * @return Site
+     * @return VanillaSite
      */
-    protected function restoreOwnSite(): Site
+    protected function restoreOwnSite(): VanillaSite
     {
         $backup = $this->backupOwnSite;
         $this->backupOwnSite = null;
 
         $this->getOwnSite()->applyFrom($backup);
 
-        return $backup;
+        return $this->getOwnSite();
     }
 
     /**

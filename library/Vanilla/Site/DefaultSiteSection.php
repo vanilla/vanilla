@@ -10,7 +10,7 @@ namespace Vanilla\Site;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Dashboard\Models\BannerImageModel;
-use Vanilla\Layout\GlobalRecordProvider;
+use Vanilla\Layout\GlobalLayoutRecordProvider;
 
 /**
  * Site section definition for a site with only a single section.
@@ -18,7 +18,7 @@ use Vanilla\Layout\GlobalRecordProvider;
  */
 class DefaultSiteSection implements SiteSectionInterface
 {
-    const DEFAULT_ID = 0;
+    const DEFAULT_ID = "0";
 
     const DEFAULT_CATEGORY_ID = -1;
 
@@ -110,6 +110,7 @@ class DefaultSiteSection implements SiteSectionInterface
     public function getDefaultRoute(): array
     {
         $configDefaultController = $this->config->get("Routes.DefaultController");
+
         return $this->router->parseRoute($configDefaultController) + ["OverridesCustomLayout" => false];
     }
 
@@ -119,6 +120,7 @@ class DefaultSiteSection implements SiteSectionInterface
     public function applications(): array
     {
         $apps = ["forum" => !(bool) $this->config->get("Vanilla.Forum.Disabled")];
+
         return array_merge($apps, $this->appOverrides);
     }
 
@@ -174,15 +176,28 @@ class DefaultSiteSection implements SiteSectionInterface
         return $this->config->get(BannerImageModel::DEFAULT_CONFIG_KEY, "");
     }
 
+    public function getLayoutRecordType(): string
+    {
+        return GlobalLayoutRecordProvider::RECORD_TYPE;
+    }
+
+    public function getLayoutRecordID(): int
+    {
+        return GlobalLayoutRecordProvider::RECORD_ID;
+    }
+
     /**
      * @inheritDoc
      */
-    public function getLayoutIdLookupParams(string $layoutViewType, string $recordType, string $recordID): array
+    public function getTrackablePayload(): array
     {
         return [
-            "layoutViewType" => $layoutViewType,
-            "recordType" => GlobalRecordProvider::getValidRecordTypes()[0],
-            "recordID" => -1,
+            "Subcommunity" => [
+                "SubcommunityID" => $this->getSectionID(),
+                "Locale" => $this->getContentLocale(),
+                "Folder" => $this->getBasePath(),
+                "Name" => $this->getSectionName(),
+            ],
         ];
     }
 }

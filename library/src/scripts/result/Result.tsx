@@ -13,21 +13,18 @@ import { IAttachmentIcon } from "@library/content/attachments/AttachmentIcon";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { ListItem } from "@library/lists/ListItem";
 import { ListItemMedia } from "@library/lists/ListItemMedia";
-export interface IResult {
-    name: string;
-    className?: string;
+
+export interface IResult extends Pick<React.ComponentProps<typeof ListItem>, "name" | "url" | "icon" | "className"> {
     meta?: React.ReactNode;
-    url: string;
     excerpt?: string;
     highlight?: string;
     image?: string;
     imageSet?: string;
     attachments?: IAttachmentIcon[];
-    icon?: React.ReactNode;
     rel?: string;
 }
 
-export default function Result(props: IResult) {
+function Result(props: IResult) {
     const { name, className, meta, url, excerpt, image, imageSet, attachments, icon, highlight } = props;
     const hasAttachments = !!(attachments && attachments.length > 0);
     const showImage = (!!image || !!imageSet) && !hasAttachments;
@@ -36,7 +33,7 @@ export default function Result(props: IResult) {
 
     const media = hasMedia ? (
         showImage ? (
-            <ListItemMedia src={image!} srcSet={imageSet} alt={t("Thumbnail for: " + name)} />
+            <ListItemMedia src={image!} srcSet={imageSet} alt={name ? t("Thumbnail for: " + name) : t("Thumbnail")} />
         ) : hasAttachments ? (
             <AttachmentIcons attachments={attachments!} />
         ) : null
@@ -65,3 +62,5 @@ export default function Result(props: IResult) {
         />
     );
 }
+
+export default Result;

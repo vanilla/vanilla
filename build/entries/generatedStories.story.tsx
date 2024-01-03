@@ -23,6 +23,8 @@ import "../../applications/vanilla/src/scripts/entries/forum";
 import "../../plugins/rich-editor/src/scripts/entries/forum";
 import { Provider } from "react-redux";
 import getStore from "@library/redux/getStore";
+import { loadTranslations } from "@vanilla/i18n";
+loadTranslations({});
 
 ///
 /// These imports are just so that the files get loaded into storybook.

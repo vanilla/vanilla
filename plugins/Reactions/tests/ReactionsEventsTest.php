@@ -9,6 +9,7 @@ namespace Reactions\Tests;
 
 use CommentModel;
 use DiscussionModel;
+use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\Utility\ArrayUtils;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SetupTraitsTrait;
@@ -43,6 +44,14 @@ class ReactionsEventsTest extends VanillaTestCase
     protected static function getAddons(): array
     {
         return ["vanilla", "reactions"];
+    }
+
+    /**
+     * @return \Gdn_Database
+     */
+    protected function getDb(): \Gdn_Database
+    {
+        return \Gdn::database();
     }
 
     /**
@@ -112,6 +121,7 @@ class ReactionsEventsTest extends VanillaTestCase
      */
     public function testToggleUserTagCommentReactionEvent()
     {
+        $this->resetTable("UserPoints");
         $discussion = $this->createDiscussion();
         $comment = $this->createComment();
 
@@ -128,6 +138,10 @@ class ReactionsEventsTest extends VanillaTestCase
         [$record] = $this->reactionModel->getRow("Comment", $comment["commentID"]);
 
         $this->reactionModel->toggleUserTag($data, $record, $this->commentModel);
+        $reactionPoints = $this->getDb()
+            ->createSql()
+            ->getWhere("UserPoints", ["Source" => "Reactions", "UserID" => $record["InsertUserID"]])
+            ->resultArray();
 
         $this->assertEventDispatched(
             $this->expectedResourceEvent("reaction", ResourceEvent::ACTION_INSERT, [
@@ -136,5 +150,6 @@ class ReactionsEventsTest extends VanillaTestCase
                 "recordUrl" => CommentModel::commentUrl(ArrayUtils::pascalCase($comment)),
             ])
         );
+        $this->assertSame($reaction["Points"], $reactionPoints[0]["Points"]);
     }
 }

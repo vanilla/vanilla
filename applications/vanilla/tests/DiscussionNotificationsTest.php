@@ -44,7 +44,10 @@ class DiscussionNotificationsTest extends \VanillaTests\SiteTestCase
             $notifyUser = $this->createUser();
             $authorUser = $this->createUser();
             $notifyCategory = $this->createCategory();
-            $this->setCategoryPreference($notifyUser, $notifyCategory, \CategoryModel::NOTIFICATION_DISCUSSIONS);
+            $this->setCategoryPreference($notifyUser, $notifyCategory, [
+                "preferences.followed" => true,
+                "preferences.popup.posts" => true,
+            ]);
 
             $notifyDiscussion = $this->runWithUser(function () use ($notifyUser) {
                 return $this->createDiscussion([

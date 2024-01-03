@@ -22,6 +22,7 @@ paths:
                               - discussion
                               - comment
                               - group
+                              - user
                           type: string
                       type: array
                   style: form
@@ -124,6 +125,7 @@ paths:
                   schema:
                       type: string
                   x-search-filter: true
+                - $ref: "#/components/parameters/SiteSectionFilters"
                 - description: |
                       Filter the records by inserted user names.
                   in: query
@@ -208,6 +210,7 @@ paths:
                           type: string
                       type: array
                   style: form
+                - $ref: "#/components/parameters/ProfileFieldFilters"
             responses:
                 "200":
                     content:
@@ -221,6 +224,24 @@ paths:
                 - Search
             summary: Search for records matching specific criteria.
 components:
+    parameters:
+        ProfileFieldFilters:
+            x-hidden: true
+            name: profileFields
+            description: >
+                Profile field values to filter user search.
+            in: query
+            schema:
+                type: object
+        SiteSectionFilters:
+            x-hidden: true
+            name: siteSectionID
+            description: >
+                Filter Records by their site-sectionID
+            in: query
+            schema:
+                type: string
+
     schemas:
         SearchResult:
             properties:

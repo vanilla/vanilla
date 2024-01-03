@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -27,6 +27,7 @@ export interface IHomeWidgetContainerProps {
     options?: IHomeWidgetContainerOptions;
     children: React.ReactNode;
     title?: string;
+    depth?: number;
     subtitle?: string;
     description?: string;
     titleCount?: string;
@@ -54,9 +55,9 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
 
     if (options.viewAll) {
         const label = t(options?.viewAll?.name ?? "View All");
-        if (options.viewAll.onClick) {
+        if (props?.options?.viewAll?.onClick) {
             viewAllLinkOrButton = (
-                <Button onClick={options?.viewAll?.onClick} buttonType={options.viewAll.displayType}>
+                <Button onClick={props?.options?.viewAll?.onClick} buttonType={options.viewAll.displayType}>
                     {label}
                 </Button>
             );
@@ -104,6 +105,7 @@ export function HomeWidgetContainer(props: IHomeWidgetContainerProps) {
                                 alignment: options.headerAlignment,
                             }}
                             titleCount={props.titleCount}
+                            depth={props.depth}
                         />
                         {props.extraHeader}
                         <div className={classes.content}>
@@ -137,7 +139,7 @@ export function HomeWidgetGridContainer(props: IHomeWidgetContainerProps) {
                             classes.gridItem,
 
                             // Constrain grid items to the same max width in each row.
-                            // Workaround for flex-box limiations.
+                            // Workaround for flex-box limitations.
                             i !== 0 && classes.gridItemWidthConstraint(firstItemMeasure.width),
                         )}
                         key={i}

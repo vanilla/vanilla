@@ -11,6 +11,7 @@
  * @since 2.0
  */
 
+use Garden\Container\ContainerException;
 use Garden\Container\NotFoundException;
 use Garden\EventManager;
 use Vanilla\Bootstrap;
@@ -388,6 +389,8 @@ class Gdn
      * @staticvar string $installationID
      * @param string $setInstallationID
      * @return string Installation ID or NULL
+     *
+     * @deprecated Don't use installationID  for new things.
      */
     public static function installationID($setInstallationID = null)
     {
@@ -414,6 +417,8 @@ class Gdn
      * @staticvar string $installationSecret
      * @param string $setInstallationSecret
      * @return string Installation Secret or NULL
+     *
+     * @deprecated Don't use installationSecret for new things.
      */
     public static function installationSecret($setInstallationSecret = null)
     {
@@ -462,6 +467,8 @@ class Gdn
      * Get the plugin manager for the application.
      *
      * @return Gdn_PluginManager
+     * @throws NotFoundException
+     * @throws ContainerException
      * @deprecated 3.0 - Use Garden\EventManager or Vanilla\AddonManager.
      */
     public static function pluginManager()

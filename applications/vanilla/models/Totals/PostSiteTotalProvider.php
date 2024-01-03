@@ -33,12 +33,17 @@ class PostSiteTotalProvider implements SiteSectionTotalProviderInterface
     public function calculateSiteTotalCount(SiteSectionInterface $siteSection = null): int
     {
         $rootCategoryID = $siteSection === null ? \CategoryModel::ROOT_ID : $siteSection->getCategoryID();
-
-        $countDiscussionsAndComments = $this->database
-            ->createSql()
-            ->select(["CountAllDiscussions", "CountAllComments"])
+        $sql = $this->database->createSql();
+        if ($siteSection) {
+            $sql->select(["CountAllDiscussions", "CountAllComments"])->where("CategoryID", $rootCategoryID);
+        } else {
+            $sql->select(["CountAllDiscussions", "CountAllComments"], "sum")->where(
+                "ParentCategoryID",
+                $rootCategoryID
+            );
+        }
+        $countDiscussionsAndComments = $sql
             ->from($this->getTableName())
-            ->where("CategoryID", $rootCategoryID)
             ->get()
             ->resultArray();
 

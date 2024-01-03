@@ -32,6 +32,7 @@ class UsersExpander extends AbstractApiExpander
             ->addExpandField("lastPost.insertUser", "lastPost.insertUserID")
             ->addExpandField("lastUser", "lastUserID")
             ->addExpandField("updateUser", "updateUserID")
+            ->addExpandField("inviteUser", "inviteUserID")
             ->addExpandField("user", "userID");
     }
 

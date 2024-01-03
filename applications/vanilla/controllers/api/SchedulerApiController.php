@@ -10,6 +10,7 @@ use Vanilla\Scheduler\Auth\AdHocAuth;
 use Vanilla\Scheduler\Auth\AdHocAuthException;
 use Vanilla\Scheduler\Job\JobExecutionType;
 use Vanilla\Scheduler\SchedulerInterface;
+use Vanilla\Contracts\ConfigurationInterface;
 
 /**
  * Class SchedulerApiController
@@ -27,6 +28,9 @@ class SchedulerApiController extends AbstractApiController
     /** @var AdHocAuth */
     protected $auth;
 
+    /** @var UserModel */
+    protected UserModel $userModel;
+
     /**
      * SchedulerApiController constructor
      *
@@ -34,11 +38,16 @@ class SchedulerApiController extends AbstractApiController
      * @param EventManager $eventManager
      * @param AdHocAuth $auth
      */
-    public function __construct(SchedulerInterface $scheduler, EventManager $eventManager, AdHocAuth $auth)
-    {
+    public function __construct(
+        SchedulerInterface $scheduler,
+        EventManager $eventManager,
+        AdHocAuth $auth,
+        UserModel $userModel
+    ) {
         $this->scheduler = $scheduler;
         $this->eventManager = $eventManager;
         $this->auth = $auth;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -70,5 +79,7 @@ class SchedulerApiController extends AbstractApiController
         } catch (Exception $standardAuthenticationFailed) {
             $this->auth->validateToken();
         }
+        $systemUserID = $this->userModel->getSystemUserID();
+        Gdn::session()->start($systemUserID, false, false);
     }
 }

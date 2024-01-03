@@ -1,0 +1,87 @@
+[
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": "before "
+      },
+      {
+        "type": "rich_embed_inline",
+        "dataSourceType": "url",
+        "url": "https://www.google.com/",
+        "embedData": {
+          "body": "Search the world's information, including webpages, images, videos and more. Google has many special features to help you find exactly what you're looking for.",
+          "url": "https://www.google.com/",
+          "embedType": "link",
+          "name": "Google"
+        },
+        "children": [
+          {
+            "text": ""
+          }
+        ]
+      },
+      {
+        "text": " after"
+      }
+    ]
+  },
+  {
+    "type": "rich_embed_card",
+    "dataSourceType": "url",
+    "url": "https://www.google.com/",
+    "embedData": {
+      "body": "Search the world's information, including webpages, images, videos and more. Google has many special features to help you find exactly what you're looking for.",
+      "url": "https://www.google.com/",
+      "embedType": "link",
+      "name": "Google"
+    },
+    "children": [
+      {
+        "text": ""
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": ""
+      }
+    ]
+  },
+  {
+    "type": "rich_embed_card",
+    "dataSourceType": "iframe",
+    "url": "https://vanilla.higherlogic.com/",
+    "frameAttributes": {
+      "height": "900px",
+      "width": "1600px"
+    },
+    "embedData": {
+      "url": "https://vanilla.higherlogic.com/",
+      "embedType": "iframe"
+    }
+  },{
+    "type": "rich_embed_card",
+    "dataSourceType": "iframe",
+    "url": "https://vanilla.higherlogic.com/",
+    "frameAttributes": {
+      "height": 900,
+      "width": 1600
+    },
+    "embedData": {
+      "url": "https://vanilla.higherlogic.com/",
+      "embedType": "iframe",
+      "isKnowledge": true
+    }
+  },
+  {
+    "type": "p",
+    "children": [
+      {
+        "text": ""
+      }
+    ]
+  }
+]

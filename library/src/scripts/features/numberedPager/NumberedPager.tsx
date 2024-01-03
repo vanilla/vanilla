@@ -1,6 +1,6 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2022 Vanilla Forum Inc.
+ * @copyright 2009-2023 Vanilla Forum Inc.
  * @license Proprietary
  */
 
@@ -27,6 +27,12 @@ export interface INumberedPagerProps {
     totalResults?: number;
     isMobile?: boolean;
     rangeOnly?: boolean;
+
+    /** This one indicates that actual results might be more than totalResults, as normally we have a limit from APIs*/
+    hasMorePages?: boolean;
+
+    /** This one is responsible for showing the big "Next Page" button, the one in the form is still there */
+    showNextButton?: boolean;
 }
 
 export function NumberedPager(props: INumberedPagerProps) {
@@ -35,14 +41,19 @@ export function NumberedPager(props: INumberedPagerProps) {
         currentPage = 0,
         pageLimit = 10,
         totalResults = 0,
-        isMobile = false,
         rangeOnly = false,
+        isMobile: _isMobile,
+        showNextButton = true,
         className,
+        hasMorePages,
     } = props;
     const selfRef = useRef<HTMLDivElement>(null);
-    const measure = useMeasure(selfRef);
-    const notMobile = !isMobile && measure.width > 600;
-    const classes = numberedPagerClasses(!notMobile);
+    const measure = useMeasure(selfRef, false, true);
+
+    //in test environment, measure.width is 0. so we must be able to force mobile/not mobile through props
+    const isMobile = _isMobile !== undefined ? _isMobile : measure.width < 600;
+
+    const classes = numberedPagerClasses(isMobile);
     const vars = numberedPagerVariables();
     const [showJumper, setShowJumper] = useState<boolean>(false);
     const [pageNumber, setPageNumber] = useState<number>(1);
@@ -62,20 +73,15 @@ export function NumberedPager(props: INumberedPagerProps) {
         return 1;
     }, [totalResults, pageLimit]);
 
-    const hasMorePages = useMemo<boolean>(() => {
-        return totalPages >= 100 && totalResults > pageLimit;
-    }, [pageLimit, totalResults, totalPages]);
-
     useEffect(() => {
         let minNumber: RecordID = 0;
         let maxNumber: RecordID = 0;
-        const totalCount = hasMorePages ? pageLimit * 100 : totalResults;
 
-        if (totalCount > 0) {
+        if (totalResults > 0) {
             minNumber = (pageNumber - 1) * pageLimit + 1;
             maxNumber = pageNumber * pageLimit;
 
-            if (maxNumber > totalCount && !hasMorePages) maxNumber = totalCount;
+            if (maxNumber > totalResults && !hasMorePages) maxNumber = totalResults;
             if (minNumber < 0) minNumber = 1;
         }
 
@@ -91,9 +97,9 @@ export function NumberedPager(props: INumberedPagerProps) {
                 : numberWithCommas(maxNumber);
         const total = `
             ${
-                vars.formatNumber.totalResults && totalCount > 999
-                    ? humanReadableNumber(totalCount, vars.formatNumber.totalPrecision)
-                    : numberWithCommas(totalCount)
+                vars.formatNumber.totalResults && totalResults > 999
+                    ? humanReadableNumber(totalResults, vars.formatNumber.totalPrecision)
+                    : numberWithCommas(totalResults)
             }${hasMorePages ? "+" : ""}`;
 
         const returnValue = `${minNumber} - ${maxNumber} of ${total}`;
@@ -127,17 +133,19 @@ export function NumberedPager(props: INumberedPagerProps) {
     // Return a full pager component
     return (
         <div className={cx(classes.root, className)} ref={selfRef}>
-            {notMobile && <div aria-hidden="true" />}
-            <div className={classes.nextPageWrapper}>
-                <Button
-                    className={classes.nextPageButton}
-                    onClick={handleNextPage}
-                    buttonType={vars.buttons.nextPage.name as ButtonTypes}
-                    disabled={pageNumber === totalPages && !hasMorePages}
-                >
-                    Next Page
-                </Button>
-            </div>
+            {!isMobile && <div aria-hidden="true" />}
+            {showNextButton && (
+                <div className={classes.nextPageWrapper}>
+                    <Button
+                        className={classes.nextPageButton}
+                        onClick={handleNextPage}
+                        buttonType={vars.buttons.nextPage.name as ButtonTypes}
+                        disabled={pageNumber === totalPages && !hasMorePages}
+                    >
+                        {t("Next Page")}
+                    </Button>
+                </div>
+            )}
             <div className={classes.resultCount}>
                 {showJumper ? (
                     <NumberedPagerJumper
@@ -150,7 +158,7 @@ export function NumberedPager(props: INumberedPagerProps) {
                 ) : (
                     <>
                         {displayRange}
-                        {notMobile && (
+                        {!isMobile && (
                             <>
                                 <NextPrevButton
                                     direction="prev"

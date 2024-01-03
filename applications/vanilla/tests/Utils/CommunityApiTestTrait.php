@@ -157,6 +157,9 @@ trait CommunityApiTestTrait
     {
         $categoryID = $overrides["categoryID"] ?? ($this->lastInsertedCategoryID ?? -1);
 
+        $expands = $extras["expand"] ?? null;
+        unset($extras["expand"]);
+
         if ($categoryID === null) {
             throw new \RuntimeException("Could not insert a test discussion because no category was specified.");
         }
@@ -181,8 +184,10 @@ trait CommunityApiTestTrait
             return $result;
         }
 
+        $needsRefetch = $expands !== null;
         if (isset($overrides["score"])) {
             $this->setDiscussionScore($this->lastInsertedDiscussionID, $overrides["score"]);
+            $needsRefetch = true;
         }
 
         if (!empty($extras)) {
@@ -190,7 +195,15 @@ trait CommunityApiTestTrait
             $discussionModel = \Gdn::getContainer()->get(\DiscussionModel::class);
             $discussionModel->setField($this->lastInsertedDiscussionID, $extras);
             ModelUtils::validationResultToValidationException($discussionModel);
+            $needsRefetch = true;
         }
+        // Fetch again so we can handle the added extras
+        if ($needsRefetch) {
+            $result = $this->api()
+                ->get("/discussions/{$result["discussionID"]}", ["expand" => $expands])
+                ->getBody();
+        }
+
         return $result;
     }
 
@@ -248,7 +261,7 @@ trait CommunityApiTestTrait
     }
 
     /**
-     * Create a discussion.
+     * Create a comment.
      *
      * @param array $overrides Fields to override on the insert.
      *
@@ -353,17 +366,36 @@ trait CommunityApiTestTrait
      *
      * @param array|int $userOrUserID A user or userID.
      * @param array $categoryOrCategoryID A category or categoryID.
-     * @param string $mode One of the CategoryModel::NOTIFICATION_* constants.
+     * @param array $preferences An array of category notification preferences.
      * @return void
      */
-    public function setCategoryPreference($userOrUserID, $categoryOrCategoryID, string $mode)
+    public function setCategoryPreference($userOrUserID, $categoryOrCategoryID, array $preferences)
     {
-        $this->runWithUser(function () use ($categoryOrCategoryID, $mode, $userOrUserID) {
+        $this->runWithUser(function () use ($categoryOrCategoryID, $preferences, $userOrUserID) {
             $userID = is_array($userOrUserID) ? $userOrUserID["userID"] : $userOrUserID;
             $categoryID = is_array($categoryOrCategoryID) ? $categoryOrCategoryID["categoryID"] : $categoryOrCategoryID;
-            $this->api()->patch("/categories/$categoryID/preferences/$userID", [
-                \CategoryModel::PREFERENCE_KEY_NOTIFICATION => $mode,
-            ]);
+            $this->api()->patch("/categories/$categoryID/preferences/$userID", $preferences);
         }, $userOrUserID);
+    }
+
+    /**
+     * Assert that a category has a specific allowedDiscussionTypes.
+     *
+     * @param $expected array|string
+     * @param $actual array|int
+     */
+    public function assertCategoryAllowedDiscussionTypes($expected, $actual): void
+    {
+        if (!is_array($expected)) {
+            $expected = [$expected];
+        }
+
+        if (!is_array($actual)) {
+            $actual = $this->categoryModel->getID($actual, DATASET_TYPE_ARRAY);
+        }
+
+        $permissionCategory = $this->categoryModel::permissionCategory($actual);
+        $result = $this->categoryModel->getAllowedDiscussionData($permissionCategory, $actual);
+        $this->assertEquals($expected, array_keys($result));
     }
 }

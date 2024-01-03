@@ -9,8 +9,8 @@ import { IDiscussion } from "@dashboard/@types/api/discussion";
 import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
 import { getMeta, t } from "@library/utility/appUtils";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
-import { useUserCanEditDiscussion } from "@library/features/discussions/discussionHooks";
-import { hasPermission, IPermission, IPermissionOptions, PermissionMode } from "@library/features/users/Permission";
+import { useUserCanStillEditDiscussionOrComment } from "@library/features/discussions/discussionHooks";
+import { IPermission, IPermissionOptions, PermissionMode } from "@library/features/users/Permission";
 import DiscussionOptionsAnnounce from "@library/features/discussions/DiscussionOptionsAnnounce";
 import DiscussionOptionsMove from "@library/features/discussions/DiscussionOptionsMove";
 import DiscussionOptionsDelete from "@library/features/discussions/DiscussionOptionsDelete";
@@ -24,6 +24,7 @@ import { NON_CHANGE_TYPE } from "@library/features/discussions/forms/ChangeTypeD
 import { DiscussionOptionsTag } from "@library/features/discussions/DiscussionOptionsTag";
 import { CollectionsOptionButton } from "@library/featuredCollections/CollectionsOptionButton";
 import { CollectionRecordTypes } from "@library/featuredCollections/Collections.variables";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 interface IDiscussionOptionItem {
     permission?: IPermission;
@@ -38,7 +39,8 @@ export function addDiscussionOption(option: IDiscussionOptionItem) {
 }
 
 const DiscussionOptionsMenu: FunctionComponent<{ discussion: IDiscussion }> = ({ discussion }) => {
-    const canEdit = useUserCanEditDiscussion(discussion);
+    const { hasPermission } = usePermissionsContext();
+    const { canStillEdit, humanizedRemainingTime } = useUserCanStillEditDiscussionOrComment(discussion);
     const permOptions: IPermissionOptions = {
         resourceType: "category",
         resourceID: discussion.categoryID,
@@ -63,13 +65,15 @@ const DiscussionOptionsMenu: FunctionComponent<{ discussion: IDiscussion }> = ({
         return !NON_CHANGE_TYPE.includes(type);
     });
 
-    const canChangeType = filteredDiscussionTypes.length > 1 && canEdit;
+    const canChangeType = filteredDiscussionTypes.length > 1 && canStillEdit;
 
-    const canAddToCollection = hasPermission("community.manage", permOptions);
+    const canAddToCollection = hasPermission("community.manage", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
 
-    if (canEdit) {
+    if (canStillEdit) {
         items.push(
-            <DropDownItemLink to={`/post/editdiscussion/${discussion.discussionID}`}>{t("Edit")}</DropDownItemLink>,
+            <DropDownItemLink to={`/post/editdiscussion/${discussion.discussionID}`}>
+                {humanizedRemainingTime}
+            </DropDownItemLink>,
         );
         if (getMeta("TaggingAdd")) {
             items.push(<DiscussionOptionsTag discussion={discussion} />);

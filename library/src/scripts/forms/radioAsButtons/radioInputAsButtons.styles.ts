@@ -31,7 +31,6 @@ export const radioInputAsButtonsClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "flex-start",
         ...Mixins.margin({
-            horizontal: negativeUnit(globalVars.gutter.half),
             vertical: negativeUnit(globalVars.gutter.half),
         }),
         ...mediaQueries.xs({

@@ -36,7 +36,7 @@ class QnaFollowupJob extends LocalApiJob implements LoggerAwareInterface
     {
         try {
             $this->logger->info("QnA notifications start");
-            $response = $this->vanillaClient->post("/discussions/question-notifications");
+            $response = $this->vanillaClient->post("/api/v2/discussions/question-notifications");
             $this->logger->info("QnA notifications success");
             return JobExecutionStatus::complete();
         } catch (\Exception $e) {

@@ -30,12 +30,13 @@ export interface ISelectOneProps extends IMenuPlacement {
     options: IComboBoxOption[] | undefined;
     onChange: (data: IComboBoxOption) => void;
     onInputChange?: (value: string) => void;
+    onBlur?: React.ComponentProps<typeof Select>["onBlur"];
     onMenuOpen?: () => void;
     labelNote?: string;
     noteAfterInput?: string;
     errors?: IFieldError[];
     searchable?: boolean;
-    value: IComboBoxOption | undefined;
+    value: IComboBoxOption | null | undefined;
     noOptionsMessage?: (props: OptionProps<any>) => JSX.Element | null;
     isLoading?: boolean;
     inputClassName?: string;
@@ -123,7 +124,10 @@ export default function SelectOne(props: ISelectOneProps) {
                         setIsFocused(true);
                         props.onFocus?.();
                     }}
-                    onBlur={() => setIsFocused(false)}
+                    onBlur={(event) => {
+                        props.onBlur?.(event);
+                        setIsFocused(false);
+                    }}
                     menuPlacement={props.menuPlacement ?? "auto"}
                     ref={props.selectRef}
                     maxMenuHeight={props.maxHeight}

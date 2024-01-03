@@ -9,6 +9,7 @@ namespace Vanilla\Search;
 use Garden\Schema\Schema;
 use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
+use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ServerException;
 use Vanilla\ApiUtils;
 use Vanilla\DateFilterSchema;
@@ -27,6 +28,7 @@ abstract class SearchQuery
     const FILTER_OP_OR = "or";
     const FILTER_OP_AND = "and";
     const FILTER_OP_WILDCARD = "wildcard";
+    const FILTER_OP_NOT = "not";
 
     const MATCH_FULLTEXT = "fulltext";
     const MATCH_FULLTEXT_EXTENDED = "fulltext_extended";
@@ -232,12 +234,20 @@ abstract class SearchQuery
                 "default" => false,
             ],
             "boosts?" => self::buildBoostSchema($searchTypes),
+            "cursor:s?" => [
+                "description" =>
+                    "Token used to fetch next page of results. Cannot be combined with page. Warning: May lead to duplicate results if not sorted by primary key.",
+            ],
         ]);
 
         foreach ($searchTypes as $searchType) {
             $querySchema = $querySchema->merge($searchType->getQuerySchema());
         }
-        return $querySchema;
+        return $querySchema->addValidator("", function (array $data, ValidationField $field) {
+            if (isset($data["cursor"]) && intval($data["page"]) > 1) {
+                $field->addError("`cursor` parameter cannot be combined with `page` parameter");
+            }
+        });
     }
 
     /**
@@ -328,13 +338,14 @@ abstract class SearchQuery
      * Set int range filter
      *
      * @param string $attribute The attribute to filter.
-     * @param int $min The minimum value for the attribute.
-     * @param int $max The maximum value for the attribute.
-     * @param bool $exclude Whether or not the values are exlusive.
+     * @param int|null $min The minimum value for the attribute.
+     * @param int|null $max The maximum value for the attribute.
+     * @param bool $exclude Whether the values are exclusive.
+     * @param bool $isDate Whether the attribute is a date and min and max are timestamps
      *
      * @return $this
      */
-    public function setFilterRange(string $attribute, int $min, int $max, bool $exclude = false)
+    public function setFilterRange(string $attribute, ?int $min, ?int $max, bool $exclude = false, bool $isDate = true)
     {
         return $this;
     }

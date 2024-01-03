@@ -282,6 +282,24 @@ class Cookie
     }
 
     /**
+     * Decode a string to array format for a cookie header.
+     *
+     * @param string $cookieStr The cookie value string.
+     * @param array $names Cookie names to update from the string.
+     */
+    public function importCookies(string $cookieStr, array $names): void
+    {
+        foreach (explode("; ", $cookieStr) as $cookie) {
+            $parts = explode("=", $cookie);
+            if (count($parts) == 2) {
+                if (in_array($parts[0], $names)) {
+                    $this->cookies[$parts[0]] = $parts[1];
+                }
+            }
+        }
+    }
+
+    /**
      * Return the all of the current cookies in a format suitable for a "Cookie" HTTP header.
      *
      * @return string Returns a cookie string.

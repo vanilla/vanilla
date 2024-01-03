@@ -7,6 +7,8 @@
 
 namespace Vanilla\Contracts\Site;
 
+use Vanilla\Layout\Asset\LayoutQuery;
+
 /**
  * Interface representing a section of a site.
  *
@@ -124,12 +126,19 @@ interface SiteSectionInterface extends \JsonSerializable
     public function getBannerImageLink(): string;
 
     /**
-     * Adapt parameters prior to calling layoutViewModel::getLayoutIdLookup().
+     * @return string
+     */
+    public function getLayoutRecordType(): string;
+
+    /**
+     * @return string|int
+     */
+    public function getLayoutRecordID();
+
+    /**
+     * Get a payload to apply to tracking events. This will be merged with an event payload.
      *
-     * @param string $layoutViewType layoutViewType.
-     * @param string $recordType recordType.
-     * @param string $recordID recordID.
      * @return array
      */
-    public function getLayoutIdLookupParams(string $layoutViewType, string $recordType, string $recordID): array;
+    public function getTrackablePayload(): array;
 }

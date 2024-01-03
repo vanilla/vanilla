@@ -121,7 +121,7 @@ function gatherInitialRecords(records: INavigationTreeItem[], maxDepth: number):
         nextDepth = [];
         currentDepth.forEach((item) => {
             initialRecords.push(item);
-            nextDepth = [...nextDepth, ...item.children];
+            nextDepth = [...nextDepth, ...(item.children ?? [])];
         });
         currentDepth = nextDepth;
     }

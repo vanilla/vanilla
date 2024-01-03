@@ -8,8 +8,11 @@
 namespace Vanilla;
 
 use Garden\Container\Container;
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\Container\Reference;
 use Garden\Web\Dispatcher;
+use Garden\Web\PageControllerRoute;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -20,19 +23,20 @@ use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Vanilla\Analytics\AnalyticsActionsProvider;
 use Vanilla\Analytics\TrackableDecoratorInterface;
 use Vanilla\Cache\CacheCacheAdapter;
-use Vanilla\ImageSrcSet\ImageResizeProviderInterface;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\ImageSrcSet\Providers\DefaultImageResizeProvider;
+use Vanilla\Layout\GlobalLayoutRecordProvider;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Controllers\SearchRootController;
+use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Logging\TraceCollector;
 use Vanilla\Models\Model;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerMiddleware;
 use Vanilla;
+use Vanilla\Site\OwnSite;
 use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeFeatures;
-use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\Middleware\LogTransactionMiddleware;
@@ -57,6 +61,8 @@ class Bootstrap
      * THIS METHOD SHOULD NOT HAVE SIDE EFFECTS BEYOND CONTAINER CONFIG. DO NOT CREATE INSTANCES IN THIS METHOD.
      *
      * @param Container $container
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public static function configureContainer(Container $container): void
     {
@@ -210,7 +216,6 @@ class Bootstrap
             ->rule(\Garden\Web\Dispatcher::class)
             ->setShared(true)
             ->addCall("addRoute", ["route" => new Reference("@api-v2-route"), "api-v2"])
-            ->addCall("addRoute", ["route" => new Reference("@new-search-route"), "new-search"])
             ->addCall("addRoute", [
                 "route" => new \Garden\Container\Callback(function () {
                     return new \Garden\Web\PreflightRoute("/api/v2", true);
@@ -225,17 +230,12 @@ class Bootstrap
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\ContentSecurityPolicyMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\HttpStrictTransportSecurityMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\APIExpandMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(\Vanilla\Web\ApiSelectMiddleware::class)])
+            ->addCall("addMiddleware", [new Reference(Vanilla\Web\ApiExtensionMiddleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\ValidateUTF8Middleware::class)])
             ->addCall("addMiddleware", [new Reference(\Vanilla\Web\Middleware\ValidateJSONMiddleware::class)])
 
             // Specific route definitions and middlewares
-            ->rule("@new-search-route")
-            ->setClass(\Garden\Web\ResourceRoute::class)
-            ->setConstructorArgs(["/search", "*\\%sSearchPageController"])
-            ->addCall("setFeatureFlag", [SearchRootController::ENABLE_FLAG])
-            ->addCall("setMeta", ["CONTENT_TYPE", "text/html; charset=utf-8"])
-            ->addCall("setRootController", [SearchRootController::class])
-
             ->rule("@api-v2-route")
             ->setClass(\Garden\Web\ResourceRoute::class)
             ->setConstructorArgs(["/api/v2/", "*\\%sApiController"])
@@ -265,7 +265,7 @@ class Bootstrap
             ->setConstructorArgs(["/api/v2/"])
             ->addCall("addSmartID", ["CategoryID", "categories", ["name", "urlcode"], "Category"])
             ->addCall("addSmartID", ["RoleID", "roles", ["name"], "Role"])
-            ->addCall("addSmartID", ["statusID", "discussionStatus", ["name"], "RecordStatus"])
+            ->addCall("addSmartID", ["statusID", "discussionStatus", ["name"], "recordStatus"])
             ->addCall("addSmartID", ["RoleID", "roles", ["name"], "Role"])
             ->addCall("addSmartID", ["UserID", "users", "*", new Reference("@user-smart-id-resolver")])
 
@@ -285,6 +285,11 @@ class Bootstrap
             ->setConstructorArgs([ContainerUtils::config("Garden.PrivateCommunity")])
 
             // Layouts
+            ->rule(LayoutViewModel::class)
+            ->setShared(true)
+            ->addCall("addLayoutRecordProvider", [new Reference(GlobalLayoutRecordProvider::class)])
+            ->addCall("addLayoutRecordProvider", [new Reference(Vanilla\Layout\SiteSectionLayoutRecordProvider::class)])
+
             ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
             ->setShared(true)
             ->setConstructorArgs([PATH_CACHE . "/static-layouts"])
@@ -293,6 +298,19 @@ class Bootstrap
             ->rule(Layout\LayoutService::class)
             ->setShared(true)
             ->addCall("addProvider", [new Reference(\Vanilla\Layout\LayoutModel::class)])
-            ->addCall("addProvider", [new Reference(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)]);
+            ->addCall("addProvider", [new Reference(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)])
+
+            ->rule(Vanilla\Widgets\DynamicContainerSchemaOptions::class)
+            ->setShared(true)
+
+            // Sites
+            ->rule(OwnSite::class)
+            ->setShared(true);
+
+        PageControllerRoute::configurePageRoutes(
+            $container,
+            ["/search" => SearchRootController::class],
+            SearchRootController::ENABLE_FLAG
+        );
     }
 }

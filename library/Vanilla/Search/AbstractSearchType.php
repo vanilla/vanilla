@@ -7,10 +7,7 @@
 namespace Vanilla\Search;
 
 use Garden\Schema\Schema;
-use Vanilla\ApiUtils;
-use Vanilla\Contracts\Site\AbstractSiteProvider;
-use Vanilla\Utility\ArrayUtils;
-use Vanilla\Search\SearchService;
+use Vanilla\Site\SiteSectionModel;
 
 /**
  * Interface for a search item.
@@ -18,7 +15,7 @@ use Vanilla\Search\SearchService;
 abstract class AbstractSearchType
 {
     /** @var SearchService */
-    protected $searchService;
+    protected SearchService $searchService;
 
     /**
      * @var string Class used to construct search result items.
@@ -63,7 +60,7 @@ abstract class AbstractSearchType
     /**
      * Set the search service.
      *
-     * @param \Vanilla\Search\SearchService $searchService
+     * @param SearchService $searchService
      */
     public function setSearchService(SearchService $searchService)
     {
@@ -268,4 +265,38 @@ abstract class AbstractSearchType
      * @return int
      */
     abstract public function guidToRecordID(int $guid): ?int;
+
+    /**
+     * If the Query params contains siteSectionID, then we need to extract the Categories that can be processed.
+     *
+     * @param array $queryData
+     * @return void
+     */
+    public static function ProcessSiteSection(array &$queryData): void
+    {
+        if (!empty($queryData["categoryIDs"])) {
+            //if we have specific categories to search then we shouldn't process group discussion
+            $queryData["filterGroupDiscussions"] = true;
+        } else {
+            $queryData["filterGroupDiscussions"] = false;
+        }
+        if (!empty($queryData["siteSectionID"]) && is_string($queryData["siteSectionID"])) {
+            $siteSectionModel = \Gdn::getContainer()->get(SiteSectionModel::class);
+            $siteSection = $siteSectionModel->getByID($queryData["siteSectionID"]);
+            if ($siteSection) {
+                $siteSectionCategories = $siteSection->getAttributes()["allCategories"] ?? [];
+                if (!empty($siteSectionCategories)) {
+                    unset($queryData["categoryID"]); // Remove categoryID if it exists.
+                    $queryData["categoryIDs"] = !empty($queryData["categoryIDs"])
+                        ? array_values(array_intersect($siteSectionCategories, $queryData["categoryIDs"]))
+                        : $siteSectionCategories;
+                }
+            }
+        } else {
+            // check if we have sub-communities enabled for the site
+            if (\Gdn::config()->get("EnabledPlugins.subcommunities", false)) {
+                unset($queryData["locale"]); // if not in a site section, don't restrict the results per locale.
+            }
+        }
+    }
 }

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useContext, useLayoutEffect, useRef, useState } from "react";
+import React, { ElementType, useContext, useLayoutEffect, useRef, useState } from "react";
 import { containerClasses } from "@library/layout/components/containerStyles";
 import { ISpacing } from "@library/styles/cssUtilsTypes";
 import { cx } from "@emotion/css";
@@ -12,7 +12,7 @@ import { cx } from "@emotion/css";
 export interface IContainer {
     className?: string;
     children?: React.ReactNode;
-    tag?: keyof JSX.IntrinsicElements;
+    tag?: ElementType;
     fullGutter?: boolean; // Use when a component wants a full mobile/desktop gutter.
     // Useful for components that don't provide their own padding.
     narrow?: boolean;

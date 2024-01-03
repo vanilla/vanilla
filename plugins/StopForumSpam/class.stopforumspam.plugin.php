@@ -30,7 +30,7 @@ class StopForumSpamPlugin extends Gdn_Plugin
             $addIP = true;
             // Don't check against the localhost.
             foreach (["127.0.0.1/0", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"] as $localCIDR) {
-                if (Gdn_Statistics::cidrCheck($data["IPAddress"], $localCIDR)) {
+                if (self::cidrCheck($data["IPAddress"], $localCIDR)) {
                     $addIP = false;
                     break;
                 }
@@ -95,6 +95,36 @@ class StopForumSpamPlugin extends Gdn_Plugin
         }
 
         return false;
+    }
+
+    /**
+     * credit: claudiu(at)cnixs.com via php.net/manual/en/ref.network.php
+     *
+     * @param $ip
+     * @param $cidr
+     * @return bool
+     */
+    private static function cidrCheck($ip, $cidr)
+    {
+        [$net, $mask] = explode("/", $cidr);
+
+        // Allow non-standard /0 syntax
+        if ($mask == 0) {
+            if (ip2long($ip) == ip2long($net)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        $ip_net = ip2long($net);
+        $ip_mask = ~((1 << 32 - $mask) - 1);
+
+        $ip_ip = ip2long($ip);
+
+        $ip_ip_net = $ip_ip & $ip_mask;
+
+        return $ip_ip_net == $ip_net;
     }
 
     /**

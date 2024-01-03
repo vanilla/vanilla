@@ -8,12 +8,13 @@ import { t } from "@library/utility/appUtils";
 import React, { Component } from "react";
 import { getJSLocaleKey } from "@vanilla/i18n";
 import { dateTimeClasses } from "@library/content/dateTimeStyles";
-import { DateElement, humanizedTimeFrom, isSameDate } from "@library/content/DateTimeHelpers";
+import { DateElement, humanizedRelativeTime, isSameDate } from "@library/content/DateTimeHelpers";
 
 export enum DateFormats {
     DEFAULT = "default",
     EXTENDED = "extended",
     COMPACT = "compact",
+    TIME = "time",
 }
 
 interface IDateTimeProps {
@@ -26,6 +27,7 @@ interface IDateTimeProps {
     /** Display a fixed or relative visible time. */
     mode?: "relative" | "fixed";
     type?: DateFormats;
+    isSameYear?: boolean;
 }
 
 /**
@@ -80,16 +82,22 @@ export default class DateTime extends Component<IDateTimeProps> {
         switch (this.props.type) {
             case DateFormats.EXTENDED:
                 return {
-                    year: "numeric",
+                    ...(!this.props.isSameYear && { year: "numeric" }),
                     month: "short",
                     day: "numeric",
                     hour: "numeric",
                     minute: "numeric",
                     timeZone: this.props.timezone,
                 };
+            case DateFormats.TIME:
+                return {
+                    hour: "numeric",
+                    minute: "numeric",
+                    timeZone: this.props.timezone,
+                };
             default:
                 return {
-                    year: "numeric",
+                    ...(!this.props.isSameYear && { year: "numeric" }),
                     month: "short",
                     day: "numeric",
                     timeZone: this.props.timezone,
@@ -111,7 +119,7 @@ export default class DateTime extends Component<IDateTimeProps> {
             if (seconds >= 0 && seconds <= 5) {
                 return t("just now");
             }
-            return humanizedTimeFrom(inputDateObject, nowDate);
+            return humanizedRelativeTime(inputDateObject, nowDate);
         } else {
             if (this.props.type !== DateFormats.COMPACT) {
                 // If it's the same day, return the time.

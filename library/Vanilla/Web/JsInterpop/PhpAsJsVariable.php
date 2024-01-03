@@ -1,33 +1,31 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Web\JsInterpop;
+
+use Vanilla\Web\TwigRenderTrait;
 
 /**
  * Class that handles rendering an PHP object or array in a javascript context.
  */
 class PhpAsJsVariable
 {
-    /** @var string */
-    private $variableName;
-
-    /** @var string */
-    private $encodedData;
+    use TwigRenderTrait;
+    /** @var array<string, mixed> */
+    private array $variables;
 
     /**
      * Constructor.
      *
-     * @param string $variableName The name of variable to expose the script on the frontend.
-     * @param array|object $data The JSON serializable data that should be serialized for a javascript context.
+     * @param array<string, mixed> $variables Mapping of global js variable to json encodable value.
      */
-    public function __construct(string $variableName, $data)
+    public function __construct(array $variables)
     {
-        $this->variableName = $variableName;
-        $this->encodedData = json_encode($data);
+        $this->variables = $variables;
     }
 
     /**
@@ -37,6 +35,12 @@ class PhpAsJsVariable
      */
     public function __toString()
     {
-        return 'window["' . $this->variableName . '"]=' . $this->encodedData . ";\n";
+        $result = "";
+        foreach ($this->variables as $variableName => $variableValue) {
+            $encodedData = json_encode($variableValue);
+
+            $result .= "window['{$variableName}'] = {$encodedData};";
+        }
+        return $result;
     }
 }

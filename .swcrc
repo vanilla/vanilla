@@ -15,7 +15,8 @@
         },
         "transform": {
             "react": {
-                "useBuiltins": true
+                "useBuiltins": true,
+                "runtime": "automatic"
             }
         },
         "target": "es2016",

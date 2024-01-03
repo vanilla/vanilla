@@ -7,7 +7,7 @@
 import { ILoadable, Loadable, LoadStatus } from "@library/@types/api/core";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { stableObjectHash } from "@vanilla/utils";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useDebugValue, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as ConfigActions from "@library/config/configActions";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -16,6 +16,11 @@ import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { IAddon, ILocale } from "@dashboard/languages/LanguageSettingsTypes";
 import { useConfigDispatch } from "@library/config/configReducer";
 import { patchConfigThunk } from "@library/config/configActions";
+import { useToast } from "@library/features/toaster/ToastContext";
+import { t } from "@vanilla/i18n";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import apiv2 from "@library/apiv2";
+import { IError } from "@library/errorPages/CoreErrorMessages";
 
 const LOCALE_KEY = "garden.locale";
 
@@ -54,9 +59,46 @@ export function useConfigsByKeys(keys: string[]) {
     return existing;
 }
 
+export function useConfigQuery(configKeys: string[]) {
+    return useQuery<any, IError, Record<string, any>>({
+        queryKey: ["getConfigs", configKeys],
+        queryFn: async () => {
+            const response = await apiv2.get<Record<string, any>>("/config", {
+                params: {
+                    select: configKeys.join(","),
+                },
+            });
+            return response.data;
+        },
+    });
+}
+
+export type ConfigQuery = ReturnType<typeof useConfigQuery>;
+
+export function useConfigMutation() {
+    const toast = useToast();
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (values: Record<string, any>) => {
+            const response = await apiv2.patch("/config", values);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(["getConfigs"]);
+            toast.addToast({ body: t("Configuration changes saved."), autoDismiss: true, dismissible: true });
+        },
+        onError: () => {
+            toast.addToast({ body: t("Error saving configuration."), dismissible: true });
+        },
+    });
+}
+export type ConfigMutation = ReturnType<typeof useConfigMutation>;
+
 type ConfigValues = Record<string, any>;
 export function useConfigPatcher<T extends ConfigValues = ConfigValues>() {
     const watchID = useUniqueID("configPatch");
+
+    const toast = useToast();
 
     const existing = useSelector((state: ICoreStoreState) => {
         return (
@@ -72,16 +114,22 @@ export function useConfigPatcher<T extends ConfigValues = ConfigValues>() {
 
     const patchConfig = useCallback(
         async (values: T) => {
-            return dispatch(patchConfigThunk({ values, watchID }));
+            const result = await dispatch(patchConfigThunk({ values, watchID }));
+            if (result.meta.requestStatus === "fulfilled") {
+                toast.addToast({ body: t("Configuration changes saved."), autoDismiss: true, dismissible: true });
+            }
+            return result;
         },
         [watchID],
     );
 
-    return {
+    const result = {
         patchConfig,
         isLoading: existing.status === LoadStatus.LOADING,
         error: existing.status === LoadStatus.ERROR ? errorByID.error : null,
     };
+    useDebugValue(result);
+    return result;
 }
 
 const useKnowledgeEnabled = () => {

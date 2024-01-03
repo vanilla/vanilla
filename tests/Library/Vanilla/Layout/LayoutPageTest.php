@@ -7,24 +7,23 @@
 namespace VanillaTests\Library\Vanilla\Layout;
 
 use Gdn;
-use Vanilla\Layout\Asset\LayoutFormAsset;
+use Vanilla\Layout\Asset\LayoutQuery;
 use Vanilla\Layout\LayoutModel;
 use Vanilla\Layout\LayoutPage;
 use Vanilla\Layout\LayoutViewModel;
 use Vanilla\Layout\Providers\FileBasedLayoutProvider;
-use Vanilla\Layout\View\HomeLayoutView;
-use VanillaTests\BootstrapTestCase;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Layout\LayoutTestTrait;
-use VanillaTests\Library\Garden\ClassLocatorTest;
+use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 
 /**
  * Unit test for LayoutModel
  */
-class LayoutPageTest extends BootstrapTestCase
+class LayoutPageTest extends SiteTestCase
 {
     use LayoutTestTrait;
-    use SiteTestTrait;
+    use CommunityApiTestTrait;
 
     /**
      * @var LayoutViewModel
@@ -41,15 +40,6 @@ class LayoutPageTest extends BootstrapTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->container()->call(function (\Gdn_DatabaseStructure $st, \Gdn_SQLDriver $sql) {
-            $Database = Gdn::database();
-            if (!$st->tableExists("layout")) {
-                LayoutModel::structure($Database);
-            }
-            if (!$st->tableExists("layoutView")) {
-                LayoutViewModel::structure($Database);
-            }
-        });
         $fileBasedLayoutProvider = $this->container()->get(FileBasedLayoutProvider::class);
         $fileBasedLayoutProvider->setCacheBasePath(PATH_TEST_CACHE);
         $this->resetTable("layout");
@@ -66,9 +56,9 @@ class LayoutPageTest extends BootstrapTestCase
     public function testPreloadLayout()
     {
         $layoutPage = $this->container()->get(LayoutPage::class);
-        $page = $layoutPage->preloadLayout(new LayoutFormAsset("home")); //, 'home', 1, $params);
+        $page = $layoutPage->preloadLayout(new LayoutQuery("home")); //, 'home', 1, $params);
 
-        $this->assertSame("Home - LayoutPageTest - LayoutPageTest", $page->getSeoTitle());
+        $this->assertSame("Home - LayoutPageTest", $page->getSeoTitle());
         $this->assertSame("", $page->getSeoDescription());
     }
 
@@ -88,9 +78,9 @@ class LayoutPageTest extends BootstrapTestCase
         $this->layoutViewModel->insert($layoutView);
 
         $layoutPage = $this->container()->get(LayoutPage::class);
-        $page = $layoutPage->preloadLayout(new LayoutFormAsset("home", "home", 1, []));
+        $page = $layoutPage->preloadLayout(new LayoutQuery("home", "global", 1, []));
 
-        $this->assertSame("Home - LayoutPageTest - LayoutPageTest", $page->getSeoTitle());
+        $this->assertSame("Home - LayoutPageTest", $page->getSeoTitle());
         $this->assertSame("", $page->getSeoDescription());
     }
 
@@ -148,5 +138,253 @@ class LayoutPageTest extends BootstrapTestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * Test that the proper seo data is included in custom layouts.
+     *
+     * @param $input
+     * @param $expected
+     * @return void
+     * @dataProvider provideTestSeoLayoutData
+     */
+    public function testLayoutSeoTags($input, $expected): void
+    {
+        static $layoutID = 2;
+
+        $layout = [
+            "layoutID" => $layoutID,
+            "layoutViewType" => $input["layoutViewType"],
+            "name" => "Test",
+            "layout" => $input["layout"],
+        ];
+        $layoutID = $this->layoutModel->insert($layout);
+        $layoutView = [
+            "layoutID" => $layoutID,
+            "recordID" => $input["recordID"],
+            "recordType" => $input["recordType"],
+            "layoutViewType" => $input["layoutViewType"],
+        ];
+        $this->layoutViewModel->insert($layoutView);
+
+        $layoutPage = $this->container()->get(LayoutPage::class);
+        $page = $layoutPage->preloadLayout(
+            new LayoutQuery($input["layoutViewType"], $input["recordType"], $input["recordID"], [])
+        );
+        $this->assertSame($expected["title"], $page->getSeoTitle());
+        $this->assertSame($expected["description"], $page->getSeoDescription());
+        $this->assertSame($expected["canonicalUrl"], $page->getCanonicalUrl());
+        $jsonLD = $page->getJsonLdItems();
+        $crumbs = array_column($jsonLD["@graph"][0]["itemListElement"], "name");
+        foreach ($crumbs as $crumb) {
+            $this->assertTrue(in_array($crumb, $expected["breadcrumbs"]));
+        }
+        $layoutID++;
+    }
+
+    /**
+     * Provide data for testLayoutSeoTags.
+     *
+     * @return array[]
+     */
+    public function provideTestSeoLayoutData(): array
+    {
+        $siteUrl = "https://vanilla.test/layoutpagetest";
+
+        $r = [
+            "Home Layout View" => [
+                [
+                    "layoutViewType" => "home",
+                    "layout" => [
+                        [
+                            '$hydrate' => "react.section.1-column",
+                            "children" => [],
+                        ],
+                    ],
+                    "recordType" => "global",
+                    "recordID" => -1,
+                ],
+                [
+                    "title" => "Home - LayoutPageTest",
+                    "description" => "",
+                    "canonicalUrl" => $siteUrl,
+                    "breadcrumbs" => ["Home"],
+                ],
+            ],
+            "CategoryList Layout View" => [
+                [
+                    "layoutViewType" => "categoryList",
+                    "layout" => [
+                        [
+                            '$hydrate' => "react.section.1-column",
+                            "children" => [],
+                        ],
+                    ],
+                    "recordType" => "global",
+                    "recordID" => -1,
+                ],
+                [
+                    "title" => "Categories - LayoutPageTest",
+                    "description" => "",
+                    "canonicalUrl" => $siteUrl . "/categories",
+                    "breadcrumbs" => ["Home", "Categories"],
+                ],
+            ],
+            "DiscussionList Layout View" => [
+                [
+                    "layoutViewType" => "discussionList",
+                    "layout" => [
+                        [
+                            '$hydrate' => "react.section.1-column",
+                            "children" => [],
+                        ],
+                    ],
+                    "recordType" => "global",
+                    "recordID" => -1,
+                ],
+                [
+                    "title" => "Discussions - LayoutPageTest",
+                    "description" => "",
+                    "canonicalUrl" => $siteUrl . "/discussions",
+                    "breadcrumbs" => ["Home", "Discussions"],
+                ],
+            ],
+        ];
+
+        return $r;
+    }
+
+    /**
+     * Test that the proper seo data is included in the CategoryDiscussionPage layout view.
+     *
+     * @return void
+     */
+    public function testCategoryDiscussionLayoutSeoTags(): void
+    {
+        $category = $this->createCategory();
+        $layout = [
+            "layoutID" => 1,
+            "layoutViewType" => "discussionCategoryPage",
+            "name" => "TestDiscussionCategoryPage",
+            "layout" => [
+                [
+                    '$hydrate' => "react.section.1-column",
+                    "children" => [],
+                ],
+            ],
+        ];
+        $layoutID = $this->layoutModel->insert($layout);
+        $layoutView = [
+            "layoutID" => $layoutID,
+            "recordID" => -1,
+            "recordType" => "global",
+            "layoutViewType" => "discussionCategoryPage",
+        ];
+
+        $this->layoutViewModel->insert($layoutView);
+
+        $layoutPage = $this->container()->get(LayoutPage::class);
+        $page = $layoutPage->preloadLayout(
+            new LayoutQuery("discussionCategoryPage", "global", -1, [
+                "categoryID" => $category["categoryID"],
+            ])
+        );
+        $this->assertSame("{$category["name"]} - LayoutPageTest", $page->getSeoTitle());
+        $this->assertSame($category["description"], $page->getSeoDescription());
+        $this->assertSame($category["url"], $page->getCanonicalUrl());
+        $jsonLD = $page->getJsonLdItems();
+        $crumbs = array_column($jsonLD["@graph"][0]["itemListElement"], "name");
+        foreach ($crumbs as $crumb) {
+            $this->assertTrue(in_array($crumb, ["Home", $category["name"]]));
+        }
+    }
+
+    /**
+     * Test that the proper seo data is included in the NestedCategoryList layout view.
+     *
+     * @return void
+     */
+    public function testNestedCategoryListSeoTags(): void
+    {
+        $category = $this->createCategory(["displayAs" => strtolower(\CategoryModel::DISPLAY_NESTED)]);
+        $layout = [
+            "layoutID" => 1,
+            "layoutViewType" => "nestedCategoryList",
+            "name" => "TestNestedCategoryPage",
+            "layout" => [
+                [
+                    '$hydrate' => "react.section.1-column",
+                    "children" => [],
+                ],
+            ],
+        ];
+        $layoutID = $this->layoutModel->insert($layout);
+        $layoutView = [
+            "layoutID" => $layoutID,
+            "recordID" => -1,
+            "recordType" => "global",
+            "layoutViewType" => "nestedCategoryList",
+        ];
+
+        $this->layoutViewModel->insert($layoutView);
+
+        $layoutPage = $this->container()->get(LayoutPage::class);
+        $page = $layoutPage->preloadLayout(
+            new LayoutQuery("discussionCategoryPage", "global", -1, [
+                "categoryID" => $category["categoryID"],
+            ])
+        );
+        $this->assertSame("{$category["name"]} - LayoutPageTest", $page->getSeoTitle());
+        $this->assertSame($category["description"], $page->getSeoDescription());
+        $this->assertSame($category["url"], $page->getCanonicalUrl());
+        $jsonLD = $page->getJsonLdItems();
+        $crumbs = array_column($jsonLD["@graph"][0]["itemListElement"], "name");
+        foreach ($crumbs as $crumb) {
+            $this->assertTrue(in_array($crumb, ["Home", $category["name"]]));
+        }
+    }
+
+    /**
+     * Test that the proper seo data is included in the DiscussionThread layout view.
+     *
+     * @return void
+     */
+    public function testDiscussionThreadLayoutViewSeoTags(): void
+    {
+        $category = $this->createCategory();
+        $discussion = $this->createDiscussion(["categoryID" => $category["categoryID"]]);
+        $layout = [
+            "layoutID" => 1,
+            "layoutViewType" => "discussionThread",
+            "name" => "TestDiscussionThreadPage",
+            "layout" => [
+                [
+                    '$hydrate' => "react.section.1-column",
+                    "children" => [],
+                ],
+            ],
+        ];
+        $layoutID = $this->layoutModel->insert($layout);
+        $layoutView = [
+            "layoutID" => $layoutID,
+            "recordID" => -1,
+            "recordType" => "global",
+            "layoutViewType" => "discussionThread",
+        ];
+
+        $this->layoutViewModel->insert($layoutView);
+
+        $layoutPage = $this->container()->get(LayoutPage::class);
+        $page = $layoutPage->preloadLayout(
+            new LayoutQuery("discussionThread", "global", -1, ["discussionID" => $discussion["discussionID"]])
+        );
+        $this->assertSame("{$discussion["name"]} - LayoutPageTest", $page->getSeoTitle());
+        $this->assertSame(Gdn::formatService()->renderExcerpt($discussion["body"], "html"), $page->getSeoDescription());
+        $this->assertSame($discussion["canonicalUrl"] . "/p1", $page->getCanonicalUrl());
+        $jsonLD = $page->getJsonLdItems();
+        $crumbs = array_column($jsonLD["@graph"][0]["itemListElement"], "name");
+        foreach ($crumbs as $crumb) {
+            $this->assertTrue(in_array($crumb, ["Home", $category["name"], $discussion["name"]]));
+        }
     }
 }

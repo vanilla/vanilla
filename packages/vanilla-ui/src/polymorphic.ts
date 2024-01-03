@@ -5,6 +5,8 @@
  * @license GPL-2.0-only
  */
 
+import { ElementType } from "react";
+
 declare type Merge<P1 = {}, P2 = {}> = Omit<P1, keyof P2> & P2;
 declare type MergeProps<E, P = {}> = P & Merge<E extends React.ElementType ? React.ComponentPropsWithRef<E> : never, P>;
 /**
@@ -15,7 +17,7 @@ declare type OwnProps<E> = E extends ForwardRefComponent<any, infer P> ? P : {};
  * Infers the JSX.IntrinsicElement if E is a ForwardRefComponent
  */
 declare type IntrinsicElement<E> = E extends ForwardRefComponent<infer I, any> ? I : never;
-declare type NarrowIntrinsic<E> = E extends keyof JSX.IntrinsicElements ? E : never;
+declare type NarrowIntrinsic<E> = E extends ElementType ? E : never;
 /**
  * Extends original type to ensure built in React types play nice with
  * polymorphic components still e.g. `React.ElementRef` etc.
@@ -29,7 +31,7 @@ interface ForwardRefComponent<IntrinsicElementString, OwnProps = {}>
             }
         >
     > {
-    <As extends keyof JSX.IntrinsicElements = NarrowIntrinsic<IntrinsicElementString>>(
+    <As extends ElementType = NarrowIntrinsic<IntrinsicElementString>>(
         props: MergeProps<
             As,
             OwnProps & {
@@ -45,7 +47,7 @@ interface ForwardRefComponent<IntrinsicElementString, OwnProps = {}>
      * We explicitly define a `JSX.IntrinsicElements` overload so that events are
      * typed for consumers.
      */
-    <As extends keyof JSX.IntrinsicElements = NarrowIntrinsic<IntrinsicElementString>>(
+    <As extends ElementType = NarrowIntrinsic<IntrinsicElementString>>(
         props: MergeProps<As, OwnProps & { as: As }>,
     ): React.ReactElement | null;
 

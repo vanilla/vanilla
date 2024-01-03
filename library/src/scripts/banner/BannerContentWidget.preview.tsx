@@ -5,7 +5,6 @@
  */
 
 import BannerContentWidget from "@library/banner/BannerContentWidget";
-import { t } from "@vanilla/i18n";
 import React from "react";
 
 interface IProps extends React.ComponentProps<typeof BannerContentWidget> {}
@@ -13,10 +12,10 @@ interface IProps extends React.ComponentProps<typeof BannerContentWidget> {}
 export function BannerContentWidgetPreview(_props: IProps) {
     const props: IProps = {
         ..._props,
-        title: _props.title || t("Dynamic Title"),
-        description: _props.description || t("A Dynamic Description will appear here."),
-        showTitle: _props.showTitle ?? false,
-        showDescription: _props.showDescription ?? false,
+        title: _props.title,
+        description: _props.description,
+        showTitle: _props.showTitle,
+        showDescription: _props.showDescription,
     };
     return <BannerContentWidget {...props} />;
 }

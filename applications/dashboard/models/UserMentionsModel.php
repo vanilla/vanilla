@@ -7,6 +7,8 @@
 
 namespace Vanilla\Dashboard\Models;
 
+use DateTime;
+use DateTimeInterface;
 use Exception;
 
 use Garden\EventManager;
@@ -324,17 +326,24 @@ class UserMentionsModel extends PipelineModel implements LoggerAwareInterface, S
                     try {
                         $record = $models[$mention["recordType"]]->getID($mention["recordID"], DATASET_TYPE_ARRAY);
 
-                        $formatter = $formatService->getFormatter($record["Format"]);
-                        $anonymizedBody = $formatter->removeUserPII($mention["mentionedName"], $record["Body"]);
-                        $record["Body"] = $anonymizedBody;
-                        $models[$mention["recordType"]]->update(
-                            ["Body" => $record["Body"]],
-                            [
-                                $models[$mention["recordType"]]->PrimaryKey =>
-                                    $record[$models[$mention["recordType"]]->PrimaryKey],
-                            ]
-                        );
-                        $this->update(["status" => "removed"], $mention);
+                        if (!$record) {
+                            $this->logger->warning(
+                                "Skipping record {$mention["recordType"]} {$mention["recordID"]} since the original post no longer exists"
+                            );
+                            $this->update(["status" => "removed"], $mention);
+                        } else {
+                            $formatter = $formatService->getFormatter($record["Format"]);
+                            $anonymizedBody = $formatter->removeUserPII($mention["mentionedName"], $record["Body"]);
+                            $record["Body"] = $anonymizedBody;
+                            $models[$mention["recordType"]]->update(
+                                ["Body" => $record["Body"]],
+                                [
+                                    $models[$mention["recordType"]]->PrimaryKey =>
+                                        $record[$models[$mention["recordType"]]->PrimaryKey],
+                                ]
+                            );
+                            $this->update(["status" => "removed"], $mention);
+                        }
                         yield new LongRunnerSuccessID("{$mention["recordType"]}_{$mention["recordID"]}");
                     } catch (LongRunnerTimeoutException $e) {
                         throw $e;
@@ -351,8 +360,10 @@ class UserMentionsModel extends PipelineModel implements LoggerAwareInterface, S
         } catch (LongRunnerTimeoutException $exception) {
             return new LongRunnerNextArgs([$id]);
         }
-
-        $afterUserAnonymizeEvent = new AfterUserAnonymizeEvent($id);
+        $userModel = Gdn::getContainer()->get(UserModel::class);
+        $user = $userModel->getID($id, DATASET_TYPE_ARRAY);
+        $dateTime = new DateTime($user["DateInserted"]);
+        $afterUserAnonymizeEvent = new AfterUserAnonymizeEvent($id, $dateTime);
         $this->eventManager->dispatch($afterUserAnonymizeEvent);
 
         return LongRunner::FINISHED;

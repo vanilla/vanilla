@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -53,8 +53,10 @@ class ImageEmbed extends AbstractEmbed
      */
     public function renderHtml(): string
     {
+        $data = $this->data;
+        $data["embedJson"] = json_encode($this, JSON_UNESCAPED_UNICODE);
         $viewPath = dirname(__FILE__) . "/ImageEmbed.twig";
-        return $this->renderTwig($viewPath, $this->data);
+        return $this->renderTwig($viewPath, $data);
     }
 
     /**

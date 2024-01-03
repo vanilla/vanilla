@@ -66,9 +66,13 @@ class UserSpotlightWidget implements ReactWidgetInterface, CombinedPropsWidgetIn
     public static function getWidgetSchema(): Schema
     {
         $schema = SchemaUtils::composeSchemas(
-            self::widgetTitleSchema(null, true),
+            self::widgetTitleSchema(null, true, "Customer Spotlight"),
             self::widgetSubtitleSchema("subtitle"),
-            self::widgetDescriptionSchema(null, true),
+            self::widgetDescriptionSchema(
+                null,
+                true,
+                "Use this space to add a Customer Spotlight by telling the customer's story using their unique language, share what problems they experienced, and how they conquered it by using your product(s)."
+            ),
             Schema::parse([
                 "apiParams" => self::getApiSchema(),
             ]),

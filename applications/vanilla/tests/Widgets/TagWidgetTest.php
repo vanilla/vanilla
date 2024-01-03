@@ -36,6 +36,9 @@ class TagWidgetTest extends SiteTestCase
         $spec = [
             '$hydrate' => "react.tag",
             "title" => "My Tags",
+            "titleType" => "static",
+            "descriptionType" => "none",
+            '$reactTestID' => "tags",
         ];
 
         $expectedTags = [];
@@ -48,6 +51,7 @@ class TagWidgetTest extends SiteTestCase
                 "parentTagID" => null,
                 "countDiscussions" => 1,
                 "urlCode" => $tag["urlcode"],
+                "url" => url("discussions/tagged/" . $tag["urlcode"], true),
                 "type" => "User",
             ];
         }
@@ -56,8 +60,25 @@ class TagWidgetTest extends SiteTestCase
             '$reactComponent' => "TagWidget",
             '$reactProps' => [
                 "title" => "My Tags",
+                "titleType" => "static",
+                "descriptionType" => "none",
                 "tags" => $expectedTags,
+                "limit" => 10,
             ],
+            '$reactTestID' => "tags",
+            '$seoContent' => <<<HTML
+<div class=pageBox>
+    <div class=pageHeadingBox>
+        <h2>My Tags</h2>
+    </div>
+    <ul class=linkList>
+        <li><a href=https://vanilla.test/tagwidgettest/discussions/tagged/tagname-1>tagName_1</a></li>
+        <li><a href=https://vanilla.test/tagwidgettest/discussions/tagged/tagname-2>tagName_2</a></li>
+        <li><a href=https://vanilla.test/tagwidgettest/discussions/tagged/tagname-3>tagName_3</a></li>
+    </ul>
+</div>
+HTML
+        ,
         ];
 
         $this->assertHydratesTo($spec, [], $expected);

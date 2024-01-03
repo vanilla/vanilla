@@ -6,13 +6,14 @@
 
 import { ItemID, ITreeItem } from "@library/tree/types";
 import { IconType } from "@vanilla/icons";
-import { IFormControl, JsonSchema } from "@vanilla/json-schema-forms";
+import { EMPTY_SCHEMA, IFormControl, JsonSchema } from "@vanilla/json-schema-forms";
 import { slugify } from "@vanilla/utils";
 import React, { useContext, useMemo } from "react";
 
 export interface IFormTreeItemParams<ItemDataType = any> {
     itemSchema: JsonSchema;
-    getRowIcon?(treeItem: ITreeItem<ItemDataType>): IconType;
+    getRowIcon?(treeItem: ITreeItem<ItemDataType>): IconType | null;
+    isItemEditable?(item: ItemDataType): boolean;
     isItemDeletable?(item: ItemDataType): boolean;
     isItemHideable?(item: ItemDataType): boolean;
     isItemHidden?(item: ItemDataType): boolean;
@@ -41,7 +42,7 @@ export const FormTreeContext = React.createContext<IFormTreeContext>({
     saveItem: noop,
     deleteItem: noop,
     isCompact: false,
-    itemSchema: {},
+    itemSchema: EMPTY_SCHEMA,
     rootID: "",
 });
 

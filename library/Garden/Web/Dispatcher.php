@@ -8,6 +8,7 @@
 namespace Garden\Web;
 
 use Garden\EventManager;
+use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\ResponseException;
 use Gdn;
 use Gdn_Locale;
@@ -16,13 +17,19 @@ use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
 use Logger;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
+use Vanilla\ReflectionHelper;
+use Vanilla\Utility\DebugUtils;
+use Vanilla\Utility\StringUtils;
 
 /**
  * Dispatches requests and receives responses.
@@ -129,7 +136,7 @@ class Dispatcher implements LoggerAwareInterface
     {
         try {
             $result = $this->callMiddleware($request);
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             $result = $this->makeResponse($ex);
         }
         return $result;
@@ -181,7 +188,9 @@ class Dispatcher implements LoggerAwareInterface
 
                         try {
                             if ($action instanceof Action) {
-                                $this->eventManager->dispatch(new ControllerDispatchedEvent($action->getCallback()));
+                                $this->eventManager->dispatch(
+                                    new ControllerDispatchedEvent($action->getCallback(), $request)
+                                );
                             }
                             ob_start();
                             $actionResponse = $action();
@@ -205,18 +214,22 @@ class Dispatcher implements LoggerAwareInterface
                 // Pass to the next route.
                 continue;
             } catch (\Throwable $dispatchEx) {
-                if ($dispatchEx->getCode() >= 400 && $dispatchEx->getCode() < 500) {
-                    $this->logger->error($dispatchEx->getMessage(), [
-                        "event" => "api_error",
-                        "exception" => $dispatchEx,
-                    ]);
+                // Expected Exception when user tries to access private community while not logged in.  No need to log it.
+                if (
+                    $dispatchEx instanceof ForbiddenException &&
+                    ($dispatchEx->getContext()["type"] ?? "") == "!private"
+                ) {
+                } elseif ($dispatchEx->getCode() >= 400 && $dispatchEx->getCode() < 500) {
+                    ErrorLogger::warning(
+                        $dispatchEx,
+                        ["api_error", "dispatcher-caught"],
+                        ["responseCode" => $dispatchEx->getCode()]
+                    );
                 } else {
                     ErrorLogger::error(
                         $dispatchEx,
                         ["api_error", "dispatcher-caught"],
-                        [
-                            "responseCode" => $dispatchEx->getCode(),
-                        ]
+                        ["responseCode" => $dispatchEx->getCode()]
                     );
                 }
                 $response = null;
@@ -328,11 +341,6 @@ class Dispatcher implements LoggerAwareInterface
             // This is an array of response data.
             $result = new Data($raw);
         } elseif ($raw instanceof \Throwable) {
-            // Let's not mask errors when in debug mode!
-            if ($raw instanceof \Error && debug()) {
-                throw $raw;
-            }
-
             // Make sure that there's a "proper" conversion from non-HTTP to HTTP exceptions since
             // errors in the 2xx ranges are treated as success.
             // ValidationException status code are compatible with HTTP codes.
@@ -341,9 +349,18 @@ class Dispatcher implements LoggerAwareInterface
                 $errorCode = 500;
             }
 
-            $data = $raw instanceof \JsonSerializable ? $raw->jsonSerialize() : ["message" => $raw->getMessage()];
+            $data =
+                $raw instanceof \JsonSerializable
+                    ? $raw->jsonSerialize()
+                    : [
+                        "type" => get_class($raw),
+                        "message" => $raw->getMessage(),
+                        "code" => $raw->getCode(),
+                    ];
             if (debug() && is_array($data)) {
-                $data["trace"] = $raw->getTrace();
+                $data["trace"] = explode("\n", DebugUtils::stackTraceString($raw->getTrace()));
+            } else {
+                $data["message"] = StringUtils::sanitizeExceptionMessage($data["message"] ?? "");
             }
             $result = new Data($data, $errorCode);
             // Provide stack trace as meta information.
@@ -484,6 +501,8 @@ class Dispatcher implements LoggerAwareInterface
      *
      * @param RequestInterface $request The initial request.
      * @param Data $response The response data.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function render(RequestInterface $request, Data $response)
     {
@@ -531,15 +550,15 @@ class Dispatcher implements LoggerAwareInterface
             /* @var \ReflectionParameter $param */
             $lname = strtolower($param->getName());
 
-            if ($param->getClass() !== null) {
-                $className = $param->getClass()->getName();
+            if (ReflectionHelper::getClass($param) !== null) {
+                $className = ReflectionHelper::getClass($param)->getName();
 
                 if (isset($largs[$lname]) && is_a($largs[$lname], $className)) {
                     $value = $largs[$lname];
                 } elseif (isset($largs[$index]) && is_a($largs[$index], $className)) {
                     $value = $largs[$index];
                 } elseif ($container->has($className)) {
-                    $value = $container->get($param->getClass()->getName());
+                    $value = $container->get(ReflectionHelper::getClass($param)->getName());
                 } else {
                     $value = null;
                     $missing[$lname] = '$' . $param->getName();

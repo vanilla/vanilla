@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -14,9 +14,8 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { calc, percent, translate, translateX, viewHeight } from "csx";
+import { calc, percent } from "csx";
 import { css, CSSObject } from "@emotion/css";
-import { cssRule } from "@library/styles/styleShim";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 
 export const modalVariables = useThemeCache(() => {
@@ -102,10 +101,9 @@ export const modalClasses = useThemeCache(() => {
 
     const overlayMixin: CSSObject = {
         position: "fixed",
-        // Viewport units are useful here because
-        // we're actually fine this being taller than the initially visible viewport.
-        height: viewHeight(100),
-        width: percent(100),
+        // we could have made this dvh as well, but not all the browsers support this currently
+        height: "100%",
+        width: "100%",
         top: 0,
         left: 0,
         right: 0,
@@ -234,6 +232,16 @@ export const modalClasses = useThemeCache(() => {
                 marginLeft: styleUnit(-16),
                 marginRight: styleUnit(-16),
                 width: `calc(100% + (${styleUnit(16)} * 2))`,
+                "&.formGroup-radio": {
+                    alignItems: "start",
+                    "& + .formGroup-radio": {
+                        paddingTop: 16,
+                    },
+                    // to align the radio buttons with the labels
+                    "& .input-wrap > label:first-of-type": {
+                        paddingTop: 0,
+                    },
+                },
             },
             "&.noTransform": {
                 transform: "none !important",

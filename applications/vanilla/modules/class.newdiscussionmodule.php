@@ -8,7 +8,10 @@
  * @since 2.0
  */
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Vanilla\Contracts\LocaleInterface;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Web\TwigStaticRenderer;
 
 /**
@@ -48,6 +51,8 @@ class NewDiscussionModule extends Gdn_Module
      *
      * @param string $sender
      * @param bool $applicationFolder Unused.
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public function __construct($sender = "", $applicationFolder = false)
     {

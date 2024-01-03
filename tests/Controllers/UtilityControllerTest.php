@@ -38,7 +38,7 @@ class UtilityControllerTest extends SiteTestCase
             $this->assertEquals(500, $response->getStatus());
 
             $this->assertLog([
-                "message" => "Structure failed for addon {addonKey}",
+                "message" => "Structure failed for addon bad-structure",
                 "data.addonKey" => "bad-structure",
             ]);
             $newSchedulerToken = $config->get("Garden.Scheduler.Token", null);

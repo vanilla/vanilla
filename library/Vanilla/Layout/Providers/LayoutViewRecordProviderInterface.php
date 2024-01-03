@@ -7,6 +7,8 @@
 
 namespace Vanilla\Layout\Providers;
 
+use Vanilla\Layout\Asset\LayoutQuery;
+
 /**
  * Some class that can map record IDs to record name/url.
  */
@@ -38,11 +40,20 @@ interface LayoutViewRecordProviderInterface
     public function validateRecords(array $recordIDs): bool;
 
     /**
-     * Get Parent recordType/ID for layout lookup.
+     * Given a layout query, perform any resolutions that should be done before looking up the layout is looked up.
      *
-     * @param string $recordType
-     * @param string $recordID
-     * @return array
+     * @param LayoutQuery $query
+     *
+     * @return LayoutQuery
      */
-    public function getParentRecordTypeAndID(string $recordType, string $recordID): array;
+    public function resolveLayoutQuery(LayoutQuery $query): LayoutQuery;
+
+    /**
+     * Given a layout query that we couldn't find a layout for, generate a parent layout query.
+     *
+     * @param LayoutQuery $query
+     *
+     * @return LayoutQuery
+     */
+    public function resolveParentLayoutQuery(LayoutQuery $query): LayoutQuery;
 }

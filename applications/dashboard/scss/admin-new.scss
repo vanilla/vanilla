@@ -16,6 +16,11 @@ $staticVariables: false;
 
 // Copied from applications/dashboard/scss/src/_buttons.scss L114
 
+.heading {
+    // Clear out defaults
+    margin: 0;
+}
+
 .btn-secondary {
     min-width: $btn-min-width;
     @include button-variant(

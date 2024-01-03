@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -30,5 +30,35 @@ class LinkEmbed extends AbstractEmbed
     protected function schema(): Schema
     {
         return Schema::parse(["body:s?", "photoUrl:s?"]);
+    }
+
+    /**
+     * Override the parent method to render with InlineEmbed if embed style is inline.
+     *
+     * @return string
+     */
+    public function renderHtml(): string
+    {
+        $embedStyle = $this->data["embedStyle"] ?? null;
+
+        // Inline Embed
+        if ($embedStyle === self::EMBED_STYLE_INLINE) {
+            $viewPath = dirname(__FILE__) . "/InlineEmbed.twig";
+            return $this->renderTwig($viewPath, [
+                "url" => $this->getUrl(),
+                "data" => json_encode($this, JSON_UNESCAPED_UNICODE),
+            ]);
+        }
+
+        // Plain link
+        if ($embedStyle === self::EMBED_STYLE_PLAIN_LINK) {
+            $viewPath = dirname(__FILE__) . "/PlainLink.twig";
+            return $this->renderTwig($viewPath, [
+                "url" => $this->getUrl(),
+                "data" => json_encode($this, JSON_UNESCAPED_UNICODE),
+            ]);
+        }
+
+        return parent::renderHtml();
     }
 }

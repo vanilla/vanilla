@@ -67,7 +67,7 @@ export function MetaIcon(props: React.ComponentProps<typeof Icon>) {
 
     return (
         <MetaItem className={className}>
-            <Icon {...rest} className={classes.alignVerticallyInMetaItem(iconHeight)} /> {children}
+            <Icon {...rest} className={classes.alignVerticallyInMetaItem(iconHeight)} aria-hidden={false} /> {children}
         </MetaItem>
     );
 }

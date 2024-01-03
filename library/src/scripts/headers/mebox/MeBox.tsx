@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames";
 import { meBoxClasses } from "@library/headers/mebox/pieces/meBoxStyles";
 import UserDropdown from "@library/headers/mebox/pieces/UserDropdown";
@@ -12,6 +12,8 @@ import MessagesDropDown from "@library/headers/mebox/pieces/MessagesDropDown";
 import { IInjectableUserState } from "@library/features/users/userTypes";
 import NotificationsDropDown from "@library/headers/mebox/pieces/NotificationsDropDown";
 import { t } from "@library/utility/appUtils";
+import apiv2 from "@library/apiv2";
+import { useIsMounted } from "@vanilla/react-utils";
 export interface IMeBoxProps extends IInjectableUserState {
     countClass?: string;
     className?: string;

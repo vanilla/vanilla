@@ -3,46 +3,46 @@
  * @copyright 2009-2019 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
+import { css } from "@emotion/css";
+import { Mixins } from "@library/styles/Mixins";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { styleUnit } from "@library/styles/styleUnit";
-import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { percent } from "csx";
+
 export const dateRangeClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const style = styleFactory("dateRange");
 
-    const input = style("input", {
-        width: styleUnit(136),
-        maxWidth: percent(100),
+    const input = css({
+        width: "136px",
+        maxWidth: "100%",
     });
 
-    const root = style({
+    const root = css({
         display: "block",
         position: "relative",
-        width: percent(100),
+        width: "100%",
     });
 
-    const boundary = style("boundary", {
+    const boundary = css({
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "space-between",
-        width: percent(100),
+        width: "100%",
         ...{
             "& + &": {
-                marginTop: styleUnit(12),
+                ...Mixins.margin({ top: 12 }),
             },
         },
     });
 
-    const label = style("label", {
+    const label = css({
         overflow: "hidden",
         fontWeight: globalVars.fonts.weights.semiBold,
         wordBreak: "break-word",
         textOverflow: "ellipsis",
-        maxWidth: percent(100),
-        paddingLeft: styleUnit(8),
+        maxWidth: "100%",
+
+        ...Mixins.padding({ left: 8 }),
     });
 
     return {

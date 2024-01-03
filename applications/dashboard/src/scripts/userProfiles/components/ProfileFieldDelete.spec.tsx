@@ -1,61 +1,62 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import React from "react";
-import { render, waitFor, screen, fireEvent } from "@testing-library/react";
-import { ProfileFieldsFixture } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
+import { render, fireEvent, act } from "@testing-library/react";
+import { ProfileFieldsFixtures } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
 import ProfileFieldDelete from "@dashboard/userProfiles/components/ProfileFieldDelete";
+import { LiveAnnouncer } from "react-aria-live";
 
-const mockField = ProfileFieldsFixture.mockProfileFields()[0];
+const mockField = ProfileFieldsFixtures.mockProfileFields()[0];
 const mockClose = jest.fn();
 
 const renderInProvider = () => {
+    const MockProfileFieldsProvider = ProfileFieldsFixtures.createMockProfileFieldsProvider();
     return render(
-        ProfileFieldsFixture.createMockProfileFieldsProvider(
-            <ProfileFieldDelete field={mockField} close={mockClose} />,
-        ),
+        <MockProfileFieldsProvider>
+            <LiveAnnouncer>
+                <ProfileFieldDelete field={mockField} close={mockClose} />,
+            </LiveAnnouncer>
+        </MockProfileFieldsProvider>,
     );
 };
 
 describe("ProfileFieldDelete", () => {
-    it("Render profile field label in the title", () => {
-        renderInProvider();
-        waitFor(() => {
-            const title = screen.getByText(`Delete Profile Field: "${mockField.label}"`);
-            expect(title).toBeInTheDocument();
-        });
+    afterEach(() => {
+        mockClose.mockReset();
+    });
+    it("Render profile field label in the title", async () => {
+        const { findByText } = renderInProvider();
+        const title = await findByText(`Delete Profile Field: "${mockField.label}"`);
+        expect(title).toBeInTheDocument();
     });
 
-    it("Render profile field label in the modal content", () => {
-        renderInProvider();
-        waitFor(() => {
-            const question = screen.getByText(
-                `Are you sure you want to delete the "${mockField.label}" profile field?`,
-            );
-            expect(question).toBeInTheDocument();
-        });
+    it("Render profile field label in the modal content", async () => {
+        const { findByText } = renderInProvider();
+        const question = await findByText(`Are you sure you want to delete the "${mockField.label}" profile field?`);
+        expect(question).toBeInTheDocument();
     });
 
-    it("Call mock close method by clicking the close icon button", () => {
-        renderInProvider();
-        const closeButton = screen.getByRole("button", { name: "Close" });
+    it("Call mock close method by clicking the close icon button", async () => {
+        const { findByRole } = renderInProvider();
+        const closeButton = await findByRole("button", { name: "Close" });
         expect(closeButton).toBeInTheDocument();
-        fireEvent.click(closeButton);
-        waitFor(() => {
-            expect(mockClose).toBeCalled();
+        await act(async () => {
+            fireEvent.click(closeButton);
         });
+        expect(mockClose).toHaveBeenCalled();
     });
 
-    it("Call mock close method by clicking the cancel button", () => {
-        renderInProvider();
-        const cancelButton = screen.getByRole("button", { name: "Cancel" });
+    it("Call mock close method by clicking the cancel button", async () => {
+        const { findByRole } = renderInProvider();
+        const cancelButton = await findByRole("button", { name: "Cancel" });
         expect(cancelButton).toBeInTheDocument();
-        fireEvent.click(cancelButton);
-        waitFor(() => {
-            expect(mockClose).toBeCalled();
+        await act(async () => {
+            fireEvent.click(cancelButton);
         });
+        expect(mockClose).toHaveBeenCalled();
     });
 });

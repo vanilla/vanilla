@@ -14,15 +14,16 @@ use Vanilla\Formatting\Formats\MarkdownFormat;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
 use VanillaTests\SetupTraitsTrait;
+use VanillaTests\SiteTestCase;
 use VanillaTests\SiteTestTrait;
 use VanillaTests\VanillaTestCase;
 
 /**
  * Class DiscussionsControllerTest
  */
-class DiscussionsControllerTest extends TestCase
+class DiscussionsControllerTest extends SiteTestCase
 {
-    use SiteTestTrait, SetupTraitsTrait, CommunityApiTestTrait, TestDiscussionModelTrait;
+    use CommunityApiTestTrait, TestDiscussionModelTrait;
 
     /** @var CategoryModel */
     private static $categoryModel;
@@ -38,7 +39,6 @@ class DiscussionsControllerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->setupTestTraits();
         self::$categoryModel = self::container()->get(CategoryModel::class);
         $this->discussion = $this->insertDiscussions(1)[0];
     }
@@ -49,7 +49,6 @@ class DiscussionsControllerTest extends TestCase
     public function tearDown(): void
     {
         parent::tearDown();
-        $this->tearDownTestTraits();
         $this->container()->setInstance(CategoryModel::class, null);
     }
 
@@ -85,6 +84,20 @@ class DiscussionsControllerTest extends TestCase
     }
 
     /**
+     * Test that the recent discussion can also be filtered by parameter followed=true
+     *
+     * @depends testFollowedRecentDiscussions
+     * @return void
+     */
+    public function testFollowedRecentDiscussionsWithFollowedParameterTrue($data): void
+    {
+        $id = $this->discussion["DiscussionID"];
+        $this->bessy()->post("/discussion/announce/$id", ["Announce" => 1]);
+        $newData = $this->bessy()->get("/discussions?followed=true")->Data;
+        $this->assertEquals($data["Discussions"], $newData["Discussions"]);
+    }
+
+    /**
      * Smoke test a basic discussion fetch.
      *
      * @param array $data
@@ -94,10 +107,10 @@ class DiscussionsControllerTest extends TestCase
     {
         foreach ($data["Discussions"] as $discussion) {
             $url = discussionUrl($discussion, "", "/");
-            $data = $this->bessy()->get($url)->Data;
+            $responseData = $this->bessy()->get($url)->Data;
 
-            $this->assertContains("Discussion", $data);
-            $this->assertContains("Comments", $data);
+            $this->assertArrayHasKey("Discussion", $responseData);
+            $this->assertArrayHasKey("Comments", $responseData);
 
             break;
         }
@@ -267,5 +280,91 @@ class DiscussionsControllerTest extends TestCase
         // The discussion should be marked read at this point. Let's look for an entry in user discussion.
         $discussionDb = $this->discussionModel->getID($discussion["discussionID"]);
         $this->assertSame(1, (int) $discussionDb->CountCommentWatch);
+    }
+    /**
+     **
+     * Test if we are rendering all the discussions and discussions from followed categories, and the order is correct.
+     *
+     */
+    public function testAnnouncementPinning(): void
+    {
+        $this->runWithConfig(
+            [
+                \CategoryModel::CONF_CATEGORY_FOLLOWING => true,
+            ],
+            function () {
+                $this->resetTable("Discussion");
+
+                // Let's create categories and follow them
+                $category1 = $this->api()->post("categories", [
+                    "name" => "testCat1",
+                    "urlcode" => "test-cat-1",
+                ]);
+                $testCategory1ID = $category1["categoryID"];
+
+                $category2 = $this->api()->post("categories", [
+                    "name" => "testCat2",
+                    "urlcode" => "test-cat-2",
+                ]);
+                $testCategory2ID = $category2["categoryID"];
+
+                $this->api()->put("categories/{$testCategory1ID}/follow", ["followed" => true]);
+                $this->api()->put("categories/{$testCategory2ID}/follow", ["followed" => true]);
+
+                // This one is older and should be last, even though it is pinned in the category.
+                CurrentTimeStamp::mockTime("2020-01-01");
+                // pinned in category
+                $this->createDiscussion([
+                    "name" => "Pinned in category",
+                    "pinned" => true,
+                    "categoryID" => $testCategory2ID,
+                    "pinLocation" => "category",
+                ]);
+
+                // These ones are newer
+                CurrentTimeStamp::mockTime("2020-01-02");
+                // not pinned
+                $this->createDiscussion([
+                    "name" => "Not pinned",
+                    "categoryID" => $testCategory1ID,
+                ]);
+                // pinned globally
+                $this->createDiscussion([
+                    "name" => "Pinned globally",
+                    "pinned" => true,
+                    "categoryID" => $testCategory2ID,
+                    "pinLocation" => "recent",
+                ]);
+
+                $assertControllerData = function (\Gdn_Controller $controller) {
+                    //we have only global announcements first, then we have the rest, by most recent order
+                    $this->assertRowsLike(
+                        [
+                            "Name" => ["Pinned globally"],
+                        ],
+                        $controller->data("Announcements")->resultArray(),
+                        true,
+                        1
+                    );
+
+                    $this->assertRowsLike(
+                        [
+                            "Name" => ["Not pinned", "Pinned in category"],
+                        ],
+                        $controller->data("Discussions")->resultArray(),
+                        true,
+                        2
+                    );
+                };
+
+                // Works for followed.
+                $controller = $this->bessy()->get("/discussions?followed=1");
+                $assertControllerData($controller);
+
+                //same logic for all discussions
+                $controller = $this->bessy()->get("/discussions");
+                $assertControllerData($controller);
+            }
+        );
     }
 }

@@ -10,6 +10,7 @@ import {
     fetchUserProfileFields,
     patchProfileField,
     postProfileField,
+    putProfileFieldsSorts,
 } from "@dashboard/userProfiles/state/UserProfiles.actions";
 import { ProfileField, UserProfileFields } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
@@ -21,7 +22,7 @@ export interface IUserProfilesStoreState {
     userProfiles: IUserProfilesState;
 }
 
-interface IUserProfilesState {
+export interface IUserProfilesState {
     profileFieldApiNamesByParamHash: Record<string, ILoadable<Array<ProfileField["apiName"]>, any>>;
     profileFieldsByApiName: Record<ProfileField["apiName"], ProfileField>;
     profileFieldsByUserID: Record<RecordID, ILoadable<UserProfileFields, SerializedError>>;
@@ -125,6 +126,14 @@ export const userProfilesSlice = createSlice({
                     status: LoadStatus.ERROR,
                     error: action.error,
                 };
+            })
+            .addCase(putProfileFieldsSorts.fulfilled, (state, action) => {
+                Object.entries(action.meta.arg).forEach(([apiName, sort]) => {
+                    state.profileFieldsByApiName[apiName] = {
+                        ...state.profileFieldsByApiName[apiName],
+                        sort,
+                    };
+                });
             });
     },
 });

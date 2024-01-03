@@ -57,7 +57,7 @@ class CommonLayoutView extends AbstractCustomLayoutView
     /**
      * @inheritdoc
      */
-    public function getLayoutID(): string
+    public function getTemplateID(): string
     {
         return "common";
     }
@@ -67,7 +67,7 @@ class CommonLayoutView extends AbstractCustomLayoutView
      */
     public function getParamInputSchema(): Schema
     {
-        return Schema::parse(["categoryID:i?", "siteSectionID:s?"]);
+        return Schema::parse(["categoryID:i|s?", "siteSectionID:s?"]);
     }
 
     /**
@@ -93,16 +93,14 @@ class CommonLayoutView extends AbstractCustomLayoutView
             $siteSectionID === null
                 ? $this->siteSectionModel->getDefaultSiteSection()
                 : $this->siteSectionModel->getByID($siteSectionID);
-
+        if ($siteSectionID != 0) {
+            $this->siteSectionModel->setCurrentSiteSection($siteSection);
+        }
         $result["locale"] = $siteSection->getContentLocale();
         $result["siteSection"] = SiteSectionSchema::toArray($siteSection);
 
         $categoryID = $paramInput["categoryID"] ?? $siteSection->getCategoryID();
-
-        // IMPORTANT NOTE:
-        // This is for backward compatibility's sake. The RootRecordProvider & RootSiteSection are using a `-2` categoryID.
-        // However, -2 is not a proper categoryID, so we fallback to -1.
-        $categoryID = is_numeric($categoryID) && $categoryID < -1 ? -1 : $categoryID;
+        $categoryID = $this->categoryModel->ensureCategoryID($categoryID);
 
         $result["categoryID"] = $categoryID;
         // Maybe null.
@@ -114,13 +112,13 @@ class CommonLayoutView extends AbstractCustomLayoutView
         }
 
         $pageHead->setSeoTitle(
-            Gdn::formatService()->renderPlainText(Gdn::config("Garden.HomepageTitle"), HtmlFormat::FORMAT_KEY)
+            Gdn::formatService()->renderPlainText(Gdn::config("Garden.HomepageTitle"), HtmlFormat::FORMAT_KEY),
+            false
         );
         $pageHead->setSeoDescription(
             Gdn::formatService()->renderPlainText(Gdn::config("Garden.Description"), HtmlFormat::FORMAT_KEY)
         );
         $pageHead->setCanonicalUrl(\Gdn::request()->getSimpleUrl());
-        $pageHead->applyMetaTags();
         return $result;
     }
 }

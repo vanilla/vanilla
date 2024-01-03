@@ -9,8 +9,7 @@ namespace Vanilla\OAuth2\Tests\Models;
 
 use Firebase\JWT\JWT;
 use Garden\Web\Exception\ResponseException;
-use Garden\Web\Exception\ServerException;
-use Gdn_UserException;
+use Gdn_CookieIdentity;
 use PHPUnit\Framework\TestCase;
 use UserAuthenticationNonceModel;
 use VanillaTests\Fixtures\Request;
@@ -317,7 +316,7 @@ class OAuth2PluginTest extends SiteTestCase
      * Test the Post return URL that goes from `/entry/oauth2` -> `/entry/connect/oauth2`.
      *
      */
-    public function testSssertReturnPostUrlFlow(): void
+    public function testAssertReturnPostUrlFlow(): void
     {
         $this->setupSingleProvider();
         $user1 = $this->createUser(["name" => "test1_test1"]);
@@ -343,7 +342,7 @@ class OAuth2PluginTest extends SiteTestCase
             "c_hash" => "-oJlLqf-wCs_r2OMf-NW4Q",
             "nonce" => "test",
         ];
-        $idToken = JWT::encode($id_token, "");
+        $idToken = JWT::encode($id_token, "", Gdn_CookieIdentity::JWT_ALGORITHM);
         $this->expectExceptionMessage("There was an error decoding id_token.");
 
         $this->bessy()->post("/entry/" . $this->oauth2Plugin->getProviderKey(), [
@@ -359,7 +358,7 @@ class OAuth2PluginTest extends SiteTestCase
         ]);
 
         $id_token["nonce"] = $nonce;
-        $idToken = JWT::encode($id_token, "");
+        $idToken = JWT::encode($id_token, "", Gdn_CookieIdentity::JWT_ALGORITHM);
         $this->bessy()->post("/entry/" . $this->oauth2Plugin->getProviderKey(), [
             "code" => $this->testAccessCode,
             "state" => $this->generateState($clientID),
@@ -677,5 +676,22 @@ class OAuth2PluginTest extends SiteTestCase
         $this->expectException(\Gdn_UserException::class);
         $this->expectExceptionMessage("The OAuth provider does not have an authorization URL configured");
         $r = $this->bessy()->get("/entry/" . $this->oauth2Plugin->getProviderKey() . "-redirect");
+    }
+
+    /**
+     * Cancelling a sign-up should show the error from the provider
+     * @return void
+     */
+    public function testRegisterCancellationThrowsException(): void
+    {
+        $this->expectException(\Gdn_UserException::class);
+        $this->expectExceptionMessage(
+            "access_denied: ABC001: The user has cancelled entering self-asserted information."
+        );
+        $r = $this->bessy()->post("/entry/" . $this->oauth2Plugin->getProviderKey(), [
+            "error" => "access_denied",
+            "error_description" => "ABC001: The user has cancelled entering self-asserted information.",
+            "Correlation ID" => "this-is-assossiated-id",
+        ]);
     }
 }

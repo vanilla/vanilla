@@ -118,6 +118,23 @@ trait HtmlProcessorTrait
     }
 
     /**
+     * Query a DOMDocument with some CSS selector.
+     *
+     * @param \DOMDocument $document The document to query.
+     * @param string $cssQuery The selector.
+     * @see https://devhints.io/xpath For a cheatsheet.
+     *
+     * @return \DOMNodeList
+     */
+    public static function queryCssSelectorForDocument(\DOMDocument $document, string $cssQuery): \DOMNodeList
+    {
+        $converter = new CssSelectorConverter();
+        $xpathQuery = $converter->toXPath($cssQuery);
+        $xpath = new \DOMXPath($document);
+        return $xpath->query($xpathQuery) ?: new \DOMNodeList();
+    }
+
+    /**
      * Query the DOM with some CSS selector.
      *
      * @param string $cssQuery
@@ -127,8 +144,6 @@ trait HtmlProcessorTrait
      */
     public function queryCssSelector(string $cssQuery): \DOMNodeList
     {
-        $converter = new CssSelectorConverter();
-        $xpath = $converter->toXPath($cssQuery);
-        return $this->queryXPath($xpath);
+        return self::queryCssSelectorForDocument($this->getDom(), $cssQuery);
     }
 }

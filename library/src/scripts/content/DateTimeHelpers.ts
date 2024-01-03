@@ -1,51 +1,103 @@
+import { t } from "@vanilla/i18n";
+import { sprintf } from "sprintf-js";
+
 /**
  * Return a date in relation to a time like Momement.from/fromNow. By default we use "now".
  *
  * @param datePosition
  * @param dateFrom
+ * @param withPrefixOrSuffix
  * @returns
  */
-export function humanizedTimeFrom(dateInput: Date, dateFrom: Date = new Date()) {
-    const delta = Math.round((dateFrom.getTime() - dateInput.getTime()) / 1000);
+export function humanizedRelativeTime(dateInput: Date, dateFrom: Date = new Date(), withPrefixOrSuffix = true) {
+    const isPast = dateFrom.getTime() > dateInput.getTime();
+    const delta = Math.abs(
+        Math.round(
+            (isPast ? dateInput.getTime() - dateFrom.getTime() : dateFrom.getTime() - dateInput.getTime()) / 1000,
+        ),
+    );
+
     const minToSec = 60;
     const hourToSec = 3600;
     const dayToSec = 86400;
     const monthToSec = 2629744;
     const yearToSec = 31556926;
-    if (delta < 44) {
-        return "a few seconds ago";
-    }
-    if (delta < 45) {
-        return Math.floor(delta) + " seconds ago";
-    }
-    if (delta >= 45 && delta < 90) {
-        return "a minute ago";
-    }
-    if (delta >= 90 && delta < 45 * minToSec) {
-        return Math.round(delta / minToSec) + " minutes ago";
-    }
-    if (delta >= 45 * minToSec && delta < 90 * minToSec) {
-        return "an hour ago";
-    }
-    if (delta >= 90 * minToSec && delta < 22 * hourToSec) {
-        return Math.round(delta / hourToSec) + " hours ago";
-    }
-    if (delta >= 22 * hourToSec && delta < 36 * hourToSec) {
-        return "a day ago";
-    }
-    if (delta >= 36 * 60 * 60 && delta < 26 * dayToSec) {
-        return Math.round(delta / dayToSec) + " days ago";
-    }
-    if (delta >= 26 * dayToSec && delta < 45 * dayToSec) {
-        return "a month ago";
-    }
-    if (delta >= 45 * dayToSec && delta < 320 * dayToSec) {
-        return Math.round(delta / monthToSec) + " months ago";
+
+    let deltaString = "";
+    let deltaStringWithPrefixOrSuffix = "";
+
+    if (delta > 548 * dayToSec) {
+        const years = Math.round(delta / yearToSec);
+        deltaString = sprintf(t("%s years"), years);
+        deltaStringWithPrefixOrSuffix = isPast
+            ? sprintf(t("%s ago"), t(sprintf(t("%s years"), years)))
+            : sprintf(t("in %s"), t(sprintf(t("%s years"), years)));
     }
     if (delta >= 320 * dayToSec && delta < 548 * dayToSec) {
-        return "a year ago";
+        deltaString = t("a year");
+        deltaStringWithPrefixOrSuffix = isPast ? sprintf(t("%s ago"), t("a year")) : sprintf(t("in %s"), t("a year"));
     }
-    return Math.round(delta / yearToSec) + " years ago";
+    if (delta >= 45 * dayToSec && delta < 320 * dayToSec) {
+        const months = Math.round(delta / monthToSec);
+        deltaString = sprintf(t("%s months"), months);
+        deltaStringWithPrefixOrSuffix = isPast
+            ? sprintf(t("%s ago"), t(sprintf(t("%s months"), months)))
+            : sprintf(t("in %s"), t(sprintf(t("%s months"), months)));
+    }
+    if (delta >= 26 * dayToSec && delta < 45 * dayToSec) {
+        deltaString = t("a month");
+        deltaStringWithPrefixOrSuffix = isPast ? sprintf(t("%s ago"), t("a month")) : sprintf(t("in %s"), t("a month"));
+    }
+    if (delta >= 36 * 60 * 60 && delta < 26 * dayToSec) {
+        const days = Math.round(delta / dayToSec);
+        deltaString = sprintf(t("%s days"), days);
+        deltaStringWithPrefixOrSuffix = isPast
+            ? sprintf(t("%s ago"), t(sprintf(t("%s days"), days)))
+            : sprintf(t("in %s"), t(sprintf(t("%s days"), days)));
+    }
+    if (delta >= 22 * hourToSec && delta < 36 * hourToSec) {
+        deltaString = t("a day");
+        deltaStringWithPrefixOrSuffix = isPast ? sprintf(t("%s ago"), t("a day")) : sprintf(t("in %s"), t("a day"));
+    }
+    if (delta >= 90 * minToSec && delta < 22 * hourToSec) {
+        const hours = Math.round(delta / hourToSec);
+        deltaString = sprintf(t("%s hours"), hours);
+        deltaStringWithPrefixOrSuffix = isPast
+            ? sprintf(t("%s ago"), t(sprintf(t("%s hours"), hours)))
+            : sprintf(t("in %s"), t(sprintf(t("%s hours"), hours)));
+    }
+    if (delta >= 45 * minToSec && delta < 90 * minToSec) {
+        deltaString = t("an hour");
+        deltaStringWithPrefixOrSuffix = isPast ? sprintf(t("%s ago"), t("an hour")) : sprintf(t("in %s"), t("an hour"));
+    }
+    if (delta >= 90 && delta < 45 * minToSec) {
+        const minutes = Math.round(delta / minToSec);
+        deltaString = sprintf(t("%s minutes"), minutes);
+        deltaStringWithPrefixOrSuffix = isPast
+            ? sprintf(t("%s ago"), t(sprintf(t("%s minutes"), minutes)))
+            : sprintf(t("in %s"), t(sprintf(t("%s minutes"), minutes)));
+    }
+    if (delta >= 45 && delta < 90) {
+        deltaString = t("a minute");
+        deltaStringWithPrefixOrSuffix = isPast
+            ? sprintf(t("%s ago"), t("a minute"))
+            : sprintf(t("in %s"), t("a minute"));
+    }
+    if (delta < 45) {
+        const seconds = Math.floor(delta);
+        deltaString = sprintf(t("%s seconds"), seconds);
+        deltaStringWithPrefixOrSuffix = isPast
+            ? sprintf(t("%s ago"), t(sprintf(t("%s seconds"), seconds)))
+            : sprintf(t("in %s"), t(sprintf(t("%s seconds"), seconds)));
+    }
+    if (delta < 44) {
+        deltaString = t("a few seconds");
+        deltaStringWithPrefixOrSuffix = isPast
+            ? sprintf(t("%s ago"), t("a few seconds"))
+            : sprintf(t("in %s"), t("a few seconds"));
+    }
+
+    return withPrefixOrSuffix ? deltaStringWithPrefixOrSuffix : deltaString;
 }
 
 export enum DateElement {

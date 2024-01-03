@@ -48,6 +48,8 @@ export const quoteEmbedClasses = useThemeCache(() => {
         ...{
             "&&": {
                 overflow: "visible",
+                marginLeft: "auto",
+                marginRight: "auto",
             },
         },
     });

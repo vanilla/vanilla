@@ -63,6 +63,26 @@ class CategoryPermissionTest extends SiteTestCase
     {
         $actual = \CategoryModel::checkPermission($category["categoryID"], $permission);
         $this->assertEquals($expected, $actual);
+
+        // Test the new non-session based category permission mechanism as well. (Only works for Discussions.View).
+        $categoryModel = \CategoryModel::instance();
+        $categoryIDsWithPermission = $categoryModel->getCategoryIDsWithPermissionForUser(
+            \Gdn::session()->UserID,
+            $permission
+        );
+        if ($expected) {
+            $this->assertContains(
+                $category["categoryID"],
+                $categoryIDsWithPermission,
+                "Expected user to have {$permission} permission in category {$category["name"]}"
+            );
+        } else {
+            $this->assertNotContains(
+                $category["categoryID"],
+                $categoryIDsWithPermission,
+                "Expected user not to have {$permission} permission in category {$category["name"]}"
+            );
+        }
     }
 
     /**

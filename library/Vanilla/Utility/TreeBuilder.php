@@ -124,23 +124,32 @@ final class TreeBuilder
     {
         $sourcesByID = array_column($source, null, $this->recordIDFieldName);
         $rootItemIDs = [];
-        $rootItemIDsWrongRoot = [];
         $childIDsByParentID = [];
 
-        // First pass to collect some IDs.
+        // Build up array of parents
         foreach ($sourcesByID as $sourceID => $sourceRow) {
             $parentID = $sourceRow[$this->parentIDFieldName] ?? null;
-            if ($sourceID === $this->rootID) {
-                // Do nothing, this will be prepended later.
-            } elseif ($parentID === $this->rootID) {
-                $rootItemIDs[] = $sourceID;
-            } elseif ($this->allowUnreachableNodes) {
-                $rootItemIDsWrongRoot[] = $sourceID;
-            } elseif ($this->rootID === null && !isset($sourcesByID[$parentID])) {
-                $rootItemIDs[] = $sourceID;
-            }
-
             $childIDsByParentID[$parentID][] = $sourceID;
+        }
+
+        // Figure out what the root we are building from is.
+        if (isset($sourcesByID[$this->rootID])) {
+            // We have the root in our collection. Build from that.
+            $rootItemIDs = [$this->rootID];
+        } else {
+            foreach ($sourcesByID as $sourceID => $sourceRow) {
+                $parentID = $sourceRow[$this->parentIDFieldName] ?? null;
+                $recordsContainsParent = isset($sourcesByID[$parentID]);
+                $recordHasChildren = count($childIDsByParentID[$sourceID] ?? []) > 0;
+                if ($parentID === $this->rootID) {
+                    // The item is a direct descendant of the root. Start here.
+                    $rootItemIDs[] = $sourceID;
+                } elseif ($this->allowUnreachableNodes && $recordHasChildren && !$recordsContainsParent) {
+                    // The item's parent is not found at all. It's a "hole".
+                    // Stick it in the root because we are allowing unreachable nodes. Otherwise it would be excluded.
+                    $rootItemIDs[] = $sourceID;
+                }
+            }
         }
 
         $seenChildIDs = [];
@@ -179,11 +188,9 @@ final class TreeBuilder
         };
 
         $result = $getChildren($rootItemIDs);
+        $this->sortRecords($result);
 
         if ($this->allowUnreachableNodes) {
-            $wrongRoots = $getChildren($rootItemIDsWrongRoot);
-            $rootItems = [];
-
             // Collect any missing records.
             // This could happen if there are any recursive items.
             $sourceIDs = array_keys($sourcesByID);
@@ -193,15 +200,11 @@ final class TreeBuilder
                 $missingItem = &$sourcesByID[$missingID];
                 $missingItem[$this->childrenFieldName] = [];
 
-                if ($this->rootID !== null && $missingID === $this->rootID) {
-                    $rootItems[] = $missingItem;
-                } else {
-                    $missing[] = $missingItem;
-                }
+                $missing[] = $missingItem;
             }
 
             $this->sortRecords($missing);
-            $result = array_merge($rootItems, $result, $wrongRoots, $missing);
+            $result = array_merge($result, $missing);
         }
 
         return $result;
@@ -260,6 +263,7 @@ final class TreeBuilder
         if ($this->sorter !== null) {
             // Sort the children
             uasort($records, $this->sorter);
+            $records = array_values($records);
         }
     }
 }

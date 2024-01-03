@@ -11,7 +11,14 @@ if ($this->data('warnings')) {
     echo '</ul></div>';
 }
 
+$hidden = $this->data('_Hidden', false);
 echo $this->Form->open(), $this->Form->errors();
+//Add defaults as hidden so that we receive a value on post
+if($hidden) {
+    foreach($hidden as $field => $value){
+       echo '<input type="hidden" name="'.$field.'" value="'.$value.'">';
+    }
+}
 echo $this->Form->simple($this->data('_Controls'));
 
 echo '<div class="js-modal-footer form-footer buttons">';

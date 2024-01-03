@@ -1,15 +1,17 @@
 <?php
 /**
  * @author Isis Graziatto <igraziatto@higherlogic.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Vanilla\Forum\Modules\DiscussionWidgetModule;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Widgets\React\FilterableWidgetTrait;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
@@ -18,6 +20,7 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
 class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements ReactWidgetInterface
 {
     use DiscussionsWidgetSchemaTrait;
+    use FilterableWidgetTrait;
 
     /**
      * @inheridoc
@@ -63,5 +66,37 @@ class DiscussionDiscussionsWidget extends DiscussionWidgetModule implements Reac
         );
 
         return $schema;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getApiSchema(): Schema
+    {
+        $filterTypeSchemaExtraOptions = parent::getFilterTypeSchemaExtraOptions();
+
+        $apiSchema = parent::getBaseApiSchema();
+
+        $apiSchema = $apiSchema->merge(
+            SchemaUtils::composeSchemas(
+                self::filterTypeSchema(["subcommunity", "category", "none"], false, $filterTypeSchemaExtraOptions),
+                self::sortSchema(),
+                self::getSlotTypeSchema(),
+                self::limitSchema()
+            )
+        );
+
+        return $apiSchema;
+    }
+
+    /**
+     * Get the real parameters that we will pass to the API.
+     * @param array|null $params
+     * @return array
+     * @throws ValidationException
+     */
+    protected function getRealApiParams(?array $params = null): array
+    {
+        return $this->getWidgetRealApiParams($params);
     }
 }

@@ -43,7 +43,7 @@ export interface IActiveRecord {
  */
 export default class SiteNavNode extends React.Component<IProps> {
     public static contextType = SiteNavContext;
-    public context!: React.ContextType<typeof SiteNavContext>;
+    declare context: React.ContextType<typeof SiteNavContext>;
 
     public render() {
         const { siteNavNodeTypes } = this.props;
@@ -51,10 +51,16 @@ export default class SiteNavNode extends React.Component<IProps> {
         const isCurrent = this.isActiveRecord();
         const isFirstLevel = this.props.depth === 0;
         const hasChildren = collapsible;
+        const dashboardClasses = siteNavNodeDashboardClasses(isCurrent, isFirstLevel, hasChildren);
+        const normalClasses = siteNavNodeClasses(isCurrent, isFirstLevel, hasChildren);
+
         const classes =
-            siteNavNodeTypes && siteNavNodeTypes === SiteNavNodeTypes.DASHBOARD
-                ? siteNavNodeDashboardClasses(isCurrent, isFirstLevel, hasChildren)
-                : siteNavNodeClasses(isCurrent, isFirstLevel, hasChildren);
+            siteNavNodeTypes === SiteNavNodeTypes.DASHBOARD
+                ? {
+                      ...normalClasses,
+                      ...dashboardClasses,
+                  }
+                : normalClasses;
 
         let linkContents;
 
@@ -66,13 +72,19 @@ export default class SiteNavNode extends React.Component<IProps> {
                     className={classes.link}
                     onClick={this.handleToggleClick as any}
                 >
-                    <span className={classes.label}>{this.props.name}</span>
+                    <span className={classes.label}>
+                        {this.props.iconPrefix}
+                        <span className={classes.labelText}>{this.props.name}</span>
+                        {this.props.iconSuffix}
+                    </span>
                 </Button>
             );
         } else {
             const linkOrButtonContents = (
                 <span className={cx(classes.label, { [`${classes.activeLink}`]: this.props.isLink })}>
-                    {this.props.name}
+                    {this.props.iconPrefix}
+                    <span className={classes.labelText}>{this.props.name}</span>
+                    {this.props.iconSuffix}
                     {this.props.withCheckMark && <CheckCompactIcon className={siteNavNodeClasses().checkMark} />}
                 </span>
             );
@@ -111,7 +123,7 @@ export default class SiteNavNode extends React.Component<IProps> {
 
         const childrenContents =
             collapsible &&
-            this.props.children.map((child) => {
+            this.props.children?.map((child) => {
                 const key = child.recordType + child.recordID;
                 return (
                     <SiteNavNode
@@ -135,7 +147,7 @@ export default class SiteNavNode extends React.Component<IProps> {
                 role="treeitem"
                 aria-expanded={this.isOpen}
             >
-                {collapsible && this.props.children.length > 0 ? (
+                {collapsible && (this.props.children?.length ?? []) > 0 ? (
                     <div
                         className={cx(classes.buttonOffset, {
                             hasNoOffset: this.props.depth === 1,

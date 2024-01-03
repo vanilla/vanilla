@@ -35,7 +35,7 @@ const DiscussionVoteCounter: FunctionComponent<IProps> = ({
 
     let handleToggleUpvoted: VoteCounterProps["onToggleUpvoted"];
 
-    const upvoteReaction = reactions!.find((reaction) => reaction.urlcode === ReactionUrlCode.UP);
+    const upvoteReaction = reactions?.find((reaction) => reaction.urlcode === ReactionUrlCode.UP);
     if (upvoteReaction) {
         handleToggleUpvoted = async function () {
             const callback = hasUpvoted ? removeDiscussionReaction : async () => reactToDiscussion(upvoteReaction);
@@ -52,7 +52,7 @@ const DiscussionVoteCounter: FunctionComponent<IProps> = ({
     }
 
     let handleToggleDownvoted: VoteCounterProps["onToggleDownvoted"];
-    const downvoteReaction = reactions!.find((reaction) => reaction.urlcode === ReactionUrlCode.DOWN);
+    const downvoteReaction = reactions?.find((reaction) => reaction.urlcode === ReactionUrlCode.DOWN);
     if (downvoteReaction) {
         handleToggleDownvoted = async function () {
             const callback = hasDownvoted ? removeDiscussionReaction : async () => reactToDiscussion(downvoteReaction);

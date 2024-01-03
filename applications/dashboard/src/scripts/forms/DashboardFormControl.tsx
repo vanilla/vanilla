@@ -4,32 +4,37 @@
  * @license gpl-2.0-only
  */
 
+import { DashboardAutoComplete } from "@dashboard/forms/DashboardAutoComplete";
 import { DashboardCheckBox } from "@dashboard/forms/DashboardCheckBox";
 import { DashboardCodeEditor } from "@dashboard/forms/DashboardCodeEditor";
+import { DashboardCustomComponent } from "@dashboard/forms/DashboardCustomComponent";
+import { DashboardDatePicker } from "@dashboard/forms/DashboardDatePicker";
 import { DashboardColorPicker } from "@dashboard/forms/DashboardFormColorPicker";
 import { DashboardFormGroup } from "@dashboard/forms/DashboardFormGroup";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardImageUploadGroup } from "@dashboard/forms/DashboardImageUploadGroup";
 import { DashboardInput } from "@dashboard/forms/DashboardInput";
+import { DashboardPasswordInput } from "@dashboard/forms/DashboardPasswordInput";
 import { DashboardRadioButton } from "@dashboard/forms/DashboardRadioButton";
 import { DashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { DashboardToggle } from "@dashboard/forms/DashboardToggle";
+import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 import apiv2 from "@library/apiv2";
 import { FormTreeControl } from "@library/tree/FormTreeControl";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n";
-import { IControlGroupProps, IControlProps } from "@vanilla/json-schema-forms";
-import { AutoComplete, IFormGroupProps } from "@vanilla/ui";
+import { ICommonControl, IControlGroupProps, IControlProps, ICustomControl } from "@vanilla/json-schema-forms";
+import { IFormGroupProps } from "@vanilla/ui";
 import { AutoCompleteLookupOptions } from "@vanilla/ui/src/forms/autoComplete/AutoCompleteLookupOptions";
 import isEmpty from "lodash/isEmpty";
-import React, { useState } from "react";
+import React from "react";
 
-interface IControlOverride {
+interface IControlOverride<T = ICommonControl> {
     /** This boolean controls if the associated component (in callback) should be rendered */
-    condition: (props: IControlProps) => boolean;
+    condition: (props: IControlProps<T>) => boolean;
     /** Expects a react component to be produced, will render when the defined condition is met */
-    callback: (props: IControlProps) => JSX.Element;
+    callback: (props: IControlProps<T>) => JSX.Element;
 }
 
 /**
@@ -40,6 +45,7 @@ interface IControlOverride {
  * @param controlOverrides - Array of one-off controls that should short circuit the returned control
  * @returns
  */
+// TODO: pass onBlur prop to all input components rendered by DashboardFormControl
 export function DashboardFormControl(props: IControlProps, controlOverrides?: IControlOverride[]) {
     const { control, required, disabled, instance, schema, onChange, onBlur, validation, size, autocompleteClassName } =
         props;
@@ -56,35 +62,50 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
         }
     }
 
+    const fieldErrors = props.errors;
     switch (control.inputType) {
         case "textBox":
             const isMultiline = control.type === "textarea";
             const typeIsNumber = control.type === "number";
             const typeIsUrl = control.type === "url";
-            const type = typeIsNumber ? "number" : typeIsUrl ? "url" : "text";
-
-            return (
+            const typeIsPassword = control.type === "password";
+            const type = typeIsNumber ? "number" : typeIsUrl ? "url" : typeIsPassword ? "password" : "text";
+            const inputProps = {
+                value: value ?? "",
+                required,
+                disabled,
+                onBlur,
+                minLength: schema.type === "string" ? control.minLength : undefined,
+                maxLength: schema.type === "string" ? schema.maxLength : undefined,
+                type: !isMultiline ? type : undefined,
+                placeholder: control.placeholder,
+                multiline: isMultiline ? true : false,
+                inputID: control.inputID,
+                "aria-label": control.inputAriaLabel,
+                ...(typeIsNumber && {
+                    min: schema.minimum ?? schema.min,
+                    step: schema.step,
+                }),
+            };
+            return typeIsPassword ? (
+                <DashboardPasswordInput
+                    errors={fieldErrors}
+                    inputProps={inputProps}
+                    onChange={onChange}
+                    renderGeneratePasswordButton
+                />
+            ) : (
                 <DashboardInput
-                    errors={
-                        validation?.errors
-                            ?.filter((error) => error.instancePath === `/${props.path[0]!}`)
-                            .map((e) => {
-                                return {
-                                    message: e.message!,
-                                    field: `${props.path[0]!}`,
-                                };
-                            }) ?? []
-                    }
+                    errors={fieldErrors}
                     inputProps={{
-                        value: value ?? "",
-                        required,
-                        disabled,
-                        onBlur,
-                        onChange: (event) => onChange(event.target.value),
-                        maxLength: schema.type === "string" ? schema.maxLength : undefined,
-                        type: !isMultiline ? type : undefined,
-                        placeholder: control.placeholder,
-                        multiline: isMultiline ? true : false,
+                        ...inputProps,
+                        onChange: (event) => {
+                            const value =
+                                typeIsNumber && event.target.value !== ""
+                                    ? Number(event.target.value)
+                                    : event.target.value;
+                            onChange(value);
+                        },
                     }}
                     multiLineProps={
                         isMultiline
@@ -95,6 +116,7 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     }
                 />
             );
+
         case "codeBox":
             return (
                 <DashboardCodeEditor
@@ -104,6 +126,14 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     jsonSchemaUri={control.jsonSchemaUri}
                     boxHeightOverride={control.boxHeightOverride}
                 />
+            );
+
+        case "richeditor":
+            // Force the Vanilla editor to mobile mode so that the floating toolbar stays within the editor, it otherwise floats offscreen in this view
+            return (
+                <div className="input-wrap">
+                    <VanillaEditor uploadEnabled={false} onChange={onChange} initialContent={value} isMobile />
+                </div>
             );
         case "radio":
             return (
@@ -116,12 +146,21 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                                 key={optionValue}
                                 label={label}
                                 value={optionValue}
+                                tooltip={
+                                    control.tooltipsPerOption && control.tooltipsPerOption[optionValue]
+                                        ? control.tooltipsPerOption[optionValue]
+                                        : undefined
+                                }
                             />
                         ),
                     )}
                 </DashboardRadioGroup>
             );
         case "dropDown":
+        case "tokens":
+            const multiple = control.inputType === "tokens" ? true : control.multiple;
+            const helperText = control.inputType === "dropDown" ? control.helperText : undefined;
+
             const { api, staticOptions } = control.choices;
             const createOptions = () => {
                 if (staticOptions) {
@@ -135,24 +174,22 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                 return undefined;
             };
             return (
-                <div className="input-wrap">
-                    <AutoComplete
-                        value={value}
-                        clear={!required}
-                        placeholder={control.placeholder}
-                        onChange={(value) => {
-                            onChange(value);
-                        }}
-                        onBlur={onBlur}
-                        optionProvider={api ? <AutoCompleteLookupOptions api={apiv2} lookup={api} /> : undefined}
-                        options={createOptions()}
-                        size={size}
-                        className={autocompleteClassName}
-                        multiple={control.multiple}
-                        required={required}
-                        disabled={props.disabled}
-                    />
-                </div>
+                <DashboardAutoComplete
+                    errors={fieldErrors}
+                    afterInput={helperText && <div className={dashboardClasses().helperText}>{helperText}</div>}
+                    value={value}
+                    clear={!required}
+                    placeholder={control.placeholder}
+                    onChange={onChange}
+                    onBlur={onBlur}
+                    optionProvider={api ? <AutoCompleteLookupOptions api={apiv2} lookup={api} /> : undefined}
+                    options={createOptions()}
+                    size={size}
+                    className={autocompleteClassName}
+                    multiple={multiple}
+                    required={required}
+                    disabled={props.disabled}
+                />
             );
         case "checkBox":
             return (
@@ -166,7 +203,10 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                         className={
                             control.labelType === DashboardLabelType.NONE ? dashboardClasses().noLeftPadding : undefined
                         }
-                        disabledNote={control.disabledNote}
+                        tooltip={control.tooltip}
+                        tooltipIcon={control.tooltipIcon}
+                        description={control.description}
+                        name={inputName}
                     />
                 </div>
             );
@@ -196,6 +236,20 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     defaultBackground={control.defaultBackground}
                 />
             );
+        case "datePicker": {
+            return (
+                <DashboardDatePicker
+                    value={value}
+                    onChange={onChange}
+                    disabled={props.disabled}
+                    placeholder={control.placeholder}
+                    inputAriaLabel={control.inputAriaLabel || control.label}
+                />
+            );
+        }
+        case "custom": {
+            return <DashboardCustomComponent {...(props as IControlProps<ICustomControl>)} />;
+        }
         case "empty":
             return <></>;
         default:
@@ -208,19 +262,26 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
  * @param props
  * @returns
  */
-export function DashboardFormControlGroup(props: React.PropsWithChildren<IControlGroupProps> & IFormGroupProps) {
-    const { children, controls } = props;
-    const { label, description, fullSize, inputType, tooltip, labelType } = controls[0];
+export function DashboardFormControlGroup(
+    props: React.PropsWithChildren<IControlGroupProps> & IFormGroupProps & { labelType?: DashboardLabelType },
+) {
+    const { children, controls, required, errors } = props;
+    const { label, legend, description, fullSize, inputType, tooltip, labelType } = controls[0];
+    const isFieldset = ["radio"].includes(inputType);
     if (fullSize || inputType === "upload") {
         return <>{children}</>;
     }
     return (
         <DashboardFormGroup
-            label={label ?? ""}
+            label={legend ?? label ?? ""}
             description={description}
             inputType={inputType}
             tooltip={tooltip}
-            labelType={labelType as DashboardLabelType}
+            labelType={props.labelType ?? (labelType as DashboardLabelType)}
+            inputID={controls[0].inputID}
+            fieldset={isFieldset}
+            required={required}
+            errors={errors}
         >
             {children}
         </DashboardFormGroup>

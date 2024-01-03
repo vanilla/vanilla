@@ -66,6 +66,7 @@ class DbaApiController extends AbstractApiController
                 "LastDiscussionID",
                 "LastCommentID",
                 "LastDateInserted",
+                "CountFollowers",
 
                 // These ones can only be done after the previous ones are complete.
                 "CountAllComments",

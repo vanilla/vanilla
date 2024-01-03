@@ -5,10 +5,11 @@
 
 import React, { PropsWithChildren } from "react";
 import thumbnailGridClasses from "@dashboard/components/ThumbnailGrid.classes";
+import { cx } from "@emotion/css";
 
-export function ThumbnailGrid(props: PropsWithChildren<{}>) {
+export function ThumbnailGrid(props: PropsWithChildren<{ className?: string }>) {
     const classes = thumbnailGridClasses();
-    return <div className={classes.grid}>{props.children}</div>;
+    return <div className={cx(classes.grid, props.className)}>{props.children}</div>;
 }
 
 export function ThumbnailGridItem(props: PropsWithChildren<{}>) {

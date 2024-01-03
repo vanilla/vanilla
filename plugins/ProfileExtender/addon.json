@@ -9,6 +9,7 @@
     "icon": "profile-extender.png",
     "key": "profileextender",
     "type": "addon",
+    "hidden": true,
     "authors": [
         {
             "name": "Lincoln Russell",

@@ -47,11 +47,7 @@ class LayoutHydratorTest extends BootstrapTestCase
      */
     public function testLayoutHydratesTo(array $input, array $expected, array $jsonLDExpected, array $params = [])
     {
-        $hydrator = self::getLayoutService()->getHydrator("home");
-        $actual = $hydrator->resolve($input, $params);
-        // Make sure we see it as the API output would.
-        $actual = json_decode(json_encode($actual), true);
-        $this->assertSame($expected, $actual);
+        $actual = $this->assertHydratesTo($input, $params, $expected);
     }
 
     /**
@@ -66,13 +62,14 @@ class LayoutHydratorTest extends BootstrapTestCase
      */
     public function testHydrateLayout(array $input, array $expected, array $jsonLDExpected, array $params = [])
     {
-        $actual = self::getLayoutService()->hydrateLayout("home", $params, $input);
+        $actual = self::getLayoutHydrator()->hydrateLayout("home", $params, $input);
+        $actual = $this->getLayoutService()->stripSeoHtmlFromHydratedLayout($actual);
         // Make sure we see it as the API output would.
         $this->assertArrayHasKey("seo", $actual);
         $seo = json_decode(json_encode($actual["seo"]), true);
         unset($actual["seo"]);
         $actual = json_decode(json_encode($actual), true);
-        $this->assertEquals(5, count($seo));
+        $this->assertEquals(6, count($seo));
         $this->assertSame($expected, $actual);
         $this->assertSame(json_encode($jsonLDExpected, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), $seo["json-ld"]);
     }
@@ -100,7 +97,7 @@ class LayoutHydratorTest extends BootstrapTestCase
         ];
         $this->mockWebPackAsset();
         $expected = "LeaderboardWidget";
-        $actual = self::getLayoutService()->getAssetLayout("home", [], $leaderboard);
+        $actual = self::getLayoutHydrator()->getAssetLayout("home", [], $leaderboard);
         // Make sure we see it as the API output would.
         $this->assertArrayHasKey("js", $actual);
         $this->assertArrayHasKey("css", $actual);
@@ -148,7 +145,20 @@ class LayoutHydratorTest extends BootstrapTestCase
             ],
             [
                 "@context" => "https://schema.org",
-                "@graph" => [],
+                "@graph" => [
+                    [
+                        "@context" => "http://schema.org",
+                        "@type" => "BreadcrumbList",
+                        "itemListElement" => [
+                            [
+                                "@type" => "ListItem",
+                                "position" => 0,
+                                "name" => "Home",
+                                "item" => "/",
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ];
 
@@ -170,7 +180,20 @@ class LayoutHydratorTest extends BootstrapTestCase
             ],
             [
                 "@context" => "https://schema.org",
-                "@graph" => [],
+                "@graph" => [
+                    [
+                        "@context" => "http://schema.org",
+                        "@type" => "BreadcrumbList",
+                        "itemListElement" => [
+                            [
+                                "@type" => "ListItem",
+                                "position" => 0,
+                                "name" => "Home",
+                                "item" => "/",
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ];
 
@@ -194,7 +217,20 @@ class LayoutHydratorTest extends BootstrapTestCase
             ],
             [
                 "@context" => "https://schema.org",
-                "@graph" => [],
+                "@graph" => [
+                    [
+                        "@context" => "http://schema.org",
+                        "@type" => "BreadcrumbList",
+                        "itemListElement" => [
+                            [
+                                "@type" => "ListItem",
+                                "position" => 0,
+                                "name" => "Home",
+                                "item" => "/",
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ];
 
@@ -233,7 +269,20 @@ class LayoutHydratorTest extends BootstrapTestCase
             ],
             [
                 "@context" => "https://schema.org",
-                "@graph" => [],
+                "@graph" => [
+                    [
+                        "@context" => "http://schema.org",
+                        "@type" => "BreadcrumbList",
+                        "itemListElement" => [
+                            [
+                                "@type" => "ListItem",
+                                "position" => 0,
+                                "name" => "Home",
+                                "item" => "/",
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ];
     }

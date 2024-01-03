@@ -35,7 +35,8 @@ class TreeBuilderTest extends VanillaTestCase
                 $this->resultItem("1.1", 2, 1, [$this->resultItem("1.1.1", 3, 2)]),
                 $this->resultItem("1.2", 4, 1),
             ]),
-            $this->resultItem("recurse1", 5, 6, [$this->resultItem("recurse2", 6, 5)]),
+            $this->resultItem("recurse1", 5, 6),
+            $this->resultItem("recurse2", 6, 5),
             $this->resultItem("2", 100, -1),
         ];
 

@@ -34,6 +34,13 @@ import AdminHeader from "@dashboard/components/AdminHeader";
 import ModernEmbedSettings from "@library/embed/ModernEmbedSettings";
 import { userProfilesSlice } from "@dashboard/userProfiles/state/UserProfiles.slice";
 import { UserProfileSettings } from "@dashboard/userProfiles/UserProfileSettings";
+import { UserPreferences } from "@dashboard/userPreferences/UserPreferences";
+import { EmailSettings } from "@dashboard/emailSettings/notificationSettings/EmailSettings";
+import { DigestSettings } from "@dashboard/emailSettings/digestSettings/DigestSettings";
+import DashboardAddEditUser from "@dashboard/users/userManagement/dashboardAddEditUser/DashboardAddEditUser";
+import UserManagementSpoof from "@dashboard/users/userManagement/UserManagementSpoof";
+import ToggleInputInLegacyForm from "@library/forms/ToggleInputInLegacyForm";
+import { ExternalSearchSettingsPage } from "@dashboard/pages/ExternalSearchSettingsPage";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
@@ -44,6 +51,8 @@ addComponent("VanillaLabsPage", VanillaLabsPage);
 addComponent("LanguageSettingsPage", LanguageSettingsPage);
 addComponent("ModernEmbedSettings", ModernEmbedSettings);
 
+addComponent("UserManagementSpoof", UserManagementSpoof);
+
 disableComponentTheming();
 onContent(() => initAllUserContent());
 registerReducer("roles", roleReducer);
@@ -53,6 +62,10 @@ registerReducer("roleRequests", RoleRequestReducer);
 
 registerReducer(userProfilesSlice.name, userProfilesSlice.reducer);
 addComponent("UserProfileSettings", UserProfileSettings);
+addComponent("UserPreferences", UserPreferences);
+addComponent("EmailSettings", EmailSettings);
+addComponent("DigestSettings", DigestSettings);
+addComponent("toggleInputInLegacyForm", ToggleInputInLegacyForm);
 
 applySharedPortalContext((props) => {
     const [navHeight, setNavHeight] = useState(0);
@@ -100,3 +113,8 @@ onContent(mountDashboardTabs);
 onContent(mountDashboardCodeEditors);
 
 bindToggleChildrenEventListeners();
+addComponent("DashboardAddEditUser", DashboardAddEditUser); //this should be gone when we entirely switch into new react user management page
+addComponent("UserManagementPage", () => {
+    return <Router sectionRoots={["/dashboard/user"]} />;
+});
+addComponent("ExternalSearchSettingsPage", ExternalSearchSettingsPage);

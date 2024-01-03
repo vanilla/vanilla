@@ -32,7 +32,7 @@ export const signInMethodsCSS = useThemeCache(() => {
         maxWidth: calc(`100% - ${styleUnit(formElements.sizing.height - buttonGlobals.padding.horizontal)}`),
         float: "none",
         whiteSpace: "normal",
-        textAlign: "left",
+        textAlign: "start",
         minHeight: 0,
     });
 
@@ -120,7 +120,7 @@ export const signInMethodsCSS = useThemeCache(() => {
                 makeImportant: true,
             }),
             whiteSpace: "normal",
-            textAlign: "left",
+            textAlign: "start",
             lineHeight: vars.lineHeights.condensed,
             display: "flex",
             alignItems: "center",

@@ -1,10 +1,10 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React from "react";
-import { render, fireEvent, waitFor, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import DateTime from "@library/content/DateTime";
 import { setCurrentLocale } from "@vanilla/i18n";
 import { expect } from "chai";
@@ -17,11 +17,17 @@ describe("DateTime", () => {
     });
 
     it("Formats a pretty date", () => {
-        const { container, asFragment } = render(<DateTime timestamp={timeStamp} timezone={"UTC"} />);
+        const { container } = render(<DateTime timestamp={timeStamp} timezone={"UTC"} />);
         const time = container.querySelector("time");
         expect(time).not.equals(null);
         expect(time?.getAttribute("dateTime")).equals(timeStamp);
-        expect(time?.getAttribute("title")).equals("Wednesday, April 22, 2020, 2:31 PM");
+        /**
+         * Seems like chrome is flipping back and forth between which white space character to use
+         * in locale strings. This will normalize them to a regular space for the purposes
+         * of our tests
+         */
+        const title = time?.getAttribute("title")?.replace(/\s/g, " ");
+        expect(title).equals("Wednesday, April 22, 2020 at 2:31 PM");
         expect(time?.textContent).equals("Apr 22, 2020");
     });
 
@@ -29,7 +35,7 @@ describe("DateTime", () => {
         // Type of locale our backend returns.
         // An actual JS locale would be zh-TW.
         setCurrentLocale("zh_TW");
-        const { container, asFragment } = render(<DateTime timestamp={timeStamp} timezone={"UTC"} />);
+        const { container } = render(<DateTime timestamp={timeStamp} timezone={"UTC"} />);
         const time = container.querySelector("time");
         expect(time).not.equals(null);
         expect(time?.getAttribute("dateTime")).equals(timeStamp);

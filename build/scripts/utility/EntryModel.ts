@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2018 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
 
@@ -105,12 +105,16 @@ export default class EntryModel {
      */
     public async getProdEntries(section: string) {
         // A mapping `import()` strings by addon.
-        let importStringsByAddonKey: Record<string, string[]> = {};
+        let dynamicImportStringsByAddonKey: Record<string, string[]> = {};
+        let constantImportStrings: string[] = [];
+
+        const constantImportAddons = ["library", "dashboard", "vanilla"];
 
         // Loop through the addons
         for (const entryDir of this.entryDirs) {
             let importStrings: string[] = [];
             let addonName: string | null = null;
+            let constantImportStringsForAddon: string[] = [];
 
             // The common entry is one shared between sections.
             // An addon may or may not have one.
@@ -124,6 +128,7 @@ export default class EntryModel {
                         "${commonEntry.entryPath}"
                     ).catch(e => console.error("Error loading javascript for addon '${addonName}'", e))`,
                 );
+                constantImportStringsForAddon.push(`import "${commonEntry.entryPath}";`);
             }
 
             // The main entry for the section.
@@ -137,22 +142,25 @@ export default class EntryModel {
                         "${entry.entryPath}"
                     ).catch(e => console.error("Error loading javascript for addon '${addonName}'", e))`,
                 );
+                constantImportStringsForAddon.push(`import "${entry.entryPath}";`);
             }
 
             // If we have entries for the addon, stash them.
-            if (importStrings.length > 0 && addonName) {
-                importStringsByAddonKey[addonName] = importStrings;
+            if (constantImportAddons.includes(addonName ?? "")) {
+                constantImportStrings = [...constantImportStrings, ...constantImportStringsForAddon];
+            } else if (importStrings.length > 0 && addonName) {
+                dynamicImportStringsByAddonKey[addonName] = importStrings;
             }
         }
 
         let synthesizedFile = `
 import { bootstrapVanilla } from "@library/bootstrap";
-import { renderPortals } from "@vanilla/react-utils";
+${constantImportStrings.join("\n")}
 
 const enabledAddonKeys = window.__VANILLA_ENABLED_ADDON_KEYS__;
 let addonPromises = [];
 
-${Object.entries(importStringsByAddonKey)
+${Object.entries(dynamicImportStringsByAddonKey)
     .map(([addonKey, entries]) => {
         return `
 if (enabledAddonKeys.includes("${addonKey}")) {

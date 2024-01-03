@@ -42,12 +42,16 @@ class DiscussionSiteTotalProvider implements SiteSectionTotalProviderInterface
     {
         $rootCategoryID = $siteSection === null ? \CategoryModel::ROOT_ID : $siteSection->getCategoryID();
 
-        $sql = $this->database->createSql()->from("Discussion");
-        if ($rootCategoryID != \CategoryModel::ROOT_ID) {
-            $childCategoryIDs = $this->categoryModel->getCategoriesDescendantIDs([$rootCategoryID]);
-            $sql->where("CategoryID", $childCategoryIDs);
-        }
-        return $sql->getCount();
+        $countDiscussions = $this->database
+            ->createSql()
+            ->select("CountAllDiscussions")
+            ->from($this->getTableName())
+            ->where("CategoryID", $rootCategoryID)
+            ->get()
+            ->resultArray();
+
+        $countDiscussions = $countDiscussions[0]["CountAllDiscussions"];
+        return $countDiscussions;
     }
 
     /**

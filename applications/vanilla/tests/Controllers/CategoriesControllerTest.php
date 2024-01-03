@@ -31,6 +31,7 @@ class CategoriesControllerTest extends TestCase
     {
         parent::setUp();
         $this->setupTestTraits();
+        $this->useLegacyLayouts();
         /** @var \Gdn_Configuration $config */
         $config = $this->container()->get(\Gdn_Configuration::class);
         $config->saveToConfig("Vanilla.Categories.Use", true);
@@ -94,6 +95,36 @@ class CategoriesControllerTest extends TestCase
 
         $data = $this->bessy()->get("/categories/general")->Data;
         $this->assertEquals(2, count($data["CategoryTree"]));
+    }
+
+    /**
+     * Test the discussions that are returned by the `/categories` endpoint.
+     *
+     * @return void
+     */
+    public function testAnnouncementCategoriesIndex()
+    {
+        $this->createDiscussion(["categoryID" => -1]);
+        $category = $this->createCategory();
+        $this->createDiscussion();
+        $this->createDiscussion(["pinned" => true, "pinLocation" => "category"]);
+        $this->createDiscussion(["pinned" => true, "pinLocation" => "recent"]);
+        $data = $this->bessy()->get("/categories/{$category["urlcode"]}")->Data;
+
+        /** @var \Gdn_DataSet $announcements */
+        $announcements = $data["Announcements"]->resultArray();
+        $this->assertEquals(2, count($announcements));
+
+        foreach ($announcements as $announcement) {
+            $this->assertEquals($this->lastInsertedCategoryID, $announcement["CategoryID"]);
+        }
+
+        $discussions = $data["Discussions"]->resultArray();
+        $this->assertEquals(1, count($discussions));
+
+        foreach ($discussions as $discussion) {
+            $this->assertEquals($this->lastInsertedCategoryID, $discussion["CategoryID"]);
+        }
     }
 
     /**

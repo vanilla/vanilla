@@ -230,8 +230,6 @@
         }
 
         .Username {
-            @include ellipsis;
-            max-width: calc(#{$panel_width} - #{$theme-photo-small_size} - (#{$panel-item_padding} * 2) - 80px);
             display: inline-block;
             margin-left: 10px;
             line-height: $theme-photo-small_size;

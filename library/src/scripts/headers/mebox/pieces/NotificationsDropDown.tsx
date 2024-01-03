@@ -9,7 +9,7 @@ import NotificationsContents from "@library/headers/mebox/pieces/NotificationsCo
 import type NotificationsContentsImpl from "@library/headers/mebox/pieces/NotificationsContentsImpl";
 import NotificationsCount from "@library/headers/mebox/pieces/NotificationsCount";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
-import { t } from "@library/utility/appUtils";
+import { getMeta, t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import React from "react";
 
@@ -40,12 +40,13 @@ export default class NotificationsDropDown extends React.Component<IProps, IStat
     public render() {
         const { userSlug } = this.props;
         const classesHeader = titleBarClasses();
+
         return (
             <DropDown
                 contentID={this.id + "-content"}
                 handleID={this.id + "-handle"}
                 name={t("Notifications")}
-                renderLeft={true}
+                renderLeft={!getMeta("ui.isDirectionRTL", false)}
                 buttonClassName={classesHeader.button}
                 contentsClassName={classesHeader.dropDownContents}
                 buttonContents={<NotificationsCount open={this.state.open} compact={false} />}

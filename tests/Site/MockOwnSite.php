@@ -7,7 +7,8 @@
 
 namespace VanillaTests\Site;
 
-use Vanilla\Contracts\Site\Site;
+use Garden\Sites\SiteRecord;
+use Vanilla\Contracts\Site\VanillaSite;
 use Vanilla\Site\OwnSite;
 
 /**
@@ -18,14 +19,20 @@ class MockOwnSite extends OwnSite
     /**
      * Apply properties from a site to the ownsite instance.r
      *
-     * @param Site $site
+     * @param VanillaSite|SiteRecord $site
      */
-    public function applyFrom(Site $site)
+    public function applyFrom($site)
     {
-        $this->siteID = $site->getSiteID();
-        $this->accountID = $site->getAccountID();
-        $this->name = $site->getName();
-        $this->webUrl = $site->getWebUrl();
-        $this->httpClient = $site->getHttpClient();
+        if ($site instanceof OwnSite) {
+            $this->config = $site->config;
+        }
+        if ($site instanceof SiteRecord) {
+            $this->siteRecord = $site;
+        } else {
+            $this->siteRecord = $site->siteRecord;
+            $this->name = $site->getName();
+            $this->setHttpClient($site->httpClient());
+        }
+        $this->clearConfigCache();
     }
 }

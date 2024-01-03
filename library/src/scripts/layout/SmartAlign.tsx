@@ -3,15 +3,15 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ElementType } from "react";
 import { smartAlignClasses } from "@library/layout/smartAlignStyles";
 import { cx } from "@emotion/css";
 
 interface IProps {
     className?: string;
     children: React.ReactNode;
-    outerTag?: keyof JSX.IntrinsicElements;
-    innerTag?: keyof JSX.IntrinsicElements;
+    outerTag?: ElementType;
+    innerTag?: ElementType;
 }
 
 export default class SmartAlign extends React.Component<IProps> {

@@ -14,6 +14,8 @@ use VanillaTests\SiteTestCase;
  */
 class SmokeTest extends SiteTestCase
 {
+    public static $addons = ["stubcontent"];
+
     /** @var  int */
     protected static $restrictedCategoryID;
 
@@ -34,6 +36,7 @@ class SmokeTest extends SiteTestCase
     {
         parent::setUp();
 
+        $this->useLegacyLayouts();
         $this->container()->call(function (\Gdn_Configuration $config) {
             $this->config = $config;
         });
@@ -80,7 +83,7 @@ class SmokeTest extends SiteTestCase
      *
      * @param array $testUser The user to set.
      * @return $this
-     * @see APIv0::queryUserKey()
+     * @see E2ETestClient::queryUserKey()
      */
     public function setTestUser($testUser)
     {

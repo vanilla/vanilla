@@ -474,7 +474,7 @@ class Gdn_Form extends Gdn_Pluggable
         }
 
         // IN THE MEANTIME...
-        return $this->input($fieldName, "text", $attributes);
+        return $this->input($fieldName, "date", $attributes);
     }
 
     /**
@@ -982,13 +982,63 @@ class Gdn_Form extends Gdn_Pluggable
         string $label = "",
         string $description = ""
     ): string {
-        $value = $this->getValue($fieldName, null);
+        $value = $options["value"] ?? $this->getValue($fieldName, null);
+        unset($options["value"]);
 
         return $this->react(
             $fieldName,
             "tokensInputInLegacyForm",
             [
                 "options" => $options,
+                "label" => $label,
+                "description" => $description,
+                "initialValue" => $value,
+            ],
+            ""
+        );
+    }
+
+    /**
+     * A react based toggle input.
+     *
+     * @param string $fieldName The form field name for the input.
+     * @param string $label The label.
+     * @param string $description The description for the form field.
+     * @param array $modal Our React toggle might trigger a modal so this contains some modal attributes
+     * @param bool $dashboardSection Whether our React component is in dashboard or FE.
+     *
+     * @return string
+     */
+    public function toggleInputReact(
+        string $fieldName,
+        string $label = "",
+        string $description = "",
+        array $modal = [],
+        bool $dashboardSection = true
+    ): string {
+        $value = $this->getValue($fieldName, false);
+        return $this->react(
+            $fieldName,
+            "toggleInputInLegacyForm",
+            [
+                "label" => $label,
+                "description" => $description,
+                "initialValue" => $value,
+                "modal" => $modal,
+                "isDashboardSection" => $dashboardSection,
+            ],
+            ""
+        );
+    }
+
+    public function datepickerInputReact(string $fieldName, string $label = "", string $description = ""): string
+    {
+        $value = $this->getValue($fieldName, null);
+
+        return $this->react(
+            $fieldName,
+            "datepickerInLegacyForm",
+            [
                 "label" => $label,
                 "description" => $description,
                 "initialValue" => $value,
@@ -1629,6 +1679,13 @@ class Gdn_Form extends Gdn_Pluggable
      *   InlineErrors  Show inline error message?   TRUE
      *               Allows disabling per-dropdown
      *               for multi-fields like date()
+     *   addMissing  Add current field value to the FALSE
+     *               dropdown, if it is not already
+     *               and option.
+     *  optionFormat If addMissing is set, will     blank
+     *               use this function to set
+     *               display parameter of the
+     *               option tag.
      *
      * @return string
      */
@@ -1682,9 +1739,8 @@ class Gdn_Form extends Gdn_Pluggable
         } elseif ($includeNull) {
             $return .= "<option value=\"\">$includeNull</option>\n";
         }
-
+        $fieldsExist = false;
         if (is_object($dataSet)) {
-            $fieldsExist = false;
             $valueField = arrayValueI("ValueField", $attributes, "value");
             $textField = arrayValueI("TextField", $attributes, "text");
             $data = $dataSet->firstRow();
@@ -1693,6 +1749,7 @@ class Gdn_Form extends Gdn_Pluggable
                     $return .= '<option value="' . htmlspecialchars($data->$valueField) . '"';
                     if (in_array($data->$valueField, $value) && $hasValue) {
                         $return .= ' selected="selected"';
+                        $fieldsExist = true;
                     }
 
                     $return .= ">" . $data->$textField . "</option>\n";
@@ -1710,10 +1767,22 @@ class Gdn_Form extends Gdn_Pluggable
                 $return .= '<option value="' . htmlspecialchars($id) . '"';
                 if (in_array($id, $value) && $hasValue) {
                     $return .= ' selected="selected"';
+                    $fieldsExist = true;
                 }
 
                 $return .= attribute($attribs) . ">" . $text . "</option>\n";
             }
+        }
+
+        if ($hasValue && !$fieldsExist && val("addMissing", $attributes, false)) {
+            $label = is_array($value) ? $value[0] : $value;
+            $return .= '<option value="' . htmlspecialchars($label) . '" selected="selected"';
+            $return .=
+                attribute($attribs) .
+                ">" .
+                (is_callable(val("optionFormat", $attributes, null))
+                    ? $attributes["optionFormat"]($label)
+                    : $label . "</option>\n");
         }
         $return .= "</select>";
 
@@ -3178,7 +3247,7 @@ PASSWORDMETER;
      * Sets the value associated with $fieldName from the sent form fields.
      * Essentially overwrites whatever was retrieved from the form.
      *
-     * @param string $fieldName The name of the field to set the value of.
+     * @param string|array $fieldName The name of the field to set the value of, or an array of name-value pairs.
      * @param mixed $value The new value of $fieldName.
      */
     public function setFormValue($fieldName, $value = null)
@@ -3572,6 +3641,8 @@ PASSWORDMETER;
             "inlineerrors",
             "wrap",
             "categorydata",
+            "optionformat",
+            "addmissing",
         ];
         $return = "";
 

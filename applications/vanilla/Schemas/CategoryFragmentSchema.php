@@ -22,6 +22,7 @@ class CategoryFragmentSchema extends Schema
             $this->parseInternal([
                 "categoryID:i" => "The ID of the category.",
                 "name:s" => "The name of the category.",
+                "description:s?" => "The description of the category.",
                 "url:s" => "Full URL to the category.",
                 "allowedDiscussionTypes:a?" => "An array of discussion types allowed on the category.",
             ])
@@ -33,6 +34,6 @@ class CategoryFragmentSchema extends Schema
      */
     public static function fieldNames(): array
     {
-        return ["categoryID", "name", "url", "allowedDiscussionTypes"];
+        return ["categoryID", "name", "description", "url", "allowedDiscussionTypes"];
     }
 }

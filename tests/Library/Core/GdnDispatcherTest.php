@@ -178,6 +178,7 @@ class GdnDispatcherTest extends SiteTestCase
      */
     public function testHomepage()
     {
+        $this->useLegacyLayouts();
         \Gdn::config()->saveToConfig("Routes.DefaultController", ["discussions", "Internal"]);
         // Homepage should go to the legacy discussions.
         $this->bessy()->assertUrlDispatchesController("/", \DiscussionsController::class, "index");

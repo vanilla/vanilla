@@ -7,7 +7,7 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import SearchOption from "@library/features/search/SearchOption";
 import { t } from "@library/utility/appUtils";
-import { IWithSearchProps, withSearch } from "@library/contexts/SearchContext";
+import { IWithSearchProps, useSearch, withSearch } from "@library/contexts/SearchContext";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import SearchBar from "@library/features/search/SearchBar";
 import { useUniqueID } from "@library/utility/idUtils";
@@ -63,6 +63,7 @@ export function IndependentSearch(props: IIndependentSearchProps) {
     const hasScope = scope.optionsItems.length > 0;
 
     const { pushSmartLocation } = useLinkContext();
+    const { externalSearchQuery } = useSearch();
 
     const scopeValue = scope.value?.value || "";
     const handleSubmit = useCallback(() => {
@@ -71,8 +72,9 @@ export function IndependentSearch(props: IIndependentSearchProps) {
         if ([SEARCH_SCOPE_LOCAL, SEARCH_SCOPE_EVERYWHERE].includes(scopeValue)) {
             queryParams.scope = scopeValue;
         }
-        pushSmartLocation(props.searchOptionProvider.makeSearchUrl(query, queryParams));
-    }, [props.searchOptionProvider, pushSmartLocation, query, scopeValue]);
+
+        pushSmartLocation(props.searchOptionProvider.makeSearchUrl(query, queryParams, externalSearchQuery));
+    }, [props.searchOptionProvider, pushSmartLocation, query, scopeValue, externalSearchQuery]);
 
     const handleSearchChange = useCallback(
         (newQuery: string) => {
@@ -109,7 +111,9 @@ export function IndependentSearch(props: IIndependentSearchProps) {
                 onChange={handleSearchChange}
                 onSearch={handleSubmit}
                 loadOptions={(query, options) =>
-                    props.searchOptionProvider.autocomplete(query, { ...options, scope: scope.value?.value })
+                    externalSearchQuery
+                        ? Promise.resolve([])
+                        : props.searchOptionProvider.autocomplete(query, { ...options, scope: scope.value?.value })
                 }
                 triggerSearchOnClear={false}
                 resultsRef={resultsRef}
@@ -122,6 +126,7 @@ export function IndependentSearch(props: IIndependentSearchProps) {
                 iconContainerClasses={props.iconContainerClasses}
                 scope={props.scope}
                 overwriteSearchBar={props.overwriteSearchBar}
+                disableMenu={!!externalSearchQuery}
             />
             <div
                 ref={resultsRef}

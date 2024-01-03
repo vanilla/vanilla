@@ -30,6 +30,7 @@ export function mountDashboardTabs() {
 
         mountReact(<Tabs data={tabs} legacyButtons />, tabRoot as HTMLElement, undefined, {
             overwrite: true,
+            bypassPortalManager: true,
         });
     });
 }

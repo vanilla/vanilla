@@ -21,6 +21,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  */
 class MediaTest extends AbstractAPIv2Test
 {
+    public static $addons = ["stubcontent"];
     use UsersAndRolesApiTestTrait;
     use SchedulerTestTrait;
 

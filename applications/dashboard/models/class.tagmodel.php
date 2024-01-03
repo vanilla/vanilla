@@ -170,15 +170,11 @@ class TagModel extends Gdn_Model
 
             return $toID;
         } else {
-            if (Gdn::session()->checkPermission("Vanilla.Tagging.Add")) {
-                // Tag-type tags (i.e., user generated tags) are saved with no type.
-                if (strtolower(val("Type", $formPostValues)) == "tag") {
-                    $formPostValues["Type"] = "";
-                }
-                return parent::save($formPostValues, $settings);
-            } else {
-                return false;
+            // Tag-type tags (i.e., user generated tags) are saved with no type.
+            if (strtolower(val("Type", $formPostValues)) == "tag") {
+                $formPostValues["Type"] = "";
             }
+            return parent::save($formPostValues, $settings);
         }
     }
 
@@ -392,7 +388,7 @@ class TagModel extends Gdn_Model
 
         // Select the tags.
         $all_tags = $this->SQL
-            ->select("td.DiscussionID, t.TagID, t.Name, t.FullName")
+            ->select("td.DiscussionID, t.TagID, t.Name, t.FullName, t.Type")
             ->from("TagDiscussion td")
             ->join("Tag t", "t.TagID = td.TagID")
             ->whereIn("td.DiscussionID", $ids)
@@ -432,7 +428,7 @@ class TagModel extends Gdn_Model
      */
     public function getTagFragmentSchema(): Schema
     {
-        $schema = Schema::parse(["tagID:i", "name:s", "urlcode:s?"]);
+        $schema = Schema::parse(["tagID:i", "name:s", "urlcode:s?", "type:s"]);
         return $schema;
     }
 
@@ -468,9 +464,10 @@ class TagModel extends Gdn_Model
         $fullSchema = $fragmentSchema->merge(
             Schema::parse([
                 "urlcode:s",
+                "url:s?",
                 "parentTagID:i?",
                 "type:s?",
-                "insertUserID:i",
+                "insertUserID:i?",
                 "dateInserted:dt",
                 "countDiscussions:i",
             ])
@@ -600,6 +597,11 @@ class TagModel extends Gdn_Model
             if (empty($normalized["name"])) {
                 $normalized["name"] = t("(Untitled)");
             }
+
+            if (empty($normalized["type"])) {
+                $normalized["type"] = "User";
+            }
+
             $normalizedTags[] = $normalized;
         }
 
@@ -908,7 +910,6 @@ class TagModel extends Gdn_Model
 
         $discussionModel = new DiscussionModel();
         $discussions = $discussionModel->getWhere([
-            "Announce" => "all",
             "d.DiscussionID" => $taggedDiscussionIDs,
         ]);
 

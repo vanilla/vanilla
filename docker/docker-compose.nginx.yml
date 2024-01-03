@@ -1,0 +1,55 @@
+name: "vanilla"
+services:
+    nginx:
+        build:
+            context: "./images/nginx"
+        container_name: "nginx"
+        ports:
+            - "80:80"
+            - "8080:8080"
+            - "443:443"
+        networks:
+            vanilla-network:
+                aliases: # Allows (sso|dev).vanilla.localhost to be resolved internally from php-fpm
+                    - "sso.vanilla.localhost"
+                    - "dev.vanilla.localhost"
+                    - "e2e-tests.vanilla.localhost"
+                    - "vanilla.test"
+                    - "vanilla.localhost"
+                    - "queue.vanilla.localhost"
+                    - "elastic.vanilla.localhost"
+                    - "kibana.vanilla.localhost"
+                    - "search.vanilla.localhost"
+        volumes:
+            - "./images/nginx/certs:/usr/local/share/ca-certificates" # Mount self-signed certificates
+
+            # Link our parents so other useful minimal repos like our sso stubs and embed stubs can work.
+            # Also needed so relatively symlinked customer repositories work.
+            - "../../:/srv/vanilla-repositories"
+
+            # Needed in case our current directory is not named vanilla
+            - "../:/srv/vanilla-repositories/vanilla:cached"
+
+            # Not cached for consistency.
+            - "../conf:/srv/vanilla-repositories/conf"
+
+            # A few exclusions so that we don't have to sync some large directories.
+            - "/srv/vanilla-repositories/vanilla/.git" # Don't sync this one.
+            - "/srv/vanilla-repositories/vanilla/node_modules" # Don't sync this one.
+            - "/srv/vanilla-repositories/vanilla/.yarn" # Don't sync this one either.
+
+            # Specifically excluded because it runs in its own container.
+            - /srv/vanilla-repositories/vanilla-queue-service
+            - /srv/vanilla-repositories/vanilla-search-service
+
+            # Sync nginx logs to a volume for usage in the logging container.
+            - logs-nginx:/var/log/nginx
+
+volumes:
+    logs-nginx:
+
+networks:
+    vanilla-network:
+        external: true
+        driver: "bridge"
+        name: "vanilla-network"

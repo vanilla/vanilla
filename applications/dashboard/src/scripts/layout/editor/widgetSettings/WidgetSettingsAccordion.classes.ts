@@ -10,6 +10,9 @@ import { calc } from "csx";
 
 export const widgetSettingsAccordionClasses = useThemeCache(() => {
     const root = css({
+        "&:first-of-type": {
+            marginTop: 24,
+        },
         "&:last-child > .item": {
             borderBottom: "solid 1px #c1cbd7",
         },
@@ -19,6 +22,9 @@ export const widgetSettingsAccordionClasses = useThemeCache(() => {
             top: 8,
             horizontal: 16,
         }),
+        "& > .form-group:last-child": {
+            paddingBottom: 24,
+        },
     });
     const header = css({
         textAlign: "center",

@@ -11,7 +11,7 @@ import { MetaIcon, MetaItem, Metas, MetaTag } from "@library/metas/Metas";
 import SmartLink from "@library/routing/links/SmartLink";
 import { StoryContent } from "@library/storybook/StoryContent";
 import React from "react";
-import { STORY_DATE } from "@library/storybook/storyData";
+import { STORY_DATE_STARTS } from "@library/storybook/storyData";
 import { metasClasses } from "@library/metas/Metas.styles";
 import { TagPreset } from "@library/metas/Tags.variables";
 import { StoryHeading } from "@library/storybook/StoryHeading";
@@ -41,7 +41,7 @@ export function StoryMetasMinimal() {
             <MetaItem>4.3k Comments</MetaItem>
             <MetaIcon icon="meta-external" />
             <MetaItem>
-                <DateTime timestamp={STORY_DATE}></DateTime>
+                <DateTime timestamp={STORY_DATE_STARTS}></DateTime>
             </MetaItem>
         </>
     );
@@ -70,7 +70,7 @@ export function StoryMetasAll() {
                 />
             </MetaItem>
             <MetaItem>
-                <DateTime timestamp={STORY_DATE}></DateTime>
+                <DateTime timestamp={STORY_DATE_STARTS}></DateTime>
             </MetaItem>
         </>
     );

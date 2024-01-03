@@ -44,7 +44,7 @@ export const embedDropdownClasses = useThemeCache(() => {
 
     const optionLabel = style("optionLabel", {
         flex: 1,
-        textAlign: "left",
+        textAlign: "start",
         marginLeft: 12,
     });
 

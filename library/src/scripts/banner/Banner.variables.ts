@@ -501,7 +501,7 @@ export const bannerVariables = useThemeCache(
              */
             Variables.font({
                 color: colors.primaryContrast,
-                align: options.alignment,
+                align: options.alignment === "left" ? "start" : options.alignment,
                 shadow: `0 1px 1px ${ColorsUtils.colorOut(
                     ensureColorHelper(
                         ColorsUtils.modifyColorBasedOnLightness({

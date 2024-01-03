@@ -1,0 +1,19 @@
+name: "vanilla"
+services:
+    # https://docs.imgproxy.net/
+    imgproxy:
+        build:
+            context: "./images/imgproxy"
+        container_name: "imgproxy"
+        networks:
+            - "vanilla-network"
+        environment:
+            - "IMGPROXY_IGNORE_SSL_VERIFICATION=${IMGPROXY_IGNORE_SSL_VERIFICATION:-true}"
+            - "IMGPROXY_KEY=${IMGPROXY_KEY}"
+            - "IMGPROXY_SALT=${IMGPROXY_SALT}"
+            - "IMGPROXY_SIGNATURE_SIZE=32"
+networks:
+    vanilla-network:
+        external: true
+        driver: "bridge"
+        name: "vanilla-network"

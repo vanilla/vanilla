@@ -28,6 +28,9 @@ trait PrunableTrait
      */
     private $pruneLimit = 10;
 
+    /** @var array Extra where clauses for pruning. */
+    private $pruneWhere = [];
+
     /**
      * Get the delete after time.
      *
@@ -48,7 +51,7 @@ trait PrunableTrait
     {
         if ($pruneAfter) {
             // Make sure the string can be converted into a date.
-            $now = time();
+            $now = CurrentTimeStamp::get();
             $testTime = strtotime($pruneAfter, $now);
             if ($testTime === false) {
                 throw new \InvalidArgumentException('Invalid timespan value for "prune after".', 400);
@@ -100,7 +103,12 @@ trait PrunableTrait
             $options["limit"] = $limit;
         }
 
-        $this->delete([$this->getPruneField() . " <" => $date->format("Y-m-d H:i:s")], $options);
+        $this->delete(
+            array_merge($this->pruneWhere, [
+                $this->getPruneField() . " <" => $date->format("Y-m-d H:i:s"),
+            ]),
+            $options
+        );
     }
 
     /**
@@ -122,9 +130,8 @@ trait PrunableTrait
         if (!$this->pruneAfter) {
             return null;
         } else {
-            $tz = new \DateTimeZone("UTC");
-            $now = new \DateTimeImmutable("now", $tz);
-            $test = new \DateTimeImmutable($this->pruneAfter, $tz);
+            $now = CurrentTimeStamp::getDateTime();
+            $test = CurrentTimeStamp::getDateTime()->modify($this->pruneAfter);
 
             $interval = $test->diff($now);
 
@@ -156,5 +163,15 @@ trait PrunableTrait
     {
         $this->pruneLimit = $pruneLimit;
         return $this;
+    }
+
+    /**
+     * Add extra criteria for the items being pruned. Don't forget to index!
+     *
+     * @param array $pruneWhere
+     */
+    public function setPruneWhere(array $pruneWhere): void
+    {
+        $this->pruneWhere = $pruneWhere;
     }
 }

@@ -67,7 +67,13 @@ class FileBasedLayoutProvider implements LayoutProviderInterface
         }
         $cachePath = "{$this->cacheBasePath}/{$layoutID}.php";
         $this->requestedLayoutPath = $this->layoutPaths[$layoutID];
+        if (!file_exists($this->cacheBasePath)) {
+            @mkdir($this->cacheBasePath, 0755);
+        }
         $layout = (array) FileUtils::getCached($cachePath, [$this, "parseRequestedLayoutFile"]);
+
+        $layout = \Gdn::addonManager()->filterDataByAddon($layout);
+
         $this->requestedLayoutPath = null;
         return $layout;
     }

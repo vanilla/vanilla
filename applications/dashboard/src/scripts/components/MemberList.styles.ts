@@ -205,7 +205,7 @@ export const memberListClasses = useThemeCache(() => {
     });
 
     const leftAlign = style("leftAlign", {
-        textAlign: "left",
+        textAlign: "start",
     });
 
     const minHeight = style("minHeight", {

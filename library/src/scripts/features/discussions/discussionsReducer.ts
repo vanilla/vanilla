@@ -13,6 +13,8 @@ import { IReaction } from "@dashboard/@types/api/reaction";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import difference from "lodash/difference";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
+import { useDispatch } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
 export interface IDiscussionsStoreState {
     discussions: IDiscussionState;
 }
@@ -559,3 +561,7 @@ export const discussionsReducer = produce(
             return state;
         }),
 );
+
+const store = configureStore({ reducer: { ["discussions"]: discussionsReducer } });
+type discussionsDispatch = typeof store.dispatch;
+export const useDiscussionsDispatch = () => useDispatch<discussionsDispatch>();

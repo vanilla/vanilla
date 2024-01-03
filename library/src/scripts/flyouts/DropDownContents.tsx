@@ -6,7 +6,7 @@
 
 import * as React from "react";
 import classNames from "classnames";
-import { flyoutPosition } from "@rich-editor/flyouts/pieces/flyoutPosition";
+import { flyoutPosition } from "@library/editor/flyouts/pieces/flyoutPosition";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { TabHandler } from "@vanilla/dom-utils";
 import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";

@@ -7,7 +7,8 @@
 
 namespace VanillaTests\Site;
 
-use Vanilla\Contracts\Site\Site;
+use Garden\Sites\Site;
+use Vanilla\Contracts\Site\VanillaSite;
 use Vanilla\Site\OwnSiteProvider;
 
 /**
@@ -15,40 +16,41 @@ use Vanilla\Site\OwnSiteProvider;
  */
 class MockSiteProvider extends OwnSiteProvider
 {
-    /** @var Site */
-    private $mockSites = [];
+    /** @var array<int, VanillaSite> */
+    private array $mockSites = [];
 
     /**
      * Apply a mock site.
      *
-     * @param Site $site
+     * @param VanillaSite $site
      */
-    public function addMockSite(Site $site): void
+    public function addMockSite(VanillaSite $site): void
     {
-        $this->mockSites[] = $site;
+        $this->mockSites[$site->getSiteID()] = $site;
     }
 
     /**
      * @return array
      */
-    public function getAllSites(): array
+    public function loadAllSiteRecords(): array
     {
-        return array_merge([$this->ownSite], $this->mockSites);
+        $result = [
+            $this->getOwnSite()->getSiteID() => $this->getOwnSite()->getSiteRecord(),
+        ];
+
+        foreach ($this->mockSites as $mockSite) {
+            $result[$mockSite->getSiteID()] = $mockSite->getSiteRecord();
+        }
+        return $result;
     }
 
-    /**
-     * @param Site $ownSite
-     */
-    public function setOwnSite(Site $ownSite): void
+    public function getSite(int $siteID): Site
     {
-        $this->ownSite = $ownSite;
-    }
+        if ($siteID === $this->getOwnSite()->getSiteID()) {
+            return parent::getSite($siteID);
+        }
 
-    /**
-     * @param Site $unknownSite
-     */
-    public function setUnknownSite(Site $unknownSite): void
-    {
-        $this->unknownSite = $unknownSite;
+        $this->getSiteRecord($siteID);
+        return $this->mockSites[$siteID];
     }
 }

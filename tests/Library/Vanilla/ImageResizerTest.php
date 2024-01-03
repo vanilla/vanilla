@@ -408,15 +408,7 @@ class ImageResizerTest extends TestCase
      */
     public function provideResizes(): array
     {
-        $r = [
-            [300, 300, "png"],
-            [300, 300, "jpg"],
-            [100, 100, "png"],
-            [100, 100, "jpg"],
-            [100, 100, "gif"],
-            [32, 32, "ico", ["icoSizes" => [16]]],
-            [50, 100],
-        ];
+        $r = [[300, 300, "png"], [300, 300, "jpg"], [100, 100, "png"], [100, 100, "jpg"], [100, 100, "gif"], [50, 100]];
 
         $r2 = [];
         foreach ($r as $row) {
@@ -443,5 +435,43 @@ class ImageResizerTest extends TestCase
         $actual = ImageResizer::getTypeExt();
         $this->assertIsArray($actual);
         $this->assertNotEmpty($actual);
+    }
+
+    /**
+     * Test that resizing a non-resizeable image (such as ico) throws an exception
+     */
+    public function testNonResizeableImage()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Cannot resize images of this type (ico).");
+        $this->expectExceptionCode(400);
+
+        $source = PATH_ROOT . "/tests/fixtures/apple.ico";
+        $dest = PATH_ROOT . "/tests/cache/image-resizer/" . __FUNCTION__ . ".ico";
+
+        $this->imageResizer->resize($source, $dest, ["width" => 128, "height" => 128]);
+    }
+
+    /**
+     * Test that if the image has sensitive exif data, it is removed
+     */
+    public function testExifDataIsRemoved()
+    {
+        $source = PATH_ROOT . "/tests/fixtures/exif.jpg";
+        $dest = PATH_ROOT . "/tests/cache/image-resizer/exif-test.jpg";
+        if (!function_exists("exif_read_data")) {
+            $this->markTestSkipped("The exif_read_data() function is not available to do this test.");
+        }
+        $exifData = exif_read_data($source);
+        $sensitiveExifData = ["Make", "Model", "Software", "GPSLatitudeRef", "GPSLongitudeRef"];
+        $this->assertIsArray($exifData);
+        foreach ($sensitiveExifData as $key) {
+            $this->assertArrayHasKey($key, $exifData);
+        }
+        $this->imageResizer->resize($source, $dest, ["crop" => false, "width" => 480, "height" => 640]);
+        $exifData = exif_read_data($dest);
+        foreach ($sensitiveExifData as $key) {
+            $this->assertArrayNotHasKey($key, $exifData);
+        }
     }
 }

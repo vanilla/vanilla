@@ -13,17 +13,25 @@ import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import LazyAnnounceDiscussionForm from "@library/features/discussions/forms/LazyAnnounceDiscussionForm";
 import { StackingContextProvider } from "@vanilla/react-utils";
 
-const DiscussionOptionsAnnounce: FunctionComponent<{ discussion: IDiscussion }> = ({ discussion }) => {
+const DiscussionOptionsAnnounce: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
+    discussion,
+    onSuccess,
+}) => {
     const [isVisible, setIsVisible] = useState(false);
     const open = () => setIsVisible(true);
     const close = () => setIsVisible(false);
+
+    async function handleSuccess() {
+        !!onSuccess && (await onSuccess());
+        close();
+    }
 
     return (
         <>
             <DropDownItemButton onClick={open}>{t("Announce")}</DropDownItemButton>
             <StackingContextProvider>
                 <Modal isVisible={isVisible} size={ModalSizes.MEDIUM} exitHandler={close}>
-                    <LazyAnnounceDiscussionForm discussion={discussion} onSuccess={close} onCancel={close} />
+                    <LazyAnnounceDiscussionForm discussion={discussion} onSuccess={handleSuccess} onCancel={close} />
                 </Modal>
             </StackingContextProvider>
         </>

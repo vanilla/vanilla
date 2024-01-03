@@ -49,6 +49,9 @@ class ModerationControllerSmokeTest extends BaseTest
             "Garden.Registration.Method" => "Basic",
             "Garden.Registration.ConfirmEmail" => false,
             "Garden.Registration.SkipCaptcha" => true,
+            "Feature.customLayout.discussionList.Enabled" => false,
+            "Feature.customLayout.home.Enabled" => false,
+            "Feature.customLayout.categoryList.Enabled" => false,
             "Cache.Enabled" => false,
         ]);
 

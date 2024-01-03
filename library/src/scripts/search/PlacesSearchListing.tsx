@@ -6,17 +6,21 @@
 import React from "react";
 import { LoadStatus } from "@library/@types/api/core";
 import { PlacesListingPlaceHolder } from "@library/search/PlacesListingPlaceHolder";
-import { PLACES_DOMAIN_NAME } from "@library/search/searchConstants";
+
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { PlacesSearchListingContainer } from "@library/search/PlacesSearchListingContainer";
 import { useSearchForm } from "@library/search/SearchContext";
+import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain";
+import { ISearchState } from "./searchReducer";
 
-interface IProps {}
+interface IProps {
+    domainSearchResponse: ISearchState["domainSearchResponse"];
+}
 
 export default function PlacesSearchListing(props: IProps) {
-    const { domainSearchResponse } = useSearchForm<{}>();
+    const { domainSearchResponse } = props;
 
-    const response = domainSearchResponse[PLACES_DOMAIN_NAME];
+    const response = domainSearchResponse[PLACES_SEARCH_DOMAIN.key];
     // To prevent situation when component is mounted but response not yet
     // available
     const status = (response && response.status) || LoadStatus.PENDING;

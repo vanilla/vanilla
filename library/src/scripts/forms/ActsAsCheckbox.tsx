@@ -13,12 +13,19 @@ interface IProps {
     onChange: () => any;
     children: (props: { checked: boolean; disabled: boolean }) => JSX.Element;
     title?: string;
+    disabled?: boolean;
 }
 
-const ActsAsCheckbox: FunctionComponent<IProps> = ({ checked = false, onChange, title, children }) => {
+const ActsAsCheckbox: FunctionComponent<IProps> = ({
+    checked = false,
+    onChange,
+    title,
+    children,
+    disabled: _disabled,
+}) => {
     const classes = actsAsCheckboxClasses();
 
-    const [disabled, setDisabled] = useState(false);
+    const [disabled, setDisabled] = useState(!!_disabled);
     async function handleChange() {
         setDisabled(true);
         await Promise.resolve(onChange());

@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -48,6 +48,10 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean; zIndex
         display: "flex",
         width: "100%",
         justifyContent: "center",
+    });
+
+    const rankRow = css({
+        marginTop: 12,
     });
 
     const button = css({
@@ -193,6 +197,7 @@ export const userCardClasses = useThemeCache((props: { compact?: boolean; zIndex
         close,
         userPhoto,
         row,
+        rankRow,
         metas,
         metaItem,
         message,

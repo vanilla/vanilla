@@ -55,6 +55,11 @@ trait PageHeadProxyTrait // implements PageHeadInterface
         return $this;
     }
 
+    public function getJsonLdItems(): array
+    {
+        return $this->proxy->getJsonLdItems();
+    }
+
     /**
      * @inheritdoc
      */

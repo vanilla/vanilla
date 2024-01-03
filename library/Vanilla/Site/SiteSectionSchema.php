@@ -40,6 +40,7 @@ class SiteSectionSchema extends InstanceValidatorSchema
             "sectionGroup" => $section->getSectionGroup(),
             "sectionID" => $section->getSectionID(),
             "name" => $section->getSectionName(),
+            "description" => $section->getSectionDescription(),
             "apps" => $section->applications(),
             "attributes" => $section->getAttributes(),
         ];
@@ -62,6 +63,7 @@ class SiteSectionSchema extends InstanceValidatorSchema
             "sectionGroup:s" => "The group holding this site section (and potentially others).",
             "sectionID:s" => "The id of the site section.",
             "name:s" => "The name of the site section.",
+            "description:s?" => "The description of the site section.",
             "apps:o",
             "attributes:o",
         ]);

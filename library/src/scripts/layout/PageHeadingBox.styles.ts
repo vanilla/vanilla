@@ -26,7 +26,7 @@ export const pageHeadingBoxClasses = useThemeCache((optionOverrides?: Partial<IP
     };
 
     const root = css({
-        textAlign: vars.options.alignment as "left",
+        textAlign: vars.options.alignment === "left" ? "start" : vars.options.alignment,
         display: "flex", // Prevent margin collapse in here.
         flexDirection: "column",
         ...Mixins.margin({

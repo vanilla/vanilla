@@ -154,11 +154,16 @@ class CategorySearchType extends AbstractSearchType
      */
     protected function getCategoryIDs(SearchQuery $query): ?array
     {
+        $siteCategoryIDs = [];
+        if (!empty($query->getQueryParameter("siteSectionID"))) {
+            $siteCategoryIDs = $query->getQueryParameter("categoryIDs");
+        }
         $categoryIDs = $this->categoryModel->getSearchCategoryIDs(
             $query->getQueryParameter("categoryID"),
             $query->getQueryParameter("followedCategories"),
             $query->getQueryParameter("includeChildCategories"),
-            $query->getQueryParameter("includeArchivedCategories")
+            $query->getQueryParameter("includeArchivedCategories"),
+            $siteCategoryIDs
         );
         if (empty($categoryIDs)) {
             $categoryIDs[] = 0;

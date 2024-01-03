@@ -8,11 +8,13 @@
 namespace VanillaTests\Library\Vanilla\Logging;
 
 use Garden\Http\HttpClient;
+use Garden\Sites\SiteRecord;
 use Psr\Log\LoggerInterface;
-use Vanilla\Contracts\Site\Site;
+use Vanilla\Contracts\Site\VanillaSite;
 use Vanilla\Logger;
 use Vanilla\Logging\LogDecorator;
 use Vanilla\Site\OwnSite;
+use Vanilla\Site\OwnSiteProvider;
 use VanillaTests\Site\MockOwnSite;
 use VanillaTests\SiteTestCase;
 use VanillaTests\TestLogger;
@@ -113,7 +115,7 @@ class LogDecoratorTest extends SiteTestCase
         $this->assertLog([
             "message" => "foo",
             "request.method" => "POST",
-            "request.protocol" => "http",
+            "request.protocol" => "https",
             "request.hostname" => "vanilla.test",
             "request.path" => "/my-path/nested",
             "request.clientIP" => "0.0.0.5",
@@ -126,7 +128,13 @@ class LogDecoratorTest extends SiteTestCase
     public function testSiteContext()
     {
         $mockOwnSite = self::container()->get(MockOwnSite::class);
-        $mockOwnSite->applyFrom(new Site("site", "https://test.com", "100", "500", new HttpClient()));
+        $mockOwnSite->applyFrom(
+            new VanillaSite(
+                "site",
+                new SiteRecord(100, 500, null, "cl00000", "https://test.com"),
+                new OwnSiteProvider($mockOwnSite)
+            )
+        );
         self::container()->setInstance(OwnSite::class, $mockOwnSite);
         $this->reset();
         $this->log->info("foo");

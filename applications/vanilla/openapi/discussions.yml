@@ -22,6 +22,12 @@ paths:
                 - $ref: "#/components/parameters/DateInserted"
                 - $ref: "#/components/parameters/DateUpdated"
                 - $ref: "#/components/parameters/DateLastComment"
+                - name: slotType
+                  description: Filter to discussions created within a certain timeframe. Daily, Weekly, Monthly, Yearly, or all time.
+                  in: query
+                  schema:
+                      type: string
+                      enum: ["d", "w", "m", "y", "a"]
                 - description: |-
                       Filter discussions by site section ID (ex. subcommunity).
                       The subcommunity ID or folder can be used if you use [smart IDs](https://success.vanillaforums.com/kb/articles/46-smart-ids).
@@ -30,7 +36,6 @@ paths:
                       ```
                       siteSectionID=$subcommunityID:{id|folder}
                       ```
-                  example: "$subcommunityID:en"
                   in: query
                   name: siteSectionID
                   schema:
@@ -40,7 +45,7 @@ paths:
                   name: tagID
                   schema:
                       $ref: "#/components/schemas/RangeExpression"
-                - description: Filter by discussion type.
+                - description: Filter by discussion type, or comma separated list.
                   in: query
                   name: type
                   schema:
@@ -158,7 +163,6 @@ paths:
                       type: array
                       items:
                           type: integer
-                  example: [1, 2, 3]
                 - description: List of internalStatusIDs to filter discussion by.
                   in: query
                   name: internalStatusID[]
@@ -166,7 +170,6 @@ paths:
                       type: array
                       items:
                           type: integer
-                  example: [1, 2, 3]
             responses:
                 "200":
                     content:
@@ -1049,6 +1052,64 @@ paths:
                     $ref: "#/components/responses/PermissionError"
                 "404":
                     $ref: "#/components/responses/NotFound"
+    "/discussions/{id}/dismiss":
+        put:
+            parameters:
+                - description: The discussion ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                properties:
+                                    dismissed:
+                                        description: The current dismiss value.
+                                        default: true
+                                        type: boolean
+                                type: object
+                    description: Success
+            tags:
+                - Discussions
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                dismissed:
+                                    description: Pass true to dismiss the announcement or false to remove the dismissal.
+                                    type: boolean
+                            type: object
+                required: true
+            summary: Dismiss an announcement.
+    /discussions/{id}/bump:
+        patch:
+            summary: Bump a discussion higher in the list by updating the DateLastComment field.
+            tags:
+                - Discussions
+            parameters:
+                - description: The discussion ID.
+                  in: path
+                  name: id
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                "200":
+                    content:
+                        "application/json":
+                            schema:
+                                $ref: "#/components/schemas/Discussion"
+                    description: Success
+                "404":
+                    description: Not Found
+                "400":
+                    description: Bad Request
+
 components:
     parameters:
         DateLastComment:

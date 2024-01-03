@@ -8,9 +8,9 @@ import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
 import { IHydratedLayoutWidget } from "@library/features/Layout/LayoutRenderer.types";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { registerLoadableWidgets } from "@library/utility/componentRegistry";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import React, { Suspense } from "react";
-import "@testing-library/jest-dom/extend-expect";
+import "@testing-library/jest-dom";
 
 const mockLayout: IHydratedLayoutWidget[] = [
     {
@@ -31,19 +31,20 @@ function Faux() {
 
 describe("registerLoadableWidgets", () => {
     beforeAll(() => {
-        registerLoadableWidgets({
+        return registerLoadableWidgets({
             LazyComponent: () => import("./__fixtures__/MockLazyComponent"),
         });
     });
 
-    it("show fallback before lazy component loads", () => {
+    it("show fallback before lazy component loads", async () => {
         render(<Faux />);
-        const mockLazyWidget = screen.queryByText(/I am the lazy component/i);
-        expect(mockLazyWidget).not.toBeInTheDocument();
+        expect(screen.queryByText(/I am still loading/)).toBeInTheDocument();
     });
 
     it("loads the lazy component", async () => {
-        render(<Faux />);
+        await act(async () => {
+            render(<Faux />);
+        });
         const mockLazyWidget = await screen.findByText(/I am the lazy component/i);
         expect(mockLazyWidget).toBeInTheDocument();
     });

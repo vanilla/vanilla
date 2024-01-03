@@ -25,7 +25,7 @@ export interface IProps extends IInjectableUserState {
 export class DropDownUserCard extends React.Component<IProps> {
     public render() {
         const currentUser = this.props.currentUser.data!;
-        const profileLink = makeProfileUrl(currentUser.name);
+        const profileLink = makeProfileUrl(currentUser.userID, currentUser.name);
         const classesUserDropDown = userDropDownClasses();
         return (
             <li className={classNames(classesUserDropDown.userCard, "dropDown-userCard", this.props.className)}>

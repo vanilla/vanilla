@@ -7,6 +7,7 @@
 
 namespace Vanilla\Formatting\Formats;
 
+use Vanilla\Formatting\FormatRegexReplacements;
 use Vanilla\Formatting\FormatUtil;
 use Vanilla\Formatting\Html\HtmlEnhancer;
 use Vanilla\Formatting\Html\HtmlPlainTextConverter;
@@ -40,9 +41,14 @@ class WysiwygFormat extends HtmlFormat
     /**
      * @inheritdoc
      */
-    public function renderHtml(string $content, bool $enhance = true): string
+    public function renderHtml($content, bool $enhance = true): string
     {
-        $result = FormatUtil::replaceButProtectCodeBlocks('/\\\r\\\n/', "", $content);
+        if ($content instanceof HtmlFormatParsed) {
+            $result = $content;
+        } else {
+            $result = FormatUtil::replaceButProtectCodeBlocks('/\\\r\\\n/', "", $content);
+        }
+
         return parent::renderHtml($result, $enhance);
     }
 
@@ -64,42 +70,40 @@ class WysiwygFormat extends HtmlFormat
      */
     public function removeUserPII(string $username, string $body): string
     {
-        [$pattern["atMention"], $replacement["atMention"]] = $this->getNonRichAtMentionReplacePattern(
-            $username,
-            $this->anonymizeUsername
+        $regex = new FormatRegexReplacements();
+        $regex->addReplacement(...$this->getNonRichAtMentionReplacePattern($username, $this->anonymizeUsername));
+        $regex->addReplacement(...$this->getUrlReplacementPattern($username, $this->anonymizeUrl));
+        $regex->addReplacement(
+            sprintf(
+                '~<div\s+class="QuoteAuthor">\s*<a\s+href="(.+?)"\s+class="(.+?)"\s+data-userid="(\d+)">%s</a>~',
+                preg_quote($username)
+            ),
+            sprintf(
+                '<div class="QuoteAuthor"><a href="%s" class="$2" data-userid="-1">%s</a>',
+                $this->anonymizeUrl,
+                $this->anonymizeUsername
+            )
+        );
+        $regex->addReplacement(
+            "~" . preg_quote(sprintf(t("%s said:"), '<a rel="nofollow">' . $username . "</a>")) . "~",
+            sprintf(t("%s said:"), '<a rel="nofollow">' . $this->anonymizeUsername . "</a>")
         );
 
-        [$pattern["url"], $replacement["url"]] = $this->getUrlReplacementPattern($username, $this->anonymizeUrl);
-
-        $pattern["quote"] =
-            '~<div class="QuoteAuthor">\s*<a href="([^"]+?)" class="([^"]+?)" data-userid="(\d+)">' .
-            $username .
-            "</a>~";
-        $replacement["quote"] =
-            '<div class="QuoteAuthor"><a href="' .
-            $this->anonymizeUrl .
-            '" class="$2" data-userid="$3">' .
-            $this->anonymizeUsername .
-            "</a>";
-
-        return preg_replace($pattern, $replacement, $body);
+        return $regex->replace($body);
     }
 
     /**
      * @inheritDoc
      */
-    public function parseAllMentions(string $body): array
+    public function parseAllMentions($body): array
     {
-        $matches = [];
-        $atMention = $this->getNonRichAtMention();
-        $urlMention = $this->getUrlPattern();
+        if ($body instanceof HtmlFormatParsed) {
+            $body = $body->getRawHtml();
+        }
 
-        $quoteMention =
-            '<div class="QuoteAuthor">\s*<a href="[^"]+?" class="[^"]+?" data-userid="\d+">(?<quote_mentions>[^<]+?)</a>';
-
-        $pattern = "~($atMention|$urlMention|$quoteMention)~";
-        preg_match_all($pattern, $body, $matches, PREG_UNMATCHED_AS_NULL);
-
-        return $this->normalizeMatches($matches);
+        return $this->getNonRichMentions($body, [
+            '<div\s+class="QuoteAuthor">\s*<a\s+href=".+?"\s+class=".+?"\s+data-userid="\d+">(.+?)</a>',
+            sprintf(t("%s said:"), '<a rel="nofollow">(.+?)</a>'),
+        ]);
     }
 }

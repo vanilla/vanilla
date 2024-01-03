@@ -5,9 +5,9 @@
  */
 
 import { logError } from "@vanilla/utils";
-import Ajv, { ErrorObject } from "ajv";
+import { OutputUnit, ValidationResult, Validator } from "@cfworker/json-schema";
 import React, { ReactNode, useContext, useMemo } from "react";
-import { IValidationResult, JsonSchema } from "./types";
+import { IValidationResult, JSONSchemaType, JsonSchema, SchemaErrorMessage } from "./types";
 
 type GenericFlatObject = Record<string, any>;
 
@@ -19,9 +19,7 @@ interface IErrorMessageTransformer {
 
 interface IValidationContext {
     /** A function that performs validation that the JSONSchemaForm can consume */
-    validate(schema: JsonSchema, instance: GenericFlatObject): IValidationResult;
-    /** Instance of the validator, currently AJV */
-    validatorInstance?: Ajv;
+    validate(schema: JSONSchemaType, instance: GenericFlatObject): ValidationResult;
 }
 
 /**
@@ -29,9 +27,9 @@ interface IValidationContext {
  */
 export const FormValidationContext = React.createContext<IValidationContext>({
     // Default to true, if the FE does not catch invalid forms, the server should
-    validate: (schema: JsonSchema, instance: GenericFlatObject) => {
+    validate: (schema: JSONSchemaType, instance: GenericFlatObject): ValidationResult => {
         logError("A ValidationContext has not been defined for this form. Any validation logic is ignored.");
-        return { isValid: true };
+        return { valid: true, errors: [] };
     },
 });
 
@@ -46,61 +44,56 @@ export const FormValidationContext = React.createContext<IValidationContext>({
 export function ValidationProvider(props: { children: ReactNode }) {
     const { children } = props;
 
-    /**
-     * Copied whole sale
-     * from https://github.com/vanilla/vanilla-cloud/commit/7e71d855f08142dc513945f4429d7eaefc6628db
-     * Create a new AVJ instance
-     */
-    const ajv = useMemo(() => {
-        const ajv = new Ajv({
-            allErrors: true,
-            // Will remove additional properties if a schema has { additionalProperties: false }.
-            removeAdditional: true,
-            // Will set defaults automatically.
-            useDefaults: true,
-            // Will make sure types match the schema.
-            coerceTypes: true,
-            // Lets us use discriminators to validate oneOf schemas properly (and remove additional properties)
-            discriminator: true,
-            // AJV is out of date and it doesn't understand the new JSON schema specs.
-            strict: false,
-        });
-        // Add x-control as a supported keyword of the schema.
-        ajv.addKeyword("x-control");
-        // Add x-form as a supported keyword of the schema.
-        ajv.addKeyword("x-form");
-        ajv.addFormat(
-            "url",
-            /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/,
-        );
-        return ajv;
-    }, []);
-
-    const replaceValidationMessages = (errors: ErrorObject[], schema: JsonSchema): ErrorObject[] | null => {
+    const replaceValidationMessages = (errors: OutputUnit[], schema: JSONSchemaType): OutputUnit[] => {
         // Look up error messages in the JsonSchema and replace the AJV messages
-        return errors.map((error: ErrorObject) => {
-            const instancePathAsKey = error.instancePath.replace("/", "");
-            const hasCustomMessage = !!schema?.properties[instancePathAsKey]?.errorMessage;
+        return errors.map((error: OutputUnit) => {
+            const instancePathAsKey = error.instanceLocation.replace(/\/|#/g, "");
+            const hasCustomMessage = !!schema?.properties?.[instancePathAsKey]?.errorMessage;
+
+            const getMatchingCustomMessage = (): string => {
+                let messageToReturn: string = error.error ?? "";
+                const errorMessage = schema?.properties?.[instancePathAsKey]?.errorMessage;
+
+                if (errorMessage && Array.isArray(errorMessage)) {
+                    const customMessage: SchemaErrorMessage | undefined = errorMessage.find(
+                        (item: Record<"keyword" | "message", string>) => item?.keyword === error.keyword,
+                    );
+                    if (customMessage) {
+                        messageToReturn = customMessage.message;
+                    }
+                }
+                if (errorMessage && typeof errorMessage === "string") {
+                    messageToReturn = errorMessage;
+                }
+                return messageToReturn;
+            };
+
             return {
                 ...error,
-                ...(hasCustomMessage && { message: schema?.properties[instancePathAsKey]?.errorMessage }),
+                ...(hasCustomMessage && { error: getMatchingCustomMessage() }),
             };
         });
     };
 
-    const validate = (schema: JsonSchema, instance: GenericFlatObject) => {
-        ajv.validate(schema, instance);
-        return {
-            isValid: !ajv.errors || !ajv.errors.length,
-            errors: ajv.errors ? replaceValidationMessages(ajv.errors, schema) : [],
-        };
+    const validate = (schema: JSONSchemaType, instance: GenericFlatObject): ValidationResult => {
+        try {
+            const validator = new Validator(schema, "2020-12", false);
+            const validationState = validator.validate(instance);
+            return {
+                ...validationState,
+                errors:
+                    validationState.errors.length > 0 ? replaceValidationMessages(validationState.errors, schema) : [],
+            };
+        } catch (error) {
+            logError(error);
+            return {
+                valid: false,
+                errors: [],
+            };
+        }
     };
 
-    return (
-        <FormValidationContext.Provider value={{ validate, validatorInstance: ajv }}>
-            {children}
-        </FormValidationContext.Provider>
-    );
+    return <FormValidationContext.Provider value={{ validate }}>{children}</FormValidationContext.Provider>;
 }
 
 export function useFormValidation() {

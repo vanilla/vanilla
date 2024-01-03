@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -20,12 +20,16 @@ use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\HtmlUtils;
+use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 /**
  * Class for enhancing a twig environment with various vanilla functions & methods.
  */
 class TwigEnhancer
 {
+    use TwigRenderTrait;
+    use HomeWidgetContainerSchemaTrait;
+
     /** @var AddonManager */
     private $addonManager;
 
@@ -154,7 +158,7 @@ class TwigEnhancer
      *
      * @return \Twig\Markup The echoed HTML wrapped as twig markup. All content here should be sanitized already.
      */
-    public function fireEchoEvent(string $eventName, array &$args = []): \Twig\Markup
+    public function fireEchoEvent(string $eventName, array $args = []): \Twig\Markup
     {
         ob_start();
         try {
@@ -326,6 +330,23 @@ class TwigEnhancer
     }
 
     /**
+     * Wrap a function so it's output turns into twig markup.
+     *
+     * @param callable $callable
+     * @return callable
+     */
+    public function wrapInTwigMarkup(callable $callable): callable
+    {
+        return function (...$args) use ($callable) {
+            $result = call_user_func_array($callable, $args);
+            if (!is_string($result)) {
+                $result = "";
+            }
+            return new \Twig\Markup($result, "utf-8");
+        };
+    }
+
+    /**
      * @return string
      */
     public function renderNoop(): string
@@ -345,6 +366,7 @@ class TwigEnhancer
             "getTranslation" => [$this, "getTranslation"],
             "t" => [$this, "getTranslation"],
             "sprintf",
+            "empty",
 
             // Utility`
             "sanitizeUrl" => [\Gdn_Format::class, "sanitizeUrl"],
@@ -356,8 +378,14 @@ class TwigEnhancer
                 },
                 ["is_safe" => ["html"]]
             ),
+            "str_repeat" => "str_repeat",
             "isArray" => [ArrayUtils::class, "isArray"],
             "isAssociativeArray" => [ArrayUtils::class, "isAssociative"],
+
+            // View rendering
+            "renderSeoLinkList" => $this->wrapInTwigMarkup([$this, "renderSeoLinkList"]),
+            "renderSeoUser" => $this->wrapInTwigMarkup([$this, "renderSeoUser"]),
+            "renderWidgetContainerSeoContent" => $this->wrapInTwigMarkup([$this, "renderWidgetContainerSeoContent"]),
 
             // Application interaction.
             "renderControllerAsset" => [$this, "renderControllerAsset"],

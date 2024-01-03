@@ -1015,12 +1015,27 @@ if (!function_exists("isTrustedDomain")) {
             $trusted = null;
         }
 
-        if (empty($url)) {
+        //check if the passed value is a domain or an url
+        if (strpos($url, "http:") === 0 || strpos($url, "https:") === 0) {
+            //This is a complete url
+            $urlParts = parse_url($url);
+            if (!empty($urlParts["user"])) {
+                //we don't currently allow user:pass in the origin header so this can be a malicious request so don't set headers
+                return false;
+            }
+            $domain = $urlParts["host"];
+        } else {
+            $domain = $url;
+        }
+
+        if (empty($domain)) {
             return false;
         }
 
         // Short circuit on our own domain.
-        if (urlMatch(Gdn::request()->host(), $url)) {
+        $request = \Gdn::getContainer()->get(Gdn_Request::class);
+        $currentHost = $request->getHost();
+        if ($currentHost === $domain || urlMatch($currentHost, $domain)) {
             return true;
         }
 

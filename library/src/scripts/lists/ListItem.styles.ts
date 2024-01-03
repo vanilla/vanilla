@@ -102,6 +102,7 @@ export const listItemClasses = useThemeCache(
             alignItems: "center",
             ...(!hasImage && {
                 marginRight: asTile ? 8 : 16,
+                marginInlineEnd: asTile ? 8 : 16,
             }),
             ...(!asTile &&
                 hasImage && {

@@ -222,4 +222,27 @@ class UserMentionsTest extends SiteTestCase
         );
         $this->assertEquals($discussion2["discussionID"], $results->current()["DiscussionID"]);
     }
+
+    /**
+     * Test that mentions from non-existing are still flagged as removed.
+     *
+     * @return void
+     */
+    public function testRemovingNonExistingRecord(): void
+    {
+        $user = $this->createUser(["name" => __FUNCTION__]);
+        $discussion = $this->createDiscussion(["body" => "test @\"{$user["name"]}\""]);
+
+        $database = \Gdn::database();
+        $database->createSql()->delete("Discussion", ["DiscussionID" => $discussion["discussionID"]]);
+        $mentions = $this->userMentionModel->getByUser($user["userID"]);
+        $this->assertEquals(1, count($mentions));
+
+        $response = $this->api()->post("{$this->baseUrl}/{$user["userID"]}/anonymize");
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $mentions = $this->userMentionModel->getByUser($user["userID"]);
+
+        $this->assertEquals("removed", $mentions[0]["status"]);
+    }
 }

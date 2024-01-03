@@ -1,25 +1,27 @@
 {
     "extends": "@vanilla/tsconfig/base.json",
+    "baseUrl": "./",
     "compilerOptions": {
         "paths": {
             "@library/*": ["./library/src/scripts/*"],
             "@vanilla/addon-vanilla/*": ["./applications/vanilla/src/scripts/*"],
             "@dashboard/*": ["./applications/dashboard/src/scripts/*"],
             "@rich-editor/*": ["./plugins/rich-editor/src/scripts/*"],
-            "@openapi-embed/*": ["./plugins/openapi-embed/src/scripts/*"],
-            "@knowledge/*": ["./plugins/knowledge/src/scripts/*"],
-            "@vanillaanalytics/*": ["./plugins/vanillaanalytics/src/scripts/*"],
-            "@FederatedSearch/*": ["./plugins/FederatedSearch/src/scripts/*"],
+            "@openapi-embed/*": ["./cloud/plugins/openapi-embed/src/scripts/*"],
+            "@knowledge/*": ["./cloud/plugins/knowledge/src/scripts/*"],
+            "@vanillaanalytics/*": ["./cloud/plugins/vanillaanalytics/src/scripts/*"],
+            "@FederatedSearch/*": ["./cloud/plugins/FederatedSearch/src/scripts/*"],
             "@oauth2/*": ["./plugins/oauth2/src/scripts/*"],
-            "@webhooks/*": ["./plugins/webhooks/src/scripts/*"],
-            "@themingapi/*": ["./plugins/themingapi/src/scripts/*"],
-            "@subcommunities/*": ["./plugins/subcommunities/src/scripts/*"],
+            "@webhooks/*": ["./cloud/plugins/webhooks/src/scripts/*"],
+            "@themingapi/*": ["./cloud/plugins/themingapi/src/scripts/*"],
+            "@subcommunities/*": ["./cloud/plugins/subcommunities/src/scripts/*"],
+            "@ideation/*": ["./plugins/ideation/src/scripts/*"],
             "@groups/*": ["./applications/groups/src/scripts/*"],
-            "@Ranks/*": ["./plugins/Ranks/src/scripts/*"],
-            "@Reactions/*": ["./plugins/Reactions/src/scripts/*"],
-            "@badges/*": ["./plugins/badges/src/scripts/*"],
-            "@Online/*": ["./plugins/Online/src/scripts/*"],
-            "@ElasticSearch/*": ["./plugins/ElasticSearch/src/scripts/*"],
+            "@Ranks/*": ["./cloud/plugins/Ranks/src/scripts/*"],
+            "@Reactions/*": ["./plugins/Reactions/src/scripts/*", "./cloud/plugins/Reactions/src/scripts/*"],
+            "@badges/*": ["./cloud/plugins/badges/src/scripts/*"],
+            "@Online/*": ["./cloud/plugins/Online/src/scripts/*"],
+            "@ElasticSearch/*": ["./cloud/plugins/ElasticSearch/src/scripts/*"],
             "typestyle": ["./library/src/scripts/styles/styleShim.ts"],
             "@vanilla/babel-preset": ["./packages/vanilla-babel-preset/*"],
             "@vanilla/dom-utils": ["./packages/vanilla-dom-utils/*"],
@@ -46,6 +48,8 @@
         "library/src/scripts/**/*.tsx",
         "applications/*/src/scripts/**/*.ts",
         "applications/*/src/scripts/**/*.tsx",
+        "cloud/plugins/*/src/scripts/**/*.ts",
+        "cloud/plugins/*/src/scripts/**/*.tsx",
         "plugins/*/src/scripts/**/*.ts",
         "plugins/*/src/scripts/**/*.tsx",
         "themes/*/src/scripts/**/*.ts",
@@ -54,5 +58,11 @@
         "addons/themes/*/src/scripts/**/*.tsx",
         ".storybookAppPages/*.ts*"
     ],
-    "exclude": ["**/*.js", "**/*.jsx", "cloud/**/*", "node_modules/**/*", "node_modules", "packages/*/src/*"]
+    "files": [
+        "node_modules/jest-expect-message/types/index.d.ts",
+        "library/src/scripts/htmlWidget/HtmlWidgetEditor.d.ts",
+        "./library/src/scripts/vanilla-editor/plugins/richEmbedPlugin/toolbar/triggerFloatingLinkEdit.tsx",
+        "library/src/scripts/vanilla-editor/VanillaEditorContainer.tsx"
+    ],
+    "exclude": ["**/*.js", "**/*.jsx", "node_modules/**/*", "node_modules", "packages/*/src/*"]
 }

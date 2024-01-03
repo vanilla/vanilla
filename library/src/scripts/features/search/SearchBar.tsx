@@ -32,7 +32,7 @@ import { PLACES_CATEGORY_TYPE, PLACES_KNOWLEDGE_BASE_TYPE, PLACES_GROUP_TYPE } f
 import { Icon } from "@vanilla/icons";
 import { cx } from "@emotion/css";
 import { sprintf } from "sprintf-js";
-import { DEFAULT_SEARCH_SOURCE } from "@library/search/SearchService";
+import COMMUNITY_SEARCH_SOURCE from "@library/search/CommunitySearchSource";
 
 // Re-exported after being moved.
 export type { IComboBoxOption };
@@ -155,7 +155,9 @@ export default React.forwardRef(function SearchBar(
             // If we are provided with a custom spot to mount the menu, mount it there instead.
             Menu: resultsRef
                 ? function MenuWrapper(menuProps: any) {
-                      return <SearchBarMenuPortal {...menuProps} mountRef={resultsRef!} />;
+                      return (
+                          <SearchBarMenuPortal {...menuProps} mountRef={resultsRef!} isDisabled={props.disableMenu} />
+                      );
                   }
                 : selectOverrides.Menu,
             MenuList: selectOverrides.MenuList,
@@ -166,7 +168,7 @@ export default React.forwardRef(function SearchBar(
             LoadingMessage: selectOverrides.OptionLoader,
             Group: selectOverrides.Group,
         };
-    }, [optionComponent, resultsRef]);
+    }, [optionComponent, resultsRef, props.disableMenu]);
 
     const [options, setOptions] = useState<any[]>([]);
 
@@ -209,10 +211,11 @@ export default React.forwardRef(function SearchBar(
 
                     setOptions(results);
 
+                    //first we'll load results with no source specified (e.g. kb, which is still community results) or with "community" source, then results from custom connector
                     return [
-                        ...results.filter(({ source }) => source === DEFAULT_SEARCH_SOURCE.key),
+                        ...results.filter(({ source }) => !source || source === COMMUNITY_SEARCH_SOURCE.key),
                         ...sources
-                            .filter((source) => source.key !== DEFAULT_SEARCH_SOURCE.key)
+                            .filter((source) => source.key !== COMMUNITY_SEARCH_SOURCE.key)
                             .map((source) => ({
                                 label: source.label,
                                 options: results.filter(
@@ -239,12 +242,26 @@ export default React.forwardRef(function SearchBar(
             onKeyDown={
                 props.handleOnKeyDown ??
                 ((event: React.KeyboardEvent<HTMLInputElement>) => {
+                    const triggeringElement = event.target as HTMLInputElement;
+
+                    if (
+                        triggeringElement.value &&
+                        event.key === "Tab" &&
+                        !event.shiftKey &&
+                        triggeringElement.tagName !== "BUTTON"
+                    ) {
+                        event.preventDefault();
+                        const clearButton = triggeringElement.closest(".isClearable")?.querySelector("button");
+                        if (clearButton) {
+                            clearButton.focus();
+                        }
+                    }
+
                     if (!isFocused) {
                         return;
                     }
 
-                    const { target } = event;
-                    if (!(target instanceof HTMLInputElement)) {
+                    if (!(triggeringElement instanceof HTMLInputElement)) {
                         return;
                     }
 
@@ -253,15 +270,15 @@ export default React.forwardRef(function SearchBar(
                     } else if (event.key === "Home") {
                         if (options.length === 0) {
                             event.preventDefault();
-                            target.setSelectionRange(0, 0);
+                            triggeringElement.setSelectionRange(0, 0);
                             setForceMenuClosed(true);
                             return;
                         }
                     } else if (event.key === "End") {
                         if (options.length === 0) {
                             event.preventDefault();
-                            const length = target.value.length;
-                            target.setSelectionRange(length, length);
+                            const length = triggeringElement.value.length;
+                            triggeringElement.setSelectionRange(length, length);
                             return;
                         }
                     }
@@ -319,12 +336,12 @@ const formatReactSelectLabel = (inputValue: string) => {
  * Portal wrapper around the search bar menu.
  */
 function SearchBarMenuPortal(
-    props: MenuProps<any> & { mountRef: React.RefObject<HTMLDivElement> },
+    props: MenuProps<any> & { mountRef: React.RefObject<HTMLDivElement>; isDisabled?: boolean },
     overwriteSearchBar: ISearchBarOverwrites,
 ) {
     const classes = searchBarClasses(overwriteSearchBar);
-    const { mountRef } = props;
-    if (mountRef.current == null) {
+    const { mountRef, isDisabled } = props;
+    if (mountRef.current == null || isDisabled) {
         return null;
     }
 
@@ -381,12 +398,25 @@ function SearchBarControl(props: IControlProps) {
     });
     const [isHovered, setHovered] = useState(false);
 
+    // Use this state to record if the clear button has been clicked
+    const [shouldSearch, setShouldSearch] = useState(false);
+
+    // Destructure some props for convenience
+    const { value: propsValue, triggerSearchOnClear, onSearch } = props;
+
+    // This effect will actually perform the search and "reset" the state
+    useEffect(() => {
+        if (shouldSearch && propsValue?.length < 1) {
+            onSearch();
+            setShouldSearch(false);
+        }
+    }, [onSearch, triggerSearchOnClear, propsValue]);
+
     const clearInput = (event: React.SyntheticEvent) => {
         event.preventDefault();
         props.onChange("");
-        if (props.triggerSearchOnClear) {
-            props.onSearch();
-        }
+        // If the flag is set, we indicate that a search should occur when the value is next updated
+        triggerSearchOnClear && setShouldSearch(true);
         focusInput();
     };
 
@@ -400,30 +430,17 @@ function SearchBarControl(props: IControlProps) {
 
     return (
         <form role="search" className={classNames(classes.form, classes.root)} onSubmit={onFormSubmit}>
-            {props.needsPageTitle && (
-                <Heading
-                    depth={1}
-                    className={classNames("searchBar-heading", classes.heading, {
-                        [visibility().visuallyHidden]: props.noHeading,
-                    })}
-                    title={props.title || t("Search")}
-                >
-                    <label className={classNames("searchBar-label", classes.label)} htmlFor={searchInputID}>
-                        {props.titleAsComponent ? props.titleAsComponent : props.title}
-                    </label>
-                </Heading>
-            )}
             <div
                 onClick={focusInput}
                 className={classNames(classes.content, props.contentClass, {
                     hasFocus: isFocused,
                     withoutScope: !hasScope,
                     withScope: hasScope,
-                    withButton: searchButtonIsVisible,
-                    withoutButton: !searchButtonIsVisible,
+                    withButton: searchButtonIsVisible || hasScope,
+                    withoutButton: !searchButtonIsVisible && !hasScope,
                 })}
             >
-                {!(compact && hasScope) && (
+                {!compact && !hasScope && (
                     <Button
                         buttonType={ButtonTypes.CUSTOM}
                         onClick={() => {
@@ -433,6 +450,7 @@ function SearchBarControl(props: IControlProps) {
                         className={classes.iconContainer(hasScope)}
                         ariaLabel={t("Search")}
                         title={t("Search")}
+                        tabIndex={1}
                     >
                         <Icon size="compact" icon="search-search" />
                     </Button>
@@ -473,8 +491,8 @@ function SearchBarControl(props: IControlProps) {
                                 [classes.compoundValueContainer]: searchButtonIsVisible,
                                 withoutScope: !hasScope,
                                 withScope: hasScope,
-                                withButton: searchButtonIsVisible,
-                                withoutButton: !searchButtonIsVisible,
+                                withButton: searchButtonIsVisible || hasScope,
+                                withoutButton: !searchButtonIsVisible && !hasScope,
                                 compactScope: hasScope && compact,
                             },
                         )}
@@ -493,20 +511,41 @@ function SearchBarControl(props: IControlProps) {
                     </div>
                 </div>
             </div>
+
+            <ConditionalWrap condition={!hasScope} className={visibility().visuallyHidden}>
+                {hasScope && (
+                    <Button
+                        buttonType={ButtonTypes.CUSTOM}
+                        onClick={() => {
+                            focusInput();
+                            props.onSearch();
+                        }}
+                        className={classes.hasScopeIconContainer}
+                        ariaLabel={t("Search")}
+                        title={t("Search")}
+                        tabIndex={0}
+                    >
+                        <Icon size="compact" icon="search-search" />
+                    </Button>
+                )}
+            </ConditionalWrap>
+
             <ConditionalWrap condition={!searchButtonIsVisible} className={visibility().visuallyHidden}>
-                <Button
-                    submit={true}
-                    id={searchButtonID}
-                    buttonType={props.buttonType}
-                    className={cx(classes.submitButton, props.buttonClassName ?? classes.actionButton)}
-                    tabIndex={!searchButtonIsVisible ? 0 : -1}
-                >
-                    {props.isLoading ? (
-                        <ButtonLoader className={props.buttonLoaderClassName} buttonType={props.buttonType} />
-                    ) : (
-                        props.buttonText || t("Search")
-                    )}
-                </Button>
+                {searchButtonIsVisible && (
+                    <Button
+                        submit={true}
+                        id={searchButtonID}
+                        buttonType={props.buttonType}
+                        className={cx(classes.submitButton, props.buttonClassName ?? classes.actionButton)}
+                        tabIndex={0}
+                    >
+                        {props.isLoading ? (
+                            <ButtonLoader className={props.buttonLoaderClassName} buttonType={props.buttonType} />
+                        ) : (
+                            props.buttonText || t("Search")
+                        )}
+                    </Button>
+                )}
             </ConditionalWrap>
         </form>
     );

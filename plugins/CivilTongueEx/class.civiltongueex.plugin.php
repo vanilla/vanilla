@@ -347,9 +347,9 @@ class CivilTonguePlugin extends Gdn_Plugin
      */
     public function gdn_email_beforeSendMail_handler($sender)
     {
-        $sender->PhpMailer->Subject = $this->replace($sender->PhpMailer->Subject);
-        $sender->PhpMailer->Body = $this->replace($sender->PhpMailer->Body);
-        $sender->PhpMailer->AltBody = $this->replace($sender->PhpMailer->AltBody);
+        $sender->getMailer()->setSubject($this->replace($sender->getMailer()->getSubject()), false);
+        $sender->getMailer()->setBodyContent($this->replace($sender->getMailer()->getBodyContent()));
+        $sender->getMailer()->setTextContent($this->replace($sender->getMailer()->getTextContent()));
     }
 
     /**

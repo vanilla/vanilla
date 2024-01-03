@@ -12,6 +12,7 @@ use Psr\Log\LoggerTrait;
 use Psr\Log\LogLevel;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Logging\LogDecorator;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * A logger that can contain many loggers.
@@ -34,6 +35,7 @@ class Logger implements LoggerInterface
     public const FIELD_TARGET_EVENTID = "targetEventId";
     public const FIELD_ATTENDING = "attending";
     public const FIELD_TIMERS = "timers";
+    public const FIELD_SERVICE = "service";
 
     public const FIELDS = [
         self::FIELD_TAGS,
@@ -44,6 +46,7 @@ class Logger implements LoggerInterface
         self::FIELD_USERID,
         self::FIELD_USERNAME,
         self::FIELD_TIMERS,
+        self::FIELD_SERVICE,
     ];
 
     public const CHANNEL_ADMIN = "admin";
@@ -230,8 +233,28 @@ class Logger implements LoggerInterface
         }
         $inCall = true;
 
+        $rawContext = $context;
         // Try to decorate the context.
         $context = LogDecorator::applyLogDecorator($context);
+
+        try {
+            $messageContext = $rawContext + ($rawContext["data"] ?? []);
+            $messageContext = ArrayUtils::flattenArray(".", $messageContext, true);
+
+            foreach ($messageContext as $key => $val) {
+                if (is_string($val) || is_numeric($val)) {
+                    $message = str_replace("{{$key}}", (string) $val, $message);
+                }
+            }
+        } catch (\Throwable $e) {
+            ErrorLogger::warning(
+                "Error formatting string for logging.",
+                ["logger"],
+                [
+                    "exception" => $e,
+                ]
+            );
+        }
 
         foreach ($this->loggers as $row) {
             /* @var LoggerInterface $logger */

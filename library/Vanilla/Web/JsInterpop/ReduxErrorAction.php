@@ -9,6 +9,8 @@ namespace Vanilla\Web\JsInterpop;
 
 use Garden\Web\Data;
 use Garden\Web\Exception\HttpException;
+use Vanilla\Utility\DebugUtils;
+use Vanilla\Utility\StringUtils;
 
 /**
  * A redux error action to render a frontend error page.
@@ -22,13 +24,29 @@ class ReduxErrorAction extends ReduxAction
      */
     public function __construct(\Throwable $throwable)
     {
-        $data = [
-            "message" => $throwable->getMessage(),
-            "status" => $throwable->getCode(),
-        ];
+        if ($throwable->getCode() >= 500 || $throwable->getCode() < 400) {
+            $data = [
+                "message" => get_class($throwable),
+                "description" => StringUtils::sanitizeExceptionMessage($throwable->getMessage()),
+                "status" => $throwable->getCode(),
+            ];
+        } else {
+            $data = [
+                "message" => $throwable->getMessage(),
+                "status" => $throwable->getCode(),
+            ];
+
+            if ($throwable instanceof HttpException) {
+                $data["description"] = $throwable->getDescription();
+            }
+        }
 
         if ($throwable instanceof HttpException) {
-            $data["description"] = $throwable->getDescription();
+            $data += $throwable->getContext();
+        }
+
+        if (DebugUtils::isDebug()) {
+            $data["trace"] = DebugUtils::stackTraceString($throwable->getTrace());
         }
 
         parent::__construct(self::ACTION_TYPE, new Data($data));

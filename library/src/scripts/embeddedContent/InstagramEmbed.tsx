@@ -31,7 +31,7 @@ export function InstagramEmbed(props: IProps): JSX.Element {
     const permaLink = `https://www.instagram.com/p/${props.postID}`;
 
     const link = (
-        <a href={permaLink} rel="nofollow noreferrer ugc">
+        <a href={permaLink} rel="nofollow noopener ugc">
             {permaLink}
         </a>
     );

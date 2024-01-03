@@ -7,7 +7,6 @@
 
 namespace Vanilla\Web\JsInterpop;
 
-use Gdn_Module;
 use Vanilla\Web\TwigRenderTrait;
 use Vanilla\Web\TwigStaticRenderer;
 use Vanilla\Widgets\AbstractWidgetModule;
@@ -51,14 +50,25 @@ abstract class AbstractReactModule extends AbstractWidgetModule implements React
             if ($props === null) {
                 return "";
             }
+            $seoContent = $this->renderSeoHtml($props);
             return TwigStaticRenderer::renderReactModule(
                 $this->getComponentName(),
                 $this->getProps(),
-                $this->cssWrapperClass()
+                $this->cssWrapperClass(),
+                "<noscript>{$seoContent}</noscript>"
             );
         } catch (\Garden\Web\Exception\HttpException $e) {
             trigger_error($e->getMessage(), E_USER_NOTICE);
             return "";
         }
+    }
+
+    /**
+     * @inheritDoc
+     * Stub implementation for legacy widgets that are used in Pockets.
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        return "";
     }
 }

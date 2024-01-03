@@ -24,7 +24,7 @@ export const dropdownSwitchButtonClasses = useThemeCache(() => {
         paddingLeft: styleUnit(14),
         paddingRight: styleUnit(14),
         paddingTop: styleUnit(4),
-        textAlign: "left",
+        textAlign: "start",
         textDecoration: "none",
         userSelect: "none",
         width: percent(100),

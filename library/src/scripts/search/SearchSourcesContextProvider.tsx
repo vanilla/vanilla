@@ -9,24 +9,24 @@ import { SearchService } from "@library/search/SearchService";
 
 interface ISearchSourcesContext {
     sources: ISearchSource[];
-    currentSource: ISearchSource;
+    currentSource: ISearchSource | undefined;
     setCurrentSource: (key: ISearchSource["key"]) => void;
 }
 
 export const SearchSourcesContext = React.createContext<ISearchSourcesContext>({
-    sources: SearchService.pluggableSources,
-    currentSource: SearchService.pluggableSources[0]!,
+    sources: SearchService.sources,
+    currentSource: SearchService.sources[0] ?? undefined,
     setCurrentSource: (_key) => null,
 });
 
 export function SearchSourcesContextProvider(props: { children: ReactNode }) {
     const { children } = props;
 
-    const sources = SearchService.pluggableSources;
+    const sources = SearchService.sources;
 
-    const initialSource = sources[0]!;
+    const initialSource = sources[0] ?? undefined;
 
-    const [currentSource, _setCurrentSource] = useState<ISearchSource>(initialSource);
+    const [currentSource, _setCurrentSource] = useState<ISearchSource | undefined>(initialSource);
 
     /**
      * This effect is responsible for halting all ongoing network request
@@ -34,14 +34,14 @@ export function SearchSourcesContextProvider(props: { children: ReactNode }) {
      */
     useEffect(() => {
         sources.forEach((source) => {
-            if (source.key !== currentSource.key) {
+            if (!!currentSource && source.key !== currentSource.key) {
                 source.abort?.();
             }
         });
     }, [currentSource, sources]);
 
     const setCurrentSource = (sourceKey: ISearchSource["key"]) => {
-        const matchingSource = SearchService.pluggableSources.find(({ key }) => key === sourceKey);
+        const matchingSource = SearchService.sources.find(({ key }) => key === sourceKey);
         if (matchingSource) {
             _setCurrentSource(matchingSource);
         }

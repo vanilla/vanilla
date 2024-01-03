@@ -5,6 +5,7 @@
 
 import React from "react";
 import { IUser } from "@library/@types/api/users";
+import { formatDateStringIgnoringTimezone } from "@library/editProfileFields/utils";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import classNames from "classnames";
 import { t } from "@vanilla/i18n";
@@ -14,13 +15,14 @@ import ProfileLink from "@library/navigation/ProfileLink";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { memberListClasses } from "@dashboard/components/MemberList.styles";
 import DateTime from "@library/content/DateTime";
+import { IResult } from "@library/result/Result";
 
-export interface IMemberResultProps {
+export interface IMemberResult extends IResult {
     // We always have userInfo on these member queries.
     userInfo?: IUser;
 }
 
-export default function Member(props: IMemberResultProps) {
+export default function Member(props: IMemberResult) {
     const user = props.userInfo;
     const { isCompact } = useSection();
 
@@ -33,7 +35,9 @@ export default function Member(props: IMemberResultProps) {
         <tr className={classes.root}>
             <td className={classNames(classes.cell, classes.isLeft, classes.mainColumn)}>
                 <span className={classes.user}>
-                    <UserPhoto size={UserPhotoSize.MEDIUM} userInfo={user} />
+                    <ProfileLink userFragment={user} isUserCard>
+                        <UserPhoto size={UserPhotoSize.MEDIUM} userInfo={user} />
+                    </ProfileLink>
                     <span
                         className={classNames(classes.mainContent, {
                             [classes.mainContentCompact]: isCompact,
@@ -63,20 +67,22 @@ export default function Member(props: IMemberResultProps) {
             {!isCompact && (
                 <td className={classNames(classes.cell, classes.posts, classes.postsColumn)}>
                     <span className={classes.minHeight}>
-                        <NumberFormatted value={user.countComments || 0} />
+                        <NumberFormatted value={user.countPosts || 0} />
                     </span>
                 </td>
             )}
             {!isCompact && (
                 <td className={classNames(classes.cell, classes.date, classes.lastActiveColumn)}>
                     <span className={classes.minHeight}>
-                        <DateTime timestamp={user.dateInserted || ""} />
+                        <DateTime timestamp={formatDateStringIgnoringTimezone(user.dateInserted) || ""} />
                     </span>
                 </td>
             )}
             <td className={classNames(classes.cell, classes.date, classes.isRight, classes.lastActiveColumn)}>
                 <span className={classes.minHeight}>
-                    <DateTime timestamp={user.dateLastActive || ""} />
+                    <DateTime
+                        timestamp={user.dateLastActive ? formatDateStringIgnoringTimezone(user.dateLastActive) : ""}
+                    />
                 </span>
             </td>
         </tr>

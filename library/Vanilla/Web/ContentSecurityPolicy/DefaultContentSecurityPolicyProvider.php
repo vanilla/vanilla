@@ -45,6 +45,9 @@ class DefaultContentSecurityPolicyProvider implements ContentSecurityPolicyProvi
     private function getScriptSources(): array
     {
         $scriptSrcPolicies[] = new Policy(Policy::SCRIPT_SRC, '\'self\'');
+        if ($this->config->get(\SettingsController::CONFIG_CSP_STRICT_DYNAMIC)) {
+            $scriptSrcPolicies[] = new Policy(Policy::SCRIPT_SRC, '\'strict-dynamic\'');
+        }
         if ($whitelist = $this->config->get("ContentSecurityPolicy.ScriptSrc.AllowedDomains", false)) {
             $scriptSrcPolicies[] = new Policy(Policy::SCRIPT_SRC, implode(" ", $whitelist));
         }

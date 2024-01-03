@@ -92,4 +92,28 @@ class GuestCallToActionWidget extends AbstractReactModule implements CombinedPro
             self::getWidgetSpecificSchema(true)
         );
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $signInUrl = url(signInUrl(), true);
+        $registerUrl = url(registerUrl(), true);
+        $links = [];
+        $links[] = [
+            "name" => $props["button"]["title"] ?? null,
+            "url" => $signInUrl,
+        ];
+
+        if ($registerUrl) {
+            $links[] = [
+                "name" => $props["secondButton"]["title"] ?? null,
+                "url" => $registerUrl,
+            ];
+        }
+
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($links));
+        return $result;
+    }
 }

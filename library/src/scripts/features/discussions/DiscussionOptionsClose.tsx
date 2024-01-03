@@ -12,9 +12,11 @@ import React from "react";
 
 interface IProps {
     discussion: IDiscussion;
+    onSuccess?: () => Promise<void>;
 }
 
 export function DiscussionOptionsClose(props: IProps) {
+    const { onSuccess } = props;
     const { discussionID, closed } = props.discussion;
     const { patchDiscussion, isLoading } = useDiscussionPatch(discussionID, "close");
 
@@ -22,8 +24,9 @@ export function DiscussionOptionsClose(props: IProps) {
         <DropDownSwitchButton
             label={closed ? t("Closed") : t("Close")}
             isLoading={isLoading}
-            onClick={() => {
-                patchDiscussion({ closed: !closed });
+            onClick={async () => {
+                await patchDiscussion({ closed: !closed });
+                !!onSuccess && (await onSuccess());
             }}
             status={closed}
         />

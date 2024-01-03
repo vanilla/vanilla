@@ -252,6 +252,17 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess
     }
 
     /**
+     * Set the URL.
+     *
+     * @param $url
+     * @return void
+     */
+    public function setUrl($url): void
+    {
+        $this->data["url"] = $url;
+    }
+
+    /**
      * @return string|null
      */
     public function getExcerpt(): ?string

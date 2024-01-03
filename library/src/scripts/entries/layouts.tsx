@@ -24,7 +24,7 @@ import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
 import NotificationsModel from "@library/features/notifications/NotificationsModel";
 import { LayoutError } from "@library/features/Layout/LayoutErrorBoundary";
 import { HamburgerMenuContextProvider } from "@library/contexts/HamburgerMenuContext";
-import { getSiteSection } from "@library/utility/appUtils";
+import { getMeta, getSiteSection } from "@library/utility/appUtils";
 import { logDebug } from "@vanilla/utils";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { CommunitySearchProvider } from "@vanilla/addon-vanilla/search/CommunitySearchProvider";
@@ -94,7 +94,7 @@ registerLoadableWidgets({
     UserSpotlightWidget: () =>
         import(/* webpackChunkName: "widgets/UserSpotlightWidget" */ "@library/userSpotlight/UserSpotlightWidget"),
     SiteTotalsWidget: () =>
-        import(/* webpackChunkName: "widgets/SiteTotalsWidget" */ "@library/siteTotalsWidget/SiteTotalsWidget"),
+        import(/* webpackChunkName: "widgets/SiteTotalsWidget" */ "@library/siteTotals/SiteTotalsWidget"),
     NewPostMenu: () => import(/* webpackChunkName: "widgets/NewPostMenu" */ "@library/newPostMenu/NewPostMenu"),
     LeaderboardWidget: () =>
         import(/* webpackChunkName: "widgets/LeaderboardWidget" */ "@library/leaderboardWidget/LeaderboardWidget"),
@@ -111,6 +111,10 @@ registerLoadableWidgets({
         import(
             /* webpackChunkName: "widgets/FeaturedCollectionsWidget" */ "@library/featuredCollections/FeaturedCollectionsWidget"
         ),
+    CategoryFollowWidget: () =>
+        import(
+            /* webpackChunkName: "widgets/CategoryFollowWidget" */ "@vanilla/addon-vanilla/categories/CategoryFollowDropdown"
+        ),
 });
 
 // Reducers
@@ -118,15 +122,14 @@ logDebug("Register core reducers");
 registerReducer("notifications", new NotificationsModel().reducer);
 registerReducer("forum", forumReducer);
 registerReducer(layoutSlice.name, layoutSlice.reducer);
-
 logDebug("Register homepage handler");
 registerLayoutPage("/", () => {
     return {
-        layoutViewType: "home",
+        layoutViewType: getSiteSection().sectionID.toString() !== "0" ? "subcommunityHome" : "home",
         recordType: "siteSection",
         recordID: getSiteSection().sectionID,
         params: {
-            siteSectionID: getSiteSection().sectionID,
+            siteSectionID: getSiteSection().sectionID.toString(),
             locale: getSiteSection().contentLocale,
         },
     };

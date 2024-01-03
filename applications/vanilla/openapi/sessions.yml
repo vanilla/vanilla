@@ -1,10 +1,5 @@
 openapi: 3.0.2
 info:
-x-resourceEvents:
-    session:
-        x-addon: "vanilla"
-        name: "Session"
-        type: "session"
 paths:
     /sessions:
         get:

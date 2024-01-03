@@ -40,17 +40,13 @@ interface IProps extends IRadioGroupContext {
 }
 
 export function DashboardRadioGroup(props: IProps) {
-    const { labelID, labelType } = useFormGroup();
+    const { labelType } = useFormGroup();
     const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
     const type = props.type || "radiogroup";
 
     return (
         <RadioGroupContext.Provider value={props}>
-            <div
-                className={classNames(rootClass, { inline: props.isInline }, { grid: props.isGrid })}
-                role={type}
-                aria-labelledby={labelID}
-            >
+            <div className={classNames(rootClass, { inline: props.isInline }, { grid: props.isGrid })} role={type}>
                 {props.children}
             </div>
         </RadioGroupContext.Provider>

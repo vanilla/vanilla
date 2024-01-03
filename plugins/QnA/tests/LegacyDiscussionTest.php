@@ -19,6 +19,7 @@ class LegacyDiscussionTest extends SiteTestCase
 
     public function testLegacyDiscussionsQnaFilter()
     {
+        $this->useLegacyLayouts();
         $this->createCategory();
         $accepted = $this->createQuestion(["name" => "answered question"]);
         $answer = $this->createAnswer();

@@ -30,6 +30,9 @@ Gdn::structure()
     ->column("CountAcceptedAnswers", "int", "0")
     ->set();
 
+// Migrate from feature flag to config setting.
+Gdn::config()->renameConfigKey("Feature.QnAFollowUp.Enabled", "QnA.FollowUp.Enabled");
+
 /** @psalm-suppress InvalidScope */
 if ($this->questionFollowupFeatureEnabled()) {
     Gdn::structure()

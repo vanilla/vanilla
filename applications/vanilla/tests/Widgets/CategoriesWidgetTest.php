@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2008-2022 Vanilla Forums, Inc.
+ * @copyright 2008-2023 Vanilla Forums, Inc.
  * @license Proprietary
  */
 
@@ -15,7 +15,85 @@ use VanillaTests\Forum\Utils\CommunityApiTestTrait;
  */
 class CategoriesWidgetTest extends SiteTestCase
 {
-    use LayoutTestTrait, CommunityApiTestTrait;
+    use LayoutTestTrait;
+    use CommunityApiTestTrait;
+
+    /**
+     * A helper to generate hydrate spec.
+     */
+    public function makeHydrateSpec(array $overrides = []): array
+    {
+        return $overrides + [
+            '$hydrate' => "react.categories",
+            "title" => "My Categories",
+            "titleType" => "static",
+            "descriptionType" => "none",
+        ];
+    }
+
+    /**
+     * A helper to generate expected result.
+     */
+    public function makeExpectedResult(array $overrides = [], array $propsOverrides): array
+    {
+        return $overrides + [
+            '$reactComponent' => "CategoriesWidget",
+            '$reactProps' => $propsOverrides + [
+                "title" => "My Categories",
+                "titleType" => "static",
+                "descriptionType" => "none",
+            ],
+        ];
+    }
+
+    /**
+     * This is a helper to generate category item.
+     */
+    public function makeCategoryItem($category = null, $depth = 1, $childCategory = null): array
+    {
+        $categoryItem = [
+            "to" => $category["url"],
+            "iconUrl" => $category["iconUrl"],
+            "iconUrlSrcSet" => null,
+            "imageUrl" => $category["bannerUrl"],
+            "imageUrlSrcSet" => null,
+            "name" => $category["name"],
+            "description" => $category["description"],
+            "counts" => [
+                [
+                    "labelCode" => "discussions",
+                    "count" => $category["countDiscussions"],
+                    "countAll" => $category["countAllDiscussions"],
+                ],
+                [
+                    "labelCode" => "comments",
+                    "count" => $category["countComments"],
+                    "countAll" => $category["countAllComments"],
+                ],
+                [
+                    "labelCode" => "posts",
+                    "count" => $category["countDiscussions"] + $category["countComments"],
+                    "countAll" => $category["countAllDiscussions"] + $category["countAllComments"],
+                ],
+                [
+                    "labelCode" => "followers",
+                    "count" => $category["countFollowers"],
+                ],
+            ],
+            "categoryID" => $category["categoryID"],
+            "parentCategoryID" => $category["parentCategoryID"],
+            "displayAs" => $category["displayAs"],
+            "depth" => $depth,
+            "children" => [],
+            "lastPost" => null,
+            "preferences" => null,
+        ];
+
+        if ($childCategory) {
+            $categoryItem["children"][] = $this->makeCategoryItem($childCategory, 3);
+        }
+        return $categoryItem;
+    }
 
     /**
      * Test that we can hydrate Categories Widget.
@@ -23,149 +101,102 @@ class CategoriesWidgetTest extends SiteTestCase
     public function testHydrateCategoriesWidget()
     {
         $this->resetTable("Category");
-        $category1 = $this->createCategory(["name" => "My category 1"]);
-        $category2 = $this->createCategory(["name" => "My category 2", "parentCategoryID" => "-1"]);
+        $category1 = $this->createCategory(["name" => "My category 1", "urlCode" => "cat1"]);
+        $category2 = $this->createCategory([
+            "name" => "My category 2",
+            "parentCategoryID" => "-1",
+            "urlCode" => "cat2",
+        ]);
 
-        //the case when we don't specify limit or categoryID/parentCategoryID in apiParams
-        $defaultApiParams = [
-            "filter" => "none",
-            "limit" => 10,
-        ];
-        $spec = [
-            '$hydrate' => "react.categories",
-            "title" => "My Categories",
-        ];
-        //only 1 category
-        $apiParams = [
-            "filter" => "category",
-            "categoryID" => [$category1["categoryID"]],
-            "limit" => 3,
+        $expectedResultForBasicSpec = $this->makeExpectedResult(
+            [],
+            [
+                "apiParams" => [
+                    "filter" => "none",
+                ],
+                "itemData" => [$this->makeCategoryItem($category2), $this->makeCategoryItem($category1)],
+            ]
+        );
+
+        // Default case when we don't specify categoryID/parentCategoryID in apiParams,
+        // we should just expect the 2 categories we have
+        $this->assertHydratesTo($this->makeHydrateSpec(), [], $expectedResultForBasicSpec);
+
+        $categoryFilterApiParams = [
+            "filter" => "featured",
+            "featuredCategoryID" => [$category1["categoryID"]],
         ];
 
-        //with apiParams, itemOptions and containerOptions
-        $spec2 = [
-            '$hydrate' => "react.categories",
-            "title" => "My Categories",
-            "apiParams" => $apiParams,
+        // With apiParams, itemOptions, containerOptions and categoryOptions
+        $specWithCategoryFilterAndOtherOptions = $this->makeHydrateSpec([
+            "apiParams" => $categoryFilterApiParams,
             "containerOptions" => [
                 "borderType" => "border",
                 "displayType" => "list",
             ],
+            "categoryOptions" => [
+                "description" => [
+                    "display" => false,
+                ],
+            ],
             "itemOptions" => [
                 "contentType" => "title-description",
             ],
-        ];
+            '$reactTestID' => "catwidget",
+        ]);
 
-        $expected = [
+        $expectedWithCategoryFilterAndOtherOptions = [
             '$reactComponent' => "CategoriesWidget",
             '$reactProps' => [
                 "title" => "My Categories",
-                "apiParams" => array_merge($defaultApiParams),
-                "itemData" => [
-                    [
-                        "to" => $category2["url"],
-                        "iconUrl" => $category2["iconUrl"],
-                        "iconUrlSrcSet" => null,
-                        "imageUrl" => $category2["bannerUrl"],
-                        "imageUrlSrcSet" => null,
-                        "name" => $category2["name"],
-                        "description" => $category2["description"],
-                        "counts" => [
-                            [
-                                "labelCode" => "discussions",
-                                "count" => $category2["countAllDiscussions"],
-                            ],
-                        ],
-                    ],
-                    [
-                        "to" => $category1["url"],
-                        "iconUrl" => $category1["iconUrl"],
-                        "iconUrlSrcSet" => null,
-                        "imageUrl" => $category1["bannerUrl"],
-                        "imageUrlSrcSet" => null,
-                        "name" => $category1["name"],
-                        "description" => $category1["description"],
-                        "counts" => [
-                            [
-                                "labelCode" => "discussions",
-                                "count" => $category1["countAllDiscussions"],
-                            ],
-                        ],
-                    ],
-                ],
+                "titleType" => "static",
+                "descriptionType" => "none",
+                "apiParams" => $categoryFilterApiParams,
+                "containerOptions" => $specWithCategoryFilterAndOtherOptions["containerOptions"],
+                "categoryOptions" => $specWithCategoryFilterAndOtherOptions["categoryOptions"],
+                "itemOptions" => $specWithCategoryFilterAndOtherOptions["itemOptions"],
+                "itemData" => [$this->makeCategoryItem($category1)],
             ],
+            '$reactTestID' => "catwidget",
+            '$seoContent' => <<<HTML
+<div class=pageBox>
+    <div class=pageHeadingBox>
+        <h2>My Categories</h2>
+    </div>
+    <ul class=linkList>
+        <li><a href=https://vanilla.test/categorieswidgettest/categories/cat1>My category 1</a></li>
+    </ul>
+</div>
+HTML
+        ,
         ];
+        // We expect only filtered category
+        $this->assertHydratesTo($specWithCategoryFilterAndOtherOptions, [], $expectedWithCategoryFilterAndOtherOptions);
 
-        $expected2 = [
-            '$reactComponent' => "CategoriesWidget",
-            '$reactProps' => [
-                "title" => "My Categories",
-                "apiParams" => $apiParams,
-                "containerOptions" => $spec2["containerOptions"],
-                "itemOptions" => $spec2["itemOptions"],
-                "itemData" => [
-                    [
-                        "to" => $category1["url"],
-                        "iconUrl" => $category1["iconUrl"],
-                        "iconUrlSrcSet" => null,
-                        "imageUrl" => $category1["bannerUrl"],
-                        "imageUrlSrcSet" => null,
-                        "name" => $category1["name"],
-                        "description" => $category1["description"],
-                        "counts" => [
-                            [
-                                "labelCode" => "discussions",
-                                "count" => $category1["countAllDiscussions"],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-        $this->assertHydratesTo($spec, [], $expected);
-        $this->assertHydratesTo($spec2, [], $expected2);
-
-        //more categories to test if we specify parent category, we should have only top level categories under it
+        // More categories to test if we specify parent category, we should have only top level categories under it
         $category3 = $this->createCategory(["name" => "My category 3"]);
-        $category4 = $this->createCategory(["name" => "My category 4"]);
+        $category4 = $this->createCategory(["name" => "My category 4", "featured" => true]);
 
-        $parentCategoryApiParams = [
-            "filter" => "parentCategory",
-            "parentCategoryID" => 2,
+        $parentCategoryFilterApiParams = [
+            "filter" => "category",
+            "filterCategorySubType" => "set",
+            "categoryID" => 2,
+            "followed" => false,
         ];
 
-        $spec3 = [
-            '$hydrate' => "react.categories",
-            "title" => "My Categories",
-            "apiParams" => $parentCategoryApiParams,
-        ];
+        $specWithParentCategoryFilter = $this->makeHydrateSpec([
+            "apiParams" => $parentCategoryFilterApiParams,
+        ]);
 
-        $expected3 = [
-            '$reactComponent' => "CategoriesWidget",
-            '$reactProps' => [
-                "title" => "My Categories",
-                "apiParams" => array_merge($parentCategoryApiParams, ["limit" => 10]),
-                "itemData" => [
-                    [
-                        "to" => $category3["url"],
-                        "iconUrl" => $category3["iconUrl"],
-                        "iconUrlSrcSet" => null,
-                        "imageUrl" => $category3["bannerUrl"],
-                        "imageUrlSrcSet" => null,
-                        "name" => $category3["name"],
-                        "description" => $category3["description"],
-                        "counts" => [
-                            [
-                                "labelCode" => "discussions",
-                                "count" => $category3["countAllDiscussions"],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
+        $expectedWithParentCategoryFilter = $this->makeExpectedResult(
+            [],
+            [
+                "apiParams" => $parentCategoryFilterApiParams,
+                "itemData" => [$this->makeCategoryItem($category3, 2, $category4)],
+            ]
+        );
 
-        //should only get category 3, which is direct child of parent category 2
-        $this->assertHydratesTo($spec3, [], $expected3);
+        // Should only get category 3, which is direct child of parent category 2
+        $this->assertHydratesTo($specWithParentCategoryFilter, [], $expectedWithParentCategoryFilter);
     }
 }

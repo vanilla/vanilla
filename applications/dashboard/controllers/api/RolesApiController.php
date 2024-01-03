@@ -149,6 +149,8 @@ class RolesApiController extends AbstractApiController
             "canSession:b" => "Can users in this role start a session?",
             "personalInfo:b" => "Is membership in this role personal information?",
             "permissions:a?" => $this->getPermissionFragment(),
+            "assignable:b?" => "Can the current user assign this role?",
+            "domains:s?" => "Email domains to auto-assignment of domain",
         ]);
         return $schema;
     }
@@ -161,7 +163,9 @@ class RolesApiController extends AbstractApiController
     public function minimalRolesSchema()
     {
         return $this->schema(
-            Schema::parse(["roleID:i", "name:s", "description:s|n"])->add($this->fullSchema()),
+            Schema::parse(["roleID:i", "name:s", "description:s|n" => ["minLength" => 0], "assignable:b?"])->add(
+                $this->fullSchema()
+            ),
             "minimalRanksSchema"
         );
     }
@@ -288,7 +292,7 @@ class RolesApiController extends AbstractApiController
 
         $in = $this->schema(
             [
-                "expand?" => ApiUtils::getExpandDefinition(["permissions"]),
+                "expand?" => ApiUtils::getExpandDefinition(["permissions", "assignable"]),
             ],
             "in"
         )->setDescription("List roles.");
@@ -345,6 +349,10 @@ class RolesApiController extends AbstractApiController
                     throw new ServerException("There are too many permissions to display.", 416);
                 }
                 $dbRecord["permissions"] = $this->getFormattedPermissions($roleID);
+            }
+            if ($this->isExpandField("assignable", $expand) && $this->getSession()->checkPermission("users.edit")) {
+                $assignable = $this->roleModel->getAssignable();
+                $dbRecord["assignable"] = isset($assignable[$roleID]);
             }
         }
 
@@ -525,6 +533,7 @@ class RolesApiController extends AbstractApiController
                     "canSession?",
                     "personalInfo?",
                     "permissions?",
+                    "domains?",
                 ])->add($this->fullSchema()),
                 "RolePost"
             );

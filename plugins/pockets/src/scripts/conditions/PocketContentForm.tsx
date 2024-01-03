@@ -16,6 +16,7 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { ILookupApi } from "@library/forms/select/SelectLookup";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import React, { useEffect, useState } from "react";
+import { JsonSchema } from "@vanilla/json-schema-forms";
 
 interface IProps {
     widgetID?: string | null;
@@ -55,8 +56,39 @@ export function PocketContentForm(props: IProps) {
     const [values, setValues] = useState(props.initialWidgetParameters ?? {});
     const [body, setBody] = useState("");
 
+    /**
+     * Some widget schema's are shared with layout widget and handle default values differently.
+     * This function will set default values from the schema on the initial parameters if they are not already set.
+     *
+     * This should prevent schema resolution and validation from accessing native functions like `sort` on empty arrays.
+     */
+    const setDefaultValuesOnInitialParams = (schema: JsonSchema, values: object): object => {
+        let defaultValues = {};
+        // Iterate through the schema
+        Object.keys(schema).forEach((key) => {
+            // If we don't already have a value for this key, set it
+            if (!values.hasOwnProperty(key)) {
+                if (schema[key].hasOwnProperty("properties")) {
+                    const childValues = setDefaultValuesOnInitialParams(schema[`${key}`].properties, {});
+                    defaultValues[`${key}`] = childValues;
+                } else {
+                    const property = schema[key] ?? {};
+                    if (property.hasOwnProperty("default") && property.default !== null) {
+                        // If the property has a default value, set it
+                        defaultValues[`${key}`] = property.default;
+                    }
+                }
+            }
+        });
+        return defaultValues;
+    };
+
     useEffect(() => {
-        setValues(initialWidgetParameters ?? {});
+        const mergedValues = setDefaultValuesOnInitialParams(
+            typeOption?.data?.schema?.properties ?? {},
+            initialWidgetParameters ?? {},
+        );
+        setValues(mergedValues);
         setMountCounter((value) => value + 1);
     }, [initialWidgetParameters]);
 
@@ -64,6 +96,16 @@ export function PocketContentForm(props: IProps) {
         setBody(initialBody ?? "");
         setMountCounter((value) => value + 1);
     }, [initialBody]);
+
+    useEffect(() => {
+        if (typeOption?.data?.schema?.properties) {
+            const mergedValues = setDefaultValuesOnInitialParams(
+                typeOption.data.schema.properties,
+                initialWidgetParameters ?? {},
+            );
+            setValues(mergedValues);
+        }
+    }, [typeOption]);
 
     return (
         <>

@@ -4,13 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ElementType } from "react";
 import { visibility } from "@library/styles/styleHelpers";
 import classNames from "classnames";
 
 interface IProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
-    tag?: keyof JSX.IntrinsicElements;
+    tag?: ElementType;
 }
 
 /**

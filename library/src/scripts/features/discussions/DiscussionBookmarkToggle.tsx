@@ -10,11 +10,15 @@ import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { useToggleDiscussionBookmarked } from "@library/features/discussions/discussionHooks";
 import BookmarkToggle from "@library/bookmarkToggle/BookmarkToggle";
 
-const DiscussionBookmarkToggle: FunctionComponent<{ discussion: IDiscussion }> = ({ discussion }) => {
+const DiscussionBookmarkToggle: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
+    discussion,
+    onSuccess,
+}) => {
     const { toggleDiscussionBookmarked, isBookmarked } = useToggleDiscussionBookmarked(discussion.discussionID);
 
     async function handleToggleBookmarked() {
-        toggleDiscussionBookmarked(!isBookmarked);
+        await toggleDiscussionBookmarked(!isBookmarked);
+        !!onSuccess && (await onSuccess());
     }
 
     return <BookmarkToggle bookmarked={!!isBookmarked} onToggleBookmarked={handleToggleBookmarked} />;

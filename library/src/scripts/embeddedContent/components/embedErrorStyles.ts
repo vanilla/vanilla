@@ -12,7 +12,7 @@ export const embedErrorClasses = useThemeCache(() => {
     const style = styleFactory("embedError");
     const renderErrorRoot = style("renderErrorRoot", {
         display: "block",
-        textAlign: "left",
+        textAlign: "start",
     });
 
     const renderErrorIconLink = style("renderErrorIconLink", {

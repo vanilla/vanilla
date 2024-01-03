@@ -41,6 +41,7 @@ class ModerationControllerTest extends SiteTestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->useLegacyLayouts();
         /** @var \Gdn_Configuration $config */
         $config = $this->container()->get(\Gdn_Configuration::class);
         $config->saveToConfig("Vanilla.Categories.Use", true);

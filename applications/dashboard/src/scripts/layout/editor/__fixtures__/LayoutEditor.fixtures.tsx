@@ -15,6 +15,7 @@ import {
 import { LoadStatus } from "@library/@types/api/core";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { createReducer, configureStore, DeepPartial } from "@reduxjs/toolkit";
+import { EMPTY_SCHEMA } from "@vanilla/json-schema-forms";
 import { stableObjectHash } from "@vanilla/utils";
 import React, { ReactNode } from "react";
 import { Provider } from "react-redux";
@@ -39,7 +40,7 @@ export class LayoutEditorFixture {
             widgets: {
                 "react.my-widget": {
                     $reactComponent: "MyWidget",
-                    schema: {},
+                    schema: EMPTY_SCHEMA,
                     name: "My Widget",
                 },
             },
@@ -48,13 +49,13 @@ export class LayoutEditorFixture {
                 "react.section.1-column": {
                     $reactComponent: "SectionOneColumn",
                     allowedWidgetIDs: [],
-                    schema: {},
+                    schema: EMPTY_SCHEMA,
                     name: "1 column",
                 },
                 "react.section.2-columns": {
                     $reactComponent: "SectionTwoColumns",
                     allowedWidgetIDs: [],
-                    schema: {},
+                    schema: EMPTY_SCHEMA,
                     name: "2 columns",
                 },
             },
@@ -71,7 +72,7 @@ export class LayoutEditorFixture {
                 return [
                     widget,
                     {
-                        schema: {},
+                        schema: EMPTY_SCHEMA,
                         $reactComponent: "",
                         iconUrl: "test/url/path",
                         name: widget.replace("react.", "").replace(/\./gi, " "),
@@ -138,14 +139,14 @@ export class LayoutEditorFixture {
         };
     }
 
-    public static createMockLayoutsStore(state: { config?: object } = {}) {
+    public static createMockLayoutsStore(state: { config?: object; multisite?: object } = {}) {
         const testReducer = createReducer(
             {
                 config: {
                     configPatchesByID: {},
                     ...state.config,
                 },
-                multisite: {
+                multisite: state.multisite ?? {
                     products: {
                         enabled: false,
                         enableStatus: "SUCCESS",
@@ -159,14 +160,14 @@ export class LayoutEditorFixture {
                         subcommunitiesByID: {
                             status: "SUCCESS",
                             data: {
-                                "1": {
+                                10: {
                                     subcommunityID: 10,
                                     name: "Test Subcommunity",
                                     folder: "en",
                                     description: "",
-                                    categoryID: 16,
+                                    categoryID: null,
                                     locale: "en",
-                                    url: "https://dev.vanilla.localhost/es",
+                                    url: "https://dev.vanilla.localhost/en",
                                     siteSectionGroup: "subcommunities-group-10",
                                     siteSectionID: "subcommunities-section-10",
                                     isDefault: false,

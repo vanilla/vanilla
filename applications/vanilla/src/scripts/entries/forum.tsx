@@ -5,7 +5,7 @@
 
 import { registerReducer } from "@library/redux/reducerRegistry";
 import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
-import { registerCommunitySearchDomain } from "@vanilla/addon-vanilla/search/registerCommunitySearchDomain";
+import DISCUSSIONS_SEARCH_DOMAIN from "@vanilla/addon-vanilla/search/DiscussionsSearchDomain";
 import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { CommunitySearchProvider } from "@vanilla/addon-vanilla/search/CommunitySearchProvider";
 import { accessibleRoleButton } from "@vanilla/addon-vanilla/legacy/legacyAccessibility";
@@ -32,9 +32,23 @@ import { onReady } from "@library/utility/appUtils";
 import { AboutMeWidget } from "@library/aboutMeWidget/AboutMeWidget";
 import { ProfileOverviewWidget } from "@library/profileOverviewWidget/ProfileOverviewWidget";
 import { ProfileAnalyticsWidget } from "@library/profileAnalyticsWidget/ProfileAnalyticsWidget";
+import { AccountSettings } from "@library/accountSettings/AccountSettings";
+import { EditProfileFields } from "@library/editProfileFields/EditProfileFields";
+import { FollowedContent } from "@library/followedContent/FollowedContent";
+import { delegateEvent } from "@vanilla/dom-utils";
+import { mountModal } from "@library/modal/mountModal";
+import { CollectionRecordTypes } from "@library/featuredCollections/Collections.variables";
+import React from "react";
+import { CollectionsOptionButton } from "@library/featuredCollections/CollectionsOptionButton";
+import { UnsubscribePageRoute } from "@library/unsubscribe/unsubscribePageRoutes";
+import { Router } from "@library/Router";
+import NotificationPreferences from "@library/notificationPreferences";
+import COMMUNITY_SEARCH_SOURCE from "@library/search/CommunitySearchSource";
 
 registerReducer("forum", forumReducer);
-registerCommunitySearchDomain();
+onReady(() => {
+    COMMUNITY_SEARCH_SOURCE.addDomain(DISCUSSIONS_SEARCH_DOMAIN);
+});
 
 addComponent("HomeWidget", HomeWidget, { overwrite: true });
 addComponent("DiscussionListModule", DiscussionListModule, { overwrite: true });
@@ -56,9 +70,34 @@ addComponent("CallToActionWidget", CallToActionWidget, { overwrite: true });
 addComponent("AboutMeWidget", AboutMeWidget, { overwrite: true });
 addComponent("ProfileOverviewWidget", ProfileOverviewWidget, { overwrite: true });
 addComponent("ProfileAnalyticsWidget", ProfileAnalyticsWidget, { overwrite: true });
+addComponent("AccountSettings", AccountSettings, { overwrite: true });
+addComponent("EditProfileFields", EditProfileFields, { overwrite: true });
+addComponent("FollowedContent", FollowedContent, { overwrite: true });
+addComponent("NotificationPreferences", NotificationPreferences, { overwrite: true });
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();
 onReady(() => {
     triggerLegacyHashScrolling();
+});
+
+Router.addRoutes([UnsubscribePageRoute.route]);
+
+delegateEvent("click", ".js-addDiscussionToCollection", (event, triggeringElement) => {
+    event.preventDefault();
+    const discussionID = triggeringElement.getAttribute("data-discussionID") || null;
+    const recordType = triggeringElement.getAttribute("data-recordType");
+
+    if (discussionID === null) {
+        return;
+    }
+    const id = parseInt(discussionID, 10);
+    mountModal(
+        <CollectionsOptionButton
+            initialVisibility={true}
+            recordID={id}
+            recordType={recordType as CollectionRecordTypes}
+            modalOnly
+        />,
+    );
 });

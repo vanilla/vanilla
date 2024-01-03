@@ -187,6 +187,10 @@ components:
                     minLength: 1
                     nullable: true
                     type: string
+                dateLastUsed:
+                    description: Last time a token was used.
+                    format: date-time
+                    type: string
             required:
                 - accessTokenID
                 - name

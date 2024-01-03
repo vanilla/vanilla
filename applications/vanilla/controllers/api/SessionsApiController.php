@@ -52,6 +52,7 @@ class SessionsApiController extends AbstractApiController
      */
     public function index(array $query): array
     {
+        $this->permission("session.valid");
         $in = Schema::parse([
             "filter:s?" => [
                 "enum" => ["valid", "invalid"],

@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -60,6 +60,12 @@ export class FocusWatcher {
      */
     private handleClick = (event: MouseEvent) => {
         const triggeringElement = event.target as Element;
+
+        if (!document.documentElement.contains(triggeringElement)) {
+            // The thing that was clicked was already unmounted.
+            return;
+        }
+
         const wasClicked = this.checkDomTreeWasClicked(triggeringElement);
         if (!wasClicked) {
             this.changeHandler(false);

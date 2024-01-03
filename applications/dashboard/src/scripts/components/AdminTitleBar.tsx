@@ -12,13 +12,14 @@ import { userContentClasses } from "@library/content/UserContent.styles";
 import { useStackingContext } from "@vanilla/react-utils";
 
 export interface IProps {
-    title: string;
+    title: React.ReactNode;
     containerClassName?: string;
     titleAndActionsContainerClassName?: string;
     actions?: React.ReactNode;
     actionsWrapperClassName?: string;
     description?: ReactNode;
     titleLabel?: ReactNode;
+    compact?: boolean;
     useTwoColumnContainer?: boolean;
 }
 
@@ -29,10 +30,12 @@ export default function AdminTitleBar(props: IProps) {
 
     return (
         <div className={classes.root}>
-            <div className={cx(classes.container(props.useTwoColumnContainer), props.containerClassName)}>
+            <div
+                className={cx(classes.container(props.useTwoColumnContainer, props.compact), props.containerClassName)}
+            >
                 <div className={cx(classes.titleAndActionsContainer, props.titleAndActionsContainerClassName)}>
                     <div className={classes.titleAndDescriptionContainer}>
-                        <h2 className={classes.titleWrap} title={props.title}>
+                        <h2 className={classes.titleWrap}>
                             <TruncatedText lines={1} className={classes.title}>
                                 {props.title ?? <LoadingRectangle height={32} width={300} />}
                             </TruncatedText>

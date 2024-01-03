@@ -69,6 +69,7 @@ class SearchController extends Gdn_Controller
      *
      * @param string $search The search string.
      * @param string $page Page number.
+     * @throws Exception
      */
     public function index($search = "", $page = "")
     {

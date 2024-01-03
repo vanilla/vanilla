@@ -12,6 +12,7 @@ import { Mixins } from "@library/styles/Mixins";
 import { styleFactory, variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { percent, px } from "csx";
+import { lineHeightAdjustment } from "@library/styles/textUtils";
 
 export const attachmentVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -58,7 +59,11 @@ export const attachmentClasses = useThemeCache(() => {
         flexWrap: "nowrap",
         alignItems: "flex-start",
         justifyContent: "space-between",
+        textAlign: "start",
         padding: vars.padding.default,
+        // Offset the padding on the bottom a little bit so that the bottom padding looks event with the top.
+        // The line-height causes them to look uneven without a little offset.
+        paddingBottom: vars.padding.default - 4,
         width: percent(100),
         ...Mixins.border({
             color: globalVars.elementaryColors.transparent,
@@ -83,6 +88,7 @@ export const attachmentClasses = useThemeCache(() => {
     });
 
     const title = style("title", {
+        ...lineHeightAdjustment(),
         fontSize: px(vars.text.fontSize),
         color: vars.title.color.toString(),
         fontWeight: globalVars.fonts.weights.semiBold,

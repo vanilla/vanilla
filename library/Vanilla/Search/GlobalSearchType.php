@@ -9,7 +9,7 @@ namespace Vanilla\Search;
 
 use Garden\Schema\Schema;
 use Vanilla\ApiUtils;
-use Vanilla\Contracts\Site\AbstractSiteProvider;
+use Vanilla\Contracts\Site\VanillaSiteProvider;
 use Vanilla\DateFilterSchema;
 use Vanilla\Models\CrawlableRecordSchema;
 
@@ -138,8 +138,14 @@ class GlobalSearchType extends AbstractSearchType
             "queryOperator:s?" => [
                 "x-search-filter" => true,
             ],
+            "siteSectionID:s?",
             "name:s?" => [
                 "x-search-scope" => true,
+            ],
+            "categoryIDs:a?" => [
+                "items" => [
+                    "type" => "integer",
+                ],
             ],
             "insertUserIDs:a?" => [
                 "items" => [

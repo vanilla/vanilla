@@ -2,8 +2,8 @@
     "name": "@vanilla/webpack-interface",
     "license": "MIT",
     "devDependencies": {
-        "react": "16",
-        "react-redux": "^7.2.8",
-        "redux": "^4.2.0"
+        "react": "^17.0.2",
+        "react-redux": "^7.2.9",
+        "redux": "^4.2.1"
     }
 }

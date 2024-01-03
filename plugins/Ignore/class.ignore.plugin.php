@@ -123,7 +123,7 @@ class IgnorePlugin extends Gdn_Plugin
     {
         $args = $sender->RequestArgs;
         if (sizeof($args) < 2) {
-            $args = array_merge($args, [0, 0]);
+            $args = array_merge($args, ["", ""]);
         } elseif (sizeof($args) > 2) {
             $args = array_slice($args, 0, 2);
         }
@@ -714,7 +714,7 @@ class IgnorePlugin extends Gdn_Plugin
 
         $args = $sender->RequestArgs;
         if (sizeof($args) < 3) {
-            $args = array_merge($args, [0, 0]);
+            $args = array_merge($args, ["", ""]);
         } elseif (sizeof($args) > 2) {
             $args = array_slice($args, 1, 3);
         }
@@ -908,7 +908,7 @@ class IgnorePlugin extends Gdn_Plugin
 
         $args = $sender->RequestArgs;
         if (sizeof($args) < 3) {
-            $args = array_merge($args, [0, 0]);
+            $args = array_merge($args, ["", ""]);
         } elseif (sizeof($args) > 2) {
             $args = array_slice($args, 1, 3);
         }

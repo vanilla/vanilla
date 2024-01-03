@@ -5,6 +5,7 @@
  * @license GPL-2.0-only
  */
 
+import isPlainObject from "lodash/isPlainObject";
 import mergeWith from "lodash/mergeWith";
 
 /**
@@ -62,14 +63,18 @@ export function labelize(str: string): string {
  * Hash an object into a short key, that is stable no matter what order the parameters are.
  */
 export function stableObjectHash<T extends object>(obj: T): number {
-    // Sort the object first.
-    const ordered: any = {};
-    Object.keys(obj)
-        .sort()
-        .forEach(function (key) {
-            ordered[key] = obj[key];
-        });
-    return hashString(JSON.stringify(ordered));
+    return hashString(
+        JSON.stringify(obj, (_, val) =>
+            isPlainObject(val)
+                ? Object.keys(val)
+                      .sort()
+                      .reduce((result, key) => {
+                          result[key] = val[key];
+                          return result;
+                      }, {} as any)
+                : val,
+        ),
+    );
 }
 
 type CompareReturn = -1 | 0 | 1;
@@ -282,4 +287,21 @@ export function isNumeric(value: any) {
         return /^[+-]?([0-9]*[.])?[0-9]+$/.test(value);
     }
     return false;
+}
+
+/**
+ * Test if a given string matches a ruleset which could contain a wildcard selector (*)
+ *
+ * Example: Given string "vanillaforums" should match rule set "vanilla*"
+ */
+export function matchWithWildcard(target: string, matchers: string): boolean | null {
+    const escapeForRegex = (string: string) => string.replace(/([.*+?^=!:${}()|[\]/\\])/g, "\\$1");
+
+    if (!matchers || !target) {
+        return null;
+    }
+
+    return matchers.split("\n").some((match) => {
+        return new RegExp("^" + match.replace(/\//gi, "").split("*").map(escapeForRegex).join(".*") + "$").test(target);
+    });
 }

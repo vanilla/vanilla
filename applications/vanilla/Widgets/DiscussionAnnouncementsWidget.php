@@ -8,9 +8,10 @@
 namespace Vanilla\Forum\Widgets;
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Vanilla\Forum\Modules\AnnouncementWidgetModule;
 use Vanilla\Utility\SchemaUtils;
-use Vanilla\Widgets\React\DefaultSectionTrait;
+use Vanilla\Widgets\React\FilterableWidgetTrait;
 use Vanilla\Widgets\React\ReactWidgetInterface;
 
 /**
@@ -19,6 +20,7 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
 class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule implements ReactWidgetInterface
 {
     use DiscussionsWidgetSchemaTrait;
+    use FilterableWidgetTrait;
 
     /**
      * @inheritDoc
@@ -64,5 +66,41 @@ class DiscussionAnnouncementsWidget extends AnnouncementWidgetModule implements 
         );
 
         return $schema;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function getApiSchema(): Schema
+    {
+        $filterTypeSchemaExtraOptions = parent::getFilterTypeSchemaExtraOptions();
+
+        $apiSchema = parent::getBaseApiSchema();
+        $apiSchema = $apiSchema->merge(
+            SchemaUtils::composeSchemas(
+                self::filterTypeSchema(
+                    ["subcommunity", "category", "none"],
+                    ["subcommunity", "none"],
+                    $filterTypeSchemaExtraOptions
+                ),
+                self::sortSchema(),
+                self::limitSchema()
+            )
+        );
+        return $apiSchema;
+    }
+
+    /**
+     * Get the real parameters that we will pass to the API.
+     * @param array|null $params
+     * @return array
+     * @throws ValidationException
+     */
+    protected function getRealApiParams(?array $params = null): array
+    {
+        $apiParams = parent::getWidgetRealApiParams();
+        $apiParams["pinned"] = true;
+
+        return $apiParams;
     }
 }

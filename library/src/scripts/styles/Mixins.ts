@@ -85,7 +85,10 @@ export class Mixins {
         // Anything that makes the box stand out from the background on all side
         // Means we should apply some default behaviours, like paddings, and borderRadius.
         if (!boxHasSetPaddings && hasFullOutline) {
-            spacing = { horizontal: defaultSpacer, vertical: borderType === BorderType.SEPARATOR ? 0 : defaultSpacer };
+            spacing = {
+                horizontal: defaultSpacer,
+                vertical: [BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN].includes(borderType) ? 0 : defaultSpacer,
+            };
         }
 
         let itemSpacing = boxOptions.itemSpacing || (hasFullOutline ? defaultSpacer : 0);
@@ -98,7 +101,7 @@ export class Mixins {
 
         let extraSpacingCSS: CSSObject = {};
 
-        if (borderType === BorderType.SEPARATOR) {
+        if ([BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN].includes(borderType)) {
             const extraSpacing = globalVars.spacer.componentInner / 2;
             spacing = {
                 ...spacing,
@@ -134,7 +137,7 @@ export class Mixins {
             // Apply styles
             ...Mixins.background(background),
             ...Mixins.borderType(borderType, { border, interactiveOutline: config?.interactiveOutline }),
-            ...(hasFullOutline || borderType === BorderType.SEPARATOR
+            ...(hasFullOutline || [BorderType.SEPARATOR, BorderType.SEPARATOR_BETWEEN].includes(borderType)
                 ? {
                       "& &:first-of-type:before, & .pageBox:first-of-type:before, & .pageBoxNoCompat:first-of-type:before":
                           {
@@ -168,7 +171,7 @@ export class Mixins {
         };
     };
 
-    public static borderType(
+    private static borderType(
         borderType: BorderType,
         options?: { border?: IBorderStyles; interactiveOutline?: boolean },
     ): CSSObject {
@@ -189,6 +192,7 @@ export class Mixins {
                     [activeSelector()]: options?.interactiveOutline ? shadowHelper().embedHover() : {},
                 };
             case BorderType.SEPARATOR:
+            case BorderType.SEPARATOR_BETWEEN:
                 return {
                     "&:before": {
                         content: `""`,
@@ -211,6 +215,18 @@ export class Mixins {
                     "& + .pageBox:before, & + .pageBoxNoCompat:before": {
                         borderTop: "none",
                     },
+                    ...(borderType === BorderType.SEPARATOR_BETWEEN && {
+                        "&:first-of-type": {
+                            "&:before": {
+                                border: "none",
+                            },
+                        },
+                        "&:last-of-type": {
+                            "&:after": {
+                                border: "none",
+                            },
+                        },
+                    }),
                 };
             case BorderType.NONE:
             default:
@@ -266,10 +282,12 @@ export class Mixins {
         return spacingVals;
     }
 
-    static verticallyAlignInContainer(height: number, containerHeight: number): CSSObject {
+    static verticallyAlignInContainer(height: number, parentLineHeight: number): CSSObject {
         return {
-            transform: `translateY(-${Math.abs((containerHeight - height) / 2)}px)`,
+            [`--offset`]: `calc(calc(1em * ${parentLineHeight}) - ${height}px) / 2`,
+            [`--negative-offset`]: `min(var(--offset), -1*var(--offset))`,
             verticalAlign: "top",
+            transform: `translateY(var(--negative-offset))`,
         };
     }
 

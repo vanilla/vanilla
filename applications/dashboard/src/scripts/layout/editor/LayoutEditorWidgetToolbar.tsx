@@ -11,10 +11,10 @@ import { WidgetSettingsModal } from "@dashboard/layout/editor/widgetSettings/Wid
 import { useLayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { ILayoutEditorWidgetPath, IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { cx } from "@emotion/css";
+import { EmbedMenu } from "@library/editor/pieces/EmbedMenu";
 import { EmbedButton } from "@library/embeddedContent/components/EmbedButton";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
-import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
-import { EmbedMenu } from "@rich-editor/editor/pieces/EmbedMenu";
+import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import React, { useMemo, useState } from "react";

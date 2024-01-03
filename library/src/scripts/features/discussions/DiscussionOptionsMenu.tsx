@@ -9,8 +9,8 @@ import { IDiscussion } from "@dashboard/@types/api/discussion";
 import DropDown, { DropDownOpenDirection, FlyoutType } from "@library/flyouts/DropDown";
 import { getMeta, t } from "@library/utility/appUtils";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
-import { useUserCanEditDiscussion } from "@library/features/discussions/discussionHooks";
-import { hasPermission, IPermission, IPermissionOptions, PermissionMode } from "@library/features/users/Permission";
+import { useUserCanStillEditDiscussionOrComment } from "@library/features/discussions/discussionHooks";
+import { IPermission, IPermissionOptions, PermissionMode } from "@library/features/users/Permission";
 import DiscussionOptionsAnnounce from "@library/features/discussions/DiscussionOptionsAnnounce";
 import DiscussionOptionsMove from "@library/features/discussions/DiscussionOptionsMove";
 import DiscussionOptionsDelete from "@library/features/discussions/DiscussionOptionsDelete";
@@ -24,10 +24,11 @@ import { NON_CHANGE_TYPE } from "@library/features/discussions/forms/ChangeTypeD
 import { DiscussionOptionsTag } from "@library/features/discussions/DiscussionOptionsTag";
 import { CollectionsOptionButton } from "@library/featuredCollections/CollectionsOptionButton";
 import { CollectionRecordTypes } from "@library/featuredCollections/Collections.variables";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 interface IDiscussionOptionItem {
     permission?: IPermission;
-    component: React.ComponentType<{ discussion: IDiscussion }>;
+    component: React.ComponentType<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }>;
     sort?: number;
 }
 
@@ -37,8 +38,19 @@ export function addDiscussionOption(option: IDiscussionOptionItem) {
     additionalDiscussionOptions.push(option);
 }
 
-const DiscussionOptionsMenu: FunctionComponent<{ discussion: IDiscussion }> = ({ discussion }) => {
-    const canEdit = useUserCanEditDiscussion(discussion);
+interface IDiscussionOptionsMenuProps {
+    discussion: IDiscussion;
+    /** Callback invoked whenever a PUT or PATCH action on the discussion is successful.
+     *
+     * Useful on the new discussion thread page, where we read discussion state from react-query and not redux,
+     * and need to invalidate certain queries when a mutation is successful.
+     */
+    onMutateSuccess?: () => Promise<void>;
+}
+
+const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({ discussion, onMutateSuccess }) => {
+    const { hasPermission } = usePermissionsContext();
+    const { canStillEdit, humanizedRemainingTime } = useUserCanStillEditDiscussionOrComment(discussion);
     const permOptions: IPermissionOptions = {
         resourceType: "category",
         resourceID: discussion.categoryID,
@@ -63,16 +75,19 @@ const DiscussionOptionsMenu: FunctionComponent<{ discussion: IDiscussion }> = ({
         return !NON_CHANGE_TYPE.includes(type);
     });
 
-    const canChangeType = filteredDiscussionTypes.length > 1 && canEdit;
+    const canChangeType = filteredDiscussionTypes.length > 1 && canStillEdit;
 
-    const canAddToCollection = hasPermission("community.manage", permOptions);
+    const canAddToCollection = hasPermission("community.manage", { mode: PermissionMode.GLOBAL_OR_RESOURCE });
 
-    if (canEdit) {
+    if (canStillEdit) {
         items.push(
-            <DropDownItemLink to={`/post/editdiscussion/${discussion.discussionID}`}>{t("Edit")}</DropDownItemLink>,
+            <DropDownItemLink to={`/post/editdiscussion/${discussion.discussionID}`}>
+                {humanizedRemainingTime}
+            </DropDownItemLink>,
         );
-        if (getMeta("TaggingAdd")) {
-            items.push(<DiscussionOptionsTag discussion={discussion} />);
+        //FIXME: this looks like it should be a permission check
+        if (getMeta("TaggingAdd", true)) {
+            items.push(<DiscussionOptionsTag discussion={discussion} onSuccess={onMutateSuccess} />);
         }
     }
 
@@ -84,7 +99,7 @@ const DiscussionOptionsMenu: FunctionComponent<{ discussion: IDiscussion }> = ({
         items.push(<DropDownItemSeparator />);
 
         if (canModerate || canAddToCollection) {
-            items.push(<DiscussionOptionsAnnounce discussion={discussion} />);
+            items.push(<DiscussionOptionsAnnounce discussion={discussion} onSuccess={onMutateSuccess} />);
             if (canAddToCollection) {
                 items.push(
                     <CollectionsOptionButton
@@ -94,19 +109,19 @@ const DiscussionOptionsMenu: FunctionComponent<{ discussion: IDiscussion }> = ({
                     />,
                 );
             }
-            items.push(<DiscussionOptionsSink discussion={discussion} />);
+            items.push(<DiscussionOptionsSink discussion={discussion} onSuccess={onMutateSuccess} />);
         }
 
         if (canMove) {
-            items.push(<DiscussionOptionsMove discussion={discussion} />);
+            items.push(<DiscussionOptionsMove discussion={discussion} onSuccess={onMutateSuccess} />);
         }
 
         if (canClose) {
-            items.push(<DiscussionOptionsClose discussion={discussion} />);
+            items.push(<DiscussionOptionsClose discussion={discussion} onSuccess={onMutateSuccess} />);
         }
 
         if (canChangeType) {
-            items.push(<DiscussionChangeType discussion={discussion} />);
+            items.push(<DiscussionChangeType discussion={discussion} onSuccess={onMutateSuccess} />);
         }
 
         if (canModerate) {
@@ -122,7 +137,9 @@ const DiscussionOptionsMenu: FunctionComponent<{ discussion: IDiscussion }> = ({
             .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
             .forEach((option) => {
                 if (!option.permission || hasPermission(option.permission.permission, option.permission.options)) {
-                    permissionCheckedItems.push(<option.component discussion={discussion} />);
+                    permissionCheckedItems.push(
+                        <option.component discussion={discussion} onSuccess={onMutateSuccess} />,
+                    );
                 }
             });
         if (permissionCheckedItems.length > 0) {

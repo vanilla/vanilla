@@ -48,6 +48,15 @@ class WebLinking
     }
 
     /**
+     * @param string $rel
+     * @return string|null
+     */
+    public function getLinkUrl(string $rel): ?string
+    {
+        return $this->links[$rel][0]["uri"] ?? null;
+    }
+
+    /**
      * Remove a link.
      *
      * @param string $rel Link relation. Either an IANA registered type, or an absolute URL.
@@ -127,6 +136,11 @@ class WebLinking
             $link .= ", " . $this->getLinkHeaderValue();
         }
         $data->setHeader(self::HEADER_NAME, $link);
+        foreach ($this->links as $rel => $links) {
+            foreach ($links as $linkData) {
+                $data->setHeader("x-app-page-{$rel}-url", $linkData["uri"]);
+            }
+        }
     }
 
     /**

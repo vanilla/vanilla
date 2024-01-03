@@ -59,7 +59,6 @@ export default class Drawer extends React.Component<IDrawerProps, IState> {
                 {this.state.open && (
                     <div
                         id={this.contentID}
-                        aria-controlledby={this.buttonID}
                         className={classNames("drawer-contents", this.props.contentsClassName, classes.contents)}
                     >
                         {this.props.children}

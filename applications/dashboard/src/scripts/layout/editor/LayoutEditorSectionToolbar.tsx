@@ -8,11 +8,11 @@ import { useLayoutEditor } from "@dashboard/layout/editor/LayoutEditor";
 import { layoutEditorClasses } from "@dashboard/layout/editor/LayoutEditor.classes";
 import { LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditorSelection";
 import { IEditableLayoutWidget, ILayoutEditorPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { EmbedMenu } from "@library/editor/pieces/EmbedMenu";
 import { EmbedButton } from "@library/embeddedContent/components/EmbedButton";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
-import { EmbedMenu } from "@rich-editor/editor/pieces/EmbedMenu";
+import { ToolTip } from "@library/toolTip/ToolTip";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import React from "react";
@@ -42,6 +42,44 @@ export function LayoutEditorSectionToolbar(props: IProps) {
         >
             <Icon icon={"data-trash"} />
         </EmbedButton>
+    );
+
+    const hasBreadcrumb = editorContents.hasBreadcrumb(props.path);
+
+    const toggleBreadcrumbOnSection = () => {
+        const breadcrumbPath = {
+            ...props.path,
+            sectionRegion: editorContents.isSectionOneColumn(props.path) ? "children" : "breadcrumbs",
+            sectionRegionIndex: 0,
+        };
+        if (!hasBreadcrumb) {
+            editorContents.insertWidget(breadcrumbPath, {
+                $hydrate: "react.breadcrumbs",
+            });
+        } else {
+            editorContents.deleteWidget(breadcrumbPath);
+        }
+    };
+
+    const breadcrumbButton = !editorContents.isSectionFullWidth(props.path) && (
+        <ToolTip label={hasBreadcrumb ? t("Hide breadcrumbs on this section") : t("Show breadcrumbs on this section")}>
+            <span>
+                <EmbedButton
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        toggleBreadcrumbOnSection();
+                    }}
+                >
+                    {hasBreadcrumb ? (
+                        <Icon icon={"navigation-breadcrumb-active"} />
+                    ) : (
+                        <Icon icon={"navigation-breadcrumb-inactive"} />
+                    )}
+                </EmbedButton>
+            </span>
+        </ToolTip>
     );
 
     return (
@@ -94,7 +132,7 @@ export function LayoutEditorSectionToolbar(props: IProps) {
                     <Icon icon={"data-swap"} />
                 </EmbedButton>
             )}
-
+            {breadcrumbButton}
             <ConditionalWrap
                 component={ToolTip}
                 condition={!!props.hasAsset}

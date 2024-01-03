@@ -61,6 +61,15 @@ paths:
                           type: string
                       type: array
                   style: form
+                - name: qna
+                  in: query
+                  description: Filter comment by answer status.
+                  schema:
+                      type: string
+                      enum:
+                          - accepted
+                          - rejected
+                  x-addon: qna
             responses:
                 "200":
                     content:

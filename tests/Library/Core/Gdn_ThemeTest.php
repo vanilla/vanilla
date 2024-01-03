@@ -34,6 +34,7 @@ class Gdn_ThemeTest extends SiteTestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->useLegacyLayouts();
         /** @var MockSiteSectionProvider $siteSectionProvider */
         $this->siteSectionProvider = self::container()->get(MockSiteSectionProvider::class);
         /** @var SiteSectionModel $siteSectionModel */

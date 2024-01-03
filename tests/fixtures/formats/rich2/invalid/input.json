@@ -1,0 +1,191 @@
+[
+  {
+    "type": "th",
+    "children": [
+      {
+        "text": "th at root"
+      }
+    ]
+  },
+  {
+    "type": "td",
+    "children": [
+      {
+        "text": "td at root"
+      }
+    ]
+  },
+  {
+    "type": "tr",
+    "children": [
+      {
+        "type": "td",
+        "children": [
+          {
+            "text": "tr at root"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "thead",
+    "children": [
+      {
+        "type": "tr",
+        "children": [
+          {
+            "type": "td",
+            "children": [
+              {
+                "text": "thead at root"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "tbody",
+    "children": [
+      {
+        "type": "tr",
+        "children": [
+          {
+            "type": "td",
+            "children": [
+              {
+                "text": "tbody at root"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "tfoot",
+    "children": [
+      {
+        "type": "tr",
+        "children": [
+          {
+            "type": "td",
+            "children": [
+              {
+                "text": "tfoot at root"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "caption",
+    "children": [
+      {
+        "text": "caption at root"
+      }
+    ]
+  },
+  {
+    "type": "spoiler-item",
+    "children": [
+      {
+        "text": "spoiler-item at root"
+      }
+    ]
+  },
+  {
+    "type": "spoiler-content",
+    "children": [
+      {
+        "type": "spoiler-item",
+        "children": [
+          {
+            "text": "spoiler-content at root"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "lic",
+    "children": [
+      {
+        "text": "lic at root"
+      }
+    ]
+  },
+  {
+    "type": "li",
+    "children": [
+      {
+        "type": "lic",
+        "children": [
+          {
+            "text": "li at root"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "code_line",
+    "children": [
+      {
+        "text": "code_line at root"
+      }
+    ]
+  },
+  {
+    "type": "blockquote-line",
+    "children": [
+      {
+        "text": "blockquote-line at root"
+      }
+    ]
+  },
+  {
+    "children": [
+      {
+        "type": "li",
+        "children": [
+          {
+            "type": "lic",
+            "children": [
+              {
+                "text": "list inside paragraph"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "li",
+        "children": [
+          {
+            "type": "lic",
+            "children": [
+              {
+                "text": "list inside paragraph"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "type": "p"
+  },
+  {
+    "type": "paragraph",
+    "children": [
+      {
+        "type": "code_line",
+        "text": "text with a type property should ignore the type and render as text"
+      }
+    ]
+  }
+]

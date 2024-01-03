@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $confirmationSupported = $this->data('ConfirmationSupported');
 helpAsset(sprintf(t('About %s'), t('Registration')), t('Change the way that new users register with the site.'));
-helpAsset(t('Need More Help?'), anchor(t("Video tutorial on user registration"), 'settings/tutorials/user-registration'))
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on user registration"), 'https://success.vanillaforums.com/kb/articles/457-n-registration-methods-video'))
 ?>
 <h1><?php echo t('User Registration Settings'); ?></h1>
 <?php

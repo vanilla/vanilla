@@ -1,11 +1,11 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React, { useEffect, useMemo, useState } from "react";
-import DayPicker, { DateUtils, RangeModifier } from "react-day-picker";
+import React, { useMemo, useState } from "react";
+import DayPicker, { DateUtils, Modifiers, RangeModifier } from "react-day-picker";
 import moment from "moment";
 import "react-day-picker/lib/style.css";
 import DatePickerNav from "@library/forms/rangePicker/DatePickerNav";
@@ -13,19 +13,14 @@ import { rangePickerClasses } from "./RangePicker.styles";
 import { IDateModifierRangePickerProps } from "@library/forms/rangePicker/types";
 import { applyDateModifier, dateModifier } from "@library/forms/rangePicker/utils";
 
-function addDateToRange(rangeModifier: RangeModifier, date: Date) {
-    if (rangeModifier) {
-        return DateUtils.addDayToRange(date, rangeModifier);
-    }
-    return { from: date, to: undefined };
-}
-
 export function RangePicker(props: IDateModifierRangePickerProps) {
     const { range, setRange } = props;
     const { from, to } = range;
+    const [clickTrack, setClickTrack] = useState(0);
+
     const fromDate = useMemo(() => applyDateModifier(from), [from]);
     const toDate = useMemo(() => applyDateModifier(to), [to]);
-    const rangeModifier = useMemo(
+    const rangeModifier: RangeModifier = useMemo(
         () => ({
             from: fromDate,
             to: toDate,
@@ -45,6 +40,19 @@ export function RangePicker(props: IDateModifierRangePickerProps) {
 
     const handleClick = (date: Date) => {
         if (!setRange) return;
+        //lets keep track of our clicks when we choose a range, so we can have a pattern, first click is from, second click is to
+        setClickTrack(!clickTrack ? 1 : 0);
+        switch (clickTrack) {
+            case 0:
+                rangeModifier.from = undefined;
+                if (DateUtils.isDayAfter(date, rangeModifier.to as Date)) {
+                    rangeModifier.to = date;
+                }
+                break;
+            case 1:
+                rangeModifier.to = undefined;
+                break;
+        }
         const { from, to } = DateUtils.addDayToRange(date, rangeModifier);
         setRange({
             from: dateModifier(from!).build(),
@@ -61,7 +69,7 @@ export function RangePicker(props: IDateModifierRangePickerProps) {
                 pagedNavigation
                 fixedWeeks
                 selectedDays={rangeModifier}
-                modifiers={modifiers}
+                modifiers={modifiers as Partial<Modifiers>}
                 onDayClick={handleClick}
                 disabledDays={{ after: new Date() }}
                 navbarElement={DatePickerNav}
@@ -73,7 +81,7 @@ export function RangePicker(props: IDateModifierRangePickerProps) {
                 pagedNavigation
                 fixedWeeks
                 selectedDays={rangeModifier}
-                modifiers={modifiers}
+                modifiers={modifiers as Partial<Modifiers>}
                 onDayClick={handleClick}
                 disabledDays={{ after: new Date() }}
                 navbarElement={DatePickerNav}

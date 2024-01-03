@@ -40,7 +40,7 @@ abstract class AbstractCustomLayoutView implements LayoutViewInterface
     /**
      * @return string
      */
-    abstract public function getLayoutID(): string;
+    abstract public function getTemplateID(): string;
 
     /**
      * Get a schema for the input parameters when resolving this viewType.
@@ -63,7 +63,7 @@ abstract class AbstractCustomLayoutView implements LayoutViewInterface
      * Given a set of parameters matching paramInputSchema, resolve them into paramResolve schema.
      *
      * @param array $paramInput The input parameters.
-     *
+     * @param PageHeadInterface|null $pageHead
      * @return array
      */
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array

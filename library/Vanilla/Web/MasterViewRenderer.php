@@ -163,6 +163,7 @@ class MasterViewRenderer
             "themeHeader" => new \Twig\Markup($this->themePreloader->getThemeHeaderHtml(), "utf-8"),
             "themeFooter" => new \Twig\Markup($this->themePreloader->getThemeFooterHtml(), "utf-8"),
             "homePageTitle" => $this->config->get("Garden.HomepageTitle", ""),
+            "isDirectionRTL" => $this->siteMeta->getDirectionRTL(),
         ];
     }
 }

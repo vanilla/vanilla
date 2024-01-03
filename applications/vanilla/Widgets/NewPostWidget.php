@@ -1,11 +1,13 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Forum\Widgets;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\Schema\Schema;
 use Vanilla\Forms\FieldMatchConditional;
 use Vanilla\Forms\FormOptions;
@@ -14,8 +16,8 @@ use Vanilla\Forms\StaticFormChoices;
 use Vanilla\InjectableInterface;
 use Gdn;
 use CategoryModel;
-use Vanilla\Layout\Section\SectionThreeColumns;
-use Vanilla\Layout\Section\SectionTwoColumns;
+use Vanilla\Layout\HydrateAwareInterface;
+use Vanilla\Layout\HydrateAwareTrait;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
@@ -26,14 +28,19 @@ use Vanilla\Widgets\React\ReactWidgetInterface;
 /**
  * New Post Button Widget
  */
-class NewPostWidget implements ReactWidgetInterface, CombinedPropsWidgetInterface, InjectableInterface
+class NewPostWidget implements
+    ReactWidgetInterface,
+    CombinedPropsWidgetInterface,
+    InjectableInterface,
+    HydrateAwareInterface
 {
     use HomeWidgetContainerSchemaTrait;
     use CombinedPropsWidgetTrait;
     use DefaultSectionTrait;
+    use HydrateAwareTrait;
 
     /** @var CategoryModel */
-    private $categoryModel;
+    private CategoryModel $categoryModel;
 
     /**
      * DI.
@@ -82,47 +89,65 @@ class NewPostWidget implements ReactWidgetInterface, CombinedPropsWidgetInterfac
      *
      * @param array|null $params
      * @return array|null
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public function getProps(?array $params = null): ?array
     {
         $customLabels = $this->props["customLabels"] ?? [];
         $excludedButtons = $this->props["excludedButtons"] ?? [];
 
-        //basic permission
-        $hasPermission = Gdn::session()->checkPermission("Vanilla.Discussions.Add", true, "Category", "any");
+        $layoutViewType = $this->getHydrateParam("layoutViewType");
+        $categoryID = $this->getHydrateParam("category.categoryID");
+        $permissionCategory = $this->categoryModel::permissionCategory($categoryID);
+        $category = CategoryModel::categories($categoryID);
 
-        //if no permissions or guest mode
+        if ($categoryID !== -1) {
+            // Permission check for the specific category.
+            $hasPermission = CategoryModel::checkPermission($categoryID, "Vanilla.Discussions.Add");
+        } else {
+            // Permission check for any category.
+            $hasPermission = Gdn::session()->checkPermission("Vanilla.Discussions.Add", true, "Category", "any");
+        }
+
+        // If user isn't allowed or is a guest.
         if (!$hasPermission || !Gdn::session()->isValid()) {
             return [];
         }
 
-        //get allowed discussion type data
-        $permissionCategory = $this->categoryModel::permissionCategory(null);
-        $allowedDiscussionTypes = $this->categoryModel::getAllowedDiscussionData($permissionCategory, []);
+        // Get allowed discussion types.
+        $allowedDiscussionTypes = $this->categoryModel::getAllowedDiscussionData($permissionCategory, $category);
 
         $this->props["items"] = [];
-        foreach ($allowedDiscussionTypes as $key => $discussionType) {
+        foreach ($allowedDiscussionTypes as $discussionTypeKey => $discussionType) {
+            // If the discussion type is explicitly excluded from this button's configuration.
+            if (in_array(strtolower($discussionTypeKey), $excludedButtons)) {
+                continue;
+            }
+
+            // Or we don't have global permission to add that type of discussion
             if (
                 isset($discussionType["AddPermission"]) &&
                 !Gdn::session()->checkPermission($discussionType["AddPermission"])
             ) {
-                // User doesn't have permission.
+                unset($allowedDiscussionTypes[$discussionTypeKey]);
                 continue;
             }
 
-            $isExcluded = in_array(strtolower($key), $excludedButtons);
-            if ($isExcluded) {
-                // Button was excluded in the configuration.
-                continue;
+            $url = $discussionType["AddUrl"];
+
+            if ($layoutViewType === "discussionCategoryPage" && $categoryID !== -1) {
+                $urlCode = rawurlencode($category["UrlCode"]);
+                $url .= !str_contains($url, "?") ? "/" . $urlCode : "";
             }
 
             $this->props["items"][] = [
-                "label" => $customLabels[strtolower($key)] ?? $discussionType["AddText"],
-                "action" => $discussionType["AddUrl"],
+                "label" => $customLabels[strtolower($discussionTypeKey)] ?? $discussionType["AddText"],
+                "action" => $url,
                 "type" => "link",
                 "id" => str_replace(" ", "-", strtolower($discussionType["AddText"])),
                 "icon" => $discussionType["AddIcon"],
-                "asOwnButton" => in_array(strtolower($key), $this->props["asOwnButtons"]),
+                "asOwnButton" => in_array(strtolower($discussionTypeKey), $this->props["asOwnButtons"]),
             ];
         }
 
@@ -170,6 +195,8 @@ class NewPostWidget implements ReactWidgetInterface, CombinedPropsWidgetInterfac
      * Get the schema specific to this widget.
      *
      * @return Schema
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     public static function widgetSpecificSchema(): Schema
     {
@@ -264,5 +291,20 @@ class NewPostWidget implements ReactWidgetInterface, CombinedPropsWidgetInterfac
     public static function getWidgetSchema(): Schema
     {
         return SchemaUtils::composeSchemas(self::widgetTitleSchema(), self::widgetSpecificSchema());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $links = array_map(function (array $item) {
+            return [
+                "url" => $item["action"],
+                "name" => $item["label"] ?? null,
+            ];
+        }, array_filter($props["items"] ?? []));
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($links));
+        return $result;
     }
 }

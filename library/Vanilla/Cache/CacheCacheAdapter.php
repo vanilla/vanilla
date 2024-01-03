@@ -16,7 +16,8 @@ use Psr\SimpleCache\CacheInterface;
  * This class adapts the functionality, but not all of the validation of the `CacheInterface`. If you want to validate
  * the keys going into and out of the cache then use the `ValidatingCacheCacheAdapter` class.
  */
-class CacheCacheAdapter implements CacheInterface {
+class CacheCacheAdapter implements CacheInterface
+{
     /**
      * @var Gdn_Cache
      */
@@ -27,7 +28,8 @@ class CacheCacheAdapter implements CacheInterface {
      *
      * @param Gdn_Cache $cache
      */
-    public function __construct(Gdn_Cache $cache) {
+    public function __construct(Gdn_Cache $cache)
+    {
         $this->cache = $cache;
     }
 
@@ -37,9 +39,10 @@ class CacheCacheAdapter implements CacheInterface {
      * @param int|\DateInterval $ttl
      * @return int|null Returns a number of seconds or **null** on failture.
      */
-    protected function ttlToSeconds($ttl): ?int {
+    protected function ttlToSeconds($ttl): ?int
+    {
         if (is_numeric($ttl)) {
-            return (int)$ttl;
+            return (int) $ttl;
         } elseif (is_object($ttl) && $ttl instanceof \DateInterval) {
             return $ttl->s + 60 * $ttl->i + 3600 * $ttl->h + 86400 * $ttl->d;
         } else {
@@ -50,7 +53,8 @@ class CacheCacheAdapter implements CacheInterface {
     /**
      * {@inheritdoc}
      */
-    public function get($key, $default = null) {
+    public function get($key, $default = null)
+    {
         $value = $this->cache->get($key, [Gdn_Cache::FEATURE_DEFAULT => $default]);
         return $value;
     }
@@ -58,7 +62,8 @@ class CacheCacheAdapter implements CacheInterface {
     /**
      * {@inheritdoc}
      */
-    public function set($key, $value, $ttl = null) {
+    public function set($key, $value, $ttl = null)
+    {
         $options = [];
         if (is_int($ttl) || (is_object($ttl) && $ttl instanceof \DateInterval)) {
             $secs = $this->ttlToSeconds($ttl);
@@ -77,7 +82,8 @@ class CacheCacheAdapter implements CacheInterface {
     /**
      * {@inheritdoc}
      */
-    public function delete($key) {
+    public function delete($key)
+    {
         // Gdn_Cache returns `false` if the item isn't removed while `CacheInterface` only wants false on error.
         try {
             $this->cache->remove($key);
@@ -90,11 +96,15 @@ class CacheCacheAdapter implements CacheInterface {
     /**
      * {@inheritdoc}
      */
-    public function getMultiple($keys, $default = null) {
+    public function getMultiple($keys, $default = null)
+    {
         if (is_object($keys) && $keys instanceof \Traversable) {
             $keys = iterator_to_array($keys, false);
         } elseif (!is_array($keys)) {
-            throw new InvalidArgumentException('CacheInterface::getMultiple() expects $keys to be an array or Traversable.', 500);
+            throw new InvalidArgumentException(
+                'CacheInterface::getMultiple() expects $keys to be an array or Traversable.',
+                500
+            );
         }
 
         $r = $this->cache->get($keys) + array_fill_keys($keys, $default);
@@ -105,7 +115,8 @@ class CacheCacheAdapter implements CacheInterface {
     /**
      * {@inheritdoc}
      */
-    public function setMultiple($values, $ttl = null) {
+    public function setMultiple($values, $ttl = null)
+    {
         $success = true;
         foreach ($values as $key => $value) {
             $success = $success && $this->set($key, $value, $ttl);
@@ -116,7 +127,8 @@ class CacheCacheAdapter implements CacheInterface {
     /**
      * {@inheritdoc}
      */
-    public function deleteMultiple($keys) {
+    public function deleteMultiple($keys)
+    {
         $success = true;
         foreach ($keys as $key) {
             $success = $success && $this->delete($key);
@@ -127,15 +139,16 @@ class CacheCacheAdapter implements CacheInterface {
     /**
      * {@inheritdoc}
      */
-    public function has($key) {
+    public function has($key)
+    {
         return $this->cache->exists($key);
     }
-
 
     /**
      * @inheritDoc
      */
-    public function clear() {
+    public function clear()
+    {
         return $this->cache->flush();
     }
 
@@ -144,7 +157,8 @@ class CacheCacheAdapter implements CacheInterface {
      *
      * @return Gdn_Cache
      */
-    public function getCache(): Gdn_Cache {
+    public function getCache(): Gdn_Cache
+    {
         return $this->cache;
     }
 }

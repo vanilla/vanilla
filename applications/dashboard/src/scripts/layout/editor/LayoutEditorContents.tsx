@@ -6,6 +6,7 @@
 
 import { LayoutEditorAssetUtils } from "@dashboard/layout/editor/LayoutEditorAssetUtils";
 import { ILayoutSectionInfo, LayoutSectionInfos } from "@dashboard/layout/editor/LayoutSectionInfos";
+import { RESOLVE_MAP } from "@dashboard/layout/editor/widgetSettings/resolveFieldParams";
 import {
     IEditableLayoutSpec,
     IEditableLayoutWidget,
@@ -285,12 +286,20 @@ export class LayoutEditorContents {
         return newContents;
     };
 
-    // public canMoveWidget = (widget: IHydratedEditableLayoutWidget, possiblePath: ILayoutEditorParent): boolean => {
-    //     // Lookup the section type of the parent.
-    //     // Does that type of section support this type of widget.
-    //     // Ask that section if supports this widget?
-    //     return true;
-    // };
+    /**
+     * Check if a given section for a path has breadcrumbs
+     */
+    public hasBreadcrumb = (path: ILayoutEditorPath): boolean => {
+        const section = this.getSection(path);
+        const isOneColumn = this.isSectionOneColumn(path);
+        if (isOneColumn) {
+            const breadcrumb: object | null = section?.children?.find(
+                (child: Pick<IHydratedEditableWidgetProps, "$hydrate">) => child.$hydrate === "react.breadcrumbs",
+            );
+            return !!breadcrumb;
+        }
+        return (section?.hasOwnProperty("breadcrumbs") && section.breadcrumbs.length > 0) ?? false;
+    };
 
     /**
      * Validate that our editor contents can be saved.
@@ -339,6 +348,14 @@ export class LayoutEditorContents {
     public isSectionFullWidth = (path: ILayoutEditorPath): boolean => {
         const section = this.getSection(path);
         return section?.$hydrate === "react.section.full-width";
+    };
+
+    /**
+     * Check if there is a one column section at a path.
+     */
+    public isSectionOneColumn = (path: ILayoutEditorPath): boolean => {
+        const section = this.getSection(path);
+        return section?.$hydrate === "react.section.1-column";
     };
 
     /**
@@ -481,16 +498,30 @@ export class LayoutEditorContents {
     }
 
     /**
+     * Resolve a given node and return a tuple of the field key and resolved value
+     */
+    private resolveFieldParam = (
+        key: string,
+        node: IEditableLayoutWidget,
+    ): [string, string | number | object] | null => {
+        if (node[key] !== null && typeof node[key] === "object") {
+            // ensure we're resolving a param
+            if (node[key].hasOwnProperty("$hydrate") && node[key]["$hydrate"] === "param") {
+                const resolvedPreviewValue = RESOLVE_MAP[node[key].ref];
+                return [key, resolvedPreviewValue];
+            }
+        }
+        return null;
+    };
+
+    /**
      * Hydrate a node recursively from the layout catalog.
      *
      * @param node The node to hydrate.
      * @param nodePath The path to the node.
      * @returns The hydrated node.
      */
-    private hydrateNode = <T extends unknown>(
-        node: T | IHydratedEditableLayoutWidget,
-        nodePath: Partial<ILayoutEditorPath>,
-    ) => {
+    private hydrateNode = (node: unknown | IHydratedEditableLayoutWidget, nodePath: Partial<ILayoutEditorPath>) => {
         if (node == null || typeof node !== "object") {
             return node;
         }
@@ -515,13 +546,22 @@ export class LayoutEditorContents {
         }
 
         const props = Object.fromEntries(
-            Object.keys(omit(node, "$hydrate", "$middleware")).map((key) => [
-                key,
-                this.hydrateNode(node[key], {
-                    ...nodePath,
-                    sectionRegion: key,
-                }),
-            ]),
+            Object.keys(omit(node, "$hydrate", "$middleware")).map((key) => {
+                if (["title", "description"].includes(key)) {
+                    const hydrated = this.resolveFieldParam(key, node);
+                    if (hydrated) {
+                        return hydrated;
+                    }
+                }
+
+                return [
+                    key,
+                    this.hydrateNode(node[key], {
+                        ...nodePath,
+                        sectionRegion: key,
+                    }),
+                ];
+            }),
         );
 
         const extraProps: IHydratedEditableWidgetProps = {

@@ -393,42 +393,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/JsonSchema"
-    /layouts/views-legacy:
-        x-hidden: true
-        put:
-            summary: Get a list of layout views by layout ID
-            tags:
-                - Layout
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            type: object
-                            properties:
-                                layoutViewType:
-                                    type: string
-                                    enum:
-                                        - home
-                                        - discussionList
-                                        - categoryList
-                                    description: The layout view type to set a legacy view for.
-                                legacyViewValue:
-                                    type: string
-                                    description: |
-                                        The configuration value for the legacy view if applicable.
-                                        For 'home' this is a route that will be rendered internally on the homepage.
-                                        For the discussionList and categoryList the values are 'foundation', 'table', 'modern', and 'mixed'.
-            responses:
-                "200":
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/LayoutViewSchema"
-                    description: Success
-                "403":
-                    $ref: "#/components/responses/PermissionError"
-                "404":
-                    $ref: "#/components/responses/NotFound"
     /layouts/{id}/views:
         x-hidden: true
         parameters:

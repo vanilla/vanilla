@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -10,7 +10,6 @@ namespace VanillaTests;
 use Psr\Log\LoggerInterface;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Logging\LogDecorator;
-use Vanilla\Site\OwnSite;
 use VanillaTests\Library\Vanilla\Logging\TestErrorLoggerCollection;
 
 /**
@@ -165,6 +164,12 @@ trait TestLoggerTrait
     public function assertLogMessage(string $message, TestLogger $testLogger = null)
     {
         $logger = $testLogger ?? $this->getTestLogger();
-        $this->assertTrue($logger->hasMessage($message), "The log doesn't have the message: " . $message);
+        $this->assertTrue(
+            $logger->hasMessage($message),
+            "The log doesn't have the message: " .
+                $message .
+                "\n Found logs: \n" .
+                json_encode($logger->getLog(), JSON_PRETTY_PRINT)
+        );
     }
 }

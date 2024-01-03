@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -9,6 +9,7 @@ namespace Garden\Web;
 
 use Garden\MetaTrait;
 use Vanilla\FeatureFlagHelper;
+use Vanilla\ReflectionHelper;
 
 /**
  * The base class for routes.
@@ -293,7 +294,8 @@ abstract class Route
      */
     public function isMapped(\ReflectionParameter $param, $type = 0)
     {
-        if ($param->getClass() !== null && $param->getClass()->implementsInterface(RequestInterface::class)) {
+        $class = ReflectionHelper::getClass($param);
+        if ($class !== null && $class->implementsInterface(RequestInterface::class)) {
             $mapping = Route::MAP_REQUEST;
         } elseif (empty($this->mappings[strtolower($param->getName())])) {
             return false;
@@ -303,7 +305,7 @@ abstract class Route
         if (($mapping & $type) !== $type) {
             return false;
         }
-        if (!$param->isArray() && ($mapping & Route::MAP_PATH) !== Route::MAP_PATH) {
+        if (!ReflectionHelper::isArray($param) && ($mapping & Route::MAP_PATH) !== Route::MAP_PATH) {
             return false;
         }
 
@@ -320,7 +322,8 @@ abstract class Route
      */
     protected function mapParam(\ReflectionParameter $param, RequestInterface $request, array $args = [])
     {
-        if ($param->getClass() !== null && $param->getClass()->implementsInterface(RequestInterface::class)) {
+        $class = ReflectionHelper::getClass($param);
+        if ($class !== null && $class->implementsInterface(RequestInterface::class)) {
             return $request;
         }
 
@@ -341,7 +344,12 @@ abstract class Route
             $result += $request->getQuery() + $this->getDefault("query", []);
         }
         if ($mapping & self::MAP_BODY) {
-            $result += $request->getBody();
+            $body = $request->getBody();
+            if (is_array($body)) {
+                $result += $body;
+            } else {
+                $result = $body;
+            }
         }
 
         return $result;

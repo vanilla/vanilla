@@ -13,10 +13,18 @@ import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import TagDiscussionForm from "@library/features/discussions/forms/TagDiscussionForm";
 import { cx, css } from "@emotion/css";
 
-export const DiscussionOptionsTag: FunctionComponent<{ discussion: IDiscussion }> = ({ discussion }) => {
+export const DiscussionOptionsTag: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
+    discussion,
+    onSuccess,
+}) => {
     const [isVisible, setIsVisible] = useState(false);
     const open = () => setIsVisible(true);
     const close = () => setIsVisible(false);
+
+    async function handleSuccess() {
+        !!onSuccess && (await onSuccess());
+        close();
+    }
     const visibleOverrideForSuggestions = css(`
         overflow: visible!important
     `);
@@ -30,7 +38,7 @@ export const DiscussionOptionsTag: FunctionComponent<{ discussion: IDiscussion }
                 exitHandler={close}
                 className={visibleOverrideForSuggestions}
             >
-                <TagDiscussionForm discussion={discussion} onSuccess={close} onCancel={close} />
+                <TagDiscussionForm discussion={discussion} onSuccess={handleSuccess} onCancel={close} />
             </Modal>
         </>
     );

@@ -40,6 +40,7 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test
      */
     public function testGettingSingleCount()
     {
+        $this->createCategory(["name" => "Single Count"]);
         $this->createDiscussion();
         $this->createDiscussion();
         $this->createDiscussion();
@@ -54,6 +55,7 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test
      */
     public function testGettingMultipleCounts()
     {
+        $this->createCategory(["name" => "Multiple Count"]);
         $this->createDiscussion();
         $this->createComment();
         $this->createComment();
@@ -84,10 +86,13 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test
      */
     public function testCategoryCounts()
     {
+        $categoryModel = \CategoryModel::instance();
+        //Avoid root category
+        $currentCount = $categoryModel->getCount(["CategoryID <>" => -1]);
         $this->createCategory();
         $this->createCategory();
         $catCount = $this->api()->get($this->baseUrl . "?counts[]=category");
-        $this->assertSame(3, $catCount["counts"]["category"]["count"]);
+        $this->assertSame($currentCount + 2, $catCount["counts"]["category"]["count"]);
     }
 
     /**
@@ -111,5 +116,34 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test
             // Is filtered should be false for everything.
             $this->assertFalse($count["isFiltered"]);
         }
+    }
+
+    /**
+     * Test that the site total are updated after a new record is created.
+     *
+     * @return void
+     */
+    public function testSiteTotalAfterUpdate(): void
+    {
+        $countsBefore = $this->api()
+            ->get($this->baseUrl . "?counts[]=all")
+            ->getBody()["counts"];
+
+        $this->createUserFixture(self::ROLE_MEMBER);
+        $this->createCategory();
+        $this->createDiscussion();
+        $this->createComment();
+
+        self::$testCache->flush();
+
+        $countsAfter = $this->api()
+            ->get($this->baseUrl . "?counts[]=all")
+            ->getBody()["counts"];
+
+        $this->assertEquals($countsBefore["user"]["count"] + 1, $countsAfter["user"]["count"]);
+        $this->assertEquals($countsBefore["category"]["count"] + 1, $countsAfter["category"]["count"]);
+        $this->assertEquals($countsBefore["discussion"]["count"] + 1, $countsAfter["discussion"]["count"]);
+        $this->assertEquals($countsBefore["comment"]["count"] + 1, $countsAfter["comment"]["count"]);
+        $this->assertEquals($countsBefore["post"]["count"] + 2, $countsAfter["post"]["count"]);
     }
 }

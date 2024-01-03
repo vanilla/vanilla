@@ -555,7 +555,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
 
     const textAlignment: CSSObject = {
         "&&": {
-            textAlign: isImageLeft ? "left" : vars.options.alignment,
+            textAlign: isImageLeft ? "start" : vars.options.alignment,
         },
     };
 
@@ -723,7 +723,7 @@ export const homeWidgetItemClasses = useThemeCache((optionOverrides?: DeepPartia
                 ...Mixins.box(vars.options.box, { onlyPaddings: true }),
                 paddingTop: 4,
                 paddingBottom: 4,
-                textAlign: "left",
+                textAlign: "start",
                 flex: 1,
                 display: "flex",
                 alignItems: "center",

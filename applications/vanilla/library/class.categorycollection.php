@@ -396,12 +396,12 @@ class CategoryCollection
             }
             $max--;
 
-            if ($category["CategoryID"] == -1) {
-                break;
-            }
-
             if ($includeHeadings || $category["DisplayAs"] !== "Heading") {
                 $result[] = $category;
+            }
+
+            if ($category["CategoryID"] == -1) {
+                break;
             }
         }
         $result = array_reverse($result);

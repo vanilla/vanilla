@@ -29,7 +29,8 @@ interface IProps {
     onCancel?: (e: React.SyntheticEvent) => void;
     onConfirm?: (e: React.SyntheticEvent) => void;
     confirmLinkTo?: string;
-    confirmTitle?: string;
+    confirmTitle?: React.ReactNode;
+    cancelTitle?: string;
     children: React.ReactNode;
     isConfirmLoading?: boolean;
     isConfirmDisabled?: boolean;
@@ -83,23 +84,11 @@ export default class ModalConfirm extends React.Component<IProps> {
                     body={
                         <FrameBody>
                             {fullWidthContent ? (
-                                <div
-                                    className={cx(
-                                        "frameBody-contents",
-                                        classesFrameBody.contents,
-                                        this.props.bodyClassName,
-                                    )}
-                                >
+                                <div className={cx(classesFrameBody.contents, this.props.bodyClassName)}>
                                     {children}
                                 </div>
                             ) : (
-                                <SmartAlign
-                                    className={cx(
-                                        "frameBody-contents",
-                                        classesFrameBody.contents,
-                                        this.props.bodyClassName,
-                                    )}
-                                >
+                                <SmartAlign className={cx(classesFrameBody.contents, this.props.bodyClassName)}>
                                     {children}
                                 </SmartAlign>
                             )}
@@ -113,7 +102,7 @@ export default class ModalConfirm extends React.Component<IProps> {
                                 buttonRef={this.cancelRef}
                                 onClick={onCancel}
                             >
-                                {t("Cancel")}
+                                {this.props.cancelTitle ?? t("Cancel")}
                             </Button>
                             {!!onConfirm && (
                                 <Button

@@ -19,6 +19,7 @@ use Vanilla\Search\SearchResultItem;
 use Vanilla\Search\SearchService;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Utility\ModelUtils;
+use Garden\Web\Pagination;
 
 /**
  * API Controller for the `/comments` resource.
@@ -86,9 +87,12 @@ class CommentsApiController extends AbstractApiController
     {
         if ($this->commentPostSchema === null) {
             $this->commentPostSchema = $this->schema(
-                Schema::parse(["body", "format" => new \Vanilla\Models\FormatSchema(), "discussionID"])->add(
-                    $this->fullSchema()
-                ),
+                Schema::parse([
+                    "body",
+                    "format" => new \Vanilla\Models\FormatSchema(),
+                    "discussionID",
+                    "draftID?",
+                ])->add($this->fullSchema()),
                 "CommentPost"
             );
         }
@@ -364,15 +368,15 @@ class CommentsApiController extends AbstractApiController
                     "default" => 1,
                     "minimum" => 1,
                 ],
+                "sort:s?" => [
+                    "enum" => ApiUtils::sortEnum("dateInserted", "commentID", "dateUpdated"),
+                    "default" => "dateInserted",
+                ],
                 "limit:i?" => [
                     "description" => "Desired number of items per page.",
                     "default" => $this->commentModel->getDefaultLimit(),
                     "minimum" => 1,
                     "maximum" => ApiUtils::getMaxLimit(),
-                ],
-                "sort:s?" => [
-                    "enum" => ApiUtils::sortEnum("dateInserted", "commentID", "dateUpdated"),
-                    "default" => "dateInserted",
                 ],
                 "insertUserID:i?" => [
                     "description" => "Filter by author.",
@@ -442,8 +446,8 @@ class CommentsApiController extends AbstractApiController
         } else {
             $paging = ApiUtils::morePagerInfo($hasMore, "/api/v2/comments", $query, $in);
         }
-
-        return new Data($result, ["paging" => $paging]);
+        $pagingObject = Pagination::tryCursorPagination($paging, $query, $result, "commentID");
+        return new Data($result, $pagingObject);
     }
 
     /**
@@ -551,6 +555,19 @@ class CommentsApiController extends AbstractApiController
         }
         $id = $this->commentModel->save($commentData);
         $this->validateModel($this->commentModel);
+
+        // Comments drafts should be deleted after the comment is made
+        if (isset($body["draftID"])) {
+            $draftID = $body["draftID"];
+            $draftModel = Gdn::getContainer()->get(DraftModel::class);
+            //Ensure draft exists
+            $draft = $draftModel->getID($draftID);
+            if ($draft) {
+                $draftModel->deleteID($draftID);
+                $this->validateModel($draftModel);
+            }
+        }
+
         ModelUtils::validateSaveResultPremoderation($id, "comment");
         if (!$id) {
             throw new ServerException("Unable to insert comment.", 500);

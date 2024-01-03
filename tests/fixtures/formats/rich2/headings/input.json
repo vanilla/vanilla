@@ -1,0 +1,33 @@
+[
+  { "type": "h2", "children": [{ "text": "Here is a H2 title" }], "ref": "here-is-a-h2-title"},
+  { "type": "h2", "children": [{ "text": "Here is a H2 title" }], "ref": "here-is-a-h2-title-1"},
+  { "type": "h3", "children": [{ "text": "Here is a H3 title" }], "ref": "here-is-a-h3-title"},
+  { "type": "h4", "children": [{ "text": "Here is a H4 title" }], "ref": "here-is-a-h4-title"},
+  { "type": "h5", "children": [{ "text": "Here is a H5 title" }], "ref": "here-is-a-h5-title"},
+  {
+    "type": "rich_embed_card",
+    "dataSourceType": "url",
+    "url": "https://petstore.swagger.io/v2/swagger.json",
+    "embedData": {
+      "headings": [
+        {
+          "text": "pet",
+          "ref": "/pet",
+          "level": 2
+        },
+        {
+          "text": "POST /pet",
+          "ref": "/pet/addPet",
+          "level": 3
+        }
+      ],
+      "url": "https://petstore.swagger.io/v2/swagger.json",
+      "embedType": "mockHeadingProviderEmbed"
+    },
+    "children": [
+      {
+        "text": ""
+      }
+    ]
+  }
+]

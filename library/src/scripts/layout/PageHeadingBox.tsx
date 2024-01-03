@@ -25,6 +25,7 @@ interface IProps {
     includeBackLink?: boolean;
     options?: Partial<IPageHeadingBoxOptions>;
     titleCount?: string;
+    depth?: number;
 }
 
 export function PageHeadingBox(props: IProps) {
@@ -35,7 +36,8 @@ export function PageHeadingBox(props: IProps) {
     const contextClasses = useWidgetSectionClasses();
 
     const wrapperRef = useRef<HTMLDivElement | null>(null);
-    const depth = useCalculatedDepth(wrapperRef);
+    const calcedDepth = useCalculatedDepth(wrapperRef);
+    const depth = props.depth ?? calcedDepth;
 
     if (!title && !description && !subtitle && !actions) {
         return <></>;

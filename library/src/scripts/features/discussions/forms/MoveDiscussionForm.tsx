@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { t } from "@library/utility/appUtils";
 import { useFormik } from "formik";
@@ -20,25 +20,33 @@ import CommunityCategoryInput from "@vanilla/addon-vanilla/forms/CommunityCatego
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
 import { CategoryDisplayAs, ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import { useDiscussionPatch } from "@library/features/discussions/discussionHooks";
+import { useBulkDiscussionMove } from "@library/features/discussions/discussionHooks";
+import { bulkDiscussionsClasses } from "@library/features/discussions/forms/BulkDiscussions.classes";
+import Checkbox from "@library/forms/Checkbox";
+import { useToast } from "@library/features/toaster/ToastContext";
+import Translate from "@library/content/Translate";
 
 type FormValues = {
     category?: {
         label: ICategoryFragment["name"];
         value: ICategoryFragment["categoryID"];
     };
+    addRedirects: boolean;
 };
 
 interface IProps {
     onCancel: () => void;
-    onSuccess: () => void;
+    onSuccess?: () => Promise<void>;
     isLoading?: boolean;
     discussion: IDiscussion;
 }
 
 export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: IProps) {
-    const { patchDiscussion } = useDiscussionPatch(discussion.discussionID, "move");
-    const formik = useFormik<FormValues>({
+    const [moveIsTriggered, setMoveIsTriggered] = useState<boolean>(false);
+
+    const toast = useToast();
+
+    const { values, setFieldValue, handleSubmit, dirty, isSubmitting, resetForm } = useFormik<FormValues>({
         initialValues: {
             category: discussion.category
                 ? {
@@ -46,13 +54,21 @@ export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: 
                       value: discussion.category.categoryID,
                   }
                 : undefined,
+            addRedirects: false,
         },
-        onSubmit: async ({ category }, helpers) => {
-            const categoryID = category!.value;
-            await patchDiscussion({ categoryID });
-
-            onSuccess();
-            helpers.resetForm();
+        onSubmit: () => {
+            try {
+                moveSelectedDiscussions();
+                setMoveIsTriggered(true);
+            } catch (error) {
+                toast.addToast({
+                    autoDismiss: false,
+                    dismissible: true,
+                    body: <Translate source="There was a problem moving <0/>" c0={discussion.name} />,
+                });
+                onCancel();
+                setMoveIsTriggered(false);
+            }
         },
     });
 
@@ -60,7 +76,41 @@ export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: 
     const classFrameFooter = frameFooterClasses();
     const classes = discussionListClasses();
 
-    const { values, setFieldValue, handleSubmit, dirty, isSubmitting } = formik;
+    const { isSuccess, failedDiscussions, moveSelectedDiscussions } = useBulkDiscussionMove(
+        [discussion.discussionID],
+        values.category?.value,
+        values.addRedirects,
+        true,
+    );
+
+    useEffect(() => {
+        if (moveIsTriggered) {
+            if (isSuccess) {
+                !!onSuccess && onSuccess();
+                toast.addToast({
+                    autoDismiss: true,
+                    body: <>{t("Selected discussion has been moved successfully.")}</>,
+                });
+                resetForm();
+            } else if (failedDiscussions) {
+                toast.addToast({
+                    autoDismiss: false,
+                    dismissible: true,
+                    body: <>{errorMessage}</>,
+                });
+                onCancel();
+            }
+            setMoveIsTriggered(false);
+        }
+    }, [isSuccess, failedDiscussions]);
+
+    const errorMessage = useMemo<string | null>(() => {
+        return failedDiscussions
+            ? `${t("There was a problem moving")} ${Object.values(failedDiscussions)
+                  .map(({ name }) => `"${name}"`)
+                  .join(", ")}`
+            : null;
+    }, [failedDiscussions]);
 
     return (
         <form onSubmit={handleSubmit}>
@@ -83,7 +133,15 @@ export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: 
                                      * dropdowns from overflowing with the modal
                                      * Remove with https://github.com/vanilla/vanilla-cloud/issues/3155
                                      */
-                                    maxHeight={130}
+                                    maxHeight={100}
+                                />
+                            </div>
+                            <div className={bulkDiscussionsClasses().separatedSection}>
+                                <Checkbox
+                                    className={bulkDiscussionsClasses().checkboxLabel}
+                                    label={t("Leave a redirect link")}
+                                    checked={values.addRedirects}
+                                    onChange={(e) => setFieldValue("addRedirects", e.target.checked)}
                                 />
                             </div>
                         </div>

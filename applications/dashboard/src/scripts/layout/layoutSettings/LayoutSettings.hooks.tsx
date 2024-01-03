@@ -3,65 +3,77 @@
  * @license Proprietary
  */
 
+import { LayoutOverviewRoute, LegacyLayoutsRoute } from "@dashboard/appearance/routes/appearanceRoutes";
 import * as layoutActions from "@dashboard/layout/layoutSettings/LayoutSettings.actions";
-import {
-    getLayoutsByViewType,
-    useLayoutDispatch,
-    useLayoutSelector,
-} from "@dashboard/layout/layoutSettings/LayoutSettings.slice";
+import { useLayoutDispatch, useLayoutSelector } from "@dashboard/layout/layoutSettings/LayoutSettings.slice";
 import {
     ILayoutDetails,
     ILayoutEdit,
-    ILayoutsStoreState,
-    ILayoutView,
+    LayoutRecordType,
     LayoutViewFragment,
     LayoutViewType,
+    LAYOUT_VIEW_TYPES,
 } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { Loadable, LoadStatus } from "@library/@types/api/core";
-import { updateConfigsLocal } from "@library/config/configActions";
-import { useToast } from "@library/features/toaster/ToastContext";
-import { t } from "@vanilla/i18n";
+import apiv2 from "@library/apiv2";
+import { IError } from "@library/errorPages/CoreErrorMessages";
+import { getRelativeUrl } from "@library/utility/appUtils";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useThrowError } from "@vanilla/react-utils";
-import { RecordID } from "@vanilla/utils";
-import { useCallback, useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { RecordID, spaceshipCompare } from "@vanilla/utils";
+import { useEffect, useMemo } from "react";
+import { useHistory } from "react-router";
 import { bindActionCreators } from "redux";
 
 export function useLayoutsActions() {
     const dispatch = useLayoutDispatch();
     return useMemo(() => bindActionCreators(layoutActions, dispatch), [dispatch]);
 }
-export function useLayouts() {
-    const { fetchAllLayouts } = useLayoutsActions();
-    const layoutsListStatus = useLayoutSelector(({ layoutSettings }) => layoutSettings.layoutsListStatus);
-    const layoutsByViewType = useLayoutSelector(({ layoutSettings }) => getLayoutsByViewType(layoutSettings));
 
-    useEffect(() => {
-        if (layoutsListStatus.status === LoadStatus.PENDING) {
-            fetchAllLayouts();
-        }
-    }, [layoutsListStatus, fetchAllLayouts]);
-
-    return {
-        isLoading: [LoadStatus.PENDING, LoadStatus.LOADING].includes(layoutsListStatus.status),
-        error: layoutsListStatus.status === LoadStatus.ERROR && layoutsListStatus.error,
-        layoutsByViewType,
-    };
-}
-
-export function useLayout(layoutID?: ILayoutDetails["layoutID"]) {
-    const { fetchLayout } = useLayoutsActions();
-    const layout = useLayoutSelector(({ layoutSettings }) =>
-        layoutID !== undefined ? layoutSettings.layoutsByID[layoutID] : undefined,
+export function sliceLayoutsByViewType(layouts: ILayoutDetails[]): { [key in LayoutViewType]: ILayoutDetails[] } {
+    const obj = Object.fromEntries(
+        LAYOUT_VIEW_TYPES.map((viewType: ILayoutDetails["layoutViewType"]) => {
+            return [
+                viewType,
+                Object.values(layouts)
+                    .filter((layout) => layout.layoutViewType === viewType)
+                    .sort((a, b) => {
+                        return spaceshipCompare(a.dateInserted, b.dateInserted);
+                    }),
+            ];
+        }),
     );
 
-    useEffect(() => {
-        if (layoutID !== undefined && !layout) {
-            fetchLayout(layoutID);
-        }
-    }, [fetchLayout, layout, layoutID]);
+    return obj as { [key in LayoutViewType]: ILayoutDetails[] };
+}
 
-    return layout ?? { status: LoadStatus.PENDING };
+export function useLayoutsQuery() {
+    const layoutsQuery = useQuery({
+        queryFn: async () => {
+            const response = await apiv2.get("/layouts", {
+                params: {
+                    expand: "true,users",
+                },
+            });
+            return response.data;
+        },
+        queryKey: ["layouts"],
+    });
+
+    return layoutsQuery;
+}
+
+export function useLayoutQuery(layoutID?: ILayoutDetails["layoutID"]) {
+    const layoutQuery = useQuery<{}, IError, ILayoutDetails>({
+        queryFn: async () => {
+            const response = await apiv2.get(`/layouts/${layoutID}?expand=true,users`, {});
+            return response.data;
+        },
+        queryKey: ["layouts", "overview", layoutID],
+        enabled: layoutID != null,
+    });
+
+    return layoutQuery;
 }
 
 export function useLayoutJson(layoutID: ILayoutDetails["layoutID"]): Loadable<ILayoutEdit> {
@@ -82,85 +94,43 @@ export function useLayoutJson(layoutID: ILayoutDetails["layoutID"]): Loadable<IL
     return loadable;
 }
 
-export function usePutLayoutViews(layout: ILayoutDetails) {
-    const { layoutID, layoutViewType } = layout;
-    const dispatch = useLayoutDispatch();
-
-    return async (layoutViews: LayoutViewFragment[]) => {
-        await dispatch(
-            layoutActions.putLayoutViews({
-                layoutID,
-                layoutViews,
-            }),
-        ).unwrap();
-        dispatch(
-            updateConfigsLocal({
-                [`customLayout.${layoutViewType}`]: true,
-            }),
-        );
-    };
-}
-
-export function useDeleteLayout({
-    layoutID,
-    onSuccessBeforeDeletion,
-}: {
-    layoutID: ILayoutDetails["layoutID"];
-    onSuccessBeforeDeletion?: () => void;
-}) {
-    const dispatch = useLayoutDispatch();
-    return async () => dispatch(layoutActions.deleteLayout({ layoutID, onSuccessBeforeDeletion })).unwrap();
-}
-
-export function useDeleteLayoutView() {
-    const { deleteLayoutView } = useLayoutsActions();
-
-    return useCallback(
-        (layoutID: ILayoutView["layoutID"]) => {
-            deleteLayoutView({ layoutID: layoutID });
+export function useLayoutViewMutation(layout: ILayoutDetails) {
+    const { layoutID } = layout;
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+        mutationFn: async (layoutViews: LayoutViewFragment[]) => {
+            const response = await apiv2.put(`/layouts/${layoutID}/views`, layoutViews);
+            return response.data;
         },
-
-        [deleteLayoutView],
-    );
-}
-
-export function useLegacyLayoutView(layoutViewType: LayoutViewType, legacyViewValueConfig?: string) {
-    const { putLayoutLegacyView } = useLayoutsActions();
-    const toastContext = useToast();
-    const state = useSelector((state: ILayoutsStoreState) => {
-        return (
-            state.layoutSettings.legacyStatusesByViewType[layoutViewType] ?? {
-                status: LoadStatus.PENDING,
-            }
-        );
+        mutationKey: ["layoutView", layoutID],
+        onSuccess: () => {
+            queryClient.invalidateQueries(["layouts"]);
+        },
     });
+    return mutation;
+}
 
-    useEffect(() => {
-        if (state.error) {
-            toastContext.addToast({
-                dismissible: true,
-                body: (
-                    <>
-                        {t("Error apply layout.")} {state.error.message}
-                    </>
-                ),
-            });
-        }
-    }, [state.error]);
+export function useDeleteLayoutMutation(layout: ILayoutDetails) {
+    const { layoutID } = layout;
 
-    const putLegacyView = useCallback(
-        (legacyViewValue?: string) => {
-            putLayoutLegacyView({ layoutViewType, legacyViewValue, legacyViewValueConfig });
+    const history = useHistory();
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+        mutationFn: async () => {
+            const response = await apiv2.delete(`/layouts/${layoutID}`);
+            return response.data;
         },
-        [putLayoutLegacyView],
-    );
+        mutationKey: ["layouts", "delete", layoutID],
+        onSuccess: () => {
+            queryClient.invalidateQueries(["layouts"]);
 
-    const isSubmitLoading = state.status === LoadStatus.LOADING;
-
-    return {
-        isSubmitLoading,
-        putLegacyView,
-    };
+            // If we're on the page of this layout, redirect to the settings page
+            if (LayoutOverviewRoute.url(layout).includes(history.location.pathname)) {
+                history.replace(getRelativeUrl(LegacyLayoutsRoute.url(layout.layoutViewType)));
+            }
+        },
+    });
+    return mutation;
 }
 
 /**
@@ -169,7 +139,7 @@ export function useLegacyLayoutView(layoutViewType: LayoutViewType, legacyViewVa
  * @param layoutID The ID of the layout.
  */
 export function useCatalogForLayout(layoutID: RecordID) {
-    const layout = useLayout(layoutID);
+    const layout = useLayoutQuery(layoutID);
     const catalog = useLayoutCatalog(layout?.data?.layoutViewType ?? null);
     return catalog;
 }
@@ -212,4 +182,23 @@ export function useLayoutCatalog(layoutViewType: LayoutViewType | null) {
     }, [catalogLoadable]);
 
     return catalog;
+}
+
+export function getAllowedRecordTypesForLayout(layout: ILayoutDetails): LayoutRecordType[] {
+    switch (layout.layoutViewType) {
+        case "home":
+            return [LayoutRecordType.GLOBAL];
+        case "subcommunityHome":
+        case "categoryList":
+        case "discussionList":
+            return [LayoutRecordType.GLOBAL, LayoutRecordType.SUBCOMMUNITY];
+        case "nestedCategoryList":
+        case "discussionCategoryPage":
+        case "discussionThread":
+        case "ideaThread":
+        case "questionThread":
+            return [LayoutRecordType.GLOBAL, LayoutRecordType.CATEGORY, LayoutRecordType.SUBCOMMUNITY];
+        default:
+            return [];
+    }
 }

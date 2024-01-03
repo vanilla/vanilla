@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,13 +8,12 @@ import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { LeftChevronCompactIcon } from "@library/icons/common";
 import { useBackRouting } from "@library/routing/links/BackRoutingProvider";
-import backLinkClasses from "@library/routing/links/backLinkStyles";
-import SmartLink from "@library/routing/links/SmartLink";
+import backLinkClasses from "@library/routing/links/BackLink.classes";
 import { t } from "@library/utility/appUtils";
-import classNames from "classnames";
 import React from "react";
 import { useHistory } from "react-router";
 import LinkAsButton from "@library/routing/LinkAsButton";
+import { cx } from "@emotion/css";
 
 interface IProps {
     ///
@@ -64,7 +63,7 @@ export default function BackLink(props: IProps) {
     const { canGoBack, backFallbackUrl, navigateBack } = useBackRouting();
 
     const classes = backLinkClasses();
-    const className = classNames(classes.link, { hasVisibleLabel: !!props.visibleLabel }, props.linkClassName);
+    const className = cx(classes.link, { hasVisibleLabel: !!props.visibleLabel }, props.linkClassName);
     const title = props.title || t("Back");
 
     if (!canGoBack && props.hideIfNoHistory && !props.fallbackUrl) {
@@ -73,7 +72,7 @@ export default function BackLink(props: IProps) {
 
     let content = (
         <>
-            <LeftChevronCompactIcon className={classNames(classes.icon, props.chevronClass)} />
+            <LeftChevronCompactIcon className={cx(classes.icon, props.chevronClass)} />
             {props.visibleLabel && <span className={classes.label}>{title}</span>}
         </>
     );
@@ -127,7 +126,7 @@ export default function BackLink(props: IProps) {
         );
     }
 
-    return <div className={classNames("backLink", classes.root, props.className)}>{content}</div>;
+    return <div className={cx(classes.root, props.className)}>{content}</div>;
 }
 
 BackLink.defaultProps = {

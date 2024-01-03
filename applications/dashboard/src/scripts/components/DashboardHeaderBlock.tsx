@@ -16,13 +16,14 @@ interface IProps {
     /** @deprecated use useFallbackBackUrl("/action"); instead */
     onBackClick?: () => void;
     className?: string;
+    sticky?: boolean;
 }
 
 export function DashboardHeaderBlock(props: IProps) {
     const HeadingTag = props.headingTag ?? "h1";
     const history = useHistory();
     return (
-        <header className={cx("header-block", props.className)}>
+        <header className={cx("header-block", props.className, { "no-sticky": !(props.sticky ?? true) })}>
             <div className="title-block">
                 {props.showBackLink && history && <BackLink aria-label={t("Return")} onClick={props.onBackClick} />}
                 <HeadingTag>{props.title}</HeadingTag>

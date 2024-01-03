@@ -29,7 +29,9 @@
 {%- endif -%}
 
 {% for stylesheet in styles -%}
+    {% if stylesheet.isNoScript|default(false) %}<noscript>{% endif %}
     <link href="{{ stylesheet.getWebPath() }}" rel="stylesheet" type="text/css" />
+    {% if stylesheet.isNoScript|default(false) %}</noscript>{% endif %}
 {% endfor -%}
 
 {{ preloadModel.renderHtml()|raw }}

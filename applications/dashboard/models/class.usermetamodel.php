@@ -19,6 +19,10 @@ class UserMetaModel extends Gdn_Model
     const SOFT_LIMIT = 100;
     const HARD_LIMIT = 500;
     const QUERY_VALUE_LENGTH = 500;
+    const NAME_LENGTH = 100;
+
+    /** Anonymize Meta */
+    const ANONYMIZE_DATA_USER_META = "AnonymizeData";
 
     /** @var Gdn_Cache */
     private $cache;
@@ -148,7 +152,7 @@ class UserMetaModel extends Gdn_Model
         foreach ($changedKeys as $changedKey) {
             $directKey = $this->getSingleUserCacheKey($userID, $changedKey);
             $this->cache->remove($directKey);
-            $keyPieces = explode(".", $changedKey);
+            $keyPieces = explode(".", $directKey);
             // We don't need the last piece for this.
             array_pop($keyPieces);
             $wildcardBuilder = "";
@@ -158,6 +162,17 @@ class UserMetaModel extends Gdn_Model
                 $this->cache->remove($wildcardBuilder . "%");
             }
         }
+    }
+
+    /**
+     * Clear UserMeta cache
+     *
+     * @param int $userID
+     *
+     */
+    public function clearUserMetaCache(int $userID)
+    {
+        $this->invalidateUserCaches($userID, ["Profile.%"]);
     }
 
     /**
@@ -268,6 +283,12 @@ class UserMetaModel extends Gdn_Model
      */
     public function setUserMeta($userID, string $key, $value = null)
     {
+        // Cast boolean values so they get concatted properly.
+        if ($value === false) {
+            $value = "0";
+        } elseif ($value === true) {
+            $value = "1";
+        }
         if (is_array($userID)) {
             foreach ($userID as $iD) {
                 $this->setUserMeta($iD, $key, $value);
@@ -332,6 +353,9 @@ class UserMetaModel extends Gdn_Model
     {
         if ($value instanceof DateTimeInterface) {
             $value = $value->format(MYSQL_DATE_FORMAT);
+        }
+        if (is_bool($value)) {
+            $value = (int) $value;
         }
         return $value;
     }

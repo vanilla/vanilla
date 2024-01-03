@@ -1,24 +1,25 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Http;
 
 use Garden\Container\Container;
-use Garden\Http\HttpClient;
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
+use Garden\Sites\Clients\SiteHttpClient;
+use Garden\Web\Data;
 use Garden\Web\Exception\HttpException;
+use Vanilla\Site\OwnSite;
 use Vanilla\Utility\DebugUtils;
-use VanillaTests\TestInstallModel;
 
 /**
  * Http client for making requests internally against the dispatcher.
  */
-class InternalClient extends HttpClient
+class InternalClient extends SiteHttpClient
 {
     const DEFAULT_USER_ID = 2;
 
@@ -42,33 +43,20 @@ class InternalClient extends HttpClient
      */
     private $transientKeySigned;
 
-    /** @var string */
-    private $siteBaseUrl;
-
     /**
      * InternalClient constructor.
      *
      * @param Container $container The container used to create requests.
+     * @param OwnSite $ownSite
      * @param string $baseUrl The base Url for relative path requests.
      */
-    public function __construct(Container $container, $baseUrl = "/api/v2")
+    public function __construct(Container $container, OwnSite $ownSite, $baseUrl = "/api/v2")
     {
-        parent::__construct($baseUrl);
+        parent::__construct($ownSite);
+        $this->setBaseUrl($baseUrl);
         $this->throwExceptions = true;
         $this->container = $container;
-        $this->siteBaseUrl = $container->get("@baseUrl");
-
-        // Add a middleware to ensure objects are properly serialized.
-        $this->addMiddleware(function (HttpRequest $request, callable $next): HttpResponse {
-            /** @var HttpResponse $response */
-            $response = $next($request);
-            if (stripos($response->getHeader("Content-Type"), "application/json") !== false) {
-                if ($response->getBody()) {
-                    $response->setBody(json_decode($response->getRawBody(), true));
-                }
-            }
-            return $response;
-        });
+        $this->setDefaultOption("timeout", 25);
     }
 
     /**
@@ -160,7 +148,7 @@ class InternalClient extends HttpClient
             $exception = HttpException::createFromStatus(
                 $response->getStatusCode(),
                 $message,
-                $body ?? [],
+                is_array($body) ? $body : [],
                 $previousEx
             );
 
@@ -220,8 +208,8 @@ class InternalClient extends HttpClient
      * Configure the transient key to be used for requests.
      *
      * @param string $transientKey
-     * @throws \Exception if no active user session is available.
      * @return $this
+     * @throws \Exception if no active user session is available.
      */
     public function setTransientKey($transientKey)
     {
@@ -294,5 +282,69 @@ class InternalClient extends HttpClient
         array $options = []
     ): HttpResponse {
         return $this->request(HttpRequest::METHOD_DELETE, $uri, $body, $headers, $options);
+    }
+
+    /**
+     * @param HttpResponse $response
+     * @return InternalResponse
+     */
+    private function ensureInternalResponse(HttpResponse $response): InternalResponse
+    {
+        if ($response instanceof InternalResponse) {
+            return $response;
+        }
+
+        $data = new Data($response->getBody(), $response->getStatusCode(), $response->getHeaders());
+        return new InternalResponse($data);
+    }
+
+    /**
+     * Wrap in {@link InternalResponse}
+     * @inheritDoc
+     */
+    public function request(
+        string $method,
+        string $uri,
+        $body,
+        array $headers = [],
+        array $options = []
+    ): InternalResponse {
+        return $this->ensureInternalResponse(parent::request($method, $uri, $body, $headers, $options));
+    }
+
+    /**
+     * Wrap in {@link InternalResponse}
+     * @inheritDoc
+     */
+    public function get(string $uri, array $query = [], array $headers = [], $options = []): InternalResponse
+    {
+        return $this->ensureInternalResponse(parent::get($uri, $query, $headers, $options));
+    }
+
+    /**
+     * Wrap in {@link InternalResponse}
+     * @inheritDoc
+     */
+    public function post(string $uri, $body = [], array $headers = [], $options = []): InternalResponse
+    {
+        return $this->ensureInternalResponse(parent::post($uri, $body, $headers, $options));
+    }
+
+    /**
+     * Wrap in {@link InternalResponse}
+     * @inheritDoc
+     */
+    public function patch(string $uri, $body = [], array $headers = [], $options = []): InternalResponse
+    {
+        return $this->ensureInternalResponse(parent::patch($uri, $body, $headers, $options));
+    }
+
+    /**
+     * Wrap in {@link InternalResponse}
+     * @inheritDoc
+     */
+    public function delete(string $uri, array $query = [], array $headers = [], array $options = []): InternalResponse
+    {
+        return $this->ensureInternalResponse(parent::delete($uri, $query, $headers, $options));
     }
 }

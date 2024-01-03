@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Fixtures;
 
+use Garden\MetaTrait;
 use Garden\Web\RequestInterface;
 use Vanilla\Cache\InvalidArgumentException;
 
@@ -15,6 +16,8 @@ use Vanilla\Cache\InvalidArgumentException;
  */
 class Request implements RequestInterface
 {
+    use MetaTrait;
+
     private $scheme = "http";
     private $host = "example.com";
     private $assetRoot = "";
@@ -225,9 +228,9 @@ class Request implements RequestInterface
     /**
      * @inheritdoc
      */
-    public function setAssetRoot(string $assetRoot)
+    public function setAssetRoot(string $root)
     {
-        $this->assetRoot = rtrim("/" . trim($assetRoot, "/"), "/");
+        $this->assetRoot = rtrim("/" . trim($root, "/"), "/");
         return $this;
     }
 

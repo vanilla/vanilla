@@ -4,10 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { LoadStatus } from "@library/@types/api/core";
+import { IApiError, ILoadable, LoadStatus } from "@library/@types/api/core";
 import getStore from "@library/redux/getStore";
 import React from "react";
-import { usePermissions } from "@library/features/users/userModel";
+import { IPermissions } from "@library/features/users/userTypes";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 export enum PermissionMode {
     /**
@@ -54,7 +55,7 @@ interface IProps {
  * Conditionally renders either it's children or a fallback based on if the user has a permission.
  */
 export default function Permission(props: IProps) {
-    usePermissions();
+    const { hasPermission } = usePermissionsContext();
 
     if (!props.permission) {
         return <>{props.children}</>;
@@ -90,9 +91,11 @@ export interface IPermissionOptions {
  * - Always true if the user has the admin flag set.
  * - Only 1 one of the provided permissions needs to match.
  */
-export function hasPermission(permission: string | string[], options?: IPermissionOptions) {
-    const { permissions } = getStore().getState().users;
-
+export function checkPermission(
+    permissions: ILoadable<IPermissions>,
+    permission: string | string[],
+    options?: IPermissionOptions,
+) {
     let permissionsToCheck = permission;
     if (!Array.isArray(permissionsToCheck)) {
         permissionsToCheck = [permissionsToCheck];
@@ -158,6 +161,14 @@ export function hasPermission(permission: string | string[], options?: IPermissi
     });
     return hasMatch;
 }
+
+export type PermissionChecker = (permission: string | string[], options?: IPermissionOptions) => boolean;
+
+/** @deprecated this should only be used in entry scripts, or where the AppContext is not available. In React components or hooks, use `const {hasPermission} = usePermissionsContext()` */
+export const hasPermission: PermissionChecker = function (permission, options?) {
+    const { permissions } = getStore().getState().users;
+    return checkPermission(permissions, permission, options);
+};
 
 export function isUserAdmin(): boolean {
     return getStore().getState().users.permissions.data?.isAdmin ?? false;

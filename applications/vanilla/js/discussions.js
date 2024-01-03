@@ -12,6 +12,7 @@ jQuery(document).ready(function($) {
         // profile/discussions paging
         $('.Section-Profile .Discussions .MorePager, .Section-Profile .Comments .MorePager').morepager({
             pagerInContainer: true,
+            pageContainerSelector: ".Section-Profile .DataList.Discussions",
             afterPageLoaded: function() {
                 $(document).trigger('DiscussionPagingComplete');
             }

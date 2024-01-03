@@ -98,7 +98,7 @@ export const selectOneClasses = useThemeCache(() => {
             },
             ".suggestedTextInput-option": {
                 width: "100%",
-                textAlign: "left",
+                textAlign: "start",
                 ...Mixins.padding({
                     vertical: 6,
                     horizontal: 12,

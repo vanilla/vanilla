@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -49,6 +49,19 @@ class IFrameEmbed extends AbstractEmbed
      */
     protected function schema(): Schema
     {
-        return Schema::parse(["height:i", "width:i"]);
+        return Schema::parse(["height:s", "width:s"]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function renderHtml(): string
+    {
+        // Ensure the iframe domain is trusted or in knowledge, or skip it
+        $url = $this->data["url"] ?? null;
+        if (($url && isTrustedDomain($url)) || $this->data["isKnowledge"]) {
+            return parent::renderHtml();
+        }
+        return "";
     }
 }

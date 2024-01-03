@@ -26,16 +26,22 @@ class CommonLayoutView extends AbstractCustomLayoutView
     /** @var \CategoryModel */
     private $categoryModel;
 
+    private \Gdn_Request $request;
+
     /**
      * DI.
      *
      * @param SiteSectionModel $siteSectionModel
      * @param \CategoryModel $categoryModel
      */
-    public function __construct(SiteSectionModel $siteSectionModel, \CategoryModel $categoryModel)
-    {
+    public function __construct(
+        SiteSectionModel $siteSectionModel,
+        \CategoryModel $categoryModel,
+        \Gdn_Request $request
+    ) {
         $this->siteSectionModel = $siteSectionModel;
         $this->categoryModel = $categoryModel;
+        $this->request = $request;
     }
 
     /**
@@ -57,7 +63,7 @@ class CommonLayoutView extends AbstractCustomLayoutView
     /**
      * @inheritdoc
      */
-    public function getLayoutID(): string
+    public function getTemplateID(): string
     {
         return "common";
     }
@@ -67,7 +73,7 @@ class CommonLayoutView extends AbstractCustomLayoutView
      */
     public function getParamInputSchema(): Schema
     {
-        return Schema::parse(["categoryID:i?", "siteSectionID:s?"]);
+        return Schema::parse(["categoryID:i|s?", "siteSectionID:s?"]);
     }
 
     /**
@@ -93,16 +99,18 @@ class CommonLayoutView extends AbstractCustomLayoutView
             $siteSectionID === null
                 ? $this->siteSectionModel->getDefaultSiteSection()
                 : $this->siteSectionModel->getByID($siteSectionID);
+        if ($siteSectionID != 0) {
+            $webroot = $this->request->getAssetRoot();
+            $this->siteSectionModel->setCurrentSiteSection($siteSection);
 
+            // Make sure requests are constructed with the site section slug.
+            $this->request->setRoot(trim("$webroot{$siteSection->getBasePath()}", "/"));
+        }
         $result["locale"] = $siteSection->getContentLocale();
         $result["siteSection"] = SiteSectionSchema::toArray($siteSection);
 
         $categoryID = $paramInput["categoryID"] ?? $siteSection->getCategoryID();
-
-        // IMPORTANT NOTE:
-        // This is for backward compatibility's sake. The RootRecordProvider & RootSiteSection are using a `-2` categoryID.
-        // However, -2 is not a proper categoryID, so we fallback to -1.
-        $categoryID = is_numeric($categoryID) && $categoryID < -1 ? -1 : $categoryID;
+        $categoryID = $this->categoryModel->ensureCategoryID($categoryID);
 
         $result["categoryID"] = $categoryID;
         // Maybe null.
@@ -114,13 +122,13 @@ class CommonLayoutView extends AbstractCustomLayoutView
         }
 
         $pageHead->setSeoTitle(
-            Gdn::formatService()->renderPlainText(Gdn::config("Garden.HomepageTitle"), HtmlFormat::FORMAT_KEY)
+            Gdn::formatService()->renderPlainText(Gdn::config("Garden.HomepageTitle"), HtmlFormat::FORMAT_KEY),
+            false
         );
         $pageHead->setSeoDescription(
             Gdn::formatService()->renderPlainText(Gdn::config("Garden.Description"), HtmlFormat::FORMAT_KEY)
         );
         $pageHead->setCanonicalUrl(\Gdn::request()->getSimpleUrl());
-        $pageHead->applyMetaTags();
         return $result;
     }
 }

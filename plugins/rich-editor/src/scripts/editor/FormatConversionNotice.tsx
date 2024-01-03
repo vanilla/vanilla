@@ -16,9 +16,12 @@ export const FormatConversionNotice = React.forwardRef(function FormatConversion
     ref: React.RefObject<HTMLDivElement>,
 ) {
     const conversionTitle = t("This text has been converted from another format.");
-    const conversionMessage = t(
-        "As a result you may lose some of your original content and will not be able to revert your changes. Do you wish to continue?",
+    let conversionMessage = t(
+        "As a result you may lose some of your original content and will not be able to revert your changes.",
     );
+    if (props.onCancel) {
+        conversionMessage += ` ${t("Do you wish to continue?")}`;
+    }
 
     return (
         <Message

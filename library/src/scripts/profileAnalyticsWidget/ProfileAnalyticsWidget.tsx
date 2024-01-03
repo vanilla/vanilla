@@ -6,12 +6,12 @@
 import React, { ReactNode, useMemo } from "react";
 import { t } from "@vanilla/i18n";
 import { getMeta } from "@library/utility/appUtils";
-import { hasPermission } from "@library/features/users/Permission";
 import StatTable from "@library/stats/StatTable";
 import { profileAnalyticsClasses } from "./ProfileAnalyticsWidget.styles";
 import DateTime from "@library/content/DateTime";
 import SmartLink from "@library/routing/links/SmartLink";
 import { Icon } from "@vanilla/icons";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 
 export type IUserAnalytics = {
     points?: number;
@@ -28,6 +28,7 @@ export interface IUserAnalyticsProps {
 export function ProfileAnalyticsWidget(props: IUserAnalyticsProps) {
     const { userID } = props;
     const classes = profileAnalyticsClasses();
+    const { hasPermission } = usePermissionsContext();
 
     const { joinDate, lastActive, ...userInfo } = props.userInfo;
     const formattedData = {

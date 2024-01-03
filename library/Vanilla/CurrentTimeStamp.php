@@ -76,7 +76,7 @@ final class CurrentTimeStamp
     {
         self::assertTestMode();
         if ($toConvert instanceof \DateTime) {
-            \DateTimeImmutable::createFromMutable($toConvert);
+            return \DateTimeImmutable::createFromMutable($toConvert);
         } elseif ($toConvert instanceof \DateTimeImmutable) {
             return $toConvert;
         } elseif (is_numeric($toConvert)) {

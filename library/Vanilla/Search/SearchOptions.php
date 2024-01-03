@@ -20,16 +20,22 @@ class SearchOptions
     /** @var int */
     private $limit;
 
+    private bool $skipConversion;
+
+    private array $aggregations = [];
+
     /**
      * Constructor.
      *
      * @param int $offset
      * @param int $limit
+     * @param bool $skipConversion
      */
-    public function __construct(int $offset = 0, int $limit = self::DEFAULT_LIMIT)
+    public function __construct(int $offset = 0, int $limit = self::DEFAULT_LIMIT, bool $skipConversion = false)
     {
         $this->offset = $offset;
         $this->limit = $limit;
+        $this->skipConversion = $skipConversion;
     }
 
     /**
@@ -46,5 +52,36 @@ class SearchOptions
     public function getLimit(): int
     {
         return $this->limit;
+    }
+
+    /**
+     * Whether we should skip AbstractSearchDriver::convertRecordsToResultItems().
+     *
+     * @return bool
+     */
+    public function skipConversion(): bool
+    {
+        return $this->skipConversion;
+    }
+
+    /**
+     * Returns all aggregation options.
+     *
+     * @return SearchAggregation[]
+     */
+    public function getAggregations(): array
+    {
+        return $this->aggregations;
+    }
+
+    /**
+     * Add an aggregation option.
+     *
+     * @param SearchAggregation $aggregation
+     * @return void
+     */
+    public function addAggregation(SearchAggregation $aggregation): void
+    {
+        $this->aggregations[$aggregation->getName()] = $aggregation;
     }
 }

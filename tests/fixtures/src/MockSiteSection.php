@@ -7,7 +7,7 @@
 namespace VanillaTests\Fixtures;
 
 use Vanilla\Contracts\Site\SiteSectionInterface;
-use Vanilla\Layout\GlobalRecordProvider;
+use Vanilla\Layout\GlobalLayoutRecordProvider;
 use Vanilla\Site\SiteSectionSchema;
 
 /**
@@ -201,12 +201,31 @@ class MockSiteSection implements SiteSectionInterface
     /**
      * @inheritDoc
      */
-    public function getLayoutIdLookupParams(string $layoutViewType, string $recordType, string $recordID): array
+    public function getLayoutRecordType(): string
+    {
+        return GlobalLayoutRecordProvider::RECORD_TYPE;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLayoutRecordID()
+    {
+        return GlobalLayoutRecordProvider::RECORD_ID;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTrackablePayload(): array
     {
         return [
-            "layoutViewType" => $layoutViewType,
-            "recordType" => GlobalRecordProvider::getValidRecordTypes()[0],
-            "recordID" => -1,
+            "Subcommunity" => [
+                "SubcommunityID" => $this->getSectionID(),
+                "Locale" => $this->getContentLocale(),
+                "Folder" => $this->getBasePath(),
+                "Name" => $this->getSectionName(),
+            ],
         ];
     }
 }

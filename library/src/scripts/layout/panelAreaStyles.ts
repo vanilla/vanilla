@@ -14,6 +14,7 @@ import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { SectionTypes } from "@library/layout/types/interface.layoutTypes";
 import { Mixins } from "@library/styles/Mixins";
+import { css } from "@emotion/css";
 
 export const panelAreaClasses = useThemeCache((mediaQueries) => {
     const globalVars = globalVariables();
@@ -21,7 +22,7 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
     const classesPanelWidget = panelWidgetClasses(mediaQueries);
     const overflowSize = globalVars.spacer.mainLayout;
 
-    const root = style({
+    const root = css({
         width: percent(100),
         ...Mixins.padding({
             horizontal: globalVariables().widget.padding,
@@ -58,7 +59,9 @@ export const panelAreaClasses = useThemeCache((mediaQueries) => {
 
     const overflowFull = useThemeCache((offset: number, useMinHeight: boolean = true) =>
         style("overflowFull", {
-            [useMinHeight ? "height" : "maxHeight"]: calc(`100vh - ${styleUnit(offset)}`),
+            [useMinHeight ? "height" : "maxHeight"]: calc(
+                `100vh - ${styleUnit(offset)} + ${styleUnit(useMinHeight ? overflowSize : 0)}`,
+            ),
             minHeight: useMinHeight ? 100 : undefined,
             overflow: "auto",
             position: "relative",

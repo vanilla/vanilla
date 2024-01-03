@@ -29,7 +29,7 @@ class FormatSchema extends Schema
                 "type" => "string",
             ]);
         } else {
-            $formats = ["rich", "markdown", "text", "textex", "wysiwyg", "bbcode"];
+            $formats = ["rich", "markdown", "text", "textex", "wysiwyg", "bbcode", "rich2"];
             if ($deprecated) {
                 $formats = array_merge($formats, ["html", "ipb"]);
             }

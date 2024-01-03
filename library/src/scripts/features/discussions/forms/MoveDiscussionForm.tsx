@@ -31,7 +31,7 @@ type FormValues = {
 
 interface IProps {
     onCancel: () => void;
-    onSuccess: () => void;
+    onSuccess?: () => Promise<void>;
     isLoading?: boolean;
     discussion: IDiscussion;
 }
@@ -51,7 +51,7 @@ export default function MoveDiscussionForm({ onCancel, discussion, onSuccess }: 
             const categoryID = category!.value;
             await patchDiscussion({ categoryID });
 
-            onSuccess();
+            !!onSuccess && (await onSuccess());
             helpers.resetForm();
         },
     });

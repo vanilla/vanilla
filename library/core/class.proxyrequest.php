@@ -116,7 +116,7 @@ class ProxyRequest
      * @param $headerString
      * @return int
      */
-    public function curlHeader(&$handler, $headerString)
+    public function curlHeader($handler, $headerString)
     {
         $line = explode(":", $headerString);
         $key = trim(array_shift($line));
@@ -138,7 +138,7 @@ class ProxyRequest
      * @param $handler
      * @return mixed|string
      */
-    protected function curlReceive(&$handler)
+    protected function curlReceive($handler)
     {
         $startTime = microtime(true);
         $response = curl_exec($handler);

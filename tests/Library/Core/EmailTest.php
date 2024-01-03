@@ -176,4 +176,54 @@ class EmailTest extends BootstrapTestCase
             "Specifying neither email nor name" => ["", "", null, null],
         ];
     }
+
+    /**
+     * Test email footer settings
+     *
+     * @dataProvider provideFooterContent
+     */
+    public function testFooterContent(array $configs, string $expected): void
+    {
+        $this->runWithConfig($configs, function () use ($expected) {
+            $email = new Gdn_Email();
+            $this->assertEquals($expected, $email->getFooterContent());
+        });
+    }
+
+    /**
+     * @return iterable
+     */
+    public function provideFooterContent(): iterable
+    {
+        yield "empty config" => [
+            [
+                "Garden.Email.Footer" => "",
+            ],
+            "",
+        ];
+
+        yield "invalid config" => [
+            [
+                "Garden.Email.Footer" => "invalid rich text",
+            ],
+            "",
+        ];
+
+        yield "Rich content text email" => [
+            [
+                "Garden.Email.Footer" =>
+                    '[{"type":"h2","children":[{"text":"Hello World!!"}]},{"type":"p","children":[{"text":"test"}]}]',
+            ],
+            "Hello World!!\ntest",
+        ];
+
+        yield "Rich content html email" => [
+            [
+                "Garden.Email.Format" => "html",
+                "Garden.Email.Footer" =>
+                    '[{"type":"h2","children":[{"text":"Hello World!!"}]},{"type":"p","children":[{"text":"test"}]}]',
+            ],
+            '<h2 data-id="hello-world">Hello World!!</h2><p>test</p>',
+        ];
+    }
 }

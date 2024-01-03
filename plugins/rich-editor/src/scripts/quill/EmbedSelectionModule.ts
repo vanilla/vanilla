@@ -18,7 +18,7 @@ import {
     isEmbedSelected,
 } from "@rich-editor/quill/utility";
 import MentionAutoCompleteBlot from "@rich-editor/quill/blots/embeds/MentionAutoCompleteBlot";
-import { isEditorWalledEvent } from "@rich-editor/editor/pieces/EditorEventWall";
+import { isEditorWalledEvent } from "@library/editor/pieces/EditorEventWall";
 
 /**
  * A module for managing focus of Embeds. For this to work for a new Embed,

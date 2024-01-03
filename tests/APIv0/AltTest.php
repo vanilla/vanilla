@@ -14,6 +14,17 @@ use VanillaTests\APIv2\AbstractAPIv2Test;
  */
 class AltTest extends AbstractAPIv2Test
 {
+    public static $addons = ["stubcontent"];
+
+    /**
+     * @return void
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->useLegacyLayouts();
+    }
+
     /**
      * Test an alternate install method.
      *
@@ -42,7 +53,7 @@ class AltTest extends AbstractAPIv2Test
     public function testAltInstallWithNoUpdateToken()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionCode(403);
+        $this->expectExceptionCode(401);
         $this->doAltInstallWithUpdateToken(true, "xkcd", "");
     }
 
@@ -60,7 +71,7 @@ class AltTest extends AbstractAPIv2Test
         string $postUpdateToken,
         bool $retried = false
     ) {
-        $apiv0 = new APIv0();
+        $apiv0 = new E2ETestClient();
 
         $apiv0->uninstall();
         $apiv0->createDatabase();
@@ -77,17 +88,21 @@ class AltTest extends AbstractAPIv2Test
             $r["Success"],
             "Site failed to install properly " . json_encode($r, JSON_PRETTY_PRINT)
         );
-        $apiv0->saveToConfig(["Garden.Installed" => true]);
+        $apiv0->saveToConfig([
+            "Garden.Installed" => true,
+            "Feature.customLayout.home.Enabled" => false,
+            "Feature.customLayout.discussionList.Enabled" => false,
+            "Feature.customLayout.categoryList.Enabled" => false,
+        ]);
 
         // Do a simple get to make sure there isn't an error.
-        $data = $this->dispatchData("/discussions", DELIVERY_TYPE_DATA);
+        $data = $apiv0->get("/discussions.json")->getBody();
         $this->assertIsArray($data);
         /** @var \Gdn_DataSet $discussions */
         $discussions = $data["Discussions"] ?? null;
-        $discussions = $discussions->resultArray();
         $this->assertIsArray($discussions, "Could not find discussions in: " . json_encode($data, JSON_PRETTY_PRINT));
 
-        if (count($discussions, 3)) {
+        if (count($discussions) === 3) {
             $this->assertCount(3, $discussions);
         } elseif (!$retried) {
             // This test is notoriously flaky.
@@ -97,7 +112,7 @@ class AltTest extends AbstractAPIv2Test
             $wholeConfig = \Gdn::config()->get(".");
             /** @var \DiscussionModel $discussionModel */
             $discussionModel = $this->container()->get(\DiscussionModel::class);
-            $allDiscussions = $discussionModel->getWhere()->resultArray();
+            $allDiscussions = $discussionModel->getWhere(["Announce" => false])->resultArray();
             $message =
                 "Alt Install failed twice.\n" .
                 "Dumping Config:\n" .
@@ -113,9 +128,9 @@ class AltTest extends AbstractAPIv2Test
     /**
      * Get the config to be applied to the site before update.
      *
-     * @param APIv0 $apiv0
+     * @param E2ETestClient $apiv0
      */
-    private function getBaseConfig(APIv0 $apiv0)
+    private function getBaseConfig(E2ETestClient $apiv0)
     {
         $config = [
             "Database" => [

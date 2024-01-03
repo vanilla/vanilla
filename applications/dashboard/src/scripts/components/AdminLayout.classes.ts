@@ -35,16 +35,18 @@ export const adminLayoutClasses = useThemeCache(() => {
         borderRight: singleBorder(),
         // Make sure the border stretches to the full height.
         height: "100%",
+        paddingTop: 48,
     });
 
     const twoColLeftPanel = css({
         // Add some extra padding on here so absolute position collapsers
         // don't get cutoff by the the overflow: auto.
-        width: 240 + 24,
+        width: 280,
         marginLeft: -24,
         paddingLeft: 24,
         ...sticky(),
-        top: titleBarVariables().fullHeight + 1,
+        top: 16,
+        paddingTop: 48,
         // Critical for the sticky to work.
         alignSelf: "flex-start",
         maxHeight: `calc(100vh - ${titleBarVariables().fullHeight}px)`,
@@ -100,37 +102,46 @@ export const adminLayoutClasses = useThemeCache(() => {
     // closer resemble the old dashboard three panel view
     const threePanel = css({
         "&&": {
-            marginTop: 0,
-            "&& > main": {
-                marginTop: 0,
+            marginTop: 10,
+        },
 
-                // The left panel
-                "& > div > div:nth-of-type(1)": {
-                    borderRight: singleBorder(),
-                    "& > div > div": {
-                        overflow: "visible",
-                        "& > div": {
-                            paddingRight: 0,
-                            "& aside": {
-                                border: 0,
-                            },
-                        },
+        "& main": {
+            marginTop: 0,
+        },
+
+        "& .leftColumn": {
+            borderRight: singleBorder(),
+            "& > div > div": {
+                width: "calc(100% + 24px)",
+                paddingLeft: 24,
+                marginLeft: -24,
+                // overflow: "visible",
+                "& > div": {
+                    paddingRight: 0,
+                    "& aside": {
+                        border: 0,
                     },
                 },
-                // The content panel
-                "& > div > div:nth-of-type(2)": {
-                    backgroundColor: "#fff",
-                },
-                // The right panel
-                "& > div > div:nth-of-type(3)": {
-                    borderLeft: singleBorder(),
-                },
             },
+        },
 
-            "&& .panelArea": {
-                paddingLeft: 0,
-                paddingRight: 0,
-            },
+        // The content panel
+        "& .mainColumn": {
+            backgroundColor: "#fff",
+        },
+        // The right panel
+        "& .rightColumn": {
+            borderLeft: singleBorder(),
+        },
+
+        "& .panelArea": {
+            paddingLeft: 0,
+            paddingRight: 0,
+        },
+
+        "* .middleTopArea": {
+            // So sticky headers work.
+            display: "contents",
         },
     });
 
@@ -142,9 +153,13 @@ export const adminLayoutClasses = useThemeCache(() => {
             Variables.spacing({
                 vertical: 18,
                 horizontal: 18,
-                top: 32,
+                top: 48,
             }),
         ),
+
+        "& .panelWidget *:first-child": {
+            marginTop: 0,
+        },
     });
 
     const adjustedContainerPadding = css(

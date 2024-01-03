@@ -63,7 +63,7 @@ class MediaModelTest extends AbstractAPIv2Test
         $this->assertFileExists(PATH_UPLOADS . "/" . $media["Path"]);
 
         $this->mediaModel->deleteID($insertedMedia["mediaID"], ["deleteFile" => true]);
-        $this->assertFileNotExists(PATH_UPLOADS . "/" . $media["Path"]);
+        $this->assertFileDoesNotExist(PATH_UPLOADS . "/" . $media["Path"]);
 
         $this->expectException(NotFoundException::class);
         $this->mediaModel->findUploadedMediaByID($insertedMedia["mediaID"]);

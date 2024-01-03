@@ -159,6 +159,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         allowArbitraryInput,
         placeholder,
         optionProvider,
+        id,
         ...otherProps
     } = props;
     const { zIndex } = useStackingContext();
@@ -178,17 +179,22 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
     // This state tracks if a user is using the direction keys tp navigate the combo box
     const [isUsingDirectionKeys, setUsingDirectionKeys] = useState(false);
 
-    const { options, optionByValue, optionByLabel } = useMemo(
-        () => makeOptionState(controlledOptions ? controlledOptions : props.options ?? [], optionProvider),
-        [controlledOptions, optionProvider, props.options],
-    );
+    const { options, optionByValue, optionByLabel } = useMemo(() => {
+        let options = [...(props.options ? props.options : []), ...(controlledOptions ? controlledOptions : [])];
+
+        // Remove duplicate for a prop option that has been chosen and sent back as controlledOption
+        if (controlledOptions && controlledOptions.length) {
+            options = options.filter((obj, index) => options.findIndex((item) => item.value == obj.value) === index);
+        }
+        return makeOptionState(options, optionProvider);
+    }, [controlledOptions, optionProvider, props.options]);
 
     const values = value;
 
     // this prevents switching from multiple to non-multiple when the value is cleared
     const isMultiple = useMemo(() => {
         return props.multiple || Array.isArray(value);
-    }, []);
+    }, [props, value]);
 
     // We need to control the value to be able to clear it.
     const displayValue = isMultiple
@@ -370,8 +376,8 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
         const values = Array.isArray(valuesState) ? valuesState : [valuesState];
         return values
             .map((value) => optionByValue[value]?.label ?? "")
-            .filter((item) => item !== undefined && item !== "");
-    }, [isMultiple, optionByValue, valuesState]);
+            .filter((item) => item !== undefined && item !== "" && !arbitraryValues.map(String).includes(item));
+    }, [isMultiple, optionByValue, valuesState, arbitraryValues]);
 
     /**
      * Removes a specific value and fires off the onChange
@@ -482,6 +488,7 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                     )}
                     <Reach.ComboboxInput
                         {...otherProps}
+                        id={id}
                         ref={inputRef}
                         selectOnClick
                         disabled={disabled}

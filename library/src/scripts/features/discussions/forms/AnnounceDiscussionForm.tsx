@@ -30,7 +30,7 @@ type FormValues = {
 
 interface IProps {
     onCancel: () => void;
-    onSuccess: () => void;
+    onSuccess?: () => Promise<void>;
     discussion: IDiscussion;
 }
 
@@ -40,13 +40,13 @@ export default function AnnounceDiscussionForm({ onCancel, onSuccess, discussion
         initialValues: {
             pinLocation: discussion.pinned ? discussion.pinLocation! : "",
         },
-        onSubmit: ({ pinLocation }) => {
-            patchDiscussion({
+        onSubmit: async ({ pinLocation }) => {
+            await patchDiscussion({
                 pinLocation: pinLocation !== "" ? pinLocation : undefined,
                 pinned: pinLocation !== "",
             });
 
-            onSuccess();
+            !!onSuccess && (await onSuccess());
         },
     });
 

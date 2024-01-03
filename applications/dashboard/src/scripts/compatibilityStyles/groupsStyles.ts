@@ -174,7 +174,7 @@ export const groupsCSS = () => {
             transform: translateX(`5px`),
         },
         "body.Groups .StructuredForm .Buttons-Confirm": {
-            textAlign: "left",
+            textAlign: "start",
         },
         // Group Box
         ".Group-Box .Item:not(tr)": {
@@ -243,9 +243,9 @@ export const groupsCSS = () => {
             top: "auto",
         },
         [`.Section-Group .Group-Box .H, .Section-Group .Group-Box .EmptyMessage`]: {
-            textAlign: "left",
+            textAlign: "start",
             ...mediaQueries.tabletDown({
-                textAlign: "left",
+                textAlign: "start",
             }),
             ...mediaQueries.mobileDown({
                 marginBottom: styleUnit(6),

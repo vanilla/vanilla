@@ -50,6 +50,15 @@ class ModerationMessagesApiControllerTest extends AbstractResourceTest
     ];
 
     /**
+     * @return void
+     */
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->useLegacyLayouts();
+    }
+
+    /**
      * Test assigning a message to a specific category.
      */
     public function testPostingToCategory()

@@ -39,7 +39,7 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface
     /** @var SiteSectionInterface $currentSiteSection */
     private $currentSiteSection;
 
-    /** @var SiteSectionInterface $currentSiteSection */
+    /** @var SiteSectionInterface $defaultSiteSection */
     private $defaultSiteSection;
 
     /** @var array $defaultRoutes */
@@ -51,15 +51,15 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface
     /** @var SiteSectionInterface[] $siteSectionsForAttribute */
     private $siteSectionsForAttributes = [];
 
+    private \Gdn_Request $request;
+
     /**
      * SiteSectionModel constructor.
-     *
-     * @param ConfigurationInterface $config
-     * @param Gdn_Router $router
      */
-    public function __construct(ConfigurationInterface $config, Gdn_Router $router)
+    public function __construct(ConfigurationInterface $config, Gdn_Router $router, \Gdn_Request $request)
     {
         $this->defaultSiteSection = new DefaultSiteSection($config, $router);
+        $this->request = $request;
     }
 
     /**
@@ -273,6 +273,14 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface
     }
 
     /**
+     * @param SiteSectionInterface $currentSiteSection
+     */
+    public function setCurrentSiteSection(SiteSectionInterface $currentSiteSection): void
+    {
+        $this->currentSiteSection = $currentSiteSection;
+    }
+
+    /**
      * Register application available
      *
      * @param string $app
@@ -338,7 +346,13 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface
      */
     public function getDefaultSiteSection(): SiteSectionInterface
     {
-        return $this->defaultSiteSection;
+        $default = null;
+        foreach ($this->providers as $provider) {
+            if (!empty(($current = $provider->getDefaultSiteSection()))) {
+                $default = $current;
+            }
+        }
+        return $default ?? $this->defaultSiteSection;
     }
 
     /**

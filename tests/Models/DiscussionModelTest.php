@@ -10,11 +10,13 @@ namespace VanillaTests\Models;
 use ActivityModel;
 use CategoryModel;
 use DiscussionModel;
+use Exception;
 use Garden\EventManager;
 use Garden\Events\BulkUpdateEvent;
 use Gdn;
 use RoleModel;
 use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Formatting\Formats\MarkdownFormat;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Scheduler\LongRunnerAction;
@@ -181,7 +183,7 @@ class DiscussionModelTest extends SiteTestCase
      */
     public function testInvalidArchiveDate()
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         $this->discussionModel->setArchiveDate("dnsfids");
     }
@@ -406,7 +408,7 @@ class DiscussionModelTest extends SiteTestCase
      * @param string|null $testMaxDateInserted The most recent insert date of the viewed comments.
      * @param array $expected The expected result.
      * @dataProvider provideTestCalculateWatchArrays
-     * @throws \Exception Throws an exception if given an invalid timestamp.
+     * @throws Exception Throws an exception if given an invalid timestamp.
      */
     public function testCalculateWatch(
         $testDiscussionArray,
@@ -696,7 +698,7 @@ class DiscussionModelTest extends SiteTestCase
     }
 
     /**
-     * Test that chaning a discussions category triggers a bulk update for all of it's comments.
+     * Test that changing a discussions category triggers a bulk update for all of it's comments.
      */
     public function testChangeTriggersBulkUpdate()
     {
@@ -747,7 +749,7 @@ class DiscussionModelTest extends SiteTestCase
      * Test inserting and updating a user's watch status of comments in a discussion.
      *
      * @return void
-     * @throws \Exception Throws an exception if given an invalid timestamp.
+     * @throws Exception Throws an exception if given an invalid timestamp.
      */
     public function testSetWatch(): void
     {
@@ -903,8 +905,8 @@ class DiscussionModelTest extends SiteTestCase
         $row = ["Name" => "ax1", "Announce" => 1];
         $this->insertDiscussions(10, $row);
 
-        $rows = $this->discussionModel->getAnnouncements($row, 0, false, "-DiscussionID")->resultArray();
-        self::assertSorted($rows, "-DiscussionID");
+        $rows = $this->discussionModel->getAnnouncements($row, 0, false)->resultArray();
+        self::assertSorted($rows, "-DateLastComment");
     }
 
     /**
@@ -916,6 +918,7 @@ class DiscussionModelTest extends SiteTestCase
         $this->assertSame(
             [
                 "Discussion" => [
+                    "layoutViewType" => "discussionThread",
                     "apiType" => "discussion",
                     "Singular" => "Discussion",
                     "Plural" => "Discussions",
@@ -1437,6 +1440,56 @@ class DiscussionModelTest extends SiteTestCase
                 ->get("/notifications")
                 ->getBody();
             $this->assertCount(1, $notifications);
+        });
+    }
+
+    /**
+     * Test that the old bookmarks alias `w` is compatible with getWhere();
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function testLegacyBookmarkAlias(): void
+    {
+        $discussion = $this->createDiscussion();
+        $this->bookmarkDiscussion();
+        $result = $this->discussionModel
+            ->getWhere(["w.Bookmarked" => 1, "DiscussionID" => $discussion["discussionID"]])
+            ->firstRow(DATASET_TYPE_ARRAY);
+
+        $this->assertEquals($discussion["discussionID"], $result["DiscussionID"]);
+    }
+
+    /**
+     * Test that DiscussionModel::getWhere() respects the configured default sort when not passed one.
+     */
+    public function testRespectsDefaultSorts()
+    {
+        $this->resetTable("Discussion");
+        CurrentTimeStamp::mockTime("Dec 1 2020");
+        $disc1 = $this->createDiscussion([], ["Score" => 20]);
+
+        CurrentTimeStamp::mockTime("Dec 15 2020");
+        $disc2 = $this->createDiscussion([], ["Score" => 10]);
+
+        // Default is ordered by dateLastComment
+        $discussions = $this->discussionModel->getWhere()->resultArray();
+        $this->assertRowsLike(
+            [
+                "DiscussionID" => [$disc2["discussionID"], $disc1["discussionID"]],
+            ],
+            $discussions
+        );
+
+        // Now with a different sort order.
+        $this->runWithConfig(["Vanilla.Discussions.SortField" => "Score"], function () use ($disc1, $disc2) {
+            $discussions = $this->discussionModel->getWhere()->resultArray();
+            $this->assertRowsLike(
+                [
+                    "DiscussionID" => [$disc1["discussionID"], $disc2["discussionID"]],
+                ],
+                $discussions
+            );
         });
     }
 }

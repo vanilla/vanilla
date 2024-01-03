@@ -13,7 +13,6 @@ import FrameBody from "@library/layout/frame/FrameBody";
 import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
-import { cx } from "@emotion/css";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@library/utility/appUtils";
@@ -28,7 +27,7 @@ type FormValues = {
 };
 export interface IProps {
     onCancel: () => void;
-    onSuccess: () => void;
+    onSuccess?: () => Promise<void>;
     discussion: IDiscussion;
 }
 
@@ -59,7 +58,7 @@ export default function TagDiscussionFormLoadable(props: IProps) {
             if (tagIDs) {
                 try {
                     await putDiscussionTags(tagIDs.map(({ value }) => value as number));
-                    onSuccess();
+                    !!onSuccess && (await onSuccess());
                 } catch (error) {
                     setErrors({ tagIDs: error.message });
                 }
@@ -74,7 +73,7 @@ export default function TagDiscussionFormLoadable(props: IProps) {
                 bodyWrapClass={classes.modalSuggestionOverride}
                 body={
                     <FrameBody>
-                        <div className={cx("frameBody-contents", classesFrameBody.contents)}>
+                        <div className={classesFrameBody.contents}>
                             <TagsInput
                                 id="tagIDs"
                                 type="User"

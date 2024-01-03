@@ -9,10 +9,11 @@ import { AxiosInstance } from "axios";
 import get from "lodash/get";
 import debounce from "lodash/debounce";
 import { t } from "@vanilla/i18n";
-import { notEmpty } from "@vanilla/utils";
+import { logError, notEmpty } from "@vanilla/utils";
 import { IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
 import { AutoCompleteContext } from "./AutoCompleteContext";
 import { useApiContext } from "../../ApiContext";
+import { useIsMounted } from "@vanilla/react-utils";
 
 export interface ILookupApi {
     searchUrl: string;
@@ -23,11 +24,13 @@ export interface ILookupApi {
     resultsKey?: string;
     excludeLookups?: string[];
     processOptions?: (options: IAutoCompleteOption[]) => IAutoCompleteOptionProps[];
+    group?: string; // if this is passed, all options will be grouped under this in dropdown
 }
 
 interface IAutoCompleteLookupProps {
     lookup: ILookupApi;
     api?: AxiosInstance;
+    lookupResult?(result: any): void;
 }
 
 /**
@@ -47,7 +50,7 @@ const apiCaches = new Map<string, any>();
  * This component does not return any DOM elements.
  */
 export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
-    const { lookup } = props;
+    const { lookup, lookupResult } = props;
     const contextApi = useApiContext();
     const api = props.api ?? contextApi;
     const { inputState, value, setOptions, setInputState, multiple } = useContext(AutoCompleteContext);
@@ -69,6 +72,7 @@ export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
     useEffect(() => {
         if (!isLoading && options && setOptions) {
             setOptions(options);
+            lookupResult && lookupResult(options);
         }
     }, [isLoading, setOptions, options]);
 
@@ -85,19 +89,37 @@ function useApiLookup(
     currentInputValue: string | number | Array<string | number>,
     initialValue: any,
 ): [IAutoCompleteOption[] | null, IAutoCompleteOption[] | null] {
-    const [options, setOptions] = useState<IAutoCompleteOption[] | null>(null);
-    const [initialOptionsOrOption, setInitialOptionsOrOption] = useState<
+    const isMounted = useIsMounted();
+
+    const [options, _setOptions] = useState<IAutoCompleteOption[] | null>(null);
+    const [initialOptionsOrOption, _setInitialOptionsOrOption] = useState<
         IAutoCompleteOption | IAutoCompleteOption[] | null
     >(null);
+
+    function setOptions(opts: typeof options) {
+        if (!isMounted()) {
+            return;
+        }
+        _setOptions(opts);
+    }
+
+    function setInitialOptionsOrOption(opts: typeof initialOptionsOrOption) {
+        if (!isMounted()) {
+            return;
+        }
+        _setInitialOptionsOrOption(opts);
+    }
+
     const {
         searchUrl,
         singleUrl,
         resultsKey = ".",
         labelKey = "name",
-        extraLabelKey = "name",
+        extraLabelKey = "",
         valueKey = "name",
         processOptions,
         excludeLookups,
+        group,
     } = lookup;
 
     useDebugValue({
@@ -116,6 +138,7 @@ function useApiLookup(
                 extraLabel,
                 value,
                 data: result,
+                group: group,
             };
         },
         [labelKey, extraLabelKey, valueKey],
@@ -126,16 +149,25 @@ function useApiLookup(
         if (initialValue && !(excludeLookups ?? []).includes(initialValue)) {
             if ([initialValue].flat().length <= 1) {
                 const actualApiUrl = singleUrl.replace("/api/v2", "").replace("%s", initialValue);
-                api.get(actualApiUrl).then((response) => {
-                    if (response.data) {
-                        let options = [transformApiToOption(response.data)];
-                        if (processOptions) {
-                            options = processOptions(options);
+
+                api.get(actualApiUrl)
+                    .then((response) => {
+                        if (!isMounted()) {
+                            return;
                         }
-                        apiCaches.set(actualApiUrl, options);
-                        setInitialOptionsOrOption(options[0]);
-                    }
-                });
+                        if (response.data) {
+                            let options = [transformApiToOption(response.data)];
+                            if (processOptions) {
+                                options = processOptions(options);
+                            }
+                            apiCaches.set(actualApiUrl, options);
+
+                            setInitialOptionsOrOption(options[0]);
+                        }
+                    })
+                    .catch((error) => {
+                        logError(error);
+                    });
             } else {
                 // query api for all options
                 const actualSearchUrl = searchUrl.replace("/api/v2", "").replace("%s", ""); //just get the options
@@ -147,20 +179,26 @@ function useApiLookup(
                 }
 
                 // Fetch from API
-                api.get(actualSearchUrl).then((response) => {
-                    const { data } = response;
-                    const results = resultsKey === "." ? data : get(data, resultsKey, "[]");
-                    let options: IAutoCompleteOption[] = results.map(transformApiToOption);
-                    if (processOptions) {
-                        options = processOptions(options);
-                    }
-                    apiCaches.set(actualSearchUrl, options);
-                    // select the current ones from the response
-                    setInitialOptionsOrOption(options.filter(({ value }) => initialValue.includes(value)));
-
-                    // fixme: this may be redundant
-                    setOptions(options);
-                });
+                api.get(actualSearchUrl)
+                    .then((response) => {
+                        if (!isMounted()) {
+                            return;
+                        }
+                        const { data } = response;
+                        const results = resultsKey === "." ? data : get(data, resultsKey, "[]");
+                        let options: IAutoCompleteOption[] = results.map(transformApiToOption);
+                        if (processOptions) {
+                            options = processOptions(options);
+                        }
+                        apiCaches.set(actualSearchUrl, options);
+                        // select the current ones from the response
+                        setInitialOptionsOrOption(options.filter(({ value }) => initialValue.includes(value)));
+                        // fixme: this may be redundant
+                        setOptions(options);
+                    })
+                    .catch((error) => {
+                        logError(error);
+                    });
             }
         }
     }, []);
@@ -176,23 +214,32 @@ function useApiLookup(
             }
 
             // Fetch from API
-            api.get(actualSearchUrl).then((response) => {
-                const { data } = response;
-                const results = resultsKey === "." ? data : get(data, resultsKey, "[]");
-                let options: IAutoCompleteOption[] = results.map(transformApiToOption);
-                if (processOptions) {
-                    options = processOptions(options);
-                }
-                apiCaches.set(actualSearchUrl, options);
-                setOptions(options);
-            });
+            api.get(actualSearchUrl)
+                .then((response) => {
+                    if (!isMounted()) {
+                        return;
+                    }
+                    const { data } = response;
+                    const results = resultsKey === "." ? data : get(data, resultsKey, "[]");
+                    let options: IAutoCompleteOption[] = results.map(transformApiToOption);
+                    if (processOptions) {
+                        options = processOptions(options);
+                    }
+                    apiCaches.set(actualSearchUrl, options);
+                    setOptions(options);
+                })
+                .catch((error) => {
+                    logError(error);
+                });
         }, 200),
         [searchUrl, singleUrl, processOptions],
     );
 
     // This hook will update the available options whenever the input has changed
     useEffect(() => {
-        updateOptions(currentInputValue);
+        if (isMounted()) {
+            updateOptions(currentInputValue);
+        }
     }, [updateOptions, currentInputValue]);
 
     const currentOptionOrOptions = useMemo(() => {

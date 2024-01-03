@@ -216,6 +216,9 @@ class DiscussionsController extends VanillaController
         $this->AnnounceData = $Offset == 0 ? $DiscussionModel->getAnnouncements($announcementsWhere) : false;
         $this->setData("Announcements", $this->AnnounceData !== false ? $this->AnnounceData : [], true);
 
+        // We already have global announcements, now get recent, including announced in category
+        $where["Announce"] = [false, $DiscussionModel::CATEGORY_ANNOUNCEMENT];
+
         // Get Discussions
         $this->DiscussionData = $DiscussionModel->getWhereRecent($where, $Limit, $Offset);
 
@@ -401,10 +404,11 @@ class DiscussionsController extends VanillaController
     /**
      * Display discussions the user has bookmarked.
      *
+     * @param string $page
+     * @throws Gdn_UserException
      * @since 2.0.0
      * @access public
      *
-     * @param int $Offset Number of discussions to skip.
      */
     public function bookmarked($page = "0")
     {
@@ -425,7 +429,7 @@ class DiscussionsController extends VanillaController
         }
 
         // Determine offset from $Page
-        [$page, $limit] = offsetLimit($page, c("Vanilla.Discussions.PerPage", 30));
+        [$offset, $limit] = offsetLimit($page, c("Vanilla.Discussions.PerPage", 30));
         $this->canonicalUrl(
             url(concatSep("/", "discussions", "bookmarked", pageNumber($page, $limit, true, false)), true)
         );
@@ -442,17 +446,17 @@ class DiscussionsController extends VanillaController
         $this->setData("Filters", $discussionModel->getFilters());
 
         $wheres = [
-            "w.Bookmarked" => "1",
-            "w.UserID" => Gdn::session()->UserID,
+            "ud.Bookmarked" => "1",
+            "ud.UserID" => Gdn::session()->UserID,
         ];
 
-        $this->DiscussionData = $discussionModel->get($page, $limit, $wheres);
+        $this->DiscussionData = $discussionModel->getWhere($wheres, "", "", $limit, $offset);
         $this->setData("Discussions", $this->DiscussionData);
         $countDiscussions = $discussionModel->getCount($wheres);
         $this->setData("CountDiscussions", $countDiscussions);
         $this->Category = false;
 
-        $this->setJson("Loading", $page . " to " . $limit);
+        $this->setJson("Loading", $offset . " to " . $limit);
 
         // Build a pager
         $pagerFactory = new Gdn_PagerFactory();
@@ -460,12 +464,12 @@ class DiscussionsController extends VanillaController
         $this->fireEvent("BeforeBuildBookmarkedPager");
         $this->Pager = $pagerFactory->getPager($this->EventArguments["PagerType"], $this);
         $this->Pager->ClientID = "Pager";
-        $this->Pager->configure($page, $limit, $countDiscussions, 'discussions/bookmarked/%1$s');
+        $this->Pager->configure($offset, $limit, $countDiscussions, 'discussions/bookmarked/%1$s');
 
         if (!$this->data("_PagerUrl")) {
             $this->setData("_PagerUrl", "discussions/bookmarked/{Page}");
         }
-        $this->setData("_Page", $page);
+        $this->setData("_Page", $offset);
         $this->setData("_Limit", $limit);
         $this->fireEvent("AfterBuildBookmarkedPager");
 
@@ -488,17 +492,22 @@ class DiscussionsController extends VanillaController
         $this->render();
     }
 
+    /**
+     * @return void
+     * @throws Gdn_UserException
+     * @deprecated
+     */
     public function bookmarkedPopin()
     {
         $this->permission("Garden.SignIn.Allow");
 
         $discussionModel = new DiscussionModel();
         $wheres = [
-            "w.Bookmarked" => "1",
-            "w.UserID" => Gdn::session()->UserID,
+            "ud.Bookmarked" => "1",
+            "ud.UserID" => Gdn::session()->UserID,
         ];
 
-        $discussions = $discussionModel->get(0, 5, $wheres)->result();
+        $discussions = $discussionModel->getWhere($wheres);
         $this->setData("Title", t("Bookmarks"));
         $this->setData("Discussions", $discussions);
         $this->render("Popin");
@@ -543,8 +552,7 @@ class DiscussionsController extends VanillaController
         $discussionModel->setFilters(Gdn::request()->get());
         $this->setData("Sort", $discussionModel->getSort());
         $this->setData("Filters", $discussionModel->getFilters());
-
-        $this->DiscussionData = $discussionModel->get($offset, $limit, $wheres);
+        $this->DiscussionData = $discussionModel->getWhere($wheres, "", "", $limit, $offset);
         $this->setData("Discussions", $this->DiscussionData);
         $countDiscussions = $this->setData("CountDiscussions", $discussionModel->getCount($wheres));
 

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <?php
-helpAsset(t('Need More Help?'), anchor(t("Embedding Documentation"), 'http://docs.vanillaforums.com/features/embedding/'));
+helpAsset(t('Need More Help?'), anchor(t("Embedding Documentation"), 'https://success.vanillaforums.com/kb/articles/67-embed-your-forum'));
 echo heading(t('Embedding'));
 ?>
 <div class="alert alert-warning">

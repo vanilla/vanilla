@@ -10,6 +10,10 @@ import { IOptionalComponentID, useUniqueID } from "@library/utility/idUtils";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
 import classNames from "classnames";
 import { cx } from "@emotion/css";
+import { ToolTip } from "@library/toolTip/ToolTip";
+import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
+import { InformationIcon } from "@library/icons/common";
+import { Icon } from "@vanilla/icons";
 
 interface IProps extends IOptionalComponentID {
     id?: string;
@@ -25,6 +29,7 @@ interface IProps extends IOptionalComponentID {
     defaultChecked?: boolean;
     fakeFocus?: boolean;
     value?: string;
+    tooltip?: string;
 }
 
 interface IState {
@@ -72,6 +77,11 @@ export default function RadioButton(props: IProps) {
                     <span id={labelID} className={classes.label}>
                         {props.label}
                     </span>
+                )}
+                {props.tooltip && (
+                    <ToolTip label={t(props.tooltip)}>
+                        <span className={classes.tooltipPerOption}>{<InformationIcon />}</span>
+                    </ToolTip>
                 )}
             </label>
             {note && (

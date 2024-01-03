@@ -24,7 +24,7 @@ import {
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import SmartLink from "@library/routing/links/SmartLink";
 import { LocaleSettings } from "@dashboard/languages/LocaleSettings";
-import { css } from "@emotion/css";
+import { css, cx } from "@emotion/css";
 import { LocaleConfigurationModal } from "@dashboard/languages/LocaleConfigurationModal";
 
 export function LanguageSettingsPage() {
@@ -97,7 +97,7 @@ export function LanguageSettingsPage() {
 
     return (
         <MemoryRouter>
-            <DashboardHeaderBlock title={t("Language Settings")} className={headerBorderOverride} />
+            <DashboardHeaderBlock sticky={false} title={t("Language Settings")} className={headerBorderOverride} />
             <section>
                 <Tabs
                     tabListClasses={dashboardClasses().extendRow}
@@ -125,7 +125,7 @@ export function LanguageSettingsPage() {
                 </p>
                 <h3>{t("Need more help?")}</h3>
                 <p>
-                    <SmartLink to="http://docs.vanillaforums.com/developers/locales/">
+                    <SmartLink to="https://success.vanillaforums.com/kb/articles/377-language-translation-overview">
                         {t("Internationalization & Localization")}
                     </SmartLink>
                 </p>

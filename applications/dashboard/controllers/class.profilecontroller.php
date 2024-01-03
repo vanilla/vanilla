@@ -10,8 +10,10 @@
 
 use Garden\EventManager;
 use Garden\Schema\ValidationException;
+use Vanilla\Dashboard\Models\ProfileFieldModel;
 use Vanilla\Exception\ExitException;
 use Vanilla\FloodControlTrait;
+use Vanilla\Models\ProfileFieldsPreloadProvider;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerAction;
 
@@ -323,8 +325,11 @@ class ProfileController extends Gdn_Controller
      * @param $Provider
      * @throws Exception
      */
-    public function disconnect($UserReference = "", $Username = "", $Provider)
+    public function disconnect($UserReference = "", $Username = "", $Provider = "")
     {
+        if (empty($Provider)) {
+            throw new InvalidArgumentException("Provider value shouldn't be empty");
+        }
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception("Requires POST", 405);
         }
@@ -376,6 +381,10 @@ class ProfileController extends Gdn_Controller
      */
     public function edit($userReference = "", $username = "", $userID = "")
     {
+        if (Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG) && !\Gdn::request()->getMeta("isApi", false)) {
+            redirectTo("/profile/account-privacy/" . $userReference);
+        }
+
         $this->permission(["Garden.SignIn.Allow", "Garden.Profiles.Edit"], true);
 
         $this->getUserInfo($userReference, $username, $userID, true);
@@ -395,8 +404,7 @@ class ProfileController extends Gdn_Controller
         $this->Form->setData($user);
 
         // Decide if they have ability to edit the username
-        $canEditUsername =
-            (bool) c("Garden.Profile.EditUsernames") || Gdn::session()->checkPermission("Garden.Users.Edit");
+        $canEditUsername = Gdn::session()->checkPermission("Garden.Users.Edit");
         $this->setData("_CanEditUsername", $canEditUsername);
 
         // Decide if they have ability to edit the email
@@ -419,20 +427,16 @@ class ProfileController extends Gdn_Controller
                 checkPermission("Garden.Users.Edit")
         );
 
-        // Decide if there will be a Titles field.
+        // Decide if there will be a `Titles` field.
         $canAddEditTitle = c("Garden.Profile.Titles", false);
         $this->setData("_CanAddEditTitle", $canAddEditTitle);
 
-        // Decide if there will be Locations field.
+        // Decide if there will be `Locations` field.
         $canAddEditLocations = c("Garden.Profile.Locations", false);
         $this->setData("_CanAddEditLocation", $canAddEditLocations);
 
         // Define gender dropdown options
-        $this->GenderOptions = [
-            "u" => t("Unspecified"),
-            "m" => t("Male"),
-            "f" => t("Female"),
-        ];
+        $this->GenderOptions = self::getGenderOptions();
 
         $this->fireEvent("BeforeEdit");
 
@@ -545,6 +549,75 @@ class ProfileController extends Gdn_Controller
     }
 
     /**
+     * Create EditProfileFields page.
+     *
+     * @param mixed $userReference Username or User ID.
+     * @param string $username
+     * @param string|int $userID
+     */
+    public function editFields($userReference = "", $username = "", $userID = "")
+    {
+        $this->permission(["Garden.SignIn.Allow", "Garden.Profiles.Edit"], true);
+        $profileFieldModel = Gdn::getContainer()->get(ProfileFieldModel::class);
+        $hasFields = $profileFieldModel->hasVisibleFields($userID);
+
+        $this->registerReduxActionProvider(\Gdn::getContainer()->get(ProfileFieldsPreloadProvider::class));
+
+        if ($hasFields) {
+            $this->getUserInfo($userReference, $username, $userID, true);
+            $this->setData("userID", valr("User.UserID", $this));
+            $this->_setBreadcrumbs(t("Edit Fields"), "/profile/edit-fields");
+            $this->render();
+        } else {
+            $this->render("ConnectError");
+        }
+    }
+
+    /**
+     * Create FollowedContent page.
+     *
+     * @param mixed $userReference Username or User ID.
+     * @param string $username
+     * @param string|int $userID
+     */
+    public function followedContent($userReference = "", $username = "", $userID = "")
+    {
+        $this->permission("Garden.SignIn.Allow");
+        $this->getUserInfo($userReference, $username, $userID, true);
+        $this->setData("userID", valr("User.UserID", $this));
+        $this->_setBreadcrumbs(t("Followed Content"), "/profile/followed-content");
+        $this->render();
+    }
+
+    /**
+     * Edit Account & Privacy Settings Page
+     *
+     * @param mixed $userReference Username or User ID.
+     * @param string $username
+     * @param string|int $userID
+     */
+    public function accountPrivacy($userReference = "", $username = "", $userID = "")
+    {
+        if (!Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG)) {
+            redirectTo("/profile/edit");
+        }
+        $this->permission(["Garden.SignIn.Allow", "Garden.Profiles.Edit"], true);
+
+        $this->registerReduxActionProvider(\Gdn::getContainer()->get(ProfileFieldsPreloadProvider::class));
+
+        // Get the currently viewed user's information
+        $this->getUserInfo($userReference, $username, $userID, true);
+        $editingUserID = valr("User.UserID", $this);
+
+        // Pass it along to the view
+        $this->setData("_EditingUserID", $editingUserID);
+
+        $this->title(t("Account & Privacy Settings"));
+        $this->_setBreadcrumbs(t("Account & Privacy Settings"), "/profile/account-privacy");
+        $this->render();
+    }
+
+    /**
      * Default profile page.
      *
      * If current user's profile, get notifications. Otherwise show their activity (if available) or discussions.
@@ -555,7 +628,12 @@ class ProfileController extends Gdn_Controller
      */
     public function index($user = "", $username = "", $userID = "", $page = false)
     {
+        if (!$user && !$username && !$userID) {
+            $this->permission("session.valid");
+        }
+
         $this->editMode(false);
+
         $this->getUserInfo($user, $username, $userID);
 
         // Optional profile redirection.
@@ -848,6 +926,10 @@ class ProfileController extends Gdn_Controller
      */
     public function password()
     {
+        if (Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG) && !\Gdn::request()->getMeta("isApi", false)) {
+            redirectTo("/profile/account-privacy");
+        }
+
         $this->permission("Garden.SignIn.Allow");
 
         $isSpamming = false;
@@ -1160,34 +1242,6 @@ class ProfileController extends Gdn_Controller
     }
 
     /**
-     * Gets or sets a user's preference. This method is meant for ajax calls.
-     *
-     * @param string|false $key The name of the preference.
-     * @throws Gdn_UserException Invalid preference passed.
-     */
-    public function preference($key = false)
-    {
-        $this->permission("Garden.SignIn.Allow");
-
-        if ($this->Form->authenticatedPostBack()) {
-            $data = $this->Form->formValues();
-            foreach ($data as $pref => $value) {
-                if (preg_match("`[^A-Z0-9\.]`i", $pref) || preg_match("`[^A-Z0-9\.]`i", $value)) {
-                    throw new Gdn_UserException("Improperly formatted Preference.", 422);
-                }
-            }
-            Gdn::userModel()->savePreference(Gdn::session()->UserID, $data);
-        } else {
-            $user = Gdn::userModel()->getID(Gdn::session()->UserID, DATASET_TYPE_ARRAY);
-            $pref = valr($key, $user["Preferences"], null);
-
-            $this->setData($key, $pref);
-        }
-
-        $this->render("Blank", "Utility");
-    }
-
-    /**
      * Edit user's preferences (mostly notification settings).
      *
      * @param int|string $userReference Unique identifier, possibly username or ID.
@@ -1196,207 +1250,16 @@ class ProfileController extends Gdn_Controller
      */
     public function preferences($userReference = "", $username = "", $userID = "")
     {
-        $this->addJsFile("profile.js");
-        $session = Gdn::session();
         $this->permission("Garden.SignIn.Allow");
 
         // Get user data
         $this->getUserInfo($userReference, $username, $userID, true);
-        $userPrefs = dbdecode($this->User->Preferences);
-        if ($this->User->UserID != $session->UserID) {
-            $this->permission(["Garden.Users.Edit", "Moderation.Profiles.Edit"], false);
-        }
+        $this->setData("userID", valr("User.UserID", $this));
 
-        if (!is_array($userPrefs)) {
-            $userPrefs = [];
-        }
-        $metaPrefs = UserModel::getMeta($this->User->UserID, "Preferences.%", "Preferences.");
-
-        // Define the preferences to be managed
-        $notifications = [];
-
-        if (c("Garden.Profile.ShowActivities", true)) {
-            $notifications = [
-                "Email.WallComment" => t("Notify me when people write on my wall."),
-                "Email.ActivityComment" => t("Notify me when people reply to my wall comments."),
-                "Popup.WallComment" => t("Notify me when people write on my wall."),
-                "Popup.ActivityComment" => t("Notify me when people reply to my wall comments."),
-            ];
-        }
-
-        $this->Preferences = ["Notifications" => $notifications];
-
-        // Allow email notification of applicants (if they have permission & are using approval registration)
-        if (checkPermission("Garden.Users.Approve") && c("Garden.Registration.Method") == "Approval") {
-            $this->Preferences["Notifications"]["Email.Applicant"] = [
-                t("NotifyApplicant", "Notify me when anyone applies for membership."),
-                "Meta",
-            ];
-        }
-
-        $this->fireEvent("AfterPreferencesDefined");
-
-        // Loop through the preferences looking for duplicates, and merge into a single row
-        $this->PreferenceGroups = [];
-        $this->PreferenceTypes = [];
-        foreach ($this->Preferences as $preferenceGroup => $preferences) {
-            $this->PreferenceGroups[$preferenceGroup] = [];
-            $this->PreferenceTypes[$preferenceGroup] = [];
-            foreach ($preferences as $name => $description) {
-                $location = "Prefs";
-                if (is_array($description)) {
-                    [$description, $location] = $description;
-                }
-
-                $nameParts = explode(".", $name);
-                $prefType = val("0", $nameParts);
-                $subName = val("1", $nameParts);
-                if ($subName != false) {
-                    // Save an array of all the different types for this group
-                    if (!in_array($prefType, $this->PreferenceTypes[$preferenceGroup])) {
-                        $this->PreferenceTypes[$preferenceGroup][] = $prefType;
-                    }
-
-                    // Store all the different subnames for the group
-                    if (!array_key_exists($subName, $this->PreferenceGroups[$preferenceGroup])) {
-                        $this->PreferenceGroups[$preferenceGroup][$subName] = [$name];
-                    } else {
-                        $this->PreferenceGroups[$preferenceGroup][$subName][] = $name;
-                    }
-                } else {
-                    $this->PreferenceGroups[$preferenceGroup][$name] = [$name];
-                }
-            }
-        }
-
-        // Loop the preferences, setting defaults from the configuration.
-        $currentPrefs = [];
-        foreach ($this->Preferences as $prefGroup => $prefs) {
-            foreach ($prefs as $pref => $desc) {
-                $location = "Prefs";
-                if (is_array($desc)) {
-                    [$desc, $location] = $desc;
-                }
-
-                if ($location == "Meta") {
-                    $currentPrefs[$pref] = val($pref, $metaPrefs, false);
-                } else {
-                    $currentPrefs[$pref] = val($pref, $userPrefs, c("Preferences." . $pref, "0"));
-                }
-
-                unset($metaPrefs[$pref]);
-            }
-        }
-        $currentPrefs = array_merge($currentPrefs, $metaPrefs);
-
-        //if user does not have the permission, we set user email preferences to false
-        if (!$session->checkPermission("Garden.Email.View")) {
-            foreach ($currentPrefs as $pref => $val) {
-                if (is_string($pref) && str_contains($pref, "Email")) {
-                    $currentPrefs[$pref] = $val === false || $val === "0" ? $val : false;
-                    if ($userPrefs && array_key_exists($pref, $userPrefs)) {
-                        $userPrefs[$pref] = false;
-                    }
-                }
-            }
-        }
-
-        $currentPrefs = array_map("intval", $currentPrefs);
-        $this->setData("Preferences", $currentPrefs);
-
-        if (UserModel::noEmail() || !$session->checkPermission("Garden.Email.View")) {
-            $this->PreferenceGroups = self::_removeEmailPreferences($this->PreferenceGroups);
-            $this->PreferenceTypes = self::_removeEmailPreferences($this->PreferenceTypes);
-            $this->setData("NoEmail", true);
-        }
-
-        $this->setData("PreferenceGroups", $this->PreferenceGroups);
-        $this->setData("PreferenceTypes", $this->PreferenceTypes);
-        $this->setData("PreferenceList", $this->Preferences);
-
-        if ($this->Form->authenticatedPostBack()) {
-            $formValues = $this->Form->formValues();
-            // Get, assign, and save the preferences.
-            $newMetaPrefs = [];
-            foreach ($this->Preferences as $prefGroup => $prefs) {
-                foreach ($prefs as $pref => $desc) {
-                    $location = "Prefs";
-                    if (is_array($desc)) {
-                        [$desc, $location] = $desc;
-                    }
-
-                    $value = $this->Form->getValue($pref, null);
-                    if (is_null($value)) {
-                        continue;
-                    }
-
-                    if ($location == "Meta") {
-                        $newMetaPrefs[$pref] = $value ? $value : null;
-                        if ($value) {
-                            $userPrefs[$pref] = $value; // dup for notifications code.
-                        }
-                    } else {
-                        if (!$currentPrefs[$pref] && !$value) {
-                            unset($userPrefs[$pref]); // save some space
-                        } else {
-                            $userPrefs[$pref] = $value;
-                        }
-                    }
-                }
-            }
-
-            //we double check $userPrefs after we get form values,
-            //in case user has permission change, but the form is not re-submitted
-            if (!$session->checkPermission("Garden.Email.View")) {
-                foreach ($userPrefs as $pref => $val) {
-                    if (is_string($pref) && str_contains($pref, "Email")) {
-                        $userPrefs[$pref] = false;
-                    }
-                }
-            }
-
-            $this->UserModel->savePreference($this->User->UserID, $userPrefs);
-            UserModel::setMeta($this->User->UserID, $newMetaPrefs, "Preferences.");
-
-            $this->setData("Preferences", array_merge($this->data("Preferences", []), $userPrefs, $newMetaPrefs));
-
-            if (empty($this->Form->errors())) {
-                $this->informMessage(
-                    sprite("Check", "InformSprite") . t("Your preferences have been saved."),
-                    "Dismissable AutoDismiss HasSprite"
-                );
-            }
-        } else {
-            $this->Form->setData($currentPrefs);
-        }
-
+        // Set title, breadcrumbs, and render the page.
         $this->title(t("Notification Preferences"));
         $this->_setBreadcrumbs($this->data("Title"), $this->canonicalUrl());
         $this->render();
-    }
-
-    protected static function _removeEmailPreferences($data)
-    {
-        $data = array_filter($data, ["ProfileController", "_RemoveEmailFilter"]);
-
-        $result = [];
-        foreach ($data as $k => $v) {
-            if (is_array($v)) {
-                $result[$k] = self::_removeEmailPreferences($v);
-            } else {
-                $result[$k] = $v;
-            }
-        }
-
-        return $result;
-    }
-
-    protected static function _removeEmailFilter($value)
-    {
-        if (is_string($value) && strpos($value, "Email") !== false) {
-            return false;
-        }
-        return true;
     }
 
     /**
@@ -1756,16 +1619,15 @@ EOT;
         // Show edit menu if in edit mode
         // Show profile pic & filter menu otherwise
         $sideMenu = new SideMenuModule($this);
-        $this->EventArguments["SideMenu"] = &$sideMenu; // Doing this out here for backwards compatibility.
+        // Doing this out here for backwards compatibility.
         if ($this->EditMode) {
             $this->addModule("UserBoxModule");
             $this->buildEditMenu($sideMenu, $currentUrl);
-            $this->fireEvent("AfterAddSideMenu");
             $this->addModule($sideMenu, "Panel");
         } else {
             // Make sure the userphoto module gets added to the page
             $this->addModule("UserPhotoModule");
-
+            $this->EventArguments["SideMenu"] = &$sideMenu;
             // And add the filter menu module
             $this->fireEvent("AfterAddSideMenu");
             $this->addModule("ProfileFilterModule");
@@ -1794,6 +1656,8 @@ EOT;
         // Is the photo hosted remotely?
         $remotePhoto = isUrl($this->User->Photo);
 
+        $profileFieldModel = Gdn::getContainer()->get(ProfileFieldModel::class);
+
         if ($this->User->UserID != $viewingUserID) {
             // Include user js files for people with edit users permissions
             if (checkPermission("Garden.Users.Edit") || checkPermission("Moderation.Profiles.Edit")) {
@@ -1807,6 +1671,16 @@ EOT;
                 ["Garden.Users.Edit", "Moderation.Profiles.Edit"],
                 ["class" => "Popup EditAccountLink"]
             );
+            $hasFields = $profileFieldModel->hasVisibleFields($this->User->UserID);
+            if ($hasFields) {
+                $module->addLink(
+                    "Options",
+                    sprite("SpProfile") . " " . t("Edit Profile Fields"),
+                    userUrl($this->User, "", "edit-fields"),
+                    ["Garden.Users.Edit", "Moderation.Profiles.Edit"],
+                    ["class" => "Popup EditAccountLink"]
+                );
+            }
             $module->addLink(
                 "Options",
                 sprite("SpProfile") . " " . t("Edit Account"),
@@ -1857,9 +1731,39 @@ EOT;
                     $editLinkUrl = $editUrl;
                 }
 
-                $module->addLink("Options", sprite("SpEdit") . " " . t("Edit Profile"), $editLinkUrl, false, [
-                    "class" => "Popup EditAccountLink",
-                ]);
+                if (Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG)) {
+                    $settingsLink = "/profile/account-privacy";
+                    $settingsUrl = "profile/account-privacy/{$this->User->Name}";
+                    if ($requestUrl === $settingsUrl) {
+                        $settingsLink = $settingsUrl;
+                    }
+
+                    $module->addLink(
+                        "Options",
+                        sprite("SpEdit") . " " . t("Account & Privacy Settings"),
+                        $settingsLink,
+                        false,
+                        ["class" => "Popup EditAccountLink"]
+                    );
+                } else {
+                    $module->addLink("Options", sprite("SpEdit") . " " . t("Edit Profile"), $editLinkUrl, false, [
+                        "class" => "Popup EditAccountLink",
+                    ]);
+                }
+
+                $hasFields = $profileFieldModel->hasVisibleFields($this->User->UserID);
+                if ($hasFields) {
+                    $editFieldsLinkUrl = "profile/edit-fields";
+                    $module->addLink(
+                        "Options",
+                        sprite("SpEdit") . " " . t("Edit Profile Fields"),
+                        $editFieldsLinkUrl,
+                        false,
+                        [
+                            "class" => "Popup EditAccountLink",
+                        ]
+                    );
+                }
             }
 
             // Add profile options for the profile owner
@@ -1871,7 +1775,11 @@ EOT;
             // password in Vanilla, they will then be able to log into Vanilla using
             // Vanilla's login form regardless of the state of their membership in the
             // external app.
-            if (c("Garden.UserAccount.AllowEdit") && c("Garden.Registration.Method") != "Connect") {
+            if (
+                c("Garden.UserAccount.AllowEdit") &&
+                c("Garden.Registration.Method") != "Connect" &&
+                !Gdn::config(ProfileFieldModel::CONFIG_FEATURE_FLAG)
+            ) {
                 // No password may have been set if they have only signed in with a connect plugin
                 $passwordLabel = t("Change My Password");
                 if ($this->User->HashMethod && $this->User->HashMethod != "Vanilla") {
@@ -1882,13 +1790,6 @@ EOT;
                 ]);
             }
 
-            $module->addLink(
-                "Options",
-                sprite("SpPreferences") . " " . t("Notification Preferences"),
-                userUrl($this->User, "", "preferences"),
-                false,
-                ["class" => "Popup PreferencesLink"]
-            );
             if ($allowImages) {
                 $module->addLink(
                     "Options",
@@ -1898,6 +1799,28 @@ EOT;
                     ["class" => "PictureLink"]
                 );
             }
+            /**
+             * Re-ordering the site nav to include addon navs in between
+             * ref: VNLA-4000
+             */
+            $this->EventArguments["SideMenu"] = $module;
+            $this->fireEvent("AfterAddSideMenu");
+
+            $module->addLink(
+                "Options",
+                sprite("SpPreferences") . " " . t("Notification Preferences"),
+                userUrl($this->User, "", "preferences"),
+                false,
+                ["class" => "Popup PreferencesLink margin-top"]
+            );
+
+            $module->addLink(
+                "Options",
+                sprite("SpFollowedContent") . " " . t("Followed Content"),
+                userUrl($this->User, "", "followed-content"),
+                false,
+                ["class" => "Popup FollowedContentLink margin-bottom"]
+            );
         }
 
         if ($this->User->UserID == $viewingUserID || $session->checkPermission("Garden.Users.Edit")) {
@@ -2052,6 +1975,11 @@ EOT;
         // If a UserID was provided as a querystring parameter, use it over anything else:
         if ($userID) {
             $userReference = $userID;
+            $username = "Unknown"; // Fill this with a value so the $UserReference is assumed to be an integer/userid.
+        }
+
+        // If we are only given a numerical `$userReference` with no `$username` or `$userID`, we assume `$userReference` is the `$userID`
+        if (is_numeric($userReference) && !$username && !$userID) {
             $username = "Unknown"; // Fill this with a value so the $UserReference is assumed to be an integer/userid.
         }
 
@@ -2279,5 +2207,19 @@ EOT;
         $users = array_values($users);
         $this->setData("Users", $users);
         $this->render();
+    }
+
+    /**
+     * Returns an array of [{values} => {translatable_caption}] for available gender options.
+     *
+     * @return array
+     */
+    public static function getGenderOptions(): array
+    {
+        return [
+            "u" => t("Unspecified"),
+            "m" => t("Male"),
+            "f" => t("Female"),
+        ];
     }
 }

@@ -4,7 +4,9 @@
  * @license GPL-2.0-only
  */
 
+use Garden\Container\ContainerException;
 use Garden\Schema\Schema;
+use Garden\Schema\Validation;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Data;
@@ -18,22 +20,26 @@ use Vanilla\Dashboard\Models\UserLeaderQuery;
 use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Dashboard\UserPointsModel;
 use Vanilla\DateFilterSchema;
+use Vanilla\Forum\Search\UserSearchType;
 use Vanilla\ImageResizer;
 use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Permissions;
+use Vanilla\Search\SearchOptions;
+use Vanilla\Search\SearchService;
 use Vanilla\UploadedFile;
 use Vanilla\UploadedFileSchema;
 use Vanilla\PermissionsTranslationTrait;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\DelimitedScheme;
 use Vanilla\Menu\CounterModel;
-use Vanilla\Utility\FileGeneratorUtils;
 use Vanilla\Utility\InstanceValidatorSchema;
 use Vanilla\Menu\Counter;
 use Vanilla\Utility\ModelUtils;
 use Vanilla\Utility\SchemaUtils;
+use Garden\Web\Pagination;
 
 /**
  * API Controller for the `/users` resource.
@@ -44,6 +50,8 @@ class UsersApiController extends AbstractApiController
 
     const ME_ACTION_CONSTANT = "@@users/GET_ME_DONE";
     const PERMISSIONS_ACTION_CONSTANT = "@@users/GET_PERMISSIONS_DONE";
+    const ERROR_SELF_EDIT_PASSWORD_MISSING = "The field `passwordConfirmation` is required to edit this profile";
+    const ERROR_PATCH_HIGHER_PERMISSION_USER = "You are not allowed to edit a user that has higher permissions than you.";
 
     /** @var ActivityModel */
     private $activityModel;
@@ -80,6 +88,9 @@ class UsersApiController extends AbstractApiController
     /** @var ProfileFieldModel */
     private $profileFieldModel;
 
+    /** @var RoleModel */
+    private $roleModel;
+
     /**
      * UsersApiController constructor.
      *
@@ -90,6 +101,7 @@ class UsersApiController extends AbstractApiController
      * @param ActivityModel $activityModel
      * @param \Vanilla\Web\APIExpandMiddleware $expandMiddleware
      * @param ProfileFieldModel $profileFieldModel
+     * @param RoleModel $roleModel
      */
     public function __construct(
         UserModel $userModel,
@@ -98,7 +110,8 @@ class UsersApiController extends AbstractApiController
         ImageResizer $imageResizer,
         ActivityModel $activityModel,
         \Vanilla\Web\APIExpandMiddleware $expandMiddleware,
-        ProfileFieldModel $profileFieldModel
+        ProfileFieldModel $profileFieldModel,
+        RoleModel $roleModel
     ) {
         $this->configuration = $configuration;
         $this->counterModel = $counterModel;
@@ -108,6 +121,7 @@ class UsersApiController extends AbstractApiController
         $this->activityModel = $activityModel;
         $this->expandMiddleware = $expandMiddleware;
         $this->profileFieldModel = $profileFieldModel;
+        $this->roleModel = $roleModel;
     }
 
     /**
@@ -241,12 +255,10 @@ class UsersApiController extends AbstractApiController
      */
     public function get(int $id, array $query): Data
     {
-        $showFullSchema = $this->checkPermission(Permissions::BAN_ROLE_TOKEN);
-
+        $isSelf = $id === $this->getSession()->UserID;
+        $showFullSchema = $isSelf || $this->checkPermission(Permissions::BAN_ROLE_TOKEN);
         $queryIn = $this->schema(
-            [
-                "expand?" => ApiUtils::getExpandDefinition([]),
-            ],
+            ["expand?" => ApiUtils::getExpandDefinition(["profileFields", "discoveryText"])],
             ["UserGet", "in"]
         )->setDescription("Get a user.");
 
@@ -256,9 +268,13 @@ class UsersApiController extends AbstractApiController
         $outSchema = $showFullSchema ? $this->userSchema() : $this->viewProfileSchema();
         $row = $this->userByID($id);
         $outSchema = CrawlableRecordSchema::applyExpandedSchema($outSchema, "user", $expand);
-        $outSchema = $this->userModel->applyExpandSchema($outSchema, $expand);
+        if (
+            $this->getSession()->checkPermission("Garden.Profiles.View") &&
+            ModelUtils::isExpandOption("discoveryText", $expand)
+        ) {
+            $outSchema->merge(Schema::parse(["discoveryText:s?"]));
+        }
         $out = $this->schema($outSchema, "out");
-        $this->userModel->joinExpandData($row, $expand);
         $row = $this->normalizeOutput($row, $expand);
 
         $showEmail = $row["showEmail"] ?? false;
@@ -266,7 +282,9 @@ class UsersApiController extends AbstractApiController
             unset($row["email"]);
         }
 
-        $this->userModel->filterPrivateUserRecord($row);
+        if (!$showFullSchema) {
+            $this->userModel->filterPrivateUserRecord($row);
+        }
         $result = $out->validate($row);
 
         // Allow addons to modify the result.
@@ -295,7 +313,7 @@ class UsersApiController extends AbstractApiController
 
         $in = $this->idParamSchema()->setDescription("Get a user for editing.");
         $out = $this->schema(
-            Schema::parse(["userID", "name", "email", "photo", "emailConfirmed", "bypassSpam"])->add(
+            Schema::parse(["userID", "name", "email", "showEmail", "photo", "emailConfirmed", "bypassSpam"])->add(
                 $this->fullSchema()
             ),
             "out"
@@ -342,6 +360,7 @@ class UsersApiController extends AbstractApiController
                 "photoUrl" => UserModel::getDefaultAvatarUrl(),
                 "dateLastActive" => null,
                 "isAdmin" => false,
+                "isSysAdmin" => false,
             ];
         }
         return $this->guestFragment;
@@ -491,6 +510,7 @@ class UsersApiController extends AbstractApiController
                 "email:s|n" => ["default" => null],
                 "dateLastActive",
                 "isAdmin:b",
+                "isSysAdmin:b",
                 "countUnreadNotifications" => [
                     "description" => "Total number of unread notifications for the current user.",
                     "type" => "integer",
@@ -568,13 +588,22 @@ class UsersApiController extends AbstractApiController
      * List users.
      *
      * @param array $query The query string.
-     * @param RequestInterface|null $request
      * @return Data
+     * @throws ClientException
+     * @throws ServerException
+     * @throws ValidationException
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
-    public function index(array $query, ?RequestInterface $request = null)
+    public function index(array $query): Data
     {
-        $extension = isset($request) ? FileGeneratorUtils::getExtension($request) : null;
-        $maxLimit = $extension === "csv" ? ApiUtils::getMaxLimit(5000) : ApiUtils::getMaxLimit();
+        // This is to support the older profile field filter name
+        $query["profileFields"] ??= $query["extended"] ?? null;
+        $result = $this->tryWithUserSearch($query);
+        if ($result instanceof Data) {
+            return $result;
+        }
+
         $showFullSchema = $this->checkPermission();
 
         $in = $this->schema(
@@ -602,49 +631,75 @@ class UsersApiController extends AbstractApiController
                 "roleID:i?" => [
                     "x-filter" => ["field" => "roleID"],
                 ],
+                "roleIDs:a?" => [
+                    "items" => [
+                        "type" => "integer",
+                    ],
+                    "x-filter" => ["field" => "roleIDs"],
+                ],
                 "userID?" => \Vanilla\Schema\RangeExpression::createSchema([":int"])->setField("x-filter", [
                     "field" => "u.UserID",
                 ]),
+                "ipAddresses:a?" => [
+                    "items" => [
+                        "type" => "string",
+                    ],
+                    "x-filter" => ["field" => "ipAddresses"],
+                ],
                 "page:i?" => [
                     "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
                     "default" => 1,
                     "minimum" => 1,
                 ],
                 "dirtyRecords:b?",
+                "sort:s?" => [
+                    "enum" => ApiUtils::sortEnum(
+                        "dateInserted",
+                        "dateLastActive",
+                        "name",
+                        "userID",
+                        "points",
+                        "countPosts"
+                    ),
+                ],
                 "limit:i?" => [
                     "description" => "Desired number of items per page.",
                     "default" => 30,
                     "minimum" => 1,
-                    "maximum" => $maxLimit,
+                    "maximum" => 5000,
                 ],
-                "sort:s?" => [
-                    "enum" => ApiUtils::sortEnum("dateInserted", "dateLastActive", "name", "userID"),
-                ],
-                "expand?" => ApiUtils::getExpandDefinition([]),
+                "profileFields:o?" => $this->profileFieldModel->getProfileFieldFilterSchema(),
+                "expand?" => ApiUtils::getExpandDefinition(["profileFields", "discoveryText"]),
             ],
             ["UserIndex", "in"]
         )
-            ->merge($this->profileFieldModel->getProfileFieldQuerySchema())
-            ->addValidator("", SchemaUtils::onlyOneOf(["dateInserted", "dateUpdated", "roleID", "userID"]));
+            ->addValidator("", SchemaUtils::onlyOneOf(["dateInserted", "dateUpdated", "roleID", "userID"]))
+            ->addValidator("ipAddresses", $this->userModel->createIpAddressesValidator());
 
         $query = $in->validate($query);
-
         $expand = $query["expand"] ?? [];
         $outSchema = $showFullSchema ? $this->userSchema() : $this->viewProfileSchema();
         $outSchema = CrawlableRecordSchema::applyExpandedSchema($outSchema, "user", $expand);
-        $outSchema = $this->userModel->applyExpandSchema($outSchema, $expand);
+        if (
+            is_array($expand) &&
+            $this->getSession()->checkPermission("Garden.Profiles.View") &&
+            (in_array("discoveryText", $expand) || in_array(ModelUtils::EXPAND_ALL, $expand))
+        ) {
+            $outSchema->merge(Schema::parse(["discoveryText:s?"]));
+        }
+
         $out = $this->schema([":a" => $outSchema], "out");
 
         $where = ApiUtils::queryToFilters($in, $query);
-
         [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
 
         $joinDirtyRecords = $query[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
         if ($joinDirtyRecords) {
             $where[DirtyRecordModel::DIRTY_RECORD_OPT] = $query[DirtyRecordModel::DIRTY_RECORD_OPT];
         }
-
-        $where["extended"] = $query["extended"] ?? null;
+        if (isset($query["profileFields"])) {
+            $where["profileFields"] = $query["profileFields"];
+        }
 
         $rows = $this->userModel->search($where, $query["sort"] ?? "", "", $limit, $offset)->resultArray();
 
@@ -653,8 +708,6 @@ class UsersApiController extends AbstractApiController
         // But isn't really appropriate for iterating over lists of users where the same user will not likely be seen twice.
         // Fetch all roles at once.
         $this->userModel->joinRoles($rows);
-
-        $this->userModel->joinExpandData($rows, $expand);
 
         foreach ($rows as &$row) {
             $this->userModel->setCalculatedFields($row);
@@ -665,23 +718,18 @@ class UsersApiController extends AbstractApiController
             }
         }
 
-        $this->userModel->filterPrivateUserRecord($rows);
+        if (!$showFullSchema) {
+            $this->userModel->filterPrivateUserRecord($rows);
+        }
         $result = $out->validate($rows);
 
-        // Determine if we are gonna use the "numbered" or "more" pageInfo.
-        if (empty($where)) {
-            if (!Gdn::userModel()->pastUserMegaThreshold()) {
-                $totalCount = $this->userModel->getCount();
-            }
-        } elseif (!Gdn::userModel()->pastUserThreshold()) {
-            if ($joinDirtyRecords) {
-                $this->userModel->applyDirtyWheres("u");
-                unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
-            }
-            $totalCount = $this->userModel->searchCount($where);
+        if ($joinDirtyRecords) {
+            $this->userModel->applyDirtyWheres("u");
+            unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
         }
+        $totalCount = $this->userModel->searchCount($where);
 
-        if (isset($totalCount)) {
+        if (!ModelUtils::isExpandOption("crawl", $query["expand"])) {
             $paging = ApiUtils::numberedPagerInfo($totalCount, "/api/v2/users", $query, $in);
         } else {
             $paging = ApiUtils::morePagerInfo($result, "/api/v2/users", $query, $in);
@@ -696,8 +744,122 @@ class UsersApiController extends AbstractApiController
             $query,
             $rows
         );
+        $meta = Pagination::tryCursorPagination($paging, $query, $result, "userID") + ["api-allow" => ["email"]];
 
-        return new Data($result, ["paging" => $paging, "api-allow" => ["email"]]);
+        return new Data($result, $meta);
+    }
+
+    /**
+     * Attempt to perform the query using search service.
+     *
+     * This method checks if the query can be handled using the SearchService (if certain keys exist in the query). If
+     * it can be handled through the search service, and the UserSearch type is available, the query is passed to the
+     * SearchService::search() method and the return value is wrapped in a Data object and returned to the caller.
+     *
+     * @param array $query The original query.
+     * @return Data|null
+     * @throws ClientException|ServerException|ValidationException|ContainerException|\Garden\Container\NotFoundException
+     */
+    private function tryWithUserSearch(array $query): ?Data
+    {
+        // If there are profile field filters, get only the filters that require elastic search.
+        $profileFields = $this->profileFieldModel->getSearchFilters($query["profileFields"] ?? null);
+        $filteredQuery = ["profileFields" => $profileFields] + $query;
+        $searchFilters = $this->filterNonEmptyValues($filteredQuery, ["name", "email", "query", "profileFields"]);
+        $searchFilters = ArrayUtils::arrayToDotNotation($searchFilters);
+
+        // If we don't have any search-only filters, break out of here.
+        if (empty($searchFilters)) {
+            return null;
+        }
+
+        $searchFilters = implode(", ", array_keys($searchFilters));
+
+        // Need to initialize search service here because of cyclical dependency.
+        $searchService = Gdn::getContainer()->get(SearchService::class);
+        $driver = $searchService->getActiveDriver($query["driver"] ?? null);
+
+        if (is_null($driver->getSearchTypeByType(UserSearchType::TYPE))) {
+            throw new ClientException("The following filters require the user search type: $searchFilters");
+        }
+
+        foreach (["dirtyRecords", "userID", "roleID"] as $filter) {
+            if (isset($query[$filter])) {
+                throw new ClientException("$filter cannot be combined with the following: $searchFilters");
+            }
+        }
+
+        $in = $searchService->buildQuerySchema();
+        // Increase our limit
+        $in->setField("properties.limit.maximum", 5000);
+
+        $originalQuery = $query;
+
+        // Add some specific filters
+        // Make sure we don't exclude banned users (default behaviour of member search).
+        $query["includeBanned"] = true;
+
+        $query = $in->validate(["recordTypes" => [UserSearchType::TYPE]] + $query);
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
+
+        // We're not validating limits here.
+        // That should have been handled at an API level.
+        $searchQuery = $query;
+        unset($searchQuery["limit"]);
+
+        // Clear off our limit, we don't want
+        $searchResults = $driver->search($searchQuery, new SearchOptions($offset, $limit, true));
+
+        // Call UsersApiController::index() with original `expand` parameter using recordIDs as userIDs
+        $userIDs = array_map(function ($resultItem) {
+            return $resultItem["recordID"] ?? null;
+        }, $searchResults->getResultItems());
+        $finalQuery = ["userID" => $userIDs, "limit" => $limit];
+        if (isset($originalQuery["expand"])) {
+            $finalQuery["expand"] = $originalQuery["expand"];
+        }
+        if (isset($originalQuery["sort"])) {
+            $finalQuery["sort"] = $originalQuery["sort"];
+        }
+
+        // Don't allow this to propagate into our paging urls.
+        $requestHadCursor = isset($query["cursor"]);
+        unset($query["cursor"]);
+        $rows = $this->index($finalQuery)->getData();
+        $paging = ApiUtils::numberedPagerInfo(
+            $searchResults->getTotalCount(),
+            "/api/v2/users",
+            $query,
+            $in,
+            $searchResults->getCursor()
+        );
+        if (($requestHadCursor && $searchResults->getCursor() === null) || $searchResults->getResultCount() < $limit) {
+            // If we are paginating with the cursor, stop paginating when the cursor runs out.
+            $paging["page"] = $paging["pageCount"];
+        }
+        return new Data($rows, ["paging" => $paging, "api-allow" => ["email"]]);
+    }
+
+    /**
+     * Helper method to filter elements from the query array if they contain empty strings or arrays of empty strings.
+     *
+     * @param array $query
+     * @param array $keys
+     * @return array
+     */
+    private function filterNonEmptyValues(array $query, array $keys): array
+    {
+        return array_filter(ArrayUtils::pluck($query, $keys), function ($field) {
+            // Filter out fields if they are empty.
+            if ($field === "") {
+                return false;
+            }
+            // Filter out fields if they are arrays and don't contain non-empty strings.
+            if (is_array($field) && count(array_filter($field, "strlen")) === 0) {
+                return false;
+            }
+            return true;
+        });
     }
 
     /**
@@ -725,27 +887,72 @@ class UsersApiController extends AbstractApiController
      */
     public function patch($id, array $body)
     {
-        $this->permission("Garden.Users.Edit");
+        $this->idParamSchema("in");
+        $user = $this->userByID($id);
+        $userPermissions = $this->userModel->getPermissions($id);
+
+        // Ensure
+        $rankCompare = Gdn::session()
+            ->getPermissions()
+            ->compareRankTo($userPermissions);
+        if ($id !== $this->getSession()->UserID && $rankCompare < 0) {
+            throw new \Garden\Web\Exception\ForbiddenException(t(self::ERROR_PATCH_HIGHER_PERMISSION_USER));
+        }
+
+        // Check for self-edit
+        if ($id == $this->getSession()->UserID) {
+            $this->validatePatchSelfEditCredentials($user, $body);
+        } else {
+            $this->permission("Garden.Users.Edit");
+        }
 
         $this->idParamSchema("in");
-        $in = $this->schema($this->userPatchSchema(), "in")->setDescription("Update a user.");
-        $out = $this->userSchema("out");
+        if ($this->checkPermission("Garden.Users.Edit")) {
+            $in = $this->schema($this->userPatchSchema(), ["UserPatchCommon", "in"])->setDescription("Update a user.");
+        } else {
+            $in = $this->schema($this->userPatchSelfEditSchema(), ["UserPatchCommon", "in"])->setDescription(
+                "Update a user."
+            );
+        }
 
-        $body = $in->validate($body, true);
-        // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
-        $this->userByID($id);
+        $in->addValidator("roleID", $this->createRoleIDValidator($id));
+        $in->addValidator("profileFields", $this->profileFieldModel->validateEditable($id));
+
+        $out = $this->userSchema("out");
+        $body = $in->validate($body);
+
         $userData = $this->normalizeInput($body);
         $userData["UserID"] = $id;
         $settings = ["ValidateName" => false];
         if (!empty($userData["RoleID"])) {
             $settings["SaveRoles"] = true;
         }
+
+        if (isset($userData["ResetPassword"]) ?? false) {
+            $userData["HashMethod"] = "Reset";
+            $settings["ResetPassword"] = true;
+        }
+
+        $existingUser = $this->userByID($id);
+        if (isset($userData["Banned"]) && $userData["Banned"] != $existingUser["Banned"]) {
+            $this->performBan($id, $userData["Banned"]);
+        }
+
         $this->userModel->save($userData, $settings);
         $this->validateModel($this->userModel);
         $row = $this->userByID($id);
         $row = $this->normalizeOutput($row);
 
         $result = $out->validate($row);
+        // Allow addons to modify the result.
+        $result = $this->getEventManager()->fireFilter(
+            "usersApiController_patchOutput",
+            $result,
+            $this,
+            $in,
+            $body,
+            $row
+        );
         $result = new Data($result, ["api-allow" => ["email"]]);
         return $result;
     }
@@ -762,6 +969,8 @@ class UsersApiController extends AbstractApiController
         $this->permission("Garden.Users.Add");
 
         $in = $this->schema($this->userPostSchema(), "in")->setDescription("Add a user.");
+        $in->addValidator("roleID", $this->createRoleIDValidator());
+        $in->addValidator("profileFields", $this->profileFieldModel->validateEditable());
         $out = $this->schema($this->userSchema(), "out");
 
         $body = $in->validate($body);
@@ -773,6 +982,9 @@ class UsersApiController extends AbstractApiController
             "ValidateName" => false,
         ];
         $id = $this->userModel->save($userData, $settings);
+        if ($id && $body["sendWelcomeEmail"] ?? true) {
+            $this->userModel->sendWelcomeEmail($id, $userData["Password"] ?? "");
+        }
         $this->validateModel($this->userModel);
 
         if (!$id) {
@@ -923,26 +1135,7 @@ class UsersApiController extends AbstractApiController
         $row = $this->userByID($id);
         $body = $in->validate($body);
 
-        // Check ranking permissions.
-        $userPermissions = $this->userModel->getPermissions($id);
-        $rankCompare = Gdn::session()
-            ->getPermissions()
-            ->compareRankTo($userPermissions);
-        if ($rankCompare < 0) {
-            throw new \Garden\Web\Exception\ForbiddenException(
-                t("You are not allowed to ban a user that has higher permissions than you.")
-            );
-        } elseif ($rankCompare === 0) {
-            throw new \Garden\Web\Exception\ForbiddenException(
-                t("You are not allowed to ban a user with the same permission level as you.")
-            );
-        }
-
-        if ($body["banned"]) {
-            $this->userModel->ban($id, []);
-        } else {
-            $this->userModel->unBan($id, []);
-        }
+        $this->performBan($id, $body["banned"]);
 
         $result = $this->userByID($id);
         return $out->validate($result);
@@ -965,8 +1158,10 @@ class UsersApiController extends AbstractApiController
 
         $body = $in->validate($body);
 
-        $this->userModel->passwordRequest($body["email"], ["checkCaptcha" => false]);
-        $this->validateModel($this->userModel, true);
+        $result = $this->userModel->passwordRequest($body["email"], ["checkCaptcha" => false]);
+        if (!$result) {
+            $this->validateModel($this->userModel, true);
+        }
     }
     /**
      * Confirm a user email address after registration.
@@ -1017,7 +1212,7 @@ class UsersApiController extends AbstractApiController
     {
         $this->permission();
         // Inbound data schema validation.
-        $query = $this->schema([
+        $schema = $this->schema([
             "leaderboardType:s" => [
                 "description" => "Type of data to use for a leaderboard.",
                 "enum" => [
@@ -1033,6 +1228,9 @@ class UsersApiController extends AbstractApiController
             "categoryID:i?" => [
                 "description" => "The numeric ID of a category to limit search results to.",
             ],
+            "siteSectionID:s?" => [
+                "description" => "The numeric ID of a subcommunity to limit search results to.",
+            ],
             "limit:i?" => [
                 "description" => "The maximum amount of records to be returned.",
                 "minimum" => 1,
@@ -1040,20 +1238,17 @@ class UsersApiController extends AbstractApiController
             ],
             "includedRoleIDs?" => \Vanilla\Schema\RangeExpression::createSchema([":int"]),
             "excludedRoleIDs?" => \Vanilla\Schema\RangeExpression::createSchema([":int"]),
-        ])->validate($query);
+        ]);
+
+        $query = $schema->validate($query);
 
         $categoryID = $query["categoryID"] ?? null;
         $userLeaderService = Gdn::getContainer()->get(UserLeaderService::class);
-        // If we want a leaderboard for a specific category but the separate tracking of points isn't enabled, throw an error.
-        if (!is_null($categoryID) && !$userLeaderService->isTrackPointsSeparately()) {
-            throw new ClientException(
-                "To filter by category, you need to enable the 'Track Points Separately' feature."
-            );
-        }
 
         $query = new UserLeaderQuery(
             $query["slotType"] ?? UserPointsModel::SLOT_TYPE_ALL,
             $query["categoryID"] ?? null,
+            $query["siteSectionID"] ?? null,
             $query["limit"] ?? null,
             isset($query["includedRoleIDs"]) ? (array) $query["includedRoleIDs"]->getValue("=") : null,
             isset($query["excludedRoleIDs"]) ? (array) $query["excludedRoleIDs"]->getValue("=") : null,
@@ -1064,16 +1259,7 @@ class UsersApiController extends AbstractApiController
         // Outbound data schema validation.
         $leaders = $this->schema(
             [
-                ":a" => [
-                    "slotType:s?",
-                    "timeSlot:dt?",
-                    "source:s?",
-                    "categoryID:i?",
-                    "userID:i",
-                    "points:i?",
-                    "name:s|n",
-                    "photo:s|n",
-                ],
+                ":a" => ["slotType:s?", "timeSlot:dt?", "source:s?", "userID:i", "points:i?", "name:s|n", "photo:s|n"],
             ],
             "out"
         )->validate($leaders);
@@ -1102,18 +1288,10 @@ class UsersApiController extends AbstractApiController
     {
         $this->userByID($id);
         $in = $this->schema($this->profileFieldModel->getUserProfileFieldSchema());
-        $in->addValidator("", function (array $data, ValidationField $field) use ($id) {
-            $profileFields = array_column($this->profileFieldModel->select(), null, "apiName");
-            foreach ($data as $fieldName => $fieldValue) {
-                $profileField = $profileFields[$fieldName];
-                if (!$this->profileFieldModel->canEdit($id, $profileField)) {
-                    $field->addError("Cannot update $fieldName", ["status" => 403]);
-                }
-            }
-        });
+        $in->addValidator("", $this->profileFieldModel->validateEditable($id));
 
         $body = $in->validate($body);
-        $this->profileFieldModel->updateUserProfileFields($id, $body);
+        $this->profileFieldModel->updateUserProfileFields($id, $body, true);
 
         return new Data($this->getUserProfileFields($id));
     }
@@ -1144,8 +1322,13 @@ class UsersApiController extends AbstractApiController
         if (array_key_exists("emailConfirmed", $schemaRecord)) {
             $schemaRecord["confirmed"] = $schemaRecord["emailConfirmed"];
         }
+        if (array_key_exists("profileFields", $schemaRecord)) {
+            $profileFields = $schemaRecord["profileFields"];
+            unset($schemaRecord["profileFields"]);
+        }
 
         $dbRecord = ApiUtils::convertInputKeys($schemaRecord);
+        $dbRecord["ProfileFields"] = $profileFields ?? [];
         return $dbRecord;
     }
 
@@ -1199,6 +1382,40 @@ class UsersApiController extends AbstractApiController
     }
 
     /**
+     * Returns a validator that checks if the current user can assign role ids to another user
+     *
+     * @param int|null $userID
+     * @return Closure
+     */
+    private function createRoleIDValidator(?int $userID = null): Closure
+    {
+        return function (array $roleIDs, ValidationField $field) use ($userID) {
+            if (empty($roleIDs)) {
+                $field->addError("A user must have at least one role.", ["status" => 403]);
+            }
+            $existingUserRoleIDs = isset($userID) ? $this->userModel->getRoleIDs($userID) : [];
+            $assignableRoles = $this->roleModel->getAssignable();
+
+            // Get non-assignable roles by excluding existing user role IDs and assignable role IDs
+            $nonassignableRoleIDs = array_diff($roleIDs, $existingUserRoleIDs, array_keys($assignableRoles));
+
+            if (empty($nonassignableRoleIDs)) {
+                return;
+            }
+
+            $nonassignableRoles = array_filter(array_map([RoleModel::class, "roles"], $nonassignableRoleIDs));
+            if (empty($nonassignableRoles)) {
+                return;
+            }
+
+            $roleNames = array_column($nonassignableRoles, "Name");
+            $field->addError("You don't have permission to assign these roles: " . implode(", ", $roleNames), [
+                "status" => 403,
+            ]);
+        };
+    }
+
+    /**
      * Get a user by its numeric ID.
      *
      * @param int $id The user ID.
@@ -1221,27 +1438,61 @@ class UsersApiController extends AbstractApiController
      */
     public function userPatchSchema()
     {
-        static $schema;
+        $schema = $this->schema(
+            Schema::parse([
+                "name?",
+                "email?",
+                "showEmail?",
+                "photo?",
+                "emailConfirmed?",
+                "bypassSpam?",
+                "password?",
+                "resetPassword:b?" => [
+                    "const" => true,
+                ],
+                "private?",
+                "banned:b?",
+                "roleID?" => [
+                    "type" => "array",
+                    "items" => ["type" => "integer"],
+                    "description" => "Roles to set on the user.",
+                ],
+                "profileFields:o?" => $this->profileFieldModel->getUserProfileFieldSchema(true),
+            ])
+                ->add($this->fullSchema())
+                ->addValidator("", SchemaUtils::onlyOneOf(["password", "resetPassword"]))
+                ->addValidator("banned", function ($banned, \Garden\Schema\ValidationField $field) {
+                    if (isset($banned)) {
+                        $canBan = $this->getSession()->checkPermission(
+                            ["Garden.Moderation.Manage", "Garden.Users.Edit", "Moderation.Users.Ban"],
+                            false
+                        );
+                        if (!$canBan) {
+                            $field->addError("You do not have permission to ban a user", ["code" => 403]);
+                        }
+                    }
+                }),
+            "UserPatch"
+        );
 
-        if ($schema === null) {
-            $schema = $this->schema(
-                Schema::parse([
-                    "name?",
-                    "email?",
-                    "photo?",
-                    "emailConfirmed?",
-                    "bypassSpam?",
-                    "password?",
-                    "roleID?" => [
-                        "type" => "array",
-                        "items" => ["type" => "integer"],
-                        "description" => "Roles to set on the user.",
-                    ],
-                ])->add($this->fullSchema()),
-                "UserPatch"
-            );
-        }
-
+        return $schema;
+    }
+    /**
+     * @return Schema
+     */
+    public function userPatchSelfEditSchema(): Schema
+    {
+        $schema = $this->schema(
+            Schema::parse([
+                "name?",
+                "email?",
+                "showEmail?",
+                "password?",
+                "private?",
+                "profileFields:o?" => $this->profileFieldModel->getUserProfileFieldSchema(true),
+            ]),
+            "UserPatchSelfEdit"
+        );
         return $schema;
     }
 
@@ -1252,26 +1503,27 @@ class UsersApiController extends AbstractApiController
      */
     public function userPostSchema()
     {
-        static $schema;
         $email = c("Garden.Registration.NoEmail", false) ? "email:s?" : "email:s";
-        if ($schema === null) {
-            $schema = $this->schema(
-                Schema::parse([
-                    "name",
-                    $email,
-                    "photo?",
-                    "password",
-                    "emailConfirmed" => ["default" => true],
-                    "bypassSpam" => ["default" => false],
-                    "roleID?" => [
-                        "type" => "array",
-                        "items" => ["type" => "integer"],
-                        "description" => "Roles to set on the user.",
-                    ],
-                ])->add($this->fullSchema()),
-                "UserPost"
-            );
-        }
+        $schema = $this->schema(
+            Schema::parse([
+                "name",
+                $email,
+                "showEmail?",
+                "photo?",
+                "password",
+                "emailConfirmed" => ["default" => true],
+                "sendWelcomeEmail:b" => ["default" => true],
+                "bypassSpam" => ["default" => false],
+                "roleID?" => [
+                    "type" => "array",
+                    "items" => ["type" => "integer"],
+                    "description" => "Roles to set on the user.",
+                ],
+                "private?",
+                "profileFields:o?" => $this->profileFieldModel->getUserProfileFieldSchema(true),
+            ])->add($this->fullSchema()),
+            "UserPost"
+        );
 
         return $schema;
     }
@@ -1303,18 +1555,110 @@ class UsersApiController extends AbstractApiController
                 "name:s?",
                 "sortName?",
                 "email:s?",
+                "sortEmail:s?",
                 "photoUrl:s?",
                 "profilePhotoUrl:s?",
                 "url:s?",
                 "dateInserted?",
                 "dateLastActive:dt?",
+                "isAdmin:b?",
+                "isSysAdmin:b?",
                 "countDiscussions?",
                 "countComments?",
                 "label:s?",
                 "banned:i?",
                 "private:b?" => ["default" => false],
+                "countVisits:i?",
+                "inviteUserID:i?",
+                "countPosts:i?",
             ])->add($this->fullSchema()),
             "ViewProfile"
         );
+    }
+
+    /**
+     * @param int $id
+     * @param $banned
+     * @throws Gdn_UserException
+     * @throws \Garden\Web\Exception\ForbiddenException
+     */
+    private function performBan(int $id, $banned): void
+    {
+        $userPermissions = $this->userModel->getPermissions($id);
+        $rankCompare = Gdn::session()
+            ->getPermissions()
+            ->compareRankTo($userPermissions);
+        if ($rankCompare < 0) {
+            throw new \Garden\Web\Exception\ForbiddenException(
+                t("You are not allowed to ban a user that has higher permissions than you.")
+            );
+        } elseif ($rankCompare === 0) {
+            throw new \Garden\Web\Exception\ForbiddenException(
+                t("You are not allowed to ban a user with the same permission level as you.")
+            );
+        }
+
+        if ($banned) {
+            $this->userModel->ban($id, []);
+        } else {
+            $this->userModel->unBan($id, []);
+        }
+    }
+
+    /**
+     * Validate the user credentials when patching for one self.
+     *
+     * @param array $user
+     * @param array $body
+     * @throws ValidationException
+     */
+    protected function validatePatchSelfEditCredentials(array $user, array $body): void
+    {
+        $fieldsPermissions = ["name" => "Garden.Username.Edit"];
+
+        // Global permission checks
+        if (!$this->getSession()->checkPermission(["Garden.Profiles.Edit", "Garden.Users.Edit"], false)) {
+            throw new \Garden\Web\Exception\ForbiddenException();
+        }
+
+        // Password check.
+        if ($user["HashMethod"] == "Random" || $user["HashMethod"] == "Reset") {
+            // The user doesn't have a password.
+            return;
+        }
+
+        $normalizedUser = $this->userModel->normalizeRow($user);
+
+        // Password confirmation is only required if one of these fields was passed and has changed.
+        $fieldsRequiredOnChange = ["name", "email"];
+        $fieldsRequiredAlways = ["password"];
+        $needsPasswordConfirmation = false;
+        foreach ($fieldsRequiredOnChange as $fieldName) {
+            if (isset($body[$fieldName]) && $normalizedUser[$fieldName] !== $body[$fieldName]) {
+                $needsPasswordConfirmation = true;
+            }
+        }
+        foreach ($fieldsRequiredAlways as $fieldName) {
+            if (isset($body[$fieldName])) {
+                $needsPasswordConfirmation = true;
+            }
+        }
+
+        if ($needsPasswordConfirmation) {
+            if (!isset($body["passwordConfirmation"])) {
+                $validation = new Validation();
+                $validation->addError("passwordConfirmation", self::ERROR_SELF_EDIT_PASSWORD_MISSING);
+                throw new ValidationException($validation);
+            }
+            $this->userModel->validateCredentials("", $normalizedUser["userID"], $body["passwordConfirmation"], true);
+        }
+
+        // Check every fields for potential special permissions,
+        foreach ($body as $field => $fieldValue) {
+            if (isset($fieldsPermissions[$field])) {
+                // Permission checks
+                $this->permission($fieldsPermissions[$field]);
+            }
+        }
     }
 }

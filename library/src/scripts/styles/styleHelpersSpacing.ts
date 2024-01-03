@@ -20,5 +20,6 @@ export function extendItemContainer(itemPaddingX: number): CSSObject {
     return {
         width: calc(`100% + ${styleUnit(itemPaddingX * 2)}`),
         marginLeft: styleUnit(-itemPaddingX),
+        marginInlineStart: styleUnit(-itemPaddingX),
     };
 }

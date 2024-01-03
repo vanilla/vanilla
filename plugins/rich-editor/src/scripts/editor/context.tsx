@@ -19,14 +19,13 @@ export interface IEditorProps {
     operationsQueue?: EditorQueueItem[];
     clearOperationsQueue?: () => void;
     legacyMode: boolean;
-    children: React.ReactNode;
 }
 export type EditorQueueItem = DeltaOperation[] | string;
 
 interface IContextProps extends IEditorProps {
-    quill: Quill | null;
+    editor: Quill | null;
+    setEditorInstance: (quill: Quill | null) => void;
     isMobile: boolean;
-    setQuillInstance: (quill: Quill | null) => void;
     onFocus?: (isFocused: boolean) => void;
 }
 

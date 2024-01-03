@@ -14,7 +14,7 @@ import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesT
 import intersection from "lodash/intersection";
 import { IForumStoreState } from "@vanilla/addon-vanilla/redux/state";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { IDiscussionsStoreState } from "@library/features/discussions/discussionsReducer";
+import { IDiscussionsStoreState, useDiscussionsDispatch } from "@library/features/discussions/discussionsReducer";
 import SimplePagerModel, { ILinkPages } from "@library/navigation/SimplePagerModel";
 
 const createAction = actionCreatorFactory("@@discussions");
@@ -139,10 +139,12 @@ export default class DiscussionActions extends ReduxActions<
 
     public getDiscussionList = (params: IGetDiscussionListParams) => {
         const thunk = bindThunkAction(DiscussionActions.getDiscussionListACs, async () => {
+            const defaultExpand = ["insertUser", "breadcrumbs"];
             const response = await this.api.get(`/discussions`, {
                 params: {
                     ...params,
-                    expand: ["insertUser", "breadcrumbs"],
+                    expand:
+                        params.expand && params.expand.length ? [...defaultExpand, ...params.expand] : defaultExpand,
                 },
             });
             const pagination = SimplePagerModel.parseHeaders(response.headers);
@@ -183,10 +185,10 @@ export default class DiscussionActions extends ReduxActions<
             },
         };
         const thunk = bindThunkAction(DiscussionActions.patchDiscussionACs, async () => {
-            const reponse = await this.api.patch(`/discussions/${discussionID}`, query, requestConfig);
+            const reponse = await this.api.patch<IDiscussion>(`/discussions/${discussionID}`, query, requestConfig);
             return reponse.data;
         })(_query);
-        return this.dispatch(thunk);
+        return thunk;
     };
 
     public static putDiscussionTypeACs = createAction.async<IPutDiscussionType, IDiscussion, IApiError>(
@@ -196,12 +198,12 @@ export default class DiscussionActions extends ReduxActions<
     public putDiscussionType = (query: IPutDiscussionType) => {
         const { discussionID, type } = query;
         const thunk = bindThunkAction(DiscussionActions.putDiscussionTypeACs, async () => {
-            const reponse = await this.api.put(`/discussions/${discussionID}/type`, {
+            const reponse = await this.api.put<IDiscussion>(`/discussions/${discussionID}/type`, {
                 type,
             });
             return reponse.data;
         })({ discussionID, type });
-        return this.dispatch(thunk);
+        return thunk;
     };
 
     public static putDiscussionBookmarkedACs = createAction.async<
@@ -213,12 +215,15 @@ export default class DiscussionActions extends ReduxActions<
     public putDiscussionBookmarked = (query: IPutDiscussionBookmarked) => {
         const { discussionID, bookmarked } = query;
         const thunk = bindThunkAction(DiscussionActions.putDiscussionBookmarkedACs, async () => {
-            const reponse = await this.api.put(`/discussions/${discussionID}/bookmark`, {
-                bookmarked,
-            });
+            const reponse = await this.api.put<IPutDiscussionBookmarkedResult>(
+                `/discussions/${discussionID}/bookmark`,
+                {
+                    bookmarked,
+                },
+            );
             return reponse.data;
         })({ discussionID, bookmarked });
-        return this.dispatch(thunk);
+        return thunk;
     };
 
     public static postDiscussionReactionACs = createAction.async<
@@ -296,12 +301,12 @@ export default class DiscussionActions extends ReduxActions<
     public putDiscussionTags = (query: IPutDiscussionTags) => {
         const { discussionID, tagIDs } = query;
         const thunk = bindThunkAction(DiscussionActions.putDiscussionTagsACs, async () => {
-            const reponse = await this.api.put(`/discussions/${discussionID}/tags`, {
+            const reponse = await this.api.put<ITag[]>(`/discussions/${discussionID}/tags`, {
                 tagIDs,
             });
             return reponse.data;
         })({ discussionID, tagIDs });
-        return this.dispatch(thunk);
+        return thunk;
     };
 
     public static getDiscussionsByIDsAC = createAction.async<IGetDiscussionsByIDs, IDiscussion[], IApiError>(

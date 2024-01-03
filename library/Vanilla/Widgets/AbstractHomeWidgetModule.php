@@ -202,6 +202,15 @@ abstract class AbstractHomeWidgetModule extends AbstractReactModule
     }
 
     /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $result = $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["itemData"]));
+        return $result;
+    }
+
+    /**
      * Get name of component to render.
      *
      * @return string

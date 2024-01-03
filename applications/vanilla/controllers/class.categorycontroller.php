@@ -49,9 +49,11 @@ class CategoryController extends VanillaController
     /**
      * Allows user to follow or unfollow a category.
      *
-     * @param int $DiscussionID Unique discussion ID.
+     * @param ?int $categoryID // Category if to be followed
+     * @param ?string $tKey // transient key
+     * @param ?int $value // follow / unfollow flag
      */
-    public function followed($categoryID = null, $tKey = null)
+    public function followed(?int $categoryID = null, ?string $tKey = null, ?int $value = null)
     {
         // Make sure we are posting back.
         if (!$this->Request->isAuthenticatedPostBack() && !Gdn::session()->validateTransientKey($tKey)) {
@@ -73,14 +75,14 @@ class CategoryController extends VanillaController
         // Check the form to see if the data was posted.
         $form = new Gdn_Form();
         $categoryID = $form->getFormValue("CategoryID", $categoryID);
-        $followed = $form->getFormValue("Followed", null);
+        $followed = (bool) $form->getFormValue("Followed", $value);
         $hasPermission = $categoryModel::checkPermission($categoryID, "Vanilla.Discussions.View");
         if (!$hasPermission) {
             throw permissionException("Vanilla.Discussion.View");
         }
-
         try {
-            $result = $categoryModel->follow($userID, $categoryID, $followed);
+            $prefsToSet = $this->getPrefsToSet($followed, $userID);
+            $this->CategoryModel->setPreferences($userID, $categoryID, $prefsToSet);
         } catch (Exception $e) {
             throw new \Gdn_UserException($e->getMessage(), 403, $e);
         }
@@ -89,7 +91,7 @@ class CategoryController extends VanillaController
         $this->setData([
             "UserID" => $userID,
             "CategoryID" => $categoryID,
-            "Followed" => $result,
+            "Followed" => $this->CategoryModel->isFollowed($userID, $categoryID),
         ]);
 
         $parentCategory = false;
@@ -146,5 +148,53 @@ class CategoryController extends VanillaController
         }
 
         $this->render();
+    }
+
+    /**
+     * Get the array of preferences to set when following/unfollowing a category. When the user is following, we rely on their selected
+     * notification preference selections, falling back to the site-wide defaults.
+     *
+     * @param bool $followed
+     * @param int $userID
+     * @return array
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    private function getPrefsToSet(bool $followed, int $userID): array
+    {
+        if (!$followed) {
+            $prefsToSet = [
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => $followed,
+            ];
+        } else {
+            $userPreferencesModel = Gdn::getContainer()->get(
+                \Vanilla\Dashboard\Models\UserNotificationPreferencesModel::class
+            );
+            $userPreferences = $userPreferencesModel->getUserPrefs($userID);
+            // Prepend "Preferences." to the keys to match CategoryModel's preference keys.
+            $values = [];
+            foreach ($userPreferences as $key => $val) {
+                $values["Preferences." . $key] = $val;
+            }
+            $prefsToSet = [
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_FOLLOW) => $followed,
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_APP) =>
+                    $values[CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_APP)] ??
+                    false,
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_EMAIL) =>
+                    $values[CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DISCUSSION_EMAIL)] ??
+                    false,
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_COMMENT_APP) =>
+                    $values[CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_COMMENT_APP)] ?? false,
+                CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_COMMENT_EMAIL) =>
+                    $values[CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_COMMENT_EMAIL)] ??
+                    false,
+            ];
+            if (CategoryModel::isDigestEnabled()) {
+                $prefsToSet[CategoryModel::stripCategoryPreferenceKey(CategoryModel::PREFERENCE_DIGEST_EMAIL)] =
+                    $values["Preferences.Email.DigestEnabled"] ?? false;
+            }
+        }
+        return $prefsToSet;
     }
 }

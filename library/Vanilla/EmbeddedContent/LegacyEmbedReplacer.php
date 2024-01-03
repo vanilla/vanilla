@@ -84,6 +84,8 @@ class LegacyEmbedReplacer
             return "";
         }
 
+        $escapedUrl = htmlspecialchars($url);
+
         switch ($key) {
             case "YouTube":
                 // Supported youtube embed urls:
@@ -107,12 +109,12 @@ class LegacyEmbedReplacer
                     if (empty($videoId)) {
                         // Playlist, no video.
                         $result = <<<EOT
-<iframe width="{$width}" height="{$height}" src="https://www.youtube.com/embed/videoseries?list={$listId}" frameborder="0" allowfullscreen></iframe>
+<iframe width="{$width}" height="{$height}" src="https://www.youtube.com/embed/videoseries?list={$listId}" frameborder="0" allowfullscreen>{$escapedUrl}</iframe>
 EOT;
                     } else {
                         // Video in a playlist.
                         $result = <<<EOT
-<iframe width="{$width}" height="{$height}" src="https://www.youtube.com/embed/{$videoId}?list={$listId}" frameborder="0" allowfullscreen></iframe>
+<iframe width="{$width}" height="{$height}" src="https://www.youtube.com/embed/{$videoId}?list={$listId}" frameborder="0" allowfullscreen>{$escapedUrl}</iframe>
 EOT;
                     }
                 } else {
@@ -149,7 +151,7 @@ EOT;
                         $width .
                         '" height="' .
                         $height .
-                        '" border="0" /></a></span>';
+                        "\" border='0' />{$escapedUrl}</a></span>";
                     $result .= '<span class="VideoPlayer"></span>';
                     $result .= "</span>";
                 }
@@ -170,7 +172,7 @@ EOT;
     webkitallowfullscreen
     mozallowfullscreen
     allowfullscreen
-></iframe>
+>{$escapedUrl}</iframe>
 EOT;
                 break;
 
@@ -193,14 +195,14 @@ EOT;
                 return <<<EOT
 <div class="twitter-card js-twitterCard" data-tweeturl="{$matches[0]}" data-tweetid="{$matches[1]}"><a
 href="{$matches[0]}"
-class="tweet-url" rel="nofollow">{$matches[0]}</a></div>
+class="tweet-url" rel="nofollow">{$escapedUrl}</a></div>
 EOT;
                 break;
 
             case "Vine":
                 return <<<EOT
 <div class="vine-video VideoWrap">
-   <iframe class="vine-embed" src="https://vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe>
+   <iframe class="vine-embed" src="https://vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0">{$escapedUrl}</iframe>
 </div>
 EOT;
                 break;
@@ -215,14 +217,14 @@ EOT;
         frameborder="0"
         scrolling="no"
         allowtransparency="true"
-    ></iframe>
+    >{$escapedUrl}</iframe>
 </div>
 EOT;
                 break;
 
             case "Pinterest":
                 return <<<EOT
-<a data-pin-do="embedPin" href="https://pinterest.com/pin/{$matches[1]}/" class="pintrest-pin" rel="nofollow"></a>
+<a data-pin-do="embedPin" href="https://pinterest.com/pin/{$matches[1]}/" class="pintrest-pin" rel="nofollow">{$escapedUrl}</a>
 EOT;
                 break;
 
@@ -234,7 +236,7 @@ EOT;
     height="{$matches[3]}"
     frameborder="0"
     scrolling="no"
-></iframe>
+>{$escapedUrl}</iframe>
 EOT;
                 break;
 
@@ -254,7 +256,7 @@ EOT;
     scrolling="no"
     autoplay="false"
     allowfullscreen="true"
-></iframe>
+>{$escapedUrl}</iframe>
 EOT;
                 break;
 
@@ -273,7 +275,7 @@ EOT;
     scrolling="no"
     autoplay="false"
     allowfullscreen="true"
-></iframe>
+>{$escapedUrl}</iframe>
 EOT;
                 break;
 
@@ -290,7 +292,7 @@ EOT;
     scrolling="no"
     frameborder="no"
     src="$frameSrc"
-></iframe>
+>{$escapedUrl}</iframe>
 EOT;
                 break;
 
@@ -314,7 +316,7 @@ EOT;
         class="wistia_responsive_wrapper"
         style="height:100%;left:0;position:absolute;top:0;width:100%;"
     >
-        <div class="{$wistiaClass}" style="height:100%;width:100%">&nbsp;</div>
+        <div class="{$wistiaClass}" style="height:100%;width:100%">{$escapedUrl}</div>
     </div>
 </div>
 EOT;

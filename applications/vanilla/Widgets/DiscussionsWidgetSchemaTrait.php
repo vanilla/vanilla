@@ -1,11 +1,13 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Forum\Widgets;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
 use Garden\Schema\Schema;
 use Vanilla\Forms\FormOptions;
 use Vanilla\Forms\SchemaForm;
@@ -201,12 +203,8 @@ trait DiscussionsWidgetSchemaTrait
                     new FieldMatchConditional(
                         "apiParams",
                         Schema::parse([
-                            "siteSectionID" => [
-                                "type" => "null",
-                            ],
-                            "followed" => [
-                                "const" => false,
-                            ],
+                            "siteSectionID" => ["type" => "null"],
+                            "followed" => ["const" => false],
                         ])
                     )
                 ),
@@ -219,15 +217,9 @@ trait DiscussionsWidgetSchemaTrait
                     new FieldMatchConditional(
                         "apiParams",
                         Schema::parse([
-                            "categoryID" => [
-                                "type" => "integer",
-                            ],
-                            "siteSectionID" => [
-                                "type" => "null",
-                            ],
-                            "followed" => [
-                                "const" => false,
-                            ],
+                            "categoryID" => ["type" => "integer"],
+                            "siteSectionID" => ["type" => "null"],
+                            "followed" => ["const" => false],
                         ])
                     )
                 ),
@@ -319,6 +311,8 @@ trait DiscussionsWidgetSchemaTrait
      * Get all site-sections form choices.
      *
      * @return array
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     protected static function getSiteSectionFormChoices(): array
     {
@@ -337,7 +331,7 @@ trait DiscussionsWidgetSchemaTrait
             $id = $siteSection->getSectionID();
             $name = $siteSection->getSectionName();
 
-            if ($id !== (string) DefaultSiteSection::DEFAULT_ID) {
+            if ($id !== DefaultSiteSection::DEFAULT_ID) {
                 $siteSectionFormChoices[$id] = $name;
             }
         }

@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -8,48 +8,30 @@ import { homeWidgetItemVariables, IHomeWidgetItemOptions } from "@library/homeWi
 import {
     WidgetContainerDisplayType,
     IHomeWidgetContainerOptions,
+    homeWidgetContainerVariables,
 } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { DeepPartial } from "redux";
-import { IHomeWidgetItemProps } from "@library/homeWidget/HomeWidgetItem";
-import { HomeWidget } from "@library/homeWidget/HomeWidget";
-import { BorderType } from "@library/styles/styleHelpersBorders";
 import { QuickLinks } from "@library/navigation/QuickLinks";
 import { Widget } from "@library/layout/Widget";
-interface IProps {
+import CategoryList from "@library/categoriesWidget/CategoryList";
+import CategoryGrid from "@library/categoriesWidget/CategoryGrid";
+import { ICategoryItem, ICategoryItemOptions } from "@library/categoriesWidget/CategoryItem";
+
+export interface ICategoriesWidgetProps {
     title?: string;
     subtitle?: string;
     description?: string;
     containerOptions?: IHomeWidgetContainerOptions;
     itemOptions?: DeepPartial<IHomeWidgetItemOptions>;
-    itemData: IHomeWidgetItemProps[];
-    maxItemCount?: number; //this will probably go away with categories API "limit" full support
+    itemData: ICategoryItem[];
+    isAsset?: boolean;
+    isPreview?: boolean; // preview in layout editor
+    categoryOptions?: ICategoryItemOptions;
 }
 
-export function CategoriesWidget(props: IProps) {
-    const globalVariables = homeWidgetItemVariables().options;
-    const itemVars = homeWidgetItemVariables(props.itemOptions).options;
-    const isListWithNoBorder =
-        props.containerOptions?.displayType === WidgetContainerDisplayType.LIST &&
-        itemVars.box.borderType === BorderType.NONE;
-
-    const containerAsItemBorderType: BorderType | undefined =
-        props.containerOptions?.borderType === "navLinks" ? BorderType.SEPARATOR : props.containerOptions?.borderType;
-
-    const defaultItemOptions: DeepPartial<IHomeWidgetItemOptions> = {
-        ...props.itemOptions,
-        imagePlacement:
-            props.containerOptions?.displayType === WidgetContainerDisplayType.LIST
-                ? "left"
-                : props.itemOptions?.imagePlacement,
-        box: {
-            ...props.itemOptions?.box,
-            borderType: isListWithNoBorder ? BorderType.SEPARATOR : containerAsItemBorderType,
-        },
-        display: {
-            counts: globalVariables.display.counts,
-        },
-        alignment: props.containerOptions?.headerAlignment ?? globalVariables.alignment,
-    };
+export function CategoriesWidget(props: ICategoriesWidgetProps) {
+    const isList = props.containerOptions?.displayType === WidgetContainerDisplayType.LIST;
+    const isLink = props.containerOptions?.displayType === WidgetContainerDisplayType.LINK;
 
     const quickLinks = props.itemData.map((item, index) => {
         return {
@@ -59,15 +41,28 @@ export function CategoriesWidget(props: IProps) {
         };
     });
 
-    if (props.containerOptions?.displayType === WidgetContainerDisplayType.LINK) {
+    if (isLink) {
         return <QuickLinks title={props.title} links={quickLinks} containerOptions={props.containerOptions} />;
-    } else {
-        return (
-            <Widget>
-                <HomeWidget {...props} itemOptions={defaultItemOptions} />
-            </Widget>
-        );
     }
+
+    return (
+        <Widget>
+            {isList || (!props.containerOptions?.displayType && props.isAsset) ? (
+                <CategoryList {...props} isPreview={props.isPreview} />
+            ) : (
+                // grid is the default display type for categories widget
+                <CategoryGrid
+                    {...props}
+                    containerOptions={{
+                        ...props.containerOptions,
+                        maxColumnCount:
+                            props.containerOptions?.maxColumnCount ??
+                            homeWidgetContainerVariables().options.maxColumnCount,
+                    }}
+                />
+            )}
+        </Widget>
+    );
 }
 
 export default CategoriesWidget;

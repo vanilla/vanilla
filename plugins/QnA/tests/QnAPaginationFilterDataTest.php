@@ -38,6 +38,7 @@ class QnAPaginationFilterDataTest extends SiteTestCase
      */
     public function testQnAPagination()
     {
+        $this->useLegacyLayouts();
         $this->runWithConfig(
             [
                 "Vanilla.Discussions.PerPage" => 1,

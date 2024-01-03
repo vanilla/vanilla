@@ -62,4 +62,48 @@ class SectionThreeColumns extends AbstractLayoutSection
     {
         return "/applications/dashboard/design/images/sectionIcons/3column.svg";
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $middleTop = $this->renderSectionChildrenHtml($props["middleTop"] ?? []);
+        $middleBottom = $this->renderSectionChildrenHtml($props["middleBottom"] ?? []);
+        $leftTop = $this->renderSectionChildrenHtml($props["leftTop"] ?? []);
+        $leftBottom = $this->renderSectionChildrenHtml($props["leftBottom"] ?? []);
+        $rightTop = $this->renderSectionChildrenHtml($props["rightTop"] ?? []);
+        $rightBottom = $this->renderSectionChildrenHtml($props["rightBottom"] ?? []);
+        $breadcrumbs = $this->renderSectionChildrenHtml($props["breadcrumbs"] ?? []);
+        $tpl = <<<TWIG
+<section>
+<div class="seoSectionRow seoBreadcrumbs">
+    {{- breadcrumbs|raw -}}
+</div>
+<div class="seoSectionColumn">
+    {{- leftTop|raw -}}
+    {{- leftBottom|raw -}}
+</div>
+<div class="seoSectionColumn mainColumn">
+    {{- middleTop|raw -}}
+    {{- middleBottom|raw -}}
+</div>
+<div class="seoSectionColumn">
+    {{- rightTop|raw -}}
+    {{- rightBottom|raw -}}
+</div>
+</section>
+TWIG;
+
+        $result = $this->renderTwigFromString($tpl, [
+            "middleTop" => $middleTop,
+            "middleBottom" => $middleBottom,
+            "leftTop" => $leftTop,
+            "leftBottom" => $leftBottom,
+            "rightTop" => $rightTop,
+            "rightBottom" => $rightBottom,
+            "breadcrumbs" => $breadcrumbs,
+        ]);
+        return $result;
+    }
 }

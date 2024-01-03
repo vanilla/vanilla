@@ -96,7 +96,7 @@ export function DropDownPanelNav(props: IProps) {
                             activeRecord={props.activeRecord}
                             isActive={i === parentNavItems.length - 1}
                             key={key}
-                            navItems={currentItems}
+                            navItems={currentItems ?? []}
                             isNestable={props.isNestable}
                             popParentItem={popParentItem}
                             pushParentItem={pushParentItem}

@@ -5,20 +5,16 @@
  */
 
 import apiv2 from "@library/apiv2";
-import {
-    ILongRunnerResponse,
-    LongRunnerClient,
-    LongRunnerFailedHandler,
-    LongRunnerSuccessHandler,
-} from "@library/LongRunnerClient";
-import { AsyncState, useAsyncFn } from "@vanilla/react-utils";
+import { IError } from "@library/errorPages/CoreErrorMessages";
+import { LongRunnerClient, LongRunnerFailedHandler, LongRunnerSuccessHandler } from "@library/LongRunnerClient";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 
 export function useLongRunnerAction<RequestBody = any>(
     method: "POST" | "PATCH" | "DELETE" | "PUT",
     url: string,
     handlers: { success?: LongRunnerSuccessHandler; failed?: LongRunnerFailedHandler } = {},
-): [AsyncState<ILongRunnerResponse>, (body: RequestBody) => Promise<ILongRunnerResponse>] {
+) {
     const longRunnerClient = useMemo(() => {
         return new LongRunnerClient(apiv2);
     }, []);
@@ -35,8 +31,8 @@ export function useLongRunnerAction<RequestBody = any>(
         }
     }, [handlers.failed]);
 
-    const [state, request] = useAsyncFn(
-        async (body: RequestBody) => {
+    const mutation = useMutation<any, IError, RequestBody>({
+        mutationFn: async (body: RequestBody) => {
             const response = await longRunnerClient.request({
                 method,
                 url,
@@ -44,8 +40,8 @@ export function useLongRunnerAction<RequestBody = any>(
             });
             return response.data;
         },
-        [longRunnerClient, method, url],
-    );
+        mutationKey: [longRunnerClient, method, url],
+    });
 
-    return [state, request];
+    return mutation;
 }

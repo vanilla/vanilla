@@ -23,6 +23,7 @@ class WebApiSecurityHeadersTest extends SiteTestCase
      */
     public function testDefaultSecurityHeadersWebResponse()
     {
+        $this->useLegacyLayouts();
         $response = $this->bessy()->getJsonData("/");
         $this->assertEquals("max-age=15768000", $response->getHeader("Strict-Transport-Security"));
         $this->assertEquals("nosniff", $response->getHeader("X-Content-Type-Options"));
@@ -60,6 +61,7 @@ class WebApiSecurityHeadersTest extends SiteTestCase
      */
     public function testConfigWebStrictTransportMaxAgeResponse()
     {
+        $this->useLegacyLayouts();
         $securityHeaderConfig["Garden.Security.Hsts.MaxAge"] = 999999;
         $this->runWithConfig($securityHeaderConfig, function () {
             $response = $this->bessy()->getJsonData("/");

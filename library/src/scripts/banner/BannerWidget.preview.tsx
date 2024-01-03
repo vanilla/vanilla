@@ -8,13 +8,27 @@ import BannerWidget from "@library/banner/BannerWidget";
 import { t } from "@vanilla/i18n";
 import React from "react";
 
-interface IProps extends React.ComponentProps<typeof BannerWidget> {}
+interface IProps extends React.ComponentProps<typeof BannerWidget> {
+    titleType: string;
+    descriptionType: string;
+}
 
 export function BannerWidgetPreview(_props: IProps) {
+    const title = typeof _props.title === "string" && _props.title.length > 0 ? _props.title : t("Contextual Title");
+    const description =
+        typeof _props.description === "string" && _props.description.length > 0
+            ? _props.description
+            : t("Contextual Description");
+
+    const showTitle = _props.titleType !== "none";
+    const showDescription = _props.descriptionType !== "none";
+
     const props = {
         ..._props,
-        title: _props.title || t("Dynamic Title"),
-        description: _props.description || t("A Dynamic Description will appear here."),
+        title,
+        description,
+        showTitle,
+        showDescription,
     };
     return <BannerWidget {...props} />;
 }

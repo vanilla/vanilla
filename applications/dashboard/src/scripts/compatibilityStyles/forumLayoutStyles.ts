@@ -167,7 +167,7 @@ export const forumLayoutVariables = useThemeCache(() => {
 });
 
 export const forumLayoutCSS = () => {
-    shimPanelPageBoxes();
+    // shimPanelPageBoxes();
     const globalVars = globalVariables();
     const vars = forumLayoutVariables();
 

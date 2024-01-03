@@ -7,10 +7,15 @@
 
 namespace Vanilla\Layout;
 
+use Garden\Container\ContainerException;
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\Dashboard\Controllers\API\LayoutsApiController;
-use Vanilla\Layout\Asset\LayoutFormAsset;
+use Vanilla\Exception\PermissionException;
+use Vanilla\Http\InternalClient;
+use Vanilla\Layout\Asset\LayoutQuery;
 use Vanilla\Web\Asset\ExternalAsset;
 use Vanilla\Web\JsInterpop\RawReduxAction;
 use Vanilla\Web\ThemedPage;
@@ -21,17 +26,18 @@ use Vanilla\Web\ThemedPage;
 class LayoutPage extends ThemedPage
 {
     /** @var LayoutsApiController */
-    public $layoutsApiController;
+    public LayoutsApiController $layoutsApiController;
+
+    private InternalClient $internalClient;
 
     /**
-     * Constructor.
-     *
-     * @throws \Garden\Container\ContainerException Container Axception.
-     * @throws \Garden\Container\NotFoundException Not found Exception.
+     * @param LayoutsApiController $layoutsApiController
+     * @param InternalClient $internalClient
      */
-    public function __construct(LayoutsApiController $layoutsApiController)
+    public function __construct(LayoutsApiController $layoutsApiController, InternalClient $internalClient)
     {
         $this->layoutsApiController = $layoutsApiController;
+        $this->internalClient = $internalClient;
     }
 
     /**
@@ -57,21 +63,28 @@ class LayoutPage extends ThemedPage
     /**
      * Preload layout.
      *
-     * @param LayoutFormAsset $layoutFormAsset Contains all the parameters for hydration.
+     * @param LayoutQuery $layoutFormAsset Contains all the parameters for hydration.
      *
      * @return $this
      * @throws ClientException Client Exception.
+     * @throws HttpException Http Exception.
      * @throws NotFoundException Not Found Exception.
-     * @throws \Garden\Schema\ValidationException Validation Exception.
-     * @throws \Garden\Web\Exception\HttpException Http Exception.
+     * @throws ValidationException Validation Exception.
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws PermissionException
      */
-    public function preloadLayout(LayoutFormAsset $layoutFormAsset): self
+    public function preloadLayout(LayoutQuery $layoutFormAsset): self
     {
         $query = (array) $layoutFormAsset;
 
-        $layoutData = $this->layoutsApiController->get_lookupHydrate($query)->getData();
+        $layoutData = $this->internalClient
+            ->get("/layouts/lookup-hydrate", $query + ["includeNoScript" => true])
+            ->getBody();
+        $this->setSeoContent($layoutData["seo"]["htmlContents"] ?? "");
+
         $layoutID = $layoutData["layoutID"];
-        $layoutWidgetAssets = $this->layoutsApiController->get_hydrateAssets($layoutID)->getData();
+        $layoutWidgetAssets = $this->internalClient->get("/layouts/{$layoutID}/hydrate-assets")->getBody();
 
         // Our layout needs all of these assets
         foreach ($layoutWidgetAssets["js"] as $scriptPath) {
@@ -91,8 +104,17 @@ class LayoutPage extends ThemedPage
         $this->setJsonLDItems($json);
         $this->setSeoTitle($seo["title"]);
         $this->setSeoDescription($seo["description"]);
-        $this->addMetaTag($seo["meta"]);
-        $this->addLinkTag($seo["links"]);
+
+        if (isset($seo["url"])) {
+            $this->setCanonicalUrl($seo["url"]);
+        }
+
+        foreach ($seo["meta"] as $meta) {
+            $this->addMetaTag($meta);
+        }
+        foreach ($seo["links"] as $link) {
+            $this->addLinkTag($link);
+        }
 
         $reduxActionPending = new RawReduxAction([
             "type" => "@@layouts/lookup/pending",

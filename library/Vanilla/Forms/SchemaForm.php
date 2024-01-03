@@ -60,6 +60,7 @@ class SchemaForm
             "placeholder" => $options->getPlaceHolder(),
             "choices" => $choices->getChoices(),
             "multiple" => $multiple,
+            "tooltip" => $options->getTooltip(),
         ];
 
         if ($conditions) {
@@ -88,6 +89,7 @@ class SchemaForm
             "inputType" => self::TEXT_TYPE,
             "placeholder" => $options->getPlaceHolder(),
             "type" => $type,
+            "tooltip" => $options->getTooltip(),
         ];
 
         if ($conditions) {
@@ -174,19 +176,22 @@ class SchemaForm
      * @param FormOptions $options
      * @param FormChoicesInterface $choices
      * @param ?FieldMatchConditional $conditions
+     * @param ?array $tooltipsPerOption
      *
      * @return array
      */
     public static function radio(
         FormOptions $options,
         FormChoicesInterface $choices,
-        FieldMatchConditional $conditions = null
+        FieldMatchConditional $conditions = null,
+        array $tooltipsPerOption = null
     ) {
         $result = [
             "description" => $options->getDescription(),
             "label" => $options->getLabel(),
             "inputType" => self::RADIO_TYPE,
             "choices" => $choices->getChoices(),
+            "tooltipsPerOption" => $tooltipsPerOption,
         ];
 
         if ($conditions) {
@@ -238,6 +243,10 @@ class SchemaForm
 
         if ($defaultBackground) {
             $result["defaultBackground"] = $defaultBackground;
+        }
+
+        if ($conditions) {
+            $result["conditions"] = [$conditions->getCondition()];
         }
 
         return $result;

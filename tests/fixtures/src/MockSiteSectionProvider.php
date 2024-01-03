@@ -36,6 +36,14 @@ class MockSiteSectionProvider implements SiteSectionProviderInterface
     }
 
     /**
+     * @return SiteSectionInterface|null
+     */
+    public function getDefaultSiteSection(): ?SiteSectionInterface
+    {
+        return $this->siteSections[0];
+    }
+
+    /**
      * @param SiteSectionInterface[] $siteSections
      */
     public function addSiteSections(array $siteSections)

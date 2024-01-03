@@ -89,4 +89,19 @@ class ImageHtmlProcessorTest extends VanillaTestCase
         // Confirm that the expected & actual results are euivalent.
         $this->assertHtmlStringEqualsHtmlString($expectedOutput, $actualOutput);
     }
+
+    /**
+     * Test rendering an empty image.
+     *
+     * @return void
+     */
+    public function testEmptyImage()
+    {
+        $expectedOutput =
+            "404 image not found! <img src=\"\" alt=\"\" class=\"embedImage-img importedEmbed-img\"></img><br>";
+        $body = "404 image not found! <img src=\"\" alt=\"\"><br>";
+        $document = new HtmlDocument(\Gdn::formatService()->renderHTML($body, WysiwygFormat::FORMAT_KEY));
+        $actualOutput = $this->processor->processDocument($document)->getInnerHtml();
+        $this->assertHtmlStringEqualsHtmlString($expectedOutput, $actualOutput);
+    }
 }

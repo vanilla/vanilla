@@ -35,6 +35,14 @@ class SingleSiteSectionProvider implements SiteSectionProviderInterface
     /**
      * @inheritDoc
      */
+    public function getDefaultSiteSection(): ?SiteSectionInterface
+    {
+        return $this->defaultSite;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getAll(): array
     {
         return [$this->defaultSite];

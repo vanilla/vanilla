@@ -28,7 +28,7 @@ class SafeCurlHttpHandlerTest extends BootstrapTestCase
         $r = [
             "notUrl" => ["not-a-url"],
             "badIP" => ["http://0.0.0.0:123"],
-            "someRandomUrl" => ["https://www.someurl.com"],
+            "someRandomUrl" => ["https://www.someurl.invalid.com"],
         ];
 
         return $r;

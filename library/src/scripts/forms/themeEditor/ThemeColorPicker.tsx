@@ -137,7 +137,7 @@ export function ThemeColorPicker(_props: IProps) {
                     placeholder={defaultColorString}
                     value={textInputValue ?? ""} // Null is not an allowed value for an input.
                     onChange={onTextChange}
-                    auto-correct="false"
+                    autoCorrect="false"
                     disabled={disabled}
                     aria-disabled={disabled}
                 />

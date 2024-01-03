@@ -25,10 +25,12 @@ import { storyBookClasses } from "@library/storybook/StoryBookStyles";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { resetThemeCache } from "@library/styles/themeCache";
 import { ThemeProvider } from "@library/theming/ThemeProvider";
+import { INITIAL_THEME_STATE } from "@library/theming/themeReducer";
 import { addComponent, _mountComponents } from "@library/utility/componentRegistry";
 import { blotCSS } from "@rich-editor/quill/components/blotStyles";
 import merge from "lodash/merge";
-import React, { useCallback, useContext, useLayoutEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useLayoutEffect, useState } from "react";
+import { LiveAnnouncer } from "react-aria-live";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router";
 import { DeepPartial } from "redux";
@@ -93,7 +95,22 @@ export function storyWithConfig(config: Partial<IContext>, Component: React.Comp
     return StoryCaller;
 }
 
-const defaultState = createRootReducer()({}, { type: "initial" });
+const INITIAL_STORY_STATE = {
+    theme: {
+        ...INITIAL_THEME_STATE,
+        assets: {
+            data: {
+                variables: {
+                    data: {},
+                    type: "json",
+                },
+            },
+            status: LoadStatus.SUCCESS,
+        },
+    },
+};
+
+const defaultState = createRootReducer()(INITIAL_STORY_STATE, { type: "initial" });
 
 export function StoryContextProvider(props: {
     children?: React.ReactNode;
@@ -102,19 +119,7 @@ export function StoryContextProvider(props: {
 }) {
     const [contextState, setContextState] = useState<IContext>({
         useWrappers: true,
-        storeState: {
-            theme: {
-                assets: {
-                    data: {
-                        variables: {
-                            data: {},
-                            type: "json",
-                        },
-                    },
-                    status: LoadStatus.SUCCESS,
-                },
-            },
-        },
+        storeState: INITIAL_STORY_STATE,
     });
     const [themeKey, setThemeKey] = useState("");
 
@@ -181,10 +186,12 @@ export function StoryContextProvider(props: {
         <StoryContext.Provider value={{ ...contextState, updateContext, refreshKey: themeKey }}>
             <Provider store={store}>
                 <MemoryRouter>
-                    <ThemeProvider variablesOnly errorComponent={<ErrorComponent />} themeKey={themeKey}>
+                    <ThemeProvider disabled errorComponent={<ErrorComponent />} themeKey={themeKey}>
                         <ScrollOffsetProvider>
                             <DeviceProvider>
-                                <TitleBarDeviceProvider>{content}</TitleBarDeviceProvider>
+                                <LiveAnnouncer>
+                                    <TitleBarDeviceProvider>{content}</TitleBarDeviceProvider>
+                                </LiveAnnouncer>
                             </DeviceProvider>
                         </ScrollOffsetProvider>
                     </ThemeProvider>

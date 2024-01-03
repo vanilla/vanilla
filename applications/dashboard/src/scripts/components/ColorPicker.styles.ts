@@ -46,7 +46,7 @@ export const colorPickerClasses = () => {
     const clearButton = css({
         position: "absolute",
         right: 54,
-        height: 30,
+        height: "100%",
         color: "#777a80",
     });
 

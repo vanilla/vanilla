@@ -1,12 +1,13 @@
 <?php
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Forum\Modules;
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use QnaModel;
 use Vanilla\Community\BaseDiscussionWidgetModule;
 use Vanilla\Forms\FormOptions;
@@ -47,7 +48,6 @@ class QnAWidgetModule extends BaseDiscussionWidgetModule
                 self::limitSchema()
             )
         );
-
         return $apiSchema;
     }
 
@@ -55,6 +55,7 @@ class QnAWidgetModule extends BaseDiscussionWidgetModule
      * Get the real parameters that we will pass to the API.
      * @param array|null $params
      * @return array
+     * @throws ValidationException
      */
     protected function getRealApiParams(?array $params = null): array
     {

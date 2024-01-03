@@ -13,6 +13,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  */
 class UserSiteTotalTest extends SiteTestCase
 {
+    public static $addons = ["stubcontent"];
+
     use UsersAndRolesApiTestTrait;
 
     protected $baseURL = "/site-totals";

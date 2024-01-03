@@ -69,10 +69,10 @@ export interface IDropDownProps extends IOpenDirectionProps {
     contentID?: string;
     horizontalOffset?: boolean;
     tag?: string;
-    accessibleLabel?: string;
     onHover?: () => void;
     modalSize?: ModalSizes;
     asReachPopover?: boolean;
+    preventFocusOnVisible?: boolean; //in some cases focus will be handled through parent components, so we'll prevent the responsibility in FlyoutToggle
 }
 
 export enum FlyoutType {
@@ -164,6 +164,7 @@ export default function DropDown(props: IDropDownProps) {
             initialFocusElement={props.initialFocusElement}
             tag={props.tag}
             contentID={contentID}
+            preventFocusOnVisible={props.preventFocusOnVisible}
         >
             {(params) => {
                 return (

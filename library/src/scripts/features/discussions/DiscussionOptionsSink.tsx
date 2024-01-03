@@ -12,18 +12,21 @@ import React from "react";
 
 interface IProps {
     discussion: IDiscussion;
+    onSuccess?: () => Promise<void>;
 }
 
 export function DiscussionOptionsSink(props: IProps) {
     const { discussionID, sink = false } = props.discussion;
+    const { onSuccess } = props;
     const { patchDiscussion, isLoading } = useDiscussionPatch(discussionID, "sink");
 
     return (
         <DropDownSwitchButton
             label={sink ? t("Sunk") : t("Sink")}
             isLoading={isLoading}
-            onClick={() => {
-                patchDiscussion({ sink: !sink });
+            onClick={async () => {
+                await patchDiscussion({ sink: !sink });
+                !!onSuccess && (await onSuccess());
             }}
             status={sink}
         />

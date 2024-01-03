@@ -1,6 +1,6 @@
 <?php use Vanilla\Theme\BoxThemeShim;
 
-if (!defined('APPLICATION')) exit(); ?>
+if (!defined('APPLICATION')) exit();?>
 <div class="FormTitleWrapper">
     <?php BoxThemeShim::startHeading(); ?>
     <h1 class="H"><?php echo t('Change My Password'); ?></h1>

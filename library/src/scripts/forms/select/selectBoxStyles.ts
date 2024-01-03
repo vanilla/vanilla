@@ -21,7 +21,7 @@ export const selectBoxClasses = useThemeCache(() => {
         display: "flex",
         alignItems: "center",
         justifyContent: "flex-start",
-        textAlign: "left",
+        textAlign: "start",
         maxWidth: percent(100),
         border: 0,
         ...{
@@ -41,7 +41,7 @@ export const selectBoxClasses = useThemeCache(() => {
         overflow: "hidden",
         alignItems: "center",
         justifyContent: "flex-start",
-        textAlign: "left",
+        textAlign: "start",
         maxWidth: percent(100),
         lineHeight: globalVars.lineHeights.condensed,
         paddingLeft: px(13.5),
@@ -81,6 +81,14 @@ export const selectBoxClasses = useThemeCache(() => {
         paddingBottom: styleUnit(0),
     });
 
+    const selectOptionLabel = css({
+        "&&&": {
+            "@media (max-width: 600px)": {
+                fontSize: globalVars.fonts.size.large,
+            },
+        },
+    });
+
     return {
         toggle,
         buttonItem,
@@ -90,5 +98,6 @@ export const selectBoxClasses = useThemeCache(() => {
         spacer,
         itemLabel,
         offsetPadding,
+        selectOptionLabel,
     };
 });

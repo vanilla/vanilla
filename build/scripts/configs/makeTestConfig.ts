@@ -16,14 +16,14 @@ export async function makeTestConfig(entryModel: EntryModel) {
     baseConfig.mode = "development";
     baseConfig.devtool = "inline-cheap-module-source-map";
     baseConfig.optimization = {
-        splitChunks: false,
         minimize: false,
     };
     baseConfig.plugins?.push(
         new webpack.DefinePlugin({
-            // Currently a warning with this. karma defines one of "development" giving a conflcit warning.
+            // Currently a warning with this. karma defines one of "development" giving a conflict warning.
             // We have quite a few things depending on this being "test".
             ["process.env.NODE_ENV"]: "'test'",
+            ["process.env.IS_WEBPACK"]: true,
         }),
         // Shim node builtins for some tests in the browser.
         new webpack.ProvidePlugin({

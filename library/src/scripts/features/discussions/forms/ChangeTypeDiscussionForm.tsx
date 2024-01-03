@@ -27,7 +27,7 @@ type FormValues = {
 
 interface IProps {
     onCancel: () => void;
-    onSuccess: () => void;
+    onSuccess?: () => Promise<void>;
     discussion: IDiscussion;
 }
 
@@ -39,12 +39,12 @@ export default function ChangeTypeDiscussionForm({ onCancel, onSuccess, discussi
         initialValues: {
             type: discussion.type,
         },
-        onSubmit: ({ type }) => {
-            putDiscussionType({
+        onSubmit: async ({ type }) => {
+            await putDiscussionType({
                 type: type,
             });
 
-            onSuccess();
+            !!onSuccess && (await onSuccess());
         },
     });
 

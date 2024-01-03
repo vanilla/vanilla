@@ -58,6 +58,37 @@ class LoggerTest extends LoggerInterfaceTest
     }
 
     /**
+     * Test log interpolation.
+     *
+     * @return void
+     */
+    public function testInterpolateLogs()
+    {
+        $testLogger = $this->getTestLogger();
+        $logger = new Logger();
+        $logger->addLogger($testLogger);
+        $logger->info("Hello {var}", ["var" => "world!"]);
+        $this->assertLog([
+            "level" => Logger::INFO,
+            "message" => "Hello world!",
+        ]);
+
+        // It works with numbers too.
+        $logger->info("Hello {var}", ["var" => 5]);
+        $this->assertLog([
+            "level" => Logger::INFO,
+            "message" => "Hello 5",
+        ]);
+
+        // Doesn't blow up on non-string values.
+        $this->getTestLogger()->info("Hello {var}", ["var" => ["arr"]]);
+        $this->assertLog([
+            "level" => Logger::INFO,
+            "message" => "Hello {var}",
+        ]);
+    }
+
+    /**
      * Should throw when an invalid level is given.
      */
     public function testThrowsOnInvalidLevel()

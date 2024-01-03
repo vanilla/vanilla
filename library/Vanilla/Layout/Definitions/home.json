@@ -3,7 +3,7 @@
     "dateInserted": "2022-01-01T00:00:00Z",
     "layoutViewType": "home",
     "layoutID": "home",
-    "name": "Default Homepage Layout",
+    "name": "Home Template",
     "layout": [
         {
             "$hydrate": "react.section.full-width",
@@ -12,7 +12,13 @@
                     "$hydrate": "react.app-banner",
                     "showTitle": true,
                     "showDescription": true,
-                    "showSearch": true
+                    "showSearch": true,
+                    "titleType": "siteSection/name",
+                    "title": {
+                        "$hydrate": "param",
+                        "ref": "siteSection/name"
+                    },
+                    "descriptionType": "none"
                 }
             ]
         },
@@ -23,7 +29,8 @@
                     "$hydrate": "react.categories",
                     "apiParams": {
                         "limit": 9,
-                        "featured": true
+                        "featured": true,
+                        "filter": "none"
                     },
                     "itemOptions": {
                         "display": {
@@ -33,6 +40,8 @@
                         }
                     },
                     "title": "Featured Categories",
+                    "titleType": "static",
+                    "descriptionType": "none",
                     "containerOptions": {
                         "displayType": "carousel"
                     }
@@ -55,10 +64,31 @@
                             "to": "/discussions"
                         }
                     },
-                    "title": "Recent Discussions"
+                    "title": "Recent Discussions",
+                    "titleType": "static",
+                    "descriptionType": "none"
                 }
             ],
             "secondaryBottom": [
+                {
+                    "$hydrate": "react.guest-cta",
+                    "title": "Welcome!",
+                    "description": "It looks like you're new here. Sign in or register to get started.",
+                    "titleType": "static",
+                    "descriptionType": "static",
+                    "secondButton": {
+                        "title": "Register",
+                        "type": "standard"
+                    },
+                    "button": {
+                        "title": "Sign In",
+                        "type": "primary"
+                    },
+                    "background": {
+                        "useOverlay": true
+                    },
+                    "alignment": "left"
+                },
                 {
                     "$hydrate": "react.newpost",
                     "asOwnButtons": [],
@@ -66,7 +96,8 @@
                 },
                 {
                     "$hydrate": "react.quick-links",
-                    "title": "Quick Links"
+                    "title": "Quick Links",
+                    "titleType": "static"
                 },
                 {
                     "$hydrate": "react.userspotlight",
@@ -76,7 +107,9 @@
                     },
                     "title": "Customer Spotlight",
                     "subtitle": "",
-                    "description": "“Use this space to add a Customer Spotlight by telling the customer's story using their unique language, share what problems they experienced, and how they conquered it by using your product(s).”"
+                    "description": "“Use this space to add a Customer Spotlight by telling the customer's story using their unique language, share what problems they experienced, and how they conquered it by using your product(s).”",
+                    "titleType": "static",
+                    "descriptionType": "static"
                 }
             ]
         }

@@ -43,7 +43,7 @@ export const themeDropDownClasses = useThemeCache(() => {
             },
             ".suggestedTextInput-option": {
                 width: percent(100),
-                textAlign: "left",
+                textAlign: "start",
                 minHeight: styleUnit(builderVariables.input.height),
                 paddingTop: 0,
                 paddingBottom: 0,

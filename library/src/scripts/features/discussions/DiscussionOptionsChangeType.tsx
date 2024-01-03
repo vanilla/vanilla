@@ -12,17 +12,25 @@ import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import LazyChangeTypeDiscussionForm from "@library/features/discussions/forms/LazyChangeTypeDiscussionForm";
 import { StackingContextProvider } from "@vanilla/react-utils";
 
-const DiscussionOptionsChangeType: FunctionComponent<{ discussion: IDiscussion }> = ({ discussion }) => {
+const DiscussionOptionsChangeType: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
+    discussion,
+    onSuccess,
+}) => {
     const [isVisible, setIsVisible] = useState(false);
     const open = () => setIsVisible(true);
     const close = () => setIsVisible(false);
+
+    async function handleSuccess() {
+        !!onSuccess && (await onSuccess());
+        close();
+    }
 
     return (
         <>
             <DropDownItemButton onClick={open}>{t("Change Type")}</DropDownItemButton>
             <StackingContextProvider>
                 <Modal isVisible={isVisible} size={ModalSizes.MEDIUM} exitHandler={close}>
-                    <LazyChangeTypeDiscussionForm discussion={discussion} onSuccess={close} onCancel={close} />
+                    <LazyChangeTypeDiscussionForm discussion={discussion} onSuccess={handleSuccess} onCancel={close} />
                 </Modal>
             </StackingContextProvider>
         </>

@@ -1,24 +1,22 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace VanillaTests\Library\Vanilla\Logging;
 
 use Garden\Http\HttpClient;
-use Garden\Web\Exception\NotFoundException;
+use Garden\Sites\SiteRecord;
 use Garden\Web\Exception\ServerException;
-use PHPUnit\Framework\Error\Notice;
 use Psr\Log\LogLevel;
-use Vanilla\Contracts\Site\Site;
-use Vanilla\Formatting\Html\HtmlDocument;
+use Vanilla\Contracts\Site\VanillaSite;
 use Vanilla\Logger;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Logging\LogDecorator;
 use Vanilla\Site\OwnSite;
-use VanillaTests\BootstrapTestCase;
+use Vanilla\Site\OwnSiteProvider;
 use VanillaTests\Fixtures\RecursiveSerializable;
 use VanillaTests\Site\MockOwnSite;
 use VanillaTests\SiteTestCase;
@@ -47,7 +45,13 @@ class ErrorLoggerTest extends SiteTestCase
     {
         $user = $this->createUser(["name" => "loguser"]);
         $mockOwnSite = self::container()->get(MockOwnSite::class);
-        $mockOwnSite->applyFrom(new Site("site", "https://test.com", 100, 500, new HttpClient()));
+        $mockOwnSite->applyFrom(
+            new VanillaSite(
+                "site",
+                new SiteRecord(100, 500, "cl00000", "https://test.com"),
+                new OwnSiteProvider($mockOwnSite)
+            )
+        );
         self::container()->setInstance(OwnSite::class, $mockOwnSite);
         $request = $this->bessy()
             ->createRequest("POST", "/path/some-request", [])
@@ -65,7 +69,7 @@ class ErrorLoggerTest extends SiteTestCase
             "level" => "error",
             "message" => "foo",
             "request.method" => "POST",
-            "request.protocol" => "http",
+            "request.protocol" => "https",
             "request.hostname" => "vanilla.test",
             "request.path" => "/path/some-request",
             "request.clientIP" => "1.1.4.4",

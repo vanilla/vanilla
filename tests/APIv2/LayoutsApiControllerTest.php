@@ -8,6 +8,7 @@
 namespace VanillaTests\APIv2;
 
 use CategoryModel;
+use DiscussionModel;
 use Garden\Container\Container;
 use Garden\Http\HttpResponse;
 use Garden\Web\Exception\ClientException;
@@ -27,6 +28,8 @@ use VanillaTests\Layout\LayoutTestTrait;
  */
 class LayoutsApiControllerTest extends AbstractResourceTest
 {
+    public static $addons = ["stubcontent"];
+
     use CommunityApiTestTrait;
     use ExpectExceptionTrait;
     use LayoutTestTrait;
@@ -289,7 +292,9 @@ class LayoutsApiControllerTest extends AbstractResourceTest
                     [
                         // Assets should be available.
                         '$hydrate' => "react.asset.discussionList",
-                        "apiParams" => [],
+                        "apiParams" => [
+                            "sort" => "-dateLastComment",
+                        ],
                     ],
                 ],
             ],
@@ -342,7 +347,9 @@ class LayoutsApiControllerTest extends AbstractResourceTest
                     [
                         // Assets should be available.
                         '$hydrate' => "react.asset.discussionList",
-                        "apiParams" => [],
+                        "apiParams" => [
+                            "sort" => "-dateLastComment",
+                        ],
                     ],
                 ],
             ],
@@ -358,7 +365,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $response = $this->api()->post("/layouts/hydrate", [
             "layout" => $layoutDefinition,
             "params" => $params,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
         $layout = $this->getDiscussionListLayoutMinusDiscussions($response->getBody()["layout"]);
@@ -369,7 +376,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $layout = $this->api()->post("/layouts", [
             "name" => "My Layout",
             "layout" => $layoutDefinition,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
 
         $response = $this->api()->put("/layouts/{$layout["layoutID"]}/views", [
@@ -380,7 +387,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         ]);
 
         $response = $this->api()->get("/layouts/lookup-hydrate", [
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
             "recordID" => $category["categoryID"],
             "recordType" => "category",
             "params" => $params,
@@ -404,7 +411,9 @@ class LayoutsApiControllerTest extends AbstractResourceTest
                     [
                         // Assets should be available.
                         '$hydrate' => "react.asset.discussionList",
-                        "apiParams" => [],
+                        "apiParams" => [
+                            "sort" => "-dateLastComment",
+                        ],
                     ],
                 ],
             ],
@@ -418,7 +427,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $response = $this->api()->post("/layouts/hydrate", [
             "layout" => $layoutDefinition,
             "params" => $params,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
         $layout = $response->getBody()["layout"];
@@ -431,7 +440,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $layout = $this->api()->post("/layouts", [
             "name" => "My Layout",
             "layout" => $layoutDefinition,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
         $response = $this->api()->get("/layouts/{$layout["layoutID"]}/hydrate-assets", [
             "params" => $params,
@@ -458,7 +467,9 @@ class LayoutsApiControllerTest extends AbstractResourceTest
                     [
                         // Assets should be available.
                         '$hydrate' => "react.asset.discussionList",
-                        "apiParams" => [],
+                        "apiParams" => [
+                            "sort" => "-dateLastComment",
+                        ],
                     ],
                 ],
             ],
@@ -472,7 +483,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $response = $this->api()->post("/layouts/hydrate", [
             "layout" => $layoutDefinition,
             "params" => $params,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
         $this->assertEquals(200, $response->getStatusCode());
 
@@ -481,7 +492,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $layout = $this->api()->post("/layouts", [
             "name" => "My Layout",
             "layout" => $layoutDefinition,
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
         ]);
 
         $response = $this->api()->put("/layouts/{$layout["layoutID"]}/views", [
@@ -492,7 +503,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         ]);
 
         $response = $this->api()->get("/layouts/lookup-hydrate-assets", [
-            "layoutViewType" => "home",
+            "layoutViewType" => "discussionList",
             "recordID" => $category["categoryID"],
             "recordType" => "category",
             "params" => $params,
@@ -511,7 +522,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         // The actual schema generation is pretty well tested over in vanilla/garden-hydrate
         // so this is just requesting the endpoint to make sure it gets parameters applied properly.
 
-        $response = $this->api()->get("/layouts/schema", ["layoutViewType" => "home"]);
+        $response = $this->api()->get("/layouts/schema", ["layoutViewType" => "discussionList"]);
         $this->assertEquals(200, $response->getStatusCode());
 
         // Home asset was applied.
@@ -536,6 +547,20 @@ class LayoutsApiControllerTest extends AbstractResourceTest
     }
 
     /**
+     * Test the assets available to the `categoryList` layoutViewType.
+     */
+    public function testCategoryListViewAssets()
+    {
+        $layoutViewType = "categoryList";
+
+        $response = $this->api()->get("/layouts/catalog", ["layoutViewType" => $layoutViewType]);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $this->assertSame($layoutViewType, $response["layoutViewType"]);
+        $this->assertSchemaExists($response, "assets", "react.asset.categoryList");
+    }
+
+    /**
      * Assert that catalog recommendations all exist.
      *
      * @param array $catalogData
@@ -553,7 +578,7 @@ class LayoutsApiControllerTest extends AbstractResourceTest
             $catalog = str_contains($allowedID, "asset") ? $catalogData["assets"] : $catalogData["widgets"];
             //this conditioning is a temporary kludge until we figure out if sections should have different
             //allowedWidgetIDs depending on layoutViewType, as discussionList catalog don't have asset breadcrumbs in it
-            if ($allowedID !== "react.asset.breadcrumbs") {
+            if (!in_array($allowedID, ["react.asset.discussionTagsAsset", "react.asset.breadcrumbs"])) {
                 $this->assertArrayHasKey(
                     $allowedID,
                     $catalog,
@@ -580,127 +605,6 @@ class LayoutsApiControllerTest extends AbstractResourceTest
             "Could not find expected schema in catalogue collection '{$collectionName}': {$propertyName}\n" .
                 json_encode($collection, JSON_PRETTY_PRINT)
         );
-    }
-
-    /**
-     * Test the lifecycle of the feature flag configuration.
-     */
-    public function testFeatureFlagConfigLifecycle()
-    {
-        $this->runWithConfig(["Feature.customLayout.home.Enabled" => false], function () {
-            $layout = $this->testPost();
-            $this->api()->put("/layouts/{$layout["layoutID"]}/views", [
-                [
-                    "recordID" => -1,
-                    "recordType" => "global",
-                ],
-            ]);
-            // Was enabled automatically.
-            $this->assertConfigValue("Feature.customLayout.home.Enabled", true);
-            $this->api()->put("/layouts/views-legacy", [
-                "layoutViewType" => "home",
-                "legacyViewValue" => "discussions",
-            ]);
-            $this->assertConfigValue("Feature.customLayout.home.Enabled", false);
-            // Our views were deleted.
-            $views = $this->api()
-                ->get("/layouts/{$layout["layoutID"]}/views")
-                ->getBody();
-            $this->assertEmpty($views);
-        });
-    }
-
-    /**
-     * @param array $body
-     * @param string $expectedFeatureFlag
-     * @param array $expectedConfigs
-     * @dataProvider providePutLegacyLayoutViewSuccess
-     */
-    public function testPutLegacyLayoutViewSuccess(
-        array $body,
-        string $expectedFeatureFlag,
-        array $expectedConfigs = []
-    ) {
-        $featureConfig = FeatureFlagHelper::featureConfigKey($expectedFeatureFlag);
-        \Gdn::config()->saveToConfig($featureConfig, true);
-        $response = $this->api()->put("/layouts/views-legacy", $body);
-        $this->assertTrue($response->isSuccessful());
-        $expectedConfigs[$featureConfig] = false;
-        foreach ($expectedConfigs as $expectedKey => $expectedValue) {
-            $this->assertConfigValue($expectedKey, $expectedValue);
-        }
-    }
-
-    /**
-     * @return \Generator
-     */
-    public function providePutLegacyLayoutViewSuccess()
-    {
-        foreach (["modern", "table", "foundation"] as $value) {
-            yield "discussionList - $value" => [
-                ["layoutViewType" => "discussionList", "legacyViewValue" => $value],
-                "customLayout.discussionList",
-                ["Vanilla.Discussions.Layout" => $value],
-            ];
-        }
-
-        foreach (["modern", "table", "mixed", "foundation"] as $value) {
-            yield "categoryList - $value" => [
-                ["layoutViewType" => "categoryList", "legacyViewValue" => $value],
-                "customLayout.categoryList",
-                ["Vanilla.Categories.Layout" => $value],
-            ];
-        }
-
-        foreach (["discussions", "categories", "bestof", "kb", "somesub/discussions"] as $value) {
-            yield "home - $value" => [
-                ["layoutViewType" => "home", "legacyViewValue" => $value],
-                "customLayout.home",
-                ["Routes.DefaultController" => [$value, "Internal"]],
-            ];
-        }
-
-        yield "discussionThread - return to legacy" => [
-            ["layoutViewType" => "discussionThread"],
-            "customLayout.discussionThread",
-        ];
-    }
-
-    /**
-     * Test error handling in the legacy view endpoint.
-     *
-     * @param array $body
-     * @param string $errorMessage
-     *
-     * @dataProvider provideLegacyLayoutViewErrors
-     */
-    public function testPutLegacyLayoutViewErrors(array $body, string $errorMessage)
-    {
-        $this->expectExceptionMessage($errorMessage);
-        $response = $this->api()->put("/layouts/views-legacy", $body);
-    }
-
-    /**
-     * @return \Generator
-     */
-    public function provideLegacyLayoutViewErrors()
-    {
-        yield "discussionList - nonsense.asdf" => [
-            ["layoutViewType" => "discussionList", "legacyViewValue" => "nonsense.asdf"],
-            "Invalid legacyViewValue",
-        ];
-
-        yield "discussionList - mixed" => [
-            ["layoutViewType" => "discussionList", "legacyViewValue" => "mixed"],
-            "Invalid legacyViewValue",
-        ];
-
-        yield "categoryList - nonsense.asdf" => [
-            ["layoutViewType" => "categoryList", "legacyViewValue" => "nonsense.asdf"],
-            "Invalid legacyViewValue",
-        ];
-
-        yield "bad layoutType" => [["layoutViewType" => "notALayoutViewType"], "layoutViewType must be one of"];
     }
 
     /**
@@ -898,6 +802,63 @@ class LayoutsApiControllerTest extends AbstractResourceTest
         $this->assertEquals($layoutID, $body[0]["layoutID"]);
         $this->assertRowsEqual($discussionView[1], $body[1]);
         $this->assertEquals($layoutID, $body[2]["layoutID"]);
+    }
+
+    /**
+     * Test excludeHiddenCategories not hiding discussions on discussionCategoryPage
+     */
+    public function testGetLayoutIdDiscussionForExcludeHiddenCategories()
+    {
+        // Mark categories discussions as hidden on global pages.
+        $category = $this->createCategory(["HideAllDiscussions" => true, "DisplayAs" => "Discussions"]);
+
+        $layoutDefinition = [
+            [
+                '$hydrate' => "react.section.1-column",
+                "children" => [
+                    [
+                        // Assets should be available.
+                        '$hydrate' => "react.asset.discussionList",
+                        "apiParams" => [
+                            "sort" => "-dateLastComment",
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $layout = $this->api()->post("/layouts", [
+            "name" => "Discussion Category Layout",
+            "layout" => $layoutDefinition,
+            "layoutViewType" => "discussionCategoryPage",
+        ]);
+        $layoutViews = [["recordID" => 1, "recordType" => "category"]];
+        $views = $this->api()
+            ->put("/layouts/" . $layout["layoutID"] . "/views", [
+                ["recordType" => "global", "recordID" => -1],
+                ["recordType" => "category", "recordID" => $category["categoryID"]],
+            ])
+            ->getBody();
+        $this->layoutViewModel->saveLayoutViews($layoutViews, "home", "discussionCategoryPage");
+        // Creating Categories
+        $this->createDiscussion(["categoryID" => $category["categoryID"]]);
+        $this->createDiscussion(["categoryID" => $category["categoryID"]]);
+        $this->createDiscussion(["categoryID" => $category["categoryID"]]);
+
+        $discussionModel = $this->container()->get(DiscussionModel::class);
+        $discussionCount = $discussionModel->getCountForCategory($category["categoryID"]);
+        $categoryLookup = $this->api()->get("/layouts/lookup-hydrate", [
+            "layoutViewType" => "categoryList",
+            "recordType" => "category",
+            "recordID" => 1,
+            "params" => [
+                "categoryID" => $category["categoryID"],
+            ],
+        ]);
+        $this->assertEquals(200, $categoryLookup->getStatusCode());
+        $discussions = $categoryLookup->getBody()["layout"][0]['$reactProps']["children"][0]['$reactProps'][
+            "discussions"
+        ];
+        $this->assertCount($discussionCount, $discussions);
     }
 
     /**

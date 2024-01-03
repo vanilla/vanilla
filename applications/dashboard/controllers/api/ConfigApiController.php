@@ -123,13 +123,20 @@ final class ConfigApiController extends Controller
             }
 
             $permission = $this->realPermissionName($item["x-read"] ?? self::PERM_ADMIN);
+            /** Check if the property should be hidden behind a feature flag */
+            $enabled = $this->config->get($item["x-feature"] ?? "", true);
             if (
-                $permission === "public" ||
-                ($permission === self::PERM_MEMBER && $this->getSession()->isValid()) ||
-                $this->getSession()->checkPermission($permission)
+                ($permission === "public" ||
+                    ($permission === self::PERM_MEMBER && $this->getSession()->isValid()) ||
+                    $this->getSession()->checkPermission($permission)) &&
+                $enabled
             ) {
                 $configKey = $item["x-key"] ?? $key;
                 $result[$key] = $this->config->get($configKey, $item["default"] ?? null);
+                $isUpload = (bool) ($item["x-upload"] ?? false);
+                if (!empty($result[$key]) && $isUpload) {
+                    $result[$key] = \Gdn_Upload::url($result[$key]);
+                }
             }
         }
         return new Data($result);
@@ -168,7 +175,9 @@ final class ConfigApiController extends Controller
         $mapped = [];
         foreach ($valid as $key => $value) {
             $configKey = $propertyMapping[$key] ?? $key;
-            $mapped[$configKey] = is_string($value) ? $this->plainTextConverter->convert($value) : $value;
+            $allowsHtml = $in->getField("properties", [])[$key]["x-allowHtml"] ?? false;
+            $mapped[$configKey] =
+                is_string($value) && !$allowsHtml ? $this->plainTextConverter->convert($value) : $value;
         }
         $this->config->saveToConfig($mapped);
 

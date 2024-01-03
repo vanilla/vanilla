@@ -67,7 +67,7 @@ export const dayPickerClasses = useThemeCache(() => {
                 padding: styleUnit(vars.spacing.padding),
                 whiteSpace: "nowrap",
                 ...{
-                    "&:hover": {
+                    "&:not('.DayPicker-Day--disabled):hover": {
                         backgroundColor: vars.colors.hover.bg.toString(),
                     },
                 },
@@ -90,7 +90,7 @@ export const dayPickerClasses = useThemeCache(() => {
                 color: ColorsUtils.colorOut(vars.colors.today),
             },
             //fix accessibility
-            ".DayPicker-Weekday, .DayPicker-Day--outside": {
+            ".DayPicker-Weekday:not(.DayPicker-Day--disabled), .DayPicker-Day--outside:not(.DayPicker-Day--disabled)": {
                 color: "#767676",
             },
         },
@@ -116,6 +116,7 @@ export const dayPickerClasses = useThemeCache(() => {
 
     return {
         root,
+
         header,
         title,
         navigation,

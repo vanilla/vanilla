@@ -9,7 +9,7 @@ import debounce from "lodash/debounce";
 import { stableObjectHash } from "@vanilla/utils";
 
 // DOMRectReadOnly.fromRect()
-const EMPTY_RECT: DOMRect = {
+export const EMPTY_RECT: DOMRect = {
     x: 0,
     y: 0,
     width: 0,

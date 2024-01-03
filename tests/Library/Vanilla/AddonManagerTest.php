@@ -544,7 +544,7 @@ class AddonManagerTest extends SharedBootstrapTestCase
     public function provideMatchClassTests()
     {
         $data = [
-            "*\DiscussionsController" => [
+            "*\\DiscussionsController" => [
                 "DiscussionsController" => true,
                 "Vanilla\DiscussionsController" => true,
                 "Vanilla\API\DiscussionsController" => true,
@@ -556,25 +556,25 @@ class AddonManagerTest extends SharedBootstrapTestCase
                 "Vanilla\API\DiscussionsController" => false,
                 "API\DiscussionsController" => false,
             ],
-            "*\api\DiscussionsController" => [
+            "*\\api\\DiscussionsController" => [
                 "DiscussionsController" => false,
                 "Vanilla\DiscussionsController" => false,
                 "Vanilla\API\DiscussionsController" => true,
                 "API\DiscussionsController" => true,
             ],
-            "Vanilla\*\DiscussionsController" => [
+            "Vanilla\\*\\DiscussionsController" => [
                 "DiscussionsController" => false,
-                "Vanilla\DiscussionsController" => true,
+                "Vanilla\DiscussionsController" => false,
                 "Vanilla\API\DiscussionsController" => true,
                 "API\DiscussionsController" => false,
             ],
-            "vanilla\*\DiscussionsController" => [
+            "vanilla\\*\\DiscussionsController" => [
                 "DiscussionsController" => false,
-                "Vanilla\DiscussionsController" => true,
+                "Vanilla\DiscussionsController" => false,
                 "Vanilla\API\DiscussionsController" => true,
                 "API\DiscussionsController" => false,
             ],
-            "*\*Controller" => [
+            "*\\*Controller" => [
                 "DiscussionsController" => true,
                 "Vanilla\DiscussionsController" => true,
                 "Vanilla\API\DiscussionsController" => true,

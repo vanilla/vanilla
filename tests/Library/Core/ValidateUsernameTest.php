@@ -154,4 +154,35 @@ class ValidateUsernameTest extends SharedBootstrapTestCase
 
         return $r;
     }
+
+    /**
+     * Test for default username validation
+     *
+     * @dataProvider provideDefaultRegexTests
+     */
+    public function testDefaultPasswordValidation($value, $expected): void
+    {
+        $this->assertSame($expected, validateUsername($value));
+    }
+
+    /**
+     * Provide tests for default password validation.
+     *
+     * @return array
+     */
+    public function provideDefaultRegexTests(): array
+    {
+        $r = [
+            "valid" => ["Madlyn", true],
+            "line feed" => ["patches\n", false],
+            "line feed-1" => ["patches\nn", false],
+            "line feed-2" => ["\npatches", false],
+            "carriage return" => ["patches\r", false],
+            "dot" => ["todd.", false],
+            "invalid slash" => ["to/dd", false],
+            "invalid unescaped backtick" => ["p`tches", false],
+        ];
+
+        return $r;
+    }
 }

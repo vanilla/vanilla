@@ -6,7 +6,6 @@
 
 import BannerWidget from "@library/banner/BannerWidget";
 import React from "react";
-import { options } from "yargs";
 
 interface IProps extends React.ComponentProps<typeof BannerWidget> {}
 

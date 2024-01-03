@@ -37,6 +37,7 @@ import { SearchBarPresets } from "@library/banner/SearchBarPresets";
 import { IBorderRadiusValue } from "@library/styles/cssUtilsTypes";
 import { searchBarVariables } from "./SearchBar.variables";
 import { metasVariables } from "@library/metas/Metas.variables";
+import { buttonUtilityClasses } from "@library/forms/Button.styles";
 
 export interface ISearchBarOverwrites {
     borderRadius?: IBorderRadiusValue;
@@ -396,8 +397,9 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
             // Both sides flat
             "&&.inputText.withButton.withScope": {
                 ...borderRadii({
-                    left: 0,
+                    all: 0,
                 }),
+                paddingRight: 0,
             },
             // Left side flat
             "&&.inputText.withoutButton.withScope:not(.compactScope)": {
@@ -463,7 +465,12 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
                     all: borderRadius,
                 }),
             },
-            "&&.withButton.withScope": {},
+            "&&.withButton.withScope": {
+                ...borderRadii({
+                    left: borderRadius,
+                    right: 0,
+                }),
+            },
             "&&.withoutButton.withScope": {
                 ...borderRadii({
                     all: borderRadius,
@@ -543,6 +550,32 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
             "&&": {
                 height: styleUnit(vars.sizing.height),
             },
+        },
+    });
+
+    const hasScopeIconContainer = css({
+        ...buttonUtilityClasses().iconMixin(formElementVars.sizing.height),
+        height: "auto",
+        width: "auto",
+        position: "relative",
+        zIndex: 1,
+        backgroundColor: ColorsUtils.colorOut(vars.input.bg),
+        alignSelf: "stretch",
+        color: ColorsUtils.colorOut(vars.searchIcon.fg),
+        ...Mixins.padding({
+            right: formElementVars.sizing.halfHeight,
+            left: formElementVars.sizing.halfHeight / 4,
+        }),
+        ...borderRadii({
+            right: borderRadius,
+            left: 0,
+        }),
+        "&:focus": {
+            color: ColorsUtils.colorOut(vars.stateColors.focus),
+        },
+        "&:hover": {
+            backgroundColor: `${ColorsUtils.colorOut(vars.input.bg)} !important`,
+            color: ColorsUtils.colorOut(vars.stateColors.hover),
         },
     });
 
@@ -768,6 +801,7 @@ export const searchBarClasses = useThemeCache((overwrites?: ISearchBarOverwrites
         heading,
         iconContainer,
         iconContainerBigInput,
+        hasScopeIconContainer,
         icon,
         results,
         resultsAsModal,

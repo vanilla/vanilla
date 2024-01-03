@@ -17,7 +17,7 @@ export const smartAlignClasses = useThemeCache(() => {
     });
 
     const inner = css({
-        textAlign: "left",
+        textAlign: "start",
     });
 
     return {

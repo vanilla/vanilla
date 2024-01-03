@@ -66,14 +66,20 @@ function LayoutEditorImpl(props: IProps) {
     const [initialSectionID, setInitialSectionID] = useState<LayoutSectionID | null>(null);
 
     useEffect(() => {
-        //TODO:we should make this more dynamic for other view types as well when we have more required assets
-        //right now only for discussion list, we need to pre-hydrate a section with discussionList asset
-        if (
-            !editorContents.validate().isValid &&
-            Object.keys(catalog.assets).length > 0 &&
-            catalog.layoutViewType === "discussionList"
-        ) {
-            editorContents.insertSection(0, LayoutEditorAssetUtils.discussionList());
+        // We need to pre-hydrate a section with required assets
+        if (!editorContents.validate().isValid && Object.keys(catalog.assets).length > 0) {
+            if (catalog.layoutViewType === "categoryList" || catalog.layoutViewType === "nestedCategoryList") {
+                editorContents.insertSection(0, LayoutEditorAssetUtils.categoryListSection());
+            }
+
+            if (catalog.layoutViewType === "discussionCategoryPage") {
+                editorContents.insertSection(0, LayoutEditorAssetUtils.categoryAndDiscussionListSection());
+            }
+
+            if (catalog.layoutViewType === "discussionList") {
+                editorContents.insertSection(0, LayoutEditorAssetUtils.discussionListSection());
+            }
+
             editorSelection.moveSelectionTo(LayoutEditorPath.section(0), LayoutEditorSelectionMode.SECTION);
         }
     }, [catalog.assets, catalog.layoutViewType]);

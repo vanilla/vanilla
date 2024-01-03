@@ -213,7 +213,7 @@ export function getDestinationPath<D>(
 /**
  * Translates a drag&drop movement from an index based position to a relative (parent, index) position
  */
-export function calculateFinalDropPositions<D>(
+export function calculateFinalDropPositions<D extends {}>(
     tree: ITreeData,
     flattenedTree: FlattenedTree<D>,
     dragState: IDragState,
@@ -446,9 +446,9 @@ export function itemsToTree<T extends PartialTreeItem<T>>(items: T[]): ITreeData
     };
 }
 
-export type WithRecursiveChildren<D> = D & { children?: Array<WithRecursiveChildren<D>> };
+export type WithRecursiveChildren<D extends {}> = D & { children?: Array<WithRecursiveChildren<D>> };
 
-export function treeToItems<D>(treeData: ITreeData<D>): Array<WithRecursiveChildren<D>> {
+export function treeToItems<D extends {}>(treeData: ITreeData<D>): Array<WithRecursiveChildren<D>> {
     function getWithChildren(item: ITreeItem<D>): WithRecursiveChildren<D> {
         const result: WithRecursiveChildren<D> = {
             ...item.data,

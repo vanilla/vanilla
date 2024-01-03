@@ -42,6 +42,8 @@ interface PageHeadInterface
      */
     public function setJsonLdItems(array $setJsonLDItems);
 
+    public function getJsonLdItems(): array;
+
     /**
      * Set the page title (in the browser tab).
      *

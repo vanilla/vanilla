@@ -109,7 +109,7 @@ describe("DataList", () => {
         expect(rows.length).toBe(5);
 
         rows.forEach((row) => {
-            const loadingRects = row.querySelectorAll("div");
+            const loadingRects = row.querySelectorAll("span");
             // We expect 1 loading rect per cell, 2 cells thus 2 rects
             expect(loadingRects.length).toBe(2);
         });

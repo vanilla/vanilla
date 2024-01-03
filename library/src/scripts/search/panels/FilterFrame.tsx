@@ -17,15 +17,23 @@ import { useSection } from "@library/layout/LayoutContext";
 export interface ISearchFilterPanel {
     title?: string;
     handleSubmit: (data) => void;
-    children: React.ReactNode;
-    valid?: boolean;
+    isSubmitting?: boolean;
+    handleClearAll?: (e: any) => void;
+    disableClearAll?: boolean;
 }
 
 /**
  * Implement search filter panel main component
  */
-export function FilterFrame(props: ISearchFilterPanel) {
-    const { title = t("Filter Results"), handleSubmit, children, valid } = props;
+export function FilterFrame(props: React.PropsWithChildren<ISearchFilterPanel>) {
+    const {
+        title = t("Filter Results"),
+        handleSubmit,
+        children,
+        handleClearAll,
+        disableClearAll,
+        isSubmitting,
+    } = props;
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -53,8 +61,15 @@ export function FilterFrame(props: ISearchFilterPanel) {
                     </FrameBody>
                 }
                 footer={
-                    <FrameFooter justifyRight={true} className={classes.footer}>
-                        <Button disabled={valid} submit={true}>
+                    <FrameFooter className={classes.footer}>
+                        {handleClearAll ? (
+                            <Button onClick={handleClearAll} disabled={disableClearAll}>
+                                {t("Clear All")}
+                            </Button>
+                        ) : (
+                            <div></div>
+                        )}
+                        <Button disabled={isSubmitting} submit>
                             {t("Filter")}
                         </Button>
                     </FrameFooter>

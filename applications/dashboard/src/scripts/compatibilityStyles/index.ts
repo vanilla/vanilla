@@ -53,6 +53,7 @@ import { widgetLayoutCompactCSS } from "@library/layout/WidgetLayout.compat.styl
 import { onlineUserWrapCSS } from "@dashboard/compatibilityStyles/onlineUserStyles";
 import { bodyStyleMixin } from "@library/layout/bodyStyles";
 import { userContentCompatCSS } from "@library/content/UserContent.compat.styles";
+import { getMeta } from "@library/utility/appUtils";
 export { cssOut };
 
 // Re-export for compatibility.
@@ -282,6 +283,12 @@ compatibilityStyles = useThemeCache(() => {
         position: "absolute",
         right: styleUnit(layoutVars.cell.paddings.horizontal),
         top: styleUnit(layoutVars.cell.paddings.vertical),
+
+        // for direction RTL, we want the flip to be correct
+        ...(getMeta("ui.isDirectionRTL", false) && {
+            left: 0,
+            right: "auto",
+        }),
     });
 
     cssOut(`.Container .DataList .Meta .Tag-Announcement`, {

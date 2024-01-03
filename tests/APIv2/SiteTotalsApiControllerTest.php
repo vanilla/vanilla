@@ -40,6 +40,7 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test
      */
     public function testGettingSingleCount()
     {
+        $this->createCategory(["name" => "Single Count"]);
         $this->createDiscussion();
         $this->createDiscussion();
         $this->createDiscussion();
@@ -54,6 +55,7 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test
      */
     public function testGettingMultipleCounts()
     {
+        $this->createCategory(["name" => "Multiple Count"]);
         $this->createDiscussion();
         $this->createComment();
         $this->createComment();
@@ -84,10 +86,13 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test
      */
     public function testCategoryCounts()
     {
+        $categoryModel = \CategoryModel::instance();
+        //Avoid root category
+        $currentCount = $categoryModel->getCount(["CategoryID <>" => -1]);
         $this->createCategory();
         $this->createCategory();
         $catCount = $this->api()->get($this->baseUrl . "?counts[]=category");
-        $this->assertSame(3, $catCount["counts"]["category"]["count"]);
+        $this->assertSame($currentCount + 2, $catCount["counts"]["category"]["count"]);
     }
 
     /**

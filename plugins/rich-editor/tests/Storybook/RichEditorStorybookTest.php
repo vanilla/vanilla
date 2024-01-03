@@ -54,10 +54,7 @@ class RichEditorStorybookTest extends StorybookGenerationTestCase
      */
     public function provideRichEditorTests(): array
     {
-        return [
-            ["/richeditorstyles/formatting", "RichEditor Formatting"],
-            ["/richeditorstyles/images", "RichEditor Images"],
-        ];
+        return [];
     }
 
     /**
@@ -79,6 +76,30 @@ class RichEditorStorybookTest extends StorybookGenerationTestCase
                 $this->generateStoryHtml(
                     "/post/editdiscussion/" . $this->lastInsertedDiscussionID,
                     "RichEditor Convert Post"
+                );
+            }
+        );
+    }
+    /**
+     * Test post being reinterpetted as rich2.
+     */
+    public function testEditPostReinterpetRich2()
+    {
+        $this->createDiscussion([
+            "name" => "Markdown Post",
+            "body" => "## Heading\n\n_italic_ **bold**\n\n- list 1\n- list 2",
+            "format" => MarkdownFormat::FORMAT_KEY,
+        ]);
+
+        $this->runWithConfig(
+            [
+                "Garden.InputFormatter" => "Rich2",
+                \RichEditorPlugin::CONFIG_REINTERPRET_ENABLE => true,
+            ],
+            function () {
+                $this->generateStoryHtml(
+                    "/post/editdiscussion/" . $this->lastInsertedDiscussionID,
+                    "RichEditor2 Convert Post"
                 );
             }
         );

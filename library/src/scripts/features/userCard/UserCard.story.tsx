@@ -18,39 +18,9 @@ import { IPartialBoxOptions } from "@library/styles/cssUtilsTypes";
 import { BorderType } from "@library/styles/styleHelpers";
 import { UserCardPopup, useUserCardTrigger } from "@library/features/userCard/UserCard";
 import { UserCardSkeleton, UserCardMinimal, UserCardError } from "@library/features/userCard/UserCard.views";
+import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 
 export const STORY_USER_ID = 1;
-
-const viewCardConfig = {
-    users: {
-        permissions: {
-            status: LoadStatus.SUCCESS,
-            data: {
-                permissions: [
-                    {
-                        type: "global",
-                        id: STORY_USER_ID,
-                        permissions: {
-                            "profiles.view": true,
-                        },
-                    },
-                ],
-            },
-        },
-    },
-};
-
-const adminConfig = {
-    users: {
-        permissions: {
-            status: LoadStatus.SUCCESS,
-            data: {
-                isAdmin: true,
-                permissions: [],
-            },
-        },
-    },
-};
 
 export default {
     title: "Components/User Card",
@@ -71,33 +41,42 @@ const boxOptions: IPartialBoxOptions = {
 
 export const Basic = ({ config }: { config?: any }) => {
     return React.createElement(
-        storyWithConfig({ storeState: { ...viewCardConfig, ...config } }, () => (
-            // <StoryContent>
-            <UserCardPopup forceOpen userID={STORY_USER.userID} user={STORY_USER}>
-                <StoryLinkTrigger />
-            </UserCardPopup>
-            // </StoryContent>
+        storyWithConfig({ storeState: { ...config } }, () => (
+            <PermissionsFixtures.SpecificPermissions permissions={["profiles.view"]}>
+                <UserCardPopup forceOpen userID={STORY_USER.userID} user={STORY_USER}>
+                    <StoryLinkTrigger />
+                </UserCardPopup>
+            </PermissionsFixtures.SpecificPermissions>
         )),
     );
 };
 
 export const BannedWithPermission = ({ config }: { config?: any }) => {
     return React.createElement(
-        storyWithConfig({ storeState: { ...adminConfig, ...config } }, () => (
-            // <StoryContent>
-            <UserCardPopup forceOpen userID={STORY_USER.userID} user={STORY_USER_BANNED}>
-                <StoryLinkTrigger />
-            </UserCardPopup>
-            // </StoryContent>
+        storyWithConfig({ storeState: { ...config } }, () => (
+            <PermissionsFixtures.AllPermissions>
+                <UserCardPopup forceOpen userID={STORY_USER.userID} user={STORY_USER_BANNED}>
+                    <StoryLinkTrigger />
+                </UserCardPopup>
+            </PermissionsFixtures.AllPermissions>
         )),
     );
 };
 
-export const WithPermissions = () => <Basic config={adminConfig} />;
+export const WithPermissions = () =>
+    React.createElement(
+        storyWithConfig({ storeState: {} }, () => (
+            <PermissionsFixtures.AllPermissions>
+                <UserCardPopup forceOpen userID={STORY_USER.userID} user={STORY_USER}>
+                    <StoryLinkTrigger />
+                </UserCardPopup>
+            </PermissionsFixtures.AllPermissions>
+        )),
+    );
 
 export const SkeletonStory = ({ config }: { config?: any }) =>
     React.createElement(
-        storyWithConfig({ storeState: { ...viewCardConfig, ...(config ?? {}) } }, () => (
+        storyWithConfig({ storeState: { ...(config ?? {}) } }, () => (
             <UserCardPopup forceOpen forceSkeleton userFragment={STORY_USER} userID={STORY_USER.userID}>
                 <StoryLinkTrigger />
             </UserCardPopup>
@@ -149,13 +128,15 @@ function StoryLinkTrigger() {
 
 function StoryUserLink(props: { forceOpen?: boolean }) {
     return (
-        <UserCardPopup userID={STORY_USER.userID} user={STORY_USER} forceOpen={props.forceOpen}>
-            <StoryLinkTrigger />
-        </UserCardPopup>
+        <PermissionsFixtures.SpecificPermissions permissions={["profiles.view"]}>
+            <UserCardPopup userID={STORY_USER.userID} user={STORY_USER} forceOpen={props.forceOpen}>
+                <StoryLinkTrigger />
+            </UserCardPopup>
+        </PermissionsFixtures.SpecificPermissions>
     );
 }
 
-export const Trigger = storyWithConfig({ storeState: viewCardConfig }, () => {
+export const Trigger = storyWithConfig({ storeState: {} }, () => {
     return (
         <StoryContent>
             <button>Before</button>
@@ -168,7 +149,7 @@ export const Trigger = storyWithConfig({ storeState: viewCardConfig }, () => {
     );
 });
 
-export const Positioning = storyWithConfig({ storeState: viewCardConfig }, () => (
+export const Positioning = storyWithConfig({ storeState: {} }, () => (
     <DeviceProvider>
         <div
             style={{

@@ -8,6 +8,7 @@ import { WidgetSettingsModal } from "@dashboard/layout/editor/widgetSettings/Wid
 import { StoryContent } from "@library/storybook/StoryContent";
 import "../../../../../scss/admin-new.scss";
 import { StoryHeading } from "@library/storybook/StoryHeading";
+import { JsonSchema } from "@vanilla/json-schema-forms";
 
 //FIXME FIXME this story is not generating on production build in chromatic
 //https://higherlogic.atlassian.net/browse/VNLA-1459
@@ -26,6 +27,7 @@ const widgetCatalogMock = {
             properties: {
                 title: {
                     type: "string",
+
                     description: "Title of the widget",
                     "x-control": {
                         description: "Set a custom title.",
@@ -81,11 +83,13 @@ const widgetCatalogMock = {
                             },
                         },
                     },
+                    required: [],
                 },
                 containerOptions: {
                     type: "object",
                     properties: {
-                        maxColumnCounnt: {
+                        maxColumnCount: {
+                            type: "string",
                             description: "Set the maximum number of columns for the widget.",
                             "x-control": {
                                 inputType: "dropDown",
@@ -134,8 +138,10 @@ const widgetCatalogMock = {
                                     },
                                 },
                             },
+                            required: [],
                         },
                     },
+                    required: [],
                 },
                 itemOptions: {
                     type: "object",
@@ -158,9 +164,11 @@ const widgetCatalogMock = {
                             },
                         },
                     },
+                    required: [],
                 },
             },
-        },
+            required: [],
+        } as JsonSchema,
     },
 };
 

@@ -69,4 +69,16 @@ trait UserSpotlightWidgetTrait
             ],
         ]);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $result = $this->renderWidgetContainerSeoContent(
+            $props,
+            "<div>" . $this->renderSeoUser($props["userInfo"]) . "</div>"
+        );
+        return $result;
+    }
 }

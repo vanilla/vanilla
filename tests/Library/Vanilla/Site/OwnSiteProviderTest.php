@@ -7,8 +7,8 @@
 
 namespace VanillaTests\Library\Vanilla\Site;
 
-use Garden\Web\Exception\NotFoundException;
-use Vanilla\Contracts\Site\AbstractSiteProvider;
+use Garden\Sites\Exceptions\SiteNotFoundException;
+use Vanilla\Contracts\Site\VanillaSiteProvider;
 use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Site\OwnSite;
 use Vanilla\Site\OwnSiteProvider;
@@ -22,9 +22,9 @@ class OwnSiteProviderTest extends AbstractAPIv2Test
     /**
      * @return OwnSiteProvider
      */
-    protected function getProvider(): AbstractSiteProvider
+    protected function getProvider(): VanillaSiteProvider
     {
-        return $this->container()->get(AbstractSiteProvider::class);
+        return $this->container()->get(VanillaSiteProvider::class);
     }
 
     /**
@@ -37,6 +37,7 @@ class OwnSiteProviderTest extends AbstractAPIv2Test
             "Vanilla.SiteID" => 105,
             "Vanilla.AccountID" => 100,
         ]);
+        self::container()->setInstance(OwnSite::class, null);
 
         $provider = $this->getProvider();
 
@@ -47,7 +48,7 @@ class OwnSiteProviderTest extends AbstractAPIv2Test
 
         $crumbs = $ownSite->toBreadcrumbs();
         $this->assertEquals(
-            [new Breadcrumb("Hello Title", "http://vanilla.test/" . static::getBootstrapFolderName())],
+            [new Breadcrumb("Hello Title", "https://vanilla.test/" . static::getBootstrapFolderName())],
             $crumbs
         );
 
@@ -65,21 +66,16 @@ class OwnSiteProviderTest extends AbstractAPIv2Test
             "Vanilla.SiteID" => 105,
             "Vanilla.AccountID" => 100,
         ]);
+        self::container()->setInstance(OwnSite::class, null);
+        self::container()->setInstance(VanillaSiteProvider::class, null);
 
         $provider = $this->getProvider();
         $accountSites = $provider->getByAccountID(100);
         $this->assertCount(1, $accountSites);
         $this->assertInstanceOf(OwnSite::class, $accountSites[0]);
 
-        $siteIDSite = $provider->getBySiteID(105);
+        $siteIDSite = $provider->getSite(105);
         $this->assertInstanceOf(OwnSite::class, $siteIDSite);
-
-        $provider = $this->getProvider();
-        $siteIDsSites = $provider->getBySiteIDs([105, 100000]);
-        $this->assertCount(2, $siteIDsSites);
-        $this->assertInstanceOf(OwnSite::class, $siteIDsSites[0]);
-        $this->assertEquals("Unknown Site", $siteIDsSites[1]->getName());
-        $this->assertEquals(-1, $siteIDsSites[1]->getSiteID());
     }
 
     /**
@@ -88,9 +84,7 @@ class OwnSiteProviderTest extends AbstractAPIv2Test
     public function testUnknownSiteHttp()
     {
         $provider = $this->getProvider();
-        $unknown = $provider->getBySiteID(314124);
-
-        $this->expectException(NotFoundException::class);
-        $unknown->getHttpClient()->get("/api/v2/discussions");
+        $this->expectException(SiteNotFoundException::class);
+        $unknown = $provider->getSite(314124);
     }
 }

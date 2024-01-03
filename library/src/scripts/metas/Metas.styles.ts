@@ -20,7 +20,7 @@ export const metaContainerStyle = (overwrites?: any) => {
         display: "block",
         ...extendItemContainer(vars.spacing.horizontal! as number),
         overflow: "initial", // We can't hide overflow or stuff like user cards will not be shown.
-        textAlign: "left",
+        textAlign: "start",
         ...overwrites,
     };
 };
@@ -81,7 +81,7 @@ export const metasClasses = useThemeCache(() => {
 
     const draftStatus = css({
         flexGrow: 1,
-        textAlign: "left",
+        textAlign: "start",
     });
 
     const noUnderline = css({
@@ -104,7 +104,7 @@ export const metasClasses = useThemeCache(() => {
     });
 
     const alignVerticallyInMetaItem = useThemeCache((height: number) =>
-        css(Mixins.verticallyAlignInContainer(height, vars.height)),
+        css(Mixins.verticallyAlignInContainer(height, vars.font.lineHeight as number)),
     );
 
     return {

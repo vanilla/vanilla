@@ -54,7 +54,7 @@
     {
         "insert": {
             "mention": {
-                "name": "@thisIsARealMention",
+                "name": "thisIsARealMention",
                 "userID": 543
             }
         }
@@ -65,7 +65,7 @@
     {
         "insert": {
             "mention": {
-                "name": "@duplicateMention",
+                "name": "duplicateMention",
                 "userID": 542
             }
         }
@@ -73,8 +73,16 @@
     {
         "insert": {
             "mention": {
-                "name": "@duplicateMention",
+                "name": "duplicateMention",
                 "userID": 542
+            }
+        }
+    },
+    {
+        "insert": {
+            "mention": {
+                "name": "mention/slashes",
+                "userID": 600
             }
         }
     },

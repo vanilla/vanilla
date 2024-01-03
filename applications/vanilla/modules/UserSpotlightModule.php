@@ -15,6 +15,7 @@ use Vanilla\InjectableInterface;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
+use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
 
 /**
  * Widget to spotlight a user.
@@ -22,6 +23,7 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
 class UserSpotlightModule extends AbstractReactModule implements InjectableInterface
 {
     use UserSpotlightWidgetTrait;
+    use HomeWidgetContainerSchemaTrait;
 
     /** @var string|null */
     private $title = null;

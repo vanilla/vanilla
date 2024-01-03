@@ -1,0 +1,54 @@
+openapi: "3.0.2"
+info:
+    title: Vanilla Email Digest API
+    version: "1.0"
+servers:
+    - url: /api/v2/
+paths:
+    /digest/delivery-dates:
+        x-hidden: true
+        get:
+            summary: List email digest scheduled dates
+            responses:
+                "200":
+                    description: Success.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    sent:
+                                        description: Most recent email digest sent dates.
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                dateScheduled:
+                                                    description: The date-time digest was sent
+                                                    type: string
+                                                    format: "date-time"
+                                                totalSubscribers:
+                                                    description: Total subscribers for the digest
+                                                    type: integer
+                                                    nullable: true
+                                            maxItems: 5
+                                    scheduled:
+                                        description: Currently scheduled email digest date.
+                                        type: object
+                                        properties:
+                                            dateScheduled:
+                                                description: The date-time digest was sent
+                                                type: string
+                                                format: "date-time"
+                                            totalSubscribers:
+                                                description: Total subscribers for the digest
+                                                type: integer
+                                                nullable: true
+                                    upcoming:
+                                        description: Upcoming email digest delivery dates.
+                                        type: array
+                                        items:
+                                            type: string
+                                            format: "date-time"
+                "401":
+                    $ref: "#/components/responses/PermissionError"

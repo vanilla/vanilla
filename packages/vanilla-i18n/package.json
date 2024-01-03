@@ -6,7 +6,7 @@
     "license": "MIT",
     "peerDependencies": {
         "@vanilla/utils": "^3.0.1",
-        "react": "^16.0.0"
+        "react": "^17.0.0"
     },
     "devDependencies": {
         "@vanilla/tsconfig": "^3.0.1"

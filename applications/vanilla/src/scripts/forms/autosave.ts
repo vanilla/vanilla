@@ -1,4 +1,4 @@
-import { siteUrl, t } from "@library/utility/appUtils";
+import { siteUrl, t, getMeta, safelyParseJSON } from "@library/utility/appUtils";
 import axios from "axios";
 import qs from "qs";
 import debounce from "lodash/debounce";
@@ -11,8 +11,11 @@ window.onVanillaReady(function () {
         "body.Post #DiscussionForm, body.Discussion .CommentForm",
     ) as HTMLElement;
 
+    const autosaveOn = getMeta("community.drafts.autosave", true);
+
     // Only save drafts when the "save draft" button is present on the form
-    const shouldSaveDrafts = formContainer && !!formContainer.querySelectorAll("#Form_SaveDraft, .DraftButton").length;
+    const shouldSaveDrafts =
+        formContainer && !!formContainer.querySelectorAll("#Form_SaveDraft, .DraftButton").length && autosaveOn;
 
     // Attach listeners to all inputs within
     if (formContainer && shouldSaveDrafts) {
@@ -64,9 +67,20 @@ const generateFormRequestBody = (form: HTMLFormElement): object | null => {
             return null;
         }
 
-        // If form body is empty
         const formBody = data.get("Body");
-        if (`${formBody}`.length === 0 || `${formBody}` === '[{"insert":"\\n"}]') {
+
+        // If form body is empty
+        if (`${formBody}`.length === 0) {
+            return null;
+        }
+        // Empty Rich1 body
+        if (`${formBody}` === '[{"insert":"\\n"}]') {
+            return null;
+        }
+
+        const parsedBody = safelyParseJSON(`${formBody}`);
+        // Empty Rich2 body
+        if (Array.isArray(parsedBody) && parsedBody.length == 1 && parsedBody[0]?.children?.[0]?.text === "") {
             return null;
         }
 

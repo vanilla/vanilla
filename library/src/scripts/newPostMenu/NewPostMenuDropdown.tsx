@@ -117,6 +117,7 @@ export default function NewPostMenuDropDown(props: INewPostMenuProps) {
                         </MenuButtonImpl>
                         <StackingContextProvider>
                             <MenuList
+                                portal={false}
                                 onKeyDown={onMenuListKeyDown}
                                 className={cx(dropDownClasses().contents, classes.buttonDropdownContents)}
                             >

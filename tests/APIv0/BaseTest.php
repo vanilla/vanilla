@@ -15,7 +15,7 @@ use VanillaTests\SharedBootstrapTestCase;
  */
 abstract class BaseTest extends SharedBootstrapTestCase
 {
-    /** @var APIv0  $api */
+    /** @var E2ETestClient  $api */
     protected static $api;
 
     /**
@@ -24,7 +24,7 @@ abstract class BaseTest extends SharedBootstrapTestCase
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        $api = new APIv0();
+        $api = new E2ETestClient();
 
         $api->uninstall();
         $api->install(get_called_class());
@@ -33,6 +33,9 @@ abstract class BaseTest extends SharedBootstrapTestCase
         self::$api->saveToConfig([
             "Vanilla.Discussion.SpamCount" => 1000,
             "Vanilla.Comment.SpamCount" => 1000,
+            "Feature.customLayout.home.Enabled" => false,
+            "Feature.customLayout.discussionList.Enabled" => false,
+            "Feature.customLayout.categoryList.Enabled" => false,
         ]);
 
         $r = $api->get("/discussions.json");
@@ -55,7 +58,7 @@ abstract class BaseTest extends SharedBootstrapTestCase
     /**
      * Get the API to make requests against.
      *
-     * @return APIv0 Returns the API.
+     * @return E2ETestClient Returns the API.
      */
     public function api()
     {

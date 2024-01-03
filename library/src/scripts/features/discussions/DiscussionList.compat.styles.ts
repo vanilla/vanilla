@@ -39,6 +39,7 @@ export const discussionListCompatCSS = () => {
     cssOut(".ItemDiscussion.ItemDiscussion", {
         "& > .PhotoWrap, & > .userCardWrapper-photo, & > .idea-counter-module": {
             marginRight: 16,
+            marginInlineEnd: 16,
         },
 
         "& .idea-counter-box": {

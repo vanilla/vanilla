@@ -1,32 +1,36 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import DiscussionActions, {
-    IAnnounceDiscussionParams,
     IDeleteDiscussionReaction,
     IGetDiscussionByID,
-    IMoveDiscussionParams,
     IPostDiscussionReaction,
     IPutDiscussionBookmarked,
     useDiscussionActions,
 } from "@library/features/discussions/DiscussionActions";
-import { IDiscussionsStoreState } from "@library/features/discussions/discussionsReducer";
+import { IDiscussionsStoreState, useDiscussionsDispatch } from "@library/features/discussions/discussionsReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { ILoadable, LoadStatus } from "@library/@types/api/core";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { IDiscussion, IGetDiscussionListParams } from "@dashboard/@types/api/discussion";
-import { logError, notEmpty, RecordID, stableObjectHash } from "@vanilla/utils";
+import { notEmpty, RecordID, stableObjectHash } from "@vanilla/utils";
 import { useCurrentUserID } from "@library/features/users/userHooks";
-import { hasPermission, PermissionMode } from "@library/features/users/Permission";
-import { usePermissions } from "@library/features/users/userModel";
+import { IPermissionOptions, PermissionMode } from "@library/features/users/Permission";
 import { getMeta, t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { useDiscussionCheckBoxContext } from "@library/features/discussions/DiscussionCheckboxContext";
 import { useToast } from "@library/features/toaster/ToastContext";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { IComment } from "@dashboard/@types/api/comment";
+import { humanizedRelativeTime } from "@library/content/DateTimeHelpers";
+import { sprintf } from "sprintf-js";
+import { useQueryClient } from "@tanstack/react-query";
+
+export const DISCUSSIONS_MAX_PAGE_COUNT = 10000;
 
 export function useDiscussion(discussionID: IGetDiscussionByID["discussionID"]): ILoadable<IDiscussion> {
     const actions = useDiscussionActions();
@@ -55,12 +59,14 @@ export function useToggleDiscussionBookmarked(discussionID: IPutDiscussionBookma
     const { putDiscussionBookmarked } = useDiscussionActions();
     const { addToast } = useToast();
 
+    const dispatch = useDiscussionsDispatch();
+
     const error =
         useSelector((state: IDiscussionsStoreState) => state.discussions.bookmarkStatusesByID[discussionID]?.error) ??
         null;
 
     const isBookmarked = useSelector(
-        (state: IDiscussionsStoreState) => state.discussions.discussionsByID[discussionID].bookmarked,
+        (state: IDiscussionsStoreState) => state.discussions.discussionsByID[discussionID]?.bookmarked ?? false,
     );
 
     useEffect(() => {
@@ -77,10 +83,12 @@ export function useToggleDiscussionBookmarked(discussionID: IPutDiscussionBookma
     }, [error]);
 
     async function toggleDiscussionBookmarked(bookmarked: IPutDiscussionBookmarked["bookmarked"]) {
-        return await putDiscussionBookmarked({
-            discussionID,
-            bookmarked,
-        });
+        return await dispatch(
+            putDiscussionBookmarked({
+                discussionID,
+                bookmarked,
+            }),
+        );
     }
 
     return { toggleDiscussionBookmarked, isBookmarked };
@@ -176,26 +184,98 @@ export function useDiscussionList(
     };
 }
 
-export function useUserCanEditDiscussion(discussion: IDiscussion) {
-    usePermissions();
+function useUserCanEditDiscussionOrComment(
+    discussion: IDiscussion,
+    comment?: IComment,
+): {
+    canEdit: boolean;
+    getRemainingTime: () => number;
+    cutoffTimestamp: number;
+} {
+    const { hasPermission } = usePermissionsContext();
+
+    const resource = comment ?? discussion;
+    const permissionName = comment ? "comments.edit" : "discussions.manage";
+    const permissionOptions: IPermissionOptions = {
+        mode: PermissionMode.RESOURCE_IF_JUNCTION,
+        resourceType: "category",
+        resourceID: resource.categoryID,
+    };
 
     const currentUserID = useCurrentUserID();
-    const currentUserIsDiscussionAuthor = discussion.insertUserID === currentUserID;
+    const currentUserIsAuthor = resource.insertUserID === currentUserID;
 
-    const now = new Date();
-    const cutoff =
+    const cutoffDate =
         getMeta("ui.editContentTimeout", -1) > -1
-            ? new Date(new Date(discussion.dateInserted).getTime() + getMeta("ui.editContentTimeout") * 1000)
+            ? new Date(new Date(resource.dateInserted).getTime() + getMeta("ui.editContentTimeout") * 1000)
             : null;
 
-    return (
-        hasPermission("discussions.manage", {
-            mode: PermissionMode.RESOURCE_IF_JUNCTION,
-            resourceType: "category",
-            resourceID: discussion.categoryID,
-        }) ||
-        (currentUserIsDiscussionAuthor && !discussion.closed && (cutoff === null || now < cutoff))
-    );
+    let cutoffTimestamp = cutoffDate?.getTime() ?? Infinity;
+
+    function getRemainingTime(): number {
+        const now = new Date();
+
+        let timeUntilEditingCutoff = 0;
+
+        if (hasPermission("moderation.manage") || hasPermission(permissionName, permissionOptions)) {
+            timeUntilEditingCutoff = Infinity;
+        } else {
+            if (currentUserIsAuthor && !discussion.closed) {
+                if (cutoffDate !== null) {
+                    timeUntilEditingCutoff = Math.max(0, Math.round(cutoffTimestamp - now.getTime()));
+                } else {
+                    timeUntilEditingCutoff = Infinity;
+                }
+            }
+        }
+        return timeUntilEditingCutoff;
+    }
+
+    const remainingTime = getRemainingTime();
+    const canEdit = remainingTime > 0;
+
+    return {
+        canEdit,
+        getRemainingTime,
+        cutoffTimestamp,
+    };
+}
+
+export function useUserCanStillEditDiscussionOrComment(
+    discussion: IDiscussion,
+    comment?: IComment,
+): {
+    canStillEdit: boolean;
+    humanizedRemainingTime: string;
+} {
+    const { canEdit, cutoffTimestamp, getRemainingTime } = useUserCanEditDiscussionOrComment(discussion, comment);
+    const initialRemainingTime = getRemainingTime();
+    const [remainingTime, setRemainingTime] = useState<number>(initialRemainingTime);
+
+    useEffect(() => {
+        const intervalID = setInterval(
+            () => {
+                setRemainingTime(getRemainingTime());
+                if (remainingTime === 0) clearInterval(intervalID);
+            },
+            !!remainingTime && remainingTime > 60000 ? 10000 : 5000,
+        );
+
+        return function cleanup() {
+            clearInterval(intervalID);
+        };
+    });
+
+    const canStillEdit = canEdit && !!remainingTime && remainingTime > 0;
+    const humanizedRemainingTime =
+        !!remainingTime && remainingTime !== Infinity
+            ? sprintf(t("Edit (%s)"), humanizedRelativeTime(new Date(cutoffTimestamp), new Date(), false))
+            : t("Edit");
+
+    return {
+        canStillEdit,
+        humanizedRemainingTime,
+    };
 }
 
 function usePatchStatus(discussionID: IDiscussion["discussionID"], patchID: string): LoadStatus {
@@ -211,20 +291,24 @@ export function useDiscussionPatch(discussionID: IDiscussion["discussionID"], pa
 
     const actions = useDiscussionActions();
 
+    const dispatch = useDiscussionsDispatch();
+
     const patchDiscussion = useCallback(
         (query: Omit<Parameters<typeof actions.patchDiscussion>[0], "discussionID" | "patchStatusID">) => {
-            return actions.patchDiscussion({
-                discussionID,
-                patchStatusID: actualPatchID,
-                ...query,
-            });
+            return dispatch(
+                actions.patchDiscussion({
+                    discussionID,
+                    patchStatusID: actualPatchID,
+                    ...query,
+                }),
+            );
         },
         [actualPatchID, actions, discussionID],
     );
 
     return {
         isLoading,
-        patchDiscussion: patchDiscussion,
+        patchDiscussion,
     };
 }
 
@@ -238,31 +322,39 @@ export function useDiscussionPutType(discussionID: IDiscussion["discussionID"]) 
     const isLoading = useDiscussionPutTypeStatus(discussionID) === LoadStatus.LOADING;
     const actions = useDiscussionActions();
 
+    const dispatch = useDiscussionsDispatch();
+
     const putDiscussionType = useCallback(
         (query: Omit<Parameters<typeof actions.putDiscussionType>[0], "discussionID">) => {
-            return actions.putDiscussionType({
-                discussionID,
-                ...query,
-            });
+            return dispatch(
+                actions.putDiscussionType({
+                    discussionID,
+                    ...query,
+                }),
+            );
         },
         [actions, discussionID],
     );
 
     return {
         isLoading,
-        putDiscussionType: putDiscussionType,
+        putDiscussionType,
     };
 }
 
 export function usePutDiscussionTags(discussionID: IDiscussion["discussionID"]) {
     const actions = useDiscussionActions();
 
+    const dispatch = useDiscussionsDispatch();
+
     async function putDiscussionTags(tagIDs: number[]) {
         try {
-            await actions.putDiscussionTags({
-                discussionID,
-                tagIDs,
-            });
+            return dispatch(
+                actions.putDiscussionTags({
+                    discussionID,
+                    tagIDs,
+                }),
+            );
         } catch (error) {
             throw new Error(error.description); //fixme: what we really want is an object that we can pass wholesale to formik's setError() function
         }

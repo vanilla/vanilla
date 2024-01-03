@@ -5,6 +5,7 @@ user:
       role: "administrator"
       email: "vanilla@stub.vanillacommunity.example"
       photo: "https://images.v-cdn.net/stubcontent/vanilla_avatar.jpg"
+
     - tag: "user1"
       name: "Karen A. Thomas"
       nick: "Karen"

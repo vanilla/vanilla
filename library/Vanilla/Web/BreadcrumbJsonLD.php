@@ -15,12 +15,12 @@ use Vanilla\Navigation\Breadcrumb;
  */
 final class BreadcrumbJsonLD extends AbstractJsonLDItem
 {
-    /** @var Breadcrumb[] */
+    /** @var array<Breadcrumb|array{name: string, url: string}> */
     private $crumbData;
 
     /**
      * Constructor.
-     * @param Breadcrumb[] $crumbData
+     * @param array<Breadcrumb|array{name: string, url: string}> $crumbData
      */
     public function __construct(array $crumbData)
     {
@@ -34,11 +34,15 @@ final class BreadcrumbJsonLD extends AbstractJsonLDItem
     {
         $crumbList = [];
         foreach ($this->crumbData as $index => $crumb) {
+            if ($crumb instanceof Breadcrumb) {
+                $crumb = $crumb->asArray();
+            }
+
             $crumbList[] = [
                 "@type" => "ListItem",
                 "position" => $index,
-                "name" => $crumb->getName(),
-                "item" => $crumb->getUrl(),
+                "name" => $crumb["name"],
+                "item" => $crumb["url"],
             ];
         }
 

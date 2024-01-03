@@ -50,7 +50,7 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
                 contentID={this.id + "-content"}
                 handleID={this.id + "-handle"}
                 name={t("Messages")}
-                renderLeft={true}
+                renderLeft={!getMeta("ui.isDirectionRTL", false)}
                 buttonClassName={classesHeader.button}
                 contentsClassName={classesHeader.dropDownContents}
                 buttonContents={<MessagesCount open={this.state.open} compact={false} />}

@@ -8,6 +8,7 @@ import { DeviceProvider } from "@library/layout/DeviceContext";
 import { StoryContent } from "@library/storybook/StoryContent";
 import InviteUserCard from "@library/features/users/ui/InviteUserCard";
 import { storyWithConfig } from "@library/storybook/StoryContext";
+import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 
 export default {
     component: InviteUserCard,
@@ -122,36 +123,22 @@ const inputEmails = "123@example.com, 456@example.com, abc@example.com, xyz.exam
 
 export const InviteCardWithPermission = storyWithConfig(
     {
-        storeState: {
-            users: {
-                permissions: {
-                    data: {
-                        permissions: [
-                            {
-                                type: "global",
-                                id: 1,
-                                permissions: {
-                                    "personalInfo.view": true,
-                                },
-                            },
-                        ],
-                    },
-                },
-            },
-        },
+        storeState: {},
     },
     () => (
         <DeviceProvider>
             <StoryContent>
-                <InviteUserCard
-                    visible={true}
-                    closeModal={() => {}}
-                    defaultUsers={defaultUsers}
-                    updateStoreInvitees={() => {}}
-                    inputEmails={inputEmails}
-                    updateStoreEmails={() => {}}
-                    sentInvitations={() => {}}
-                />
+                <PermissionsFixtures.SpecificPermissions permissions={["personalInfo.view"]}>
+                    <InviteUserCard
+                        visible={true}
+                        closeModal={() => {}}
+                        defaultUsers={defaultUsers}
+                        updateStoreInvitees={() => {}}
+                        inputEmails={inputEmails}
+                        updateStoreEmails={() => {}}
+                        sentInvitations={() => {}}
+                    />
+                </PermissionsFixtures.SpecificPermissions>
             </StoryContent>
         </DeviceProvider>
     ),
@@ -159,36 +146,22 @@ export const InviteCardWithPermission = storyWithConfig(
 
 export const InviteCardWithoutPermission = storyWithConfig(
     {
-        storeState: {
-            users: {
-                permissions: {
-                    data: {
-                        permissions: [
-                            {
-                                type: "global",
-                                id: 1,
-                                permissions: {
-                                    "personalInfo.view": false,
-                                },
-                            },
-                        ],
-                    },
-                },
-            },
-        },
+        storeState: {},
     },
     () => (
         <DeviceProvider>
             <StoryContent>
-                <InviteUserCard
-                    visible={true}
-                    closeModal={() => {}}
-                    defaultUsers={defaultUsers}
-                    updateStoreInvitees={() => {}}
-                    inputEmails={inputEmails}
-                    updateStoreEmails={() => {}}
-                    sentInvitations={() => {}}
-                />
+                <PermissionsFixtures.NoPermissions>
+                    <InviteUserCard
+                        visible={true}
+                        closeModal={() => {}}
+                        defaultUsers={defaultUsers}
+                        updateStoreInvitees={() => {}}
+                        inputEmails={inputEmails}
+                        updateStoreEmails={() => {}}
+                        sentInvitations={() => {}}
+                    />
+                </PermissionsFixtures.NoPermissions>
             </StoryContent>
         </DeviceProvider>
     ),

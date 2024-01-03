@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -156,7 +156,8 @@ export function mountReactMultiple(components: IMountable[], callback?: () => vo
         return;
     }
 
-    let toCleanup: Array<{ target: HTMLElement; cleanup: HTMLElement }> = [];
+    const elementIndexesToMove: Array<{ parent: Element; initialParentChildCount: number; target: Element }> = [];
+
     components.forEach((mountable) => {
         const { component, target } = mountable;
         let mountPoint = target;
@@ -165,25 +166,55 @@ export function mountReactMultiple(components: IMountable[], callback?: () => vo
         }
 
         if (options?.overwrite || mountable.overwrite) {
-            const container = document.createElement("span");
-            toCleanup.push({
+            /**
+             * Default mounting behaviour
+             *
+             * <Parent>
+             *     <Target> // Events are bound here
+             *         <ReactElement />
+             *     <Target />
+             * </Parent>
+             *
+             * What we want with overwrite is:
+             *
+             * <Parent> // Events are bound here
+             *    <ReactElement />
+             * </Parent>
+             */
+
+            mountPoint = mountable.target.parentElement!;
+            elementIndexesToMove.push({
+                parent: mountPoint,
+                initialParentChildCount: mountPoint.children.length,
                 target,
-                cleanup: container,
             });
-            target.parentElement!.insertBefore(container, target);
-            mountPoint = container;
         }
         portals.push({ target: mountPoint, component });
     });
 
     renderPortals(() => {
-        toCleanup.forEach(({ cleanup, target }) => {
-            if (cleanup.firstElementChild) {
-                cleanup.parentElement!.insertBefore(cleanup.firstElementChild, cleanup);
-                cleanup.remove();
-                target.remove();
+        // Loop through the elements by parent.
+
+        elementIndexesToMove.forEach((movable) => {
+            // Relocate the nodes to their proper places on the page.
+            // Without this, widgets may not appear in their intended locations.
+            const nodeToMove = movable.parent.children.item(movable.initialParentChildCount);
+            if (!nodeToMove) {
+                return;
             }
+
+            if (movable.target.parentElement !== movable.parent) {
+                console.warn("Movable parent does not container target", {
+                    parent: movable.parent.outerHTML,
+                    target: movable.target.outerHTML,
+                });
+                return;
+            }
+
+            movable.parent.insertBefore(nodeToMove, movable.target);
+            movable.target.remove();
         });
+
         callback && callback();
     });
 }

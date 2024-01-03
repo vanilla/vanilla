@@ -38,13 +38,13 @@ export const BrandingPageRoute = new RouteHandler(
 export const LayoutEditorRoute = new RouteHandler(
     () => import("@dashboard/layout/pages/LayoutEditorPage"),
     [`/appearance/layouts/:layoutViewType/:layoutID(\\w+)(-[^/]+)?/edit`, "/appearance/layouts/:layoutViewType/add"],
-    (layout: Partial<LayoutFragment>) => {
+    (layout: Partial<LayoutFragment> & { isCopy?: boolean }) => {
         if (layout.layoutID) {
             let slug = layout.layoutID;
             if (layout.name) {
                 slug += "-" + slugify(layout.name);
             }
-            return `/appearance/layouts/${layout.layoutViewType}/${slug}/edit`;
+            return `/appearance/layouts/${layout.layoutViewType}/${slug}/edit` + (layout.isCopy ? "?copy=true" : "");
         } else {
             return `/appearance/layouts/${layout.layoutViewType}/add`;
         }

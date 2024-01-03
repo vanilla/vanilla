@@ -6,7 +6,7 @@
 
 import { styleFactory } from "@library//styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
-import { richEditorVariables } from "@rich-editor/editor/richEditorVariables";
+import { richEditorVariables } from "@library/editor/richEditorVariables";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { calc, percent } from "csx";
 import { appearance } from "@library/styles/styleHelpers";
@@ -60,7 +60,7 @@ export const paragraphMenuCheckRadioClasses = useThemeCache(() => {
     const checkRadioLabel = style("checkRadioLabel", {
         flexGrow: 1,
         maxWidth: calc(`100% - ${styleUnit(vars.menuButton.size * 2)}`),
-        textAlign: "left",
+        textAlign: "start",
     });
     const checkRadioSelected = style("checkRadioSelected", {
         width: styleUnit(vars.menuButton.size),

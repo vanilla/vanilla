@@ -10,7 +10,7 @@ import { css } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
 import previewCardClasses from "@library/theming/PreviewCard.styles";
 
-interface ILayoutPreviewList {
+export interface ILayoutPreviewList {
     options: Array<{
         label: string;
         thumbnailComponent: ComponentType<{ className?: string }>;
@@ -18,6 +18,7 @@ interface ILayoutPreviewList {
         editUrl?: ILayoutPreviewCardProps["editUrl"];
         active?: ILayoutPreviewCardProps["active"];
     }>;
+    className?: string;
 }
 
 function LayoutPreviewList(props: ILayoutPreviewList) {
@@ -25,7 +26,7 @@ function LayoutPreviewList(props: ILayoutPreviewList) {
     const classesPreview = previewCardClasses();
 
     return (
-        <ThumbnailGrid>
+        <ThumbnailGrid className={props.className}>
             {options.map((option) => (
                 <ThumbnailGridItem key={option.label}>
                     <LayoutPreviewCard

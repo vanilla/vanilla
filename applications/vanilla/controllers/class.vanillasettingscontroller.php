@@ -78,6 +78,7 @@ class VanillaSettingsController extends Gdn_Controller
             "ImageUpload.Limits.Enabled",
             "ImageUpload.Limits.Width",
             "ImageUpload.Limits.Height",
+            "Vanilla.Drafts.Autosave",
             self::CONFIG_KALTURA_DOMAINS => [],
         ]);
 
@@ -552,6 +553,7 @@ class VanillaSettingsController extends Gdn_Controller
      * This endpoint is intended for API access.
      *
      * @param int $categoryID The category to find.
+     * @throws Gdn_UserException
      */
     public function getCategory($categoryID)
     {

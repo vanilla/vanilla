@@ -18,6 +18,8 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  */
 class CommentsTest extends AbstractResourceTest
 {
+    public static $addons = ["stubcontent"];
+
     use TestExpandTrait;
     use AssertLoggingTrait;
     use TestPrimaryKeyRangeFilterTrait;
@@ -239,6 +241,53 @@ class CommentsTest extends AbstractResourceTest
                 $this->api()->post("/comments/{$comment["commentID"]}", ["body" => "edited comment2"]);
             }
         );
+    }
+
+    /**
+     * Test to ensure the comment draft is cleared after posting a comment.
+     * @return void
+     */
+    public function testPostingCommentClearsDraft(): void
+    {
+        $discussionID = 1;
+        $commentBody = "This is a comment";
+
+        // Save a draft
+        $draftResponse = $this->api()
+            ->post("/drafts", [
+                "attributes" => [
+                    "format" => "markdown",
+                    "body" => $commentBody,
+                ],
+                "parentRecordID" => $discussionID,
+                "recordType" => "comment",
+            ])
+            ->getBody();
+        $draftID = $draftResponse["draftID"];
+
+        //Fetch the users drafts
+        $allDrafts = $this->api()
+            ->get("/drafts")
+            ->getBody();
+
+        // Expect 1 draft saved for the user
+        $this->assertCount(1, $allDrafts);
+
+        // Post the comment
+        $this->api()->post("/comments", [
+            "body" => $commentBody,
+            "discussionID" => $discussionID,
+            "format" => "markdown",
+            "draftID" => $draftID,
+        ]);
+
+        // Fetch the users drafts again
+        $allDrafts = $this->api()
+            ->get("/drafts")
+            ->getBody();
+
+        // Expect the draft to be deleted
+        $this->assertEmpty($allDrafts);
     }
 
     /**

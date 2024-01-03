@@ -270,8 +270,9 @@ class APIExpandMiddlewareTest extends SiteTestCase
             ];
         };
 
-        $actual = call_user_func($this->middleware, $request, $next);
-        $this->assertEquals($actual, [
+        /** @var Data $response */
+        $response = call_user_func($this->middleware, $request, $next);
+        $this->assertEquals($response->getData(), [
             "insertUserID" => self::$userID1,
         ]);
         $this->assertTrue(true);
@@ -477,7 +478,48 @@ EOT
         /** @var Data $actual */
         $actual = call_user_func($this->middleware, $request, $next);
         $this->assertArrayHasKey("ssoID", $actual["insertUser"]);
-        $this->assertArrayNotHasKey("insertUSer", $actual["insertUser"]);
+        $this->assertArrayNotHasKey("insertUser", $actual["insertUser"]);
+    }
+
+    /**
+     * Test that expand all applies all expand values, and does not scrub all from the expand query.
+     */
+    public function testExpandAll()
+    {
+        $request = new Request("/api/v2/resource?expand=all,insertUser");
+        $next = function ($r) {
+            return [
+                "insertUserID" => self::$userID1,
+            ];
+        };
+
+        /** @var Data $actual */
+        $actual = call_user_func($this->middleware, $request, $next);
+        $this->assertArrayHasKey("ssoID", $actual["insertUser"]);
+        $this->assertArrayHasKey("extended", $actual["insertUser"]);
+        $this->assertArrayHasKey("name", $actual["insertUser"]);
+        $this->assertEquals("all", $request->getQuery()["expand"], "Insert user is scrubbed, but all is not.");
+    }
+
+    /**
+     * Test that expand all only applies expanders we have permission for.
+     */
+    public function testExpandAllOnlyAppliesPermissionedItems()
+    {
+        $memberUser = $this->createUser();
+        /** @var Data $actual */
+        $actual = $this->runWithUser(function () {
+            $request = new Request("/api/v2/resource?expand=all");
+            $next = function ($r) {
+                return [
+                    "insertUserID" => self::$userID1,
+                ];
+            };
+            return call_user_func($this->middleware, $request, $next);
+        }, $memberUser);
+        $this->assertArrayNotHasKey("ssoID", $actual["insertUser"]); // No permission for this one.
+        $this->assertArrayHasKey("extended", $actual["insertUser"]);
+        $this->assertArrayHasKey("name", $actual["insertUser"]);
     }
 
     /**

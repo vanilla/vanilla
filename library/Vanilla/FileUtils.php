@@ -7,6 +7,7 @@
 namespace Vanilla;
 
 use Symfony\Component\Yaml\Yaml;
+use Vanilla\Utility\DebugUtils;
 
 /**
  * Utility functions for working with file data.
@@ -61,7 +62,7 @@ class FileUtils
             if ($chunk) {
                 $subdir = randomString(12) . "/";
             }
-            $path = "${targetDirectory}/{$subdir}${name}.${extension}";
+            $path = "{$targetDirectory}/{$subdir}{$name}.{$extension}";
         } while (file_exists($path));
         return $path;
     }
@@ -73,6 +74,9 @@ class FileUtils
      */
     public static function deleteRecursively(string $root)
     {
+        if (!file_exists($root)) {
+            return;
+        }
         $files = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($root, \RecursiveDirectoryIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
@@ -88,6 +92,33 @@ class FileUtils
     }
 
     /**
+     * Clean out a directory and ensure it exists.
+     *
+     * @param string $root
+     * @param int|null $perms File bitmask.
+     */
+    public static function ensureCleanDirectory(string $root, ?int $perms = null)
+    {
+        if (file_exists($root)) {
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($root, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::CHILD_FIRST
+            );
+
+            foreach ($files as $fileinfo) {
+                $deleteFunction = $fileinfo->isDir() ? "rmdir" : "unlink";
+                $deleteFunction($fileinfo->getRealPath());
+            }
+
+            // Final directory delete.
+            rmdir($root);
+        }
+
+        $perms = $perms ?? DebugUtils::isTestMode() ? 0777 : 0644;
+        mkdir($root, $perms, true);
+    }
+
+    /**
      * A version of file_put_contents() that is multi-thread safe.
      *
      * @param string $filename Path to the file where to write the data.
@@ -99,6 +130,11 @@ class FileUtils
      */
     public static function putContents($filename, $data, $mode = 0644)
     {
+        $dirName = dirname($filename);
+        if (!file_exists($dirName)) {
+            mkdir($dirName, DebugUtils::isTestMode() ? 0777 : 0644, true);
+        }
+
         $temp = @tempnam(dirname($filename), "atomic");
 
         if (!($fp = @fopen($temp, "wb"))) {
@@ -116,8 +152,8 @@ class FileUtils
         fclose($fp);
 
         if (!@rename($temp, $filename)) {
-            $r = @unlink($filename);
-            $r &= @rename($temp, $filename);
+            $r = unlink($filename);
+            $r &= rename($temp, $filename);
             if (!$r) {
                 trigger_error(__CLASS__ . "::" . __FUNCTION__ . "(): : error writing file '$filename'", E_USER_WARNING);
                 return false;

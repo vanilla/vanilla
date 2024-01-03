@@ -22,4 +22,11 @@ interface HydrateAwareInterface
      * @return void
      */
     public function setHydrateParams(array $params): void;
+
+    /**
+     * Get names of additional child components that should be preloaded if this one is.
+     *
+     * @return array
+     */
+    public function getChildComponentNames(): array;
 }

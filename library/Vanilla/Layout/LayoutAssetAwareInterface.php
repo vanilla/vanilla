@@ -29,7 +29,7 @@ interface LayoutAssetAwareInterface
     /**
      * Return widget names.
      *
-     * @return string
+     * @return string[] | null
      */
-    public function getWidgetNames();
+    public function getWidgetNames(): array;
 }

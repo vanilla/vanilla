@@ -6,8 +6,6 @@
     "requiredTheme": false,
     "hasLocale": true,
     "registerPermissions": false,
-    "settingsUrl": "/settings/sitemaps",
-    "settingsPermission": "Garden.Settings.Manage",
     "icon": "site-maps.png",
     "key": "sitemaps",
     "type": "addon",

@@ -4,17 +4,17 @@
  * @license Proprietary
  */
 
-import Loadable from "react-loadable";
 import React from "react";
 import { loaderClasses } from "@library/loaders/loaderStyles";
 import Loader from "@library/loaders/Loader";
+import { createLoadableComponent } from "@vanilla/react-utils";
 
-const LazyChangeTypeDiscussionForm = Loadable({
-    loader: () =>
+const LazyChangeTypeDiscussionForm = createLoadableComponent({
+    loadFunction: () =>
         import(
             /* webpackChunkName: "features/discussions/forms/ChangeTypeDiscussionForm" */ "@library/features/discussions/forms/ChangeTypeDiscussionForm"
         ),
-    loading() {
+    fallback() {
         return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
     },
 });

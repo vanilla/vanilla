@@ -22,6 +22,13 @@ interface ConfigurationInterface
     public function get($key, $defaultValue = false);
 
     /**
+     * Get the entire configuration.
+     *
+     * @return array The configuration value.
+     */
+    public function getAll(): array;
+
+    /**
      * Save a value to the configuration.
      *
      * @param string|array $name A config key. Dot notation supported.

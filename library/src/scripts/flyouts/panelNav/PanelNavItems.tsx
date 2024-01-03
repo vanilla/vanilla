@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import { INavigationTreeItem, navigationItemBadgeType } from "@library/@types/api/core";
 import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import Button from "@library/forms/Button";
@@ -19,7 +19,7 @@ import { t } from "@vanilla/i18n";
 
 export interface IPanelNavItemsProps {
     navItems: INavigationTreeItem[];
-    activeRecord: IActiveRecord;
+    activeRecord?: IActiveRecord;
     pushParentItem: (item: INavigationTreeItem) => void;
     popParentItem: () => void;
     isNestable: boolean;
@@ -30,8 +30,10 @@ export interface IPanelNavItemsProps {
     onClose?: () => void;
 }
 
+const VALID_URL_REGEX = /^\s*((https?:\/\/))|^\s*\//i;
+
 export function PanelNavItems(props: IPanelNavItemsProps) {
-    const { isActive } = props;
+    const { isActive, navItems = [] } = props;
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const prevFocusedRef = useRef<HTMLElement | null>(null);
 
@@ -47,6 +49,17 @@ export function PanelNavItems(props: IPanelNavItemsProps) {
             };
         }
     }, [isActive]);
+
+    // Check url property of nav items and convert if necessary
+    // Some old plugin urls do not have the opening forward slash for settings pages, and therefore
+    // do not render properly in a link's href attribute when in mobile view. This conversion will
+    // catch any, as there is an unknown number of these urls
+    const navItemList = useMemo<INavigationTreeItem[]>(() => {
+        return navItems.map(({ url: tmpUrl, ...navItem }) => {
+            const url = tmpUrl && VALID_URL_REGEX.test(tmpUrl) ? tmpUrl : `/${tmpUrl}`;
+            return { ...navItem, url };
+        });
+    }, [navItems]);
 
     const classes = dropDownClasses();
     return (
@@ -84,11 +97,11 @@ export function PanelNavItems(props: IPanelNavItemsProps) {
             <div className={classes.panelNavItems}>
                 <div className={classNames(classes.panelContent, { isNested: props.canGoBack })}>
                     <ul className={classes.sectionContents}>
-                        {props.navItems.map((navItem, i) => {
-                            const showChildren = props.isNestable && navItem.children.length > 0;
+                        {navItemList.map((navItem, i) => {
+                            const showChildren = props.isNestable && (navItem.children?.length ?? 0) > 0;
                             const isActive =
-                                navItem.recordType === props.activeRecord.recordType &&
-                                navItem.recordID === props.activeRecord.recordID;
+                                navItem.recordType === props.activeRecord?.recordType &&
+                                navItem.recordID === props.activeRecord?.recordID;
 
                             if (showChildren) {
                                 return (

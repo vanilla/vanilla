@@ -9,6 +9,9 @@
  * @since 2.0
  */
 
+use Vanilla\Utility\Timers;
+use Vanilla\Utility\TracedContainer;
+
 /**
  * Event Framework: Pluggable
  *
@@ -140,6 +143,27 @@ abstract class Gdn_Pluggable
 
         // Look to the PluginManager to see if there are related event handlers and call them
         return Gdn::pluginManager()->callEventHandlers($this, $fireClass, $eventName);
+    }
+
+    /**
+     * Fire an event and track how long it takes.
+     *
+     * @param string $eventName
+     * @param array $arguments
+     *
+     * @return mixed
+     */
+    public function fireTimedEvent($eventName, $arguments = null)
+    {
+        return TracedContainer::trace(function () use ($eventName, $arguments) {
+            $timers = \Gdn::getContainer()->get(Timers::class);
+            $span = $timers->startGeneric("event", [
+                "eventName" => $eventName,
+            ]);
+            $result = $this->fireEvent($eventName, $arguments);
+            $span->finish();
+            return $result;
+        });
     }
 
     /**

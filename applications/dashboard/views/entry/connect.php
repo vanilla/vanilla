@@ -1,51 +1,59 @@
-<?php if (!defined('APPLICATION')) exit();
+<?php if (!defined("APPLICATION")) {
+    exit();
+}
 
 /** @var \EntryController $this */
 
+//Do we have username passed from sso?
+$userName = $this->Form->getFormValue("Name", null) ?? $this->Form->getFormValue("ConnectName");
 // Get the connection information.
-if (!($ConnectName = $this->Form->getFormValue('FullName'))) {
-    $ConnectName = $this->Form->getFormValue('Name');
+if (!($connectName = $this->Form->getFormValue("FullName"))) {
+    $connectName = $userName;
 }
-$ConnectPhoto = $this->Form->getFormValue('Photo');
-if (!$ConnectPhoto) {
-    $ConnectPhoto = '/applications/dashboard/design/images/usericon.gif';
+
+$connectPhoto = $this->Form->getFormValue("Photo");
+if (!$connectPhoto) {
+    $connectPhoto = "/applications/dashboard/design/images/usericon.gif";
 }
-$ConnectSource = $this->Form->getFormValue('ProviderName');
+$connectSource = $this->Form->getFormValue("ProviderName");
 
 // By default, clients will try to connect existing users.
 // Turning this off forces connecting clients to choose unique usernames.
-$allowConnect = $this->data('AllowConnect');
+$allowConnect = $this->data("AllowConnect");
 
-$hasUserID = $this->Form->getFormValue('UserID');
+$hasUserID = $this->Form->getFormValue("UserID");
 
 if (!$hasUserID) {
     // Determine whether to show ConnectName field.
-    $ExistingUsers = (array)$this->data('ExistingUsers', []);
-    $NoConnectName = $this->data('NoConnectName');
+    $existingUsers = (array) $this->data("ExistingUsers", []);
+    $noConnectName = $this->data("NoConnectName");
 
     // You just landed on this page.
     $firstTimeHere = !$this->isConnectPostBack();
-    $connectNameProvided = (bool)$this->Form->getFormValue('ConnectName');
+    $connectNameProvided = (bool) $this->Form->getFormValue("ConnectName");
 
     $validationResults = $this->Form->validationResults();
-    $usernameNotValid = array_key_exists('Name', $validationResults) || array_key_exists('ConnectName', $validationResults);
+    $usernameNotValid =
+        array_key_exists("Name", $validationResults) || array_key_exists("ConnectName", $validationResults);
 
     // Buckle up, deciding whether to show this field is intense.
     // Any of these 3 scenarios will do it:
     $displayConnectName =
         // 1) If you arrived with NO ConnectName OR you've clicked Submit WITH a ConnectName (not not both!)
         //    we need to display the field again so that you can add/edit it.
-        ($firstTimeHere xor $connectNameProvided)
+        ($firstTimeHere xor $connectNameProvided) ||
         // 2) If you clicked submit and we found matches (but validation failed and you need to try again).
-        || (!$firstTimeHere && count($ExistingUsers))
+        (!$firstTimeHere && count($existingUsers)) ||
         // 3) We're forcing a manual username selection.
-        || !$allowConnect
+        !$allowConnect ||
         // 4) There was an error with the submitted name.
-        || $usernameNotValid;
+        $usernameNotValid;
 }
 ?>
 <div class="Connect FormTitleWrapper AjaxForm">
-    <h1><?php echo stringIsNullOrEmpty($ConnectSource) ? t("Sign In") : sprintf(t('%s Connect'), htmlentities($ConnectSource)); ?></h1>
+    <h1><?php echo stringIsNullOrEmpty($connectSource)
+        ? t("Sign In")
+        : sprintf(t("%s Connect"), htmlentities($connectSource)); ?></h1>
 
     <div class="FormWrapper">
         <?php
@@ -57,127 +65,157 @@ if (!$hasUserID) {
          *  the EntryController that has rules that require this form to be
          *  shown but not the Name Field.
          */
-        if ($ConnectName || $ConnectPhoto && !$this->data('HideName')) : ?>
+        if ($connectName || ($connectPhoto && !$this->data("HideName"))): ?>
             <div class="MeBox">
                 <?php
-                if ($ConnectPhoto) {
+                if ($connectPhoto) {
                     echo '<span class="PhotoWrap">',
-                    img($ConnectPhoto, ['alt' => t('Profile Picture'), 'class' => 'ProfilePhoto']),
-                    '</span>';
+                        img($connectPhoto, ["alt" => t("Profile Picture"), "class" => "ProfilePhoto"]),
+                        "</span>";
                 }
 
                 echo '<div class="WhoIs">';
-                if ($ConnectName && $ConnectSource) {
-                    $NameFormat = t('You are connected as %s through %s.');
-                } elseif ($ConnectName) {
-                    $NameFormat = t('You are connected as %s.');
-                } elseif ($ConnectSource) {
+                if ($connectName && $connectSource) {
+                    $NameFormat = t("You are connected as %s through %s.");
+                } elseif ($connectName) {
+                    $NameFormat = t("You are connected as %s.");
+                } elseif ($connectSource) {
                     $NameFormat = t('You are connected through %2$s.');
                 } else {
-                    $NameFormat = '';
+                    $NameFormat = "";
                 }
 
                 $NameFormat = '%1$s';
                 echo sprintf(
                     $NameFormat,
-                    '<span class="Name">'.htmlspecialchars($ConnectName).'</span>',
-                    '<span class="Source">'.htmlspecialchars($ConnectSource).'</span>');
+                    '<span class="Name">' . htmlspecialchars($connectName) . "</span>",
+                    '<span class="Source">' . htmlspecialchars($connectSource) . "</span>"
+                );
 
-                echo wrap(t('ConnectCreateAccount', 'Add Info &amp; Create Account'), 'h3', ["aria-level" => 2]);
+                echo wrap(t("ConnectCreateAccount", "Add Info &amp; Create Account"), "h3", ["aria-level" => 2]);
 
-                echo '</div>';
+                echo "</div>";
                 ?>
             </div>
-        <?php endif; ?>
+        <?php endif;
+        ?>
 
-        <?php if ($hasUserID) : ?>
+        <?php
+        if ($hasUserID): ?>
             <div class="SignedIn">
-                <?php echo '<div class="Info">', t('You are now signed in.'), '</div>'; ?>
+                <?php echo '<div class="Info">', t("You are now signed in."), "</div>"; ?>
             </div>
-        <?php else : ?>
+            <?php else: ?>
             <ul>
-                <?php if ($this->Form->getFormValue('EmailVisible')) : ?>
+                <?php if ($this->Form->getFormValue("EmailVisible")): ?>
                 <li>
                     <?php
-                    echo $this->Form->label('Email', 'Email');
-                    echo $this->Form->textBox('Email');
+                    echo $this->Form->label("Email", "Email");
+                    echo $this->Form->textBox("Email");
                     ?>
                 </li>
         <?php endif; ?>
 
-        <?php if ($displayConnectName && !$this->data('HideName')) : ?>
+        <?php if ($displayConnectName && !$this->data("HideName")): ?>
 
                 <li>
                     <?php
+                    if (count($existingUsers) == 1 && $noConnectName) {
+                        $Row = reset($existingUsers);
 
-                    // One User was found in GDN_User based on the Email.
-                    if (count($ExistingUsers) == 1 && $NoConnectName) {
-                        $Row = reset($ExistingUsers);
-
-                        echo '<div class="FinePrint">', t('ConnectAccountExists', 'You already have an account here.'), '</div>',
-                        wrap(sprintf(t('ConnectRegisteredName', 'Your registered username: <strong>%s</strong>'), htmlspecialchars($Row['Name'])), 'div', ['class' => 'ExistingUsername']);
-                        $this->addDefinition('NoConnectName', true);
-                        echo $this->Form->hidden('UserSelect', ['Value' => $Row['UserID']]);
+                        echo '<div class="FinePrint">',
+                            t("ConnectAccountExists", "You already have an account here."),
+                            "</div>",
+                            wrap(
+                                sprintf(
+                                    t("ConnectRegisteredName", "Your registered username: <strong>%s</strong>"),
+                                    htmlspecialchars($Row["Name"])
+                                ),
+                                "div",
+                                ["class" => "ExistingUsername"]
+                            );
+                        $this->addDefinition("NoConnectName", true);
+                        echo $this->Form->hidden("UserSelect", ["Value" => $Row["UserID"]]);
                     }
 
-                    // Found User's Name in GDN_User.
-                    if (count($ExistingUsers) >= 1 && !$NoConnectName){
-                        echo $this->Form->label('Username', 'ConnectName');
-                        echo \Gdn::translate('ConnectWithExistingUser', 'One or more users with your name already exist, would you like to connect as them?');
-                        $connectNameMessage = (!$allowConnect) ? '' : ' <span class="FinePrint">'.\Gdn::translate('(Requires a password.)').'</span>';
-                        foreach ($ExistingUsers as $Row) {
-                            echo wrap($this->Form->radio('UserSelect', $Row['Name'] . $connectNameMessage, ['value' => $Row['UserID'], 'class' => 'existingConnectName']), 'div');
+                    if (count($existingUsers) >= 1 && !$noConnectName) {
+                        echo $this->Form->label("Username", "ConnectName");
+                        echo \Gdn::translate(
+                            "ConnectWithExistingUser",
+                            "One or more users with your name already exist, would you like to connect as them?"
+                        );
+                        $connectNameMessage = !$allowConnect
+                            ? ""
+                            : ' <span class="FinePrint">' . \Gdn::translate("(Requires a password.)") . "</span>";
+                        foreach ($existingUsers as $Row) {
+                            echo wrap(
+                                $this->Form->radio("UserSelect", $Row["Name"] . $connectNameMessage, [
+                                    "value" => $Row["UserID"],
+                                    "class" => "existingConnectName",
+                                ]),
+                                "div"
+                            );
                         }
-                        $connectChooseName = ' <span class="FinePrint">('.\Gdn::translate('ConnectChooseName', 'Choose a name to identify yourself on the site.').')</span>';
-                        echo wrap($this->Form->radio('UserSelect', 'Other'.$connectChooseName, ['value' => 'other']), 'div');
-                        echo $this->Form->textbox('ConnectName');
+                        $connectChooseName =
+                            ' <span class="FinePrint">(' .
+                            \Gdn::translate("ConnectChooseName", "Choose a name to identify yourself on the site.") .
+                            ")</span>";
+                        echo wrap(
+                            $this->Form->radio("UserSelect", "Other" . $connectChooseName, ["value" => "other"]),
+                            "div"
+                        );
+                        echo $this->Form->textbox("ConnectName");
                     }
 
-                    // No Name was passed over SSO and...
-                    // No Users were found in GDN_User
-                    if (count($ExistingUsers) === 0 && !$NoConnectName) {
-                        echo $this->Form->label('Username', 'ConnectName');
-                        echo wrap(\Gdn::translate('ConnectChooseName', 'Choose a name to identify yourself on the site.'), 'div', ['class' => 'FinePrint']);
-                        echo $this->Form->textbox('ConnectName', ["aria-label" => t("Username")]);
+                    if (count($existingUsers) === 0 && !$noConnectName) {
+                        if (!$userName || $usernameNotValid) {
+                            echo $this->Form->label("Username", "ConnectName");
+                            echo wrap(
+                                \Gdn::translate("ConnectChooseName", "Choose a name to identify yourself on the site."),
+                                "div",
+                                ["class" => "FinePrint"]
+                            );
+                            echo $this->Form->textbox("ConnectName", ["aria-label" => t("Username")]);
+                        }
                     }
                     ?>
                 </li>
         <?php endif; ?>
 
                 <?php
-                $this->fireEvent('RegisterBeforePassword');
+                $this->fireEvent("RegisterBeforePassword");
 
-                //if we have custom profile fields for the user, we need to render them
-                if ($this->hasCustomProfileFields() && (count($ExistingUsers) === 0 || (count($ExistingUsers) >= 1 && !$NoConnectName))) {
-                    //this one is the case when we found a user with same name in db, so we suggest to sign in with existing user or create an account,
-                    //profile fields are hidden until user chooses the option to create new account
-                    $wrapper = count($ExistingUsers) >= 1 ? ["tag" => "div", "attributes" => ["id" => "connect-custom-profile-fields", "style"=> "display: none"]] : null;
+                if (
+                    $this->hasRegistrationCustomFields() &&
+                    (count($existingUsers) === 0 || (count($existingUsers) >= 1 && !$noConnectName))
+                ) {
+                    $wrapper =
+                        count($existingUsers) >= 1
+                            ? [
+                                "tag" => "div",
+                                "attributes" => ["id" => "connect-custom-profile-fields", "style" => "display: none"],
+                            ]
+                            : null;
 
-                    $this->generateFormCustomProfileFields($wrapper);
+                    $this->generateFormCustomProfileFields($wrapper, true);
                 }
                 ?>
 
-                <?php
-                /**
-                 *  HidePassword can be passed by any plugin that hooks into
-                 *  the EntryController that has rules that require this form to be
-                 *  shown but not the Password Field.
-                 */
-                if (!$this->data('HidePassword')) {
+                <?php if (!$this->data("HidePassword")) {
                     echo '<li id="ConnectPassword">';
-                    echo $this->Form->label('Password', 'ConnectPassword');
-                    $PasswordMessage = t('ConnectExistingPassword', 'Enter your existing account password.');
-                    echo wrap($PasswordMessage, 'div', ['class' => 'FinePrint']);
-                    echo $this->Form->input('ConnectPassword', 'password');
-                    echo '</li>';
-                }
-                ?>
+                    echo $this->Form->label("Password", "ConnectPassword");
+                    $PasswordMessage = t("ConnectExistingPassword", "Enter your existing account password.");
+                    echo wrap($PasswordMessage, "div", ["class" => "FinePrint"]);
+                    echo $this->Form->input("ConnectPassword", "password");
+                    echo "</li>";
+                } ?>
             </ul>
 
-            <?php
-            echo '<div class="Buttons">', wrap($this->Form->button('Connect', ['class' => 'Button Primary']), 'div', ['class' => 'ButtonContainer']), '</div>';
-
-        endif;
+            <?php echo '<div class="Buttons">',
+                wrap($this->Form->button("Connect", ["class" => "Button Primary"]), "div", [
+                    "class" => "ButtonContainer",
+                ]),
+                "</div>";endif;
 
         echo $this->Form->close();
         ?>

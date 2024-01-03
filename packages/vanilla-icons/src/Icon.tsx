@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { IconType } from "./IconType";
+import { coreIconsData, IconType } from "./IconType";
 import { iconRegistry } from "./IconRegistry";
 
 export const IconSize = {
@@ -21,9 +21,26 @@ interface IProps extends React.SVGAttributes<HTMLOrSVGElement> {
 export function Icon(_props: IProps) {
     const { icon, size = "default", ...props } = _props;
     const FoundIcon = iconRegistry.getIcon(icon);
+    const coreIcon = coreIconsData[icon] ?? null;
     // Return null for FoundIcon when in test mode
-    if (!FoundIcon || (process.env.NODE_ENV === "test" && typeof FoundIcon === "object")) {
-        return null;
+    if (!FoundIcon) {
+        if (coreIcon) {
+            return (
+                <svg
+                    fill="none"
+                    focusable="false"
+                    {...(coreIcon as any)}
+                    width={IconSize[size]}
+                    height={IconSize[size]}
+                    viewBox={coreIcon.viewBox ?? undefined}
+                    {...props}
+                >
+                    <use xlinkHref={`#${icon}`} />
+                </svg>
+            );
+        } else {
+            return <></>;
+        }
     }
-    return <FoundIcon focusable={false} aria-hidden="true" {...props} width={IconSize[size]} height={IconSize[size]} />;
+    return <FoundIcon focusable={false} {...props} width={IconSize[size]} height={IconSize[size]} />;
 }

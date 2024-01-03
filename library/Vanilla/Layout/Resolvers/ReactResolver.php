@@ -18,6 +18,7 @@ use Vanilla\Layout\LayoutAssetAwareInterface;
 use Vanilla\Layout\LayoutAssetAwareTrait;
 use Vanilla\Layout\Section\AbstractLayoutSection;
 use Vanilla\Utility\ArrayUtils;
+use Vanilla\Utility\Timers;
 use Vanilla\Web\PageHeadAwareInterface;
 use Vanilla\Web\PageHeadAwareTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
@@ -72,45 +73,67 @@ class ReactResolver extends AbstractDataResolver implements
      */
     protected function resolveInternal(array $data, array $params)
     {
-        /** @var ReactWidgetInterface $module */
-        $module = $this->container->get($this->reactWidgetClass);
+        $span = Timers::instance()->startGeneric("hydrateReact", [
+            "widgetClass" => $this->reactWidgetClass,
+        ]);
+        try {
+            $testID = $data['$reactTestID'] ?? null;
+            if (isset($data['$reactTestID'])) {
+                unset($data['$reactTestID']);
+            }
+            /** @var ReactWidgetInterface $module */
+            $module = $this->container->get($this->reactWidgetClass);
 
-        if ($module instanceof PageHeadAwareInterface && $this->pageHead !== null) {
-            $module->setPageHead($this->pageHead);
-        }
-
-        if ($module instanceof HydrateAwareInterface && $this->getHydrateParams() !== null) {
-            $module->setHydrateParams($this->getHydrateParams());
-        }
-
-        if ($this->getAsset) {
             $this->addWidgetName($module->getComponentName());
-            return [];
-        }
-        // Apply properties
-        if ($module instanceof CombinedPropsWidgetInterface) {
-            $module->setProps($data);
-        } else {
-            foreach ($data as $name => $value) {
-                // Check for a setter method
-                if (method_exists($module, $method = "set" . ucfirst($name))) {
-                    $module->$method($value);
-                } else {
-                    $module->$name = $value;
+
+            if ($module instanceof PageHeadAwareInterface && $this->pageHead !== null) {
+                $module->setPageHead($this->pageHead);
+            }
+
+            if ($module instanceof HydrateAwareInterface && $this->getHydrateParams() !== null) {
+                $module->setHydrateParams($this->getHydrateParams());
+
+                foreach ($module->getChildComponentNames() as $childComponentName) {
+                    $this->addWidgetName($childComponentName);
                 }
             }
-        }
 
-        $props = $module->getProps($params);
-        if ($props === null) {
-            return null;
-        }
+            if ($this->getAsset) {
+                return [];
+            }
+            // Apply properties
+            if ($module instanceof CombinedPropsWidgetInterface) {
+                $module->setProps($data);
+            } else {
+                foreach ($data as $name => $value) {
+                    // Check for a setter method
+                    if (method_exists($module, $method = "set" . ucfirst($name))) {
+                        $module->$method($value);
+                    } else {
+                        $module->$name = $value;
+                    }
+                }
+            }
 
-        // Returns something matching ReactChildrenSchema.
-        return [
-            '$reactComponent' => $module->getComponentName(),
-            '$reactProps' => $props,
-        ];
+            $props = $module->getProps($params);
+            if ($props === null) {
+                return null;
+            }
+
+            // Returns something matching ReactChildrenSchema.
+            $result = [
+                '$seoContent' => $module->renderSeoHtml($props),
+                '$reactComponent' => $module->getComponentName(),
+                '$reactProps' => $props,
+            ];
+
+            if ($testID !== null) {
+                $result['$reactTestID'] = $testID;
+            }
+            return $result;
+        } finally {
+            $span->finish();
+        }
     }
 
     /**
@@ -132,6 +155,7 @@ class ReactResolver extends AbstractDataResolver implements
      */
     public function getAllowedSectionIDs(): array
     {
+        /** @var class-string<ReactWidgetInterface> $widgetClass */
         $widgetClass = $this->getReactWidgetClass();
         return $widgetClass::getAllowedSectionIDs();
     }
@@ -147,6 +171,10 @@ class ReactResolver extends AbstractDataResolver implements
         if ($schema->getField("description", null) === null) {
             $schema->setField("description", $class::getWidgetName());
         }
+
+        $schema->setField("properties.\$reactTestID", [
+            "type" => "string",
+        ]);
         return $schema;
     }
 

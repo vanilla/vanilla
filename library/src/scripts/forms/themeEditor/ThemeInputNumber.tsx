@@ -135,7 +135,7 @@ export function ThemeInputNumber(_props: IProps) {
                     placeholder={String(generatedValue)}
                     value={rawValue ?? ""}
                     onChange={handleTextChange}
-                    auto-correct="false"
+                    autoCorrect="false"
                     step={step}
                     min={min}
                     max={max}

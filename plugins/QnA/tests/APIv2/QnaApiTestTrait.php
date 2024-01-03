@@ -167,6 +167,17 @@ trait QnaApiTestTrait
     }
 
     /**
+     * Reject an answer
+     *
+     * @param array $question
+     * @param array $answer
+     */
+    public function rejectAnswer(array $question, array $answer)
+    {
+        $this->setAnswerStatus($question, $answer, "Rejected");
+    }
+
+    /**
      * Recalculate the QnA status of a discussion.
      *
      * @param array $question

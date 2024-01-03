@@ -177,7 +177,7 @@ class TagModelTest extends \VanillaTests\SiteTestCase
 
         // This tag should be returned with the keys as they were originally.
         $normalizedOut = $this->tagModel->normalizeOutput($normalizedIn);
-        $this->assertEquals([["urlcode" => "tag", "name" => "tag"]], $normalizedOut);
+        $this->assertEquals([["urlcode" => "tag", "name" => "tag", "type" => "User"]], $normalizedOut);
     }
 
     /**
@@ -419,6 +419,25 @@ class TagModelTest extends \VanillaTests\SiteTestCase
             "plural" => "Unusable Custom Type(plural)",
             "addtag" => false,
             "default" => false,
+        ]);
+    }
+
+    /**
+     * Check that we cannot Add Tags without the "Vanilla.Tagging.Add" Permission.
+     */
+    public function testAddCustomTagTypesThroughDashboardWithputPermission(): void
+    {
+        $this->getSession()->start($this->adminID);
+
+        $this->assertContains("Garden.Community.Manage", $this->getSession()->getPermissionsArray());
+        // By default Admin permissions do not include "Vanilla.Tagging.Add" permission
+        $this->assertNotContains("Vanilla.Tagging.Add", $this->getSession()->getPermissionsArray());
+        // We set ourselves tagging permissions.
+        $this->expectExceptionMessage("You don't have permission to do that.");
+        $this->bessy()->post("/settings/tags/add?type=usablecustomtype", [
+            "FullName" => "A New Tag",
+            "Name" => "a-new-tag",
+            "Type" => "usablecustomtype",
         ]);
     }
 

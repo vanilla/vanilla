@@ -20,10 +20,7 @@ use Vanilla\Formatting\Html\HtmlSanitizer;
 use Vanilla\Formatting\Html\Processor\ExternalLinksProcessor;
 use Vanilla\Formatting\Html\Processor\ImageHtmlProcessor;
 use Vanilla\HttpCacheMiddleware;
-use Vanilla\Layout\GlobalRecordProvider;
-use Vanilla\Layout\CategoryRecordProvider;
 use Vanilla\Layout\LayoutViewModel;
-use Vanilla\Layout\RootRecordProvider;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\CurrentUserPreloadProvider;
 use Vanilla\Models\LocalePreloadProvider;
@@ -39,8 +36,8 @@ use Vanilla\Search\AbstractSearchDriver;
 use Vanilla\Search\GlobalSearchType;
 use Vanilla\Search\SearchService;
 use Vanilla\Search\SearchTypeCollectorInterface;
+use Vanilla\Site\OwnSite;
 use Vanilla\Site\OwnSiteProvider;
-use Vanilla\Site\RootSiteSectionProvider;
 use Vanilla\Site\SingleSiteSectionProvider;
 use Vanilla\Theme\FsThemeProvider;
 use Vanilla\Theme\ThemeAssetFactory;
@@ -48,6 +45,8 @@ use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\ThemeServiceHelper;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
+use Vanilla\Utility\Timers;
+use Vanilla\Utility\TracedContainer;
 use Vanilla\Web\Page;
 use Vanilla\Web\SafeCurlHttpHandler;
 use Vanilla\Web\TwigEnhancer;
@@ -77,12 +76,18 @@ if (!class_exists("Gdn")) {
 }
 
 // Set up the dependency injection container.
-$dic = new Container();
+$dic = new TracedContainer();
 Gdn::setContainer($dic);
 
+$timers = new Timers();
+$rootSpan = $timers->startRootSpan();
+
+$bootstrapSpan = $timers->startGeneric("core-bootstrap");
 \Vanilla\Bootstrap::configureContainer($dic);
 
 $dic->setInstance(Container::class, $dic)
+
+    ->setInstance(Timers::class, $timers)
 
     // Configuration
     ->rule("Gdn_Configuration")
@@ -90,17 +95,9 @@ $dic->setInstance(Container::class, $dic)
     ->addAlias("Config")
     ->addAlias(Contracts\ConfigurationInterface::class)
 
-    ->rule(Contracts\Site\AbstractSiteProvider::class)
+    ->rule(Contracts\Site\VanillaSiteProvider::class)
     ->setShared(true)
     ->setClass(OwnSiteProvider::class)
-
-    ->rule(\Vanilla\Utility\Timers::class)
-    ->setShared(true)
-
-    // Root section
-    ->rule(\Vanilla\Site\SiteSectionModel::class)
-    ->addCall("addProvider", [new Reference(RootSiteSectionProvider::class)])
-    ->setShared(true)
 
     // Site sections
     ->rule(\Vanilla\Site\SiteSectionModel::class)
@@ -306,18 +303,6 @@ $dic->setInstance(Container::class, $dic)
     ->rule(BreadcrumbModel::class)
     ->setShared(true)
 
-    ->rule(LayoutViewModel::class)
-    ->addCall("addProvider", [new Reference(GlobalRecordProvider::class)])
-    ->setShared(true)
-
-    ->rule(LayoutViewModel::class)
-    ->addCall("addProvider", [new Reference(RootRecordProvider::class)])
-    ->setShared(true)
-
-    ->rule(LayoutViewModel::class)
-    ->addCall("addProvider", [new Reference(CategoryRecordProvider::class)])
-    ->setShared(true)
-
     ->rule(\Vanilla\Models\AuthenticatorModel::class)
     ->setShared(true)
     ->addCall("registerAuthenticatorClass", [\Vanilla\Authenticator\PasswordAuthenticator::class])
@@ -497,15 +482,39 @@ $dic->setInstance(Container::class, $dic)
     ->rule(DiscussionStatusModel::class)
     ->setShared(true);
 
+$bootstrapSpan->finish();
+
+$config = $dic->get(Gdn_Configuration::class);
+
+// Set warning limits for timers.
+$warningLimits = $config->get("timers.warningLimits", []);
+$warningLimits = array_merge(
+    [
+        "dbRead" => 500,
+        "cacheRead" => 100,
+        "cacheWrite" => 100,
+    ],
+    $warningLimits
+);
+
+foreach ($warningLimits as $timerName => $limitMs) {
+    $timers->setWarningLimit($timerName, $limitMs);
+}
+
 // Run through the bootstrap with dependencies.
 $dic->call(function (
     Container $dic,
-    Gdn_Configuration $config,
     \Vanilla\AddonManager $addonManager,
     Gdn_Request $request // remove later
-) {
+) use ($timers, $config) {
     // Load default baseline Garden configurations.
+    $loadConfigSpan = $timers->startGeneric("load-config");
     $config->load(PATH_CONF . "/config-defaults.php");
+
+    $dockerDefaultsPath = PATH_CONF . "/docker-defaults.php";
+    if (file_exists($dockerDefaultsPath)) {
+        $config->load($dockerDefaultsPath);
+    }
 
     // Load installation-specific configuration so that we know what apps are enabled.
     $config->load($config->defaultPath(), "Configuration", true);
@@ -520,6 +529,8 @@ $dic->call(function (
     if (file_exists(PATH_CONF . "/bootstrap.early.php")) {
         require_once PATH_CONF . "/bootstrap.early.php";
     }
+
+    $loadConfigSpan->finish();
 
     $config->caching(true);
     debug($config->get("Debug", false));
@@ -546,6 +557,7 @@ $dic->call(function (
      */
 
     // Start the addons, plugins, and applications.
+    $startAddonsSpan = $timers->startGeneric("start-addons");
     $addonManager->startAddonsByKey($config->get("EnabledPlugins"), Addon::TYPE_ADDON);
     $addonManager->startAddonsByKey($config->get("EnabledApplications"), Addon::TYPE_ADDON);
     $addonManager->startAddonsByKey(array_keys($config->get("EnabledLocales", [])), Addon::TYPE_LOCALE);
@@ -576,16 +588,19 @@ $dic->call(function (
      */
 
     $addonManager->configureContainer($dic);
-
     // Delay instantiation in case an addon has configured it.
     $eventManager = $dic->get(EventManager::class);
 
     // Plugins startup
+    $eventBindingSpan = $timers->startGeneric("addon-events-binding");
     $addonManager->bindAllEvents($eventManager);
+    $eventBindingSpan->finish();
 
     // Prepare our locale.
     $locale = $dic->get(Gdn_Locale::class);
     $locale->loadExtraLocaleDefinitions();
+
+    $eventBindingSpan = $timers->startGeneric("addon-legacy-events");
 
     ///
     /// Both of these should be considered "soft" deprecated.
@@ -597,6 +612,8 @@ $dic->call(function (
 
     // Now that all of the events have been bound, fire an event that allows plugins to modify the container.
     $eventManager->fire("container_init", $dic);
+    $eventBindingSpan->finish();
+    $startAddonsSpan->finish();
 });
 
 // Send out cookie headers.
@@ -614,15 +631,19 @@ register_shutdown_function(function () use ($dic) {
  */
 
 // Load the Garden locale system.
+$localeSpan = $timers->startGeneric("start-locales");
 $dic->get("Gdn_Locale");
+$localeSpan->finish();
 
 require_once PATH_LIBRARY_CORE . "/functions.validation.php";
 
 // Configure JWT library to allow for five seconds of leeway.
 JWT::$leeway = 5;
 
+$authSpan = $timers->startGeneric("start-authenticator");
 // Start Authenticators
 $dic->get("Authenticator")->startAuthenticator();
+$authSpan->finish();
 
 /**
  * Bootstrap After
@@ -650,25 +671,22 @@ register_shutdown_function(function () use ($dic) {
         \Vanilla\Utility\Timers $timers,
         SchedulerInterface $scheduler
     ) {
-        // Logs timers
-        if ($config->get("trace.timers")) {
-            $timers->stopAll();
-            $timers->logAll($log, "app_timers");
-            $timers->reset();
-        }
-
         // Flush our buffers and close the request.
         $scheduler->finalizeRequest();
 
+        // Now extend our time limit a bit for the local jobs.
+        set_time_limit(60);
+
         // Now this will continue running.
-        $timers->start("schedulerDispatch");
+        $schedulerDispatchSpan = $timers->startGeneric("scheduler-dispatch");
         try {
             $scheduler->dispatchJobs();
         } finally {
-            $timers->stop("schedulerDispatch");
-            if ($config->get("trace.timers")) {
+            $schedulerDispatchSpan->finish();
+            if ($config->get("trace.timers", true)) {
                 $timers->stopAll();
                 $timers->logAll($log, "scheduler_timers");
+                $timers->recordProfile();
                 $timers->reset();
             }
         }

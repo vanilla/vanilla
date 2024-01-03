@@ -1,11 +1,11 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { allButtonStates, flexHelper, spinnerLoaderAnimationProperties } from "@library/styles/styleHelpers";
+import { flexHelper, spinnerLoaderAnimationProperties } from "@library/styles/styleHelpers";
 import { styleUnit } from "@library/styles/styleUnit";
 import { CSSObject, css } from "@emotion/css";
 import { styleFactory } from "@library/styles/styleUtils";
@@ -57,18 +57,24 @@ export const buttonUtilityClasses = useThemeCache(() => {
         display: "flex",
         height: styleUnit(dimension),
         minWidth: styleUnit(dimension),
-        width: styleUnit(dimension),
         justifyContent: "center",
         border: "none",
         padding: 0,
         background: "transparent",
         color: "inherit",
         borderRadius: 3,
-        "&:hover, &:focus": {
-            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+        "&:disabled, &[aria-disabled='true']": {
+            opacity: 0.5,
+            cursor: "not-allowed",
         },
-        "&:focus": {
+        "&:not(:disabled):not([aria-disabled='true'])": {
+            "&:hover, &:focus, &.hover, &:focus-visible, &.focus-visible": {
+                background: ColorsUtils.colorOut(globalVars.mainColors.primary.fade(0.1)),
+            },
+        },
+        "&.active": {
             background: ColorsUtils.colorOut(globalVars.mainColors.primary.fade(0.1)),
+            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
         },
         "&&.focus-visible, &:focus-visible": {
             outline: "none",
@@ -84,6 +90,8 @@ export const buttonUtilityClasses = useThemeCache(() => {
         }),
     );
 
+    const buttonIconMenuBar = css({ ...iconMixin(formElementVars.sizing.height - 4), whiteSpace: "nowrap" });
+
     const buttonIconCompact = style("iconCompact", iconMixin(vars.sizing.compactHeight));
 
     const asTextStyles: CSSObject = {
@@ -91,7 +99,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
         minWidth: important(0),
         padding: 0,
         overflow: "hidden",
-        textAlign: "left",
+        textAlign: "start",
         lineHeight: globalVars.lineHeights.base,
         fontWeight: globalVars.fonts.weights.semiBold,
         whiteSpace: "nowrap",
@@ -138,6 +146,7 @@ export const buttonUtilityClasses = useThemeCache(() => {
         pushRight,
         iconMixin,
         buttonIconCompact,
+        buttonIconMenuBar,
         buttonIcon,
         buttonIconRightMargin,
         buttonIconLeftMargin,
@@ -147,10 +156,9 @@ export const buttonUtilityClasses = useThemeCache(() => {
 
 export const buttonLoaderClasses = useThemeCache(() => {
     const flexUtils = flexHelper();
-    const style = styleFactory("buttonLoader");
 
     const root = useThemeCache((alignment: "left" | "center" = "center") =>
-        style({
+        css({
             ...(alignment === "center" ? flexUtils.middle() : flexUtils.middleLeft),
             padding: styleUnit(4),
             height: percent(100),
@@ -163,15 +171,13 @@ export const buttonLoaderClasses = useThemeCache(() => {
         }),
     );
 
-    const reducedPadding = style("reducedPadding", {
-        ...{
-            "&&": {
-                padding: styleUnit(3),
-            },
+    const reducedPadding = css({
+        "&&": {
+            padding: styleUnit(3),
         },
     });
 
-    const svg = style("svg", spinnerLoaderAnimationProperties());
+    const svg = css(spinnerLoaderAnimationProperties());
     return { root, svg, reducedPadding };
 });
 

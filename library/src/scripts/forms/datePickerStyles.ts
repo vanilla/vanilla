@@ -66,10 +66,8 @@ export const dayPickerClasses = useThemeCache(() => {
                 borderRadius: styleUnit(vars.border.radius),
                 padding: styleUnit(vars.spacing.padding),
                 whiteSpace: "nowrap",
-                ...{
-                    "&:hover": {
-                        backgroundColor: vars.colors.hover.bg.toString(),
-                    },
+                "&:not(.DayPicker-Day--disabled):hover": {
+                    backgroundColor: vars.colors.hover.bg.toString(),
                 },
             },
             ".DayPicker-Day--selected:not(.DayPicker-Day--disabled):not(.DayPicker-Day--outside)": {
@@ -77,20 +75,18 @@ export const dayPickerClasses = useThemeCache(() => {
                 color: vars.colors.selected.color.toString(),
                 //fix accessibility
                 fontWeight: "bold",
-                ...{
-                    "&:hover": {
-                        backgroundColor: vars.colors.selected.bg.toString(),
-                        //fix accessibility
-                        color: vars.colors.hover.color.toString(),
-                        fontWeight: "normal",
-                    },
+                "&:hover": {
+                    backgroundColor: vars.colors.selected.bg.toString(),
+                    //fix accessibility
+                    color: vars.colors.hover.color.toString(),
+                    fontWeight: "normal",
                 },
             },
             ".DayPicker-Day.DayPicker-Day--today": {
                 color: ColorsUtils.colorOut(vars.colors.today),
             },
             //fix accessibility
-            ".DayPicker-Weekday, .DayPicker-Day--outside": {
+            ".DayPicker-Weekday:not(.DayPicker-Day--disabled), .DayPicker-Day--outside:not(.DayPicker-Day--disabled)": {
                 color: "#767676",
             },
         },
@@ -116,6 +112,7 @@ export const dayPickerClasses = useThemeCache(() => {
 
     return {
         root,
+
         header,
         title,
         navigation,

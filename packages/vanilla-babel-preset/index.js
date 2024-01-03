@@ -32,7 +32,7 @@ module.exports = (api, options) => {
         sourceType: "unambiguous",
         presets: [
             [resolve("@babel/preset-env"), envOptions],
-            [resolve("@babel/preset-react", { useBuiltIns: true })],
+            [resolve("@babel/preset-react", { useBuiltIns: true, runtime: "automatic" })],
             resolve("@babel/preset-typescript"),
         ],
         plugins: [

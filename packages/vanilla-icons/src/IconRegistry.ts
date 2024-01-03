@@ -12,6 +12,8 @@ type IconStore = Partial<Record<IconType, IconComponentType>>;
 class IconRegistry {
     private icons: IconStore = {};
 
+    public baseUrl: string = "";
+
     public getIcon(iconType: IconType): IconComponentType | null {
         return this.icons[iconType] ?? null;
     }
@@ -28,14 +30,10 @@ class IconRegistry {
 // Singleton.
 const iconRegistry = new IconRegistry();
 
-// Build up our built-in icons.
-// Icons are processed through SVGR.
-const iconContext = require.context("../icons/", false, /.*\.svg/);
-iconContext.keys().forEach((key: string) => {
-    // Trim down the key.
-    const trimmedKey = key.replace("./", "").replace(".svg", "");
-
-    iconRegistry.registerIcon(trimmedKey as IconType, iconContext(key));
-});
+const isWebpack = process.env.IS_WEBPACK ?? false;
+if (isWebpack) {
+    iconRegistry.registerIcon("discussion-bookmark", require("../icons/discussion-bookmark.svg"));
+    iconRegistry.registerIcon("discussion-bookmark-solid", require("../icons/discussion-bookmark-solid.svg"));
+}
 
 export { iconRegistry };

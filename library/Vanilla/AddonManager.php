@@ -86,6 +86,8 @@ class AddonManager implements LoggerAwareInterface
      */
     private $autoloadClasses = [];
 
+    private Timers $timers;
+
     /// Methods ///
 
     /**
@@ -126,6 +128,8 @@ class AddonManager implements LoggerAwareInterface
         if (!$r) {
             trigger_error("Could not create necessary addon cache directories.", E_USER_WARNING);
         }
+
+        $this->timers = \Gdn::getContainer()->get(Timers::class);
     }
 
     /**
@@ -300,7 +304,7 @@ class AddonManager implements LoggerAwareInterface
 
         $resultClassNames = [];
         foreach ($classList as $classFile) {
-            if ($this->matchClass(strtolower($pattern), strtolower($classFile->className))) {
+            if ($this->matchClass($pattern, $classFile->className)) {
                 $resultClassNames[] = $classFile->className;
             }
         }
@@ -316,13 +320,14 @@ class AddonManager implements LoggerAwareInterface
      */
     protected function matchClass($pattern, $class)
     {
+        if (!str_starts_with($pattern, "*")) {
+            $pattern = "\\" . ltrim($pattern, "\\");
+        }
         $class = "\\" . ltrim($class, "\\");
 
-        $regex = str_replace(["\\*\\", "*", "\\"], ["(\\.+\\|\\)", ".*", "\\\\"], "\\" . ltrim($pattern, "\\"));
-        $regex = "`^$regex$`i";
         try {
-            $r = preg_match($regex, $class);
-            return (bool) $r;
+            $r = fnmatch(strtolower($pattern), strtolower($class), FNM_NOESCAPE);
+            return $r;
         } catch (\Exception $e) {
             return false;
         }
@@ -1106,12 +1111,23 @@ class AddonManager implements LoggerAwareInterface
                 // This addon is represented as addon => folder.
                 $lookup = $value;
             }
-            $addon = $this->lookupByType($lookup, $type);
-            if (empty($addon)) {
-                trigger_error("The $type with key $lookup could not be found and will not be started.", E_USER_NOTICE);
-            } else {
-                $this->startAddon($addon);
-                $count++;
+
+            $span = $this->timers->startGeneric("startAddon", [
+                "addonKey" => $lookup,
+            ]);
+            try {
+                $addon = $this->lookupByType($lookup, $type);
+                if (empty($addon)) {
+                    trigger_error(
+                        "The $type with key $lookup could not be found and will not be started.",
+                        E_USER_NOTICE
+                    );
+                } else {
+                    $this->startAddon($addon);
+                    $count++;
+                }
+            } finally {
+                $span->finish();
             }
         }
         return $count;

@@ -52,7 +52,7 @@ yargs
         default: false,
         boolean: true,
     })
-    .options("section", {
+    .options("sections", {
         alias: "s",
         string: true,
         default: "",
@@ -121,7 +121,7 @@ export async function getOptions(): Promise<IBuildOptions> {
         const splitSections = yargs.argv.sections
             .split(",")
             .map((section) => section.trim())
-            .filter(notEmpty);
+            .filter((section) => section.length > 0);
         if (splitSections.length > 0) {
             sections = splitSections;
         }

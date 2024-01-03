@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -16,7 +16,9 @@ use Garden\Web\Redirect;
 use Vanilla\InjectableInterface;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Permissions;
-use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
+use Vanilla\Utility\Timers;
+use Vanilla\Web\JsInterpop\PhpAsJsVariable;
+use Vanilla\Web\JsInterpop\StatePreloadTrait;
 use Vanilla\Web\JsInterpop\ReduxErrorAction;
 
 /**
@@ -24,7 +26,7 @@ use Vanilla\Web\JsInterpop\ReduxErrorAction;
  */
 abstract class Page implements InjectableInterface, CustomExceptionHandler, PageHeadInterface
 {
-    use TwigRenderTrait, ReduxActionPreloadTrait, PageHeadProxyTrait, PermissionCheckTrait;
+    use TwigRenderTrait, StatePreloadTrait, PageHeadProxyTrait, PermissionCheckTrait;
 
     /** @var bool */
     private $requiresSeo = true;
@@ -125,6 +127,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      * This method is kept private so that it can be called internally for error pages without being overridden.
      *
      * @return Data Data object for global dispatcher.
+     * @throws ServerException
      */
     private function renderMasterView(): Data
     {
@@ -132,6 +135,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
         $this->addInlineScript($this->getReduxActionsAsJsVariable());
 
         $viewData = [
+            "breadcrumbs" => $this->getSeoBreadcrumbs(),
             "themeHeader" => new \Twig\Markup($this->headerHtml, "utf-8"),
             "themeFooter" => new \Twig\Markup($this->footerHtml, "utf-8"),
             "cssClasses" => ["isLoading"],
@@ -196,7 +200,7 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
      * Render and set the SEO page content.
      *
      * @param string $viewPathOrView The path to the view to render or the rendered view.
-     * @param array $viewData The data to render the view if we gave a path.
+     * @param array|null $viewData The data to render the view if we gave a path.
      *
      * @return $this Own instance for chaining.
      */

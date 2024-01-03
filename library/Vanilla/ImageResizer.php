@@ -65,6 +65,23 @@ class ImageResizer
     ];
 
     /**
+     * Can the image's filetype be resized?
+     *
+     * @param string $source
+     * @return bool
+     */
+    public function canResize(string $source): bool
+    {
+        $result = getimagesize($source);
+        $srcType = $result[2] ?? null;
+
+        if (in_array($srcType, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Resize an image.
      *
      * @param string $source The path of the source image.
@@ -83,7 +100,7 @@ class ImageResizer
         }
 
         [$width, $height, $srcType] = getimagesize($source);
-        if (!in_array($srcType, [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+        if (!$this->canResize($source)) {
             $ext = $this->extFromImageType($srcType);
             throw new \InvalidArgumentException("Cannot resize images of this type ($ext).", 400);
         }
@@ -98,7 +115,11 @@ class ImageResizer
             $destType = $this->imageTypeFromExt($destination);
         }
 
+        $forcedConvert = false;
         $exif = $this->exif($source, $srcType);
+        if (!empty($exif)) {
+            $forcedConvert = true;
+        }
         $orientation = $exif["Orientation"] ?? null;
         switch ($orientation) {
             case self::EXIF_ORIENTATION_ROTATE_90:
@@ -113,6 +134,7 @@ class ImageResizer
 
         // Avoid processing images that do not need to be resized, reoriented or converted.
         if (
+            !$forcedConvert &&
             $height <= $resize["height"] &&
             $width <= $resize["width"] &&
             (!$orientation || $orientation === self::EXIF_ORIENTATION_STANDARD) &&
@@ -149,10 +171,10 @@ class ImageResizer
 
             $this->saveImage($destImage, $destination, $destType, $resize);
         } finally {
-            if (is_resource($srcImage)) {
+            if ($this->isGdResource($srcImage)) {
                 imagedestroy($srcImage);
             }
-            if (is_resource($destImage)) {
+            if ($this->isGdResource($destImage)) {
                 imagedestroy($destImage);
             }
         }
@@ -183,7 +205,6 @@ class ImageResizer
      * - sourceHeight: The sample height of the source image.
      * - jpgQuality: The JPEG image quality as a number from 10-100.
      * - pngQuality: The PNG compression level as a number from 0-9.
-     * - icoSizes: Additional icon sizes for .ico files as an array in the form `[size|'wxh'|[w, h], ...]`.
      */
     public function calculateResize(array $source, array $options)
     {
@@ -392,10 +413,10 @@ class ImageResizer
      * Read EXIF data from a supported image.
      *
      * @param string $source Path to an image on the file system.
-     * @param string $imageType Type of image being read, identified as one of the IMAGETYPE_* constants.
+     * @param int $imageType Type of image being read, identified as one of the IMAGETYPE_* constants.
      * @return array|null
      */
-    private function exif(string $source, string $imageType): ?array
+    private function exif(string $source, int $imageType): ?array
     {
         $result = null;
 
@@ -433,7 +454,7 @@ class ImageResizer
      */
     private function reorientImage($srcImage, ?int $orientation)
     {
-        if (!is_resource($srcImage)) {
+        if (!$this->isGdResource($srcImage)) {
             throw new \InvalidArgumentException("Unable to reorient image. Not a valid resource.");
         }
 
@@ -476,6 +497,7 @@ class ImageResizer
      * @param string $path The target path to save to.
      * @param int $type One of the __IMAGETYPE_*__ constants.
      * @param array $options An array of options from **resize()** to pass through to appropriate save methods.
+     * @psalm-suppress
      */
     private function saveImage($img, $path, $type, array $options = [])
     {
@@ -484,13 +506,10 @@ class ImageResizer
                 imagegif($img, $path);
                 break;
             case IMAGETYPE_JPEG:
-                imagejpeg($img, $path, empty($options["jpgQuality"]) ? 95 : $options["jpgQuality"]);
+                imagejpeg($img, $path, $options["jpgQuality"] ?? 95);
                 break;
             case IMAGETYPE_PNG:
-                imagepng($img, $path, empty($options["pngQuality"]) ? 9 : $options["pngQuality"]);
-                break;
-            case IMAGETYPE_ICO:
-                $this->saveIco($img, $path, $options);
+                imagepng($img, $path, $options["pngQuality"] ?? 9);
                 break;
             default:
                 $ext = self::extFromImageType($type);
@@ -499,55 +518,19 @@ class ImageResizer
     }
 
     /**
-     * Save an icon (.ico) file.
+     * Check if something is a GdImage or resource.
      *
-     * The GD library cannot save .ico files directly so this method calls out to an external library to do so.
-     *
-     * @param resource $img The GD resource representing the image.
-     * @param string $path The target path of the image.
-     * @param array $options An array of options for saving the image. This is passed through from **resize** and looks at the following option:
-     *
-     * - **icoSizes**: Additional icon sizes for .ico files as an array in the form `[size|'wxh'|[w, h], ...]`.
+     * @param mixed $maybeResource
+     * @return bool
      */
-    private function saveIco($img, $path, $options)
+    private function isGdResource($maybeResource)
     {
-        $tmpPath = tempnam(sys_get_temp_dir(), "ico");
-        $this->saveImage($img, $tmpPath, IMAGETYPE_PNG, $options);
-
-        $sizes = [];
-        if (!empty($options["icoSizes"])) {
-            foreach ($options["icoSizes"] as $size) {
-                if (is_array($size)) {
-                    $sizes[] = $size;
-                } elseif (is_int($size)) {
-                    $sizes[] = [$size, $size];
-                } elseif (preg_match('`^(\d+)x(\d+)$`i', $size, $m)) {
-                    $sizes[] = [(int) $m[1], (int) $m[2]];
-                }
-            }
+        if (class_exists("GdImage")) {
+            // PHP 8.x
+            return is_a($maybeResource, \GdImage::class);
+        } else {
+            // PHP 7.4
+            return is_resource($maybeResource);
         }
-        // Put original size last so it shows up as the size with getimagesize().
-        $sizes[] = [$options["width"], $options["height"]];
-
-        $ico = new \PHP_ICO($tmpPath, $sizes);
-        try {
-            $ico->save_ico($path);
-        } finally {
-            unlink($tmpPath);
-        }
-    }
-
-    /**
-     * Should GIFs always be rewritten? GIFs will be rewritten if they exceed limits, regardless of this setting.
-     * Rewriting animated GIFs will result in loss of animation.
-     *
-     * @param bool $alwaysRewriteGif
-     * @return self
-     * @deprecated This is essentially a noop. The target property isn't used.
-     */
-    public function setAlwaysRewriteGif(bool $alwaysRewriteGif): self
-    {
-        $this->alwaysRewriteGif = $alwaysRewriteGif;
-        return $this;
     }
 }

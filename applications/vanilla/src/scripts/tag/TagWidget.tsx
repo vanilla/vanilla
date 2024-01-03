@@ -14,6 +14,7 @@ import { Metas, MetaTag } from "@library/metas/Metas";
 import { TagPreset } from "@library/metas/Tags.variables";
 import { tagWidgetClasses } from "@vanilla/addon-vanilla/tag/TagWidget.classes";
 import { Tag } from "@library/metas/Tags";
+import { getMeta } from "@library/utility/appUtils";
 
 interface IProps {
     tags: ITag[];
@@ -32,6 +33,7 @@ export default function TagWidget(props: IProps) {
     const { subtitle, description, tags, containerOptions, itemOptions } = props;
     const title = props.title ?? t("Popular Tags");
     const classes = tagWidgetClasses(containerOptions);
+    const customLayoutsForDiscussionListIsEnabled = getMeta("featureFlags.customLayout.discussionList.Enabled", false);
 
     return (
         <HomeWidgetContainer title={title} subtitle={subtitle} description={description} options={containerOptions}>
@@ -42,7 +44,11 @@ export default function TagWidget(props: IProps) {
                             return (
                                 <MetaTag
                                     key={index}
-                                    to={`/discussions/tagged/${tag.urlcode}`}
+                                    to={
+                                        customLayoutsForDiscussionListIsEnabled
+                                            ? `/discussions?tagID=${tag.tagID}`
+                                            : `/discussions/tagged/${tag.urlcode}`
+                                    }
                                     preset={itemOptions?.tagPreset ?? TagPreset.STANDARD}
                                 >
                                     {tag.name} <span className={classNames(classes.count)}>{tag.countDiscussions}</span>

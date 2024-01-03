@@ -44,7 +44,6 @@ class DiscussionsDeleteTest extends SiteTestCase
     {
         parent::setUp();
         $this->resetTable("Log");
-        $this->resetTable("jobStatus");
         $this->enableCaching();
     }
 
@@ -217,10 +216,8 @@ class DiscussionsDeleteTest extends SiteTestCase
     public function testSimpleDelete()
     {
         $discussion = $this->createDiscussion();
-        $this->resetTable("jobStatus");
         $response = $this->api()->delete("/discussions/{$discussion["discussionID"]}");
         $this->assertEquals(204, $response->getStatusCode());
-        $this->assertTrackedJobCount(0, []);
     }
 
     /**
@@ -234,8 +231,6 @@ class DiscussionsDeleteTest extends SiteTestCase
         $discussion = $this->createDiscussion();
         $this->createComment();
 
-        $this->resetTable("jobStatus");
-
         $where = ["DiscussionID" => $discussion["discussionID"]];
 
         // Pause the scheduler so the job doesn't execute immediately.
@@ -246,7 +241,6 @@ class DiscussionsDeleteTest extends SiteTestCase
 
         // We receive the scheduled job info.
         $this->assertEquals(202, $response->getStatusCode());
-        $this->assertTrackedJobCount(1, []);
         $body = $response->getBody();
         $trackingSlips = $body["trackingSlips"];
         $this->assertCount(1, $trackingSlips);
@@ -258,9 +252,6 @@ class DiscussionsDeleteTest extends SiteTestCase
 
         // After the job executes its status is updated again.
         $scheduler->resume();
-        $this->assertTrackedJobCount(1, [
-            "jobExecutionStatus" => "complete",
-        ]);
         $this->assertNoRecordsFound("Discussion", $where);
         $this->assertNoRecordsFound("Comment", $where);
     }

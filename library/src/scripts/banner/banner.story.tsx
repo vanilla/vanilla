@@ -89,6 +89,10 @@ function StoryBannerWithScope(props: IStoryBannerProps) {
             value: "scope1",
         },
         {
+            name: "scope2",
+            value: "scope2",
+        },
+        {
             name: "Everywhere",
             value: "every-where",
         },

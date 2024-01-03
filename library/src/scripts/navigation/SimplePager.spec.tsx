@@ -4,9 +4,9 @@
  */
 
 import React from "react";
-import "@testing-library/jest-dom/extend-expect";
 import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import SimplePager from "@library/navigation/SimplePager";
+import "@testing-library/jest-dom";
 
 describe("SimplePager", () => {
     test("it renders back and forward links", async () => {

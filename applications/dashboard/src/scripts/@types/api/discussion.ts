@@ -1,15 +1,16 @@
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import { IReaction } from "@dashboard/@types/api/reaction";
 import { IUserFragment } from "@library/@types/api/users";
 import { IImage } from "@library/@types/api/core";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { RecordID } from "@vanilla/utils";
+import { LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { IReaction } from "@dashboard/@types/api/reaction";
 
 export interface IDiscussion {
     discussionID: RecordID;
@@ -50,8 +51,25 @@ export interface IDiscussion {
     unread?: boolean;
     countUnread?: number;
     bookmarked?: boolean;
+    dismissed?: boolean;
 
     reactions?: IReaction[];
+    status?: IRecordStatus;
+}
+
+export interface IRecordStatus {
+    statusID: number;
+    name: string;
+    state: "open" | "closed";
+    recordType: string;
+    recordSubType: string;
+    log?: IRecordStatusLog;
+}
+
+export interface IRecordStatusLog {
+    reasonUpdated: string;
+    dateUpdated: string;
+    updateUser?: IUserFragment;
 }
 
 export interface IDiscussionEdit {
@@ -75,11 +93,28 @@ export interface IDiscussionEmbed {
 }
 
 export interface IGetDiscussionListParams {
-    limit?: number;
+    limit?: number | string;
     page?: number;
     discussionID?: IDiscussion["discussionID"] | Array<IDiscussion["discussionID"]>;
     expand?: string | string[];
     followed?: boolean;
     featuredImage?: boolean;
     fallbackImage?: string;
+    sort?: DiscussionListSortOptions;
+    pinOrder?: "mixed" | "first";
+    type?: string[];
+    tagID?: string;
+    internalStatusID?: number[];
+    statusID?: number[];
+    layoutViewType?: LayoutViewType;
+    categoryID?: number;
+    categoryUrlCode?: string;
+}
+
+export enum DiscussionListSortOptions {
+    RECENTLY_COMMENTED = "-dateLastComment",
+    RECENTLY_CREATED = "-dateInserted",
+    TOP = "-score",
+    TRENDING = "-hot",
+    OLDEST = "dateInserted",
 }

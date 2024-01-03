@@ -1,14 +1,14 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GNU GPLv2 http://www.opensource.org/licenses/gpl-2.0.php
  */
 
 use Garden\Container\Reference;
 use Garden\EventManager;
-use Garden\Events\ResourceEvent;
 use Garden\PsrEventHandlersInterface;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
@@ -16,10 +16,10 @@ use Garden\Container\Container;
 use Vanilla\Community\Events\DiscussionStatusEvent;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RecordStatusStructureEvent;
+use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Forum\Modules\QnAWidgetModule;
-use Vanilla\QnA\Events\AnswerEvent;
 use Vanilla\QnA\Models\AnswerSearchType;
 use Vanilla\QnA\Models\QnAJsonLD;
 use Vanilla\QnA\Models\QuestionSearchType;
@@ -40,18 +40,16 @@ use Vanilla\Widgets\WidgetService;
 class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHandlersInterface
 {
     use LoggerAwareTrait;
+
     /**
      * This is the name of the feature flag to display QnA tag in the discussion.
      */
     const FEATURE_FLAG = "DiscussionQnATag";
 
-    /** @var string Question follow up feature flag key */
-    const FOLLOWUP_FLAG = "QnAFollowUp";
-
-    /** @var string key used when normalizing a record*/
+    /** @var string key used when normalizing a record */
     const QNA_KEY = "qnA";
 
-    /** @var int  */
+    /** @var int */
     private const ANSWERED_LIMIT = 100;
 
     /** @var int Maximum unanswered ideas to be counted. */
@@ -63,13 +61,13 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     /** @var int Threshold in which follow up stops checking statuses */
     private $followUpThreshold = 60;
 
-    /** @var int Threshold timeout when sending emails*/
+    /** @var int Threshold timeout when sending emails */
     private const EMAIL_TIMEOUT_THRESHOLD = 30;
 
-    /** @var bool|array  */
+    /** @var bool|array */
     protected $Reactions = false;
 
-    /** @var bool|array  */
+    /** @var bool|array */
     protected $Badges = false;
 
     /** @var bool */
@@ -102,7 +100,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     /** @var int */
     private $unansweredCountLimit = self::UNANSWERED_COUNT_LIMIT_DEFAULT;
 
-    /** @var FormatService  */
+    /** @var FormatService */
     private $formatService;
 
     /** @var DiscussionStatusModel */
@@ -269,7 +267,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $filterKeys = array_map("strtolower", [QnaModel::ACCEPTED, QnaModel::ANSWERED, QnaModel::UNANSWERED]);
         $this->discussionModel->addFilterSet("qna", "All Questions", [], false);
         foreach ($filterKeys as $filterKey) {
-            $this->discussionModel->addFilter($filterKey, "qna", ["QnA" => $filterKey], "", "qna");
+            $this->discussionModel->addFilter($filterKey, "qna", [], "", "qna");
         }
     }
 
@@ -355,7 +353,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             "QnA.Points.Enabled" => c("QnA.Points.Enabled", false),
             "QnA.Points.Answer" => c("QnA.Points.Answer", 1),
             "QnA.Points.AcceptedAnswer" => c("QnA.Points.AcceptedAnswer", 1),
-            "Feature.QnAFollowUp.Enabled" => c("Feature.QnAFollowUp.Enabled", false),
+            "QnA.FollowUp.Enabled" => c("QnA.FollowUp.Enabled", false),
             "QnA.FollowUp.Interval" => c("QnA.FollowUp.Interval", $this->getFollowUpInterval()),
         ]);
 
@@ -382,7 +380,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
                 }
             }
 
-            if ($sender->Form->getFormValue("Feature.QnAFollowUp.Enabled")) {
+            if ($sender->Form->getFormValue("QnA.FollowUp.Enabled")) {
                 //add custom validation rule
                 $configurationModel->Validation->addRule("validatePositiveNumber", "function:validatePositiveNumber");
 
@@ -467,6 +465,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $category = val("Category", $args);
         if (empty($category) || !c("Plugins.QnA.UseBigButtons")) {
             $args["Types"]["Question"] = [
+                "layoutViewType" => "questionThread",
                 "apiType" => "question",
                 "Singular" => "Question",
                 "Plural" => "Questions",
@@ -870,9 +869,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
                 $ActivityModel->saveQueue();
 
                 $this->EventArguments["Activity"] = &$activity;
-                $data = $this->commentModel->getID($commentID, DATASET_TYPE_ARRAY);
-                $answerEvent = new AnswerEvent(AnswerEvent::ACTION_ANSWER_ACCEPTED, ["answer" => $data], $sender);
-                $this->eventManager->dispatch($answerEvent);
             }
         }
         redirectTo("/discussion/comment/{$comment["CommentID"]}#Comment_{$comment["CommentID"]}", 302, false);
@@ -1258,7 +1254,8 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      */
     public function discussionsController_unanswered_create($sender, $args)
     {
-        if (\Vanilla\FeatureFlagHelper::featureEnabled("customLayout.discussionList")) {
+        // The frontend part of this isn't ready yet as it doesn't handle the appropriate url querystring.
+        if (\Vanilla\FeatureFlagHelper::featureEnabled("customLayout.discussionList.QnAPlugin")) {
             redirectTo("/discussions?type=question&status=unanswered");
         }
         $sender->View = "Index";
@@ -1554,12 +1551,13 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      */
     public function postController_question_create($sender, $categoryUrlCode = "")
     {
+        $category = null;
         $categoryModel = new CategoryModel();
         if ($categoryUrlCode != "") {
             $category = (array) $categoryModel->getByCode($categoryUrlCode);
             $category = $categoryModel::permissionCategory($category);
             $isAllowedTypes = isset($category["AllowedDiscussionTypes"]);
-            $isAllowedQuestion = in_array("Question", $category["AllowedDiscussionTypes"]);
+            $isAllowedQuestion = in_array("Question", (array) $category["AllowedDiscussionTypes"]);
         }
 
         if ($category && !$isAllowedQuestion && $isAllowedTypes) {
@@ -1579,7 +1577,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     public function postController_beforeDiscussionRender_handler($sender)
     {
         // Override if we are looking at the question url.
-        if ($sender->RequestMethod == "question") {
+        if ($sender->RequestMethod == "question" || $sender->data("Type") == "Question") {
             $sender->Form->addHidden("Type", "Question");
             $sender->title(t("Ask a Question"));
             $sender->setData("Breadcrumbs", [["Name" => $sender->data("Title"), "Url" => "/post/question"]]);
@@ -1630,14 +1628,14 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      */
     public function fullQuestionMetaDataSchema()
     {
-        return Schema::parse([
+        $schema = Schema::parse([
             "status:s" => [
                 "enum" => ["unanswered", "answered", "accepted", "rejected"],
                 "description" => "The answering state of the question.",
             ],
             "dateAccepted:dt|n" => "When an answer was accepted.",
             "dateAnswered:dt|n" => "When the last answer was inserted.",
-            "acceptedAnswers" => [
+            "acceptedAnswers?" => [
                 "object" => "Accepted answers.",
                 "type" => "array",
                 "items" => Schema::parse([
@@ -1652,6 +1650,29 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
                 ]),
             ],
         ]);
+
+        if ($this->session->checkPermission(["Garden.Curation.Manage"])) {
+            $schema->merge(
+                Schema::parse([
+                    "rejectedAnswers?" => [
+                        "object" => "Rejected answers.",
+                        "type" => "array",
+                        "items" => Schema::parse([
+                            "commentID" => [
+                                "type" => "integer",
+                                "description" => "Unique ID of the accepted answer's comment row.",
+                            ],
+                            "body?" => [
+                                "type" => "string",
+                                "description" => "Rendered content of the answer.",
+                            ],
+                        ]),
+                    ],
+                ])
+            );
+        }
+
+        return $schema;
     }
 
     /**
@@ -1664,7 +1685,12 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $schema->merge(
             Schema::parse([
                 "status:s?" => [
-                    "enum" => array_map("strtolower", [QnaModel::ACCEPTED, QnaModel::ANSWERED, QnaModel::UNANSWERED]),
+                    "enum" => array_map("strtolower", [
+                        QnaModel::ACCEPTED,
+                        QnaModel::ANSWERED,
+                        QnaModel::UNANSWERED,
+                        QnaModel::REJECTED,
+                    ]),
                 ],
             ])
         );
@@ -1693,6 +1719,31 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $where["statusID"] = $status["statusID"];
 
         return $where;
+    }
+
+    /**
+     * Add answer status to comment schema.
+     *
+     * @param Schema $schema
+     */
+    public function commentIndexSchema_init(Schema $schema)
+    {
+        $schema
+            ->merge(
+                Schema::parse([
+                    "qna:s?" => [
+                        "enum" => array_map("strtolower", [QnaModel::ACCEPTED, QnaModel::REJECTED]),
+                        "x-filter" => [
+                            "field" => "c.QnA",
+                        ],
+                    ],
+                ])
+            )
+            ->addValidator("qna", function ($data) {
+                if ($data == "rejected" && !$this->session->checkPermission(["Garden.Curation.Manage"])) {
+                    throw new PermissionException("Garden.Curation.Manage");
+                }
+            });
     }
 
     /**
@@ -1732,6 +1783,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         // Add expanding a discussion's accepted answer content.
         $expand = $schema->getField("properties.expand.items.enum");
         $expand[] = "acceptedAnswers";
+        $expand[] = "rejectedAnswers";
         $schema->setField("properties.expand.items.enum", $expand);
     }
 
@@ -1758,7 +1810,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             "status" => !empty($status) ? strtolower($status["name"]) : "unanswered",
             "dateAccepted" => $discussion["dateAccepted"],
             "dateAnswered" => $discussion["dateOfAnswer"],
-            "acceptedAnswers" => $acceptedAnswers,
         ];
 
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $options["expand"] ?? [])) {
@@ -1768,32 +1819,50 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             return $discussion;
         }
 
-        $expandAnswers = $discussionsApiController->isExpandField("acceptedAnswers", $options["expand"] ?? []);
+        $expandAccepted = $discussionsApiController->isExpandField("acceptedAnswers", $options["expand"] ?? []);
+        $expandRejected = $discussionsApiController->isExpandField("rejectedAnswers", $options["expand"] ?? []);
 
-        if (!$expandAnswers) {
+        if (!$expandAccepted && !$expandRejected) {
             return $discussion;
         }
 
-        $acceptedAnswerRows = $this->commentModel
+        if ($expandAccepted) {
+            $acceptedAnswers = $this->getDiscussionAnswersByType($discussion["discussionID"], "accepted");
+            $discussion["attributes"]["question"]["acceptedAnswers"] = $acceptedAnswers;
+        }
+
+        if ($expandRejected) {
+            if ($this->session->checkPermission(["Garden.Curation.Manage"])) {
+                $rejectedAnswers = $this->getDiscussionAnswersByType($discussion["discussionID"], "rejected");
+            } else {
+                $rejectedAnswers = [];
+            }
+            $discussion["attributes"]["question"]["rejectedAnswers"] = $rejectedAnswers;
+        }
+
+        return $discussion;
+    }
+
+    private function getDiscussionAnswersByType(int $discussionID, string $type): array
+    {
+        $type = ucfirst($type);
+        $answers = [];
+        $answerRows = $this->commentModel
             ->getWhere([
-                "DiscussionID" => $discussion["discussionID"],
-                "Qna" => "Accepted",
+                "DiscussionID" => $discussionID,
+                "Qna" => $type,
             ])
             ->resultArray();
 
-        foreach ($acceptedAnswerRows as $comment) {
+        foreach ($answerRows as $comment) {
             $answer = [
                 "commentID" => $comment["CommentID"],
+                "body" => Gdn_Format::to($comment["Body"], $comment["Format"]),
             ];
-            if ($expandAnswers) {
-                $answer["body"] = Gdn_Format::to($comment["Body"], $comment["Format"]);
-            }
-            $acceptedAnswers[] = $answer;
+            $answers[] = $answer;
         }
 
-        $discussion["attributes"]["question"]["acceptedAnswers"] = $acceptedAnswers;
-
-        return $discussion;
+        return $answers;
     }
 
     /**
@@ -1849,7 +1918,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
 
     /**
      * Apply expand query params for api queries.
-
      * @param string $recordType
      * @return array
      */
@@ -1893,6 +1961,10 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             return $comment;
         }
 
+        if (!$this->session->checkPermission("Garden.Curation.Manage") && strtolower($comment["qnA"]) === "rejected") {
+            $comment["qna"] = "pending";
+        }
+
         $comment = $this->answerModel->normalizeRow($comment);
         return $comment;
     }
@@ -1900,11 +1972,11 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     /**
      * Create PATCH /comments/answer endpoint.
      *
-     * @throws ClientException
      * @param CommentsApiController $sender
      * @param int $id
      * @param array $body
      * @return array
+     * @throws ClientException
      */
     public function commentsApiController_patch_answer(CommentsApiController $sender, $id, array $body)
     {
@@ -1976,9 +2048,9 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      */
     public function dbaController_countJobs_handler($sender)
     {
-        $name = "Recalculate Discussion.QnA";
+        $name = "Recalculate Discussion.statusID";
         // We name the table QnA and not Discussion because the model is instantiated from the table name in DBAModel.
-        $url = "/dba/counts.json?" . http_build_query(["table" => "QnA", "column" => "QnA"]);
+        $url = "/dba/counts.json?" . http_build_query(["table" => "QnA", "column" => "statusID"]);
         $sender->Data["Jobs"][$name] = $url;
     }
 
@@ -1999,19 +2071,19 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         );
         if ($this->questionFollowUpFeatureEnabled()) {
             $sender->Preferences["Notifications"]["Email.QuestionFollowUp"] = t(
-                "Send me a follow-up for my answered questions."
+                "Send me a follow-up for my answered questions"
             );
         }
     }
 
     /**
-     * Check of FOLLOWUP_FLAG is enabled.
+     * Check if Question Follow-Up is enabled.
      *
      * @return bool
      */
     private function questionFollowUpFeatureEnabled(): bool
     {
-        return \Vanilla\FeatureFlagHelper::featureEnabled(static::FOLLOWUP_FLAG);
+        return Gdn::config()->get("QnA.FollowUp.Enabled");
     }
 
     /**
@@ -2020,15 +2092,17 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      *
      * @param DiscussionsApiController $sender
      * @param array $body
-     * @throws Exception If the feature flag is not enabled.
      * @return mixed
+     * @throws Exception If the feature flag is not enabled.
      */
     public function discussionsApiController_post_questionNotifications(DiscussionsApiController $sender, array $body)
     {
         $in = $sender->schema($this->qnaFollowUpNotificationInSchema(), "in");
         $out = $sender->schema($this->qnaFollowUpNotificationOutSchema(), "out");
         $result = ["notificationsSent" => 0];
-        \Vanilla\FeatureFlagHelper::ensureFeature(static::FOLLOWUP_FLAG);
+        if (!$this->questionFollowUpFeatureEnabled()) {
+            throw new ClientException("This feature is not enabled.");
+        }
 
         $sender->permission("Garden.Community.Manage");
 
@@ -2137,6 +2211,10 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $timeThreshold = DateTimeFormatter::timeStampToDateTime(
             strtotime("-" . $this->getFollowUpThreshold() . "days")
         );
+        // Should respect interval, and not send email too soon.
+        $timeSinceThreshold = DateTimeFormatter::timeStampToDateTime(
+            strtotime("-" . $this->getFollowUpInterval() . "days")
+        );
 
         if ($discussionID) {
             $discussionsAnswered = $this->discussionModel
@@ -2155,6 +2233,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
                         [
                             "statusID" => self::DISCUSSION_STATUS_ANSWERED,
                             "DateLastComment >" => $timeThreshold,
+                            "DateLastComment <" => $timeSinceThreshold,
                         ],
                         "",
                         "",
@@ -2172,12 +2251,12 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     }
 
     /**
-     * Sends an email to all users that have answered discussions.
+     * Sends an email to the user that has asked a question in the discussions.
      *
      * @param array $discussion
      * @param string $userEmail
-     * @throws Exception Email sending failed.
      * @return bool $isSent If sending email was successful.
+     * @throws Exception Email sending failed.
      */
     private function sendNotificationEmails(array $discussion, string $userEmail)
     {

@@ -12,7 +12,7 @@ import { userDropDownClasses } from "@library/headers/mebox/pieces/userDropDownS
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { titleBarClasses } from "@library/headers/titleBarStyles";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import { t } from "@library/utility/appUtils";
+import { getMeta, t } from "@library/utility/appUtils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import classNames from "classnames";
 import React, { useEffect, useMemo, useState } from "react";
@@ -49,7 +49,7 @@ export function UserDropDown(props: IProps) {
             name={t("My Account")}
             buttonClassName={classNames(classesHeader.button)}
             contentsClassName={classNames(classes.contents, classesHeader.dropDownContents)}
-            renderLeft={true}
+            renderLeft={!getMeta("ui.isDirectionRTL", false)}
             buttonContents={
                 <MeBoxIcon compact={false}>
                     <UserPhoto

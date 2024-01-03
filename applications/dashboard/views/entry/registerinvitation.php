@@ -23,14 +23,19 @@
                 <?php
                 echo $this->Form->label('Username', 'Name');
                 echo $this->Form->textBox('Name', ['autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => TRUE]);
-                echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.t('Name Unavailable').'</span>';
+                echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">' . t('Name Unavailable') . '</span>';
                 ?>
             </li>
-            <?php $this->fireEvent('RegisterBeforePassword'); ?>
+            <?php
+            if ($this->hasCustomProfileFields()) {
+                $this->generateFormCustomProfileFields();
+            }
+            $this->fireEvent('RegisterBeforePassword');
+            ?>
             <li>
                 <?php
                 echo $this->Form->label('Password', 'Password');
-                echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')).' '.t('For a stronger password, increase its length or combine upper and lowercase letters, digits, and symbols.'), 'div', ['class' => 'Gloss']);
+                echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')) . ' ' . t('For a stronger password, increase its length or combine upper and lowercase letters, digits, and symbols.'), 'div', ['class' => 'Gloss']);
                 echo $this->Form->input('Password', 'password', ['Wrap' => true, 'Strength' => TRUE]);
                 ?>
             </li>

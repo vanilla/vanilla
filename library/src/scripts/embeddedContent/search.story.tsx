@@ -34,7 +34,7 @@ import { t } from "@vanilla/i18n/src";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { useSection } from "@library/layout/LayoutContext";
 import classNames from "classnames";
-import { PlacesResultMeta } from "@dashboard/components/panels/registerPlaceSearchDomain";
+import { PlacesResultMeta } from "@dashboard/components/panels/PlacesSearchDomain.loadable";
 
 const story = storiesOf("Search", module);
 

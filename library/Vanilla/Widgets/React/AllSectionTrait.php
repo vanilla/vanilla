@@ -10,7 +10,9 @@ namespace Vanilla\Widgets\React;
 use Vanilla\Layout\Section\SectionFullWidth;
 use Vanilla\Layout\Section\SectionOneColumn;
 use Vanilla\Layout\Section\SectionThreeColumns;
+use Vanilla\Layout\Section\SectionThreeColumnsEven;
 use Vanilla\Layout\Section\SectionTwoColumns;
+use Vanilla\Layout\Section\SectionTwoColumnsEven;
 
 /**
  * All placement in all sections.
@@ -28,6 +30,8 @@ trait AllSectionTrait
             SectionTwoColumns::getWidgetID(),
             SectionThreeColumns::getWidgetID(),
             SectionFullWidth::getWidgetID(),
+            SectionThreeColumnsEven::getWidgetID(),
+            SectionTwoColumnsEven::getWidgetID(),
         ];
     }
 }

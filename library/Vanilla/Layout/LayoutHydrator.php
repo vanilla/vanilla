@@ -8,6 +8,7 @@
 namespace Vanilla\Layout;
 
 use Garden\Container\Container;
+use Garden\Container\ContainerException;
 use Garden\Hydrate\DataHydrator;
 use Garden\Hydrate\Middleware\AbstractMiddleware;
 use Garden\Hydrate\Resolvers\AbstractDataResolver;
@@ -26,7 +27,9 @@ use Vanilla\Layout\Resolvers\ReactResolver;
 use Vanilla\Layout\Section\SectionFullWidth;
 use Vanilla\Layout\Section\SectionOneColumn;
 use Vanilla\Layout\Section\SectionThreeColumns;
+use Vanilla\Layout\Section\SectionThreeColumnsEven;
 use Vanilla\Layout\Section\SectionTwoColumns;
+use Vanilla\Layout\Section\SectionTwoColumnsEven;
 use Vanilla\Layout\View\AbstractCustomLayoutView;
 use Vanilla\Layout\View\CommonLayoutView;
 use Vanilla\Layout\View\HomeLayoutView;
@@ -35,6 +38,7 @@ use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Web\PageHead;
 use Vanilla\Web\PageHeadAwareInterface;
 use Vanilla\Web\PageHeadInterface;
+use Vanilla\Widgets\DynamicContainerSchemaOptions;
 use Vanilla\Widgets\React\BannerFullWidget;
 use Vanilla\Widgets\React\BannerContentWidget;
 use Vanilla\Widgets\React\HtmlReactWidget;
@@ -68,18 +72,27 @@ final class LayoutHydrator
     /** @var PageHead */
     private $pageHead;
 
+    /** @var DynamicContainerSchemaOptions */
+    private DynamicContainerSchemaOptions $dynamicSchemaOptions;
+
     /**
      * DI.
      *
      * @param Container $container
      * @param CommonLayoutView $commonLayout
      * @param ReactLayoutExceptionHandler $reactExceptionHandler
+     * @param DynamicContainerSchemaOptions $dynamicSchemaOptions
+     *
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
      */
     public function __construct(
         Container $container,
         CommonLayoutView $commonLayout,
-        ReactLayoutExceptionHandler $reactExceptionHandler
+        ReactLayoutExceptionHandler $reactExceptionHandler,
+        DynamicContainerSchemaOptions $dynamicSchemaOptions
     ) {
+        $this->dynamicSchemaOptions = $dynamicSchemaOptions;
         $this->container = $container;
         $this->commonLayout = $commonLayout;
         $this->dataHydrator = new DataHydrator();
@@ -92,10 +105,14 @@ final class LayoutHydrator
 
         // Register core react widget resolvers.
         $this->addReactResolver(HtmlReactWidget::class)
-            ->addReactResolver(SectionThreeColumns::class)
-            ->addReactResolver(SectionTwoColumns::class)
             ->addReactResolver(SectionOneColumn::class)
             ->addReactResolver(SectionFullWidth::class)
+
+            ->addReactResolver(SectionTwoColumns::class)
+            ->addReactResolver(SectionTwoColumnsEven::class)
+
+            ->addReactResolver(SectionThreeColumns::class)
+            ->addReactResolver(SectionThreeColumnsEven::class)
             ->addReactResolver(QuickLinksWidget::class)
             ->addReactResolver(LeaderboardWidget::class)
             ->addReactResolver(BannerFullWidget::class)
@@ -251,15 +268,17 @@ final class LayoutHydrator
     /**
      * Validate and hydrate provided layout.
      *
-     * @param string $layoutViewType Layout Type.
+     * @param string|null $layoutViewType Layout Type.
      * @param array $params parameters to hydrate the layout.
      * @param array $layout layout data
      * @param bool $includeMeta should metadata be included?
      *
      * @return array returns hydrated content.
+     * @throws NotFoundException
+     * @throws ValidationException
      */
     public function hydrateLayout(
-        string $layoutViewType,
+        ?string $layoutViewType,
         array $params,
         array $layout,
         ?bool $includeMeta = true
@@ -271,13 +290,17 @@ final class LayoutHydrator
 
         $hydrator = $this->getHydrator($layoutViewType, $cleanPageHead, false, $params);
         $result = $hydrator->resolve($layout, $params);
+        $seoContents = array_column($result["layout"] ?? [], '$seoContent');
+        $seoContent = implode("", $seoContents);
         if ($includeMeta) {
             // Apply pageHead meta
             $result["seo"] = [
+                "htmlContents" => $seoContent,
                 "title" => $cleanPageHead->getSeoTitle(),
                 "description" => $cleanPageHead->getSeoDescription(),
                 "meta" => $cleanPageHead->getMetaTags(),
                 "links" => $cleanPageHead->getLinkTags(),
+                "url" => $cleanPageHead->getCanonicalUrl(),
                 "json-ld" => $cleanPageHead->getJsonLDScriptContent(),
             ];
         }
@@ -302,8 +325,8 @@ final class LayoutHydrator
         $widgetNames = [];
         foreach ($hydrator->getResolvers() as $resolver) {
             if ($resolver instanceof LayoutAssetAwareInterface) {
-                $widget = $resolver->getWidgetNames();
-                $widgetNames = array_merge($widgetNames, $widget == null ? [] : $widget);
+                $resolverWidgets = $resolver->getWidgetNames();
+                $widgetNames = array_merge($widgetNames, $resolverWidgets);
             }
         }
 
@@ -357,7 +380,7 @@ final class LayoutHydrator
         $resolvers = array_filter([$this->commonLayout, $layoutView]);
         $resolvedParams = $inputParams;
         foreach ($resolvers as $resolver) {
-            $resolvedParams = $resolver->resolveParams($resolvedParams, $pageHead);
+            $resolvedParams = $resolver->resolveParams($resolvedParams, $pageHead) + $resolvedParams;
         }
         $resolvedParams = $resolvedParamSchema->validate($resolvedParams);
 
@@ -373,6 +396,7 @@ final class LayoutHydrator
      * @param array $resolvedParams The resolved hydration parameters.
      *
      * @return DataHydrator
+     * @throws NotFoundException
      */
     public function getHydrator(
         ?string $layoutViewType,
@@ -380,6 +404,7 @@ final class LayoutHydrator
         ?bool $onlyGetAsset = null,
         array $resolvedParams = []
     ): DataHydrator {
+        $this->applyDynamicSchemas($layoutViewType);
         $dataHydrator = $this->dataHydrator;
         $layoutView = $this->getLayoutViewType($layoutViewType);
         if ($layoutView) {
@@ -416,6 +441,7 @@ final class LayoutHydrator
      */
     public function getSchema(?string $layoutViewType): Schema
     {
+        $this->applyDynamicSchemas($layoutViewType);
         $dataHydrator = $this->getHydrator($layoutViewType);
 
         $schemaGenerator = $dataHydrator->getSchemaGenerator();
@@ -441,11 +467,38 @@ final class LayoutHydrator
     }
 
     /**
+     * Apply dynamic schema options to {@link DynamicContainerSchemaOptions}
+     *
+     * @param string|null $layoutViewType
+     */
+    private function applyDynamicSchemas(?string $layoutViewType)
+    {
+        $this->dynamicSchemaOptions->reset();
+        if ($layoutViewType === "subcommunityHome") {
+            $this->dynamicSchemaOptions->addDescriptionChoice("siteSection/description", "Subcommunity Description");
+            $this->dynamicSchemaOptions->addTitleChoice("siteSection/name", "Subcommunity Title");
+        } else {
+            $this->dynamicSchemaOptions->addDescriptionChoice("siteSection/description", "Site Description");
+            $this->dynamicSchemaOptions->addTitleChoice("siteSection/name", "Banner Title");
+        }
+
+        switch ($layoutViewType) {
+            case "discussionCategoryPage":
+            case "nestedCategoryList":
+            case "discussionThread":
+                $this->dynamicSchemaOptions->addDescriptionChoice("category/description", "Category Description");
+                $this->dynamicSchemaOptions->addTitleChoice("category/name", "Category Name");
+                break;
+        }
+    }
+
+    /**
      * Get a layout view type.
      *
      * @param string|null $layoutViewType
      *
      * @return AbstractCustomLayoutView|null
+     * @throws NotFoundException
      */
     public function getLayoutViewType(?string $layoutViewType): ?AbstractCustomLayoutView
     {

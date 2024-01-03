@@ -69,7 +69,7 @@ export const discussionListClasses = useThemeCache(
 
         const options = {
             move: css({
-                minHeight: styleUnit(200),
+                minHeight: styleUnit(70),
             }),
         };
 
@@ -140,45 +140,66 @@ export const discussionListClasses = useThemeCache(
             background: ColorsUtils.colorOut(globalVars.mainColors.bg),
         });
 
+        const selectAllCheckBox = css({
+            "&&&": {
+                ...Mixins.padding({ bottom: 0, top: 2 }),
+                ...Mixins.margin({ right: 8 }),
+            },
+        });
+
         const assetHeader = css({
             display: "flex",
             alignItems: "center",
+            justifyContent: "space-between",
             "& > *:not(:first-child)": {
                 paddingLeft: 8,
             },
             paddingBottom: 16,
-            "&.alignJustified": {
-                justifyContent: "space-between",
-            },
-            "&.alignRight": {
-                justifyContent: "flex-end",
-            },
             "& > div": {
                 display: "flex",
                 flexDirection: "row",
+                justifyContent: "flex-start",
+                alignItems: "center",
+            },
+            "@media(max-width: 600px)": {
+                [`.${selectAllCheckBox}`]: {
+                    ...Mixins.padding({ right: 12 }),
+                },
             },
         });
 
-        const selectAllCheckBox = css({
-            "&&": {
-                ...Mixins.padding({ vertical: 0 }),
-            },
+        const filterBody = css({
+            ...Mixins.padding({ vertical: 24 }),
         });
 
-        const categoryFilterContainer = css({
+        const filterContainer = css({
             display: "flex",
             alignItems: "center",
+            ...Mixins.padding({ right: 1 }),
+        });
+
+        const filterAndSortingContainer = css({
+            display: "flex",
+            alignItems: "baseline",
             "& > span": {
                 paddingRight: 8,
             },
         });
 
-        const categoryFilterLabel = css({
+        const filterAndSortingLabel = css({
             whiteSpace: "nowrap",
         });
 
-        const categoryFilterDropdown = css({
-            minWidth: 160,
+        const filterAndSortingDropdown = css({
+            marginRight: "2rem",
+        });
+
+        const filterAndSortingButton = css({
+            display: "flex",
+            alignItems: "center",
+            "& > svg": {
+                ...Mixins.margin({ horizontal: 4 }),
+            },
         });
 
         return {
@@ -196,9 +217,12 @@ export const discussionListClasses = useThemeCache(
             userIcon,
             assetHeader,
             selectAllCheckBox,
-            categoryFilterContainer,
-            categoryFilterLabel,
-            categoryFilterDropdown,
+            filterBody,
+            filterContainer,
+            filterAndSortingContainer,
+            filterAndSortingLabel,
+            filterAndSortingDropdown,
+            filterAndSortingButton,
         };
     },
 );

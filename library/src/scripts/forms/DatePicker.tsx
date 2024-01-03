@@ -6,7 +6,7 @@
 
 import React from "react";
 import { NullComponent } from "@library/forms/select/overwrites";
-import DayPickerInput from "react-day-picker/DayPickerInput";
+import DayPicker from "react-day-picker/DayPicker";
 import { t } from "@library/utility/appUtils";
 import moment, { Moment } from "moment";
 import Button from "@library/forms/Button";
@@ -16,21 +16,34 @@ import { dropDownClasses } from "@library/flyouts/dropDownStyles";
 import { dayPickerClasses } from "@library/forms/datePickerStyles";
 import classNames from "classnames";
 import { LeftChevronIcon, RightChevronIcon } from "@library/icons/common";
+/**
+ * fixme: Use our own flyout, or wrap in a stacking context in the next iteration
+ * https://higherlogic.atlassian.net/browse/VNLA-3384
+ */
 import RelativePortal from "react-relative-portal";
 import "@library/forms/DatePicker.libStyles.scss";
+import { getRequiredID } from "@library/utility/idUtils";
+import { inputClasses } from "./inputStyles";
+import { DayPickerProps, Modifier } from "react-day-picker";
 
 interface IProps {
     value: string; // ISO formatted date
     onChange: (value: string) => void;
-    contentClassName?: string;
     inputClassName?: string;
+    datePickerDropdownClassName?: string;
     alignment: "left" | "right";
-    disabledDays?: any; // See http://react-day-picker.js.org/examples/disabled
+    max?: React.InputHTMLAttributes<HTMLInputElement>["max"];
+    min?: React.InputHTMLAttributes<HTMLInputElement>["min"];
+
+    onBlur?: DayPickerProps["onBlur"];
+    inputAriaLabel?: string;
+    id?: string;
+    fieldName?: string; //this one is for legacy form submits, hidden input should have a name so it appears in gdn form values
+    required?: boolean;
 }
 
 interface IState {
-    hasBadValue: boolean;
-    wasBlurred: boolean;
+    showPopover: boolean;
 }
 
 /**
@@ -42,8 +55,7 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
     };
 
     public state: IState = {
-        hasBadValue: false,
-        wasBlurred: false,
+        showPopover: false,
     };
 
     public render() {
@@ -52,79 +64,106 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
         const os = guessOperatingSystem();
         const useNativeInput = os === OS.ANDROID || os === OS.IOS;
 
-        return useNativeInput ? this.renderNativeInput() : this.renderReactInput();
-    }
-
-    /**
-     * Render a react day picker component.
-     */
-    private renderReactInput() {
         const value = this.props.value ? moment(this.props.value).toDate() : undefined;
         const classes = dayPickerClasses();
+        const ariaLabel = t("Date Input");
+        const id = getRequiredID({ id: this.props.id }, "datePicker");
+        const contentsClasses = classNames("dropDown-contents", dropDownClasses().contents, "isOwnWidth", {
+            isRightAligned: this.props.alignment === "right",
+        });
+
         return (
             <div className={classNames(classes.root)}>
-                <DayPickerInput
-                    format="YYYY-MM-DD"
-                    placeholder={t(`yyyy-mm-dd`)}
-                    value={value}
-                    overlayComponent={this.CustomOverlay}
-                    onDayChange={this.handleDayPickerChange}
-                    classNames={
-                        {
-                            container: classNames("dayPickerInput-container", this.props.contentClassName),
-                            overlay: "dayPickerInput-overlay",
-                        } as any
-                    }
-                    dayPickerProps={{
-                        captionElement: NullComponent,
-                        navbarElement: this.CustomNavBar,
-                        disabledDays: this.props.disabledDays,
-                        showOutsideDays: true,
+                <input
+                    id={id}
+                    name={this.props.fieldName}
+                    className={classNames(inputClasses().text, this.props.inputClassName)}
+                    aria-label={this.props.inputAriaLabel ? `${this.props.inputAriaLabel} ${ariaLabel}` : ariaLabel}
+                    type="date"
+                    role="date"
+                    max={this.props.max ? moment(this.props.max).format("YYYY-MM-DD") : undefined}
+                    min={this.props.min ? moment(this.props.min).format("YYYY-MM-DD") : undefined}
+                    onClick={(e) => {
+                        if (!useNativeInput) {
+                            e.preventDefault();
+                            this.setState({ showPopover: true });
+                        }
                     }}
-                    inputProps={{
-                        className: classNames("inputText", this.props.inputClassName, {
-                            isInvalid: this.state.hasBadValue && this.state.wasBlurred,
-                        }),
-                        "aria-label": t("Date Input ") + "(yyyy-mm-dd)",
-                        onBlur: this.handleBlur,
-                        onFocus: this.handleFocus,
-                        onChange: this.handleNativeInputChange,
-                    }}
+                    onChange={this.handleNativeInputChange}
+                    value={this.props.value ?? ""}
+                    onBlur={this.props.onBlur}
+                    required={this.props.required}
                 />
+
+                {this.state.showPopover && (
+                    <RelativePortal
+                        component="div"
+                        top={0}
+                        right={this.props.alignment === "right" ? 0 : undefined}
+                        className={classes.root}
+                        onOutClick={() => {
+                            this.setState({ showPopover: false });
+                        }}
+                    >
+                        <div
+                            className={classNames(
+                                "dropDown",
+                                dropDownClasses().root,
+                                this.props.datePickerDropdownClassName,
+                            )}
+                            role="dialog"
+                            aria-label={t("DatePicker")}
+                        >
+                            <div className={contentsClasses}>
+                                <DayPicker
+                                    onBlur={this.props.onBlur}
+                                    initialMonth={value}
+                                    selectedDays={[value]}
+                                    onDayClick={(date, { disabled, selected }) => {
+                                        if (disabled) {
+                                            return;
+                                        }
+                                        this.updateDate(moment(date));
+                                        this.setState({ showPopover: false });
+                                    }}
+                                    captionElement={NullComponent}
+                                    navbarElement={this.CustomNavBar}
+                                    disabledDays={
+                                        {
+                                            ...(this.props.max
+                                                ? {
+                                                      after: new Date(this.props.max),
+                                                  }
+                                                : undefined),
+
+                                            ...(this.props.min
+                                                ? {
+                                                      before: new Date(this.props.min),
+                                                  }
+                                                : undefined),
+                                        } as Modifier
+                                    }
+                                    showOutsideDays={true}
+                                />
+                            </div>
+                        </div>
+                    </RelativePortal>
+                )}
             </div>
         );
     }
 
-    /**
-     * Render a native date picker component. These can be much nicer on mobile devices.
-     */
-    private renderNativeInput() {
-        // The native date input MUST have it's value in short ISO format, even it doesn't display that way.
-        const value = this.props.value ? this.normalizeIsoString(this.props.value) : "";
-        return (
-            <input
-                className="inputText"
-                type="date"
-                placeholder={t(`yyyy-mm-dd`)}
-                onChange={this.handleNativeInputChange}
-                value={value}
-            />
-        );
-    }
+    private handleNativeInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.updateDate(event.target.value ? moment(event.target.value) : null, event.target.value === "");
+    };
 
     /**
      * Handle a new date.
      */
     private updateDate = (date?: Moment | null, isEmpty: boolean = false) => {
         if (date) {
-            this.setState({ hasBadValue: false });
             this.props.onChange(this.normalizeIsoString(date.toISOString()));
-        } else if (!isEmpty) {
-            // invalid date
-            this.setState({ hasBadValue: true });
-            this.props.onChange("");
         } else {
-            this.setState({ hasBadValue: false });
             this.props.onChange("");
         }
     };
@@ -135,56 +174,6 @@ export default class DatePicker extends React.PureComponent<IProps, IState> {
     private normalizeIsoString(isoDate: string): string {
         return isoDate.substr(0, 10);
     }
-
-    /**
-     * Track blurred state.
-     */
-    private handleBlur = (event: React.FocusEvent) => {
-        this.setState({ wasBlurred: true });
-    };
-
-    /**
-     * Track blurred state.
-     */
-    private handleFocus = (event: React.FocusEvent) => {
-        this.setState({ wasBlurred: false });
-    };
-
-    /**
-     * Handle changes in the day picker input. Eg. A day selection in the modal.
-     *
-     * Other changes will call the handleTextChange event.
-     */
-    private handleDayPickerChange = (date?: Date | null) => {
-        if (date) {
-            this.updateDate(moment(date));
-        }
-    };
-
-    /**
-     * Handle changes in the native input.
-     */
-    private handleNativeInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        this.updateDate(event.target.valueAsDate ? moment(event.target.valueAsDate) : null, event.target.value === "");
-    };
-
-    /**
-     * Override for the date pickers flyouts.
-     */
-    private CustomOverlay = ({ classNames: c, selectedDay, children, ...props }) => {
-        const classes = dropDownClasses();
-        const contentsClasses = classNames("dropDown-contents", classes.contents, "isOwnWidth", {
-            isRightAligned: this.props.alignment === "right",
-        });
-        return (
-            // dayPickerClasses needs to be reapplied here, because it's rendered outside the root
-            <RelativePortal component="div" top={0} right={0} className={dayPickerClasses().root}>
-                <div className={classNames("dropDown", classes.root)} {...props}>
-                    <div className={contentsClasses}>{children}</div>
-                </div>
-            </RelativePortal>
-        );
-    };
 
     /**
      * Override date pickers navigation component to use our icons.

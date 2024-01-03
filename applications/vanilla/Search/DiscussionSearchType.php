@@ -51,6 +51,8 @@ class DiscussionSearchType extends AbstractSearchType
     /** @var array extenders */
     protected $extenders = [];
 
+    protected $extendersEnabled = true;
+
     /** @var ConfigurationInterface */
     private $config;
 
@@ -137,7 +139,7 @@ class DiscussionSearchType extends AbstractSearchType
      */
     public function getResultItems(array $recordIDs, SearchQuery $query): array
     {
-        if ($query->supportsExtenders()) {
+        if ($this->allowsExtenders($query)) {
             foreach ($this->extenders as $extender) {
                 $extender->extendPermissions();
             }
@@ -204,7 +206,7 @@ class DiscussionSearchType extends AbstractSearchType
                 $query->setFilter("CategoryID", $categoryIDs);
             }
 
-            if ($query->supportsExtenders()) {
+            if ($this->allowsExtenders($query)) {
                 /** @var SearchTypeQueryExtenderInterface $extender */
                 foreach ($this->extenders as $extender) {
                     $extender->extendQuery($query);
@@ -225,6 +227,16 @@ class DiscussionSearchType extends AbstractSearchType
             $tagOp = $query->getQueryParameter("tagOperator", "or");
             if (!empty($tagIDs)) {
                 $query->setFilter("tagIDs", $tagIDs, false, $tagOp);
+            }
+
+            $includedInsertUserRoleIDs = $query->getQueryParameter("includedInsertUserRoleIDs");
+            if (!empty($includedInsertUserRoleIDs)) {
+                $query->setFilter("insertUserRoleIDs", $includedInsertUserRoleIDs);
+            }
+
+            $excludedInsertUserRoleIDs = $query->getQueryParameter("excludedInsertUserRoleIDs");
+            if (!empty($excludedInsertUserRoleIDs)) {
+                $query->setFilter("insertUserRoleIDs", $excludedInsertUserRoleIDs, false, SearchQuery::FILTER_OP_NOT);
             }
         }
     }
@@ -251,37 +263,35 @@ class DiscussionSearchType extends AbstractSearchType
     public function getQuerySchema(): Schema
     {
         return Schema::parse([
-            "discussionID:i?" => [
-                "x-search-scope" => true,
-            ],
-            "categoryID:i?" => [
-                "x-search-scope" => true,
-            ],
+            "discussionID:i?",
+            "categoryID:i?",
             "categoryIDs:a?" => [
                 "items" => [
                     "type" => "integer",
                 ],
-                "x-search-scope" => true,
             ],
-            "followedCategories:b?" => [
-                "x-search-filter" => true,
-            ],
-            "includeChildCategories:b?" => [
-                "x-search-filter" => true,
-            ],
-            "includeArchivedCategories:b?" => [
-                "x-search-filter" => true,
-            ],
+            "followedCategories:b?",
+            "includeChildCategories:b?",
+            "includeArchivedCategories:b?",
             "tags:a?" => [
                 "items" => [
                     "type" => "string",
                 ],
-                "x-search-filter" => true,
             ],
             "tagOperator:s?" => [
                 "items" => [
                     "type" => "string",
                     "enum" => [SearchQuery::FILTER_OP_OR, SearchQuery::FILTER_OP_AND],
+                ],
+            ],
+            "includedInsertUserRoleIDs:a?" => [
+                "items" => [
+                    "type" => "integer",
+                ],
+            ],
+            "excludedInsertUserRoleIDs:a?" => [
+                "items" => [
+                    "type" => "integer",
                 ],
             ],
         ]);
@@ -462,7 +472,7 @@ class DiscussionSearchType extends AbstractSearchType
             $query->getQueryParameter("categoryIDs"),
             "Discussion"
         );
-        if ($query->supportsExtenders()) {
+        if ($this->allowsExtenders($query)) {
             /** @var SearchTypeQueryExtenderInterface $extender */
             foreach ($this->extenders as $extender) {
                 $categoryIDs = $extender->extendCategories($categoryIDs);
@@ -522,5 +532,27 @@ class DiscussionSearchType extends AbstractSearchType
     public function guidToRecordID(int $guid): ?int
     {
         return ($guid - 1) / 10;
+    }
+
+    /**
+     * Enable or disable extenders for this search type.
+     *
+     * @param bool $state
+     * @return void
+     */
+    public function toggleExtenders(bool $state): void
+    {
+        $this->extendersEnabled = $state;
+    }
+
+    /**
+     * If the query supports extenders and extenders are enabled for this search type.
+     *
+     * @param SearchQuery $query
+     * @return bool
+     */
+    protected function allowsExtenders(SearchQuery $query): bool
+    {
+        return $query->supportsExtenders() && $this->extendersEnabled;
     }
 }

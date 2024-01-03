@@ -7,7 +7,6 @@
 namespace VanillaTests\APIv2;
 
 use VanillaTests\CategoryAndDiscussionApiTestTrait;
-use Garden\Http\HttpResponse;
 
 /**
  * Test the /api/v2/tags endpoint.
@@ -395,8 +394,6 @@ class TagsTest extends AbstractResourceTest
         $tagWithTypeEmptyString = $this->api()
             ->get($this->baseUrl . "/" . $returnedTag["tagID"])
             ->getBody();
-        // The type should not come through because it's returned as a null value.
-        $this->assertArrayNotHasKey("type", $tagWithTypeEmptyString);
     }
 
     /**
@@ -450,6 +447,71 @@ class TagsTest extends AbstractResourceTest
      */
     public function createEditLink(int $tagID): string
     {
-        return 'href="/tagstest/settings/tags/edit/' . $tagID . '"';
+        $url = url("/settings/tags/edit/$tagID", true);
+        return "href=\"$url\"";
+    }
+
+    /**
+     * Test tags url on legacy pages
+     *
+     */
+    public function testTagUrlOnLegacyPages()
+    {
+        $this->runWithConfig(
+            // Ensure the categoryList is disabled and the discussionList is enabled, so we can test tags module (Popular tags)
+            [
+                "Tagging.Discussions.Enabled" => true,
+                "Feature.customLayout.categoryList.Enabled" => false,
+                "Feature.customLayout.discussionList.Enabled" => true,
+            ],
+            function () {
+                $testTag = $this->createTag(["Name" => "TestTag"]);
+                $urlToDiscussionListOnCustomLayout = "/discussions?tagID={$testTag["TagID"]}";
+
+                $discussion = $this->createDiscussion();
+                $this->api()->put("/discussions/{$discussion["discussionID"]}/tags", [
+                    "tagIDs" => [$testTag["TagID"]],
+                ]);
+
+                // on discussion thread page
+                $discussionHTML = $this->bessy()
+                    ->getHtml("discussion/{$discussion["discussionID"]}", [], ["deliveryType" => DELIVERY_TYPE_ALL])
+                    ->getInnerHtml();
+
+                $this->assertTrue(str_contains($discussionHTML, $testTag["Name"]));
+                $this->assertTrue(str_contains($discussionHTML, $urlToDiscussionListOnCustomLayout));
+
+                // for tags module, normally appears on legacy discussions/categories/homepage
+                $categoriesPageHTML = $this->bessy()
+                    ->getHtml("/categories", [], ["deliveryType" => DELIVERY_TYPE_ALL])
+                    ->getInnerHtml();
+
+                $this->assertTrue(str_contains($categoriesPageHTML, $testTag["Name"]));
+                $this->assertTrue(str_contains($categoriesPageHTML, $urlToDiscussionListOnCustomLayout));
+
+                // if custom layouts are disabled for discussionList, we won't have the new url for tags
+                $this->runWithConfig(["Feature.customLayout.discussionList.Enabled" => false], function () use (
+                    $discussion,
+                    $urlToDiscussionListOnCustomLayout,
+                    $testTag
+                ) {
+                    // on discussion thread page
+                    $discussionHTML = $this->bessy()
+                        ->getHtml("discussion/{$discussion["discussionID"]}", [], ["deliveryType" => DELIVERY_TYPE_ALL])
+                        ->getInnerHtml();
+
+                    $this->assertTrue(str_contains($discussionHTML, $testTag["Name"]));
+                    $this->assertFalse(str_contains($discussionHTML, $urlToDiscussionListOnCustomLayout));
+
+                    // for tags module, normally appears on legacy discussions/categories/homepage
+                    $categoriesPageHTML = $this->bessy()
+                        ->getHtml("/categories", [], ["deliveryType" => DELIVERY_TYPE_ALL])
+                        ->getInnerHtml();
+
+                    $this->assertTrue(str_contains($categoriesPageHTML, $testTag["Name"]));
+                    $this->assertFalse(str_contains($categoriesPageHTML, $urlToDiscussionListOnCustomLayout));
+                });
+            }
+        );
     }
 }

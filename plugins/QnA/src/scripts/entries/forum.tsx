@@ -4,18 +4,17 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { onReady } from "@library/utility/appUtils";
-import { AjaxModal } from "../AjaxModal";
-import { loaderClasses } from "@library/loaders/loaderStyles";
+import { DiscussionListModule } from "@library/features/discussions/DiscussionListModule";
+import gdn from "@library/gdn";
 import Loader from "@library/loaders/Loader";
+import { loaderClasses } from "@library/loaders/loaderStyles";
 import ModalSizes from "@library/modal/ModalSizes";
 import { mountModal } from "@library/modal/mountModal";
-import { t } from "@vanilla/i18n";
-import gdn from "@library/gdn";
+import { onReady } from "@library/utility/appUtils";
 import { addComponent } from "@library/utility/componentRegistry";
-import { DiscussionListModule } from "@library/features/discussions/DiscussionListModule";
-import { registerQnaSearchTypes } from "../registerQnaSearchTypes";
+import { t } from "@vanilla/i18n";
+import React from "react";
+import { AjaxModal } from "../AjaxModal";
 
 /**
  * Hijack click because api request needs to be a POST
@@ -50,7 +49,6 @@ export async function hijackFollowUpClick(e) {
 }
 
 onReady(() => {
-    registerQnaSearchTypes();
     document.addEventListener("click", hijackFollowUpClick);
 });
 

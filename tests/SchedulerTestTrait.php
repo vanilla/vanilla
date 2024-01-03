@@ -7,16 +7,12 @@
 
 namespace VanillaTests;
 
-use Garden\Container\Reference;
 use Garden\Http\HttpResponse;
 use Garden\Web\Data;
-use Garden\Web\Dispatcher;
 use PHPUnit\Framework\TestCase;
-use Vanilla\Scheduler\Job\JobStatusModel;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerResult;
 use Vanilla\Scheduler\SchedulerInterface;
-use Vanilla\Web\Middleware\SystemTokenMiddleware;
 use VanillaTests\Fixtures\Scheduler\InstantScheduler;
 
 /**
@@ -48,32 +44,6 @@ trait SchedulerTestTrait
     protected function getLongRunner(): LongRunner
     {
         return \Gdn::getContainer()->get(LongRunner::class);
-    }
-
-    /**
-     * @return JobStatusModel
-     */
-    protected function getJobStatusModel(): JobStatusModel
-    {
-        return \Gdn::getContainer()->get(JobStatusModel::class);
-    }
-
-    /**
-     * Assert that there are a certain number of jobs with a particular status.
-     *
-     * @param int $expectedCount
-     * @param array $where
-     *
-     * @return array The results.
-     */
-    protected function assertTrackedJobCount(int $expectedCount, array $where): array
-    {
-        $where += [
-            "trackingUserID" => \Gdn::session()->UserID,
-        ];
-        $results = $this->getJobStatusModel()->select($where);
-        TestCase::assertCount($expectedCount, $results);
-        return $results;
     }
 
     /**
@@ -111,8 +81,13 @@ trait SchedulerTestTrait
         $response = $this->api()->post(
             "/calls/run",
             $callbackPayload,
-            ["Content-Type" => SystemTokenMiddleware::AUTH_CONTENT_TYPE],
-            ["throw" => false]
+            [
+                "content-type" => "application/system+jwt",
+            ],
+            [
+                "timeout" => 25,
+                "throw" => false,
+            ]
         );
         return $response;
     }

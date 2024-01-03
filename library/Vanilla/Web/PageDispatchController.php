@@ -17,6 +17,8 @@ use Garden\Web\PageControllerRoute;
 use Garden\Web\ResourceRoute;
 use Vanilla\InjectableInterface;
 use Vanilla\Utility\StringUtils;
+use Vanilla\Utility\Timers;
+use Vanilla\Utility\TracedContainer;
 
 /**
  * A controller used for mapping from the dispatcher to individual page components.
@@ -58,8 +60,14 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      */
     protected function usePage(string $pageClass): Page
     {
-        $page = $this->container->get($pageClass);
+        $span = Timers::instance()->startGeneric("create-page", [
+            "name" => "Create Page - {$pageClass}",
+        ]);
+        $page = TracedContainer::trace(function () use ($pageClass) {
+            return $this->container->get($pageClass);
+        });
         $this->activePage = $page;
+        $span->finish();
         return $page;
     }
 
@@ -72,6 +80,8 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      * @param string $title The title to use.
      *
      * @return Page
+     * @throws ContainerException
+     * @throws NotFoundException
      */
     protected function useSimplePage(string $title): Page
     {
@@ -102,7 +112,11 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
      */
     public function handleException(\Throwable $e): Data
     {
-        $activePage = $this->activePage ?? $this->container->get(SimpleTitlePage::class);
+        $activePage = $this->activePage ?? null;
+        if ($activePage === null) {
+            $activePage = $this->container->get(SimpleTitlePage::class);
+            $activePage->getHead()->setAssetSection("layouts");
+        }
         return $activePage->handleException($e);
     }
 }

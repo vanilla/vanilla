@@ -3,6 +3,9 @@
 
 // @ts-check
 
+// Force UTC timezone.
+process.env.TZ = "UTC";
+
 const fs = require("fs");
 const path = require("path");
 const glob = require("globby");
@@ -141,6 +144,7 @@ module.exports = {
         "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$":
             "<rootDir>/library/src/scripts/__tests__/fileMock.js",
         "\\.(css|less|scss)$": "<rootDir>/library/src/scripts/__tests__/styleMock.js",
+        "^@vanilla/addon-vanilla/(.*)$": "<rootDir>/applications/vanilla/src/scripts/$1",
         ...packageDirectoryMaps,
         ...addonModuleMaps,
     },
@@ -161,7 +165,7 @@ module.exports = {
     // projects: null,
 
     // Use this configuration option to add custom reporters to Jest
-    // reporters: undefined,
+    reporters: ["<rootDir>/jest.reporter.js", ["summary", { summaryThreshold: 0 }]],
 
     // Automatically reset mock state between every test
     // resetMocks: false,
@@ -188,7 +192,7 @@ module.exports = {
     // setupFiles: [],
 
     // A list of paths to modules that run some code to configure or set up the testing framework before each test
-    setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+    setupFilesAfterEnv: ["<rootDir>/jest.setup.js", "jest-expect-message"],
 
     // A list of paths to snapshot serializer modules Jest should use for snapshot testing
     // snapshotSerializers: [],
@@ -227,10 +231,12 @@ module.exports = {
     // timers: "real",
 
     // A map from regular expressions to paths to transformers
-    // transform: null,
+    transform: {
+        "^.+\\.(t|j)sx?$": "@swc/jest",
+    },
 
     // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-    transformIgnorePatterns: ["/node_modules/"],
+    transformIgnorePatterns: ["/node_modules/d3-array/", "/node_modules/json-schema/"],
 
     // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
     // unmockedModulePathPatterns: undefined,

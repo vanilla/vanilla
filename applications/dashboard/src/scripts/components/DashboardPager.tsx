@@ -2,7 +2,13 @@ import React from "react";
 import { sprintf } from "sprintf-js";
 import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
-import { LeftChevronIcon, RightChevronIcon } from "@library/icons/common";
+import {
+    LeftChevronCompactIcon,
+    LeftChevronIcon,
+    LeftChevronSmallIcon,
+    RightChevronIcon,
+    RightChevronSmallIcon,
+} from "@library/icons/common";
 import { cx } from "@emotion/css";
 
 interface IProps {
@@ -44,7 +50,7 @@ export function DashboardPager(props: IProps) {
                     onClick={(e) => handleClick(e, page - 1)}
                     aria-disabled={page === 1 || props.disabled}
                 >
-                    <LeftChevronIcon />
+                    <LeftChevronSmallIcon />
                 </a>
                 <a
                     href="#"
@@ -53,7 +59,7 @@ export function DashboardPager(props: IProps) {
                     onClick={(e) => handleClick(e, page + 1)}
                     aria-disabled={!hasNext || props.disabled}
                 >
-                    <RightChevronIcon />
+                    <RightChevronSmallIcon />
                 </a>
             </nav>
         </div>

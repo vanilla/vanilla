@@ -10,7 +10,11 @@ namespace Vanilla\QnA\Addon;
 use Garden\Container\ContainerConfigurationInterface;
 use Garden\Container\Reference;
 use Vanilla\AddonContainerRules;
+use Vanilla\Dashboard\Models\ActivityService;
 use Vanilla\Models\SiteTotalService;
+use Vanilla\QnA\Activity\AnswerAcceptedActivity;
+use Vanilla\QnA\Activity\QuestionAnswerActivity;
+use Vanilla\QnA\Activity\QuestionFollowUpActivity;
 use Vanilla\QnA\Models\QnaQuickLinksProvider;
 use Vanilla\QnA\Models\Totals\AcceptedSiteTotalProvider;
 use Vanilla\QnA\Models\Totals\QuestionSiteTotalProvider;
@@ -19,6 +23,7 @@ use Vanilla\QnA\Layout\View\LegacyNewQuestionLayoutView;
 use Vanilla\QnA\Widgets\DiscussionQuestionsWidget;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
+use Vanilla\QnA\Layout\View\QuestionThreadLayoutView;
 
 /**
  * Class ForumContainerRules
@@ -42,5 +47,22 @@ class QnAContainerRules extends AddonContainerRules
         $container
             ->rule(QuickLinksVariableProvider::class)
             ->addCall("addQuickLinkProvider", [new Reference(QnaQuickLinksProvider::class)]);
+
+        $container
+            ->rule(ActivityService::class)
+            ->addCall("registerActivity", [AnswerAcceptedActivity::class])
+            ->addCall("registerActivity", [QuestionAnswerActivity::class])
+            ->addCall("registerActivity", [QuestionFollowUpActivity::class]);
+
+        $container
+            ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
+            ->addCall("registerStaticLayout", [
+                "questionThread",
+                PATH_ROOT . "/plugins/QnA/Layout/Definitions/questionThread.json",
+            ])
+            ->rule(LayoutHydrator::class)
+            ->addCall("addLayoutView", [new Reference(QuestionThreadLayoutView::class)])
+            ->rule(LayoutService::class)
+            ->addCall("addLayoutView", [new Reference(QuestionThreadLayoutView::class)]);
     }
 }

@@ -2,10 +2,13 @@
  * @copyright 2009-2022 Vanilla Forums Inc.
  * @license gpl-2.0-only */
 
-import React from "react";
-import { render } from "@testing-library/react";
+import React, { ReactNode } from "react";
+import { act, render } from "@testing-library/react";
 import Banner from "@library/banner/Banner";
 import { MemoryRouter } from "react-router";
+import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
+import { stableObjectHash } from "@vanilla/utils";
+import { LoadStatus } from "@library/@types/api/core";
 
 const BG_IMG_VARS = "https://url-vars";
 const BG_IMG_PROPS_UPLOAD = "https://url-upload";
@@ -18,9 +21,30 @@ const BG_SRC_SET = {
     1600: `${BG_IMG_PROPS_UPLOAD}/1600`,
 };
 
+function renderInProvider(children: ReactNode) {
+    return render(
+        <TestReduxProvider
+            state={{
+                config: {
+                    configsByLookupKey: {
+                        [stableObjectHash(["labs.*"])]: {
+                            status: LoadStatus.SUCCESS,
+                            data: {
+                                "externalSearch.query": false,
+                            },
+                        },
+                    },
+                },
+            }}
+        >
+            {children}
+        </TestReduxProvider>,
+    );
+}
+
 describe("Banner", () => {
     it("No image url passed, should render our default svg", () => {
-        const { container } = render(
+        const { container } = renderInProvider(
             <MemoryRouter>
                 <Banner />
             </MemoryRouter>,
@@ -29,7 +53,7 @@ describe("Banner", () => {
         expect(svgNodes.length).toBeGreaterThan(0);
     });
     it("Background image from variables", () => {
-        const { container } = render(
+        const { container } = renderInProvider(
             <MemoryRouter>
                 <Banner forcedVars={{ banner: { outerBackground: { image: BG_IMG_VARS } } }} />
             </MemoryRouter>,
@@ -44,7 +68,7 @@ describe("Banner", () => {
     });
 
     it("Background image from as props/upload, should override vars", () => {
-        const { container } = render(
+        const { container } = renderInProvider(
             <MemoryRouter>
                 <Banner
                     backgroundImage={BG_IMG_PROPS_UPLOAD}

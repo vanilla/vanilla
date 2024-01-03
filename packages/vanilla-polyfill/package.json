@@ -6,7 +6,7 @@
     "license": "MIT",
     "dependencies": {
         "@webcomponents/webcomponentsjs": "^2.3.0",
-        "core-js": "^3.19.0"
+        "core-js": "^3.33.3"
     },
     "publishConfig": {
         "access": "public"

@@ -7,8 +7,8 @@ This folder contains the **vnla** command line tool that has some useful utiliti
 To install vnla you can follow these steps.
 
 1. Make sure you have run `composer install` on the root directory of this repo. That will ensure that the command line tool will work here. You don't need to do a `composer install` from this directory.
-2. In order to do backports you will need to install [hub](https://hub.github.com/) and have it alias the `git` command on your machine.
-3. You should ensure that the [cli/bin/vnla](./bin/vnla) script is in your path so that you can execute it anywhere on your machine.
+2. You should ensure that the [cli/bin/vnla](./bin/vnla) script is in your path so that you can execute it anywhere on your machine. Running `./cli/bin/vnla install` can assist you in doing this.
+3. In order to do backports you will need to install [hub](https://hub.github.com/) and setup authentication for it. To check if your access token is properly setup run `hub api` from your terminal and you should see a response indicating your github user.
 
 ## Usage
 
@@ -24,7 +24,50 @@ To get the options for an individual command you can also use `--help` with the 
 vnla <command> --help
 ```
 
-## The backport command
+## `vnla docker`
+
+This command is the latest and greatest way to run vanilla on your local machine.
+
+```shell
+# These all ensure things are properly and setup and start the containers
+vnla docker
+vnla docker up
+vnla docker start
+vnla docker up -v # Verbose to give additional/more detailed output and progress
+
+# These stop the running containers
+vnla docker down
+vnla docker stop
+
+# Run only specific services
+# If you pass particular services it will remember them and only run those services on the next run.
+vnla docker --service vanilla,logs,mailhog,imgproxy,queue,search
+
+# For example for a minimal setup
+vnla docker --service vanilla,mailhog
+```
+
+**The following web services will then be accessible**
+
+-   https://dev.vanilla.localhost
+-   https://vanilla.localhost/dev - Same site as the previous
+-   https://kibana.vanilla.localhost - Logs/Kibana instance
+-   https://queue.vanilla.localhost - Dashboard for the queue if you are running with it.
+-   https://mail.vanilla.localhost - All outgoing mail goes here.
+-   https://search.vanilla.localhost - Vanilla search microservice.
+-   https://imgproxy.vanilla.localhost - Image resizing service
+-   https://elasticsearch.vanilla.localhost - ElasticSearch instance for kibana/logs and search service.
+
+**_You can spawn a new site by creating a new empty database and navigating to https://vanlla.localhost/some-unique-slug to configure the site._**
+
+### Migrating From [`vanilla-docker`](https://github.com/vanilla/docker)
+
+-   Completely stop your vanilla-docker containers.
+-   Run `vnla docker`.
+-   You will prompted to migrate your databases. Confirm this choice.
+-   Never run `vanilla-docker` again.
+
+## `vnla backport`
 
 In general, the command that you are going to be the most concerned with is the `backport` command. This command allows you to backport any PR in any Github backed git repo to any branch. This utility is very useful as it is repeatable and provides consistent backport PRs. If a PR consists of several commits then this tool is a huge help.
 

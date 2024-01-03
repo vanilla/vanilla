@@ -10,6 +10,8 @@ namespace Vanilla\Analytics;
 use CategoryModel;
 use CommentModel;
 use DiscussionModel;
+use Vanilla\Community\Events\SubscriptionChangeEvent;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Utility\ArrayUtils;
 
 /**
@@ -178,7 +180,7 @@ class TrackableCommunityModel
      */
     public function getTrackableComment($commentOrCommentID, string $type = "comment_add"): array
     {
-        if (is_int($commentOrCommentID)) {
+        if (is_numeric($commentOrCommentID)) {
             $comment = $this->commentModel->getID($commentOrCommentID, DATASET_TYPE_ARRAY);
             if (empty($comment)) {
                 return [
@@ -292,5 +294,81 @@ class TrackableCommunityModel
         $commentData["body"] = null;
 
         return $commentData;
+    }
+
+    /**
+     * Add and modify fields for tag tracking data.
+     *
+     * @param array $tagData
+     * @return array
+     */
+    public function getTrackableTag(array $tagData): array
+    {
+        $tagData["dateInserted"] = TrackableDateUtils::getDateTime($tagData["dateInserted"]);
+        $insertUserID = $tagData["insertUserID"] ?? null;
+        if (isset($insertUserID)) {
+            $tagData["insertUser"] = $this->userUtils->getTrackableUser($tagData["insertUserID"]);
+        }
+
+        return $tagData;
+    }
+
+    /**
+     * Add and modify fields for recordTag tracking data.
+     *
+     * @param array $recordTagData
+     * @return array
+     */
+    public function getTrackableRecordTag(array $recordTagData): array
+    {
+        $dateInserted = $recordTagData["dateInserted"] ?? CurrentTimeStamp::getDateTime();
+        $recordTagData["dateInserted"] = TrackableDateUtils::getDateTime($dateInserted);
+        $recordTagData["insertUser"] = $this->userUtils->getTrackableUser($recordTagData["insertUserID"]);
+
+        return $recordTagData;
+    }
+
+    /**
+     * provide trackable data for category subscription
+     *
+     * @param array $categorySubscriptionData
+     * @return array
+     */
+    public function getTrackableCategorySubscription(array $categorySubscriptionData): array
+    {
+        $data = [
+            "follower" => $this->userUtils->getTrackableUser($categorySubscriptionData["user"]["userID"]),
+            "category" => $this->getTrackableCategory($categorySubscriptionData["category"]["CategoryID"]),
+        ];
+        $data["category"]["totalFollowedCount"] = $categorySubscriptionData["category"]["totalFollowedCount"] ?? 0;
+        $data["category"]["totalDigestCount"] = $categorySubscriptionData["category"]["totalDigestCount"] ?? 0;
+        $type = $categorySubscriptionData["type"];
+        $enabled = str_contains($categorySubscriptionData["subscription"], "Enabled");
+        $data["dateTime"] = TrackableDateUtils::getDateTime(
+            in_array($type, [SubscriptionChangeEvent::ACTION_FOLLOW, SubscriptionChangeEvent::ACTION_UNFOLLOW]) &&
+            !$enabled
+                ? $categorySubscriptionData["category"]["DateUnFollowed"]
+                : $categorySubscriptionData["category"]["DateFollowed"]
+        );
+        $data["type"] = $type;
+        $data["subscription"] = $categorySubscriptionData["subscription"];
+        $data["enabled"] = $enabled;
+        return $data;
+    }
+
+    protected function normalizePreferences(array $preferences): array
+    {
+        $trackablePreferences["followed"] = $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_FOLLOW];
+        $trackablePreferences["emailDigest"] =
+            $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_DIGEST] ?? false;
+        $trackablePreferences["inAppDiscussions"] =
+            $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_APP];
+        $trackablePreferences["emailDiscussions"] =
+            $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_DISCUSSION_EMAIL];
+        $trackablePreferences["inAppComments"] = $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_APP];
+        $trackablePreferences["emailComments"] =
+            $preferences[\CategoriesApiController::OUTPUT_PREFERENCE_COMMENT_EMAIL];
+
+        return $trackablePreferences;
     }
 }

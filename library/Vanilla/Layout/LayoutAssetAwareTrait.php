@@ -16,7 +16,7 @@ trait LayoutAssetAwareTrait
     public $getAsset;
 
     /** @var array */
-    public $widgetList;
+    public $widgetList = [];
 
     /**
      * Set partialAsset for data population.
@@ -35,18 +35,16 @@ trait LayoutAssetAwareTrait
      */
     public function addWidgetName(string $widget)
     {
-        if ($this->widgetList == null) {
-            $this->widgetList = [];
-        }
         $this->widgetList[] = $widget;
+        $this->widgetList = array_unique($this->widgetList);
     }
 
     /**
      * Get widget name.
      *
-     * @return array
+     * @return string[]
      */
-    public function getWidgetNames()
+    public function getWidgetNames(): array
     {
         return $this->widgetList;
     }

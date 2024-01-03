@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -9,13 +9,11 @@ export enum LayoutDevice {
     DESKTOP = "desktop",
     ALL = "all",
 }
-export interface ILayoutQuery {
+export interface ILayoutQuery<T extends object = object> {
     recordID?: number | string;
     recordType?: string;
     layoutViewType: string;
-    params: {
-        [key: string]: any;
-    };
+    params: T | Record<string, any>;
 }
 
 /**

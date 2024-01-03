@@ -17,7 +17,6 @@ export function PocketMultiRoleInput(props) {
                 <MultiRoleInput
                     showIndicator={true}
                     className={dashboardClasses().tokenInput}
-                    label={""}
                     value={roles ?? []}
                     onChange={(viewRoleIDs) => {
                         setRoles(viewRoleIDs ?? []);

@@ -33,12 +33,12 @@ const story = storiesOf("Headers/Title Bar", module);
 const makeMockRegisterUser: IMe = {
     name: "Neena",
     userID: 1,
-    permissions: [],
     isAdmin: true,
     photoUrl: "",
     dateLastActive: "",
     countUnreadNotifications: 1,
     countUnreadConversations: 1,
+    emailConfirmed: true,
 };
 
 const optionsItems: ISelectBoxItem[] = [

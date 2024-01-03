@@ -26,7 +26,7 @@ export const pageHeadingBoxClasses = useThemeCache((optionOverrides?: Partial<IP
     };
 
     const root = css({
-        textAlign: vars.options.alignment as "left",
+        textAlign: vars.options.alignment === "left" ? "start" : vars.options.alignment,
         display: "flex", // Prevent margin collapse in here.
         flexDirection: "column",
         ...Mixins.margin({
@@ -39,14 +39,18 @@ export const pageHeadingBoxClasses = useThemeCache((optionOverrides?: Partial<IP
             ...Mixins.margin({
                 bottom: globalVars.spacer.headingItem,
             }),
+            "&:last-child": {
+                marginBottom: 0,
+            },
         },
         excludeHeadingMargins,
     );
     const descriptionWrap = css({
         width: "100%",
-        ...Mixins.margin({
-            bottom: globalVars.spacer.headingItem,
-        }),
+        marginBottom: globalVars.spacer.headingItem,
+        "&:last-child": {
+            marginBottom: 0,
+        },
     });
 
     const subtitle = css(

@@ -14,6 +14,7 @@ use Garden\MetaTrait;
 use Garden\Web\RequestInterface;
 use League\Uri\Http;
 use Psr\Http\Message\UriInterface;
+use Ramsey\Uuid\Uuid;
 use Vanilla\Contracts\Web\RequestModifierInterface;
 use Vanilla\UploadedFile;
 
@@ -155,9 +156,9 @@ class Gdn_Request implements RequestInterface
     /**
      * @inheritdoc
      */
-    public function setAssetRoot(string $assetRoot)
+    public function setAssetRoot(string $root)
     {
-        $this->_parsedRequestElement("AssetRoot", rtrim("/" . trim($assetRoot, "/"), "/"));
+        $this->_parsedRequestElement("AssetRoot", rtrim("/" . trim($root, "/"), "/"));
         return $this;
     }
 
@@ -793,6 +794,14 @@ class Gdn_Request implements RequestInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isApiRequest(): bool
+    {
+        return $this->getMeta("isApi") || str_starts_with($this->getPath(), "/api/v2");
+    }
+
+    /**
      * Returns a boolean value indicating if the current page has an authenticated postback.
      *
      * @param bool $throw Whether or not to throw an exception if this is a postback AND the transient key doesn't validate.
@@ -953,29 +962,19 @@ class Gdn_Request implements RequestInterface
         }
         $this->port($port);
 
-        $path = "";
-        if (!empty($_SERVER["X_REWRITE"]) || !empty($_SERVER["REDIRECT_X_REWRITE"])) {
-            $path = $_SERVER["PATH_INFO"] ?? "";
+        $path = $_SERVER["PATH_INFO"] ?? "";
 
-            // Some hosts block PATH_INFO from being passed (or even manually set).
-            // We set X_PATH_INFO in the .htaccess as a fallback for those situations.
-            // If you work for one of those hosts, know that many beautiful kittens lost their lives for your sins.
-            if (!$path) {
-                if (!empty($_SERVER["X_PATH_INFO"])) {
-                    $path = $_SERVER["X_PATH_INFO"];
-                } elseif (!empty($_SERVER["REDIRECT_X_PATH_INFO"])) {
-                    $path = $_SERVER["REDIRECT_X_PATH_INFO"];
-                }
-            }
-        } elseif (is_array($_GET)) {
-            if (isset($_GET["_p"])) {
-                $path = $_GET["_p"];
-                unset($_GET["_p"]);
-            } elseif (isset($_GET["p"])) {
-                $path = $_GET["p"];
-                unset($_GET["p"]);
+        // Some hosts block PATH_INFO from being passed (or even manually set).
+        // We set X_PATH_INFO in the .htaccess as a fallback for those situations.
+        // If you work for one of those hosts, know that many beautiful kittens lost their lives for your sins.
+        if (!$path) {
+            if (!empty($_SERVER["X_PATH_INFO"])) {
+                $path = $_SERVER["X_PATH_INFO"];
+            } elseif (!empty($_SERVER["REDIRECT_X_PATH_INFO"])) {
+                $path = $_SERVER["REDIRECT_X_PATH_INFO"];
             }
         }
+
         // Set URI directly to avoid double decoding.
         $this->_Environment["URI"] = $path;
 
@@ -1276,6 +1275,9 @@ class Gdn_Request implements RequestInterface
             "Domain" => "",
         ];
         $this->_loadEnvironment();
+        $requestID = $_SERVER["HTTP_CF_RAY"] ?? Uuid::uuid1()->toString();
+        $this->setValueOn(Gdn_Request::INPUT_CUSTOM, "requestID", $requestID);
+        $this->setMeta("requestID", $requestID);
     }
 
     /**
@@ -1442,8 +1444,10 @@ class Gdn_Request implements RequestInterface
      * @param string $inputFile Usually `php://input` for the raw input stream.
      * @param array|null $files Usually the `$_FILES` super-global.
      * @return mixed Returns the decoded post.
+     *
+     * @internal Do not use externally. For testing purpose only.
      */
-    private function decodePost($post, $server, $inputFile = "php://input", $files = null)
+    public function decodePost($post, $server, $inputFile = "php://input", $files = null)
     {
         $contentType = !isset($server["CONTENT_TYPE"]) ? "application/x-www-form-urlencoded" : $server["CONTENT_TYPE"];
 
@@ -1461,7 +1465,7 @@ class Gdn_Request implements RequestInterface
         // Add data from the PHP files array.
         if (is_array($files)) {
             $fileData = $this->parseFiles($files);
-            $result = array_merge($fileData, $result);
+            $result = array_replace($fileData, $result);
         }
 
         return $result;
@@ -1618,12 +1622,12 @@ class Gdn_Request implements RequestInterface
     /**
      * Sets the query for the request.
      *
-     * @param array $query
+     * @param array $value
      * @return self
      */
-    public function setQuery(array $query)
+    public function setQuery(array $value)
     {
-        $this->setRequestArguments(self::INPUT_GET, $query);
+        $this->setRequestArguments(self::INPUT_GET, $value);
         return $this;
     }
 
@@ -1775,15 +1779,6 @@ class Gdn_Request implements RequestInterface
         if ($allowSSL === null) {
             $allowSSL = c("Garden.AllowSSL", false);
         }
-        static $rewrite = null;
-        if ($rewrite === null) {
-            /**
-             * X_REWRITE is used to determine whether rewriting URLs is supported by the server. The Garden.RewriteUrls
-             * config is only supported for backwards compatibility. This value should not be true by default, because
-             * rewriting may be unavailable (e.g. during installation when .htaccess.dist has not yet been renamed).
-             */
-            $rewrite = val("X_REWRITE", $_SERVER, c("Garden.RewriteUrls", false));
-        }
 
         if (!$allowSSL) {
             $ssl = null;
@@ -1844,11 +1839,6 @@ class Gdn_Request implements RequestInterface
             if ($webRoot != "") {
                 $parts[] = $webRoot;
             }
-
-            if (!$rewrite) {
-                $parts[] = $this->_environmentElement("SCRIPT") . "?p=";
-                $query = str_replace("?", "&", $query);
-            }
         }
 
         if ($path == "") {
@@ -1857,7 +1847,7 @@ class Gdn_Request implements RequestInterface
             if (!$query) {
                 $query = http_build_query($this->getRequestArguments(self::INPUT_GET));
                 if (!empty($query)) {
-                    $query = ($rewrite ? "?" : "&") . $query;
+                    $query = "?" . $query;
                 }
             }
         }

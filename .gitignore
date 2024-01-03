@@ -29,6 +29,7 @@
 !/conf/constants.php
 !/conf/readme.txt
 /dist/*
+/docker/install.json
 /locales/*
 !/locales/.gitkeep
 /plugins/*
@@ -115,6 +116,7 @@ git-diff.txt
 phpcs-diff.json
 .phpunit.result.cache
 *.cookiejar
+/cli/config.json
 /cli/vendor/
 /cli/composer.lock
 /coverage

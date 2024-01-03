@@ -8,15 +8,16 @@
         "eslint": "^7.10.0"
     },
     "dependencies": {
-        "@typescript-eslint/eslint-plugin": "^4.3.0",
-        "@typescript-eslint/parser": "^4.3.0",
+        "@tanstack/eslint-plugin-query": "^4.36.1",
+        "@typescript-eslint/eslint-plugin": "^5.46.0",
+        "@typescript-eslint/parser": "^5.46.0",
         "@vanilla/eslint-plugin": "*",
         "eslint": "^7.10.0",
         "eslint-config-prettier": "^6.5.0",
         "eslint-plugin-import": "^2.17.3",
         "eslint-plugin-jsx-a11y": "^6.2.1",
         "eslint-plugin-lodash": "^6.0.0",
-        "eslint-plugin-react": "^7.13.0",
+        "eslint-plugin-react": "^7.33.2",
         "eslint-plugin-react-hooks": "^1.6.0"
     }
 }

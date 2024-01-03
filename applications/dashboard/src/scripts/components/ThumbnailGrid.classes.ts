@@ -13,7 +13,7 @@ const thumbnailGridClasses = useThemeCache(() => {
             display: "grid",
             justifyItems: "stretch",
             alignItems: "stretch",
-            gridTemplateColumns: "repeat(3, 1fr)",
+            gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
             gridAutoRows: "minmax(240px, auto)",
             gridGap: 20,
         },

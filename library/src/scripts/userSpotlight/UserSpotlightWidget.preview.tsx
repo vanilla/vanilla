@@ -13,12 +13,9 @@ interface IProps extends Omit<React.ComponentProps<typeof UserSpotlightWidget>, 
 export function UserSpotlightWidgetPreview(props: IProps) {
     return (
         <UserSpotlightWidget
-            title={props.title ?? "Customer Spotlight"}
+            title={props.title}
             subtitle={props.subtitle ?? ""}
-            description={
-                props.description ??
-                "“Use this space to add a Customer Spotlight by telling the customer's story using their unique language, share what problems they experienced, and how they conquered it by using your product(s).”"
-            }
+            description={props.description}
             userInfo={LayoutEditorPreviewData.user()}
             containerOptions={props.containerOptions}
         />

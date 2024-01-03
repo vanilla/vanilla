@@ -96,7 +96,7 @@ class ExtendedContentFormatServiceTest extends TestCase
     /**
      * Test embeds in the rich editor with iframes.
      */
-    public function testRichFrameEmbeds()
+    public function testDisallowedRichFrameEmbeds()
     {
         $ops = [
             [
@@ -118,6 +118,33 @@ class ExtendedContentFormatServiceTest extends TestCase
         $extended = $this->getExtendedFormatter()->renderHTML($in, RichFormat::FORMAT_KEY);
 
         $this->assertTrue(str_contains($normal, "There was an error"));
-        $this->assertFalse(str_contains($extended, "There was an error"));
+        $this->assertTrue(str_contains($extended, "There was an error"));
+    }
+    /**
+     * Test embeds in the rich editor with allowed iframes specified in trusted domains.
+     */
+    public function testAllowedRichFrameEmbeds()
+    {
+        $this->runWithConfig(["Garden.TrustedDomains" => "*.vanillaforums.com"], function () {
+            $ops = [
+                [
+                    "insert" => [
+                        "embed-external" => [
+                            "data" => [
+                                "url" => "https://vanillaforums.com/images/metaIcons/vanillaForums.png",
+                                "embedType" => "iframe",
+                                "height" => 630,
+                                "width" => 1200,
+                            ],
+                        ],
+                    ],
+                ],
+            ];
+            $in = json_encode($ops);
+
+            $extended = $this->getExtendedFormatter()->renderHTML($in, RichFormat::FORMAT_KEY);
+
+            $this->assertFalse(str_contains($extended, "There was an error"));
+        });
     }
 }

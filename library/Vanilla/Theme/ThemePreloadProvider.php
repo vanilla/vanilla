@@ -141,6 +141,42 @@ class ThemePreloadProvider implements ReduxActionProviderInterface
     }
 
     /**
+     * Get the theme variables.
+     *
+     * @return array
+     */
+    public function getVariables(): array
+    {
+        $theme = $this->getPreloadTheme();
+        if (!$theme) {
+            return [];
+        }
+
+        $variables = $theme->getVariables()->getValue();
+        return $variables;
+    }
+
+    /**
+     * Get the font variables (deprecated).
+     *
+     * @return array
+     */
+    public function getFontsJson(): array
+    {
+        $theme = $this->getPreloadTheme();
+        if (!$theme) {
+            return [];
+        }
+
+        $fonts = $theme->getAsset("fonts");
+        if (empty($fonts)) {
+            return [];
+        }
+
+        return $fonts->getValue();
+    }
+
+    /**
      * Load data from the theme API.
      */
     private function loadData()

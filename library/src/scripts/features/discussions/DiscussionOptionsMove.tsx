@@ -13,16 +13,25 @@ import ModalSizes from "@library/modal/ModalSizes";
 import LazyMoveDiscussionForm from "@library/features/discussions/forms/LazyMoveDiscussionForm";
 import { StackingContextProvider } from "@vanilla/react-utils";
 
-const DiscussionOptionsMove: FunctionComponent<{ discussion: IDiscussion }> = ({ discussion }) => {
+const DiscussionOptionsMove: FunctionComponent<{ discussion: IDiscussion; onSuccess?: () => Promise<void> }> = ({
+    discussion,
+    onSuccess,
+}) => {
     const [isVisible, setIsVisible] = useState(false);
     const open = () => setIsVisible(true);
     const close = () => setIsVisible(false);
+
+    async function handleSuccess() {
+        !!onSuccess && (await onSuccess());
+        close();
+    }
+
     return (
         <>
             <DropDownItemButton onClick={open}>{t("Move")}</DropDownItemButton>
             <StackingContextProvider>
                 <Modal isVisible={isVisible} size={ModalSizes.MEDIUM} exitHandler={close}>
-                    <LazyMoveDiscussionForm discussion={discussion} onSuccess={close} onCancel={close} />
+                    <LazyMoveDiscussionForm discussion={discussion} onSuccess={handleSuccess} onCancel={close} />
                 </Modal>
             </StackingContextProvider>
         </>

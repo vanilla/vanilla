@@ -55,9 +55,12 @@ export const dataListClasses = useThemeCache((layoutMediaQueries?: { xs: any }) 
     const globalVars = globalVariables();
     const mediaQueries = layoutMediaQueries ?? oneColumnVariables().mediaQueries();
 
-    const root = css({});
+    const root = css({
+        width: "100%",
+    });
 
     const table = css({
+        width: "100%",
         "&&": {
             ...mediaQueries.xs({
                 display: "inline-table",
@@ -85,10 +88,12 @@ export const dataListClasses = useThemeCache((layoutMediaQueries?: { xs: any }) 
         textAlign: vars.key.textAlignment,
         verticalAlign: "top",
         ...Mixins.padding(vars.value.padding),
+        whiteSpace: "pre-line",
     });
 
     const tokenGap = css({
         display: "flex",
+        flexWrap: "wrap",
         gap: globalVars.fonts.size.small,
     });
 

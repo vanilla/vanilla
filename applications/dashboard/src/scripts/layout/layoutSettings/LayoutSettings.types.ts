@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -41,8 +41,19 @@ export const INITIAL_LAYOUTS_STATE: ILayoutsState = {
     legacyStatusesByViewType: {},
 };
 
-export const LAYOUT_VIEW_TYPES = ["home", "discussionList", "categoryList"] as const;
-export type LayoutViewType = typeof LAYOUT_VIEW_TYPES[number];
+export const LAYOUT_VIEW_TYPES = [
+    "home",
+    "subcommunityHome",
+    "discussionList",
+    "categoryList",
+    "nestedCategoryList",
+    "discussionCategoryPage",
+    "discussionThread",
+    "discussionPage",
+    "ideaThread",
+    "questionThread",
+] as const;
+export type LayoutViewType = (typeof LAYOUT_VIEW_TYPES)[number];
 
 export interface ILayoutDetails {
     layoutID: RecordID;
@@ -67,12 +78,27 @@ export interface ILayoutDraft extends IEditableLayoutSpec {
     layoutID?: ILayoutDetails["layoutID"];
 }
 
+export enum LayoutRecordType {
+    /**
+     * Used exclusively to apply a layout to the top level home page.
+     * Should get phased out in a future iteration now that the layout types are split.
+     * @deprecated
+     */
+    ROOT = "root",
+    // Used to apply a layout as a "default" layout for its layoutViewType
+    GLOBAL = "global",
+    // Used to apply a layout to specific subcommunity/siteSection
+    SUBCOMMUNITY = "subcommunity",
+    // Used to apply a layout to a specific category.
+    CATEGORY = "category",
+}
+
 export interface ILayoutView {
     layoutViewID: RecordID;
     layoutViewType: LayoutViewType;
     layoutID: RecordID;
     recordID: number;
-    recordType: string;
+    recordType: LayoutRecordType;
     insertUserID: number;
     dateInserted: string;
     updateUserID: number;

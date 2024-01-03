@@ -29,10 +29,11 @@ export default {
 };
 
 function DummyListItem() {
-    return <ListItem as={"li"} url={"#"} name={"Hello Story List Item"} metas={<StoryMetasMinimal />} />;
+    return <ListItem as={"li"} url={"#"} name={"Hello Story List Item"} metas={<StoryMetasMinimal />} asTile={false} />;
 }
 
 interface IDummy {
+    title?: string;
     withSubtitle?: boolean;
     withDescription?: boolean;
 }
@@ -40,14 +41,14 @@ interface IDummy {
 function HeadingBlock(props: IDummy) {
     return (
         <PageHeadingBox
-            title="This is a title"
+            title={props.title ?? "This is a title"}
             subtitle={props.withSubtitle ? "Hello subtitle" : undefined}
             description={props.withDescription ? "This is a description for the heading block here" : undefined}
         />
     );
 }
 
-function DummyWidget(props: IDummy) {
+export function DummyWidget(props: IDummy) {
     return (
         <HomeWidgetContainer>
             <HeadingBlock {...props} />

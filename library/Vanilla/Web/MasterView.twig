@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="{{ locale }}">
+
+<html lang="{{ locale }}" {{  isDirectionRTL ? 'dir="rtl"' : ""}}>
+
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,6 +19,7 @@
         </noscript>
     </head>
     <body class="{{ cssClasses }}">
+        {% include "@resources/svg-symbols.html" %}
         <div id="page" class="page">
             {%- if themeHeader -%}
                 <noscript id="themeHeader">
@@ -29,12 +32,20 @@
             {%- else -%}
                 <header id="titleBar"></header>
                 <div id="app" class="page-minHeight">
+                    {% if breadcrumbs|default(false) %}
+                        <noscript>
+                            <div class="breadcrumbs">
+                            {% for breadcrumb in breadcrumbs %}
+                                <span class="crumb">
+                                    <a href="{{ breadcrumb.getUrl() }}">{{ breadcrumb.getName() }}</a>
+                                </span>
+                            {% endfor %}
+                            </div>
+                        </noscript>
+                    {% endif %}
                     {%- if seoContent|default(false) -%}
                         <noscript id="fallbackPageContent">
-                            <h1 class="heading heading-1 pageTitle">
-                                {{- title -}}
-                            </h1>
-                            {{- seoContent -}}
+                            {{- seoContent|raw -}}
                         </noscript>
                     {%- endif -%}
                     <div class="fullPageLoader"></div>

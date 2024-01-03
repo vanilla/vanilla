@@ -6,13 +6,25 @@
 
 namespace Vanilla\Forum\Widgets;
 
+use Vanilla\Layout\HydrateAwareInterface;
+use Vanilla\Layout\HydrateAwareTrait;
+use Vanilla\Site\SiteSectionModel;
 use Vanilla\Widgets\TabWidgetModule;
+use Vanilla\Widgets\TabWidgetTabService;
 
 /**
  * Class TabsWidget
  */
-class TabsWidget extends TabWidgetModule
+class TabsWidget extends TabWidgetModule implements HydrateAwareInterface
 {
+    use HydrateAwareTrait;
+
+    public function __construct(TabWidgetTabService $tabService, SiteSectionModel $siteSectionModel)
+    {
+        parent::__construct($tabService, $siteSectionModel);
+        $this->addChildComponentName("DiscussionListModule");
+    }
+
     /**
      * @inheritdoc
      */

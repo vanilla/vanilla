@@ -7,6 +7,7 @@ import { ISearchForm, ISearchResult, ISearchResponse } from "@library/search/sea
 import { getSearchAnalyticsData, IResultAnalyticsData, splitSearchTerms } from "./searchAnalyticsData";
 import * as _appUtils from "@library/utility/appUtils";
 import { SearchFixture } from "@library/search/__fixtures__/Search.fixture";
+import { mockSiteSection } from "@library/utility/__fixtures__/SiteSection.fixtures";
 
 interface ITermsCase {
     name: string;
@@ -44,21 +45,7 @@ const testCases: ITermsCase[] = [
     },
 ];
 
-const mockSiteSection: _appUtils.ISiteSection = {
-    basePath: "string",
-    contentLocale: "en",
-    sectionGroup: "",
-    sectionID: "0",
-    name: "Test",
-    apps: {
-        forum: true,
-    },
-    attributes: {
-        categoryID: -1,
-    },
-};
-
-jest.spyOn(_appUtils, "getSiteSection").mockReturnValue(mockSiteSection);
+_appUtils.setMeta("siteSection", mockSiteSection);
 
 describe("splitSearchTerms", () => {
     testCases.forEach((testCase) => {

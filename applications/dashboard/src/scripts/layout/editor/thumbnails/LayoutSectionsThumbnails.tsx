@@ -62,51 +62,49 @@ export default function LayoutSectionsThumbnails(props: IProps) {
                 value={value}
                 className={classes.thumbnails}
             >
-                {Object.keys(sections)
-                    .reverse()
-                    .map((sectionID: LayoutSectionID) => {
-                        const label = t(sections[sectionID].name);
-                        const accessibleDescription = t(sections[sectionID].name);
+                {Object.keys(sections).map((sectionID: LayoutSectionID) => {
+                    const label = t(sections[sectionID].name);
+                    const accessibleDescription = t(sections[sectionID].name);
 
-                        return (
-                            <CustomRadioInput
-                                onClick={(e) => {
-                                    // Browser fire a click event even if an item is selected with keyboard.
-                                    // https://github.com/facebook/react/issues/7407
-                                    if (e.type === "click" && e.clientX !== 0 && e.clientY !== 0) {
-                                        // This is a real click. Do something here
-                                        props.onSectionClick?.(sectionID);
-                                    }
-                                }}
-                                value={sectionID}
-                                accessibleDescription={accessibleDescription}
-                                key={sectionID}
-                                className={classes.thumbnailWrapper}
-                            >
-                                {({ isSelected, isFocused }) => (
-                                    <>
-                                        <span
-                                            role="decoration"
-                                            className={cx(classes.thumbnail, {
-                                                isSelected,
-                                                "focus-visible": isFocused,
-                                            })}
-                                        >
-                                            <img
-                                                width="188"
-                                                height="138"
-                                                className={classes.thumbnailImage}
-                                                alt={label}
-                                                src={sections[sectionID].iconUrl}
-                                            />
-                                        </span>
+                    return (
+                        <CustomRadioInput
+                            onClick={(e) => {
+                                // Browser fire a click event even if an item is selected with keyboard.
+                                // https://github.com/facebook/react/issues/7407
+                                if (e.type === "click" && e.clientX !== 0 && e.clientY !== 0) {
+                                    // This is a real click. Do something here
+                                    props.onSectionClick?.(sectionID);
+                                }
+                            }}
+                            value={sectionID}
+                            accessibleDescription={accessibleDescription}
+                            key={sectionID}
+                            className={classes.thumbnailWrapper}
+                        >
+                            {({ isSelected, isFocused }) => (
+                                <>
+                                    <span
+                                        role="decoration"
+                                        className={cx(classes.thumbnail, {
+                                            isSelected,
+                                            "focus-visible": isFocused,
+                                        })}
+                                    >
+                                        <img
+                                            width="120"
+                                            height="100"
+                                            className={classes.thumbnailImage}
+                                            alt={label}
+                                            src={sections[sectionID].iconUrl}
+                                        />
+                                    </span>
 
-                                        <div className={classes.labelContainer}>{t(label)}</div>
-                                    </>
-                                )}
-                            </CustomRadioInput>
-                        );
-                    })}
+                                    <div className={classes.labelContainer}>{t(label)}</div>
+                                </>
+                            )}
+                        </CustomRadioInput>
+                    );
+                })}
             </CustomRadioGroup>
         </div>
     );

@@ -9,10 +9,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { _mountComponents, addComponent } from "@library/utility/componentRegistry";
 import { HomeWidget } from "@library/homeWidget/HomeWidget";
-import { loadThemeFonts } from "@library/theming/loadThemeFonts";
-
-// Make sure our fonts load
-loadThemeFonts();
+import "../../resources/fonts/Open Sans/font.css";
 
 const panelLayoutBreakPoints = oneColumnVariables().breakPoints;
 

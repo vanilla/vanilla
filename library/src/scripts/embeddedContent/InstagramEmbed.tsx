@@ -5,7 +5,7 @@
 
 import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService.register";
 import React, { useLayoutEffect } from "react";
 import { ensureScript } from "@vanilla/dom-utils";
 import { useThrowError } from "@vanilla/react-utils";
@@ -31,7 +31,7 @@ export function InstagramEmbed(props: IProps): JSX.Element {
     const permaLink = `https://www.instagram.com/p/${props.postID}`;
 
     const link = (
-        <a href={permaLink} rel="nofollow noreferrer ugc">
+        <a href={permaLink} rel="nofollow noopener ugc">
             {permaLink}
         </a>
     );

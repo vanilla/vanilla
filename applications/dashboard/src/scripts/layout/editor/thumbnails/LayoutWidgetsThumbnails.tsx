@@ -5,8 +5,6 @@
 import { layoutThumbnailsClasses } from "@dashboard/layout/editor/thumbnails/LayoutThumbnails.classes";
 import { ILayoutCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { cx } from "@emotion/css";
-import { LoadStatus } from "@library/@types/api/core";
-import { useConfigsByKeys } from "@library/config/configHooks";
 import Translate from "@library/content/Translate";
 import { userContentClasses } from "@library/content/UserContent.styles";
 import { searchBarClasses } from "@library/features/search/SearchBar.styles";
@@ -15,6 +13,7 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
+import { useIsMounted } from "@vanilla/react-utils";
 import { CustomRadioGroup, CustomRadioInput } from "@vanilla/ui";
 import { spaceshipCompare } from "@vanilla/utils";
 import debounce from "lodash/debounce";
@@ -42,8 +41,12 @@ export default function LayoutWidgetsThumbnails(props: IProps) {
     const value = props.value ?? ownValue;
     const onChange = props.onChange ?? ownOnChange;
     const descriptionID = useUniqueID("widgetDescription");
+    const isMounted = useIsMounted();
 
     const search = (searchInputValue: string) => {
+        if (!isMounted()) {
+            return;
+        }
         let newWidgetIDs: string[] = [];
         Object.keys(widgets).forEach((widgetID: string) => {
             if (widgets[widgetID].name.toLocaleLowerCase().includes(searchInputValue.toLocaleLowerCase())) {
@@ -147,7 +150,7 @@ export default function LayoutWidgetsThumbnails(props: IProps) {
                                             <img
                                                 width="120"
                                                 height="100"
-                                                className={classes.thumbnailImageSmall}
+                                                className={classes.thumbnailImage}
                                                 alt={label}
                                                 src={widgets[widgetID].iconUrl}
                                             />

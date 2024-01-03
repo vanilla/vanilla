@@ -5,7 +5,7 @@
 
 import { ensureScript } from "@vanilla/dom-utils";
 import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService.register";
 import { twitterEmbedClasses } from "@library/embeddedContent/twitterEmbedStyles";
 import { visibility } from "@library/styles/styleHelpers";
 import classNames from "classnames";
@@ -61,7 +61,7 @@ export function TwitterEmbed(props: IProps): JSX.Element {
                     data-tweeturl={props.url}
                     data-tweetid={props.statusID}
                 >
-                    <a href={props.url} className="tweet-url" rel="nofollow noreferrer ugc">
+                    <a href={props.url} className="tweet-url" rel="nofollow noopener ugc">
                         {props.url}
                     </a>
                 </div>

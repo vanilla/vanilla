@@ -55,6 +55,11 @@ trait PageHeadProxyTrait // implements PageHeadInterface
         return $this;
     }
 
+    public function getJsonLdItems(): array
+    {
+        return $this->proxy->getJsonLdItems();
+    }
+
     /**
      * @inheritdoc
      */
@@ -98,6 +103,23 @@ trait PageHeadProxyTrait // implements PageHeadInterface
     {
         $this->proxy->addInlineScript($script);
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addInlineStyles(string $styles)
+    {
+        $this->proxy->addInlineStyles($styles);
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getInlineStyleFromUrl(string $url): ?string
+    {
+        return $this->proxy->getInlineStyleFromUrl($url);
     }
 
     /**

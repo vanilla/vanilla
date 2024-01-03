@@ -3,16 +3,17 @@
  * Database manager
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  * @package Core
  * @since 2.0
  */
 
-use Garden\Schema\Schema;
-use Garden\Web\Exception\ServerException;
-use Vanilla\InjectableInterface;
 use Garden\EventManager;
+use Garden\Schema\Schema;
+use Vanilla\InjectableInterface;
+use Vanilla\Utility\Spans\AbstractSpan;
+use Vanilla\Utility\StringUtils;
 
 /**
  * The Database object contains connection and engine information for a single database.
@@ -410,10 +411,9 @@ class Gdn_Database implements InjectableInterface
             $returnType = null;
         }
 
-        try {
-            $timerName = $returnType === "DataSet" ? "dbRead" : "dbWrite";
-            $this->timers->start(["db", $timerName]);
+        $span = $returnType === "DataSet" ? $this->timers->startDbRead() : $this->timers->startDbWrite();
 
+        try {
             if (isset($options["Cache"])) {
                 // Check to see if the query is cached.
                 $cacheKeys = (array) val("Cache", $options, null);
@@ -601,7 +601,7 @@ class Gdn_Database implements InjectableInterface
 
             return $this->_CurrentResultSet;
         } finally {
-            $this->timers->stop(["db", $timerName]);
+            $span->finish($sql, $inputParameters ?? []);
         }
     }
 
@@ -613,6 +613,14 @@ class Gdn_Database implements InjectableInterface
         if ($this->_InTransaction) {
             $this->_InTransaction = !$this->connection()->rollBack();
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInTransaction(): bool
+    {
+        return $this->_InTransaction;
     }
 
     /**

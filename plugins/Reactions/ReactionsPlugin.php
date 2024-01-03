@@ -259,7 +259,9 @@ class ReactionsPlugin extends Gdn_Plugin
         $reaction = $this->reactionModel->getUserReaction($userID, "Comment", $id);
         if ($reaction) {
             $urlCode = $reaction["UrlCode"];
-            $this->reactionModel->react("Comment", $id, $urlCode, null, false, ReactionModel::FORCE_REMOVE);
+            $this->reactionModel->react("Comment", $id, $urlCode, $userID, false, ReactionModel::FORCE_REMOVE);
+        } else {
+            new NotFoundException("Reaction");
         }
     }
 
@@ -512,7 +514,7 @@ class ReactionsPlugin extends Gdn_Plugin
         $reaction = $this->reactionModel->getUserReaction($userID, "Discussion", $id);
         if ($reaction) {
             $urlCode = $reaction["UrlCode"];
-            $this->reactionModel->react("Discussion", $id, $urlCode, null, false, ReactionModel::FORCE_REMOVE);
+            $this->reactionModel->react("Discussion", $id, $urlCode, $userID, false, ReactionModel::FORCE_REMOVE);
         }
     }
 
@@ -531,8 +533,9 @@ class ReactionsPlugin extends Gdn_Plugin
         $sender->idParamSchema()->setDescription("Get a summary of reactions on a discussion.");
         $in = $sender
             ->schema([
-                "type:s|n" => [
+                "type:s?" => [
                     "default" => null,
+                    "nullable" => true,
                     "description" => "Filter to a specific reaction type by using its URL code.",
                 ],
                 "page:i?" => [
@@ -1215,6 +1218,20 @@ class ReactionsPlugin extends Gdn_Plugin
             $Sender->permission("Reactions." . $PermissionClass . ".Add");
         }
 
+        if (strtolower($RecordType) === "discussion") {
+            $discussion = $this->discussionModel->getID((int) $ID);
+        } elseif (strtolower($RecordType) === "comment") {
+            $comment = $this->commentModel->getID((int) $ID);
+            $discussion = $this->discussionModel->getID($comment->DiscussionID);
+        }
+
+        if ($discussion) {
+            $eventManager = Gdn::eventManager();
+            $eventManager->fire("reactionsPlugin_beforeReact", $discussion);
+            $category = CategoryModel::categories($discussion->CategoryID);
+            $Sender->permission("Vanilla.Discussions.View", true, "Category", $category["PermissionCategoryID"]);
+        }
+
         $ReactionModel = new ReactionModel();
         $ReactionModel->react($RecordType, $ID, $Reaction, null, $selfReact);
         $Sender->render("Blank", "Utility", "Dashboard");
@@ -1496,26 +1513,6 @@ class ReactionsPlugin extends Gdn_Plugin
         $sender->addSideMenu();
         $sender->setData("Title", t("Recalculate Reactions"));
         $sender->render("Recalculate", "", "plugins/Reactions");
-    }
-
-    /**
-     * Adds track points separately option to category options in edit/add category page.
-     *
-     * @param SettingsController $sender
-     */
-    public function vanillaSettingsController_afterCategorySettings_handler($sender)
-    {
-        $showCustomPoints = c("Plugins.Reactions.TrackPointsSeparately", false);
-        if ($showCustomPoints) {
-            $desc =
-                "This allows you to create separate leaderboards for this category. Tracking points for this " .
-                "category separately will not be retroactive. To add a category-specific leaderboard module to your " .
-                'theme template, add <code>{module name="LeaderboardModule" CategoryID="7"}</code>, replacing the ' .
-                "CategoryID value with the ID of the category with separate tracking enabled.";
-            $label = "Track leaderboard points for this category separately.";
-            $toggle = $sender->Form->toggle("CustomPoints", $label, [], $desc);
-            echo wrap($toggle, "li", ["class" => "form-group"]);
-        }
     }
 
     /**

@@ -45,7 +45,7 @@ class CommentEmbedFactoryTest extends AbstractAPIv2Test
 
         $sectionProvider = new MockSiteSectionProvider(new DefaultSiteSection(new MockConfig(), new \Gdn_Router()));
         $sectionProvider->addSiteSections($siteSections);
-        $sectionModel = new SiteSectionModel(new MockConfig(), new \Gdn_Router());
+        $sectionModel = new SiteSectionModel(new MockConfig(), new \Gdn_Router(), \Gdn::request());
         $sectionModel->addProvider($sectionProvider);
 
         $factory = new CommentEmbedFactory($request, $sectionModel, $commentsApi);
@@ -58,7 +58,7 @@ class CommentEmbedFactoryTest extends AbstractAPIv2Test
      */
     public function supportedDomainsProvider(): array
     {
-        $bootstrapBase = "http://vanilla.test";
+        $bootstrapBase = "https://vanilla.test";
         return [
             // Allowed
             "Correct" => [$bootstrapBase . "/discussion/comment/41342", true],

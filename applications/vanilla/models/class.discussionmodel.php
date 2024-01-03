@@ -34,8 +34,10 @@ use Vanilla\Formatting\DateTimeFormatter;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
+use Vanilla\Forum\Jobs\DeferredResourceEventJob;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\ImageSrcSet\MainImageSchema;
+use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerFailedID;
 use Vanilla\Scheduler\LongRunnerItemResultInterface;
@@ -47,6 +49,7 @@ use Vanilla\Navigation\Breadcrumb;
 use Vanilla\Scheduler\LongRunnerQuantityTotal;
 use Vanilla\Scheduler\LongRunnerSuccessID;
 use Vanilla\Scheduler\LongRunnerTimeoutException;
+use Vanilla\Scheduler\SchedulerInterface;
 use Vanilla\Schema\RangeExpression;
 use Vanilla\SchemaFactory;
 use Vanilla\Search\SearchService;
@@ -105,6 +108,9 @@ class DiscussionModel extends Gdn_Model implements
     /** @var string for type redirect */
     const REDIRECT_TYPE = "redirect";
 
+    /** @var string for type stub */
+    const STUB_TYPE = "stub";
+
     /** @var string for type discussion */
     const DISCUSSION_TYPE = "Discussion";
 
@@ -119,6 +125,24 @@ class DiscussionModel extends Gdn_Model implements
 
     /** @var int */
     public const DEFAULT_STATUS_ID = 0;
+
+    /** @var int */
+    public const MAX_SNIPPET_LENGTH = 180;
+
+    public const SORT_EXPIRIMENTAL_TRENDING = "experimentalTrending";
+
+    /**
+     * Each sort in the array has the following properties:
+     * - **key**: string - The key name of the sort. Appears in the query string, should be url-friendly.
+     * - **name**: string - The display name of the sort.
+     * - **orderBy**: string - An array indicating order by fields and their directions in the format:
+     *   `['field1' => 'direction', 'field2' => 'direction']`
+     */
+    public const DEFAULT_ALLOWED_SORTS = [
+        "hot" => ["key" => "hot", "name" => "Hot", "orderBy" => ["DateLastComment" => "desc"]],
+        "top" => ["key" => "top", "name" => "Top", "orderBy" => ["Score" => "desc", "DateInserted" => "desc"]],
+        "new" => ["key" => "new", "name" => "New", "orderBy" => ["DateInserted" => "desc"]],
+    ];
 
     /** @var CategoryModel */
     private $categoryModel;
@@ -141,6 +165,12 @@ class DiscussionModel extends Gdn_Model implements
     // Use to continue a long-running action to delete a discussion with the same transaction ID.
     private const OPT_DELETE_SINGLE_TRANSACTION_ID = "deleteSingleTransactionID";
 
+    public const GLOBAL_ANNOUNCEMENT = 1;
+
+    public const CATEGORY_ANNOUNCEMENT = 2;
+
+    public const ANNOUNCEMENT = [self::GLOBAL_ANNOUNCEMENT, self::CATEGORY_ANNOUNCEMENT];
+
     /**
      * @deprecated 2.6
      * @var bool
@@ -152,18 +182,8 @@ class DiscussionModel extends Gdn_Model implements
 
     /**
      * @var array The sorts that are accessible via GET. Each sort corresponds with an order by clause.
-     *
-     * Each sort in the array has the following properties:
-     * - **key**: string - The key name of the sort. Appears in the query string, should be url-friendly.
-     * - **name**: string - The display name of the sort.
-     * - **orderBy**: string - An array indicating order by fields and their directions in the format:
-     *   `['field1' => 'direction', 'field2' => 'direction']`
      */
-    protected static $allowedSorts = [
-        "hot" => ["key" => "hot", "name" => "Hot", "orderBy" => ["DateLastComment" => "desc"]],
-        "top" => ["key" => "top", "name" => "Top", "orderBy" => ["Score" => "desc", "DateInserted" => "desc"]],
-        "new" => ["key" => "new", "name" => "New", "orderBy" => ["DateInserted" => "desc"]],
-    ];
+    protected static $allowedSorts = self::DEFAULT_ALLOWED_SORTS;
 
     /**
      * @var array The filters that are accessible via GET. Each filter corresponds with a where clause. You can have multiple
@@ -241,6 +261,7 @@ class DiscussionModel extends Gdn_Model implements
         self::$discussionTypes = null;
         self::$categoryPermissions = null;
         self::$initStaticFired = false;
+        self::$allowedSorts = self::DEFAULT_ALLOWED_SORTS;
     }
 
     /**
@@ -715,6 +736,22 @@ class DiscussionModel extends Gdn_Model implements
     }
 
     /**
+     * Given a discussion type, get the layout view type for it.
+     *
+     * @param string|null $discussionType
+     *
+     * @return string
+     */
+    public function layoutViewTypeByDiscussionType(?string $discussionType): string
+    {
+        $discussionType = self::normalizeDiscussionType($discussionType);
+        $discussionTypes = self::discussionTypes();
+        $layoutViewTypesByDiscussionType = array_column($discussionTypes, "layoutViewType", "apiType");
+
+        return $layoutViewTypesByDiscussionType[$discussionType] ?? "discussionThread";
+    }
+
+    /**
      * Get the allowed discussion types.
      *
      * @param stdClass $category
@@ -725,6 +762,7 @@ class DiscussionModel extends Gdn_Model implements
         if (self::$discussionTypes === null) {
             $discussionTypes = [
                 "Discussion" => [
+                    "layoutViewType" => "discussionThread",
                     "apiType" => "discussion",
                     "Singular" => "Discussion",
                     "Plural" => "Discussions",
@@ -819,10 +857,23 @@ class DiscussionModel extends Gdn_Model implements
         $this->EventArguments["sql"] = &$this->SQL;
         $this->fireEvent("BeforeGet"); // @see 'BeforeGetCount' for consistency in results vs. counts
 
-        $includeAnnouncements = false;
+        $removeAnnouncements = true;
         if (strtolower(val("Announce", $wheres)) == "all") {
-            $includeAnnouncements = true;
+            $removeAnnouncements = false;
             unset($wheres["Announce"]);
+        }
+
+        // If not looking at discussions filtered by bookmarks or user, filter announcements out.
+        if ($removeAnnouncements && !isset($wheres["w.Bookmarked"]) && !isset($wheres["d.InsertUserID"])) {
+            if ($userID > 0) {
+                $this->SQL
+                    ->beginWhereGroup()
+                    ->where(["d.Announce" => 0])
+                    ->orWhere(["w.Dismissed <>" => 0])
+                    ->endWhereGroup();
+            } else {
+                $this->SQL->where(["Announce" => false]);
+            }
         }
 
         if (is_array($wheres)) {
@@ -836,13 +887,6 @@ class DiscussionModel extends Gdn_Model implements
         // Set range and fetch
         $data = $this->SQL->get();
 
-        // If not looking at discussions filtered by bookmarks or user, filter announcements out.
-        if (!$includeAnnouncements) {
-            if (!isset($wheres["w.Bookmarked"]) && !isset($wheres["d.InsertUserID"])) {
-                $this->removeAnnouncements($data);
-            }
-        }
-
         // Change discussions returned based on additional criteria
         $this->addDiscussionColumns($data);
 
@@ -850,7 +894,7 @@ class DiscussionModel extends Gdn_Model implements
         $this->userModel->joinUsers($data, ["FirstUserID", "LastUserID"]);
         CategoryModel::joinCategories($data);
 
-        if (c("Vanilla.Views.Denormalize", false)) {
+        if ($this->shouldUseDenormalizedViews()) {
             $this->addDenormalizedViews($data);
         }
 
@@ -878,11 +922,12 @@ class DiscussionModel extends Gdn_Model implements
      * @param bool $expand Expand relevant related records (e.g. category, users).
      * @return Gdn_DataSet Returns a <a href='psi_element://Gdn_DataSet'>Gdn_DataSet</a> of discussions.
      * of discussions.
+     * @deprecated Use DiscussionModel::getWhere() instead.
      */
     public function getWhereRecent($where = [], $limit = false, $offset = false, $expand = true)
     {
+        $where["Announce"] = $where["Announce"] ?? false;
         $result = $this->getWhere($where, "", "", $limit, $offset, $expand);
-
         return $result;
     }
 
@@ -988,10 +1033,7 @@ class DiscussionModel extends Gdn_Model implements
     /**
      * Get a list of discussions.
      *
-     * This method call will remove announcements and may not return exactly {@link $limit} records for optimization.
-     * You can set `$where['d.Announce'] = 'all'` to return announcements.
-     *
-     * @param array|false $where The where condition of the get.
+     * @param array $where The where condition of the get.
      * @param string $orderFields The field to order the discussions by.
      * @param string $orderDirection The order, either **asc** or **desc**.
      * @param int|false $limit The number of discussion to return.
@@ -1000,114 +1042,48 @@ class DiscussionModel extends Gdn_Model implements
      * @param bool|string $filterType Query Filter.
      * @param bool|int $userID potential User ID.
      * @return Gdn_DataSet Returns a {@link Gdn_DataSet} of discussions.
+     * @param array $selects Extra fields to select.
      */
     public function getWhere(
-        $where = false,
+        $where = [],
         $orderFields = "",
         $orderDirection = "",
         $limit = false,
         $offset = false,
         bool $expand = true,
         $filterType = false,
-        $userID = false
+        $userID = false,
+        array $selects = []
     ) {
-        // Add backwards compatibility for the old way getWhere() was called.
-        if (is_numeric($orderFields)) {
-            deprecated('DiscussionModel->getWhere($where, $limit, ...)', "DiscussionModel->getWhereRecent()");
-            $limit = $orderFields;
-            $orderFields = "";
-        }
-        if (is_numeric($orderDirection)) {
-            deprecated('DiscussionModel->getWhere($where, $limit, $offset)', "DiscussionModel->getWhereRecent()");
-            $offset = $orderDirection;
-            $orderDirection = "";
-        }
+        $limit = $limit ?? $this->getDefaultLimit();
 
-        if ($limit === 0) {
-            trigger_error("You should not supply 0 to for $limit in DiscussionModel->getWhere()", E_USER_NOTICE);
-        }
-        if (empty($limit)) {
-            $limit = c("Vanilla.Discussions.PerPage", 30);
-        }
-        if (empty($offset)) {
-            $offset = 0;
-        }
-
-        if (!is_array($where)) {
-            $where = [];
-        }
-
-        if (isset($where["CategoryID"])) {
-            $where["d.CategoryID"] = $where["CategoryID"];
-            unset($where["CategoryID"]);
+        if (!empty($orderFields)) {
+            $orderBy = [$orderFields => $orderDirection];
+        } else {
+            $orderBy = $this->getOrderBy();
         }
 
         $where = $this->combineWheres($this->getWheres(), $where);
 
-        $orderBy = [];
-        if (empty($orderFields)) {
-            $orderBy = $this->getOrderBy();
-        } elseif (is_string($orderFields)) {
-            if ($orderDirection != "asc") {
-                $orderDirection = "desc";
-            }
-            $orderBy = [$orderFields => $orderDirection];
-        }
-
-        $selects = [];
         $this->EventArguments["OrderBy"] = &$orderBy;
         $this->EventArguments["Wheres"] = &$where;
         $this->EventArguments["Selects"] = &$selects;
-        $this->fireEvent("BeforeGet");
+        $this->getEventManager()->fire("discussionModel_beforeGet", $this, $this->EventArguments);
 
-        if (array_key_exists("Followed", $where)) {
-            if ($where["Followed"]) {
-                $categoryModel = new CategoryModel();
-                $followed = $categoryModel->getFollowed(Gdn::session()->UserID);
-                $categoryIDs = array_column($followed, "CategoryID");
-
-                if (isset($where["d.CategoryID"])) {
-                    $where["d.CategoryID"] = array_values(
-                        array_intersect((array) $where["d.CategoryID"], $categoryIDs)
-                    );
-                } else {
-                    $where["d.CategoryID"] = $categoryIDs;
-                }
-            }
-            unset($where["Followed"]);
-        }
-
-        // Check to see whether or not we are removing announcements.
-        if (strtolower(val("Announce", $where)) == "all") {
-            $removeAnnouncements = false;
-            unset($where["Announce"]);
-        } elseif (strtolower(val("d.Announce", $where)) == "all") {
-            $removeAnnouncements = false;
-            unset($where["d.Announce"]);
-        } else {
-            $removeAnnouncements = true;
-        }
-
-        $finalQuery = $this->getWhereQuery($where, $orderBy, $selects, $limit, $offset, $filterType, $userID);
+        $finalQuery = $this->getWhereQuery(
+            $where,
+            $orderBy,
+            $selects,
+            $limit,
+            $offset,
+            $filterType,
+            $userID
+        )->getSelect();
         $sql = $this->SQL;
         $data = $sql->query($finalQuery);
 
-        if (!empty([$orderBy])) {
-            // This is pseudo foreach loop.
-            // We only take the first pair of $orderField => $orderDirection here.
-            // So the loop will only entered ones
-            foreach (array_slice($orderBy, 0, 1, true) as $orderField => $orderDirection) {
-                $this->fixOrder($data, $orderField, $orderDirection);
-            }
-        }
-
         // Change discussions returned based on additional criteria
         $this->addDiscussionColumns($data);
-
-        // If not looking at discussions filtered by bookmarks or user, filter announcements out.
-        if ($removeAnnouncements && !isset($where["w.Bookmarked"]) && !isset($where["d.InsertUserID"])) {
-            $this->removeAnnouncements($data);
-        }
 
         // Join in users and categories.
         if ($expand) {
@@ -1115,34 +1091,32 @@ class DiscussionModel extends Gdn_Model implements
             CategoryModel::joinCategories($data);
         }
 
-        if (c("Vanilla.Views.Denormalize", false)) {
+        if (c("Vanilla.Views.Denormalize")) {
             $this->addDenormalizedViews($data);
         }
 
         // Prep and fire event
         $this->EventArguments["Data"] = $data;
-        $this->fireEvent("AfterAddColumns");
-
+        $this->getEventManager()->fire("discussionModel_afterAddColumns", $this);
+        $this->SQL->reset();
         return $data;
     }
 
     /**
      * Get a query for list of discussions.
      *
-     * This method call will remove announcements and may not return exactly {@link $limit} records for optimization.
-     * You can set `$where['d.Announce'] = 'all'` to return announcements.
      *
      * @param array $where The where condition of the get.
      * @param array $orderBy Order By array.
      * @param array $selects Select parameters.
-     * @param string $orderDirection The order, either **asc** or **desc**.
      * @param int|false $limit The number of discussion to return.
      * @param int|false $offset The offset within the total set.
      * @param bool|string $filterType Query Filter.
      * @param bool|int $userID potential User ID.
-     * @return string Returns query of discussions.
+     * @return Gdn_MySQLDriver Returns query of discussions.
+     * @throws Exception
      */
-    public function getWhereQuery(
+    private function getWhereQuery(
         array $where = [],
         array $orderBy = [],
         array $selects = [],
@@ -1150,24 +1124,20 @@ class DiscussionModel extends Gdn_Model implements
         $offset = false,
         $filterType = false,
         $userID = false
-    ): string {
+    ): Gdn_MySQLDriver {
+        $limit = $limit ?: $this->getDefaultLimit();
+        $offset = $offset ?: 0;
+        $userID = $userID ?: Gdn::session()->UserID;
+
         $joinDirtyRecords = $where[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
         if (isset($where[DirtyRecordModel::DIRTY_RECORD_OPT])) {
             unset($where[DirtyRecordModel::DIRTY_RECORD_OPT]);
         }
 
-        if (!is_array($where)) {
-            $where = [];
-        }
-
-        if (isset($where["CategoryID"])) {
-            $where["d.CategoryID"] = $where["CategoryID"];
-            unset($where["CategoryID"]);
-        }
+        $where = $this->normalizeQuery($where, "d");
 
         // Verify permissions (restricting by category if necessary)
         $perms = self::categoryPermissions();
-
         if ($perms !== true) {
             if (isset($where["d.CategoryID"])) {
                 $where["d.CategoryID"] = array_values(array_intersect((array) $where["d.CategoryID"], $perms));
@@ -1175,114 +1145,148 @@ class DiscussionModel extends Gdn_Model implements
                 $where["d.CategoryID"] = $perms;
             }
         }
+
         $sql = $this->SQL;
 
+        $sql->select("d.*")->from("Discussion d");
+
+        // Set Dirty records
         if ($joinDirtyRecords) {
             $this->applyDirtyWheres("d");
         }
 
-        // Build up the base query. Self-join for optimization.
-        if ($userID && $filterType) {
-            $sql->select("ud.DiscussionID")
-                ->from("UserDiscussion ud")
-                ->where([
-                    "UserID" => $userID,
-                    ucfirst($filterType) => 1,
-                ])
-                ->join("Discussion d", "ud.DiscussionID = d.DiscussionID", "left");
-        } else {
-            $sql->select("d.DiscussionID")->from("Discussion d");
-        }
-
-        if (!empty($limit)) {
-            $sql->limit($limit, $offset);
-        }
-
-        foreach ($orderBy as $field => $direction) {
-            $sql->orderBy($this->addFieldPrefix($field), $direction);
-        }
-
-        if (array_key_exists("Followed", $where)) {
-            if ($where["Followed"]) {
-                $categoryModel = new CategoryModel();
-                $followed = $categoryModel->getFollowed(Gdn::session()->UserID);
-                $categoryIDs = array_column($followed, "CategoryID");
-
-                if (isset($where["d.CategoryID"])) {
-                    $where["d.CategoryID"] = array_values(
-                        array_intersect((array) $where["d.CategoryID"], $categoryIDs)
-                    );
-                } else {
-                    $where["d.CategoryID"] = $categoryIDs;
-                }
+        if (isset($where["d.Followed"])) {
+            $followedCategory = $this->categoryModel->getFollowed(Gdn::session()->UserID);
+            if (isset($where["d.CategoryID"])) {
+                $where["d.CategoryID"] = array_values(
+                    array_intersect($where["d.CategoryID"], array_keys($followedCategory))
+                );
+            } else {
+                $where["d.CategoryID"] = array_keys($followedCategory);
             }
-            unset($where["Followed"]);
+
+            unset($where["d.Followed"]);
         }
 
-        // Make sure there aren't any ambiguous discussion references.
-        $safeWheres = [];
-        foreach ($where as $key => $value) {
-            $safeWheres[$this->addFieldPrefix($key)] = $value;
+        // Ensure NULL are treated as discussions.
+        if (isset($where["d.Type"])) {
+            if (!is_array($where["d.Type"])) {
+                $where["d.Type"] = [$where["d.Type"]];
+            }
+
+            if (in_array("discussion", $where["d.Type"]) || in_array("Discussion", $where["d.Type"])) {
+                $sql->beginWhereGroup()
+                    ->where("d.Type", $where["d.Type"])
+                    ->orWhere("d.Type is null")
+                    ->endWhereGroup();
+                unset($where["d.Type"]);
+            }
         }
-        $this->EventArguments["SQL"] = $sql;
-        $this->fireEvent("BeforeGetSubQuery");
-        $this->modifyTypeDiscussionQueryClause($safeWheres);
-        $sql->where($safeWheres);
-
-        $subQuery = $sql->getSelect(true);
-
-        $sql->reset();
-        $sql->select("d2.*")
-            ->from("Discussion d2")
-            ->join("_TBL_ d", "d.DiscussionID = d2.DiscussionID");
-        $this->fireEvent("AfterGetSubQuery");
 
         // Add the UserDiscussion query.
-        if (($userID = Gdn::session()->UserID) > 0) {
-            $sql->join("UserDiscussion w", "w.DiscussionID = d2.DiscussionID and w.UserID = $userID", "left")
-                ->select("w.UserID", "", "WatchUserID")
-                ->select("w.DateLastViewed, w.Dismissed, w.Bookmarked")
-                ->select("w.CountComments", "", "CountCommentWatch")
-                ->select("w.Participated");
+        if ($userID > 0) {
+            $sql->join("UserDiscussion ud", "ud.DiscussionID = d.DiscussionID and ud.UserID = $userID", "left")
+                ->select("ud.UserID", "", "WatchUserID")
+                ->select("ud.DateLastViewed, ud.Dismissed, ud.Bookmarked")
+                ->select("ud.CountComments", "", "CountCommentWatch")
+                ->select("ud.Participated");
+
+            if ($filterType) {
+                $where["ud." . ucfirst($filterType)] = 1;
+            }
         }
 
-        // Add select of addition fields to the SQL object.
-        foreach ($selects as $select) {
-            $sql->select($select);
+        if (($where["d.Announce"] ?? null) === "all") {
+            // This value historically meant to not do any announcement filtering because it was implicitly baked in.
+            // Nowadays we should just strip it and do not filtering.
+            unset($where["d.Announce"]);
         }
 
-        $outerQuery = $sql->getSelect();
-        $finalQuery = str_replace("`" . $this->Database->DatabasePrefix . "_TBL_`", "(" . $subQuery . ")", $outerQuery);
-        return $finalQuery;
+        if (isset($where["d.Announce"]) && $userID) {
+            // If we have an announce value and a sessioned user we need to or with UserDiscussion.
+
+            $announceValue = (array) $where["d.Announce"];
+            if (in_array(0, $announceValue)) {
+                $sql->beginWhereGroup()
+                    ->where(["d.Announce" => $announceValue])
+                    ->orWhere(["ud.Dismissed <>" => 0])
+                    ->endWhereGroup();
+            } else {
+                $sql->where(["d.Announce" => $where["d.Announce"]])
+                    ->beginWhereGroup()
+                    ->where(["ud.Dismissed <>" => 1])
+                    ->orWhere("ud.Dismissed is null")
+                    ->endWhereGroup();
+            }
+            unset($where["d.Announce"]);
+        }
+
+        $this->EventArguments["SQL"] = $sql;
+        $this->fireEvent("BeforeGetSubQuery");
+
+        $sql->select($selects);
+        $sql->where($where);
+
+        if (!empty($orderBy)) {
+            $sql->orderBy($orderBy);
+        }
+
+        $sql->limit($limit);
+        $sql->offset($offset);
+
+        return $sql;
+    }
+
+    /**
+     *  Normalize a where rows by adding a prefix to specify the table to make sure there aren't any ambiguous references.
+     *
+     * @param array $where
+     * @param string $prefix
+     * @return array
+     */
+    public function normalizeQuery(array $where, string $prefix): array
+    {
+        $safeWheres = [];
+        foreach ($where as $key => $value) {
+            // Normalize the legacy UserDiscussion alias.
+            if (str_contains($key, "w.")) {
+                $this->logger->warning("Using deprecated `w` alias for UserDiscussion", [
+                    "where" => $where,
+                ]);
+                $key = str_replace("w.", "ud.", $key);
+            }
+
+            if ($key) {
+                $safeWheres[$this->addFieldPrefix($key, $prefix)] = $value;
+            }
+        }
+        return $safeWheres;
     }
 
     /**
      * Get a count of the list of discussions.
      *
      * @param array $where The where condition of the get.
-     * @param int|false $limit records per page limit.
      * @param bool|string $filterType Query Filter.
      * @param bool|int $userID potential User ID.
-     * @return string Returns query of discussions.
+     * @return int Returns query of discussions.
+     * @throws Exception
      */
-    public function getPagingCount(array $where = [], $limit = false, $filterType = false, $userID = false): int
+    public function getPagingCount(array $where = [], $filterType = false, $userID = false): int
     {
-        // Check to see whether or not we are removing announcements.
-        if (strtolower(val("Announce", $where)) == "all") {
-            unset($where["Announce"]);
-            $where["d.Announce"] = "> 0";
-        } elseif (strtolower(val("d.Announce", $where)) == "all") {
-            $where["d.Announce"] = "> 0";
-        } else {
-            $where["d.Announce"] = "0";
-        }
-        if (empty($limit)) {
-            $limit = c("Vanilla.Discussions.PerPage", 30);
-        }
-        $limit *= 100;
-        $countQuery = $this->getWhereQuery($where, [], [], $limit, false, $filterType, $userID);
+        $limit = Gdn::config("Vanilla.APIv2.MaxCount", 10000);
+        $sql = $this->getWhereQuery($where, [], ["d.DiscussionID"], $limit, false, $filterType, $userID);
+        $countQuery = $sql
+            ->resetSelects()
+            ->select("d.DiscussionID")
+            ->getSelect();
+        $countQuery = <<<SQL
+SELECT COUNT(*) as count FROM ({$countQuery}) cq
+SQL;
+
         $result = $this->SQL->query($countQuery);
-        return $result->count();
+
+        return $result->firstRow(DATASET_TYPE_ARRAY)["count"];
     }
 
     /**
@@ -1303,156 +1307,29 @@ class DiscussionModel extends Gdn_Model implements
     }
 
     /**
-     * Gets the data for multiple unread discussions based on the given criteria.
-     *
-     * Sorts results based on config options Vanilla.Discussions.SortField
-     * and Vanilla.Discussions.SortDirection.
-     * Events: BeforeGet, AfterAddColumns.
-     *
-     * @param int $offset Number of discussions to skip.
-     * @param int|false $limit Max number of discussions to return.
-     * @param array $wheres SQL conditions.
-     * @param array $additionalFields Allows selection of additional fields as Alias=>Table.Fieldname.
-     * @return Gdn_DataSet SQL result.
-     * @deprecated since 2.4, reason: doesn't scale
-     */
-    public function getUnread($offset = 0, $limit = false, $wheres = [], $additionalFields = [])
-    {
-        deprecated(__METHOD__);
-
-        if ($limit == false) {
-            $limit = Gdn::config("Vanilla.Discussions.PerPage", 50);
-        }
-
-        $offset = !is_numeric($offset) || $offset < 0 ? 0 : $offset;
-
-        $session = Gdn::session();
-        $userID = $session->UserID > 0 ? $session->UserID : 0;
-        $this->discussionSummaryQuery($additionalFields, false);
-
-        if ($userID > 0) {
-            $this->SQL
-                ->select("w.UserID", "", "WatchUserID")
-                ->select("w.DateLastViewed, w.Dismissed, w.Bookmarked")
-                ->select("w.CountComments", "", "CountCommentWatch")
-                ->select("w.Participated")
-                ->join("UserDiscussion w", "d.DiscussionID = w.DiscussionID and w.UserID = " . $userID, "left")
-                ->beginWhereGroup()
-                ->where("d.CountComments >", "COALESCE(w.CountComments, 0)", true, false)
-                ->orWhere("w.DateLastViewed", null)
-                ->endWhereGroup();
-        } else {
-            $this->SQL
-                ->select("0", "", "WatchUserID")
-                ->select("now()", "", "DateLastViewed")
-                ->select("0", "", "Dismissed")
-                ->select("0", "", "Bookmarked")
-                ->select("0", "", "CountCommentWatch")
-                ->select("0", "", "Participated")
-                ->select("d.Announce", "", "IsAnnounce");
-        }
-
-        $this->SQL->limit($limit, $offset);
-
-        $this->EventArguments["SortField"] = c("Vanilla.Discussions.SortField", "d.DateLastComment");
-        $this->EventArguments["SortDirection"] = c("Vanilla.Discussions.SortDirection", "desc");
-        $this->EventArguments["Wheres"] = &$wheres;
-        $this->fireEvent("BeforeGetUnread"); // @see 'BeforeGetCount' for consistency in results vs. counts
-
-        $includeAnnouncements = false;
-        if (strtolower(val("Announce", $wheres)) == "all") {
-            $includeAnnouncements = true;
-            unset($wheres["Announce"]);
-        }
-
-        if (is_array($wheres)) {
-            $this->SQL->where($wheres);
-        }
-
-        // Get sorting options from config
-        $sortField = $this->EventArguments["SortField"];
-        if (!in_array($sortField, ["d.DiscussionID", "d.DateLastComment", "d.DateInserted"])) {
-            trigger_error("You are sorting discussions by a possibly sub-optimal column.", E_USER_NOTICE);
-        }
-
-        $sortDirection = $this->EventArguments["SortDirection"];
-        if ($sortDirection != "asc") {
-            $sortDirection = "desc";
-        }
-
-        $this->SQL->orderBy($this->addFieldPrefix($sortField), $sortDirection);
-
-        // Set range and fetch
-        $data = $this->SQL->get();
-
-        // If not looking at discussions filtered by bookmarks or user, filter announcements out.
-        if (!$includeAnnouncements) {
-            if (!isset($wheres["w.Bookmarked"]) && !isset($wheres["d.InsertUserID"])) {
-                $this->removeAnnouncements($data);
-            }
-        }
-
-        // Change discussions returned based on additional criteria
-        $this->addDiscussionColumns($data);
-
-        // Join in the users.
-        $this->userModel->joinUsers($data, ["FirstUserID", "LastUserID"]);
-        CategoryModel::joinCategories($data);
-
-        if (c("Vanilla.Views.Denormalize", false)) {
-            $this->addDenormalizedViews($data);
-        }
-
-        // Prep and fire event
-        $this->EventArguments["Data"] = $data;
-        $this->fireEvent("AfterAddColumns");
-
-        return $data;
-    }
-
-    /**
-     * Removes undismissed announcements from the data.
-     *
-     * @param Gdn_DataSet $data SQL result.
-     */
-    public function removeAnnouncements($data)
-    {
-        $result = &$data->result();
-        $unset = false;
-
-        foreach ($result as $key => &$discussion) {
-            if (isset($this->_AnnouncementIDs)) {
-                if (in_array($discussion->DiscussionID, $this->_AnnouncementIDs)) {
-                    unset($result[$key]);
-                    $unset = true;
-                }
-            } elseif ($discussion->Announce && $discussion->Dismissed == 0) {
-                // Unset discussions that are announced and not dismissed
-                unset($result[$key]);
-                $unset = true;
-            }
-        }
-        if ($unset) {
-            // Make sure the discussions are still in order for json encoding.
-            $result = array_values($result);
-        }
-    }
-
-    /**
      * Add denormalized views to discussions.
      *
      * @param Gdn_DataSet $discussions
      */
     public function addDenormalizedViews(&$discussions)
     {
+        $cache = \Gdn::cache();
         if ($discussions instanceof Gdn_DataSet) {
             $result = $discussions->result();
-            foreach ($result as &$discussion) {
-                $cacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $discussion->DiscussionID);
-                $cacheViews = Gdn::cache()->get($cacheKey);
-                if ($cacheViews !== Gdn_Cache::CACHEOP_FAILURE) {
-                    $discussion->CountViews += $cacheViews;
-                }
+            $cacheKeys = [];
+            foreach ($result as $discussion) {
+                $discussionID = $discussion->DiscussionID;
+                $cacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $discussionID);
+                $cacheKeys[] = $cacheKey;
+            }
+            $cached = $cache->get($cacheKeys) ?: [];
+
+            foreach ($result as $i => &$discussion) {
+                $discussionID = $discussion->DiscussionID;
+                $cacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $discussionID);
+
+                $cachedViews = $cached[$cacheKey] ?? 0;
+                $discussion->CountViews += $cachedViews;
             }
         } else {
             if (isset($discussions->DiscussionID)) {
@@ -1602,10 +1479,10 @@ class DiscussionModel extends Gdn_Model implements
         if (property_exists($discussion, "Announce") && $discussion->Announce > 0) {
             $pinned = true;
             switch (intval($discussion->Announce)) {
-                case 1:
+                case self::GLOBAL_ANNOUNCEMENT:
                     $pinLocation = "recent";
                     break;
-                case 2:
+                case self::CATEGORY_ANNOUNCEMENT:
                     $pinLocation = "category";
             }
         }
@@ -1721,190 +1598,63 @@ class DiscussionModel extends Gdn_Model implements
      * @param array $wheres SQL conditions.
      * @param int $offset The number of records to skip.
      * @param int|false $limit The number of records to limit the query to.
-     * @param string|string[]|null $orderBy An array of column names for sorting.
      * @return Gdn_DataSet SQL result.
+     * @throws Exception
+     * @deprecated Use DiscussionModel::getWhere() and DiscussionModel::getAnnouncementWhere() instead.
      */
-    public function getAnnouncements($wheres = [], $offset = 0, $limit = false, $orderBy = null)
+    public function getAnnouncements($wheres = [], $offset = 0, $limit = false)
     {
-        if ($limit === false) {
-            $limit = c("Vanilla.Discussions.PerPage", 30);
-        }
-        $query = $this->getAnnouncementsQuery($wheres, $offset, $limit, $orderBy);
-        if (empty($query)) {
-            return new Gdn_DataSet();
-        }
-        $data = $this->SQL->query($query);
-
-        // Save the announcements that were fetched for later removal.
-        $announcementIDs = [];
-        foreach ($data as $row) {
-            $announcementIDs[] = val("DiscussionID", $row);
-        }
-        $this->_AnnouncementIDs = $announcementIDs;
-
-        $this->addDiscussionColumns($data);
-
-        if (c("Vanilla.Views.Denormalize", false)) {
-            $this->addDenormalizedViews($data);
-        }
-
-        $this->userModel->joinUsers($data, ["FirstUserID", "LastUserID"]);
-        CategoryModel::joinCategories($data);
-
-        // Prep and fire event
-        $this->EventArguments["Data"] = $data;
-        $this->fireEvent("AfterAddColumns");
-
+        $whereAnnounce = array_merge($wheres, ["Announce" => $this->getAnnouncementWhere($wheres, true)]);
+        $data = $this->getWhere($whereAnnounce, "", "", $limit, $offset);
         return $data;
     }
 
     /**
-     * Gets announced discussions query.
+     * Manage the various cases to fetch discussion announcements
      *
-     * @param array $wheres SQL conditions.
-     * @param int $offset The number of records to skip.
-     * @param int|false $limit The number of records to limit the query to.
-     * @param string|string[]|null $orderBy An array of column names for sorting.
-     * @return string sql Query
+     * @param array $where
+     * @param bool $includeAnnouncement
+     * @return int|array
      */
-    public function getAnnouncementsQuery($wheres = [], $offset = 0, $limit = false, $orderBy = null): string
+    public function getAnnouncementWhere(array $where, bool $includeAnnouncement = false)
     {
-        $joinDirtyRecords = $wheres[DirtyRecordModel::DIRTY_RECORD_OPT] ?? false;
-        if (isset($wheres[DirtyRecordModel::DIRTY_RECORD_OPT])) {
-            unset($wheres[DirtyRecordModel::DIRTY_RECORD_OPT]);
-        }
-        $wheres = $this->combineWheres($this->getWheres(), $wheres);
-        $session = Gdn::session();
-        $userID = $session->UserID > 0 ? $session->UserID : 0;
-        $categoryID = val("d.CategoryID", $wheres, 0);
-        $groupID = val("d.GroupID", $wheres, 0);
-        // Get the discussion IDs of the announcements.
-        $cacheKey = $this->getAnnouncementCacheKey($categoryID);
-        if ($groupID == 0) {
-            $this->SQL->cache($cacheKey);
-        }
-        $this->SQL->select("d.DiscussionID")->from("Discussion d");
+        $where = $this->normalizeQuery($where, "d");
+        if (isset($where["d.Announce"])) {
+            $announce = $where["d.Announce"];
+        } elseif (isset($where["d.CategoryID"]) || isset($where["d.categoryID"]) || isset($where["d.groupID"])) {
+            $announcementType = DiscussionModel::ANNOUNCEMENT;
 
-        $announceOverride = false;
-        $whereFields = array_keys($wheres);
-        foreach ($whereFields as $field) {
-            if (stringBeginsWith($field, "d.Announce")) {
-                $announceOverride = true;
-                break;
+            // If we have multiple categories then show only global announcements (e.g. followed categories page).
+            $categoryID = $where["d.CategoryID"] ?? ($where["d.categoryID"] ?? null);
+            if (is_array($categoryID)) {
+                $announcementType = DiscussionModel::GLOBAL_ANNOUNCEMENT;
             }
-        }
-        if (!$announceOverride) {
-            if (!is_array($categoryID) && ($categoryID > 0 || $groupID > 0)) {
-                $this->SQL->where("d.Announce >", "0");
-            } else {
-                $this->SQL->where("d.Announce", 1);
-            }
-        }
 
-        if ($groupID > 0) {
-            $this->SQL->where("d.GroupID", $groupID);
-        } elseif (is_array($categoryID)) {
-            $this->SQL->whereIn("d.CategoryID", $categoryID);
-        } elseif ($categoryID > 0) {
-            $this->SQL->where("d.CategoryID", $categoryID);
-        }
-
-        if ($joinDirtyRecords) {
-            $this->applyDirtyWheres("d");
-        }
-
-        $announcementIDs = $this->SQL->get()->resultArray();
-        $announcementIDs = array_column($announcementIDs, "DiscussionID");
-
-        // Short circuit querying when there are no announcements.
-        if (count($announcementIDs) == 0) {
-            $this->_AnnouncementIDs = $announcementIDs;
-
-            return "";
-        }
-
-        $this->discussionSummaryQuery([], false);
-
-        $this->modifyTypeDiscussionQueryClause($wheres);
-
-        if (!empty($wheres)) {
-            $this->SQL->where($wheres);
-        }
-
-        if ($userID) {
-            $this->SQL
-                ->select("w.UserID", "", "WatchUserID")
-                ->select("w.DateLastViewed, w.Dismissed, w.Bookmarked")
-                ->select("w.CountComments", "", "CountCommentWatch")
-                ->select("w.Participated")
-                ->join("UserDiscussion w", "d.DiscussionID = w.DiscussionID and w.UserID = " . $userID, "left");
+            $announce = $includeAnnouncement ? $announcementType : [false];
         } else {
-            // Don't join in the user table when we are a guest.
-            $this->SQL->select(
-                "null as WatchUserID, null as DateLastViewed, null as Dismissed, null as Bookmarked, null as CountCommentWatch"
-            );
+            $announce = $includeAnnouncement
+                ? [DiscussionModel::GLOBAL_ANNOUNCEMENT]
+                : [false, DiscussionModel::CATEGORY_ANNOUNCEMENT];
         }
 
-        // Add conditions passed.
-        $this->SQL->whereIn("d.DiscussionID", $announcementIDs);
-
-        // If we aren't viewing announcements in a category then only show global announcements.
-        if (empty($wheres) || is_array($categoryID)) {
-            $this->SQL->where("d.Announce", 1);
-        } else {
-            $this->SQL->where("d.Announce >", 0);
-        }
-
-        // If we allow users to dismiss discussions, skip ones this user dismissed
-        if (c("Vanilla.Discussions.Dismiss", 1) && $userID) {
-            $this->SQL->where('coalesce(w.Dismissed, \'0\')', "0", false);
-        }
-
-        $this->SQL->limit($limit, $offset);
-
-        $orderBy = $orderBy ?? $this->getOrderBy();
-        $this->SQL->orderByPrefix("d.", $orderBy);
-        $this->EventArguments["Wheres"] = &$wheres;
+        $this->EventArguments["Wheres"] = &$where;
         $this->fireEvent("beforeGetAnnouncements");
 
-        return $this->SQL->getSelect();
+        return $announce;
     }
 
     /**
      * Gets announced discussions count.
      *
      * @param array $wheres SQL conditions.
-     * @param int|false $limit Per page limit.
      * @return int row count.
+     * @throws Exception
+     * @deprecated
      */
-    public function getAnnouncementsPagingCount($wheres = [], $limit = false): int
+    public function getAnnouncementsPagingCount($wheres = []): int
     {
-        if (empty($limit)) {
-            $limit = c("Vanilla.Discussions.PerPage", 30);
-        }
-        $limit *= 100;
-        $countQuery = $this->getAnnouncementsQuery($wheres, 0, $limit);
-        if (empty($countQuery)) {
-            return 0;
-        }
-        $result = $this->SQL->query($countQuery);
-        return $result->count();
-    }
-
-    /**
-     * Get announcement cache key.
-     *
-     * @param int $categoryID Category ID,
-     * @return string $key CacheKey name to be used for cache.
-     */
-    public function getAnnouncementCacheKey($categoryID = 0)
-    {
-        $key = "Announcements";
-        if (!is_array($categoryID) && $categoryID > 0) {
-            $key .= ":" . $categoryID;
-        }
-
-        return $key;
+        $whereAnnounce = array_merge($wheres, ["Announce" => self::ANNOUNCEMENT]);
+        return $this->getPagingCount($whereAnnounce);
     }
 
     /**
@@ -2169,7 +1919,7 @@ class DiscussionModel extends Gdn_Model implements
     public function fetchFragments(array $ids, array $options = []): array
     {
         $ids = array_values($ids);
-        $rows = $this->getWhere(["DiscussionID" => $ids, "Announce" => "all"])->resultArray();
+        $rows = $this->getWhere(["DiscussionID" => $ids])->resultArray();
         $fragments = [];
 
         $schema = SchemaFactory::get(PostFragmentSchema::class);
@@ -2259,6 +2009,8 @@ class DiscussionModel extends Gdn_Model implements
      */
     public function getCount($wheres = [], $unused = null)
     {
+        $wheres = $this->normalizeQuery($wheres, "d");
+
         // Get permissions.
         $perms = self::categoryPermissions();
 
@@ -2337,15 +2089,15 @@ class DiscussionModel extends Gdn_Model implements
 
         $hasUserDiscussionFilter = false;
         foreach ($wheres as $key => $val) {
-            if (stringBeginsWith($key, "w.")) {
+            if (stringBeginsWith($key, "ud.")) {
                 $hasUserDiscussionFilter = true;
             }
         }
 
         if ($hasUserDiscussionFilter) {
             $query = $query->join(
-                "UserDiscussion w",
-                "d.DiscussionID = w.DiscussionID and w.UserID = " . Gdn::session()->UserID,
+                "UserDiscussion ud",
+                "d.DiscussionID = ud.DiscussionID and ud.UserID = " . Gdn::session()->UserID,
                 "left"
             );
         }
@@ -2618,6 +2370,7 @@ class DiscussionModel extends Gdn_Model implements
      * If a query asks for only discussion-type records, modifies the query to get 'discussion' and null values.
      *
      * @param array $wheres
+     * @deprecated
      */
     public function modifyTypeDiscussionQueryClause(&$wheres)
     {
@@ -2636,8 +2389,10 @@ class DiscussionModel extends Gdn_Model implements
      *
      * @param int $discussionID Unique ID of discussion being affected.
      * @param int $userID Unique ID of the user being affected.
+     * @param bool $dismissal
+     * @throws Exception
      */
-    public function dismissAnnouncement($discussionID, $userID)
+    public function dismissAnnouncement($discussionID, $userID, bool $dismissal = true)
     {
         $count = $this->SQL
             ->select("UserID")
@@ -2659,7 +2414,7 @@ class DiscussionModel extends Gdn_Model implements
                 ->update("UserDiscussion")
                 ->set("CountComments", $countComments)
                 ->set("DateLastViewed", DateTimeFormatter::getCurrentDateTime())
-                ->set("Dismissed", "1")
+                ->set("Dismissed", $dismissal)
                 ->where("DiscussionID", $discussionID)
                 ->where("UserID", $userID)
                 ->put();
@@ -2670,7 +2425,7 @@ class DiscussionModel extends Gdn_Model implements
                 "DiscussionID" => $discussionID,
                 "CountComments" => $countComments,
                 "DateLastViewed" => DateTimeFormatter::getCurrentDateTime(),
-                "Dismissed" => "1",
+                "Dismissed" => $dismissal,
             ]);
         }
     }
@@ -2844,10 +2599,10 @@ class DiscussionModel extends Gdn_Model implements
                 $pinLocation = strtolower(val("PinLocation", $formPostValues, "category"));
                 switch ($pinLocation) {
                     case "recent":
-                        $announce = 1;
+                        $announce = self::GLOBAL_ANNOUNCEMENT;
                         break;
                     default:
-                        $announce = 2;
+                        $announce = self::CATEGORY_ANNOUNCEMENT;
                 }
             }
             $formPostValues["Announce"] = $announce;
@@ -2945,19 +2700,6 @@ class DiscussionModel extends Gdn_Model implements
                         return $invalidReturnType;
                     }
 
-                    // Clear the cache if necessary.
-                    $cacheKeys = [];
-                    if (val("Announce", $stored) != val("Announce", $fields)) {
-                        $cacheKeys[] = $this->getAnnouncementCacheKey();
-                        $cacheKeys[] = $this->getAnnouncementCacheKey(val("CategoryID", $stored));
-                    }
-                    if (val("CategoryID", $stored) != val("CategoryID", $fields)) {
-                        $cacheKeys[] = $this->getAnnouncementCacheKey(val("CategoryID", $fields));
-                    }
-                    foreach ($cacheKeys as $cacheKey) {
-                        Gdn::cache()->remove($cacheKey);
-                    }
-
                     // The primary key was removed from the form fields, but we need it for logging.
                     LogModel::logChange("Edit", "Discussion", array_merge($fields, ["DiscussionID" => $discussionID]));
 
@@ -3018,15 +2760,6 @@ class DiscussionModel extends Gdn_Model implements
                     // Update cached last post info for a category.
                     CategoryModel::updateLastPost($fields);
 
-                    // Clear the cache if necessary.
-                    if (val("Announce", $fields)) {
-                        Gdn::cache()->remove($this->getAnnouncementCacheKey(val("CategoryID", $fields)));
-
-                        if (val("Announce", $fields) == 1) {
-                            Gdn::cache()->remove($this->getAnnouncementCacheKey());
-                        }
-                    }
-
                     // Update the user's discussion count.
                     $insertUser = $this->userModel->getID($fields["InsertUserID"]);
                     $this->updateUserDiscussionCount(
@@ -3074,15 +2807,14 @@ class DiscussionModel extends Gdn_Model implements
                 $this->EventArguments["DiscussionID"] = $discussionID;
                 $this->fireEvent("AfterSaveDiscussion");
 
-                // Fetch the discussion again.
-                // It may have been modified in the event handler.
-                $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
-                $discussionEvent = $this->eventFromRow(
-                    (array) $discussion,
-                    $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE,
-                    $this->userModel->currentFragment()
+                $action = $insert ? DiscussionEvent::ACTION_INSERT : DiscussionEvent::ACTION_UPDATE;
+                \Gdn::scheduler()->addJobDescriptor(
+                    new NormalJobDescriptor(DeferredResourceEventJob::class, [
+                        "id" => $discussionID,
+                        "model" => DiscussionModel::class,
+                        "action" => $action,
+                    ])
                 );
-                $this->getEventManager()->dispatch($discussionEvent);
             }
         }
 
@@ -3362,6 +3094,16 @@ class DiscussionModel extends Gdn_Model implements
     }
 
     /**
+     * Determine if we should use "view denormalization".
+     *
+     * This is when we defer writeback of a discussion's 'CountViews' to a buffer in memcached.
+     */
+    private function shouldUseDenormalizedViews(): bool
+    {
+        return c("Vanilla.Views.Denormalize", false) && Gdn::cache()->activeEnabled();
+    }
+
+    /**
      * Increments view count for the specified discussion.
      *
      * @param int $discussionID Unique ID of discussion to get +1 view.
@@ -3369,11 +3111,7 @@ class DiscussionModel extends Gdn_Model implements
     public function addView($discussionID)
     {
         $incrementBy = 0;
-        if (
-            c("Vanilla.Views.Denormalize", false) &&
-            Gdn::cache()->activeEnabled() &&
-            Gdn::cache()->type() != Gdn_Cache::CACHE_TYPE_NULL
-        ) {
+        if ($this->shouldUseDenormalizedViews()) {
             $writebackLimit = c("Vanilla.Views.DenormalizeWriteback", 10);
             $cacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $discussionID);
 
@@ -3824,7 +3562,6 @@ SQL;
     {
         $discussions = LegacyModelUtils::reduceTable($this, [
             "d.CategoryID" => $categoryID,
-            "Announce" => "all",
         ]);
         foreach ($discussions as $discussion) {
             $this->deleteID($discussion["DiscussionID"], $options);
@@ -3847,7 +3584,6 @@ SQL;
     {
         $discussions = LegacyModelUtils::reduceTable($this, [
             "d.CategoryID" => $categoryID,
-            "Announce" => "all",
         ]);
         foreach ($discussions as $discussion) {
             $this->save(
@@ -4497,12 +4233,18 @@ SQL;
     {
         $this->fixRow($row);
         $session = \Gdn::session();
-        if ($session->User) {
+        $discussionMoved = $row["Type"] === self::REDIRECT_TYPE && $row["Closed"];
+        if ($session->User && !$discussionMoved) {
             $row["unread"] =
+                isset($row["CountUnreadComments"]) &&
                 $row["CountUnreadComments"] !== 0 &&
                 ($row["CountUnreadComments"] !== true ||
                     dateCompare(val("DateFirstVisit", $session->User), $row["DateInserted"]) <= 0);
-            if ($row["CountUnreadComments"] !== true && $row["CountUnreadComments"] > 0) {
+            if (
+                isset($row["CountUnreadComments"]) &&
+                $row["CountUnreadComments"] !== true &&
+                $row["CountUnreadComments"] > 0
+            ) {
                 $row["countUnread"] = $row["CountUnreadComments"];
             }
         } else {
@@ -4519,35 +4261,39 @@ SQL;
             unset($row["Category"]);
         }
 
-        $row["Announce"] = (bool) $row["Announce"];
+        $row["Announce"] = (bool) ($row["Announce"] ?? 0);
+        $row["Dismissed"] = (bool) ($row["Dismissed"] ?? 0);
         $row["Url"] = discussionUrl($row);
         $row["CanonicalUrl"] =
             isset($row["CanonicalUrl"]) && is_string($row["CanonicalUrl"]) ? $row["CanonicalUrl"] : $row["Url"];
 
-        $rawBody = $row["Body"];
-        $format = $row["Format"];
+        $rawBody = $row["Body"] ?? "";
+        $format = $row["Format"] ?? null;
 
-        $this->formatField($row, "Body", $format);
-        $row["Attributes"] = new Attributes($row["Attributes"]);
+        $bodyParsed = $this->formatterService->parse($rawBody, $format);
+        if ($this->doFieldFormatting) {
+            $row["Body"] = $this->formatterService->renderHTML($bodyParsed, $format);
+        }
+        $row["Attributes"] = new Attributes($row["Attributes"] ?? null);
 
         if (array_key_exists("Bookmarked", $row)) {
-            $row["Bookmarked"] = (bool) $row["Bookmarked"];
+            $row["Bookmarked"] = (bool) ($row["Bookmarked"] ?? 0);
         }
 
         if (ModelUtils::isExpandOption("lastPost", $expand)) {
             $lastPost = [
-                "discussionID" => $row["DiscussionID"],
-                "insertUserID" => $row["LastUserID"],
+                "discussionID" => $row["DiscussionID"] ?? null,
+                "insertUserID" => $row["LastUserID"] ?? null,
             ];
-            $lastPost["dateInserted"] = $row["DateLastComment"] ?? $row["DateInserted"];
+            $lastPost["dateInserted"] = $row["DateLastComment"] ?? ($row["DateInserted"] ?? null);
             if ($row["LastCommentID"]) {
-                $lastPost["CommentID"] = $row["LastCommentID"];
-                $lastPost["CategoryID"] = $row["CategoryID"];
-                $lastPost["name"] = sprintft("Re: %s", $row["Name"]);
-                $lastPost["url"] = commentUrl($lastPost, true);
+                $lastPost["CommentID"] = $row["LastCommentID"] ?? null;
+                $lastPost["CategoryID"] = $row["CategoryID"] ?? null;
+                $lastPost["name"] = sprintft("Re: %s", $row["Name"] ?? "");
+                $lastPost["url"] = isset($lastPost) ? commentUrl($lastPost, true) : null;
             } else {
-                $lastPost["name"] = $row["Name"];
-                $lastPost["url"] = $row["Url"];
+                $lastPost["name"] = $row["Name"] ?? null;
+                $lastPost["url"] = $row["Url"] ?? null;
             }
 
             if (
@@ -4565,11 +4311,14 @@ SQL;
 
         // This shouldn't be necessary, but the db allows nulls for dateLastComment.
         if (empty($row["DateLastComment"])) {
-            $row["DateLastComment"] = $row["DateInserted"];
+            $row["DateLastComment"] = $row["DateInserted"] ?? null;
         }
 
         if (ModelUtils::isExpandOption("excerpt", $expand)) {
-            $row["excerpt"] = $this->formatterService->renderExcerpt($rawBody, $format);
+            $row["excerpt"] = $this->formatterService->renderExcerpt($bodyParsed, $format);
+        }
+        if (ModelUtils::isExpandOption("snippet", $expand)) {
+            $row["snippet"] = $this->formatterService->renderExcerpt($bodyParsed, $format, self::MAX_SNIPPET_LENGTH);
         }
         if (ModelUtils::isExpandOption("-body", $expand)) {
             unset($row["Body"]);
@@ -4579,9 +4328,9 @@ SQL;
 
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
             $row["recordCollapseID"] = "site{$this->ownSite->getSiteID()}_discussion{$row["DiscussionID"]}";
-            $row["excerpt"] = $row["excerpt"] ?? $this->formatterService->renderExcerpt($rawBody, $format);
-            $row["bodyPlainText"] = Gdn::formatService()->renderPlainText($rawBody, $format);
-            $row["image"] = $this->formatterService->parseImageUrls($rawBody, $format)[0] ?? null;
+            $row["excerpt"] = $row["excerpt"] ?? $this->formatterService->renderExcerpt($bodyParsed, $format);
+            $row["bodyPlainText"] = Gdn::formatService()->renderPlainText($bodyParsed, $format);
+            $row["image"] = $this->formatterService->parseImageUrls($bodyParsed, $format)[0] ?? null;
             $row["scope"] = $this->categoryModel->getRecordScope($row["CategoryID"]);
             $row["score"] = $row["Score"] ?? 0;
             $row["hot"] = $row["hot"];
@@ -4610,7 +4359,7 @@ SQL;
         $result["type"] = self::normalizeDiscussionType($result["type"] ?? null);
 
         // Get the discussion's parsed body's first image & get the srcset for it.
-        $result["image"] = $this->formatterService->parseMainImage($rawBody, $format);
+        $result["image"] = $this->formatterService->parseMainImage($bodyParsed, $format);
 
         return $result;
     }
@@ -4625,6 +4374,7 @@ SQL;
     public static function normalizeDiscussionType(?string $discussionType): string
     {
         if (!empty($discussionType)) {
+            $discussionType = $discussionType === self::STUB_TYPE ? self::DISCUSSION_TYPE : $discussionType;
             return lcfirst($discussionType);
         } else {
             return "discussion";
@@ -4684,7 +4434,7 @@ SQL;
         $schema = [
             "discussionID:i" => "The ID of the discussion.",
             "discussionCollapseID:s?",
-            "type:s|n" => [
+            "type:s|n?" => [
                 "description" => "The type of this discussion if any.",
             ],
             "name:s" => [
@@ -4696,6 +4446,9 @@ SQL;
             ],
             "excerpt:s?" => [
                 "description" => "Plain-text excerpt of the current discussion body.",
+            ],
+            "snippet:s?" => [
+                "description" => "Plain-text snippet of discussion body for use in emails.",
             ],
             "bodyRaw:s?",
             "bodyPlainText:s?" => [
@@ -4751,6 +4504,7 @@ SQL;
                 ],
             ],
             "status?" => RecordStatusModel::getSchemaFragment(),
+            "trending:o?",
         ];
         if (\Gdn::session()->checkPermission("staff.allow")) {
             $schema["internalStatusID:i"] = ["default" => 0];
@@ -4772,6 +4526,7 @@ SQL;
             "bookmarked:b" => "Whether or not the discussion is bookmarked by the current user.",
             "unread:b" => "Whether or not the discussion should have an unread indicator.",
             "countUnread:i?" => "The number of unread comments.",
+            "dismissed:b" => "Whether or not the discussion has been dismissed by the current user.",
         ]);
         return $result;
     }
@@ -4985,7 +4740,8 @@ SQL;
 
         // Find all discussions with content from after DateMarkedRead.
         $discussionModel = new DiscussionModel();
-        $discussions = $discussionModel->get(0, $lookBackCount + 1, $wheres);
+
+        $discussions = $discussionModel->getWhere($wheres);
         unset($discussionModel);
 
         // Abort if we get back as many as we asked for, meaning a
@@ -5014,7 +4770,7 @@ SQL;
     {
         $r = LegacyModelUtils::getCrawlInfoFromPrimaryKey(
             $this,
-            "/api/v2/discussions?pinOrder=mixed&sort=-discussionID&expand[]=crawl&expand[]=tagIDs",
+            "/api/v2/discussions?pinOrder=mixed&sort=-discussionID&expand=crawl,tagIDs,roles",
             "discussionID"
         );
         return $r;
@@ -5056,14 +4812,14 @@ SQL;
         }
 
         $discussion = (object) $discussion;
-        $name = Gdn_Format::url($discussion->Name);
+        $name = isset($discussion->Name) ? Gdn_Format::url($discussion->Name) : null;
 
         // Disallow an empty name slug in discussion URLs.
         if (empty($name)) {
             $name = "x";
         }
 
-        $result = "/discussion/" . $discussion->DiscussionID . "/" . $name;
+        $result = "/discussion/" . ($discussion->DiscussionID ?? "") . "/" . $name;
 
         if ($page) {
             if ($page > 1 || Gdn::session()->UserID) {

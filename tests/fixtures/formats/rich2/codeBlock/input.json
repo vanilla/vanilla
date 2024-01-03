@@ -1,0 +1,15 @@
+[
+  {
+    "type": "code_block",
+    "children": [
+      { "type": "code_line", "children": [{ "text": "Line 1" }] },
+      { "type": "code_line", "children": [{ "text": "" }] },
+      { "type": "code_line", "children": [{ "text": "Line 3" }] },
+      { "type": "code_line", "children": [{ "text": "" }] },
+      { "type": "code_line", "children": [{ "text": "" }] },
+      { "type": "code_line", "children": [{ "text": "" }] },
+      { "type": "code_line", "children": [{ "text": "Line 7" }] }
+    ],
+    "lang": "sql"
+  }
+]

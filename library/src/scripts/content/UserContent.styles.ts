@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -43,7 +43,7 @@ export function userContentMixin(): CSSObject {
     };
 
     const headings: CSSObject = {
-        "& h1:not(.heading)": headingStyle("h1", vars.fonts.headings.h1),
+        "& h1:not(.heading)": headingStyle("h1", vars.fonts.headings.h2), // The h1 is styled as an h2. User content doesn't get to use H1s.
         "& h2:not(.heading)": headingStyle("h2", vars.fonts.headings.h2),
         "& h3:not(.heading)": headingStyle("h3", vars.fonts.headings.h3),
         "& h4:not(.heading)": headingStyle("h4", vars.fonts.headings.h4),
@@ -70,14 +70,29 @@ export function userContentMixin(): CSSObject {
             ...{
                 [`& > li`]: {
                     // There are unrelated !important styles in _style.scss which is overrides
-                    listStyle: "none!important",
+                    listStyle: "disc !important",
                     position: "relative",
+                    "&::marker": {
+                        fontSize: ".85rem",
+                    },
                 },
-                [`& > li::before`]: {
-                    fontFamily: `'Arial', serif`,
-                    content: `"•"`,
-                    position: "absolute",
-                    left: em(-1),
+                [`& ul > li`]: {
+                    listStyle: "circle !important",
+                },
+                [`& ul ul > li`]: {
+                    listStyle: "square !important",
+                },
+                [`& ul ul ul > li`]: {
+                    listStyle: "disc !important",
+                },
+                [`& ul ul ul ul > li`]: {
+                    listStyle: "circle !important",
+                },
+                [`& ul ul ul ul ul > li`]: {
+                    listStyle: "square !important",
+                },
+                [`& ul ul ul ul ul ul > li`]: {
+                    listStyle: "disc !important",
                 },
                 [`& ol, & ul`]: {
                     margin: vars.list.nestedList.margin,
@@ -114,14 +129,18 @@ export function userContentMixin(): CSSObject {
         },
         [`& li`]: {
             margin: `5px 0`,
-            ...{
-                [`&, & *:first-child`]: {
-                    marginTop: 0,
-                },
-                [`&, & *:last-child`]: {
-                    marginBottom: 0,
-                },
+            [`&, & *:first-child`]: {
+                marginTop: 0,
             },
+            [`&, & *:last-child`]: {
+                marginBottom: 0,
+            },
+        },
+        [`& .listItemChild::after`]: {
+            // Clearfix for floating images in lists.
+            content: '""',
+            display: "table",
+            clear: "both",
         },
     };
 
@@ -129,6 +148,7 @@ export function userContentMixin(): CSSObject {
         "& > p": {
             marginTop: 0,
             marginBottom: 0,
+            minHeight: "1rem",
             ...{
                 "&:not(:first-child)": {
                     marginTop: vars.blocks.margin * 0.5,
@@ -212,6 +232,17 @@ export function userContentMixin(): CSSObject {
             color: ColorsUtils.colorOut(vars.codeBlock.fg),
             backgroundColor: ColorsUtils.colorOut(vars.codeBlock.bg),
             ...Mixins.padding(vars.codeBlock.padding),
+            "&&::selection": {
+                background: "#c1def1",
+            },
+        },
+
+        "&& .codeBlockWrapped": {
+            whiteSpace: "normal",
+        },
+
+        "& code": {
+            fontFamily: `Menlo, Monaco, Consolas, "Courier New", monospace`,
         },
     };
 
@@ -268,6 +299,11 @@ export function userContentMixin(): CSSObject {
           && .float-right .embedExternal-content`]: {
             marginBottom: vars.blocks.margin,
         },
+
+        //this one is for the live-announcer (we inject div for accessibility purposes) so we need to tweak its display type otherwise it'll break the inline-ness
+        "&& .inlineEmbed .embedExternal-content + div": {
+            display: "inline-flex",
+        },
     };
 
     const blockQuoteVars = blockQuoteVariables();
@@ -276,6 +312,20 @@ export function userContentMixin(): CSSObject {
         ".blockquote": {
             color: ColorsUtils.colorOut(blockQuoteVars.colors.fg),
         },
+        ".blockquote-content": {
+            ...Mixins.margin({ top: 8 }),
+            "&:first-of-type": {
+                ...Mixins.margin({ top: 0 }),
+            },
+        },
+    };
+
+    const emoji: CSSObject = {
+        ".emoji": {
+            ...Mixins.margin({ top: -2, bottom: -3 }),
+            width: globalVars.fonts.size.large,
+            height: "auto",
+        },
     };
 
     const tables: CSSObject = {
@@ -283,14 +333,14 @@ export function userContentMixin(): CSSObject {
             overflowX: "auto",
             width: percent(100),
         },
-        "& > .tableWrapper > table": {
+        "& table": {
             width: percent(100),
         },
         // Rest of the table styles
-        "& > .tableWrapper th": {
+        "& .tableWrapper th": {
             whiteSpace: "nowrap",
         },
-        "& > .tableWrapper td, & > .tableWrapper th": {
+        "& .tableWrapper td, & .tableWrapper th": {
             overflowWrap: "break-word",
             minWidth: 80,
             ...Mixins.padding({
@@ -311,13 +361,16 @@ export function userContentMixin(): CSSObject {
                       borderRight: singleBorder(vars.tables.verticalBorders.borders),
                   }
                 : {}),
+            "& > *:not(ul):not(ol)": {
+                margin: 0,
+            },
         },
-        "& > .tableWrapper tr:nth-child(even)": vars.tables.striped
+        "& .tableWrapper tr:nth-child(even)": vars.tables.striped
             ? {
                   background: ColorsUtils.colorOut(vars.tables.stripeColor),
               }
             : {},
-        "& > .tableWrapper th, & > .tableWrapper thead td": {
+        "& .tableWrapper th, & .tableWrapper thead td": {
             fontWeight: globalVars.fonts.weights.bold,
         },
 
@@ -352,19 +405,19 @@ export function userContentMixin(): CSSObject {
         {
             ...{
                 ".tableWrapper": outerBorderMixin(),
-                "& > .tableWrapper thead tr:first-child > *, & > .tableWrapper tbody:first-child tr:first-child > *": {
+                "& .tableWrapper thead tr:first-child > *, & .tableWrapper tbody:first-child tr:first-child > *": {
                     // Get rid of the outer border radius.
                     borderTop: "none",
                 },
-                "& > .tableWrapper :not(thead) tr:last-child > *": {
+                "& .tableWrapper :not(thead) tr:last-child > *": {
                     // Get rid of the outer border radius.
                     borderBottom: "none",
                 },
-                "& > .tableWrapper tr > *:last-child": {
+                "& .tableWrapper tr > *:last-child": {
                     // Get rid of the outer border radius.
                     borderRight: "none",
                 },
-                "& > .tableWrapper tr > *:first-child, & > .tableWrapper tr > .mobileTableHead:first-child + *": {
+                "& .tableWrapper tr > *:first-child, & .tableWrapper tr > .mobileTableHead:first-child + *": {
                     // Get rid of the outer border radius.
                     borderLeft: "none",
                 },
@@ -448,6 +501,7 @@ export function userContentMixin(): CSSObject {
         ...spoilersAndQuotes,
         ...embeds,
         ...blockquotes,
+        ...emoji,
         ...linkStyle,
         ...tableOuterRadiusQuery,
         ...tableMobileQuery,
@@ -463,7 +517,149 @@ export function userContentMixin(): CSSObject {
 }
 
 export const userContentClasses = useThemeCache(() => {
+    const vars = userContentVariables();
+    const globalVars = globalVariables();
+
+    const outerBorderMixin = (): CSSObject => {
+        return {
+            borderRadius: vars.tables.outerBorderRadius,
+            borderTop: vars.tables.horizontalBorders.enabled
+                ? singleBorder(vars.tables.horizontalBorders.borders)
+                : undefined,
+            borderBottom: vars.tables.horizontalBorders.enabled
+                ? singleBorder(vars.tables.horizontalBorders.borders)
+                : undefined,
+            borderLeft: vars.tables.verticalBorders.enabled
+                ? singleBorder(vars.tables.verticalBorders.borders)
+                : undefined,
+            borderRight: vars.tables.verticalBorders.enabled
+                ? singleBorder(vars.tables.verticalBorders.borders)
+                : undefined,
+        };
+    };
+
+    const tableOuterRadiusQuery = media(
+        { minWidth: vars.tables.mobileBreakpoint + 1 },
+        {
+            ...outerBorderMixin(),
+            "& thead tr:first-child > *, & tbody:first-child tr:first-child > *": {
+                // Get rid of the outer border radius.
+                borderTop: "none",
+            },
+            "& :not(thead) tr:last-child > *": {
+                // Get rid of the outer border radius.
+                borderBottom: "none",
+            },
+            "& tr > *:last-child": {
+                // Get rid of the outer border radius.
+                borderRight: "none",
+            },
+            "& tr > *:first-child": {
+                // Get rid of the outer border radius.
+                borderLeft: "none",
+            },
+        },
+    );
+
+    const tableMobileQuery = media(
+        { maxWidth: vars.tables.mobileBreakpoint },
+        {
+            ...{
+                "& .tableHead": {
+                    ...Mixins.absolute.srOnly(),
+                },
+                "& tr": {
+                    display: "block",
+                    flexWrap: "wrap",
+                    width: percent(100),
+                    background: "none !important",
+                    marginBottom: vars.blocks.margin,
+                    ...outerBorderMixin(),
+                },
+                "& tr .mobileStripe": vars.tables.striped
+                    ? {
+                          borderTop: "none",
+                          borderBottom: "none",
+                          background: ColorsUtils.colorOut(vars.tables.stripeColor),
+                      }
+                    : {
+                          borderTop: "none",
+                          borderBottom: "none",
+                      },
+                // First row.
+                "& tr > *:first-child": {
+                    borderTop: "none",
+                },
+                // Last row.
+                "& tr > *:last-child": {
+                    borderBottom: "none",
+                },
+                "& .mobileTableHead": {
+                    borderBottom: "none",
+                },
+                "& .mobileTableHead + *": {
+                    marginTop: -6,
+                    borderTop: "none",
+                },
+                "& tr > *": {
+                    width: percent(100),
+                    wordWrap: "break-word",
+                    display: "block",
+                    borderLeft: "none",
+                    borderRight: "none",
+                },
+                "& tr > :not(.mobileTableHead)": {
+                    borderRight: "none",
+                },
+            },
+        },
+    );
+
+    const tableWrapper = css({
+        overflowX: "auto",
+        width: percent(100),
+        "& > table": {
+            width: percent(100),
+            "& th": {
+                whiteSpace: "pre",
+            },
+            "& th, & td": {
+                overflowWrap: "break-word",
+                minWidth: 80,
+                ...Mixins.padding({
+                    vertical: 6,
+                    horizontal: 12,
+                }),
+                border: "none",
+                textAlign: vars.tables.cell.alignment,
+                ...(vars.tables.horizontalBorders.enabled
+                    ? {
+                          borderTop: singleBorder(vars.tables.horizontalBorders.borders),
+                          borderBottom: singleBorder(vars.tables.horizontalBorders.borders),
+                      }
+                    : {}),
+                ...(vars.tables.verticalBorders.enabled
+                    ? {
+                          borderLeft: singleBorder(vars.tables.verticalBorders.borders),
+                          borderRight: singleBorder(vars.tables.verticalBorders.borders),
+                      }
+                    : {}),
+            },
+            "& tr:nth-child(even)": vars.tables.striped
+                ? {
+                      background: ColorsUtils.colorOut(vars.tables.stripeColor),
+                  }
+                : {},
+            "& th, & thead td": {
+                fontWeight: globalVars.fonts.weights.bold,
+            },
+            ...tableOuterRadiusQuery,
+            ...tableMobileQuery,
+        },
+    });
+
     return {
         root: css(userContentMixin()),
+        tableWrapper,
     };
 });

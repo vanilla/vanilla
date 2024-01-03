@@ -8,6 +8,7 @@ namespace Vanilla\Search;
 
 use Garden\Schema\ValidationException;
 use Vanilla\Utility\SchemaUtils;
+use Vanilla\Utility\UrlUtils;
 
 /**
  * Item to handle search results.
@@ -29,6 +30,10 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
     /** @var string[] $terms */
     private $terms;
 
+    private ?string $cursor;
+
+    private array $aggregations;
+
     /**
      * Constructor.
      *
@@ -37,13 +42,22 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
      * @param int $offset
      * @param int $limit
      */
-    public function __construct(array $resultItems, int $totalCount, int $offset, int $limit, array $terms = [])
-    {
+    public function __construct(
+        array $resultItems,
+        int $totalCount,
+        int $offset,
+        int $limit,
+        array $terms = [],
+        ?string $cursor = null,
+        array $aggregations = []
+    ) {
         $this->resultItems = $resultItems;
         $this->totalCount = $totalCount;
         $this->offset = $offset;
         $this->limit = $limit;
         $this->terms = $terms;
+        $this->cursor = $cursor;
+        $this->aggregations = $aggregations;
     }
 
     /**
@@ -52,6 +66,15 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
     public function getResultItems(): array
     {
         return $this->resultItems;
+    }
+
+    /**
+     * @param array $resultItems
+     * @return void
+     */
+    public function setResultItems(array $resultItems): void
+    {
+        $this->resultItems = $resultItems;
     }
 
     /**
@@ -106,6 +129,16 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
         return $this->terms;
     }
 
+    /**
+     * Token which may be used to fetch next page of results.
+     *
+     * @return string|null
+     */
+    public function getCursor(): ?string
+    {
+        return $this->cursor;
+    }
+
     ///
     /// PHP interfaces
     ///
@@ -153,5 +186,37 @@ class SearchResults implements \IteratorAggregate, \JsonSerializable, \Countable
             }
         }
         return $results;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAggregations(): array
+    {
+        return $this->aggregations;
+    }
+
+    /**
+     * Add UTM parameters to the search results' URLs.
+     *
+     * @param string $searchTerm
+     * @return void
+     */
+    public function applyUtmParams(string $searchTerm = "")
+    {
+        $utmParameters = [
+            "utm_source" => "community-search",
+            "utm_medium" => "organic-search",
+            "utm_term" => $searchTerm,
+        ];
+
+        $resultItems = $this->getResultItems();
+        foreach ($resultItems as &$resultItem) {
+            $itemUrl = $resultItem->getUrl();
+            $itemUrl = UrlUtils::concatQuery($itemUrl, $utmParameters);
+
+            $resultItem->setUrl($itemUrl);
+        }
+        $this->setResultItems($resultItems);
     }
 }

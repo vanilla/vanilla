@@ -17,7 +17,7 @@ import Heading from "@library/layout/Heading";
 
 export interface IDataListNode {
     key: React.ReactNode;
-    value: React.ReactNode | RecordID | RecordID[];
+    value: React.ReactNode | RecordID | RecordID[] | React.ReactNode[];
 }
 
 interface DataListProps {
@@ -30,7 +30,7 @@ interface DataListProps {
     /** Optional and will be rendered on the screen */
     title?: string;
     /** Define table spacing in terms of percentages which sum 100% */
-    colgroups?: number[];
+    colgroups?: [string | number, string | number];
 }
 
 type IProps = RequireAtLeastOne<DataListProps, "title" | "caption">;
@@ -99,7 +99,11 @@ export function DataList(props: IProps) {
                 {colgroups && (
                     <colgroup>
                         {colgroups.map((percent, index) => (
-                            <col key={index} span={1} style={{ width: `${percent}%` }} />
+                            <col
+                                key={index}
+                                span={1}
+                                style={{ width: typeof percent === "number" ? `${percent}%` : percent }}
+                            />
                         ))}
                     </colgroup>
                 )}

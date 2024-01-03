@@ -58,38 +58,14 @@ class BannerContentWidget extends BannerFullWidget
         return "BannerContentWidget";
     }
 
+    /**
+     * @return Schema
+     */
     public static function getWidgetSchema(): Schema
     {
         $schema = parent::getWidgetSchema()->getSchemaArray();
         unset($schema["properties"]["showSearch"]);
         unset($schema["properties"]["searchPlacement"]);
-        $schema["properties"]["showTitle"]["default"] = false;
-        $schema["properties"]["showTitle"]["x-control"] = SchemaForm::toggle(new FormOptions("Title"));
-        $schema["properties"]["title"]["label"] = "";
-        $showTitleConditions = [
-            (new FieldMatchConditional(
-                "showTitle",
-                Schema::parse([
-                    "type" => "boolean",
-                    "const" => true,
-                    "default" => false,
-                ])
-            ))->getCondition(),
-        ];
-        $schema["properties"]["title"]["x-control"]["conditions"] = $showTitleConditions;
-        $schema["properties"]["textColor"]["x-control"]["conditions"] = $showTitleConditions;
-        $schema["properties"]["alignment"]["x-control"]["conditions"] = $showTitleConditions;
-        $schema["properties"]["showDescription"]["default"] = false;
-        $schema["properties"]["description"]["x-control"]["conditions"] = [
-            (new FieldMatchConditional(
-                "showDescription",
-                Schema::parse([
-                    "type" => "boolean",
-                    "const" => true,
-                    "default" => false,
-                ])
-            ))->getCondition(),
-        ];
         return new Schema($schema);
     }
 }

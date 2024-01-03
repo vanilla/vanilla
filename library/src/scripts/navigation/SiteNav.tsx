@@ -4,19 +4,20 @@
  * @license GPL-2.0-only
  */
 
-import React, { useEffect } from "react";
-import classNames from "classnames";
-import SiteNavNode, { IActiveRecord } from "@library/navigation/SiteNavNode";
-import { siteNavClasses } from "@library/navigation/siteNavStyles";
+import { INavigationTreeItem } from "@library/@types/api/core";
 import Heading from "@library/layout/Heading";
+import { useSection } from "@library/layout/LayoutContext";
+import { panelListClasses } from "@library/layout/panelListStyles";
+import { useSiteNavContext } from "@library/navigation/SiteNavContext";
+import SiteNavNode, { IActiveRecord } from "@library/navigation/SiteNavNode";
+import { SiteNavNodeTypes } from "@library/navigation/SiteNavNodeTypes";
+import { siteNavClasses } from "@library/navigation/siteNavStyles";
+import { useActiveNavRecord } from "@library/routing/routingUtils";
 import { t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
-import { INavigationTreeItem } from "@library/@types/api/core";
 import { TabHandler } from "@vanilla/dom-utils";
-import { panelListClasses } from "@library/layout/panelListStyles";
-import { useSection } from "@library/layout/LayoutContext";
-import { SiteNavNodeTypes } from "@library/navigation/SiteNavNodeTypes";
-import { useSiteNavContext } from "@library/navigation/SiteNavContext";
+import classNames from "classnames";
+import React, { useEffect } from "react";
 
 interface IProps {
     activeRecord?: IActiveRecord;
@@ -44,7 +45,9 @@ export function SiteNav(props: IProps) {
 
     const titleID = id + "-title";
 
-    const { activeRecord, collapsible, onItemHover, onSelectItem, children, siteNavNodeTypes } = props;
+    const { activeRecord: _activeRecord, collapsible, onItemHover, onSelectItem, children, siteNavNodeTypes } = props;
+
+    const activeRecord = useActiveNavRecord(children, _activeRecord);
     const hasChildren = children && children.length > 0;
     const classes = siteNavClasses();
     const classesPanelList = panelListClasses(useSection().mediaQueries);
@@ -67,7 +70,7 @@ export function SiteNav(props: IProps) {
                   <SiteNavNode
                       {...child}
                       collapsible={collapsible}
-                      activeRecord={activeRecord}
+                      activeRecord={activeRecord ?? undefined}
                       key={child.recordType + child.recordID}
                       titleID={titleID}
                       depth={0}
@@ -121,7 +124,7 @@ function gatherInitialRecords(records: INavigationTreeItem[], maxDepth: number):
         nextDepth = [];
         currentDepth.forEach((item) => {
             initialRecords.push(item);
-            nextDepth = [...nextDepth, ...item.children];
+            nextDepth = [...nextDepth, ...(item.children ?? [])];
         });
         currentDepth = nextDepth;
     }

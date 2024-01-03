@@ -816,7 +816,7 @@ class TwitterPlugin extends SSOAddon
     {
         $c = curl_init();
         curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, true);
         switch ($request->get_normalized_http_method()) {
             case "POST":
                 curl_setopt($c, CURLOPT_URL, $request->get_normalized_http_url());

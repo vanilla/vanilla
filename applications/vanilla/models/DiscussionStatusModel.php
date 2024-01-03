@@ -100,22 +100,25 @@ class DiscussionStatusModel
         } else {
             $oldStatusID = $discussion["statusID"] ?? 0;
         }
-        $noChange = $statusID === $oldStatusID;
+        $noStatusChange = $statusID === $oldStatusID;
 
-        $this->discussionModel->saveToSerializedColumn("Attributes", $discussionID, "StatusChanged", !$noChange);
+        $this->discussionModel->saveToSerializedColumn("Attributes", $discussionID, "StatusChanged", !$noStatusChange);
 
         $existingStatusNotes = DiscussionModel::getRecordAttribute($discussion, "StatusNotes");
         $statusNotes = $reason ?? $existingStatusNotes;
         $statusNotes = $statusNotes === "" ? null : $statusNotes;
         $this->discussionModel->saveToSerializedColumn("Attributes", $discussionID, "StatusNotes", $statusNotes);
 
-        if (!$noChange) {
+        $noReasonChange = strcmp($reason, $existingStatusNotes) === 0;
+
+        if (!$noStatusChange || !$noReasonChange) {
             $recordLogData = [
                 "insertUserID" => Gdn::session()->UserID,
                 "dateInserted" => DateTimeFormatter::timeStampToDateTime(CurrentTimeStamp::get()),
                 "recordType" => "discussion",
                 "recordID" => $discussionID,
                 "reason" => $reason,
+                "reasonUpdated" => $reason,
                 "statusID" => $statusID,
             ];
 

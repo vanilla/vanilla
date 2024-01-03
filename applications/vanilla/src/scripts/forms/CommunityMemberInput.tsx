@@ -25,6 +25,7 @@ interface IProps {
     hideTitle?: boolean;
     maxHeight?: number;
     name?: string;
+    isClearable?: boolean;
 }
 
 /**
@@ -76,6 +77,7 @@ export function CommunityMemberInput(props: IProps) {
             label={props.label ?? ""}
             value={(props.value ?? [])[0]}
             maxHeight={props.maxHeight}
+            inputClassName={"form-control"}
         />
     );
 }
@@ -106,7 +108,7 @@ export function useMember(query: string) {
             setLoading(false);
             return (
                 resultsByQuery[query]?.map((user: IUserFragment) => ({
-                    value: user.name,
+                    value: user.userID,
                     label: user.name,
                     data: {
                         ...user,
@@ -114,7 +116,11 @@ export function useMember(query: string) {
                 })) ?? []
             );
         } else {
-            !!query && query.length > 2 && fetchMemberByName(query);
+            // If the query is empty, offer some suggestions in the dropdown
+            if (query === "") {
+                fetchMemberByName("");
+            }
+            !!query && query.length > 0 && fetchMemberByName(query);
         }
     }, [resultsByQuery, query, resultsCached]);
 

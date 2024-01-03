@@ -52,11 +52,20 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
                         const modulesRequiringTranspilation = [
                             "@vanilla/.*",
                             "@monaco-editor/react.*",
-                            "ajv.*",
+                            "@cfworker*",
                             "@?react-spring.*",
                             "highlight.js",
                             "@simonwep.*",
                             "serialize-error", // Comes from swagger-ui
+                            // These are needed for plate
+                            "@udecode/.*",
+                            "jotai",
+                            "zustand",
+                            "@radix-ui/.*",
+                            "@floating-ui/.*",
+                            "downshift",
+                            "@tanstack/*",
+                            "flame-chart-js.*",
                         ];
                         const exclusionRegex = new RegExp(`node_modules/(${modulesRequiringTranspilation.join("|")})/`);
 
@@ -114,7 +123,7 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
                 {
                     test: /\.s?css$/,
                     use: [
-                        BuildMode.PRODUCTION === options.mode
+                        [BuildMode.PRODUCTION, BuildMode.ANALYZE].includes(options.mode)
                             ? MiniCssExtractPlugin.loader
                             : {
                                   loader: "style-loader",
@@ -164,6 +173,7 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
             new webpack.DefinePlugin({
                 __DIST__NAME__: JSON.stringify(DIST_NAME),
                 __BUILD__SECTION__: JSON.stringify(section),
+                "process.env.IS_WEBPACK": true,
             }),
             new webpack.IgnorePlugin({
                 resourceRegExp: /^\.\/locale$/,
@@ -207,7 +217,7 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
         },
     };
 
-    if (options.mode === BuildMode.PRODUCTION) {
+    if ([BuildMode.PRODUCTION, BuildMode.ANALYZE].includes(options.mode)) {
         config.plugins.push(
             new MiniCssExtractPlugin({
                 filename: "[contenthash].min.css",

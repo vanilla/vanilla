@@ -121,7 +121,7 @@ class RoleModelTest extends SiteTestCase
     public function testPersonalInfo(): void
     {
         $role = ["Name" => __FUNCTION__, "PersonalInfo" => true];
-        $id = $this->roleModel->insert($role);
+        $id = (int) $this->roleModel->insert($role);
         $this->userModel->addRoles($this->adminID, [$id], false);
 
         $rolesAsAdmin = $this->roleModel->getPublicUserRoles($this->adminID, "RoleID");
@@ -130,6 +130,18 @@ class RoleModelTest extends SiteTestCase
 
         $this->assertContains($id, $rolesAsAdmin);
         $this->assertNotContains($id, $rolesAsMember);
+    }
+
+    /**
+     * Updating unconfirmed default role should be allowed without errors.
+     */
+    public function testUpdateUnconfirmedRole(): void
+    {
+        $role = ["Name" => __FUNCTION__];
+        $unconfirmed = $this->roleModel->getID(RoleModel::UNCONFIRMED_ID, DATASET_TYPE_ARRAY);
+        $unconfirmed["Name"] = "Test Unconfirmed";
+        $this->roleModel->save($unconfirmed);
+        $this->assertArraySubsetRecursive($unconfirmed, RoleModel::roles(RoleModel::UNCONFIRMED_ID));
     }
 
     /**

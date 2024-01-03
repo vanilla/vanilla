@@ -10,6 +10,7 @@ use Garden\EventManager;
 use Garden\Schema\Schema;
 use Gdn;
 use Psr\Container\ContainerInterface;
+use Vanilla\Utility\TracedSchema;
 
 /**
  * Factory for schema objects.
@@ -97,6 +98,16 @@ final class SchemaFactory
             Gdn::getContainer()
                 ->get(EventManager::class)
                 ->fire("{$id}Schema_init", $result);
+        }
+
+        // Wrap the schema in a traced schema.
+        // We can only really do this for generic schemas though.
+        // Otherwise something might be expecting a more specific schema to come out of this.
+        if (get_class($schema) === Schema::class) {
+            $result = new TracedSchema($result);
+            if (!empty($id)) {
+                $result->setID($id);
+            }
         }
 
         return $result;

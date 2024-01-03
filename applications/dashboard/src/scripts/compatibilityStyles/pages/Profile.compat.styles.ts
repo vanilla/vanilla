@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-import { absolutePosition, unit, userSelect } from "@library/styles/styleHelpers";
+import { absolutePosition, singleBorder, unit, userSelect } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
@@ -13,7 +13,7 @@ import { globalVariables } from "@library/styles/globalStyleVars";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { important, percent } from "csx";
 import { MixinsFoundation } from "@library/styles/MixinsFoundation";
-import { profileVariables, ProfilePhotoAlignment } from "@dashboard/compatibilityStyles/pages/Profile.variables";
+import { profileVariables } from "@dashboard/compatibilityStyles/pages/Profile.variables";
 import { oneColumnVariables } from "@library/layout/Section.variables";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { injectGlobal } from "@emotion/css";
@@ -138,6 +138,31 @@ export const profileCompatCSS = () => {
     injectGlobal({
         ".Profile .Panel .UserBox a.Username": {
             color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+        },
+    });
+
+    cssOut(`.Section-Profile .Panel .pageBox .pageBox li.margin-top`, {
+        marginTop: styleUnit(20),
+    });
+
+    cssOut(`.Section-Profile .Panel .pageBox .pageBox li.margin-bottom`, {
+        marginBottom: styleUnit(20),
+    });
+
+    cssOut(`.Section-Profile .Panel .pageBox .pageBox li.Active a`, {
+        fontWeight: 600,
+    });
+
+    // this one is particularly when we load more discussions through react discussion list module, when clicking on "More Discussions" button
+    // we adjust the styling a bit so the next bit of discussions are like continuation of existing list
+    injectGlobal({
+        ".Section-Profile .Discussions > div:not(:first-of-type) li.pageBoxNoCompat:first-of-type:before": {
+            content: `""`,
+            display: "block",
+            height: globalVars.spacer.componentInner,
+            width: `calc(100% + ${globalVars.spacer.componentInner}px)`,
+            marginLeft: -8,
+            borderTop: singleBorder(),
         },
     });
 };

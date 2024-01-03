@@ -6,16 +6,14 @@
 
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { LoadStatus } from "@library/@types/api/core";
-import { IError } from "@library/errorPages/CoreErrorMessages";
 import { useDiscussionActions } from "@library/features/discussions/DiscussionActions";
 import { useDiscussionCheckBoxContext } from "@library/features/discussions/DiscussionCheckboxContext";
-import { useDiscussionByIDs, useDiscussionList } from "@library/features/discussions/discussionHooks";
+import { useDiscussionList } from "@library/features/discussions/discussionHooks";
 import { BulkDiscussionErrors } from "@library/features/discussions/forms/BulkDiscussionErrors";
 import { bulkDiscussionsClasses } from "@library/features/discussions/forms/BulkDiscussions.classes";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Checkbox from "@library/forms/Checkbox";
-import ErrorMessages from "@library/forms/ErrorMessages";
 import RadioButton from "@library/forms/RadioButton";
 import RadioButtonGroup from "@library/forms/RadioButtonGroup";
 import { ErrorIcon } from "@library/icons/common";
@@ -29,10 +27,10 @@ import { ILongRunnerResponse } from "@library/LongRunnerClient";
 import Message from "@library/messages/Message";
 import { useLongRunnerAction } from "@library/useLongRunner";
 import { t } from "@vanilla/i18n";
-import { AutoComplete, AutoCompleteOption, FormGroup, FormGroupInput, FormGroupLabel } from "@vanilla/ui";
-import { notEmpty, RecordID } from "@vanilla/utils";
-import { count } from "console";
+import { AutoComplete, FormGroup, FormGroupInput, FormGroupLabel } from "@vanilla/ui";
+import { RecordID } from "@vanilla/utils";
 import React, { useEffect, useMemo, useState } from "react";
+import { useDiscussionsDispatch } from "@library/features/discussions/discussionsReducer";
 
 interface IMergeRequestBody {
     discussionIDs: Array<IDiscussion["discussionID"]>;
@@ -49,6 +47,7 @@ export default function DiscussionMergeFormImpl(props: IProps) {
         useDiscussionCheckBoxContext();
 
     const discussionActions = useDiscussionActions();
+    const dispatch = useDiscussionsDispatch();
 
     // Keep these stable even as we are removing them.
     const initialCheckedIDs = useMemo(() => {
@@ -61,25 +60,25 @@ export default function DiscussionMergeFormImpl(props: IProps) {
         ILongRunnerResponse["progress"]["exceptionsByID"] | null
     >(null);
 
-    const [mergeState, mergeDiscussions] = useLongRunnerAction<IMergeRequestBody>("PATCH", "/discussions/merge", {
-        success: (successIDs) => {
+    const mergeMutation = useLongRunnerAction<IMergeRequestBody>("PATCH", "/discussions/merge", {
+        success: async (successIDs) => {
             removePendingDiscussionByIDs(successIDs);
             const refetchIDs = successIDs;
             if (destinationDiscussionID) {
                 refetchIDs.push(destinationDiscussionID as number);
             }
-            discussionActions.getDiscussionByIDs({ discussionIDs: refetchIDs, expand: "all" }, true);
+            await dispatch(discussionActions.getDiscussionByIDs({ discussionIDs: refetchIDs, expand: "all" }, true));
         },
         failed: (failedIDs, exceptionsByID) => {
             removePendingDiscussionByIDs(failedIDs);
             setExceptionsByDiscussionID(exceptionsByID);
         },
     });
-    const isSuccess = mergeState.status === "success";
-    const isLoading = mergeState.status === "loading";
-    const canSubmit = mergeState.status === "pending" && destinationDiscussionID !== null;
+    const isSuccess = mergeMutation.status === "success";
+    const isLoading = mergeMutation.status === "loading";
+    const canSubmit = mergeMutation.status === "idle" && destinationDiscussionID !== null;
     const classes = bulkDiscussionsClasses();
-    const hasErrors = exceptionsByDiscussionID != null || mergeState.error != null;
+    const hasErrors = exceptionsByDiscussionID != null || mergeMutation.error != null;
     useEffect(() => {
         if (!hasErrors && isSuccess) {
             props.onCancel();
@@ -94,7 +93,7 @@ export default function DiscussionMergeFormImpl(props: IProps) {
                     <FrameBody hasVerticalPadding>
                         <BulkDiscussionErrors
                             errorsByDiscussionID={exceptionsByDiscussionID}
-                            generalError={mergeState.error}
+                            generalError={mergeMutation.error ?? undefined}
                             messagePrefix={t("Failed to merge discussions:")}
                         />
                         <DiscussionSelector
@@ -123,7 +122,7 @@ export default function DiscussionMergeFormImpl(props: IProps) {
                                 buttonType={ButtonTypes.TEXT_PRIMARY}
                                 onClick={async () => {
                                     addPendingDiscussionByIDs(initialCheckedIDs);
-                                    await mergeDiscussions({
+                                    await mergeMutation.mutateAsync({
                                         discussionIDs: initialCheckedIDs,
                                         destinationDiscussionID: destinationDiscussionID!,
                                         addRedirects,
@@ -193,7 +192,7 @@ function DiscussionSelector(props: IDiscussionSelectorProps) {
     }
 
     return (
-        <RadioButtonGroup label={t("Choose the main discussion into which all comments will be merged:")}>
+        <RadioButtonGroup legend={t("Choose the main discussion into which all comments will be merged:")}>
             {discussions.status === LoadStatus.PENDING || discussions.status === LoadStatus.LOADING ? (
                 <RadioButtonGroup>
                     {props.discussionIDs.map((discussionID, i) => {

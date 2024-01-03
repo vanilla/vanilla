@@ -6,6 +6,7 @@
  */
 
 use Vanilla\Models\DashboardPreloadProvider;
+use Vanilla\Utility\Timers;
 use Vanilla\Web\ThemedPage;
 
 /**
@@ -20,7 +21,7 @@ class DashboardPage extends ThemedPage
      */
     public function initialize(): self
     {
-        // Nothing for now.
+        Timers::instance()->setShouldRecordProfile(false);
     }
 
     /**

@@ -4,12 +4,13 @@
  * @license Proprietary
  */
 
+import { IError } from "@library/errorPages/CoreErrorMessages";
 import { Toast } from "@library/features/toaster/Toast";
 import { toastManagerClasses } from "@library/features/toaster/ToastContext.styles";
 import { uuidv4 } from "@vanilla/utils";
-import React, { ReactNode, useContext, useEffect, useState } from "react";
+import React, { ReactNode, useContext, useState } from "react";
 
-interface IToast {
+export interface IToast {
     /** If the toast should dismiss itself */
     autoDismiss?: boolean;
     /** If the toast should persist at the bottom of the stack */
@@ -20,6 +21,8 @@ interface IToast {
     body: ReactNode;
     /** Apply custom styling to the toast */
     className?: string;
+    /** Use a wider toast variant */
+    wide?: boolean;
 }
 
 interface IToasterContext {
@@ -57,6 +60,19 @@ export function useToast() {
     return useContext(ToastContext);
 }
 
+export function useToastErrorHandler() {
+    const toast = useToast();
+
+    return (error: any) => {
+        const toastID = toast.addToast({
+            body: error?.message ?? "Something has gone wrong.",
+            dismissible: true,
+        });
+
+        return toastID;
+    };
+}
+
 /**
  * Toast notifications logic
  */
@@ -75,7 +91,7 @@ export function ToastProvider(props: { children: ReactNode }) {
     window.__LEGACY_ADD_TOAST__ = addToast;
 
     const updateToast = (toastID: string, updatedToast: IToast) => {
-        if (toasts && updatedToast) {
+        if (updatedToast) {
             setToast((prevState) =>
                 prevState
                     ? prevState.map((prevToast) => {
@@ -94,28 +110,26 @@ export function ToastProvider(props: { children: ReactNode }) {
     };
 
     const removeToast = (toastID: string) => {
-        if (toasts) {
-            // First set the visibility to false (to allow the exit animation)
-            setToast((prevState) => {
-                if (prevState) {
-                    return prevState.map((prevToast, index) => {
-                        if (prevToast.toastID === toastID) {
-                            // prevToast does not hold maintain the content of the body field,
-                            // so I am spreading it directly from the state
-                            return { ...toasts[index], visibility: false };
-                        }
-                        return prevToast;
-                    });
-                }
-                return prevState;
-            });
-            // Then remove the item altogether
-            setTimeout(() => {
-                setToast((prevState) =>
-                    prevState ? prevState.filter((prevToast) => prevToast.toastID !== toastID) : prevState,
-                );
-            }, 2000);
-        }
+        // First set the visibility to false (to allow the exit animation)
+        setToast((prevState) => {
+            if (prevState) {
+                return prevState.map((prevToast, index) => {
+                    if (prevToast.toastID === toastID) {
+                        // prevToast does not hold maintain the content of the body field,
+                        // so I am spreading it directly from the state
+                        return { ...prevState[index], visibility: false };
+                    }
+                    return prevToast;
+                });
+            }
+            return prevState;
+        });
+        // Then remove the item altogether
+        setTimeout(() => {
+            setToast((prevState) =>
+                prevState ? prevState.filter((prevToast) => prevToast.toastID !== toastID) : prevState,
+            );
+        }, 2000);
     };
 
     return (
@@ -151,6 +165,7 @@ function ToastManager() {
                             .map((toast: IToastState) => {
                                 return (
                                     <Toast
+                                        wide={toast.wide}
                                         key={toast.toastID}
                                         visibility={toast.visibility ?? true}
                                         autoCloseDuration={toast.autoDismiss ? 3000 : undefined}

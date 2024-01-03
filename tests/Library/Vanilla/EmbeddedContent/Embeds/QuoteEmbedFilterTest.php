@@ -110,7 +110,7 @@ class QuoteEmbedFilterTest extends MinimalContainerTestCase
         );
 
         $expectedRendered = <<<HTML
-    <p><a href="http://test.com/replaced" rel="nofollow noreferrer ugc">http://test.com/replaced</a></p>
+    <p><a href="http://test.com/replaced" rel="nofollow noopener ugc">http://test.com/replaced</a></p>
     <p>After Embed</p>
 HTML;
 
@@ -150,7 +150,7 @@ HTML;
     class="js-embed embedResponsive"
     data-embedJson="{&quot;url&quot;:&quot;http:\/\/test.com&quot;,&quot;embedType&quot;:&quot;testEmbedType&quot;}"
 >
-    <a href="http://test.com" rel="nofollow noreferrer ugc">
+    <a href="http://test.com" rel="nofollow noopener ugc">
         http://test.com
     </a>
 </div><p>After Embed</p>

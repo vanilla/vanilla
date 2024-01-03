@@ -38,11 +38,7 @@ export default class MeBoxDropDownItemList extends React.Component<ITitleBarNavP
                         })}
                     </ul>
                 )}
-                {count === 0 && (
-                    <div className={classNames("frameBody-noContentMessage", classesFrameBody.noContentMessage)}>
-                        {this.props.emptyMessage}
-                    </div>
-                )}
+                {count === 0 && <div className={classesFrameBody.noContentMessage}>{this.props.emptyMessage}</div>}
             </div>
         );
     }

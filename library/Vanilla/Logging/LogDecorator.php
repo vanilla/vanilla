@@ -149,7 +149,7 @@ class LogDecorator implements LoggerInterface
 
         $coreContext = [
             self::FIELD_SCHEMA => self::SCHEMA_VERSION,
-
+            "service" => "vanilla_app",
             // Vanilla App Info
             "site" => [
                 "version" => APPLICATION_VERSION,

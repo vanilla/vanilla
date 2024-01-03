@@ -7,7 +7,10 @@
 
 namespace VanillaTests\Fixtures;
 
+use Garden\MetaTrait;
 use Garden\Web\RequestInterface;
+use League\Uri\Http;
+use Psr\Http\Message\UriInterface;
 use Vanilla\Cache\InvalidArgumentException;
 
 /**
@@ -15,6 +18,8 @@ use Vanilla\Cache\InvalidArgumentException;
  */
 class Request implements RequestInterface
 {
+    use MetaTrait;
+
     private $scheme = "http";
     private $host = "example.com";
     private $assetRoot = "";
@@ -68,6 +73,33 @@ class Request implements RequestInterface
     public function getPath()
     {
         return $this->path;
+    }
+
+    /**
+     * Retrieves the URI instance.
+     *
+     * This method MUST return a UriInterface instance.
+     *
+     * @link http://tools.ietf.org/html/rfc3986#section-4.3
+     * @return UriInterface Returns a UriInterface instance representing the URI of the request.
+     */
+    public function getUri()
+    {
+        return Http::createFromString($this->getUrl());
+    }
+
+    /**
+     * Get the URL.
+     *
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        $scheme = $this->getScheme();
+        $host = $this->getHost();
+        $assetRoot = $this->getAssetRoot();
+        $path = $this->getPath();
+        return "{$scheme}://{$host}{$assetRoot}{$path}";
     }
 
     /**
@@ -225,9 +257,9 @@ class Request implements RequestInterface
     /**
      * @inheritdoc
      */
-    public function setAssetRoot(string $assetRoot)
+    public function setAssetRoot(string $root)
     {
-        $this->assetRoot = rtrim("/" . trim($assetRoot, "/"), "/");
+        $this->assetRoot = rtrim("/" . trim($root, "/"), "/");
         return $this;
     }
 

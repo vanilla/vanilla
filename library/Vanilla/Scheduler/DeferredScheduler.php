@@ -27,9 +27,9 @@ use Vanilla\Scheduler\Job\JobExecutionType;
 use Vanilla\Scheduler\Job\JobInterface;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Scheduler\Job\JobPriorityAwareInterface;
-use Vanilla\Scheduler\Job\JobStatusModel;
 use Vanilla\Scheduler\Job\JobTypeAwareInterface;
 use Vanilla\Scheduler\Job\TrackableJobAwareInterface;
+use Vanilla\Utility\Timers;
 
 /**
  * DeferredScheduler.
@@ -41,6 +41,9 @@ use Vanilla\Scheduler\Job\TrackableJobAwareInterface;
 class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
+
+    /** @var string Determine if all queue job scheduling should be blocking. Ideal for E2E tests. */
+    public const CONF_USE_BLOCKING_MODE = "VanillaQueue.UseBlockingMode";
 
     /** @var JobExecutionType */
     protected $executionType;
@@ -57,9 +60,6 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
     /** @var EventManager */
     protected $eventManager = null;
 
-    /** @var JobStatusModel */
-    protected $jobStatusModel;
-
     /** @var bool */
     protected $logErrorsAsWarnings = false;
 
@@ -69,19 +69,13 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
     /** @var Gdn_Cache */
     protected $cache;
 
+    protected Timers $timers;
+
     /** @var ConfigurationInterface */
     protected $config;
 
     /**
      * DeferredScheduler constructor.
-     *
-     * @param ContainerInterface $container
-     * @param LoggerInterface $logger
-     * @param EventManager $eventManager
-     * @param CronModel $cronModel
-     * @param Gdn_Cache $cache
-     * @param ConfigurationInterface $config
-     * @param JobStatusModel $jobStatusModel
      */
     public function __construct(
         ContainerInterface $container,
@@ -90,7 +84,7 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
         CronModel $cronModel,
         Gdn_Cache $cache,
         ConfigurationInterface $config,
-        JobStatusModel $jobStatusModel
+        Timers $timers
     ) {
         $this->logger = $logger;
         $this->container = $container;
@@ -99,7 +93,7 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
         $this->cache = $cache;
         $this->config = $config;
         $this->executionType = JobExecutionType::normal();
-        $this->jobStatusModel = $jobStatusModel;
+        $this->timers = $timers;
     }
 
     /**
@@ -247,10 +241,6 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
 
                 if ($job instanceof TrackableJobAwareInterface) {
                     $job->setTrackingID($trackingSlip->getTrackingID());
-
-                    if ($trackingUserID = $job->getTrackingUserID()) {
-                        $this->jobStatusModel->insertDriverSlip($driverSlip, $trackingUserID);
-                    }
                 }
 
                 $trackingSlip->log();
@@ -275,6 +265,12 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
      */
     public function finalizeRequest(): void
     {
+        $shouldFinalize = $this->config->get(self::CONF_USE_BLOCKING_MODE, true);
+        if (!$shouldFinalize) {
+            // Nothing to do.
+            return;
+        }
+
         // Finish Flushes all response data to the client
         // so that job payloads can run without affecting the browser experience
         session_write_close();
@@ -345,6 +341,11 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
         /** @var TrackingSlip $trackingSlip */
         foreach ($this->generateTrackingSlips() as $trackingSlip) {
             $trackingSlip->start();
+            $jobClass = $trackingSlip->getJobInterface();
+            $span = $this->timers->startGeneric("dispatchJob", [
+                "name" => "Job: $jobClass",
+                "trackingID" => $trackingSlip->getTrackingID(),
+            ]);
             try {
                 $driverSlip = $trackingSlip->getDriverSlip();
                 $jobDescriptor = $trackingSlip->getDescriptor();
@@ -381,11 +382,9 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
 
                 $this->logger->error($msg);
             } finally {
+                $span->finish();
                 $trackingSlip->stop();
                 $trackingSlip->log();
-                if (isset($driverSlip)) {
-                    $this->jobStatusModel->updateDriverSlip($driverSlip);
-                }
             }
         }
         return $this->trackingSlips;

@@ -21,9 +21,6 @@ class LocalApiBulkDeleteJob extends LocalApiJob implements TrackableJobAwareInte
 
     use TrackableJobAwareTrait;
 
-    /** @var JobStatusModel */
-    private $jobStatusModel;
-
     /** @var string */
     private $iteratorUrl;
 
@@ -43,16 +40,6 @@ class LocalApiBulkDeleteJob extends LocalApiJob implements TrackableJobAwareInte
     private $notify;
 
     /**
-     * DI.
-     *
-     * @param JobStatusModel $jobStatusModel
-     */
-    public function __construct(JobStatusModel $jobStatusModel)
-    {
-        $this->jobStatusModel = $jobStatusModel;
-    }
-
-    /**
      * @return JobExecutionStatus
      */
     public function run(): JobExecutionStatus
@@ -64,7 +51,7 @@ class LocalApiBulkDeleteJob extends LocalApiJob implements TrackableJobAwareInte
 
         foreach ($this->runIterator() as $status) {
             if ($status instanceof JobExecutionProgress) {
-                $this->jobStatusModel->progressJob($this, $status);
+                // nothing do do.
             } else {
                 return $status;
             }

@@ -54,7 +54,7 @@ class PageControllerRouteTest extends SiteTestCase
         ];
 
         foreach ($expectedTitles as $url => $responseCode) {
-            $response = $dispatcher->dispatch(new Request($url));
+            $response = $dispatcher->dispatch($this->bessy()->createRequest("GET", $url));
             $this->assertEquals($responseCode, $response->getStatus());
         }
     }

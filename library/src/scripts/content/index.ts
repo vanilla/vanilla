@@ -8,14 +8,14 @@
 import { initCodeHighlighting } from "@library/content/code";
 import { initEmojiSupport } from "@library/content/emoji";
 import { initSpoilers } from "@library/content/spoilers";
-import { mountAllEmbeds } from "@library/embeddedContent/embedService";
+import { mountAllEmbeds } from "@library/embeddedContent/embedService.mounting";
 import { autoWrapCollapsableContent } from "@library/content/CollapsableContent";
+import { initTables } from "@library/content/table";
 
 export async function initAllUserContent() {
     await autoWrapCollapsableContent();
     initEmojiSupport();
     initSpoilers();
-    await mountAllEmbeds();
     initCodeHighlighting();
 }
 
@@ -25,4 +25,5 @@ export async function initAllUserContent() {
  */
 export function convertAllUserContent() {
     mountAllEmbeds();
+    initTables();
 }

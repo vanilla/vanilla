@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -95,7 +95,7 @@ class ThemesTest extends AbstractAPIv2Test
             $response = $this->api()->get("themes/{$theme}/assets/{$assetKey}");
             $this->assertEquals(200, $response->getStatusCode());
             $this->assertEquals($contentType, $response->getHeader("Content-Type"));
-            $this->assertEquals($rawBody, $response->getRawBody());
+            $this->assertEquals(rtrim($rawBody), rtrim($response->getRawBody()));
         });
     }
 

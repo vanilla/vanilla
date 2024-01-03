@@ -16,9 +16,9 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
 import React from "react";
 import { MemoryRouter } from "react-router";
-import { CustomLayoutLabItem } from "@dashboard/labs/CustomLayoutLabItem";
 import Translate from "@library/content/Translate";
 import { NewEmbedSystemLabItem } from "@dashboard/labs/NewEmbedSystemLabItem";
+import { NewUserManagementLabItem } from "@dashboard/labs/NewUserManagementLabItem";
 
 export function VanillaLabsPage() {
     return (
@@ -30,12 +30,12 @@ export function VanillaLabsPage() {
                     {VanillaLabsPage.extraLabComponents.map((ComponentName, index) => {
                         return <ComponentName key={index} />;
                     })}
-                    <CustomLayoutLabItem />
                     <UserCardsLabItem />
                     <NewSearchPageLabItem />
                     <NewQuickLinksLabItem />
                     <NewPostMenuLabItem />
                     <NewEmbedSystemLabItem />
+                    <NewUserManagementLabItem />
                 </AddonList>
             </div>
             <DashboardHelpAsset>

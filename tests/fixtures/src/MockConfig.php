@@ -35,6 +35,18 @@ class MockConfig implements Contracts\ConfigurationInterface
     }
 
     /**
+     * @return array
+     */
+    public function getAll(): array
+    {
+        $result = [];
+        foreach ($this->data as $key => $value) {
+            ArrayUtils::setByPath($key, $result, $value);
+        }
+        return $result;
+    }
+
+    /**
      * @inheritdoc
      */
     public function get($key, $defaultValue = false)

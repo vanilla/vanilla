@@ -8,6 +8,7 @@ import {
     EditorSectionFullWidth,
     EditorSectionOneColumn,
     EditorSectionThreeColumns,
+    EditorSectionEvenColumns,
     EditorSectionTwoColumns,
 } from "@dashboard/layout/editor/LayoutEditor.sections";
 import { fetchOverviewComponent } from "@dashboard/layout/overview/LayoutOverview";
@@ -30,6 +31,8 @@ registerLayoutEditorOverviews({
     SectionThreeColumns: EditorSectionThreeColumns,
     SectionOneColumn: EditorSectionOneColumn,
     SectionFullWidth: EditorSectionFullWidth,
+    SectionThreeColumnsEven: EditorSectionEvenColumns,
+    SectionTwoColumnsEven: EditorSectionEvenColumns,
 });
 
 export const fetchEditorOverviewComponent: IComponentFetcher = (componentName) => {

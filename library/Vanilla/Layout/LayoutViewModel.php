@@ -1,20 +1,28 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Layout;
 
+use CategoryModel;
 use Exception;
+use Garden\Container\ContainerException;
+use Garden\EventManager;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\NotFoundException;
+use Gdn;
 use Vanilla\ApiUtils;
 use Vanilla\Database\Operation\CurrentDateFieldProcessor;
 use Vanilla\Database\Operation\CurrentUserFieldProcessor;
 use Vanilla\Exception\Database\NoResultsException;
+use Vanilla\Layout\Asset\LayoutQuery;
 use Vanilla\Layout\Providers\LayoutViewRecordProviderInterface;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\FullRecordCacheModel;
+use Vanilla\Models\ModelCache;
 use Vanilla\SchemaFactory;
 use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\ModelUtils;
@@ -30,11 +38,10 @@ class LayoutViewModel extends FullRecordCacheModel
     public const FILE_RECORD_TYPE = "file";
     //endregion
 
-    /** @var LayoutHydrator $layoutHydrator */
-    private $layoutHydrator;
+    /** @var array<LayoutViewRecordProviderInterface> */
+    private array $recordProviders = [];
 
-    /** @var array A mapping of recordType to breadcrumb provider. */
-    private $providers = [];
+    private \Gdn_Cache $cache;
 
     //region Constructor
     /**
@@ -42,21 +49,27 @@ class LayoutViewModel extends FullRecordCacheModel
      *
      * @param CurrentUserFieldProcessor $userFields
      * @param CurrentDateFieldProcessor $dateFields
-     * @param LayoutHydrator $layoutHydrator,
-     * @param \GDN_Cache $cache
+     * @param \Gdn_Cache $cache
      */
     public function __construct(
         CurrentUserFieldProcessor $userFields,
         CurrentDateFieldProcessor $dateFields,
-        LayoutHydrator $layoutHydrator,
-        \GDN_Cache $cache
+        \Gdn_Cache $cache
     ) {
+        $this->cache = $cache;
         parent::__construct(self::TABLE_NAME, $cache);
         $userFields->camelCase();
         $this->addPipelineProcessor($userFields);
         $dateFields->camelCase();
         $this->addPipelineProcessor($dateFields);
-        $this->layoutHydrator = $layoutHydrator;
+    }
+
+    /**
+     * @return LayoutHydrator
+     */
+    private function layoutHydrator(): LayoutHydrator
+    {
+        return \Gdn::getContainer()->get(LayoutHydrator::class);
     }
 
     //endregion
@@ -65,11 +78,11 @@ class LayoutViewModel extends FullRecordCacheModel
     /**
      * @param LayoutViewRecordProviderInterface $provider
      */
-    public function addProvider(LayoutViewRecordProviderInterface $provider)
+    public function addLayoutRecordProvider(LayoutViewRecordProviderInterface $provider)
     {
         $types = $provider::getValidRecordTypes();
         foreach ($types as $type) {
-            $this->providers[$type] = $provider;
+            $this->recordProviders[$type] = $provider;
         }
     }
 
@@ -104,7 +117,8 @@ class LayoutViewModel extends FullRecordCacheModel
      * @param string $layoutViewType Layout type.
      * @param string $layoutID Layout ID.
      *
-     * @return int
+     * @return array
+     * @throws NotFoundException
      */
     public function saveLayoutViews(array $body, string $layoutViewType, string $layoutID): array
     {
@@ -112,17 +126,12 @@ class LayoutViewModel extends FullRecordCacheModel
         try {
             $this->database->beginTransaction();
 
-            $globalBody = GlobalRecordProvider::getRecordTypeAndID();
-            $rootBody = RootRecordProvider::getRecordTypeAndID();
-
-            // A layout can't be applied to both "All Homepages & "Site Homepage" at once.
-            if (in_array($globalBody, $body) && in_array($rootBody, $body)) {
-                throw new Exception(t('A layout can\'t be applied to both "All Homepages" & "Site Homepage".'), 403);
-            }
-
             $this->delete([
                 "layoutID" => $layoutID,
             ]);
+            /** @var EventManager $eventManager */
+            $eventManager = Gdn::getContainer()->get(EventManager::class);
+            $eventManager->fire("saveLayoutViews", $body);
 
             foreach ($body as $record) {
                 $record["layoutViewType"] = $layoutViewType;
@@ -131,6 +140,15 @@ class LayoutViewModel extends FullRecordCacheModel
                 if (!$this->validateRecordExists($record["recordType"], [$record["recordID"]])) {
                     throw new NotFoundException($record["recordType"]);
                 }
+
+                if ($record["recordType"] === GlobalLayoutRecordProvider::RECORD_TYPE) {
+                    // Clear out "root" and global record types as well. This is a holdover from the legacy system.
+                    $this->delete([
+                        "layoutViewType" => $record["layoutViewType"],
+                        "recordType" => ["root", GlobalLayoutRecordProvider::RECORD_TYPE],
+                    ]);
+                }
+
                 // only 1 layout can be assigned to layoutViewType/recordType/recordID
                 $this->delete([
                     "layoutViewType" => $record["layoutViewType"],
@@ -148,38 +166,6 @@ class LayoutViewModel extends FullRecordCacheModel
     }
 
     /**
-     * Get a Layout ID by a provided viewType, recordType and record ID
-     *
-     * @param string $layoutViewType View type
-     * @param string $recordType Record Type
-     * @param string $recordID ID of the record
-     *
-     * @return string
-     * @throws NotFoundException In case layout ID is not found based on provided parameters.
-     */
-    public function getLayoutIdLookup(string $layoutViewType, string $recordType, string $recordID): string
-    {
-        // Get a specific page's `WHERE` statement for GDN_layoutView.
-        $where = $this->getProviderLayoutIdLookupParams($layoutViewType, $recordType, $recordID);
-
-        try {
-            // See if a layout is assigned to a specific page.
-            $row = $this->selectSingle($where);
-        } catch (NoResultsException $e) {
-            [$recordType, $recordID] = $this->getParentRecordTypeAndID($where["recordType"], $where["recordID"]);
-            //Reached the top, only option left is file based layout.
-            if ($recordType == self::FILE_RECORD_TYPE) {
-                $fileLayoutView = $this->layoutHydrator->getLayoutViewType($layoutViewType);
-                return $fileLayoutView->getLayoutID();
-            }
-
-            return $this->getLayoutIdLookup($layoutViewType, $recordType, $recordID);
-        }
-
-        return $row["layoutID"];
-    }
-
-    /**
      * Get a list of Layout Views by a provided viewType, recordType and or record ID
      *
      * @param bool $allowNull Are we iterating with values allowed to be null
@@ -188,6 +174,7 @@ class LayoutViewModel extends FullRecordCacheModel
      * @param int|null $recordID ID of the record
      *
      * @return array
+     * @throws ValidationException
      */
     public function getLayoutViews(
         bool $allowNull,
@@ -195,6 +182,7 @@ class LayoutViewModel extends FullRecordCacheModel
         string $recordType = null,
         int $recordID = null
     ): array {
+        $where = [];
         if ($layoutViewType != null) {
             $where["layoutViewType"] = $layoutViewType;
         }
@@ -226,6 +214,7 @@ class LayoutViewModel extends FullRecordCacheModel
      * @param array $row Layout View record from database row
      * @param array|string|bool $expand Additional parameters used to expand output based on row property values
      * @return array Normalized row
+     * @throws NotFoundException
      */
     public function normalizeRow(array $row, $expand = false): array
     {
@@ -241,6 +230,7 @@ class LayoutViewModel extends FullRecordCacheModel
      * @param array $rows Layout View records from database rows
      * @param array|string|bool $expand Additional parameters used to expand output based on row property values
      * @return array Normalized row
+     * @throws NotFoundException
      */
     public function normalizeRows(array $rows, $expand): array
     {
@@ -256,7 +246,10 @@ class LayoutViewModel extends FullRecordCacheModel
             }, $rows);
             // Query recordIDs for each record type.
             foreach ($ids as $recordType => $idList) {
-                $recordViews[$recordType] = $this->getRecords($recordType, $idList);
+                try {
+                    $recordViews[$recordType] = $this->getRecords($recordType, $idList);
+                } catch (Exception $e) {
+                }
             }
         }
 
@@ -276,6 +269,16 @@ class LayoutViewModel extends FullRecordCacheModel
         return $rows;
     }
 
+    public function getRecordProvider(string $recordType): LayoutViewRecordProviderInterface
+    {
+        $provider = $this->recordProviders[$recordType] ?? null;
+        if (!$provider) {
+            throw new NotFoundException("Could not find layout view recordProvider for recordType: " . $recordType);
+        }
+
+        return $provider;
+    }
+
     /**
      * Translating recordIDs to record information
      *
@@ -286,69 +289,128 @@ class LayoutViewModel extends FullRecordCacheModel
      */
     public function getRecords(string $recordType, array $recordIDs): array
     {
-        $provider = $this->providers[$recordType] ?? null;
-        if (!$provider) {
-            throw new NotFoundException($recordType . " provider could not be found");
-        }
-        return $provider->getRecords($recordIDs);
+        return $this->getRecordProvider($recordType)->getRecords($recordIDs);
     }
 
     /**
-     * Adapt parameters prior to calling layoutViewModel::getLayoutIdLookup(), if needed.
+     * Get a Layout ID by a provided viewType, recordType and record ID.
      *
-     * @param string $layoutViewType layoutViewType.
-     * @param string $recordType recordType.
-     * @param string $recordID recordID.
-     * @return array
-     * @throws \Garden\Container\ContainerException Container Exception.
-     * @throws \Garden\Container\NotFoundException Container not found exception.
+     * This more than a direct lookup and will attempt to resolve dynamic parts of the query.
+     * Additionally, it will attempt to search parent records if the query cannot be found.
+     *
+     * Actually resolution is delegated to implementations of {@link LayoutViewRecordProviderInterface}
+     *
+     * For example, if looking up LayoutQuery("discussionThread", "discussion", 56) this will perform the following resolutions:
+     * - Ensure the discussion exists.
+     * - Resolve the type of discussionThread Eg. (discussionThread, questionThread, or ideaThread)
+     * - Look for layoutView assignements on the discussions category.
+     * - Look for layoutView assignements on the siteSection/subcommunity
+     * - Look for a default layout assignemnt (global)
+     * - Fallback to the layout template.
+     *
+     * @param LayoutQuery $query
+     *
+     * @return string
+     *
+     * @throws NotFoundException In case layout ID is not found based on provided parameters.
      */
-    public function getProviderLayoutIdLookupParams(string $layoutViewType, string $recordType, string $recordID): array
+    public function queryLayoutID(LayoutQuery $query): string
     {
-        // If the recordID is non-numeric(a slug), we see if we can rely on the SiteSectionModel to provide
-        // alternative parameters for getLayOutIdLookup().
-        if (!is_numeric($recordID) || $recordType == "siteSection") {
-            $model = \Gdn::getContainer()->get(SiteSectionModel::class);
-            $section = $model->getByID($recordID);
+        $initialQuery = $query;
+        $currentDepth = 0;
+        while (true) {
+            $currentDepth++;
+            if ($currentDepth > 10) {
+                // Sanity check to prevent infinite loop.
+                // Something is clearly wrong so lets log that.
+                ErrorLogger::error("Infinite loop detected while querying layout ID", [
+                    "initialQuery" => $initialQuery,
+                ]);
+                return $this->queryDefaultTemplateID($query);
+            }
 
-            if ($section && method_exists($section, "getLayoutIdLookupParams")) {
-                return $section->getLayoutIdLookupParams($layoutViewType, $recordType, $recordID);
+            // Perform initial resolution/normalization of the query.
+            $query = $this->resolveLayoutQuery($query);
+
+            try {
+                // See if a layout is assigned to a specific page.
+                $row = $this->selectSingle([
+                    "layoutViewType" => $query->layoutViewType,
+                    "recordType" => $query->recordType,
+                    "recordID" => $query->recordID,
+                ]);
+
+                return $row["layoutID"];
+            } catch (NoResultsException $e) {
+                // Not a big deal necessarily. Try and get the parent.
+                $query = $this->resolveParentLayoutQuery($query);
+
+                if ($query->recordType == self::FILE_RECORD_TYPE) {
+                    // If we've reached the "file" record type, we've made it to the top level.
+                    // At this point no matching layout was assigned in the database
+                    // So we should just fall back to the layout template.
+                    $fileLayoutView = $this->layoutHydrator()->getLayoutViewType($query->layoutViewType);
+                    return $fileLayoutView->getTemplateID();
+                }
+
+                // Loop again with the new parent query.
+                continue;
             }
         }
-        return ["layoutViewType" => $layoutViewType, "recordType" => $recordType, "recordID" => $recordID];
     }
 
     /**
-     * Get parent element for the layout hierarchy lookup.
+     * Get the default templateID for a layoutViewType.
      *
-     * @param string $recordType Record Type.
-     * @param string $recordID Record ID.
-     * @return array
+     * @param LayoutQuery $query
+     * @return string
+     */
+    private function queryDefaultTemplateID(LayoutQuery $query): string
+    {
+        // If we've reached the "file" record type, we've made it to the top level.
+        // At this point no matching layout was assigned in the database
+        // So we should just fall back to the layout template.
+        $fileLayoutView = $this->layoutHydrator()->getLayoutViewType($query->layoutViewType);
+        return $fileLayoutView->getTemplateID();
+    }
+
+    /**
+     * Given a layout query, perform any resolutions that should be done before looking up the layout is looked up.
+     *
+     * @param LayoutQuery $query A layout query
+     *
+     * @return LayoutQuery
      * @throws NotFoundException
      */
-    public function getParentRecordTypeAndID(string $recordType, string $recordID): array
+    private function resolveLayoutQuery(LayoutQuery $query): LayoutQuery
     {
-        $provider = $this->providers[$recordType] ?? null;
-        if (!$provider) {
-            throw new NotFoundException($recordType . " provider could not be found");
-        }
-        return $provider->getParentRecordTypeAndID($recordType, $recordID);
+        return $this->getRecordProvider($query->recordType)->resolveLayoutQuery($query);
+    }
+
+    /**
+     * Given a layout query that we couldn't find a layout for, generate a parent layout query.
+     *
+     * @param LayoutQuery $query A layout query
+     *
+     * @return LayoutQuery
+     * @throws NotFoundException
+     */
+    private function resolveParentLayoutQuery(LayoutQuery $query): LayoutQuery
+    {
+        return $this->getRecordProvider($query->recordType)->resolveParentLayoutQuery($query);
     }
 
     /**
      * We verify if that category exists.
      *
-     * @param string $recordType Record Type
-     * @param array $recordIDs Record IDs
-     * @throws NotFoundException Throws exception if there is no provider for the requested recordType.
+     * @param string $recordType
+     * @param array $recordIDs
+     *
+     * @return bool
      */
     public function validateRecordExists(string $recordType, array $recordIDs): bool
     {
-        $provider = $this->providers[$recordType] ?? null;
-        if (!$provider) {
-            throw new NotFoundException($recordType . " provider could not be found");
-        }
-        return $provider->validateRecords($recordIDs);
+        return $this->getRecordProvider($recordType)->validateRecords($recordIDs);
     }
 
     /**
@@ -359,6 +421,7 @@ class LayoutViewModel extends FullRecordCacheModel
      * false to retain those columns. Default false.
      * @param bool $drop Optional, true to drop table if it already exists,
      * false to retain table if it already exists. Default false.
+     * @throws Exception
      */
     public static function structure(\Gdn_Database $database, bool $explicit = false, bool $drop = false): void
     {
@@ -376,34 +439,52 @@ class LayoutViewModel extends FullRecordCacheModel
             ->column("updateUserID", "int", null)
             ->column("dateUpdated", "datetime", null)
             ->set($explicit, $drop);
-        $default = [
-            "layoutViewID" => 1,
-            "layoutID" => "home",
-            "recordID" => 0,
-            "recordType" => "global",
-            "layoutViewType" => "global",
-            "insertUserID" => 2,
-            "dateInserted" => date("Y-m-d H:i:s"),
-            "updateUserID" => 2,
-            "dateUpdated" => date("Y-m-d H:i:s"),
-        ];
 
-        $insertDefault =
-            !$database->structure()->tableExists(self::TABLE_NAME) ||
-            $sql->getWhere(self::TABLE_NAME, ["layoutViewID" => 1])->numRows() == 0;
+        // Older version inject a "global" layoutViewType. It didn't do anything but screws up the UI a bit in the admin section.
+        // We remove it here.
+        // The fallback to the file-based layouts is dynamic and doesn't need layoutView records.
+        $oldDefaultView = $sql
+            ->getWhere(self::TABLE_NAME, [
+                "recordID" => 0,
+                "recordType" => "global",
+                "layoutViewType" => "global",
+            ])
+            ->firstRow(DATASET_TYPE_ARRAY);
 
-        if ($insertDefault) {
-            $sql->insert(self::TABLE_NAME, $default);
-        }
-
-        $fixDefault =
-            $database->structure()->tableExists(self::TABLE_NAME) &&
-            $sql->getWhere(self::TABLE_NAME, ["layoutViewID" => 1, "layoutID" => 1, "recordID" => 0])->numRows() == 1;
-
-        if ($fixDefault) {
-            $sql->update(self::TABLE_NAME, ["layoutID" => "home"], ["layoutViewID" => 1])->put();
+        if ($oldDefaultView) {
+            $viewModel = \Gdn::getContainer()->get(LayoutViewModel::class);
+            $viewModel->delete(["layoutViewID" => $oldDefaultView["layoutViewID"]]);
         }
     }
+
+    /**
+     * Migrate configs for the 2023.019 release.
+     *
+     * @param \Gdn_Configuration $config
+     * @param \Gdn_Database $database Database handle
+     *
+     */
+    public static function clearCategoryLayouts_2023_019(\Gdn_Configuration $config, \Gdn_Database $database): void
+    {
+        $sql = $database->sql();
+        $hasAny = $sql
+            ->select(self::TABLE_NAME, [
+                "layoutViewType" => "categoryList",
+                "recordType" => "category",
+            ])
+            ->whereCount();
+        if (
+            ($config->get("Feature.LayoutEditor.nestedCategoryList.Enabled", true) ||
+                $config->get("Feature.LayoutEditor.discussionCategoryPage.Enabled", true)) &&
+            $hasAny
+        ) {
+            $sql->delete(self::TABLE_NAME, [
+                "layoutViewType" => "categoryList",
+                "recordType" => "category",
+            ]);
+        }
+    }
+
     /**
      * @return Schema
      */

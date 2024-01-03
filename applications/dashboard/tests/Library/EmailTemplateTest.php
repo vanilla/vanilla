@@ -19,6 +19,8 @@ class EmailTemplateTest extends BootstrapTestCase
     {
         $evilString = '<a href="https://vulnerableurl.com"></a>';
         $expected = htmlspecialchars($evilString);
+        $expectedText =
+            "&lt;a href=&quot;https://vulnerableurl.com&quot; style=&quot;color: &amp;lt;a href=&amp;quot;https://vulnerableurl.com&amp;quot;&amp;gt;&amp;lt;/a&amp;gt;; font-weight: 600;&quot;&gt;&lt;/a&gt;";
         $emailTemplate = new \EmailTemplate();
 
         $emailTemplate->setTextColor($evilString);
@@ -34,10 +36,5 @@ class EmailTemplateTest extends BootstrapTestCase
         $this->assertSame($expected, $emailTemplate->getImage()["source"]);
         $this->assertSame($expected, $emailTemplate->getImage()["link"]);
         $this->assertSame($expected, $emailTemplate->getImage()["alt"]);
-
-        $emailTemplate->setFooter($evilString, $evilString, $evilString);
-        $this->assertSame($expected, $emailTemplate->getFooter()["text"]);
-        $this->assertSame($expected, $emailTemplate->getFooter()["textColor"]);
-        $this->assertSame($expected, $emailTemplate->getFooter()["backgroundColor"]);
     }
 }

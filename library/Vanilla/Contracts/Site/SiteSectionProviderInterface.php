@@ -32,6 +32,13 @@ interface SiteSectionProviderInterface
     public function getCurrentSiteSection(): ?SiteSectionInterface;
 
     /**
+     * Get the default site section for the request automatically if possible.
+     *
+     * @return SiteSectionInterface
+     */
+    public function getDefaultSiteSection(): ?SiteSectionInterface;
+
+    /**
      * Get a schema for a site section picker.
      *
      * @param FieldMatchConditional|null $conditional

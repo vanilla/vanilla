@@ -7,7 +7,6 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use PHPUnit\Framework\Error\Error;
 use PHPUnit\Framework\Error\Warning;
 use Vanilla\Contracts\ConfigurationInterface;
 use VanillaTests\Fixtures\MockUASniffer;
@@ -52,6 +51,15 @@ class ContentSecurityPolicyModelTest extends MinimalContainerTestCase
         $this->assertStringEndsWith('\'self\'', $header);
         $this->assertStringContainsString("frame-ancestors ", $header);
         $this->assertStringNotContainsString("unsafe-eval", $header);
+        return $header;
+    }
+
+    public function testCspModelDefaultProviderWithSctrictDynamic()
+    {
+        $c = $this->container()->get(\Gdn_Configuration::class);
+        $c->set(\SettingsController::CONFIG_CSP_STRICT_DYNAMIC, true, true, false);
+        $header = $this->testCspModelDefaultProvider();
+        $this->assertStringContainsString("strict-dynamic", $header);
     }
 
     /**
@@ -152,8 +160,8 @@ class ContentSecurityPolicyModelTest extends MinimalContainerTestCase
         $provider = new DefaultContentSecurityPolicyProvider($config);
         $cspModel->addProvider($provider);
 
-        if (is_subclass_of($expected, \Exception::class)) {
-            $this->expectException($expected);
+        if ($expected === Warning::class) {
+            $this->expectWarning();
             $cspModel->getXFrameString();
         } else {
             $this->assertEquals($expected, $cspModel->getXFrameString());

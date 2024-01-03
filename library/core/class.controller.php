@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -14,15 +14,19 @@ use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemePreloadProvider;
 use Vanilla\Utility\DebugUtils;
 use Vanilla\Utility\HtmlUtils;
+use Vanilla\Utility\StringUtils;
 use Vanilla\Web\Asset\LegacyAssetModel;
+use Vanilla\Web\Asset\NoScriptStylesAsset;
 use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\CacheControlTrait;
 use Vanilla\Web\HttpStrictTransportSecurityModel;
 use Vanilla\Web\ContentSecurityPolicy\ContentSecurityPolicyModel;
 use Vanilla\Web\ContentSecurityPolicy\Policy;
-use Vanilla\Web\JsInterpop\ReduxActionPreloadTrait;
+use Vanilla\Web\JsInterpop\StatePreloadTrait;
 use Vanilla\Web\MasterViewRenderer;
 use Vanilla\Dashboard\Pages\LegacyDashboardPage;
+use Vanilla\Web\SeoMetaModel;
+use Vanilla\Web\TwigStaticRenderer;
 
 /**
  * Controller base class.
@@ -33,7 +37,7 @@ use Vanilla\Dashboard\Pages\LegacyDashboardPage;
  */
 class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInterface
 {
-    use \Garden\MetaTrait, ReduxActionPreloadTrait, CacheControlTrait;
+    use \Garden\MetaTrait, StatePreloadTrait, CacheControlTrait;
 
     /** Seconds before reauthentication is required for protected operations. */
     const REAUTH_TIMEOUT = 1200; // 20 minutes
@@ -681,6 +685,18 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     }
 
     /**
+     * Validate that our meta values serialize properly.
+     *
+     * @return string
+     */
+    public function validateDefinitionList()
+    {
+        // Generate the list.
+        $this->definitionList();
+        return StringUtils::jsonEncodeChecked($this->_Definitions);
+    }
+
+    /**
      * Gets the javascript definition list used to pass data to the client.
      *
      * @param bool $wrap Whether or not to wrap the result in a `script` tag.
@@ -725,16 +741,10 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         }
 
         if (!array_key_exists("ResolvedArgs", $this->_Definitions)) {
-            if (
-                sizeof($this->ReflectArgs) &&
-                ((isset($this->ReflectArgs[0]) && $this->ReflectArgs[0] instanceof Gdn_Pluggable) ||
-                    (isset($this->ReflectArgs["Sender"]) && $this->ReflectArgs["Sender"] instanceof Gdn_Pluggable) ||
-                    (isset($this->ReflectArgs["sender"]) && $this->ReflectArgs["sender"] instanceof Gdn_Pluggable))
-            ) {
-                $reflectArgs = array_slice($this->ReflectArgs, 1);
-            } else {
-                $reflectArgs = $this->ReflectArgs;
-            }
+            // Get a filtered list of arguments that are not pluggables.
+            $reflectArgs = array_filter($this->ReflectArgs, function ($arg) {
+                return !($arg instanceof Gdn_Pluggable);
+            });
 
             $this->_Definitions["ResolvedArgs"] = $reflectArgs;
         }
@@ -1761,8 +1771,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     {
         $origin = Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, "HTTP_ORIGIN", false);
         if ($origin) {
-            $originHost = parse_url($origin, PHP_URL_HOST);
-            if ($originHost && isTrustedDomain($originHost)) {
+            if (isTrustedDomain($origin)) {
                 $this->setHeader("Access-Control-Allow-Origin", $origin);
                 $this->setHeader("Access-Control-Allow-Credentials", "true");
             }
@@ -1965,11 +1974,12 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
     /**
      * Render a page that hosts a react component.
      */
-    public function renderReact()
+    public function renderReact(string $innerContent = "")
     {
         if (!$this->data("hasPanel")) {
             $this->CssClass .= " NoPanel";
         }
+        $this->setData("seoReactContent", $innerContent);
         $this->render("react", "", "core");
     }
 
@@ -2306,6 +2316,13 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
                 $this->Head->setMobileAddressBarColor($mobileAddressBarColor);
             }
 
+            // Add config defined SEO metas.
+            $seoMetaModel = \Gdn::getContainer()->get(SeoMetaModel::class);
+            $seoMetas = $seoMetaModel->getMetas();
+            foreach ($seoMetas as $seoMeta) {
+                $this->Head->addTag("meta", $seoMeta);
+            }
+
             // Make sure the head module gets passed into the assets collection.
             $this->addModule("Head");
         }
@@ -2418,6 +2435,11 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
             $result = $viewRenderer->renderGdnController($this);
             echo $result;
         } else {
+            // Force our icons into the legacy master template
+            // This is a little hacky but the browsers seem to render it just fine (and treat it as part of the body).
+            // Modern views just properly put it as the first thing in the body.
+            $this->getHead()->addString(TwigStaticRenderer::renderTwigStatic("@resources/svg-symbols.html", []));
+
             // Check to see if there is a handler for this particular extension.
             $viewHandler = Gdn::factory("ViewHandler" . strtolower(strrchr($masterViewPath, ".")));
             if (is_null($viewHandler)) {
@@ -2485,6 +2507,10 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         foreach ($styleAssets as $asset) {
             $this->Head->addCss($asset->getWebPath(), null, false);
         }
+
+        // Noscript stylesheet
+        $noScriptStyleAsset = \Gdn::getContainer()->get(NoScriptStylesAsset::class);
+        $this->Head->addTag("noscript", [], "<link rel='stylesheet' href='{$noScriptStyleAsset->getWebPath()}'>");
     }
 
     /**

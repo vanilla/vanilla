@@ -7,7 +7,6 @@
         "dbaeumer.vscode-eslint",
         "calebporzio.better-phpunit",
         "eamodio.gitlens",
-        "firsttris.vscode-jest-runner",
         "ziyasal.vscode-open-in-github",
         "neilbrayfield.php-docblocker",
         "bmewburn.vscode-intelephense-client",
@@ -16,7 +15,9 @@
         "redhat.vscode-yaml",
         "silvenon.mdx",
         "ikappas.phpcs",
-        "nhoizey.gremlins"
+        "nhoizey.gremlins",
+        "Orta.vscode-jest",
+        "BriteSnow.vscode-toggle-quotes",
     ],
     // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
     "unwantedRecommendations": []

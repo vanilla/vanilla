@@ -6,17 +6,31 @@
 import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
 import { globalVariables } from "@library/styles/globalStyleVars";
+import { oneColumnVariables } from "@library/layout/Section.variables";
 import { css } from "@emotion/css";
 import { extendItemContainer } from "@library/styles/styleHelpersSpacing";
 import { singleBorder } from "@library/styles/styleHelpersBorders";
-import { inputMixinVars } from "@library/forms/inputStyles";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { Mixins } from "@library/styles/Mixins";
 
 export const dashboardClasses = useThemeCache(() => {
     const globalVars = globalVariables();
-    const _inputMixinVars = inputMixinVars();
+    const mediaQueries = oneColumnVariables().mediaQueries();
 
     const style = styleFactory("dashboard");
+
+    const subHeadingBackground = style({
+        "&.subheading": {
+            fontSize: "14px",
+            marginBottom: "0",
+            paddingTop: "9px",
+            borderTop: "1px solid #D8D8D8",
+            borderBottom: "1px solid #D8D8D8",
+            backgroundColor: "#f6f9fb",
+            textTransform: "uppercase",
+            maxHeight: 41,
+        },
+    });
 
     const formList = style({
         padding: 0,
@@ -161,10 +175,23 @@ export const dashboardClasses = useThemeCache(() => {
     const label = css({
         display: "inline-flex",
         alignItems: "center",
+        ...Mixins.font({
+            weight: globalVars.fonts.weights.semiBold,
+        }),
+        ...Mixins.margin({
+            bottom: 0,
+        }),
+    });
+
+    const labelRequired = css({
+        position: "absolute",
+        color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+        left: 8,
     });
 
     const labelIcon = css({
         marginLeft: 4,
+        marginTop: 2,
     });
 
     const noLeftPadding = css({
@@ -173,7 +200,48 @@ export const dashboardClasses = useThemeCache(() => {
         },
     });
 
+    const helperText = css({
+        display: "block",
+        fontSize: 12,
+        lineHeight: 1.3333333333,
+        color: "#949aa2",
+        marginTop: "1em",
+    });
+
+    const passwordInput = css({
+        "& input": { fontSize: 14 },
+    });
+
+    const spaceBetweenFormGroup = css({
+        justifyContent: "space-between",
+
+        "& .input-wrap": {
+            flex: 0,
+        },
+    });
+
+    const buttonRow = css({
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingInline: globalVars.widget.paddingBothSides,
+
+        "& .label-wrap": {
+            // Create the 58.3333333% used from the old 24 col grid system css
+            flex: `0 0 ${(100 / 24) * 14}%`,
+        },
+
+        "& h1, h2, h3, h4": {
+            marginTop: 9,
+        },
+
+        ...mediaQueries.oneColumnDown({
+            display: "block",
+        }),
+    });
+
     return {
+        subHeadingBackground,
         formList,
         helpAsset,
         tokenInput,
@@ -189,7 +257,12 @@ export const dashboardClasses = useThemeCache(() => {
         colorInput,
         swatch,
         label,
+        labelRequired,
         labelIcon,
         noLeftPadding,
+        helperText,
+        passwordInput,
+        spaceBetweenFormGroup,
+        buttonRow,
     };
 });

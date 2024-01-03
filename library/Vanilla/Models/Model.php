@@ -23,6 +23,7 @@ class Model implements InjectableInterface
     public const OPT_OFFSET = "offset";
     public const OPT_SELECT = "select";
     public const OPT_ORDER = "order";
+    public const OPT_DIRECTION = "orderDirection";
     public const OPT_MODE = "mode";
     public const OPT_REPLACE = "replace";
     public const OPT_IGNORE = "ignore";
@@ -173,7 +174,7 @@ class Model implements InjectableInterface
     public function select(array $where = [], array $options = []): array
     {
         $orderFields = $options[self::OPT_ORDER] ?? ($options["orderFields"] ?? []);
-        $orderDirection = $options["orderDirection"] ?? "asc";
+        $orderDirection = $options[self::OPT_DIRECTION] ?? "asc";
         $limit = $options[self::OPT_LIMIT] ?? false;
         $offset = $options[self::OPT_OFFSET] ?? 0;
         $selects = $options[self::OPT_SELECT] ?? [];

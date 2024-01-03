@@ -9,79 +9,353 @@ namespace Vanilla\Utility;
 
 use Psr\Log\LoggerInterface;
 use Vanilla\Logger;
+use Vanilla\Logging\ErrorLogger;
+use Vanilla\Models\DeveloperProfileModel;
+use Vanilla\Utility\Spans\CacheReadSpan;
+use Vanilla\Utility\Spans\CacheWriteSpan;
+use Vanilla\Utility\Spans\DbReadSpan;
+use Vanilla\Utility\Spans\DbWriteSpan;
+use Vanilla\Utility\Spans\GenericSpan;
+use Vanilla\Utility\Spans\RequestSpan;
+use Vanilla\Utility\Spans\AbstractSpan;
 
 /**
- * Contains some light weight timers for profiling and logging application code.
+ * Contains some light-weight timers for profiling and logging application code.
  *
- * You can use this class by sharing it application wide and then putting calls to `Timers::start()` and `Timers::stop()`
- * throughout hot spots in the code, such as I/O.
+ * To record a timer one of the Timers::start() methods, then you've finished the action,
+ * call $span->finish();
  *
- * Each timer must be given a name such as "db" or "cache". You can call `start()` and `stop()` many times wih the same
- * name and the total time will be tracked alongside the min, max, and count of timers.
+ * It's highly recommended to put the finish call in a try {} finally {} block so that
+ * it is gaurenteed to stop.
  */
-final class Timers implements \JsonSerializable
+final class Timers
 {
-    const TIMERS = ["cacheRead", "cacheWrite", "dbRead", "dbWrite"];
+    /**
+     * @var array<string, int>
+     */
+    private array $warningLimitsMs = [];
 
-    private const DEFAULT_TIMER = [
-        "time" => 0.0,
-        "human" => "0",
-        "count" => 0,
-        "min" => null,
-        "max" => 0.0,
-    ];
+    /** @var array<string, AbstractSpan> */
+    private array $timeSpans = [];
 
-    private $timers = [];
+    private ?float $offsetMs = null;
+    private ?string $rootSpanUUID = null;
+    private ?string $currentSpanUUID = null;
 
-    private $customTimers = [];
+    private bool $isEnabled = true;
 
     /**
-     * Start a timer.
+     * Set if timers are enabled.
      *
-     * @param string|string[] $name The name of the timer to start or an array of names to start..
-     * @return array Returns the timer row or an array of timer rows.
+     * @param bool $isEnabled
+     *
+     * @return void
      */
-    public function start($name): array
+    public function setIsEnabled(bool $isEnabled): void
     {
-        if (!is_string($name) && !is_array($name)) {
-            throw new \InvalidArgumentException("Timers::start() expects a string or array.", 400);
-        }
-        $now = microtime(true);
-
-        $names = (array) $name;
-        $result = [];
-        foreach ($names as $n) {
-            $timer = ($this->timers[$n] ?? []) + self::DEFAULT_TIMER;
-
-            if (isset($timer["start"]) && !isset($timer["stop"])) {
-                trigger_error("Timer was started while another one was running: $n", E_USER_NOTICE);
-                // This timer was started, but not stopped, stop it now.
-                $timer = $this->stopInternal($timer, $now);
-            }
-            $this->timers[$n] = $result[$n] = $this->startInternal($timer, $now);
-        }
-        return is_string($name) ? $result[$name] : $result;
+        $this->isEnabled = $isEnabled;
     }
 
     /**
-     * Set a timer's stop fields and return it.
-     *
-     * @param array $timer The name of the timer to stop.
-     * @param float $now The current time.
-     * @return array Returns the time array properly stopped.
+     * @return float|null
      */
-    private function stopInternal(array $timer, float $now): array
+    public function getOffsetMs(): ?float
     {
-        $timer["stop"] = $now;
-        $elapsed = ($timer["stop"] - $timer["start"]) * 1000.0;
-        $timer["time"] += $elapsed;
-        $timer["human"] = self::formatDuration($timer["time"]);
-        if ($timer["min"] === null || $timer["min"] > $elapsed) {
-            $timer["min"] = $elapsed;
-        }
-        $timer["max"] = max($timer["max"], $elapsed);
+        return $this->offsetMs;
+    }
 
-        return $timer;
+    /**
+     * @param float|null $offsetMs
+     * @return void
+     */
+    public function setOffsetMs(?float $offsetMs): void
+    {
+        $this->offsetMs = $offsetMs;
+    }
+
+    /**
+     * Get an instance of the Timers class.
+     *
+     * @return Timers
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public static function instance(): Timers
+    {
+        $timers = \Gdn::getContainer()->get(Timers::class);
+        return $timers;
+    }
+
+    /**
+     * The root span should only ever be created once after the application is bootstrapped.
+     *
+     * @return GenericSpan
+     */
+    public function startRootSpan(): GenericSpan
+    {
+        $span = $this->startGeneric("root");
+        $this->setOffsetMs($span->getStartMs());
+        $this->rootSpanUUID = $span->getUuid();
+
+        // Since this the root, we need to apply the offset ourselves.
+        $span->setOffsetMs($span->getStartMs());
+        return $span;
+    }
+
+    /**
+     * Track an http request.
+     *
+     * @param \Garden\Http\HttpRequest|\Garden\Web\RequestInterface $request
+     *
+     * @return RequestSpan
+     */
+    public function startRequest($request): RequestSpan
+    {
+        $span = new RequestSpan($request, $this->currentSpanUUID);
+        $this->trackSpan($span);
+        return $span;
+    }
+
+    /**
+     * Track a cache read.
+     *
+     * @return CacheReadSpan
+     */
+    public function startCacheRead(): CacheReadSpan
+    {
+        $span = new CacheReadSpan($this->currentSpanUUID);
+        $this->trackSpan($span);
+        return $span;
+    }
+
+    /**
+     * Track a cache write.
+     *
+     * @return CacheWriteSpan
+     */
+    public function startCacheWrite(): CacheWriteSpan
+    {
+        $span = new CacheWriteSpan($this->currentSpanUUID);
+        $this->trackSpan($span);
+        return $span;
+    }
+
+    /**
+     * Start a generic timer.
+     *
+     * @param string $type The type of timer.
+     * @param array $data Metadata about the timer.
+     *
+     * @return GenericSpan
+     */
+    public function startGeneric(string $type, array $data = []): GenericSpan
+    {
+        $span = new GenericSpan($type, $this->currentSpanUUID, $data);
+        $this->trackSpan($span);
+        return $span;
+    }
+
+    /**
+     * @return DbReadSpan
+     */
+    public function startDbRead(): DbReadSpan
+    {
+        $span = new DbReadSpan($this->currentSpanUUID);
+        $this->trackSpan($span);
+        return $span;
+    }
+
+    /**
+     * @return DbWriteSpan
+     */
+    public function startDbWrite(): DbWriteSpan
+    {
+        $span = new DbWriteSpan($this->currentSpanUUID);
+        $this->trackSpan($span);
+        return $span;
+    }
+
+    /**
+     * Record a started timer.
+     *
+     * This method is also responsible for tracking the "nesting" of spans
+     * and adjusting the offsets of a span.
+     *
+     * @param AbstractSpan $span
+     *
+     * @return void
+     */
+    private function trackSpan(AbstractSpan $span): void
+    {
+        if (!$this->isEnabled) {
+            return;
+        }
+        if (count($this->timeSpans) > 5000) {
+            ErrorLogger::warning("Too many timers have been recorded.", ["timers"]);
+            return;
+        }
+        $this->currentSpanUUID = $span->getUuid();
+        $span->setTimers($this);
+        $this->timeSpans[$span->getUuid()] = $span;
+        if ($offsetMs = $this->getOffsetMs()) {
+            $span->setOffsetMs($offsetMs);
+        }
+    }
+
+    /**
+     * Called by a span when it complets.
+     *
+     * - Pop the span off the stack to handle nesting.
+     * - Warn if the span took too long.
+     *
+     * @param AbstractSpan $span
+     *
+     * @return void
+     *
+     * @internal Don't call this yourself. Instead use TimerSpan::finish().
+     */
+    public function trackSpanFinished(AbstractSpan $span): void
+    {
+        if (!$this->isEnabled) {
+            return;
+        }
+        // Reset the "current" span.
+        $this->currentSpanUUID = $span->getParentUuid();
+
+        $warningLimitMs = $this->warningLimitsMs[$span->getType()] ?? null;
+        $elapsedMs = $span->getElapsedMs();
+        if ($warningLimitMs !== null && $elapsedMs > $warningLimitMs) {
+            $formattedDuration = self::formatDuration($elapsedMs);
+            // Issue a warning that the timer took too long.
+            ErrorLogger::warning(
+                "Timer {$span->getType()} took {$formattedDuration}. This was longer than the allowed limit.",
+                ["timerWarning", $span->getType()],
+                [
+                    "elapsedMs" => $elapsedMs,
+                    "allowedMs" => $warningLimitMs,
+                ] + $span->getData()
+            );
+        }
+    }
+
+    private ?bool $shouldRecordProfile = null;
+
+    /**
+     * Force a profile to record or not record.
+     *
+     * @param bool|null $shouldRecordProfile
+     */
+    public function setShouldRecordProfile(?bool $shouldRecordProfile): void
+    {
+        $this->shouldRecordProfile = $shouldRecordProfile;
+    }
+
+    /**
+     * Determine if a profile should be recorded.
+     */
+    private function shouldRecordProfile(): bool
+    {
+        if (!$this->isEnabled) {
+            return false;
+        }
+        $session = \Gdn::session();
+        $config = \Gdn::config();
+
+        if (!$config->get("trace.profiler", true)) {
+            // Never record traces if the feature is disabled. On by default.
+            return false;
+        }
+
+        if ($this->shouldRecordProfile === true) {
+            return true;
+        } elseif ($this->shouldRecordProfile === false) {
+            return false;
+        }
+
+        if ($session->getPermissions()->isSysAdmin()) {
+            // Always record sysadmin traces
+            return true;
+        }
+
+        if ($this->isSlowRequest()) {
+            return true;
+        }
+
+        // Otherwise do a random sampling rate.
+        $samplingRate = $config->get("trace.samplingRate", 1000);
+        $isSampleHit = random_int(1, $samplingRate) === 1;
+        return $isSampleHit;
+    }
+
+    /**
+     * Determine if a request took too long and should be recorded.
+     *
+     * @return bool
+     */
+    private function isSlowRequest(): bool
+    {
+        $rootSpan = $this->getSpans()[$this->rootSpanUUID];
+        if ($rootSpan === null) {
+            return false;
+        }
+
+        // A 10 second request is slow.
+        return $rootSpan->getElapsedMs() > 10 * 1000;
+    }
+
+    /**
+     * Record if the current profile in the database if possible.
+     *
+     * @return void
+     */
+    public function recordProfile(): void
+    {
+        if (!$this->shouldRecordProfile()) {
+            return;
+        }
+
+        $spans = $this->getSpans();
+        foreach ($spans as $span) {
+            $span->stopTimer();
+        }
+        $profile = [
+            "source" => "backend",
+            "rootSpanUuid" => $this->rootSpanUUID,
+            "spans" => $this->getSpans(),
+        ];
+        $timers = $this->getAggregateTimers();
+        $rootSpan = $this->getSpans()[$this->rootSpanUUID] ?? null;
+        $elapsedMs = $rootSpan ? $rootSpan->getElapsedMs() : 0;
+
+        $profileModel = \Gdn::getContainer()->get(DeveloperProfileModel::class);
+        $request = \Gdn::request();
+
+        $name = $request->getMethod() . " " . $request->getPath();
+        $name = substr($name, 0, 255);
+
+        try {
+            $profileModel->insert([
+                "profile" => $profile,
+                "timers" => $timers,
+                "name" => $name,
+                "isTracked" => false,
+                "requestElapsedMs" => $elapsedMs,
+                "requestID" => $request->getMeta("requestID"),
+                "requestMethod" => $request->getMethod(),
+                "requestPath" => $request->getPath(),
+                "requestQuery" => $request->getQuery(),
+            ]);
+        } catch (\Throwable $throwable) {
+            ErrorLogger::warning("Failed to record developer profile.", ["developerProfile"], ["error" => $throwable]);
+        }
+    }
+
+    /**
+     * @return AbstractSpan[]
+     */
+    public function getSpans(): array
+    {
+        return $this->timeSpans;
     }
 
     /**
@@ -123,82 +397,13 @@ final class Timers implements \JsonSerializable
     }
 
     /**
-     * Set a timer's start fields and return it.
-     *
-     * @param array $timer
-     * @param float $now
-     * @return array
-     */
-    private function startInternal(array $timer, float $now): array
-    {
-        $timer["count"]++;
-        $timer["start"] = $now;
-        unset($timer["stop"]);
-
-        return $timer;
-    }
-
-    /**
-     * Stop a timer.
-     *
-     * @param string|string[] $name The name of the timer to stop or an array of names.
-     * @return array Returns the timer row or an array of timer rows..
-     */
-    public function stop($name): array
-    {
-        if (!is_string($name) && !is_array($name)) {
-            throw new \InvalidArgumentException("Timers::stop() expects a string or array.", 400);
-        }
-
-        $now = microtime(true);
-        $names = (array) $name;
-
-        $result = [];
-        foreach ($names as $n) {
-            $timer = ($this->timers[$n] ?? []) + self::DEFAULT_TIMER;
-
-            if (!isset($timer["start"])) {
-                trigger_error("Timer was stopped before calling start: $n", E_USER_NOTICE);
-                $timer = $this->startInternal($timer, $now);
-            }
-
-            $this->timers[$n] = $result[$n] = $this->stopInternal($timer, $now);
-        }
-        return is_string($name) ? $result[$name] : $result;
-    }
-
-    /**
-     * Call a function and time it.
-     *
-     * This method calls the passed function and returns its result, incrementing timing information for it.
-     *
-     * @param string|string[] $name A timer name or array of timer names.
-     * @param callable $callable The function to call.
-     * @return mixed Returns the result of the function call.
-     */
-    public function time($name, callable $callable)
-    {
-        if (!is_string($name) && !is_array($name)) {
-            throw new \InvalidArgumentException("Timers::time() expects arument 1 to be a string or array.", 400);
-        }
-        try {
-            $this->start($name);
-            return $callable();
-        } finally {
-            $this->stop($name);
-        }
-    }
-
-    /**
      * Stop all of the currently running timers.
      */
     public function stopAll(): void
     {
-        $now = microtime(true);
-        foreach ($this->timers as &$timer) {
-            if (!isset($timer["stop"])) {
-                $timer = $this->stopInternal($timer, $now);
-            }
+        $this->currentSpanUUID = null;
+        foreach ($this->getSpans() as $span) {
+            $span->stopTimer();
         }
     }
 
@@ -211,68 +416,63 @@ final class Timers implements \JsonSerializable
      */
     public function logAll(LoggerInterface $logger, string $eventName): void
     {
-        $logger->info("elapsed: {request_elapsed_ms}ms, " . $this->getLogFormatString(), [
-            Logger::FIELD_TIMERS => $this->jsonSerialize() + [
+        $aggregates = $this->getAggregateTimers();
+        $logger->info("Recording Timers: {$eventName}", [
+            Logger::FIELD_TIMERS => $aggregates + [
                 "request_elapsed_ms" => $_SERVER["REQUEST_TIME_FLOAT"]
                     ? (int) ((microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"]) * 1000)
                     : null,
                 "peak_memory" => memory_get_peak_usage(true),
             ],
-            \Vanilla\Logger::FIELD_EVENT => $eventName,
-            \Vanilla\Logger::FIELD_CHANNEL => \Vanilla\Logger::CHANNEL_SYSTEM,
+            Logger::FIELD_EVENT => $eventName,
+            Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
         ]);
     }
 
     /**
-     * Get a timer's info array.
+     * Calculate an aggregate of each type of timer and how long they took.
      *
-     * @param string $name The name of the timer.
-     * @return array|null Returns the timer's info or **null** if one doesn't exist.
-     */
-    public function get($name): ?array
-    {
-        return $this->timers[$name] ?? null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function jsonSerialize()
-    {
-        return $this->timers;
-    }
-
-    /**
-     * Get a string appropriate to pass as log format to a PSR loggger.
-     *
-     * @return string Returns a format string.
-     */
-    public function getLogFormatString(): string
-    {
-        $keys = array_keys($this->timers);
-        natcasesort($keys);
-
-        $args = array_map(function ($key) {
-            return $key . ": {" . $key . ".human}";
-        }, $keys);
-
-        return implode(", ", $args);
-    }
-
-    /**
      * @return array
      */
-    public function getTimers(): array
+    public function getAggregateTimers(): array
     {
-        return array_merge(self::TIMERS, $this->customTimers);
+        $results = [];
+        foreach ($this->getSpans() as $span) {
+            $results[$span->getType() . "_elapsed_ms"] =
+                ($results[$span->getType()] ?? 0) + $this->getSpanSelfMs($span);
+        }
+
+        return $results;
     }
 
     /**
-     * @param string $timer
+     * Calculate how long a span spent in its own time, excluding child spans.
+     *
+     * @param AbstractSpan $span
+     *
+     * @return float
      */
-    public function addCustomTimer(string $timer): void
+    private function getSpanSelfMs(AbstractSpan $span): float
     {
-        $this->customTimers[] = $timer;
+        $spanMs = $span->getElapsedMs();
+        $selfMs = $spanMs;
+        foreach ($this->getSpans() as $otherSpan) {
+            if ($otherSpan->getParentUuid() === $span->getUuid()) {
+                $selfMs -= $otherSpan->getElapsedMs();
+            }
+        }
+        return $selfMs;
+    }
+
+    /**
+     * Set a number of ms at which a timer will generate a warning.
+     *
+     * @param string $timerName
+     * @param int $warnAtMs
+     */
+    public function setWarningLimit(string $timerName, int $warnAtMs)
+    {
+        $this->warningLimitsMs[$timerName] = $warnAtMs;
     }
 
     /**
@@ -282,7 +482,39 @@ final class Timers implements \JsonSerializable
      */
     public function reset()
     {
-        $this->timers = [];
-        $this->customTimers = [];
+        $this->timeSpans = [];
+        $this->rootSpanUUID = null;
+        $this->currentSpanUUID = null;
+    }
+
+    /**
+     * Legacy stubs. Remove once vanillainfrastructure has been updated
+     *
+     * @deprecated
+     */
+    public function start(string $_)
+    {
+        // Do nothing
+    }
+
+    /**
+     * Legacy stubs. Remove once vanillainfrastructure has been updated
+     *
+     * @deprecated
+     */
+    public function stop(string $_)
+    {
+    }
+
+    /**
+     * Legacy stubs. Remove once vanillainfrastructure has been updated
+     *
+     * @deprecated
+     */
+    public function get(string $_): array
+    {
+        return [
+            "time" => 0,
+        ];
     }
 }

@@ -12,7 +12,7 @@ import { negative, allLinkStates } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { styleUnit } from "@library/styles/styleUnit";
 import { percent, px, calc } from "csx";
-import { css, CSSObject } from "@emotion/css";
+import { css, CSSObject, cx } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
 import { trimTrailingCommas } from "@dashboard/compatibilityStyles/trimTrailingCommas";
 import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
@@ -45,7 +45,7 @@ export const siteNavVariables = useThemeCache(() => {
     });
 
     const spacer = makeThemeVars("spacer", {
-        default: 7,
+        default: 12,
     });
 
     return { node, title, nodeToggle, spacer };
@@ -58,6 +58,7 @@ export const siteNavClasses = useThemeCache(() => {
 
     const style = styleFactory("siteNav");
 
+    const offset = vars.nodeToggle.width - vars.nodeToggle.iconWidth / 2 - vars.spacer.default;
     const root = style(
         {
             position: "relative",
@@ -65,7 +66,8 @@ export const siteNavClasses = useThemeCache(() => {
             zIndex: 1,
         },
         mediaQueries.noBleedDown({
-            marginLeft: styleUnit(vars.nodeToggle.width - vars.nodeToggle.iconWidth / 2 - vars.spacer.default),
+            marginLeft: offset,
+            width: `calc(100% - ${offset}px)`,
         }),
     );
 
@@ -95,11 +97,12 @@ export const linkMixin = (base?: CSSObject, useTextColor?: boolean, selector?: s
             hover: {
                 color: ColorsUtils.colorOut(globalVars.links.colors.hover),
             },
-            focus: {
-                color: ColorsUtils.colorOut(globalVars.links.colors.focus),
-            },
             keyboardFocus: {
                 color: ColorsUtils.colorOut(globalVars.links.colors.keyboardFocus),
+                outline: "none",
+                "& > *": {
+                    outline: "auto 2px -webkit-focus-ring-color",
+                },
             },
             active: {
                 color: ColorsUtils.colorOut(globalVars.links.colors.active),
@@ -177,10 +180,11 @@ export const siteNavNodeClasses = useThemeCache((active = false, isFirstLevel = 
     const label = css(
         {
             position: "relative",
-            display: "block",
+            display: "flex",
+            alignItems: "center",
             width: calc(`100% + ${styleUnit(vars.nodeToggle.width)}`),
             marginLeft: styleUnit(-vars.nodeToggle.width),
-            textAlign: "left",
+            textAlign: "start",
             border: `solid transparent ${styleUnit(vars.node.borderWidth)}`,
             paddingTop: styleUnit(vars.node.padding + vars.node.borderWidth),
             paddingRight: styleUnit(vars.node.padding),
@@ -195,6 +199,10 @@ export const siteNavNodeClasses = useThemeCache((active = false, isFirstLevel = 
             }),
         }),
     );
+
+    const labelText = css({
+        flex: 1,
+    });
 
     const spacer = style("spacer", {
         display: "block",
@@ -213,6 +221,7 @@ export const siteNavNodeClasses = useThemeCache((active = false, isFirstLevel = 
         outline: 0,
         height: styleUnit(vars.nodeToggle.height),
         width: styleUnit(vars.nodeToggle.width),
+        lineHeight: 0,
     });
 
     const buttonOffset = style("buttonOffset", {
@@ -240,10 +249,36 @@ export const siteNavNodeClasses = useThemeCache((active = false, isFirstLevel = 
         color: ColorsUtils.colorOut(globalVars.links.colors.active),
     });
 
-    const checkMark = style("checkMark", {
-        color: ColorsUtils.colorOut(globalVars.mainColors.primary),
-        ...Mixins.margin({ left: 8, right: 4 }),
+    const icon = css({
+        height: 18,
+        width: 18,
+        position: "relative",
+        transform: "scale(1.25)",
+        ...Mixins.margin({ left: 4, right: 8 }),
+        color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+        ["&.disabled"]: {
+            opacity: 0.5,
+        },
     });
+
+    const iconGroup = css({
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+
+        marginRight: 8,
+        "& *": {
+            margin: 0,
+        },
+    });
+
+    const checkMark = cx(
+        icon,
+        css({
+            color: ColorsUtils.colorOut(globalVars.mainColors.primary),
+            ...Mixins.margin({ left: 4, right: 8 }),
+        }),
+    );
 
     return {
         root,
@@ -251,10 +286,13 @@ export const siteNavNodeClasses = useThemeCache((active = false, isFirstLevel = 
         contents,
         link,
         label,
+        labelText,
         spacer,
         toggle,
         buttonOffset,
         activeLink,
+        iconGroup,
+        icon,
         checkMark,
     };
 });
@@ -265,20 +303,6 @@ export const siteNavNodeDashboardClasses = useThemeCache(
         const vars = siteNavVariables();
 
         const style = styleFactory(SiteNavNodeTypes.DASHBOARD);
-
-        const root = style("dashboard", {
-            position: "relative",
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "flex-start",
-            flexWrap: "nowrap",
-            fontSize: styleUnit(vars.node.fontSize),
-            color: vars.node.fg.toString(),
-        });
-
-        const children = style("children", {
-            marginLeft: styleUnit(vars.spacer.default),
-        });
 
         const link = css({
             ...(isFirstLevel
@@ -304,16 +328,21 @@ export const siteNavNodeDashboardClasses = useThemeCache(
 
         const label = css({
             position: "relative",
-            display: "block",
+            display: "flex",
+            alignItems: "center",
             width: calc(`100% + ${styleUnit(vars.nodeToggle.width)}`),
             marginLeft: styleUnit(-vars.nodeToggle.width),
-            textAlign: "left",
+            textAlign: "start",
             border: `solid transparent ${styleUnit(vars.node.borderWidth)}`,
             paddingTop: styleUnit(vars.node.padding + vars.node.borderWidth),
             paddingRight: styleUnit(vars.node.padding),
             paddingBottom: styleUnit(vars.node.padding + vars.node.borderWidth),
             paddingLeft: styleUnit(vars.nodeToggle.width - vars.node.borderWidth),
             fontSize: styleUnit(globalVars.fonts.size.medium),
+            "& > svg": {
+                height: 18,
+                width: 18,
+            },
             ...(active
                 ? {
                       borderTopLeftRadius: 6,
@@ -328,62 +357,9 @@ export const siteNavNodeDashboardClasses = useThemeCache(
                 : {}),
         });
 
-        const spacer = style("spacer", {
-            display: "block",
-            height: styleUnit(vars.nodeToggle.height),
-            width: styleUnit(vars.spacer.default),
-            margin: `6px 0`,
-        });
-
-        const toggle = style("toggle", {
-            margin: `6px 0`,
-            padding: 0,
-            zIndex: 1,
-            display: "block",
-            alignItems: "center",
-            justifyContent: "center",
-            outline: 0,
-            height: styleUnit(vars.nodeToggle.height),
-            width: styleUnit(vars.nodeToggle.width),
-            font: "initial",
-            lineHeight: 0,
-        });
-
-        const buttonOffset = style("buttonOffset", {
-            position: "relative",
-            display: "flex",
-            justifyContent: "flex-end",
-            width: styleUnit(vars.nodeToggle.width),
-            marginLeft: styleUnit(-vars.nodeToggle.width),
-            top: px(16),
-            transform: `translateY(-50%)`,
-        });
-
-        const contents = style("contents", {
-            display: "block",
-            width: percent(100),
-            ...{
-                [`.${buttonOffset}`]: {
-                    top: styleUnit(15.5),
-                },
-            },
-        });
-
-        const activeLink = style("active", {
-            fontWeight: globalVars.fonts.weights.semiBold,
-            color: ColorsUtils.colorOut(globalVars.links.colors.active),
-        });
-
         return {
-            root,
-            children,
-            contents,
             link,
             label,
-            spacer,
-            toggle,
-            buttonOffset,
-            activeLink,
         };
     },
 );

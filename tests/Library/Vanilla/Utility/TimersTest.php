@@ -9,12 +9,16 @@ namespace VanillaTests\Library\Vanilla\Utility;
 
 use PHPUnit\Framework\TestCase;
 use Vanilla\Utility\Timers;
+use VanillaTests\DatabaseTestTrait;
+use VanillaTests\SiteTestCase;
 
 /**
  * Tests for the `Timers` class.
  */
-class TimersTest extends TestCase
+class TimersTest extends SiteTestCase
 {
+    use DatabaseTestTrait;
+
     /**
      * @var Timers
      */
@@ -28,151 +32,85 @@ class TimersTest extends TestCase
         parent::setUp();
 
         $this->timers = new Timers();
-        $this->timers->start("test");
+        self::container()->setInstance(Timers::class, $this->timers);
     }
 
     /**
-     * Test stopping the test timer.
+     * Test that timer spans can be nested inside of each other.
      */
-    public function testStopTimer(): void
+    public function testTimerNesting()
     {
-        $timer = $this->timers->stop("test");
-        $this->assertSame(1, $timer["count"]);
-        $this->assertSame($timer["time"], $timer["min"]);
-        $this->assertSame($timer["time"], $timer["max"]);
-        $this->assertSame(Timers::formatDuration($timer["time"]), $timer["human"]);
+        $outerSpan = $this->timers->startGeneric("outer");
+        usleep(100 * 1000);
+        $innerSpan = $this->timers->startGeneric("inner");
+        usleep(500 * 1000);
+        $innerSpan->finish();
+        $outerSpan->finish();
+
+        $this->assertEquals($outerSpan->getUuid(), $innerSpan->getParentUuid());
+
+        $timers = $this->timers->getAggregateTimers();
+        $this->assertLessThanOrEqual(500, $timers["outer_elapsed_ms"]);
+
+        $this->assertGreaterThanOrEqual(500, $timers["inner_elapsed_ms"]);
     }
 
     /**
-     * Test calling `start()/stop()` with an array of names.
+     * Test recording of profiles.
      */
-    public function testMultiSyntax(): void
+    public function testRecordProfile()
     {
-        $timers = $this->timers->start(["a", "b"]);
-        $this->assertArrayHasKey("a", $timers);
-        $this->assertArrayHasKey("b", $timers);
-        foreach ($timers as $timer) {
-            $this->assertSame(1, $timer["count"]);
-            $this->assertArrayHasKey("start", $timer);
-        }
+        $root = $this->timers->startRootSpan();
+        \Gdn::request()->fromImport($this->bessy()->createRequest("GET", "/my-url"));
+        \Gdn::request()->setMeta("requestID", "my-request");
+        $this->timers->setShouldRecordProfile(true);
+        $this->timers->recordProfile();
 
-        $timers = $this->timers->stop(["a", "b"]);
-        $this->assertArrayHasKey("a", $timers);
-        $this->assertArrayHasKey("b", $timers);
-        foreach ($timers as $timer) {
-            $this->assertSame(1, $timer["count"]);
-            $this->assertArrayHasKey("stop", $timer);
-            $this->assertSame(Timers::formatDuration($timer["time"]), $timer["human"]);
-        }
+        $this->assertRecordsFound("developerProfile", [
+            "requestID" => "my-request",
+            "requestMethod" => "GET",
+            "requestPath" => "/my-url",
+            "name" => "GET /my-url",
+            "requestElapsedMs LIKE" => $root->getElapsedMs(),
+        ]);
     }
 
     /**
-     * Test `Timers::time()`.
+     * Finishing a timer twice does nothing.
      */
-    public function testTime(): void
+    public function testFinishSpanTwice(): void
     {
-        $r = $this->timers->time(["foo", "bar"], function () {
-            return "baz";
-        });
-        $this->assertSame("baz", $r);
-        foreach (["foo", "bar"] as $name) {
-            $timer = $this->timers->get($name);
-            $this->assertIsArray($timer);
-            $this->assertSame(1, $timer["count"]);
-            $this->assertArrayHasKey("stop", $timer);
-        }
+        $span = $this->timers->startGeneric("test");
+        usleep(300 * 1000);
+        $span->finish();
+        $elapsed = $span->getElapsedMs();
+        usleep(300 * 1000);
+        $span->finish();
+
+        $this->assertSame($elapsed, $span->getElapsedMs());
+        $this->assertErrorLogMessage("Timer test was finished more than once.");
     }
 
     /**
-     * Getting a non-existent timer should return null.
+     * Test that timers can warn.
      */
-    public function testNonexistent(): void
+    public function testTimerWarning()
     {
-        $this->assertNull($this->timers->get("foo"));
-    }
-
-    /**
-     * You should be able to start a timer twice and have it count as stopped.
-     */
-    public function testStartingTimerTwice(): void
-    {
-        usleep(1);
-        $timer = @$this->timers->start("test");
-        $this->assertSame(2, $timer["count"]);
-
-        usleep(2);
-        $timer = $this->timers->stop("test");
-        $this->assertGreaterThanOrEqual($timer["min"], $timer["max"]);
-    }
-
-    /**
-     * Stopping a timer without starting is like immediately starting then stopping it.
-     */
-    public function testStoppingTimerTwice(): void
-    {
-        $timer = @$this->timers->stop(__FUNCTION__);
-        $this->assertSame(1, $timer["count"]);
-        $this->assertSame(0.0, $timer["time"]);
-    }
-
-    /**
-     * Test stopping all timers.
-     */
-    public function testStopAll(): void
-    {
-        $this->timers->start(__FUNCTION__);
-        $this->timers->stopAll();
-        $timers = $this->timers->jsonSerialize();
-        foreach ($timers as $name => $timer) {
-            $this->assertIsFloat($timer["stop"]);
-            $this->assertIsFloat($timer["min"]);
-            $this->assertIsFloat($timer["max"]);
-        }
-    }
-
-    /**
-     * Test the lower bounds of the various duration types.
-     *
-     * @param string $expected
-     * @param float $milliseconds
-     * @dataProvider provideFormatTests
-     */
-    public function testFormatDurationMinimums(string $expected, float $milliseconds): void
-    {
-        $this->assertSame($expected, Timers::formatDuration($milliseconds));
-    }
-
-    /**
-     * Data provider.
-     *
-     * @return array
-     */
-    public function provideFormatTests(): array
-    {
-        $r = [
-            ["0", 0],
-            ["1μs", 1e-3],
-            ["1ms", 1],
-            ["1s", 1000],
-            ["1m", 60000],
-            ["1h", 1000 * strtotime("1 hour", 0)],
-            ["1d", 1000 * strtotime("1 day", 0)],
-            ["20ms", 19.572019577026367],
-        ];
-
-        return array_column($r, null, 0);
-    }
-
-    /**
-     * Test a sample format string.
-     */
-    public function testLogFormatString(): void
-    {
-        $this->timers->stop("test");
-        usleep(2);
-        $this->timers->start("foo");
-        $str = $this->timers->getLogFormatString();
-        $this->assertSame("foo: {foo.human}, test: {test.human}", $str);
-        $this->timers->stopAll();
+        $this->timers->setWarningLimit("slowTimer", 100);
+        $span = $this->timers->startGeneric("slowTimer", [
+            "start" => "foo",
+        ]);
+        usleep(300 * 1000);
+        $span->finish([
+            "end" => "bar",
+        ]);
+        $expectedMs = round($span->getElapsedMs());
+        $this->assertErrorLogMessage("Timer slowTimer took {$expectedMs}ms.");
+        $this->assertErrorLog([
+            "tags" => ["timerWarning", "slowTimer"],
+            "data.start" => "foo",
+            "data.end" => "bar",
+            "data.allowedMs" => 100,
+        ]);
     }
 }

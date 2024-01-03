@@ -9,6 +9,7 @@ namespace VanillaTests\Library\Database;
 
 use PHPUnit\Framework\TestCase;
 use Gdn_Database;
+use Vanilla\Cache\CacheCacheAdapter;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Database\SetLiterals\Increment;
 use Vanilla\Database\SetLiterals\MinMax;
@@ -535,7 +536,7 @@ SQL;
     public function testSchemaCache()
     {
         $cache = self::enableCaching();
-        $this->sql->setCache($cache);
+        $this->sql->setCache(new CacheCacheAdapter($cache));
         $tableName = __FUNCTION__;
         $runStructure = function (bool $withChange = false) use ($tableName) {
             $st = $this->sql->Database->structure();
@@ -553,13 +554,14 @@ SQL;
         $runStructure();
         $cache->flush();
         $this->sql->fetchTableSchema($tableName);
-        $cache->assertSetCount("*mysql*", 1);
+        $cache->assertSetCount("mysql*", 1);
         $this->sql->fetchTableSchema($tableName);
-        $cache->assertSetCount("*mysql*", 1);
+        $cache->assertSetCount("mysql*", 1);
         $cache->assertNotEmpty();
 
         $runStructure(true);
-        $cache->assertSetCount("*mysql*", 2);
+        $this->sql->fetchTableSchema($tableName);
+        $cache->assertSetCount("mysql*", 2);
         $this->assertTableSchemaHasColumn($tableName, "new");
     }
 

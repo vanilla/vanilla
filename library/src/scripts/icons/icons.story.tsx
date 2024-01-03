@@ -19,15 +19,20 @@ import * as RevisionIcons from "@library/icons/revision";
 import * as SearchIcons from "@library/icons/searchIcons";
 import { StoryTiles } from "@library/storybook/StoryTiles";
 import { color } from "csx";
-import { Icon, iconRegistry } from "@vanilla/icons";
+import { coreIconsData, Icon, iconRegistry } from "@vanilla/icons";
 import { css } from "@emotion/css";
 import groupBy from "lodash/groupBy";
 import { labelize } from "@vanilla/utils";
 import { IconType } from "@vanilla/icons";
+import iconSymbolsHtml from "!raw-loader!../../../../resources/views/svg-symbols.html";
 
 const story = storiesOf("Components", module);
 
 const invert = ["NewPostMenuIcon"];
+
+const iconDiv = document.createElement("div");
+iconDiv.innerHTML = iconSymbolsHtml;
+document.body.insertBefore(iconDiv, document.body.firstChild);
 
 function IconSet({ icons }) {
     return (
@@ -61,8 +66,8 @@ const vanillaIconsStyle = css({
     input: { appearance: "none", border: 0 },
 });
 
-function VanillaIconsSet({ icons }) {
-    const iconTypes = Object.keys(icons) as IconType[];
+function VanillaIconsSet() {
+    const iconTypes = Object.keys(coreIconsData) as string[];
     const grouped = groupBy(iconTypes, (icon) => icon.split("-")[0]);
     return (
         <div className={vanillaIconsStyle}>
@@ -73,7 +78,7 @@ function VanillaIconsSet({ icons }) {
                         <ul>
                             {values.map((value) => (
                                 <li key={value}>
-                                    <Icon icon={value} />
+                                    <Icon icon={value as IconType} />
                                     <input
                                         type="text"
                                         onClick={(event) => (event.target as HTMLInputElement).select()}
@@ -99,7 +104,7 @@ story.add("Icons", () => {
                 24px.
             </StoryParagraph>
             <StoryHeading>@vanilla/icons</StoryHeading>
-            <VanillaIconsSet icons={iconRegistry.getAllIcons()} />
+            <VanillaIconsSet />
             <StoryHeading>Common</StoryHeading>
             <IconSet icons={CommonIcons} />
             <StoryHeading>Editor</StoryHeading>

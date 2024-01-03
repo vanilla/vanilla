@@ -14,6 +14,7 @@ import { LayoutEditorSelectionMode } from "@dashboard/layout/editor/LayoutEditor
 import { LayoutSectionInfos } from "@dashboard/layout/editor/LayoutSectionInfos";
 import { IHydratedEditableWidgetProps, ILayoutEditorPath } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { cx } from "@emotion/css";
+import { SectionEvenColumns } from "@library/layout/SectionEvenColumns";
 import { SectionFullWidth } from "@library/layout/SectionFullWidth";
 import { SectionOneColumn } from "@library/layout/SectionOneColumn";
 import SectionThreeColumns from "@library/layout/ThreeColumnSection";
@@ -121,7 +122,7 @@ export function EditorSectionThreeColumns(props: EditorSectionProps<typeof Secti
     const { $editorPath, $componentName, $hydrate, ...restProps } = props;
     const classes = layoutEditorClasses();
     const ref = useRef<HTMLDivElement | null>(null);
-    const { isActive, isSelected, activeClasses } = useSectionFocusRef(props.$editorPath, ref);
+    const { isSelected, activeClasses } = useSectionFocusRef(props.$editorPath, ref);
     const onClick = useSectionClickHandler(props.$editorPath);
 
     return (
@@ -139,6 +140,30 @@ export function EditorSectionThreeColumns(props: EditorSectionProps<typeof Secti
                 childrenBefore={<SectionDecorationAbsolute {...props} />}
             />
         </>
+    );
+}
+
+export function EditorSectionEvenColumns(props: EditorSectionProps<typeof SectionEvenColumns>) {
+    props = useSectionPropsWithAddButtons(props);
+    const { $editorPath, $componentName, $hydrate, ...restProps } = props;
+    const classes = layoutEditorClasses();
+    const ref = useRef<HTMLDivElement | null>(null);
+    const { isActive, isSelected, activeClasses } = useSectionFocusRef(props.$editorPath, ref);
+    const onClick = useSectionClickHandler(props.$editorPath);
+
+    return (
+        <SectionEvenColumns
+            {...props}
+            role={"button"}
+            aria-label={`Three column section`}
+            data-layout-editor-focusable
+            onClick={onClick}
+            className={cx(classes.section(), activeClasses)}
+            tabIndex={isSelected ? 0 : -1}
+            data-layout-selectable={true}
+            ref={ref}
+            childrenBefore={<SectionDecorationAbsolute {...props} />}
+        />
     );
 }
 

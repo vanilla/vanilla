@@ -4,10 +4,19 @@
  * @license GPL-2.0-only
  */
 
+use Garden\Web\Exception\ServerException;
 use PHPMailer\PHPMailer\PHPMailer;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\CurrentTimeStamp;
+use Vanilla\Email\MailerInterface;
+use Vanilla\Email\SendGridMailer;
+use Vanilla\Email\StandardMailer;
+use Vanilla\Formatting\Formats\Rich2Format;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Utility\DebugUtils;
+use Vanilla\Utility\Timers;
 
 /**
  * Email layer abstraction
@@ -23,14 +32,25 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
+    public const CONF_DISABLED = "Garden.Email.Disabled";
+
+    public const CONF_SENDGRID_MAILER_API_KEY = "Garden.Email.SendGridMailer.ApiKey";
+
+    public const CONF_SENDGRID_MAILER_ENABLED = "Garden.Email.SendGridMailer.Enabled";
+
     /** Error: The email was not attempted to be sent.. */
     const ERR_SKIPPED = 1;
 
     /** @var bool */
     private $debug;
 
-    /** @var PHPMailer */
+    /**
+     * @deprecated
+     * @var PHPMailer
+     */
     public $PhpMailer;
+
+    protected MailerInterface $mailer;
 
     /** @var boolean */
     private $_IsToSet;
@@ -44,6 +64,8 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
     /** @var string The format of the email. */
     protected $format;
 
+    protected ConfigurationInterface $config;
+
     /** @var string[] The supported email formats. */
     public static $supportedFormats = ["html", "text"];
 
@@ -52,11 +74,10 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
      */
     public function __construct()
     {
-        $this->PhpMailer = new \Vanilla\VanillaMailer();
-        $this->PhpMailer->CharSet = "utf-8";
-        $this->PhpMailer->SingleTo = c("Garden.Email.SingleTo", false);
-        $this->PhpMailer->Hostname = c("Garden.Email.Hostname", "");
-        $this->PhpMailer->Encoding = "quoted-printable";
+        $this->PhpMailer = StandardMailer::createPhpMailer();
+        $this->config = \Gdn::config();
+        $this->mailer = $this->initializeMailer();
+
         $this->clear();
         $this->addHeader("Precedence", "list");
         $this->addHeader("X-Auto-Response-Suppress", "All");
@@ -70,6 +91,25 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
 
         $this->resolveFormat();
         parent::__construct();
+    }
+
+    /**
+     * Initialize and return appropriate mailer instance based on current configuration.
+     *
+     * @return MailerInterface
+     */
+    private function initializeMailer(): MailerInterface
+    {
+        $addonManager = Gdn::addonManager();
+        if (
+            $addonManager->isEnabled("vanilla-queue", \Vanilla\Addon::TYPE_ADDON) &&
+            !$addonManager->isEnabled("vanillapop", \Vanilla\Addon::TYPE_ADDON) &&
+            $this->config->configKeyExists(self::CONF_SENDGRID_MAILER_API_KEY) &&
+            $this->config->get(self::CONF_SENDGRID_MAILER_ENABLED)
+        ) {
+            return new SendGridMailer();
+        }
+        return new StandardMailer($this->PhpMailer);
     }
 
     /**
@@ -127,8 +167,28 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
      */
     public function addHeader($name, $value)
     {
-        $this->PhpMailer->addCustomHeader("$name:$value");
+        $this->mailer->addHeader($name, $value);
         return $this;
+    }
+
+    /**
+     * Schedule a particular delivery time for this email.
+     *
+     * This only works with sendgrid the time may not be more than 3 days in the future.
+     */
+    public function scheduleDelivery(\DateTimeInterface $time): void
+    {
+        $nowTs = CurrentTimeStamp::get();
+        $deliveryTs = $time->getTimestamp();
+
+        $threeDayDiff = 60 * 60 * 24 * 3;
+        if ($deliveryTs - $nowTs > $threeDayDiff) {
+            throw new ServerException("You can't schedule an email for delivery more than 3 days in the future.", 500, [
+                "scheduleTime" => $time,
+            ]);
+        }
+
+        $this->addHeader("X-SMTPAPI", json_encode(["send_at" => $deliveryTs]));
     }
 
     /**
@@ -146,7 +206,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
         }
 
         ob_start();
-        $this->PhpMailer->addBCC($recipientEmail, $recipientName);
+        $this->mailer->addBCC($recipientEmail, $recipientName);
         ob_end_clean();
         return $this;
     }
@@ -166,7 +226,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
         }
 
         ob_start();
-        $this->PhpMailer->addCC($recipientEmail, $recipientName);
+        $this->mailer->addCC($recipientEmail, $recipientName);
         ob_end_clean();
         return $this;
     }
@@ -179,9 +239,8 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
      */
     public function clear()
     {
-        $this->PhpMailer->clearAllRecipients();
-        $this->PhpMailer->Body = "";
-        $this->PhpMailer->AltBody = "";
+        $this->mailer->clearRecipients();
+        $this->mailer->clearContent();
         $this->from();
         $this->_IsToSet = false;
         $this->mimeType(c("Garden.Email.MimeType", "text/plain"));
@@ -249,13 +308,13 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
             $fromName = c("Garden.Email.SupportName", c("Garden.Title", ""));
         }
 
-        if ($this->PhpMailer->Sender == "" || $bOverrideSender) {
+        if ($this->mailer->getSender() == "" || $bOverrideSender) {
             $envelopeEmail = $bOverrideSender ? $fromEmail : $this->getDefaultSenderAddress();
-            $this->PhpMailer->Sender = $envelopeEmail;
+            $this->mailer->setSender($envelopeEmail);
         }
 
         ob_start();
-        $this->PhpMailer->setFrom($fromEmail, $fromName, false);
+        $this->mailer->setFrom($fromEmail, $fromName);
         ob_end_clean();
         return $this;
     }
@@ -289,7 +348,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
 
     public function formatMessage($message)
     {
-        if ($this->PhpMailer->ContentType == "text/html") {
+        if ($this->mailer->getContentType() == "text/html") {
             $textVersion = false;
             if (stristr($message, "<!-- //TEXT VERSION FOLLOWS//")) {
                 $emailParts = explode("<!-- //TEXT VERSION FOLLOWS//", $message);
@@ -301,13 +360,13 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
                 $message = trim($message);
             }
 
-            $this->PhpMailer->msgHTML(self::imageInlineStyles($message));
-            if ($textVersion !== false && !empty($textVersion)) {
+            $this->mailer->setHtmlContent(self::imageInlineStyles($message));
+            if (!empty($textVersion)) {
                 $textVersion = html_entity_decode($textVersion);
-                $this->PhpMailer->AltBody = $textVersion;
+                $this->mailer->setTextContent($textVersion);
             }
         } else {
-            $this->PhpMailer->Body = $message;
+            $this->mailer->setTextOnlyContent($message);
         }
         return $this;
     }
@@ -433,7 +492,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
      */
     public function mimeType($mimeType)
     {
-        $this->PhpMailer->isHTML($mimeType === "text/html");
+        $this->mailer->setContentType($mimeType);
         return $this;
     }
 
@@ -448,7 +507,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
     public function send($eventName = "")
     {
         $this->formatMessage($this->emailTemplate->toString());
-        $this->fireEvent("BeforeSendMail");
+        $this->fireAs(Gdn_Email::class)->fireEvent("BeforeSendMail");
 
         if (c("Garden.Email.Disabled")) {
             throw new Exception("Email disabled", self::ERR_SKIPPED);
@@ -459,39 +518,21 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
             return true;
         }
 
-        if (c("Garden.Email.UseSmtp")) {
-            $this->PhpMailer->isSMTP();
-            $smtpHost = c("Garden.Email.SmtpHost", "");
-            $smtpPort = c("Garden.Email.SmtpPort", 25);
-            if (strpos($smtpHost, ":") !== false) {
-                [$smtpHost, $smtpPort] = explode(":", $smtpHost);
-            }
-
-            $this->PhpMailer->Host = $smtpHost;
-            $this->PhpMailer->Port = $smtpPort;
-            $this->PhpMailer->SMTPSecure = c("Garden.Email.SmtpSecurity", "");
-            $this->PhpMailer->Username = $username = c("Garden.Email.SmtpUser", "");
-            $this->PhpMailer->Password = $password = c("Garden.Email.SmtpPassword", "");
-            if (!empty($username)) {
-                $this->PhpMailer->SMTPAuth = true;
-            }
-        } else {
-            $this->PhpMailer->isMail();
-        }
-
         if ($eventName != "") {
             $this->EventArguments["EventName"] = $eventName;
             $this->fireEvent("SendMail");
         }
 
-        if (!empty($this->Skipped) && count($this->PhpMailer->getAllRecipientAddresses()) == 0) {
+        if (!empty($this->Skipped) && count($this->mailer->getAllRecipients()) == 0) {
             // We've skipped all recipients.
             throw new Exception("No valid email recipients.", self::ERR_SKIPPED);
         }
 
-        $this->PhpMailer->setThrowExceptions(true);
-        if (!$this->PhpMailer->send()) {
-            throw new Exception($this->PhpMailer->ErrorInfo);
+        $span = Timers::instance()->startGeneric("sendEmail");
+        try {
+            $this->mailer->send();
+        } finally {
+            $span->stopTimer();
         }
 
         if ($this->isDebug() && $this->logger instanceof Psr\Log\LoggerInterface) {
@@ -505,16 +546,15 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
                 "method" => Gdn::request()->requestMethod(),
                 "domain" => rtrim(url("/", true), "/"),
                 "path" => Gdn::request()->path(),
-                "charset" => $this->PhpMailer->CharSet,
-                "contentType" => $this->PhpMailer->ContentType,
-                "from" => $this->PhpMailer->From,
-                "fromName" => $this->PhpMailer->FromName,
-                "sender" => $this->PhpMailer->Sender,
-                "subject" => $this->PhpMailer->Subject,
-                // Address data comes in an array of [address, name] items and we only need the address.
-                "to" => array_column($this->PhpMailer->getToAddresses(), 0),
-                "cc" => array_column($this->PhpMailer->getCcAddresses(), 0),
-                "bcc" => array_column($this->PhpMailer->getBccAddresses(), 0),
+                "charset" => $this->mailer->getCharSet(),
+                "contentType" => $this->mailer->getContentType(),
+                "from" => $this->mailer->getFromAddress(),
+                "fromName" => $this->mailer->getFromName(),
+                "sender" => $this->mailer->getSender(),
+                "subject" => $this->mailer->getSubject(),
+                "to" => array_column($this->mailer->getToAddresses(), "email"),
+                "cc" => array_column($this->mailer->getCcAddresses(), "email"),
+                "bcc" => array_column($this->mailer->getBccAddresses(), "email"),
             ]);
         }
         return true;
@@ -528,7 +568,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
      */
     public function subject($subject)
     {
-        $this->PhpMailer->Subject = mb_encode_mimeheader($subject, $this->PhpMailer->CharSet);
+        $this->mailer->setSubject($subject);
         return $this;
     }
 
@@ -539,7 +579,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
         }
 
         ob_start();
-        $this->PhpMailer->addAddress($recipientEmail, $recipientName);
+        $this->mailer->addTo($recipientEmail, $recipientName);
         ob_end_clean();
         return $this;
     }
@@ -565,7 +605,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
                 // trim no need, PhpMailer::addAnAddress() will do it
                 return $this->to($recipientEmail, $recipientName);
             }
-            if ($this->PhpMailer->SingleTo) {
+            if ($this->mailer->isSingleTo()) {
                 return $this->addTo($recipientEmail, $recipientName);
             }
             if (!$this->_IsToSet) {
@@ -626,15 +666,6 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
         );
     }
 
-    public function charset($use = "")
-    {
-        if ($use != "") {
-            $this->PhpMailer->CharSet = $use;
-            return $this;
-        }
-        return $this->PhpMailer->CharSet;
-    }
-
     /**
      * Should mailing be debugged?
      *
@@ -653,5 +684,75 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
     public function isDebug(): bool
     {
         return $this->debug;
+    }
+
+    /**
+     * Get email footer html string if available
+     *
+     * @return string
+     */
+    public function getFooterContent(string $content = null): string
+    {
+        $footerConfig = $content ?? $this->config->get("Garden.Email.Footer", "");
+        if (empty(trim($footerConfig))) {
+            return "";
+        }
+        try {
+            $footerText = $this->formatConfigContent($footerConfig);
+        } catch (\Exception $exception) {
+            ErrorLogger::error(
+                "Failed to render email footer.",
+                ["email"],
+                [
+                    "exception" => $exception,
+                ]
+            );
+            $footerText = "";
+        }
+
+        return $footerText;
+    }
+
+    /**
+     * Covert config content to html or plain text
+     *
+     * @param string $content
+     * @return string
+     */
+    protected function formatConfigContent(string $content): string
+    {
+        $rich2Formatter = Gdn::getContainer()->get(Rich2Format::class);
+
+        if ($this->format === "html") {
+            $formattedContent = $rich2Formatter->renderHTML($content);
+        } else {
+            $formattedContent = $rich2Formatter->renderPlainText($content);
+        }
+        if (str_contains($formattedContent, Rich2Format::RENDER_ERROR_MESSAGE)) {
+            return "";
+        }
+        return $formattedContent;
+    }
+
+    /**
+     * Sets an activity ID if this email is associated with an `Activity` record.
+     * This is so that mailers are able to update the associated activity email status.
+     *
+     * @param int $activityID
+     * @return void
+     */
+    public function setActivityID(int $activityID): void
+    {
+        $this->mailer->setActivityID($activityID);
+    }
+
+    /**
+     * Get the MailerInterface instance.
+     *
+     * @return MailerInterface
+     */
+    public function getMailer(): MailerInterface
+    {
+        return $this->mailer;
     }
 }

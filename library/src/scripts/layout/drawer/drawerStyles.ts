@@ -57,7 +57,7 @@ export const drawerClasses = useThemeCache(() => {
         fontWeight: vars.fonts.weight,
         padding: `${styleUnit(vars.spacing.button.padding)} 0`,
         width: percent(100),
-        textAlign: "left",
+        textAlign: "start",
         ...debug.name("toggle"),
     });
     const icon = css({

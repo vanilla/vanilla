@@ -1,48 +1,41 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import { AppliedLayoutViewLocationDetails } from "@dashboard/appearance/components/AppliedLayoutViewLocationDetails";
+import { ApplyLayout } from "@dashboard/appearance/components/ApplyLayout";
+import { DeleteLayout } from "@dashboard/appearance/components/DeleteLayout";
 import { AppearanceNav } from "@dashboard/appearance/nav/AppearanceNav";
-import AdminLayout from "@dashboard/components/AdminLayout";
-import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
-import { useCollisionDetector } from "@vanilla/react-utils";
-import { t } from "@vanilla/i18n";
-import LinkAsButton from "@library/routing/LinkAsButton";
-import { ButtonTypes } from "@library/forms/buttonTypes";
-import { RouteComponentProps } from "react-router-dom";
-import { useLayout } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
-import { LoadStatus } from "@library/@types/api/core";
-import ErrorMessages from "@library/forms/ErrorMessages";
-import { notEmpty } from "@vanilla/utils";
-import Translate from "@library/content/Translate";
-import DateTime from "@library/content/DateTime";
-import { ILayoutDetails, LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
-import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
-import layoutOverviewPageClasses from "./LayoutOverviewPage.classes";
-import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { ErrorWrapper } from "@dashboard/appearance/pages/ErrorWrapper";
-import { LayoutOverview } from "@dashboard/layout/overview/LayoutOverview";
-import { MetaItem, Metas } from "@library/metas/Metas";
-import ProfileLink from "@library/navigation/ProfileLink";
-import { metasClasses } from "@library/metas/Metas.styles";
 import { LayoutEditorRoute } from "@dashboard/appearance/routes/appearanceRoutes";
-import {
-    LayoutActionsContextProvider,
-    useLayoutActionsContext,
-} from "@dashboard/layout/layoutSettings/LayoutActionsContextProvider";
-import { useConfigsByKeys } from "@library/config/configHooks";
-import { LAYOUT_EDITOR_CONFIG_KEY } from "@dashboard/appearance/nav/AppearanceNav.hooks";
-import { ToolTip } from "@library/toolTip/ToolTip";
+import AdminLayout from "@dashboard/components/AdminLayout";
+import { useLayoutQuery } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
+import { ILayoutDetails, LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
+import { LayoutOverview } from "@dashboard/layout/overview/LayoutOverview";
+import DateTime from "@library/content/DateTime";
+import Translate from "@library/content/Translate";
+import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
+import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import { ButtonTypes } from "@library/forms/buttonTypes";
+import ErrorMessages from "@library/forms/ErrorMessages";
+import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
+import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
+import { MetaItem, Metas } from "@library/metas/Metas";
+import { metasClasses } from "@library/metas/Metas.styles";
+import ProfileLink from "@library/navigation/ProfileLink";
+import LinkAsButton from "@library/routing/LinkAsButton";
+import { t } from "@vanilla/i18n";
+import { useCollisionDetector } from "@vanilla/react-utils";
+import { notEmpty, stableObjectHash } from "@vanilla/utils";
+import React from "react";
+import { RouteComponentProps } from "react-router-dom";
+import { layoutOverviewPageClasses } from "./LayoutOverviewPage.classes";
 
 function LayoutOverviewPageMetasImpl(props: { layout: ILayoutDetails }) {
     const { layout } = props;
 
     const classesMetas = metasClasses();
-    const layoutViewNames = layout.layoutViews ? layout.layoutViews.map((layoutView) => layoutView.record.name) : [];
-
-    const appliedGloballyOnly = layoutViewNames.length && !(layoutViewNames || []).some((value) => value !== "global");
 
     return (
         <Metas>
@@ -70,16 +63,7 @@ function LayoutOverviewPageMetasImpl(props: { layout: ILayoutDetails }) {
                     />
                 </MetaItem>
             )}
-            <MetaItem>
-                {!!layoutViewNames.length &&
-                    t("Applied on ") +
-                        (appliedGloballyOnly
-                            ? layout.layoutViewType === "discussionList"
-                                ? t("recent discussions page")
-                                : t("homepage")
-                            : layoutViewNames.join(", ")) +
-                        "."}
-            </MetaItem>
+            <AppliedLayoutViewLocationDetails layout={layout} mode="meta" />
         </Metas>
     );
 }
@@ -88,41 +72,39 @@ function TitleBarActionsContent(props: { layout: ILayoutDetails }) {
     const { layout } = props;
     const { layoutID, layoutViewType } = layout;
 
-    const { DeleteLayout, ApplyLayout } = useLayoutActionsContext();
-
     const classes = layoutOverviewPageClasses();
-
-    const canEdit = !layout.isDefault;
-    let editButton = (
-        <LinkAsButton
-            buttonType={ButtonTypes.OUTLINE}
-            to={LayoutEditorRoute.url({
-                layoutID,
-                layoutViewType,
-            })}
-            disabled={!canEdit}
-        >
-            {t("Edit")}
-        </LinkAsButton>
-    );
-
-    if (!canEdit) {
-        editButton = (
-            <ToolTip label={t("This is a default layout and cannot be edited.")}>
-                <span>{editButton}</span>
-            </ToolTip>
-        );
-    }
 
     return (
         <>
-            <DropDown name={t("Layout Options")} flyoutType={FlyoutType.LIST} className={classes.layoutOptionsDropdown}>
-                {/* <DropDownItemButton onClick={() => {}}>{t("Preview")}</DropDownItemButton> */}
+            <DropDown
+                key={stableObjectHash(layout.layoutViews)}
+                name={t("Layout Options")}
+                flyoutType={FlyoutType.LIST}
+                className={classes.layoutOptionsDropdown}
+            >
                 <ApplyLayout layout={layout} />
                 <DeleteLayout layout={layout} />
+                <DropDownItemLink
+                    to={LayoutEditorRoute.url({
+                        layoutID,
+                        layoutViewType,
+                        isCopy: true,
+                    })}
+                >
+                    {t("Copy")}
+                </DropDownItemLink>
             </DropDown>
 
-            {editButton}
+            <LinkAsButton
+                buttonType={ButtonTypes.OUTLINE}
+                to={LayoutEditorRoute.url({
+                    layoutID,
+                    layoutViewType,
+                    isCopy: layout.isDefault,
+                })}
+            >
+                {layout.isDefault ? t("Copy") : t("Edit")}
+            </LinkAsButton>
         </>
     );
 }
@@ -140,55 +122,30 @@ export default function LayoutOverviewPage(
     const { hasCollision } = useCollisionDetector();
     const isCompact = hasCollision || device === TitleBarDevices.COMPACT;
 
-    const config = useConfigsByKeys([LAYOUT_EDITOR_CONFIG_KEY]);
-    const isCustomLayoutsEnabled = !!config?.data?.[LAYOUT_EDITOR_CONFIG_KEY];
+    const layoutQuery = useLayoutQuery(layoutID);
 
-    const layoutLoadable = useLayout(layoutID);
-    const layout = layoutLoadable.data;
-
-    const layoutStatusIsPending = [LoadStatus.PENDING, LoadStatus.LOADING].includes(layoutLoadable.status);
-    const layoutStatusIsError = !layoutLoadable.data || layoutLoadable.error;
-
-    const errorContent = (errorLoadable) => (
-        <ErrorWrapper message={errorLoadable.error.message}>
-            <ErrorMessages errors={[errorLoadable.error].filter(notEmpty)} />
-        </ErrorWrapper>
-    );
-
-    const descriptionContent = layoutStatusIsPending ? (
+    const descriptionContent = layoutQuery.isLoading ? (
         <LoadingRectangle width={320} height={22} />
-    ) : layoutStatusIsError ? (
-        errorContent(layoutLoadable)
+    ) : layoutQuery.isError ? (
+        <ErrorWrapper message={layoutQuery.error.message}>
+            <ErrorMessages errors={[layoutQuery.error].filter(notEmpty)} />
+        </ErrorWrapper>
     ) : (
-        isCustomLayoutsEnabled && <LayoutOverviewPageMetasImpl layout={layout!} />
+        <LayoutOverviewPageMetasImpl layout={layoutQuery.data} />
     );
 
     return (
         <AdminLayout
             contentClassNames={classes.overviewContent}
             activeSectionID={"appearance"}
-            title={isCustomLayoutsEnabled ? layout?.name || "" : ""}
+            title={layoutQuery.data?.name || ""}
             description={descriptionContent}
-            titleBarActions={
-                !layoutStatusIsError && isCustomLayoutsEnabled ? (
-                    <LayoutActionsContextProvider>
-                        <TitleBarActionsContent layout={layout!} />
-                    </LayoutActionsContextProvider>
-                ) : (
-                    <></>
-                )
-            }
+            titleBarActions={layoutQuery.data ? <TitleBarActionsContent layout={layoutQuery.data} /> : <></>}
             adminBarHamburgerContent={<AppearanceNav asHamburger />}
             leftPanel={!isCompact && <AppearanceNav />}
-            content={
-                layoutID && isCustomLayoutsEnabled ? (
-                    <LayoutOverview layoutID={layoutID} />
-                ) : (
-                    config.status === LoadStatus.SUCCESS && <h1 style={{ padding: 24 }}>{t("Page Not Found")}</h1>
-                )
-            }
+            content={<LayoutOverview layoutID={layoutID} />}
             titleLabel={
-                (layout?.layoutViews ?? []).length > 0 && isCustomLayoutsEnabled ? (
+                (layoutQuery.data?.layoutViews ?? []).length > 0 ? (
                     <span className={classes.titleLabel}>{t("Applied")}</span>
                 ) : undefined
             }

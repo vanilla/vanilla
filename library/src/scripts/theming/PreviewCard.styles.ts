@@ -184,7 +184,7 @@ const previewCardClasses = useThemeCache(() => {
         paddingLeft: styleUnit(14),
         paddingRight: styleUnit(14),
         paddingTop: styleUnit(4),
-        textAlign: "left",
+        textAlign: "start",
         color: vars.colors.btnTextColor.toString(),
         ...{
             "&:hover": {

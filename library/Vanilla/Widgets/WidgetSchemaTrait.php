@@ -229,12 +229,22 @@ trait WidgetSchemaTrait
     public static function limitSchema(): Schema
     {
         return Schema::parse([
-            "limit?" => [
+            "limit" => [
                 "type" => "integer",
                 "description" => t("Desired number of items."),
                 "minimum" => 1,
+                "maximum" => 100,
+                "step" => 1,
                 "default" => 10,
-                "x-control" => DiscussionsApiIndexSchema::getLimitFormOptions(),
+                "x-control" => SchemaForm::textBox(
+                    new FormOptions(
+                        t("Limit"),
+                        t("Choose how many records to display."),
+                        "",
+                        t("Up to a maximum of 100 items may be displayed.")
+                    ),
+                    "number"
+                ),
             ],
         ]);
     }

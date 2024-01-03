@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -17,13 +17,18 @@ class QnaModel
     const ACCEPTED = "Accepted";
     const ANSWERED = "Answered";
     const UNANSWERED = "Unanswered";
+    const REJECTED = "Rejected";
     const TYPE = "Question";
+
+    const COMMENT_STATUS = ["Accepted", "Rejected"];
 
     /** @var RecordStatusModel */
     private $recordStatusModel;
 
     /**
      * Constructor for the class
+     *
+     * @param RecordStatusModel $recordStatusModel
      */
     public function __construct(RecordStatusModel $recordStatusModel)
     {
@@ -35,16 +40,17 @@ class QnaModel
      *
      * @param string $column
      * @return array $results Formatted to match what "dba.js" expects
+     * @throws Exception
      */
-    public function counts($column)
+    public function counts(string $column): array
     {
         $result = ["Complete" => true];
 
         switch ($column) {
             // Discussion table, QnA column will be updated.
-            case "QnA":
+            case "statusID":
                 $request = Gdn::request()->get();
-                $result = $this->recalculateDiscussionQnABatches(
+                $result = $this->recalculateDiscussionQnAStatusBatches(
                     $request["NumberOfBatchesDone"] ?? 0,
                     $request["LatestID"] ?? 0
                 );
@@ -103,7 +109,6 @@ class QnaModel
     /**
      * Get all Question Statuses
      *
-     * @param boolean $isActive
      * @return array
      */
     public function getStatuses(): array
@@ -117,8 +122,9 @@ class QnaModel
      *
      * @param int $statusID
      * @return array|null
+     * @throws \Garden\Schema\ValidationException
      */
-    public function getStatus(int $statusID)
+    public function getStatus(int $statusID): ?array
     {
         $where = $this->getCondition(["statusID" => $statusID]);
         try {
@@ -136,13 +142,13 @@ class QnaModel
      * @param array $discussionIDs discussions to be recalculated
      * @throws Exception | Being thrown from the put method of the sql object
      */
-    private function recalculateDiscussionsQnA($discussionIDs)
+    private function recalculateDiscussionsQnAStatus(array $discussionIDs)
     {
         // Updating questions with accepted answers.
         Gdn::sql()
             ->update("Discussion d")
-            ->join("Comment c", 'c.DiscussionID = d.DiscussionID and c.QnA = \'Accepted\'')
-            ->set("d.QnA", "Accepted")
+            ->join("Comment c", 'c.DiscussionID = d.DiscussionID and c.QnA = \'' . QnaModel::ACCEPTED . '\'')
+            ->set("d.statusID", QnAPlugin::DISCUSSION_STATUS_ACCEPTED)
             ->whereIn("d.DiscussionID", $discussionIDs)
             ->put();
 
@@ -150,7 +156,7 @@ class QnaModel
         Gdn::sql()
             ->update("Discussion d")
             ->leftJoin("Comment c", "c.DiscussionID = d.DiscussionID")
-            ->set("d.QnA", "Unanswered")
+            ->set("d.statusID", QnAPlugin::DISCUSSION_STATUS_UNANSWERED)
             ->where(["c.CommentID is null" => ""])
             ->whereIn("d.DiscussionID", $discussionIDs)
             ->put();
@@ -159,8 +165,8 @@ class QnaModel
         Gdn::sql()
             ->update("Discussion d")
             ->join("Comment c", "c.DiscussionID = d.DiscussionID and c.QnA is null")
-            ->leftJoin("Comment c1", 'c1.DiscussionID = d.DiscussionID and c1.QnA = \'Accepted\'')
-            ->set("d.QnA", "Answered")
+            ->leftJoin("Comment c1", 'c1.DiscussionID = d.DiscussionID and c1.QnA = \'' . QnaModel::ACCEPTED . '\'')
+            ->set("d.statusID", QnAPlugin::DISCUSSION_STATUS_ANSWERED)
             ->where(["c1.CommentID is null" => ""])
             ->whereIn("d.DiscussionID", $discussionIDs)
             ->put();
@@ -168,9 +174,12 @@ class QnaModel
         // Updating questions with ONLY rejected answers.
         Gdn::sql()
             ->update("Discussion d")
-            ->join("Comment c", 'c.DiscussionID = d.DiscussionID and c.QnA = \'Rejected\'')
-            ->leftJoin("Comment c1", 'c1.DiscussionID = d.DiscussionID and (c1.QnA = \'Accepted\' OR c1.QnA is null)')
-            ->set("d.QnA", "Rejected")
+            ->join("Comment c", 'c.DiscussionID = d.DiscussionID and c.QnA = \'' . QnaModel::REJECTED . '\'')
+            ->leftJoin(
+                "Comment c1",
+                'c1.DiscussionID = d.DiscussionID and (c1.QnA = \'' . QnaModel::ACCEPTED . '\' OR c1.QnA is null)'
+            )
+            ->set("d.statusID", QnAPlugin::DISCUSSION_STATUS_REJECTED)
             ->where(["c1.CommentID is null" => ""])
             ->whereIn("d.DiscussionID", $discussionIDs)
             ->put();
@@ -183,8 +192,9 @@ class QnaModel
      * @param integer $numberOfBatchesDone number of batches already processed
      * @param integer $latestID latest discussionID we treated
      * @return array current state of QnA recalculation. Formatted to match what "dba.js" expects
+     * @throws Exception
      */
-    private function recalculateDiscussionQnABatches($numberOfBatchesDone, $latestID)
+    private function recalculateDiscussionQnAStatusBatches($numberOfBatchesDone, int $latestID): array
     {
         $perBatch = 1000;
 
@@ -195,16 +205,8 @@ class QnaModel
             throw new Exception("Amount of questions is exceeding the database threshold of " . $threshold . ".");
         }
 
-        // Get min and max discussionID for questions
-        $result = Gdn::sql()
-            ->select("DiscussionID", "max", "MaxValue")
-            ->select("DiscussionID", "min", "MinValue")
-            ->from("Discussion")
-            ->where(["Type" => "Question"])
-            ->get()
-            ->firstRow(DATASET_TYPE_ARRAY);
-
-        $totalBatches = ceil(($result["MaxValue"] - $result["MinValue"]) / $perBatch);
+        $totalQuestion = Gdn::sql()->getCount("Discussion", ["Type" => "Question"]);
+        $totalBatches = ceil($totalQuestion / $perBatch);
 
         $currentBatch = Gdn::sql()
             ->select("DiscussionID")
@@ -222,7 +224,7 @@ class QnaModel
 
         $latestID = key(array_slice($currentBatch, -1, 1, true));
 
-        $this->recalculateDiscussionsQnA($currentBatch);
+        $this->recalculateDiscussionsQnAStatus($currentBatch);
 
         $numberOfBatchesDone++;
 
@@ -243,6 +245,8 @@ class QnaModel
      * Get question status data by its name
      * @param string $name
      * @return array
+     * @throws NoResultsException
+     * @throws \Garden\Schema\ValidationException
      */
     public function getQuestionStatusByName(string $name): array
     {
@@ -255,7 +259,7 @@ class QnaModel
      * @param array $additional
      * @return array
      */
-    private function getCondition(array $additional = [])
+    private function getCondition(array $additional = []): array
     {
         $default = [
             "recordSubtype" => "question",

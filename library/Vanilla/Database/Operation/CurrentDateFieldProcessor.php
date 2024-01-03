@@ -15,11 +15,18 @@ use Vanilla\Utility\ArrayUtils;
  */
 class CurrentDateFieldProcessor implements Processor
 {
-    /** @var array */
-    private $insertFields = ["DateInserted"];
+    private array $insertFields;
+    private array $updateFields;
 
-    /** @var array */
-    private $updateFields = ["DateUpdated"];
+    /**
+     * @param array|string[] $insertFields
+     * @param array|string[] $updateFields
+     */
+    public function __construct(array $insertFields = ["DateInserted"], array $updateFields = ["DateUpdated"])
+    {
+        $this->insertFields = $insertFields;
+        $this->updateFields = $updateFields;
+    }
 
     /**
      * Get the list of fields to be populated with the current user ID when adding a new row.

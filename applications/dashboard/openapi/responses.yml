@@ -63,7 +63,6 @@ components:
         TrackingSlipResponse:
             description: |
                 Endpoints may queue a job to perform a task in the background.
-                This response allows you track that progress with the `/api/v2/job-statuses` endpoints.
             content:
                 application/json:
                     schema:

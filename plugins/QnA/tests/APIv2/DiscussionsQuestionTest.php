@@ -10,6 +10,7 @@ namespace VanillaTests\APIv2;
 use CategoryModel;
 use Gdn;
 use QnAPlugin;
+use Vanilla\CurrentTimeStamp;
 
 /**
  * Test managing questions with the /api/v2/discussions endpoint.
@@ -45,8 +46,63 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test
         ]);
 
         self::setupQnAFollowUpFeature();
-
+        Gdn::database()
+            ->sql()
+            ->truncate("Discussion");
         $session->end();
+    }
+    /**
+     * Test /discussions filters by type = "question".
+     */
+    public function testGetDiscussionTypes()
+    {
+        $postedQuestions[] = $this->testPostQuestion();
+        $postedQuestions[] = $this->testPostQuestion();
+        $postedQuestions[] = $this->testPostQuestion();
+        $postedQuestionIDs = array_column($postedQuestions, "discussionID");
+        // Add a regular discussion to ensure it's filtered out.
+        $response = $this->api()->post("discussions", [
+            "categoryID" => 1,
+            "name" => "Test Discussion",
+            "body" => "Hello world!",
+            "format" => "markdown",
+        ]);
+        $this->assertTrue($response->isSuccessful());
+        $postBody = $response->getBody();
+        $this->assertArrayHasKey("discussionID", $postBody);
+        $nonQuestionDiscussionID = intval($postBody["discussionID"]);
+
+        $response = $this->api()->get("discussions", ["type" => "Question"]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $body = $response->getBody();
+        $this->assertNotEmpty($body);
+        $allQuestionIDs = array_column($body, "discussionID");
+        $this->assertNotContains(
+            $nonQuestionDiscussionID,
+            $allQuestionIDs,
+            "Non-question discussion found in question-specific discussion set"
+        );
+
+        $this->assertEqualsCanonicalizing(
+            $postedQuestionIDs,
+            $allQuestionIDs,
+            "One or more questions posted in this test were not included in the question-specific discussion set"
+        );
+
+        $response = $this->api()->get("discussions", ["type" => "Question,Discussion"]);
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $body = $response->getBody();
+        $this->assertNotEmpty($body);
+        $allQuestionIDs = array_column($body, "discussionID");
+        $postedQuestionIDs[] = $nonQuestionDiscussionID;
+        $this->assertEqualsCanonicalizing(
+            $postedQuestionIDs,
+            $allQuestionIDs,
+            "One or more posts in this test were not included in the question and discussion set"
+        );
     }
 
     /**
@@ -187,6 +243,10 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test
      */
     public function testQuestionNotifications()
     {
+        $now = time();
+        //Create comments 1 day ago.
+        $now -= 24 * 3600;
+        CurrentTimeStamp::mockTime($now);
         //make a few questions
         $questionsCount = 1;
         for ($i = 1; $i <= $questionsCount; $i++) {
@@ -206,7 +266,7 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test
                 "format" => "Markdown",
             ]);
         }
-
+        CurrentTimeStamp::mockTime(time());
         $followUp = $this->api()
             ->post("discussions/question-notifications")
             ->getBody();
@@ -314,7 +374,8 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test
         // enable feature flag
         /** @var \Gdn_Configuration $config */
         $config = static::container()->get(\Gdn_Configuration::class);
-        $config->set("Feature." . \QnAPlugin::FOLLOWUP_FLAG . ".Enabled", true, true, false);
+        $config->set("QnA.FollowUp.Enabled", true, true, false);
+        $config->set("QnA.FollowUp.Interval", 0);
 
         // add user preference
         $config->touch(["Preferences.Email.QuestionFollowUp" => 1]);
@@ -376,5 +437,53 @@ class DiscussionsQuestionTest extends AbstractAPIv2Test
         $updatedQuestion = $updatedQuestion->getBody();
 
         $this->assertEquals("accepted", $updatedQuestion["attributes"]["question"]["status"]);
+    }
+
+    /**
+     * Test that rejected answers respect permissions.
+     */
+    public function testRejectedAnswerPermissions(): void
+    {
+        $question = $this->createQuestion();
+        $goodAnswer = $this->createAnswer();
+        $this->acceptAnswer($question, $goodAnswer);
+        $badAnswer = $this->createAnswer();
+        $this->rejectAnswer($question, $badAnswer);
+
+        $retrievedQuestion = $this->api()
+            ->get("discussions/{$question["discussionID"]}", ["expand" => ["acceptedAnswers", "rejectedAnswers"]])
+            ->getBody();
+
+        // The admin user has the Curation.Manage permission, so should get back both the accepted and rejected answer.
+        $this->assertArrayHasKey("acceptedAnswers", $retrievedQuestion["attributes"]["question"]);
+        $this->assertCount(1, $retrievedQuestion["attributes"]["question"]["acceptedAnswers"]);
+        $this->assertSame(
+            $goodAnswer["commentID"],
+            $retrievedQuestion["attributes"]["question"]["acceptedAnswers"][0]["commentID"]
+        );
+
+        $this->assertArrayHasKey("rejectedAnswers", $retrievedQuestion["attributes"]["question"]);
+        $this->assertCount(1, $retrievedQuestion["attributes"]["question"]["rejectedAnswers"]);
+        $this->assertSame(
+            $badAnswer["commentID"],
+            $retrievedQuestion["attributes"]["question"]["rejectedAnswers"][0]["commentID"]
+        );
+
+        // Switch to a member user, who does not have the Curation.Manage permission.
+        $this->api()->setUserID($this->memberID);
+
+        $retrievedQuestion = $this->api()
+            ->get("discussions/{$question["discussionID"]}", ["expand" => ["acceptedAnswers", "rejectedAnswers"]])
+            ->getBody();
+
+        // The member user should only get back the accepted answer.
+        $this->assertArrayHasKey("acceptedAnswers", $retrievedQuestion["attributes"]["question"]);
+        $this->assertCount(1, $retrievedQuestion["attributes"]["question"]["acceptedAnswers"]);
+        $this->assertSame(
+            $goodAnswer["commentID"],
+            $retrievedQuestion["attributes"]["question"]["acceptedAnswers"][0]["commentID"]
+        );
+
+        $this->assertArrayNotHasKey("rejectedAnswers", $retrievedQuestion["attributes"]["question"]);
     }
 }

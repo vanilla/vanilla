@@ -15,6 +15,7 @@ use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\Job\LongRunnerJob;
 use Vanilla\Scheduler\Job\JobPriority;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Utility\Timers;
 use Vanilla\Web\SystemCallableInterface;
 use Vanilla\Web\SystemTokenUtils;
 
@@ -53,6 +54,8 @@ class LongRunner implements SystemCallableInterface
     /** @var ConfigurationInterface */
     private $config;
 
+    private Timers $timers;
+
     /** @var string LongRunner::MODE_* */
     private $mode = self::MODE_SYNC;
 
@@ -68,22 +71,19 @@ class LongRunner implements SystemCallableInterface
 
     /**
      * DI.
-     *
-     * @param ContainerInterface $container
-     * @param SystemTokenUtils $tokenUtils
-     * @param \Gdn_Session $session
-     * @param ConfigurationInterface $config
      */
     public function __construct(
         ContainerInterface $container,
         SystemTokenUtils $tokenUtils,
         \Gdn_Session $session,
-        ConfigurationInterface $config
+        ConfigurationInterface $config,
+        Timers $timers
     ) {
         $this->container = $container;
         $this->tokenUtils = $tokenUtils;
         $this->session = $session;
         $this->config = $config;
+        $this->timers = $timers;
     }
 
     public static function getSystemCallableMethods(): array
@@ -161,6 +161,10 @@ class LongRunner implements SystemCallableInterface
      */
     public function runIterator(LongRunnerAction $action): \Generator
     {
+        $span = $this->timers->startGeneric("long-runner", [
+            "name" => $action->getCallableName(),
+        ]);
+
         $className = $action->getClassName();
         $method = $action->getMethod();
         $args = $action->getArgs();
@@ -169,74 +173,80 @@ class LongRunner implements SystemCallableInterface
         $this->validateLongRunnable($action);
 
         $generator = $this->generatorFromAction($action);
-        $callableName = $action->getCallableName();
 
         // Start preparing our result.
         $result = new LongRunnerResult();
-
-        // If we are resuming an existing long runner, preserve it's previous total.
-        $previousTotal = $options[LongRunnerAction::OPT_PREVIOUS_TOTAL] ?? null;
-        if ($previousTotal !== null) {
-            $result->setCountTotalIDs($previousTotal);
-        }
-
-        // Iterate through with timeout and memory checks.
-        $timeoutGenerator =
-            $this->timeout >= 0 ? ModelUtils::iterateWithTimeout($generator, $this->timeout) : $generator;
-        $iterations = 0;
-        $stopReason = "timeout";
-        foreach ($timeoutGenerator as $value) {
-            if ($value instanceof LongRunnerQuantityTotal) {
-                if ($previousTotal === null) {
-                    // If we haven't already set a total allow it to be set here.
-                    $result->setCountTotalIDs(($result->getCountTotalIDs() ?? 0) + $value->getValue());
-                }
-                continue;
+        try {
+            // If we are resuming an existing long runner, preserve it's previous total.
+            $previousTotal = $options[LongRunnerAction::OPT_PREVIOUS_TOTAL] ?? null;
+            if ($previousTotal !== null) {
+                $result->setCountTotalIDs($previousTotal);
             }
 
-            if ($value instanceof LongRunnerItemResultInterface) {
-                $result->addResult($value);
-                try {
-                    yield $result;
-                } catch (LongRunnerTimeoutException $ex) {
-                    // we ran out of time. Stop iterator and throw into the generator.
+            // Iterate through with timeout and memory checks.
+            $timeoutGenerator =
+                $this->timeout >= 0 ? ModelUtils::iterateWithTimeout($generator, $this->timeout) : $generator;
+            $iterations = 0;
+            $stopReason = "timeout";
+            foreach ($timeoutGenerator as $value) {
+                if ($value instanceof LongRunnerQuantityTotal) {
+                    if ($previousTotal === null) {
+                        // If we haven't already set a total allow it to be set here.
+                        $result->setCountTotalIDs(($result->getCountTotalIDs() ?? 0) + $value->getValue());
+                    }
+                    continue;
+                }
+
+                if ($value instanceof LongRunnerItemResultInterface) {
+                    $result->addResult($value);
+                    try {
+                        yield $result;
+                    } catch (LongRunnerTimeoutException $ex) {
+                        // we ran out of time. Stop iterator and throw into the generator.
+                        break;
+                    }
+                }
+                $iterations++;
+
+                if ($this->maxIterations !== null && $iterations >= $this->maxIterations) {
+                    // Stop execution early.
+                    $stopReason = "reached max iteratons: {$this->maxIterations}";
                     break;
                 }
             }
-            $iterations++;
+            $timeoutGeneratorSucceeded = !$timeoutGenerator->valid() && $timeoutGenerator->getReturn();
+            $innerGeneratorCompleted = !$generator->valid();
 
-            if ($this->maxIterations !== null && $iterations >= $this->maxIterations) {
-                // Stop execution early.
-                $stopReason = "reached max iteratons: {$this->maxIterations}";
-                break;
+            // We are finished if the timeout genrerator returned successfully or the initial generator is complete.
+            $finished = $timeoutGeneratorSucceeded || $innerGeneratorCompleted;
+            if (!$finished) {
+                $options[LongRunnerAction::OPT_PREVIOUS_TOTAL] = $result->getCountTotalIDs();
+                $newAction = new LongRunnerAction($className, $method, $args, $options);
+                // Either we are low on memory or we are running out of time.
+                // Get the next args and we need to continue.
+                try {
+                    $generator->throw(new LongRunnerTimeoutException($stopReason));
+                } catch (LongRunnerTimeoutException $e) {
+                    // The generator doesn't have any specific handling for timeouts.
+                    // We can call it with the same arguments.
+                    $result->setCallbackPayload($action->asCallbackPayload($this->tokenUtils));
+                    return $result;
+                }
+
+                $nextArgs = $this->extractNextArgs($action, $generator);
+                if ($nextArgs === null) {
+                    // We actually called the runner on it's last iteration. It's actually done.
+                    return $result;
+                }
+
+                $result->setCallbackPayload($newAction->applyNextArgs($nextArgs)->asCallbackPayload($this->tokenUtils));
             }
-        }
-        $timeoutGeneratorSucceeded = !$timeoutGenerator->valid() && $timeoutGenerator->getReturn();
-        $innerGeneratorCompleted = !$generator->valid();
-
-        // We are finished if the timeout genrerator returned successfully or the initial generator is complete.
-        $finished = $timeoutGeneratorSucceeded || $innerGeneratorCompleted;
-        if (!$finished) {
-            $options[LongRunnerAction::OPT_PREVIOUS_TOTAL] = $result->getCountTotalIDs();
-            $newAction = new LongRunnerAction($className, $method, $args, $options);
-            // Either we are low on memory or we are running out of time.
-            // Get the next args and we need to continue.
-            try {
-                $generator->throw(new LongRunnerTimeoutException($stopReason));
-            } catch (LongRunnerTimeoutException $e) {
-                // The generator doesn't have any specific handling for timeouts.
-                // We can call it with the same arguments.
-                $result->setCallbackPayload($action->asCallbackPayload($this->tokenUtils));
-                return $result;
-            }
-
-            $nextArgs = $this->extractNextArgs($action, $generator);
-            if ($nextArgs === null) {
-                // We actually called the runner on it's last iteration. It's actually done.
-                return $result;
-            }
-
-            $result->setCallbackPayload($newAction->applyNextArgs($nextArgs)->asCallbackPayload($this->tokenUtils));
+        } finally {
+            $span->finish([
+                "countTotalIDs" => $result->getCountTotalIDs(),
+                "countSuccessIDs" => count($result->getSuccessIDs()),
+                "countFailedIDs" => count($result->getFailedIDs()),
+            ]);
         }
 
         return $result;

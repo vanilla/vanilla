@@ -37,6 +37,7 @@ class PocketsRenderTest extends AbstractAPIv2Test
     public function setUp(): void
     {
         parent::setUp();
+        $this->useLegacyLayouts();
         self::$currentOnPage = null;
         $this->pocketsModel = $this->container()->get(PocketsModel::class);
         $this->resetTable("Pocket");

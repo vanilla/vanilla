@@ -10,7 +10,9 @@ import React, { useMemo } from "react";
 import { QuickLinks } from "@library/navigation/QuickLinks";
 import DiscussionListAsset from "@library/features/discussions/DiscussionListAsset";
 
-interface IProps extends React.ComponentProps<typeof DiscussionListModule> {}
+interface IProps extends React.ComponentProps<typeof DiscussionListModule> {
+    isPreview?: boolean;
+}
 
 export function DiscussionsWidget(props: IProps) {
     const { containerOptions } = props;

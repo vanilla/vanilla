@@ -102,6 +102,7 @@ export const listItemClasses = useThemeCache(
             alignItems: "center",
             ...(!hasImage && {
                 marginRight: asTile ? 8 : 16,
+                marginInlineEnd: asTile ? 8 : 16,
             }),
             ...(!asTile &&
                 hasImage && {
@@ -153,6 +154,8 @@ export const listItemClasses = useThemeCache(
         const title = css({
             flex: 1,
             ...Mixins.font(vars.title.font),
+            margin: 0,
+            marginBottom: 0,
         });
 
         const titleLink = css(mixinListItemTitleLink());
@@ -190,6 +193,7 @@ export const listItemClasses = useThemeCache(
 
         const description = css({
             ...Mixins.font(vars.description.font),
+            marginBottom: 0,
             [`.${metasContainer} + &`]: {
                 marginTop: 4,
             },

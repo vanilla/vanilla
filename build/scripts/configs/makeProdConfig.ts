@@ -54,35 +54,27 @@ export async function makeProdConfig(entryModel: EntryModel, section: string) {
             chunks: "all",
             cacheGroups: {
                 defaultVendors: false,
-                // The library chunk ensures that commonly used parts of library are shared between addons.
-                library: {
-                    test: /[\\/](library)[\\/]/,
-                    idHint: "library",
-                    name: "library",
-                    chunks: "all",
-                    maxSize: 500000,
-                    minRemainingSize: 50000,
-                    priority: 1,
-                },
                 // Packages is similar to library
                 // This one is configured a little differently because
                 // webpack kept duplicating `@vanilla/icons` in addon chunks.
                 packages: {
-                    test: /[\\/]packages[\\/]vanilla/,
+                    test: /[\\/]packages[\\/]vanilla-(i18n|icons)/,
                     idHint: "packages",
                     name: "packages",
                     reuseExistingChunk: false,
                     priority: 100000,
+                    minSizeReduction: 50000,
                     enforce: true,
                 },
                 // Increase the minimum size of the default chunk splitting.
                 // Webpack doesn't take gzip into account when measuring chunk sizes.
                 default: {
-                    minSize: 50000,
+                    minSize: 1024 * 50,
+                    maxSize: 1024 * 200,
                 },
                 // Put our most stable vendor files into their own chunks.
                 vendors: {
-                    test: /[\\/]node_modules[\\/](@emotion|react|react-dom|react-redux|redux|react-loadable|lodash)[\\/]/,
+                    test: /[\\/]node_modules[\\/](@emotion|react|react-dom|react-redux|redux|react-loadable|react-router|lodash)[\\/]/,
                     name: "vendors",
                     chunks: "all",
                     priority: 10,

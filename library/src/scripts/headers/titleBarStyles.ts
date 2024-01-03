@@ -1,6 +1,6 @@
 /*
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -33,7 +33,7 @@ import {
     translateY,
     viewWidth,
 } from "csx";
-import backLinkClasses from "@library/routing/links/backLinkStyles";
+import backLinkClasses from "@library/routing/links/BackLink.classes";
 import { css, CSSObject } from "@emotion/css";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { buttonResetMixin } from "@library/forms/buttonMixins";
@@ -85,7 +85,7 @@ export const titleBarClasses = useThemeCache(() => {
                 cursor: "pointer",
             },
             ".searchBar__placeholder": {
-                textAlign: "left",
+                textAlign: "start",
                 color: vars.colors.fg.fade(0.8).toString(),
             },
             [`.${backLinkClasses().link}`]: {
@@ -646,7 +646,6 @@ export const titleBarClasses = useThemeCache(() => {
     const hamburger = css(
         {
             marginRight: styleUnit(12),
-            marginLeft: negativeUnit(globalVars.buttonIcon.offset),
             "&&": {
                 ...allButtonStates({
                     allStates: {

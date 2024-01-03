@@ -7,20 +7,18 @@
 import React, { useEffect, useState } from "react";
 import { Tabs as ReachTabs, TabList, Tab, TabPanels, TabPanel } from "@reach/tabs";
 import { tabStandardClasses, tabBrowseClasses, tabGroupClasses } from "@library/sectioning/tabStyles";
-import classNames from "classnames";
 import { ToolTip, ToolTipIcon } from "@library/toolTip/ToolTip";
 import { InformationIcon } from "@library/icons/common";
 import { iconClasses } from "@library/icons/iconStyles";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
-import { DomNodeAttacher } from "@vanilla/react-utils";
+import { DomNodeAttacher, mountPortal } from "@vanilla/react-utils";
 import { cx } from "@emotion/css";
-import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { Icon } from "@vanilla/icons";
 import TruncatedText from "@library/content/TruncatedText";
 
 export interface ITabData {
     tabID?: string | number;
-    label: string;
+    label: React.ReactNode;
     contents?: React.ReactNode;
     contentNodes?: Node[];
     error?: React.ReactNode;
@@ -30,6 +28,8 @@ export interface ITabData {
 }
 export interface ITabsProps {
     data: ITabData[];
+    activeTab?: number;
+    setActiveTab?: (newActiveTab: number) => void;
     tabType?: TabsTypes;
     largeTabs?: boolean;
     extendContainer?: boolean;
@@ -42,6 +42,7 @@ export interface ITabsProps {
     tabListClasses?: string;
     tabPanelClasses?: string;
     tabsRootClass?: string;
+    tabClass?: string;
 }
 
 function PassThruKludge(props: any) {
@@ -58,8 +59,11 @@ export function Tabs(props: ITabsProps) {
         tabListClasses,
         tabPanelClasses,
         tabsRootClass,
+        tabClass,
     } = props;
-    const [activeTab, setActiveTab] = useState(defaultTabIndex ?? 0);
+    const [ownActiveTab, ownSetActiveTab] = useState(defaultTabIndex ?? 0);
+    const activeTab = props.activeTab ?? ownActiveTab;
+    const setActiveTab = props.setActiveTab ?? ownSetActiveTab;
 
     useEffect(() => {
         if (props.defaultTabIndex !== undefined && activeTab !== props.defaultTabIndex) {
@@ -74,8 +78,55 @@ export function Tabs(props: ITabsProps) {
     ]);
     const classes = tabType && classVariants.get(tabType) ? classVariants.get(tabType) : tabStandardClasses();
 
-    // Need "disabled" applied as a prop on the top level element so it isn't recognized as a tab.
-    const FragmentKludge = React.Fragment as any;
+    let tabList = (
+        <TabList className={cx(classes?.tabList({ includeBorder, isLegacy: props.legacyButtons }), tabListClasses)}>
+            {data.map((tab, index) => {
+                const isActive = activeTab === index;
+                return (
+                    <Tab
+                        key={index}
+                        className={cx(
+                            classes?.tab(props.largeTabs, props.legacyButtons),
+                            {
+                                [classes!.isActive]: isActive,
+                            },
+                            tabClass,
+                        )}
+                        disabled={tab.disabled}
+                    >
+                        <TruncatedText lines={1} maxCharCount={25}>
+                            {tab.label}
+                        </TruncatedText>
+
+                        {(tab.error || tab.warning) && (
+                            <ToolTip label={tab.error || tab.warning}>
+                                <ToolTipIcon>
+                                    <Icon
+                                        className={
+                                            tab.error ? iconClasses().errorFgColor : iconClasses().warningFgColor
+                                        }
+                                        icon={"status-warning"}
+                                        size={"compact"}
+                                    />
+                                </ToolTipIcon>
+                            </ToolTip>
+                        )}
+                        {tab.info && (
+                            <ToolTip label={tab.info}>
+                                <ToolTipIcon>
+                                    <InformationIcon />
+                                </ToolTipIcon>
+                            </ToolTip>
+                        )}
+                    </Tab>
+                );
+            })}
+            {/* Need to have "disabled" given to make sure this isn't parsed as a tab. */}
+            <PassThruKludge disabled>
+                {props.extraButtons ? <div className={classes?.extraButtons}>{props.extraButtons}</div> : null}
+            </PassThruKludge>
+        </TabList>
+    );
 
     return (
         <ReachTabs
@@ -86,49 +137,7 @@ export function Tabs(props: ITabsProps) {
                 props.onChange?.(props.data[index]);
             }}
         >
-            <TabList className={cx(classes?.tabList({ includeBorder, isLegacy: props.legacyButtons }), tabListClasses)}>
-                {data.map((tab, index) => {
-                    const isActive = activeTab === index;
-                    return (
-                        <Tab
-                            key={index}
-                            className={classNames(classes?.tab(props.largeTabs, props.legacyButtons), {
-                                [classes!.isActive]: isActive,
-                            })}
-                            disabled={tab.disabled}
-                        >
-                            <TruncatedText lines={1} maxCharCount={25}>
-                                {tab.label}
-                            </TruncatedText>
-
-                            {(tab.error || tab.warning) && (
-                                <ToolTip label={tab.error || tab.warning}>
-                                    <ToolTipIcon>
-                                        <Icon
-                                            className={
-                                                tab.error ? iconClasses().errorFgColor : iconClasses().warningFgColor
-                                            }
-                                            icon={"status-warning"}
-                                            size={"compact"}
-                                        />
-                                    </ToolTipIcon>
-                                </ToolTip>
-                            )}
-                            {tab.info && (
-                                <ToolTip label={tab.info}>
-                                    <ToolTipIcon>
-                                        <InformationIcon />
-                                    </ToolTipIcon>
-                                </ToolTip>
-                            )}
-                        </Tab>
-                    );
-                })}
-                {/* Need to have "disabled" given to make sure this isn't parsed as a tab. */}
-                <PassThruKludge disabled>
-                    {props.extraButtons ? <div className={classes?.extraButtons}>{props.extraButtons}</div> : null}
-                </PassThruKludge>
-            </TabList>
+            {tabList}
             <TabPanels className={cx(classes?.tabPanels, tabPanelClasses, "tabContent")}>
                 {data.map((tab, index) => {
                     return (

@@ -297,12 +297,6 @@ export const newPostMenuClasses = useThemeCache(
                     ? ColorsUtils.colorOut(globalVars.states.hover.contrast)
                     : undefined,
             },
-
-            "&&": {
-                width: containerOptions?.borderType
-                    ? styleUnit(dropdownWidth - globalVars.gutter.size)
-                    : styleUnit(dropdownWidth),
-            },
         });
 
         const fabLabel = css({

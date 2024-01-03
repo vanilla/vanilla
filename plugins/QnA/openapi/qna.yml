@@ -13,3 +13,4 @@ components:
                 items:
                     enum:
                         - acceptedAnswers
+                        - rejectedAnswers

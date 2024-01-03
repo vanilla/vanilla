@@ -16,6 +16,7 @@
  */
 
 use Vanilla\CurrentTimeStamp;
+use Vanilla\Database\Select;
 
 /**
  * Class Gdn_SQLDriver
@@ -2154,11 +2155,23 @@ abstract class Gdn_SQLDriver
                 $select = [$select];
             }
         }
+
+        if ($select instanceof Select) {
+            $select = [$select];
+        }
+
         $count = count($select);
 
         $selects = [];
         for ($i = 0; $i < $count; $i++) {
-            $field = trim($select[$i]);
+            $field = $select[$i];
+            if ($field instanceof Select) {
+                // No processing to do here.
+                $selects[] = ["Field" => $field->fieldExpression, "Function" => "", "Alias" => $field->alias];
+                continue;
+            }
+
+            $field = trim($field);
 
             // Try and figure out an alias for the field.
             if ($alias == "" || ($count > 1 && $i > 0)) {
@@ -2204,6 +2217,17 @@ abstract class Gdn_SQLDriver
                 $this->_Selects[$alias] = $selectInfo;
             }
         }
+        return $this;
+    }
+
+    /**
+     * Clear out all selects.
+     *
+     * @return $this
+     */
+    public function resetSelects()
+    {
+        $this->_Selects = [];
         return $this;
     }
 

@@ -12,8 +12,18 @@ export interface ILayoutSectionInfo {
 }
 
 export const LayoutSectionInfos: Record<string, ILayoutSectionInfo> = {
+    "react.section.3-columns-even": {
+        regionNames: ["left", "middle", "right"],
+        oneWidgetPerRegion: false,
+        allowColumnInvert: false,
+    },
     "react.section.3-columns": {
         regionNames: ["leftBottom", "middleBottom", "rightBottom"],
+        oneWidgetPerRegion: false,
+        allowColumnInvert: false,
+    },
+    "react.section.2-columns-even": {
+        regionNames: ["left", "right"],
         oneWidgetPerRegion: false,
         allowColumnInvert: false,
     },

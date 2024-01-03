@@ -11,6 +11,7 @@
 
 use Garden\JSON\Transformer;
 use Vanilla\Attributes;
+use Vanilla\Models\ModelCache;
 
 /**
  * Used to access and manipulate the UserAuthenticationProvider table.
@@ -26,8 +27,6 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model
     /** Database mapping. */
     const COLUMN_NAME = "Name";
 
-    const ALL_CACHE_KEY = "AuthenticationProviders-All";
-    const DEFAULT_CACHE_KEY = "AuthenticationProviders-Default";
     const CACHE_TTL = 60 * 30; // 30 minutes.
     const OPT_RETURN_KEY = "returnKey";
 
@@ -36,12 +35,26 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model
      */
     public $PrimaryKey = "UserAuthenticationProviderID";
 
+    private ModelCache $modelCache;
+
     /**
      *
      */
     public function __construct()
     {
         parent::__construct("UserAuthenticationProvider");
+        $this->modelCache = new ModelCache($this->getTableName(), Gdn::cache(), [
+            ModelCache::OPT_TTL => self::CACHE_TTL,
+        ]);
+    }
+
+    /**
+     * @return ModelCache
+     */
+    private static function modelCache(): ModelCache
+    {
+        $instance = \Gdn::getContainer()->get(Gdn_AuthenticationProviderModel::class);
+        return $instance->modelCache;
     }
 
     /**
@@ -50,9 +63,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model
     public function onUpdate()
     {
         parent::onUpdate();
-        $cache = Gdn::cache();
-        $cache->remove(self::ALL_CACHE_KEY);
-        $cache->remove(self::DEFAULT_CACHE_KEY);
+        $this->modelCache->invalidateAll();
     }
 
     /**
@@ -132,24 +143,16 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model
      */
     public static function getDefault()
     {
-        $cache = Gdn::cache();
-        // GDN cache has local caching by default.
-        $result = $cache->get(self::DEFAULT_CACHE_KEY);
-        if ($result === Gdn_Cache::CACHEOP_FAILURE) {
-            try {
-                $rows = self::getWhereStatic(["IsDefault" => 1]);
-            } catch (\Exception $e) {
-                $rows = [];
-            }
-            if (empty($rows)) {
-                // Store null to differentiate from  "false" (Eg. not getting a cache hit).
-                $result = null;
-            } else {
-                $result = array_pop($rows);
-            }
-            $cache->store(self::DEFAULT_CACHE_KEY, $result, [
-                Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL,
-            ]);
+        try {
+            $rows = self::getWhereStatic(["IsDefault" => 1]);
+        } catch (\Exception $e) {
+            $rows = [];
+        }
+        if (empty($rows)) {
+            // Store null to differentiate from  "false" (Eg. not getting a cache hit).
+            $result = null;
+        } else {
+            $result = array_pop($rows);
         }
         // Convert back from null to false.
         return $result ?? false;
@@ -193,20 +196,14 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model
      */
     public function getAllVisible(): array
     {
-        $cache = Gdn::cache();
-
-        $data = $cache->get(self::ALL_CACHE_KEY);
-        if ($data === Gdn_Cache::CACHEOP_FAILURE) {
-            $data = $this->SQL
+        $data = $this->modelCache->getCachedOrHydrate([__METHOD__], function () {
+            return $this->createSql()
                 ->select("uap.*")
                 ->from("UserAuthenticationProvider uap")
                 ->where("Visible", true)
                 ->get()
                 ->resultArray();
-            $cache->store(self::ALL_CACHE_KEY, $data, [
-                Gdn_Cache::FEATURE_EXPIRY => self::CACHE_TTL,
-            ]);
-        }
+        });
 
         return $data;
     }
@@ -331,12 +328,19 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model
         $limit = false,
         $offset = false
     ) {
-        $data = Gdn::sql()
-            ->getWhere("UserAuthenticationProvider", $where, $orderFields, $orderDirection, $limit, $offset)
-            ->resultArray();
-        foreach ($data as &$row) {
-            self::calculate($row);
-        }
+        $data = self::modelCache()->getCachedOrHydrate(
+            ["where", $where, $orderFields, $orderDirection, $limit, $offset],
+            function () use ($where, $orderFields, $orderDirection, $limit, $offset) {
+                $data = Gdn::sql()
+                    ->getWhere("UserAuthenticationProvider", $where, $orderFields, $orderDirection, $limit, $offset)
+                    ->resultArray();
+                foreach ($data as &$row) {
+                    self::calculate($row);
+                }
+                return $data;
+            }
+        );
+
         return $data;
     }
 
@@ -432,7 +436,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model
             $postedAuthKey = val("AuthenticationKey", $formPostValues);
             if ($default) {
                 $existingDefault = self::getDefault();
-                $isAlreadyDefault = $existingDefault && $existingDefault["AuthenticationKey"] !== $postedAuthKey;
+                $isAlreadyDefault = $existingDefault && $existingDefault["AuthenticationKey"] == $postedAuthKey;
                 if (!$isAlreadyDefault) {
                     $this->SQL->put($this->Name, ["IsDefault" => 0], ["AuthenticationKey <>" => $postedAuthKey]);
                 }

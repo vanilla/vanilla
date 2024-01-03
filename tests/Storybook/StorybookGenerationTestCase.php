@@ -40,6 +40,7 @@ abstract class StorybookGenerationTestCase extends AbstractAPIv2Test
      */
     public function generateStoryHtml(string $url, string $storyName)
     {
+        $this->useLegacyLayouts();
         $htmlDocument = $this->bessy()->getHtml($url, [
             "deliveryType" => DELIVERY_TYPE_ALL,
         ]);

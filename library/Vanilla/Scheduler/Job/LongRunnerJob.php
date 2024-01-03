@@ -30,19 +30,14 @@ class LongRunnerJob implements LocalJobInterface, TrackableJobAwareInterface
     /** @var LongRunner */
     private $longRunner;
 
-    /** @var JobStatusModel */
-    private $jobStatusModel;
-
     /**
      * DI.
      *
      * @param LongRunner $longRunner
-     * @param JobStatusModel $jobStatusModel
      */
-    public function __construct(LongRunner $longRunner, JobStatusModel $jobStatusModel)
+    public function __construct(LongRunner $longRunner)
     {
         $this->longRunner = $longRunner;
-        $this->jobStatusModel = $jobStatusModel;
     }
 
     /**
@@ -83,7 +78,6 @@ class LongRunnerJob implements LocalJobInterface, TrackableJobAwareInterface
                 $countResults++;
                 if ($countResults % self::PROGRESS_DEBOUNCE_RATE === 0) {
                     $progress = $maybeResult->asProgress();
-                    $this->jobStatusModel->progressJob($this, $progress);
                     yield $progress;
                 }
             }

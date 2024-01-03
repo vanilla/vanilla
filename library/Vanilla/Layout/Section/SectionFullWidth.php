@@ -38,7 +38,7 @@ class SectionFullWidth extends AbstractLayoutSection
      */
     public static function getWidgetName(): string
     {
-        return "Full Width";
+        return "1 Column - Full Width";
     }
 
     /**
@@ -55,5 +55,14 @@ class SectionFullWidth extends AbstractLayoutSection
     public static function getWidgetIconPath(): string
     {
         return "/applications/dashboard/design/images/sectionIcons/fullwidth.svg";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $children = $this->renderSectionChildrenHtml($props["children"] ?? []);
+        return "<section>{$children}</section>";
     }
 }

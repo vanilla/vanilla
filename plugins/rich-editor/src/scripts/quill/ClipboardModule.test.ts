@@ -8,8 +8,8 @@ import { ListType } from "@rich-editor/quill/blots/lists/ListUtils";
 import ClipboardModule from "@rich-editor/quill/ClipboardModule";
 import OpUtils from "@rich-editor/__tests__/OpUtils";
 import { setupTestQuill } from "@rich-editor/__tests__/quillUtils";
-import { wait, waitFor } from "@testing-library/react";
-import { registerEmbed } from "@library/embeddedContent/embedService";
+import { waitFor } from "@testing-library/react";
+import { registerEmbed } from "@library/embeddedContent/embedService.register";
 import { IFrameEmbed, supportsFrames } from "@library/embeddedContent/IFrameEmbed";
 import { expect } from "chai";
 import Quill, { DeltaOperation } from "quill/core";
@@ -409,10 +409,8 @@ Hello<iframe type="text/html" width="${width}" height="${height}" src="${frameSr
             quill.clipboard.dangerouslyPasteHTML(iframeHtml);
 
             await waitFor(() => {
-                const frameHtml = quill.scroll.domNode.querySelector("iframe")?.outerHTML;
-                expect(frameHtml).equal(
-                    `<iframe sandbox="allow-same-origin allow-scripts allow-forms" src="https://www.example.com/embed/M7lc1UVf-VE?origin=http://example.com" class="embedIFrame-iframe" frameborder="0"></iframe>`,
-                );
+                const iframe = quill.scroll.domNode.querySelector("iframe")!;
+                expect(iframe.src).to.equal(frameSrc);
                 expect(quill.getContents().ops?.[1]).deep.equals({
                     insert: {
                         "embed-external": {

@@ -1,17 +1,17 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
 import { PublishStatus } from "@library/@types/api/core";
-import { IUserFragment, IUser } from "@library/@types/api/users";
+import { IUserFragment } from "@library/@types/api/users";
 import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { RecordID } from "@vanilla/utils";
 import { ImageSourceSet } from "@library/utility/appUtils";
+import SearchDomain from "@library/search/SearchDomain";
 
 export interface ISearchSource<RequestQueryType = ISearchRequestQuery, SearchResultType = ISearchResult> {
     /** Key used to identify the search source */
@@ -24,21 +24,17 @@ export interface ISearchSource<RequestQueryType = ISearchRequestQuery, SearchRes
     abort?: AbortController["abort"];
     /** Sort options available to this search source */
     sortOptions?: ISelectBoxItem[];
-    /** The additional search filters this source should make available */
-    queryFilterComponent?: React.ReactNode;
-    /** The domains that can be searched using this source */
-    searchableDomainKeys?: string[];
-    /** The default domain searched using this source */
-    defaultDomainKey?: string;
+
+    domains: SearchDomain[];
+
+    loadDomains?: () => Promise<SearchDomain[]>;
 }
 
 interface ISearchFormBase {
     domain: string;
-    query: string;
+    query: RecordID;
     name?: string;
     authors?: IComboBoxOption[];
-    startDate?: string;
-    endDate?: string;
     page?: RecordID;
     /** Used to provide a full URL to refresh the form */
     pageURL?: string;
@@ -49,16 +45,14 @@ interface ISearchFormBase {
     needsResearch?: boolean;
     tags?: string[];
 
+    recordTypes?: string[];
     scope?: string; // moved from ISearchRequestQuery
     collapse?: boolean; // moved from ISearchRequestQuery
 }
 
 export type ISearchForm<ExtraFormValues extends object = {}> = ISearchFormBase & ExtraFormValues;
 
-export type ISearchRequestQuery<ExtraFormValues extends object = {}> = Omit<
-    ISearchForm<ExtraFormValues>,
-    "authors" | "startDate" | "endDate"
-> & {
+export type ISearchRequestQuery<ExtraFormValues extends object = {}> = Omit<ISearchForm<ExtraFormValues>, "authors"> & {
     dateInserted?: string;
     insertUserIDs?: number[];
 
@@ -66,8 +60,7 @@ export type ISearchRequestQuery<ExtraFormValues extends object = {}> = Omit<
     offset?: RecordID;
     locale?: string;
     expand?: string[];
-
-    recordTypes?: string[];
+    siteSectionID?: string;
 
     // fixme: this stuff needs to go
     categoryIDs?: RecordID[];

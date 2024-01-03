@@ -16,6 +16,12 @@ export default function ProfileFieldsListClasses() {
             paddingLeft: 12,
             paddingRight: 12,
         },
+        "& td:not(:last-child)": {
+            textAlign: "start",
+            "& span": {
+                justifyContent: "left",
+            },
+        },
         "& td:first-child, & th:first-child": {
             paddingLeft: 18,
         },
@@ -74,6 +80,13 @@ export default function ProfileFieldsListClasses() {
         paddingBottom: 9,
     });
 
+    const actionButtonsContainer = css({
+        display: "flex",
+        justifyContent: "flex-end",
+        alignItems: "center",
+        gap: 18,
+    });
+
     return {
         root,
         extendTableRows,
@@ -83,5 +96,6 @@ export default function ProfileFieldsListClasses() {
         editIconSize,
         deleteIconSize,
         actionsLayout,
+        actionButtonsContainer,
     };
 }

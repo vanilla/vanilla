@@ -68,12 +68,12 @@ export default {
 const makeMockRegisterUser: IMe = {
     name: "Neena",
     userID: 1,
-    permissions: [],
     isAdmin: true,
     photoUrl: "",
     dateLastActive: "",
     countUnreadNotifications: 1,
     countUnreadConversations: 1,
+    emailConfirmed: true,
 };
 
 const initialState = testStoreState({
@@ -331,12 +331,12 @@ loadTranslations({});
 const makeMockGuestUser: IMe = {
     name: "test",
     userID: 0,
-    permissions: [],
     isAdmin: true,
     photoUrl: "",
     dateLastActive: "",
     countUnreadNotifications: 1,
     countUnreadConversations: 1,
+    emailConfirmed: false,
 };
 
 export const TitleBarGuestUser = storyWithConfig(
@@ -606,6 +606,14 @@ const navigationItems: INavigationVariableItem[] = [
 
 export const TitleBarWithMegaMenu = storyWithConfig(
     { useWrappers: false, themeVars: { navigation: { navigationItems } } },
+    () => <StoryTitleBar forceMenuOpen title="With Mega Menu" />,
+);
+
+export const TitleBarWithMegaMenuLogoAlignment = storyWithConfig(
+    {
+        useWrappers: false,
+        themeVars: { navigation: { navigationItems }, titleBarMegaMenu: { wrapper: { alignment: "logo" } } },
+    },
     () => <StoryTitleBar forceMenuOpen title="With Mega Menu" />,
 );
 

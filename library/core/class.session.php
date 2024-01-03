@@ -30,21 +30,23 @@ class Gdn_Session implements LoggerAwareInterface
      */
     const CSRF_NAME = "TransientKey";
 
+    /** Name of Guest AnonymizeData Cookie */
+    const COOKIE_ANONYMIZE = "-AnonymizeData";
+
     /** Maximum length of inactivity, in seconds, before a visit is considered new. */
     const VISIT_LENGTH = 1200; // 20 minutes
 
     /** Short time interval for short term sessions, such as passwordReset */
     const SHORT_STASH_SESSION_LENGHT = "now + 10 minutes";
 
-    public const FEATURE_SESSION_ID_COOKIE = "sessionIDCookie";
-
-    public const FEATURE_ENFORCE_SESSION_ID_COOKIE = "enforceSessionIDCookie";
-
     /** @var int Unique user identifier. */
     public $UserID;
 
     /** @var int Unique session identifier. */
     public $SessionID;
+
+    /** @var array DB Session record. */
+    public $Session;
 
     /** @var object A User object containing properties relevant to session */
     public $User;
@@ -74,6 +76,7 @@ class Gdn_Session implements LoggerAwareInterface
     {
         $this->UserID = 0;
         $this->SessionID = 0;
+        $this->Session = [];
         $this->User = false;
         $this->_Attributes = [];
         $this->_Preferences = [];
@@ -191,6 +194,7 @@ class Gdn_Session implements LoggerAwareInterface
 
         $this->UserID = 0;
         $this->SessionID = 0;
+        $this->Session = [];
         $this->User = false;
         $this->_Attributes = [];
         $this->_Preferences = [];
@@ -462,11 +466,11 @@ class Gdn_Session implements LoggerAwareInterface
      * Authenticates the user with the provided Authenticator class.
      *
      * @param int|false $userID The UserID to start the session with.
-     * @param bool $setIdentity Whether or not to set the identity (cookie) or make this a one request session.
+     * @param bool $setIdentity Whether to set the identity (cookie) or make this a one request session or not.
      * @param bool $persist If setting an identity, should we persist it beyond browser restart?
      * @param string|null $sessionID Session ID to use to start the session.
      */
-    public function start($userID = false, bool $setIdentity = true, bool $persist = false, $sessionID = null)
+    public function start($userID = false, bool $setIdentity = true, bool $persist = false, string $sessionID = null)
     {
         if (!c("Garden.Installed", false)) {
             return;
@@ -478,6 +482,7 @@ class Gdn_Session implements LoggerAwareInterface
         $userModel = Gdn::authenticator()->getUserModel();
         $this->UserID = $userID !== false ? (int) $userID : Gdn::authenticator()->getIdentity();
         $this->SessionID = Gdn::authenticator()->getSession();
+        $this->Session = Gdn::authenticator()->getSessionArray();
 
         $this->User = false;
         $this->loadTransientKey();
@@ -509,15 +514,13 @@ class Gdn_Session implements LoggerAwareInterface
                         ->get(\Garden\EventManager::class)
                         ->fire("gdn_session_set", $this);
                     if ($setIdentity) {
-                        if (\Vanilla\FeatureFlagHelper::featureEnabled(self::FEATURE_SESSION_ID_COOKIE)) {
-                            $sessionModel = new SessionModel();
-                            $session = $sessionModel->startNewSession($this->UserID, $sessionID);
-                            Gdn::authenticator()->setIdentity($this->UserID, $persist, $session["SessionID"]);
-                            $this->SessionID = $session["SessionID"];
-                        } else {
-                            Gdn::authenticator()->setIdentity($this->UserID, $persist);
-                        }
-                        $this->logger->info("Session started for {username}.", [
+                        $this->processAnonymousCookie();
+                        $sessionModel = new SessionModel();
+                        $this->Session = $sessionModel->startNewSession($this->UserID, $sessionID);
+                        $userModel->giveRolesByEmail((array) $this->User);
+                        Gdn::authenticator()->setIdentity($this->UserID, $persist, $this->Session["SessionID"]);
+                        $this->SessionID = $this->Session["SessionID"];
+                        $this->logger->info("Session started for userID {$this->UserID}.", [
                             Logger::FIELD_EVENT => "session_start",
                             Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                         ]);
@@ -772,14 +775,14 @@ class Gdn_Session implements LoggerAwareInterface
 
         if (!$return && $forceValid !== true) {
             if (Gdn::session()->User) {
-                $this->logger->error("Invalid transient key for {username}.", [
+                $this->logger->info("Invalid transient key for {username}.", [
                     Logger::FIELD_EVENT => "csrf_failure",
                     "User TK" => $foreignKey,
                     "Site TK" => $this->_TransientKey,
                     Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                 ]);
             } else {
-                $this->logger->error("Invalid transient key.", [
+                $this->logger->info("Invalid transient key.", [
                     Logger::FIELD_EVENT => "csrf_failure",
                     Logger::FIELD_CHANNEL => Logger::CHANNEL_SECURITY,
                 ]);
@@ -863,7 +866,7 @@ class Gdn_Session implements LoggerAwareInterface
             ],
             ["SessionID" => $sessionID]
         );
-
+        $this->Session = $sessionModel->getID($sessionID, DATASET_TYPE_ARRAY);
         return $value;
     }
 
@@ -883,10 +886,7 @@ class Gdn_Session implements LoggerAwareInterface
     {
         $cookieName = c("Garden.Cookie.Name", "Vanilla");
         $name = $cookieName . "-sid";
-        $sessionID = "";
-        if (\Vanilla\FeatureFlagHelper::featureEnabled(Gdn_Session::FEATURE_SESSION_ID_COOKIE)) {
-            $sessionID = Gdn::session()->SessionID;
-        }
+        $sessionID = Gdn::session()->SessionID;
         if ($sessionID == "") {
             // Get session ID from cookie
             $sessionID = val($name, $_COOKIE, "");
@@ -897,10 +897,10 @@ class Gdn_Session implements LoggerAwareInterface
         }
 
         // Grab the entire session record.
-        $session = $sessionModel->getID($sessionID, DATASET_TYPE_ARRAY);
+        $this->Session = $sessionModel->getID($sessionID, DATASET_TYPE_ARRAY);
 
-        if (!$session) {
-            $session = [
+        if (!$this->Session) {
+            $this->Session = [
                 "UserID" => Gdn::session()->UserID,
                 "DateInserted" => CurrentTimeStamp::getMySQL(),
                 "Attributes" => [],
@@ -911,8 +911,8 @@ class Gdn_Session implements LoggerAwareInterface
             ];
 
             // Save the session information to the database.
-            $sessionID = $sessionModel->insert($session);
-            $session["SessionID"] = $sessionID;
+            $sessionID = $sessionModel->insert($this->Session);
+            $this->Session["SessionID"] = $sessionID;
             trace("Inserting session stash $sessionID");
 
             // Save a session cookie.
@@ -931,6 +931,31 @@ class Gdn_Session implements LoggerAwareInterface
             $_COOKIE[$name] = $sessionID;
         }
 
-        return $session;
+        return $this->Session;
+    }
+
+    /**
+     * Locad cookie and save to user meta after login.
+     *
+     * @return void
+     */
+    public function processAnonymousCookie()
+    {
+        $anonymousData = $this->getCookie($this::COOKIE_ANONYMIZE, -1);
+        if ($anonymousData !== -1) {
+            $userMetaModel = \Gdn::getContainer()->get(UserMetaModel::class);
+            $current = $userMetaModel->getUserMeta($this->UserID, UserMetaModel::ANONYMIZE_DATA_USER_META, -1)[
+                UserMetaModel::ANONYMIZE_DATA_USER_META
+            ];
+            // If the values are different update
+            if ($current != $anonymousData) {
+                $userMetaModel->setUserMeta(
+                    $this->UserID,
+                    UserMetaModel::ANONYMIZE_DATA_USER_META,
+                    $anonymousData == "true" ? "1" : "0"
+                );
+            }
+            $this->setCookie($this::COOKIE_ANONYMIZE, null, -3600);
+        }
     }
 }

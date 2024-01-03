@@ -65,21 +65,25 @@
             <tr>
                 <td>
         <![endif]-->
-        <table class="outer footer" align="center" style='font-size: 14px;margin: 0;padding: 0;box-sizing: border-box;color: {$email.footer.textColor};border-spacing: 0;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;Margin: 0 auto;width: 100%;max-width: 600px;background-color: {$email.footer.backgroundColor}'><tr style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%">
-<td style='font-size: 100%;margin: 0;padding: 0;box-sizing: border-box;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;color: {$email.textColor};background-color: {$email.footer.backgroundColor}'>
-                    <table width="100%" style='font-size: 100%;margin: 0;padding: 0;box-sizing: border-box;color: {$email.textColor};border-spacing: 0;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4'><tr style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%">
-<td class="inner contents" style='font-size: 100%;margin: 0;padding: 20px 30px;box-sizing: border-box;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;color: {$email.textColor};background-color: {$email.footer.backgroundColor}'>
-                                <div class="content" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%">
-                                    <table style='font-size: 100%;margin: 0;padding: 0;box-sizing: border-box;color: {$email.textColor};border-spacing: 0;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4'><tr style="margin: 0;padding: 0;box-sizing: border-box;font-size: 100%">
-<td style='font-size: 100%;margin: 0;padding: 0;box-sizing: border-box;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;color: {$email.textColor};background-color: {$email.footer.backgroundColor}'>
-                                                <div class="footer center" style="margin: 0;padding: 0;box-sizing: border-box;font-size: 14px;color: {$email.footer.textColor};text-align: center;background-color: {$email.footer.backgroundColor}">{$email.footer.text}</div>
-                                            </td>
-                                        </tr></table>
-</div>
-                            </td>
-                        </tr></table>
-</td>
-            </tr></table>
+
+            <table
+                class="outer footer"
+                align="center"
+                style='font-size: 14px;margin: 0;padding: 0;box-sizing: border-box;color: {$email.footer.textColor};border-spacing: 0;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;Margin: 0 auto;width: 100%;max-width: 600px;background-color: {$email.footer.backgroundColor}; display: table;'
+            >
+                <tr style="margin: 0; padding: 0; box-sizing: border-box; font-size: 100%;">
+                    <td
+                        style='font-size: 100%;margin: 0;padding: 0;box-sizing: border-box;font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;font-weight: 300;text-align: left;line-height: 1.4;color: {$email.textColor};background-color: {$email.footer.backgroundColor}'
+                    >
+
+                        <div style="margin: 0;padding: 10px;box-sizing: border-box;font-size: 14px;color: {$email.footer.textColor};;background-color: {$email.footer.backgroundColor}">
+                            {$email.footer.text}
+                        </div>
+
+                    </td>
+                </tr>
+            </table>
+
 <!--[if (gte mso 9)|(IE)]>
                 </td>
             </tr>

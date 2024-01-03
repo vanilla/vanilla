@@ -28,9 +28,6 @@ use Vanilla\Scheduler\SchedulerInterface;
  */
 class ModelCache
 {
-    /** @var int When we hit this size of incrementing key, we reset from 0. */
-    const MAX_INCREMENTING_KEY = 1000000;
-
     /** @var string */
     const INCREMENTING_KEY_NAMESPACE = "vanillaIncrementingKey";
 
@@ -53,8 +50,8 @@ class ModelCache
     /** @var array */
     private $defaultCacheOptions;
 
-    /** @var CacheInterface */
-    private $cache;
+    /** @var \Psr\SimpleCache\CacheInterface */
+    private \Psr\SimpleCache\CacheInterface $simpleCache;
 
     /** @var \Symfony\Contracts\Cache\CacheInterface */
     private $cacheContract;
@@ -69,13 +66,16 @@ class ModelCache
      * Constructor.
      *
      * @param string $cacheNameSpace Namespace to use in the cache.
-     * @param \Gdn_Cache $cache The cache instance.
+     * @param \Gdn_Cache|\Psr\SimpleCache\CacheInterface $cache The cache instance.
      * @param array $defaultCacheOptions Default options to apply for storing cache values.
      */
-    public function __construct(string $cacheNameSpace, \Gdn_Cache $cache, array $defaultCacheOptions = [])
+    public function __construct(string $cacheNameSpace, $cache, array $defaultCacheOptions = [])
     {
-        $this->cache = new CacheCacheAdapter($cache);
-        $this->cacheContract = new Psr16Adapter($this->cache, $cacheNameSpace);
+        $this->simpleCache = $cache instanceof \Gdn_Cache ? new CacheCacheAdapter($cache) : $cache;
+        $this->cacheContract =
+            $this->simpleCache instanceof \Symfony\Contracts\Cache\CacheInterface
+                ? $this->simpleCache
+                : new Psr16Adapter($this->simpleCache, $cacheNameSpace);
 
         // By default symfony has a wrapped that takes locks to prevent concurrent calculation of a cache key.
         // Unfortunately we've had extensive deadlocking issues on infrastrucutre and increased latency with this.
@@ -158,12 +158,12 @@ class ModelCache
             if ($scheduler instanceof SchedulerInterface) {
                 // Defer hydration.
                 $fullKey = $this->createCacheKey($args);
-                $this->scheduleHydration($scheduler, $fullKey, $hydrate, $args);
+                $this->scheduleHydration($scheduler, $fullKey, $ttl, $hydrate, array_values($args));
                 // Return the default for now.
                 return serialize($default);
             } else {
                 // Hydrate immediately.
-                $result = call_user_func_array($hydrate, $args);
+                $result = call_user_func_array($hydrate, array_values($args));
                 $result = serialize($result);
                 return $result;
             }
@@ -177,28 +177,34 @@ class ModelCache
      *
      * @param SchedulerInterface $scheduler
      * @param string $cacheKey
+     * @param int $ttl
      * @param callable $hydrate
      * @param array $args
      * @return void
      */
-    private function scheduleHydration(SchedulerInterface $scheduler, string $cacheKey, callable $hydrate, array $args)
-    {
+    private function scheduleHydration(
+        SchedulerInterface $scheduler,
+        string $cacheKey,
+        int $ttl,
+        callable $hydrate,
+        array $args
+    ) {
         $time = CurrentTimeStamp::get();
 
         $scheduler->addJobDescriptor(
             new NormalJobDescriptor(CallbackJob::class, [
-                "callback" => function () use ($cacheKey, $hydrate, $args, $time) {
+                "callback" => function () use ($cacheKey, $hydrate, $ttl, $args, $time) {
                     // If the threshold has been reached, we delete the cache key and the hydration
                     // will run on the next request.
                     $newTime = CurrentTimeStamp::get();
                     if ($newTime - $time > self::RESCHEDULE_THRESHOLD) {
-                        $this->cache->delete($cacheKey);
+                        $this->simpleCache->delete($cacheKey);
                         return;
                     }
 
                     $result = call_user_func_array($hydrate, $args);
                     $result = serialize($result);
-                    $this->cache->set($cacheKey, $result);
+                    $this->simpleCache->set($cacheKey, $result, $ttl);
                 },
             ])
         );
@@ -237,7 +243,11 @@ class ModelCache
         }
 
         $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . "-" . $this->cacheNameSpace;
-        $result = $this->cache->get($incrementKeyCacheKey, 0);
+        $result = $this->simpleCache->get($incrementKeyCacheKey);
+        if ($result === null) {
+            $result = $time = CurrentTimeStamp::get();
+            $this->simpleCache->set($incrementKeyCacheKey, $time);
+        }
         return $result;
     }
 
@@ -251,12 +261,34 @@ class ModelCache
         }
 
         $incrementKeyCacheKey = self::INCREMENTING_KEY_NAMESPACE . "-" . $this->cacheNameSpace;
-        $existingKey = $this->getIncrementingKey();
-        $newKey = $existingKey + 1;
-        if ($newKey > self::MAX_INCREMENTING_KEY) {
-            // Restart from 0.
-            $newKey = 0;
+
+        $this->incrementCacheKey($incrementKeyCacheKey, 1, CurrentTimeStamp::get());
+    }
+
+    /**
+     * Increment a cache key.
+     *
+     * @param string $key
+     * @param int $by
+     * @param int $initial
+     */
+    private function incrementCacheKey(string $key, int $by, int $initial)
+    {
+        if ($this->simpleCache instanceof CacheCacheAdapter) {
+            // If we have a native increment operator use it.
+            $this->simpleCache->getCache()->increment($key, $by, [\Gdn_Cache::FEATURE_INITIAL => $initial]);
+        } else {
+            // We don't have a native increment operator so use a lock to perform the incrementation.
+            $lockService = \Gdn::getContainer()->get(LockService::class);
+            $lock = $lockService->createLock("incremenet-$key", 5);
+            if (!$lock->acquire()) {
+                try {
+                    $existing = $this->simpleCache->get($key, $initial);
+                    $this->simpleCache->set($key, $existing + $by);
+                } finally {
+                    $lock->release();
+                }
+            }
         }
-        $this->cache->set($incrementKeyCacheKey, $newKey);
     }
 }

@@ -240,7 +240,7 @@ class CommentsAnswerTest extends AbstractAPIv2Test
             ->resultArray();
 
         foreach ($unansweredQuestions as $question) {
-            $this->assertContains(strtolower($question["statusID"]), [
+            $this->assertContains((int) $question["statusID"], [
                 \QnAPlugin::DISCUSSION_STATUS_UNANSWERED,
                 \QnAPlugin::DISCUSSION_STATUS_REJECTED,
             ]);
@@ -525,5 +525,79 @@ class CommentsAnswerTest extends AbstractAPIv2Test
                 $question["name"],
             ]),
         ]);
+    }
+
+    /**
+     * Test that comments can be filtered using the `qna` field.
+     *
+     * @return void
+     */
+    public function testGetAnswerByDiscussionID(): void
+    {
+        $question = $this->createQuestion();
+        $acceptedAnswer = $this->createComment();
+        $this->api()->patch("comments/answer/" . $acceptedAnswer["commentID"], [
+            "status" => "accepted",
+        ]);
+        $rejectedAnswer = $this->createComment();
+        $this->api()->patch("comments/answer/" . $rejectedAnswer["commentID"], [
+            "status" => "rejected",
+        ]);
+        // One random non-answer comment.
+        $this->createComment();
+
+        $result = $this->api()
+            ->get("comments", [
+                "discussionID" => $question["discussionID"],
+                "qna" => "accepted",
+            ])
+            ->getBody();
+        $this->assertEquals(1, count($result));
+        $this->assertEquals($acceptedAnswer["commentID"], $result[0]["commentID"]);
+
+        $result = $this->api()
+            ->get("comments", [
+                "discussionID" => $question["discussionID"],
+                "qna" => "rejected",
+            ])
+            ->getBody();
+        $this->assertEquals(1, count($result));
+        $this->assertEquals($rejectedAnswer["commentID"], $result[0]["commentID"]);
+    }
+
+    /**
+     * Test that users without the `Curation.Manage` permission are not able to see rejected answers but can see accepted ones.
+     *
+     * @return void
+     */
+    public function testGetCommentByAnswerPermissions(): void
+    {
+        $user = $this->createUser();
+        $this->createQuestion();
+        $question = $this->createQuestion();
+        $goodAnswer = $this->createAnswer();
+        $badAnswer = $this->createAnswer();
+        $this->acceptAnswer($question, $goodAnswer);
+        $this->rejectAnswer($question, $badAnswer);
+
+        // A member-level user will get the accepted answer.
+        $this->runWithUser(function () use ($question) {
+            $result = $this->api()->get("comments", [
+                "discussionID" => $question["discussionID"],
+                "qna" => "accepted",
+            ]);
+            $this->assertTrue($result->isSuccessful());
+            $this->assertEquals(1, count($result->getBody()));
+        }, $user);
+
+        // An error will be thrown if a member-level user tries to get the rejected answer.
+        $this->expectExceptionMessage("Permission Problem");
+        $this->expectExceptionCode(403);
+        $this->runWithUser(function () use ($question) {
+            $result = $this->api()->get("comments", [
+                "discussionID" => $question["discussionID"],
+                "qna" => "rejected",
+            ]);
+        }, $user);
     }
 }

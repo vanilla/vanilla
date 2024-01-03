@@ -48,13 +48,15 @@ export const quoteEmbedClasses = useThemeCache(() => {
         ...{
             "&&": {
                 overflow: "visible",
+                marginLeft: "auto",
+                marginRight: "auto",
             },
         },
     });
 
     const body = style("body", {
         display: "block",
-        textAlign: "left",
+        textAlign: "start",
         margin: 0,
         padding: 0,
         ...{

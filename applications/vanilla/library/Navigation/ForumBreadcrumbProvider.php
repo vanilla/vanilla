@@ -46,6 +46,11 @@ class ForumBreadcrumbProvider implements BreadcrumbProviderInterface
      */
     public function getForRecord(RecordInterface $record, string $locale = null): array
     {
+        // Generally when loading breadcrumbs it will be more efficient to prime the entire categories cache
+        // Than to load 100s of individual trees.
+        // Force that priming of the cache here.
+        \CategoryModel::categories();
+
         $ancestors = $this->categoryModel->getAncestors($record->getRecordID());
 
         $crumbs = [new Breadcrumb(self::t("Home"), \Gdn::request()->url("/", true))];

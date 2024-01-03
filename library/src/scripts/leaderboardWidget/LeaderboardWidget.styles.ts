@@ -67,22 +67,21 @@ export const leaderboardWidgetClasses = () => {
     });
 
     const userStyles = css({
-        whiteSpace: "nowrap",
         display: "flex",
+        alignItems: "center",
         ...Mixins.padding({
             vertical: 4,
         }),
     });
 
     const usernameStyles = css({
+        flex: 1,
         verticalAlign: "middle",
         display: "inline-block",
-        ...singleLineEllipsis(),
-        maxWidth: `calc(100% - ${vars.profilePhoto.size}px - ${vars.username.margin.horizontal}px)`,
         ...Mixins.margin(vars.username.margin),
         ...Mixins.font({
             ...vars.username.font,
-            lineHeight: px(vars.profilePhoto.size),
+            lineHeight: 1,
         }),
     });
 
@@ -109,11 +108,11 @@ export const leaderboardWidgetClasses = () => {
 
     const cell = css({
         padding: 0,
-        minWidth: styleUnit(100),
+        minWidth: "5ch",
         verticalAlign: "middle",
         textAlign: "right",
         "&:first-of-type": {
-            textAlign: "left",
+            textAlign: "start",
         },
     });
 

@@ -5,15 +5,17 @@
 
 module.exports = {
     parser: "@typescript-eslint/parser",
-    plugins: ["@typescript-eslint", "@vanilla", "react", "react-hooks", "jsx-a11y", "lodash"],
+    plugins: ["@typescript-eslint", "@vanilla", "react", "react-hooks", "jsx-a11y", "lodash", "@tanstack/query"],
     extends: [
         "eslint:recommended",
         "plugin:react/recommended",
+        "plugin:react/jsx-runtime",
         "plugin:@typescript-eslint/recommended",
         // "plugin:jsx-a11y/recommended",
         "prettier",
         "prettier/react",
         "prettier/@typescript-eslint",
+        "plugin:@tanstack/eslint-plugin-query/recommended",
     ],
     parserOptions: {
         project: "./tsconfig.json",
@@ -45,6 +47,7 @@ module.exports = {
         "no-alert": ["error"],
 
         // Typescript specific rules
+        "@typescript-eslint/no-namespace": "off",
         "@typescript-eslint/ban-types": [
             "error",
             {

@@ -10,7 +10,7 @@ namespace Vanilla\Models;
 use Gdn;
 use Garden\Schema\Schema;
 use LocaleModel;
-use Vanilla\Contracts\Site\AbstractSiteProvider;
+use Vanilla\Contracts\Site\VanillaSiteProvider;
 use Vanilla\Utility\ModelUtils;
 
 /**
@@ -136,8 +136,8 @@ final class CrawlableRecordSchema
      */
     public static function schema(string $defaultType): Schema
     {
-        /** @var AbstractSiteProvider $siteProvider */
-        $siteProvider = \Gdn::getContainer()->get(AbstractSiteProvider::class);
+        /** @var VanillaSiteProvider $siteProvider */
+        $siteProvider = \Gdn::getContainer()->get(VanillaSiteProvider::class);
         $isPrivateCommunity = \Gdn::config("Garden.PrivateCommunity", false);
 
         return Schema::parse([

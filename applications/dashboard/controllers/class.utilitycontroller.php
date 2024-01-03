@@ -10,6 +10,8 @@
 
 use Garden\Web\Exception\ServerException;
 use Vanilla\Formatting\DateTimeFormatter;
+use Vanilla\Site\OwnSite;
+use Vanilla\Utility\Timers;
 
 /**
  * Handles /utility endpoint.
@@ -114,12 +116,12 @@ class UtilityController extends DashboardController
      * i.e. /dashboard/utility/set/preference/name/value/transientKey
      * or /dashboard/utility/set/attribute/name/value/transientKey
      *
-     * @since 2.0.0
-     * @access public
      * @param string $userPropertyColumn The type of value being saved: preference or attribute.
      * @param string $name The name of the property being saved.
      * @param string $value The value of the property being saved.
      * @param string $transientKey A unique transient key to authenticate that the user intended to perform this action.
+     * @since 2.0.0
+     * @access public
      */
     public function set($userPropertyColumn = "", $name = "", $value = "", $transientKey = "")
     {
@@ -242,6 +244,7 @@ class UtilityController extends DashboardController
     {
         // This permission is run again to be sure someone doesn't accidentally call this method incorrectly.
         $this->permission("Garden.Settings.Manage");
+        Timers::instance()->setShouldRecordProfile(true);
 
         $updateModel = \Gdn::getContainer()->get(UpdateModel::class);
         $capturedSql = $updateModel->runStructure($captureOnly);
@@ -400,9 +403,18 @@ class UtilityController extends DashboardController
      */
     public function alive()
     {
+        Timers::instance()->setShouldRecordProfile(true);
         $this->setData("Success", true);
         $this->MasterView = "empty";
         $this->CssClass = "Home";
+
+        $ownSite = \Gdn::getContainer()->get(OwnSite::class);
+        $this->setData("Site", [
+            "siteID" => $ownSite->getSiteID(),
+            "accountID" => $ownSite->getAccountID(),
+            "clusterID" => $ownSite->getClusterID(),
+            "regionID" => $ownSite->getCluster()->getRegionID(),
+        ]);
 
         $this->fireEvent("Alive");
         Gdn_Theme::section("Utility");
@@ -470,10 +482,10 @@ class UtilityController extends DashboardController
     /**
      * Set the user's timezone (hour offset).
      *
-     * @since 2.0.0
-     * @access public
      * @param string $ClientDate Client-reported datetime.
      * @param string $transientKey Security token.
+     * @since 2.0.0
+     * @access public
      */
     public function setClientHour($clientHour = "", $transientKey = "")
     {
@@ -570,11 +582,11 @@ class UtilityController extends DashboardController
     /**
      * Grab a feed from the mothership.
      *
-     * @since 2.0.?
-     * @access public
      * @param string $Type Type of feed.
      * @param int $Length Number of items to get.
      * @param string $FeedFormat How we want it (valid formats are 'normal' or 'sexy'. OK, not really).
+     * @since 2.0.?
+     * @access public
      */
     public function getFeed($type = "news", $length = 5, $feedFormat = "normal")
     {

@@ -6,8 +6,10 @@
 
 namespace Vanilla\Database\Operation;
 
+use Vanilla\ApiUtils;
 use Vanilla\Database\Operation;
 use Vanilla\Logging\LoggerUtils;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Database operation processor for packing and unpacking JSON fields.
@@ -17,14 +19,17 @@ class JsonFieldProcessor implements Processor
     /** @var array */
     private $fields = [];
 
+    private int $jsonFlags = 0;
+
     /**
      * JsonFieldProcessor constructor.
      *
      * @param array $fields
      */
-    public function __construct(array $fields = [])
+    public function __construct(array $fields = [], int $jsonFlags = 0)
     {
         $this->setFields($fields);
+        $this->jsonFlags = $jsonFlags;
     }
 
     /**
@@ -72,7 +77,7 @@ class JsonFieldProcessor implements Processor
                 if (is_array($json)) {
                     $json = LoggerUtils::stringifyDates($json);
                 }
-                $json = json_encode($json, JSON_FORCE_OBJECT);
+                $json = json_encode($json, JSON_FORCE_OBJECT | $this->jsonFlags);
                 if ($json === false) {
                     throw new \InvalidArgumentException("Unable to encode field as JSON.", 400);
                 }

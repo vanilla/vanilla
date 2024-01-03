@@ -7,15 +7,16 @@
 namespace Vanilla\Controllers\Api;
 
 use AbstractApiController;
-use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\Data;
-use Gdn;
+use Garden\Web\Exception\ServerException;
 use UserModel;
 use Vanilla\ApiUtils;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchService;
 use Vanilla\Search\SearchResultItem;
 use Vanilla\Search\SearchResults;
+use Vanilla\Utility\UrlUtils;
 
 /**
  * Class SearchApiController
@@ -51,6 +52,8 @@ class SearchApiController extends AbstractApiController
      * @param array $query
      *
      * @return Data
+     * @throws ValidationException
+     * @throws ServerException
      */
     public function index(array $query): Data
     {
@@ -77,6 +80,8 @@ class SearchApiController extends AbstractApiController
             $searchResults,
             $this->resolveExpandFields($query, ["updateUser" => "updateUserID"])
         );
+
+        $searchResults->applyUtmParams($query["query"] ?? "");
 
         $totalCount = $searchResults->getTotalCount();
 

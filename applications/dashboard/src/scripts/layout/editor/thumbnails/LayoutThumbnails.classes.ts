@@ -28,10 +28,10 @@ export const layoutThumbnailsClasses = useThemeCache(() => {
 
     const thumbnails = css({
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
         gridTemplateRows: "max-content",
         ...extendItemContainer(gutterSize / 2),
-        minHeight: 460,
+        minHeight: 300,
     });
 
     const smallerThumbnails = css({
@@ -68,11 +68,6 @@ export const layoutThumbnailsClasses = useThemeCache(() => {
     });
 
     const thumbnailImage = css({
-        width: "100%",
-        minWidth: 200,
-    });
-
-    const thumbnailImageSmall = css({
         width: "100%",
         display: "block",
     });
@@ -131,7 +126,6 @@ export const layoutThumbnailsClasses = useThemeCache(() => {
     return {
         form,
         thumbnailImage,
-        thumbnailImageSmall,
         container,
         description,
         thumbnails,

@@ -10,6 +10,7 @@ namespace Vanilla\Web;
 use Garden\EventManager;
 use Garden\Web\Data;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\FileUtils;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Theme\ThemePreloadProvider;
 use Vanilla\Web\Events\PageRenderBeforeEvent;
@@ -72,6 +73,20 @@ class MasterViewRenderer
     public function renderPage(Page $page, array $viewData, $masterViewPath = self::MASTER_VIEW_PATH): string
     {
         $head = $page->getHead();
+
+        foreach ($this->getFontCssUrls() as $fontCssUrl) {
+            $inlineContent = $head->getInlineStyleFromUrl($fontCssUrl);
+            if ($inlineContent !== null) {
+                $head->addInlineStyles($inlineContent);
+            } else {
+                $head->addLinkTag([
+                    "rel" => "stylesheet",
+                    "type" => "text/css",
+                    "href" => $fontCssUrl,
+                ]);
+            }
+        }
+
         $this->eventManager->fire("pageRenderBefore", new PageRenderBeforeEvent($head, $page));
 
         $extraData = [
@@ -163,6 +178,36 @@ class MasterViewRenderer
             "themeHeader" => new \Twig\Markup($this->themePreloader->getThemeHeaderHtml(), "utf-8"),
             "themeFooter" => new \Twig\Markup($this->themePreloader->getThemeFooterHtml(), "utf-8"),
             "homePageTitle" => $this->config->get("Garden.HomepageTitle", ""),
+            "isDirectionRTL" => $this->siteMeta->getDirectionRTL(),
         ];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getFontCssUrls(): array
+    {
+        $fontsAssets = $this->themePreloader->getFontsJson();
+        $fontsAssetUrls = array_column($fontsAssets, "url");
+
+        $variables = $this->themePreloader->getVariables();
+        $fontVars = $variables["font"] ?? [];
+
+        $customFontUrl = $fontVars["customFont"]["url"] ?? ($fontVars["customFontUrl"] ?? null);
+        $forceGoogleFont = $fontVars["forceGoogleFont"] ?? false;
+        $googleFont = $fontVars["googleFontFamily"] ?? "Open Sans";
+        $googleFontUrl = asset("/resources/fonts/" . rawurlencode($googleFont) . "/font.css", true);
+
+        if ($forceGoogleFont) {
+            return [$googleFontUrl];
+        } elseif (!empty($customFontUrl)) {
+            // We have a custom font to load.
+            return [$customFontUrl];
+        } elseif (!empty($fontsAssetUrls)) {
+            return $fontsAssetUrls;
+        } else {
+            // Default fallback.
+            return [$googleFontUrl];
+        }
     }
 }

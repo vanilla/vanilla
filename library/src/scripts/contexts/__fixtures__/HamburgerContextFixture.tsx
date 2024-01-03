@@ -12,6 +12,7 @@ import {
 } from "@library/contexts/HamburgerMenuContext";
 import Hamburger from "@library/flyouts/Hamburger";
 import React, { useEffect } from "react";
+import { MemoryRouter } from "react-router";
 
 interface IProps {
     componentsAddedToContext?: Array<PartialBy<IHamburgerDynamicComponent, "id">>;
@@ -39,7 +40,9 @@ export function HamburgerWithComponents(props: IProps) {
     }, [componentsToRemoveFromContext]);
 
     return componentsAddedToContext ? (
-        <Hamburger forceHamburgerOpen />
+        <MemoryRouter>
+            <Hamburger forceHamburgerOpen />
+        </MemoryRouter>
     ) : (
         <>No components added, use componentsAddedToContext prop</>
     );

@@ -7,7 +7,6 @@
 import React, { useRef, useState } from "react";
 import { IStoryTileAndTextProps } from "@library/storybook/StoryTileAndText";
 import Button from "@library/forms/Button";
-import classNames from "classnames";
 import { useUniqueID } from "@library/utility/idUtils";
 import Modal from "@library/modal/Modal";
 import ModalSizes from "@library/modal/ModalSizes";
@@ -71,7 +70,7 @@ export function StoryExampleModal(props: IProps) {
                     }
                     body={
                         <FrameBody>
-                            <div className={classNames("frameBody-contents", classesFrameBody.contents)}>
+                            <div className={classesFrameBody.contents}>
                                 <InputTextBlock inputProps={{}} />
                             </div>
                         </FrameBody>

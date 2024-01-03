@@ -53,13 +53,13 @@ export const Widget = React.forwardRef(function Widget(
                 props.className,
             )}
         >
+            {context.extraContent}
             <ConditionalWrap
                 condition={!!context.childrenWrapperClassName}
                 componentProps={{ className: context.childrenWrapperClassName }}
             >
                 {children}
             </ConditionalWrap>
-            {context.extraContent}
         </div>
     );
 });

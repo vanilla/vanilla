@@ -19,6 +19,7 @@ interface IProps {
     inProgress?: boolean;
     disabled?: boolean;
     errors?: IFieldError[];
+    name?: string;
 }
 
 export function DashboardToggle(props: IProps) {
@@ -43,6 +44,7 @@ export function DashboardToggle(props: IProps) {
                     })}
                 >
                     <input
+                        name={props.name}
                         disabled={props.disabled || props.inProgress}
                         id={inputID}
                         type="checkbox"

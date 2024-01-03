@@ -6,6 +6,7 @@
 
 namespace VanillaTests\APIv2;
 
+use RoleModel;
 use RolesApiController;
 use VanillaTests\UsersAndRolesApiTestTrait;
 
@@ -35,6 +36,33 @@ class RolesTest extends AbstractResourceTest
         $this->testPagingOnIndex = false;
 
         parent::__construct($name, $data, $dataName);
+    }
+
+    /**
+     * Test expand=assignable
+     *
+     * @return void
+     */
+    public function testIndexWithAssignableExpand()
+    {
+        $callApi = function () {
+            return $this->api()
+                ->get($this->baseUrl, ["expand" => "assignable"])
+                ->getBody();
+        };
+
+        // Test response has assignable property if user has users.edit
+        $roles = $this->runWithPermissions($callApi, ["users.edit" => true]);
+        foreach ($roles as $role) {
+            $this->assertArrayHasKey("assignable", $role);
+            $this->assertIsBool($role["assignable"]);
+        }
+
+        // Test response does not have assignable property if user does not have users.edit
+        $roles = $this->runWithPermissions($callApi, []);
+        foreach ($roles as $role) {
+            $this->assertArrayNotHasKey("assignable", $role);
+        }
     }
 
     /**
@@ -383,5 +411,44 @@ class RolesTest extends AbstractResourceTest
             ->getBody();
         $filteredRoleIDs = array_column($filteredRoles, "roleID");
         $this->assertNotContains($record["roleID"], $filteredRoleIDs);
+    }
+
+    /**
+     * Test domains role assignments.
+     */
+    public function testRolePostAndAssignment()
+    {
+        $role = $this->createRole(["domains" => "test.com hl.com"]);
+        $user = $this->createUser();
+        $this->getSession()->start($user["userID"]);
+        $userRoles = $this->userModel->getRoleIDs($user["userID"]);
+        $this->assertContains($role["roleID"], $userRoles);
+    }
+
+    /**
+     * Test Role type patch doesn't update for default roles, but works for user created roles.
+     */
+    public function testRoleTypePatch()
+    {
+        $this->api()->patch($this->baseUrl . "/" . RoleModel::ADMIN_ID, [
+            "type" => RoleModel::TYPE_MEMBER,
+        ]);
+        $roleModel = $this->container()->get(RoleModel::class);
+        $adminRole = $roleModel->getByRoleID(RoleModel::ADMIN_ID);
+        $this->assertEquals(RoleModel::TYPE_ADMINISTRATOR, $adminRole->Type);
+
+        $newRole = $this->createRole();
+
+        $this->api()->patch($this->baseUrl . "/" . $newRole["roleID"], [
+            "type" => RoleModel::TYPE_APPLICANT,
+        ]);
+        $newRole = $roleModel->getByRoleID($newRole["roleID"]);
+        $this->assertEquals(RoleModel::TYPE_APPLICANT, $newRole->Type);
+
+        $this->api()->patch($this->baseUrl . "/" . $newRole->RoleID, [
+            "type" => RoleModel::TYPE_GUEST,
+        ]);
+        $newRole = $roleModel->getByRoleID($newRole->RoleID);
+        $this->assertEquals(RoleModel::TYPE_GUEST, $newRole->Type);
     }
 }

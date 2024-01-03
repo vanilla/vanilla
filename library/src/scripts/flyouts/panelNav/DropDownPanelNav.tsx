@@ -17,11 +17,12 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import ScreenReaderContent from "@library/layout/ScreenReaderContent";
 import { CloseTinyIcon } from "@library/icons/common";
 import { t } from "@vanilla/i18n";
+import { useActiveNavRecord } from "@library/routing/routingUtils";
 
 interface IProps {
     title?: string;
     navItems: INavigationTreeItem[];
-    activeRecord: IActiveRecord;
+    activeRecord?: IActiveRecord;
     afterNavSections?: React.ReactNode;
     isNestable: boolean;
     onClose?: () => void;
@@ -31,6 +32,8 @@ export function DropDownPanelNav(props: IProps) {
     const [parentNavItems, setParentNavItems] = useState<Array<INavigationTreeItem | null>>([]);
 
     const classes = dropDownClasses();
+
+    const activeRecord = useActiveNavRecord(props.navItems, props.activeRecord);
 
     const popParentItem = () => {
         parentNavItems.pop();
@@ -65,7 +68,7 @@ export function DropDownPanelNav(props: IProps) {
             )}
             <div className={classNames(classes.panel, classes.panelFirst)} aria-hidden={parentNavItems.length > 0}>
                 <PanelNavItems
-                    activeRecord={props.activeRecord}
+                    activeRecord={activeRecord ?? undefined}
                     isActive={false}
                     navItems={props.navItems}
                     isNestable={props.isNestable}
@@ -96,7 +99,7 @@ export function DropDownPanelNav(props: IProps) {
                             activeRecord={props.activeRecord}
                             isActive={i === parentNavItems.length - 1}
                             key={key}
-                            navItems={currentItems}
+                            navItems={currentItems ?? []}
                             isNestable={props.isNestable}
                             popParentItem={popParentItem}
                             pushParentItem={pushParentItem}

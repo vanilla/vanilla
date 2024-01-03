@@ -41,7 +41,7 @@ class SectionOneColumn extends AbstractLayoutSection
      */
     public static function getWidgetName(): string
     {
-        return "1 Column";
+        return "1 Column - Default";
     }
 
     /**
@@ -58,5 +58,14 @@ class SectionOneColumn extends AbstractLayoutSection
     public static function getWidgetIconPath(): string
     {
         return "/applications/dashboard/design/images/sectionIcons/1column.svg";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        $children = $this->renderSectionChildrenHtml($props["children"] ?? []);
+        return "<section>{$children}</section>";
     }
 }

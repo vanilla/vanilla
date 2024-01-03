@@ -8,7 +8,7 @@ import React, { useContext } from "react";
 import { Optionalize } from "@library/@types/utils";
 import { ISearchOptionData } from "@library/features/search/SearchOption";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
-import { formatUrl } from "@library/utility/appUtils";
+import { formatUrl, getMeta } from "@library/utility/appUtils";
 
 const defaultOptionProvider: ISearchOptionProvider = {
     supportsAutoComplete: false,
@@ -18,12 +18,18 @@ const defaultOptionProvider: ISearchOptionProvider = {
 
 const SearchContext = React.createContext<IWithSearchProps>({
     searchOptionProvider: defaultOptionProvider,
+    externalSearchQuery: undefined,
 });
 export default SearchContext;
 
 export function SearchContextProvider({ children }) {
     return (
-        <SearchContext.Provider value={{ searchOptionProvider: SearchContextProvider.optionProvider }}>
+        <SearchContext.Provider
+            value={{
+                searchOptionProvider: SearchContextProvider.optionProvider,
+                externalSearchQuery: getMeta("search.externalSearchQuery", false), // check if we have external search query, no autocomplete and pointing into external search in this case
+            }}
+        >
             {children}
         </SearchContext.Provider>
     );
@@ -37,11 +43,12 @@ SearchContextProvider.setOptionProvider = (provider: ISearchOptionProvider) => {
 export interface ISearchOptionProvider {
     supportsAutoComplete?: boolean;
     autocomplete(query: string, options?: Record<string, any>): Promise<Array<IComboBoxOption<ISearchOptionData>>>;
-    makeSearchUrl(query: string, options?: Record<string, any>): string;
+    makeSearchUrl(query: string, options?: Record<string, any>, externalSearchQuery?: string): string;
 }
 
 export interface IWithSearchProps {
     searchOptionProvider: ISearchOptionProvider;
+    externalSearchQuery?: string;
 }
 
 export function useSearch() {

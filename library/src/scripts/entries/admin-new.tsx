@@ -11,7 +11,7 @@ import SectionThreeColumns from "@library/layout/ThreeColumnSection";
 import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import { QuickLinks } from "@library/navigation/QuickLinks";
 import { UserSpotlightWidgetPreview } from "@library/userSpotlight/UserSpotlightWidget.preview";
-import { SiteTotalsWidgetPreview } from "@library/siteTotalsWidget/SiteTotalsWidget.preview";
+import { SiteTotalsWidgetPreview } from "@library/siteTotals/SiteTotalsWidget.preview";
 import { CategoriesWidgetPreview } from "@library/categoriesWidget/CategoriesWidget.preview";
 import { LeaderboardWidgetPreview } from "@library/leaderboardWidget/LeaderboardWidget.preview";
 import { DiscussionsWidgetPreview } from "@library/discussions/DiscussionsWidget.preview";
@@ -25,13 +25,18 @@ import "@library/theming/reset";
 import CallToActionWidget from "@library/callToAction/CallToActionWidget";
 import GuestCallToActionWidget from "@library/callToAction/GuestCallToActionWidget";
 import { FeaturedCollectionsWidgetPreview } from "@library/featuredCollections/FeaturedCollectionsWidget.preview";
+import { CategoryFollowWidgetPreview } from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown.preview";
+import { BreadcrumbsWidgetPreview } from "@library/navigation/Breadcrumbs.preview";
+import SectionEvenColumns from "@library/layout/SectionEvenColumns";
 
 registerWidgetOverviews({
     // Sections
     SectionFullWidth,
     SectionOneColumn,
     SectionTwoColumns,
+    SectionTwoColumnsEven: SectionEvenColumns,
     SectionThreeColumns,
+    SectionThreeColumnsEven: SectionEvenColumns,
     // Widgets
     QuickLinks, // Quicklinks doesn't need server data so the same widget renders here as on the server.
     UserSpotlightWidget: UserSpotlightWidgetPreview,
@@ -48,4 +53,6 @@ registerWidgetOverviews({
     CallToActionWidget, // Just like Quicklinks, CTA data is also server free.
     GuestCallToActionWidget, // See comment above
     FeaturedCollectionsWidget: FeaturedCollectionsWidgetPreview,
+    CategoryFollowWidget: CategoryFollowWidgetPreview,
+    Breadcrumbs: BreadcrumbsWidgetPreview,
 });

@@ -5,7 +5,7 @@
 
 import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService.register";
 import { t } from "@library/utility/appUtils";
 import { simplifyFraction } from "@vanilla/utils";
 import classNames from "classnames";

@@ -39,6 +39,9 @@ class TrustedDomainModel
     /** @var array|null */
     private $localDomainCache = null;
 
+    /** @var ConfigurationInterface */
+    private $config;
+
     /**
      * DI.
      *
@@ -49,6 +52,7 @@ class TrustedDomainModel
     public function __construct(EventManager $eventManager, ConfigurationInterface $config, RequestInterface $request)
     {
         $this->eventManager = $eventManager;
+        $this->config = $config;
         $configuredDomains = $config->get("Garden.TrustedDomains", []);
         if (!is_array($configuredDomains)) {
             $configuredDomains = is_string($configuredDomains) ? explode("\n", $configuredDomains) : [];
@@ -79,10 +83,13 @@ class TrustedDomainModel
      */
     public function getAll(): array
     {
+        $configuredDomains = $this->fetchTrustedDomains();
+
         if ($this->localDomainCache !== null) {
-            return $this->localDomainCache;
+            return array_merge($this->localDomainCache, $configuredDomains);
         }
-        $this->localDomainCache = array_merge([$this->siteDomain], $this->configuredTrustedDomains);
+
+        $this->localDomainCache = array_merge([$this->siteDomain], $configuredDomains);
         if (!$this->isInstalled) {
             // Bail out here because we don't have a database yet.
             return $this->localDomainCache;
@@ -113,17 +120,13 @@ class TrustedDomainModel
     }
 
     /**
-     * Transform a destination to make sure that the resulting URL is "Safe".
+     * Check if a given url is trusted or not
      *
-     * "Safe" means that the domain of the URL is trusted.
-     *
-     * @param string $destination Destination URL or path.
-     * @param bool $withDomain
-     * @return string The destination if safe, /home/leaving?Target=$destination if not.
+     * @param $url string The URL to check
+     * @return bool The url is trusted or not
      */
-    public function safeUrl($destination, $withDomain = false)
+    public function isTrustedDomain(string $url): bool
     {
-        $url = url($destination, true);
         $trustedDomains = $this->getAll();
         $isTrustedDomain = false;
 
@@ -134,7 +137,24 @@ class TrustedDomainModel
             }
         }
 
-        return $isTrustedDomain ? $url : url("/home/leaving?Target=" . urlencode($destination), $withDomain);
+        return $isTrustedDomain;
+    }
+
+    /**
+     * Transform a destination to make sure that the resulting URL is "Safe".
+     *
+     * "Safe" means that the domain of the URL is trusted.
+     *
+     * @param string $destination Destination URL or path.
+     * @param bool $withDomain
+     * @return string The destination if safe, /home/leaving?Target=$destination if not.
+     */
+    public function safeUrl($destination, $withDomain = true)
+    {
+        $url = url($destination, true);
+        $isTrustedDomain = $this->isTrustedDomain($url);
+
+        return $isTrustedDomain ? $url : url("/home/leaving?target=" . urlencode($destination), $withDomain);
     }
 
     /**
@@ -145,10 +165,22 @@ class TrustedDomainModel
      * @param bool $withDomain
      * @return string The destination if safe, /home/leaving?Target=$destination if not.
      */
-    public function safeContentUrl($destination, $withDomain = false)
+    public function safeContentUrl($destination)
     {
         // If the Garden.Format.WarnLeaving Config is explicitly set to false we return the url as is
         // otherwise we process the url through safeUrl();
-        return !$this->linkWarnLeaving ? url($destination, $withDomain) : $this->safeUrl($destination, $withDomain);
+        return !$this->linkWarnLeaving ? url($destination, true) : $this->safeUrl($destination, true);
+    }
+
+    public function fetchTrustedDomains(): array
+    {
+        $trustedDomains = $this->config->get("Garden.TrustedDomains", []);
+        if (!is_array($trustedDomains)) {
+            $trustedDomains = is_string($trustedDomains) ? explode("\n", $trustedDomains) : [];
+            $trustedDomains = array_filter($trustedDomains, function ($item) {
+                return !empty($item);
+            });
+        }
+        return $trustedDomains;
     }
 }

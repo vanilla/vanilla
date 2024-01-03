@@ -5,8 +5,8 @@
     "version": "1.0.0",
     "license": "MIT",
     "dependencies": {
-        "@vanilla/ui": "*",
-        "ajv": "^8.0.1"
+        "@cfworker/json-schema": "^1.12.7",
+        "@vanilla/ui": "*"
     },
     "devDependencies": {
         "@vanilla/tsconfig": "^3.0.1"

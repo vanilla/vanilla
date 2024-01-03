@@ -1,20 +1,18 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import React, { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { INavigationVariableItem } from "@library/headers/navigationVariables";
-import useClasses from "./TitleBarMegaMenu.styles";
+import useClasses, { titleBarMegaMenuVariables } from "./TitleBarMegaMenu.styles";
 import { useScrollOffset } from "@library/layout/ScrollOffsetContext";
 import Container from "@library/layout/components/Container";
-import { titleBarNavigationVariables } from "@library/headers/titleBarNavStyles";
-import { titleBarVariables } from "@library/headers/TitleBar.variables";
-import { useLastValue, useMeasure } from "@vanilla/react-utils/src";
+import { useMeasure } from "@vanilla/react-utils/src";
 import { TabHandler } from "@vanilla/dom-utils/src";
-import { containerVariables } from "@library/layout/components/containerStyles";
-import { Func } from "mocha";
 import SmartLink from "@library/routing/links/SmartLink";
+import { globalVariables } from "@library/styles/globalStyleVars";
+import { hasPermission } from "@library/features/users/Permission";
 
 /** How much time is elapsed before the menu is hidden, either from loss of focus or mouseout. */
 const HIDE_TIMEOUT_MS = 250;
@@ -210,17 +208,55 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
     function generateMegaMenuList(items: INavigationVariableItem[]) {
         return (
             <ul className={classes.menuItemChildren} role="menu">
-                {items.map((item, key) => (
-                    <TitleBarMegaMenuChild
-                        className={classes.menuItemChild}
-                        url={item.url}
-                        text={item.name}
-                        key={key}
-                        onKeyDown={(e) => handleKeyPress(e)}
-                    />
-                ))}
+                {items.map((item, key) => {
+                    if (item.permission && !hasPermission(item.permission)) {
+                        return <React.Fragment key={key}></React.Fragment>;
+                    }
+                    return (
+                        <TitleBarMegaMenuChild
+                            className={classes.menuItemChild}
+                            url={item.url}
+                            text={item.name}
+                            key={key}
+                            onKeyDown={(e) => handleKeyPress(e)}
+                        />
+                    );
+                })}
             </ul>
         );
+    }
+
+    const megaMenuVars = titleBarMegaMenuVariables();
+
+    function calculateContainerOffset() {
+        switch (megaMenuVars.wrapper.alignment) {
+            case "firstItem":
+                const firstItemOffset = leftOffset;
+                const containerOffset = containerDimensions.left;
+                // With logo alignment we take the offset of the logo
+                // and remove our own containers offset to get the difference
+                // Example:
+                // ------------------------------------------------------
+                // |  (space)                 LOGO     Item1    Item2
+                // |  (space)                          subitem     subitem
+                // |  (space)                          subitem     subitem
+                // ------------------------------------------------------
+                // |-- firstItemOffset ---------------|
+                // |-- containerOffset --|
+                //                       |-- RESULT --|
+                return firstItemOffset - containerOffset;
+            case "logo":
+                // Align with the logo
+                // Example:
+                // ------------------------------------------------------
+                // |       LOGO     Item1    Item2
+                // |       subitem     subitem
+                // |       subitem     subitem
+                // ------------------------------------------------------
+                // |------| fullGutter
+                //        |-| item space
+                return globalVariables().constants.fullGutter - titleBarMegaMenuVariables().item.spacer;
+        }
     }
 
     return (
@@ -239,7 +275,9 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
                     (containerRef as any).current = ref;
                     focusFirstItem();
                 }}
-                style={{ paddingLeft: leftOffset - containerDimensions.left }}
+                style={{
+                    paddingLeft: calculateContainerOffset(),
+                }}
                 className={classes.container}
                 ignoreContext
                 fullGutter
@@ -247,7 +285,9 @@ function TitleBarMegaMenuImpl(props: IProps, ref: React.Ref<IMegaMenuHandle>) {
                 {expanded?.children?.map((item, key) =>
                     item.children?.length ? (
                         <div key={key} className={classes.menuItem}>
-                            <span className={classes.menuItemTitle}>{item.name}</span>
+                            <span className={classes.menuItemTitle} role="heading">
+                                {item.name}
+                            </span>
                             {item.children && generateMegaMenuList(item.children)}
                         </div>
                     ) : (

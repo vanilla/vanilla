@@ -9,6 +9,7 @@ namespace VanillaTests;
 
 use Garden\Container\Container;
 use Garden\EventManager;
+use Garden\Http\Mocks\MockHttpHandler;
 use Garden\Web\Exception\ResponseException;
 use Garden\Web\Redirect;
 use PHPUnit\Framework\AssertionFailedError;
@@ -16,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\FeatureFlagHelper;
 use Vanilla\Http\InternalClient;
 use Vanilla\Models\AddonModel;
 use Vanilla\Permissions;
@@ -23,6 +25,8 @@ use Vanilla\Site\SiteSectionModel;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Theme\VariablesProviderInterface;
 use Vanilla\Utility\ModelUtils;
+use Vanilla\Utility\Timers;
+use Vanilla\Utility\TracedContainer;
 use Vanilla\Utility\UrlUtils;
 use Vanilla\Web\Pagination\WebLinking;
 
@@ -54,7 +58,7 @@ trait SiteTestTrait
     /**
      * @var array The addons to install. Restored on teardownAfterClass();
      */
-    protected static $addons = ["vanilla", "conversations", "stubcontent"];
+    protected static $addons = ["vanilla", "conversations"];
 
     /** @var array $enabledLocales */
     protected static $enabledLocales = [];
@@ -103,8 +107,8 @@ trait SiteTestTrait
     protected static function getAddons(): array
     {
         // These applications must currently all be enabled at startup or things can get flaky.
-        static::$addons = array_unique(array_merge(["dashboard", "conversations", "vanilla"], static::$addons));
-        return static::$addons;
+        $addons = array_unique(array_merge(["dashboard", "conversations", "vanilla"], static::$addons));
+        return $addons;
     }
 
     /**
@@ -123,9 +127,12 @@ trait SiteTestTrait
         $this->setUpBootstrap();
         $this->backupSession();
 
+        TracedContainer::setShouldTrace(false);
+        Timers::instance()->reset();
+
         // Clear out all notifications before each test.
         static::container()->call(function (\Gdn_SQLDriver $sql, \UserModel $userModel, \RoleModel $roleModel) {
-            $sql->truncate("Activity");
+            $this->resetTable("Activity");
             $this->userModel = $userModel;
             $this->roleModel = $roleModel;
         });
@@ -144,6 +151,7 @@ trait SiteTestTrait
      */
     public function teardownSiteTest(): void
     {
+        MockHttpHandler::clearMock();
         $this->restoreSession();
     }
 
@@ -162,7 +170,6 @@ trait SiteTestTrait
      */
     protected static function setupBeforeClassSiteTestTrait(): void
     {
-        self::symlinkAddonFixtures();
         static::bootstrapBeforeClass();
 
         $dic = self::$container;
@@ -251,60 +258,7 @@ TEMPLATE;
      */
     public static function teardownAfterClass(): void
     {
-        self::$addons = ["vanilla", "conversations", "stubcontent"];
         static::bootstrapAfterClass();
-        self::unSymlinkAddonFixtures();
-    }
-
-    /**
-     * Symlink all addon fixtures.
-     */
-    private static function symlinkAddonFixtures(): void
-    {
-        self::mapAddonFixtures(function (string $path, string $dest): void {
-            if (file_exists($dest)) {
-                if (realpath($dest) !== realpath($path)) {
-                    throw new AssertionFailedError("Cannot symlink addon fixture: $path");
-                }
-            } else {
-                self::$symLinkedAddons[$path] = $dest;
-
-                symlink($path, $dest);
-            }
-        });
-    }
-
-    /**
-     * Remove symlinks to all addon fixtures.
-     */
-    private static function unSymlinkAddonFixtures(): void
-    {
-        self::mapAddonFixtures(function (string $path, string $dest): void {
-            if (isset(self::$symLinkedAddons[$path]) && file_exists($dest) && realpath($dest) === realpath($path)) {
-                unlink($dest);
-            }
-        });
-        self::$symLinkedAddons = [];
-    }
-
-    /**
-     * Run a callback on all test addon fixtures.
-     *
-     * @param callable $callback
-     */
-    private static function mapAddonFixtures(callable $callback): void
-    {
-        $testAddonPaths = array_merge(
-            glob(PATH_ROOT . "/tests/addons/*", GLOB_ONLYDIR),
-            glob(PATH_ROOT . "/plugins/*/tests/plugins/*", GLOB_ONLYDIR)
-        );
-        foreach ($testAddonPaths as $path) {
-            $dirname = basename($path);
-
-            $dest = PATH_ROOT . "/plugins/$dirname";
-
-            $callback($path, $dest);
-        }
     }
 
     /**
@@ -525,6 +479,24 @@ TEMPLATE;
     }
 
     /**
+     * Make sure a user does not have any roles in a list.
+     *
+     * @param int $userID
+     * @param array $roles
+     */
+    protected function assertUserHasNotRoles(int $userID, array $roles)
+    {
+        $userRoles = $this->userModel->getRoleIDs($userID);
+        foreach ($roles as $role) {
+            if (!is_numeric($role)) {
+                $role = $this->roleID($role);
+            }
+
+            $this->assertNotContains($role, $userRoles);
+        }
+    }
+
+    /**
      * Make sure that there is no active session.
      *
      * @param string $message
@@ -654,5 +626,19 @@ TEMPLATE;
         } finally {
             $themeService->clearVariableProviders();
         }
+    }
+
+    /**
+     * Enable legacy layouts.
+     */
+    function useLegacyLayouts(): void
+    {
+        self::container()
+            ->get(ConfigurationInterface::class)
+            ->saveToConfig([
+                "Feature.customLayout.home.Enabled" => false,
+                "Feature.customLayout.discussionList.Enabled" => false,
+                "Feature.customLayout.categoryList.Enabled" => false,
+            ]);
     }
 }

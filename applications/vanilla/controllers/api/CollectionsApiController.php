@@ -215,7 +215,6 @@ class CollectionsApiController extends \AbstractApiController
      */
     public function get_content(int $collectionID, string $locale): Data
     {
-        $this->permission("community.manage");
         $in = Schema::parse([
             "id:i" => "collectionID",
             "locale:s",

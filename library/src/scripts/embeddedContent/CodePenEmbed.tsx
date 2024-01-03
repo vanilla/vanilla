@@ -5,7 +5,7 @@
 
 import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService.register";
 import React from "react";
 
 interface IProps extends IBaseEmbedProps {

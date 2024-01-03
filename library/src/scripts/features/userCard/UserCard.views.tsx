@@ -1,9 +1,9 @@
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React, { ComponentProps, ComponentType, useMemo } from "react";
+import React, { ComponentType } from "react";
 import { IUser, IUserFragment } from "@library/@types/api/users";
 import Permission, { PermissionMode } from "@library/features/users/Permission";
 import { userCardClasses } from "@library/features/userCard/UserCard.styles";
@@ -27,10 +27,11 @@ import {
 import { cx } from "@emotion/css";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import DateTime from "@library/content/DateTime";
-import { hasPermission } from "@library/features/users/Permission";
 import { formatUrl } from "@library/utility/appUtils";
 import { useCurrentUserID } from "@library/features/users/userHooks";
 import { useStackingContext } from "@vanilla/react-utils";
+import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import { UserTitle } from "@library/content/UserTitle";
 
 interface IProps {
     user: IUser;
@@ -74,6 +75,7 @@ UserCardView.registerLinks = function (registeredLinks: IExtraUserCardContent) {
 
 export function UserCardView(props: IProps) {
     const { zIndex } = useStackingContext();
+    const { hasPermission } = usePermissionsContext();
     const classes = userCardClasses({ zIndex: zIndex });
     const { user } = props;
     const device = useDevice();
@@ -81,8 +83,8 @@ export function UserCardView(props: IProps) {
     const photoSize: UserPhotoSize = isCompact ? UserPhotoSize.XLARGE : UserPhotoSize.LARGE;
     const isConversationsEnabled = getMeta("context.conversationsEnabled", false);
 
-    const currentUseID = useCurrentUserID();
-    const isOwnUser = user.userID === currentUseID;
+    const currentUserID = useCurrentUserID();
+    const isOwnUser = user.userID === currentUserID;
 
     const privateProfile = user?.private ?? false;
     const hasPersonalInfoView = hasPermission("personalInfo.view");
@@ -93,25 +95,12 @@ export function UserCardView(props: IProps) {
     const privateBannedProfileEnabled = bannedPrivateProfile !== "0";
     const showPrivateBannedProfile = isBanned && privateBannedProfileEnabled;
 
-    const labelSection = useMemo(() => {
-        const { label, title } = user;
-        if (isBanned) {
-            return <div className={classes.label}>{t(BANNED)}</div>;
-        }
-        if (title) {
-            /* Title can be input by the user. */
-            return <div className={classes.label}>{title}</div>;
-        }
-        if (!title && label) {
-            /* Labels (from rank label) are sanitized server side. */
-            return <div className={classes.label} dangerouslySetInnerHTML={{ __html: label }} />;
-        }
-        return null;
-    }, [isBanned, user]);
-
     if ((privateProfile || showPrivateBannedProfile) && !hasPersonalInfoView && !isOwnUser) {
         return <UserCardMinimal user={user} onClose={props.onClose} />;
     }
+
+    const userTitle = <UserTitle user={user} />;
+
     return (
         <>
             <div className={classes.header}>
@@ -132,9 +121,10 @@ export function UserCardView(props: IProps) {
                 <div className={classes.row}>
                     <div className={classes.name}>{user.name}</div>
                 </div>
+
                 {
                     /* We don't want this section to show at all if there's no label */
-                    labelSection && <div className={classes.row}>{labelSection}</div>
+                    userTitle && <div className={cx(classes.row, classes.rankRow)}>{userTitle}</div>
                 }
 
                 {user.email && (
@@ -159,7 +149,7 @@ export function UserCardView(props: IProps) {
             </Container>
 
             <div className={cx(classes.row, classes.buttonsContainer)}>
-                <CardButton to={makeProfileUrl(user.name)}>{t("View Profile")}</CardButton>
+                <CardButton to={makeProfileUrl(user.userID, user.name)}>{t("View Profile")}</CardButton>
                 <Permission permission={"conversations.add"}>
                     {isConversationsEnabled && !banned && (
                         <CardButton to={`/messages/add/${user.name}`}>{t("Message")}</CardButton>
@@ -172,13 +162,13 @@ export function UserCardView(props: IProps) {
 
             <Container borderTop>
                 <Stat
-                    to={makeProfileDiscussionsUrl(user.name)}
+                    to={makeProfileDiscussionsUrl(user.userID, user.name)}
                     value={user.countDiscussions}
                     label={t("Discussions")}
                     classNames={classes.statLeft}
                 />
                 <Stat
-                    to={makeProfileCommentsUrl(user.name)}
+                    to={makeProfileCommentsUrl(user.userID, user.name)}
                     value={user.countComments}
                     label={t("Comments")}
                     classNames={classes.statRight}
@@ -268,7 +258,7 @@ export function UserCardSkeleton(props: ISkeletonProps) {
             <div className={cx(classes.row, classes.buttonsContainer)}>
                 <CardButton
                     disabled={!userFragment?.name}
-                    to={userFragment?.name ? makeProfileUrl(userFragment?.name) : ""}
+                    to={userFragment?.name ? makeProfileUrl(userFragment?.userID, userFragment?.name) : ""}
                 >
                     {t("View Profile")}
                 </CardButton>

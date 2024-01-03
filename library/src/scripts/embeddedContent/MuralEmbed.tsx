@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService.register";
 import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
 import { EmbedContent } from "@library/embeddedContent/components/EmbedContent";
 

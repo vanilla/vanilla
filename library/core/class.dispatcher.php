@@ -23,6 +23,7 @@ use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Exception\ExitException;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Utility\DebugUtils;
+use Vanilla\Utility\StringUtils;
 use Vanilla\Utility\Timers;
 
 /**
@@ -46,6 +47,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable
 
     /** @var array List of exceptions not to block */
     private $blockExceptions = [
+        "#^api/v2/vfspoof#" => self::BLOCK_NEVER,
         "#^api/v2/#" => self::BLOCK_PERMISSION,
         '#^dist(/|$)#' => self::BLOCK_NEVER,
         '#^asset(/|$)#' => self::BLOCK_NEVER,
@@ -310,6 +312,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable
      */
     public function dispatch($importRequest = null, $permanent = true)
     {
+        $timers = \Gdn::getContainer()->get(Timers::class);
         if ($importRequest && is_string($importRequest)) {
             $importRequest = Gdn_Request::create()
                 ->fromEnvironment()
@@ -325,8 +328,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable
         $this->EventArguments["Request"] = $request;
 
         // Move this up to allow pre-routing
-        $this->fireEvent("BeforeDispatch");
+        $this->fireTimedEvent("BeforeDispatch");
 
+        $routerTimer = $timers->startGeneric("rewriteRequest");
         // If we're in update mode and aren't explicitly prevented from blocking, block.
         if (inMaintenanceMode() && $this->getCanBlock($request) > self::BLOCK_NEVER) {
             $request->setURI(Gdn::router()->getDestination("UpdateMode"));
@@ -334,13 +338,18 @@ class Gdn_Dispatcher extends Gdn_Pluggable
 
         // Check for URL rewrites.
         $request = $this->rewriteRequest($request);
+        $routerTimer->finish();
+
+        if ($requestID = $request->getAttribute("requestID")) {
+            safeHeader("X-Request-Id: $requestID");
+        }
 
         // We need to save this state now because it's lost after this method.
         $isHomepage = $request->getMeta(self::META_IS_HOMEPAGE, false);
         $this->passData("isHomepage", $isHomepage);
 
         // Let plugins change augment the request before dispatch, but after internal routing.
-        $this->fireEvent("BeforeAnalyzeRequest");
+        $this->fireTimedEvent("BeforeAnalyzeRequest");
 
         // If we're in a private community and can block, redirect to signin
         if (c("Garden.PrivateCommunity") && $this->getCanBlock($request) > self::BLOCK_PERMISSION) {
@@ -374,7 +383,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable
             // If we received a matched response with the new dispatcher
             // Use that.
             if (!$response->getMeta("noMatch")) {
-                $this->applyTimeHeaders($response);
                 $this->dispatcher->render($request, $response);
                 return;
             }
@@ -955,6 +963,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable
      * @param Gdn_Request $request The request being dispatched.
      * @param array $routeArgs The result of {@link Gdn_Dispatcher::analyzeRequest()}.
      * @return mixed Returns the result of a dispatch not found if the controller wasn't found or is disabled.
+     * @throws ReflectionException
+     * @throws Throwable
      */
     private function dispatchController($request, $routeArgs)
     {
@@ -1022,9 +1032,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable
         try {
             $this->fireEvent("BeforeControllerMethod");
             Gdn::pluginManager()->callEventHandlers($controller, $controllerName, $controllerMethod, "before");
-            $this->eventManager->dispatch(new ControllerDispatchedEvent($callback));
+            $this->eventManager->dispatch(new ControllerDispatchedEvent($callback, $request));
             call_user_func_array($callback, $args);
-            $this->applyTimeHeaders();
         } catch (ExitException $ex) {
             // The controller wanted to exit.
             if (!DebugUtils::isTestMode()) {
@@ -1064,38 +1073,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable
     }
 
     /**
-     * @return array|null
-     */
-    private function getAllTimerHeaders(): ?array
-    {
-        $headers = [];
-        foreach ($this->timers->getTimers() as $timer) {
-            $headers += $this->getTimerHeadersForKey($timer);
-        }
-        return $headers;
-    }
-
-    /**
-     * Get timer entry headers for a key.
-     *
-     * @param string $key
-     * @return array
-     */
-    private function getTimerHeadersForKey(string $key): array
-    {
-        $timer = $this->timers->get($key);
-        if ($timer === null) {
-            return [];
-        }
-        $result = [
-            "x-app-$key-count" => $timer["count"],
-            "x-app-$key-time" => Timers::formatDuration($timer["time"]),
-            "x-app-$key-max" => Timers::formatDuration($timer["max"]),
-        ];
-        return $result;
-    }
-
-    /**
      * Keep track of the headers from the last response.
      *
      * @param array $headers The headers that were sent.
@@ -1113,29 +1090,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable
     public function getSentHeaders(): array
     {
         return $this->sentHeaders;
-    }
-
-    /**
-     * Apply our cache trace headers.
-     *
-     * @param Data|null $data
-     */
-    private function applyTimeHeaders(?Data $data = null)
-    {
-        if (!$this->config->get("trace.headers", debug())) {
-            return;
-        }
-        $headers = $this->getAllTimerHeaders();
-        if ($headers === null) {
-            return;
-        }
-        foreach ($headers as $header => $value) {
-            if ($data !== null) {
-                $data->setHeader($header, $value);
-            } else {
-                safeHeader("{$header}: {$value}");
-            }
-        }
     }
 
     /**
@@ -1372,7 +1326,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable
     {
         if (str_contains($exception->getMessage(), ", called in")) {
             $exception_type = get_class($exception);
-            $message = substr($exception->getMessage(), 0, strrpos($exception->getMessage(), ", called in"));
+            $message = StringUtils::sanitizeExceptionMessage($exception->getMessage());
             $reflectedObject = new \ReflectionClass($exception_type);
             $property = $reflectedObject->getProperty("message");
             $property->setAccessible(true);

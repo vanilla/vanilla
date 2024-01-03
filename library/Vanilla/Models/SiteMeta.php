@@ -16,6 +16,7 @@ use Vanilla\Contracts;
 use Vanilla\Dashboard\Models\BannerImageModel;
 use Vanilla\FeatureFlagHelper;
 use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Search\SearchService;
 use Vanilla\Site\OwnSite;
 use Vanilla\Site\SiteSectionModel;
@@ -68,12 +69,6 @@ class SiteMeta implements \JsonSerializable
     private $maxUploads;
 
     /** @var string */
-    private $localeKey;
-
-    /** @var ThemeService */
-    private $themeService;
-
-    /** @var string */
     private $activeThemeKey;
 
     /** @var int $activeThemeRevisionID */
@@ -101,16 +96,10 @@ class SiteMeta implements \JsonSerializable
     private $mobileAddressBarColor;
 
     /** @var string|null */
-    private $shareImage;
-
-    /** @var string|null */
     private $bannerImage;
 
     /** @var array */
     private $featureFlags;
-
-    /** @var Contracts\Site\SiteSectionInterface */
-    private $currentSiteSection;
 
     /** @var string */
     private $logo;
@@ -121,12 +110,6 @@ class SiteMeta implements \JsonSerializable
     /** @var string */
     private $cacheBuster;
 
-    /** @var string */
-    private $staticPathFolder = "";
-
-    /** @var string */
-    private $dynamicPathFolder = "";
-
     /** @var Gdn_Session */
     private $session;
 
@@ -135,15 +118,6 @@ class SiteMeta implements \JsonSerializable
 
     /** @var FormatService */
     private $formatService;
-
-    /** @var bool */
-    private $supportsSearchScope;
-
-    /** @var string */
-    private $defaultSearchScope;
-
-    /** @var string */
-    private $activeDriver;
 
     /** @var int */
     private $editContentTimeout = -1;
@@ -162,6 +136,10 @@ class SiteMeta implements \JsonSerializable
     /** @var string $roleTokenEncoded */
     private $roleTokenEncoded;
 
+    private RequestInterface $request;
+
+    private SiteSectionModel $siteSectionModel;
+
     /**
      * SiteMeta constructor.
      *
@@ -169,13 +147,11 @@ class SiteMeta implements \JsonSerializable
      * @param Contracts\ConfigurationInterface $config The config object.
      * @param SiteSectionModel $siteSectionModel
      * @param DeploymentCacheBuster $deploymentCacheBuster
-     * @param ThemeFeatures $themeFeatures
      * @param ThemeService $themeService
      * @param Gdn_Session $session
      * @param FormatService $formatService
      * @param UserModel $userModel
      * @param AddonManager $addonManager
-     * @param SearchService $searchService
      * @param OwnSite $site
      * @param RoleTokenFactory $roleTokenFactory
      */
@@ -184,16 +160,16 @@ class SiteMeta implements \JsonSerializable
         Contracts\ConfigurationInterface $config,
         SiteSectionModel $siteSectionModel,
         DeploymentCacheBuster $deploymentCacheBuster,
-        ThemeFeatures $themeFeatures,
         ThemeService $themeService,
         Gdn_Session $session,
         FormatService $formatService,
         UserModel $userModel,
         AddonManager $addonManager,
-        SearchService $searchService,
         OwnSite $site,
         RoleTokenFactory $roleTokenFactory
     ) {
+        $this->request = $request;
+        $this->siteSectionModel = $siteSectionModel;
         $this->host = $request->getHost();
         $this->config = $config;
         $this->formatService = $formatService;
@@ -207,9 +183,6 @@ class SiteMeta implements \JsonSerializable
         $this->conversationsEnabled = $addonManager->isEnabled("conversations", Addon::TYPE_ADDON);
 
         $this->featureFlags = $config->get("Feature", []);
-        $this->themeFeatures = $themeFeatures;
-
-        $this->currentSiteSection = $siteSectionModel->getCurrentSiteSection();
 
         // Get some ui metadata
         // This title may become knowledge base specific or may come down in a different way in the future.
@@ -223,12 +196,15 @@ class SiteMeta implements \JsonSerializable
 
         // Fetch Uploading metadata.
         $this->allowedExtensions = $config->get("Garden.Upload.AllowedFileExtensions", []);
+        if ($session->getPermissions()->has("Garden.Community.Manage")) {
+            $this->allowedExtensions = array_merge(
+                $this->allowedExtensions,
+                \MediaApiController::UPLOAD_RESTRICTED_ALLOWED_FILE_EXTENSIONS
+            );
+        }
         $maxSize = $config->get("Garden.Upload.MaxFileSize", ini_get("upload_max_filesize"));
         $this->maxUploadSize = \Gdn_Upload::unformatFileSize($maxSize);
         $this->maxUploads = (int) $config->get("Garden.Upload.maxFileUploads", ini_get("max_file_uploads"));
-
-        // localization
-        $this->localeKey = $this->currentSiteSection->getContentLocale();
 
         // DeploymentCacheBuster
         $this->cacheBuster = $deploymentCacheBuster->value();
@@ -253,12 +229,6 @@ class SiteMeta implements \JsonSerializable
         $this->mobileThemeKey = $config->get("Garden.MobileTheme", "Garden.Theme");
         $this->desktopThemeKey = $config->get("Garden.Theme", ThemeService::FALLBACK_THEME_KEY);
         $this->themePreview = $themeService->getPreviewTheme();
-        $this->defaultSearchScope = $config->get("Search.DefaultScope", "site");
-
-        $activeDriverInstance = $searchService->getActiveDriver();
-        $this->supportsSearchScope =
-            (bool) $config->get("Search.SupportsScope", false) && $activeDriverInstance->supportsForeignRecords();
-        $this->activeDriver = $activeDriverInstance->getName();
 
         $editContentTimeout = $config->get("Garden.EditContentTimeout");
         $this->editContentTimeout = intval($editContentTimeout);
@@ -269,10 +239,6 @@ class SiteMeta implements \JsonSerializable
 
         if ($logo = $config->get("Garden.Logo")) {
             $this->logo = \Gdn_Upload::url($logo);
-        }
-
-        if ($shareImage = $config->get("Garden.ShareImage")) {
-            $this->shareImage = \Gdn_Upload::url($shareImage);
         }
 
         $this->bannerImage = BannerImageModel::getCurrentBannerImageLink() ?: null;
@@ -337,14 +303,44 @@ class SiteMeta implements \JsonSerializable
     public function value(array $localizedExtraMetas = []): array
     {
         $extras = array_map(function (SiteMetaExtra $extra) {
-            return $extra->getValue();
+            try {
+                return $extra->getValue();
+            } catch (\Throwable $throwable) {
+                ErrorLogger::error(
+                    "Failed to load site meta   value for class " . get_class($extra),
+                    ["siteMeta"],
+                    [
+                        "exception" => $throwable,
+                    ]
+                );
+                return [];
+            }
         }, array_merge($this->extraMetas, $localizedExtraMetas));
 
         $embedAllowValue = $this->config->get("Garden.Embed.Allow", false);
         $hasNewEmbed = FeatureFlagHelper::featureEnabled("newEmbedSystem");
+
+        $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
+
+        $siteSectionSlugs = [];
+        foreach ($this->siteSectionModel->getAll() as $siteSection) {
+            if ($basePath = $siteSection->getBasePath()) {
+                $siteSectionSlugs[] = $basePath;
+            }
+        }
+
+        $defaultSiteSection = $this->siteSectionModel->getDefaultSiteSection();
+
+        // Deferred for performance reasons.
+        $themeFeatures = \Gdn::getContainer()->get(ThemeFeatures::class);
+        $activeDriverInstance = \Gdn::getContainer()
+            ->get(SearchService::class)
+            ->getActiveDriver();
+
         return array_replace_recursive(
             [
                 "context" => [
+                    "requestID" => $this->request->getMeta("requestID"),
                     "host" => $this->assetPath,
                     "basePath" => $this->basePath,
                     "assetPath" => $this->assetPath,
@@ -352,8 +348,6 @@ class SiteMeta implements \JsonSerializable
                     "translationDebug" => $this->translationDebugModeEnabled,
                     "conversationsEnabled" => $this->conversationsEnabled,
                     "cacheBuster" => $this->cacheBuster,
-                    "staticPathFolder" => $this->staticPathFolder,
-                    "dynamicPathFolder" => $this->dynamicPathFolder,
                     "siteID" => $this->siteID,
                 ],
                 "embed" => [
@@ -366,13 +360,13 @@ class SiteMeta implements \JsonSerializable
                 "ui" => [
                     "siteName" => $this->siteTitle,
                     "orgName" => $this->orgName,
-                    "localeKey" => $this->localeKey,
+                    "localeKey" => $this->getLocaleKey(),
                     "themeKey" => $this->activeThemeKey,
                     "mobileThemeKey" => $this->mobileThemeKey,
                     "desktopThemeKey" => $this->desktopThemeKey,
                     "logo" => $this->logo,
                     "favIcon" => $this->favIcon,
-                    "shareImage" => $this->shareImage,
+                    "shareImage" => $this->getShareImage(),
                     "bannerImage" => $this->bannerImage,
                     "mobileAddressBarColor" => $this->mobileAddressBarColor,
                     "fallbackAvatar" => UserModel::getDefaultAvatarUrl(),
@@ -380,11 +374,17 @@ class SiteMeta implements \JsonSerializable
                     "editContentTimeout" => $this->editContentTimeout,
                     "bannedPrivateProfile" => $this->bannedPrivateProfiles,
                     "useAdminCheckboxes" => boolval($this->config->get("Vanilla.AdminCheckboxes.Use", false)),
+                    "autoOffsetComments" => boolval($this->config->get("Vanilla.Comments.AutoOffset", true)),
+                    "allowSelfDelete" => boolval($this->config->get("Vanilla.Comments.AllowSelfDelete", false)),
+                    "isDirectionRTL" => $this->getDirectionRTL(),
                 ],
                 "search" => [
-                    "defaultScope" => $this->defaultSearchScope,
-                    "supportsScope" => $this->supportsSearchScope,
-                    "activeDriver" => $this->activeDriver,
+                    "defaultScope" => $this->config->get("Search.DefaultScope", "site"),
+                    "supportsScope" =>
+                        (bool) $this->config->get("Search.SupportsScope", false) &&
+                        $activeDriverInstance->supportsForeignRecords(),
+                    "activeDriver" => $activeDriverInstance->getName(),
+                    "externalSearchQuery" => $this->config->get("Garden.ExternalSearch.Query", false),
                 ],
                 "upload" => [
                     "maxSize" => $this->maxUploadSize,
@@ -397,9 +397,11 @@ class SiteMeta implements \JsonSerializable
                 "signInUrl" => $this->tryWithFallback("signInUrl", ""),
                 "signOutUrl" => $this->tryWithFallback("signOutUrl", ""),
                 "featureFlags" => $this->featureFlags,
-                "themeFeatures" => $this->themeFeatures->allFeatures(),
-                "addonFeatures" => $this->themeFeatures->allAddonFeatures(),
-                "siteSection" => $this->currentSiteSection->jsonSerialize(),
+                "themeFeatures" => $themeFeatures->allFeatures(),
+                "addonFeatures" => $themeFeatures->allAddonFeatures(),
+                "defaultSiteSection" => $defaultSiteSection->jsonSerialize(),
+                "siteSection" => $currentSiteSection->jsonSerialize(),
+                "siteSectionSlugs" => $siteSectionSlugs,
                 "themePreview" => $this->themePreview,
                 "reCaptchaKey" => $this->reCaptchaKey,
                 "TransientKey" => $this->session->transientKey(),
@@ -478,7 +480,7 @@ class SiteMeta implements \JsonSerializable
      */
     public function getLocaleKey(): string
     {
-        return $this->localeKey;
+        return $this->siteSectionModel->getCurrentSiteSection()->getContentLocale();
     }
 
     /**
@@ -522,7 +524,12 @@ class SiteMeta implements \JsonSerializable
      */
     public function getShareImage(): ?string
     {
-        return $this->shareImage;
+        $shareImage = $this->config->get("Garden.ShareImage");
+        if (!empty($shareImage)) {
+            return \Gdn_Upload::url($shareImage);
+        }
+
+        return null;
     }
 
     /**
@@ -544,22 +551,6 @@ class SiteMeta implements \JsonSerializable
     }
 
     /**
-     * @param string $staticPathFolder
-     */
-    public function setStaticPathFolder(string $staticPathFolder)
-    {
-        $this->staticPathFolder = $staticPathFolder;
-    }
-
-    /**
-     * @param string $dynamicPathFolder
-     */
-    public function setDynamicPathFolder(string $dynamicPathFolder)
-    {
-        $this->dynamicPathFolder = $dynamicPathFolder;
-    }
-
-    /**
      * Get the configured banned profile setting.
      *
      * @return bool
@@ -567,5 +558,14 @@ class SiteMeta implements \JsonSerializable
     public function getBannedPrivateProfiles(): bool
     {
         return $this->bannedPrivateProfiles;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDirectionRTL(): bool
+    {
+        return in_array($this->getLocaleKey(), \LocaleModel::getRTLLocales()) &&
+            in_array($this->getLocaleKey(), $this->config->get("Garden.RTLLocales", []));
     }
 }

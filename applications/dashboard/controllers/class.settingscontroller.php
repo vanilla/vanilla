@@ -22,6 +22,7 @@ class SettingsController extends DashboardController
 {
     const DEFAULT_AVATAR_FOLDER = "defaultavatar";
     const CONFIG_CSP_DOMAINS = "ContentSecurityPolicy.ScriptSrc.AllowedDomains";
+    const CONFIG_CSP_STRICT_DYNAMIC = "ContentSecurityPolicy.StrictDynamic";
     const CONFIG_TRUSTED_DOMAINS = "Garden.TrustedDomains";
     const DEFAULT_PASSWORD_LENGTH = 8;
 
@@ -65,6 +66,21 @@ class SettingsController extends DashboardController
     {
         $this->permission("Garden.Settings.Manage");
         $this->render("labs");
+    }
+
+    /**
+     * Settings page for external search.
+     */
+    public function externalSearch()
+    {
+        $this->permission(["Garden.Settings.Manage"], false);
+        if (Gdn::config("Garden.ExternalSearch.Enabled", false)) {
+            $this->setHighlightRoute("dashboard/settings/external-search");
+            $this->title(t("External Search"));
+            $this->render("external-search");
+        } else {
+            throw notFoundException("Page");
+        }
     }
 
     /**
@@ -544,6 +560,17 @@ class SettingsController extends DashboardController
     }
 
     /**
+     * User preferences page.
+     */
+    public function preferences()
+    {
+        $this->permission(["Garden.Settings.Manage"], false);
+        $this->setHighlightRoute("dashboard/settings/preferences");
+        $this->title(t("User Preferences"));
+        $this->render();
+    }
+
+    /**
      * Manage user bans (add, edit, delete, list).
      *
      * @since 2.0.18
@@ -669,6 +696,7 @@ class SettingsController extends DashboardController
         $configurationModel->setField([
             self::CONFIG_TRUSTED_DOMAINS,
             self::CONFIG_CSP_DOMAINS,
+            self::CONFIG_CSP_STRICT_DYNAMIC,
             "Garden.Format.WarnLeaving",
             HstsModel::MAX_AGE_KEY,
             HstsModel::INCLUDE_SUBDOMAINS_KEY,
@@ -677,6 +705,7 @@ class SettingsController extends DashboardController
             "Garden.Cookie.PersistExpiry",
             "Garden.SignIn.Attempts",
             "Garden.SignIn.LockoutTime",
+            "Garden.Privacy.IPs",
         ]);
 
         // Set the model on the form.
@@ -695,6 +724,10 @@ class SettingsController extends DashboardController
             // Apply the config settings to the form.
             $this->Form->setData($configurationModel->Data);
         } else {
+            $this->Form->setFormValue(
+                self::CONFIG_CSP_STRICT_DYNAMIC,
+                (bool) $this->Form->getValue(self::CONFIG_CSP_STRICT_DYNAMIC)
+            );
             $configurationModel->Validation->applyRule("Garden.Password.MinLength", "Integer");
             if ($this->Form->getValue("Garden.Password.MinLength") < self::DEFAULT_PASSWORD_LENGTH) {
                 $this->Form->addError(
@@ -792,354 +825,25 @@ class SettingsController extends DashboardController
     {
         $this->permission("Garden.Settings.Manage");
         $this->setHighlightRoute("dashboard/settings/email");
-        $this->addJsFile("email.js");
-        $this->title(t("Outgoing Email"));
+        $this->title(t("Email Settings"));
+        $this->render();
+    }
 
-        $validation = new Gdn_Validation();
-        $configurationModel = new Gdn_ConfigurationModel($validation);
-        $configurationModel->setField([
-            "Garden.Email.SupportName",
-            "Garden.Email.SupportAddress",
-            "Garden.Email.UseSmtp",
-            "Garden.Email.SmtpHost",
-            "Garden.Email.SmtpUser",
-            "Garden.Email.SmtpPassword",
-            "Garden.Email.SmtpPort",
-            "Garden.Email.SmtpSecurity",
-            "Garden.Email.OmitToName",
-        ]);
+    /**
+     * Manage email digest settings
+     */
 
-        // Set the model on the form.
-        $this->Form->setModel($configurationModel);
-
-        // If seeing the form for the first time...
-        if ($this->Form->authenticatedPostBack() === false) {
-            // Apply the config settings to the form.
-            $this->Form->setData($configurationModel->Data);
+    public function digest()
+    {
+        $this->permission(["Garden.Settings.Manage", "Garden.Community.Manage"]);
+        $this->setHighlightRoute("dashboard/settings/digest");
+        $this->title(t("Digest Settings"));
+        $emailDigestEnabled = !Gdn::config("Garden.Email.Disabled") && Gdn::config("Feature.Digest.Enabled");
+        if ($emailDigestEnabled) {
+            $this->render();
         } else {
-            // Define some validation rules for the fields being saved
-            $configurationModel->Validation->applyRule("Garden.Email.SupportName", "Required");
-            $configurationModel->Validation->applyRule("Garden.Email.SupportAddress", "Required");
-            $configurationModel->Validation->applyRule("Garden.Email.SupportAddress", "Email");
-
-            if ($this->Form->save() !== false) {
-                $this->informMessage(t("Your settings have been saved."));
-            }
+            redirectTo("home/index");
         }
-
-        $this->render();
-    }
-
-    /**
-     * Settings page for HTML email styling.
-     *
-     * Exposes config settings:
-     * Garden.EmailTemplate.BackgroundColor
-     * Garden.EmailTemplate.ButtonBackgroundColor
-     * Garden.EmailTemplate.ButtonTextColor
-     * Garden.EmailTemplate.Image
-     *
-     * Saves the image based on 2 config settings:
-     * Garden.EmailTemplate.ImageMaxWidth (default 400px) and
-     * Garden.EmailTemplate.ImageMaxHeight (default 300px)
-     *
-     * @throws Gdn_UserException
-     */
-    public function emailStyles()
-    {
-        // Set default value for fullpost inclusions in email digests to `false`.
-        if (!c("Vanilla.Email.FullPost")) {
-            saveToConfig("Vanilla.Email.FullPost", false, false);
-        }
-        // Set default colors
-        if (!c("Garden.EmailTemplate.TextColor")) {
-            saveToConfig("Garden.EmailTemplate.TextColor", EmailTemplate::DEFAULT_TEXT_COLOR, false);
-        }
-        if (!c("Garden.EmailTemplate.BackgroundColor")) {
-            saveToConfig("Garden.EmailTemplate.BackgroundColor", EmailTemplate::DEFAULT_BACKGROUND_COLOR, false);
-        }
-        if (!c("Garden.EmailTemplate.ContainerBackgroundColor")) {
-            saveToConfig(
-                "Garden.EmailTemplate.ContainerBackgroundColor",
-                EmailTemplate::DEFAULT_CONTAINER_BACKGROUND_COLOR,
-                false
-            );
-        }
-        if (!c("Garden.EmailTemplate.ButtonTextColor")) {
-            saveToConfig("Garden.EmailTemplate.ButtonTextColor", EmailTemplate::DEFAULT_BUTTON_TEXT_COLOR, false);
-        }
-        if (!c("Garden.EmailTemplate.ButtonBackgroundColor")) {
-            saveToConfig(
-                "Garden.EmailTemplate.ButtonBackgroundColor",
-                EmailTemplate::DEFAULT_BUTTON_BACKGROUND_COLOR,
-                false
-            );
-        }
-
-        $this->permission("Garden.Settings.Manage");
-        $this->addJsFile("email.js");
-
-        $configurationModule = new ConfigurationModule($this);
-
-        $configurationModule->initialize([
-            "Garden.EmailTemplate.Image" => [
-                "Control" => "imageupload",
-                "LabelCode" => "Email Logo",
-                "Size" =>
-                    c("Garden.EmailTemplate.ImageMaxWidth", "400") .
-                    "x" .
-                    c("Garden.EmailTemplate.ImageMaxHeight", "300"),
-                "Description" => sprintf(
-                    t("Large images will be scaled down."),
-                    c("Garden.EmailTemplate.ImageMaxWidth", 400),
-                    c("Garden.EmailTemplate.ImageMaxHeight", 300)
-                ),
-                "Options" => [
-                    "RemoveConfirmText" => sprintf(t("Are you sure you want to delete your %s?"), t("email logo")),
-                ],
-            ],
-            "Garden.EmailTemplate.TextColor" => [
-                "LabelCode" => "Text Color",
-                "Control" => "color",
-            ],
-            "Garden.EmailTemplate.BackgroundColor" => [
-                "LabelCode" => "Background Color",
-                "Control" => "color",
-            ],
-            "Garden.EmailTemplate.ContainerBackgroundColor" => [
-                "Control" => "color",
-                "LabelCode" => "Page Color",
-            ],
-            "Garden.EmailTemplate.ButtonTextColor" => [
-                "LabelCode" => "Button Text Color",
-                "Control" => "color",
-            ],
-            "Garden.EmailTemplate.ButtonBackgroundColor" => [
-                "LabelCode" => "Button Background Color",
-                "Control" => "color",
-            ],
-        ]);
-
-        $previewButton = wrap(t("Preview"), "span", ["class" => "js-email-preview-button btn btn-secondary"]);
-        $configurationModule->controller()->setData("FormFooter", ["FormFooter" => $previewButton]);
-
-        $this->setData("ConfigurationModule", $configurationModule);
-        $this->render();
-    }
-
-    /**
-     * Sets up a new Gdn_Email object with a test email.
-     *
-     * @param string $image The img src of the previewed image
-     * @param string $textColor The hex color code of the text.
-     * @param string $backGroundColor The hex color code of the background color.
-     * @param string $containerBackgroundColor The hex color code of the container background color.
-     * @param string $buttonTextColor The hex color code of the link color.
-     * @param string $buttonBackgroundColor The hex color code of the button background.
-     * @return Gdn_Email The email object with the test colors set.
-     */
-    public function getTestEmail(
-        $image = "",
-        $textColor = "",
-        $backGroundColor = "",
-        $containerBackgroundColor = "",
-        $buttonTextColor = "",
-        $buttonBackgroundColor = ""
-    ) {
-        $emailer = new Gdn_Email();
-        $email = $emailer->getEmailTemplate();
-
-        if ($image) {
-            $email->setImage($image);
-        }
-        if ($textColor) {
-            $email->setTextColor($textColor);
-        }
-        if ($backGroundColor) {
-            $email->setBackgroundColor($backGroundColor);
-        }
-        if ($backGroundColor) {
-            $email->setContainerBackgroundColor($containerBackgroundColor);
-        }
-        if ($buttonTextColor) {
-            $email->setDefaultButtonTextColor($buttonTextColor);
-        }
-        if ($buttonBackgroundColor) {
-            $email->setDefaultButtonBackgroundColor($buttonBackgroundColor);
-        }
-        $message = t("Test Email Message");
-
-        $email
-            ->setMessage($message)
-            ->setTitle(t("Test Email"))
-            ->setButton(externalUrl("/"), t("Check it out"));
-        $emailer->setEmailTemplate($email);
-        return $emailer;
-    }
-
-    /**
-     * Echoes out a test email with the colors and image in the post request.
-     *
-     * @throws Exception
-     */
-    public function emailPreview()
-    {
-        $this->permission("Garden.Settings.Manage");
-
-        if ($this->Form->authenticatedPostBack() !== false) {
-            $request = Gdn::request();
-            $image = $request->post("image", "");
-            $textColor = $request->post("textColor", "");
-            $backGroundColor = $request->post("backgroundColor", "");
-            $containerBackGroundColor = $request->post("containerBackgroundColor", "");
-            $buttonTextColor = $request->post("buttonTextColor", "");
-            $buttonBackgroundColor = $request->post("buttonBackgroundColor", "");
-
-            echo $this->getTestEmail(
-                $image,
-                $textColor,
-                $backGroundColor,
-                $containerBackGroundColor,
-                $buttonTextColor,
-                $buttonBackgroundColor
-            )
-                ->getEmailTemplate()
-                ->toString();
-        }
-    }
-
-    /**
-     * Form for sending a test email.
-     *
-     * On postback, sends a test email to the addresses specified in the form.
-     *
-     * @throws Exception
-     */
-    public function emailTest()
-    {
-        if (!Gdn::session()->checkPermission("Garden.Community.Manage")) {
-            throw permissionException();
-        }
-        $this->setHighlightRoute("dashboard/settings/email");
-        $this->Form = new Gdn_Form();
-        $validation = new Gdn_Validation();
-        $configurationModel = new Gdn_ConfigurationModel($validation);
-        $this->Form->setModel($configurationModel);
-        if ($this->Form->authenticatedPostBack() !== false) {
-            $addressList = $this->Form->getFormValue("EmailTestAddresses");
-            $addresses = explode(",", $addressList);
-            if (sizeof($addresses) > 10) {
-                $this->Form->addError(sprintf(t('Too many addresses! We\'ll send up to %s addresses at once.'), "10"));
-            } else {
-                $emailer = $this->getTestEmail();
-                $emailer->to($addresses);
-                $emailer->subject(sprintf(t("Test email from %s"), c("Garden.Title")));
-
-                try {
-                    if ($emailer->send()) {
-                        $this->informMessage(t("The email has been sent."));
-                    } else {
-                        $this->Form->addError(t("Error sending email. Please review the addresses and try again."));
-                    }
-                } catch (Exception $e) {
-                    if (debug()) {
-                        throw $e;
-                    }
-                }
-            }
-        }
-        $this->render();
-    }
-
-    /**
-     * Manages the Garden.Email.Format setting.
-     *
-     * @param $value Whether to send emails in plaintext.
-     * @throws Exception
-     * @throws Gdn_UserException
-     */
-    public function setEmailFormat($value)
-    {
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception("Requires POST", 405);
-        }
-        $value = strtolower($value);
-        if (in_array($value, Gdn_Email::$supportedFormats)) {
-            if (Gdn::session()->checkPermission("Garden.Community.Manage")) {
-                saveToConfig("Garden.Email.Format", $value);
-                if ($value === "html") {
-                    $newToggle = wrap(
-                        anchor(
-                            '<div class="toggle-well"></div><div class="toggle-slider"></div>',
-                            "/dashboard/settings/setemailformat/text",
-                            "Hijack"
-                        ),
-                        "span",
-                        ["class" => "toggle-wrap toggle-wrap-on"]
-                    );
-                    $this->jsonTarget(".js-foggy", "foggyOff", "Trigger");
-                } else {
-                    $newToggle = wrap(
-                        anchor(
-                            '<div class="toggle-well"></div><div class="toggle-slider"></div>',
-                            "/dashboard/settings/setemailformat/html",
-                            "Hijack"
-                        ),
-                        "span",
-                        ["class" => "toggle-wrap toggle-wrap-off"]
-                    );
-                    $this->jsonTarget(".js-foggy", "foggyOn", "Trigger");
-                }
-                $this->jsonTarget("#plaintext-toggle", $newToggle);
-            }
-        }
-        $this->render("Blank", "Utility");
-    }
-
-    /**
-     * Manages the Vanilla.Email.FullPost setting.
-     *
-     * @param int $value Whether to enable full posts in emails.
-     * @throws Exception If it's not PostBack.
-     * @throws Gdn_UserException When an error is encountered.
-     */
-    public function toggleEmailFullpost(int $value): void
-    {
-        Gdn::request()->isAuthenticatedPostBack(true);
-
-        $value = (bool) $value;
-
-        $this->permission("Garden.Community.Manage");
-        // We save the new config value.
-        saveToConfig("Vanilla.Email.FullPost", $value);
-        if ($value) {
-            // The new toggle would be ON & allow to turn OFF.
-            $newToggle = wrap(
-                anchor(
-                    '<div class="toggle-well"></div><div class="toggle-slider"></div>',
-                    "/dashboard/settings/toggleemailfullpost/0",
-                    "Hijack"
-                ),
-                "span",
-                ["class" => "toggle-wrap toggle-wrap-on"]
-            );
-            $this->informMessage(sprintf(t("%s enabled."), t("Full post in email notifications")));
-        } else {
-            // The new toggle would be OFF & allow to turn ON.
-            $newToggle = wrap(
-                anchor(
-                    '<div class="toggle-well"></div><div class="toggle-slider"></div>',
-                    "/dashboard/settings/toggleemailfullpost/1",
-                    "Hijack"
-                ),
-                "span",
-                ["class" => "toggle-wrap toggle-wrap-off"]
-            );
-            $this->informMessage(sprintf(t("%s disabled."), t("Full post in email notifications")));
-        }
-        // We replace the current toggle with a new one.
-        $this->jsonTarget("#enable-email-full-post-toggle", $newToggle);
-        $this->render("Blank", "Utility");
     }
 
     /**
@@ -1192,21 +896,6 @@ class SettingsController extends DashboardController
         }
 
         $this->render("blank", "utility");
-    }
-
-    /**
-     * Endpoint for retrieving current email image url.
-     */
-    public function emailImageUrl()
-    {
-        $this->deliveryMethod(DELIVERY_METHOD_JSON);
-        $this->deliveryType(DELIVERY_TYPE_DATA);
-        $image = c("Garden.EmailTemplate.Image");
-        if ($image) {
-            $image = Gdn_UploadImage::url($image);
-        }
-        $this->setData("EmailImage", $image);
-        $this->render();
     }
 
     /**

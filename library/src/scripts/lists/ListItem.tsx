@@ -8,7 +8,7 @@ import { cx } from "@emotion/css";
 import { listItemClasses } from "@library/lists/ListItem.styles";
 import { Metas } from "@library/metas/Metas";
 import SmartLink from "@library/routing/links/SmartLink";
-import React, { ReactElement, useContext, useRef } from "react";
+import React, { ElementType, ReactElement, useContext, useRef } from "react";
 import { useMeasure } from "@vanilla/react-utils";
 import { PageBox } from "@library/layout/PageBox";
 import {
@@ -47,7 +47,7 @@ export interface IListItemProps {
     image?: IImage;
     featuredImage?: IFeaturedImage;
     actions?: React.ReactNode;
-    as?: keyof JSX.IntrinsicElements;
+    as?: ElementType;
     headingDepth?: number;
     options?: Partial<IListItemComponentOptions>;
     checkbox?: React.ReactNode;
@@ -66,9 +66,9 @@ export function ListItem(props: IListItemProps) {
         options: { iconPosition },
     } = listItemVars;
 
-    const isMobileMedia = measure.width <= 600;
+    const isMobileMedia = measure.width > 0 ? measure.width <= 600 : false;
     const hasImage = props.featuredImage?.display || Boolean(props.mediaItem);
-    const asTile = props.asTile || isMobileMedia;
+    const asTile = props.asTile == null ? props.asTile || isMobileMedia : props.asTile;
     const iconInMeta = iconPosition === ListItemIconPosition.META && !hasImage;
     const hasCheckbox = Boolean(props.checkbox);
     const classes = listItemClasses(asTile, hasImage, hasCheckbox, isMobileMedia && !props.asTile);
@@ -159,7 +159,7 @@ export function ListItem(props: IListItemProps) {
     const descriptionView = props.description ? (
         <Paragraph className={cx(classes.description, descriptionClassName)}>
             {truncateDescription ? (
-                <TruncatedText maxCharCount={descriptionMaxCharCount} lines={asTile ? 3 : 1}>
+                <TruncatedText maxCharCount={descriptionMaxCharCount} lines={3}>
                     {props.description}
                 </TruncatedText>
             ) : (
@@ -205,7 +205,7 @@ export function ListItem(props: IListItemProps) {
                         <Heading custom className={classes.title} depth={headingDepth}>
                             {props.url ? (
                                 <SmartLink to={props.url} className={cx(classes.titleLink, props.nameClassName)}>
-                                    <TruncatedText lines={asTile ? 3 : 1}>{props.name}</TruncatedText>
+                                    <TruncatedText lines={3}>{props.name}</TruncatedText>
                                 </SmartLink>
                             ) : (
                                 <span className={cx(props.className)}>{props.name}</span>

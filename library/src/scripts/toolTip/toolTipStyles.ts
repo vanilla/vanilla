@@ -1,6 +1,6 @@
 /**
  * @author Stéphane LaFlèche <stephane.l@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -13,8 +13,7 @@ import { styleUnit } from "@library/styles/styleUnit";
 import { Mixins } from "@library/styles/Mixins";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 import { translateX, percent, px, important } from "csx";
-import { modalVariables } from "@library/modal/modalStyles";
-import { css, injectGlobal } from "@emotion/css";
+import { css } from "@emotion/css";
 
 export const tooltipVariables = useThemeCache(() => {
     const makeThemeVars = variableFactory("toolTips");
@@ -23,7 +22,7 @@ export const tooltipVariables = useThemeCache(() => {
     // Main colors
     const sizes = makeThemeVars("sizes", {
         min: 150,
-        max: 250,
+        max: 320,
     });
 
     const nub = makeThemeVars("nub", {
@@ -36,7 +35,7 @@ export const tooltipVariables = useThemeCache(() => {
     };
 });
 
-export const toolTipClasses = useThemeCache(() => {
+export const toolTipClasses = useThemeCache((customWidth?: number) => {
     const style = styleFactory("toolTip");
     const globalVars = globalVariables();
     const vars = tooltipVariables();
@@ -69,14 +68,14 @@ export const toolTipClasses = useThemeCache(() => {
             ...globalVars.fontSizeAndWeightVars("medium"),
             lineHeight: globalVars.lineHeights.base,
         }),
-        minWidth: styleUnit(vars.sizes.min),
+        minWidth: customWidth ?? styleUnit(vars.sizes.min),
         maxWidth: styleUnit(vars.sizes.max),
         backgroundColor: ColorsUtils.colorOut(globalVars.mainColors.bg),
         ...Mixins.border(),
         ...Mixins.padding({
             all: globalVars.fonts.size.medium,
         }),
-        ...shadow.dropDown(),
+        ...shadow.toolbar(),
     });
 
     const boxStackingLevel = (zIndex: number = 1) =>

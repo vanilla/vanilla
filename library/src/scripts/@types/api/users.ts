@@ -20,10 +20,10 @@ export interface IUserFragment {
 export interface IUserFragmentAndRoles extends IUserFragment, IUserRoles {}
 
 export interface IMe extends IUserFragment {
-    permissions: string[];
     countUnreadNotifications: number;
     countUnreadConversations: number;
     isAdmin: boolean;
+    emailConfirmed: boolean;
 }
 
 export interface ICount {
@@ -47,12 +47,15 @@ export interface IUser extends IUserFragment, IUserRoles {
     emailConfirmed: boolean;
     showEmail: boolean;
     bypassSpam: boolean;
+    admin: number;
+    isAdmin: boolean;
+    isSysAdmin: boolean;
     banned: number;
     dateInserted: string;
     dateUpdated?: string;
     hidden: boolean;
     title?: string;
-    rankID?: number;
+    rankID?: number | null;
     rank?: {
         rankID: number;
         name: string;
@@ -61,7 +64,13 @@ export interface IUser extends IUserFragment, IUserRoles {
     label?: string;
     countDiscussions: number;
     countComments: number;
+    countPosts: number;
     private: boolean;
+    profileFields?: {};
+    hashMethod?: string;
+    lastIPAddress?: string;
+    insertIPAddress?: string;
+    points?: number;
 }
 
 export interface IInvitees {

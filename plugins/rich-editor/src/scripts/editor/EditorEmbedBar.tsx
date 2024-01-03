@@ -1,19 +1,24 @@
 /**
  * @author Adam (charrondev) Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import classNames from "classnames";
 import { getMeta, t } from "@library/utility/appUtils";
 import Permission from "@library/features/users/Permission";
-import EditorUploadButton from "@rich-editor/editor/pieces/EditorUploadButton";
-import { richEditorClasses } from "@rich-editor/editor/richEditorStyles";
-import EmbedFlyout from "@rich-editor/flyouts/EmbedFlyout";
+import EditorUploadButton from "@library/editor/flyouts/EditorUploadButton";
+import { richEditorClasses } from "@library/editor/richEditorStyles";
+import EmbedFlyout from "@library/editor/flyouts/EmbedFlyout";
 import ParagraphMenusBarToggle from "@rich-editor/menuBar/paragraph/ParagraphMenusBarToggle";
 import { useEditor } from "@rich-editor/editor/context";
-import { EmojiFlyout } from "@rich-editor/flyouts/EmojiFlyout";
+import EmojiFlyout from "@library/editor/flyouts/EmojiFlyout";
+
+import Quill from "quill/core";
+import { forceSelectionUpdate } from "@rich-editor/quill/utility";
+import EmbedInsertionModule from "@rich-editor/quill/EmbedInsertionModule";
+import { isFileImage } from "@vanilla/utils";
 
 interface IProps {
     className?: string;
@@ -22,63 +27,127 @@ interface IProps {
 }
 
 export function EditorEmbedBar(props: IProps) {
-    const { isMobile, isLoading, legacyMode, quill } = useEditor();
-    if (!quill) {
+    const { isMobile, isLoading, legacyMode, editor } = useEditor();
+    const embedModule: EmbedInsertionModule = useMemo(() => editor && editor.getModule("embed/insertion"), [editor]);
+
+    const insertEmoji = useCallback(
+        (emojiChar: string) => {
+            if (editor) {
+                const range = editor.getSelection(true);
+                editor.insertEmbed(
+                    range.index,
+                    "emoji",
+                    {
+                        emojiChar,
+                    },
+                    Quill.sources.USER,
+                );
+                editor.setSelection(range.index + 1, 0, Quill.sources.SILENT);
+            }
+        },
+        [editor],
+    );
+
+    if (!editor) {
         return null;
     }
-    const mimeTypes = getMeta("upload.allowedExtensions", []);
-    const classesRichEditor = richEditorClasses(legacyMode);
     const uploadEnabled = props.uploadEnabled ?? true;
+    const classesRichEditor = richEditorClasses(legacyMode);
+
+    const createUploadHandler = (type: "image" | "file") => (files: File[]) => {
+        const embedInsertion = editor.getModule("embed/insertion") as EmbedInsertionModule;
+        const maxUploads = getMeta("upload.maxUploads", 20);
+        // Increment the upload count to reset the input.
+        const filesArray = Array.from(files);
+        if (filesArray.length >= maxUploads) {
+            const error = new Error(`Can't upload more than ${maxUploads} files at once.`);
+            embedInsertion.createErrorEmbed(error);
+            throw error;
+        }
+
+        filesArray.forEach((file) => {
+            if (type === "image") {
+                embedInsertion.createImageEmbed(file);
+            } else {
+                embedInsertion.createFileEmbed(file);
+            }
+        });
+    };
+
     return (
-        <div
-            ref={props.contentRef}
-            className={classNames("richEditor-embedBar", props.className, classesRichEditor.embedBar)}
-        >
+        <div ref={props.contentRef} className={classNames(classesRichEditor.embedBar, props.className)}>
             <ul
-                className={classNames(
-                    "richEditor-menuItems",
-                    "richEditor-inlineMenuItems",
-                    classesRichEditor.menuItems,
-                )}
+                className={classNames("richEditor-menuItems", classesRichEditor.menuItems, "widthPadding")}
                 role="menubar"
                 aria-label={t("Inline Level Formatting Menu")}
             >
                 {isMobile && (
-                    <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
+                    <li className={classesRichEditor.menuItem} role="menuitem">
                         <ParagraphMenusBarToggle renderAbove={legacyMode} disabled={isLoading} mobile={true} />
                     </li>
                 )}
                 {!isMobile && (
                     <li
-                        className={classNames(
-                            "richEditor-menuItem",
-                            "u-richEditorHiddenOnMobile",
-                            classesRichEditor.menuItem,
-                        )}
+                        className={classNames("u-richEditorHiddenOnMobile", classesRichEditor.menuItem)}
                         role="menuitem"
                     >
-                        <EmojiFlyout disabled={isLoading} renderAbove={legacyMode} legacyMode={legacyMode} />
+                        <EmojiFlyout
+                            disabled={isLoading}
+                            renderAbove={legacyMode}
+                            onInsertEmoji={insertEmoji}
+                            legacyMode={legacyMode}
+                            onVisibilityChange={forceSelectionUpdate}
+                        />
                     </li>
                 )}
                 {uploadEnabled && (
                     <Permission permission="uploads.add">
-                        <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
-                            <EditorUploadButton disabled={isLoading} type="image" allowedMimeTypes={mimeTypes} />
+                        <li className={classesRichEditor.menuItem} role="menuitem">
+                            <EditorUploadButton
+                                disabled={isLoading}
+                                type="image"
+                                legacyMode={legacyMode}
+                                onUpload={createUploadHandler("image")}
+                            />
                         </li>
                     </Permission>
                 )}
-                <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
-                    <EmbedFlyout disabled={isLoading} renderAbove={legacyMode} />
+                <li className={classesRichEditor.menuItem} role="menuitem">
+                    <EmbedFlyout
+                        createEmbed={(url) => {
+                            embedModule.scrapeMedia(url);
+                        }}
+                        createIframe={({ url, width, height }) => {
+                            embedModule.createEmbed({
+                                loaderData: {
+                                    type: "link",
+                                },
+                                data: {
+                                    url,
+                                    embedType: "iframe",
+                                    width,
+                                    height,
+                                },
+                            });
+                        }}
+                        disabled={isLoading}
+                        renderAbove={legacyMode}
+                    />
                 </li>
                 {uploadEnabled && (
                     <Permission permission="uploads.add">
-                        <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
-                            <EditorUploadButton disabled={isLoading} type="file" allowedMimeTypes={mimeTypes} />
+                        <li className={classesRichEditor.menuItem} role="menuitem">
+                            <EditorUploadButton
+                                disabled={isLoading}
+                                type="file"
+                                legacyMode={legacyMode}
+                                onUpload={createUploadHandler("file")}
+                            />
                         </li>
                     </Permission>
                 )}
                 {getExtraComponents().length > 0 && (
-                    <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="separator">
+                    <li className={classesRichEditor.menuItem} role="separator">
                         <hr className={classesRichEditor.embedBarSeparator} />
                     </li>
                 )}
@@ -95,7 +164,7 @@ EditorEmbedBar.Item = function EditorEmbedBarItem(props: { children: React.React
     const classesRichEditor = richEditorClasses(legacyMode);
 
     return (
-        <li className={classNames("richEditor-menuItem", classesRichEditor.menuItem)} role="menuitem">
+        <li className={classesRichEditor.menuItem} role="menuitem">
             {props.children}
         </li>
     );

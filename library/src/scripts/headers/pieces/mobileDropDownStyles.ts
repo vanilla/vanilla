@@ -129,7 +129,7 @@ export const mobileDropDownClasses = useThemeCache(() => {
             overflow: "hidden",
         },
         mediaQueries.xs({
-            textAlign: "left",
+            textAlign: "start",
         }),
     );
 

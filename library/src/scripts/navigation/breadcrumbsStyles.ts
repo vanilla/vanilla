@@ -84,6 +84,18 @@ export const breadcrumbsClasses = useThemeCache(() => {
         alignItems: "center",
         justifyContent: "flex-start",
         flexWrap: "wrap",
+        /**
+         * When breadcrumbs are placed in a single column layout,
+         * they need some separation from the proceeding  widgets.
+         *
+         * In all other cases, the breadcrumbs are placed in their
+         * own container without siblings
+         */
+        "& + div": {
+            ...Mixins.margin({
+                top: globalVars.spacer.pageComponentCompact,
+            }),
+        },
     });
 
     const crumb = style("crumb", {

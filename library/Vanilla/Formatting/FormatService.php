@@ -8,11 +8,13 @@ namespace Vanilla\Formatting;
 
 use Garden\Container\Container;
 use Vanilla\Contracts\Formatting\FormatInterface;
+use Vanilla\Contracts\Formatting\FormatParsedInterface;
 use Vanilla\Contracts\Formatting\Heading;
 use Vanilla\Formatting\Exception\FormatterNotFoundException;
 use Vanilla\Formatting\Exception\FormattingException;
 use Vanilla\Formatting\Formats\NotFoundFormat;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
+use Vanilla\Utility\Timers;
 
 /**
  * Simple service for calling out to formatters registered in FormatFactory.
@@ -28,40 +30,84 @@ class FormatService
     /** @var ImageSrcSetService */
     private $imageSrcSetService;
 
+    private Timers $timers;
+
     /**
      * DI.
-     *
-     * @param ImageSrcSetService $imageSrcSetService
      */
-    public function __construct(ImageSrcSetService $imageSrcSetService)
+    public function __construct(ImageSrcSetService $imageSrcSetService, Timers $timers)
     {
         $this->imageSrcSetService = $imageSrcSetService;
+        $this->timers = $timers;
+    }
+
+    /**
+     * Preparse a format to call multiple other format methods more efficiently.
+     *
+     * @param string|FormatParsedInterface $content The content to render.
+     * @param string|null $format The format of the content.
+     * @param array|null $context context for logging.
+     *
+     * @return FormatParsedInterface
+     */
+    public function parse(string $content, ?string $format = null, ?array $context = null): FormatParsedInterface
+    {
+        $formatter = $this->getFormatter($format)->setContext($context);
+        $span = $this->timers->startGeneric(
+            "FormatService::parse()",
+            [
+                "formatter" => get_class($formatter),
+            ] +
+                ($context ?? [])
+        );
+
+        try {
+            return $formatter->parse($content);
+        } finally {
+            $span->finish();
+        }
     }
 
     /**
      * Render a safe, sanitized, HTML version of some content.
      *
-     * @param string $content The content to render.
-     * @param string $format The format of the content.
-     * @param array $context context for logging.
+     * @param string|FormatParsedInterface $content The content to render.
+     * @param string|null $format The format of the content.
+     * @param array|null $context context for logging.
      *
      * @return string
      */
-    public function renderHTML(string $content, ?string $format = null, ?array $context = null): string
+    public function renderHTML($content, ?string $format = null, ?array $context = null): string
     {
+        if ($content instanceof FormatParsedInterface) {
+            $format = $content->getFormatKey();
+        }
         if (empty($content) && empty($format)) {
             return "";
         }
 
-        return $this->getFormatter($format)
-            ->setContext($context)
-            ->renderHTML($content);
+        $formatter = $this->getFormatter($format)->setContext($context);
+
+        $span = $this->timers->startGeneric(
+            "FormatService::renderHtml()",
+            [
+                "formatter" => get_class($formatter),
+                "isPreparsed" => $content instanceof FormatParsedInterface,
+            ] +
+                ($context ?? [])
+        );
+
+        try {
+            return $formatter->renderHTML($content);
+        } finally {
+            $span->finish();
+        }
     }
 
     /**
      * Format a particular string.
      *
-     * @param string $content The content to render.
+     * @param string|FormatParsedInterface $content The content to render.
      * @param string|null $format The format of the content.
      *
      * @return string
@@ -69,89 +115,120 @@ class FormatService
      * @throws FormattingException If the post content wasn't valid and couldn't be filtered.
      * @throws FormatterNotFoundException If the format doesn't have a match.
      */
-    public function filter(string $content, ?string $format): string
+    public function filter($content, ?string $format): string
     {
+        if ($content instanceof FormatParsedInterface) {
+            $format = $content->getFormatKey();
+        }
         return $this->getFormatter($format, true)->filter($content);
     }
 
     /**
      * Render a safe, sanitized, short version of some content.
      *
-     * @param string $content The content to render.
+     * @param string|FormatParsedInterface $content The content to render.
      * @param string|null $format The format of the content.
+     * @param int|null $length The max-length for the excerpt
      *
      * @return string
      */
-    public function renderExcerpt(string $content, ?string $format): string
+    public function renderExcerpt($content, ?string $format, ?int $length = null): string
     {
+        if ($content instanceof FormatParsedInterface) {
+            $format = $content->getFormatKey();
+        }
         if (empty($format) && empty($content)) {
             return "";
         }
 
-        return $this->getFormatter($format)->renderExcerpt($content);
+        $formatter = $this->getFormatter($format);
+
+        $span = $this->timers->startGeneric("FormatService::renderHtml()", [
+            "formatter" => get_class($formatter),
+            "isPreparsed" => $content instanceof FormatParsedInterface,
+        ]);
+
+        try {
+            return $formatter->renderExcerpt($content, $length);
+        } finally {
+            $span->finish();
+        }
     }
 
     /**
      * Render a plain text version of some content.
      *
-     * @param string $content The content to render.
+     * @param string|FormatParsedInterface $content The content to render.
      * @param string|null $format The format of the content.
      *
      * @return string
      */
-    public function renderPlainText(string $content, ?string $format): string
+    public function renderPlainText($content, ?string $format): string
     {
-        return $this->getFormatter($format)->renderPlainText($content);
+        if ($content instanceof FormatParsedInterface) {
+            $format = $content->getFormatKey();
+        }
+        $formatter = $this->getFormatter($format);
+        return $formatter->renderPlainText($content);
     }
 
     /**
      * Get the length of content with all formatting removed.
      *
-     * @param string $content The content to render.
+     * @param string|FormatParsedInterface $content The content to render.
      * @param string|null $format The format of the content.
      *
      * @return int The number of visible characters in $content.
      */
-    public function getPlainTextLength(string $content, ?string $format): int
+    public function getPlainTextLength($content, ?string $format): int
     {
+        if ($content instanceof FormatParsedInterface) {
+            $format = $content->getFormatKey();
+        }
         return $this->getFormatter($format)->getPlainTextLength($content);
     }
 
     /**
      * Render a version of the content suitable to be quoted in other content.
      *
-     * @param string $content The raw content to render.
+     * @param string|FormatParsedInterface $content The raw content to render.
      * @param string|null $format The format of the content.
      *
      * @return string
      */
-    public function renderQuote(string $content, ?string $format): string
+    public function renderQuote($content, ?string $format): string
     {
+        if ($content instanceof FormatParsedInterface) {
+            $format = $content->getFormatKey();
+        }
         return $this->getFormatter($format)->renderQuote($content);
     }
 
     /**
      * Parse attachment data from a message.
      *
-     * @param string $content The content the parse.
+     * @param string|FormatParsedInterface $content The content the parse.
      * @param string|null $format The format of the content.
      *
      * @return Attachment[]
      */
-    public function parseAttachments(string $content, ?string $format): array
+    public function parseAttachments($content, ?string $format): array
     {
+        if ($content instanceof FormatParsedInterface) {
+            $format = $content->getFormatKey();
+        }
         return $this->getFormatter($format)->parseAttachments($content);
     }
 
     /**
      * Parse out the main image from some content.
      *
-     * @param string $content
+     * @param string|FormatParsedInterface $content
      * @param string|null $format
      *
      * @return array|null
      */
-    public function parseMainImage(string $content, ?string $format): ?array
+    public function parseMainImage($content, ?string $format): ?array
     {
         $images = $this->parseImages($content, $format);
         if (empty($images)) {
@@ -166,52 +243,64 @@ class FormatService
     /**
      * Parse images out of the post contents.
      *
-     * @param string $content
+     * @param string|FormatParsedInterface $content
      * @param string|null $format The format of the content.
      *
      * @return string[]
      */
-    public function parseImageUrls(string $content, ?string $format): array
+    public function parseImageUrls($content, ?string $format): array
     {
+        if ($content instanceof FormatParsedInterface) {
+            $format = $content->getFormatKey();
+        }
         return $this->getFormatter($format)->parseImageUrls($content);
     }
 
     /**
      * Parse image attributes out of the post contents.
      *
-     * @param string $content
+     * @param string|FormatParsedInterface $content
      * @param string|null $format The format of the content.
      *
      * @return array
      */
-    public function parseImages(string $content, ?string $format): array
+    public function parseImages($content, ?string $format): array
     {
+        if ($content instanceof FormatParsedInterface) {
+            $format = $content->getFormatKey();
+        }
         return $this->getFormatter($format)->parseImages($content);
     }
 
     /**
      * Parse out a list of headings from the post contents.
      *
-     * @param string $content The raw content to parse.
+     * @param string|FormatParsedInterface $content The raw content to parse.
      * @param string|null $format The format of the content.
      *
      * @return Heading[]
      */
-    public function parseHeadings(string $content, ?string $format): array
+    public function parseHeadings($content, ?string $format): array
     {
+        if ($content instanceof FormatParsedInterface) {
+            $format = $content->getFormatKey();
+        }
         return $this->getFormatter($format)->parseHeadings($content);
     }
 
     /**
      * Parse out a list of usernames mentioned in the post contents.
      *
-     * @param string $content The content the parse.
+     * @param string|FormatParsedInterface $content The content the parse.
      * @param string|null $format The format of the content.
      *
      * @return string[] A list of usernames.
      */
-    public function parseMentions(string $content, ?string $format, bool $skipTaggedContent = true): array
+    public function parseMentions($content, ?string $format, bool $skipTaggedContent = true): array
     {
+        if ($content instanceof FormatParsedInterface) {
+            $format = $content->getFormatKey();
+        }
         return $this->getFormatter($format)->parseMentions($content, $skipTaggedContent);
     }
 
@@ -230,14 +319,15 @@ class FormatService
             ->registerFormat(Formats\TextExFormat::FORMAT_KEY, Formats\TextExFormat::class)
             ->registerFormat(Formats\WysiwygFormat::FORMAT_KEY, Formats\WysiwygFormat::class)
             ->registerFormat(Formats\WysiwygFormat::ALT_FORMAT_KEY, Formats\WysiwygFormat::class)
-            ->registerFormat(Formats\DisplayFormat::FORMAT_KEY, Formats\DisplayFormat::class);
+            ->registerFormat(Formats\DisplayFormat::FORMAT_KEY, Formats\DisplayFormat::class)
+            ->registerFormat(Formats\Rich2Format::FORMAT_KEY, Formats\Rich2Format::class);
     }
 
     /**
      * Register a format type and the class name handles it.
      *
      * @param string $formatKey
-     * @param FormatInterface}string $format
+     * @param FormatInterface|string $format
      *
      * @return $this For method chaining.
      */
@@ -269,7 +359,7 @@ class FormatService
     /**
      * Get an instance of a formatter.
      *
-     * @param string $formatKey The key of the format to fetch.
+     * @param string|null $formatKey The key of the format to fetch.
      * @param bool $throw Whether or not to throw an exception if the format couldn't be found.
      *
      * @return FormatInterface
@@ -327,11 +417,14 @@ class FormatService
     /**
      * Parse out every user mention from a post.
      *
-     * @param string $body
+     * @param string|FormatParsedInterface $body
      * @return array Username mentioned in the post.
      */
-    public function parseAllMentions(string $body, ?string $format): array
+    public function parseAllMentions($body, ?string $format): array
     {
+        if ($body instanceof FormatParsedInterface) {
+            $format = $body->getFormatKey();
+        }
         return $this->getFormatter($format)->parseAllMentions($body);
     }
 }

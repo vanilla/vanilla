@@ -31,12 +31,14 @@ class PruneProcessor implements Processor
      * @param string $field The name of the date field to use to filter the prune.
      * @param string $pruneAfter A `strtotime()` expression to filter which records to prune.
      * @param int $limit The number of rows to delete with each prune.
+     * @param array $where Extra where clauses for pruning.
      */
-    public function __construct(string $field, string $pruneAfter = "30 days", int $limit = 10)
+    public function __construct(string $field, string $pruneAfter = "30 days", int $limit = 10, array $where = [])
     {
         $this->setPruneField($field);
         $this->setPruneAfter($pruneAfter);
         $this->setPruneLimit($limit);
+        $this->setPruneWhere($where);
     }
 
     /**
@@ -44,19 +46,14 @@ class PruneProcessor implements Processor
      */
     public function handle(Operation $operation, callable $stack)
     {
-        switch ($operation->getType()) {
-            case Operation::TYPE_INSERT:
-                $op = $this->operation;
-                try {
-                    $this->operation = $operation;
-                    $this->prune();
-                } finally {
-                    $this->operation = $op;
-                }
-                break;
+        $result = $stack($operation);
+
+        $this->operation = $operation;
+        if ($operation->getType() === Operation::TYPE_INSERT) {
+            $this->prune();
         }
 
-        return $stack($operation);
+        return $result;
     }
 
     /**

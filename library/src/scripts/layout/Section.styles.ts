@@ -65,6 +65,7 @@ export const generateSectionClasses = (props: {
         flexGrow: 1,
         width: percent(100),
         justifyContent: "space-between",
+        alignSelf: "stretch",
     });
 
     const panel = style("panel", {

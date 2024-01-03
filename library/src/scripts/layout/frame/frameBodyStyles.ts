@@ -51,6 +51,10 @@ export const frameBodyClasses = useThemeCache(() => {
                 },
             },
         },
+        "& .form-group:last-child": {
+            marginBottom: 0,
+            borderBottom: "none",
+        },
     });
 
     const framePaddings = style("framePaddings", {
@@ -78,6 +82,10 @@ export const frameBodyClasses = useThemeCache(() => {
         fontSize: importantUnit(globalVars.fonts.size.medium),
         minHeight: styleUnit(50),
         color: ColorsUtils.colorOut(globalVars.mainColors.fg),
+
+        "& p:last-child": {
+            marginBottom: 0,
+        },
     });
     return {
         root,

@@ -100,6 +100,7 @@ class DraftsApiController extends AbstractApiController
                     "description" => "The type of record associated with this draft.",
                     "enum" => ["comment", "discussion"],
                 ],
+                "type:s" => "discussion type",
                 "parentRecordID:i|n" => "The unique ID of the intended parent to this record.",
                 "attributes:o" => "A free-form object containing all custom data for this draft.",
                 "insertUserID:i" => "The unique ID of the user who created this draft.",
@@ -223,6 +224,9 @@ class DraftsApiController extends AbstractApiController
                 case "comment":
                     if ($query["parentRecordID"] !== null) {
                         $where["DiscussionID"] = $query["parentRecordID"];
+                        $orderFields = "DateUpdated";
+                        $orderDirection = "desc";
+                        $commentDraft = true;
                     } else {
                         $where["DiscussionID >"] = 0;
                     }
@@ -237,7 +241,16 @@ class DraftsApiController extends AbstractApiController
         }
 
         [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
-        $rows = $this->draftModel->getWhere($where, "", "asc", $limit, $offset)->resultArray();
+        $rows = $this->draftModel
+            ->getWhere($where, $orderFields ?? "", $orderDirection ?? "asc", $limit, $offset)
+            ->resultArray();
+
+        // If there are multiple drafts for the same comment, only return the first one.
+        if ($commentDraft ?? false) {
+            if (count($rows) > 0) {
+                $rows = [$rows[0]];
+            }
+        }
 
         foreach ($rows as &$row) {
             $row = $this->normalizeOutput($row);
@@ -301,6 +314,8 @@ class DraftsApiController extends AbstractApiController
         $out = $this->schema($this->fullSchema(), "out");
 
         $body = $in->validate($body);
+        $body["attributes"]["format"] = $body["attributes"]["format"] ?? "Text";
+
         $draftData = $this->normalizeInput($body);
         $draftID = $this->draftModel->save($draftData);
         $this->validateModel($this->draftModel);
@@ -335,9 +350,8 @@ class DraftsApiController extends AbstractApiController
             $dbRecord["RecordType"] = "discussion";
             $attributes = $discussionAttributes;
         }
-
-        $dbRecord["Attributes"] = array_intersect_key($dbRecord, array_flip($attributes));
         $dbRecord["ParentRecordID"] = $parentRecordID;
+        $dbRecord["Attributes"] = array_intersect_key($dbRecord, array_flip($attributes));
 
         // Remove redundant attribute columns on the row.
         foreach (array_merge($commentAttributes, $discussionAttributes) as $col) {
@@ -376,7 +390,7 @@ class DraftsApiController extends AbstractApiController
                 $schemaRecord["tags"] = implode(",", $schemaRecord["tags"]);
             }
         }
-
+        $schemaRecord["Type"] = $recordType;
         switch ($recordType) {
             case "comment":
                 if (array_key_exists("parentRecordID", $schemaRecord)) {

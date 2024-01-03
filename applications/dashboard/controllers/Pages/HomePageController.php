@@ -7,9 +7,13 @@
 
 namespace Vanilla\Dashboard\Controllers\Pages;
 
-use Vanilla\Layout\Asset\LayoutFormAsset;
+use Garden\Hydrate\DataHydrator;
+use Gdn;
+use Vanilla\Layout\Asset\LayoutQuery;
 use Vanilla\Layout\LayoutPage;
+use Vanilla\Site\DefaultSiteSection;
 use Vanilla\Site\SiteSectionModel;
+use Vanilla\Utility\Timers;
 use Vanilla\Web\PageDispatchController;
 
 /**
@@ -36,11 +40,15 @@ class HomePageController extends PageDispatchController
     public function index()
     {
         $siteSection = $this->siteSectionModel->getCurrentSiteSection();
-
-        $query = new LayoutFormAsset("home", "siteSection", (string) $siteSection->getSectionID(), [
-            "siteSectionID" => (string) $siteSection->getSectionID(),
-            "locale" => $siteSection->getContentLocale(),
-        ]);
+        $query = new LayoutQuery(
+            $siteSection->getSectionID() !== DefaultSiteSection::DEFAULT_ID ? "subcommunityHome" : "home",
+            "siteSection",
+            (string) $siteSection->getSectionID(),
+            [
+                "siteSectionID" => (string) $siteSection->getSectionID(),
+                "locale" => $siteSection->getContentLocale(),
+            ]
+        );
 
         return $this->usePage(LayoutPage::class)
             ->permission()

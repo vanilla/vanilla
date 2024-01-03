@@ -18,6 +18,12 @@ if (!function_exists("absoluteSource")) {
      * associated URL (ie. the page that the image appears on), and returns the
      * absolute source (including url & protocol) path.
      *
+     * WARNING: This function always returns a URL with `$srcPath` relative to the "basename" of `$url`.
+     * For example, absoluteSource('bar/baz.jpg', 'https://example.com/foo/index.html')
+     * will return https://example.com/foo/index.html/bar/baz.jpg, while it should actually return
+     * https://example.com/foo/bar/baz.jpg. Note that the "source" path should be relative to the second-to-last
+     * segment of the path, *unless* the base URL has a trailing slash. Consider using `UrlUtils::ensureAbsoluteUrl()`.
+     *
      * @param string $srcPath The source path to make absolute (if not absolute already).
      * @param string $url The full url to the page containing the src reference.
      * @return string Absolute source path.
@@ -359,6 +365,9 @@ if (!function_exists("check_utf8")) {
      */
     function check_utf8($str)
     {
+        if (!is_string($str)) {
+            return false;
+        }
         $len = strlen($str);
         for ($i = 0; $i < $len; $i++) {
             $c = ord($str[$i]);

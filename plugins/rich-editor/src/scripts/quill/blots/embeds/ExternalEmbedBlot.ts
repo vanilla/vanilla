@@ -4,10 +4,10 @@
  * @license GPL-2.0-only
  */
 
-import { IBaseEmbedProps } from "@library/embeddedContent/embedService";
+import { IBaseEmbedProps } from "@library/embeddedContent/embedService.register";
 import { EMBED_FOCUS_CLASS } from "@library/embeddedContent/embedConstants";
 import { getData, setData } from "@vanilla/dom-utils";
-import { mountEmbed } from "@library/embeddedContent/embedService";
+import { mountEmbed } from "@library/embeddedContent/embedService.loadable";
 import ProgressEventEmitter from "@library/utility/ProgressEventEmitter";
 import ErrorBlot, { ErrorBlotType, IErrorData } from "@rich-editor/quill/blots/embeds/ErrorBlot";
 import LoadingBlot from "@rich-editor/quill/blots/embeds/LoadingBlot";

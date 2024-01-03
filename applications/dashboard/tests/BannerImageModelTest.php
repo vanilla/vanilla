@@ -123,7 +123,7 @@ class BannerImageModelTest extends TestCase
      */
     public function testGetCurrent()
     {
-        $uploadPrefix = "http://vanilla.test/bannerimagemodeltest/uploads/";
+        $uploadPrefix = "https://vanilla.test/bannerimagemodeltest/uploads/";
         $router = self::container()->get(\Gdn_Router::class);
         $defaultSection = new DefaultSiteSection(
             new MockConfig([

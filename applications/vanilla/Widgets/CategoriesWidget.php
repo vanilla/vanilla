@@ -1,12 +1,19 @@
 <?php
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 namespace Vanilla\Forum\Widgets;
 
+use CategoriesApiController;
+use CategoryModel;
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
+use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\NotFoundException;
+use Vanilla\Exception\PermissionException;
+use Vanilla\Http\InternalClient;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\Layout\HydrateAwareInterface;
 use Vanilla\Layout\HydrateAwareTrait;
@@ -14,9 +21,11 @@ use Vanilla\Site\SiteSectionModel;
 use Vanilla\Utility\SchemaUtils;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Widgets\HomeWidgetContainerSchemaTrait;
+use Vanilla\Widgets\React\FilterableWidgetTrait;
 use Vanilla\Widgets\WidgetSchemaTrait;
 use Vanilla\Widgets\React\CombinedPropsWidgetInterface;
 use Vanilla\Widgets\React\CombinedPropsWidgetTrait;
+use Gdn;
 
 /**
  * Class CategoriesWidget
@@ -28,44 +37,41 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
     use WidgetSchemaTrait;
     use HydrateAwareTrait;
     use CategoriesWidgetTrait;
+    use FilterableWidgetTrait;
 
-    public const FILTER_CATEGORY = "category";
-    public const FILTER_PARENT_CATEGORY = "parentCategory";
-    public const FILTER_SITE_SECTION = "siteSection";
-    public const FILTER_CURRENT_SITE_SECTION = "currentSiteSection";
-    public const FILTER_CURRENT_CATEGORY = "currentCategory";
-    public const FILTER_NONE = "none";
+    /** @var InternalClient */
+    private InternalClient $api;
 
-    /** @var \CategoriesApiController */
-    private $api;
-
-    /** @var \CategoryModel */
-    private $categoryModel;
+    /** @var CategoryModel */
+    private CategoryModel $categoryModel;
 
     /** @var SiteSectionModel */
-    private $siteSectionModel;
+    private SiteSectionModel $siteSectionModel;
 
     /** @var ImageSrcSetService */
-    private $imageSrcSetService;
+    private ImageSrcSetService $imageSrcSetService;
 
     /**
      * DI.
      *
-     * @param \CategoriesApiController $api
-     * @param \CategoryModel $categoryModel
+     * @param InternalClient $api
+     * @param CategoryModel $categoryModel
      * @param SiteSectionModel $siteSectionModel
      * @param ImageSrcSetService $imageSrcSetService
      */
     public function __construct(
-        \CategoriesApiController $api,
-        \CategoryModel $categoryModel,
+        InternalClient $api,
+        CategoryModel $categoryModel,
         SiteSectionModel $siteSectionModel,
         ImageSrcSetService $imageSrcSetService
     ) {
+        parent::__construct();
+
         $this->api = $api;
         $this->categoryModel = $categoryModel;
         $this->siteSectionModel = $siteSectionModel;
         $this->imageSrcSetService = $imageSrcSetService;
+        $this->addChildComponentName("CategoryFollowWidget");
     }
 
     /**
@@ -104,96 +110,132 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
      * Get props for component
      *
      * @return array
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function getProps(): ?array
     {
-        $validatedParams = $this->getApiSchema()->validate((array) $this->props["apiParams"]);
-        $this->props["apiParams"] = array_merge((array) $this->props["apiParams"], $validatedParams);
+        $this->props["apiParams"] = $this->props["apiParams"] ?? [];
+        $this->props["apiParams"]["filter"] = $this->props["apiParams"]["filter"] ?? "none";
 
-        $filter = $this->props["apiParams"]["filter"];
-        $categoryIDs = null;
+        $apiParams = $this->props["apiParams"];
 
-        switch ($filter) {
-            case self::FILTER_CATEGORY:
-                $categoryIDs = count($this->props["apiParams"]["categoryID"])
-                    ? $this->props["apiParams"]["categoryID"]
-                    : null;
-                break;
-            case self::FILTER_PARENT_CATEGORY:
-                $categoryIDs = $this->categoryModel
-                    ->getCollection()
-                    ->getChildIDs([$this->props["apiParams"]["parentCategoryID"] ?? -1]);
-                break;
-            case self::FILTER_SITE_SECTION:
-                $siteSection = $this->siteSectionModel->getByID($this->props["apiParams"]["siteSectionID"] ?? "");
-                $siteSectionCategoryID = $siteSection ? $siteSection->getCategoryID() : -1;
-                $categoryIDs = $this->categoryModel->getCollection()->getChildIDs([$siteSectionCategoryID]);
-                break;
-            case self::FILTER_CURRENT_CATEGORY:
-                $parentCategoryID = $this->getHydrateParam("category.categoryID") ?? -1;
-                $categoryIDs =
-                    $parentCategoryID === -1
-                        ? null
-                        : $this->categoryModel->getCollection()->getChildIDs([$parentCategoryID]);
-                break;
-            case self::FILTER_CURRENT_SITE_SECTION:
-                $siteSectionID = $this->getHydrateParam("siteSection.sectionID");
-                $siteSection = $this->siteSectionModel->getByID($siteSectionID);
-                $siteSectionCategoryID = $siteSection->getCategoryID();
-                $categoryIDs =
-                    $siteSectionCategoryID === -1
-                        ? null
-                        : $this->categoryModel->getCollection()->getChildIDs([$siteSectionCategoryID]);
-                break;
-            case self::FILTER_NONE:
-                break;
+        $followedFilter = $apiParams["followed"] ?? null;
+
+        $params["followed"] = $followedFilter;
+        $params["expand"] = "all";
+
+        if ($followedFilter) {
+            // Forcing ourselves to be flat.
+            $params["outputFormat"] = "flat";
+            $params["limit"] = 500;
+        } else {
+            $params["outputFormat"] = "tree";
+            $params["maxDepth"] = 4;
         }
 
-        //get the categories
-        $categories = $this->api
-            ->index([
-                "categoryID" => $categoryIDs,
-                "limit" => $this->props["apiParams"]["limit"] ?? null,
-                "followed" => $this->props["apiParams"]["followed"] ?? null,
-                "featured" => $this->props["apiParams"]["featured"] ?? null,
-            ])
-            ->getData();
+        $apiParams = $this->kludgeLegacyApiParams($apiParams);
 
-        $this->props["itemData"] = array_map(function ($category) {
-            $fallbackImage = $this->props["itemOptions"]["fallbackImage"] ?? null;
-            $fallbackImage = $fallbackImage ?: null;
-            $imageUrl = $category["bannerUrl"] ?? $fallbackImage;
-            $imageUrlSrcSet = $category["bannerUrlSrcSet"] ?? null;
-            if (!$imageUrlSrcSet && $fallbackImage && $this->imageSrcSetService) {
-                $imageUrlSrcSet = $this->imageSrcSetService->getResizedSrcSet($imageUrl);
-            }
+        $expectedFields = [];
+        switch ($apiParams["filter"]) {
+            case "subcommunity":
+                if ($apiParams["filterSubcommunitySubType"] == "contextual") {
+                    // "Contexual" filtering
+                    $params["siteSectionID"] = $this->getHydrateParam("siteSection.sectionID");
+                } elseif ($apiParams["filterSubcommunitySubType"] == "set") {
+                    // "Set" filtering
+                    // `0` is default site section.
+                    $siteSection = $this->siteSectionModel->getByID($apiParams["siteSectionID"] ?? 0);
+                    $params["siteSectionID"] = $siteSection->getSectionID();
+                }
 
-            $fallbackIcon = $this->props["itemOptions"]["fallbackIcon"] ?? null;
-            $fallbackIcon = $fallbackIcon ?: null;
-            $iconUrl = $category["iconUrl"] ?? $fallbackIcon;
-            $iconUrlSrcSet = $category["iconUrlSrcSet"] ?? null;
-            if (!$iconUrlSrcSet && $fallbackIcon && $this->imageSrcSetService) {
-                $iconUrlSrcSet = $this->imageSrcSetService->getResizedSrcSet($iconUrl);
-            }
+                $expectedFields = ["filter", "filterSubcommunitySubType", "siteSectionID", "followed"];
+                break;
+            case "category":
+                if ($apiParams["filterCategorySubType"] == "contextual") {
+                    // "Contexual" filtering
+                    $params["parentCategoryID"] =
+                        $this->getHydrateParam("category.categoryID") ?? $this->categoryModel::ROOT_ID;
+                } elseif ($apiParams["filterCategorySubType"] == "set") {
+                    // "Set" filtering
+                    $params["parentCategoryID"] = $apiParams["categoryID"] ?? null;
+                }
 
-            return [
-                "to" => $category["url"],
-                "iconUrl" => $iconUrl,
-                "iconUrlSrcSet" => $iconUrlSrcSet,
-                "imageUrl" => $imageUrl,
-                "imageUrlSrcSet" => $imageUrlSrcSet,
-                "name" => $category["name"],
-                "description" => $category["description"] ?? "",
-                "counts" => [
-                    [
-                        "labelCode" => "discussions",
-                        "count" => (int) $category["countAllDiscussions"] ?? 0,
-                    ],
-                ],
-            ];
-        }, $categories);
+                $expectedFields = ["filter", "filterCategorySubType", "categoryID", "followed"];
+                break;
+            case "featured":
+                $params["categoryID"] = $apiParams["featuredCategoryID"];
+                $expectedFields = ["filter", "featuredCategoryID"];
+                break;
+            case "none":
+                $expectedFields = ["filter", "followed"];
+                break;
+        }
+        // Cleanup
+        $this->props["apiParams"] = array_intersect_key($this->props["apiParams"], array_flip($expectedFields));
+
+        // Get the categories
+        $categories = $this->api->get("/categories", $params)->getBody();
+
+        $this->props["itemData"] = $this->mapCategoryToItem($categories);
 
         return $this->props;
+    }
+
+    /**
+     * Given the API params that could be from an old version of the widget, we need to convert them to the new ones.
+     *
+     * @param array $apiParams
+     * @return array
+     */
+    function kludgeLegacyApiParams(array $apiParams): array
+    {
+        // Compatibility layer. With release 2023.022 we changed category filter values, so we need to convert the previous filter values into right ones
+        // Previously the property `categoryID` indicated one or more categories that should appear in the widget.
+        if (
+            (!is_array($apiParams["featuredCategoryID"] ?? null) || count($apiParams["featuredCategoryID"]) == 0) &&
+            is_array($apiParams["categoryID"] ?? null) &&
+            count($apiParams["categoryID"]) > 0
+        ) {
+            $apiParams["filter"] = "featured";
+            $apiParams["featuredCategoryID"] = $apiParams["categoryID"];
+            $apiParams["categoryID"] = null;
+        }
+
+        // `parentCategory` into `category`
+        if ($apiParams["filter"] === "parentCategory" && $apiParams["parentCategoryID"] ?? null) {
+            $apiParams["filter"] = "category";
+            $apiParams["categoryID"] = $apiParams["parentCategoryID"];
+            $apiParams["parentCategoryID"] = null;
+        }
+        // `siteSection` into `subcommunity` with subType `set`
+        if ($apiParams["filter"] === "siteSection" && $apiParams["siteSectionID"] ?? null) {
+            $apiParams["filter"] = "subcommunity";
+            $apiParams["filterSubcommunitySubType"] = "set";
+        }
+        // `currentSiteSection` into `subcommunity` with subType `contextual`
+        if ($apiParams["filter"] === "currentSiteSection" ?? null) {
+            $apiParams["filter"] = "subcommunity";
+            $apiParams["filterSubcommunitySubType"] = "contextual";
+            $apiParams["currentSiteSection"] = null;
+        }
+        // `currentCategory` into `none` as we don't have equivalents for this now
+        if ($apiParams["currentCategory"] ?? null) {
+            $apiParams["filter"] = "none";
+            $apiParams["currentCategory"] = null;
+        }
+
+        return $apiParams;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function renderSeoHtml(array $props): ?string
+    {
+        return $this->renderWidgetContainerSeoContent($props, $this->renderSeoLinkList($props["itemData"]));
     }
 
     /**
@@ -201,15 +243,64 @@ class CategoriesWidget extends AbstractReactModule implements CombinedPropsWidge
      */
     public static function getWidgetSchema(): Schema
     {
+        $filterTypeSchemaExtraOptions = self::getfilterTypeSchemaExtraOptions();
+
         return SchemaUtils::composeSchemas(
             self::widgetTitleSchema(),
             self::widgetDescriptionSchema(),
             self::widgetSubtitleSchema("subtitle"),
             Schema::parse([
-                "apiParams" => self::getApiSchema(),
+                "apiParams?" => SchemaUtils::composeSchemas(
+                    self::filterTypeSchema(
+                        ["subcommunity", "category", "featured", "none"],
+                        true,
+                        $filterTypeSchemaExtraOptions
+                    ),
+                    // this bit is a kludge for widgets prior to 2023.022 release, so if the widget had `parentCategoryID`
+                    // we will adjust its value to `categoryID` as it's the new filter value we use
+                    Schema::parse([
+                        "parentCategoryID?" => [
+                            "type" => ["integer", "string", "null"],
+                            "description" => "Parent Category ID",
+                        ],
+                    ])
+                ),
             ]),
             self::containerOptionsSchema("containerOptions"),
+            self::optionsSchema(),
             self::itemOptionsSchema("itemOptions", self::getFallbackImageSchema())
         );
+    }
+
+    /**
+     * Return filterTypeSchemaExtraOptions depending on the current `layoutViewType`.
+     *
+     * @return array|false[]
+     */
+    private static function getfilterTypeSchemaExtraOptions(): array
+    {
+        // We may have a provided `layoutViewType`, or not.
+        $layoutViewType = Gdn::request()->get("layoutViewType", false);
+        switch ($layoutViewType) {
+            case "home":
+                $filterTypeSchemaExtraOptions = [
+                    "hasSubcommunitySubTypeOptions" => false,
+                    "hasCategorySubTypeOptions" => false,
+                ];
+                break;
+            case "subcommunityHome":
+            case "discussionList":
+            case "categoryList":
+                $filterTypeSchemaExtraOptions = [
+                    "hasCategorySubTypeOptions" => false,
+                ];
+                break;
+            case "discussionCategoryPage":
+            case "nestedCategoryList":
+            default:
+                $filterTypeSchemaExtraOptions = [];
+                break;
+        }
+        return $filterTypeSchemaExtraOptions;
     }
 }

@@ -40,9 +40,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver
      * DI.
      *
      * @param ConfigurationInterface $config
-     * @param Gdn_Cache $cache
+     * @param \Psr\SimpleCache\CacheInterface $cache
      */
-    public function __construct(ConfigurationInterface $config, Gdn_Cache $cache)
+    public function __construct(ConfigurationInterface $config, \Psr\SimpleCache\CacheInterface $cache)
     {
         parent::__construct();
         $this->config = $config;
@@ -50,11 +50,9 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver
     }
 
     /**
-     * Apply a cache for the table structures.
-     *
-     * @param Gdn_Cache $cache
+     * @param \Psr\SimpleCache\CacheInterface $cache
      */
-    public function setCache(Gdn_Cache $cache): void
+    public function setCache(\Psr\SimpleCache\CacheInterface $cache)
     {
         $this->modelCache = new ModelCache("mysql", $cache);
     }
@@ -212,7 +210,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver
                 return $schemaData;
             },
             [
-                ModelCache::OPT_TTL => 60,
+                ModelCache::OPT_TTL => 10 * 60,
             ]
         );
         return $result;

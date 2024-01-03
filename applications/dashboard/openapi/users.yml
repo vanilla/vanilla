@@ -54,11 +54,47 @@ paths:
                   in: query
                   schema:
                       type: integer
+                - name: roleIDs[]
+                  description: Filter by one of multiple role IDs.
+                  in: query
+                  schema:
+                      type: array
+                      items:
+                          type: integer
+                - name: rankIDs[]
+                  description: Filter by one of multiple rank IDs.
+                  in: query
+                  schema:
+                      type: array
+                      items:
+                          type: integer
                 - name: userID
                   description: Filter by a range or CSV of user IDs.
                   in: query
                   schema:
                       $ref: "#/components/schemas/RangeExpression"
+                - name: name
+                  description: Filter by the user's username.
+                  in: query
+                  schema:
+                      type: string
+                - name: email
+                  description: Filter by the user's email address.
+                  in: query
+                  schema:
+                      type: string
+                - name: query
+                  description: Filter by the user's email address or username.
+                  in: query
+                  schema:
+                      type: string
+                - name: ipAddresses[]
+                  description: Filter by the user's associated IP addresses
+                  in: query
+                  schema:
+                      items:
+                          type: string
+                      type: array
                 - $ref: "#/components/parameters/Page"
                 - description: |
                       Desired number of items per page.
@@ -69,6 +105,13 @@ paths:
                       default: 30
                       maximum: 500
                       minimum: 1
+                - description: |
+                      Token used to fetch next page of results. Cannot be combined with page.
+                      Warning: May lead to duplicate results if not sorted by primary key.
+                  in: query
+                  name: cursor
+                  schema:
+                      type: string
                 - name: sort
                   in: query
                   description: Sort the results.
@@ -79,12 +122,25 @@ paths:
                           - dateLastActive
                           - name
                           - userID
+                          - points
+                          - countPosts
                           - -dateInserted
                           - -dateLastActive
                           - -name
                           - -userID
+                          - -points
+                          - -countPosts
+                - name: fields[]
+                  description: >
+                      Fields that will be included in the response.
+                  in: query
+                  schema:
+                      items:
+                          type: string
+                      type: array
+                  style: form
                 - $ref: "#/components/parameters/UserExpand"
-                - $ref: "#/components/parameters/ExtendedQuerySchema"
+                - $ref: "#/components/parameters/ProfileFieldFilters"
             responses:
                 "200":
                     content:
@@ -191,6 +247,9 @@ paths:
                                           isAdmin:
                                               description: Whether or not the user is a global admin.
                                               type: boolean
+                                          isSysAdmin:
+                                              description: Whether or not the user is a system admin.
+                                              type: boolean
                                           permissions:
                                               description: Global permissions available to the current user.
                                               type: array
@@ -204,6 +263,7 @@ paths:
                                               type: integer
                                       required:
                                           - isAdmin
+                                          - isSysAdmin
                                           - permissions
                     description: Success
             tags:
@@ -363,6 +423,7 @@ paths:
                       items:
                           enum:
                               - rank
+                              - discoveryText
                               - all
                           type: string
                       type: array
@@ -741,9 +802,6 @@ paths:
                                         source:
                                             description: The score's source (Total, Badges, etc.) for the requested Slot type.
                                             type: string
-                                        categoryID:
-                                            description: The category on which the leaderboard is based on.
-                                            type: integer
                                         userID:
                                             description: ID of the user.
                                             type: integer
@@ -900,22 +958,22 @@ components:
                     enum:
                         - rank
                         - all
+                        - profileFields
+                        - extended
+                        - discoveryText
                     type: string
                 type: array
             style: form
-        ExtendedQuerySchema:
+        ProfileFieldFilters:
             x-hidden: true
-            name: extended
-            description: >
-                Profile field values to filter users.
-                Multiple values can be passed in as comma-separated values.
+            name: profileFields
+            description: Filter by users' profile field values.
             in: query
             schema:
                 type: object
                 properties:
-                    extended:
+                    profileFields:
                         type: object
-                        description: extended
 
     schemas:
         User:
@@ -936,6 +994,9 @@ components:
                     description: Email address of the user.
                     minLength: 0
                     type: string
+                hashMethod:
+                    type: string
+                    description: Hashing mechanism used for this user's password.
                 roles:
                     items:
                         $ref: "schemas.yml#/components/schemas/RoleFragment"
@@ -997,6 +1058,19 @@ components:
                 showEmail:
                     description: Is the email address visible to other users?
                     type: boolean
+                insertIPAddress:
+                    description: First IP address of this user. Only visible to site administrators.
+                    type: string
+                lastIPAddress:
+                    description: Last known IP address of this user. Only visible to site administrators.
+                    type: string
+                countVisits:
+                    description: Number of visits the user has made to the site.
+                    type: integer
+                inviteUserID:
+                    description: UserID of the user that invited this user if applicable.
+                    type: integer
+                    nullable: true
             required:
                 - userID
                 - name
@@ -1024,6 +1098,9 @@ components:
                 emailConfirmed:
                     description: Has the email address for this user been confirmed?
                     type: boolean
+                showEmail:
+                    description: Is the email address visible to other users?
+                    type: boolean
                 name:
                     description: Name of the user.
                     minLength: 1
@@ -1031,6 +1108,12 @@ components:
                 password:
                     description: Password of the user.
                     minLength: 1
+                    type: string
+                resetPassword:
+                    description: Set to true to reset the user's password and send them a notification email.
+                    type: boolean
+                passwordConfirmation:
+                    description: Required when editing your own profile and when a password is associated with the account.
                     type: string
                 photo:
                     description: Raw photo field value from the user record.
@@ -1042,6 +1125,15 @@ components:
                     items:
                         type: integer
                     type: array
+                profileFields:
+                    $ref: "#/components/schemas/UserProfileFields"
+                private:
+                    description: Is the profile visible to other users?
+                    type: boolean
+                    default: false
+                banned:
+                    description: Set the banned status of the user.
+                    type: boolean
         UserPost:
             type: object
             properties:
@@ -1053,9 +1145,16 @@ components:
                     description: Email address of the user.
                     minLength: 1
                     type: string
+                showEmail:
+                    description: Is the email address visible to other users?
+                    type: boolean
                 emailConfirmed:
                     default: true
                     description: Has the email address for this user been confirmed?
+                    type: boolean
+                sendWelcomeEmail:
+                    default: true
+                    description: Send welcome email?
                     type: boolean
                 name:
                     description: Name of the user.
@@ -1075,6 +1174,12 @@ components:
                     items:
                         type: integer
                     type: array
+                private:
+                    description: Is the profile visible to other users?
+                    type: boolean
+                    default: false
+                profileFields:
+                    $ref: "#/components/schemas/UserProfileFields"
             required:
                 - name
                 - email
@@ -1095,6 +1200,10 @@ components:
                     type: string
                 url:
                     description: URL to the badge photo.
+                    type: string
+                dateInserted:
+                    description: Date the badge was awarded.
+                    format: date-time
                     type: string
         UserProfileFields:
             type: object

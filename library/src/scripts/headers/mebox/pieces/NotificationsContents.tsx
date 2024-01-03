@@ -5,13 +5,13 @@
  */
 
 import React from "react";
-import Loadable from "react-loadable";
 import Loader from "@library/loaders/Loader";
 import { loaderClasses } from "@library/loaders/loaderStyles";
+import { createLoadableComponent } from "@vanilla/react-utils";
 
-const NotificationContents = Loadable({
-    loader: () => import(/* webpackChunkName: "mebox/notifications" */ "./NotificationsContentsImpl"),
-    loading() {
+const NotificationContents = createLoadableComponent({
+    loadFunction: () => import(/* webpackChunkName: "mebox/notifications" */ "./NotificationsContentsImpl"),
+    fallback() {
         return <Loader size={100} loaderStyleClass={loaderClasses().mediumLoader} />;
     },
 });

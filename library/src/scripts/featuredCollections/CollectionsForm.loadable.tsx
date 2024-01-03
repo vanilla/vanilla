@@ -6,6 +6,7 @@
 
 import { cx } from "@emotion/css";
 import { LoadStatus } from "@library/@types/api/core";
+import Translate from "@library/content/Translate";
 import { ICollectionResource } from "@library/featuredCollections/Collections.variables";
 import { collectionsFormClasses } from "@library/featuredCollections/CollectionsForm.styles";
 import {
@@ -104,9 +105,16 @@ export function CollectionsFormLoadable(props: IProps) {
             newCollections: [],
         },
         onSubmit: async (formValues, helpers) => {
+            const previousCollectionIDs = resourceCollections.data
+                ? resourceCollections.data?.map(({ collectionID }) => collectionID)
+                : [];
             const collectionIDs = formValues.collections.map(({ value }) => value);
             // filter out blank values from the list of new collections
             const newCollections = formValues.newCollections.filter((name) => isFieldValid(name) && name.length > 0);
+            // get the collections that the resource was removed from
+            const removeCollections = previousCollectionIDs.filter((id) => collectionIDs.indexOf(id) < 0);
+            // get the existing collections that the resource was added to
+            const addCollections = collectionIDs.filter((id) => previousCollectionIDs?.indexOf(id) < 0);
 
             try {
                 await putCollections(collectionIDs);
@@ -115,14 +123,28 @@ export function CollectionsFormLoadable(props: IProps) {
                     await postCollections(newCollections);
                 }
 
+                const addCollectionCount = addCollections.length + newCollections.length;
+                const removeCollectionCount = removeCollections.length;
+                const addMessage = addCollectionCount > 1 ? "Added to <0/> collections" : "Added to 1 collection.";
+                const removeMessage =
+                    removeCollectionCount > 1 ? "Removed from <0/> collections." : "Removed from 1 collection.";
+
                 addToast({
                     autoDismiss: true,
                     body: (
                         <>
-                            {t(
-                                `Success! You added ${
-                                    props.record?.name ? `"${props.record?.name}"` : "the item"
-                                } to Collections.`,
+                            {t("Success!")}
+                            {addCollectionCount > 0 && (
+                                <>
+                                    {" "}
+                                    <Translate source={addMessage} c0={addCollectionCount} />
+                                </>
+                            )}
+                            {removeCollectionCount > 0 && (
+                                <>
+                                    {" "}
+                                    <Translate source={removeMessage} c0={removeCollectionCount} />
+                                </>
                             )}
                         </>
                     ),
@@ -215,7 +237,7 @@ export function CollectionsFormLoadable(props: IProps) {
                                         <div key={idx}>
                                             <div className={classes.newCollection}>
                                                 <TextInput
-                                                    inputRef={
+                                                    ref={
                                                         idx === countNewCollections - 1 ? lastCollectionRef : undefined
                                                     }
                                                     id={`${idx}-newCollection`}

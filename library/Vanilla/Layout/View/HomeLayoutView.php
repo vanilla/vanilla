@@ -8,6 +8,11 @@
 namespace Vanilla\Layout\View;
 
 use Garden\Schema\Schema;
+use Gdn;
+use Vanilla\Formatting\Formats\HtmlFormat;
+use Vanilla\Forum\Navigation\ForumCategoryRecordType;
+use Vanilla\Navigation\Breadcrumb;
+use Vanilla\Navigation\BreadcrumbModel;
 use Vanilla\Web\PageHeadInterface;
 
 /**
@@ -34,7 +39,7 @@ class HomeLayoutView extends AbstractCustomLayoutView
     /**
      * @inheritdoc
      */
-    public function getLayoutID(): string
+    public function getTemplateID(): string
     {
         return "home";
     }
@@ -53,8 +58,12 @@ class HomeLayoutView extends AbstractCustomLayoutView
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
     {
         $resolvedParams = parent::resolveParams($paramInput, $pageHead);
-        $title = $pageHead->getSeoTitle();
-        $pageHead->setSeoTitle("Home - " . $title, false);
+
+        $pageHead->setSeoTitle(t("Home"), false);
+
+        $crumbs = [new Breadcrumb(t("Home"), "/")];
+
+        $pageHead->setSeoBreadcrumbs($crumbs);
         return $resolvedParams;
     }
 }

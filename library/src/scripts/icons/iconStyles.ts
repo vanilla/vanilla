@@ -455,11 +455,6 @@ export const iconClasses = useThemeCache(() => {
         height: styleUnit(vars.standard.height),
     });
 
-    const featureIcon = style("featureIcon", {
-        width: 22,
-        height: 22,
-    });
-
     const errorFgColor = style("errorFgColor", {
         color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
     });
@@ -657,7 +652,6 @@ export const iconClasses = useThemeCache(() => {
         discussionIcon,
         isSmall,
         hamburger,
-        featureIcon,
         documentation,
         /**
          * @deprecated

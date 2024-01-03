@@ -16,7 +16,8 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { important, percent } from "csx";
 import merge from "lodash/merge";
-import { CSSObject } from "@emotion/css";
+import { css, CSSObject } from "@emotion/css";
+import { IBorderStyles, ISimpleBorderStyle, IMixedBorderStyles } from "@library/styles/cssUtilsTypes";
 
 export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     const globalVars = globalVariables(forcedVars);
@@ -54,17 +55,27 @@ export const inputVariables = useThemeCache((forcedVars?: IThemeVariables) => {
     };
 });
 
-export const inputMixinVars = (vars?: { sizing?: any; font?: any; colors?: any; border?: any }) => {
+const inputMixinVars = (vars?: {
+    sizing?: any;
+    font?: any;
+    colors?: any;
+    border?: IBorderStyles | ISimpleBorderStyle | IMixedBorderStyles;
+}) => {
     const inputVars = inputVariables();
     return {
-        sizing: merge(inputVars.sizing, vars?.sizing ?? {}),
-        font: Variables.font(merge(inputVars.font, vars?.font ?? {})),
-        colors: merge(inputVars.colors, vars?.colors ?? {}),
-        border: merge(inputVars.border, vars?.border ?? {}),
+        sizing: merge({ ...inputVars.sizing }, vars?.sizing ?? {}),
+        font: Variables.font(merge({ ...inputVars.font }, vars?.font ?? {})),
+        colors: merge({ ...inputVars.colors }, vars?.colors ?? {}),
+        border: merge({ ...inputVars.border }, vars?.border ?? {}),
     };
 };
 
-export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; border?: any }): CSSObject => {
+export const inputMixin = (vars?: {
+    sizing?: any;
+    font?: any;
+    colors?: any;
+    border?: IBorderStyles | ISimpleBorderStyle | IMixedBorderStyles;
+}): CSSObject => {
     const variables = inputMixinVars(vars);
     const globalVars = globalVariables();
     const {
@@ -83,46 +94,52 @@ export const inputMixin = (vars?: { sizing?: any; font?: any; colors?: any; bord
         ...Mixins.border(border),
         ...Mixins.font(font),
         outline: 0,
-        ...{
-            ...placeholderStyles({
-                color: ColorsUtils.colorOut(colors.placeholder),
-            }),
-            ".SelectOne__input": {
-                width: percent(100),
-            },
-            ".SelectOne__placeholder": {
-                color: ColorsUtils.colorOut(formElementsVariables().placeholder.color),
-            },
-            ".tokens__placeholder": {
-                color: ColorsUtils.colorOut(formElementsVariables().placeholder.color),
-            },
-            ".SelectOne__input input": {
-                display: "inline-block",
-                width: important(`100%`),
-                overflow: "hidden",
-                lineHeight: undefined,
-                minHeight: 0,
-            },
-            "&:active, &:hover, &:focus, &.focus-visible": {
+        ...placeholderStyles({
+            color: ColorsUtils.colorOut(colors.placeholder),
+        }),
+        ".SelectOne__input": {
+            width: percent(100),
+        },
+        ".SelectOne__placeholder": {
+            color: ColorsUtils.colorOut(formElementsVariables().placeholder.color),
+        },
+        ".tokens__placeholder": {
+            color: ColorsUtils.colorOut(formElementsVariables().placeholder.color),
+        },
+        ".SelectOne__input input": {
+            display: "inline-block",
+            width: important(`100%`),
+            overflow: "hidden",
+            lineHeight: undefined,
+            minHeight: 0,
+        },
+        "&:not(:disabled)": {
+            "&:active, &:hover, &:focus, &.focus-visible, &:focus-within": {
                 ...Mixins.border({
                     ...border,
                     color: colors.state.fg,
                 }),
             },
-            "&.hasError": {
-                borderColor: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
-                backgroundColor: ColorsUtils.colorOut(globalVars.messageColors.error.bg),
-                color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
-            },
+        },
+        "&.hasError": {
+            borderColor: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+            backgroundColor: ColorsUtils.colorOut(globalVars.messageColors.error.bg),
+            color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+        },
+        "@media (max-width: 600px)": {
+            // To prevent needing to zoom in safari.
+            fontSize: globalVars.fonts.size.large,
         },
     };
 };
 
 export const inputClasses = useThemeCache(() => {
     const vars = inputVariables();
+    const variables = inputMixinVars(vars);
     const style = styleFactory("input");
     const formElementVars = formElementsVariables();
     const globalVars = globalVariables();
+    const { colors, border } = variables;
 
     const inputPaddingMixin: CSSObject = {
         padding: inputMixin().padding,
@@ -133,7 +150,9 @@ export const inputClasses = useThemeCache(() => {
     };
 
     // Use as assignable unique style.
-    const text = style("text", inputMixin());
+    const text = css({
+        ...inputMixin(),
+    });
 
     // Use as a global selector. This should be refactored in the future.
     const applyInputCSSRules = () => cssOut(" .inputText.inputText", inputMixin());
@@ -148,5 +167,44 @@ export const inputClasses = useThemeCache(() => {
         },
     });
 
-    return { text, inputText, inputPaddingMixin, inputMixin, applyInputCSSRules };
+    const inputWrapper = style("inputWrapper", {
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+    });
+
+    const inputContainer = style("inputContainer", {
+        flex: 1,
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        ...inputMixin(),
+        ...Mixins.padding({ all: 0 }),
+        "& input": {
+            ...inputMixin({ border: { style: "none" } }),
+            ...inputPaddingMixin,
+            flex: 1,
+            background: "none",
+        },
+    });
+
+    const errorIcon = style("invalidIcon", {
+        color: ColorsUtils.colorOut(globalVars.messageColors.error.fg),
+        minWidth: globalVars.icon.sizes.large,
+    });
+
+    const hugRight = css({
+        marginRight: -6,
+    });
+
+    return {
+        text,
+        inputText,
+        inputPaddingMixin,
+        applyInputCSSRules,
+        inputWrapper,
+        inputContainer,
+        errorIcon,
+        hugRight,
+    };
 });

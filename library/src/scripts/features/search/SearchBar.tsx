@@ -27,7 +27,7 @@ import { AsyncCreatable, components } from "react-select";
 import { MenuProps } from "react-select/lib/components/Menu";
 import { ActionMeta, InputActionMeta } from "react-select/lib/types";
 import { useSearchScope } from "@library/features/search/SearchScopeContext";
-import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
+import { useSearchSources } from "@library/search/SearchSourcesContext";
 import { PLACES_CATEGORY_TYPE, PLACES_KNOWLEDGE_BASE_TYPE, PLACES_GROUP_TYPE } from "@library/search/searchConstants";
 import { Icon } from "@vanilla/icons";
 import { cx } from "@emotion/css";
@@ -154,9 +154,7 @@ export default React.forwardRef(function SearchBar(
             // If we are provided with a custom spot to mount the menu, mount it there instead.
             Menu: resultsRef
                 ? function MenuWrapper(menuProps: any) {
-                      return (
-                          <SearchBarMenuPortal {...menuProps} mountRef={resultsRef!} isDisabled={props.disableMenu} />
-                      );
+                      return <SearchBarMenuPortal {...menuProps} mountRef={resultsRef!} />;
                   }
                 : selectOverrides.Menu,
             MenuList: selectOverrides.MenuList,
@@ -167,7 +165,7 @@ export default React.forwardRef(function SearchBar(
             LoadingMessage: selectOverrides.OptionLoader,
             Group: selectOverrides.Group,
         };
-    }, [optionComponent, resultsRef, props.disableMenu]);
+    }, [optionComponent, resultsRef]);
 
     const [options, setOptions] = useState<any[]>([]);
 
@@ -339,8 +337,8 @@ function SearchBarMenuPortal(
     overwriteSearchBar: ISearchBarOverwrites,
 ) {
     const classes = searchBarClasses(overwriteSearchBar);
-    const { mountRef, isDisabled } = props;
-    if (mountRef.current == null || isDisabled) {
+    const { mountRef } = props;
+    if (mountRef.current == null) {
         return null;
     }
 

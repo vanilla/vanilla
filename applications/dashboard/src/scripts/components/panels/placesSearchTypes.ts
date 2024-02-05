@@ -3,6 +3,7 @@
  * @license GPL-2.0-only
  */
 
-export interface IPlaceSearchTypes {
+export interface IPlacesSearchTypes {
     description?: string;
+    types?: string[];
 }

@@ -3617,8 +3617,6 @@ class UserModel extends Gdn_Model implements
             "profilePhotoUrl?",
             "url?",
             "points",
-            "isAdmin?",
-            "isSysAdmin?",
             "roles?",
             "showEmail",
             "userID",
@@ -3638,7 +3636,7 @@ class UserModel extends Gdn_Model implements
         $result->add($this->schema());
 
         if ($this->session->checkPermission("site.manage")) {
-            $adminOnlySchema = Schema::parse(["insertIPAddress?", "lastIPAddress?"]);
+            $adminOnlySchema = Schema::parse(["insertIPAddress?", "lastIPAddress?", "isAdmin?", "isSysAdmin?"]);
             $result = $result->merge($adminOnlySchema);
         }
 
@@ -5823,7 +5821,10 @@ SQL;
     {
         $user = $this->getID($userID, DATASET_TYPE_ARRAY);
         $result = val($attribute, $user["Attributes"], $defaultValue);
-
+        // return same default value type
+        if (is_array($defaultValue) && $result === false) {
+            $result = $defaultValue;
+        }
         return $result;
     }
 

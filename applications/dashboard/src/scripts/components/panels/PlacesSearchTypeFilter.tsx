@@ -6,10 +6,10 @@
 import React from "react";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import Checkbox from "@library/forms/Checkbox";
-import { useSearchForm } from "@library/search/SearchContext";
+import { useSearchForm } from "@library/search/SearchFormContext";
 import flatten from "lodash/flatten";
 import { onReady, t } from "@library/utility/appUtils";
-import { inputBlockClasses } from "@library/forms/InputBlockStyles";
+import { IPlacesSearchTypes } from "@dashboard/components/panels/placesSearchTypes";
 
 interface IProps {}
 
@@ -41,10 +41,10 @@ function difference(setA: Set<any>, setB: Set<any>) {
 }
 
 export function PlacesSearchTypeFilter(props: IProps) {
-    const { form, updateForm } = useSearchForm<{}>();
+    const { form, updateForm } = useSearchForm<IPlacesSearchTypes>();
     const registeredTypes = PlacesSearchTypeFilter.searchTypes;
-    const allTypes = flatten(registeredTypes.map((v) => v.values));
-    const allTypeSet = new Set(allTypes);
+    const allSupportedTypes = flatten(registeredTypes.map((v) => v.values));
+    const allSupportedTypesSet = new Set(allSupportedTypes);
 
     if (registeredTypes.length <= 1) {
         return null;
@@ -53,7 +53,6 @@ export function PlacesSearchTypeFilter(props: IProps) {
     const formTypes = form.types;
     const formTypeSet = new Set(formTypes ?? []);
 
-    const classesInputBlock = inputBlockClasses();
     return (
         <CheckboxGroup legend={t("What to search")} tight>
             {registeredTypes.map((registeredType, i) => {
@@ -65,25 +64,29 @@ export function PlacesSearchTypeFilter(props: IProps) {
                         label={registeredType.label}
                         key={i}
                         onChange={(e) => {
+                            let newTypes: string[] = [];
+
                             const newCheck = e.target.checked;
                             if (newCheck) {
                                 // This works because of the isSuperset check above
                                 const allNewTypeSet = union(valueSet, formTypeSet);
-                                updateForm({ types: Array.from(allNewTypeSet) });
+                                newTypes = Array.from(allNewTypeSet);
                             } else {
                                 // There are two cases: this is the last checked box in which case other
                                 // boxes needed to be checked, or this is not the last checked box.
                                 const remainingTypeSet = difference(formTypeSet, valueSet);
                                 if (remainingTypeSet.size === 0) {
-                                    const allNewTypeSet = difference(allTypeSet, valueSet);
-                                    updateForm({ types: Array.from(allNewTypeSet) as string[] });
+                                    const allNewTypeSet = difference(allSupportedTypesSet, valueSet);
+                                    newTypes = Array.from(allNewTypeSet);
                                 } else {
-                                    updateForm({ types: Array.from(remainingTypeSet) as string[] });
+                                    newTypes = Array.from(remainingTypeSet);
                                 }
                             }
+                            updateForm({
+                                types: Array.from(newTypes.filter((type) => allSupportedTypes.includes(type))),
+                            });
                         }}
                         checked={isChecked}
-                        className={classesInputBlock.root}
                     />
                 );
             })}
@@ -102,6 +105,7 @@ PlacesSearchTypeFilter.addSearchTypes = (searchType: IPlacesSearchType) => {
     PlacesSearchTypeFilter.searchTypes.push(searchType);
 };
 
+// Deferred to onReady for translation initialization.
 onReady(() => {
     PlacesSearchTypeFilter.addSearchTypes({
         label: t("Categories"),

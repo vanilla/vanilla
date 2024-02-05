@@ -14,8 +14,9 @@ import { bulkDiscussionsClasses } from "@library/features/discussions/forms/Bulk
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import Checkbox from "@library/forms/Checkbox";
+import InputBlock from "@library/forms/InputBlock";
 import RadioButton from "@library/forms/RadioButton";
-import RadioButtonGroup from "@library/forms/RadioButtonGroup";
+import { RadioGroupContext } from "@library/forms/RadioGroupContext";
 import { ErrorIcon } from "@library/icons/common";
 import Frame from "@library/layout/frame/Frame";
 import FrameBody from "@library/layout/frame/FrameBody";
@@ -192,34 +193,30 @@ function DiscussionSelector(props: IDiscussionSelectorProps) {
     }
 
     return (
-        <RadioButtonGroup legend={t("Choose the main discussion into which all comments will be merged:")}>
-            {discussions.status === LoadStatus.PENDING || discussions.status === LoadStatus.LOADING ? (
-                <RadioButtonGroup>
-                    {props.discussionIDs.map((discussionID, i) => {
-                        return (
-                            <RadioButton
-                                disabled={true}
-                                checked={false}
-                                key={i}
-                                label={<LoadingRectangle width={getLoadingPercentageForIndex(i)} height={16} />}
-                            />
-                        );
-                    })}
-                </RadioButtonGroup>
-            ) : (
-                discussions.data.discussionList.map((discussion, i) => {
-                    return (
-                        <RadioButton
-                            key={i}
-                            checked={discussion.discussionID === props.value}
-                            onChecked={() => {
-                                props.onChange(discussion.discussionID);
-                            }}
-                            label={discussion.name}
-                        />
-                    );
-                })
-            )}
-        </RadioButtonGroup>
+        <InputBlock legend={t("Choose the main discussion into which all comments will be merged:")}>
+            <RadioGroupContext.Provider
+                value={{
+                    value: `${props.value}`,
+                    onChange: (value) => {
+                        props.onChange(value);
+                    },
+                }}
+            >
+                {discussions.status === LoadStatus.PENDING || discussions.status === LoadStatus.LOADING
+                    ? props.discussionIDs.map((discussionID, i) => {
+                          return (
+                              <RadioButton
+                                  value="loading"
+                                  key={i}
+                                  disabled={true}
+                                  label={<LoadingRectangle width={getLoadingPercentageForIndex(i)} height={16} />}
+                              />
+                          );
+                      })
+                    : discussions.data.discussionList.map((discussion, i) => {
+                          return <RadioButton key={i} value={`${discussion.discussionID}`} label={discussion.name} />;
+                      })}
+            </RadioGroupContext.Provider>
+        </InputBlock>
     );
 }

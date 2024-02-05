@@ -69,9 +69,10 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
     {
         $discussionID = $paramInput["discussionID"];
-
-        // This api call functions as our permission check.
-        $discussion = $this->internalClient->get("/discussions/{$discussionID}?expand=all,status.log")->asData();
+        $commaSeparatedExpands = implode(",", $this->getExpands());
+        $discussion = $this->internalClient
+            ->get("/discussions/{$discussionID}?expand={$commaSeparatedExpands}")
+            ->asData();
         $discussionTags = $discussion["tags"];
         $discussionTags = array_values(
             array_filter($discussionTags, function (array $tag) {
@@ -101,8 +102,12 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
         $breadcrumbs = $discussionData["breadcrumbs"] ?? [];
         $pageHead->addJsonLDItem(new BreadcrumbJsonLD($breadcrumbs));
 
+        $expands = $this->getExpands();
         $result = array_merge($paramInput, [
             "discussion" => $discussion,
+            "discussionApiParams" => [
+                "expand" => $expands,
+            ],
             "breadcrumbs" => $breadcrumbs,
             "tags" => $discussionTags,
         ]);
@@ -110,9 +115,19 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
         return $result;
     }
 
+    /**
+     *
+     * Define the expands necessary to provide the preloaded discussion, and for subsequent re-requests.
+     * @return array<string>
+     */
+    public function getExpands(): array
+    {
+        return ["tags", "insertUser", "breadcrumbs"];
+    }
+
     public function getParamResolvedSchema(): Schema
     {
-        return Schema::parse(["discussion:o", "tags:a", "breadcrumbs:a"]);
+        return Schema::parse(["discussion:o", "tags:a", "breadcrumbs:a", "discussionApiParams:o"]);
     }
 
     /**

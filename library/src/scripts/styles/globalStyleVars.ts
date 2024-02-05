@@ -257,6 +257,13 @@ export const globalVariables = useThemeCache((forcedVars?: IThemeVariables) => {
          * @format hex-color
          */
         confirm: color("#60bd68"),
+
+        /**
+         * @var global.messageColors.success
+         * @type string
+         * @format hex-color
+         */
+        success: color("#38853D"),
         /**
          * @varGroup global.messageColors.deleted
          * @commonDescription Deleted

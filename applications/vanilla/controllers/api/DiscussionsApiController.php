@@ -664,8 +664,8 @@ class DiscussionsApiController extends AbstractApiController
             $this->resolveExpandFields($query, ["insertUser" => "InsertUserID", "lastUser" => "LastUserID"])
         );
         $row = $this->normalizeOutput($row, $query["expand"]);
-
         $this->discussionExpandSchema->commonExpand($row, $query["expand"] ?? []);
+
         $rows = [&$row];
         $this->expandLastCommentBody($rows, $query["expand"]);
         $result = $out->validate($row);

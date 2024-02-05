@@ -130,7 +130,9 @@ const TableRows = (props: ITableRowProps) => {
                                     )}
                                 >
                                     <span className={classes.cellContentWrap}>
-                                        <TruncatedText lines={2}>{cell.render("Cell")}</TruncatedText>
+                                        <TruncatedText className={classes.cellContentTruncate} lines={2}>
+                                            {cell.render("Cell")}
+                                        </TruncatedText>
                                     </span>
                                 </td>
                             );

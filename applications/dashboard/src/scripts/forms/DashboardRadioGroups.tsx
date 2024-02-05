@@ -9,30 +9,7 @@ import classNames from "classnames";
 import { useThrowError } from "@vanilla/react-utils";
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { IFieldError } from "@library/@types/api/core";
-
-interface IRadioGroupContext {
-    isInline?: boolean;
-    isGrid?: boolean;
-    onChange?: (value: string) => void;
-    value?: string;
-    errors?: IFieldError[];
-}
-
-const RadioGroupContext = React.createContext<IRadioGroupContext>({});
-
-export function useDashboardRadioGroup() {
-    const context = useContext(RadioGroupContext);
-
-    const throwError = useThrowError();
-    if (context === null) {
-        throwError(
-            new Error(
-                "Attempting to use a radio group without specifying a group. Be sure to wrap it in a <DashboardRadioGroup />",
-            ),
-        );
-    }
-    return context!;
-}
+import { IRadioGroupContext, RadioGroupContext } from "@library/forms/RadioGroupContext";
 
 interface IProps extends IRadioGroupContext {
     children: React.ReactNode;

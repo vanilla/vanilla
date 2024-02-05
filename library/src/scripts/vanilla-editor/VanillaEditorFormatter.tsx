@@ -1,15 +1,17 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
+import { toggleBlockquote } from "@library/vanilla-editor/plugins/blockquotePlugin/toggleBlockquote";
 import { unwrapBlockquote } from "@library/vanilla-editor/plugins/blockquotePlugin/unwrapBlockquote";
 import {
     ELEMENT_RICH_EMBED_CARD,
     ELEMENT_RICH_EMBED_INLINE,
 } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
 import { ELEMENT_SPOILER } from "@library/vanilla-editor/plugins/spoilerPlugin/createSpoilerPlugin";
+import { toggleSpoiler } from "@library/vanilla-editor/plugins/spoilerPlugin/toggleSpoiler";
 import { unwrapSpoiler } from "@library/vanilla-editor/plugins/spoilerPlugin/unwrapSpoiler";
 import { MyEditor } from "@library/vanilla-editor/typescript";
 import { ELEMENT_BLOCKQUOTE } from "@udecode/plate-block-quote";
@@ -90,6 +92,7 @@ export class VanillaEditorFormatter {
         return this.isListElement(ELEMENT_OL);
     };
     public orderedList = () => {
+        this.paragraph();
         toggleList(this.editor, { type: ELEMENT_OL });
         focusEditor(this.editor);
     };
@@ -98,6 +101,7 @@ export class VanillaEditorFormatter {
         return this.isListElement(ELEMENT_UL);
     }
     public unorderedList = () => {
+        this.paragraph();
         toggleList(this.editor, { type: ELEMENT_UL });
         focusEditor(this.editor);
     };
@@ -177,27 +181,24 @@ export class VanillaEditorFormatter {
         return this.isElement(ELEMENT_CODE_BLOCK);
     };
     public codeBlock = (): void => {
+        this.paragraph();
         toggleCodeBlock(this.editor);
     };
     public isBlockquote = (): boolean => {
         return this.isElement(ELEMENT_BLOCKQUOTE);
     };
     public blockquote = (): void => {
-        if (this.isBlockquote()) {
-            unwrapBlockquote(this.editor);
-        } else {
-            this.toggleElement(ELEMENT_BLOCKQUOTE);
-        }
+        this.paragraph();
+        toggleBlockquote(this.editor);
+        focusEditor(this.editor);
     };
     public isSpoiler = (): boolean => {
         return this.isElement(ELEMENT_SPOILER);
     };
     public spoiler = (): void => {
-        if (this.isSpoiler()) {
-            unwrapSpoiler(this.editor);
-        } else {
-            this.toggleElement(ELEMENT_SPOILER);
-        }
+        this.paragraph();
+        toggleSpoiler(this.editor);
+        focusEditor(this.editor);
     };
 
     public isParagraph = (): boolean => {

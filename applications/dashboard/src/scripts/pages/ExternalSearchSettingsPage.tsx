@@ -1,10 +1,11 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { DashboardHeaderBlock } from "@dashboard/components/DashboardHeaderBlock";
 import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
+import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import { LoadStatus } from "@library/@types/api/core";
@@ -21,17 +22,20 @@ import { MemoryRouter } from "react-router";
 
 export interface IExternalSearchSettings {
     externalSearchQuery: string;
+    externalSearchResultsInNewTab: boolean;
 }
 
 export function ExternalSearchSettingsPage() {
-    const configs = useConfigsByKeys(["externalSearch.query"]);
+    const configs = useConfigsByKeys(["externalSearch.query", "externalSearch.resultsInNewTab"]);
     const configPatcher = useConfigPatcher();
-    const [value, setValue] = useState<IExternalSearchSettings>(
-        { externalSearchQuery: configs.data?.["externalSearch.query"] } ?? {},
-    );
+    const externalSearchValuesFromConfig = {
+        externalSearchQuery: configs.data?.["externalSearch.query"],
+        externalSearchResultsInNewTab: configs.data?.["externalSearch.resultsInNewTab"],
+    };
+    const [value, setValue] = useState<IExternalSearchSettings>(externalSearchValuesFromConfig ?? {});
     const [error, setError] = useState(null);
     useEffect(() => {
-        setValue({ externalSearchQuery: configs.data?.["externalSearch.query"] } ?? {});
+        setValue(externalSearchValuesFromConfig ?? {});
     }, [configs.data]);
 
     const schema: JSONSchemaType<IExternalSearchSettings> = {
@@ -39,13 +43,22 @@ export function ExternalSearchSettingsPage() {
         properties: {
             externalSearchQuery: {
                 type: "string",
-
                 "x-control": {
                     label: t("Search Query"),
                     inputType: "textBox",
                     description: t(
                         "Enter full search query for our searchboxes to point to. Use %s as a placeholder for the search term. For example: https://www.google.com/search?q=%s",
                     ),
+                },
+            },
+            externalSearchResultsInNewTab: {
+                type: "boolean",
+                default: false,
+                "x-control": {
+                    label: t("Search Result in New Tab"),
+                    inputType: "toggle",
+                    description: t("When enabled, search result will open in a new browser tab."),
+                    labelType: DashboardLabelType.WIDE,
                 },
             },
         },
@@ -59,6 +72,7 @@ export function ExternalSearchSettingsPage() {
                     try {
                         configPatcher.patchConfig({
                             "externalSearch.query": value.externalSearchQuery,
+                            "externalSearch.resultsInNewTab": value.externalSearchResultsInNewTab,
                         });
                     } catch (error) {
                         setError(error);

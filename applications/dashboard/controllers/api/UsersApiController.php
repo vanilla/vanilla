@@ -902,13 +902,6 @@ class UsersApiController extends AbstractApiController
             throw new \Garden\Web\Exception\ForbiddenException(t(self::ERROR_PATCH_HIGHER_PERMISSION_USER));
         }
 
-        // Check for self-edit
-        if ($id == $this->getSession()->UserID) {
-            $this->validatePatchSelfEditCredentials($user, $body);
-        } else {
-            $this->permission("Garden.Users.Edit");
-        }
-
         $this->idParamSchema("in");
         if ($this->checkPermission("Garden.Users.Edit")) {
             $in = $this->schema($this->userPatchSchema(), ["UserPatchCommon", "in"])->setDescription("Update a user.");
@@ -917,12 +910,22 @@ class UsersApiController extends AbstractApiController
                 "Update a user."
             );
         }
-
+        if ($id == $this->getSession()->UserID) {
+            $in->merge(Schema::parse(["passwordConfirmation:s?"]));
+        }
         $in->addValidator("roleID", $this->createRoleIDValidator($id));
         $in->addValidator("profileFields", $this->profileFieldModel->validateEditable($id));
 
         $out = $this->userSchema("out");
         $body = $in->validate($body);
+
+        // Check for self-edit
+        if ($id == $this->getSession()->UserID) {
+            $this->validatePatchSelfEditCredentials($user, $body);
+            unset($body["passwordConfirmation"]);
+        } else {
+            $this->permission("Garden.Users.Edit");
+        }
 
         $userData = $this->normalizeInput($body);
         $userData["UserID"] = $id;
@@ -1564,8 +1567,6 @@ class UsersApiController extends AbstractApiController
                 "url:s?",
                 "dateInserted?",
                 "dateLastActive:dt?",
-                "isAdmin:b?",
-                "isSysAdmin:b?",
                 "countDiscussions?",
                 "countComments?",
                 "label:s?",

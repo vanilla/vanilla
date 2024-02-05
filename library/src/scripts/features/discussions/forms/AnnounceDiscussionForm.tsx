@@ -1,6 +1,6 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -15,14 +15,13 @@ import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { useFormik } from "formik";
 import Permission, { PermissionMode } from "@library/features/users/Permission";
-import RadioButtonGroup from "@library/forms/RadioButtonGroup";
-import RadioButton from "@library/forms/RadioButton";
 import Button from "@library/forms/Button";
 import Translate from "@library/content/Translate";
-
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useDiscussionPatch } from "@library/features/discussions/discussionHooks";
+import { RadioGroupContext } from "@library/forms/RadioGroupContext";
+import RadioButton from "@library/forms/RadioButton";
 
 type FormValues = {
     pinLocation: "recent" | "category" | "";
@@ -53,7 +52,7 @@ export default function AnnounceDiscussionForm({ onCancel, onSuccess, discussion
     const classesFrameBody = frameBodyClasses();
     const classFrameFooter = frameFooterClasses();
 
-    const { isSubmitting, handleSubmit, handleChange } = formik;
+    const { isSubmitting, handleSubmit } = formik;
 
     return (
         <form onSubmit={handleSubmit}>
@@ -64,10 +63,15 @@ export default function AnnounceDiscussionForm({ onCancel, onSuccess, discussion
                         <div className={classesFrameBody.contents}>
                             <>{t("Where do you want to announce this discussion?")}</>
 
-                            <RadioButtonGroup>
+                            <RadioGroupContext.Provider
+                                value={{
+                                    value: formik.values.pinLocation,
+                                    onChange: (value) => {
+                                        formik.setFieldValue("pinLocation", value);
+                                    },
+                                }}
+                            >
                                 <RadioButton
-                                    defaultChecked={formik.values.pinLocation === "category"}
-                                    onChange={handleChange}
                                     name="pinLocation"
                                     value="category"
                                     label={
@@ -88,8 +92,6 @@ export default function AnnounceDiscussionForm({ onCancel, onSuccess, discussion
                                  */}
                                 <Permission permission={["discussions.announce", "discussions.moderate"]}>
                                     <RadioButton
-                                        defaultChecked={formik.values.pinLocation === "recent"}
-                                        onChange={handleChange}
                                         name="pinLocation"
                                         value="recent"
                                         label={
@@ -105,13 +107,11 @@ export default function AnnounceDiscussionForm({ onCancel, onSuccess, discussion
                                     />
                                 </Permission>
                                 <RadioButton
-                                    defaultChecked={formik.values.pinLocation === ""}
-                                    onChange={handleChange}
                                     name="pinLocation"
                                     value=""
                                     label={<Translate source={"Don't announce."} />}
                                 />
-                            </RadioButtonGroup>
+                            </RadioGroupContext.Provider>
                         </div>
                     </FrameBody>
                 }

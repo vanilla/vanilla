@@ -21,13 +21,14 @@ import { MyValue } from "@library/vanilla-editor/typescript";
 import { isMyValue } from "@library/vanilla-editor/utils/isMyValue";
 import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
+import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
 import { discussionCommentEditorClasses } from "@vanilla/addon-vanilla/thread/DiscussionCommentEditorAsset.classes";
 import { DraftsApi } from "@vanilla/addon-vanilla/thread/DraftsApi";
 import { t } from "@vanilla/i18n";
 import { logError, RecordID } from "@vanilla/utils";
 import isEqual from "lodash/isEqual";
 import React, { useEffect, useRef, useState } from "react";
+import { IComment } from "@dashboard/@types/api/comment";
 
 interface IDraftProps {
     draftID: number;
@@ -68,11 +69,15 @@ export function DiscussionCommentEditorAsset(props: IProps) {
                 ...(ownDraft?.draftID && { draftID: ownDraft?.draftID }),
                 body,
             }),
-        onSuccess: () => {
-            resetState();
-            queryClient.invalidateQueries({ queryKey: ["commentList"] });
-        },
     });
+
+    async function handlePostCommentSuccess(comment: IComment) {
+        resetState();
+        await queryClient.invalidateQueries({ queryKey: ["discussion"] });
+        await queryClient.invalidateQueries({ queryKey: ["commentList"] });
+        //FIXME: comment permalinks don't work in new thread view yet
+        // window.location.href = comment.url;
+    }
 
     const draftMutation = useMutation({
         mutationFn: async () => {
@@ -144,7 +149,8 @@ export function DiscussionCommentEditorAsset(props: IProps) {
                 onSubmit={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    await postMutation.mutateAsync(JSON.stringify(value));
+                    const newComment = await postMutation.mutateAsync(JSON.stringify(value));
+                    await handlePostCommentSuccess(newComment);
                 }}
             >
                 <PageHeadingBox title={t("Leave a Comment")} />

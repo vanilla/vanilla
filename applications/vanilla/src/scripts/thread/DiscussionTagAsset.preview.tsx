@@ -8,8 +8,7 @@ import React from "react";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 import DiscussionTagAsset from "@vanilla/addon-vanilla/thread/DiscussionTagAsset";
 
-interface IProps
-    extends Omit<React.ComponentProps<typeof DiscussionTagAsset>, "commentsPreload" | "categoryID" | "discussion"> {}
+interface IProps extends Omit<React.ComponentProps<typeof DiscussionTagAsset>, "comments" | "discussion"> {}
 
 export function DiscussionTagAssetPreview(_props: IProps) {
     const props = {

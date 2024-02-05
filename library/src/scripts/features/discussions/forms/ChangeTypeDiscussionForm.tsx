@@ -13,13 +13,13 @@ import { frameBodyClasses } from "@library/layout/frame/frameBodyStyles";
 import FrameFooter from "@library/layout/frame/FrameFooter";
 import FrameHeader from "@library/layout/frame/FrameHeader";
 import { useFormik } from "formik";
-import RadioButtonGroup from "@library/forms/RadioButtonGroup";
-import RadioButton from "@library/forms/RadioButton";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useDiscussionPutType } from "@library/features/discussions/discussionHooks";
 import { labelize } from "@vanilla/utils";
+import { RadioGroupContext } from "@library/forms/RadioGroupContext";
+import RadioButton from "@library/forms/RadioButton";
 
 type FormValues = {
     type: string;
@@ -60,16 +60,7 @@ export default function ChangeTypeDiscussionForm({ onCancel, onSuccess, discussi
     if (allowedDiscussionTypes) {
         buttonGroup = allowedDiscussionTypes.map((type) => {
             if (type.length > 1 && !NON_CHANGE_TYPE.includes(type)) {
-                return (
-                    <RadioButton
-                        key={type}
-                        defaultChecked={formik.values.type === type}
-                        onChange={handleChange}
-                        name={"type"}
-                        value={`${type}`}
-                        label={t(`${labelize(type)}`)}
-                    />
-                );
+                return <RadioButton key={type} name={"type"} value={`${type}`} label={t(`${labelize(type)}`)} />;
             }
         });
     }
@@ -82,7 +73,16 @@ export default function ChangeTypeDiscussionForm({ onCancel, onSuccess, discussi
                     <FrameBody>
                         <div className={classesFrameBody.contents}>
                             <>{t("Select Discussion Type") + ":"}</>
-                            <RadioButtonGroup>{buttonGroup}</RadioButtonGroup>
+                            <RadioGroupContext.Provider
+                                value={{
+                                    value: formik.values.type,
+                                    onChange: (value) => {
+                                        formik.setFieldValue("type", value);
+                                    },
+                                }}
+                            >
+                                {buttonGroup}
+                            </RadioGroupContext.Provider>
                         </div>
                     </FrameBody>
                 }

@@ -22,9 +22,8 @@ class DiscussionOriginalPostAsset extends AbstractLayoutAsset implements Hydrate
     {
         $props =
             [
-                "discussionID" => $this->getHydrateParam("discussionID"),
-                "categoryID" => $this->getHydrateParam("categoryID"),
                 "discussion" => $this->getHydrateParam("discussion"),
+                "discussionApiParams" => $this->getHydrateParam("discussionApiParams"),
                 "category" => $this->getHydrateParam("category"),
                 "page" => $this->getHydrateParam("page"),
             ] + $this->props;

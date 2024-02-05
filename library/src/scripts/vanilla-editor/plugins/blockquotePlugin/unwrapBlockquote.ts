@@ -1,6 +1,6 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -57,9 +57,8 @@ export const unwrapBlockquote = <V extends Value>(editor: PlateEditor<V>, { at }
 
             unwrapNodes(editor, {
                 at,
-                match: { type: [blockquoteItemType, blockquoteType] },
+                match: { type: blockquoteType },
                 split: true,
-                block: true,
             });
         } while (ancestorTypeCheck());
     });

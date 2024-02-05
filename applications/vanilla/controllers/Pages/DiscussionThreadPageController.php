@@ -65,7 +65,7 @@ class DiscussionThreadPageController extends PageDispatchController
                 $discussionData = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
                 $siteSection = $this->getSiteSection($discussionData);
                 $page->preloadLayout(
-                    new LayoutQuery("discussionThread", "discussion", $discussionID, [
+                    new LayoutQuery("discussionThread", "discussion", (string) $discussionID, [
                         "discussionID" => $discussionID,
                         "locale" => $siteSection["contentLocale"],
                         "siteSectionID" => $siteSection["sectionID"],

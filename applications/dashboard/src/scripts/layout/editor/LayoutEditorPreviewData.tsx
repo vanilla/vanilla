@@ -19,8 +19,18 @@ import { ILinkPages } from "@library/navigation/SimplePagerModel";
 import random from "lodash/random";
 import { ICategoryItem } from "@library/categoriesWidget/CategoryItem";
 import { ICrumb } from "@library/navigation/Breadcrumbs";
+import { IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 
 export class LayoutEditorPreviewData {
+    currentWidgetSchemaFromCatalog: IWidgetCatalog = {};
+
+    /**
+     * Stores current widget catalog, this is to be usen in preview when we have some optional data to be rendered or no (from plugins etc)
+     */
+    public static setCurrentWidgetCatalog(catalog: IWidgetCatalog): void {
+        self.currentWidgetSchemaFromCatalog = catalog;
+    }
+
     /**
      * Return some basic static user data in userfragment format.
      */
@@ -224,13 +234,13 @@ export class LayoutEditorPreviewData {
         return comments;
     }
 
-    public static paging(limit: number): ILinkPages {
+    public static paging(limit: number, total = 999): ILinkPages {
         return {
             nextURL: "#",
             prevURL: "#",
-            total: 999,
             currentPage: 1,
             limit,
+            total,
         };
     }
 
@@ -376,14 +386,17 @@ export class LayoutEditorPreviewData {
 
     /**
      * Return mock data to be consumed by the New Post Widget.
-     * @returns IAddPost[]
+     * @returns IAddPost[] and post type keys in an object
      */
-    public static getPostTypes(options: React.ComponentProps<typeof NewPostMenuPreview>): IAddPost[] {
+    public static getPostTypes(options: React.ComponentProps<typeof NewPostMenuPreview>): {
+        options: IAddPost[];
+        types: string[];
+    } {
         const asOwnButtonsList = options.asOwnButtons ?? [];
         const customLabels = options.customLabels ?? [];
         const excludedButtons = options.excludedButtons ?? [];
 
-        const postTypes = {
+        const allPostTypes = {
             discussion: {
                 label: customLabels["discussion"] ?? "New Discussion",
                 action: "#",
@@ -426,11 +439,27 @@ export class LayoutEditorPreviewData {
             },
         };
 
+        let postTypes = {
+            discussion: allPostTypes["discussion"],
+        };
+
+        if (self.currentWidgetSchemaFromCatalog) {
+            const typeOptions =
+                self.currentWidgetSchemaFromCatalog["react.newpost"].schema.properties.excludedButtons["x-control"]
+                    .choices.staticOptions;
+            const possibleTypesFromSchema = Object.keys(typeOptions ?? {});
+            possibleTypesFromSchema.forEach((type) => {
+                postTypes[type] = allPostTypes[type];
+            });
+        } else {
+            postTypes = allPostTypes;
+        }
+
         excludedButtons.forEach((button) => {
             delete postTypes[button];
         });
 
-        return Object.values(postTypes);
+        return { options: Object.values(postTypes), types: Object.keys(postTypes) };
     }
 
     /**

@@ -63,7 +63,7 @@ export function IndependentSearch(props: IIndependentSearchProps) {
     const hasScope = scope.optionsItems.length > 0;
 
     const { pushSmartLocation } = useLinkContext();
-    const { externalSearchQuery } = useSearch();
+    const { externalSearch } = useSearch();
 
     const scopeValue = scope.value?.value || "";
     const handleSubmit = useCallback(() => {
@@ -73,8 +73,15 @@ export function IndependentSearch(props: IIndependentSearchProps) {
             queryParams.scope = scopeValue;
         }
 
-        pushSmartLocation(props.searchOptionProvider.makeSearchUrl(query, queryParams, externalSearchQuery));
-    }, [props.searchOptionProvider, pushSmartLocation, query, scopeValue, externalSearchQuery]);
+        const searchUrl = searchOptionProvider.makeSearchUrl(query, queryParams, externalSearch?.query);
+
+        if (externalSearch?.query && externalSearch?.resultsInNewTab) {
+            window.open(searchUrl, "_blank");
+            return;
+        }
+
+        pushSmartLocation(searchUrl);
+    }, [props.searchOptionProvider, pushSmartLocation, query, scopeValue, externalSearch]);
 
     const handleSearchChange = useCallback(
         (newQuery: string) => {
@@ -111,7 +118,7 @@ export function IndependentSearch(props: IIndependentSearchProps) {
                 onChange={handleSearchChange}
                 onSearch={handleSubmit}
                 loadOptions={(query, options) =>
-                    externalSearchQuery
+                    externalSearch?.query
                         ? Promise.resolve([])
                         : props.searchOptionProvider.autocomplete(query, { ...options, scope: scope.value?.value })
                 }
@@ -126,7 +133,7 @@ export function IndependentSearch(props: IIndependentSearchProps) {
                 iconContainerClasses={props.iconContainerClasses}
                 scope={props.scope}
                 overwriteSearchBar={props.overwriteSearchBar}
-                disableMenu={!!externalSearchQuery}
+                disableAutocomplete={!!externalSearch?.query}
             />
             <div
                 ref={resultsRef}

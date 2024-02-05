@@ -43,7 +43,7 @@ export interface IMessageProps {
     /** Icons that could be displayed beside the message */
     icon?: React.ReactNode | false;
     /** The kind of message */
-    type?: "warning" | "error" | "neutral";
+    type?: "warning" | "error" | "neutral" | "info";
 }
 
 export const Message = React.forwardRef(function Message(props: IMessageProps, ref: RefObject<HTMLDivElement>) {
@@ -95,6 +95,7 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
                     },
                     { [classes.error]: isError },
                     { [classes.neutral]: props.type === "neutral" },
+                    { [classes.info]: props.type === "info" },
                 )}
             >
                 <OuterWrapper>

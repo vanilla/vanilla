@@ -5,6 +5,7 @@ namespace Vanilla\QnA\Layout\View;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Forum\Layout\View\DiscussionThreadLayoutView;
 use Vanilla\Http\InternalClient;
+use Vanilla\QnA\Layout\Assets\TabbedCommentListAsset;
 use Vanilla\Navigation\BreadcrumbModel;
 
 /**
@@ -22,6 +23,15 @@ class QuestionThreadLayoutView extends DiscussionThreadLayoutView
         BreadcrumbModel $breadcrumbModel
     ) {
         parent::__construct($internalClient, $configuration, $discussionModel, $breadcrumbModel);
+        $this->registerAssetClass(TabbedCommentListAsset::class);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getExpands(): array
+    {
+        return array_merge(parent::getExpands(), ["acceptedAnswers", "rejectedAnswers"]);
     }
 
     /**

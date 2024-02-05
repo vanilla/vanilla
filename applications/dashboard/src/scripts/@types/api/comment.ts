@@ -40,3 +40,9 @@ export interface ICommentEmbed {
     body?: string;
     bodyRaw: string;
 }
+
+export enum QnAStatus {
+    ACCEPTED = "accepted",
+    REJECTED = "rejected",
+    PENDING = "pending",
+}

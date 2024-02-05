@@ -17,4 +17,5 @@ export interface IDiscussionSearchTypes {
     tagsOptions?: IComboBoxOption[];
     startDate?: string;
     endDate?: string;
+    types?: string[];
 }

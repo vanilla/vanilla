@@ -81,4 +81,12 @@ class DiscussionTagEvent extends DiscussionEvent implements LoggableEventInterfa
     {
         return $this->getAction();
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getBaseAction(): string
+    {
+        return self::ACTION_UPDATE;
+    }
 }

@@ -3388,6 +3388,9 @@ PASSWORDMETER;
      */
     public function simple($schema, $options = [])
     {
+        if (empty($schema)) {
+            $schema = [];
+        }
         $options = array_change_key_case($options) + [
             "wrap" => ["<ul>", "</ul>"],
             "itemwrap" => ['<li class="' . $this->getStyle("form-group") . "\">\n", "\n</li>\n"],

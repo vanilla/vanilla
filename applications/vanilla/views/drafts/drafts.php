@@ -12,6 +12,7 @@ foreach ($this->DraftData->resultArray() as $Draft) {
     }
 
     $draftID = val("DraftID", $Draft);
+    $groupID = val("GroupID", $Draft, 0);
     $discussionID = val("DiscussionID", $Draft);
     $excerpt = sliceString(Gdn_Format::plainText(val("Body", $Draft), val("Format", $Draft)), 200) ?: t("(No Body)");
 
@@ -20,7 +21,7 @@ foreach ($this->DraftData->resultArray() as $Draft) {
 
     $editUrl =
         $isDiscussion || $orphaned
-            ? "/post/editdiscussion/0/" . $draftID
+            ? "/post/editdiscussion/0/" . $draftID . ($groupID != 0 ? "?groupid={$groupID}" : "")
             : "/discussion/" . $discussionID . "/" . $Offset . "/#Form_Comment";
     $deleteUrl =
         "vanilla/drafts/delete/" .

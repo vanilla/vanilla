@@ -6,24 +6,25 @@
 
 import { IComment } from "@dashboard/@types/api/comment";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
-import DateTime from "@library/content/DateTime";
-import { MetaLink } from "@library/metas/Metas";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CommentEditor } from "@vanilla/addon-vanilla/thread/CommentEditor";
 import { CommentOptionsMenu } from "@vanilla/addon-vanilla/thread/CommentOptionsMenu";
-import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
+import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
 import { ThreadItem } from "@vanilla/addon-vanilla/thread/ThreadItem";
 import React, { useState } from "react";
+import CommentMeta from "@vanilla/addon-vanilla/thread/CommentMeta";
 
 interface IProps {
     comment: IComment;
     discussion: IDiscussion;
     /** called after a successful PATCH or DELETE.*/
     onMutateSuccess?: () => Promise<void>;
+
+    actions?: React.ComponentProps<typeof ThreadItem>["actions"];
 }
 
 export function CommentThreadItem(props: IProps) {
-    const { comment, onMutateSuccess } = props;
+    const { comment, onMutateSuccess, actions } = props;
     const [isEditing, setIsEditing] = useState(false);
     const editCommentQuery = useQuery({
         enabled: isEditing,
@@ -39,16 +40,11 @@ export function CommentThreadItem(props: IProps) {
         await queryClient.invalidateQueries(["commentEdit", comment.commentID]);
     }
 
-    const permalink = (
-        <MetaLink to={comment.url}>
-            <DateTime timestamp={comment.dateInserted} />
-        </MetaLink>
-    );
-
     return (
         <ThreadItem
             boxOptions={{}}
             content={comment.body}
+            actions={actions}
             editor={
                 isEditing &&
                 !!editCommentQuery.data && (
@@ -67,7 +63,7 @@ export function CommentThreadItem(props: IProps) {
                 )
             }
             user={comment.insertUser}
-            contentMeta={permalink}
+            contentMeta={<CommentMeta comment={comment} />}
             key={comment.commentID}
             userPhotoLocation={"header"}
             recordType={"comment"}
@@ -79,7 +75,7 @@ export function CommentThreadItem(props: IProps) {
                     onCommentEdit={() => {
                         setIsEditing(true);
                     }}
-                    onDeleteSuccess={onMutateSuccess}
+                    onMutateSuccess={onMutateSuccess}
                     isEditLoading={isEditing && editCommentQuery.isLoading}
                 />
             }

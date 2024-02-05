@@ -9,6 +9,7 @@ import { ISearchForm, ISearchResult, ISearchResponse, IArticlesSearchResult } fr
 import { ISearchRequestQuery, ISearchSource } from "@library/search/searchTypes";
 import SearchDomain from "@library/search/SearchDomain";
 import { TypeAllIcon } from "@library/icons/searchIcons";
+import { SearchDomainLoadable } from "../SearchDomainLoadable";
 
 interface IParams {
     pagination?: ISearchResponse["pagination"];
@@ -119,6 +120,77 @@ export class MockSearchSource implements ISearchSource {
     });
 }
 
+export class MockSearchSourceWithAsyncDomains implements ISearchSource {
+    private abortController: AbortController;
+
+    constructor() {
+        this.abortController = new AbortController();
+    }
+
+    abort() {
+        this.abortController.abort();
+        this.abortController = new AbortController();
+    }
+
+    get key() {
+        return "mockSearchSourceWithAsyncDomainsKey";
+    }
+
+    get label() {
+        return "Mock Async Search Source";
+    }
+
+    //mock api response for a custom connected search
+    public performSearch = jest.fn(async (requestParams: ISearchRequestQuery, endpointOverride?: string) => {
+        return {
+            results: [],
+            pagination: {},
+        };
+    });
+
+    private asyncDomains: SearchDomainLoadable[] = [];
+
+    private loadedDomains: SearchDomain[] = [];
+
+    public addDomain = (loadable: SearchDomainLoadable) => {
+        this.asyncDomains.push(loadable);
+    };
+
+    get domains(): SearchDomain[] {
+        return this.loadedDomains;
+    }
+
+    public clearDomains() {
+        this.loadedDomains = [];
+        this.asyncDomains = [];
+    }
+
+    public loadDomains = async (): Promise<SearchDomain[]> => {
+        return await Promise.all(
+            Array.from(this.asyncDomains).map((asyncDomain) => {
+                return new Promise<SearchDomain>((resolve) => {
+                    if (asyncDomain.loadedDomain) {
+                        this.pushDomain(asyncDomain.loadedDomain);
+
+                        return resolve(asyncDomain.loadedDomain);
+                    } else {
+                        return asyncDomain.load().then((loaded) => {
+                            this.pushDomain(loaded);
+                            return resolve(loaded);
+                        });
+                    }
+                });
+            }),
+        );
+    };
+
+    private pushDomain(domain: SearchDomain) {
+        if (!this.loadedDomains.find(({ key }) => key === domain.key)) {
+            this.loadedDomains.push(domain);
+        }
+    }
+}
+
 //represents shrunk mock of ConnectedSearchSource class, with fake api response
 export class MockConnectedSearchSource implements ISearchSource {
     public label: string;
@@ -159,9 +231,9 @@ export class MockConnectedSearchSource implements ISearchSource {
 }
 
 export const MOCK_SEARCH_DOMAIN = new (class MockSearchDomain extends SearchDomain {
-    public key = "mockSearch";
+    public key = "mockSearchDomain";
     public sort = 0;
-    public name = "Mock Search";
+    public name = "Mock Search Domain";
     public icon = (<TypeAllIcon />);
     public recordTypes = [];
     public isIsolatedType = false;
@@ -171,3 +243,21 @@ export const MOCK_SEARCH_DOMAIN = new (class MockSearchDomain extends SearchDoma
         };
     });
 })();
+
+export const MOCK_ASYNC_SEARCH_DOMAIN_LOADABLE = new (class MockAsyncSearchDomain extends SearchDomain {
+    public key = "mockAsyncSearchDomain";
+    public sort = 0;
+    public name = "Mock Async Search Domain";
+    public icon = (<TypeAllIcon />);
+    public recordTypes = [];
+    public isIsolatedType = false;
+    public transformFormToQuery = jest.fn(function (form) {
+        return {
+            ...form,
+        };
+    });
+})();
+
+export const MOCK_ASYNC_SEARCH_DOMAIN = new SearchDomainLoadable("mockAsyncSearchDomain", async () => ({
+    default: MOCK_ASYNC_SEARCH_DOMAIN_LOADABLE,
+}));

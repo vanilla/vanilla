@@ -174,6 +174,7 @@ class TagModel extends Gdn_Model
             if (strtolower(val("Type", $formPostValues)) == "tag") {
                 $formPostValues["Type"] = "";
             }
+
             return parent::save($formPostValues, $settings);
         }
     }

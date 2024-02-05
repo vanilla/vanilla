@@ -18,9 +18,8 @@ export const formTreeClasses = useThemeCache(() => {
     const vars = formTreeVariables();
 
     const treeDescription = css({
-        // Little bit of a cheat to get this to display as the mockups.
         display: "block",
-        marginTop: -8,
+        marginTop: 8,
     });
 
     const tree = css({

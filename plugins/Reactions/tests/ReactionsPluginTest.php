@@ -91,4 +91,54 @@ class ReactionsPluginTest extends SiteTestCase
         $this->expectExceptionCode(403);
         $this->react("discussion", $discussion["discussionID"], "like");
     }
+
+    /**
+     * Test that user points are reversed when a post marked as spam is approved
+     *
+     * @return void
+     */
+    public function testSpamApproval(): void
+    {
+        $this->createUserFixtures();
+        $spamTestUser = $this->createUser(["name" => "SpamTest", "email" => "spamtestuser@test.com"]);
+        $reactionModel = $this->container()->get(\ReactionModel::class);
+        $logModel = $this->container()->get(\LogModel::class);
+        $userPoints = function () use ($spamTestUser) {
+            $sql = $this->userModel->createSql();
+            return $sql
+                ->select("points")
+                ->from("User")
+                ->where("userID", $spamTestUser["userID"])
+                ->get()
+                ->firstRow(DATASET_TYPE_ARRAY)["points"];
+        };
+        $this->runWithUser(function () use ($spamTestUser, $reactionModel, $userPoints) {
+            $discussion = $this->createDiscussion([
+                "name" => "SpamTest",
+                "body" => "This is a discussion to test spam",
+            ]);
+            $reactionModel->react("discussion", $discussion["discussionID"], "like", $this->memberID);
+            $currentPoints = $userPoints();
+            $this->assertSame(1, $currentPoints);
+        }, $spamTestUser["userID"]);
+
+        //Now Mark this discussion as Spam
+        $discussionID = $this->lastInsertedDiscussionID;
+        $reactionModel->react("discussion", $discussionID, "spam", $this->getSession()->UserID);
+        //Now test that the user has lost the points
+        $currentPoints = $userPoints();
+        $this->assertSame(0, $currentPoints);
+
+        //Now Undo the spam
+        $log = $logModel->getWhere([
+            "RecordType" => "Discussion",
+            "RecordID" => $discussionID,
+            "Operation" => "Spam",
+        ])[0];
+        $logModel->restore($log);
+
+        //Now test that the user has gained the points back
+        $currentPoints = $userPoints();
+        $this->assertSame(1, $currentPoints);
+    }
 }

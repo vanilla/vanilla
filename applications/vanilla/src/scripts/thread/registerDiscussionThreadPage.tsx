@@ -10,7 +10,6 @@ import { getSiteSection } from "@library/utility/appUtils";
 import { registerLoadableWidgets } from "@library/utility/componentRegistry";
 import { DiscussionThreadContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
-import getStore from "@library/redux/getStore";
 
 interface IDiscussionThreadPageParams {
     id: IDiscussion["discussionID"];

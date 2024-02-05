@@ -28,6 +28,8 @@ class DiscussionExpandSchema
     /** @var RecordStatusLogModel */
     private $recordStatusLogModel;
 
+    private AttachmentModel $attachmentModel;
+
     /**
      * DiscussionsSchema constructor.
      *
@@ -35,17 +37,20 @@ class DiscussionExpandSchema
      * @param TagModel $tagModel
      * @param RecordStatusLogModel $recordStatusLogModel
      * @param RecordStatusModel $recordStatusModel
+     * @param AttachmentModel $attachmentModel
      */
     public function __construct(
         CategoryModel $categoryModel,
         TagModel $tagModel,
         RecordStatusLogModel $recordStatusLogModel,
-        RecordStatusModel $recordStatusModel
+        RecordStatusModel $recordStatusModel,
+        AttachmentModel $attachmentModel
     ) {
         $this->categoryModel = $categoryModel;
         $this->tagModel = $tagModel;
         $this->recordStatusLogModel = $recordStatusLogModel;
         $this->recordStatusModel = $recordStatusModel;
+        $this->attachmentModel = $attachmentModel;
     }
 
     /**
@@ -84,6 +89,7 @@ class DiscussionExpandSchema
             "snippet",
             "status",
             "status.log",
+            "attachments",
         ]);
     }
 
@@ -104,6 +110,14 @@ class DiscussionExpandSchema
         if (ModelUtils::isExpandOption("status", $expandOption)) {
             $this->recordStatusModel->expandStatuses($rows);
         }
+        if (
+            ModelUtils::isExpandOption("attachments", $expandOption) &&
+            Gdn::session()->checkPermission("staff.allow")
+        ) {
+            $this->attachmentModel->joinAttachments($rows);
+            AttachmentModel::camelCaseAttachments($rows);
+        }
+
         // This one can be slightly performance intensive so don't do it unless explicitly asked.
         // Eg. Will not be included in expand=all
         if (ModelUtils::isExpandOption("status.log", $expandOption, true)) {

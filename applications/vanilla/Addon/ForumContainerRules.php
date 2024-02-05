@@ -173,7 +173,7 @@ class ForumContainerRules extends AddonContainerRules
         PageControllerRoute::configurePageRoutes(
             $container,
             [
-                "/discussion" => DiscussionThreadPageController::class,
+                "/discussion/" => DiscussionThreadPageController::class,
             ],
             "customLayout.discussionThread"
         );

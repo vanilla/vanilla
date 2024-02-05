@@ -9,11 +9,7 @@ import { Widget } from "@library/layout/Widget";
 import DiscussionOriginalPostAsset from "@vanilla/addon-vanilla/thread/DiscussionOriginalPostAsset";
 import React from "react";
 
-interface IProps
-    extends Omit<
-        React.ComponentProps<typeof DiscussionOriginalPostAsset>,
-        "commentsPreload" | "categoryID" | "discussion"
-    > {}
+interface IProps extends Omit<React.ComponentProps<typeof DiscussionOriginalPostAsset>, "comments" | "discussion"> {}
 
 const discussion = LayoutEditorPreviewData.discussion();
 

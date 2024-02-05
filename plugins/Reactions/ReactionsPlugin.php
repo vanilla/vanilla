@@ -1238,6 +1238,24 @@ class ReactionsPlugin extends Gdn_Plugin
     }
 
     /**
+     * Un-spam a discussion/comment and restore user points.
+     *
+     * @param LogModel $sender
+     * @param array $args Event's arguments
+     */
+    public function logModel_afterRestore_handler($sender, $args)
+    {
+        $log = val("Log", $args);
+        if (
+            $log["Operation"] == "Spam" &&
+            in_array($log["RecordType"], ["Discussion", "Comment"]) &&
+            is_int($log["RecordID"])
+        ) {
+            $this->reactionModel->react($log["RecordType"], $log["RecordID"], "Undo-Spam", $log["InsertUserID"], false);
+        }
+    }
+
+    /**
      * Add the "Best Of..." link to the main menu.
      *
      * @param Gdn_Controller $sender

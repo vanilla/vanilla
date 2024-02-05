@@ -122,6 +122,9 @@ export function TagsAndLabels() {
                     <MetaTag to="#" tagPreset={TagPreset.COLORED}>
                         Colored
                     </MetaTag>
+                    <MetaTag to="#" tagPreset={TagPreset.SUCCESS}>
+                        Success
+                    </MetaTag>
                 </Metas>
             </SizedBox>
             <SizedBox width={600} title={"All Tag Types (active states)"}>
@@ -137,6 +140,9 @@ export function TagsAndLabels() {
                     </MetaTag>
                     <MetaTag to="#" className={"focus-visible"} tagPreset={TagPreset.COLORED}>
                         Colored
+                    </MetaTag>
+                    <MetaTag to="#" className={"focus-visible"} tagPreset={TagPreset.SUCCESS}>
+                        Success
                     </MetaTag>
                 </Metas>
             </SizedBox>

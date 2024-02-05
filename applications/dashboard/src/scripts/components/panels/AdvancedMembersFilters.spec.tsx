@@ -21,7 +21,7 @@ import MEMBERS_SEARCH_DOMAIN from "@dashboard/components/panels/MembersSearchDom
 import { mockAPI } from "@library/__tests__/utility";
 import { SearchService } from "@library/search/SearchService";
 import COMMUNITY_SEARCH_SOURCE from "@library/search/CommunitySearchSource";
-import { SearchSourcesContextProvider } from "@library/search/SearchSourcesContextProvider";
+import { MemoryRouter } from "react-router";
 
 jest.setTimeout(20000);
 
@@ -132,15 +132,15 @@ describe("AdvancedMembersFilters", () => {
 
     beforeEach(async () => {
         result = render(
-            <SearchSourcesContextProvider>
-                <PermissionsFixtures.SpecificPermissions permissions={["personalInfo.view"]}>
+            <PermissionsFixtures.SpecificPermissions permissions={["personalInfo.view"]}>
+                <MemoryRouter>
                     <SearchFormContextProvider>
                         <MockProfileFieldsProvider>
                             <MembersSearchFilterPanel />
                         </MockProfileFieldsProvider>
                     </SearchFormContextProvider>
-                </PermissionsFixtures.SpecificPermissions>
-            </SearchSourcesContextProvider>,
+                </MemoryRouter>
+            </PermissionsFixtures.SpecificPermissions>,
         );
     });
 

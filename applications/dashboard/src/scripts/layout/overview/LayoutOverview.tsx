@@ -1,15 +1,11 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import { LayoutEditorContents } from "@dashboard/layout/editor/LayoutEditorContents";
-import {
-    useCatalogForLayout,
-    useLayoutCatalog,
-    useLayoutJson,
-} from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
+import { useCatalogForLayout, useLayoutJson } from "@dashboard/layout/layoutSettings/LayoutSettings.hooks";
 import { ILayoutDetails } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { layoutOverviewClasses } from "@dashboard/layout/overview/LayoutOverview.classes";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";

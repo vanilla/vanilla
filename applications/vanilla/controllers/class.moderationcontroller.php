@@ -270,7 +270,7 @@ class ModerationController extends VanillaController
     {
         $session = Gdn::session();
         if ($session->validateTransientKey($transientKey)) {
-            Gdn::userModel()->saveAttribute($session->UserID, "CheckedDiscussions", false);
+            Gdn::userModel()->saveAttribute($session->UserID, "CheckedDiscussions", []);
         }
 
         redirectTo(getIncomingValue("Target", "/discussions"));

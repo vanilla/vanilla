@@ -14,7 +14,7 @@ use VanillaTests\Forum\Utils\CommunityApiTestTrait;
  */
 class DraftsTest extends AbstractResourceTest
 {
-    public static $addons = ["stubcontent"];
+    protected static $addons = ["stubcontent"];
 
     use CommunityApiTestTrait;
 

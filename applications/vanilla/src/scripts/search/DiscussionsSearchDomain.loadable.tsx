@@ -45,6 +45,7 @@ class DiscussionsSearchDomain extends SearchDomain<IDiscussionSearchTypes & { di
             "includeChildCategories",
             "includeArchivedCategories",
             "discussionID",
+            "types",
         ];
     }
 
@@ -55,6 +56,11 @@ class DiscussionsSearchDomain extends SearchDomain<IDiscussionSearchTypes & { di
             ...form,
             expand: ["insertUser", "breadcrumbs", "image", "excerpt", "-body"],
         };
+
+        if (form.types) {
+            const supportedTypes = flatten(CommunityPostTypeFilter.postTypes.map((type) => type.values));
+            query.types = form.types.filter((type) => supportedTypes.includes(type));
+        }
 
         if (form.discussionID && typeof parseInt(form.discussionID) === "number") {
             query.recordTypes = ["comment"]; // Include only comment record types.
@@ -101,11 +107,11 @@ class DiscussionsSearchDomain extends SearchDomain<IDiscussionSearchTypes & { di
         return query;
     };
 
-    public defaultFormValues = {
+    public defaultFormValues: Partial<ISearchForm<IDiscussionSearchTypes>> = {
         followedCategories: false,
         includeChildCategories: false,
         includeArchivedCategories: false,
-        types: flatten(CommunityPostTypeFilter.postTypes.map((type) => type.values)),
+        types: [],
     };
 
     public get sortValues() {

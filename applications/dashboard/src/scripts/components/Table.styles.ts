@@ -89,6 +89,10 @@ export const tableClasses = () => {
         ...Mixins.padding({ vertical: 4 }),
     });
 
+    const cellContentTruncate = css({
+        width: "100%",
+    });
+
     const cellCompact = css({
         "&&": {
             ...Mixins.padding({
@@ -171,6 +175,7 @@ export const tableClasses = () => {
         row,
         cell,
         cellContentWrap,
+        cellContentTruncate,
         cellCompact,
         basicColumn,
         pagination,

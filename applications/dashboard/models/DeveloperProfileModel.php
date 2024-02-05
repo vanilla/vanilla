@@ -30,7 +30,7 @@ class DeveloperProfileModel extends PipelineModel
         $this->config = $config;
         parent::__construct(self::TABLE_NAME);
         $this->addPipelineProcessor(
-            new PruneProcessor("dateRecorded", "7 days", 100, [
+            new PruneProcessor("dateRecorded", "1 days", 100, [
                 "isTracked" => false,
             ])
         );

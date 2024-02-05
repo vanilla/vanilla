@@ -829,6 +829,12 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                         }
                     }
 
+                    if (trim(str_replace(" ", "-", $tagData)) !== TagModel::tagSlug($tagData)) {
+                        $sender->Form->addError(
+                            "@" . t("ValidateTag", "The Url Slug may only contain alphanumeric characters and hyphens.")
+                        );
+                    }
+
                     if ($sender->Form->save()) {
                         $sender->informMessage(t("Your changes have been saved."));
                         $sender->setRedirectTo("/settings/tagging");
@@ -872,6 +878,12 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                     // Make sure that the tag name is not already in use.
                     if ($tagModel->getWhere(["Name" => $tagName])->numRows() > 0) {
                         $sender->Form->addError("The specified tag name is already in use.");
+                    }
+
+                    if (trim(str_replace(" ", "-", $tagName)) !== TagModel::tagSlug($tagName)) {
+                        $sender->Form->addError(
+                            "@" . t("ValidateTag", "The Url Slug may only contain alphanumeric characters and hyphens.")
+                        );
                     }
 
                     $saved = $sender->Form->save();

@@ -8,7 +8,7 @@ import React, { FunctionComponent } from "react";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { t } from "@library/utility/appUtils";
 import { useMutation } from "@tanstack/react-query";
-import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
+import DiscussionsApi from "@vanilla/addon-vanilla/thread/DiscussionsApi";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import DropDownSwitchButton from "@library/flyouts/DropDownSwitchButton";

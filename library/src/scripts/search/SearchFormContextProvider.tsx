@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -14,23 +14,28 @@ import {
     ALL_CONTENT_DOMAIN_KEY,
 } from "@library/search/searchConstants";
 import { t } from "@vanilla/i18n";
-import React, { useCallback, useMemo, useReducer, useState, useEffect } from "react";
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from "react";
 import merge from "lodash/merge";
 import { ISelectBoxItem } from "@library/forms/select/SelectBox";
-import { useSearchScope } from "@library/features/search/SearchScopeContext";
+import { SEARCH_SCOPE_LOCAL, useSearchScope } from "@library/features/search/SearchScopeContext";
 import { getCurrentLocale } from "@vanilla/i18n";
-import { SearchContext } from "./SearchContext";
+import { SearchFormContext } from "@library/search/SearchFormContext";
 import { getSearchAnalyticsData } from "@library/search/searchAnalyticsData";
-import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
+import { useSearchSources } from "@library/search/SearchSourcesContext";
 import { stableObjectHash } from "@vanilla/utils";
 import { dateRangeToString } from "@library/search/SearchUtils";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain";
 import SearchDomain from "@library/search/SearchDomain";
 import { useSiteSectionContext } from "@library/utility/SiteSectionContext";
+import QueryString from "@library/routing/QueryString";
+import PageLoader from "@library/routing/PageLoader";
+import { LoadStatus } from "@library/@types/api/core";
 
-interface IProps {
+interface IProps<ExtraFormValues extends object = {}> {
     children?: React.ReactNode;
+    initialSourceKey?: string;
+    initialFormState?: Partial<ISearchForm<ExtraFormValues>>;
 }
 
 export const SEARCH_LIMIT_DEFAULT = 10;
@@ -53,8 +58,55 @@ export function getGlobalSearchSorts(): ISelectBoxItem[] {
     ];
 }
 
-export function SearchFormContextProvider(props: IProps) {
-    const { sources, currentSource, setCurrentSource } = useSearchSources();
+export function SearchFormContextProvider<ExtraFormValues extends object = {}>(props: IProps<ExtraFormValues>) {
+    const { initialSourceKey } = props;
+    const { sources } = useSearchSources();
+
+    const initialSource =
+        (initialSourceKey ? sources.find(({ key }) => key === initialSourceKey) : undefined) ?? sources[0] ?? undefined;
+
+    const [currentSource, _setCurrentSource] = useState<ISearchSource | undefined>(initialSource);
+
+    /**
+     * This effect is responsible for halting all ongoing network request
+     * except for the currently selected source
+     */
+    useEffect(() => {
+        sources.forEach((source) => {
+            if (!!currentSource && source.key !== currentSource.key) {
+                source.abort?.();
+            }
+        });
+    }, [currentSource, sources]);
+
+    const setCurrentSource = useCallback(
+        (sourceKey: ISearchSource["key"]) => {
+            const matchingSource = sources.find(({ key }) => key === sourceKey);
+            if (matchingSource) {
+                _setCurrentSource(matchingSource);
+            }
+        },
+        [sources],
+    );
+
+    const [ready, setReady] = useState<boolean>(false);
+
+    const currentSourceKey = currentSource?.key;
+
+    async function loadDomainsAndSetReady() {
+        await currentSource!.loadDomains?.();
+        setReady(true);
+    }
+
+    useEffect(() => {
+        setReady(false);
+    }, [currentSourceKey]);
+
+    useEffect(() => {
+        if (!ready) {
+            loadDomainsAndSetReady();
+        }
+    }, [ready]);
 
     const currentSourceDomains = currentSource?.domains ?? [];
     const { children } = props;
@@ -127,6 +179,7 @@ export function SearchFormContextProvider(props: IProps) {
         form: {
             ...INITIAL_SEARCH_STATE.form,
             domain: ALL_CONTENT_DOMAIN_KEY,
+            ...(props.initialFormState ?? {}),
         },
     });
 
@@ -222,8 +275,6 @@ export function SearchFormContextProvider(props: IProps) {
     const search = async () => {
         const { form } = state;
 
-        await currentSource?.loadDomains?.();
-
         if (currentSource) {
             dispatch(SearchActions.performSearchACs.started(form));
 
@@ -313,7 +364,17 @@ export function SearchFormContextProvider(props: IProps) {
             };
 
             if ("domain" in update) {
-                const nextDomain = domains.find(({ key }) => key === updatedForm.domain);
+                const nextDomain = (
+                    domains.filter(({ isIsolatedType }) => !isIsolatedType).length > 1
+                        ? [ALL_CONTENT_DOMAIN, ...(currentSource?.domains ?? [])]
+                        : currentSource?.domains ?? []
+                ).find(({ key }) => key === updatedForm.domain);
+
+                // clear "types" when switching domains; different domains are not likely to support the same values for this field.
+                if (nextDomain?.key !== currentDomain.key) {
+                    updatedForm["types"] = undefined;
+                }
+
                 const nextDomainAllowedFields = Array.from(
                     new Set([...ALLOWED_GLOBAL_SEARCH_FIELDS, ...(nextDomain?.getAllowedFields(hasPermission) ?? [])]),
                 );
@@ -336,7 +397,7 @@ export function SearchFormContextProvider(props: IProps) {
 
             dispatch(SearchActions.updateSearchFormAC(updatedForm));
         },
-        [domains, currentDomain, state.form],
+        [domains, currentDomain, state.form, currentSource],
     );
 
     const resetForm = useCallback(() => {
@@ -350,7 +411,7 @@ export function SearchFormContextProvider(props: IProps) {
     }, [currentDomain]);
 
     const handleSourceChange = useCallback(
-        (newSourceKey: string) => {
+        async (newSourceKey: string) => {
             const nextSource = sources.find((source) => source.key === newSourceKey)!;
             const nextDomainKey = nextSource.domains.some(({ key }) => key === currentDomain.key)
                 ? currentDomain.key
@@ -358,17 +419,17 @@ export function SearchFormContextProvider(props: IProps) {
                 ? nextSource.domains[0]?.key ?? ALL_CONTENT_DOMAIN_KEY
                 : ALL_CONTENT_DOMAIN_KEY;
 
+            setCurrentSource(newSourceKey);
+            await nextSource.loadDomains?.();
             updateForm({
                 domain: nextDomainKey,
             });
-
-            setCurrentSource(newSourceKey);
         },
         [currentDomain.key, setCurrentSource, sources, updateForm],
     );
 
     return (
-        <SearchContext.Provider
+        <SearchFormContext.Provider
             value={{
                 ...state,
                 updateForm,
@@ -378,9 +439,26 @@ export function SearchFormContextProvider(props: IProps) {
                 defaultFormValues,
                 resetForm,
                 handleSourceChange,
+                currentSource,
             }}
         >
-            {children}
-        </SearchContext.Provider>
+            <QueryString
+                value={{
+                    ...{
+                        ...state.form,
+                        initialized: undefined,
+                        needsResearch: undefined,
+                        pageURL: undefined,
+                        offset: undefined,
+                    },
+                    source: currentSource?.key,
+                    scope: currentDomain.isIsolatedType
+                        ? SEARCH_SCOPE_LOCAL
+                        : searchScope.value?.value ?? state.form.scope ?? SEARCH_SCOPE_LOCAL,
+                }}
+                defaults={defaultFormValues}
+            />
+            <PageLoader status={ready ? LoadStatus.SUCCESS : LoadStatus.LOADING}>{children}</PageLoader>
+        </SearchFormContext.Provider>
     );
 }

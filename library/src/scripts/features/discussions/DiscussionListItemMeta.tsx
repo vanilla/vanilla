@@ -26,6 +26,7 @@ import { usePermissionsContext } from "@library/features/users/PermissionsContex
 import { qnaStatus } from "./DiscussionListItem";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { getMeta } from "@library/utility/appUtils";
+import { sprintf } from "sprintf-js";
 
 export interface IDiscussionItemMetaProps extends IDiscussion {
     inTile?: boolean;
@@ -156,11 +157,7 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
                     <Translate source="<0/> comments" c0={countComments} />
                 </MetaItem>
             )}
-            {displayScore && !renderScoreAsIcon && (
-                <MetaItem>
-                    <Translate source="<0/> reactions" c0={score ?? 0} />
-                </MetaItem>
-            )}
+            {displayScore && !renderScoreAsIcon && <MetaItem>{getPointsLabel(score ?? 0)}</MetaItem>}
             {displayStartedByUser && (
                 <MetaItem>
                     <Translate
@@ -216,4 +213,9 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
             )}
         </>
     );
+}
+
+function getPointsLabel(points: number): string {
+    const label = points === 0 ? t("%s point") : t("%s points");
+    return sprintf(label, points);
 }

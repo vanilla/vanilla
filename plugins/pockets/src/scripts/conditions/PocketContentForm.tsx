@@ -64,22 +64,26 @@ export function PocketContentForm(props: IProps) {
      */
     const setDefaultValuesOnInitialParams = (schema: JsonSchema, values: object): object => {
         let defaultValues = {};
-        // Iterate through the schema
-        Object.keys(schema).forEach((key) => {
-            // If we don't already have a value for this key, set it
-            if (!values.hasOwnProperty(key)) {
-                if (schema[key].hasOwnProperty("properties")) {
-                    const childValues = setDefaultValuesOnInitialParams(schema[`${key}`].properties, {});
-                    defaultValues[`${key}`] = childValues;
-                } else {
-                    const property = schema[key] ?? {};
-                    if (property.hasOwnProperty("default") && property.default !== null) {
-                        // If the property has a default value, set it
-                        defaultValues[`${key}`] = property.default;
+        if (Object.keys(schema).length > 0) {
+            defaultValues = { ...values };
+            // Iterate through the schema
+            Object.keys(schema).forEach((key) => {
+                // If we don't already have a value for this key, set it
+                if (!values.hasOwnProperty(key) || (key === "apiParams" && values[key]?.length === 0)) {
+                    if (schema[key].hasOwnProperty("properties")) {
+                        const childValues = setDefaultValuesOnInitialParams(schema[`${key}`].properties, {});
+                        defaultValues = { ...defaultValues, [`${key}`]: childValues };
+                    } else {
+                        const property = schema[key] ?? {};
+                        if (property.hasOwnProperty("default") && property.default !== null) {
+                            // If the property has a default value, set it
+                            defaultValues[`${key}`] = property.default;
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
+
         return defaultValues;
     };
 

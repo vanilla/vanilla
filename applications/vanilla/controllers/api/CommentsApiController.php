@@ -192,6 +192,13 @@ class CommentsApiController extends AbstractApiController
         }
 
         $this->userModel->expandUsers($comment, $this->resolveExpandFields($query, ["insertUser" => "InsertUserID"]));
+        if (
+            ModelUtils::isExpandOption("attachments", $query["expand"] ?? []) &&
+            Gdn::session()->checkPermission("Garden.Staff.Allow")
+        ) {
+            $attachmentModel = AttachmentModel::instance();
+            $attachmentModel->joinAttachments($comment);
+        }
         $comment = $this->normalizeOutput($comment, $query["expand"]);
         $result = $out->validate($comment);
 
@@ -311,7 +318,7 @@ class CommentsApiController extends AbstractApiController
             $this->idParamSchema = $this->schema(
                 Schema::parse([
                     "id:i" => "The comment ID.",
-                    "expand" => ApiUtils::getExpandDefinition(["-insertUser"]),
+                    "expand" => ApiUtils::getExpandDefinition(["-insertUser", "attachments"]),
                 ]),
                 $type
             );
@@ -384,7 +391,7 @@ class CommentsApiController extends AbstractApiController
                         "field" => "InsertUserID",
                     ],
                 ],
-                "expand?" => ApiUtils::getExpandDefinition(["insertUser", "-body"]),
+                "expand?" => ApiUtils::getExpandDefinition(["insertUser", "-body", "attachments"]),
             ],
             ["CommentIndex", "in"]
         )
@@ -423,6 +430,13 @@ class CommentsApiController extends AbstractApiController
 
         // Expand associated rows.
         $this->userModel->expandUsers($rows, $this->resolveExpandFields($query, ["insertUser" => "InsertUserID"]));
+        if (
+            ModelUtils::isExpandOption("attachments", $query["expand"] ?? []) &&
+            Gdn::session()->checkPermission("Garden.Staff.Allow")
+        ) {
+            $attachmentModel = AttachmentModel::instance();
+            $attachmentModel->joinAttachments($rows);
+        }
 
         foreach ($rows as &$currentRow) {
             $currentRow = $this->normalizeOutput($currentRow, $query["expand"]);

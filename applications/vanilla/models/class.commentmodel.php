@@ -905,6 +905,8 @@ class CommentModel extends Gdn_Model implements
                 "x-null-value" => -1,
             ],
             "image?" => new MainImageSchema(),
+            "attachments:a?" =>
+                "Attachments associated with this comment. Requires the 'Garden.Staff.Allow' permission.",
         ]);
         return $result;
     }

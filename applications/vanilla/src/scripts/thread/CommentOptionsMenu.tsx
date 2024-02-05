@@ -9,31 +9,44 @@ import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { IApiError } from "@library/@types/api/core";
 import { useUserCanStillEditDiscussionOrComment } from "@library/features/discussions/discussionHooks";
 import { useToast } from "@library/features/toaster/ToastContext";
-import { IPermissionOptions, PermissionMode } from "@library/features/users/Permission";
+import { IPermission, IPermissionOptions, PermissionChecker, PermissionMode } from "@library/features/users/Permission";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import { useCurrentUser } from "@library/features/users/userHooks";
 import DropDown, { DropDownOpenDirection, FlyoutType, IDropDownProps } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
+import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import { getMeta } from "@library/utility/appUtils";
 import { useMutation } from "@tanstack/react-query";
-import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
+import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
 import { t } from "@vanilla/i18n";
 import { Hoverable } from "@vanilla/react-utils";
 import React, { useState } from "react";
+
+interface ICommentOptionItem {
+    shouldRender: (comment: IComment, permissionChecker: PermissionChecker) => boolean;
+    component: React.ComponentType<{ comment: IComment; onSuccess?: () => Promise<void> }>;
+    sort?: number;
+}
+
+const additionalCommentOptions: ICommentOptionItem[] = [];
+
+export function addCommentOption(option: ICommentOptionItem) {
+    additionalCommentOptions.push(option);
+}
 
 interface IProps {
     comment: IComment;
     discussion: IDiscussion;
     onCommentEdit: () => void;
-    onDeleteSuccess?: () => Promise<void>;
+    onMutateSuccess?: () => Promise<void>;
     isEditLoading: boolean;
     isVisible?: IDropDownProps["isVisible"];
 }
 
 export function CommentOptionsMenu(props: IProps) {
-    const { discussion, comment } = props;
+    const { discussion, comment, onMutateSuccess } = props;
     const items: React.ReactNode[] = [];
     const currentUser = useCurrentUser();
     const { hasPermission } = usePermissionsContext();
@@ -113,7 +126,7 @@ export function CommentOptionsMenu(props: IProps) {
                     isConfirmLoading={deleteMutation.isLoading}
                     onConfirm={async () => {
                         await deleteMutation.mutateAsync(comment.commentID);
-                        !!props.onDeleteSuccess && (await props.onDeleteSuccess());
+                        !!onMutateSuccess && (await onMutateSuccess());
                     }}
                 >
                     {t("Are you sure you want to delete this comment?")}
@@ -127,6 +140,16 @@ export function CommentOptionsMenu(props: IProps) {
                 {t("Revision History")}
             </DropDownItemLink>,
         );
+    }
+
+    const additionalItemsToRender = additionalCommentOptions
+        .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0))
+        .filter(({ shouldRender }) => shouldRender(comment, hasPermission))
+        .map((option, index) => <option.component key={index} comment={comment} onSuccess={onMutateSuccess} />);
+
+    if (additionalItemsToRender.length > 0) {
+        items.push(<DropDownItemSeparator />);
+        items.push(...additionalItemsToRender);
     }
 
     return items.length > 0 ? (

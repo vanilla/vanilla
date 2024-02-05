@@ -53,10 +53,10 @@ class DiscussionCommentsAsset extends AbstractLayoutAsset implements HydrateAwar
         $comments = $this->internalClient->get("/comments", $apiParams)->asData();
         $props =
             [
-                "commentsPreload" => $comments->withPaging(),
+                "comments" => $comments->withPaging(),
                 "apiParams" => array_merge($this->props["apiParams"] ?? [], $apiParams),
-                "discussionID" => $this->getHydrateParam("discussionID"),
                 "discussion" => $this->getHydrateParam("discussion"),
+                "discussionApiParams" => $this->getHydrateParam("discussionApiParams"),
             ] + $this->props;
 
         return $props;
@@ -67,13 +67,13 @@ class DiscussionCommentsAsset extends AbstractLayoutAsset implements HydrateAwar
         $result = $this->renderTwigFromString(
             <<<TWIG
 <h2>{{t("Comments")}}</h2>
-{% for comment in commentsPreload.data %}
+{% for comment in comments.data %}
 <div class="comment separated">
 <div>{{ renderSeoUser(comment.insertUser) }}</div>
 <div class="userContent">{{ comment.body|raw }}</div>
 </div>
 {% endfor %}
-{% if empty(commentsPreload.data) %}
+{% if empty(comments.data) %}
 {{ t("There are no comments yet") }}
 {% endif %}
 TWIG

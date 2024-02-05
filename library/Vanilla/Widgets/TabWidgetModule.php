@@ -191,7 +191,8 @@ class TabWidgetModule extends AbstractReactModule
         ]);
 
         return Schema::parse([
-            "limit:i" => [
+            "limit" => [
+                "type" => ["string", "integer"],
                 "default" => 5,
                 "x-control" => SchemaForm::dropDown(
                     new FormOptions("Max Items", "Maximum number of items to display in each widget."),

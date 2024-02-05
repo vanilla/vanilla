@@ -261,8 +261,8 @@ final class Timers
         $session = \Gdn::session();
         $config = \Gdn::config();
 
-        if (!$config->get("trace.profiler", true)) {
-            // Never record traces if the feature is disabled. On by default.
+        if (!$config->get("trace.profiler", false)) {
+            // Never record traces if the feature is disabled. Off by default.
             return false;
         }
 

@@ -99,7 +99,7 @@ export const checkRadioClasses = useThemeCache(() => {
     const globalVars = globalVariables();
     const vars = checkRadioVariables();
 
-    const isDashboard = css({
+    const dashboardRadioButton = css({
         ...Mixins.padding({
             vertical: 5,
             horizontal: 6,
@@ -234,7 +234,7 @@ export const checkRadioClasses = useThemeCache(() => {
             all: 0,
             right: px(globalVars.spacer.size / 2),
         }),
-        [`&.${isDashboard} + .info`]: {
+        [`&.${dashboardRadioButton} + .info`]: {
             ...Mixins.margin({
                 top: styleUnit(2),
                 bottom: styleUnit(6),
@@ -297,7 +297,7 @@ export const checkRadioClasses = useThemeCache(() => {
         diskIcon,
         input,
         grid,
-        isDashboard,
+        dashboardRadioButton,
         checkBoxDescription,
     };
 });

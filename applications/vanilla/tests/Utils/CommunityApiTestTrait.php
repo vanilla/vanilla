@@ -7,7 +7,9 @@
 
 namespace VanillaTests\Forum\Utils;
 
+use AttachmentModel;
 use Garden\Http\HttpResponse;
+use Gdn_Format;
 use Vanilla\Formatting\Formats\TextFormat;
 use Vanilla\Http\InternalClient;
 use Vanilla\Utility\ModelUtils;
@@ -359,6 +361,27 @@ trait CommunityApiTestTrait
         // Update media with $attachmentData
         $response = $this->api()->patch("/media/{$mediaID}/attachment", $attachmentData);
         return $response->getBody();
+    }
+
+    public function createAttachment(string $recordType, int $recordID)
+    {
+        $recordType = strtolower($recordType);
+        $recordPrefix = substr($recordType, 0, 1);
+        $attachment = [
+            "Type" => "mock",
+            "ForeignID" => "{$recordPrefix}-{$recordID}",
+            "ForeignUserID" => self::$siteInfo["adminUserID"],
+            "Source" => "mockSite",
+            "SourceID" => 99,
+            "SourceURL" => "https://www.example.com",
+            "Status" => "active",
+            "DateLastModified" => Gdn_Format::toDateTime(),
+        ];
+
+        $attachmentModel = $this->container()->get(AttachmentModel::class);
+        $id = $attachmentModel->save($attachment);
+        $savedAttachment = $attachmentModel->getID($id);
+        return $savedAttachment;
     }
 
     /**

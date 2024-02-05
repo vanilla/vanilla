@@ -4505,6 +4505,7 @@ SQL;
             ],
             "status?" => RecordStatusModel::getSchemaFragment(),
             "trending:o?",
+            "attachments:a?",
         ];
         if (\Gdn::session()->checkPermission("staff.allow")) {
             $schema["internalStatusID:i"] = ["default" => 0];

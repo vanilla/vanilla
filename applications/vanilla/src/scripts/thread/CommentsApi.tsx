@@ -9,13 +9,10 @@ import apiv2 from "@library/apiv2";
 import SimplePagerModel, { IWithPaging } from "@library/navigation/SimplePagerModel";
 import { RecordID } from "@vanilla/utils";
 
-export const CommentsApi = {
+const CommentsApi = {
     index: async (apiParams: CommentsApi.IndexParams): Promise<IWithPaging<IComment[]>> => {
         const result = await apiv2.get<IComment[]>("/comments", {
-            params: {
-                // Make sure if you add anything else here it's handled in the backend preload as well.
-                ...apiParams,
-            },
+            params: apiParams,
         });
 
         const paging = SimplePagerModel.parseHeaders(result.headers);
@@ -28,12 +25,11 @@ export const CommentsApi = {
         const result = await apiv2.get<ICommentEdit>(`/comments/${commentID}/edit`);
         return result.data;
     },
-    post: async (apiParams: CommentsApi.PostParams): Promise<IComment[]> => {
+    post: async (apiParams: CommentsApi.PostParams): Promise<IComment> => {
         const result = await apiv2.post("/comments", apiParams);
         return result.data;
     },
-    patch: async (apiParams: CommentsApi.PatchParams): Promise<IComment[]> => {
-        const { commentID, ...body } = apiParams;
+    patch: async (commentID: IComment["commentID"], apiParams: CommentsApi.PatchParams): Promise<IComment> => {
         const result = await apiv2.patch(`/comments/${commentID}`, apiParams);
         return result.data;
     },
@@ -41,3 +37,5 @@ export const CommentsApi = {
         await apiv2.delete(`/comments/${commentID}`);
     },
 };
+
+export default CommentsApi;

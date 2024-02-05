@@ -27,12 +27,13 @@ const StoryCommentList = () => {
             },
         },
     });
+    const fakeDiscussion = LayoutEditorPreviewData.discussion();
     return (
         <QueryClientProvider client={queryClient}>
             <DiscussionCommentsAsset
-                commentsPreload={{ data: STORY_COMMENTS, paging: LayoutEditorPreviewData.paging(5) }}
-                apiParams={{ discussionID: "fake", limit: 5, page: 1 }}
-                discussion={{ ...LayoutEditorPreviewData.discussion() }}
+                comments={{ data: STORY_COMMENTS, paging: LayoutEditorPreviewData.paging(5) }}
+                apiParams={{ discussionID: fakeDiscussion.discussionID, limit: 5, page: 1 }}
+                discussion={fakeDiscussion}
             />
         </QueryClientProvider>
     );

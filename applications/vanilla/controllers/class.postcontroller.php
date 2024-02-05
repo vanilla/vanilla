@@ -512,6 +512,7 @@ class PostController extends VanillaController
             $record = $this->Draft = $this->DraftModel->getID($draftID);
             $this->CategoryID = $this->Draft->CategoryID;
             $this->setData("Type", $record->Type ?? "Discussion");
+            $this->setData("Discussion", $record, true);
             // Verify this is their draft
             if (val("InsertUserID", $this->Draft) != Gdn::session()->UserID) {
                 throw permissionException();

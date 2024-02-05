@@ -36,11 +36,20 @@ class WidgetFactoryTest extends BootstrapTestCase
                     ],
                 ],
             ],
+            [
+                "name" => "Array",
+                "value" => "test",
+            ],
         ];
         $actual = $factory->getWidgetSummaryParameters([
             "name" => "Hello Title",
             "nested" => [
                 "slotType" => "m",
+            ],
+            "array" => [
+                [
+                    "label" => "test",
+                ],
             ],
         ]);
 

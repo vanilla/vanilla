@@ -13,7 +13,7 @@ import { usePermissionsContext } from "@library/features/users/PermissionsContex
 import { FormControl, FormControlGroup } from "@library/forms/FormControl";
 import InputBlock from "@library/forms/InputBlock";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
-import { useSearchForm } from "@library/search/SearchContext";
+import { useSearchForm } from "@library/search/SearchFormContext";
 import { t } from "@vanilla/i18n";
 import { JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { useFormik } from "formik";

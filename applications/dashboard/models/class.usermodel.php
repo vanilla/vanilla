@@ -5823,7 +5823,10 @@ SQL;
     {
         $user = $this->getID($userID, DATASET_TYPE_ARRAY);
         $result = val($attribute, $user["Attributes"], $defaultValue);
-
+        // return same default value type
+        if (is_array($defaultValue) && $result === false) {
+            $result = $defaultValue;
+        }
         return $result;
     }
 

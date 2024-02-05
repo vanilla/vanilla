@@ -202,6 +202,10 @@ export const discussionListClasses = useThemeCache(
             },
         });
 
+        const disablePointerEvents = css({
+            pointerEvents: "none",
+        });
+
         return {
             title,
             iconAndVoteCounterWrapper,
@@ -223,6 +227,7 @@ export const discussionListClasses = useThemeCache(
             filterAndSortingLabel,
             filterAndSortingDropdown,
             filterAndSortingButton,
+            disablePointerEvents,
         };
     },
 );

@@ -38,4 +38,11 @@ interface DriverInterface
      * @return array
      */
     public function getSupportedInterfaces(): array;
+
+    /**
+     * Use this method to have your driver perform any necessary cleanup after all jobs have been executed.
+     *
+     * @return void
+     */
+    public function cleanupAfterDispatch(): void;
 }

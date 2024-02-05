@@ -49,4 +49,12 @@ class VoidDriver implements DriverInterface
     {
         return [];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function cleanupAfterDispatch(): void
+    {
+        // Nothing to do here.
+    }
 }

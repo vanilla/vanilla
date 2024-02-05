@@ -7,6 +7,7 @@
 namespace Vanilla\Utility;
 
 use Firebase\JWT\JWT;
+use function Sodium\add;
 
 /**
  * A collection of string utilities.
@@ -237,6 +238,13 @@ final class StringUtils
             } elseif (is_array($value)) {
                 $result = $result + self::flattenArray($value, $prefix . $key . ".");
             } else {
+                if (is_string($value)) {
+                    // Remove escaped quotes since those are not processed by the CSV generator.
+                    $value = str_replace("\\\"", "\"", $value);
+
+                    // Escape next line to prevent text from breaking.
+                    $value = str_replace("\n", "\\n", $value);
+                }
                 $result[$prefix . $key] = $value;
             }
         }

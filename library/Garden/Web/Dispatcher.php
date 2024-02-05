@@ -79,7 +79,7 @@ class Dispatcher implements LoggerAwareInterface
         $this->locale = $locale;
         $this->container = $container;
         $this->eventManager = $eventManager ?? new EventManager();
-        $this->timers = $timers ?? new Timers();
+        // $this->timers = $timers ?? new Timers();
     }
 
     /**
@@ -136,13 +136,13 @@ class Dispatcher implements LoggerAwareInterface
      */
     public function dispatch(RequestInterface $request)
     {
-        $span = $this->timers->startRequest($request);
+        // $span = $this->timers->startRequest($request);
         try {
             $result = $this->callMiddleware($request);
         } catch (\Throwable $ex) {
             $result = $this->makeResponse($ex);
         } finally {
-            $span->finish($result ? $result->asHttpResponse() : null);
+            // $span->finish($result ? $result->asHttpResponse() : null);
         }
         return $result;
     }
@@ -162,9 +162,9 @@ class Dispatcher implements LoggerAwareInterface
 
         foreach ($this->routes as $route) {
             try {
-                $routeMatchSpan = $this->timers->startGeneric("route-match");
+                // $routeMatchSpan = $this->timers->startGeneric("route-match");
                 $action = $route->match($request);
-                $routeMatchSpan->finish();
+                // $routeMatchSpan->finish();
                 if ($action instanceof \Exception) {
                     // Hold the action in case another route succeeds.
                     $ex = $action;

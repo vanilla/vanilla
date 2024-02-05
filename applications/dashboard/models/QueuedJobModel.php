@@ -119,12 +119,13 @@ class QueuedJobModel extends PipelineModel implements LoggerAwareInterface
     ) {
         parent::__construct(self::TABLE_NAME);
         $this->addPipelineProcessor(new JsonFieldProcessor(["message", "metrics"]));
+        $successPruneDuration = $config->get("JobQueue.SuccessPruneDuration", "3 days");
         $this->addPipelineProcessor(
             new PruneProcessor("dateUpdated", "3 days", 100, [
                 "status" => [self::STATUS_SUCCESS],
             ])
         );
-        $this->addPipelineProcessor(new PruneProcessor("dateUpdated", "1 month", 100));
+        $this->addPipelineProcessor(new PruneProcessor("dateUpdated", "2 weeks", 100));
         $this->lockService = $lockService;
         $this->config = $config;
         $this->scheduler = $scheduler;
@@ -241,12 +242,11 @@ class QueuedJobModel extends PipelineModel implements LoggerAwareInterface
     }
 
     /**
-     * Check to schedule Job
-     * @param string $jobDescriptor Class name of the job to schedule
+     * Check if we should flush any pending jobs.
      *
-     * @throws \Exception
+     * @return bool
      */
-    public function checkToScheduleJob(string $jobDescriptor)
+    public function shouldFlushPendingJobs(): bool
     {
         $subquery = $this->createSql();
         $subquery
@@ -275,10 +275,7 @@ class QueuedJobModel extends PipelineModel implements LoggerAwareInterface
         }
 
         // Trigger job when we have jobThreshold(default 50) number of jobs queued, or latest queued job was queued 1 minute ago.
-        if ($pendingCount >= $this->getJobThreshold() || $hasEarlyJob) {
-            $jobDescriptor = new NormalJobDescriptor($jobDescriptor);
-            $this->scheduler->addJobDescriptor($jobDescriptor);
-        }
+        return $pendingCount >= $this->getJobThreshold() || $hasEarlyJob;
     }
 
     /**

@@ -23,13 +23,14 @@ interface IProps {
     paginationProps?: INumberedPagerProps;
     apiParams: IGetDiscussionListParams;
     updateApiParams: (newParams: Partial<IGetDiscussionListParams>) => void;
+    isPreview?: boolean;
 }
 
 /**
  * Header component for discussion list asset.
  */
 export function DiscussionListAssetHeader(props: IProps) {
-    const { updateApiParams, apiParams } = props;
+    const { updateApiParams, apiParams, isPreview } = props;
     const classes = discussionListClasses();
     const { hasPermission } = usePermissionsContext();
     const canUseCheckboxes =
@@ -39,7 +40,7 @@ export function DiscussionListAssetHeader(props: IProps) {
     const isMobile = measure.width < 600;
 
     return (
-        <div className={cx(classes.assetHeader)} ref={selfRef}>
+        <div className={cx(classes.assetHeader, { [classes.disablePointerEvents]: isPreview })} ref={selfRef}>
             <div>
                 {canUseCheckboxes && (
                     <DiscussionListSelectAll

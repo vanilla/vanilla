@@ -1,4 +1,4 @@
-import { Condition, IFieldError, IPtrReference } from "./types";
+import { Condition, IFieldError, IPtrReference, JsonSchema } from "./types";
 import get from "lodash/get";
 import { logError, notEmpty } from "@vanilla/utils";
 import { FormikErrors } from "formik";
@@ -130,6 +130,19 @@ export function validationErrorsToFieldErrors(
                 }
             })
             .map((error) => {
+                // if we're getting a root as instance location, lets go fishing for the field in the message
+                if (error.instanceLocation === "#") {
+                    const match = error.error.match(/(["'])(?:(?=(\\?))\2.)*?\1/);
+                    if (match && match.length > 0) {
+                        const field = match[0].replace(/"/g, "");
+                        return {
+                            code: error.keyword ?? "unknown",
+                            message: error.error!,
+                            field,
+                        };
+                    }
+                }
+
                 return {
                     code: error.keyword ?? "unknown",
                     message: error.error!,
@@ -151,12 +164,34 @@ export function mapValidationErrorsToFormikErrors(validationErrors: ValidationRe
     );
 }
 
-export function recursivelyCleanInstance(instance: Record<string, any>) {
+export function recursivelyCleanInstance(instance: Record<string, any>, schema?: JsonSchema) {
     return Object.keys(instance).reduce((acc, key) => {
         const value = instance[key];
         if (typeof value !== "undefined") {
             if (value !== null && typeof value === "object" && !Array.isArray(value)) {
-                return { ...acc, [key]: recursivelyCleanInstance(value) };
+                return { ...acc, [key]: recursivelyCleanInstance(value, schema) };
+            }
+            // Resolve strings used in inputs but numbers desired in schema
+            if (typeof value === "string" && schema?.properties?.[key]?.type === "number") {
+                // Omitting empty string values allows required number fields to be validated
+                if (value?.length === 0) {
+                    return { ...acc };
+                }
+                return { ...acc, [key]: parseInt(value) };
+            }
+            /**
+             * Strictly speaking, required checks only assert a property on the instance, but in practice,
+             * empty strings are represent omitted values in our forms.
+             */
+            if (
+                typeof value === "string" &&
+                schema?.properties?.[key]?.type === "string" &&
+                schema?.required?.includes(key)
+            ) {
+                // Omitting empty string values allows required number fields to be validated
+                if (value?.length === 0) {
+                    return { ...acc };
+                }
             }
             return { ...acc, [key]: value };
         }

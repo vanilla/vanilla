@@ -14,8 +14,6 @@ import InputBlock from "@library/forms/InputBlock";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock, { IInputTextProps } from "@library/forms/InputTextBlock";
 import PasswordInput from "@library/forms/PasswordInput";
-import RadioButton from "@library/forms/RadioButton";
-import RadioButtonGroup from "@library/forms/RadioButtonGroup";
 import SelectOne from "@library/forms/select/SelectOne";
 import { Tokens } from "@library/forms/select/Tokens";
 import { StoryContent } from "@library/storybook/StoryContent";
@@ -24,6 +22,8 @@ import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { StorySmallContent } from "@library/storybook/StorySmallContent";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
 import React, { useState } from "react";
+import RadioButton from "@library/forms/RadioButton";
+import { RadioGroupContext } from "@library/forms/RadioGroupContext";
 
 export default {
     title: "Forms/Front End Form Fields",
@@ -183,21 +183,29 @@ export function Toggles() {
     );
 }
 
-export function RadioGroups() {
+function RadioGroupsStoryContent() {
+    const [value, setValue] = useState<string>("a");
     // To avoid clashing with other components also using these radio buttons, you need to generate a unique ID for the group.
     const radioButtonGroup1 = uniqueIDFromPrefix("radioButtonGroupA");
+
     return (
         <StoryContent>
             <StoryHeading>Radio Buttons - In a Group</StoryHeading>
-            <RadioButtonGroup legend={"Gaggle of radio buttons"}>
-                <RadioButton label={"Option A"} name={radioButtonGroup1} defaultChecked />
-                <RadioButton label={"Option B"} name={radioButtonGroup1} />
-                <RadioButton label={"Option C (hovered)"} name={radioButtonGroup1} fakeFocus />
-                <RadioButton label={"Option D"} name={radioButtonGroup1} />
-                <RadioButton label={"Option E"} name={radioButtonGroup1} />
-            </RadioButtonGroup>
+            <InputBlock legend={"Gaggle of radio buttons"}>
+                <RadioGroupContext.Provider value={{ value, onChange: setValue }}>
+                    <RadioButton value={"a"} label={"Option A"} name={radioButtonGroup1} />
+                    <RadioButton value={"b"} label={"Option B"} name={radioButtonGroup1} />
+                    <RadioButton value={"c"} label={"Option C (hovered)"} name={radioButtonGroup1} fakeFocus />
+                    <RadioButton value={"d"} label={"Option D"} name={radioButtonGroup1} />
+                    <RadioButton value={"e"} label={"Option E"} name={radioButtonGroup1} />
+                </RadioGroupContext.Provider>
+            </InputBlock>
         </StoryContent>
     );
+}
+
+export function RadioGroups() {
+    return <RadioGroupsStoryContent />;
 }
 
 export function Checkboxes() {

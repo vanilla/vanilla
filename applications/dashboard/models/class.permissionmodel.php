@@ -672,6 +672,7 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
         $result = array_merge(array_keys($enabledApplications), array_keys($pluginNamespaces));
         if (in_array("Dashboard", $result)) {
             $result[] = "Garden";
+            $result[] = "Reactions";
         }
         return $result;
     }

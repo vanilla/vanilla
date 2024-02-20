@@ -343,10 +343,7 @@ class PageScraper implements LoggerAwareInterface
     {
         $document = new DOMDocument();
 
-        $err = libxml_use_internal_errors(true);
-        libxml_clear_errors();
-        $loadResult = $document->loadHTML($html);
-        libxml_use_internal_errors($err);
+        @$loadResult = $document->loadHTML($html, LIBXML_NOERROR | LIBXML_NOWARNING);
 
         if ($loadResult === false) {
             throw new Exception("Failed to load document for parsing.", 400);

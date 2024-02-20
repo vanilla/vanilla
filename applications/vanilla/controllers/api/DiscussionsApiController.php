@@ -103,6 +103,8 @@ class DiscussionsApiController extends AbstractApiController
     /** @var DiscussionStatusModel */
     private $discussionStatusModel;
 
+    private ReactionModel $reactionModel;
+
     /**
      * DiscussionsApiController constructor.
      *
@@ -117,6 +119,7 @@ class DiscussionsApiController extends AbstractApiController
      * @param RecordStatusLogModel $recordStatusLogModel
      * @param LongRunner $longRunner
      * @param DiscussionStatusModel $discussionStatusModel
+     * @param ReactionModel $reactionModel
      */
     public function __construct(
         DiscussionModel $discussionModel,
@@ -129,7 +132,8 @@ class DiscussionsApiController extends AbstractApiController
         RecordStatusModel $recordStatusModel,
         RecordStatusLogModel $recordStatusLogModel,
         LongRunner $longRunner,
-        DiscussionStatusModel $discussionStatusModel
+        DiscussionStatusModel $discussionStatusModel,
+        ReactionModel $reactionModel
     ) {
         $this->categoryModel = $categoryModel;
         $this->discussionModel = $discussionModel;
@@ -142,6 +146,7 @@ class DiscussionsApiController extends AbstractApiController
         $this->recordStatusLogModel = $recordStatusLogModel;
         $this->longRunner = $longRunner;
         $this->discussionStatusModel = $discussionStatusModel;
+        $this->reactionModel = $reactionModel;
     }
 
     /**
@@ -204,6 +209,7 @@ class DiscussionsApiController extends AbstractApiController
         // Expand associated rows.
         $this->discussionExpandSchema->commonExpand($rows, $query["expand"] ?? []);
         $this->expandLastCommentBody($rows, $query["expand"]);
+        $rows = $this->reactionModel->expandDiscussionReactions($rows, $query["expand"]);
 
         $result = $out->validate($rows);
 
@@ -664,10 +670,11 @@ class DiscussionsApiController extends AbstractApiController
             $this->resolveExpandFields($query, ["insertUser" => "InsertUserID", "lastUser" => "LastUserID"])
         );
         $row = $this->normalizeOutput($row, $query["expand"]);
-
         $this->discussionExpandSchema->commonExpand($row, $query["expand"] ?? []);
+
         $rows = [&$row];
         $this->expandLastCommentBody($rows, $query["expand"]);
+        [$row] = $this->reactionModel->expandDiscussionReactions($rows, $query["expand"]);
         $result = $out->validate($row);
         if ($this->isExpandField("tags", $query["expand"]) ?? false) {
             $this->tagModel->expandTags($result);
@@ -984,6 +991,13 @@ class DiscussionsApiController extends AbstractApiController
             $where["DateInserted >"] = $filterTime;
         }
 
+        if (isset($query["reactionType"])) {
+            $reactedDiscussions = $this->reactionModel->getReactedDiscussionIDsByUser($this->getSession()->UserID, [
+                $query["reactionType"],
+            ]);
+            $where["d.DiscussionID"] = $reactedDiscussions;
+        }
+
         // Allow addons to update the where clause.
         $where = $this->getEventManager()->fireFilter(
             "discussionsApiController_indexFilters",
@@ -1160,6 +1174,7 @@ class DiscussionsApiController extends AbstractApiController
         }
         $this->discussionExpandSchema->commonExpand($rows, $query["expand"] ?? []);
         $this->expandLastCommentBody($rows, $query["expand"]);
+        $rows = $this->reactionModel->expandDiscussionReactions($rows, $query["expand"]);
 
         $result = $out->validate($rows);
         // Allow addons to modify the result.
@@ -1895,5 +1910,118 @@ class DiscussionsApiController extends AbstractApiController
     {
         $categoryIDs = $this->categoryModel->getSearchCategoryIDs($categoryID, $followed, true);
         return $categoryIDs;
+    }
+
+    /**
+     * Respond to /api/v2/discussions/:id/reactions
+     *
+     * @param int $id The discussion ID.
+     * @param array $query The request query.
+     * @return array
+     */
+    public function get_reactions(int $id, array $query)
+    {
+        $this->permission();
+
+        $this->idParamSchema()->setDescription("Get a summary of reactions on a discussion.");
+        $in = $this->schema([
+            "type:s?" => [
+                "default" => null,
+                "nullable" => true,
+                "description" => "Filter to a specific reaction type by using its URL code.",
+            ],
+            "page:i?" => [
+                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                "default" => 1,
+                "minimum" => 1,
+                "maximum" => 100,
+            ],
+            "limit:i?" => [
+                "description" => "Desired number of items per page.",
+                "default" => $this->reactionModel->getDefaultLimit(),
+                "minimum" => 1,
+                "maximum" => 100,
+            ],
+        ])->setDescription("Get reactions to a discussion.");
+        $out = $this->schema(
+            [":a" => $this->reactionModel->getReactionLogFragment($this->getUserFragmentSchema())],
+            "out"
+        );
+
+        $discussion = $this->discussionByID($id);
+        $this->discussionModel->categoryPermission("Vanilla.Discussions.View", $discussion["CategoryID"]);
+
+        $query = $in->validate($query);
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
+        $discussion += ["recordType" => "Discussion", "recordID" => $discussion["DiscussionID"]];
+        $rows = $this->reactionModel->getRecordReactions($discussion, true, $query["type"], $offset, $limit);
+
+        $result = $out->validate($rows);
+        return $result;
+    }
+
+    /**
+     * React to a discussion with /api/v2/discussions/:id/reactions
+     *
+     * @param int $id The discussion ID.
+     * @param array $body The request query.
+     * @return array
+     */
+    public function post_reactions(int $id, array $body)
+    {
+        $this->permission("Garden.SignIn.Allow");
+
+        $in = $this->schema(
+            [
+                "reactionType:s" => "URL code of a reaction type.",
+            ],
+            "in"
+        )->setDescription("React to a discussion.");
+        $out = $this->schema($this->reactionModel->getReactionSummaryFragment(), "out");
+        $discussion = $this->discussionByID($id);
+        $session = $this->getSession();
+        $this->reactionModel->canViewDiscussion($discussion, $session);
+        $body = $in->validate($body);
+
+        $this->reactionModel->react("Discussion", $id, $body["reactionType"], null, false, ReactionModel::FORCE_ADD);
+
+        // Refresh the discussion to grab its updated attributes.
+        $discussion = $this->discussionByID($id);
+        $rows = $this->reactionModel->getRecordSummary($discussion);
+
+        $result = $out->validate($rows);
+        return $result;
+    }
+
+    /**
+     * Delete a discussion reaction with /api/v2/discussions/:id/reactions/:userID
+     *
+     * @param int $id The discussion ID.
+     * @param int|null $userID
+     * @return void
+     */
+    public function delete_reactions(int $id, int $userID = null): void
+    {
+        $this->permission("Garden.SignIn.Allow");
+
+        $in = $this->schema(
+            $this->idParamSchema()->merge(Schema::parse(["userID:i" => "The target user ID."])),
+            "in"
+        )->setDescription('Remove a user\'s reaction.');
+        $out = $this->schema([], "out");
+
+        $this->discussionByID($id);
+
+        if ($userID === null) {
+            $userID = $this->getSession()->UserID;
+        } elseif ($userID !== $this->getSession()->UserID) {
+            $this->permission("Garden.Moderation.Manage");
+        }
+
+        $reaction = $this->reactionModel->getUserReaction($userID, "Discussion", $id);
+        if ($reaction) {
+            $urlCode = $reaction["UrlCode"];
+            $this->reactionModel->react("Discussion", $id, $urlCode, $userID, false, ReactionModel::FORCE_REMOVE);
+        }
     }
 }

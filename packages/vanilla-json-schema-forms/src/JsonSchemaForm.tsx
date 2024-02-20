@@ -133,7 +133,7 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
          * prior to validating to resolve type mismatch errors
          * required validation will continue to function as expected
          */
-        const cleanInstance = recursivelyCleanInstance(instance);
+        const cleanInstance = recursivelyCleanInstance(instance, schemaRef.current);
 
         result = formValidation.validate(schemaRef.current, cleanInstance);
 

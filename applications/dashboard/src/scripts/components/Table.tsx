@@ -38,10 +38,14 @@ export interface ITableHeaderProps {
 const TableHeader = (props: ITableHeaderProps) => {
     const { headerGroups, sortable, columnsNotSortable, rows, headerClassNames, rowClassNames, hiddenHeaders } = props;
     const classes = tableClasses();
-    const valueTypeLookUp = useMemo<Record<string, string>>(
-        () => Object.fromEntries(Object.keys(rows[0].original).map((key) => [key, typeof rows[0].original[key]])),
-        [rows],
-    );
+    const valueTypeLookUp = useMemo<Record<string, string>>(() => {
+        if (rows?.[0]?.original) {
+            return Object.fromEntries(
+                Object.keys(rows?.[0]?.original).map((key) => [key, typeof rows?.[0]?.original?.[key]]),
+            );
+        }
+        return {};
+    }, [rows]);
 
     return (
         <thead className={headerClassNames}>
@@ -130,7 +134,9 @@ const TableRows = (props: ITableRowProps) => {
                                     )}
                                 >
                                     <span className={classes.cellContentWrap}>
-                                        <TruncatedText lines={2}>{cell.render("Cell")}</TruncatedText>
+                                        <TruncatedText className={classes.cellContentTruncate} lines={2}>
+                                            {cell.render("Cell")}
+                                        </TruncatedText>
                                     </span>
                                 </td>
                             );

@@ -93,7 +93,10 @@ class RSSFeedParser extends AbstractXmlParser
         }
         $encoding = $DOMImgElement->ownerDocument->encoding ?? "UTF-8";
         $doc = new DOMDocument();
-        $doc->loadHTML(sprintf('<?xml encoding="%s" ?>%s', $encoding, $imageContent));
+        @$doc->loadHTML(
+            sprintf('<?xml encoding="%s" ?>%s', $encoding, $imageContent),
+            LIBXML_NOERROR | LIBXML_NOWARNING
+        );
         /** @var \DOMElement $imageElement */
         $imageElement = $doc->getElementsByTagName("img")->item(0);
         $attributes = $this->getAttributesFromElement($imageElement, $schemaArray);

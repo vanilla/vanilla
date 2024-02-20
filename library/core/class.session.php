@@ -419,7 +419,12 @@ class Gdn_Session implements LoggerAwareInterface
     public function getAttribute($attributeName, $defaultValue = false)
     {
         if (is_array($this->_Attributes)) {
-            return val($attributeName, $this->_Attributes, $defaultValue);
+            $value = val($attributeName, $this->_Attributes, $defaultValue);
+            // return same default value type
+            if (is_array($defaultValue) && $value === false) {
+                $value = $defaultValue;
+            }
+            return $value;
         }
         return $defaultValue;
     }

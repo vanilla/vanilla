@@ -384,7 +384,10 @@ class SiteMeta implements \JsonSerializable
                         (bool) $this->config->get("Search.SupportsScope", false) &&
                         $activeDriverInstance->supportsForeignRecords(),
                     "activeDriver" => $activeDriverInstance->getName(),
-                    "externalSearchQuery" => $this->config->get("Garden.ExternalSearch.Query", false),
+                    "externalSearch" => [
+                        "query" => $this->config->get("Garden.ExternalSearch.Query", false),
+                        "resultsInNewTab" => $this->config->get("Garden.ExternalSearch.ResultsInNewTab", false),
+                    ],
                 ],
                 "upload" => [
                     "maxSize" => $this->maxUploadSize,

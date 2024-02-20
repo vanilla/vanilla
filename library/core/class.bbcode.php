@@ -305,7 +305,7 @@ class BBCode extends Gdn_Pluggable
     {
         $bbcode = str_replace(["[CODE]", "[/CODE]"], ["[code]", "[/code]"], $bbcode);
 
-        return $this->nbbc()->parse($bbcode);
+        return @$this->nbbc()->parse($bbcode);
     }
 
     /**
@@ -565,7 +565,7 @@ class BBCode extends Gdn_Pluggable
     protected function isValidURL($bbcode, string $url): bool
     {
         $parsed = parse_url($url);
-        if ($parsed !== false && in_array($parsed["scheme"], ["http", "https", "ftp"], true)) {
+        if ($parsed !== false && in_array($parsed["scheme"] ?? null, ["http", "https", "ftp"], true)) {
             return true;
         }
         return $bbcode->isValidURL($url);

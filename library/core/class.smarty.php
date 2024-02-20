@@ -146,7 +146,7 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface
             }
         }
 
-        $smarty->display($path, null, $compileID);
+        @$smarty->display($path, null, $compileID);
     }
 
     /**

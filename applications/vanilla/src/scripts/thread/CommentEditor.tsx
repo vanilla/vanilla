@@ -14,7 +14,7 @@ import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
 import { FormatConversionNotice } from "@rich-editor/editor/FormatConversionNotice";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { focusEditor } from "@udecode/plate-common";
-import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
+import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
 import { t } from "@vanilla/i18n";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
@@ -30,7 +30,7 @@ export function CommentEditor(props: IProps) {
     const [value, setValue] = useState<MyValue>();
 
     const patchMutation = useMutation({
-        mutationFn: CommentsApi.patch,
+        mutationFn: async (params: CommentsApi.PatchParams) => await CommentsApi.patch(comment.commentID, params),
         onSuccess: async () => {
             setValue(undefined);
             !!props.onSuccess && (await props.onSuccess?.());
@@ -54,7 +54,6 @@ export function CommentEditor(props: IProps) {
                 e.preventDefault();
                 e.stopPropagation();
                 await patchMutation.mutateAsync({
-                    commentID: comment.commentID,
                     body: JSON.stringify(value),
                     format: "rich2",
                 });

@@ -19,19 +19,19 @@ import MockAdapter from "axios-mock-adapter";
 import { LiveAnnouncer } from "react-aria-live";
 import { ICommentEdit } from "@dashboard/@types/api/comment";
 
-const MOCK_API_PARAMS: React.ComponentProps<typeof DiscussionCommentsAsset>["apiParams"] = {
-    discussionID: "fake",
-    limit: 5,
-    page: 1,
-};
-
 const MOCK_DISCUSSION: React.ComponentProps<typeof DiscussionCommentsAsset>["discussion"] = {
     ...fakeDiscussions[0],
     url: "https://vanilla.test/mockPath",
     name: "Mock Discussion",
 };
 
-const MOCK_PAGING: React.ComponentProps<typeof DiscussionCommentsAsset>["commentsPreload"]["paging"] = {
+const MOCK_API_PARAMS: React.ComponentProps<typeof DiscussionCommentsAsset>["apiParams"] = {
+    discussionID: MOCK_DISCUSSION.discussionID,
+    limit: 5,
+    page: 1,
+};
+
+const MOCK_PAGING: NonNullable<React.ComponentProps<typeof DiscussionCommentsAsset>["comments"]>["paging"] = {
     nextURL: "#",
     prevURL: "#",
     total: 100,
@@ -86,7 +86,7 @@ describe("DiscussionCommentsAsset", () => {
             beforeEach(async () => {
                 result = await renderInProvider(
                     <DiscussionCommentsAsset
-                        commentsPreload={{
+                        comments={{
                             data: LayoutEditorPreviewData.comments(5),
                             paging: {
                                 ...MOCK_PAGING,
@@ -108,9 +108,9 @@ describe("DiscussionCommentsAsset", () => {
             beforeEach(async () => {
                 result = await renderInProvider(
                     <DiscussionCommentsAsset
-                        commentsPreload={{ data: LayoutEditorPreviewData.comments(5), paging: MOCK_PAGING }}
-                        apiParams={MOCK_API_PARAMS}
                         discussion={MOCK_DISCUSSION}
+                        comments={{ data: LayoutEditorPreviewData.comments(5), paging: MOCK_PAGING }}
+                        apiParams={MOCK_API_PARAMS}
                     />,
                 );
             });
@@ -134,7 +134,7 @@ describe("DiscussionCommentsAsset", () => {
         beforeEach(async () => {
             result = await renderInProvider(
                 <DiscussionCommentsAsset
-                    commentsPreload={{ data: LayoutEditorPreviewData.comments(5), paging: MOCK_PAGING }}
+                    comments={{ data: LayoutEditorPreviewData.comments(5), paging: MOCK_PAGING }}
                     apiParams={MOCK_API_PARAMS}
                     discussion={{ ...MOCK_DISCUSSION, closed: true }}
                 />,
@@ -189,6 +189,7 @@ describe("DiscussionCommentsAsset - Edit", () => {
 
     beforeEach(async () => {
         mockAdapter = mockAPI();
+        mockAdapter.onGet(`/discussions/${MOCK_DISCUSSION.discussionID}`).replyOnce(200, MOCK_DISCUSSION);
         mockAdapter.onGet("/comments").replyOnce(200, mockComments);
         mockAdapter.onGet(`/comments/${mockComments[0].commentID}/edit`).replyOnce<ICommentEdit>(() => {
             return [200, { ...LayoutEditorPreviewData.comments(1)[0], format: "rich2" }];
@@ -196,7 +197,7 @@ describe("DiscussionCommentsAsset - Edit", () => {
 
         result = await renderWithAPI(
             <DiscussionCommentsAsset
-                commentsPreload={{ data: mockComments, paging: MOCK_PAGING }}
+                comments={{ data: mockComments, paging: MOCK_PAGING }}
                 apiParams={MOCK_API_PARAMS}
                 discussion={MOCK_DISCUSSION}
             />,

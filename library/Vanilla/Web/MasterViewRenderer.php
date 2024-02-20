@@ -115,6 +115,16 @@ class MasterViewRenderer
 
         $bodyHtmlKey = $controller->getIsReactView() ? "seoContent" : "bodyContent";
 
+        foreach ($this->getFontCssUrls() as $fontCssUrl) {
+            $modernPageHead = \Gdn::getContainer()->get(PageHead::class);
+            $inlineContent = $modernPageHead->getInlineStyleFromUrl($fontCssUrl);
+            if ($inlineContent !== null) {
+                $controller->Head->addString("<style>{$inlineContent}</style>");
+            } else {
+                $controller->Head->addCss($fontCssUrl);
+            }
+        }
+
         $extraData = [
             $bodyHtmlKey => $this->renderThemeContentView($data) ?? $controller->renderAssetForTwig("Content"),
             "cssClasses" =>
@@ -191,7 +201,7 @@ class MasterViewRenderer
         $fontsAssetUrls = array_column($fontsAssets, "url");
 
         $variables = $this->themePreloader->getVariables();
-        $fontVars = $variables["font"] ?? [];
+        $fontVars = $variables["global"]["fonts"] ?? [];
 
         $customFontUrl = $fontVars["customFont"]["url"] ?? ($fontVars["customFontUrl"] ?? null);
         $forceGoogleFont = $fontVars["forceGoogleFont"] ?? false;

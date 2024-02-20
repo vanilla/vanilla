@@ -23,7 +23,7 @@ trait HtmlParserTrait
     protected function parseSimpleAttrs(string $html, string $tagName): ?array
     {
         $dom = new \DOMDocument();
-        $dom->loadHTML($html);
+        @$dom->loadHTML($html, LIBXML_NOERROR | LIBXML_NOWARNING);
         $tags = $dom->getElementsByTagName($tagName);
         if (count($tags) > 0) {
             $attrs = [];

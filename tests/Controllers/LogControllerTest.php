@@ -70,11 +70,12 @@ class LogControllerTest extends SiteTestCase
      */
     public function testNotSpamNoDuplicationCommentRestore(): void
     {
+        $userID = $this->createUserByModel(__FUNCTION__);
         $data = [
             "Body" => "test comment",
             "CommentID" => 20,
             "DiscussionID" => 20,
-            "InsertUserID" => 1,
+            "InsertUserID" => $userID,
             "Format" => "Text",
         ];
 
@@ -424,5 +425,27 @@ class LogControllerTest extends SiteTestCase
         // Try to restore a record with an invalid/deleted userID.
         $this->expectExceptionMessage("No user found for ID: {$invalidUserID}");
         $this->bessy()->post("/log/restore", ["LogIDs" => $logID]);
+    }
+
+    /**
+     * Create user using UserModel. Api method interferes with global request object used in above tests.
+     *
+     * @param string $name Unique name used for name and email.
+     * @return int UserID
+     * @throws \Gdn_UserException
+     */
+    protected function createUserByModel(string $name): int
+    {
+        return $this->runWithConfig(["Garden.User.ValidationLength" => "{3,}"], function () use ($name) {
+            $data = [
+                "Name" => $name,
+                "Email" => "$name@example.com",
+                "Password" => randomString(\Gdn::config("Garden.Password.MinLength")),
+            ];
+
+            $userID = $this->userModel->save($data);
+            $this->assertIsNumeric($userID);
+            return $userID;
+        });
     }
 }

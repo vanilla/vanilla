@@ -20,7 +20,7 @@ import { frameFooterClasses } from "@library/layout/frame/frameFooterStyles";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { useMutation } from "@tanstack/react-query";
 import { CommunityMemberInput } from "@vanilla/addon-vanilla/forms/CommunityMemberInput";
-import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
+import DiscussionsApi from "@vanilla/addon-vanilla/thread/DiscussionsApi";
 import { t } from "@vanilla/i18n";
 import { RecordID } from "@vanilla/utils";
 import React, { useState } from "react";
@@ -56,8 +56,7 @@ export default function ChangeAuthorForm(props: IProps) {
 
     const changeAuthorMutation = useMutation({
         mutationFn: async (authorID: RecordID) =>
-            await DiscussionsApi.patch({
-                discussionID,
+            await DiscussionsApi.patch(discussionID, {
                 insertUserID: authorID,
             }),
         onSuccess: async () => {

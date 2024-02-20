@@ -49,7 +49,8 @@ export default class MessagesDropDown extends React.Component<IProps, IState> {
             <DropDown
                 contentID={this.id + "-content"}
                 handleID={this.id + "-handle"}
-                name={t("Messages")}
+                // Intentionally not setting this. We want the button contents to be read out which may include an unread count.
+                name={undefined}
                 renderLeft={!getMeta("ui.isDirectionRTL", false)}
                 buttonClassName={classesHeader.button}
                 contentsClassName={classesHeader.dropDownContents}

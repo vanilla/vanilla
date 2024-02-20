@@ -21,11 +21,11 @@ const searchBarMockProps = {
 };
 
 describe("SearchBar", () => {
-    const assertSearchResults = async (externalSearchQuery?: string) => {
+    const assertSearchResults = async (externalSearch?: { query: string; resultsInNewTab: boolean }) => {
         document.body.innerHTML = "";
         const { findByRole, container } = render(
             <SearchContext.Provider
-                value={{ searchOptionProvider: new MockSearchData(), externalSearchQuery: externalSearchQuery }}
+                value={{ searchOptionProvider: new MockSearchData(), externalSearch: externalSearch }}
             >
                 <MemoryRouter>
                     <IndependentSearch initialQuery="my search term" />
@@ -40,7 +40,7 @@ describe("SearchBar", () => {
         const results = container.querySelector(".search-results");
         expect(results).toBeInTheDocument();
 
-        if (externalSearchQuery) {
+        if (externalSearch?.query) {
             expect(results).toHaveTextContent("");
         } else {
             expect(results).toHaveTextContent("Search for new search term");
@@ -115,6 +115,6 @@ describe("SearchBar", () => {
 
     it("Search results  population (autocomplete), will depend on external search configuration", async () => {
         await assertSearchResults();
-        await assertSearchResults("#");
+        await assertSearchResults({ query: "#test", resultsInNewTab: false });
     });
 });

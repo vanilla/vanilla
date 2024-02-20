@@ -9,7 +9,7 @@ import { getMeta } from "@library/utility/appUtils";
 /**
  * Get saved data from localStorage or DefaultValue
  */
-function getStorageOrDefault<T>(key: string, defaultValue: T): T {
+export function getStorageOrDefault<T>(key: string, defaultValue: T): T {
     const stored = localStorage.getItem(key);
 
     if (!stored) {

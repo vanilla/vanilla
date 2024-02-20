@@ -133,8 +133,12 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
                                               'link[rel="stylesheet"][static="1"]',
                                           );
                                           const lastStaticStylesheet = staticStylesheets[staticStylesheets.length - 1];
+
+                                          const firstStyleTag = document.head.querySelector("style");
                                           if (lastStaticStylesheet) {
                                               document.head.insertBefore(element, lastStaticStylesheet.nextSibling);
+                                          } else if (firstStyleTag) {
+                                              document.head.insertBefore(element, firstStyleTag);
                                           } else {
                                               document.head.appendChild(element);
                                           }
@@ -191,6 +195,10 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
                 "@dashboard/compatibilityStyles/Leaderboard.styles": path.resolve(
                     VANILLA_ROOT,
                     "library/src/scripts/leaderboardWidget/LeaderboardWidget.styles.ts",
+                ),
+                "@library/embeddedContent/embedService": path.resolve(
+                    VANILLA_ROOT,
+                    "library/src/scripts/embeddedContent/embedService.register.tsx",
                 ),
                 ...entryModel.aliases,
                 "library-scss": path.resolve(VANILLA_ROOT, "library/src/scss"),

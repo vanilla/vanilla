@@ -7,8 +7,9 @@ import React from "react";
 import Checkbox from "@library/forms/Checkbox";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import { onReady, t } from "@library/utility/appUtils";
-import { useSearchForm } from "@library/search/SearchContext";
+import { useSearchForm } from "@library/search/SearchFormContext";
 import flatten from "lodash/flatten";
+import { IDiscussionSearchTypes } from "./discussionSearchTypes";
 
 interface IProps {}
 
@@ -27,7 +28,7 @@ interface IProps {}
  *   });
  */
 export function CommunityPostTypeFilter(props: IProps) {
-    const { form, updateForm } = useSearchForm<{}>();
+    const { form, updateForm } = useSearchForm<IDiscussionSearchTypes>();
     const registeredTypes = CommunityPostTypeFilter.postTypes;
     const allTypes = flatten(registeredTypes.map((v) => v.values));
 

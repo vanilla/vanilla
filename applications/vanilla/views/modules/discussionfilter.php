@@ -79,6 +79,9 @@ $titleID = "BoxFilterTitle";
             <li class="MyDrafts<?php echo $Controller->ControllerName == 'draftscontroller' ? ' Active' : ''; ?>"><?php echo anchor(sprite('SpMyDrafts').' '.$MyDrafts, '/drafts'); ?></li>
         <?php
         }
+        if (Gdn::config("Reactions.ShowBestOf")) { ?>
+            <li class="Reactions-BestOf"><?php echo anchor(sprite("SpBestOf") . " " . t("Best Of..."), "/bestof/everything", ""); ?></li>
+        <?php }
         $Controller->fireEvent('AfterDiscussionFilters');
         ?>
     </ul>

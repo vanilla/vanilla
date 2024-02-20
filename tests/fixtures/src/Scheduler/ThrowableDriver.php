@@ -54,4 +54,12 @@ class ThrowableDriver implements DriverInterface
     {
         return [LocalJobInterface::class];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function cleanupAfterDispatch(): void
+    {
+        // Nothing to do here.
+    }
 }

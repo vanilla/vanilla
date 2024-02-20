@@ -19,6 +19,9 @@ import LazyDateRange from "@library/forms/LazyDateRange";
 import { useStackingContext } from "@vanilla/react-utils";
 import { css } from "@emotion/css";
 import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
+import RadioButton from "@library/forms/RadioButton";
+import { useUniqueID } from "@library/utility/idUtils";
+import { RadioGroupContext } from "@library/forms/RadioGroupContext";
 
 const createOptionsFromRecord = (options?: Record<string, React.ReactNode>): IComboBoxOption[] => {
     return options
@@ -43,6 +46,8 @@ export function FormControl(props: IControlProps) {
         inModal,
         dateRangeDirection = "above",
     } = props;
+
+    const inputName = useUniqueID("input");
 
     const value = instance ?? schema.default;
 
@@ -151,6 +156,27 @@ export function FormControl(props: IControlProps) {
                 />
             );
         }
+        case "radio":
+            return (
+                <RadioGroupContext.Provider value={{ value, onChange }}>
+                    {Object.entries(control.choices.staticOptions ?? []).map(
+                        ([optionValue, label]: [string, string]) => (
+                            <RadioButton
+                                disabled={disabled}
+                                name={inputName}
+                                key={optionValue}
+                                label={label}
+                                value={optionValue}
+                                tooltip={
+                                    control.tooltipsPerOption && control.tooltipsPerOption[optionValue]
+                                        ? control.tooltipsPerOption[optionValue]
+                                        : undefined
+                                }
+                            />
+                        ),
+                    )}
+                </RadioGroupContext.Provider>
+            );
         case "dropDown": {
             const options = createOptionsFromRecord(control.choices.staticOptions);
             const currentValue = options.find((opt) => `${opt.value}` === `${value}`);

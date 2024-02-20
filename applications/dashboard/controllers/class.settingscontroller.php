@@ -420,7 +420,23 @@ class SettingsController extends DashboardController
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $this->Form->setModel($configurationModel);
 
-        if (($avatar = c("Garden.DefaultAvatar")) && $this->isUploadedDefaultAvatar($avatar)) {
+        // If the avatar is a svg file, don't show crop module.
+        $avatar = c("Garden.DefaultAvatar");
+        $ext = !empty($avatar) ? strtolower(pathinfo($avatar, PATHINFO_EXTENSION)) : "";
+        $isSvg = Gdn_UploadSvg::isSvg("DefaultAvatar");
+        $isImageUploaded = !empty($_FILES["DefaultAvatar"]);
+
+        /*
+         * Don't show crop module on the following conditions as we are not able to crop them:
+         * 1) if the current avatar is an svg file
+         * 2) if the current avatar is not a svg file but the uploaded file is a svg file
+         * 3) if the current avatar is not a svg file but the uploaded file is a svg file
+         */
+        if (
+            (($isImageUploaded && !$isSvg && $ext !== "svg") || (!$isImageUploaded && $ext !== "svg")) &&
+            $avatar &&
+            $this->isUploadedDefaultAvatar($avatar)
+        ) {
             //Get the image source so we can manipulate it in the crop module.
             $upload = new Gdn_UploadImage();
             $thumbnailSize = c("Garden.Thumbnail.Size");
@@ -434,20 +450,25 @@ class SettingsController extends DashboardController
             $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
             $this->setData("crop", $crop);
         } else {
-            $this->setData("avatar", UserModel::getDefaultAvatarUrl());
+            $userImage = $avatar
+                ? (isUrl($avatar)
+                    ? $avatar
+                    : Gdn_UploadImage::url(changeBasename($avatar, "p%s")))
+                : UserModel::getDefaultAvatarUrl();
+            $this->setData("avatar", $userImage);
         }
 
         if (!$this->Form->authenticatedPostBack()) {
             $this->Form->setData($configurationModel->Data);
         } elseif ($this->Form->save() !== false) {
-            $upload = new Gdn_UploadImage();
+            $upload = $isSvg ? new Gdn_UploadSvg() : new Gdn_UploadImage();
             $newAvatar = false;
             $newUpload = false;
             if ($tmpAvatar = $upload->validateUpload("DefaultAvatar", false)) {
                 // New upload
                 $newUpload = true;
                 $thumbOptions = ["Crop" => true, "SaveGif" => c("Garden.Thumbnail.SaveGif")];
-                $newAvatar = $this->saveDefaultAvatars($tmpAvatar, $thumbOptions);
+                $newAvatar = $this->saveDefaultAvatars($tmpAvatar, $thumbOptions, $isSvg);
             } elseif ($avatar && $crop && $crop->isCropped()) {
                 // New thumbnail
                 $tmpAvatar = $source;
@@ -464,18 +485,24 @@ class SettingsController extends DashboardController
                 if ($newAvatar) {
                     $this->deleteDefaultAvatars($avatar);
                     $avatar = c("Garden.DefaultAvatar");
-                    $thumbnailSize = c("Garden.Thumbnail.Size");
+                    if (!$isSvg) {
+                        $thumbnailSize = c("Garden.Thumbnail.Size");
 
-                    // Update crop properties.
-                    $basename = changeBasename($avatar, "p%s");
-                    $source = $upload->copyLocal($basename);
-                    $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
-                    $crop->saveButton = false;
-                    $crop->setSize($thumbnailSize, $thumbnailSize);
-                    $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
-                    $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
-                    $this->setData("crop", $crop);
-
+                        // Update crop properties.
+                        $basename = changeBasename($avatar, "p%s");
+                        $source = $upload->copyLocal($basename);
+                        $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
+                        $crop->saveButton = false;
+                        $crop->setSize($thumbnailSize, $thumbnailSize);
+                        $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
+                        $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
+                        $this->setData("crop", $crop);
+                    } else {
+                        $this->setData(
+                            "avatar",
+                            isurl($avatar) ? $avatar : Gdn_UploadImage::url(changeBasename($avatar, "p%s"))
+                        );
+                    }
                     // New uploads stay on the page to allow cropping. Otherwise, redirect to avatar settings page.
                     if (!$newUpload) {
                         redirectTo("/dashboard/settings/avatars");
@@ -495,37 +522,45 @@ class SettingsController extends DashboardController
      *
      * @param string $source The path to the local copy of the image.
      * @param array $thumbOptions The options to save the thumbnail-sized avatar with.
+     * @param bool $isSvg Whether the image is SVG.
      * @return bool Whether the saves were successful.
      */
-    private function saveDefaultAvatars($source, $thumbOptions)
+    private function saveDefaultAvatars($source, $thumbOptions, $isSvg = false)
     {
         try {
-            $upload = new Gdn_UploadImage();
+            $upload = $isSvg ? new Gdn_UploadSvg() : new Gdn_UploadImage();
+            $ext = $isSvg ? "svg" : "jpg";
             // Generate the target image name
-            $targetImage = $upload->generateTargetName(PATH_UPLOADS);
+            $targetImage = $upload->generateTargetName(PATH_UPLOADS, $ext);
             $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
 
-            // Save the full size image.
-            $parts = Gdn_UploadImage::saveImageAs($source, self::DEFAULT_AVATAR_FOLDER . "/" . $imageBaseName);
+            if ($isSvg) {
+                $parts = $upload->saveAs($source, self::DEFAULT_AVATAR_FOLDER . "/" . $imageBaseName, [], true);
+                $upload->saveAs($source, self::DEFAULT_AVATAR_FOLDER . "/p$imageBaseName", [], true);
+                $upload->saveAs($source, self::DEFAULT_AVATAR_FOLDER . "/n$imageBaseName");
+            } else {
+                // Save the full size image.
+                $parts = Gdn_UploadImage::saveImageAs($source, self::DEFAULT_AVATAR_FOLDER . "/" . $imageBaseName);
 
-            // Save the profile size image.
-            Gdn_UploadImage::saveImageAs(
-                $source,
-                self::DEFAULT_AVATAR_FOLDER . "/p$imageBaseName",
-                c("Garden.Profile.MaxHeight"),
-                c("Garden.Profile.MaxWidth"),
-                ["SaveGif" => c("Garden.Thumbnail.SaveGif")]
-            );
+                // Save the profile size image.
+                Gdn_UploadImage::saveImageAs(
+                    $source,
+                    self::DEFAULT_AVATAR_FOLDER . "/p$imageBaseName",
+                    c("Garden.Profile.MaxHeight"),
+                    c("Garden.Profile.MaxWidth"),
+                    ["SaveGif" => c("Garden.Thumbnail.SaveGif")]
+                );
 
-            $thumbnailSize = c("Garden.Thumbnail.Size");
-            // Save the thumbnail size image.
-            Gdn_UploadImage::saveImageAs(
-                $source,
-                self::DEFAULT_AVATAR_FOLDER . "/n$imageBaseName",
-                $thumbnailSize,
-                $thumbnailSize,
-                $thumbOptions
-            );
+                $thumbnailSize = c("Garden.Thumbnail.Size");
+                // Save the thumbnail size image.
+                Gdn_UploadImage::saveImageAs(
+                    $source,
+                    self::DEFAULT_AVATAR_FOLDER . "/n$imageBaseName",
+                    $thumbnailSize,
+                    $thumbnailSize,
+                    $thumbOptions
+                );
+            }
         } catch (Exception $ex) {
             $this->Form->addError($ex);
             return false;

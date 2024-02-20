@@ -1429,6 +1429,7 @@ Gdn::config()->touch("Context.Secret", betterRandomString(32, "Aa0"));
 // User Mentions table.
 UserMentionsModel::structure($Database);
 ProfileFieldModel::structure();
+ReactionModel::structure($Construct);
 
 // Remove legacy Plugins
 Gdn::config()->removeFromConfig($LEGACYADDON);

@@ -80,7 +80,7 @@ class HtmlDocument implements TextDOMInterface
         if ($wrap) {
             $innerHtml = $this->getDocumentPrefix() . $innerHtml . $this->getDocumentSuffix();
         }
-        @$this->dom->loadHTML($innerHtml, LIBXML_NOBLANKS);
+        @$this->dom->loadHTML($innerHtml, LIBXML_NOBLANKS | LIBXML_NOERROR | LIBXML_NOWARNING);
     }
 
     /**

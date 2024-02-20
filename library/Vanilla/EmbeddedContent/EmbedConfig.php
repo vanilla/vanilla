@@ -108,7 +108,7 @@ class EmbedConfig
                 $size = "normal";
             }
         }
-        [$width, $height] = self::EMBED_SIZES[$size];
+        [$width, $height] = self::EMBED_SIZES[$size] ?? self::EMBED_SIZES["normal"];
         return [$width, $height];
     }
 }

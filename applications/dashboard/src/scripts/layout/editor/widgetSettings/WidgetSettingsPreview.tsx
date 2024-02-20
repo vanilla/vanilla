@@ -16,6 +16,7 @@ import { LinkContext } from "@library/routing/links/LinkContextProvider";
 import { IWidgetCatalog } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { MemoryRouter } from "react-router-dom";
 import { resolveFieldParams } from "@dashboard/layout/editor/widgetSettings/resolveFieldParams";
+import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
 
 interface IWidgetSettingsPreviewProps {
     widgetCatalog: IWidgetCatalog;
@@ -29,6 +30,8 @@ export function WidgetSettingsPreview(props: IWidgetConfigurationComponentProps 
 
     const classes = widgetSettingsClasses();
     const { widgetCatalog, assetCatalog, widgetID, config } = props;
+
+    LayoutEditorPreviewData.setCurrentWidgetCatalog(widgetCatalog);
 
     const reactComponent = widgetCatalog[widgetID]
         ? widgetCatalog[widgetID].$reactComponent

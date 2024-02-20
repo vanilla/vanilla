@@ -21,12 +21,10 @@ import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { TitleBarDeviceProvider } from "@library/layout/TitleBarContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { BannerContextProvider } from "@library/banner/BannerContext";
-import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
 import { EntryLinkContextProvider } from "@library/contexts/EntryLinkContext";
 import { css } from "@emotion/css";
 import { ApiV2Context } from "@library/apiv2";
 import { ToastProvider } from "@library/features/toaster/ToastContext";
-import { SearchSourcesContextProvider } from "@library/search/SearchSourcesContextProvider";
 import { PermissionsContextProvider } from "@library/features/users/PermissionsContext";
 import { ReactQueryContext } from "@library/ReactQueryContext";
 import { SiteSectionContextProvider } from "./utility/SiteSectionContext";
@@ -73,7 +71,6 @@ export function AppContext(props: IProps) {
             SiteSectionContextProvider,
             PermissionsContextProvider,
             LocaleProvider,
-            SearchSourcesContextProvider,
             SearchContextProvider,
             ContentTranslationProvider,
             LiveAnnouncer,
@@ -89,7 +86,6 @@ export function AppContext(props: IProps) {
             ],
             FontSizeCalculatorProvider,
             ...ExtraContextProviders,
-            SearchFormContextProvider,
             TitleBarDeviceProvider,
             BannerContextProvider,
             EntryLinkContextProvider,

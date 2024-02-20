@@ -408,7 +408,7 @@ class RedirectorPlugin extends Gdn_Plugin
             $result = [
                 "_arg3" => "CommentID",
             ];
-        } elseif (val("_arg2", $get) == "ta-p") {
+        } elseif (in_array(val("_arg2", $get), ["ta-p", "ba-p", "idi-p"])) {
             // Thread = Discussion
             $result = [
                 "_arg3" => "DiscussionID",

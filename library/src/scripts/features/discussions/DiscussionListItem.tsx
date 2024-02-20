@@ -75,10 +75,12 @@ export default function DiscussionListItem(props: IProps) {
     if (
         currentUserSignedIn &&
         discussion.type === "idea" &&
-        discussion.reactions?.some(({ urlcode }) => [ReactionUrlCode.UP, ReactionUrlCode.DOWN].includes(urlcode))
+        discussion.reactions?.some(({ urlcode }) =>
+            [ReactionUrlCode.UP, ReactionUrlCode.DOWN].includes(urlcode as ReactionUrlCode),
+        )
     ) {
         const availableReactionsCount = discussion.reactions.filter(({ urlcode }) =>
-            [ReactionUrlCode.UP, ReactionUrlCode.DOWN].includes(urlcode),
+            [ReactionUrlCode.UP, ReactionUrlCode.DOWN].includes(urlcode as ReactionUrlCode),
         ).length;
         const ideationCounterContent = (
             <DiscussionVoteCounter

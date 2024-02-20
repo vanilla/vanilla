@@ -245,10 +245,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $this->qnaModel = $qnaModel;
         $this->eventManager = $eventManager;
         $this->setLogger(Logger::getLogger());
-        if (
-            Gdn::addonManager()->isEnabled("Reactions", \Vanilla\Addon::TYPE_ADDON) &&
-            c("Plugins.QnA.Reactions", true)
-        ) {
+        if (c("Plugins.QnA.Reactions", true)) {
             $this->Reactions = true;
         }
 
@@ -428,10 +425,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     public function base_addonEnabled_handler($sender, $args)
     {
         switch (strtolower($args["AddonName"])) {
-            case "reactions":
-                $this->Reactions = true;
-                $this->structure();
-                break;
             case "badges":
                 $this->Badges = true;
                 $this->structure();

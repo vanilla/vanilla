@@ -1,9 +1,10 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
+import { IReaction } from "@dashboard/@types/api/reaction";
 import { css } from "@emotion/css";
 import { IUserFragment } from "@library/@types/api/users";
 import { CollapsableContent } from "@library/content/CollapsableContent";
@@ -11,9 +12,11 @@ import UserContent from "@library/content/UserContent";
 import { UserPhoto, UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { PageBox } from "@library/layout/PageBox";
 import ProfileLink from "@library/navigation/ProfileLink";
+import { Reactions } from "@library/reactions/Reactions";
 import { IBoxOptions } from "@library/styles/cssUtilsTypes";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { IThreadItemContext, ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
+import ThreadItemActions from "@vanilla/addon-vanilla/thread/ThreadItemActions";
 import { ThreadItemHeader } from "@vanilla/addon-vanilla/thread/ThreadItemHeader";
 import React from "react";
 
@@ -27,6 +30,7 @@ interface IProps extends IThreadItemContext {
     boxOptions?: Partial<IBoxOptions>;
     options?: React.ReactNode;
     actions?: React.ReactNode;
+    reactions?: IReaction[];
 }
 
 export function ThreadItem(props: IProps) {
@@ -55,6 +59,7 @@ export function ThreadItem(props: IProps) {
                 <>
                     {userContent}
                     {props.actions}
+                    <ThreadItemActions reactions={props.reactions} />
                 </>
             )}
         </>
@@ -72,7 +77,7 @@ export function ThreadItem(props: IProps) {
     }
 
     return (
-        <ThreadItemContextProvider recordType={props.recordType} recordID={props.recordID}>
+        <ThreadItemContextProvider recordType={props.recordType} recordID={props.recordID} recordUrl={props.recordUrl}>
             <PageBox options={{ borderType: BorderType.SEPARATOR_BETWEEN, ...props.boxOptions }}>{result}</PageBox>
         </ThreadItemContextProvider>
     );

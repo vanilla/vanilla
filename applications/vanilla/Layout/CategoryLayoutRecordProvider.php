@@ -109,7 +109,6 @@ class CategoryLayoutRecordProvider implements LayoutViewRecordProviderInterface
     public function resolveParentLayoutQuery(LayoutQuery $query): LayoutQuery
     {
         // Our parent will be a site section
-        $this->siteSectionModel->setCurrentSiteSection($this->siteSectionModel->getDefaultSiteSection());
         $siteSection = $this->siteSectionModel->getSiteSectionForAttribute("allCategories", $query->recordID);
 
         return $query

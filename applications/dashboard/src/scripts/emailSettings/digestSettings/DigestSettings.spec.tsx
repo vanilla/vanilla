@@ -149,6 +149,7 @@ describe("DigestSchedule", () => {
         await act(async () => {
             render(
                 <DigestScheduleImpl
+                    isFetched={true}
                     upcomingDigestDates="Sat Sep 16th, 2023; Sat Sep 23rd, 2023; Sat Sep 30th, 2023; "
                     sentDigestDates={[
                         {

@@ -9,7 +9,7 @@ import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { t } from "@library/utility/appUtils";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { useMutation } from "@tanstack/react-query";
-import { DiscussionsApi } from "@vanilla/addon-vanilla/thread/DiscussionsApi";
+import DiscussionsApi from "@vanilla/addon-vanilla/thread/DiscussionsApi";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 

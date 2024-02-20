@@ -2,7 +2,7 @@
 /**
  * Conversation model.
  *
- * @copyright 2009-2019 Vanilla Forums Inc.
+ * @copyright 2009-2024 Higher Logic Inc.
  * @license GPL-2.0-only
  * @package Conversations
  * @since 2.0
@@ -422,12 +422,13 @@ class ConversationModel extends ConversationsModel implements AggregateCountable
     /**
      * Get all users involved in conversation.
      *
-     * @since 2.0.0
-     * @access public
-     *
      * @param int $conversationID Unique ID of conversation.
      * @param int $limit The number of recipients to grab.
      * @return Gdn_DataSet SQL results.
+     * @throws Exception
+     * @since 2.0.0
+     * @access public
+     *
      */
     public function getRecipients($conversationID, $limit = 1000)
     {
@@ -1001,10 +1002,10 @@ class ConversationModel extends ConversationsModel implements AggregateCountable
      * If we pass $countRecipients then $conversationID isn't needed (set to zero).
      *
      * @param int $conversationID Unique ID of the conversation.
-     * @param int $countRecipients Optionally skip needing to query the count by passing it.
+     * @param int $recipientsCount Optionally skip needing to query the count by passing it.
      * @return bool Whether user may add more recipients to conversation.
      */
-    public function addUserAllowed($conversationID = 0, $countRecipients = 0)
+    public function addUserAllowed($conversationID = 0, $recipientsCount = 0)
     {
         // Determine whether recipients can be added
         $canAddRecipients = true;
@@ -1012,14 +1013,16 @@ class ConversationModel extends ConversationsModel implements AggregateCountable
 
         // Avoid a query if we already know we can add. MaxRecipients being unset means unlimited.
         if ($maxRecipients) {
-            if (!$countRecipients) {
+            if (!$recipientsCount) {
                 // Count current recipients
-                $conversationModel = new ConversationModel();
-                $countRecipients = $conversationModel->getRecipients($conversationID);
+                $recipientsCount = $this->getRecipients($conversationID);
             }
 
+            if (is_array($recipientsCount)) {
+                $recipientsCount = count($recipientsCount);
+            }
             // Add 1 because sender counts as a recipient.
-            $canAddRecipients = count($countRecipients) < $maxRecipients + 1;
+            $canAddRecipients = $recipientsCount < $maxRecipients + 1;
         }
 
         return $canAddRecipients;

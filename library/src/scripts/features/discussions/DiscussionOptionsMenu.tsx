@@ -14,7 +14,7 @@ import { IPermission, IPermissionOptions, PermissionMode } from "@library/featur
 import DiscussionOptionsAnnounce from "@library/features/discussions/DiscussionOptionsAnnounce";
 import DiscussionOptionsMove from "@library/features/discussions/DiscussionOptionsMove";
 import DiscussionOptionsDelete from "@library/features/discussions/DiscussionOptionsDelete";
-import { useUsersState } from "@library/features/users/userModel";
+import { useCurrentUserID } from "@library/features/users/userHooks";
 import { DiscussionOptionsClose } from "@library/features/discussions/DiscussionOptionsClose";
 import { DiscussionOptionsSink } from "@library/features/discussions/DiscussionOptionsSink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
@@ -61,7 +61,7 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         mode: PermissionMode.RESOURCE_IF_JUNCTION,
     };
 
-    const currentUserID = useUsersState().currentUser.data?.userID;
+    const currentUserID = useCurrentUserID();
 
     const isAuthor = discussion.insertUserID === currentUserID;
 

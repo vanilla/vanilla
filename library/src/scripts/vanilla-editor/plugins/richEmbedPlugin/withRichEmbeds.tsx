@@ -8,6 +8,7 @@ import { insertRichFile } from "@library/vanilla-editor/plugins/richEmbedPlugin/
 import { insertRichImage } from "@library/vanilla-editor/plugins/richEmbedPlugin/transforms/insertRichImage";
 import { MyEditor } from "@library/vanilla-editor/typescript";
 import { isFileImage } from "@vanilla/utils";
+import { normalizeRichEmbed } from "./normalizeRichEmbed";
 
 export function withRichEmbeds(editor: MyEditor) {
     const { insertData } = editor;
@@ -29,6 +30,8 @@ export function withRichEmbeds(editor: MyEditor) {
             insertData(data);
         }
     };
+
+    editor.normalizeNode = normalizeRichEmbed(editor);
 
     return editor;
 }

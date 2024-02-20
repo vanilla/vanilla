@@ -138,111 +138,69 @@ class QueuedJobModelTest extends SiteTestCase
                 "message" => "{\"test\": \"test\"}",
                 "status" => "pending",
             ],
-            "received",
         ];
-        yield "insert queue-service" => [
-            [
-                "jobType" => "Vanilla\VanillaQueue\\Jobs\\HttpRequestJob",
-                "driver" => "queue-service",
-                "message" => "{\"test\": \"test\"}",
-                "status" => "pending",
-            ],
-            "received",
-        ];
-        yield "insert received queue-service" => [
-            [
-                "jobType" => "Vanilla\VanillaQueue\\Jobs\\HttpRequestJob",
-                "driver" => "queue-service",
-                "message" => "{\"test\": \"test\"}",
-                "status" => "received",
-            ],
-            "progress",
-        ];
-        yield "insert progress queue-service" => [
-            [
-                "jobType" => "Vanilla\VanillaQueue\\Jobs\\HttpRequestJob",
-                "driver" => "queue-service",
-                "message" => "{\"test\": \"test\"}",
-                "status" => "progress",
-            ],
-            "success",
-        ];
-        yield "insert success queue-service" => [
-            [
-                "jobType" => "Vanilla\VanillaQueue\\Jobs\\HttpRequestJob",
-                "driver" => "queue-service",
-                "message" => "{\"test\": \"test\"}",
-                "status" => "success",
-            ],
-            "failed",
-        ];
-        yield "insert failed queue-service" => [
-            [
-                "jobType" => "Vanilla\VanillaQueue\\Jobs\\HttpRequestJob",
-                "driver" => "queue-service",
-                "message" => "{\"test\": \"test\"}",
-                "status" => "failed",
-            ],
-            "success",
+        yield "insert queue-service" => [self::queueJob(QueuedJobModel::STATUS_PENDING)];
+        yield "insert received queue-service" => [self::queueJob(QueuedJobModel::STATUS_QUEUED)];
+        yield "insert progress queue-service" => [self::queueJob(QueuedJobModel::STATUS_PROGRESS)];
+        yield "insert success queue-service" => [self::queueJob(QueuedJobModel::STATUS_SUCCESS)];
+        yield "insert failed queue-service" => [self::queueJob(QueuedJobModel::STATUS_FAILED)];
+    }
+
+    /**
+     * Get a body of a pending queue job row.
+     *
+     * @return array
+     */
+    public static function queueJob(string $status): array
+    {
+        return [
+            "jobType" => "Vanilla\VanillaQueue\\Jobs\\HttpRequestJob",
+            "driver" => "queue-service",
+            "message" => "{\"test\": \"test\"}",
+            "status" => $status,
         ];
     }
 
     /**
      * Test inserting a job queue over threshold causes jobs to be scheduled in queued service.
-     *
-     * @throws ClientException Not Applicable.
-     * @throws ValidationException Not Applicable.
-     * @throws NoResultsException Not Applicable.
-     * @dataProvider insertDataProvider
      */
-    public function testThresholdInsert(array $jobToSave)
+    public function testThresholdInsert()
     {
         \Gdn::config()->saveToConfig([
-            QueuedJobModel::CONF_THRESHOLD => 10,
+            QueuedJobModel::CONF_THRESHOLD => 5,
         ]);
-        $this->queuedJobModel->setScheduler($this->mockScheduler);
-        $this->mockScheduler
-            ->expects(
-                $jobToSave["driver"] == QueuedJobModel::QUEUE_SERVICE &&
-                $jobToSave["status"] == QueuedJobModel::STATUS_PENDING
-                    ? $this->atLeastOnce()
-                    : $this->never()
-            )
-            ->method("addJobDescriptor")
-            ->with(new NormalJobDescriptor(LocalApiJob::class));
-        for ($index = 0; $index < $this->queuedJobModel->getJobThreshold(); $index++) {
-            $lastID = $this->queuedJobModel->insert($jobToSave);
-            $this->queuedJobModel->checkToScheduleJob(LocalApiJob::class);
+
+        for ($i = 0; $i < 4; $i++) {
+            $this->queuedJobModel->insert(self::queueJob(QueuedJobModel::STATUS_PENDING));
         }
+        // No need ot flush yet. Not at the threshold.
+        $this->assertFalse($this->queuedJobModel->shouldFlushPendingJobs());
+
+        // 1 more and now we're ready.
+        $this->queuedJobModel->insert(self::queueJob(QueuedJobModel::STATUS_PENDING));
+        $this->assertTrue($this->queuedJobModel->shouldFlushPendingJobs());
     }
 
     /**
      * Test inserting a job queue over 1 minute ago causes jobs to be scheduled in queued service.
-     *
-     * @throws ClientException Not Applicable.
-     * @throws ValidationException Not Applicable.
-     * @throws NoResultsException Not Applicable.
-     * @dataProvider insertDataProvider
      */
-    public function testThreshTimeInsert(array $jobToSave)
+    public function testThreshTimeInsert()
     {
+        \Gdn::config()->saveToConfig([
+            QueuedJobModel::CONF_THRESHOLD => 100,
+        ]);
         $currentTime = CurrentTimeStamp::getDateTime();
-        $this->queuedJobModel->setScheduler($this->mockScheduler);
-        $this->mockScheduler
-            ->expects(
-                $jobToSave["driver"] == QueuedJobModel::QUEUE_SERVICE &&
-                $jobToSave["status"] == QueuedJobModel::STATUS_PENDING
-                    ? $this->atLeastOnce()
-                    : $this->never()
-            )
-            ->method("addJobDescriptor")
-            ->with(new NormalJobDescriptor(LocalApiJob::class));
+
         CurrentTimeStamp::mockTime($currentTime);
 
-        $this->queuedJobModel->insert($jobToSave);
+        $this->queuedJobModel->insert(self::queueJob(QueuedJobModel::STATUS_PENDING));
+
+        // It's too soon.
+        $this->assertFalse($this->queuedJobModel->shouldFlushPendingJobs());
 
         CurrentTimeStamp::mockTime($currentTime->modify("+1 minute"));
-        $this->queuedJobModel->insert($jobToSave);
-        $this->queuedJobModel->checkToScheduleJob(LocalApiJob::class);
+
+        // Now we're ready.
+        $this->assertTrue($this->queuedJobModel->shouldFlushPendingJobs());
     }
 }

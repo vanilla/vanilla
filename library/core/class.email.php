@@ -532,7 +532,7 @@ class Gdn_Email extends Gdn_Pluggable implements LoggerAwareInterface
         try {
             $this->mailer->send();
         } finally {
-            $span->stopTimer();
+            $span->finish();
         }
 
         if ($this->isDebug() && $this->logger instanceof Psr\Log\LoggerInterface) {

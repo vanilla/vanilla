@@ -174,6 +174,7 @@ class TagModel extends Gdn_Model
             if (strtolower(val("Type", $formPostValues)) == "tag") {
                 $formPostValues["Type"] = "";
             }
+
             return parent::save($formPostValues, $settings);
         }
     }
@@ -210,6 +211,20 @@ class TagModel extends Gdn_Model
                     "plural" => "Tags",
                     "default" => false,
                     "addtag" => true,
+                ],
+                "BestOf" => [
+                    "key" => "BestOf",
+                    "name" => "BestOf",
+                    "plural" => "BestOf",
+                    "addtag" => false,
+                    "default" => false,
+                ],
+                "Reaction" => [
+                    "key" => "Reaction",
+                    "name" => "Reaction",
+                    "plural" => "Reactions",
+                    "addtag" => false,
+                    "default" => false,
                 ],
             ];
 

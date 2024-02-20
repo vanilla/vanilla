@@ -16,10 +16,10 @@ import { applyDateModifier, dateModifier } from "@library/forms/rangePicker/util
 export function RangePicker(props: IDateModifierRangePickerProps) {
     const { range, setRange } = props;
     const { from, to } = range;
-    const [clickTrack, setClickTrack] = useState(0);
 
     const fromDate = useMemo(() => applyDateModifier(from), [from]);
     const toDate = useMemo(() => applyDateModifier(to), [to]);
+
     const rangeModifier: RangeModifier = useMemo(
         () => ({
             from: fromDate,
@@ -27,6 +27,7 @@ export function RangePicker(props: IDateModifierRangePickerProps) {
         }),
         [fromDate, toDate],
     );
+
     const modifiers = useMemo(
         () => ({
             start: rangeModifier.from,
@@ -34,29 +35,40 @@ export function RangePicker(props: IDateModifierRangePickerProps) {
         }),
         [rangeModifier],
     );
+
     const classes = rangePickerClasses();
     const fromMonth = useMemo(() => moment(fromDate).add(1, "month").toDate(), [fromDate]);
     const toMonth = useMemo(() => moment(toDate).subtract(1, "month").toDate(), [toDate]);
 
     const handleClick = (date: Date) => {
         if (!setRange) return;
-        //lets keep track of our clicks when we choose a range, so we can have a pattern, first click is from, second click is to
-        setClickTrack(!clickTrack ? 1 : 0);
-        switch (clickTrack) {
-            case 0:
-                rangeModifier.from = undefined;
-                if (DateUtils.isDayAfter(date, rangeModifier.to as Date)) {
-                    rangeModifier.to = date;
-                }
-                break;
-            case 1:
-                rangeModifier.to = undefined;
-                break;
+
+        const closest = [fromDate, toDate].sort((a, b) => {
+            const deltaA = Math.abs(date.getTime() - a.getTime());
+            const deltaB = Math.abs(date.getTime() - b.getTime());
+            return deltaA - deltaB;
+        })[0];
+
+        const toModify = closest === fromDate ? "from" : "to";
+        let sameDay = false;
+        if (rangeModifier.from && rangeModifier.to) {
+            sameDay = DateUtils.isSameDay(date, rangeModifier.to) || DateUtils.isSameDay(date, rangeModifier.from);
         }
-        const { from, to } = DateUtils.addDayToRange(date, rangeModifier);
+
+        if (toModify === "from") {
+            rangeModifier.from = date;
+        }
+        if (toModify === "to") {
+            rangeModifier.to = date;
+        }
+        if (sameDay) {
+            rangeModifier.from = date;
+            rangeModifier.to = date;
+        }
+
         setRange({
-            from: dateModifier(from!).build(),
-            to: dateModifier(to!).build(),
+            from: dateModifier(rangeModifier?.from ?? undefined).build(),
+            to: dateModifier(rangeModifier?.to ?? undefined).build(),
         });
     };
 
@@ -65,7 +77,7 @@ export function RangePicker(props: IDateModifierRangePickerProps) {
             <DayPicker
                 className={classes.picker}
                 // Always render this and the previous month
-                month={new Date(new Date().setMonth(new Date().getMonth() - 1))}
+                month={fromDate}
                 pagedNavigation
                 fixedWeeks
                 selectedDays={rangeModifier}
@@ -78,6 +90,7 @@ export function RangePicker(props: IDateModifierRangePickerProps) {
             />
             <DayPicker
                 className={classes.picker}
+                month={toDate}
                 pagedNavigation
                 fixedWeeks
                 selectedDays={rangeModifier}

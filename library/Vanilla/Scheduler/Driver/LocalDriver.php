@@ -94,4 +94,12 @@ class LocalDriver implements DriverInterface, LoggerAwareInterface
     {
         return [LocalJobInterface::class];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function cleanupAfterDispatch(): void
+    {
+        // Nothing to do here.
+    }
 }

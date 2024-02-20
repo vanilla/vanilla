@@ -4,7 +4,7 @@
  */
 
 import { css, CSSObject } from "@emotion/css";
-import { tagPresetVariables, tagsVariables, TagType } from "@library/metas/Tags.variables";
+import { TagPreset, tagPresetVariables, tagsVariables, TagType } from "@library/metas/Tags.variables";
 import { Mixins } from "@library/styles/Mixins";
 import { defaultTransition, userSelect } from "@library/styles/styleHelpers";
 import { useThemeCache } from "@library/styles/themeCache";
@@ -60,7 +60,7 @@ export const tagMixin = (
     return style;
 };
 
-export const tagClasses = useThemeCache(() => {
+export const tagClasses = useThemeCache(function (): { [key in TagPreset]: (applyStateStyles?: boolean) => string } {
     const tagVars = tagsVariables();
     const presets = tagPresetVariables();
 
@@ -69,5 +69,6 @@ export const tagClasses = useThemeCache(() => {
         standard: (applyStateStyles = false) => css(tagMixin(tagVars, presets.standard, applyStateStyles)),
         greyscale: (applyStateStyles = false) => css(tagMixin(tagVars, presets.greyscale, applyStateStyles)),
         colored: (applyStateStyles = false) => css(tagMixin(tagVars, presets.colored, applyStateStyles)),
+        success: (applyStateStyles = false) => css(tagMixin(tagVars, presets.success, applyStateStyles)),
     };
 });

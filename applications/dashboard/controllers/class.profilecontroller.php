@@ -631,9 +631,12 @@ class ProfileController extends Gdn_Controller
         if (!$user && !$username && !$userID) {
             $this->permission("session.valid");
         }
+        if (!Gdn::session()->isValid()) {
+            //if the user hasn't signed in, check if the guest have permission to view profiles
+            $this->permission("Garden.Profiles.View");
+        }
 
         $this->editMode(false);
-
         $this->getUserInfo($user, $username, $userID);
 
         // Optional profile redirection.
@@ -1061,6 +1064,7 @@ class ProfileController extends Gdn_Controller
             );
         }
 
+        $isSvgImage = Gdn_UploadSvg::isSvg("Avatar");
         // Get user data & prep form.
         if ($this->Form->authenticatedPostBack() && $this->Form->getFormValue("UserID")) {
             $userID = $this->Form->getFormValue("UserID");
@@ -1075,10 +1079,16 @@ class ProfileController extends Gdn_Controller
             $avatar = UserModel::getDefaultAvatarUrl();
         }
 
+        $extension = strtolower(pathinfo($avatar, PATHINFO_EXTENSION));
         $source = "";
         $crop = null;
+        // Don't crop if the uploaded image is a svg file
 
-        if ($this->isUploadedAvatar($avatar)) {
+        if (
+            ((!isset($_FILES["Avatar"]) && $extension !== "svg") ||
+                (isset($_FILES["Avatar"]) && !$isSvgImage && $extension !== "svg")) &&
+            $this->isUploadedAvatar($avatar)
+        ) {
             // Get the image source so we can manipulate it in the crop module.
             $upload = new Gdn_UploadImage();
             $thumbnailSize = c("Garden.Thumbnail.Size");
@@ -1091,18 +1101,18 @@ class ProfileController extends Gdn_Controller
             $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
             $this->setData("crop", $crop);
         } else {
-            $this->setData("avatar", $avatar);
+            $this->setData("avatar", isUrl($avatar) ? $avatar : Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
         }
 
         if (!$this->Form->authenticatedPostBack()) {
             $this->Form->setData($configurationModel->Data);
         } elseif ($this->Form->save() !== false) {
-            $upload = new Gdn_UploadImage();
+            $upload = $isSvgImage ? new Gdn_UploadSvg() : new Gdn_UploadImage();
             $newAvatar = false;
             if ($tmpAvatar = $upload->validateUpload("Avatar", false)) {
                 // New upload
                 $thumbOptions = ["Crop" => true, "SaveGif" => c("Garden.Thumbnail.SaveGif")];
-                $newAvatar = $this->saveAvatars($tmpAvatar, $thumbOptions, $upload);
+                $newAvatar = $this->saveAvatars($tmpAvatar, $thumbOptions, $upload, $isSvgImage);
             } elseif ($avatar && $crop && $crop->isCropped()) {
                 // New thumbnail
                 $tmpAvatar = $source;
@@ -1116,7 +1126,7 @@ class ProfileController extends Gdn_Controller
                 $newAvatar = $this->saveAvatars($tmpAvatar, $thumbOptions);
             }
             if ($this->Form->errorCount() == 0) {
-                if ($newAvatar !== false) {
+                if ($newAvatar !== false && !$isSvgImage) {
                     $thumbnailSize = c("Garden.Thumbnail.Size");
                     // Update crop properties.
                     $basename = changeBasename($newAvatar, "p%s");
@@ -1126,6 +1136,13 @@ class ProfileController extends Gdn_Controller
                     $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($newAvatar, "n%s")));
                     $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($newAvatar, "p%s")));
                     $this->setData("crop", $crop);
+                } else {
+                    $this->setData(
+                        "avatar",
+                        isUrl($this->User->Photo)
+                            ? $this->User->Photo
+                            : Gdn_UploadImage::url(changeBasename($this->User->Photo, "p%s"))
+                    );
                 }
             }
             if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
@@ -1133,7 +1150,7 @@ class ProfileController extends Gdn_Controller
 
                 $this->setRedirectTo(userUrl($this->User));
             }
-            if ($upload->Exception) {
+            if (!empty($upload->Exception)) {
                 $this->Form->addError($upload->Exception);
             } else {
                 $this->informMessage(t("Your settings have been saved."));
@@ -1184,16 +1201,17 @@ class ProfileController extends Gdn_Controller
      *
      * @param string $source The path to the local copy of the image.
      * @param array $thumbOptions The options to save the thumbnail-sized avatar with.
-     * @param Gdn_UploadImage|null $upload The upload object.
+     * @param Gdn_Upload|null $upload The upload object.
+     * @param bool $isSvg Whether the image is an SVG.
      * @return bool Whether the saves were successful.
      */
-    private function saveAvatars($source, $thumbOptions, $upload = null)
+    private function saveAvatars($source, $thumbOptions, $upload = null, $isSvg = false)
     {
         try {
             $ext = "";
             if (!$upload) {
-                $upload = new Gdn_UploadImage();
-                $ext = "jpg";
+                $upload = $isSvg ? new Gdn_UploadSvg() : new Gdn_UploadImage();
+                $ext = $isSvg ? "svg" : "jpg";
             }
 
             // Generate the target image name
@@ -1201,25 +1219,30 @@ class ProfileController extends Gdn_Controller
             $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
             $subdir = stringBeginsWith(dirname($targetImage), PATH_UPLOADS . "/", false, true);
 
-            // Save the profile size image.
-            $parts = Gdn_UploadImage::saveImageAs(
-                $source,
-                self::AVATAR_FOLDER . "/$subdir/p$imageBaseName",
-                c("Garden.Profile.MaxHeight"),
-                c("Garden.Profile.MaxWidth"),
-                ["SaveGif" => c("Garden.Thumbnail.SaveGif")]
-            );
+            if ($isSvg) {
+                $parts = $upload->saveAs($source, self::AVATAR_FOLDER . "/$subdir/p$imageBaseName", [], true);
+                $upload->saveAs($source, self::AVATAR_FOLDER . "/$subdir/n$imageBaseName", [], true);
+            } else {
+                // Save the profile size image.
+                $parts = Gdn_UploadImage::saveImageAs(
+                    $source,
+                    self::AVATAR_FOLDER . "/$subdir/p$imageBaseName",
+                    c("Garden.Profile.MaxHeight"),
+                    c("Garden.Profile.MaxWidth"),
+                    ["SaveGif" => c("Garden.Thumbnail.SaveGif")]
+                );
 
-            $thumbnailSize = c("Garden.Thumbnail.Size");
+                $thumbnailSize = c("Garden.Thumbnail.Size");
 
-            // Save the thumbnail size image.
-            Gdn_UploadImage::saveImageAs(
-                $source,
-                self::AVATAR_FOLDER . "/$subdir/n$imageBaseName",
-                $thumbnailSize,
-                $thumbnailSize,
-                $thumbOptions
-            );
+                // Save the thumbnail size image.
+                Gdn_UploadImage::saveImageAs(
+                    $source,
+                    self::AVATAR_FOLDER . "/$subdir/n$imageBaseName",
+                    $thumbnailSize,
+                    $thumbnailSize,
+                    $thumbOptions
+                );
+            }
         } catch (Exception $ex) {
             $this->Form->addError($ex);
             return false;
@@ -2221,5 +2244,74 @@ EOT;
             "m" => t("Male"),
             "f" => t("Female"),
         ];
+    }
+
+    /**
+     * Show user's reacted-to content by reaction type.
+     *
+     * @param string|int $userReference A username or userid.
+     * @param string $username
+     * @param string $reaction Which reaction is selected.
+     * @param int|string $page What page to show. Defaults to 1.
+     */
+    public function reactions($userReference, $username = "", $reaction = "", $page = "")
+    {
+        $this->permission("Garden.Profiles.View");
+
+        $reactionType = ReactionModel::reactionTypes($reaction);
+        if (!$reactionType) {
+            throw notFoundException();
+        }
+
+        $this->editMode(false);
+        $this->getUserInfo($userReference, $username);
+        $userID = val("UserID", $this->User);
+
+        [$offset, $limit] = offsetLimit($page, 5);
+
+        // If this value is less-than-or-equal-to _CurrentRecords, we'll get a "next" pagination link.
+        $this->setData("_Limit", $limit + 1);
+
+        // Try to query five additional records to compensate for user permission and deleted record issues.
+        $reactionModel = new ReactionModel();
+        $data = $reactionModel->getRecordsWhere(
+            [
+                "TagID" => $reactionType["TagID"],
+                "RecordType" => ["Discussion-Total", "Comment-Total"],
+                "UserID" => $userID,
+                "Total >" => 0,
+            ],
+            "DateInserted",
+            "desc",
+            $limit + 5,
+            $offset
+        );
+        $this->setData("_CurrentRecords", count($data));
+
+        // If necessary, shave records off the end to get back down to the original size limit.
+        while (count($data) > $limit) {
+            array_pop($data);
+        }
+        if (c("Plugins.Reactions.ShowUserReactions", ReactionModel::RECORD_REACTIONS_DEFAULT) === "avatars") {
+            $reactionModel->joinUserTags($data);
+        }
+
+        $this->setData("Data", $data);
+        $this->setData("EditMode", false, true);
+        $this->setData("_robots", "noindex, nofollow");
+
+        $canonicalUrl = userUrl($this->User, "", "reactions");
+        if (!empty($reaction) || !in_array($page, ["", "p1"])) {
+            $canonicalUrl .=
+                "?" . http_build_query(["reaction" => strtolower($reaction) ?: null, "page" => $page ?: null]);
+        }
+        $this->canonicalUrl(url($canonicalUrl, true));
+
+        $this->_setBreadcrumbs(t($reactionType["Name"]), $this->canonicalUrl());
+        $this->setTabView("Reactions", "DataList", "reactions", "dashboard");
+        $this->addJsFile("jquery-ui.min.js");
+        $this->addJsFile("reactions.js", "vanilla");
+
+        $this->render();
     }
 }

@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { InputHTMLAttributes } from "react";
 import { inputClasses } from "@library/forms/inputStyles";
 import InputBlock, { IInputBlockProps } from "@library/forms/InputBlock";
 import { getRequiredID } from "@library/utility/idUtils";
@@ -42,6 +42,8 @@ export interface IInputProps {
     // these are for number inputs
     min?: string;
     step?: string;
+    inputmode?: string;
+    pattern?: string;
 }
 
 export interface IInputTextProps extends Omit<IInputBlockProps, "children" | "legend"> {
@@ -116,17 +118,19 @@ export default class InputTextBlock extends React.Component<IInputTextProps> {
                         "aria-invalid": hasErrors,
                         "aria-describedby": describedBy,
                         "aria-label": inputProps["aria-label"],
+                        inputMode: inputProps.inputmode,
+                        pattern: inputProps.pattern,
                     };
 
                     return !inputProps.multiline ? (
                         <input
-                            {...commonProps}
+                            {...(commonProps as InputHTMLAttributes<HTMLInputElement>)}
                             className={classNames(classes, inputProps.className)}
                             autoComplete={inputProps.autoComplete ? "on" : "off"}
                         />
                     ) : (
                         <TextareaAutosize
-                            {...commonProps}
+                            {...(commonProps as InputHTMLAttributes<HTMLTextAreaElement>)}
                             {...multiLineProps}
                             async
                             className={classNames(classes, multiLineProps.className, {

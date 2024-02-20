@@ -76,5 +76,4 @@ applications/dashboard/scss/vendors
 ./library/deprecated/functions.deprecated.php
 ./plugins/OpenID/class.lightopenid.php
 ./plugins/Quotes/class.quotes.plugin.php
-./plugins/Reactions/ReactionsPlugin.php
 ./plugins/VanillaInThisDiscussion/class.inthisdiscussionmodule.php

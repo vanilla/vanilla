@@ -9,16 +9,11 @@ declare namespace DiscussionsApi {
     export interface IndexParams {}
 
     export interface GetParams {
-        discussionID: RecordID;
+        expand?: string[];
     }
 
-    export interface PatchParams extends Partial<IDiscussion> {
-        discussionID: RecordID;
-        insertUserID?: RecordID;
-    }
-    export interface PutReactionParams {
-        reactionTypeID: number;
-        hasReacted: boolean;
+    export interface PatchParams extends Exclude<Partial<IDiscussion>, "discussionID"> {
+        insertUserID?: string | number;
     }
 
     export interface DismissParams {

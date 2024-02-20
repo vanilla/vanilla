@@ -31,8 +31,8 @@ require_once PATH_LIBRARY_CORE . "/functions.validation.php";
 require_once PATH_LIBRARY_CORE . "/functions.render.php";
 
 // Load this for psalm
-require_once PATH_PLUGINS . "/Reactions/views/reaction_functions.php";
-require_once PATH_PLUGINS . "/Reactions/views/settings_functions.php";
+require_once PATH_APPLICATIONS . "/dashboard/views/reactions/reaction_functions.php";
+require_once PATH_APPLICATIONS . "/dashboard/views/reactions/settings_functions.php";
 require_once PATH_PLUGINS . "/ProfileExtender/views/helper_functions.php";
 require_once PATH_APPLICATIONS . "/dashboard/views/profile/connection_functions.php";
 require_once PATH_APPLICATIONS . "/dashboard/views/profile/helper_functions.php";

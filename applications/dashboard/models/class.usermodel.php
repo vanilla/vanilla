@@ -188,6 +188,8 @@ class UserModel extends Gdn_Model implements
     /** @var SessionModel|mixed|object  */
     private SessionModel $sessionModel;
 
+    private ReactionModel $reactionModel;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -233,6 +235,7 @@ class UserModel extends Gdn_Model implements
         $this->userMetaModel = Gdn::getContainer()->get(UserMetaModel::class);
         $this->sessionModel = Gdn::getContainer()->get(SessionModel::class);
         $this->setLogger(Gdn::getContainer()->get(LoggerInterface::class));
+        $this->reactionModel = Gdn::getContainer()->get(ReactionModel::class);
     }
 
     /**
@@ -678,6 +681,8 @@ class UserModel extends Gdn_Model implements
         $this->mergeCopy($mergeID, "Conversation", "InsertUserID", $oldUserID, $newUserID);
         $this->mergeCopy($mergeID, "ConversationMessage", "InsertUserID", $oldUserID, $newUserID, "MessageID");
         $this->mergeCopy($mergeID, "UserConversation", "UserID", $oldUserID, $newUserID, "ConversationID");
+        $this->reactionModel->mergeUsers($oldUserID, $newUserID);
+        Gdn::sql()->put("UserMerge", ["ReactionsMerged" => 1], ["MergeID" => $mergeID]);
 
         $this->EventArguments["MergeID"] = $mergeID;
         $this->EventArguments["OldUser"] = $oldUser;
@@ -3617,8 +3622,6 @@ class UserModel extends Gdn_Model implements
             "profilePhotoUrl?",
             "url?",
             "points",
-            "isAdmin?",
-            "isSysAdmin?",
             "roles?",
             "showEmail",
             "userID",
@@ -3634,11 +3637,12 @@ class UserModel extends Gdn_Model implements
             ],
             "inviteUserID:i?",
             "punished:i?",
+            "reactionsReceived?" => $this->reactionModel->compoundTypeFragmentSchema(),
         ]);
         $result->add($this->schema());
 
         if ($this->session->checkPermission("site.manage")) {
-            $adminOnlySchema = Schema::parse(["insertIPAddress?", "lastIPAddress?"]);
+            $adminOnlySchema = Schema::parse(["insertIPAddress?", "lastIPAddress?", "isAdmin?", "isSysAdmin?"]);
             $result = $result->merge($adminOnlySchema);
         }
 
@@ -3837,6 +3841,7 @@ class UserModel extends Gdn_Model implements
         // Insert the new role associations for this user.
         foreach ($insertRoleIDs as $insertRoleID) {
             if (is_numeric($insertRoleID)) {
+                $this->SQL->options("Replace", true);
                 $this->SQL->insert("UserRole", ["UserID" => $userID, "RoleID" => $insertRoleID]);
             }
         }
@@ -5250,6 +5255,7 @@ class UserModel extends Gdn_Model implements
 
         // Remove user's cache rows
         $this->clearCache($id);
+        $this->clearUserNameCache($userData["Name"]);
         if ($userData) {
             $userEvent = $this->eventFromRow((array) $userData, UserEvent::ACTION_DELETE, $this->currentFragment());
             $this->getEventManager()->dispatch($userEvent);
@@ -5823,7 +5829,10 @@ SQL;
     {
         $user = $this->getID($userID, DATASET_TYPE_ARRAY);
         $result = val($attribute, $user["Attributes"], $defaultValue);
-
+        // return same default value type
+        if (is_array($defaultValue) && $result === false) {
+            $result = $defaultValue;
+        }
         return $result;
     }
 
@@ -6609,6 +6618,23 @@ SQL;
         if (in_array("permissions", $cacheTypesToClear)) {
             Gdn::sql()->put("User", ["Permissions" => ""], ["UserID" => $userID]);
         }
+        return true;
+    }
+
+    /**
+     * Delete cached username data for user.
+     *
+     * @param string|null $userID The user to clear the cache for.
+     * @return bool Returns **true** if the cache was cleared or **false** otherwise.
+     */
+    public function clearUserNameCache($userToken)
+    {
+        if (!$userToken) {
+            return false;
+        }
+        $userNameKey = formatString(self::USERNAME_KEY, ["Name" => md5($userToken)]);
+        Gdn::cache()->remove($userNameKey);
+
         return true;
     }
 

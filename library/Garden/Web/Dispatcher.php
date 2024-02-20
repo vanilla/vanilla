@@ -162,9 +162,7 @@ class Dispatcher implements LoggerAwareInterface
 
         foreach ($this->routes as $route) {
             try {
-                $routeMatchSpan = $this->timers->startGeneric("route-match");
                 $action = $route->match($request);
-                $routeMatchSpan->finish();
                 if ($action instanceof \Exception) {
                     // Hold the action in case another route succeeds.
                     $ex = $action;

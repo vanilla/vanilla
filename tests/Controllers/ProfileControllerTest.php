@@ -14,6 +14,7 @@ use Gdn_UserException;
 use ProfileController;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Utility\ArrayUtils;
+use VanillaTests\Fixtures\TestUploader;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
 use VanillaTests\VanillaTestCase;
@@ -221,18 +222,86 @@ class ProfileControllerTest extends SiteTestCase
     }
 
     /**
+     *  Test that you can upload profile picture for your profile.
+     */
+    public function testUploadProfilePicture(): void
+    {
+        $currentUserId = $this->api()->getUserID();
+        $userData = $this->userModel->getID($currentUserId, DATASET_TYPE_ARRAY);
+        $this->assertEmpty($userData["Photo"]);
+
+        //Now upload a svg image for the user profile
+        TestUploader::uploadFile("Avatar", PATH_ROOT . "/tests/fixtures/insightful.svg");
+        $r = $this->bessy()->post("/profile/picture");
+        $lastHtml = $this->bessy()->getLastHtml();
+        $lastHtml->assertContainsString($r->Data["avatar"], "profile picture was not updated");
+        $this->assertNotEmpty($r->Data["avatar"]);
+        $userData = $this->userModel->getID($currentUserId, DATASET_TYPE_ARRAY);
+        $this->assertNotEmpty($userData["Photo"]);
+        $pictureName = basename($userData["Photo"]);
+        $oldProfilePicture = str_replace($pictureName, "p" . $pictureName, $userData["Photo"]);
+        $this->assertFileExists(PATH_UPLOADS . "/" . $oldProfilePicture);
+        $this->assertEquals("svg", strtolower(pathinfo(PATH_UPLOADS . "/" . $oldProfilePicture, PATHINFO_EXTENSION)));
+
+        // Now upload a jpg image for the user profile
+        TestUploader::uploadFile("Avatar", PATH_ROOT . "/tests/fixtures/apple.jpg");
+        $r = $this->bessy()->post("/profile/picture");
+        $updatedUserData = $this->userModel->getID($currentUserId, DATASET_TYPE_ARRAY);
+
+        // The old profile picture should be deleted
+        $this->assertFileDoesNotExist(PATH_UPLOADS . "/" . $oldProfilePicture);
+        $pictureName = basename($updatedUserData["Photo"]);
+        $newProfilePicture = str_replace($pictureName, "p" . $pictureName, $updatedUserData["Photo"]);
+        $this->assertFileExists(PATH_UPLOADS . "/" . $newProfilePicture);
+        $this->assertEquals("jpg", strtolower(pathinfo(PATH_UPLOADS . "/" . $newProfilePicture, PATHINFO_EXTENSION)));
+    }
+
+    /**
      * Test the private profile config setting.
      */
     public function testPrivateProfile(): void
     {
-        $this->runWithConfig(["Garden.Profile.Public" => false], function () {
-            $user = $this->userModel->getID($this->memberID, DATASET_TYPE_ARRAY);
-            $this->getSession()->end();
+        $privateUser = $this->createUser([
+            "name" => "PrivateUser",
+            "email" => "private_profile@test.com",
+            "private" => true,
+        ]);
+        $this->runWithPermissions(
+            function () use ($privateUser) {
+                $this->expectException(\Gdn_UserException::class);
+                $this->expectExceptionMessage(ProfileController::PRIVATE_PROFILE);
+                $r = $this->bessy()->get(userUrl($privateUser));
+            },
+            ["profiles.view" => false, "personalInfo.view" => false]
+        );
+    }
 
+    /**
+     * Test the private profile config setting.
+     */
+
+    public function testPrivateProfileConfigSetting(): void
+    {
+        $this->runWithConfig(["Garden.Profile.Public" => false], function () {
+            $this->getSession()->end();
             $this->expectException(\Gdn_UserException::class);
             $this->expectExceptionMessage(ProfileController::PRIVATE_PROFILE);
-            $r = $this->bessy()->get(userUrl($user));
+            $profileController = $this->container()->get(ProfileController::class);
+            $profileController->getUserInfo("", "", $this->memberID);
         });
+    }
+
+    /**
+     * Test that unsigned guest users with no permissions to view profile receive permission error.
+     *
+     * @return void
+     */
+    public function testGuestUsersWithOutProfileViewPermissionReceivePermissionError(): void
+    {
+        $this->getSession()->end();
+        $this->expectException(\Gdn_UserException::class);
+        $this->expectExceptionMessage("You don't have permission to do that.");
+        $r = $this->bessy()->get("/profile/{$this->memberID}");
     }
 
     /**

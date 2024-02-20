@@ -1,0 +1,169 @@
+openapi: 3.0.3
+info:
+paths:
+    /attachments:
+        x-hidden: true
+        get:
+            summary: List attachments
+            description: |
+                List attachments.
+            tags:
+                - Attachments
+            parameters:
+                - in: query
+                  name: recordType
+                  required: true
+                  schema:
+                      type: string
+                      enum:
+                          - discussion
+                          - comment
+                          - user
+                      description: |
+                          The record type of the attachment.
+                - in: query
+                  name: recordID
+                  required: true
+                  schema:
+                      type: string
+                      description: |
+                          The record ID of the attachment.
+
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Attachment"
+        post:
+            summary: Create attachment
+            description: |
+                Create attachment.
+            tags:
+                - Attachments
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/AttachmentPost"
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Attachment"
+components:
+    schemas:
+        Attachment:
+            type: object
+            properties:
+                attachmentID:
+                    type: integer
+                    description: |
+                        The ID of the attachment.
+                recordType:
+                    type: string
+                    description: |
+                        The record type of the attachment.
+                recordID:
+                    type: string
+                    description: |
+                        The record ID of the attachment.
+                type:
+                    type: string
+                    description: |
+                        The attachment type.
+                foreignUserID:
+                    type: integer
+                    description: |
+                        The ID of the user associated with the attachment.
+                source:
+                    type: string
+                    description: |
+                        The external source associated with the attachment.
+                sourceID:
+                    type: integer
+                    description: |
+                        The external ID associated with the attachment.
+                sourceUrl:
+                    type: string
+                    format: uri
+                    description: |
+                        The source url.
+                status:
+                    type: string
+                    description: |
+                        The status associated with the attachment.
+                insertUserID:
+                    type: integer
+                    description: |
+                        The ID of the user who created the attachment.
+                dateUpdated:
+                    type: string
+                    format: date-time
+                    description: |
+                        The date the attachment was last updated.
+                lastModifiedDate:
+                    type: string
+                    format: date-time
+                    description: |
+                        The date the external source associated with the attachement was last modified.
+                updateUserID:
+                    type: integer
+                    description: |
+                        The ID of the user who last updated the attachment.
+                metadata:
+                    type: array
+                    description: |
+                        The metadata associated with the attachment.
+                    items:
+                        $ref: "#/components/schemas/AttachmentMetadata"
+            required:
+                - attachmentID
+                - recordType
+                - recordID
+                - type
+                - foreignUserID
+                - source
+                - sourceID
+                - sourceUrl
+                - status
+                - insertUserID
+        AttachmentPost:
+            type: object
+            properties:
+                recordType:
+                    type: string
+                    description: |
+                        The record type of the attachment.
+                recordID:
+                    type: integer
+                    description: |
+                        The record ID of the attachment.
+                type:
+                    type: string
+                    description: |
+                        The attachment type.
+                source:
+                    type: string
+                    description: |
+                        The external source associated with the attachment.
+                metadata:
+                    type: array
+                    description: |
+                        The metadata associated with the attachment.
+                    items:
+                        $ref: "#/components/schemas/AttachmentMetadata"
+        AttachmentMetadata:
+            type: object
+            properties:
+                labelCode:
+                    type: string
+                    description: |
+                        The key of the metadatum.
+                value:
+                    type: string
+                    description: |
+                        The value of the metadatum.

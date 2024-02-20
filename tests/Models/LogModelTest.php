@@ -187,14 +187,4 @@ class LogModelTest extends SiteTestCase
             ->getBody();
         $this->assertCount(1, $comments);
     }
-
-    /**
-     * @inheritDoc
-     */
-    public static function getAddons(): array
-    {
-        $addons = parent::getAddons();
-        $addons[] = "reactions";
-        return $addons;
-    }
 }

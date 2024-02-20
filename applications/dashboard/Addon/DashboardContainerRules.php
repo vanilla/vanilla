@@ -152,5 +152,9 @@ class DashboardContainerRules extends AddonContainerRules
             ->setConstructorArgs([new Reference(Gdn_Session::class), new Reference("@smart-id-middleware")]);
 
         $container->rule(Dispatcher::class)->addCall("addMiddleware", [new Reference(SpoofMiddleware::class)]);
+
+        $container
+            ->rule(\Vanilla\OpenAPIBuilder::class)
+            ->addCall("addFilter", ["filter" => new Reference(\ReactionsFilterOpenApi::class)]);
     }
 }

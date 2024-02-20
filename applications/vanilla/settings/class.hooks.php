@@ -11,6 +11,7 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\DiscussionTypeHandler;
+use Vanilla\Theme\BoxThemeShim;
 use Vanilla\Theme\ThemeSectionModel;
 
 /**
@@ -272,6 +273,33 @@ class VanillaHooks extends Gdn_Plugin
                 $sender->setData("Discussion." . $key, $value);
             }
         }
+
+        $OrderBy = ReactionModel::commentOrder();
+        [$OrderColumn, $OrderDirection] = explode(" ", val("0", $OrderBy));
+        $OrderColumn = stringBeginsWith($OrderColumn, "c.", true, true);
+
+        // Send back comment order for non-api calls.
+        if ($sender->deliveryType() !== DELIVERY_TYPE_DATA) {
+            $sender->setData("CommentOrder", ["Column" => $OrderColumn, "Direction" => $OrderDirection]);
+        }
+
+        $sender->addJsFile("jquery-ui.min.js");
+        $sender->addJsFile("reactions.js", "vanilla");
+
+        $ReactionModel = new ReactionModel();
+        if (
+            checkPermission("Garden.Reactions.View") &&
+            Gdn::config("Vanilla.Reactions.ShowUserReactions", ReactionModel::RECORD_REACTIONS_DEFAULT) == "avatars"
+        ) {
+            $ReactionModel->joinUserTags($sender->Data["Discussion"], "Discussion");
+            $ReactionModel->joinUserTags($sender->Data["Comments"], "Comment");
+
+            if (isset($sender->Data["Answers"])) {
+                $ReactionModel->joinUserTags($sender->Data["Answers"], "Comment");
+            }
+        }
+
+        include_once $sender->fetchViewLocation("reaction_functions", "reactions", "dashboard");
     }
 
     /**
@@ -315,8 +343,8 @@ class VanillaHooks extends Gdn_Plugin
      */
     public function discussionModel_beforeSaveDiscussion_handler($sender, $args)
     {
-        // Allow an addon to set disallowed tag names.
-        $reservedTags = [];
+        // Allow an addon to set disallowed tag names. Reaction types are reserved by default.
+        $reservedTags = array_keys(ReactionModel::reactionTypes());
         $sender->EventArguments["ReservedTags"] = &$reservedTags;
         $sender->fireEvent("ReservedTags");
 
@@ -713,6 +741,17 @@ class VanillaHooks extends Gdn_Plugin
     {
         if ($sender->Menu) {
             $sender->Menu->addLink("Discussions", t("Discussions"), "/discussions", false, ["Standard" => true]);
+            if (Gdn::config("Vanilla.Reactions.ShowBestOf")) {
+                $sender->Menu->addLink("BestOf", t("Best Of..."), "/bestof/everything", false, ["class" => "BestOf"]);
+            }
+        }
+        if (!isMobile()) {
+            if (checkPermission("Garden.Reactions.View")) {
+                $sender->addDefinition(
+                    "ShowUserReactions",
+                    Gdn::config("Vanilla.Reactions.ShowUserReactions", ReactionModel::RECORD_REACTIONS_DEFAULT)
+                );
+            }
         }
 
         if (!inSection("Dashboard")) {
@@ -1142,6 +1181,14 @@ class VanillaHooks extends Gdn_Plugin
                 $sort
             )
             ->addLinkIf(
+                "Garden.Community.Manage",
+                t("Reactions"),
+                "reactions",
+                "forum.reactions",
+                "nav-reactions",
+                $sort
+            )
+            ->addLinkIf(
                 c("Vanilla.Archive.Date", false) && Gdn::session()->checkPermission("Garden.Settings.Manage"),
                 t("Archive Discussions"),
                 "/vanilla/settings/archive",
@@ -1243,5 +1290,424 @@ class VanillaHooks extends Gdn_Plugin
         include PATH_APPLICATIONS . DS . "vanilla" . DS . "settings" . DS . "structure.php";
 
         saveToConfig("Routes.DefaultController", "discussions");
+    }
+
+    /**
+     * Render the reactions on the profile.
+     *
+     * @param ProfileController $sender
+     */
+    public function profileController_render_before($sender)
+    {
+        if (!$sender->data("Profile")) {
+            return;
+        }
+
+        // Grab all of the counts for the user.
+        $data = Gdn::sql()
+            ->getWhere("UserTag", [
+                "RecordID" => $sender->data("Profile.UserID"),
+                "RecordType" => "User",
+                "UserID" => ReactionModel::USERID_OTHER,
+            ])
+            ->resultArray();
+        $data = Gdn_DataSet::index($data, ["TagID"]);
+
+        $counts = $sender->data("Counts", []);
+        foreach (ReactionModel::reactionTypes() as $code => $type) {
+            if (!$type["Active"]) {
+                continue;
+            }
+
+            $row = [
+                "Name" => $type["Name"],
+                "Url" => url(
+                    userUrl($sender->data("Profile"), "", "reactions") . "?reaction=" . urlencode($code),
+                    true
+                ),
+                "Total" => 0,
+            ];
+
+            if (isset($data[$type["TagID"]])) {
+                $row["Total"] = $data[$type["TagID"]]["Total"];
+            }
+            $counts[$type["Name"]] = $row;
+        }
+
+        $sender->setData("Counts", $counts);
+        $sender->addJsFile("jquery-ui.min.js");
+        $sender->addJsFile("reactions.js", "vanilla");
+    }
+
+    /**
+     *
+     *
+     * @param ActivityController $sender
+     */
+    public function activityController_render_before($sender)
+    {
+        if ($sender->deliveryMethod() == DELIVERY_METHOD_XHTML || $sender->deliveryType() == DELIVERY_TYPE_VIEW) {
+            $sender->addJsFile("jquery-ui.min.js");
+            $sender->addJsFile("reactions.js", "vanilla");
+            include_once $sender->fetchViewLocation("reaction_functions", "reactions", "dashboard");
+        }
+    }
+
+    /**
+     * Add the reactions CSS to the page.
+     *
+     * @param \Vanilla\Web\Asset\LegacyAssetModel $sender
+     */
+    public function assetModel_styleCss_handler($sender)
+    {
+        $sender->addCssFile("reactions.css", "vanilla");
+    }
+
+    /**
+     * Handle user reactions.
+     *
+     * @param Gdn_Controller $Sender
+     * @param string $RecordType Type of record we're reacting to. Discussion, comment or activity.
+     * @param string $Reaction The url code of the reaction.
+     * @param int $ID The ID of the record.
+     * @param bool $selfReact Whether a user can react to their own post
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    public function rootController_react_create($Sender, $RecordType, $Reaction, $ID, $selfReact = false)
+    {
+        if (!Gdn::session()->isValid()) {
+            throw new Gdn_UserException(t("You need to sign in before you can do this."), 403);
+        }
+
+        include_once $Sender->fetchViewLocation("reaction_functions", "reactions", "dashboard");
+
+        if (!$Sender->Request->isAuthenticatedPostBack(true)) {
+            throw permissionException("Javascript");
+        }
+
+        $ReactionType = ReactionModel::reactionTypes($Reaction);
+        $Sender->EventArguments["ReactionType"] = &$ReactionType;
+        $Sender->EventArguments["RecordType"] = $RecordType;
+        $Sender->EventArguments["RecordID"] = $ID;
+        $Sender->fireAs("ReactionModel")->fireEvent("GetReaction");
+
+        // Only allow enabled reactions
+        if (!val("Active", $ReactionType)) {
+            throw forbiddenException("@You may not use that Reaction.");
+        }
+
+        // Permission
+        if ($Permission = val("Permission", $ReactionType)) {
+            // Check reaction's permission if a custom/specific one is applied
+            $Sender->permission($Permission);
+        } elseif ($PermissionClass = val("Class", $ReactionType)) {
+            // Check reaction's permission based on class
+            $Sender->permission("Reactions." . $PermissionClass . ".Add");
+        }
+
+        if (strtolower($RecordType) === "discussion") {
+            $discussion = DiscussionModel::instance()->getID((int) $ID);
+        } elseif (strtolower($RecordType) === "comment") {
+            $comment = CommentModel::instance()->getID((int) $ID);
+            $discussion = DiscussionModel::instance()->getID($comment->DiscussionID);
+        }
+
+        if ($discussion) {
+            $eventManager = Gdn::eventManager();
+            $eventManager->fire("reactionModel_beforeReact", $discussion);
+            $category = CategoryModel::categories($discussion->CategoryID);
+            $Sender->permission("Vanilla.Discussions.View", true, "Category", $category["PermissionCategoryID"]);
+        }
+
+        $ReactionModel = new ReactionModel();
+        $ReactionModel->react($RecordType, $ID, $Reaction, null, $selfReact);
+        $Sender->render("Blank", "Utility", "Dashboard");
+    }
+
+    /**
+     * Add a "Best Of" view for reacted content.
+     *
+     * @param RootController $sender Controller firing the event.
+     * @param string $reaction Type of reaction content to show
+     * @param int $page The current page of content
+     */
+    public function rootController_bestOfOld_create($sender, $reaction = "everything")
+    {
+        // Load all of the reaction types.
+        try {
+            $reactionTypes = ReactionModel::getReactionTypes(["Class" => "Positive", "Active" => 1]);
+            $sender->setData("ReactionTypes", $reactionTypes);
+        } catch (Exception $ex) {
+            $sender->setData("ReactionTypes", []);
+        }
+        if (!isset($reactionTypes[$reaction])) {
+            $reaction = "everything";
+        }
+        $sender->setData("CurrentReaction", $reaction);
+
+        // Define the query offset & limit.
+        $page = "p" . getIncomingValue("Page", 1);
+        $limit = c("Vanilla.Reactions.BestOfPerPage", 30);
+        [$offset, $limit] = offsetLimit($page, $limit);
+        $sender->setData("_Limit", $limit + 1);
+
+        $reactionModel = new ReactionModel();
+        if ($reaction === "everything") {
+            $promotedTagID = $reactionModel->defineTag("Promoted", "BestOf");
+            $data = $reactionModel->getRecordsWhere(
+                ["TagID" => $promotedTagID, "RecordType" => ["Discussion", "Comment"]],
+                "DateInserted",
+                "desc",
+                $limit + 1,
+                $offset
+            );
+        } else {
+            $reactionType = $reactionTypes[$reaction];
+            $data = $reactionModel->getRecordsWhere(
+                [
+                    "TagID" => $reactionType["TagID"],
+                    "RecordType" => ["Discussion-Total", "Comment-Total"],
+                    "Total >=" => 1,
+                ],
+                "DateInserted",
+                "desc",
+                $limit + 1,
+                $offset
+            );
+        }
+
+        $sender->setData("_CurrentRecords", count($data));
+        if (count($data) > $limit) {
+            array_pop($data);
+        }
+        if (
+            checkPermission("Garden.Reactions.View") &&
+            Gdn::config("Vanilla.Reactions.ShowUserReactions", ReactionModel::RECORD_REACTIONS_DEFAULT) == "avatars"
+        ) {
+            $reactionModel->joinUserTags($data);
+        }
+        $sender->setData("Data", $data);
+
+        // Set up head.
+        $sender->Head = new HeadModule($sender);
+        $sender->addJsFile("jquery.js");
+        $sender->addJsFile("jquery.livequery.js");
+        $sender->addJsFile("global.js");
+        $sender->addJsFile("library/jQuery-Masonry/jquery.masonry.js", "vanilla"); // I customized this to get proper callbacks.
+        $sender->addJsFile("library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js", "vanilla");
+        $sender->addJsFile("tile.js", "vanilla");
+        $sender->addCssFile("style.css");
+        $sender->addCssFile("vanillicon.css", "static");
+
+        // Set the title, breadcrumbs, canonical.
+        $sender->title(t("Best Of"));
+        $sender->setData("Breadcrumbs", [["Name" => t("Best Of"), "Url" => "/bestof/everything"]]);
+        $sender->canonicalUrl(
+            url(
+                concatSep("/", "bestof/" . $reaction, pageNumber($offset, $limit, true, Gdn::session()->UserID != 0)),
+                true
+            ),
+            Gdn::session()->UserID == 0
+        );
+
+        // Modules
+        $sender->addModule("GuestModule");
+        $sender->addModule("SignedInModule");
+        $sender->addModule("BestOfFilterModule");
+
+        // Render the page.
+        if (class_exists("LeaderBoardModule")) {
+            $sender->addModule("LeaderBoardModule");
+
+            $module = new LeaderBoardModule();
+            $module->SlotType = "a";
+            $sender->addModule($module);
+        }
+
+        // Render the page (or deliver the view)
+        $sender->render("bestof_old", "reactions", "dashboard");
+    }
+
+    /**
+     * Add a "Best Of" view for reacted content.
+     *
+     * @param RootController $sender Controller firing the event.
+     * @param string $reaction Type of reaction content to show
+     */
+    public function rootController_bestOf_create($sender, $reaction = "everything")
+    {
+        Gdn_Theme::section("BestOf");
+        // Load all of the reaction types.
+        try {
+            $reactionTypes = ReactionModel::getReactionTypes(["Class" => "Positive", "Active" => 1]);
+
+            $sender->setData("ReactionTypes", $reactionTypes);
+        } catch (Exception $ex) {
+            $sender->setData("ReactionTypes", []);
+        }
+
+        if (!isset($reactionTypes[$reaction])) {
+            $reaction = "everything";
+        }
+        $sender->setData("CurrentReaction", $reaction);
+
+        // Define the query offset & limit.
+        $page = Gdn::request()->get("Page", 1);
+
+        // Limit the number of pages.
+        if (ReactionModel::BEST_OF_MAX_PAGES && $page > ReactionModel::BEST_OF_MAX_PAGES) {
+            $page = ReactionModel::BEST_OF_MAX_PAGES;
+        }
+        $page = "p" . $page;
+
+        $limit = Gdn::config("Vanilla.Reactions.BestOfPerPage", 10);
+        [$offset, $limit] = offsetLimit($page, $limit);
+
+        $sender->setData("_Limit", $limit + 1);
+
+        $reactionModel = new ReactionModel();
+        Gdn::config()->set("Vanilla.Reactions.ShowUserReactions", false, false);
+        if ($reaction == "everything") {
+            $promotedTagID = $reactionModel->defineTag("Promoted", "BestOf");
+            $reactionModel->fireEvent("BeforeGet", ["ApplyRestrictions" => true]);
+            $data = $reactionModel->getRecordsWhere(
+                ["TagID" => $promotedTagID, "RecordType" => ["Discussion", "Comment"]],
+                "UserTag.DateInserted",
+                "desc",
+                $limit + 1,
+                $offset
+            );
+        } else {
+            $reactionType = $reactionTypes[$reaction];
+            $reactionModel->fireEvent("BeforeGet", [
+                "RecordType" => [
+                    "Discussion" => "Discussion-Total",
+                    "Comment" => "Comment-Total",
+                ],
+                "ApplyRestrictions" => true,
+            ]);
+            $data = $reactionModel->getRecordsWhere(
+                [
+                    "TagID" => $reactionType["TagID"],
+                    "RecordType" => ["Discussion-Total", "Comment-Total"],
+                    "Total >=" => 1,
+                ],
+                "UserTag.DateInserted",
+                "desc",
+                $limit + 1,
+                $offset
+            );
+        }
+
+        $sender->setData("_CurrentRecords", $reactionModel->LastCount);
+        if (count($data) > $limit) {
+            array_pop($data);
+        }
+        $sender->setData("Data", $data);
+
+        // Set up head
+        $sender->Head = new HeadModule($sender);
+
+        $sender->addJsFile("jquery.js");
+        $sender->addJsFile("jquery.livequery.js");
+        $sender->addJsFile("global.js");
+        $sender->addJsFile("jquery.form.js");
+        $sender->addJsFile("jquery.popup.js");
+
+        // A little ugly bit will do the trick until this tiled layout has been rewritten.
+        // This janky jquery masonry plugin is not peformant and is very buggy.
+        // Until it is re-implemented, data-driven (new) themes will default to use the "list" layout
+        // unless they explicitly opt-in to using tiles (can be configured in the Reactions plugin settings).
+        //
+        // See https://github.com/vanilla/support/issues/4368#issuecomment-920959129
+        if (\Gdn::themeFeatures()->useDataDrivenTheme()) {
+            \Gdn::config()->touch("Vanilla.Reactions.BestOfStyle", "List", false);
+        }
+
+        if (Gdn::config("Vanilla.Reactions.BestOfStyle", "Tiles") == "Tiles") {
+            $sender->addJsFile("library/jQuery-Masonry/jquery.masonry.js", "vanilla"); // I customized this to get proper callbacks.
+            $sender->addJsFile("library/jQuery-InfiniteScroll/jquery.infinitescroll.min.js", "vanilla");
+            $sender->addJsFile("tile.js", "vanilla");
+            $sender->CssClass .= " NoPanel";
+            $view = $sender->deliveryType() == DELIVERY_TYPE_VIEW ? "tile_items" : "tiles";
+        } else {
+            $view = "BestOf";
+            $sender->addModule("GuestModule");
+            $sender->addModule("SignedInModule");
+            $sender->addModule("BestOfFilterModule");
+        }
+
+        $sender->addCssFile("style.css");
+        $sender->addCssFile("vanillicon.css", "static");
+
+        // Set the title, breadcrumbs, canonical
+        $sender->title(t("Best Of"));
+        $sender->setData("Breadcrumbs", [["Name" => t("Best Of"), "Url" => "/bestof/everything"]]);
+
+        // set canonical url
+        if ($sender->Data["isHomepage"]) {
+            $sender->canonicalUrl(url("/", true));
+        } else {
+            $sender->canonicalUrl(
+                url(
+                    concatSep(
+                        "/",
+                        "bestof/" . $reaction,
+                        pageNumber($offset, $limit, true, Gdn::session()->UserID != 0)
+                    ),
+                    true
+                ),
+                Gdn::session()->UserID == 0
+            );
+        }
+
+        // Render the page (or deliver the view)
+        $sender->render($view, "reactions", "dashboard");
+    }
+
+    /**
+     * @param $Sender
+     * @param $Args
+     * @throws Exception
+     */
+    public function base_afterUserInfo_handler($Sender, $Args)
+    {
+        // Fetch the view helper functions.
+        include_once Gdn::controller()->fetchViewLocation("reaction_functions", "reactions", "dashboard");
+
+        $reactionsModuleEnabled = \Gdn::themeFeatures()->get("NewReactionsModule");
+        if ($reactionsModuleEnabled) {
+            /** @var ReactionsModule $reactionModule */
+            $reactionModule = Gdn::getContainer()->get(ReactionsModule::class);
+            echo $reactionModule;
+        } else {
+            $this->displayProfileCounts();
+        }
+    }
+
+    /**
+     * Display legacy profile Counts.
+     *
+     * @see writeProfileCounts()
+     */
+    private function displayProfileCounts(): void
+    {
+        $heading = '<h2 class="H">' . t("Reactions") . "</h2>";
+        if (BoxThemeShim::isActive()) {
+            BoxThemeShim::startWidget();
+            BoxThemeShim::startHeading();
+            echo $heading;
+            BoxThemeShim::endHeading();
+            BoxThemeShim::startBox("ReactionsWrap");
+            writeProfileCounts();
+            BoxThemeShim::endBox();
+            BoxThemeShim::endWidget();
+        } else {
+            echo '<div class="ReactionsWrap">';
+            echo $heading;
+            writeProfileCounts();
+            echo "</div>";
+        }
     }
 }

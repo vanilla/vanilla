@@ -8,9 +8,8 @@ import React from "react";
 import { registerLayoutPage } from "@library/features/Layout/LayoutPage";
 import { getSiteSection } from "@library/utility/appUtils";
 import { registerLoadableWidgets } from "@library/utility/componentRegistry";
-import { DiscussionThreadContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
+import { DiscussionThreadPaginationContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadPaginationContext";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
-import getStore from "@library/redux/getStore";
 
 interface IDiscussionThreadPageParams {
     id: IDiscussion["discussionID"];
@@ -35,9 +34,9 @@ export function registerDiscussionThreadPage() {
         },
         (layoutQuery, page) => {
             return (
-                <DiscussionThreadContextProvider initialPage={layoutQuery.params.page}>
+                <DiscussionThreadPaginationContextProvider initialPage={layoutQuery.params.page}>
                     {page}
-                </DiscussionThreadContextProvider>
+                </DiscussionThreadPaginationContextProvider>
             );
         },
     );

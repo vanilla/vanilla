@@ -221,8 +221,6 @@ export interface IControlProps<T = IFormControl> extends IBaseSchemaFormProps {
     onBlur?(): void;
     size?: InputSize;
     autocompleteClassName?: string;
-    /** If this form is rendered within a modal, allows for options boxes to be rendered outside */
-    inModal?: boolean;
     /** This controls the direction for DateRange option boxes (DatePicker in the end) */
     dateRangeDirection?: "above" | "below";
 }

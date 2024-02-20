@@ -5,6 +5,7 @@
  */
 
 import React, { useMemo } from "react";
+import { useIsInModal } from "@library/modal/Modal.context";
 import { Tokens } from "@library/forms/select/Tokens";
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { useTypeOptions } from "@library/features/discussions/filters/discussionListFilterHooks";
@@ -13,11 +14,11 @@ export interface ISelectTypesProps {
     value: string[];
     onChange: (newValue: string[]) => void;
     label?: string;
-    inModal?: boolean;
 }
 
 export function SelectTypes(props: ISelectTypesProps) {
-    const { value: valueFromProps, onChange, label, inModal } = props;
+    const isInModal = useIsInModal();
+    const { value: valueFromProps, onChange, label } = props;
     const options = useTypeOptions();
 
     const value = useMemo<IComboBoxOption[]>(() => {
@@ -36,6 +37,13 @@ export function SelectTypes(props: ISelectTypesProps) {
     }
 
     return (
-        <Tokens value={value} label={label} inModal={inModal} onChange={handleChange} options={options} showIndicator />
+        <Tokens
+            value={value}
+            label={label}
+            onChange={handleChange}
+            options={options}
+            inModal={isInModal}
+            showIndicator
+        />
     );
 }

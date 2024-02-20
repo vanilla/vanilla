@@ -1,6 +1,6 @@
 /**
  * @author Jenny Seburn <jseburn@higherlogic.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -61,9 +61,14 @@ export const unwrapSpoiler = <V extends Value>(editor: PlateEditor<V>, { at }: {
 
             unwrapNodes(editor, {
                 at,
-                match: { type: [spoilerItemType, spoilerContentType, spoilerType] },
+                match: { type: spoilerContentType },
                 split: true,
-                block: true,
+            });
+
+            unwrapNodes(editor, {
+                at,
+                match: { type: spoilerType },
+                split: true,
             });
         } while (ancestorTypeCheck());
     });

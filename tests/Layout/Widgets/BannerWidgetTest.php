@@ -149,12 +149,16 @@ HTML
     public function provideBackgroundImageSourceData(): array
     {
         return [
-            ["react.app-banner", BannerFullWidget::IMAGE_SOURCE_STYLEGUIDE],
-            ["react.app-banner", BannerFullWidget::IMAGE_SOURCE_CATEGORY],
-            ["react.app-banner", BannerFullWidget::IMAGE_SOURCE_CUSTOM],
-            ["react.app.content-banner", BannerFullWidget::IMAGE_SOURCE_STYLEGUIDE],
-            ["react.app.content-banner", BannerFullWidget::IMAGE_SOURCE_CATEGORY],
-            ["react.app.content-banner", BannerFullWidget::IMAGE_SOURCE_CUSTOM],
+            ["react.app-banner", BannerFullWidget::IMAGE_SOURCE_STYLEGUIDE, null],
+            ["react.app-banner", BannerFullWidget::IMAGE_SOURCE_CATEGORY, "https://www.example.com/category.jpg"],
+            ["react.app-banner", BannerFullWidget::IMAGE_SOURCE_CUSTOM, "https://www.example.com/custom.jpg"],
+            ["react.app.content-banner", BannerFullWidget::IMAGE_SOURCE_STYLEGUIDE, null],
+            [
+                "react.app.content-banner",
+                BannerFullWidget::IMAGE_SOURCE_CATEGORY,
+                "https://www.example.com/category.jpg",
+            ],
+            ["react.app.content-banner", BannerFullWidget::IMAGE_SOURCE_CUSTOM, "https://www.example.com/custom.jpg"],
         ];
     }
 
@@ -163,14 +167,14 @@ HTML
      *
      * @param string $widgetID
      * @param string $imageSource
+     * @param string|null $expectedImage
      * @return void
      * @dataProvider provideBackgroundImageSourceData
      */
-    public function testHydrateBackgroundImage(string $widgetID, string $imageSource)
+    public function testHydrateBackgroundImage(string $widgetID, string $imageSource, ?string $expectedImage)
     {
         // Unique banner image names for each image source attribute.
         $categoryImage = BannerFullWidget::IMAGE_SOURCE_CATEGORY;
-        $styleGuideImage = BannerFullWidget::IMAGE_SOURCE_STYLEGUIDE;
         $customImage = BannerFullWidget::IMAGE_SOURCE_CUSTOM;
 
         // Create category for testing category-based images.
@@ -189,24 +193,20 @@ HTML
                 "image" => "https://www.example.com/$customImage.jpg",
             ],
         ];
-        $this->runWithConfig(
-            [BannerImageModel::DEFAULT_CONFIG_KEY => "https://www.example.com/$styleGuideImage.jpg"],
-            function () use ($spec, $categoryID, $imageSource) {
-                $this->assertHydratesTo(
-                    $spec,
-                    [
-                        "categoryID" => $categoryID,
-                    ],
-                    self::markForSparseComparision([
-                        '$reactProps' => self::markForSparseComparision([
-                            "background" => self::markForSparseComparision([
-                                "imageSource" => $imageSource,
-                                "image" => "https://www.example.com/$imageSource.jpg",
-                            ]),
-                        ]),
-                    ])
-                );
-            }
+
+        $this->assertHydratesTo(
+            $spec,
+            [
+                "categoryID" => $categoryID,
+            ],
+            self::markForSparseComparision([
+                '$reactProps' => self::markForSparseComparision([
+                    "background" => self::markForSparseComparision([
+                        "imageSource" => $imageSource,
+                        "image" => $expectedImage,
+                    ]),
+                ]),
+            ])
         );
     }
 }

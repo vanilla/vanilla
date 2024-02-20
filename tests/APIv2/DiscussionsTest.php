@@ -2038,4 +2038,75 @@ facilisis luctus, metus</p>";
             ->getBody();
         $this->assertEquals($result[0]["discussionID"], $announcement["discussionID"]);
     }
+
+    /**
+     * Test expanding attachments via the "/discussions" endpoint.
+     *
+     * @return void
+     */
+    public function testExpandDiscussionsAttachments(): void
+    {
+        $discussion = $this->createDiscussion();
+        $attachment = $this->createAttachment("discussion", $discussion["discussionID"]);
+        $result = $this->api()
+            ->get($this->baseUrl, ["expand" => "attachments", "discussionID" => $discussion["discussionID"]])
+            ->getBody();
+        $retrievedDiscussion = $result[0];
+        $this->assertArrayHasKey("attachments", $retrievedDiscussion);
+        $this->assertEquals($attachment["AttachmentID"], $retrievedDiscussion["attachments"][0]["attachmentID"]);
+    }
+
+    /**
+     * Test expanding attachments via the "/discussions/{id} endpoint.
+     *
+     * @return void
+     */
+    public function testExpandDiscussionAttachments(): void
+    {
+        $discussion = $this->createDiscussion();
+        $attachment = $this->createAttachment("discussion", $discussion["discussionID"]);
+        $result = $this->api()
+            ->get("{$this->baseUrl}/{$discussion["discussionID"]}", ["expand" => "attachments"])
+            ->getBody();
+        $this->assertArrayHasKey("attachments", $result);
+        $this->assertCount(1, $result["attachments"]);
+        $this->assertEquals($attachment["AttachmentID"], $result["attachments"][0]["attachmentID"]);
+    }
+
+    /**
+     * Test that expanding attachments via the "/discussion/{id}" endpoint without the "Garden.Staff.Allow" permission
+     * returns no attachments.
+     *
+     * @return void
+     */
+    public function testExpandDiscussionAttachmentsWithoutPermission(): void
+    {
+        $discussion = $this->createDiscussion();
+        $this->createAttachment("discussion", $discussion["discussionID"]);
+        $member = $this->createUser();
+        $this->api()->setUserID($member["userID"]);
+        $discussion = $this->api()
+            ->get("{$this->baseUrl}/{$discussion["discussionID"]}", ["expand" => "attachments"])
+            ->getBody();
+        $this->assertArrayNotHasKey("attachments", $discussion);
+    }
+
+    /**
+     * Test that expanding attachments via the "/discussions" endpoint without the "Garden.Staff.Allow" permission
+     * returns no attachments.
+     *
+     * @return void
+     */
+    public function testExpandDiscussionsAttachmentsWithoutPermission(): void
+    {
+        $discussion = $this->createDiscussion();
+        $this->createAttachment("discussion", $discussion["discussionID"]);
+        $member = $this->createUser();
+        $this->api()->setUserID($member["userID"]);
+        $result = $this->api()
+            ->get($this->baseUrl, ["expand" => "attachments"])
+            ->getBody();
+        $retrievedDiscussion = $result[0];
+        $this->assertArrayNotHasKey("attachments", $retrievedDiscussion);
+    }
 }

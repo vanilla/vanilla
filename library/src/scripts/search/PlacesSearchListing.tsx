@@ -9,7 +9,7 @@ import { PlacesListingPlaceHolder } from "@library/search/PlacesListingPlaceHold
 
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 import { PlacesSearchListingContainer } from "@library/search/PlacesSearchListingContainer";
-import { useSearchForm } from "@library/search/SearchContext";
+import { useSearchForm } from "@library/search/SearchFormContext";
 import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain";
 import { ISearchState } from "./searchReducer";
 

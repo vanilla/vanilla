@@ -154,7 +154,6 @@ export default function AdvancedMembersFilters(props: IProps) {
                                         FormControl={(props) =>
                                             FormControl({
                                                 ...props,
-                                                inModal: true,
                                                 dateRangeDirection: dateRangeDirection,
                                             })
                                         }

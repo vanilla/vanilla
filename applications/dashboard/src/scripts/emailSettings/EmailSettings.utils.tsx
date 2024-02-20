@@ -184,7 +184,7 @@ export function getEmailSettingsSchemas() {
  *  Get the email digest settings schemas
  */
 export function getDigestSettingsSchemas() {
-    const emailDigesGeneralSchema: JSONSchemaType<IEmailDigestSettings> = {
+    const emailDigestGeneralSchema: JSONSchemaType<IEmailDigestSettings> = {
         type: "object",
         properties: {
             "emailDigest.enabled": {
@@ -246,12 +246,24 @@ export function getDigestSettingsSchemas() {
         type: "object",
         properties: {
             "emailDigest.postCount": {
-                type: ["number", "string"],
+                type: "number",
                 minimum: 3,
                 maximum: 20,
                 default: 5,
-                pattern: "^(?!s*$).+", // schema validation does not throw "required" error if value is emty string, so we need to add this pattern as a workaround
-                errorMessage: t("Required field."),
+                errorMessage: [
+                    {
+                        keyword: "minimum",
+                        message: t("Out of range. Minimum is 3."),
+                    },
+                    {
+                        keyword: "maximum",
+                        message: t("Out of range. Minimum is 20."),
+                    },
+                    {
+                        keyword: "required",
+                        message: t("Required field."),
+                    },
+                ],
                 "x-control": {
                     label: t("Number of posts"),
                     description: t("Maximum number of posts to be included in the email digest."),
@@ -322,9 +334,18 @@ export function getDigestSettingsSchemas() {
             },
             "emailDigest.title": {
                 type: "string",
+                minLength: 1,
                 maxLength: 60,
-                pattern: "^(?!s*$).+", // schema validation does not throw "required" error if value is emty string, so we need to add this pattern as a workaround
-                errorMessage: t("Required field."),
+                errorMessage: [
+                    {
+                        keyword: "required",
+                        message: t("Required field."),
+                    },
+                    {
+                        keyword: "maxLength",
+                        message: t("Maximum length is 60 characters."),
+                    },
+                ],
                 "x-control": {
                     label: t("Subject Line and Title"),
                     description: t("Limits: 60 characters, no breaks."),
@@ -349,6 +370,7 @@ export function getDigestSettingsSchemas() {
             },
             "emailDigest.introduction": {
                 type: ["string", "array"],
+                default: [{ children: [{ text: "" }], type: "p" }],
                 "x-control": {
                     label: t("Introduction"),
                     description: t("The first line of content in the email digest after the title."),
@@ -358,6 +380,7 @@ export function getDigestSettingsSchemas() {
             },
             "emailDigest.footer": {
                 type: ["string", "array"],
+                default: [{ children: [{ text: "" }], type: "p" }],
                 "x-control": {
                     label: t("Footer"),
                     description: t(
@@ -374,14 +397,14 @@ export function getDigestSettingsSchemas() {
     const emailDigestSchema: JSONSchemaType<IEmailDigestSettings> = {
         type: "object",
         properties: {
-            ...emailDigesGeneralSchema.properties,
+            ...emailDigestGeneralSchema.properties,
             ...emailDigestContentSchema.properties,
         },
-        required: [...emailDigesGeneralSchema.required, ...emailDigestContentSchema.required],
+        required: [...emailDigestGeneralSchema.required, ...emailDigestContentSchema.required],
     };
     return {
         emailDigestSchema: emailDigestSchema,
-        emailDigesGeneralSchema: emailDigesGeneralSchema,
+        emailDigestGeneralSchema: emailDigestGeneralSchema,
         emailDigestContentSchema: emailDigestContentSchema,
     };
 }

@@ -1,13 +1,12 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { css } from "@emotion/css";
 import DateTime from "@library/content/DateTime";
-import DiscussionActions from "@library/features/discussions/DiscussionActions";
 import DiscussionBookmarkToggle from "@library/features/discussions/DiscussionBookmarkToggle";
 import { discussionListVariables } from "@library/features/discussions/DiscussionList.variables";
 import DiscussionOptionsMenu from "@library/features/discussions/DiscussionOptionsMenu";
@@ -18,40 +17,31 @@ import { Tag } from "@library/metas/Tags";
 import { useFallbackBackUrl } from "@library/routing/links/BackRoutingProvider";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import { useDiscussionThreadPageContext } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
+import { useDiscussionThreadPaginationContext } from "@vanilla/addon-vanilla/thread/DiscussionThreadPaginationContext";
 import { ThreadItem } from "@vanilla/addon-vanilla/thread/ThreadItem";
 import { t } from "@vanilla/i18n";
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import React from "react";
 import { discussionThreadClasses } from "@vanilla/addon-vanilla/thread/DiscussionThread.classes";
-import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread//DiscussionThread.hooks";
+import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread/DiscussionThread.hooks";
+import { DiscussionThreadContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
+import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 
 interface IProps {
     discussion: IDiscussion;
+    discussionApiParams?: DiscussionsApi.GetParams;
     category: ICategoryFragment;
 }
 
 export function DiscussionOriginalPostAsset(props: IProps) {
-    const { discussion: discussionPreload, category } = props;
+    const { discussion: discussionPreload, discussionApiParams, category } = props;
     const { discussionID } = discussionPreload;
 
-    const { page } = useDiscussionThreadPageContext();
-
-    // Some redux stuff wants the discussion in there.
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(
-            DiscussionActions.getDiscussionByIDACs.done({
-                params: { discussionID: discussionID },
-                result: discussionPreload,
-            }),
-        );
-    }, [discussionPreload]);
+    const { page } = useDiscussionThreadPaginationContext();
 
     const {
         query: { data },
         invalidate: invalidateDiscussionQuery,
-    } = useDiscussionQuery(discussionID, discussionPreload);
+    } = useDiscussionQuery(discussionID, discussionApiParams, discussionPreload);
 
     const currentUserSignedIn = useCurrentUserSignedIn();
     useFallbackBackUrl(category.url);
@@ -64,7 +54,7 @@ export function DiscussionOriginalPostAsset(props: IProps) {
     };
 
     return (
-        <>
+        <DiscussionThreadContextProvider discussion={discussion}>
             <PageHeadingBox
                 title={
                     <>
@@ -84,10 +74,12 @@ export function DiscussionOriginalPostAsset(props: IProps) {
                     currentUserSignedIn && (
                         <div className={css({ display: "flex", alignItems: "center", gap: 4 })}>
                             <DiscussionBookmarkToggle discussion={discussion} onSuccess={invalidateDiscussionQuery} />
-                            <DiscussionOptionsMenu
-                                discussion={discussion}
-                                onMutateSuccess={invalidateDiscussionQuery}
-                            />
+                            <AttachmentIntegrationsContextProvider>
+                                <DiscussionOptionsMenu
+                                    discussion={discussion}
+                                    onMutateSuccess={invalidateDiscussionQuery}
+                                />
+                            </AttachmentIntegrationsContextProvider>
                         </div>
                     )
                 }
@@ -108,8 +100,10 @@ export function DiscussionOriginalPostAsset(props: IProps) {
                 collapsed={page > 1}
                 recordID={discussion.discussionID}
                 recordType={"discussion"}
+                reactions={discussion.type !== "idea" ? discussion.reactions : undefined}
+                recordUrl={discussion.url}
             />
-        </>
+        </DiscussionThreadContextProvider>
     );
 }
 export default DiscussionOriginalPostAsset;

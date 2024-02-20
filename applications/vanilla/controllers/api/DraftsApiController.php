@@ -19,6 +19,9 @@ class DraftsApiController extends AbstractApiController
     /** @var DraftModel */
     private $draftModel;
 
+    /** @var Schema */
+    private $draftSchema;
+
     /**
      * DraftsApiController constructor.
      *
@@ -124,7 +127,7 @@ class DraftsApiController extends AbstractApiController
         $this->permission("Garden.SignIn.Allow");
 
         $in = $this->idParamSchema("in")->setDescription("Get a draft.");
-        $out = $this->schema($this->fullSchema(), "out");
+        $out = $this->schema($this->draftSchema(), "out");
 
         $row = $this->draftByID($id);
         if ($row["InsertUserID"] !== $this->getSession()->UserID) {
@@ -148,7 +151,7 @@ class DraftsApiController extends AbstractApiController
 
         $in = $this->idParamSchema("in")->setDescription("Get a draft for editing.");
         $out = $this->schema(
-            Schema::parse(["draftID", "parentRecordID", "attributes"])->add($this->fullSchema()),
+            Schema::parse(["draftID", "parentRecordID", "attributes"])->add($this->draftSchema()),
             "out"
         );
 
@@ -214,7 +217,7 @@ class DraftsApiController extends AbstractApiController
             ],
             "in"
         )->setDescription("List drafts created by the current user.");
-        $out = $this->schema([":a" => $this->fullSchema()], "out");
+        $out = $this->schema([":a" => $this->draftSchema()], "out");
 
         $query = $in->validate($query);
 
@@ -277,7 +280,7 @@ class DraftsApiController extends AbstractApiController
         $this->idParamSchema();
         $in = $this->draftPostSchema("in")->setDescription("Update a draft.");
         $out = $this->schema(
-            Schema::parse(["draftID", "parentRecordID", "attributes"])->add($this->fullSchema()),
+            Schema::parse(["draftID", "parentRecordID", "attributes"])->add($this->draftSchema()),
             "out"
         );
 
@@ -311,7 +314,7 @@ class DraftsApiController extends AbstractApiController
         $this->permission("Garden.SignIn.Allow");
 
         $in = $this->draftPostSchema("in")->setDescription("Create a draft.");
-        $out = $this->schema($this->fullSchema(), "out");
+        $out = $this->schema($this->draftSchema(), "out");
 
         $body = $in->validate($body);
         $body["attributes"]["format"] = $body["attributes"]["format"] ?? "Text";
@@ -407,5 +410,19 @@ class DraftsApiController extends AbstractApiController
 
         $result = ApiUtils::convertInputKeys($schemaRecord);
         return $result;
+    }
+
+    /**
+     * Get the full draft schema.
+     *
+     * @param string $type The type of schema.
+     * @return Schema Returns a schema object.
+     */
+    public function draftSchema($type = "")
+    {
+        if ($this->draftSchema === null) {
+            $this->draftSchema = $this->schema($this->fullSchema(), "Draft");
+        }
+        return $this->schema($this->draftSchema, $type);
     }
 }

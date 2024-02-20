@@ -30,7 +30,7 @@ class ValidateAttachmentsCommand extends DatabaseCommand
     const REPORT_NOT_FOUND = "not-found";
 
     /** @var int */
-    private int $batchSize = 1000;
+    private int $batchSize = 100;
 
     /** @var string|bool */
     private $baseUrl;
@@ -84,6 +84,15 @@ class ValidateAttachmentsCommand extends DatabaseCommand
                 "Type of report: `full`, `not-found`. Will default to `not-found`"
             )
         );
+
+        $definition->addOption(
+            new InputOption(
+                "batch-size",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "How many records to fetch at a time. Defaults to 100."
+            )
+        );
     }
 
     /**
@@ -93,6 +102,7 @@ class ValidateAttachmentsCommand extends DatabaseCommand
     {
         parent::initialize($input, $output);
         $this->httpClient = Gdn::getContainer()->get(HttpClient::class);
+        $this->batchSize = $input->getOption("batch-size") ?? 100;
 
         // Make sure we have a valid domain.
         $siteID = $input->getOption("siteID");
@@ -131,7 +141,7 @@ class ValidateAttachmentsCommand extends DatabaseCommand
         while ($medias) {
             foreach ($medias as $media) {
                 try {
-                    $media["FullPath"] = $this->setDomain($media["Path"]);
+                    $media["FullPath"] = $this->setDomain(str_replace(" ", "%20", $media["Path"]));
                     $headers = get_headers($media["FullPath"]);
                     if (strpos($headers[0], "200")) {
                         $this->success++;
@@ -194,7 +204,6 @@ class ValidateAttachmentsCommand extends DatabaseCommand
             ->limit($this->batchSize)
             ->get()
             ->resultArray();
-
         return $result;
     }
 

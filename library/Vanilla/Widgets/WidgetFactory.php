@@ -156,7 +156,7 @@ class WidgetFactory implements \JsonSerializable
                     $formattedValue = "(Default)";
                 } else {
                     $firstItem = $actualValue[0];
-                    $key = array_keys($firstItem[0]);
+                    $key = array_keys($firstItem);
                     if (array_key_exists("label", $firstItem)) {
                         $key = "label";
                     } elseif (array_key_exists("value", $firstItem)) {

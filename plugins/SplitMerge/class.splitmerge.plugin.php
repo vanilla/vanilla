@@ -317,7 +317,7 @@ class SplitMergePlugin extends Gdn_Plugin
                 $CommentModel->removePageCache($MergeDiscussionID);
 
                 // Clear selections
-                Gdn::userModel()->saveAttribute($Session->UserID, "CheckedDiscussions", false);
+                Gdn::userModel()->saveAttribute($Session->UserID, "CheckedDiscussions", []);
                 ModerationController::informCheckedDiscussions($Sender);
                 if ($ErrorCount == 0) {
                     $Sender->jsonTarget("", "", "Refresh");

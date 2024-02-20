@@ -291,6 +291,81 @@ class CommentsTest extends AbstractResourceTest
     }
 
     /**
+     * Test expanding attachments via the "/comments" endpoint.
+     *
+     * @return void
+     */
+    public function testExpandCommentsAttachments(): void
+    {
+        $discussion = $this->createDiscussion();
+        $comment = $this->createComment();
+        $attachment = $this->createAttachment("comment", $comment["commentID"]);
+        $result = $this->api()
+            ->get($this->baseUrl, ["discussionID" => $discussion["discussionID"], "expand" => "attachments"])
+            ->getBody();
+        $retrievedComment = $result[0];
+        $this->assertArrayHasKey("attachments", $retrievedComment);
+        $this->assertEquals($attachment["AttachmentID"], $retrievedComment["attachments"][0]["attachmentID"]);
+    }
+
+    /**
+     * Test expanding attachments via the "/comments/{commentID}" endpoint.
+     *
+     * @return void
+     */
+    public function testExpandCommentAttachments(): void
+    {
+        $this->createDiscussion();
+        $comment = $this->createComment();
+        $attachment = $this->createAttachment("comment", $comment["commentID"]);
+        $result = $this->api()
+            ->get("{$this->baseUrl}/{$comment["commentID"]}", ["expand" => "attachments"])
+            ->getBody();
+        $this->assertArrayHasKey("attachments", $result);
+        $this->assertCount(1, $result["attachments"]);
+        $this->assertEquals($attachment["AttachmentID"], $result["attachments"][0]["attachmentID"]);
+    }
+
+    /**
+     * Test that expanding attachments via the "/comments/{commentID}" endpoint without the "Garden.Staff.Allow" permission
+     * returns no attachments.
+     *
+     * @return void
+     */
+    public function testExpandCommentAttachmentsWithoutPermission(): void
+    {
+        $this->createDiscussion();
+        $comment = $this->createComment();
+        $this->createAttachment("comment", $comment["commentID"]);
+        $member = $this->createUser();
+        $this->api()->setUserID($member["userID"]);
+        $discussion = $this->api()
+            ->get("{$this->baseUrl}/{$comment["commentID"]}", ["expand" => "attachments"])
+            ->getBody();
+        $this->assertArrayNotHasKey("attachments", $discussion);
+    }
+
+    /**
+     *  Test that expanding attachments via the "/comments" endpoint without the "Garden.Staff.Allow" permission
+     *  returns no attachments.
+     *
+     * @return void
+     */
+    public function testExpandCommentsAttachmentsWithoutPermission(): void
+    {
+        $discussion = $this->createDiscussion();
+        $comment = $this->createComment();
+        $this->createAttachment("comment", $comment["commentID"]);
+        $member = $this->createUser();
+        $this->api()->setUserID($member["userID"]);
+        $result = $this->api()
+            ->get($this->baseUrl, ["discussionID" => $discussion["discussionID"], "expand" => "attachments"])
+            ->getBody();
+        $retrievedComment = $result[0];
+        $this->assertArrayNotHasKey("attachments", $retrievedComment);
+    }
+
+    /**
      * Ensure that there are dirtyRecords for a specific resource.
      */
     protected function triggerDirtyRecords()

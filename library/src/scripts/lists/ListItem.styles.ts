@@ -20,6 +20,7 @@ export const listItemClasses = useThemeCache(
         const globalVars = globalVariables();
         const vars = listItemVariables();
         const homeWidgetItemVars = homeWidgetItemVariables();
+        const isTile = asTile || isMobileTile;
 
         const listInTab = css({
             ".tabContent &": {
@@ -31,7 +32,7 @@ export const listItemClasses = useThemeCache(
             flex: 1,
             display: "flex",
             alignItems: "flex-start",
-            ...(asTile &&
+            ...(isTile &&
                 (hasImage || hasCheckbox) && {
                     flexDirection: "column",
                     alignItems: "stretch",
@@ -46,6 +47,10 @@ export const listItemClasses = useThemeCache(
 
         const checkboxContainer = css({
             marginRight: "8px",
+            ...(isTile && {
+                display: "flex",
+                alignItems: "center",
+            }),
         });
 
         const contentContainer = css({
@@ -54,13 +59,13 @@ export const listItemClasses = useThemeCache(
             justifyContent: "space-between",
             flex: 1,
             color: ColorsUtils.colorOut(globalVars.mainColors.fg),
-            ...((hasImage || asTile) && {
+            ...((hasImage || isTile) && {
                 ...Mixins.padding({
                     horizontal: 8,
-                    vertical: asTile ? 8 : 0,
+                    vertical: isTile ? 8 : 0,
                 }),
             }),
-            ...(asTile &&
+            ...(isTile &&
                 !hasImage && {
                     ...Mixins.padding({ vertical: 0 }),
                 }),
@@ -90,6 +95,11 @@ export const listItemClasses = useThemeCache(
                     vertical: 8,
                 }),
             }),
+            ...(isTile && {
+                ...Mixins.margin({
+                    bottom: globalVars.gutter.quarter,
+                }),
+            }),
         });
 
         const iconAndCheckbox = css({
@@ -101,10 +111,10 @@ export const listItemClasses = useThemeCache(
             display: "flex",
             alignItems: "center",
             ...(!hasImage && {
-                marginRight: asTile ? 8 : 16,
-                marginInlineEnd: asTile ? 8 : 16,
+                marginRight: isTile ? 8 : 16,
+                marginInlineEnd: isTile ? 8 : 16,
             }),
-            ...(!asTile &&
+            ...(!isTile &&
                 hasImage && {
                     position: "absolute",
                     width: "fit-content",
@@ -121,7 +131,7 @@ export const listItemClasses = useThemeCache(
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            ...(!asTile &&
+            ...(!isTile &&
                 hasImage && {
                     order: 1,
                 }),
@@ -129,7 +139,7 @@ export const listItemClasses = useThemeCache(
 
         const secondIcon = css({
             ...Mixins.margin({ left: -10 }),
-            ...(!asTile && {
+            ...(!isTile && {
                 position: "initial",
                 left: "initial",
                 bottom: "initial",
@@ -141,7 +151,11 @@ export const listItemClasses = useThemeCache(
                 left: -5,
                 margin: 0,
             }),
-            ...(asTile && hasCheckbox && { position: "initial", margin: -10 }),
+            ...(isTile &&
+                hasCheckbox && {
+                    position: "initial",
+                    margin: -10,
+                }),
         });
 
         const secondIconInList = css({});
@@ -167,18 +181,24 @@ export const listItemClasses = useThemeCache(
         const mobileMediaContainer = css({});
 
         const mediaWrapContainer = css({
-            width: 160,
-            ...Mixins.padding({ right: 16 }),
+            ...(isTile
+                ? {
+                      aspectRation: "9/6",
+                  }
+                : {
+                      width: 160,
+                      ...Mixins.padding({ right: 16 }),
+                  }),
             position: "relative",
             "& > div:first-child": {
-                borderRadius: asTile ? 0 : 8,
+                borderRadius: isTile ? 0 : 8,
                 overflow: "hidden",
                 position: "relative",
             },
         });
 
         const mediaContainer = css({
-            borderRadius: asTile ? 0 : 8,
+            borderRadius: isTile ? 0 : 8,
             overflow: "hidden",
             position: "relative",
         });
@@ -186,7 +206,7 @@ export const listItemClasses = useThemeCache(
         const mediaIconContainer = css({});
 
         const metasContainer = css({
-            ...(asTile && {
+            ...(isTile && {
                 marginTop: "auto",
             }),
         });
@@ -199,11 +219,11 @@ export const listItemClasses = useThemeCache(
             },
             [`& + .${metasContainer}`]: {
                 marginTop: 8,
-                ...(asTile && {
+                ...(isTile && {
                     marginTop: "auto",
                 }),
             },
-            ...(asTile && {
+            ...(isTile && {
                 marginBottom: 8,
                 lineHeight: "21px",
             }),
@@ -214,7 +234,7 @@ export const listItemClasses = useThemeCache(
             flexWrap: "wrap",
             flexDirection: "row-reverse",
             ...extendItemContainer(8),
-            ...(asTile && {
+            ...(isTile && {
                 flexGrow: 1,
             }),
         });
@@ -224,7 +244,7 @@ export const listItemClasses = useThemeCache(
             flexGrow: 1,
             flexBasis: "300px",
             marginTop: 4,
-            ...(asTile && {
+            ...(isTile && {
                 display: "flex",
                 flexDirection: "column",
             }),

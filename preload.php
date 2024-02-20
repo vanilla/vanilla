@@ -49,7 +49,6 @@ $addonManager->preloadAddonClasses([
     "groups",
     "knowledge",
     "vanillaanalytics",
-    "Reactions",
     "ideation",
     "elasticsearch",
     "themingapi",

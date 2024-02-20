@@ -21,7 +21,7 @@ class DiscussionSortHotTopTest extends AbstractAPIv2Test
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;
 
-    protected static $addons = ["vanilla", "reactions"];
+    protected static $addons = ["vanilla"];
 
     protected static $data = [];
 

@@ -65,6 +65,10 @@ trait CsvProviderTrait
                 "firstColumn,secondColumn\ntest1,test2\ntest3,test4\n",
             ],
             [["secondColumn" => "test2", "firstColumn" => "test1"], "firstColumn,secondColumn\ntest1,test2\n"],
+            [
+                ["firstColumn" => "first hello world\\\"\"\n last", "secondColumn" => "test2"],
+                "firstColumn,secondColumn\n\"first hello world\"\"\"\"\\n last\",test2\n",
+            ],
         ];
         return $r;
     }

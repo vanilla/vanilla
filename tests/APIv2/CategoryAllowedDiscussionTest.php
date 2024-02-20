@@ -17,7 +17,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  */
 class CategoryAllowedDiscussionTest extends SiteTestCase
 {
-    protected static $addons = ["QnA", "reactions", "polls"];
+    protected static $addons = ["QnA", "polls"];
 
     use CommunityApiTestTrait;
     use UsersAndRolesApiTestTrait;

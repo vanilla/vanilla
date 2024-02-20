@@ -33,6 +33,7 @@ use Vanilla\Forum\Models\CategorySiteMetaExtra;
 use Vanilla\Forum\Models\DiscussionCollectionProvider;
 use Vanilla\Forum\Models\ForumQuickLinksProvider;
 use Vanilla\Forum\Models\PostingSiteMetaExtra;
+use Vanilla\Forum\Models\ReactionsQuickLinksProvider;
 use Vanilla\Forum\Models\Totals\CategorySiteTotalProvider;
 use Vanilla\Forum\Models\Totals\CommentSiteTotalProvider;
 use Vanilla\Forum\Models\Totals\DiscussionSiteTotalProvider;
@@ -62,7 +63,7 @@ use Vanilla\Models\SiteMeta;
 use Vanilla\Models\SiteTotalService;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
-use VanillaTests\Forum\Widgets\DiscussionTagsAssetTest;
+use Vanilla\Utility\DebugUtils;
 
 /**
  * Class ForumContainerRules
@@ -173,7 +174,7 @@ class ForumContainerRules extends AddonContainerRules
         PageControllerRoute::configurePageRoutes(
             $container,
             [
-                "/discussion" => DiscussionThreadPageController::class,
+                "/discussion/" => DiscussionThreadPageController::class,
             ],
             "customLayout.discussionThread"
         );
@@ -210,5 +211,13 @@ class ForumContainerRules extends AddonContainerRules
             "forum",
             ["name" => "Forum"],
         ]);
+
+        $container
+            ->rule(QuickLinksVariableProvider::class)
+            ->addCall("addQuickLinkProvider", [new Reference(ReactionsQuickLinksProvider::class)]);
+
+        if (!DebugUtils::isTestMode() && !function_exists("writeReactions")) {
+            include PATH_APPLICATIONS . "/dashboard/views/reactions/reaction_functions.php";
+        }
     }
 }

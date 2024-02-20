@@ -14,6 +14,7 @@ import { cssOut } from "@dashboard/compatibilityStyles/cssOut";
 import { metasVariables } from "@library/metas/Metas.variables";
 import { Mixins } from "@library/styles/Mixins";
 
+// When the layout-based discussion pages are used everywhere, these compatibility styles should be removed.
 export const reactionsCSS = () => {
     const vars = globalVariables();
     const metasVars = metasVariables();

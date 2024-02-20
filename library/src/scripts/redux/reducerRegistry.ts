@@ -20,6 +20,7 @@ import { discussionsReducer } from "@library/features/discussions/discussionsRed
 import { configSlice, IConfigState } from "@library/config/configReducer";
 import { collectionsReducer } from "@library/featuredCollections/collectionsReducer";
 import routeReducer, { IRouteState } from "@library/RouteReducer";
+import { reactionsSlice } from "@library/reactions/ReactionsReducer";
 
 let dynamicReducers = {};
 
@@ -56,6 +57,7 @@ export function getReducers(): ReducersMapObject<any, any> {
         collections: collectionsReducer,
         route: routeReducer,
         [configSlice.name]: configSlice.reducer,
+        [reactionsSlice.name]: reactionsSlice.reducer,
         ...dynamicReducers,
     };
 }

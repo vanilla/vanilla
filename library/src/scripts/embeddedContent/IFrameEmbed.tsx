@@ -14,6 +14,7 @@ import ConditionalWrap from "@library/layout/ConditionalWrap";
 interface IProps extends IBaseEmbedProps {
     height?: HTMLIFrameElement["style"]["height"];
     width?: HTMLIFrameElement["style"]["width"];
+    style?: React.CSSProperties;
 }
 
 let _supportFrames = false;
@@ -50,7 +51,8 @@ export function IFrameEmbed(props: IProps): JSX.Element {
         height: props.height ? ensureValidSize(props.height) : "auto",
         maxHeight: "80vh",
         //if we allow iframe to capture the pointer events, we cannot click to select the embed
-        pointerEvents: props.inEditor && !props.isSelected ? "none" : undefined,
+        ...(props.inEditor && !props.isSelected && { pointerEvents: "none" }),
+        ...props.style,
     };
 
     return (

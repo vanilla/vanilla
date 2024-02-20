@@ -43,6 +43,7 @@ import { Provider } from "react-redux";
 import { Path } from "slate";
 import { VanillaEditorContainer } from "./VanillaEditorContainer";
 import { isMyValue } from "@library/vanilla-editor/utils/isMyValue";
+import { useIsInModal } from "@library/modal/Modal.context";
 
 /**
  * @todo
@@ -129,8 +130,11 @@ export function VanillaEditorLoadable(props: IProps) {
     }, [props.editor]);
     useImperativeHandle(props.editorRef, () => editor, [editor]);
 
+    const isInModal = useIsInModal();
     const device = useDevice();
     const isMobile = props.isMobile ?? [Devices.MOBILE, Devices.XS].includes(device);
+
+    const followMobileRenderingRules = isInModal || isMobile;
 
     /**
      * Event listener so when the legacy/hidden textArea clears we clear our editor content and reset the focus on it.
@@ -238,9 +242,9 @@ export function VanillaEditorLoadable(props: IProps) {
                         <PersistentToolbar
                             uploadEnabled={uploadEnabled}
                             flyoutsDirection={"above"}
-                            isMobile={isMobile}
+                            isMobile={followMobileRenderingRules}
                         />
-                        {!isMobile && <FloatingElementToolbar />}
+                        {!followMobileRenderingRules && <FloatingElementToolbar />}
                     </VanillaEditorContainer>
                 </VanillaEditorBoundsContext>
             </PlateProvider>

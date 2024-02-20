@@ -477,6 +477,10 @@ final class LayoutHydrator
         if ($layoutViewType === "subcommunityHome") {
             $this->dynamicSchemaOptions->addDescriptionChoice("siteSection/description", "Subcommunity Description");
             $this->dynamicSchemaOptions->addTitleChoice("siteSection/name", "Subcommunity Title");
+            $this->dynamicSchemaOptions->addImageSourceChoice(
+                BannerFullWidget::IMAGE_SOURCE_SITE_SECTION,
+                "Subcommunity Banner"
+            );
         } else {
             $this->dynamicSchemaOptions->addDescriptionChoice("siteSection/description", "Site Description");
             $this->dynamicSchemaOptions->addTitleChoice("siteSection/name", "Banner Title");
@@ -488,8 +492,18 @@ final class LayoutHydrator
             case "discussionThread":
                 $this->dynamicSchemaOptions->addDescriptionChoice("category/description", "Category Description");
                 $this->dynamicSchemaOptions->addTitleChoice("category/name", "Category Name");
+                $this->dynamicSchemaOptions->addImageSourceChoice(
+                    BannerFullWidget::IMAGE_SOURCE_CATEGORY,
+                    "Category Banner"
+                );
                 break;
         }
+
+        $this->dynamicSchemaOptions->addImageSourceChoice(
+            BannerFullWidget::IMAGE_SOURCE_STYLEGUIDE,
+            "Style Guide Banner"
+        );
+        $this->dynamicSchemaOptions->addImageSourceChoice(BannerFullWidget::IMAGE_SOURCE_CUSTOM, "Custom");
     }
 
     /**

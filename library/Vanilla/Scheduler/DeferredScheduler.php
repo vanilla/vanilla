@@ -341,9 +341,8 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
         /** @var TrackingSlip $trackingSlip */
         foreach ($this->generateTrackingSlips() as $trackingSlip) {
             $trackingSlip->start();
-            $jobClass = $trackingSlip->getJobInterface();
             $span = $this->timers->startGeneric("dispatchJob", [
-                "name" => "Job: $jobClass",
+                "name" => "Job: {$trackingSlip->getType()}",
                 "trackingID" => $trackingSlip->getTrackingID(),
             ]);
             try {
@@ -386,6 +385,10 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
                 $trackingSlip->stop();
                 $trackingSlip->log();
             }
+        }
+
+        foreach ($this->drivers as $driver) {
+            $driver->cleanupAfterDispatch();
         }
         return $this->trackingSlips;
     }

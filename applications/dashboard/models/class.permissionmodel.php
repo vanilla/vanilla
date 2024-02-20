@@ -246,41 +246,36 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
             "Garden.Activity.View" => 1,
             "Garden.Profiles.View" => 0,
             "Garden.Uploads.Add" => 0,
+            "Garden.Reactions.View" => 0,
         ]);
-        $this->addDefault(
-            RoleModel::TYPE_UNCONFIRMED,
-            $permissions = [
-                "Garden.SignIn.Allow" => 1,
-                "Garden.Activity.View" => 1,
-                "Garden.Profiles.View" => 1,
-                "Garden.Email.View" => 1,
-                "Garden.Uploads.Add" => 0,
-            ]
-        );
-        $this->addDefault(
-            RoleModel::TYPE_APPLICANT,
-            $permissions = [
-                "Garden.SignIn.Allow" => 1,
-                "Garden.Activity.View" => 1,
-                "Garden.Profiles.View" => 1,
-                "Garden.Email.View" => 1,
-                "Garden.Uploads.Add" => 0,
-            ]
-        );
-        $this->addDefault(
-            RoleModel::TYPE_MODERATOR,
-            $permissions = [
-                "Garden.SignIn.Allow" => 1,
-                "Garden.Activity.View" => 1,
-                "Garden.Curation.Manage" => 1,
-                "Garden.Moderation.Manage" => 1,
-                "Garden.PersonalInfo.View" => 1,
-                "Garden.Profiles.View" => 1,
-                "Garden.Profiles.Edit" => 1,
-                "Garden.Email.View" => 1,
-                "Garden.Uploads.Add" => 1,
-            ]
-        );
+        $this->addDefault(RoleModel::TYPE_UNCONFIRMED, [
+            "Garden.SignIn.Allow" => 1,
+            "Garden.Activity.View" => 1,
+            "Garden.Profiles.View" => 1,
+            "Garden.Email.View" => 1,
+            "Garden.Reactions.View" => 1,
+            "Garden.Uploads.Add" => 0,
+        ]);
+        $this->addDefault(RoleModel::TYPE_APPLICANT, [
+            "Garden.SignIn.Allow" => 1,
+            "Garden.Activity.View" => 1,
+            "Garden.Profiles.View" => 1,
+            "Garden.Email.View" => 1,
+            "Garden.Reactions.View" => 1,
+            "Garden.Uploads.Add" => 0,
+        ]);
+        $this->addDefault(RoleModel::TYPE_MODERATOR, [
+            "Garden.SignIn.Allow" => 1,
+            "Garden.Activity.View" => 1,
+            "Garden.Curation.Manage" => 1,
+            "Garden.Moderation.Manage" => 1,
+            "Garden.Reactions.View" => 1,
+            "Garden.PersonalInfo.View" => 1,
+            "Garden.Profiles.View" => 1,
+            "Garden.Profiles.Edit" => 1,
+            "Garden.Email.View" => 1,
+            "Garden.Uploads.Add" => 1,
+        ]);
         $this->addDefault(RoleModel::TYPE_ADMINISTRATOR, [
             "Garden.SignIn.Allow" => 1,
             "Garden.Settings.View" => 1,
@@ -302,6 +297,7 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
             "Garden.Username.Edit" => 1,
             "Garden.Curation.Manage" => 1,
             "Garden.Moderation.Manage" => 1,
+            "Garden.Reactions.View" => 1,
             "Garden.Uploads.Add" => 1,
         ]);
         $this->addDefault(RoleModel::TYPE_MEMBER, [
@@ -311,6 +307,7 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
             "Garden.Profiles.Edit" => 1,
             "Garden.Email.View" => 1,
             "Garden.Uploads.Add" => 1,
+            "Garden.Reactions.View" => 1,
         ]);
 
         // Allow the ability for other applications and plug-ins to speak up with their own default permissions.
@@ -672,6 +669,7 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
         $result = array_merge(array_keys($enabledApplications), array_keys($pluginNamespaces));
         if (in_array("Dashboard", $result)) {
             $result[] = "Garden";
+            $result[] = "Reactions";
         }
         return $result;
     }
@@ -1402,8 +1400,7 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
 
             foreach ($permissions as $permission) {
                 $roleID = 0; // default role.
-                // Remove non-existing columns from input row, and add  missing, to match DB, to make sure all rows in array have the same size
-                //.
+                // Remove non-existing columns from input row, and add  missing, to match DB, to make sure all rows in array have the same size.
                 $permission = array_intersect_key($permission, $permissionColumns);
                 $permission = array_merge($permissionColumns, $permission);
 

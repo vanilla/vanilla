@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -78,10 +78,6 @@ export const categoryListClasses = useThemeCache((itemOptionsOverrides?: ICatego
         "&:active, &:hover, &:focus, &.focus-visible": {
             ...Mixins.font(vars.item.title.fontState),
         },
-    });
-
-    const description = css({
-        lineHeight: "18px",
     });
 
     const message = css({
@@ -180,7 +176,6 @@ export const categoryListClasses = useThemeCache((itemOptionsOverrides?: ICatego
         iconContainerInGridItem,
         icon,
         title,
-        description,
         gridContainer,
         gridContainerNoMargin,
         gridHeadingWrapper,

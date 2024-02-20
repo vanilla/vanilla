@@ -1,13 +1,12 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
 import { IComment } from "@dashboard/@types/api/comment";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { css } from "@emotion/css";
-import { IApiError } from "@library/@types/api/core";
 import { scrollToElement } from "@library/content/hashScrolling";
 import { discussionListVariables } from "@library/features/discussions/DiscussionList.variables";
 import NumberedPager, { INumberedPagerProps } from "@library/features/numberedPager/NumberedPager";
@@ -18,43 +17,63 @@ import Loader from "@library/loaders/Loader";
 import { Tag } from "@library/metas/Tags";
 import { IWithPaging } from "@library/navigation/SimplePagerModel";
 import { BorderType } from "@library/styles/styleHelpersBorders";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { CommentsApi } from "@vanilla/addon-vanilla/thread/CommentsApi";
 import { CommentThreadItem } from "@vanilla/addon-vanilla/thread/CommentThreadItem";
-import { useDiscussionThreadPageContext } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
+import { useDiscussionThreadPaginationContext } from "@vanilla/addon-vanilla/thread/DiscussionThreadPaginationContext";
 import { t } from "@vanilla/i18n";
 import React, { useRef, useState } from "react";
 import { discussionThreadClasses } from "@vanilla/addon-vanilla/thread/DiscussionThread.classes";
-import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread//DiscussionThread.hooks";
+import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread/DiscussionThread.hooks";
+import { useCommentListQuery } from "@vanilla/addon-vanilla/thread/Comments.hooks";
+import isEqual from "lodash/isEqual";
+import { DiscussionThreadContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
 
 interface IProps {
-    apiParams: CommentsApi.IndexParams;
     discussion: IDiscussion;
-    commentsPreload: IWithPaging<IComment[]>;
+    discussionApiParams?: DiscussionsApi.GetParams;
+    comments?: IWithPaging<IComment[]>;
+    apiParams: CommentsApi.IndexParams;
+    renderTitle?: boolean;
+    ThreadItemActionsComponent?: React.ComponentType<{
+        comment: IComment;
+        discussion: IDiscussion;
+        onMutateSuccess?: () => Promise<void>;
+    }>;
 }
 
 export function DiscussionCommentsAsset(props: IProps) {
-    const [apiParams, _setApiParams] = useState(props.apiParams);
     const {
-        discussion: { discussionID },
+        discussion: discussionPreload,
+        discussionApiParams,
+        comments: commentsPreload,
+        renderTitle = true,
+        ThreadItemActionsComponent,
     } = props;
 
-    const { query } = useDiscussionQuery(discussionID, props.discussion);
+    const { discussionID } = discussionPreload;
 
-    const discussion = query.data!;
-
-    const { setPage } = useDiscussionThreadPageContext();
-    const commentListQuery = useQuery<IWithPaging<IComment[]>, IApiError>({
-        queryFn: () => CommentsApi.index(apiParams),
-        keepPreviousData: true,
-        queryKey: ["commentList", apiParams],
-        initialData: apiParams === props.apiParams ? props.commentsPreload : undefined,
+    const [apiParams, _setApiParams] = useState<CommentsApi.IndexParams>({
+        ...props.apiParams,
+        discussionID,
     });
 
-    const queryClient = useQueryClient();
+    const { query: discussionListQuery, invalidate: invalidateDiscussionQuery } = useDiscussionQuery(
+        discussionID,
+        discussionApiParams ?? {},
+        discussionPreload,
+    );
 
-    async function invalidateCommentListQuery() {
-        await queryClient.invalidateQueries(["commentList", apiParams]);
+    const discussion = discussionListQuery.data!;
+
+    const { setPage } = useDiscussionThreadPaginationContext();
+
+    const { query: commentListQuery, invalidate: invalidateCommentListQuery } = useCommentListQuery(
+        apiParams,
+        isEqual(apiParams, props.apiParams) ? commentsPreload : undefined,
+    );
+
+    async function invalidateQueries() {
+        await invalidateDiscussionQuery();
+        await invalidateCommentListQuery();
     }
 
     const commentTopRef = useRef<HTMLSpanElement>(null);
@@ -103,7 +122,7 @@ export function DiscussionCommentsAsset(props: IProps) {
 
     // FIXME: when there are no comments and discussion isn't closed, empty widget's padding takes up vertical space.
     return (
-        <>
+        <DiscussionThreadContextProvider discussion={discussion}>
             {(hasComments || discussion.closed) && (
                 <PageBox
                     options={{
@@ -113,26 +132,28 @@ export function DiscussionCommentsAsset(props: IProps) {
                     {hasComments && (
                         <>
                             <span ref={commentTopRef}></span>
-                            <PageHeadingBox
-                                title={
-                                    <div
-                                        className={css({
-                                            marginTop: 16,
-                                        })}
-                                    >
-                                        <span>{t("Comments")}</span>
-                                        {discussion.closed && (
-                                            <Tag
-                                                className={discussionThreadClasses().closedTag}
-                                                preset={discussionListVariables().labels.tagPreset}
-                                            >
-                                                {t("Closed")}
-                                            </Tag>
-                                        )}
-                                    </div>
-                                }
-                                actions={hasPager && <NumberedPager {...pagerProps} rangeOnly />}
-                            />
+                            {renderTitle && (
+                                <PageHeadingBox
+                                    title={
+                                        <div
+                                            className={css({
+                                                marginTop: 16,
+                                            })}
+                                        >
+                                            <span>{t("Comments")}</span>
+                                            {discussion.closed && (
+                                                <Tag
+                                                    className={discussionThreadClasses().closedTag}
+                                                    preset={discussionListVariables().labels.tagPreset}
+                                                >
+                                                    {t("Closed")}
+                                                </Tag>
+                                            )}
+                                        </div>
+                                    }
+                                    actions={hasPager && <NumberedPager {...pagerProps} rangeOnly />}
+                                />
+                            )}
 
                             {comments.map((comment) => {
                                 return (
@@ -140,7 +161,16 @@ export function DiscussionCommentsAsset(props: IProps) {
                                         key={comment.commentID}
                                         comment={comment}
                                         discussion={discussion}
-                                        onMutateSuccess={invalidateCommentListQuery}
+                                        onMutateSuccess={invalidateQueries}
+                                        actions={
+                                            ThreadItemActionsComponent ? (
+                                                <ThreadItemActionsComponent
+                                                    comment={comment}
+                                                    discussion={discussion}
+                                                    onMutateSuccess={invalidateQueries}
+                                                />
+                                            ) : undefined
+                                        }
                                     />
                                 );
                             })}
@@ -161,7 +191,7 @@ export function DiscussionCommentsAsset(props: IProps) {
                     {hasPager && <NumberedPager {...pagerProps} />}
                 </PageBox>
             )}
-        </>
+        </DiscussionThreadContextProvider>
     );
 }
 

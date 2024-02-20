@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Models;
 
+use Garden\Schema\Validation;
+use Garden\Schema\ValidationException;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use TagModel;
@@ -102,6 +104,42 @@ class TagModelTest extends \VanillaTests\SiteTestCase
         $tagIDs = array_column($tags, "TagID");
 
         $this->assertIDsEqual($tagIDs, array_values($this->tagModel->getTagIDsByName($tagNames)));
+    }
+
+    /**
+     * Test that tag names with symbols/punctuation other will throw a validation error.
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testAddTagWithInvalidUrlSlug(): void
+    {
+        $tagNameInput = "t@g-w!th-syb*ls()";
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage("The Url Slug may only contain alphanumeric characters and hyphens.");
+        $this->bessy()
+            ->post("/settings/tags/add?type=All", ["FullName" => "Tag with symbols", "Name" => $tagNameInput])
+            ->getJson();
+    }
+
+    /**
+     * Test that a validation error is thrown when trying to patch a tag with an invalid url slug.
+     *
+     * @return void
+     */
+    public function testPatchWithInvalidUrlSlug(): void
+    {
+        $tag = $this->insertTags(1)[0];
+        $tagNameInput = "tag.invalid@slug";
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage("The Url Slug may only contain alphanumeric characters and hyphens.");
+        $this->bessy()
+            ->post("/settings/tags/edit/{$tag["TagID"]}", [
+                "TagID" => $tag["TagID"],
+                "FullName" => $tag["FullName"],
+                "Name" => $tagNameInput,
+            ])
+            ->getJson();
     }
 
     /**

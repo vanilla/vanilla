@@ -45,7 +45,6 @@ export interface ISearchBarProps extends IOptionalComponentID {
     forcedOptions?: any[];
     scope?: ISearchScopeNoCompact;
     overwriteSearchBar?: ISearchBarOverwrites;
-    disableMenu?: boolean;
 }
 
 export interface IComboBoxOption<T = any> {

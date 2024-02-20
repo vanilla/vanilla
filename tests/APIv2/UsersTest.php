@@ -374,6 +374,7 @@ class UsersTest extends AbstractResourceTest
                 "profile.editusernames",
                 "profiles.edit",
                 "profiles.view",
+                "reactions.view",
                 "session.valid",
                 "settings.view",
                 "site.manage",
@@ -1572,6 +1573,23 @@ class UsersTest extends AbstractResourceTest
     }
 
     /**
+     * Test that deleting user clears all of users cache
+     */
+    public function testDeleteUserClearsCache()
+    {
+        $user = $this->createUser(["name" => "PatchUser"]);
+        $username = $user["name"];
+        $email = $user["email"];
+        $userByName = \Gdn::userModel()->getByUsername($username);
+        $this->assertNotEmpty($userByName);
+        \Gdn::userModel()->deleteID($user["userID"]);
+        $userByName = \Gdn::userModel()->getByUsername($username);
+        $userByEmail = \Gdn::userModel()->getByEmail($email);
+        $this->assertEmpty($userByName);
+        $this->assertEmpty($userByEmail);
+    }
+
+    /**
      * Provider for testGetUserProfileFieldsWithVisibility
      *
      * @return array[]
@@ -2044,6 +2062,26 @@ class UsersTest extends AbstractResourceTest
     }
 
     /**
+     * Test that an error for password confirmation is thrown if the patch fields have a different casing
+     */
+    public function testPatchSelfEditWrongPasswordErrorWithDifferentCasing()
+    {
+        $user = $this->createUser([
+            "name" => "AdminUser",
+            "email" => "adminuser@test.com",
+            "roleID" => [\RoleModel::ADMIN_ID],
+            "password" => "adminUser1234!",
+        ]);
+        $this->expectException(ClientException::class);
+        $this->expectExceptionMessage(UsersApiController::ERROR_SELF_EDIT_PASSWORD_MISSING);
+        $this->runWithUser(function () use ($user) {
+            $this->api()->patch("/users/{$user["userID"]}", [
+                "Email" => "admin.patched@test.com",
+            ]);
+        }, $user);
+    }
+
+    /**
      * Test that password confirmation is only required if a value changes.
      */
     public function testPatchSelfOnlyRequiresPasswordConfirmationOnChange()
@@ -2499,5 +2537,33 @@ class UsersTest extends AbstractResourceTest
                 ["profiles.view" => false, "personalInfo.view" => true, "users.add" => true]
             );
         }
+    }
+
+    /**
+     * Test that an admin-level user can see sensitive user fields, but a member-level user cannot.
+     *
+     * @return void
+     */
+    public function testSensitiveUserFieldsPermissions(): void
+    {
+        $memberUser = $this->createUser();
+        $userToRetrieve = $this->createUser();
+
+        $retrievedByAdmin = $this->api()
+            ->get($this->baseUrl . "/{$userToRetrieve["userID"]}")
+            ->getBody();
+        $this->assertArrayHasKey("lastIPAddress", $retrievedByAdmin);
+        $this->assertArrayHasKey("insertIPAddress", $retrievedByAdmin);
+        $this->assertArrayHasKey("isAdmin", $retrievedByAdmin);
+        $this->assertArrayHasKey("isSysAdmin", $retrievedByAdmin);
+
+        $this->api()->setUserID($memberUser["userID"]);
+        $retrievedByMember = $this->api()
+            ->get($this->baseUrl . "/{$userToRetrieve["userID"]}")
+            ->getBody();
+        $this->assertArrayNotHasKey("lastIPAddress", $retrievedByMember);
+        $this->assertArrayNotHasKey("insertIPAddress", $retrievedByMember);
+        $this->assertArrayNotHasKey("isAdmin", $retrievedByMember);
+        $this->assertArrayNotHasKey("isSysAdmin", $retrievedByMember);
     }
 }

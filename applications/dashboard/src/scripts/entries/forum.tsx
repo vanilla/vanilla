@@ -36,6 +36,7 @@ import { DatePickerInLegacyForm } from "@library/forms/DatePickerInLegacyForm";
 import { hasPermission } from "@library/features/users/Permission";
 import { hasUserViewPermission } from "@library/features/users/modules/hasUserViewPermission";
 import { LeavingPageRoute } from "@library/leavingPage/LeavingPageRoutes";
+import { ReactionListModule } from "@library/reactions/ReactionListModule";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);
@@ -43,6 +44,7 @@ onContent(convertAllUserContent);
 addComponent("imageUploadGroup", DashboardImageUploadGroup, { overwrite: true });
 addComponent("tokensInputInLegacyForm", TokensInputInLegacyForm, { overwrite: true });
 addComponent("datepickerInLegacyForm", DatePickerInLegacyForm, { overwrite: true });
+addComponent("ReactionListModule", ReactionListModule, { overwrite: true });
 
 // Redux
 registerReducer("auth", authReducer);

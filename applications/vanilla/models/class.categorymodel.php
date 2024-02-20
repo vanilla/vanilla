@@ -6211,7 +6211,7 @@ SQL;
     {
         $permissionCategory = self::permissionCategory($category);
 
-        return (bool) $permissionCategory["AllowFileUploads"] ?? true;
+        return (bool) ($permissionCategory["AllowFileUploads"] ?? true);
     }
 
     /**

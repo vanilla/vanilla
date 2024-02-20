@@ -119,6 +119,8 @@ class CommentModel extends Gdn_Model implements
     /** @var UserMentionsModel */
     private $userMentionsModel;
 
+    private ReactionModel $reactionModel;
+
     /**
      * Class constructor. Defines the related database table name.
      *
@@ -143,6 +145,7 @@ class CommentModel extends Gdn_Model implements
         $this->setMediaModel(Gdn::getContainer()->get(MediaModel::class));
         $this->setSessionInterface(Gdn::getContainer()->get("Session"));
         $this->ownSite = \Gdn::getContainer()->get(OwnSite::class);
+        $this->reactionModel = Gdn::getContainer()->get(ReactionModel::class);
     }
 
     /**
@@ -905,6 +908,9 @@ class CommentModel extends Gdn_Model implements
                 "x-null-value" => -1,
             ],
             "image?" => new MainImageSchema(),
+            "reactions?" => $this->reactionModel->getReactionSummaryFragment(),
+            "attachments:a?" =>
+                "Attachments associated with this comment. Requires the 'Garden.Staff.Allow' permission.",
         ]);
         return $result;
     }
@@ -1537,6 +1543,13 @@ class CommentModel extends Gdn_Model implements
         $this->fireEvent("BeforeUpdateCommentCount");
 
         if ($discussion) {
+            if ((int) $discussion["Score"] <= Gdn::config()->get("Vanilla.Reactions.BuryValue", -5)) {
+                $controller = Gdn::controller();
+                if ($controller instanceof Gdn_Controller) {
+                    $controller->setData("Score", $discussion["Score"]);
+                }
+                setValue("Sink", $discussion, true);
+            }
             if ($data && $data["CountComments"] !== 0) {
                 $this->SQL->update("Discussion");
                 if (!$discussion["Sink"] && $data["DateLastComment"]) {

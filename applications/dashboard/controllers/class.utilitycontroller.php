@@ -403,7 +403,6 @@ class UtilityController extends DashboardController
      */
     public function alive()
     {
-        Timers::instance()->setShouldRecordProfile(true);
         $this->setData("Success", true);
         $this->MasterView = "empty";
         $this->CssClass = "Home";
@@ -743,5 +742,26 @@ class UtilityController extends DashboardController
         $this->fireEvent("AfterUpdate");
 
         return true;
+    }
+
+    /**
+     * Recalculate all reaction data, including totals.
+     *
+     */
+    public function recalculateReactions()
+    {
+        $this->permission("Garden.Settings.Manage");
+
+        $this->form = new Gdn_Form();
+
+        if ($this->form->authenticatedPostback()) {
+            $reactionModel = new ReactionModel();
+            $reactionModel->recalculateTotals();
+            $this->setData("Recalculated", true);
+        }
+
+        $this->addSideMenu();
+        $this->setData("Title", t("Recalculate Reactions"));
+        $this->render("Recalculate", "reactions", "dashboard");
     }
 }

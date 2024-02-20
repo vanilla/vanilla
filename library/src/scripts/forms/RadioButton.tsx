@@ -14,7 +14,7 @@ import { ToolTip } from "@library/toolTip/ToolTip";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { InformationIcon } from "@library/icons/common";
 import { Icon } from "@vanilla/icons";
-
+import { useRadioGroupContext } from "@library/forms/RadioGroupContext";
 interface IProps extends IOptionalComponentID {
     id?: string;
     className?: string;
@@ -28,18 +28,14 @@ interface IProps extends IOptionalComponentID {
     note?: string;
     defaultChecked?: boolean;
     fakeFocus?: boolean;
-    value?: string;
+    value: string;
     tooltip?: string;
-}
-
-interface IState {
-    id: string;
 }
 
 /**
  * A styled, accessible checkbox component.
  */
-export default function RadioButton(props: IProps) {
+export function RadioButton(props: IProps) {
     const labelID = useUniqueID("radioButton-label");
     const classes = checkRadioClasses();
     const { isHorizontal, note } = props;
@@ -91,4 +87,22 @@ export default function RadioButton(props: IProps) {
             )}
         </>
     );
+}
+
+// this can be used either in admin forms or in frontend forms.
+// must be wrapped in a RadioGroupContext
+export default function RadioButtonInRadioGroup(
+    props: Omit<React.ComponentProps<typeof RadioButton>, "onChange" | "checked">,
+) {
+    const { onChange, value, isInline } = useRadioGroupContext();
+
+    const controlledProps =
+        onChange !== undefined
+            ? {
+                  onChange: () => onChange(props.value),
+                  checked: value === props.value,
+              }
+            : {};
+
+    return <RadioButton {...props} {...controlledProps} isHorizontal={isInline} />;
 }

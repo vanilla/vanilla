@@ -78,6 +78,10 @@ class QuickLinksWidgetTest extends SiteTestCase
                             "name" => "My Drafts",
                             "url" => "/drafts",
                         ]),
+                        self::markForSparseComparision([
+                            "name" => "Best Of",
+                            "url" => "/bestof",
+                        ]),
                     ],
                 ],
                 '$reactTestID' => "defaults",
@@ -104,6 +108,9 @@ class QuickLinksWidgetTest extends SiteTestCase
         </li>
         <li>
             <a href=/drafts>My Drafts</a>
+        </li>
+        <li>
+            <a href=/bestof>Best Of</a>
         </li>
     </ul>
 </div>

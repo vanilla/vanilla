@@ -646,6 +646,10 @@ $PermissionModel->define([
     "Garden.Tokens.Add" => "Garden.Settings.Manage",
     "Garden.Staff.Allow" => "Garden.Moderation.Manage",
     $uploadPermission => 1,
+    "Reactions.Positive.Add" => "Garden.SignIn.Allow",
+    "Reactions.Negative.Add" => "Garden.SignIn.Allow",
+    "Reactions.Flag.Add" => "Garden.SignIn.Allow",
+    "Garden.Reactions.View" => "Garden.SignIn.Allow",
 ]);
 
 $PermissionModel->undefine([
@@ -1429,6 +1433,7 @@ Gdn::config()->touch("Context.Secret", betterRandomString(32, "Aa0"));
 // User Mentions table.
 UserMentionsModel::structure($Database);
 ProfileFieldModel::structure();
+ReactionModel::structure($Construct);
 
 // Remove legacy Plugins
 Gdn::config()->removeFromConfig($LEGACYADDON);

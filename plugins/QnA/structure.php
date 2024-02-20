@@ -187,13 +187,13 @@ if ($this->Badges && class_exists("BadgeModel")) {
 
 // Define 'Accept' reaction
 
-if (Gdn::addonManager()->isEnabled("Reactions", \Vanilla\Addon::TYPE_ADDON) && c("Plugins.QnA.Reactions", true)) {
+if (c("Plugins.QnA.Reactions", true)) {
     /** @psalm-suppress InaccessibleProperty  */
     $this->Reactions = true;
 }
 
 /** @psalm-suppress InaccessibleProperty  */
-if ($this->Reactions && class_exists("ReactionModel")) {
+if ($this->Reactions) {
     $Rm = new ReactionModel();
 
     if (

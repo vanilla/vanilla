@@ -39,9 +39,6 @@ export const pageHeadingBoxClasses = useThemeCache((optionOverrides?: Partial<IP
             ...Mixins.margin({
                 bottom: globalVars.spacer.headingItem,
             }),
-            "&:last-child": {
-                marginBottom: 0,
-            },
         },
         excludeHeadingMargins,
     );

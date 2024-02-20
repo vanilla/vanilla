@@ -252,6 +252,8 @@ class DiscussionModel extends Gdn_Model implements
     /** @var DiscussionStatusModel */
     private $discussionStatusModel;
 
+    private ReactionModel $reactionModel;
+
     /**
      * Clear out the statically cached values for tests.
      */
@@ -304,6 +306,7 @@ class DiscussionModel extends Gdn_Model implements
             trigger_error($ex->getMessage(), E_USER_NOTICE);
         }
         $this->logger = Gdn::getContainer()->get(\Psr\Log\LoggerInterface::class);
+        $this->reactionModel = Gdn::getContainer()->get(ReactionModel::class);
     }
 
     /**
@@ -530,7 +533,7 @@ class DiscussionModel extends Gdn_Model implements
             return true;
         }
 
-        if ($isClosed && $attributes[self::CLOSED_BY_USER_ID] !== Gdn::session()->UserID) {
+        if ($isClosed && ($attributes[self::CLOSED_BY_USER_ID] ?? null) !== Gdn::session()->UserID) {
             return false;
         }
 
@@ -2846,9 +2849,14 @@ SQL;
         if ($statusFragment !== null) {
             $result->setStatus($statusFragment);
         }
-        $internalStatusFragment = $this->discussionStatusModel->tryGetStatusFragment($result->getInternalStatusID());
-        if ($internalStatusFragment !== null) {
-            $result->setInternalStatus($internalStatusFragment);
+        // Schema validation may have stripped out the internalStatusID depending on the session user's permissions.
+        if (isset($result->getPayload()["discussion"]["internalStatusID"])) {
+            $internalStatusFragment = $this->discussionStatusModel->tryGetStatusFragment(
+                $result->getInternalStatusID()
+            );
+            if ($internalStatusFragment !== null) {
+                $result->setInternalStatus($internalStatusFragment);
+            }
         }
         if (isset($row["oldStatusID"])) {
             $result->setOldStatusID($row["oldStatusID"]);
@@ -4505,6 +4513,8 @@ SQL;
             ],
             "status?" => RecordStatusModel::getSchemaFragment(),
             "trending:o?",
+            "reactions?" => $this->reactionModel->getReactionSummaryFragment(),
+            "attachments:a?",
         ];
         if (\Gdn::session()->checkPermission("staff.allow")) {
             $schema["internalStatusID:i"] = ["default" => 0];

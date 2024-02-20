@@ -69,7 +69,7 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
             const typeIsNumber = control.type === "number";
             const typeIsUrl = control.type === "url";
             const typeIsPassword = control.type === "password";
-            const type = typeIsNumber ? "number" : typeIsUrl ? "url" : typeIsPassword ? "password" : "text";
+            const type = typeIsUrl ? "url" : typeIsPassword ? "password" : "text";
             const inputProps = {
                 value: value ?? "",
                 required,
@@ -86,6 +86,8 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     min: schema.minimum ?? schema.min,
                     step: schema.step,
                 }),
+                // https://html.spec.whatwg.org/multipage/input.html#when-number-is-not-appropriate
+                ...(typeIsNumber && { inputmode: "numeric", pattern: "[0-9]*" }),
             };
             return typeIsPassword ? (
                 <DashboardPasswordInput
@@ -100,10 +102,7 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                     inputProps={{
                         ...inputProps,
                         onChange: (event) => {
-                            const value =
-                                typeIsNumber && event.target.value !== ""
-                                    ? Number(event.target.value)
-                                    : event.target.value;
+                            const value = event.target.value;
                             onChange(value);
                         },
                     }}

@@ -18,7 +18,7 @@ const defaultOptionProvider: ISearchOptionProvider = {
 
 const SearchContext = React.createContext<IWithSearchProps>({
     searchOptionProvider: defaultOptionProvider,
-    externalSearchQuery: undefined,
+    externalSearch: undefined,
 });
 export default SearchContext;
 
@@ -27,7 +27,7 @@ export function SearchContextProvider({ children }) {
         <SearchContext.Provider
             value={{
                 searchOptionProvider: SearchContextProvider.optionProvider,
-                externalSearchQuery: getMeta("search.externalSearchQuery", false), // check if we have external search query, no autocomplete and pointing into external search in this case
+                externalSearch: getMeta("search.externalSearch", false), // check if we have external search query, no autocomplete and pointing into external search in this case
             }}
         >
             {children}
@@ -48,7 +48,10 @@ export interface ISearchOptionProvider {
 
 export interface IWithSearchProps {
     searchOptionProvider: ISearchOptionProvider;
-    externalSearchQuery?: string;
+    externalSearch?: {
+        query: string;
+        resultsInNewTab: boolean;
+    };
 }
 
 export function useSearch() {

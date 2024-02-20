@@ -11,7 +11,8 @@ import React from "react";
 import { TabHandler } from "@vanilla/dom-utils";
 import { mountPortal } from "@vanilla/react-utils";
 import { uniqueIDFromPrefix } from "@library/utility/idUtils";
-import { MODAL_CONTAINER_ID, PAGE_CONTAINER_ID } from "./mountModal";
+import { MODAL_CONTAINER_ID, PAGE_CONTAINER_ID } from "@library/modal/mountModal";
+import { ModalContext } from "@library/modal/Modal.context";
 
 interface IProps {
     id?: string;
@@ -86,7 +87,7 @@ export default class ModalLoadable extends React.Component<IProps, IState> {
                     onKeyPress={this.props.onKeyPress}
                     realRootID={this.state.realRootID}
                 >
-                    {this.props.children}
+                    <ModalContext.Provider value={{ isInModal: true }}>{this.props.children}</ModalContext.Provider>
                 </ModalView>
                 {this.props.afterContent}
             </>,

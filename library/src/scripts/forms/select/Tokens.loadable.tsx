@@ -60,7 +60,7 @@ export default class TokensLoadable extends React.Component<ITokenProps, IState>
     };
 
     public render() {
-        const { className, disabled, options, isLoading, inModal, hideSelectedOptions = true } = this.props;
+        const { className, disabled, options, hideSelectedOptions = true, inModal = false } = this.props;
         const classes = tokensClasses();
         const classesInputBlock = inputBlockClasses();
 

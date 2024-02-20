@@ -76,12 +76,7 @@ export const useFloatingMarkToolbar = ({
     const { id, selection } = editor ?? {};
 
     useEffect(() => {
-        if (
-            !selectionExpanded ||
-            !selectionText ||
-            isRangeAcrossBlocks(editor) || //Do not open if the selection spans multiple blocks
-            waitForCollapsedSelection
-        ) {
+        if (!selectionExpanded || !selectionText || waitForCollapsedSelection) {
             setOpen(false);
         } else if (isEditorFocused && selectionExpanded && selectionTextLength > 0) {
             update();

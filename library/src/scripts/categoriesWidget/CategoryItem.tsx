@@ -127,7 +127,6 @@ export default function CategoryItem(props: IProps) {
             <HomeWidgetItem
                 className={classes.gridItem}
                 nameClassName={classes.title}
-                descriptionClassName={classes.description}
                 key={category.categoryID}
                 name={category.name}
                 to={category.to}
@@ -155,7 +154,6 @@ export default function CategoryItem(props: IProps) {
             url={category.to as string}
             name={category.name}
             nameClassName={classes.title}
-            descriptionClassName={classes.description}
             className={cx(classes.listItem, props.className)}
             headingDepth={depth}
             description={description}

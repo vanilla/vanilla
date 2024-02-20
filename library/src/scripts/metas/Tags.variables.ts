@@ -135,6 +135,7 @@ export enum TagPreset {
     PRIMARY = "primary",
     GREYSCALE = "greyscale",
     COLORED = "colored",
+    SUCCESS = "success",
 }
 
 export const tagPresetVariables = useThemeCache(function (): { [key in TagPreset]: TagType } {
@@ -223,12 +224,12 @@ export const tagPresetVariables = useThemeCache(function (): { [key in TagPreset
     });
 
     const coloredBaseColor = ensureColorHelper(colored.fontColor!);
-    const isLight = ColorsUtils.isLightColor(coloredBaseColor);
+    const coloredIsLight = ColorsUtils.isLightColor(coloredBaseColor);
 
     colored = makeThemeVars("colored", {
         ...colored,
-        bgColor: isLight ? coloredBaseColor.darken(0.6) : coloredBaseColor.fade(0.08),
-        borderColor: isLight ? coloredBaseColor.lighten(0.2) : coloredBaseColor.fade(0.6),
+        bgColor: coloredIsLight ? coloredBaseColor.darken(0.6) : coloredBaseColor.fade(0.08),
+        borderColor: coloredIsLight ? coloredBaseColor.lighten(0.2) : coloredBaseColor.fade(0.6),
     });
 
     colored = makeThemeVars("colored", {
@@ -238,11 +239,38 @@ export const tagPresetVariables = useThemeCache(function (): { [key in TagPreset
         borderColorState: coloredBaseColor,
     });
 
+    /**
+     * @varGroup tags.success
+     * @title Success tag preset
+     * @expand tagPreset
+     */
+
+    let success: TagType = makeThemeVars("success", {
+        fontColor: globalVars.messageColors.success,
+    });
+
+    const successBaseColor = ensureColorHelper(success.fontColor!);
+    const successIsLight = ColorsUtils.isLightColor(successBaseColor);
+
+    success = makeThemeVars("success", {
+        ...success,
+        bgColor: successIsLight ? successBaseColor.darken(0.6) : background.color,
+        borderColor: successBaseColor,
+    });
+
+    success = makeThemeVars("success", {
+        ...success,
+        fontColorState: success.fontColor,
+        bgColorState: success.bgColor,
+        borderColorState: successBaseColor,
+    });
+
     return {
         primary,
         standard,
         greyscale,
         colored,
+        success,
     };
 });
 

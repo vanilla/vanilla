@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -189,6 +189,11 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
+    "editor-quote": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+    },
     "editor-unlink": {
         width: "24",
         height: "24",
@@ -371,10 +376,112 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
+    "reaction-arrow-down": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-arrow-up": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-awesome": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
     "reaction-comments": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "reaction-dislike": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-expressionless": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-fire": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-funny": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-insightful": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-like": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-log": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "reaction-love": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-more": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-off-topic": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-support": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-thumbs-down": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-thumbs-up": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
+        fill: "none",
+    },
+    "reaction-wtf": {
+        width: "25",
+        height: "24",
+        viewBox: "0 0 25 24",
         fill: "none",
     },
     "search-answered": {

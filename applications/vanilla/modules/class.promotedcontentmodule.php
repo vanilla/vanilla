@@ -587,6 +587,37 @@ class PromotedContentModule extends Gdn_Module
     }
 
     /**
+     * Add content from a reaction to the promoted content module.
+     *
+     * @param string $urlCode
+     */
+    protected function selectByReaction($urlCode)
+    {
+        $model = new ReactionModel();
+        $reactionType = ReactionModel::reactionTypes($urlCode);
+
+        if (!$reactionType) {
+            return;
+        }
+
+        $data = $model->getRecordsWhere(
+            ["TagID" => $reactionType["TagID"], "RecordType" => ["Discussion-Total", "Comment-Total"], "Total >=" => 1],
+            "DateInserted",
+            "desc",
+            $this->Limit,
+            0
+        );
+
+        // Massage the data for the promoted content module.
+        foreach ($data as &$row) {
+            $row["ItemType"] = $row["RecordType"];
+            $row["Author"] = Gdn::userModel()->getID($row["InsertUserID"]);
+        }
+
+        return $data;
+    }
+
+    /**
      * Attach CategoryID to Comments
      *
      * @param array $comments

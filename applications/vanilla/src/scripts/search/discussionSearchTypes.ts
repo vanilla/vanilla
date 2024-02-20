@@ -15,6 +15,8 @@ export interface IDiscussionSearchTypes {
     includeArchivedCategories?: boolean;
     tags?: string[];
     tagsOptions?: IComboBoxOption[];
+    tagOperator?: "and" | "or";
     startDate?: string;
     endDate?: string;
+    types?: string[];
 }

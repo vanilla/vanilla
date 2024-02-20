@@ -185,7 +185,7 @@ class AnswerModel implements EventFromRowInterface
 
             // Update reactions
             if ($this->Reactions) {
-                include_once Gdn::controller()->fetchViewLocation("reaction_functions", "", "plugins/Reactions");
+                include_once Gdn::controller()->fetchViewLocation("reaction_functions", "reactions", "dashboard");
                 $reactionModel = new ReactionModel();
 
                 // Assume that the reaction is done by the question's owner

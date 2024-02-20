@@ -15,7 +15,11 @@ interface IProps {
     // Data
     title: string;
     description?: string;
-    background?: Partial<IBackground> & { useOverlay?: boolean; imageUrlSrcSet?: ImageSourceSet };
+    background?: Partial<IBackground> & {
+        useOverlay?: boolean;
+        imageUrlSrcSet?: ImageSourceSet;
+        imageSource?: string;
+    };
 
     // Options
     showDescription?: boolean;

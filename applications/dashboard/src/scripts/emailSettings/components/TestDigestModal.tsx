@@ -128,6 +128,9 @@ export function TestDigestModalImpl(props: {
                 "x-control": {
                     inputType: "custom",
                     component: CustomCommunityMemberInput,
+                    componentProps: {
+                        placeholder: t("Start typing username"),
+                    },
                     label: t("Community Member Content"),
                     description: t(
                         "The test digest will generate content as if it were this user receiving the digest.",

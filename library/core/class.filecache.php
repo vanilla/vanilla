@@ -322,8 +322,9 @@ class Gdn_Filecache extends Gdn_Cache
             }
             usleep(50);
         } while (microtime(true) <= $endTimeMS);
-        @fclose($cache);
-
+        if (is_resource($cache)) {
+            @fclose($cache);
+        }
         if (!is_null($data)) {
             return $data;
         }

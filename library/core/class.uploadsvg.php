@@ -46,4 +46,16 @@ class Gdn_UploadSvg extends Gdn_Upload
         $tmpName = parent::validateUpload($inputName, $throwException);
         return $tmpName;
     }
+
+    /**
+     * Check if the uploaded file is an svg.
+     *
+     * @param string $filename
+     * @return bool
+     */
+    public static function isSvg(string $filename): bool
+    {
+        return isset($_FILES[$filename]) &&
+            in_array(strtolower($_FILES[$filename]["type"]), ["image/svg+xml", "image/svg"]);
+    }
 }

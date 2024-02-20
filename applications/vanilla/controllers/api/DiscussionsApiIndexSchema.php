@@ -170,6 +170,7 @@ class DiscussionsApiIndexSchema extends Schema
                         "field" => "internalStatusID",
                     ],
                 ],
+                "reactionType:s?",
             ])
         );
         $this->addValidator("", function (array $value, ValidationField $field) {

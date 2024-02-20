@@ -88,7 +88,7 @@ function useIsElementToolbarEdgeCase(): boolean {
 
     // We don't currently handle applying block formats across multiple lines well so bail out.
     if (selectionText.length > 0 && isRangeAcrossBlocks(editor)) {
-        return true;
+        return false;
     }
     // Don't show it if an embed is selected
     if (formatter.isEmbed()) {

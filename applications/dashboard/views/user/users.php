@@ -46,7 +46,11 @@ foreach ($this->UserData->result() as $User) {
             }
 
             foreach ($Roles as $RoleID => $RoleName) {
-                $Query = http_build_query(["Keywords" => $RoleName]);
+                $Query = http_build_query(
+                    Gdn::config("Feature.NewUserManagement.Enabled")
+                        ? ["roleIDs" => [$RoleID]]
+                        : ["Keywords" => $RoleName]
+                );
                 $RolesString = concatSep(
                     ", ",
                     $RolesString,

@@ -15,7 +15,9 @@ import ProfileLink from "@library/navigation/ProfileLink";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { memberListClasses } from "@dashboard/components/MemberList.styles";
 import DateTime from "@library/content/DateTime";
+import { DateElement, isSameDate } from "@library/content/DateTimeHelpers";
 import { IResult } from "@library/result/Result";
+import { logError } from "@vanilla/utils";
 
 export interface IMemberResult extends IResult {
     // We always have userInfo on these member queries.
@@ -31,6 +33,22 @@ export default function Member(props: IMemberResult) {
     }
 
     const classes = memberListClasses();
+
+    const safelyFormatDate = (dateString: string | null): string => {
+        if (dateString) {
+            try {
+                const nowDate = new Date();
+                const date = new Date(dateString);
+                const isSameDay = isSameDate(date, nowDate, DateElement.DAY);
+                return isSameDay ? dateString : formatDateStringIgnoringTimezone(dateString);
+            } catch (e) {
+                logError(e);
+                return "";
+            }
+        }
+        return "";
+    };
+
     return (
         <tr className={classes.root}>
             <td className={classNames(classes.cell, classes.isLeft, classes.mainColumn)}>
@@ -74,15 +92,13 @@ export default function Member(props: IMemberResult) {
             {!isCompact && (
                 <td className={classNames(classes.cell, classes.date, classes.lastActiveColumn)}>
                     <span className={classes.minHeight}>
-                        <DateTime timestamp={formatDateStringIgnoringTimezone(user.dateInserted) || ""} />
+                        <DateTime timestamp={safelyFormatDate(user.dateInserted)} />
                     </span>
                 </td>
             )}
             <td className={classNames(classes.cell, classes.date, classes.isRight, classes.lastActiveColumn)}>
                 <span className={classes.minHeight}>
-                    <DateTime
-                        timestamp={user.dateLastActive ? formatDateStringIgnoringTimezone(user.dateLastActive) : ""}
-                    />
+                    <DateTime timestamp={safelyFormatDate(user.dateLastActive)} />
                 </span>
             </td>
         </tr>

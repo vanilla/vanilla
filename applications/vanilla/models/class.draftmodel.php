@@ -193,7 +193,7 @@ class DraftModel extends Gdn_Model
         if (val("Sink", $formPostValues, "") === false) {
             unset($formPostValues["Sink"]);
         }
-        $args = ["FormPostValues" => $formPostValues];
+        $args = ["FormPostValues" => &$formPostValues];
         /** @var \Garden\EventManager $eventManager */
         $eventManager = Gdn::getContainer()->get(EventManager::class);
         $eventManager->fireFilter("draftModel_beforeSaveDiscussion", $this, $args);

@@ -461,7 +461,6 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
                 $templateData["email"]["utmParams"] = $utmParameters;
             }
             $templateData["email"]["title"] = $title;
-            $templateData["email"]["introduction"] = $this->email->getIntroductionContentForDigest();
             $templateData["email"]["locale"] = $digestLanguage;
             $trendingDiscussions = $this->getTopWeeklyDiscussions($digestCategoryIDs, $canUnsubscribe);
             if (empty($trendingDiscussions)) {
@@ -483,6 +482,7 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
             }
             $templateData["email"]["categories"] = $trendingDiscussions;
             $this->email->setFormat("html");
+            $templateData["email"]["introduction"] = $this->email->getIntroductionContentForDigest();
             $templateData["email"]["footer"] = $this->email::imageInlineStyles($this->email->getFooterContent());
             $this->setLocale($digestLanguage);
             $renderHtml = $this->renderTwig("@vanilla/email/email-digest.twig", $templateData);

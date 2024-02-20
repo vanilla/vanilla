@@ -4,11 +4,10 @@
  */
 
 import React from "react";
-import COMMUNITY_SEARCH_SOURCE from "@library/search/CommunitySearchSource";
 import { t } from "@library/utility/appUtils";
-import { TypePlacesIcon, TypeCategoriesIcon } from "@library/icons/searchIcons";
-import { IPlacesSearchResult, ISearchForm, ISearchResult } from "@library/search/searchTypes";
-import { IPlaceSearchTypes } from "@dashboard/components/placeSearchType";
+import { TypePlacesIcon } from "@library/icons/searchIcons";
+import { IPlacesSearchResult, ISearchForm } from "@library/search/searchTypes";
+import { IPlacesSearchTypes } from "@dashboard/components/panels/placesSearchTypes";
 import PlacesSearchFilterPanel from "@dashboard/components/panels/PlacesSearchFilterPanel";
 import flatten from "lodash/flatten";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
@@ -23,7 +22,7 @@ export function PlacesResultMeta(props: { searchResult: Partial<IPlacesSearchRes
     return <ResultMeta type={type} counts={counts} />;
 }
 
-class PlacesSearchDomain extends SearchDomain<IPlaceSearchTypes> {
+class PlacesSearchDomain extends SearchDomain<IPlacesSearchTypes> {
     public key = "places";
     public sort = 3;
 
@@ -34,13 +33,14 @@ class PlacesSearchDomain extends SearchDomain<IPlaceSearchTypes> {
     public icon = (<TypePlacesIcon />);
 
     public getAllowedFields() {
-        return ["name", "description"];
+        return ["name", "description", "types"];
     }
 
-    public transformFormToQuery = function (form: ISearchForm<IPlaceSearchTypes>) {
+    public transformFormToQuery = function (form: ISearchForm<IPlacesSearchTypes>) {
+        const supportedTypes = flatten(PlacesSearchTypeFilter.searchTypes.map((type) => type.values));
         return {
             ...form,
-            types: form.types ?? flatten(PlacesSearchTypeFilter.searchTypes.map((type) => type.values)),
+            types: form.types ? supportedTypes.filter((type) => supportedTypes.includes(type)) : supportedTypes,
             expand: ["breadcrumbs", "image", "excerpt", "-body"],
             recordTypes: undefined,
         };
@@ -50,7 +50,7 @@ class PlacesSearchDomain extends SearchDomain<IPlaceSearchTypes> {
 
     public PanelComponent = PlacesSearchFilterPanel;
 
-    public defaultFormValues = {
+    public defaultFormValues: Partial<ISearchForm<IPlacesSearchTypes>> = {
         description: "",
         types: flatten(PlacesSearchTypeFilter.searchTypes.map((type) => type.values)),
     };

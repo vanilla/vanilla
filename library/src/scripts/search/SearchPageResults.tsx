@@ -10,7 +10,7 @@ import { ResultMeta } from "@library/result/ResultMeta";
 import { SearchPageResultsLoader } from "@library/search/SearchPageResultsLoader";
 import { SearchPagination } from "@library/search/SearchPagination";
 import { ISearchResult } from "@library/search/searchTypes";
-import { useSearchForm } from "@library/search/SearchContext";
+import { useSearchForm } from "@library/search/SearchFormContext";
 import { useLastValue } from "@vanilla/react-utils";
 import React, { useLayoutEffect, useMemo } from "react";
 import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";

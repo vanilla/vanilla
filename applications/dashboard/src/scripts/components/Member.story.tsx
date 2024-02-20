@@ -69,6 +69,21 @@ const badUserName = {
     } as IUser,
 };
 
+const malformedDates = {
+    ...common,
+    userInfo: {
+        email: "test@example.com",
+        userID: 1,
+        name: "Valérie RRRRRRRRR RRRRRRRRRRR RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR",
+        photoUrl: "https://us.v-cdn.net/5022541/uploads/userpics/164/nQQG7FTJACOTX.jpg",
+        dateLastActive: "-0000-00-00T00:00:00+00:00",
+        dateInserted: "-0001-11-31T00:72:00+00:00",
+        label: "Product Manager",
+        countDiscussions: 213,
+        countComments: 19,
+    } as IUser,
+};
+
 export const MemberList = () => (
     <SectionTwoColumns
         mainTop={
@@ -82,6 +97,7 @@ export const MemberList = () => (
                 <Member {...two} />
                 <Member {...one} />
                 <Member {...badUserName} />
+                <Member {...malformedDates} />
             </MemberTable>
         }
     />

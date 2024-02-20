@@ -157,9 +157,6 @@ class LayoutsApiController extends \AbstractApiController
             $widgetIconUrl = asset($widgetClass::getWidgetIconPath(), true);
             $widgetName = $widgetClass::getWidgetName();
             $schema = $resolver->getSchema();
-            if (method_exists($widgetClass, "getExtendedSchemaForLayout")) {
-                $schema->merge($widgetClass::getExtendedSchemaForLayout($query["layoutViewType"]));
-            }
 
             if (is_a($widgetClass, AbstractLayoutSection::class, true)) {
                 $sectionSchemas[$resolver->getType()] = [

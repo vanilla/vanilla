@@ -91,6 +91,8 @@ class UsersApiController extends AbstractApiController
     /** @var RoleModel */
     private $roleModel;
 
+    private ReactionModel $reactionModel;
+
     /**
      * UsersApiController constructor.
      *
@@ -102,6 +104,7 @@ class UsersApiController extends AbstractApiController
      * @param \Vanilla\Web\APIExpandMiddleware $expandMiddleware
      * @param ProfileFieldModel $profileFieldModel
      * @param RoleModel $roleModel
+     * @param ReactionModel $reactionModel
      */
     public function __construct(
         UserModel $userModel,
@@ -111,7 +114,8 @@ class UsersApiController extends AbstractApiController
         ActivityModel $activityModel,
         \Vanilla\Web\APIExpandMiddleware $expandMiddleware,
         ProfileFieldModel $profileFieldModel,
-        RoleModel $roleModel
+        RoleModel $roleModel,
+        ReactionModel $reactionModel
     ) {
         $this->configuration = $configuration;
         $this->counterModel = $counterModel;
@@ -122,6 +126,7 @@ class UsersApiController extends AbstractApiController
         $this->expandMiddleware = $expandMiddleware;
         $this->profileFieldModel = $profileFieldModel;
         $this->roleModel = $roleModel;
+        $this->reactionModel = $reactionModel;
     }
 
     /**
@@ -258,7 +263,7 @@ class UsersApiController extends AbstractApiController
         $isSelf = $id === $this->getSession()->UserID;
         $showFullSchema = $isSelf || $this->checkPermission(Permissions::BAN_ROLE_TOKEN);
         $queryIn = $this->schema(
-            ["expand?" => ApiUtils::getExpandDefinition(["profileFields", "discoveryText"])],
+            ["expand?" => ApiUtils::getExpandDefinition(["profileFields", "discoveryText", "reactionsReceived"])],
             ["UserGet", "in"]
         )->setDescription("Get a user.");
 
@@ -284,6 +289,9 @@ class UsersApiController extends AbstractApiController
 
         if (!$showFullSchema) {
             $this->userModel->filterPrivateUserRecord($row);
+        }
+        if (ModelUtils::isExpandOption("reactionsReceived", $expand)) {
+            [$row] = $this->reactionModel->expandUserReactionsReceived([$row]);
         }
         $result = $out->validate($row);
 
@@ -672,7 +680,7 @@ class UsersApiController extends AbstractApiController
                     "maximum" => 5000,
                 ],
                 "profileFields:o?" => $this->profileFieldModel->getProfileFieldFilterSchema(),
-                "expand?" => ApiUtils::getExpandDefinition(["profileFields", "discoveryText"]),
+                "expand?" => ApiUtils::getExpandDefinition(["profileFields", "discoveryText", "reactionsReceived"]),
             ],
             ["UserIndex", "in"]
         )
@@ -723,6 +731,9 @@ class UsersApiController extends AbstractApiController
 
         if (!$showFullSchema) {
             $this->userModel->filterPrivateUserRecord($rows);
+        }
+        if (ModelUtils::isExpandOption("reactionsReceived", $expand)) {
+            $rows = $this->reactionModel->expandUserReactionsReceived($rows);
         }
         $result = $out->validate($rows);
 
@@ -902,13 +913,6 @@ class UsersApiController extends AbstractApiController
             throw new \Garden\Web\Exception\ForbiddenException(t(self::ERROR_PATCH_HIGHER_PERMISSION_USER));
         }
 
-        // Check for self-edit
-        if ($id == $this->getSession()->UserID) {
-            $this->validatePatchSelfEditCredentials($user, $body);
-        } else {
-            $this->permission("Garden.Users.Edit");
-        }
-
         $this->idParamSchema("in");
         if ($this->checkPermission("Garden.Users.Edit")) {
             $in = $this->schema($this->userPatchSchema(), ["UserPatchCommon", "in"])->setDescription("Update a user.");
@@ -917,12 +921,22 @@ class UsersApiController extends AbstractApiController
                 "Update a user."
             );
         }
-
+        if ($id == $this->getSession()->UserID) {
+            $in->merge(Schema::parse(["passwordConfirmation:s?"]));
+        }
         $in->addValidator("roleID", $this->createRoleIDValidator($id));
         $in->addValidator("profileFields", $this->profileFieldModel->validateEditable($id));
 
         $out = $this->userSchema("out");
         $body = $in->validate($body);
+
+        // Check for self-edit
+        if ($id == $this->getSession()->UserID) {
+            $this->validatePatchSelfEditCredentials($user, $body);
+            unset($body["passwordConfirmation"]);
+        } else {
+            $this->permission("Garden.Users.Edit");
+        }
 
         $userData = $this->normalizeInput($body);
         $userData["UserID"] = $id;
@@ -1564,8 +1578,6 @@ class UsersApiController extends AbstractApiController
                 "url:s?",
                 "dateInserted?",
                 "dateLastActive:dt?",
-                "isAdmin:b?",
-                "isSysAdmin:b?",
                 "countDiscussions?",
                 "countComments?",
                 "label:s?",
@@ -1574,6 +1586,7 @@ class UsersApiController extends AbstractApiController
                 "countVisits:i?",
                 "inviteUserID:i?",
                 "countPosts:i?",
+                "reactionsReceived?" => $this->reactionModel->compoundTypeFragmentSchema(),
             ])->add($this->fullSchema()),
             "ViewProfile"
         );
@@ -1663,5 +1676,115 @@ class UsersApiController extends AbstractApiController
                 $this->permission($fieldsPermissions[$field]);
             }
         }
+    }
+
+    /**
+     * Get all the comments and discussions a user has posted that have received a certain reaction.
+     *
+     * @param int $userID
+     * @param array $query
+     * @return Data
+     * @throws ValidationException Throws validation exception.
+     * @throws \Garden\Web\Exception\HttpException Http exception.
+     * @throws NotFoundException Throws an exception if the user or reaction isn't found.
+     * @throws \Vanilla\Exception\PermissionException Permission exception.
+     */
+    public function get_reacted(int $userID, array $query = []): Data
+    {
+        $this->permission("Garden.Profiles.View");
+
+        // Make the schemas
+        $in = Schema::parse([
+            "reactionUrlcode:s",
+            "expand" => ApiUtils::getExpandDefinition(["all", "insertUser", "updateUser", "reactions"]),
+            "page:i?" => [
+                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                "default" => 1,
+                "minimum" => 1,
+            ],
+            "limit:i?" => [
+                "description" => "Desired number of items per page.",
+                "default" => $this->reactionModel->getDefaultLimit(),
+                "minimum" => 1,
+                "maximum" => ApiUtils::getMaxLimit(100),
+            ],
+        ]);
+
+        $out = Schema::parse([
+            ":a" => [
+                "name:s",
+                "body:s",
+                "format:s",
+                "insertUserID:i",
+                "updateUserID:i?",
+                "dateUpdated:dt?",
+                "recordID:i",
+                "recordType:s",
+                "url:s",
+                "reactions?" => $this->reactionModel->getReactionSummaryFragment(),
+                "insertUser?" => $this->getUserFragmentSchema(),
+                "updateUser?" => $this->getUserFragmentSchema(),
+            ],
+        ]);
+
+        $validatedQuery = $in->validate($query);
+
+        // Throws not found exception if no user found.
+        $user = $this->userByID($userID);
+
+        // Get the reaction and throw an error if it isn't found.
+        $reactionType = ReactionModel::reactionTypes($validatedQuery["reactionUrlcode"]);
+        if (!$reactionType) {
+            throw new NotFoundException("Reaction");
+        }
+
+        $where = [
+            "UserID" => $user["UserID"],
+            "RecordType" => ["Discussion-Total", "Comment-Total"],
+            "TagID" => $reactionType["TagID"],
+            "Total >" => 0,
+        ];
+        [$offset, $limit] = offsetLimit("p{$validatedQuery["page"]}", $validatedQuery["limit"]);
+        $pascalData = $this->reactionModel->getRecordsWhere($where, "DateInserted", "desc", $limit, $offset);
+
+        $expand = $validatedQuery["expand"] ?? [];
+
+        // Convert the array keys for api output.
+        $data = [];
+        foreach ($pascalData as &$datum) {
+            $data[] = ApiUtils::convertOutputKeys($datum);
+        }
+
+        // Add the user data, if requested.
+        ModelUtils::leftJoin($data, ModelUtils::expandedFields(["insertUser", "updateUser"], $expand), [
+            $this->userModel,
+            "fetchFragments",
+        ]);
+
+        // Add the reaction data, if requested.
+        if (ModelUtils::expandedFields(["reactions"], $expand)) {
+            $attributes = array_column($pascalData, "Attributes", "RecordID");
+            array_walk($data, function (&$data) use ($attributes) {
+                $withAttributes = ReactionModel::addAttributes($data, $attributes[$data["recordID"]]);
+                $summary = ApiUtils::convertOutputKeys($this->reactionModel->getRecordSummary($withAttributes));
+                $data["reactions"] = $summary;
+            });
+        }
+
+        // Render the body in html.
+        foreach ($data as &$record) {
+            $record["body"] = Gdn::formatService()->renderHTML($record["body"], $record["format"]);
+        }
+        $data = $out->validate($data);
+
+        // Get the paging info.
+        $paging = ApiUtils::morePagerInfo(
+            $data,
+            "url",
+            ["page" => $validatedQuery["page"], "limit" => $validatedQuery["limit"]],
+            $in
+        );
+
+        return new Data($data, ["paging" => $paging]);
     }
 }

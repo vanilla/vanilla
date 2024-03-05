@@ -6,6 +6,7 @@
 import chai, { expect } from "chai";
 import asPromised from "chai-as-promised";
 import { flattenObject, spaceshipCompare, unflattenObject } from "./logicUtils";
+import { ColorHelper } from "csx";
 chai.use(asPromised);
 
 describe("spaceshipCompare()", () => {
@@ -30,6 +31,7 @@ describe("flattenObject()", () => {
             nestedKey: "val2",
             array1: ["one", "two", "three"],
         },
+        color: new ColorHelper("rgb", 0, 0, 0, 1, false),
     };
 
     const flattened = {
@@ -37,6 +39,7 @@ describe("flattenObject()", () => {
         isNull: null,
         "nested.nestedKey": "val2",
         "nested.array1": ["one", "two", "three"],
+        color: "rgb(0,0,0)",
     };
 
     const things = ["one", "two"];
@@ -46,6 +49,6 @@ describe("flattenObject()", () => {
     });
 
     it("unflattens objects", () => {
-        expect(unflattenObject(flattened)).deep.equal(nested);
+        expect(unflattenObject(flattened)).deep.equal({ ...nested, color: "rgb(0,0,0)" });
     });
 });

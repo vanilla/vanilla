@@ -179,7 +179,7 @@ class PostController extends VanillaController
         $categoryData = $this->ShowCategorySelector ? CategoryModel::categories() : false;
 
         // Check permission
-        if (isset($this->Discussion)) {
+        if (isset($this->Discussion) and $draftID == 0) {
             // Make sure that content can (still) be edited.
             $canEdit = DiscussionModel::canEdit($this->Discussion);
             if (!$canEdit) {

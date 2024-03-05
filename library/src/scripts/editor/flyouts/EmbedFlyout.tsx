@@ -101,8 +101,8 @@ export default function EmbedFlyout(props: IProps) {
     };
 
     const handleFrameHtml = (html: string) => {
-        const container = document.createElement("div");
-        container.innerHTML = html;
+        const parser = new DOMParser();
+        const container = parser.parseFromString(html, "text/html");
         const iframe = container.querySelector("iframe");
         if (!iframe) {
             clearState();

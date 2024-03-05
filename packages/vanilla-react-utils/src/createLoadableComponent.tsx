@@ -8,7 +8,7 @@ import React from "react";
 
 interface IParams<TProps extends {}> {
     loadFunction(): Promise<React.ComponentType<TProps> | { default: React.ComponentType<TProps> }>;
-    fallback: React.ComponentType<{}>;
+    fallback: React.ComponentType<TProps>;
 }
 
 export type LoadableComponent<TProps extends {}> = {
@@ -26,7 +26,7 @@ export function createLoadableComponent<TProps extends {}>(params: IParams<TProp
 
     const NewComponent = (props: TProps) => {
         return (
-            <React.Suspense fallback={<params.fallback />}>
+            <React.Suspense fallback={<params.fallback {...props} />}>
                 <Lazy {...props} />
             </React.Suspense>
         );

@@ -293,7 +293,7 @@ class LayoutViewModel extends FullRecordCacheModel
     }
 
     /**
-     * Get a Layout ID by a provided viewType, recordType and record ID.
+     * Get a Layout ID and an updated query by a provided viewType, recordType and record ID.
      *
      * This more than a direct lookup and will attempt to resolve dynamic parts of the query.
      * Additionally, it will attempt to search parent records if the query cannot be found.
@@ -310,11 +310,11 @@ class LayoutViewModel extends FullRecordCacheModel
      *
      * @param LayoutQuery $query
      *
-     * @return string
+     * @return array{string, LayoutQuery} LayoutID and updated query
      *
      * @throws NotFoundException In case layout ID is not found based on provided parameters.
      */
-    public function queryLayoutID(LayoutQuery $query): string
+    public function queryLayout(LayoutQuery $query): array
     {
         $initialQuery = $query;
         $currentDepth = 0;
@@ -326,7 +326,7 @@ class LayoutViewModel extends FullRecordCacheModel
                 ErrorLogger::error("Infinite loop detected while querying layout ID", [
                     "initialQuery" => $initialQuery,
                 ]);
-                return $this->queryDefaultTemplateID($query);
+                return ["layoutID" => $this->queryDefaultTemplateID($query), "query" => (array) $query];
             }
 
             // Perform initial resolution/normalization of the query.
@@ -340,7 +340,7 @@ class LayoutViewModel extends FullRecordCacheModel
                     "recordID" => $query->recordID,
                 ]);
 
-                return $row["layoutID"];
+                return [$row["layoutID"], $query];
             } catch (NoResultsException $e) {
                 // Not a big deal necessarily. Try and get the parent.
                 $query = $this->resolveParentLayoutQuery($query);
@@ -350,7 +350,7 @@ class LayoutViewModel extends FullRecordCacheModel
                     // At this point no matching layout was assigned in the database
                     // So we should just fall back to the layout template.
                     $fileLayoutView = $this->layoutHydrator()->getLayoutViewType($query->layoutViewType);
-                    return $fileLayoutView->getTemplateID();
+                    return [$fileLayoutView->getTemplateID(), $query];
                 }
 
                 // Loop again with the new parent query.

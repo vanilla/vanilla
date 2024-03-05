@@ -206,6 +206,12 @@ class QnaModel
         }
 
         $totalQuestion = Gdn::sql()->getCount("Discussion", ["Type" => "Question"]);
+
+        // Early exit if there are no questions.
+        if ($totalQuestion == 0) {
+            return ["Complete" => true];
+        }
+
         $totalBatches = ceil($totalQuestion / $perBatch);
 
         $currentBatch = Gdn::sql()

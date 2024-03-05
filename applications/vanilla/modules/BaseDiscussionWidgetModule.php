@@ -8,6 +8,7 @@ namespace Vanilla\Community;
 
 use CategoryModel;
 use DiscussionsApiController;
+use Exception;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
@@ -131,7 +132,10 @@ class BaseDiscussionWidgetModule extends AbstractReactModule implements Limitabl
         if ($this->discussions === null) {
             try {
                 $this->discussions = $this->api->get("/discussions", $apiParams)->asData();
-            } catch (PermissionException $e) {
+            } catch (Exception $e) {
+                if (!$e->getMessage() == "Permission Problem") {
+                    throw $e;
+                }
                 // A user might not have permission to see this.
                 return null;
             }

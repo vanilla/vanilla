@@ -9,10 +9,12 @@ namespace Vanilla\Web;
 
 use Garden\EventManager;
 use Garden\Web\Data;
+use Twig\TwigFunction;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\FileUtils;
 use Vanilla\Models\SiteMeta;
 use Vanilla\Theme\ThemePreloadProvider;
+use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\Events\PageRenderBeforeEvent;
 
 /**
@@ -115,6 +117,16 @@ class MasterViewRenderer
 
         $bodyHtmlKey = $controller->getIsReactView() ? "seoContent" : "bodyContent";
 
+        foreach ($this->getFontCssUrls() as $fontCssUrl) {
+            $modernPageHead = \Gdn::getContainer()->get(PageHead::class);
+            $inlineContent = $modernPageHead->getInlineStyleFromUrl($fontCssUrl);
+            if ($inlineContent !== null) {
+                $controller->Head->addString("<style>{$inlineContent}</style>");
+            } else {
+                $controller->Head->addCss($fontCssUrl);
+            }
+        }
+
         $extraData = [
             $bodyHtmlKey => $this->renderThemeContentView($data) ?? $controller->renderAssetForTwig("Content"),
             "cssClasses" =>
@@ -170,7 +182,9 @@ class MasterViewRenderer
      */
     private function getSharedData(): array
     {
+        $themeVariables = $this->themePreloader->getPreloadTheme()->getVariables();
         return [
+            "theme" => $themeVariables,
             "siteMeta" => $this->siteMeta->value(),
             "locale" => $this->siteMeta->getLocaleKey(),
             "debug" => $this->siteMeta->getDebugModeEnabled(),
@@ -191,7 +205,7 @@ class MasterViewRenderer
         $fontsAssetUrls = array_column($fontsAssets, "url");
 
         $variables = $this->themePreloader->getVariables();
-        $fontVars = $variables["font"] ?? [];
+        $fontVars = $variables["global"]["fonts"] ?? [];
 
         $customFontUrl = $fontVars["customFont"]["url"] ?? ($fontVars["customFontUrl"] ?? null);
         $forceGoogleFont = $fontVars["forceGoogleFont"] ?? false;

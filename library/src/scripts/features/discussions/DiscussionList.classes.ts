@@ -17,6 +17,8 @@ import { styleUnit } from "../../styles/styleUnit";
 import voteCounterVariables from "@library/voteCounter/VoteCounter.variables";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { DeepPartial } from "redux";
+import { tagMixin } from "@library/metas/Tags.styles";
+import { tagsVariables } from "@library/metas/Tags.variables";
 
 export const discussionListClasses = useThemeCache(
     (itemOptionOverrides?: DeepPartial<IDiscussionItemOptions>, asTile?: boolean) => {
@@ -202,6 +204,15 @@ export const discussionListClasses = useThemeCache(
             },
         });
 
+        const disablePointerEvents = css({
+            pointerEvents: "none",
+        });
+
+        const announcementTag = css(tagMixin(tagsVariables(), vars.announcementTag, false));
+        const qnaStatusUnanswered = css(tagMixin(tagsVariables(), vars.qnaStatusUnanswered, false));
+        const qnaStatusAnswered = css(tagMixin(tagsVariables(), vars.qnaStatusAnswered, false));
+        const qnaStatusAccepted = css(tagMixin(tagsVariables(), vars.qnaStatusAccepted, false));
+
         return {
             title,
             iconAndVoteCounterWrapper,
@@ -223,6 +234,11 @@ export const discussionListClasses = useThemeCache(
             filterAndSortingLabel,
             filterAndSortingDropdown,
             filterAndSortingButton,
+            disablePointerEvents,
+            announcementTag,
+            qnaStatusUnanswered,
+            qnaStatusAnswered,
+            qnaStatusAccepted,
         };
     },
 );

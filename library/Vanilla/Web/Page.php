@@ -11,6 +11,7 @@ use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
 use Garden\CustomExceptionHandler;
 use Garden\Web\Data;
+use Garden\Web\Exception\ResponseException;
 use Garden\Web\Exception\ServerException;
 use Garden\Web\Redirect;
 use Vanilla\InjectableInterface;
@@ -233,6 +234,10 @@ abstract class Page implements InjectableInterface, CustomExceptionHandler, Page
         if ($e instanceof ForbiddenException && !$this->session->isValid()) {
             $signinUrl = url("/entry/signin?Target=" . urlencode($this->request->getUrl()), true);
             return new Redirect($signinUrl);
+        }
+
+        if ($e instanceof ResponseException) {
+            return $e->getResponse();
         }
 
         $this->requiresSeo = false;

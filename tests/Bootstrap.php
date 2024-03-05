@@ -29,6 +29,7 @@ use Vanilla\Contracts\Site\VanillaSiteProvider;
 use Vanilla\Contracts\Site\SiteSectionProviderInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
 use Vanilla\Dashboard\Controllers\API\ConfigApiController;
+use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\RemoteResourceModel;
 use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Dashboard\UserPointsModel;
@@ -443,6 +444,9 @@ class Bootstrap
             ->setConstructorArgs([ContainerUtils::config("Context.Secret", "secret")])
 
             ->rule(DiscussionStatusModel::class)
+            ->setShared(true)
+
+            ->rule(RecordStatusModel::class)
             ->setShared(true);
 
         $container

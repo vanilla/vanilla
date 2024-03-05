@@ -10,11 +10,13 @@ import React, { useContext } from "react";
 export interface IThreadItemContext {
     recordType: "discussion" | "comment";
     recordID: RecordID;
+    recordUrl: string;
 }
 
 const ThreadItemContext = React.createContext<IThreadItemContext>({
     recordType: "discussion",
     recordID: 0,
+    recordUrl: "",
 });
 
 export function ThreadItemContextProvider(props: { children: React.ReactNode } & IThreadItemContext) {

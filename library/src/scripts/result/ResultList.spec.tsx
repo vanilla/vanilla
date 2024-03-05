@@ -16,6 +16,7 @@ import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomai
 import EVENT_SEARCH_DOMAIN from "@groups/search/EventSearchDomain";
 import COMMUNITY_SEARCH_SOURCE from "@library/search/CommunitySearchSource";
 import { SearchService } from "@library/search/SearchService";
+import { MemoryRouter } from "react-router";
 
 beforeAll(() => {
     COMMUNITY_SEARCH_SOURCE.addDomain(DISCUSSIONS_SEARCH_DOMAIN);
@@ -34,9 +35,11 @@ describe("ResultList", () => {
         const results = SearchFixture.createMockSearchResults(1);
 
         const { findByText, container } = render(
-            <SearchFormContextProvider>
-                <ResultList results={results.results} rel={"noindex nofollow"} />
-            </SearchFormContextProvider>,
+            <MemoryRouter>
+                <SearchFormContextProvider>
+                    <ResultList results={results.results} rel={"noindex nofollow"} />
+                </SearchFormContextProvider>
+            </MemoryRouter>,
         );
 
         waitFor(async () => {
@@ -57,9 +60,11 @@ describe("ResultList", () => {
         });
 
         const { container } = render(
-            <SearchFormContextProvider>
-                <ResultList results={results.results} rel={"noindex nofollow"} />
-            </SearchFormContextProvider>,
+            <MemoryRouter>
+                <SearchFormContextProvider>
+                    <ResultList results={results.results} rel={"noindex nofollow"} />
+                </SearchFormContextProvider>
+            </MemoryRouter>,
         );
 
         waitFor(async () => {
@@ -84,9 +89,11 @@ describe("ResultList", () => {
         });
 
         const { container } = render(
-            <SearchFormContextProvider>
-                <ResultList results={results.results} rel={"noindex nofollow"} />
-            </SearchFormContextProvider>,
+            <MemoryRouter>
+                <SearchFormContextProvider>
+                    <ResultList results={results.results} rel={"noindex nofollow"} />
+                </SearchFormContextProvider>
+            </MemoryRouter>,
         );
 
         waitFor(async () => {

@@ -171,9 +171,9 @@ function stripUndefinedKeys(obj: any) {
 }
 
 const rgbRegex = /^rgb\((\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?)\)$/;
-const rgbaRegex = /^rgba\((\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d*(?:\.\d+)?)\)$/;
+const rgbaRegex = /^rgba\((\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d+(?:\.\d+)?)\)$/;
 const hslRegex = /^hsl\((\d+),\s*([\d.]+)%,\s*([\d.]+)%\)$/;
-const hslaRegex = /^hsla\((\d+),\s*([\d.]+)%,\s*([\d.]+)%,\s*(\d*(?:\.\d+)?)\)/;
+const hslaRegex = /^hsla\((\d+),\s*([\d.]+)%,\s*([\d.]+)%,\s*(\d+(?:\.\d+)?)\)/;
 const hexRegex = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 
 /**
@@ -232,7 +232,7 @@ export function normalizeVariables(customVariable: any, defaultVariable: any) {
  * @param colorString
  */
 export function stringIsHexColor(colorValue) {
-    return typeof colorValue === "string" && colorValue.match(hexRegex);
+    return typeof colorValue === "string" && !!colorValue.match(hexRegex);
 }
 
 /**
@@ -240,7 +240,7 @@ export function stringIsHexColor(colorValue) {
  * @param colorString
  */
 export function stringIsRgbColor(colorValue) {
-    return typeof colorValue === "string" && colorValue.match(rgbRegex);
+    return typeof colorValue === "string" && !!colorValue.match(rgbRegex);
 }
 
 /**
@@ -248,7 +248,7 @@ export function stringIsRgbColor(colorValue) {
  * @param colorString
  */
 export function stringIsRgbaColor(colorValue) {
-    return typeof colorValue === "string" && colorValue.match(rgbaRegex);
+    return typeof colorValue === "string" && !!colorValue.match(rgbaRegex);
 }
 
 /**
@@ -256,7 +256,7 @@ export function stringIsRgbaColor(colorValue) {
  * @param colorString
  */
 export function stringIsHslColor(colorValue) {
-    return typeof colorValue === "string" && colorValue.match(hslRegex);
+    return typeof colorValue === "string" && !!colorValue.match(hslRegex);
 }
 
 /**
@@ -264,7 +264,7 @@ export function stringIsHslColor(colorValue) {
  * @param colorString
  */
 export function stringIsHslaColor(colorValue) {
-    return typeof colorValue === "string" && colorValue.match(hslaRegex);
+    return typeof colorValue === "string" && !!colorValue.match(hslaRegex);
 }
 
 /**
@@ -314,7 +314,7 @@ export const getDefaultOrCustomErrorMessage = (error, defaultMessage: string) =>
  * Convert a color string into an instance.
  * @param colorString
  */
-export function colorStringToInstance(colorString: string, throwOnFailure: boolean = false) {
+export function colorStringToInstance(colorString: any, throwOnFailure: boolean = false) {
     if (stringIsHexColor(colorString)) {
         // It's a colour.
         return color(colorString);
@@ -350,6 +350,12 @@ export function colorStringToInstance(colorString: string, throwOnFailure: boole
         const a = parseFloat(result[4]);
 
         return hsla(h, s, l, a);
+    } else if (typeof colorString === "object" && colorString.f) {
+        if (colorString.f === "hsl") {
+            return hsla(colorString.h, colorString.s, colorString.l, colorString.a);
+        }
+
+        return rgba(colorString.r, colorString.g, colorString.b, colorString.a);
     } else {
         if (throwOnFailure) {
             throw new Error(`Invalid color detected: ${colorString}`);

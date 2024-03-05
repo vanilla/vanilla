@@ -9,6 +9,7 @@ namespace Vanilla\Theme\Asset;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Theme\ThemeAssetFactory;
 use Vanilla\Utility\ArrayUtils;
+use function Vanilla\Web;
 
 /**
  * JSON theme asset.
@@ -58,6 +59,52 @@ class JsonThemeAsset extends ThemeAsset
             $this->data = $this->preservedOutputDecode($data);
             $this->ensureArray();
         }
+    }
+
+    /**
+     * Get a variable.
+     *
+     * @param string $variableName
+     * @param string $fallback
+     *
+     * @return string
+     */
+    public function variable(string $variableName, string $fallback): string
+    {
+        $value = $this->get($variableName, $fallback);
+        if (is_array($value)) {
+            return $fallback;
+        } else {
+            return $value;
+        }
+    }
+
+    /**
+     * Get a pixel value.
+     *
+     * @param string $variableName
+     * @param int $fallbackPixels
+     * @return int
+     */
+    public function pixelVariable(string $variableName, int $fallbackPixels): int
+    {
+        $value = $this->variable($variableName, $fallbackPixels);
+        $value = str_replace("px", "", $value);
+        $value = (int) $value;
+        return $value;
+    }
+
+    /**
+     * Get debug HTML for the asset.
+     *
+     * @return \Twig\Markup
+     */
+    public function debug(): \Twig\Markup
+    {
+        $vars = json_encode($this->preservedOutputDecode($this->jsonString), JSON_PRETTY_PRINT);
+        $encodedVars = htmlspecialchars($vars);
+        $html = "<pre style='max-width: 100%; overflow: auto; position: fixed; z-index: 10000; top: 40px; left: 40px; right: 40px; bottom: 40px; background: #fff; border: 3px #0c7cd5 solid;'>{$encodedVars}</pre>";
+        return new \Twig\Markup($html, "utf-8");
     }
 
     /**

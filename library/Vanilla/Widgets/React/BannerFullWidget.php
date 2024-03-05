@@ -253,19 +253,18 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
                     ),
                 ],
             ]),
-            self::getExtendedSchemaForLayout()
+            self::getBackgroundSchema()
         );
     }
 
     /**
      * Get an extended schema specific to a given layout type.
      *
-     * @param string|null $layoutViewType
      * @return Schema
      */
-    public static function getExtendedSchemaForLayout(?string $layoutViewType = null): Schema
+    public static function getBackgroundSchema(): Schema
     {
-        $siteSectionModel = Gdn::getContainer()->get(SiteSectionModel::class);
+        $dynamicSchemaOptions = \Gdn::getContainer()->get(DynamicContainerSchemaOptions::class);
         $backgroundSchema = new WidgetBackgroundSchema("Banner Background", true, true);
         $backgroundSchemaArray = $backgroundSchema->getSchemaArray();
 
@@ -273,20 +272,10 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
         $image = $backgroundSchemaArray["properties"]["image"];
         unset($backgroundSchemaArray["properties"]["image"]);
 
-        // Build the set of allowed image sources.
-        $imageSourceOptions = [self::IMAGE_SOURCE_STYLEGUIDE => "Style Guide Banner"];
-        if (in_array($layoutViewType, ["discussionCategoryPage", "nestedCategoryList"])) {
-            $imageSourceOptions[self::IMAGE_SOURCE_CATEGORY] = "Category Banner";
-        }
-        if ($layoutViewType == "home" && count($siteSectionModel->getAll()) > 1) {
-            $imageSourceOptions[self::IMAGE_SOURCE_SITE_SECTION] = "Subcommunity Banner";
-        }
-        $imageSourceOptions[self::IMAGE_SOURCE_CUSTOM] = "Custom";
-
         // Add imageSource prop.
         $backgroundSchemaArray["properties"]["imageSource"] = [
             "type" => "string",
-            "default" => self::IMAGE_SOURCE_CUSTOM,
+            "default" => self::IMAGE_SOURCE_STYLEGUIDE,
             "enum" => [
                 self::IMAGE_SOURCE_STYLEGUIDE,
                 self::IMAGE_SOURCE_CUSTOM,
@@ -295,7 +284,7 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
             ],
             "x-control" => SchemaForm::radio(
                 new FormOptions("Image Source"),
-                new StaticFormChoices($imageSourceOptions)
+                new StaticFormChoices($dynamicSchemaOptions->getImageSourceChoices())
             ),
         ];
 
@@ -339,6 +328,18 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
         $this->props["background"]["imageUrlSrcSet"] = $this->imageSrcSetService->getResizedSrcSet(
             $this->props["background"]["image"]
         );
+
+        // The background image source has not been set, possibly from being last edited before the prop existed
+        if (!isset($this->props["background"]["imageSource"])) {
+            // A background image was not previously defined, the image source is styleguide
+            if (empty($this->props["background"]["image"])) {
+                $this->props["background"]["imageSource"] = self::IMAGE_SOURCE_STYLEGUIDE;
+            }
+            // A background image was previously defined, the image source is custom
+            else {
+                $this->props["background"]["imageSource"] = self::IMAGE_SOURCE_CUSTOM;
+            }
+        }
 
         if ($this->props["title"] === "") {
             $this->props["title"] = $siteSection->getSectionName();
@@ -389,7 +390,7 @@ class BannerFullWidget implements ReactWidgetInterface, CombinedPropsWidgetInter
             return BannerImageModel::getBannerImageSlug($this->getHydrateParam("categoryID"));
         }
         if ($imageSource === self::IMAGE_SOURCE_STYLEGUIDE) {
-            return $this->siteSectionModel->getDefaultSiteSection()->getBannerImageLink();
+            return null;
         }
 
         return empty($this->props["background"]["image"])

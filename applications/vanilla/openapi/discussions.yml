@@ -156,6 +156,11 @@ paths:
                   schema:
                       type: integer
                   allowEmptyValue: false
+                - name: reactionType
+                  description: Discussions for which the user has given the specified reaction.
+                  in: query
+                  schema:
+                      type: string
                 - description: List of statusIDs to filter discussion by.
                   in: query
                   name: statusID[]

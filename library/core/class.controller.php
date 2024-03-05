@@ -504,6 +504,11 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
      */
     public function addJsFile($fileName, $appFolder = "", $options = null)
     {
+        // Reactions has been moved to core.
+        // This is a shim to make sure custom addons referencing reaction javascript still work.
+        if ($appFolder === "plugins/Reactions") {
+            $appFolder = "vanilla";
+        }
         $jsInfo = ["FileName" => $fileName, "AppFolder" => $appFolder, "Options" => $options];
 
         $this->_JsFiles[] = $jsInfo;
@@ -1032,6 +1037,12 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
         $throwError = true,
         $useController = true
     ) {
+        // Reactions has been moved to core.
+        // This is a shim to make sure custom addons referencing reaction views still work.
+        if ($applicationFolder === "plugins/Reactions") {
+            $controllerName = "reactions";
+            $applicationFolder = "dashboard";
+        }
         // Accept an explicitly defined view, or look to the method that was called on this controller
         if ($view == "") {
             $view = $this->View;
@@ -2170,6 +2181,7 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
      */
     public function renderMaster()
     {
+        $themeType = isMobile() ? "mobile" : "desktop";
         // Build the master view if necessary
         if ($this->isRenderingMasterView()) {
             $this->MasterView = $this->masterView();
@@ -2182,7 +2194,6 @@ class Gdn_Controller extends Gdn_Pluggable implements CacheControlConstantsInter
                 $this->fireEvent("BeforeAddCss");
 
                 $etag = LegacyAssetModel::eTag();
-                $themeType = isMobile() ? "mobile" : "desktop";
                 /* @var LegacyAssetModel $assetModel */
                 $assetModel = Gdn::getContainer()->get(LegacyAssetModel::class);
 

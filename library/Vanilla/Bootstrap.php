@@ -210,6 +210,9 @@ class Bootstrap
             ->setShared(true)
             ->addCall("addThemeProvider", [new Reference(FsThemeProvider::class)])
 
+            ->rule(Vanilla\Theme\ThemePreloadProvider::class)
+            ->setShared(true)
+
             ->rule(\Vanilla\Theme\ThemeSectionModel::class)
             ->setShared(true);
 

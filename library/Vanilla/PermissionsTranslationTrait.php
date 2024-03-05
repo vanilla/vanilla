@@ -78,7 +78,6 @@ trait PermissionsTranslationTrait
     private $deprecatedPermissions = [
         "Garden.Activity.Delete",
         "Garden.Activity.View",
-        "Garden.Curation.Manage",
         "Vanilla.Approval.Require",
         "Vanilla.Comments.Me",
     ];

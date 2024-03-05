@@ -29,6 +29,11 @@ export function BannerWidgetPreview(_props: IProps) {
         description,
         showTitle,
         showDescription,
+        background: {
+            ..._props.background,
+            image: _props.background?.imageSource === "custom" ? _props.background?.image : "",
+        },
     };
+
     return <BannerWidget {...props} />;
 }

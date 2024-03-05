@@ -19,7 +19,7 @@ class CollectionModel extends PipelineModel
 {
     private const TABLE_NAME = "collection";
 
-    public const LIMIT_DEFAULT = 20;
+    public const LIMIT_DEFAULT = 500;
 
     /** Cache time to live. */
     const CACHE_TTL = 3600;

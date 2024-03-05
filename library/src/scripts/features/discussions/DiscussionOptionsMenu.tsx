@@ -14,7 +14,7 @@ import { IPermission, IPermissionOptions, PermissionMode } from "@library/featur
 import DiscussionOptionsAnnounce from "@library/features/discussions/DiscussionOptionsAnnounce";
 import DiscussionOptionsMove from "@library/features/discussions/DiscussionOptionsMove";
 import DiscussionOptionsDelete from "@library/features/discussions/DiscussionOptionsDelete";
-import { useUsersState } from "@library/features/users/userModel";
+import { useCurrentUserID } from "@library/features/users/userHooks";
 import { DiscussionOptionsClose } from "@library/features/discussions/DiscussionOptionsClose";
 import { DiscussionOptionsSink } from "@library/features/discussions/DiscussionOptionsSink";
 import DropDownItemSeparator from "@library/flyouts/items/DropDownItemSeparator";
@@ -28,6 +28,11 @@ import { usePermissionsContext } from "@library/features/users/PermissionsContex
 import { DiscussionOptionsChangeAuthor } from "@library/features/discussions/DiscussionOptionsChangeAuthor";
 import DiscussionOptionsDismiss from "@library/features/discussions/DiscussionOptionsDismiss";
 import DiscussionOptionsBump from "@library/features/discussions/DiscussionOptionsBump";
+import {
+    IntegrationContextProvider,
+    useAttachmentIntegrations,
+} from "@library/features/discussions/integrations/Integrations.context";
+import { IntegrationButtonAndModal } from "@library/features/discussions/integrations/Integrations";
 
 interface IDiscussionOptionItem {
     permission?: IPermission;
@@ -61,7 +66,9 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         mode: PermissionMode.RESOURCE_IF_JUNCTION,
     };
 
-    const currentUserID = useUsersState().currentUser.data?.userID;
+    const availableIntegrations = useAttachmentIntegrations();
+
+    const currentUserID = useCurrentUserID();
 
     const isAuthor = discussion.insertUserID === currentUserID;
 
@@ -160,7 +167,7 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         changeLogItems.push(<DiscussionOptionsChangeLog discussion={discussion} />);
     }
 
-    let permissionCheckedItems: React.ReactNode[] = [];
+    let permissionCheckedAndIntegrationItems: React.ReactNode[] = [];
     if (additionalDiscussionOptions.length) {
         // Do the extras
         additionalDiscussionOptions
@@ -190,7 +197,7 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
                             );
                             break;
                         default:
-                            permissionCheckedItems.push(
+                            permissionCheckedAndIntegrationItems.push(
                                 <option.component discussion={discussion} onSuccess={onMutateSuccess} />,
                             );
                             break;
@@ -216,9 +223,23 @@ const DiscussionOptionsMenu: FunctionComponent<IDiscussionOptionsMenuProps> = ({
         items.push(...changeLogItems);
     }
 
-    if (permissionCheckedItems.length > 0) {
+    availableIntegrations
+        .filter(({ recordTypes }) => recordTypes.includes("discussion"))
+        .forEach(({ attachmentType }) => {
+            permissionCheckedAndIntegrationItems.push(
+                <IntegrationContextProvider
+                    recordType="discussion"
+                    attachmentType={attachmentType}
+                    recordID={discussion.discussionID}
+                >
+                    <IntegrationButtonAndModal onSuccess={onMutateSuccess} />
+                </IntegrationContextProvider>,
+            );
+        });
+
+    if (permissionCheckedAndIntegrationItems.length > 0) {
         items.push(<DropDownItemSeparator />);
-        items.push(...permissionCheckedItems);
+        items.push(...permissionCheckedAndIntegrationItems);
     }
 
     if (items.length === 0) {

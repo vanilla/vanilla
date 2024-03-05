@@ -109,29 +109,9 @@ export const globalCSS = useThemeCache(() => {
     });
 
     injectGlobal({
-        ".page": {
-            display: "flex",
-            overflow: "visible",
-            flexDirection: "column",
-            width: percent(100),
-            minHeight: viewHeight(100),
-            position: "relative",
-            zIndex: 0,
-        },
-    });
-
-    injectGlobal({
         button: {
             WebkitAppearance: "none",
             MozAppearance: "none",
-        },
-    });
-
-    injectGlobal({
-        ".page-minHeight": {
-            flexGrow: 1,
-            display: "flex",
-            flexDirection: "column",
         },
     });
 

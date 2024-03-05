@@ -69,6 +69,11 @@ export function DiscussionListAsset(props: IProps) {
             pinOrder: getPinOrder(sort),
         };
 
+        // we always receive this from props, so reset it here to avoid categoryID from previous page/state if navigating between react pages
+        if (props.apiParams?.categoryID) {
+            finalParams.categoryID = props.apiParams?.categoryID;
+        }
+
         // In case a community manager shared a link that had one of these set.
         // Display a permission error and exclude the parameter.
         if (finalParams.internalStatusID?.length && !isCommunityManager) {
@@ -125,6 +130,7 @@ export function DiscussionListAsset(props: IProps) {
             paginationProps={paginationProps}
             apiParams={actualApiParams}
             updateApiParams={updateApiParams}
+            isPreview={props.isPreview}
         />
     );
 

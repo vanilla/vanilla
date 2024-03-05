@@ -10,11 +10,13 @@ import React from "react";
 interface IProps extends Omit<React.ComponentProps<typeof NewPostMenu>, "items"> {}
 
 export function NewPostMenuPreview(props: IProps) {
+    const postTypes = LayoutEditorPreviewData.getPostTypes({ ...props });
     return (
         <NewPostMenu
             {...props}
-            items={LayoutEditorPreviewData.getPostTypes({ ...props })}
-            postableDiscussionTypes={["discussion", "question", "poll"]}
+            items={postTypes.options}
+            postableDiscussionTypes={postTypes.types}
+            forceDesktopOnly
             disableDropdownItemsClick
         />
     );

@@ -15,8 +15,9 @@ import Translate from "@library/content/Translate";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ErrorMessages from "@library/forms/ErrorMessages";
+import InputBlock from "@library/forms/InputBlock";
 import RadioButton from "@library/forms/RadioButton";
-import RadioButtonGroup from "@library/forms/RadioButtonGroup";
+import { RadioGroupContext } from "@library/forms/RadioGroupContext";
 import { PageHeadingBox } from "@library/layout/PageHeadingBox";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
 import ButtonLoader from "@library/loaders/ButtonLoader";
@@ -70,29 +71,21 @@ function LegacyLayoutForm(props: IFormProps) {
 
     return (
         <>
-            <RadioButtonGroup legend={radios.legendLabel}>
-                <RadioButton
-                    onChecked={() => {
-                        onChange({
-                            [customLayoutConfigKey]: true,
-                        });
+            <InputBlock legend={radios.legendLabel}>
+                <RadioGroupContext.Provider
+                    value={{
+                        value: isCustom ? "custom" : "legacy",
+                        onChange: (value) => {
+                            onChange({
+                                [customLayoutConfigKey]: value === "custom",
+                            });
+                        },
                     }}
-                    checked={isCustom}
-                    label={radios.customLabel}
-                    value="custom"
-                />
-
-                <RadioButton
-                    onChecked={() => {
-                        onChange({
-                            [customLayoutConfigKey]: false,
-                        });
-                    }}
-                    checked={!isCustom}
-                    label={radios.legacyLabel}
-                    value="legacy"
-                />
-            </RadioButtonGroup>
+                >
+                    <RadioButton label={radios.customLabel} value={"custom"} />
+                    <RadioButton label={radios.legacyLabel} value={"legacy"} />
+                </RadioGroupContext.Provider>
+            </InputBlock>
             {props.legacyLayoutTypes && legacyLayoutConfigKey && (
                 <div className={cx(classes.legacyOptions, { disabled: isCustom })}>
                     <PageHeadingBox

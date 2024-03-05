@@ -127,13 +127,11 @@ export function DiscussionListFilter(props: IProps) {
                                         setFilterStatus(type);
                                     }}
                                     label={t("Post Type")}
-                                    inModal
                                 />
                                 <SelectStatuses
                                     value={values.statusID}
                                     onChange={(statusID) => setValues({ ...values, statusID })}
                                     label={t("Post Status")}
-                                    inModal
                                     types={filterStatus}
                                 />
                                 {isCommunityManager && (
@@ -147,7 +145,6 @@ export function DiscussionListFilter(props: IProps) {
                                     value={values.tagID}
                                     onChange={(tagID) => setValues({ ...values, tagID })}
                                     label={t("Tags")}
-                                    inModal
                                 />
                             </FrameBody>
                         }

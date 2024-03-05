@@ -191,7 +191,14 @@ final class Timers
             return;
         }
         if (count($this->timeSpans) > 5000) {
-            ErrorLogger::warning("Too many timers have been recorded.", ["timers"]);
+            ErrorLogger::warning(
+                "Too many timers have been recorded.",
+                ["timers"],
+                [
+                    Logger::FIELD_TIMERS => $this->getAggregateTimers(),
+                ]
+            );
+            $this->isEnabled = false;
             return;
         }
         $this->currentSpanUUID = $span->getUuid();
@@ -258,11 +265,10 @@ final class Timers
         if (!$this->isEnabled) {
             return false;
         }
-        $session = \Gdn::session();
         $config = \Gdn::config();
 
-        if (!$config->get("trace.profiler", true)) {
-            // Never record traces if the feature is disabled. On by default.
+        if (!$config->get("trace.profiler", false)) {
+            // Never record traces if the feature is disabled. Off by default.
             return false;
         }
 
@@ -272,17 +278,13 @@ final class Timers
             return false;
         }
 
-        if ($session->getPermissions()->isSysAdmin()) {
-            // Always record sysadmin traces
-            return true;
-        }
-
-        if ($this->isSlowRequest()) {
-            return true;
-        }
-
         // Otherwise do a random sampling rate.
-        $samplingRate = $config->get("trace.samplingRate", 1000);
+        $samplingRate = $config->get("trace.samplingRate", 100000);
+        if ($this->isSlowRequest()) {
+            // Slow request get sampled at a higher rate.
+            $samplingRate = round($samplingRate / 100);
+        }
+
         $isSampleHit = random_int(1, $samplingRate) === 1;
         return $isSampleHit;
     }

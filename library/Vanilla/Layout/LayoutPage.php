@@ -12,6 +12,8 @@ use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ResponseException;
+use Garden\Web\Redirect;
 use Vanilla\Dashboard\Controllers\API\LayoutsApiController;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Http\InternalClient;
@@ -81,6 +83,12 @@ class LayoutPage extends ThemedPage
         $layoutData = $this->internalClient
             ->get("/layouts/lookup-hydrate", $query + ["includeNoScript" => true])
             ->getBody();
+
+        if (isset($layoutData["redirectTo"])) {
+            // Perform an actual redirect.
+            throw new ResponseException(new Redirect($layoutData["redirectTo"], $layoutData["status"] ?? 302));
+        }
+
         $this->setSeoContent($layoutData["seo"]["htmlContents"] ?? "");
 
         $layoutID = $layoutData["layoutID"];

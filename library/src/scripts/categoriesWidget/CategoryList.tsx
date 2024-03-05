@@ -16,6 +16,7 @@ import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { updateCategoryFollowCount } from "@library/categoriesWidget/CategoriesWidget.utils";
 import cloneDeep from "lodash/cloneDeep";
+import isEqual from "lodash/isEqual";
 
 export function CategoryList(props: ICategoriesWidgetProps) {
     const classes = categoryListClasses();
@@ -25,13 +26,20 @@ export function CategoryList(props: ICategoriesWidgetProps) {
         contentType: props.itemOptions?.contentType,
     };
 
-    const [categories, setCategories] = useState<ICategoryItem[]>(cloneDeep(props.itemData));
+    const itemData = cloneDeep(props.itemData);
+
+    const [categories, setCategories] = useState<ICategoryItem[]>(itemData);
     const [categoryWithFollowCountChange, setCategoryWithFollowCountChange] = useState<{
         categoryID: ICategoryItem["categoryID"];
         preferences: ICategoryItem["preferences"];
     } | null>(null);
 
     useEffect(() => {
+        // reset the state if itemData from props is changed
+        if (!isEqual(categories, itemData)) {
+            setCategories(itemData);
+        }
+
         if (categoryWithFollowCountChange) {
             const updatedCategories = updateCategoryFollowCount(
                 categories,
@@ -44,7 +52,7 @@ export function CategoryList(props: ICategoriesWidgetProps) {
             }
             setCategoryWithFollowCountChange(null);
         }
-    }, [categoryWithFollowCountChange]);
+    }, [categoryWithFollowCountChange, itemData]);
 
     const onCategoryFollowChange = (categoryWithNewPreferences: {
         categoryID: ICategoryItem["categoryID"];

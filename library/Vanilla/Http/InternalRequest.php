@@ -123,8 +123,10 @@ class InternalRequest extends HttpRequest implements RequestInterface
             $_COOKIE = $cookieStash;
         }
 
-        if (DebugUtils::isTestMode() && $data instanceof Redirect) {
-            throw new ResponseException($data);
+        if ($data instanceof Redirect) {
+            $ex = new ResponseException($data);
+            $ex->setIsInternal(true);
+            throw $ex;
         }
 
         $response = $data->asHttpResponse();

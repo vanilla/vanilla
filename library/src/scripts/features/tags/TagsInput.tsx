@@ -26,7 +26,7 @@ export function TagsInput(props: IProps) {
     return (
         <Tokens
             {...props}
-            value={!props.value ? [] : props.value}
+            value={props.value ?? []}
             onInputChange={setText}
             onChange={(options) => {
                 props.onChange(options);

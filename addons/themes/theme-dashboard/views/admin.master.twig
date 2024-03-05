@@ -5,6 +5,11 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         {{ renderControllerAsset("Head") }}
+        <style>
+            body.isLoading .main-row {
+                visibility: hidden;
+            }
+        </style>
         <noscript>
             <style>
                 .fullPageLoader {
@@ -14,10 +19,14 @@
                     max-height: initial;
                     height: initial;
                 }
+
+                body.isLoading .main-row {
+                    visibility: visible;
+                }
             </style>
         </noscript>
     </head>
-    <body class="{{ cssClass }}">
+    <body class="{{ cssClass }} isLoading">
         {% include "@resources/svg-symbols.html" %}
         {{ renderControllerAsset("Symbols") }}
         <div class="main-container">
@@ -26,12 +35,6 @@
                 <div class="panel panel-left">
                     <div class="panel-nav panel-content-wrapper">
                         <div class="js-fluid-fixed panel-content">
-                            <a href="/" class="title">
-                                {{ forumLinkLabel }}
-                                <svg class="icon icon-svg icon-16" alt="external-link" viewbox="0 0 17 17">
-                                    <use xlink:href="#external-link"></use>
-                                </svg>
-                            </a>
                             <div id="panel-nav" class="js-panel-nav">
                                 {{ dashboardNav|raw }}
                             </div>

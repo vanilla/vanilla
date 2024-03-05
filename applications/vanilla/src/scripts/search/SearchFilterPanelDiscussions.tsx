@@ -7,7 +7,7 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
-import { useSearchForm } from "@library/search/SearchContext";
+import { useSearchForm } from "@library/search/SearchFormContext";
 import { t } from "@library/utility/appUtils";
 import React, { useEffect, useMemo } from "react";
 import Checkbox from "@library/forms/Checkbox";
@@ -27,7 +27,7 @@ import { useSiteSectionContext } from "@library/utility/SiteSectionContext";
  */
 export function SearchFilterPanelDiscussions() {
     const { form, updateForm, search } = useSearchForm<IDiscussionSearchTypes>();
-    const { value, setValue } = useSearchScope();
+    const { value: scope, setValue } = useSearchScope();
 
     const classesInputBlock = inputBlockClasses();
 
@@ -44,31 +44,22 @@ export function SearchFilterPanelDiscussions() {
         return form?.tagsOptions && form.tagsOptions.length > 0;
     }, [form]);
 
-    // If the scope is everywhere, the category or tag filters should be cleared
+    // If the scope is changed to a value other than 'local' the category or tag filters should be cleared
     useEffect(() => {
-        if (value?.value !== SEARCH_SCOPE_LOCAL) {
-            if (isFilteringCategories) {
-                updateForm({ categoryOptions: [] });
-            }
-            if (isFilteringTags) {
-                updateForm({ tagsOptions: [] });
-            }
+        if (scope && scope.value !== SEARCH_SCOPE_LOCAL) {
+            updateForm({
+                ...(isFilteringCategories ? { categoryOptions: [] } : {}),
+                ...(isFilteringTags ? { tagsOptions: [] } : {}),
+            });
         }
-    }, [value]);
+    }, [scope]);
 
-    // If a category filter is selected, the scope must be local
+    // If a tag filter or a category filter is applied, the scope should be set to 'local'.
     useEffect(() => {
-        if (value?.value !== SEARCH_SCOPE_LOCAL && isFilteringCategories) {
+        if (scope && scope.value !== SEARCH_SCOPE_LOCAL && (isFilteringTags || isFilteringCategories)) {
             setValue && setValue(SEARCH_SCOPE_LOCAL);
         }
-    }, [isFilteringCategories]);
-
-    // If a tag filter is selected, the scope must be local
-    useEffect(() => {
-        if (value?.value !== SEARCH_SCOPE_LOCAL && isFilteringTags) {
-            setValue && setValue(SEARCH_SCOPE_LOCAL);
-        }
-    }, [isFilteringTags]);
+    }, [isFilteringTags, isFilteringCategories]);
 
     return (
         <FilterFrame handleSubmit={search}>
@@ -79,7 +70,7 @@ export function SearchFilterPanelDiscussions() {
                         const { value } = event.target;
                         updateForm({ name: value });
                     },
-                    value: form.name || undefined,
+                    value: form.name ?? "",
                 }}
             />
             <MultiUserInput
@@ -109,7 +100,9 @@ export function SearchFilterPanelDiscussions() {
                 }}
                 parentCategoryID={siteSection?.attributes?.categoryID ?? null}
                 value={form.categoryOptions ?? []}
-                labelNote={isFilteringCategories ? t("Searching categories on this community only") : undefined}
+                labelNote={
+                    scope && isFilteringCategories ? t("Searching categories on this community only") : undefined
+                }
             />
 
             <CheckboxGroup tight={true}>
@@ -147,7 +140,16 @@ export function SearchFilterPanelDiscussions() {
                 onChange={(options: IComboBoxOption[]) => {
                     updateForm({ tagsOptions: options });
                 }}
-                labelNote={isFilteringTags ? t("Searching tags on this community only") : undefined}
+                labelNote={scope && isFilteringTags ? t("Searching tags on this community only") : undefined}
+            />
+
+            <Checkbox
+                label={t("Match All Tags")}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    updateForm({ tagOperator: event.target.checked ? "and" : "or" });
+                }}
+                checked={form.tagOperator === "and"}
+                className={classesInputBlock.root}
             />
 
             <CommunityPostTypeFilter />

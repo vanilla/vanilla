@@ -45,6 +45,18 @@ class ConversationModelTest extends SiteTestCase
     }
 
     /**
+     * Test `ConversationModel`'s `addUserAllowed()` method.
+     */
+    public function testAddUserAllowed(): void
+    {
+        $conversationID = $this->createConversation(1, 2);
+        $checkWithoutCount = $this->conversationModel->addUserAllowed($conversationID);
+        $this->assertTrue($checkWithoutCount);
+        $checkWithSpecifiedCount = $this->conversationModel->addUserAllowed($conversationID, 3);
+        $this->assertTrue($checkWithSpecifiedCount);
+    }
+
+    /**
      * Test DateUpdated for /dba/counts, on  conversation with deleted messages, test that the count doesn't crash.
      */
     public function testDateUpdatedCount(): void

@@ -9,7 +9,10 @@ $desc = t(
 
 $links = "<ul>";
 $links .= wrap(
-    anchor(t("Video tutorial on managing roles &amp; permissions"), "https://success.vanillaforums.com/kb/articles/449-f-roles-and-permissions-video"),
+    anchor(
+        t("Video tutorial on managing roles &amp; permissions"),
+        "https://success.vanillaforums.com/kb/articles/449-f-roles-and-permissions-video"
+    ),
     "li"
 );
 $links .= wrap(
@@ -70,10 +73,16 @@ $this->fireEvent("AfterRolesInfo");
                         echo htmlEsc(t(val("Type", $Role)));
                     } ?>
                 </td>
-                <td><?php echo anchor(
-                    $Role["CountUsers"] ?: 0,
-                    "/dashboard/user?Keywords=" . urlencode($Role["Name"])
-                ); ?></td>
+                <td>
+                    <?php
+                    $Query = http_build_query(
+                        Gdn::config("Feature.NewUserManagement.Enabled")
+                            ? ["roleIDs" => [$Role["RoleID"]]]
+                            : ["Keywords" => $Role["Name"]]
+                    );
+                    echo anchor($Role["CountUsers"] ?: 0, "/dashboard/user?" . $Query);
+                    ?>
+                </td>
                 <td class="options">
                     <div class="btn-group">
                     <?php if ($Role["CanModify"]) {

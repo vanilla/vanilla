@@ -554,6 +554,17 @@ export function widgetsSchemaTransformer(
 
         value.showTitle = value?.titleType !== "none";
         value.showDescription = value?.descriptionType !== "none";
+
+        if (value.background?.imageSource === undefined) {
+            const imageSourceDefault = value.background?.image !== undefined ? "custom" : "styleGuide";
+            value = {
+                ...value,
+                background: {
+                    ...value.background,
+                    imageSource: imageSourceDefault,
+                },
+            };
+        }
     }
 
     const resolvedTitle = setParamField("title", transformedSchema, value);

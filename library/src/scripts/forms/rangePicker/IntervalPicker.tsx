@@ -13,7 +13,10 @@ import { labelize } from "@vanilla/utils";
 import { IDateModifierRange, TimeInterval } from "@library/forms/rangePicker/types";
 import { timeFrameFromDateModifierRange } from "@library/forms/rangePicker/utils";
 import moment from "moment";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import Message from "@library/messages/Message";
+import { css } from "@emotion/css";
+import { Icon } from "@vanilla/icons";
 
 const intervals: TimeInterval[] = [
     TimeInterval.HOURLY,
@@ -44,11 +47,10 @@ export function IntervalPicker(props: IProps) {
     const isInRange = (value: number, min: number, max: number): boolean => value >= min && value <= max;
 
     /**
-     * This keeps record of the available intervals for a given range.
-     * If there are multiple available intervals for a range, the first
-     * array value is considered the default.
+     * This keeps record of the optimized intervals for a given range.
+     * If there are multiple optimized intervals for a range.
      */
-    const availableIntervals = useMemo<TimeInterval[]>(() => {
+    const optimizedIntervals = useMemo<TimeInterval[]>(() => {
         const { start, end } = timeFrameFromDateModifierRange(range);
         // This is the number of days between start and end
         const dayDelta = Math.abs(moment(start).diff(moment(end).endOf("day"), "days"));
@@ -81,14 +83,11 @@ export function IntervalPicker(props: IProps) {
         return [];
     }, [range]);
 
-    /**
-     * Fires the onChange when user selection is not valid for the range
-     */
-    useEffect(() => {
-        if (!availableIntervals.includes(interval)) {
-            onChange(availableIntervals[0]);
-        }
-    }, [availableIntervals, interval, onChange]);
+    const wrapper = css({
+        "* + &": {
+            margin: "0 0 16px",
+        },
+    });
 
     return (
         <section className={className}>
@@ -100,14 +99,19 @@ export function IntervalPicker(props: IProps) {
                 setData={onChange}
             >
                 {intervals.map((interval) => (
-                    <RadioInputAsButton
-                        key={interval}
-                        label={labelize(t(interval))}
-                        data={interval}
-                        disabled={!availableIntervals.includes(interval)}
-                    />
+                    <RadioInputAsButton key={interval} label={labelize(t(interval))} data={interval} />
                 ))}
             </RadioGroup>
+            {!optimizedIntervals.includes(interval) && (
+                <Message
+                    className={wrapper}
+                    type="info"
+                    icon={<Icon icon={"data-information"} />}
+                    stringContents={t(
+                        "Exportable data available, but charts may not be visually optimized for this time and date range.",
+                    )}
+                />
+            )}
         </section>
     );
 }

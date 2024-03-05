@@ -39,14 +39,14 @@ trait MockResponseTrait
      * @param string $uri
      * @param HttpResponse $response
      * @param string $method
-     * @param string|null $bodyRequest
+     * @param string|null|array $bodyRequest
      * @return $this
      */
     public function addMockResponse(
         string $uri,
         HttpResponse $response,
         string $method = HttpRequest::METHOD_GET,
-        ?string $bodyRequest = null
+        $bodyRequest = null
     ) {
         $key = $this->makeMockResponseKey($uri, $method, $bodyRequest);
         $this->mockedResponses[$key] = $response;

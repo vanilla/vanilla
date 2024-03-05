@@ -12,7 +12,6 @@ import { initAllUserContent } from "@library/content";
 import { applyCompatibilityUserCards } from "@library/features/userCard/UserCard.compat";
 import { NO_WRAPPER_CONFIG, useStoryConfig } from "@library/storybook/StoryContext";
 import { onReady, setMeta, _executeReady } from "@library/utility/appUtils";
-import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
 import { storiesOf } from "@storybook/react";
 import { applySharedPortalContext } from "@vanilla/react-utils";
 import classNames from "classnames";
@@ -115,7 +114,6 @@ function HtmlRenderComponent(props: { html: string; data: IHtmlData }) {
         compatibilityStyles();
         applyCompatibilityIcons();
         applyCompatibilityUserCards();
-        loadedCSS();
         initAllUserContent();
         setMeta("themeFeatures.NewQuickLinks", true);
 

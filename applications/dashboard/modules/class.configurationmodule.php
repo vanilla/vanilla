@@ -134,7 +134,7 @@ class ConfigurationModule extends Gdn_Module
                     }
 
                     // Old image to clean!
-                    $options["CurrentImage"] = c($name, false);
+                    $options["CurrentImage"] = Gdn::config($name);
 
                     // Save the new image and clean up the old one.
                     $form->saveImage($name, $options);
@@ -165,7 +165,7 @@ class ConfigurationModule extends Gdn_Module
             // Halt the save if we've had errors assigned.
             if ($form->errorCount() == 0) {
                 // Save it to the config.
-                saveToConfig($data, ["RemoveEmpty" => true]);
+                Gdn::config()->saveToConfig($data, ["RemoveEmpty" => true]);
                 $this->_Sender->informMessage(t("Saved"));
             }
         } else {

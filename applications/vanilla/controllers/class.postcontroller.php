@@ -179,7 +179,7 @@ class PostController extends VanillaController
         $categoryData = $this->ShowCategorySelector ? CategoryModel::categories() : false;
 
         // Check permission
-        if (isset($this->Discussion)) {
+        if (isset($this->Discussion) and $draftID == 0) {
             // Make sure that content can (still) be edited.
             $canEdit = DiscussionModel::canEdit($this->Discussion);
             if (!$canEdit) {
@@ -512,6 +512,7 @@ class PostController extends VanillaController
             $record = $this->Draft = $this->DraftModel->getID($draftID);
             $this->CategoryID = $this->Draft->CategoryID;
             $this->setData("Type", $record->Type ?? "Discussion");
+            $this->setData("Discussion", $record, true);
             // Verify this is their draft
             if (val("InsertUserID", $this->Draft) != Gdn::session()->UserID) {
                 throw permissionException();
@@ -997,6 +998,8 @@ class PostController extends VanillaController
         }
 
         $this->fireEvent("BeforeCommentRender");
+
+        include_once $this->fetchViewLocation("reaction_functions", "reactions", "dashboard");
 
         if ($this->deliveryType() == DELIVERY_TYPE_DATA) {
             if ($this->data("Comments") instanceof Gdn_DataSet) {

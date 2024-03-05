@@ -33,6 +33,9 @@ class TimersTest extends SiteTestCase
 
         $this->timers = new Timers();
         self::container()->setInstance(Timers::class, $this->timers);
+        \Gdn::config()->saveToConfig([
+            "trace.profiler" => true,
+        ]);
     }
 
     /**

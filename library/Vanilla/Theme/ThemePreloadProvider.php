@@ -75,11 +75,18 @@ class ThemePreloadProvider implements ReduxActionProviderInterface
         $this->themeService = $themeService;
     }
 
+    private function clearLocaleCaches(): void
+    {
+        $this->theme = null;
+        $this->inlineStyles = "";
+    }
+
     /**
      * @param int|string $forcedThemeKey
      */
     public function setForcedThemeKey($forcedThemeKey): void
     {
+        $this->clearLocaleCaches();
         $this->forcedThemeKey = $forcedThemeKey;
     }
 
@@ -88,6 +95,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface
      */
     public function setForcedRevisionID(?int $revisionID = null): void
     {
+        $this->clearLocaleCaches();
         $this->revisionID = $revisionID;
     }
 

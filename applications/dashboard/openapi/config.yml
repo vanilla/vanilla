@@ -816,3 +816,11 @@ components:
                     x-key: "Garden.ExternalSearch.Query"
                     x-read: community.manage
                     x-write: community.manage
+                "externalSearch.resultsInNewTab":
+                    description: |
+                        To open the results page in a new tab or within community
+                    type: boolean
+                    default: false
+                    x-key: "Garden.ExternalSearch.ResultsInNewTab"
+                    x-read: community.manage
+                    x-write: community.manage

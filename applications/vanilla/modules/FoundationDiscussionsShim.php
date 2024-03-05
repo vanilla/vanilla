@@ -38,6 +38,8 @@ class FoundationDiscussionsShim
     /** @var EventManager */
     private $eventManager;
 
+    private \ReactionModel $reactionModel;
+
     /**
      * DI.
      *
@@ -47,6 +49,7 @@ class FoundationDiscussionsShim
      * @param \CategoryModel $categoryModel
      * @param \TagModel $tagModel
      * @param EventManager $eventManager
+     * @param \ReactionModel $reactionModel
      */
     public function __construct(
         \DiscussionsApiController $discussionsApiController,
@@ -54,7 +57,8 @@ class FoundationDiscussionsShim
         \UserModel $userModel,
         \CategoryModel $categoryModel,
         \TagModel $tagModel,
-        EventManager $eventManager
+        EventManager $eventManager,
+        \ReactionModel $reactionModel
     ) {
         $this->discussionsApiController = $discussionsApiController;
         $this->container = $container;
@@ -62,6 +66,7 @@ class FoundationDiscussionsShim
         $this->categoryModel = $categoryModel;
         $this->tagModel = $tagModel;
         $this->eventManager = $eventManager;
+        $this->reactionModel = $reactionModel;
     }
 
     /**
@@ -150,6 +155,8 @@ class FoundationDiscussionsShim
         // In any case the category cache in the app should be primed already from the initial fetch.
         // It's worth the CPU cycles to be sure.
         $this->categoryModel->expandCategories($normalized, "category");
+
+        $this->reactionModel->expandDiscussionReactions($normalized);
 
         // Apply validation
         foreach ($normalized as &$normalizedItem) {

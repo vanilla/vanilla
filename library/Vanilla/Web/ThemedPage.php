@@ -18,7 +18,10 @@ abstract class ThemedPage extends Page
     protected $themeProvider;
 
     /** @var string|null */
-    protected $forcedThemeKey;
+    protected $forcedThemeKey = null;
+
+    /** @var string|null */
+    protected $forcedThemeRevisionID = null;
 
     /**
      * @inheritdoc
@@ -36,8 +39,23 @@ abstract class ThemedPage extends Page
         $this->themeProvider = $themeProvider;
         if ($this->forcedThemeKey !== null) {
             $this->themeProvider->setForcedThemeKey($this->forcedThemeKey);
+            if ($this->forcedThemeRevisionID !== null) {
+                $this->themeProvider->setForcedRevisionID($this->forcedThemeRevisionID);
+            }
         }
         $this->initAssets();
+    }
+
+    /**
+     * @param string $themeKey
+     * @param int|null $revisionID
+     * @return $this
+     */
+    public function withForcedTheme(string $themeKey, ?int $revisionID = null): ThemedPage
+    {
+        $this->forcedThemeKey = $themeKey;
+        $this->forcedThemeRevisionID = $revisionID;
+        return $this;
     }
 
     /**

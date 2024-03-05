@@ -10,17 +10,18 @@ import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { useStatusOptions } from "@library/features/discussions/filters/discussionListFilterHooks";
 import flatten from "lodash/flatten";
 import { IGroupOption } from "@library/forms/select/Tokens.loadable";
+import { useIsInModal } from "@library/modal/Modal.context";
 
 export interface ISelectStatusesProps {
     value: number[];
     onChange: (newValue: number[]) => void;
     label?: string;
-    inModal?: boolean;
     types?: string[];
 }
 
 export function SelectStatuses(props: ISelectStatusesProps) {
-    const { value: valueFromProps, onChange, label, inModal, types = [] } = props;
+    const isInModal = useIsInModal();
+    const { value: valueFromProps, onChange, label, types = [] } = props;
     const groups = useStatusOptions();
 
     const options = useMemo<IGroupOption[]>(() => {
@@ -62,6 +63,13 @@ export function SelectStatuses(props: ISelectStatusesProps) {
     }
 
     return (
-        <Tokens value={value} options={options} onChange={handleChange} label={label} inModal={inModal} showIndicator />
+        <Tokens
+            value={value}
+            options={options}
+            onChange={handleChange}
+            label={label}
+            inModal={isInModal}
+            showIndicator
+        />
     );
 }

@@ -6,6 +6,7 @@
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { IUserFragment } from "@library/@types/api/users";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
+import { IReaction } from "@dashboard/@types/api/reaction";
 
 export interface IComment {
     name: string;
@@ -20,6 +21,7 @@ export interface IComment {
     insertUser: IUserFragment;
     url: string;
     attributes: any;
+    reactions?: IReaction[];
 }
 
 export interface ICommentEdit {
@@ -39,4 +41,10 @@ export interface ICommentEmbed {
     format: string;
     body?: string;
     bodyRaw: string;
+}
+
+export enum QnAStatus {
+    ACCEPTED = "accepted",
+    REJECTED = "rejected",
+    PENDING = "pending",
 }

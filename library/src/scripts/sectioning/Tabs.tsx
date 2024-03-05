@@ -34,7 +34,7 @@ export interface ITabsProps {
     largeTabs?: boolean;
     extendContainer?: boolean;
     legacyButtons?: boolean;
-    onChange?: (newTab: ITabData) => void;
+    onChange?: (newTab: ITabData) => void | Promise<void>;
     extraButtons?: React.ReactNode;
     defaultTabIndex?: number;
     includeBorder?: boolean;

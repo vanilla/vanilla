@@ -8,22 +8,22 @@ import { IDiscussion } from "@dashboard/@types/api/discussion";
 import apiv2 from "@library/apiv2";
 import { RecordID } from "@vanilla/utils";
 
-export const DiscussionsApi = {
-    get: async (apiParams: DiscussionsApi.GetParams): Promise<IDiscussion> => {
-        const result = await apiv2.get<IDiscussion>(`/discussions/${apiParams.discussionID}`, {
-            params: { expand: ["insertUser", "breadcrumbs", "reactions", "status", "status.log"] },
+const DiscussionsApi = {
+    get: async (
+        discussionID: IDiscussion["discussionID"],
+        apiParams: DiscussionsApi.GetParams,
+    ): Promise<IDiscussion> => {
+        const result = await apiv2.get<IDiscussion>(`/discussions/${discussionID}`, {
+            params: apiParams,
         });
         return result.data;
     },
 
-    patch: async (apiParams: DiscussionsApi.PatchParams): Promise<IDiscussion> => {
-        const { discussionID, ...body } = apiParams;
-        const result = await apiv2.patch<IDiscussion>(`/discussions/${discussionID}`, body);
-        return result.data;
-    },
-
-    putReaction: async (commentID: RecordID, apiParams: DiscussionsApi.PutReactionParams) => {
-        const result = await apiv2.put<IDiscussion[]>(`/comments/${commentID}/reactions`, apiParams);
+    patch: async (
+        discussionID: IDiscussion["discussionID"],
+        apiParams: DiscussionsApi.PatchParams,
+    ): Promise<IDiscussion> => {
+        const result = await apiv2.patch<IDiscussion>(`/discussions/${discussionID}`, apiParams);
         return result.data;
     },
 
@@ -37,3 +37,5 @@ export const DiscussionsApi = {
         return result.data;
     },
 };
+
+export default DiscussionsApi;

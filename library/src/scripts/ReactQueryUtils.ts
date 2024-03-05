@@ -24,7 +24,7 @@ export function queryResultToILoadable<T = never, E = IApiError>(
             };
         case "loading":
             return {
-                status: LoadStatus.LOADING,
+                status: queryResult.isFetching ? LoadStatus.LOADING : LoadStatus.PENDING,
             };
         default:
             return {

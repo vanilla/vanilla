@@ -28,7 +28,6 @@ export interface ISectionProps extends React.HTMLAttributes<HTMLElement> {
     toggleMobileMenu?: (isOpen: boolean) => void;
     contentTag?: ElementType;
     growMiddleBottom?: boolean;
-    topPadding?: boolean;
     leftTop?: React.ReactNode;
     leftBottom?: React.ReactNode;
     mainTop?: React.ReactNode;
@@ -83,7 +82,6 @@ export default function Section(props: ISectionProps) {
         className,
         contentTag = "div",
         growMiddleBottom = false,
-        topPadding = true,
         leftTop,
         leftBottom,
         middleTop,
@@ -166,7 +164,6 @@ export default function Section(props: ISectionProps) {
         { noRightPanel: !shouldRenderRightPanel },
         { noBreadcrumbs: !shouldRenderBreadcrumbs },
         className,
-        { hasTopPadding: topPadding },
         growMiddleBottom ? inheritHeightClass() : "",
         widgetClasses.widgetClass,
     );

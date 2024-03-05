@@ -19,6 +19,10 @@ import LazyDateRange from "@library/forms/LazyDateRange";
 import { useStackingContext } from "@vanilla/react-utils";
 import { css } from "@emotion/css";
 import { VanillaEditor } from "@library/vanilla-editor/VanillaEditor";
+import RadioButton from "@library/forms/RadioButton";
+import { useUniqueID } from "@library/utility/idUtils";
+import { RadioGroupContext } from "@library/forms/RadioGroupContext";
+import { useIsInModal } from "@library/modal/Modal.context";
 
 const createOptionsFromRecord = (options?: Record<string, React.ReactNode>): IComboBoxOption[] => {
     return options
@@ -32,19 +36,13 @@ const createOptionsFromRecord = (options?: Record<string, React.ReactNode>): ICo
 };
 
 export function FormControl(props: IControlProps) {
-    const {
-        disabled,
-        onChange,
-        onBlur,
-        control,
-        instance,
-        schema,
-        required,
-        inModal,
-        dateRangeDirection = "above",
-    } = props;
+    const { disabled, onChange, onBlur, control, instance, schema, required, dateRangeDirection = "above" } = props;
 
-    const value = instance ?? schema.default;
+    const isInModal = useIsInModal();
+
+    const inputName = useUniqueID("input");
+
+    const value = instance;
 
     const { zIndex } = useStackingContext();
 
@@ -151,6 +149,27 @@ export function FormControl(props: IControlProps) {
                 />
             );
         }
+        case "radio":
+            return (
+                <RadioGroupContext.Provider value={{ value, onChange }}>
+                    {Object.entries(control.choices.staticOptions ?? []).map(
+                        ([optionValue, label]: [string, string]) => (
+                            <RadioButton
+                                disabled={disabled}
+                                name={inputName}
+                                key={optionValue}
+                                label={label}
+                                value={optionValue}
+                                tooltip={
+                                    control.tooltipsPerOption && control.tooltipsPerOption[optionValue]
+                                        ? control.tooltipsPerOption[optionValue]
+                                        : undefined
+                                }
+                            />
+                        ),
+                    )}
+                </RadioGroupContext.Provider>
+            );
         case "dropDown": {
             const options = createOptionsFromRecord(control.choices.staticOptions);
             const currentValue = options.find((opt) => `${opt.value}` === `${value}`);
@@ -198,7 +217,7 @@ export function FormControl(props: IControlProps) {
                         onChange={(options) => onChange(options.map(({ value }) => value))}
                         onBlur={onBlur}
                         options={options}
-                        inModal={inModal}
+                        inModal={isInModal}
                     />
                     {!!required && (
                         <input
@@ -217,7 +236,9 @@ export function FormControl(props: IControlProps) {
             return (
                 <VanillaEditor
                     showConversionNotice={!!control.initialFormat && control.initialFormat !== "rich2"}
-                    onChange={onChange}
+                    onChange={(val) => {
+                        onChange(JSON.stringify(val));
+                    }}
                     onBlur={onBlur}
                     initialContent={value}
                     initialFormat={control.initialFormat}

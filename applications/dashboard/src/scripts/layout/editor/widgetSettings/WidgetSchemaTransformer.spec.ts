@@ -306,13 +306,20 @@ describe("WidgetSchemaTransformer", () => {
             },
             descriptionType: "none",
         };
+        const mockBannerValue = {
+            background: {
+                imageSource: "styleGuide",
+            },
+            description: "",
+        };
         // The newest schema version
         const withTypes = widgetsSchemaTransformer(mockBannerSchema, {}, mockValueWithTypes);
-        expect(withTypes.value).toEqual(mockValueWithTypes);
+        expect(withTypes.value).toEqual({ ...mockBannerValue, ...mockValueWithTypes });
 
         // Schema version where types are omitted but values are empty strings
         const withoutTypes = widgetsSchemaTransformer(mockBannerSchema, {}, mockValueWithoutTypes);
         expect(withoutTypes.value).toEqual({
+            ...mockBannerValue,
             ...mockValueWithoutTypes,
             titleType: "siteSection/name",
             title: {
@@ -329,6 +336,7 @@ describe("WidgetSchemaTransformer", () => {
         // Schema version where entire fields are omitted
         const withoutFields = widgetsSchemaTransformer(mockBannerSchema, {}, mockValueWithoutFields);
         expect(withoutFields.value).toEqual({
+            ...mockBannerValue,
             ...mockValueWithoutFields,
             titleType: "siteSection/name",
             title: {

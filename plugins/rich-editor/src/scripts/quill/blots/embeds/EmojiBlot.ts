@@ -5,7 +5,7 @@
  */
 
 import Embed from "quill/blots/embed";
-import { setData, getData, convertToSafeEmojiCharacters, isEmojiSupported } from "@vanilla/dom-utils";
+import { setData, getData } from "@vanilla/dom-utils";
 
 export default class EmojiBlot extends Embed {
     public static className = "safeEmoji";
@@ -14,12 +14,8 @@ export default class EmojiBlot extends Embed {
 
     public static create(data) {
         const node = super.create(data) as HTMLElement;
-        if (isEmojiSupported()) {
-            node.innerHTML = data.emojiChar;
-            node.classList.add("nativeEmoji");
-        } else {
-            node.innerHTML = convertToSafeEmojiCharacters(data.emojiChar);
-        }
+        node.innerText = data.emojiChar;
+        node.classList.add("nativeEmoji");
         setData(node, "data", data);
         return node;
     }

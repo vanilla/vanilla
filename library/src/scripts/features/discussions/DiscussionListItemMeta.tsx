@@ -26,6 +26,7 @@ import { usePermissionsContext } from "@library/features/users/PermissionsContex
 import { qnaStatus } from "./DiscussionListItem";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { getMeta } from "@library/utility/appUtils";
+import { sprintf } from "sprintf-js";
 
 export interface IDiscussionItemMetaProps extends IDiscussion {
     inTile?: boolean;
@@ -75,6 +76,18 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
     const displayLastUser = countComments > 0 && !!lastUser && display.lastUser;
 
     const displayQnaStatus = !!attributes?.question?.status && display.qnaStatus;
+    const getQNAClass = (status: string) => {
+        switch (status) {
+            case "unanswered":
+                return classes.qnaStatusUnanswered;
+            case "answered":
+                return classes.qnaStatusAnswered;
+            case "accepted":
+                return classes.qnaStatusAccepted;
+            default:
+                return "";
+        }
+    };
 
     const displayViewCount = countViews > 0 && display.viewCount;
     const renderViewCountAsIcon = displayViewCount && renderAsIcons;
@@ -107,10 +120,10 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
             )}
             {closed && <MetaTag tagPreset={variables.labels.tagPreset}>{t("Closed")}</MetaTag>}
 
-            {pinned && <MetaTag tagPreset={variables.labels.tagPreset}>{t("Announcement")}</MetaTag>}
+            {pinned && <MetaTag className={classes.announcementTag}>{t("Announcement")}</MetaTag>}
 
             {displayQnaStatus && (
-                <MetaTag tagPreset={variables.labels.tagPreset}>
+                <MetaTag className={getQNAClass(attributes.question.status)}>
                     {t(`${qnaStatus(attributes!.question!.status!)}`)}
                 </MetaTag>
             )}
@@ -156,11 +169,7 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
                     <Translate source="<0/> comments" c0={countComments} />
                 </MetaItem>
             )}
-            {displayScore && !renderScoreAsIcon && (
-                <MetaItem>
-                    <Translate source="<0/> reactions" c0={score ?? 0} />
-                </MetaItem>
-            )}
+            {displayScore && !renderScoreAsIcon && <MetaItem>{getPointsLabel(score ?? 0)}</MetaItem>}
             {displayStartedByUser && (
                 <MetaItem>
                     <Translate
@@ -216,4 +225,9 @@ export function DiscussionListItemMeta(props: IDiscussionItemMetaProps) {
             )}
         </>
     );
+}
+
+function getPointsLabel(points: number): string {
+    const label = points === 0 ? t("%s point") : t("%s points");
+    return sprintf(label, points);
 }

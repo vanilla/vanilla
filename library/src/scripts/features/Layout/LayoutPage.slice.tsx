@@ -34,6 +34,10 @@ export const layoutSlice = createSlice({
                 return state;
             })
             .addCase(lookupLayout.fulfilled, (state, action) => {
+                if (action.payload.redirectTo) {
+                    // Do nothing, thunk will redirect.
+                    return state;
+                }
                 const hash = stableObjectHash(action.meta.arg ?? {});
                 state.layoutsByHash[hash] = {
                     status: LoadStatus.SUCCESS,

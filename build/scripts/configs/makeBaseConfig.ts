@@ -129,12 +129,15 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
                                   loader: "style-loader",
                                   options: {
                                       insert: function insertAtTop(element: HTMLElement) {
+                                          const styleMeta = document.head.querySelector("vanilla-styles");
                                           const staticStylesheets = document.head.querySelectorAll(
                                               'link[rel="stylesheet"][static="1"]',
                                           );
-                                          const lastStaticStylesheet = staticStylesheets[staticStylesheets.length - 1];
-                                          if (lastStaticStylesheet) {
-                                              document.head.insertBefore(element, lastStaticStylesheet.nextSibling);
+                                          const lastStaticStylesheet =
+                                              staticStylesheets[staticStylesheets.length - 1]?.nextSibling;
+                                          const insertStylesBeforeElem = styleMeta ?? lastStaticStylesheet;
+                                          if (insertStylesBeforeElem) {
+                                              document.head.insertBefore(element, insertStylesBeforeElem);
                                           } else {
                                               document.head.appendChild(element);
                                           }
@@ -191,6 +194,10 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
                 "@dashboard/compatibilityStyles/Leaderboard.styles": path.resolve(
                     VANILLA_ROOT,
                     "library/src/scripts/leaderboardWidget/LeaderboardWidget.styles.ts",
+                ),
+                "@library/embeddedContent/embedService": path.resolve(
+                    VANILLA_ROOT,
+                    "library/src/scripts/embeddedContent/embedService.register.tsx",
                 ),
                 ...entryModel.aliases,
                 "library-scss": path.resolve(VANILLA_ROOT, "library/src/scss"),

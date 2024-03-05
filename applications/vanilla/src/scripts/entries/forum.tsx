@@ -30,6 +30,7 @@ import { RSSWidget } from "@library/rssWidget/RSSWidget";
 import { SearchWidget } from "@library/searchWidget/SearchWidget";
 import TabWidget from "@library/tabWidget/TabWidget";
 import { UnsubscribePageRoute } from "@library/unsubscribe/unsubscribePageRoutes";
+import { ConvertHTMLPageRoute } from "@library/convertHTML/convertHTMLPageRoutes";
 import { UserSpotlight } from "@library/userSpotlight/UserSpotlight";
 import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
 import { onReady } from "@library/utility/appUtils";
@@ -76,7 +77,7 @@ onReady(() => {
     triggerLegacyHashScrolling();
 });
 
-Router.addRoutes([UnsubscribePageRoute.route]);
+Router.addRoutes([UnsubscribePageRoute.route, ConvertHTMLPageRoute.route]);
 
 delegateEvent("click", ".js-addDiscussionToCollection", (event, triggeringElement) => {
     event.preventDefault();

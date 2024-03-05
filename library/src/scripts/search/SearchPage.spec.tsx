@@ -1,47 +1,60 @@
 /**
  * @author Mihran Abrahamian <mabrahamian@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
 import React from "react";
 import { render, act, cleanup, fireEvent, within, RenderResult } from "@testing-library/react";
-import { SearchFormContextProvider } from "./SearchFormContextProvider";
+import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
 import { SearchPageContent } from "./SearchPage";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
-import COMMUNITY_SEARCH_SOURCE from "./CommunitySearchSource";
 import { SearchService } from "./SearchService";
-import { SearchSourcesContextProvider } from "./SearchSourcesContextProvider";
 import DISCUSSIONS_SEARCH_DOMAIN from "@vanilla/addon-vanilla/search/DiscussionsSearchDomain";
-import { MOCK_SEARCH_DOMAIN, MockSearchSource } from "./__fixtures__/Search.fixture";
+import {
+    MOCK_ASYNC_SEARCH_DOMAIN,
+    MOCK_ASYNC_SEARCH_DOMAIN_LOADABLE,
+    MOCK_SEARCH_DOMAIN,
+    MockSearchSource,
+    MockSearchSourceWithAsyncDomains,
+} from "./__fixtures__/Search.fixture";
 import MEMBERS_SEARCH_DOMAIN from "@dashboard/components/panels/MembersSearchDomain";
 import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain";
 import { LiveAnnouncer } from "react-aria-live";
-import { SiteSectionContext, SiteSectionContextProvider } from "@library/utility/SiteSectionContext";
+import { SiteSectionContext } from "@library/utility/SiteSectionContext";
 import { mockSiteSection } from "@library/utility/__fixtures__/SiteSection.fixtures";
 import LOADABLE_DISCUSSIONS_SEARCH_DOMAIN from "@vanilla/addon-vanilla/search/DiscussionsSearchDomain.loadable";
 import LOADABLE_MEMBERS_SEARCH_DOMAIN from "@dashboard/components/panels/MembersSearchDomain.loadable";
+import { MemoryRouter } from "react-router";
+import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
+import { ISearchForm } from "./searchTypes";
+import LOADABLE_PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain.loadable";
 
 const MOCK_SEARCH_SOURCE = new MockSearchSource();
 
-function MockSearchPage() {
+const MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS = new MockSearchSourceWithAsyncDomains();
+
+function MockSearchPage(props: {
+    initialFormState?: React.ComponentProps<typeof SearchFormContextProvider>["initialFormState"];
+}) {
     return (
-        <SearchSourcesContextProvider>
+        <MemoryRouter>
             <PermissionsFixtures.AllPermissions>
                 <LiveAnnouncer>
-                    <SearchFormContextProvider>
+                    <SearchFormContextProvider initialFormState={props.initialFormState}>
                         <SearchPageContent />
                     </SearchFormContextProvider>
                 </LiveAnnouncer>
             </PermissionsFixtures.AllPermissions>
-        </SearchSourcesContextProvider>
+        </MemoryRouter>
     );
 }
 
 afterEach(() => {
     cleanup();
     SearchService.sources = [];
-    COMMUNITY_SEARCH_SOURCE.clearDomains();
+    MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS.clearDomains();
+    MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS.performSearch.mockClear();
     MOCK_SEARCH_SOURCE.domains = [];
     MOCK_SEARCH_SOURCE.performSearch.mockClear();
     MOCK_SEARCH_DOMAIN.transformFormToQuery.mockClear();
@@ -52,7 +65,7 @@ describe("SearchPage", () => {
 
     describe("Single Search Source", () => {
         it("does not render tabs", async () => {
-            SearchService.addSource(COMMUNITY_SEARCH_SOURCE);
+            SearchService.addSource(MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS);
 
             await act(async () => {
                 result = render(<MockSearchPage />);
@@ -64,8 +77,8 @@ describe("SearchPage", () => {
     });
     describe("Multiple Search Sources", () => {
         beforeEach(() => {
-            COMMUNITY_SEARCH_SOURCE.addDomain(DISCUSSIONS_SEARCH_DOMAIN);
-            SearchService.addSource(COMMUNITY_SEARCH_SOURCE);
+            MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS.addDomain(DISCUSSIONS_SEARCH_DOMAIN);
+            SearchService.addSource(MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS);
             MOCK_SEARCH_SOURCE.addDomain(MOCK_SEARCH_DOMAIN);
             SearchService.addSource(MOCK_SEARCH_SOURCE);
         });
@@ -77,7 +90,7 @@ describe("SearchPage", () => {
 
             const tabs = await result.findAllByRole("tab");
             expect(tabs).toHaveLength(2);
-            const tabOneLabel = await within(tabs[0]).findByText(COMMUNITY_SEARCH_SOURCE.label);
+            const tabOneLabel = await within(tabs[0]).findByText(MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS.label);
             expect(tabOneLabel).toBeInTheDocument();
 
             const tabTwoLabel = await within(tabs[1]).findByText(MOCK_SEARCH_SOURCE.label);
@@ -88,7 +101,17 @@ describe("SearchPage", () => {
             it("performs a search on the newly selected SearchSource", async () => {
                 await act(async () => {
                     result = render(<MockSearchPage />);
+                    const form = await result.findByRole("search");
+                    const searchQueryInput = await within(form).findByLabelText("Search Text");
+                    await act(async () => {
+                        fireEvent.change(searchQueryInput, { target: { value: "test" } });
+                    });
+                    await act(async () => {
+                        fireEvent.submit(form);
+                    });
                 });
+
+                expect(MOCK_SEARCH_SOURCE.performSearch).not.toHaveBeenCalled();
 
                 const tabTwo = await result.findByRole("tab", { name: MOCK_SEARCH_SOURCE.label });
 
@@ -96,7 +119,12 @@ describe("SearchPage", () => {
                     fireEvent.click(tabTwo);
                 });
 
-                expect(MOCK_SEARCH_SOURCE.performSearch).toHaveBeenCalledTimes(1);
+                expect(MOCK_SEARCH_SOURCE.performSearch).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        query: "test",
+                    }),
+                    undefined,
+                );
             });
         });
     });
@@ -117,12 +145,12 @@ describe("SearchPage", () => {
     });
 
     describe("Multiple Search Domains", () => {
-        describe("With one non-isolated domain", () => {
+        describe("With one isolated domain and one non-isolated domain", () => {
             beforeEach(async () => {
-                COMMUNITY_SEARCH_SOURCE.addDomain(DISCUSSIONS_SEARCH_DOMAIN);
-                COMMUNITY_SEARCH_SOURCE.addDomain(MEMBERS_SEARCH_DOMAIN);
-                await COMMUNITY_SEARCH_SOURCE.loadDomains();
-                SearchService.addSource(COMMUNITY_SEARCH_SOURCE);
+                MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS.addDomain(DISCUSSIONS_SEARCH_DOMAIN);
+                MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS.addDomain(MEMBERS_SEARCH_DOMAIN);
+
+                SearchService.addSource(MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS);
 
                 return act(async () => {
                     result = render(<MockSearchPage />);
@@ -145,26 +173,111 @@ describe("SearchPage", () => {
 
         describe("With multiple non-isolated domains", () => {
             beforeEach(async () => {
-                COMMUNITY_SEARCH_SOURCE.addDomain(DISCUSSIONS_SEARCH_DOMAIN);
-                COMMUNITY_SEARCH_SOURCE.addDomain(PLACES_SEARCH_DOMAIN);
-                COMMUNITY_SEARCH_SOURCE.addDomain(MEMBERS_SEARCH_DOMAIN);
-                await COMMUNITY_SEARCH_SOURCE.loadDomains();
-                SearchService.addSource(COMMUNITY_SEARCH_SOURCE);
-
-                return act(async () => {
-                    result = render(<MockSearchPage />);
-                });
+                MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS.addDomain(PLACES_SEARCH_DOMAIN);
+                MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS.addDomain(MOCK_ASYNC_SEARCH_DOMAIN);
+                SearchService.addSource(MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS);
             });
             it("renders an All button", async () => {
+                await act(async () => {
+                    result = render(
+                        <MockSearchPage
+                            initialFormState={{
+                                domain: PLACES_SEARCH_DOMAIN.key,
+                            }}
+                        />,
+                    );
+                });
                 const radioGroup = await result.findByRole("radiogroup");
                 expect(await within(radioGroup).findByRole("radio", { name: "All" })).toBeInTheDocument();
             });
 
+            it("renders a radio button for each loadable domain", async () => {
+                await act(async () => {
+                    result = render(
+                        <MockSearchPage
+                            initialFormState={{
+                                domain: PLACES_SEARCH_DOMAIN.key,
+                            }}
+                        />,
+                    );
+                });
+                const radioGroup = await result.findByRole("radiogroup");
+                expect(
+                    await within(radioGroup).findByRole("radio", { name: LOADABLE_PLACES_SEARCH_DOMAIN.name }),
+                ).toBeInTheDocument();
+                expect(
+                    await within(radioGroup).findByRole("radio", { name: MOCK_ASYNC_SEARCH_DOMAIN_LOADABLE.name }),
+                ).toBeInTheDocument();
+            });
+
             describe("Changing SearchDomain", () => {
-                // TODO: https://higherlogic.atlassian.net/browse/VNLA-4624
-                // set up a search with some mock query parameters in domain A
-                // switch to domain B
-                // assert: any parameters unsupported in domain B are cleared from the query.
+                const fakePlacesTypes = ["fakeType1", "fakeType2"];
+                const fakeQuery = "test";
+
+                beforeEach(async () => {
+                    await act(async () => {
+                        PlacesSearchTypeFilter.addSearchTypes({
+                            label: "Fake Place Types",
+                            values: fakePlacesTypes,
+                        });
+
+                        result = render(
+                            <MockSearchPage
+                                initialFormState={
+                                    {
+                                        domain: PLACES_SEARCH_DOMAIN.key,
+                                        query: fakeQuery,
+                                        types: fakePlacesTypes,
+                                    } as ISearchForm<{ types: string[] }>
+                                }
+                            />,
+                        );
+
+                        const form = await result.findByRole("search");
+                        fireEvent.submit(form);
+                    });
+                });
+
+                afterEach(() => {
+                    PlacesSearchTypeFilter.searchTypes = [];
+                });
+
+                it("Clears unsupported form values", async () => {
+                    const radioGroup = await result.findByRole("radiogroup");
+                    const asyncDomainRadioBtn = await within(radioGroup).findByRole("radio", {
+                        name: MOCK_ASYNC_SEARCH_DOMAIN_LOADABLE.name,
+                    });
+
+                    // The initial search contains `types`.
+                    expect(MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS.performSearch).toHaveBeenLastCalledWith(
+                        expect.objectContaining({
+                            query: fakeQuery,
+                            types: fakePlacesTypes,
+                        }),
+                        undefined,
+                    );
+
+                    // Change to a domain that doesn't support `types`.
+                    await act(async () => {
+                        fireEvent.click(asyncDomainRadioBtn);
+                    });
+
+                    // The search in the new domain was performed without `types`.
+                    expect(MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS.performSearch).toHaveBeenLastCalledWith(
+                        expect.not.objectContaining({
+                            types: fakePlacesTypes,
+                        }),
+                        undefined,
+                    );
+
+                    // The search in the new domain was performed with the same `query` value.
+                    expect(MOCK_SEARCH_SOURCE_WITH_ASYNC_DOMAINS.performSearch).toHaveBeenLastCalledWith(
+                        expect.objectContaining({
+                            query: fakeQuery,
+                        }),
+                        undefined,
+                    );
+                });
             });
         });
     });
@@ -184,13 +297,14 @@ describe("SearchPage", () => {
                         <MockSearchPage />
                     </SiteSectionContext.Provider>,
                 );
+
                 const form = await result.findByRole("search");
                 fireEvent.submit(form);
             });
         });
 
         it("calls the SearchDomain's transformFormToQuery implementation", async () => {
-            expect(MOCK_SEARCH_DOMAIN.transformFormToQuery).toHaveBeenCalledTimes(1);
+            expect(MOCK_SEARCH_DOMAIN.transformFormToQuery).toHaveBeenCalled();
         });
 
         it("Includes the siteSectionID in the search query", async () => {

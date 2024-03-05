@@ -10,7 +10,7 @@ if (!function_exists('renderNav')) {
 	    if (val('type', $item) == 'group') {
 		$heading = val('text', $item);
 		if (!$heading) {
-		    $item['cssClass'] .= ' nav-group-noheading';
+			$item['cssClass'] = ($item['cssClass'] ?? "") . ' nav-group-noheading';
 		} ?>
 		<div type="group" class="nav-group <?php echo val('cssClass', $item); ?>">
 		<?php if ($heading) {

@@ -102,7 +102,7 @@ export function LeavingPageImpl(props: IProps) {
 }
 
 export default function LeavingPage() {
-    const siteName = getMeta("siteSection.name", true);
+    const siteName = getMeta("ui.siteName", "");
     const parsedQuery = qs.parse(window.location.search);
     const targetProperty = Object.keys(parsedQuery).find((key) =>
         ["target", "?target", "Target", "?Target"].includes(key),

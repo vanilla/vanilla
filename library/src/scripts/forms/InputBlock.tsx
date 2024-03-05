@@ -73,6 +73,8 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
     public render() {
         const { label, legend, required, tooltip, tooltipIcon = "data-information" } = this.props;
         const OuterTag = legend ? "div" : label ? "label" : "div";
+        const role = legend ? "group" : undefined;
+
         const LegendOrSpanTag = legend ? "div" : "span";
 
         const hasLegendOrLabel = !!this.props.legend || !!this.props.label;
@@ -94,7 +96,7 @@ export default class InputBlock extends React.Component<IInputBlockProps, IState
         }
 
         return (
-            <OuterTag className={componentClasses}>
+            <OuterTag className={componentClasses} role={role}>
                 {hasLegendOrLabel && (
                     <span className={classesInputBlock.labelAndDescription}>
                         <LegendOrSpanTag

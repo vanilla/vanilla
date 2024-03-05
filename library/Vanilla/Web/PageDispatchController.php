@@ -15,6 +15,7 @@ use Garden\CustomExceptionHandler;
 use Garden\Web\Data;
 use Garden\Web\PageControllerRoute;
 use Garden\Web\ResourceRoute;
+use Throwable;
 use Vanilla\InjectableInterface;
 use Vanilla\Utility\StringUtils;
 use Vanilla\Utility\Timers;
@@ -29,13 +30,15 @@ use Vanilla\Utility\TracedContainer;
 class PageDispatchController implements CustomExceptionHandler, InjectableInterface
 {
     /** @var Page The active page. */
-    private $activePage;
+    protected $activePage;
 
     /** @var Container */
-    private $container;
+    protected $container;
 
     /** @var string|null */
     protected $assetSection = null;
+    /** @var string Class to use for useSimplePage */
+    protected $simplePageClass = SimpleTitlePage::class;
 
     /**
      * Dependency Injection.
@@ -49,30 +52,59 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
     }
 
     /**
+     * Forward the call onto our active page if we have one.
+     *
+     * @inheritdoc
+     */
+    public function hasExceptionHandler(Throwable $e): bool
+    {
+        return true;
+    }
+
+    /**
+     * Use or active pages handler.
+     *
+     * @inheritdoc
+     */
+    public function handleException(Throwable $e): Data
+    {
+        $activePage = $this->activePage ?? null;
+        if ($activePage === null) {
+            $activePage = $this->container->get(SimpleTitlePage::class);
+            $activePage->getHead()->setAssetSection("layouts");
+        }
+
+        return $activePage->handleException($e);
+    }
+
+    /**
      * Instantiate a page class and set it as the active instance.
      *
      * @template T of Page
      *
-     * @param class-string<T> $pageClass
+     * @param class-string<T>|T $pageOrPageClass
      * @return T The instance of the requested page.
      * @throws NotFoundException If the page class couldn't be located.
      * @throws ContainerException Error while retrieving the entry.
      */
-    protected function usePage(string $pageClass): Page
+    protected function usePage($pageOrPageClass): Page
     {
-        $span = Timers::instance()->startGeneric("create-page", [
-            "name" => "Create Page - {$pageClass}",
-        ]);
-        $page = TracedContainer::trace(function () use ($pageClass) {
-            return $this->container->get($pageClass);
-        });
+        if ($pageOrPageClass instanceof Page) {
+            $page = $pageOrPageClass;
+        } else {
+            $span = Timers::instance()->startGeneric("create-page", [
+                "name" => "Create Page - {$pageOrPageClass}",
+            ]);
+            $page = TracedContainer::trace(function () use ($pageOrPageClass) {
+                return $this->container->get($pageOrPageClass);
+            });
+            $span->finish();
+        }
+
         $this->activePage = $page;
-        $span->finish();
+
         return $page;
     }
-
-    /** @var string Class to use for useSimplePage */
-    protected $simplePageClass = SimpleTitlePage::class;
 
     /**
      * Instantiate a SimpleTitlePage with a title and set it as the active instance.
@@ -94,29 +126,7 @@ class PageDispatchController implements CustomExceptionHandler, InjectableInterf
 
         $this->activePage = $page;
         $this->activePage->initialize($title);
+
         return $this->activePage;
-    }
-
-    /**
-     * Forward the call onto our active page if we have one.
-     * @inheritdoc
-     */
-    public function hasExceptionHandler(\Throwable $e): bool
-    {
-        return true;
-    }
-
-    /**
-     * Use or active pages handler.
-     * @inheritdoc
-     */
-    public function handleException(\Throwable $e): Data
-    {
-        $activePage = $this->activePage ?? null;
-        if ($activePage === null) {
-            $activePage = $this->container->get(SimpleTitlePage::class);
-            $activePage->getHead()->setAssetSection("layouts");
-        }
-        return $activePage->handleException($e);
     }
 }

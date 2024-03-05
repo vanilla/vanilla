@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -9,7 +9,7 @@ import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
 import { useLayoutSpec } from "@library/features/Layout/LayoutPage.hooks";
 import { Router } from "@library/Router";
-import { Route, RouteComponentProps, RouteProps } from "react-router";
+import { Route, RouteComponentProps } from "react-router";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
 import { matchPath } from "react-router";

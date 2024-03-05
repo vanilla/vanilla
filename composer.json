@@ -84,7 +84,8 @@
         "vanilla/garden-hydrate": "^2.2.1",
         "fakerphp/faker": "^1.19",
         "symfony/lock": "^5.2",
-        "vanilla/garden-sites": "^1.5"
+        "vanilla/garden-sites": "^1.5",
+        "chrome-php/chrome": "^1.10"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",

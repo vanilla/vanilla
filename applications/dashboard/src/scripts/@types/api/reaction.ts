@@ -9,7 +9,13 @@ export enum ReactionUrlCode {
 }
 
 export interface IReaction {
-    urlcode: ReactionUrlCode;
+    urlcode: ReactionUrlCode | string;
     reactionValue: number;
     hasReacted?: boolean;
+    class?: string;
+    count?: number;
+    tagID?: number;
+    name?: string;
+    url?: string;
+    photoUrl?: string;
 }

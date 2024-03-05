@@ -4,10 +4,10 @@
  */
 
 import React from "react";
-import { useDashboardRadioGroup } from "@dashboard/forms/DashboardRadioGroups";
 import CheckBox from "@library/forms/Checkbox";
 import { cx } from "@emotion/css";
 import { checkRadioClasses } from "@library/forms/checkRadioStyles";
+import { useRadioGroupContext } from "@library/forms/RadioGroupContext";
 
 interface IProps extends Omit<React.ComponentProps<typeof CheckBox>, "onChange"> {
     onChange?: (newValue: boolean) => void;
@@ -15,7 +15,7 @@ interface IProps extends Omit<React.ComponentProps<typeof CheckBox>, "onChange">
 }
 
 export function DashboardCheckBox(props: IProps) {
-    const { isInline } = useDashboardRadioGroup();
+    const { isInline } = useRadioGroupContext();
     const { excludeFromICheck = true } = props;
 
     return (

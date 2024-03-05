@@ -8,11 +8,11 @@
 namespace Vanilla\Forum\Tests\Controllers;
 
 use Garden\Schema\ValidationException;
+use Garden\Web\Exception\ForbiddenException;
 use PHPUnit\Framework\TestCase;
 use Vanilla\CurrentTimeStamp;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
-use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestCategoryModelTrait;
@@ -20,6 +20,7 @@ use VanillaTests\Models\TestCommentModelTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
 use VanillaTests\SetupTraitsTrait;
 use VanillaTests\SiteTestTrait;
+use VanillaTests\VanillaTestCase;
 
 /**
  * Tests for the `DraftsController` class.
@@ -717,5 +718,51 @@ HTML
             $this->assertSame($this->commentDraft["Body"], $r->Form->getValue("Body"));
             $this->assertSame($this->commentDraft["Format"], $r->Form->getValue("Format"));
         });
+    }
+
+    /**
+     * Make sure we can edit a draft even without Discussion.Edit.
+     *
+     * @return void
+     */
+    public function testEditingPermission(): void
+    {
+        // Disable editing of posts.
+        $this->config->saveToConfig("Garden.EditContentTimeout", "0");
+        $this->api()->setUserID($this->memberID);
+        $draftID = $this->draftModel->save([
+            "Name" => __FUNCTION__,
+            "Body" => __FUNCTION__,
+            "Format" => "Text",
+            "Type" => "Discussion",
+            "CategoryID" => -1,
+        ]);
+
+        /** @var \PostController $response */
+        $response = $this->bessy()->get("/post/editdiscussion/0/$draftID");
+        $this->assertEquals($draftID, $response->Draft->DraftID);
+    }
+
+    /**
+     * Test fetching the draft from another user.
+     *
+     * @return void
+     */
+    public function testEditingAnotherUserDraft(): void
+    {
+        $this->expectException(ForbiddenException::class);
+        $user = $this->createUserFixture(VanillaTestCase::ROLE_MEMBER);
+        $this->api()->setUserID($user["UserID"]);
+        $draftID = $this->draftModel->save([
+            "Name" => __FUNCTION__,
+            "Body" => __FUNCTION__,
+            "Format" => "Text",
+            "Type" => "Discussion",
+            "CategoryID" => -1,
+        ]);
+
+        $this->api()->setUserID($this->memberID);
+        /** @var \PostController $response */
+        $this->bessy()->get("/post/editdiscussion/0/$draftID");
     }
 }

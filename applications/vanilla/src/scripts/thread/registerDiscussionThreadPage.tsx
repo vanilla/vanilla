@@ -8,9 +8,8 @@ import React from "react";
 import { registerLayoutPage } from "@library/features/Layout/LayoutPage";
 import { getSiteSection } from "@library/utility/appUtils";
 import { registerLoadableWidgets } from "@library/utility/componentRegistry";
-import { DiscussionThreadContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
+import { DiscussionThreadPaginationContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadPaginationContext";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
-import getStore from "@library/redux/getStore";
 
 interface IDiscussionThreadPageParams {
     id: IDiscussion["discussionID"];
@@ -18,6 +17,29 @@ interface IDiscussionThreadPageParams {
 }
 
 export function registerDiscussionThreadPage() {
+    registerLayoutPage<IDiscussionThreadPageParams>(
+        ["/discussion/comment/:id(\\d+)"],
+        (params) => {
+            return {
+                layoutViewType: "discussionThread",
+                recordType: "comment",
+                recordID: params.match.params.id,
+                params: {
+                    siteSectionID: getSiteSection().sectionID,
+                    locale: getSiteSection().contentLocale,
+                    commentID: params.match.params.id,
+                },
+            };
+        },
+        (layoutQuery, page) => {
+            return (
+                <DiscussionThreadPaginationContextProvider initialPage={layoutQuery.params.page}>
+                    {page}
+                </DiscussionThreadPaginationContextProvider>
+            );
+        },
+    );
+
     registerLayoutPage<IDiscussionThreadPageParams>(
         ["/discussion/:id(\\d+)(/[^/]+)?/p:page(\\d+)", "/discussion/:id(\\d+)(/[^/]+)?"],
         (params) => {
@@ -35,9 +57,9 @@ export function registerDiscussionThreadPage() {
         },
         (layoutQuery, page) => {
             return (
-                <DiscussionThreadContextProvider initialPage={layoutQuery.params.page}>
+                <DiscussionThreadPaginationContextProvider initialPage={layoutQuery.params.page}>
                     {page}
-                </DiscussionThreadContextProvider>
+                </DiscussionThreadPaginationContextProvider>
             );
         },
     );

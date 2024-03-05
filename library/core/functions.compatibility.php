@@ -420,11 +420,14 @@ if (!function_exists("safeHeader")) {
             $context = requestContext();
         }
 
-        //TODO: Remove this after cleaning up header newline error(s)
         if (strpos($header, "\n") !== false) {
-            ErrorLogger::warning("Header contained newline"["headers"], [
-                "header" => $header,
-            ]);
+            ErrorLogger::warning(
+                "Header contained newline",
+                ["headers"],
+                [
+                    "header" => $header,
+                ]
+            );
         }
 
         if ($context == "http") {

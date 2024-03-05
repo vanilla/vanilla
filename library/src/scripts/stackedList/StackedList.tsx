@@ -5,6 +5,7 @@ import { stackedListVariables } from "@library/stackedList/StackedList.variables
 import { t } from "@library/utility/appUtils";
 import NumberFormatted from "@library/content/NumberFormatted";
 import Button from "@library/forms/Button";
+import ConditionalWrap from "@library/layout/ConditionalWrap";
 
 interface IStackedListProps<T extends {}> {
     themingVariables: ReturnType<typeof stackedListVariables>;
@@ -31,16 +32,20 @@ export function StackedList<T extends {}>(props: IStackedListProps<T>) {
                     </li>
                 );
             })}
-            {extraCount > 0 && !!openModal && (
+            {extraCount > 0 && (
                 <li className={plusLink} key={data.length}>
-                    <Button onClick={openModal} buttonType={ButtonTypes.TEXT}>
+                    <ConditionalWrap
+                        condition={!!openModal}
+                        component={Button}
+                        componentProps={{ onClick: openModal, buttonType: ButtonTypes.TEXT }}
+                    >
                         <span style={{ display: "inline-block" }}>
                             <>
                                 +
                                 <NumberFormatted value={extraCount} title={tooltipText ? t(tooltipText) : undefined} />
                             </>
                         </span>
-                    </Button>
+                    </ConditionalWrap>
                 </li>
             )}
         </ul>

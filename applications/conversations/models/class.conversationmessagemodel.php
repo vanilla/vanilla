@@ -18,6 +18,8 @@ class ConversationMessageModel extends ConversationsModel
      */
     private static $instance;
 
+    private $LastMessageID;
+
     /**
      * @var ConversationModel
      */

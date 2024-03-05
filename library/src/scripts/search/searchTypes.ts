@@ -39,7 +39,6 @@ interface ISearchFormBase {
     /** Used to provide a full URL to refresh the form */
     pageURL?: string;
     offset?: RecordID;
-    types?: string[];
     sort?: string;
     initialized?: boolean;
     needsResearch?: boolean;

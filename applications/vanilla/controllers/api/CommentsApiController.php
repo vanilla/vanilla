@@ -47,18 +47,26 @@ class CommentsApiController extends AbstractApiController
     /** @var UserModel */
     private $userModel;
 
+    private ReactionModel $reactionModel;
+
     /**
      * CommentsApiController constructor.
      *
      * @param CommentModel $commentModel
      * @param DiscussionModel $discussionModel
      * @param UserModel $userModel
+     * @param ReactionModel $reactionModel
      */
-    public function __construct(CommentModel $commentModel, DiscussionModel $discussionModel, UserModel $userModel)
-    {
+    public function __construct(
+        CommentModel $commentModel,
+        DiscussionModel $discussionModel,
+        UserModel $userModel,
+        ReactionModel $reactionModel
+    ) {
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
         $this->userModel = $userModel;
+        $this->reactionModel = $reactionModel;
     }
 
     /**
@@ -192,7 +200,17 @@ class CommentsApiController extends AbstractApiController
         }
 
         $this->userModel->expandUsers($comment, $this->resolveExpandFields($query, ["insertUser" => "InsertUserID"]));
+        if (
+            ModelUtils::isExpandOption("attachments", $query["expand"] ?? []) &&
+            Gdn::session()->checkPermission("Garden.Staff.Allow")
+        ) {
+            $attachmentModel = AttachmentModel::instance();
+            $attachmentModel->joinAttachments($comment);
+        }
         $comment = $this->normalizeOutput($comment, $query["expand"]);
+        if (ModelUtils::isExpandOption("reactions", $query["expand"])) {
+            $this->reactionModel->expandCommentReactions($comment);
+        }
         $result = $out->validate($comment);
 
         // Allow addons to modify the result.
@@ -311,7 +329,7 @@ class CommentsApiController extends AbstractApiController
             $this->idParamSchema = $this->schema(
                 Schema::parse([
                     "id:i" => "The comment ID.",
-                    "expand" => ApiUtils::getExpandDefinition(["-insertUser"]),
+                    "expand" => ApiUtils::getExpandDefinition(["-insertUser", "attachments", "reactions"]),
                 ]),
                 $type
             );
@@ -384,7 +402,7 @@ class CommentsApiController extends AbstractApiController
                         "field" => "InsertUserID",
                     ],
                 ],
-                "expand?" => ApiUtils::getExpandDefinition(["insertUser", "-body"]),
+                "expand?" => ApiUtils::getExpandDefinition(["insertUser", "-body", "attachments", "reactions"]),
             ],
             ["CommentIndex", "in"]
         )
@@ -423,9 +441,20 @@ class CommentsApiController extends AbstractApiController
 
         // Expand associated rows.
         $this->userModel->expandUsers($rows, $this->resolveExpandFields($query, ["insertUser" => "InsertUserID"]));
+        if (
+            ModelUtils::isExpandOption("attachments", $query["expand"] ?? []) &&
+            Gdn::session()->checkPermission("Garden.Staff.Allow")
+        ) {
+            $attachmentModel = AttachmentModel::instance();
+            $attachmentModel->joinAttachments($rows);
+        }
 
         foreach ($rows as &$currentRow) {
             $currentRow = $this->normalizeOutput($currentRow, $query["expand"]);
+        }
+
+        if (ModelUtils::isExpandOption("reactions", $query["expand"])) {
+            $this->reactionModel->expandCommentReactions($rows);
         }
 
         $result = $out->validate($rows);
@@ -621,5 +650,122 @@ class CommentsApiController extends AbstractApiController
             "expand" => $query["expand"] ?? null,
             "limit" => $query["limit"] ?? null,
         ]);
+    }
+
+    /**
+     * Respond to /api/v2/comments/:id/reactions
+     *
+     * @param int $id The comment ID.
+     * @param array $query The request query.
+     * @return array
+     */
+    public function get_reactions(int $id, array $query)
+    {
+        $this->permission();
+
+        $this->idParamSchema();
+        $in = $this->schema([
+            "type:s|n" => [
+                "default" => null,
+                "description" => "Filter to a specific reaction type by using its URL code.",
+            ],
+            "page:i?" => [
+                "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
+                "default" => 1,
+                "minimum" => 1,
+                "maximum" => 100,
+            ],
+            "limit:i?" => [
+                "description" => "Desired number of items per page.",
+                "default" => $this->reactionModel->getDefaultLimit(),
+                "minimum" => 1,
+                "maximum" => 100,
+            ],
+        ])->setDescription("Get reactions to a comment.");
+        $out = $this->schema(
+            [":a" => $this->reactionModel->getReactionLogFragment($this->getUserFragmentSchema())],
+            "out"
+        );
+
+        $comment = $this->commentByID($id);
+        $discussion = $this->discussionByID($comment["DiscussionID"]);
+        $this->discussionModel->categoryPermission("Vanilla.Discussions.View", $discussion["CategoryID"]);
+
+        $query = $in->validate($query);
+        [$offset, $limit] = offsetLimit("p{$query["page"]}", $query["limit"]);
+        $comment += ["recordType" => "Comment", "recordID" => $comment["CommentID"]];
+        $rows = $this->reactionModel->getRecordReactions($comment, true, $query["type"], $offset, $limit);
+
+        $result = $out->validate($rows);
+        return $result;
+    }
+
+    /**
+     * React to a comment with /api/v2/comments/:id/reactions
+     *
+     * @param int $id The comment ID.
+     * @param array $body The request query.
+     * @return array
+     */
+    public function post_reactions(int $id, array $body)
+    {
+        $this->permission("Garden.SignIn.Allow");
+
+        $in = $this->schema(
+            [
+                "reactionType:s" => "URL code of a reaction type.",
+            ],
+            "in"
+        )->setDescription("React to a comment.");
+        $out = $this->schema($this->reactionModel->getReactionSummaryFragment(), "out");
+
+        $comment = $this->commentByID($id);
+        $discussion = $this->discussionByID($comment["DiscussionID"]);
+        $session = $this->getSession();
+        $this->reactionModel->canViewDiscussion($discussion, $session);
+        $body = $in->validate($body);
+
+        $this->reactionModel->react("Comment", $id, $body["reactionType"], null, false, ReactionModel::FORCE_ADD);
+
+        // Refresh the comment to grab its updated attributes.
+        $comment = $this->commentByID($id);
+        $rows = $this->reactionModel->getRecordSummary($comment);
+
+        $result = $out->validate($rows);
+        return $result;
+    }
+
+    /**
+     * Delete a comment reaction with /api/v2/comments/:id/reactions/:userID
+     *
+     * @param int $id The comment ID.
+     * @param int|null $userID
+     * @return void
+     */
+    public function delete_reactions(int $id, int $userID = null): void
+    {
+        $this->permission("Garden.SignIn.Allow");
+
+        $in = $this->schema(
+            $this->idParamSchema()->merge(Schema::parse(["userID:i" => "The target user ID."])),
+            "in"
+        )->setDescription('Remove a user\'s reaction.');
+        $out = $this->schema([], "out");
+
+        $this->commentByID($id);
+
+        if ($userID === null) {
+            $userID = $this->getSession()->UserID;
+        } elseif ($userID !== $this->getSession()->UserID) {
+            $this->permission("Garden.Moderation.Manage");
+        }
+
+        $reaction = $this->reactionModel->getUserReaction($userID, "Comment", $id);
+        if ($reaction) {
+            $urlCode = $reaction["UrlCode"];
+            $this->reactionModel->react("Comment", $id, $urlCode, $userID, false, ReactionModel::FORCE_REMOVE);
+        } else {
+            new NotFoundException("Reaction");
+        }
     }
 }

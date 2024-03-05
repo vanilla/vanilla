@@ -1170,7 +1170,13 @@ if (!function_exists("ipAnchor")) {
     function ipAnchor($iP, $cssClass = "")
     {
         if ($iP) {
-            return anchor(formatIP($iP), "/user/browse?keywords=" . urlencode(ipDecode($iP)), $cssClass);
+            $decodedIP = ipDecode($iP);
+            $Query = http_build_query(
+                Gdn::config("Feature.NewUserManagement.Enabled")
+                    ? ["ipAddresses" => [$decodedIP]]
+                    : ["Keywords" => $decodedIP]
+            );
+            return anchor(formatIP($iP), "/user/browse?" . $Query, $cssClass);
         } else {
             return $iP;
         }

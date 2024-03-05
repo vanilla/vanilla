@@ -11,7 +11,7 @@ import { Tokens } from "@library/forms/select/Tokens";
 import { t } from "@vanilla/i18n";
 
 interface IProps extends Omit<React.ComponentProps<typeof Tokens>, "options" | "isLoading" | "value" | "onChange"> {
-    value: number[];
+    value?: number[];
     onChange: (roleIDs: number[]) => void;
 }
 
@@ -23,7 +23,7 @@ export function MultiRoleInput(props: IProps) {
         <Tokens
             {...props}
             placeholder={t("Select...")}
-            value={props.value
+            value={(props.value ?? [])
                 .map((roleID) => {
                     const role = rolesByID.data?.[roleID];
                     if (!role) {

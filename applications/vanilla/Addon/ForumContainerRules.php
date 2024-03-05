@@ -20,6 +20,7 @@ use Vanilla\Forum\Controllers\Pages\DiscussionListPageController;
 use Vanilla\Forum\Controllers\Pages\DiscussionThreadPageController;
 use Vanilla\Forum\Controllers\Pages\NestedCategoryListPageController;
 use Vanilla\Forum\Controllers\Pages\UnsubscribePageController;
+use Vanilla\Forum\Controllers\Pages\ConvertHTMLPageController;
 use Vanilla\Forum\Layout\View\CategoryListLayoutView;
 use Vanilla\Forum\Layout\View\DiscussionCategoryPageLayoutView;
 use Vanilla\Forum\Layout\View\LegacyCategoryListLayoutView;
@@ -33,6 +34,7 @@ use Vanilla\Forum\Models\CategorySiteMetaExtra;
 use Vanilla\Forum\Models\DiscussionCollectionProvider;
 use Vanilla\Forum\Models\ForumQuickLinksProvider;
 use Vanilla\Forum\Models\PostingSiteMetaExtra;
+use Vanilla\Forum\Models\ReactionsQuickLinksProvider;
 use Vanilla\Forum\Models\Totals\CategorySiteTotalProvider;
 use Vanilla\Forum\Models\Totals\CommentSiteTotalProvider;
 use Vanilla\Forum\Models\Totals\DiscussionSiteTotalProvider;
@@ -52,6 +54,7 @@ use Vanilla\Forum\Widgets\GuestCallToActionWidget;
 use Vanilla\Forum\Widgets\FeaturedCollectionsWidget;
 use Vanilla\Forum\Widgets\DiscussionListAsset;
 use Vanilla\Layout\CategoryLayoutRecordProvider;
+use Vanilla\Layout\CommentLayoutRecordProvider;
 use Vanilla\Layout\DiscussionLayoutRecordProvider;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Layout\LayoutService;
@@ -62,7 +65,7 @@ use Vanilla\Models\SiteMeta;
 use Vanilla\Models\SiteTotalService;
 use Vanilla\Theme\VariableProviders\QuickLinksVariableProvider;
 use Vanilla\Utility\ContainerUtils;
-use VanillaTests\Forum\Widgets\DiscussionTagsAssetTest;
+use Vanilla\Utility\DebugUtils;
 
 /**
  * Class ForumContainerRules
@@ -103,7 +106,8 @@ class ForumContainerRules extends AddonContainerRules
         $container
             ->rule(LayoutViewModel::class)
             ->addCall("addLayoutRecordProvider", [new Reference(CategoryLayoutRecordProvider::class)])
-            ->addCall("addLayoutRecordProvider", [new Reference(DiscussionLayoutRecordProvider::class)]);
+            ->addCall("addLayoutRecordProvider", [new Reference(DiscussionLayoutRecordProvider::class)])
+            ->addCall("addLayoutRecordProvider", [new Reference(CommentLayoutRecordProvider::class)]);
 
         $container
             ->rule(\Vanilla\Layout\Providers\FileBasedLayoutProvider::class)
@@ -173,7 +177,7 @@ class ForumContainerRules extends AddonContainerRules
         PageControllerRoute::configurePageRoutes(
             $container,
             [
-                "/discussion" => DiscussionThreadPageController::class,
+                "/discussion/" => DiscussionThreadPageController::class,
             ],
             "customLayout.discussionThread"
         );
@@ -190,6 +194,7 @@ class ForumContainerRules extends AddonContainerRules
             $container,
             [
                 "/unsubscribe" => UnsubscribePageController::class,
+                "/utility/convert-html" => ConvertHTMLPageController::class,
             ],
             null,
             -1
@@ -210,5 +215,13 @@ class ForumContainerRules extends AddonContainerRules
             "forum",
             ["name" => "Forum"],
         ]);
+
+        $container
+            ->rule(QuickLinksVariableProvider::class)
+            ->addCall("addQuickLinkProvider", [new Reference(ReactionsQuickLinksProvider::class)]);
+
+        if (!DebugUtils::isTestMode() && !function_exists("writeReactions")) {
+            include PATH_APPLICATIONS . "/dashboard/views/reactions/reaction_functions.php";
+        }
     }
 }

@@ -9,7 +9,7 @@ import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import InputTextBlock from "@library/forms/InputTextBlock";
 import LazyDateRange from "@library/forms/LazyDateRange";
 import { FilterFrame } from "@library/search/panels/FilterFrame";
-import { useSearchForm } from "@library/search/SearchContext";
+import { useSearchForm } from "@library/search/SearchFormContext";
 import { t } from "@vanilla/i18n";
 import React from "react";
 import InputBlock from "@library/forms/InputBlock";
@@ -31,7 +31,7 @@ export function FilterPanelAll(props: IProps) {
                         const { value } = event.target;
                         updateForm({ name: value });
                     },
-                    value: form.name || undefined,
+                    value: form.name ?? "",
                 }}
             />
             <MultiUserInput

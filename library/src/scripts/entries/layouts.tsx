@@ -47,9 +47,11 @@ function LayoutApp() {
         <>
             <HamburgerMenuContextProvider>
                 <Backgrounds />
-                <TitleBar />
-                <AnalyticsData uniqueKey={"customLayoutPage"} />
-                <Router useLayoutRouting />
+
+                <Router useLayoutRouting>
+                    <TitleBar />
+                    <AnalyticsData uniqueKey={"customLayoutPage"} />
+                </Router>
             </HamburgerMenuContextProvider>
         </>
     );

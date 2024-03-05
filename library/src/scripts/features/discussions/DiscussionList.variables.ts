@@ -9,7 +9,7 @@ import { UserPhotoSize } from "@library/headers/mebox/pieces/UserPhoto";
 import { Variables } from "@library/styles/Variables";
 import { listItemVariables } from "@library/lists/ListItem.variables";
 import { IThemeVariables } from "@library/theming/themeReducer";
-import { TagPreset } from "@library/metas/Tags.variables";
+import { TagPreset, tagPresetVariables } from "@library/metas/Tags.variables";
 import { css } from "@emotion/css";
 import { DeepPartial } from "redux";
 import { IFont } from "@library/styles/cssUtilsTypes";
@@ -235,6 +235,34 @@ export const discussionListVariables = useThemeCache(
             itemOptionsOverrides,
         );
 
+        /**
+         * @varGroup discussionList.announcementTag
+         * @description Announced/pinned discussion item.
+         * @expand tagPreset
+         */
+        const announcementTag = makeThemeVars("announcementTag", tagPresetVariables()[labels.tagPreset]);
+
+        /**
+         * @varGroup discussionList.qnaStatusUnanswered
+         * @description Q&A status: questions that have no answers.
+         * @expand tagPreset
+         */
+        const qnaStatusUnanswered = makeThemeVars("qnaStatusUnanswered", tagPresetVariables()[labels.tagPreset]);
+
+        /**
+         * @varGroup discussionList.qnaStatusAnswered
+         * @description Q&A status: questions with answers, but not accepted answers.
+         * @expand tagPreset
+         */
+        const qnaStatusAnswered = makeThemeVars("qnaStatusAnswered", tagPresetVariables()[labels.tagPreset]);
+
+        /**
+         * @varGroup discussionList.qnaStatusAccepted
+         * @description Q&A status: questions with accepted answers.
+         * @expand tagPreset
+         */
+        const qnaStatusAccepted = makeThemeVars("qnaStatusAccepted", tagPresetVariables()[labels.tagPreset]);
+
         return {
             profilePhoto,
             panelBoxes,
@@ -242,6 +270,10 @@ export const discussionListVariables = useThemeCache(
             item,
             labels,
             userTags,
+            announcementTag,
+            qnaStatusUnanswered,
+            qnaStatusAnswered,
+            qnaStatusAccepted,
         };
     },
 );

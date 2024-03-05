@@ -92,7 +92,7 @@ export function CompactSearch(props: ICompactSearchProps) {
         }
     });
 
-    const { searchOptionProvider, externalSearchQuery } = useSearch();
+    const { searchOptionProvider, externalSearch } = useSearch();
     const { pushSmartLocation } = useLinkContext();
 
     const scopeValue = scope.value?.value || "";
@@ -102,8 +102,16 @@ export function CompactSearch(props: ICompactSearchProps) {
         if ([SEARCH_SCOPE_LOCAL, SEARCH_SCOPE_EVERYWHERE].includes(scopeValue)) {
             queryParams.scope = scopeValue;
         }
-        pushSmartLocation(searchOptionProvider.makeSearchUrl(query, queryParams, externalSearchQuery));
-    }, [searchOptionProvider, pushSmartLocation, query, scopeValue, externalSearchQuery]);
+
+        const searchUrl = searchOptionProvider.makeSearchUrl(query, queryParams, externalSearch?.query);
+
+        if (externalSearch?.query && externalSearch?.resultsInNewTab) {
+            window.open(searchUrl, "_blank");
+            return;
+        }
+
+        pushSmartLocation(searchUrl);
+    }, [searchOptionProvider, pushSmartLocation, query, scopeValue, externalSearch]);
 
     // Close with the escape key.
     useEscapeListener({
@@ -165,7 +173,7 @@ export function CompactSearch(props: ICompactSearchProps) {
                             onChange={setQuery}
                             onSearch={handleSubmit}
                             loadOptions={(query, options) =>
-                                externalSearchQuery
+                                externalSearch?.query
                                     ? Promise.resolve([])
                                     : searchOptionProvider.autocomplete(query, {
                                           ...options,
@@ -182,7 +190,7 @@ export function CompactSearch(props: ICompactSearchProps) {
                             valueContainerClasses={classNames(classes.valueContainer, props.valueContainerClass)}
                             scope={props.scope}
                             overwriteSearchBar={props.overwriteSearchBar}
-                            disableMenu={!!externalSearchQuery}
+                            disableAutocomplete={!!externalSearch?.query}
                         />
 
                         <div

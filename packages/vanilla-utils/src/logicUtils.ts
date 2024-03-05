@@ -5,6 +5,7 @@
  */
 
 import set from "lodash/set";
+import { ColorHelper } from "csx";
 
 export function spaceshipCompare(a, b): number {
     if (a > b) {
@@ -20,7 +21,11 @@ export function flattenObject(obj: Record<any, any>, delimiter = "") {
     return Object.keys(obj).reduce((acc, key) => {
         const prefix = delimiter.length ? delimiter + "." : "";
         if (typeof obj[key] === "object" && !Array.isArray(obj[key]) && obj[key] !== null) {
-            Object.assign(acc, flattenObject(obj[key], prefix + key));
+            if (obj[key] instanceof ColorHelper) {
+                acc[prefix + key] = obj[key].toString();
+            } else {
+                Object.assign(acc, flattenObject(obj[key], prefix + key));
+            }
         } else {
             acc[prefix + key] = obj[key];
         }

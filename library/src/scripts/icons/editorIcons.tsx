@@ -10,6 +10,7 @@ import classNames from "classnames";
 import { areaHiddenType } from "@library/styles/styleHelpersVisibility";
 import { cx } from "@library/styles/styleShim";
 import { iconClasses } from "@library/icons/iconStyles";
+import { Icon } from "@vanilla/icons";
 
 const currentColorFill = {
     fill: "currentColor",
@@ -224,21 +225,12 @@ export function Heading5Icon(props: { className?: string; "aria-hidden"?: areaHi
     );
 }
 
-export function BlockquoteIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
-    const classesRichEditor = iconClasses();
-    return (
-        <svg
-            className={classNames(classesRichEditor.standard, props.className)}
-            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-            viewBox="0 0 24 24"
-        >
-            <title>{t("Quote")}</title>
-            <path
-                d="M10.531,17.286V12.755H8.122a9.954,9.954,0,0,1,.1-1.408,4.22,4.22,0,0,1,.388-1.286,2.62,2.62,0,0,1,.735-.918A1.815,1.815,0,0,1,10.49,8.8V6.755a3.955,3.955,0,0,0-2,.49A4.164,4.164,0,0,0,7.082,8.551a5.84,5.84,0,0,0-.817,1.9A9.65,9.65,0,0,0,6,12.755v4.531Zm7.469,0V12.755H15.592a9.954,9.954,0,0,1,.1-1.408,4.166,4.166,0,0,1,.388-1.286,2.606,2.606,0,0,1,.734-.918A1.819,1.819,0,0,1,17.959,8.8V6.755a3.958,3.958,0,0,0-2,.49,4.174,4.174,0,0,0-1.408,1.306,5.86,5.86,0,0,0-.816,1.9,9.649,9.649,0,0,0-.266,2.306v4.531Z"
-                style={currentColorFill}
-            />
-        </svg>
-    );
+/**
+ * @deprecated
+ * Use `<Icon icon="editor-quote" />` instead.
+ */
+export function BlockquoteIcon(props: { className?: string }) {
+    return <Icon icon="editor-quote" />;
 }
 
 export function CodeBlockIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {

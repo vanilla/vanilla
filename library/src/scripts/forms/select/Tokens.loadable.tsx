@@ -60,7 +60,7 @@ export default class TokensLoadable extends React.Component<ITokenProps, IState>
     };
 
     public render() {
-        const { className, disabled, options, isLoading, inModal, hideSelectedOptions = true } = this.props;
+        const { className, disabled, options, hideSelectedOptions = true, inModal = false } = this.props;
         const classes = tokensClasses();
         const classesInputBlock = inputBlockClasses();
 
@@ -106,7 +106,7 @@ export default class TokensLoadable extends React.Component<ITokenProps, IState>
                             isLoading={this.showLoader}
                             classNamePrefix={this.prefix}
                             className={classNames(this.prefix, className)}
-                            placeholder={this.props.placeholder}
+                            placeholder={this.props.placeholder ? t(this.props.placeholder) : t("Select...")}
                             aria-label={t("Search")}
                             escapeClearsValue={true}
                             pageSize={20}

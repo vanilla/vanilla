@@ -78,6 +78,7 @@ class VanillaCli extends Console\Application
             Commands\DockerBuildCommand::class,
             Commands\ValidateAttachmentsCommand::class,
             Commands\SyncFontsCommand::class,
+            Commands\ConvertToRich::class,
         ];
     }
 

@@ -25,6 +25,7 @@ interface IProps {
     useLayoutRouting?: boolean;
     onRouteChange?: (history: History) => void;
     ErrorPageComponent?: React.ComponentType<{ error?: Partial<IError> }>;
+    children?: React.ReactNode;
 }
 
 export function Router(props: IProps) {
@@ -63,7 +64,12 @@ export function Router(props: IProps) {
         </ErrorPageBoundary>
     );
 
-    routes = <BackRoutingProvider>{routes}</BackRoutingProvider>;
+    routes = (
+        <BackRoutingProvider>
+            {props.children}
+            {routes}
+        </BackRoutingProvider>
+    );
     if (!props.disableDynamicRouting) {
         routes = (
             <LinkContextProvider

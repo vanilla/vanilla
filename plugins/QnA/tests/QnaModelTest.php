@@ -1,15 +1,13 @@
 <?php
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 namespace VanillaTests\QnA;
 
 use DiscussionModel;
-use Garden\Container\ContainerException;
-use Garden\Container\NotFoundException;
 use QnaModel;
 use QnAPlugin;
 use Vanilla\QnA\Models\QnaQuickLinksProvider;
@@ -110,6 +108,13 @@ class QnaModelTest extends SiteTestCase
      */
     public function testQnARecounts()
     {
+        // Check that there are no questions
+        $questionsCount = $this->discussionModel->getCount(["Type" => "Question"]);
+        $this->assertEquals(0, $questionsCount);
+        $blankCountResponse = $this->qnAModel->counts("statusID");
+        // Check that the count exits early without erroring out.
+        $this->assertEquals(["Complete" => true], $blankCountResponse);
+
         // Create a few questions with an answer for each.
         $acceptedQuestion = $this->createQuestion();
         $acceptedAnswer = $this->createAnswer();

@@ -30,7 +30,7 @@ export interface IPanelNavItemsProps {
     onClose?: () => void;
 }
 
-const VALID_URL_REGEX = /^\s*((https?:\/\/))|^\s*\//i;
+const VALID_URL_REGEX = /^\s*((https?:\/\/))|^\s*\/|^\s*~/i;
 
 export function PanelNavItems(props: IPanelNavItemsProps) {
     const { isActive, navItems = [] } = props;

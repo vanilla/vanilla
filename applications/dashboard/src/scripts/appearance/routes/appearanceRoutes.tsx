@@ -1,12 +1,13 @@
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 import RouteHandler from "@library/routing/RouteHandler";
-import PageLoader from "@library/routing/PageLoader";
 import { ILayoutDetails, LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { slugify } from "@vanilla/utils";
+import ModalLoader from "@library/modal/ModalLoader";
+import AppearanceRoutePageLoader from "../components/AppearanceRoutePageLoader";
 
 type LayoutFragment = {
     layoutID: ILayoutDetails["layoutID"];
@@ -18,23 +19,24 @@ export const AppearanceRoute = new RouteHandler(
     () => import("@dashboard/appearance/pages/AppearancePage"),
     "/appearance",
     () => "/appearance",
-    PageLoader,
+    AppearanceRoutePageLoader,
 );
 
 export const LegacyLayoutsRoute = new RouteHandler(
     () => import("@dashboard/appearance/pages/LegacyLayoutsPage"),
     "/appearance/layouts/:layoutViewType/legacy",
     (layoutViewType: LayoutViewType) => `/appearance/layouts/${layoutViewType}/legacy`,
-    PageLoader,
+    AppearanceRoutePageLoader,
 );
 
 export const BrandingPageRoute = new RouteHandler(
     () => import("@dashboard/appearance/pages/BrandingAndSEOPage"),
     "/appearance/branding",
     () => "/appearance/branding",
-    PageLoader,
+    AppearanceRoutePageLoader,
 );
 
+// no adminlayout?
 export const LayoutEditorRoute = new RouteHandler(
     () => import("@dashboard/layout/pages/LayoutEditorPage"),
     [`/appearance/layouts/:layoutViewType/:layoutID(\\w+)(-[^/]+)?/edit`, "/appearance/layouts/:layoutViewType/add"],
@@ -49,7 +51,7 @@ export const LayoutEditorRoute = new RouteHandler(
             return `/appearance/layouts/${layout.layoutViewType}/add`;
         }
     },
-    PageLoader,
+    ModalLoader,
 );
 
 export const LayoutOverviewRoute = new RouteHandler(
@@ -57,21 +59,21 @@ export const LayoutOverviewRoute = new RouteHandler(
     `/appearance/layouts/:layoutViewType/:layoutID(\\w+)(-[^/]+)?`,
     (layout: LayoutFragment) =>
         `/appearance/layouts/${layout.layoutViewType}/${layout.layoutID}-${slugify(layout.name)}`,
-    PageLoader,
+    AppearanceRoutePageLoader,
 );
 
 export const LayoutOverviewRedirectRoute = new RouteHandler(
     () => import("@dashboard/appearance/pages/LayoutOverviewRedirectPage"),
     `/appearance/layouts/:layoutID(\\w+)(-[^/]+)?`,
     (layout: LayoutFragment) => `/appearance/layouts/${layout.layoutID}-${slugify(layout.name)}`,
-    PageLoader,
+    AppearanceRoutePageLoader,
 );
 
 export const AppearanceLayoutsRoute = new RouteHandler(
     () => import("@dashboard/appearance/pages/AppearanceLayoutsPage"),
     "/appearance/layouts",
     () => "/appearance/layouts",
-    PageLoader,
+    AppearanceRoutePageLoader,
 );
 
 export function getAppearanceRoutes() {

@@ -16,7 +16,7 @@ import { createReducer } from "@reduxjs/toolkit";
 import MEMBERS_SEARCH_DOMAIN from "@dashboard/components/panels/MembersSearchDomain";
 import COMMUNITY_SEARCH_SOURCE from "@library/search/CommunitySearchSource";
 import { SearchService } from "@library/search/SearchService";
-import { SearchSourcesContextProvider } from "@library/search/SearchSourcesContextProvider";
+import { MemoryRouter } from "react-router";
 
 export const mockRolesState: Partial<IRoleState> = {
     rolesByID: {
@@ -69,13 +69,13 @@ describe("MembersSearchFilterPanel", () => {
 
     const MockSearchFilterPanel = () => {
         return (
-            <SearchSourcesContextProvider>
+            <MemoryRouter>
                 <SearchFormContextProvider>
                     <MockProfileFieldsProvider>
                         <MembersSearchFilterPanel />
                     </MockProfileFieldsProvider>
                 </SearchFormContextProvider>
-            </SearchSourcesContextProvider>
+            </MemoryRouter>
         );
     };
 

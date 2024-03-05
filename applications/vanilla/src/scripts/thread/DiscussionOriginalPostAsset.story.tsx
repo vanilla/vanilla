@@ -6,6 +6,7 @@
 
 import { LoadStatus } from "@library/@types/api/core";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
+import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import { STORY_DISCUSSION } from "@library/storybook/storyData";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DiscussionOriginalPostAsset from "@vanilla/addon-vanilla/thread/DiscussionOriginalPostAsset";
@@ -59,7 +60,9 @@ export const CurrentUser = () => {
                 },
             }}
         >
-            <StoryDiscussionCommentEditorAsset />
+            <PermissionsFixtures.AllPermissions>
+                <StoryDiscussionCommentEditorAsset />
+            </PermissionsFixtures.AllPermissions>
         </TestReduxProvider>
     );
 };

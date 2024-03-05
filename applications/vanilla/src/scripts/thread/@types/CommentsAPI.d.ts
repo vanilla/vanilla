@@ -6,22 +6,23 @@
 
 declare namespace CommentsApi {
     export interface IndexParams {
-        discussionID: RecordID;
+        discussionID: string | number;
         limit: number;
         page: number;
+        expand?: string[];
+        qna?: string;
     }
 
     export interface PostParams {
         body: string;
         format: string;
-        discussionID: RecordID;
-        draftID?: RecordID;
+        discussionID: string | number;
+        draftID?: string | number;
     }
 
     export interface PatchParams {
         body: string;
         format: string;
-        commentID: RecordID;
     }
 
     export type CommentListData = IWithPaging<IComment[]>;

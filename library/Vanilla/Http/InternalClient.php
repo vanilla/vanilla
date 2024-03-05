@@ -13,6 +13,7 @@ use Garden\Http\HttpResponse;
 use Garden\Sites\Clients\SiteHttpClient;
 use Garden\Web\Data;
 use Garden\Web\Exception\HttpException;
+use Garden\Web\Exception\ResponseException;
 use Vanilla\Site\OwnSite;
 use Vanilla\Utility\DebugUtils;
 
@@ -145,6 +146,7 @@ class InternalClient extends SiteHttpClient
                     $previousEx = $throwable;
                 }
             }
+
             $exception = HttpException::createFromStatus(
                 $response->getStatusCode(),
                 $message,

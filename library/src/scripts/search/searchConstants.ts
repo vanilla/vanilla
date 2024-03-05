@@ -7,7 +7,7 @@ import { getMeta } from "@library/utility/appUtils";
 
 export const EMPTY_SEARCH_DOMAIN_KEY = "empty";
 export const ALL_CONTENT_DOMAIN_KEY = "all_content";
-export const ALLOWED_GLOBAL_SEARCH_FIELDS = ["domain", "scope", "page", "query", "types", "sort"];
+export const ALLOWED_GLOBAL_SEARCH_FIELDS = ["domain", "scope", "page", "query", "sort"];
 export const NEW_SEARCH_PAGE_ENABLED = getMeta("themeFeatures.useNewSearchPage", false);
 export const MEMBERS_RECORD_TYPE = "user";
 

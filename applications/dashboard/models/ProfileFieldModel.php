@@ -208,7 +208,7 @@ class ProfileFieldModel extends FullRecordCacheModel
         parent::__construct(self::TABLE_NAME, $cache, [
             \Gdn_Cache::FEATURE_EXPIRY => 3600, // 1 hour.
         ]);
-        $this->addPipelineProcessor(new JsonFieldProcessor(["displayOptions", "dropdownOptions"]));
+        $this->addPipelineProcessor(new JsonFieldProcessor(["displayOptions", "dropdownOptions", "attributes"]));
         $this->addPipelineProcessor(new BooleanFieldProcessor(["enabled"]));
     }
 
@@ -251,6 +251,7 @@ class ProfileFieldModel extends FullRecordCacheModel
             ->column("displayOptions", "mediumtext")
             ->column("dropdownOptions", "mediumtext", true)
             ->column("registrationOptions", self::REGISTRATION_OPTIONS, self::REGISTRATION_HIDDEN)
+            ->column("attributes", "json", true)
             ->column("sort", "int")
             ->column("isCoreField", "varchar(100)", "")
             ->column("enabled", "tinyint", 1)

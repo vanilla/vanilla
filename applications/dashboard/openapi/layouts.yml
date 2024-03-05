@@ -213,7 +213,13 @@ paths:
                       type: object
             responses:
                 "200":
-                    $ref: "#/components/responses/HydratedLayout"
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                oneOf:
+                                    - $ref: "#/components/schemas/HydratedLayoutResponseSchema"
+                                    - $ref: "#/components/schemas/LayoutRedirectResponseSchema"
                 "404":
                     $ref: "#/components/responses/NotFound"
     /layouts/{id}/hydrate-assets:
@@ -302,7 +308,14 @@ paths:
                                     type: object
             responses:
                 "200":
-                    $ref: "#/components/responses/HydratedLayout"
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                oneOf:
+                                    - $ref: "#/components/schemas/HydratedLayoutResponseSchema"
+                                    - $ref: "#/components/schemas/LayoutRedirectResponseSchema"
+
                 "403":
                     $ref: "#/components/responses/PermissionError"
     /layouts/catalog:
@@ -496,12 +509,7 @@ components:
             content:
                 application/json:
                     schema:
-                        type: object
-                        properties:
-                            layoutViewType:
-                                $ref: "#/components/schemas/LayoutViewType"
-                            layout:
-                                $ref: "#/components/schemas/LayoutDefinitionHydrated"
+                        $ref: "#/components/schemas/HydratedLayoutResponseSchema"
         LayoutAssets:
             description: Success
             content:
@@ -523,14 +531,35 @@ components:
                                     type: string
                                 default: []
                                 readOnly: true
+        LayoutRedirectResponse:
+            description: Success
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/LayoutRedirectResponseSchema"
     schemas:
+        HydratedLayoutResponseSchema:
+            type: object
+            properties:
+                layoutViewType:
+                    $ref: "#/components/schemas/LayoutViewType"
+                layout:
+                    $ref: "#/components/schemas/LayoutDefinitionHydrated"
         JsonSchema:
             type: object
             example:
                 $schema: "https://json-schema.org/draft-07/schema#"
                 type: "object"
                 properties: {}
-
+        LayoutRedirectResponseSchema:
+            type: object
+            properties:
+                redirectTo:
+                    type: string
+                    description: URL to redirect to
+                status:
+                    type: integer
+                    description: HTTP status code
         LayoutViewType:
             description: Type of resource to which this layout applies
             type: string

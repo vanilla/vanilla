@@ -235,4 +235,14 @@ abstract class ResourceEvent implements \JsonSerializable
 
         return $siteSection->getSectionID() ?? null;
     }
+
+    /**
+     * Gets the "base" event action. Defaults to the same value of `getAction()`. Can be overridden by subclasses.
+     *
+     * @return string
+     */
+    public function getBaseAction(): string
+    {
+        return $this->getAction();
+    }
 }

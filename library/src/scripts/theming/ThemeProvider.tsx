@@ -15,7 +15,6 @@ import { useSelector } from "react-redux";
 import { Backgrounds, BackgroundsProvider } from "@library/layout/Backgrounds";
 import { BrowserRouter } from "react-router-dom";
 import { useThemeCacheID } from "@library/styles/themeCache";
-import { loadThemeShadowDom } from "@library/theming/loadThemeShadowDom";
 import { logError } from "@vanilla/utils";
 
 interface IProps {
@@ -61,7 +60,6 @@ export const ThemeProvider: React.FC<IProps> = (props: IProps) => {
 
         if (assets.data && !hasMounted) {
             hasMounted = true;
-            loadThemeShadowDom();
             const themeHeader = document.getElementById("themeHeader");
             if (themeHeader) {
                 // Apply the theme's header height to offset our panel layouts.

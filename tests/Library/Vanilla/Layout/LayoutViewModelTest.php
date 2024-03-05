@@ -83,12 +83,11 @@ class LayoutViewModelTest extends SiteTestCase
             $layoutID2
         );
 
-        $resultLayoutID = $this->layoutViewModel->queryLayoutID(new LayoutQuery("home", "global", -1));
-        $resultFileLayoutID = $this->layoutViewModel->queryLayoutID(
+        [$resultLayoutID] = $this->layoutViewModel->queryLayout(new LayoutQuery("home", "global", -1));
+        [$resultFileLayoutID] = $this->layoutViewModel->queryLayout(
             new LayoutQuery("discussionCategoryPage", "category", 1)
         );
-
-        $resultFileLayoutID2 = $this->layoutViewModel->queryLayoutID(new LayoutQuery("categoryList", "category", 1));
+        [$resultFileLayoutID2] = $this->layoutViewModel->queryLayout(new LayoutQuery("categoryList", "category", 1));
 
         $this->assertEquals($layoutID1, $resultLayoutID);
         $this->assertEquals($layoutID2, $resultFileLayoutID);
@@ -116,18 +115,18 @@ class LayoutViewModelTest extends SiteTestCase
             $nestedLayoutID
         );
         //Test Default
-        $resultFileLayoutID = $this->layoutViewModel->queryLayoutID(new LayoutQuery("categoryList", "category", 1));
+        [$resultFileLayoutID] = $this->layoutViewModel->queryLayout(new LayoutQuery("categoryList", "category", 1));
 
         $this->assertEquals("discussionCategoryPage", $resultFileLayoutID);
 
-        $resultFileLayoutID = $this->layoutViewModel->queryLayoutID(
+        [$resultFileLayoutID] = $this->layoutViewModel->queryLayout(
             new LayoutQuery("categoryList", "category", $nestedCategory["categoryID"])
         );
 
         $this->assertEquals($nestedLayoutID, $resultFileLayoutID);
 
         $this->expectExceptionMessage("Heading categories cannot be viewed directly.");
-        $resultFileLayoutID = $this->layoutViewModel->queryLayoutID(
+        [$resultFileLayoutID] = $this->layoutViewModel->queryLayout(
             new LayoutQuery("categoryList", "category", $headingCategory["categoryID"])
         );
     }
@@ -276,7 +275,7 @@ class LayoutViewModelTest extends SiteTestCase
      */
     private function assertLayoutQueryID($expectedID, LayoutQuery $query, ?string $message = ""): void
     {
-        $actual = $this->layoutViewModel->queryLayoutID($query);
+        [$actual] = $this->layoutViewModel->queryLayout($query);
         $this->assertEquals($expectedID, $actual, $message);
     }
 }

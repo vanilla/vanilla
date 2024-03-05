@@ -44,7 +44,7 @@ describe("ValidationProvider", () => {
             const validation = result.current.validate(MOCK_SCHEMA, { mockProperty: "" });
             expect(validation.valid).toBeFalsy();
             expect(validation.errors?.length).not.toBe(0);
-            expect(validation?.errors?.[1]?.error).toBe("String is too short (0 < 1).");
+            expect(validation?.errors?.[0]?.error).toBe("String is too short (0 < 1).");
         });
     });
     it("validate function returns custom error messages, when a generic message is specified", () => {
@@ -66,7 +66,7 @@ describe("ValidationProvider", () => {
             });
             expect(validation.valid).toBeFalsy();
             expect(validation.errors?.length).not.toBe(0);
-            expect(validation?.errors?.[1]?.error).toBe("Custom error message");
+            expect(validation?.errors?.[0]?.error).toBe("Custom error message");
         });
     });
     it("validate function returns custom error messages, for specific keywords", () => {
@@ -97,13 +97,13 @@ describe("ValidationProvider", () => {
             });
             expect(minLengthValidation.valid).toBeFalsy();
             expect(minLengthValidation.errors?.length).not.toBe(0);
-            expect(minLengthValidation?.errors?.[1]?.error).toBe("Custom min length error message");
+            expect(minLengthValidation?.errors?.[0]?.error).toBe("Custom min length error message");
             const maxLengthValidation = result.current.validate(MOCK_SCHEMA_WITH_CUSTOM_MESSAGE, {
                 mockProperty: "Her is a string which is longer than the maximum allowed length of this schema",
             });
             expect(maxLengthValidation.valid).toBeFalsy();
             expect(maxLengthValidation.errors?.length).not.toBe(0);
-            expect(maxLengthValidation?.errors?.[1]?.error).toBe("Custom max length error message");
+            expect(maxLengthValidation?.errors?.[0]?.error).toBe("Custom max length error message");
         });
     });
 });

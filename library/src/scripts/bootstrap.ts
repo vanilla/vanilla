@@ -31,8 +31,6 @@ import "@library/VanillaGlobals";
 
 // Has some side effects of creating globals.
 import "@library/gdn";
-import { loadedCSS } from "@rich-editor/quill/components/loadedStyles";
-import { loadThemeShadowDom } from "@library/theming/loadThemeShadowDom";
 import { initModernEmbed } from "@library/embed/modernEmbed.local";
 import { iconRegistry } from "@vanilla/icons";
 
@@ -82,14 +80,13 @@ export function bootstrapVanilla() {
     }
 
     // Make sure we mount our header/footer shadow doms before anything else happens.
-    _executeReady(loadThemeShadowDom)
+    _executeReady()
         .then(() => {
             // Mount all data-react components.
             onContent((e) => {
                 _mountComponents(e.target as HTMLElement).finally(() => {
                     setTimeout(() => {
-                        // Without setImmediate there is a FOUC
-                        loadedCSS();
+                        document.body.classList.remove("isLoading");
                     }, 0);
                 });
                 blotCSS();

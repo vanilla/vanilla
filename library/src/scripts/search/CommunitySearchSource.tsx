@@ -1,15 +1,14 @@
 /**
  * @author Mihran Abrahamian <mabrahamian@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
 import apiv2 from "@library/apiv2";
 import SimplePagerModel from "@library/navigation/SimplePagerModel";
-import { ISearchRequestQuery, ISearchResult, ISearchSource } from "@library/search/searchTypes";
+import { ISearchRequestQuery, ISearchSource } from "@library/search/searchTypes";
 import { t } from "@vanilla/i18n";
 import type SearchDomain from "@library/search/SearchDomain";
-import { IResult } from "@library/result/Result";
 import { SearchDomainLoadable } from "@library/search/SearchDomainLoadable";
 
 class CommunitySearchSource implements ISearchSource {
@@ -64,15 +63,22 @@ class CommunitySearchSource implements ISearchSource {
     }
 
     public loadDomains = async (): Promise<SearchDomain[]> => {
-        for (let asyncDomain of this.asyncDomains) {
-            if (asyncDomain.loadedDomain) {
-                this.pushDomain(asyncDomain.loadedDomain);
-            } else {
-                const loaded = await asyncDomain.load();
-                this.pushDomain(loaded);
-            }
-        }
-        return this.loadedDomains;
+        return await Promise.all(
+            Array.from(this.asyncDomains).map((asyncDomain) => {
+                return new Promise<SearchDomain>((resolve) => {
+                    if (asyncDomain.loadedDomain) {
+                        this.pushDomain(asyncDomain.loadedDomain);
+
+                        return resolve(asyncDomain.loadedDomain);
+                    } else {
+                        return asyncDomain.load().then((loaded) => {
+                            this.pushDomain(loaded);
+                            return resolve(loaded);
+                        });
+                    }
+                });
+            }),
+        );
     };
 
     private pushDomain(domain: SearchDomain) {

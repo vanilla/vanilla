@@ -12,6 +12,8 @@ namespace Garden\Web;
  */
 class Redirect extends Data
 {
+    private string $url;
+
     /**
      * Redirect constructor.
      *
@@ -20,6 +22,17 @@ class Redirect extends Data
      */
     public function __construct(string $url, int $status = 302)
     {
+        $this->url = $url;
         parent::__construct(null, ["status" => $status], ["Location" => $url]);
+    }
+
+    /**
+     * Get the redirect URL.
+     *
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
     }
 }

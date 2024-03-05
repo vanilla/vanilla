@@ -6,6 +6,7 @@
 import React from "react";
 import { fireEvent, render, waitFor, screen, act } from "@testing-library/react";
 import EmbedFlyout from "@library/editor/flyouts/EmbedFlyout";
+import { supportsFrames } from "@library/embeddedContent/IFrameEmbed";
 
 describe("Embed Flyout", () => {
     it("Render flyout and ensure we properly clear input after submit.", async () => {
@@ -58,5 +59,51 @@ describe("Embed Flyout", () => {
         fireEvent.click(insertButton);
         expect(screen.queryAllByRole("textbox").length).toBe(1);
         expect(insertButton).toBeDisabled();
+    });
+
+    it("Properly handle iframe creation", async () => {
+        jest.useFakeTimers();
+        supportsFrames(true);
+        const createIframe = jest.fn();
+
+        // Boilerplate to render the flyout
+        const { container } = render(<EmbedFlyout createEmbed={(url) => {}} createIframe={createIframe} />);
+
+        const insertMediaButton = screen.getByRole("button", {
+            name: "Insert Media",
+        });
+
+        expect(insertMediaButton).toBeInTheDocument();
+        fireEvent.click(insertMediaButton);
+
+        const urlInput = container.querySelectorAll("textarea")[0];
+
+        await waitFor(() => {
+            expect(urlInput).toBeInTheDocument();
+        });
+
+        const insertButton = screen.getByRole("button", {
+            name: "Insert",
+        });
+        expect(insertButton).toBeInTheDocument();
+
+        // Iframe code
+        const iframeCode = `<iframe src="https://www.youtube.com" width="560" height="315" />`;
+
+        // Insert and submit
+        await act(async () => {
+            fireEvent.change(screen.getByRole("textbox"), {
+                target: { value: iframeCode },
+            });
+            jest.advanceTimersByTime(500);
+        });
+        await waitFor(() => {
+            expect(urlInput.value).toBe(iframeCode);
+            fireEvent.click(insertButton);
+            jest.advanceTimersByTime(500);
+        });
+
+        // Validate attributes have been extracted
+        expect(createIframe).toHaveBeenCalledWith({ url: "https://www.youtube.com", width: "560", height: "315" });
     });
 });

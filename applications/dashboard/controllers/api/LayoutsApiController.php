@@ -17,6 +17,8 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
+use Garden\Web\Exception\ResponseException;
+use Garden\Web\Redirect;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Layout\Asset\AbstractLayoutAsset;
@@ -157,9 +159,6 @@ class LayoutsApiController extends \AbstractApiController
             $widgetIconUrl = asset($widgetClass::getWidgetIconPath(), true);
             $widgetName = $widgetClass::getWidgetName();
             $schema = $resolver->getSchema();
-            if (method_exists($widgetClass, "getExtendedSchemaForLayout")) {
-                $schema->merge($widgetClass::getExtendedSchemaForLayout($query["layoutViewType"]));
-            }
 
             if (is_a($widgetClass, AbstractLayoutSection::class, true)) {
                 $sectionSchemas[$resolver->getType()] = [
@@ -413,11 +412,28 @@ class LayoutsApiController extends \AbstractApiController
         );
         $query = $in->validate($query);
 
-        $layoutID = $this->layoutViewModel->queryLayoutID(
-            new LayoutQuery($query["layoutViewType"], $query["recordType"], $query["recordID"])
-        );
+        try {
+            [$layoutID, $resolvedQuery] = $this->layoutViewModel->queryLayout(
+                new LayoutQuery(
+                    $query["layoutViewType"],
+                    $query["recordType"],
+                    $query["recordID"],
+                    $query["params"] ?? []
+                )
+            );
+        } catch (ResponseException $exception) {
+            $response = $exception->getResponse();
+            if ($response instanceof Redirect) {
+                return new Data([
+                    "redirectTo" => $response->getUrl(),
+                    "status" => $response->getStatus(),
+                ]);
+            } else {
+                throw $exception;
+            }
+        }
 
-        return $this->get_hydrate($layoutID, $query);
+        return $this->get_hydrate($layoutID, $resolvedQuery->jsonSerialize());
     }
 
     /**
@@ -451,7 +467,7 @@ class LayoutsApiController extends \AbstractApiController
         );
         $out = $this->layoutModel->getHydratedSchema();
         $query = $in->validate($query);
-        $params = $query["params"] ?? [];
+        $params = isset($query["params"]) ? (array) $query["params"] : [];
 
         // Grab the record from the database if it exists.
         $provider = $this->layoutService->getCompatibleProvider($layoutID);
@@ -466,7 +482,19 @@ class LayoutsApiController extends \AbstractApiController
 
         $layoutViewType = $row["layoutViewType"];
 
-        $hydrated = $this->layoutHydrator->hydrateLayout($layoutViewType, $params, $row);
+        try {
+            $hydrated = $this->layoutHydrator->hydrateLayout($layoutViewType, $params, $row);
+        } catch (ResponseException $exception) {
+            $response = $exception->getResponse();
+            if ($response instanceof Redirect) {
+                return new Data([
+                    "redirectTo" => $response->getUrl(),
+                    "status" => $response->getStatus(),
+                ]);
+            } else {
+                throw $exception;
+            }
+        }
 
         $result = $this->layoutModel->normalizeRow($hydrated);
         $result = $out->validate($result);
@@ -498,11 +526,16 @@ class LayoutsApiController extends \AbstractApiController
 
         $in = $this->schema(["layoutViewType:s", "recordID:i", "recordType:s", "params:o?"], "in");
         $parsedQuery = $in->validate($query);
-        $layoutID = $this->layoutViewModel->queryLayoutID(
-            new LayoutQuery($parsedQuery["layoutViewType"], $parsedQuery["recordType"], $parsedQuery["recordID"])
+        [$layoutID, $resolvedQuery] = $this->layoutViewModel->queryLayout(
+            new LayoutQuery(
+                $parsedQuery["layoutViewType"],
+                $parsedQuery["recordType"],
+                $parsedQuery["recordID"],
+                $parsedQuery["params"] ?? []
+            )
         );
 
-        return $this->get_hydrateAssets($layoutID, $query);
+        return $this->get_hydrateAssets($layoutID, $resolvedQuery->jsonSerialize());
     }
 
     /**
@@ -528,7 +561,7 @@ class LayoutsApiController extends \AbstractApiController
         $in = $this->schema(["params:o?"], "in");
         $out = Schema::parse(["js:a", "css:a"]);
         $query = $in->validate($query);
-        $params = $query["params"] ?? [];
+        $params = isset($query["params"]) ? (array) $query["params"] : [];
 
         // Grab the record from the database if it exists.
         $provider = $this->layoutService->getCompatibleProvider($layoutID);

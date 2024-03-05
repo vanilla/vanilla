@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { IEmailDigestDeliveryDates, ISentDigest } from "@dashboard/emailSettings/EmailSettings.types";
 import Message from "@library/messages/Message";
 import Heading from "@library/layout/Heading";
@@ -16,6 +16,7 @@ import { IError } from "@library/errorPages/CoreErrorMessages";
 import { t } from "@vanilla/i18n";
 import { Table } from "@dashboard/components/Table";
 import digestTableStyles from "./DigestTable.styles";
+import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 
 const dateFormat = "ddd MMM Do, YYYY";
 
@@ -47,15 +48,36 @@ export default function DigestSchedule(props: { dayOfWeek: number }) {
         }
     }, [deliveryDatesQuery.data, sentDigestDates]);
 
-    if (deliveryDatesQuery.isLoading) {
-        return null;
-    }
-
-    return <DigestScheduleImpl upcomingDigestDates={upcomingDigestDates} sentDigestDates={sentDigestDates} />;
+    return (
+        <DigestScheduleImpl
+            isFetched={deliveryDatesQuery.isFetched}
+            upcomingDigestDates={upcomingDigestDates}
+            sentDigestDates={sentDigestDates}
+        />
+    );
 }
 
-export function DigestScheduleImpl(props: { upcomingDigestDates: string; sentDigestDates: ISentDigest[] }) {
-    const { upcomingDigestDates, sentDigestDates } = props;
+export function DigestScheduleImpl(props: {
+    isFetched: boolean;
+    upcomingDigestDates: string;
+    sentDigestDates: ISentDigest[];
+}) {
+    const { upcomingDigestDates, sentDigestDates, isFetched } = props;
+
+    const tableData = useMemo(() => {
+        return !isFetched
+            ? Array.from(new Array(4)).map((_) => ({
+                  dateScheduled: <LoadingRectangle />,
+                  totalSubscribers: <LoadingRectangle />,
+              }))
+            : Object.values(sentDigestDates).map((sentDigest) => {
+                  return {
+                      dateScheduled: moment(sentDigest.dateScheduled).format(dateFormat),
+                      totalSubscribers:
+                          sentDigest.totalSubscribers && `${sentDigest.totalSubscribers} ${t("subscribers")}`,
+                  };
+              });
+    }, [isFetched, sentDigestDates]);
 
     return (
         <>
@@ -63,31 +85,21 @@ export function DigestScheduleImpl(props: { upcomingDigestDates: string; sentDig
                 <div style={{ width: "100%", marginInline: 18 }}>
                     <Message
                         icon={<InformationIcon />}
-                        stringContents={`The next three email digest delivery dates: ${upcomingDigestDates}`}
+                        stringContents={`The next three email digest delivery dates: ${
+                            isFetched ? upcomingDigestDates : ""
+                        }`}
                         type="neutral"
                     />
                 </div>
             </li>
-            {sentDigestDates.length > 0 && (
-                <li className="form-group" style={{ background: "#fff", border: 0 }}>
-                    <div style={{ width: "100%", marginInline: 18 }}>
-                        <>
-                            <Heading depth={5} title={t("History")} style={{ margin: 0 }} />
-                            <Table
-                                data={Object.values(sentDigestDates).map((sentDigest) => {
-                                    return {
-                                        dateScheduled: moment(sentDigest.dateScheduled).format(dateFormat),
-                                        totalSubscribers:
-                                            sentDigest.totalSubscribers &&
-                                            `${sentDigest.totalSubscribers} ${t("subscribers")}`,
-                                    };
-                                })}
-                                tableClassNames={digestTableStyles().table}
-                            />
-                        </>
-                    </div>
-                </li>
-            )}
+            <li className="form-group" style={{ background: "#fff", border: 0 }}>
+                <div style={{ width: "100%", marginInline: 18 }}>
+                    <>
+                        <Heading depth={5} title={t("History")} style={{ margin: 0 }} />
+                        <Table data={tableData} tableClassNames={digestTableStyles().table} />
+                    </>
+                </div>
+            </li>
         </>
     );
 }

@@ -14,7 +14,6 @@
         <directory name="applications/vanilla" />
         <directory name="plugins/Akismet" />
         <directory name="plugins/AllViewed" />
-        <directory name="plugins/Reactions" />
         <directory name="plugins/CivilTongueEx" />
         <directory name="plugins/Facebook" />
         <directory name="plugins/Flagging" />
@@ -30,7 +29,6 @@
         <directory name="plugins/ProfileExtender" />
         <directory name="plugins/QnA" />
         <directory name="plugins/Quotes" />
-        <directory name="plugins/Reactions" />
         <directory name="plugins/Signatures" />
         <directory name="plugins/Sitemaps" />
         <directory name="plugins/SplitMerge" />

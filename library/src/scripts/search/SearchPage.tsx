@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -13,20 +13,17 @@ import Container from "@library/layout/components/Container";
 import Drawer from "@library/layout/drawer/Drawer";
 import { PageHeading } from "@library/layout/PageHeading";
 import DocumentTitle from "@library/routing/DocumentTitle";
-import QueryString from "@library/routing/QueryString";
 import { SearchInFilter } from "@library/search/SearchInFilter";
 import { SearchPageResults } from "@library/search/SearchPageResults";
 import { SortAndPaginationInfo } from "@library/search/SortAndPaginationInfo";
-import { typographyClasses } from "@library/styles/typographyStyles";
 // This new page must have our base reset in place.
 import "@library/theming/reset";
 import { t, formatUrl } from "@library/utility/appUtils";
 import Banner from "@library/banner/Banner";
-import { useSearchForm } from "@library/search/SearchContext";
+import { useSearchForm } from "@library/search/SearchFormContext";
 import { useLastValue } from "@vanilla/react-utils";
-import classNames from "classnames";
 import qs from "qs";
-import React, { ReactElement, useEffect, useMemo } from "react";
+import React, { ReactElement, useEffect, useMemo, useState } from "react";
 import { useLocation, useHistory } from "react-router";
 import SectionTwoColumns from "@library/layout/TwoColumnSection";
 import { SectionProvider, useSection } from "@library/layout/LayoutContext";
@@ -45,23 +42,27 @@ import History from "history";
 import { Backgrounds } from "@library/layout/Backgrounds";
 import { Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
-import { useSearchSources } from "@library/search/SearchSourcesContextProvider";
+import { useSearchSources } from "@library/search/SearchSourcesContext";
 import { ALL_CONTENT_DOMAIN_KEY } from "./searchConstants";
 import PlacesSearchListing from "./PlacesSearchListing";
 import PLACES_SEARCH_DOMAIN from "@dashboard/components/panels/PlacesSearchDomain";
+import { SearchFormContextProvider } from "@library/search/SearchFormContextProvider";
 
-interface IProps {
-    placeholder?: string;
-}
-
-export function SearchPageContent(props: IProps) {
-    const { form, updateForm, search, response, domainSearchResponse, handleSourceChange, domains, currentDomain } =
-        useSearchForm<{}>();
+export function SearchPageContent() {
+    const {
+        form,
+        updateForm,
+        search,
+        response,
+        domainSearchResponse,
+        handleSourceChange,
+        domains,
+        currentDomain,
+        currentSource,
+    } = useSearchForm<{}>();
 
     const { isCompact } = useSection();
-
-    const { sources, currentSource } = useSearchSources();
-    const lastSourceKey = useLastValue(currentSource?.key);
+    const { sources } = useSearchSources();
 
     let scope = useSearchScope().value?.value ?? SEARCH_SCOPE_LOCAL;
     if (currentDomain.isIsolatedType) {
@@ -83,12 +84,7 @@ export function SearchPageContent(props: IProps) {
 
     const { needsResearch } = form;
     useEffect(() => {
-        if (
-            currentSource &&
-            (needsResearch ||
-                (lastScope && lastScope !== scope) ||
-                (lastSourceKey && lastSourceKey !== currentSource.key))
-        ) {
+        if (needsResearch || (lastScope && lastScope !== scope)) {
             search();
         }
     });
@@ -169,7 +165,6 @@ export function SearchPageContent(props: IProps) {
                             >
                                 <div className={searchBarClasses({}).standardContainer}>
                                     <SearchBar
-                                        placeholder={props.placeholder}
                                         onChange={(newQuery) => updateForm({ query: newQuery })}
                                         value={`${form.query}`}
                                         onSearch={search}
@@ -207,8 +202,8 @@ export function SearchPageContent(props: IProps) {
                                     label: source.label,
                                     contents: searchPageResultsContent,
                                 }))}
-                                onChange={({ tabID: newSourceKey }) => {
-                                    handleSourceChange(`${newSourceKey!}`);
+                                onChange={async ({ tabID: newSourceKey }) => {
+                                    await handleSourceChange(`${newSourceKey!}`);
                                 }}
                                 extraButtons={sortAndPaginationContent}
                             />
@@ -228,8 +223,6 @@ function useInitialQueryParamSync() {
     const history = useHistory();
     const location = useLocation();
     const searchScope = useSearchScope();
-
-    const { sources, setCurrentSource } = useSearchSources();
 
     const { initialized } = form;
 
@@ -280,10 +273,6 @@ function useInitialQueryParamSync() {
             if (key === "discussionID") {
                 queryForm.domain = "discussions";
             }
-
-            if (key === "source") {
-                queryForm.source = queryForm[key];
-            }
         }
 
         // fixme
@@ -298,10 +287,6 @@ function useInitialQueryParamSync() {
             searchScope.setValue?.(queryForm.scope);
         }
 
-        if (typeof queryForm.source === "string" && sources.find(({ key }) => key === queryForm.source)) {
-            setCurrentSource(queryForm.source);
-        }
-
         queryForm.initialized = true;
 
         updateForm(queryForm);
@@ -310,40 +295,38 @@ function useInitialQueryParamSync() {
     }, [initialized]);
 }
 
-export default function SearchPage(props: IProps) {
-    const { form, defaultFormValues, currentDomain } = useSearchForm<{}>();
-    const { currentSource } = useSearchSources();
-
-    let scope = useSearchScope().value?.value ?? SEARCH_SCOPE_LOCAL;
-    if (currentDomain.isIsolatedType) {
-        scope = SEARCH_SCOPE_LOCAL;
-    }
-
+export function SearchPage() {
     useInitialQueryParamSync();
+    const { form } = useSearchForm<{}>();
 
     return (
         <SectionProvider type={SectionTypes.TWO_COLUMNS}>
-            <QueryString
-                value={{
-                    ...form,
-                    initialized: undefined,
-                    scope,
-                    needsResearch: undefined,
-                    source: currentSource?.key,
-                    pageURL: undefined,
-                    offset: undefined,
-                }}
-                defaults={defaultFormValues}
-            />
             <Backgrounds />
             {/* Add a context provider so that smartlinks within search use dynamic navigation. */}
             <LinkContextProvider linkContexts={[formatUrl("/search", true)]}>
                 <DocumentTitle title={form.query ? `${form.query}` : t("Search Results")}>
                     <TitleBar title={t("Search")} />
                     <Banner isContentBanner />
-                    <SearchPageContent {...props} />
+                    <SearchPageContent />
                 </DocumentTitle>
             </LinkContextProvider>
         </SectionProvider>
+    );
+}
+
+export default function SearchPageWithContext() {
+    const location = useLocation();
+
+    const queryString: any = qs.parse(location.search, { ignoreQueryPrefix: true });
+    const initialSourceKey = typeof queryString.source === "string" ? (queryString.source as string) : undefined;
+    const initialDomainKey = typeof queryString.domain === "string" ? (queryString.domain as string) : undefined;
+
+    return (
+        <SearchFormContextProvider
+            initialSourceKey={initialSourceKey}
+            initialFormState={initialDomainKey ? { domain: initialDomainKey } : undefined}
+        >
+            <SearchPage />
+        </SearchFormContextProvider>
     );
 }

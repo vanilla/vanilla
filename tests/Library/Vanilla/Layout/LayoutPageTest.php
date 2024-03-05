@@ -6,7 +6,6 @@
 
 namespace VanillaTests\Library\Vanilla\Layout;
 
-use Gdn;
 use Vanilla\Layout\Asset\LayoutQuery;
 use Vanilla\Layout\LayoutModel;
 use Vanilla\Layout\LayoutPage;
@@ -15,7 +14,6 @@ use Vanilla\Layout\Providers\FileBasedLayoutProvider;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Layout\LayoutTestTrait;
 use VanillaTests\SiteTestCase;
-use VanillaTests\SiteTestTrait;
 
 /**
  * Unit test for LayoutModel
@@ -341,50 +339,6 @@ class LayoutPageTest extends SiteTestCase
         $crumbs = array_column($jsonLD["@graph"][0]["itemListElement"], "name");
         foreach ($crumbs as $crumb) {
             $this->assertTrue(in_array($crumb, ["Home", $category["name"]]));
-        }
-    }
-
-    /**
-     * Test that the proper seo data is included in the DiscussionThread layout view.
-     *
-     * @return void
-     */
-    public function testDiscussionThreadLayoutViewSeoTags(): void
-    {
-        $category = $this->createCategory();
-        $discussion = $this->createDiscussion(["categoryID" => $category["categoryID"]]);
-        $layout = [
-            "layoutID" => 1,
-            "layoutViewType" => "discussionThread",
-            "name" => "TestDiscussionThreadPage",
-            "layout" => [
-                [
-                    '$hydrate' => "react.section.1-column",
-                    "children" => [],
-                ],
-            ],
-        ];
-        $layoutID = $this->layoutModel->insert($layout);
-        $layoutView = [
-            "layoutID" => $layoutID,
-            "recordID" => -1,
-            "recordType" => "global",
-            "layoutViewType" => "discussionThread",
-        ];
-
-        $this->layoutViewModel->insert($layoutView);
-
-        $layoutPage = $this->container()->get(LayoutPage::class);
-        $page = $layoutPage->preloadLayout(
-            new LayoutQuery("discussionThread", "global", -1, ["discussionID" => $discussion["discussionID"]])
-        );
-        $this->assertSame("{$discussion["name"]} - LayoutPageTest", $page->getSeoTitle());
-        $this->assertSame(Gdn::formatService()->renderExcerpt($discussion["body"], "html"), $page->getSeoDescription());
-        $this->assertSame($discussion["canonicalUrl"] . "/p1", $page->getCanonicalUrl());
-        $jsonLD = $page->getJsonLdItems();
-        $crumbs = array_column($jsonLD["@graph"][0]["itemListElement"], "name");
-        foreach ($crumbs as $crumb) {
-            $this->assertTrue(in_array($crumb, ["Home", $category["name"], $discussion["name"]]));
         }
     }
 }

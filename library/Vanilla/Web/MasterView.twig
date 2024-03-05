@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-
 <html lang="{{ locale }}" {{  isDirectionRTL ? 'dir="rtl"' : ""}}>
-
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,50 +7,122 @@
         {{ pageHead }}
         <noscript>
             <style>
-                .fullPageLoader { display: none }
-
-                body.isLoading .page {
+                body .page {
                     max-height: initial;
                     height: initial;
                 }
             </style>
         </noscript>
+
+        <style>
+            body {
+                background: {{ "#{theme.variable('global.body.backgroundImage.color', theme.variable('global.options.preset', 'light') == 'light' ? '#fff' : '#272A2D')}" }};
+                font-size: {{ "#{theme.variable('global.fonts.size.medium', 14)}px" }};
+                color: {{ "#{theme.variable('global.mainColors.fg', theme.variable('global.options.preset', 'light') == 'light' ? '#555a62' : '#f5f6f7')}" }};
+                word-break: break-word;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                line-height: {{ theme.variable('global.lineHeight.condensed', 1.25) }};
+                color: {{ "#{theme.variable('global.mainColors.fgHeading', theme.variable('global.mainColors.fgHeading', theme.variable('global.mainColors.fg', theme.variable('global.options.preset', 'light') == 'light' ? '#555a62' : '#f5f6f7')))}" }};
+            }
+
+            .page {
+                display: -webkit-box;
+                display: -webkit-flex;
+                display: -ms-flexbox;
+                display: flex;
+                overflow: visible;
+                -webkit-flex-direction: column;
+                -ms-flex-direction: column;
+                flex-direction: column;
+                width: 100%;
+                min-height: 100vh;
+                position: relative;
+                z-index: 0;
+            }
+
+            .page-minHeight {
+                -webkit-box-flex: 1;
+                -webkit-flex-grow: 1;
+                -ms-flex-positive: 1;
+                flex-grow: 1;
+                display: -webkit-box;
+                display: -webkit-flex;
+                display: -ms-flexbox;
+                display: flex;
+                -webkit-flex-direction: column;
+                -ms-flex-direction: column;
+                flex-direction: column;
+
+                min-height: 100vh;
+            }
+        </style>
+        <style>
+            body.isLoading #titleBar {
+                background: {{ theme.variable("titleBar.colors.bg", "#037DBC") }};
+                height: {{ theme.pixelVariable('titleBar.sizing.height', 48) }}px;
+            }
+            @media (max-width: {{ theme.pixelVariable("titlebar.breakpoints.compact", 800) }}px) {
+                body.isLoading #titleBar {
+                    height: {{ "#{theme.pixelVariable('titleBar.sizing.mobile.height', 44)}px" }}
+                }
+            }
+            body.isLoading .Frame {
+                /* For the legacy Gdn_Controller FOUC */
+                visibility: hidden;
+            }
+        </style>
+        <noscript>
+            <style>
+                body.isLoading .Frame {
+                    /* For the legacy Gdn_Controller FOUC */
+                    visibility: visible;
+                }
+            </style>
+        </noscript>
     </head>
-    <body class="{{ cssClasses }}">
+
+    <body class="{{ cssClasses }}" style="margin: 0;">
         {% include "@resources/svg-symbols.html" %}
         <div id="page" class="page">
-            {%- if themeHeader -%}
-                <noscript id="themeHeader">
-                    {{ themeHeader }}
-                </noscript>
-            {%- endif -%}
-            {%- if bodyContent|default(false) -%}
-                <header id="titleBar" data-react="title-bar-hamburger"></header>
-                {{ bodyContent }}
-            {%- else -%}
-                <header id="titleBar"></header>
-                <div id="app" class="page-minHeight">
-                    {% if breadcrumbs|default(false) %}
-                        <noscript>
-                            <div class="breadcrumbs">
-                            {% for breadcrumb in breadcrumbs %}
-                                <span class="crumb">
-                                    <a href="{{ breadcrumb.getUrl() }}">{{ breadcrumb.getName() }}</a>
-                                </span>
-                            {% endfor %}
-                            </div>
-                        </noscript>
-                    {% endif %}
-                    {%- if seoContent|default(false) -%}
-                        <noscript id="fallbackPageContent">
-                            {{- seoContent|raw -}}
-                        </noscript>
-                    {%- endif -%}
-                    <div class="fullPageLoader"></div>
-                </div>
-            {%- endif -%}
+            <div class="page-minHeight">
+                {%- if themeHeader -%}
+                    <div id="themeHeader">
+                        <template shadowrootmode="open">{{ themeHeader }}</template>
+                    </div>
+                {%- endif -%}
+                {%- if bodyContent|default(false) -%}
+                {# Legacy Gdn_Controller layout (forum, admin) #}
+                    <header id="titleBar" class="react-title-bar" data-react="title-bar-hamburger"></header>
+                    {{ bodyContent }}
+                {%- else -%}
+                {# Modern Vanilla\Web\Page layout (layouts, admin-new, knowledge) #}
+                    <header id="titleBar"></header>
+                    <div id="app">
+                        {% if breadcrumbs|default(false) %}
+                            <noscript>
+                                <div class="breadcrumbs">
+                                {% for breadcrumb in breadcrumbs %}
+                                    <span class="crumb">
+                                        <a href="{{ breadcrumb.getUrl() }}">{{ breadcrumb.getName() }}</a>
+                                    </span>
+                                {% endfor %}
+                                </div>
+                            </noscript>
+                        {% endif %}
+                        {%- if seoContent|default(false) -%}
+                            <noscript id="fallbackPageContent">
+                                {{- seoContent|raw -}}
+                            </noscript>
+                        {%- endif -%}
+                    </div>
+                {%- endif -%}
+            </div>
             {%- if themeFooter -%}
-                <noscript id="themeFooter">{{ themeFooter }}</noscript>
+                <div id="themeFooter">
+                    <template shadowrootmode="open">{{ themeFooter }}</template>
+                </div>
             {%- endif -%}
         </div>
         <div id="modals"></div>

@@ -13,5 +13,13 @@ export const lookupLayout = createAsyncThunk("@@layouts/lookup", async (query: I
     const layoutSpec = await apiv2.get<IHydratedLayoutSpec>("/layouts/lookup-hydrate", {
         params: query,
     });
-    return layoutSpec.data;
+    const data = layoutSpec.data;
+
+    if (data.redirectTo) {
+        // We just navigated to this url.
+        // In order to avoid a double navigation, we need to replace the current history entry so that the "bad" redirecting url is no longer there.
+        window.location.replace(data.redirectTo);
+    }
+
+    return data;
 });

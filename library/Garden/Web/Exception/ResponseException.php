@@ -25,6 +25,8 @@ class ResponseException extends HttpException
      */
     private $response;
 
+    private bool $isInternal = false;
+
     /**
      * ResponseException constructor.
      *
@@ -44,5 +46,22 @@ class ResponseException extends HttpException
     public function getResponse(): Data
     {
         return $this->response;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInternal(): bool
+    {
+        return $this->isInternal;
+    }
+
+    /**
+     * @param bool $isInternal
+     * @return void
+     */
+    public function setIsInternal(bool $isInternal): void
+    {
+        $this->isInternal = $isInternal;
     }
 }

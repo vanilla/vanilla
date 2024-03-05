@@ -8,8 +8,11 @@
 namespace Vanilla\Forum\Layout\View;
 
 use Garden\Schema\Schema;
+use Garden\Web\Exception\ResponseException;
+use Garden\Web\Redirect;
 use Gdn;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Forum\Widgets\DiscussionCommentEditorAsset;
 use Vanilla\Forum\Widgets\DiscussionCommentsAsset;
@@ -20,6 +23,8 @@ use Vanilla\Layout\View\AbstractCustomLayoutView;
 use Vanilla\Layout\View\LegacyLayoutViewInterface;
 use Vanilla\Models\DiscussionJsonLD;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Site\SiteSectionModel;
+use Vanilla\Site\SiteSectionSchema;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Web\BreadcrumbJsonLD;
 use Vanilla\Web\PageHeadInterface;
@@ -31,25 +36,29 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
 {
     private \DiscussionModel $discussionModel;
     private InternalClient $internalClient;
-    private ConfigurationInterface $configuration;
     private BreadcrumbModel $breadcrumbModel;
+    private \Gdn_Request $request;
+    private SiteSectionModel $siteSectionModel;
 
     /**
      * @param InternalClient $internalClient
-     * @param ConfigurationInterface $configuration
      * @param \DiscussionModel $discussionModel
      * @param BreadcrumbModel $breadcrumbModel
+     * @param \Gdn_Request $request
+     * @param SiteSectionModel $siteSectionModel
      */
     public function __construct(
         InternalClient $internalClient,
-        ConfigurationInterface $configuration,
         \DiscussionModel $discussionModel,
-        BreadcrumbModel $breadcrumbModel
+        BreadcrumbModel $breadcrumbModel,
+        \Gdn_Request $request,
+        SiteSectionModel $siteSectionModel
     ) {
         $this->internalClient = $internalClient;
-        $this->configuration = $configuration;
         $this->discussionModel = $discussionModel;
         $this->breadcrumbModel = $breadcrumbModel;
+        $this->request = $request;
+        $this->siteSectionModel = $siteSectionModel;
         $this->registerAssetClass(DiscussionCommentsAsset::class);
         $this->registerAssetClass(DiscussionOriginalPostAsset::class);
         $this->registerAssetClass(DiscussionCommentEditorAsset::class);
@@ -63,15 +72,17 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
 
     public function getParamInputSchema(): Schema
     {
-        return Schema::parse(["discussionID:i", "page:i" => ["default" => 1]]);
+        return Schema::parse(["discussionID:i", "commentID:i?", "page:i?" => ["default" => 1]]);
     }
 
     public function resolveParams(array $paramInput, ?PageHeadInterface $pageHead = null): array
     {
         $discussionID = $paramInput["discussionID"];
-
-        // This api call functions as our permission check.
-        $discussion = $this->internalClient->get("/discussions/{$discussionID}?expand=all,status.log")->asData();
+        $commentID = $paramInput["commentID"] ?? null;
+        $commaSeparatedExpands = implode(",", $this->getExpands());
+        $discussion = $this->internalClient
+            ->get("/discussions/{$discussionID}?expand={$commaSeparatedExpands}")
+            ->asData();
         $discussionTags = $discussion["tags"];
         $discussionTags = array_values(
             array_filter($discussionTags, function (array $tag) {
@@ -84,15 +95,23 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
 
         $discussionData = $discussion->getData();
 
+        // Ensure we're in a valid site section, otherwise this will perform a redirect.
+        $canonicalUrl = isset($paramInput["page"])
+            ? $discussionData["canonicalUrl"] . "/p{$paramInput["page"]}"
+            : $discussionData["canonicalUrl"];
+        $redirectBase = $canonicalUrl;
+        if ($commentID !== null) {
+            $redirectBase .= "#Comment_" . $commentID;
+        }
+        $this->tryRedirectSiteSection($discussionData["categoryID"], $redirectBase);
+
         $pageHead->setSeoTitle($discussionData["name"], false);
         $pageHead->setSeoDescription(Gdn::formatService()->renderExcerpt($discussionData["body"], "html"));
         $crumbs = $this->breadcrumbModel->getForRecord(new ForumCategoryRecordType($discussionData["categoryID"]));
         $pageHead->setSeoBreadcrumbs($crumbs);
-        $url = isset($paramInput["page"])
-            ? $discussionData["canonicalUrl"] . "/p{$paramInput["page"]}"
-            : $discussionData["canonicalUrl"];
-        $pageHead->setCanonicalUrl($url);
-        $pageHead->addOpenGraphTag("og:url", $url);
+
+        $pageHead->setCanonicalUrl($canonicalUrl);
+        $pageHead->addOpenGraphTag("og:url", $canonicalUrl);
         if (isset($discussionData["image"])) {
             $pageHead->addOpenGraphTag("og:image", $discussionData["image"]["url"]);
         }
@@ -101,8 +120,12 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
         $breadcrumbs = $discussionData["breadcrumbs"] ?? [];
         $pageHead->addJsonLDItem(new BreadcrumbJsonLD($breadcrumbs));
 
+        $expands = $this->getExpands();
         $result = array_merge($paramInput, [
             "discussion" => $discussion,
+            "discussionApiParams" => [
+                "expand" => $expands,
+            ],
             "breadcrumbs" => $breadcrumbs,
             "tags" => $discussionTags,
         ]);
@@ -110,9 +133,19 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
         return $result;
     }
 
+    /**
+     *
+     * Define the expands necessary to provide the preloaded discussion, and for subsequent re-requests.
+     * @return array<string>
+     */
+    public function getExpands(): array
+    {
+        return ["tags", "insertUser", "breadcrumbs", "reactions"];
+    }
+
     public function getParamResolvedSchema(): Schema
     {
-        return Schema::parse(["discussion:o", "tags:a", "breadcrumbs:a"]);
+        return Schema::parse(["discussion:o", "tags:a", "breadcrumbs:a", "discussionApiParams:o"]);
     }
 
     /**
@@ -137,5 +170,27 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
     public function getLegacyType(): string
     {
         return "Vanilla/Discussion/Index";
+    }
+
+    /**
+     * Get the correct site section for a discussion.
+     *
+     * @param int $categoryID, string $discussionUrl
+     */
+    private function tryRedirectSiteSection(int $categoryID, string $discussionUrl): void
+    {
+        $currentSiteSection = $this->siteSectionModel->getCurrentSiteSection();
+
+        $siteSectionsForCategory = $this->siteSectionModel->getSiteSectionsForCategory($categoryID);
+
+        $canonicalSiteSection = $siteSectionsForCategory[0] ?? null;
+        if (!in_array($currentSiteSection, $siteSectionsForCategory) && $canonicalSiteSection !== null) {
+            $currentPath = parse_url($discussionUrl, PHP_URL_PATH);
+            $originalPath = str_replace("/", "\/", preg_quote($currentSiteSection->getBasePath()));
+            $newPath = preg_replace("/^{$originalPath}/", $canonicalSiteSection->getBasePath(), $currentPath);
+
+            // Redirect to discussion canonical
+            throw new ResponseException(new Redirect($newPath, 302, false));
+        }
     }
 }

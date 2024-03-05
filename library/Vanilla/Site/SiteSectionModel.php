@@ -342,6 +342,25 @@ class SiteSectionModel implements SiteSectionChildIDProviderInterface
     }
 
     /**
+     * Get the canonical site sections for a category. There could be multiple or none.
+     *
+     * @param int $categoryID
+     *
+     * @return SiteSectionInterface[]
+     */
+    public function getSiteSectionsForCategory(int $categoryID): array
+    {
+        $siteSections = [];
+        foreach ($this->getAll() as $siteSection) {
+            $categories = $siteSection->getAttributes()["allCategories"] ?? [];
+            if (in_array($categoryID, $categories)) {
+                $siteSections[] = $siteSection;
+            }
+        }
+        return $siteSections;
+    }
+
+    /**
      * @return SiteSectionInterface
      */
     public function getDefaultSiteSection(): SiteSectionInterface

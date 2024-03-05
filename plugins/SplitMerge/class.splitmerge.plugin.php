@@ -317,7 +317,7 @@ class SplitMergePlugin extends Gdn_Plugin
                 $CommentModel->removePageCache($MergeDiscussionID);
 
                 // Clear selections
-                Gdn::userModel()->saveAttribute($Session->UserID, "CheckedDiscussions", false);
+                Gdn::userModel()->saveAttribute($Session->UserID, "CheckedDiscussions", []);
                 ModerationController::informCheckedDiscussions($Sender);
                 if ($ErrorCount == 0) {
                     $Sender->jsonTarget("", "", "Refresh");
@@ -326,6 +326,22 @@ class SplitMergePlugin extends Gdn_Plugin
         }
 
         $Sender->render("MergeDiscussions", "", "plugins/SplitMerge");
+    }
+
+    /**
+     * Add "redirect" to allowed discussion types when moving discussions.
+     *
+     * @param $allowedDiscussions
+     * @return mixed
+     */
+    public function discussionModel_moveAllowedTypes($allowedDiscussions)
+    {
+        // If the array is empty or null, the default is to allow all types. We don't
+        // want to interfere with that.
+        if (is_array($allowedDiscussions) && !empty($allowedDiscussions)) {
+            $allowedDiscussions[] = "redirect";
+        }
+        return $allowedDiscussions;
     }
 
     /**

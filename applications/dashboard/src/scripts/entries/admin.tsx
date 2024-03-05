@@ -41,6 +41,7 @@ import DashboardAddEditUser from "@dashboard/users/userManagement/dashboardAddEd
 import UserManagementSpoof from "@dashboard/users/userManagement/UserManagementSpoof";
 import ToggleInputInLegacyForm from "@library/forms/ToggleInputInLegacyForm";
 import { ExternalSearchSettingsPage } from "@dashboard/pages/ExternalSearchSettingsPage";
+import { MemoryRouter } from "react-router";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
@@ -96,7 +97,15 @@ addComponent("App", () => {
     return <Router disableDynamicRouting />;
 });
 
-addComponent("title-bar-hamburger", AdminHeader);
+const WrappedAdminHeader = () => {
+    return (
+        <MemoryRouter>
+            <AdminHeader />
+        </MemoryRouter>
+    );
+};
+
+addComponent("title-bar-hamburger", WrappedAdminHeader);
 
 const render = () => {
     const app = document.querySelector("#app") as HTMLElement;

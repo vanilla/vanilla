@@ -11,6 +11,7 @@ use Gdn_Form;
 use PermissionModel;
 use RoleModel;
 use TagModel;
+use VanillaTests\Fixtures\TestUploader;
 use VanillaTests\SiteTestCase;
 
 /**
@@ -297,5 +298,28 @@ class VanillaSettingsControllerTest extends SiteTestCase
             // Check if the new value has been saved as a config.
             $this->assertConfigValue($newConfigField, $newConfigValue);
         }
+    }
+
+    /**
+     * Test uploading default avatar
+     */
+    public function testDefaultAvatarUpload(): void
+    {
+        $defaultAvatar = \Gdn::config("Garden.DefaultAvatar");
+        $this->assertEmpty($defaultAvatar);
+        // Upload a new svg avatar.
+        TestUploader::uploadFile("DefaultAvatar", PATH_ROOT . "/tests/fixtures/insightful.svg");
+        $this->bessy()->post("dashboard/settings/defaultavatar");
+        $defaultAvatar = \Gdn::config("Garden.DefaultAvatar");
+        $this->assertNotEmpty($defaultAvatar);
+        $this->assertFileExists(PATH_UPLOADS . "/" . $defaultAvatar);
+
+        // Now upload a new jpg avatar.
+        TestUploader::uploadFile("DefaultAvatar", PATH_ROOT . "/tests/fixtures/apple.jpg");
+        $this->bessy()->post("dashboard/settings/defaultavatar");
+        $newDefaultAvatar = \Gdn::config("Garden.DefaultAvatar");
+        $this->assertNotEmpty($defaultAvatar);
+        $this->assertNotEquals($defaultAvatar, $newDefaultAvatar);
+        $this->assertFileExists(PATH_UPLOADS . "/" . $newDefaultAvatar);
     }
 }

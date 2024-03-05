@@ -46,33 +46,49 @@ export function ValidationProvider(props: { children: ReactNode }) {
 
     const replaceValidationMessages = (errors: OutputUnit[], schema: JSONSchemaType): OutputUnit[] => {
         // Look up error messages in the JsonSchema and replace the AJV messages
-        return errors.map((error: OutputUnit) => {
-            const instancePathAsKey = error.instanceLocation.replace(/\/|#/g, "");
-            const hasCustomMessage = !!schema?.properties?.[instancePathAsKey]?.errorMessage;
+        return errors
+            .filter((error: OutputUnit) => {
+                // Errors of "does not match schema." are not particularly helpful to end user
+                return !error.error.includes("does not match schema");
+            })
+            .map((error: OutputUnit) => {
+                const hasOriginalInstancePathAsKey = !!error.instanceLocation.replace(/\/|#/g, "");
+                let instancePathAsKey = error.instanceLocation.replace(/\/|#/g, "");
 
-            const getMatchingCustomMessage = (): string => {
-                let messageToReturn: string = error.error ?? "";
-                const errorMessage = schema?.properties?.[instancePathAsKey]?.errorMessage;
-
-                if (errorMessage && Array.isArray(errorMessage)) {
-                    const customMessage: SchemaErrorMessage | undefined = errorMessage.find(
-                        (item: Record<"keyword" | "message", string>) => item?.keyword === error.keyword,
-                    );
-                    if (customMessage) {
-                        messageToReturn = customMessage.message;
+                // If the instance path is empty, perhaps there is a clue in the error message
+                if (!instancePathAsKey) {
+                    const match = error.error.match(/(["'])(?:(?=(\\?))\2.)*?\1/);
+                    if (match && match.length > 0) {
+                        instancePathAsKey = match[0].replace(/"/g, "");
                     }
                 }
-                if (errorMessage && typeof errorMessage === "string") {
-                    messageToReturn = errorMessage;
-                }
-                return messageToReturn;
-            };
 
-            return {
-                ...error,
-                ...(hasCustomMessage && { error: getMatchingCustomMessage() }),
-            };
-        });
+                const hasCustomMessage = !!schema?.properties?.[instancePathAsKey]?.errorMessage;
+
+                const getMatchingCustomMessage = (): string => {
+                    let messageToReturn: string = error.error ?? "";
+                    const errorMessage = schema?.properties?.[instancePathAsKey]?.errorMessage;
+
+                    if (errorMessage && Array.isArray(errorMessage)) {
+                        const customMessage: SchemaErrorMessage | undefined = errorMessage.find(
+                            (item: Record<"keyword" | "message", string>) => item?.keyword === error.keyword,
+                        );
+                        if (customMessage) {
+                            messageToReturn = customMessage.message;
+                        }
+                    }
+                    if (errorMessage && typeof errorMessage === "string") {
+                        messageToReturn = errorMessage;
+                    }
+                    return messageToReturn;
+                };
+
+                return {
+                    ...error,
+                    ...(!hasOriginalInstancePathAsKey && { instanceLocation: `#/${instancePathAsKey}` }),
+                    ...(hasCustomMessage && { error: getMatchingCustomMessage() }),
+                };
+            });
     };
 
     const validate = (schema: JSONSchemaType, instance: GenericFlatObject): ValidationResult => {

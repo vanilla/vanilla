@@ -54,6 +54,8 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
 
     private CommunityNotificationGenerator $communityNotificationGenerator;
 
+    private ReactionModel $reactionModel;
+
     /**
      * Constructor.
      */
@@ -74,6 +76,7 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
         }
         $this->discussionModel = Gdn::getContainer()->get(DiscussionModel::class);
         $this->communityNotificationGenerator = Gdn::getContainer()->get(CommunityNotificationGenerator::class);
+        $this->reactionModel = Gdn::getContainer()->get(ReactionModel::class);
     }
 
     /**
@@ -1214,6 +1217,19 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
         }
 
         $this->fireEvent("AfterRestore");
+        if (
+            $log["Operation"] == "Spam" &&
+            in_array($log["RecordType"], ["Discussion", "Comment"]) &&
+            is_int($log["RecordID"])
+        ) {
+            $this->reactionModel->react(
+                $log["RecordType"],
+                $log["RecordID"],
+                "Undo-Spam",
+                Gdn::session()->UserID,
+                true
+            );
+        }
 
         if ($deleteLog) {
             Gdn::sql()->delete("Log", ["LogID" => $log["LogID"]]);

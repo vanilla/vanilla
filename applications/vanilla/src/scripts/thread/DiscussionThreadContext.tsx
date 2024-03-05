@@ -1,34 +1,32 @@
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
-import React, { useContext, useState } from "react";
+import { IDiscussion } from "@dashboard/@types/api/discussion";
+import React, { useContext } from "react";
 
 const DiscussionThreadContext = React.createContext<{
-    page: number;
-    setPage: (newPage: number | ((currentPage: number) => number)) => void;
+    discussion?: IDiscussion;
 }>({
-    page: 1,
-    setPage: () => {},
+    discussion: undefined,
 });
 
-export function DiscussionThreadContextProvider(props: { initialPage: number; children: React.ReactNode }) {
-    const [page, setPage] = useState(props.initialPage);
+export function DiscussionThreadContextProvider(props: React.PropsWithChildren<{ discussion: IDiscussion }>) {
+    const { discussion, children } = props;
 
     return (
         <DiscussionThreadContext.Provider
             value={{
-                page,
-                setPage,
+                discussion,
             }}
         >
-            {props.children}
+            {children}
         </DiscussionThreadContext.Provider>
     );
 }
 
-export function useDiscussionThreadPageContext() {
+export function useDiscussionThreadContext() {
     return useContext(DiscussionThreadContext);
 }

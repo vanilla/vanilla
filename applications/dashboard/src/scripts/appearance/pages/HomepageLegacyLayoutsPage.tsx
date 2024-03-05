@@ -13,6 +13,7 @@ import { LegacyLayoutFormPage } from "@dashboard/appearance/components/LegacyLay
 import Categories from "@dashboard/appearance/previews/Categories";
 import ModernLayout from "@dashboard/appearance/previews/ModernLayout";
 import Translate from "@library/content/Translate";
+import BestOfPreviewThumbnail from "@library/reactions/BestOfPreviewThumbnail";
 import SmartLink from "@library/routing/links/SmartLink";
 import { formatUrl } from "@library/utility/appUtils";
 import { t } from "@vanilla/i18n";
@@ -34,6 +35,11 @@ const homepageRouteOptions: IHomepageRouteOption[] = [
         label: "Categories",
         value: "categories",
         thumbnailComponent: Categories,
+    },
+    {
+        label: "Best Of",
+        value: "bestof",
+        thumbnailComponent: BestOfPreviewThumbnail,
     },
 ];
 

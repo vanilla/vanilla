@@ -66,6 +66,7 @@ categoryListEnabled &&
                 recordType: "category",
                 recordID: params.match.params.id,
                 params: {
+                    ...urlQuery,
                     siteSectionID: getSiteSection().sectionID,
                     locale: getSiteSection().contentLocale,
                     categoryID: params.match.params.id,

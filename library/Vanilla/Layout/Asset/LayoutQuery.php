@@ -130,35 +130,31 @@ class LayoutQuery implements \JsonSerializable
     /**
      * Get Parameters as associative array for front end.
      *
-     * @return array|stdClass
+     * @return \ArrayObject
      */
     public function getParams()
     {
-        if (is_array($this->params)) {
-            $params = $this->params;
-            array_walk_recursive($params, function (&$val) {
-                if ($val === true) {
-                    $val = "true";
-                } elseif ($val === false) {
-                    $val = "false";
-                } elseif (is_integer($val)) {
-                    $val = (string) $val;
-                }
-            });
-            return $params;
-        } else {
-            return new stdClass();
-        }
+        $params = $this->params;
+        array_walk_recursive($params, function (&$val) {
+            if ($val === true) {
+                $val = "true";
+            } elseif ($val === false) {
+                $val = "false";
+            } elseif (is_integer($val)) {
+                $val = (string) $val;
+            }
+        });
+        return new \ArrayObject($params);
     }
 
     /**
      * Set Parameters.
      *
-     * @param array $params
+     * @param array|\ArrayObject $params
      */
-    public function setParams(array $params): void
+    public function setParams($params): void
     {
-        $this->params = $params;
+        $this->params = (array) $params;
     }
 
     /**

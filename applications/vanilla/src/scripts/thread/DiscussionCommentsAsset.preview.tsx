@@ -10,11 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DiscussionCommentsAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset";
 import React from "react";
 
-interface IProps
-    extends Omit<
-        React.ComponentProps<typeof DiscussionCommentsAsset>,
-        "commentsPreload" | "categoryID" | "discussion"
-    > {}
+interface IProps extends Omit<React.ComponentProps<typeof DiscussionCommentsAsset>, "comments" | "discussion"> {}
 
 const comments = LayoutEditorPreviewData.comments(5);
 const queryClient = new QueryClient({
@@ -33,7 +29,7 @@ export function DiscussionCommentsAssetPreview(props: IProps) {
             <QueryClientProvider client={queryClient}>
                 <DiscussionCommentsAsset
                     {...props}
-                    commentsPreload={{
+                    comments={{
                         data: comments,
                         paging: LayoutEditorPreviewData.paging(props.apiParams?.limit ?? 30),
                     }}

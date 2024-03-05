@@ -49,6 +49,16 @@ class MockWidget1 extends AbstractWidgetModule
                     ],
                 ],
             ],
+            "array?" => [
+                "type" => "array",
+                "items" => [
+                    "label" => [
+                        "type" => "string",
+                        "x-control" => SchemaForm::textBox(new FormOptions("Label")),
+                    ],
+                ],
+                "x-control" => SchemaForm::textBox(new FormOptions("Array", "array text box description")),
+            ],
         ]);
     }
 

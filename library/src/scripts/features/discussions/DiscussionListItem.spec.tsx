@@ -11,6 +11,17 @@ import { fakeDiscussions } from "@library/features/discussions/DiscussionList.st
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { LoadStatus } from "@library/@types/api/core";
 import { setMeta } from "@library/utility/appUtils";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            enabled: false,
+            retry: false,
+            staleTime: Infinity,
+        },
+    },
+});
 
 const renderInProvider = () => {
     const discussion = { ...fakeDiscussions[0], url: "/mockPath", name: "Mock Discussion" };
@@ -30,7 +41,9 @@ const renderInProvider = () => {
                 },
             }}
         >
-            <DiscussionListItem discussion={discussion} />
+            <QueryClientProvider client={queryClient}>
+                <DiscussionListItem discussion={discussion} />
+            </QueryClientProvider>
         </TestReduxProvider>,
     );
 };

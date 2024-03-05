@@ -63,10 +63,6 @@ export const searchReducer = produce(
                 if (!("page" in payload)) {
                     nextForm.page = 1;
                 }
-
-                if ("domain" in payload || "source" in payload) {
-                    delete nextForm.types;
-                }
             }
 
             nextState.form = nextForm;

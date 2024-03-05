@@ -130,6 +130,12 @@ if (!function_exists('writeComment')) :
             $cssClass .= ' isOriginalPoster';
         }
 
+        $scoreCssClass = scoreCssClass($comment);
+        if ($scoreCssClass) {
+            $cssClass .= " " . $scoreCssClass;
+            setValue("_CssClass", $comment, $scoreCssClass);
+        }
+
         // DEPRECATED ARGUMENTS (as of 2.1)
         $sender->EventArguments['Object'] = &$comment;
         $sender->EventArguments['Type'] = 'Comment';
@@ -171,7 +177,7 @@ if (!function_exists('writeComment')) :
 
                         <span class="AuthorInfo">
                             <?php
-                                if (Gdn::config("Feature.CustomProfileFields.Enabled") && function_exists('getCustomFields') && $author->UserID && !$author->Deleted) {
+                                if (Gdn::config("Feature.CustomProfileFields.Enabled") && function_exists('getCustomFields') && is_object($author) && $author->UserID && !$author->Deleted) {
                                     echo getCustomFields($author->UserID);
                                 } else {
                                     echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);

@@ -8,6 +8,8 @@
  * @since 2.2
  */
 
+use Garden\Schema\Schema;
+
 /**
  * Handles attachments. Least-Buddhist model of them all.
  *
@@ -145,11 +147,12 @@ class AttachmentModel extends Gdn_Model
      */
     public static function rowID($row)
     {
-        if ($id = val("CommentID", $row)) {
+        $rowArray = (array) $row;
+        if ($id = $rowArray["CommentID"] ?? ($rowArray["commentID"] ?? false)) {
             return "c-" . $id;
-        } elseif ($id = val("DiscussionID", $row)) {
+        } elseif ($id = $rowArray["DiscussionID"] ?? ($rowArray["discussionID"] ?? false)) {
             return "d-" . $id;
-        } elseif ($id = val("UserID", $row)) {
+        } elseif ($id = $rowArray["UserID"] ?? ($rowArray["userID"] ?? false)) {
             return "u-" . $id;
         }
         throw new Gdn_UserException("Failed to get Type...");
@@ -229,12 +232,76 @@ class AttachmentModel extends Gdn_Model
         }
         // Get the attachments.
         $attachments = $this->getWhere(["ForeignID" => array_keys($foreignIDs)], "DateInserted", "desc")->resultArray();
+        $this->normalizeAttachments($attachments);
         $attachments = Gdn_DataSet::index($attachments, "ForeignID", ["Unique" => false]);
 
         // Join the attachments.
         $this->joinAttachmentsTo($data, $attachments);
         if ($data2) {
             $this->joinAttachmentsTo($data2, $attachments);
+        }
+    }
+
+    /**
+     * Split a foreign ID into its record type and ID components.
+     *
+     * @param string $foreignID
+     * @return array
+     */
+    public static function splitForeignID(string $foreignID): array
+    {
+        $parts = explode("-", $foreignID);
+        if (count($parts) !== 2) {
+            throw new InvalidArgumentException("Invalid foreign ID: {$foreignID}");
+        }
+
+        switch ($parts[0]) {
+            case "c":
+                $parts[0] = "Comment";
+                break;
+            case "d":
+                $parts[0] = "Discussion";
+                break;
+            case "u":
+                $parts[0] = "User";
+                break;
+            default:
+                throw new InvalidArgumentException("Invalid foreign ID: {$foreignID}");
+        }
+
+        $result["recordType"] = lcfirst($parts[0]);
+        $result["recordID"] = (int) $parts[1];
+
+        return $result;
+    }
+
+    /**
+     * Create a foreign id from a record type and id.
+     *
+     * @param string $recordType
+     * @param int $recordID
+     * @return string
+     */
+    public static function createForeignID(string $recordType, int $recordID): string
+    {
+        return $recordType[0] . "-" . $recordID;
+    }
+
+    /**
+     * Add special fields to an attachment's metadata array.
+     *
+     * @param array $attachment
+     * @param array $fields
+     */
+    public static function addSpecialFields(array &$attachment, array $fields): void
+    {
+        foreach ($fields as $field) {
+            if (isset($attachment[$field])) {
+                $attachment["metadata"][] = [
+                    "labelCode" => lcfirst($field),
+                    "value" => $attachment[$field],
+                ];
+            }
         }
     }
 
@@ -254,6 +321,8 @@ class AttachmentModel extends Gdn_Model
         $where = array_merge(["ForeignUserID" => $user->UserID], $where);
 
         $attachments = $this->getWhere($where, "", "desc", $limit)->resultArray();
+        $this->normalizeAttachments($attachments);
+
         $sender->setData("Attachments", $attachments);
         return true;
     }
@@ -276,6 +345,142 @@ class AttachmentModel extends Gdn_Model
                 setValue("Attachments", $data, $attachments[$rowID]);
             }
         }
+    }
+
+    /**
+     * Normalize attachment data for api output.
+     *
+     * @param array $attachments
+     * @return void
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function normalizeAttachments(array &$attachments)
+    {
+        $this->EventArguments["Attachments"] = $attachments;
+        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
+        $eventManager->fireFilter("attachmentModel_normalizeAttachments", $this, ["Attachments" => &$attachments]);
+        foreach ($attachments as &$attachment) {
+            $attachment["attachmentType"] = $attachment["Type"];
+            if (isset($attachment["SourceURL"])) {
+                $attachment["sourceUrl"] = $attachment["SourceURL"];
+            }
+            unset($attachment["InsertIPAddress"]);
+            unset($attachment["UpdateIPAddress"]);
+            unset($attachment["InsertUser"]);
+        }
+    }
+
+    /**
+     * Change the keys of the attachment array to camelCase.
+     *
+     * @param array $rows
+     * @return void
+     */
+    public static function camelCaseAttachments(array &$rows): void
+    {
+        // A single record
+        if (!isset($rows[0])) {
+            if (isset($rows["Attachments"])) {
+                $rows["attachments"] = \Vanilla\Utility\ArrayUtils::camelCase($rows["Attachments"]);
+                unset($rows["Attachments"]);
+            }
+            // Multiple records
+        } else {
+            foreach ($rows as &$row) {
+                if (isset($row["Attachments"])) {
+                    $row["attachments"] = \Vanilla\Utility\ArrayUtils::camelCase($row["Attachments"]);
+                    unset($row["Attachments"]);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the attachment schema.
+     *
+     * @return \Garden\Schema\Schema
+     */
+    public static function getAttachmentSchema(): \Garden\Schema\Schema
+    {
+        return Schema::parse([
+            "attachmentID:i",
+            "attachmentType:s",
+            "recordType:s",
+            "recordID:i",
+            "foreignUserID:i",
+            "source:s",
+            "sourceID:s",
+            "sourceUrl:s",
+            "status:s",
+            "lastModifiedDate:s",
+            "metadata:a?" => [
+                "items" => [
+                    "properties" => ["labelCode:s", "value:s"],
+                ],
+            ],
+            "dateInserted:s",
+            "insertUserID:i",
+            "dateUpdated:s?",
+            "updateUserID:i?",
+        ]);
+    }
+
+    /**
+     * Get the hydrated schema for posting an attachment.
+     *
+     * @param string $attachmentType
+     * @param string $recordType
+     * @param int $recordID
+     * @return Schema
+     */
+    public function getHydratedAttachmentPostSchema(string $attachmentType, string $recordType, int $recordID): Schema
+    {
+        $schema = Schema::parse([
+            "attachmentType" => [
+                "default" => $attachmentType,
+                "disabled" => true,
+                "required" => true,
+            ],
+            "recordType" => [
+                "default" => $recordType,
+                "disabled" => true,
+                "required" => true,
+            ],
+            "recordID" => [
+                "default" => $recordID,
+                "disabled" => true,
+                "required" => true,
+            ],
+        ]);
+
+        return $schema;
+    }
+
+    /**
+     * Get the schema for posting an attachment.
+     *
+     * @return Schema
+     */
+    public function getAttachmentPostSchema(): Schema
+    {
+        return Schema::parse(["attachmentType", "recordType", "recordID"], "AttachmentPost")->add(
+            $this->getAttachmentSchema()
+        );
+    }
+
+    /**
+     * Pull up the metadata of an array to the top level.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function fillMetadata(array $data): array
+    {
+        foreach ($data["metadata"] as $item) {
+            $data[$item["labelCode"]] = $item["value"];
+        }
+        return $data;
     }
 
     /**

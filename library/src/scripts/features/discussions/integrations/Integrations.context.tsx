@@ -51,7 +51,7 @@ export function AttachmentIntegrationsApiContextProvider({
     );
 }
 
-export const INTEGRATIONS_META_KEY = "integrations";
+export const INTEGRATIONS_META_KEY = "externalAttachments";
 
 function getIntegrationsFromMeta(): IAttachmentIntegrationCatalog | undefined {
     return getMeta(INTEGRATIONS_META_KEY, undefined);

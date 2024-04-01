@@ -14,6 +14,7 @@ use Vanilla\EmbeddedContent\Embeds\IFrameEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\LinkEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
 use Vanilla\EmbeddedContent\Embeds\YouTubeEmbed;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\Formats\Rich2Format;
@@ -191,5 +192,17 @@ HTML;
         $actualOutput = $output->getNodeList()->render();
 
         $this->assertSame($expectedOutput, $actualOutput);
+    }
+
+    /**
+     * Test that the content from nested quotes get stripped out.
+     *
+     * @return void
+     */
+    public function testReparseQuote(): void
+    {
+        $body = file_get_contents(PATH_ROOT . "/tests/Library/Vanilla/Formatting/Formats/nestedQuote.json");
+        $parseBody = $this->prepareFormatter()->reparseQuotes($body);
+        $this->assertFalse(str_contains($parseBody, "This shouldn't be in the quote"));
     }
 }

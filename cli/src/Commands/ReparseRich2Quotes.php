@@ -1,34 +1,36 @@
 <?php
 /**
- * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @author Olivier Lamy-Canuel <olamy-canuel@higherlogic.com>
+ * @copyright 2009-2024 Higher Logic Inc.
  * @license Proprietary
  */
 
 namespace Vanilla\Cli\Commands;
 
+use Exception;
 use Gdn;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Vanilla\Cli\Utils\DatabaseCommand;
 use Vanilla\Cli\Utils\ScriptLoggerTrait;
-use Vanilla\Dashboard\Models\UserMentionsModel;
-use Vanilla\Formatting\Exception\FormattingException;
-use Vanilla\Schema\RangeExpression;
+use Vanilla\Formatting\Formats\Rich2Format;
 use Vanilla\Utility\Timers;
 
+// Remove the memory limit for absurdly large posts.
+ini_set("memory_limit", "-1");
+
 /**
- * Command indexing user mentions.
+ * Loop through every post to reparse the quotes. This is especially useful to strip out nested quotes.
  */
-class IndexMentionsCommand extends DatabaseCommand
+class ReparseRich2Quotes extends DatabaseCommand
 {
     use ScriptLoggerTrait;
 
     const maxInt = 2147483647;
 
     /** @var array */
-    private array $indexableRecords = [
+    protected array $recordTypes = [
         "discussion" => [
             "id" => "DiscussionID",
             "parentRecordType" => "category",
@@ -48,20 +50,17 @@ class IndexMentionsCommand extends DatabaseCommand
     ];
 
     /** @var array */
-    private array $records = ["discussion", "comment"];
+    protected array $records = ["discussion", "comment"];
 
-    /** @var UserMentionsModel */
-    private UserMentionsModel $userMentionsModel;
+    protected Rich2Format $format;
 
     /**
      * @inheritdoc
      */
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
-        $this->setName("index-mentions")->setDescription(
-            "Command for indexing user mentions in comments and discussions into the GDN_userMention table."
-        );
+        $this->setName("strip-nested-quotes")->setDescription("Strip nested quotes from rich2 posts.");
         $definition = $this->getDefinition();
         $definition->addOption(
             new InputOption(
@@ -118,70 +117,45 @@ class IndexMentionsCommand extends DatabaseCommand
         if ($records !== null) {
             $this->setRecords($records);
         }
-        $this->userMentionsModel = Gdn::getContainer()->get(UserMentionsModel::class);
-    }
 
+        $this->format = Gdn::getContainer()->get(Rich2Format::class);
+    }
     /**
-     * Index the user mentions.
+     * Go through the records and reparse the quotes.
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $totalStartTime = microtime(true);
 
         foreach ($this->records as $recordType) {
             $offset = 0;
-            $record = $this->indexableRecords[$recordType];
+            $record = $this->recordTypes[$recordType];
             $currentMax = $record["from"];
-            $maxID = $this->getMaxID($record["id"], $record["table"], $record["to"]);
-            $results = $this->fetchPosts($record, $offset);
+            $maxID = $this->getMaxID($record["id"], $record["table"], $record["to"], ["Format" => "Rich2"]);
+            $results = $this->fetchPosts($record, $offset, ["Format" => "Rich2"]);
 
             if (empty($results)) {
-                $this->logger()->success("There are no {$recordType}s to index.");
-                return;
+                $this->logger()->success("There are no Rich2 {$recordType}s to reparse.");
+                return self::SUCCESS;
             }
 
             while ($currentMax < $maxID) {
-                $mentions = [];
                 $startTime = microtime(true);
                 $id = $record["id"];
-                $parentRecordType = $record["parentRecordType"];
 
                 foreach ($results as $result) {
-                    $body = $result["Body"] ?? null;
-                    $format = $result["Format"] ?? null;
-
-                    if ($body === null || $format === null) {
-                        // If there is bad data, pass over it and don't let it stop the indexing.
-                        continue;
-                    }
-
                     try {
-                        $userMentions = $this->userMentionsModel->parseMentions($body, $format);
-                    } catch (FormattingException $e) {
-                        $this->logger()->error("Failed to index mentions from record: {$result[$record["id"]]}", [
-                            "recordID" => $result[$record["id"]],
-                            "recordType" => $recordType,
-                        ]);
-                    }
-
-                    foreach ($userMentions as $userMention) {
-                        $mentions[] = [
-                            "userID" => $userMention["userID"],
-                            "mentionedName" => $userMention["name"],
-                            "recordType" => $recordType,
-                            "recordID" => $result[$id],
-                            "parentRecordID" => $result[$record["parentRecordID"]],
-                            "parentRecordType" => $parentRecordType,
-                            "dateInserted" => $result["DateInserted"],
-                        ];
+                        $body = $this->format->reparseQuotes($result["Body"]);
+                        $this->updateBody($result[$id], $record["table"], $body);
+                    } catch (Exception $e) {
+                        $this->logger()->error("Error re-parsing {$recordType} {$result[$id]}: {$e->getMessage()}");
                     }
                 }
                 $currentMax = $result[$id] ?? $maxID;
 
-                $this->userMentionBulkInsert($mentions);
                 $stopTime = microtime(true);
                 $time = Timers::formatDuration(($stopTime - $startTime) * 1000);
-                $this->logger()->success("Last $id indexed: $currentMax/$maxID $time");
+                $this->logger()->success("Last $id updated: $currentMax/$maxID $time");
 
                 $offset += $this->batchSize;
                 $results = $this->fetchPosts($record, $offset);
@@ -189,21 +163,9 @@ class IndexMentionsCommand extends DatabaseCommand
 
             $totalStopTime = microtime(true);
             $time = Timers::formatDuration(($totalStopTime - $totalStartTime) * 1000);
-            $this->logger()->success("Total indexing time: $time");
+            $this->logger()->success("Total re-parsing time: $time");
         }
         return self::SUCCESS;
-    }
-
-    /**
-     * Insert user mention records in bulk.
-     *
-     * @param array $rows
-     */
-    protected function userMentionBulkInsert(array $rows)
-    {
-        $sql = $this->getDatabase()->createSql();
-        $sql->options("Ignore", true);
-        $sql->insert("userMention", $rows);
     }
 
     /**
@@ -213,8 +175,8 @@ class IndexMentionsCommand extends DatabaseCommand
      */
     public function setFrom(int $from): void
     {
-        $this->indexableRecords["discussion"]["from"] = $from;
-        $this->indexableRecords["comment"]["from"] = $from;
+        $this->recordTypes["discussion"]["from"] = $from;
+        $this->recordTypes["comment"]["from"] = $from;
     }
 
     /**
@@ -224,7 +186,25 @@ class IndexMentionsCommand extends DatabaseCommand
      */
     public function setTo(int $to): void
     {
-        $this->indexableRecords["discussion"]["to"] = $to;
-        $this->indexableRecords["comment"]["to"] = $to;
+        $this->recordTypes["discussion"]["to"] = $to;
+        $this->recordTypes["comment"]["to"] = $to;
+    }
+
+    /**
+     * Update the body of a post.
+     *
+     * @param $recordID
+     * @param $recordType
+     * @param $body
+     * @return void
+     * @throws Exception
+     */
+    protected function updateBody($recordID, $recordType, $body): void
+    {
+        $sql = $this->getDatabase()->sql();
+        $sql->update($recordType)
+            ->set("Body", $body)
+            ->where("{$recordType}ID", $recordID)
+            ->put();
     }
 }

@@ -11,6 +11,7 @@ use Vanilla\Contracts\Models\UserProviderInterface;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbeddedContentException;
 use Vanilla\EmbeddedContent\EmbedFilterInterface;
+use Vanilla\Formatting\Formats\Rich2Format;
 use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Quill\Parser;
@@ -101,6 +102,10 @@ class QuoteEmbedFilter implements EmbedFilterInterface
             if (strtolower($format) === RichFormat::FORMAT_KEY) {
                 $bodyRaw = $this->stripNestedRichEmbeds($bodyRaw);
             }
+
+            if (strtolower($format) === Rich2Format::FORMAT_KEY) {
+                $bodyRaw = $this->stripNestedRich2Embeds($bodyRaw);
+            }
             $renderedBody = $this->formatService->renderQuote($bodyRaw, $format);
         }
 
@@ -133,6 +138,35 @@ class QuoteEmbedFilter implements EmbedFilterInterface
                     $linkEmbedOps = $this->makeLinkEmbedInserts($url);
                     array_splice($arrayBody, $subInsertIndex, 1, $linkEmbedOps);
                 }
+            }
+        }
+
+        return json_encode($arrayBody, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Strip nested embeds from a raw rich 2 body.
+     *
+     * @param string $richRawBody A rich content body, JSON encoded.
+     *
+     * @return string
+     */
+    public static function stripNestedRich2Embeds(string $richRawBody): string
+    {
+        $arrayBody = Parser::jsonToOperations($richRawBody);
+        // Iterate through the nested embed.
+        foreach ($arrayBody as $subInsertIndex => &$subInsertOp) {
+            if (!isset($subInsertOp["embedData"]["embedType"])) {
+                continue;
+            }
+
+            if ($subInsertOp["embedData"]["embedType"] == "quote") {
+                $embedData = [
+                    "url" => $subInsertOp["embedData"]["url"],
+                    "embedType" => "link",
+                ];
+
+                $subInsertOp["embedData"] = $embedData;
             }
         }
 

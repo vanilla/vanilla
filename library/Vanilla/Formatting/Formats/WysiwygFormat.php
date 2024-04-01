@@ -88,6 +88,10 @@ class WysiwygFormat extends HtmlFormat
             "~" . preg_quote(sprintf(t("%s said:"), '<a rel="nofollow">' . $username . "</a>")) . "~",
             sprintf(t("%s said:"), '<a rel="nofollow">' . $this->anonymizeUsername . "</a>")
         );
+        $regex->addReplacement(
+            "~<a rel=\"nofollow\" href=\".*?\">$username</a>~",
+            "<a rel=\"nofollow\" href=\"$this->anonymizeUrl\">$this->anonymizeUsername</a>"
+        );
 
         return $regex->replace($body);
     }

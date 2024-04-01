@@ -41,7 +41,7 @@ final class ErrorLogger
     public const LEVEL_ERROR = "error";
     public const LEVEL_CRITICAL = "critical";
 
-    private const ERROR_SUPPRESSED = 0;
+    public const ERROR_SUPPRESSED = 0;
     private const BITMASK_FATAL =
         E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
     private const BITMASK_NOTICE = E_NOTICE | E_USER_NOTICE;

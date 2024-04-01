@@ -260,6 +260,7 @@ class DiscussionSortHotTopTest extends AbstractAPIv2Test
                 "Body" => "Comment for Discussion A",
                 "DiscussionID" => $discussionArray[0],
                 "Format" => "Text",
+                "DateInserted" => date("Y-m-d H:i:s", strtotime("2021-06-05 13:00:00")),
             ],
             1 => [
                 "Body" => "Comment for Discussion B",

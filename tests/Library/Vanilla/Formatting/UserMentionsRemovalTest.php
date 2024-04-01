@@ -283,6 +283,19 @@ class UserMentionsRemovalTest extends SiteTestCase
                  </blockquote>',
                 self::USERNAME_WITH_SPACE,
             ],
+            "validQuoteWithLineBreak" => [
+                '<blockquote class="Quote">
+  <div><a rel="nofollow" href="/profile/UserToAnonymize">UserToAnonymize</a> said:</div>
+  <div>blablabla</div>
+</blockquote>',
+                '<blockquote class="Quote">
+  <div><a rel="nofollow" href="' .
+                $baseUrl .
+                self::PROFILE_URL_ANONYMIZE .
+                '">[Deleted User]</a> said:</div>
+  <div>blablabla</div>
+</blockquote>',
+            ],
             "invalidQuoteBefore" => [
                 '<blockquote class="Quote"><div class="QuoteAuthor"><a href="/profile/1UserToAnonymize" class="js-userCard" data-userid="1">1UserToAnonymize</a> said:</div>
                  <div>UserToAnonymize is an amazing human slash genius.</div>

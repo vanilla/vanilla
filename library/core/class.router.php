@@ -33,6 +33,7 @@ class Gdn_Router extends Gdn_Pluggable
     {
         parent::__construct();
         $this->RouteTypes = [
+            "internal" => "Internal",
             "Internal" => "Internal",
             "Temporary" => "Temporary (302)",
             "Permanent" => "Permanent (301)",

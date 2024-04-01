@@ -345,10 +345,23 @@ class SitemapsPlugin extends Gdn_Plugin
     {
         $discussionModel = Gdn::getContainer()->get(\DiscussionModel::class);
         $where = ["CategoryID" => $categoryID];
-        return $discussionModel->Database
-            ->sql()
-            ->select(["DiscussionID", "CategoryID", "Name", "DateLastComment", "DateUpdated"])
-            ->getWhere($discussionModel->getTableName(), $where, "DateLastComment", "desc", $limit, $offset)
-            ->result();
+
+        $innerSelect = $discussionModel->Database
+            ->createSql()
+            ->from("Discussion")
+            ->select(["DiscussionID"])
+            ->where($where)
+            ->orderBy("DateLastComment", "desc")
+            ->limit($limit, $offset)
+            ->getSelect(true);
+
+        $discussions = $discussionModel->Database
+            ->createSql()
+            ->select("DiscussionID", "CategoryID", "Name", "DateLastComment", "DateUpdated")
+            ->from("Discussion d")
+            ->join("({$innerSelect}) d2", "d.DiscussionID = d2.DiscussionID")
+            ->get()
+            ->resultArray();
+        return $discussions;
     }
 }

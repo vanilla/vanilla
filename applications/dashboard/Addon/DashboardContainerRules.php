@@ -37,13 +37,13 @@ use Vanilla\Dashboard\Controllers\Api\SiteTotalsFilterOpenApi;
 use Vanilla\Dashboard\Controllers\LayoutSettingsPageController;
 use Vanilla\Dashboard\Controllers\LeavingController;
 use Vanilla\Dashboard\Controllers\Pages\AppearancePageController;
-use Vanilla\Dashboard\Controllers\Pages\DeveloperPageController;
 use Vanilla\Dashboard\Controllers\Pages\DeveloperProfilesPageController;
 use Vanilla\Dashboard\Controllers\Pages\HomePageController;
 use Vanilla\Dashboard\Layout\View\LegacyProfileLayoutView;
 use Vanilla\Dashboard\Layout\View\LegacyRegistrationLayoutView;
 use Vanilla\Dashboard\Layout\View\LegacySigninLayoutView;
 use Vanilla\Dashboard\Models\ActivityService;
+use Vanilla\Dashboard\Models\AttachmentMeta;
 use Vanilla\Dashboard\Models\ModerationMessagesFilterOpenApi;
 use Vanilla\Dashboard\Models\ProfileFieldsOpenApi;
 use Vanilla\Dashboard\Models\RolesExpander;
@@ -54,6 +54,7 @@ use Vanilla\Dashboard\UserLeaderService;
 use Vanilla\Layout\LayoutHydrator;
 use Vanilla\Layout\LayoutService;
 use Vanilla\Layout\Middleware\LayoutPermissionFilterMiddleware;
+use Vanilla\Models\SiteMeta;
 use Vanilla\Models\SiteTotalService;
 use Vanilla\OpenAPIBuilder;
 use Vanilla\Web\APIExpandMiddleware;
@@ -156,5 +157,7 @@ class DashboardContainerRules extends AddonContainerRules
         $container
             ->rule(\Vanilla\OpenAPIBuilder::class)
             ->addCall("addFilter", ["filter" => new Reference(\ReactionsFilterOpenApi::class)]);
+
+        $container->rule(SiteMeta::class)->addCall("addExtra", [new Reference(AttachmentMeta::class)]);
     }
 }

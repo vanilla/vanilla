@@ -106,6 +106,7 @@ class AttachmentsApiController extends AbstractApiController
      * Fetch the attachment schemas of the available external providers.
      *
      * @return Data
+     * @deprecated Get the catalog from the SiteMetaExtra instead.
      */
     public function get_catalog(): Data
     {

@@ -410,6 +410,6 @@ class QueuedJobModel extends PipelineModel implements LoggerAwareInterface
      */
     public function createLock(): LockInterface
     {
-        return $this->lockService->createLock(self::QUEUED_KEY_LOCK, 15);
+        return $this->lockService->createLock(self::QUEUED_KEY_LOCK, 60);
     }
 }

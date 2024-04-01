@@ -576,16 +576,16 @@ class UserModel extends Gdn_Model implements
         }
         $user = (object) $user;
 
-        if ($user->Banned || $user->Deleted) {
+        if (($user->Banned ?? false) || ($user->Deleted ?? false)) {
             return false;
         }
 
-        if ($user->Admin) {
+        if ($user->Admin ?? false) {
             return true;
         }
 
         // Grab the permissions for the user.
-        if ($user->UserID == 0) {
+        if (($user->UserID ?? 0) == 0) {
             $permissions = $this->getPermissions(0);
         } elseif (!Gdn::cache()->activeEnabled() && is_array($user->Permissions)) {
             // Only attempt to use the DB field value if permissions aren't being cached elsewhere.

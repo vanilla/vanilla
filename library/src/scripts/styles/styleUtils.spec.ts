@@ -4,7 +4,8 @@
  * @license Proprietary
  */
 
-import { normalizeVariables } from "@library/styles/styleUtils";
+import { getVariableTypes, normalizeVariables, variableFactory } from "@library/styles/styleUtils";
+import { color } from "csx";
 
 const testData = {
     testFontFamilies: {
@@ -95,5 +96,29 @@ describe("normalizeVariables", () => {
         expect(objectArray).toStrictEqual(testData.testFontFamilies.array);
         const arrayObject = normalizeVariables(testData.testFontFamilies.array, testData.testFontFamilies.object);
         expect(arrayObject).toStrictEqual(testData.testFontFamilies.object);
+    });
+});
+
+describe("variableTypes", () => {
+    it("sets and gets variable types when theme variables are set", () => {
+        const makeThemeVars = variableFactory("test-theme");
+        makeThemeVars("validColors", {
+            color: color("#ffffff"),
+            string: "this is a string",
+            number: 5,
+            array: ["this", "is", "an", "array"],
+            object: { this: "is", an: color("#aaaaaa"), object: 5 },
+        });
+        const output = getVariableTypes();
+        const expected = {
+            "test-theme.validColors.color": "ColorHelper",
+            "test-theme.validColors.string": "string",
+            "test-theme.validColors.number": "number",
+            "test-theme.validColors.array": "array",
+            "test-theme.validColors.object.this": "string",
+            "test-theme.validColors.object.an": "ColorHelper",
+            "test-theme.validColors.object.object": "number",
+        };
+        expect(expected).toStrictEqual(output);
     });
 });

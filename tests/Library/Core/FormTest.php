@@ -197,9 +197,9 @@ HTML;
         $actual = $this->form->bodyBox();
         $expected = <<<EOT
 <div class="bodybox-wrap">
-    <input type="hidden" id="Form_Format" name="Format" value="rich" />
+    <input type="hidden" id="Form_Format" name="Format" value="rich2" />
     <div class="input-wrap">
-        <textarea id="Form_Body" name="Body" class="form-control js-bodybox" format="rich" rows="6" cols="100"></textarea>
+        <textarea id="Form_Body" name="Body" class="form-control js-bodybox" format="rich2" rows="6" cols="100"></textarea>
     </div>
 </div>
 EOT;

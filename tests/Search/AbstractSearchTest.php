@@ -133,6 +133,23 @@ abstract class AbstractSearchTest extends AbstractAPIv2Test
     }
 
     /**
+     * Assert that a search returns no results.
+     *
+     * @param array $searchParams
+     *
+     * @return HttpResponse
+     */
+    public function assertNoSearchResults(array $searchParams): HttpResponse
+    {
+        $response = $this->performSearch($searchParams);
+        $this->lastSearchResponse = $response;
+        $this->assertEquals(200, $response->getStatusCode());
+        $results = $response->getBody();
+        $this->assertEmpty($results);
+        return $response;
+    }
+
+    /**
      * Perform a search.
      *
      * @param array $searchParams

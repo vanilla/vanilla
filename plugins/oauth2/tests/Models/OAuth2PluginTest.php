@@ -63,6 +63,11 @@ class OAuth2PluginTest extends SiteTestCase
     private $ssoUtils;
 
     /**
+     * @var \Gdn_Configuration
+     */
+    private $config;
+
+    /**
      * {@inheritdoc}
      */
     public static function getAddons(): array
@@ -91,6 +96,7 @@ class OAuth2PluginTest extends SiteTestCase
 
         $this->container()->call(function (
             \OAuth2Plugin $oauth2Plugin,
+            \Gdn_Configuration $config,
             \Gdn_AuthenticationProviderModel $authenticationProviderModel
         ) {
             $this->oauth2Plugin = $oauth2Plugin;
@@ -99,6 +105,7 @@ class OAuth2PluginTest extends SiteTestCase
                 /** @var \Gdn_OAuth2 $this */
                 return $this->getSsoUtils();
             });
+            $this->config = $config;
         });
 
         // Re-run the structure because some tests assert fixing of the structure.
@@ -316,10 +323,51 @@ class OAuth2PluginTest extends SiteTestCase
      * Test the Post return URL that goes from `/entry/oauth2` -> `/entry/connect/oauth2`.
      *
      */
-    public function testAssertReturnPostUrlFlow(): void
+    public function testAssertReturnPostUrlFlowInvalidToken(): void
     {
         $this->setupSingleProvider();
-        $user1 = $this->createUser(["name" => "test1_test1"]);
+        $user1 = $this->createUser(["name" => "testToken_test1"]);
+        \Gdn::session()->end();
+        $clientID = self::CLIENT_ID_SINGLE;
+        $this->createProviderProxyRequestMock($clientID);
+        $nonceModel = new UserAuthenticationNonceModel();
+        $nonce = uniqid("oidc_", true);
+        $nonceModel->insert(["Nonce" => $nonce, "Token" => "OIDC_Nonce"]);
+
+        $id_token = [
+            "name" => $user1["name"],
+            "picture" => "",
+            "updated_at" => "2022-06-07T15:44:54.927Z",
+            "email" => $user1["email"],
+            "email_verified" => true,
+            "verified" => true,
+            "iss" => "https://dev-hs9tepb0.us.auth0.com/",
+            "sub" => "auth0|628fd38ff9d32a006f9103c5",
+            "aud" => "zZBr4ZgdS9uyPPy2JawQLFkTenpyO1wm",
+            "iat" => 1654702587,
+            "exp" => 1654738587,
+            "at_hash" => "opjf1cVoRvev9Xkva-_mDg",
+            "c_hash" => "-oJlLqf-wCs_r2OMf-NW4Q",
+            "nonce" => "test",
+        ];
+        $idToken = JWT::encode($id_token, "", Gdn_CookieIdentity::JWT_ALGORITHM);
+        $this->expectExceptionMessage("There was an error decoding id_token.");
+
+        $this->bessy()->post("/entry/" . $this->oauth2Plugin->getProviderKey(), [
+            "code" => $this->testAccessCode,
+            "state" => $this->generateState($clientID),
+            "id_token" => "sdfgsdfg",
+        ]);
+    }
+
+    /**
+     * Test the Post return URL that goes from `/entry/oauth2` -> `/entry/connect/oauth2`.
+     *
+     */
+    public function testAssertReturnPostUrlFlowInvalidNonce(): void
+    {
+        $this->setupSingleProvider();
+        $user1 = $this->createUser(["name" => "testNonce_test1"]);
         \Gdn::session()->end();
         $clientID = self::CLIENT_ID_SINGLE;
         $this->createProviderProxyRequestMock($clientID);
@@ -343,27 +391,72 @@ class OAuth2PluginTest extends SiteTestCase
             "nonce" => "test",
         ];
         $idToken = JWT::encode($id_token, "", Gdn_CookieIdentity::JWT_ALGORITHM);
-        $this->expectExceptionMessage("There was an error decoding id_token.");
-
-        $this->bessy()->post("/entry/" . $this->oauth2Plugin->getProviderKey(), [
-            "code" => $this->testAccessCode,
-            "state" => $this->generateState($clientID),
-            "id_token" => "sdfgsdfg",
-        ]);
         $this->expectExceptionMessage("Potential reply attack, not matching nonce values.");
         $this->bessy()->post("/entry/" . $this->oauth2Plugin->getProviderKey(), [
             "code" => $this->testAccessCode,
             "state" => $this->generateState($clientID),
             "id_token" => $idToken,
         ]);
+    }
 
-        $id_token["nonce"] = $nonce;
+    /**
+     * Test the Post return URL that goes from `/entry/oauth2` -> `/entry/connect/oauth2`.
+     * And Keep existing attributes from loosing.
+     *
+     */
+    public function testAssertReturnPostUrlFlowKeepsAttributes(): void
+    {
+        $this->setupSingleProvider();
+        $user1 = $this->createUser(["name" => "test2_test2"], ["Attributes" => ["Private" => true]]);
+        \Gdn::session()->end();
+        $clientID = self::CLIENT_ID_SINGLE;
+        $this->createProviderProxyRequestMock($clientID);
+        $nonceModel = new UserAuthenticationNonceModel();
+        $nonce = uniqid("oidc_", true);
+        $nonceModel->insert(["Nonce" => $nonce, "Token" => "OIDC_Nonce"]);
+
+        $id_token = [
+            "name" => $user1["name"],
+            "picture" => "",
+            "updated_at" => "2022-06-07T15:44:54.927Z",
+            "email" => $user1["email"],
+            "email_verified" => true,
+            "verified" => true,
+            "iss" => "https://dev-hs9tepb0.us.auth0.com/",
+            "sub" => "auth0|628fd38ff9d32a006f9103c5",
+            "aud" => "zZBr4ZgdS9uyPPy2JawQLFkTenpyO1wm",
+            "iat" => 1654702587,
+            "exp" => 1654738587,
+            "at_hash" => "opjf1cVoRvev9Xkva-_mDg",
+            "c_hash" => "-oJlLqf-wCs_r2OMf-NW4Q",
+            "nonce" => $nonce,
+        ];
+
         $idToken = JWT::encode($id_token, "", Gdn_CookieIdentity::JWT_ALGORITHM);
-        $this->bessy()->post("/entry/" . $this->oauth2Plugin->getProviderKey(), [
-            "code" => $this->testAccessCode,
-            "state" => $this->generateState($clientID),
-            "id_token" => $idToken,
-        ]);
+        $this->config->set("Garden.Registration.AutoConnect", true);
+        try {
+            $this->bessy()->post("/entry/" . $this->oauth2Plugin->getProviderKey(), [
+                "code" => $this->testAccessCode,
+                "state" => $this->generateState($clientID),
+                "id_token" => $idToken,
+            ]);
+        } catch (ResponseException $ex) {
+            // 2. Our OAuth implementation then redirects to `/entry/connect/oauth2`.
+            $response = $ex->getResponse();
+            $this->assertSame(302, $response->getStatus());
+            $location = new Request($response->getHeader("Location"));
+            $this->assertSubpath("/entry/connect/" . $this->oauth2Plugin->getProviderKey(), $location->getPath());
+
+            // 3. Simulate the browser requesting the redirected URL.
+            $controller = $this->bessy()->get($this->stripWebRoot($location->getPath()), $location->getQuery());
+
+            // 4. The user should be signed in.
+            $this->assertTrue(\Gdn::session()->isValid(), "The user was not signed into Vanilla.");
+            $auth = \Gdn::userModel()->getAuthenticationByUser(\Gdn::session()->UserID, $clientID);
+            $this->assertIsArray($auth, "The GDN_UserAuthentication entry was not found or incorrect.");
+            $private = $this->userModel->getAttribute($user1["userID"], "Private");
+            $this->assertSame(true, $private);
+        }
     }
 
     /**

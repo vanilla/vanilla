@@ -1,14 +1,17 @@
 <?php
 /**
- * @copyright 2009-2021 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
 use Garden\Schema\Schema;
+use Garden\Schema\ValidationException;
 use Garden\Web\Data;
 use Garden\Web\Exception\ClientException;
+use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Vanilla\ApiUtils;
+use Vanilla\Exception\PermissionException;
 
 /**
  * API Controller for the `/tags` resource.
@@ -16,7 +19,7 @@ use Vanilla\ApiUtils;
 class TagsApiController extends AbstractApiController
 {
     /** @var TagModel */
-    private $tagModel;
+    private TagModel $tagModel;
 
     /**
      * TagsApiController constructor.
@@ -33,7 +36,7 @@ class TagsApiController extends AbstractApiController
      *
      * @return Schema Returns a schema object.
      */
-    protected function fullSchema()
+    protected function fullSchema(): Schema
     {
         static $schema;
 
@@ -59,12 +62,21 @@ class TagsApiController extends AbstractApiController
      *
      * @param array $query
      * @return array
+     * @throws ValidationException
+     * @throws HttpException
+     * @throws PermissionException
      */
     public function index(array $query)
     {
         $this->permission();
         $in = $this->schema([
             "query:s?",
+            "tagID:a?" => [
+                "items" => [
+                    "type" => "integer",
+                ],
+                "style" => "form",
+            ],
             "type:a?" => [
                 "items" => [
                     "type" => "string",
@@ -108,6 +120,11 @@ class TagsApiController extends AbstractApiController
 
         $query = $in->validate($query);
 
+        if (key_exists("tagID", $query)) {
+            $query["tagID"] = array_map("intval", $query["tagID"]);
+            $options["tagID"] = $query["tagID"];
+        }
+
         $query["type"] = $query["type"] ?? ["all"];
         $query["type"] = array_map(function ($type) {
             return $type === "User" ? "" : $type;
@@ -140,10 +157,10 @@ class TagsApiController extends AbstractApiController
      *
      * @param int $id
      * @return Data
-     * @throws \Garden\Schema\ValidationException Validation Exception.
-     * @throws \Garden\Web\Exception\HttpException Http Exception.
+     * @throws ValidationException Validation Exception.
+     * @throws HttpException Http Exception.
      * @throws NotFoundException Throws an exception if no tag is found.
-     * @throws \Vanilla\Exception\PermissionException Throws an exception if the user doesn't have the Vanilla.Tagging.Add permission.
+     * @throws PermissionException Throws an exception if the user doesn't have the Vanilla.Tagging.Add permission.
      */
     public function get(int $id): Data
     {
@@ -158,10 +175,10 @@ class TagsApiController extends AbstractApiController
      *
      * @param array $body
      * @return Data
-     * @throws \Garden\Schema\ValidationException Validation Exception.
-     * @throws \Garden\Web\Exception\HttpException HttpException.
+     * @throws ValidationException Validation Exception.
+     * @throws HttpException HttpException.
      * @throws NotFoundException Throws an exception if tag can't be found.
-     * @throws \Vanilla\Exception\PermissionException Throws an exception if user doesn't have Garden.Community.Manage permission.
+     * @throws PermissionException Throws an exception if user doesn't have Garden.Community.Manage permission.
      */
     public function post(array $body): Data
     {
@@ -207,10 +224,10 @@ class TagsApiController extends AbstractApiController
      * @param int $id The tag ID.
      * @param array $body The tag fields.
      * @return Data
-     * @throws \Garden\Schema\ValidationException Validation Exception.
-     * @throws \Garden\Web\Exception\HttpException Http Exception.
+     * @throws ValidationException Validation Exception.
+     * @throws HttpException Http Exception.
      * @throws NotFoundException Throws exception if the tag to patch can't be found.
-     * @throws \Vanilla\Exception\PermissionException Throws exception if the user doesn't have the Garden.Community.Manage permission.
+     * @throws PermissionException Throws exception if the user doesn't have the Garden.Community.Manage permission.
      */
     public function patch(int $id, array $body): Data
     {
@@ -257,9 +274,9 @@ class TagsApiController extends AbstractApiController
      *
      * @param int $id The tag ID.
      * @throws ClientException Throws an exception if the tag is a parent.
-     * @throws \Garden\Web\Exception\HttpException Http Exception.
+     * @throws HttpException Http Exception.
      * @throws NotFoundException Throws an exception if the tag to delete isn't found.
-     * @throws \Vanilla\Exception\PermissionException Throws exception if the user doesn't have the Garden.Community.Manage permission.
+     * @throws PermissionException Throws exception if the user doesn't have the Garden.Community.Manage permission.
      */
     public function delete(int $id): void
     {
@@ -319,7 +336,7 @@ class TagsApiController extends AbstractApiController
      *
      * @param int $tagID
      * @return array Returns the normalized and validated tag data.
-     * @throws \Garden\Schema\ValidationException Throws a validation exception.
+     * @throws ValidationException Throws a validation exception.
      * @throws NotFoundException Throws an exception if the tag isn't found.
      */
     private function getTagFormattedForOutput(int $tagID): array

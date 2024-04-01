@@ -11655,6 +11655,7 @@ body.isMobile .Popup.hasRichEditor .Border {
   position: relative;
   margin-left: auto;
   margin-right: auto;
+  width: 100%;
   max-width: 100%;
   max-height: none;
 }

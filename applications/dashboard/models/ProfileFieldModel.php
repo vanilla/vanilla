@@ -377,8 +377,22 @@ class ProfileFieldModel extends FullRecordCacheModel
     public function getQuerySchema(): Schema
     {
         return Schema::parse([
-            "dataType:s?" => ["x-filter" => true, "enum" => self::DATA_TYPES],
-            "formType:s?" => ["x-filter" => true, "enum" => self::FORM_TYPES],
+            "dataType:a?" => [
+                "items" => [
+                    "type" => "string",
+                    "enum" => self::DATA_TYPES,
+                ],
+                "style" => "form",
+                "x-filter" => true,
+            ],
+            "formType:a?" => [
+                "items" => [
+                    "type" => "string",
+                    "enum" => self::FORM_TYPES,
+                ],
+                "style" => "form",
+                "x-filter" => true,
+            ],
             "visibility:s?" => ["x-filter" => true, "enum" => self::VISIBILITIES],
             "mutability:s?" => ["x-filter" => true, "enum" => self::MUTABILITIES],
             "registrationOptions:s?" => ["x-filter" => true, "enum" => self::REGISTRATION_OPTIONS],

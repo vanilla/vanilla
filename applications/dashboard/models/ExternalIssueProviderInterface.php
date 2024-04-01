@@ -27,6 +27,14 @@ interface ExternalIssueProviderInterface
     public function makeNewIssue(string $recordType, int $recordID, array $issueData): array;
 
     /**
+     * Sync issue data from the external issue tracker and return the saved associated attachment data.
+     *
+     * @param array $attachment
+     * @return array
+     */
+    public function syncIssue(array $attachment): array;
+
+    /**
      * The schema for required special posting fields.
      *
      * @return Schema
@@ -92,6 +100,13 @@ interface ExternalIssueProviderInterface
      * @return void
      */
     public function setIssueTypeID($issueTypeID): void;
+
+    /**
+     * Get the time in milliseconds to wait before refreshing the external data.
+     *
+     * @return int
+     */
+    public function getRefreshTime(): int;
 
     //    abstract public function getOptions(string $recordType, array $record): array;
 }

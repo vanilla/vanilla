@@ -8,6 +8,7 @@
 namespace VanillaTests\APIv2;
 
 use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\CurrentTimeStamp;
 use VanillaTests\Analytics\SpyingAnalyticsTestTrait;
 use VanillaTests\EventSpyTestTrait;
 use VanillaTests\ExpectExceptionTrait;
@@ -34,17 +35,27 @@ class DiscussionsMergeTest extends SiteTestCase
     public function testSuccessMergeDiscussions(): void
     {
         // Create our records.
+        $this->resetCategoryTable();
+        $this->resetTable("Discussion");
+        $this->resetTable("Comment");
         $this->enableCaching();
         $rootCategory = $this->createCategory();
+        CurrentTimeStamp::mockTime("2022-01-01");
         $category1 = $this->createCategory(["parentCategoryID" => $rootCategory["categoryID"]]);
         $discussion1 = $this->createDiscussion();
         $comment1_1 = $this->createComment(["body" => "comment1"]);
         $comment1_2 = $this->createComment(["body" => "comment2"]);
         $category2 = $this->createCategory(["parentCategoryID" => $rootCategory["categoryID"]]);
+        CurrentTimeStamp::mockTime("2022-02-01");
+        $discussion4 = $this->createDiscussion(["body" => "discussion4"]);
+        // These ones are newer.
         $discussion2 = $this->createDiscussion(["body" => "discussion2"]);
+        CurrentTimeStamp::mockTime("2022-02-02");
         $comment2_1 = $this->createComment(["body" => "comment3"]);
-        $comment2_2 = $this->createComment(["body" => "comment4"]);
+        CurrentTimeStamp::mockTime("2022-01-02");
         $discussion3 = $this->createDiscussion(["body" => "discussion3"]);
+        CurrentTimeStamp::mockTime("2022-01-03");
+        $comment2_2 = $this->createComment(["body" => "comment4", "discussionID" => $discussion2["discussionID"]]);
 
         $mergedDiscussionIDs = [$discussion2["discussionID"], $discussion3["discussionID"]];
 
@@ -97,11 +108,32 @@ class DiscussionsMergeTest extends SiteTestCase
             [
                 "categoryID" => $categoryIDs,
                 "countComments" => [0, 0, 6],
-                "countDiscussions" => [0, 2, 1],
+                "countDiscussions" => [0, 3, 1],
             ],
             $categories,
             true,
             3
+        );
+
+        // Make sure the "lastPost" was adjusted appropriately on the category and the discussion.
+        // New discussion should properly account for the
+        $targetDiscussion = $this->api()->get("/discussions/{$discussion1["discussionID"]}", ["expand" => "lastPost"]);
+        $this->assertArraySubsetRecursive(
+            [
+                "commentID" => $comment2_1["commentID"],
+                "dateInserted" => $comment2_1["dateInserted"],
+            ],
+            $targetDiscussion["lastPost"]
+        );
+
+        // Make sure the category lastPost is correct.
+        $category = $this->api()->get("/categories/{$discussion1["categoryID"]}", ["expand" => "lastPost"]);
+        $this->assertArraySubsetRecursive(
+            [
+                "commentID" => $comment2_1["commentID"],
+                "dateInserted" => $comment2_1["dateInserted"],
+            ],
+            $category["lastPost"]
         );
     }
 

@@ -41,7 +41,7 @@ final class ErrorLogger
     public const LEVEL_ERROR = "error";
     public const LEVEL_CRITICAL = "critical";
 
-    private const ERROR_SUPPRESSED = 0;
+    public const ERROR_SUPPRESSED = 0;
     private const BITMASK_FATAL =
         E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
     private const BITMASK_NOTICE = E_NOTICE | E_USER_NOTICE;
@@ -231,6 +231,13 @@ final class ErrorLogger
     {
         $isErrorSuppressed = error_reporting() === self::ERROR_SUPPRESSED;
         if ($isErrorSuppressed) {
+            return;
+        }
+
+        // New PHP8 method for checking for suppressed errors (statements prefixed with @).
+        // For suppressed errors error_reporting() is set to E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR | E_PARSE
+        // Notably errors cannot be suppressed. See https://www.php.net/manual/en/migration80.incompatible.php
+        if (!(error_reporting() & $severity)) {
             return;
         }
 

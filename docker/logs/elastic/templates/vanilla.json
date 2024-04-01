@@ -4,7 +4,7 @@
     "settings": {
         "index": {
             "lifecycle": {
-                "name": "delete_after_7_days",
+                "name": "delete_after_1_day",
                 "rollover_alias": "vanilla"
             },
             "mapping": {
@@ -12,8 +12,8 @@
                     "limit": "10000"
                 }
             },
-            "refresh_interval": "1s",
-            "number_of_routing_shards": "30",
+            "refresh_interval": "10s",
+            "number_of_routing_shards": "1",
             "query": {
                 "default_field": ["request.*"]
             }
@@ -35,9 +35,6 @@
                 "type": "keyword"
             },
             "level": {
-                "type": "keyword"
-            },
-            "event": {
                 "type": "keyword"
             },
             "tags": {

@@ -623,6 +623,8 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $comment = (array) $args["Comment"];
         $commentID = $comment["CommentID"];
         $discussion = (array) $args["Discussion"];
+        $categoryID = $discussion["CategoryID"];
+        $category = CategoryModel::categories($categoryID);
         $existingActivity = $args["Activity"];
 
         if ($comment["InsertUserID"] == $discussion["InsertUserID"]) {
@@ -658,6 +660,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             "Route" => "/discussion/comment/$commentID#Comment_$commentID",
             "Data" => [
                 "Name" => val("Name", $discussion),
+                "Category" => $category["Name"] ?? null,
                 "Reason" => "questionAnswered",
             ],
         ];
@@ -666,18 +669,13 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     }
 
     /**
+     * Handle a comment being inserted or deleted.
      *
-     *
-     * @param CommentModel $sender Sending controller instance.
-     * @param array $args Event arguments.
+     * @param array{comment: array, discussion: array} $args Event arguments.
      */
-    public function commentModel_beforeUpdateCommentCount_handler($sender, $args)
+    public function forumAggregateModel_comment_handler(array $args)
     {
-        if (empty($args["Discussion"])) {
-            return;
-        }
-        // Merge the updated counts to the discussion.
-        $discussion = $args["Counts"] + $args["Discussion"];
+        $discussion = $args["discussion"];
 
         // Bail out if this isn't a comment on a question.
         if (strtolower($discussion["Type"]) !== "question") {
@@ -942,9 +940,8 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      * Recalculate the QnA status of a discussion.
      *
      * @param array|object $discussion The discussion to recalculate.
-     * @return array $set (optional based on the $return argument). Discussion QnA data.
      */
-    public function recalculateDiscussionQnA($discussion, bool $return = false): void
+    public function recalculateDiscussionQnA($discussion): void
     {
         $discussionArr = (array) $discussion;
         $discussionID = (int) ($discussionArr["discussionID"] ?? $discussionArr["DiscussionID"]);

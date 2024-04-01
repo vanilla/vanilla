@@ -81,6 +81,7 @@ class DiscussionLayoutRecordProvider implements LayoutViewRecordProviderInterfac
             ->firstRow(DATASET_TYPE_ARRAY);
 
         if (!$discussion) {
+            $this->discussionModel->tryThrowGoneException($query->recordID);
             throw new NotFoundException("Discussion", [
                 "discussionID" => $query->recordID,
             ]);

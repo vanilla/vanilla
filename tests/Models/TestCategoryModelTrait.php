@@ -9,6 +9,7 @@ namespace VanillaTests\Models;
 
 use CategoryModel;
 use PHPUnit\Framework\TestCase;
+use VanillaTests\VanillaTestCase;
 
 trait TestCategoryModelTrait
 {
@@ -132,5 +133,66 @@ trait TestCategoryModelTrait
     protected function followCategory(int $userID, int $categoryID, ?bool $followed = null)
     {
         return $this->categoryModel->follow($userID, $categoryID, $followed);
+    }
+
+    /**
+     * Assert that all the cached aggregate data on the category table is correct.
+     *
+     * @param int $categoryID
+     */
+    public function assertCategoryCounts(int $categoryID): void
+    {
+        $sql = \Gdn::database()->createSql();
+        $category = $sql->getWhere("Category", ["CategoryID" => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
+        $this->assertNotEmpty($category);
+
+        $counts = $sql
+            ->select("d.DiscussionID", "count", "CountDiscussions")
+            ->select("d.CountComments", "sum", "CountComments")
+            ->from("Discussion d")
+            ->where("CategoryID", $categoryID)
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+
+        $descendantIDs = \CategoryModel::instance()->getCategoriesDescendantIDs([$categoryID]);
+        $allCategoryIDs = array_merge([$categoryID], $descendantIDs);
+        $allCounts = $sql
+            ->select("d.DiscussionID", "count", "CountAllDiscussions")
+            ->select("d.CountComments", "sum", "CountAllComments")
+            ->from("Discussion d")
+            ->where("CategoryID", $allCategoryIDs)
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+
+        $expected = $counts + $allCounts;
+        // Sum operations give us strings.
+        $expected["CountComments"] = (int) $expected["CountComments"];
+        $expected["CountAllComments"] = (int) $expected["CountAllComments"];
+
+        $allCategoriesToCheckForLastPost = array_merge(
+            [$categoryID],
+            CategoryModel::instance()->getCategoryDescendantIDs($categoryID)
+        );
+        // Check the lastIDs.
+        $lastDiscussion = $sql
+            ->from("Discussion d")
+            ->select(["DiscussionID", "DateLastComment", "LastCommentID"])
+            ->where([
+                "d.CategoryID" => $allCategoriesToCheckForLastPost,
+            ])
+            ->limit(1)
+            ->orderBy(["-d.DateLastComment", "-d.DiscussionID"])
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+
+        if ($lastDiscussion) {
+            $expected += [
+                "LastDiscussionID" => $lastDiscussion["DiscussionID"],
+                "LastCommentID" => $lastDiscussion["LastCommentID"],
+                "LastDateInserted" => $lastDiscussion["DateLastComment"],
+            ];
+        }
+
+        VanillaTestCase::assertDataLike($expected, $category, "categoryID: $categoryID, name: {$category["Name"]}");
     }
 }

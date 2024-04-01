@@ -150,6 +150,16 @@ class AggregateCountOption implements \JsonSerializable
     }
 
     /**
+     * Increment the current aggregate index.
+     *
+     * @return void
+     */
+    public function incrementCurrentAggregateIndex(): void
+    {
+        $this->currentAggregateIndex++;
+    }
+
+    /**
      * @return int
      */
     public function getCurrentBatchIndex(): int
@@ -171,6 +181,14 @@ class AggregateCountOption implements \JsonSerializable
     public function setCurrentBatchIndex(int $currentBatchIndex): void
     {
         $this->currentBatchIndex = $currentBatchIndex;
+    }
+
+    /**
+     * Increment the current batch index.
+     */
+    public function incrementCurrentBatchIndex(): void
+    {
+        $this->currentBatchIndex++;
     }
 
     /**

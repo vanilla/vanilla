@@ -71,10 +71,10 @@ export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
 
     useEffect(() => {
         if (!isLoading && options && setOptions) {
-            setOptions(options);
+            setOptions([...options, ...(currentOptionOrOptions ?? [])]);
             lookupResult && lookupResult(options);
         }
-    }, [isLoading, setOptions, options]);
+    }, [isLoading, setOptions, options, currentOptionOrOptions]);
 
     return null;
 }
@@ -82,7 +82,7 @@ export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
 /**
  * This hook is used to fetch and process search results
  */
-function useApiLookup(
+export function useApiLookup(
     lookup: ILookupApi,
     api: AxiosInstance,
     currentValue: string | number | Array<string | number>,
@@ -100,7 +100,15 @@ function useApiLookup(
         if (!isMounted()) {
             return;
         }
-        _setOptions(opts);
+        _setOptions((prev) => {
+            if (prev === null) {
+                return opts;
+            }
+            if (opts === null) {
+                return null;
+            }
+            return [...prev, ...opts];
+        });
     }
 
     function setInitialOptionsOrOption(opts: typeof initialOptionsOrOption) {
@@ -204,33 +212,50 @@ function useApiLookup(
     }, []);
 
     const updateOptions = useCallback(
-        debounce((inputValue: string | number | Array<string | number>) => {
-            const actualSearchUrl = searchUrl.replace("/api/v2", "").replace("%s", inputValue.toString());
+        debounce((inputValue: string | number | Array<string | number>, useSingle: boolean = false) => {
+            const url = useSingle ? singleUrl : searchUrl;
 
-            const cached = apiCaches.get(actualSearchUrl);
-            if (cached) {
-                setOptions(cached);
-                return;
-            }
+            const inputValuesAsArray =
+                Array.isArray(inputValue) && inputValue.length === 0 ? [""] : [inputValue].flat();
 
-            // Fetch from API
-            api.get(actualSearchUrl)
-                .then((response) => {
-                    if (!isMounted()) {
-                        return;
-                    }
-                    const { data } = response;
-                    const results = resultsKey === "." ? data : get(data, resultsKey, "[]");
-                    let options: IAutoCompleteOption[] = results.map(transformApiToOption);
-                    if (processOptions) {
-                        options = processOptions(options);
-                    }
-                    apiCaches.set(actualSearchUrl, options);
-                    setOptions(options);
-                })
-                .catch((error) => {
-                    logError(error);
-                });
+            const actualSearchUrls: string[] = inputValuesAsArray.map((inputValue) => {
+                return url.replace("/api/v2", "").replace("%s", inputValue.toString());
+            });
+
+            actualSearchUrls.forEach((actualSearchUrl) => {
+                const cached = apiCaches.get(actualSearchUrl);
+                if (cached) {
+                    setOptions(cached);
+                    return;
+                }
+            });
+
+            actualSearchUrls.forEach((actualSearchUrl) => {
+                // Fetch from API
+                api.get(actualSearchUrl)
+                    .then((response) => {
+                        if (!isMounted()) {
+                            return;
+                        }
+                        const { data } = response;
+                        let options: IAutoCompleteOption[] = [];
+
+                        if (Array.isArray(data) && data.length !== 1) {
+                            const results = resultsKey === "." ? data : get(data, resultsKey, []);
+                            options = results.map(transformApiToOption);
+                        } else {
+                            options = [transformApiToOption(data)];
+                        }
+                        if (processOptions) {
+                            options = processOptions(options);
+                        }
+                        apiCaches.set(actualSearchUrl, options);
+                        setOptions(options);
+                    })
+                    .catch((error) => {
+                        logError(error);
+                    });
+            });
         }, 200),
         [searchUrl, singleUrl, processOptions],
     );
@@ -241,6 +266,12 @@ function useApiLookup(
             updateOptions(currentInputValue);
         }
     }, [updateOptions, currentInputValue]);
+
+    useEffect(() => {
+        if (isMounted() && Array.isArray(currentValue)) {
+            updateOptions(currentValue, true);
+        }
+    }, [currentValue]);
 
     const currentOptionOrOptions = useMemo(() => {
         return (

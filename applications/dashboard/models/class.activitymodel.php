@@ -36,6 +36,7 @@ use Vanilla\Scheduler\LongRunnerTimeoutException;
 use Vanilla\Utility\CamelCaseScheme;
 use Vanilla\Utility\DebugUtils;
 use Vanilla\Web\SystemCallableInterface;
+use Vanilla\Utility\HtmlUtils;
 
 /**
  * Activity data management.
@@ -1417,15 +1418,15 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             count($activityData["reasons"]) === 1 &&
             $activityData["reasons"][0] == "advanced"
         ) {
-            $notifyReason = sprintf(
-                t("You are receiving this email because you are following category %1\$s."),
+            $notifyReason = HtmlUtils::formatTags(
+                t("You are receiving this email because you are following category <0/>."),
                 $data["Category"]
             );
         } elseif (count($tokenData["ActivityTypes"]) == 1) {
             $activityTypeObj = $this->activityService->getActivityByTypeID($tokenData["ActivityType"]);
             /** @var <class-string<Activity>> $activityTypeObj */
-            $notifyReason = sprintf(
-                t("You are receiving this email because you have requested to be notified %1\$s."),
+            $notifyReason = HtmlUtils::formatTags(
+                t("You are receiving this email because you have requested to be notified <0/>."),
                 t($activityTypeObj != null ? $activityTypeObj::getActivityReason() : "")
             );
         } else {

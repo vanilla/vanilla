@@ -17,6 +17,9 @@
                     "title": "Find more posts tagged with"
                 },
                 {
+                    "$hydrate": "react.asset.discussionAttachments"
+                },
+                {
                     "$hydrate": "react.asset.tabbed-comment-list"
                 },
                 {

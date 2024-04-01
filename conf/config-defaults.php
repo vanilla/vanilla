@@ -143,8 +143,8 @@ $Configuration['Garden']['Embed']['PageToForum'] = true;
 $Configuration['Garden']['SignIn']['Popup'] = true; // Should the sign-in link pop up or go to it's own page? (SSO requires going to it's own external page)
 
 // User experience & formatting.
-$Configuration['Garden']['InputFormatter'] = 'Rich'; // Html, BBCode, Markdown, Text, Rich
-$Configuration['Garden']['MobileInputFormatter'] = 'Rich';
+$Configuration['Garden']['InputFormatter'] = 'Rich2'; // Html, BBCode, Markdown, Text, Rich
+$Configuration['Garden']['MobileInputFormatter'] = 'Rich2';
 $Configuration['Garden']['Html']['AllowedElements'] = "a, abbr, acronym, address, area, audio, b, bdi, bdo, big, blockquote, br, caption, center, cite, code, col, colgroup, dd, del, details, dfn, div, dl, dt, em, figure, figcaption, font, h1, h2, h3, h4, h5, h6, hgroup, hr, i, img, ins, kbd, li, map, mark, menu, meter, ol, p, pre, q, s, samp, small, span, strike, strong, sub, sup, summary, table, tbody, td, tfoot, th, thead, time, tr, tt, u, ul, var, video, wbr";
 $Configuration['Garden']['Html']['AllowedUrlSchemes'] = [
     'aim', 'feed', 'file', 'ftp', 'gopher', 'http', 'https', 'irc', 'mailto', 'news', 'nntp', 'rapidminer', 'sftp', 'ssh', 'telnet'

@@ -61,7 +61,7 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
     protected $eventManager = null;
 
     /** @var bool */
-    protected $logErrorsAsWarnings = false;
+    protected $logErrorsAsWarnings = true;
 
     /** @var CronModel */
     protected $cronModel;
@@ -376,10 +376,10 @@ class DeferredScheduler implements SchedulerInterface, LoggerAwareInterface
                 }
 
                 if ($this->logErrorsAsWarnings) {
-                    trigger_error($msg, E_USER_ERROR);
+                    $this->logger->error($msg);
+                } else {
+                    throw $t;
                 }
-
-                $this->logger->error($msg);
             } finally {
                 $span->finish();
                 $trackingSlip->stop();

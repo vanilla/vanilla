@@ -11,6 +11,12 @@ export type IconData = {
 };
 
 export const coreIconsData = {
+    ".DS_Store": null,
+    "ai-sparkle": {
+        width: "16",
+        height: "16",
+        fill: "none",
+    },
     "analytics-add": {
         width: "18",
         height: "18",
@@ -103,11 +109,23 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
+    "data-send": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
     "data-settings": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
         ariahidden: "true",
+    },
+    "data-share": {
+        width: "16",
+        height: "16",
+        viewBox: "0 0 16 16",
+        fill: "none",
     },
     "data-site-metric": {
         width: "24",
@@ -220,6 +238,28 @@ export const coreIconsData = {
     },
     "external-link": {
         viewBox: "0 0 17 17",
+    },
+    "logo-github": {
+        width: "60",
+        height: "60",
+        viewBox: "0 0 60 60",
+        fill: "none",
+    },
+    "logo-jira": {
+        width: "60",
+        height: "60",
+        viewBox: "0 0 60 60",
+        fill: "none",
+    },
+    "logo-salesforce": {
+        width: "60",
+        height: "60",
+        viewBox: "0 0 60 60",
+    },
+    "logo-zendesk": {
+        width: "60",
+        height: "60",
+        viewBox: "0 0 60 60",
     },
     "me-inbox": {
         width: "24",

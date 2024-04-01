@@ -5,8 +5,8 @@
 
 import chai, { expect } from "chai";
 import asPromised from "chai-as-promised";
+import { color } from "csx";
 import { flattenObject, spaceshipCompare, unflattenObject } from "./logicUtils";
-import { ColorHelper } from "csx";
 chai.use(asPromised);
 
 describe("spaceshipCompare()", () => {
@@ -31,7 +31,26 @@ describe("flattenObject()", () => {
             nestedKey: "val2",
             array1: ["one", "two", "three"],
         },
-        color: new ColorHelper("rgb", 0, 0, 0, 1, false),
+        color: color("#000"),
+        colorNoClass: { r: 0, g: 0, b: 0, a: 1, f: "rgb", o: false },
+        multipleColors: {
+            color1: "#000",
+            color2: "#0F0",
+        },
+        errMultipleColors: {
+            color1: "rgb(0,0,0)",
+            color2: "rgb(0,255,0)",
+            r: 0,
+            g: 0,
+            b: 0,
+            a: 1,
+            f: "rgb",
+            o: false,
+        },
+        nestedColorObjects: {
+            color1: color("#000"),
+            color2: { r: 0, g: 0, b: 0, a: 1, f: "rgb", o: false },
+        },
     };
 
     const flattened = {
@@ -40,6 +59,31 @@ describe("flattenObject()", () => {
         "nested.nestedKey": "val2",
         "nested.array1": ["one", "two", "three"],
         color: "rgb(0,0,0)",
+        colorNoClass: "rgb(0,0,0)",
+        "multipleColors.color1": "#000",
+        "multipleColors.color2": "#0F0",
+        "errMultipleColors.color1": "rgb(0,0,0)",
+        "errMultipleColors.color2": "rgb(0,255,0)",
+        "nestedColorObjects.color1": "rgb(0,0,0)",
+        "nestedColorObjects.color2": "rgb(0,0,0)",
+    };
+
+    const unflattened = {
+        ...nested,
+        color: "rgb(0,0,0)",
+        colorNoClass: "rgb(0,0,0)",
+        multipleColors: {
+            color1: "#000",
+            color2: "#0F0",
+        },
+        errMultipleColors: {
+            color1: "rgb(0,0,0)",
+            color2: "rgb(0,255,0)",
+        },
+        nestedColorObjects: {
+            color1: "rgb(0,0,0)",
+            color2: "rgb(0,0,0)",
+        },
     };
 
     const things = ["one", "two"];
@@ -49,6 +93,6 @@ describe("flattenObject()", () => {
     });
 
     it("unflattens objects", () => {
-        expect(unflattenObject(flattened)).deep.equal({ ...nested, color: "rgb(0,0,0)" });
+        expect(unflattenObject(flattened)).deep.equal(unflattened);
     });
 });

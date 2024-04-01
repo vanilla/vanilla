@@ -21,7 +21,7 @@ paths:
                   schema:
                       type: integer
                   allowEmptyValue: true
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: |
                       Desired number of items per page.
                   in: query

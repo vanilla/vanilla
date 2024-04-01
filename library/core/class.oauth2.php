@@ -968,8 +968,8 @@ class Gdn_OAuth2 extends SSOAddon implements \Vanilla\InjectableInterface, Cache
 
         // Retrieve the profile that was saved to the session in the entryEndPoint.
         $profile = $savedProfile["Attributes"]["Profile"] ?? [];
-        $accessToken = val("AccessToken", $savedProfile);
-        $refreshToken = val("RefreshToken", $savedProfile);
+        $accessToken = val("AccessToken", $savedProfile["Attributes"]);
+        $refreshToken = val("RefreshToken", $savedProfile["Attributes"]);
 
         trace($profile, "Profile");
         trace($accessToken, "Access Token");

@@ -68,7 +68,7 @@ export function PostReactions(props: { reactions?: IReaction[] }) {
     }, [counts]);
 
     // there is no list of reactions, don't display anything
-    if (!list) {
+    if (!list || list.length === 0) {
         return null;
     }
 

@@ -21,9 +21,9 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/NotificationPreferences"
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
         patch:
             summary: Update a user's notification preferences.
             tags:
@@ -41,9 +41,9 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/NotificationPreferences"
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
     /notification-preferences/schema:
         x-hidden: true
         get:

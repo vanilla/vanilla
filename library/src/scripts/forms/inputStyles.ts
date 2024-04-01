@@ -94,6 +94,7 @@ export const inputMixin = (vars?: {
         ...Mixins.border(border),
         ...Mixins.font(font),
         outline: 0,
+        height: sizing.height,
         ...placeholderStyles({
             color: ColorsUtils.colorOut(colors.placeholder),
         }),

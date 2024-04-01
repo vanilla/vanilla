@@ -120,7 +120,6 @@ export function DiscussionCommentsAsset(props: IProps) {
         },
     };
 
-    // FIXME: when there are no comments and discussion isn't closed, empty widget's padding takes up vertical space.
     return (
         <DiscussionThreadContextProvider discussion={discussion}>
             {(hasComments || discussion.closed) && (

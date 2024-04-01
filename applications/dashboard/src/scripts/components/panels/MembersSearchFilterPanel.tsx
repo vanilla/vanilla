@@ -58,7 +58,7 @@ export function MembersSearchFilterPanel() {
         profileFields: form["profileFields"] ?? {},
     };
 
-    const { values, submitForm, setValues, setFieldValue, resetForm, isSubmitting } = useFormik({
+    const { values, submitForm, setValues, setFieldValue, resetForm } = useFormik({
         initialValues: valuesFromSearchForm as any, //most of the form is dynamic... but tighten it up if possible
         onSubmit: async () => {
             await search();
@@ -90,7 +90,7 @@ export function MembersSearchFilterPanel() {
                         schema={combinedSchema}
                         values={values}
                         onSubmit={async (newValues) => {
-                            await setValues(newValues);
+                            setValues(newValues);
                             await submitForm();
                         }}
                     />
@@ -107,9 +107,7 @@ export function MembersSearchFilterPanel() {
             <JsonSchemaForm
                 schema={quickFiltersSchema}
                 instance={values}
-                onChange={(quickFiltersValues) => {
-                    setValues({ ...values, ...quickFiltersValues });
-                }}
+                onChange={setValues}
                 FormControl={FormControl}
                 FormControlGroup={FormControlGroup}
             />

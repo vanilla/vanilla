@@ -141,12 +141,7 @@ export function DefaultNotificationPreferencesModal(
                     schema={groupSchema}
                     FormControl={DashboardFormControl}
                     FormSection={NotificationPreferencesFormSection}
-                    onChange={(newValues) => {
-                        setValues({
-                            ...values,
-                            ...newValues,
-                        });
-                    }}
+                    onChange={setValues}
                 />
             ),
         };

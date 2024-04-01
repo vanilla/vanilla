@@ -8,23 +8,20 @@
 namespace Garden\Web;
 
 use Garden\EventManager;
-use Garden\Hydrate\DataHydrator;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\ResponseException;
 use Gdn;
-use Gdn_Locale;
 use Garden\Schema\ValidationException;
 use Garden\Web\Exception\HttpException;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
-use Logger;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\LocaleInterface;
-use Vanilla\Exception\PermissionException;
+use Vanilla\Logger;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Permissions;
 use Garden\CustomExceptionHandler;
@@ -228,11 +225,11 @@ class Dispatcher implements LoggerAwareInterface
                     ($dispatchEx->getContext()["type"] ?? "") == "!private"
                 ) {
                 } elseif ($dispatchEx->getCode() >= 400 && $dispatchEx->getCode() < 500) {
-                    ErrorLogger::warning(
-                        $dispatchEx,
-                        ["api_error", "dispatcher-caught"],
-                        ["responseCode" => $dispatchEx->getCode()]
-                    );
+                    $this->logger->notice($dispatchEx->getMessage(), [
+                        Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+                        Logger::FIELD_TAGS => ["api_error", "dispatcher-caught"],
+                        "responseCode" => $dispatchEx->getCode(),
+                    ]);
                 } else {
                     ErrorLogger::error(
                         $dispatchEx,

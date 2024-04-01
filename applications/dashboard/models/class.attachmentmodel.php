@@ -233,6 +233,7 @@ class AttachmentModel extends Gdn_Model
         // Get the attachments.
         $attachments = $this->getWhere(["ForeignID" => array_keys($foreignIDs)], "DateInserted", "desc")->resultArray();
         $this->normalizeAttachments($attachments);
+        \Gdn::userModel()->expandUsers($attachments, ["InsertUser", "UpdateUser"]);
         $attachments = Gdn_DataSet::index($attachments, "ForeignID", ["Unique" => false]);
 
         // Join the attachments.

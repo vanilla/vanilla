@@ -11,7 +11,7 @@ import { cx } from "@emotion/css";
 interface IProps {
     headingTag?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
     showBackLink?: boolean;
-    title: string;
+    title: React.ReactNode;
     actionButtons?: React.ReactNode;
     /** @deprecated use useFallbackBackUrl("/action"); instead */
     onBackClick?: () => void;

@@ -8,7 +8,7 @@ paths:
                   description: Filter by a range or CSV of category IDs.
                   in: query
                   schema:
-                      $ref: "#/components/schemas/RangeExpression"
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
                 - description: Parent category ID.
                   in: query
                   name: parentCategoryID
@@ -300,7 +300,7 @@ paths:
                                             minLength: 1
                                             type: string
                                         lastPost:
-                                            $ref: "#/components/schemas/PostFragment"
+                                            $ref: "discussions.yml#/components/schemas/PostFragment"
                                         preferences:
                                             $ref: "#/components/schemas/CategoryPreferences"
                                     required:
@@ -427,37 +427,51 @@ paths:
     /categories/search:
         get:
             parameters:
-                - description: |
+                - name: query
+                  description: |
                       Category name filter.
                   in: query
-                  name: query
                   required: true
                   schema:
                       minLength: 1
                       type: string
-                - description: |
+                - name: displayAs[]
+                  description: The display style of the category.
+                  in: query
+                  required: false
+                  schema:
+                      type: array
+                      items:
+                          type: string
+                          enum:
+                              - Categories
+                              - Discussions
+                              - Flat
+                              - Heading
+                  style: form
+                - name: page
+                  description: |
                       Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
                   in: query
-                  name: page
                   schema:
                       type: integer
                       default: 1
                       maximum: 100
                       minimum: 1
-                - description: |
+                - name: limit
+                  description: |
                       Desired number of items per page.
                   in: query
-                  name: limit
                   schema:
                       type: integer
                       default: 30
                       maximum: 200
                       minimum: 1
-                - description: |
+                - name: expand
+                  description: |
                       Expand associated records using one or more valid field names (all, parent, breadcrumbs).
                       A value of "all" will expand all expandable fields.
                   in: query
-                  name: expand
                   schema:
                       items:
                           enum:
@@ -465,10 +479,10 @@ paths:
                               - parent
                               - all
                           type: string
-                - description: |
+                - name: layoutViewType
+                  description: |
                       Layout View Type.
                   in: query
-                  name: layoutViewType
                   required: false
                   schema:
                       minLength: 1
@@ -942,7 +956,7 @@ components:
             type: array
             items:
                 allOf:
-                    - $ref: "#/components/schemas/CategoryFragment"
+                    - $ref: "discussions.yml#/components/schemas/CategoryFragment"
                     - type: object
                       properties:
                           preferences:

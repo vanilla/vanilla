@@ -15,13 +15,13 @@ import {
     useIntegrationContext,
 } from "@library/features/discussions/integrations/Integrations.context";
 import {
+    FAKE_API,
     FAKE_INTEGRATION,
     FAKE_INTEGRATIONS_CATALOG,
-    createMockApi,
 } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, RenderResult, act } from "@testing-library/react-hooks";
-import { IAttachmentIntegration } from "./Integrations.types";
+import { IAttachmentIntegration, IIntegrationsApi } from "./Integrations.types";
 import { PropsWithChildren } from "react";
 
 const queryClient = new QueryClient({
@@ -32,7 +32,11 @@ const queryClient = new QueryClient({
     },
 });
 
-const mockApi = createMockApi();
+const mockApi: IIntegrationsApi = {
+    getIntegrationsCatalog: jest.fn(FAKE_API.getIntegrationsCatalog),
+    getAttachmentSchema: jest.fn(FAKE_API.getAttachmentSchema),
+    postAttachment: jest.fn(FAKE_API.postAttachment),
+};
 
 export function TestWrapper({ children }: PropsWithChildren<{}>) {
     return (

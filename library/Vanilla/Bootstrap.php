@@ -144,6 +144,8 @@ class Bootstrap
             ->rule(Model::class)
             ->setShared(true);
 
+        $container->rule(Vanilla\OpenAI\OpenAIClient::class)->setShared(true);
+
         // Caches
         $container
             ->rule(\Gdn_Cache::class)

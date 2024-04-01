@@ -15,6 +15,7 @@ use Psr\Log\LoggerAwareTrait;
 use Vanilla\Community\Events\CommentEvent;
 use Vanilla\Community\Events\DiscussionEvent;
 use Vanilla\Dashboard\Events\LogPostEvent;
+use Vanilla\Forum\Models\ForumAggregateModel;
 use Vanilla\Models\CommunityNotificationGenerator;
 use Vanilla\PrunableTrait;
 use Vanilla\Utility\ArrayUtils;
@@ -828,23 +829,35 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
     }
 
     /**
+     * @return ForumAggregateModel
+     */
+    private function aggregateModel(): ForumAggregateModel
+    {
+        return Gdn::getContainer()->get(ForumAggregateModel::class);
+    }
+
+    /**
      * Recalculate a record after a log operation.
      */
     public function recalculate()
     {
-        $categoryModel = CategoryModel::instance();
         $commentModel = CommentModel::instance();
+        $discussionIDs = array_keys($this->recalcIDs["Discussion"] ?? []);
+        // We also have discussions from the comments that were restored.
+        $commentDiscussionIDs = $commentModel
+            ->createSql()
+            ->from("Comment")
+            ->select("DiscussionID")
+            ->distinct()
+            ->where("CommentID", array_keys($this->recalcIDs["Comment"] ?? []))
+            ->get()
+            ->column("DiscussionID");
+        $discussionIDs = array_unique(array_merge($discussionIDs, $commentDiscussionIDs));
 
-        if ($discussionIDs = val("Discussion", $this->recalcIDs)) {
-            foreach ($discussionIDs as $discussionID => $tmp) {
-                $commentModel->updateCommentCount($discussionID);
-                $categoryModel->incrementLastDiscussion($discussionID);
-            }
-        }
-
-        if ($commentIDs = val("Comment", $this->recalcIDs)) {
-            foreach ($commentIDs as $commentID => $tmp) {
-                $categoryModel->incrementLastComment($commentID);
+        foreach ($discussionIDs as $discussionID) {
+            $discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+            if ($discussion) {
+                $this->aggregateModel()->recalculateDiscussionAggregates($discussion);
             }
         }
 

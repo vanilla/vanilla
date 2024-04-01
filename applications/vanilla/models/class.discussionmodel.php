@@ -28,6 +28,7 @@ use Vanilla\Dashboard\Models\AggregateCountableInterface;
 use Vanilla\Dashboard\Models\RecordStatusModel;
 use Vanilla\Dashboard\Models\UserMentionsInterface;
 use Vanilla\Dashboard\Models\UserMentionsModel;
+use Vanilla\Database\SetLiterals\RawExpression;
 use Vanilla\Events\LegacyDirtyRecordTrait;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Formatting\DateTimeFormatter;
@@ -35,6 +36,7 @@ use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\FormatFieldTrait;
 use Vanilla\Formatting\UpdateMediaTrait;
 use Vanilla\Forum\Jobs\DeferredResourceEventJob;
+use Vanilla\Forum\Models\ForumAggregateModel;
 use Vanilla\ImageSrcSet\ImageSrcSetService;
 use Vanilla\ImageSrcSet\MainImageSchema;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
@@ -1336,6 +1338,7 @@ SQL;
             }
         } else {
             if (isset($discussions->DiscussionID)) {
+                /** @var object $discussion */
                 $discussion = $discussions;
                 $cacheKey = sprintf(DiscussionModel::CACHE_DISCUSSIONVIEWS, $discussion->DiscussionID);
                 $cacheViews = Gdn::cache()->get($cacheKey);
@@ -2439,10 +2442,10 @@ SQL;
      * @param int $rowID
      * @param string|array $property
      * @param mixed $value
-     * @param bool $isPostInsert Set this if we are just doing some modification after the initial insert.
+     * @param bool $isDiscussionInsert Set this if we are just doing some modification after the initial insert.
      * In that case we don't want to fire any update events.
      */
-    public function setField($rowID, $property, $value = false, bool $isPostInsert = false)
+    public function setField($rowID, $property, $value = false, bool $isDiscussionInsert = false)
     {
         if (!is_array($property)) {
             $property = [$property => $value];
@@ -2452,11 +2455,11 @@ SQL;
         $this->EventArguments["SetField"] = $property;
 
         parent::setField($rowID, $property, $value);
-        if (!$isPostInsert) {
+        if (!$isDiscussionInsert) {
             $this->addDirtyRecord("discussion", $rowID);
         }
 
-        if (isset($property["Score"]) || isset($property["CountComments"])) {
+        if (isset($property["Score"]) || (isset($property["CountComments"]) && !isset($property["hot"]))) {
             // update hot column value
             $this->updateColumnHot(["DiscussionID" => $rowID]);
         }
@@ -2483,6 +2486,14 @@ SQL;
     }
 
     /**
+     * @return ForumAggregateModel
+     */
+    private function aggregateModel(): ForumAggregateModel
+    {
+        return Gdn::getContainer()->get(ForumAggregateModel::class);
+    }
+
+    /**
      * Inserts or updates the discussion via form values.
      *
      * Events: BeforeSaveDiscussion, AfterValidateDiscussion, AfterSaveDiscussion.
@@ -2496,6 +2507,7 @@ SQL;
     public function save($formPostValues, $settings = false)
     {
         // Define the primary key in this model's table.
+        $settings = is_array($settings) ? $settings : [];
         $this->defineSchema();
 
         // If the site isn't configured to use categories, don't allow one to be set.
@@ -2659,7 +2671,11 @@ SQL;
             }
 
             // If the post is new and it validates, make sure the user isn't spamming
-            if (!$insert || !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
+            if (
+                !$insert ||
+                (($settings["skipSpamCheck"] ?? false) ||
+                    !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate))
+            ) {
                 $forcedFormat = $formPostValues["forcedFormat"] ?? false;
                 // Get all fields on the form that relate to the schema
                 $fields = $validation->schemaValidationFields();
@@ -2675,8 +2691,6 @@ SQL;
 
                 // Remove the primary key from the fields for saving.
                 unset($fields["DiscussionID"]);
-                $oldCategoryID = false;
-                $hasCategoryUpdate = false;
                 if ($discussionID > 0) {
                     // Updating
                     $stored = $this->getID($discussionID, DATASET_TYPE_OBJECT);
@@ -2707,10 +2721,18 @@ SQL;
                     LogModel::logChange("Edit", "Discussion", array_merge($fields, ["DiscussionID" => $discussionID]));
 
                     self::serializeRow($fields);
+                    $fields["hot"] = $this->getHotCalculationExpression();
                     $oldCategoryID = $stored->CategoryID ?? null;
                     $newCategoryID = $fields["CategoryID"] ?? null;
-                    $hasCategoryUpdate = $oldCategoryID !== $newCategoryID;
+                    $hasCategoryUpdate =
+                        $oldCategoryID !== null && $newCategoryID !== null && $oldCategoryID !== $newCategoryID;
+
+                    $this->SQL->put($this->Name, $fields, [$this->PrimaryKey => $discussionID]);
+
                     if ($hasCategoryUpdate) {
+                        $oldCategory = CategoryModel::categories($oldCategoryID);
+                        $newCategory = CategoryModel::categories($newCategoryID);
+                        $this->aggregateModel()->handleDiscussionMove((array) $stored, $oldCategory, $newCategory);
                         $this->getEventManager()->dispatch(
                             new BulkUpdateEvent(
                                 "comment",
@@ -2722,12 +2744,6 @@ SQL;
                                 ]
                             )
                         );
-                    }
-
-                    $this->SQL->put($this->Name, $fields, [$this->PrimaryKey => $discussionID]);
-
-                    if (val("CategoryID", $stored) != val("CategoryID", $fields)) {
-                        $oldCategoryID = val("CategoryID", $stored);
                     }
                 } else {
                     // Inserting.
@@ -2757,11 +2773,9 @@ SQL;
 
                     // Create discussion
                     $this->serializeRow($fields);
+                    $fields["hot"] = $this->getHotCalculationExpression();
                     $discussionID = $this->SQL->insert($this->Name, $fields);
                     $fields["DiscussionID"] = $discussionID;
-
-                    // Update cached last post info for a category.
-                    CategoryModel::updateLastPost($fields);
 
                     // Update the user's discussion count.
                     $insertUser = $this->userModel->getID($fields["InsertUserID"]);
@@ -2782,24 +2796,15 @@ SQL;
                     $formPostValues["DiscussionID"] = $discussionID;
 
                     $discussion = $this->getID($discussionID, DATASET_TYPE_ARRAY);
+                    if ($discussion) {
+                        $this->aggregateModel()->handleDiscussionInsert($discussion);
 
-                    // Send notifications
-                    $notificationGenerator = Gdn::getContainer()->get(
-                        \Vanilla\Models\CommunityNotificationGenerator::class
-                    );
-                    $notificationGenerator->notifyNewDiscussion($discussion);
-                }
-
-                // Get CategoryID of this discussion
-                $discussion = $this->getID($discussionID, DATASET_TYPE_OBJECT);
-
-                // Update discussion counter for affected categories.
-                if ($insert || ($oldCategoryID && $hasCategoryUpdate)) {
-                    $this->categoryModel->onDiscussionAdd((array) $discussion);
-                }
-
-                if ($oldCategoryID && !empty($stored) && $hasCategoryUpdate) {
-                    $this->categoryModel->onDiscussionRemove((array) $stored);
+                        // Send notifications
+                        $notificationGenerator = Gdn::getContainer()->get(
+                            \Vanilla\Models\CommunityNotificationGenerator::class
+                        );
+                        $notificationGenerator->notifyNewDiscussion($discussion);
+                    }
                 }
 
                 $this->calculateMediaAttachments($discussionID, !$insert);
@@ -2863,107 +2868,6 @@ SQL;
         }
 
         return $result;
-    }
-
-    /**
-     * Update the CountDiscussions value on the category based on the CategoryID being saved.
-     *
-     * @param int $categoryID Unique ID of category we are updating.
-     * @param array|false $discussion The discussion to update the count for or **false** for all of them.
-     */
-    public function updateDiscussionCount($categoryID, $discussion = false)
-    {
-        if (strcasecmp($categoryID, "All") == 0) {
-            // Update all categories.
-            $sql = "update :_Category c
-            left join (
-              select
-                d.CategoryID,
-                coalesce(count(d.DiscussionID), 0) as CountDiscussions,
-                coalesce(sum(d.CountComments), 0) as CountComments
-              from :_Discussion d
-              group by d.CategoryID
-            ) d
-              on c.CategoryID = d.CategoryID
-            set
-               c.CountDiscussions = coalesce(d.CountDiscussions, 0),
-               c.CountComments = coalesce(d.CountComments, 0)";
-            $sql = str_replace(":_", $this->Database->DatabasePrefix, $sql);
-            $this->Database->query($sql, [], "DiscussionModel_UpdateDiscussionCount");
-        } elseif (is_numeric($categoryID)) {
-            $discussion = is_object($discussion) || is_array($discussion) ? (array) $discussion : null;
-            $this->categoryModel->updateDiscussionCount($categoryID, $discussion);
-        }
-    }
-
-    /**
-     * @param int|array|stdClass $discussion The discussion ID or discussion.
-     * @throws Exception
-     * @deprecated
-     */
-    public function incrementNewDiscussion($discussion)
-    {
-        deprecated("DiscussionModel::incrementNewDiscussion", "CategoryModel::incrementLastDiscussion");
-
-        $this->categoryModel->incrementLastDiscussion($discussion);
-    }
-
-    /**
-     * Given a comment, update it's discussion last post info and counts.
-     *
-     * Usually, this method shouldn't be called directly. It is meant mainly to be called from other models.
-     *
-     * @param array $discussion The discussion being incremented.
-     * @param array $comment The comment that prompted the increment.
-     * @param int $offset Pass 1 if the comment was added to the discussion or -1 if it was removed.
-     * @param bool $updateCategory Whether or not to update aggregates on the category too.
-     */
-    public function adjustLastComment(array $discussion, array $comment, int $offset = 1, $updateCategory = true)
-    {
-        $this->incrementCommentCount($discussion, $offset, $updateCategory);
-
-        // Update the cached last post info with whatever we have.
-        $this->updateLastComment($comment, $updateCategory);
-    }
-
-    /**
-     * Recursively increment counts for a discussion & it's ancestors.
-     *
-     * @param array $discussion
-     * @param int $offset
-     * @param bool $updateCategory
-     */
-    private function incrementCommentCount(array $discussion, int $offset = 1, bool $updateCategory = true)
-    {
-        $discussionID = $discussion["DiscussionID"];
-        $this->SQL->put("Discussion", ["CountComments+" => $offset], ["DiscussionID" => $discussionID]);
-
-        $categoryID = $discussion["CategoryID"] ?? false;
-
-        if ($updateCategory && $categoryID) {
-            if ($offset > 0) {
-                CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $offset);
-            } else {
-                CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, -$offset);
-            }
-        }
-    }
-
-    /**
-     * Update the latest post info for a Discussion
-     *
-     * @param array $comment
-     * @param bool $updateCategory Whether or not to check the categories for the comment.
-     */
-    private function updateLastComment(array $comment, bool $updateCategory = true)
-    {
-        $discussionID = $comment["DiscussionID"] ?? false;
-
-        // TODO: Update the last comment on the discussion itself.
-
-        if ($updateCategory) {
-            CategoryModel::updateLastPost($discussionID, $comment);
-        }
     }
 
     /**
@@ -3044,61 +2948,6 @@ SQL;
             ->put();
 
         return $value;
-    }
-
-    /**
-     * Sets the discussion score for specified user.
-     *
-     * @param int $discussionID Unique ID of discussion to update.
-     * @param int $userID Unique ID of user setting score.
-     * @param int $score New score for discussion.
-     * @return int Total score.
-     */
-    public function setUserScore($discussionID, $userID, $score)
-    {
-        // Insert or update the UserDiscussion row
-        $this->SQL->replace(
-            "UserDiscussion",
-            ["Score" => $score],
-            ["DiscussionID" => $discussionID, "UserID" => $userID]
-        );
-
-        // Get the total new score
-        $totalScore = $this->SQL
-            ->select("Score", "sum", "TotalScore")
-            ->from("UserDiscussion")
-            ->where("DiscussionID", $discussionID)
-            ->get()
-            ->firstRow()->TotalScore;
-
-        // Update the Discussion's cached version
-        $this->SQL
-            ->update("Discussion")
-            ->set("Score", $totalScore)
-            ->where("DiscussionID", $discussionID)
-            ->put();
-
-        return $totalScore;
-    }
-
-    /**
-     * Gets the discussion score for specified user.
-     *
-     * @param int $discussionID Unique ID of discussion getting score for.
-     * @param int $userID Unique ID of user whose score we're getting.
-     * @return int Total score.
-     */
-    public function getUserScore($discussionID, $userID)
-    {
-        $data = $this->SQL
-            ->select("Score")
-            ->from("UserDiscussion")
-            ->where("DiscussionID", $discussionID)
-            ->where("UserID", $userID)
-            ->get()
-            ->firstRow();
-
-        return $data ? $data->Score : 0;
     }
 
     /**
@@ -4335,13 +4184,13 @@ SQL;
         $row["Closed"] = isset($row["Closed"]) ? (bool) $row["Closed"] : false;
 
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $expand)) {
+            $row["canonicalID"] = "discussion_{$row["DiscussionID"]}";
             $row["recordCollapseID"] = "site{$this->ownSite->getSiteID()}_discussion{$row["DiscussionID"]}";
             $row["excerpt"] = $row["excerpt"] ?? $this->formatterService->renderExcerpt($bodyParsed, $format);
             $row["bodyPlainText"] = Gdn::formatService()->renderPlainText($bodyParsed, $format);
             $row["image"] = $this->formatterService->parseImageUrls($bodyParsed, $format)[0] ?? null;
             $row["scope"] = $this->categoryModel->getRecordScope($row["CategoryID"]);
             $row["score"] = $row["Score"] ?? 0;
-            $row["hot"] = $row["hot"];
             $type = $row["Type"] ?? "";
             $row["Type"] = $type === self::REDIRECT_TYPE ? self::DISCUSSION_TYPE : $type;
             $siteSection = $this->siteSectionModel->getSiteSectionForAttribute("allCategories", $row["CategoryID"]);
@@ -4962,6 +4811,7 @@ SQL;
             // This should ensure that all aggregate info is updated properly
             // And is in fact the reason this whole thing is an iterator.
             $deleteResult = $commentModel->deleteID($commentID, $options);
+            $existingDiscussion["CountComments"]--;
 
             try {
                 // Yield for the generator in case we hit a timeout.
@@ -5000,13 +4850,7 @@ SQL;
         $this->getEventManager()->dispatch($discussionEvent);
 
         // Update some ancillary counts.
-        $this->updateDiscussionCount($categoryID);
-
-        // Update the last post info for the category and its parents.
-        $this->categoryModel->refreshAggregateRecentPost($categoryID, true);
-
-        // Decrement CountAllDiscussions for category and its parents.
-        CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION);
+        $this->aggregateModel()->handleDiscussionDelete($existingDiscussion, $existingDiscussion["CategoryID"]);
 
         // Get the user's discussion count.
         $this->updateUserDiscussionCount($insertUserID);
@@ -5015,6 +4859,39 @@ SQL;
         $this->recalculateBookmarkCounts($discussionID, $bookmarkedUserIDs);
 
         yield new LongRunnerSuccessID($discussionID);
+    }
+
+    /**
+     * If we can find a discussion, try to throw a better exception based on the log model.
+     *
+     * @param int $discussionID
+     */
+    public function tryThrowGoneException(int $discussionID)
+    {
+        $logRow = $this->createSql()
+            ->from("Log")
+            ->select(["Operation", "LogID"])
+            ->where(["RecordType" => "Discussion", "RecordID" => $discussionID, "Operation" => ["Spam", "Delete"]])
+            ->orderBy(["-DateInserted"])
+            ->limit(1)
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+        if (!$logRow) {
+            return;
+        }
+
+        switch ($logRow["Operation"]) {
+            case "Spam":
+                throw new ClientException("Discussion has been marked as spam.", 410, [
+                    "discussionID" => $discussionID,
+                    "logID" => $logRow["LogID"],
+                ]);
+            case "Delete":
+                throw new ClientException("Discussion has been deleted.", 410, [
+                    "discussionID" => $discussionID,
+                    "logID" => $logRow["LogID"],
+                ]);
+        }
     }
 
     /**
@@ -5120,8 +4997,6 @@ SQL;
      * Get long runner count of total items to process.
      *
      * @param array $discussionIDs DiscussionIDs to move.
-     * @param int $categoryID CategoryID to move discussions into.
-     * @param bool $addRedirects If a redirect needs to be created.
      *
      * @return int
      */
@@ -5243,23 +5118,38 @@ SQL;
 
     public function updateColumnHot(array $where = [])
     {
-        $prefix = $this->Database->DatabasePrefix;
-
-        $setSql = <<<SQL
-        floor(
-        case
-            when CountComments = 0 and DateUpdated is null
-            then unix_timestamp(date_add(DateInserted, interval (CountComments * 10) + (coalesce(score,0) * 5) minute ))
-            when CountComments = 0 AND DateUpdated is not null
-            then unix_timestamp(DateInserted) + unix_timestamp(date_add(DateUpdated, interval (CountComments * 10) + (coalesce(score,0) * 5) minute ))
-            else unix_timestamp(DateInserted) + unix_timestamp(date_add(greatest(coalesce(DateUpdated,'1970-01-01'), DateLastComment), interval (CountComments * 10) + (coalesce(score,0) * 5) minute ))
-        end )
-SQL;
-
         $this->createSql()
             ->update("Discussion")
-            ->set("hot", $setSql, false, false)
+            ->set("hot", $this->getHotCalculationExpression())
             ->where($where)
             ->put();
+    }
+
+    /**
+     * Get a SQL expression to update the "hot" value of a discussion if there are comments on the discussion.
+     *
+     * @return RawExpression
+     */
+    public function getHotCalculationExpression(): RawExpression
+    {
+        return new RawExpression(
+            <<<SQL
+floor(
+CASE WHEN CountComments = 0 AND coalesce(Score, 0) <= 0
+    THEN
+        0
+    ELSE
+        unix_timestamp(DateInserted) + unix_timestamp(
+            date_add(
+                greatest(
+                    coalesce(DateUpdated, '1970-01-01'),
+                    DateLastComment,
+                    DateInserted
+                ),
+                interval(CountComments * 10)+ (coalesce(Score, 0) * 5) minute)
+    )
+END)
+SQL
+        );
     }
 }

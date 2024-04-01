@@ -12,6 +12,7 @@ import { ISelectBoxItem } from "@library/forms/select/SelectBox";
 import { RecordID } from "@vanilla/utils";
 import { ImageSourceSet } from "@library/utility/appUtils";
 import SearchDomain from "@library/search/SearchDomain";
+import { ITag } from "@library/features/tags/TagsReducer";
 
 export interface ISearchSource<RequestQueryType = ISearchRequestQuery, SearchResultType = ISearchResult> {
     /** Key used to identify the search source */
@@ -98,6 +99,7 @@ export interface IVanillaSearchResult extends IBaseSearchResult {
     insertUser?: IUserFragment;
     subqueryMatchCount?: number;
     subqueryExtraParams?: Record<string, any>;
+    tags?: ITag[];
 }
 
 export interface IArticlesSearchResult extends IVanillaSearchResult {

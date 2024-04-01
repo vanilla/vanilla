@@ -17,11 +17,12 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import PanelWidget from "@library/layout/components/PanelWidget";
 import { TitleBarDevices, useTitleBarDevice } from "@library/layout/TitleBarContext";
 import ButtonLoader from "@library/loaders/ButtonLoader";
-import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
-import { JsonSchema, JsonSchemaForm, JSONSchemaType } from "@vanilla/json-schema-forms";
-import { useCollisionDetector, useLastValue } from "@vanilla/react-utils";
-import React, { useEffect, useMemo, useState } from "react";
+import { JsonSchemaForm, JSONSchemaType } from "@vanilla/json-schema-forms";
+import { getDefaultValuesFromSchema } from "@vanilla/json-schema-forms/src/utils";
+import { useCollisionDetector } from "@vanilla/react-utils";
+import { useFormik } from "formik";
+import React, { useEffect, useMemo } from "react";
 
 const BRANDING_SETTINGS: JSONSchemaType<{
     "garden.homepageTitle": string;
@@ -46,6 +47,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             nullable: true,
             minLength: 1,
             maxLength: 500,
+            default: "",
             "x-control": {
                 label: t("Homepage Title"),
                 description: t(
@@ -59,6 +61,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             type: "string",
             nullable: true,
             maxLength: 350,
+            default: "",
             "x-control": {
                 label: t("Site Description"),
                 description: t(
@@ -72,6 +75,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             type: "string",
             nullable: true,
             minLength: 1,
+            default: "",
             "x-control": {
                 label: t("Banner Title"),
                 description: t(
@@ -85,6 +89,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             type: "string",
             nullable: true,
             maxLength: 50,
+            default: "",
             "x-control": {
                 label: t("Organization"),
                 description: t("Your organization name is used for SEO microdata and JSON+LD"),
@@ -95,6 +100,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             type: "string",
             nullable: true,
             maxLength: 500,
+            default: "",
             "x-control": {
                 label: t("Logo"),
                 description: t(
@@ -107,6 +113,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             type: "string",
             nullable: true,
             maxLength: 500,
+            default: "",
             "x-control": {
                 label: t("Mobile Logo"),
                 description: t(
@@ -119,6 +126,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             type: "string",
             nullable: true,
             maxLength: 500,
+            default: "",
             "x-control": {
                 label: t("Banner Image"),
                 description: t(
@@ -131,6 +139,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             type: "string",
             nullable: true,
             maxLength: 500,
+            default: "",
             "x-control": {
                 label: t("Favicon"),
                 description: t(
@@ -143,6 +152,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             type: "string",
             nullable: true,
             maxLength: 500,
+            default: "",
             "x-control": {
                 label: t("Touch Icon"),
                 description: t(
@@ -155,6 +165,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             type: "string",
             nullable: true,
             maxLength: 500,
+            default: "",
             "x-control": {
                 label: t("Share Image"),
                 description: t(
@@ -167,6 +178,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
             type: "string",
             nullable: true,
             maxLength: 9,
+            default: "",
             "x-control": {
                 label: t("Address Bar Color"),
                 description: t("Some browsers support a color for the address bar."),
@@ -176,6 +188,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
         "seo.metaHtml": {
             type: "string",
             nullable: true,
+            default: "",
             "x-control": {
                 label: t("Meta Tags"),
                 description: t(
@@ -187,6 +200,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
         "labs.deferredLegacyScripts": {
             type: "boolean",
             nullable: true,
+            default: false,
             "x-control": {
                 label: t("Defer Javascript Loading"),
                 description: `${t(
@@ -202,6 +216,7 @@ const BRANDING_SETTINGS: JSONSchemaType<{
         "forum.disabled": {
             type: "boolean",
             nullable: true,
+            default: false,
             "x-control": {
                 label: t("Disable Forum Pages"),
                 description: t(
@@ -234,27 +249,16 @@ export default function BrandingAndSEOPage() {
 
     // Load state for the setting values
     const isLoaded = [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status);
-    const wasLoaded = useLastValue(isLoaded);
 
-    const [value, setValue] = useState(
-        Object.fromEntries(
-            Object.keys(BRANDING_SETTINGS["properties"]).map((key) => [
-                key,
-                BRANDING_SETTINGS["properties"][key]["type"] === "boolean" ? false : "",
-            ]),
-        ),
-    );
+    const { values, submitForm, setValues } = useFormik<object>({
+        initialValues: isLoaded && !!settings.data ? settings.data : getDefaultValuesFromSchema(BRANDING_SETTINGS),
 
-    useEffect(() => {
-        // Initialize the values we just loaded.
-        if (!wasLoaded && isLoaded && settings.data) {
-            setValue((existing) => ({ ...existing, ...settings.data }));
-        }
-    }, [wasLoaded, isLoaded, settings.data]);
+        enableReinitialize: true,
 
-    const handleSubmit = () => {
-        patchConfig(value);
-    };
+        onSubmit: async (values) => {
+            await patchConfig(values);
+        },
+    });
 
     const device = useTitleBarDevice();
     const { hasCollision } = useCollisionDetector();
@@ -269,7 +273,9 @@ export default function BrandingAndSEOPage() {
             titleBarActions={
                 <Button
                     buttonType={ButtonTypes.OUTLINE}
-                    onClick={() => handleSubmit()}
+                    onClick={async () => {
+                        await submitForm();
+                    }}
                     disabled={isPatchLoading || !isLoaded}
                 >
                     {isPatchLoading ? <ButtonLoader buttonType={ButtonTypes.DASHBOARD_PRIMARY} /> : t("Save")}
@@ -283,10 +289,10 @@ export default function BrandingAndSEOPage() {
                         disabled={!isLoaded}
                         fieldErrors={error?.errors ?? {}}
                         schema={BRANDING_SETTINGS}
-                        instance={value}
+                        instance={values}
                         FormControlGroup={DashboardFormControlGroup}
                         FormControl={DashboardFormControl}
-                        onChange={setValue}
+                        onChange={setValues}
                     />
                 </section>
             }

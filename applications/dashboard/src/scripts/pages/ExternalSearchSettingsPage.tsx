@@ -106,9 +106,7 @@ export function ExternalSearchSettingsPage() {
                                 instance={value}
                                 FormControlGroup={DashboardFormControlGroup}
                                 FormControl={DashboardFormControl}
-                                onChange={(value) => {
-                                    setValue(value);
-                                }}
+                                onChange={setValue}
                             />
                         </DashboardFormList>
                     </ErrorBoundary>

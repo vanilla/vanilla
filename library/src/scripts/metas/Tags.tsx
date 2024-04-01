@@ -17,7 +17,7 @@ interface IProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 export function Tag(props: IProps) {
-    const { to, className, preset = TagPreset.STANDARD, ...rest } = props;
+    const { to, className, color, preset = TagPreset.STANDARD, ...rest } = props;
     const classes = tagClasses();
 
     if (to) {

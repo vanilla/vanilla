@@ -8,6 +8,11 @@ import { IComment } from "@dashboard/@types/api/comment";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { IApiError } from "@library/@types/api/core";
 import { useUserCanStillEditDiscussionOrComment } from "@library/features/discussions/discussionHooks";
+import { IntegrationButtonAndModal } from "@library/features/discussions/integrations/Integrations";
+import {
+    IntegrationContextProvider,
+    useAttachmentIntegrations,
+} from "@library/features/discussions/integrations/Integrations.context";
 import { useToast } from "@library/features/toaster/ToastContext";
 import { IPermission, IPermissionOptions, PermissionChecker, PermissionMode } from "@library/features/users/Permission";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
@@ -76,6 +81,7 @@ export function CommentOptionsMenu(props: IProps) {
     const isOwnComment = comment.insertUserID === currentUser?.userID;
 
     const { canStillEdit, humanizedRemainingTime } = useUserCanStillEditDiscussionOrComment(discussion, comment);
+    const availableIntegrations = useAttachmentIntegrations();
 
     if (canStillEdit) {
         items.push(
@@ -150,6 +156,27 @@ export function CommentOptionsMenu(props: IProps) {
     if (additionalItemsToRender.length > 0) {
         items.push(<DropDownItemSeparator />);
         items.push(...additionalItemsToRender);
+    }
+
+    let integrationItems: React.ReactNode[] = [];
+
+    availableIntegrations
+        .filter(({ recordTypes }) => recordTypes.includes("comment"))
+        .forEach(({ attachmentType }) => {
+            integrationItems.push(
+                <IntegrationContextProvider
+                    recordType="comment"
+                    attachmentType={attachmentType}
+                    recordID={comment.commentID}
+                >
+                    <IntegrationButtonAndModal onSuccess={onMutateSuccess} />
+                </IntegrationContextProvider>,
+            );
+        });
+
+    if (integrationItems.length > 0) {
+        items.push(<DropDownItemSeparator />);
+        items.push(...integrationItems);
     }
 
     return items.length > 0 ? (

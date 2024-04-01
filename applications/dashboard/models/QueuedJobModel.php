@@ -295,12 +295,15 @@ class QueuedJobModel extends PipelineModel implements LoggerAwareInterface
             if (DebugUtils::isTestMode()) {
                 throw $e;
             }
-            ErrorLogger::error("Error scheduling queued jobs.", [
-                Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
-                "event" => "vanilla_queue",
-                "tags" => ["queue", "scheduler"],
-                "exception" => $e,
-            ]);
+            ErrorLogger::error(
+                "Error scheduling queued jobs.",
+                ["queue", "scheduler"],
+                [
+                    Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+                    "event" => "vanilla_queue",
+                    "exception" => $e,
+                ]
+            );
         } finally {
             $lock->release();
         }
@@ -410,6 +413,6 @@ class QueuedJobModel extends PipelineModel implements LoggerAwareInterface
      */
     public function createLock(): LockInterface
     {
-        return $this->lockService->createLock(self::QUEUED_KEY_LOCK, 15);
+        return $this->lockService->createLock(self::QUEUED_KEY_LOCK, 60);
     }
 }

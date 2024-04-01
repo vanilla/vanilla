@@ -156,4 +156,30 @@ class MockExternalIssueProvider implements ExternalIssueProviderInterface
     {
         // TODO: Implement setIssueTypeID() method.
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function syncIssue(array $attachment): array
+    {
+        // Simulate update from external issue tracker
+        $attachmentID = $this->attachmentModel->save([
+            "AttachmentID" => $attachment["AttachmentID"],
+            "SpecialMockField1" => $attachment["SpecialMockField1"] . "_updated",
+            "SpecialMockField2" => $attachment["SpecialMockField2"] . "_updated",
+        ]);
+
+        $attachment = $this->attachmentModel->getID($attachmentID);
+        return (array) $attachment;
+    }
+
+    /**
+     * @inheridoc
+     *
+     * @return int
+     */
+    public function getRefreshTime(): int
+    {
+        return 5 * 60 * 1000;
+    }
 }

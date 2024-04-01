@@ -14,10 +14,10 @@ import { QuickLinksView } from "@library/navigation/QuickLinks.view";
 import { findMatchingPath } from "@library/routing/routingUtils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { t } from "@vanilla/i18n";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 
 interface IProps {
-    title?: string;
+    title?: ReactNode | string;
     links?: INavigationVariableItem[];
     forcedCounts?: Record<string, number>;
     currentPath?: string;
@@ -78,7 +78,7 @@ export function QuickLinks(props: IProps) {
             const id = addComponent({
                 type: DynamicComponentTypes.tree,
                 tree: linksAsNavTree,
-                title: props.title ?? t("Quick Links"),
+                title: (props.title as string) ?? t("Quick Links"),
             });
             setMenuID(id);
         }

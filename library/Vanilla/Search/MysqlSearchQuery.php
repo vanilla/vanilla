@@ -35,12 +35,9 @@ class MysqlSearchQuery extends SearchQuery
     /**
      * @inheritdoc
      */
-    public function whereText(
-        string $text,
-        array $fieldNames = [],
-        string $matchMode = self::MATCH_FULLTEXT,
-        ?string $locale = ""
-    ): self {
+    public function whereText(string $text, array $fieldNames, string $matchMode): self
+    {
+        // Unsupported.
         return $this;
     }
 

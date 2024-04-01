@@ -9,27 +9,32 @@ paths:
                   description: Filter by the dataType.
                   in: query
                   schema:
-                      type: string
-                      enum:
-                          - text
-                          - boolean
-                          - date
-                          - number
-                          - string[]
-                          - number[]
+                      type: array
+                      items:
+                          type: string
+                          enum:
+                              - text
+                              - boolean
+                              - date
+                              - number
+                              - string[]
+                              - number[]
+                  style: form
                 - name: formType
                   description: Filter by the formType.
                   in: query
                   schema:
-                      type: string
-                      enum:
-                          - text
-                          - text-multiline
-                          - dropdown
-                          - tokens
-                          - checkbox
-                          - date
-                          - number
+                      type: array
+                      items:
+                          type: string
+                          enum:
+                              - text
+                              - text-multiline
+                              - dropdown
+                              - tokens
+                              - checkbox
+                              - date
+                              - number
                 - name: visibility
                   description: Filter by the visibility.
                   in: query

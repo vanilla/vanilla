@@ -16,7 +16,7 @@ paths:
                                     type: integer
                                     description: The role to apply to.
                                 type:
-                                    $ref: "#/components/schemas/RoleRequestType"
+                                    $ref: "role-requests.yml#/components/schemas/RoleRequestType"
                                 name:
                                     type: string
                                     description: The title displayed to to the user.
@@ -24,11 +24,11 @@ paths:
                                     type: string
                                     description: The default text to display to the user.
                                 format:
-                                    $ref: "#/components/schemas/Format"
+                                    $ref: "schemas.yml#/components/schemas/Format"
                                 attributes:
                                     $ref: "#/components/schemas/RoleRequestMetaAttributes"
                                 attributesSchema:
-                                    $ref: "#/components/schemas/BasicSchema"
+                                    $ref: "basic-schema.yml#/components/schemas/BasicSchema"
                             required:
                                 - roleID
                                 - type
@@ -51,7 +51,7 @@ paths:
                   in: query
                   description: Filter on type.
                   schema:
-                      $ref: "#/components/schemas/RoleRequestType"
+                      $ref: "role-requests.yml#/components/schemas/RoleRequestType"
                 - name: roleID
                   in: query
                   description: Filter on role.
@@ -92,7 +92,7 @@ paths:
                   required: true
                   description: The type of request.
                   schema:
-                      $ref: "#/components/schemas/RoleRequestType"
+                      $ref: "role-requests.yml#/components/schemas/RoleRequestType"
                 - name: roleID
                   in: path
                   required: true
@@ -116,7 +116,7 @@ paths:
                   required: true
                   description: The type of request.
                   schema:
-                      $ref: "#/components/schemas/RoleRequestType"
+                      $ref: "role-requests.yml#/components/schemas/RoleRequestType"
                 - name: roleID
                   in: path
                   required: true
@@ -134,7 +134,7 @@ components:
                 roleID:
                     type: integer
                 type:
-                    $ref: "#/components/schemas/RoleRequestType"
+                    $ref: "role-requests.yml#/components/schemas/RoleRequestType"
                 name:
                     type: string
                     description: The title displayed to to the user.
@@ -142,9 +142,9 @@ components:
                     type: string
                     description: The default text to display to the user.
                 format:
-                    $ref: "#/components/schemas/Format"
+                    $ref: "schemas.yml#/components/schemas/Format"
                 attributesSchema:
-                    $ref: "#/components/schemas/BasicSchema"
+                    $ref: "basic-schema.yml#/components/schemas/BasicSchema"
                 attributes:
                     $ref: "#/components/schemas/RoleRequestMetaAttributes"
                 url:
@@ -155,7 +155,7 @@ components:
                     type: boolean
                     description: Whether or not the user has this role.
                 roleRequest:
-                    $ref: "#/components/schemas/RoleRequestFragment"
+                    $ref: "role-requests.yml#/components/schemas/RoleRequestFragment"
             required:
                 - roleID
                 - type
@@ -217,7 +217,7 @@ components:
                     description: Override the notification body.
                     type: string
                 format:
-                    $ref: "#/components/schemas/Format"
+                    $ref: "schemas.yml#/components/schemas/Format"
                 url:
                     description: Overide the notification URL.
                     type: string

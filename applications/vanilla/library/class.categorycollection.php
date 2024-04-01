@@ -788,9 +788,9 @@ class CategoryCollection
      * will be privatized.
      *
      * @param int $categoryID The category to refresh.
-     * @return bool Returns **true** if the category was refreshed or **false** otherwise.
+     * @return array The refreshed row.
      */
-    public function refreshCache($categoryID)
+    public function refreshCache($categoryID): array
     {
         $category = $this->sql->getWhere("Category", ["CategoryID" => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
         if ($category) {
@@ -803,9 +803,9 @@ class CategoryCollection
             $this->calculateDynamic($category);
             $this->categories[(int) $category["CategoryID"]] = $category;
             $this->categorySlugs[strtolower($category["UrlCode"])] = (int) $category["CategoryID"];
-            return true;
+            return $category;
         } else {
-            return false;
+            return [];
         }
     }
 

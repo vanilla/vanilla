@@ -1,10 +1,10 @@
 /**
  * @author Taylor Chance <tchance@higherlogic.com>
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useToast } from "@library/features/toaster/ToastContext";
 import Heading from "@library/layout/Heading";
 import { PageBox } from "@library/layout/PageBox";
@@ -17,6 +17,7 @@ import { FormControl, FormControlGroup } from "@library/forms/FormControl";
 import { useNotificationPreferencesContext } from "@library/notificationPreferences";
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
 import { useLocales } from "@library/config/configHooks";
+import { useFormik } from "formik";
 
 export function EmailLanguagePreferencesImpl(props: {
     localeOptions: IComboBoxOption[] | undefined;
@@ -32,36 +33,35 @@ export function EmailLanguagePreferencesImpl(props: {
     const { localeOptions, preferences, editPreferences } = props;
     const formClasses = notificationPreferencesFormClasses();
     const toast = useToast();
-    const [value, setValue] = useState({});
 
-    useEffect(() => {
-        if (preferences) {
-            setValue({ NotificationLanguage: preferences.NotificationLanguage });
-        }
-    }, [preferences]);
+    const { values, setValues, submitForm } = useFormik<{
+        NotificationLanguage: string;
+    }>({
+        initialValues: {
+            NotificationLanguage: (preferences?.NotificationLanguage as string) ?? localeOptions?.[0]?.value ?? "",
+        },
+        enableReinitialize: true,
+        onSubmit: async (vals) => {
+            await editPreferences?.(vals, {
+                onSuccess: () => {
+                    toast.addToast({
+                        autoDismiss: true,
+                        body: <>{t("Success! Your changes were saved.")}</>,
+                    });
+                },
+                onError: (e) => {
+                    toast.addToast({
+                        dismissible: true,
+                        body: <>{t(e.message)}</>,
+                    });
+                },
+            });
+        },
+    });
 
     if (!localeOptions || !localeOptions.length || localeOptions.length < 2) {
         return null;
     }
-
-    const handleSubmit = async (value) => {
-        if (!editPreferences) return;
-        setValue(value);
-        await editPreferences(value, {
-            onSuccess: () => {
-                toast.addToast({
-                    autoDismiss: true,
-                    body: <>{t("Success! Your changes were saved.")}</>,
-                });
-            },
-            onError: (e) => {
-                toast.addToast({
-                    dismissible: true,
-                    body: <>{t(e.message)}</>,
-                });
-            },
-        });
-    };
 
     const schema: JsonSchema = {
         type: "object",
@@ -84,6 +84,7 @@ export function EmailLanguagePreferencesImpl(props: {
                 },
             },
         },
+        required: ["NotificationLanguage"],
     };
 
     return (
@@ -98,10 +99,13 @@ export function EmailLanguagePreferencesImpl(props: {
             <PageBox className={formClasses.subgroupWrapper}>
                 <JsonSchemaForm
                     schema={schema}
-                    instance={value}
+                    instance={values}
                     FormControl={FormControl}
                     FormControlGroup={FormControlGroup}
-                    onChange={handleSubmit}
+                    onChange={async (values) => {
+                        setValues(values);
+                        await submitForm();
+                    }}
                 />
             </PageBox>
         </PageBox>

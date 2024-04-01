@@ -107,6 +107,12 @@ export const metasClasses = useThemeCache(() => {
         css(Mixins.verticallyAlignInContainer(height, vars.font.lineHeight as number)),
     );
 
+    const iconButton = css({
+        ...metaLinkItemStyle(),
+        maxHeight: vars.height,
+        padding: 0,
+    });
+
     return {
         root,
         meta,
@@ -117,5 +123,6 @@ export const metasClasses = useThemeCache(() => {
         noUnderline,
         inlineBlock,
         alignVerticallyInMetaItem,
+        iconButton,
     };
 });

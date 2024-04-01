@@ -85,21 +85,12 @@ export function CodeIcon(props: { className?: string; "aria-hidden"?: areaHidden
     );
 }
 
+/**
+ * @deprecated
+ * Use `<Icon icon="editor-link" />` instead.
+ */
 export function LinkIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {
-    const classesRichEditor = iconClasses();
-    return (
-        <svg
-            className={classNames(classesRichEditor.standard, props.className)}
-            aria-hidden={props["aria-hidden"] !== undefined ? props["aria-hidden"] : "true"}
-            viewBox="0 0 24 24"
-        >
-            <title>{t("Link")}</title>
-            <path
-                d="M13.575,10.4a3.824,3.824,0,0,1,.266,5.107c-.17.211-.076.106-2.318,2.348a3.821,3.821,0,0,1-5.4-5.4l1.731-1.731a.327.327,0,0,1,.559.223,4.735,4.735,0,0,0,.129,1.033.325.325,0,0,1-.087.3L7.2,13.53a2.293,2.293,0,0,0,3.243,3.242L12.5,14.72a2.293,2.293,0,0,0-.623-3.685.329.329,0,0,1-.179-.337,1.412,1.412,0,0,1,.4-.829l.12-.12a.324.324,0,0,1,.375-.062A3.792,3.792,0,0,1,13.575,10.4ZM17.853,6.12a3.819,3.819,0,0,0-5.4,0C10.207,8.362,10.3,8.257,10.131,8.468a3.82,3.82,0,0,0,1.25,5.818.325.325,0,0,0,.375-.063l.12-.119a1.412,1.412,0,0,0,.4-.83.329.329,0,0,0-.179-.337,2.291,2.291,0,0,1-.623-3.684L13.53,7.2a2.293,2.293,0,1,1,3.242,3.243l-1.251,1.251a.322.322,0,0,0-.087.3,4.726,4.726,0,0,1,.129,1.032.328.328,0,0,0,.559.224c.316-.315.836-.837,1.731-1.732A3.819,3.819,0,0,0,17.853,6.12Z"
-                style={currentColorFill}
-            />
-        </svg>
-    );
+    return <Icon icon={"editor-link"} {...props} />;
 }
 
 export function EmojiIcon(props: { className?: string; "aria-hidden"?: areaHiddenType }) {

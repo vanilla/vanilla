@@ -189,21 +189,20 @@ class CategorySearchType extends AbstractSearchType
         } else {
             $query->addIndex($this->getIndex());
 
-            $locale = $query->getQueryParameter("locale");
             $enableBoost = false;
 
             if ($queryParam = $query->getQueryParameter("query", false)) {
-                $query->whereText($queryParam, ["name", "description"], $query::MATCH_FULLTEXT_EXTENDED, $locale);
+                $query->whereText($queryParam, ["name", "description"], SearchQuery::MATCH_FULLTEXT_EXTENDED);
                 $enableBoost = true;
             }
 
             if ($name = $query->getQueryParameter("name", false)) {
-                $query->whereText($name, ["name"], $query::MATCH_FULLTEXT_EXTENDED, $locale);
+                $query->whereText($name, ["name"], SearchQuery::MATCH_FULLTEXT_EXTENDED);
                 $enableBoost = true;
             }
 
             if ($description = $query->getQueryParameter("description", false)) {
-                $query->whereText($description, ["description"]);
+                $query->whereText($description, ["description"], SearchQuery::MATCH_FULLTEXT_EXTENDED);
             }
 
             $categoryIDs = $this->getCategoryIDs($query);

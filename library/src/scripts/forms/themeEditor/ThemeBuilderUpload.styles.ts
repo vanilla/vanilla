@@ -12,6 +12,7 @@ import { flexHelper, importantUnit } from "@library/styles/styleHelpers";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
 import { inputMixin } from "@library/forms/inputStyles";
+import { css } from "@emotion/css";
 
 export const themeBuilderUploadClasses = useThemeCache(() => {
     const themeBuilderVars = themeBuilderVariables();
@@ -32,11 +33,13 @@ export const themeBuilderUploadClasses = useThemeCache(() => {
         ...Mixins.border(themeBuilderVars.border),
         height: themeBuilderVars.input.height,
         ...Mixins.font(themeBuilderVars.input.fonts),
+        borderRadius: "3px !important",
         cursor: "pointer",
-        ...{
-            "&:hover, &:focus, &:active": {
-                ...Mixins.border({ ...themeBuilderVars.border, color: globalVars.mainColors.primary }),
-            },
+        "&:hover, &:focus, &:active": {
+            ...Mixins.border({
+                ...themeBuilderVars.border,
+                color: globalVars.mainColors.primary,
+            }),
         },
     });
 
@@ -89,5 +92,11 @@ export const themeBuilderUploadClasses = useThemeCache(() => {
         objectPosition: "center",
     });
 
-    return { root, button, optionContainer, optionButton, optionDropdown, imagePreviewContainer, imagePreview };
+    const choose = css({
+        whiteSpace: "nowrap",
+        textOverflow: "ellipsis",
+        overflow: "hidden",
+    });
+
+    return { root, button, optionContainer, optionButton, optionDropdown, imagePreviewContainer, choose, imagePreview };
 });

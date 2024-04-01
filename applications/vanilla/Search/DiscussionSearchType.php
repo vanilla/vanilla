@@ -148,7 +148,7 @@ class DiscussionSearchType extends AbstractSearchType
             $results = $this->discussionsApi->index([
                 "discussionID" => implode(",", $recordIDs),
                 "limit" => 100,
-                "expand" => [ModelUtils::EXPAND_CRAWL, "tagIDs"],
+                "expand" => [ModelUtils::EXPAND_CRAWL, "tagIDs", "tags"],
             ]);
             $results = $results->getData();
 
@@ -185,17 +185,15 @@ class DiscussionSearchType extends AbstractSearchType
         } else {
             $query->addIndex($this->getIndex());
 
-            $locale = $query->getQueryParameter("locale");
-
             $name = $query->getQueryParameter("name");
             if ($name) {
-                $query->whereText($name, ["name"], $query::MATCH_FULLTEXT_EXTENDED, $locale);
+                $query->whereText($name, ["name"], $query::MATCH_FULLTEXT_EXTENDED);
             }
 
             $allTextQuery = $query->getQueryParameter("query");
             if ($allTextQuery) {
-                $fields = $query->setQueryMatchFields($this->queryFullTextFields);
-                $query->whereText($allTextQuery, $fields, $query::MATCH_FULLTEXT_EXTENDED, $locale);
+                $fields = $this->queryFullTextFields;
+                $query->whereText($allTextQuery, $fields, $query::MATCH_FULLTEXT_EXTENDED);
             }
 
             if ($discussionID = $query->getQueryParameter("discussionID", false)) {

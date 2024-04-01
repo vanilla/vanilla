@@ -23,6 +23,7 @@ export function getEmailSettingsSchemas() {
         properties: {
             "emailStyles.format": {
                 type: "boolean",
+                default: false,
                 "x-control": {
                     label: t("Enable HTML emails"),
                     description: t("Spruce up your emails by adding a logo and customizing the colors."),
@@ -34,6 +35,7 @@ export function getEmailSettingsSchemas() {
                 type: "string",
                 nullable: true,
                 maxLength: 500,
+                default: "",
                 "x-control": {
                     label: t("Email Logo"),
                     description: t("Recommended dimensions are about 400px by 300px or smaller with similar ratio."),
@@ -45,6 +47,7 @@ export function getEmailSettingsSchemas() {
                 type: "string",
                 nullable: true,
                 maxLength: 9,
+                default: "",
                 "x-control": {
                     label: t("Text Color"),
                     inputType: "color",
@@ -55,6 +58,7 @@ export function getEmailSettingsSchemas() {
                 type: "string",
                 nullable: true,
                 maxLength: 9,
+                default: "",
                 "x-control": {
                     label: t("Background Color"),
                     inputType: "color",
@@ -65,6 +69,7 @@ export function getEmailSettingsSchemas() {
                 type: "string",
                 nullable: true,
                 maxLength: 9,
+                default: "",
                 "x-control": {
                     label: t("Page Color"),
                     inputType: "color",
@@ -75,6 +80,7 @@ export function getEmailSettingsSchemas() {
                 type: "string",
                 nullable: true,
                 maxLength: 9,
+                default: "",
                 "x-control": {
                     label: t("Button Text Color"),
                     inputType: "color",
@@ -85,6 +91,7 @@ export function getEmailSettingsSchemas() {
                 type: "string",
                 nullable: true,
                 maxLength: 9,
+                default: "",
                 "x-control": {
                     label: t("Button Background Color"),
                     inputType: "color",
@@ -101,6 +108,7 @@ export function getEmailSettingsSchemas() {
                 type: "string",
                 nullable: true,
                 minLength: 1,
+                default: "",
                 "x-control": {
                     label: t("From Name"),
                     description: t("Email sent from the application will be addressed from this name"),
@@ -112,6 +120,7 @@ export function getEmailSettingsSchemas() {
                 type: "string",
                 nullable: true,
                 minLength: 1,
+                default: "",
                 "x-control": {
                     label: t("From Email Address"),
                     description: t("Email sent from the application will be addressed from this email address"),
@@ -128,6 +137,7 @@ export function getEmailSettingsSchemas() {
         properties: {
             "emailNotifications.disabled": {
                 type: "boolean",
+                default: false,
                 "x-control": {
                     label: t("Enable sending notification emails"),
                     description: t("When enabled, users may choose to receive notifications from the community"),
@@ -137,6 +147,7 @@ export function getEmailSettingsSchemas() {
             },
             "emailNotifications.fullPost": {
                 type: "boolean",
+                default: false,
                 "x-control": {
                     label: t("Include full post in email notifications"),
                     description: t(
@@ -151,6 +162,7 @@ export function getEmailSettingsSchemas() {
                 type: "string",
                 nullable: true,
                 maxLength: 500,
+                default: "",
                 "x-control": {
                     label: t("Email Footer"),
                     description: t(

@@ -84,6 +84,7 @@ export const adminLayoutClasses = useThemeCache(() => {
     const content = css(
         {
             maxWidth: panelLayoutVars.contentWidth - 240,
+            height: "100%",
             ...Mixins.padding(
                 Variables.spacing({
                     vertical: 28,

@@ -56,6 +56,8 @@ export const themeDropDownClasses = useThemeCache(() => {
                 minHeight: styleUnit(builderVariables.input.height),
                 paddingTop: 0,
                 paddingBottom: 0,
+                paddingLeft: 8,
+                height: "initial",
                 backgroundColor: ColorsUtils.colorOut(globalVars.elementaryColors.white),
                 fontSize: "inherit",
                 ...Mixins.border(

@@ -19,6 +19,8 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
+use Vanilla\Analytics\Models\OpenAIPrompt;
+use Vanilla\Analytics\Models\OpenAIPrompter;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Exception\ExitException;
 use Vanilla\FeatureFlagHelper;
@@ -1052,7 +1054,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable
                 $this->dispatchException = $ex;
                 $controller->renderException($ex);
             } else {
-                trigger_error("Multiple exceptions encountered while dispatching {$request->path}.", E_USER_WARNING);
+                trigger_error(
+                    "Multiple exceptions encountered while dispatching {$request->getPath()}.",
+                    E_USER_WARNING
+                );
                 $this->logger->warning("Multiple exceptions encountered while dispatching.", [
                     "lastException" => [
                         "message" => $ex->getMessage(),

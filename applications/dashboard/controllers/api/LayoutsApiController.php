@@ -765,6 +765,7 @@ class LayoutsApiController extends \AbstractApiController
             }
         });
         $body = $in->validate($body);
+
         //Get layoutViewType from Layout.
         $provider = $this->layoutService->getCompatibleProvider($layoutID);
         if (!isset($provider)) {

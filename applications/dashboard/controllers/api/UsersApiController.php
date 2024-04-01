@@ -26,6 +26,8 @@ use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\PermissionFragmentSchema;
 use Vanilla\Permissions;
+use Vanilla\Scheduler\LongRunner;
+use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\Search\SearchOptions;
 use Vanilla\Search\SearchService;
 use Vanilla\UploadedFile;
@@ -61,6 +63,9 @@ class UsersApiController extends AbstractApiController
 
     /** @var CounterModel */
     private $counterModel;
+
+    /** @var LongRunner */
+    private $longRunner;
 
     /** @var array */
     private $guestFragment;
@@ -105,6 +110,7 @@ class UsersApiController extends AbstractApiController
      * @param ProfileFieldModel $profileFieldModel
      * @param RoleModel $roleModel
      * @param ReactionModel $reactionModel
+     * @param LongRunner $longRunner
      */
     public function __construct(
         UserModel $userModel,
@@ -115,7 +121,8 @@ class UsersApiController extends AbstractApiController
         \Vanilla\Web\APIExpandMiddleware $expandMiddleware,
         ProfileFieldModel $profileFieldModel,
         RoleModel $roleModel,
-        ReactionModel $reactionModel
+        ReactionModel $reactionModel,
+        LongRunner $longRunner
     ) {
         $this->configuration = $configuration;
         $this->counterModel = $counterModel;
@@ -127,6 +134,7 @@ class UsersApiController extends AbstractApiController
         $this->profileFieldModel = $profileFieldModel;
         $this->roleModel = $roleModel;
         $this->reactionModel = $reactionModel;
+        $this->longRunner = $longRunner;
     }
 
     /**
@@ -779,7 +787,13 @@ class UsersApiController extends AbstractApiController
         // If there are profile field filters, get only the filters that require elastic search.
         $profileFields = $this->profileFieldModel->getSearchFilters($query["profileFields"] ?? null);
         $filteredQuery = ["profileFields" => $profileFields] + $query;
-        $searchFilters = $this->filterNonEmptyValues($filteredQuery, ["name", "email", "query", "profileFields"]);
+        $searchFilters = $this->filterNonEmptyValues($filteredQuery, [
+            "name",
+            "email",
+            "query",
+            "profileFields",
+            "emailDomain",
+        ]);
         $searchFilters = ArrayUtils::arrayToDotNotation($searchFilters);
 
         // If we don't have any search-only filters, break out of here.
@@ -795,6 +809,9 @@ class UsersApiController extends AbstractApiController
 
         if (is_null($driver->getSearchTypeByType(UserSearchType::TYPE))) {
             throw new ClientException("The following filters require the user search type: $searchFilters");
+        }
+        if (isset($query["query"]) && isset($query["domain"])) {
+            throw new ClientException("query cannot be combined with the domain filter.");
         }
 
         foreach (["dirtyRecords", "userID", "roleID"] as $filter) {
@@ -1786,5 +1803,41 @@ class UsersApiController extends AbstractApiController
         );
 
         return new Data($data, ["paging" => $paging]);
+    }
+
+    /**
+     * Bulk update Role assignment for a collection of users
+     *
+     * @param array $body
+     * @return Data
+     */
+    public function patch_bulkRoleAssignment(array $body = []): Data
+    {
+        $this->permission("Garden.Users.Edit");
+
+        // Make the schemas
+        $in = Schema::parse(["userIDs:a", "addRoleIDs:a?", "removeRoleIDs:a?", "addReplacementRoleIDs:a?"]);
+        $in->addValidator("addRoleIDs", $this->createRoleIDValidator())
+            ->addValidator("removeRoleIDs", $this->createRoleIDValidator())
+            ->addValidator("addReplacementRoleIDs", $this->createRoleIDValidator())
+            ->requireOneOf(["addRoleIDs", "removeRoleIDs"])
+            ->addValidator("", function ($values, $field) {
+                if (!empty($values["removeRoleIDs"]) && empty($values["addReplacementRoleIDs"])) {
+                    $count = $this->roleModel->getUserRoleCounts($values["removeRoleIDs"], $values["userIDs"], true);
+                    if ($count > 0) {
+                        $field->addError("invalidRoles", [
+                            "messageCode" => "You must choose a replacement role for orphaned users.",
+                        ]);
+                    }
+                }
+                return $values;
+            });
+
+        $validatedRoleAssignments = $in->validate($body);
+
+        $result = $this->longRunner->runApi(
+            new LongRunnerAction(UserModel::class, "usersRolesIterator", [$validatedRoleAssignments])
+        );
+        return $result;
     }
 }

@@ -20,7 +20,7 @@ paths:
                       items:
                           type: string
                       format: form
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - name: limit
                   in: query
                   description: >
@@ -56,7 +56,7 @@ paths:
                                 $ref: "#/components/schemas/AuthenticatorFragment"
                     description: Success
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
     "/authenticators/{id}":
         parameters:
             - name: id
@@ -100,9 +100,9 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/AuthenticatorFragment"
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
 components:
     schemas:
         AuthenticatorFragment:

@@ -10,7 +10,10 @@ use Garden\Web\Data;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\ServerException;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Vanilla\Contracts\ConfigurationInterface;
+use Vanilla\Logger;
 use Vanilla\Scheduler\Descriptor\NormalJobDescriptor;
 use Vanilla\Scheduler\Job\LongRunnerJob;
 use Vanilla\Scheduler\Job\JobPriority;
@@ -22,8 +25,9 @@ use Vanilla\Web\SystemTokenUtils;
 /**
  * This class provides utility methods for executing longer running tasks that use iterators to break up their work.
  */
-class LongRunner implements SystemCallableInterface
+class LongRunner implements SystemCallableInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
     /** @var string A long-running generator can return this to indicate it is complete. */
     public const FINISHED = "finished";
 
@@ -118,6 +122,11 @@ class LongRunner implements SystemCallableInterface
      */
     public function runDeferred(LongRunnerAction $action): TrackingSlipInterface
     {
+        $this->logger->info("Running long runner deferred: {$action->getCallableName()}", [
+            Logger::FIELD_TAGS => ["longRunner"],
+            Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+            "args" => json_encode($action->getArgs(), JSON_PRETTY_PRINT),
+        ]);
         $this->validateLongRunnable($action);
         $job = new NormalJobDescriptor(LongRunnerJob::class);
         $job->setMessage([
@@ -146,6 +155,11 @@ class LongRunner implements SystemCallableInterface
      */
     public function runImmediately(LongRunnerAction $action): LongRunnerResult
     {
+        $this->logger->info("Running long runner immediately: {$action->getCallableName()}", [
+            Logger::FIELD_TAGS => ["longRunner"],
+            Logger::FIELD_CHANNEL => Logger::CHANNEL_SYSTEM,
+            "args" => json_encode($action->getArgs(), JSON_PRETTY_PRINT),
+        ]);
         $generator = $this->runIterator($action);
         return ModelUtils::consumeGenerator($generator);
     }

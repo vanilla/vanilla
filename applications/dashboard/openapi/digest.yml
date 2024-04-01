@@ -51,4 +51,4 @@ paths:
                                             type: string
                                             format: "date-time"
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"

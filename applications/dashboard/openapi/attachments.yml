@@ -35,7 +35,9 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/Attachment"
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Attachment"
         post:
             summary: Create attachment
             description: |
@@ -54,6 +56,37 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Attachment"
+    /attachments/refresh:
+        x-hidden: true
+        post:
+            summary: Sync selected attachments.
+            description: |
+                Sync selected attachments with the external issue provider. Can only sync up to 10 at a time.
+            tags:
+                - Attachments
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                attachmentIDs:
+                                    type: array
+                                    items:
+                                        type: integer
+                                        description: Attachment ID of the attachment to sync.
+            responses:
+                "200":
+                    description: Success
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Attachment"
+                "400":
+                    description: Bad Request, e.g. trying to sync more than 10 attachments
+
 components:
     schemas:
         Attachment:

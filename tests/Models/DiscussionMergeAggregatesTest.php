@@ -14,7 +14,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
 /**
  * Verify discussion count routines.
  */
-class DiscussionMergeCountsTest extends AbstractCountsTest
+class DiscussionMergeAggregatesTest extends AbstractAggregatesTest
 {
     use UsersAndRolesApiTestTrait;
 

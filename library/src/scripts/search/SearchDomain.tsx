@@ -92,6 +92,8 @@ export default abstract class SearchDomain<
             image: result.image?.url,
             highlight: result.highlight,
             icon,
+            tags: result?.tags,
+
             ...(sourceSet.imageSet.length > 0 ? sourceSet : {}),
         } as any;
     }

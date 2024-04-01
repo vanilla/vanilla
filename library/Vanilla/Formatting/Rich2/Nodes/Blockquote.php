@@ -24,7 +24,7 @@ class Blockquote extends AbstractNode
         }
         $wrapperClass = HtmlUtils::attributes(["class" => "blockquote"]);
         $contentClass = HtmlUtils::attributes(["class" => "blockquote-content"]);
-        return "<div $wrapperClass><div $contentClass>";
+        return "<blockquote $wrapperClass><div $contentClass>";
     }
 
     /**
@@ -35,7 +35,7 @@ class Blockquote extends AbstractNode
         if ($this->parseMode === Parser::PARSE_MODE_QUOTE) {
             return "";
         }
-        return "</div></div>";
+        return "</div></blockquote>";
     }
 
     /**

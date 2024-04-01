@@ -198,3 +198,17 @@ export function recursivelyCleanInstance(instance: Record<string, any>, schema?:
         return acc;
     }, {});
 }
+
+// This only works for simple schemas, not nested ones
+// TODO: improve this for nested schemas
+export function getDefaultValuesFromSchema(schema: JsonSchema): any {
+    const defaultValues: any = {};
+
+    for (const [key, value] of Object.entries(schema.properties ?? {})) {
+        if ("default" in value) {
+            defaultValues[key] = value.default;
+        }
+    }
+
+    return defaultValues;
+}

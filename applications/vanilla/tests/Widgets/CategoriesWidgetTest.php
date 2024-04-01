@@ -34,7 +34,7 @@ class CategoriesWidgetTest extends SiteTestCase
     /**
      * A helper to generate expected result.
      */
-    public function makeExpectedResult(array $overrides = [], array $propsOverrides): array
+    public function makeExpectedResult(array $overrides = [], array $propsOverrides = []): array
     {
         return $overrides + [
             '$reactComponent' => "CategoriesWidget",

@@ -12,6 +12,7 @@ import { IFieldError } from "@library/@types/api/core";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import { dashboardClasses } from "@dashboard/forms/dashboardStyles";
 import { cx } from "@emotion/css";
+import { ToolTip } from "@library/toolTip/ToolTip";
 
 interface IProps {
     checked: boolean;
@@ -20,6 +21,7 @@ interface IProps {
     disabled?: boolean;
     errors?: IFieldError[];
     name?: string;
+    tooltip?: string;
 }
 
 export function DashboardToggle(props: IProps) {
@@ -30,32 +32,40 @@ export function DashboardToggle(props: IProps) {
     const { inputID, labelType } = formGroup || {};
     const rootClass = labelType === DashboardLabelType.WIDE ? "input-wrap-right" : "input-wrap";
 
-    return (
-        <div className={cx(rootClass, props.disabled && classes.disabled)}>
-            <label
-                className={classNames("toggle-wrap", {
-                    "toggle-wrap-on": props.checked,
-                    "toggle-wrap-off": !props.checked,
+    let toggle = (
+        <label
+            className={classNames("toggle-wrap", {
+                "toggle-wrap-on": props.checked,
+                "toggle-wrap-off": !props.checked,
+            })}
+        >
+            <div
+                className={classNames({
+                    "toggle-wrap-active": props.inProgress,
                 })}
             >
-                <div
-                    className={classNames({
-                        "toggle-wrap-active": props.inProgress,
-                    })}
-                >
-                    <input
-                        name={props.name}
-                        disabled={props.disabled || props.inProgress}
-                        id={inputID}
-                        type="checkbox"
-                        className={classNames(visibility().visuallyHidden, "toggle-input")}
-                        checked={props.checked}
-                        onChange={(event) => props.onChange(!!event.target.checked)}
-                    />
-                    <div className="toggle-well" />
-                    <div className="toggle-slider" />
-                </div>
-            </label>
+                <input
+                    name={props.name}
+                    disabled={props.disabled || props.inProgress}
+                    id={inputID}
+                    type="checkbox"
+                    className={classNames(visibility().visuallyHidden, "toggle-input")}
+                    checked={props.checked}
+                    onChange={(event) => props.onChange(!!event.target.checked)}
+                />
+                <div className="toggle-well" />
+                <div className="toggle-slider" />
+            </div>
+        </label>
+    );
+
+    if (props.tooltip) {
+        toggle = <ToolTip label={props.tooltip}>{toggle}</ToolTip>;
+    }
+
+    return (
+        <div className={cx(rootClass, props.disabled && classes.disabled)}>
+            {toggle}
             {props.errors && <ErrorMessages errors={props.errors} />}
         </div>
     );

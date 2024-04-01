@@ -19,6 +19,7 @@ import { PostReactions } from "@library/postReactions/PostReactions";
 import { IReaction } from "@dashboard/@types/api/reaction";
 import { PostReactionsProvider } from "@library/postReactions/PostReactionsContext";
 import { PostReactionsLogAsModal } from "@library/postReactions/PostReactionsLog";
+import ThreadItemShareMenu from "@vanilla/addon-vanilla/thread/ThreadItemShareMenu";
 
 function QuoteButton(props: { scrapeUrl: string }) {
     const { scrapeUrl } = props;
@@ -64,10 +65,6 @@ export default function ThreadItemActions(props: IProps) {
 
     const canQuote = canComment;
 
-    if (![canQuote].includes(true)) {
-        return null;
-    }
-
     const canManageReactions = hasPermission("community.moderate");
 
     return (
@@ -85,6 +82,10 @@ export default function ThreadItemActions(props: IProps) {
                             <QuoteButton scrapeUrl={recordUrl} />
                         </div>
                     )}
+
+                    <div className={classes.actionItem}>
+                        <ThreadItemShareMenu />
+                    </div>
                 </div>
             </PostReactionsProvider>
         </div>

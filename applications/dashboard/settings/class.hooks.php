@@ -595,8 +595,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
                 "/settings/language",
                 "site-settings.languages",
                 "",
-                $sort,
-                ["badge" => "New"]
+                $sort
             )
             ->addLinkIf(
                 "Garden.Settings.Manage",

@@ -66,7 +66,7 @@ class AggregateCountModel implements SystemCallableInterface
         if ($option->getCountBatches() === null) {
             $this->calculateBatches($option, $limit);
         }
-        return $option->getCountBatches();
+        return $option->getCountBatches() * count($option->getAggregates());
     }
 
     /**
@@ -89,27 +89,39 @@ class AggregateCountModel implements SystemCallableInterface
 
             yield new LongRunnerQuantityTotal([$this, "getTotalCount"], [$option, $limit]);
 
+            if ($option->getCountBatches() === 0) {
+                // There's no work to do.
+                return LongRunner::FINISHED;
+            }
+
             /** @var AggregateCountableInterface $model */
             $model = Gdn::getContainer()->get($option->getModelClass());
-            //loop through each batch and update the counts
-            for ($i = $option->getCurrentBatchIndex(); $i < $option->getCountBatches(); $i++) {
-                try {
-                    $option->setCurrentBatchIndex($i);
+            // loop through each batch and update the counts
+
+            while ($option->getCurrentAggregateIndex() < count($option->getAggregates())) {
+                $aggregate = $option->getAggregates()[$option->getCurrentAggregateIndex()];
+
+                while ($option->getCurrentBatchIndex() < $option->getCountBatches()) {
                     [$min, $max] = $this->getIDRanges($option, $limit);
-                    for ($j = $option->getCurrentAggregateIndex(); $j < count($option->getAggregates()); $j++) {
-                        $option->setCurrentAggregateIndex($j);
-                        $aggregate = $option->getAggregates()[$j];
+
+                    try {
                         $model->calculateAggregates($aggregate, $min, $max);
-                        yield;
+                        yield new LongRunnerSuccessID($option->getIterationName());
+                    } catch (LongRunnerTimeoutException $ex) {
+                        throw $ex;
+                    } catch (Exception $ex) {
+                        yield new LongRunnerFailedID($option->getIterationName(), $ex);
+                    } finally {
+                        // Move the next batch.
+                        $option->incrementCurrentBatchIndex();
+                        if ($option->getCurrentBatchIndex() === $option->getCountBatches()) {
+                            // We're moving over to the next aggregate
+                            $option->incrementCurrentAggregateIndex();
+                        }
                     }
-                    // Finished iterating, set the aggregate index back to 0.
-                    $option->setCurrentAggregateIndex(0);
-                    yield new LongRunnerSuccessID($option->getIterationName());
-                } catch (LongRunnerTimeoutException $ex) {
-                    throw $ex;
-                } catch (Exception $ex) {
-                    yield new LongRunnerFailedID($option->getIterationName(), $ex);
                 }
+                // Finished iterating, set the aggregate index back to 0.
+                $option->setCurrentBatchIndex(0);
             }
         } catch (LongRunnerTimeoutException $ex) {
             return new LongRunnerNextArgs([$option, $limit]);

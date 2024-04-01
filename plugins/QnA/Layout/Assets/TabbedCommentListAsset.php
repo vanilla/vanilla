@@ -98,7 +98,7 @@ TWIG
             "discussionID" => $discussionID,
             "page" => $page,
             "limit" => $limit,
-            "expand" => ["insertUser"],
+            "expand" => ["insertUser", "reactions"],
         ];
         $comments = $this->internalClient->get("/comments", $apiParams)->asData();
 

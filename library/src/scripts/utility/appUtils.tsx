@@ -14,7 +14,7 @@ import { sprintf } from "sprintf-js";
 export { t, translate } from "@vanilla/i18n";
 
 // Absolute path pattern
-const ABSOLUTE_PATH_REGEX = /^\s*(https?:)?\/\//i;
+const ABSOLUTE_PATH_REGEX = /^\s*(mailto:|((https?:)?\/\/))/i;
 
 /**
  * Get a piece of metadata passed from the server.

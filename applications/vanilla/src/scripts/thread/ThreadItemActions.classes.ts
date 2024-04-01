@@ -46,12 +46,16 @@ const ThreadItemActionsClasses = useThemeCache(() => {
         display: "inline-flex",
         flexDirection: "row",
         alignItems: "center",
+        "&:empty": {
+            display: "none",
+        },
     });
 
     const actionButton = css({
         ...Mixins.font(metasVars.font),
         display: "inline-flex",
         alignItems: "center",
+        gap: 2,
     });
 
     return {

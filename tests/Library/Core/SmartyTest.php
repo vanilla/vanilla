@@ -34,6 +34,17 @@ class SmartyTest extends BootstrapTestCase
     }
 
     /**
+     * Assert that we can render a template with an undefined property access and it will not error.
+     *
+     * @return void
+     */
+    public function testAccessUndefinedVariables(): void
+    {
+        $this->fetch(PATH_ROOT . "/tests/fixtures/smarty/variable-access.tpl");
+        $this->assertTrue(true);
+    }
+
+    /**
      * Some keys should be removed.
      */
     public function testSanitizeRemove()

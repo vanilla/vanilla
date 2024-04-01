@@ -62,6 +62,7 @@ class CrawlableRecordSchemaTest extends BootstrapTestCase
             "invalidField" => "should be filtered out",
             "testAdditionalField1" => "this should be in",
             "testAdditionalField2" => "this should also be in",
+            "canonicalID" => "recordType_5",
         ]);
 
         $this->assertArrayNotHasKey("invalidField", $validated);

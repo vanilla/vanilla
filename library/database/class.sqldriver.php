@@ -17,6 +17,7 @@
 
 use Vanilla\CurrentTimeStamp;
 use Vanilla\Database\Select;
+use Vanilla\Database\SetLiterals\RawExpression;
 
 /**
  * Class Gdn_SQLDriver
@@ -471,12 +472,15 @@ abstract class Gdn_SQLDriver
     /**
      * Escape the identifiers in a field reference expression.
      *
-     * @param string $refExpr The field reference expression.
+     * @param string|RawExpression $refExpr The field reference expression.
      * @param bool $check Check to see if the field is already quoted.
      * @return string Returns an escaped expression.
      */
-    protected function escapeFieldReference(string $refExpr, bool $check = true): string
+    protected function escapeFieldReference($refExpr, bool $check = true): string
     {
+        if ($refExpr instanceof RawExpression) {
+            return $refExpr->getExpression();
+        }
         if ($check && preg_match('/^`[^`]+`$/', $refExpr)) {
             return $refExpr;
         }
@@ -1653,7 +1657,7 @@ abstract class Gdn_SQLDriver
      * Order by a field or fields, adding a prefix to each fields.
      *
      * @param string $px
-     * @param string|array|null $fields
+     * @param string|array|RawExpression|null $fields
      * @param string $direction
      * @return $this
      * @see Gdn_SQLDriver::orderBy()
@@ -1664,8 +1668,11 @@ abstract class Gdn_SQLDriver
             return $this;
         }
 
-        if (!is_array($fields)) {
+        if (is_string($fields)) {
             $fields = explode(",", "$fields $direction");
+        } elseif ($fields instanceof RawExpression) {
+            $this->_OrderBys[] = $fields->getExpression();
+            return $this;
         }
 
         foreach ($fields as $key => $parts) {

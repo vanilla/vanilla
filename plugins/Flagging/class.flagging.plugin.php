@@ -276,7 +276,7 @@ class FlaggingPlugin extends Gdn_Plugin
 
         if ($sender->Form->authenticatedPostBack()) {
             $sender->Form->setFormValue("FlaggedUrl", $url);
-            $sQL = Gdn::sql();
+            $sql = Gdn::sql();
             $comment = $sender->Form->getValue("Plugin.Flagging.Reason");
             $sender->setData("Plugin.Flagging.Reason", $comment);
             $createDiscussion = c("Plugins.Flagging.UseDiscussions");
@@ -287,7 +287,7 @@ class FlaggingPlugin extends Gdn_Plugin
 
                 // New discussion name
                 if ($context == "comment") {
-                    $result = $sQL
+                    $result = $sql
                         ->select("d.Name")
                         ->select("c.Body")
                         ->from("Comment c")
@@ -308,9 +308,6 @@ class FlaggingPlugin extends Gdn_Plugin
                     "FlaggedContent" => val("Body", $result),
                 ]);
 
-                // Assume no discussion exists
-                $this->DiscussionID = null;
-
                 // Get discussion ID if already flagged
                 $flagResult = Gdn::sql()
                     ->select("DiscussionID")
@@ -324,39 +321,44 @@ class FlaggingPlugin extends Gdn_Plugin
                     // New comment in existing discussion
                     $discussionID = $flagResult->DiscussionID;
                     $reportBody = $sender->fetchView("reportcomment", "", "plugins/Flagging");
-                    $sQL->insert("Comment", [
-                        "DiscussionID" => $discussionID,
-                        "InsertUserID" => $userID,
-                        "Body" => $reportBody,
-                        "Format" => "Html",
-                        "DateInserted" => date("Y-m-d H:i:s"),
-                    ]);
                     $commentModel = new CommentModel();
-                    $commentModel->updateCommentCount($discussionID);
+                    $commentModel->save(
+                        [
+                            "DiscussionID" => $discussionID,
+                            "InsertUserID" => $userID,
+                            "Body" => $reportBody,
+                            "Format" => "Html",
+                            "DateInserted" => date("Y-m-d H:i:s"),
+                        ],
+                        [
+                            "skipSpamCheck" => true,
+                        ]
+                    );
                 } else {
                     // New discussion body
                     $reportBody = $sender->fetchView("report", "", "plugins/Flagging");
-                    $discussionID = $sQL->insert("Discussion", [
-                        "InsertUserID" => $userID,
-                        "UpdateUserID" => $userID,
-                        "CategoryID" => $categoryID,
-                        "Name" => $prefixedDiscussionName,
-                        "Body" => $reportBody,
-                        "Format" => "Html",
-                        "CountComments" => 1,
-                        "DateInserted" => date("Y-m-d H:i:s"),
-                        "DateUpdated" => date("Y-m-d H:i:s"),
-                        "DateLastComment" => date("Y-m-d H:i:s"),
-                    ]);
-
-                    // Update discussion count
-                    $this->discussionModel->updateDiscussionCount($categoryID);
+                    $discussionModel = DiscussionModel::instance();
+                    $discussionID = $discussionModel->save(
+                        [
+                            "InsertUserID" => $userID,
+                            "UpdateUserID" => $userID,
+                            "CategoryID" => $categoryID,
+                            "Name" => $prefixedDiscussionName,
+                            "Body" => $reportBody,
+                            "Format" => "Html",
+                            "CountComments" => 1,
+                            "DateInserted" => date("Y-m-d H:i:s"),
+                            "DateUpdated" => date("Y-m-d H:i:s"),
+                            "DateLastComment" => date("Y-m-d H:i:s"),
+                        ],
+                        ["skipSpamCheck" => true]
+                    );
                 }
             }
 
             try {
                 // Insert the flag
-                $sQL->insert("Flag", [
+                $sql->insert("Flag", [
                     "DiscussionID" => $discussionID,
                     "InsertUserID" => $userID,
                     "InsertName" => $userName,

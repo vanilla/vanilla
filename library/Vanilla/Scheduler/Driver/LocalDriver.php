@@ -68,23 +68,8 @@ class LocalDriver implements DriverInterface, LoggerAwareInterface
             throw new Exception($missingInterfaceMsg);
         }
 
-        /* @var $driverSlip LocalDriverSlip */
-        try {
-            return $driverSlip->execute();
-        } catch (Throwable $t) {
-            $msg = $t->getMessage();
-            if (strpos($msg, "File: ") !== false) {
-                $msg = "Scheduler failed to execute Job";
-                $msg .= ". Message: " . $t->getMessage();
-                $msg .= ". File: " . $t->getFile();
-                $msg .= ". Line: " . $t->getLine();
-            }
-
-            trigger_error($msg, E_USER_WARNING);
-            $driverSlip->setStackExecutionFailed($msg);
-
-            return $driverSlip->getStatus();
-        }
+        // Exceptions will propagate to the scheduler which will catch them.
+        return $driverSlip->execute();
     }
 
     /**

@@ -8,6 +8,7 @@
 namespace Vanilla\Formatting\Formats;
 
 use Garden\StaticCacheTranslationTrait;
+use Gdn;
 use Vanilla\Contracts\Formatting\FormatInterface;
 use Vanilla\Contracts\Formatting\Heading;
 use Vanilla\Contracts\Formatting\HeadingProviderInterface;
@@ -15,6 +16,7 @@ use Vanilla\EmbeddedContent\Embeds\ErrorEmbed;
 use Vanilla\EmbeddedContent\Embeds\FileEmbed;
 use Vanilla\EmbeddedContent\Embeds\ImageEmbed;
 use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
 use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\Formatting\BaseFormat;
 use Vanilla\Formatting\Exception\FormattingException;
@@ -33,6 +35,9 @@ use Vanilla\Formatting\UserMentionsTrait;
 use Vanilla\Logging\ErrorLogger;
 use Vanilla\Utility\ArrayUtils;
 
+/**
+ *
+ */
 class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInterface
 {
     use StaticCacheTranslationTrait;
@@ -440,5 +445,34 @@ class Rich2Format extends BaseFormat implements ParsableDOMInterface, FormatInte
             ["formatService"],
             ["input" => $input] + ($this->context ?? [])
         );
+    }
+
+    /**
+     * Reparse quotes in a rich2 body.
+     *
+     * @param string $body
+     * @return string
+     * @throws FormattingException
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    public function reparseQuotes(string $body): string
+    {
+        // Make sure quotes are an accepted embed type.
+        $this->embedService->registerEmbed(QuoteEmbed::class, QuoteEmbed::TYPE);
+        $this->embedService->registerFilter(Gdn::getContainer()->get(QuoteEmbedFilter::class));
+        $nodeList = $this->parser->parse($body, function (AbstractNode $node) {
+            if ($node instanceof External) {
+                $data = $node->getEmbedData();
+                $embedType = $data["embedType"] ?? null;
+                if ($embedType === QuoteEmbed::TYPE) {
+                    $embed = $this->embedService->createEmbedFromData($data);
+                    if (!($embed instanceof ErrorEmbed)) {
+                        $node->setEmbed($embed);
+                    }
+                }
+            }
+        });
+        return json_encode($nodeList);
     }
 }

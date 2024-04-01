@@ -47,32 +47,7 @@ class InternalResponse extends HttpResponse
     private function prepareBody()
     {
         if (empty($this->body)) {
-            $processNode = function ($node) use (&$processNode) {
-                if (is_array($node)) {
-                    // Do all the children.
-                    foreach ($node as $key => $value) {
-                        $node[$key] = $processNode($value);
-                    }
-                    return $node;
-                }
-
-                if (is_object($node)) {
-                    if ($node instanceof \JsonSerializable) {
-                        $node = $node->jsonSerialize();
-                        $node = $processNode($node);
-                        return $node;
-                    } else {
-                        $node = (array) $node;
-                        $node = $processNode($node);
-                        return $node;
-                    }
-                }
-
-                return $node;
-            };
-            // Done lazily to avoid json encoding/decoding if we don't have to.
-            $result = $processNode($this->data->jsonSerialize());
-            $this->setBody($result);
+            $this->setBody(json_decode(json_encode($this->data), true));
         }
     }
 
@@ -99,7 +74,9 @@ class InternalResponse extends HttpResponse
      */
     public function getThrowable(): ?\Throwable
     {
-        return $this->throwable;
+        $progressExceptions = $this->data["progress"]["exceptionsByID"] ?? [];
+        $progressException = reset($progressExceptions) ?: null;
+        return $this->throwable ?? $progressException;
     }
 
     /**

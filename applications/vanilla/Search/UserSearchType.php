@@ -143,6 +143,16 @@ class UserSearchType extends AbstractSearchType
                 }
                 $searchableFields[] = "sortEmail";
             }
+            if ($query->getQueryParameter("emailDomain") && method_exists($query, "wildPartialMatchTextArray")) {
+                $emailDomains = array_map(function (string $emailDomain) {
+                    $emailDomain = strtolower($emailDomain);
+                    if ($emailDomain[0] !== "@") {
+                        $emailDomain = "@" . $emailDomain;
+                    }
+                    return $emailDomain;
+                }, $query->getQueryParameter("emailDomain"));
+                $query->wildPartialMatchTextArray($emailDomains, "sortEmail");
+            }
 
             if ($allFieldText = $query->getQueryParameter("query")) {
                 $query->whereText(strtolower($allFieldText), $searchableFields, SearchQuery::MATCH_WILDCARD);
@@ -220,6 +230,11 @@ class UserSearchType extends AbstractSearchType
         $schemaFields = array_merge(
             [
                 "email:s?",
+                "emailDomain:a?" => [
+                    "items" => [
+                        "type" => "string",
+                    ],
+                ],
                 "roleIDs:a?" => [
                     "items" => [
                         "type" => "integer",
@@ -438,7 +453,7 @@ class UserSearchType extends AbstractSearchType
                     if (strpos($value, "*") !== false) {
                         $query->whereText($value, ["profileFields.$apiName.keyword"], SearchQuery::MATCH_WILDCARD);
                     } else {
-                        $query->whereText($value, ["profileFields.$apiName"]);
+                        $query->whereText($value, ["profileFields.$apiName"], SearchQuery::MATCH_FULLTEXT_EXTENDED);
                     }
                     break;
                 case [ProfileFieldModel::DATA_TYPE_BOOL, ProfileFieldModel::FORM_TYPE_CHECKBOX]:

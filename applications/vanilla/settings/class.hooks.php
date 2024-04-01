@@ -110,9 +110,7 @@ class VanillaHooks extends Gdn_Plugin
                 "CountAllDiscussions",
                 "CountComments",
                 "CountAllComments",
-                "LastDiscussionID",
-                "LastCommentID",
-                "LastDateInserted",
+                "LastPost",
             ],
             "Tag" => ["CountDiscussions"],
             "User" => ["CountDiscussions", "CountComments"],
@@ -225,7 +223,7 @@ class VanillaHooks extends Gdn_Plugin
             // Update the appropriate recent posts in the categories.
             $categoryModel = new CategoryModel();
             foreach ($categoryIDs as $categoryID) {
-                $categoryModel->setRecentPost($categoryID);
+                $categoryModel->refreshAggregateRecentPost($categoryID, false);
             }
         } elseif ($deleteMethod == "wipe") {
             // Erase the user's discussions.

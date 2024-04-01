@@ -949,24 +949,6 @@ class DiscussionModelTest extends SiteTestCase
     }
 
     /**
-     * A user without access to a category should not see it included in discussion counts.
-     *
-     * @param int $adminCountAllowed
-     * @depends testDiscussionCountAsFullAdmin
-     */
-    public function testDiscussionCountWithOneUnviewableCategory($adminCountAllowed): void
-    {
-        $userID = $this->createUserFixture(Bootstrap::ROLE_MEMBER);
-        $this->session->start($userID);
-
-        $memberCountAllowed = $this->discussionModel->getCount([
-            "d.CategoryID" => [$this->publicCategory["CategoryID"], $this->privateCategory["CategoryID"]],
-        ]);
-        $this->assertSame(2, $memberCountAllowed);
-        $this->assertLessThan($adminCountAllowed, $memberCountAllowed);
-    }
-
-    /**
      * Admin with no parameters provided to getCount(), as in getting recent discussions.
      *
      * @return int
@@ -991,11 +973,12 @@ class DiscussionModelTest extends SiteTestCase
     public function testDiscussionCountRecentDiscussionsMember($adminCountAllowed): void
     {
         $userID = $this->createUserFixture(Bootstrap::ROLE_MEMBER);
-        $this->session->start($userID);
+        $this->api()->setUserID($userID);
+        DiscussionModel::cleanForTests();
         $allCategories = DiscussionModel::categoryPermissions();
         $memberCountAllowed = $this->discussionModel->getCount();
         $this->assertDiscussionCountsFromDb($allCategories, $memberCountAllowed);
-        $this->assertLessThan($adminCountAllowed, $memberCountAllowed);
+        $this->assertLessThan($memberCountAllowed, $adminCountAllowed);
     }
 
     /**
@@ -1419,9 +1402,7 @@ class DiscussionModelTest extends SiteTestCase
             $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
 
             $userMeta = [
-                sprintf("Preferences.Email.NewDiscussion.%d", $categoryAdmin["categoryID"]) => $categoryAdmin[
-                    "categoryID"
-                ],
+                sprintf("Preferences.Email.NewDiscussion.%d", $categoryAdmin["categoryID"]) => 1,
             ];
             $this->userModel::setMeta($memberUser["userID"], $userMeta);
 

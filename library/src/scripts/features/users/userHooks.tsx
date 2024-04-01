@@ -59,7 +59,7 @@ export function useUser(query: Partial<IGetUserByIDQuery>): ILoadable<IUser> {
             // Nothing to do. We weren't given a userID.
             return;
         }
-        if (LoadStatus.PENDING.includes(status)) {
+        if ([LoadStatus.PENDING].includes(status)) {
             actions.getUserByID({ userID });
         }
     }, [status, actions, userID]);

@@ -630,6 +630,14 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable, Inj
     }
 
     /**
+     * @param array $results
+     */
+    public function overrideResult(array $results): void
+    {
+        $this->_Result = $results;
+    }
+
+    /**
      * Returns an array of associative arrays containing the ResultSet data.
      *
      * @return array Returns an array reference.

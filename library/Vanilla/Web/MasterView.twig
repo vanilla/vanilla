@@ -97,7 +97,7 @@
                     <header id="titleBar" class="react-title-bar" data-react="title-bar-hamburger"></header>
                     {{ bodyContent }}
                 {%- else -%}
-                {# Modern Vanilla\Web\Page layout (layouts, admin-new, knowledge) #}
+                {# Modern Vanilla\Web\Page layout (layouts, admin-new, knowledge, forum w/ isReactView) #}
                     <header id="titleBar"></header>
                     <div id="app">
                         {% if breadcrumbs|default(false) %}
@@ -112,9 +112,17 @@
                             </noscript>
                         {% endif %}
                         {%- if seoContent|default(false) -%}
-                            <noscript id="fallbackPageContent">
-                                {{- seoContent|raw -}}
-                            </noscript>
+                            {% if useNoScript|default(false) %}
+                                {#  Used by Vanilla\Web\Page #}
+                                <noscript id="fallbackPageContent">
+                                    {{- seoContent|raw -}}
+                                </noscript>
+                            {% else %}
+                                {#  Used by Gdn_Controller with isReactView #}
+                                <div id="fallbackPageContent">
+                                    {{- seoContent|raw -}}
+                                </div>
+                            {% endif %}
                         {%- endif -%}
                     </div>
                 {%- endif -%}

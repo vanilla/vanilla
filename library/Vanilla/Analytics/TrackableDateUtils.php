@@ -9,6 +9,7 @@ namespace Vanilla\Analytics;
 
 use DateTime;
 use DateTimeZone;
+use Vanilla\CurrentTimeStamp;
 
 /**
  * Date utilities for analytics tracking.
@@ -56,16 +57,18 @@ final class TrackableDateUtils
     /**
      * Grab an array of date/time parts representing the specified date/time.
      *
-     * @param string $time Time to breakdown.
+     * @param string|null $time Time to breakdown.
      * @param DateTimeZone|null $timeZone Time zone to represent the specified time in.
      * @return array
      */
-    public static function getDateTime($time = "now", DateTimeZone $timeZone = null)
+    public static function getDateTime($time = null, DateTimeZone $timeZone = null)
     {
         if (is_a($time, \DateTimeInterface::class)) {
             $dateTime = $time;
-        } else {
+        } elseif ($time !== null) {
             $dateTime = new DateTime($time, is_null($timeZone) ? self::getDefaultTimeZone() : $timeZone);
+        } else {
+            $dateTime = CurrentTimeStamp::getDateTime();
         }
 
         $startOfWeek = $dateTime->format("w") === 0 ? "today" : "last sunday";

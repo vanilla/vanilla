@@ -18,7 +18,7 @@ trait UserMentionsTrait
     protected $AFTER_URL_TOKENS = "&nbsp;|\s|\.|,|;|\?|!|:|'|$|\"|<|>|\[|\]|\(|\)";
 
     /** @var string A regex expression which contains every token that can terminate an at mention */
-    protected $AFTER_AT_MENTION_TOKENS = "&nbsp;|\s|\.|,|;|\?|!|:|'|$";
+    protected $AFTER_AT_MENTION_TOKENS = "&nbsp;|\s|\.|,|;|\?|!|:|'|$|<";
 
     /**
      * AtMention pattern used by all non-rich formats.

@@ -641,6 +641,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
             // Always save the attributes because they may contain authorization information.
             if ($attributes = $this->Form->getFormValue("Attributes")) {
+                $attributes = array_merge($user["Attributes"], $attributes);
                 $userModel->saveAttribute($userID, $attributes);
             }
 
@@ -727,6 +728,7 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
 
                             // Always save the attributes because they may contain authorization information.
                             if ($attributes = $this->Form->getFormValue("Attributes")) {
+                                $attributes = array_merge($user["Attributes"], $attributes);
                                 $userModel->saveAttribute($userID, $attributes);
                             }
 
@@ -1072,6 +1074,17 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                         (bool) $this->Form->getFormValue("RememberMe", c("Garden.SSO.RememberMe", true)),
                         $stashID
                     );
+                    if (
+                        !Gdn::session()
+                            ->getPermissions()
+                            ->has("Garden.SignIn.Allow")
+                    ) {
+                        $this->Form->addError("Permission Problem");
+                        Gdn::session()->end();
+                        $this->render();
+
+                        return;
+                    }
                     Gdn::userModel()->fireEvent("AfterSignIn");
 
                     //Set default category follow to the user
@@ -1228,6 +1241,10 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                     unset($profileFields[$error["field"]]);
                 }
             }
+        }
+
+        if (key_exists("Attributes", $data)) {
+            $data["Attributes"] = array_merge($user["Attributes"] ?? [], $data["Attributes"] ?? []);
         }
 
         // Synchronize the user's data.

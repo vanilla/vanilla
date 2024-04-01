@@ -184,6 +184,7 @@ export function FormControl(props: IControlProps) {
                         }}
                         onBlur={onBlur}
                         options={options}
+                        isClearable={!required}
                     />
                     {!!required && (
                         <input

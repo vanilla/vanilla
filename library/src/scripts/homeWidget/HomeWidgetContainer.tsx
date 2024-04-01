@@ -26,7 +26,7 @@ import React, { ReactNode, useRef } from "react";
 export interface IHomeWidgetContainerProps {
     options?: IHomeWidgetContainerOptions;
     children: React.ReactNode;
-    title?: string;
+    title?: string | ReactNode;
     depth?: number;
     subtitle?: string;
     description?: string;

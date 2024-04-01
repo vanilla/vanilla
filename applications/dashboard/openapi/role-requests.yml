@@ -45,8 +45,8 @@ paths:
                   description: Filter by user.
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/Page"
-                - $ref: "#/components/parameters/Offset"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Offset"
                 - name: limit
                   in: query
                   description: Desired number of items per page.
@@ -161,7 +161,7 @@ components:
                     type: integer
                     description: The unique ID of the entry.
                 type:
-                    $ref: "#/components/schemas/RoleRequestType"
+                    $ref: "role-requests.yml#/components/schemas/RoleRequestType"
                 roleID:
                     type: integer
                     description: The role being applied/invited to.
@@ -193,8 +193,8 @@ components:
         RoleApplication:
             allOf:
                 - $ref: "#/components/schemas/RoleRequestItem"
-                - $ref: "#/components/schemas/InsertInfo"
-                - $ref: "#/components/schemas/UpdateInfo"
+                - $ref: "columns.yaml#/components/schemas/InsertInfo"
+                - $ref: "columns.yaml#/components/schemas/UpdateInfo"
         RoleRequestStatus:
             description: The current status of the request.
             type: string

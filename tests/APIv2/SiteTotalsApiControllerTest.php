@@ -23,18 +23,6 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test
 
     protected $baseUrl = "/site-totals";
 
-    protected $cache;
-
-    /**
-     * @inheritDoc
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-        // Make sure we have a fresh cache for each test.
-        self::$testCache->flush();
-    }
-
     /**
      * Test getting a single site-totals count.
      */
@@ -64,9 +52,10 @@ class SiteTotalsApiControllerTest extends AbstractAPIv2Test
         // Make sure all counts are up-to-date.
         $categoryModel = Gdn::getContainer()->get(\CategoryModel::class);
 
-        $commentAndDiscussionCounts = $this->api()->get($this->baseUrl . "?counts[]=discussion&counts[]=comment");
-        $this->assertSame($commentAndDiscussionCounts["counts"]["discussion"]["count"], 4);
-        $this->assertSame($commentAndDiscussionCounts["counts"]["comment"]["count"], 3);
+        $commentAndDiscussionCounts = $this->api()->get($this->baseUrl . "?counts=comment,discussion,post");
+        $this->assertSame(4, $commentAndDiscussionCounts["counts"]["discussion"]["count"]);
+        $this->assertSame(3, $commentAndDiscussionCounts["counts"]["comment"]["count"]);
+        $this->assertSame(7, $commentAndDiscussionCounts["counts"]["post"]["count"]);
     }
 
     /**

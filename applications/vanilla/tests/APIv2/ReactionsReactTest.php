@@ -231,7 +231,7 @@ class ReactionsReactTest extends AbstractAPIv2Test
         }, $memberUser);
 
         // Admin marks post as spam, post should be deleted, and moved to the log
-        $this->runWithExpectedExceptionCode(404, function () use ($discussionIDA, $type) {
+        $this->runWithExpectedExceptionCode(410, function () use ($discussionIDA, $type) {
             $this->api()->post("/discussions/${discussionIDA}/reactions", [
                 "reactionType" => $type,
             ]);

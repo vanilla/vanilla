@@ -209,9 +209,10 @@ class DigestApiControllerTest extends AbstractAPIv2Test
                 "Garden.Digest.DayOfWeek" => 1,
             ],
             function () {
-                $defaultScheduleDate = new \DateTimeImmutable("now", new \DateTimeZone("America/New_York"));
+                $defaultScheduleDate = new \DateTimeImmutable("2023-04-04", new \DateTimeZone("America/New_York"));
+                CurrentTimeStamp::mockTime("2023-04-01");
                 $defaultScheduleDate = $defaultScheduleDate->setTime(9, 0);
-                $nextExpectedScheduledDate = new \DateTimeImmutable("now", new \DateTimeZone("UTC"));
+                $nextExpectedScheduledDate = new \DateTimeImmutable("2023-04-04", new \DateTimeZone("UTC"));
                 if (
                     intval($nextExpectedScheduledDate->format("w") == 2) &&
                     $nextExpectedScheduledDate->format("H") < 13

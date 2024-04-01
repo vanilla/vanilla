@@ -24,27 +24,13 @@ import Modal from "@library/modal/Modal";
 import ModalConfirm from "@library/modal/ModalConfirm";
 import ModalSizes from "@library/modal/ModalSizes";
 import { t } from "@vanilla/i18n";
-import { EMPTY_SCHEMA, IJsonSchemaFormHandle, JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import { mapValidationErrorsToFormikErrors } from "@vanilla/json-schema-forms/src/utils";
+import { EMPTY_SCHEMA, IJsonSchemaFormHandle, JsonSchemaForm } from "@vanilla/json-schema-forms";
+import { getDefaultValuesFromSchema, mapValidationErrorsToFormikErrors } from "@vanilla/json-schema-forms/src/utils";
 import { useFormik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
 
 interface IIntegrationModalProps extends Pick<React.ComponentProps<typeof Modal>, "isVisible" | "exitHandler"> {
     onSuccess?: () => Promise<void>;
-}
-
-// This only works for simple schemas, not nested ones
-// TODO: improve this for nested schemas
-export function getDefaultValuesFromSchema(schema: JsonSchema): any {
-    const defaultValues: any = {};
-
-    for (const [key, value] of Object.entries(schema.properties ?? {})) {
-        if ("default" in value) {
-            defaultValues[key] = value.default;
-        }
-    }
-
-    return defaultValues;
 }
 
 export default function IntegrationModalLoadable(props: IIntegrationModalProps) {
@@ -60,6 +46,8 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
         schema: { status: schemaStatus, data: integrationSchema },
         getSchema,
         postAttachment,
+        CustomIntegrationForm,
+        beforeSubmit,
     } = useIntegrationContext();
 
     useEffect(() => {
@@ -101,7 +89,8 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
         },
         onSubmit: async (values) => {
             try {
-                await postAttachment(values);
+                const finalValues = beforeSubmit?.(values) ?? values;
+                await postAttachment(finalValues);
                 handleClose();
                 await handleSuccess();
             } catch (e) {
@@ -153,14 +142,22 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
                             <FrameBody>
                                 <div className={classesFrameBody.contents}>
                                     {schemaReady && Object.keys(values).length > 0 ? (
-                                        <JsonSchemaForm
-                                            ref={schemaFormRef}
-                                            schema={integrationSchema}
-                                            instance={values}
-                                            onChange={setValues}
-                                            FormControl={FormControl}
-                                            FormControlGroup={FormControlGroup}
-                                        />
+                                        CustomIntegrationForm ? (
+                                            <CustomIntegrationForm
+                                                values={values}
+                                                schema={integrationSchema}
+                                                onChange={setValues}
+                                            />
+                                        ) : (
+                                            <JsonSchemaForm
+                                                ref={schemaFormRef}
+                                                schema={integrationSchema}
+                                                instance={values}
+                                                onChange={setValues}
+                                                FormControl={FormControl}
+                                                FormControlGroup={FormControlGroup}
+                                            />
+                                        )
                                     ) : (
                                         <Loader small />
                                     )}

@@ -346,6 +346,8 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess
 
     /**
      * Get the highlighted string.
+     *
+     * @return string|string[]
      */
     public function getHighlight()
     {
@@ -355,9 +357,9 @@ class SearchResultItem implements \JsonSerializable, \ArrayAccess
     /**
      * Set the highlighted string.
      *
-     * @param string $highlight
+     * @param string|string[] $highlight
      */
-    public function setHighlight(string $highlight = "")
+    public function setHighlight($highlight = "")
     {
         $this->data["highlight"] = $highlight;
     }

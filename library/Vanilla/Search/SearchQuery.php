@@ -30,11 +30,16 @@ abstract class SearchQuery
     const FILTER_OP_WILDCARD = "wildcard";
     const FILTER_OP_NOT = "not";
 
+    // Match terms from the query in any order using a fulltext-language specific analyzer.
+    // Supports the "queryOperator" of "or" in particular, allowing to match just one of the given terms.
     const MATCH_FULLTEXT = "fulltext";
+
+    // Match terms from the query in any order with smart processing.
+    // Support for exact match with "value" and exclusions with -"value"
     const MATCH_FULLTEXT_EXTENDED = "fulltext_extended";
+
+    // Exact text matching with wildcard support. Only used on small text fields.
     const MATCH_WILDCARD = "wildcard";
-    const MATCH_PHRASE = "match_phrase";
-    const MATCH_PHRASE_PREFIX = "match_phrase_prefix";
 
     const SORT_RELEVANCE = "relevance";
     const SORT_ASC = "asc";
@@ -52,8 +57,14 @@ abstract class SearchQuery
     /** @var AbstractSearchType[]|null */
     protected $currentTypes = null;
 
+    /** @var SearchTypeCollection|null */
+    protected $filteredTypes = null;
+
     /** @var array The boost values. */
     private $boosts;
+
+    /** @var string */
+    protected array $highlightTextFieldNames = [];
 
     /**
      * Create a query.
@@ -101,6 +112,23 @@ abstract class SearchQuery
 
         $hasCollapsableType = false;
 
+        // Ensure we apply a type filter.
+        // It could be implied from recordTypes
+        $this->filteredTypes = $filteredTypes;
+        if (empty($this->queryData["types"])) {
+            $types = [];
+            /** @var AbstractSearchType $searchType */
+            foreach ($filteredTypes as $searchType) {
+                $types[] = $searchType->getType();
+            }
+            $this->queryData["types"] = $types;
+        }
+
+        $types = $this->getQueryParameter("types");
+        if (!empty($types)) {
+            $this->setFilter("type.keyword", $types, false, SearchQuery::FILTER_OP_OR, false);
+        }
+
         // Give each of the search types a chance to validate the query object.
         /** @var AbstractSearchType $searchType */
         foreach ($filteredTypes->getAsOptimizedRecordTypes() as $searchTypeGroup) {
@@ -133,6 +161,24 @@ abstract class SearchQuery
         ) {
             $this->collapseField("recordCollapseID");
         }
+    }
+
+    /**
+     * @return SearchTypeCollection|null
+     */
+    public function getFilteredTypes(): ?SearchTypeCollection
+    {
+        return $this->filteredTypes;
+    }
+
+    /**
+     * Get field names that were highlighted.
+     *
+     * @return array
+     */
+    public function getHighlightTextFieldNames(): array
+    {
+        return $this->highlightTextFieldNames;
     }
 
     /**
@@ -285,16 +331,10 @@ abstract class SearchQuery
      * @param string $text The text to search.
      * @param string[] $fieldNames The fields to perform the search against. If empty, all fields will be searched.
      * @param string $matchMode Matching mode to use for this text query.
-     * @param string|null $locale
      *
      * @return $this
      */
-    abstract public function whereText(
-        string $text,
-        array $fieldNames = [],
-        string $matchMode = self::MATCH_FULLTEXT,
-        ?string $locale = ""
-    );
+    abstract public function whereText(string $text, array $fieldNames, string $matchMode);
 
     /**
      * Add index to scan to the search query
@@ -310,11 +350,15 @@ abstract class SearchQuery
     /**
      * Get all indexes to scan
      *
-     * @return array|null
+     * @return array
      */
-    public function getIndexes(): ?array
+    public function getIndexes(): array
     {
-        return $this->indexes !== null ? array_keys($this->indexes) : null;
+        $indexes = $this->indexes !== null ? array_keys($this->indexes) : [];
+        // Combined index. In the future this will be the only index.
+        // Right now the individual index names are kept until the new combined index is created everywhere.
+        $indexes[] = "vanilla";
+        return $indexes;
     }
 
     /**
@@ -407,16 +451,5 @@ abstract class SearchQuery
     public function supportsExtenders(): bool
     {
         return false;
-    }
-
-    /**
-     * Set the matches for the search query.
-     *
-     * @param array $fields
-     * @return array
-     */
-    public function setQueryMatchFields(array $fields = []): array
-    {
-        return $fields;
     }
 }

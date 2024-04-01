@@ -87,7 +87,7 @@ export function SearchPageResults() {
             break;
 
         case LoadStatus.SUCCESS:
-            const { next, prev, nextURL, prevURL } = response.data!.pagination;
+            const { next, prev, nextURL, prevURL, currentPage } = response.data!.pagination;
             let paginationNextClick: React.MouseEventHandler | undefined;
             let paginationPreviousClick: React.MouseEventHandler | undefined;
 
@@ -133,6 +133,11 @@ export function SearchPageResults() {
                     {results.length > 0 && (
                         <SearchPagination onNextClick={paginationNextClick} onPreviousClick={paginationPreviousClick} />
                     )}
+
+                    {/* New edge case for Salesforce */}
+                    {results.length === 0 && (currentPage ?? 0) > 1 && (
+                        <SearchPagination onPreviousClick={paginationPreviousClick} />
+                    )}
                 </>
             );
             break;
@@ -158,6 +163,7 @@ export function MetaFactory(props: {
         dateInserted,
         labelCodes,
         isForeign,
+        tags,
     } = searchResult;
 
     const { form } = useSearchForm();
@@ -198,6 +204,7 @@ export function MetaFactory(props: {
                 updateUser={insertUser}
                 dateUpdated={dateUpdated ?? dateInserted}
                 labels={labelCodes}
+                tags={tags}
                 crumbs={crumbs}
                 isForeign={isForeign}
                 extra={extraResults}

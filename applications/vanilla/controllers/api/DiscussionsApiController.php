@@ -517,6 +517,8 @@ class DiscussionsApiController extends AbstractApiController
     {
         $row = $this->discussionModel->getID($id, DATASET_TYPE_ARRAY);
         if (!$row) {
+            $this->discussionModel->tryThrowGoneException($id);
+
             throw new NotFoundException("Discussion", ["discussionID" => $id]);
         }
         return $row;

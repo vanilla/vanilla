@@ -7,6 +7,8 @@
 
 namespace Vanilla\Cli;
 
+require_once PATH_LIBRARY_CORE . "/functions.render.php";
+
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Garden\Web\RequestInterface;
@@ -32,6 +34,9 @@ use Vanilla\Contracts;
 use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Contracts\LocaleInterface;
 use Vanilla\Contracts\Web\UASnifferInterface;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbed;
+use Vanilla\EmbeddedContent\Embeds\QuoteEmbedFilter;
+use Vanilla\EmbeddedContent\EmbedService;
 use Vanilla\EmbeddedContent\LegacyEmbedReplacer;
 use Vanilla\Models\Model;
 use Vanilla\Scheduler\SchedulerInterface;
@@ -78,7 +83,9 @@ class VanillaCli extends Console\Application
             Commands\DockerBuildCommand::class,
             Commands\ValidateAttachmentsCommand::class,
             Commands\SyncFontsCommand::class,
+            Commands\RecalculatePoints::class,
             Commands\ConvertToRich::class,
+            Commands\ReparseRich2Quotes::class,
         ];
     }
 

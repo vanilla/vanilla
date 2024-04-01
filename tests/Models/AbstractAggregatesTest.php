@@ -15,7 +15,7 @@ use VanillaTests\SiteTestTrait;
 /**
  * Test count updating around categories, discussions, and comments.
  */
-abstract class AbstractCountsTest extends SiteTestCase
+abstract class AbstractAggregatesTest extends SiteTestCase
 {
     use TestCategoryModelTrait, TestDiscussionModelTrait, TestCommentModelTrait;
 
@@ -46,6 +46,7 @@ abstract class AbstractCountsTest extends SiteTestCase
     {
         parent::setUp();
         $this->sql = $this->discussionModel->SQL;
+        $this->enableCaching();
 
         $this->categories = [];
         $this->discussions = [];
@@ -126,100 +127,6 @@ abstract class AbstractCountsTest extends SiteTestCase
         foreach ($this->categories as $categoryID => $_) {
             $this->assertCategoryCounts($categoryID);
         }
-    }
-
-    /**
-     * Assert that all of the cached aggregate data on the discussion table is correct.
-     *
-     * @param int $discussionID
-     */
-    public function assertDiscussionCounts(int $discussionID): void
-    {
-        // Use database to ensure no model flim-flammery.
-        $discussion = $this->sql
-            ->getWhere("Discussion", ["DiscussionID" => $discussionID])
-            ->firstRow(DATASET_TYPE_ARRAY);
-        $this->assertNotEmpty($discussion);
-
-        $counts = $this->query(
-            <<<SQL
-select
-    count(c.CommentID) as CountComments,
-    max(c.DateInserted) as DateLastComment
-from GDN_Comment c
-where c.DiscussionID = :id
-SQL
-            ,
-            ["id" => $discussionID]
-        )->firstRow(DATASET_TYPE_ARRAY);
-
-        if (empty($counts)) {
-            $counts = [
-                "CountComments" => 0,
-                "DateLastComment" => $discussion["DateInserted"],
-            ];
-        } else {
-            // Get the last comment by date then ID.
-            $firstComment = $this->sql
-                ->orderBy(["DateInserted", "CommentID"])
-                ->limit(1)
-                ->getWhere("Comment", ["DiscussionID" => $discussionID])
-                ->firstRow(DATASET_TYPE_ARRAY);
-
-            $lastComment = $this->sql
-                ->orderBy(["-DateInserted", "-CommentID"])
-                ->limit(1)
-                ->getWhere("Comment", ["DiscussionID" => $discussionID])
-                ->firstRow(DATASET_TYPE_ARRAY);
-
-            $counts += [
-                "FirstCommentID" => $firstComment["CommentID"],
-                "LastCommentID" => $lastComment["CommentID"],
-                "LastCommentUserID" => $lastComment["InsertUserID"],
-            ];
-        }
-
-        $this->assertPartialArray($counts, $discussion, "discussionID: {$discussionID}, name: {$discussion["Name"]}");
-    }
-
-    /**
-     * Assert that all of the cached aggregate data on the category table is correct.
-     *
-     * @param int $categoryID
-     */
-    public function assertCategoryCounts(int $categoryID): void
-    {
-        $category = $this->sql->getWhere("Category", ["CategoryID" => $categoryID])->firstRow(DATASET_TYPE_ARRAY);
-        $this->assertNotEmpty($category);
-
-        $counts = $this->query(
-            <<<SQL
-select
-    count(d.DiscussionID) as CountDiscussions,
-    sum(d.CountComments) as CountComments
-from GDN_Discussion d
-where d.CategoryID = :id
-SQL
-            ,
-            ["id" => $categoryID]
-        )->firstRow(DATASET_TYPE_ARRAY);
-
-        if (empty($counts)) {
-            $counts = [
-                "CountDiscussions" => 0,
-                "CountComments" => 0,
-            ];
-        } else {
-            $counts["CountComments"] = (int) ($counts["CountComments"] ?? 0);
-            // Get the last comment to fix the last discussion ID.
-            //            if ($counts['LastCommentID'] !== null) {
-            //                $lastComment = $this->sql->getWhere('Comment', ['CommentID' => $counts['LastCommentID']])->firstRow(DATASET_TYPE_ARRAY);
-            //                $this->assertNotEmpty($lastComment);
-            //                $counts['LastDiscussionID'] = $lastComment['DiscussionID'];
-            //            }
-        }
-
-        $this->assertPartialArray($counts, $category, "categoryID: $categoryID, name: {$category["Name"]}");
     }
 
     /**

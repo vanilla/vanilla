@@ -16,14 +16,30 @@ export const TokenItemClasses = () => {
         borderRadius: 2,
         alignItems: "center",
         maxWidth: "85%",
+    });
+
+    const textContent = css({
         ...Mixins.padding({
             vertical: 4,
             horizontal: 8,
         }),
         ...Mixins.font(metaVars.font),
     });
+    const button = css({
+        marginLeft: -4,
+    });
+
+    const icon = css({
+        height: 7,
+        width: 7,
+        position: "relative",
+        transform: "translateY(1px)",
+    });
 
     return {
         root,
+        textContent,
+        button,
+        icon,
     };
 };

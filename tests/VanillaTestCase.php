@@ -343,7 +343,14 @@ class VanillaTestCase extends TestCase
         ?int $count = null
     ) {
         if (is_int($count)) {
-            self::assertEquals($count, count($actualRows));
+            self::assertEquals(
+                $count,
+                count($actualRows),
+                "Expected $count values. Instead received " .
+                    count($actualRows) .
+                    " values.\n" .
+                    json_encode($actualRows, JSON_PRETTY_PRINT)
+            );
         }
 
         foreach ($expectedFields as $expectedField => $expectedValues) {
@@ -364,7 +371,7 @@ class VanillaTestCase extends TestCase
                 self::assertEquals(
                     $expectedValues,
                     $actualValues,
-                    "Found wrong values for expected field: $expectedField"
+                    "Found wrong values for expected field: $expectedField."
                 );
             }
         }
@@ -376,19 +383,29 @@ class VanillaTestCase extends TestCase
      * @param array $expected Map of 'path.to.data' => 'expected value'
      * @param array{string, mixed} $data A mapping of dot notation keys to expected values.
      */
-    public static function assertDataLike(array $expected, array $data): void
+    public static function assertDataLike(array $expected, array $data, string $message = ""): void
     {
+        $actual = [];
+
         foreach ($expected as $key => $expectedValue) {
             $actualValue = ArrayUtils::getByPath($key, $data);
-            Assert::assertEquals(
-                $expectedValue,
-                $actualValue,
-                "Expect key '$key' to be equal to:\n" .
-                    json_encode($expectedValue, JSON_PRETTY_PRINT) .
-                    "\n Instead got:\n" .
-                    json_encode($actualValue, JSON_PRETTY_PRINT)
-            );
+            $actual[$key] = $actualValue;
         }
+
+        Assert::assertEquals(
+            $expected,
+            $actual,
+            implode(
+                "\n",
+                array_filter([
+                    $message,
+                    "Expected values:" .
+                    json_encode($expected, JSON_PRETTY_PRINT) .
+                    "Instead got:" .
+                    json_encode($actual, JSON_PRETTY_PRINT),
+                ])
+            )
+        );
     }
 
     /**

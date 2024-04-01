@@ -29,6 +29,8 @@ use Vanilla\Web\SystemCallableInterface;
  */
 class CommunityNotificationGenerator implements SystemCallableInterface
 {
+    const CONF_NOTIFICATIONS_CHUNK_SIZE = "categoryFollowing.notifications.chunkSize";
+
     /**
      * @var \CommentModel
      */
@@ -59,9 +61,10 @@ class CommunityNotificationGenerator implements SystemCallableInterface
     /** @var \Gdn_Database */
     private $database;
 
+    /** @var \PermissionModel  */
+    private \PermissionModel $permissionModel;
+
     /**
-     * DI.
-     *
      * @param \CommentModel $commentModel
      * @param \DiscussionModel $discussionModel
      * @param ActivityModel $activityModel
@@ -70,6 +73,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
      * @param LongRunner $longRunner
      * @param \UserMetaModel $userMetaModel
      * @param \Gdn_Database $database
+     * @param \PermissionModel $permissionModel
      */
     public function __construct(
         \CommentModel $commentModel,
@@ -79,7 +83,8 @@ class CommunityNotificationGenerator implements SystemCallableInterface
         \UserModel $userModel,
         LongRunner $longRunner,
         \UserMetaModel $userMetaModel,
-        \Gdn_Database $database
+        \Gdn_Database $database,
+        \PermissionModel $permissionModel
     ) {
         $this->commentModel = $commentModel;
         $this->discussionModel = $discussionModel;
@@ -89,6 +94,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
         $this->longRunner = $longRunner;
         $this->userMetaModel = $userMetaModel;
         $this->database = $database;
+        $this->permissionModel = $permissionModel;
     }
 
     /**
@@ -442,75 +448,98 @@ class CommunityNotificationGenerator implements SystemCallableInterface
     ): \Generator {
         $activity["Data"]["Reason"] = "advanced";
 
-        $discussion = $this->discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
-        if (empty($discussion)) {
+        $categoryID = $this->getCategoryIDForDiscussion($discussionID);
+        if ($categoryID === null) {
             // Discussion was deleted before we got here.
             return LongRunner::FINISHED;
         }
-        $categoryID = $discussion["CategoryID"];
 
-        // Grab all the users that need to be notified.
-        $userPrefs = $this->userMetaModel
-            ->getWhere(
-                [
-                    "Name" => [
-                        "Preferences.Email.New" . ucfirst($recordType) . "." . $categoryID,
-                        "Preferences.Popup.New" . ucfirst($recordType) . "." . $categoryID,
+        $validRoleIDs = $this->permissionModel->getRoleIDsHavingSpecificPermission(
+            "discussions.view",
+            "Category",
+            $categoryID
+        );
+        $prepareUserMetaQuery = function () use ($recordType, $categoryID, $validRoleIDs): \Gdn_SQLDriver {
+            return $this->database
+                ->createSql()
+                ->from("UserMeta um")
+                ->join("UserRole ur", "um.UserID = ur.UserID", "inner")
+                ->where([
+                    "um.QueryValue" => [
+                        "Preferences.Email.New" . ucfirst($recordType) . "." . $categoryID . ".1",
+                        "Preferences.Popup.New" . ucfirst($recordType) . "." . $categoryID . ".1",
                     ],
-                    "Value >" => "0",
-                    "UserID >" => $lastUserID,
-                ],
-                "UserID"
-            )
-            ->resultArray();
+                    "ur.RoleID" => $validRoleIDs,
+                ]);
+        };
 
-        // Group the user preferences together by user.
-        $userToNotifyByID = [];
-        foreach ($userPrefs as $userPref) {
-            $userID = $userPref["UserID"];
-            $prefName = $userPref["Name"];
-            if (str_contains($prefName, ".Email.")) {
-                $userToNotifyByID[$userID]["Emailed"] = ActivityModel::SENT_PENDING;
-            } elseif (str_contains($prefName, ".Popup.")) {
-                $userToNotifyByID[$userID]["Notified"] = ActivityModel::SENT_PENDING;
-            }
+        try {
+            yield new LongRunnerQuantityTotal(function () use ($prepareUserMetaQuery) {
+                $query = $prepareUserMetaQuery()->select("COUNT(DISTINCT(um.UserID)) as count");
+
+                return $query->get()->firstRow()->count ?? 0;
+            });
+        } catch (LongRunnerTimeoutException $e) {
+            return new LongRunnerNextArgs([$activity, $discussionID, $recordType, $lastUserID]);
         }
-
-        yield new LongRunnerQuantityTotal(function () use ($userToNotifyByID) {
-            return count($userToNotifyByID);
-        });
 
         // Start sending the notifications.
-        foreach ($userToNotifyByID as $userID => $notificationPrefs) {
-            try {
-                if (
-                    !Gdn::config(CategoryModel::CONF_CATEGORY_FOLLOWING) &&
-                    !$this->userModel->checkPermission($userID, "Garden.AdvancedNotifications.Allow")
-                ) {
-                    continue;
-                }
+        $chunkSize = $this->configuration->get(self::CONF_NOTIFICATIONS_CHUNK_SIZE, 500);
+        // Loop get broken if we select more < $chunkSize of users.
+        while (true) {
+            // Grab all the users that need to be notified.
+            $userPrefs = $prepareUserMetaQuery()
+                ->select(["um.UserID", "um.QueryValue"])
+                ->where([
+                    "um.UserID >" => $lastUserID,
+                ])
+                ->orderBy("um.UserID", "ASC")
+                ->limit($chunkSize)
+                ->get()
+                ->resultArray();
+            $seletedAllRemaining = count($userPrefs) < $chunkSize;
 
-                if (!$this->discussionModel->canView($discussion, $userID)) {
-                    continue;
+            // Group the user preferences together by user.
+            $userToNotifyByID = [];
+            foreach ($userPrefs as $userPref) {
+                $userID = $userPref["UserID"];
+                $prefName = $userPref["QueryValue"];
+                if (str_contains($prefName, ".Email.")) {
+                    $userToNotifyByID[$userID]["Emailed"] = ActivityModel::SENT_PENDING;
+                } elseif (str_contains($prefName, ".Popup.")) {
+                    $userToNotifyByID[$userID]["Notified"] = ActivityModel::SENT_PENDING;
                 }
+            }
+            foreach ($userToNotifyByID as $userID => $notificationPrefs) {
+                $lastUserID = $userID;
+                try {
+                    if (
+                        !Gdn::config(CategoryModel::CONF_CATEGORY_FOLLOWING) &&
+                        !$this->userModel->checkPermission($userID, "Garden.AdvancedNotifications.Allow")
+                    ) {
+                        continue;
+                    }
 
-                $activity["NotifyUserID"] = $userID;
-                $activity["Emailed"] = $notificationPrefs["Emailed"] ?? false;
-                $activity["Notified"] = $notificationPrefs["Notified"] ?? false;
-                $this->activityModel->queue($activity, false, ["NoDelete" => true]);
-                yield new LongRunnerSuccessID(
-                    "{$activity["RecordType"]}_{$activity["RecordID"]}_User_{$userID}_NotificationType_category"
-                );
-            } catch (LongRunnerTimeoutException $e) {
-                return new LongRunnerNextArgs([$activity, $discussionID, $recordType, $userID]);
-            } catch (\Exception $e) {
-                yield new LongRunnerFailedID(
-                    "{$activity["RecordType"]}_{$activity["RecordID"]}_User_{$userID}_NotificationType_category"
-                );
-            } finally {
-                $this->activityModel->saveQueue();
+                    $activity["NotifyUserID"] = $userID;
+                    $activity["Emailed"] = $notificationPrefs["Emailed"] ?? false;
+                    $activity["Notified"] = $notificationPrefs["Notified"] ?? false;
+                    $this->activityModel->save($activity, false, ["NoDelete" => true]);
+                    yield new LongRunnerSuccessID(
+                        "{$activity["RecordType"]}_{$activity["RecordID"]}_User_{$userID}_NotificationType_category"
+                    );
+                } catch (LongRunnerTimeoutException $e) {
+                    return new LongRunnerNextArgs([$activity, $discussionID, $recordType, $lastUserID]);
+                } catch (\Exception $e) {
+                    yield new LongRunnerFailedID(
+                        "{$activity["RecordType"]}_{$activity["RecordID"]}_User_{$userID}_NotificationType_category"
+                    );
+                }
+            }
+            if ($seletedAllRemaining) {
+                break;
             }
         }
+
         return LongRunner::FINISHED;
     }
 
@@ -596,7 +625,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                 $notification["NotifyUserID"] = $notifyUserID;
                 $notification["Data"]["Reason"] = $reason;
                 $notification["Data"]["Preference"] = $preference;
-                $this->activityModel->queue($notification, $preference, $options);
+                $this->activityModel->save($notification, $preference, $options);
                 $maxNotifiedUserID = $notifyUserID;
                 yield new LongRunnerSuccessID(
                     "{$notificationData["RecordType"]}_{$notification["RecordID"]}_User_{$notifyUserID}_NotificationType_{$reason}"
@@ -613,8 +642,6 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                 yield new LongRunnerFailedID(
                     "{$notificationData["RecordType"]}_{$notification["RecordID"]}_User_{$notifyUserID}_NotificationType_{$reason}"
                 );
-            } finally {
-                $this->activityModel->saveQueue();
             }
         }
     }
@@ -642,7 +669,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
         $options = $groupData["options"] ?? [];
 
         if (!isset($notifyUsersWhere)) {
-            return;
+            return LongRunner::FINISHED;
         }
 
         yield new LongRunnerQuantityTotal(function () use ($discussionID, $notifyUsersWhere) {
@@ -670,7 +697,7 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                 $notification["NotifyUserID"] = $notifyUserID;
                 $notification["Data"]["Reason"] = $reason;
                 $notification["Data"]["Preference"] = $preference;
-                $this->activityModel->queue($notification, $preference, $options);
+                $this->activityModel->save($notification, $preference, $options);
                 $maxNotifiedUserID = $notifyUserID;
                 yield new LongRunnerSuccessID(
                     "{$notificationData["RecordType"]}_{$notification["RecordID"]}_User_{$notifyUserID}_NotificationType_{$reason}"
@@ -687,8 +714,6 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                 yield new LongRunnerFailedID(
                     "{$notificationData["RecordType"]}_{$notification["RecordID"]}_User_{$notifyUserID}_NotificationType_{$reason}"
                 );
-            } finally {
-                $this->activityModel->saveQueue();
             }
         }
     }
@@ -733,5 +758,22 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                 $maxNotifiedUserID = $userID;
             }
         }
+    }
+
+    /**
+     * @param int $discussionID
+     * @return int|null
+     */
+    private function getCategoryIDForDiscussion(int $discussionID): ?int
+    {
+        $categoryID =
+            $this->discussionModel
+                ->createSql()
+                ->select("CategoryID")
+                ->from("Discussion")
+                ->where("DiscussionID", $discussionID)
+                ->get()
+                ->firstRow()->CategoryID ?? null;
+        return $categoryID;
     }
 }

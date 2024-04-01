@@ -46,6 +46,9 @@ class SiteTotalsApiController extends AbstractApiController
      */
     public function index(array $query)
     {
+        $this->permission();
+        $schema = $this->siteTotalService->getCountsQuerySchema();
+        $query = $schema->validate($query);
         // No permission check.
         $siteSection = null;
         if ($query["siteSectionID"] ?? null) {
@@ -55,13 +58,11 @@ class SiteTotalsApiController extends AbstractApiController
             }
         }
 
-        $schema = $this->siteTotalService->getCountsQuerySchema();
-        $validatedQuery = $schema->validate($query);
         $result = $siteSection ? ["siteSectionID" => $query["siteSectionID"]] : [];
         if (in_array("all", $query["counts"])) {
-            $validatedQuery["counts"] = $this->siteTotalService->getCountRecordTypes();
+            $query["counts"] = $this->siteTotalService->getCountRecordTypes();
         }
-        foreach ($validatedQuery["counts"] as $countItem) {
+        foreach ($query["counts"] as $countItem) {
             $count = $this->siteTotalService->getTotalForType($countItem, $siteSection ?? null);
             $result["counts"][$countItem]["count"] = $count;
             $result["counts"][$countItem]["isCalculating"] = $count === -1;

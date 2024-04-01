@@ -73,6 +73,10 @@ export function registerDiscussionThreadPage() {
             import(
                 /* webpackChunkName: "widgets/DiscussionCommentsAsset" */ "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset"
             ),
+        DiscussionAttachmentsAsset: () =>
+            import(
+                /* webpackChunkName: "widgets/DiscussionAttachmentsAsset" */ "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset"
+            ),
         DiscussionCommentEditorAsset: () =>
             import(
                 /* webpackChunkName: "widgets/DiscussionCommentEditorAsset" */ "@vanilla/addon-vanilla/thread/DiscussionCommentEditorAsset"

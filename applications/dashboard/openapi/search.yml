@@ -146,7 +146,7 @@ paths:
                       type: array
                   style: form
                   x-search-filter: true
-                - $ref: "#/components/parameters/DateInserted"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/DateInserted"
                 - description: |
                       Filter discussions by matching tags.
                   in: query
@@ -178,7 +178,7 @@ paths:
                       enum:
                           - and
                           - or
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: |
                       Desired number of items per page.
                   in: query

@@ -7,10 +7,11 @@
 import { CSSObject, css } from "@emotion/css";
 import merge from "lodash/merge";
 import { color, rgba, rgb, hsla, hsl, ColorHelper } from "csx";
-import { logDebug, logWarning, logError, notEmpty } from "@vanilla/utils";
+import { logDebug, logWarning, logError, notEmpty, flattenObject, unflattenObject } from "@vanilla/utils";
 import { getThemeVariables } from "@library/theming/getThemeVariables";
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { GlobalVariableMapping, LocalVariableMapping } from "@library/styles/VariableMapping";
+import set from "lodash/set";
 
 // Re-export for compatibility.
 export { useThemeCache } from "@library/styles/themeCache";
@@ -145,8 +146,39 @@ export function variableFactory(
         if (overrides != null) {
             result = normalizeVariables(stripUndefinedKeys(overrides), result);
         }
+
+        // set the variable types for external validation
+        setVariableTypes(componentNames as string[], subElementName, result);
+
         return result;
     };
+}
+
+/** Object with types for variables for validation */
+const variableTypes: Record<string, string> = {};
+/** Return the variable types in an external file */
+export function getVariableTypes() {
+    return variableTypes;
+}
+/** Process the variables and assign proper value types for external validation */
+function setVariableTypes(componentName: string[], elementName: string, varObject: any) {
+    const parentKey = [...componentName, elementName];
+    Object.entries(varObject).forEach(([key, value]) => {
+        const fullKey = [...parentKey, key].join(".");
+        if (value === null || value === undefined) {
+            variableTypes[fullKey] = "undefined";
+        } else if (value instanceof ColorHelper) {
+            variableTypes[fullKey] = "ColorHelper";
+        } else if (typeof value === "object") {
+            if (Array.isArray(value)) {
+                variableTypes[fullKey] = "array";
+            } else {
+                setVariableTypes(parentKey, key, value);
+            }
+        } else {
+            variableTypes[fullKey] = typeof value;
+        }
+    });
 }
 
 function stripUndefinedKeys(obj: any) {

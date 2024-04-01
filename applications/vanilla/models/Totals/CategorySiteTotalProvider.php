@@ -8,29 +8,26 @@
 namespace Vanilla\Forum\Models\Totals;
 
 use CategoryModel;
+use Vanilla\Contracts\Models\AlreadyCachedSiteSectionTotalProviderInterface;
 use Vanilla\Contracts\Models\SiteSectionTotalProviderInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 
 /**
  * Provide site totals for categories.
  */
-class CategorySiteTotalProvider implements SiteSectionTotalProviderInterface
+class CategorySiteTotalProvider implements
+    SiteSectionTotalProviderInterface,
+    AlreadyCachedSiteSectionTotalProviderInterface
 {
-    /** @var \Gdn_Database */
-    private $database;
-
-    /** @var CategoryModel */
-    private $categoryModel;
+    private CategoryModel $categoryModel;
 
     /**
      * DI.
      *
-     * @param \Gdn_Database $database
      * @param \CategoryModel $categoryModel
      */
-    public function __construct(\Gdn_Database $database, CategoryModel $categoryModel)
+    public function __construct(CategoryModel $categoryModel)
     {
-        $this->database = $database;
         $this->categoryModel = $categoryModel;
     }
 
@@ -40,19 +37,14 @@ class CategorySiteTotalProvider implements SiteSectionTotalProviderInterface
     public function calculateSiteTotalCount(SiteSectionInterface $siteSection = null): int
     {
         $rootCategoryID = $siteSection === null ? \CategoryModel::ROOT_ID : $siteSection->getCategoryID();
-        $cats = array_merge([$rootCategoryID], $this->categoryModel->getCategoryDescendantIDs($rootCategoryID));
-
-        $dbResult = $this->database
-            ->createSql()
-            ->select("CountCategories")
-            ->from("Category")
-            ->where("CategoryID", $cats)
-            ->get()
-            ->resultArray();
-
-        $count = array_sum(array_column($dbResult, "CountCategories"));
-
-        return $count;
+        // Use collection not filter by permissions.
+        $descendantIDs = $this->categoryModel->getCollection()->getDescendantIDs($rootCategoryID);
+        $total = count($descendantIDs);
+        if ($rootCategoryID === \CategoryModel::ROOT_ID) {
+            return $total;
+        } else {
+            return $total + 1;
+        }
     }
 
     /**

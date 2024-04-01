@@ -34,7 +34,7 @@ paths:
                   description: Filter by recordID
                   in: query
                   schema:
-                      $ref: "#/components/schemas/RangeExpression"
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
                 - name: type
                   in: query
                   description: Filter by message type.
@@ -49,7 +49,7 @@ paths:
                   in: query
                   description: Filter messages by the layoutViewType
                   schema:
-                      $ref: "#/components/schemas/LayoutViewType"
+                      $ref: "layouts.yml#/components/schemas/LayoutViewType"
             responses:
                 "200":
                     description: Success
@@ -78,9 +78,9 @@ paths:
                                 $ref: "#/components/schemas/ModerationMessage"
                     description: Success
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
         patch:
             summary: Edit a moderation message.
             tags:
@@ -98,9 +98,9 @@ paths:
                                 $ref: "#/components/schemas/ModerationMessage"
                     description: Success
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
         delete:
             summary: Delete a moderation message.
             tags:
@@ -109,9 +109,9 @@ paths:
                 "204":
                     description: Success
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
     /moderation-messages/{id}/dismiss:
         parameters:
             - name: id
@@ -145,7 +145,7 @@ components:
                     type: string
                     description: The content of the message.
                 format:
-                    $ref: "#/components/schemas/Format"
+                    $ref: "schemas.yml#/components/schemas/Format"
                 isDismissible:
                     type: boolean
                     description: Whether the moderation message can be dismissed by a user.
@@ -180,7 +180,7 @@ components:
                         - content
                         - panel
                 layoutViewType:
-                    $ref: "#/components/schemas/LayoutViewType"
+                    $ref: "layouts.yml#/components/schemas/LayoutViewType"
             required:
                 - body
                 - format
@@ -195,7 +195,7 @@ components:
                     type: string
                     description: The content of the message.
                 format:
-                    $ref: "#/components/schemas/Format"
+                    $ref: "schemas.yml#/components/schemas/Format"
                 isDismissible:
                     type: boolean
                     description: Whether the moderation message can be dismissed by a user.
@@ -230,7 +230,7 @@ components:
                         - content
                         - panel
                 layoutViewType:
-                    $ref: "#/components/schemas/LayoutViewType"
+                    $ref: "layouts.yml#/components/schemas/LayoutViewType"
             required:
                 - body
                 - format
@@ -243,7 +243,7 @@ components:
                     type: string
                     description: The content of the message.
                 format:
-                    $ref: "#/components/schemas/Format"
+                    $ref: "schemas.yml#/components/schemas/Format"
                 isDismissible:
                     type: boolean
                     description: Whether the moderation message can be dismissed by a user.
@@ -282,4 +282,4 @@ components:
                         - content
                         - panel
                 layoutViewType:
-                    $ref: "#/components/schemas/LayoutViewType"
+                    $ref: "layouts.yml#/components/schemas/LayoutViewType"

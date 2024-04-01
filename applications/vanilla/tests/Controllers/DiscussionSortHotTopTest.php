@@ -9,6 +9,7 @@ namespace VanillaTests\Cloud\ElasticSearch;
 
 use RoleModel;
 use ReactionModel;
+use Vanilla\CurrentTimeStamp;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -33,6 +34,7 @@ class DiscussionSortHotTopTest extends AbstractAPIv2Test
         $reactionModel = \Gdn::getContainer()->get(ReactionModel::class);
         $reactionModel::$ReactionTypes = null;
         $this->prepareUsers(5);
+        $time = CurrentTimeStamp::mockTime("2023-04-04 12:00:00");
         $discussions = [
             [["name" => "No Reactions - No Comments", "body" => "Lorem ipsum.. "]],
             [["name" => "No Reactions - 2 Comments", "body" => "Lorem ipsum.. "], 2],
@@ -193,9 +195,9 @@ class DiscussionSortHotTopTest extends AbstractAPIv2Test
                     "name" => [
                         "No Reactions - No Comments",
                         "3 Likes - 0 Comments",
-                        "4 Likes - 0 Comments",
                         "1 Like - 1 Comment",
                         "No Reactions - 2 Comments",
+                        "4 Likes - 0 Comments",
                         "No Reactions - 3 Comments",
                         "1 Like - 4 Comments",
                     ],
@@ -212,9 +214,9 @@ class DiscussionSortHotTopTest extends AbstractAPIv2Test
                         "1 Like - 4 Comments",
                         "No Reactions - 3 Comments",
                         "No Reactions - 2 Comments",
-                        "1 Like - 1 Comment",
                         "4 Likes - 0 Comments",
                         "3 Likes - 0 Comments",
+                        "1 Like - 1 Comment",
                         "No Reactions - No Comments",
                     ],
                 ],
@@ -225,6 +227,7 @@ class DiscussionSortHotTopTest extends AbstractAPIv2Test
 
     /**
      *  Test hot column values are calculated and records are sorted appropriately.
+     *
      *  @return void
      */
     public function testSortHot()
@@ -260,6 +263,7 @@ class DiscussionSortHotTopTest extends AbstractAPIv2Test
                 "Body" => "Comment for Discussion A",
                 "DiscussionID" => $discussionArray[0],
                 "Format" => "Text",
+                "DateInserted" => date("Y-m-d H:i:s", strtotime("2021-06-05 13:00:00")),
             ],
             1 => [
                 "Body" => "Comment for Discussion B",

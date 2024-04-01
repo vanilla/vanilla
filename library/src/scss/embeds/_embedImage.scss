@@ -25,6 +25,12 @@
             max-width: calc(66.666% - 1px);
         }
 
+        &.display-large,
+        &.display-large .embedImage-img {
+            // The display sizes above handle the actual width of the image.
+            width: 100%;
+        }
+
         &.float-left .embedExternal-content {
             float: left;
             margin-right: 20px;

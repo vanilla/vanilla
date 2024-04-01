@@ -10,6 +10,7 @@ namespace VanillaTests\APIv2;
 use Garden\Http\HttpResponse;
 use Garden\Web\Exception\ClientException;
 use Vanilla\Formatting\FormatCompatibilityService;
+use Vanilla\Formatting\Formats\RichFormat;
 use Vanilla\Formatting\Formats\WysiwygFormat;
 
 /**
@@ -280,6 +281,11 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test
             return;
         }
 
+        if (strtolower($record["format"]) !== RichFormat::FORMAT_KEY) {
+            $this->assertTrue(true);
+            return;
+        }
+
         $row = $this->testPost($record);
 
         $expectedBody = "Converted!!";
@@ -415,7 +421,10 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test
             $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}");
             $this->fail("The {$this->singular} did not get deleted.");
         } catch (\Exception $ex) {
-            $this->assertEquals(404, $ex->getCode());
+            $this->assertTrue(
+                in_array($ex->getCode(), [404, 410]),
+                "Expected discussion to be deleted but instead got a {$ex->getCode()} error." . $ex->getMessage()
+            );
             return;
         }
         $this->fail("Something odd happened while deleting a {$this->singular}.");

@@ -220,7 +220,7 @@ class ConvertToRich extends DatabaseCommand
             if (isset($matches[1])) {
                 $this->updateRecords($recordType, $recordID, $matches[1]);
             } else {
-                echo 0;
+                $this->logger()->error("Failed to convert $recordType #$recordID.");
             }
             $recordEndTime = microtime(true);
             $this->logger()->success(

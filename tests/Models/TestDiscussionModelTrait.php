@@ -8,6 +8,7 @@
 namespace VanillaTests\Models;
 
 use DiscussionModel;
+use Garden\Web\Exception\NotFoundException;
 use PHPUnit\Framework\TestCase;
 use Vanilla\Forum\Models\DiscussionMergeModel;
 use VanillaTests\VanillaTestCase;
@@ -92,5 +93,50 @@ trait TestDiscussionModelTrait
         }
         $expectedCounts = (int) $this->categoryModel->SQL->get()->value("CountDiscussions", null);
         $this->assertSame($expectedCounts, $actualCount);
+    }
+
+    /**
+     * Assert that all of the cached aggregate data on the discussion table is correct.
+     *
+     * @param int $discussionID
+     */
+    public function assertDiscussionCounts(int $discussionID): void
+    {
+        $sql = \Gdn::database()->createSql();
+        $discussion = $sql->getWhere("Discussion", ["DiscussionID" => $discussionID])->firstRow(DATASET_TYPE_ARRAY);
+        if (!$discussion) {
+            throw new NotFoundException("Discussion", ["discussionID" => $discussionID]);
+        }
+        $countComments = $sql->getCount("Comment", ["DiscussionID" => $discussionID]);
+
+        $expected = [
+            "CountComments" => $countComments,
+        ];
+
+        // Get the last comment by date then ID.
+        $firstComment = $sql
+            ->orderBy(["DateInserted", "CommentID"])
+            ->limit(1)
+            ->getWhere("Comment", ["DiscussionID" => $discussionID])
+            ->firstRow(DATASET_TYPE_ARRAY);
+
+        $lastComment = $sql
+            ->orderBy(["-DateInserted", "-CommentID"])
+            ->limit(1)
+            ->getWhere("Comment", ["DiscussionID" => $discussionID])
+            ->firstRow(DATASET_TYPE_ARRAY);
+
+        $expected += [
+            "DateLastComment" => $lastComment["DateInserted"] ?? $discussion["DateInserted"],
+            "FirstCommentID" => $firstComment["CommentID"] ?? null,
+            "LastCommentID" => $lastComment["CommentID"] ?? null,
+            "LastCommentUserID" => $lastComment["InsertUserID"] ?? null,
+        ];
+
+        VanillaTestCase::assertDataLike(
+            $expected,
+            $discussion,
+            "discussionID: {$discussionID}, name: {$discussion["Name"]}"
+        );
     }
 }

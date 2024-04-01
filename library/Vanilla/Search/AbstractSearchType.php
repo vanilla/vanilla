@@ -286,22 +286,17 @@ abstract class AbstractSearchType
             $siteSections = $siteSectionModel->getForSectionGroup($queryData["siteSectionGroup"]);
         } elseif (!empty($queryData["siteSectionID"]) && is_string($queryData["siteSectionID"])) {
             $siteSections = [$siteSectionModel->getByID($queryData["siteSectionID"])];
+        } else {
+            $siteSections = [];
         }
 
-        if (!empty($siteSections)) {
-            foreach ($siteSections as $siteSection) {
-                $siteSectionCategories = $siteSection->getAttributes()["allCategories"] ?? [];
-                if (!empty($siteSectionCategories)) {
-                    unset($queryData["categoryID"]); // Remove categoryID if it exists.
-                    $queryData["categoryIDs"] = !empty($queryData["categoryIDs"])
-                        ? array_values(array_intersect($siteSectionCategories, $queryData["categoryIDs"]))
-                        : $siteSectionCategories;
-                }
-            }
-        } else {
-            // check if we have sub-communities enabled for the site
-            if (\Gdn::config()->get("EnabledPlugins.subcommunities", false)) {
-                unset($queryData["locale"]); // if not in a site section, don't restrict the results per locale.
+        foreach ($siteSections as $siteSection) {
+            $siteSectionCategories = $siteSection->getAttributes()["allCategories"] ?? [];
+            if (!empty($siteSectionCategories)) {
+                unset($queryData["categoryID"]); // Remove categoryID if it exists.
+                $queryData["categoryIDs"] = !empty($queryData["categoryIDs"])
+                    ? array_values(array_intersect($siteSectionCategories, $queryData["categoryIDs"]))
+                    : $siteSectionCategories;
             }
         }
     }

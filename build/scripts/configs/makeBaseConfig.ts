@@ -129,7 +129,7 @@ export async function makeBaseConfig(entryModel: EntryModel, section: string) {
                                   loader: "style-loader",
                                   options: {
                                       insert: function insertAtTop(element: HTMLElement) {
-                                          const styleMeta = document.head.querySelector("vanilla-styles");
+                                          const styleMeta = document.head.querySelector("[name=vanilla-styles]");
                                           const staticStylesheets = document.head.querySelectorAll(
                                               'link[rel="stylesheet"][static="1"]',
                                           );

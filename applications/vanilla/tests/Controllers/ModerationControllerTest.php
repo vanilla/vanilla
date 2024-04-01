@@ -57,6 +57,8 @@ class ModerationControllerTest extends SiteTestCase
         $discussion = $this->discussions[0];
         $r = $this->moveDiscussion($discussion["DiscussionID"], $this->category);
         $this->assertTrue(in_array($discussion["DiscussionID"], array_column($r, "DiscussionID")));
+        $this->assertCategoryCounts($discussion["CategoryID"]);
+        $this->assertCategoryCounts($this->category["CategoryID"]);
     }
 
     /**

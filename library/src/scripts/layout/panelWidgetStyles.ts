@@ -37,6 +37,9 @@ export const panelWidgetClasses = useThemeCache((mediaQueries) => {
         "&.isSelfPadded": {
             ...Mixins.padding({ all: 0 }),
         },
+        "&:empty": {
+            ...Mixins.padding({ all: 0 }),
+        },
         ...mediaQueries({
             [SectionTypes.TWO_COLUMNS]: {
                 oneColumnDown: {

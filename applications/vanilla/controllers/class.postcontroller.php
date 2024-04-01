@@ -655,7 +655,7 @@ class PostController extends VanillaController
                 ];
                 $this->EventArguments["Discussion"] = &$EmbeddedDiscussionData;
                 $this->fireEvent("BeforeEmbedDiscussion");
-                $DiscussionID = $this->DiscussionModel->SQL->insert("Discussion", $EmbeddedDiscussionData);
+                $DiscussionID = $this->DiscussionModel->save($EmbeddedDiscussionData);
                 $ValidationResults = $this->DiscussionModel->validationResults();
                 if (count($ValidationResults) == 0 && $DiscussionID > 0) {
                     $this->Form->addHidden("DiscussionID", $DiscussionID); // Put this in the form so reposts won't cause new discussions.
@@ -666,10 +666,6 @@ class PostController extends VanillaController
                         DATASET_TYPE_OBJECT,
                         ["Slave" => false]
                     );
-                    // Update the category discussion count
-                    if ($vanilla_category_id > 0) {
-                        $this->DiscussionModel->updateDiscussionCount($vanilla_category_id, $DiscussionID);
-                    }
                 }
             }
 

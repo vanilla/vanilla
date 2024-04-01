@@ -14,6 +14,7 @@ export interface ILinkPages {
     currentPage?: number;
     nextURL?: string;
     prevURL?: string;
+    currentResultsLength?: number;
 }
 
 export interface IWithPaging<T> {

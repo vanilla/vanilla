@@ -16,6 +16,7 @@ use Vanilla\Contracts\Site\SiteSectionInterface;
 use Vanilla\Forum\Navigation\ForumCategoryRecordType;
 use Vanilla\Forum\Widgets\DiscussionCommentEditorAsset;
 use Vanilla\Forum\Widgets\DiscussionCommentsAsset;
+use Vanilla\Forum\Widgets\DiscussionAttachmentsAsset;
 use Vanilla\Forum\Widgets\DiscussionOriginalPostAsset;
 use Vanilla\Forum\Widgets\DiscussionTagsAsset;
 use Vanilla\Http\InternalClient;
@@ -60,6 +61,7 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
         $this->request = $request;
         $this->siteSectionModel = $siteSectionModel;
         $this->registerAssetClass(DiscussionCommentsAsset::class);
+        $this->registerAssetClass(DiscussionAttachmentsAsset::class);
         $this->registerAssetClass(DiscussionOriginalPostAsset::class);
         $this->registerAssetClass(DiscussionCommentEditorAsset::class);
         $this->registerAssetClass(DiscussionTagsAsset::class);
@@ -140,7 +142,7 @@ class DiscussionThreadLayoutView extends AbstractCustomLayoutView implements Leg
      */
     public function getExpands(): array
     {
-        return ["tags", "insertUser", "breadcrumbs", "reactions"];
+        return ["tags", "insertUser", "breadcrumbs", "reactions", "attachments"];
     }
 
     public function getParamResolvedSchema(): Schema

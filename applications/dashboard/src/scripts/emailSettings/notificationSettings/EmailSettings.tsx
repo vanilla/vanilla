@@ -7,7 +7,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouteChangePrompt } from "@vanilla/react-utils";
 import { JsonSchemaForm } from "@vanilla/json-schema-forms";
-import { useLastValue } from "@vanilla/react-utils";
 import { LoadStatus } from "@library/@types/api/core";
 import { DashboardFormList } from "@dashboard/forms/DashboardFormList";
 import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/forms/DashboardFormControl";
@@ -25,6 +24,8 @@ import { MemoryRouter } from "react-router";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
 import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import { getEmailSettingsSchemas } from "@dashboard/emailSettings/EmailSettings.utils";
+import { getDefaultValuesFromSchema } from "@vanilla/json-schema-forms/src/utils";
+import { useFormik } from "formik";
 
 const EMAIL_STYLES_SECTION = "Email Styles";
 const OUTGOING_EMAILS_SECTION = "Outgoing Emails";
@@ -34,41 +35,58 @@ export function EmailSettings() {
     const emailSettingsSchema = getEmailSettingsSchemas().emailSettingsSchema;
     const settings = useConfigsByKeys(Object.keys(emailSettingsSchema["properties"]));
     const isLoaded = [LoadStatus.SUCCESS, LoadStatus.ERROR].includes(settings.status);
-    const wasLoaded = useLastValue(isLoaded);
     const { isLoading: isPatchLoading, patchConfig, error } = useConfigPatcher();
     const [showTestEmailModal, setShowTestEmailModal] = useState<boolean>(false);
     const [showPreviewEmailModal, setShowPreviewEmailModal] = useState<boolean>(false);
-    const [value, setValue] = useState<IEmailSettings | {}>(
-        Object.keys(emailSettingsSchema.properties).reduce((acc, currentKey) => {
-            const value = emailSettingsSchema.properties[currentKey];
-            return {
-                ...acc,
-                [currentKey]: value.type === "boolean" ? false : value.type === "number" ? 1 : "",
+
+    const defaultValues = getDefaultValuesFromSchema(emailSettingsSchema);
+
+    const isReady = isLoaded && !!settings.data;
+
+    const { values, setValues, dirty, submitForm } = useFormik({
+        initialValues: isReady
+            ? {
+                  ...defaultValues,
+                  ...Object.fromEntries(
+                      Object.keys(settings.data).map((key) => {
+                          if (key === "emailNotifications.disabled") {
+                              return [key, !settings.data[key]];
+                          } else if (key === "emailStyles.format") {
+                              return [key, settings.data[key] === "html" ? true : false];
+                          }
+                          return [key, settings.data[key]];
+                      }),
+                  ),
+              }
+            : defaultValues,
+        enableReinitialize: true,
+        onSubmit: async (values) => {
+            const patchValues = {
+                ...values,
             };
-        }, {}),
-    );
 
-    const [settingsLoaded, setSettingsLoaded] = useState<boolean>(false);
+            if (values["emailNotifications.disabled"] === false) {
+                patchValues["emailDigest.enabled"] = false;
+            } else if ("emailDigest.enabled" in values) {
+                delete patchValues["emailDigest.enabled"];
+            }
 
-    useEffect(() => {
-        // Initialize the values we just loaded.
-        if (!wasLoaded && isLoaded && settings.data) {
-            setValue((existing) => ({
-                ...existing,
-                ...Object.fromEntries(
-                    Object.keys(settings.data).map((key) => {
+            await patchConfig(
+                Object.fromEntries(
+                    Object.keys(patchValues).map((key) => {
                         if (key === "emailNotifications.disabled") {
-                            return [key, !settings.data[key]];
+                            return [key, !patchValues[key]];
                         } else if (key === "emailStyles.format") {
-                            return [key, settings.data[key] === "html" ? true : false];
+                            return [key, patchValues[key] ? "html" : "text"];
+                        } else if (key === "outgoingEmails.footer") {
+                            return [key, JSON.stringify(patchValues[key])];
                         }
-                        return [key, settings.data[key]];
+                        return [key, patchValues[key]];
                     }),
-                ),
-            }));
-            setSettingsLoaded(true);
-        }
-    }, [wasLoaded, isLoaded, settings.data]);
+                ) as IEmailConfigs,
+            );
+        },
+    });
 
     const scrollRefs = useRef<HTMLDivElement[]>([]);
 
@@ -83,37 +101,20 @@ export function EmailSettings() {
 
     let sections = [EMAIL_STYLES_SECTION, OUTGOING_EMAILS_SECTION, EMAIL_NOTIFICATIONS_SECTION];
 
-    const [isFormEdited, setIsFormEdited] = useState<boolean>(false);
-    const [disabledRouteChangePrompt, setDisableRouteChangePrompt] = useState<boolean>(true);
+    const [disabledRouteChangePrompt, setDisableRouteChangePrompt] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (dirty) {
+            setDisableRouteChangePrompt(false);
+        }
+    }, [dirty]);
+
     useRouteChangePrompt(
         t(
             "You are leaving the Email Settings page without saving your changes. Make sure your updates are saved before exiting.",
         ),
         disabledRouteChangePrompt,
     );
-
-    const handleSubmit = () => {
-        if (value["emailNotifications.disabled"] === false) {
-            value["emailDigest.enabled"] = false;
-        } else if ("emailDigest.enabled" in value) {
-            delete value["emailDigest.enabled"];
-        }
-        patchConfig(
-            Object.fromEntries(
-                Object.keys(value).map((key) => {
-                    if (key === "emailNotifications.disabled") {
-                        return [key, !value[key]];
-                    } else if (key === "emailStyles.format") {
-                        return [key, value[key] ? "html" : "text"];
-                    } else if (key === "outgoingEmails.footer") {
-                        return [key, JSON.stringify(value[key])];
-                    }
-                    return [key, value[key]];
-                }),
-            ) as IEmailConfigs,
-        );
-        setDisableRouteChangePrompt(true);
-    };
 
     return (
         <MemoryRouter>
@@ -123,7 +124,7 @@ export function EmailSettings() {
                     <Button
                         buttonType={ButtonTypes.DASHBOARD_PRIMARY}
                         disabled={isPatchLoading || !isLoaded}
-                        onClick={() => handleSubmit()}
+                        onClick={async () => await submitForm()}
                     >
                         {t("Save")}
                     </Button>
@@ -131,7 +132,7 @@ export function EmailSettings() {
             />
 
             <DashboardFormList>
-                {settingsLoaded &&
+                {isReady &&
                     sections.map((section, index) => (
                         <div key={index} ref={(ele) => addToRefs(ele, index)} style={{ scrollMarginTop: 96 }}>
                             <DashboardFormSubheading hasBackground>
@@ -166,16 +167,10 @@ export function EmailSettings() {
                                         ? getEmailSettingsSchemas().emailNotificationsSchema
                                         : getEmailSettingsSchemas().emailStylesSchema
                                 }
-                                instance={value}
+                                instance={values}
                                 FormControlGroup={DashboardFormControlGroup}
                                 FormControl={DashboardFormControl}
-                                onChange={(value) => {
-                                    setValue(value);
-                                    if (isFormEdited) {
-                                        setDisableRouteChangePrompt(false);
-                                    }
-                                    setIsFormEdited(true);
-                                }}
+                                onChange={setValues}
                             />
                         </div>
                     ))}
@@ -198,9 +193,9 @@ export function EmailSettings() {
             </DashboardHelpAsset>
 
             {showPreviewEmailModal && (
-                <EmailPreviewModal settings={value} onCancel={() => setShowPreviewEmailModal(false)} />
+                <EmailPreviewModal settings={values} onCancel={() => setShowPreviewEmailModal(false)} />
             )}
-            {showTestEmailModal && <TestEmailModal settings={value} onCancel={() => setShowTestEmailModal(false)} />}
+            {showTestEmailModal && <TestEmailModal settings={values} onCancel={() => setShowTestEmailModal(false)} />}
         </MemoryRouter>
     );
 }

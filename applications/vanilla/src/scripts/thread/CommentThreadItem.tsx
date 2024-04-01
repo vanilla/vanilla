@@ -13,6 +13,12 @@ import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
 import { ThreadItem } from "@vanilla/addon-vanilla/thread/ThreadItem";
 import React, { useState } from "react";
 import CommentMeta from "@vanilla/addon-vanilla/thread/CommentMeta";
+import {
+    AttachmentIntegrationsContextProvider,
+    IntegrationContextProvider,
+} from "@library/features/discussions/integrations/Integrations.context";
+import { DiscussionAttachment } from "./DiscussionAttachmentsAsset";
+import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
 
 interface IProps {
     comment: IComment;
@@ -41,46 +47,63 @@ export function CommentThreadItem(props: IProps) {
     }
 
     return (
-        <ThreadItem
-            boxOptions={{}}
-            content={comment.body}
-            actions={actions}
-            editor={
-                isEditing &&
-                !!editCommentQuery.data && (
-                    <CommentEditor
-                        commentEdit={editCommentQuery.data}
-                        comment={props.comment}
-                        onSuccess={async () => {
-                            !!onMutateSuccess && (await onMutateSuccess());
-                            await invalidateEditCommentQuery();
-                            setIsEditing(false);
-                        }}
-                        onClose={() => {
-                            setIsEditing(false);
-                        }}
-                    />
-                )
-            }
-            user={comment.insertUser}
-            contentMeta={<CommentMeta comment={comment} />}
-            key={comment.commentID}
-            userPhotoLocation={"header"}
-            recordType={"comment"}
-            recordID={comment.commentID}
-            reactions={comment.reactions}
-            recordUrl={comment.url}
-            options={
-                <CommentOptionsMenu
-                    discussion={props.discussion}
-                    comment={comment}
-                    onCommentEdit={() => {
-                        setIsEditing(true);
-                    }}
-                    onMutateSuccess={onMutateSuccess}
-                    isEditLoading={isEditing && editCommentQuery.isLoading}
+        <AttachmentIntegrationsContextProvider>
+            <ThreadItemContextProvider
+                recordType={"comment"}
+                recordID={comment.commentID}
+                recordUrl={comment.url}
+                timestamp={comment.dateInserted}
+                name={comment.name}
+            >
+                <ThreadItem
+                    boxOptions={{}}
+                    content={comment.body}
+                    actions={actions}
+                    editor={
+                        isEditing &&
+                        !!editCommentQuery.data && (
+                            <CommentEditor
+                                commentEdit={editCommentQuery.data}
+                                comment={props.comment}
+                                onSuccess={async () => {
+                                    !!onMutateSuccess && (await onMutateSuccess());
+                                    await invalidateEditCommentQuery();
+                                    setIsEditing(false);
+                                }}
+                                onClose={() => {
+                                    setIsEditing(false);
+                                }}
+                            />
+                        )
+                    }
+                    user={comment.insertUser}
+                    contentMeta={<CommentMeta comment={comment} />}
+                    key={comment.commentID}
+                    userPhotoLocation={"header"}
+                    reactions={comment.reactions}
+                    attachmentsContent={comment.attachments?.map((attachment) => (
+                        <IntegrationContextProvider
+                            key={attachment.attachmentID}
+                            recordType={"comment"}
+                            recordID={comment.commentID}
+                            attachmentType={attachment.attachmentType}
+                        >
+                            <DiscussionAttachment key={attachment.attachmentID} attachment={attachment} />
+                        </IntegrationContextProvider>
+                    ))}
+                    options={
+                        <CommentOptionsMenu
+                            discussion={props.discussion}
+                            comment={comment}
+                            onCommentEdit={() => {
+                                setIsEditing(true);
+                            }}
+                            onMutateSuccess={onMutateSuccess}
+                            isEditLoading={isEditing && editCommentQuery.isLoading}
+                        />
+                    }
                 />
-            }
-        />
+            </ThreadItemContextProvider>
+        </AttachmentIntegrationsContextProvider>
     );
 }

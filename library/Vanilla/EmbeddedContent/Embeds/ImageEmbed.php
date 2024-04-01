@@ -35,7 +35,7 @@ class ImageEmbed extends AbstractEmbed
         $data = EmbedUtils::ensureDimensions($data);
         $data["size"] = $data["size"] ?? 0;
 
-        $name = $data["name"] ?: null;
+        $name = !empty($data["name"]) ? $data["name"] : null;
         if ($name === null) {
             $data["name"] = basename($data["url"]);
         }

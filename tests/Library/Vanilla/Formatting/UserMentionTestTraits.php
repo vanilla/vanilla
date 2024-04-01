@@ -39,6 +39,9 @@ trait UserMentionTestTraits
             "validAtMentionEndWithSingleQuote" => [
                 "@$this->USERNAME_NO_SPACE' Some fluff text to make sure inline UserNoSpace is not removed.",
             ],
+            "validateMentionEndWithTag" => [
+                "@$this->USERNAME_NO_SPACE<\/a> Some fluff text to make sure inline UserNoSpace is not removed.",
+            ],
             "validAtMentionEOF" => ["@$this->USERNAME_NO_SPACE"],
             "validAtMentionSkipLine" => [
                 "@$this->USERNAME_NO_SPACE

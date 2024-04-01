@@ -13,13 +13,14 @@ import {
     homeWidgetItemVariables,
 } from "@library/homeWidget/HomeWidgetItem.styles";
 import { categoryListClasses } from "@library/categoriesWidget/CategoryList.classes";
-import { HomeWidgetItem, IHomeWidgetItemProps } from "@library/homeWidget/HomeWidgetItem";
+import { CommonHomeWidgetItemProps, HomeWidgetItem, IHomeWidgetItemProps } from "@library/homeWidget/HomeWidgetItem";
 import { ICountResult } from "@library/search/searchTypes";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { CategoryItemMeta } from "@library/categoriesWidget/CategoryItemMeta";
 import CategoryFollowDropDown from "@vanilla/addon-vanilla/categories/CategoryFollowDropdown";
 import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { useCurrentUser, useCurrentUserSignedIn } from "@library/features/users/userHooks";
+import { LocationDescriptor } from "history";
 
 export interface ICategoryItemOptions {
     imagePlacement?: IHomeWidgetItemOptions["imagePlacement"];
@@ -49,7 +50,9 @@ export interface ICategoryItemOptions {
 export type ICategoryItemCount = ICountResult & {
     countAll?: number; //case where we include children count as well
 };
-export interface ICategoryItem extends IHomeWidgetItemProps {
+
+export interface ICategoryItem extends CommonHomeWidgetItemProps {
+    to: LocationDescriptor;
     name: string;
     categoryID: number;
     parentCategoryID?: number;

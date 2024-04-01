@@ -10,7 +10,7 @@ import { cx } from "@emotion/css";
 import classNames from "classnames";
 import { Tag } from "@library/metas/Tags";
 import { TagPreset, tagsVariables } from "@library/metas/Tags.variables";
-import { Icon } from "@vanilla/icons";
+import { Icon, IconType } from "@vanilla/icons";
 import { iconVariables } from "@library/icons/iconStyles";
 import SmartLink from "@library/routing/links/SmartLink";
 
@@ -30,9 +30,10 @@ export const MetaItem = React.forwardRef(function MetaItem(props: IProps, ref: R
 export function MetaLink(props: React.ComponentProps<typeof SmartLink>) {
     const classes = metasClasses();
 
+    const { className, ...linkProps } = props;
     return (
-        <MetaItem>
-            <SmartLink {...props} className={classNames(classes.metaLink, props.className)} />
+        <MetaItem className={props.className}>
+            <SmartLink {...linkProps} className={classes.metaLink} />
         </MetaItem>
     );
 }
@@ -68,6 +69,36 @@ export function MetaIcon(props: React.ComponentProps<typeof Icon>) {
     return (
         <MetaItem className={className}>
             <Icon {...rest} className={classes.alignVerticallyInMetaItem(iconHeight)} aria-hidden={false} /> {children}
+        </MetaItem>
+    );
+}
+
+export function MetaButton(
+    props: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+        icon?: IconType;
+    },
+) {
+    const classes = metasClasses();
+
+    const { icon, className, children, ...buttonProps } = props;
+
+    return (
+        <MetaItem className={className}>
+            <button
+                {...buttonProps}
+                className={cx({
+                    [classes.iconButton]: !!icon,
+                })}
+            >
+                {icon && (
+                    <Icon
+                        size={"default"}
+                        icon={icon}
+                        className={classes.alignVerticallyInMetaItem(iconVariables().standard.height)}
+                    />
+                )}
+                {children}
+            </button>
         </MetaItem>
     );
 }

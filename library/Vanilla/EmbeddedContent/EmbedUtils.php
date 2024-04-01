@@ -44,14 +44,13 @@ class EmbedUtils
             $sizeAdjust = 1;
 
             // If display size is defined, adjust the size
-            if (isset($response["displaySize"])) {
-                // adjust sizes based on defined display size
-                $sizes = ["small", "medium", "large"];
-                $sizeAdjust = array_search($response["displaySize"], $sizes) + 1;
-            }
-
-            $width = 16 * (20 * $sizeAdjust);
-            $height = 9 * (20 * $sizeAdjust);
+            // adjust sizes based on defined display size
+            $sizes = [
+                "small" => [320, 180],
+                "medium" => [480, 270],
+                "large" => [1280, 720],
+            ];
+            [$width, $height] = $sizes[$response["display_size"] ?? "large"] ?? [1280, 720];
         }
 
         return [$height, $width];

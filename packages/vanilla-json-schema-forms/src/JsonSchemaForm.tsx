@@ -1,31 +1,25 @@
 /**
  * @author Dominic Lacaille <dominic.lacaille@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { ISchemaRenderProps, IFieldError, JSONSchemaType, JsonSchema } from "./types";
-import { PartialSchemaForm, RenderChildren } from "./PartialSchemaForm";
+import { IPartialSchemaFormProps, PartialSchemaForm, RenderChildren } from "./PartialSchemaForm";
 import { VanillaUIFormControl } from "./vanillaUIControl/VanillaUIFormControl";
 import { VanillaUIFormControlGroup } from "./vanillaUIControl/VanillaUIFormControlGroup";
 import { useFormValidation, ValidationProvider } from "./ValidationContext";
 import { fieldErrorsToValidationErrors, recursivelyCleanInstance } from "./utils";
 import { ValidationResult } from "@cfworker/json-schema";
 
-interface IProps extends ISchemaRenderProps {
+interface IProps extends ISchemaRenderProps, IPartialSchemaFormProps {
     /** When possible, define `schema` as `JSONSchemaType<YourSchemaInterface>` and cast `as JsonSchema` when passing props to this component  */
     schema: JSONSchemaType | string;
     instance: any;
     /** false by default */
     autoValidate?: boolean;
-    onChange(instance: any): void;
-    onBlur?(fieldName: string): void;
-    disabled?: boolean;
     vanillaUI?: boolean;
-    hideDescriptionInLabels?: boolean;
-    size?: "small" | "default";
-    autocompleteClassName?: string;
     fieldErrors?: Record<string, IFieldError[]>;
 }
 
@@ -66,7 +60,6 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
 ) {
     const {
         autoValidate = false,
-        onBlur,
         instance,
         Form,
         FormSection,
@@ -75,9 +68,6 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
         FormControlGroup,
         FormGroupWrapper,
         vanillaUI = false,
-        hideDescriptionInLabels = false,
-        size = "default",
-        autocompleteClassName,
     } = props;
 
     const formValidation = useFormValidation();
@@ -85,7 +75,7 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
     const [_validation, setValidation] = useState<ValidationResult>();
 
     const validation = useMemo((): ValidationResult | undefined => {
-        const isValid = (_validation?.valid ?? true) && (props.fieldErrors ?? []).length === 0;
+        const isValid = (_validation?.valid ?? true) && Object.keys(props.fieldErrors ?? {}).length === 0;
         return {
             valid: isValid,
             errors: [...(_validation?.errors ?? []), ...fieldErrorsToValidationErrors(props.fieldErrors ?? {})],
@@ -160,7 +150,6 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
         <PartialSchemaForm
             {...props}
             {...Memoized}
-            disabled={props.disabled}
             pathString="/"
             errors={[]}
             path={[]}
@@ -168,10 +157,6 @@ const JsonSchemaFormInstance = forwardRef(function JsonSchemaFormImpl(
             rootSchema={schema}
             rootInstance={instance}
             validation={validation}
-            onBlur={onBlur}
-            hideDescriptionInLabels={hideDescriptionInLabels}
-            size={size}
-            autocompleteClassName={autocompleteClassName}
         />
     );
 });

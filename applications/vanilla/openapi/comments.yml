@@ -13,15 +13,15 @@ paths:
                   in: query
                   description: Filter by a range or CSV of comment IDs.
                   schema:
-                      $ref: "#/components/schemas/RangeExpression"
-                - $ref: "#/components/parameters/DateInserted"
-                - $ref: "#/components/parameters/DateUpdated"
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/DateInserted"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/DateUpdated"
                 - description: The discussion ID.
                   in: query
                   name: discussionID
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: |
                       Desired number of items per page.
                   in: query
@@ -112,7 +112,7 @@ paths:
                   schema:
                       minLength: 1
                       type: string
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: |
                       Desired number of items per page.
                   in: query
@@ -387,7 +387,7 @@ paths:
                       minLength: 1
                       type: string
                   allowEmptyValue: true
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: |
                       Desired number of items per page.
                   in: query

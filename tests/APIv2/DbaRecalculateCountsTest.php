@@ -9,6 +9,7 @@ namespace VanillaTests\APIv2;
 
 use Vanilla\CurrentTimeStamp;
 use VanillaTests\ExpectExceptionTrait;
+use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\Models\TestCategoryModelTrait;
 use VanillaTests\Models\TestCommentModelTrait;
 use VanillaTests\Models\TestDiscussionModelTrait;
@@ -28,6 +29,7 @@ class DbaRecalculateCountsTest extends SiteTestCase
     use TestCategoryModelTrait;
     use TestDiscussionModelTrait;
     use TestCommentModelTrait;
+    use CommunityApiTestTrait;
 
     /** @var \ConversationModel */
     protected $conversationModel;
@@ -44,11 +46,9 @@ class DbaRecalculateCountsTest extends SiteTestCase
         $this->resetTable("Conversation");
         $this->conversationModel = \Gdn::getContainer()->get(\ConversationModel::class);
         $this->sql = $this->discussionModel->SQL;
-        $this->categories = $this->discussions = $this->comments = $this->conversations = $this->users = [];
-        $this->batches = 1;
+        $this->conversations = $this->users = [];
         CurrentTimeStamp::mockTime("2022-01-01");
         \Gdn::config()->set("Dba.Limit", 2);
-        $this->setDicussionCountTestData();
     }
 
     /**
@@ -89,6 +89,7 @@ class DbaRecalculateCountsTest extends SiteTestCase
 
     public function testDiscussionCounts()
     {
+        $this->setDicussionCountTestData();
         $this->getLongRunner()->setMaxIterations(1000000);
         $set = [
             "FirstCommentID" => 0,
@@ -97,7 +98,10 @@ class DbaRecalculateCountsTest extends SiteTestCase
             "DateLastComment" => "1970-01-01 00:00:00",
             "LastCommentUserID" => 0,
         ];
-        $this->resetTableCounts("Discussion", "DiscussionID", array_keys($this->discussions), $set);
+        $this->container()
+            ->get(\DiscussionModel::class)
+            ->update($set, []);
+
         $body = [
             "aggregates" => ["discussion.*"],
         ];
@@ -105,24 +109,18 @@ class DbaRecalculateCountsTest extends SiteTestCase
         // Request should be successful.
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
-        $this->assertEquals($this->batches, count($body["progress"]["successIDs"]));
-        $this->assertEquals($this->batches, $body["progress"]["countTotalIDs"]);
+        // There are 8 discussions with a batch size of 2. This makes 4 batches.
+        // There are 6 total aggregates being calculated so we have 24 total iterations.
+        $this->assertEquals(24, count($body["progress"]["successIDs"]));
+        $this->assertEquals(24, $body["progress"]["countTotalIDs"]);
         $this->assertNull($body["callbackPayload"]);
         $this->assertEmpty($body["progress"]["failedIDs"]);
-        $randomDiscussionIds = array_rand($this->discussions, 2);
-        $updatedDiscussions = $this->discussionModel
-            ->getWhere(["DiscussionID" => $randomDiscussionIds, "Announce" => false])
-            ->resultArray();
-        $fieldsToCompare = array_keys($set);
-        foreach ($updatedDiscussions as $updatedDiscussion) {
-            $discussionId = $updatedDiscussion["DiscussionID"];
-            foreach ($fieldsToCompare as $field) {
-                $this->assertEquals(
-                    $this->discussions[$discussionId][$field],
-                    $updatedDiscussion[$field],
-                    "Incorrect $field for Discussion $discussionId"
-                );
-            }
+        $allDiscussionIDs = \Gdn::sql()
+            ->select("DiscussionID")
+            ->get("Discussion")
+            ->column("DiscussionID");
+        foreach ($allDiscussionIDs as $discussionID) {
+            $this->assertDiscussionCounts($discussionID);
         }
     }
 
@@ -134,7 +132,6 @@ class DbaRecalculateCountsTest extends SiteTestCase
             "Name" => "Parent Count %s",
             "DisplayAs" => \CategoryModel::DISPLAY_NESTED,
         ]);
-        $this->categories += array_column($parentCategories, null, "CategoryID");
 
         foreach ($parentCategories as $category) {
             $childCategories = $this->insertCategories(2, [
@@ -143,36 +140,15 @@ class DbaRecalculateCountsTest extends SiteTestCase
                 "ParentCategoryID" => $category["CategoryID"],
             ]);
 
-            $this->categories += array_column($childCategories, null, "CategoryID");
-
             foreach ($childCategories as $childCategory) {
                 // Insert some test discussions.
                 $discussions = $this->insertDiscussions(2, ["CategoryID" => $childCategory["CategoryID"]]);
-                $this->discussions += array_column($discussions, null, "DiscussionID");
 
                 // Insert some comments for each discussion.
                 foreach ($discussions as $discussion) {
                     $comments = $this->insertComments(5, ["DiscussionID" => $discussion["DiscussionID"]]);
-                    $this->comments += array_column($comments, null, "CommentID");
                 }
             }
-        }
-        $this->batches = (int) ceil(count($this->discussions) / \Gdn::config("Dba.Limit"));
-        $this->reloadDiscussions();
-    }
-
-    /**
-     * Reloads Discussions  to the class member.
-     */
-    private function reloadDiscussions(): void
-    {
-        // Reload discussions
-        $discussionsRows = $this->discussionModel
-            ->getWhere(["DiscussionID" => array_keys($this->discussions), "Announce" => false])
-            ->resultArray();
-        $this->discussions = [];
-        foreach ($discussionsRows as $discussionsRow) {
-            $this->discussions[$discussionsRow["DiscussionID"]] = $discussionsRow;
         }
     }
 
@@ -197,20 +173,29 @@ class DbaRecalculateCountsTest extends SiteTestCase
      * Test if we are receiving a successful counts and failed counts and payload
      * on in case of time out
      */
-    public function testTimeout()
+    public function testStopAndResume()
     {
+        $this->createCategory();
+        $this->createDiscussion();
+        $this->createDiscussion();
         $this->getLongRunner()->setMaxIterations(1);
-        $this->runWithExpectedExceptionCode(408, function () {
-            $body = [
-                "aggregates" => ["discussion.*"],
-            ];
-            $response = $this->api()->put("/dba/recalculate-aggregates", $body);
-            $this->assertEquals(408, $response->getStatusCode());
-            $body = $response->getBody()["counts"];
-            $this->assertEquals($this->batches, $body["progress"]["countTotalIDs"]);
-            $this->assertCount(1, $body["progress"]["successIDs"]);
-            $this->assertNotNull($body["callbackPayload"]);
-        });
+        $body = [
+            "aggregates" => ["discussion.*"],
+        ];
+        $response = $this->api()->put("/dba/recalculate-aggregates", $body, [], ["throw" => false]);
+        $this->assertEquals(408, $response->getStatusCode());
+        $body = $response->getBody();
+        $this->assertEquals(6, $body["progress"]["countTotalIDs"]);
+        $this->assertCount(1, $body["progress"]["successIDs"]);
+        $this->assertNotNull($body["callbackPayload"]);
+
+        $this->getLongRunner()->setMaxIterations(null);
+        $finalResponse = $this->resumeLongRunner($response);
+        $this->assertEquals(200, $finalResponse->getStatusCode());
+        $body = $finalResponse->getBody();
+        $this->assertEquals(6, $body["progress"]["countTotalIDs"]);
+        $this->assertCount(5, $body["progress"]["successIDs"]);
+        $this->assertNull($body["callbackPayload"]);
     }
 
     /**
@@ -224,12 +209,12 @@ class DbaRecalculateCountsTest extends SiteTestCase
             "aggregates" => ["conversation.*"],
         ];
         $response = $this->api()->put("/dba/recalculate-aggregates", $body);
-        $batches = (int) ceil(count($this->conversations) / \Gdn::config("Dba.Limit"));
         // Request should be successful.
         $this->assertEquals(200, $response->getStatusCode());
         $body = $response->getBody();
-        $this->assertEquals($batches, count($body["progress"]["successIDs"]));
-        $this->assertEquals($batches, $body["progress"]["countTotalIDs"]);
+        // 4 conversations with a batch size of 2 * 6 aggregates = 12 total iterations.
+        $this->assertEquals(12, count($body["progress"]["successIDs"]));
+        $this->assertEquals(12, $body["progress"]["countTotalIDs"]);
         $this->assertNull($body["callbackPayload"]);
         $this->assertEmpty($body["progress"]["failedIDs"]);
         $updatedConversations = $this->conversationModel
@@ -251,9 +236,6 @@ class DbaRecalculateCountsTest extends SiteTestCase
     /** Set discussion data for testing */
     private function setConverstionCountTestData()
     {
-        if (!empty($this->conversations)) {
-            return;
-        }
         $users = $this->getTestUsers(3);
         //create multiple conversations for testing
         $messageUser = array_pop($users);
@@ -306,19 +288,21 @@ class DbaRecalculateCountsTest extends SiteTestCase
     }
 
     /**
-     *   Test can process multiple tables
+     * Test can process multiple tables
      */
     public function testMultipleTables()
     {
+        $this->setDicussionCountTestData();
         $this->setConverstionCountTestData();
-
         $body = [
             "aggregates" => ["discussion.*", "conversation.*"],
         ];
         $response = $this->api()->put("/dba/recalculate-aggregates", $body);
         $body = $response->getBody();
         $successIds = $body["progress"]["successIDs"];
-        $this->assertEquals(6, $body["progress"]["countTotalIDs"]);
+        // 2 conversation iterations & 6 total aggregates = 12 conversations iterations
+        // 4 discussion iterations &
+        $this->assertEquals(36, $body["progress"]["countTotalIDs"]);
 
         $this->assertEmpty($body["progress"]["failedIDs"]);
         $this->assertEquals(
@@ -327,8 +311,38 @@ class DbaRecalculateCountsTest extends SiteTestCase
                 "Discussion_CountComments_1",
                 "Discussion_CountComments_2",
                 "Discussion_CountComments_3",
+                "Discussion_FirstCommentID_0",
+                "Discussion_FirstCommentID_1",
+                "Discussion_FirstCommentID_2",
+                "Discussion_FirstCommentID_3",
+                "Discussion_LastCommentID_0",
+                "Discussion_LastCommentID_1",
+                "Discussion_LastCommentID_2",
+                "Discussion_LastCommentID_3",
+                "Discussion_DateLastComment_0",
+                "Discussion_DateLastComment_1",
+                "Discussion_DateLastComment_2",
+                "Discussion_DateLastComment_3",
+                "Discussion_LastCommentUserID_0",
+                "Discussion_LastCommentUserID_1",
+                "Discussion_LastCommentUserID_2",
+                "Discussion_LastCommentUserID_3",
+                "Discussion_Hot_0",
+                "Discussion_Hot_1",
+                "Discussion_Hot_2",
+                "Discussion_Hot_3",
                 "Conversation_CountMessages_0",
                 "Conversation_CountMessages_1",
+                "Conversation_CountParticipants_0",
+                "Conversation_CountParticipants_1",
+                "Conversation_FirstMessageID_0",
+                "Conversation_FirstMessageID_1",
+                "Conversation_LastMessageID_0",
+                "Conversation_LastMessageID_1",
+                "Conversation_DateUpdated_0",
+                "Conversation_DateUpdated_1",
+                "Conversation_UpdateUserID_0",
+                "Conversation_UpdateUserID_1",
             ],
             $successIds
         );
@@ -339,20 +353,21 @@ class DbaRecalculateCountsTest extends SiteTestCase
      */
     public function testCategoryCounts()
     {
-        $this->reloadCategories();
-
-        $columns = [
-            "CountCategories" => 0,
-            "CountDiscussions" => 0,
-            "CountAllDiscussions" => 0,
-            "CountComments" => 0,
-            "CountAllComments" => 0,
-            "LastCommentID" => null,
-            "LastDiscussionID" => null,
-            "LastDateInserted" => null,
-            "CountFollowers" => 0,
-        ];
-        $this->resetTableCounts("Category", "CategoryID", array_keys($this->categories), $columns);
+        $this->setDicussionCountTestData();
+        $this->categoryModel->update(
+            [
+                "CountCategories" => 0,
+                "CountDiscussions" => 0,
+                "CountAllDiscussions" => 0,
+                "CountComments" => 0,
+                "CountAllComments" => 0,
+                "LastCommentID" => null,
+                "LastDiscussionID" => null,
+                "LastDateInserted" => null,
+                "CountFollowers" => 0,
+            ],
+            []
+        );
         $body = [
             "aggregates" => ["category.*"],
         ];
@@ -360,32 +375,14 @@ class DbaRecalculateCountsTest extends SiteTestCase
         // Request should be successful.
         $this->assertEquals(200, $response->getStatusCode());
 
-        $updatedCategories = $this->categoryModel
-            ->getWhere(["CategoryID" => array_column($this->categories, "CategoryID")])
-            ->resultArray();
-        $fieldsToCompare = array_keys($columns);
-        foreach ($updatedCategories as $updatedCategory) {
-            $categoryId = $updatedCategory["CategoryID"];
-            foreach ($fieldsToCompare as $field) {
-                $this->assertEquals(
-                    $this->categories[$categoryId][$field],
-                    $updatedCategory[$field],
-                    "Incorrect $field for Category $categoryId"
-                );
-            }
-        }
-    }
-
-    /**
-     * Reloads Categories to the class member.
-     */
-    private function reloadCategories()
-    {
-        // Reload discussions
-        $categoryRows = $this->categoryModel->getWhere(["CategoryID" => array_keys($this->categories)])->resultArray();
-        $this->categories = [];
-        foreach ($categoryRows as $categoryRow) {
-            $this->categories[$categoryRow["CategoryID"]] = $categoryRow;
+        $allCategoryIDs = $this->categoryModel
+            ->createSql()
+            ->select("CategoryID")
+            ->from("Category")
+            ->get()
+            ->column("CategoryID");
+        foreach ($allCategoryIDs as $categoryID) {
+            $this->assertCategoryCounts($categoryID);
         }
     }
 }

@@ -32,7 +32,7 @@ paths:
                                   url: "https://example.com/api/v2/resources/comment"
                                   crawlable: true
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
     /resources/{recordType}:
         get:
             summary: Get the details of a resource.
@@ -65,7 +65,7 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Resource"
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
     /resources/dirty-records/{recordType}:
         delete:
             summary: Delete resources dirty records.

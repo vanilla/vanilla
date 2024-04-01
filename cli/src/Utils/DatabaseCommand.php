@@ -13,6 +13,7 @@ use Gdn_Database;
 use Symfony\Component\Console;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Vanilla\Schema\RangeExpression;
 
 /**
  * Abstract class for command using a database.
@@ -21,6 +22,8 @@ abstract class DatabaseCommand extends Console\Command\Command
 {
     /** @var Gdn_Database */
     private $database = null;
+
+    protected int $batchSize = 1000;
 
     /**
      * Return the Database singleton.
@@ -76,5 +79,75 @@ abstract class DatabaseCommand extends Console\Command\Command
         ];
         \Gdn::config()->saveToConfig("Database", $dbInfo);
         $this->database->init($dbInfo);
+    }
+
+    /**
+     * Fetch the posts based on a recordType and a cursor.
+     *
+     * @param $record
+     * @param $offset
+     * @return array|null
+     */
+    protected function fetchPosts(array $record, int $offset, array $where = [])
+    {
+        $sql = $this->getDatabase()->createSql();
+
+        $where = array_merge($where, [
+            $record["id"] => new RangeExpression(">=", $record["from"], "<=", $record["to"]),
+        ]);
+
+        $result = $sql
+            ->select([$record["id"], "Body", "Format", "DateInserted", $record["parentRecordID"]])
+            ->from($record["table"])
+            ->where($where)
+            ->offset($offset)
+            ->limit($this->batchSize)
+            ->get()
+            ->resultArray();
+
+        return $result;
+    }
+
+    /**
+     * A comma-separated list of the records to be indexed (e.g. `discussion,comment`).
+     *
+     * @param string $records
+     */
+    public function setRecords(string $records): void
+    {
+        $records = explode(",", $records);
+        $this->records = $records;
+    }
+
+    /**
+     * Set the size of the batches to be indexed.
+     *
+     * @param int $batchSize
+     */
+    public function setBatchSize(int $batchSize): void
+    {
+        $this->batchSize = $batchSize;
+    }
+
+    /**
+     * Return the highest value between the MaxID of a certain field or the $to argument.
+     *
+     * @param string $recordID
+     * @param string $recordTable
+     * @param array $where
+     * @param int $to
+     * @return int
+     */
+    protected function getMaxID(string $recordID, string $recordTable, int $to, array $where = []): int
+    {
+        $sql = $this->getDatabase()->createSql();
+        $result = $sql
+            ->select($recordID, "max")
+            ->from($recordTable)
+            ->where($where)
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+
+        return min($result[$recordID], $to);
     }
 }

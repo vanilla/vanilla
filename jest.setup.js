@@ -26,6 +26,22 @@ global.ResizeObserver = class ResizeObserver {
     }
 };
 
+global.IntersectionObserver = class IntersectionObserver {
+    constructor() {}
+
+    observe() {
+        // do nothing
+    }
+
+    disconnect() {
+        // do nothing
+    }
+
+    unobserve() {
+        // do nothing
+    }
+};
+
 // Mock DataTransfer, commonly used in copy/paste and drag/drop operations.
 global.DataTransfer = class DataTransfer {
     constructor() {

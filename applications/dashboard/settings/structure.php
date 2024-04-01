@@ -41,6 +41,9 @@ $LEGACYADDON = [
     "EnabledPlugins.NBBC",
     "EnabledPlugins.whispers",
     "EnabledPlugins.autorolebyemail2",
+    "EnabledPlugins.Spoof",
+    "EnabledPlugins.Reactions",
+    "EnabledPlugins.VanillaStats",
 ];
 
 if (!defined("APPLICATION")) {
@@ -780,7 +783,7 @@ $Construct
     ->column("PluralHeadlineFormat", "varchar(255)", true)
     ->column("Story", "text", true)
     ->column("Format", "varchar(10)", true)
-    ->column("Route", "varchar(255)", true)
+    ->column("Route", "text", true)
     ->column("RecordType", "varchar(20)", true)
     ->column("RecordID", "int", true)
     ->column("ParentRecordID", "int", true)

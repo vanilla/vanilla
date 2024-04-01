@@ -559,7 +559,7 @@ class EmailDigestGenerator implements SystemCallableInterface, LoggerAwareInterf
                 $categoryData = \CategoryModel::categories($categoryID);
                 $digestData[$categoryID] = [
                     "name" => $categoryData["Name"],
-                    "url" => $categoryData["Url"],
+                    "url" => categoryUrl($categoryData),
                     "iconUrl" => $categoryData["Photo"]
                         ? (\Gdn_UploadImage::url($categoryData["Photo"]) ?:
                         null)

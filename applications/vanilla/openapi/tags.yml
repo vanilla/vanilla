@@ -9,6 +9,14 @@ paths:
                   in: query
                   schema:
                       type: string
+                - name: tagID[]
+                  description: The ID of the tag to find.
+                  in: query
+                  schema:
+                      type: array
+                      items:
+                          type: integer
+                  style: form
                 - name: type
                   description: The type of tags to list.
                   in: query
@@ -31,7 +39,7 @@ paths:
                   schema:
                       type: boolean
                   style: form
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: Desired number of tags per page.
                   in: query
                   name: limit
@@ -68,9 +76,9 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Tag"
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
     /tags/{id}:
         parameters:
             - name: id
@@ -91,9 +99,9 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Tag"
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
         patch:
             summary: Update a tag.
             tags:
@@ -111,9 +119,9 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Tag"
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
         delete:
             summary: Delete a tag.
             tags:
@@ -122,15 +130,15 @@ paths:
                 "204":
                     description: Success.
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
                 "409":
                     description: Tag isn't empty.
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/BasicError"
+                                $ref: "../../dashboard/openapi/responses.yml#/components/schemas/BasicError"
 components:
     schemas:
         TagFragment:
@@ -167,7 +175,7 @@ components:
                           nullable: true
                           default: null
                           description: The tag type.
-                - $ref: "#/components/schemas/InsertInfo"
+                - $ref: "../../dashboard/openapi/columns.yaml#/components/schemas/InsertInfo"
 
         LegacyTag:
             description: A backwards compatible tag.

@@ -52,7 +52,7 @@ describe("DataList", () => {
         ];
         const { container } = render(<DataList title={"My test title"} data={stubData} />);
         // Assuming tokens are spans here
-        const spans = container.querySelectorAll("span");
+        const spans = container.querySelectorAll("span.token");
         expect(spans.length).toBe(3);
         expect(screen.getByText(/entry-one/)).toBeInTheDocument();
         expect(screen.getByText(/entry-two/)).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe("DataList", () => {
         ];
         const { container } = render(<DataList title={"My test title"} data={stubData} />);
         // Assuming tokens are spans here
-        const spans = container.querySelectorAll("span");
+        const spans = container.querySelectorAll("span.token");
         expect(spans.length).toBe(3);
         expect(screen.getByText(/entry-one/)).toBeInTheDocument();
         expect(screen.getByText(/75/)).toBeInTheDocument();

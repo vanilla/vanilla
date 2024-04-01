@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useDebugValue, useMemo } from "react";
+import React, { ReactNode, useDebugValue, useMemo } from "react";
 import {
     IHomeWidgetItemOptions,
     homeWidgetItemVariables,
@@ -16,7 +16,7 @@ import Heading from "@library/layout/Heading";
 import TruncatedText from "@library/content/TruncatedText";
 import { ICountResult } from "@library/search/searchTypes";
 import { ResultMeta } from "@library/result/ResultMeta";
-import { getClassForButtonType } from "@library/forms/Button";
+import Button, { getClassForButtonType } from "@library/forms/Button";
 import { createSourceSetValue, ImageSourceSet, t } from "@library/utility/appUtils";
 import { ArrowIcon } from "@library/icons/common";
 import { DeepPartial } from "redux";
@@ -25,10 +25,10 @@ import { cx } from "@emotion/css";
 import { buttonClasses } from "@library/forms/Button.styles";
 import { HomeWidgetItemDefaultImage } from "@library/homeWidget/HomeWidgetItemDefaultImage";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
+import { ButtonTypes } from "@library/forms/buttonTypes";
 
-export interface IHomeWidgetItemProps {
+export interface CommonHomeWidgetItemProps {
     // Content
-    to: LocationDescriptor;
     imageUrl?: string;
     imageUrlSrcSet?: ImageSourceSet;
     iconUrl?: string;
@@ -50,7 +50,20 @@ export interface IHomeWidgetItemProps {
     options?: DeepPartial<IHomeWidgetItemOptions>;
 }
 
+export type IHomeWidgetItemProps = CommonHomeWidgetItemProps &
+    (
+        | {
+              to?: LocationDescriptor;
+              callback?: never;
+          }
+        | {
+              to?: never;
+              callback?: () => void;
+          }
+    );
+
 export function HomeWidgetItem(props: IHomeWidgetItemProps) {
+    const { to, callback } = props;
     const vars = homeWidgetItemVariables(props.options);
     const options = vars.options;
     const classes = homeWidgetItemClasses(props.options);
@@ -73,18 +86,21 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
     useDebugValue({ opts: options });
 
     if (props.children && !Array.isArray(props.children)) {
-        return (
-            <SmartLink
-                to={props.to}
-                className={cx(classes.root, props.className)}
-                tabIndex={props.tabIndex}
-                // Prevent dragging these guys as links.
-                draggable={"false"}
-                onDragStart={(e) => e.preventDefault()}
-            >
-                {props.children}
-            </SmartLink>
-        );
+        if (props.to) {
+            return (
+                <SmartLink
+                    to={props.to}
+                    className={cx(classes.root, props.className)}
+                    tabIndex={props.tabIndex}
+                    // Prevent dragging these guys as links.
+                    draggable={"false"}
+                    onDragStart={(e) => e.preventDefault()}
+                >
+                    {props.children}
+                </SmartLink>
+            );
+        }
+        return <>{props.children}</>;
     }
 
     const isAbsoluteContent = [
@@ -136,15 +152,8 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
               </div>
           );
 
-    return (
-        <SmartLink
-            to={props.to}
-            className={cx(classes.root, props.className)}
-            tabIndex={props.tabIndex}
-            // Prevent dragging these guys as links.
-            draggable={"false"}
-            onDragStart={(e) => e.preventDefault()}
-        >
+    const content = (
+        <>
             <div className={classes.backgroundContainer}>
                 {[
                     HomeWidgetItemContentType.TITLE_BACKGROUND_DESCRIPTION,
@@ -188,7 +197,34 @@ export function HomeWidgetItem(props: IHomeWidgetItemProps) {
                     <ArrowIcon />
                 </span>
             )}
-        </SmartLink>
+        </>
+    );
+
+    return (
+        <>
+            {to && !callback && (
+                <SmartLink
+                    to={to}
+                    className={cx(classes.root, props.className)}
+                    tabIndex={props.tabIndex}
+                    // Prevent dragging these guys as links.
+                    draggable={"false"}
+                    onDragStart={(e) => e.preventDefault()}
+                >
+                    {content}
+                </SmartLink>
+            )}
+            {!to && !!callback && (
+                <Button
+                    buttonType={ButtonTypes.CUSTOM}
+                    className={cx(classes.root, props.className)}
+                    onClick={() => callback()}
+                >
+                    {content}
+                </Button>
+            )}
+            {!to && !callback && <div className={cx(classes.root, props.className)}>{content}</div>}
+        </>
     );
 }
 

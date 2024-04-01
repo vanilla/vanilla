@@ -686,4 +686,82 @@ class ProfileFieldsApiControllerTest extends AbstractResourceTest
         $this->assertEquals(200, $result->getStatusCode());
         $this->assertTrue($result->getBody()["displayOptions"]["search"]);
     }
+
+    /**
+     * Test get profile-field, filter by multiple formType/dataType
+     *
+     * @return void
+     */
+    public function testListProfileFields(): void
+    {
+        $record = $this->record();
+        $profileFieldsData = [
+            "text-field" => [
+                "apiName" => "text-field",
+                "label" => "Text Field",
+            ],
+            "dropdown-field" => [
+                "apiName" => "dropdown-field",
+                "label" => "Dropdown Field",
+                "formType" => ProfileFieldModel::FORM_TYPE_DROPDOWN,
+                "dropdownOptions" => ["one", "two", "three"],
+            ],
+            "checkbox-field" => [
+                "apiName" => "checkbox-field",
+                "label" => "Checkbox Field",
+                "dataType" => ProfileFieldModel::DATA_TYPE_BOOL,
+                "formType" => ProfileFieldModel::FORM_TYPE_CHECKBOX,
+            ],
+            "date-field" => [
+                "apiName" => "date-field",
+                "label" => "Date Field",
+                "dataType" => ProfileFieldModel::DATA_TYPE_DATE,
+                "formType" => ProfileFieldModel::FORM_TYPE_DATE,
+            ],
+            "number-field" => [
+                "apiName" => "number-field",
+                "label" => "Number Field",
+                "dataType" => ProfileFieldModel::DATA_TYPE_NUMBER,
+                "formType" => ProfileFieldModel::FORM_TYPE_NUMBER,
+            ],
+            "tokens-field" => [
+                "apiName" => "tokens-field",
+                "label" => "Tokens Field",
+                "dataType" => ProfileFieldModel::DATA_TYPE_STRING_MUL,
+                "formType" => ProfileFieldModel::FORM_TYPE_TOKENS,
+                "dropdownOptions" => ["one", "two", "three"],
+            ],
+            "text-multiline-field" => [
+                "apiName" => "text-multiline-field",
+                "label" => "Text Multiline Field",
+                "formType" => ProfileFieldModel::FORM_TYPE_TEXT_MULTILINE,
+            ],
+        ];
+        foreach ($profileFieldsData as $profileFieldData) {
+            $profileFieldData = array_merge($record, $profileFieldData);
+            $this->api()->post($this->baseUrl, $profileFieldData);
+        }
+
+        // Get a list of profile fields with data-type of "text".
+        $result = $this->api()->get($this->baseUrl, ["dataType" => "text"]);
+        $textProfileFields = $result->getBody();
+        $this->assertCount(3, $textProfileFields);
+        $this->assertEquals("text-field", $textProfileFields[0]["apiName"]);
+        $this->assertEquals("dropdown-field", $textProfileFields[1]["apiName"]);
+        $this->assertEquals("text-multiline-field", $textProfileFields[2]["apiName"]);
+
+        // Get a list of profile fields with data-type of "number", "boolean" and "string[]".
+        $result = $this->api()->get($this->baseUrl, ["dataType" => ["number", "boolean", "string[]"]]);
+        $numberBooleanStringProfileFields = $result->getBody();
+        $this->assertCount(3, $numberBooleanStringProfileFields);
+        $profileFields = array_column($numberBooleanStringProfileFields, "apiName");
+        $this->assertEqualsCanonicalizing(["checkbox-field", "number-field", "tokens-field"], $profileFields);
+
+        // Get a list of profile fields with formType of "date" and "number".
+        $result = $this->api()->get($this->baseUrl, ["formType" => ["number", "date"]]);
+        $numberDateProfileFields = $result->getBody();
+        $this->assertCount(2, $numberDateProfileFields);
+        $profileFields = array_column($numberDateProfileFields, "apiName");
+        $this->assertEqualsCanonicalizing(["date-field", "number-field"], $profileFields);
+    }
 }

@@ -8,7 +8,7 @@ services:
         image: docker.elastic.co/kibana/kibana:${ES_STACK_VERSION}
         ports:
             - 5601:5601
-        mem_limit: 512m
+        mem_limit: 1024m
         volumes:
             - kibana-data:/usr/share/kibana/data
         environment:

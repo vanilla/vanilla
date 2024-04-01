@@ -680,10 +680,10 @@ class CategoriesTest extends AbstractResourceTest
     {
         // notably these are in a tree structure.
         $this->resetTable("Category");
-        $this->createCategory(["name" => "category 1"]);
+        $this->createCategory(["name" => "category 1", "displayAs" => strtolower(CategoryModel::DISPLAY_FLAT)]);
         $cat2 = $this->createCategory(["name" => "category 2"]);
-        $this->createCategory(["name" => "not related"]);
-        $this->createPermissionedCategory(["name" => "not related"], [\RoleModel::ADMIN_ID]);
+        $this->createCategory(["name" => "not related 1", "displayAs" => strtolower(CategoryModel::DISPLAY_NESTED)]);
+        $this->createPermissionedCategory(["name" => "not related 2"], [\RoleModel::ADMIN_ID]);
         $this->createCategory(["name" => "very nested category"]);
 
         $this->assertApiResults(
@@ -702,6 +702,24 @@ class CategoriesTest extends AbstractResourceTest
                 "name" => ["category 2", "very nested category"],
             ]
         );
+
+        // Check filtering a parent category.
+        $this->assertApiResults(
+            "/categories/search",
+            ["query" => "category", "parentCategoryID" => $cat2["categoryID"]],
+            [
+                "name" => ["category 2", "very nested category"],
+            ]
+        );
+
+        // This would return 2 records: "category 1" and "not related 1"
+        $result = $this->api()
+            ->get("/categories/search", [
+                "query" => "o",
+                "displayAs" => [CategoryModel::DISPLAY_NESTED, CategoryModel::DISPLAY_FLAT],
+            ])
+            ->getBody();
+        $this->assertCount(2, $result);
 
         // Check permissions.
         $this->runWithUser(function () {
@@ -994,6 +1012,24 @@ class CategoriesTest extends AbstractResourceTest
 
         // Assert that Second category has no expand on  lasPost
         $this->assertArrayNotHasKey("lastPost", $categories[$secondCategory["categoryID"]]);
+    }
+
+    /**
+     * Test that we sanitize the last post on the categories API based on permissions.
+     */
+    public function testSanitizeLastPostBasedOnPermissions()
+    {
+        $cat = $this->createCategory();
+        $catNestedPermissions = $this->createPermissionedCategory();
+        $this->createDiscussion(["name" => "Super Secret"]);
+        $cat = $this->api()->get("/categories/{$cat["categoryID"]}", ["expand" => "lastPost"]);
+        $this->assertEquals("Super Secret", $cat["lastPost"]["name"]);
+
+        // Now as someone without permission for that post
+        $this->runWithUser(function () use ($cat) {
+            $cat = $this->api()->get("/categories/{$cat["categoryID"]}", ["expand" => "lastPost"]);
+            $this->assertEquals("(Restricted Content)", $cat["lastPost"]["name"]);
+        }, UserModel::GUEST_USER_ID);
     }
 
     /**

@@ -7,31 +7,17 @@
 
 namespace Vanilla\Forum\Models\Totals;
 
+use Vanilla\Contracts\Models\AlreadyCachedSiteSectionTotalProviderInterface;
 use Vanilla\Contracts\Models\SiteSectionTotalProviderInterface;
 use Vanilla\Contracts\Site\SiteSectionInterface;
 
 /**
  * Provide site totals for comments.
  */
-class CommentSiteTotalProvider implements SiteSectionTotalProviderInterface
+class CommentSiteTotalProvider implements
+    SiteSectionTotalProviderInterface,
+    AlreadyCachedSiteSectionTotalProviderInterface
 {
-    /** @var \Gdn_Database */
-    private $database;
-
-    /** @var \CategoryModel */
-    private $categoryModel;
-
-    /**
-     * DI.
-     *
-     * @param \Gdn_Database $database
-     */
-    public function __construct(\Gdn_Database $database, \CategoryModel $categoryModel)
-    {
-        $this->database = $database;
-        $this->categoryModel = $categoryModel;
-    }
-
     /**
      * Get the total number of comments on a site (or site section).
      *
@@ -41,17 +27,9 @@ class CommentSiteTotalProvider implements SiteSectionTotalProviderInterface
     public function calculateSiteTotalCount(?SiteSectionInterface $siteSection = null): int
     {
         $rootCategoryID = $siteSection === null ? \CategoryModel::ROOT_ID : $siteSection->getCategoryID();
-
-        $countDiscussions = $this->database
-            ->createSql()
-            ->select("CountAllComments")
-            ->from($this->getTableName())
-            ->where("CategoryID", $rootCategoryID)
-            ->get()
-            ->resultArray();
-
-        $countDiscussions = $countDiscussions[0]["CountAllComments"];
-        return $countDiscussions;
+        $category = \CategoryModel::categories($rootCategoryID) ?: [];
+        $postCount = $category["CountAllComments"] ?? 0;
+        return $postCount;
     }
 
     /**

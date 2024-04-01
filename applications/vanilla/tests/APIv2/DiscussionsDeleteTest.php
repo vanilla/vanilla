@@ -20,6 +20,7 @@ use VanillaTests\EventSpyTestTrait;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\LogModelTestTrait;
+use VanillaTests\Models\TestCategoryModelTrait;
 use VanillaTests\SchedulerTestTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -36,6 +37,7 @@ class DiscussionsDeleteTest extends SiteTestCase
     use UsersAndRolesApiTestTrait;
     use ExpectExceptionTrait;
     use LogModelTestTrait;
+    use TestCategoryModelTrait;
 
     /**
      * @inheritdoc
@@ -106,56 +108,12 @@ class DiscussionsDeleteTest extends SiteTestCase
         $disc2 = $this->createDiscussion();
         $comment = $this->createComment();
 
-        $common = [
-            "CountAllDiscussions" => 2,
-            "CountAllComments" => 1,
-            "LastCommentID" => $comment["commentID"],
-            "LastDiscussionID" => $disc2["discussionID"],
-        ];
-        $this->assertRecordsFound(
-            "Category",
-            [
-                "CategoryID" => $cat1["categoryID"],
-                // Direct counts.
-                "CountDiscussions" => 0,
-                "CountComments" => 0,
-            ] + $common
-        );
-
-        $this->assertRecordsFound(
-            "Category",
-            [
-                "CategoryID" => $cat1_1["categoryID"],
-                // Direct counts.
-                "CountDiscussions" => 2,
-                "CountComments" => 1,
-            ] + $common
-        );
+        $this->assertCategoryCounts($cat1["categoryID"]);
+        $this->assertCategoryCounts($cat1_1["categoryID"]);
 
         $this->api()->delete("/discussions/{$disc2["discussionID"]}");
-        $common = [
-            "CountAllDiscussions" => 1,
-            "CountAllComments" => 0,
-            "LastCommentID" => null,
-            "LastDiscussionID" => $disc1["discussionID"],
-        ];
-        $this->assertRecordsFound(
-            "Category",
-            [
-                "CategoryID" => $cat1["categoryID"],
-                "CountDiscussions" => 0,
-                "CountComments" => 0,
-            ] + $common
-        );
-
-        $this->assertRecordsFound(
-            "Category",
-            [
-                "CategoryID" => $cat1_1["categoryID"],
-                "CountDiscussions" => 1,
-                "CountComments" => 0,
-            ] + $common
-        );
+        $this->assertCategoryCounts($cat1["categoryID"]);
+        $this->assertCategoryCounts($cat1_1["categoryID"]);
     }
 
     /**

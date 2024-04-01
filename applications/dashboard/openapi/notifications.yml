@@ -24,7 +24,7 @@ paths:
                       Whether to batch notifications.
                   schema:
                       type: boolean
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
             responses:
                 "200":
                     content:

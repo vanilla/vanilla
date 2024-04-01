@@ -220,6 +220,7 @@ label,
     }
     &.inline {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         label {
             margin-right: $spacer * 0.25;

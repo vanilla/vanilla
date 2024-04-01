@@ -80,7 +80,7 @@ components:
                     description: Filter by title
                     type: string
                 siteSection:
-                    $ref: "#/components/schemas/SiteSections"
+                    $ref: "schemas.yml#/components/schemas/SiteSections"
                 source:
                     description: The source being searched.
                     type: object

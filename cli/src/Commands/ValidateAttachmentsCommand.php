@@ -30,7 +30,7 @@ class ValidateAttachmentsCommand extends DatabaseCommand
     const REPORT_NOT_FOUND = "not-found";
 
     /** @var int */
-    private int $batchSize = 100;
+    protected int $batchSize = 100;
 
     /** @var string|bool */
     private $baseUrl;

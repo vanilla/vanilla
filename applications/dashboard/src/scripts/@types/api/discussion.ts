@@ -11,6 +11,7 @@ import { ICategoryFragment } from "@vanilla/addon-vanilla/categories/categoriesT
 import { RecordID } from "@vanilla/utils";
 import { LayoutViewType } from "@dashboard/layout/layoutSettings/LayoutSettings.types";
 import { IReaction } from "@dashboard/@types/api/reaction";
+import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 
 export interface IDiscussion {
     discussionID: RecordID;
@@ -55,6 +56,7 @@ export interface IDiscussion {
 
     reactions?: IReaction[];
     status?: IRecordStatus;
+    attachments?: IAttachment[];
 }
 
 export interface IRecordStatus {

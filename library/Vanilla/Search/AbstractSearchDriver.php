@@ -126,7 +126,18 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
             $siteID = $this->supportsForeignRecords() ? $record["siteID"] ?? "" : "";
             $type = $record["type"] ?? "";
             $recordID = $record["recordID"] ?? "";
-            $highlight = $record["highlight"]["bodyPlainText"] ?? "";
+            $highlight = null;
+            foreach ($query->getHighlightTextFieldNames() as $fieldName) {
+                if (str_contains($fieldName, "name")) {
+                    // Exclude name fields. We don't have a way to visualize them yet.
+                    continue;
+                }
+                $highlight = $record["highlight"][$fieldName] ?? null;
+                if ($highlight) {
+                    break;
+                }
+            }
+
             $key = $siteID . $type . $recordID;
             $resultItemForKey = $resultsItemsByTypeAndID[$key] ?? null;
             if ($resultItemForKey !== null) {
@@ -140,8 +151,8 @@ abstract class AbstractSearchDriver implements SearchTypeCollectorInterface, Inj
                     }
                     $resultItemForKey->setSiteDomain($site->getWebUrl());
                 }
-                if ($highlight) {
-                    $resultItemForKey["highlight"] = $highlight;
+                if ($highlight !== null) {
+                    $resultItemForKey->setHighlight($highlight);
                 }
                 $resultItemForKey->setSearchScore($record[SearchResultItem::FIELD_SCORE] ?? null);
                 $resultItemForKey->setSubqueryMatchCount($record[SearchResultItem::FIELD_SUBQUERY_COUNT] ?? null);

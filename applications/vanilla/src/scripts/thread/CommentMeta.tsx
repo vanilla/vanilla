@@ -6,10 +6,10 @@
 
 import React, { ReactNode } from "react";
 import { IComment, QnAStatus } from "@dashboard/@types/api/comment";
-import DateTime from "@library/content/DateTime";
-import { MetaLink, MetaTag } from "@library/metas/Metas";
+import { MetaTag } from "@library/metas/Metas";
 import { t } from "@vanilla/i18n";
 import { TagPreset } from "@library/metas/Tags.variables";
+import ThreadItemPermalink from "@vanilla/addon-vanilla/thread/ThreadItemPermalink";
 
 interface IProps {
     comment: IComment;
@@ -32,16 +32,10 @@ export default function CommentMeta(props: IProps) {
             qnaTag = undefined;
     }
 
-    const permaLink = (
-        <MetaLink to={comment.url}>
-            <DateTime timestamp={comment.dateInserted} />
-        </MetaLink>
-    );
-
     return (
         <>
             {qnaTag}
-            {permaLink}
+            <ThreadItemPermalink />
         </>
     );
 }

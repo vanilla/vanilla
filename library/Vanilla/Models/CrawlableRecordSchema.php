@@ -145,12 +145,14 @@ final class CrawlableRecordSchema
                 "type" => "string",
                 "enum" => [self::SCOPE_PUBLIC, self::SCOPE_RESTRICTED],
             ],
-            "name:s",
+            "name:s" => [
+                "x-localize" => true,
+            ],
             "excerpt:s" => [
                 "minLength" => 0,
             ],
             "image:s?",
-            "localizedID:s?",
+            "canonicalID:s",
             "locale:s?",
             "type:s" => [
                 "default" => $defaultType,

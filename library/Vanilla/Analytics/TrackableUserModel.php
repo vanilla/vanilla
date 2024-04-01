@@ -10,6 +10,7 @@ namespace Vanilla\Analytics;
 use Garden\Web\Data;
 use UserMetaModel;
 use UserModel;
+use Vanilla\CurrentTimeStamp;
 
 /**
  * Model for creating trackable user instances.
@@ -112,8 +113,8 @@ class TrackableUserModel
             $timeFirstVisit = strtotime($user->DateFirstVisit) ?: 0;
             $timeRegistered = strtotime($user->DateInserted) ?: 0;
 
-            $userInfo["sinceFirstVisit"] = time() - $timeFirstVisit;
-            $userInfo["sinceRegistered"] = time() - $timeRegistered;
+            $userInfo["sinceFirstVisit"] = CurrentTimeStamp::get() - $timeFirstVisit;
+            $userInfo["sinceRegistered"] = CurrentTimeStamp::get() - $timeRegistered;
 
             $userInfo["points"] = val("Points", $user, 0);
 

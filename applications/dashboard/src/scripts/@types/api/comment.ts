@@ -7,6 +7,7 @@ import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { IUserFragment } from "@library/@types/api/users";
 import { ICategory } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { IReaction } from "@dashboard/@types/api/reaction";
+import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 
 export interface IComment {
     name: string;
@@ -22,6 +23,7 @@ export interface IComment {
     url: string;
     attributes: any;
     reactions?: IReaction[];
+    attachments?: IAttachment[];
 }
 
 export interface ICommentEdit {

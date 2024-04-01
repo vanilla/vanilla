@@ -9,6 +9,7 @@
  * @since 2.0
  */
 
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\SmartyBC;
 
 /**
@@ -158,12 +159,14 @@ class Gdn_Smarty implements \Vanilla\Contracts\Web\LegacyViewHandlerInterface
     {
         if (is_null($this->_Smarty)) {
             $smarty = new SmartyBC();
+            $smarty->error_reporting = ErrorLogger::ERROR_SUPPRESSED;
 
             $smarty->setCacheDir(PATH_CACHE . "/Smarty/cache");
             $smarty->setCompileDir(PATH_CACHE . "/Smarty/compile");
             $smarty->addPluginsDir(PATH_LIBRARY . "/SmartyPlugins");
             $smarty->setDebugTemplate(PATH_APPLICATIONS . "/dashboard/views/debug.tpl");
             $smarty->registerPlugin("function", "debug_vars", [$this, "debugVars"], false);
+            $smarty->addDefaultModifiers(["default:false"]);
 
             //         Gdn::pluginManager()->Trace = TRUE;
             Gdn::pluginManager()->callEventHandlers($smarty, "Gdn_Smarty", "Init");

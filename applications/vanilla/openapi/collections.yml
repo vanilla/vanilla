@@ -10,7 +10,7 @@ paths:
                   name: collectionID
                   required: false
                   schema:
-                      $ref: "#/components/schemas/RangeExpression"
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
                 - description: Filter by collection name
                   in: query
                   name: name
@@ -19,7 +19,7 @@ paths:
                       type: string
                       minLength: 1
                       maxLength: 255
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: Desired number of collections per page.
                   in: query
                   name: limit
@@ -37,7 +37,7 @@ paths:
                                 type: array
                     description: Success
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
             tags:
                 - Collections
         post:
@@ -55,15 +55,15 @@ paths:
                                 $ref: "#/components/schemas/FullCollectionSchema"
                     description: Success.
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
                 "400":
                     description: Bad Request
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/BasicError"
+                                $ref: "../../dashboard/openapi/responses.yml#/components/schemas/BasicError"
             tags:
                 - Collections
     /collections/{id}:
@@ -84,9 +84,9 @@ paths:
                                 $ref: "#/components/schemas/FullCollectionSchema"
                     description: Success
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
             tags:
                 - Collections
         patch:
@@ -104,15 +104,15 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/Collection"
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
                 "400":
                     description: Bad Request
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/BasicError"
+                                $ref: "../../dashboard/openapi/responses.yml#/components/schemas/BasicError"
             tags:
                 - Collections
         delete:
@@ -121,9 +121,9 @@ paths:
                 "204":
                     description: Success.
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
             tags:
                 - Collections
     /collections/{id}/content/{locale}:
@@ -150,9 +150,9 @@ paths:
                                 $ref: "#/components/schemas/CollectionContentSchema"
                     description: Success
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
             tags:
                 - Collections
     /collections/by-resource:
@@ -181,9 +181,9 @@ paths:
                                     $ref: "#/components/schemas/Collection"
                     description: Success
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
             tags:
                 - Collections
         put:
@@ -224,9 +224,9 @@ paths:
                                 $ref: "#/components/schemas/CollectionContentSchema"
                     description: Success
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
             tags:
                 - Collections
 components:

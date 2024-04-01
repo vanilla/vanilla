@@ -1,0 +1,49 @@
+[
+    {
+        "type": "rich_embed_card",
+        "children": [
+            {
+                "text": ""
+            }
+        ],
+        "dataSourceType": "url",
+        "url": "https://olivierlamycanuel.vanillademo.com/discussion/comment/18819#Comment_18819",
+        "embedData": {
+            "recordID": 18819,
+            "recordType": "comment",
+            "body": "<p><a href=\"https://olivierlamycanuel.vanillademo.com/discussion/2462/test\">https://olivierlamycanuel.vanillademo.com/discussion/2462/test</a></p><p>Inner quote</p>",
+            "bodyRaw": "[{\"type\":\"rich_embed_card\",\"children\":[{\"text\":\"\"}],\"dataSourceType\":\"url\",\"url\":\"https://olivierlamycanuel.vanillademo.com/discussion/2462/test\",\"embedData\":{\"recordID\":2462,\"recordType\":\"discussion\",\"body\":\"<p>This shouldn't be in the quote</p>\",\"bodyRaw\":\"[{\\\"type\\\":\\\"p\\\",\\\"children\\\":[{\\\"text\\\":\\\"This shouldn't be in the quote\\\"}]}]\",\"format\":\"rich2\",\"dateInserted\":\"2024-03-05T14:27:19+00:00\",\"insertUser\":{\"userID\":1,\"name\":\"System\",\"url\":\"https://olivierlamycanuel.vanillademo.com/profile/System\",\"photoUrl\":\"https://w3.vanillicon.com/v2/359d2bb0a78b6f3f4f4a45d0705cf226.svg\",\"dateLastActive\":\"2024-03-05T14:26:44+00:00\",\"banned\":0,\"punished\":0,\"private\":false},\"displayOptions\":{\"showUserLabel\":false,\"showCompactUserInfo\":true,\"showDiscussionLink\":true,\"showPostLink\":true,\"showCategoryLink\":false,\"renderFullContent\":false,\"expandByDefault\":false},\"url\":\"https://olivierlamycanuel.vanillademo.com/discussion/2462/test\",\"embedType\":\"quote\",\"name\":\"test\"}},{\"type\":\"p\",\"children\":[{\"text\":\"Inner quote\"}]}]",
+            "format": "rich2",
+            "dateInserted": "2024-03-05T14:31:01+00:00",
+            "insertUser": {
+                "userID": 1,
+                "name": "System",
+                "url": "https://olivierlamycanuel.vanillademo.com/profile/System",
+                "photoUrl": "https://w3.vanillicon.com/v2/359d2bb0a78b6f3f4f4a45d0705cf226.svg",
+                "dateLastActive": "2024-03-05T14:26:44+00:00",
+                "banned": 0,
+                "punished": 0,
+                "private": false
+            },
+            "displayOptions": {
+                "showUserLabel": false,
+                "showCompactUserInfo": true,
+                "showDiscussionLink": false,
+                "showPostLink": false,
+                "showCategoryLink": false,
+                "renderFullContent": false,
+                "expandByDefault": false
+            },
+            "url": "https://olivierlamycanuel.vanillademo.com/discussion/comment/18819#Comment_18819",
+            "embedType": "quote"
+        }
+    },
+    {
+        "type": "p",
+        "children": [
+            {
+                "text": "Outter quote"
+            }
+        ]
+    }
+]

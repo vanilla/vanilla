@@ -70,5 +70,6 @@ export const tagClasses = useThemeCache(function (): { [key in TagPreset]: (appl
         greyscale: (applyStateStyles = false) => css(tagMixin(tagVars, presets.greyscale, applyStateStyles)),
         colored: (applyStateStyles = false) => css(tagMixin(tagVars, presets.colored, applyStateStyles)),
         success: (applyStateStyles = false) => css(tagMixin(tagVars, presets.success, applyStateStyles)),
+        error: (applyStateStyles = false) => css(tagMixin(tagVars, presets.error, applyStateStyles)),
     };
 });

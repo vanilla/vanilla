@@ -136,6 +136,7 @@ export enum TagPreset {
     GREYSCALE = "greyscale",
     COLORED = "colored",
     SUCCESS = "success",
+    ERROR = "error",
 }
 
 export const tagPresetVariables = useThemeCache(function (): { [key in TagPreset]: TagType } {
@@ -265,12 +266,27 @@ export const tagPresetVariables = useThemeCache(function (): { [key in TagPreset
         borderColorState: successBaseColor,
     });
 
+    const errorBaseColor = ensureColorHelper(globalVars.messageColors.error.fg);
+    const errorBgColor = ColorsUtils.isLightColor(errorBaseColor)
+        ? errorBaseColor.darken(0.6)
+        : errorBaseColor.lighten(0.57);
+
+    let error: TagType = makeThemeVars("error", {
+        fontColor: errorBaseColor,
+        bgColor: errorBgColor,
+        borderColor: errorBaseColor,
+        fontColorState: errorBaseColor,
+        bgColorState: errorBgColor,
+        borderColorState: errorBaseColor,
+    });
+
     return {
         primary,
         standard,
         greyscale,
         colored,
         success,
+        error,
     };
 });
 

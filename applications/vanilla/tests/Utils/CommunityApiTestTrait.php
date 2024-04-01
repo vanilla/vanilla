@@ -421,4 +421,29 @@ trait CommunityApiTestTrait
         $result = $this->categoryModel->getAllowedDiscussionData($permissionCategory, $actual);
         $this->assertEquals($expected, array_keys($result));
     }
+
+    /**
+     * Make a reaction on a discussion.
+     *
+     * @param $discussionOrDiscussionID
+     * @param string $reactionType
+     */
+    public function reactDiscussion($discussionOrDiscussionID, string $reactionType)
+    {
+        $discussionID = is_array($discussionOrDiscussionID)
+            ? $discussionOrDiscussionID["discussionID"]
+            : $discussionOrDiscussionID;
+        $response = $this->api()->post(
+            "/discussions/$discussionID/reactions",
+            [
+                "reactionType" => $reactionType,
+            ],
+            [],
+            ["throw" => false]
+        );
+        if (!$response->isSuccessful() && $response->getStatusCode() !== 410) {
+            // 410 is a known response to a spam reaction.
+            throw $response->asException();
+        }
+    }
 }

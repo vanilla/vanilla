@@ -8,9 +8,11 @@ import { IApiError, ILoadable, LoadStatus } from "@library/@types/api/core";
 import { queryResultToILoadable } from "@library/ReactQueryUtils";
 import { IntegrationsApi } from "@library/features/discussions/integrations/Integrations.api";
 import {
+    CustomIntegrationContext,
     IAttachment,
     IAttachmentIntegration,
     IAttachmentIntegrationCatalog,
+    ICustomIntegrationContext,
     IIntegrationsApi,
     IPostAttachmentParams,
 } from "@library/features/discussions/integrations/Integrations.types";
@@ -51,7 +53,7 @@ export function AttachmentIntegrationsApiContextProvider({
     );
 }
 
-export const INTEGRATIONS_META_KEY = "integrations";
+export const INTEGRATIONS_META_KEY = "externalAttachments";
 
 function getIntegrationsFromMeta(): IAttachmentIntegrationCatalog | undefined {
     return getMeta(INTEGRATIONS_META_KEY, undefined);
@@ -99,12 +101,27 @@ export function AttachmentIntegrationsContextProvider(
     );
 }
 
+/**
+ * Additional context values for customizing integrations from a plugin.
+ */
+const customIntegrationContext: Record<string, CustomIntegrationContext> = {};
+export function registerCustomIntegrationContext(name: string, hook: CustomIntegrationContext) {
+    customIntegrationContext[name] = hook;
+}
+
 export interface IIntegrationContextValue {
     getSchema: () => Promise<JsonSchema>;
     schema: ILoadable<JsonSchema>;
     postAttachment: (values: IPostAttachmentParams) => Promise<IAttachment>;
     label: IAttachmentIntegration["label"];
     submitButton: IAttachmentIntegration["submitButton"];
+    title: IAttachmentIntegration["title"];
+    externalIDLabel: IAttachmentIntegration["externalIDLabel"];
+    logoIcon: IAttachmentIntegration["logoIcon"];
+    // context customizations
+    transformLayout?: ICustomIntegrationContext["transformLayout"];
+    beforeSubmit?: ICustomIntegrationContext["beforeSubmit"];
+    CustomIntegrationForm?: ICustomIntegrationContext["CustomIntegrationForm"];
 }
 
 export const IntegrationContext = createContext<IIntegrationContextValue>({
@@ -113,6 +130,9 @@ export const IntegrationContext = createContext<IIntegrationContextValue>({
     postAttachment: async () => ({} as any),
     label: "",
     submitButton: "",
+    title: "",
+    externalIDLabel: "",
+    logoIcon: "meta-external",
 });
 
 export function useIntegrationContext() {
@@ -131,7 +151,15 @@ export function IntegrationContextProvider(
     const { children, attachmentType, recordType, recordID } = props;
 
     const integration = integrations.find((i) => i.attachmentType === attachmentType);
-    const { label, submitButton } = integration ?? { label: "", submitButton: "" };
+    const {
+        label = "",
+        submitButton = "",
+        title = "",
+        externalIDLabel = "",
+        logoIcon = "meta-external",
+    } = integration ?? {};
+
+    const customContext = customIntegrationContext[attachmentType]?.();
 
     const schemaQuery = useQuery<unknown, IApiError, JsonSchema>({
         queryFn: async () => await api.getAttachmentSchema({ attachmentType, recordType, recordID }),
@@ -153,6 +181,9 @@ export function IntegrationContextProvider(
                 ...{
                     label,
                     submitButton,
+                    title,
+                    externalIDLabel,
+                    logoIcon,
                     schema,
                     getSchema: async () => {
                         const response = await schemaQuery.refetch();
@@ -162,6 +193,9 @@ export function IntegrationContextProvider(
                         const response = await postAttachment.mutateAsync(values);
                         return response;
                     },
+                    transformLayout: customContext?.transformLayout,
+                    beforeSubmit: customContext?.beforeSubmit,
+                    CustomIntegrationForm: customContext?.CustomIntegrationForm,
                 },
             }}
         >

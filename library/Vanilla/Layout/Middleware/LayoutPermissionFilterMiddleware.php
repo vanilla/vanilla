@@ -23,13 +23,13 @@ use Vanilla\Forms\SchemaForm;
 class LayoutPermissionFilterMiddleware extends AbstractMiddleware
 {
     /** @var Gdn_Session $session */
-    private Gdn_Session $session;
+    protected Gdn_Session $session;
 
     /** @var UserModel */
-    private UserModel $userModel;
+    protected UserModel $userModel;
 
     /** @var RoleModel */
-    private RoleModel $roleModel;
+    protected RoleModel $roleModel;
 
     /**
      * DI.

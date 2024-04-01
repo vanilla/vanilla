@@ -32,7 +32,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/BasicError"
+                                $ref: "responses.yml#/components/schemas/BasicError"
         post:
             summary: Create a new discussion status.
             tags:
@@ -51,11 +51,11 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/BasicError"
+                                $ref: "responses.yml#/components/schemas/BasicError"
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
     /discussions/statuses/{id}:
         parameters:
             - name: id
@@ -71,7 +71,7 @@ paths:
                 "200":
                     $ref: "#/components/responses/RecordStatusResponse"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
         patch:
             summary: Update a discussion status.
             tags:
@@ -89,11 +89,11 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/BasicError"
+                                $ref: "responses.yml#/components/schemas/BasicError"
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
         delete:
             summary: Delete a discussion status.
             tags:
@@ -106,11 +106,11 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/BasicError"
+                                $ref: "responses.yml#/components/schemas/BasicError"
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
 components:
     responses:
         RecordStatusResponse:

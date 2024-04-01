@@ -160,6 +160,7 @@ export const inputBlockClasses = useThemeCache(() => {
 
     const multiLine = (resize?: Property.Resize, overflow?: Property.Overflow) => {
         return css({
+            height: "auto",
             ...Mixins.padding({ vertical: 9 }),
             resize: (resize ? resize : "vertical") as Property.Resize,
             overflow: (overflow ? overflow : "auto") as Property.Overflow,

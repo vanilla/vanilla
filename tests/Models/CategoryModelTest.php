@@ -9,8 +9,10 @@ namespace VanillaTests\Models;
 
 use CategoriesApiController;
 use CategoryModel;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
+use Vanilla\Database\SetLiterals\Increment;
 use Vanilla\Schema\RangeExpression;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
@@ -50,6 +52,18 @@ class CategoryModelTest extends SiteTestCase
 
         $this->category = $this->insertCategories(1)[0];
         $this->categoryID = $this->category["CategoryID"];
+    }
+
+    /**
+     * Test that setExpressions work with caching.
+     */
+    public function testSetFieldWithSetExpression()
+    {
+        $this->categoryModel->setField($this->categoryID, ["CountComments" => 100]);
+        $this->assertEquals(100, CategoryModel::categories($this->categoryID)["CountComments"]);
+
+        $this->categoryModel->setField($this->categoryID, ["CountComments" => new Increment(50)]);
+        $this->assertEquals(150, CategoryModel::categories($this->categoryID)["CountComments"]);
     }
 
     /**
@@ -1058,12 +1072,12 @@ class CategoryModelTest extends SiteTestCase
                 $discussionID = $discussion["discussionID"];
                 $this->api()->get("discussions/{$discussionID}");
                 $this->fail("Discussion not deleted: {$discussionID}");
-            } catch (NotFoundException $e) {
-                $this->assertStringStartsWith("Discussion not found.", $e->getMessage());
+            } catch (ClientException $e) {
+                $this->assertStringStartsWith("Discussion has been deleted.", $e->getMessage());
             }
         }
 
-        $this->expectException(NotFoundException::class);
+        $this->expectExceptionCode(404);
         $this->expectExceptionMessage("Category not found.");
         $this->api()->get("categories/{$categoryID}");
     }

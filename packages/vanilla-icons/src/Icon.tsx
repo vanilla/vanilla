@@ -32,7 +32,6 @@ export function Icon(_props: IProps) {
                     {...(coreIcon as any)}
                     width={IconSize[size]}
                     height={IconSize[size]}
-                    viewBox={coreIcon.viewBox ?? undefined}
                     {...props}
                 >
                     <use xlinkHref={`#${icon}`} />

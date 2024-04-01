@@ -32,6 +32,7 @@ use Vanilla\Forum\Layout\View\NestedCategoryListPageLayoutView;
 use Vanilla\Forum\Models\CategoryCollectionProvider;
 use Vanilla\Forum\Models\CategorySiteMetaExtra;
 use Vanilla\Forum\Models\DiscussionCollectionProvider;
+use Vanilla\Forum\Models\ForumAggregateModel;
 use Vanilla\Forum\Models\ForumQuickLinksProvider;
 use Vanilla\Forum\Models\PostingSiteMetaExtra;
 use Vanilla\Forum\Models\ReactionsQuickLinksProvider;
@@ -78,6 +79,9 @@ class ForumContainerRules extends AddonContainerRules
     public function configureContainer(ContainerConfigurationInterface $container): void
     {
         $container
+            ->rule(ForumAggregateModel::class)
+            ->setShared(true)
+
             ->rule(LayoutHydrator::class)
             ->addCall("addReactResolver", [DiscussionAnnouncementsWidget::class])
             ->addCall("addReactResolver", [DiscussionDiscussionsWidget::class])

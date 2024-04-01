@@ -43,6 +43,8 @@ export interface ITabsProps {
     tabPanelClasses?: string;
     tabsRootClass?: string;
     tabClass?: string;
+    activeTabIndex?: number;
+    setActiveTabIndex?: (index: number) => void;
 }
 
 function PassThruKludge(props: any) {

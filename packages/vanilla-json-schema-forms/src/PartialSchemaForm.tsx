@@ -1,6 +1,6 @@
 /**
  * @author Dominic Lacaille <dominic.lacaille@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -14,32 +14,34 @@ import {
     ISchemaRenderProps,
     ISectionProps,
     JSONSchemaType,
-    JsonSchema,
 } from "./types";
 import { notEmpty } from "@vanilla/utils";
 import { TabbedSchemaForm } from "./TabbedSchemaForm";
 import { FormControlWrapper } from "./FormControlWrapper";
 import { FormWrapper } from "./FormWrapper";
 import { validateConditions, validationErrorsToFieldErrors } from "./utils";
-import { Schema } from "@cfworker/json-schema";
 
 export const RenderChildren = (props: React.PropsWithChildren<ISectionProps | IFormProps | IControlGroupProps>) => (
     <>{props.children}</>
 );
 
-interface IPartialProps extends IBaseSchemaFormProps, ISchemaRenderProps {
-    isRequired?: boolean;
-    inheritSchema?: JSONSchemaType;
-    onChange(instance: any): void;
-    onBlur?(fieldName: string): void;
+export interface IPartialSchemaFormProps {
+    /** onChange is a function that receives the current state as an argument, and should return the updated state. It is the function returned from `React.useState`, or as `setValues` from useFormik().  */
+    onChange: React.Dispatch<React.SetStateAction<any>>;
     disabled?: boolean;
-    groupName?: string;
-    hideDescriptionInLabels?: boolean;
+    onBlur?(fieldName: string): void;
     size?: "small" | "default";
     autocompleteClassName?: string;
+    hideDescriptionInLabels?: boolean;
 }
 
-export function PartialSchemaForm(props: IPartialProps) {
+interface IProps extends IBaseSchemaFormProps, ISchemaRenderProps, IPartialSchemaFormProps {
+    isRequired?: boolean;
+    inheritSchema?: JSONSchemaType;
+    groupName?: string;
+}
+
+export function PartialSchemaForm(props: IProps) {
     let {
         path,
         rootSchema,
@@ -55,8 +57,8 @@ export function PartialSchemaForm(props: IPartialProps) {
         FormControlGroup = RenderChildren,
         FormGroupWrapper,
         groupName,
-        hideDescriptionInLabels,
-        size,
+        hideDescriptionInLabels = false,
+        size = "default",
         autocompleteClassName,
     } = props;
 
@@ -148,9 +150,7 @@ export function PartialSchemaForm(props: IPartialProps) {
                                 FormControl={FormControl}
                                 FormControlGroup={FormControlGroup}
                                 FormGroupWrapper={FormGroupWrapper}
-                                onChange={(value) => {
-                                    onChange({ ...instance, [key]: value });
-                                }}
+                                onChange={props.onChange}
                                 onBlur={onBlur}
                                 isRequired={requiredProperties.includes(key)}
                                 groupName={key}
@@ -233,7 +233,32 @@ export function PartialSchemaForm(props: IPartialProps) {
                     rootInstance={rootInstance}
                     schema={schema}
                     rootSchema={rootSchema}
-                    onChange={onChange}
+                    onChange={(value) => {
+                        onChange((topLevelInstance: any) => {
+                            const pathArray = [...path];
+                            const changes = pathArray.reduceRight((acc, key, index) => {
+                                const spreadFromTopLevelInstance = pathArray.slice(0, index).reduce(
+                                    (acc, key) => ({
+                                        ...acc[`${key}`],
+                                    }),
+                                    topLevelInstance,
+                                );
+
+                                return index === pathArray.length - 1
+                                    ? {
+                                          ...spreadFromTopLevelInstance,
+                                          ...acc,
+                                          [`${key}`]: value,
+                                      }
+                                    : {
+                                          ...spreadFromTopLevelInstance,
+                                          [`${key}`]: acc,
+                                      };
+                            }, {});
+
+                            return { ...topLevelInstance, ...changes };
+                        });
+                    }}
                     required={props.isRequired}
                     validation={validation}
                     FormControl={FormControl}

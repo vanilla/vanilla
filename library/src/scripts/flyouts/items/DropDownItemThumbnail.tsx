@@ -22,6 +22,8 @@ export default function DropDownItemThumbnail(props: IProps) {
             className={cx(classes.thumbnailItem, isCompact ? classes.thumbnailItemSmall : undefined)}
             onClick={onClick}
             tabIndex={0}
+            role="button"
+            aria-label={label}
         >
             <span className={classes.thumbnailItemThumbnail}>{thumbnail}</span>
             <span className={classes.thumbnailItemLabel}>{label}</span>

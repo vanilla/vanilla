@@ -42,6 +42,7 @@ export const colorPickerClasses = useThemeCache(() => {
     const textInput = style("textInput", {
         position: "relative",
         ...textInputSizingFromFixedHeight(vars.sizing.height, builderVariables.input.fonts.size as number, 2, 0),
+        padding: "2px 8px",
         width: styleUnit(inputWidth),
         maxWidth: styleUnit(inputWidth), // Needed for Firefox.
         color: ColorsUtils.colorOut(builderVariables.defaultFont.color),

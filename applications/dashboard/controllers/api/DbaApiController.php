@@ -63,15 +63,11 @@ class DbaApiController extends AbstractApiController
                 "CountChildCategories",
                 "CountDiscussions",
                 "CountComments",
-                "LastDiscussionID",
-                "LastCommentID",
-                "LastDateInserted",
                 "CountFollowers",
 
                 // These ones can only be done after the previous ones are complete.
-                "CountAllComments",
-                "ParentLastCommentID",
-                "ParentLastDateInserted",
+                "CountAll",
+                "LastPost",
             ]),
         ];
 
@@ -105,19 +101,22 @@ class DbaApiController extends AbstractApiController
         foreach ($options as $key => $option) {
             $aggregates = $option->getAggregates();
             $finalAggregates = [];
+            $specialActions = [];
             $secondaryAggregates = [];
             foreach ($aggregates as $aggregate) {
                 $possibleMatches = ["{$key}.$aggregate", "{$key}.*"];
                 if (count(array_intersect($possibleMatches, $body["aggregates"]))) {
-                    if (
-                        in_array($aggregate, [
-                            // These ones can only be done after the previous ones are complete.
-                            "CountAllComments",
-                            "ParentLastCommentID",
-                            "ParentLastDateInserted",
-                        ])
-                    ) {
-                        $secondaryAggregates[] = $aggregate;
+                    if ($aggregate === "CountAll") {
+                        $option = clone $option;
+                        $option->setAggregates($secondaryAggregates);
+                        $specialActions[] = new LongRunnerAction(CategoryModel::class, "recalculateAllCountAlls", []);
+                    } elseif ($aggregate === "LastPost") {
+                        $option = clone $option;
+                        $option->setAggregates(["LastPost"]);
+                        $actions[] = new LongRunnerAction(AggregateCountModel::class, "processAggregateOption", [
+                            $option,
+                            $body["batchSize"] ?? null,
+                        ]);
                     } else {
                         $finalAggregates[] = $aggregate;
                     }
@@ -131,13 +130,8 @@ class DbaApiController extends AbstractApiController
                 ]);
             }
 
-            if (count($secondaryAggregates) > 0) {
-                $option = clone $option;
-                $option->setAggregates($secondaryAggregates);
-                $actions[] = new LongRunnerAction(AggregateCountModel::class, "processAggregateOption", [
-                    $option,
-                    $body["batchSize"] ?? null,
-                ]);
+            foreach ($specialActions as $specialAction) {
+                $actions[] = $specialAction;
             }
         }
 

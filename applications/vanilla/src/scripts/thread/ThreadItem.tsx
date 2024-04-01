@@ -5,7 +5,6 @@
  */
 
 import { IReaction } from "@dashboard/@types/api/reaction";
-import { css } from "@emotion/css";
 import { IUserFragment } from "@library/@types/api/users";
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import UserContent from "@library/content/UserContent";
@@ -14,12 +13,13 @@ import { PageBox } from "@library/layout/PageBox";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { IBoxOptions } from "@library/styles/cssUtilsTypes";
 import { BorderType } from "@library/styles/styleHelpersBorders";
-import { IThreadItemContext, ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
 import ThreadItemActions from "@vanilla/addon-vanilla/thread/ThreadItemActions";
 import { ThreadItemHeader } from "@vanilla/addon-vanilla/thread/ThreadItemHeader";
 import React from "react";
+import ThreadItemClasses from "@vanilla/addon-vanilla/thread/ThreadItem.classes";
+import { useThreadItemContext } from "./ThreadItemContext";
 
-interface IProps extends IThreadItemContext {
+interface IProps {
     content: string;
     editor?: React.ReactNode;
     contentMeta: React.ReactNode;
@@ -30,6 +30,7 @@ interface IProps extends IThreadItemContext {
     options?: React.ReactNode;
     actions?: React.ReactNode;
     reactions?: IReaction[];
+    attachmentsContent?: React.ReactNode;
 }
 
 function getThreadItemID(recordType: string, recordID: string | number) {
@@ -42,7 +43,9 @@ export function ThreadItem(props: IProps) {
 
     const headerHasUserPhoto = userPhotoLocation === "header";
 
-    let userContent = <UserContent content={content} className={css({ paddingTop: headerHasUserPhoto ? 12 : 2 })} />;
+    const classes = ThreadItemClasses(headerHasUserPhoto);
+
+    let userContent = <UserContent content={content} className={classes.userContent} />;
     if (collapsed) {
         userContent = (
             <CollapsableContent maxHeight={200} overshoot={250}>
@@ -51,7 +54,9 @@ export function ThreadItem(props: IProps) {
         );
     }
 
-    const itemID = getThreadItemID(props.recordType, props.recordID);
+    const { recordType, recordID } = useThreadItemContext();
+
+    const itemID = getThreadItemID(recordType, recordID);
 
     let result = (
         <>
@@ -66,6 +71,9 @@ export function ThreadItem(props: IProps) {
                     {userContent}
                     {props.actions}
                     <ThreadItemActions reactions={props.reactions} />
+                    {!!props.attachmentsContent && (
+                        <div className={classes.attachmentsContentWrapper}>{props.attachmentsContent}</div>
+                    )}
                 </>
             )}
         </>
@@ -73,20 +81,18 @@ export function ThreadItem(props: IProps) {
 
     if (!headerHasUserPhoto) {
         result = (
-            <div style={{ display: "flex", gap: 12 }}>
+            <div className={classes.resultWrapper}>
                 <ProfileLink userFragment={user}>
                     <UserPhoto size={UserPhotoSize.MEDIUM} userInfo={user} />
                 </ProfileLink>
-                <PageBox className={css({})}>{result}</PageBox>
+                <PageBox>{result}</PageBox>
             </div>
         );
     }
 
     return (
-        <ThreadItemContextProvider recordType={props.recordType} recordID={props.recordID} recordUrl={props.recordUrl}>
-            <PageBox id={itemID} options={{ borderType: BorderType.SEPARATOR_BETWEEN, ...props.boxOptions }}>
-                {result}
-            </PageBox>
-        </ThreadItemContextProvider>
+        <PageBox id={itemID} options={{ borderType: BorderType.SEPARATOR_BETWEEN, ...props.boxOptions }}>
+            {result}
+        </PageBox>
     );
 }

@@ -3,7 +3,7 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { ReactNode } from "react";
 import {
     IHomeWidgetItemOptions,
     HomeWidgetItemContentType,
@@ -22,7 +22,7 @@ import { BorderType } from "@library/styles/styleHelpersBorders";
 
 export interface IWidgetCommonProps {
     /** The title of the widget */
-    title?: string;
+    title?: ReactNode | string;
     /** The subtitle of the widget */
     subtitle?: string;
     /** Text describing the widget */

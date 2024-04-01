@@ -26,8 +26,8 @@ export class DiscussionFixture {
 
     public static mockDiscussion: IDiscussion = {
         ...this.commonFields,
-        url: "#",
-        canonicalUrl: "#",
+        url: "https://vanillaforum.com/discussion/10",
+        canonicalUrl: "https://vanillaforum.com/discussion/10",
         name: "Mock Discussion",
         body: "Mock discussion content",
         excerpt: "This is a mock discussion",

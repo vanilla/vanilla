@@ -14,10 +14,10 @@ import { quickLinksVariables } from "@library/navigation/QuickLinks.variables";
 import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
 import classNames from "classnames";
-import React from "react";
+import React, { ReactNode } from "react";
 
 interface IProps {
-    title?: string;
+    title?: ReactNode | string;
     links: Array<INavigationVariableItem & { count?: number; countLimit?: number | null }>;
     activePath?: string;
     containerOptions?: IHomeWidgetContainerOptions;

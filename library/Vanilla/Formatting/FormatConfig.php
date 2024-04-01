@@ -8,7 +8,7 @@
 namespace Vanilla\Formatting;
 
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Formatting\Formats\RichFormat;
+use Vanilla\Formatting\Formats\Rich2Format;
 
 /**
  * Class representing various configuration options for formatting.
@@ -38,7 +38,7 @@ class FormatConfig
     {
         $this->shouldReplaceNewLines = $config->get("Garden.Format.ReplaceNewlines", true);
         $this->useVanillaMarkdownFlavor = $config->get("Garden.Format.UseVanillaMarkdownFlavor", true);
-        $this->defaultDesktopFormat = $config->get("Garden.InputFormatter", RichFormat::FORMAT_KEY);
+        $this->defaultDesktopFormat = $config->get("Garden.InputFormatter", Rich2Format::FORMAT_KEY);
         $this->defaultMobileFormat = $config->get("Garden.MobileInputFormatter", $this->defaultDesktopFormat);
         $this->defaultFormat = isMobile() ? $this->defaultMobileFormat : $this->defaultDesktopFormat;
     }

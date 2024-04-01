@@ -31,7 +31,7 @@ paths:
                                 type: array
                     description: Success
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
         post:
             summary: Create a layout
             requestBody:
@@ -49,7 +49,7 @@ paths:
                                 $ref: "#/components/schemas/LayoutSchema"
                     description: Success
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
     /layouts/{id}:
         x-hidden: true
         parameters:
@@ -87,9 +87,9 @@ paths:
                                 $ref: "#/components/schemas/LayoutMetadata"
                     description: Success
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
         patch:
             summary: Update a layout
             tags:
@@ -107,9 +107,9 @@ paths:
                                 $ref: "#/components/schemas/LayoutSchema"
                     description: Success
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
                 "422":
                     $ref: "#/components/responses/CannotMutateImmutableLayoutResponse"
         delete:
@@ -120,9 +120,9 @@ paths:
                 "204":
                     description: Success
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
                 "422":
                     $ref: "#/components/responses/CannotMutateImmutableLayoutResponse"
     /layouts/{id}/edit:
@@ -148,9 +148,9 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/LayoutSchema"
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
                 "422":
                     $ref: "#/components/responses/CannotMutateImmutableLayoutResponse"
     /layouts/{id}/hydrate:
@@ -179,7 +179,7 @@ paths:
                 "200":
                     $ref: "#/components/responses/HydratedLayout"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
     /layouts/lookup-hydrate:
         x-hidden: true
         get:
@@ -221,7 +221,7 @@ paths:
                                     - $ref: "#/components/schemas/HydratedLayoutResponseSchema"
                                     - $ref: "#/components/schemas/LayoutRedirectResponseSchema"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
     /layouts/{id}/hydrate-assets:
         x-hidden: true
         parameters:
@@ -248,7 +248,7 @@ paths:
                 "200":
                     $ref: "#/components/responses/HydratedLayout"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
     /layouts/lookup-hydrate-assets:
         x-hidden: true
         get:
@@ -286,7 +286,7 @@ paths:
                 "200":
                     $ref: "#/components/responses/HydratedLayout"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
     /layouts/hydrate:
         x-hidden: true
         post:
@@ -317,7 +317,7 @@ paths:
                                     - $ref: "#/components/schemas/LayoutRedirectResponseSchema"
 
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
     /layouts/catalog:
         x-hidden: true
         get:
@@ -444,9 +444,9 @@ paths:
                                 $ref: "#/components/schemas/LayoutViewSchema"
                     description: Success
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
         put:
             summary: Add a view to a layout
             tags:
@@ -473,9 +473,9 @@ paths:
                                 $ref: "#/components/schemas/LayoutViewSchema"
                     description: Success
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
         delete:
             summary: Delete a layout View mapping
             parameters:
@@ -493,9 +493,9 @@ paths:
                 "204":
                     description: Success
                 "403":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "responses.yml#/components/responses/NotFound"
 components:
     responses:
         CannotMutateImmutableLayoutResponse:
@@ -503,7 +503,7 @@ components:
             content:
                 application/json:
                     schema:
-                        $ref: "#/components/schemas/BasicError"
+                        $ref: "responses.yml#/components/schemas/BasicError"
         HydratedLayout:
             description: Success
             content:

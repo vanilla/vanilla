@@ -240,9 +240,17 @@ export const dashboardClasses = useThemeCache(() => {
         }),
     });
 
+    const inputWrapper = css({
+        display: "flex",
+        "& > input": {
+            flex: 1,
+        },
+    });
+
     return {
         subHeadingBackground,
         formList,
+        inputWrapper,
         helpAsset,
         tokenInput,
         selectOne,

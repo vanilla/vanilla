@@ -10,6 +10,7 @@ namespace Vanilla\Dashboard\Controllers\Api;
 use AbstractApiController;
 use AttachmentModel;
 use Garden\Container\ContainerException;
+use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Gdn;
 use Vanilla\Dashboard\Models\ExternalIssueService;
@@ -106,6 +107,7 @@ class AttachmentsApiController extends AbstractApiController
      * Fetch the attachment schemas of the available external providers.
      *
      * @return Data
+     * @deprecated Get the catalog from the SiteMetaExtra instead.
      */
     public function get_catalog(): Data
     {
@@ -156,6 +158,41 @@ class AttachmentsApiController extends AbstractApiController
         $schema = $baseSchema->merge($providerSchema);
 
         return new Data($schema);
+    }
+
+    /**
+     * Accepts an array of attachmentIDs and refreshes the associated data using the external issue provider.
+     *
+     * @param array $body
+     * @return Data
+     * @throws ClientException
+     */
+    public function post_refresh(array $body = [])
+    {
+        $this->permission("staff.allow");
+
+        $in = $this->schema(["attachmentIDs:a" => ["items" => "int"]]);
+        $body = $in->validate($body);
+        $attachmentIDs = array_unique($body["attachmentIDs"]);
+
+        if (count($attachmentIDs) > 10) {
+            throw new ClientException("Can't refresh more than 10 attachments");
+        }
+
+        $attachments = $this->attachmentModel->getWhere(["AttachmentID" => $attachmentIDs]);
+        $results = [];
+        foreach ($attachments as $attachment) {
+            $provider = $this->getProvider($attachment["Type"]);
+            if ($provider) {
+                $attachment = $provider->syncIssue($attachment);
+                $results[] = $attachment;
+            }
+        }
+
+        $this->normalizeAttachments($results);
+        $out = $this->schema([":a" => $this->attachmentModel->getAttachmentSchema()], "out");
+        $out->validate($results);
+        return new Data($results);
     }
 
     /**

@@ -13,14 +13,14 @@ paths:
                   description: Filter by a range or CSV of discussion IDs.
                   in: query
                   schema:
-                      $ref: "#/components/schemas/RangeExpression"
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
                 - description: Filter by a category.
                   in: query
                   name: categoryID
                   schema:
                       type: integer
-                - $ref: "#/components/parameters/DateInserted"
-                - $ref: "#/components/parameters/DateUpdated"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/DateInserted"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/DateUpdated"
                 - $ref: "#/components/parameters/DateLastComment"
                 - name: slotType
                   description: Filter to discussions created within a certain timeframe. Daily, Weekly, Monthly, Yearly, or all time.
@@ -44,7 +44,7 @@ paths:
                   in: query
                   name: tagID
                   schema:
-                      $ref: "#/components/schemas/RangeExpression"
+                      $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
                 - description: Filter by discussion type, or comma separated list.
                   in: query
                   name: type
@@ -98,7 +98,7 @@ paths:
                       enum:
                           - first
                           - mixed
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: >
                       Desired number of items per page. **Note that you may not get the exact number of records back as specified
                       with the limit unless you also specify pinOrder=mixed**. This is an optimization for pinned
@@ -207,7 +207,7 @@ paths:
     /discussions/bookmarked:
         get:
             parameters:
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: |
                       Desired number of items per page.
                   in: query
@@ -292,7 +292,7 @@ paths:
                   schema:
                       minLength: 1
                       type: string
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: |
                       Desired number of items per page.
                   in: query
@@ -796,7 +796,7 @@ paths:
                       minLength: 1
                       type: string
                   allowEmptyValue: true
-                - $ref: "#/components/parameters/Page"
+                - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
                 - description: |
                       Desired number of items per page.
                   in: query
@@ -857,6 +857,22 @@ paths:
                                     type: object
                                 type: array
                     description: Success
+                410:
+                    description: Gone
+                    content:
+                        "application/json":
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        description: The message.
+                                    operation:
+                                        type: string
+                                        enum: ["Delete", "Spam"]
+                                    logID:
+                                        type: integer
+                                        description: The log ID.
             tags:
                 - Discussions
             summary: Get reactions to a discussion.
@@ -1021,7 +1037,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/TagReference"
+                            $ref: "tags.yml#/components/schemas/TagReference"
             responses:
                 "200":
                     description: Success.
@@ -1030,11 +1046,11 @@ paths:
                             schema:
                                 type: array
                                 items:
-                                    $ref: "#/components/schemas/TagFragment"
+                                    $ref: "tags.yml#/components/schemas/TagFragment"
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
         post:
             summary: Add tags to a discussion.
             tags:
@@ -1043,7 +1059,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/TagReference"
+                            $ref: "tags.yml#/components/schemas/TagReference"
             responses:
                 "200":
                     description: Success.
@@ -1052,11 +1068,11 @@ paths:
                             schema:
                                 type: array
                                 items:
-                                    $ref: "#/components/schemas/TagFragment"
+                                    $ref: "tags.yml#/components/schemas/TagFragment"
                 "401":
-                    $ref: "#/components/responses/PermissionError"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
                 "404":
-                    $ref: "#/components/responses/NotFound"
+                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/NotFound"
     "/discussions/{id}/dismiss":
         put:
             parameters:

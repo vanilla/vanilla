@@ -12,7 +12,9 @@ import React from "react";
 
 interface IProps extends Omit<React.ComponentProps<typeof DiscussionCommentsAsset>, "comments" | "discussion"> {}
 
+const discussion = LayoutEditorPreviewData.discussion();
 const comments = LayoutEditorPreviewData.comments(5);
+
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
@@ -33,8 +35,8 @@ export function DiscussionCommentsAssetPreview(props: IProps) {
                         data: comments,
                         paging: LayoutEditorPreviewData.paging(props.apiParams?.limit ?? 30),
                     }}
-                    apiParams={{ discussionID: "fake", limit: 30, page: 1 }}
-                    discussion={{ ...LayoutEditorPreviewData.discussion() }}
+                    apiParams={{ discussionID: discussion.discussionID, limit: 30, page: 1 }}
+                    discussion={discussion}
                 />
             </QueryClientProvider>
         </Widget>

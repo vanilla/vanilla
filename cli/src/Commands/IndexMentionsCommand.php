@@ -50,9 +50,6 @@ class IndexMentionsCommand extends DatabaseCommand
     /** @var array */
     private array $records = ["discussion", "comment"];
 
-    /** @var int */
-    private int $batchSize = 1000;
-
     /** @var UserMentionsModel */
     private UserMentionsModel $userMentionsModel;
 
@@ -134,10 +131,9 @@ class IndexMentionsCommand extends DatabaseCommand
         foreach ($this->records as $recordType) {
             $offset = 0;
             $record = $this->indexableRecords[$recordType];
-
-            $results = $this->fetchPosts($record, $offset);
-            $maxID = $this->getMaxID($recordType);
             $currentMax = $record["from"];
+            $maxID = $this->getMaxID($record["id"], $record["table"], $record["to"]);
+            $results = $this->fetchPosts($record, $offset);
 
             if (empty($results)) {
                 $this->logger()->success("There are no {$recordType}s to index.");
@@ -199,29 +195,6 @@ class IndexMentionsCommand extends DatabaseCommand
     }
 
     /**
-     * Fetch the posts based on a recordType and a cursor.
-     *
-     * @param $record
-     * @param $offset
-     * @return array|null
-     */
-    protected function fetchPosts($record, $offset)
-    {
-        $sql = $this->getDatabase()->createSql();
-
-        $result = $sql
-            ->select([$record["id"], "Body", "Format", "DateInserted", $record["parentRecordID"]])
-            ->from($record["table"])
-            ->where([$record["id"] => new RangeExpression(">=", $record["from"], "<=", $record["to"])])
-            ->offset($offset)
-            ->limit($this->batchSize)
-            ->get()
-            ->resultArray();
-
-        return $result;
-    }
-
-    /**
      * Insert user mention records in bulk.
      *
      * @param array $rows
@@ -231,27 +204,6 @@ class IndexMentionsCommand extends DatabaseCommand
         $sql = $this->getDatabase()->createSql();
         $sql->options("Ignore", true);
         $sql->insert("userMention", $rows);
-    }
-
-    /**
-     * A comma-separated list of the records to be indexed (e.g. `discussion,comment`).
-     *
-     * @param string $records
-     */
-    public function setRecords(string $records): void
-    {
-        $records = explode(",", $records);
-        $this->records = $records;
-    }
-
-    /**
-     * Set the size of the batches to be indexed.
-     *
-     * @param int $batchSize
-     */
-    public function setBatchSize(int $batchSize): void
-    {
-        $this->batchSize = $batchSize;
     }
 
     /**
@@ -274,25 +226,5 @@ class IndexMentionsCommand extends DatabaseCommand
     {
         $this->indexableRecords["discussion"]["to"] = $to;
         $this->indexableRecords["comment"]["to"] = $to;
-    }
-
-    /**
-     * Return the highest value between the MaxID of a certain field or the $to argument.
-     *
-     * @param $recordType
-     * @return int
-     */
-    protected function getMaxID($recordType): int
-    {
-        $record = $this->indexableRecords[$recordType];
-        $sql = $this->getDatabase()->createSql();
-        $id = $record["id"];
-        $result = $sql
-            ->select($id, "max")
-            ->from($record["table"])
-            ->get()
-            ->firstRow(DATASET_TYPE_ARRAY);
-
-        return min($result[$id], $record["to"]);
     }
 }

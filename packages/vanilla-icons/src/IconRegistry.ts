@@ -34,6 +34,7 @@ const isWebpack = process.env.IS_WEBPACK ?? false;
 if (isWebpack) {
     iconRegistry.registerIcon("discussion-bookmark", require("../icons/discussion-bookmark.svg"));
     iconRegistry.registerIcon("discussion-bookmark-solid", require("../icons/discussion-bookmark-solid.svg"));
+    iconRegistry.registerIcon("logo-jira", require("../icons/logo-jira.svg"));
 }
 
 export { iconRegistry };

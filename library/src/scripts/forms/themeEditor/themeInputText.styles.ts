@@ -36,13 +36,16 @@ export const themeInputTextClasses = useThemeCache(() => {
     });
     const input = style("input", {
         ...{
-            [`&&.${classesInput.inputText}`]: inputMixin({
-                sizing: {
-                    height: vars.input.height,
-                },
-                font: vars.input.fonts,
-                border: vars.border,
-            }),
+            [`&&.${classesInput.inputText}`]: {
+                ...inputMixin({
+                    sizing: {
+                        height: vars.input.height,
+                    },
+                    font: vars.input.fonts,
+                    border: vars.border,
+                }),
+                padding: "2px 8px",
+            },
         },
     });
 

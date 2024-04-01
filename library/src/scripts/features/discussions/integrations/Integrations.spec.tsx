@@ -11,16 +11,17 @@ import {
     IntegrationContextProvider,
 } from "@library/features/discussions/integrations/Integrations.context";
 import {
+    FAKE_API,
     FAKE_INTEGRATION,
     FAKE_INTEGRATIONS_CATALOG,
     FAKE_INTEGRATION_SCHEMAS,
-    createMockApi,
 } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
 import { setMeta } from "@library/utility/appUtils";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RenderResult, act, fireEvent, render, within } from "@testing-library/react";
 import { IFormControl } from "@vanilla/json-schema-forms";
 import { IntegrationButtonAndModal } from "./Integrations";
+import { IIntegrationsApi } from "./Integrations.types";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -30,7 +31,11 @@ const queryClient = new QueryClient({
     },
 });
 
-const mockApi = createMockApi();
+const mockApi: IIntegrationsApi = {
+    getIntegrationsCatalog: jest.fn(FAKE_API.getIntegrationsCatalog),
+    getAttachmentSchema: jest.fn(FAKE_API.getAttachmentSchema),
+    postAttachment: jest.fn(FAKE_API.postAttachment),
+};
 
 beforeEach(() => {
     setMeta(INTEGRATIONS_META_KEY, undefined);

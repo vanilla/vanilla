@@ -18,6 +18,8 @@ import DateTime from "@library/content/DateTime";
 import { MetaIcon, MetaItem, MetaTag } from "@library/metas/Metas";
 import { metasClasses } from "@library/metas/Metas.styles";
 import { discussionListVariables } from "@library/features/discussions/DiscussionList.variables";
+import { getMeta } from "@library/utility/appUtils";
+import { ITag } from "@library/features/tags/TagsReducer";
 
 interface IProps {
     updateUser?: IUserFragment;
@@ -29,10 +31,11 @@ interface IProps {
     isForeign?: boolean;
     counts?: ICountResult[];
     extra?: React.ReactNode;
+    tags?: ITag[];
 }
 
 export function ResultMeta(props: IProps) {
-    const { dateUpdated, updateUser, labels, crumbs, status, type, isForeign, counts, extra } = props;
+    const { dateUpdated, updateUser, labels, crumbs, status, type, isForeign, counts, extra, tags } = props;
     const isDeleted = status === PublishStatus.DELETED;
 
     const typeMetaContents =
@@ -70,6 +73,8 @@ export function ResultMeta(props: IProps) {
 
     const displayDate = !!dateUpdated && !isNaN(new Date(dateUpdated).getTime());
 
+    const customLayoutsForDiscussionListIsEnabled = getMeta("featureFlags.customLayout.discussionList.Enabled", false);
+
     return (
         <>
             {labels &&
@@ -78,6 +83,22 @@ export function ResultMeta(props: IProps) {
                         {t(label)}
                     </MetaTag>
                 ))}
+
+            {tags?.map((tag) => {
+                const discussionsWithTagFilterUrl = customLayoutsForDiscussionListIsEnabled
+                    ? `/discussions?tagID=${tag.tagID}`
+                    : `/discussions/tagged/${tag.urlcode}`;
+
+                return (
+                    <MetaTag
+                        key={tag.tagID}
+                        to={discussionsWithTagFilterUrl}
+                        tagPreset={discussionListVariables().userTags.tagPreset}
+                    >
+                        {t(tag.name)}
+                    </MetaTag>
+                );
+            })}
 
             {typeMetaContents && (
                 <MetaItem>

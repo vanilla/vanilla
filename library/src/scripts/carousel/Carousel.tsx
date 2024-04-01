@@ -4,7 +4,7 @@
  * @license GPL-2.0-only
  */
 
-import React, { useRef, useState, useEffect, useMemo } from "react";
+import React, { useRef, useState, useEffect, useMemo, ReactNode } from "react";
 import { useMeasure } from "@vanilla/react-utils";
 import _debounce from "lodash/debounce";
 import _range from "lodash/range";
@@ -47,7 +47,7 @@ const initCarouselState: CarouselState = {
 };
 interface IProps {
     children: React.ReactNode;
-    carouselTitle?: string;
+    carouselTitle?: string | ReactNode;
     showPaging?: boolean;
     maxSlidesToShow?: number;
 }

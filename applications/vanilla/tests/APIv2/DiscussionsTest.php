@@ -1857,8 +1857,9 @@ laquelle j’ai envie de donner vie.</p>";
             );
         }, $this->adminID);
 
-        //Query in as guest
+        // Query as a guest
 
+        DiscussionModel::cleanForTests();
         $this->runWithUser(function () use ($publicDiscussion, $privateDiscussion) {
             $result = $this->api()
                 ->get($this->baseUrl, [

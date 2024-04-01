@@ -354,9 +354,7 @@ class CommentModelTest extends SiteTestCase
             $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
 
             $userMeta = [
-                sprintf("Preferences.Email.NewComment.%d", $categoryAdmin["categoryID"]) => $categoryAdmin[
-                    "categoryID"
-                ],
+                sprintf("Preferences.Email.NewComment.%d", $categoryAdmin["categoryID"]) => 1,
             ];
             $this->userModel::setMeta($memberUser["userID"], $userMeta);
 

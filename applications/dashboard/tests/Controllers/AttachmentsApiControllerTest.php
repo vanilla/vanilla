@@ -42,9 +42,9 @@ class AttachmentsApiControllerTest extends SiteTestCase
     /**
      * Test posting an attachment for a discussion.
      *
-     * @return void
+     * @return array
      */
-    public function testPostDiscussionAttachment(): void
+    public function testPostDiscussionAttachment(): array
     {
         $discussion = $this->createDiscussion();
         $attachmentData = $this->createAttachmentPostData("discussion", $discussion["discussionID"]);
@@ -58,6 +58,8 @@ class AttachmentsApiControllerTest extends SiteTestCase
         foreach ($expectedAttachmentData as $field => $value) {
             $this->assertSame($attachment[$field], $value);
         }
+
+        return $attachment;
     }
 
     /**
@@ -310,5 +312,26 @@ class AttachmentsApiControllerTest extends SiteTestCase
             "recordType" => "discussion",
             "recordID" => $discussion["discussionID"],
         ]);
+    }
+
+    /**
+     * Test refreshing attachments using the attachments/refresh endpoint.
+     *
+     * @depends testPostDiscussionAttachment
+     * @return void
+     */
+    public function testAttachmentsRefresh($attachment)
+    {
+        $attachments = $this->api()
+            ->post("attachments/refresh", ["attachmentIDs" => [$attachment["attachmentID"]]])
+            ->getBody();
+        $this->assertCount(1, $attachments);
+        $this->assertArrayHasKey(0, $attachments);
+
+        $metadata = array_column($attachments[0]["metadata"], "value", "labelCode");
+        $this->assertArrayHasKey("specialMockField1", $metadata);
+        $this->assertEquals("foo_updated", $metadata["specialMockField1"]);
+        $this->assertArrayHasKey("specialMockField2", $metadata);
+        $this->assertEquals("bar_updated", $metadata["specialMockField2"]);
     }
 }

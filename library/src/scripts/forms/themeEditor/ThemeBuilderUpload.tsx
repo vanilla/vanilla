@@ -79,7 +79,7 @@ export function ThemeBuilderUpload(props: IProps) {
                             }
                         }}
                     />
-                    <span>{t("Choose Image")}</span>
+                    <span className={classes.choose}>{t("Choose Image")}</span>
                 </label>
                 <span className={classes.optionContainer}>
                     <span className={classes.imagePreviewContainer}>

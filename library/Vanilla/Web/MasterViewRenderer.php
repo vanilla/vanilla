@@ -96,6 +96,7 @@ class MasterViewRenderer
             "cssClasses" => ["isLoading"],
             "pageHead" => $page->getHead()->renderHtml(),
             "title" => $page->getSeoTitle(),
+            "useNoScript" => true,
         ];
         $data = array_merge($this->getSharedData(), $extraData, $viewData);
         $data["cssClasses"] = implode(" ", $data["cssClasses"]);

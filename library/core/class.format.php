@@ -975,18 +975,6 @@ class Gdn_Format
     }
 
     /**
-     * Returns embedded video width and height, based on configuration.
-     *
-     * @return array array(Width, Height)
-     * @deprecated 3.2 \Vanilla\EmbeddedContent\EmbedConfig::getLegacyEmbedSize()
-     */
-    public static function getEmbedSize()
-    {
-        deprecated(__FUNCTION__, "\Vanilla\EmbeddedContent\EmbedConfig::getLegacyEmbedSize()");
-        return self::getEmbedConfig()->getLegacyEmbedSize();
-    }
-
-    /**
      * Format a string using Markdown syntax.
      *
      * @param mixed $mixed An object, array, or string to be formatted.

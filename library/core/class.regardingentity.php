@@ -427,8 +427,6 @@ class Gdn_RegardingEntity extends Gdn_Pluggable
                         if (!$discussionID) {
                             throw new Gdn_UserException($discussionModel->Validation->resultsText());
                         }
-
-                        $discussionModel->updateDiscussionCount($categoryID);
                     } else {
                         // Add a comment to the existing discussion.
                         $commentModel = new CommentModel();

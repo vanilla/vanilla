@@ -45,6 +45,10 @@ export const listItemClasses = useThemeCache(
                 }),
         });
 
+        const itemCentered = css({
+            alignItems: "center",
+        });
+
         const checkboxContainer = css({
             marginRight: "8px",
             ...(isTile && {
@@ -288,6 +292,7 @@ export const listItemClasses = useThemeCache(
         return {
             listInTab,
             item,
+            itemCentered,
             checkboxContainer,
             contentContainer,
             actionsContainer,

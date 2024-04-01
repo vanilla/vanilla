@@ -449,13 +449,18 @@ class UserMentionsModel extends PipelineModel implements LoggerAwareInterface, S
             ->structure()
             ->table("userMention")
             ->column("userID", "int", false, ["primary", "index.userMention"])
-            ->column("recordType", ["discussion", "comment"], false, ["primary", "index.userMention", "index.record"])
+            ->column("recordType", ["discussion", "comment"], false, [
+                "primary",
+                "index.userMention",
+                "index.record",
+                "index.userID_status",
+            ])
             ->column("recordID", "int", false, ["primary", "index.userMention", "index.record"])
             ->column("mentionedName", "varchar(100)", null)
             ->column("parentRecordType", "varchar(20)", null)
             ->column("parentRecordID", "int", null)
             ->column("dateInserted", "datetime", null)
-            ->column("status", ["active", "removed", "toDelete"], "active")
+            ->column("status", ["active", "removed", "toDelete"], "active", ["index.userID_status"])
             ->set($explicit, $drop);
     }
 }

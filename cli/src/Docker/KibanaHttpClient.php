@@ -51,17 +51,17 @@ class KibanaHttpClient extends HttpClient
             "nginx-" => "Nginx Logs",
             "vf_" => "Site Search Data",
         ];
-        foreach ($templatesNames as $pattern => $title) {
+        foreach ($templatesNames as $pattern => $label) {
             $attrs = [
-                "name" => "{$pattern}*",
-                "title" => $title,
+                "title" => "{$pattern}*",
+                "name" => $label,
                 "timeFieldName" => $pattern === "vf_" ? "dateInserted" : "@timestamp",
             ];
             $this->put("/api/saved_objects/index-pattern/{$pattern}star", [
                 "upsert" => $attrs,
                 "attributes" => $attrs,
             ]);
-            $this->logger()->info("Created data view pattern <yellow>{$title}</yellow>");
+            $this->logger()->info("Created data view pattern <yellow>{$label}</yellow>");
         }
 
         // Setup default configs.

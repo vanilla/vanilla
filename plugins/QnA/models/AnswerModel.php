@@ -52,14 +52,17 @@ class AnswerModel implements EventFromRowInterface
     public function normalizeRow(array $row): array
     {
         $out = $this->commentModel->schema()->merge(Schema::parse(["qnA:s?", "dateAccepted:s?", "acceptUserID:s?"]));
+        // Preserve original attributes
+        $attributes = $row["attributes"] ?? [];
 
         $validatedRow = $out->validate($row);
 
-        $validatedRow["attributes"]["answer"] = [
+        $attributes["answer"] = [
             "status" => !empty($validatedRow["qnA"]) ? strtolower($validatedRow["qnA"]) : "pending",
             "dateAccepted" => $validatedRow["dateAccepted"] ?? null,
             "acceptUserID" => $validatedRow["acceptedUserID"] ?? null,
         ];
+        $validatedRow["attributes"] = $attributes;
 
         return $validatedRow;
     }

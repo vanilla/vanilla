@@ -22,6 +22,7 @@
             "@Online/*": ["./cloud/plugins/Online/src/scripts/*"],
             "@ElasticSearch/*": ["./cloud/plugins/ElasticSearch/src/scripts/*"],
             "@QnA/*": ["./plugins/QnA/src/scripts/*"],
+            "@vanilla-ai/*": ["./cloud/plugins/vanilla-ai/src/scripts/*"],
             "typestyle": ["./library/src/scripts/styles/styleShim.ts"],
             "@vanilla/babel-preset": ["./packages/vanilla-babel-preset/*"],
             "@vanilla/dom-utils": ["./packages/vanilla-dom-utils/*"],

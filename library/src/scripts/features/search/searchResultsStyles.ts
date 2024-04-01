@@ -169,9 +169,10 @@ export const searchResultClasses = useThemeCache(() => {
     });
 
     const highlight = css({
-        "b, strong, em": {
+        "b, strong, em, mark": {
             fontStyle: "normal",
             fontWeight: 700,
+            backgroundColor: "transparent",
         },
     });
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -255,7 +255,7 @@ class CategoriesApiController extends AbstractApiController
 
         $in = $this->idParamSchema()->setDescription("Get a category.");
         $query = $in->validate($query);
-        $expand = $query["expand"];
+        $expand = $query["expand"] ?? [];
 
         $out = $this->schema(
             CrawlableRecordSchema::applyExpandedSchema($this->schemaWithParent(), "category", $expand),
@@ -263,6 +263,9 @@ class CategoriesApiController extends AbstractApiController
         );
 
         $row = $this->category($id);
+
+        $rows = [&$row];
+        $this->joinCategoryExpandFields($rows, $expand);
         $row = $this->normalizeOutput($row, $expand);
 
         $result = $out->validate($row);
@@ -334,8 +337,11 @@ class CategoriesApiController extends AbstractApiController
      *
      * @param array $query The query string.
      * @return Data
+     * @throws HttpException
+     * @throws PermissionException
+     * @throws ValidationException
      */
-    public function get_search(array $query)
+    public function get_search(array $query): Data
     {
         $this->permission();
 
@@ -343,6 +349,18 @@ class CategoriesApiController extends AbstractApiController
             "query:s" => [
                 "description" => "Category name filter.",
                 "minLength" => 0,
+            ],
+            "displayAs:a?" => [
+                "description" => "DisplayAs filter.",
+                "items" => [
+                    "type" => "string",
+                    "enum" => [
+                        Categorymodel::DISPLAY_NESTED,
+                        Categorymodel::DISPLAY_DISCUSSIONS,
+                        Categorymodel::DISPLAY_FLAT,
+                        CategoryModel::DISPLAY_HEADING,
+                    ],
+                ],
             ],
             "page:i?" => [
                 "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
@@ -378,6 +396,10 @@ class CategoriesApiController extends AbstractApiController
             }
         }
 
+        if ($query["displayAs"] ?? false) {
+            $where["DisplayAs"] = $query["displayAs"];
+        }
+
         $results = $this->categoryModel->searchByName(
             $query["query"],
             $query["parentCategoryID"] ?? null,
@@ -410,7 +432,7 @@ class CategoriesApiController extends AbstractApiController
             $this->idParamSchema = $this->schema(
                 Schema::parse([
                     "id:i" => "The category ID.",
-                    "expand?" => ApiUtils::getExpandDefinition([]),
+                    "expand?" => ApiUtils::getExpandDefinition(["lastPost"]),
                 ]),
                 $type
             );
@@ -689,10 +711,10 @@ class CategoriesApiController extends AbstractApiController
      * Expand on Category
      *
      * @param array $rows
-     * @param array $expand
+     * @param array|bool|string $expand
      * @return void
      */
-    private function joinCategoryExpandFields(array &$rows, array $expand, ?int $userID = null): void
+    private function joinCategoryExpandFields(array &$rows, $expand, ?int $userID = null): void
     {
         if (ModelUtils::isExpandOption("lastPost", $expand)) {
             CategoryModel::joinRecentPosts($rows, null);
@@ -1070,7 +1092,10 @@ class CategoriesApiController extends AbstractApiController
      */
     public function schemaWithParent($expand = false, $type = "")
     {
-        $attributes = ["parentCategoryID:i|n" => "Parent category ID."];
+        $attributes = [
+            "parentCategoryID:i|n" => "Parent category ID.",
+            "lastPost?" => \Vanilla\SchemaFactory::get(PostFragmentSchema::class, "PostFragment"),
+        ];
         if ($expand) {
             $attributes["parent:o?"] = Schema::parse(["categoryID", "name", "urlcode", "url"])->add(
                 $this->fullSchema()
@@ -1203,7 +1228,7 @@ class CategoriesApiController extends AbstractApiController
         // Drop off the root category.
         unset($categories[-1]);
 
-        categoryModel::joinUserData($categories, true, $userID);
+        \CategoryModel::joinUserData($categories, true, $userID);
 
         if (isset($sort) && $sort == "dateFollowed" && count($categories) > 1) {
             $compare = function ($compare1, $compare2) use ($orderDirection) {

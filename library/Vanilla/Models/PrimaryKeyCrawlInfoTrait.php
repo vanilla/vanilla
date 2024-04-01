@@ -62,7 +62,7 @@ trait PrimaryKeyCrawlInfoTrait
             [
                 "url" => $url,
                 "parameter" => $parameter,
-                "uniqueIDField" => $uniqueIDField ?? $parameter,
+                "uniqueIDField" => $uniqueIDField ?? "canonicalID",
                 "count" => $count,
             ] + $range;
         return $r;

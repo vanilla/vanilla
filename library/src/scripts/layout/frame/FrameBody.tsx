@@ -14,6 +14,7 @@ export interface IFrameBodyProps {
     hasVerticalPadding?: boolean;
     children: React.ReactNode;
     scrollable?: boolean; // DON'T use at the same time as the Modal scrollable.
+    style?: React.CSSProperties;
 }
 
 /**
@@ -29,6 +30,7 @@ export default class FrameBody extends React.PureComponent<IFrameBodyProps> {
                     isSelfPadded: this.props.selfPadded,
                     hasVerticalPadding: this.props.hasVerticalPadding,
                 })}
+                style={this.props.style}
             >
                 {this.props.children}
             </div>

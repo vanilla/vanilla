@@ -83,26 +83,30 @@ class GlobalSearchType extends AbstractSearchType
             $insertUserIDs[] = 0;
         }
 
-        if ($dateInserted = $query->getQueryParameter("dateInserted")) {
-            $query->setDateFilterSchema("dateInserted", $dateInserted);
-        }
-        $types = $query->getQueryParameter("types");
-
         ///
         /// Apply the query.
         ///
+        ///
 
-        if (!empty($types)) {
-            $query->setFilter("type.keyword", $types);
-        }
-
-        if ($insertUserIDs) {
-            $query->setFilter("insertUserID", $insertUserIDs);
+        // Global query
+        if ($dateInserted = $query->getQueryParameter("dateInserted")) {
+            $query->setDateFilterSchema("dateInserted", $dateInserted);
         }
 
         $locale = $query->getQueryParameter("locale");
         if ($locale) {
-            $query->setFilter("locale", [$locale, strtolower($locale), CrawlableRecordSchema::ALL_LOCALES]);
+            $query->setFilter(
+                "locale",
+                [$locale, strtolower($locale), CrawlableRecordSchema::ALL_LOCALES],
+                false,
+                SearchQuery::FILTER_OP_OR,
+                false
+            );
+        }
+
+        // Site specific query.
+        if ($insertUserIDs) {
+            $query->setFilter("insertUserID", $insertUserIDs);
         }
 
         // Sorts

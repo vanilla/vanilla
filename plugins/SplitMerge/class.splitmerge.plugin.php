@@ -8,12 +8,24 @@
  */
 
 use Vanilla\Community\Events\DiscussionEvent;
+use Vanilla\Forum\Models\ForumAggregateModel;
 
 /**
  * Class SplitMergePlugin
  */
 class SplitMergePlugin extends Gdn_Plugin
 {
+    /**
+     * @return ForumAggregateModel
+     * @throws \Garden\Container\ContainerException
+     * @throws \Garden\Container\NotFoundException
+     */
+    private function aggregateModel(): ForumAggregateModel
+    {
+        $aggregateModel = \Gdn::getContainer()->get(ForumAggregateModel::class);
+        return $aggregateModel;
+    }
+
     /**
      * Add "split" action link.
      *
@@ -136,11 +148,14 @@ class SplitMergePlugin extends Gdn_Plugin
                     ->put();
 
                 // Update counts on both discussions
-                $commentModel = new CommentModel();
-                $commentModel->updateCommentCount($discussionID);
-                //            $CommentModel->updateUserCommentCounts($DiscussionID);
-                $commentModel->updateCommentCount($newDiscussionID);
-                $commentModel->removePageCache($discussionID, 1);
+                $newDiscussion = $discussionModel->getID($newDiscussionID, DATASET_TYPE_ARRAY);
+                if ($newDiscussion) {
+                    $this->aggregateModel()->recalculateDiscussionAggregates($newDiscussion);
+                }
+                $oldDiscussion = $discussionModel->getID($discussionID, DATASET_TYPE_ARRAY);
+                if ($oldDiscussion) {
+                    $this->aggregateModel()->recalculateDiscussionAggregates($oldDiscussion);
+                }
 
                 // Dispatch a Discussion event (split)
                 $senderUserID = Gdn::session()->UserID;
@@ -301,8 +316,7 @@ class SplitMergePlugin extends Gdn_Plugin
                                 "Format" => "Html",
                             ];
                             $DiscussionModel->setField($Discussion["DiscussionID"], $RedirectDiscussion);
-                            $CommentModel->updateCommentCount($Discussion["DiscussionID"]);
-                            $CommentModel->removePageCache($Discussion["DiscussionID"]);
+                            $this->aggregateModel()->recalculateDiscussionAggregates($Discussion);
                         } else {
                             // Delete discussion that was merged.
                             $DiscussionModel->deleteID($Discussion["DiscussionID"]);
@@ -313,8 +327,7 @@ class SplitMergePlugin extends Gdn_Plugin
                     }
                 }
                 // Update counts on all affected discussions.
-                $CommentModel->updateCommentCount($MergeDiscussionID);
-                $CommentModel->removePageCache($MergeDiscussionID);
+                $this->aggregateModel()->recalculateDiscussionAggregates($MergeDiscussion);
 
                 // Clear selections
                 Gdn::userModel()->saveAttribute($Session->UserID, "CheckedDiscussions", []);

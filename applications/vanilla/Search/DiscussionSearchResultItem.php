@@ -24,7 +24,7 @@ class DiscussionSearchResultItem extends SearchResultItem
      */
     protected function extraSchema(): ?Schema
     {
-        return Schema::parse(["discussionID:i?", "tagIDs:a?", "labelCodes:a?"]);
+        return Schema::parse(["discussionID:i?", "tagIDs:a?", "labelCodes:a?", "tags:a?"]);
     }
 
     /**

@@ -30,7 +30,7 @@ class InstantScheduler extends DeferredScheduler
      */
     private $isPaused = false;
 
-    protected $logErrorsAsWarnings = true;
+    protected $logErrorsAsWarnings = false;
 
     private $scheduledJobs = [];
 

@@ -4,15 +4,18 @@
  * @license gpl-2.0-only
  */
 
+import { cx } from "@emotion/css";
 import { noticeClasses } from "@library/metas/Notice.styles";
 
 import React, { FunctionComponent } from "react";
 
-interface INoticeProps {}
+interface INoticeProps {
+    className?: string;
+}
 
-const Notice: FunctionComponent<INoticeProps> = ({ children }) => {
+const Notice: FunctionComponent<INoticeProps> = ({ children, className }) => {
     const classes = noticeClasses();
-    return <div className={classes.root}>{children}</div>;
+    return <div className={cx(classes.root, className)}>{children}</div>;
 };
 
 export default Notice;

@@ -25,12 +25,6 @@ class SiteTotalServiceTest extends SiteTestCase
      */
     public function testExpensiveThreshold()
     {
-        $this->resetTable("Discussion");
-        // 3 discussions is above the threshold.
-        $this->createDiscussion();
-        $this->createDiscussion();
-        $this->createDiscussion();
-
         // Pause the scheduler so the counts don't happen immediately.
         $this->getScheduler()->pause();
         $this->runWithConfig(
@@ -42,14 +36,14 @@ class SiteTotalServiceTest extends SiteTestCase
 
                 // Since we have 3 discussions it's calculations should be deferred until it finishes calculating.
                 // Do it a few times just to make sure it keeps returning that default value.
-                $service->getTotalForType("discussion");
-                $total = $this->getSiteTotalService()->getTotalForType("discussion");
+                $service->getTotalForType("user");
+                $total = $this->getSiteTotalService()->getTotalForType("user");
                 $this->assertEquals(-1, $total);
 
                 // Now unpause.
                 $this->getScheduler()->resume();
-                $total = $this->getSiteTotalService()->getTotalForType("discussion");
-                $this->assertEquals(3, $total);
+                $total = $this->getSiteTotalService()->getTotalForType("user");
+                $this->assertEquals(2, $total);
             }
         );
     }

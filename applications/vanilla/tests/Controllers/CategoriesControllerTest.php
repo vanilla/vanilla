@@ -128,6 +128,18 @@ class CategoriesControllerTest extends TestCase
     }
 
     /**
+     * Provides test cases for the most recent join with permission test.
+     */
+    public function providerMostRecentDataProvider()
+    {
+        // $role, $prefix, $expect
+        return [
+            ["member", "mem", ["title" => "(Restricted Content)", "urlMatch" => "/restricted-content/"]],
+            ["admin", "admin", ["title" => "privateDiscussion", "urlMatch" => "/privatediscussion/"]],
+        ];
+    }
+
+    /**
      * Test most recent discussion join with permissions.
      *
      * @param string $role
@@ -151,7 +163,6 @@ class CategoriesControllerTest extends TestCase
             [16]
         );
 
-        $user = $expected["userID"] === "apiUser" ? $this->api()->getUserID() : null;
         $discussionInPublic = $this->createDiscussion([
             "categoryID" => $publicChildCategory["categoryID"],
             "name" => "publicDiscussion",
@@ -168,7 +179,8 @@ class CategoriesControllerTest extends TestCase
             ->data("CategoryTree");
         $category = $data[0];
         $this->assertEquals($expected["title"], $category["LastTitle"]);
-        $this->assertEquals($user, $category["LastUserID"]);
+        $this->assertEquals($this->api()->getUserID(), $category["LastUserID"]);
+        $this->assertMatchesRegularExpression($expected["urlMatch"], $category["LastUrl"]);
     }
 
     /**
@@ -212,18 +224,6 @@ class CategoriesControllerTest extends TestCase
             $this->assertEquals(302, $exResponse->getStatus());
             $this->assertEquals($lvl2Category["url"], $exResponse->getMeta("HTTP_LOCATION"));
         }
-    }
-
-    /**
-     * Provides test cases for the most recent join with permission test.
-     */
-    public function providerMostRecentDataProvider()
-    {
-        // $role, $prefix, $expect
-        return [
-            ["member", "mem", ["title" => "", "userID" => null]],
-            ["admin", "admin", ["title" => "privateDiscussion", "userID" => "apiUser"]],
-        ];
     }
 
     /**

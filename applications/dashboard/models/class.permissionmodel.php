@@ -1707,24 +1707,45 @@ class PermissionModel extends Gdn_Model implements LoggerAwareInterface
     }
 
     /**
-     * Return all roles having a specific permission
+     * Return the roleIDs that have a particular permission.
+     * If the permission is a junction permission, the junction table and ID must be provided.
+     * If a junction table is provided, the mode {@link Permissions::CHECK_MODE_RESOURCE_IF_JUNCTION} will be used.
      *
-     * @param string $permissionColumn
-     *
+     * @param string $permissionName
+     * @param string|null $junctionTable
+     * @param int|null $junctionID
      * @return int[]
      */
-    public function getRoleIDsHavingSpecificPermission(string $permissionColumn): array
-    {
+    public function getRoleIDsHavingSpecificPermission(
+        string $permissionName,
+        ?string $junctionTable = null,
+        ?int $junctionID = null
+    ): array {
         $permissionsInc = \Gdn::userModel()->getPermissionsIncrement();
         return $this->modelCache->getCachedOrHydrate(
-            ["roleIDsByPermission", $permissionColumn, "inc" => $permissionsInc],
-            function () use ($permissionColumn) {
-                $permissionColumn = $this->SQL->escapeIdentifier($permissionColumn);
-                $roleIDs = $this->SQL
-                    ->select("RoleID")
+            ["roleIDsByPermission", $permissionName, $junctionTable, $junctionID, "inc" => $permissionsInc],
+            function () use ($permissionName, $junctionTable, $junctionID) {
+                $emptyPermissionInstance = $this->createPermissionInstance();
+                $resolvePermissionName = $emptyPermissionInstance->resolvePermissionName($permissionName);
+                $permissionColumn = $this->SQL->escapeIdentifier($resolvePermissionName);
+
+                $wheres = [
+                    $permissionColumn => 1,
+                ];
+                if ($junctionTable && $junctionID) {
+                    $resolveJunctionID = $emptyPermissionInstance->hasJunctionID($junctionTable, $junctionID)
+                        ? $emptyPermissionInstance->resolveJuntionAlias($junctionTable, $junctionID)
+                        : -1;
+                    $wheres = [
+                        "JunctionTable" => $junctionTable,
+                        "JunctionID" => $resolveJunctionID,
+                    ];
+                }
+
+                $roleIDs = $this->createSql()
                     ->from("Permission")
-                    ->where($permissionColumn, 1)
-                    ->where("JunctionTable", null)
+                    ->select("RoleID", "distinct")
+                    ->where($wheres)
                     ->get()
                     ->column("RoleID");
 

@@ -79,9 +79,10 @@ export function SearchPageContent() {
     const rightTopContent: ReactElement | undefined = SpecificRecordFilter ? (
         <SpecificRecordFilter />
     ) : currentDomain.PanelComponent ? (
-        <currentDomain.PanelComponent />
+        form.initialized ? (
+            <currentDomain.PanelComponent />
+        ) : undefined
     ) : undefined;
-
     const { needsResearch } = form;
     useEffect(() => {
         if (needsResearch || (lastScope && lastScope !== scope)) {

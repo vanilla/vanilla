@@ -47,6 +47,7 @@ export interface IListItemProps {
     image?: IImage;
     featuredImage?: IFeaturedImage;
     actions?: React.ReactNode;
+    actionAlignment?: "center";
     as?: ElementType;
     headingDepth?: number;
     options?: Partial<IListItemComponentOptions>;
@@ -189,7 +190,7 @@ export function ListItem(props: IListItemProps) {
 
     return (
         <PageBox as={props.as ?? "li"} ref={selfRef} className={cx(props.className)}>
-            <div className={classes.item}>
+            <div className={cx(classes.item, props.actionAlignment === "center" && classes.itemCentered)}>
                 {media}
                 {asTile && (icon || actionsContent || hasCheckbox) && (
                     <div className={classes.tileActions}>

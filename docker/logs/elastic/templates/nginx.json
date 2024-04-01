@@ -4,11 +4,11 @@
     "settings": {
         "index": {
             "lifecycle": {
-                "name": "delete_after_7_days",
+                "name": "delete_after_1_day",
                 "rollover_alias": "vanilla"
             },
-            "refresh_interval": "5s",
-            "number_of_routing_shards": "30",
+            "refresh_interval": "15s",
+            "number_of_routing_shards": "1",
             "query": {
                 "default_field": ["request.*"]
             }

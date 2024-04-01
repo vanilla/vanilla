@@ -44,8 +44,8 @@ class RichEditorPlugin extends Gdn_Plugin
      */
     public function setup()
     {
-        saveToConfig("Garden.InputFormatter", RichFormat::FORMAT_KEY);
-        saveToConfig("Garden.MobileInputFormatter", RichFormat::FORMAT_KEY);
+        saveToConfig("Garden.InputFormatter", "Rich2");
+        saveToConfig("Garden.MobileInputFormatter", "Rich2");
         saveToConfig(self::CONFIG_QUOTE_ENABLE, true);
         saveToConfig("EnabledPlugins.Quotes", false);
     }
@@ -171,8 +171,17 @@ class RichEditorPlugin extends Gdn_Plugin
      */
     public function getPostFormats_handler(array $postFormats): array
     {
-        $postFormats[] = "Rich"; // The config values have always been uppercase. (including in default configs).
-        $postFormats[] = "Rich2";
+        $hasRich1 =
+            strtolower(\Gdn::config("Garden.InputFormatter")) === RichFormat::FORMAT_KEY ||
+            strtolower(\Gdn::config("Garden.MobileInputFormatter")) === RichFormat::FORMAT_KEY;
+        if ($hasRich1) {
+            // We still show rich2 in the dropdown.
+            $postFormats[] = "Rich";
+            $postFormats[] = "Rich2";
+        } else {
+            // Rich2 is the one true format.
+            $postFormats["Rich2"] = "Rich";
+        }
         return $postFormats;
     }
 

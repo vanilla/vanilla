@@ -11,6 +11,7 @@ namespace Vanilla\Dashboard\Tests\Controllers;
 
 use EntryController;
 use Garden\Schema\ValidationException;
+use PermissionModel;
 use Vanilla\Dashboard\Models\ProfileFieldModel;
 use VanillaTests\Bootstrap;
 use VanillaTests\Dashboard\EntryControllerConnectTestTrait;
@@ -789,6 +790,66 @@ class EntryControllerConnectTest extends SiteTestCase
         $metaData = $userMetaModel->getUserMeta($dbUser["UserID"]);
         $this->assertArrayHasKey("Profile." . $profileFieldData["apiName"], $metaData);
         $this->assertEquals($metaData["Profile." . $profileFieldData["apiName"]], "testValue");
+    }
+
+    /**
+     * A new user should be able to register through connect page and update the user meta table with custom profile fields.
+     * Error check when default role assigned to new user does not have sing-in permission.
+     *
+     * This is the scenario when we create the user with some additional info - custom profile fields.
+     *
+     * 1. Someone has never been to your site.
+     * 2. Their user information is minimal, and you have configured some custom profile fields.
+     *
+     * The user should just register and have their SSO information and custom profile fields info saved.
+     *
+     */
+    public function testConnectPageWithCustomProfileFieldsDefaultRoleWithoutSignin()
+    {
+        $profileFieldData = $this->createProfileFieldsWithPermission(["registrationOptions" => "required"]);
+
+        $permissionModel = $this->container()->get(PermissionModel::class);
+        $permissions = [
+            [
+                "JunctionID" => "",
+                "JunctionTable" => "",
+                "JunctionColumn" => "",
+                "RoleID" => 8,
+                "Garden.Email.View" => 1,
+                "Garden.SignIn.Allow" => 0,
+                "Vanilla.Discussions.View" => 1,
+                "Vanilla.Discussions.Add" => 1,
+                "Vanilla.Discussions.Edit" => 1,
+                "Vanilla.Discussions.Announce" => 1,
+                "Vanilla.Discussions.Sink" => 1,
+                "Vanilla.Discussions.Close" => 1,
+                "Vanilla.Discussions.Delete" => 1,
+                "Vanilla.Comments.Add" => 1,
+                "Vanilla.Comments.Edit" => 1,
+                "Vanilla.Comments.Delete" => 1,
+            ],
+        ];
+        $permissionModel->saveAll($permissions, ["RoleID" => 8]);
+        //Connect button is not pressed yet, checking if our profile fields are there
+        $ssoUser = $this->dummyUser(["UniqueID" => __FUNCTION__]);
+        $r = $this->entryConnect($ssoUser);
+
+        $lastHTML = $this->bessy()->getLastHtml();
+        $this->bessy()->assertNoFormErrors();
+        $this->bessy()
+            ->getLastHtml()
+            ->assertFormInput("Profile[{$profileFieldData["apiName"]}]");
+        $this->bessy()->assertNoFormErrors();
+
+        //now lets connect again with submit and send some values so $isPostBack is true
+        $body = $lastHTML->getFormValues();
+        $profileKey = "Profile[{$profileFieldData["apiName"]}]";
+        if (isset($body[$profileKey])) {
+            unset($body[$profileKey]);
+            $body["Profile"][$profileFieldData["apiName"]] = "testValue";
+        }
+        $this->expectExceptionMessage("Permission Problem");
+        $r = $this->entryConnect($ssoUser, $body);
     }
 
     /**

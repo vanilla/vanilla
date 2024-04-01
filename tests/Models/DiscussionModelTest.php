@@ -1402,7 +1402,9 @@ class DiscussionModelTest extends SiteTestCase
             $categoryAdmin = $this->createPermissionedCategory([], [$roles["Member"]]);
 
             $userMeta = [
-                sprintf("Preferences.Email.NewDiscussion.%d", $categoryAdmin["categoryID"]) => 1,
+                sprintf("Preferences.Email.NewDiscussion.%d", $categoryAdmin["categoryID"]) => $categoryAdmin[
+                    "categoryID"
+                ],
             ];
             $this->userModel::setMeta($memberUser["userID"], $userMeta);
 

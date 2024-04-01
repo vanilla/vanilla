@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2022 Vanilla Forums Inc.
  * @license GPL-2.0-only
  */
 
@@ -337,11 +337,8 @@ class CategoriesApiController extends AbstractApiController
      *
      * @param array $query The query string.
      * @return Data
-     * @throws HttpException
-     * @throws PermissionException
-     * @throws ValidationException
      */
-    public function get_search(array $query): Data
+    public function get_search(array $query)
     {
         $this->permission();
 
@@ -349,18 +346,6 @@ class CategoriesApiController extends AbstractApiController
             "query:s" => [
                 "description" => "Category name filter.",
                 "minLength" => 0,
-            ],
-            "displayAs:a?" => [
-                "description" => "DisplayAs filter.",
-                "items" => [
-                    "type" => "string",
-                    "enum" => [
-                        Categorymodel::DISPLAY_NESTED,
-                        Categorymodel::DISPLAY_DISCUSSIONS,
-                        Categorymodel::DISPLAY_FLAT,
-                        CategoryModel::DISPLAY_HEADING,
-                    ],
-                ],
             ],
             "page:i?" => [
                 "description" => "Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).",
@@ -394,10 +379,6 @@ class CategoriesApiController extends AbstractApiController
             } elseif ($query["layoutViewType"] == CategoryModel::LAYOUT_DISCUSSION_CATEGORY_PAGE) {
                 $where["DisplayAs"] = Categorymodel::DISPLAY_DISCUSSIONS;
             }
-        }
-
-        if ($query["displayAs"] ?? false) {
-            $where["DisplayAs"] = $query["displayAs"];
         }
 
         $results = $this->categoryModel->searchByName(

@@ -158,10 +158,10 @@ class CategoryModel extends Gdn_Model implements
     const DISPLAY_HEADING = "Heading";
     const DISPLAY_DISCUSSIONS = "Discussions";
 
-    const DISPLAY_NESTED = "Categories";
     const LAYOUT_CATEGORY_LIST = "categoryList";
     const LAYOUT_NESTED_CATEGORY_LIST = "nestedCategoryList";
     const LAYOUT_DISCUSSION_CATEGORY_PAGE = "discussionCategoryPage";
+    const DISPLAY_NESTED = "Categories";
 
     /** @var int The tippy-top of the category tree. */
     public const ROOT_ID = -1;
@@ -5029,7 +5029,6 @@ SQL;
             ->where($where)
             ->like("Name", $name)
             ->orderBy("Name");
-
         if ($limit !== null) {
             $offset = $offset === null ? false : $offset;
             $query->limit($limit, $offset);

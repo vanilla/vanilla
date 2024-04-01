@@ -198,13 +198,12 @@
         "*.jsx": "javascriptreact",
         "*.tpl": "html"
     },
-    "jest.runMode": "on-demand",
-    "jest.coverageFormatter": "GutterFormatter",
-    "typescript.tsdk": "node_modules/typescript/lib",
-    "jest.outputConfig": {
-        "revealOn": "run",
-        "revealWithFocus": "test-results",
-        "clearOnRun": "none"
+    "jest.autoRun": {
+        "watch": false
     },
+    "jest.showCoverageOnLoad": true,
+    "jest.coverageFormatter": "GutterFormatter",
     "jest.jestCommandLine": "JEST=true node --preserve-symlinks --preserve-symlinks-main node_modules/.bin/jest",
+    "testing.openTesting": "neverOpen",
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

@@ -234,13 +234,6 @@ final class ErrorLogger
             return;
         }
 
-        // New PHP8 method for checking for suppressed errors (statements prefixed with @).
-        // For suppressed errors error_reporting() is set to E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR | E_PARSE
-        // Notably errors cannot be suppressed. See https://www.php.net/manual/en/migration80.incompatible.php
-        if (!(error_reporting() & $severity)) {
-            return;
-        }
-
         $errorException = new \ErrorException($message, $severity, $severity, $file, $line);
 
         // Fatal errors are thrown.

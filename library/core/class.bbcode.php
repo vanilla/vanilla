@@ -6,7 +6,6 @@
 
 use Garden\EventManager;
 use Nbbc\BBCode as Nbbc;
-use Vanilla\EmbeddedContent\EmbedConfig;
 
 /**
  * A wrapper around Nbbc\BBCode with some custom configuration.
@@ -26,8 +25,6 @@ class BBCode extends Gdn_Pluggable
     /** @var EventManager */
     private $eventManager;
 
-    private EmbedConfig $embedConfig;
-
     /**
      * @param EventManager $eventManager
      */
@@ -35,7 +32,6 @@ class BBCode extends Gdn_Pluggable
     {
         // There are some old empty constructed usages.
         $this->eventManager = $eventManager ?? \Gdn::getContainer()->get(EventManager::class);
-        $this->embedConfig = \Gdn::getContainer()->get(EmbedConfig::class);
     }
 
     /**
@@ -267,7 +263,7 @@ class BBCode extends Gdn_Pluggable
      */
     function doVideo($bbcode, $action, $name, $default, $params, $content)
     {
-        [$width, $height] = $this->embedConfig->getLegacyEmbedSize();
+        [$width, $height] = Gdn_Format::getEmbedSize();
         [$type, $code] = explode(";", $default);
         switch ($type) {
             case "youtube":

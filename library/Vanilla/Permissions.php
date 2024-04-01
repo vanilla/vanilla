@@ -467,7 +467,9 @@ class Permissions implements \JsonSerializable
     ): bool {
         // Check if new permission is used, try to revert it back to old permission style
         foreach ($permissions as &$permissionName) {
-            $permissionName = $this->resolvePermissionName($permissionName);
+            if ($this->isTwoPartPermission($permissionName)) {
+                $permissionName = $this->untranslatePermission($permissionName);
+            }
         }
         // Look for the bans first.
         if ($this->isBanned($permissions)) {
@@ -505,7 +507,9 @@ class Permissions implements \JsonSerializable
     ): bool {
         // Check if new permission is used, try to revert it back to old permission style
         foreach ($permissions as &$permissionName) {
-            $permissionName = $this->resolvePermissionName($permissionName);
+            if ($this->isTwoPartPermission($permissionName)) {
+                $permissionName = $this->untranslatePermission($permissionName);
+            }
         }
         // Look for the bans first.
         if ($this->isBanned($permissions)) {
@@ -821,7 +825,8 @@ class Permissions implements \JsonSerializable
 
             switch ($checkMode) {
                 case self::CHECK_MODE_RESOURCE_IF_JUNCTION:
-                    $hasJunction = $this->hasJunctionID($junctionTable, $junctionID);
+                    $junctionIDs = $this->junctions[$junctionTable] ?? [];
+                    $hasJunction = in_array($junctionID, $junctionIDs, true);
                     return $hasJunction ? $hasResource : $hasGlobal;
                 case self::CHECK_MODE_RESOURCE_ONLY:
                     return $hasResource;
@@ -835,24 +840,6 @@ class Permissions implements \JsonSerializable
     }
 
     /**
-     * Check if there is a specific junction ID.
-     *
-     * @param string|null $junctionTable
-     * @param int|null $junctionID
-     * @return bool
-     */
-    public function hasJunctionID(?string $junctionTable, ?int $junctionID): bool
-    {
-        if ($junctionID === null || $junctionTable === null) {
-            return false;
-        }
-        $resolvedJunctionID = $this->resolveJuntionAlias($junctionTable, $junctionID);
-        $junctionIDs = $this->junctions[$junctionTable] ?? [];
-        $hasJunction = in_array($resolvedJunctionID, $junctionIDs, true);
-        return $hasJunction;
-    }
-
-    /**
      * Resolve a junction alias, falling back to the initial if there is no alias.
      *
      * @param string $junctionTable
@@ -860,7 +847,7 @@ class Permissions implements \JsonSerializable
      *
      * @return int
      */
-    public function resolveJuntionAlias(string $junctionTable, int $junctionID): int
+    private function resolveJuntionAlias(string $junctionTable, int $junctionID): int
     {
         $junctionsToCheck = $this->junctionAliases[$junctionTable] ?? [];
         return $junctionsToCheck[$junctionID] ?? $junctionID;

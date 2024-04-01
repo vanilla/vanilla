@@ -1298,7 +1298,6 @@ class TagModel extends Gdn_Model
      * @param string|array $type
      * @param array $options
      * @return array
-     * @throws Exception
      */
     public function search($q = "", $id = false, $parent = false, $type = "tag", array $options = []): array
     {
@@ -1323,10 +1322,6 @@ class TagModel extends Gdn_Model
             $tagQuery = Gdn::sql()
                 ->select("*")
                 ->from("Tag");
-
-            if (key_exists("tagID", $options)) {
-                $tagQuery->whereIn("TagID", $options["tagID"]);
-            }
 
             if (key_exists("sort", $options)) {
                 $tagQuery->orderBy($options["sort"], "desc");

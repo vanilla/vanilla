@@ -172,14 +172,4 @@ class MockExternalIssueProvider implements ExternalIssueProviderInterface
         $attachment = $this->attachmentModel->getID($attachmentID);
         return (array) $attachment;
     }
-
-    /**
-     * @inheridoc
-     *
-     * @return int
-     */
-    public function getRefreshTime(): int
-    {
-        return 5 * 60 * 1000;
-    }
 }

@@ -203,21 +203,6 @@ trait PermissionsTranslationTrait
     }
 
     /**
-     * Resolve the actual underlying database permission name.
-     *
-     * @param string $permissionName
-     * @return string
-     */
-    public function resolvePermissionName(string $permissionName): string
-    {
-        if ($this->isTwoPartPermission($permissionName)) {
-            return $this->untranslatePermission($permissionName);
-        } else {
-            return $permissionName;
-        }
-    }
-
-    /**
      * Check if permission is 2 part
      *
      * @param string $permission

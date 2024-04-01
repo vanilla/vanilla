@@ -4997,6 +4997,8 @@ SQL;
      * Get long runner count of total items to process.
      *
      * @param array $discussionIDs DiscussionIDs to move.
+     * @param int $categoryID CategoryID to move discussions into.
+     * @param bool $addRedirects If a redirect needs to be created.
      *
      * @return int
      */

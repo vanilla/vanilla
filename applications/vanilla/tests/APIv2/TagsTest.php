@@ -97,14 +97,6 @@ class TagsTest extends AbstractResourceTest
             ->getBody();
         $this->assertEquals(3, count($results));
         $this->assertArrayHasKey("type", $results[0]);
-
-        $tagIDs = [$results[0]["tagID"], $results[1]["tagID"]];
-
-        // Test filtering by tagIDs
-        $filteredResults = $this->api()
-            ->get("/tags", ["tagID" => $tagIDs])
-            ->getBody();
-        $this->assertCount(2, $filteredResults);
     }
 
     /**

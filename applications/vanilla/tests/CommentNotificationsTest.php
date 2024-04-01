@@ -214,7 +214,6 @@ class CommentNotificationsTest extends SiteTestCase
         // Create 2 users and a category with a discussion that has a comment.
         $user1 = $this->createUser();
         $user2 = $this->createUser();
-        $user3 = $this->createUser();
         $category = $this->createCategory();
         $discussion = $this->createDiscussion();
         $discussionFromDB = Gdn::database()
@@ -223,13 +222,12 @@ class CommentNotificationsTest extends SiteTestCase
             ->resultArray()[0];
         $comment = $this->createComment();
 
-        // Have the 3 users subscribe to comment notifications for that category.
+        // Have the 2 users subscribe to comment notifications for that category.
         $userMeta = [
-            sprintf("Preferences.Email.NewComment.%d", $category["categoryID"]) => 1,
+            sprintf("Preferences.Email.NewComment.%d", $category["categoryID"]) => $category["categoryID"],
         ];
         $this->userModel::setMeta($user1["userID"], $userMeta);
         $this->userModel::setMeta($user2["userID"], $userMeta);
-        $this->userModel::setMeta($user3["userID"], $userMeta);
 
         // Recreate an activity to process.
         $activity = $this->getCommentActivity($category["name"], $comment, $discussion);
@@ -241,20 +239,15 @@ class CommentNotificationsTest extends SiteTestCase
             [$activity, $discussionFromDB["DiscussionID"], "comment"]
         );
         $longRunner = $this->getLongRunner();
-        // To trigger the looping through a "large" record set.
-        \Gdn::config()->saveToConfig([
-            CommunityNotificationGenerator::CONF_NOTIFICATIONS_CHUNK_SIZE => 1,
-        ]);
-        // To trigger the long runner timeout.
-        $longRunner->setMaxIterations(2);
+        $longRunner->setMaxIterations(1);
         $response = $longRunner->runApi($longRunnerAction);
 
         // The first, but not the second, mention notification should have been processed, and we should have a callback payload.
         $longRunnerResult = $response->getData();
         $callbackPayload = $longRunnerResult["callbackPayload"];
         $this->assertNotNull($callbackPayload);
-        $this->assertSame(3, $longRunnerResult["progress"]["countTotalIDs"]);
-        $this->assertCount(2, $longRunnerResult["progress"]["successIDs"]);
+        $this->assertSame(2, $longRunnerResult["progress"]["countTotalIDs"]);
+        $this->assertCount(1, $longRunnerResult["progress"]["successIDs"]);
         $this->assertEquals(
             "Comment_{$comment["commentID"]}_User_{$user1["userID"]}_NotificationType_category",
             $longRunnerResult["progress"]["successIDs"][0]
@@ -265,10 +258,10 @@ class CommentNotificationsTest extends SiteTestCase
         // The second mention notification should have been processed, and we should not have a callback payload.
         $responseBody = $this->resumeLongRunner($callbackPayload)->getBody();
         $this->assertNull($responseBody["callbackPayload"]);
-        $this->assertSame(3, $responseBody["progress"]["countTotalIDs"]);
+        $this->assertSame(2, $responseBody["progress"]["countTotalIDs"]);
         $this->assertCount(1, $responseBody["progress"]["successIDs"]);
         $this->assertEquals(
-            "Comment_{$comment["commentID"]}_User_{$user3["userID"]}_NotificationType_category",
+            "Comment_{$comment["commentID"]}_User_{$user2["userID"]}_NotificationType_category",
             $responseBody["progress"]["successIDs"][0]
         );
     }

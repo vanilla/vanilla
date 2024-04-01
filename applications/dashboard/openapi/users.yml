@@ -944,7 +944,6 @@ paths:
                             schema:
                                 $ref: "#/components/schemas/UserProfileFields"
                     description: Success
-
     /users/{id}/reacted:
         get:
             summary: Get a user's posts that have received a certain reaction.
@@ -986,27 +985,6 @@ paths:
                                     $ref: "#/components/schemas/ReactedRecord"
                     description: Success
 
-    /users/bulk-role-assignment:
-        x-hidden: true
-        patch:
-            summary: Update role assignment on multiple users.
-            tags:
-                - Users
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/BulkRoleAssignment"
-                required: true
-            responses:
-                "202":
-                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/TrackingSlipResponse"
-                "204":
-                    description: Success
-                "403":
-                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/PermissionError"
-                "408":
-                    $ref: "../../dashboard/openapi/responses.yml#/components/responses/LongRunnerResponse"
 components:
     parameters:
         UserExpand:
@@ -1327,24 +1305,3 @@ components:
                     type: string
                 count:
                     type: integer
-        BulkRoleAssignment:
-            type: object
-            properties:
-                userIDs:
-                    type: array
-                    items:
-                        type: integer
-                addRoleIDs:
-                    type: array
-                    items:
-                        type: integer
-                removeRoleIDs:
-                    type: array
-                    items:
-                        type: integer
-                addReplacementRoleID:
-                    type: array
-                    items:
-                        type: integer
-            required:
-                - userIDs

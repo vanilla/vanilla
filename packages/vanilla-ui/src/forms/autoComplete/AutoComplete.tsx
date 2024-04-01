@@ -498,7 +498,6 @@ export const AutoComplete = React.forwardRef(function AutoCompleteImpl(props, fo
                         value={String(state.value)}
                         className={cx(classesInput.input, classes.input, inputClassName)}
                         onKeyDown={handleKeyDown}
-                        autoComplete="off"
                     />
 
                     {!disabled && (

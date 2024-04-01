@@ -58,10 +58,6 @@ const AttachmentLayoutClasses = useThemeCache(() => {
             horizontal: 30,
             vertical: 20,
         }),
-        "& svg": {
-            width: 60,
-            height: 60,
-        },
     });
 
     const textSection = css({

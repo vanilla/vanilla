@@ -37,9 +37,6 @@ class AttachmentMeta extends SiteMetaExtra
                 continue;
             }
             $catalog[$provider->getTypeName()] = $provider->getCatalog();
-
-            // We want to have at least 30 seconds between each call.
-            $catalog[$provider->getTypeName()]["refreshTime"] = max($provider->getRefreshTime(), 30) * 1000;
         }
 
         return ["externalAttachments" => $catalog];

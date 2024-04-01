@@ -38,16 +38,9 @@ use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\UserFragmentSchema;
 use Vanilla\Permissions;
-use Vanilla\Scheduler\LongRunner;
-use Vanilla\Scheduler\LongRunnerFailedID;
-use Vanilla\Scheduler\LongRunnerItemResultInterface;
-use Vanilla\Scheduler\LongRunnerNextArgs;
-use Vanilla\Scheduler\LongRunnerQuantityTotal;
-use Vanilla\Scheduler\LongRunnerTimeoutException;
 use Vanilla\SchemaFactory;
 use Vanilla\Utility\ArrayUtils;
 use Vanilla\Utility\ModelUtils;
-use Vanilla\Web\SystemCallableInterface;
 
 /**
  * Handles user data.
@@ -56,7 +49,6 @@ class UserModel extends Gdn_Model implements
     UserProviderInterface,
     EventFromRowInterface,
     CrawlableInterface,
-    SystemCallableInterface,
     FragmentFetcherInterface,
     LoggerAwareInterface
 {
@@ -161,9 +153,6 @@ class UserModel extends Gdn_Model implements
         self::USERMETA_GENDER,
     ];
 
-    // Use to continue a long-running action to update user roles with the same transaction ID.
-    private const OPT_UPDATE_ROLE_SINGLE_TRANSACTION_ID = "updateRoleSingleTransactionID";
-
     // Prefix for fields saved in the `UserMeta` table.
     public const USERMETA_FIELDS_PREFIX = "Profile.";
 
@@ -247,14 +236,6 @@ class UserModel extends Gdn_Model implements
         $this->sessionModel = Gdn::getContainer()->get(SessionModel::class);
         $this->setLogger(Gdn::getContainer()->get(LoggerInterface::class));
         $this->reactionModel = Gdn::getContainer()->get(ReactionModel::class);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getSystemCallableMethods(): array
-    {
-        return ["usersRolesIterator"];
     }
 
     /**
@@ -3794,99 +3775,6 @@ class UserModel extends Gdn_Model implements
         if ($options[self::OPT_LOG_ROLE_CHANGES]) {
             $this->logRoleChanges($userID, $insertRoleIDs, $deleteRoleIDs);
         }
-    }
-
-    /**
-     * Generator for role modification, which can be a long-running process.
-     *
-     * User with LongRunner::run* methods.
-     *
-     * @param array $request The array of userIDs, and roles fpr updating.
-     * @param array $options Options for the job.
-     * @return Generator<int, LongRunnerItemResultInterface, string, string|LongRunnerNextArgs>
-     */
-    public function usersRolesIterator($request, array $options = []): Generator
-    {
-        $completedUserIDs = [];
-
-        try {
-            $userIDs = array_unique($request["userIDs"]);
-
-            yield new LongRunnerQuantityTotal([$this, "getTotalCount"], [$userIDs]);
-
-            foreach ($userIDs as $userID) {
-                try {
-                    $this->updateRoleAssignmentsPerUser(
-                        $userID,
-                        $request["addRoleIDs"] ?? [],
-                        $request["removeRoleIDs"] ?? [],
-                        $request["addReplacementRoleIDs"] ?? []
-                    );
-                    $completedUserIDs[] = $userID;
-                } catch (Exception $e) {
-                    if ($e instanceof LongRunnerTimeoutException) {
-                        // Throw it back up to our next catch block.
-                        throw $e;
-                    }
-                    yield new LongRunnerFailedID($userID, $e);
-                }
-            }
-        } catch (LongRunnerTimeoutException $e) {
-            // We might have been in the middle of a log transaction.
-            // Preserve it for when we continue.
-            $options[self::OPT_UPDATE_ROLE_SINGLE_TRANSACTION_ID] = LogModel::getTransactionID();
-            $request["userIDs"] = array_diff($request["userIDs"], $completedUserIDs);
-            return new LongRunnerNextArgs([$request, $options]);
-        }
-
-        return LongRunner::FINISHED;
-    }
-
-    /**
-     * Add/remove roles for a user.
-     *
-     * @param int $userID
-     * @param array $addRoleIDs
-     * @param array $removeRoleIDs
-     * @param array $addReplacementRoleIDs
-     * @return array
-     */
-    public function updateRoleAssignmentsPerUser(
-        int $userID,
-        array $addRoleIDs,
-        array $removeRoleIDs,
-        array $addReplacementRoleIDs
-    ): array {
-        $result = [];
-        $user = $this->getID($userID, DATASET_TYPE_ARRAY);
-        if (!$user) {
-            throw new \Garden\Web\Exception\NotFoundException("User");
-        }
-        if (!empty($addRoleIDs)) {
-            $this->addRoles($userID, $addRoleIDs, true);
-        }
-        if (!empty($removeRoleIDs)) {
-            $this->removeRoles($userID, $removeRoleIDs, true);
-        }
-
-        $userCurrentRoles = $this->getRoleIDs($userID);
-        if (count($userCurrentRoles) == 0 && !empty($addReplacementRoleIDs)) {
-            $this->addRoles($userID, $addReplacementRoleIDs, true);
-        }
-        return $result;
-    }
-
-    /**
-     * Get long runner count of total items to process.
-     *
-     * @param array $userIDs DiscussionIDs to move.
-     *
-     * @return int
-     */
-    public function getTotalCount(array $userIDs): int
-    {
-        $userIDs = array_unique($userIDs);
-        return $this->getCount(["userID" => $userIDs]);
     }
 
     /**

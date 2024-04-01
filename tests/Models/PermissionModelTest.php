@@ -11,7 +11,6 @@ use Vanilla\Forum\Widgets\CategoriesWidgetTrait;
 use VanillaTests\Bootstrap;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
-use VanillaTests\UsersAndRolesApiTestTrait;
 
 /**
  * Tests for the `PermissionModel` class.
@@ -23,7 +22,6 @@ class PermissionModelTest extends SiteTestCase
     use TestCategoryModelTrait;
     use CommunityApiTestTrait;
     use CategoriesWidgetTrait;
-    use UsersAndRolesApiTestTrait;
 
     /**
      * @var \PermissionModel
@@ -399,38 +397,12 @@ class PermissionModelTest extends SiteTestCase
      */
     public function testRolesHavingSpecificPermission(): void
     {
-        $nonPermissionCategory = $this->createCategory();
-        $permissionCategory = $this->createPermissionedCategory([], [8, 32]);
-        $nestedPermissionCategory = $this->createCategory();
         $expectedRoleIds = [3, 4, 8, 32, 16];
         $actualRoleIDs = $this->permissionModel->getRoleIDsHavingSpecificPermission("Garden.Email.View");
         $this->assertEqualsCanonicalizing($expectedRoleIds, $actualRoleIDs);
 
         $expectedRoleIds = [16];
         $actualRoleIDs = $this->permissionModel->getRoleIDsHavingSpecificPermission("Garden.Settings.Manage");
-        $this->assertEquals($expectedRoleIds, $actualRoleIDs);
-
-        $expectedRoleIds = [8, 32];
-        $actualRoleIDs = $this->permissionModel->getRoleIDsHavingSpecificPermission(
-            "discussions.view",
-            \CategoryModel::PERM_JUNCTION_TABLE,
-            $permissionCategory["categoryID"]
-        );
-        $this->assertEquals($expectedRoleIds, $actualRoleIDs);
-
-        $actualRoleIDs = $this->permissionModel->getRoleIDsHavingSpecificPermission(
-            "Vanilla.Discussions.View",
-            \CategoryModel::PERM_JUNCTION_TABLE,
-            $nestedPermissionCategory["categoryID"]
-        );
-        $this->assertEquals($expectedRoleIds, $actualRoleIDs);
-
-        $expectedRoleIds = [2, 3, 4, 8, 16, 32];
-        $actualRoleIDs = $this->permissionModel->getRoleIDsHavingSpecificPermission(
-            "Vanilla.Discussions.View",
-            \CategoryModel::PERM_JUNCTION_TABLE,
-            $nonPermissionCategory["categoryID"]
-        );
         $this->assertEquals($expectedRoleIds, $actualRoleIDs);
     }
 }

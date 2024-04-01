@@ -101,12 +101,5 @@ interface ExternalIssueProviderInterface
      */
     public function setIssueTypeID($issueTypeID): void;
 
-    /**
-     * Get the time in milliseconds to wait before refreshing the external data.
-     *
-     * @return int
-     */
-    public function getRefreshTime(): int;
-
     //    abstract public function getOptions(string $recordType, array $record): array;
 }

@@ -11,7 +11,6 @@ export type IconData = {
 };
 
 export const coreIconsData = {
-    ".DS_Store": null,
     "ai-sparkle": {
         width: "16",
         height: "16",
@@ -240,12 +239,6 @@ export const coreIconsData = {
         viewBox: "0 0 17 17",
     },
     "logo-github": {
-        width: "60",
-        height: "60",
-        viewBox: "0 0 60 60",
-        fill: "none",
-    },
-    "logo-jira": {
         width: "60",
         height: "60",
         viewBox: "0 0 60 60",

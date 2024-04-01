@@ -1074,17 +1074,6 @@ class EntryController extends Gdn_Controller implements LoggerAwareInterface
                         (bool) $this->Form->getFormValue("RememberMe", c("Garden.SSO.RememberMe", true)),
                         $stashID
                     );
-                    if (
-                        !Gdn::session()
-                            ->getPermissions()
-                            ->has("Garden.SignIn.Allow")
-                    ) {
-                        $this->Form->addError("Permission Problem");
-                        Gdn::session()->end();
-                        $this->render();
-
-                        return;
-                    }
                     Gdn::userModel()->fireEvent("AfterSignIn");
 
                     //Set default category follow to the user

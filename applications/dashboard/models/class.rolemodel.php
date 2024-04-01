@@ -539,35 +539,6 @@ class RoleModel extends Gdn_Model implements FragmentFetcherInterface
     }
 
     /**
-     * Returns the number of users assigned to the provided RoleIDs. If
-     * $usersOnlyWithThisRole is TRUE, it will return the number of users who
-     * are assigned to this RoleID and NO OTHER.
-     *
-     * @param array $roleIDs The RoleID to filter to.
-     * @param array $userIDs The UsertID to filter to.
-     * @param bool $usersOnlyWithThisRole Indicating if the count should be any users with this RoleID, or users who are ONLY assigned to this RoleID.
-     */
-    public function getUserRoleCounts(array $roleIDs, array $userIDs, $usersOnlyWithThisRole = false)
-    {
-        if ($usersOnlyWithThisRole) {
-            $data = $this->SQL
-                ->select("ur.UserID", "count", "UserCount")
-                ->from("UserRole ur")
-                ->join("UserRole urs", "ur.UserID = urs.UserID")
-                ->groupBy("urs.UserID")
-                ->having("count(urs.RoleID) <=", count($roleIDs), false, false)
-                ->where("ur.RoleID", $roleIDs)
-                ->where("ur.UserID", $userIDs)
-                ->get()
-                ->firstRow();
-
-            return $data ? $data->UserCount : 0;
-        } else {
-            return $this->SQL->getCount("UserRole", ["RoleID" => $roleIDs, "UserID" => $userIDs]);
-        }
-    }
-
-    /**
      * Get the current number of applicants waiting to be approved.
      *
      * @param bool $force Whether or not to force a cache refresh.

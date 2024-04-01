@@ -427,51 +427,37 @@ paths:
     /categories/search:
         get:
             parameters:
-                - name: query
-                  description: |
+                - description: |
                       Category name filter.
                   in: query
+                  name: query
                   required: true
                   schema:
                       minLength: 1
                       type: string
-                - name: displayAs[]
-                  description: The display style of the category.
-                  in: query
-                  required: false
-                  schema:
-                      type: array
-                      items:
-                          type: string
-                          enum:
-                              - Categories
-                              - Discussions
-                              - Flat
-                              - Heading
-                  style: form
-                - name: page
-                  description: |
+                - description: |
                       Page number. See [Pagination](https://docs.vanillaforums.com/apiv2/#pagination).
                   in: query
+                  name: page
                   schema:
                       type: integer
                       default: 1
                       maximum: 100
                       minimum: 1
-                - name: limit
-                  description: |
+                - description: |
                       Desired number of items per page.
                   in: query
+                  name: limit
                   schema:
                       type: integer
                       default: 30
                       maximum: 200
                       minimum: 1
-                - name: expand
-                  description: |
+                - description: |
                       Expand associated records using one or more valid field names (all, parent, breadcrumbs).
                       A value of "all" will expand all expandable fields.
                   in: query
+                  name: expand
                   schema:
                       items:
                           enum:
@@ -479,10 +465,10 @@ paths:
                               - parent
                               - all
                           type: string
-                - name: layoutViewType
-                  description: |
+                - description: |
                       Layout View Type.
                   in: query
+                  name: layoutViewType
                   required: false
                   schema:
                       minLength: 1

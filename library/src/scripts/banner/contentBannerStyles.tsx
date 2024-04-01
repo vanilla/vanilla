@@ -15,20 +15,13 @@ import { IMediaQueryFunction } from "@library/layout/types/interface.panelLayout
 import { Variables } from "@library/styles/Variables";
 import { cx, css } from "@emotion/css";
 import { styleUnit } from "@library/styles/styleUnit";
-import { LocalVariableMapping } from "@library/styles/VariableMapping";
 
 export const CONTENT_BANNER_MAX_HEIGHT = 180;
 export const CONTENT_BANNER_MIN_HEIGHT = 80;
 
 export const contentBannerVariables = useThemeCache(
     (optionOverrides?: Partial<IBannerOptions>, forcedVars?: IThemeVariables) => {
-        const makeVars = variableFactory(
-            "contentBanner",
-            forcedVars,
-            new LocalVariableMapping({
-                "options.useOverlay": "backgrounds.useOverlay",
-            }),
-        );
+        const makeVars = variableFactory("contentBanner", forcedVars);
 
         const normalBannerVars = bannerVariables(optionOverrides, forcedVars, "contentBanner");
 

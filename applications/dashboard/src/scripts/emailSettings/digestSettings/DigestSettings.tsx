@@ -17,12 +17,10 @@ import { DashboardHelpAsset } from "@dashboard/forms/DashboardHelpAsset";
 import { cx } from "@emotion/css";
 import { LoadStatus } from "@library/@types/api/core";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
-import Translate from "@library/content/Translate";
 import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
-import SmartLink from "@library/routing/links/SmartLink";
 import { t } from "@vanilla/i18n";
 import { IFieldError, IJsonSchemaFormHandle, JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { validationErrorsToFieldErrors } from "@vanilla/json-schema-forms/src/utils";
@@ -278,18 +276,11 @@ export function DigestSettings() {
 
                 <h3 className={classes.uppercase}>{t("About Email Digest")}</h3>
                 <p>
-                    <Translate source="Styles and general visual appearance of all emails, including email digest, are set site-wide on Email Settings page." />
+                    {t(
+                        "Styles and general visual appearance of all emails, including email digest, are set site-wide on Email Settings page.",
+                    )}
                 </p>
-                <p>
-                    <Translate
-                        source="<0>Read More</0>"
-                        c0={(text) => (
-                            <SmartLink to="https://success.vanillaforums.com/kb/articles/1479-email-digest">
-                                {text}
-                            </SmartLink>
-                        )}
-                    />
-                </p>
+                <p>{t("Email Digest Prompt Widget will be available when the Email Digest is enabled.")}</p>
             </DashboardHelpAsset>
             {showTestDigestModal && (
                 <TestDigestModal settings={emailSettings} onCancel={() => setShowTestDigestModal(false)} />

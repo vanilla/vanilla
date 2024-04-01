@@ -623,8 +623,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
         $comment = (array) $args["Comment"];
         $commentID = $comment["CommentID"];
         $discussion = (array) $args["Discussion"];
-        $categoryID = $discussion["CategoryID"];
-        $category = CategoryModel::categories($categoryID);
         $existingActivity = $args["Activity"];
 
         if ($comment["InsertUserID"] == $discussion["InsertUserID"]) {
@@ -660,7 +658,6 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
             "Route" => "/discussion/comment/$commentID#Comment_$commentID",
             "Data" => [
                 "Name" => val("Name", $discussion),
-                "Category" => $category["Name"] ?? null,
                 "Reason" => "questionAnswered",
             ],
         ];

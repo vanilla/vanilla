@@ -8,11 +8,9 @@ import { IApiError, ILoadable, LoadStatus } from "@library/@types/api/core";
 import { queryResultToILoadable } from "@library/ReactQueryUtils";
 import { IntegrationsApi } from "@library/features/discussions/integrations/Integrations.api";
 import {
-    CustomIntegrationContext,
     IAttachment,
     IAttachmentIntegration,
     IAttachmentIntegrationCatalog,
-    ICustomIntegrationContext,
     IIntegrationsApi,
     IPostAttachmentParams,
 } from "@library/features/discussions/integrations/Integrations.types";
@@ -101,14 +99,6 @@ export function AttachmentIntegrationsContextProvider(
     );
 }
 
-/**
- * Additional context values for customizing integrations from a plugin.
- */
-const customIntegrationContext: Record<string, CustomIntegrationContext> = {};
-export function registerCustomIntegrationContext(name: string, hook: CustomIntegrationContext) {
-    customIntegrationContext[name] = hook;
-}
-
 export interface IIntegrationContextValue {
     getSchema: () => Promise<JsonSchema>;
     schema: ILoadable<JsonSchema>;
@@ -118,10 +108,6 @@ export interface IIntegrationContextValue {
     title: IAttachmentIntegration["title"];
     externalIDLabel: IAttachmentIntegration["externalIDLabel"];
     logoIcon: IAttachmentIntegration["logoIcon"];
-    // context customizations
-    transformLayout?: ICustomIntegrationContext["transformLayout"];
-    beforeSubmit?: ICustomIntegrationContext["beforeSubmit"];
-    CustomIntegrationForm?: ICustomIntegrationContext["CustomIntegrationForm"];
 }
 
 export const IntegrationContext = createContext<IIntegrationContextValue>({
@@ -159,8 +145,6 @@ export function IntegrationContextProvider(
         logoIcon = "meta-external",
     } = integration ?? {};
 
-    const customContext = customIntegrationContext[attachmentType]?.();
-
     const schemaQuery = useQuery<unknown, IApiError, JsonSchema>({
         queryFn: async () => await api.getAttachmentSchema({ attachmentType, recordType, recordID }),
         queryKey: ["attachmentSchema", attachmentType, recordType, recordID],
@@ -193,9 +177,6 @@ export function IntegrationContextProvider(
                         const response = await postAttachment.mutateAsync(values);
                         return response;
                     },
-                    transformLayout: customContext?.transformLayout,
-                    beforeSubmit: customContext?.beforeSubmit,
-                    CustomIntegrationForm: customContext?.CustomIntegrationForm,
                 },
             }}
         >

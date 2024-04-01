@@ -5,11 +5,9 @@
  */
 
 import { IUser, IUserFragment } from "@library/@types/api/users";
-import { IAttachmentLayoutProps } from "@library/features/discussions/integrations/components/AttachmentLayout";
 import { IconType } from "@vanilla/icons";
 import { JsonSchema } from "@vanilla/json-schema-forms";
 import { RecordID } from "@vanilla/utils";
-import { FormikHelpers } from "formik";
 
 export interface IAttachmentIntegration {
     attachmentType: string;
@@ -48,8 +46,6 @@ export interface IGetAttachmentSchemaParams {
     attachmentType: string;
     recordType: string;
     recordID: RecordID;
-    projectID?: string;
-    issueTypeID?: string;
 }
 
 export interface IPostAttachmentParams {
@@ -62,15 +58,3 @@ export interface IIntegrationsApi {
     getAttachmentSchema: (params: IGetAttachmentSchemaParams) => Promise<JsonSchema>;
     postAttachment: (params: IPostAttachmentParams) => Promise<IAttachment>;
 }
-
-export interface ICustomIntegrationContext {
-    transformLayout?: (props: IAttachmentLayoutProps) => IAttachmentLayoutProps & Record<string, any>;
-    beforeSubmit?: (values?: any) => any;
-    CustomIntegrationForm?: React.ComponentType<{
-        values?: any;
-        schema?: JsonSchema;
-        onChange?: FormikHelpers<IPostAttachmentParams>["setValues"];
-    }>;
-}
-
-export type CustomIntegrationContext = () => ICustomIntegrationContext;

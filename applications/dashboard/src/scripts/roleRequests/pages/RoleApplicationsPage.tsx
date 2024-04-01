@@ -248,9 +248,8 @@ function BasicSchemaAttributes({ attributes, meta }: { attributes: BasicAttribut
     return (
         <dl>
             {Object.entries(attributes).map(([key, value]) => {
-                const metaProperty = meta?.attributesSchema?.properties[key];
+                const metaProperty = meta.attributesSchema?.properties[key];
                 let label = key;
-
                 if (metaProperty) {
                     label = metaProperty["x-label"] ?? label;
                 }

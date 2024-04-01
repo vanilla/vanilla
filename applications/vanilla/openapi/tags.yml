@@ -9,14 +9,6 @@ paths:
                   in: query
                   schema:
                       type: string
-                - name: tagID[]
-                  description: The ID of the tag to find.
-                  in: query
-                  schema:
-                      type: array
-                      items:
-                          type: integer
-                  style: form
                 - name: type
                   description: The type of tags to list.
                   in: query

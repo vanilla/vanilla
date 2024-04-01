@@ -16,9 +16,8 @@ import SmartLink from "@library/routing/links/SmartLink";
 import { Icon } from "@vanilla/icons";
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import { IUserFragment } from "@library/@types/api/users";
-import { useIntegrationContext } from "../Integrations.context";
 
-export interface IAttachmentLayoutProps {
+interface IAttachmentLayoutProps {
     icon?: React.ReactNode;
     title?: string;
     notice?: string;
@@ -27,12 +26,11 @@ export interface IAttachmentLayoutProps {
     idLabel?: string;
     dateUpdated?: string;
     user?: IUserFragment;
-    details?: Array<{ label: string; value: string; url?: string }>;
+    details?: Array<{ label: string; value: string }>;
 }
 
 export default function AttachmentLayout(props: IAttachmentLayoutProps) {
-    const { transformLayout } = useIntegrationContext();
-    const { icon, title, notice, url, id, idLabel, dateUpdated, user, details } = transformLayout?.(props) ?? props;
+    const { icon, title, notice, url, id, idLabel, dateUpdated, user, details } = props;
     const classes = AttachmentLayoutClasses();
 
     return (
@@ -90,20 +88,7 @@ export default function AttachmentLayout(props: IAttachmentLayoutProps) {
                         {(details ?? [])?.map((detail, index) => (
                             <div key={index} className={classes.detailItem}>
                                 <div className={classes.detailLabel}>{detail.label}</div>
-                                <div className={classes.detailValue}>
-                                    {detail.url ? (
-                                        <SmartLink to={detail.url} className={classes.externalLink}>
-                                            {detail.value}
-                                            <Icon
-                                                className={classes.externalIcon}
-                                                icon="meta-external"
-                                                size="default"
-                                            />
-                                        </SmartLink>
-                                    ) : (
-                                        detail.value
-                                    )}
-                                </div>
+                                <div className={classes.detailValue}>{detail.value}</div>
                             </div>
                         ))}
                     </div>

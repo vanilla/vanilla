@@ -9,11 +9,13 @@ import { Optionalize } from "@library/@types/utils";
 import { ISearchOptionData } from "@library/features/search/SearchOption";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { formatUrl, getMeta } from "@library/utility/appUtils";
+import { makeSearchUrl } from "@library/search/SearchUtils";
 
 const defaultOptionProvider: ISearchOptionProvider = {
     supportsAutoComplete: false,
     autocomplete: () => Promise.resolve([]),
-    makeSearchUrl: (query) => formatUrl(`/search?search=${query}`, true),
+    makeSearchUrl: (query: string, options: Record<string, any>, externalSearchQuery?: string) =>
+        makeSearchUrl(query, options, externalSearchQuery),
 };
 
 const SearchContext = React.createContext<IWithSearchProps>({

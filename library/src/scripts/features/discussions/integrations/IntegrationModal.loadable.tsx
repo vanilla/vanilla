@@ -4,12 +4,12 @@
  * @license Proprietary
  */
 
-import { LoadStatus } from "@library/@types/api/core";
+import { IApiError, IServerError, LoadStatus } from "@library/@types/api/core";
 import { useIntegrationContext } from "@library/features/discussions/integrations/Integrations.context";
 import { IPostAttachmentParams } from "@library/features/discussions/integrations/Integrations.types";
 import { useToast } from "@library/features/toaster/ToastContext";
 import Button from "@library/forms/Button";
-import { FormControl, FormControlGroup } from "@library/forms/FormControl";
+import { FormControl, FormControlGroup, FormControlWithNewDropdown } from "@library/forms/FormControl";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import Frame from "@library/layout/frame/Frame";
@@ -28,6 +28,9 @@ import { EMPTY_SCHEMA, IJsonSchemaFormHandle, JsonSchemaForm } from "@vanilla/js
 import { getDefaultValuesFromSchema, mapValidationErrorsToFormikErrors } from "@vanilla/json-schema-forms/src/utils";
 import { useFormik } from "formik";
 import React, { useEffect, useRef, useState } from "react";
+import Message from "@library/messages/Message";
+import ErrorMessages from "@library/forms/ErrorMessages";
+import { CoreErrorMessages } from "@library/errorPages/CoreErrorMessages";
 
 interface IIntegrationModalProps extends Pick<React.ComponentProps<typeof Modal>, "isVisible" | "exitHandler"> {
     onSuccess?: () => Promise<void>;
@@ -38,12 +41,13 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
 
     const toast = useToast();
 
+    const [serverError, setServerError] = useState<IServerError | null>(null);
     const [confirmDialogVisible, setConfirmDialogVisible] = useState(false);
 
     const {
         label,
         submitButton,
-        schema: { status: schemaStatus, data: integrationSchema },
+        schema: { status: schemaStatus, data: integrationSchema, error: schemaError },
         getSchema,
         postAttachment,
         CustomIntegrationForm,
@@ -69,11 +73,8 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
         });
     }
 
-    async function handleError(e: any) {
-        toast.addToast({
-            autoDismiss: true,
-            body: t("Integration failed"), //FIXME: copy
-        });
+    async function handleError(e: IApiError) {
+        setServerError(e);
     }
 
     function handleClose() {
@@ -88,6 +89,7 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
             ...getDefaultValuesFromSchema(integrationSchema ?? EMPTY_SCHEMA),
         },
         onSubmit: async (values) => {
+            setServerError(null);
             try {
                 const finalValues = beforeSubmit?.(values) ?? values;
                 await postAttachment(finalValues);
@@ -141,23 +143,36 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
                         body={
                             <FrameBody>
                                 <div className={classesFrameBody.contents}>
+                                    {serverError && (
+                                        <Message
+                                            error={serverError}
+                                            stringContents={serverError.message}
+                                            className={classesFrameBody.error}
+                                        />
+                                    )}
                                     {schemaReady && Object.keys(values).length > 0 ? (
-                                        CustomIntegrationForm ? (
-                                            <CustomIntegrationForm
-                                                values={values}
-                                                schema={integrationSchema}
-                                                onChange={setValues}
-                                            />
-                                        ) : (
-                                            <JsonSchemaForm
-                                                ref={schemaFormRef}
-                                                schema={integrationSchema}
-                                                instance={values}
-                                                onChange={setValues}
-                                                FormControl={FormControl}
-                                                FormControlGroup={FormControlGroup}
-                                            />
-                                        )
+                                        <>
+                                            {CustomIntegrationForm ? (
+                                                <CustomIntegrationForm
+                                                    values={values}
+                                                    schema={integrationSchema}
+                                                    onChange={setValues}
+                                                    fieldErrors={serverError?.errors}
+                                                />
+                                            ) : (
+                                                <JsonSchemaForm
+                                                    ref={schemaFormRef}
+                                                    schema={integrationSchema}
+                                                    instance={values}
+                                                    onChange={setValues}
+                                                    FormControl={FormControlWithNewDropdown}
+                                                    FormControlGroup={FormControlGroup}
+                                                    fieldErrors={serverError?.errors}
+                                                />
+                                            )}
+                                        </>
+                                    ) : schemaError ? (
+                                        <CoreErrorMessages error={schemaError} />
                                     ) : (
                                         <Loader small />
                                     )}
@@ -179,7 +194,7 @@ export default function IntegrationModalLoadable(props: IIntegrationModalProps) 
                                     buttonType={ButtonTypes.TEXT_PRIMARY}
                                     className={classFrameFooter.actionButton}
                                 >
-                                    {!schemaReady || isSubmitting ? <ButtonLoader /> : t(submitButton) ?? t("Save")}
+                                    {isSubmitting ? <ButtonLoader /> : t(submitButton) ?? t("Save")}
                                 </Button>
                             </FrameFooter>
                         }

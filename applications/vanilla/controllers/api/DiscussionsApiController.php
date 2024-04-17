@@ -5,6 +5,7 @@
  * @license GPL-2.0-only
  */
 
+use Garden\Container\ContainerException;
 use Garden\Schema\Schema;
 use Garden\Schema\ValidationException;
 use Garden\Web\Data;
@@ -30,6 +31,7 @@ use Vanilla\Models\CrawlableRecordSchema;
 use Vanilla\Models\DirtyRecordModel;
 use Vanilla\Models\Model;
 use Vanilla\Navigation\BreadcrumbModel;
+use Vanilla\Navigation\BreadcrumbProviderNotFoundException;
 use Vanilla\Scheduler\LongRunner;
 use Vanilla\Scheduler\LongRunnerAction;
 use Vanilla\SchemaFactory;
@@ -154,6 +156,9 @@ class DiscussionsApiController extends AbstractApiController
      *
      * @param array $query The request query.
      * @return Data
+     * @throws HttpException
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function get_bookmarked(array $query)
     {
@@ -231,6 +236,9 @@ class DiscussionsApiController extends AbstractApiController
      * @param int $id The record id
      * @param array $query The request query.
      * @return Data
+     * @throws HttpException
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function get_statusLog(int $id, array $query)
     {
@@ -284,6 +292,9 @@ class DiscussionsApiController extends AbstractApiController
      * @param int $id The ID of the discussion.
      *
      * @return Data
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws PermissionException
      */
     public function delete(int $id): Data
     {
@@ -304,6 +315,10 @@ class DiscussionsApiController extends AbstractApiController
      * Delete a list of discussions.
      *
      * @param array $body The request body.
+     * @return Data
+     * @throws HttpException
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function delete_list(array $body)
     {
@@ -343,6 +358,9 @@ class DiscussionsApiController extends AbstractApiController
      * @param array $body The request body.
      *
      * @return Data the HTTP response.
+     * @throws HttpException
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function patch_move(array $body): Data
     {
@@ -393,6 +411,8 @@ class DiscussionsApiController extends AbstractApiController
      * @param array $body The request body.
      *
      * @return Data the HTTP response.
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function patch_close(array $body): Data
     {
@@ -436,6 +456,10 @@ class DiscussionsApiController extends AbstractApiController
      * @param array $body The request's body.
      *
      * @return Data
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function patch_merge(array $body): Data
     {
@@ -484,7 +508,10 @@ class DiscussionsApiController extends AbstractApiController
      *
      * @param int $id The discussion ID.
      * @return Data
+     * @throws HttpException
      * @throws NotFoundException
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function patch_bump(int $id): Data
     {
@@ -511,6 +538,7 @@ class DiscussionsApiController extends AbstractApiController
      * @param int $id The discussion ID.
      * @return array
      *
+     * @throws ClientException
      * @throws NotFoundException If the discussion could not be found.
      */
     public function discussionByID(int $id): array
@@ -636,8 +664,12 @@ class DiscussionsApiController extends AbstractApiController
      *
      * @param int $id The ID of the discussion.
      * @param array $query The request query.
-     * @throws NotFoundException if the discussion could not be found.
      * @return array
+     * @throws ClientException
+     * @throws HttpException
+     * @throws NotFoundException if the discussion could not be found.
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function get(int $id, array $query)
     {
@@ -697,8 +729,11 @@ class DiscussionsApiController extends AbstractApiController
      * Normalize a database record to match the Schema definition.
      *
      * @param array $dbRecord Database record.
-     * @param array|string|bool $expand
+     * @param array $expand
      * @return array Return a Schema record.
+     * @throws ContainerException
+     * @throws \Garden\Container\NotFoundException
+     * @throws BreadcrumbProviderNotFoundException
      */
     public function normalizeOutput(array $dbRecord, $expand = [])
     {
@@ -741,7 +776,7 @@ class DiscussionsApiController extends AbstractApiController
      * @return array The discussion quote data.
      *
      * @throws NotFoundException If the record with the given ID can't be found.
-     * @throws \Exception Throws an exception if no session is available.
+     * @throws Exception Throws an exception if no session is available.
      * @throws PermissionException Throws an exception if the user does not have the specified permission(s).
      * @throws ValidationException If the output schema is configured incorrectly.
      */
@@ -795,8 +830,12 @@ class DiscussionsApiController extends AbstractApiController
      * Get a discussion for editing.
      *
      * @param int $id The ID of the discussion.
-     * @throws NotFoundException if the discussion could not be found.
      * @return array
+     * @throws ClientException
+     * @throws HttpException
+     * @throws NotFoundException if the discussion could not be found.
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function get_edit(int $id)
     {
@@ -850,10 +889,13 @@ class DiscussionsApiController extends AbstractApiController
      *
      * @param array $query The query string.
      * @return Data
+     * @throws BreadcrumbProviderNotFoundException
+     * @throws ContainerException
+     * @throws HttpException
      * @throws NotFoundException
      * @throws PermissionException
      * @throws ValidationException
-     * @throws HttpException
+     * @throws \Garden\Container\NotFoundException
      */
     public function index(array $query)
     {
@@ -887,6 +929,16 @@ class DiscussionsApiController extends AbstractApiController
                 );
             } else {
                 unset($where["internalStatusID"]);
+            }
+        }
+
+        if (isset($query["hasComments"])) {
+            // Only get discussions that do not have any comment.
+            if ($query["hasComments"] == false) {
+                $where["countComments"] = 0;
+            } elseif ($query["hasComments"] == true) {
+                // Only get discussions that do have comments.
+                $where["countComments >"] = 0;
             }
         }
 

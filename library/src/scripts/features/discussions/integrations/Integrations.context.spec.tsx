@@ -4,49 +4,22 @@
  * @license Proprietary
  */
 
-import { setMeta } from "@library/utility/appUtils";
 import {
-    AttachmentIntegrationsApiContextProvider,
-    AttachmentIntegrationsContextProvider,
     IIntegrationContextValue,
     INTEGRATIONS_META_KEY,
     IntegrationContextProvider,
     useAttachmentIntegrations,
     useIntegrationContext,
 } from "@library/features/discussions/integrations/Integrations.context";
+import { IAttachmentIntegration } from "@library/features/discussions/integrations/Integrations.types";
 import {
-    FAKE_API,
     FAKE_INTEGRATION,
     FAKE_INTEGRATIONS_CATALOG,
+    IntegrationsTestWrapper,
+    mockApi,
 } from "@library/features/discussions/integrations/fixtures/Integrations.fixtures";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderHook, RenderResult, act } from "@testing-library/react-hooks";
-import { IAttachmentIntegration, IIntegrationsApi } from "./Integrations.types";
-import { PropsWithChildren } from "react";
-
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            retry: false,
-        },
-    },
-});
-
-const mockApi: IIntegrationsApi = {
-    getIntegrationsCatalog: jest.fn(FAKE_API.getIntegrationsCatalog),
-    getAttachmentSchema: jest.fn(FAKE_API.getAttachmentSchema),
-    postAttachment: jest.fn(FAKE_API.postAttachment),
-};
-
-export function TestWrapper({ children }: PropsWithChildren<{}>) {
-    return (
-        <QueryClientProvider client={queryClient}>
-            <AttachmentIntegrationsApiContextProvider api={mockApi}>
-                <AttachmentIntegrationsContextProvider>{children}</AttachmentIntegrationsContextProvider>
-            </AttachmentIntegrationsApiContextProvider>
-        </QueryClientProvider>
-    );
-}
+import { setMeta } from "@library/utility/appUtils";
+import { RenderResult, act, renderHook } from "@testing-library/react-hooks";
 
 beforeEach(() => {
     setMeta(INTEGRATIONS_META_KEY, undefined);
@@ -61,7 +34,7 @@ describe("AttachmentIntegrationsContext", () => {
 
             act(() => {
                 const renderHookResult = renderHook(() => useAttachmentIntegrations(), {
-                    wrapper: TestWrapper,
+                    wrapper: IntegrationsTestWrapper,
                 });
                 result = renderHookResult.result;
             });
@@ -81,7 +54,7 @@ describe("AttachmentIntegrationsContext", () => {
             setMeta(INTEGRATIONS_META_KEY, undefined);
             act(() => {
                 const renderHookResult = renderHook(() => useAttachmentIntegrations(), {
-                    wrapper: TestWrapper,
+                    wrapper: IntegrationsTestWrapper,
                 });
                 result = renderHookResult.result;
             });
@@ -108,7 +81,7 @@ describe("IntegrationContext", () => {
                 const renderHookResult = renderHook(() => useIntegrationContext(), {
                     wrapper: function Wrapper(props: React.ComponentProps<typeof IntegrationContextProvider>) {
                         return (
-                            <TestWrapper>
+                            <IntegrationsTestWrapper>
                                 <IntegrationContextProvider
                                     {...{
                                         attachmentType: FAKE_INTEGRATION["attachmentType"],
@@ -118,7 +91,7 @@ describe("IntegrationContext", () => {
                                 >
                                     {props.children}
                                 </IntegrationContextProvider>
-                            </TestWrapper>
+                            </IntegrationsTestWrapper>
                         );
                     },
                 });

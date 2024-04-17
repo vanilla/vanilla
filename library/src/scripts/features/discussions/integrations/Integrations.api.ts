@@ -15,6 +15,7 @@ import { JsonSchema } from "@vanilla/json-schema-forms";
 const GET_CATALOG_ENDPOINT = "/attachments/catalog";
 const GET_SCHEMA_ENDPOINT = "/attachments/schema";
 const POST_ATTACHMENT_ENDPOINT = "/attachments";
+const REFRESH_ATTACHMENTS_ENDPOINT = "/attachments/refresh";
 
 export const IntegrationsApi: IIntegrationsApi = {
     getIntegrationsCatalog: async function () {
@@ -29,6 +30,15 @@ export const IntegrationsApi: IIntegrationsApi = {
     },
     postAttachment: async function (params) {
         const response = await apiv2.post<IAttachment>(POST_ATTACHMENT_ENDPOINT, params);
+        return response.data;
+    },
+
+    refreshAttachments: async function (params) {
+        const { attachmentIDs, onlyStale = false } = params;
+        const response = await apiv2.post<IAttachment[]>(REFRESH_ATTACHMENTS_ENDPOINT, {
+            attachmentIDs,
+            onlyStale,
+        });
         return response.data;
     },
 };

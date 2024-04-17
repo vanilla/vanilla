@@ -8,6 +8,7 @@
 namespace VanillaTests\Forum\Utils;
 
 use AttachmentModel;
+use Exception;
 use Garden\Http\HttpResponse;
 use Gdn_Format;
 use Vanilla\Formatting\Formats\TextFormat;
@@ -244,7 +245,7 @@ trait CommunityApiTestTrait
     {
         $discussionID = $discussionID ?? $this->lastInsertedDiscussionID;
         if ($discussionID === null) {
-            throw new \Exception("Specify a discussion to bookmark.");
+            throw new Exception("Specify a discussion to bookmark.");
         }
         $this->api()->put("/discussions/$discussionID/bookmark", ["bookmarked" => true]);
     }
@@ -268,13 +269,14 @@ trait CommunityApiTestTrait
      * @param array $overrides Fields to override on the insert.
      *
      * @return array
+     * @throws Exception
      */
     public function createComment(array $overrides = []): array
     {
         $discussionID = $overrides["discussionID"] ?? $this->lastInsertedDiscussionID;
 
         if ($discussionID === null) {
-            throw new \Exception("Could not insert a test comment because no discussion was specified.");
+            throw new Exception("Could not insert a test comment because no discussion was specified.");
         }
 
         $params = $overrides + [
@@ -338,7 +340,7 @@ trait CommunityApiTestTrait
      * @param array $overrides
      * @param array $attachmentData
      * @return mixed|string
-     * @throws \Exception If mediaID is null.
+     * @throws Exception If mediaID is null.
      */
     public function createMedia(array $overrides = [], array $attachmentData = [])
     {
@@ -355,7 +357,7 @@ trait CommunityApiTestTrait
         $mediaID = $result["mediaID"] ?? null;
 
         if (is_null($mediaID)) {
-            throw new \Exception("Could not insert a test media because mediaID is null");
+            throw new Exception("Could not insert a test media because mediaID is null");
         }
 
         // Update media with $attachmentData
@@ -368,7 +370,7 @@ trait CommunityApiTestTrait
         $recordType = strtolower($recordType);
         $recordPrefix = substr($recordType, 0, 1);
         $attachment = [
-            "Type" => "mock",
+            "Type" => "mock-issue",
             "ForeignID" => "{$recordPrefix}-{$recordID}",
             "ForeignUserID" => self::$siteInfo["adminUserID"],
             "Source" => "mockSite",

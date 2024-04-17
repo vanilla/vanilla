@@ -7,6 +7,9 @@
 
 namespace Vanilla\Web;
 
+use Garden\JsonFilterTrait;
+use Vanilla\ApiUtils;
+
 /**
  * Render a twig template form a static context.
  * Classes should prefer using `TwigRenderTrait`.
@@ -45,14 +48,18 @@ class TwigStaticRenderer
         string $componentName,
         array $props,
         string $cssClass = null,
-        string $htmlContents = ""
+        string $htmlContents = "",
+        string $htmlTag = "div"
     ): string {
         /** @var TwigStaticRenderer $selfInstance */
         $selfInstance = \Gdn::getContainer()->get(TwigStaticRenderer::class);
         return $selfInstance->renderTwigFromString(
-            '<div class="{{ class }}" data-react="{{ component }}" data-props="{{ props|e(\'html_attr\') }}">{{ htmlContents|raw }}</div>',
+            <<<TWIG
+    <{$htmlTag} class="{{ class }}" data-react="{{ component }}" data-props="{{ props|e('html_attr') }}">{{ htmlContents|raw }}</{$htmlTag}>
+TWIG
+            ,
             [
-                "props" => json_encode($props, JSON_UNESCAPED_UNICODE),
+                "props" => json_encode(ApiUtils::jsonFilter($props), JSON_UNESCAPED_UNICODE),
                 "component" => $componentName,
                 "class" => trim($cssClass),
                 "htmlContents" => $htmlContents,

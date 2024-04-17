@@ -60,26 +60,57 @@ class AccessTokenModel extends Gdn_Model
         // Ensured to exist in the dashboard structure.
         Assert::integerish($systemUserID);
 
-        // Get existing tokens.
-        $existingTokens = $this->getWhere([
-            "UserID" => $systemUserID,
-            "Type" => self::TYPE_SYSTEM,
-        ])->resultArray();
+        // Get our current token.
+        $currentFullToken = $this->config->get(self::CONFIG_SYSTEM_TOKEN, null);
+        $currentTokenID = null;
+        if ($currentFullToken !== null) {
+            $currentTokenRow = $this->getToken($this->trim($currentFullToken));
+            if ($currentTokenRow !== false) {
+                $currentTokenID = $currentTokenRow["AccessTokenID"];
+            }
+        }
 
-        // Issue a new token.
-        $newToken = $this->issue(
-            $systemUserID,
-            "1 month", // Long expiration, but get's revoked frequently.
-            self::TYPE_SYSTEM
-        );
+        // Expire all existing system tokens
+        $db = $this->SQL->Database;
+        $db->beginTransaction();
 
-        // Save the new token into the config for access by orch or for system recovery.
-        $this->config->saveToConfig(self::CONFIG_SYSTEM_TOKEN, $newToken, ["BypassLogging" => true]);
+        try {
+            // Expire all existing tokens
+            $this->update(
+                [
+                    "DateExpires" => CurrentTimeStamp::getDateTime()
+                        ->modify("-1 hour")
+                        ->format(MYSQL_DATE_FORMAT),
+                ],
+                [
+                    "UserID" => $systemUserID,
+                    "Type" => self::TYPE_SYSTEM,
+                ]
+            );
 
-        // Revoke all previous tokens.
-        $expireDate = Gdn_Format::toDateTime($this->toTimestamp("6 hours"));
-        foreach ($existingTokens as $existingToken) {
-            $this->setField($existingToken["AccessTokenID"], ["DateExpires" => $expireDate]);
+            // Rewrite the current token if we have one with a little bit of buffer time.
+            if ($currentTokenID !== null) {
+                $this->setField($currentTokenID, [
+                    "DateExpires" => CurrentTimeStamp::getDateTime()
+                        ->modify("+6 hours")
+                        ->format(MYSQL_DATE_FORMAT),
+                ]);
+            }
+
+            // Now create a new token.
+            // Issue a new token.
+            $newToken = $this->issue(
+                $systemUserID,
+                "1 month", // Long expiration, but get's revoked frequently.
+                self::TYPE_SYSTEM
+            );
+
+            $db->commitTransaction();
+            // Save the new token into the config for access by orch or for system recovery.
+            $this->config->saveToConfig(self::CONFIG_SYSTEM_TOKEN, $newToken, ["BypassLogging" => true]);
+        } catch (Throwable $e) {
+            $db->rollbackTransaction();
+            throw $e;
         }
     }
 

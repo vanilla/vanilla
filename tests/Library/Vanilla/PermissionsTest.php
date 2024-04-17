@@ -809,6 +809,7 @@ class PermissionsTest extends SiteTestCase
             ],
             "isAdmin" => false,
             "isSysAdmin" => false,
+            "isSuperAdmin" => false,
             "junctions" => [
                 "category" => [62, 50, 100, 101],
             ],
@@ -833,6 +834,7 @@ class PermissionsTest extends SiteTestCase
                 ],
                 "isAdmin" => false,
                 "isSysAdmin" => false,
+                "isSuperAdmin" => false,
             ],
             $permissions->asApiOutput(false)
         );
@@ -847,6 +849,7 @@ class PermissionsTest extends SiteTestCase
                 ],
                 "isAdmin" => false,
                 "isSysAdmin" => false,
+                "isSuperAdmin" => false,
                 "junctions" => new \stdClass(),
                 "junctionAliases" => new \stdClass(),
             ],

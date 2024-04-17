@@ -30,7 +30,7 @@ class AnswerEvent extends ResourceEvent implements TrackingEventInterface
     public function getTrackablePayload(TrackableCommunityModel $trackableCommunity): array
     {
         $trackingData = $trackableCommunity->getTrackableComment($this->getPayload()["answer"]);
-
+        $trackingData["answer"]["body"] = null;
         // If the siteSectionID is set, we add it to the payload. We only send the first canonical one to keen.
         if (isset($this->payload["answer"]["siteSectionIDs"])) {
             $trackingData["siteSectionID"] = $this->payload["answer"]["siteSectionIDs"][0];

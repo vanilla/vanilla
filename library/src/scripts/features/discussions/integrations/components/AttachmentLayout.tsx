@@ -7,16 +7,16 @@
 import React from "react";
 import AttachmentLayoutClasses from "@library/features/discussions/integrations/components/AttachmentLayout.classes";
 import { MetaItem, Metas } from "@library/metas/Metas";
-import DateTime from "@library/content/DateTime";
+import DateTime, { DateFormats } from "@library/content/DateTime";
 import Translate from "@library/content/Translate";
 import ProfileLink from "@library/navigation/ProfileLink";
 import { metasClasses } from "@library/metas/Metas.styles";
 import Notice from "@library/metas/Notice";
 import SmartLink from "@library/routing/links/SmartLink";
 import { Icon } from "@vanilla/icons";
-import { CollapsableContent } from "@library/content/CollapsableContent";
 import { IUserFragment } from "@library/@types/api/users";
-import { useIntegrationContext } from "../Integrations.context";
+import { t } from "@vanilla/i18n";
+import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 
 export interface IAttachmentLayoutProps {
     icon?: React.ReactNode;
@@ -27,12 +27,11 @@ export interface IAttachmentLayoutProps {
     idLabel?: string;
     dateUpdated?: string;
     user?: IUserFragment;
-    details?: Array<{ label: string; value: string; url?: string }>;
+    metadata: IAttachment["metadata"];
 }
 
 export default function AttachmentLayout(props: IAttachmentLayoutProps) {
-    const { transformLayout } = useIntegrationContext();
-    const { icon, title, notice, url, id, idLabel, dateUpdated, user, details } = transformLayout?.(props) ?? props;
+    const { icon, title, notice, url, id, idLabel, dateUpdated, user, metadata } = props;
     const classes = AttachmentLayoutClasses();
 
     return (
@@ -55,7 +54,7 @@ export default function AttachmentLayout(props: IAttachmentLayoutProps) {
                             {!!dateUpdated && !!user && (
                                 <MetaItem>
                                     <Translate
-                                        source="Last updated <0/> by <1/>."
+                                        source="Last refreshed <0/> by <1/>."
                                         c0={<DateTime timestamp={dateUpdated} />}
                                         c1={<ProfileLink className={metasClasses().metaLink} userFragment={user} />}
                                     />
@@ -71,7 +70,7 @@ export default function AttachmentLayout(props: IAttachmentLayoutProps) {
                                     <div className={classes.detailLabel}>{idLabel}</div>
                                     <div className={classes.detailValue}>
                                         <SmartLink to={url} className={classes.externalLink}>
-                                            {id}
+                                            <strong>{id}</strong>
                                             <Icon
                                                 className={classes.externalIcon}
                                                 icon="meta-external"
@@ -84,30 +83,37 @@ export default function AttachmentLayout(props: IAttachmentLayoutProps) {
                         </div>
                     )}
                 </div>
+                <div className={classes.details}>
+                    {(metadata ?? [])?.map((detail, index) => {
+                        let valueContents: React.ReactNode = detail.value;
 
-                <CollapsableContent>
-                    <div className={classes.details}>
-                        {(details ?? [])?.map((detail, index) => (
+                        if (detail.format === "date-time") {
+                            valueContents = (
+                                <DateTime
+                                    timestamp={detail.value.toString()}
+                                    mode="fixed"
+                                    type={DateFormats.EXTENDED}
+                                />
+                            );
+                        }
+
+                        if (detail.labelCode)
+                            if (detail.url) {
+                                valueContents = (
+                                    <SmartLink to={detail.url} className={classes.detailLink}>
+                                        {valueContents}
+                                        <Icon className={classes.externalIcon} icon="meta-external" size="default" />
+                                    </SmartLink>
+                                );
+                            }
+                        return (
                             <div key={index} className={classes.detailItem}>
-                                <div className={classes.detailLabel}>{detail.label}</div>
-                                <div className={classes.detailValue}>
-                                    {detail.url ? (
-                                        <SmartLink to={detail.url} className={classes.externalLink}>
-                                            {detail.value}
-                                            <Icon
-                                                className={classes.externalIcon}
-                                                icon="meta-external"
-                                                size="default"
-                                            />
-                                        </SmartLink>
-                                    ) : (
-                                        detail.value
-                                    )}
-                                </div>
+                                <div className={classes.detailLabel}>{t(detail.labelCode)}</div>
+                                <div className={classes.detailValue}>{valueContents}</div>
                             </div>
-                        ))}
-                    </div>
-                </CollapsableContent>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );

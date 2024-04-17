@@ -43,6 +43,10 @@ import { forumReducer } from "@vanilla/addon-vanilla/redux/reducer";
 import { CommunitySearchProvider } from "@vanilla/addon-vanilla/search/CommunitySearchProvider";
 import { delegateEvent } from "@vanilla/dom-utils";
 import React from "react";
+import {
+    LegacyIntegrationsOptionsMenuItems,
+    LegacyThreadAttachmentsAsset,
+} from "@vanilla/addon-vanilla/thread/LegacyAttachments";
 
 registerReducer("forum", forumReducer);
 
@@ -70,6 +74,8 @@ addComponent("AccountSettings", AccountSettings, { overwrite: true });
 addComponent("EditProfileFields", EditProfileFields, { overwrite: true });
 addComponent("FollowedContent", FollowedContent, { overwrite: true });
 addComponent("NotificationPreferences", NotificationPreferences, { overwrite: true });
+addComponent("LegacyThreadAttachmentsAsset", LegacyThreadAttachmentsAsset);
+addComponent("LegacyIntegrationsOptionsMenuItems", LegacyIntegrationsOptionsMenuItems);
 
 SearchContextProvider.setOptionProvider(new CommunitySearchProvider());
 accessibleRoleButton();

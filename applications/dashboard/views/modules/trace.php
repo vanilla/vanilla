@@ -52,11 +52,11 @@
     </style>
     <h2>Debug Trace</h2>
     <table>
-        <?php
-        foreach ($this->data('Traces') as $Trace):
-            list($Message, $Type) = $Trace;
+        <?php foreach ($this->data("Traces") as $Trace):
 
-            $Var = 'Debug';
+            [$Message, $Type] = $Trace;
+
+            $Var = "Debug";
             if (!in_array($Type, [TRACE_ERROR, TRACE_INFO, TRACE_NOTICE, TRACE_WARNING])) {
                 $Var = $Type;
                 $Type = TRACE_INFO;
@@ -68,26 +68,29 @@
             <tr>
                 <td class="TagColumn">
                     <span
-                        class="Tag Tag-<?php echo Gdn_Format::alphaNumeric($Type); ?>"><?php echo htmlspecialchars($Type); ?></span>
+                        class="Tag Tag-<?php echo Gdn_Format::alphaNumeric($Type); ?>"><?php echo htmlspecialchars(
+    $Type
+); ?></span>
                 </td>
                 <td>
-                    <?php
-                    if (is_string($Message)) {
-                        if ($Var != 'Debug')
-                            echo '<b>'.htmlspecialchars($Var).'</b>: ';
+                    <?php if (is_string($Message)) {
+                        if ($Var != "Debug") {
+                            echo "<b>" . htmlspecialchars($Var) . "</b>: ";
+                        }
 
                         echo nl2br(htmlspecialchars($Message));
-                    } elseif (is_a($Message, 'Exception')) {
-                        echo '<pre>';
+                    } elseif ($Message instanceof Throwable) {
+                        echo "<pre>";
                         echo htmlspecialchars($Message->getMessage());
                         echo "\n\n";
                         echo htmlspecialchars($Message->getTraceAsString());
-                        echo '</pre>';
-                    } else
-                        echo "<pre><b>$Var:</b> ".htmlspecialchars(var_export($Message, true)).'</pre>';
-                    ?>
+                        echo "</pre>";
+                    } else {
+                        echo "<pre><b>$Var:</b> " . htmlspecialchars(var_export($Message, true)) . "</pre>";
+                    } ?>
                 </td>
             </tr>
-        <?php endforeach; ?>
+        <?php
+        endforeach; ?>
     </table>
 </div>

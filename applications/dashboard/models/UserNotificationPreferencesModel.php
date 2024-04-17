@@ -165,10 +165,9 @@ class UserNotificationPreferencesModel
                 if (empty($activitiesPerPreference)) {
                     throw new NotFoundException("{$parts[1]} is not a valid preference.");
                 }
-                if ($val != $existingPrefs[$key]) {
-                    $prefsToSave[$key] = intval($val);
-                    $this->userMetaModel->setUserMeta($userID, "Preferences." . $key, intval($val));
-                }
+
+                $prefsToSave[$key] = intval($val);
+                $this->userMetaModel->setUserMeta($userID, "Preferences." . $key, intval($val));
             }
         }
 

@@ -18,7 +18,7 @@ use VanillaTests\UsersAndRolesApiTestTrait;
  */
 class CommentsTest extends AbstractResourceTest
 {
-    public static $addons = ["stubcontent"];
+    public static $addons = ["stubcontent", "test-mock-issue"];
 
     use TestExpandTrait;
     use AssertLoggingTrait;

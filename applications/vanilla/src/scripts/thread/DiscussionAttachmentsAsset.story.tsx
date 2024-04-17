@@ -5,7 +5,10 @@
  */
 
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
-import { AttachmentIntegrationsApiContextProvider } from "@library/features/discussions/integrations/Integrations.context";
+import {
+    AttachmentIntegrationsApiContextProvider,
+    AttachmentIntegrationsContextProvider,
+} from "@library/features/discussions/integrations/Integrations.context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DiscussionAttachmentsAsset from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
 import React from "react";
@@ -32,19 +35,21 @@ const StoryAttachments = () => {
     return (
         <QueryClientProvider client={queryClient}>
             <AttachmentIntegrationsApiContextProvider api={FAKE_API}>
-                <DiscussionAttachmentsAsset
-                    discussion={{
-                        ...discussion,
-                        attachments: [
-                            {
-                                ...FAKE_ATTACHMENT,
-                                recordType: "discussion",
-                                recordID: `${discussion.discussionID}`,
-                                insertUser: STORY_USER,
-                            },
-                        ],
-                    }}
-                />
+                <AttachmentIntegrationsContextProvider>
+                    <DiscussionAttachmentsAsset
+                        discussion={{
+                            ...discussion,
+                            attachments: [
+                                {
+                                    ...FAKE_ATTACHMENT,
+                                    recordType: "discussion",
+                                    recordID: `${discussion.discussionID}`,
+                                    insertUser: STORY_USER,
+                                },
+                            ],
+                        }}
+                    />
+                </AttachmentIntegrationsContextProvider>
             </AttachmentIntegrationsApiContextProvider>
         </QueryClientProvider>
     );

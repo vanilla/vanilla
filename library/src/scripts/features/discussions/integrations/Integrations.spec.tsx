@@ -35,6 +35,7 @@ const mockApi: IIntegrationsApi = {
     getIntegrationsCatalog: jest.fn(FAKE_API.getIntegrationsCatalog),
     getAttachmentSchema: jest.fn(FAKE_API.getAttachmentSchema),
     postAttachment: jest.fn(FAKE_API.postAttachment),
+    refreshAttachments: jest.fn(FAKE_API.refreshAttachments),
 };
 
 beforeEach(() => {

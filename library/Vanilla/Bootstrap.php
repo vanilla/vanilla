@@ -122,6 +122,9 @@ class Bootstrap
             ->addAlias("AddonManager")
             ->addCall("registerAutoloader");
 
+        // Attachements
+        $container->rule(Vanilla\Dashboard\Models\AttachmentService::class)->setShared(true);
+
         // Analytics
         $container
             ->rule(\Vanilla\Analytics\Client::class)

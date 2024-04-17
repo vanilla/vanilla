@@ -13,7 +13,7 @@ namespace Vanilla;
 abstract class AddonStructure
 {
     /**
-     * Strucutre the site for the adodn.
+     * Structure the site for the addon.
      *
      * This is called after an addon is enabled as well as whenever new code is deployed.
      * This method is meant to take whatever the current state of the configuration or database of a site

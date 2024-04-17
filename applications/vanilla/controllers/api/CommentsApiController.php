@@ -200,10 +200,7 @@ class CommentsApiController extends AbstractApiController
         }
 
         $this->userModel->expandUsers($comment, $this->resolveExpandFields($query, ["insertUser" => "InsertUserID"]));
-        if (
-            ModelUtils::isExpandOption("attachments", $query["expand"] ?? []) &&
-            Gdn::session()->checkPermission("Garden.Staff.Allow")
-        ) {
+        if (ModelUtils::isExpandOption("attachments", $query["expand"] ?? [])) {
             $attachmentModel = AttachmentModel::instance();
             $attachmentModel->joinAttachments($comment);
         }
@@ -441,10 +438,7 @@ class CommentsApiController extends AbstractApiController
 
         // Expand associated rows.
         $this->userModel->expandUsers($rows, $this->resolveExpandFields($query, ["insertUser" => "InsertUserID"]));
-        if (
-            ModelUtils::isExpandOption("attachments", $query["expand"] ?? []) &&
-            Gdn::session()->checkPermission("Garden.Staff.Allow")
-        ) {
+        if (ModelUtils::isExpandOption("attachments", $query["expand"] ?? [])) {
             $attachmentModel = AttachmentModel::instance();
             $attachmentModel->joinAttachments($rows);
         }

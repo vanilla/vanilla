@@ -10,7 +10,14 @@ import {
     IAttachmentIntegrationCatalog,
     IIntegrationsApi,
 } from "@library/features/discussions/integrations/Integrations.types";
+import { api } from "@library/notificationPreferences";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { JsonSchema } from "@vanilla/json-schema-forms";
+import React, { PropsWithChildren } from "react";
+import {
+    AttachmentIntegrationsApiContextProvider,
+    AttachmentIntegrationsContextProvider,
+} from "../Integrations.context";
 
 export const FAKE_INTEGRATION: IAttachmentIntegration = {
     label: "Fake Integration for Discussion",
@@ -95,4 +102,31 @@ export const FAKE_API: IIntegrationsApi = {
     getIntegrationsCatalog: async () => FAKE_INTEGRATIONS_CATALOG,
     getAttachmentSchema: async (params) => FAKE_INTEGRATION_SCHEMAS[params.attachmentType],
     postAttachment: async (params) => ({} as any),
+    refreshAttachments: async (params) => [],
 };
+
+export const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            enabled: false,
+            retry: false,
+        },
+    },
+});
+
+export const mockApi = {
+    getIntegrationsCatalog: jest.fn(FAKE_API.getIntegrationsCatalog),
+    getAttachmentSchema: jest.fn(FAKE_API.getAttachmentSchema),
+    postAttachment: jest.fn(FAKE_API.postAttachment),
+    refreshAttachments: jest.fn(FAKE_API.refreshAttachments),
+};
+
+export function IntegrationsTestWrapper({ children }: PropsWithChildren<{}>) {
+    return (
+        <QueryClientProvider client={queryClient}>
+            <AttachmentIntegrationsApiContextProvider api={mockApi}>
+                <AttachmentIntegrationsContextProvider>{children}</AttachmentIntegrationsContextProvider>
+            </AttachmentIntegrationsApiContextProvider>
+        </QueryClientProvider>
+    );
+}

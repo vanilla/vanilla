@@ -20,6 +20,7 @@
             "@Ranks/*": ["./cloud/plugins/Ranks/src/scripts/*"],
             "@badges/*": ["./cloud/plugins/badges/src/scripts/*"],
             "@Online/*": ["./cloud/plugins/Online/src/scripts/*"],
+            "@Jira/*": ["./cloud/plugins/Jira/src/scripts/*"],
             "@ElasticSearch/*": ["./cloud/plugins/ElasticSearch/src/scripts/*"],
             "@QnA/*": ["./plugins/QnA/src/scripts/*"],
             "@vanilla-ai/*": ["./cloud/plugins/vanilla-ai/src/scripts/*"],

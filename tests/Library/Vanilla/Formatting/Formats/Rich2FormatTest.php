@@ -205,4 +205,19 @@ HTML;
         $parseBody = $this->prepareFormatter()->reparseQuotes($body);
         $this->assertFalse(str_contains($parseBody, "This shouldn't be in the quote"));
     }
+
+    /**
+     * Test that an unsafe URL is sanitized.
+     *
+     * @return void
+     */
+    public function testSanitizeUrl(): void
+    {
+        $body =
+            "[{\"type\":\"p\",\"children\":[{\"text\":\"\"},{\"type\":\"a\",\"url\":\"javascript:alert(document.cookie)\",\"children\":[{\"text\":\"TEST1\"}]},{\"text\":\"\"}]}]";
+        $expectedUrl = "unsafe:javascript:alert(document.cookie)";
+        $output = $this->prepareFormatter()->parse($body);
+        $renderedOutput = $output->getNodeList()->render();
+        $this->assertStringContainsString($expectedUrl, $renderedOutput);
+    }
 }

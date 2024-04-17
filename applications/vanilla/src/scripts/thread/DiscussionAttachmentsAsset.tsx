@@ -4,12 +4,13 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import {
-    AttachmentIntegrationsContextProvider,
     IntegrationContextProvider,
+    useAttachmentIntegrations,
     useIntegrationContext,
+    useRefreshStaleAttachments,
 } from "@library/features/discussions/integrations/Integrations.context";
 import { IAttachment } from "@library/features/discussions/integrations/Integrations.types";
 import AttachmentLayout from "@library/features/discussions/integrations/components/AttachmentLayout";
@@ -28,38 +29,57 @@ export function DiscussionAttachmentsAsset(props: IProps) {
 
     const {
         query: { data },
+        invalidate: invalidateDiscussionQuery,
     } = useDiscussionQuery(discussionID, discussionApiParams, discussionPreload);
 
     const discussion = data!;
     const attachments = discussion.attachments;
 
+    const refreshStaleAttachments = useRefreshStaleAttachments();
+
+    const refreshStaleDiscussionAttachments = useCallback(async () => {
+        if (!!attachments && attachments.length > 0) {
+            await refreshStaleAttachments(attachments.map(({ attachmentID }) => attachmentID));
+            await invalidateDiscussionQuery();
+        }
+    }, [attachments?.length]);
+
+    useEffect(() => {
+        refreshStaleDiscussionAttachments();
+    }, [refreshStaleDiscussionAttachments]);
+
     return (
-        <AttachmentIntegrationsContextProvider>
-            {attachments?.map((attachment) => {
-                return (
-                    <IntegrationContextProvider
+        <>
+            {attachments?.map((attachment) => (
+                <IntegrationContextProvider
+                    key={attachment.attachmentID}
+                    recordType={"discussion"}
+                    recordID={discussion.discussionID}
+                    attachmentType={attachment.attachmentType}
+                >
+                    <DiscussionAttachment
                         key={attachment.attachmentID}
-                        recordType={"discussion"}
-                        recordID={discussion.discussionID}
-                        attachmentType={attachment.attachmentType}
-                    >
-                        <DiscussionAttachment attachment={attachment} />
-                    </IntegrationContextProvider>
-                );
-            })}
-        </AttachmentIntegrationsContextProvider>
+                        attachment={attachment}
+                        onSuccessfulRefresh={invalidateDiscussionQuery}
+                    />
+                </IntegrationContextProvider>
+            ))}
+        </>
     );
 }
 
-export function DiscussionAttachment(props: { attachment: IAttachment }) {
-    const { title, externalIDLabel, logoIcon } = useIntegrationContext();
+export function DiscussionAttachment(props: { attachment: IAttachment; onSuccessfulRefresh?: () => Promise<void> }) {
     const {
         attachment: { state, status, sourceUrl, sourceID, dateUpdated, dateInserted, metadata, insertUser },
     } = props;
 
-    const details = metadata
-        .map(({ labelCode, value }) => ({ label: labelCode, value: `${value ?? ""}` }))
-        .filter((d) => !!d.value);
+    const integrations = useAttachmentIntegrations();
+
+    const integration = integrations.find((i) => i.attachmentType === props.attachment.attachmentType);
+
+    const title = integration?.title ?? "Unknown Integration";
+    const externalIDLabel = integration?.externalIDLabel ?? "Unknown #";
+    const logoIcon = integration?.logoIcon ?? "meta-external";
 
     return (
         <AttachmentLayout
@@ -71,7 +91,7 @@ export function DiscussionAttachment(props: { attachment: IAttachment }) {
             id={sourceID ? `${sourceID}` : undefined}
             dateUpdated={dateUpdated ?? dateInserted}
             user={insertUser}
-            details={details}
+            metadata={metadata}
         />
     );
 }

@@ -106,5 +106,13 @@ export const rangePickerClasses = () => {
             },
         },
     });
-    return { container, picker };
+    const invalid = css({
+        padding: "0 0 20px",
+        width: "100%",
+        display: "block",
+        color: "#d0021b",
+        fontSize: 12,
+        marginTop: -4,
+    });
+    return { container, picker, invalid };
 };

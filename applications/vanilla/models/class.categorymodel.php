@@ -2678,7 +2678,7 @@ class CategoryModel extends Gdn_Model implements
             $children = self::flattenTree($this->collection->getTree($categoryID));
             $recursionLevel++;
             foreach ($children as $child) {
-                self::legacyDelete($child, 0);
+                self::legacyDelete($child["CategoryID"], 0);
             }
             $recursionLevel--;
         }
@@ -4458,8 +4458,9 @@ class CategoryModel extends Gdn_Model implements
             $defaultPreferences = $this->convertOldPreferencesToNew($defaultPreferences);
             foreach ($defaultPreferences as $categoryPreference) {
                 $categoryID = $categoryPreference["categoryID"];
+                $category = $this->getOne($categoryID);
 
-                if (!self::checkPermission($categoryID, "Vanilla.Discussions.View")) {
+                if (empty($category) || !self::checkPermission($categoryID, "Vanilla.Discussions.View")) {
                     continue;
                 }
                 // set the preferences here and it should be all set
@@ -4487,6 +4488,37 @@ class CategoryModel extends Gdn_Model implements
                 "trace" => $exception->getTraceAsString(),
             ]);
         }
+    }
+
+    /**
+     *  Remove category from the default categories list if they exist in the list
+     *
+     * @param int $deletedCategoryId
+     * @return void
+     * @throws JsonException
+     */
+    public function removeDefaultCategory(int $deletedCategoryId): void
+    {
+        $defaultPreferences = Gdn::config()->get(self::DEFAULT_FOLLOWED_CATEGORIES_KEY, false);
+        // If there are no default preferences, we don't need to do anything.
+        if (!$defaultPreferences) {
+            return;
+        }
+        $defaultPreferences = json_decode($defaultPreferences, true, 512, JSON_THROW_ON_ERROR);
+        if (!is_array($defaultPreferences)) {
+            throw new JsonException("Invalid format received");
+        }
+        $defaultCategories = array_column($defaultPreferences, "categoryID");
+        $index = array_search($deletedCategoryId, $defaultCategories);
+        if ($index === false) {
+            return;
+        }
+
+        // Remove the category from the default preferences
+        unset($defaultPreferences[$index]);
+        $defaultPreferences = array_values($defaultPreferences);
+
+        Gdn::config()->set(self::DEFAULT_FOLLOWED_CATEGORIES_KEY, json_encode($defaultPreferences));
     }
 
     /**
@@ -5276,6 +5308,9 @@ SQL;
 
         // We delete layoutViews associated with the deleted category.
         $layoutViewModel->delete(["recordType" => "category", "recordID" => $categoryID]);
+
+        // Remove the category from the default preferences if it's there
+        $this->removeDefaultCategory($categoryID);
 
         // Let the world know we completed our mission.
         $this->EventArguments["CategoryID"] = $categoryID;

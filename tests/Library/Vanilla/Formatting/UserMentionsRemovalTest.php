@@ -271,6 +271,17 @@ class UserMentionsRemovalTest extends SiteTestCase
                  <div>UserToAnonymize is an amazing human slash genius.</div>
                  </blockquote>',
             ],
+            "validQuoteNoSpaceWithFluff" => [
+                '<blockquote class="Quote"><div class="QuoteAuthor"><a href="/profile/UserToAnonymize" class="js-userCard" data-userid="1" title="Link:/profile/UserToAnonymize">UserToAnonymize</a> said:</div>
+                 <div>UserToAnonymize is an amazing human slash genius.</div>
+                 </blockquote>',
+                '<blockquote class="Quote"><div class="QuoteAuthor"><a href="' .
+                $baseUrl .
+                self::PROFILE_URL_ANONYMIZE .
+                '" class="js-userCard" data-userid="-1">[Deleted User]</a> said:</div>
+                 <div>UserToAnonymize is an amazing human slash genius.</div>
+                 </blockquote>',
+            ],
             "validQuoteWithSpace" => [
                 '<blockquote class="Quote"><div class="QuoteAuthor"><a href="/profile/User%20To%20Anonymize" class="js-userCard" data-userid="1">User To Anonymize</a> said:</div>
                  <div>UserToAnonymize is an amazing human slash genius.</div>

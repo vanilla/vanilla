@@ -75,7 +75,7 @@ class WysiwygFormat extends HtmlFormat
         $regex->addReplacement(...$this->getUrlReplacementPattern($username, $this->anonymizeUrl));
         $regex->addReplacement(
             sprintf(
-                '~<div\s+class="QuoteAuthor">\s*<a\s+href="(.+?)"\s+class="(.+?)"\s+data-userid="(\d+)">%s</a>~',
+                '~<div\s+class="QuoteAuthor">\s*<a\s+href="(.+?)"\s+class="(.+?)"\s+data-userid="(\d+)".*?>%s</a>~',
                 preg_quote($username)
             ),
             sprintf(

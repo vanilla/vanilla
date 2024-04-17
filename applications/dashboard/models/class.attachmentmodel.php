@@ -9,6 +9,8 @@
  */
 
 use Garden\Schema\Schema;
+use Vanilla\Dashboard\Models\AttachmentService;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Handles attachments. Least-Buddhist model of them all.
@@ -219,7 +221,7 @@ class AttachmentModel extends Gdn_Model
      * @param $data2 - Optional set of Data to which to attach comments
      *
      */
-    public function joinAttachments(&$data, &$data2 = null)
+    public function joinAttachments(&$data, &$data2 = null, bool $refresh = false)
     {
         if ($data == null) {
             return;
@@ -231,15 +233,27 @@ class AttachmentModel extends Gdn_Model
             self::gatherIDs($data2, $foreignIDs);
         }
         // Get the attachments.
-        $attachments = $this->getWhere(["ForeignID" => array_keys($foreignIDs)], "DateInserted", "desc")->resultArray();
-        $this->normalizeAttachments($attachments);
-        \Gdn::userModel()->expandUsers($attachments, ["InsertUser", "UpdateUser"]);
-        $attachments = Gdn_DataSet::index($attachments, "ForeignID", ["Unique" => false]);
+        $attachments = $legacyAttachments = $this->getWhere(
+            ["ForeignID" => array_keys($foreignIDs)],
+            "DateInserted",
+            "asc"
+        )->resultArray();
+
+        if ($refresh) {
+            $attachments = $this->attachmentService()->refreshStale($attachments);
+        }
+
+        $attachments = $this->attachmentService()->normalizeAttachments($attachments);
+        \Gdn::userModel()->expandUsers($attachments, ["insertUser", "updateUser"]);
+        $attachmentsByForeignID = ArrayUtils::arrayColumnArrays($attachments, null, "foreignID");
+        $legacyAttachmentsByForeignID = ArrayUtils::arrayColumnArrays($legacyAttachments, null, "ForeignID");
 
         // Join the attachments.
-        $this->joinAttachmentsTo($data, $attachments);
+        $this->joinAttachmentsTo($data, $attachmentsByForeignID);
+        $this->joinAttachmentsTo($data, $legacyAttachmentsByForeignID, "LegacyAttachments");
         if ($data2) {
-            $this->joinAttachmentsTo($data2, $attachments);
+            $this->joinAttachmentsTo($data2, $attachmentsByForeignID);
+            $this->joinAttachmentsTo($data2, $legacyAttachmentsByForeignID, "LegacyAttachments");
         }
     }
 
@@ -322,13 +336,13 @@ class AttachmentModel extends Gdn_Model
         $where = array_merge(["ForeignUserID" => $user->UserID], $where);
 
         $attachments = $this->getWhere($where, "", "desc", $limit)->resultArray();
-        $this->normalizeAttachments($attachments);
+        $attachments = $this->attachmentService()->normalizeAttachments($attachments);
 
         $sender->setData("Attachments", $attachments);
         return true;
     }
 
-    protected function joinAttachmentsTo(&$data, $attachments)
+    private function joinAttachmentsTo(&$data, $attachments, string $joinAs = "Attachments")
     {
         if (is_a($data, "Gdn_DataSet") || (is_array($data) && isset($data[0]))) {
             // This is a dataset.
@@ -336,40 +350,24 @@ class AttachmentModel extends Gdn_Model
                 // This is a single record.
                 $rowID = self::rowID($row);
                 if (isset($attachments[$rowID])) {
-                    setValue("Attachments", $row, $attachments[$rowID]);
+                    setValue($joinAs, $row, $attachments[$rowID]);
                 }
             }
         } else {
             // This is a single record.
             $rowID = self::rowID($data);
             if (isset($attachments[$rowID])) {
-                setValue("Attachments", $data, $attachments[$rowID]);
+                setValue($joinAs, $data, $attachments[$rowID]);
             }
         }
     }
 
     /**
-     * Normalize attachment data for api output.
-     *
-     * @param array $attachments
-     * @return void
-     * @throws \Garden\Container\ContainerException
-     * @throws \Garden\Container\NotFoundException
+     * @return AttachmentService
      */
-    public function normalizeAttachments(array &$attachments)
+    private function attachmentService(): AttachmentService
     {
-        $this->EventArguments["Attachments"] = $attachments;
-        $eventManager = Gdn::getContainer()->get(\Garden\EventManager::class);
-        $eventManager->fireFilter("attachmentModel_normalizeAttachments", $this, ["Attachments" => &$attachments]);
-        foreach ($attachments as &$attachment) {
-            $attachment["attachmentType"] = $attachment["Type"];
-            if (isset($attachment["SourceURL"])) {
-                $attachment["sourceUrl"] = $attachment["SourceURL"];
-            }
-            unset($attachment["InsertIPAddress"]);
-            unset($attachment["UpdateIPAddress"]);
-            unset($attachment["InsertUser"]);
-        }
+        return Gdn::getContainer()->get(AttachmentService::class);
     }
 
     /**
@@ -409,20 +407,29 @@ class AttachmentModel extends Gdn_Model
             "attachmentType:s",
             "recordType:s",
             "recordID:i",
+            "foreignID:s",
             "foreignUserID:i",
             "source:s",
             "sourceID:s",
             "sourceUrl:s",
             "status:s",
-            "lastModifiedDate:s",
-            "metadata:a?" => [
+            "lastModifiedDate:dt",
+            "metadata:a" => [
+                "default" => [],
                 "items" => [
-                    "properties" => ["labelCode:s", "value:s"],
+                    "properties" => [
+                        "labelCode:s",
+                        "value:s",
+                        "url:s?",
+                        "format:s?" => [
+                            "enum" => "date-time",
+                        ],
+                    ],
                 ],
             ],
-            "dateInserted:s",
+            "dateInserted:dt",
             "insertUserID:i",
-            "dateUpdated:s?",
+            "dateUpdated:dt",
             "updateUserID:i?",
         ]);
     }

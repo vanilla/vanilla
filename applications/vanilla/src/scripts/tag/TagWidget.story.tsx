@@ -4,11 +4,12 @@
  * @license Proprietary
  */
 
-import React from "react";
+import { TagPreset } from "@library/metas/Tags.variables";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import TagWidget from "@vanilla/addon-vanilla/tag/TagWidget";
 import { BorderType } from "@library/styles/styleHelpersBorders";
+import TagWidget from "@vanilla/addon-vanilla/tag/TagWidget";
+import React from "react";
 
 export default {
     title: "Widgets/Tag",
@@ -207,6 +208,9 @@ const tagStubPropsShadow = {
         borderType: BorderType.SHADOW as BorderType,
         headerAlignment: "center" as "left" | "center",
     },
+    itemOptions: {
+        tagPreset: TagPreset.PRIMARY as TagPreset,
+    },
 };
 
 const tagStubPropsBorder = {
@@ -227,7 +231,11 @@ const tagStubNaked = {
 
 export const ContainerOptionsVariants = storyWithConfig({}, () => (
     <>
-        <StoryHeading>{'containerOptions: { borderType: "shadow" , headerAlignment: "center"}'}</StoryHeading>
+        <StoryHeading>
+            {
+                'containerOptions: { borderType: "shadow" , headerAlignment: "center"}, itemOptions: { tagPreset: "primary" }'
+            }
+        </StoryHeading>
         <TagWidget {...tagStubPropsShadow} />
         <StoryHeading>
             {'containerOptions: { borderType: "none" , outerBackground: "#AEE4FE", innerBackground: "#FFFFFF"}'}
@@ -237,3 +245,37 @@ export const ContainerOptionsVariants = storyWithConfig({}, () => (
         <TagWidget {...tagStubNaked} />
     </>
 ));
+
+export const ThemeVariables = storyWithConfig(
+    {
+        themeVars: {
+            tags: {
+                tagCloud: {
+                    showCount: false,
+                    tagPreset: "success",
+                    box: {
+                        background: {
+                            color: "rgb(255,241,219)",
+                        },
+                    },
+                },
+            },
+        },
+    },
+    () => (
+        <>
+            <StoryHeading>
+                {
+                    'containerOptions: { borderType: "shadow" , headerAlignment: "center"}, itemOptions: { tagPreset: "primary" }'
+                }
+            </StoryHeading>
+            <TagWidget {...tagStubPropsShadow} />
+            <StoryHeading>
+                {'containerOptions: { borderType: "none" , outerBackground: "#AEE4FE", innerBackground: "#FFFFFF"}'}
+            </StoryHeading>
+            <TagWidget {...tagStubPropsBorder} />
+            <StoryHeading>{"naked"}</StoryHeading>
+            <TagWidget {...tagStubNaked} />
+        </>
+    ),
+);

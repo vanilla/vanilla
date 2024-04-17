@@ -32,6 +32,9 @@ class DiscussionController extends VanillaController
     /** @var Message[] */
     private $messages = [];
 
+    /** @var object|null */
+    public $Discussion;
+
     /**
      *
      *
@@ -340,12 +343,9 @@ class DiscussionController extends VanillaController
 
         $AttachmentModel = AttachmentModel::instance();
         if (AttachmentModel::enabled()) {
-            $AttachmentModel->joinAttachments($this->Data["Discussion"], $this->Data["Comments"]);
+            $AttachmentModel->joinAttachments($this->Data["Discussion"], $this->Data["Comments"], true);
 
-            $this->fireEvent("FetchAttachmentViews");
-            if ($this->deliveryMethod() === DELIVERY_METHOD_XHTML) {
-                require_once $this->fetchViewLocation("attachment", "attachments", "dashboard");
-            }
+            require_once $this->fetchViewLocation("attachment", "attachments", "dashboard");
         }
 
         if (Gdn::config("Vanilla.Discussions.BuiltInJsonLD", true)) {

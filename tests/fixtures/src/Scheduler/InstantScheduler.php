@@ -142,6 +142,7 @@ class InstantScheduler extends DeferredScheduler
     public function reset()
     {
         $this->trackingSlips = [];
+        $this->scheduledJobs = [];
         $this->isPaused = false;
         $this->isDispatching = false;
     }

@@ -30,10 +30,12 @@ import { useFloatingLinkSelectors } from "@udecode/plate-link";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
 import React, { useRef } from "react";
+import { useVanillaEditorFocus } from "@library/vanilla-editor/VanillaEditorFocusContext";
 
 const FloatingLinkInsertRoot = function (props: React.PropsWithChildren<{}>) {
     const arrowRef = useRef<HTMLDivElement | null>(null);
     const { boundsRef } = useVanillaEditorBounds();
+    const { isFocusWithinEditor } = useVanillaEditorFocus();
 
     const floatingResult = useFloatingLinkInsert({
         floatingOptions: {
@@ -49,7 +51,7 @@ const FloatingLinkInsertRoot = function (props: React.PropsWithChildren<{}>) {
         },
     });
 
-    if (!floatingResult.open) {
+    if (!floatingResult.open || !isFocusWithinEditor) {
         return null;
     }
 
@@ -63,6 +65,7 @@ const FloatingLinkInsertRoot = function (props: React.PropsWithChildren<{}>) {
 const FloatingLinkEditRoot = function (props: React.PropsWithChildren<{}>) {
     const arrowRef = useRef<HTMLDivElement | null>(null);
     const { boundsRef } = useVanillaEditorBounds();
+    const { isFocusWithinEditor } = useVanillaEditorFocus();
 
     const floatingResult = useFloatingLinkEdit({
         floatingOptions: {
@@ -78,7 +81,7 @@ const FloatingLinkEditRoot = function (props: React.PropsWithChildren<{}>) {
         },
     });
 
-    if (!floatingResult.open) {
+    if (!floatingResult.open || !isFocusWithinEditor) {
         return null;
     }
 

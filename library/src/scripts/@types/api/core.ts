@@ -50,9 +50,15 @@ export type { IFieldError };
 
 export interface IServerError {
     message: string;
+    description?: string;
     status: number;
     errors?: {
         [key: string]: IFieldError[];
+    };
+    actionButton?: {
+        label: string;
+        url: string;
+        target?: string;
     };
 }
 

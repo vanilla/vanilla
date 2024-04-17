@@ -125,6 +125,7 @@ class LogPostEvent implements \Garden\Events\TrackingEventInterface
         } elseif (isset($postEvent["comment"])) {
             $trackingData = $trackableCommunityModel->getTrackableLogComment($postEvent["comment"]);
         }
+        $trackingData["comment"]["body"] = null;
 
         $discussionID = $postEvent["discussion"]["discussionID"] ?? null;
         if ($discussionID !== null) {
@@ -132,6 +133,7 @@ class LogPostEvent implements \Garden\Events\TrackingEventInterface
         } elseif (isset($postEvent["discussion"])) {
             $trackingData["discussion"] = $trackableCommunityModel->getTrackableLogDiscussion($postEvent["discussion"]);
         }
+        $trackingData["discussion"]["body"] = null;
 
         $trackingData["discipliningUser"] = $trackableUserModel->getTrackableUser(
             $postEvent["discipliningUser"]["userID"]

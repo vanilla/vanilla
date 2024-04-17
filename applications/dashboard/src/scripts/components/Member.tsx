@@ -48,7 +48,7 @@ export default function Member(props: IMemberResult) {
         }
         return "";
     };
-
+    const safeData = safelyFormatDate(user.dateLastActive);
     return (
         <tr className={classes.root}>
             <td className={classNames(classes.cell, classes.isLeft, classes.mainColumn)}>
@@ -97,9 +97,7 @@ export default function Member(props: IMemberResult) {
                 </td>
             )}
             <td className={classNames(classes.cell, classes.date, classes.isRight, classes.lastActiveColumn)}>
-                <span className={classes.minHeight}>
-                    <DateTime timestamp={safelyFormatDate(user.dateLastActive)} />
-                </span>
+                <span className={classes.minHeight}>{safeData !== "" && <DateTime timestamp={safeData} />}</span>
             </td>
         </tr>
     );

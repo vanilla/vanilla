@@ -8,7 +8,6 @@ import { IApiError, ILoadable, LoadStatus } from "@library/@types/api/core";
 import { queryResultToILoadable } from "@library/ReactQueryUtils";
 import { IntegrationsApi } from "@library/features/discussions/integrations/Integrations.api";
 import {
-    CustomIntegrationContext,
     IAttachment,
     IAttachmentIntegration,
     IAttachmentIntegrationCatalog,
@@ -21,6 +20,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { JsonSchema } from "@vanilla/json-schema-forms";
 import { RecordID } from "@vanilla/utils";
 import { PropsWithChildren, createContext, useContext } from "react";
+import { lookupCustomIntegrationsContext } from "@library/features/discussions/integrations/Integrations.registry";
 
 export interface IAttachmentIntegrationsApiContextValue {
     api: IIntegrationsApi;
@@ -60,14 +60,20 @@ function getIntegrationsFromMeta(): IAttachmentIntegrationCatalog | undefined {
 }
 interface IAttachmentIntegrationsContextValue {
     integrations: IAttachmentIntegration[];
+    refreshStaleAttachments: (attachmentIDs: Array<IAttachment["attachmentID"]>) => Promise<void>;
 }
 
-const AttachmentIntegrationsContext = createContext<IAttachmentIntegrationsContextValue>({
+export const AttachmentIntegrationsContext = createContext<IAttachmentIntegrationsContextValue>({
     integrations: [],
+    refreshStaleAttachments: async (_attachmentIDs) => ({} as any),
 });
 
 export function useAttachmentIntegrations() {
     return useContext(AttachmentIntegrationsContext).integrations;
+}
+
+export function useRefreshStaleAttachments() {
+    return useContext(AttachmentIntegrationsContext).refreshStaleAttachments;
 }
 
 export function AttachmentIntegrationsContextProvider(
@@ -86,27 +92,26 @@ export function AttachmentIntegrationsContextProvider(
         enabled: initialIntegrations === undefined,
     });
 
-    const availableIntegrations = integrationsQuery.isSuccess ? integrationsQuery.data! : {};
+    const integrationsValue = integrationsQuery.data ?? initialIntegrations;
+
+    const refreshStaleAttachments = useMutation({
+        mutationFn: async (attachmentIDs: Array<IAttachment["attachmentID"]>) => {
+            await api.refreshAttachments({ attachmentIDs, onlyStale: true });
+        },
+    });
 
     return (
         <AttachmentIntegrationsContext.Provider
             value={{
                 ...{
-                    integrations: Object.values(availableIntegrations),
+                    integrations: Object.values(integrationsValue ?? {}),
+                    refreshStaleAttachments: refreshStaleAttachments.mutateAsync,
                 },
             }}
         >
             {props.children}
         </AttachmentIntegrationsContext.Provider>
     );
-}
-
-/**
- * Additional context values for customizing integrations from a plugin.
- */
-const customIntegrationContext: Record<string, CustomIntegrationContext> = {};
-export function registerCustomIntegrationContext(name: string, hook: CustomIntegrationContext) {
-    customIntegrationContext[name] = hook;
 }
 
 export interface IIntegrationContextValue {
@@ -118,6 +123,7 @@ export interface IIntegrationContextValue {
     title: IAttachmentIntegration["title"];
     externalIDLabel: IAttachmentIntegration["externalIDLabel"];
     logoIcon: IAttachmentIntegration["logoIcon"];
+
     // context customizations
     transformLayout?: ICustomIntegrationContext["transformLayout"];
     beforeSubmit?: ICustomIntegrationContext["beforeSubmit"];
@@ -159,15 +165,32 @@ export function IntegrationContextProvider(
         logoIcon = "meta-external",
     } = integration ?? {};
 
-    const customContext = customIntegrationContext[attachmentType]?.();
+    const customContextQuery = useQuery({
+        queryFn: async () => {
+            const customContext = lookupCustomIntegrationsContext(attachmentType);
+            if (customContext) {
+                const contextFn = await customContext();
+                return contextFn();
+            }
+            return null;
+        },
+        queryKey: [attachmentType],
+    });
 
     const schemaQuery = useQuery<unknown, IApiError, JsonSchema>({
+        retry: false,
         queryFn: async () => await api.getAttachmentSchema({ attachmentType, recordType, recordID }),
         queryKey: ["attachmentSchema", attachmentType, recordType, recordID],
         enabled: false,
     });
 
-    const schema = queryResultToILoadable(schemaQuery);
+    let schema = queryResultToILoadable(schemaQuery);
+    if (customContextQuery.isLoading) {
+        schema = {
+            status: LoadStatus.LOADING,
+            data: undefined,
+        };
+    }
 
     const postAttachment = useMutation({
         mutationFn: async (values: IPostAttachmentParams) => {
@@ -175,6 +198,11 @@ export function IntegrationContextProvider(
             return response;
         },
     });
+
+    if (!integration) {
+        return null;
+    }
+
     return (
         <IntegrationContext.Provider
             value={{
@@ -193,9 +221,9 @@ export function IntegrationContextProvider(
                         const response = await postAttachment.mutateAsync(values);
                         return response;
                     },
-                    transformLayout: customContext?.transformLayout,
-                    beforeSubmit: customContext?.beforeSubmit,
-                    CustomIntegrationForm: customContext?.CustomIntegrationForm,
+                    transformLayout: customContextQuery?.data?.transformLayout,
+                    beforeSubmit: customContextQuery?.data?.beforeSubmit,
+                    CustomIntegrationForm: customContextQuery?.data?.CustomIntegrationForm,
                 },
             }}
         >

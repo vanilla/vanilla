@@ -55,6 +55,7 @@ export interface IDropdownControl extends ICommonControl {
     multiple?: boolean;
     helperText?: string;
     type?: string;
+    openDirection?: "top" | "bottom" | "auto";
 }
 
 interface IRadioControl extends ICommonControl {

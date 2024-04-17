@@ -27,7 +27,7 @@ export function AdvancedRangePicker(props: IDateModifierRangePickerProps) {
      * Validates that the end of the range is after the start and that the end of the range is not in the future
      */
     const isRangeValid = useMemo(() => {
-        return moment().isAfter(fromDate) && moment(moment().add(1, "days")).isAfter(toDate);
+        return moment(toDate).isAfter(fromDate);
     }, [fromDate, toDate]);
 
     return (

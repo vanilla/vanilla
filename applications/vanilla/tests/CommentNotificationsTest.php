@@ -156,22 +156,24 @@ class CommentNotificationsTest extends SiteTestCase
      */
     public function testPauseAndResumeProcessExpensiveNotifications()
     {
+        $discussionUser = $this->createUser();
         $firstCommentUser = $this->createUser();
         $secondCommentUser = $this->createUser();
 
         $category = $this->createCategory();
         // Get the discussion and comment from the DB to recreate an activity to process.
-        $discussion = $this->runWithUser([$this, "createDiscussion"], $firstCommentUser);
+        $discussion = $this->runWithUser([$this, "createDiscussion"], $discussionUser);
         $discussionFromDB = Gdn::database()
             ->sql()
             ->getWhere("Discussion", ["DiscussionID" => $discussion["discussionID"]])
             ->resultArray()[0];
 
-        $comment = $this->runWithUser([$this, "createComment"], $secondCommentUser);
+        $comment1 = $this->runWithUser([$this, "createComment"], $firstCommentUser);
+        $comment2 = $this->runWithUser([$this, "createComment"], $secondCommentUser);
 
         $notificationGenerator = Gdn::getContainer()->get(CommunityNotificationGenerator::class);
 
-        $commentActivity = $this->getCommentActivity($category["name"], $comment, $discussion);
+        $commentActivity = $this->getCommentActivity($category["name"], $comment2, $discussion);
 
         // Process the activity.
         $longRunnerAction = $notificationGenerator->processParticipatedNotifications(
@@ -189,7 +191,7 @@ class CommentNotificationsTest extends SiteTestCase
         self::assertSame(2, $longRunnerResult["progress"]["countTotalIDs"]);
         self::assertCount(1, $longRunnerResult["progress"]["successIDs"]);
         self::assertEquals(
-            "Comment_{$comment["commentID"]}_User_{$firstCommentUser["userID"]}_NotificationType_participated",
+            "Comment_{$comment2["commentID"]}_User_{$discussionUser["userID"]}_NotificationType_participated",
             $longRunnerResult["progress"]["successIDs"][0]
         );
 
@@ -199,11 +201,14 @@ class CommentNotificationsTest extends SiteTestCase
         $responseBody = $this->resumeLongRunner($callbackPayload)->getBody();
         $this->assertNull($responseBody["callbackPayload"]);
         $this->assertSame(2, $responseBody["progress"]["countTotalIDs"]);
+
         $this->assertCount(1, $responseBody["progress"]["successIDs"]);
         $this->assertEquals(
-            "Comment_{$comment["commentID"]}_User_{$secondCommentUser["userID"]}_NotificationType_participated",
+            "Comment_{$comment2["commentID"]}_User_{$firstCommentUser["userID"]}_NotificationType_participated",
             $responseBody["progress"]["successIDs"][0]
         );
+
+        // Notably not notification was made to our self.
     }
 
     /**

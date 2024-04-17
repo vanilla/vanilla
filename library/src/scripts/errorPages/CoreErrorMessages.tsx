@@ -3,7 +3,7 @@
  * @license Proprietary
  */
 
-import { LoadStatus } from "@library/@types/api/core";
+import { IApiError, LoadStatus } from "@library/@types/api/core";
 import { CollapsableContent } from "@library/content/CollapsableContent";
 import UserContent from "@library/content/UserContent";
 import { userContentVariables } from "@library/content/UserContent.variables";
@@ -46,7 +46,15 @@ export function CoreErrorMessages(props: IProps) {
                     </CollapsableContent>
                 </div>
             )}
-            {error.actionItem && <div className={classes.cta}>{error.actionItem}</div>}
+            {error.actionButton ? (
+                <div className={classes.cta}>
+                    <LinkAsButton to={error.actionButton.url} target={error.actionButton.target}>
+                        {error.actionButton.label}
+                    </LinkAsButton>
+                </div>
+            ) : (
+                error.actionItem && <div className={classes.cta}>{error.actionItem}</div>
+            )}
         </main>
     );
 }
@@ -153,6 +161,7 @@ export interface IError {
     icon?: ReactNode;
     response?: any;
     trace?: string;
+    actionButton?: IApiError["actionButton"];
 }
 
 export enum DefaultError {

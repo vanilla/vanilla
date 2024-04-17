@@ -20,12 +20,13 @@ import { BorderType } from "@library/styles/styleHelpersBorders";
 import { CommentThreadItem } from "@vanilla/addon-vanilla/thread/CommentThreadItem";
 import { useDiscussionThreadPaginationContext } from "@vanilla/addon-vanilla/thread/DiscussionThreadPaginationContext";
 import { t } from "@vanilla/i18n";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { discussionThreadClasses } from "@vanilla/addon-vanilla/thread/DiscussionThread.classes";
 import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread/DiscussionThread.hooks";
 import { useCommentListQuery } from "@vanilla/addon-vanilla/thread/Comments.hooks";
 import isEqual from "lodash/isEqual";
 import { DiscussionThreadContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
+import { useRefreshStaleAttachments } from "@library/features/discussions/integrations/Integrations.context";
 
 interface IProps {
     discussion: IDiscussion;
@@ -75,6 +76,22 @@ export function DiscussionCommentsAsset(props: IProps) {
         await invalidateDiscussionQuery();
         await invalidateCommentListQuery();
     }
+
+    const refreshStaleAttachments = useRefreshStaleAttachments();
+
+    const refreshStaleCommentAttachments = useCallback(async () => {
+        if (!commentListQuery.isPreviousData && commentListQuery.isSuccess) {
+            const attachments = (commentListQuery.data?.data ?? []).map((comment) => comment.attachments ?? []).flat();
+            if (attachments.length > 0) {
+                await refreshStaleAttachments(attachments.map(({ attachmentID }) => attachmentID));
+                await invalidateCommentListQuery();
+            }
+        }
+    }, [commentListQuery.isPreviousData, commentListQuery.isSuccess]);
+
+    useEffect(() => {
+        refreshStaleCommentAttachments();
+    }, [refreshStaleCommentAttachments]);
 
     const commentTopRef = useRef<HTMLSpanElement>(null);
 

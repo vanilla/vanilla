@@ -221,6 +221,8 @@ class RichEditorPlugin extends Gdn_Plugin
                 "descriptionID" => "richEditor-" . $editorID . "-description",
                 "hasUploadPermission" => checkPermission("uploads.add"),
                 "uploadEnabled" => $args["Attributes"]["UploadEnabled"] ?? true,
+                "needsHtmlConversion" => $args["Attributes"]["needsHtmlConversion"] ?? false,
+                "showConversionNotice" => $args["Attributes"]["showConversionNotice"] ?? false,
             ];
 
             if (!Gdn::session()->User->Admin) {
@@ -250,6 +252,7 @@ class RichEditorPlugin extends Gdn_Plugin
                 $shouldConvert = strcasecmp($currentInputFormat, $originalFormat) !== 0;
                 if ($shouldConvert) {
                     $viewData["needsHtmlConversion"] = true;
+                    $viewData["showConversionNotice"] = $args["Attributes"]["showConversionNotice"] ?? true;
                     $newBodyValue = $this->formatService->renderHTML($body, $originalFormat);
                     $sender->setValue($bodyFieldName, $newBodyValue);
                     $sender->setValue(

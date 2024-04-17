@@ -19,7 +19,7 @@ import DropDownItemLink from "@library/flyouts/items/DropDownItemLink";
 export default function ThreadItemShareMenu() {
     const classes = ThreadItemActionsClasses();
     const toast = useToast();
-    const { recordType, handleCopyUrl, handleNativeShare, emailUrl } = useThreadItemContext();
+    const { recordType, handleCopyUrl, handleNativeShare, emailUrl, shareInMessageUrl } = useThreadItemContext();
 
     const buttonTitle = t("Share");
 
@@ -64,6 +64,8 @@ export default function ThreadItemShareMenu() {
             </DropDownItemButton>
 
             <DropDownItemLink to={emailUrl}>{t("Email Link")}</DropDownItemLink>
+
+            {!!shareInMessageUrl && <DropDownItemLink to={shareInMessageUrl}>{t("Share In Message")}</DropDownItemLink>}
         </DropDown>
     );
 }

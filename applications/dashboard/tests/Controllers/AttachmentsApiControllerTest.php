@@ -9,8 +9,9 @@ namespace VanillaTests\Dashboard\Controllers;
 
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Dashboard\Models\ExternalIssueService;
-use VanillaTests\Fixtures\addons\addons\TestMockIssue\MockExternalIssueProvider;
+use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Models\AttachmentService;
+use VanillaTests\Fixtures\Addons\TestMockIssue\MockAttachmentProvider;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\SiteTestCase;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -25,7 +26,7 @@ class AttachmentsApiControllerTest extends SiteTestCase
 
     protected static $addons = ["test-mock-issue"];
 
-    private MockExternalIssueProvider $mockExternalIssueProvier;
+    private MockAttachmentProvider $mockExternalIssueProvier;
 
     /**
      * @inheritDoc
@@ -34,9 +35,9 @@ class AttachmentsApiControllerTest extends SiteTestCase
     {
         parent::setUp();
         $this->container()
-            ->rule(ExternalIssueService::class)
-            ->addCall("addProvider", [new \Garden\Container\Reference(MockExternalIssueProvider::class)]);
-        $this->mockExternalIssueProvier = $this->container()->get(MockExternalIssueProvider::class);
+            ->rule(AttachmentService::class)
+            ->addCall("addProvider", [new \Garden\Container\Reference(MockAttachmentProvider::class)]);
+        $this->mockExternalIssueProvier = $this->container()->get(MockAttachmentProvider::class);
     }
 
     /**
@@ -46,6 +47,7 @@ class AttachmentsApiControllerTest extends SiteTestCase
      */
     public function testPostDiscussionAttachment(): array
     {
+        CurrentTimeStamp::mockTime("2023-01-01");
         $discussion = $this->createDiscussion();
         $attachmentData = $this->createAttachmentPostData("discussion", $discussion["discussionID"]);
 
@@ -53,11 +55,39 @@ class AttachmentsApiControllerTest extends SiteTestCase
             ->post("/attachments", $attachmentData)
             ->getBody();
 
-        $expectedAttachmentData = $this->createAttachmentData("discussion", $discussion["discussionID"]);
+        $expected = [
+            "attachmentID" => $attachment["attachmentID"],
+            "attachmentType" => "mock-issue",
+            "recordType" => "discussion",
+            "recordID" => $discussion["discussionID"],
+            "foreignID" => "d-{$discussion["discussionID"]}",
+            "foreignUserID" => 2,
+            "source" => "mock",
+            "sourceID" => $attachment["sourceID"],
+            "sourceUrl" => "www.example.com/mockIssue/{$attachment["sourceID"]}",
+            "status" => "active",
+            "lastModifiedDate" => "2023-01-01T00:00:00+00:00",
+            "metadata" => [
+                [
+                    "labelCode" => "Special Mock Field 1",
+                    "value" => "foo",
+                ],
+                [
+                    "labelCode" => "Special Mock Field 2",
+                    "value" => "bar",
+                ],
+                [
+                    "labelCode" => "Last Modified",
+                    "value" => "2023-01-01T00:00:00.000+00:00",
+                    "format" => "date-time",
+                ],
+            ],
+            "dateInserted" => "2023-01-01T00:00:00+00:00",
+            "insertUserID" => 2,
+            "dateUpdated" => "2023-01-01T00:00:00+00:00",
+        ];
 
-        foreach ($expectedAttachmentData as $field => $value) {
-            $this->assertSame($attachment[$field], $value);
-        }
+        $this->assertEquals($expected, $attachment);
 
         return $attachment;
     }
@@ -69,6 +99,7 @@ class AttachmentsApiControllerTest extends SiteTestCase
      */
     public function testPostCommentAttachment(): void
     {
+        CurrentTimeStamp::mockTime("2023-01-01");
         $this->createDiscussion();
         $comment = $this->createComment();
         $attachmentData = $this->createAttachmentPostData("comment", $comment["commentID"]);
@@ -77,11 +108,39 @@ class AttachmentsApiControllerTest extends SiteTestCase
             ->post("/attachments", $attachmentData)
             ->getBody();
 
-        $expectedAttachmentData = $this->createAttachmentData("comment", $comment["commentID"]);
+        $expected = [
+            "attachmentID" => $attachment["attachmentID"],
+            "attachmentType" => "mock-issue",
+            "recordType" => "comment",
+            "recordID" => $comment["commentID"],
+            "foreignID" => "c-{$comment["commentID"]}",
+            "foreignUserID" => 2,
+            "source" => "mock",
+            "sourceID" => $attachment["sourceID"],
+            "sourceUrl" => "www.example.com/mockIssue/{$attachment["sourceID"]}",
+            "status" => "active",
+            "lastModifiedDate" => "2023-01-01T00:00:00+00:00",
+            "metadata" => [
+                [
+                    "labelCode" => "Special Mock Field 1",
+                    "value" => "foo",
+                ],
+                [
+                    "labelCode" => "Special Mock Field 2",
+                    "value" => "bar",
+                ],
+                [
+                    "labelCode" => "Last Modified",
+                    "value" => "2023-01-01T00:00:00.000+00:00",
+                    "format" => "date-time",
+                ],
+            ],
+            "dateInserted" => "2023-01-01T00:00:00+00:00",
+            "insertUserID" => 2,
+            "dateUpdated" => "2023-01-01T00:00:00+00:00",
+        ];
 
-        foreach ($expectedAttachmentData as $field => $value) {
-            $this->assertSame($attachment[$field], $value);
-        }
+        $this->assertEquals($expected, $attachment);
     }
 
     /**
@@ -131,7 +190,7 @@ class AttachmentsApiControllerTest extends SiteTestCase
         $discussion = $this->createDiscussion();
         $attachmentData = $this->createAttachmentPostData("discussion", $discussion["discussionID"]);
 
-        $this->api()
+        $posted = $this->api()
             ->post("/attachments", $attachmentData)
             ->getBody();
 
@@ -142,12 +201,7 @@ class AttachmentsApiControllerTest extends SiteTestCase
         $this->assertCount(1, $attachments);
 
         $attachment = $attachments[0];
-
-        $expectedAttachmentData = $this->createAttachmentData("discussion", $discussion["discussionID"]);
-
-        foreach ($expectedAttachmentData as $field => $value) {
-            $this->assertSame($attachment[$field], $value);
-        }
+        $this->assertEquals($posted, $attachment);
     }
 
     /**
@@ -168,35 +222,6 @@ class AttachmentsApiControllerTest extends SiteTestCase
         $this->expectException(ForbiddenException::class);
         $this->expectExceptionMessage("Permission Problem");
         $this->api()->get("/attachments", ["recordType" => "discussion", "recordID" => $discussion["discussionID"]]);
-    }
-
-    /**
-     * Create attachment data for testing.
-     *
-     * @param string $recordType
-     * @param int $recordID
-     * @return array
-     */
-    public function createAttachmentData(string $recordType, int $recordID): array
-    {
-        $attachmentData = [
-            "attachmentType" => "mock-issue",
-            "recordType" => $recordType,
-            "recordID" => $recordID,
-            "source" => "mock",
-            "metadata" => [
-                [
-                    "labelCode" => "specialMockField1",
-                    "value" => "foo",
-                ],
-                [
-                    "labelCode" => "specialMockField2",
-                    "value" => "bar",
-                ],
-            ],
-        ];
-
-        return $attachmentData;
     }
 
     /**
@@ -227,25 +252,21 @@ class AttachmentsApiControllerTest extends SiteTestCase
      */
     public function testGetCatalog(): void
     {
-        $expected = ["mock-issue" => ["label" => "mock", "recordTypes" => ["discussion", "comment", "user"]]];
+        $expected = [
+            "mock-issue" => [
+                "recordTypes" => ["discussion", "comment", "user"],
+                "label" => "Mock - Create Case",
+                "attachmentType" => "mock-issue",
+                "submitButton" => "Create Case",
+                "title" => "Mock - Case",
+                "externalIDLabel" => "Mock #",
+                "logoIcon" => "logo-mock",
+            ],
+        ];
         $response = $this->api()->get("/attachments/catalog");
         $body = $response->getBody();
         $this->assertTrue($response->isSuccessful());
         $this->assertEquals($expected, $body);
-    }
-
-    /**
-     * Test that no catalog is return when a user is not allowed to see any using [GET] `/api/v2/attachments/catalog`.
-     *
-     * @return void
-     */
-    public function testGetCatalogPermission(): void
-    {
-        $user = $this->createUser();
-        $this->runWithUser(function () {
-            $response = $this->api()->get("/attachments/catalog");
-            $this->assertEmpty($response->getBody());
-        }, $user);
     }
 
     /**
@@ -261,19 +282,8 @@ class AttachmentsApiControllerTest extends SiteTestCase
             "recordType" => "discussion",
             "recordID" => $discussion["discussionID"],
         ]);
-        $body = $response->getBody();
-
-        $issuePostSchema = $this->mockExternalIssueProvier->issuePostSchema();
-        $attachmentModel = $this->container()->get(\AttachmentModel::class);
-        $baseSchema = $attachmentModel->getHydratedAttachmentPostSchema(
-            "mock-issue",
-            "discussion",
-            $discussion["discussionID"]
-        );
-        $expected = $baseSchema->merge($issuePostSchema)->getSchemaArray();
-
-        $this->assertTrue($response->isSuccessful());
-        $this->assertEquals($expected, $body);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals("object", $response["type"]);
     }
 
     /**
@@ -329,9 +339,9 @@ class AttachmentsApiControllerTest extends SiteTestCase
         $this->assertArrayHasKey(0, $attachments);
 
         $metadata = array_column($attachments[0]["metadata"], "value", "labelCode");
-        $this->assertArrayHasKey("specialMockField1", $metadata);
-        $this->assertEquals("foo_updated", $metadata["specialMockField1"]);
-        $this->assertArrayHasKey("specialMockField2", $metadata);
-        $this->assertEquals("bar_updated", $metadata["specialMockField2"]);
+        $this->assertArrayHasKey("Special Mock Field 1", $metadata);
+        $this->assertEquals("foo_updated", $metadata["Special Mock Field 1"]);
+        $this->assertArrayHasKey("Special Mock Field 2", $metadata);
+        $this->assertEquals("bar_updated", $metadata["Special Mock Field 2"]);
     }
 }

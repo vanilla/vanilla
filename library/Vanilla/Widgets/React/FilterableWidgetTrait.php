@@ -246,6 +246,14 @@ trait FilterableWidgetTrait
                     )
                 ),
             ],
+            "includeChildCategories?" => [
+                "type" => "boolean",
+                "default" => false,
+                "x-control" => SchemaForm::toggle(
+                    new FormOptions("Include content from subcategories"),
+                    new FieldMatchConditional("apiParams", Schema::parse(["filter" => ["const" => "category"]]))
+                ),
+            ],
         ];
 
         return $schema;

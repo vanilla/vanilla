@@ -13,6 +13,7 @@ import { useQueryParam } from "@library/routing/routingUtils";
 import { ITabData, Tabs } from "@library/sectioning/Tabs";
 import { TabsTypes } from "@library/sectioning/TabsTypes";
 import { BorderType } from "@library/styles/styleHelpersBorders";
+import { useCommentListQuery } from "@vanilla/addon-vanilla/thread/Comments.hooks";
 import DiscussionCommentsAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset";
 import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread/DiscussionThread.hooks";
 import { t } from "@vanilla/i18n";
@@ -44,10 +45,11 @@ function TabbedCommentListAsset(props: IProps) {
     } = props;
 
     const { discussionID } = discussionPreload;
-
     const { query } = useDiscussionQuery(discussionID, discussionApiParams, discussionPreload);
-
     const discussion = query.data!;
+
+    //useCommentListQuery is invoked here so that there is a query in the cache to invalidate when the first comment is added
+    useCommentListQuery(apiParams, comments);
 
     const acceptedAnswers = discussion.attributes?.question?.acceptedAnswers ?? acceptedAnswersPreload?.data ?? [];
     const rejectedAnswers = discussion.attributes?.question?.rejectedAnswers ?? rejectedAnswersPreload?.data ?? [];

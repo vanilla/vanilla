@@ -92,14 +92,17 @@ const AttachmentLayoutClasses = useThemeCache(() => {
     });
 
     const title = css({
-        display: "inline-flex",
-        ...Mixins.font({
-            ...globalVars.fontSizeAndWeightVars("large"),
-        }),
-        ...Mixins.margin({
-            right: globalVars.gutter.half,
-            bottom: 2,
-        }),
+        // Extra specificity for legacy page.
+        "&&": {
+            ...Mixins.margin({
+                right: globalVars.gutter.half,
+                bottom: 2,
+            }),
+            display: "inline-flex",
+            ...Mixins.font({
+                ...globalVars.fontSizeAndWeightVars("large"),
+            }),
+        },
     });
 
     const inlineMetas = css({
@@ -121,9 +124,6 @@ const AttachmentLayoutClasses = useThemeCache(() => {
     const externalLink = css({
         display: "flex",
         height: "1lh",
-        ...Mixins.font({
-            weight: globalVars.fonts.weights.semiBold,
-        }),
         ...Mixins.clickable.itemState(),
     });
 
@@ -140,6 +140,11 @@ const AttachmentLayoutClasses = useThemeCache(() => {
         ...Mixins.margin(metasVars.spacing),
     });
 
+    const detailLink = css({
+        display: "flex",
+        ...Mixins.clickable.itemState(),
+    });
+
     const details = css({
         ...Mixins.padding({
             top: globalVars.gutter.quarter * 3,
@@ -147,7 +152,7 @@ const AttachmentLayoutClasses = useThemeCache(() => {
         }),
 
         columnGap: globalVars.gutter.size,
-        columnCount: 3,
+        columnCount: 2,
         columnWidth: 220,
 
         [`> .${detailItem}`]: {
@@ -185,6 +190,7 @@ const AttachmentLayoutClasses = useThemeCache(() => {
         details,
         detailItem,
         detailLabel,
+        detailLink,
         detailValue,
     };
 });

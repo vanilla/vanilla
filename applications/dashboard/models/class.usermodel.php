@@ -1494,6 +1494,9 @@ class UserModel extends Gdn_Model implements
 
             if (!empty($confirmRoleIDs)) {
                 touchValue("Attributes", $fields, []);
+                if (is_string($fields["Attributes"])) {
+                    $fields["Attributes"] = dbdecode($fields["Attributes"]);
+                }
                 $confirmationCode = $this->confirmationCode();
                 $fields["Attributes"]["EmailKey"] = $confirmationCode;
                 $fields["Confirmed"] = 0;
@@ -3513,8 +3516,9 @@ class UserModel extends Gdn_Model implements
         }
         if (array_key_exists("Admin", $row)) {
             // The site creator is 1, System is 2.
-            $row["isAdmin"] = in_array($row["Admin"], [1, 2]);
+            $row["isAdmin"] = in_array($row["Admin"], [1, 2, 3]);
             $row["isSysAdmin"] = $row["Admin"] == 2;
+            $row["isSuperAdmin"] = $row["Admin"] > 2;
             unset($row["Admin"]);
         }
 
@@ -3662,7 +3666,13 @@ class UserModel extends Gdn_Model implements
         $result->add($this->schema());
 
         if ($this->session->checkPermission("site.manage")) {
-            $adminOnlySchema = Schema::parse(["insertIPAddress?", "lastIPAddress?", "isAdmin?", "isSysAdmin?"]);
+            $adminOnlySchema = Schema::parse([
+                "insertIPAddress?",
+                "lastIPAddress?",
+                "isAdmin?",
+                "isSysAdmin?",
+                "isSuperAdmin?",
+            ]);
             $result = $result->merge($adminOnlySchema);
         }
 
@@ -6790,6 +6800,7 @@ SQL;
         $adminFlag = $user["Admin"] ?? 0;
         $permissions->setAdmin($adminFlag > 0);
         $permissions->setSysAdmin($adminFlag > 1);
+        $permissions->setSuperAdmin($adminFlag > 2);
         $data = Gdn::permissionModel()->getPermissionsByUser($userID);
         $permissions->setPermissions($data);
 

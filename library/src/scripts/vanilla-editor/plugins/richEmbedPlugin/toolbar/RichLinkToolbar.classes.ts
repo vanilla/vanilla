@@ -25,6 +25,7 @@ export const linkToolbarClasses = useThemeCache(() => {
         lineHeight: 2,
         display: "flex",
         alignItems: "center",
+        ...Mixins.clickable.itemState(),
     });
 
     const linkPreviewIcon = css({

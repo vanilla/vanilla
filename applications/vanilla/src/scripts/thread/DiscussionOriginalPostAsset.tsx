@@ -22,7 +22,6 @@ import React from "react";
 import { discussionThreadClasses } from "@vanilla/addon-vanilla/thread/DiscussionThread.classes";
 import { useDiscussionQuery } from "@vanilla/addon-vanilla/thread/DiscussionThread.hooks";
 import { DiscussionThreadContextProvider } from "@vanilla/addon-vanilla/thread/DiscussionThreadContext";
-import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import ThreadItemPermalink from "@vanilla/addon-vanilla/thread/ThreadItemPermalink";
 import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
 
@@ -84,12 +83,10 @@ export function DiscussionOriginalPostAsset(props: IProps) {
                                     discussion={discussion}
                                     onSuccess={invalidateDiscussionQuery}
                                 />
-                                <AttachmentIntegrationsContextProvider>
-                                    <DiscussionOptionsMenu
-                                        discussion={discussion}
-                                        onMutateSuccess={invalidateDiscussionQuery}
-                                    />
-                                </AttachmentIntegrationsContextProvider>
+                                <DiscussionOptionsMenu
+                                    discussion={discussion}
+                                    onMutateSuccess={invalidateDiscussionQuery}
+                                />
                             </div>
                         )
                     }

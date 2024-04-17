@@ -504,6 +504,7 @@ class Gdn_Session implements LoggerAwareInterface
                 // Set permission overrides.
                 $this->permissions->setAdmin($this->User->Admin > 0);
                 $this->permissions->setSysAdmin($this->User->Admin > 1);
+                $this->permissions->setSuperAdmin($this->User->Admin > 2);
                 if (!empty($this->User->Deleted)) {
                     $this->permissions->addBan(Permissions::BAN_DELETED, [
                         "msg" => t("Your account has been deleted."),

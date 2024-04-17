@@ -1,5 +1,5 @@
 /**
- * @copyright 2009-2023 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -14,6 +14,7 @@ import {
 import { DashboardLabelType } from "@dashboard/forms/DashboardFormLabel";
 import { t } from "@vanilla/i18n";
 
+const emptyRichEditorValue = [{ children: [{ text: "" }], type: "p" }];
 /**
  *  Get the email settings schemas
  */
@@ -159,10 +160,9 @@ export function getEmailSettingsSchemas() {
                 },
             },
             "outgoingEmails.footer": {
-                type: "string",
-                nullable: true,
+                type: ["string", "array"],
                 maxLength: 500,
-                default: "",
+                default: emptyRichEditorValue,
                 "x-control": {
                     label: t("Email Footer"),
                     description: t(
@@ -382,7 +382,7 @@ export function getDigestSettingsSchemas() {
             },
             "emailDigest.introduction": {
                 type: ["string", "array"],
-                default: [{ children: [{ text: "" }], type: "p" }],
+                default: emptyRichEditorValue,
                 "x-control": {
                     label: t("Introduction"),
                     description: t("The first line of content in the email digest after the title."),
@@ -392,7 +392,7 @@ export function getDigestSettingsSchemas() {
             },
             "emailDigest.footer": {
                 type: ["string", "array"],
-                default: [{ children: [{ text: "" }], type: "p" }],
+                default: emptyRichEditorValue,
                 "x-control": {
                     label: t("Footer"),
                     description: t(

@@ -106,6 +106,7 @@ class LeaderboardWidgetTest extends SiteTestCase
                 "excludedRoleIDs" => [],
                 "filter" => "none",
                 "siteSectionID" => null,
+                "includeChildCategories" => false,
             ],
             "title" => "Leaderboard Title",
             "titleType" => "static",

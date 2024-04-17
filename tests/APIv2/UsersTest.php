@@ -300,6 +300,7 @@ class UsersTest extends AbstractResourceTest
             "dateLastActive" => null,
             "isAdmin" => false,
             "isSysAdmin" => false,
+            "isSuperAdmin" => false,
             "countUnreadNotifications" => 0,
             "countUnreadConversations" => 0,
             "permissions" => ["activity.view", "discussions.view"],
@@ -2556,6 +2557,7 @@ class UsersTest extends AbstractResourceTest
         $this->assertArrayHasKey("insertIPAddress", $retrievedByAdmin);
         $this->assertArrayHasKey("isAdmin", $retrievedByAdmin);
         $this->assertArrayHasKey("isSysAdmin", $retrievedByAdmin);
+        $this->assertArrayHasKey("isSuperAdmin", $retrievedByAdmin);
 
         $this->api()->setUserID($memberUser["userID"]);
         $retrievedByMember = $this->api()
@@ -2565,5 +2567,6 @@ class UsersTest extends AbstractResourceTest
         $this->assertArrayNotHasKey("insertIPAddress", $retrievedByMember);
         $this->assertArrayNotHasKey("isAdmin", $retrievedByMember);
         $this->assertArrayNotHasKey("isSysAdmin", $retrievedByMember);
+        $this->assertArrayNotHasKey("isSuperAdmin", $retrievedByMember);
     }
 }

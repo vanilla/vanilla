@@ -5,7 +5,7 @@
  * @license GPL-2.0-only
  */
 
-namespace VanillaTests\Fixtures\addons\addons\TestMockIssue;
+namespace VanillaTests\Fixtures\Addons\TestMockIssue;
 
 use AttachmentModel;
 use CommentModel;
@@ -13,13 +13,14 @@ use DiscussionModel;
 use OpenStack\Identity\v3\Models\User;
 use UserModel;
 use Garden\Schema\Schema;
-use Vanilla\Dashboard\Models\ExternalIssueProviderInterface;
+use Vanilla\CurrentTimeStamp;
+use Vanilla\Dashboard\Models\AttachmentProviderInterface;
 use Vanilla\Formatting\DateTimeFormatter;
 
 /**
  * Mock issue provider for tests.
  */
-class MockExternalIssueProvider implements ExternalIssueProviderInterface
+class MockAttachmentProvider implements AttachmentProviderInterface
 {
     const TYPE_NAME = "mock-issue";
 
@@ -53,7 +54,7 @@ class MockExternalIssueProvider implements ExternalIssueProviderInterface
     /**
      * @inheritDoc
      */
-    public function makeNewIssue(string $recordType, int $recordID, array $issueData): array
+    public function createAttachment(string $recordType, int $recordID, array $issueData): array
     {
         $issueData = \Vanilla\Utility\ArrayUtils::pascalCase($issueData);
 
@@ -71,7 +72,7 @@ class MockExternalIssueProvider implements ExternalIssueProviderInterface
             "Source" => "mock",
             "SourceID" => $sourceID,
             "SourceURL" => "www.example.com/mockIssue/{$sourceID}",
-            "LastModifiedDate" => DateTimeFormatter::timeStampToDateTime(now()),
+            "LastModifiedDate" => CurrentTimeStamp::getMySQL(),
             "Status" => "active",
             "SpecialMockField1" => $issueData["SpecialMockField1"],
             "SpecialMockField2" => $issueData["SpecialMockField2"],
@@ -84,29 +85,11 @@ class MockExternalIssueProvider implements ExternalIssueProviderInterface
     /**
      * @inheritDoc
      */
-    public function issuePostSchema(): \Garden\Schema\Schema
+    public function getHydratedFormSchema(string $recordType, int $recordID, array $args): Schema
     {
         $schema = \Garden\Schema\Schema::parse(["specialMockField1:s", "specialMockField2:s"]);
 
         return $schema;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function fullIssueSchema(): \Garden\Schema\Schema
-    {
-        $schema = $this->attachmentModel->getAttachmentSchema();
-        $schema->merge($this->issuePostSchema());
-        return $schema;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getHydratedFormSchema(string $recordType, int $recordID): Schema
-    {
-        return $this->issuePostSchema();
     }
 
     /**
@@ -120,12 +103,11 @@ class MockExternalIssueProvider implements ExternalIssueProviderInterface
     /**
      * Verify that the user has the `staff.allow` permission.
      *
-     * @param $user
      * @return bool
      */
-    public function validatePermissions($user): bool
+    public function hasPermissions(): bool
     {
-        return $this->userModel->checkPermission($user, "staff.allow");
+        return $this->userModel->checkPermission(\Gdn::session()->User, "staff.allow");
     }
 
     /**
@@ -136,50 +118,87 @@ class MockExternalIssueProvider implements ExternalIssueProviderInterface
         return ["discussion", "comment", "user"];
     }
 
-    public function getCatalog(): array
-    {
-        return ["label" => "mock", "recordTypes" => ["discussion", "comment", "user"]];
-    }
-
     /**
-     * @inheridoc
+     * @inheritDoc
      */
-    public function setProjectID($projectID): void
+    public function getCreateLabelCode(): string
     {
-        // TODO: Implement setProjectID() method.
-    }
-
-    /**
-     * @inheridoc
-     */
-    public function setIssueTypeID($issueTypeID): void
-    {
-        // TODO: Implement setIssueTypeID() method.
+        return "Mock - Create Case";
     }
 
     /**
      * @inheritDoc
      */
-    public function syncIssue(array $attachment): array
+    public function getSubmitLabelCode(): string
     {
-        // Simulate update from external issue tracker
-        $attachmentID = $this->attachmentModel->save([
-            "AttachmentID" => $attachment["AttachmentID"],
-            "SpecialMockField1" => $attachment["SpecialMockField1"] . "_updated",
-            "SpecialMockField2" => $attachment["SpecialMockField2"] . "_updated",
-        ]);
-
-        $attachment = $this->attachmentModel->getID($attachmentID);
-        return (array) $attachment;
+        return "Create Case";
     }
 
     /**
-     * @inheridoc
-     *
-     * @return int
+     * @inheritDoc
      */
-    public function getRefreshTime(): int
+    public function getTitleLabelCode(): string
     {
-        return 5 * 60 * 1000;
+        return "Mock - Case";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getExternalIDLabelCode(): string
+    {
+        return "Mock #";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLogoIconName(): string
+    {
+        return "logo-mock";
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function refreshAttachments(array $attachmentRows): array
+    {
+        // Simulate update from external issue tracker
+        foreach ($attachmentRows as &$attachmentRow) {
+            $attachmentRow = array_merge($attachmentRow, [
+                "SpecialMockField1" => ($attachmentRow["SpecialMockField1"] ?? "fallback") . "_updated",
+                "SpecialMockField2" => ($attachmentRow["SpecialMockField2"] ?? "fallback") . "_updated",
+            ]);
+            $this->attachmentModel->save($attachmentRow);
+        }
+
+        return $attachmentRows;
+    }
+
+    /**
+     * @param array $attachment
+     * @return array
+     */
+    public function normalizeAttachment(array $attachment): array
+    {
+        $attachment["metadata"] = [
+            [
+                "labelCode" => "Special Mock Field 1",
+                "value" => $attachment["SpecialMockField1"] ?? "fallback",
+            ],
+            [
+                "labelCode" => "Special Mock Field 2",
+                "value" => $attachment["SpecialMockField2"] ?? "fallback",
+            ],
+        ];
+        return $attachment;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getRefreshTimeSeconds(): int
+    {
+        return 5 * 60;
     }
 }

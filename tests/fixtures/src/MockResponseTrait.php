@@ -9,6 +9,7 @@ namespace VanillaTests\Fixtures;
 
 use Garden\Http\HttpRequest;
 use Garden\Http\HttpResponse;
+use Vanilla\Utility\ArrayUtils;
 
 /**
  * Trait for mocking HTTP responses.
@@ -28,8 +29,12 @@ trait MockResponseTrait
      */
     private function makeMockResponseKey(string $uri, string $method = HttpRequest::METHOD_GET, $body = null): string
     {
-        $queryBody = $body && is_array($body) ? serialize($body) : $body;
-        $bodyHash = $queryBody ? "-" . md5($queryBody) : "";
+        if (is_array($body)) {
+            $body = ArrayUtils::flattenArray(".", $body);
+            ksort($body);
+            $body = json_encode($body);
+        }
+        $bodyHash = md5($body);
         return $method . "-" . $uri . $bodyHash;
     }
 
@@ -49,6 +54,8 @@ trait MockResponseTrait
         $bodyRequest = null
     ) {
         $key = $this->makeMockResponseKey($uri, $method, $bodyRequest);
+        $mockRequest = new HttpRequest($method, $uri, $bodyRequest);
+        $response->setRequest($mockRequest);
         $this->mockedResponses[$key] = $response;
         return $this;
     }

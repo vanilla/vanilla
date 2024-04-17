@@ -348,7 +348,7 @@ export function userContentMixin(): CSSObject {
                 horizontal: 12,
             }),
             border: "none",
-            textAlign: vars.tables.cell.alignment,
+            textAlign: "start",
             ...(vars.tables.horizontalBorders.enabled
                 ? {
                       borderTop: singleBorder(vars.tables.horizontalBorders.borders),
@@ -631,7 +631,7 @@ export const userContentClasses = useThemeCache(() => {
                     horizontal: 12,
                 }),
                 border: "none",
-                textAlign: vars.tables.cell.alignment,
+                textAlign: "start",
                 ...(vars.tables.horizontalBorders.enabled
                     ? {
                           borderTop: singleBorder(vars.tables.horizontalBorders.borders),

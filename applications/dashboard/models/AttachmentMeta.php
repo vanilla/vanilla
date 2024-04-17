@@ -8,6 +8,7 @@
 namespace Vanilla\Dashboard\Models;
 
 use Gdn;
+use Vanilla\Logging\ErrorLogger;
 use Vanilla\Models\SiteMetaExtra;
 
 /**
@@ -15,14 +16,14 @@ use Vanilla\Models\SiteMetaExtra;
  */
 class AttachmentMeta extends SiteMetaExtra
 {
-    protected ExternalIssueService $externalIssueService;
+    protected AttachmentService $attachmentService;
 
     /**
-     * @param ExternalIssueService $externalIssueService
+     * @param AttachmentService $attachmentService
      */
-    public function __construct(ExternalIssueService $externalIssueService)
+    public function __construct(AttachmentService $attachmentService)
     {
-        $this->externalIssueService = $externalIssueService;
+        $this->attachmentService = $attachmentService;
     }
 
     /**
@@ -30,18 +31,8 @@ class AttachmentMeta extends SiteMetaExtra
      */
     public function getValue(): array
     {
-        $providers = $this->externalIssueService->getAllProviders();
-        $catalog = [];
-        foreach ($providers as $provider) {
-            if (!$provider->validatePermissions(Gdn::session()->User)) {
-                continue;
-            }
-            $catalog[$provider->getTypeName()] = $provider->getCatalog();
-
-            // We want to have at least 30 seconds between each call.
-            $catalog[$provider->getTypeName()]["refreshTime"] = max($provider->getRefreshTime(), 30) * 1000;
-        }
-
-        return ["externalAttachments" => $catalog];
+        return [
+            "externalAttachments" => $this->attachmentService->getCatalog(),
+        ];
     }
 }

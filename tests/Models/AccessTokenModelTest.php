@@ -138,6 +138,9 @@ class AccessTokenModelTest extends SharedBootstrapTestCase
     {
         $model = new AccessTokenModel("sss");
 
+        // This one should be totally revoked
+        $model->ensureSingleSystemToken();
+        $tokenToBeExpired = \Gdn::config(AccessTokenModel::CONFIG_SYSTEM_TOKEN);
         $model->ensureSingleSystemToken();
         $initialConfToken = \Gdn::config()->get(AccessTokenModel::CONFIG_SYSTEM_TOKEN);
         $this->assertNotFalse($model->verify($initialConfToken));
@@ -159,5 +162,9 @@ class AccessTokenModelTest extends SharedBootstrapTestCase
 
         $tresholdAfter = \Gdn_Format::toDateTime(strtotime("7 hours"));
         $this->assertLessThan($tresholdAfter, $initialToken["DateExpires"]);
+
+        // The initial token should be totally invalid.
+        $this->expectExceptionMessage("Your access token has expired");
+        $model->verify($tokenToBeExpired, true);
     }
 }

@@ -14,6 +14,7 @@ import { frameVariables } from "@library/layout/frame/frameStyles";
 import { inputBlockClasses } from "@library/forms/InputBlockStyles";
 import { percent } from "csx";
 import { Mixins } from "@library/styles/Mixins";
+import { css } from "@emotion/css";
 
 export const frameBodyClasses = useThemeCache(() => {
     const vars = frameVariables();
@@ -87,10 +88,19 @@ export const frameBodyClasses = useThemeCache(() => {
             marginBottom: 0,
         },
     });
+
+    const error = css({
+        marginBottom: 16,
+        position: "sticky",
+        top: 16,
+        zIndex: 1,
+    });
+
     return {
         root,
         framePaddings,
         noContentMessage,
         contents,
+        error,
     };
 });

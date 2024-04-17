@@ -7,7 +7,7 @@
 import { IUser, IUserFragment } from "@library/@types/api/users";
 import { IAttachmentLayoutProps } from "@library/features/discussions/integrations/components/AttachmentLayout";
 import { IconType } from "@vanilla/icons";
-import { JsonSchema } from "@vanilla/json-schema-forms";
+import { IFieldError, JsonSchema } from "@vanilla/json-schema-forms";
 import { RecordID } from "@vanilla/utils";
 import { FormikHelpers } from "formik";
 
@@ -40,7 +40,9 @@ export interface IAttachment {
     status?: string;
     metadata: Array<{
         labelCode: string;
-        value?: string | number;
+        value: string | number;
+        url?: string;
+        format?: "date-time";
     }>;
 }
 
@@ -57,10 +59,16 @@ export interface IPostAttachmentParams {
     [key: string]: any;
 }
 
+export interface IRefreshAttachmentsParams {
+    attachmentIDs: Array<IAttachment["attachmentID"]>;
+    onlyStale?: boolean;
+}
+
 export interface IIntegrationsApi {
     getIntegrationsCatalog: () => Promise<IAttachmentIntegrationCatalog>;
     getAttachmentSchema: (params: IGetAttachmentSchemaParams) => Promise<JsonSchema>;
     postAttachment: (params: IPostAttachmentParams) => Promise<IAttachment>;
+    refreshAttachments: (params: IRefreshAttachmentsParams) => Promise<IAttachment[]>;
 }
 
 export interface ICustomIntegrationContext {
@@ -70,6 +78,7 @@ export interface ICustomIntegrationContext {
         values?: any;
         schema?: JsonSchema;
         onChange?: FormikHelpers<IPostAttachmentParams>["setValues"];
+        fieldErrors?: Record<string, IFieldError[]>;
     }>;
 }
 

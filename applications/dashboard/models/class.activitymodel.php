@@ -1979,10 +1979,17 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
         // Check the user's preference.
         $activity = $this->calculateActivityPreference($activity, $preference ?: null);
 
+        $logContext = [
+            \Vanilla\Logger::FIELD_CHANNEL => \Vanilla\Logger::CHANNEL_SYSTEM,
+            "tags" => ["notifications"],
+            "notifyUserID" => $activity["NotifyUserID"] ?? null,
+            "recordType" => $activity["RecordType"] ?? null,
+            "recordID" => $activity["RecordID"] ?? null,
+        ];
         $activity = $this->handleDuplicateActivityForEvent($activity);
         if ($activity === null) {
-            trace("Skipping activity because it was a duplicate for the current event.");
-            return null;
+            $this->logger->info("Merging activity into existing event.", $logContext);
+            return $activity;
         }
 
         $activityType = self::getActivityType($activity["ActivityType"]);
@@ -2066,6 +2073,12 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
             if (!val("DisableFloodControl", $options)) {
                 $storageObject = FloodControlHelper::configure($this, "Vanilla", "Activity");
                 if ($this->checkUserSpamming(Gdn::session()->UserID, $storageObject)) {
+                    $this->logger->info(
+                        "Skipping notification because user is spamming.",
+                        $logContext + [
+                            "SpammingUserID" => Gdn::session()->UserID,
+                        ]
+                    );
                     return false;
                 }
             }
@@ -2089,6 +2102,7 @@ class ActivityModel extends Gdn_Model implements SystemCallableInterface
                 $skip = $activity["Skip"] ?? false;
                 // A plugin handled this activity so don't save it.
                 // If the plugin left a flag to skip sending notifications, return null.
+                $this->logger->info("Skipping notification because a plugin handled it.", $logContext);
                 return $skip ? null : $activity;
             }
 

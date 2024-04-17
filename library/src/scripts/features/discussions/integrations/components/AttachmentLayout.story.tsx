@@ -29,18 +29,19 @@ export function AttachmentLayout(props: {}) {
                 dateUpdated={"2021-02-03 17:51:15"}
                 user={STORY_USER}
                 icon={<Icon icon={"logo-salesforce"} height={60} width={60} />}
-                details={[
-                    { label: "Name", value: "Willy Wonka" },
-                    { label: "Title", value: "President" },
-                    { label: "Company", value: "Wonka Candy Company" },
-                    { label: "Favourite Color", value: "Metallic Green" },
-                    { label: "More Information", value: "Lorem Ipsum Dolor Sit Amet" },
-                    { label: "Subcontractor", value: "Meta" },
-                    { label: "Subcontractor", value: "Meta" },
-                    { label: "Date of first contact", value: "June 4" },
-                    { label: "Subcontractor", value: "Meta" },
+                metadata={[
+                    { labelCode: "Name", value: "Willy Wonka" },
+                    { labelCode: "Title", value: "President" },
+                    { labelCode: "Company", value: "Wonka Candy Company", url: "https://google.com" },
+                    { labelCode: "Favourite Color", value: "Metallic Green" },
+                    { labelCode: "More Information", value: "Lorem Ipsum Dolor Sit Amet" },
+                    { labelCode: "Subcontractor", value: "Meta" },
+                    { labelCode: "Subcontractor", value: "Meta" },
+                    { labelCode: "Date of first contact", value: "2023-01-04T12:42:04Z", format: "date-time" },
+                    { labelCode: "Subcontractor", value: "Meta" },
                     {
-                        label: "Some Longer Titled Information goes here and wraps around and that's OK if it needs to do that",
+                        labelCode:
+                            "Some Longer Titled Information goes here and wraps around and that's OK if it needs to do that",
                         value: "This one is also a lot longer than we'd like it to be but that's OK",
                     },
                 ]}

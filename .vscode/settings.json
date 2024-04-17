@@ -59,6 +59,7 @@
         "plugins/ImageRequired": true,
         "plugins/Images": true,
         "plugins/IpsumInserter": true,
+        "plugins/Jira": true,
         "plugins/KeywordBlocker": true,
         "plugins/LinkedIn": true,
         "plugins/MailChimpPush": true,
@@ -150,7 +151,7 @@
         "plugins/vfoptions": true,
         "plugins/vanilla-ai": true,
         "plugins/webhooks": true,
-        "plugins/zapier": true,
+        "plugins/zapier": true
     },
     "[json]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"

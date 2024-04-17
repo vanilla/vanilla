@@ -31,6 +31,7 @@ class UserPermissionsTest extends SiteTestCase
             [
                 "isAdmin" => true,
                 "isSysAdmin" => false,
+                "isSuperAdmin" => false,
             ],
             $permissions
         );
@@ -43,6 +44,7 @@ class UserPermissionsTest extends SiteTestCase
             [
                 "isAdmin" => true,
                 "isSysAdmin" => true,
+                "isSuperAdmin" => false,
             ],
             $permissions
         );
@@ -119,6 +121,7 @@ class UserPermissionsTest extends SiteTestCase
             [
                 "isAdmin" => false,
                 "isSysAdmin" => false,
+                "isSuperAdmin" => false,
                 "permissions" => [
                     [
                         "type" => PermissionFragmentSchema::TYPE_GLOBAL,

@@ -15,36 +15,45 @@ import ButtonLoader from "@library/loaders/ButtonLoader";
 import { cx } from "@emotion/css";
 import { ErrorIcon } from "@library/icons/common";
 import { Icon } from "@vanilla/icons";
+import { IServerError } from "@library/@types/api/core";
+import LinkAsButton from "@library/routing/LinkAsButton";
 
-export interface IMessageProps {
-    /** Classes to be applied to the root of the component */
-    className?: string;
-    /** The message content as rendered by the component */
-    contents?: React.ReactNode;
-    /** Message content for screen readers */
-    stringContents: string;
-    /** Re-announces the message if the page gets rerendered. This is an important message, so we want this by default. */
-    clearOnUnmount?: boolean;
-    /** Handler for the confirm button */
-    onConfirm?: () => void;
-    /** Optional confirm label, defaults to "OK" */
-    confirmText?: React.ReactNode;
-    /** Handler for the cancel button */
-    onCancel?: () => void;
-    /** Optional confirm label, defaults to "Cancel" */
-    cancelText?: React.ReactNode;
-    /** Should the message be fixed to the top of the viewport */
-    isFixed?: boolean;
-    isContained?: boolean;
-    /** Title displayed above the message content */
-    title?: React.ReactNode;
-    /** Boolean which switches confirmation and cancel text with a spinner */
-    isActionLoading?: boolean;
-    /** Icons that could be displayed beside the message */
-    icon?: React.ReactNode | false;
-    /** The kind of message */
-    type?: "warning" | "error" | "neutral" | "info";
-}
+export type IMessageProps =
+    | {
+          /** Classes to be applied to the root of the component */
+          className?: string;
+          /** The message content as rendered by the component */
+          contents?: React.ReactNode;
+          /** Re-announces the message if the page gets rerendered. This is an important message, so we want this by default. */
+          clearOnUnmount?: boolean;
+          /** Handler for the confirm button */
+          onConfirm?: () => void;
+          /** Optional confirm label, defaults to "OK" */
+          confirmText?: React.ReactNode;
+          /** Handler for the cancel button */
+          onCancel?: () => void;
+          /** Optional confirm label, defaults to "Cancel" */
+          cancelText?: React.ReactNode;
+          /** Should the message be fixed to the top of the viewport */
+          isFixed?: boolean;
+          isContained?: boolean;
+          /** Title displayed above the message content */
+          title?: React.ReactNode;
+          /** Boolean which switches confirmation and cancel text with a spinner */
+          isActionLoading?: boolean;
+          /** Icons that could be displayed beside the message */
+          icon?: React.ReactNode | false;
+          /** The kind of message */
+          type?: "warning" | "error" | "neutral" | "info";
+      } & (
+          | {
+                /** Message content for screen readers */
+                stringContents: string;
+            }
+          | {
+                error: IServerError;
+            }
+      );
 
 export const Message = React.forwardRef(function Message(props: IMessageProps, ref: RefObject<HTMLDivElement>) {
     const classes = messagesClasses();
@@ -52,10 +61,12 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
     // When fixed we need to apply an extra layer for padding.
     const InnerWrapper = props.isContained ? Container : React.Fragment;
     const OuterWrapper = props.isFixed ? Container : React.Fragment;
-    const contents = <div className={classes.content}>{props.contents || props.stringContents}</div>;
+    const stringContents = "error" in props ? props.error.description ?? props.error.message : props.stringContents;
+    let title = props.title ?? ("error" in props && props.error.description ? props.error.message : undefined);
+    const contents = <div className={classes.content}>{props.contents || stringContents}</div>;
 
-    const hasTitle = !!props.title;
-    const isError: boolean = !!props.type && props.type === "error";
+    const hasTitle = !!title;
+    const isError: boolean = "error" in props || (!!props.type && props.type === "error");
     let icon = props.icon;
     if (!icon && isError) {
         icon = <ErrorIcon />;
@@ -65,7 +76,7 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
     const hasIcon = !!icon;
 
     const content = <div className={classes.text}>{contents}</div>;
-    const title = props.title && (
+    title = title && (
         <h2
             className={cx(
                 classes.title,
@@ -73,7 +84,7 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
                 "heading",
             )}
         >
-            {props.title}
+            {title}
         </h2>
     );
 
@@ -127,6 +138,15 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
                                     </>
                                 )}
                             </div>
+                            {"error" in props && props.error && props.error.actionButton && (
+                                <LinkAsButton
+                                    buttonType={ButtonTypes.TEXT}
+                                    to={props.error.actionButton.url}
+                                    target={props.error.actionButton.target}
+                                >
+                                    {t(props.error.actionButton.label)}
+                                </LinkAsButton>
+                            )}
                             {props.onCancel && (
                                 <Button
                                     buttonType={ButtonTypes.TEXT}
@@ -152,12 +172,8 @@ export const Message = React.forwardRef(function Message(props: IMessageProps, r
                 </OuterWrapper>
             </div>
             {/* Does not visually render, but sends message to screen reader users*/}
-            {!!props.stringContents && (
-                <LiveMessage
-                    clearOnUnmount={!!props.clearOnUnmount}
-                    message={props.stringContents}
-                    aria-live="assertive"
-                />
+            {!!stringContents && (
+                <LiveMessage clearOnUnmount={!!props.clearOnUnmount} message={stringContents} aria-live="assertive" />
             )}
         </>
     );

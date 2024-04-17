@@ -159,5 +159,9 @@ export const discussionCompatCSS = () => {
             paddingLeft: 0,
             display: "block",
         },
+
+        "& .RoleTitle": {
+            whiteSpace: "normal",
+        },
     });
 };

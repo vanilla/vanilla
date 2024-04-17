@@ -23,6 +23,7 @@ import RadioButton from "@library/forms/RadioButton";
 import { useUniqueID } from "@library/utility/idUtils";
 import { RadioGroupContext } from "@library/forms/RadioGroupContext";
 import { useIsInModal } from "@library/modal/Modal.context";
+import { AutoComplete } from "@vanilla/ui";
 
 const createOptionsFromRecord = (options?: Record<string, React.ReactNode>): IComboBoxOption[] => {
     return options
@@ -35,7 +36,11 @@ const createOptionsFromRecord = (options?: Record<string, React.ReactNode>): ICo
         : [];
 };
 
-export function FormControl(props: IControlProps) {
+export function FormControlWithNewDropdown(props: IControlProps) {
+    return <FormControl {...props} useNewDropdown />;
+}
+
+export function FormControl(props: IControlProps & { useNewDropdown?: boolean }) {
     const { disabled, onChange, onBlur, control, instance, schema, required, dateRangeDirection = "above" } = props;
 
     const isInModal = useIsInModal();
@@ -175,17 +180,30 @@ export function FormControl(props: IControlProps) {
             const currentValue = options.find((opt) => `${opt.value}` === `${value}`);
             return (
                 <>
-                    <SelectOne
-                        label={null}
-                        disabled={disabled}
-                        value={currentValue ?? null}
-                        onChange={(option) => {
-                            onChange(option?.value);
-                        }}
-                        onBlur={onBlur}
-                        options={options}
-                        isClearable={!required}
-                    />
+                    {props.useNewDropdown ? (
+                        <AutoComplete
+                            options={options}
+                            value={value}
+                            onBlur={onBlur}
+                            clear={!required}
+                            onChange={(value) => {
+                                onChange(value);
+                            }}
+                            disabled={disabled}
+                        />
+                    ) : (
+                        <SelectOne
+                            label={null}
+                            disabled={disabled}
+                            value={currentValue ?? null}
+                            onChange={(option) => {
+                                onChange(option?.value);
+                            }}
+                            onBlur={onBlur}
+                            options={options}
+                            isClearable={!required}
+                        />
+                    )}
                     {!!required && (
                         <input
                             tabIndex={-1}

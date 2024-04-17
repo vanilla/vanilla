@@ -477,6 +477,22 @@ trait NestedCollection
     }
 
     /**
+     * Add a react component.
+     *
+     * @param string $key
+     * @param string $component
+     * @param array $props
+     */
+    public function addReact(string $key, string $component, array $props)
+    {
+        $this->addItem("react", [
+            "key" => $key,
+            "component" => $component,
+            "props" => $props,
+        ]);
+    }
+
+    /**
      * Add an item to the items array.
      *
      * @param string $type The type of the item: link, group or divider.

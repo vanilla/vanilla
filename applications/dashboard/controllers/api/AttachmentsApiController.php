@@ -13,11 +13,11 @@ use Garden\Container\ContainerException;
 use Garden\Web\Exception\ClientException;
 use Garden\Web\Exception\ForbiddenException;
 use Gdn;
-use Vanilla\Dashboard\Models\ExternalIssueService;
+use Vanilla\Dashboard\Models\AttachmentService;
 use Garden\Utils\ArrayUtils;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
-use Vanilla\Dashboard\Models\ExternalIssueProviderInterface;
+use Vanilla\Dashboard\Models\AttachmentProviderInterface;
 
 /**
  * API v2 endpoints for attachments.
@@ -26,18 +26,18 @@ class AttachmentsApiController extends AbstractApiController
 {
     private AttachmentModel $attachmentModel;
 
-    private ExternalIssueService $externalIssueService;
+    private AttachmentService $attachmentService;
 
     /**
      * D.I.
      *
      * @param AttachmentModel $attachmentModel
-     * @param ExternalIssueService $externalIssueService
+     * @param AttachmentService $attachmentService
      */
-    public function __construct(AttachmentModel $attachmentModel, ExternalIssueService $externalIssueService)
+    public function __construct(AttachmentModel $attachmentModel, AttachmentService $attachmentService)
     {
         $this->attachmentModel = $attachmentModel;
-        $this->externalIssueService = $externalIssueService;
+        $this->attachmentService = $attachmentService;
     }
 
     /**
@@ -55,22 +55,25 @@ class AttachmentsApiController extends AbstractApiController
         if (!$provider) {
             throw new NotFoundException("No provider was found for this attachment type.");
         }
-        if (!$provider->validatePermissions($this->getSession()->User)) {
+        if (!$provider->hasPermissions()) {
             throw new ForbiddenException("You do not have permission to use this provider.");
         }
 
-        $in = $this->attachmentModel->getAttachmentPostSchema()->merge($provider->issuePostSchema());
-        $in->validate($body);
+        $basicBody = $this->attachmentModel->getAttachmentPostSchema()->validate($body);
+        $recordType = $basicBody["recordType"];
+        $recordID = $basicBody["recordID"];
+        $fullSchema = $this->attachmentModel
+            ->getAttachmentPostSchema()
+            ->merge($provider->getHydratedFormSchema($recordType, $recordID, $body));
 
-        $recordType = $body["recordType"];
-        $recordID = $body["recordID"];
+        $body = $fullSchema->validate($body);
 
-        $attachment = $provider->makeNewIssue($recordType, $recordID, $body);
+        $attachment = $provider->createAttachment($recordType, $recordID, $body);
 
         $attachment = $this->normalizeSingleAttachment($attachment);
 
-        $out = $provider->fullIssueSchema();
-        $out->validate($attachment, true);
+        $out = AttachmentModel::getAttachmentSchema();
+        $out->validate($attachment);
 
         return new Data($attachment);
     }
@@ -95,7 +98,7 @@ class AttachmentsApiController extends AbstractApiController
         $foreignID = $this->attachmentModel->createForeignID($query["recordType"], $query["recordID"]);
 
         $attachments = $this->attachmentModel->getWhere(["ForeignID" => $foreignID])->resultArray();
-        $this->normalizeAttachments($attachments);
+        $attachments = $this->attachmentService->normalizeAttachments($attachments);
 
         $out = $this->schema([":a" => $this->attachmentModel->getAttachmentSchema()], "out");
         $out->validate($attachments);
@@ -111,15 +114,8 @@ class AttachmentsApiController extends AbstractApiController
      */
     public function get_catalog(): Data
     {
-        $providers = $this->externalIssueService->getAllProviders();
-        $catalog = [];
-        foreach ($providers as $provider) {
-            if (!$provider->validatePermissions($this->getSession()->User)) {
-                continue;
-            }
-            $catalog[$provider->getTypeName()] = $provider->getCatalog();
-        }
-
+        $this->permission();
+        $catalog = $this->attachmentService->getCatalog();
         return new Data($catalog);
     }
 
@@ -140,7 +136,7 @@ class AttachmentsApiController extends AbstractApiController
             throw new NotFoundException("No provider was found for this attachment source.");
         }
 
-        if (!$provider->validatePermissions($this->getSession()->User)) {
+        if (!$provider->hasPermissions()) {
             throw new ForbiddenException("You do not have permission to use this provider.");
         }
 
@@ -150,10 +146,7 @@ class AttachmentsApiController extends AbstractApiController
             $query["recordID"]
         );
 
-        $provider->setProjectID($query["projectID"] ?? null);
-        $provider->setIssueTypeID($query["issueTypeID"] ?? null);
-
-        $providerSchema = $provider->getHydratedFormSchema($query["recordType"], $query["recordID"]);
+        $providerSchema = $provider->getHydratedFormSchema($query["recordType"], $query["recordID"], $query);
 
         $schema = $baseSchema->merge($providerSchema);
 
@@ -171,7 +164,12 @@ class AttachmentsApiController extends AbstractApiController
     {
         $this->permission("staff.allow");
 
-        $in = $this->schema(["attachmentIDs:a" => ["items" => "int"]]);
+        $in = $this->schema([
+            "attachmentIDs:a" => ["items" => "int"],
+            "onlyStale:b?" => [
+                "default" => true,
+            ],
+        ]);
         $body = $in->validate($body);
         $attachmentIDs = array_unique($body["attachmentIDs"]);
 
@@ -179,17 +177,10 @@ class AttachmentsApiController extends AbstractApiController
             throw new ClientException("Can't refresh more than 10 attachments");
         }
 
-        $attachments = $this->attachmentModel->getWhere(["AttachmentID" => $attachmentIDs]);
-        $results = [];
-        foreach ($attachments as $attachment) {
-            $provider = $this->getProvider($attachment["Type"]);
-            if ($provider) {
-                $attachment = $provider->syncIssue($attachment);
-                $results[] = $attachment;
-            }
-        }
+        $attachmentRows = $this->attachmentModel->getWhere(["AttachmentID" => $attachmentIDs])->resultArray();
+        $refreshed = $this->attachmentService->refreshAttachments($attachmentRows);
+        $results = $this->attachmentService->normalizeAttachments($refreshed);
 
-        $this->normalizeAttachments($results);
         $out = $this->schema([":a" => $this->attachmentModel->getAttachmentSchema()], "out");
         $out->validate($results);
         return new Data($results);
@@ -199,11 +190,11 @@ class AttachmentsApiController extends AbstractApiController
      * Get the provider for a source.
      *
      * @param string $typeName
-     * @return ExternalIssueProviderInterface|null
+     * @return AttachmentProviderInterface|null
      */
-    private function getProvider(string $typeName): ?ExternalIssueProviderInterface
+    private function getProvider(string $typeName): ?AttachmentProviderInterface
     {
-        foreach ($this->externalIssueService->getAllProviders() as $provider) {
+        foreach ($this->attachmentService->getAllProviders() as $provider) {
             if ($provider->getTypeName() == $typeName) {
                 return $provider;
             }
@@ -235,27 +226,11 @@ class AttachmentsApiController extends AbstractApiController
     private function normalizeSingleAttachment(array $attachment): array
     {
         $attachmentArray = [$attachment];
-        $this->attachmentModel->normalizeAttachments($attachmentArray);
+        $attachmentArray = $this->attachmentService->normalizeAttachments($attachmentArray);
         $normalizedAttachment = $attachmentArray[0];
         $normalizedAttachment = ArrayUtils::camelCase($normalizedAttachment);
         $schemaArray = $this->attachmentModel->getAttachmentSchema()->getSchemaArray();
         $filteredAttachment = array_intersect_key($normalizedAttachment, $schemaArray["properties"]);
         return $filteredAttachment;
-    }
-
-    /**
-     * Normalize an array of attachments for output.
-     *
-     * @param array $attachments
-     * @return void
-     */
-    private function normalizeAttachments(array &$attachments): void
-    {
-        $this->attachmentModel->normalizeAttachments($attachments);
-        $schemaArray = $this->attachmentModel->getAttachmentSchema()->getSchemaArray();
-        $attachments = ArrayUtils::camelCase($attachments);
-        foreach ($attachments as &$attachment) {
-            $attachment = array_intersect_key($attachment, $schemaArray["properties"]);
-        }
     }
 }

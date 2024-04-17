@@ -87,7 +87,9 @@ function customErrorHandler(error: AxiosError) {
 
     if (typeof data === "object" && data.message) {
         (error as any).message = data.message;
+        (error as any).description = data.description;
         (error as any).errors = data.errors ?? {};
+        (error as any).actionButton = data.actionButton;
     }
 
     const contentType = error.response?.headers?.["content-type"];

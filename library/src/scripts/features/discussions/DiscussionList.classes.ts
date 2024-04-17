@@ -75,11 +75,9 @@ export const discussionListClasses = useThemeCache(
             }),
         };
 
-        type AvailableReactionsCount = 1 | 2;
-
         const voteCounterVars = voteCounterVariables();
 
-        const iconAndVoteCounterWrapper = useThemeCache((availableReactionsCount: AvailableReactionsCount = 1) => {
+        const iconAndVoteCounterWrapper = useThemeCache((availableReactionsCount: number = 1) => {
             return css({
                 position: "relative",
                 ...(listItemVars.options.iconPosition === ListItemIconPosition.META
@@ -89,6 +87,20 @@ export const discussionListClasses = useThemeCache(
                       })
                     : {}),
             });
+        });
+
+        const voteCounterWrapper = useThemeCache((availableReactionsCount: number = 0) => {
+            if (listItemVars.options.iconPosition !== ListItemIconPosition.META && !vars.item.featuredImage.display) {
+                return css({
+                    ...Mixins.margin({
+                        bottom:
+                            availableReactionsCount > 0
+                                ? voteCounterVars.sizing.magicOffset * availableReactionsCount
+                                : 0,
+                    }),
+                });
+            }
+            return css({});
         });
 
         const resolved = css({
@@ -216,6 +228,7 @@ export const discussionListClasses = useThemeCache(
         return {
             title,
             iconAndVoteCounterWrapper,
+            voteCounterWrapper,
             voteCounterContainer,
             checkedboxRowStyle,
             options,

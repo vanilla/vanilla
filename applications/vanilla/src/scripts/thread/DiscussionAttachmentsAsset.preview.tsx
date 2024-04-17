@@ -4,6 +4,7 @@
  * @license GPL-2.0-only
  */
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
+import { AttachmentIntegrationsContextProvider } from "@library/features/discussions/integrations/Integrations.context";
 import { Widget } from "@library/layout/Widget";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import DiscussionAttachmentsAsset from "@vanilla/addon-vanilla/thread/DiscussionAttachmentsAsset";
@@ -25,7 +26,9 @@ export function DiscussionAttachmentsAssetPreview() {
     return (
         <Widget>
             <QueryClientProvider client={queryClient}>
-                <DiscussionAttachmentsAsset discussion={discussion} />
+                <AttachmentIntegrationsContextProvider>
+                    <DiscussionAttachmentsAsset discussion={discussion} />
+                </AttachmentIntegrationsContextProvider>
             </QueryClientProvider>
         </Widget>
     );

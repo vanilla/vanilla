@@ -70,6 +70,10 @@ paths:
                         schema:
                             type: object
                             properties:
+                                onlyStale:
+                                    description: Only refresh attachments that are stale.
+                                    type: boolean
+                                    default: true
                                 attachmentIDs:
                                     type: array
                                     items:
@@ -195,8 +199,19 @@ components:
                 labelCode:
                     type: string
                     description: |
-                        The key of the metadatum.
+                        The translation code of the label of the metadatum.
                 value:
                     type: string
                     description: |
                         The value of the metadatum.
+                url:
+                    type: string
+                    description: URL for the metadatum.
+                format:
+                    type: string
+                    description: Format information about the metadata
+                    enum:
+                        - html
+            required:
+                - labelCode
+                - value

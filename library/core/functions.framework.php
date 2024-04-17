@@ -1393,7 +1393,7 @@ if (!function_exists("removeFromConfig")) {
      *
      * This function removes the value from the application configuration. It will not touch any default configurations.
      *
-     * @param string $name The dot-separated name of the config.
+     * @param string|array $name The dot-separated name of the config.
      * @param array $options An array of additional options for removal.
      * @see Gdn_Config::removeFromConfig()
      */

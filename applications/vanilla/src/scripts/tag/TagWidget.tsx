@@ -4,17 +4,16 @@
  * @license Proprietary
  */
 
-import React from "react";
+import { ITag } from "@library/features/tags/TagsReducer";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
+import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
+import { Metas, MetaTag } from "@library/metas/Metas";
+import { tagCloudVariables, TagPreset } from "@library/metas/Tags.variables";
+import { getMeta } from "@library/utility/appUtils";
+import { tagWidgetClasses } from "@vanilla/addon-vanilla/tag/TagWidget.classes";
 import { t } from "@vanilla/i18n";
 import classNames from "classnames";
-import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { ITag } from "@library/features/tags/TagsReducer";
-import { Metas, MetaTag } from "@library/metas/Metas";
-import { TagPreset } from "@library/metas/Tags.variables";
-import { tagWidgetClasses } from "@vanilla/addon-vanilla/tag/TagWidget.classes";
-import { Tag } from "@library/metas/Tags";
-import { getMeta } from "@library/utility/appUtils";
+import React from "react";
 
 interface IProps {
     tags: ITag[];
@@ -33,6 +32,7 @@ export default function TagWidget(props: IProps) {
     const { subtitle, description, tags, containerOptions, itemOptions } = props;
     const title = props.title ?? t("Popular Tags");
     const classes = tagWidgetClasses(containerOptions);
+    const vars = tagCloudVariables();
     const customLayoutsForDiscussionListIsEnabled = getMeta("featureFlags.customLayout.discussionList.Enabled", false);
 
     return (
@@ -49,9 +49,12 @@ export default function TagWidget(props: IProps) {
                                             ? `/discussions?tagID=${tag.tagID}`
                                             : `/discussions/tagged/${tag.urlcode}`
                                     }
-                                    preset={itemOptions?.tagPreset ?? TagPreset.STANDARD}
+                                    tagPreset={itemOptions?.tagPreset ?? vars.tagPreset}
                                 >
-                                    {tag.name} <span className={classNames(classes.count)}>{tag.countDiscussions}</span>
+                                    {tag.name}
+                                    {vars.showCount && (
+                                        <span className={classNames(classes.count)}> {tag.countDiscussions}</span>
+                                    )}
                                 </MetaTag>
                             );
                         })}

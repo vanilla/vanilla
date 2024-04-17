@@ -82,6 +82,8 @@ class UserDisciplineEvent extends UserEvent implements \Garden\Events\TrackingEv
                     ? $trackableUserModel->getTrackableUser($eventPayload["discipliningUser"]["userID"])
                     : null,
         ];
+        $trackingData["discussion"]["body"] = null;
+        $trackingData["comment"]["body"] = null;
         return $trackingData;
     }
 

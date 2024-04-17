@@ -164,13 +164,19 @@ class UserModelTest extends SiteTestCase
      *
      * @param array $result
      * @param array $ban
+     * @param string $prepend
      * @return array
      */
-    public function banModel_banWhere_handler(array $result, array $ban): array
-    {
+    public function banModel_banWhere_handler(
+        array $result,
+        array $ban,
+        string $prepend = "",
+        bool $inverse = false
+    ): array {
+        $inverse = $inverse ? " !" : "";
         switch (strtolower($ban["BanType"])) {
             case "password":
-                $result["u.Password"] = $ban["BanValue"];
+                $result["{$prepend}Password{$inverse}"] = $ban["BanValue"];
                 break;
         }
         return $result;

@@ -357,7 +357,7 @@ class SitemapsPlugin extends Gdn_Plugin
 
         $discussions = $discussionModel->Database
             ->createSql()
-            ->select("DiscussionID", "CategoryID", "Name", "DateLastComment", "DateUpdated")
+            ->select(["DiscussionID", "CategoryID", "Name", "DateLastComment", "DateUpdated"])
             ->from("Discussion d")
             ->join("({$innerSelect}) d2", "d.DiscussionID = d2.DiscussionID")
             ->get()

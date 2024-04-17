@@ -383,6 +383,64 @@ class NotificationPreferencesApiControllerTest extends AbstractAPIv2Test
     }
 
     /**
+     * Test patching a user's notification preference, and updating default doesn't change user preferences.
+     *
+     * @return void
+     */
+    public function testPatchSinglePreferenceUpdateDefault(): void
+    {
+        $patch = [
+            "WallComment" => [
+                "popup" => true,
+            ],
+            "DiscussionComment" => [
+                "email" => false,
+            ],
+        ];
+        $this->api()->patch("notification-preferences/defaults", $patch);
+        $user = $this->createUser();
+        $existingPrefs = $this->userPrefsModel->getUserPrefs($user["userID"]);
+        $this->assertSame(0, $existingPrefs["Email.DiscussionComment"]);
+        $this->api()->patch("{$this->baseUrl}/{$user["userID"]}", [
+            "DiscussionComment" => ["email" => true],
+            // Setting preference to same as default, should still save the value to protect from when default changes.
+            "WallComment" => ["popup" => true],
+        ]);
+
+        $updatedPrefs = $this->api()
+            ->get("{$this->baseUrl}/{$user["userID"]}")
+            ->getBody();
+        $this->assertSame(true, $updatedPrefs["DiscussionComment"]["email"]);
+        // Verify the preferences have been saved to both the userMeta table and the user table.
+        $userData = $this->userModel->getID($user["userID"]);
+        $prefFromUserTable = $userData->Preferences;
+        $this->assertSame(1, $prefFromUserTable["Email.DiscussionComment"]);
+        $prefFromMetaTable = $this->userMetaModel->getUserMeta($user["userID"], "Preferences.Email.DiscussionComment");
+        $this->assertSame("1", $prefFromMetaTable["Preferences.Email.DiscussionComment"]);
+
+        // Update the default preferences
+        $patch = [
+            "WallComment" => [
+                "popup" => false,
+            ],
+        ];
+
+        $this->api()->patch("notification-preferences/defaults", $patch);
+
+        $patchedDefaults = $this->api()
+            ->get("notification-preferences/defaults")
+            ->getBody();
+
+        $this->assertSame(false, $patchedDefaults["WallComment"]["popup"]);
+        //  Get Current this user preferences after default update
+        $updatedPrefs = $this->api()
+            ->get("{$this->baseUrl}/{$user["userID"]}")
+            ->getBody();
+        // Should still maintain the user preference
+        $this->assertSame(true, $updatedPrefs["WallComment"]["popup"]);
+    }
+
+    /**
      * Test that trying to patch an activity type that doesn't exist throws a 404 error.
      *
      * @return void

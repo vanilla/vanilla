@@ -115,12 +115,8 @@ class DiscussionExpandSchema
         if (ModelUtils::isExpandOption("status", $expandOption)) {
             $this->recordStatusModel->expandStatuses($rows);
         }
-        if (
-            ModelUtils::isExpandOption("attachments", $expandOption) &&
-            Gdn::session()->checkPermission("staff.allow")
-        ) {
+        if (ModelUtils::isExpandOption("attachments", $expandOption)) {
             $this->attachmentModel->joinAttachments($rows);
-            AttachmentModel::camelCaseAttachments($rows);
         }
 
         // This one can be slightly performance intensive so don't do it unless explicitly asked.

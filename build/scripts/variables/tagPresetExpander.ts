@@ -36,7 +36,7 @@ export const tagPresetExpander: ITypeExpander = {
             },
             {
                 ...variable,
-                key: variable.key + ".fontColorHover",
+                key: variable.key + ".fontColorState",
                 title: variable.title + " - " + "Font Color (Hover)",
                 description: `The tag's text color when hovered, active, or focused`,
                 type: "string",
@@ -44,7 +44,7 @@ export const tagPresetExpander: ITypeExpander = {
             },
             {
                 ...variable,
-                key: variable.key + ".bgColorHover",
+                key: variable.key + ".bgColorState",
                 title: variable.title + " - " + "Background Color (Hover)",
                 description: `The tag's background color when hovered, active, or focused`,
                 type: "string",
@@ -52,7 +52,7 @@ export const tagPresetExpander: ITypeExpander = {
             },
             {
                 ...variable,
-                key: variable.key + ".borderColorHover",
+                key: variable.key + ".borderColorState",
                 title: variable.title + " - " + "Border Color (Hover)",
                 description: `The tag's border color when hovered, active, or focused`,
                 type: "string",

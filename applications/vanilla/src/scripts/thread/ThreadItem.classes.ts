@@ -22,6 +22,9 @@ const ThreadItemClasses = useThemeCache((headerHasUserPhoto = false) => {
 
     const attachmentsContentWrapper = css({
         ...Mixins.margin({ top: globalVars.gutter.size }),
+        "&:empty": {
+            display: "none",
+        },
     });
 
     return {

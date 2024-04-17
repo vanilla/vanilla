@@ -523,10 +523,17 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                     $activity["NotifyUserID"] = $userID;
                     $activity["Emailed"] = $notificationPrefs["Emailed"] ?? false;
                     $activity["Notified"] = $notificationPrefs["Notified"] ?? false;
-                    $this->activityModel->save($activity, false, ["NoDelete" => true]);
-                    yield new LongRunnerSuccessID(
-                        "{$activity["RecordType"]}_{$activity["RecordID"]}_User_{$userID}_NotificationType_category"
-                    );
+                    $result = $this->activityModel->save($activity, false, [
+                        "NoDelete" => true,
+                        "DisableFloodControl" => true,
+                    ]);
+
+                    $longRunnerID = "{$activity["RecordType"]}_{$activity["RecordID"]}_User_{$userID}_NotificationType_category";
+                    if (!$this->didActivitySave($result)) {
+                        yield new LongRunnerFailedID($longRunnerID);
+                    } else {
+                        yield new LongRunnerSuccessID($longRunnerID);
+                    }
                 } catch (LongRunnerTimeoutException $e) {
                     return new LongRunnerNextArgs([$activity, $discussionID, $recordType, $lastUserID]);
                 } catch (\Exception $e) {
@@ -597,17 +604,22 @@ class CommunityNotificationGenerator implements SystemCallableInterface
         ?int $maxNotifiedUserID = null
     ): Generator {
         $headlineFormat = $groupData["headlineFormat"] ?? $notificationData["HeadlineFormat"];
-        $notifyUserIDs = $groupData["notifyUserIDs"] ?? null;
+        $notifyUserIDs = $groupData["notifyUserIDs"] ?? [];
         $preference = $groupData["preference"] ?? false;
         $options = $groupData["options"] ?? [];
+        $options["DisableFloodControl"] = true;
+
+        $notifyUserIDs = array_unique(
+            array_filter($notifyUserIDs, function ($userID) use ($notificationData) {
+                return $userID != $notificationData["ActivityUserID"];
+            })
+        );
 
         yield new LongRunnerQuantityTotal(function () use ($notifyUserIDs) {
             return count($notifyUserIDs ?? []);
         });
 
-        if (is_array($notifyUserIDs)) {
-            sort($notifyUserIDs);
-        }
+        sort($notifyUserIDs);
 
         foreach ($notifyUserIDs as $notifyUserID) {
             try {
@@ -625,11 +637,16 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                 $notification["NotifyUserID"] = $notifyUserID;
                 $notification["Data"]["Reason"] = $reason;
                 $notification["Data"]["Preference"] = $preference;
-                $this->activityModel->save($notification, $preference, $options);
+                $result = $this->activityModel->save($notification, $preference, $options);
+
+                $longRunnerID = "{$notificationData["RecordType"]}_{$notification["RecordID"]}_User_{$notifyUserID}_NotificationType_{$reason}";
                 $maxNotifiedUserID = $notifyUserID;
-                yield new LongRunnerSuccessID(
-                    "{$notificationData["RecordType"]}_{$notification["RecordID"]}_User_{$notifyUserID}_NotificationType_{$reason}"
-                );
+
+                if (!$this->didActivitySave($result)) {
+                    yield new LongRunnerFailedID($longRunnerID);
+                } else {
+                    yield new LongRunnerSuccessID($longRunnerID);
+                }
             } catch (LongRunnerTimeoutException $timeoutException) {
                 return new LongRunnerNextArgs([
                     $notificationData,
@@ -664,9 +681,12 @@ class CommunityNotificationGenerator implements SystemCallableInterface
         ?int $maxNotifiedUserID = null
     ): Generator {
         $headlineFormat = $groupData["headlineFormat"] ?? $notificationData["HeadlineFormat"];
-        $notifyUsersWhere = $groupData["notifyUsersWhere"] ?? null;
+        $notifyUsersWhere = $groupData["notifyUsersWhere"] ?? [];
         $preference = $groupData["preference"] ?? false;
         $options = $groupData["options"] ?? [];
+        $options["DisableFloodControl"] = true;
+
+        $notifyUsersWhere["UserID <>"] = $notificationData["ActivityUserID"];
 
         if (!isset($notifyUsersWhere)) {
             return LongRunner::FINISHED;
@@ -697,11 +717,15 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                 $notification["NotifyUserID"] = $notifyUserID;
                 $notification["Data"]["Reason"] = $reason;
                 $notification["Data"]["Preference"] = $preference;
-                $this->activityModel->save($notification, $preference, $options);
+                $result = $this->activityModel->save($notification, $preference, $options);
+                $longRunnerID = "{$notificationData["RecordType"]}_{$notification["RecordID"]}_User_{$notifyUserID}_NotificationType_{$reason}";
                 $maxNotifiedUserID = $notifyUserID;
-                yield new LongRunnerSuccessID(
-                    "{$notificationData["RecordType"]}_{$notification["RecordID"]}_User_{$notifyUserID}_NotificationType_{$reason}"
-                );
+
+                if (!$this->didActivitySave($result)) {
+                    yield new LongRunnerFailedID($longRunnerID);
+                } else {
+                    yield new LongRunnerSuccessID($longRunnerID);
+                }
             } catch (LongRunnerTimeoutException $timeoutException) {
                 return new LongRunnerNextArgs([
                     $notificationData,
@@ -775,5 +799,16 @@ class CommunityNotificationGenerator implements SystemCallableInterface
                 ->get()
                 ->firstRow()->CategoryID ?? null;
         return $categoryID;
+    }
+
+    /**
+     * Check if an activity was saved.
+     *
+     * @param mixed $activityResult
+     * @return bool
+     */
+    private function didActivitySave($activityResult): bool
+    {
+        return is_array($activityResult) && isset($activityResult["ActivityID"]);
     }
 }

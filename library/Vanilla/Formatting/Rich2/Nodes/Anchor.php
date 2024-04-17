@@ -35,7 +35,11 @@ class Anchor extends AbstractNode
 
     public function getUrl(): ?string
     {
-        return $this->data["url"] ?? null;
+        $url = $this->data["url"] ?? null;
+        if (isset($url)) {
+            $url = \Gdn_Format::sanitizeUrl($this->data["url"]);
+        }
+        return $url;
     }
 
     public function setUrl(string $url)

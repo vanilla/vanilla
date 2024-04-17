@@ -150,7 +150,7 @@ class SitemapsTest extends AbstractAPIv2Test
      * @param int $categoryId
      * @param string $name
      * @param int $counts
-     * @return void
+     * @return array
      */
     private function createCategoryDiscussions(int $categoryId, string $name = "Test", int $counts = 1)
     {

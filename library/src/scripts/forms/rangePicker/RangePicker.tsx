@@ -4,7 +4,7 @@
  * @license Proprietary
  */
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import DayPicker, { DateUtils, Modifiers, RangeModifier } from "react-day-picker";
 import moment from "moment";
 import "react-day-picker/lib/style.css";
@@ -62,8 +62,8 @@ export function RangePicker(props: IDateModifierRangePickerProps) {
             rangeModifier.to = date;
         }
         if (sameDay) {
-            rangeModifier.from = moment(date).startOf("day").toDate();
-            rangeModifier.to = moment(date).endOf("day").toDate();
+            rangeModifier.from = date;
+            rangeModifier.to = date;
         }
 
         setRange({
@@ -72,47 +72,36 @@ export function RangePicker(props: IDateModifierRangePickerProps) {
         });
     };
 
-    const isRangeValid = useMemo(() => {
-        return moment(toDate).isAfter(fromDate);
-    }, [fromDate, toDate]);
-
     return (
-        <>
-            <section className={classes.container}>
-                <DayPicker
-                    className={classes.picker}
-                    // Always render this and the previous month
-                    month={fromDate}
-                    pagedNavigation
-                    fixedWeeks
-                    selectedDays={rangeModifier}
-                    modifiers={modifiers as Partial<Modifiers>}
-                    onDayClick={handleClick}
-                    disabledDays={{ after: new Date() }}
-                    navbarElement={DatePickerNav}
-                    toMonth={toMonth}
-                    captionElement={() => <></>}
-                />
-                <DayPicker
-                    className={classes.picker}
-                    month={toDate}
-                    pagedNavigation
-                    fixedWeeks
-                    selectedDays={rangeModifier}
-                    modifiers={modifiers as Partial<Modifiers>}
-                    onDayClick={handleClick}
-                    disabledDays={{ after: new Date() }}
-                    navbarElement={DatePickerNav}
-                    toMonth={new Date()}
-                    fromMonth={fromMonth}
-                    captionElement={() => <></>}
-                />
-            </section>
-            {!isRangeValid && (
-                <span className={classes.invalid}>
-                    The date range {fromDate?.toLocaleDateString()} - {toDate?.toLocaleDateString()} is invalid
-                </span>
-            )}
-        </>
+        <section className={classes.container}>
+            <DayPicker
+                className={classes.picker}
+                // Always render this and the previous month
+                month={fromDate}
+                pagedNavigation
+                fixedWeeks
+                selectedDays={rangeModifier}
+                modifiers={modifiers as Partial<Modifiers>}
+                onDayClick={handleClick}
+                disabledDays={{ after: new Date() }}
+                navbarElement={DatePickerNav}
+                toMonth={toMonth}
+                captionElement={() => <></>}
+            />
+            <DayPicker
+                className={classes.picker}
+                month={toDate}
+                pagedNavigation
+                fixedWeeks
+                selectedDays={rangeModifier}
+                modifiers={modifiers as Partial<Modifiers>}
+                onDayClick={handleClick}
+                disabledDays={{ after: new Date() }}
+                navbarElement={DatePickerNav}
+                toMonth={new Date()}
+                fromMonth={fromMonth}
+                captionElement={() => <></>}
+            />
+        </section>
     );
 }

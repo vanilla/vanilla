@@ -30,9 +30,7 @@
     }
 
     echo '<div class="P">';
-    $needsHtmlConversion = !empty($this->Form->getValue("Body"));
-    $showConversionNotice = $needsHtmlConversion ? false : NULL;
-    echo $this->Form->bodyBox('Body', ['Table' => 'ConversationMessage', 'FileUpload' => true, "needsHtmlConversion" => $needsHtmlConversion, "showConversionNotice" => $showConversionNotice]);
+    echo $this->Form->bodyBox('Body', ['Table' => 'ConversationMessage', 'FileUpload' => true]);
     //      echo wrap($this->Form->textBox('Body', array('MultiLine' => TRUE)), 'div', array('class' => 'TextBoxWrapper'));
     echo '</div>';
 

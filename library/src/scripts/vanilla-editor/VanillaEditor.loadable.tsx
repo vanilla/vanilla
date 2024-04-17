@@ -1,6 +1,6 @@
 /**
  * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -197,10 +197,6 @@ export function VanillaEditorLoadable(props: IProps) {
             } catch (error) {
                 // If the string can't be parsed, assume its already HTML or plain text
                 return deserializeHtml(value);
-            }
-        } else {
-            if (isMyValue(value as any)) {
-                return value as MyValue;
             }
         }
     };

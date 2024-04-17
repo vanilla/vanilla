@@ -418,40 +418,6 @@ class DiscussionsTest extends AbstractResourceTest
     }
 
     /**
-     * Test GET `/discussions` API endpoint filtering by `hasComments`.
-     */
-    public function testHasCommentsFiltering()
-    {
-        $this->resetTable("Discussion");
-        $this->resetTable("Comment");
-        // Create a discussion with a comment.
-        $this->createDiscussion();
-        $this->createComment();
-        // Create another discussion with a comment.
-        $this->createDiscussion();
-        $this->createComment();
-        // Create a discussion without a comment.
-        $this->createDiscussion();
-
-        // Get a list of discussions with comments.
-        $discussionsWithComments = $this->api()
-            ->get($this->baseUrl, ["hasComments" => true])
-            ->getBody();
-        $this->assertCount(2, $discussionsWithComments);
-
-        // Get a list of discussions without comments.
-        $discussionsWithoutComments = $this->api()
-            ->get($this->baseUrl, ["hasComments" => false])
-            ->getBody();
-        $this->assertCount(1, $discussionsWithoutComments);
-
-        $unfilteredDiscussions = $this->api()
-            ->get($this->baseUrl)
-            ->getBody();
-        $this->assertCount(3, $unfilteredDiscussions);
-    }
-
-    /**
      * Test the `excludeHiddenCategories` parameter from the GET `/discussions` API endpoint.
      */
     public function testExcludeHiddenCategories()

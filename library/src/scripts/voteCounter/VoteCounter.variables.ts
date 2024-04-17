@@ -5,8 +5,8 @@
  */
 
 import { globalVariables } from "@library/styles/globalStyleVars";
-import { variableFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
+import { variableFactory } from "@library/styles/styleUtils";
 
 const voteCounterVariables = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -15,7 +15,7 @@ const voteCounterVariables = useThemeCache(() => {
 
     const colors = makeThemeVars("colors", {
         bg: "#e8e8e8",
-        fg: globalVars.elementaryColors.darkText,
+        fg: globalVars.mainColors.fg,
     });
 
     const sizing = {

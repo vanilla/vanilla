@@ -1429,7 +1429,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
         if (
             Gdn::session()->validateTransientKey($transientKey) &&
             Gdn::session()->checkPermission("Garden.Settings.Manage") &&
-            $user->Admin < 2
+            $user->Admin !== 2
         ) {
             $spoofedByUser = Gdn::session()->User;
             $session = Gdn::session()->Session;
@@ -1479,7 +1479,7 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
         }
 
         $user = getValue("User", $sender->EventArguments);
-        if ($user && $user->Admin < 2) {
+        if ($user && $user->Admin !== 2) {
             $attr = [
                 "aria-label" => t("Spoof"),
                 "title" => t("Spoof"),
@@ -1497,7 +1497,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
 
     /**
      * Adds a "Spoof" link to the site management list.
-     * NOTE: There doesn't seem to be a `manageController_siteListOptions` event.
      *
      * @param ManageController $sender
      */
@@ -1522,8 +1521,6 @@ class DashboardHooks extends Gdn_Plugin implements LoggerAwareInterface
 
     /**
      * Add items to the profile dashboard.
-     * NOTE: The event `afterAddSideMenu` only seems to be fired when viewing one's own profile and this handler
-     * has a specific check that the profile must be for a different user. So it doesn't seem to do anything.
      *
      * @param ProfileController $sender
      */

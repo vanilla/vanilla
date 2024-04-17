@@ -120,7 +120,6 @@ class DiscussionsApiIndexSchema extends Schema
                         ])
                     ),
                 ],
-                "hasComments:b?",
                 "dirtyRecords:b?",
                 "siteSectionID:s?",
                 "page:i?" => [

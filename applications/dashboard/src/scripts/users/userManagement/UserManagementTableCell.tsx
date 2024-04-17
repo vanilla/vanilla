@@ -380,7 +380,7 @@ export function ActionsCell(props: { data: IUser }) {
     const classes = userManagementClasses();
     const { permissions, currentUserID, RanksWrapperComponent, ...rest } = useUserManagement();
     const { canEditUsers, canDeleteUsers, canSpoofUsers } = permissions;
-    const notSelfOrSystem = currentUserID !== props.data?.userID && !props.data.isSysAdmin && !props.data.isSuperAdmin;
+    const notSelfOrSystem = currentUserID !== props.data?.userID && !props.data.isSysAdmin;
 
     // we need to do a bit of adjustment here for userAddEdit form role dropdown
     const userData = {
@@ -408,12 +408,7 @@ export function ActionsCell(props: { data: IUser }) {
                 </LinkAsButton>
             )}
             {canSpoofUsers && (
-                <UserManagementSpoof
-                    userID={userData.userID}
-                    isSysAdmin={userData.isSysAdmin}
-                    isSuperAdmin={userData.isSuperAdmin}
-                    name={userData.name}
-                />
+                <UserManagementSpoof userID={userData.userID} isSysAdmin={userData.isSysAdmin} name={userData.name} />
             )}
         </div>
     );

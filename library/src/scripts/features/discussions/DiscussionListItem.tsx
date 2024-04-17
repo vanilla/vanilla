@@ -73,14 +73,22 @@ export default function DiscussionListItem(props: IProps) {
         icon = <div className={cx(iconClass, classes.userIcon)}>{iconView}</div>;
     }
 
-    const availableReactionsCount = discussion.reactions?.filter(({ urlcode }) =>
-        [ReactionUrlCode.UP, ReactionUrlCode.DOWN].includes(urlcode as ReactionUrlCode),
-    ).length;
-
-    if (currentUserSignedIn && discussion.type === "idea") {
+    if (
+        currentUserSignedIn &&
+        discussion.type === "idea" &&
+        discussion.reactions?.some(({ urlcode }) =>
+            [ReactionUrlCode.UP, ReactionUrlCode.DOWN].includes(urlcode as ReactionUrlCode),
+        )
+    ) {
+        const availableReactionsCount = discussion.reactions.filter(({ urlcode }) =>
+            [ReactionUrlCode.UP, ReactionUrlCode.DOWN].includes(urlcode as ReactionUrlCode),
+        ).length;
         const ideationCounterContent = (
             <DiscussionVoteCounter
-                className={cx(classes.iconAndVoteCounterWrapper(availableReactionsCount), iconClass)}
+                className={cx(
+                    classes.iconAndVoteCounterWrapper(availableReactionsCount as 1 | 2 | undefined),
+                    iconClass,
+                )}
                 discussion={discussion}
             />
         );
@@ -157,7 +165,6 @@ export default function DiscussionListItem(props: IProps) {
             actions={actions}
             icon={icon}
             secondIcon={secondIcon}
-            iconWrapperClass={classes.voteCounterWrapper(availableReactionsCount)}
             options={variables.item.options}
             as={props.asTile ? "div" : undefined}
             featuredImage={variables.item.featuredImage}

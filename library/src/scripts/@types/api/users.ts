@@ -50,7 +50,6 @@ export interface IUser extends IUserFragment, IUserRoles {
     admin: number;
     isAdmin: boolean;
     isSysAdmin: boolean;
-    isSuperAdmin: boolean;
     banned: number;
     dateInserted: string;
     dateUpdated?: string;

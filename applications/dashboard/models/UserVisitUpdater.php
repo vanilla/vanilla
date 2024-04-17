@@ -133,6 +133,7 @@ class UserVisitUpdater
                 // User is freshly banned. Update the user record.
                 $ban = array_pop($bans);
                 $this->banModel->saveUser($user, true, $ban);
+                $this->banModel->setCounts($ban);
             }
         }
 

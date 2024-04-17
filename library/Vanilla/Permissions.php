@@ -41,11 +41,8 @@ class Permissions implements \JsonSerializable
 
     public const PERMISSION_SYSTEM = "system";
 
-    public const PERMISSION_SUPER_ADMIN = "Garden.SuperAdmin.Allow";
-
     /** Array of ranked permissions. */
     private const RANKED_PERMISSIONS = [
-        self::PERMISSION_SUPER_ADMIN => 7, // virtual permission for isSuperAdmin
         "Garden.Admin.Allow" => 6, // virtual permission for isAdmin
         "Garden.Settings.Manage" => 5,
         "Garden.Community.Manage" => 4,
@@ -108,8 +105,6 @@ class Permissions implements \JsonSerializable
     private $isAdmin = false;
 
     private $isSysAdmin = false;
-
-    private bool $isSuperAdmin = false;
 
     /**
      * @var array An array of bans that override all permissions a user may have.
@@ -479,7 +474,7 @@ class Permissions implements \JsonSerializable
             return false;
         }
 
-        if ($this->hasAdminPermission($permissions)) {
+        if (!in_array(self::PERMISSION_SYSTEM, $permissions) && $this->isAdmin()) {
             return true;
         }
 
@@ -517,7 +512,7 @@ class Permissions implements \JsonSerializable
             return false;
         }
 
-        if ($this->hasAdminPermission($permissions)) {
+        if (!in_array(self::PERMISSION_SYSTEM, $permissions) && $this->isAdmin()) {
             return true;
         }
 
@@ -532,26 +527,6 @@ class Permissions implements \JsonSerializable
         }
 
         return $nullCount === count($permissions);
-    }
-
-    /**
-     * Return the admin flag or false if the permissions array contains a special permission.
-     *
-     * @param array $permissions
-     * @return bool
-     */
-    protected function hasAdminPermission(array $permissions): bool
-    {
-        foreach ($permissions as $permission) {
-            if ($permission == self::PERMISSION_SYSTEM) {
-                return false;
-            }
-            if ($permission == self::PERMISSION_SUPER_ADMIN) {
-                return false;
-            }
-        }
-
-        return $this->isAdmin();
     }
 
     /**
@@ -575,16 +550,6 @@ class Permissions implements \JsonSerializable
     }
 
     /**
-     * Determine if the superAdmin flag is set.
-     *
-     * @return bool
-     */
-    public function isSuperAdmin(): bool
-    {
-        return $this->isSuperAdmin;
-    }
-
-    /**
      * Merge in data from another Permissions instance.
      *
      * @param Permissions $source The source Permissions instance to import permissions from.
@@ -598,7 +563,6 @@ class Permissions implements \JsonSerializable
         $this->addJunctionAliases($source->getJunctionAliases());
         $this->setAdmin($this->isAdmin() || $source->isAdmin());
         $this->setSysAdmin($this->isSysAdmin() || $source->isSysAdmin());
-        $this->setSuperAdmin($this->isSuperAdmin() || $source->isSuperAdmin());
 
         return $this;
     }
@@ -697,18 +661,6 @@ class Permissions implements \JsonSerializable
     public function setSysAdmin($isSysAdmin): self
     {
         $this->isSysAdmin = (bool) $isSysAdmin;
-        return $this;
-    }
-
-    /**
-     * Set the superAdmin flag.
-     *
-     * @param bool $isSuperAdmin Is the user a super admin?
-     * @return $this
-     */
-    public function setSuperAdmin(bool $isSuperAdmin): self
-    {
-        $this->isSuperAdmin = $isSuperAdmin;
         return $this;
     }
 
@@ -856,8 +808,6 @@ class Permissions implements \JsonSerializable
 
         if (strcasecmp($permission, "admin") === 0) {
             return $this->isAdmin();
-        } elseif (strcasecmp($permission, self::PERMISSION_SUPER_ADMIN) === 0) {
-            return $this->isSuperAdmin();
         } elseif (substr($permission, 0, 1) === "!") {
             // This is a ban so skip it.
             return null;
@@ -1012,7 +962,6 @@ class Permissions implements \JsonSerializable
             "permissions" => $this->asPermissionFragments(),
             "isAdmin" => $this->isAdmin(),
             "isSysAdmin" => $this->isSysAdmin(),
-            "isSuperAdmin" => $this->isSuperAdmin(),
         ];
 
         if ($withJunctions) {

@@ -42,6 +42,8 @@ interface SynchronizationProviderProps {
 export function SynchronizationProvider(props: PropsWithChildren<SynchronizationProviderProps>) {
     const { textArea, initialFormat, needsHtmlConversion } = props;
 
+    const [showConversionNotice, setConversionNotice] = useState(needsHtmlConversion ?? false);
+
     const initialValue = useMemo(() => {
         // If the post is already rich2, we can pass it to the editor as JSON
         const initialString = props.initialValue ?? textArea?.value;
@@ -49,8 +51,7 @@ export function SynchronizationProvider(props: PropsWithChildren<Synchronization
             return safelyParseJSON(initialString ?? []);
         }
         if (needsHtmlConversion) {
-            const emptyHtml = "<p></p>";
-            return deserializeHtml(!!initialString && initialString !== "" ? initialString : emptyHtml ?? emptyHtml);
+            return deserializeHtml(initialString ?? "");
         }
         return undefined;
     }, []);
@@ -65,13 +66,7 @@ export function SynchronizationProvider(props: PropsWithChildren<Synchronization
     }, 1000 / 60);
 
     return (
-        <SynchronizationContext.Provider
-            value={{
-                syncTextArea,
-                initialValue,
-                showConversionNotice: needsHtmlConversion ?? false,
-            }}
-        >
+        <SynchronizationContext.Provider value={{ syncTextArea, initialValue, showConversionNotice }}>
             {props.children}
         </SynchronizationContext.Provider>
     );

@@ -14,9 +14,9 @@ paths:
                   in: query
                   schema:
                       $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
-                - name: categoryID
-                  description: Filter by a category.
+                - description: Filter by a category.
                   in: query
+                  name: categoryID
                   schema:
                       type: integer
                 - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/DateInserted"
@@ -28,8 +28,7 @@ paths:
                   schema:
                       type: string
                       enum: ["d", "w", "m", "y", "a"]
-                - name: siteSectionID
-                  description: |-
+                - description: |-
                       Filter discussions by site section ID (ex. subcommunity).
                       The subcommunity ID or folder can be used if you use [smart IDs](https://success.vanillaforums.com/kb/articles/46-smart-ids).
                       The query looks like:
@@ -38,53 +37,53 @@ paths:
                       siteSectionID=$subcommunityID:{id|folder}
                       ```
                   in: query
+                  name: siteSectionID
                   schema:
                       type: string
-                - name: tagID
-                  description: Filter discussion by a range of tag IDs.
+                - description: Filter discussion by a range of tag IDs.
                   in: query
+                  name: tagID
                   schema:
                       $ref: "../../dashboard/openapi/schemas.yml#/components/schemas/RangeExpression"
-                - name: type
-                  description: Filter by discussion type, or comma separated list.
+                - description: Filter by discussion type, or comma separated list.
                   in: query
+                  name: type
                   schema:
                       type: string
                   x-filter:
                       field: d.Type
-                - name: status
-                  description: Filter questions by status (accepted, answered, unanswered).
+                - description: Filter questions by status (accepted, answered, unanswered).
                   in: query
+                  name: status
                   schema:
                       type: string
                   x-filter:
                       field: d.QnA
-                - name: excludeHiddenCategories
-                  description: Exclude discussions from categories that has the `HideAllDiscussions` option set to true.
+                - description: Exclude discussions from categories that has the `HideAllDiscussions` option set to true.
                   in: query
+                  name: excludeHiddenCategories
                   required: true
                   schema:
                       default: false
                       type: boolean
-                - name: followed
-                  description: >
+                - description: >
                       Only fetch discussions from followed categories. Pinned
                       discussions are mixed in.
                   in: query
+                  name: followed
                   required: true
                   schema:
                       default: false
                       type: boolean
-                - name: pinned
-                  description: >
+                - description: >
                       Whether or not to include pinned discussions. If true, only
                       return pinned discussions. Cannot be used with the pinOrder
                       parameter.
                   in: query
+                  name: pinned
                   schema:
                       type: boolean
-                - name: pinOrder
-                  description: >
+                - description: >
                       If including pinned posts, in what order should they be
                       integrated? When "first", discussions pinned to a specific category
                       will only be affected if the discussion's category is passed as the
@@ -92,25 +91,20 @@ paths:
 
                       Must be one of: "first", "mixed".
                   in: query
+                  name: pinOrder
                   schema:
                       type: string
                       default: first
                       enum:
                           - first
                           - mixed
-                - name: hasComments
-                  description: Optionally only include discussions that have/doesn't have comments.
-                  in: query
-                  required: false
-                  schema:
-                      type: boolean
                 - $ref: "../../dashboard/openapi/parameters.yml#/components/parameters/Page"
-                - name: limit
-                  description: >
+                - description: >
                       Desired number of items per page. **Note that you may not get the exact number of records back as specified
                       with the limit unless you also specify pinOrder=mixed**. This is an optimization for pinned
                       (i.e. announcement) discussion handling.
                   in: query
+                  name: limit
                   schema:
                       type: integer
                       default: 30
@@ -128,37 +122,37 @@ paths:
                           - -dateLastComment
                           - -dateInserted
                           - -discussionID
-                - name: insertUserID
-                  description: |
+                - description: |
                       Filter by author.
                   in: query
+                  name: insertUserID
                   schema:
                       type: integer
                   x-filter:
                       field: d.InsertUserID
                 - $ref: "#/components/parameters/DiscussionExpand"
-                - name: groupID
-                  description: The group the discussion is in.
+                - description: The group the discussion is in.
                   in: query
+                  name: groupID
                   schema:
                       type: integer
                   allowEmptyValue: true
-                - name: resolved
-                  description: Filter by resolved status.
+                - description: Filter by resolved status.
                   in: query
+                  name: resolved
                   schema:
                       type: boolean
                   x-filter:
                       field: d.Resolved
-                - name: bookmarkUserID
-                  description: Bookmarked by the UserID.
+                - description: Bookmarked by the UserID.
                   in: query
+                  name: bookmarkUserID
                   schema:
                       type: integer
                   allowEmptyValue: false
-                - name: participatedUserID
-                  description: Commented (participated) on by the UserID.
+                - description: Commented (participated) on by the UserID.
                   in: query
+                  name: participatedUserID
                   schema:
                       type: integer
                   allowEmptyValue: false
@@ -167,16 +161,16 @@ paths:
                   in: query
                   schema:
                       type: string
-                - name: statusID[]
-                  description: List of statusIDs to filter discussion by.
+                - description: List of statusIDs to filter discussion by.
                   in: query
+                  name: statusID[]
                   schema:
                       type: array
                       items:
                           type: integer
-                - name: internalStatusID[]
-                  description: List of internalStatusIDs to filter discussion by.
+                - description: List of internalStatusIDs to filter discussion by.
                   in: query
+                  name: internalStatusID[]
                   schema:
                       type: array
                       items:

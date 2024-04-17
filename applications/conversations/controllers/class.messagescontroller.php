@@ -51,14 +51,13 @@ class MessagesController extends ConversationsController
     /**
      * Start a new conversation.
      *
-     * @param string $recipient Username of the recipient.
-     * @param string $subject Subject of the message.
-     * @param string|null $content initial content.
      * @since 2.0.0
      * @access public
      *
+     * @param string $recipient Username of the recipient.
+     * @param string $subject Subject of the message.
      */
-    public function add($recipient = "", $subject = "", $content = null)
+    public function add($recipient = "", $subject = "")
     {
         $this->permission("Conversations.Conversations.Add");
 
@@ -67,15 +66,10 @@ class MessagesController extends ConversationsController
         if (!empty($optionalRedirection)) {
             $this->redirect($optionalRedirection);
             $this->render("blank", "utility", "dashboard");
-
             return;
         }
 
         $this->Form->setModel($this->ConversationModel);
-
-        if ($content !== null) {
-            $this->Form->setValue("Body", $content);
-        }
 
         // Detect our recipient limit.
         $maxRecipients = ConversationModel::getMaxRecipients();
@@ -119,7 +113,6 @@ class MessagesController extends ConversationsController
             if (!empty($this->Form->getFormValue("To"))) {
                 $this->Form->setFormValue("RecipientUserID", $recipientUserIDs);
             }
-
             $conversationID = $this->Form->save();
             if ($conversationID !== false) {
                 $target = $this->Form->getFormValue("Target", "messages/" . $conversationID);
@@ -217,10 +210,8 @@ class MessagesController extends ConversationsController
                 "ssoID" => rawurlencode($userSsoID),
             ];
             $newUrl = formatString($redirectUrl, $urlReplacements);
-
             return $newUrl;
         }
-
         return null;
     }
 
@@ -236,17 +227,16 @@ class MessagesController extends ConversationsController
         } else {
             $this->setRedirectTo($url, false);
         }
-
         return;
     }
 
     /**
      * Add a message to a conversation.
      *
-     * @param int|string $conversationID Unique ID of the conversation.
      * @since 2.0.0
      * @access public
      *
+     * @param int|string $conversationID Unique ID of the conversation.
      */
     public function addMessage($conversationID = "")
     {
@@ -310,6 +300,58 @@ class MessagesController extends ConversationsController
                 }
             }
         }
+        $this->render();
+    }
+
+    /**
+     * Show all conversations for the currently authenticated user.
+     *
+     * @since 2.0.0
+     * @access public
+     *
+     * @param string $page The page number argument.
+     */
+    public function all($page = "")
+    {
+        $this->title(t("Inbox"));
+        Gdn_Theme::section("ConversationList");
+
+        [$offset, $limit] = offsetLimit($page, c("Conversations.Conversations.PerPage", 50));
+
+        // Calculate offset
+        $this->Offset = $offset;
+
+        $userID = $this->Request->get("userid", Gdn::session()->UserID);
+        if ($userID != Gdn::session()->UserID) {
+            if (!c("Conversations.Moderation.Allow", false)) {
+                throw permissionException();
+            }
+            $this->permission("Conversations.Moderation.Manage");
+        }
+
+        $conversations = $this->ConversationModel->get2($userID, $offset, $limit)->resultArray();
+
+        $this->EventArguments["Conversations"] = &$conversations;
+        $this->fireEvent("beforeMessagesAll");
+
+        $this->setData("Conversations", $conversations);
+
+        // Build the pager
+        if (!$this->data("_PagerUrl")) {
+            $this->setData("_PagerUrl", "messages/all/{Page}");
+        }
+        $this->setData("_Page", $page);
+        $this->setData("_Limit", $limit);
+        $this->setData("_CurrentRecords", count($conversations));
+
+        // Deliver json data if necessary
+        if ($this->_DeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryMethod == DELIVERY_METHOD_XHTML) {
+            $this->setJson("LessRow", $this->Pager->toString("less"));
+            $this->setJson("MoreRow", $this->Pager->toString("more"));
+            $this->View = "conversations";
+        }
+
+        // Build and display page.
         $this->render();
     }
 
@@ -629,57 +671,5 @@ class MessagesController extends ConversationsController
     {
         $this->View = "All";
         $this->all($page);
-    }
-
-    /**
-     * Show all conversations for the currently authenticated user.
-     *
-     * @param string $page The page number argument.
-     * @since 2.0.0
-     * @access public
-     *
-     */
-    public function all($page = "")
-    {
-        $this->title(t("Inbox"));
-        Gdn_Theme::section("ConversationList");
-
-        [$offset, $limit] = offsetLimit($page, c("Conversations.Conversations.PerPage", 50));
-
-        // Calculate offset
-        $this->Offset = $offset;
-
-        $userID = $this->Request->get("userid", Gdn::session()->UserID);
-        if ($userID != Gdn::session()->UserID) {
-            if (!c("Conversations.Moderation.Allow", false)) {
-                throw permissionException();
-            }
-            $this->permission("Conversations.Moderation.Manage");
-        }
-
-        $conversations = $this->ConversationModel->get2($userID, $offset, $limit)->resultArray();
-
-        $this->EventArguments["Conversations"] = &$conversations;
-        $this->fireEvent("beforeMessagesAll");
-
-        $this->setData("Conversations", $conversations);
-
-        // Build the pager
-        if (!$this->data("_PagerUrl")) {
-            $this->setData("_PagerUrl", "messages/all/{Page}");
-        }
-        $this->setData("_Page", $page);
-        $this->setData("_Limit", $limit);
-        $this->setData("_CurrentRecords", count($conversations));
-
-        // Deliver json data if necessary
-        if ($this->_DeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryMethod == DELIVERY_METHOD_XHTML) {
-            $this->setJson("LessRow", $this->Pager->toString("less"));
-            $this->setJson("MoreRow", $this->Pager->toString("more"));
-            $this->View = "conversations";
-        }
-
-        // Build and display page.
-        $this->render();
     }
 }

@@ -13,7 +13,6 @@ import { ALL_CONTENT_DOMAIN_KEY, NEW_SEARCH_PAGE_ENABLED } from "@library/search
 import { ISearchRequestQuery } from "@library/search/searchTypes";
 import { SearchService } from "@library/search/SearchService";
 import { getCurrentLocale } from "@vanilla/i18n";
-import { makeSearchUrl } from "@library/search/SearchUtils";
 
 /**
  * Advanced Search implementation of autocomplete using sphinx.
@@ -108,6 +107,17 @@ export class CommunitySearchProvider implements ISearchOptionProvider {
         return this.debounceFetchSearch(query, options);
     };
 
-    public makeSearchUrl = (query: string, options: Record<string, any>, externalSearchQuery?: string) =>
-        makeSearchUrl(query, options, externalSearchQuery);
+    public makeSearchUrl = (query: string, options: Record<string, any>, externalSearchQuery?: string) => {
+        const queryParamName = NEW_SEARCH_PAGE_ENABLED ? "query" : "search";
+        const queryParams = {
+            ...options,
+            [queryParamName]: query,
+        };
+
+        const url =
+            externalSearchQuery && externalSearchQuery !== ""
+                ? externalSearchQuery.replace("%s", encodeURI(query))
+                : formatUrl(`/search?${qs.stringify(queryParams)}`, true);
+        return url;
+    };
 }

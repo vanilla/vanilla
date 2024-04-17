@@ -3,10 +3,6 @@
  * @license gpl-2.0-only
  */
 
-import { NEW_SEARCH_PAGE_ENABLED } from "@library/search/searchConstants";
-import { formatUrl } from "@library/utility/appUtils";
-import qs from "qs";
-
 /**
  * This will convert an object with start date string and end date string into string.
  *
@@ -62,17 +58,3 @@ export function dateStringInUrlToDateRange(dateStringInUrl: string): { start?: s
 
     return dateRange;
 }
-
-export const makeSearchUrl = (query: string, options: Record<string, any>, externalSearchQuery?: string) => {
-    const queryParamName = NEW_SEARCH_PAGE_ENABLED ? "query" : "search";
-    const queryParams = {
-        ...options,
-        [queryParamName]: query,
-    };
-
-    const url =
-        externalSearchQuery && externalSearchQuery !== ""
-            ? externalSearchQuery.replace("%s", encodeURI(query))
-            : formatUrl(`/search?${qs.stringify(queryParams)}`, true);
-    return url;
-};

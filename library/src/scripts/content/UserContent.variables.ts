@@ -90,6 +90,17 @@ export const userContentVariables = useThemeCache((forcedVars?: IThemeVariables)
          */
         borders: globalVars.border,
 
+        cell: {
+            /**
+             * @var userContent.tables.cell.alignment
+             * @title UserContent - Tables - Cell Alignment
+             * @description Choose the alignment of table cells.
+             * @type string
+             * @enum "center" | "left" | "right",
+             */
+            alignment: "left" as "center" | "left" | "right",
+        },
+
         /**
          * @var userContent.tables.mobileBreakpoint
          * @title UserContent - Tables - Mobile Breakpoint

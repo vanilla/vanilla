@@ -18,14 +18,13 @@ interface IProps {
     userID: IUser["userID"];
     name: IUser["name"];
     isSysAdmin: IUser["isSysAdmin"];
-    isSuperAdmin: IUser["isSuperAdmin"];
 }
 export default function UserManagementSpoof(props: IProps) {
     const { currentUserID } = useUserManagement();
     const classes = userManagementClasses();
     const transientKey = getMeta("TransientKey");
     const isViewingSelf = currentUserID == props.userID;
-    const showSpoofButton = !isViewingSelf && !props.isSysAdmin && !props.isSuperAdmin;
+    const showSpoofButton = !isViewingSelf && !props.isSysAdmin;
     const [visible, setVisible] = useState<boolean>(false);
 
     return (

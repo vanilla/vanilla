@@ -25,7 +25,6 @@ import QuickLinks from "@library/navigation/QuickLinks";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import keyBy from "lodash/keyBy";
-import { GlobalPreset } from "@library/styles/globalStyleVars";
 
 export default {
     title: "Components/DiscussionLists",
@@ -632,55 +631,4 @@ export const AsAssetWithHeader = storyWithConfig(
             </PermissionsFixtures.AllPermissions>
         </>
     ),
-);
-
-export const OnDarkThemeHiddenMeta = storyWithConfig(
-    {
-        themeVars: {
-            discussionList: {
-                contentBoxes: {
-                    depth1: {
-                        background: {
-                            color: "#FFFFFF",
-                        },
-                        borderType: "none",
-                    },
-                    depth2: {
-                        borderType: "border",
-                    },
-                },
-                item: {
-                    excerpt: {
-                        display: false,
-                    },
-                    metas: {
-                        display: {
-                            startedByUser: false,
-                            lastUser: false,
-                            viewCount: false,
-                        },
-                    },
-                },
-            },
-            global: {
-                options: {
-                    preset: GlobalPreset.DARK,
-                },
-            },
-        },
-        storeState: loggedInStoreState,
-    },
-    () => {
-        setMeta("ui.useAdminCheckboxes", false);
-
-        return (
-            <StoryContent>
-                <QueryClientProvider client={queryClient}>
-                    <PermissionsFixtures.AllPermissions>
-                        <DiscussionListView discussions={fakeDiscussions}></DiscussionListView>
-                    </PermissionsFixtures.AllPermissions>
-                </QueryClientProvider>
-            </StoryContent>
-        );
-    },
 );

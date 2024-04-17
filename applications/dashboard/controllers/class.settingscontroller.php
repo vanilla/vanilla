@@ -264,7 +264,7 @@ class SettingsController extends DashboardController
     protected function _banFilter($ban)
     {
         $banModel = $this->getBanModel();
-        $banWhere = $banModel->banWhere($ban, "u.");
+        $banWhere = $banModel->banWhere($ban);
         foreach ($banWhere as $name => $value) {
             if (!in_array($name, ["u.Admin", "u.Deleted"])) {
                 return "$name $value";

@@ -1,10 +1,10 @@
 /**
  * @author Taylor Chance <tchance@higherlogic.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouteChangePrompt } from "@vanilla/react-utils";
 import { JsonSchemaForm } from "@vanilla/json-schema-forms";
 import { LoadStatus } from "@library/@types/api/core";
@@ -16,7 +16,7 @@ import DropDown, { FlyoutType } from "@library/flyouts/DropDown";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import TestEmailModal from "@dashboard/emailSettings/components/TestEmailModal";
 import EmailPreviewModal from "@dashboard/emailSettings/components/EmailPreviewModal";
-import { IEmailConfigs } from "@dashboard/emailSettings/EmailSettings.types";
+import { IEmailSettings, IEmailConfigs } from "@dashboard/emailSettings/EmailSettings.types";
 import Button from "@library/forms/Button";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import { t } from "@vanilla/i18n";
@@ -44,35 +44,23 @@ export function EmailSettings() {
     const isReady = isLoaded && !!settings.data;
 
     const { values, setValues, dirty, submitForm } = useFormik({
-        initialValues: {
-            ...defaultValues,
-            ...(isReady
-                ? Object.fromEntries(
+        initialValues: isReady
+            ? {
+                  ...defaultValues,
+                  ...Object.fromEntries(
                       Object.keys(settings.data).map((key) => {
                           if (key === "emailNotifications.disabled") {
                               return [key, !settings.data[key]];
                           } else if (key === "emailStyles.format") {
                               return [key, settings.data[key] === "html" ? true : false];
-                          } else if (key === "outgoingEmails.footer") {
-                              if (typeof settings.data[key] === "string") {
-                                  try {
-                                      const value = JSON.parse(settings.data[key]);
-                                      return [key, value];
-                                  } catch (e) {
-                                      return defaultValues[key];
-                                  }
-                              } else {
-                                  return [key, settings.data[key]];
-                              }
                           }
                           return [key, settings.data[key]];
                       }),
-                  )
-                : {}),
-        },
+                  ),
+              }
+            : defaultValues,
         enableReinitialize: true,
-
-        onSubmit: async (values, { resetForm }) => {
+        onSubmit: async (values) => {
             const patchValues = {
                 ...values,
             };
@@ -97,8 +85,6 @@ export function EmailSettings() {
                     }),
                 ) as IEmailConfigs,
             );
-
-            resetForm({ values });
         },
     });
 
@@ -115,11 +101,19 @@ export function EmailSettings() {
 
     let sections = [EMAIL_STYLES_SECTION, OUTGOING_EMAILS_SECTION, EMAIL_NOTIFICATIONS_SECTION];
 
+    const [disabledRouteChangePrompt, setDisableRouteChangePrompt] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (dirty) {
+            setDisableRouteChangePrompt(false);
+        }
+    }, [dirty]);
+
     useRouteChangePrompt(
         t(
             "You are leaving the Email Settings page without saving your changes. Make sure your updates are saved before exiting.",
         ),
-        !dirty,
+        disabledRouteChangePrompt,
     );
 
     return (

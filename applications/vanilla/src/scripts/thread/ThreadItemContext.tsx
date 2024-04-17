@@ -4,7 +4,6 @@
  * @license gpl-2.0-only
  */
 
-import { usePermissionsContext } from "@library/features/users/PermissionsContext";
 import { t } from "@vanilla/i18n";
 import { RecordID, guessOperatingSystem, OS } from "@vanilla/utils";
 import React, { useContext } from "react";
@@ -18,7 +17,6 @@ export interface IThreadItemContext {
     handleCopyUrl: () => Promise<void>;
     handleNativeShare?: () => Promise<void>;
     emailUrl: string;
-    shareInMessageUrl?: string;
 }
 
 const ThreadItemContext = React.createContext<IThreadItemContext>({
@@ -29,27 +27,18 @@ const ThreadItemContext = React.createContext<IThreadItemContext>({
     name: "",
     handleCopyUrl: async () => {},
     emailUrl: "",
-    shareInMessageUrl: undefined,
 });
 
 export function ThreadItemContextProvider(
-    props: { children: React.ReactNode } & Omit<
-        IThreadItemContext,
-        "handleCopyUrl" | "handleNativeShare" | "emailUrl" | "shareInMessageUrl"
-    >,
+    props: { children: React.ReactNode } & Omit<IThreadItemContext, "handleCopyUrl" | "handleNativeShare" | "emailUrl">,
 ) {
     const { children, ...contextProps } = props;
     const { recordUrl, name } = contextProps;
 
-    const { hasPermission } = usePermissionsContext();
-    const canShareInMessage = hasPermission("conversations.add");
-
-    const url = new URL(recordUrl);
-
-    url.searchParams.set("utm_source", "community-share");
+    const urlToShare = `${recordUrl}?utm_source=community-share`;
 
     const shareData = {
-        url: url.toString(),
+        url: urlToShare,
         text: t("Check out this post:"),
     };
 
@@ -67,19 +56,14 @@ export function ThreadItemContextProvider(
         : undefined;
 
     async function handleCopyUrl() {
-        await navigator.clipboard.writeText(shareData.url);
+        await navigator.clipboard.writeText(urlToShare);
     }
-
-    const shareInMessageUrl = `/messages/add?content=${encodeURIComponent(
-        t("Check out this post:") + " " + shareData.url,
-    )}`;
 
     const contextValue = {
         ...contextProps,
         handleCopyUrl,
         handleNativeShare,
         emailUrl,
-        shareInMessageUrl: canShareInMessage ? shareInMessageUrl : undefined,
     };
 
     return <ThreadItemContext.Provider value={contextValue}>{props.children}</ThreadItemContext.Provider>;

@@ -24,7 +24,6 @@ export default function mountEditor(containerSelector: string | Element, descrip
 
     const uploadEnabled = !!container.dataset.uploadenabled;
     const needsHtmlConversion = !!container.dataset.needshtmlconversion;
-    const showConversionNotice = !!container.dataset.showconversionnotice ?? needsHtmlConversion;
 
     if (!bodybox) {
         throw new Error("Could not find the BodyBox to mount editor to.");
@@ -45,7 +44,6 @@ export default function mountEditor(containerSelector: string | Element, descrip
                     needsHtmlConversion={needsHtmlConversion}
                     legacyTextArea={bodybox as HTMLInputElement}
                     uploadEnabled={uploadEnabled}
-                    showConversionNotice={showConversionNotice}
                 />
             ) : (
                 <ForumEditor

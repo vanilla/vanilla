@@ -6,9 +6,7 @@
 
 import { css } from "@emotion/css";
 import { metasVariables } from "@library/metas/Metas.variables";
-import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { Mixins } from "@library/styles/Mixins";
-import { GlobalPreset, globalVariables } from "@library/styles/globalStyleVars";
 
 export const TokenItemClasses = () => {
     const metaVars = metasVariables();
@@ -26,9 +24,6 @@ export const TokenItemClasses = () => {
             horizontal: 8,
         }),
         ...Mixins.font(metaVars.font),
-        ...(globalVariables().options.preset === GlobalPreset.DARK && {
-            color: ColorsUtils.colorOut(globalVariables().elementaryColors.darkText),
-        }),
     });
     const button = css({
         marginLeft: -4,

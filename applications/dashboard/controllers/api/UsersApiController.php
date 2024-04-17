@@ -377,7 +377,6 @@ class UsersApiController extends AbstractApiController
                 "dateLastActive" => null,
                 "isAdmin" => false,
                 "isSysAdmin" => false,
-                "isSuperAdmin" => false,
             ];
         }
         return $this->guestFragment;
@@ -475,7 +474,6 @@ class UsersApiController extends AbstractApiController
         $out = $this->schema([
             "isAdmin:b",
             "isSysAdmin:b",
-            "isSuperAdmin:b",
             "permissions:a" => new PermissionFragmentSchema(),
             "junctions?",
             "junctionAliases?",
@@ -532,7 +530,6 @@ class UsersApiController extends AbstractApiController
                 "dateLastActive",
                 "isAdmin:b",
                 "isSysAdmin:b",
-                "isSuperAdmin:b",
                 "countUnreadNotifications" => [
                     "description" => "Total number of unread notifications for the current user.",
                     "type" => "integer",

@@ -4,12 +4,12 @@
  * @license gpl-2.0-only
  */
 
-import { css, CSSObject } from "@emotion/css";
-import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { useThemeCache } from "@library/styles/themeCache";
-import voteCounterVariables from "@library/voteCounter/VoteCounter.variables";
+import { css, CSSObject } from "@emotion/css";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { percent } from "csx";
+import voteCounterVariables from "@library/voteCounter/VoteCounter.variables";
 
 export const voteCounterClasses = useThemeCache(() => {
     const globalVars = globalVariables();
@@ -17,7 +17,6 @@ export const voteCounterClasses = useThemeCache(() => {
 
     const root = css({
         backgroundColor: vars.colors.bg,
-        color: ColorsUtils.colorOut(vars.colors.fg),
         fontSize: vars.sizing.height,
         lineHeight: 1,
         width: "1em",
@@ -46,14 +45,14 @@ export const voteCounterClasses = useThemeCache(() => {
     });
 
     const iconCheckedStyle: CSSObject = {
-        stroke: "currentcolor",
+        stroke: ColorsUtils.colorOut(globalVars.mainColors.fg),
         fillOpacity: 1,
     };
 
     const iconDefaultStyle: CSSObject = {
-        fill: "currentcolor",
+        fill: iconCheckedStyle.stroke,
         fillOpacity: 0,
-        stroke: "currentcolor",
+        stroke: ColorsUtils.colorOut(globalVars.mainColors.fg),
     };
 
     const icon = css({

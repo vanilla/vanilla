@@ -4,11 +4,11 @@
  * @license Proprietary
  */
 
-import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { tagCloudVariables } from "@library/metas/Tags.variables";
-import { Mixins } from "@library/styles/Mixins";
-import { styleFactory } from "@library/styles/styleUtils";
 import { useThemeCache } from "@library/styles/themeCache";
+import { IHomeWidgetContainerOptions } from "@library/homeWidget/HomeWidgetContainer.styles";
+import { styleFactory } from "@library/styles/styleUtils";
+import { Mixins } from "@library/styles/Mixins";
+import { tagCloudVariables } from "@library/metas/Tags.variables";
 
 export const tagWidgetClasses = useThemeCache((options?: IHomeWidgetContainerOptions) => {
     const vars = tagCloudVariables(options);

@@ -10,7 +10,6 @@ namespace VanillaTests\APIv2;
 use CategoriesApiController;
 use Garden\Web\Exception\ForbiddenException;
 use Gdn_Session;
-use UserModel;
 use Vanilla\CurrentTimeStamp;
 use VanillaTests\ExpectedNotification;
 use VanillaTests\NotificationsApiTestTrait;
@@ -144,39 +143,6 @@ class CommentsAnswerTest extends AbstractAPIv2Test
 
         $updatedQuestion = $this->getQuestion($question["discussionID"]);
         $this->assertIsQuestion($updatedQuestion, ["status" => "rejected"]);
-    }
-
-    /**
-     * Test the "Rejected" label code visibility depending on the user's role/permissions.
-     *
-     * @return void
-     */
-    public function testRejectedAnswerLabelCodesVisibility()
-    {
-        // Create a category, a question, and an answer.
-        $category = $this->createCategory();
-        $question = $this->createQuestion(["categoryID" => $category["categoryID"]]);
-        $answer = $this->testPostAnswer($question["discussionID"]);
-
-        // Reject the answer.
-        $response = $this->api()->patch("comments/answer/" . $answer["commentID"], [
-            "status" => "rejected",
-        ]);
-
-        // Check that the "Rejected" label code is visible to an admin.
-        $response = $this->api()->get("comments/" . $answer["commentID"], ["expand" => "crawl"]);
-        $this->assertEquals(200, $response->getStatusCode());
-        $body = $response->getBody();
-        $this->assertArrayHasKey("labelCodes", $body);
-        $this->assertEquals(["Rejected"], $body["labelCodes"]);
-
-        // Check that the "Rejected" label code is not visible to a guest user.
-        $this->runWithUser(function () use ($answer) {
-            $response = $this->api()->get("comments/" . $answer["commentID"], ["expand" => "crawl"]);
-            $this->assertEquals(200, $response->getStatusCode());
-            $body = $response->getBody();
-            $this->assertArrayNotHasKey("labelCode", $body);
-        }, UserModel::GUEST_USER_ID);
     }
 
     /**

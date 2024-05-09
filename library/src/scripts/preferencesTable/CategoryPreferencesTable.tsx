@@ -5,7 +5,6 @@
  */
 
 import { cx } from "@emotion/css";
-import Translate from "@library/content/Translate";
 import Checkbox from "@library/forms/Checkbox";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import ErrorMessages from "@library/forms/ErrorMessages";
@@ -78,14 +77,14 @@ export function CategoryPreferencesTable(props: IProps) {
             {
                 popup: props.preferences["preferences.popup.posts"],
                 ...(emailEnabled && { email: props.preferences["preferences.email.posts"] }),
-                description: <Translate source={"Notify <0/> of new posts"} c0={subject} />,
+                description: `Notify ${subject} of new posts`,
                 id: "posts",
                 error: preferenceError,
             },
             {
                 popup: props.preferences["preferences.popup.comments"],
                 ...(emailEnabled && { email: props.preferences["preferences.email.comments"] }),
-                description: <Translate source={"Notify <0/> of new comments"} c0={subject} />,
+                description: `Notify ${subject} of new comments`,
                 id: "comments",
                 error: preferenceError,
             },
@@ -193,7 +192,8 @@ export function CategoryPreferencesTable(props: IProps) {
                         className={classes.checkBox}
                     />
                     <Checkbox
-                        label={<Translate source={"Notify <0/> of new content"} c0={subject} />}
+                        // TODO: Make two locale strings for this and others like this
+                        label={t(`Notify ${subject} of new content`)}
                         labelBold={false}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                             setNotificationPreferenceTableVisibility(event.target.checked);

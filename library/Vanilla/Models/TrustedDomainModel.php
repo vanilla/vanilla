@@ -181,7 +181,6 @@ class TrustedDomainModel
                 return !empty($item);
             });
         }
-        $trustedDomains[] = "us.v-cdn.net";
         return $trustedDomains;
     }
 }

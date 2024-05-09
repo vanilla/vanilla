@@ -1,12 +1,11 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2024 Vanilla Forums Inc.
+ * @copyright 2009-2023 Vanilla Forums Inc.
  * @license Proprietary
  */
 
 import DidThisAnswer from "@QnA/components/DidThisAnswer";
 import ViewInContext from "@QnA/components/ViewInContext";
-import { IComment } from "@dashboard/@types/api/comment";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 import { PageBox } from "@library/layout/PageBox";
 import { useQueryStringSync } from "@library/routing/QueryString";
@@ -52,24 +51,8 @@ function TabbedCommentListAsset(props: IProps) {
     //useCommentListQuery is invoked here so that there is a query in the cache to invalidate when the first comment is added
     useCommentListQuery(apiParams, comments);
 
-    const acceptedAnswers =
-        acceptedAnswersPreload ??
-        (!!discussion?.attributes?.question?.acceptedAnswers &&
-        (discussion.attributes.question.acceptedAnswers as IComment[]).length > 0
-            ? { paging: {}, data: discussion.attributes.question.acceptedAnswers as IComment[] }
-            : undefined) ??
-        undefined;
-
-    const rejectedAnswers =
-        rejectedAnswersPreload ??
-        (!!discussion?.attributes?.question?.rejectedAnswers &&
-        (discussion.attributes.question.rejectedAnswers as IComment[]).length > 0
-            ? { paging: {}, data: discussion.attributes.question.rejectedAnswers as IComment[] }
-            : undefined) ??
-        undefined;
-
-    const { query: acceptedAnswersQuery } = useCommentListQuery(acceptedAnswersApiParams!, acceptedAnswers);
-    const { query: rejectedAnswersQuery } = useCommentListQuery(rejectedAnswersApiParams!, rejectedAnswers);
+    const acceptedAnswers = discussion.attributes?.question?.acceptedAnswers ?? acceptedAnswersPreload?.data ?? [];
+    const rejectedAnswers = discussion.attributes?.question?.rejectedAnswers ?? rejectedAnswersPreload?.data ?? [];
 
     const tabs: ITabData[] = [
         {
@@ -88,7 +71,7 @@ function TabbedCommentListAsset(props: IProps) {
         },
     ]
         .concat(
-            acceptedAnswersQuery?.data?.data?.length ?? 0 > 0
+            acceptedAnswers.length > 0
                 ? [
                       {
                           label: t("Accepted Answers"),
@@ -97,7 +80,7 @@ function TabbedCommentListAsset(props: IProps) {
                               <DiscussionCommentsAsset
                                   discussion={discussion}
                                   discussionApiParams={discussionApiParams}
-                                  comments={acceptedAnswersQuery?.data}
+                                  comments={acceptedAnswersPreload}
                                   apiParams={acceptedAnswersApiParams!}
                                   renderTitle={false}
                                   ThreadItemActionsComponent={ViewInContext}
@@ -108,7 +91,7 @@ function TabbedCommentListAsset(props: IProps) {
                 : [],
         )
         .concat(
-            rejectedAnswersQuery?.data?.data?.length ?? 0 > 0
+            rejectedAnswers.length > 0
                 ? [
                       {
                           label: t("Rejected Answers"),
@@ -117,7 +100,7 @@ function TabbedCommentListAsset(props: IProps) {
                               <DiscussionCommentsAsset
                                   discussion={discussion}
                                   discussionApiParams={discussionApiParams}
-                                  comments={rejectedAnswersQuery?.data}
+                                  comments={rejectedAnswersPreload}
                                   apiParams={rejectedAnswersApiParams!}
                                   renderTitle={false}
                                   ThreadItemActionsComponent={ViewInContext}
@@ -129,24 +112,22 @@ function TabbedCommentListAsset(props: IProps) {
         );
 
     const tabIDs = tabs.map((t) => t.tabID);
-    const defaultTabID = !!acceptedAnswers?.data?.length && acceptedAnswers.data.length > 0 ? "accepted" : "all";
+    const defaultTabID = acceptedAnswers.length > 0 ? "accepted" : "all";
     const queryTab = useQueryParam("tab", defaultTabID);
 
-    const [selectedTabIndex, _setSelectedTabIndex] = useState(
+    const [selectedTabIndex, setSelectedTabIndex] = useState(
         Math.max(
             tabIDs.findIndex((t) => t === queryTab),
             0,
         ),
     );
-
-    function setSelectedTabIndex(index: number) {
-        const newTabIndex = index >= 0 && index < tabs.length ? index : 0;
-        _setSelectedTabIndex(newTabIndex);
-    }
-
     useEffect(() => {
-        setSelectedTabIndex(selectedTabIndex);
-    }, [tabs.length]);
+        const initialTabIndex = Math.max(
+            tabIDs.findIndex((t) => t === queryTab),
+            0,
+        );
+        setSelectedTabIndex(initialTabIndex);
+    }, [queryTab]);
 
     useQueryStringSync(
         {
@@ -165,7 +146,6 @@ function TabbedCommentListAsset(props: IProps) {
                     }}
                 >
                     <Tabs
-                        key={tabs.length}
                         largeTabs
                         tabType={TabsTypes.BROWSE}
                         data={tabs}

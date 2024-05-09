@@ -8,7 +8,6 @@ import { logError } from "@vanilla/utils";
 import { OutputUnit, ValidationResult, Validator } from "@cfworker/json-schema";
 import React, { ReactNode, useContext, useMemo } from "react";
 import { IValidationResult, JSONSchemaType, JsonSchema, SchemaErrorMessage } from "./types";
-import cloneDeep from "lodash-es/cloneDeep";
 
 type GenericFlatObject = Record<string, any>;
 
@@ -94,8 +93,7 @@ export function ValidationProvider(props: { children: ReactNode }) {
 
     const validate = (schema: JSONSchemaType, instance: GenericFlatObject): ValidationResult => {
         try {
-            const schemaToValidate = cloneDeep(schema);
-            const validator = new Validator(schemaToValidate, "2020-12", false);
+            const validator = new Validator(schema, "2020-12", false);
             const validationState = validator.validate(instance);
             return {
                 ...validationState,

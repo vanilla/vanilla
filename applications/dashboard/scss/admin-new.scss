@@ -86,7 +86,7 @@ $global-button_radius: $global_borderRadius;
     user-select: none;
     overflow: hidden;
     cursor: pointer;
-    background-color: $global-color_white;
+    background-color: $button-basic_bg;
     color: $button-basic_fg;
     border: {
         width: $formElement_borderWidth;

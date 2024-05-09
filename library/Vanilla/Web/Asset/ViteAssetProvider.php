@@ -10,7 +10,6 @@ namespace Vanilla\Web\Asset;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 use Vanilla\Contracts\ConfigurationInterface;
-use Vanilla\Contracts\Web\AssetInterface;
 use Vanilla\FileUtils;
 use Vanilla\Theme\ThemeService;
 use Vanilla\Web\TwigRenderTrait;
@@ -33,7 +32,6 @@ final class ViteAssetProvider
     private ThemeService $themeService;
     private \Gdn_Session $session;
     private ConfigurationInterface $config;
-    private DeploymentCacheBuster $deploymentCacheBuster;
 
     /**
      * DI.
@@ -43,23 +41,13 @@ final class ViteAssetProvider
         AddonManager $addonManager,
         ThemeService $themeService,
         \Gdn_Session $session,
-        ConfigurationInterface $config,
-        DeploymentCacheBuster $deploymentCacheBuster
+        ConfigurationInterface $config
     ) {
         $this->request = $request;
         $this->addonManager = $addonManager;
         $this->themeService = $themeService;
         $this->session = $session;
         $this->config = $config;
-        $this->deploymentCacheBuster = $deploymentCacheBuster;
-    }
-
-    /**
-     * @return LocaleAsset
-     */
-    public function getLocaleAsset(): LocaleAsset
-    {
-        return new LocaleAsset($this->request, \Gdn::locale()->current(), $this->deploymentCacheBuster->value());
     }
 
     /**
@@ -76,12 +64,12 @@ final class ViteAssetProvider
      *
      * @param string $buildSection
      *
-     * @return AssetInterface[]
+     * @return ViteBuildArtifact[]
      */
     public function getEnabledEntryAssets(string $buildSection): array
     {
         $assetsByID = $this->getAssetsByID($buildSection);
-        $entryAssets = [$this->getLocaleAsset()];
+        $entryAssets = [];
         $enabledAddonKeys = $this->getEnabledAddonKeys();
         foreach ($assetsByID as $asset) {
             if ($asset->isEntry($buildSection) && $asset->belongsToAddon($enabledAddonKeys)) {
@@ -157,7 +145,6 @@ JS;
         return [
             new WebAsset("http://frontend.vanilla.localhost:3030/@vite/client", true),
             new WebAsset("http://frontend.vanilla.localhost:3030/build/.vite/{$section}.js", true),
-            $this->getLocaleAsset(),
         ];
     }
 

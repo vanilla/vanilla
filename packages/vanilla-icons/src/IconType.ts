@@ -160,7 +160,7 @@ export const coreIconsData = {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
-        strokewidth: "1.4",
+        strokeWidth: "1.4",
         fill: "currentColor",
         stroke: "currentColor",
     },
@@ -168,7 +168,7 @@ export const coreIconsData = {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
-        strokewidth: "1.4",
+        strokeWidth: "1.4",
         stroke: "currentColor",
     },
     "editor-eye-slash": {
@@ -630,12 +630,6 @@ export const coreIconsData = {
         fill: "none",
     },
     "status-running": {
-        width: "16",
-        height: "16",
-        viewBox: "0 0 16 16",
-        fill: "none",
-    },
-    "status-success": {
         width: "16",
         height: "16",
         viewBox: "0 0 16 16",

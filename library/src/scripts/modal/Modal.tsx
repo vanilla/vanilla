@@ -273,7 +273,6 @@ It seems auto-detection isn't working, so you'll need to specify the "elementToF
      */
     private handleScrimClick = (event: React.MouseEvent) => {
         event.preventDefault();
-        event.stopPropagation();
         if (this.props.exitHandler) {
             this.props.exitHandler(event);
         }

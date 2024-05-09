@@ -153,8 +153,7 @@
         "plugins/vfoptions": true,
         "plugins/vanilla-ai": true,
         "plugins/webhooks": true,
-        "plugins/zapier": true,
-        "plugins/zoom": true,
+        "plugins/zapier": true
     },
     "[json]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -195,8 +194,7 @@
     ],
     "editor.wordWrapColumn": 120,
     "typescript.preferences.autoImportFileExcludePatterns": [
-        "jquery*",
-        "vitest/dist/*"
+        "jquery*"
     ],
     "php.suggest.basic": false,
     "files.associations": {

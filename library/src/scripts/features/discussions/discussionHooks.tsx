@@ -194,7 +194,7 @@ function useUserCanEditDiscussionOrComment(
     const { hasPermission } = usePermissionsContext();
 
     const resource = comment ?? discussion;
-    const permissionName = comment ? "comments.edit" : "discussions.edit";
+    const permissionName = comment ? "comments.edit" : "discussions.manage";
     const permissionOptions: IPermissionOptions = {
         mode: PermissionMode.RESOURCE_IF_JUNCTION,
         resourceType: "category",

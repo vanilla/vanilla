@@ -54,7 +54,7 @@ class TrustedDomainsTest extends TestCase
             ],
             function () {
                 $this->assertEquals(
-                    ["vanilla.test", "example.com", "other.com", "us.v-cdn.net"],
+                    ["vanilla.test", "example.com", "other.com"],
                     $this->trustedDomainModel()->getAll()
                 );
             }
@@ -65,10 +65,7 @@ class TrustedDomainsTest extends TestCase
                 "Garden.TrustedDomains" => ["example.com"],
             ],
             function () {
-                $this->assertEqualsCanonicalizing(
-                    ["vanilla.test", "example.com", "us.v-cdn.net"],
-                    $this->trustedDomainModel()->getAll()
-                );
+                $this->assertEquals(["vanilla.test", "example.com"], $this->trustedDomainModel()->getAll());
             }
         );
     }
@@ -85,10 +82,7 @@ class TrustedDomainsTest extends TestCase
             "RegisterUrl" => "http://registerdomain.com/auth",
         ]);
 
-        $this->assertEqualsCanonicalizing(
-            ["vanilla.test", "registerdomain.com", "us.v-cdn.net"],
-            $this->trustedDomainModel()->getAll()
-        );
+        $this->assertEquals(["vanilla.test", "registerdomain.com"], $this->trustedDomainModel()->getAll());
     }
 
     /**
@@ -97,10 +91,7 @@ class TrustedDomainsTest extends TestCase
     public function testEventDomains()
     {
         $this->getEventManager()->bindClass($this);
-        $this->assertEqualsCanonicalizing(
-            ["vanilla.test", "eventdomain.com", "us.v-cdn.net"],
-            $this->trustedDomainModel()->getAll()
-        );
+        $this->assertEquals(["vanilla.test", "eventdomain.com"], $this->trustedDomainModel()->getAll());
     }
 
     /**

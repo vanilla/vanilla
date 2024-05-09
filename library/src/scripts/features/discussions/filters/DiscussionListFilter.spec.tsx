@@ -4,8 +4,8 @@
  * @license Proprietary
  */
 
-import { ReactNode, useState } from "react";
-import { render, screen, act, cleanup, fireEvent } from "@testing-library/react";
+import React, { ReactNode, useState } from "react";
+import { render, waitFor, screen, act, cleanup } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook } from "@testing-library/react-hooks";
@@ -272,7 +272,7 @@ describe("DiscussionListFilter", () => {
         });
     });
 
-    it("Displays all fields including resolution status and post engagement due to proper permissions", async () => {
+    it("Displays all fields including resolution status due to proper permissions", async () => {
         render(<MockFilter isCommunityManager />);
         await vi.dynamicImportSettled();
 
@@ -280,10 +280,9 @@ describe("DiscussionListFilter", () => {
         expect(await screen.findByText(/Post Status/)).toBeInTheDocument();
         expect(screen.getByText(/Tags/)).toBeInTheDocument();
         expect(screen.getByText(/Resolution Status/)).toBeInTheDocument();
-        expect(screen.getByText(/Post Engagement/)).toBeInTheDocument();
     });
 
-    it("Displays all fields except resolution status and post engagement due to lack of permissions", async () => {
+    it("Displays all fields except resolution status due to lack of permissions", async () => {
         render(<MockFilter />);
 
         await vi.dynamicImportSettled();
@@ -292,98 +291,5 @@ describe("DiscussionListFilter", () => {
         expect(await screen.findByText(/Post Status/)).toBeInTheDocument();
         expect(screen.getByText(/Tags/)).toBeInTheDocument();
         expect(screen.queryByText(/Resolution Status/)).not.toBeInTheDocument();
-        expect(screen.queryByText(/Post Engagement/)).not.toBeInTheDocument();
-    });
-
-    describe("Post engagement section", async () => {
-        it("renders both checkboxes as checked by default", async () => {
-            render(<MockFilter isCommunityManager />);
-            await vi.dynamicImportSettled();
-            const hasNoCommentsCheckbox = await screen.findByRole("checkbox", { name: "No Comments" });
-            const hasCommentsCheckbox = await screen.findByRole("checkbox", { name: "Has Comments" });
-
-            expect(hasNoCommentsCheckbox).toBeChecked();
-            expect(hasCommentsCheckbox).toBeChecked();
-        });
-
-        it("allows the user to uncheck a checkbox", async () => {
-            render(<MockFilter isCommunityManager />);
-            await vi.dynamicImportSettled();
-            const hasNoCommentsCheckbox = await screen.findByRole("checkbox", { name: "No Comments" });
-            const hasCommentsCheckbox = await screen.findByRole("checkbox", { name: "Has Comments" });
-
-            // Both are checked by default, uncheck 'has no comments'
-            await act(async () => {
-                fireEvent.click(hasNoCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).not.toBeChecked();
-            expect(hasCommentsCheckbox).toBeChecked();
-
-            // re-check 'has no comments' so both are checked again
-            await act(async () => {
-                fireEvent.click(hasNoCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).toBeChecked();
-            expect(hasCommentsCheckbox).toBeChecked();
-
-            // uncheck 'has comments'
-            await act(async () => {
-                fireEvent.click(hasCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).toBeChecked();
-            expect(hasCommentsCheckbox).not.toBeChecked();
-        });
-
-        it("won't allow the user to uncheck both checkboxes", async () => {
-            render(<MockFilter isCommunityManager />);
-            await vi.dynamicImportSettled();
-            const hasNoCommentsCheckbox = await screen.findByRole("checkbox", { name: "No Comments" });
-            const hasCommentsCheckbox = await screen.findByRole("checkbox", { name: "Has Comments" });
-
-            // Both are checked by default, uncheck 'has no comments'
-            await act(async () => {
-                fireEvent.click(hasNoCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).not.toBeChecked();
-            expect(hasCommentsCheckbox).toBeChecked();
-
-            // Attempt to uncheck 'has comments' too
-            await act(async () => {
-                fireEvent.click(hasCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).not.toBeChecked();
-            // At least one checkbox must be selected, so it can't be unchecked
-            expect(hasCommentsCheckbox).toBeChecked();
-
-            // Make both checkboxes checked again
-            await act(async () => {
-                fireEvent.click(hasNoCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).toBeChecked();
-            expect(hasCommentsCheckbox).toBeChecked();
-
-            // Uncheck 'has comments'
-            await act(async () => {
-                fireEvent.click(hasCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).toBeChecked();
-            expect(hasCommentsCheckbox).not.toBeChecked();
-
-            // Attempt to uncheck 'has no comments' too
-            await act(async () => {
-                fireEvent.click(hasNoCommentsCheckbox);
-            });
-
-            expect(hasNoCommentsCheckbox).toBeChecked();
-            // At least one checkbox must be selected, so it can't be unchecked
-            expect(hasCommentsCheckbox).not.toBeChecked();
-        });
     });
 });

@@ -12,17 +12,13 @@ import qs from "qs";
  *
  */
 export function dateRangeToString(dateRange: { start?: string; end?: string }): string | undefined {
-    let { start, end } = dateRange;
+    const { start, end } = dateRange;
     let dateRangeString: string | undefined;
     if (start && end) {
         if (start === end) {
             // Simple equality.
             dateRangeString = start;
         } else {
-            // We should only have one comma in the date string (if time also included, we might have a comma)
-            start = start.replace(/,/g, "");
-            end = end.replace(/,/g, "");
-
             // Date range
             dateRangeString = `[${start},${end}]`;
         }

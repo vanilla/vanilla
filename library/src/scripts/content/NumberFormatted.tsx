@@ -38,7 +38,7 @@ function stripTrailingZeros(value: string): string {
 export function humanReadableNumber(value: number, precision: number = 1): string {
     const valueAbs = Math.abs(value);
     const negativeValue = value < 0 ? "-" : "";
-    if (valueAbs < 1e3) return negativeValue + valueAbs.toFixed(precision);
+    if (valueAbs < 1e3) return valueAbs.toFixed(precision);
     if (valueAbs >= 1e3 && valueAbs < 1e6) return negativeValue + (valueAbs / 1e3).toFixed(precision) + "k";
     if (valueAbs >= 1e6 && valueAbs < 1e9) return negativeValue + (valueAbs / 1e6).toFixed(precision) + "m";
     if (valueAbs >= 1e9 && valueAbs < 1e12) return negativeValue + (valueAbs / 1e9).toFixed(precision) + "b";

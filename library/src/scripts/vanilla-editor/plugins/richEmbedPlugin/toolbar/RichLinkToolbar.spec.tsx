@@ -16,9 +16,6 @@ import { focusEditor, select } from "@udecode/plate-common";
 import React from "react";
 import { act } from "react-dom/test-utils";
 
-// These tests can be a bit slow in CI. Extend their timeout.
-jest.setTimeout(100000);
-
 describe("<RichLinkToolbar />", () => {
     describe("<RichLinkForm />", () => {
         const mockAdapter = mockAPI();

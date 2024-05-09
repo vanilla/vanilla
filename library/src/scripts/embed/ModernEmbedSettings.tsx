@@ -8,8 +8,8 @@ import { DashboardFormControl, DashboardFormControlGroup } from "@dashboard/form
 import { LoadStatus } from "@library/@types/api/core";
 import { useConfigPatcher, useConfigsByKeys } from "@library/config/configHooks";
 import { JSONSchemaType, JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import isEqual from "lodash/isEqual";
-import isEmpty from "lodash/isEmpty";
+import isEqual from "lodash-es/isEqual";
+import isEmpty from "lodash-es/isEmpty";
 import React, { useEffect, useMemo, useState } from "react";
 import Button from "@library/forms/Button";
 import ButtonLoader from "@library/loaders/ButtonLoader";

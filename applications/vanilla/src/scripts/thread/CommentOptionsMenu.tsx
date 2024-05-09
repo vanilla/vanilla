@@ -26,6 +26,7 @@ import { getMeta } from "@library/utility/appUtils";
 import { useMutation } from "@tanstack/react-query";
 import CommentsApi from "@vanilla/addon-vanilla/thread/CommentsApi";
 import { t } from "@vanilla/i18n";
+import { Icon } from "@vanilla/icons";
 import { Hoverable } from "@vanilla/react-utils";
 import React, { useState } from "react";
 
@@ -182,6 +183,7 @@ export function CommentOptionsMenu(props: IProps) {
     return items.length > 0 ? (
         <DropDown
             name={t("Comment Options")}
+            buttonContents={<Icon icon="navigation-circle-ellipsis" />}
             openDirection={DropDownOpenDirection.BELOW_LEFT}
             flyoutType={FlyoutType.LIST}
             isVisible={props.isVisible}

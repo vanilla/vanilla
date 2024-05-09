@@ -41,15 +41,12 @@ export default function NewPostMenu(props: INewPostMenuProps) {
     const { postableDiscussionTypes, items, ...rest } = props;
     const isCompact = !useSection().isFullWidth && !props.forceDesktopOnly;
 
-    const filteredItems = useMemo(() => {
-        return (
-            postableDiscussionTypes &&
-            Array.isArray(postableDiscussionTypes) &&
-            items.filter((item) => {
-                return postableDiscussionTypes?.findIndex((type) => item.id.includes(type)) > -1;
-            })
-        );
-    }, [postableDiscussionTypes, items]);
+    const filteredItems =
+        postableDiscussionTypes && Array.isArray(postableDiscussionTypes)
+            ? items.filter((item) => {
+                  return postableDiscussionTypes?.findIndex((type) => item.id.includes(type)) > -1;
+              })
+            : items;
 
     if (!filteredItems || !filteredItems.length) {
         return <></>;

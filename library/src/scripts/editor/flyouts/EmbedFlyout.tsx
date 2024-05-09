@@ -19,7 +19,7 @@ import { isURL, normalizeUrl, t } from "@library/utility/appUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { forceInt } from "@vanilla/utils";
 import classNames from "classnames";
-import debounce from "lodash/debounce";
+import debounce from "lodash-es/debounce";
 import React, { useCallback, useRef, useState } from "react";
 
 interface IProps {

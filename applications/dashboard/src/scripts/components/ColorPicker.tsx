@@ -9,7 +9,7 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { ensureColorHelper } from "@library/styles/styleHelpers";
 import { stringIsValidColor } from "@library/styles/styleUtils";
 import { t } from "@vanilla/i18n/src";
-import debounce from "lodash/debounce";
+import debounce from "lodash-es/debounce";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Pickr from "@simonwep/pickr";
 import { colorPickerClasses } from "@dashboard/components/ColorPicker.styles";

@@ -1,10 +1,3 @@
-/**
- * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2019 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { EmbedRenderError } from "@library/embeddedContent/components/EmbedRenderError";
@@ -14,7 +7,11 @@ import AttachmentLoading from "@library/content/attachments/AttachmentLoading";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { AttachmentType } from "@library/content/attachments/AttatchmentType";
 
-storiesOf("User Content", module).add("Errors", () => {
+export default {
+    title: "User Content",
+};
+
+export const Errors = () => {
     const now = new Date();
     const doNothing = () => {
         return;
@@ -37,4 +34,4 @@ storiesOf("User Content", module).add("Errors", () => {
             />
         </StoryContent>
     );
-});
+};

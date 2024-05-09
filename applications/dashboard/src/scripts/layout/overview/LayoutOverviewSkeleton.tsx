@@ -11,7 +11,7 @@ import { DeviceProvider } from "@library/layout/DeviceContext";
 import { SectionBehaviourContext } from "@library/layout/SectionBehaviourContext";
 import SectionThreeColumns from "@library/layout/ThreeColumnSection";
 import React, { useMemo } from "react";
-import random from "lodash/random";
+import random from "lodash-es/random";
 import { SectionOneColumn } from "@library/layout/SectionOneColumn";
 import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { SectionFullWidth } from "@library/layout/SectionFullWidth";

@@ -18,16 +18,15 @@ import { IUsersState } from "@library/features/users/userTypes";
 import { createReducer } from "@reduxjs/toolkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LiveAnnouncer } from "react-aria-live";
-
-jest.setTimeout(20000);
+import MockAdapter from "axios-mock-adapter/types";
 
 // set up a mock API to intercept calls (from the autocomplete lookup) to /roles.
 // Otherwise, in the test environment, the API request is rejected, by which time the test runner will fail and blame whichever test it is currently running.
-const mockAdapter = mockAPI();
-mockAdapter.onGet(/roles/).reply(200, []);
+let mockAdapter: MockAdapter;
 
-afterAll(() => {
-    mockAdapter.restore();
+beforeEach(() => {
+    mockAdapter = mockAPI();
+    mockAdapter.onGet(/roles/).reply(200, []);
 });
 
 const mockUsersState: Partial<IUsersState> = {
@@ -222,9 +221,8 @@ describe("Editing another user", () => {
     });
 
     describe("Disabled profile fields in the form", () => {
-        mockAdapter.onPatch(`/users/${mockUserData.userID}`).replyOnce(200, []);
-
         beforeEach(async () => {
+            mockAdapter.onPatch(`/users/${mockUserData.userID}`).replyOnce(200, []);
             await act(async () => {
                 result = await renderInProvider({
                     userData: mockUserData,

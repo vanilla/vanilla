@@ -6,6 +6,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { ReactElement } from "react";
+import { globalValueRef } from "@vanilla/utils";
 
 export interface IComponentMountOptions {
     overwrite?: boolean;
@@ -36,16 +37,16 @@ interface IPortal {
 }
 
 let hasRendered = false;
-const portals: IPortal[] = [];
+const portals = globalValueRef<IPortal[]>("portals", []);
 
 const PORTAL_MANAGER_ID = "vanillaPortalManager";
 type PortalContextType = React.FC<{ children?: React.ReactNode }>;
-let PortalContext: PortalContextType = (props) => {
+let portalContextRef = globalValueRef<PortalContextType>("PortalContext", (props) => {
     return <React.Fragment>{props.children}</React.Fragment>;
-};
+});
 
 export function applySharedPortalContext(context: PortalContextType) {
-    PortalContext = context;
+    portalContextRef.set(context);
     if (hasRendered) {
         // Re-render the portals. We never want to be the first to initialize rendering though.
         renderPortals();
@@ -58,10 +59,11 @@ export function applySharedPortalContext(context: PortalContextType) {
  * This allows a shared context provider to be applied to parts of the site.
  */
 function PortalManager() {
+    const PortalContext = portalContextRef.current();
     return (
         <div>
             <PortalContext>
-                {portals.map((portal, i) => {
+                {portals.current().map((portal, i) => {
                     return (
                         <React.Fragment key={i}>
                             {ReactDOM.createPortal(portal.component, portal.target)}
@@ -112,6 +114,7 @@ export function mountReact(
     options?: IComponentMountOptions & { bypassPortalManager?: boolean },
 ) {
     if (options?.bypassPortalManager) {
+        const PortalContext = portalContextRef.current();
         const doRender = () => {
             ReactDOM.render(<PortalContext>{component}</PortalContext>, target, callback);
         };
@@ -134,7 +137,7 @@ export function mountReact(
         target.parentElement!.insertBefore(container, target);
         mountPoint = container;
     }
-    portals.push({ target: mountPoint, component });
+    portals.current().push({ target: mountPoint, component });
 
     renderPortals(() => {
         if (cleanupContainer) {
@@ -194,7 +197,7 @@ export function mountReactMultiple(components: IMountable[], callback?: () => vo
                 target,
             });
         }
-        portals.push({ target: mountPoint, component });
+        portals.current().push({ target: mountPoint, component });
     });
 
     renderPortals(() => {

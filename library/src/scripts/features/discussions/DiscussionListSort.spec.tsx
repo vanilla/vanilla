@@ -5,7 +5,7 @@
  */
 
 import React, { useState } from "react";
-import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, within, waitFor, act } from "@testing-library/react";
 import DiscussionListSort from "@library/features/discussions/DiscussionListSort";
 import { DiscussionListSortOptions } from "@dashboard/@types/api/discussion";
 
@@ -30,7 +30,7 @@ describe("Discussion List Sort", () => {
 
     it("Selects new sort by option", async () => {
         render(<ListSortMock />);
-        const button = screen.getByRole("button");
+        let button = screen.getByRole("button");
         expect(button).toHaveTextContent(/Recently Commented/);
 
         fireEvent.click(button);
@@ -41,8 +41,8 @@ describe("Discussion List Sort", () => {
 
         fireEvent.click(trendingButton);
 
-        waitFor(() => {
-            expect(button).toHaveTextContent(/Trending/);
-        });
+        button = screen.getByRole("button");
+
+        expect(button).toHaveTextContent(/Trending/);
     });
 });

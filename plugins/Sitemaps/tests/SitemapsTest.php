@@ -6,6 +6,7 @@
 
 namespace VanillaTests\Sitemaps;
 
+use Vanilla\CurrentTimeStamp;
 use VanillaTests\APIv2\AbstractAPIv2Test;
 use VanillaTests\Forum\Utils\CommunityApiTestTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -94,11 +95,24 @@ class SitemapsTest extends AbstractAPIv2Test
             $categories["visibleCategoryWithDiscussions"]["url"] . "/p2",
             $categories["visibleCategoryWithDiscussions"]["url"] . "/p3",
         ];
-        $this->assertCount(3, $result["Urls"]);
-        foreach ($result["Urls"] as $key => $val) {
-            $this->assertEquals($expectedCategoryUrls[$key], $val["Loc"]);
-        }
+        $this->assertEquals($expectedCategoryUrls, array_column($result["Urls"], "Loc"));
     }
+
+    /**
+     * Test single category sitemap.
+     *
+     * @return void
+     */
+    public function testSingleCategorySitemap()
+    {
+        CurrentTimeStamp::mockTime("2023-01-01");
+        $category = $this->createCategory(["name" => "Test Category"]);
+        $disc1 = $this->createDiscussion(["name" => "Disc 1"]);
+        $disc2 = $this->createDiscussion(["name" => "Disc 2"]);
+        $result = $this->bessy()->get("/utility/sitemap/category-{$category["urlcode"]}-1-1000.xml")->Data;
+        $this->assertEquals([$disc1["url"], $disc2["url"]], array_column($result["Urls"], "Loc"));
+    }
+
     /**
      * Provide necessary data required for test
      *
@@ -106,6 +120,8 @@ class SitemapsTest extends AbstractAPIv2Test
      */
     public function testPrepareDataForTest(): array
     {
+        $this->resetTable("Discussion");
+        $this->resetCategoryTable();
         //Create a category with some discussions
         $visibleCategoryWithDiscussions = $this->createCategory([
             "name" => "Category A",

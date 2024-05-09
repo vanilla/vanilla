@@ -141,7 +141,7 @@ export default function LayoutTextEditorPage(
                 )}
                 <TextEditor
                     value={textContent}
-                    onChange={(_e, value) => {
+                    onChange={(value) => {
                         if (value) {
                             setTextContent(value);
                         }

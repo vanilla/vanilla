@@ -194,7 +194,7 @@ function useUserCanEditDiscussionOrComment(
     const { hasPermission } = usePermissionsContext();
 
     const resource = comment ?? discussion;
-    const permissionName = comment ? "comments.edit" : "discussions.manage";
+    const permissionName = comment ? "comments.edit" : "discussions.edit";
     const permissionOptions: IPermissionOptions = {
         mode: PermissionMode.RESOURCE_IF_JUNCTION,
         resourceType: "category",
@@ -529,7 +529,6 @@ export function useBulkDiscussionMove(
         statusByID: Record<string, ILoadable> | null,
         statusCondition: LoadStatus,
     ): RecordID[] | null => {
-        // debugger;
         if (statusByID) {
             const result = Object.keys(statusByID)
                 .filter((ID) => {
@@ -608,7 +607,7 @@ export function useBulkDiscussionClose(discussionIDs: Array<IDiscussion["discuss
     ): RecordID[] => {
         if (statusByID) {
             return Object.keys(statusByID)
-                .filter((ID) => statusByID[ID]?.status === statusCondition ?? null)
+                .filter((ID) => statusByID[ID]?.status === statusCondition)
                 .map((ID) => Number(ID.replace("-close", "")))
                 .filter((ID) => discussionIDs.indexOf(ID) >= 0);
         }

@@ -34,6 +34,7 @@ import {
     TextBox,
 } from "@vanilla/ui";
 import React, { useState } from "react";
+import puppyImage from "../../../../applications/dashboard/styleguide/public/resources/images/puppy.jpg";
 
 export default {
     title: "Forms/Admin Form Fields",
@@ -336,8 +337,6 @@ export function ColorPicker() {
 }
 
 export function ImageUpload() {
-    const puppyImage = require("../../../../applications/dashboard/styleguide/public/resources/images/puppy.jpg");
-
     //these styles are taken from widget settings styles from layout editor,
     //plus some tweaks, probably should go to admin-new.scss at some point when we sure that these are the ones
     const uploadStyles = css({

@@ -5,13 +5,13 @@
 
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import { fakeDiscussions } from "@library/features/discussions/DiscussionList.story";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { LoadStatus } from "@library/@types/api/core";
 import DiscussionOptionsMenu, { addDiscussionOption } from "@library/features/discussions/DiscussionOptionsMenu";
 import { PermissionsFixtures } from "@library/features/users/Permissions.fixtures";
 import DropDownItemButton from "@library/flyouts/items/DropDownItemButton";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 
 const renderInProvider = async (permissions?: string[]) => {
     const queryClient = new QueryClient({
@@ -24,7 +24,7 @@ const renderInProvider = async (permissions?: string[]) => {
     });
     const discussion = {
         ...{
-            ...fakeDiscussions[0],
+            ...DiscussionFixture.fakeDiscussions[0],
             category: {
                 categoryID: 1,
                 name: "General",

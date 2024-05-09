@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
 import { onContent, getMeta, onReady } from "@library/utility/appUtils";
 import { registerReducer } from "@library/redux/reducerRegistry";
 // The forum section needs these legacy scripts that have been moved into the bundled JS so it could be refactored.
@@ -37,6 +36,7 @@ import { hasPermission } from "@library/features/users/Permission";
 import { hasUserViewPermission } from "@library/features/users/modules/hasUserViewPermission";
 import { LeavingPageRoute } from "@library/leavingPage/LeavingPageRoutes";
 import { ReactionListModule } from "@library/reactions/ReactionListModule";
+import { RouterRegistry } from "@library/Router.registry";
 
 onReady(initAllUserContent);
 onContent(convertAllUserContent);
@@ -50,7 +50,9 @@ addComponent("ReactionListModule", ReactionListModule, { overwrite: true });
 registerReducer("auth", authReducer);
 registerReducer("notifications", new NotificationsModel().reducer);
 
-Router.addRoutes([NEW_SEARCH_PAGE_ENABLED ? SearchPageRoute.route : null, LeavingPageRoute.route].filter(notEmpty));
+RouterRegistry.addRoutes(
+    [NEW_SEARCH_PAGE_ENABLED ? SearchPageRoute.route : null, LeavingPageRoute.route].filter(notEmpty),
+);
 
 applySharedPortalContext((props) => {
     return (

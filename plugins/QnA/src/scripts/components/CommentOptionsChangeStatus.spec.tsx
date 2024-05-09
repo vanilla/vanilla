@@ -12,6 +12,8 @@ import { ToastProvider } from "@library/features/toaster/ToastContext";
 import { CommentFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Comment.Fixture";
 import CommentOptionsChangeStatus from "./CommentOptionsChangeStatus";
 import { QnAStatus } from "@dashboard/@types/api/comment";
+import { vitest } from "vitest";
+import MockAdapter from "axios-mock-adapter/types";
 
 const rejectedComment = {
     ...CommentFixture.mockComment,
@@ -21,8 +23,7 @@ const rejectedComment = {
         },
     },
 };
-const mockApi = mockAPI();
-const onSuccess = jest.fn(async function () {});
+const onSuccess = vitest.fn(async function () {});
 
 async function renderInProvider() {
     const queryClient = new QueryClient({
@@ -42,11 +43,6 @@ async function renderInProvider() {
         </ToastProvider>,
     );
 }
-
-beforeEach(() => {
-    onSuccess.mockReset();
-    mockApi.reset();
-});
 
 async function clickOptionButtonToOpenForm() {
     const button = await screen.findByText("Change Status");
@@ -73,28 +69,37 @@ async function fillAndSubmitForm() {
 }
 
 describe("CommentOptionsChangeStatus", () => {
-    describe("Initial data", () => {
-        beforeEach(async () => {
-            await act(async () => {
-                renderInProvider();
-            });
-            await clickOptionButtonToOpenForm();
-        });
+    let mockAdapter: MockAdapter;
 
-        it("renders a form with the correct radio button initially selected", async () => {
-            const form = await screen.findByRole("form");
-            expect(form).toBeInTheDocument();
-            const rejectOption = within(form).getByLabelText("No", {
-                exact: false,
-                selector: `input[value='${QnAStatus.REJECTED}']`,
-            });
-            expect(rejectOption).toBeChecked();
+    beforeEach(() => {
+        mockAdapter = mockAPI();
+        onSuccess.mockReset();
+    });
+
+    afterEach(() => {
+        mockAdapter.reset();
+    });
+
+    it("renders a form with the correct radio button initially selected", async () => {
+        await act(async () => {
+            renderInProvider();
         });
+        await clickOptionButtonToOpenForm();
+        const form = await screen.findByRole("form");
+        expect(form).toBeInTheDocument();
+        const rejectOption = within(form).getByLabelText("No", {
+            exact: false,
+            selector: `input[value='${QnAStatus.REJECTED}']`,
+        });
+        expect(rejectOption).toBeChecked();
     });
 
     describe("Successful form submission", () => {
         beforeEach(async () => {
-            mockApi.onPatch(`/comments/${rejectedComment.commentID}/answer`).replyOnce(
+            mockAdapter = mockAPI();
+            onSuccess.mockReset();
+
+            mockAdapter.onPatch(`/comments/${rejectedComment.commentID}/answer`).replyOnce(
                 (requestConfig: {
                     data: {
                         status: QnAStatus;
@@ -121,7 +126,7 @@ describe("CommentOptionsChangeStatus", () => {
         });
 
         it("makes an API call to the patch endpoint", async () => {
-            expect(mockApi.history.patch.length).toBe(1);
+            expect(mockAdapter.history.patch.length).toBe(1);
         });
 
         it("calls the onSuccess callback", async () => {
@@ -133,7 +138,7 @@ describe("CommentOptionsChangeStatus", () => {
         const fakeErrorMessage = "Fake Error";
 
         beforeEach(async () => {
-            mockApi
+            mockAdapter
                 .onPatch(`/comments/${rejectedComment.commentID}/answer`)
                 .replyOnce(500, { message: fakeErrorMessage });
 

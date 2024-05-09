@@ -22,7 +22,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { ColorHelper, important, percent, px } from "csx";
 import { css, CSSObject } from "@emotion/css";
 import { Property } from "csstype";
-import merge from "lodash/merge";
+import merge from "lodash-es/merge";
 import { getValueIfItExists } from "@library/forms/borderStylesCalculator";
 import { GlobalPreset, globalVariables } from "@library/styles/globalStyleVars";
 import { getBackgroundImage } from "@library/styles/styleHelpersBackgroundStyling";

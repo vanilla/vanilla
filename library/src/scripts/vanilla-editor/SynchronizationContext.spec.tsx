@@ -9,6 +9,7 @@ import { act } from "@testing-library/react";
 import { SynchronizationProvider, useSynchronizationContext } from "@library/vanilla-editor/SynchronizationContext";
 import { renderHook } from "@testing-library/react-hooks";
 import { MyValue } from "@library/vanilla-editor/typescript";
+import { vitest } from "vitest";
 
 const MOCK_RICH2_SCHEMA = [{ type: "p", children: [{ text: "This is some unformatted text" }] }];
 const MOCK_POST_HTML = "<p>This is some unformatted text</p>";
@@ -42,7 +43,7 @@ describe("SynchronizationContext", () => {
     });
 
     it("syncTextArea update textarea value", async () => {
-        jest.useFakeTimers();
+        vitest.useFakeTimers();
         const wrapper = ({ children }) => (
             <SynchronizationProvider textArea={textarea} initialFormat={"rich2"}>
                 {children}
@@ -51,7 +52,7 @@ describe("SynchronizationContext", () => {
         const { result } = renderHook(() => useSynchronizationContext(), { wrapper });
         await act(async () => {
             result.current.syncTextArea(MOCK_RICH2_SCHEMA as MyValue);
-            jest.advanceTimersByTime(2000);
+            vitest.advanceTimersByTime(2000);
             expect(textarea.value).toBe(JSON.stringify(MOCK_RICH2_SCHEMA));
         });
     });

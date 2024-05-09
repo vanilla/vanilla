@@ -15,6 +15,8 @@ use Vanilla\Contracts;
  */
 abstract class SiteAsset implements Contracts\Web\AssetInterface
 {
+    use Contracts\Web\AssetTrait;
+
     /** @var RequestInterface */
     protected $request;
 

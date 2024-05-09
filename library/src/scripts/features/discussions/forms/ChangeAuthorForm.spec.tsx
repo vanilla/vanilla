@@ -15,6 +15,8 @@ import { act } from "react-dom/test-utils";
 import { IUser } from "@library/@types/api/users";
 import { ToastContext } from "@library/features/toaster/ToastContext";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
+import { vitest } from "vitest";
+import MockAdapter from "axios-mock-adapter/types";
 
 const mockUser: IUser = {
     ...STORY_USER,
@@ -38,31 +40,31 @@ const queryClient = new QueryClient({
     },
 });
 
-const mockApi = mockAPI();
+let mockApi: MockAdapter;
 
 const mockToastProps = {
     toasts: [],
-    addToast: jest.fn(),
-    updateToast: jest.fn(),
-    removeToast: jest.fn(),
+    addToast: vitest.fn(),
+    updateToast: vitest.fn(),
+    removeToast: vitest.fn(),
 };
 
 const renderInProvider = async () => {
-    await act(async () => {
-        render(
-            <QueryClientProvider client={queryClient}>
-                <TestReduxProvider>
-                    <ToastContext.Provider value={mockToastProps}>
-                        <ChangeAuthorForm discussion={baseDiscussion} onCancel={() => null} />
-                    </ToastContext.Provider>
-                </TestReduxProvider>
-            </QueryClientProvider>,
-        );
-    });
+    render(
+        <QueryClientProvider client={queryClient}>
+            <TestReduxProvider>
+                <ToastContext.Provider value={mockToastProps}>
+                    <ChangeAuthorForm discussion={baseDiscussion} onCancel={() => null} />
+                </ToastContext.Provider>
+            </TestReduxProvider>
+        </QueryClientProvider>,
+    );
 };
 
 describe("ChangeAuthorForm", () => {
     beforeEach(() => {
+        mockApi = mockAPI();
+        mockToastProps.addToast.mockClear();
         mockApi.onGet(/users\/by-name/).reply(200, [
             {
                 ...mockUser,

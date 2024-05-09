@@ -7,7 +7,7 @@ import React from "react";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import Checkbox from "@library/forms/Checkbox";
 import { useSearchForm } from "@library/search/SearchFormContext";
-import flatten from "lodash/flatten";
+import flatten from "lodash-es/flatten";
 import { onReady, t } from "@library/utility/appUtils";
 import { IPlacesSearchTypes } from "@dashboard/components/panels/placesSearchTypes";
 

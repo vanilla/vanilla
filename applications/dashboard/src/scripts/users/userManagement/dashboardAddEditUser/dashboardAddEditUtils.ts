@@ -116,7 +116,7 @@ export function mapUserDataToFormValues(
         },
         roles: {
             roles: roles ?? [],
-            banned: !!initialValues.banned ?? false,
+            banned: !!initialValues.banned,
         },
         rankID:
             ranks && initialValues.rankID && Object.keys(ranks).some((item) => Number(item) === initialValues.rankID)

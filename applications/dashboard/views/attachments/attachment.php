@@ -16,6 +16,9 @@ if (!function_exists("WriteAttachments")) {
     {
         \Gdn::controller()->fireEvent("beforeWriteAttachments");
         if (!empty($attachments)) {
+            $attachments = array_filter($attachments, function ($attachment) {
+                return $attachment["attachmentType"] !== "IdeaKludge";
+            });
             echo TwigStaticRenderer::renderReactModule("LegacyThreadAttachmentsAsset", ["attachments" => $attachments]);
         }
     }

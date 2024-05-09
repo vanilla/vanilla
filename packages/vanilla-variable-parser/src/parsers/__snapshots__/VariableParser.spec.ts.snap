@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`VariableParser can handle type expanders: font expansions 1`] = `
+exports[`VariableParser > can handle type expanders > font expansions 1`] = `
 [
   {
     "commonTitle": "Thing Font",
@@ -21,7 +21,7 @@ exports[`VariableParser can handle type expanders: font expansions 1`] = `
 ]
 `;
 
-exports[`VariableParser can parse a single file 1`] = `
+exports[`VariableParser > can parse a single file 1`] = `
 {
   "errors": [],
   "variableGroups": [

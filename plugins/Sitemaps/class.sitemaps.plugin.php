@@ -131,9 +131,12 @@ class SitemapsPlugin extends Gdn_Plugin
         /* @var \DiscussionModel $model */
         $discussions = $this->selectRecentDiscussionForCategory($category["CategoryID"], $limit, $offset);
         foreach ($discussions as $discussion) {
-            $lastModified = $discussion->DateLastComment;
-            if ($discussion->DateUpdated && $discussion->DateUpdated > $discussion->DateLastComment) {
-                $lastModified = $discussion->DateUpdated;
+            $lastModified = $discussion["DateLastComment"];
+            if (
+                $discussion["DateUpdated"] &&
+                dateCompare($discussion["DateUpdated"], $discussion["DateLastComment"]) > 0
+            ) {
+                $lastModified = $discussion["DateUpdated"];
             }
             $url = [
                 "Loc" => discussionUrl($discussion),
@@ -357,7 +360,7 @@ class SitemapsPlugin extends Gdn_Plugin
 
         $discussions = $discussionModel->Database
             ->createSql()
-            ->select(["DiscussionID", "CategoryID", "Name", "DateLastComment", "DateUpdated"])
+            ->select(["d.DiscussionID", "CategoryID", "Name", "DateLastComment", "DateUpdated"])
             ->from("Discussion d")
             ->join("({$innerSelect}) d2", "d.DiscussionID = d2.DiscussionID")
             ->get()

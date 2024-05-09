@@ -3,7 +3,6 @@
  * @license GPL-2.0-only
  */
 import { DateElement, humanizedRelativeTime, isSameDate } from "@library/content/DateTimeHelpers";
-import { expect } from "chai";
 
 describe("DateTime helpers", () => {
     it("is same date", () => {

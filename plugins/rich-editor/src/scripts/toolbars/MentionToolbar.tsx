@@ -6,8 +6,8 @@
 
 import React, { ComponentProps } from "react";
 import Quill, { Sources, DeltaStatic } from "quill/core";
-import uniqueId from "lodash/uniqueId";
-import isEqual from "lodash/isEqual";
+import uniqueId from "lodash-es/uniqueId";
+import isEqual from "lodash-es/isEqual";
 import Keyboard from "quill/modules/keyboard";
 import { IWithEditorProps } from "@rich-editor/editor/context";
 import { withEditor } from "@rich-editor/editor/withEditor";

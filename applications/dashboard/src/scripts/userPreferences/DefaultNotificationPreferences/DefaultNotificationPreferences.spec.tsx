@@ -10,10 +10,11 @@ import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { DefaultNotificationPreferencesModal } from "./DefaultNotificationPreferences";
+import { vitest } from "vitest";
 
 describe("Default Notification Preferences Form", () => {
     const mockApi = createMockApi();
-    const mockExitHandler = jest.fn();
+    const mockExitHandler = vitest.fn();
 
     const queryClient = new QueryClient({
         defaultOptions: {

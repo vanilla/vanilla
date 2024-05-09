@@ -2,22 +2,6 @@
     "name": "@vanilla/addon-dashboard",
     "version": "3.0.1",
     "private": true,
-    "devDependencies": {
-        "autoprefixer": "^9.8.8",
-        "css-loader": "^6.7.4",
-        "extract-loader": "^5.1.0",
-        "ignore-emit-webpack-plugin": "^2.0.6",
-        "mini-css-extract-plugin": "^2.7.6",
-        "node-sass-glob-importer": "^5.3.3",
-        "postcss-loader": "^6.2.1",
-        "sass": "1.52.1",
-        "sass-loader": "^12.6.0",
-        "webpack": "^5.72.1",
-        "webpack-cli": "^4.9.2"
-    },
-    "peerDependencies": {
-        "lodash": "*"
-    },
     "scripts": {
         "build": "yarn build:js & yarn build:styles",
         "build:js": "webpack --config ./webpack.config.js",

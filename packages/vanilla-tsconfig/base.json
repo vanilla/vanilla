@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
-        "jsx": "react",
+        "jsx": "react-jsx",
+        "jsxImportSource": "react",
         "lib": ["es2019", "dom", "dom.iterable"],
         "noImplicitThis": true,
         "allowSyntheticDefaultImports": true,
@@ -10,6 +11,7 @@
         "module": "esnext",
         "isolatedModules": false,
         "skipLibCheck": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "types": ["vitest/globals"]
     }
 }

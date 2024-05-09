@@ -11,7 +11,7 @@ import { actionCreatorFactory } from "typescript-fsa";
 import { IPermissions } from "@library/features/users/userTypes";
 import { IComboBoxOption } from "@library/features/search/SearchBar";
 import { RecordID } from "@vanilla/utils";
-import omit from "lodash/omit";
+import omit from "lodash-es/omit";
 
 const createAction = actionCreatorFactory("@@users");
 

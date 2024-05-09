@@ -4,18 +4,13 @@
  * @license gpl-2.0-only
  */
 
-import React, { Suspense } from "react";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
 import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
 import { useLayoutSpec } from "@library/features/Layout/LayoutPage.hooks";
-import { Router } from "@library/Router";
-import { Route, RouteComponentProps } from "react-router";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { ILayoutQuery } from "@library/features/Layout/LayoutRenderer.types";
-import { matchPath } from "react-router";
 import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
 import { PageBoxDepthContextProvider } from "@library/layout/PageBox.context";
-import { getRelativeUrl, siteUrl } from "@library/utility/appUtils";
 import { useEmailConfirmationToast } from "@library/features/Layout/EmailConfirmation.hook";
 
 interface IProps {
@@ -52,47 +47,4 @@ export function LayoutPage(props: IProps) {
             </PageBoxDepthContextProvider>
         </WidgetLayout>
     );
-}
-
-type IPathLayoutQueryMapper<T extends object> = (params: RouteComponentProps<T>) => ILayoutQuery<T>;
-
-let layoutPaths: string[] = [];
-
-export function registerLayoutPage<T extends object>(
-    path: string | string[],
-    pathMapper: IPathLayoutQueryMapper<T>,
-    render?: (layoutQuery: ILayoutQuery<T>, page: React.ReactNode) => JSX.Element,
-) {
-    if (Array.isArray(path)) {
-        layoutPaths = [...layoutPaths, ...path];
-    } else {
-        layoutPaths = [...layoutPaths, path];
-    }
-    Router.addRoutes([
-        <Route
-            key={[path].flat().join("-")}
-            path={path}
-            exact={true}
-            render={(params: RouteComponentProps<T>) => {
-                const mappedQuery = pathMapper(params);
-                let page = <LayoutPage layoutQuery={mappedQuery} />;
-                if (render) {
-                    page = render(mappedQuery, page);
-                }
-                return <Suspense fallback={<LayoutOverviewSkeleton />}>{page}</Suspense>;
-            }}
-        />,
-    ]);
-}
-
-export function isLayoutRoute(url: string): boolean {
-    if (!url.startsWith(siteUrl(""))) {
-        return false;
-    }
-    const relative = getRelativeUrl(url);
-    const result = !!matchPath(relative, {
-        path: layoutPaths,
-        exact: true,
-    });
-    return result;
 }

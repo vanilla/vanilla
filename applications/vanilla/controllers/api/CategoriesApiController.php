@@ -943,7 +943,13 @@ class CategoriesApiController extends AbstractApiController
      * Set the "follow" status on a category for the current user.
      *
      * @param int $id The target category's ID.
+     * @param array $body
      * @return array
+     * @throws ClientException
+     * @throws HttpException
+     * @throws NotFoundException
+     * @throws PermissionException
+     * @throws ValidationException
      */
     public function put_follow($id, array $body)
     {

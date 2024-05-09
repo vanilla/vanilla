@@ -25,18 +25,25 @@ export function Default() {
                 A status indicator can be passed any icon and text combination and will display it beside one another by
                 default
             </StoryParagraph>
-            <StatusIndicator icon={<ApproveIcon className={classes.verified} />} statusText={"Confirmed"} />
-            <hr />
-            <StatusIndicator
-                icon={<Icon icon="status-warning" className={classes.unverified} />}
-                statusText={"Needs Confirmation"}
-            />
-            <hr />
-            <StatusIndicator icon={<ApproveIcon className={classes.verified} />} statusText={"Username Available"} />
-            <hr />
-            <StatusIndicator icon={<ErrorIcon />} statusText={"Username Unavailable"} />
-            <hr />
-            <StatusIndicator icon={<ApproveIcon className={classes.verified} />} statusText={"Passwords Match"} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+                <StatusIndicator
+                    icon={<Icon icon="status-success" className={classes.verified} />}
+                    statusText={"Confirmed"}
+                />
+                <StatusIndicator
+                    icon={<Icon icon="status-warning" className={classes.unverified} />}
+                    statusText={"Needs Confirmation"}
+                />
+                <StatusIndicator
+                    icon={<Icon icon="status-success" className={classes.verified} />}
+                    statusText={"Username Available"}
+                />
+                <StatusIndicator icon={<ErrorIcon />} statusText={"Username Unavailable"} />
+                <StatusIndicator
+                    icon={<Icon icon="status-success" className={classes.verified} />}
+                    statusText={"Passwords Match"}
+                />
+            </div>
         </>
     );
 }

@@ -21,7 +21,7 @@ import { IThemeVariables } from "@library/theming/themeReducer";
 import { LocalVariableMapping } from "@library/styles/VariableMapping";
 import { DeepPartial } from "redux";
 
-const defaultIcon = require("!file-loader!./widgetDefaultIcon.svg").default;
+import defaultIcon from "./widgetDefaultIcon.svg";
 
 export enum HomeWidgetItemContentType {
     TITLE = "title",

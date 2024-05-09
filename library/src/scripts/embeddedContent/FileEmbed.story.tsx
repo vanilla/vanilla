@@ -5,15 +5,16 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import { FileEmbed } from "@library/embeddedContent/FileEmbed";
 import { formatUrl } from "@library/utility/appUtils";
 
-const story = storiesOf("Embeds", module);
+export default {
+    title: "Embeds",
+};
 const date = "2019-06-05 20:59:01";
 
-story.add("FileEmbed", () => {
+export const _FileEmbed = () => {
     return (
         <>
             <StoryHeading depth={1}>COMPONENT: FileEmbed</StoryHeading>
@@ -59,4 +60,8 @@ story.add("FileEmbed", () => {
             />
         </>
     );
-});
+};
+
+_FileEmbed.story = {
+    name: "FileEmbed",
+};

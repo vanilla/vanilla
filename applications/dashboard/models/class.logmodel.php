@@ -506,11 +506,12 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
      * @param bool $offset The database offset.
      * @param bool $limit The database limit.
      * @return array Returns a data set.
+     * @throws Exception
      */
     public function getWhere(
         $where = false,
-        $orderFields = "",
-        $orderDirection = "asc",
+        string $orderFields = "",
+        string $orderDirection = "asc",
         $offset = false,
         $limit = false
     ) {
@@ -551,6 +552,7 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
      *
      * @param array $where The filter.
      * @return int Returns the count.
+     * @throws Exception
      */
     public function getCountWhere($where)
     {
@@ -570,10 +572,38 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
     }
 
     /**
+     * Get the count of log entries matching a query, by recordType.
+     *
+     * @param array $where The filter.
+     * @return array Returns the count.
+     * @throws Exception
+     */
+    public function getCountWhereByRecordType($where)
+    {
+        if (isset($where["Operation"])) {
+            Gdn::sql()->whereIn("Operation", (array) $where["Operation"]);
+            unset($where["Operation"]);
+        }
+
+        $result = Gdn::sql()
+            ->select("l.LogID", "count", "CountLogID")
+            ->select("l.RecordType")
+            ->from("Log l")
+            ->groupBy("l.RecordType")
+            ->where($where)
+            ->get()
+            ->resultArray();
+        $result = array_column($result, "CountLogID", "RecordType");
+
+        return $result;
+    }
+
+    /**
      * A wrapper for GetCountWhere that takes care of caching specific operation counts.
      *
      * @param string $operation Comma-delimited list of operation types to get (sum of) counts for.
      * @return int Returns a count.
+     * @throws Exception
      */
     public function getOperationCount($operation)
     {
@@ -671,7 +701,9 @@ class LogModel extends Gdn_Pluggable implements LoggerAwareInterface
             "OtherUserIDs" => implode(",", val("OtherUserIDs", $options, [])),
             "SpoofUserID" => self::logValue($data, "SpoofUserID"),
             "SpoofUserName" => self::logValue($data, "SpoofUserName"),
-            "Data" => dbencode($data),
+            "Data" => $operation === "Automation" && isset($data["Data"]) ? dbencode($data["Data"]) : dbencode($data),
+            "DispatchUUID" => self::logValue($data, "DispatchUUID"),
+            "AutomationRuleRevisionID" => self::logValue($data, "AutomationRuleRevisionID"),
         ];
         if ($logRow["RecordDate"] == null) {
             $logRow["RecordDate"] = Gdn_Format::toDateTime();

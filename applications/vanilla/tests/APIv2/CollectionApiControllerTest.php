@@ -7,6 +7,10 @@
 
 namespace VanillaTests\APIv2;
 
+use Garden\Container\ContainerException;
+use Garden\Container\NotFoundException;
+use Garden\Schema\ValidationException;
+use Vanilla\CurrentTimeStamp;
 use VanillaTests\ExpectExceptionTrait;
 use VanillaTests\TestLoggerTrait;
 use VanillaTests\UsersAndRolesApiTestTrait;
@@ -185,6 +189,9 @@ class CollectionApiControllerTest extends AbstractResourceTest
      *
      * @param string $sort
      * @return array
+     * @throws ContainerException
+     * @throws NotFoundException
+     * @throws ValidationException
      */
     public function getRecord(string $sort = "asc"): array
     {
@@ -455,10 +462,10 @@ class CollectionApiControllerTest extends AbstractResourceTest
     /** Test adding and removing records from collections also resets the cache data */
     public function testPutByResourceClearsCache(): void
     {
-        //create a collections with records
+        // Create a collections with records
         $collectionOne = $this->testCollectionPost();
 
-        //Verify that the collections show up when the get the full collection results based on locale
+        // Verify that the collections show up when the get the full collection results based on locale
         $locale = \Gdn::locale()->current() ?: "en";
         $url = $this->baseUrl . "/content/{$collectionOne[$this->pk]}/$locale";
         $response = $this->api()->get($url);
@@ -473,8 +480,7 @@ class CollectionApiControllerTest extends AbstractResourceTest
             array_column($collectionFullContent["records"], "recordID")
         );
 
-        //Add a new record to the collection
-
+        // Add a new record to the collection
         $record = $this->getRecord()["records"][0];
         $response = $this->api()->put($this->baseUrl . "/by-resource", [
             "collectionIDs" => [$collectionOne["collectionID"]],
@@ -482,7 +488,7 @@ class CollectionApiControllerTest extends AbstractResourceTest
         ]);
         $this->assertEquals(200, $response->getStatusCode());
 
-        //Check if the new records shows in the collection
+        // Check if the new records shows in the collection
         $response = $this->api()->get($url);
         $this->assertEquals(200, $response->getStatusCode());
         $collectionFullContent = $response->getBody();
@@ -490,21 +496,67 @@ class CollectionApiControllerTest extends AbstractResourceTest
         $this->assertCount(count($collectionOne["records"]) + 1, $collectionFullContent["records"]);
         $this->assertContains($record["recordID"], array_column($collectionFullContent["records"], "recordID"));
 
-        //create a new collection and add the same record to the collection and see if it gets removed from the existing collection
-
+        // Create a new collection and add the same record to the collection and see if it gets removed from the existing collection
         $collectionTwo = $this->testCollectionPost();
         $response = $this->api()->put($this->baseUrl . "/by-resource", [
             "collectionIDs" => [$collectionTwo["collectionID"]],
             "record" => $record,
         ]);
 
-        //Now test that the collection doesn't have the record anymore
+        // Now test that the collection doesn't have the record anymore
         $response = $this->api()->get($url);
         $this->assertEquals(200, $response->getStatusCode());
         $collectionFullContent = $response->getBody();
         $this->assertEquals($collectionOne["collectionID"], $collectionFullContent["collectionID"]);
         $this->assertCount(count($collectionOne["records"]), $collectionFullContent["records"]);
         $this->assertNotContains($record["recordID"], array_column($collectionFullContent["records"], "recordID"));
+    }
+
+    /**
+     * Test the results are filterable by `dateUpdated`.
+     *
+     * @return void
+     */
+    public function testCollectionFilterByDateUpdated()
+    {
+        $this->resetTable("collection");
+        $this->resetTable("collectionRecord");
+
+        $collectionRecords = [];
+
+        $discussions[] = $this->createDiscussion();
+        $discussions[] = $this->createDiscussion();
+
+        foreach ($discussions as $discussion) {
+            $collectionRecords[] = ["recordID" => $discussion["discussionID"], "recordType" => "discussion"];
+        }
+
+        // Create collection dated `2020-01-01 10:00:00`
+        CurrentTimeStamp::mockTime("2020-01-01 10:00:00");
+        $this->createCollection($collectionRecords);
+        // Create collection dated `2021-01-01 10:00:00`
+        CurrentTimeStamp::mockTime("2021-01-01 10:00:00");
+        $this->createCollection($collectionRecords);
+        // Create collection dated `2022-01-01 10:00:00`
+        CurrentTimeStamp::mockTime("2022-01-01 10:00:00");
+        $this->createCollection($collectionRecords);
+
+        CurrentTimeStamp::mockTime("now");
+
+        $results = $this->api()
+            ->get($this->baseUrl, ["dateUpdated" => ">2019-01-01"])
+            ->getBody();
+        $this->assertCount(3, $results);
+
+        $results = $this->api()
+            ->get($this->baseUrl, ["dateUpdated" => ">2021-02-02"])
+            ->getBody();
+        $this->assertCount(1, $results);
+
+        $results = $this->api()
+            ->get($this->baseUrl, ["dateUpdated" => "<2025-01-01"])
+            ->getBody();
+        $this->assertCount(3, $results);
     }
 
     /**

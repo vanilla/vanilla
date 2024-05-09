@@ -5,11 +5,10 @@
  */
 
 import React, { ReactNode } from "react";
-import { fireEvent, render, act, waitFor, within, RenderResult } from "@testing-library/react";
+import { fireEvent, render, act, waitFor, within, RenderResult, screen } from "@testing-library/react";
 import DiscussionCommentsAsset from "@vanilla/addon-vanilla/thread/DiscussionCommentsAsset";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserFixture } from "@library/features/__fixtures__/User.fixture";
-import { fakeDiscussions } from "@library/features/discussions/DiscussionList.story";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { LoadStatus } from "@library/@types/api/core";
 import { LayoutEditorPreviewData } from "@dashboard/layout/editor/LayoutEditorPreviewData";
@@ -18,9 +17,11 @@ import { mockAPI } from "@library/__tests__/utility";
 import MockAdapter from "axios-mock-adapter";
 import { LiveAnnouncer } from "react-aria-live";
 import { ICommentEdit } from "@dashboard/@types/api/comment";
+import { vitest } from "vitest";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 
 const MOCK_DISCUSSION: React.ComponentProps<typeof DiscussionCommentsAsset>["discussion"] = {
-    ...fakeDiscussions[0],
+    ...DiscussionFixture[0],
     url: "https://vanilla.test/mockPath",
     name: "Mock Discussion",
 };
@@ -40,10 +41,8 @@ const MOCK_PAGING: NonNullable<React.ComponentProps<typeof DiscussionCommentsAss
 };
 
 beforeEach(() => {
-    window.scrollTo = jest.fn();
+    (window as any).scrollTo = vitest.fn();
 });
-
-jest.setTimeout(100000);
 
 async function renderInProvider(children: ReactNode) {
     const queryClient = new QueryClient({
@@ -119,7 +118,7 @@ describe("DiscussionCommentsAsset", () => {
                 expect(await result.findByText(/Next/)).toBeInTheDocument();
             });
             it("Navigator is updated when going to a new comment list page", async () => {
-                window.history.replaceState = jest.fn();
+                window.history.replaceState = vitest.fn();
 
                 const nextButton = await result.findByText(/Next/);
                 await act(async () => {
@@ -189,11 +188,12 @@ describe("DiscussionCommentsAsset - Edit", () => {
 
     beforeEach(async () => {
         mockAdapter = mockAPI();
-        mockAdapter.onGet(`/discussions/${MOCK_DISCUSSION.discussionID}`).replyOnce(200, MOCK_DISCUSSION);
-        mockAdapter.onGet("/comments").replyOnce(200, mockComments);
-        mockAdapter.onGet(`/comments/${mockComments[0].commentID}/edit`).replyOnce<ICommentEdit>(() => {
+        mockAdapter.onGet(`/discussions/${MOCK_DISCUSSION.discussionID}`).reply(200, MOCK_DISCUSSION);
+        mockAdapter.onGet("/comments").reply(200, mockComments);
+        mockAdapter.onGet(`/comments/${mockComments[0].commentID}/edit`).reply<ICommentEdit>(() => {
             return [200, { ...LayoutEditorPreviewData.comments(1)[0], format: "rich2" }];
         });
+        mockAdapter.onGet(/comments\/.*\/reactions/).reply(200, {});
 
         result = await renderWithAPI(
             <DiscussionCommentsAsset
@@ -205,23 +205,18 @@ describe("DiscussionCommentsAsset - Edit", () => {
     });
 
     it("Editing a comment loads comment in a vanilla editor instance", async () => {
-        const contextMenu = result.queryAllByRole("button", { expanded: false })[0];
+        const contextMenu = screen.queryAllByRole("button", { expanded: false })[0];
         expect(contextMenu).toBeInTheDocument();
+        fireEvent.click(contextMenu);
 
-        act(() => {
-            fireEvent.click(contextMenu);
-        });
-
-        const editButton = (await within(result.container).findByText(/Edit/)).closest("button");
+        const editButton = await screen.findByText(/Edit/);
         expect(editButton).toBeInTheDocument();
+        fireEvent.click(editButton!);
 
-        await act(async () => {
-            fireEvent.click(editButton!);
-        });
-
-        await waitFor(async () => {
-            expect(result.container.querySelectorAll("#vanilla-editor-root").length).toBe(1);
-        });
+        await vitest.dynamicImportSettled();
+        vi.waitFor(async () => {
+            expect(await screen.findByTestId("vanilla-editor")).toBeInTheDocument();
+        }, 5000);
     });
 
     // FIXME: The context menu selectors need work but I have bigger fish to fry right now

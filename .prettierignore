@@ -3,6 +3,8 @@ bower_components
 node_modules
 vendor
 .yarn
+package.json
+bun.lockb
 
 # App writeable directories
 uploads
@@ -15,6 +17,8 @@ locales
 # Build directory
 dist
 storyshots
+.cache
+.vite
 
 # IDE Config
 .vscode

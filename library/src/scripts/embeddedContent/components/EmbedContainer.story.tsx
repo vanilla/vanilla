@@ -7,17 +7,18 @@
 import { EmbedContainer } from "@library/embeddedContent/components/EmbedContainer";
 import { EmbedContainerSize } from "@library/embeddedContent/components/EmbedContainerSize";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import { EmbedContext } from "@library/embeddedContent/IEmbedContext";
 
-const story = storiesOf("Embeds/Pieces", module);
+export default {
+    title: "Embeds/Pieces",
+};
 
 const ipsum = `
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus. Fusce vitae porttitor augue. Integer sagittis justo vitae nibh aliquet, a viverra ipsum laoreet. Interdum et malesuada fames ac ante ipsum primis in faucibus. Curabitur elit ligula, fermentum nec felis vel, aliquam interdum justo. Suspendisse et egestas neque. Vivamus volutpat odio eget enim tincidunt, in pretium arcu consectetur. Nulla sodales molestie pharetra.
 `;
 
-story.add("EmbedContainer", () => {
+export const _EmbedContainer = () => {
     return (
         <>
             <StoryHeading depth={1}>COMPONENT: EmbedContainer</StoryHeading>
@@ -37,4 +38,8 @@ story.add("EmbedContainer", () => {
             </EmbedContext.Provider>
         </>
     );
-});
+};
+
+_EmbedContainer.story = {
+    name: "EmbedContainer",
+};

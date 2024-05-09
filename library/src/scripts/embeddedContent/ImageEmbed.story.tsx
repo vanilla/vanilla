@@ -5,14 +5,15 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import { ImageEmbed } from "@library/embeddedContent/ImageEmbed";
 import { EmbedContext } from "@library/embeddedContent/IEmbedContext";
 import { userContentClasses } from "@library/content/UserContent.styles";
 import classNames from "classnames";
 
-const story = storiesOf("Embeds", module);
+export default {
+    title: "Embeds",
+};
 
 const date = "2019-06-05 20:59:01";
 
@@ -29,7 +30,7 @@ function EmbedWrapper({ children }) {
     );
 }
 
-story.add("ImageEmbed", () => {
+export const _ImageEmbed = () => {
     return (
         <>
             <StoryHeading depth={1}>COMPONENT: ImageEmbed</StoryHeading>
@@ -139,4 +140,8 @@ story.add("ImageEmbed", () => {
             </EditorContent>
         </>
     );
-});
+};
+
+_ImageEmbed.story = {
+    name: "ImageEmbed",
+};

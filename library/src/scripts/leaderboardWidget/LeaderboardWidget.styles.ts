@@ -3,13 +3,13 @@
  * @license GPL-2.0-only
  */
 
-import { Mixins } from "@library/styles/Mixins";
-import { singleLineEllipsis, styleUnit } from "@library/styles/styleHelpers";
-import { shadowHelper } from "@library/styles/shadowHelpers";
-import { color, percent, px } from "csx";
 import { css } from "@emotion/css";
-import { BorderType } from "@library/styles/styleHelpers";
 import { leaderboardVariables } from "@library/leaderboardWidget/LeaderboardWidget.variables";
+import { ColorsUtils } from "@library/styles/ColorsUtils";
+import { Mixins } from "@library/styles/Mixins";
+import { shadowHelper } from "@library/styles/shadowHelpers";
+import { BorderType } from "@library/styles/styleHelpers";
+import { color, percent } from "csx";
 
 export const leaderboardWidgetClasses = () => {
     const vars = leaderboardVariables();
@@ -50,7 +50,7 @@ export const leaderboardWidgetClasses = () => {
         alignItems: "center",
         ...Mixins.clickable.itemState(),
         ...Mixins.font({
-            color: vars.username.font.color ?? color(Mixins.clickable.itemState().color),
+            color: vars.username.font.color ?? ColorsUtils.ensureColorHelper(Mixins.clickable.itemState().color as any),
         }),
     });
 

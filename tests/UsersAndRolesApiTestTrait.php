@@ -305,4 +305,18 @@ trait UsersAndRolesApiTestTrait
     {
         return "-" . round(microtime(true) * 1000) . rand(1, 1000);
     }
+
+    /**
+     * Register new user
+     *
+     * @param array $formFields
+     */
+    public function registerNewUser(array $formFields): object
+    {
+        return $this->runWithConfig(["Garden.Registration.Method" => "Basic"], function () use ($formFields) {
+            $registrationResults = $this->bessy()->post("/entry/register", $formFields);
+            $this->assertIsObject($registrationResults);
+            return $registrationResults;
+        });
+    }
 }

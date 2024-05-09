@@ -4,10 +4,10 @@
  * @license gpl-2.0-only
  */
 
-import clone from "lodash/clone";
-import set from "lodash/set";
-import unset from "lodash/unset";
-import get from "lodash/get";
+import clone from "lodash-es/clone";
+import set from "lodash-es/set";
+import unset from "lodash-es/unset";
+import get from "lodash-es/get";
 
 type Mapping = Record<string, string | string[]>;
 

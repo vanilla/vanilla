@@ -7,10 +7,8 @@
 
 namespace VanillaTests\Library\Vanilla\Web\Asset;
 
-use Vanilla\Web\Asset\ExternalAsset;
-use Vanilla\Web\Asset\HotBuildAsset;
+use Vanilla\Web\Asset\WebAsset;
 use Vanilla\Web\Asset\LocaleAsset;
-use Vanilla\Web\Asset\PolyfillAsset;
 use VanillaTests\Fixtures\Request;
 use VanillaTests\MinimalContainerTestCase;
 
@@ -24,16 +22,10 @@ class AssetsTest extends MinimalContainerTestCase
      */
     public function testStatic()
     {
-        $polyfill = new PolyfillAsset(new Request());
-        $this->assertTrue($polyfill->isStatic());
-
         $locale = new LocaleAsset(new Request(), "en");
         $this->assertFalse($locale->isStatic());
 
-        $external = new ExternalAsset("http://test.com/script.js");
+        $external = new WebAsset("http://test.com/script.js");
         $this->assertFalse($external->isStatic());
-
-        $hotBuild = new HotBuildAsset("test");
-        $this->assertFalse($hotBuild->isStatic());
     }
 }

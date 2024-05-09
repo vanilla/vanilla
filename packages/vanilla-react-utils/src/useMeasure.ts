@@ -4,8 +4,7 @@
  */
 
 import { RefObject, useState, useLayoutEffect, MutableRefObject } from "react";
-import ResizeObserver from "resize-observer-polyfill";
-import debounce from "lodash/debounce";
+import debounce from "lodash-es/debounce";
 import { stableObjectHash } from "@vanilla/utils";
 
 // DOMRectReadOnly.fromRect()

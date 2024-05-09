@@ -66,8 +66,8 @@ export const textInputSizingFromFixedHeight = (
         minHeight: styleUnit(height),
         ...Mixins.padding({
             vertical: styleUnit(px(paddingVertical)),
-            left: px(paddingHorizontal + paddingOffsets.left ?? 0),
-            right: px(paddingHorizontal + paddingOffsets.right ?? 0),
+            left: px(paddingHorizontal + paddingOffsets.left),
+            right: px(paddingHorizontal + paddingOffsets.right),
         }),
     };
 };

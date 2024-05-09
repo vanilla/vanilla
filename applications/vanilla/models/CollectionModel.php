@@ -10,6 +10,8 @@ namespace Vanilla\Models;
 use Garden\Schema\ValidationException;
 use Garden\Schema\ValidationField;
 use Garden\Web\Exception\ClientException;
+use Gdn;
+use Vanilla\CurrentTimeStamp;
 use Vanilla\Database\Operation;
 
 /**
@@ -90,6 +92,7 @@ class CollectionModel extends PipelineModel
      */
     public function searchCollectionRecords(array $where = [], array $options = []): array
     {
+        // Get the `collectionID`s for subsequent query.
         $results = $this->select($where, $options);
         $where = [];
         $where["c.collectionID"] = array_column($results, "collectionID");
@@ -177,6 +180,7 @@ class CollectionModel extends PipelineModel
      *
      * @param int $collectionID
      * @return void
+     * @throws \Exception
      */
     public function deleteCollection(int $collectionID): void
     {
@@ -185,6 +189,26 @@ class CollectionModel extends PipelineModel
         $sql->delete("collectionRecord", $where);
         $this->delete($where);
         $this->clearAllCache($collectionID);
+    }
+
+    /**
+     * Check that all collectionIDs exist.
+     *
+     * @param array $collectionIDs
+     * @return bool
+     *
+     * @throws \Exception
+     */
+    public static function checkCollectionsExist(array $collectionIDs): bool
+    {
+        $validCollectionCount = Gdn::database()
+            ->sql()
+            ->select("*")
+            ->from(self::TABLE_NAME)
+            ->where("collectionID", $collectionIDs)
+            ->get()
+            ->resultArray();
+        return count($collectionIDs) == count($validCollectionCount);
     }
 
     /**
@@ -232,6 +256,7 @@ class CollectionModel extends PipelineModel
         foreach ($records as $record) {
             $record["collectionID"] = $collectionID;
             $record["sort"] = empty($record["sort"]) ? 30 : $record["sort"];
+            $record["dateInserted"] = $record["dateInserted"] ?? CurrentTimeStamp::getMySQL();
             $key = $record["recordID"] . "_" . $record["recordType"];
             if (!in_array($key, $insertedKeys)) {
                 $sql->insert("collectionRecord", $record);

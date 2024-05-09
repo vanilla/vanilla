@@ -3,14 +3,14 @@
  * @license Proprietary
  */
 
-import React from "react";
 import { Router } from "@library/Router";
 import { allAuthenticatorRoutes } from "@oauth2/AuthenticatorRoutes";
 import { addComponent } from "@library/utility/componentRegistry";
 import { authenticatorsSlice } from "@oauth2/AuthenticatorReducer";
 import { registerReducer } from "@library/redux/reducerRegistry";
+import { RouterRegistry } from "@library/Router.registry";
 
-Router.addRoutes(allAuthenticatorRoutes);
+RouterRegistry.addRoutes(allAuthenticatorRoutes);
 
 registerReducer(authenticatorsSlice.name, authenticatorsSlice.reducer);
 

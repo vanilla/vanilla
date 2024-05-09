@@ -55,13 +55,15 @@ class AttachmentsApiController extends AbstractApiController
         if (!$provider) {
             throw new NotFoundException("No provider was found for this attachment type.");
         }
-        if (!$provider->hasPermissions()) {
-            throw new ForbiddenException("You do not have permission to use this provider.");
-        }
 
         $basicBody = $this->attachmentModel->getAttachmentPostSchema()->validate($body);
         $recordType = $basicBody["recordType"];
         $recordID = $basicBody["recordID"];
+
+        if (!$provider->canCreateAttachmentForRecord($recordType, $recordID)) {
+            throw new ForbiddenException("You do not have permission to use this provider.");
+        }
+
         $fullSchema = $this->attachmentModel
             ->getAttachmentPostSchema()
             ->merge($provider->getHydratedFormSchema($recordType, $recordID, $body));

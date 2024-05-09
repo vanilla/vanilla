@@ -269,14 +269,14 @@ class DiscussionSortHotTopTest extends AbstractAPIv2Test
                 "Body" => "Comment for Discussion B",
                 "DiscussionID" => $discussionArray[1],
                 "Format" => "Text",
-                "DateInserted" => date("Y-m-d H:i:s", strtotime("2022-06-05 13:00:00")),
+                "DateInserted" => date("Y-m-d H:i:s", strtotime("2023-06-05 13:00:00")),
             ],
         ];
         $commentModel = $this->container()->get(\CommentModel::class);
         foreach ($comments as $key => $comment) {
             $commentArray[] = $commentModel->save($comment);
         }
-        $discussion2Hot = strtotime("2021-10-10 10:00:00") + strtotime("2022-06-05 13:00:00 + 10 minute");
+        $discussion2Hot = strtotime("2021-10-10 10:00:00") + strtotime("2023-06-05 13:00:00 + 10 minute");
         $response = $this->api()->get("/discussions", ["sort" => "-hot", "limit" => 10]);
         $this->assertEquals(200, $response->getStatusCode());
         $results = $response->getBody();

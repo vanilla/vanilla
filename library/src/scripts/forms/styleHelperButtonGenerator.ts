@@ -11,9 +11,9 @@ import { IButton } from "@library/forms/styleHelperButtonInterface";
 import { Mixins } from "@library/styles/Mixins";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { percent } from "csx";
-import merge from "lodash/merge";
+import merge from "lodash-es/merge";
 import { css, CSSObject } from "@emotion/css";
-import cloneDeep from "lodash/cloneDeep";
+import cloneDeep from "lodash-es/cloneDeep";
 import { defaultTransition } from "@library/styles/styleHelpersAnimation";
 import { shadowHelper } from "@library/styles/shadowHelpers";
 

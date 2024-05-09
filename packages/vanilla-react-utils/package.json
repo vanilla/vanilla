@@ -5,11 +5,10 @@
     "version": "3.0.2",
     "license": "MIT",
     "dependencies": {
-        "@vanilla/dom-utils": "^3.0.1",
-        "lodash": "^4.17.21",
-        "resize-observer-polyfill": "1.5.1"
+        "@vanilla/dom-utils": "*"
     },
     "peerDependencies": {
+        "lodash-es": "*",
         "react": "^17.0.2",
         "react-dom": "^17.0.2"
     },

@@ -12,10 +12,11 @@ import { LoadStatus } from "@library/@types/api/core";
 import { useEmailConfirmationToast } from "@library/features/Layout/EmailConfirmation.hook";
 import { ToastContext } from "@library/features/toaster/ToastContext";
 import { renderHook } from "@testing-library/react-hooks";
+import { vitest } from "vitest";
 
 describe("EmailConfirmation", () => {
     it("Toast is created when a user is unconfirmed", async () => {
-        const addToast = jest.fn();
+        const addToast = vitest.fn();
         const mockCurrentUser = UserFixture.createMockUser({ userID: 7, name: "new-test-user", emailConfirmed: false });
 
         const wrapper = ({ children }) => {
@@ -58,7 +59,7 @@ describe("EmailConfirmation", () => {
         expect(addToast).toHaveBeenCalledTimes(1);
     });
     it("Toast is not created when a user is confirmed", async () => {
-        const addToast = jest.fn();
+        const addToast = vitest.fn();
         const mockCurrentUser = UserFixture.createMockUser({ userID: 8, name: "new-test-user", emailConfirmed: true });
 
         const wrapper = ({ children }) => {
@@ -101,7 +102,7 @@ describe("EmailConfirmation", () => {
         expect(addToast).not.toHaveBeenCalled();
     });
     it("Toast is not created for guest users", async () => {
-        const addToast = jest.fn();
+        const addToast = vitest.fn();
         const mockCurrentUser = UserFixture.createMockUser({ userID: 0, name: "Guest" });
 
         const wrapper = ({ children }) => {

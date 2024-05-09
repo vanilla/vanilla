@@ -9,7 +9,6 @@ import gdn from "@library/gdn";
 import { escapeHTML } from "@vanilla/dom-utils";
 import Translate from "@library/content/Translate";
 import { render } from "enzyme";
-import { expect } from "chai";
 
 describe("<Translate />", () => {
     it("renders nothing when given an empty string source", () => {

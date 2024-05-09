@@ -21,7 +21,7 @@ export function applyCompatibilityIcons(scope: HTMLElement | Document | undefine
     const cogWheels = scope.querySelectorAll(".Arrow.SpFlyoutHandle:not(.compatIcons)");
     cogWheels.forEach((wheel) => {
         wheel.classList.add("compatIcons");
-        ReactDOM.render(<Icon icon="navigation-ellipsis" />, wheel);
+        ReactDOM.render(<Icon icon="navigation-circle-ellipsis" />, wheel);
     });
 
     const docLinks = scope.querySelectorAll("a.documentationLink");

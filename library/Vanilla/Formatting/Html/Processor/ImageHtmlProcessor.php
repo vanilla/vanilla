@@ -30,6 +30,35 @@ class ImageHtmlProcessor extends HtmlProcessor
         // For each images in the content, we attempt to build a srcset based on its original src.
         /** @var \DOMElement $domImage */
         foreach ($domImages as $domImage) {
+            $isRichImage = $domImage->hasAttribute("data-display-size");
+
+            if (!$isRichImage) {
+                $height = $domImage->getAttribute("height");
+                $width = $domImage->getAttribute("width");
+                if ($width && !$height) {
+                    $height = "auto";
+                }
+                if ($height && !$width) {
+                    $width = "auto";
+                }
+                $styles = [];
+                if ($height) {
+                    if (is_numeric($height)) {
+                        $height = $height . "px";
+                    }
+                    $styles[] = "height: " . htmlspecialchars($height);
+                }
+                if ($width) {
+                    if (is_numeric($width)) {
+                        $width = $width . "px";
+                    }
+                    $styles[] = "width: " . htmlspecialchars($width);
+                }
+                if (!empty($styles)) {
+                    $domImage->setAttribute("style", implode("; ", $styles));
+                }
+            }
+
             $srcSetValues = [];
             $imageSrc = $domImage->getAttribute("src") ?: null;
             if (empty($imageSrc)) {

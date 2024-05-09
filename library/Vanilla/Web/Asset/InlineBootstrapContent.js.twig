@@ -1,0 +1,40 @@
+{%- autoescape false -%}
+if (!window.onVanillaReady) {
+    window.onVanillaReady = function (handler) {
+        if (typeof handler !== "function") {
+            console.error("Cannot register a vanilla ready handler that is not a function.");
+            return;
+        }
+        document.addEventListener("X-VanillaReady", function () {
+            if (!window.__VANILLA_INTERNAL_IS_READY__) {
+                return;
+            }
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        })
+
+        if (window.__VANILLA_INTERNAL_IS_READY__) {
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        }
+    }
+}
+
+if (!window.onVanillaContentUpdate) {
+    window.onVanillaContentUpdate = function (handler) {
+        if (typeof handler !== "function") {
+            console.error("Cannot register a vanilla ready handler that is not a function.");
+            return;
+        }
+        document.addEventListener("X-DOMContentReady", function () {
+            if (!window.__VANILLA_INTERNAL_IS_READY__) {
+                return;
+            }
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        })
+
+        if (window.__VANILLA_INTERNAL_IS_READY__) {
+            handler(window.__VANILLA_GLOBALS_DO_NOT_USE_DIRECTLY__);
+        }
+    }
+}
+window.__VANILLA_ENABLED_ADDON_KEYS__ = {{ enabledAddonKeys }};
+{%- endautoescape -%}

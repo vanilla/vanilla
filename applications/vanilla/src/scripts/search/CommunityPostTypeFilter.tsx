@@ -8,7 +8,7 @@ import Checkbox from "@library/forms/Checkbox";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import { onReady, t } from "@library/utility/appUtils";
 import { useSearchForm } from "@library/search/SearchFormContext";
-import flatten from "lodash/flatten";
+import flatten from "lodash-es/flatten";
 import { IDiscussionSearchTypes } from "./discussionSearchTypes";
 
 interface IProps {}

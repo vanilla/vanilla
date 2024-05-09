@@ -15,6 +15,7 @@ export interface IGetUsersQueryParams {
     query?: string;
     name?: string;
     email?: string;
+    emailDomain?: string[];
     limit?: number;
     page?: number;
     sort?: UserSortParams;
@@ -49,7 +50,7 @@ export async function getUsers(params: IGetUsersQueryParams = {}) {
     };
 }
 
-export function useGetUsers(query: IGetUsersQueryParams) {
+export function useGetUsers(query: IGetUsersQueryParams, shouldFetch = true) {
     const {
         refetch,
         isLoading,
@@ -63,6 +64,7 @@ export function useGetUsers(query: IGetUsersQueryParams) {
         refetchOnMount: "always",
         keepPreviousData: true,
         refetchOnWindowFocus: false,
+        enabled: shouldFetch,
     });
 
     //send back the first error message

@@ -7,6 +7,7 @@
 namespace VanillaTests\Library\Vanilla\Formatting\Html\Processor;
 
 use Gdn_Request;
+use Vanilla\Formatting\Formats\MarkdownFormat;
 use Vanilla\Formatting\Formats\WysiwygFormat;
 use Vanilla\Formatting\FormatService;
 use Vanilla\Formatting\Html\HtmlDocument;
@@ -103,5 +104,18 @@ class ImageHtmlProcessorTest extends VanillaTestCase
         $document = new HtmlDocument(\Gdn::formatService()->renderHTML($body, WysiwygFormat::FORMAT_KEY));
         $actualOutput = $this->processor->processDocument($document)->getInnerHtml();
         $this->assertHtmlStringEqualsHtmlString($expectedOutput, $actualOutput);
+    }
+
+    /**
+     * Test that image height and width are preserved.
+     */
+    public function testImageSize()
+    {
+        $input = "<img src='https://somesite.com/some/url' height='50px' width='100px' />";
+        $expected =
+            "<img alt=image class=\"embedImage-img importedEmbed-img\" height=50px src=https://somesite.com/some/url srcset=\"https://loremflickr.com/g/10/600/url 10w, https://loremflickr.com/g/300/600/url 300w, https://loremflickr.com/g/800/600/url 800w, https://loremflickr.com/g/1200/600/url 1200w, https://loremflickr.com/g/1600/600/url 1600w, https://somesite.com/some/url\" style=\"height: 50px; width: 100px\" width=100px>";
+        $document = new HtmlDocument(\Gdn::formatService()->renderHTML($input, WysiwygFormat::FORMAT_KEY));
+        $actualOutput = $this->processor->processDocument($document)->getInnerHtml();
+        $this->assertHtmlStringEqualsHtmlString($expected, $actualOutput);
     }
 }

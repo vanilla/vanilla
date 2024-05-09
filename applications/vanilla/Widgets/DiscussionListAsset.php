@@ -211,6 +211,7 @@ class DiscussionListAsset extends AbstractLayoutAsset implements HydrateAwareInt
             "tagID?",
             "internalStatusID?",
             "statusID?",
+            "hasComments?",
         ])->add($mainSchema->withNoDefaults());
         return $schema;
     }

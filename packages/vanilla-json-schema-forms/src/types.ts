@@ -231,15 +231,17 @@ export interface IValidationResult extends ValidationResult {}
 export interface ISchemaRenderProps {
     FormControlGroup?: React.ComponentType<IControlGroupProps>;
     Form?: React.ComponentType<IFormProps>;
-    FormSection?: React.ComponentType<ISectionProps>;
+    FormSection?: React.ComponentType<React.PropsWithChildren<ISectionProps>>;
     FormTabs?: React.ComponentType<ITabsProps>;
     FormControl?: React.ComponentType<IControlProps>;
-    FormGroupWrapper?: React.ComponentType<{
-        groupName?: string;
-        header?: string;
-        description?: string;
-        rootInstance?: any;
-    }>;
+    FormGroupWrapper?: React.ComponentType<
+        React.PropsWithChildren<{
+            groupName?: string;
+            header?: string;
+            description?: string;
+            rootInstance?: any;
+        }>
+    >;
 }
 
 export interface IPtrReference {

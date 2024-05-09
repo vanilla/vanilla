@@ -154,7 +154,7 @@ export function isSameOrAfterDate(date1: Date, date2: Date, precision?: DateElem
 }
 
 /**
- * Get a new date by substractin days from a date.
+ * Get a new date by subtracting days from a date.
  *
  * @param date
  * @param days

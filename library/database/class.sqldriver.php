@@ -740,6 +740,7 @@ abstract class Gdn_SQLDriver
      * @param int|false $limit Adds a limit to the query.
      * @param int|false $pageNumber The page of data to retrieve.
      * @return Gdn_DataSet
+     * @throws Exception
      */
     public function get($table = "", $orderFields = "", $orderDirection = "asc", $limit = false, $pageNumber = false)
     {
@@ -1067,6 +1068,7 @@ abstract class Gdn_SQLDriver
      * @param int|false $limit The number of records to limit the query to.
      * @param int $offset The offset where the query results should begin.
      * @return Gdn_DataSet The data returned by the query.
+     * @throws Exception
      */
     public function getWhere(
         $table = "",

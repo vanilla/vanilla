@@ -9,7 +9,6 @@ import { INITIAL_REACTIONS_STATE, reactionsSlice } from "@library/reactions/Reac
 import { dummyReactionsData } from "@library/reactions/dummyReactions";
 import { IReaction } from "@library/reactions/Reaction";
 import { stableObjectHash } from "@vanilla/utils";
-import { expect } from "chai";
 
 describe("ReactionsReducer", () => {
     it("Get user reactions", () => {

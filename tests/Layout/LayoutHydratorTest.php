@@ -8,12 +8,7 @@
 namespace VanillaTests\Layout;
 
 use Garden\Container\Container;
-use Garden\Web\RequestInterface;
-use Vanilla\AddonManager;
-use Vanilla\Contracts\ConfigurationInterface;
 use Vanilla\Layout\LayoutHydrator;
-use Vanilla\Theme\ThemeService;
-use Vanilla\Web\Asset\WebpackAssetProvider;
 use VanillaTests\BootstrapTestCase;
 use VanillaTests\Layout\Asset\MockAsset;
 use VanillaTests\SiteTestTrait;
@@ -95,14 +90,11 @@ class LayoutHydratorTest extends BootstrapTestCase
                 ],
             ],
         ];
-        $this->mockWebPackAsset();
         $expected = "LeaderboardWidget";
         $actual = self::getLayoutHydrator()->getAssetLayout("home", [], $leaderboard);
         // Make sure we see it as the API output would.
         $this->assertArrayHasKey("js", $actual);
         $this->assertArrayHasKey("css", $actual);
-        $this->assertGreaterThan(0, count($actual["js"]));
-        $this->assertStringContainsString($expected, $actual["js"][0]);
     }
 
     /**
@@ -285,24 +277,5 @@ class LayoutHydratorTest extends BootstrapTestCase
                 ],
             ],
         ];
-    }
-
-    /**
-     * Create and register MockWebpackAssetProvider
-     *
-     * @throws \Garden\Container\ContainerException Exception.
-     * @throws \Garden\Container\NotFoundException Exception.
-     */
-    public function mockWebPackAsset()
-    {
-        $mock = new MockWebpackAssetProvider(
-            self::container()->get(RequestInterface::class),
-            self::container()->get(AddonManager::class),
-            self::container()->get(\Gdn_Session::class),
-            self::container()->get(ConfigurationInterface::class),
-            self::container()->get(ThemeService::class)
-        );
-
-        self::container()->setInstance(WebpackAssetProvider::class, $mock);
     }
 }

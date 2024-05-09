@@ -5,7 +5,6 @@
 
 import { createMemoryHistory } from "history";
 import { onPageView, initPageViewTracking } from "@library/pageViews/pageViewTracking";
-import { expect } from "chai";
 import sinon from "sinon";
 
 describe("pageViewTracking", () => {

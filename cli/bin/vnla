@@ -1,49 +1,27 @@
-#!/usr/bin/env php
-<?php
-/**
- * @author Adam Charron <adam.c@vanillaforums.com>
- * @copyright 2009-2020 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
+#!/usr/bin/env sh
 
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Vanilla\Cli\Cloud\VanillaCloudCli;
-use Vanilla\Cli\Utils\SimpleScriptLogger;
-use Vanilla\Cli\VanillaCli;
+_VANILLA_ROOT="$(dirname "$0")/../../"
+VANILLA_ROOT="$(realpath "$_VANILLA_ROOT")"
 
-umask(0);
-
-// Throw errors as exceptions.
-set_error_handler(static function(
-    int $code,
-    string $message,
-    string $filename = 'unknown',
-    int $line = -1
-) {
-    throw new ErrorException($message, $code, 1, $filename, $line);
-}, E_ALL);
-
-$originalCwd = getcwd();
-$root = realpath(__DIR__ . "/../../");
-
-    define('PATH_ROOT', $root);
-    $paths = [
-        __DIR__ . '/../../environment.php',
-    ];
-    foreach ($paths as $path) {
-        if (file_exists($path)) {
-            require_once $path;
-            break;
-        }
-    }
-
-    $main = new VanillaCli();
-try {
-    $main->run();
-} catch (\Throwable $t) {
-    /** Restore the original CWD. */
-    system("cd {$originalCwd}");
-    $exitCode = $t->getCode() === 0 ? 1 : $t->getCode();
-    $main->renderThrowable($t, new ConsoleOutput());
-}
-
+case "$1" in
+    ssh)
+        # SSH into any given docker container.
+        docker exec -i -t $2 sh
+        ;;
+    composer | php)
+        # Execute php or composer using the proper PHP version.
+        docker exec -i -t php-fpm sh -c "cd /srv/vanilla-repositories/vanilla && $*"
+        ;;
+    build | storybook)
+        if [ "$2" = "--help" ]; then
+            sh -c "${0%/*}/vnla-cli $*"
+        else
+            BUILD_ARGS=$(sh -c "${0%/*}/vnla-cli $*")
+            sh -c "cd $VANILLA_ROOT && $BUILD_ARGS"
+        fi
+        ;;
+    *)
+        # These commands need to execute on the host.
+        "$VANILLA_ROOT/cli/bin/vnla-cli" "$@"
+        ;;
+esac

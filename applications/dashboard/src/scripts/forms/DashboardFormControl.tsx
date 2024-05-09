@@ -27,7 +27,7 @@ import { t } from "@vanilla/i18n";
 import { ICommonControl, IControlGroupProps, IControlProps, ICustomControl } from "@vanilla/json-schema-forms";
 import { IFormGroupProps } from "@vanilla/ui";
 import { AutoCompleteLookupOptions } from "@vanilla/ui/src/forms/autoComplete/AutoCompleteLookupOptions";
-import isEmpty from "lodash/isEmpty";
+import isEmpty from "lodash-es/isEmpty";
 import React from "react";
 
 interface IControlOverride<T = ICommonControl> {
@@ -47,9 +47,18 @@ interface IControlOverride<T = ICommonControl> {
  */
 // TODO: pass onBlur prop to all input components rendered by DashboardFormControl
 export function DashboardFormControl(props: IControlProps, controlOverrides?: IControlOverride[]) {
-    const { control, required, disabled, instance, schema, onChange, onBlur, validation, size, autocompleteClassName } =
-        props;
-    const value = instance ?? schema.default;
+    const {
+        control,
+        required,
+        disabled,
+        instance: value,
+        schema,
+        onChange,
+        onBlur,
+        size,
+        autocompleteClassName,
+    } = props;
+
     const inputName = useUniqueID("input");
 
     // If specific controls need to be overridden
@@ -84,10 +93,13 @@ export function DashboardFormControl(props: IControlProps, controlOverrides?: IC
                 "aria-label": control.inputAriaLabel,
                 ...(typeIsNumber && {
                     min: schema.minimum ?? schema.min,
+                    max: schema.maximum ?? schema.max,
                     step: schema.step,
+
+                    // https://html.spec.whatwg.org/multipage/input.html#when-number-is-not-appropriate
+                    inputmode: "numeric",
+                    pattern: "[0-9]*",
                 }),
-                // https://html.spec.whatwg.org/multipage/input.html#when-number-is-not-appropriate
-                ...(typeIsNumber && { inputmode: "numeric", pattern: "[0-9]*" }),
             };
             return typeIsPassword ? (
                 <DashboardPasswordInput

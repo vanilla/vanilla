@@ -11,7 +11,6 @@ export type IconData = {
 };
 
 export const coreIconsData = {
-    ".DS_Store": null,
     "ai-sparkle": {
         width: "16",
         height: "16",
@@ -350,6 +349,12 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
         fill: "none",
     },
+    "navigation-circle-ellipsis": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
     "navigation-collapseAll": {
         viewBox: "0 0 24 24",
         role: "img",
@@ -399,6 +404,12 @@ export const coreIconsData = {
         viewBox: "0 0 24 24",
     },
     "notification-alert": {
+        width: "24",
+        height: "24",
+        viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "notification-running": {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
@@ -616,6 +627,18 @@ export const coreIconsData = {
         width: "24",
         height: "24",
         viewBox: "0 0 24 24",
+        fill: "none",
+    },
+    "status-running": {
+        width: "16",
+        height: "16",
+        viewBox: "0 0 16 16",
+        fill: "none",
+    },
+    "status-success": {
+        width: "16",
+        height: "16",
+        viewBox: "0 0 16 16",
         fill: "none",
     },
     "status-warning": {

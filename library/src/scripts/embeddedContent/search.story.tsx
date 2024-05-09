@@ -4,7 +4,6 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import { ButtonTypes } from "@library/forms/buttonTypes";
 import IndependentSearch from "@library/features/search/IndependentSearch";
@@ -36,7 +35,9 @@ import { useSection } from "@library/layout/LayoutContext";
 import classNames from "classnames";
 import { PlacesResultMeta } from "@dashboard/components/panels/PlacesSearchDomain.loadable";
 
-const story = storiesOf("Search", module);
+export default {
+    title: "Embeds",
+};
 
 const dummyUserFragment = {
     userID: 1,
@@ -45,7 +46,7 @@ const dummyUserFragment = {
     dateLastActive: "2016-07-25 17:51:15",
 };
 
-story.add("Search Box", () => {
+export const SearchBox = () => {
     const classesSearch = bannerClasses();
     return (
         <StoryContent>
@@ -73,9 +74,9 @@ story.add("Search Box", () => {
             </SearchContext.Provider>
         </StoryContent>
     );
-});
+};
 
-story.add("Search Results", () => {
+export const SearchResults = () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}>Search Results</StoryHeading>
@@ -274,9 +275,9 @@ story.add("Search Results", () => {
             />
         </StoryContent>
     );
-});
+};
 
-story.add("Search Results for Places", () => {
+export const SearchResultsForPlaces = () => {
     return (
         <StoryContent>
             <StoryHeading depth={1}> Search Results for Places</StoryHeading>
@@ -394,4 +395,8 @@ story.add("Search Results for Places", () => {
             />
         </StoryContent>
     );
-});
+};
+
+SearchResultsForPlaces.story = {
+    name: "Search Results for Places",
+};

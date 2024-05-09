@@ -15,7 +15,7 @@ import { stringIsValidColor } from "@library/styles/styleUtils";
 import { useUniqueID } from "@library/utility/idUtils";
 import { t } from "@vanilla/i18n/src";
 import classNames from "classnames";
-import debounce from "lodash/debounce";
+import debounce from "lodash-es/debounce";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ThemeBuilderRevert } from "@library/forms/themeEditor/ThemeBuilderRevert";
 import Pickr from "@simonwep/pickr";

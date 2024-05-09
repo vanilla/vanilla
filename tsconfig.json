@@ -1,7 +1,7 @@
 {
-    "extends": "@vanilla/tsconfig/base.json",
-    "baseUrl": "./",
+    "extends": "./packages/vanilla-tsconfig/base.json",
     "compilerOptions": {
+        "baseUrl": "./",
         "paths": {
             "@library/*": ["./library/src/scripts/*"],
             "@vanilla/addon-vanilla/*": ["./applications/vanilla/src/scripts/*"],
@@ -11,6 +11,7 @@
             "@knowledge/*": ["./cloud/plugins/knowledge/src/scripts/*"],
             "@vanillaanalytics/*": ["./cloud/plugins/vanillaanalytics/src/scripts/*"],
             "@FederatedSearch/*": ["./cloud/plugins/FederatedSearch/src/scripts/*"],
+            "@AutomationRules/*": ["./cloud/plugins/AutomationRules/src/scripts/*"],
             "@oauth2/*": ["./plugins/oauth2/src/scripts/*"],
             "@webhooks/*": ["./cloud/plugins/webhooks/src/scripts/*"],
             "@themingapi/*": ["./cloud/plugins/themingapi/src/scripts/*"],
@@ -21,15 +22,16 @@
             "@badges/*": ["./cloud/plugins/badges/src/scripts/*"],
             "@Online/*": ["./cloud/plugins/Online/src/scripts/*"],
             "@Jira/*": ["./cloud/plugins/Jira/src/scripts/*"],
+            "@SentimentAnalysis/*": ["./cloud/plugins/SentimentAnalysis/src/scripts/*"],
             "@ElasticSearch/*": ["./cloud/plugins/ElasticSearch/src/scripts/*"],
+            "@Zendesk/*": ["./cloud/plugins/Zendesk/src/scripts/*"],
             "@QnA/*": ["./plugins/QnA/src/scripts/*"],
             "@vanilla-ai/*": ["./cloud/plugins/vanilla-ai/src/scripts/*"],
+            "@zoom/*": ["./cloud/plugins/zoom/src/scripts/*"],
             "typestyle": ["./library/src/scripts/styles/styleShim.ts"],
-            "@vanilla/babel-preset": ["./packages/vanilla-babel-preset/*"],
             "@vanilla/dom-utils": ["./packages/vanilla-dom-utils/*"],
             "@vanilla/eslint-config": ["./packages/vanilla-eslint-config/*"],
             "@vanilla/i18n": ["./packages/vanilla-i18n/*"],
-            "@vanilla/polyfill": ["./packages/vanilla-polyfill/*"],
             "@vanilla/prettier-config": ["./packages/vanilla-prettier-config/*"],
             "@vanilla/react-utils": ["./packages/vanilla-react-utils/*"],
             "@vanilla/redux-utils": ["./packages/vanilla-redux-utils/*"],
@@ -42,27 +44,47 @@
         // Our typecheck time is ~30 seconds. When we emit it takes much longer.
         "incremental": false,
         "skipLibCheck": true,
-        "skipDefaultLibCheck": true
+        "skipDefaultLibCheck": true,
+        "types": ["vitest/globals", "jquery"],
+        "esModuleInterop": true
+    },
+    "ts-node": {
+        "esm": true,
+        "transpileOnly": true,
+        "files": true,
+        "swc": true
     },
     "include": [
-        "build/scripts/**/*.ts",
+        "build/**/*.ts",
+        "build/**/*.tsx",
+        "build/**/*.mts",
         "library/src/scripts/**/*.ts",
         "library/src/scripts/**/*.tsx",
         "applications/*/src/scripts/**/*.ts",
         "applications/*/src/scripts/**/*.tsx",
         "cloud/plugins/*/src/scripts/**/*.ts",
         "cloud/plugins/*/src/scripts/**/*.tsx",
+        "cloud/applications/*/src/scripts/**/*.ts",
+        "cloud/applications/*/src/scripts/**/*.tsx",
         "plugins/*/src/scripts/**/*.ts",
         "plugins/*/src/scripts/**/*.tsx",
         "themes/*/src/scripts/**/*.ts",
         "themes/*/src/scripts/**/*.tsx",
         "addons/themes/*/src/scripts/**/*.ts",
         "addons/themes/*/src/scripts/**/*.tsx",
-        ".storybookAppPages/*.ts*"
+        ".storybookAppPages/*.ts*",
+        "vitest.config.ts"
     ],
-    "files": [
-        "node_modules/jest-expect-message/types/index.d.ts",
-        "library/src/scripts/htmlWidget/HtmlWidgetEditor.d.ts"
-    ],
-    "exclude": ["**/*.js", "**/*.jsx", "node_modules/**/*", "node_modules", "packages/*/src/*"]
+    "files": ["library/src/scripts/htmlWidget/HtmlWidgetEditor.d.ts", "node_modules/vite/client.d.ts"],
+    "exclude": [
+        "**/*.js",
+        "**/*.jsx",
+        "node_modules/**/*",
+        "node_modules",
+        "packages/*/src/*",
+        "node_modules",
+        "./node_modules",
+        "./node_modules/*",
+        "./node_modules/@types/node/index.d.ts"
+    ]
 }

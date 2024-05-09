@@ -13,14 +13,13 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import { DeleteIcon, EditIcon } from "@library/icons/common";
 import { StoryContent } from "@library/storybook/StoryContent";
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import { DashboardPagerArea, DashboardToolbar, DashboardToolbarButtons } from "@dashboard/components/DashboardToolbar";
 import { DashboardPager } from "@dashboard/components/DashboardPager";
+import puppyImage from "../../../styleguide/public/resources/images/smart-puppy.jpg";
+import chickImage from "../../../styleguide/public/resources/images/little-chick.jpg";
 
 const { HeadItem } = DashboardTable;
-const puppyImage = require("../../../styleguide/public/resources/images/smart-puppy.jpg");
-const chickImage = require("../../../styleguide/public/resources/images/little-chick.jpg");
 
 export default {
     title: "Dashboard/Legacy",

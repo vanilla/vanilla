@@ -69,6 +69,7 @@ class SearchApiController extends AbstractApiController
         if (isset($query["collapse"]) && $query["collapse"]) {
             $expands[] = "collapse";
         }
+
         $this->applyExpandFields($searchResults, $expands);
 
         $this->userModel->expandUsers(

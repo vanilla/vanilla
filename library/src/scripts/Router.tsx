@@ -17,6 +17,7 @@ import RouteActions from "@library/RouteActions";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
 import { IError } from "@library/errorPages/CoreErrorMessages";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
+import { RouterRegistry } from "@library/Router.registry";
 
 interface IProps {
     disableDynamicRouting?: boolean;
@@ -57,7 +58,7 @@ export function Router(props: IProps) {
                 <ErrorPageComponent error={initialRouteError}></ErrorPageComponent>
             ) : (
                 <Switch>
-                    {Router._routes}
+                    {RouterRegistry.routes}
                     <Route key="@not-found" component={NotFoundPage} />
                 </Switch>
             )}
@@ -83,22 +84,3 @@ export function Router(props: IProps) {
 
     return <ReactRouter history={history}>{routes}</ReactRouter>;
 }
-
-/**
- * The currently registered routes.
- * @private
- */
-Router._routes = [];
-
-/**
- * Register one or more routes to the app component.
- *
- * @param routes An array of routes to add.
- */
-Router.addRoutes = (routes: React.ReactNode[]) => {
-    if (!Array.isArray(routes)) {
-        Router._routes.push(routes);
-    } else {
-        Router._routes.push(...routes);
-    }
-};

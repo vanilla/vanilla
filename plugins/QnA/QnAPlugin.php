@@ -1927,6 +1927,7 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
      * @param CommentsApiController $commentsApiController
      * @param array $options
      * @return array
+     * @throws NotFoundException
      */
     public function commentsApiController_normalizeOutput(
         array $comment,
@@ -1935,7 +1936,13 @@ class QnAPlugin extends Gdn_Plugin implements LoggerAwareInterface, PsrEventHand
     ) {
         if (ModelUtils::isExpandOption(ModelUtils::EXPAND_CRAWL, $options["expand"] ?? [])) {
             if (!empty($comment[self::QNA_KEY])) {
-                $comment["labelCodes"][] = $comment[self::QNA_KEY];
+                if ($comment[self::QNA_KEY] === "Rejected") {
+                    if ($this->session->checkPermission("Garden.Curation.Manage")) {
+                        $comment["labelCodes"][] = $comment[self::QNA_KEY];
+                    }
+                } else {
+                    $comment["labelCodes"][] = $comment[self::QNA_KEY];
+                }
             }
             return $comment;
         }

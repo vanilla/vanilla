@@ -5,9 +5,6 @@
 
 // Some polyfills
 import "focus-visible";
-import smoothscroll from "smoothscroll-polyfill";
-
-smoothscroll.polyfill();
 
 export * from "./downloadAsFile";
 export * from "./domData";

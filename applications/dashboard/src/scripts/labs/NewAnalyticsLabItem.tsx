@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import image from "!file-loader!./NewAnalyticsLabItem.svg";
+import image from "./NewAnalyticsLabItem.svg";
 import { LabThemeEditorNote } from "@dashboard/labs/LabThemeEditorNote";
 import { VanillaLabsItem } from "@dashboard/labs/VanillaLabsItem";
 import { t } from "@vanilla/i18n";

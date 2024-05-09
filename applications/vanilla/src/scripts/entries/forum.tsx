@@ -25,12 +25,11 @@ import NotificationPreferences from "@library/notificationPreferences";
 import { ProfileAnalyticsWidget } from "@library/profileAnalyticsWidget/ProfileAnalyticsWidget";
 import { ProfileOverviewWidget } from "@library/profileOverviewWidget/ProfileOverviewWidget";
 import { registerReducer } from "@library/redux/reducerRegistry";
-import { Router } from "@library/Router";
+import { RouterRegistry } from "@library/Router.registry";
 import { RSSWidget } from "@library/rssWidget/RSSWidget";
 import { SearchWidget } from "@library/searchWidget/SearchWidget";
 import TabWidget from "@library/tabWidget/TabWidget";
 import { UnsubscribePageRoute } from "@library/unsubscribe/unsubscribePageRoutes";
-import { ConvertHTMLPageRoute } from "@library/convertHTML/convertHTMLPageRoutes";
 import { UserSpotlight } from "@library/userSpotlight/UserSpotlight";
 import { UserSpotlightWidget } from "@library/userSpotlight/UserSpotlightWidget";
 import { onReady } from "@library/utility/appUtils";
@@ -83,7 +82,7 @@ onReady(() => {
     triggerLegacyHashScrolling();
 });
 
-Router.addRoutes([UnsubscribePageRoute.route, ConvertHTMLPageRoute.route]);
+RouterRegistry.addRoutes([UnsubscribePageRoute.route]);
 
 delegateEvent("click", ".js-addDiscussionToCollection", (event, triggeringElement) => {
     event.preventDefault();

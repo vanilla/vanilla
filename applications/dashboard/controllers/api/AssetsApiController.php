@@ -8,11 +8,8 @@
 namespace Vanilla\Dashboard\Controllers\Api;
 
 use Garden\Web\Data;
-use Vanilla\Web\Asset\DeploymentCacheBuster;
-use Vanilla\Web\Asset\HotBuildAsset;
-use Vanilla\Web\Asset\WebpackAsset;
-use Vanilla\Web\Asset\WebpackAssetProvider;
-use Vanilla\Web\CacheControlMiddleware;
+use Vanilla\Web\Asset\ViteAssetProvider;
+use Vanilla\Web\CacheControlConstantsInterface;
 use Vanilla\Web\Controller;
 
 /**
@@ -20,15 +17,14 @@ use Vanilla\Web\Controller;
  */
 class AssetsApiController extends Controller
 {
-    /** @var WebpackAssetProvider */
-    private $assetProvider;
+    private ViteAssetProvider $assetProvider;
 
     /**
      * DI.
      *
-     * @param WebpackAssetProvider $assetProvider
+     * @param ViteAssetProvider $assetProvider
      */
-    public function __construct(WebpackAssetProvider $assetProvider)
+    public function __construct(ViteAssetProvider $assetProvider)
     {
         $this->assetProvider = $assetProvider;
     }
@@ -36,19 +32,32 @@ class AssetsApiController extends Controller
     /**
      * Get the current cache buster for the application.
      */
-    public function get_embedScript(\Gdn_Request $request)
+    public function get_embedScript()
     {
-        if ($this->assetProvider->isHotReloadEnabled()) {
-            $asset = new HotBuildAsset("embed");
-        } else {
-            $asset = $this->assetProvider->getEmbedAsset();
+        $asset = $this->assetProvider->getEmbedAsset();
+
+        if ($asset === null) {
+            $jsContent = <<<JS
+console.error("Vanilla embed script could not be generated. This is due to a build error in vanilla.");
+JS;
+
+            return new Data(
+                $jsContent,
+                [],
+                [
+                    "content-type" => "application/javascript",
+                    CacheControlConstantsInterface::HEADER_CACHE_CONTROL =>
+                        CacheControlConstantsInterface::PUBLIC_CACHE,
+                    "Access-Control-Allow-Origin" => "*",
+                ]
+            );
         }
 
         return new Data(
             "",
             [],
             [
-                CacheControlMiddleware::HEADER_CACHE_CONTROL => CacheControlMiddleware::PUBLIC_CACHE,
+                CacheControlConstantsInterface::HEADER_CACHE_CONTROL => CacheControlConstantsInterface::PUBLIC_CACHE,
                 "Access-Control-Allow-Origin" => "*",
                 "Location" => $asset->getWebPath(),
             ]

@@ -31,7 +31,7 @@ import { INavigationVariableItem } from "@library/headers/navigationVariables";
 import { ScrollOffsetProvider } from "@library/layout/ScrollOffsetContext";
 import { Icon } from "@vanilla/icons";
 
-const localLogoUrl = require("./titleBarStoryLogo.png");
+import localLogoUrl from "./titleBarStoryLogo.png";
 
 loadTranslations({});
 

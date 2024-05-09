@@ -14,7 +14,7 @@ import NotificationsActions from "@library/features/notifications/NotificationsA
 import { useSelector } from "react-redux";
 import { useContext, useEffect } from "react";
 import { IUsersState, IInjectableUserState, IPermissions } from "./userTypes";
-import clone from "lodash/clone";
+import clone from "lodash-es/clone";
 
 const suggestionReducer = new UserSuggestionModel().reducer;
 

@@ -689,13 +689,17 @@ if ($Construct->tableExists("contentGroupRecord")) {
     }
     $Construct->renameTable($contentGroupRecordTable, $collectionRecordTable);
 } else {
+    $Construct->table("collectionRecord");
+    $dateInsertExists = $Construct->columnExists("dateInserted");
     $Construct
-        ->table("collectionRecord")
         ->column("collectionID", "int", false, "primary")
         ->column("recordID", "int", false, ["primary", "index.recordID"])
-        ->column("recordType", "varchar(50)", false, ["primary", "index.recordType"])
-        ->column("sort", "int", 30)
-        ->set($Explicit, $Drop);
+        ->column("recordType", "varchar(50)", false, ["primary", "index.recordType"]);
+    if (!$dateInsertExists) {
+        // If the dateInserted Column doesn't exist, add a new column with default date as current date
+        $Construct->column("dateInserted", "datetime", \Vanilla\CurrentTimeStamp::getMySQL(), "index");
+    }
+    $Construct->column("sort", "int", 30)->set($Explicit, $Drop);
 }
 $Categories = Gdn::sql()
     ->where("coalesce(UrlCode, '') =", "''", false, false)

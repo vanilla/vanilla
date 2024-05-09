@@ -15,8 +15,8 @@ import { ButtonTypes } from "@library/forms/buttonTypes";
 import ButtonLoader from "@library/loaders/ButtonLoader";
 import { t } from "@vanilla/i18n";
 import { JSONSchemaType, JsonSchema, JsonSchemaForm } from "@vanilla/json-schema-forms";
-import isEmpty from "lodash/isEmpty";
-import isEqual from "lodash/isEqual";
+import isEmpty from "lodash-es/isEmpty";
+import isEqual from "lodash-es/isEqual";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const REDIRECT_SCHEMA: JSONSchemaType<{

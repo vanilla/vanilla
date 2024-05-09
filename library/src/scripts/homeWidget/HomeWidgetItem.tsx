@@ -16,7 +16,7 @@ import Heading from "@library/layout/Heading";
 import TruncatedText from "@library/content/TruncatedText";
 import { ICountResult } from "@library/search/searchTypes";
 import { ResultMeta } from "@library/result/ResultMeta";
-import Button, { getClassForButtonType } from "@library/forms/Button";
+import { getClassForButtonType } from "@library/forms/Button.getClassForButtonType";
 import { createSourceSetValue, ImageSourceSet, t } from "@library/utility/appUtils";
 import { ArrowIcon } from "@library/icons/common";
 import { DeepPartial } from "redux";
@@ -26,6 +26,7 @@ import { buttonClasses } from "@library/forms/Button.styles";
 import { HomeWidgetItemDefaultImage } from "@library/homeWidget/HomeWidgetItemDefaultImage";
 import { Devices, useDevice } from "@library/layout/DeviceContext";
 import { ButtonTypes } from "@library/forms/buttonTypes";
+import Button from "@library/forms/Button";
 
 export interface CommonHomeWidgetItemProps {
     // Content

@@ -5,6 +5,7 @@
  * @license GPL-2.0-only
  */
 
+import { globalValueRef } from "@vanilla/utils";
 import { useMemo } from "react";
 
 // Optional ID
@@ -20,12 +21,13 @@ export interface IRequiredComponentID {
 const DEFAULT_PREFIX = "";
 
 // Cache of ID's by their prefix.
-let idCache: { [key: string]: number } = {};
+let idCacheRef = globalValueRef<{ [key: string]: number }>("idCache", {});
 
 // Generates unique ID from suffix
 export function uniqueIDFromPrefix(prefix: string = DEFAULT_PREFIX) {
     let count = 0;
 
+    const idCache = idCacheRef.current();
     if (prefix in idCache) {
         count = idCache[prefix] + 1;
     }
@@ -45,7 +47,7 @@ export function useUniqueID(prefix?: string) {
  * Clear the cache of unique IDs. Useful for testing particularly.
  */
 export function clearUniqueIDCache() {
-    idCache = {};
+    idCacheRef.set({});
 }
 
 // Get required ID, will either return ID given through props or generate unique ID from suffix

@@ -242,6 +242,7 @@ export const dashboardClasses = useThemeCache(() => {
 
     const inputWrapper = css({
         display: "flex",
+        width: "100%",
         "& > input": {
             flex: 1,
         },

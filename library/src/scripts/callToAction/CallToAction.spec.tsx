@@ -28,6 +28,7 @@ describe("CallToAction", () => {
             button: {
                 title: "CTA button",
                 url: "https://somewhere",
+                shouldUseButton: true,
             },
         };
         const { container } = render(<CallToActionWidget {...componentProps} />);
@@ -38,6 +39,7 @@ describe("CallToAction", () => {
         expect(buttonNodes[0].innerHTML).toBe(componentProps.button.title);
         expect(buttonNodes[0]).toHaveAttribute("href");
         expect(buttonNodes[0].getAttribute("href")).toContain(componentProps.button.url);
+        expect(buttonNodes[0]).toHaveAttribute("role", "button");
     });
 
     it("Test background image", async () => {
@@ -62,5 +64,37 @@ describe("CallToAction", () => {
         expect(imgNodes.length).toBeGreaterThan(0);
         expect(imgNodes[0]).toHaveAttribute("src");
         expect(imgNodes[0]).toHaveAttribute("srcset");
+    });
+
+    it("should render the outer container as a link when shouldUseButton is false and a URL is provided", async () => {
+        const componentProps = {
+            title: "My CTA",
+            description: "My CTA description",
+            button: {
+                url: "https://somewhere",
+                shouldUseButton: false,
+            },
+        };
+        const { container } = render(<CallToActionWidget {...componentProps} />);
+
+        const title = screen.getByText(componentProps.title);
+        const description = screen.getByText(componentProps.description);
+        const link = container.querySelector(`[href='${componentProps.button.url}']`);
+        expect(link).toContainElement(title);
+        expect(link).toContainElement(description);
+        expect(link).not.toHaveAttribute("role", "button");
+    });
+
+    it("should include neither a link nor a button if shouldUseButton is false and no url is provided", async () => {
+        const componentProps = {
+            title: "My CTA",
+            description: "My CTA description",
+            button: {
+                shouldUseButton: false,
+            },
+        };
+        const { container } = render(<CallToActionWidget {...componentProps} />);
+        const linksAndButtons = container.querySelectorAll("a,[role='button']");
+        expect(linksAndButtons).toHaveLength(0);
     });
 });

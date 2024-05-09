@@ -7,7 +7,7 @@ import RouteHandler from "@library/routing/RouteHandler";
 import PageLoader from "@library/routing/PageLoader";
 
 export const LeavingPageRoute = new RouteHandler(
-    () => import(/* webpackChunkName: "pages/search" */ "@library/leavingPage/LeavingPage"),
+    () => import(/* webpackChunkName: "pages_search" */ "@library/leavingPage/LeavingPage"),
     "/home/leaving",
     () => "/home/leaving",
     PageLoader,

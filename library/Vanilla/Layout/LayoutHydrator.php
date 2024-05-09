@@ -33,7 +33,7 @@ use Vanilla\Layout\Section\SectionTwoColumnsEven;
 use Vanilla\Layout\View\AbstractCustomLayoutView;
 use Vanilla\Layout\View\CommonLayoutView;
 use Vanilla\Layout\View\HomeLayoutView;
-use Vanilla\Web\Asset\WebpackAssetProvider;
+use Vanilla\Web\Asset\ViteAssetProvider;
 use Vanilla\Web\JsInterpop\AbstractReactModule;
 use Vanilla\Web\PageHead;
 use Vanilla\Web\PageHeadAwareInterface;
@@ -75,6 +75,8 @@ final class LayoutHydrator
     /** @var DynamicContainerSchemaOptions */
     private DynamicContainerSchemaOptions $dynamicSchemaOptions;
 
+    private ViteAssetProvider $viteAssetProvider;
+
     /**
      * DI.
      *
@@ -82,6 +84,7 @@ final class LayoutHydrator
      * @param CommonLayoutView $commonLayout
      * @param ReactLayoutExceptionHandler $reactExceptionHandler
      * @param DynamicContainerSchemaOptions $dynamicSchemaOptions
+     * @param ViteAssetProvider $viteAssetProvider
      *
      * @throws ContainerException
      * @throws \Garden\Container\NotFoundException
@@ -90,11 +93,13 @@ final class LayoutHydrator
         Container $container,
         CommonLayoutView $commonLayout,
         ReactLayoutExceptionHandler $reactExceptionHandler,
-        DynamicContainerSchemaOptions $dynamicSchemaOptions
+        DynamicContainerSchemaOptions $dynamicSchemaOptions,
+        ViteAssetProvider $viteAssetProvider
     ) {
         $this->dynamicSchemaOptions = $dynamicSchemaOptions;
         $this->container = $container;
         $this->commonLayout = $commonLayout;
+        $this->viteAssetProvider = $viteAssetProvider;
         $this->dataHydrator = new DataHydrator();
         $this->dataHydrator->setExceptionHandler($reactExceptionHandler);
         $this->pageHead = $container->get(PageHead::class);
@@ -318,7 +323,13 @@ final class LayoutHydrator
      */
     public function getAssetLayout(string $layoutViewType, array $params, array $layout): array
     {
-        $result = [];
+        $result = [
+            "css" => [],
+            "js" => [],
+        ];
+        if ($this->viteAssetProvider->isHotBuild()) {
+            return $result;
+        }
         // Validate the params.
         $hydrator = $this->getHydrator($layoutViewType, null, true);
         $hydrator->resolve($layout, $params);
@@ -329,29 +340,14 @@ final class LayoutHydrator
                 $widgetNames = array_merge($widgetNames, $resolverWidgets);
             }
         }
-
-        /** @var WebpackAssetProvider $webpackAssetProvider */
-        $webpackAssetProvider = Gdn::getContainer()->get(WebpackAssetProvider::class);
-        $webpackAssetProvider->setHotReloadEnabled(false);
-        $jsList = $webpackAssetProvider->getScripts("layouts", true);
-        $cssList = $webpackAssetProvider->getStylesheets("layouts", true);
-        $webpackAssetProvider->setHotReloadEnabled(true);
-        $result["js"] = [];
-        $result["css"] = [];
-
-        foreach ($widgetNames as $widget) {
-            foreach ($jsList as $jsAsset) {
-                if (str_contains($jsAsset->getWebPath(), $widget)) {
-                    $result["js"][] = $jsAsset->getWebPath();
-                }
-            }
-            foreach ($cssList as $cssAsset) {
-                if (str_contains($cssAsset->getWebPath(), $widget)) {
-                    $result["css"][] = $cssAsset->getWebPath();
-                }
+        $assets = $this->viteAssetProvider->getAssetsByNames("layouts", $widgetNames);
+        foreach ($assets as $asset) {
+            if ($asset->isScript()) {
+                $result["js"][] = $asset->getWebPath();
+            } elseif ($asset->isStyleSheet()) {
+                $result["css"][] = $asset->getWebPath();
             }
         }
-        // Apply pageHead meta
 
         return $result;
     }

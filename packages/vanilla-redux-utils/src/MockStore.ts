@@ -4,7 +4,7 @@
  */
 
 import { Store, Reducer, AnyAction } from "redux";
-import isEqual from "lodash/isEqual";
+import isEqual from "lodash-es/isEqual";
 
 /**
  * Class for wrapping some backing redux store and making assertions about the dispatched actions.

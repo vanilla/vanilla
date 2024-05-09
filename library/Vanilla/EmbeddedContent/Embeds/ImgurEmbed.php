@@ -11,7 +11,7 @@ use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbeddedContentException;
 use Vanilla\EmbeddedContent\EmbedUtils;
 use Vanilla\Web\Asset\AssetPreloader;
-use Vanilla\Web\Asset\ExternalAsset;
+use Vanilla\Web\Asset\WebAsset;
 
 /**
  * Embed data object for imgur.
@@ -30,7 +30,7 @@ class ImgurEmbed extends AbstractEmbed
         parent::__construct($data);
 
         EmbedUtils::getPreloadModel()->addScript(
-            new ExternalAsset(self::JS_SCRIPT),
+            new WebAsset(self::JS_SCRIPT),
             AssetPreloader::REL_PRELOAD,
             "imgur-embed-script-asset"
         );

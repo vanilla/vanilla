@@ -33,6 +33,8 @@ interface IProps {
     onKeyPress?: (e) => void;
     // The ID of the real place the modal is mounted.
     realRootID: string;
+    // If enabled, regardless of content, modal's height will be fixed to max
+    isFixHeight?: boolean;
 }
 
 /**
@@ -190,6 +192,7 @@ export function ModalView(props: IProps) {
                                     isSmall: size === ModalSizes.SMALL,
                                     isShadowed: size === ModalSizes.LARGE || ModalSizes.MEDIUM || ModalSizes.SMALL,
                                     noTransform: removeTransform,
+                                    isFixHeight: props.isFixHeight,
                                 },
                                 props.className,
                             )}

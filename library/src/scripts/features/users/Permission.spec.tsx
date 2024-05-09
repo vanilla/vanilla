@@ -11,8 +11,9 @@ import { render, fireEvent, waitFor, screen } from "@testing-library/react";
 import React, { ReactElement } from "react";
 import { PermissionsContextProvider } from "@library/features/users/PermissionsContext";
 import "@testing-library/jest-dom";
+import { vitest } from "vitest";
 
-jest.mock("@library/apiv2");
+vitest.mock("@library/apiv2");
 
 const renderWithClear: typeof render = (ui: ReactElement): any => {
     document.body.innerHTML = "";

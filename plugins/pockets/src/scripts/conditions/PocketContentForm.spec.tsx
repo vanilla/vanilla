@@ -6,8 +6,7 @@
 import { render, screen } from "@testing-library/react";
 import { PocketContentForm } from "./PocketContentForm";
 import { mockAPI } from "@library/__tests__/utility";
-
-jest.setTimeout(20000);
+import MockAdapter from "axios-mock-adapter/types";
 
 describe("Pocket Content Form", () => {
     const mockPartialWidgetSchema = {
@@ -147,9 +146,12 @@ describe("Pocket Content Form", () => {
         titleType: "static",
     };
 
-    const mockAdapter = mockAPI();
-    mockAdapter.onGet("/widgets").reply(200, []);
-    mockAdapter.onGet("/widgets/list-discussions").reply(200, mockPartialWidgetSchema);
+    let mockAdapter: MockAdapter;
+    beforeEach(() => {
+        mockAdapter = mockAPI();
+        mockAdapter.onGet("/widgets").reply(200, []);
+        mockAdapter.onGet("/widgets/list-discussions").reply(200, mockPartialWidgetSchema);
+    });
 
     it("Discussion List Widget - initial values are correctly populated in pocket content form", async () => {
         render(

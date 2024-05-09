@@ -11,7 +11,7 @@ import { DropDownPanelNav } from "@library/flyouts/panelNav/DropDownPanelNav";
 import { useTitleBarDevice, TitleBarDevices } from "@library/layout/TitleBarContext";
 import { useCollisionDetector } from "@vanilla/react-utils";
 import { RecordID, stableObjectHash } from "@vanilla/utils";
-import omit from "lodash/omit";
+import omit from "lodash-es/omit";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
 /** Supported Component Types */

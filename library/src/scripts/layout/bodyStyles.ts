@@ -9,7 +9,7 @@ import { useThemeCache } from "@library/styles/themeCache";
 import { percent, viewHeight } from "csx";
 import { ColorsUtils } from "@library/styles/ColorsUtils";
 import { homePageVariables } from "@library/layout/homePageStyles";
-import isEmpty from "lodash/isEmpty";
+import isEmpty from "lodash-es/isEmpty";
 import { CSSObject, injectGlobal } from "@emotion/css";
 import { Mixins } from "@library/styles/Mixins";
 import { useEffect } from "react";

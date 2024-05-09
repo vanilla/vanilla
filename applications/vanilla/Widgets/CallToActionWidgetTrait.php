@@ -90,36 +90,62 @@ trait CallToActionWidgetTrait
         ];
 
         $buttonSchema = [
-            "title:s" => [
-                "description" => "Set button text.",
-                "default" => "Button",
-            ],
-            "type:s" => [
-                "enum" => ["standard", "primary", "text"],
-                "description" => "Describe what type of button the widget should have.",
-                "default" => "primary",
+            "shouldUseButton:b" => [
+                "description" => "Should a button be used in this CTA?",
+                "default" => true,
+                "x-control" => SchemaForm::toggle(
+                    new FormOptions(
+                        "Should use button?",
+                        "Use a button in this CTA.",
+                        "",
+                        "If a URL is provided and Use Button is disabled, the entire CTA area will become linked."
+                    )
+                ),
             ],
         ];
 
         if (!$isGuestCTASchema) {
-            $buttonSchema["title:s"]["x-control"] = SchemaForm::textBox(
-                new FormOptions("Title", "Set a custom title.")
+            $buttonSchema["url:s?"]["description"] = "Set button url.";
+            $buttonSchema["url:s?"]["x-control"] = SchemaForm::textBox(
+                new FormOptions("URL", "Set a button url to be redirected to.")
             );
+            $buttonSchema["title:s"]["description"] = "Set button text.";
+            $buttonSchema["title:s"]["default"] = "Button";
+            $buttonSchema["title:s"]["x-control"] = SchemaForm::textBox(
+                new FormOptions("Title", "Set a custom title."),
+                "text",
+                new FieldMatchConditional(
+                    "button.shouldUseButton",
+                    Schema::parse([
+                        "type" => "boolean",
+                        "const" => true,
+                    ])
+                )
+            );
+            $buttonSchema["type:s"]["description"] = "Describe what type of button the widget should have.";
+            $buttonSchema["type:s"]["default"] = "primary";
+            $buttonSchema["type:s"]["enum"] = ["standard", "primary", "text"];
             $buttonSchema["type:s"]["x-control"] = SchemaForm::dropDown(
                 new FormOptions("Button Type", "Choose widget button type", "Style Guide Default"),
                 new StaticFormChoices([
                     "standard" => "Secondary",
                     "primary" => "Primary",
                     "text" => "Text",
-                ])
-            );
-            $buttonSchema["url:s"]["description"] = "Set button url.";
-            $buttonSchema["url:s"]["x-control"] = SchemaForm::textBox(
-                new FormOptions("URL", "Set a button url to be redirected to.")
+                ]),
+                new FieldMatchConditional(
+                    "button.shouldUseButton",
+                    Schema::parse([
+                        "type" => "boolean",
+                        "const" => true,
+                    ])
+                )
             );
         } else {
             //first button
+            $buttonSchema["title:s"]["description"] = "Set button text.";
             $buttonSchema["title:s"]["default"] = "Sign In";
+            $buttonSchema["type:s"]["description"] = "Describe what type of button the widget should have.";
+            $buttonSchema["type:s"]["default"] = "primary";
             $buttonSchema["type:s"]["x-control"] = SchemaForm::dropDown(
                 new FormOptions("Sign In Button Type", "Choose widget button type", "Style Guide Default"),
                 new StaticFormChoices([
@@ -148,7 +174,7 @@ trait CallToActionWidgetTrait
 
         $schema["button?"] = Schema::parse($buttonSchema)->setField(
             "x-control",
-            SchemaForm::section(new FormOptions("Buttons"))
+            SchemaForm::section(new FormOptions("Link"))
         );
 
         $schema["background?"] = Schema::parse([

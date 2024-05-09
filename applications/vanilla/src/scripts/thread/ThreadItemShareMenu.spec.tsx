@@ -8,9 +8,10 @@ import { ToastProvider } from "@library/features/toaster/ToastContext";
 import { RenderResult, act, fireEvent, render } from "@testing-library/react";
 import { ThreadItemContextProvider } from "@vanilla/addon-vanilla/thread/ThreadItemContext";
 import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
+import { vitest } from "vitest";
 import ThreadItemShareMenu from "./ThreadItemShareMenu";
 
-const mockWriteText = jest.fn().mockImplementation(async () => {});
+const mockWriteText = vitest.fn().mockImplementation(async () => {});
 
 Object.assign(navigator, {
     clipboard: {

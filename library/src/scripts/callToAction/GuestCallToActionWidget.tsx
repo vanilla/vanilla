@@ -14,12 +14,13 @@ interface IProps extends React.ComponentProps<typeof CallToActionWidget> {}
 export default function GuestCallToActionWidget(props: IProps) {
     const signInLink = useSignInLink();
     const registerLink = useRegisterLink();
-    let widgetProps = {
+    let widgetProps: React.ComponentProps<typeof CallToActionWidget> = {
         ...props,
         button: {
             title: props.button?.title ?? t("Sign In"),
             type: props.button?.type ?? ButtonTypes.PRIMARY,
             url: signInLink,
+            shouldUseButton: true,
         },
     };
 

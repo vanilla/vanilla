@@ -4840,7 +4840,7 @@ output {
           user-select: none;
   overflow: hidden;
   cursor: pointer;
-  background-color: transparent;
+  background-color: #fff;
   color: #555a62;
   border-width: 1px;
   border-radius: 6px;

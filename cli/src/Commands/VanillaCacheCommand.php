@@ -34,6 +34,7 @@ class VanillaCacheCommand extends Console\Command\Command
     {
         ComposerHelper::clearPhpCache();
         ComposerHelper::clearTwigCache();
+        ComposerHelper::clearJsDepsCache();
         $addonManager = new AddonManager(AddonManager::getDefaultScanDirectories(), PATH_CACHE);
         $addonManager->ensureMultiCache();
         return 0;

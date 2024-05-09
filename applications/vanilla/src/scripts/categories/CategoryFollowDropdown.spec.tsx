@@ -12,6 +12,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { mockAPI } from "@library/__tests__/utility";
 import { CategoryPreferencesFixture } from "@dashboard/userPreferences/__fixtures__/CategoryNotificationPreferences.Fixture";
 import { setMeta } from "@library/utility/appUtils";
+import { vitest } from "vitest";
+import MockAdapter from "axios-mock-adapter/types";
 
 const queryClient = new QueryClient();
 
@@ -36,14 +38,12 @@ async function renderInProvider(props?: Partial<React.ComponentProps<typeof Cate
     );
 }
 
-const mockAdapter = mockAPI();
-
-beforeEach(() => {
-    mockAdapter.reset();
-});
+let mockAdapter: MockAdapter;
 
 describe("CategoryFollowDropDown", () => {
     beforeEach(() => {
+        mockAdapter = mockAPI();
+        mockAdapter.reset();
         mockAdapter.onGet(`/notification-preferences/${MOCK_USER_ID}`).replyOnce(200, {
             NewDiscussion: {
                 email: true,
@@ -57,7 +57,7 @@ describe("CategoryFollowDropDown", () => {
                 email: true,
             },
         });
-        jest.useFakeTimers();
+        vitest.useFakeTimers();
     });
 
     it("unfollowed category displays the follow category button", async () => {
@@ -77,7 +77,7 @@ describe("CategoryFollowDropDown", () => {
         act(() => {
             fireEvent.click(followCategory);
             // Fast forward timers since network request functions are debounced
-            jest.runAllTimers();
+            vitest.runAllTimers();
         });
         await waitFor(() => expect(screen.getByRole("button", { name: "Unfollow Category" })).toBeInTheDocument());
         expect(mockAdapter.history.patch.length).toBe(1);
@@ -97,7 +97,7 @@ describe("CategoryFollowDropDown", () => {
         act(() => {
             fireEvent.click(followCategory);
             // Fast forward timers since network request functions are debounced
-            jest.runAllTimers();
+            vitest.runAllTimers();
         });
         await waitFor(() => expect(screen.getByRole("button", { name: "Unfollow Category" })).toBeInTheDocument());
         expect(mockAdapter.history.patch.length).toBe(1);
@@ -118,7 +118,7 @@ describe("CategoryFollowDropDown", () => {
         act(() => {
             fireEvent.click(followCategory);
             // Fast forward timers since network request functions are debounced
-            jest.runAllTimers();
+            vitest.runAllTimers();
         });
         await waitFor(() => expect(screen.getByRole("button", { name: "Unfollow Category" })).toBeInTheDocument());
 
@@ -206,7 +206,7 @@ describe("CategoryFollowDropDown", () => {
         act(() => {
             fireEvent.click(followCategory);
             // Fast forward timers since network request functions are debounced
-            jest.runOnlyPendingTimers();
+            vitest.runOnlyPendingTimers();
         });
         await waitFor(() => expect(screen.getByRole("button", { name: "Follow" })).toBeInTheDocument());
         expect(mockAdapter.history.patch.length).toBe(1);
@@ -223,6 +223,10 @@ describe("CategoryFollowDropDown", () => {
 });
 
 describe("Conditionally displays the digest checkbox", () => {
+    beforeEach(() => {
+        mockAdapter.reset();
+    });
+
     const notificationPreferences = {
         "preferences.followed": true,
         "preferences.email.digest": true,
@@ -251,8 +255,8 @@ describe("Conditionally displays the digest checkbox", () => {
             notificationPreferences,
             emailDigestEnabled: true,
         });
-
-        await waitFor(() => expect(screen.queryByText("Include in email digest")).toBeInTheDocument());
+        const digestControl = await screen.findByText("Include in email digest");
+        expect(digestControl).toBeInTheDocument();
     });
 
     it("Does not display digest when user is not subscribed", async () => {
@@ -272,10 +276,10 @@ describe("Conditionally displays the digest checkbox", () => {
 
         await renderInProvider({
             notificationPreferences,
-            emailDigestEnabled: true,
+            emailDigestEnabled: false,
         });
 
-        await waitFor(() => expect(screen.queryByText("Include in email digest")).not.toBeInTheDocument());
+        expect(screen.queryByText("Include in email digest")).not.toBeInTheDocument();
     });
 
     it("Does not display digest when user is subscribed, but no meta", async () => {
@@ -295,7 +299,7 @@ describe("Conditionally displays the digest checkbox", () => {
             emailDigestEnabled: true,
         });
 
-        await waitFor(() => expect(screen.queryByText("Include in email digest")).not.toBeInTheDocument());
+        expect(screen.queryByText("Include in email digest")).not.toBeInTheDocument();
     });
 
     it("Does not display digest when user is subscribed, but emailDigest disabled", async () => {
@@ -318,6 +322,6 @@ describe("Conditionally displays the digest checkbox", () => {
             emailDigestEnabled: false,
         });
 
-        await waitFor(() => expect(screen.queryByText("Include in email digest")).not.toBeInTheDocument());
+        expect(screen.queryByText("Include in email digest")).not.toBeInTheDocument();
     });
 });

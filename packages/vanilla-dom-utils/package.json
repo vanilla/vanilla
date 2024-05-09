@@ -6,9 +6,7 @@
     "license": "MIT",
     "dependencies": {
         "@vanilla/utils": "^3.0.1",
-        "focus-visible": "4.1.5",
-        "smoothscroll-polyfill": "0.4.4",
-        "twemoji": "2.5.1"
+        "focus-visible": "4.1.5"
     },
     "devDependencies": {
         "@vanilla/tsconfig": "^3.0.1"
@@ -17,6 +15,6 @@
         "access": "public"
     },
     "peerDependencies": {
-        "lodash": "*"
+        "lodash-es": "*"
     }
 }

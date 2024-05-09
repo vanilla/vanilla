@@ -7,7 +7,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import qs from "qs";
 import { useHistory, useLocation } from "react-router";
-import debounce from "lodash/debounce";
+import debounce from "lodash-es/debounce";
 import History from "history";
 import { useLastValue } from "@vanilla/react-utils";
 import { Uri } from "monaco-editor";

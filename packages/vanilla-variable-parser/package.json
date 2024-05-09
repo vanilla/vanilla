@@ -20,7 +20,7 @@
         "@vanilla/tsconfig": "^3.0.1"
     },
     "peerDependencies": {
-        "lodash": "*"
+        "lodash-es": "*"
     },
     "scripts": {
         "test:unit": "jest"

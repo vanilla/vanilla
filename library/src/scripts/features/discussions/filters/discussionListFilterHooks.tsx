@@ -10,9 +10,9 @@ import { IError } from "@library/errorPages/CoreErrorMessages";
 import { useQuery } from "@tanstack/react-query";
 import { ITag } from "@library/features/tags/TagsReducer";
 import { IComboBoxOption } from "@library/features/search/ISearchBarProps";
-import sortBy from "lodash/sortBy";
+import sortBy from "lodash-es/sortBy";
 import { IGroupOption } from "@library/forms/select/Tokens.loadable";
-import { getMeta } from "@library/utility/appUtils";
+import { getMeta, t } from "@library/utility/appUtils";
 import { useConfigsByKeys } from "@library/config/configHooks";
 import { LoadStatus } from "@library/@types/api/core";
 
@@ -45,21 +45,22 @@ export function useTagOptions(): IComboBoxOption[] {
     return options;
 }
 
-/**
- * Get a list of discussions types as combo box options and display types if addon is enabled
- */
-const PLUGIN_LIST = {
-    "plugins.qna": { label: "Question", value: "Question" },
-    "plugins.ideation": { label: "Idea", value: "Idea" },
-    "plugins.polls": { label: "Poll", value: "Poll" },
-};
 export function useTypeOptions(): IComboBoxOption[] {
+    /**
+     * Get a list of discussions types as combo box options and display types if addon is enabled
+     */
+    const PLUGIN_LIST = {
+        "plugins.qna": { label: t("Question"), value: "Question" },
+        "plugins.ideation": { label: t("Idea"), value: "Idea" },
+        "plugins.polls": { label: t("Poll"), value: "Poll" },
+    };
+
     const { status, data }: { status: LoadStatus; data?: Record<string, boolean> } = useConfigsByKeys(
         Object.keys(PLUGIN_LIST),
     );
 
     const options = useMemo<IComboBoxOption[]>(() => {
-        const tmpList: IComboBoxOption[] = [{ label: "Discussion", value: "Discussion" }];
+        const tmpList: IComboBoxOption[] = [{ label: t("Discussion"), value: "Discussion" }];
 
         if (status === LoadStatus.SUCCESS && data) {
             Object.entries(PLUGIN_LIST).forEach(([key, option]) => {
@@ -79,7 +80,7 @@ export function useTypeOptions(): IComboBoxOption[] {
  * Get a list of discussion statuses as combo box options
  */
 export function useStatusOptions(internal?: boolean): IGroupOption[] | IComboBoxOption[] {
-    const { isSuccess, data } = useQuery<any, IError, Array<Record<string, any>>>({
+    const query = useQuery<any, IError, Array<Record<string, any>>>({
         queryKey: ["discussionStatuses"],
         queryFn: async () => {
             const { data } = await apiv2.get("/discussions/statuses");
@@ -87,19 +88,21 @@ export function useStatusOptions(internal?: boolean): IGroupOption[] | IComboBox
         },
     });
 
+    const { data, isSuccess } = query;
+
     const options = useMemo<IGroupOption[] | IComboBoxOption[]>(() => {
         if (isSuccess) {
             const statusMap: Record<string, any> = {
                 question: {
-                    label: "Q & A",
+                    label: t("Q & A"),
                     options: [],
                 },
                 ideation: {
-                    label: "Ideas",
+                    label: t("Ideas"),
                     options: [],
                 },
                 internal: {
-                    label: "Resolution Status",
+                    label: t("Resolution Status"),
                     options: [],
                 },
             };
@@ -108,7 +111,7 @@ export function useStatusOptions(internal?: boolean): IGroupOption[] | IComboBox
                 if (statusID > 0) {
                     statusMap[isInternal ? "internal" : recordSubtype].options.push({
                         value: statusID,
-                        label: name,
+                        label: t(name),
                     });
                 }
             });

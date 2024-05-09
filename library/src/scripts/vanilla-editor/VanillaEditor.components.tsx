@@ -46,7 +46,7 @@ import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { ELEMENT_TABLE, ELEMENT_TD, ELEMENT_TH, ELEMENT_TR } from "@udecode/plate-table";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
-import debounce from "lodash/debounce";
+import debounce from "lodash-es/debounce";
 import "prismjs/components/prism-php";
 import React, { ElementType, useCallback, useEffect } from "react";
 import { Node } from "slate";

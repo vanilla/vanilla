@@ -6,8 +6,8 @@
 
 import * as React from "react";
 import produce from "immer";
-import get from "lodash/get";
-import set from "lodash/set";
+import get from "lodash-es/get";
+import set from "lodash-es/set";
 import { IControlProps, ISchemaRenderProps } from "./types";
 import { findAllReferences, validateConditions } from "./utils";
 import { stableObjectHash } from "@vanilla/utils";

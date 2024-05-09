@@ -26,15 +26,15 @@ import * as React from "react";
 import { useParams } from "react-router";
 import { DashboardSelect } from "@dashboard/forms/DashboardSelect";
 import { IFieldError, IServerError } from "@library/@types/api/core";
-import get from "lodash/get";
-import set from "lodash/set";
+import get from "lodash-es/get";
+import set from "lodash-es/set";
 
 import produce from "immer";
 import { authenticatorAddEditClasses } from "@oauth2/pages/AuthenticatorAddEdit.styles";
 import { useFormik } from "formik";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useState } from "react";
-import flatten from "lodash/flatten";
+import flatten from "lodash-es/flatten";
 import ErrorMessages from "@library/forms/ErrorMessages";
 import Message from "@library/messages/Message";
 import { ErrorIcon } from "@library/icons/common";

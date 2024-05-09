@@ -34,7 +34,7 @@ import {
 } from "@library/unsubscribe/unsubscribePageHooks";
 import { t } from "@library/utility/appUtils";
 import { useFormik } from "formik";
-import isEmpty from "lodash/isEmpty";
+import isEmpty from "lodash-es/isEmpty";
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { IUnsubscribeData, IUnsubscribeToken } from "@library/unsubscribe/unsubscribePage.types";

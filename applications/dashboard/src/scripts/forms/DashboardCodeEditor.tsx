@@ -6,11 +6,10 @@
 
 import { useFormGroup } from "@dashboard/forms/DashboardFormGroupContext";
 import { css } from "@emotion/css";
-import { IInputProps } from "@library/forms/InputTextBlock";
 import TextEditor from "@library/textEditor/TextEditor";
 import { mountReact } from "@vanilla/react-utils";
 import { logWarning } from "@vanilla/utils";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 interface IProps {
     value: string;
@@ -45,7 +44,7 @@ export function DashboardCodeEditor(props: IProps) {
                 language={language ?? "text/html"}
                 jsonSchemaUri={jsonSchemaUri}
                 value={value}
-                onChange={(e, value) => onChange(value ?? "")}
+                onChange={(value) => onChange(value ?? "")}
                 {...styleOverrides}
             />
         </div>

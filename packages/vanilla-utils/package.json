@@ -11,7 +11,7 @@
         "immer": "^2.0.0"
     },
     "peerDependencies": {
-        "lodash": "*"
+        "lodash-es": "*"
     },
     "publishConfig": {
         "access": "public"

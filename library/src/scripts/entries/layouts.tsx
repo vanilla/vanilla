@@ -8,7 +8,7 @@
 import React from "react";
 import { AppContext } from "@library/AppContext";
 import { ErrorPage } from "@library/errorPages/ErrorComponent";
-import { registerLayoutPage } from "@library/features/Layout/LayoutPage";
+import { registerLayoutPage } from "@library/features/Layout/LayoutPage.registry";
 import TitleBar from "@library/headers/TitleBar";
 
 import { Router } from "@library/Router";
@@ -30,6 +30,10 @@ import { SearchContextProvider } from "@library/contexts/SearchContext";
 import { CommunitySearchProvider } from "@vanilla/addon-vanilla/search/CommunitySearchProvider";
 import { AnalyticsData, onPageViewWithContext } from "@library/analytics/AnalyticsData";
 import { trackPageView } from "@library/analytics/tracking";
+import SectionFullWidth from "@library/layout/SectionFullWidth";
+import SectionOneColumn from "@library/layout/SectionOneColumn";
+import ThreeColumnSection from "@library/layout/ThreeColumnSection";
+import TwoColumnSection from "@library/layout/TwoColumnSection";
 
 // App Setup
 logDebug("Boot layout app");
@@ -64,20 +68,16 @@ addPageComponent(LayoutApp);
 logDebug("Register core widgets");
 registerWidgets({
     LayoutError,
+    SectionFullWidth,
+    SectionOneColumn,
+    SectionThreeColumns: ThreeColumnSection,
+    SectionTwoColumns: TwoColumnSection,
 });
 
 registerLoadableWidgets({
     // Sections
-    SectionFullWidth: () =>
-        import(/* webpackChunkName: "sections/SectionFullWidth" */ "@library/layout/SectionFullWidth"),
-    SectionOneColumn: () =>
-        import(/* webpackChunkName: "sections/SectionOneColumn" */ "@library/layout/SectionOneColumn"),
-    SectionTwoColumns: () =>
-        import(/* webpackChunkName: "sections/SectionTwoColumns" */ "@library/layout/TwoColumnSection"),
     SectionTwoColumnsEven: () =>
         import(/* webpackChunkName: "sections/SectionEvenColumns" */ "@library/layout/SectionEvenColumns"),
-    SectionThreeColumns: () =>
-        import(/* webpackChunkName: "sections/SectionThreeColumns" */ "@library/layout/ThreeColumnSection"),
     SectionThreeColumnsEven: () =>
         import(/* webpackChunkName: "sections/SectionEvenColumns" */ "@library/layout/SectionEvenColumns"),
     // Widgets

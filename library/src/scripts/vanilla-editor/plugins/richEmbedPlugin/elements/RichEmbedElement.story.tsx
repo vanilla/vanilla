@@ -1,18 +1,14 @@
-/**
- * @copyright 2009-2023 Vanilla Forums Inc.
- * @license GPL-2.0-only
- */
-
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { RichEmbedElement } from "@library/vanilla-editor/plugins/richEmbedPlugin/elements/RichEmbedElement";
 import { createVanillaEditor } from "@library/vanilla-editor/VanillaEditor.loadable";
 import { ELEMENT_RICH_EMBED_CARD } from "@library/vanilla-editor/plugins/richEmbedPlugin/types";
 
-const story = storiesOf("Embeds/Pieces", module);
+export default {
+    title: "Embeds/Pieces",
+};
 
-story.add("RichEmbedElement", () => {
+export const _RichEmbedElement = () => {
     return (
         <>
             <StoryHeading depth={1}>Loading error element when cannot get embed data</StoryHeading>
@@ -32,4 +28,8 @@ story.add("RichEmbedElement", () => {
             </RichEmbedElement>
         </>
     );
-});
+};
+
+_RichEmbedElement.story = {
+    name: "RichEmbedElement",
+};

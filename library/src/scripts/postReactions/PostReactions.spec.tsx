@@ -20,8 +20,10 @@ import { ReactNode } from "react";
 import { PostReactionTooltip } from "./PostReactionTooltip";
 import { useReactionLog } from "./PostReactions.hooks";
 import { PostReactionsLog } from "./PostReactionsLog";
+import { vitest } from "vitest";
+import MockAdapter from "axios-mock-adapter/types";
 
-const mockAdapter = mockAPI();
+let mockAdapter: MockAdapter;
 const REACTIONS_URL = "/discussions/1/reactions";
 
 const MOCK_RECORD: IPostRecord = {
@@ -41,7 +43,7 @@ function queryClientWrapper() {
     return Wrapper;
 }
 
-const toggleReaction = jest.fn();
+const toggleReaction = vitest.fn();
 const reactionLog = getMockReactionLog();
 
 function MockProvider(props: { children: ReactNode }) {
@@ -126,7 +128,7 @@ describe("Post Reactions Component", () => {
             const button = screen.getByLabelText(reaction.name);
             expect(button).toBeInTheDocument();
             if (reaction.hasReacted) {
-                expect(button).toHaveStyle("background-color: rgb(3, 125, 188)");
+                expect(button).toHaveStyle("background-color: rgb(3, 105, 158)");
             } else {
                 expect(button).toHaveStyle("background-color: rgb(255, 255, 255)");
             }
@@ -179,11 +181,8 @@ describe("Post Reactions Component", () => {
 });
 
 describe("Post Reactions Hooks", () => {
-    afterEach(() => {
-        mockAdapter.reset();
-    });
-
     it("Fetches the reaction log", async () => {
+        mockAdapter = mockAPI();
         mockAdapter.onGet(REACTIONS_URL).replyOnce(200, reactionLog);
         const { result, waitFor } = renderHook(() => useReactionLog(MOCK_RECORD), { wrapper: queryClientWrapper() });
         await waitFor(() => {

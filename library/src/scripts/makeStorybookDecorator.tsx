@@ -5,8 +5,11 @@
 
 import React from "react";
 import { StoryContextProvider } from "@library/storybook/StoryContext";
+import * as i18n from "@vanilla/i18n";
 
 export function makeStorybookDecorator() {
+    i18n.loadLocales([]);
+
     return function StorybookDecorator(storyFn) {
         return <StoryContextProvider>{storyFn()}</StoryContextProvider>;
     };

@@ -18,7 +18,7 @@ use Vanilla\Dashboard\Controllers\API\LayoutsApiController;
 use Vanilla\Exception\PermissionException;
 use Vanilla\Http\InternalClient;
 use Vanilla\Layout\Asset\LayoutQuery;
-use Vanilla\Web\Asset\ExternalAsset;
+use Vanilla\Web\Asset\WebAsset;
 use Vanilla\Web\JsInterpop\RawReduxAction;
 use Vanilla\Web\ThemedPage;
 
@@ -96,7 +96,7 @@ class LayoutPage extends ThemedPage
 
         // Our layout needs all of these assets
         foreach ($layoutWidgetAssets["js"] as $scriptPath) {
-            $this->addScript(new ExternalAsset($scriptPath));
+            $this->addScript(new WebAsset($scriptPath, true));
         }
 
         foreach ($layoutWidgetAssets["css"] as $cssPath) {

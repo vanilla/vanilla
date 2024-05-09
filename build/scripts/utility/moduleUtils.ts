@@ -4,29 +4,11 @@
  * @license GPL-2.0-only
  */
 
-import { getOptions } from "../buildOptions";
-import { print, fail } from "./utils";
 import { spawn } from "child_process";
 import fse from "fs-extra";
 import path from "path";
 import { DIST_DIRECTORY, VANILLA_ROOT } from "../env";
-
-/**
- * Install dependancies for all requirements.
- *
- * @param options
- */
-export async function installYarn() {
-    const options = await getOptions();
-
-    try {
-        print(`Installing node_modules with yarn.`);
-        const spawnOptions = options.verbose ? { stdio: "inherit" } : {};
-        await spawnChildProcess("yarn", ["install", "--frozen-lockfile"], spawnOptions);
-    } catch (err) {
-        fail(`\nNode module installation failed.\n    ${err}\n`);
-    }
-}
+import { print } from "./utils";
 
 /**
  * Copy files from the monaco editor the dist directory.

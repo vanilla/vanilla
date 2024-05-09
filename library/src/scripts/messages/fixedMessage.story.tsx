@@ -99,5 +99,5 @@ function MessageStory() {
 }
 
 export function MessageFixedPosition() {
-    <MessageStory />;
+    return <MessageStory />;
 }

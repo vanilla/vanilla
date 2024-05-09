@@ -7,10 +7,11 @@ import React from "react";
 import { fireEvent, render, waitFor, screen, act } from "@testing-library/react";
 import EmbedFlyout from "@library/editor/flyouts/EmbedFlyout";
 import { supportsFrames } from "@library/embeddedContent/IFrameEmbed";
+import { vitest } from "vitest";
 
 describe("Embed Flyout", () => {
     it("Render flyout and ensure we properly clear input after submit.", async () => {
-        jest.useFakeTimers();
+        vitest.useFakeTimers();
         render(<EmbedFlyout createEmbed={(url) => {}} createIframe={(options) => {}} />);
 
         const insertMediaButton = screen.getByRole("button", {
@@ -36,7 +37,7 @@ describe("Embed Flyout", () => {
         //lets input some text and submit
         await act(async () => {
             fireEvent.change(screen.getByRole("textbox"), { target: { value: "youtube.com" } });
-            jest.advanceTimersByTime(500);
+            vitest.advanceTimersByTime(500);
         });
         await waitFor(() => {
             expect(screen.getByRole("textbox").getAttribute("value")).toBe("youtube.com");
@@ -62,9 +63,9 @@ describe("Embed Flyout", () => {
     });
 
     it("Properly handle iframe creation", async () => {
-        jest.useFakeTimers();
+        vitest.useFakeTimers();
         supportsFrames(true);
-        const createIframe = jest.fn();
+        const createIframe = vitest.fn();
 
         // Boilerplate to render the flyout
         const { container } = render(<EmbedFlyout createEmbed={(url) => {}} createIframe={createIframe} />);
@@ -76,7 +77,7 @@ describe("Embed Flyout", () => {
         expect(insertMediaButton).toBeInTheDocument();
         fireEvent.click(insertMediaButton);
 
-        const urlInput = container.querySelectorAll("textarea")[0];
+        const urlInput = container.getElementsByTagName("textarea")[0];
 
         await waitFor(() => {
             expect(urlInput).toBeInTheDocument();
@@ -95,13 +96,12 @@ describe("Embed Flyout", () => {
             fireEvent.change(screen.getByRole("textbox"), {
                 target: { value: iframeCode },
             });
-            jest.advanceTimersByTime(500);
+            vitest.advanceTimersByTime(500);
         });
-        await waitFor(() => {
-            expect(urlInput.value).toBe(iframeCode);
-            fireEvent.click(insertButton);
-            jest.advanceTimersByTime(500);
-        });
+
+        expect(urlInput.value).toBe(iframeCode);
+        fireEvent.click(insertButton);
+        vitest.advanceTimersByTime(500);
 
         // Validate attributes have been extracted
         expect(createIframe).toHaveBeenCalledWith({ url: "https://www.youtube.com", width: "560", height: "315" });

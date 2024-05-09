@@ -36,6 +36,10 @@ export function useSwaggerUI(_options: { url?: string; spec?: object; [key: stri
     }, [tryIt]);
 
     useEffect(() => {
+        if (process.env.NODE_ENV === "test") {
+            // Swagger doesn't run properly in vitest.
+            return;
+        }
         importSwagger().then((SwaggerUIConstructor) => {
             replaceDeepLinkScrolling(SwaggerUIConstructor);
             if (swaggerRef.current) {

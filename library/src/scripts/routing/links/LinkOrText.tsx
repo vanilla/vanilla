@@ -50,7 +50,12 @@ export function LinkOrText(props: IProps) {
         // Text only
         const Tag = (tag || "span") as "span";
         return (
-            <Tag id={id} title={outputLabel} {...passThrough} className={classNames(props.className, props.textClass)}>
+            <Tag
+                id={id}
+                title={outputLabel}
+                {...(passThrough as any)}
+                className={classNames(props.className, props.textClass)}
+            >
                 {outputLabel}
             </Tag>
         );

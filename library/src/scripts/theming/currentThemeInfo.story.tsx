@@ -5,12 +5,13 @@
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { IThemePreview, ThemeType } from "@library/theming/themeReducer";
-import { storiesOf } from "@storybook/react";
 import React from "react";
 import CurrentThemeInfo from "./CurrentThemeInfo";
 import ThemePreviewCard from "./ThemePreviewCard";
 
-const story = storiesOf("Theme UI", module);
+export default {
+    title: "Theme UI",
+};
 
 const preview: IThemePreview = {
     variables: {
@@ -30,7 +31,7 @@ const preview: IThemePreview = {
     imageUrl: null,
 };
 
-story.add("Current Theme", () => {
+export const CurrentTheme = () => {
     return (
         <>
             <StoryHeading depth={1}>Current Theme</StoryHeading>
@@ -56,4 +57,4 @@ story.add("Current Theme", () => {
             </div>
         </>
     );
-});
+};

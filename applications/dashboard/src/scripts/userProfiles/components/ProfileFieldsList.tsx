@@ -25,7 +25,7 @@ import { LoadingRectangle } from "@library/loaders/LoadingRectangle";
 import { visibility } from "@library/styles/styleHelpersVisibility";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
-import sortBy from "lodash/sortBy";
+import sortBy from "lodash-es/sortBy";
 import React, { useMemo, useState } from "react";
 import ConditionalWrap from "@library/layout/ConditionalWrap";
 import { ToolTip } from "@library/toolTip/ToolTip";

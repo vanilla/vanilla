@@ -9,7 +9,7 @@ import CheckBox from "@library/forms/Checkbox";
 import { t } from "@vanilla/i18n";
 import ReactDOM from "react-dom";
 import React, { useLayoutEffect, useRef, useState } from "react";
-import intersection from "lodash/intersection";
+import intersection from "lodash-es/intersection";
 import { discussionListClasses } from "@library/features/discussions/DiscussionList.classes";
 import { IDiscussion } from "@dashboard/@types/api/discussion";
 

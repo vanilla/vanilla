@@ -26,6 +26,7 @@ interface ICTALink {
 
 interface IProps {
     to: string;
+    shouldUseButton?: boolean;
     textCTA: string;
     title: string;
     otherCTAs?: ICTALink[];
@@ -44,6 +45,7 @@ export function CallToAction(props: IProps) {
     const imageItemMeasure = useMeasure(imageItemRef, false, true);
     const options = callToActionVariables(props.options).options;
     const ctaClasses = callToActionClasses(props.options);
+    const shouldUseButton = props.shouldUseButton ?? true;
 
     let multipleLinks: any = undefined;
     if (props.otherCTAs) {
@@ -83,10 +85,17 @@ export function CallToAction(props: IProps) {
         ...backgroundUrlSrcSet,
     };
 
+    const isLink = !shouldUseButton && props.to !== "";
+    const AnchorOrDiv = isLink ? "a" : "div";
+    const anchorOrDivProps = shouldUseButton ? {} : { href: props.to };
+
     return (
         <Widget>
             {showContent && (
-                <div className={cx(ctaClasses.root, props.className)}>
+                <AnchorOrDiv
+                    {...anchorOrDivProps}
+                    className={cx(ctaClasses.root, props.className, { [ctaClasses.containerLink]: !!isLink })}
+                >
                     <div className={ctaClasses.container}>
                         {backgroundFromOption?.image && (
                             <img className={ctaClasses.image} {...backgroundImageProps} role="presentation" />
@@ -121,7 +130,9 @@ export function CallToAction(props: IProps) {
                                     {typeof props.description === "string" ? t(props.description) : props.description}
                                 </div>
                             )}
-                            {!multipleLinks &&
+                            {shouldUseButton &&
+                                props.to &&
+                                !multipleLinks &&
                                 (props.customCTA ? (
                                     props.customCTA
                                 ) : (
@@ -133,10 +144,12 @@ export function CallToAction(props: IProps) {
                                         {t(props.textCTA ?? "")}
                                     </LinkAsButton>
                                 ))}
-                            {multipleLinks && <div className={ctaClasses.linksWrapper}>{multipleLinks}</div>}
+                            {shouldUseButton && multipleLinks && (
+                                <div className={ctaClasses.linksWrapper}>{multipleLinks}</div>
+                            )}
                         </div>
                     </div>
-                </div>
+                </AnchorOrDiv>
             )}
         </Widget>
     );

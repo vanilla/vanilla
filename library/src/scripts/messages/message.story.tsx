@@ -4,7 +4,6 @@
  */
 
 import { StoryHeading } from "@library/storybook/StoryHeading";
-import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import { StoryContent } from "@library/storybook/StoryContent";
 import Message from "@library/messages/Message";
@@ -16,14 +15,16 @@ import { t } from "@library/utility/appUtils";
 import SmartLink from "@library/routing/links/SmartLink";
 import { Icon } from "@vanilla/icons";
 
-const story = storiesOf("Alerts", module);
+export default {
+    title: "Alerts",
+};
 
 const shortMessage = `Something went wrong while contacting the server.`;
 const message = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus.`;
 const longMessage = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce blandit lorem ac dui porta, scelerisque placerat felis finibus. Fusce vitae porttitor augue. Integer sagittis justo vitae nibh aliquet, a viverra ipsum laoreet. Interdum et malesuada fames ac ante ipsum primis in faucibus.
 `;
 
-story.add("Message", () => {
+export const _Message = () => {
     const classesMessages = messagesClasses();
 
     return (
@@ -243,4 +244,4 @@ story.add("Message", () => {
             </StoryContent>
         </>
     );
-});
+};

@@ -7,8 +7,8 @@ import { IComboBoxOption } from "@library/features/search/SearchBar";
 import SelectOne, { ISelectOneProps } from "@library/forms/select/SelectOne";
 import { t } from "@vanilla/i18n";
 import { notEmpty } from "@vanilla/utils";
-import debounce from "lodash/debounce";
-import get from "lodash/get";
+import debounce from "lodash-es/debounce";
+import get from "lodash-es/get";
 import React, { useCallback, useDebugValue, useEffect, useRef, useState } from "react";
 
 export interface ILookupApi {

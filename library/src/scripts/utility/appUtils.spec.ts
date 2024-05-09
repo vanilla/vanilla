@@ -37,14 +37,14 @@ describe("metaDataFunctions", () => {
     });
 });
 
+function stubLocation(url: string) {
+    // @ts-ignore
+    delete window.location;
+    window.location = new URL("https://mysite.com") as any;
+}
+
 describe("formatUrl", () => {
     let location = window.location;
-
-    function stubLocation(url: string) {
-        // @ts-ignore
-        delete window.location;
-        window.location = new URL("https://mysite.com") as any;
-    }
 
     afterEach(() => {
         window.location = location;
@@ -128,15 +128,16 @@ describe("isUrl", () => {
 
 describe("makeProfileUrl", () => {
     beforeEach(() => {
+        stubLocation("https://mysite.com");
         application.setMeta("context.basePath", "/test");
     });
     it("can make a simple url", () => {
-        expect(application.makeProfileUrl(6, "hello")).toBe("http://localhost/test/profile/6/hello");
+        expect(application.makeProfileUrl(6, "hello")).toBe("https://mysite.com/test/profile/6/hello");
     });
 
     it("can encoded various url characters", () => {
         expect(application.makeProfileUrl(6, "hello-$%^^*()")).toBe(
-            "http://localhost/test/profile/6/hello-%24%25%5E%5E*()",
+            "https://mysite.com/test/profile/6/hello-%24%25%5E%5E*()",
         );
     });
 
@@ -144,7 +145,7 @@ describe("makeProfileUrl", () => {
         // These are double encoded for compatibility with quirks in our backed router.
         // The backend also encodes these characters this way in user urls (see \userUrl() and UserModel::getProfileUrl())
         expect(application.makeProfileUrl(6, "he&llo/user")).toBe(
-            "http://localhost/test/profile/6/he%2526llo%252fuser",
+            "https://mysite.com/test/profile/6/he%2526llo%252fuser",
         );
     });
 });

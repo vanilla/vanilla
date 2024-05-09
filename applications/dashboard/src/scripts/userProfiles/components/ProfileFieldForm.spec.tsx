@@ -7,11 +7,10 @@ import React from "react";
 import { render } from "@testing-library/react";
 import { ProfileFieldsFixtures } from "@dashboard/userProfiles/components/ProfileFields.fixtures";
 import ProfileFieldForm from "@dashboard/userProfiles/components/ProfileFieldForm";
+import { vitest } from "vitest";
 
-jest.setTimeout(20000);
-
-const mockSubmit = jest.fn();
-const mockClose = jest.fn();
+const mockSubmit = vitest.fn();
+const mockClose = vitest.fn();
 
 describe("ProfileFieldForm", () => {
     it("Make display options checkboxes are rendered and have desired default values", async () => {

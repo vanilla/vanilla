@@ -3,7 +3,7 @@
  * @license gpl-2.0-only
  */
 
-import { extractDataByKeyLookup } from "@dashboard/layout/editor/LayoutEditorAddWidget";
+import { extractDataByKeyLookup } from "@dashboard/layout/editor/utils";
 import { EMPTY_SCHEMA, JsonSchema } from "@vanilla/json-schema-forms";
 
 describe("WidgetSettings", () => {
@@ -90,6 +90,7 @@ describe("WidgetSettings", () => {
                     level3_withDefault_value: true,
                     level3_withNested_value: {
                         level4_deeplyNested_default_value: true,
+                        level4_default_isNull: null,
                     },
                 },
             },

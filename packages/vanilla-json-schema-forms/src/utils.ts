@@ -1,9 +1,9 @@
 import { Condition, IFieldError, IPtrReference, JsonSchema } from "./types";
-import get from "lodash/get";
+import get from "lodash-es/get";
 import { logError, notEmpty } from "@vanilla/utils";
 import { FormikErrors } from "formik";
 import { ValidationResult, OutputUnit, Validator, Schema } from "@cfworker/json-schema";
-import cloneDeep from "lodash/cloneDeep";
+import cloneDeep from "lodash-es/cloneDeep";
 
 /**
  * Get a validation result

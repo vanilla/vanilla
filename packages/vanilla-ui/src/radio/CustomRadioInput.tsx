@@ -5,7 +5,7 @@
  */
 
 import { RecordID } from "@vanilla/utils";
-import uniqueId from "lodash/uniqueId";
+import uniqueId from "lodash-es/uniqueId";
 import React, { useContext, useDebugValue, useMemo, useRef, useState } from "react";
 import { CustomRadioGroupContext } from "./CustomRadioGroup";
 import { customRadioGroupClasses } from "./CustomRadioGroup.classes";

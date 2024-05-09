@@ -3,7 +3,7 @@ import { reducerWithInitialState } from "typescript-fsa-reducers";
 import { INITIAL_ROLE_REQUEST_STATE, IRoleRequestState } from "@dashboard/roleRequests/state/roleRequestTypes";
 import { RoleRequestActions } from "@dashboard/roleRequests/state/roleRequestActions";
 import { LoadStatus } from "@library/@types/api/core";
-import keyBy from "lodash/keyBy";
+import keyBy from "lodash-es/keyBy";
 import { concatNewRows } from "@vanilla/utils/src/apiUtils";
 
 export const RoleRequestReducer = produce(

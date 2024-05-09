@@ -39,7 +39,7 @@ import ModalConfirm from "@library/modal/ModalConfirm";
 import { MetaItem, Metas } from "@library/metas/Metas";
 import { css, cx } from "@emotion/css";
 import { CategoryPreferencesTable } from "@library/preferencesTable/CategoryPreferencesTable";
-import omit from "lodash/omit";
+import omit from "lodash-es/omit";
 import { logDebug, notEmpty } from "@vanilla/utils";
 
 interface IProps {

@@ -8,6 +8,7 @@ import React from "react";
 import { LayoutThumbnailsModal } from "@dashboard/layout/editor/thumbnails/LayoutThumbnailsModal";
 import { fireEvent, render, waitFor } from "@testing-library/react";
 import { LayoutEditorFixture } from "@dashboard/layout/editor/__fixtures__/LayoutEditor.fixtures";
+import { vitest } from "vitest";
 
 const MOCK_WIDGETS = LayoutEditorFixture.widgetData([
     "react.article.articles",
@@ -17,8 +18,8 @@ const MOCK_WIDGETS = LayoutEditorFixture.widgetData([
 
 describe("LayoutThumbnailsModal", () => {
     it("onAddSection fires on form submit", () => {
-        const mockAddSection = jest.fn();
-        const { container } = render(
+        const mockAddSection = vitest.fn();
+        const { getByRole } = render(
             <LayoutThumbnailsModal
                 sections={MOCK_WIDGETS}
                 title="Choose your widget"
@@ -29,10 +30,8 @@ describe("LayoutThumbnailsModal", () => {
                 selectedSection="react.banner.content"
             />,
         );
-        waitFor(async () => {
-            const addButton = container.querySelector(`button[type="submit"]`);
-            addButton && fireEvent.click(addButton);
-            expect(mockAddSection.mock.calls.length).toBe(1);
-        });
+        const addButton = getByRole("button", { name: "Add" });
+        fireEvent.click(addButton);
+        expect(mockAddSection.mock.calls.length).toBe(1);
     });
 });

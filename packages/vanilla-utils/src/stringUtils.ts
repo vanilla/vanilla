@@ -5,8 +5,8 @@
  * @license GPL-2.0-only
  */
 
-import isPlainObject from "lodash/isPlainObject";
-import mergeWith from "lodash/mergeWith";
+import isPlainObject from "lodash-es/isPlainObject";
+import mergeWith from "lodash-es/mergeWith";
 
 /**
  * A simple, fast method of hashing a string. Similar to Java's hash function.

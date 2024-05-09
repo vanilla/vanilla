@@ -111,6 +111,9 @@ export interface IGetDiscussionListParams {
     layoutViewType?: LayoutViewType;
     categoryID?: number;
     categoryUrlCode?: string;
+    dateInserted?: string;
+    dateLastComment?: string;
+    hasComments?: boolean;
 }
 
 export enum DiscussionListSortOptions {

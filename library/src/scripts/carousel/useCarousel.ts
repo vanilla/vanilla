@@ -6,7 +6,7 @@
 
 import { containerVariables } from "@library/layout/components/containerStyles";
 import { bindActionCreators, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import clamp from "lodash/clamp";
+import clamp from "lodash-es/clamp";
 import { useReducer, useMemo, useEffect, useDebugValue } from "react";
 import { useSwipeable } from "react-swipeable";
 interface CarouselState {

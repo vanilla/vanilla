@@ -5,6 +5,7 @@
  */
 
 import { cx } from "@emotion/css";
+import Translate from "@library/content/Translate";
 import Checkbox from "@library/forms/Checkbox";
 import CheckboxGroup from "@library/forms/CheckboxGroup";
 import ErrorMessages from "@library/forms/ErrorMessages";
@@ -18,7 +19,7 @@ import { getMeta } from "@library/utility/appUtils";
 import { ICategoryPreferences } from "@vanilla/addon-vanilla/categories/categoriesTypes";
 import { t } from "@vanilla/i18n";
 import { Icon } from "@vanilla/icons";
-import omit from "lodash/omit";
+import omit from "lodash-es/omit";
 import React, { useEffect, useMemo, useState } from "react";
 import { Column, Row, useTable } from "react-table";
 
@@ -77,14 +78,14 @@ export function CategoryPreferencesTable(props: IProps) {
             {
                 popup: props.preferences["preferences.popup.posts"],
                 ...(emailEnabled && { email: props.preferences["preferences.email.posts"] }),
-                description: `Notify ${subject} of new posts`,
+                description: <Translate source={"Notify <0/> of new posts"} c0={subject} />,
                 id: "posts",
                 error: preferenceError,
             },
             {
                 popup: props.preferences["preferences.popup.comments"],
                 ...(emailEnabled && { email: props.preferences["preferences.email.comments"] }),
-                description: `Notify ${subject} of new comments`,
+                description: <Translate source={"Notify <0/> of new comments"} c0={subject} />,
                 id: "comments",
                 error: preferenceError,
             },
@@ -192,8 +193,7 @@ export function CategoryPreferencesTable(props: IProps) {
                         className={classes.checkBox}
                     />
                     <Checkbox
-                        // TODO: Make two locale strings for this and others like this
-                        label={t(`Notify ${subject} of new content`)}
+                        label={<Translate source={"Notify <0/> of new content"} c0={subject} />}
                         labelBold={false}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                             setNotificationPreferenceTableVisibility(event.target.checked);

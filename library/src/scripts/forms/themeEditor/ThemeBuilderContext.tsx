@@ -7,10 +7,10 @@ import React, { useMemo, useContext, useState, useDebugValue, useRef } from "rea
 import { IThemeVariables } from "@library/theming/themeReducer";
 import { globalVariables } from "@library/styles/globalStyleVars";
 import { buttonVariables, buttonGlobalVariables } from "@library/forms/Button.variables";
-import get from "lodash/get";
-import set from "lodash/set";
-import cloneDeep from "lodash/cloneDeep";
-import unset from "lodash/unset";
+import get from "lodash-es/get";
+import set from "lodash-es/set";
+import cloneDeep from "lodash-es/cloneDeep";
+import unset from "lodash-es/unset";
 import { bannerVariables } from "@library/banner/Banner.variables";
 import { titleBarVariables } from "@library/headers/TitleBar.variables";
 import { contentBannerVariables } from "@library/banner/contentBannerStyles";

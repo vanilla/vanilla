@@ -3,30 +3,31 @@
  * @license GPL-2.0-only
  */
 
-import { registerLayoutPage } from "@library/features/Layout/LayoutPage";
+import { registerLayoutPage } from "@library/features/Layout/LayoutPage.registry";
 import { getMeta, getSiteSection } from "@library/utility/appUtils";
 import { registerDiscussionThreadPage } from "@vanilla/addon-vanilla/thread/registerDiscussionThreadPage";
 import QueryStringParams from "qs";
 
 const discussionThreadEnabled = getMeta("featureFlags.customLayout.discussionThread.Enabled", false);
-
-registerLayoutPage("/discussions", (routeParams) => {
-    const { location } = routeParams;
-    const urlQuery = QueryStringParams.parse(location.search.substring(1));
-
-    return {
-        layoutViewType: "discussionList",
-        recordType: "siteSection",
-        recordID: getSiteSection().sectionID,
-        params: {
-            siteSectionID: getSiteSection().sectionID,
-            locale: getSiteSection().contentLocale,
-            ...urlQuery,
-        },
-    };
-});
-
+const discussionListEnabled = getMeta("featureFlags.customLayout.discussionList.Enabled", false);
 const categoryListEnabled = getMeta("featureFlags.customLayout.categoryList.Enabled", false);
+
+discussionListEnabled &&
+    registerLayoutPage("/discussions", (routeParams) => {
+        const { location } = routeParams;
+        const urlQuery = QueryStringParams.parse(location.search.substring(1));
+
+        return {
+            layoutViewType: "discussionList",
+            recordType: "siteSection",
+            recordID: getSiteSection().sectionID,
+            params: {
+                siteSectionID: getSiteSection().sectionID,
+                locale: getSiteSection().contentLocale,
+                ...urlQuery,
+            },
+        };
+    });
 
 /**
  * Register Categories Page

@@ -1,15 +1,16 @@
 /**
  * @author Maneesh Chiba <maneesh.chiba@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license Proprietary
  */
 
-import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useRef } from "react";
 import { tableClasses } from "./Table.styles";
 import {
     Column,
     HeaderGroup,
     Row,
+    SortByFn,
     TableInstance,
     useColumnOrder,
     usePagination,
@@ -91,7 +92,7 @@ const TableHeader = (props: ITableHeaderProps) => {
                                     >
                                         {column.render("Header")}
                                     </ConditionalWrap>
-                                    <Icon icon={column.isSortedDesc ? "data-up" : "data-down"} />
+                                    <Icon icon={column.isSortedDesc ? "data-down" : "data-up"} />
                                 </ConditionalWrap>
                             </th>
                         );
@@ -162,7 +163,7 @@ export interface ISortOption {
 
 interface ICustomCellRender {
     columnName: string[];
-    component: ReactNode;
+    component: ReactNode | ((props: TableInstance<{}>) => ReactNode);
 }
 
 export interface ITableProps {
@@ -171,6 +172,9 @@ export interface ITableProps {
     sortable?: boolean;
     columnsNotSortable?: string[];
     customColumnSort?: ISortOption;
+    customSortByFnPerColumn?: Record<string, SortByFn<any>>;
+    onSortChange?: (sortOptions) => void;
+    initialSortBy?: ISortOption[];
     paginate?: boolean;
     pageSize?: number;
     customCellRenderer?: ICustomCellRender[];
@@ -190,6 +194,9 @@ export const Table = (props: ITableProps) => {
         sortable,
         columnsNotSortable,
         customColumnSort,
+        customSortByFnPerColumn,
+        onSortChange,
+        initialSortBy,
         paginate,
         pageSize,
         customCellRenderer,
@@ -232,6 +239,10 @@ export const Table = (props: ITableProps) => {
                             }
                             return row.original[key];
                         },
+                        ...(Object.keys(customSortByFnPerColumn ?? {}).includes(key) && {
+                            sortType: customSortByFnPerColumn?.[key],
+                        }),
+                        sortDescFirst: true,
                         ...customCell,
                     };
                 });
@@ -267,6 +278,9 @@ export const Table = (props: ITableProps) => {
         {
             columns: memoizedColumns,
             data: memoizedData,
+            initialState: {
+                sortBy: initialSortBy ?? [],
+            },
         },
         useColumnOrder,
         useSortBy,
@@ -300,6 +314,13 @@ export const Table = (props: ITableProps) => {
         }
     }, [setSortBy, customColumnSort]);
 
+    // Listen to sort changes
+    useEffect(() => {
+        if (onSortChange) {
+            onSortChange(state.sortBy);
+        }
+    }, [state.sortBy, onSortChange]);
+
     // Enable pagination
     useEffect(() => {
         if (pageSize && pageSize > 0) {
@@ -322,7 +343,7 @@ export const Table = (props: ITableProps) => {
         <>
             <TableWrap
                 condition={paginate}
-                wrapper={(children: React.ReactChildren) => (
+                wrapper={(children: React.ReactNode) => (
                     <section ref={wrapperRef} className={classes.layoutWrap}>
                         {children}
                     </section>
@@ -330,7 +351,7 @@ export const Table = (props: ITableProps) => {
             >
                 <TableWrap
                     condition={paginate}
-                    wrapper={(children: React.ReactChildren) => (
+                    wrapper={(children: React.ReactNode) => (
                         <section className={classes.tableWrap}>
                             <Scrollbars
                                 style={{ width: "100%", height: "100%" }}
@@ -365,7 +386,7 @@ export const Table = (props: ITableProps) => {
                 {showPaginationControls && (
                     <TableWrap
                         condition={paginate}
-                        wrapper={(children: React.ReactChildren) => (
+                        wrapper={(children: React.ReactNode) => (
                             <section className={classes.paginationWrap}>{children}</section>
                         )}
                     >

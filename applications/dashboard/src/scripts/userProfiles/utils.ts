@@ -13,7 +13,7 @@ import {
     ProfileFieldVisibility,
     ProfileFieldRegistrationOptions,
 } from "@dashboard/userProfiles/types/UserProfiles.types";
-import pick from "lodash/pick";
+import pick from "lodash-es/pick";
 
 const DATA_TYPE_AND_FORM_TYPE_MAP: { [index in `${ProfileFieldType}`]: Pick<ProfileField, "dataType" | "formType"> } = {
     [ProfileFieldType.TEXT_INPUT]: {

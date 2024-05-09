@@ -6,6 +6,7 @@
     "version": "3.0.1",
     "peerDependencies": {
         "@emotion/css": "*",
+        "@vanilla/utils": "*",
         "react": "*"
     },
     "publishConfig": {

@@ -13,8 +13,6 @@ import { LoadStatus } from "@library/@types/api/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { setMeta } from "@library/utility/appUtils";
 
-jest.setTimeout(100000);
-
 const queryClient = new QueryClient();
 
 beforeAll(() => {

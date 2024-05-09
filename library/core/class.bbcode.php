@@ -7,12 +7,15 @@
 use Garden\EventManager;
 use Nbbc\BBCode as Nbbc;
 use Vanilla\EmbeddedContent\EmbedConfig;
+use Vanilla\Logging\ErrorLogger;
 
 /**
  * A wrapper around Nbbc\BBCode with some custom configuration.
  */
 class BBCode extends Gdn_Pluggable
 {
+    const ERROR_HTML = "<p>There was an error rendering this BBCode post</p>";
+
     /**
      * @var array A list of records from the Media table, indexed by MediaID.
      */
@@ -309,7 +312,18 @@ class BBCode extends Gdn_Pluggable
     {
         $bbcode = str_replace(["[CODE]", "[/CODE]"], ["[code]", "[/code]"], $bbcode);
 
-        return @$this->nbbc()->parse($bbcode);
+        try {
+            return @$this->nbbc()->parse($bbcode);
+        } catch (\Throwable $e) {
+            ErrorLogger::notice(
+                "BBCode parsing error: {$e->getMessage()}",
+                ["bbcode"],
+                [
+                    "exception" => $e,
+                ]
+            );
+            return self::ERROR_HTML;
+        }
     }
 
     /**

@@ -61,6 +61,11 @@ const iconData = Object.fromEntries(
                 const [key, value] = item.split(":");
                 return { ...acc, [key]: value };
             }, {});
+
+            if (attrs.strokewidth) {
+                attrs.strokeWidth = attrs.strokewidth;
+                delete attrs.strokewidth;
+            }
         }
 
         return [iconName, attrs];

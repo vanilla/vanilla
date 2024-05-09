@@ -1206,6 +1206,26 @@ class TagModel extends Gdn_Model
     }
 
     /**
+     * Check if TagIDs exist
+     *
+     * @param array $tagIDs
+     * @return bool
+     *
+     * @throws Exception
+     */
+    public static function validateTagIDsExist(array $tagIDs): bool
+    {
+        $validTags = Gdn::database()
+            ->sql()
+            ->select("*")
+            ->from("Tag")
+            ->where("TagID", $tagIDs)
+            ->get()
+            ->resultArray();
+        return count($tagIDs) == count($validTags);
+    }
+
+    /**
      *
      *
      * @param $type

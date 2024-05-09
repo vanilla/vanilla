@@ -6,7 +6,7 @@
  */
 
 import gdn from "@library/gdn";
-import { logError, PromiseOrNormalCallback, RecordID } from "@vanilla/utils";
+import { globalValueRef, logError, PromiseOrNormalCallback, RecordID } from "@vanilla/utils";
 import { ensureScript } from "@vanilla/dom-utils";
 import { sprintf } from "sprintf-js";
 
@@ -269,11 +269,7 @@ export function themeAsset(path: string): string {
     return assetUrl(`/themes/${themeKey}/${path}`);
 }
 
-/**
- * @type {Array}
- * @private
- */
-const _readyHandlers: PromiseOrNormalCallback[] = [];
+const _readyHandlersRef = globalValueRef<PromiseOrNormalCallback[]>("readyHandlers", []);
 
 /**
  * Register a callback that executes when the document and the core libraries are ready to use.
@@ -281,7 +277,7 @@ const _readyHandlers: PromiseOrNormalCallback[] = [];
  * @param callback - The function to call. This can return a Promise but doesn't have to.
  */
 export function onReady(callback: PromiseOrNormalCallback) {
-    _readyHandlers.push(callback);
+    _readyHandlersRef.current().push(callback);
 }
 
 /**
@@ -291,7 +287,7 @@ export function onReady(callback: PromiseOrNormalCallback) {
  */
 export function _executeReady(before?: () => void | Promise<void>): Promise<any[]> {
     return new Promise((resolve) => {
-        const handlerPromises = _readyHandlers.map((handler) => {
+        const handlerPromises = _readyHandlersRef.current().map((handler) => {
             let result = handler();
             if (result instanceof Promise) {
                 result.catch((err) => logError(err));

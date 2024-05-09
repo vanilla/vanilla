@@ -4,14 +4,12 @@
  * @license GPL-2.0-only
  */
 
-import React from "react";
-import { storiesOf } from "@storybook/react";
-import { StoryHeading } from "@library/storybook/StoryHeading";
-import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import { CategoryIcon } from "@library/icons/common";
+import Breadcrumbs from "@library/navigation/Breadcrumbs";
 import LocationBreadcrumbs from "@library/navigation/LocationBreadcrumbs";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { STORY_CRUMBS } from "@library/storybook/storyData";
+import { StoryHeading } from "@library/storybook/StoryHeading";
 
 export default {
     title: "Navigation/Breadcrumbs",

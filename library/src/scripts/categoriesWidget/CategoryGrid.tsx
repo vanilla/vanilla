@@ -17,7 +17,7 @@ import { groupCategoryItems } from "@library/categoriesWidget/CategoriesWidget.u
 import CategoryItem, { ICategoryItem, ICategoryItemOptions } from "@library/categoriesWidget/CategoryItem";
 import Heading from "@library/layout/Heading";
 import { homeWidgetItemClasses, homeWidgetItemVariables } from "@library/homeWidget/HomeWidgetItem.styles";
-import cloneDeep from "lodash/cloneDeep";
+import cloneDeep from "lodash-es/cloneDeep";
 import { cx } from "@emotion/css";
 import { BorderType } from "@library/styles/styleHelpersBorders";
 

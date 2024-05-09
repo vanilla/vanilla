@@ -9,7 +9,7 @@ import { TypePlacesIcon } from "@library/icons/searchIcons";
 import { IPlacesSearchResult, ISearchForm } from "@library/search/searchTypes";
 import { IPlacesSearchTypes } from "@dashboard/components/panels/placesSearchTypes";
 import PlacesSearchFilterPanel from "@dashboard/components/panels/PlacesSearchFilterPanel";
-import flatten from "lodash/flatten";
+import flatten from "lodash-es/flatten";
 import { PlacesSearchTypeFilter } from "@dashboard/components/panels/PlacesSearchTypeFilter";
 import { ResultMeta } from "@library/result/ResultMeta";
 import SearchDomain from "@library/search/SearchDomain";

@@ -43,26 +43,25 @@ export class CommentFixture {
             },
         });
 
-        await act(async () => {
-            render(
-                <TestReduxProvider
-                    state={{
-                        users: {
-                            current: {
-                                status: LoadStatus.SUCCESS,
-                                data: {
-                                    ...UserFixture.createMockUser({ userID: 1 }),
-                                    countUnreadNotifications: 0,
-                                    countUnreadConversations: 0,
-                                },
+        render(
+            <TestReduxProvider
+                state={{
+                    users: {
+                        current: {
+                            status: LoadStatus.SUCCESS,
+                            data: {
+                                ...UserFixture.createMockUser({ userID: 1 }),
+                                countUnreadNotifications: 0,
+                                countUnreadConversations: 0,
                             },
                         },
-                        ...options?.state,
-                    }}
-                >
-                    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-                </TestReduxProvider>,
-            );
-        });
+                    },
+                    ...options?.state,
+                }}
+            >
+                <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+            </TestReduxProvider>,
+        );
+        await vi.dynamicImportSettled();
     };
 }

@@ -5,7 +5,7 @@
 
 import { DeepPartial } from "redux";
 import { ICoreStoreState } from "@library/redux/reducerRegistry";
-import merge from "lodash/merge";
+import merge from "lodash-es/merge";
 import { INITIAL_USERS_STATE } from "@library/features/users/userModel";
 import { INITIAL_LOCALE_STATE } from "@library/locales/localeReducer";
 import { INITIAL_THEME_STATE } from "@library/theming/themeReducer";

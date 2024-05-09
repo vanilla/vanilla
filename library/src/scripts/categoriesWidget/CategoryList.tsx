@@ -15,8 +15,8 @@ import { cx } from "@emotion/css";
 import { HomeWidgetContainer } from "@library/homeWidget/HomeWidgetContainer";
 import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
 import { updateCategoryFollowCount } from "@library/categoriesWidget/CategoriesWidget.utils";
-import cloneDeep from "lodash/cloneDeep";
-import isEqual from "lodash/isEqual";
+import cloneDeep from "lodash-es/cloneDeep";
+import isEqual from "lodash-es/isEqual";
 
 export function CategoryList(props: ICategoriesWidgetProps) {
     const classes = categoryListClasses();

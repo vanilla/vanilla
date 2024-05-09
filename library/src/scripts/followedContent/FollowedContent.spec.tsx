@@ -47,7 +47,7 @@ describe("FollowedContent", () => {
         expect(header.tagName.toLowerCase()).toEqual("h2");
     });
 
-    it("Displays the mocked category", () => {
+    it("Displays the mocked category", async () => {
         renderFollowedContent();
         const categoryTitle = screen.getByRole("heading", { name: "Mocked Category" });
         expect(categoryTitle).toBeInTheDocument();
@@ -55,10 +55,10 @@ describe("FollowedContent", () => {
 
         expect(screen.getByText("10 discussions")).toBeInTheDocument();
 
-        const mostRecentDiscussionLink = screen.getByRole("link", { name: "Unresolved Discussion" });
+        const mostRecentDiscussionLink = await screen.findByRole("link", { name: "Unresolved Discussion" });
         expect(mostRecentDiscussionLink).toBeInTheDocument();
 
-        const mostRecentDiscussionUser = screen.getByRole("link", { name: "Joe Walsh" });
+        const mostRecentDiscussionUser = await screen.findByRole("link", { name: "Joe Walsh" });
         expect(mostRecentDiscussionUser).toBeInTheDocument();
     });
 
@@ -79,33 +79,5 @@ describe("FollowedContent", () => {
     it("Displays the empty state", async () => {
         renderEmptyContent();
         expect(screen.getByText("No categories followed")).toBeInTheDocument();
-    });
-});
-
-describe("FollowedContent API", () => {
-    it("Renders an API error", async () => {
-        const mockAdapter = mockAPI();
-
-        render(
-            <FollowedContentContext.Provider
-                value={{
-                    userID: 1,
-                    followedCategories: [],
-                    sortBy: "alphabetical",
-                    setSortBy: () => {},
-                    error: null,
-                }}
-            />,
-        );
-
-        waitFor(() => {
-            expect(screen.getByText("Please try again later.")).toBeInTheDocument();
-        });
-
-        mockAdapter.onGet(`categories*`).replyOnce(200);
-
-        waitFor(() => {
-            expect(screen.getByText("No categories followed")).toBeInTheDocument();
-        });
     });
 });

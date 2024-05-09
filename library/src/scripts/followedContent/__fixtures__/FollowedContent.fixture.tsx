@@ -10,10 +10,10 @@ import { UserFixture } from "@library/features/__fixtures__/User.fixture";
 import { TestReduxProvider } from "@library/__tests__/TestReduxProvider";
 import { FollowedContentContext } from "@library/followedContent/FollowedContentContext";
 import { CategoryDisplayAs, CategoryPostNotificationType } from "@vanilla/addon-vanilla/categories/categoriesTypes";
-import { fakeDiscussions } from "@library/features/discussions/DiscussionList.story";
 import { STORY_USER } from "@library/storybook/storyData";
 import { CategorySortOption } from "@dashboard/@types/api/category";
 import { CategoryPreferencesFixture } from "@dashboard/userPreferences/__fixtures__/CategoryNotificationPreferences.Fixture";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 
 export const mockedCategories = [
     {
@@ -42,8 +42,8 @@ export const mockedCategories = [
             "preferences.followed": true,
         },
         lastPost: {
-            ...fakeDiscussions[0],
-            lastUser: STORY_USER,
+            ...DiscussionFixture.fakeDiscussions[0],
+            insertUser: STORY_USER,
         },
     },
 ];

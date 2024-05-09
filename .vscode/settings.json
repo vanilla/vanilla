@@ -10,7 +10,9 @@
         "**/node_modules": false,
         "**/bower_components": true,
         "**/.phpunit.result.cache": true,
-        ".htaccess.dist": true
+        ".htaccess.dist": true,
+        "build/.cache": true,
+        ".swc": true,
     },
     "search.exclude": {
         "**/.git": true,
@@ -151,7 +153,8 @@
         "plugins/vfoptions": true,
         "plugins/vanilla-ai": true,
         "plugins/webhooks": true,
-        "plugins/zapier": true
+        "plugins/zapier": true,
+        "plugins/zoom": true,
     },
     "[json]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -192,20 +195,13 @@
     ],
     "editor.wordWrapColumn": 120,
     "typescript.preferences.autoImportFileExcludePatterns": [
-        "jquery*"
+        "jquery*",
+        "vitest/dist/*"
     ],
     "php.suggest.basic": false,
     "files.associations": {
         "*.jsx": "javascriptreact",
         "*.tpl": "html"
     },
-    "jest.runMode": "on-demand",
-    "jest.coverageFormatter": "GutterFormatter",
-    "typescript.tsdk": "node_modules/typescript/lib",
-    "jest.outputConfig": {
-        "revealOn": "run",
-        "revealWithFocus": "test-results",
-        "clearOnRun": "none"
-    },
-    "jest.jestCommandLine": "JEST=true node --preserve-symlinks --preserve-symlinks-main node_modules/.bin/jest",
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

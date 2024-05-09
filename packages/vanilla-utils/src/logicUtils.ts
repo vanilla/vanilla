@@ -4,7 +4,7 @@
  * @license gpl-2.0-only
  */
 
-import set from "lodash/set";
+import set from "lodash-es/set";
 import { ColorHelper, color } from "csx";
 
 export function spaceshipCompare(a, b): number {

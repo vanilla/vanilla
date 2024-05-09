@@ -41,7 +41,7 @@ export const stackableTableClasses = useThemeCache((actionsColumnWidth?: number)
     const compactActionsColumn = {
         width: actionsColumnWidth,
         minWidth: actionsColumnWidth,
-        paddingLeft: 0,
+        // paddingLeft: 0,
     };
 
     const tableRow = css({
@@ -89,7 +89,7 @@ export const stackableTableClasses = useThemeCache((actionsColumnWidth?: number)
             },
         },
         "& td:last-child": {
-            paddingRight: 18,
+            // paddingRight: 18,
             justifyContent: "flex-end",
         },
         "& td:not(:first-child)": {

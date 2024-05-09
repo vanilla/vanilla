@@ -1,14 +1,16 @@
-import React from "react";
-import { storiesOf } from "@storybook/react";
+/**
+ * @author Adam Charron <adam.c@vanillaforums.com>
+ * @copyright 2009-2024 Vanilla Forums Inc.
+ * @license gpl-2.0-only
+ */
+
+import { DashboardPager } from "@dashboard/components/DashboardPager";
 import { dashboardCssDecorator } from "@dashboard/__tests__/dashboardCssDecorator";
-import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryContent } from "@library/storybook/StoryContent";
+import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
 import { StoryTileAndTextCompact } from "@library/storybook/StoryTileAndTextCompact";
-import Button from "@library/forms/Button";
 import { StoryTiles } from "@library/storybook/StoryTiles";
-import { StoryTileAndText } from "@library/storybook/StoryTileAndText";
-import { DashboardPager } from "@dashboard/components/DashboardPager";
 
 export default {
     title: "Dashboard/Legacy",

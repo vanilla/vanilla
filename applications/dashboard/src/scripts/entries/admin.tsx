@@ -42,6 +42,7 @@ import UserManagementSpoof from "@dashboard/users/userManagement/UserManagementS
 import ToggleInputInLegacyForm from "@library/forms/ToggleInputInLegacyForm";
 import { ExternalSearchSettingsPage } from "@dashboard/pages/ExternalSearchSettingsPage";
 import { MemoryRouter } from "react-router";
+import { RouterRegistry } from "@library/Router.registry";
 
 // Expose some new module functions to our old javascript system.
 window.escapeHTML = escapeHTML;
@@ -80,7 +81,7 @@ applySharedPortalContext((props) => {
         }
     }, [setNavHeight]);
     return (
-        <AppContext variablesOnly errorComponent={ErrorPage}>
+        <AppContext variablesOnly errorComponent={<ErrorPage />}>
             <ScrollOffsetContext.Provider value={{ ...SCROLL_OFFSET_DEFAULTS, scrollOffset: navHeight }}>
                 <TextEditorContextProvider>{props.children}</TextEditorContextProvider>
             </ScrollOffsetContext.Provider>
@@ -90,7 +91,7 @@ applySharedPortalContext((props) => {
 
 registerReducer(dashboardSectionSlice.name, dashboardSectionSlice.reducer);
 
-Router.addRoutes(getDashboardRoutes());
+RouterRegistry.addRoutes(getDashboardRoutes());
 
 // Routing
 addComponent("App", () => {

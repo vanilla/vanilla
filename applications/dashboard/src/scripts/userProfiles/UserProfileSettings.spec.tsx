@@ -32,10 +32,8 @@ describe("UserProfileSettings", () => {
                 <UserProfileSettings />
             </TestReduxProvider>,
         );
-        waitFor(() => {
-            expect(screen.findByText(/User Profile/)).toBeInTheDocument();
-            expect(screen.findByText(/"Profile" redirection URL/)).toBeInTheDocument();
-            expect(screen.findByText(/"New Message" redirection URL/)).toBeInTheDocument();
-        });
+        expect(screen.getByText(/User Profile/)).toBeInTheDocument();
+        expect(screen.getByText(/"Profile" redirection URL/)).toBeInTheDocument();
+        expect(screen.getByText(/"New Message" redirection URL/)).toBeInTheDocument();
     });
 });

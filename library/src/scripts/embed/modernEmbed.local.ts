@@ -9,7 +9,7 @@
 import { EmbedEvent } from "@library/embed/embedEvents";
 import { getMeta, siteUrl } from "@library/utility/appUtils";
 import { delegateEvent, removeDelegatedEvent } from "@vanilla/dom-utils";
-import debounce from "lodash/debounce";
+import debounce from "lodash-es/debounce";
 
 /**
  * Initalization of our modern embed.
@@ -26,16 +26,20 @@ export function initModernEmbed() {
 
     const forceEmbed = getMeta("embed.forceModernEmbed");
     const inIframe = window.top !== window.self;
-    if (!inIframe && forceEmbed) {
-        // Force embed is on and someone is visiting directly through the embed.
-        const bypassEmbed = getBypassEmbed();
+    if (!inIframe) {
+        if (forceEmbed) {
+            // Force embed is on and someone is visiting directly through the embed.
+            const bypassEmbed = getBypassEmbed();
 
-        const fullRemoteUrl = new URL(remoteUrl);
-        if (!bypassEmbed && fullRemoteUrl.host !== window.location.host) {
-            // We don't have an embed bypass and the host is different.
-            // Redirect the user to the embed site.
-            fullRemoteUrl.hash = `${escape(window.location.href)}`;
-            window.location.href = fullRemoteUrl.toString();
+            const fullRemoteUrl = new URL(remoteUrl);
+            if (!bypassEmbed && fullRemoteUrl.host !== window.location.host) {
+                // We don't have an embed bypass and the host is different.
+                // Redirect the user to the embed site.
+                fullRemoteUrl.hash = `${escape(window.location.href)}`;
+                window.location.href = fullRemoteUrl.toString();
+                return null;
+            }
+        } else {
             return null;
         }
     }

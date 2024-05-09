@@ -10,7 +10,7 @@ use Garden\Schema\Schema;
 use Vanilla\EmbeddedContent\AbstractEmbed;
 use Vanilla\EmbeddedContent\EmbedUtils;
 use Vanilla\Web\Asset\AssetPreloader;
-use Vanilla\Web\Asset\ExternalAsset;
+use Vanilla\Web\Asset\WebAsset;
 
 /**
  * Embed data object for Instagram.
@@ -29,7 +29,7 @@ class InstagramEmbed extends AbstractEmbed
         parent::__construct($data);
 
         EmbedUtils::getPreloadModel()->addScript(
-            new ExternalAsset(self::JS_SCRIPT),
+            new WebAsset(self::JS_SCRIPT),
             AssetPreloader::REL_PRELOAD,
             "instagram-embed-script-asset"
         );

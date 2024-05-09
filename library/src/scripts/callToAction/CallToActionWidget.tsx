@@ -17,9 +17,10 @@ interface IProps {
     textColor?: string;
     borderType?: BorderType;
     button?: {
-        title: string;
+        title?: string;
         type?: Partial<ButtonTypes>;
-        url: string;
+        url?: string;
+        shouldUseButton: boolean;
     };
     secondButton?: {
         title: string;
@@ -38,6 +39,7 @@ export default function CallToActionWidget(props: IProps) {
     return (
         <CallToAction
             to={props.button?.url ?? ""}
+            shouldUseButton={props.button?.shouldUseButton ?? true}
             textCTA={(props.button?.title as string) ?? ""}
             title={props.title}
             description={props.description ?? ""}

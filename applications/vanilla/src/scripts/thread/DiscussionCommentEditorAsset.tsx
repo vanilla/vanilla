@@ -26,9 +26,10 @@ import { discussionCommentEditorClasses } from "@vanilla/addon-vanilla/thread/Di
 import { DraftsApi } from "@vanilla/addon-vanilla/thread/DraftsApi";
 import { t } from "@vanilla/i18n";
 import { logError, RecordID } from "@vanilla/utils";
-import isEqual from "lodash/isEqual";
+import isEqual from "lodash-es/isEqual";
 import React, { useEffect, useRef, useState } from "react";
 import { IComment } from "@dashboard/@types/api/comment";
+import { IError } from "@library/errorPages/CoreErrorMessages";
 
 interface IDraftProps {
     draftID: number;
@@ -108,7 +109,7 @@ export function DiscussionCommentEditorAsset(props: IProps) {
                 format: data.attributes.format,
             });
         },
-        onError(error) {
+        onError(error: IError) {
             addToast({
                 body: error,
                 autoDismiss: false,

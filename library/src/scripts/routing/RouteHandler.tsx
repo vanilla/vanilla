@@ -55,7 +55,7 @@ export default class RouteHandler<GeneratorProps> {
     public Link = (props: Omit<NavLinkProps, "to"> & { data: GeneratorProps }) => {
         return (
             <Hoverable duration={50} onHover={this.preload}>
-                {(provided) => <SmartLink {...provided} {...props} to={this.url(props.data)} />}
+                {(provided) => <SmartLink {...(provided as any)} {...(props as any)} to={this.url(props.data)} />}
             </Hoverable>
         );
     };

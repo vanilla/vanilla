@@ -23,8 +23,9 @@ import { ToolTip } from "@library/toolTip/ToolTip";
 import { SelectTags } from "@library/features/discussions/filters/SelectTags";
 import { SelectStatuses } from "@library/features/discussions/filters/SelectStatuses";
 import { SelectTypes } from "@library/features/discussions/filters/SelectTypes";
-import { SelectInternalStatus } from "./SelectInternalStatus";
+import { SelectInternalStatus } from "@library/features/discussions/filters/SelectInternalStatus";
 import { usePermissionsContext } from "@library/features/users/PermissionsContext";
+import SelectCommentStatus from "@library/features/discussions/filters/SelectCommentStatus";
 
 interface IProps {
     apiParams: IGetDiscussionListParams;
@@ -37,6 +38,7 @@ interface IFilterFormValues {
     tagID: string;
     statusID: number[];
     internalStatusID: number[];
+    hasComments: boolean | undefined;
 }
 
 const DEFAULT_FILTER_VALUES: IFilterFormValues = {
@@ -44,6 +46,7 @@ const DEFAULT_FILTER_VALUES: IFilterFormValues = {
     tagID: "",
     internalStatusID: [],
     statusID: [],
+    hasComments: undefined,
 };
 
 export function DiscussionListFilter(props: IProps) {
@@ -80,6 +83,7 @@ export function DiscussionListFilter(props: IProps) {
             tagID: apiParams.tagID ?? DEFAULT_FILTER_VALUES.tagID,
             internalStatusID: apiParams.internalStatusID ?? DEFAULT_FILTER_VALUES.internalStatusID,
             statusID: apiParams.statusID ?? DEFAULT_FILTER_VALUES.statusID,
+            hasComments: apiParams.hasComments ?? DEFAULT_FILTER_VALUES.hasComments,
         });
     }, [apiParams, setValues]);
 
@@ -135,11 +139,19 @@ export function DiscussionListFilter(props: IProps) {
                                     types={filterStatus}
                                 />
                                 {isCommunityManager && (
-                                    <SelectInternalStatus
-                                        value={values.internalStatusID}
-                                        onChange={(internalStatusID) => setValues({ ...values, internalStatusID })}
-                                        label={t("Resolution Status")}
-                                    />
+                                    <>
+                                        <SelectInternalStatus
+                                            value={values.internalStatusID}
+                                            onChange={(internalStatusID) => setValues({ ...values, internalStatusID })}
+                                            label={t("Resolution Status")}
+                                        />
+
+                                        <SelectCommentStatus
+                                            label={t("Post Engagement")}
+                                            value={values.hasComments}
+                                            onChange={(hasComments) => setValues({ ...values, hasComments })}
+                                        />
+                                    </>
                                 )}
                                 <SelectTags
                                     value={values.tagID}

@@ -1,6 +1,6 @@
 /**
  * @author Mihran Abrahamian <mihran.abrahamian@vanillaforums.com>
- * @copyright 2009-2022 Vanilla Forums Inc.
+ * @copyright 2009-2024 Vanilla Forums Inc.
  * @license gpl-2.0-only
  */
 
@@ -9,7 +9,6 @@ import {
     collapseSelection,
     focusEditor,
     getSelectionText,
-    isRangeAcrossBlocks,
     isSelectionExpanded,
     mergeProps,
     PlateEditor,
@@ -105,6 +104,23 @@ export const useFloatingMarkToolbar = ({
             enableOnContentEditable: true,
         },
         [open],
+    );
+
+    useHotkeys(
+        "ctrl+shift+i",
+        (e) => {
+            setOpen(true);
+            const menuItems = document.querySelectorAll(`[role="menuitem"]`);
+            if (menuItems.length > 0) {
+                const firstItem = menuItems[0] as HTMLElement;
+                firstItem.focus();
+            }
+        },
+        {
+            enabled: isEditorFocused,
+            enableOnContentEditable: true,
+        },
+        [],
     );
 
     useEffect(() => {

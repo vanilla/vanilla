@@ -9,7 +9,7 @@ import { StoryContent } from "@library/storybook/StoryContent";
 import { STORY_IPSUM_SHORT } from "@library/storybook/storyData";
 import { StoryHeading } from "@library/storybook/StoryHeading";
 import { StoryParagraph } from "@library/storybook/StoryParagraph";
-import { ComponentStory } from "@storybook/react";
+import { StoryObj } from "@storybook/react";
 import React, { useState } from "react";
 import { Toast } from "./Toast";
 
@@ -36,7 +36,7 @@ const StatefulToastStory = (props: React.ComponentProps<typeof Toast> & { showEx
     );
 };
 
-export const ToastStory: ComponentStory<any> = () => {
+export const ToastStory: StoryObj<any> = () => {
     return (
         <StoryContent>
             <StoryHeading>Always visible</StoryHeading>

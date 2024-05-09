@@ -8,7 +8,7 @@ import { LayoutRenderer } from "@library/features/Layout/LayoutRenderer";
 import { IHydratedLayoutWidget } from "@library/features/Layout/LayoutRenderer.types";
 import { WidgetLayout } from "@library/layout/WidgetLayout";
 import { registerLoadableWidgets } from "@library/utility/componentRegistry";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import React, { Suspense } from "react";
 import "@testing-library/jest-dom";
 
@@ -21,31 +21,31 @@ const mockLayout: IHydratedLayoutWidget[] = [
 
 function Faux() {
     return (
-        <Suspense fallback={"I am still loading"}>
-            <WidgetLayout>
-                <LayoutRenderer layout={mockLayout} />
-            </WidgetLayout>
-        </Suspense>
+        <WidgetLayout>
+            <LayoutRenderer fallback={<div data-testid="loading">I am still loading</div>} layout={mockLayout} />
+        </WidgetLayout>
     );
 }
 
 describe("registerLoadableWidgets", () => {
     beforeAll(() => {
         return registerLoadableWidgets({
-            LazyComponent: () => import("./__fixtures__/MockLazyComponent"),
+            LazyComponent: () =>
+                new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve(import("./__fixtures__/MockLazyComponent"));
+                    }, 500);
+                }),
         });
-    });
-
-    it("show fallback before lazy component loads", async () => {
-        render(<Faux />);
-        expect(screen.queryByText(/I am still loading/)).toBeInTheDocument();
     });
 
     it("loads the lazy component", async () => {
-        await act(async () => {
-            render(<Faux />);
-        });
-        const mockLazyWidget = await screen.findByText(/I am the lazy component/i);
-        expect(mockLazyWidget).toBeInTheDocument();
+        render(<Faux />);
+
+        const loading = await screen.findByTestId("loading");
+        const loaded = await screen.findByTestId("loaded");
+
+        expect(loaded).toBeInTheDocument();
+        expect(loading).not.toBeInTheDocument();
     });
 });

@@ -20,7 +20,7 @@ use Vanilla\Theme\Asset\TwigThemeAsset;
 use Vanilla\Web\Asset\AssetPreloader;
 use Vanilla\Web\Asset\AssetPreloadModel;
 use Vanilla\Web\Asset\DeploymentCacheBuster;
-use Vanilla\Web\Asset\ExternalAsset;
+use Vanilla\Web\Asset\WebAsset;
 use Vanilla\Web\Asset\ThemeScriptAsset;
 use Vanilla\Web\JsInterpop\ReduxAction;
 use Vanilla\Web\JsInterpop\ReduxActionProviderInterface;
@@ -293,7 +293,7 @@ class ThemePreloadProvider implements ReduxActionProviderInterface
         if ($variables instanceof JsonThemeAsset) {
             $bgImage = $variables->get("titleBar.colors.bgImage", null);
             if ($bgImage !== null) {
-                $asset = new ExternalAsset($bgImage);
+                $asset = new WebAsset($bgImage);
                 $preloader = new AssetPreloader($asset, AssetPreloader::REL_PRELOAD, AssetPreloader::AS_IMAGE);
                 $this->assetPreloader->addPreload($preloader);
             }

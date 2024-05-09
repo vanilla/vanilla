@@ -85,9 +85,10 @@ export function DigestScheduleImpl(props: {
                 <div style={{ width: "100%", marginInline: 18 }}>
                     <Message
                         icon={<InformationIcon />}
-                        stringContents={`The next three email digest delivery dates: ${
-                            isFetched ? upcomingDigestDates : ""
-                        }`}
+                        stringContents={
+                            t("The next three email digest delivery dates") +
+                            `: ${isFetched ? upcomingDigestDates : ""}`
+                        }
                         type="neutral"
                     />
                 </div>

@@ -5,14 +5,15 @@
 
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { fakeDiscussions } from "@library/features/discussions/DiscussionList.story";
 import { LoadStatus } from "@library/@types/api/core";
 import MoveDiscussionForm from "./MoveDiscussionForm";
 import { configureStore, createReducer } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
+import { vitest } from "vitest";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 
 const renderInProvider = () => {
-    const discussion = { ...fakeDiscussions[0], url: "/mockPath", name: "Mock Discussion" };
+    const discussion = { ...DiscussionFixture.fakeDiscussions[0], url: "/mockPath", name: "Mock Discussion" };
 
     const testReducer = createReducer(
         {
@@ -41,7 +42,7 @@ const renderInProvider = () => {
     const store = configureStore({ reducer: testReducer });
     render(
         <Provider store={store}>
-            <MoveDiscussionForm discussion={discussion} onCancel={jest.fn} />
+            <MoveDiscussionForm discussion={discussion} onCancel={vitest.fn} />
         </Provider>,
     );
 };

@@ -6,8 +6,8 @@
 
 import { useCallback, useContext, useDebugValue, useEffect, useMemo, useState } from "react";
 import { AxiosInstance } from "axios";
-import get from "lodash/get";
-import debounce from "lodash/debounce";
+import get from "lodash-es/get";
+import debounce from "lodash-es/debounce";
 import { t } from "@vanilla/i18n";
 import { logError, notEmpty } from "@vanilla/utils";
 import { IAutoCompleteOption, IAutoCompleteOptionProps } from "./AutoCompleteOption";
@@ -72,7 +72,11 @@ export function AutoCompleteLookupOptions(props: IAutoCompleteLookupProps) {
     useEffect(() => {
         if (!isLoading && options && setOptions) {
             setOptions([...options, ...(currentOptionOrOptions ?? [])]);
-            lookupResult && lookupResult(options);
+            try {
+                lookupResult && lookupResult(options);
+            } catch (err) {
+                logError("Failed to lookup autocomplete options", err);
+            }
         }
     }, [isLoading, setOptions, options, currentOptionOrOptions]);
 
@@ -158,24 +162,27 @@ export function useApiLookup(
             if ([initialValue].flat().length <= 1) {
                 const actualApiUrl = singleUrl.replace("/api/v2", "").replace("%s", initialValue);
 
-                api.get(actualApiUrl)
-                    .then((response) => {
-                        if (!isMounted()) {
-                            return;
-                        }
-                        if (response.data) {
-                            let options = [transformApiToOption(response.data)];
-                            if (processOptions) {
-                                options = processOptions(options);
+                // in some cases we don't have single url (e.g /profile-fields), so we need to check if it's empty
+                if (actualApiUrl !== "") {
+                    api.get(actualApiUrl)
+                        .then((response) => {
+                            if (!isMounted()) {
+                                return;
                             }
-                            apiCaches.set(actualApiUrl, options);
+                            if (response.data) {
+                                let options = [transformApiToOption(response.data)];
+                                if (processOptions) {
+                                    options = processOptions(options);
+                                }
+                                apiCaches.set(actualApiUrl, options);
 
-                            setInitialOptionsOrOption(options[0]);
-                        }
-                    })
-                    .catch((error) => {
-                        logError(error);
-                    });
+                                setInitialOptionsOrOption(options[0]);
+                            }
+                        })
+                        .catch((error) => {
+                            logError(error);
+                        });
+                }
             } else {
                 // query api for all options
                 const actualSearchUrl = searchUrl.replace("/api/v2", "").replace("%s", ""); //just get the options
@@ -268,7 +275,7 @@ export function useApiLookup(
     }, [updateOptions, currentInputValue]);
 
     useEffect(() => {
-        if (isMounted() && Array.isArray(currentValue)) {
+        if (isMounted() && Array.isArray(currentValue) && currentValue.length > 0) {
             updateOptions(currentValue, true);
         }
     }, [currentValue]);

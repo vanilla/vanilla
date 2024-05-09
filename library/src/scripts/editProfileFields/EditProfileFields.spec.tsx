@@ -15,16 +15,16 @@ import {
 } from "@dashboard/userProfiles/types/UserProfiles.types";
 import { transformUserProfileFieldsData } from "@library/editProfileFields/utils";
 import { mockAPI } from "@library/__tests__/utility";
+import MockAdapter from "axios-mock-adapter/types";
 
 const mockProfileFields = ProfileFieldsFixtures.mockProfileFields();
 
 describe("EditProfileForm", () => {
     let result: RenderResult;
 
-    const mockAdapter = mockAPI();
-
-    afterAll(() => {
-        mockAdapter.resetHistory();
+    let mockAdapter: MockAdapter;
+    beforeEach(() => {
+        mockAdapter = mockAPI();
     });
 
     const MockProfileFieldsProvider = ProfileFieldsFixtures.createMockProfileFieldsProvider({

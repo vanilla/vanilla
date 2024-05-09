@@ -8,8 +8,8 @@ import React from "react";
 import { FeaturedCollections } from "@library/featuredCollections/FeaturedCollections";
 import { storyWithConfig } from "@library/storybook/StoryContext";
 import { WidgetContainerDisplayType } from "@library/homeWidget/HomeWidgetContainer.styles";
-import { fakeDiscussions } from "@library/features/discussions/DiscussionList.story";
 import { CollectionRecordTypes, ICollection } from "@library/featuredCollections/Collections.variables";
+import { DiscussionFixture } from "@vanilla/addon-vanilla/thread/__fixtures__/Discussion.Fixture";
 
 export default {
     title: "Widgets/FeaturedCollections",
@@ -19,7 +19,7 @@ export default {
 export const fakeCollection: ICollection = {
     collectionID: 1,
     name: "Storybook Collection",
-    records: fakeDiscussions.map((record) => ({
+    records: DiscussionFixture.fakeDiscussions.map((record) => ({
         recordID: record.discussionID,
         recordType: CollectionRecordTypes.DISCUSSION,
         record,

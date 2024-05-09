@@ -18,7 +18,7 @@ describe("modernEmbed.remote - <vanilla-embed />", () => {
         const embed = new VanillaEmbedElement();
         expect(() => {
             embed.connectedCallback();
-        }).toThrowErrorMatchingInlineSnapshot(`"You must define a remote url"`);
+        }).toThrowErrorMatchingInlineSnapshot(`[Error: You must define a remote url]`);
     });
     it("constructs an iframe with a proper src url", () => {
         const embed = new VanillaEmbedElement();

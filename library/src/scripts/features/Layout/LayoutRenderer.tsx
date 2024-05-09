@@ -17,6 +17,7 @@ import { getComponent, IRegisteredComponent } from "@library/utility/componentRe
 import { logDebug } from "@vanilla/utils";
 import React, { useContext } from "react";
 import { isHydratedLayoutWidget } from "@library/features/Layout/LayoutRenderer.utils";
+import { LayoutOverviewSkeleton } from "@dashboard/layout/overview/LayoutOverviewSkeleton";
 
 export type IComponentFetcher = (name: string) => IRegisteredComponent | null;
 export type FallbackLayoutWidget = React.ComponentType<IHydratedLayoutWidget>;
@@ -27,6 +28,7 @@ interface IProps<T> {
     layout: Array<IHydratedLayoutWidget<T>>;
     layoutRef?: React.Ref<HTMLDivElement>;
     allowInternalProps?: boolean;
+    fallback?: React.ReactNode;
 }
 
 interface ILayoutLookupContext<T> {
@@ -78,7 +80,9 @@ function LayoutRendererImpl<T>(props: IProps<T> & ILayoutLookupContext<T>) {
                 const key = `${index}-${layout.length}`;
                 return (
                     <React.Fragment key={key}>
-                        {resolveDynamicComponent(componentConfig, layoutRenderContext, key)}
+                        <React.Suspense fallback={props.fallback ?? <LayoutOverviewSkeleton />}>
+                            {resolveDynamicComponent(componentConfig, layoutRenderContext, key)}
+                        </React.Suspense>
                     </React.Fragment>
                 );
             })}
@@ -140,12 +144,16 @@ function resolveDynamicComponent(
     let result: React.ReactNode = null;
     // Return an error boundary wrapped component
     if (registeredComponent) {
-        result = React.createElement(LayoutErrorBoundary, { key, componentName: componentConfig?.$reactComponent }, [
-            React.createElement(registeredComponent.Component, {
-                ...resolveNestedComponents(componentConfig.$reactProps, context),
-                key: key,
-            }),
-        ]);
+        result = React.createElement(
+            LayoutErrorBoundary,
+            { key: String(key), componentName: componentConfig?.$reactComponent },
+            [
+                React.createElement(registeredComponent.Component, {
+                    ...resolveNestedComponents(componentConfig.$reactProps, context),
+                    key: key,
+                }),
+            ],
+        );
     } else if (context.fallbackWidget) {
         result = React.createElement(
             context.fallbackWidget,

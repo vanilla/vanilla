@@ -205,6 +205,40 @@ class AttachmentsApiControllerTest extends SiteTestCase
     }
 
     /**
+     * Test that an attachment record with no saved status (as might be the case with old or corrupted records)
+     * doesn't throw, but is returned with a status of "unknown".
+     *
+     * @return void
+     */
+    public function testGettingAttachmentWithoutStatus(): void
+    {
+        $discussion = $this->createDiscussion();
+        $attachmentData = [
+            "Type" => "mock-issue",
+            "ForeignID" => "d-" . $discussion["discussionID"],
+            "ForeignUserID" => 2,
+            "Source" => "mock",
+            "SourceID" => "123",
+            "SourceURL" => "www.example.com/mockIssue/123",
+            "DateInserted" => "2024-01-01",
+            "InsertUserID" => 2,
+            "InsertIPAddress" => "::1",
+        ];
+
+        $database = $this->container()->get(\Gdn_Database::class);
+        $database->sql()->insert("Attachment", $attachmentData);
+
+        $attachments = $this->api()
+            ->get("/attachments", ["recordType" => "discussion", "recordID" => $discussion["discussionID"]])
+            ->getBody();
+
+        $this->assertCount(1, $attachments);
+
+        $attachment = $attachments[0];
+        $this->assertSame("unknown", $attachment["status"]);
+    }
+
+    /**
      * Test that getting attachments without the required permission throws an error.
      *
      * @return void
@@ -261,6 +295,10 @@ class AttachmentsApiControllerTest extends SiteTestCase
                 "title" => "Mock - Case",
                 "externalIDLabel" => "Mock #",
                 "logoIcon" => "logo-mock",
+                "name" => "Mock Provider",
+                "canEscalateOwnPost" => false,
+                "escalationDelayUnit" => null,
+                "escalationDelayLength" => 0,
             ],
         ];
         $response = $this->api()->get("/attachments/catalog");
